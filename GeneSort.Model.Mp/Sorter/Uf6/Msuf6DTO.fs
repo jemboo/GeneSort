@@ -1,0 +1,78 @@
+﻿
+namespace GeneSort.Model.Mp.Sorter.Uf6
+
+open System
+open FSharp.UMX
+open MessagePack
+open GeneSort.Sorter
+open GeneSort.Core.Mp.TwoOrbitUnfolder
+open GeneSort.Model.Sorter.Uf6
+open GeneSort.Model.Sorter
+
+[<MessagePackObject>]
+type Msuf6DTO =
+    { [<Key(0)>] Id: Guid
+      [<Key(1)>] SortingWidth: int
+      [<Key(2)>] TwoOrbitUnfolder6s: TwoOrbitUf6DTO array }
+    
+    static member Create(id: Guid, sortingWidth: int, twoOrbitUnfolder6s: TwoOrbitUf6DTO array) : Result<Msuf6DTO, string> =
+        if isNull twoOrbitUnfolder6s then
+            Error "TwoOrbitUnfolder6s array cannot be null"
+        else if twoOrbitUnfolder6s.Length < 1 then
+            Error $"Must have at least 1 TwoOrbitUnfolder6, got {twoOrbitUnfolder6s.Length}"
+        else if sortingWidth < 1 then
+            Error $"SortingWidth must be at least 1, got {sortingWidth}"
+        else
+            try
+                if twoOrbitUnfolder6s |> Array.exists (fun tou -> (tou |> TwoOrbitUf6DTO.getOrder) <> sortingWidth) then
+                    Error $"All TwoOrbitUnfolder6 must have order {sortingWidth}"
+                else
+                    Ok { Id = id
+                         SortingWidth = sortingWidth
+                         TwoOrbitUnfolder6s = twoOrbitUnfolder6s }
+            with
+            | :? ArgumentException as ex ->
+                Error ex.Message
+
+module Msuf6DTO =
+    type Msuf6DTOError =
+        | NullTwoOrbitUnfolder6sArray of string
+        | EmptyTwoOrbitUnfolder6sArray of string
+        | InvalidSortingWidth of string
+        | MismatchedTwoOrbitUnfolder6Order of string
+        | TwoOrbitUnfolder6ConversionError of TwoOrbitUf6DTO.TwoOrbitUf6DTOError
+
+    let toMsuf6DTO (msuf6: Msuf6) : Msuf6DTO =
+        { Id = %msuf6.Id
+          SortingWidth = %msuf6.SortingWidth
+          TwoOrbitUnfolder6s = msuf6.TwoOrbitUnfolder6s |> Array.map TwoOrbitUf6DTO.toTwoOrbitUf6DTO }
+
+    let toMsuf6 (dto: Msuf6DTO) : Result<Msuf6, Msuf6DTOError> =
+        let twoOrbitUnfolder6sResult = 
+            dto.TwoOrbitUnfolder6s 
+            |> Array.map TwoOrbitUf6DTO.toTwoOrbitUf6
+            |> Array.fold (fun acc res ->
+                match acc, res with
+                | Ok arr, Ok tou -> Ok (Array.append arr [|tou|])
+                | Ok _, Error e -> Error (TwoOrbitUnfolder6ConversionError e)
+                | Error e, _ -> Error e
+            ) (Ok [||])
+        match twoOrbitUnfolder6sResult with
+        | Error e -> Error e
+        | Ok twoOrbitUnfolder6s ->
+            try
+                let msuf6 = 
+                    Msuf6.create
+                        (UMX.tag<sorterModelID> dto.Id)
+                        (UMX.tag<sortingWidth> dto.SortingWidth)
+                        twoOrbitUnfolder6s
+                Ok msuf6
+            with
+            | :? ArgumentException as ex when ex.Message.Contains("TwoOrbitUnfolder6") && ex.Message.Contains("at least 1") ->
+                Error (EmptyTwoOrbitUnfolder6sArray ex.Message)
+            | :? ArgumentException as ex when ex.Message.Contains("SortingWidth") ->
+                Error (InvalidSortingWidth ex.Message)
+            | :? ArgumentException as ex when ex.Message.Contains("order") ->
+                Error (MismatchedTwoOrbitUnfolder6Order ex.Message)
+            | ex ->
+                Error (InvalidSortingWidth ex.Message)

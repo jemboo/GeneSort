@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="PermutationDto.fs" />
+    <Compile Include="Perm_SiDto.fs" />
+    <Compile Include="Perm_RsDto.fs" />
+    <Compile Include="TwoOrbitUnfolder\TwoOrbitUfStepDto.fs" />
+    <Compile Include="TwoOrbitUnfolder\TwoOrbitUf4Dto.fs" />
+    <Compile Include="TwoOrbitUnfolder\TwoOrbitUf6Dto.fs" />
+    <Compile Include="RatesAndOps\IndelRatesDto.fs" />
+    <Compile Include="RatesAndOps\OpActionRatesDto.fs" />
+    <Compile Include="RatesAndOps\OpsGenRatesDto.fs" />
+    <Compile Include="RatesAndOps\OpsActionRatesDto.fs" />
+    <Compile Include="RatesAndOps\OpsTransitionRatesDto.fs" />
+    <Compile Include="RatesAndOps\Seed6GenRatesDto.fs" />
+    <Compile Include="RatesAndOps\Seed6ActionRatesDto.fs" />
+    <Compile Include="RatesAndOps\Seed6TransitionRatesDto.fs" />
+    <Compile Include="RatesAndOps\Uf4GenRatesDto.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="5.0.1" />
+    <PackageReference Include="MessagePack" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+  </ItemGroup>
+
+</Project>

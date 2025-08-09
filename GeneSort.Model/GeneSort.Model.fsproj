@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Sorter\Interfaces.fs" />
+    <Compile Include="Sorter\SorterModelSet.fs" />
+    <Compile Include="Sorter\SorterModelSetMaker.fs" />
+    <Compile Include="Sorter\Ce\Msce.fs" />
+    <Compile Include="Sorter\Ce\MsceRandGen.fs" />
+    <Compile Include="Sorter\Ce\MsceRandMutate.fs" />
+    <Compile Include="Sorter\Si\Mssi.fs" />
+    <Compile Include="Sorter\Si\MssiRandGen.fs" />
+    <Compile Include="Sorter\Si\MssiRandMutate.fs" />
+    <Compile Include="Sorter\Rs\Msrs.fs" />
+    <Compile Include="Sorter\Rs\MsrsRandGen.fs" />
+    <Compile Include="Sorter\Rs\MsrsRandMutate.fs" />
+    <Compile Include="Sorter\Uf4\Msuf4.fs" />
+    <Compile Include="Sorter\Uf6\Msuf6.fs" />
+    <Compile Include="Program.fs" CompileOrder="CompileLast" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.UMX" Version="1.1.0" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+    <ProjectReference Include="..\GeneSort.Sorter\GeneSort.Sorter.fsproj" />
+  </ItemGroup>
+
+</Project>
