@@ -1,7 +1,5 @@
 ﻿namespace GeneSort.Core
-
 open System
-
 
 [<Struct; CustomEquality; NoComparison>]
 type Uf4GenRatesArray =
@@ -12,6 +10,9 @@ type Uf4GenRatesArray =
         if Array.isEmpty rates then failwith "Rates array cannot be empty"
         if Array.exists (fun r -> r.order < 4 || r.order % 2 <> 0) rates then
             failwith "All Uf4GenRates orders must be at least 4 and even"
+        let listLengths = rates |> Array.map (fun r -> r.opsGenRatesList.Length)
+        if Array.distinct listLengths |> Array.length > 1 then
+            failwith "All Uf4GenRates must have the same opsGenRatesList length"
         { rates = rates }
 
     member this.Length = this.rates.Length
@@ -51,8 +52,6 @@ type Uf4GenRatesArray =
                     a.seedOpsGenRates.Equals(b.seedOpsGenRates) && 
                     a.opsGenRatesList = b.opsGenRatesList) this.rates other.rates
 
-
-
 module Uf4GenRatesArray =
 
     let private clamp (value: float) (min: float) (max: float) =
@@ -62,6 +61,8 @@ module Uf4GenRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if order < 4 || order % 2 <> 0 then failwith "Order must be at least 4 and even"
         if startRates.order <> order || endRates.order <> order then failwith "Start and end rates must have the same order"
+        if startRates.opsGenRatesList.Length <> endRates.opsGenRatesList.Length then
+            failwith "Start and end rates must have the same opsGenRatesList length"
         let rates =
             Array.init length (fun i ->
                 let t = float i / float (length - 1)
@@ -87,6 +88,8 @@ module Uf4GenRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if order < 4 || order % 2 <> 0 then failwith "Order must be at least 4 and even"
         if baseRates.order <> order || amplitudes.order <> order then failwith "Base and amplitudes must have the same order"
+        if baseRates.opsGenRatesList.Length <> amplitudes.opsGenRatesList.Length then
+            failwith "Base and amplitudes must have the same opsGenRatesList length"
         let rates =
             Array.init length (fun i ->
                 let t = float i / float (length - 1) * 2.0 * Math.PI * frequency
@@ -112,6 +115,8 @@ module Uf4GenRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if order < 4 || order % 2 <> 0 then failwith "Order must be at least 4 and even"
         if baseRates.order <> order || hotSpotRates.order <> order then failwith "Base and hotspot rates must have the same order"
+        if baseRates.opsGenRatesList.Length <> hotSpotRates.opsGenRatesList.Length then
+            failwith "Base and hotspot rates must have the same opsGenRatesList length"
         if hotSpotIndex < 0 || hotSpotIndex >= length then failwith "HotSpotIndex out of range"
         if sigma <= 0.0 then failwith "Sigma must be positive"
         let rates =
@@ -140,6 +145,8 @@ module Uf4GenRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if order < 4 || order % 2 <> 0 then failwith "Order must be at least 4 and even"
         if baseRates.order <> order || hotSpotRates.order <> order then failwith "Base and hotspot rates must have the same order"
+        if baseRates.opsGenRatesList.Length <> hotSpotRates.opsGenRatesList.Length then
+            failwith "Base and hotspot rates must have the same opsGenRatesList length"
         if hotSpotStart < 0 || hotSpotStart >= length || hotSpotEnd < hotSpotStart || hotSpotEnd >= length then failwith "Invalid hot spot range"
         let rates =
             Array.init length (fun i ->

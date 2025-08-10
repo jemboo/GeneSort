@@ -49,7 +49,10 @@
     <Compile Include="Rates\Uf4GenRatesArray.fs" />
     <Compile Include="Rates\Uf4MutationRates.fs" />
     <Compile Include="Rates\Uf4MutationRatesArray.fs" />
-    <Compile Include="Rates\UnfolderRates6.fs" />
+    <Compile Include="Rates\Uf6GenRates.fs" />
+    <Compile Include="Rates\Uf6GenRatesArray.fs" />
+    <Compile Include="Rates\Uf6MutationRates.fs" />
+    <Compile Include="Rates\Uf6MutationRatesArray.fs" />
     <Compile Include="RateOps\Perm_RsOps.fs" />
     <Compile Include="RateOps\TwoOrbitTypeOps.fs" />
     <Compile Include="RateOps\UnfolderOps.fs" />

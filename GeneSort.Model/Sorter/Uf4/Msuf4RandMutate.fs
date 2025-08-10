@@ -1,151 +1,63 @@
 ﻿namespace GeneSort.Model.Sorter.Uf4
-
 open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
 open MathUtils
-open GeneSort.Core.Combinatorics
 open GeneSort.Model.Sorter
 
 
-/// Represents a configuration for mutating Msuf4 instances with specified mutation probabilities.
 [<Struct; CustomEquality; NoComparison>]
 type Msuf4RandMutate = 
     private 
         { rngType: rngType
           stageCount: int<stageCount>
-          probabilities: Msuf4MutationModeProbabilities array
-          pickers: Lazy<((unit -> float) -> Uf4MutationRates option)[]> } 
+          mutationRates: Uf4MutationRatesArray } 
     static member create 
             (rngType: rngType)
             (stageCount: int<stageCount>)
-            (order: int)
-            (orthoToParaRates: float<uf4OrthoToParaMutationRate>[]) 
-            (orthoToSelfReflRates: float<uf4OrthoToSelfReflMutationRate>[]) 
-            (paraToOrthoRates: float<uf4ParaToOrthoMutationRate>[]) 
-            (paraToSelfReflRates: float<uf4ParaToSelfReflMutationRate>[]) 
-            (selfReflToOrthoRates: float<uf4SelfReflToOrthoMutationRate>[]) 
-            (selfReflToParaRates: float<uf4SelfReflToParaMutationRate>[]) 
+            (mutationRates: Uf4MutationRatesArray) 
             : Msuf4RandMutate =
         if rngType = Unchecked.defaultof<rngType> then
             failwith "rngType must be specified"
         else if %stageCount < 1 then
             failwith $"StageCount must be at least 1, got {%stageCount}"
-        else if orthoToParaRates.Length <> %stageCount || 
-                orthoToSelfReflRates.Length <> %stageCount || 
-                paraToOrthoRates.Length <> %stageCount || 
-                paraToSelfReflRates.Length <> %stageCount || 
-                selfReflToOrthoRates.Length <> %stageCount || 
-                selfReflToParaRates.Length <> %stageCount then
-            failwith $"Number of mutation rates must equal stageCount {%stageCount}"
-
-        let probabilities = 
-            Array.zip3 orthoToParaRates orthoToSelfReflRates paraToOrthoRates
-            |> Array.zip3 paraToSelfReflRates selfReflToOrthoRates 
-            |> Array.zip selfReflToParaRates
-            |> Array.map (fun (selfReflToParaRate, (paraToSelfReflRate, selfReflToOrthoRate, (orthoToParaRate, orthoToSelfReflRate, paraToOrthoRate))) -> 
-                Msuf4MutationModeProbabilities.create order orthoToParaRate orthoToSelfReflRate paraToOrthoRate paraToSelfReflRate selfReflToOrthoRate selfReflToParaRate)
-
-        let pickers = lazy (probabilities |> Array.map (fun prob -> pick prob.Modes))
+        else if mutationRates.Length <> %stageCount then
+            failwith $"mutationRates array length (%d{mutationRates.Length}) must equal stageCount ({%stageCount})"
         {
             rngType = rngType
             stageCount = stageCount
-            probabilities = probabilities
-            pickers = pickers
+            mutationRates = mutationRates
         }
 
     static member createFromSingleRate
             (rngType: rngType)
             (stageCount: int<stageCount>)
-            (order: int)
-            (orthoToParaRate: float<uf4OrthoToParaMutationRate>)
-            (orthoToSelfReflRate: float<uf4OrthoToSelfReflMutationRate>)
-            (paraToOrthoRate: float<uf4ParaToOrthoMutationRate>)
-            (paraToSelfReflRate: float<uf4ParaToSelfReflMutationRate>)
-            (selfReflToOrthoRate: float<uf4SelfReflToOrthoMutationRate>)
-            (selfReflToParaRate: float<uf4SelfReflToParaMutationRate>) 
+            (rates: Uf4MutationRates) 
             : Msuf4RandMutate =
-        let orthoToParaRates = Array.create (%stageCount) orthoToParaRate
-        let orthoToSelfReflRates = Array.create (%stageCount) orthoToSelfReflRate
-        let paraToOrthoRates = Array.create (%stageCount) paraToOrthoRate
-        let paraToSelfReflRates = Array.create (%stageCount) paraToSelfReflRate
-        let selfReflToOrthoRates = Array.create (%stageCount) selfReflToOrthoRate
-        let selfReflToParaRates = Array.create (%stageCount) selfReflToParaRate
-        Msuf4RandMutate.create rngType stageCount order 
-            orthoToParaRates orthoToSelfReflRates paraToOrthoRates 
-            paraToSelfReflRates selfReflToOrthoRates selfReflToParaRates
+        let mutationRates = Uf4MutationRatesArray.create (Array.create (%stageCount) rates)
+        Msuf4RandMutate.create rngType stageCount mutationRates
 
     member this.RngType with get () = this.rngType
     member this.StageCount with get () = this.stageCount
-    member this.OrthoToParaRates with get () = 
-        this.probabilities 
-        |> Array.map (fun prob -> 
-            prob.Modes 
-            |> Array.tryFind (fun (mode, _) -> mode.IsSome) 
-            |> Option.map (fun (mode, _) -> mode.Value.seedMutationRates.OrthoToPara) 
-            |> Option.defaultValue 0.0 
-            |> LanguagePrimitives.FloatWithMeasure)
-    member this.OrthoToSelfReflRates with get () = 
-        this.probabilities 
-        |> Array.map (fun prob -> 
-            prob.Modes 
-            |> Array.tryFind (fun (mode, _) -> mode.IsSome) 
-            |> Option.map (fun (mode, _) -> mode.Value.seedMutationRates.OrthoToSelfRefl) 
-            |> Option.defaultValue 0.0 
-            |> LanguagePrimitives.FloatWithMeasure)
-    member this.ParaToOrthoRates with get () = 
-        this.probabilities 
-        |> Array.map (fun prob -> 
-            prob.Modes 
-            |> Array.tryFind (fun (mode, _) -> mode.IsSome) 
-            |> Option.map (fun (mode, _) -> mode.Value.seedMutationRates.ParaToOrtho) 
-            |> Option.defaultValue 0.0 
-            |> LanguagePrimitives.FloatWithMeasure)
-    member this.ParaToSelfReflRates with get () = 
-        this.probabilities 
-        |> Array.map (fun prob -> 
-            prob.Modes 
-            |> Array.tryFind (fun (mode, _) -> mode.IsSome) 
-            |> Option.map (fun (mode, _) -> mode.Value.seedMutationRates.ParaToSelfRefl) 
-            |> Option.defaultValue 0.0 
-            |> LanguagePrimitives.FloatWithMeasure)
-    member this.SelfReflToOrthoRates with get () = 
-        this.probabilities 
-        |> Array.map (fun prob -> 
-            prob.Modes 
-            |> Array.tryFind (fun (mode, _) -> mode.IsSome) 
-            |> Option.map (fun (mode, _) -> mode.Value.seedMutationRates.SelfReflToOrtho) 
-            |> Option.defaultValue 0.0 
-            |> LanguagePrimitives.FloatWithMeasure)
-    member this.SelfReflToParaRates with get () = 
-        this.probabilities 
-        |> Array.map (fun prob -> 
-            prob.Modes 
-            |> Array.tryFind (fun (mode, _) -> mode.IsSome) 
-            |> Option.map (fun (mode, _) -> mode.Value.seedMutationRates.SelfReflToPara) 
-            |> Option.defaultValue 0.0 
-            |> LanguagePrimitives.FloatWithMeasure)
-    member this.Pickers with get () = this.pickers
+    member this.MutationRates with get () = this.mutationRates
 
     override this.Equals(obj) = 
         match obj with
         | :? Msuf4RandMutate as other -> 
             this.rngType = other.rngType && 
             this.stageCount = other.stageCount &&
-            this.probabilities = other.probabilities
+            this.mutationRates.Equals(other.mutationRates)
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.GetType(), this.rngType, this.stageCount, this.probabilities)
+        hash (this.rngType, this.stageCount, this.mutationRates)
 
     interface IEquatable<Msuf4RandMutate> with
         member this.Equals(other) = 
             this.rngType = other.rngType && 
             this.stageCount = other.stageCount &&
-            this.probabilities = other.probabilities
-
-
+            this.mutationRates.Equals(other.mutationRates)
 
 module Msuf4RandMutate =
 
@@ -154,7 +66,7 @@ module Msuf4RandMutate =
         [ 
             msuf4RandMutate.RngType :> obj
             %msuf4RandMutate.StageCount :> obj
-            msuf4RandMutate.probabilities :> obj
+            msuf4RandMutate.MutationRates.RatesArray :> obj
             %msuf4.Id :> obj
             index :> obj
         ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
@@ -162,21 +74,16 @@ module Msuf4RandMutate =
     /// Returns a string representation of the Msuf4RandMutate configuration.
     let toString (msuf4RandMutate: Msuf4RandMutate) : string =
         let ratesStr = 
-            msuf4RandMutate.probabilities 
-            |> Array.mapi (fun i prob -> 
-                let rates = 
-                    prob.Modes 
-                    |> Array.tryFind (fun (mode, _) -> mode.IsSome) 
-                    |> Option.map (fun (mode, _) -> mode.Value.seedMutationRates)
-                    |> Option.defaultValue { OrthoToPara = 0.0; OrthoToSelfRefl = 0.0; ParaToOrtho = 0.0; ParaToSelfRefl = 0.0; SelfReflToOrtho = 0.0; SelfReflToPara = 0.0 }
+            msuf4RandMutate.MutationRates.RatesArray 
+            |> Array.mapi (fun i rates -> 
                 sprintf "[%d: OrthoToPara=%f, OrthoToSelfRefl=%f, ParaToOrtho=%f, ParaToSelfRefl=%f, SelfReflToOrtho=%f, SelfReflToPara=%f]" 
                     i 
-                    rates.OrthoToPara
-                    rates.OrthoToSelfRefl
-                    rates.ParaToOrtho
-                    rates.ParaToSelfRefl
-                    rates.SelfReflToOrtho
-                    rates.SelfReflToPara)
+                    rates.seedOpsTransitionRates.OrthoRates.ParaRate
+                    rates.seedOpsTransitionRates.OrthoRates.SelfReflRate
+                    rates.seedOpsTransitionRates.ParaRates.OrthoRate
+                    rates.seedOpsTransitionRates.ParaRates.SelfReflRate
+                    rates.seedOpsTransitionRates.SelfReflRates.OrthoRate
+                    rates.seedOpsTransitionRates.SelfReflRates.ParaRate)
             |> String.concat ", "
         sprintf "Msuf4RandMutate(RngType=%A, StageCount=%d, MutationRates=%s)" 
                 msuf4RandMutate.RngType 
@@ -198,19 +105,14 @@ module Msuf4RandMutate =
             failwith $"Stage count of Msuf4 {%msuf4.StageCount} must match Msuf4RandMutate {%msuf4RandMutate.StageCount}"
         else if %msuf4.SortingWidth < 1 then
             failwith $"Msuf4 SortingWidth must be at least 1, got {%msuf4.SortingWidth}"
-        else if msuf4RandMutate.probabilities |> Array.exists (fun prob -> 
-                    prob.Modes 
-                    |> Array.tryFind (fun (mode, _) -> mode.IsSome) 
-                    |> Option.map (fun (mode, _) -> mode.Value.order <> %msuf4.SortingWidth) 
-                    |> Option.defaultValue false) then
+        else if msuf4RandMutate.MutationRates.RatesArray |> Array.exists (fun rates -> rates.order <> %msuf4.SortingWidth) then
             failwith $"All mutationRates must have order {%msuf4.SortingWidth}"
+        else if msuf4RandMutate.MutationRates.RatesArray |> Array.exists (fun rates -> rates.twoOrbitPairOpsTransitionRates.Length <> exactLog2(%msuf4.SortingWidth / 4)) then
+            failwith $"All mutationRates must have twoOrbitPairOpsTransitionRates length equal to log2(sortingWidth/4)"
         let id = makeId msuf4RandMutate msuf4 index
         let rando = randoGen msuf4RandMutate.RngType %id
-        let pickers = msuf4RandMutate.Pickers.Value
         let mutatedUnfolders = 
-            Array.zip msuf4.TwoOrbitUnfolder4s pickers
-            |> Array.map (fun (unfolder, picker) ->
-                match picker rando.NextFloat with
-                | Some mutationRates -> TwoOrbitUf4Ops.mutateTwoOrbitUf4 rando.NextFloat mutationRates unfolder
-                | None -> unfolder)
+            Array.zip msuf4.TwoOrbitUnfolder4s msuf4RandMutate.MutationRates.RatesArray
+            |> Array.map (fun (unfolder, mutationRates) ->
+                UnfolderOps4.mutateTwoOrbitUf4 rando.NextFloat mutationRates unfolder)
         Msuf4.create id msuf4.SortingWidth mutatedUnfolders
