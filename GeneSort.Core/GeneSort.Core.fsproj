@@ -41,6 +41,7 @@
     <Compile Include="RatesAndOps\OpsActionRates.fs" />
     <Compile Include="RatesAndOps\OpsActionRatesArray.fs" />
     <Compile Include="RatesAndOps\OpsTransitionRates.fs" />
+    <Compile Include="RatesAndOps\OpsTransitionRatesArray.fs" />
     <Compile Include="RatesAndOps\Perm_RsOps.fs" />
     <Compile Include="RatesAndOps\Seed6GenRates.fs" />
     <Compile Include="RatesAndOps\Seed6ActionRates.fs" />

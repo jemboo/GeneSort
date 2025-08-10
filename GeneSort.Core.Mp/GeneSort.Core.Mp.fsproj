@@ -14,9 +14,13 @@
     <Compile Include="TwoOrbitUnfolder\TwoOrbitUf6Dto.fs" />
     <Compile Include="RatesAndOps\IndelRatesDto.fs" />
     <Compile Include="RatesAndOps\OpActionRatesDto.fs" />
+    <Compile Include="RatesAndOps\OpActionRatesArrayDto.fs" />
     <Compile Include="RatesAndOps\OpsGenRatesDto.fs" />
+    <Compile Include="RatesAndOps\OpsGenRatesArrayDto.fs" />
     <Compile Include="RatesAndOps\OpsActionRatesDto.fs" />
+    <Compile Include="RatesAndOps\OpsActionRatesArrayDto.fs" />
     <Compile Include="RatesAndOps\OpsTransitionRatesDto.fs" />
+    <Compile Include="RatesAndOps\OpsTransitionRatesArrayDto.fs" />
     <Compile Include="RatesAndOps\Seed6GenRatesDto.fs" />
     <Compile Include="RatesAndOps\Seed6ActionRatesDto.fs" />
     <Compile Include="RatesAndOps\Seed6TransitionRatesDto.fs" />

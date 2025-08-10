@@ -8,68 +8,6 @@ open MathUtils
 open GeneSort.Core.Combinatorics
 open GeneSort.Model.Sorter
 
-[<Measure>] type uf4OrthoToParaMutationRate
-[<Measure>] type uf4OrthoToSelfReflMutationRate
-[<Measure>] type uf4ParaToOrthoMutationRate
-[<Measure>] type uf4ParaToSelfReflMutationRate
-[<Measure>] type uf4SelfReflToOrthoMutationRate
-[<Measure>] type uf4SelfReflToParaMutationRate
-
-/// Represents probabilities for mutating a TwoOrbitUnfolder4 instance.
-[<Struct; CustomEquality; NoComparison>]
-type Msuf4MutationModeProbabilities = 
-    private 
-        { modes: (Uf4MutationRates option * float) array }
-    static member create 
-            (order: int)
-            (orthoToParaRate: float<uf4OrthoToParaMutationRate>) 
-            (orthoToSelfReflRate: float<uf4OrthoToSelfReflMutationRate>) 
-            (paraToOrthoRate: float<uf4ParaToOrthoMutationRate>) 
-            (paraToSelfReflRate: float<uf4ParaToSelfReflMutationRate>) 
-            (selfReflToOrthoRate: float<uf4SelfReflToOrthoMutationRate>) 
-            (selfReflToParaRate: float<uf4SelfReflToParaMutationRate>) 
-            : Msuf4MutationModeProbabilities =
-
-        let seedMutationRates : SeedMutationRatesUf4 = 
-            { OrthoToPara = %orthoToParaRate
-              OrthoToSelfRefl = %orthoToSelfReflRate
-              ParaToOrtho = %paraToOrthoRate
-              ParaToSelfRefl = %paraToSelfReflRate
-              SelfReflToOrtho = %selfReflToOrthoRate
-              SelfReflToPara = %selfReflToParaRate }
-        let sum = 
-            %orthoToParaRate + %orthoToSelfReflRate + 
-            %paraToOrthoRate + %paraToSelfReflRate + 
-            %selfReflToOrthoRate + %selfReflToParaRate
-        if sum > 1.0 then
-            failwith $"Sum of mutation rates must not exceed 1.0, got {sum}"
-        if order < 1 then
-            failwith $"Order must be at least 1, got {order}"
-        else if (order - 1) &&& order <> 0 then
-            failwith $"Order must be a power of 2, got {order}"
-        let noMutation = 1.0 - sum
-        let mutationRates = 
-            { Uf4MutationRates.order = order
-              seedMutationRates = seedMutationRates
-              twoOrbitPairActionRates = List.init (exactLog2 (order / 4)) (fun _ -> TwoOrbitPairActionRates.createUniform 0.2) }
-        {
-            modes = 
-                [|
-                    (Some mutationRates, sum)
-                    (None, noMutation)
-                |]
-        }
-    member this.Modes with get () = this.modes
-    override this.Equals(obj) = 
-        match obj with
-        | :? Msuf4MutationModeProbabilities as other -> 
-            this.modes = other.modes
-        | _ -> false
-    override this.GetHashCode() = 
-        hash (this.GetType(), this.modes)
-    interface IEquatable<Msuf4MutationModeProbabilities> with
-        member this.Equals(other) = 
-            this.modes = other.modes
 
 /// Represents a configuration for mutating Msuf4 instances with specified mutation probabilities.
 [<Struct; CustomEquality; NoComparison>]
