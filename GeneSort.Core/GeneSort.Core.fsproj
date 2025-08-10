@@ -42,13 +42,17 @@
     <Compile Include="RatesAndOps\OpsActionRatesArray.fs" />
     <Compile Include="RatesAndOps\OpsTransitionRates.fs" />
     <Compile Include="RatesAndOps\OpsTransitionRatesArray.fs" />
-    <Compile Include="RatesAndOps\Perm_RsOps.fs" />
     <Compile Include="RatesAndOps\Seed6GenRates.fs" />
     <Compile Include="RatesAndOps\Seed6ActionRates.fs" />
-    <Compile Include="RatesAndOps\TwoOrbitTypeOps.fs" />
     <Compile Include="RatesAndOps\Seed6TransitionRates.fs" />
-    <Compile Include="RatesAndOps\UnfolderRates.fs" />
-    <Compile Include="RatesAndOps\UnfolderOps.fs" />
+    <Compile Include="RatesAndOps\Uf4GenRates.fs" />
+    <Compile Include="RatesAndOps\Uf4GenRatesArray.fs" />
+    <Compile Include="RatesAndOps\Uf4MutationRates.fs" />
+    <Compile Include="RatesAndOps\Uf4MutationRatesArray.fs" />
+    <Compile Include="RatesAndOps\UnfolderRates6.fs" />
+    <Compile Include="RateOps\Perm_RsOps.fs" />
+    <Compile Include="RateOps\TwoOrbitTypeOps.fs" />
+    <Compile Include="RateOps\UnfolderOps.fs" />
     <Compile Include="CoreGen.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />
   </ItemGroup>

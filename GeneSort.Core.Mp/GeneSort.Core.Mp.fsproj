@@ -12,19 +12,20 @@
     <Compile Include="TwoOrbitUnfolder\TwoOrbitUfStepDto.fs" />
     <Compile Include="TwoOrbitUnfolder\TwoOrbitUf4Dto.fs" />
     <Compile Include="TwoOrbitUnfolder\TwoOrbitUf6Dto.fs" />
-    <Compile Include="RatesAndOps\IndelRatesDto.fs" />
-    <Compile Include="RatesAndOps\OpActionRatesDto.fs" />
-    <Compile Include="RatesAndOps\OpActionRatesArrayDto.fs" />
-    <Compile Include="RatesAndOps\OpsGenRatesDto.fs" />
-    <Compile Include="RatesAndOps\OpsGenRatesArrayDto.fs" />
-    <Compile Include="RatesAndOps\OpsActionRatesDto.fs" />
-    <Compile Include="RatesAndOps\OpsActionRatesArrayDto.fs" />
-    <Compile Include="RatesAndOps\OpsTransitionRatesDto.fs" />
-    <Compile Include="RatesAndOps\OpsTransitionRatesArrayDto.fs" />
-    <Compile Include="RatesAndOps\Seed6GenRatesDto.fs" />
-    <Compile Include="RatesAndOps\Seed6ActionRatesDto.fs" />
-    <Compile Include="RatesAndOps\Seed6TransitionRatesDto.fs" />
-    <Compile Include="RatesAndOps\Uf4GenRatesDto.fs" />
+    <Compile Include="Rates\IndelRatesDto.fs" />
+    <Compile Include="Rates\IndelRatesArrayDto.fs" />
+    <Compile Include="Rates\OpsGenRatesDto.fs" />
+    <Compile Include="Rates\OpsGenRatesArrayDto.fs" />
+    <Compile Include="Rates\OpActionRatesDto.fs" />
+    <Compile Include="Rates\OpActionRatesArrayDto.fs" />
+    <Compile Include="Rates\OpsActionRatesDto.fs" />
+    <Compile Include="Rates\OpsActionRatesArrayDto.fs" />
+    <Compile Include="Rates\OpsTransitionRatesDto.fs" />
+    <Compile Include="Rates\OpsTransitionRatesArrayDto.fs" />
+    <Compile Include="Rates\Seed6GenRatesDto.fs" />
+    <Compile Include="Rates\Seed6ActionRatesDto.fs" />
+    <Compile Include="Rates\Seed6TransitionRatesDto.fs" />
+    <Compile Include="Rates\Uf4GenRatesDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
