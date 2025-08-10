@@ -9,7 +9,9 @@ open MathUtils
 [<Struct; CustomEquality; NoComparison>]
 type Msuf4RandGen = 
     private 
-        { rngType: rngType
+        { 
+          id: Guid<sorterModelMakerID>
+          rngType: rngType
           sortingWidth: int<sortingWidth>
           stageCount: int<stageCount> 
           genRates: Uf4GenRatesArray } 
@@ -40,7 +42,16 @@ type Msuf4RandGen =
         else if genRates.RatesArray |> Array.exists (fun gr -> gr.opsGenRatesList.Length <> exactLog2(gr.order / 4)) then
             failwith "twoOrbitTypeGenRatesList length must equal log2(order/4)"
         else
-            { rngType = rngType
+            let id =
+                [
+                    rngType :> obj
+                    sortingWidth :> obj
+                    stageCount :> obj
+                    genRates :> obj
+                ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
+
+            { id = id
+              rngType = rngType
               sortingWidth = sortingWidth
               stageCount = stageCount
               genRates = genRates }
@@ -69,6 +80,21 @@ type Msuf4RandGen =
             this.stageCount = other.stageCount &&
             this.genRates.Equals(other.genRates)
 
+    interface ISorterModelMaker with
+        member this.Id = this.id
+
+        member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : ISorterModel =
+            let id = SorterModelMaker.makeSorterModelId this index
+            let rando = rngFactory this.RngType %id
+            let sc = %this.StageCount
+            let genRts = this.GenRates
+            let twoOrbitUnfolder4s =
+                    [| for dex in 0 .. (sc - 1) ->
+                        UnfolderOps4.makeTwoOrbitUf4 rando.NextFloat (genRts.Item(dex)) |]
+            Msuf4.create id this.SortingWidth twoOrbitUnfolder4s
+
+
+
 module Msuf4RandGen =
 
     /// Generates a unique ID for an Msuf4 instance based on the Msuf4RandGen configuration and an index.
@@ -94,19 +120,3 @@ module Msuf4RandGen =
                 (%msuf4Gen.SortingWidth) 
                 (%msuf4Gen.StageCount)
                 genRatesStr
-
-    /// Generates an Msuf4 instance with uniform generation rates for all TwoOrbitUnfolder4 instances.
-    /// <param name="msuf4Gen">The Msuf4RandGen configuration.</param>
-    /// <param name="randoGen">The random number generator factory.</param>
-    /// <param name="index">The index for ID generation.</param>
-    /// <returns>A randomly generated Msuf4 instance with the specified generation rates.</returns>
-    let makeModel
-            (msuf4Gen: Msuf4RandGen)
-            (randoGen: rngType -> Guid -> IRando)
-            (index: int) : Msuf4 =
-        let id = makeId msuf4Gen index
-        let rando = randoGen msuf4Gen.RngType %id
-        let twoOrbitUnfolder4s =
-            [| for dex in 0 .. (%msuf4Gen.StageCount - 1) ->
-                UnfolderOps4.makeTwoOrbitUf4 rando.NextFloat (msuf4Gen.GenRates.Item(dex)) |]
-        Msuf4.create id msuf4Gen.SortingWidth twoOrbitUnfolder4s

@@ -52,6 +52,19 @@ type Msuf4 =
         member this.Equals(other) = 
             this.id = other.id
 
+    interface ISorterModel with
+        member this.Id = this.id 
+        member this.MakeSorter() = 
+            let ces = 
+                this.TwoOrbitUnfolder4s
+                |> Array.collect (fun tou ->
+                    tou.MakePerm_Si
+                    |> Perm_Si.getTwoOrbits
+                    |> Array.map Ce.fromTwoOrbit)
+            Sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
+
+
+
 module Msuf4 =
 
     /// Returns a string representation of the Msuf4 instance.
@@ -60,16 +73,3 @@ module Msuf4 =
                 (%msuf4.Id) 
                 (%msuf4.SortingWidth) 
                 msuf4.StageCount
-
-    /// Converts an Msuf4 instance to a Sorter by mapping each TwoOrbitUnfolder4 to a Perm_Si,
-    /// extracting TwoOrbits, converting them to Ce elements, and creating a Sorter.
-    /// <param name="msuf4">The Msuf4 instance to convert.</param>
-    /// <returns>A Sorter instance with the same ID and sorting width, containing Ce elements derived from TwoOrbitUnfolder4s.</returns>
-    let makeSorter (msuf4: Msuf4) : Sorter =
-        let ces = 
-            msuf4.TwoOrbitUnfolder4s
-            |> Array.collect (fun tou ->
-                tou.MakePerm_Si
-                |> Perm_Si.getTwoOrbits
-                |> Array.map Ce.fromTwoOrbit)
-        Sorter.create (%msuf4.Id |> UMX.tag<sorterId>) msuf4.SortingWidth ces
