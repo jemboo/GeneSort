@@ -19,6 +19,7 @@
     <Compile Include="Sorter\Rs\MsrsRandGen.fs" />
     <Compile Include="Sorter\Rs\MsrsRandMutate.fs" />
     <Compile Include="Sorter\Uf4\Msuf4.fs" />
+    <Compile Include="Sorter\Uf4\Msuf4RandGen.fs" />
     <Compile Include="Sorter\Uf6\Msuf6.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />
   </ItemGroup>
