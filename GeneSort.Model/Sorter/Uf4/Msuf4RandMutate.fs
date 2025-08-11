@@ -2,8 +2,6 @@
 open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorter
-open MathUtils
 open GeneSort.Model.Sorter
 
 
@@ -48,7 +46,7 @@ type Msuf4RandMutate =
         Msuf4RandMutate.create rngType msuf4 mutationRates
 
     member this.Id with get () = this.id
-    member this.Msrs with get () = this.msuf4
+    member this.Msuf4 with get () = this.msuf4
     member this.RngType with get () = this.rngType
     member this.StageCount with get () = this.msuf4.StageCount
     member this.Uf4MutationRatesArray with get () = this.uf4MutationRatesArray

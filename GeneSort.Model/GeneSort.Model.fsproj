@@ -24,6 +24,7 @@
     <Compile Include="Sorter\Uf6\Msuf6.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />
     <Compile Include="Sorter\Uf6\Msuf6RandGen.fs" />
+    <Compile Include="Sorter\Uf6\Msuf6RandMutate.fs" />
   </ItemGroup>
 
   <ItemGroup>
