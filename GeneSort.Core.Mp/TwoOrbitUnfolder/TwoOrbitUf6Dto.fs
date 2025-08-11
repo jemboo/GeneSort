@@ -8,10 +8,10 @@ open MessagePack
 
 [<MessagePackObject>]
 type TwoOrbitUf6DTO =
-    { [<Key(0)>] SeedType: Seed6TwoOrbitType
+    { [<Key(0)>] SeedType: TwoOrbitTripleType
       [<Key(1)>] TwoOrbitUfSteps: TwoOrbitUfStepDTO list }
     
-    static member Create(seedType: Seed6TwoOrbitType, twoOrbitUnfolderSteps: TwoOrbitUfStepDTO list) : Result<TwoOrbitUf6DTO, string> =
+    static member Create(seedType: TwoOrbitTripleType, twoOrbitUnfolderSteps: TwoOrbitUfStepDTO list) : Result<TwoOrbitUf6DTO, string> =
         if List.isEmpty twoOrbitUnfolderSteps then
             Error "TwoOrbitUnfolderSteps list cannot be empty"
         else

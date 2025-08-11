@@ -17,7 +17,7 @@ type TwoOrbitPairTests() =
         Assert.Equal(orbit1, pair.FirstOrbit)
         Assert.Equal(orbit2, pair.SecondOrbit.Value)
         Assert.Equal(order, pair.Order)
-        Assert.Equal(TwoOrbitType.Ortho, pair |> TwoOrbitPairOps.getTwoOrbitType)
+        Assert.Equal(TwoOrbitPairType.Ortho, pair |> TwoOrbitPairOps.getTwoOrbitPairType)
         Assert.Equal((orbit1, orbit2), (pair.FirstOrbit, pair.SecondOrbit.Value))
 
     [<Fact>]
@@ -29,7 +29,7 @@ type TwoOrbitPairTests() =
         Assert.Equal(orbit1, pair.FirstOrbit)
         Assert.Equal(orbit2, pair.SecondOrbit.Value)
         Assert.Equal(order, pair.Order)
-        Assert.Equal(TwoOrbitType.Para, pair |> TwoOrbitPairOps.getTwoOrbitType)
+        Assert.Equal(TwoOrbitPairType.Para, pair |> TwoOrbitPairOps.getTwoOrbitPairType)
         Assert.Equal((orbit1, orbit2), (pair.FirstOrbit, pair.SecondOrbit.Value))
 
     [<Fact>]
@@ -41,7 +41,7 @@ type TwoOrbitPairTests() =
         Assert.Equal(orbit2, pair.FirstOrbit)
         Assert.Equal(orbit1, pair.SecondOrbit.Value)
         Assert.Equal(order, pair.Order)
-        Assert.Equal(TwoOrbitType.SelfRefl, pair |> TwoOrbitPairOps.getTwoOrbitType)
+        Assert.Equal(TwoOrbitPairType.SelfRefl, pair |> TwoOrbitPairOps.getTwoOrbitPairType)
         Assert.Equal((orbit2, orbit1), (pair.FirstOrbit, pair.SecondOrbit.Value))
 
     [<Fact>]
@@ -106,7 +106,7 @@ type TwoOrbitPairTests() =
         Assert.Equal(expectedFirst, pair.FirstOrbit)
         Assert.Equal(expectedSecond, pair.SecondOrbit.Value)
         Assert.Equal(order * 2, pair.Order) // order * 2 = 8
-        Assert.Equal(TwoOrbitType.Ortho, pair |> TwoOrbitPairOps.getTwoOrbitType)
+        Assert.Equal(TwoOrbitPairType.Ortho, pair |> TwoOrbitPairOps.getTwoOrbitPairType)
         Assert.Equal((expectedFirst, expectedSecond), (pair.FirstOrbit, pair.SecondOrbit.Value))
 
     [<Fact>]
@@ -119,7 +119,7 @@ type TwoOrbitPairTests() =
         Assert.Equal(expectedFirst, pair.FirstOrbit)
         Assert.Equal(expectedSecond, pair.SecondOrbit.Value)
         Assert.Equal(order * 2, pair.Order) // order * 2 = 8
-        Assert.Equal(TwoOrbitType.Para, pair |> TwoOrbitPairOps.getTwoOrbitType)
+        Assert.Equal(TwoOrbitPairType.Para, pair |> TwoOrbitPairOps.getTwoOrbitPairType)
         Assert.Equal((expectedFirst, expectedSecond), (pair.FirstOrbit, pair.SecondOrbit.Value))
 
     [<Fact>]
@@ -132,7 +132,7 @@ type TwoOrbitPairTests() =
         Assert.Equal(expectedFirst, pair.FirstOrbit)
         Assert.Equal(expectedSecond, pair.SecondOrbit.Value)
         Assert.Equal(order * 2, pair.Order) // order * 2 = 8
-        Assert.Equal(TwoOrbitType.SelfRefl, pair |> TwoOrbitPairOps.getTwoOrbitType)
+        Assert.Equal(TwoOrbitPairType.SelfRefl, pair |> TwoOrbitPairOps.getTwoOrbitPairType)
         Assert.Equal((expectedFirst, expectedSecond), (pair.FirstOrbit, pair.SecondOrbit.Value))
 
     [<Fact>]

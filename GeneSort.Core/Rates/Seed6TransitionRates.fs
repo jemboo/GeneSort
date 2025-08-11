@@ -99,15 +99,15 @@ type Seed6TransitionRates =
             Seed6TransitionRates.create(ortho1Rates, ortho2Rates, para1Rates, para2Rates, para3Rates, para4Rates, selfReflRates)
 
 
-    member this.PickMode (floatPicker: unit -> float) (orbitType: Seed6TwoOrbitType) : Seed6ActionMode =
+    member this.PickMode (floatPicker: unit -> float) (orbitType: TwoOrbitTripleType) : Seed6ActionMode =
         match orbitType with
-        | Seed6TwoOrbitType.Ortho1 -> this.ortho1Rates.PickMode floatPicker
-        | Seed6TwoOrbitType.Ortho2 -> this.ortho2Rates.PickMode floatPicker
-        | Seed6TwoOrbitType.Para1 -> this.para1Rates.PickMode floatPicker
-        | Seed6TwoOrbitType.Para2 -> this.para2Rates.PickMode floatPicker
-        | Seed6TwoOrbitType.Para3 -> this.para3Rates.PickMode floatPicker
-        | Seed6TwoOrbitType.Para4 -> this.para4Rates.PickMode floatPicker
-        | Seed6TwoOrbitType.SelfRefl -> this.selfReflRates.PickMode floatPicker
+        | TwoOrbitTripleType.Ortho1 -> this.ortho1Rates.PickMode floatPicker
+        | TwoOrbitTripleType.Ortho2 -> this.ortho2Rates.PickMode floatPicker
+        | TwoOrbitTripleType.Para1 -> this.para1Rates.PickMode floatPicker
+        | TwoOrbitTripleType.Para2 -> this.para2Rates.PickMode floatPicker
+        | TwoOrbitTripleType.Para3 -> this.para3Rates.PickMode floatPicker
+        | TwoOrbitTripleType.Para4 -> this.para4Rates.PickMode floatPicker
+        | TwoOrbitTripleType.SelfRefl -> this.selfReflRates.PickMode floatPicker
 
 
     member this.TransitionMode (floatPicker: unit -> float) (seed6GenMode: Seed6GenMode) : Seed6GenMode =

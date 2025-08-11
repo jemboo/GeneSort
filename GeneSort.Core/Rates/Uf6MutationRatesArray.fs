@@ -302,7 +302,7 @@ module Uf6MutationRatesArray =
         (selfReflMutator: 'a -> 'a) 
         (noActionMutator: 'a -> 'a) 
         (floatPicker: unit -> float) 
-        (seed6TwoOrbitType: Seed6TwoOrbitType) 
+        (seed6TwoOrbitType: TwoOrbitTripleType) 
         (arrayToMutate: 'a[]) : 'a[] = 
         if uf6MutationRatesArray.Length <> arrayToMutate.Length then
             failwith "Array length does not match rates length"

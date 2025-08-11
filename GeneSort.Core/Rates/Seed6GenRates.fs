@@ -115,23 +115,23 @@ type Seed6GenRates =
 
 module Seed6GenMode =
 
-    let fromSeed6TwoOrbitType (seed6TwoOrbitType:Seed6TwoOrbitType) : Seed6GenMode =
+    let fromSeed6TwoOrbitType (seed6TwoOrbitType:TwoOrbitTripleType) : Seed6GenMode =
             match seed6TwoOrbitType with 
-            | Seed6TwoOrbitType.Ortho1 -> Seed6GenMode.Ortho1
-            | Seed6TwoOrbitType.Ortho2 -> Seed6GenMode.Ortho2
-            | Seed6TwoOrbitType.Para1 -> Seed6GenMode.Para1
-            | Seed6TwoOrbitType.Para2 -> Seed6GenMode.Para2
-            | Seed6TwoOrbitType.Para3 -> Seed6GenMode.Para3
-            | Seed6TwoOrbitType.Para4 -> Seed6GenMode.Para4
-            | Seed6TwoOrbitType.SelfRefl -> Seed6GenMode.SelfRefl
+            | TwoOrbitTripleType.Ortho1 -> Seed6GenMode.Ortho1
+            | TwoOrbitTripleType.Ortho2 -> Seed6GenMode.Ortho2
+            | TwoOrbitTripleType.Para1 -> Seed6GenMode.Para1
+            | TwoOrbitTripleType.Para2 -> Seed6GenMode.Para2
+            | TwoOrbitTripleType.Para3 -> Seed6GenMode.Para3
+            | TwoOrbitTripleType.Para4 -> Seed6GenMode.Para4
+            | TwoOrbitTripleType.SelfRefl -> Seed6GenMode.SelfRefl
             
 
-    let toSeed6TwoOrbitType (seed6GenMode:Seed6GenMode) : Seed6TwoOrbitType =
+    let toSeed6TwoOrbitType (seed6GenMode:Seed6GenMode) : TwoOrbitTripleType =
             match seed6GenMode with 
-            | Seed6GenMode.Ortho1 -> Seed6TwoOrbitType.Ortho1
-            | Seed6GenMode.Ortho2 -> Seed6TwoOrbitType.Ortho2
-            | Seed6GenMode.Para1 -> Seed6TwoOrbitType.Para1
-            | Seed6GenMode.Para2 -> Seed6TwoOrbitType.Para2
-            | Seed6GenMode.Para3 -> Seed6TwoOrbitType.Para3
-            | Seed6GenMode.Para4 -> Seed6TwoOrbitType.Para4
-            | Seed6GenMode.SelfRefl -> Seed6TwoOrbitType.SelfRefl
+            | Seed6GenMode.Ortho1 -> TwoOrbitTripleType.Ortho1
+            | Seed6GenMode.Ortho2 -> TwoOrbitTripleType.Ortho2
+            | Seed6GenMode.Para1 -> TwoOrbitTripleType.Para1
+            | Seed6GenMode.Para2 -> TwoOrbitTripleType.Para2
+            | Seed6GenMode.Para3 -> TwoOrbitTripleType.Para3
+            | Seed6GenMode.Para4 -> TwoOrbitTripleType.Para4
+            | Seed6GenMode.SelfRefl -> TwoOrbitTripleType.SelfRefl

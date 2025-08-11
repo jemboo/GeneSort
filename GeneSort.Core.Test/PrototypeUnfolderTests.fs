@@ -33,11 +33,11 @@ type PrototypeUnfolderTests() =
         Assert.Equal<int list>(expected.[0].FirstOrbit.Indices, result.[0].FirstOrbit.Indices)
         Assert.Equal<int list>(expected.[0].SecondOrbit.Value.Indices, result.[0].SecondOrbit.Value.Indices)
         Assert.Equal<int>(expected.[0].Order, result.[0].Order)
-        Assert.Equal(expected.[0] |> TwoOrbitPairOps.getTwoOrbitType, result.[0] |> TwoOrbitPairOps.getTwoOrbitType)
+        Assert.Equal(expected.[0] |> TwoOrbitPairOps.getTwoOrbitPairType, result.[0] |> TwoOrbitPairOps.getTwoOrbitPairType)
         Assert.Equal<int list>(expected.[1].FirstOrbit.Indices, result.[1].FirstOrbit.Indices)
         Assert.Equal<int list>(expected.[1].SecondOrbit.Value.Indices, result.[1].SecondOrbit.Value.Indices)
         Assert.Equal(expected.[1].Order, result.[1].Order)
-        Assert.Equal(expected.[1] |> TwoOrbitPairOps.getTwoOrbitType, result.[1] |> TwoOrbitPairOps.getTwoOrbitType)
+        Assert.Equal(expected.[1] |> TwoOrbitPairOps.getTwoOrbitPairType, result.[1] |> TwoOrbitPairOps.getTwoOrbitPairType)
 
 
     [<Fact>]
@@ -53,11 +53,11 @@ type PrototypeUnfolderTests() =
         Assert.Equal<int list>(expected1.[0].FirstOrbit.Indices, pairs1.[0].FirstOrbit.Indices)
         Assert.Equal<int list>(expected1.[0].SecondOrbit.Value.Indices, pairs1.[0].SecondOrbit.Value.Indices)
         Assert.Equal<int>(expected1.[0].Order, pairs1.[0].Order)
-        Assert.Equal(expected1.[0] |> TwoOrbitPairOps.getTwoOrbitType, pairs1.[0] |> TwoOrbitPairOps.getTwoOrbitType)
+        Assert.Equal(expected1.[0] |> TwoOrbitPairOps.getTwoOrbitPairType, pairs1.[0] |> TwoOrbitPairOps.getTwoOrbitPairType)
         Assert.Equal<int list>(expected1.[1].FirstOrbit.Indices, pairs1.[1].FirstOrbit.Indices)
         Assert.Equal<int list>(expected1.[1].SecondOrbit.Value.Indices, pairs1.[1].SecondOrbit.Value.Indices)
         Assert.Equal(expected1.[1].Order, pairs1.[1].Order)
-        Assert.Equal(expected1.[1] |> TwoOrbitPairOps.getTwoOrbitType, pairs1.[1] |> TwoOrbitPairOps.getTwoOrbitType)
+        Assert.Equal(expected1.[1] |> TwoOrbitPairOps.getTwoOrbitPairType, pairs1.[1] |> TwoOrbitPairOps.getTwoOrbitPairType)
         /// next round
         let types1 = [TwoOrbitType.Ortho; TwoOrbitType.SelfRefl; TwoOrbitType.Para; TwoOrbitType.Para]
         let pairs2 = unfoldTwoOrbitPairsIntoTwoOrbitPairs types1 pairs1

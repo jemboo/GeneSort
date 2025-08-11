@@ -125,11 +125,11 @@ module Perm_RsOps =
             // Find two points in the permutation to mutate
             let twoOrbitPair = findRsPoints indexPicker permRs
 
-            let twoOrbitTypeOpt = twoOrbitPair |> TwoOrbitPairOps.getTwoOrbitTypeOption
-            let twoOrbitTypeFound = 
+            let twoOrbitTypeOpt = twoOrbitPair |> TwoOrbitPairOps.getTwoOrbitPairTypeOption
+            let twoOrbitPairTypeFound = 
                 match twoOrbitTypeOpt with
                 | Some t -> t
-                | None -> failwith "TwoOrbitPair must have a valid TwoOrbitType"
+                | None -> failwith "TwoOrbitPair must have a valid TwoOrbitPairType"
             let secondPair = 
                 match twoOrbitPair.SecondOrbit with
                 | Some sto -> sto
@@ -142,8 +142,8 @@ module Perm_RsOps =
 
             match opsActionMode with
             | OpsActionMode.Ortho -> 
-                match twoOrbitTypeFound with
-                | TwoOrbitType.Ortho -> ()
+                match twoOrbitPairTypeFound with
+                | TwoOrbitPairType.Ortho -> ()
 
                 | _ -> 
                     newArray.[firstL] <- secondL
@@ -152,24 +152,24 @@ module Perm_RsOps =
                     newArray.[secondH] <- firstH 
 
             | OpsActionMode.Para -> 
-                match twoOrbitTypeFound with
-                | TwoOrbitType.Ortho -> 
+                match twoOrbitPairTypeFound with
+                | TwoOrbitPairType.Ortho -> 
                     newArray.[firstL] <- secondL
                     newArray.[secondL] <- firstL 
                     newArray.[firstH] <- secondH
                     newArray.[secondH] <- firstH
 
-                | TwoOrbitType.Para -> ()
+                | TwoOrbitPairType.Para -> ()
 
-                | TwoOrbitType.SelfRefl -> 
+                | TwoOrbitPairType.SelfRefl -> 
                     newArray.[firstL] <- secondH
                     newArray.[secondH] <- firstL 
                     newArray.[firstH] <- secondL
                     newArray.[secondL] <- firstH 
 
             | OpsActionMode.SelfRefl -> 
-                match twoOrbitTypeFound with
-                | TwoOrbitType.SelfRefl -> ()
+                match twoOrbitPairTypeFound with
+                | TwoOrbitPairType.SelfRefl -> ()
                 | _ -> 
                     newArray.[firstL] <- secondH
                     newArray.[secondH] <- firstL 

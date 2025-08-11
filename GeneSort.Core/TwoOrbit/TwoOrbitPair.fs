@@ -1,5 +1,9 @@
 ﻿namespace GeneSort.Core
 
+type TwoOrbitPairType =
+    | Ortho
+    | Para
+    | SelfRefl
 
 /// Represents a pair of TwoOrbit instances (second optional) with an associated order.
 /// The order must be non-negative and even, and the TwoOrbits must be disjoint if both are present.
