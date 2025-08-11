@@ -31,7 +31,6 @@
     <Compile Include="TwoOrbitUnfolder\TwoOrbitUfStep.fs" />
     <Compile Include="TwoOrbitUnfolder\TwoOrbitUf4.fs" />
     <Compile Include="TwoOrbitUnfolder\TwoOrbitUf6.fs" />
-    <Compile Include="PrototypeUnfolder.fs" />
     <Compile Include="Rates\IndelRates.fs" />
     <Compile Include="Rates\IndelRatesArray.fs" />
     <Compile Include="Rates\OpsGenRates.fs" />
@@ -53,6 +52,7 @@
     <Compile Include="Rates\Uf6GenRatesArray.fs" />
     <Compile Include="Rates\Uf6MutationRates.fs" />
     <Compile Include="Rates\Uf6MutationRatesArray.fs" />
+    <Compile Include="PrototypeUnfolder.fs" />
     <Compile Include="RateOps\Perm_RsOps.fs" />
     <Compile Include="RateOps\TwoOrbitTypeOps.fs" />
     <Compile Include="RateOps\UnfolderOps.fs" />

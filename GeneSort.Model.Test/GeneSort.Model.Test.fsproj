@@ -13,6 +13,7 @@
     <Compile Include="Sorter\Rs\MsrsRandGenTests.fs" />
     <Compile Include="Sorter\Rs\MsrsRandMutateTests.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />
+    <Compile Include="Sorter\Uf\Msuf4Tests.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,10 +36,6 @@
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
     <ProjectReference Include="..\GeneSort.Model\GeneSort.Model.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorter\GeneSort.Sorter.fsproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Sorter\Uf\" />
   </ItemGroup>
 
 </Project>
