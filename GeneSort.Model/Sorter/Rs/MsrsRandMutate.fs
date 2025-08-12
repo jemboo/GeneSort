@@ -68,7 +68,7 @@ type MsrsRandMutate =
         /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
         member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
                         : ISorterModel =
-            let id = SorterModelMaker.makeSorterModelId this index
+            let id = ISorterModelMaker.makeSorterModelId this index
             let rng = rngFactory this.RngType %id
             let orthoMutator = fun psi ->   Perm_RsOps.mutatePerm_Rs (rng.NextIndex) OpsActionMode.Ortho psi 
             let paraMutator = fun psi ->    Perm_RsOps.mutatePerm_Rs (rng.NextIndex) OpsActionMode.Para psi 

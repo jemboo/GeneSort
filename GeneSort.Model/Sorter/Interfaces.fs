@@ -19,8 +19,8 @@ type ISorterModelMaker =
     abstract member Id : Guid<sorterModelMakerID>
     abstract member MakeSorterModel : (rngType -> Guid -> IRando) -> int -> ISorterModel
 
-
-module SorterModelMaker =
+    
+module ISorterModelMaker =
     let makeSorterModelId (sorterModelMaker: ISorterModelMaker) (index:int) =
         [
             %sorterModelMaker.Id  :> obj

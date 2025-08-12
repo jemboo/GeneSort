@@ -76,12 +76,11 @@ type Msuf6RandMutate =
         /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
         member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
                         : ISorterModel =
-            let id = SorterModelMaker.makeSorterModelId this index
             if %this.StageCount <> this.Uf6MutationRatesArray.Length then
                 failwith $"Stage count of Msuf6 {%this.StageCount} must match Msuf6RandMutate length {this.Uf6MutationRatesArray.Length}"
             //else if msuf6RandMutate.MutationRates.RatesArray |> Array.exists (fun rates -> rates.twoOrbitPairOpsTransitionRates.Length <> exactLog2(%msuf6.SortingWidth / 4)) then
             //    failwith $"All mutationRates must have twoOrbitPairOpsTransitionRates length equal to log2(sortingWidth/4)"
-            let id = SorterModelMaker.makeSorterModelId this index
+            let id = ISorterModelMaker.makeSorterModelId this index
             let rng = rngFactory this.RngType %id
             let mutatedUnfolders = 
                 Array.zip this.msuf6.TwoOrbitUnfolder6s this.Uf6MutationRatesArray.RatesArray

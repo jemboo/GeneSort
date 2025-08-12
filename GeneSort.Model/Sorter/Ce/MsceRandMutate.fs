@@ -67,7 +67,7 @@ type MsceRandMutate =
         /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
         member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
                     : ISorterModel =
-            let id = SorterModelMaker.makeSorterModelId this index
+            let id = ISorterModelMaker.makeSorterModelId this index
             let rng = rngFactory this.RngType %id
             let excludeSelfCe = this.ExcludeSelfCe
             let sortingWidth = %this.msce.SortingWidth
