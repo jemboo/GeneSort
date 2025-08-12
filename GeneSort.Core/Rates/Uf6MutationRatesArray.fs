@@ -19,8 +19,10 @@ type Uf6MutationRatesArray =
 
     member this.toString() =
         String.Join(", ", Array.map (
-            fun r -> sprintf "Uf6MutationRates(order=%d, seed=%s, listLength=%d)" 
-                        r.order (r.seed6TransitionRates.toString()) r.opsTransitionRates.Length) this.rates)
+            fun r -> sprintf "Uf6MutationRates(order=%d, seed=%s, opsTransitionRates=%s)" 
+                        r.order 
+                        (r.seed6TransitionRates.toString()) 
+                        (r.opsTransitionRates.toString())) this.rates)
 
     override this.Equals(obj) =
         match obj with
@@ -30,7 +32,7 @@ type Uf6MutationRatesArray =
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seed6TransitionRates.Equals(b.seed6TransitionRates) && 
-                    a.opsTransitionRates = b.opsTransitionRates) this.rates other.rates
+                    a.opsTransitionRates.Equals(b.opsTransitionRates)) this.rates other.rates
         | _ -> false
 
     override this.GetHashCode() =
@@ -48,8 +50,7 @@ type Uf6MutationRatesArray =
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seed6TransitionRates.Equals(b.seed6TransitionRates) && 
-                    a.opsTransitionRates = b.opsTransitionRates) this.rates other.rates
-
+                    a.opsTransitionRates.Equals(b.opsTransitionRates)) this.rates other.rates
 
 module Uf6MutationRatesArray =
 
@@ -99,11 +100,13 @@ module Uf6MutationRatesArray =
                 let listLength = exactLog2 (order / 6)
                 let opsTransitionRates =
                     Array.init listLength (fun j ->
-                        let startList = startRates.opsTransitionRates
-                        let endList = endRates.opsTransitionRates
+                        let startList = startRates.opsTransitionRates.RatesArray
+                        let endList = endRates.opsTransitionRates.RatesArray
                         if j >= startList.Length || j >= endList.Length then OpsTransitionRates.createUniform(0.1)
                         else interpolateOpsTransitionRates startList.[j] endList.[j] t)
-                { Uf6MutationRates.order = order; seed6TransitionRates = seed; opsTransitionRates = opsTransitionRates })
+                { Uf6MutationRates.order = order
+                  seed6TransitionRates = seed
+                  opsTransitionRates = OpsTransitionRatesArray.create opsTransitionRates })
         Uf6MutationRatesArray.create rates
 
     let createSinusoidalVariation (length: int) (order: int) (baseRates: Uf6MutationRates) (amplitudes: Uf6MutationRates) (frequency: float) : Uf6MutationRatesArray =
@@ -174,8 +177,8 @@ module Uf6MutationRatesArray =
                 let listLength = exactLog2 (order / 6)
                 let opsTransitionRates =
                     Array.init listLength (fun j ->
-                        let baseList = baseRates.opsTransitionRates
-                        let ampList = amplitudes.opsTransitionRates
+                        let baseList = baseRates.opsTransitionRates.RatesArray
+                        let ampList = amplitudes.opsTransitionRates.RatesArray
                         if j >= baseList.Length || j >= ampList.Length then OpsTransitionRates.createUniform(0.1)
                         else
                             OpsTransitionRates.create(
@@ -191,7 +194,9 @@ module Uf6MutationRatesArray =
                                     clamp (baseList.[j].SelfReflRates.OrthoRate + ampList.[j].SelfReflRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
                                     clamp (baseList.[j].SelfReflRates.ParaRate + ampList.[j].SelfReflRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
                                     clamp (baseList.[j].SelfReflRates.SelfReflRate + ampList.[j].SelfReflRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0)))
-                { Uf6MutationRates.order = order; seed6TransitionRates = seed; opsTransitionRates = opsTransitionRates })
+                { Uf6MutationRates.order = order
+                  seed6TransitionRates = seed
+                  opsTransitionRates = OpsTransitionRatesArray.create opsTransitionRates })
         Uf6MutationRatesArray.create rates
 
     let createGaussianHotSpot (length: int) (order: int) (baseRates: Uf6MutationRates) (hotSpotIndex: int) (hotSpotRates: Uf6MutationRates) (sigma: float) : Uf6MutationRatesArray =
@@ -205,21 +210,23 @@ module Uf6MutationRatesArray =
                 let x = float (i - hotSpotIndex)
                 let weight = Math.Exp(-x * x / (2.0 * sigma * sigma))
                 let seed = Seed6TransitionRates.create(
-                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Ortho1Rates (hotSpotRates.seed6TransitionRates.Ortho1Rates) weight,
-                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Ortho2Rates (hotSpotRates.seed6TransitionRates.Ortho2Rates) weight,
-                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Para1Rates (hotSpotRates.seed6TransitionRates.Para1Rates) weight,
-                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Para2Rates (hotSpotRates.seed6TransitionRates.Para2Rates) weight,
-                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Para3Rates (hotSpotRates.seed6TransitionRates.Para3Rates) weight,
-                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Para4Rates (hotSpotRates.seed6TransitionRates.Para4Rates) weight,
-                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.SelfReflRates (hotSpotRates.seed6TransitionRates.SelfReflRates) weight)
+                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Ortho1Rates hotSpotRates.seed6TransitionRates.Ortho1Rates weight,
+                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Ortho2Rates hotSpotRates.seed6TransitionRates.Ortho2Rates weight,
+                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Para1Rates hotSpotRates.seed6TransitionRates.Para1Rates weight,
+                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Para2Rates hotSpotRates.seed6TransitionRates.Para2Rates weight,
+                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Para3Rates hotSpotRates.seed6TransitionRates.Para3Rates weight,
+                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Para4Rates hotSpotRates.seed6TransitionRates.Para4Rates weight,
+                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.SelfReflRates hotSpotRates.seed6TransitionRates.SelfReflRates weight)
                 let listLength = exactLog2 (order / 6)
                 let opsTransitionRates =
                     Array.init listLength (fun j ->
-                        let baseList = baseRates.opsTransitionRates
-                        let hotSpotList = hotSpotRates.opsTransitionRates
+                        let baseList = baseRates.opsTransitionRates.RatesArray
+                        let hotSpotList = hotSpotRates.opsTransitionRates.RatesArray
                         if j >= baseList.Length || j >= hotSpotList.Length then OpsTransitionRates.createUniform(0.1)
                         else interpolateOpsTransitionRates baseList.[j] hotSpotList.[j] weight)
-                { Uf6MutationRates.order = order; seed6TransitionRates = seed; opsTransitionRates = opsTransitionRates })
+                { Uf6MutationRates.order = order
+                  seed6TransitionRates = seed
+                  opsTransitionRates = OpsTransitionRatesArray.create opsTransitionRates })
         Uf6MutationRatesArray.create rates
 
     let createStepHotSpot (length: int) (order: int) (baseRates: Uf6MutationRates) (hotSpotStart: int) (hotSpotEnd: int) (hotSpotRates: Uf6MutationRates) : Uf6MutationRatesArray =
@@ -230,7 +237,7 @@ module Uf6MutationRatesArray =
         let rates =
             Array.init length (fun i ->
                 let rates = if i >= hotSpotStart && i <= hotSpotEnd then hotSpotRates else baseRates
-                { Uf6MutationRates.order = order; 
+                { Uf6MutationRates.order = order
                   seed6TransitionRates = Seed6TransitionRates.create(
                       Seed6ActionRates.create(
                           rates.seed6TransitionRates.Ortho1Rates.Ortho1Rate,
@@ -287,7 +294,7 @@ module Uf6MutationRatesArray =
                           rates.seed6TransitionRates.SelfReflRates.Para2Rate,
                           rates.seed6TransitionRates.SelfReflRates.Para3Rate,
                           rates.seed6TransitionRates.SelfReflRates.Para4Rate,
-                          rates.seed6TransitionRates.SelfReflRates.SelfReflRate));
+                          rates.seed6TransitionRates.SelfReflRates.SelfReflRate))
                   opsTransitionRates = rates.opsTransitionRates })
         Uf6MutationRatesArray.create rates
 

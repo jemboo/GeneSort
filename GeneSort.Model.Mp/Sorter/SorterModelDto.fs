@@ -91,7 +91,7 @@ module SorterModelDto =
                         let msg = match err with
                                   | MssiDto.InvalidPermSiCount m -> m
                                   | MssiDto.InvalidWidth m -> m
-                        Error $"Failed to convert MssiDTO: {msg}"
+                        Error $"Failed to convert MssiDto: {msg}"
                 | None -> Error "MssiRandGen requires Mssi data"
             | "MsrsRandGen" ->
                 match dto.Msrs with
@@ -122,7 +122,7 @@ module SorterModelDto =
                                             | PermutationDto.PermutationDtoError.NullArray m -> m
 
 
-                        Error $"Failed to convert MsrsDTO: {msg}"
+                        Error $"Failed to convert MsrsDto: {msg}"
                 | None -> Error "MsrsRandGen requires Msrs data"
             | "Msuf4RandGen" ->
                 match dto.Msuf4 with
@@ -168,7 +168,7 @@ module SorterModelDto =
                                         |TwoOrbitUnfolderStepDto.TwoOrbitUnfolderStepDtoError.InvalidTwoOrbitTypesLength m -> m
                                         |TwoOrbitUnfolderStepDto.TwoOrbitUnfolderStepDtoError.NotEvenOrder m -> m
 
-                        Error $"Failed to convert Msuf6DTO: {msg}"
+                        Error $"Failed to convert Msuf6Dto: {msg}"
                 | None -> Error "Msuf6RandGen requires Msuf6 data"
             | _ -> Error $"Unknown SorterModel type: {dto.Type}"
         with
