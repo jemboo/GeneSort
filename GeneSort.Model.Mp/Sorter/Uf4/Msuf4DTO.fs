@@ -47,7 +47,7 @@ module Msuf4Dto =
           SortingWidth = %msuf4.SortingWidth
           TwoOrbitUnfolder4s = msuf4.TwoOrbitUnfolder4s |> Array.map TwoOrbitUf4Dto.toTwoOrbitUnfolder4Dto }
 
-    let toMsuf4 (dto: Msuf4Dto)   = // : Result<Msuf4, Msuf4DtoError> =
+    let fromMsuf4Dto (dto: Msuf4Dto)   = // : Result<Msuf4, Msuf4DtoError> =
         let twoOrbitUnfolder4sResult = 
             dto.TwoOrbitUnfolder4s 
             |> Array.map TwoOrbitUf4Dto.toTwoOrbitUnfolder4

@@ -127,7 +127,7 @@ module SorterModelDto =
             | "Msuf4RandGen" ->
                 match dto.Msuf4 with
                 | Some msuf4Dto ->
-                    match Msuf4Dto.toMsuf4 msuf4Dto with
+                    match Msuf4Dto.fromMsuf4Dto msuf4Dto with
                     | Ok msuf4 -> Ok (Msuf4 msuf4)
                     | Error err ->
                         let msg = match err with
@@ -150,7 +150,7 @@ module SorterModelDto =
             | "Msuf6RandGen" ->
                 match dto.Msuf6 with
                 | Some msuf6Dto ->
-                    match Msuf6Dto.toMsuf6 msuf6Dto with
+                    match Msuf6Dto.fromMsuf6Dto msuf6Dto with
                     | Ok msuf6 -> Ok (Msuf6 msuf6)
                     | Error err ->
                         let msg = match err with

@@ -1,9 +1,5 @@
 ﻿namespace GeneSort.Model.Sorter
 
-open System
-open FSharp.UMX
-open GeneSort.Sorter
-open GeneSort.Core
 open GeneSort.Model.Sorter.Ce
 open GeneSort.Model.Sorter.Si
 open GeneSort.Model.Sorter.Rs

@@ -23,6 +23,7 @@
     <Compile Include="Sorter\Uf6\Msuf6RandGenDto.fs" />
     <Compile Include="Sorter\Uf6\Msuf6RandMutateDto.fs" />
     <Compile Include="Sorter\SorterModelDto.fs" />
+    <Compile Include="Sorter\SorterModelMakerDto.fs" />
   </ItemGroup>
 
   <ItemGroup>

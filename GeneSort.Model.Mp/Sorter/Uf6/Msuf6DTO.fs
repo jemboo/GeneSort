@@ -47,7 +47,7 @@ module Msuf6Dto =
           SortingWidth = %msuf6.SortingWidth
           TwoOrbitUnfolder6s = msuf6.TwoOrbitUnfolder6s |> Array.map TwoOrbitUf6Dto.toTwoOrbitUf6Dto }
 
-    let toMsuf6 (dto: Msuf6Dto) : Result<Msuf6, Msuf6DtoError> =
+    let fromMsuf6Dto (dto: Msuf6Dto) : Result<Msuf6, Msuf6DtoError> =
         let twoOrbitUnfolder6sResult = 
             dto.TwoOrbitUnfolder6s 
             |> Array.map TwoOrbitUf6Dto.toTwoOrbitUf6

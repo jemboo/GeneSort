@@ -55,7 +55,8 @@ type Msuf4RandGen =
               sortingWidth = sortingWidth
               stageCount = stageCount
               genRates = genRates }
-
+              
+    member this.Id with get () = this.id
     member this.RngType with get () = this.rngType
     member this.SortingWidth with get () = this.sortingWidth
     member this.StageCount with get () = this.stageCount
