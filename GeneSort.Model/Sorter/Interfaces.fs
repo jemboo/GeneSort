@@ -12,7 +12,7 @@ open GeneSort.Core
 [<Measure>] type sorterModelSetMakerID
 
 type ISorterModel =
-    abstract member Id : Guid<sorterModelID>
+    abstract member Id : Guid<sorterModelID> 
     abstract member MakeSorter : unit -> Sorter
 
 type ISorterModelMaker =

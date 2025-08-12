@@ -8,7 +8,7 @@ module UnfolderOps4 =
 
         let seedTypeUf4 = floatPicker |> uf4GenRates.seedOpsGenRates.PickMode |> OpsGenMode.toTwoOrbitType
         let twoOrbitUnfolderSteps = 
-            uf4GenRates.opsGenRatesArray
+            uf4GenRates.opsGenRatesArray.RatesArray
                 |> Array.mapi(fun dex rates ->
                     TwoOrbitTypeOps.makeTwoOrbitUnfolderStep floatPicker (4 * (MathUtils.integerPower 2 dex)) rates)
         TwoOrbitUf4.create seedTypeUf4 twoOrbitUnfolderSteps
@@ -44,7 +44,8 @@ module UnfolderOps6 =
         let seed6TwoOrbitType = 
                 uf6GenRates.seedGenRatesUf6.PickMode floatPicker |> Seed6GenMode.toSeed6TwoOrbitType
 
-        let twoOrbitUfSteps = uf6GenRates.opsGenRatesList
+        let twoOrbitUfSteps = 
+                    uf6GenRates.opsGenRatesArray.RatesArray
                                 |> Array.mapi(
             fun dex rates -> TwoOrbitTypeOps.makeTwoOrbitUnfolderStep floatPicker (6 * (MathUtils.integerPower 2 dex)) rates)
 

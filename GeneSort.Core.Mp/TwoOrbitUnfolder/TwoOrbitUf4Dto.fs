@@ -12,7 +12,7 @@ type TwoOrbitUf4DTO =
     
     static member Create(seedType: TwoOrbitType, twoOrbitUnfolderSteps: TwoOrbitUfStepDTO array) : Result<TwoOrbitUf4DTO, string> =
         if Array.isEmpty twoOrbitUnfolderSteps then
-            Error "TwoOrbitUnfolderSteps list cannot be empty"
+            Error "TwoOrbitUnfolderSteps array cannot be empty"
         else
             Ok { SeedType = seedType
                  TwoOrbitUfSteps = twoOrbitUnfolderSteps }
