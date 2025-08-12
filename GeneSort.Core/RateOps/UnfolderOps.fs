@@ -65,12 +65,10 @@ module UnfolderOps6 =
                         |> Seed6GenMode.toSeed6TwoOrbitType
 
         let twoOrbitUnfolderSteps = 
-                    uf6MutationRates.opsTransitionRates
+                    uf6MutationRates.opsTransitionRates.RatesArray
                     |> Array.mapi(
-                fun dex rates -> 
-                    TwoOrbitTypeOps.mutateTwoOrbitUnfolderStep floatPicker rates twoOrbitUf6.TwoOrbitUnfolderSteps[dex])
+                            fun dex rates -> 
+                                TwoOrbitTypeOps.mutateTwoOrbitUnfolderStep floatPicker rates twoOrbitUf6.TwoOrbitUnfolderSteps[dex])
 
         TwoOrbitUf6.create seed6TwoOrbitTypeMutated twoOrbitUnfolderSteps
-
-
 
