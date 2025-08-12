@@ -2,9 +2,7 @@
 
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorter
 open GeneSort.Model.Mp.Sorter.Rs
-open GeneSort.Model.Sorter.Rs
 open GeneSort.Core.Mp.RatesAndOps
 open MessagePack
 open MessagePack.Resolvers
@@ -14,7 +12,7 @@ open GeneSort.Core.Mp
 
 [<MessagePackObject>]
 type MsrsRandMutateDto = 
-    { [<Key(0)>] Msrs: MsrsDTO
+    { [<Key(0)>] Msrs: MsrsDto
       [<Key(1)>] RngType: rngType
       [<Key(2)>] OpsActionRatesArray: OpsActionRatesArrayDto }
 
@@ -24,13 +22,13 @@ module MsrsRandMutateDto =
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let toMsrsRandMutateDto (msrsRandMutate: MsrsRandMutate) : MsrsRandMutateDto =
-        { Msrs = MsrsDTO.toMsrsDTO msrsRandMutate.Msrs
+        { Msrs = MsrsDto.toMsrsDto msrsRandMutate.Msrs
           RngType = msrsRandMutate.RngType
           OpsActionRatesArray = OpsActionRatesArrayDto.fromOpsActionRatesArray msrsRandMutate.OpsActionRates }
 
     let fromMsrsRandMutateDto (dto: MsrsRandMutateDto) : MsrsRandMutate =
         try
-            let msrsResult = MsrsDTO.toMsrs dto.Msrs
+            let msrsResult = MsrsDto.toMsrs dto.Msrs
             match msrsResult with
             | Ok msrs ->
                 if %msrs.StageCount <> dto.OpsActionRatesArray.Rates.Length then
@@ -41,26 +39,26 @@ module MsrsRandMutateDto =
                     (OpsActionRatesArrayDto.toOpsActionRatesArray dto.OpsActionRatesArray)
             | Error err ->
                 let msg = match err with
-                          | MsrsDTO.NullPermRssArray m -> m
-                          | MsrsDTO.EmptyPermRssArray m -> m
-                          | MsrsDTO.InvalidWidth m -> m
-                          | MsrsDTO.MismatchedPermRsOrder m -> m
-                          | MsrsDTO.PermRsConversionError e ->
+                          | MsrsDto.NullPermRssArray m -> m
+                          | MsrsDto.EmptyPermRssArray m -> m
+                          | MsrsDto.InvalidWidth m -> m
+                          | MsrsDto.MismatchedPermRsOrder m -> m
+                          | MsrsDto.PermRsConversionError e ->
                               match e with
-                              | Perm_RsDTO.Perm_RsDTOError.OrderTooSmall m -> m
-                              | Perm_RsDTO.Perm_RsDTOError.OrderNotDivisibleByTwo m -> m
-                              | Perm_RsDTO.Perm_RsDTOError.NotReflectionSymmetric m -> m
-                              | Perm_RsDTO.Perm_RsDTOError.PermSiConversionError e' ->
+                              | Perm_RsDto.Perm_RsDtoError.OrderTooSmall m -> m
+                              | Perm_RsDto.Perm_RsDtoError.OrderNotDivisibleByTwo m -> m
+                              | Perm_RsDto.Perm_RsDtoError.NotReflectionSymmetric m -> m
+                              | Perm_RsDto.Perm_RsDtoError.PermSiConversionError e' ->
                                   match e' with
-                                  | Perm_SiDTO.Perm_SiDTOError.EmptyArray m -> m
-                                  | Perm_SiDTO.Perm_SiDTOError.InvalidPermutation m -> m
-                                  | Perm_SiDTO.Perm_SiDTOError.NotSelfInverse m -> m
-                                  | Perm_SiDTO.Perm_SiDTOError.NullArray m -> m
-                                  | Perm_SiDTO.Perm_SiDTOError.PermutationConversionError e'' ->
+                                  | Perm_SiDto.Perm_SiDtoError.EmptyArray m -> m
+                                  | Perm_SiDto.Perm_SiDtoError.InvalidPermutation m -> m
+                                  | Perm_SiDto.Perm_SiDtoError.NotSelfInverse m -> m
+                                  | Perm_SiDto.Perm_SiDtoError.NullArray m -> m
+                                  | Perm_SiDto.Perm_SiDtoError.PermutationConversionError e'' ->
                                       match e'' with
-                                      | PermutationDTO.PermutationDTOError.EmptyArray m -> m
-                                      | PermutationDTO.PermutationDTOError.InvalidPermutation m -> m
-                                      | PermutationDTO.PermutationDTOError.NullArray m -> m
-                failwith $"Failed to convert MsrsDTO: {msg}"
+                                      | PermutationDto.PermutationDtoError.EmptyArray m -> m
+                                      | PermutationDto.PermutationDtoError.InvalidPermutation m -> m
+                                      | PermutationDto.PermutationDtoError.NullArray m -> m
+                failwith $"Failed to convert MsrsDto: {msg}"
         with
         | ex -> failwith $"Failed to convert MsrsRandMutateDto: {ex.Message}"

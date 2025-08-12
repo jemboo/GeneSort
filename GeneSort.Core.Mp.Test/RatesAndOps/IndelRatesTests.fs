@@ -19,7 +19,7 @@ type IndelRatesTests() =
         rates.NoActionRate |> should (equalWithin epsilon) 0.1 // 1.0 - 0.9
 
     [<Fact>]
-    let ``IndelRatesDto fromIndelRates should correctly map to DTO`` () =
+    let ``IndelRatesDto fromIndelRates should correctly map to Dto`` () =
         let rates = IndelRates.create (0.2, 0.3, 0.4)
         let dto = IndelRatesDto.fromIndelRates rates
         dto.MutationThresh |> should (equalWithin epsilon) 0.2

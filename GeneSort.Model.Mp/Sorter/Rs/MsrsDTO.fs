@@ -9,12 +9,12 @@ open GeneSort.Core.Mp
 open GeneSort.Model.Sorter
 
 [<MessagePackObject; Struct>]
-type MsrsDTO =
+type MsrsDto =
     { [<Key(0)>] Id: Guid
       [<Key(1)>] Width: int
-      [<Key(2)>] Perm_Rss: Perm_RsDTO array }
+      [<Key(2)>] Perm_Rss: Perm_RsDto array }
     
-    static member Create(id: Guid, width: int, permRss: Perm_RsDTO array) : Result<MsrsDTO, string> =
+    static member Create(id: Guid, width: int, permRss: Perm_RsDto array) : Result<MsrsDto, string> =
         if isNull permRss then
             Error "Perm_Rss array cannot be null"
         else if permRss.Length < 1 then
@@ -28,24 +28,24 @@ type MsrsDTO =
                  Width = width
                  Perm_Rss = permRss }
 
-module MsrsDTO =
+module MsrsDto =
 
-    type MsrsDTOError =
+    type MsrsDtoError =
         | NullPermRssArray of string
         | EmptyPermRssArray of string
         | InvalidWidth of string
         | MismatchedPermRsOrder of string
-        | PermRsConversionError of Perm_RsDTO.Perm_RsDTOError
+        | PermRsConversionError of Perm_RsDto.Perm_RsDtoError
 
-    let toMsrsDTO (msrs: Msrs) : MsrsDTO =
+    let toMsrsDto (msrs: Msrs) : MsrsDto =
         { Id = %msrs.Id
           Width = %msrs.SortingWidth
-          Perm_Rss = msrs.Perm_Rss |> Array.map Perm_RsDTO.toPerm_RsDTO }
+          Perm_Rss = msrs.Perm_Rss |> Array.map Perm_RsDto.toPerm_RsDto }
 
-    let toMsrs (dto: MsrsDTO) : Result<Msrs, MsrsDTOError> =
+    let toMsrs (dto: MsrsDto) : Result<Msrs, MsrsDtoError> =
         let permRssResult = 
             dto.Perm_Rss 
-            |> Array.map Perm_RsDTO.toPerm_Rs
+            |> Array.map Perm_RsDto.toPerm_Rs
             |> Array.fold (fun acc res ->
                 match acc, res with
                 | Ok arr, Ok permRs -> Ok (Array.append arr [|permRs|])

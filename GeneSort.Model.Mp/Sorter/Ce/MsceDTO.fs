@@ -27,21 +27,21 @@ type MsceDto =
 
 
 module MsceDto =
-    type MsceDTOError =
+    type MsceDtoError =
         | InvalidCeCodesLength of string
         | InvalidSortingWidth of string
 
-    let toMsceDTO (msce: Msce) : MsceDto =
+    let toMsceDto (msce: Msce) : MsceDto =
         { Id = %msce.Id
           SortingWidth = %msce.SortingWidth
           CeCodes = msce.CeCodes }
 
-    let toMsce (msceDTO: MsceDto) : Result<Msce, MsceDTOError> =
+    let toMsce (msceDto: MsceDto) : Result<Msce, MsceDtoError> =
         try
             let msce = GeneSort.Model.Sorter.Ce.Msce.create
-                            (UMX.tag<sorterModelID> msceDTO.Id)
-                            (UMX.tag<sortingWidth> msceDTO.SortingWidth)
-                            msceDTO.CeCodes
+                            (UMX.tag<sorterModelID> msceDto.Id)
+                            (UMX.tag<sortingWidth> msceDto.SortingWidth)
+                            msceDto.CeCodes
             Ok msce
         with
         | :? ArgumentException as ex when ex.Message.Contains("Ce") ->

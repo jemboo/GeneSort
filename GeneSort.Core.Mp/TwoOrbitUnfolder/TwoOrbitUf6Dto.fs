@@ -7,11 +7,11 @@ open GeneSort.Core
 open MessagePack
 
 [<MessagePackObject>]
-type TwoOrbitUf6DTO =
+type TwoOrbitUf6Dto =
     { [<Key(0)>] SeedType: TwoOrbitTripleType
-      [<Key(1)>] TwoOrbitUfSteps: TwoOrbitUfStepDTO array }
+      [<Key(1)>] TwoOrbitUfSteps: TwoOrbitUfStepDto array }
     
-    static member Create(seedType: TwoOrbitTripleType, twoOrbitUnfolderSteps: TwoOrbitUfStepDTO array) : Result<TwoOrbitUf6DTO, string> =
+    static member Create(seedType: TwoOrbitTripleType, twoOrbitUnfolderSteps: TwoOrbitUfStepDto array) : Result<TwoOrbitUf6Dto, string> =
         if Array.isEmpty twoOrbitUnfolderSteps then
             Error "TwoOrbitUnfolderSteps list cannot be empty"
         else
@@ -23,20 +23,20 @@ type TwoOrbitUf6DTO =
                      TwoOrbitUfSteps = twoOrbitUnfolderSteps }
 
 
-module TwoOrbitUf6DTO =
-    type TwoOrbitUf6DTOError =
+module TwoOrbitUf6Dto =
+    type TwoOrbitUf6DtoError =
         | EmptyTwoOrbitUnfolderSteps of string
         | InvalidStepOrder of string
-        | StepConversionError of TwoOrbitUnfolderStepDTO.TwoOrbitUnfolderStepDTOError
+        | StepConversionError of TwoOrbitUnfolderStepDto.TwoOrbitUnfolderStepDtoError
 
-    let toTwoOrbitUf6DTO (tou: TwoOrbitUf6) : TwoOrbitUf6DTO =
+    let toTwoOrbitUf6Dto (tou: TwoOrbitUf6) : TwoOrbitUf6Dto =
         { SeedType = tou.Seed6TwoOrbitType
-          TwoOrbitUfSteps = tou.TwoOrbitUnfolderSteps |> Array.map TwoOrbitUnfolderStepDTO.toTwoOrbitUnfolderStepDTO }
+          TwoOrbitUfSteps = tou.TwoOrbitUnfolderSteps |> Array.map TwoOrbitUnfolderStepDto.toTwoOrbitUnfolderStepDto }
 
-    let toTwoOrbitUf6 (dto: TwoOrbitUf6DTO) : Result<TwoOrbitUf6, TwoOrbitUf6DTOError> =
+    let toTwoOrbitUf6 (dto: TwoOrbitUf6Dto) : Result<TwoOrbitUf6, TwoOrbitUf6DtoError> =
         let stepsResult = 
             dto.TwoOrbitUfSteps 
-            |> Array.map TwoOrbitUnfolderStepDTO.toTwoOrbitUnfolderStep
+            |> Array.map TwoOrbitUnfolderStepDto.toTwoOrbitUnfolderStep
             |> Array.fold (fun acc res ->
                 match acc, res with
                 | Ok arr, Ok step -> Ok (arr @ [step])
@@ -57,5 +57,5 @@ module TwoOrbitUf6DTO =
                 Error (EmptyTwoOrbitUnfolderSteps ex.Message)
 
 
-    let getOrder (twoOrbitUnfolder: TwoOrbitUf6DTO) : int =
+    let getOrder (twoOrbitUnfolder: TwoOrbitUf6Dto) : int =
             6 * (MathUtils.integerPower 2 (Array.length twoOrbitUnfolder.TwoOrbitUfSteps))

@@ -1,0 +1,2 @@
+﻿module Msuf6RandGenDto
+

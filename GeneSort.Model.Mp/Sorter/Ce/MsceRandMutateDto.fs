@@ -22,7 +22,7 @@ module MsceRandMutateDto =
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let toMsceRandMutateDto (msceRandMutate: MsceRandMutate) : MsceRandMutateDto =
-        { Msce = MsceDto.toMsceDTO msceRandMutate.Msce
+        { Msce = MsceDto.toMsceDto msceRandMutate.Msce
           RngType = msceRandMutate.RngType
           IndelRatesArray = IndelRatesArrayDto.fromIndelRatesArray msceRandMutate.IndelRatesArray
           ExcludeSelfCe = msceRandMutate.ExcludeSelfCe }

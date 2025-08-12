@@ -14,7 +14,7 @@ open System.Threading.Tasks
 
 
 [<MessagePackObject>]
-type WorkspaceDTO = 
+type WorkspaceDto = 
     { 
         [<MessagePack.Key("Name")>] Name: string
         [<MessagePack.Key("Description")>]  Description: string
@@ -36,13 +36,13 @@ module Workspace =
     /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-    let toWorkspaceDTO (workspace: Workspace) : WorkspaceDTO =
+    let toWorkspaceDto (workspace: Workspace) : WorkspaceDto =
         { Name = workspace.Name
           Description = workspace.Description
           RootDirectory = workspace.RootDirectory
           ParameterSets = workspace.ParameterSets }
 
-    let fromWorkspaceDTO (dto: WorkspaceDTO) : Workspace =
+    let fromWorkspaceDto (dto: WorkspaceDto) : Workspace =
         { Workspace.Name = dto.Name
           Description = dto.Description
           RootDirectory = dto.RootDirectory
@@ -97,7 +97,7 @@ module Workspace =
             else
                 try
                     executor workspace run
-                    let runDto = Run.toRunDTO run
+                    let runDto = Run.toRunDto run
                     let directory = Path.GetDirectoryName filePath
                     Directory.CreateDirectory directory |> ignore
                     use stream = new FileStream(filePath, FileMode.Create, FileAccess.Write)

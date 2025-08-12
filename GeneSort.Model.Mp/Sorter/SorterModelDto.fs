@@ -20,10 +20,10 @@ open GeneSort.Core.Mp.TwoOrbitUnfolder
 type SorterModelDto =
     { [<Key(0)>] Type: string
       [<Key(1)>] Msce: MsceDto option
-      [<Key(2)>] Mssi: MssiDTO option
-      [<Key(3)>] Msrs: MsrsDTO option
-      [<Key(4)>] Msuf4: Msuf4DTO option
-      [<Key(5)>] Msuf6: Msuf6DTO option }
+      [<Key(2)>] Mssi: MssiDto option
+      [<Key(3)>] Msrs: MsrsDto option
+      [<Key(4)>] Msuf4: Msuf4Dto option
+      [<Key(5)>] Msuf6: Msuf6Dto option }
 
 module SorterModelDto =
 
@@ -34,7 +34,7 @@ module SorterModelDto =
         match sorterModel with
         | Msce msce ->
             { Type = "MsceRandGen"
-              Msce = Some (MsceDto.toMsceDTO msce)
+              Msce = Some (MsceDto.toMsceDto msce)
               Mssi = None
               Msrs = None
               Msuf4 = None
@@ -42,7 +42,7 @@ module SorterModelDto =
         | Mssi mssi ->
             { Type = "MssiRandGen"
               Msce = None
-              Mssi = Some (MssiDTO.toMssiDTO mssi)
+              Mssi = Some (MssiDto.toMssiDto mssi)
               Msrs = None
               Msuf4 = None
               Msuf6 = None }
@@ -50,7 +50,7 @@ module SorterModelDto =
             { Type = "MsrsRandGen"
               Msce = None
               Mssi = None
-              Msrs = Some (MsrsDTO.toMsrsDTO msrs)
+              Msrs = Some (MsrsDto.toMsrsDto msrs)
               Msuf4 = None
               Msuf6 = None }
         | Msuf4 msuf4 ->
@@ -58,7 +58,7 @@ module SorterModelDto =
               Msce = None
               Mssi = None
               Msrs = None
-              Msuf4 = Some (Msuf4DTO.toMsuf4DTO msuf4)
+              Msuf4 = Some (Msuf4Dto.toMsuf4Dto msuf4)
               Msuf6 = None }
         | Msuf6 msuf6 ->
             { Type = "Msuf6RandGen"
@@ -66,7 +66,7 @@ module SorterModelDto =
               Mssi = None
               Msrs = None
               Msuf4 = None
-              Msuf6 = Some (Msuf6DTO.toMsuf6DTO msuf6) }
+              Msuf6 = Some (Msuf6Dto.toMsuf6Dto msuf6) }
 
     let fromSorterModelDto (dto: SorterModelDto) : Result<SorterModel, string> =
         try
@@ -85,41 +85,41 @@ module SorterModelDto =
             | "MssiRandGen" ->
                 match dto.Mssi with
                 | Some mssiDto ->
-                    match MssiDTO.toMssi mssiDto with
+                    match MssiDto.toMssi mssiDto with
                     | Ok mssi -> Ok (Mssi mssi)
                     | Error err ->
                         let msg = match err with
-                                  | MssiDTO.InvalidPermSiCount m -> m
-                                  | MssiDTO.InvalidWidth m -> m
+                                  | MssiDto.InvalidPermSiCount m -> m
+                                  | MssiDto.InvalidWidth m -> m
                         Error $"Failed to convert MssiDTO: {msg}"
                 | None -> Error "MssiRandGen requires Mssi data"
             | "MsrsRandGen" ->
                 match dto.Msrs with
                 | Some msrsDto ->
-                    match MsrsDTO.toMsrs msrsDto with
+                    match MsrsDto.toMsrs msrsDto with
                     | Ok msrs -> Ok (Msrs msrs)
                     | Error err ->
                         let msg = match err with
-                                  | MsrsDTO.NullPermRssArray m -> m
-                                  | MsrsDTO.EmptyPermRssArray m -> m
-                                  | MsrsDTO.InvalidWidth m -> m
-                                  | MsrsDTO.MismatchedPermRsOrder m -> m
-                                  | MsrsDTO.PermRsConversionError e ->
+                                  | MsrsDto.NullPermRssArray m -> m
+                                  | MsrsDto.EmptyPermRssArray m -> m
+                                  | MsrsDto.InvalidWidth m -> m
+                                  | MsrsDto.MismatchedPermRsOrder m -> m
+                                  | MsrsDto.PermRsConversionError e ->
                                       match e with
-                                      | Perm_RsDTO.Perm_RsDTOError.OrderTooSmall m -> m
-                                      | Perm_RsDTO.Perm_RsDTOError.OrderNotDivisibleByTwo m -> m
-                                      | Perm_RsDTO.Perm_RsDTOError.NotReflectionSymmetric m -> m
-                                      | Perm_RsDTO.Perm_RsDTOError.PermSiConversionError et ->
+                                      | Perm_RsDto.Perm_RsDtoError.OrderTooSmall m -> m
+                                      | Perm_RsDto.Perm_RsDtoError.OrderNotDivisibleByTwo m -> m
+                                      | Perm_RsDto.Perm_RsDtoError.NotReflectionSymmetric m -> m
+                                      | Perm_RsDto.Perm_RsDtoError.PermSiConversionError et ->
                                         match et with
-                                        | Perm_SiDTO.Perm_SiDTOError.EmptyArray m -> m
-                                        | Perm_SiDTO.Perm_SiDTOError.InvalidPermutation m -> m
-                                        | Perm_SiDTO.Perm_SiDTOError.NotSelfInverse m -> m
-                                        | Perm_SiDTO.Perm_SiDTOError.NullArray m -> m
-                                        | Perm_SiDTO.Perm_SiDTOError.PermutationConversionError e ->
+                                        | Perm_SiDto.Perm_SiDtoError.EmptyArray m -> m
+                                        | Perm_SiDto.Perm_SiDtoError.InvalidPermutation m -> m
+                                        | Perm_SiDto.Perm_SiDtoError.NotSelfInverse m -> m
+                                        | Perm_SiDto.Perm_SiDtoError.NullArray m -> m
+                                        | Perm_SiDto.Perm_SiDtoError.PermutationConversionError e ->
                                             match e with
-                                            | PermutationDTO.PermutationDTOError.EmptyArray m -> m
-                                            | PermutationDTO.PermutationDTOError.InvalidPermutation m -> m
-                                            | PermutationDTO.PermutationDTOError.NullArray m -> m
+                                            | PermutationDto.PermutationDtoError.EmptyArray m -> m
+                                            | PermutationDto.PermutationDtoError.InvalidPermutation m -> m
+                                            | PermutationDto.PermutationDtoError.NullArray m -> m
 
 
                         Error $"Failed to convert MsrsDTO: {msg}"
@@ -127,46 +127,46 @@ module SorterModelDto =
             | "Msuf4RandGen" ->
                 match dto.Msuf4 with
                 | Some msuf4Dto ->
-                    match Msuf4DTO.toMsuf4 msuf4Dto with
+                    match Msuf4Dto.toMsuf4 msuf4Dto with
                     | Ok msuf4 -> Ok (Msuf4 msuf4)
                     | Error err ->
                         let msg = match err with
-                                  | Msuf4DTO.NullTwoOrbitUnfolder4sArray m -> m
-                                  | Msuf4DTO.EmptyTwoOrbitUnfolder4sArray m -> m
-                                  | Msuf4DTO.InvalidSortingWidth m -> m
-                                  | Msuf4DTO.MismatchedTwoOrbitUnfolder4Order m -> m
-                                  | Msuf4DTO.TwoOrbitUnfolder4ConversionError e ->
+                                  | Msuf4Dto.NullTwoOrbitUnfolder4sArray m -> m
+                                  | Msuf4Dto.EmptyTwoOrbitUnfolder4sArray m -> m
+                                  | Msuf4Dto.InvalidSortingWidth m -> m
+                                  | Msuf4Dto.MismatchedTwoOrbitUnfolder4Order m -> m
+                                  | Msuf4Dto.TwoOrbitUnfolder4ConversionError e ->
                                       match e with
-                                      | TwoOrbitUf4DTO.TwoOrbitUf4DTOError.EmptyTwoOrbitUfSteps m -> m
-                                      | TwoOrbitUf4DTO.TwoOrbitUf4DTOError.StepConversionError e -> 
+                                      | TwoOrbitUf4Dto.TwoOrbitUf4DtoError.EmptyTwoOrbitUfSteps m -> m
+                                      | TwoOrbitUf4Dto.TwoOrbitUf4DtoError.StepConversionError e -> 
                                         match e with
-                                        |TwoOrbitUnfolderStepDTO.TwoOrbitUnfolderStepDTOError.InvalidOrder m -> m
-                                        |TwoOrbitUnfolderStepDTO.TwoOrbitUnfolderStepDTOError.InvalidTwoOrbitTypesLength m -> m
-                                        |TwoOrbitUnfolderStepDTO.TwoOrbitUnfolderStepDTOError.NotEvenOrder m -> m
+                                        |TwoOrbitUnfolderStepDto.TwoOrbitUnfolderStepDtoError.InvalidOrder m -> m
+                                        |TwoOrbitUnfolderStepDto.TwoOrbitUnfolderStepDtoError.InvalidTwoOrbitTypesLength m -> m
+                                        |TwoOrbitUnfolderStepDto.TwoOrbitUnfolderStepDtoError.NotEvenOrder m -> m
 
 
-                        Error $"Failed to convert Msuf4DTO: {msg}"
+                        Error $"Failed to convert Msuf4Dto: {msg}"
                 | None -> Error "Msuf4RandGen requires Msuf4 data"
             | "Msuf6RandGen" ->
                 match dto.Msuf6 with
                 | Some msuf6Dto ->
-                    match Msuf6DTO.toMsuf6 msuf6Dto with
+                    match Msuf6Dto.toMsuf6 msuf6Dto with
                     | Ok msuf6 -> Ok (Msuf6 msuf6)
                     | Error err ->
                         let msg = match err with
-                                  | Msuf6DTO.NullTwoOrbitUnfolder6sArray m -> m
-                                  | Msuf6DTO.EmptyTwoOrbitUnfolder6sArray m -> m
-                                  | Msuf6DTO.InvalidSortingWidth m -> m
-                                  | Msuf6DTO.MismatchedTwoOrbitUnfolder6Order m -> m
-                                  | Msuf6DTO.TwoOrbitUnfolder6ConversionError e ->
+                                  | Msuf6Dto.NullTwoOrbitUnfolder6sArray m -> m
+                                  | Msuf6Dto.EmptyTwoOrbitUnfolder6sArray m -> m
+                                  | Msuf6Dto.InvalidSortingWidth m -> m
+                                  | Msuf6Dto.MismatchedTwoOrbitUnfolder6Order m -> m
+                                  | Msuf6Dto.TwoOrbitUnfolder6ConversionError e ->
                                       match e with
-                                      | TwoOrbitUf6DTO.TwoOrbitUf6DTOError.EmptyTwoOrbitUnfolderSteps m -> m
-                                      | TwoOrbitUf6DTO.TwoOrbitUf6DTOError.InvalidStepOrder m -> m
-                                      | TwoOrbitUf6DTO.TwoOrbitUf6DTOError.StepConversionError e ->
+                                      | TwoOrbitUf6Dto.TwoOrbitUf6DtoError.EmptyTwoOrbitUnfolderSteps m -> m
+                                      | TwoOrbitUf6Dto.TwoOrbitUf6DtoError.InvalidStepOrder m -> m
+                                      | TwoOrbitUf6Dto.TwoOrbitUf6DtoError.StepConversionError e ->
                                         match e with
-                                        |TwoOrbitUnfolderStepDTO.TwoOrbitUnfolderStepDTOError.InvalidOrder m -> m
-                                        |TwoOrbitUnfolderStepDTO.TwoOrbitUnfolderStepDTOError.InvalidTwoOrbitTypesLength m -> m
-                                        |TwoOrbitUnfolderStepDTO.TwoOrbitUnfolderStepDTOError.NotEvenOrder m -> m
+                                        |TwoOrbitUnfolderStepDto.TwoOrbitUnfolderStepDtoError.InvalidOrder m -> m
+                                        |TwoOrbitUnfolderStepDto.TwoOrbitUnfolderStepDtoError.InvalidTwoOrbitTypesLength m -> m
+                                        |TwoOrbitUnfolderStepDto.TwoOrbitUnfolderStepDtoError.NotEvenOrder m -> m
 
                         Error $"Failed to convert Msuf6DTO: {msg}"
                 | None -> Error "Msuf6RandGen requires Msuf6 data"

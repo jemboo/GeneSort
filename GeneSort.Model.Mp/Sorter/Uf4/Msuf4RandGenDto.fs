@@ -1,0 +1,2 @@
+﻿module Msuf4RandGenDto
+

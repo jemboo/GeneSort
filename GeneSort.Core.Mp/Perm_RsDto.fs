@@ -5,37 +5,37 @@ open GeneSort.Core
 open MessagePack
 
 [<MessagePackObject; Struct>]
-type Perm_RsDTO =
-    { [<Key(0)>] Perm_Si: Perm_SiDTO }
+type Perm_RsDto =
+    { [<Key(0)>] Perm_Si: Perm_SiDto }
     
-    static member Create(arr: int array) : Result<Perm_RsDTO, string> =
+    static member Create(arr: int array) : Result<Perm_RsDto, string> =
         if arr.Length < 4 then
             Error "Perm_Rs order must be at least 4"
         else if arr.Length % 2 <> 0 then
             Error "Perm_Rs order must be divisible by 2"
         else
-            match Perm_SiDTO.Create(arr) with
+            match Perm_SiDto.Create(arr) with
             | Error e -> Error e
-            | Ok permSiDTO ->
+            | Ok permSiDto ->
                 let permSi = Perm_Si.create arr
                 if not (Perm_Si.isReflectionSymmetric permSi) then
                     Error "Invalid Perm_Rs: permutation must be reflection-symmetric"
                 else
-                    Ok { Perm_Si = permSiDTO }
+                    Ok { Perm_Si = permSiDto }
 
 
-module Perm_RsDTO =
-    type Perm_RsDTOError =
+module Perm_RsDto =
+    type Perm_RsDtoError =
         | OrderTooSmall of string
         | OrderNotDivisibleByTwo of string
         | NotReflectionSymmetric of string
-        | PermSiConversionError of Perm_SiDTO.Perm_SiDTOError
+        | PermSiConversionError of Perm_SiDto.Perm_SiDtoError
 
-    let toPerm_RsDTO (permRs: Perm_Rs) : Perm_RsDTO =
-        { Perm_Si = Perm_SiDTO.toPerm_SiDTO permRs.Perm_Si }
+    let toPerm_RsDto (permRs: Perm_Rs) : Perm_RsDto =
+        { Perm_Si = Perm_SiDto.toPerm_SiDto permRs.Perm_Si }
 
-    let toPerm_Rs (dto: Perm_RsDTO) : Result<Perm_Rs, Perm_RsDTOError> =
-        match Perm_SiDTO.toPerm_Si dto.Perm_Si with
+    let toPerm_Rs (dto: Perm_RsDto) : Result<Perm_Rs, Perm_RsDtoError> =
+        match Perm_SiDto.toPerm_Si dto.Perm_Si with
         | Error e -> Error (PermSiConversionError e)
         | Ok permSi ->
             try

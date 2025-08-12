@@ -9,12 +9,12 @@ open GeneSort.Model.Sorter.Si
 open MessagePack
 
 [<MessagePackObject; Struct>]
-type MssiDTO =
+type MssiDto =
     { [<Key(0)>] Id: Guid
       [<Key(1)>] Width: int
       [<Key(2)>] Perm_Sis: Perm_Si array }
     
-    static member Create(id: Guid, width: int, perm_Sis: Perm_Si array) : Result<MssiDTO, string> =
+    static member Create(id: Guid, width: int, perm_Sis: Perm_Si array) : Result<MssiDto, string> =
         if isNull perm_Sis || perm_Sis.Length < 1 then
             Error "Must have at least 1 Perm_Si"
         else if width < 1 then
@@ -24,22 +24,22 @@ type MssiDTO =
     
     member this.StageCount = this.Perm_Sis.Length
 
-module MssiDTO =
-    type MssiDTOError =
+module MssiDto =
+    type MssiDtoError =
         | InvalidPermSiCount of string
         | InvalidWidth of string
 
-    let toMssiDTO (mssi: Mssi) : MssiDTO =
+    let toMssiDto (mssi: Mssi) : MssiDto =
         { Id = %mssi.Id
           Width = %mssi.SortingWidth
           Perm_Sis = mssi.Perm_Sis }
 
-    let toMssi (mssiDTO: MssiDTO) : Result<Mssi, MssiDTOError> =
+    let toMssi (mssiDto: MssiDto) : Result<Mssi, MssiDtoError> =
         try
             let mssi = GeneSort.Model.Sorter.Si.Mssi.create
-                            (UMX.tag<sorterModelID> mssiDTO.Id)
-                            (UMX.tag<sortingWidth> mssiDTO.Width)
-                            mssiDTO.Perm_Sis
+                            (UMX.tag<sorterModelID> mssiDto.Id)
+                            (UMX.tag<sortingWidth> mssiDto.Width)
+                            mssiDto.Perm_Sis
             Ok mssi
         with
         | :? ArgumentException as ex when ex.Message.Contains("Perm_Si") ->

@@ -12,7 +12,7 @@ open System.Threading.Tasks
 
 
 [<MessagePackObject>]
-type RunDTO = 
+type RunDto = 
     { 
       [<Key("index")>] Index: int
       [<Key("parameters")>] Properties: Map<string, string>
@@ -30,11 +30,11 @@ module Run =
     // MessagePack options for serialization
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-    // Convert Run to a DTO for serialization
-    let toRunDTO (run: Run) : RunDTO =
+    // Convert Run to a Dto for serialization
+    let toRunDto (run: Run) : RunDto =
         { Index = run.Index
           Properties = run.Parameters }
 
-    let fromDto (dto: RunDTO) : Run =
+    let fromDto (dto: RunDto) : Run =
         { Index = dto.Index
           Parameters = dto.Properties }

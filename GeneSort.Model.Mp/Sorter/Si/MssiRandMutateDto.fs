@@ -12,7 +12,7 @@ open MessagePack.FSharp
 
 [<MessagePackObject>]
 type MssiRandMutateDto = 
-    { [<Key(0)>] Mssi: MssiDTO
+    { [<Key(0)>] Mssi: MssiDto
       [<Key(1)>] RngType: rngType
       [<Key(2)>] OpActionRatesArray: OpActionRatesArrayDto }
 
@@ -22,13 +22,13 @@ module MssiRandMutateDto =
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let toMssiRandMutateDto (mssiRandMutate: MssiRandMutate) : MssiRandMutateDto =
-        { Mssi = MssiDTO.toMssiDTO mssiRandMutate.Mssi
+        { Mssi = MssiDto.toMssiDto mssiRandMutate.Mssi
           RngType = mssiRandMutate.RngType
           OpActionRatesArray = OpActionRatesArrayDto.fromOpActionRatesArray mssiRandMutate.OpActionRates }
 
     let fromMssiRandMutateDto (dto: MssiRandMutateDto) : Result<MssiRandMutate, string> =
         try
-            let mssiResult = MssiDTO.toMssi dto.Mssi
+            let mssiResult = MssiDto.toMssi dto.Mssi
             match mssiResult with
             | Ok mssi ->
                 if %mssi.StageCount <> (OpActionRatesArrayDto.toOpActionRatesArray dto.OpActionRatesArray).Length then
@@ -42,7 +42,7 @@ module MssiRandMutateDto =
                     Ok mssiRandMutate
             | Error err ->
                 Error (match err with
-                       | MssiDTO.InvalidPermSiCount msg -> msg
-                       | MssiDTO.InvalidWidth msg -> msg)
+                       | MssiDto.InvalidPermSiCount msg -> msg
+                       | MssiDto.InvalidWidth msg -> msg)
         with
         | ex -> Error ex.Message

@@ -10,12 +10,12 @@ open GeneSort.Model.Sorter.Uf6
 open GeneSort.Model.Sorter
 
 [<MessagePackObject>]
-type Msuf6DTO =
+type Msuf6Dto =
     { [<Key(0)>] Id: Guid
       [<Key(1)>] SortingWidth: int
-      [<Key(2)>] TwoOrbitUnfolder6s: TwoOrbitUf6DTO array }
+      [<Key(2)>] TwoOrbitUnfolder6s: TwoOrbitUf6Dto array }
     
-    static member Create(id: Guid, sortingWidth: int, twoOrbitUnfolder6s: TwoOrbitUf6DTO array) : Result<Msuf6DTO, string> =
+    static member Create(id: Guid, sortingWidth: int, twoOrbitUnfolder6s: TwoOrbitUf6Dto array) : Result<Msuf6Dto, string> =
         if isNull twoOrbitUnfolder6s then
             Error "TwoOrbitUnfolder6s array cannot be null"
         else if twoOrbitUnfolder6s.Length < 1 then
@@ -24,7 +24,7 @@ type Msuf6DTO =
             Error $"SortingWidth must be at least 1, got {sortingWidth}"
         else
             try
-                if twoOrbitUnfolder6s |> Array.exists (fun tou -> (tou |> TwoOrbitUf6DTO.getOrder) <> sortingWidth) then
+                if twoOrbitUnfolder6s |> Array.exists (fun tou -> (tou |> TwoOrbitUf6Dto.getOrder) <> sortingWidth) then
                     Error $"All TwoOrbitUnfolder6 must have order {sortingWidth}"
                 else
                     Ok { Id = id
@@ -34,23 +34,23 @@ type Msuf6DTO =
             | :? ArgumentException as ex ->
                 Error ex.Message
 
-module Msuf6DTO =
-    type Msuf6DTOError =
+module Msuf6Dto =
+    type Msuf6DtoError =
         | NullTwoOrbitUnfolder6sArray of string
         | EmptyTwoOrbitUnfolder6sArray of string
         | InvalidSortingWidth of string
         | MismatchedTwoOrbitUnfolder6Order of string
-        | TwoOrbitUnfolder6ConversionError of TwoOrbitUf6DTO.TwoOrbitUf6DTOError
+        | TwoOrbitUnfolder6ConversionError of TwoOrbitUf6Dto.TwoOrbitUf6DtoError
 
-    let toMsuf6DTO (msuf6: Msuf6) : Msuf6DTO =
+    let toMsuf6Dto (msuf6: Msuf6) : Msuf6Dto =
         { Id = %msuf6.Id
           SortingWidth = %msuf6.SortingWidth
-          TwoOrbitUnfolder6s = msuf6.TwoOrbitUnfolder6s |> Array.map TwoOrbitUf6DTO.toTwoOrbitUf6DTO }
+          TwoOrbitUnfolder6s = msuf6.TwoOrbitUnfolder6s |> Array.map TwoOrbitUf6Dto.toTwoOrbitUf6Dto }
 
-    let toMsuf6 (dto: Msuf6DTO) : Result<Msuf6, Msuf6DTOError> =
+    let toMsuf6 (dto: Msuf6Dto) : Result<Msuf6, Msuf6DtoError> =
         let twoOrbitUnfolder6sResult = 
             dto.TwoOrbitUnfolder6s 
-            |> Array.map TwoOrbitUf6DTO.toTwoOrbitUf6
+            |> Array.map TwoOrbitUf6Dto.toTwoOrbitUf6
             |> Array.fold (fun acc res ->
                 match acc, res with
                 | Ok arr, Ok tou -> Ok (Array.append arr [|tou|])

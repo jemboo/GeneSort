@@ -5,10 +5,10 @@ open GeneSort.Core
 open MessagePack
 
 [<MessagePackObject; Struct>]
-type PermutationDTO =
+type PermutationDto =
     { [<Key(0)>] Array: int array }
     
-    static member Create(arr: int array) : Result<PermutationDTO, string> =
+    static member Create(arr: int array) : Result<PermutationDto, string> =
         if isNull arr then
             Error "Array cannot be null"
         else if arr.Length = 0 then
@@ -22,16 +22,16 @@ type PermutationDTO =
             else
                 Ok { Array = arr }
 
-module PermutationDTO =
-    type PermutationDTOError =
+module PermutationDto =
+    type PermutationDtoError =
         | NullArray of string
         | EmptyArray of string
         | InvalidPermutation of string
 
-    let toPermutationDTO (perm: Permutation) : PermutationDTO =
+    let toPermutationDto (perm: Permutation) : PermutationDto =
         { Array = perm.Array }
 
-    let toPermutation (dto: PermutationDTO) : Result<Permutation, PermutationDTOError> =
+    let toPermutation (dto: PermutationDto) : Result<Permutation, PermutationDtoError> =
         try
             let perm = Permutation.create dto.Array
             Ok perm

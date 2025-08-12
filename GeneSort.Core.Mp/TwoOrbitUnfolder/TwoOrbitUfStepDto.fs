@@ -7,11 +7,11 @@ open MessagePack
 open GeneSort.Core
 
 [<MessagePackObject; Struct>]
-type TwoOrbitUfStepDTO =
+type TwoOrbitUfStepDto =
     { [<Key(0)>] TwoOrbitTypes: TwoOrbitType array
       [<Key(1)>] Order: int }
     
-    static member Create(twoOrbitTypes: TwoOrbitType array, order: int) : Result<TwoOrbitUfStepDTO, string> =
+    static member Create(twoOrbitTypes: TwoOrbitType array, order: int) : Result<TwoOrbitUfStepDto, string> =
         if order < 4 then
             Error $"Order must be at least 4, got {order}"
         else if order % 2 <> 0 then
@@ -22,17 +22,17 @@ type TwoOrbitUfStepDTO =
             Ok { TwoOrbitTypes = twoOrbitTypes; Order = order }
 
 
-module TwoOrbitUnfolderStepDTO =
-    type TwoOrbitUnfolderStepDTOError =
+module TwoOrbitUnfolderStepDto =
+    type TwoOrbitUnfolderStepDtoError =
         | InvalidOrder of string
         | NotEvenOrder of string
         | InvalidTwoOrbitTypesLength of string
 
-    let toTwoOrbitUnfolderStepDTO (step: TwoOrbitUfStep) : TwoOrbitUfStepDTO =
+    let toTwoOrbitUnfolderStepDto (step: TwoOrbitUfStep) : TwoOrbitUfStepDto =
         { TwoOrbitTypes = (step.TwoOrbitTypes |> List.toArray)
           Order = step.Order }
 
-    let toTwoOrbitUnfolderStep (dto: TwoOrbitUfStepDTO) : Result<TwoOrbitUfStep, TwoOrbitUnfolderStepDTOError> =
+    let toTwoOrbitUnfolderStep (dto: TwoOrbitUfStepDto) : Result<TwoOrbitUfStep, TwoOrbitUnfolderStepDtoError> =
         try
             let step = TwoOrbitUfStep.create (dto.TwoOrbitTypes |> Array.toList) dto.Order
             Ok step
