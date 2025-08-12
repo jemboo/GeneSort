@@ -87,7 +87,7 @@ module PrototypeUnfolder =
             for chunk in rsOrbitPairTypeChunks do
                 workingList <- unfoldTwoOrbitPairsIntoTwoOrbitPairs chunk workingList 
 
-            Perm_Si.fromTwoOrbitPair workingList
+            Perm_Si.fromTwoOrbitPair (workingList |> List.toArray)
 
         match seedTwoOrbitPairs with
         | Some orbitPairs -> 

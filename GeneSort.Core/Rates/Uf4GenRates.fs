@@ -5,7 +5,7 @@ type Uf4GenRates =
     {
         order:int;
         seedOpsGenRates: OpsGenRates;
-        opsGenRatesList: OpsGenRates list
+        opsGenRatesArray: OpsGenRates array
     }
 
 module Uf4GenRates =
@@ -17,11 +17,11 @@ module Uf4GenRates =
         if order % 2 <> 0 then
             failwith "TwoOrbitUfStep order must be even"
         let genRatesListLength = MathUtils.exactLog2 (order / 4)
-        let genRatesList = List.init genRatesListLength (fun _ -> OpsGenRates.createUniform())
+        let genRatesList = Array.init genRatesListLength (fun _ -> OpsGenRates.createUniform())
         { 
             Uf4GenRates.order = order;
             seedOpsGenRates = OpsGenRates.createUniform();
-            opsGenRatesList = genRatesList; 
+            opsGenRatesArray = genRatesList; 
         }
 
 
@@ -34,7 +34,7 @@ module Uf4GenRates =
             {
                 Uf4GenRates.order = order;
                 seedOpsGenRates = OpsGenRates.createUniform();
-                opsGenRatesList = []
+                opsGenRatesArray = [||]
             }
         else
             let genRatesBaseList =
@@ -48,5 +48,5 @@ module Uf4GenRates =
             { 
                 Uf4GenRates.order = order;
                 seedOpsGenRates = OpsGenRates.createUniform();
-                opsGenRatesList = genRatesListWithLast; 
+                opsGenRatesArray = (genRatesListWithLast |> List.toArray); 
             }

@@ -98,7 +98,7 @@ module Uf6MutationRatesArray =
                     interpolateSeed6ActionRates startRates.seed6TransitionRates.SelfReflRates endRates.seed6TransitionRates.SelfReflRates t)
                 let listLength = exactLog2 (order / 6)
                 let opsTransitionRates =
-                    List.init listLength (fun j ->
+                    Array.init listLength (fun j ->
                         let startList = startRates.opsTransitionRates
                         let endList = endRates.opsTransitionRates
                         if j >= startList.Length || j >= endList.Length then OpsTransitionRates.createUniform(0.1)
@@ -173,7 +173,7 @@ module Uf6MutationRatesArray =
                         clamp (baseRates.seed6TransitionRates.SelfReflRates.SelfReflRate + amplitudes.seed6TransitionRates.SelfReflRates.SelfReflRate * Math.Sin(t + 5.0 * phaseShift)) 0.0 1.0))
                 let listLength = exactLog2 (order / 6)
                 let opsTransitionRates =
-                    List.init listLength (fun j ->
+                    Array.init listLength (fun j ->
                         let baseList = baseRates.opsTransitionRates
                         let ampList = amplitudes.opsTransitionRates
                         if j >= baseList.Length || j >= ampList.Length then OpsTransitionRates.createUniform(0.1)
@@ -214,7 +214,7 @@ module Uf6MutationRatesArray =
                     interpolateSeed6ActionRates baseRates.seed6TransitionRates.SelfReflRates (hotSpotRates.seed6TransitionRates.SelfReflRates) weight)
                 let listLength = exactLog2 (order / 6)
                 let opsTransitionRates =
-                    List.init listLength (fun j ->
+                    Array.init listLength (fun j ->
                         let baseList = baseRates.opsTransitionRates
                         let hotSpotList = hotSpotRates.opsTransitionRates
                         if j >= baseList.Length || j >= hotSpotList.Length then OpsTransitionRates.createUniform(0.1)

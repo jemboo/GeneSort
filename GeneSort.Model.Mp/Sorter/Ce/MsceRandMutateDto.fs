@@ -1,0 +1,50 @@
+﻿namespace GeneSort.Model.Mp.Sorter.Ce
+
+open FSharp.UMX
+open GeneSort.Core
+open GeneSort.Sorter
+open GeneSort.Model.Sorter.Ce
+open MessagePack
+open MessagePack.Resolvers
+open MessagePack.FSharp
+open GeneSort.Core.Mp.RatesAndOps
+
+[<MessagePackObject>]
+type MsceRandMutateDto = 
+    { [<Key(0)>] Msce: MsceDto
+      [<Key(1)>] RngType: rngType
+      [<Key(2)>] IndelRatesArray: IndelRatesArrayDto
+      [<Key(3)>] ExcludeSelfCe: bool }
+
+module MsceRandMutateDto =
+
+    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
+    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
+
+    let toMsceRandMutateDto (msceRandMutate: MsceRandMutate) : MsceRandMutateDto =
+        { Msce = MsceDto.toMsceDTO msceRandMutate.Msce
+          RngType = msceRandMutate.RngType
+          IndelRatesArray = IndelRatesArrayDto.fromIndelRatesArray msceRandMutate.IndelRatesArray
+          ExcludeSelfCe = msceRandMutate.ExcludeSelfCe }
+
+    let fromMsceRandMutateDto (dto: MsceRandMutateDto) : Result<MsceRandMutate, string> =
+        try
+            let msceResult = MsceDto.toMsce dto.Msce
+            match msceResult with
+            | Ok msce ->
+                if %msce.CeCount <> (IndelRatesArrayDto.toIndelRatesArray dto.IndelRatesArray).Length then
+                    Error "CeCount must match IndelRatesArray.Length"
+                else
+                    let msceRandMutate = 
+                        MsceRandMutate.create
+                            (dto.RngType)
+                            (IndelRatesArrayDto.toIndelRatesArray dto.IndelRatesArray)
+                            (dto.ExcludeSelfCe)
+                            msce
+                    Ok msceRandMutate
+            | Error err ->
+                Error (match err with
+                       | MsceDto.InvalidCeCodesLength msg -> msg
+                       | MsceDto.InvalidSortingWidth msg -> msg)
+        with
+        | ex -> Error ex.Message

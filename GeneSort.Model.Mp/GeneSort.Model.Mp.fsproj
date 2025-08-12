@@ -6,12 +6,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Sorter\Ce\MsceDTO.fs" />
+    <Compile Include="Sorter\Ce\MsceDto.fs" />
+    <Compile Include="Sorter\Ce\MsceRandGenDto.fs" />
+    <Compile Include="Sorter\Ce\MsceRandMutateDto.fs" />
     <Compile Include="Sorter\Si\MssiDTO.fs" />
+    <Compile Include="Sorter\Si\MssiRandGenDto.fs" />
+    <Compile Include="Sorter\Si\MssiRandMutateDto.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />
     <Compile Include="Sorter\Rs\MsrsDTO.fs" />
+    <Compile Include="Sorter\Rs\MsrsRandGenDto.fs" />
+    <Compile Include="Sorter\Rs\MsrsRandMutateDto.fs" />
     <Compile Include="Sorter\Uf4\Msuf4DTO.fs" />
     <Compile Include="Sorter\Uf6\Msuf6DTO.fs" />
+    <Compile Include="Sorter\SorterModelDto.fs" />
   </ItemGroup>
 
   <ItemGroup>

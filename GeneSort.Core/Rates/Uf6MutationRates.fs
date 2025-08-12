@@ -4,7 +4,7 @@ type Uf6MutationRates =
     {
         order:int;
         seed6TransitionRates: Seed6TransitionRates;
-        opsTransitionRates: OpsTransitionRates list
+        opsTransitionRates: OpsTransitionRates array
     }
 
 
@@ -13,7 +13,7 @@ module Uf6MutationRates =
     let makeUniform (order:int) (seed6MutationRates:float) (twoOrbitMutationRate:float) 
          : Uf6MutationRates   =
         let mutRatesListLength = MathUtils.exactLog2 (order / 6)
-        let mutRatesList = List.init mutRatesListLength (fun _ -> OpsTransitionRates.createUniform(twoOrbitMutationRate))
+        let mutRatesList = Array.init mutRatesListLength (fun _ -> OpsTransitionRates.createUniform(twoOrbitMutationRate))
         { Uf6MutationRates.order = order;
           seed6TransitionRates = Seed6TransitionRates.createUniform(seed6MutationRates);
           opsTransitionRates = mutRatesList; }
@@ -27,4 +27,4 @@ module Uf6MutationRates =
         let genRatesListWithLast = mutRatesBaseList @ [lastGenRates]
         { Uf6MutationRates.order = order;
           seed6TransitionRates = Seed6TransitionRates.createUniform(seed6MutationRates);
-          opsTransitionRates = genRatesListWithLast; }
+          opsTransitionRates = (genRatesListWithLast |> List.toArray); }

@@ -39,7 +39,7 @@ type Msuf4RandGen =
             failwith $"genRates array length (%d{genRates.Length}) must equal stageCount ({%stageCount})"
         else if genRates.RatesArray |> Array.exists (fun gr -> gr.order <> %sortingWidth) then
             failwith $"All genRates must have order {%sortingWidth}"
-        else if genRates.RatesArray |> Array.exists (fun gr -> gr.opsGenRatesList.Length <> exactLog2(gr.order / 4)) then
+        else if genRates.RatesArray |> Array.exists (fun gr -> gr.opsGenRatesArray.Length <> exactLog2(gr.order / 4)) then
             failwith "twoOrbitTypeGenRatesList length must equal log2(order/4)"
         else
             let id =

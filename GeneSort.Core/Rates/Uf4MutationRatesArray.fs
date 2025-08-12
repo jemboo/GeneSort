@@ -1,4 +1,5 @@
 ﻿namespace GeneSort.Core
+
 open System
 
 [<Struct; CustomEquality; NoComparison>]
@@ -8,8 +9,8 @@ type Uf4MutationRatesArray =
 
     static member create (rates: Uf4MutationRates array) : Uf4MutationRatesArray =
         if Array.isEmpty rates then failwith "Rates array cannot be empty"
-        if Array.exists (fun r -> r.order < 4 || r.order % 2 <> 0) rates then
-            failwith "All Uf4MutationRates orders must be at least 4 and even"
+        if Array.exists (fun r -> r.order < 4 || r.order % 4 <> 0) rates then
+            failwith "All Uf4MutationRates orders must be at least 4 and divisible by 4"
         { rates = rates }
 
     member this.Length = this.rates.Length
@@ -18,7 +19,7 @@ type Uf4MutationRatesArray =
 
     member this.toString() =
         String.Join(", ", Array.map (
-            fun r -> sprintf "Uf4MutationRates(order=%d, seed=%s, listLength=%d)" 
+            fun r -> sprintf "Uf4MutationRates(order=%d, seed=%s, arrayLength=%d)" 
                         r.order (r.seedOpsTransitionRates.toString()) r.twoOrbitPairOpsTransitionRates.Length) this.rates)
 
     override this.Equals(obj) =
@@ -29,7 +30,7 @@ type Uf4MutationRatesArray =
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seedOpsTransitionRates.Equals(b.seedOpsTransitionRates) && 
-                    a.twoOrbitPairOpsTransitionRates = b.twoOrbitPairOpsTransitionRates) this.rates other.rates
+                    a.twoOrbitPairOpsTransitionRates.Equals(b.twoOrbitPairOpsTransitionRates)) this.rates other.rates
         | _ -> false
 
     override this.GetHashCode() =
@@ -47,7 +48,7 @@ type Uf4MutationRatesArray =
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seedOpsTransitionRates.Equals(b.seedOpsTransitionRates) && 
-                    a.twoOrbitPairOpsTransitionRates = b.twoOrbitPairOpsTransitionRates) this.rates other.rates
+                    a.twoOrbitPairOpsTransitionRates.Equals(b.twoOrbitPairOpsTransitionRates)) this.rates other.rates
 
 module Uf4MutationRatesArray =
 
@@ -56,8 +57,10 @@ module Uf4MutationRatesArray =
 
     let createLinearVariation (length: int) (order: int) (startRates: Uf4MutationRates) (endRates: Uf4MutationRates) : Uf4MutationRatesArray =
         if length <= 0 then failwith "Length must be positive"
-        if order < 4 || order % 2 <> 0 then failwith "Order must be at least 4 and even"
+        if order < 4 || order % 4 <> 0 then failwith "Order must be at least 4 and divisible by 4"
         if startRates.order <> order || endRates.order <> order then failwith "Start and end rates must have the same order"
+        if startRates.twoOrbitPairOpsTransitionRates.Length <> endRates.twoOrbitPairOpsTransitionRates.Length then
+            failwith "Start and end rates must have the same twoOrbitPairOpsTransitionRates length"
         let rates =
             Array.init length (fun i ->
                 let t = float i / float (length - 1)
@@ -75,32 +78,34 @@ module Uf4MutationRatesArray =
                         startRates.seedOpsTransitionRates.SelfReflRates.ParaRate + t * (endRates.seedOpsTransitionRates.SelfReflRates.ParaRate - startRates.seedOpsTransitionRates.SelfReflRates.ParaRate),
                         startRates.seedOpsTransitionRates.SelfReflRates.SelfReflRate + t * (endRates.seedOpsTransitionRates.SelfReflRates.SelfReflRate - startRates.seedOpsTransitionRates.SelfReflRates.SelfReflRate)))
                 let listLength = MathUtils.exactLog2 (order / 4)
-                let opsTransitionRatesList =
-                    List.init listLength (fun j ->
-                        let startList = startRates.twoOrbitPairOpsTransitionRates
-                        let endList = endRates.twoOrbitPairOpsTransitionRates
-                        if j >= startList.Length || j >= endList.Length then OpsTransitionRates.createUniform(0.0)
-                        else
-                            OpsTransitionRates.create(
-                                OpsActionRates.create(
-                                    startList.[j].OrthoRates.OrthoRate + t * (endList.[j].OrthoRates.OrthoRate - startList.[j].OrthoRates.OrthoRate),
-                                    startList.[j].OrthoRates.ParaRate + t * (endList.[j].OrthoRates.ParaRate - startList.[j].OrthoRates.ParaRate),
-                                    startList.[j].OrthoRates.SelfReflRate + t * (endList.[j].OrthoRates.SelfReflRate - startList.[j].OrthoRates.SelfReflRate)),
-                                OpsActionRates.create(
-                                    startList.[j].ParaRates.OrthoRate + t * (endList.[j].ParaRates.OrthoRate - startList.[j].ParaRates.OrthoRate),
-                                    startList.[j].ParaRates.ParaRate + t * (endList.[j].ParaRates.ParaRate - startList.[j].ParaRates.ParaRate),
-                                    startList.[j].ParaRates.SelfReflRate + t * (endList.[j].ParaRates.SelfReflRate - startList.[j].ParaRates.SelfReflRate)),
-                                OpsActionRates.create(
-                                    startList.[j].SelfReflRates.OrthoRate + t * (endList.[j].SelfReflRates.OrthoRate - startList.[j].SelfReflRates.OrthoRate),
-                                    startList.[j].SelfReflRates.ParaRate + t * (endList.[j].SelfReflRates.ParaRate - startList.[j].SelfReflRates.ParaRate),
-                                    startList.[j].SelfReflRates.SelfReflRate + t * (endList.[j].SelfReflRates.SelfReflRate - startList.[j].SelfReflRates.SelfReflRate))))
-                { Uf4MutationRates.order = order; seedOpsTransitionRates = seed; twoOrbitPairOpsTransitionRates = opsTransitionRatesList })
+                let opsTransitionRatesArray =
+                    Array.init listLength (fun j ->
+                        let startArray = startRates.twoOrbitPairOpsTransitionRates.RatesArray
+                        let endArray = endRates.twoOrbitPairOpsTransitionRates.RatesArray
+                        OpsTransitionRates.create(
+                            OpsActionRates.create(
+                                startArray.[j].OrthoRates.OrthoRate + t * (endArray.[j].OrthoRates.OrthoRate - startArray.[j].OrthoRates.OrthoRate),
+                                startArray.[j].OrthoRates.ParaRate + t * (endArray.[j].OrthoRates.ParaRate - startArray.[j].OrthoRates.ParaRate),
+                                startArray.[j].OrthoRates.SelfReflRate + t * (endArray.[j].OrthoRates.SelfReflRate - startArray.[j].OrthoRates.SelfReflRate)),
+                            OpsActionRates.create(
+                                startArray.[j].ParaRates.OrthoRate + t * (endArray.[j].ParaRates.OrthoRate - startArray.[j].ParaRates.OrthoRate),
+                                startArray.[j].ParaRates.ParaRate + t * (endArray.[j].ParaRates.ParaRate - startArray.[j].ParaRates.ParaRate),
+                                startArray.[j].ParaRates.SelfReflRate + t * (endArray.[j].ParaRates.SelfReflRate - startArray.[j].ParaRates.SelfReflRate)),
+                            OpsActionRates.create(
+                                startArray.[j].SelfReflRates.OrthoRate + t * (endArray.[j].SelfReflRates.OrthoRate - startArray.[j].SelfReflRates.OrthoRate),
+                                startArray.[j].SelfReflRates.ParaRate + t * (endArray.[j].SelfReflRates.ParaRate - startArray.[j].SelfReflRates.ParaRate),
+                                startArray.[j].SelfReflRates.SelfReflRate + t * (endArray.[j].SelfReflRates.SelfReflRate - startArray.[j].SelfReflRates.SelfReflRate))))
+                { Uf4MutationRates.order = order
+                  seedOpsTransitionRates = seed
+                  twoOrbitPairOpsTransitionRates = OpsTransitionRatesArray.create opsTransitionRatesArray })
         Uf4MutationRatesArray.create rates
 
     let createSinusoidalVariation (length: int) (order: int) (baseRates: Uf4MutationRates) (amplitudes: Uf4MutationRates) (frequency: float) : Uf4MutationRatesArray =
         if length <= 0 then failwith "Length must be positive"
-        if order < 4 || order % 2 <> 0 then failwith "Order must be at least 4 and even"
+        if order < 4 || order % 4 <> 0 then failwith "Order must be at least 4 and divisible by 4"
         if baseRates.order <> order || amplitudes.order <> order then failwith "Base and amplitudes must have the same order"
+        if baseRates.twoOrbitPairOpsTransitionRates.Length <> amplitudes.twoOrbitPairOpsTransitionRates.Length then
+            failwith "Base and amplitudes must have the same twoOrbitPairOpsTransitionRates length"
         let rates =
             Array.init length (fun i ->
                 let t = float i / float (length - 1) * 2.0 * Math.PI * frequency
@@ -118,34 +123,36 @@ module Uf4MutationRatesArray =
                         clamp (baseRates.seedOpsTransitionRates.SelfReflRates.ParaRate + amplitudes.seedOpsTransitionRates.SelfReflRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
                         clamp (baseRates.seedOpsTransitionRates.SelfReflRates.SelfReflRate + amplitudes.seedOpsTransitionRates.SelfReflRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0))
                 let listLength = MathUtils.exactLog2 (order / 4)
-                let opsTransitionRatesList =
-                    List.init listLength (fun j ->
-                        let baseList = baseRates.twoOrbitPairOpsTransitionRates
-                        let ampList = amplitudes.twoOrbitPairOpsTransitionRates
-                        if j >= baseList.Length || j >= ampList.Length then OpsTransitionRates.createUniform(0.0)
-                        else
-                            OpsTransitionRates.create(
-                                OpsActionRates.create(
-                                    clamp (baseList.[j].OrthoRates.OrthoRate + ampList.[j].OrthoRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
-                                    clamp (baseList.[j].OrthoRates.ParaRate + ampList.[j].OrthoRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
-                                    clamp (baseList.[j].OrthoRates.SelfReflRate + ampList.[j].OrthoRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0),
-                                OpsActionRates.create(
-                                    clamp (baseList.[j].ParaRates.OrthoRate + ampList.[j].ParaRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
-                                    clamp (baseList.[j].ParaRates.ParaRate + ampList.[j].ParaRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
-                                    clamp (baseList.[j].ParaRates.SelfReflRate + ampList.[j].ParaRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0),
-                                OpsActionRates.create(
-                                    clamp (baseList.[j].SelfReflRates.OrthoRate + ampList.[j].SelfReflRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
-                                    clamp (baseList.[j].SelfReflRates.ParaRate + ampList.[j].SelfReflRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
-                                    clamp (baseList.[j].SelfReflRates.SelfReflRate + ampList.[j].SelfReflRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0)))
-                { Uf4MutationRates.order = order; seedOpsTransitionRates = seed; twoOrbitPairOpsTransitionRates = opsTransitionRatesList })
+                let opsTransitionRatesArray =
+                    Array.init listLength (fun j ->
+                        let baseArray = baseRates.twoOrbitPairOpsTransitionRates.RatesArray
+                        let ampArray = amplitudes.twoOrbitPairOpsTransitionRates.RatesArray
+                        OpsTransitionRates.create(
+                            OpsActionRates.create(
+                                clamp (baseArray.[j].OrthoRates.OrthoRate + ampArray.[j].OrthoRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
+                                clamp (baseArray.[j].OrthoRates.ParaRate + ampArray.[j].OrthoRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
+                                clamp (baseArray.[j].OrthoRates.SelfReflRate + ampArray.[j].OrthoRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0),
+                            OpsActionRates.create(
+                                clamp (baseArray.[j].ParaRates.OrthoRate + ampArray.[j].ParaRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
+                                clamp (baseArray.[j].ParaRates.ParaRate + ampArray.[j].ParaRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
+                                clamp (baseArray.[j].ParaRates.SelfReflRate + ampArray.[j].ParaRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0),
+                            OpsActionRates.create(
+                                clamp (baseArray.[j].SelfReflRates.OrthoRate + ampArray.[j].SelfReflRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
+                                clamp (baseArray.[j].SelfReflRates.ParaRate + ampArray.[j].SelfReflRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
+                                clamp (baseArray.[j].SelfReflRates.SelfReflRate + ampArray.[j].SelfReflRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0)))
+                { Uf4MutationRates.order = order
+                  seedOpsTransitionRates = seed
+                  twoOrbitPairOpsTransitionRates = OpsTransitionRatesArray.create opsTransitionRatesArray })
         Uf4MutationRatesArray.create rates
 
     let createGaussianHotSpot (length: int) (order: int) (baseRates: Uf4MutationRates) (hotSpotIndex: int) (hotSpotRates: Uf4MutationRates) (sigma: float) : Uf4MutationRatesArray =
         if length <= 0 then failwith "Length must be positive"
-        if order < 4 || order % 2 <> 0 then failwith "Order must be at least 4 and even"
+        if order < 4 || order % 4 <> 0 then failwith "Order must be at least 4 and divisible by 4"
         if baseRates.order <> order || hotSpotRates.order <> order then failwith "Base and hotspot rates must have the same order"
         if hotSpotIndex < 0 || hotSpotIndex >= length then failwith "HotSpotIndex out of range"
         if sigma <= 0.0 then failwith "Sigma must be positive"
+        if baseRates.twoOrbitPairOpsTransitionRates.Length <> hotSpotRates.twoOrbitPairOpsTransitionRates.Length then
+            failwith "Base and hotspot rates must have the same twoOrbitPairOpsTransitionRates length"
         let rates =
             Array.init length (fun i ->
                 let x = float (i - hotSpotIndex)
@@ -164,41 +171,43 @@ module Uf4MutationRatesArray =
                         baseRates.seedOpsTransitionRates.SelfReflRates.ParaRate + (hotSpotRates.seedOpsTransitionRates.SelfReflRates.ParaRate - baseRates.seedOpsTransitionRates.SelfReflRates.ParaRate) * weight,
                         baseRates.seedOpsTransitionRates.SelfReflRates.SelfReflRate + (hotSpotRates.seedOpsTransitionRates.SelfReflRates.SelfReflRate - baseRates.seedOpsTransitionRates.SelfReflRates.SelfReflRate) * weight))
                 let listLength = MathUtils.exactLog2 (order / 4)
-                let opsTransitionRatesList =
-                    List.init listLength (fun j ->
-                        let baseList = baseRates.twoOrbitPairOpsTransitionRates
-                        let hotSpotList = hotSpotRates.twoOrbitPairOpsTransitionRates
-                        if j >= baseList.Length || j >= hotSpotList.Length then OpsTransitionRates.createUniform(0.0)
-                        else
-                            OpsTransitionRates.create(
-                                OpsActionRates.create(
-                                    baseList.[j].OrthoRates.OrthoRate + (hotSpotList.[j].OrthoRates.OrthoRate - baseList.[j].OrthoRates.OrthoRate) * weight,
-                                    baseList.[j].OrthoRates.ParaRate + (hotSpotList.[j].OrthoRates.ParaRate - baseList.[j].OrthoRates.ParaRate) * weight,
-                                    baseList.[j].OrthoRates.SelfReflRate + (hotSpotList.[j].OrthoRates.SelfReflRate - baseList.[j].OrthoRates.SelfReflRate) * weight),
-                                OpsActionRates.create(
-                                    baseList.[j].ParaRates.OrthoRate + (hotSpotList.[j].ParaRates.OrthoRate - baseList.[j].ParaRates.OrthoRate) * weight,
-                                    baseList.[j].ParaRates.ParaRate + (hotSpotList.[j].ParaRates.ParaRate - baseList.[j].ParaRates.ParaRate) * weight,
-                                    baseList.[j].ParaRates.SelfReflRate + (hotSpotList.[j].ParaRates.SelfReflRate - baseList.[j].ParaRates.SelfReflRate) * weight),
-                                OpsActionRates.create(
-                                    baseList.[j].SelfReflRates.OrthoRate + (hotSpotList.[j].SelfReflRates.OrthoRate - baseList.[j].SelfReflRates.OrthoRate) * weight,
-                                    baseList.[j].SelfReflRates.ParaRate + (hotSpotList.[j].SelfReflRates.ParaRate - baseList.[j].SelfReflRates.ParaRate) * weight,
-                                    baseList.[j].SelfReflRates.SelfReflRate + (hotSpotList.[j].SelfReflRates.SelfReflRate - baseList.[j].SelfReflRates.SelfReflRate) * weight)))
-                { Uf4MutationRates.order = order; seedOpsTransitionRates = seed; twoOrbitPairOpsTransitionRates = opsTransitionRatesList })
+                let opsTransitionRatesArray =
+                    Array.init listLength (fun j ->
+                        let baseArray = baseRates.twoOrbitPairOpsTransitionRates.RatesArray
+                        let hotSpotArray = hotSpotRates.twoOrbitPairOpsTransitionRates.RatesArray
+                        OpsTransitionRates.create(
+                            OpsActionRates.create(
+                                baseArray.[j].OrthoRates.OrthoRate + (hotSpotArray.[j].OrthoRates.OrthoRate - baseArray.[j].OrthoRates.OrthoRate) * weight,
+                                baseArray.[j].OrthoRates.ParaRate + (hotSpotArray.[j].OrthoRates.ParaRate - baseArray.[j].OrthoRates.ParaRate) * weight,
+                                baseArray.[j].OrthoRates.SelfReflRate + (hotSpotArray.[j].OrthoRates.SelfReflRate - baseArray.[j].OrthoRates.SelfReflRate) * weight),
+                            OpsActionRates.create(
+                                baseArray.[j].ParaRates.OrthoRate + (hotSpotArray.[j].ParaRates.OrthoRate - baseArray.[j].ParaRates.OrthoRate) * weight,
+                                baseArray.[j].ParaRates.ParaRate + (hotSpotArray.[j].ParaRates.ParaRate - baseArray.[j].ParaRates.ParaRate) * weight,
+                                baseArray.[j].ParaRates.SelfReflRate + (hotSpotArray.[j].ParaRates.SelfReflRate - baseArray.[j].ParaRates.SelfReflRate) * weight),
+                            OpsActionRates.create(
+                                baseArray.[j].SelfReflRates.OrthoRate + (hotSpotArray.[j].SelfReflRates.OrthoRate - baseArray.[j].SelfReflRates.OrthoRate) * weight,
+                                baseArray.[j].SelfReflRates.ParaRate + (hotSpotArray.[j].SelfReflRates.ParaRate - baseArray.[j].SelfReflRates.ParaRate) * weight,
+                                baseArray.[j].SelfReflRates.SelfReflRate + (hotSpotArray.[j].SelfReflRates.SelfReflRate - baseArray.[j].SelfReflRates.SelfReflRate) * weight)))
+                { Uf4MutationRates.order = order
+                  seedOpsTransitionRates = seed
+                  twoOrbitPairOpsTransitionRates = OpsTransitionRatesArray.create opsTransitionRatesArray })
         Uf4MutationRatesArray.create rates
 
     let createStepHotSpot (length: int) (order: int) (baseRates: Uf4MutationRates) (hotSpotStart: int) (hotSpotEnd: int) (hotSpotRates: Uf4MutationRates) : Uf4MutationRatesArray =
         if length <= 0 then failwith "Length must be positive"
-        if order < 4 || order % 2 <> 0 then failwith "Order must be at least 4 and even"
+        if order < 4 || order % 4 <> 0 then failwith "Order must be at least 4 and divisible by 4"
         if baseRates.order <> order || hotSpotRates.order <> order then failwith "Base and hotspot rates must have the same order"
         if hotSpotStart < 0 || hotSpotStart >= length || hotSpotEnd < hotSpotStart || hotSpotEnd >= length then failwith "Invalid hot spot range"
+        if baseRates.twoOrbitPairOpsTransitionRates.Length <> hotSpotRates.twoOrbitPairOpsTransitionRates.Length then
+            failwith "Base and hotspot rates must have the same twoOrbitPairOpsTransitionRates length"
         let rates =
             Array.init length (fun i ->
                 let rates = if i >= hotSpotStart && i <= hotSpotEnd then hotSpotRates else baseRates
-                { Uf4MutationRates.order = order; 
+                { Uf4MutationRates.order = order
                   seedOpsTransitionRates = OpsTransitionRates.create(
                       OpsActionRates.create(rates.seedOpsTransitionRates.OrthoRates.OrthoRate, rates.seedOpsTransitionRates.OrthoRates.ParaRate, rates.seedOpsTransitionRates.OrthoRates.SelfReflRate),
                       OpsActionRates.create(rates.seedOpsTransitionRates.ParaRates.OrthoRate, rates.seedOpsTransitionRates.ParaRates.ParaRate, rates.seedOpsTransitionRates.ParaRates.SelfReflRate),
-                      OpsActionRates.create(rates.seedOpsTransitionRates.SelfReflRates.OrthoRate, rates.seedOpsTransitionRates.SelfReflRates.ParaRate, rates.seedOpsTransitionRates.SelfReflRates.SelfReflRate));
+                      OpsActionRates.create(rates.seedOpsTransitionRates.SelfReflRates.OrthoRate, rates.seedOpsTransitionRates.SelfReflRates.ParaRate, rates.seedOpsTransitionRates.SelfReflRates.SelfReflRate))
                   twoOrbitPairOpsTransitionRates = rates.twoOrbitPairOpsTransitionRates })
         Uf4MutationRatesArray.create rates
 

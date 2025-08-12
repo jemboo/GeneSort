@@ -72,7 +72,7 @@ module Uf6GenRatesArray =
                     startRates.seedGenRatesUf6.SelfReflRate + t * (endRates.seedGenRatesUf6.SelfReflRate - startRates.seedGenRatesUf6.SelfReflRate))
                 let listLength = exactLog2 (order / 6)
                 let opsGenRatesList =
-                    List.init listLength (fun j ->
+                    Array.init listLength (fun j ->
                         let startList = startRates.opsGenRatesList
                         let endList = endRates.opsGenRatesList
                         if j >= startList.Length || j >= endList.Length then OpsGenRates.createUniform()
@@ -103,7 +103,7 @@ module Uf6GenRatesArray =
                     clamp (baseRates.seedGenRatesUf6.SelfReflRate + amplitudes.seedGenRatesUf6.SelfReflRate * Math.Sin(t + 6.0 * phaseShift)) 0.0 1.0)
                 let listLength = exactLog2 (order / 6)
                 let opsGenRatesList =
-                    List.init listLength (fun j ->
+                    Array.init listLength (fun j ->
                         let baseList = baseRates.opsGenRatesList
                         let ampList = amplitudes.opsGenRatesList
                         if j >= baseList.Length || j >= ampList.Length then OpsGenRates.createUniform()
@@ -136,7 +136,7 @@ module Uf6GenRatesArray =
                     baseRates.seedGenRatesUf6.SelfReflRate + (hotSpotRates.seedGenRatesUf6.SelfReflRate - baseRates.seedGenRatesUf6.SelfReflRate) * weight)
                 let listLength = exactLog2 (order / 6)
                 let opsGenRatesList =
-                    List.init listLength (fun j ->
+                    Array.init listLength (fun j ->
                         let baseList = baseRates.opsGenRatesList
                         let hotSpotList = hotSpotRates.opsGenRatesList
                         if j >= baseList.Length || j >= hotSpotList.Length then OpsGenRates.createUniform()

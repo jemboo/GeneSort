@@ -8,10 +8,10 @@ open MessagePack
 [<MessagePackObject; Struct>]
 type TwoOrbitUf4DTO =
     { [<Key(0)>] SeedType: TwoOrbitType
-      [<Key(1)>] TwoOrbitUfSteps: TwoOrbitUfStepDTO list }
+      [<Key(1)>] TwoOrbitUfSteps: TwoOrbitUfStepDTO array }
     
-    static member Create(seedType: TwoOrbitType, twoOrbitUnfolderSteps: TwoOrbitUfStepDTO list) : Result<TwoOrbitUf4DTO, string> =
-        if List.isEmpty twoOrbitUnfolderSteps then
+    static member Create(seedType: TwoOrbitType, twoOrbitUnfolderSteps: TwoOrbitUfStepDTO array) : Result<TwoOrbitUf4DTO, string> =
+        if Array.isEmpty twoOrbitUnfolderSteps then
             Error "TwoOrbitUnfolderSteps list cannot be empty"
         else
             Ok { SeedType = seedType
@@ -24,13 +24,13 @@ module TwoOrbitUf4DTO =
 
     let toTwoOrbitUnfolder4DTO (tou: TwoOrbitUf4) : TwoOrbitUf4DTO =
         { SeedType = tou.TwoOrbitType
-          TwoOrbitUfSteps = tou.TwoOrbitUnfolderSteps |> List.map TwoOrbitUnfolderStepDTO.toTwoOrbitUnfolderStepDTO }
+          TwoOrbitUfSteps = tou.TwoOrbitUnfolderSteps |> Array.map TwoOrbitUnfolderStepDTO.toTwoOrbitUnfolderStepDTO }
 
     let toTwoOrbitUnfolder4 (dto: TwoOrbitUf4DTO) : Result<TwoOrbitUf4, TwoOrbitUf4DTOError> =
         let stepsResult = 
             dto.TwoOrbitUfSteps 
-            |> List.map TwoOrbitUnfolderStepDTO.toTwoOrbitUnfolderStep
-            |> List.fold (fun acc res ->
+            |> Array.map TwoOrbitUnfolderStepDTO.toTwoOrbitUnfolderStep
+            |> Array.fold (fun acc res ->
                 match acc, res with
                 | Ok arr, Ok step -> Ok (arr @ [step])
                 | Ok _, Error e -> Error (StepConversionError e)
@@ -41,7 +41,7 @@ module TwoOrbitUf4DTO =
         | Error e -> Error e
         | Ok steps ->
             try
-                let tou = TwoOrbitUf4.create dto.SeedType steps
+                let tou = TwoOrbitUf4.create dto.SeedType (steps |> List.toArray)
                 Ok tou
             with
             | :? ArgumentException as ex when ex.Message.Contains("empty") ->
@@ -51,4 +51,4 @@ module TwoOrbitUf4DTO =
 
 
     let getOrder (twoOrbitUnfolder: TwoOrbitUf4DTO) : int =
-            4 * (MathUtils.integerPower 2 (List.length twoOrbitUnfolder.TwoOrbitUfSteps))
+            4 * (MathUtils.integerPower 2 (Array.length twoOrbitUnfolder.TwoOrbitUfSteps))

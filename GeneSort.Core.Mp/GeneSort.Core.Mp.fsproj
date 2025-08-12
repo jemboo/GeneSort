@@ -9,9 +9,6 @@
     <Compile Include="PermutationDto.fs" />
     <Compile Include="Perm_SiDto.fs" />
     <Compile Include="Perm_RsDto.fs" />
-    <Compile Include="TwoOrbitUnfolder\TwoOrbitUfStepDto.fs" />
-    <Compile Include="TwoOrbitUnfolder\TwoOrbitUf4Dto.fs" />
-    <Compile Include="TwoOrbitUnfolder\TwoOrbitUf6Dto.fs" />
     <Compile Include="Rates\IndelRatesDto.fs" />
     <Compile Include="Rates\IndelRatesArrayDto.fs" />
     <Compile Include="Rates\OpsGenRatesDto.fs" />
@@ -26,12 +23,20 @@
     <Compile Include="Rates\Seed6ActionRatesDto.fs" />
     <Compile Include="Rates\Seed6TransitionRatesDto.fs" />
     <Compile Include="Rates\Uf4GenRatesDto.fs" />
+    <Compile Include="Rates\Uf4MutationRatesDto.fs" />
+    <Compile Include="Rates\Uf4MutationRatesArrayDto.fs" />
+    <Compile Include="Rates\Uf6MutationRatesDto.fs" />
+    <Compile Include="Rates\Uf6MutationRatesArrayDto.fs" />
+    <Compile Include="TwoOrbitUnfolder\TwoOrbitUfStepDto.fs" />
+    <Compile Include="TwoOrbitUnfolder\TwoOrbitUf4Dto.fs" />
+    <Compile Include="TwoOrbitUnfolder\TwoOrbitUf6Dto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FsToolkit.ErrorHandling" Version="5.0.1" />
     <PackageReference Include="MessagePack" Version="3.1.4" />
+    <PackageReference Include="MessagePack.FSharpExtensions" Version="4.0.0" />
   </ItemGroup>
 
   <ItemGroup>

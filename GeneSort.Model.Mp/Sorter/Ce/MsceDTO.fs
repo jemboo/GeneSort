@@ -10,12 +10,12 @@ open MessagePack
 open GeneSort.Model.Sorter
 
 [<MessagePackObject; Struct>]
-type MsceDTO =
+type MsceDto =
     { [<Key(0)>] Id: Guid
       [<Key(1)>] SortingWidth: int
       [<Key(2)>] CeCodes: int array }
     
-    static member Create(id: Guid, sortingWidth: int, ceCodes: int array) : MsceDTO =
+    static member Create(id: Guid, sortingWidth: int, ceCodes: int array) : MsceDto =
         if isNull ceCodes || ceCodes.Length < 1 then
             invalidArg "ceCodes" "Must be at least 1 Ce"
         if sortingWidth < 1 then
@@ -26,17 +26,17 @@ type MsceDTO =
     member this.CeCount = this.CeCodes.Length
 
 
-module MsceDTO =
+module MsceDto =
     type MsceDTOError =
         | InvalidCeCodesLength of string
         | InvalidSortingWidth of string
 
-    let toMsceDTO (msce: Msce) : MsceDTO =
+    let toMsceDTO (msce: Msce) : MsceDto =
         { Id = %msce.Id
           SortingWidth = %msce.SortingWidth
           CeCodes = msce.CeCodes }
 
-    let toMsce (msceDTO: MsceDTO) : Result<Msce, MsceDTOError> =
+    let toMsce (msceDTO: MsceDto) : Result<Msce, MsceDTOError> =
         try
             let msce = GeneSort.Model.Sorter.Ce.Msce.create
                             (UMX.tag<sorterModelID> msceDTO.Id)

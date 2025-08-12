@@ -15,7 +15,7 @@ type TwoOrbitTripleType =
 
 module TwoOrbitTripleType =
 
-    // twoOrbit6RS
+    /// 
     let getTwoOrbits (seedType:TwoOrbitTripleType) : TwoOrbit list =
         match seedType with
         | Ortho1 -> [TwoOrbit.create [0; 1]; TwoOrbit.create [4; 5]; TwoOrbit.create [2; 3]]

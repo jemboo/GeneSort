@@ -9,7 +9,7 @@ type Uf4GenRatesDto = {
     [<Key(1)>]
     OpsGenRatesDto: OpsGenRatesDto
     [<Key(2)>]
-    OpsGenRatesDtoList: OpsGenRatesDto list
+    OpsGenRatesDtoList: OpsGenRatesDto array
 }
 
 module Uf4GenRatesDto =
@@ -17,11 +17,11 @@ module Uf4GenRatesDto =
         {
             order = dto.Order
             seedOpsGenRates = OpsGenRatesDto.toOpsGenRates dto.OpsGenRatesDto
-            opsGenRatesList = List.map OpsGenRatesDto.toOpsGenRates dto.OpsGenRatesDtoList
+            opsGenRatesArray = Array.map OpsGenRatesDto.toOpsGenRates dto.OpsGenRatesDtoList
         }
 
     let fromUf4GenRates (domain: Uf4GenRates) : Uf4GenRatesDto = {
         Order = domain.order
         OpsGenRatesDto = OpsGenRatesDto.fromOpsGenRates domain.seedOpsGenRates
-        OpsGenRatesDtoList = List.map OpsGenRatesDto.fromOpsGenRates domain.opsGenRatesList
+        OpsGenRatesDtoList = Array.map OpsGenRatesDto.fromOpsGenRates domain.opsGenRatesArray
     }
