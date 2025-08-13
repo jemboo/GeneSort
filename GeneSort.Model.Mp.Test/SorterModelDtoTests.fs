@@ -8,10 +8,6 @@ open MessagePack.FSharp
 open GeneSort.Core
 open GeneSort.Model.Sorter
 open GeneSort.Model.Mp.Sorter
-open GeneSort.Model.Mp.Sorter.Ce
-open GeneSort.Model.Mp.Sorter.Si
-open GeneSort.Model.Mp.Sorter.Rs
-open GeneSort.Model.Mp.Sorter.Uf4
 open GeneSort.Model.Mp.Sorter.Uf6
 open GeneSort.Model.Sorter.Uf6
 open FSharp.UMX
@@ -21,7 +17,61 @@ open GeneSort.Model.Sorter.Rs
 open GeneSort.Model.Sorter.Si
 open GeneSort.Model.Sorter.Ce
 
-module SorterModelDtoTests =
+type SorterModelDtoTests() =
+
+
+    // Mock floatPicker for deterministic testing
+    let mockFloatPicker () = 0.5
+
+    // Helper function to create a TwoOrbitUf4GenRates for a given order
+    let createTestGenRates (order: int) =
+        Uf4GenRates.makeUniform order
+
+    // Helper function to create a valid TwoOrbitUnfolder4 for a given order, SeedType, and optional TwoOrbitType override
+    let createTestTwoOrbitUnfolder4 
+            (order: int) 
+            (twoOrbitPairType: TwoOrbitPairType) 
+            (twoOrbitPairTypeOverride: TwoOrbitPairType option) 
+     : TwoOrbitUf4  =
+        let baseGenRates = createTestGenRates order
+        let orthoRate = if twoOrbitPairType = TwoOrbitPairType.Ortho then 1.0 else 0.0
+        let paraRate = if twoOrbitPairType = TwoOrbitPairType.Para then 1.0 else 0.0
+        let selfSyymRate = if twoOrbitPairType = TwoOrbitPairType.SelfRefl then 1.0 else 0.0
+
+        let ratesArray = 
+                match twoOrbitPairTypeOverride with
+                | Some tot -> 
+                    let orthoRate = if twoOrbitPairType = TwoOrbitPairType.Ortho then 1.0 else 0.0
+                    let paraRate = if twoOrbitPairType = TwoOrbitPairType.Para then 1.0 else 0.0
+                    let selfSyymRate = if twoOrbitPairType = TwoOrbitPairType.SelfRefl then 1.0 else 0.0
+                    Array.init baseGenRates.opsGenRatesArray.RatesArray.Length (
+                        fun _ -> OpsGenRates.create(orthoRate, paraRate, selfSyymRate))
+                | None -> baseGenRates.opsGenRatesArray.RatesArray
+
+        let genRates : Uf4GenRates = 
+            { 
+              Uf4GenRates.order = baseGenRates.order
+              seedOpsGenRates = OpsGenRates.create(orthoRate, paraRate, selfSyymRate)
+              opsGenRatesArray = OpsGenRatesArray.create(ratesArray)
+            }
+
+        UnfolderOps4.makeTwoOrbitUf4 mockFloatPicker genRates
+
+
+
+    // Helper function to create a valid TwoOrbitUnfolder4 for a given order, SeedType, and optional TwoOrbitType override
+    let createTestTwoOrbitUnfolder6
+            (order: int) 
+            (twoOrbitPairType: TwoOrbitPairType) 
+            (twoOrbitPairTypeOverride: TwoOrbitPairType option) 
+     : TwoOrbitUf6  =
+        let genRates : Uf6GenRates = 
+            Uf6GenRates.makeUniform order
+
+        UnfolderOps6.makeTwoOrbitUf6 mockFloatPicker genRates
+
+
+
 
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
@@ -47,7 +97,8 @@ module SorterModelDtoTests =
 
     [<Fact>]
     let ``Mssi round-trip serialization and deserialization should succeed`` () =
-        let mssi = Mssi.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [||]
+        let permSi = Perm_Si.create [|1; 0; 2; 3|] // (0 1)
+        let mssi = Mssi.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|permSi|]
         let sorterModel = SorterModel.Mssi mssi
         let result = roundTrip sorterModel
         match result with
@@ -59,7 +110,8 @@ module SorterModelDtoTests =
 
     [<Fact>]
     let ``Msrs round-trip serialization and deserialization should succeed`` () =
-        let msrs = Msrs.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [||]
+        let permRss = [| Perm_Rs.create([| 3; 2; 1; 0 |]); Perm_Rs.create([| 1; 0; 3; 2 |]) |]
+        let msrs = Msrs.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 4) permRss
         let sorterModel = SorterModel.Msrs msrs
         let result = roundTrip sorterModel
         match result with
@@ -71,7 +123,10 @@ module SorterModelDtoTests =
 
     [<Fact>]
     let ``Msuf4 round-trip serialization and deserialization should succeed`` () =
-        let msuf4 = Msuf4.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [||] 
+        let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
+        let width = 16<sortingWidth>
+        let tou = createTestTwoOrbitUnfolder4 16 TwoOrbitPairType.Ortho (Some TwoOrbitPairType.Para)
+        let msuf4 = Msuf4.create id width [|tou|] 
         let sorterModel = SorterModel.Msuf4 msuf4
         let result = roundTrip sorterModel
         match result with
@@ -81,9 +136,15 @@ module SorterModelDtoTests =
             Assert.Equal<TwoOrbitUf4>(msuf4.TwoOrbitUnfolder4s, resultMsuf4.TwoOrbitUnfolder4s)
         | _ -> Assert.True(false, "Expected Msuf4 case")
 
+
     [<Fact>]
     let ``Msuf6 round-trip serialization and deserialization should succeed`` () =
-        let msuf6 = Msuf6.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 6) [||]
+        let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
+        let order = 12
+        let width = 12<sortingWidth>
+        let tou = createTestTwoOrbitUnfolder6 order TwoOrbitPairType.Ortho (Some TwoOrbitPairType.Para)
+
+        let msuf6 = Msuf6.create id width [|tou|]
         let sorterModel = SorterModel.Msuf6 msuf6
         let result = roundTrip sorterModel
         match result with
@@ -92,6 +153,7 @@ module SorterModelDtoTests =
             Assert.Equal(msuf6.SortingWidth, resultMsuf6.SortingWidth)
             Assert.Equal<TwoOrbitUf6 array>(msuf6.TwoOrbitUnfolder6s, resultMsuf6.TwoOrbitUnfolder6s)
         | _ -> Assert.True(false, "Expected Msuf6 case")
+
 
     [<Fact>]
     let ``Deserialization with invalid Msuf6Dto should throw exception`` () =
