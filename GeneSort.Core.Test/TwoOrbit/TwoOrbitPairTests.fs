@@ -100,7 +100,7 @@ type TwoOrbitPairTests() =
     let ``unfoldTwoOrbitIntoTwoOrbitPair with Ortho type creates correct TwoOrbitPair`` () =
         let twoOrbit = TwoOrbit.create [0; 1]
         let order = 4
-        let pair = unfoldTwoOrbitIntoTwoOrbitPair twoOrbit order TwoOrbitType.Ortho
+        let pair = unfoldTwoOrbitIntoTwoOrbitPair twoOrbit order TwoOrbitPairType.Ortho
         let expectedFirst = TwoOrbit.create [0; 1]
         let expectedSecond = TwoOrbit.create [6; 7]
         Assert.Equal(expectedFirst, pair.FirstOrbit)
@@ -113,7 +113,7 @@ type TwoOrbitPairTests() =
     let ``unfoldTwoOrbitIntoTwoOrbitPair with Para type creates correct TwoOrbitPair`` () =
         let twoOrbit = TwoOrbit.create [0; 1]
         let order = 4
-        let pair = unfoldTwoOrbitIntoTwoOrbitPair twoOrbit order TwoOrbitType.Para
+        let pair = unfoldTwoOrbitIntoTwoOrbitPair twoOrbit order TwoOrbitPairType.Para
         let expectedFirst = TwoOrbit.create [0; 6]
         let expectedSecond = TwoOrbit.create [1; 7]
         Assert.Equal(expectedFirst, pair.FirstOrbit)
@@ -126,7 +126,7 @@ type TwoOrbitPairTests() =
     let ``unfoldTwoOrbitIntoTwoOrbitPair with ReflectionSymmetric type creates correct TwoOrbitPair`` () =
         let twoOrbit = TwoOrbit.create [1; 2]
         let order = 4
-        let pair = unfoldTwoOrbitIntoTwoOrbitPair twoOrbit order TwoOrbitType.SelfRefl
+        let pair = unfoldTwoOrbitIntoTwoOrbitPair twoOrbit order TwoOrbitPairType.SelfRefl
         let expectedFirst = TwoOrbit.create [1; 6]
         let expectedSecond = TwoOrbit.create [2; 5]
         Assert.Equal(expectedFirst, pair.FirstOrbit)
@@ -139,28 +139,28 @@ type TwoOrbitPairTests() =
     let ``unfoldTwoOrbitIntoTwoOrbitPair with order less than 2 fails`` () =
         let twoOrbit = TwoOrbit.create [0; 1]
         let order = 1
-        Assert.Throws<Exception>(fun () -> unfoldTwoOrbitIntoTwoOrbitPair twoOrbit order TwoOrbitType.Ortho |> ignore)
+        Assert.Throws<Exception>(fun () -> unfoldTwoOrbitIntoTwoOrbitPair twoOrbit order TwoOrbitPairType.Ortho |> ignore)
 
 
     [<Fact>]
     let ``makeTwoCycleFromRsOrbitPairTypes with no seed`` () =
         let types = [
-                TwoOrbitType.SelfRefl; TwoOrbitType.Ortho; 
-                TwoOrbitType.Para; TwoOrbitType.SelfRefl; 
-                TwoOrbitType.Para; TwoOrbitType.Ortho; TwoOrbitType.Para]
-        let perm_Rs = makePerm_SiFromTwoOrbitTypes None types
+                TwoOrbitPairType.SelfRefl; TwoOrbitPairType.Ortho; 
+                TwoOrbitPairType.Para; TwoOrbitPairType.SelfRefl; 
+                TwoOrbitPairType.Para; TwoOrbitPairType.Ortho; TwoOrbitPairType.Para]
+        let perm_Rs = makePerm_SiFromTwoOrbitPairsAndTypes None types
         Assert.Equal((perm_Rs.Order |> UMX.untag), 16)
 
 
     [<Fact>]
     let ``makeTwoCycleFromRsOrbitPairTypes with a seed`` () =
-        let types = [TwoOrbitType.Para; TwoOrbitType.SelfRefl; 
-                     TwoOrbitType.Para; TwoOrbitType.Ortho; 
-                     TwoOrbitType.Para; TwoOrbitType.SelfRefl;]
+        let types = [TwoOrbitPairType.Para; TwoOrbitPairType.SelfRefl; 
+                     TwoOrbitPairType.Para; TwoOrbitPairType.Ortho; 
+                     TwoOrbitPairType.Para; TwoOrbitPairType.SelfRefl;]
         let orbit1 = TwoOrbit.create [0; 1]
         let orbit2 = TwoOrbit.create [2; 3]
         let pair = TwoOrbitPair.create 4 orbit1 (orbit2 |> Some)
-        let perm_Rs = makePerm_SiFromTwoOrbitTypes (Some [pair]) types
+        let perm_Rs = makePerm_SiFromTwoOrbitPairsAndTypes (Some [pair]) types
         Assert.Equal((perm_Rs.Order |> UMX.untag), 16)
 
 

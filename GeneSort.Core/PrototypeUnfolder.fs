@@ -10,22 +10,22 @@ module PrototypeUnfolder =
 
 
     // randomRsOrbitPairTypeList
-    let randomTwoOrbitTypeList (randy:IRando) (n: int) : TwoOrbitType list =
+    let randomTwoOrbitPairTypeList (randy:IRando) (n: int) : TwoOrbitPairType list =
         if n < 0 then failwith "Length must be non-negative"
-        let values = [| TwoOrbitType.Ortho; TwoOrbitType.Para; TwoOrbitType.SelfRefl |]
+        let values = [| TwoOrbitPairType.Ortho; TwoOrbitPairType.Para; TwoOrbitPairType.SelfRefl |]
         List.init n (fun _ -> values.[randy.NextIndex(values.Length)])
 
 
     /// returns allTwoOrbitType lists of length n
-    let allTwoOrbitTypeLists n =
-        let allValues = [TwoOrbitType.Ortho; TwoOrbitType.Para; TwoOrbitType.SelfRefl]
+    let allTwoOrbitPairTypeLists n =
+        let allValues = [TwoOrbitPairType.Ortho; TwoOrbitPairType.Para; TwoOrbitPairType.SelfRefl]
         let inputLists = List.replicate n allValues
         cartesianProduct inputLists
 
 
     // creates TwoOrbitPairs from TwoOrbits by reflection
     let unfoldTwoOrbitPairsIntoTwoOrbitPairs 
-            (types: TwoOrbitType list) 
+            (types: TwoOrbitPairType list) 
             (twoOrbitPairs: TwoOrbitPair list) : TwoOrbitPair list =
 
         if types.Length <> (twoOrbitPairs.Length * 2) then
@@ -56,32 +56,32 @@ module PrototypeUnfolder =
 
 
     // twoOrbitPairsForOrder4
-    let twoOrbitPairsForOrder4 (twoOrbitType:TwoOrbitType) : TwoOrbitPair =
-        match twoOrbitType with
-        | TwoOrbitType.Ortho -> TwoOrbitPair.create 4 (TwoOrbit.create [0; 2]) (TwoOrbit.create [1; 3] |> Some)
-        | TwoOrbitType.Para -> TwoOrbitPair.create 4 (TwoOrbit.create [0; 1]) (TwoOrbit.create [2; 3] |> Some)
-        | TwoOrbitType.SelfRefl ->  TwoOrbitPair.create 4 (TwoOrbit.create [0; 3]) (TwoOrbit.create [1; 2] |> Some)
+    let twoOrbitPairsForOrder4 (twoOrbitPairType:TwoOrbitPairType) : TwoOrbitPair =
+        match twoOrbitPairType with
+        | TwoOrbitPairType.Ortho -> TwoOrbitPair.create 4 (TwoOrbit.create [0; 2]) (TwoOrbit.create [1; 3] |> Some)
+        | TwoOrbitPairType.Para -> TwoOrbitPair.create 4 (TwoOrbit.create [0; 1]) (TwoOrbit.create [2; 3] |> Some)
+        | TwoOrbitPairType.SelfRefl ->  TwoOrbitPair.create 4 (TwoOrbit.create [0; 3]) (TwoOrbit.create [1; 2] |> Some)
 
 
     // makeTwoCycleFromTwoOrbitTypes
-    let makePerm_SiFromTwoOrbitTypes
-            (seedTwoOrbitPairs : TwoOrbitPair list option)
-            (twoOrbitTypes: TwoOrbitType list) : Perm_Si =
-        if twoOrbitTypes.Length < 1 then
-            failwith "twoOrbitTypes list must have an element"
+    let makePerm_SiFromTwoOrbitPairsAndTypes
+            (seedTwoOrbitPair : TwoOrbitPair list option)
+            (twoOrbitPairTypes: TwoOrbitPairType list) : Perm_Si =
+        if twoOrbitPairTypes.Length < 1 then
+            failwith "twoOrbitPairTypes list must have an element"
 
         let _makeTwoCycleFromTwoOrbitTypes
                 (seedTwoOrbitPairs : TwoOrbitPair list)
-                (twoOrbitTypes: TwoOrbitType list)  : Perm_Si =
+                (twoOrbitPairTypes: TwoOrbitPairType list)  : Perm_Si =
             if seedTwoOrbitPairs.Length < 1 then
                 failwith "seedRsOrbitPair list must have an element"
-            if twoOrbitTypes.Length < 1 then
-                failwith "twoOrbitTypes list must have an element"
+            if twoOrbitPairTypes.Length < 1 then
+                failwith "twoOrbitPairTypes list must have an element"
 
             let rsOrbitPairTypeChunks = 
                     chunkByPowersOfTwo 
                         (seedTwoOrbitPairs.Length * 2)
-                        twoOrbitTypes 
+                        twoOrbitPairTypes 
                         |> Seq.map Seq.toList |> Seq.toList
             let mutable workingList = seedTwoOrbitPairs
             for chunk in rsOrbitPairTypeChunks do
@@ -89,11 +89,11 @@ module PrototypeUnfolder =
 
             Perm_Si.fromTwoOrbitPair (workingList |> List.toArray)
 
-        match seedTwoOrbitPairs with
+        match seedTwoOrbitPair with
         | Some orbitPairs -> 
-                _makeTwoCycleFromTwoOrbitTypes orbitPairs twoOrbitTypes
+                _makeTwoCycleFromTwoOrbitTypes orbitPairs twoOrbitPairTypes
         | None -> 
-                let h::t = twoOrbitTypes
+                let h::t = twoOrbitPairTypes
                 let seedPrs = [twoOrbitPairsForOrder4 h]
                 _makeTwoCycleFromTwoOrbitTypes seedPrs t
 
@@ -112,8 +112,8 @@ module PrototypeUnfolder =
             else _seqLen (v/2) (c + v/4)
 
         let seqLength = _seqLen order 0
-        (allTwoOrbitTypeLists seqLength) 
-        |> Seq.map(makePerm_SiFromTwoOrbitTypes None)
+        (allTwoOrbitPairTypeLists seqLength) 
+        |> Seq.map(makePerm_SiFromTwoOrbitPairsAndTypes None)
 
 
     // makeRandomPerm_Sis
@@ -135,8 +135,8 @@ module PrototypeUnfolder =
         let seqLength = getTwoOrbitTypeLengthForOrder order
         seq {
                 while true do
-                    let rsTypes = randomTwoOrbitTypeList randy seqLength
-                    yield makePerm_SiFromTwoOrbitTypes None rsTypes
+                    let rsTypes = randomTwoOrbitPairTypeList randy seqLength
+                    yield makePerm_SiFromTwoOrbitPairsAndTypes None rsTypes
             }
 
                     

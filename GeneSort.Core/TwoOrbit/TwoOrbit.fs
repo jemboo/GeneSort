@@ -6,6 +6,11 @@ type TwoOrbitType =
     | SelfRefl
 
 
+type TwoOrbitPairType =
+    | Ortho
+    | Para
+    | SelfRefl
+
 /// Represents a pair of distinct, non-negative indices in canonical order (smaller index first).
 [<CustomEquality; NoComparison>]
 type TwoOrbit = private TwoOrbit of (int * int) with
@@ -102,8 +107,8 @@ module TwoOrbit =
         else
             TwoOrbitType.Ortho
 
-    let getTwoOrbits (twoOrbitType:TwoOrbitType) : TwoOrbit list =
-        match twoOrbitType with
-        | TwoOrbitType.Ortho -> [TwoOrbit.create [0; 1]; TwoOrbit.create [2; 3]]
-        | TwoOrbitType.Para -> [TwoOrbit.create [0; 2]; TwoOrbit.create [1; 3]]
-        | TwoOrbitType.SelfRefl -> [TwoOrbit.create [0; 3]; TwoOrbit.create [1; 2]]
+    let getTwoOrbits (twoOrbitPairType:TwoOrbitPairType) : TwoOrbit list =
+        match twoOrbitPairType with
+        | TwoOrbitPairType.Ortho -> [TwoOrbit.create [0; 1]; TwoOrbit.create [2; 3]]
+        | TwoOrbitPairType.Para -> [TwoOrbit.create [0; 2]; TwoOrbit.create [1; 3]]
+        | TwoOrbitPairType.SelfRefl -> [TwoOrbit.create [0; 3]; TwoOrbit.create [1; 2]]

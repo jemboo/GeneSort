@@ -7,10 +7,10 @@ open MessagePack
 
 [<MessagePackObject; Struct>]
 type TwoOrbitUf4Dto =
-    { [<Key(0)>] SeedType: TwoOrbitType
+    { [<Key(0)>] SeedType: TwoOrbitPairType
       [<Key(1)>] TwoOrbitUfSteps: TwoOrbitUfStepDto array }
     
-    static member Create(seedType: TwoOrbitType, twoOrbitUnfolderSteps: TwoOrbitUfStepDto array) : Result<TwoOrbitUf4Dto, string> =
+    static member Create(seedType: TwoOrbitPairType, twoOrbitUnfolderSteps: TwoOrbitUfStepDto array) : Result<TwoOrbitUf4Dto, string> =
         if Array.isEmpty twoOrbitUnfolderSteps then
             Error "TwoOrbitUnfolderSteps array cannot be empty"
         else
@@ -23,7 +23,7 @@ module TwoOrbitUf4Dto =
         | StepConversionError of TwoOrbitUnfolderStepDto.TwoOrbitUnfolderStepDtoError
 
     let toTwoOrbitUnfolder4Dto (tou: TwoOrbitUf4) : TwoOrbitUf4Dto =
-        { SeedType = tou.TwoOrbitType
+        { SeedType = tou.TwoOrbitPairType
           TwoOrbitUfSteps = tou.TwoOrbitUnfolderSteps |> Array.map TwoOrbitUnfolderStepDto.toTwoOrbitUnfolderStepDto }
 
     let toTwoOrbitUnfolder4 (dto: TwoOrbitUf4Dto) : Result<TwoOrbitUf4, TwoOrbitUf4DtoError> =
