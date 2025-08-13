@@ -49,7 +49,7 @@ module TwoOrbitTypeOps =
         TwoOrbitUfStep.create 
                 (makeRandomTwoOrbitTypes floatPicker opsGenRates 
                     |> Seq.take (order / 2)
-                    |> Seq.toList)
+                    |> Seq.toArray)
                 order
 
 
@@ -61,5 +61,5 @@ module TwoOrbitTypeOps =
         TwoOrbitUfStep.create 
                 (mutateTwoOrbitTypes floatPicker opsTransitionRates twoOrbitUfStep.twoOrbitTypes
                     |> Seq.take (twoOrbitUfStep.Order / 2)
-                    |> Seq.toList)
+                    |> Seq.toArray)
                 twoOrbitUfStep.Order

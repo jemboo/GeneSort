@@ -29,12 +29,12 @@ module TwoOrbitUnfolderStepDto =
         | InvalidTwoOrbitTypesLength of string
 
     let toTwoOrbitUnfolderStepDto (step: TwoOrbitUfStep) : TwoOrbitUfStepDto =
-        { TwoOrbitTypes = (step.TwoOrbitTypes |> List.toArray)
+        { TwoOrbitTypes = step.TwoOrbitTypes
           Order = step.Order }
 
     let toTwoOrbitUnfolderStep (dto: TwoOrbitUfStepDto) : Result<TwoOrbitUfStep, TwoOrbitUnfolderStepDtoError> =
         try
-            let step = TwoOrbitUfStep.create (dto.TwoOrbitTypes |> Array.toList) dto.Order
+            let step = TwoOrbitUfStep.create dto.TwoOrbitTypes dto.Order
             Ok step
         with
         | :? ArgumentException as ex when ex.Message.Contains("at least 4") ->
