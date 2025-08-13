@@ -55,7 +55,7 @@
     <Compile Include="PrototypeUnfolder.fs" />
     <Compile Include="RateOps\Perm_RsOps.fs" />
     <Compile Include="RateOps\TwoOrbitTypeOps.fs" />
-    <Compile Include="RateOps\UnfolderOps.fs" />
+    <Compile Include="RateOps\RandomUnfolderOps.fs" />
     <Compile Include="CoreGen.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />
   </ItemGroup>

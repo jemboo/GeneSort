@@ -7,7 +7,6 @@ type OpActionRatesArray =
 
     private { Rates: OpActionRates array }
     static member create (rates: OpActionRates array) : OpActionRatesArray =
-        if Array.isEmpty rates then failwith "Rates array cannot be empty"
         { Rates = rates }
     member this.Length = this.Rates.Length
     member this.Item(index: int) = this.Rates.[index]

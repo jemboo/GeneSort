@@ -9,7 +9,6 @@ type Uf4GenRatesArray =
         { rates: Uf4GenRates array }
 
     static member create (rates: Uf4GenRates array) : Uf4GenRatesArray =
-        if Array.isEmpty rates then failwith "Rates array cannot be empty"
         if Array.exists (fun r -> r.order < 4 || r.order % 4 <> 0) rates then
             failwith "All Uf4GenRates orders must be at least 4 and divisible by 4"
         let arrayLengths = rates |> Array.map (fun r -> r.opsGenRatesArray.Length)

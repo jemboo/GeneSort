@@ -85,7 +85,7 @@ type Msuf6RandMutate =
             let mutatedUnfolders = 
                 Array.zip this.msuf6.TwoOrbitUnfolder6s this.Uf6MutationRatesArray.RatesArray
                 |> Array.map (fun (unfolder, mutationRates) ->
-                    UnfolderOps6.mutateTwoOrbitUf6 rng.NextFloat mutationRates unfolder)
+                    RandomUnfolderOps6.mutateTwoOrbitUf6 rng.NextFloat mutationRates unfolder)
             Msuf6.create id this.msuf6.SortingWidth mutatedUnfolders
 
 

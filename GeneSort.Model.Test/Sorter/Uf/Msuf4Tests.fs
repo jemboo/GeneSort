@@ -22,7 +22,7 @@ type Msuf4Tests() =
     let mockFloatPicker () = 0.5
 
     // Helper function to create a TwoOrbitUf4GenRates for a given order
-    let createTestGenRates (order: int) =
+    let createTestGenRates (order: int) :Uf4GenRates =
         Uf4GenRates.makeUniform order
 
     // Helper function to create a valid TwoOrbitUnfolder4 for a given order, SeedType, and optional TwoOrbitType override
@@ -53,7 +53,7 @@ type Msuf4Tests() =
               opsGenRatesArray = OpsGenRatesArray.create(ratesArray)
             }
 
-        UnfolderOps4.makeTwoOrbitUf4 mockFloatPicker genRates
+        RandomUnfolderOps4.makeRandomTwoOrbitUf4 mockFloatPicker genRates
 
     // Helper function to create a valid Msuf4
     let createTestMsuf4 
@@ -121,7 +121,8 @@ type Msuf4Tests() =
     let ``makeSorter handles order 8 correctly with Ortho seed and Para unfolding`` () =
         let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let width = 8<sortingWidth>
-        let tou = createTestTwoOrbitUnfolder4 8 TwoOrbitPairType.Ortho (Some TwoOrbitPairType.Para)
+        let seedType = TwoOrbitPairType.Ortho
+        let tou = createTestTwoOrbitUnfolder4 8 seedType (Some TwoOrbitPairType.Para)
         let msuf4 = Msuf4.create id width [| tou |]
         let sorter = (msuf4 :> ISorterModel).MakeSorter()
         let expectedCes = [| Ce.create 0 6; Ce.create 1 7; Ce.create 2 4; Ce.create 3 5 |]
@@ -133,7 +134,8 @@ type Msuf4Tests() =
     let ``makeSorter handles order 8 correctly with Ortho seed and Ortho unfolding`` () =
         let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let width = 8<sortingWidth>
-        let tou = createTestTwoOrbitUnfolder4 8 TwoOrbitPairType.Ortho (Some TwoOrbitPairType.Ortho)
+        let seedType = TwoOrbitPairType.Ortho
+        let tou = createTestTwoOrbitUnfolder4 8 seedType (Some TwoOrbitPairType.Ortho)
         let msuf4 = Msuf4.create id width [| tou |]
         let sorter = (msuf4 :> ISorterModel).MakeSorter()
         let expectedCes = [| Ce.create 0 1; Ce.create 2 3; Ce.create 4 5; Ce.create 6 7 |]
@@ -145,7 +147,8 @@ type Msuf4Tests() =
     let ``makeSorter handles order 8 correctly with Ortho seed and SelfRefl unfolding`` () =
         let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let width = 8<sortingWidth>
-        let tou = createTestTwoOrbitUnfolder4 8 TwoOrbitPairType.Ortho (Some TwoOrbitPairType.SelfRefl)
+        let seedType = TwoOrbitPairType.Ortho
+        let tou = createTestTwoOrbitUnfolder4 8 seedType (Some TwoOrbitPairType.SelfRefl)
         let msuf4 = Msuf4.create id width [| tou |]
         let sorter = (msuf4 :> ISorterModel).MakeSorter()
         let expectedCes = [| Ce.create 0 7; Ce.create 1 6; Ce.create 2 5; Ce.create 3 4 |]
@@ -157,7 +160,8 @@ type Msuf4Tests() =
     let ``makeSorter handles order 16 correctly with Ortho seed and Para unfolding`` () =
         let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let width = 16<sortingWidth>
-        let tou = createTestTwoOrbitUnfolder4 16 TwoOrbitPairType.Ortho (Some TwoOrbitPairType.Para)
+        let seedType = TwoOrbitPairType.Ortho
+        let tou = createTestTwoOrbitUnfolder4 16 seedType (Some TwoOrbitPairType.Para)
         let msuf4 = Msuf4.create id width [| tou |]
         let sorter = (msuf4 :> ISorterModel).MakeSorter()
         let expectedCes = [| Ce.create 0 9; Ce.create 1 8; Ce.create 2 11; Ce.create 3 10

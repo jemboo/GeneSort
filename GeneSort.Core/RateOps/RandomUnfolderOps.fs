@@ -1,16 +1,16 @@
 ﻿namespace GeneSort.Core
 
-module UnfolderOps4 = 
+module RandomUnfolderOps4 = 
 
     // makeTwoOrbitUnfolder4
-    let makeTwoOrbitUf4 (floatPicker:unit -> float) (uf4GenRates:Uf4GenRates)
+    let makeRandomTwoOrbitUf4 (floatPicker:unit -> float) (uf4GenRates:Uf4GenRates)
                         : TwoOrbitUf4 =
 
         let seedTypeUf4 = floatPicker |> uf4GenRates.seedOpsGenRates.PickMode |> OpsGenMode.toTwoOrbitType
         let twoOrbitUnfolderSteps = 
             uf4GenRates.opsGenRatesArray.RatesArray
                 |> Array.mapi(fun dex rates ->
-                    TwoOrbitTypeOps.makeTwoOrbitUnfolderStep floatPicker (4 * (MathUtils.integerPower 2 dex)) rates)
+                    TwoOrbitTypeOps.makeRandomTwoOrbitUnfolderStep floatPicker (4 * (MathUtils.integerPower 2 dex)) rates)
         TwoOrbitUf4.create seedTypeUf4 twoOrbitUnfolderSteps
 
 
@@ -35,10 +35,10 @@ module UnfolderOps4 =
 
 
 
-module UnfolderOps6 =
+module RandomUnfolderOps6 =
  
     // makeTwoOrbitUnfolder6
-    let makeTwoOrbitUf6 (floatPicker:unit -> float) (uf6GenRates:Uf6GenRates) 
+    let makeRandomTwoOrbitUf6 (floatPicker:unit -> float) (uf6GenRates:Uf6GenRates) 
                 : TwoOrbitUf6 =
 
         let seed6TwoOrbitType = 
@@ -47,7 +47,7 @@ module UnfolderOps6 =
         let twoOrbitUfSteps = 
                     uf6GenRates.opsGenRatesArray.RatesArray
                                 |> Array.mapi(
-            fun dex rates -> TwoOrbitTypeOps.makeTwoOrbitUnfolderStep floatPicker (6 * (MathUtils.integerPower 2 dex)) rates)
+            fun dex rates -> TwoOrbitTypeOps.makeRandomTwoOrbitUnfolderStep floatPicker (6 * (MathUtils.integerPower 2 dex)) rates)
 
         TwoOrbitUf6.create seed6TwoOrbitType twoOrbitUfSteps
 

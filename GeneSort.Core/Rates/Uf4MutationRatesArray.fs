@@ -8,7 +8,6 @@ type Uf4MutationRatesArray =
         { rates: Uf4MutationRates array }
 
     static member create (rates: Uf4MutationRates array) : Uf4MutationRatesArray =
-        if Array.isEmpty rates then failwith "Rates array cannot be empty"
         if Array.exists (fun r -> r.order < 4 || r.order % 4 <> 0) rates then
             failwith "All Uf4MutationRates orders must be at least 4 and divisible by 4"
         { rates = rates }

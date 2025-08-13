@@ -3,7 +3,7 @@
 module TwoOrbitTypeOps =
 
     ///makeTwoOrbitTypeGen
-    let makeTwoOrbitTypes 
+    let makeRandomTwoOrbitTypes 
             (floatPicker:unit -> float)
             (opsGenRates:OpsGenRates) 
             : TwoOrbitType seq =
@@ -41,13 +41,13 @@ module TwoOrbitTypeOps =
 
 
     // makeTwoOrbitUnfolderStep
-    let makeTwoOrbitUnfolderStep
+    let makeRandomTwoOrbitUnfolderStep
                 (floatPicker:unit -> float)
                 (order:int) 
                 (opsGenRates:OpsGenRates) 
                 : TwoOrbitUfStep =
         TwoOrbitUfStep.create 
-                (makeTwoOrbitTypes floatPicker opsGenRates 
+                (makeRandomTwoOrbitTypes floatPicker opsGenRates 
                     |> Seq.take (order / 2)
                     |> Seq.toList)
                 order

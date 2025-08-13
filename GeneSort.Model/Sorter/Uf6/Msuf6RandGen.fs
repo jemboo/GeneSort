@@ -78,7 +78,7 @@ type Msuf6RandGen =
             let sortingWidth = %this.SortingWidth
             let twoOrbitUnfolder6s =
                 [| for dex in 0 .. (stageCount - 1) ->
-                    UnfolderOps6.makeTwoOrbitUf6
+                    RandomUnfolderOps6.makeRandomTwoOrbitUf6
                         rng.NextFloat
                         (genRatesArray.Item(dex)) |]
             Msuf6.create id this.SortingWidth twoOrbitUnfolder6s :> ISorterModel

@@ -91,7 +91,7 @@ type Msuf4RandGen =
             let genRts = this.GenRates
             let twoOrbitUnfolder4s =
                     [| for dex in 0 .. (sc - 1) ->
-                        UnfolderOps4.makeTwoOrbitUf4 rando.NextFloat (genRts.Item(dex)) |]
+                        RandomUnfolderOps4.makeRandomTwoOrbitUf4 rando.NextFloat (genRts.Item(dex)) |]
             Msuf4.create id this.SortingWidth twoOrbitUnfolder4s
 
 

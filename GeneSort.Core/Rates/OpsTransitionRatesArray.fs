@@ -5,8 +5,8 @@ open System
 type OpsTransitionRatesArray =
     private { rates: OpsTransitionRates array }
 
-    static member create (rates: OpsTransitionRates array) : OpsTransitionRatesArray =
-        if Array.isEmpty rates then failwith "Rates array cannot be empty"
+    static member create (rates: OpsTransitionRates array) 
+                    : OpsTransitionRatesArray =
         { rates = rates }
 
     member this.Length = this.rates.Length

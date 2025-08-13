@@ -55,7 +55,7 @@ type SorterModelDtoTests() =
               opsGenRatesArray = OpsGenRatesArray.create(ratesArray)
             }
 
-        UnfolderOps4.makeTwoOrbitUf4 mockFloatPicker genRates
+        RandomUnfolderOps4.makeRandomTwoOrbitUf4 mockFloatPicker genRates
 
 
 
@@ -68,7 +68,7 @@ type SorterModelDtoTests() =
         let genRates : Uf6GenRates = 
             Uf6GenRates.makeUniform order
 
-        UnfolderOps6.makeTwoOrbitUf6 mockFloatPicker genRates
+        RandomUnfolderOps6.makeRandomTwoOrbitUf6 mockFloatPicker genRates
 
 
 

@@ -8,7 +8,6 @@ type Uf6MutationRatesArray =
         { rates: Uf6MutationRates array }
 
     static member create (rates: Uf6MutationRates array) : Uf6MutationRatesArray =
-        if Array.isEmpty rates then failwith "Rates array cannot be empty"
         if Array.exists (fun r -> r.order < 6 || r.order % 2 <> 0) rates then
             failwith "All Uf6MutationRates orders must be at least 6 and even"
         { rates = rates }

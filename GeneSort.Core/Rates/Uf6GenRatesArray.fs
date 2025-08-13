@@ -9,7 +9,6 @@ type Uf6GenRatesArray =
         { rates: Uf6GenRates array }
 
     static member create (rates: Uf6GenRates array) : Uf6GenRatesArray =
-        if Array.isEmpty rates then failwith "Rates array cannot be empty"
         if Array.exists (fun r -> r.order < 6 || r.order % 6 <> 0) rates then
             failwith "All Uf6GenRates orders must be at least 6 and divisible by 6"
         { rates = rates }

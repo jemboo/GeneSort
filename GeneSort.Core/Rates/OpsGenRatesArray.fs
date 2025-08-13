@@ -5,35 +5,34 @@ open System
 [<Struct; CustomEquality; NoComparison>]
 type OpsGenRatesArray =
 
-    private { Rates: OpsGenRates array }
-    static member create (rates: OpsGenRates array) : OpsGenRatesArray =
-        if Array.isEmpty rates then failwith "Rates array cannot be empty"
-        { Rates = rates }
-    member this.Length = this.Rates.Length
-    member this.Item(index: int) = this.Rates.[index]
-    member this.RatesArray = this.Rates
+    private { opsGenRatesArray: OpsGenRates array }
+    static member create (opsGenRatesArray: OpsGenRates array) : OpsGenRatesArray =
+        { opsGenRatesArray = opsGenRatesArray }
+    member this.Length = this.opsGenRatesArray.Length
+    member this.Item(index: int) = this.opsGenRatesArray.[index]
+    member this.RatesArray = this.opsGenRatesArray
     member this.toString() =
-        String.Join(", ", Array.map (fun r -> r.ToString()) this.Rates)
+        String.Join(", ", Array.map (fun r -> r.ToString()) this.opsGenRatesArray)
 
     override this.Equals(obj) =
         match obj with
         | :? OpsGenRatesArray as other ->
-            if this.Rates.Length <> other.Rates.Length then false
+            if this.opsGenRatesArray.Length <> other.opsGenRatesArray.Length then false
             else
-                Array.forall2 (fun a b -> a.Equals(b)) this.Rates other.Rates
+                Array.forall2 (fun a b -> a.Equals(b)) this.opsGenRatesArray other.opsGenRatesArray
         | _ -> false
 
     override this.GetHashCode() =
         let mutable hash = 17
-        for rate in this.Rates do
+        for rate in this.opsGenRatesArray do
             hash <- hash * 23 + rate.GetHashCode()
         hash
 
     interface IEquatable<OpsGenRatesArray> with
         member this.Equals(other) =
-            if this.Rates.Length <> other.Rates.Length then false
+            if this.opsGenRatesArray.Length <> other.opsGenRatesArray.Length then false
             else
-                Array.forall2 (fun a b -> a.Equals(b)) this.Rates other.Rates
+                Array.forall2 (fun a b -> a.Equals(b)) this.opsGenRatesArray other.opsGenRatesArray
 
 
 module OpsGenRatesArray =
