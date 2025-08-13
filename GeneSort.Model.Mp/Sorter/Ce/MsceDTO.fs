@@ -23,7 +23,7 @@ type MsceDto =
         
         { Id = id; SortingWidth = sortingWidth; CeCodes = ceCodes }
     
-    member this.CeCount = this.CeCodes.Length
+   // member this.CeCount = this.CeCodes.Length
 
 
 module MsceDto =

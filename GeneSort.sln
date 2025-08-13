@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36310.24 d17.14
+VisualStudioVersion = 17.14.36310.24
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.Core", "GeneSort.Core\GeneSort.Core.fsproj", "{D4A96BBD-B9E4-B746-8106-888D4EA99A57}"
 EndProject
@@ -24,6 +24,8 @@ EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.Sorter.Test", "GeneSort.Sorter.Test\GeneSort.Sorter.Test.fsproj", "{EB1EA128-EE73-8E42-86BB-AF9312B3105C}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.Model.Test", "GeneSort.Model.Test\GeneSort.Model.Test.fsproj", "{F4F5BD44-6369-BB4C-F682-7DEC1CE65636}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.Model.Mp.Test", "GeneSort.Model.Mp.Test\GeneSort.Model.Mp.Test.fsproj", "{5756FBAF-078B-4583-B3F8-77D952C72393}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{F4F5BD44-6369-BB4C-F682-7DEC1CE65636}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4F5BD44-6369-BB4C-F682-7DEC1CE65636}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4F5BD44-6369-BB4C-F682-7DEC1CE65636}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5756FBAF-078B-4583-B3F8-77D952C72393}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5756FBAF-078B-4583-B3F8-77D952C72393}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5756FBAF-078B-4583-B3F8-77D952C72393}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5756FBAF-078B-4583-B3F8-77D952C72393}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

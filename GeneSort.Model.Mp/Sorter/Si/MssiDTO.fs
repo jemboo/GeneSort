@@ -22,7 +22,7 @@ type MssiDto =
         else
             Ok { Id = id; Width = width; Perm_Sis = perm_Sis }
     
-    member this.StageCount = this.Perm_Sis.Length
+    //member this.StageCount = this.Perm_Sis.Length
 
 module MssiDto =
     type MssiDtoError =
