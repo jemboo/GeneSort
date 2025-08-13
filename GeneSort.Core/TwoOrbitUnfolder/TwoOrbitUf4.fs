@@ -56,3 +56,17 @@ module TwoOrbitUnfolder4 =
 
     let getOrder (twoOrbitUnfolder: TwoOrbitUf4) : int =
             4 * (MathUtils.integerPower 2 (Array.length twoOrbitUnfolder.twoOrbitUnfolderSteps))
+
+    let makeTestTwoOrbitUf4 
+            (seedTwoOrbitType: TwoOrbitType)
+            (unfolderTwoOrbitType: TwoOrbitType)
+            (order: int)
+            : TwoOrbitUf4 =
+
+        let twoOrbitUnfolderStepCount  = MathUtils.exactLog2 (order / 4)
+        let twoOrbitUfSteps = 
+                Array.init
+                    twoOrbitUnfolderStepCount
+                    (fun dex -> TwoOrbitUfStep.makeUniformUfStep (4 * (MathUtils.integerPower 2 dex)) unfolderTwoOrbitType)
+
+        TwoOrbitUf4.create seedTwoOrbitType twoOrbitUfSteps

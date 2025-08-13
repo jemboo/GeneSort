@@ -54,7 +54,7 @@
     <Compile Include="Rates\Uf6MutationRatesArray.fs" />
     <Compile Include="PrototypeUnfolder.fs" />
     <Compile Include="RateOps\Perm_RsOps.fs" />
-    <Compile Include="RateOps\TwoOrbitTypeOps.fs" />
+    <Compile Include="RateOps\RandomTwoOrbitTypeOps.fs" />
     <Compile Include="RateOps\RandomUnfolderOps.fs" />
     <Compile Include="CoreGen.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />

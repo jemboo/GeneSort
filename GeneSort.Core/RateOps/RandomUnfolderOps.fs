@@ -3,8 +3,9 @@
 module RandomUnfolderOps4 = 
 
     // makeTwoOrbitUnfolder4
-    let makeRandomTwoOrbitUf4 (floatPicker:unit -> float) (uf4GenRates:Uf4GenRates)
-                        : TwoOrbitUf4 =
+    let makeRandomTwoOrbitUf4 
+            (floatPicker:unit -> float) 
+            (uf4GenRates:Uf4GenRates) : TwoOrbitUf4 =
 
         let seedTypeUf4 = floatPicker |> uf4GenRates.seedOpsGenRates.PickMode |> OpsGenMode.toTwoOrbitType
         let twoOrbitUnfolderSteps = 
