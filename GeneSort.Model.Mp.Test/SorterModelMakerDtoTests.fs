@@ -165,79 +165,38 @@ type SorterModelMakerDtoTests() =
             Assert.Equal(msuf4RandMutate.Uf4MutationRatesArray, resultMsuf4RandMutate.Uf4MutationRatesArray)
         | _ -> Assert.True(false, "Expected Msuf4RandMutate case")
 
-    //[<Fact>]
-    //let ``Msuf6RandGen round-trip serialization and deserialization should succeed`` () =
-    //    let genRates = Uf6GenRatesArray.create [| Uf6GenRates.create (UMX.tag<sortingWidth> 6) (Seed6GenRates.createUniform 0.1) [||] |]
-    //    let msuf6RandGen = Msuf6RandGen.create rngType.Lcg (UMX.tag<sortingWidth> 6) (UMX.tag<stageCount> 1) genRates
-    //    let sorterModelMaker = SorterModelMaker.Msuf6RandGen msuf6RandGen
-    //    let result = roundTrip sorterModelMaker
-    //    match result with
-    //    | SorterModelMaker.Msuf6RandGen resultMsuf6RandGen ->
-    //        Assert.Equal(msuf6RandGen.Id, resultMsuf6RandGen.Id)
-    //        Assert.Equal(msuf6RandGen.RngType, resultMsuf6RandGen.RngType)
-    //        Assert.Equal(msuf6RandGen.SortingWidth, resultMsuf6RandGen.SortingWidth)
-    //        Assert.Equal(msuf6RandGen.StageCount, resultMsuf6RandGen.StageCount)
-    //        Assert.Equal(msuf6RandGen.GenRates, resultMsuf6RandGen.GenRates)
-    //    | _ -> Assert.True(false, "Expected Msuf6RandGen case")
+    [<Fact>]
+    let ``Msuf6RandGen round-trip serialization and deserialization should succeed`` () =
+        let order = 12
+        let genRates = Uf6GenRatesArray.create  [|Uf6GenRates.makeUniform order|]
+        let msuf6RandGen = Msuf6RandGen.create rngType.Lcg (UMX.tag<sortingWidth> order) (UMX.tag<stageCount> 1) genRates
+        let sorterModelMaker = SorterModelMaker.Msuf6RandGen msuf6RandGen
+        let result = roundTrip sorterModelMaker
+        match result with
+        | SorterModelMaker.Msuf6RandGen resultMsuf6RandGen ->
+            Assert.Equal(msuf6RandGen.Id, resultMsuf6RandGen.Id)
+            Assert.Equal(msuf6RandGen.RngType, resultMsuf6RandGen.RngType)
+            Assert.Equal(msuf6RandGen.SortingWidth, resultMsuf6RandGen.SortingWidth)
+            Assert.Equal(msuf6RandGen.StageCount, resultMsuf6RandGen.StageCount)
+            Assert.Equal(msuf6RandGen.GenRates, resultMsuf6RandGen.GenRates)
+        | _ -> Assert.True(false, "Expected Msuf6RandGen case")
 
-    //[<Fact>]
-    //let ``Msuf6RandMutate round-trip serialization and deserialization should succeed`` () =
-    //    let msuf6 = Msuf6.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 6) [| TwoOrbitUf6.create (UMX.tag<sortingWidth> 6) [||] |]
-    //    let mutationRates = Uf6MutationRatesArray.create [| Uf6MutationRates.makeUniform 6 0.1 0.05 |]
-    //    let msuf6RandMutate = Msuf6RandMutate.create rngType.Lcg msuf6 mutationRates
-    //    let sorterModelMaker = SorterModelMaker.Msuf6RandMutate msuf6RandMutate
-    //    let result = roundTrip sorterModelMaker
-    //    match result with
-    //    | SorterModelMaker.Msuf6RandMutate resultMsuf6RandMutate ->
-    //        Assert.Equal(msuf6RandMutate.Id, resultMsuf6RandMutate.Id)
-    //        Assert.Equal(msuf6RandMutate.RngType, resultMsuf6RandMutate.RngType)
-    //        Assert.Equal(msuf6RandMutate.Msuf6, resultMsuf6RandMutate.Msuf6)
-    //        Assert.Equal(msuf6RandMutate.Uf6MutationRatesArray, resultMsuf6RandMutate.Uf6MutationRatesArray)
-    //    | _ -> Assert.True(false, "Expected Msuf6RandMutate case")
-
-    //[<Fact>]
-    //let ``Deserialization with invalid MsceRandGenDto should throw exception`` () =
-    //    let invalidMsceRandGenDto = { MsceRandGenDto.Id = Guid.NewGuid(); RngType = rngType.Lcg; SortingWidth = 3; CeCount = 10; ChromosomeRates = ChromosomeRates.createUniform 0.1 } // Invalid: SortingWidth not a power of 2
-    //    let dto = SorterModelMakerDto.MsceRandGen invalidMsceRandGenDto
-    //    let bytes = MessagePackSerializer.Serialize(dto, options)
-    //    let deserializedDto = MessagePackSerializer.Deserialize<SorterModelMakerDto>(bytes, options)
-    //    let ex = Assert.ThrowsAny<Exception>(fun () -> SorterModelMakerDto.fromSorterModelMakerDto deserializedDto |> ignore)
-    //    Assert.Contains("SortingWidth must be a power of 2", ex.Message)
-
-    //[<Fact>]
-    //let ``Deserialization with invalid MssiRandGenDto should throw exception`` () =
-    //    let invalidMssiRandGenDto = { MssiRandGenDto.Id = Guid.NewGuid(); RngType = rngType.Lcg; SortingWidth = 1; PermSiCount = 5; PermSiGenRates = PermSiGenRates.createUniform 0.1 } // Invalid: SortingWidth < 2
-    //    let dto = SorterModelMakerDto.MssiRandGen invalidMssiRandGenDto
-    //    let bytes = MessagePackSerializer.Serialize(dto, options)
-    //    let deserializedDto = MessagePackSerializer.Deserialize<SorterModelMakerDto>(bytes, options)
-    //    let ex = Assert.ThrowsAny<Exception>(fun () -> SorterModelMakerDto.fromSorterModelMakerDto deserializedDto |> ignore)
-    //    Assert.Contains("SortingWidth must be at least 2", ex.Message)
-
-    //[<Fact>]
-    //let ``Deserialization with invalid MssiRandMutateDto should throw exception`` () =
-    //    let mssi = Mssi.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 2) [| Perm_Si.create (Permutation.create [|0; 1|]) |]
-    //    let invalidMssiRandMutateDto = { MssiRandMutateDto.Id = Guid.NewGuid(); RngType = rngType.Lcg; Mssi = MssiDto.toMssiDto mssi; PermSiGenRates = PermSiGenRates.createUniform -0.1 } // Invalid: Negative rate
-    //    let dto = SorterModelMakerDto.MssiRandMutate invalidMssiRandMutateDto
-    //    let bytes = MessagePackSerializer.Serialize(dto, options)
-    //    let deserializedDto = MessagePackSerializer.Deserialize<SorterModelMakerDto>(bytes, options)
-    //    let ex = Assert.ThrowsAny<Exception>(fun () -> SorterModelMakerDto.fromSorterModelMakerDto deserializedDto |> ignore)
-    //    Assert.Contains("Rate must be between 0 and 1", ex.Message)
-
-    //[<Fact>]
-    //let ``Deserialization with invalid Msuf4RandGenDto should throw exception`` () =
-    //    let invalidMsuf4RandGenDto = { Msuf4RandGenDto.Id = Guid.NewGuid(); RngType = rngType.Lcg; SortingWidth = 3; StageCount = 1; GenRates = Uf4GenRatesArrayDto.create [||] } // Invalid: SortingWidth not a power of 2
-    //    let dto = SorterModelMakerDto.Msuf4RandGen invalidMsuf4RandGenDto
-    //    let bytes = MessagePackSerializer.Serialize(dto, options)
-    //    let deserializedDto = MessagePackSerializer.Deserialize<SorterModelMakerDto>(bytes, options)
-    //    let ex = Assert.ThrowsAny<Exception>(fun () -> SorterModelMakerDto.fromSorterModelMakerDto deserializedDto |> ignore)
-    //    Assert.Contains("SortingWidth must be a power of 2", ex.Message)
-
-    //[<Fact>]
-    //let ``Deserialization with invalid Msuf6RandGenDto should throw exception`` () =
-    //    let invalidMsuf6RandGenDto = { Msuf6RandGenDto.Id = Guid.NewGuid(); RngType = rngType.Lcg; SortingWidth = 5; StageCount = 1; GenRates = Uf6GenRatesArrayDto.create [||] } // Invalid: SortingWidth not divisible by 6
-    //    let dto = SorterModelMakerDto.Msuf6RandGen invalidMsuf6RandGenDto
-    //    let bytes = MessagePackSerializer.Serialize(dto, options)
-    //    let deserializedDto = MessagePackSerializer.Deserialize<SorterModelMakerDto>(bytes, options)
-    //    let ex = Assert.ThrowsAny<Exception>(fun () -> SorterModelMakerDto.fromSorterModelMakerDto deserializedDto |> ignore)
-    //    Assert.Contains("SortingWidth must be at least 6 and divisible by 6", ex.Message)
+    [<Fact>]
+    let ``Msuf6RandMutate round-trip serialization and deserialization should succeed`` () =
+        let order = 12
+        let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
+        let twoOrbitUfSteps = TwoOrbitUfStep.create [|TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; |] order
+        let twoOrbitUf6s = [| TwoOrbitUf6.create TwoOrbitTripleType.Ortho1 [|twoOrbitUfSteps|] |]
+        let msuf6 = Msuf6.create id (UMX.tag<sortingWidth> order) twoOrbitUf6s
+        let mutationRates = Uf6MutationRatesArray.create [| Uf6MutationRates.makeUniform order 0.1 0.05 |]
+        let msuf6RandMutate = Msuf6RandMutate.create rngType.Lcg msuf6 mutationRates
+        let sorterModelMaker = SorterModelMaker.Msuf6RandMutate msuf6RandMutate
+        let result = roundTrip sorterModelMaker 
+        match result with
+        | SorterModelMaker.Msuf6RandMutate resultMsuf6RandMutate ->
+            Assert.Equal(msuf6RandMutate.Id, resultMsuf6RandMutate.Id)
+            Assert.Equal(msuf6RandMutate.RngType, resultMsuf6RandMutate.RngType)
+            Assert.Equal(msuf6RandMutate.Msuf6, resultMsuf6RandMutate.Msuf6)
+            Assert.Equal(msuf6RandMutate.Uf6MutationRatesArray, resultMsuf6RandMutate.Uf6MutationRatesArray)
+        | _ -> Assert.True(false, "Expected Msuf6RandMutate case")
 

@@ -18,3 +18,13 @@ type SorterModel =
      | Msuf4 of Msuf4
      | Msuf6 of Msuf6
 
+
+module SorterModel =
+    let toISorterModel (sm: SorterModel) : ISorterModel =
+        match sm with
+        | Msce m -> m :> ISorterModel
+        | Mssi m -> m :> ISorterModel
+        | Msrs m -> m :> ISorterModel
+        | Msuf4 m -> m :> ISorterModel
+        | Msuf6 m -> m :> ISorterModel
+
