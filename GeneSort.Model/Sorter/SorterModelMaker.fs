@@ -24,20 +24,17 @@ type SorterModelMaker =
 
 
 module SorterModelMaker =
+    let makeSorterModelMaker (rngFactory: rngType -> Guid -> IRando) (index: int)  (model: SorterModelMaker) : SorterModel =
+        match model with
+        | MsceRandGen msce -> msce.MakeSorterModel rngFactory index |> SorterModel.Msce
+        | MsceRandMutate msce -> msce.MakeSorterModel rngFactory index |> SorterModel.Msce
+        | MssiRandGen mssi -> mssi.MakeSorterModel rngFactory index |> SorterModel.Mssi
+        | MssiRandMutate mssi -> mssi.MakeSorterModel rngFactory index |> SorterModel.Mssi
+        | MsrsRandGen msrs -> msrs.MakeSorterModel rngFactory index |> SorterModel.Msrs
+        | MsrsRandMutate msrs -> msrs.MakeSorterModel rngFactory index |> SorterModel.Msrs
+        | Msuf4RandGen msuf4 -> msuf4.MakeSorterModel rngFactory index |> SorterModel.Msuf4
+        | Msuf4RandMutate msuf4 -> msuf4.MakeSorterModel rngFactory index |> SorterModel.Msuf4
+        | Msuf6RandGen msuf6 -> msuf6.MakeSorterModel rngFactory index |> SorterModel.Msuf6
+        | Msuf6RandMutate msuf6 -> msuf6.MakeSorterModel rngFactory index |> SorterModel.Msuf6
 
-    let toISorterModelMaker (smm: SorterModelMaker) : ISorterModelMaker =
-        match smm with
-        | MsceRandGen m -> m :> ISorterModelMaker
-        | MsceRandMutate m -> m :> ISorterModelMaker
-        | MssiRandGen m -> m :> ISorterModelMaker
-        | MssiRandMutate m -> m :> ISorterModelMaker
-        | MsrsRandGen m -> m :> ISorterModelMaker
-        | MsrsRandMutate m -> m :> ISorterModelMaker
-        | Msuf4RandGen m -> m :> ISorterModelMaker
-        | Msuf4RandMutate m -> m :> ISorterModelMaker
-        | Msuf6RandGen m -> m :> ISorterModelMaker
-        | Msuf6RandMutate m -> m :> ISorterModelMaker
-
-    let makeSorterModel (randoGen: rngType -> Guid -> IRando) (index: int) (smm: SorterModelMaker) : ISorterModel =
-        (smm |> toISorterModelMaker).MakeSorterModel randoGen index
 

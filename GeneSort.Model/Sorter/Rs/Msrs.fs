@@ -53,16 +53,14 @@ type Msrs =
         member this.Equals(other) = 
             this.id = other.id
 
-    interface ISorterModel with
-        member this.Id = this.id 
-        member this.MakeSorter() = 
-            let ces = 
-                this.Perm_Rss
-                |> Array.collect (fun prs -> 
-                    prs.Perm_Si 
-                    |> Perm_Si.getTwoOrbits
-                    |> Array.map (fun tbit -> Ce.create tbit.First tbit.Second))
-            Sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
+    member this.MakeSorter() = 
+        let ces = 
+            this.Perm_Rss
+            |> Array.collect (fun prs -> 
+                prs.Perm_Si 
+                |> Perm_Si.getTwoOrbits
+                |> Array.map (fun tbit -> Ce.create tbit.First tbit.Second))
+        Sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
 
 
 module Msrs =

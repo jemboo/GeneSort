@@ -58,28 +58,29 @@ type MsceRandMutate =
         member this.Equals(other) = 
             this.Id = other.Id
 
-    interface ISorterModelMaker with
-        member this.Id = this.id
 
-        /// Mutates an Msce by applying ChromosomeRates.mutate to its ceCodes array.
-        /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
-        /// The ceCodes array is modified using the provided indelRatesArray, with insertions and mutations
-        /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
-        member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
-                    : ISorterModel =
-            let id = ISorterModelMaker.makeSorterModelId this index
-            let rng = rngFactory this.RngType %id
-            let excludeSelfCe = this.ExcludeSelfCe
-            let sortingWidth = %this.msce.SortingWidth
-            let ceCodeInserter = fun () -> Ce.generateCeCode excludeSelfCe sortingWidth (rng.NextIndex)
-            let ceCodeMutator = fun ce -> Ce.generateCeCode excludeSelfCe sortingWidth (rng.NextIndex)
-            let ceCodes = IndelRatesArray.mutate 
-                            this.IndelRatesArray 
-                            ceCodeInserter 
-                            ceCodeMutator 
-                            (rng.NextFloat) 
-                            this.msce.CeCodes
-            Msce.create id this.msce.SortingWidth ceCodes
+    /// Mutates an Msce by applying IndelRatesArray to its ceCodes array.
+    /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
+    /// The ceCodes array is modified using the provided indelRatesArray, with insertions and mutations
+    /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
+    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
+                : Msce =
+        let id = [
+                    this.Id  :> obj
+                    index :> obj
+                    ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+        let rng = rngFactory this.RngType %id
+        let excludeSelfCe = this.ExcludeSelfCe
+        let sortingWidth = %this.msce.SortingWidth
+        let ceCodeInserter = fun () -> Ce.generateCeCode excludeSelfCe sortingWidth (rng.NextIndex)
+        let ceCodeMutator = fun ce -> Ce.generateCeCode excludeSelfCe sortingWidth (rng.NextIndex)
+        let ceCodes = IndelRatesArray.mutate 
+                        this.IndelRatesArray 
+                        ceCodeInserter 
+                        ceCodeMutator 
+                        (rng.NextFloat) 
+                        this.msce.CeCodes
+        Msce.create id this.msce.SortingWidth ceCodes
 
 
 module MsceRandMutate =

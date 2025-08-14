@@ -52,18 +52,14 @@ type Msuf6 =
         member this.Equals(other) = 
             this.id = other.id
 
-    interface ISorterModel with
-        member this.Id = this.id 
-        member this.MakeSorter() = 
-            let ces = 
-                this.TwoOrbitUnfolder6s
-                |> Array.collect (fun tou ->
-                    tou.MakePerm_Si
-                    |> Perm_Si.getTwoOrbits
-                    |> Array.map Ce.fromTwoOrbit)
-            Sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
-
-
+    member this.MakeSorter() = 
+        let ces = 
+            this.TwoOrbitUnfolder6s
+            |> Array.collect (fun tou ->
+                tou.MakePerm_Si
+                |> Perm_Si.getTwoOrbits
+                |> Array.map Ce.fromTwoOrbit)
+        Sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
 
 
 

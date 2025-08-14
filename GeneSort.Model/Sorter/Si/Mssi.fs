@@ -51,14 +51,12 @@ type Mssi =
             this.sortingWidth = other.sortingWidth && 
             this.perm_Sis = other.perm_Sis
 
-    interface ISorterModel with
-        member this.Id = this.id 
-        member this.MakeSorter() = 
-            let ces = this.perm_Sis
-                        |> Array.map (fun psi -> psi |> Perm_Si.getTwoOrbits)
-                        |> Array.collect(id)
-                        |> Array.map(fun tbit -> Ce.create tbit.First tbit.Second)
-            Sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
+    member this.MakeSorter() = 
+        let ces = this.perm_Sis
+                    |> Array.map (fun psi -> psi |> Perm_Si.getTwoOrbits)
+                    |> Array.collect(id)
+                    |> Array.map(fun tbit -> Ce.create tbit.First tbit.Second)
+        Sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
 
 
 

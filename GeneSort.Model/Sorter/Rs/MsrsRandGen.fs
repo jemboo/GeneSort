@@ -59,26 +59,26 @@ type MsrsRandGen =
         member this.Equals(other) = 
             this.Id = other.Id
 
-    interface ISorterModelMaker with
-
-        member this.Id = this.id
         
-        member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
-                    : ISorterModel =
-            let id = ISorterModelMaker.makeSorterModelId this index
-            let rng = rngFactory this.RngType %id
-            let genRatesArray = this.OpsGenRatesArray
-            let stageCount = %this.StageCount
-            let sortingWidth = %this.SortingWidth
-            let perm_Rss =
-                [| for dex in 0 .. (stageCount - 1) ->
-                    Perm_RsOps.makeRandomPerm_Rs
-                        (rng.NextIndex)
-                        (rng.NextFloat)
-                        (genRatesArray.[dex])
-                        (sortingWidth) |]
+    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
+                : Msrs =
+        let id = [
+                    this.Id  :> obj
+                    index :> obj
+                    ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+        let rng = rngFactory this.RngType %id
+        let genRatesArray = this.OpsGenRatesArray
+        let stageCount = %this.StageCount
+        let sortingWidth = %this.SortingWidth
+        let perm_Rss =
+            [| for dex in 0 .. (stageCount - 1) ->
+                Perm_RsOps.makeRandomPerm_Rs
+                    (rng.NextIndex)
+                    (rng.NextFloat)
+                    (genRatesArray.[dex])
+                    (sortingWidth) |]
 
-            Msrs.create id this.SortingWidth perm_Rss
+        Msrs.create id this.SortingWidth perm_Rss
 
 
 module MsrsRandGen =

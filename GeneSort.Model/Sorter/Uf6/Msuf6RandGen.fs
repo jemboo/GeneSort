@@ -67,21 +67,22 @@ type Msuf6RandGen =
         member this.Equals(other) =
             this.id = other.id
 
-    interface ISorterModelMaker with
-        member this.Id = this.id
 
-        member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : ISorterModel =
-            let id = ISorterModelMaker.makeSorterModelId this index
-            let rng = rngFactory this.RngType %id
-            let genRatesArray = this.GenRates
-            let stageCount = %this.StageCount
-            let sortingWidth = %this.SortingWidth
-            let twoOrbitUnfolder6s =
-                [| for dex in 0 .. (stageCount - 1) ->
-                    RandomUnfolderOps6.makeRandomTwoOrbitUf6
-                        rng.NextFloat
-                        (genRatesArray.Item(dex)) |]
-            Msuf6.create id this.SortingWidth twoOrbitUnfolder6s :> ISorterModel
+    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : Msuf6 =
+        let id = [
+                    this.Id  :> obj
+                    index :> obj
+                    ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+        let rng = rngFactory this.RngType %id
+        let genRatesArray = this.GenRates
+        let stageCount = %this.StageCount
+        let sortingWidth = %this.SortingWidth
+        let twoOrbitUnfolder6s =
+            [| for dex in 0 .. (stageCount - 1) ->
+                RandomUnfolderOps6.makeRandomTwoOrbitUf6
+                    rng.NextFloat
+                    (genRatesArray.Item(dex)) |]
+        Msuf6.create id this.SortingWidth twoOrbitUnfolder6s
 
 module Msuf6RandGen =
 

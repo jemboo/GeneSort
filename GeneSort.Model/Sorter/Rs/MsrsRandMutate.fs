@@ -59,29 +59,29 @@ type MsrsRandMutate =
             this.Id = other.Id
 
 
-    interface ISorterModelMaker with
-        member this.Id = this.id
+    /// Mutates an Msrs by applying OpsActionRatesArray to its ceCodes array.
+    /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
+    /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
+    /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
+    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
+                    : Msrs =
+        let id = [
+                    this.Id  :> obj
+                    index :> obj
+                    ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+        let rng = rngFactory this.RngType %id
+        let orthoMutator = fun psi ->   Perm_RsOps.mutatePerm_Rs (rng.NextIndex) OpsActionMode.Ortho psi 
+        let paraMutator = fun psi ->    Perm_RsOps.mutatePerm_Rs (rng.NextIndex) OpsActionMode.Para psi 
+        let selfSymMutator = fun psi -> Perm_RsOps.mutatePerm_Rs  (rng.NextIndex) OpsActionMode.SelfRefl psi 
+        let mutated = OpsActionRatesArray.mutate 
+                        this.OpsActionRates 
+                        orthoMutator 
+                        paraMutator 
+                        selfSymMutator
+                        (rng.NextFloat) 
+                        this.Msrs.Perm_Rss
 
-        /// Mutates an Msce by applying ChromosomeRates.mutate to its ceCodes array.
-        /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
-        /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
-        /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
-        member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
-                        : ISorterModel =
-            let id = ISorterModelMaker.makeSorterModelId this index
-            let rng = rngFactory this.RngType %id
-            let orthoMutator = fun psi ->   Perm_RsOps.mutatePerm_Rs (rng.NextIndex) OpsActionMode.Ortho psi 
-            let paraMutator = fun psi ->    Perm_RsOps.mutatePerm_Rs (rng.NextIndex) OpsActionMode.Para psi 
-            let selfSymMutator = fun psi -> Perm_RsOps.mutatePerm_Rs  (rng.NextIndex) OpsActionMode.SelfRefl psi 
-            let mutated = OpsActionRatesArray.mutate 
-                            this.OpsActionRates 
-                            orthoMutator 
-                            paraMutator 
-                            selfSymMutator
-                            (rng.NextFloat) 
-                            this.Msrs.Perm_Rss
-
-            Msrs.create id this.Msrs.SortingWidth mutated
+        Msrs.create id this.Msrs.SortingWidth mutated
 
 
 

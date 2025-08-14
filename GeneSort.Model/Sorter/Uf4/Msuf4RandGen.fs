@@ -81,18 +81,19 @@ type Msuf4RandGen =
             this.stageCount = other.stageCount &&
             this.genRates.Equals(other.genRates)
 
-    interface ISorterModelMaker with
-        member this.Id = this.id
 
-        member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : ISorterModel =
-            let id = ISorterModelMaker.makeSorterModelId this index
-            let rando = rngFactory this.RngType %id
-            let sc = %this.StageCount
-            let genRts = this.GenRates
-            let twoOrbitUnfolder4s =
-                    [| for dex in 0 .. (sc - 1) ->
-                        RandomUnfolderOps4.makeRandomTwoOrbitUf4 rando.NextFloat (genRts.Item(dex)) |]
-            Msuf4.create id this.SortingWidth twoOrbitUnfolder4s
+    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : Msuf4 =
+        let id = [
+                    this.Id  :> obj
+                    index :> obj
+                    ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+        let rando = rngFactory this.RngType %id
+        let sc = %this.StageCount
+        let genRts = this.GenRates
+        let twoOrbitUnfolder4s =
+                [| for dex in 0 .. (sc - 1) ->
+                    RandomUnfolderOps4.makeRandomTwoOrbitUf4 rando.NextFloat (genRts.Item(dex)) |]
+        Msuf4.create id this.SortingWidth twoOrbitUnfolder4s
 
 
 

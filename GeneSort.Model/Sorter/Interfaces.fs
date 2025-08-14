@@ -10,19 +10,3 @@ open GeneSort.Core
 [<Measure>] type sorterModelSetID
 [<Measure>] type sorterModelMakerID
 [<Measure>] type sorterModelSetMakerID
-
-type ISorterModel =
-    abstract member Id : Guid<sorterModelID> 
-    abstract member MakeSorter : unit -> Sorter
-
-type ISorterModelMaker =
-    abstract member Id : Guid<sorterModelMakerID>
-    abstract member MakeSorterModel : (rngType -> Guid -> IRando) -> int -> ISorterModel
-
-    
-module ISorterModelMaker =
-    let makeSorterModelId (sorterModelMaker: ISorterModelMaker) (index:int) =
-        [
-            %sorterModelMaker.Id  :> obj
-            index :> obj
-        ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>

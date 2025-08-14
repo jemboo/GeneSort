@@ -66,26 +66,27 @@ type MsceRandGen =
             this.excludeSelfCe = other.excludeSelfCe && 
             this.ceCount = other.ceCount
 
+    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : Msce =
+        let id = [
+                    this.Id  :> obj
+                    index :> obj
+                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
 
-    interface ISorterModelMaker with
-        member this.Id = this.id
-        member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : ISorterModel =
-            let id = ISorterModelMaker.makeSorterModelId this index
-            let rando = rngFactory this.RngType %id
-            let ceCodes = 
-                if this.ExcludeSelfCe then
-                    Ce.generateCeCodesExcludeSelf (rando.NextIndex) %this.SortingWidth
-                    |> Seq.take %this.sortingWidth
-                    |> Seq.toArray
-                else
-                    Ce.generateCeCodes (rando.NextIndex) %this.SortingWidth
-                    |> Seq.take %this.CeCount
-                    |> Seq.toArray
+        let rando = rngFactory this.RngType %id
+        let ceCodes = 
+            if this.ExcludeSelfCe then
+                Ce.generateCeCodesExcludeSelf (rando.NextIndex) %this.SortingWidth
+                |> Seq.take %this.sortingWidth
+                |> Seq.toArray
+            else
+                Ce.generateCeCodes (rando.NextIndex) %this.SortingWidth
+                |> Seq.take %this.CeCount
+                |> Seq.toArray
 
-            Msce.create
-                id 
-                this.SortingWidth
-                ceCodes
+        Msce.create
+            id 
+            this.SortingWidth
+            ceCodes
 
 
 

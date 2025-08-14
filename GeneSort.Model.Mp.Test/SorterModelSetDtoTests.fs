@@ -1,0 +1,45 @@
+﻿namespace GeneSort.Model.Mp.Sorter.Tests
+
+open System
+open Xunit
+open MessagePack
+open MessagePack.Resolvers
+open MessagePack.FSharp
+open GeneSort.Core
+open GeneSort.Model.Sorter
+open GeneSort.Model.Mp.Sorter
+open GeneSort.Model.Mp.Sorter.Uf6
+open GeneSort.Model.Sorter.Uf6
+open FSharp.UMX
+open GeneSort.Sorter
+open GeneSort.Model.Sorter.Uf4
+open GeneSort.Model.Sorter.Rs
+open GeneSort.Model.Sorter.Si
+open GeneSort.Model.Sorter.Ce
+
+type SorterModelSetDtoTests() =
+
+    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
+    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
+
+    // Helper function to perform round-trip serialization
+    let roundTrip (sorterModelSet: SorterModelSet) : SorterModelSet =
+        let dto = SorterModelSetDto.fromDomain sorterModelSet
+        let bytes = MessagePackSerializer.Serialize(dto, options)
+        let deserializedDto = MessagePackSerializer.Deserialize<SorterModelSetDto>(bytes, options)
+        SorterModelSetDto.toDomain deserializedDto
+
+    [<Fact>]
+    let ``SorterModelSetDto with Msce round-trip serialization and deserialization should succeed`` () =
+        let msce = Msce.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|1;2;3|]
+        let sorterModel = SorterModel.Msce msce
+        let sorterModelSet = { SorterModelSet.Id = Guid.NewGuid() |> UMX.tag<sorterModelSetID>; SorterModels = [| sorterModel |] }
+        let result = roundTrip sorterModelSet
+        Assert.Equal(sorterModelSet.Id, result.Id)
+        Assert.Equal(sorterModelSet.SorterModels.Length, result.SorterModels.Length)
+        match result.SorterModels.[0] with
+        | SorterModel.Msce resultMsce ->
+            Assert.Equal(msce.Id, resultMsce.Id)
+            Assert.Equal(msce.SortingWidth, resultMsce.SortingWidth)
+            Assert.Equal<int>(msce.CeCodes, resultMsce.CeCodes)
+        | _ -> Assert.True(false, "Expected Msce case")

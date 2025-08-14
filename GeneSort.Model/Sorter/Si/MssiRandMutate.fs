@@ -58,25 +58,26 @@ type MssiRandMutate =
         member this.Equals(other) = 
             this.Id = other.Id
 
-    interface ISorterModelMaker with
-        member this.Id = this.id
 
-        /// Mutates an Msce by applying ChromosomeRates.mutate to its ceCodes array.
-        /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
-        /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
-        /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
-        member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : ISorterModel =
-            let id = ISorterModelMaker.makeSorterModelId this index
-            let rng = rngFactory this.RngType %id
-            let orthoMutator = fun psi ->  Perm_Si.mutate (rng.NextIndex) MutationMode.Ortho psi 
-            let paraMutator = fun psi ->   Perm_Si.mutate (rng.NextIndex) MutationMode.Para psi 
-            let mutated = OpActionRatesArray.mutate 
-                            this.OpActionRates 
-                            orthoMutator 
-                            paraMutator 
-                            (rng.NextFloat) 
-                            this.Mssi.Perm_Sis
-            Mssi.create id this.Mssi.SortingWidth mutated
+    /// Mutates an Mssi by applying OpActionRatesArray to its ceCodes array.
+    /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
+    /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
+    /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
+    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : Mssi =
+        let id = [
+                    this.Id  :> obj
+                    index :> obj
+                    ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+        let rng = rngFactory this.RngType %id
+        let orthoMutator = fun psi ->  Perm_Si.mutate (rng.NextIndex) MutationMode.Ortho psi 
+        let paraMutator = fun psi ->   Perm_Si.mutate (rng.NextIndex) MutationMode.Para psi 
+        let mutated = OpActionRatesArray.mutate 
+                        this.OpActionRates 
+                        orthoMutator 
+                        paraMutator 
+                        (rng.NextFloat) 
+                        this.Mssi.Perm_Sis
+        Mssi.create id this.Mssi.SortingWidth mutated
 
 
 

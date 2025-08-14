@@ -8,8 +8,7 @@ type SorterModelSet =
       SorterModels : SorterModel[] }
 
 module SorterModelSet =
-
     let makeSorterSet (modelSet: SorterModelSet) : SorterSet =
         let sorters = modelSet.SorterModels 
-                        |> Array.map (fun sm -> (sm |> SorterModel.toISorterModel).MakeSorter())
+                        |> Array.map (fun sm -> sm |> SorterModel.makeSorter)
         SorterSet.create (%modelSet.Id |> UMX.tag<sorterSetId>) sorters

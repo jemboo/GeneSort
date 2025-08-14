@@ -40,7 +40,7 @@ type MsrsRandMutateTests() =
         let modelRsMutate = MsrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick NoAction
-        let result = (modelRsMutate :> ISorterModelMaker).MakeSorterModel randoGen 0 :?> Msrs
+        let result = modelRsMutate.MakeSorterModel randoGen 0
         Assert.Equal(width, result.SortingWidth)
         Assert.Equal(2<stageCount>, result.StageCount)
         Assert.Equal<Perm_Rs array>(permRss, result.Perm_Rss)
@@ -57,7 +57,7 @@ type MsrsRandMutateTests() =
         let modelRsMutate = MsrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick SelfSym
-        let result = (modelRsMutate :> ISorterModelMaker).MakeSorterModel randoGen 0 :?> Msrs
+        let result = modelRsMutate.MakeSorterModel randoGen 0
         Assert.Equal(width, result.SortingWidth)
         Assert.Equal(2<stageCount>, result.StageCount)
         Assert.Equal<Perm_Rs array>(expectedPermRss, result.Perm_Rss)
@@ -75,7 +75,7 @@ type MsrsRandMutateTests() =
         let modelRsMutate = MsrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick Ortho
-        let result = (modelRsMutate :> ISorterModelMaker).MakeSorterModel randoGen 0 :?> Msrs
+        let result = modelRsMutate.MakeSorterModel randoGen 0
         Assert.Equal(width, result.SortingWidth)
         Assert.Equal(2<stageCount>, result.StageCount)
         Assert.Equal<Perm_Rs array>(expectedPermRss, result.Perm_Rss)
@@ -93,7 +93,7 @@ type MsrsRandMutateTests() =
         let modelRsMutate = MsrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick Para
-        let result = (modelRsMutate :> ISorterModelMaker).MakeSorterModel randoGen 0 :?> Msrs
+        let result = modelRsMutate.MakeSorterModel randoGen 0
         Assert.Equal(width, result.SortingWidth)
         Assert.Equal(2<stageCount>, result.StageCount)
         Assert.Equal<Perm_Rs array>(expectedPermRss, result.Perm_Rss)
@@ -111,7 +111,7 @@ type MsrsRandMutateTests() =
         let modelRsMutate = MsrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Picks SelfSym for first, Para for second
-        let result = (modelRsMutate :> ISorterModelMaker).MakeSorterModel randoGen 0 :?> Msrs
+        let result = modelRsMutate.MakeSorterModel randoGen 0
         let expectedPermRss = [| [| 3; 2; 1; 0 |]; [| 2; 3; 0; 1 |] |] |> Array.map createPermRs
         Assert.Equal(width, result.SortingWidth)
         Assert.Equal(2<stageCount>, result.StageCount)
@@ -141,6 +141,6 @@ type MsrsRandMutateTests() =
         let modelRsMutate = MsrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1 ] [ 0.9 ]
-        let result = (modelRsMutate :> ISorterModelMaker).MakeSorterModel randoGen 0 :?> Msrs
+        let result = modelRsMutate.MakeSorterModel randoGen 0
         Assert.NotEqual(%id, %result.Id)
         Assert.NotEqual(Guid.Empty, %result.Id)

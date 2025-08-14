@@ -64,16 +64,18 @@ type MssiRandGen =
             this.sortingWidth = other.sortingWidth &&
             this.stageCount = other.stageCount
 
-    interface ISorterModelMaker with
-        member this.Id = this.id
-        member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) 
-                (index: int) : ISorterModel =
-            let id = ISorterModelMaker.makeSorterModelId this index
-            let rando = rngFactory this.RngType %id
-            let perm_Sis = Perm_Si.makeRandoms (rando.NextIndex) (%this.SortingWidth) 
-                           |> Seq.take (%this.StageCount)
-                           |> Seq.toArray
-            Mssi.create id this.SortingWidth perm_Sis
+
+    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) 
+            (index: int) : Mssi =
+        let id = [
+                    this.Id  :> obj
+                    index :> obj
+                    ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+        let rando = rngFactory this.RngType %id
+        let perm_Sis = Perm_Si.makeRandoms (rando.NextIndex) (%this.SortingWidth) 
+                        |> Seq.take (%this.StageCount)
+                        |> Seq.toArray
+        Mssi.create id this.SortingWidth perm_Sis
 
 
 

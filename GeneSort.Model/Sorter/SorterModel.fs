@@ -20,11 +20,11 @@ type SorterModel =
 
 
 module SorterModel =
-    let toISorterModel (sm: SorterModel) : ISorterModel =
-        match sm with
-        | Msce m -> m :> ISorterModel
-        | Mssi m -> m :> ISorterModel
-        | Msrs m -> m :> ISorterModel
-        | Msuf4 m -> m :> ISorterModel
-        | Msuf6 m -> m :> ISorterModel
+    let makeSorter (model: SorterModel) : Sorter =
+        match model with
+        | Msce msce -> msce.MakeSorter()
+        | Mssi mssi -> mssi.MakeSorter()
+        | Msrs msrs -> msrs.MakeSorter()
+        | Msuf4 msuf4 -> msuf4.MakeSorter()
+        | Msuf6 msuf6 -> msuf6.MakeSorter()
 

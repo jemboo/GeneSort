@@ -28,7 +28,7 @@ open GeneSort.Model.Sorter.Uf6
 
 
 
-type SorterModelMakerDtoTests() =
+type SorterModelSetMakerDtoTests() =
 
 
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
@@ -199,4 +199,6 @@ type SorterModelMakerDtoTests() =
             Assert.Equal(msuf6RandMutate.Msuf6, resultMsuf6RandMutate.Msuf6)
             Assert.Equal(msuf6RandMutate.Uf6MutationRatesArray, resultMsuf6RandMutate.Uf6MutationRatesArray)
         | _ -> Assert.True(false, "Expected Msuf6RandMutate case")
+
+
 

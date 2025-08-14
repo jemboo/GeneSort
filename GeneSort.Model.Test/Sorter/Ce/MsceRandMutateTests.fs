@@ -28,10 +28,10 @@ type MsceRandMutateTests() =
     let ``mutate applies Mutation mode correctly`` () =
         let arrayRates = IndelRatesArray.create [| IndelRates.create (1.0, 0.0, 0.0) |] // Always Mutation
         let msce = Msce.create msceId sortingWidth [| mockCeCode |]
-        let msceMutate = MsceRandMutate.create (rngType.Lcg) arrayRates false msce :> ISorterModelMaker
+        let msceMutate = MsceRandMutate.create (rngType.Lcg) arrayRates false msce
         
         let mockRando = createMockRando [newCeCode] [0.9]
-        let result = (msceMutate.MakeSorterModel mockRando 0) :?> Msce
+        let result = msceMutate.MakeSorterModel mockRando 0
         result.CeCodes |> should equal [| newCeCode |]
         result.SortingWidth |> should equal sortingWidth
         result.CeCount |> should equal (1 |> UMX.tag<ceCount>)
@@ -40,10 +40,10 @@ type MsceRandMutateTests() =
     let ``mutate applies Insertion mode and trims to ceCount`` () =
         let arrayRates = IndelRatesArray.create [| IndelRates.create (0.0, 1.0, 0.0); IndelRates.create (0.0, 1.0, 0.0) |] // Insertion; Insertion
         let msce = Msce.create msceId sortingWidth [| mockCeCode; mockCeCode |]
-        let msceMutate = MsceRandMutate.create (rngType.Lcg) arrayRates false msce :> ISorterModelMaker
+        let msceMutate = MsceRandMutate.create (rngType.Lcg) arrayRates false msce
         
         let mockRando = createMockRando [newCeCode; newCeCode] [0.9; 0.9]
-        let result = (msceMutate.MakeSorterModel mockRando 0) :?> Msce
+        let result = msceMutate.MakeSorterModel mockRando 0
         result.CeCodes |> should equal [| newCeCode; mockCeCode; |] // Two insertions, trimmed to ceCount
         result.CeCount |> should equal (2 |> UMX.tag<ceCount>)
         result.SortingWidth |> should equal sortingWidth
@@ -52,10 +52,10 @@ type MsceRandMutateTests() =
     let ``mutate applies Deletion mode and appends insertion`` () =
         let arrayRates = IndelRatesArray.create [| IndelRates.create (0.0, 0.0, 1.0); IndelRates.create (0.0, 1.0, 0.0) |] // Deletion; Insertion
         let msce = Msce.create msceId sortingWidth [| mockCeCode; mockCeCode |]
-        let msceMutate = MsceRandMutate.create (rngType.Lcg) arrayRates false msce :> ISorterModelMaker
+        let msceMutate = MsceRandMutate.create (rngType.Lcg) arrayRates false msce
         
         let mockRando = createMockRando [newCeCode] [0.9; 0.9]
-        let result = (msceMutate.MakeSorterModel mockRando 0) :?> Msce
+        let result = msceMutate.MakeSorterModel mockRando 0
         result.CeCodes |> should equal [| newCeCode; mockCeCode |] // Deletion + Insertion
         result.CeCount |> should equal (2 |> UMX.tag<ceCount>)
         result.SortingWidth |> should equal sortingWidth
@@ -64,10 +64,10 @@ type MsceRandMutateTests() =
     let ``mutate applies NoAction mode correctly`` () =
         let arrayRates = IndelRatesArray.create [| IndelRates.create (0.0, 0.0, 0.0) |] // Always NoAction
         let msce = Msce.create msceId sortingWidth [| mockCeCode |]
-        let msceMutate = MsceRandMutate.create (rngType.Lcg) arrayRates false msce :> ISorterModelMaker
+        let msceMutate = MsceRandMutate.create (rngType.Lcg) arrayRates false msce
         
         let mockRando = createMockRando [0] [0.9]
-        let result = (msceMutate.MakeSorterModel mockRando 0) :?> Msce
+        let result = msceMutate.MakeSorterModel mockRando 0
         result.CeCodes |> should equal [| mockCeCode |] // Unchanged
         result.CeCount |> should equal (1 |> UMX.tag<ceCount>)
         result.SortingWidth |> should equal sortingWidth

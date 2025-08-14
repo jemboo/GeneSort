@@ -50,12 +50,10 @@ type Msce =
             this.sortingWidth = other.sortingWidth &&
             this.ceCodes = other.ceCodes
 
-    interface ISorterModel with
-        member this.Id = this.id 
-        member this.MakeSorter() = 
-            let sw = %this.sortingWidth
-            let ces = this.CeCodes |> Array.map (fun code -> Ce.create code sw)
-            Sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
+    member this.MakeSorter() = 
+        let sw = %this.sortingWidth
+        let ces = this.CeCodes |> Array.map (fun code -> Ce.create code sw)
+        Sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
 
 
 module Msce =
