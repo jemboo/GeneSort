@@ -8,6 +8,8 @@
   <ItemGroup>
     <Compile Include="Run.fs" />
     <Compile Include="Workspace.fs" />
+    <Compile Include="WorkspaceDto.fs" />
+    <Compile Include="WorkspaceOps.fs" />
     <Compile Include="Exp1.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

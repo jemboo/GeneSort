@@ -12,13 +12,15 @@ open System.Threading.Tasks
 
 
 module Exp1 =
-    
+    let projectDir = "c:\Projects"
     let parameterSet = 
-        [ ("SorterType", ["Mcse"; "Mssi"; "Msrs"; "Msuf6"])
+        [ ("SorterModel", ["Mcse"; "Mssi"; "Msrs"; "Msuf4"])
           ("SortingWidth", ["8"; "16"; "32"; "64"]) ]
 
-    //let makeRandGenModel (paramMap: Map<string, string>) : RandGenModel =
-    //    { RandGenModel.Width = width
-    //      RandGenModel.Seed = 42 // Fixed seed for reproducibility
-    //      RandGenModel.Count = 1000 // Number of random elements to generate
-    //      RandGenModel.MaxValue = 1000 } // Maximum value for random elements
+    let workspace = Workspace.create "Exp1" "Exp1" projectDir parameterSet
+
+    let executor (workspace:Workspace) (run: Run) =
+        Console.WriteLine (sprintf "Executing Run %d" run.Index)
+
+    let RunAll() =
+        WorkspaceOps.executeWorkspace workspace 6 executor
