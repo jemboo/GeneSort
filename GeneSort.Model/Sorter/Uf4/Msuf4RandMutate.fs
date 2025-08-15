@@ -75,18 +75,13 @@ type Msuf4RandMutate =
                     : Msuf4 =
         if %this.StageCount <> this.Uf4MutationRatesArray.Length then
             failwith $"Stage count of Msuf4 {%this.StageCount} must match Msuf4RandMutate length {this.Uf4MutationRatesArray.Length}"
-
-        let id = [
-                    this.Id  :> obj
-                    index :> obj
-                    ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+        let id = Common.makeSorterModelId this.Id index
         let rng = rngFactory this.RngType %id
         let mutatedUnfolders = 
             Array.zip this.msuf4.TwoOrbitUnfolder4s this.Uf4MutationRatesArray.RatesArray
             |> Array.map (fun (unfolder, mutationRates) ->
                 RandomUnfolderOps4.mutateTwoOrbitUf4 rng.NextFloat mutationRates unfolder)
         Msuf4.create id this.msuf4.SortingWidth mutatedUnfolders
-
 
 
 module Msuf4RandMutate =

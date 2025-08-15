@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <Compile Include="Run.fs" />
+    <Compile Include="RunDto.fs" />
     <Compile Include="Workspace.fs" />
     <Compile Include="WorkspaceDto.fs" />
     <Compile Include="WorkspaceOps.fs" />

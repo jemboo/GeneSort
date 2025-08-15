@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Sorter\Interfaces.fs" />
+    <Compile Include="Sorter\Common.fs" />
     <Compile Include="Sorter\Ce\Msce.fs" />
     <Compile Include="Sorter\Ce\MsceRandGen.fs" />
     <Compile Include="Sorter\Ce\MsceRandMutate.fs" />

@@ -62,10 +62,7 @@ type MsrsRandGen =
         
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
                 : Msrs =
-        let id = [
-                    this.Id  :> obj
-                    index :> obj
-                    ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+        let id = Common.makeSorterModelId this.Id index
         let rng = rngFactory this.RngType %id
         let genRatesArray = this.OpsGenRatesArray
         let stageCount = %this.StageCount

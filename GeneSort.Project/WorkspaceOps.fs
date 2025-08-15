@@ -21,7 +21,7 @@ module WorkspaceOps =
 
     let saveRunDto (workspace: Workspace) (run: Run) : System.Threading.Tasks.Task =
         let filePath = workspace.getRunFileName run
-        let runDto = Run.toRunDto run
+        let runDto = RunDto.toRunDto run
         let directory = Path.GetDirectoryName filePath
         Directory.CreateDirectory directory |> ignore
         use stream = new FileStream(filePath, FileMode.Create, FileAccess.Write)

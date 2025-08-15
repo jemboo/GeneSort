@@ -67,11 +67,7 @@ type MsceRandGen =
             this.ceCount = other.ceCount
 
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : Msce =
-        let id = [
-                    this.Id  :> obj
-                    index :> obj
-                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
-
+        let id = Common.makeSorterModelId this.Id index
         let rando = rngFactory this.RngType %id
         let ceCodes = 
             if this.ExcludeSelfCe then

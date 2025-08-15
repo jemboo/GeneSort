@@ -83,10 +83,7 @@ type Msuf4RandGen =
 
 
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : Msuf4 =
-        let id = [
-                    this.Id  :> obj
-                    index :> obj
-                    ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+        let id = Common.makeSorterModelId this.Id index
         let rando = rngFactory this.RngType %id
         let sc = %this.StageCount
         let genRts = this.GenRates
@@ -96,18 +93,7 @@ type Msuf4RandGen =
         Msuf4.create id this.SortingWidth twoOrbitUnfolder4s
 
 
-
 module Msuf4RandGen =
-
-    /// Generates a unique ID for an Msuf4 instance based on the Msuf4RandGen configuration and an index.
-    let makeId (msuf4RandGen: Msuf4RandGen) (index: int) : Guid<sorterModelID> =
-        [ 
-            msuf4RandGen.RngType :> obj
-            %msuf4RandGen.SortingWidth :> obj
-            %msuf4RandGen.StageCount :> obj
-            msuf4RandGen.GenRates.RatesArray :> obj
-            index :> obj
-        ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
 
     /// Returns a string representation of the Msuf4RandGen configuration.
     let toString (msuf4Gen: Msuf4RandGen) : string =

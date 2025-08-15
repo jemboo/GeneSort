@@ -105,7 +105,7 @@ type WorkspaceTests() =
             Assert.True(File.Exists filePath)
             use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read)
             let runDto = MessagePackSerializer.Deserialize<RunDto>(stream, options)
-            let expectedDto = Run.toRunDto run
+            let expectedDto = RunDto.toRunDto run
             Assert.Equal(expectedDto.Index, runDto.Index)
             Assert.Equal<Map<string,string>>(expectedDto.Properties, runDto.Properties)
         cleanupTempDir tempDir
@@ -123,7 +123,7 @@ type WorkspaceTests() =
         let filePath = workspace.getRunFileName run
         Directory.CreateDirectory (Path.GetDirectoryName filePath) |> ignore
         use stream = new FileStream(filePath, FileMode.Create, FileAccess.Write)
-        MessagePackSerializer.Serialize(stream, Run.toRunDto run, options)
+        MessagePackSerializer.Serialize(stream, RunDto.toRunDto run, options)
         let mutable executedCount = 0
         let executor _ _ = executedCount <- executedCount + 1
         WorkspaceOps.executeWorkspace workspace 2 executor
