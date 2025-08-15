@@ -24,7 +24,7 @@ type SorterModelMaker =
 
 
 module SorterModelMaker =
-    let makeSorterModelMaker (rngFactory: rngType -> Guid -> IRando) (index: int)  (model: SorterModelMaker) : SorterModel =
+    let makeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int)  (model: SorterModelMaker) : SorterModel =
         match model with
         | MsceRandGen msce -> msce.MakeSorterModel rngFactory index |> SorterModel.Msce
         | MsceRandMutate msce -> msce.MakeSorterModel rngFactory index |> SorterModel.Msce

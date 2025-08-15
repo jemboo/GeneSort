@@ -2,7 +2,6 @@
 
 open System
 open FSharp.UMX
-open GeneSort.Sorter
 open GeneSort.Core
 
 type SorterModelSetMaker =
@@ -32,3 +31,15 @@ type SorterModelSetMaker =
     member this.SorterModelMaker with get() = this.sorterModelMaker
     member this.FirstIndex with get() = this.firstIndex
     member this.Count with get() = this.count
+
+    member this.MakeSorterModelSet (rngFactory: rngType -> Guid -> IRando) : SorterModelSet =
+        if this.count <= 0 then
+            failwith "Count must be greater than 0"
+        if this.firstIndex < 0 then
+            failwith "FirstIndex must be non-negative"
+        let sorterModels = 
+            [| for i in 0 .. this.count - 1 do
+                let index = this.firstIndex + i
+                SorterModelMaker.makeSorterModel rngFactory index this.sorterModelMaker |]
+        let id = (%this.id) |> UMX.tag<sorterModelSetID>
+        { Id = id; SorterModels = sorterModels }

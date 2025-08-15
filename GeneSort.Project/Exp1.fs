@@ -22,8 +22,7 @@ module Exp1 =
     let randomType = rngType.Lcg
     let excludeSelfCe = true
     let parameterSet = 
-        [ ("SorterModel", ["Mcse"; "Mssi"; "Msrs"; "Msuf4"])
-          ("SortingWidth", ["8"; "16"; "32"; "64"]) ]
+        [ ParamHelpers.getSortingWidths(); ParamHelpers.getSorterModels() ]
 
     let workspace = Workspace.create "Exp1" "Exp1" projectDir parameterSet
 

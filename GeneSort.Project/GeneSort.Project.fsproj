@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="ParamHelpers.fs" />
     <Compile Include="Run.fs" />
     <Compile Include="RunDto.fs" />
     <Compile Include="Workspace.fs" />
