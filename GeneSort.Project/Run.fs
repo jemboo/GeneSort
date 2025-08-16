@@ -10,10 +10,10 @@ open System.IO
 open System.Threading
 open System.Threading.Tasks
 
-// Event type for Run completion
-//type RunCompletedEventArgs = { Index: int }
+[<Measure>] type cycleNumber
 
 // Run type
 type Run = 
     { Index: int
+      Cycle: int<cycleNumber>
       Parameters: Map<string, string> }

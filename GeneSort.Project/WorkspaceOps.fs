@@ -12,15 +12,13 @@ open GeneSort.Core.Combinatorics
 open System.Threading.Tasks
 
 
-
-
 module WorkspaceOps =  
     /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let saveRunDto (workspace: Workspace) (run: Run) : System.Threading.Tasks.Task =
-        let filePath = workspace.getRunFileName run
+    let saveRunDto (workspace: Workspace) (cycle: int<cycleNumber>) (run: Run) : System.Threading.Tasks.Task =
+        let filePath = workspace.getRunFileName cycle run
         let runDto = RunDto.toRunDto run
         let directory = Path.GetDirectoryName filePath
         Directory.CreateDirectory directory |> ignore
@@ -29,10 +27,10 @@ module WorkspaceOps =
 
 
     /// Returns a sequence of Runs made from all possible parameter combinations
-    let getRuns (workspace: Workspace) : Run seq = 
+    let getRuns (workspace: Workspace) (cycle: int<cycleNumber>) : Run seq =
         workspace.ParameterSets
         |> cartesianProductMaps
-        |> Seq.mapi (fun i paramsMap -> { Index = i; Parameters = paramsMap })
+        |> Seq.mapi (fun i paramsMap -> { Index = i; Cycle= cycle; Parameters = paramsMap })
 
 
     /// Executes async computations in parallel, limited to maxDegreeOfParallelism at a time
@@ -58,16 +56,20 @@ module WorkspaceOps =
 
     /// Executes all runs from the workspace, running up to atTheSameTime runs concurrently
     /// Skips runs if their output file already exists; saves runs to .msgpack files after execution
-    let executeWorkspace (workspace: Workspace) (maxDegreeOfParallelism: int) (executor: Workspace -> Run -> unit) : unit =
-        let runs = getRuns workspace
+    let executeWorkspace 
+                (workspace: Workspace) 
+                (cycle: int<cycleNumber>)
+                (maxDegreeOfParallelism: int) 
+                (executor: Workspace -> int<cycleNumber> -> Run -> unit) : unit =
+        let runs = getRuns workspace cycle
         let executeRun run = async {
-            let filePath = workspace.getRunFileName run
+            let filePath = workspace.getRunFileName cycle run
             if File.Exists filePath then
                 () // Skip if file exists
             else
                 try
-                    executor workspace run
-                    do! Async.AwaitTask (saveRunDto workspace run)
+                    executor workspace cycle run
+                    do! Async.AwaitTask (saveRunDto workspace cycle run)
                 with e ->
                     printfn "Error processing Run %d: %s" run.Index e.Message
         }

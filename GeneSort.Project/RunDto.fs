@@ -2,20 +2,19 @@
 namespace GeneSort.Project
 
 
+open FSharp.UMX
+
 open MessagePack
 open MessagePack.FSharp
 open MessagePack.Resolvers
-open System
-open System.IO
-open System.Threading
-open System.Threading.Tasks
 
 
 [<MessagePackObject>]
 type RunDto = 
     { 
-      [<Key("index")>] Index: int
-      [<Key("parameters")>] Properties: Map<string, string>
+      [<Key("0")>] Index: int
+      [<Key("1")>] Cycle: int
+      [<Key("2")>] Properties: Map<string, string>
     }
 
 module RunDto =
@@ -25,8 +24,10 @@ module RunDto =
     // Convert Run to a Dto for serialization
     let toRunDto (run: Run) : RunDto =
         { Index = run.Index
+          Cycle = %run.Cycle
           Properties = run.Parameters }
 
     let fromDto (dto: RunDto) : Run =
         { Index = dto.Index
+          Cycle = dto.Cycle |> UMX.tag<cycleNumber>
           Parameters = dto.Properties }

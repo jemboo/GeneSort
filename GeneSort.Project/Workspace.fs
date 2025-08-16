@@ -49,7 +49,7 @@ type Workspace =
     member this.getWorkspaceFolder (folderName:string) : string =
         Path.Combine(this.WorkspaceFolder, folderName)
 
-    member this.getRunFileName (run: Run) : string =
+    member this.getRunFileName (cycle: int<cycleNumber>) (run: Run) : string =
         let folder = this.getWorkspaceFolder "Runs"
-        let fileName = sprintf "Run_%d.msgpack" run.Index
+        let fileName = sprintf "Run_%d_%d.msgpack" %cycle run.Index
         Path.Combine(folder, fileName)

@@ -26,7 +26,7 @@ module Exp1 =
 
     let workspace = Workspace.create "Exp1" "Exp1" projectDir parameterSet
 
-    let executor (workspace:Workspace) (run: Run) =
+    let executor (workspace:Workspace) (cycle: int<cycleNumber>) (run: Run) =
         // Simulate some work for the run
         let id =
             [
@@ -42,4 +42,5 @@ module Exp1 =
         Console.WriteLine (sprintf "Executing Run %d   %A   %d" run.Index (%id) qua)
 
     let RunAll() =
-        WorkspaceOps.executeWorkspace workspace 6 executor
+        let cycle = 1<cycleNumber>
+        WorkspaceOps.executeWorkspace workspace cycle 6 executor
