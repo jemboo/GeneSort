@@ -15,6 +15,7 @@ open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Model
 open GeneSort.Model.Sorter
+open GeneSort.Project.Params
 
 
 module Exp1 =
@@ -22,7 +23,7 @@ module Exp1 =
     let randomType = rngType.Lcg
     let excludeSelfCe = true
     let parameterSet = 
-        [ ParamHelpers.getSortingWidths(); ParamHelpers.getSorterModels() ]
+        [ swFull.standardMapVals(); SorterModels.standardMapVals() ]
 
     let workspace = Workspace.create "Exp1" "Exp1" projectDir parameterSet
 

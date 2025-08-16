@@ -1,64 +1,22 @@
-﻿namespace GeneSort.Project
+﻿namespace GeneSort.Project.Params
 open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Model.Sorter
 
-type IntegerRange = { Min: int; Max: int }
 
-type sortingSuccess = 
-    | Record
-    | P900
-    | P999
+module CeCount =
 
-type swFull =
-    | Sw4  | Sw6  | Sw8  | Sw12  | Sw16  | Sw24  | Sw32  | Sw48  | Sw64 
-
-type swMerege =
-    | Sw4  | Sw6  | Sw8  | Sw12  | Sw16  | Sw24  | Sw32  | Sw48  | Sw64  | Sw96
-    | Sw128 | Sw192  | Sw256  | Sw384  | Sw512  | Sw768  | Sw1024  | Sw1536
-    | Sw2048  | Sw3072  | Sw4096  | Sw6144  | Sw8192
-
-
-module ParamHelpers =
-
-   let getRange (index:int) (extent:int) :IntegerRange =
-        {
-            IntegerRange.Min = index * extent
-            IntegerRange.Max = (index + 1) * extent - 1  
-        }
-
-   let getSortingWidths () : string*string list =
-       ("SortingWidth", ["8"; "16"; "32"; "64"]) 
-       
-   
-   let getSorterModels () : string*string list =
-       ("SorterModel", ["Mcse"; "Mssi"; "Msrs"; "Msuf4"])
-
-   let getSwFullForSortingWidth (sortingWidth:int<sortingWidth>) : swFull =
-       match %sortingWidth with
-        | 4 -> swFull.Sw4
-        | 6 -> swFull.Sw6
-        | 8 -> swFull.Sw8
-        | 12 -> swFull.Sw12
-        | 16 -> swFull.Sw16
-        | 24 -> swFull.Sw24
-        | 32 -> swFull.Sw32
-        | 48 -> swFull.Sw48
-        | 64 -> swFull.Sw64
-        | _ -> failwith "Unsupported sorting width"
-
-
-   let getSwMeregeForSortingWidth (sortingWidth:int<sortingWidth>) : swMerege =
-        match %sortingWidth with
-        | 4 -> swMerege.Sw4  | 6 -> swMerege.Sw6  | 8 -> swMerege.Sw8  | 12 -> swMerege.Sw12
-        | 16 -> swMerege.Sw16  | 24 -> swMerege.Sw24  | 32 -> swMerege.Sw32  | 48 -> swMerege.Sw48
-        | 64 -> swMerege.Sw64  | 96 -> swMerege.Sw96  | 128 -> swMerege.Sw128  | 192 -> swMerege.Sw192
-        | 256 -> swMerege.Sw256 | 384 -> swMerege.Sw384  | 512 -> swMerege.Sw512  | 768 -> swMerege.Sw768
-        | 1024 -> swMerege.Sw1024 | 1536 -> swMerege.Sw1536  | 2048 -> swMerege.Sw2048  | 3072 -> swMerege.Sw3072
-        | 4096 -> swMerege.Sw4096 | 6144 -> swMerege.Sw6144  | 8192 -> swMerege.Sw8192
-        | _ -> failwith "Unsupported sorting width"
+   let fromString (s: string) : int<ceCount> =
+        // Ensure the string is not null or empty
+        if String.IsNullOrEmpty(s) then
+            failwith "ceCount string cannot be null or empty"
+        try
+            System.Int32.Parse(s) |> UMX.tag<ceCount>
+        with 
+        | :? System.FormatException as ex ->
+            failwithf "Invalid ceCount string format: %s. Error: %s" s ex.Message
 
 
    let getRecordCeCountForFull (swFull:swFull) : int<ceCount> =
@@ -99,9 +57,7 @@ module ParamHelpers =
         | swMerege.Sw4096 -> 1000<ceCount>
         | swMerege.Sw6144 -> 5000<ceCount>
         | swMerege.Sw8192 -> 5000<ceCount>
-                
-
-
+                 
 
    let getP900CeCountForFull (swFull:swFull) : int<ceCount> =
        match swFull with
@@ -184,31 +140,3 @@ module ParamHelpers =
 
 
 
-
-   let getCeCountForFullSortingSuccess (sortingSuccess:sortingSuccess) 
-                (sortingWidth:int<sortingWidth>) : int<ceCount> =
-       match sortingSuccess with
-        | sortingSuccess.Record -> 
-            let swFull = getSwFullForSortingWidth sortingWidth
-            getRecordCeCountForFull swFull
-        | sortingSuccess.P900 -> 
-            let swFull = getSwFullForSortingWidth sortingWidth
-            getP900CeCountForFull swFull
-        | sortingSuccess.P999 -> 
-            let swFull = getSwFullForSortingWidth sortingWidth
-            getP999CeCountForFull swFull
-
-
-
-   let getCeCountForMergeSortingSuccess (sortingSuccess:sortingSuccess) 
-            (sortingWidth:int<sortingWidth>) : int<ceCount> = 
-       match sortingSuccess with
-        | sortingSuccess.Record -> 
-            let swMerege = getSwMeregeForSortingWidth sortingWidth
-            getRecordCeCountForMerge swMerege
-        | sortingSuccess.P900 -> 
-            let swMerege = getSwMeregeForSortingWidth sortingWidth
-            getP900CeCountForMerge swMerege
-        | sortingSuccess.P999 -> 
-            let swMerege = getSwMeregeForSortingWidth sortingWidth
-            getP999CeCountForMerge swMerege

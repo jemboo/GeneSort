@@ -28,7 +28,7 @@ module WorkspaceOps =
 
     /// Returns a sequence of Runs made from all possible parameter combinations
     let getRuns (workspace: Workspace) (cycle: int<cycleNumber>) : Run seq =
-        workspace.ParameterSets
+        workspace.ParameterSets 
         |> cartesianProductMaps
         |> Seq.mapi (fun i paramsMap -> { Index = i; Cycle= cycle; Parameters = paramsMap })
 
