@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+    <ProjectReference Include="..\GeneSort.Model.Mp\GeneSort.Model.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorter\GeneSort.Sorter.fsproj" />
     <ProjectReference Include="..\GeneSort.Model\GeneSort.Model.fsproj" />
   </ItemGroup>

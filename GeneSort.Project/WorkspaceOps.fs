@@ -13,27 +13,6 @@ open System.Threading.Tasks
 
 
 module WorkspaceOps =  
-    /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
-    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-
-    //let getWorkspaceFolder (workspace:Workspace) (outputFileType: OutputDataType): string =
-    //    Path.Combine(workspace.WorkspaceFolder, (OutputDataType.toString outputFileType))
-
-    //let getOutputFileName (workspace:Workspace) (index:int) (cycle: int<cycleNumber>) 
-    //                      (outputFileType: OutputDataType) : string =
-    //    let folder = getWorkspaceFolder workspace outputFileType
-    //    let fileName = sprintf "%s_%d_%d.msgpack" (OutputDataType.toString outputFileType) %cycle index 
-    //    Path.Combine(folder, fileName)
-
-    //let saveRunDto (workspace: Workspace) (run: Run) : System.Threading.Tasks.Task =
-    //    let filePath = getOutputFileName workspace run.Index run.Cycle OutputDataType.Run
-    //    let runDto = RunDto.toRunDto run
-    //    let directory = Path.GetDirectoryName filePath
-    //    Directory.CreateDirectory directory |> ignore
-    //    use stream = new FileStream(filePath, FileMode.Create, FileAccess.Write)
-    //    MessagePackSerializer.SerializeAsync(stream, runDto, options) // |> Async.AwaitTask |> Async.RunSynchronously
-
 
     /// Returns a sequence of Runs made from all possible parameter combinations
     let getRuns (workspace: Workspace) (cycle: int<cycleNumber>) : Run seq =
@@ -69,7 +48,7 @@ module WorkspaceOps =
                 (workspace: Workspace) 
                 (cycle: int<cycleNumber>)
                 (maxDegreeOfParallelism: int) 
-                (executor: Workspace -> int<cycleNumber> -> Run -> unit) 
+                (executor: Workspace -> int<cycleNumber> -> Run -> Async<unit>)
                 : unit =
         let runs = getRuns workspace cycle
         let executeRun (run:Run) = async {
@@ -78,13 +57,52 @@ module WorkspaceOps =
                 () // Skip if file exists
             else
                 try
-                    executor workspace cycle run
-                    do! Async.AwaitTask (OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run))
+                    do! executor workspace cycle run
+                    do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run)
                 with e ->
                     printfn "Error processing Run %d: %s" run.Index e.Message
         }
         let limitedParallel =
             runs
             |> Seq.map executeRun
+            |> Seq.toList
             |> ParallelWithThrottle maxDegreeOfParallelism
         Async.RunSynchronously limitedParallel
+
+
+    //let executeWorkspace 
+    //    (workspace: Workspace) 
+    //    (cycle: int<cycleNumber>)
+    //    (executor: Workspace -> int<cycleNumber> -> Run -> Async<unit>) 
+    //    : unit =
+    //    let runs = getRuns workspace cycle
+    //    for run in runs do
+    //        let filePath = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run |> OutputData.toString)
+    //        if File.Exists filePath then
+    //            () // Skip if file exists
+    //        else
+    //            async {
+    //                try
+    //                    do! executor workspace cycle run
+    //                    do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run)
+    //                with e ->
+    //                    printfn "Error processing Run %d: %s" run.Index e.Message
+    //            } |> Async.RunSynchronously
+
+
+    //let executeWorkspace 
+    //        (workspace: Workspace) 
+    //        (cycle: int<cycleNumber>)
+    //        (executor: Workspace -> int<cycleNumber> -> Run -> unit) 
+    //        : unit =
+    //    let runs = getRuns workspace cycle
+    //    for run in runs do
+    //        let filePath = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run |> OutputData.toString)
+    //        if File.Exists filePath then
+    //            () // Skip if file exists
+    //        else
+    //            try
+    //                executor workspace cycle run
+    //                Async.RunSynchronously (Async.AwaitTask (OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run)))
+    //            with e ->
+    //                printfn "Error processing Run %d: %s" run.Index e.Message

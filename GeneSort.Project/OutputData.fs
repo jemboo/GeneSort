@@ -11,32 +11,13 @@ open System.IO
 open GeneSort.Core.Combinatorics
 open System.Threading.Tasks
 open GeneSort.Model.Sorter
-
-
-
-//type OutputDataType =
-//    | Run
-//    | SorterSet
-//    | SorterModelSet
-
-
-//module OutputDataType =
-//    let toString = function
-//        | Run -> "Run"
-//        | SorterSet -> "SorterSet"
-//        | SorterModelSet -> "SorterModelSet"
-//    let fromString (s: string) =
-//        match s with
-//        | "Run" -> Run
-//        | "SorterSet" -> SorterSet
-//        | "SorterModelSet" -> SorterModelSet
-//        | _ -> failwithf "Unknown OutputFileType: %s" s
+open GeneSort.Model.Mp.Sorter
 
 
 type OutputData =
     | Run of Run
     | SorterSet of SorterSet
-    | SorterModelSet of SorterModelSetMaker
+    | SorterModelSetMaker of SorterModelSetMaker
 
 
 module OutputData =
@@ -48,7 +29,7 @@ module OutputData =
         match outputData with
         | Run _ -> "Run"
         | SorterSet _ -> "SorterSet"
-        | SorterModelSet _ -> "SorterModelSet"
+        | SorterModelSetMaker _ -> "SorterModelSet"
 
     let getOutputDataFolder (workspace:Workspace) (outputDataFolder: string) 
                     : string =
@@ -65,7 +46,7 @@ module OutputData =
             (workspaceFolder:string) 
             (index:int) 
             (cycle: int<cycleNumber>) 
-            (outputData: OutputData) : System.Threading.Tasks.Task =
+            (outputData: OutputData) : Async<unit> =
     
         let filePath = getOutputFileName workspaceFolder index cycle (toString outputData)
         let directory = Path.GetDirectoryName filePath
@@ -74,12 +55,12 @@ module OutputData =
         match outputData with
         | Run r -> 
             let dto = RunDto.toRunDto r
-            MessagePackSerializer.SerializeAsync(stream, dto, options)// |> Async.AwaitTask |> Async.RunSynchronously
-        | SorterSet ss -> 
-            failwith "SorterSet serialization not implemented yet"
+            MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask //|> Async.RunSynchronously
+        | SorterSet ss ->
+            failwith "SorterModelSet serialization not implemented yet"
             //let dto = SorterSetDto.toSorterSetDto ss
             //MessagePackSerializer.SerializeAsync(stream, dto, options)// |> Async.AwaitTask |> Async.RunSynchronously    
-        | SorterModelSet sms -> 
-            failwith "SorterModelSet serialization not implemented yet"
-            //let dto = SorterModelSetDto.toSorterModelSetDto sms
-            //MessagePackSerializer.SerializeAsync(stream, dto, options)// |> Async.AwaitTask |> Async.RunSynchronously
+        | SorterModelSetMaker sms -> 
+           // failwith "SorterModelSet serialization not implemented yet"
+            let dto = SorterModelSetMakerDto.fromDomain sms
+            MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask //|> Async.RunSynchronously
