@@ -52,9 +52,9 @@ module WorkspaceOps =
                 : unit =
         let runs = getRuns workspace cycle
         let executeRun (run:Run) = async {
-            let filePath = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run |> OutputData.toString)
-            if File.Exists filePath then
-                () // Skip if file exists
+            let filePathRun = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run |> OutputData.toString)
+            if File.Exists filePathRun then
+                        printfn "Skipping Run %d: Output file %s already exists" run.Index filePathRun
             else
                 try
                     do! executor workspace cycle run
@@ -62,6 +62,7 @@ module WorkspaceOps =
                 with e ->
                     printfn "Error processing Run %d: %s" run.Index e.Message
         }
+
         let limitedParallel =
             runs
             |> Seq.map executeRun
@@ -77,9 +78,9 @@ module WorkspaceOps =
     //    : unit =
     //    let runs = getRuns workspace cycle
     //    for run in runs do
-    //        let filePath = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run |> OutputData.toString)
-    //        if File.Exists filePath then
-    //            () // Skip if file exists
+    //        let filePathRun = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run |> OutputData.toString)
+    //        if File.Exists filePathRun then
+    //                    printfn "Skipping Run %d: Output file %s already exists" run.Index filePathRun
     //        else
     //            async {
     //                try
@@ -88,21 +89,3 @@ module WorkspaceOps =
     //                with e ->
     //                    printfn "Error processing Run %d: %s" run.Index e.Message
     //            } |> Async.RunSynchronously
-
-
-    //let executeWorkspace 
-    //        (workspace: Workspace) 
-    //        (cycle: int<cycleNumber>)
-    //        (executor: Workspace -> int<cycleNumber> -> Run -> unit) 
-    //        : unit =
-    //    let runs = getRuns workspace cycle
-    //    for run in runs do
-    //        let filePath = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run |> OutputData.toString)
-    //        if File.Exists filePath then
-    //            () // Skip if file exists
-    //        else
-    //            try
-    //                executor workspace cycle run
-    //                Async.RunSynchronously (Async.AwaitTask (OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run)))
-    //            with e ->
-    //                printfn "Error processing Run %d: %s" run.Index e.Message

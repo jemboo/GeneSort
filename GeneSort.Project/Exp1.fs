@@ -86,6 +86,9 @@ module Exp1 =
             let firstIndex = (%cycle * %sorterCount) |> UMX.tag<sorterCount>
 
             let sorterModelSetMaker = SorterModelSetMaker.create modelMaker firstIndex sorterCount
+
+            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterModelSetMaker |> OutputData.SorterModelSetMaker)
+
             // Save is handled in executeWorkspace, so no need to save here
             do! Async.Sleep 0 // Placeholder to ensure async context; replace with actual async work if needed
             Console.WriteLine(sprintf "Executing Run %d   %A" run.Index run.Parameters)
