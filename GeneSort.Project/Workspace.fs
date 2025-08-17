@@ -11,26 +11,6 @@ open System.IO
 open GeneSort.Core.Combinatorics
 open System.Threading.Tasks
 
-
-type OutputFileType =
-    | Run
-    | SorterSet
-    | SorterModelSet
-
-
-module OutputFileType =
-    let toString = function
-        | Run -> "Run"
-        | SorterSet -> "SorterSet"
-        | SorterModelSet -> "SorterModelSet"
-    let fromString (s: string) =
-        match s with
-        | "Run" -> Run
-        | "SorterSet" -> SorterSet
-        | "SorterModelSet" -> SorterModelSet
-        | _ -> failwithf "Unknown OutputFileType: %s" s
-
-
 // Workspace type
 type Workspace = 
     private
@@ -65,11 +45,3 @@ type Workspace =
     member this.RootDirectory with get () = this.rootDirectory
     member this.ParameterSets with get () = this.parameterSets
     member this.WorkspaceFolder with get() = Path.Combine(this.RootDirectory, this.Name)
-
-    member this.getWorkspaceFolder (outputFileType: OutputFileType): string =
-        Path.Combine(this.WorkspaceFolder, (OutputFileType.toString outputFileType))
-
-    member this.getOutputFileName (run: Run) (outputFileType: OutputFileType) : string =
-        let folder = this.getWorkspaceFolder outputFileType
-        let fileName = sprintf "%s_%d_%d.msgpack" (OutputFileType.toString outputFileType) %run.Cycle run.Index 
-        Path.Combine(folder, fileName)

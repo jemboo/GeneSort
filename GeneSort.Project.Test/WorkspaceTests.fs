@@ -73,8 +73,8 @@ type WorkspaceTests() =
         let tempDir = createTempDir ()
         let workspace = createWorkspace tempDir [("algorithm", ["quick"; "merge"]); ("size", ["small"; "large"])]
         let run = { Index = 3; Cycle = cycle; Parameters = Map.ofList [("algorithm", "quick")] }
-        let filePath = workspace.getOutputFileName run OutputFileType.Run
-        let expectedPath = Path.Combine(tempDir, "TestWorkspace", "Run", "Run_1_3.msgpack")
+        let filePath = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run |> OutputData.toString)
+        let expectedPath = Path.Combine(tempDir, workspace.Name,  "Run", "Run_1_3.msgpack")
         Assert.Equal(expectedPath, filePath)
         cleanupTempDir tempDir
 
@@ -85,13 +85,13 @@ type WorkspaceTests() =
         let tempDir = createTempDir ()
         let workspace = createWorkspace tempDir [("algorithm", ["quick"; "merge"; "fonzy"; "ralph"; "quick1"; "merge1"; "fonzy1"; "ralph1"; "quick2"; "merge2"; "fonzy2"; "ralph2"])]
         // Clear Runs folder to ensure no existing files
-        let runsFolder = workspace.getWorkspaceFolder OutputFileType.Run
+        let runsFolder = OutputData.getOutputDataFolder workspace "Run"
         if Directory.Exists runsFolder then
             Directory.Delete(runsFolder, true)
         // Log existing files for debugging
         let runs = WorkspaceOps.getRuns workspace cycle |> Seq.toList
         for run in runs do
-            let filePath = workspace.getOutputFileName run OutputFileType.Run
+            let filePath = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run |> OutputData.toString)
             if File.Exists filePath then
                 printfn "File already exists for Run %d: %s" run.Index filePath
         let mutable executedRuns = []
@@ -105,7 +105,7 @@ type WorkspaceTests() =
         WorkspaceOps.executeWorkspace workspace cycle 2 executor
         Assert.Equal(12, runs.Length) // 12 algorithms
         for run in runs do
-            let filePath = workspace.getOutputFileName run OutputFileType.Run
+            let filePath = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run |> OutputData.toString)
             Assert.True(File.Exists filePath)
             use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read)
             let runDto = MessagePackSerializer.Deserialize<RunDto>(stream, options)
@@ -125,7 +125,7 @@ type WorkspaceTests() =
         let tempDir = createTempDir ()
         let workspace = createWorkspace tempDir [("algorithm", ["quick"])]
         let run = { Index = 0; Cycle = cycle; Parameters = Map.ofList [("algorithm", "quick")] }
-        let filePath = workspace.getOutputFileName run OutputFileType.Run
+        let filePath = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run |> OutputData.toString)
         Directory.CreateDirectory (Path.GetDirectoryName filePath) |> ignore
         use stream = new FileStream(filePath, FileMode.Create, FileAccess.Write)
         MessagePackSerializer.Serialize(stream, RunDto.toRunDto run, options)
@@ -143,6 +143,6 @@ type WorkspaceTests() =
         let executor _ _ (run: Run) = raise (Exception $"Error in Run {run.Index}")
         WorkspaceOps.executeWorkspace workspace cycle 2 executor
         let run = { Index = 0; Cycle=cycle; Parameters = Map.ofList [("algorithm", "quick")] }
-        let filePath = workspace.getOutputFileName run OutputFileType.Run
+        let filePath = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run |> OutputData.toString)
         Assert.False(File.Exists filePath) // File not created due to error
         cleanupTempDir tempDir
