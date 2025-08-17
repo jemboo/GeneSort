@@ -7,47 +7,97 @@ open Combinatorics
 
 module Perm_RsOps = 
 
-    // Create a random Perm_Rs
-    let makeRandomPerm_Rs
-            (indexPicker: int -> int) 
-            (floatPicker: unit -> float)
-            (opsGenRates: OpsGenRates) 
-            (order: int)  : Perm_Rs =
-        if(order % 2 <> 0) then
-            failwith "Perm_Rs order must be even"
+    //// Create a random Perm_Rs
+    //let makeRandomPerm_Rs
+    //        (indexPicker: int -> int) 
+    //        (floatPicker: unit -> float)
+    //        (opsGenRates: OpsGenRates) 
+    //        (order: int)  : Perm_Rs =
+    //    if(order % 2 <> 0) then
+    //        failwith "Perm_Rs order must be even"
             
+    //    let mutationModePicker () = 
+    //            opsGenRates.PickMode floatPicker
+
+    //    let rsPairTracker = Array.init (order / 2) (fun dex -> ((dex, reflect order dex), true))
+    //    let _availableFlags () = rsPairTracker |> Seq.filter (fun (_, f) -> f)
+
+    //    let twoOrbits =
+    //        seq {
+    //            while (_availableFlags () |> Seq.length > 0) do
+    //                if (_availableFlags () |> Seq.length < 2) then
+    //                    // Since only one pair is left, just yield it
+    //                    let lastOne = _availableFlags () |> Seq.head |> fst
+    //                    rsPairTracker.[fst lastOne] <- (lastOne, false)
+    //                    yield lastOne
+    //                else
+    //                    let (dex1, dex2) = pickAndOrderTwoDistinct indexPicker (_availableFlags () |> Seq.length)
+    //                    let pair1 = rsPairTracker.[dex1] |> fst
+    //                    let pair2 = rsPairTracker.[dex2] |> fst 
+    //                    rsPairTracker.[dex1] <- (pair1, false)
+    //                    rsPairTracker.[dex2] <- (pair2, false)
+    //                    let mode = mutationModePicker ()
+    //                    match mode with
+    //                    | OpsGenMode.SelfRefl ->
+    //                        // return original self-symmetric pairs
+    //                        yield pair1
+    //                        yield pair2
+    //                    | OpsGenMode.Ortho ->
+    //                        // reconfigure pairs as Ortho pairs
+    //                        yield (fst pair1, fst pair2)
+    //                        yield (snd pair1, snd pair2)
+    //                    | OpsGenMode.Para ->
+    //                        // reconfigure pairs as Para pairs
+    //                        yield (fst pair1, snd pair2)
+    //                        yield (fst pair2, snd pair1)
+    //        } |> Seq.toList
+
+        
+        //let perm_Si = twoOrbits |> Perm_Si.fromTranspositions order
+
+        //Perm_Rs.create perm_Si.Array
+
+    let makeRandomPerm_Rs
+        (indexPicker: int -> int) 
+        (floatPicker: unit -> float)
+        (opsGenRates: OpsGenRates) 
+        (order: int) : Perm_Rs =
+        if order % 2 <> 0 then
+            failwith "Perm_Rs order must be even"
+        
         let mutationModePicker () = 
-                opsGenRates.PickMode floatPicker
+            opsGenRates.PickMode floatPicker
 
         let rsPairTracker = Array.init (order / 2) (fun dex -> ((dex, reflect order dex), true))
-        let _availableFlags () = rsPairTracker |> Seq.filter (fun (_, f) -> f)
+        let _availableFlags () = rsPairTracker |> Seq.mapi (fun i (pair, flag) -> (i, pair, flag)) |> Seq.filter (fun (_, _, flag) -> flag)
 
         let twoOrbits =
             seq {
                 while (_availableFlags () |> Seq.length > 0) do
-                    if (_availableFlags () |> Seq.length < 2) then
+                    let availablePairs = _availableFlags () |> Seq.toArray
+                    if availablePairs.Length < 2 then
                         // Since only one pair is left, just yield it
-                        let lastOne = _availableFlags () |> Seq.head |> fst
-                        rsPairTracker.[fst lastOne] <- (lastOne, false)
-                        yield lastOne
+                        let (origIndex, lastPair, _) = availablePairs.[0]
+                        rsPairTracker.[origIndex] <- (lastPair, false)
+                        yield lastPair
                     else
-                        let (dex1, dex2) = pickAndOrderTwoDistinct indexPicker (_availableFlags () |> Seq.length)
-                        let pair1 = rsPairTracker.[dex1] |> fst
-                        let pair2 = rsPairTracker.[dex2] |> fst 
-                        rsPairTracker.[dex1] <- (pair1, false)
-                        rsPairTracker.[dex2] <- (pair2, false)
+                        let (dex1, dex2) = pickAndOrderTwoDistinct indexPicker availablePairs.Length
+                        let (origIndex1, pair1, _) = availablePairs.[dex1]
+                        let (origIndex2, pair2, _) = availablePairs.[dex2]
+                        rsPairTracker.[origIndex1] <- (pair1, false)
+                        rsPairTracker.[origIndex2] <- (pair2, false)
                         let mode = mutationModePicker ()
                         match mode with
                         | OpsGenMode.SelfRefl ->
-                            // return original self-symmetric pairs
+                            // Return original self-symmetric pairs
                             yield pair1
                             yield pair2
                         | OpsGenMode.Ortho ->
-                            // reconfigure pairs as Ortho pairs
+                            // Reconfigure pairs as Ortho pairs
                             yield (fst pair1, fst pair2)
                             yield (snd pair1, snd pair2)
                         | OpsGenMode.Para ->
-                            // reconfigure pairs as Para pairs
+                            // Reconfigure pairs as Para pairs
                             yield (fst pair1, snd pair2)
                             yield (fst pair2, snd pair1)
             } |> Seq.toList
@@ -56,8 +106,6 @@ module Perm_RsOps =
         let perm_Si = twoOrbits |> Perm_Si.fromTranspositions order
 
         Perm_Rs.create perm_Si.Array
-
-
 
 
     /// Analyzes two distinct points in a Perm_Rs permutation to determine their symmetry properties.
