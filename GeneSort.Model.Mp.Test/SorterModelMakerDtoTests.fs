@@ -45,10 +45,10 @@ type SorterModelSetMakerDtoTests() =
     let ``MsceRandGen round-trip serialization and deserialization should succeed`` () =
         let excludeSelfCe = true
         let msceRandGen = MsceRandGen.create rngType.Lcg (UMX.tag<sortingWidth> 16) excludeSelfCe (UMX.tag<ceCount> 10)
-        let sorterModelMaker = SorterModelMaker.MsceRandGen msceRandGen
+        let sorterModelMaker = SorterModelMaker.SmmMsceRandGen msceRandGen
         let result = roundTrip sorterModelMaker
         match result with
-        | SorterModelMaker.MsceRandGen resultMsceRandGen ->
+        | SorterModelMaker.SmmMsceRandGen resultMsceRandGen ->
             Assert.Equal(msceRandGen.Id, resultMsceRandGen.Id)
             Assert.Equal(msceRandGen.RngType, resultMsceRandGen.RngType)
             Assert.Equal(msceRandGen.SortingWidth, resultMsceRandGen.SortingWidth)
@@ -61,10 +61,10 @@ type SorterModelSetMakerDtoTests() =
         let msce = Msce.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|16|]
         let arrayRates = IndelRatesArray.create [| IndelRates.create (1.0, 0.0, 0.0) |] // Always Mutation
         let msceRandMutate = MsceRandMutate.create rngType.Lcg arrayRates excludeSelfCe msce
-        let sorterModelMaker = SorterModelMaker.MsceRandMutate msceRandMutate
+        let sorterModelMaker = SorterModelMaker.SmmMsceRandMutate msceRandMutate
         let result = roundTrip sorterModelMaker
         match result with
-        | SorterModelMaker.MsceRandMutate resultMsceRandMutate ->
+        | SorterModelMaker.SmmMsceRandMutate resultMsceRandMutate ->
             Assert.Equal(msceRandMutate.Id, resultMsceRandMutate.Id)
             Assert.Equal(msceRandMutate.RngType, resultMsceRandMutate.RngType)
             Assert.Equal(msceRandMutate.Msce, resultMsceRandMutate.Msce)
@@ -73,10 +73,10 @@ type SorterModelSetMakerDtoTests() =
     [<Fact>]
     let ``MssiRandGen round-trip serialization and deserialization should succeed`` () =
         let mssiRandGen = MssiRandGen.create rngType.Lcg (UMX.tag<sortingWidth> 2) (UMX.tag<stageCount> 5)
-        let sorterModelMaker = SorterModelMaker.MssiRandGen mssiRandGen
+        let sorterModelMaker = SorterModelMaker.SmmMssiRandGen mssiRandGen
         let result = roundTrip sorterModelMaker
         match result with
-        | SorterModelMaker.MssiRandGen resultMssiRandGen ->
+        | SorterModelMaker.SmmMssiRandGen resultMssiRandGen ->
             Assert.Equal(mssiRandGen.Id, resultMssiRandGen.Id)
             Assert.Equal(mssiRandGen.RngType, resultMssiRandGen.RngType)
             Assert.Equal(mssiRandGen.SortingWidth, resultMssiRandGen.SortingWidth)
@@ -88,10 +88,10 @@ type SorterModelSetMakerDtoTests() =
         let siMutationRates = OpActionRates.create (0.0, 0.0)
         let opActionRatesArray = OpActionRatesArray.create [|siMutationRates|]
         let mssiRandMutate = MssiRandMutate.create rngType.Lcg mssi opActionRatesArray
-        let sorterModelMaker = SorterModelMaker.MssiRandMutate mssiRandMutate 
+        let sorterModelMaker = SorterModelMaker.SmmMssiRandMutate mssiRandMutate 
         let result = roundTrip sorterModelMaker
         match result with
-        | SorterModelMaker.MssiRandMutate resultMssiRandMutate ->
+        | SorterModelMaker.SmmMssiRandMutate resultMssiRandMutate ->
             Assert.Equal(mssiRandMutate.Id, resultMssiRandMutate.Id)
             Assert.Equal(mssiRandMutate.RngType, resultMssiRandMutate.RngType)
             Assert.Equal(mssiRandMutate.Mssi, resultMssiRandMutate.Mssi)
@@ -102,10 +102,10 @@ type SorterModelSetMakerDtoTests() =
         let opsGenRates = OpsGenRates.create (0.0, 1.0, 0.0)
         let opsGenRatesArray = OpsGenRatesArray.create [|opsGenRates|]
         let msrsRandGen = MsrsRandGen.create rngType.Lcg (UMX.tag<sortingWidth> 2) opsGenRatesArray
-        let sorterModelMaker = SorterModelMaker.MsrsRandGen msrsRandGen
+        let sorterModelMaker = SorterModelMaker.SmmMsrsRandGen msrsRandGen
         let result = roundTrip sorterModelMaker
         match result with
-        | SorterModelMaker.MsrsRandGen resultMsrsRandGen ->
+        | SorterModelMaker.SmmMsrsRandGen resultMsrsRandGen ->
             Assert.Equal(msrsRandGen.Id, resultMsrsRandGen.Id)
             Assert.Equal(msrsRandGen.RngType, resultMsrsRandGen.RngType)
             Assert.Equal(msrsRandGen.SortingWidth, resultMsrsRandGen.SortingWidth)
@@ -119,10 +119,10 @@ type SorterModelSetMakerDtoTests() =
         let opsActionRates = OpsActionRates.create (1.0, 0.0, 0.0)
         let opsActionRatesArray = OpsActionRatesArray.create [|opsActionRates|]
         let msrsRandMutate = MsrsRandMutate.create rngType.Lcg msrs opsActionRatesArray
-        let sorterModelMaker = SorterModelMaker.MsrsRandMutate msrsRandMutate
+        let sorterModelMaker = SorterModelMaker.SmmMsrsRandMutate msrsRandMutate
         let result = roundTrip sorterModelMaker
         match result with
-        | SorterModelMaker.MsrsRandMutate resultMsrsRandMutate ->
+        | SorterModelMaker.SmmMsrsRandMutate resultMsrsRandMutate ->
             Assert.Equal(msrsRandMutate.Id, resultMsrsRandMutate.Id)
             Assert.Equal(msrsRandMutate.RngType, resultMsrsRandMutate.RngType)
             Assert.Equal(msrsRandMutate.Msrs, resultMsrsRandMutate.Msrs)
@@ -136,10 +136,10 @@ type SorterModelSetMakerDtoTests() =
         let uf4GenRatesArray = [|Uf4GenRates.makeUniform order|]
         let genRates = Uf4GenRatesArray.create uf4GenRatesArray
         let msuf4RandGen = Msuf4RandGen.create rngType.Lcg (UMX.tag<sortingWidth> order) (UMX.tag<stageCount> 1) genRates
-        let sorterModelMaker = SorterModelMaker.Msuf4RandGen msuf4RandGen
+        let sorterModelMaker = SorterModelMaker.SmmMsuf4RandGen msuf4RandGen
         let result = roundTrip sorterModelMaker
         match result with
-        | SorterModelMaker.Msuf4RandGen resultMsuf4RandGen ->
+        | SorterModelMaker.SmmMsuf4RandGen resultMsuf4RandGen ->
             Assert.Equal(msuf4RandGen.Id, resultMsuf4RandGen.Id)
             Assert.Equal(msuf4RandGen.RngType, resultMsuf4RandGen.RngType)
             Assert.Equal(msuf4RandGen.SortingWidth, resultMsuf4RandGen.SortingWidth)
@@ -155,10 +155,10 @@ type SorterModelSetMakerDtoTests() =
         let msuf4 = Msuf4.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> order) twoOrbitUf4s
         let mutationRates = Uf4MutationRatesArray.create [| Uf4MutationRates.makeUniform order 0.1 0.05 |]
         let msuf4RandMutate = Msuf4RandMutate.create rngType.Lcg msuf4 mutationRates
-        let sorterModelMaker = SorterModelMaker.Msuf4RandMutate msuf4RandMutate
+        let sorterModelMaker = SorterModelMaker.SmmMsuf4RandMutate msuf4RandMutate
         let result = roundTrip sorterModelMaker
         match result with
-        | SorterModelMaker.Msuf4RandMutate resultMsuf4RandMutate ->
+        | SorterModelMaker.SmmMsuf4RandMutate resultMsuf4RandMutate ->
             Assert.Equal(msuf4RandMutate.Id, resultMsuf4RandMutate.Id)
             Assert.Equal(msuf4RandMutate.RngType, resultMsuf4RandMutate.RngType)
             Assert.Equal(msuf4RandMutate.Msuf4, resultMsuf4RandMutate.Msuf4)
@@ -170,10 +170,10 @@ type SorterModelSetMakerDtoTests() =
         let order = 12
         let genRates = Uf6GenRatesArray.create  [|Uf6GenRates.makeUniform order|]
         let msuf6RandGen = Msuf6RandGen.create rngType.Lcg (UMX.tag<sortingWidth> order) (UMX.tag<stageCount> 1) genRates
-        let sorterModelMaker = SorterModelMaker.Msuf6RandGen msuf6RandGen
+        let sorterModelMaker = SorterModelMaker.SmmMsuf6RandGen msuf6RandGen
         let result = roundTrip sorterModelMaker
         match result with
-        | SorterModelMaker.Msuf6RandGen resultMsuf6RandGen ->
+        | SorterModelMaker.SmmMsuf6RandGen resultMsuf6RandGen ->
             Assert.Equal(msuf6RandGen.Id, resultMsuf6RandGen.Id)
             Assert.Equal(msuf6RandGen.RngType, resultMsuf6RandGen.RngType)
             Assert.Equal(msuf6RandGen.SortingWidth, resultMsuf6RandGen.SortingWidth)
@@ -190,10 +190,10 @@ type SorterModelSetMakerDtoTests() =
         let msuf6 = Msuf6.create id (UMX.tag<sortingWidth> order) twoOrbitUf6s
         let mutationRates = Uf6MutationRatesArray.create [| Uf6MutationRates.makeUniform order 0.1 0.05 |]
         let msuf6RandMutate = Msuf6RandMutate.create rngType.Lcg msuf6 mutationRates
-        let sorterModelMaker = SorterModelMaker.Msuf6RandMutate msuf6RandMutate
+        let sorterModelMaker = SorterModelMaker.SmmMsuf6RandMutate msuf6RandMutate
         let result = roundTrip sorterModelMaker 
         match result with
-        | SorterModelMaker.Msuf6RandMutate resultMsuf6RandMutate ->
+        | SorterModelMaker.SmmMsuf6RandMutate resultMsuf6RandMutate ->
             Assert.Equal(msuf6RandMutate.Id, resultMsuf6RandMutate.Id)
             Assert.Equal(msuf6RandMutate.RngType, resultMsuf6RandMutate.RngType)
             Assert.Equal(msuf6RandMutate.Msuf6, resultMsuf6RandMutate.Msuf6)

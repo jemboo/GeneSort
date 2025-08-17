@@ -40,6 +40,11 @@ module OpsActionRatesArray =
     let private clamp (value: float) (min: float) (max: float) =
         Math.Max(min, Math.Min(max, value))
 
+    let createUniform (length: int) (actionRate:float) : OpsActionRatesArray =
+        if length <= 0 then failwith "Length must be positive"
+        let rates = Array.init length (fun _ -> OpsActionRates.createUniform(actionRate))
+        OpsActionRatesArray.create rates
+
     // Smooth variation: Linear interpolation from startRates to endRates
     let createLinearVariation (length: int) (startRates: OpsActionRates) (endRates: OpsActionRates) : OpsActionRatesArray =
         if length <= 0 then failwith "Length must be positive"

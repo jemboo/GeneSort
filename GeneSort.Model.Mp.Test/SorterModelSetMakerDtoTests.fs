@@ -44,14 +44,14 @@ type SorterModelMakerDtoTests() =
     let ``SorterModelSetMakerDto with MsceRandGen round-trip serialization and deserialization should succeed`` () =
         let excludeSelfCe = true 
         let msceRandGen = MsceRandGen.create rngType.Lcg (UMX.tag<sortingWidth> 16) excludeSelfCe (UMX.tag<ceCount> 10)
-        let sorterModelMaker = SorterModelMaker.MsceRandGen msceRandGen
+        let sorterModelMaker = SorterModelMaker.SmmMsceRandGen msceRandGen
         let sorterModelSetMaker = SorterModelSetMaker.create sorterModelMaker 0<sorterCount> 5<sorterCount>
         let result = roundTrip sorterModelSetMaker
         Assert.Equal(sorterModelSetMaker.Id, result.Id)
         Assert.Equal(sorterModelSetMaker.FirstIndex, result.FirstIndex)
         Assert.Equal(sorterModelSetMaker.Count, result.Count)
         match result.SorterModelMaker with
-        | SorterModelMaker.MsceRandGen resultMsceRandGen ->
+        | SorterModelMaker.SmmMsceRandGen resultMsceRandGen ->
             Assert.Equal(msceRandGen.Id, resultMsceRandGen.Id)
             Assert.Equal(msceRandGen.RngType, resultMsceRandGen.RngType)
             Assert.Equal(msceRandGen.SortingWidth, resultMsceRandGen.SortingWidth)

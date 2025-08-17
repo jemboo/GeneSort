@@ -21,7 +21,7 @@ type MsrsRandGen =
     static member create 
             (rngType: rngType)
             (sortingWidth: int<sortingWidth>)
-            (opActionRatesArray: OpsGenRatesArray)
+            (opsGenRatesArray: OpsGenRatesArray)
             : MsrsRandGen =
 
         if %sortingWidth < 2 then
@@ -30,13 +30,13 @@ type MsrsRandGen =
             [
                 rngType :> obj
                 sortingWidth :> obj
-                opActionRatesArray :> obj
+                opsGenRatesArray :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
 
         {
             id = id
             sortingWidth = sortingWidth
-            opsGenRatesArray = opActionRatesArray
+            opsGenRatesArray = opsGenRatesArray
             rngType = rngType
         }
         

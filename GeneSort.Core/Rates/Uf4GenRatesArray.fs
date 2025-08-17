@@ -58,6 +58,18 @@ module Uf4GenRatesArray =
     let private clamp (value: float) (min: float) (max: float) =
         Math.Max(min, Math.Min(max, value))
 
+
+    let createUniform (length: int) (order: int) : Uf4GenRatesArray =
+        if length <= 0 then failwith "Length must be positive"
+        if order < 4 || order % 4 <> 0 then failwith "Order must be at least 4 and divisible by 4"
+        let arrayLength = MathUtils.exactLog2 (order / 4)
+        let rates = Array.init length (fun _ -> 
+            { Uf4GenRates.order = order
+              seedOpsGenRates = OpsGenRates.createUniform()
+              opsGenRatesArray = OpsGenRatesArray.create (Array.init arrayLength (fun _ -> OpsGenRates.createUniform())) })
+        Uf4GenRatesArray.create rates
+
+
     let createLinearVariation (length: int) (order: int) (startRates: Uf4GenRates) (endRates: Uf4GenRates) : Uf4GenRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if order < 4 || order % 4 <> 0 then failwith "Order must be at least 4 and divisible by 4"

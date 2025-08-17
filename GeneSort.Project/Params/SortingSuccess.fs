@@ -4,8 +4,8 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Model.Sorter
-open swFull
-open swMerege
+open SwFull
+open SwMerege
 open CeCount
 open StageCount
 
@@ -17,7 +17,7 @@ type sortingSuccess =
 
 module SortingSuccess =
 
-   let getCeCountForSortingSuccessFull (sortingSuccess:sortingSuccess) 
+   let getCeCountForFull (sortingSuccess:sortingSuccess) 
                 (sortingWidth:int<sortingWidth>) : int<ceCount> =
        match sortingSuccess with
         | sortingSuccess.Record -> 
@@ -31,7 +31,7 @@ module SortingSuccess =
             getP999CeCountForFull swFull
 
 
-   let getCeCountForSortingSuccessMerge (sortingSuccess:sortingSuccess) 
+   let getCeCountForMerge (sortingSuccess:sortingSuccess) 
             (sortingWidth:int<sortingWidth>) : int<ceCount> = 
        match sortingSuccess with
         | sortingSuccess.Record -> 
@@ -45,7 +45,7 @@ module SortingSuccess =
             getP999CeCountForMerge swMerege
 
 
-   let getStageCountForSortingSuccessFull (sortingSuccess:sortingSuccess) 
+   let getStageCountForFull (sortingSuccess:sortingSuccess) 
             (sortingWidth:int<sortingWidth>) : int<stageCount> =
        match sortingSuccess with
         | sortingSuccess.Record -> 
@@ -59,7 +59,7 @@ module SortingSuccess =
             getP999StageCountForMerge swMerege
 
 
-   let getStageCountForSortingSuccessMerge (sortingSuccess:sortingSuccess)
+   let getStageCountForMerge (sortingSuccess:sortingSuccess)
             (sortingWidth:int<sortingWidth>) : int<stageCount> =
        match sortingSuccess with
         | sortingSuccess.Record -> 

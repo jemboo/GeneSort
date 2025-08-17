@@ -48,6 +48,11 @@ module OpsGenRatesArray =
             let scale = 1.0 / sum
             (ortho * scale, para * scale, selfSym * scale)
 
+    let createUniform (length: int) : OpsGenRatesArray =
+        if length <= 0 then failwith "Length must be positive"
+        let rates = Array.init length (fun _ -> OpsGenRates.createUniform())
+        OpsGenRatesArray.create rates
+
     // Smooth variation: Linear interpolation from startRates to endRates
     let createLinearVariation (length: int) (startRates: OpsGenRates) (endRates: OpsGenRates) : OpsGenRatesArray =
         if length <= 0 then failwith "Length must be positive"

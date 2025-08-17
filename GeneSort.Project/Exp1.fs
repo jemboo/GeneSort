@@ -16,21 +16,45 @@ open GeneSort.Sorter
 open GeneSort.Model
 open GeneSort.Model.Sorter
 open GeneSort.Project.Params
+open GeneSort.Model.Sorter.Ce
+open GeneSort.Model.Sorter.Si
+open GeneSort.Model.Sorter.Uf4
+open GeneSort.Model.Sorter.Rs
 
 
 module Exp1 =
+
     let projectDir = "c:\Projects"
     let randomType = rngType.Lcg
     let excludeSelfCe = true
     let parameterSet = 
-        [ swFull.standardMapVals(); SorterModels.standardMapVals() ]
+        [ SwFull.standardMapVals(); SorterModelKey.allButMusf6Kvps() ]
 
     let workspace = Workspace.create "Exp1" "Exp1" projectDir parameterSet
 
     let executor (workspace:Workspace) (cycle: int<cycleNumber>) (run: Run) =
-        
-        //let swFull = run.Parameters |> Map.find "swFull" |> UMX.untag<swFull>
-        //let sorterModel = run.Parameters |> Map.find "sorterModel" |> UMX.untag<sorterModel>
+        let sorterModelKey = (run.Parameters["SorterModel"]) |> SorterModelKey.fromString
+        let swFull = (run.Parameters["SortingWidth"]) |> SwFull.fromString
+        let sortingWidth = swFull |> SwFull.toSortingWidth
+        let ceCount = SortingSuccess.getCeCountForFull sortingSuccess.P999 sortingWidth
+
+        let stageCount = SortingSuccess.getStageCountForFull sortingSuccess.P999 sortingWidth
+        let opsGenRatesArray = OpsGenRatesArray.createUniform %stageCount
+        let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageCount %sortingWidth
+
+        let modelMaker =
+            match sorterModelKey with
+            | SorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceCount) |> SorterModelMaker.SmmMsceRandGen
+            | SorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
+            | SorterModelKey.Msrs -> (MsrsRandGen.create randomType sortingWidth opsGenRatesArray) |> SorterModelMaker.SmmMsrsRandGen
+            | SorterModelKey.Msuf4 -> (Msuf4RandGen.create randomType sortingWidth stageCount uf4GenRatesArray) |> SorterModelMaker.SmmMsuf4RandGen
+            | SorterModelKey.Msuf6 -> failwith "Msuf6 not supported in this experiment"
+
+
+        let sorterCount = swFull |> SorterCount.getSorterCountForSwFull
+        let firstIndex = (%cycle * %sorterCount) |> UMX.tag<sorterCount>
+
+        let sorterModelSetMaker = SorterModelSetMaker.create modelMaker firstIndex sorterCount
 
         Console.WriteLine (sprintf "Executing Run %d   %A " run.Index run.Parameters)
 

@@ -36,49 +36,49 @@ module SorterModelMakerDto =
 
     let toSorterModelMakerDto (sorterModelMaker: SorterModelMaker) : SorterModelMakerDto =
         match sorterModelMaker with
-        | SorterModelMaker.MsceRandGen msceRandGen ->
+        | SorterModelMaker.SmmMsceRandGen msceRandGen ->
             MsceRandGen (MsceRandGenDto.toMsceRandGenDto msceRandGen)
-        | SorterModelMaker.MsceRandMutate msceRandMutate ->
+        | SorterModelMaker.SmmMsceRandMutate msceRandMutate ->
             MsceRandMutate (MsceRandMutateDto.toMsceRandMutateDto msceRandMutate)
-        | SorterModelMaker.MssiRandGen mssiRandGen ->
+        | SorterModelMaker.SmmMssiRandGen mssiRandGen ->
             MssiRandGen (MssiRandGenDto.toMssiRandGenDto mssiRandGen)
-        | SorterModelMaker.MssiRandMutate mssiRandMutate ->
+        | SorterModelMaker.SmmMssiRandMutate mssiRandMutate ->
             MssiRandMutate (MssiRandMutateDto.toMssiRandMutateDto mssiRandMutate)
-        | SorterModelMaker.MsrsRandGen msrsRandGen ->
+        | SorterModelMaker.SmmMsrsRandGen msrsRandGen ->
             MsrsRandGen (MsrsRandGenDto.toMsrsRandGenDto msrsRandGen)
-        | SorterModelMaker.MsrsRandMutate msrsRandMutate ->
+        | SorterModelMaker.SmmMsrsRandMutate msrsRandMutate ->
             MsrsRandMutate (MsrsRandMutateDto.toMsrsRandMutateDto msrsRandMutate)
-        | SorterModelMaker.Msuf4RandGen msuf4RandGen ->
+        | SorterModelMaker.SmmMsuf4RandGen msuf4RandGen ->
             Msuf4RandGen (Msuf4RandGenDto.toMsuf4RandGenDto msuf4RandGen)
-        | SorterModelMaker.Msuf4RandMutate msuf4RandMutate ->
+        | SorterModelMaker.SmmMsuf4RandMutate msuf4RandMutate ->
             Msuf4RandMutate (Msuf4RandMutateDto.toMsuf4RandMutateDto msuf4RandMutate)
-        | SorterModelMaker.Msuf6RandGen msuf6RandGen ->
+        | SorterModelMaker.SmmMsuf6RandGen msuf6RandGen ->
             Msuf6RandGen (Msuf6RandGenDto.toMsuf6RandGenDto msuf6RandGen)
-        | SorterModelMaker.Msuf6RandMutate msuf6RandMutate ->
+        | SorterModelMaker.SmmMsuf6RandMutate msuf6RandMutate ->
             Msuf6RandMutate (Msuf6RandMutateDto.toMsuf6RandMutateDto msuf6RandMutate)
 
     let fromSorterModelMakerDto (dto: SorterModelMakerDto) : SorterModelMaker =
         try
             match dto with
             | MsceRandGen msceRandGenDto ->
-                SorterModelMaker.MsceRandGen (MsceRandGenDto.fromMsceRandGenDto msceRandGenDto)
+                SorterModelMaker.SmmMsceRandGen (MsceRandGenDto.fromMsceRandGenDto msceRandGenDto)
             | MsceRandMutate msceRandMutateDto ->
-                SorterModelMaker.MsceRandMutate (MsceRandMutateDto.fromMsceRandMutateDto msceRandMutateDto |> Result.toOption |> Option.get )
+                SorterModelMaker.SmmMsceRandMutate (MsceRandMutateDto.fromMsceRandMutateDto msceRandMutateDto |> Result.toOption |> Option.get )
             | MssiRandGen mssiRandGenDto ->
-                SorterModelMaker.MssiRandGen (MssiRandGenDto.fromMssiRandGenDto mssiRandGenDto |> Result.toOption |> Option.get )
+                SorterModelMaker.SmmMssiRandGen (MssiRandGenDto.fromMssiRandGenDto mssiRandGenDto |> Result.toOption |> Option.get )
             | MssiRandMutate mssiRandMutateDto ->
-                SorterModelMaker.MssiRandMutate (MssiRandMutateDto.fromMssiRandMutateDto mssiRandMutateDto |> Result.toOption |> Option.get )
+                SorterModelMaker.SmmMssiRandMutate (MssiRandMutateDto.fromMssiRandMutateDto mssiRandMutateDto |> Result.toOption |> Option.get )
             | MsrsRandGen msrsRandGenDto ->
-                SorterModelMaker.MsrsRandGen (MsrsRandGenDto.fromMsrsRandGenDto msrsRandGenDto)
+                SorterModelMaker.SmmMsrsRandGen (MsrsRandGenDto.fromMsrsRandGenDto msrsRandGenDto)
             | MsrsRandMutate msrsRandMutateDto ->
-                SorterModelMaker.MsrsRandMutate (MsrsRandMutateDto.fromMsrsRandMutateDto msrsRandMutateDto)
+                SorterModelMaker.SmmMsrsRandMutate (MsrsRandMutateDto.fromMsrsRandMutateDto msrsRandMutateDto)
             | Msuf4RandGen msuf4RandGenDto ->
-                SorterModelMaker.Msuf4RandGen (Msuf4RandGenDto.fromMsuf4RandGenDto msuf4RandGenDto)
+                SorterModelMaker.SmmMsuf4RandGen (Msuf4RandGenDto.fromMsuf4RandGenDto msuf4RandGenDto)
             | Msuf4RandMutate msuf4RandMutateDto ->
-                SorterModelMaker.Msuf4RandMutate (Msuf4RandMutateDto.fromMsuf4RandMutateDto msuf4RandMutateDto)
+                SorterModelMaker.SmmMsuf4RandMutate (Msuf4RandMutateDto.fromMsuf4RandMutateDto msuf4RandMutateDto)
             | Msuf6RandGen msuf6RandGenDto ->
-                SorterModelMaker.Msuf6RandGen (Msuf6RandGenDto.fromMsuf6RandGenDto msuf6RandGenDto)
+                SorterModelMaker.SmmMsuf6RandGen (Msuf6RandGenDto.fromMsuf6RandGenDto msuf6RandGenDto)
             | Msuf6RandMutate msuf6RandMutateDto ->
-                SorterModelMaker.Msuf6RandMutate (Msuf6RandMutateDto.fromMsuf6RandMutateDto msuf6RandMutateDto)
+                SorterModelMaker.SmmMsuf6RandMutate (Msuf6RandMutateDto.fromMsuf6RandMutateDto msuf6RandMutateDto)
         with
         | ex -> failwith $"Failed to convert SorterModelMakerDto: {ex.Message}"

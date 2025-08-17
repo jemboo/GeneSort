@@ -8,7 +8,7 @@ open GeneSort.Model.Sorter
 type swFull =
     | Sw4  | Sw6  | Sw8  | Sw12  | Sw16  | Sw24  | Sw32  | Sw48  | Sw64 
 
-module swFull =
+module SwFull =
 
    let all = [Sw4; Sw6; Sw8; Sw12; Sw16; Sw24; Sw32; Sw48; Sw64]
 
@@ -36,6 +36,19 @@ module swFull =
         | Sw32 -> "32"
         | Sw48 -> "48"
         | Sw64 -> "64"
+
+   let toSortingWidth (swFull:swFull) : int<sortingWidth> =
+        match swFull with
+        | Sw4 -> 4<sortingWidth>
+        | Sw6 -> 6<sortingWidth>
+        | Sw8 -> 8<sortingWidth>
+        | Sw12 -> 12<sortingWidth>
+        | Sw16 -> 16<sortingWidth>
+        | Sw24 -> 24<sortingWidth>
+        | Sw32 -> 32<sortingWidth>
+        | Sw48 -> 48<sortingWidth>
+        | Sw64 -> 64<sortingWidth>
+
 
    let getSwFullForSortingWidth (sortingWidth:int<sortingWidth>) : swFull =
        match %sortingWidth with
@@ -75,7 +88,7 @@ type swMerege =
     | Sw128 | Sw192  | Sw256  | Sw384  | Sw512  | Sw768  | Sw1024  | Sw1536
     | Sw2048  | Sw3072  | Sw4096  | Sw6144  | Sw8192
 
-module swMerege =
+module SwMerege =
 
    let all = 
         [Sw4; Sw6; Sw8; Sw12; Sw16; Sw24; Sw32; Sw48; Sw64; Sw96;
