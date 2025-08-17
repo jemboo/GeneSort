@@ -18,7 +18,7 @@ module WorkspaceOps =
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let saveRunDto (workspace: Workspace) (cycle: int<cycleNumber>) (run: Run) : System.Threading.Tasks.Task =
-        let filePath = workspace.getRunFileName cycle run
+        let filePath = workspace.getOutputFileName run OutputFileType.Run
         let runDto = RunDto.toRunDto run
         let directory = Path.GetDirectoryName filePath
         Directory.CreateDirectory directory |> ignore
@@ -30,7 +30,7 @@ module WorkspaceOps =
     let getRuns (workspace: Workspace) (cycle: int<cycleNumber>) : Run seq =
         workspace.ParameterSets 
         |> cartesianProductMaps
-        |> Seq.mapi (fun i paramsMap -> { Index = i; Cycle= cycle; Parameters = paramsMap })
+        |> Seq.mapi (fun i paramsMap -> { Index = i; Cycle = cycle; Parameters = paramsMap })
 
 
     /// Executes async computations in parallel, limited to maxDegreeOfParallelism at a time
@@ -63,7 +63,7 @@ module WorkspaceOps =
                 (executor: Workspace -> int<cycleNumber> -> Run -> unit) : unit =
         let runs = getRuns workspace cycle
         let executeRun run = async {
-            let filePath = workspace.getRunFileName cycle run
+            let filePath = workspace.getOutputFileName run OutputFileType.Run
             if File.Exists filePath then
                 () // Skip if file exists
             else

@@ -11,6 +11,7 @@ open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 open FSharp.UMX
+open GeneSort.Sorter
 
 
 [<MessagePackObject>]
@@ -36,11 +37,11 @@ module SorterModelSetMakerDto =
 
         SorterModelSetMaker.create
             sorterModelMaker
-            dto.FirstIndex
-            dto.Count
+            (dto.FirstIndex |> UMX.tag<sorterCount>)
+            (dto.Count |> UMX.tag<sorterCount>)
 
     let fromDomain (domain: SorterModelSetMaker) : SorterModelSetMakerDto =
         { Id = %domain.Id
           SorterModelMaker = SorterModelMakerDto.toSorterModelMakerDto domain.SorterModelMaker
-          FirstIndex = domain.FirstIndex
-          Count = domain.Count }
+          FirstIndex = %domain.FirstIndex
+          Count = %domain.Count }

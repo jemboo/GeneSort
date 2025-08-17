@@ -25,7 +25,7 @@ type MapStringTransformerTests() =
         Assert.Equal(2, result.Count)
         Assert.Equal("value1" :> obj, result.["out1"])
         Assert.Equal("value2" :> obj, result.["out2"])
-        Assert.IsType<string>(result.["out1"])
+        Assert.IsType<string>(result.["out1"]) |> ignore
         Assert.IsType<string>(result.["out2"])
 
     [<Fact>]
@@ -40,8 +40,8 @@ type MapStringTransformerTests() =
         Assert.Equal([| "value1" |] :> obj, result.["out1"])
         Assert.Equal(6 :> obj, result.["out2"]) // "value1" has length 6
         Assert.Equal("VALUE2" :> obj, result.["out3"])
-        Assert.IsType<string[]>(result.["out1"])
-        Assert.IsType<int>(result.["out2"])
+        Assert.IsType<string[]>(result.["out1"]) |> ignore
+        Assert.IsType<int>(result.["out2"]) |> ignore
         Assert.IsType<string>(result.["out3"])
 
     [<Fact>]
@@ -72,5 +72,5 @@ type MapStringTransformerTests() =
         Assert.Equal(2, result.Count)
         Assert.Equal("value" :> obj, result.["out1"])
         Assert.Equal("VALUE" :> obj, result.["out2"])
-        Assert.IsType<string>(result.["out1"])
+        Assert.IsType<string>(result.["out1"]) |> ignore
         Assert.IsType<string>(result.["out2"])

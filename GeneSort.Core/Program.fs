@@ -111,4 +111,4 @@ module Example =
             printfn "  %3d successes: %4d times (%.2f%%)" successes count percentage)
 
 Example.printBinomialHistogramReport()
-Console.ReadLine()
+Console.ReadLine() |> ignore

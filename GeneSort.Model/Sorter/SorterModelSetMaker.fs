@@ -3,20 +3,21 @@
 open System
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Sorter
 
 type SorterModelSetMaker =
     private
         { 
           id : Guid<sorterModelSetMakerID>
           sorterModelMaker : SorterModelMaker
-          firstIndex : int
-          count : int 
+          firstIndex : int<sorterCount>
+          count : int<sorterCount>
         }
     with
     static member create 
                 (sorterModelMaker: SorterModelMaker) 
-                (firstIndex: int) 
-                (count: int) : SorterModelSetMaker =
+                (firstIndex: int<sorterCount>) 
+                (count: int<sorterCount>) : SorterModelSetMaker =
         let id = 
             // Generate a unique ID based on the SorterModelMaker and indices
             GuidUtils.guidFromObjs [
@@ -33,13 +34,13 @@ type SorterModelSetMaker =
     member this.Count with get() = this.count
 
     member this.MakeSorterModelSet (rngFactory: rngType -> Guid -> IRando) : SorterModelSet =
-        if this.count <= 0 then
+        if %this.count <= 0 then
             failwith "Count must be greater than 0"
-        if this.firstIndex < 0 then
+        if %this.firstIndex < 0 then
             failwith "FirstIndex must be non-negative"
         let sorterModels = 
-            [| for i in 0 .. this.count - 1 do
-                let index = this.firstIndex + i
+            [| for i in 0 .. %this.count - 1 do
+                let index = %this.firstIndex + i
                 SorterModelMaker.makeSorterModel rngFactory index this.sorterModelMaker |]
         let id = (%this.id) |> UMX.tag<sorterModelSetID>
         { Id = id; SorterModels = sorterModels }

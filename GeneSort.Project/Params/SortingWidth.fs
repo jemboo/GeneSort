@@ -25,6 +25,17 @@ module swFull =
         | "64" -> Sw64
         | _ -> failwithf "Unsupported swFull string: %s" s
 
+   let toString (swFull:swFull) : string =
+        match swFull with
+        | Sw4 -> "4"
+        | Sw6 -> "6"
+        | Sw8 -> "8"
+        | Sw12 -> "12"
+        | Sw16 -> "16"
+        | Sw24 -> "24"
+        | Sw32 -> "32"
+        | Sw48 -> "48"
+        | Sw64 -> "64"
 
    let getSwFullForSortingWidth (sortingWidth:int<sortingWidth>) : swFull =
        match %sortingWidth with
@@ -71,6 +82,7 @@ module swMerege =
          Sw128; Sw192; Sw256; Sw384; Sw512; Sw768; Sw1024; Sw1536;
          Sw2048; Sw3072; Sw4096; Sw6144; Sw8192]
 
+
    let fromString (s: string) : swMerege =
         match s with
         | "4" -> Sw4  | "6" -> Sw6  | "8" -> Sw8  | "12" -> Sw12
@@ -82,6 +94,16 @@ module swMerege =
         | _ -> failwithf "Unsupported swMerege string: %s" s
 
 
+   let toString (swMerege:swMerege) : string =
+        match swMerege with
+        | Sw4 -> "4"  | Sw6 -> "6"  | Sw8 -> "8"  | Sw12 -> "12"
+        | Sw16 -> "16"  | Sw24 -> "24"  | Sw32 -> "32"  | Sw48 -> "48"
+        | Sw64 -> "64"  | Sw96 -> "96"  | Sw128 -> "128"  | Sw192 -> "192"
+        | Sw256 -> "256" | Sw384 -> "384"  | Sw512 -> "512"  | Sw768 -> "768"
+        | Sw1024 -> "1024" | Sw1536 -> "1536"  | Sw2048 -> "2048"  | Sw3072 -> "3072"
+        | Sw4096 -> "4096" | Sw6144 -> "6144"  | Sw8192 -> "8192"
+
+
    let getSwMergeForSortingWidth (sortingWidth:int<sortingWidth>) : swMerege =
         match %sortingWidth with
         | 4 -> swMerege.Sw4  | 6 -> swMerege.Sw6  | 8 -> swMerege.Sw8  | 12 -> swMerege.Sw12
@@ -91,3 +113,4 @@ module swMerege =
         | 1024 -> swMerege.Sw1024 | 1536 -> swMerege.Sw1536  | 2048 -> swMerege.Sw2048  | 3072 -> swMerege.Sw3072
         | 4096 -> swMerege.Sw4096 | 6144 -> swMerege.Sw6144  | 8192 -> swMerege.Sw8192
         | _ -> failwith "Unsupported sorting width"
+         

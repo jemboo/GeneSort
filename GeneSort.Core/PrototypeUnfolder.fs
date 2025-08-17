@@ -8,7 +8,6 @@ open MathUtils
 
 module PrototypeUnfolder =
 
-
     // randomRsOrbitPairTypeList
     let randomTwoOrbitPairTypeList (randy:IRando) (n: int) : TwoOrbitPairType list =
         if n < 0 then failwith "Length must be non-negative"
@@ -88,15 +87,14 @@ module PrototypeUnfolder =
                 workingList <- unfoldTwoOrbitPairsIntoTwoOrbitPairs chunk workingList 
 
             Perm_Si.fromTwoOrbitPair (workingList |> List.toArray)
-
-        match seedTwoOrbitPair with
-        | Some orbitPairs -> 
-                _makeTwoCycleFromTwoOrbitTypes orbitPairs twoOrbitPairTypes
-        | None -> 
-                let h::t = twoOrbitPairTypes
-                let seedPrs = [twoOrbitPairsForOrder4 h]
-                _makeTwoCycleFromTwoOrbitTypes seedPrs t
-
+        match seedTwoOrbitPair, twoOrbitPairTypes with
+        | Some orbitPairs, _::_ ->
+            _makeTwoCycleFromTwoOrbitTypes orbitPairs twoOrbitPairTypes
+        | None, h::t ->
+            let seedPrs = [twoOrbitPairsForOrder4 h]
+            _makeTwoCycleFromTwoOrbitTypes seedPrs t
+        | _, [] ->
+            failwith "twoOrbitPairTypes list must have an element"
 
 
     // makeAllPerm_SisOfOrder

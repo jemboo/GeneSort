@@ -28,19 +28,11 @@ module Exp1 =
     let workspace = Workspace.create "Exp1" "Exp1" projectDir parameterSet
 
     let executor (workspace:Workspace) (cycle: int<cycleNumber>) (run: Run) =
-        // Simulate some work for the run
-        let id =
-            [
-                randomType :> obj
-                1 :> obj
-                excludeSelfCe :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
+        
+        //let swFull = run.Parameters |> Map.find "swFull" |> UMX.untag<swFull>
+        //let sorterModel = run.Parameters |> Map.find "sorterModel" |> UMX.untag<sorterModel>
 
-        let qua = hash (randomType, 111111111, excludeSelfCe)
-
-        let yab = rngType.Lcg
-
-        Console.WriteLine (sprintf "Executing Run %d   %A   %d" run.Index (%id) qua)
+        Console.WriteLine (sprintf "Executing Run %d   %A " run.Index run.Parameters)
 
     let RunAll() =
         let cycle = 1<cycleNumber>

@@ -57,7 +57,6 @@ module StageCount =
          | swMerege.Sw4096 -> 27<stageCount>
          | swMerege.Sw6144 -> 28<stageCount>
          | swMerege.Sw8192 -> 29<stageCount>
-         | _ -> failwith "Unsupported swMerege for stage count"
 
 
     let getP900StageCountForFull (swFull:swFull) : int<stageCount> =
@@ -138,5 +137,4 @@ module StageCount =
          | swMerege.Sw4096 -> 5000<stageCount>
          | swMerege.Sw6144 -> 6000<stageCount>
          | swMerege.Sw8192 -> 7000<stageCount>
-         | _ -> failwith "Unsupported swMerege for stage count"
          
