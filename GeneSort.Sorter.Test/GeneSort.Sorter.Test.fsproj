@@ -10,6 +10,8 @@
     <Compile Include="CeTests.fs" />
     <Compile Include="SorterTests.fs" />
     <Compile Include="SorterSetTests.fs" />
+    <Compile Include="SortableBoolArrayTests.fs" />
+    <Compile Include="SortableIntArrayTests.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />
   </ItemGroup>
 

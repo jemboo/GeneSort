@@ -38,6 +38,34 @@ module Ce =
     let toString (ce: Ce) : string =
         sprintf "(%d, %d)" ce.Low ce.Hi
 
+    let inline sortBy< ^a when ^a: comparison> (ces: Ce[]) (values: ^a[]) : ^a[] =
+        let result = Array.copy values
+        for ce in ces do
+            if result.[ce.Low] > result.[ce.Hi] then
+                let temp = result.[ce.Low]
+                result.[ce.Low] <- result.[ce.Hi]
+                result.[ce.Hi] <- temp
+        result
+
+
+    let inline sortByWithHistory< ^a when ^a: comparison> (ces: Ce[]) (values: ^a[]) : ^a[][] =
+        if isNull ces then
+            invalidArg "ces" "Comparison-exchange array cannot be null"
+        if isNull values then
+            invalidArg "values" "Values array cannot be null"
+        let result = Array.init (ces.Length + 1) (fun _ -> Array.copy values)
+        for i = 0 to ces.Length - 1 do
+            let ce = ces.[i]
+            if ce.Low >= values.Length || ce.Hi >= values.Length then
+                invalidArg "ces" $"Comparison-exchange indices (low={ce.Low}, hi={ce.Hi}) must be within array bounds (length={values.Length})"
+            result.[i + 1] <- Array.copy result.[i]
+            if result.[i + 1].[ce.Low] > result.[i + 1].[ce.Hi] then
+                let temp = result.[i + 1].[ce.Low]
+                result.[i + 1].[ce.Low] <- result.[i + 1].[ce.Hi]
+                result.[i + 1].[ce.Hi] <- temp
+        result
+
+
     let maxIndexForWdith (width: int) : int =
         width*(width - 1) / 2
 

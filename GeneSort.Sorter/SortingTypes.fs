@@ -8,6 +8,7 @@ open FSharp.UMX
 [<Measure>] type sorterId
 [<Measure>] type stageCount
 [<Measure>] type ceCount
+[<Measure>] type symbolSetSize
 
 
 
