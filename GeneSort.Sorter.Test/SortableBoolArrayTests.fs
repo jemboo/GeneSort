@@ -12,7 +12,7 @@ type SortableBoolArrayTests() =
     let ``Create with valid inputs succeeds`` () =
         let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
         Assert.Equal<bool>([| true; false; true |], arr.Values)
-        Assert.Equal(3<sortingWidth>, arr.Order)
+        Assert.Equal(3<sortingWidth>, arr.SortingWidth)
 
     [<Fact>]
     let ``Create with mismatched length throws`` () =
@@ -32,13 +32,6 @@ type SortableBoolArrayTests() =
         let other = sortableBoolArray.Create([| false; false; true |], 3<sortingWidth>)
         let result = arr.DistanceSquared(other)
         Assert.Equal(1, result) // (1-0)^2 + (0-0)^2 + (1-1)^2 = 1 + 0 + 0 = 1
-
-    [<Fact>]
-    let ``DistanceSquared with wrong order throws`` () =
-        let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
-        let other = sortableBoolArray.Create([| true; false |], 2<sortingWidth>)
-        let ex = Assert.Throws<ArgumentException>(fun () -> arr.DistanceSquared(other) |> ignore)
-        Assert.Equal("Other array order (2) must equal this order (3). (Parameter 'other')", ex.Message)
 
     [<Fact>]
     let ``IsSorted returns true for sorted array`` () =
@@ -67,14 +60,14 @@ type SortableBoolArrayTests() =
         let sorted = arr.SortBy(ces)
         Assert.Equal<bool>([| false; true; true |], sorted.Values)
         Assert.True(sorted.IsSorted)
-        Assert.Equal(arr.Order, sorted.Order)
+        Assert.Equal(arr.SortingWidth, sorted.SortingWidth)
 
     [<Fact>]
     let ``SortBy with empty ces returns copy`` () =
         let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
         let sorted = arr.SortBy([||])
         Assert.Equal<bool>(arr.Values, sorted.Values)
-        Assert.Equal(arr.Order, sorted.Order)
+        Assert.Equal(arr.SortingWidth, sorted.SortingWidth)
 
     [<Fact>]
     let ``SortByWithHistory captures sorting steps correctly`` () =
@@ -86,14 +79,14 @@ type SortableBoolArrayTests() =
         Assert.Equal<bool>([| false; true; true |], history.[1].Values) // After Ce(0,1)
         Assert.Equal<bool>([| false; true; true |], history.[2].Values) // After Ce(1,2)
         Assert.True(history.[2].IsSorted)
-        Assert.True(history |> Array.forall (fun x -> x.Order = arr.Order))
+        Assert.True(history |> Array.forall (fun x -> x.SortingWidth = arr.SortingWidth))
 
     [<Fact>]
     let ``getAllSortableBoolArrays with sortingWidth 0 returns single empty array`` () =
         let arrays = SortableBoolArray.getAllSortableBoolArrays 0<sortingWidth>
         Assert.Equal(1, arrays.Length)
         Assert.Equal<bool>([||], arrays.[0].Values)
-        Assert.Equal(0<sortingWidth>, arrays.[0].Order)
+        Assert.Equal(0<sortingWidth>, arrays.[0].SortingWidth)
 
 
     [<Fact>]

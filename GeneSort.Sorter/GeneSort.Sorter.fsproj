@@ -14,6 +14,7 @@
     <Compile Include="Ce.fs" />
     <Compile Include="SortableBoolArray.fs" />
     <Compile Include="SortableIntArray.fs" />
+    <Compile Include="SortableArray.fs" />
     <Compile Include="Sorter.fs" />
     <Compile Include="SorterSet.fs" />
     <Compile Include="Program.fs" />

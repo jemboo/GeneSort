@@ -24,6 +24,12 @@ type sortableIntArray =
             invalidArg "values" $"All values must be in [0, {uint64 %symbolSetSize})."
         { values = Array.copy values; sortingWidth = sortingWidth; symbolSetSize = symbolSetSize }
 
+    static member CreateSorted(sortingWidth: int<sortingWidth>) =
+        if sortingWidth < 0<sortingWidth> then
+            invalidArg "sortingWidth" "Sorting width must be non-negative."
+        let values = [| 0 .. (%sortingWidth - 1) |]
+        { values = values; sortingWidth = sortingWidth; symbolSetSize = %sortingWidth |> uint64 |> UMX.tag<symbolSetSize> }
+
     /// Gets the values array.
     member this.Values = this.values
 
@@ -58,103 +64,27 @@ type sortableIntArray =
 
 
 
+module SortableIntArray =
+    
+    let fromPermutation (perm:Permutation) : sortableIntArray =
+        sortableIntArray.Create(
+                perm.Array, 
+                (%perm.Order |> UMX.tag<sortingWidth>), 
+                (%perm.Order |> uint64 |> UMX.tag<symbolSetSize>))
+
+
+    let getOrbit (maxCount:int) (perm:Permutation) 
+                    :sortableIntArray seq =
+        Permutation.powerSequence perm  
+        |> CollectionUtils.takeUpToOrWhile maxCount (fun perm -> Permutation.isIdentity perm)
+        |> Seq.map(fun perm -> fromPermutation perm)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//module SortableIntArray =
-
-//    let Identity (order: int<sortingWidth>) (symbolCount: uint64<symbolSetSize>) =
-//        let ordV = (order |> UMX.untag)
-//        let sc = symbolCount |> UMX.untag |> int
-
-//        if (ordV <> sc) then
-//            sprintf "order %d and symbolcount %d don't match (*83)" ordV sc |> Error
-//        else
-//            { sortableIntArray.values = [| 0 .. ordV - 1 |]
-//              sortingWidth = order
-//              symbolSetSize = symbolCount }
-//            |> Ok
-
-
-//    let makeOrbits (maxCount: int<sortableCount> option) (perm: permutation) =
-//        let order = perm |> Permutation.getOrder
-//        let symbolSetSize = order |> UMX.untag |> uint64 |> UMX.tag<symbolSetSize>
-//        let intOpt = maxCount |> Option.map UMX.untag
-
-//        Permutation.powers intOpt perm
-//        |> Seq.map (Permutation.getArray)
-//        |> Seq.map (fun arr ->
-//            { sortableIntArray.values = arr
-//              sortingWidth = order
-//              symbolSetSize = symbolSetSize })
-
-
-//    // test set for the merge sort (merge two sorted sets of order/2)
-//    let makeMergeSortTestWithInts (order: int<order>) =
-//        let hov = (order |> UMX.untag ) / 2
-//        let symbolSetSize = order |> UMX.untag |> uint64 |> UMX.tag<symbolSetSize>
-//        [|0 .. hov|]
-//        |> Array.map (
-//            fun dex ->
-//                { sortableIntArray.values = Permutation.stackedSource order dex 
-//                  sortingWidth = order
-//                  symbolSetSize = symbolSetSize }
-//            )
-
-
-//    let makeRandomPermutation (order: int<sortingWidth>) (randy: IRando) =
-//        let symbolSetSize = order |> UMX.untag |> uint64 |> UMX.tag<symbolSetSize>
-
-//        { sortableIntArray.values = RandVars.randomPermutation randy order
-//          sortingWidth = order
-//          symbolSetSize = symbolSetSize }
-
-
-//    let makeRandomSymbol (order: int<sortingWidth>) (symbolSetSize: uint64<symbolSetSize>) (randy: IRando) =
-//        let arrayLength = order |> UMX.untag
-//        let intArray = RandVars.randSymbols symbolSetSize randy arrayLength |> Seq.toArray
-
-//        { sortableIntArray.values = intArray
-//          sortingWidth = order
-//          symbolSetSize = symbolSetSize }
-
-
-//    let makeRandomSymbols 
-//                (order: int<sortingWidth>) 
-//                (symbolSetSize: uint64<symbolSetSize>) 
-//                (rnd: IRando) 
-//        =
-//        seq {
-//            while true do
-//                yield makeRandomSymbol order symbolSetSize rnd
-//        }
-
-
+    // returns a random Permutation by shuffling the identity Permutation
+    let randomSortableIntArray 
+            (indexShuffler: int -> int) 
+            (sortingWidth: int<sortingWidth>) 
+            : sortableIntArray =
+        let perm = Permutation.randomPermutation indexShuffler %sortingWidth
+        fromPermutation perm

@@ -8,28 +8,28 @@ open GeneSort.Core
 type sortableBoolArray =
     private { 
         values: bool[] 
-        order: int<sortingWidth> 
+        sortingWidth: int<sortingWidth> 
     }
     /// Creates a sortableBoolArray, throwing if values length does not match order.
     /// <exception cref="ArgumentException">Thrown when order is negative or values length does not equal order.</exception>
-    static member Create(values: bool[], order: int<sortingWidth>) =
-        if order < 0<sortingWidth> then
-            invalidArg "order" "Order must be non-negative."
-        if values.Length <> int order then
-            invalidArg "values" $"Values length ({values.Length}) must equal order ({int order})."
-        { values = Array.copy values; order = order }
+    static member Create(values: bool[], sortingWidth: int<sortingWidth>) =
+        if sortingWidth < 0<sortingWidth> then
+            invalidArg "order" "SortingWidth must be non-negative."
+        if values.Length <> int sortingWidth then
+            invalidArg "values" $"Values length ({values.Length}) must equal order ({int sortingWidth})."
+        { values = Array.copy values; sortingWidth = sortingWidth }
 
     /// Gets the values array.
     member this.Values = this.values
 
     /// Gets the sorting order.
-    member this.Order = this.order
+    member this.SortingWidth = this.sortingWidth
 
     /// Computes the squared distance between this array and another sortableBoolArray, treating true as 1 and false as 0.
     /// <exception cref="ArgumentException">Thrown when the other array's order does not match this array's order.</exception>
     member this.DistanceSquared(other: sortableBoolArray) =
-        if other.order <> this.order then
-            invalidArg "other" $"Other array order ({int other.order}) must equal this order ({int this.order})."
+        if other.SortingWidth <> this.SortingWidth then
+            invalidArg "other" $"Other array SortingWidth ({int other.SortingWidth}) must equal this SortingWidth ({int this.SortingWidth})."
         let thisNumeric = this.values |> Array.map (fun b -> if b then 1 else 0)
         let otherNumeric = other.values |> Array.map (fun b -> if b then 1 else 0)
         ArrayProperties.distanceSquared thisNumeric otherNumeric
@@ -41,13 +41,13 @@ type sortableBoolArray =
     /// <exception cref="ArgumentException">Thrown when ces contains indices out of bounds.</exception>
     member this.SortBy(ces: Ce[]) =
         let sortedValues =  Ce.sortBy ces this.values
-        sortableBoolArray.Create(sortedValues, this.order)
+        sortableBoolArray.Create(sortedValues, this.SortingWidth)
 
     /// Returns an array of sortableIntArray, starting with the original array and followed by arrays after each comparison-exchange.
     /// <exception cref="ArgumentException">Thrown when ces contains indices out of bounds.</exception>
     member this.SortByWithHistory(ces: Ce[]) =
         let history = Ce.sortByWithHistory ces this.values
-        history |> Array.map (fun values -> sortableBoolArray.Create(values, this.order))
+        history |> Array.map (fun values -> sortableBoolArray.Create(values, this.SortingWidth))
 
 
 
@@ -69,26 +69,6 @@ module SortableBoolArray =
 
 
 //module SortableBoolArray =
-
-//    let makeAllBits (order: int<sortingWidth>) =
-//        let symbolSetSize = 2uL |> UMX.tag<symbolSetSize>
-//        let bitShift = order |> UMX.untag
-
-//        { 0uL .. (1uL <<< bitShift) - 1uL }
-//        |> Seq.map (ByteUtils.uint64ToBoolArray order)
-//        |> Seq.map (fun arr ->
-//            { sortableBoolArray.values = arr
-//              order = order })
-
-
-//    let makeAllForOrder (order: int<sortingWidth>) =
-//        let bitShift = order |> UMX.untag
-
-//        { 0uL .. (1uL <<< bitShift) - 1uL }
-//        |> Seq.map (ByteUtils.uint64ToBoolArray order)
-//        |> Seq.map (fun arr ->
-//            { sortableBoolArray.values = arr
-//              order = order })
 
 
 //    let makeSortedStacks (orderStack: int<sortingWidth>[]) =

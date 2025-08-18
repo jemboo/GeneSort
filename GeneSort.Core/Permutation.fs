@@ -98,6 +98,15 @@ module Permutation =
         if Array.length arr1 <> Array.length arr2 then
             failwith "Permutations must have the same order"
         Permutation.createUnsafe (Array.init (Array.length arr1) (fun i -> arr2.[arr1.[i]]))
+
+    let powerSequence (perm: Permutation) : Permutation seq =
+        let mutable curPerm = perm
+        seq
+            {
+                while true do
+                    yield curPerm
+                    curPerm <- compose perm curPerm
+            }
         
     let isSelfInverse (perm: Permutation) : bool =
         let arr = perm.Array
@@ -155,7 +164,6 @@ module Permutation =
                     permArray.[indices.[i]] <- indices.[i + 1]
                 permArray.[indices.[indices.Length - 1]] <- indices.[0]
         Permutation.create permArray
-
 
         
     // Find orbits of the elements of a permutation, including fixed points
