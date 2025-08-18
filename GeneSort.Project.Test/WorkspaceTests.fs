@@ -95,14 +95,13 @@ type WorkspaceTests() =
             if File.Exists filePath then
                 printfn "File already exists for Run %d: %s" run.Index filePath
         let mutable executedRuns = []
-
-        let lockObj = obj() // Lock object for thread safety
-        let executor _ cycle (run: Run) =
-            printfn "Executing Run index: %d cycle: %d" run.Index cycle
-            lock lockObj (fun () ->
-                executedRuns <- run.Index :: executedRuns)
-
-        WorkspaceOps.executeWorkspace workspace cycle 2 executor
+        let executor (_: Workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
+            async {
+                printfn "Executing Run index: %d cycle: %d" run.Index %cycle
+                lock (obj()) (fun () ->
+                    executedRuns <- run.Index :: executedRuns)
+            }
+        WorkspaceOps.executeWorkspace workspace cycle 1 executor
         Assert.Equal(12, runs.Length) // 12 algorithms
         for run in runs do
             let filePath = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run |> OutputData.toString)
@@ -119,6 +118,7 @@ type WorkspaceTests() =
         Assert.Contains(3, executedRuns)
 
 
+
     [<Fact>]
     let ``executeWorkspace skips existing run files`` () =
         let cycle = 1<cycleNumber>
@@ -130,10 +130,14 @@ type WorkspaceTests() =
         use stream = new FileStream(filePath, FileMode.Create, FileAccess.Write)
         MessagePackSerializer.Serialize(stream, RunDto.toRunDto run, options)
         let mutable executedCount = 0
-        let executor _ _ _ = executedCount <- executedCount + 1
-        WorkspaceOps.executeWorkspace workspace cycle 2 executor
+        let executor (_: Workspace) (_: int<cycleNumber>) (_: Run) : Async<unit> = 
+            async {
+                executedCount <- executedCount + 1
+            }
+        WorkspaceOps.executeWorkspace workspace cycle 1 executor
         Assert.Equal(0, executedCount) // Run should be skipped
         cleanupTempDir tempDir
+
 
     [<Fact>]
     let ``executeWorkspace handles executor errors`` () =

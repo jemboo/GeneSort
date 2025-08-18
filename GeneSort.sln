@@ -27,6 +27,10 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.Model.Test", "Gene
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.Model.Mp.Test", "GeneSort.Model.Mp.Test\GeneSort.Model.Mp.Test.fsproj", "{5756FBAF-078B-4583-B3F8-77D952C72393}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.Sorter.Mp", "GeneSort.Sorter.Mp\GeneSort.Sorter.Mp.fsproj", "{AC7247F1-5B38-4D80-BDD5-A8C6532632AB}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.Sorter.Mp.Test", "GeneSort.Sorter.Mp.Test\GeneSort.Sorter.Mp.Test.fsproj", "{A342C3D9-6D56-425A-8443-837A2DC8A1B8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +85,14 @@ Global
 		{5756FBAF-078B-4583-B3F8-77D952C72393}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5756FBAF-078B-4583-B3F8-77D952C72393}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5756FBAF-078B-4583-B3F8-77D952C72393}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC7247F1-5B38-4D80-BDD5-A8C6532632AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC7247F1-5B38-4D80-BDD5-A8C6532632AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC7247F1-5B38-4D80-BDD5-A8C6532632AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC7247F1-5B38-4D80-BDD5-A8C6532632AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A342C3D9-6D56-425A-8443-837A2DC8A1B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A342C3D9-6D56-425A-8443-837A2DC8A1B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A342C3D9-6D56-425A-8443-837A2DC8A1B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A342C3D9-6D56-425A-8443-837A2DC8A1B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
