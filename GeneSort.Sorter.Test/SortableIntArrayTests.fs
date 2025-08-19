@@ -27,7 +27,7 @@ type SortableIntArrayTests() =
         let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
         let other = sortableIntArray.Create([| 1; 0; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>)) 
         let result = arr.DistanceSquared(other) 
-        Assert.Equal(5, result) // (0-1)^2 + (2-0)^2 + (1-1)^2 = 1 + 4 + 0 = 5
+        Assert.Equal(5, result)
 
     [<Fact>]
     let ``DistanceSquared with wrong sorting width throws`` () =
@@ -57,31 +57,92 @@ type SortableIntArrayTests() =
         Assert.True(arr.IsSorted)
 
     [<Fact>]
-    let ``SortBy sorts unsorted array correctly`` () =
+    let ``SortByCes sorts unsorted array correctly`` () =
         let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
         let ces = [| Ce.create 1 2; Ce.create 0 1 |]
-        let sorted = arr.SortBy(ces)
+        let useCounter = [| 0; 0 |]
+        let sorted = arr.SortByCes ces 0 2 useCounter
         Assert.Equal<int>([| 0; 1; 2 |], sorted.Values)
         Assert.True(sorted.IsSorted)
         Assert.Equal(arr.SortingWidth, sorted.SortingWidth)
         Assert.Equal(arr.SymbolSetSize, sorted.SymbolSetSize)
+        Assert.Equal<int>([| 1; 0 |], useCounter)
 
     [<Fact>]
-    let ``SortBy with empty ces returns copy`` () =
+    let ``SortByCes with empty ces returns copy`` () =
         let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
-        let sorted = arr.SortBy([||])
+        let useCounter = [||]
+        let sorted = arr.SortByCes [||] 0 0 useCounter
         Assert.Equal<int>(arr.Values, sorted.Values)
         Assert.Equal(arr.SortingWidth, sorted.SortingWidth)
         Assert.Equal(arr.SymbolSetSize, sorted.SymbolSetSize)
+        Assert.Equal<int>([||], useCounter)
 
     [<Fact>]
-    let ``SortByWithHistory captures sorting steps correctly`` () =
+    let ``SortByCes with partial extent sorts correctly`` () =
         let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
         let ces = [| Ce.create 1 2; Ce.create 0 1 |]
-        let history = arr.SortByWithHistory(ces)
-        Assert.Equal(3, history.Length) // ces.Length + 1
-        Assert.Equal<int>([| 0; 2; 1 |], history.[0].Values) // Original
-        Assert.Equal<int>([| 0; 1; 2 |], history.[1].Values) // After Ce(1,2)
-        Assert.Equal<int>([| 0; 1; 2 |], history.[2].Values) // After Ce(0,1)
+        let useCounter = [| 0; 0 |]
+        let sorted = arr.SortByCes ces 0 1 useCounter
+        Assert.Equal<int>([| 0; 1; 2 |], sorted.Values)
+        Assert.Equal<int>([| 1; 0 |], useCounter)
+
+    [<Fact>]
+    let ``SortByCesWithHistory captures sorting steps correctly`` () =
+        let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
+        let ces = [| Ce.create 1 2; Ce.create 0 1 |]
+        let useCounter = [| 0; 0 |]
+        let history = arr.SortByCesWithHistory ces 0 2 useCounter
+        Assert.Equal(3, history.Length)
+        Assert.Equal<int>([| 0; 2; 1 |], history.[0].Values)
+        Assert.Equal<int>([| 0; 1; 2 |], history.[1].Values)
+        Assert.Equal<int>([| 0; 1; 2 |], history.[2].Values)
         Assert.True(history.[2].IsSorted)
         Assert.True(history |> Array.forall (fun x -> x.SortingWidth = arr.SortingWidth && x.SymbolSetSize = arr.SymbolSetSize))
+        Assert.Equal<int>([| 1; 0 |], useCounter)
+
+    [<Fact>]
+    let ``SortByCesWithHistory with partial extent captures correctly`` () =
+        let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
+        let ces = [| Ce.create 1 2; Ce.create 0 1 |]
+        let useCounter = [| 0; 0 |]
+        let history = arr.SortByCesWithHistory ces 1 1 useCounter
+        Assert.Equal(2, history.Length)
+        Assert.Equal<int>([| 0; 2; 1 |], history.[0].Values)
+        Assert.Equal<int>([| 0; 2; 1 |], history.[1].Values)
+        Assert.Equal<int>([| 0; 0 |], useCounter)
+
+    [<Fact>]
+    let ``Equality with same values returns true`` () =
+        let arr1 = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
+        let arr2 = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
+        Assert.True(arr1.Equals(arr2))
+        Assert.True(arr1.Equals(arr2 :> obj))
+        Assert.Equal(arr1.GetHashCode(), arr2.GetHashCode())
+
+    [<Fact>]
+    let ``Equality with different values returns false`` () =
+        let arr1 = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
+        let arr2 = sortableIntArray.Create([| 1; 0; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
+        Assert.False(arr1.Equals(arr2))
+        Assert.False(arr1.Equals(arr2 :> obj))
+
+    [<Fact>]
+    let ``Equality with different sortingWidth returns false`` () =
+        let arr1 = sortableIntArray.Create([| 0; 2 |], 2<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
+        let arr2 = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
+        Assert.False(arr1.Equals(arr2))
+        Assert.False(arr1.Equals(arr2 :> obj))
+
+    [<Fact>]
+    let ``Equality with different symbolSetSize returns false`` () =
+        let arr1 = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
+        let arr2 = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (4UL |> UMX.tag<symbolSetSize>))
+        Assert.False(arr1.Equals(arr2))
+        Assert.False(arr1.Equals(arr2 :> obj))
+
+    [<Fact>]
+    let ``Equality with different type returns false`` () =
+        let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
+        let obj = obj()
+        Assert.False(arr.Equals(obj))

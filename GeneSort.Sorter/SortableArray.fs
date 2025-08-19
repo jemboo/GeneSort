@@ -39,26 +39,22 @@ module SortableArray =
         | Ints intArray -> intArray.IsSorted
         | Bools boolArray -> boolArray.IsSorted
     
-    /// Returns a new SortableArray with values sorted according to the comparison-exchange operations.
-    /// <exception cref="ArgumentException">Thrown when ces contains indices out of bounds.</exception>
-    let sortBy (ces: Ce[]) (sortable: SortableArray) : SortableArray =
+    let sortByCes (ces: Ce[]) (startIndex: int) (extent: int) (useCounter: int[]) (sortable: SortableArray) : SortableArray =
         match sortable with
         | Ints intArray ->
-            let sortedValues = Ce.sortBy ces intArray.Values
+            let sortedValues = Ce.sortBy ces startIndex extent useCounter intArray.Values
             Ints (sortableIntArray.Create(sortedValues, intArray.SortingWidth, intArray.SymbolSetSize))
         | Bools boolArray ->
-            let sortedValues = Ce.sortBy ces boolArray.Values
+            let sortedValues = Ce.sortBy ces startIndex extent useCounter boolArray.Values
             Bools (sortableBoolArray.Create(sortedValues, boolArray.SortingWidth))
-    
-    /// Returns an array of SortableArray, starting with the original array and followed by arrays after each cumulative comparison-exchange.
-    /// <exception cref="ArgumentException">Thrown when ces contains indices out of bounds.</exception>
-    let sortByWithHistory (ces: Ce[]) (sortable: SortableArray) : SortableArray[] =
+
+    let sortByCesWithHistory (ces: Ce[]) (startIndex: int) (extent: int) (useCounter: int[]) (sortable: SortableArray) : SortableArray[] =
         match sortable with
         | Ints intArray ->
-            let history = Ce.sortByWithHistory ces intArray.Values
+            let history = Ce.sortByWithHistory ces startIndex extent useCounter intArray.Values
             history |> Array.map (fun values -> Ints (sortableIntArray.Create(values, intArray.SortingWidth, intArray.SymbolSetSize)))
         | Bools boolArray ->
-            let history = Ce.sortByWithHistory ces boolArray.Values
+            let history = Ce.sortByWithHistory ces startIndex extent useCounter boolArray.Values
             history |> Array.map (fun values -> Bools (sortableBoolArray.Create(values, boolArray.SortingWidth)))
     
     /// Computes the squared distance between two SortableArray instances of the same kind.

@@ -5,7 +5,7 @@ open FSharp.UMX
 open GeneSort.Core
 
 
-/// A record representing an integer array with a specified sorting width and symbol set size.
+[<Struct; CustomEquality; NoComparison>]
 type sortableIntArray =
     private { 
         values: int[] 
@@ -49,18 +49,32 @@ type sortableIntArray =
     /// Checks if the values array is sorted in non-decreasing order.
     member this.IsSorted = ArrayProperties.isSorted this.values
 
-    /// Returns a new sortableIntArray with values sorted according to the comparison-exchange operations.
-    /// <exception cref="ArgumentException">Thrown when ces contains indices out of bounds.</exception>
-    member this.SortBy(ces: Ce[]) =
-        let sortedValues = Ce.sortBy ces this.values
-        sortableIntArray.Create(sortedValues, this.sortingWidth, this.symbolSetSize)
+    member this.SortByCes(ces: Ce[]) (startIndex: int) (extent: int) (useCounter: int[]) =
+        let sortedValues = Ce.sortBy ces startIndex extent useCounter this.values
+        sortableIntArray.Create(sortedValues, this.SortingWidth, this.symbolSetSize)
 
-    /// Returns an array of sortableIntArray, starting with the original array and followed by arrays after each comparison-exchange.
-    /// <exception cref="ArgumentException">Thrown when ces contains indices out of bounds.</exception>
-    member this.SortByWithHistory(ces: Ce[]) =
-        let history = Ce.sortByWithHistory ces this.values
-        history |> Array.map (fun values -> sortableIntArray.Create(values, this.sortingWidth, this.symbolSetSize))
+    member this.SortByCesWithHistory(ces: Ce[]) (startIndex: int) (extent: int) (useCounter: int[]) =
+        let history = Ce.sortByWithHistory ces startIndex extent useCounter this.values
+        let sw = this.SortingWidth
+        let sss = this.SymbolSetSize
+        history |> Array.map (fun values -> sortableIntArray.Create(values, sw, sss))
 
+    override this.Equals(obj) =
+        match obj with
+        | :? sortableIntArray as other ->
+            this.sortingWidth = other.sortingWidth &&
+            this.symbolSetSize = other.symbolSetSize &&
+            Array.forall2 (=) this.values other.values
+        | _ -> false
+
+    override this.GetHashCode() =
+        hash (this.sortingWidth, this.symbolSetSize, hash this.values)
+
+    interface IEquatable<sortableIntArray> with
+        member this.Equals(other) =
+            this.sortingWidth = other.sortingWidth &&
+            this.symbolSetSize = other.symbolSetSize &&
+            Array.forall2 (=) this.values other.values
 
 
 

@@ -4,7 +4,7 @@ open System
 open FSharp.UMX
 open GeneSort.Core
 
-
+[<Struct; CustomEquality; NoComparison>]
 type sortableBoolArray =
     private { 
         values: bool[] 
@@ -20,10 +20,10 @@ type sortableBoolArray =
         { values = Array.copy values; sortingWidth = sortingWidth }
 
     /// Gets the values array.
-    member this.Values = this.values
+    member this.Values with get() = this.values
 
     /// Gets the sorting order.
-    member this.SortingWidth = this.sortingWidth
+    member this.SortingWidth with get()  = this.sortingWidth
 
     /// Computes the squared distance between this array and another sortableBoolArray, treating true as 1 and false as 0.
     /// <exception cref="ArgumentException">Thrown when the other array's order does not match this array's order.</exception>
@@ -36,18 +36,28 @@ type sortableBoolArray =
 
     /// Checks if the values array is sorted in non-decreasing order.
     member this.IsSorted = ArrayProperties.isSorted this.values
-
-    /// Returns a new sortableBoolArray with values sorted according to the comparison-exchange operations.
-    /// <exception cref="ArgumentException">Thrown when ces contains indices out of bounds.</exception>
-    member this.SortBy(ces: Ce[]) =
-        let sortedValues =  Ce.sortBy ces this.values
+     
+    member this.SortByCes(ces: Ce[]) (startIndex: int) (extent: int) (useCounter: int[]) =
+        let sortedValues = Ce.sortBy ces startIndex extent useCounter this.values
         sortableBoolArray.Create(sortedValues, this.SortingWidth)
 
-    /// Returns an array of sortableIntArray, starting with the original array and followed by arrays after each comparison-exchange.
-    /// <exception cref="ArgumentException">Thrown when ces contains indices out of bounds.</exception>
-    member this.SortByWithHistory(ces: Ce[]) =
-        let history = Ce.sortByWithHistory ces this.values
-        history |> Array.map (fun values -> sortableBoolArray.Create(values, this.SortingWidth))
+    member this.SortByCesWithHistory(ces: Ce[]) (startIndex: int) (extent: int) (useCounter: int[]) =
+        let history = Ce.sortByWithHistory ces startIndex extent useCounter this.values
+        let sw = this.SortingWidth
+        history |> Array.map (fun values -> sortableBoolArray.Create(values, sw))
+
+    override this.Equals(obj) =
+        match obj with
+        | :? sortableBoolArray as other ->
+            this.sortingWidth = other.sortingWidth && Array.forall2 (=) this.values other.values
+        | _ -> false
+
+    override this.GetHashCode() =
+        hash (this.sortingWidth, hash this.values)
+
+    interface IEquatable<sortableBoolArray> with
+        member this.Equals(other) =
+            this.sortingWidth = other.sortingWidth && Array.forall2 (=) this.values other.values
 
 
 

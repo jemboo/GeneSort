@@ -6,6 +6,7 @@ open FSharp.UMX
 open System
 open GeneSort.Sorter
 
+
 type SortableBoolArrayTests() =
 
     [<Fact>]
@@ -24,14 +25,14 @@ type SortableBoolArrayTests() =
         let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
         let other = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
         let result = arr.DistanceSquared(other)
-        Assert.Equal(0, result) // (1-1)^2 + (0-0)^2 + (1-1)^2 = 0
+        Assert.Equal(0, result)
 
     [<Fact>]
     let ``DistanceSquared with different array computes correctly`` () =
         let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
         let other = sortableBoolArray.Create([| false; false; true |], 3<sortingWidth>)
         let result = arr.DistanceSquared(other)
-        Assert.Equal(1, result) // (1-0)^2 + (0-0)^2 + (1-1)^2 = 1 + 0 + 0 = 1
+        Assert.Equal(1, result)
 
     [<Fact>]
     let ``IsSorted returns true for sorted array`` () =
@@ -54,32 +55,58 @@ type SortableBoolArrayTests() =
         Assert.True(arr.IsSorted)
 
     [<Fact>]
-    let ``SortBy sorts unsorted array correctly`` () =
-        let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth> )
+    let ``SortByCes sorts unsorted array correctly`` () =
+        let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
         let ces = [| Ce.create 0 1; Ce.create 1 2 |]
-        let sorted = arr.SortBy(ces)
+        let useCounter = [| 0; 0 |]
+        let sorted = arr.SortByCes ces 0 2 useCounter
         Assert.Equal<bool>([| false; true; true |], sorted.Values)
         Assert.True(sorted.IsSorted)
         Assert.Equal(arr.SortingWidth, sorted.SortingWidth)
+        Assert.Equal<int>([| 1; 0 |], useCounter)
 
     [<Fact>]
-    let ``SortBy with empty ces returns copy`` () =
+    let ``SortByCes with empty ces returns copy`` () =
         let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
-        let sorted = arr.SortBy([||])
+        let useCounter = [||]
+        let sorted = arr.SortByCes [||] 0 0 useCounter
         Assert.Equal<bool>(arr.Values, sorted.Values)
         Assert.Equal(arr.SortingWidth, sorted.SortingWidth)
+        Assert.Equal<int>([||], useCounter)
 
     [<Fact>]
-    let ``SortByWithHistory captures sorting steps correctly`` () =
+    let ``SortByCes with partial extent sorts correctly`` () =
         let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
         let ces = [| Ce.create 0 1; Ce.create 1 2 |]
-        let history = arr.SortByWithHistory(ces)
-        Assert.Equal(3, history.Length) // ces.Length + 1
-        Assert.Equal<bool>([| true; false; true |], history.[0].Values) // Original
-        Assert.Equal<bool>([| false; true; true |], history.[1].Values) // After Ce(0,1)
-        Assert.Equal<bool>([| false; true; true |], history.[2].Values) // After Ce(1,2)
+        let useCounter = [| 0; 0 |]
+        let sorted = arr.SortByCes ces 0 1 useCounter
+        Assert.Equal<bool>([| false; true; true |], sorted.Values)
+        Assert.Equal<int>([| 1; 0 |], useCounter)
+
+    [<Fact>]
+    let ``SortByCesWithHistory captures sorting steps correctly`` () =
+        let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
+        let ces = [| Ce.create 0 1; Ce.create 1 2 |]
+        let useCounter = [| 0; 0 |]
+        let history = arr.SortByCesWithHistory ces 0 2 useCounter
+        Assert.Equal(3, history.Length)
+        Assert.Equal<bool>([| true; false; true |], history.[0].Values)
+        Assert.Equal<bool>([| false; true; true |], history.[1].Values)
+        Assert.Equal<bool>([| false; true; true |], history.[2].Values)
         Assert.True(history.[2].IsSorted)
         Assert.True(history |> Array.forall (fun x -> x.SortingWidth = arr.SortingWidth))
+        Assert.Equal<int>([| 1; 0 |], useCounter)
+
+    [<Fact>]
+    let ``SortByCesWithHistory with partial extent captures correctly`` () =
+        let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
+        let ces = [| Ce.create 0 1; Ce.create 1 2 |]
+        let useCounter = [| 0; 0 |]
+        let history = arr.SortByCesWithHistory ces 1 1 useCounter
+        Assert.Equal(2, history.Length)
+        Assert.Equal<bool>([| true; false; true |], history.[0].Values)
+        Assert.Equal<bool>([| true; false; true |], history.[1].Values)
+        Assert.Equal<int>([| 0; 0 |], useCounter)
 
     [<Fact>]
     let ``getAllSortableBoolArrays with sortingWidth 0 returns single empty array`` () =
@@ -87,7 +114,6 @@ type SortableBoolArrayTests() =
         Assert.Equal(1, arrays.Length)
         Assert.Equal<bool>([||], arrays.[0].Values)
         Assert.Equal(0<sortingWidth>, arrays.[0].SortingWidth)
-
 
     [<Fact>]
     let ``getAllSortableBoolArrays with sortingWidth 1 returns two arrays`` () =
@@ -116,3 +142,30 @@ type SortableBoolArrayTests() =
         let arrays = SortableBoolArray.getAllSortableBoolArrays 3<sortingWidth>
         Assert.Equal(8, arrays.Length)
 
+    [<Fact>]
+    let ``Equality with same values returns true`` () =
+        let arr1 = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
+        let arr2 = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
+        Assert.True(arr1.Equals(arr2))
+        Assert.True(arr1.Equals(arr2 :> obj))
+        Assert.Equal(arr1.GetHashCode(), arr2.GetHashCode())
+
+    [<Fact>]
+    let ``Equality with different values returns false`` () =
+        let arr1 = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
+        let arr2 = sortableBoolArray.Create([| false; false; true |], 3<sortingWidth>)
+        Assert.False(arr1.Equals(arr2))
+        Assert.False(arr1.Equals(arr2 :> obj))
+
+    [<Fact>]
+    let ``Equality with different order returns false`` () =
+        let arr1 = sortableBoolArray.Create([| true; false |], 2<sortingWidth>)
+        let arr2 = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
+        Assert.False(arr1.Equals(arr2))
+        Assert.False(arr1.Equals(arr2 :> obj))
+
+    [<Fact>]
+    let ``Equality with different type returns false`` () =
+        let arr = sortableBoolArray.Create([| true; false |], 2<sortingWidth>)
+        let obj = obj()
+        Assert.False(arr.Equals(obj))
