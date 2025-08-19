@@ -75,7 +75,27 @@ module SortableBoolArray =
             result.[i] <- sortableBoolArray.Create(boolArray, sortingWidth)
         result
 
+    let getAllSortedSortableBoolArrays (sortingWidth: int<sortingWidth>) : sortableBoolArray[] =
+        if sortingWidth < 0<sortingWidth> then
+            invalidArg "sortingWidth" "Sorting width must be non-negative."
+        let n = int sortingWidth
+        Array.init (n + 1) (fun k ->
+            let boolArray = Array.init n (fun i -> i >= n - k)
+            sortableBoolArray.Create(boolArray, sortingWidth))
 
+    let getMergeSortTestCases (sortingWidth: int<sortingWidth>) : sortableBoolArray[] =
+        if %sortingWidth % 2 <> 0 then
+            invalidArg "sortingWidth" "Sorting width must be even."
+        let n = int sortingWidth
+        let m = n / 2
+        let sortedHalfArrays = getAllSortedSortableBoolArrays (m * 1<sortingWidth>)
+        let result = ResizeArray<sortableBoolArray>()
+        for left in sortedHalfArrays do
+            for right in sortedHalfArrays do
+                let boolArray = Array.concat [left.Values; right.Values]
+                let sba = sortableBoolArray.Create(boolArray, sortingWidth)
+                result.Add(sba)
+        result.ToArray()
 
 
 //module SortableBoolArray =

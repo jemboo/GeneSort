@@ -169,3 +169,38 @@ type SortableBoolArrayTests() =
         let arr = sortableBoolArray.Create([| true; false |], 2<sortingWidth>)
         let obj = obj()
         Assert.False(arr.Equals(obj))
+
+    [<Fact>]
+    let ``getMergeSortTestCases with sortingWidth 2 returns correct test cases`` () =
+        let arrays = SortableBoolArray.getMergeSortTestCases 2<sortingWidth>
+        let expected = [|
+            sortableBoolArray.Create([| false; false |], 2<sortingWidth>) // [false], [false]
+            sortableBoolArray.Create([| false; true |], 2<sortingWidth>)  // [false], [true]
+            sortableBoolArray.Create([| true; false |], 2<sortingWidth>)  // [true], [false]
+            sortableBoolArray.Create([| true; true |], 2<sortingWidth>)   // [true], [true]
+        |]
+        Assert.Equal(4, arrays.Length)
+        Assert.Equal<sortableBoolArray[]>(expected, arrays)
+        Assert.True(arrays |> Array.forall (fun x -> 
+            let half = int x.SortingWidth / 2
+            x.IsSorted || (ArrayProperties.isSorted (x.Values.[0 .. half-1]) && ArrayProperties.isSorted (x.Values.[half ..]))))
+
+    [<Fact>]
+    let ``getMergeSortTestCases with sortingWidth 4 returns correct test cases`` () =
+        let arrays = SortableBoolArray.getMergeSortTestCases 4<sortingWidth>
+        Assert.Equal(9, arrays.Length) // (2+1) * (2+1) = 9
+        let expected = [|
+            sortableBoolArray.Create([| false; false; false; false |], 4<sortingWidth>) // [false; false], [false; false]
+            sortableBoolArray.Create([| false; false; false; true |], 4<sortingWidth>)  // [false; false], [false; true]
+            sortableBoolArray.Create([| false; false; true; true |], 4<sortingWidth>)   // [false; false], [true; true]
+            sortableBoolArray.Create([| false; true; false; false |], 4<sortingWidth>)  // [false; true], [false; false]
+            sortableBoolArray.Create([| false; true; false; true |], 4<sortingWidth>)   // [false; true], [false; true]
+            sortableBoolArray.Create([| false; true; true; true |], 4<sortingWidth>)    // [false; true], [true; true]
+            sortableBoolArray.Create([| true; true; false; false |], 4<sortingWidth>)   // [true; true], [false; false]
+            sortableBoolArray.Create([| true; true; false; true |], 4<sortingWidth>)    // [true; true], [false; true]
+            sortableBoolArray.Create([| true; true; true; true |], 4<sortingWidth>)     // [true; true], [true; true]
+        |]
+        Assert.Equal<sortableBoolArray[]>(expected, arrays)
+        Assert.True(arrays |> Array.forall (fun x -> 
+            let half = int x.SortingWidth / 2
+            x.IsSorted || (ArrayProperties.isSorted (x.Values.[0 .. half-1]) && ArrayProperties.isSorted (x.Values.[half ..]))))

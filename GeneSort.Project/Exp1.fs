@@ -69,3 +69,22 @@ module Exp1 =
     let RunAll() =
         let cycle = 1<cycleNumber>
         WorkspaceOps.executeWorkspace workspace cycle 6 executor
+
+    let RunSandbox() =
+        
+        let getIntArrayMergeCases (sortingWidth:int<sortingWidth>) =
+            let halfWidth = %sortingWidth / 2
+            [|
+                for i = 0 to (halfWidth - 1) do
+                   let arrayData = 
+                        [| (%sortingWidth - i)   .. (%sortingWidth - 1) |] 
+                        |> Array.append
+                            [| 0  .. (halfWidth - 1 - i) |] 
+                            |> Array.append
+                                [| (halfWidth - i)  .. (%sortingWidth - 1 - i) |]
+
+                   sortableIntArray.Create(arrayData, sortingWidth, (%sortingWidth |> uint64 |>  UMX.tag<symbolSetSize>))
+            |]
+
+        getIntArrayMergeCases (10 |> UMX.tag<sortingWidth>) 
+        |> Array.map(fun sia -> Console.WriteLine(sprintf "%A" sia.Values)    )
