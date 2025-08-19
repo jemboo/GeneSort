@@ -59,6 +59,25 @@ type sortableIntArray =
         let sss = this.SymbolSetSize
         history |> Array.map (fun values -> sortableIntArray.Create(values, sw, sss))
 
+    member this.ToSortableBoolArrays() : sortableBoolArray[] =
+        if this.SortingWidth <= 1<sortingWidth> then
+            [||]
+        else
+            let minValue = Array.min this.values
+            let thresholds = 
+                this.values 
+                |> Array.filter (fun v -> v > minValue) 
+                |> Array.distinct 
+                |> Array.sort
+            let vals = this.Values
+            let sw = this.SortingWidth
+            thresholds 
+            |> Array.map (
+                fun threshold ->
+                    let boolValues = vals |> Array.map (fun v -> v >= threshold)
+                    sortableBoolArray.Create(boolValues, sw))
+
+
     override this.Equals(obj) =
         match obj with
         | :? sortableIntArray as other ->

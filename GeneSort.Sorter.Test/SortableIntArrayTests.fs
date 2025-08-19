@@ -112,6 +112,38 @@ type SortableIntArrayTests() =
         Assert.Equal<int>([| 0; 2; 1 |], history.[1].Values)
         Assert.Equal<int>([| 0; 0 |], useCounter)
 
+
+    [<Fact>]
+    let ``ToSortableBoolArrays with multiple values creates correct arrays`` () =
+        let arr = sortableIntArray.Create([| 0; 2; 1; 3 |], 4<sortingWidth>, (4UL |> UMX.tag<symbolSetSize>))
+        let boolArrays = arr.ToSortableBoolArrays()
+        Assert.Equal(3, boolArrays.Length) // SortingWidth - 1 = 4 - 1 = 3
+        let expected = [|
+            sortableBoolArray.Create([| false; true; true; true |], 4<sortingWidth>) // threshold = 1
+            sortableBoolArray.Create([| false; true; false; true |], 4<sortingWidth>) // threshold = 2
+            sortableBoolArray.Create([| false; false; false; true |], 4<sortingWidth>) // threshold = 3
+        |]
+        Assert.Equal<sortableBoolArray[]>(expected, boolArrays)
+
+    [<Fact>]
+    let ``ToSortableBoolArrays with SortingWidth 0 returns empty array`` () =
+        let arr = sortableIntArray.Create([||], 0<sortingWidth>, (1UL |> UMX.tag<symbolSetSize>))
+        let boolArrays = arr.ToSortableBoolArrays()
+        Assert.Equal(0, boolArrays.Length)
+
+    [<Fact>]
+    let ``ToSortableBoolArrays with SortingWidth 1 returns empty array`` () =
+        let arr = sortableIntArray.Create([| 0 |], 1<sortingWidth>, (1UL |> UMX.tag<symbolSetSize>))
+        let boolArrays = arr.ToSortableBoolArrays()
+        Assert.Equal(0, boolArrays.Length)
+
+    [<Fact>]
+    let ``ToSortableBoolArrays with all equal values returns empty array`` () =
+        let arr = sortableIntArray.Create([| 1; 1; 1 |], 3<sortingWidth>, (2UL |> UMX.tag<symbolSetSize>))
+        let boolArrays = arr.ToSortableBoolArrays()
+        Assert.Equal(0, boolArrays.Length)
+
+
     [<Fact>]
     let ``Equality with same values returns true`` () =
         let arr1 = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
