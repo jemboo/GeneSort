@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Tests.fs" />
+    <Compile Include="SortableArrayDtoTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GeneSort.Core.Mp\GeneSort.Core.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorter.Mp\GeneSort.Sorter.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorter\GeneSort.Sorter.fsproj" />

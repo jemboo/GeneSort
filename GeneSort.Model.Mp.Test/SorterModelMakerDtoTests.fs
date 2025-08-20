@@ -30,7 +30,6 @@ open GeneSort.Model.Sorter.Uf6
 
 type SorterModelSetMakerDtoTests() =
 
-
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 

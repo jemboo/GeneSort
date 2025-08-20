@@ -26,6 +26,8 @@
     <Compile Include="Sorter\SorterModelMaker.fs" />
     <Compile Include="Sorter\SorterModelSet.fs" />
     <Compile Include="Sorter\SorterModelSetMaker.fs" />
+    <Compile Include="Sortable\Common.fs" />
+    <Compile Include="Sortable\Msce.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />
   </ItemGroup>
 
