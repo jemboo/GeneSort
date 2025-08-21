@@ -27,7 +27,10 @@
     <Compile Include="Sorter\SorterModelSet.fs" />
     <Compile Include="Sorter\SorterModelSetMaker.fs" />
     <Compile Include="Sortable\Common.fs" />
-    <Compile Include="Sortable\Msce.fs" />
+    <Compile Include="Sortable\MsasF.fs" />
+    <Compile Include="Sortable\MsasO.fs" />
+    <Compile Include="Sortable\MsasORandGen.fs" />
+    <Compile Include="Sortable\SortableSetModel.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />
   </ItemGroup>
 

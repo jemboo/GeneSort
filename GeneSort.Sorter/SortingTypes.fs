@@ -9,23 +9,22 @@ open FSharp.UMX
 [<Measure>] type stageCount
 [<Measure>] type ceCount
 [<Measure>] type symbolSetSize
-
-
-
-
-
+[<Measure>] type sortableSetCount
 
 
 [<Measure>] type sorterParentId
 [<Measure>] type sortableCount
 [<Measure>] type sortableSetId
-[<Measure>] type sortableSetCount
+[<Measure>] type sorterSetId
 [<Measure>] type setOfSortableSetId
+
+
+
+
 [<Measure>] type sorterSetConcatMapId
 [<Measure>] type sorterSetParentMapId
 [<Measure>] type sorterSetMutatorId
 [<Measure>] type sorterSpeedBinSetId
-[<Measure>] type sorterSetId
 [<Measure>] type stageWindowSize
 [<Measure>] type switchFrequency
 

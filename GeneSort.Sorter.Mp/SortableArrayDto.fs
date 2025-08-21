@@ -17,7 +17,7 @@ type sortableBoolArrayDto = {
 type sortableIntArrayDto = {
     [<Key(0)>] Values: int[]
     [<Key(1)>] SortingWidth: int
-    [<Key(2)>] SymbolSetSize: uint64
+    [<Key(2)>] SymbolSetSize: int
 }
 
 [<MessagePackObject>]
@@ -35,7 +35,7 @@ module SortableArrayDto =
         sortableBoolArray.Create(dto.Values, UMX.tag<sortingWidth> dto.SortingWidth)
 
     let toDtoIntArray (sia: sortableIntArray) : sortableIntArrayDto =
-        { Values = sia.Values; SortingWidth = int sia.SortingWidth; SymbolSetSize = uint64 %sia.SymbolSetSize }
+        { Values = sia.Values; SortingWidth = int sia.SortingWidth; SymbolSetSize = %sia.SymbolSetSize }
 
     let fromDtoIntArray (dto: sortableIntArrayDto) : sortableIntArray =
         sortableIntArray.Create(dto.Values, UMX.tag<sortingWidth> dto.SortingWidth, UMX.tag<symbolSetSize> dto.SymbolSetSize)

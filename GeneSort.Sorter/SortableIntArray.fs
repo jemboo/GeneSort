@@ -10,15 +10,15 @@ type sortableIntArray =
     private { 
         values: int[] 
         sortingWidth: int<sortingWidth> 
-        symbolSetSize: uint64<symbolSetSize> 
+        symbolSetSize: int<symbolSetSize> 
     }
 
-    static member Create(values: int[], sortingWidth: int<sortingWidth>, symbolSetSize: uint64<symbolSetSize>) =
+    static member Create(values: int[], sortingWidth: int<sortingWidth>, symbolSetSize: int<symbolSetSize>) =
         if sortingWidth < 0<sortingWidth> then
             invalidArg "sortingWidth" "Sorting width must be non-negative."
         if values.Length <> int sortingWidth then
             invalidArg "values" $"Values length ({values.Length}) must equal sorting width ({int sortingWidth})."
-        if %symbolSetSize <= 0UL then
+        if %symbolSetSize <= 0 then
             invalidArg "symbolSetSize" "Symbol set size must be positive."
         if values |> Array.exists (fun v -> v < 0 || uint64 v >= uint64 %symbolSetSize) then
             invalidArg "values" $"All values must be in [0, {uint64 %symbolSetSize})."
@@ -28,7 +28,7 @@ type sortableIntArray =
         if sortingWidth < 0<sortingWidth> then
             invalidArg "sortingWidth" "Sorting width must be non-negative."
         let values = [| 0 .. (%sortingWidth - 1) |]
-        { values = values; sortingWidth = sortingWidth; symbolSetSize = %sortingWidth |> uint64 |> UMX.tag<symbolSetSize> }
+        { values = values; sortingWidth = sortingWidth; symbolSetSize = %sortingWidth |> UMX.tag<symbolSetSize> }
 
     /// Gets the values array.
     member this.Values = this.values
@@ -67,8 +67,9 @@ type sortableIntArray =
             let thresholds = 
                 this.values 
                 |> Array.filter (fun v -> v > minValue) 
-                |> Array.distinct 
+                |> Array.distinct
                 |> Array.sort
+
             let vals = this.Values
             let sw = this.SortingWidth
             thresholds 
@@ -103,7 +104,7 @@ module SortableIntArray =
         sortableIntArray.Create(
                 perm.Array, 
                 (%perm.Order |> UMX.tag<sortingWidth>), 
-                (%perm.Order |> uint64 |> UMX.tag<symbolSetSize>))
+                (%perm.Order |> UMX.tag<symbolSetSize>))
 
 
     let getOrbit (maxCount:int) (perm:Permutation) 
@@ -134,5 +135,5 @@ module SortableIntArray =
                         |> Array.append
                             [| (halfWidth - i) .. (%sortingWidth - 1 - i) |]
 
-                sortableIntArray.Create(arrayData, sortingWidth, (%sortingWidth |> uint64 |>  UMX.tag<symbolSetSize>))
+                sortableIntArray.Create(arrayData, sortingWidth, (%sortingWidth |>  UMX.tag<symbolSetSize>))
         |]

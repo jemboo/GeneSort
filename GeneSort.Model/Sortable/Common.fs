@@ -5,7 +5,7 @@ open FSharp.UMX
 open GeneSort.Sorter
 open GeneSort.Core
 
-[<Measure>] type sortableModelID
+[<Measure>] type sortableSetModelID
 [<Measure>] type sortableModelSetID
 [<Measure>] type sortableModelMakerID
 [<Measure>] type sortableModelSetMakerID
@@ -13,8 +13,8 @@ open GeneSort.Core
 module Common =
     let makeSorterModelId 
                 (id:  Guid<sortableModelMakerID>) 
-                (index:int): Guid<sortableModelID> = 
+                (index:int): Guid<sortableSetModelID> = 
         [
             id  :> obj
             index :> obj
-        ] |> GuidUtils.guidFromObjs |> UMX.tag<sortableModelID>
+        ] |> GuidUtils.guidFromObjs |> UMX.tag<sortableSetModelID>

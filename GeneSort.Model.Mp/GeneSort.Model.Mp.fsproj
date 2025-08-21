@@ -26,6 +26,7 @@
     <Compile Include="Sorter\SorterModelMakerDto.fs" />
     <Compile Include="Sorter\SorterModelSetDto.fs" />
     <Compile Include="Sorter\SorterModelSetMakerDto.fs" />
+    <Compile Include="Sortable\SortableSetModelDto.fs" />
   </ItemGroup>
 
   <ItemGroup>

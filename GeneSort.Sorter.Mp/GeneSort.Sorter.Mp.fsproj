@@ -6,11 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SortableArrayDto.fs" />
     <Compile Include="CeDto.fs" />
     <Compile Include="SorterDto.fs" />
     <Compile Include="SorterSetDto.fs" />
     <Compile Include="Program.fs" />
+    <Compile Include="SortableArrayDto.fs" />
   </ItemGroup>
 
   <ItemGroup>

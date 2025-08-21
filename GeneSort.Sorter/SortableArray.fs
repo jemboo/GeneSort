@@ -5,6 +5,9 @@ open System
 open FSharp.UMX
 open GeneSort.Core
 
+type SortableArrayType = 
+    | Ints
+    | Bools
  
 type SortableArray = 
     | Ints of sortableIntArray
@@ -12,13 +15,19 @@ type SortableArray =
 
 
 module SortableArray =
+
+    /// Gets the underlying values as an obj array.
+    let getSortableArrayType (sortableArray: SortableArray) : SortableArrayType =
+        match sortableArray with
+        | Ints _ -> SortableArrayType.Ints
+        | Bools _ -> SortableArrayType.Bools
     
     /// Creates a SortableArray from a boolean array and sorting width.
     let createBools (values: bool[]) (sortingWidth: int<sortingWidth>) : SortableArray =
         Bools (sortableBoolArray.Create(values, sortingWidth))
     
     /// Creates a SortableArray from an integer array, sorting width, and symbol set size.
-    let createInts (values: int[]) (sortingWidth: int<sortingWidth>) (symbolSetSize: uint64<symbolSetSize>) : SortableArray =
+    let createInts (values: int[]) (sortingWidth: int<sortingWidth>) (symbolSetSize: int<symbolSetSize>) : SortableArray =
         Ints (sortableIntArray.Create(values, sortingWidth, symbolSetSize))
     
     /// Gets the underlying values as an obj array.

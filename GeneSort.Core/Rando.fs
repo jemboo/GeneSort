@@ -191,14 +191,14 @@ type randomNet(seed: int32<randomSeed>) =
 
     module Rando =
         
-        let create (rngType:rngType) (guid:Guid) =
+        let create (rngType:rngType) (guid:Guid) : IRando =
             let seed = RandomSeed.fromGuid guid
             match rngType with
             | Lcg -> randomLcg(seed) :> IRando
             | Net -> randomNet(UMX.tag<randomSeed> (int32 seed)) :> IRando
 
 
-        let nextTwo (maxDex:int) (randy:IRando) =
+        let nextTwoIndexes (maxDex:int) (randy:IRando) =
             if (maxDex < 2) then failwith "array must have at least two elements"
             else if (maxDex = 2) then (0, 1)
             else

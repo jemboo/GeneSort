@@ -162,20 +162,20 @@ type RandoTests() =
     let ``nextTwo throws exception when maxDex is less than 2`` () =
         let seed = 42UL
         let randy = randomLcg (UMX.tag<randomSeed> seed) :> IRando
-        Assert.Throws<exn>(fun () -> Rando.nextTwo 1 randy |> ignore)
+        Assert.Throws<exn>(fun () -> Rando.nextTwoIndexes 1 randy |> ignore)
 
     [<Fact>]
     let ``nextTwo returns (0,1) when maxDex equals 2`` () =
         let seed = 42UL
         let randy = randomLcg (UMX.tag<randomSeed> seed) :> IRando
-        let result = Rando.nextTwo 2 randy
+        let result = Rando.nextTwoIndexes 2 randy
         result |> should equal (0, 1)
 
     [<Fact>]
     let ``nextTwo returns distinct indices within range for maxDex greater than 2`` () =
         let seed = 42UL
         let randy = randomLcg (UMX.tag<randomSeed> seed) :> IRando
-        let result = Rando.nextTwo 5 randy
+        let result = Rando.nextTwoIndexes 5 randy
         fst result |> should be (greaterThanOrEqualTo 0)
         fst result |> should be (lessThan 5)
         snd result |> should be (greaterThanOrEqualTo 0)
