@@ -83,7 +83,7 @@ module Exp1 =
                             |> Array.append
                                 [| (halfWidth - i)  .. (%sortingWidth - 1 - i) |]
 
-                   sortableIntArray.Create(arrayData, sortingWidth, (%sortingWidth |> uint64 |>  UMX.tag<symbolSetSize>))
+                   sortableIntArray.Create(arrayData, sortingWidth, (%sortingWidth |>  UMX.tag<symbolSetSize>))
             |]
 
         getIntArrayMergeCases (10 |> UMX.tag<sortingWidth>) 

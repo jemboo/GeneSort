@@ -12,6 +12,8 @@
     <Compile Include="Sorter\Si\MssiDto.fs" />
     <Compile Include="Sorter\Si\MssiRandGenDto.fs" />
     <Compile Include="Sorter\Si\MssiRandMutateDto.fs" />
+    <Compile Include="Sortable\MsasORandGenDto.fs" />
+    <Compile Include="Sortable\SortableSetModelDto.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />
     <Compile Include="Sorter\Rs\MsrsDto.fs" />
     <Compile Include="Sorter\Rs\MsrsRandGenDto.fs" />
@@ -26,7 +28,6 @@
     <Compile Include="Sorter\SorterModelMakerDto.fs" />
     <Compile Include="Sorter\SorterModelSetDto.fs" />
     <Compile Include="Sorter\SorterModelSetMakerDto.fs" />
-    <Compile Include="Sortable\SortableSetModelDto.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -28,7 +28,7 @@ type SortableArrayDtoTests() =
 
     [<Fact>]
     let ``sortableIntArrayDto round-trip serialization`` () =
-        let original = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3UL |> UMX.tag<symbolSetSize>))
+        let original = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
         let dto = SortableArrayDto.toDtoIntArray original
         let bytes = MessagePackSerializer.Serialize(dto, options)
         let deserialized = MessagePackSerializer.Deserialize<sortableIntArrayDto>(bytes, options)
@@ -48,7 +48,7 @@ type SortableArrayDtoTests() =
 
     [<Fact>]
     let ``SortableArrayDto Ints round-trip serialization`` () =
-        let original = SortableArray.createInts [| 0; 2; 1 |] 3<sortingWidth> (3UL |> UMX.tag<symbolSetSize>)
+        let original = SortableArray.createInts [| 0; 2; 1 |] 3<sortingWidth> (3 |> UMX.tag<symbolSetSize>)
         let dto = SortableArrayDto.toDto original
         let bytes = MessagePackSerializer.Serialize(dto, options)
         let deserialized = MessagePackSerializer.Deserialize<SortableArrayDto>(bytes, options)
@@ -75,6 +75,6 @@ type SortableArrayDtoTests() =
 
     [<Fact>]
     let ``sortableIntArrayDto with invalid SymbolSetSize throws`` () =
-        let dto = { Values = [| 0; 1 |]; SortingWidth = 2; SymbolSetSize = 0UL }
+        let dto = { Values = [| 0; 1 |]; SortingWidth = 2; SymbolSetSize = 0 }
         let ex = Assert.Throws<ArgumentException>(fun () -> SortableArrayDto.fromDtoIntArray dto |> ignore)
         Assert.Contains("Symbol set size must be positive", ex.Message)
