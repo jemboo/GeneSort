@@ -1,4 +1,5 @@
 ﻿open GeneSort.Sorter
+open GeneSort.Sorter.Sorter
 
 let yab () = 
     let sortingWidth = 10

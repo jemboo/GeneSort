@@ -9,9 +9,13 @@
     <Compile Include="CeDto.fs" />
     <Compile Include="SorterDto.fs" />
     <Compile Include="SorterSetDto.fs" />
+    <None Include="SorterTestDto.fs" />
+    <None Include="SorterTestSetDto.fs" />
     <Compile Include="Program.fs" />
     <Compile Include="SortableArrayDto.fs" />
   </ItemGroup>
+
+  <ItemGroup />
 
   <ItemGroup>
     <PackageReference Include="FSharp.UMX" Version="1.1.0" />

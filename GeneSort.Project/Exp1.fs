@@ -35,6 +35,10 @@ module Exp1 =
 
     let executor (workspace: Workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
         async {
+
+            Console.WriteLine(sprintf "Executing Run %d   %A" run.Index run.Parameters)
+
+
             let sorterModelKey = (run.Parameters["SorterModel"]) |> SorterModelKey.fromString
             let swFull = (run.Parameters["SortingWidth"]) |> SwFull.fromString
             let sortingWidth = swFull |> SwFull.toSortingWidth
@@ -62,7 +66,8 @@ module Exp1 =
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSet |> OutputData.SorterSet)
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterModelSetMaker |> OutputData.SorterModelSetMaker)
 
-            Console.WriteLine(sprintf "Executing Run %d   %A" run.Index run.Parameters)
+
+            Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %cycle)
         }
 
 

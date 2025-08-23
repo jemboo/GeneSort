@@ -2,6 +2,8 @@
 
 open FSharp.UMX
 open GeneSort.Sorter
+open GeneSort.Sorter.Sorter
+open GeneSort.Sorter.Sortable
 
 type SorterModelSet =
     { Id : Guid<sorterModelSetID>

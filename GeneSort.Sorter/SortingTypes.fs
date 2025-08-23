@@ -2,7 +2,6 @@
 
 open FSharp.UMX
 
-[<Measure>] type sorterLength
 [<Measure>] type sortingWidth
 [<Measure>] type sorterCount
 [<Measure>] type sorterId
@@ -10,12 +9,12 @@ open FSharp.UMX
 [<Measure>] type ceCount
 [<Measure>] type symbolSetSize
 [<Measure>] type sortableCount
+[<Measure>] type sorterTestId
+[<Measure>] type sorterTestSetId
 
 
 [<Measure>] type sorterParentId
-[<Measure>] type sortableSetId
 [<Measure>] type sorterSetId
-[<Measure>] type setOfSortableSetId
 
 
 

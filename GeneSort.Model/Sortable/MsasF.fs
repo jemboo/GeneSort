@@ -4,6 +4,8 @@ open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
+open GeneSort.Sorter.Sorter
+open GeneSort.Sorter.Sortable
 open GeneSort.Model.Sorter
 
 
@@ -43,10 +45,10 @@ type MsasF =
         member this.Equals(other) = 
             this.sortingWidth = other.sortingWidth
 
-    member this.MakeSortableArraySet (sortingWidth: int<sortingWidth>) : SortableArraySet =
+    member this.MakeSorterTestSet (sortingWidth: int<sortingWidth>) : SorterTest =
         let sortableArrays = 
                 SortableBoolArray.getAllSortableBoolArrays sortingWidth |> Array.map(SortableArray.Bools)
-        SortableArraySet.create ( %this.id |> UMX.tag<sortableSetId>) sortableArrays
+        SorterTest.create ( %this.id |> UMX.tag<sorterTestId>) sortableArrays
 
 
 module MsasF = ()

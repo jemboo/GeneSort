@@ -17,7 +17,7 @@ type SorterTestModelSetDto = {
 
 module SorterTestModelSetDto =
 
-    let toDtoSorterTestModelSet (set: SorterTestModelSet) : SorterTestModelSetDto =
+    let fromDomain (set: SorterTestModelSet) : SorterTestModelSetDto =
         { Id = %set.Id; SorterTestModels = set.SorterTestModels |> Array.map SorterTestModelDto.toDto }
 
     let fromDtoSorterTestModelSet (dto: SorterTestModelSetDto) : SorterTestModelSet =

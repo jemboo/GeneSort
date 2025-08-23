@@ -9,6 +9,8 @@ open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 open GeneSort.Sorter
+open GeneSort.Sorter.Sorter
+open GeneSort.Sorter.Sortable
 open GeneSort.Sorter.Mp
 
 type SortableArrayDtoTests() =

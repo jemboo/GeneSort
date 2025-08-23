@@ -4,6 +4,8 @@ open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
+open GeneSort.Sorter.Sorter
+open GeneSort.Sorter.Sortable
 open GeneSort.Model.Sorter
 
 
@@ -47,20 +49,20 @@ type MsasO =
             this.id = other.id
 
     member this.MakeSortableBoolArraySet 
-            (sortingWidth: int<sortingWidth>) : SortableArraySet =
-        let ssId = %this.Id |> UMX.tag<sortableSetId>
+            (sortingWidth: int<sortingWidth>) : SorterTest =
+        let ssId = %this.Id |> UMX.tag<sorterTestId>
         let bArrays =
             this.sortableIntArrays 
             |> Array.map(fun sia -> sia.ToSortableBoolArrays())
             |> Array.collect id
             |> Array.distinct
-        SortableArraySet.create ssId (bArrays |> Array.map(SortableArray.Bools))
+        SorterTest.create ssId (bArrays |> Array.map(SortableArray.Bools))
 
 
     member this.MakeSortableIntArraySet 
-            (sortingWidth: int<sortingWidth>) : SortableArraySet =
-        let ssId = %this.Id |> UMX.tag<sortableSetId>
-        SortableArraySet.create ssId (this.sortableIntArrays |> Array.map(SortableArray.Ints))
+            (sortingWidth: int<sortingWidth>) : SorterTest =
+        let ssId = %this.Id |> UMX.tag<sorterTestId>
+        SorterTest.create ssId (this.sortableIntArrays |> Array.map(SortableArray.Ints))
 
 
 module MsasO = ()

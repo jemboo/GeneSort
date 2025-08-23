@@ -37,15 +37,23 @@ module Exp2 =
 
     let executor (workspace: Workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
         async {
+
+            Console.WriteLine(sprintf "Executing Run %d   %A" run.Index run.Parameters)
+
+
             let swFull = (run.Parameters["SortingWidth"]) |> SwFull.fromString
             let sortingWidth = swFull |> SwFull.toSortingWidth
             let maxOrbiit = Int32.Parse((run.Parameters["MaxOrbiit"]))
             let firstIndex = (%cycle * %testModelCount) |> UMX.tag<sorterTestModelCount>
             let sorterTestModelGen = MsasORandGen.create randomType (sortingWidth) maxOrbiit |> SorterTestModelGen.MsasORandGen
             let sorterTestModelSetMaker = SorterTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
-            let sorterTestModelSetMakerDto = SorterTestModelSetMakerDto.fromDomain sorterTestModelSetMaker
-            Console.WriteLine $"Executing run for cycle {cycle} with parameters: {run.Parameters}"
+            let sorterTestModelSet = sorterTestModelSetMaker.MakeSorterTestModelSet
 
+            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestModelSet |> OutputData.SorterTestModelSet)
+            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestModelSetMaker |> OutputData.SorterTestModelSetMaker)
+
+
+            Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %cycle)
         }
 
 

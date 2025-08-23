@@ -11,13 +11,14 @@
 
   <ItemGroup>
     <Compile Include="SortingTypes.fs" />
-    <Compile Include="Ce.fs" />
-    <Compile Include="SortableBoolArray.fs" />
-    <Compile Include="SortableIntArray.fs" />
-    <Compile Include="SortableArray.fs" />
-    <Compile Include="SortableArraySet.fs" />
-    <Compile Include="Sorter.fs" />
-    <Compile Include="SorterSet.fs" />
+    <Compile Include="Sorter\Ce.fs" />
+    <Compile Include="Sorter\Sorter.fs" />
+    <Compile Include="Sorter\SorterSet.fs" />
+    <Compile Include="Sortable\SortableBoolArray.fs" />
+    <Compile Include="Sortable\SortableIntArray.fs" />
+    <Compile Include="Sortable\SortableArray.fs" />
+    <Compile Include="Sortable\SorterTest.fs" />
+    <Compile Include="Sortable\SorterTestSet.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

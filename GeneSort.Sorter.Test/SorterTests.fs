@@ -5,6 +5,8 @@ open Xunit
 open FSharp.UMX
 open FsUnit.Xunit
 open GeneSort.Sorter
+open GeneSort.Sorter.Sorter
+open GeneSort.Sorter.Sortable
 
 
 type SorterTests() =

@@ -1,7 +1,9 @@
-﻿namespace GeneSort.Sorter
+﻿
+namespace GeneSort.Sorter.Sorter
 
 open System
 open FSharp.UMX
+open GeneSort.Sorter
 
 type SorterSet =
         { SorterSetId: Guid<sorterSetId>

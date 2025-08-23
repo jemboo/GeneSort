@@ -3,6 +3,8 @@
 open System
 open FSharp.UMX
 open GeneSort.Sorter
+open GeneSort.Sorter.Sorter
+open GeneSort.Sorter.Sortable
 
 
 
@@ -19,12 +21,12 @@ module SorterTestModel =
         | MsasO msasO -> %msasO.SeedPermutation.Order |> UMX.tag<sortingWidth>
 
 
-    let makeSortableArraySet (model: SorterTestModel) (sortableArrayType:SortableArrayType) : SortableArraySet =
+    let makeSortableArraySet (model: SorterTestModel) (sortableArrayType:SortableArrayType) : SorterTest =
         match model with
         | MsasF msasF -> 
                 match sortableArrayType with
                 | SortableArrayType.Bools ->        
-                        msasF.MakeSortableArraySet(getSortingWidth model)
+                        msasF.MakeSorterTestSet(getSortingWidth model)
                 | SortableArrayType.Ints ->
                     failwith "Ints SortableArrayType not supported"
 

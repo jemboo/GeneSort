@@ -5,6 +5,8 @@ open GeneSort.Core
 open FSharp.UMX
 open System
 open GeneSort.Sorter
+open GeneSort.Sorter.Sorter
+open GeneSort.Sorter.Sortable
 
 type SortableIntArrayTests() =
 

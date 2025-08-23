@@ -4,6 +4,7 @@ open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
+open GeneSort.Sorter.Sorter
 open MessagePack
 
 
@@ -16,7 +17,7 @@ type SorterSetDto = {
 }
 
 module SorterSetDto =
-    let toSorterSetDto (sorterSet: SorterSet) : SorterSetDto =
+    let fromDomain (sorterSet: SorterSet) : SorterSetDto =
         { SorterSetId = %sorterSet.SorterSetId
           Sorters = sorterSet.Sorters |> Array.map SorterDto.toSorterDto }
 
