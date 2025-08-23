@@ -1,6 +1,6 @@
 ﻿// For more information see https://aka.ms/fsharp-console-apps
 open GeneSort.Project
 
-Exp1.RunSandbox()
+Exp2.RunAll()
 printfn "Hello from F#"
  

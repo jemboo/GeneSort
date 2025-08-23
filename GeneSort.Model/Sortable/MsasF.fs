@@ -10,7 +10,7 @@ open GeneSort.Model.Sorter
 [<Struct; CustomEquality; NoComparison>]
 type MsasF = 
     private 
-        { id: Guid<sortableSetModelID>
+        { id: Guid<sorterTestModelID>
           sortingWidth: int<sortingWidth> }
 
     static member create 
@@ -23,7 +23,7 @@ type MsasF =
                 [
                     "MsasF" :> obj
                     sortingWidth :> obj
-                ] |> GuidUtils.guidFromObjs |> UMX.tag<sortableSetModelID>
+                ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
             { id = id; sortingWidth = sortingWidth; }
 
     member this.Id with get() = this.id

@@ -9,11 +9,10 @@ open FSharp.UMX
 [<Measure>] type stageCount
 [<Measure>] type ceCount
 [<Measure>] type symbolSetSize
-[<Measure>] type sortableSetCount
+[<Measure>] type sortableCount
 
 
 [<Measure>] type sorterParentId
-[<Measure>] type sortableCount
 [<Measure>] type sortableSetId
 [<Measure>] type sorterSetId
 [<Measure>] type setOfSortableSetId

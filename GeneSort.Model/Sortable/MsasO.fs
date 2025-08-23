@@ -10,7 +10,7 @@ open GeneSort.Model.Sorter
 [<Struct; CustomEquality; NoComparison>]
 type MsasO = 
     private 
-        { id: Guid<sortableSetModelID>
+        { id: Guid<sorterTestModelID>
           sortableIntArrays : sortableIntArray array
           seedPermutation : Permutation
           maxOrbit: int; }
@@ -25,7 +25,7 @@ type MsasO =
                     "MsasO" :> obj
                     seedPermutation :> obj
                     maxOrbit :> obj
-                ] |> GuidUtils.guidFromObjs |> UMX.tag<sortableSetModelID>
+                ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
 
             { id = id; seedPermutation = seedPermutation; maxOrbit = maxOrbit; sortableIntArrays = sias}
 

@@ -6,20 +6,20 @@ open GeneSort.Sorter
 
 
 
-type SortableSetModel =
+type SorterTestModel =
      | MsasF of MsasF
      | MsasO of MsasO
 
 
-module SortableSetModel =
+module SorterTestModel =
 
-    let getSortingWidth (model: SortableSetModel) : int<sortingWidth> =
+    let getSortingWidth (model: SorterTestModel) : int<sortingWidth> =
         match model with
         | MsasF msasF -> msasF.sortingWidth
         | MsasO msasO -> %msasO.SeedPermutation.Order |> UMX.tag<sortingWidth>
 
 
-    let makeSortableArraySet (model: SortableSetModel) (sortableArrayType:SortableArrayType) : SortableArraySet =
+    let makeSortableArraySet (model: SorterTestModel) (sortableArrayType:SortableArrayType) : SortableArraySet =
         match model with
         | MsasF msasF -> 
                 match sortableArrayType with

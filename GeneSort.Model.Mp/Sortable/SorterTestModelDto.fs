@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Mp.Sorter
+﻿namespace GeneSort.Model.Mp.Sortable
 
 open System
 open GeneSort.Model.Sorter
@@ -23,20 +23,7 @@ type MsasODto = {
 }
 
 [<MessagePackObject>]
-type SortableArrayDto = {
-[<Key(0)>] Kind: int // 0 = Bools, 1 = Ints
-[<Key(1)>] BoolValues: bool[] // used when Kind=0
-[<Key(2)>] IntValues: int[] // used when Kind=1
-}
-
-[<MessagePackObject>]
-type SortableArraySetDto = {
-[<Key(0)>] Id: Guid
-[<Key(1)>] Arrays: SortableArrayDto[]
-}
-
-[<MessagePackObject>]
-type SortableSetModelDto = {
+type SorterTestModelDto = {
 [<Key(0)>] Kind: int // 0 = MsasF, 1 = MsasO
 [<Key(1)>] MsasF: MsasFDto // used when Kind=0
 [<Key(2)>] MsasO: MsasODto // used when Kind=1
@@ -72,11 +59,27 @@ module MsasODtoConv =
         MsasO.create perm dto.MaxOrbit
 
 
-module SortableSetModelDto =
+module SorterTestModelDto =
 
-    let fromDto (dto: SortableSetModelDto) : SortableSetModel =
+    let fromDto (dto: SorterTestModelDto) : SorterTestModel =
         match dto.Kind with
-        | 0 -> dto.MsasF |> MsasFDtoConv.fromDto |> SortableSetModel.MsasF
-        | 1 -> dto.MsasO |> MsasODtoConv.fromDto |> SortableSetModel.MsasO
-        | k -> failwithf "Unknown SortableSetModelDto.Kind = %d" k
+        | 0 -> dto.MsasF |> MsasFDtoConv.fromDto |> SorterTestModel.MsasF
+        | 1 -> dto.MsasO |> MsasODtoConv.fromDto |> SorterTestModel.MsasO
+        | k -> failwithf "Unknown SorterTestModelDto.Kind = %d" k
+
+
+    let toDto (m: SorterTestModel) : SorterTestModelDto =
+        match m with
+        | SorterTestModel.MsasF msasF ->
+            {
+                Kind = 0
+                MsasF = msasF |> MsasFDtoConv.toDto
+                MsasO = Unchecked.defaultof<MsasODto>
+            }
+        | SorterTestModel.MsasO msasO ->
+            {
+                Kind = 1
+                MsasF = Unchecked.defaultof<MsasFDto>
+                MsasO = msasO |> MsasODtoConv.toDto
+            }
 

@@ -10,7 +10,7 @@ open GeneSort.Sorter
 type MsasORandGen = 
     private 
         { 
-          id : Guid<sortableModelSetMakerID>
+          id : Guid<sorterTestModelMakerID>
           rngType: rngType
           sortingWidth: int<sortingWidth>
           maxOrbit: int } 
@@ -26,7 +26,7 @@ type MsasORandGen =
                     sortingWidth :> obj
                     rngType :> obj
                     maxOrbit :> obj
-                ] |> GuidUtils.guidFromObjs |> UMX.tag<sortableModelSetMakerID>
+                ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelMakerID>
 
             { id = id; rngType = rngType; maxOrbit = maxOrbit; sortingWidth = sortingWidth}
 
@@ -48,7 +48,7 @@ type MsasORandGen =
         member this.Equals(other) = 
             this.id = other.id
 
-    member this.getMsasOs (offset: int) : MsasO seq =
+    member this.getMsasOs (offset: int) : SorterTestModel seq =
             let randy = Rando.create this.RngType (%this.id)
             let sw = %this.sortingWidth
             let maxO = this.maxOrbit
@@ -56,7 +56,7 @@ type MsasORandGen =
                 seq {   while true do
                             yield  Permutation.randomPermutation (randy.NextIndex) sw
                     }
-            permSeq |> Seq.skip offset |> Seq.map(fun perm -> MsasO.create perm maxO)
+            permSeq |> Seq.skip offset |> Seq.map(fun perm -> MsasO.create perm maxO |> SorterTestModel.MsasO)
 
 
 module MsasORandGen = ()
