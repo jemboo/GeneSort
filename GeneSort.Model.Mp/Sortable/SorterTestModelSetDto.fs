@@ -17,12 +17,9 @@ type SorterTestModelSetDto = {
 
 module SorterTestModelSetDto =
 
-    let toDtoMsasORandGen (msas: MsasORandGen) : MsasORandGenDto =
-        { Id = %msas.Id; RngType = msas.RngType; SortingWidth = int msas.SortingWidth; MaxOrbit = msas.MaxOrbit }
+    let toDtoSorterTestModelSet (set: SorterTestModelSet) : SorterTestModelSetDto =
+        { Id = %set.Id; SorterTestModels = set.SorterTestModels |> Array.map SorterTestModelDto.toDto }
 
-    let fromDtoMsasORandGen (dto: MsasORandGenDto) : MsasORandGen =
-        if dto.SortingWidth < 0 then
-            invalidArg "SortingWidth" "Sorting width must be non-negative."
-        if dto.MaxOrbit < 0 then
-            invalidArg "MaxOrbit" "Max orbit must be non-negative."
-        MsasORandGen.create dto.RngType (UMX.tag<sortingWidth> dto.SortingWidth) dto.MaxOrbit
+    let fromDtoSorterTestModelSet (dto: SorterTestModelSetDto) : SorterTestModelSet =
+        let models = dto.SorterTestModels |> Array.map SorterTestModelDto.fromDto
+        SorterTestModelSet.create (UMX.tag<sorterTestModelSetID> dto.Id) models

@@ -21,6 +21,7 @@ open GeneSort.Model.Sorter.Si
 open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Rs
 open GeneSort.Model.Sortable
+open GeneSort.Model.Mp.Sortable
 
 
 module Exp2 = 
@@ -28,6 +29,7 @@ module Exp2 =
     let projectDir = "c:\Projects"
     let randomType = rngType.Lcg
     let excludeSelfCe = true
+    let testModelCount = 10<sorterTestModelCount>
     let parameterSet = 
         [ SwFull.standardMapVals(); SorterTestModels.maxOrbit() ]
 
@@ -38,9 +40,10 @@ module Exp2 =
             let swFull = (run.Parameters["SortingWidth"]) |> SwFull.fromString
             let sortingWidth = swFull |> SwFull.toSortingWidth
             let maxOrbiit = Int32.Parse((run.Parameters["MaxOrbiit"]))
-            let firstIndex = (%cycle * maxOrbiit) |> UMX.tag<sorterCount>
-            let msasORandGen = MsasORandGen.create randomType (sortingWidth) maxOrbiit
-           // sorterTestModel = msasORandGen |> SorterTestModel.SorterTestModelMsasORandGen
+            let firstIndex = (%cycle * %testModelCount) |> UMX.tag<sorterTestModelCount>
+            let sorterTestModelGen = MsasORandGen.create randomType (sortingWidth) maxOrbiit |> SorterTestModelGen.MsasORandGen
+            let sorterTestModelSetMaker = SorterTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
+            let sorterTestModelSetMakerDto = SorterTestModelSetMakerDto.fromDomain sorterTestModelSetMaker
             Console.WriteLine $"Executing run for cycle {cycle} with parameters: {run.Parameters}"
 
         }
