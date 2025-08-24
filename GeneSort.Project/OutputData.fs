@@ -42,6 +42,9 @@ module OutputData =
         | SorterModelSetMaker _ -> "SorterModelSet"
         | SorterTestModelSet _ -> "SorterTestModelSet"
         | SorterTestModelSetMaker _ -> "SorterTestModelSetMaker"
+        | SorterTestSet _ -> "SorterTestSet"
+        | _ -> failwith "Unknown OutputData type"
+
 
     let getOutputDataFolder (workspace:Workspace) (outputDataFolder: string) 
                     : string =

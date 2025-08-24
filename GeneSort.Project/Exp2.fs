@@ -39,23 +39,31 @@ module Exp2 =
 
     let executor (workspace: Workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
         async {
+            try
+                Console.WriteLine(sprintf "Executing Run %d   %A" run.Index run.Parameters)
 
-            Console.WriteLine(sprintf "Executing Run %d   %A" run.Index run.Parameters)
+                let sortingWidth =
+                    match run.Parameters.TryGetValue("SortingWidth") with
+                    | true, value -> value |> SwFull.fromString |> SwFull.toSortingWidth
+                    | false, _ -> failwith "SortingWidth parameter not found"
+                let maxOrbiit =
+                    match Int32.TryParse(run.Parameters["MaxOrbiit"]) with
+                    | true, value -> value
+                    | false, _ -> failwith "Invalid MaxOrbiit value"
 
+                let firstIndex = (%cycle * %testModelCount) |> UMX.tag<sorterTestModelCount>
+                let sorterTestModelGen = MsasORandGen.create randomType sortingWidth maxOrbiit |> SorterTestModelGen.MsasORandGen
+                let sorterTestModelSetMaker = SorterTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
+                let sorterTestModelSet = sorterTestModelSetMaker.MakeSorterTestModelSet
+                let sorterTestSet = sorterTestModelSet.makeSorterTestSet sortableArrayType
+                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestSet |> OutputData.SorterTestSet)
+                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestModelSet |> OutputData.SorterTestModelSet)
+                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestModelSetMaker |> OutputData.SorterTestModelSetMaker)
 
-            let swFull = (run.Parameters["SortingWidth"]) |> SwFull.fromString
-            let sortingWidth = swFull |> SwFull.toSortingWidth
-            let maxOrbiit = Int32.Parse((run.Parameters["MaxOrbiit"]))
-            let firstIndex = (%cycle * %testModelCount) |> UMX.tag<sorterTestModelCount>
-            let sorterTestModelGen = MsasORandGen.create randomType (sortingWidth) maxOrbiit |> SorterTestModelGen.MsasORandGen
-            let sorterTestModelSetMaker = SorterTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
-            let sorterTestModelSet = sorterTestModelSetMaker.MakeSorterTestModelSet
-            let sorterTestSet = sorterTestModelSet.makeSorterTestSet sortableArrayType
-            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestModelSet |> OutputData.SorterTestModelSet)
-            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestModelSetMaker |> OutputData.SorterTestModelSetMaker)
-
-
-            Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %cycle)
+                Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %cycle)
+            with ex ->
+                Console.WriteLine(sprintf "Error in Run %d, Cycle %d: %s" run.Index %cycle ex.Message)
+                raise ex
         }
 
 

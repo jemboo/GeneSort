@@ -113,7 +113,7 @@ module SortableIntArray =
     let getOrbit (maxCount:int) (perm:Permutation) 
                     :sortableIntArray seq =
         Permutation.powerSequence perm  
-        |> CollectionUtils.takeUpToOrWhile maxCount (fun perm -> Permutation.isIdentity perm)
+        |> CollectionUtils.takeUpToOrWhile maxCount (fun perm -> not (Permutation.isIdentity perm))
         |> Seq.map(fun perm -> fromPermutation perm)
 
 
