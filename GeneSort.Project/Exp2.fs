@@ -13,8 +13,10 @@ open MessagePack.Resolvers
 
 open GeneSort.Core
 open GeneSort.Sorter
+open GeneSort.Sorter.Sortable
+open GeneSort.Sorter.Sorter
 open GeneSort.Model
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sortable
 open GeneSort.Project.Params
 open GeneSort.Model.Sorter.Ce
 open GeneSort.Model.Sorter.Si
@@ -28,7 +30,7 @@ module Exp2 =
 
     let projectDir = "c:\Projects"
     let randomType = rngType.Lcg
-    let excludeSelfCe = true
+    let sortableArrayType = SortableArrayType.Ints
     let testModelCount = 10<sorterTestModelCount>
     let parameterSet = 
         [ SwFull.standardMapVals(); SorterTestModels.maxOrbit() ]
@@ -48,7 +50,7 @@ module Exp2 =
             let sorterTestModelGen = MsasORandGen.create randomType (sortingWidth) maxOrbiit |> SorterTestModelGen.MsasORandGen
             let sorterTestModelSetMaker = SorterTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
             let sorterTestModelSet = sorterTestModelSetMaker.MakeSorterTestModelSet
-
+            let sorterTestSet = sorterTestModelSet.makeSorterTestSet sortableArrayType
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestModelSet |> OutputData.SorterTestModelSet)
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestModelSetMaker |> OutputData.SorterTestModelSetMaker)
 

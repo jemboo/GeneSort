@@ -16,12 +16,14 @@ open GeneSort.Model.Sorter
 open GeneSort.Model.Sortable
 open GeneSort.Model.Mp.Sorter
 open GeneSort.Model.Mp.Sortable
-open GeneSort.Sorter.Mp
+open GeneSort.Sorter.Mp.Sorter
+open GeneSort.Sorter.Mp.Sortable
 
 
 type OutputData =
     | Run of Run
     | SorterSet of SorterSet
+    | SorterTestSet of SorterTestSet
     | SorterModelSetMaker of SorterModelSetMaker
     | SorterTestModelSet of SorterTestModelSet
     | SorterTestModelSetMaker of SorterTestModelSetMaker
@@ -70,6 +72,9 @@ module OutputData =
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterSet ss ->
                     let dto = SorterSetDto.fromDomain ss
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | SorterTestSet sts ->
+                    let dto = SorterTestSetDto.toDto sts
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterModelSetMaker sms -> 
                     let dto = SorterModelSetMakerDto.fromDomain sms

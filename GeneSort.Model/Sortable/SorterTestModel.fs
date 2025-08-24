@@ -21,7 +21,7 @@ module SorterTestModel =
         | MsasO msasO -> %msasO.SeedPermutation.Order |> UMX.tag<sortingWidth>
 
 
-    let makeSortableArraySet (model: SorterTestModel) (sortableArrayType:SortableArrayType) : SorterTest =
+    let makeSorterTest (model: SorterTestModel) (sortableArrayType:SortableArrayType) : SorterTest =
         match model with
         | MsasF msasF -> 
                 match sortableArrayType with

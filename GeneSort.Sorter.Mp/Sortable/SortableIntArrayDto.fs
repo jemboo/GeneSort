@@ -1,0 +1,26 @@
+﻿namespace GeneSort.Sorter.Mp.Sortable
+
+open System
+open FSharp.UMX
+open GeneSort.Core
+open GeneSort.Sorter
+open GeneSort.Sorter.Sortable
+open MessagePack
+
+
+
+[<MessagePackObject>]
+type sortableIntArrayDto = {
+    [<Key(0)>] Values: int[]
+    [<Key(1)>] SortingWidth: int
+    [<Key(2)>] SymbolSetSize: int
+}
+
+module SortableIntArrayDto =
+
+    let toDtoIntArray (sia: sortableIntArray) : sortableIntArrayDto =
+        { Values = sia.Values; SortingWidth = int sia.SortingWidth; SymbolSetSize = %sia.SymbolSetSize }
+
+    let fromDtoIntArray (dto: sortableIntArrayDto) : sortableIntArray =
+        sortableIntArray.Create(dto.Values, UMX.tag<sortingWidth> dto.SortingWidth, UMX.tag<symbolSetSize> dto.SymbolSetSize)
+

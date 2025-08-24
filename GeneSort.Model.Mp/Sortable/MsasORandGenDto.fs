@@ -1,11 +1,9 @@
 ﻿namespace GeneSort.Model.Mp.Sortable
 
 open System
-open GeneSort.Model.Sorter
 open MessagePack
 open FSharp.UMX
 open GeneSort.Model.Sortable
-open GeneSort.Core.Mp
 open GeneSort.Sorter
 open GeneSort.Core
 
