@@ -11,7 +11,7 @@ module SorterTestModels =
 
 
     let maxOrbit () : string*string list =
-        ("MaxOrbiit", ["1000"])
+        ("MaxOrbiit", ["100000"])
 
 
 

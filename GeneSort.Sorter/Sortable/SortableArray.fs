@@ -68,6 +68,8 @@ module SortableArray =
             let history = Ce.sortByWithHistory ces startIndex extent useCounter boolArray.Values
             history |> Array.map (fun values -> Bools (sortableBoolArray.Create(values, boolArray.SortingWidth)))
     
+
+
     /// Computes the squared distance between two SortableArray instances of the same kind.
     /// <exception cref="ArgumentException">Thrown when the arrays are of different kinds or have different widths.</exception>
     let distanceSquared (a: SortableArray) (b: SortableArray) : int =

@@ -35,6 +35,8 @@ type sortableIntArray =
 
     /// Gets the values array.
     member this.Values = this.values
+    
+    member this.ArrayLength with get() = this.values.Length
 
     /// Gets the sorting width.
     member this.SortingWidth = this.sortingWidth

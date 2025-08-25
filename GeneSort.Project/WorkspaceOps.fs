@@ -69,23 +69,3 @@ module WorkspaceOps =
             |> Seq.toList
             |> ParallelWithThrottle maxDegreeOfParallelism
         Async.RunSynchronously limitedParallel
-
-
-    //let executeWorkspace 
-    //    (workspace: Workspace) 
-    //    (cycle: int<cycleNumber>)
-    //    (executor: Workspace -> int<cycleNumber> -> Run -> Async<unit>) 
-    //    : unit =
-    //    let runs = getRuns workspace cycle
-    //    for run in runs do
-    //        let filePathRun = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run |> OutputData.toString)
-    //        if File.Exists filePathRun then
-    //                    printfn "Skipping Run %d: Output file %s already exists" run.Index filePathRun
-    //        else
-    //            async {
-    //                try
-    //                    do! executor workspace cycle run
-    //                    do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run)
-    //                with e ->
-    //                    printfn "Error processing Run %d: %s" run.Index e.Message
-    //            } |> Async.RunSynchronously

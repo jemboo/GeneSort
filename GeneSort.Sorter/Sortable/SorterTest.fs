@@ -34,9 +34,11 @@ type SorterTest =
 
     member this.SortableArrayType with get() = SortableArray.getSortableArrayType this.sortableArrays.[0]
 
+    member this.Count with get() = this.sortableArrays.Length
+
     interface IEquatable<SorterTest> with
         member this.Equals(other) =
             this.Id = other.Id && Array.forall2 (=) this.sortableArrays other.sortableArrays
 
 
-module SortableArraySet = ()
+module SorterTest = ()

@@ -25,6 +25,8 @@ type sortableBoolArray =
     /// Gets the values array.
     member this.Values with get() = this.values
 
+    member this.ArrayLength with get() = this.values.Length
+
     /// Gets the sorting order.
     member this.SortingWidth with get()  = this.sortingWidth
 
