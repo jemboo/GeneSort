@@ -29,7 +29,7 @@ type OutputData =
     | SorterTestModelSetMaker of SorterTestModelSetMaker
 
 
-
+     
 module OutputData =
         /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
