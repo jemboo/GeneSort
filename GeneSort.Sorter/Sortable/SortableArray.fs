@@ -50,7 +50,14 @@ module SortableArray =
         | Ints intArray -> intArray.IsSorted
         | Bools boolArray -> boolArray.IsSorted
     
-    let sortByCes (ces: Ce[]) (startIndex: int) (extent: int) (useCounter: int[]) (sortable: SortableArray) : SortableArray =
+    // sorts one sortable (this) by a sequence of ces, and returns an array
+    // tracking how many times each ce was used (useCounter)
+    let sortByCes 
+            (ces: Ce[]) 
+            (startIndex: int)
+            (extent: int) 
+            (useCounter: int[]) 
+            (sortable: SortableArray) : SortableArray =
         match sortable with
         | Ints intArray ->
             let sortedValues = Ce.sortBy ces startIndex extent useCounter intArray.Values
@@ -59,7 +66,14 @@ module SortableArray =
             let sortedValues = Ce.sortBy ces startIndex extent useCounter boolArray.Values
             Bools (sortableBoolArray.Create(sortedValues, boolArray.SortingWidth))
 
-    let sortByCesWithHistory (ces: Ce[]) (startIndex: int) (extent: int) (useCounter: int[]) (sortable: SortableArray) : SortableArray[] =
+    // sorts one sortable (this) by a sequence of ces, and returns an array of the intermediate results (SortableArray[])
+    // as well as tracking how many times each ce was used (useCounter)
+    let sortByCesWithHistory 
+            (ces: Ce[]) 
+            (startIndex: int) 
+            (extent: int) 
+            (useCounter: int[]) 
+            (sortable: SortableArray) : SortableArray[] =
         match sortable with
         | Ints intArray ->
             let history = Ce.sortByWithHistory ces startIndex extent useCounter intArray.Values
@@ -68,7 +82,6 @@ module SortableArray =
             let history = Ce.sortByWithHistory ces startIndex extent useCounter boolArray.Values
             history |> Array.map (fun values -> Bools (sortableBoolArray.Create(values, boolArray.SortingWidth)))
     
-
 
     /// Computes the squared distance between two SortableArray instances of the same kind.
     /// <exception cref="ArgumentException">Thrown when the arrays are of different kinds or have different widths.</exception>
@@ -82,3 +95,23 @@ module SortableArray =
     /// <exception cref="ArgumentException">Thrown when sortingWidth is negative.</exception>
     let getAllBools (sortingWidth: int<sortingWidth>) : SortableArray[] =
         SortableBoolArray.getAllSortableBoolArrays sortingWidth |> Array.map Bools
+
+
+    open System.Linq
+    open System.Collections.Generic
+
+    // Custom comparer for sortableBoolArray based only on Values
+    type SortableBoolArrayValueComparer() =
+        interface IEqualityComparer<sortableBoolArray> with
+            member _.Equals(x, y) =
+                Array.forall2 (=) x.Values y.Values
+            member _.GetHashCode(obj) =
+                // Efficiently hash the Values bool array
+                let mutable hash = 17
+                for v in obj.Values do
+                    hash <- hash * 23 + v.GetHashCode()
+                hash
+
+    // Function to remove duplicates based on Values
+    let removeDuplicatesByValues (arr: sortableBoolArray[]) : sortableBoolArray[] =
+        arr.Distinct(SortableBoolArrayValueComparer()).ToArray()

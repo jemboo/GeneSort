@@ -19,5 +19,4 @@ module SorterTestModelGen =
                 SorterTestModel seq =
         match gen with
         | MsasORandGen msasORandGen ->
-                msasORandGen.getMsasOs(firstIndex)
-                    |> Seq.take(count)
+                msasORandGen.getMsasOs(firstIndex) |> Seq.take(count)

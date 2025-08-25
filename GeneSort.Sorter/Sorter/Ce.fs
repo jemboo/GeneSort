@@ -54,11 +54,14 @@ module Ce =
                 result.[ce.Hi] <- temp
                 useCounter.[i] <- useCounter.[i] + 1
         result
-
+         
+    // sorts one sortable (values[]) by a sequence of ces, 
+    // returning an array of the intermediate results (values[][]) 
     let inline sortByWithHistory< ^a when ^a: comparison> 
                 (ces: Ce[]) 
                 (startIndex: int) (extent: int) 
-                (useCounter: int[]) (values: ^a[]) : ^a[][] =
+                (useCounter: int[]) 
+                (values: ^a[]) : ^a[][] =
         let result = Array.init (extent + 1) (fun _ -> Array.copy values)
         for i = 0 to extent - 1 do
             let ce = ces.[startIndex + i]

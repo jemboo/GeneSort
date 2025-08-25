@@ -42,11 +42,23 @@ type sortableBoolArray =
     /// Checks if the values array is sorted in non-decreasing order.
     member this.IsSorted = ArrayProperties.isSorted this.values
      
-    member this.SortByCes(ces: Ce[]) (startIndex: int) (extent: int) (useCounter: int[]) =
+    // sorts one sortable (this) by a sequence of ces, and returns an array
+    // tracking how many times each ce was used (useCounter)
+    member this.SortByCes
+                (ces: Ce[]) 
+                (startIndex: int) 
+                (extent: int) 
+                (useCounter: int[]) : sortableBoolArray =
         let sortedValues = Ce.sortBy ces startIndex extent useCounter this.values
         sortableBoolArray.Create(sortedValues, this.SortingWidth)
 
-    member this.SortByCesWithHistory(ces: Ce[]) (startIndex: int) (extent: int) (useCounter: int[]) =
+    // sorts one sortable (this) by a sequence of ces, and returns an array of the intermediate results (sortableBoolArray[])
+    // as well as tracking how many times each ce was used (useCounter)
+    member this.SortByCesWithHistory 
+                (ces: Ce[]) 
+                (startIndex: int) 
+                (extent: int) 
+                (useCounter: int[]) : sortableBoolArray[] =
         let history = Ce.sortByWithHistory ces startIndex extent useCounter this.values
         let sw = this.SortingWidth
         history |> Array.map (fun values -> sortableBoolArray.Create(values, sw))

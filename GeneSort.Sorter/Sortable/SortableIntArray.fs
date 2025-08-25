@@ -53,12 +53,24 @@ type sortableIntArray =
 
     /// Checks if the values array is sorted in non-decreasing order.
     member this.IsSorted = ArrayProperties.isSorted this.values
-
-    member this.SortByCes(ces: Ce[]) (startIndex: int) (extent: int) (useCounter: int[]) =
+    
+    // sorts one sortable (this) by a sequence of ces, and returns an array
+    // tracking how many times each ce was used (useCounter)
+    member this.SortByCes
+                (ces: Ce[]) 
+                (startIndex: int) 
+                (extent: int) 
+                (useCounter: int[]) : sortableIntArray =
         let sortedValues = Ce.sortBy ces startIndex extent useCounter this.values
         sortableIntArray.Create(sortedValues, this.SortingWidth, this.symbolSetSize)
 
-    member this.SortByCesWithHistory(ces: Ce[]) (startIndex: int) (extent: int) (useCounter: int[]) =
+    // sorts one sortable (this) by a sequence of ces, and returns an array of the intermediate results (sortableIntArray[])
+    // as well as tracking how many times each ce was used (useCounter)
+    member this.SortByCesWithHistory 
+                        (ces: Ce[]) 
+                        (startIndex: int) 
+                        (extent: int) 
+                        (useCounter: int[]) : sortableIntArray[] =
         let history = Ce.sortByWithHistory ces startIndex extent useCounter this.values
         let sw = this.SortingWidth
         let sss = this.SymbolSetSize
@@ -142,3 +154,23 @@ module SortableIntArray =
 
                 sortableIntArray.Create(arrayData, sortingWidth, (%sortingWidth |>  UMX.tag<symbolSetSize>))
         |]
+
+
+    open System.Linq
+    open System.Collections.Generic
+
+    // Custom comparer for sortableIntArray based only on Values
+    type SortableIntArrayValueComparer() =
+        interface IEqualityComparer<sortableIntArray> with
+            member _.Equals(x, y) =
+                Array.forall2 (=) x.Values y.Values
+            member _.GetHashCode(obj) =
+                // Efficiently hash the Values array
+                let mutable hash = 17
+                for v in obj.Values do
+                    hash <- hash * 23 + v.GetHashCode()
+                hash
+
+    // Function to remove duplicates based on Values
+    let removeDuplicatesByValues (arr: sortableIntArray[]) : sortableIntArray[] =
+        arr.Distinct(SortableIntArrayValueComparer()).ToArray()
