@@ -6,16 +6,18 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
 
-type SorterIntTestSet =
+type sorterIntTestSet =
     { Id: Guid<sorterTestSetId>
-      sorterTests: SorterIntTest[] }
+      sorterTests: sorterIntTest[] }
 
     static member create 
                     (id: Guid<sorterTestSetId>) 
-                    (arrays: SorterIntTest[]) : SorterIntTestSet =
+                    (arrays: sorterIntTest[]) : sorterIntTestSet =
         if Array.isEmpty arrays then
             invalidArg "arrays" "Arrays must not be empty."
         { Id = id; sorterTests = Array.copy arrays; }
+
+    member this.Count with get() = this.sorterTests.Length
 
     member this.SortableArrayType with get() = SortableArrayType.Ints
 

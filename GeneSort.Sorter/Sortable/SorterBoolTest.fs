@@ -7,12 +7,12 @@ open GeneSort.Core
 open GeneSort.Sorter
 
 [<Struct; CustomEquality; NoComparison>]
-type SorterBoolTest =
+type sorterBoolTest =
     { id: Guid<sorterTestId>
       sortingWidth: int<sortingWidth>
       sortableArrays: sortableBoolArray[] }
 
-    static member create (id: Guid<sorterTestId>) (arrays: sortableBoolArray[]) : SorterBoolTest =
+    static member create (id: Guid<sorterTestId>) (arrays: sortableBoolArray[]) : sorterBoolTest =
         //if Array.isEmpty arrays then
         //    invalidArg "arrays" "Arrays must not be empty."
         //let arrayType = SortableArray.getSortableArrayType arrays.[0]
@@ -25,7 +25,7 @@ type SorterBoolTest =
 
     override this.Equals(obj) =
         match obj with
-        | :? SorterBoolTest as other ->
+        | :? sorterBoolTest as other ->
             this.Id = other.Id && Array.forall2 (=) this.sortableArrays other.sortableArrays
         | _ -> false
 
@@ -41,7 +41,7 @@ type SorterBoolTest =
 
     member this.SortingWidth with get() = this.sortingWidth
 
-    interface IEquatable<SorterBoolTest> with
+    interface IEquatable<sorterBoolTest> with
         member this.Equals(other) =
             this.Id = other.Id && Array.forall2 (=) this.sortableArrays other.sortableArrays
 

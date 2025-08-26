@@ -7,18 +7,19 @@ open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Sorter.Sortable
 
+
 [<MessagePackObject>]
-type SorterTestSetDto = {
-    [<Key(0)>] Id: Guid
-    [<Key(1)>] sorterTestDtos: sorterTestDto[]
-}
+type sorterTestSetDto =
+    | Ints of sorterIntTestSetDto
+    | Bools of sorterBoolTestSetDto
 
 module SorterTestSetDto =
-    let toDto (sorterTestSet: SorterTestSet) : SorterTestSetDto =
-        { Id = %sorterTestSet.Id
-          sorterTestDtos = sorterTestSet.sorterTests |> Array.map SorterTestDto.toDto }
+    let toDto (sorterTestSet: sorterTestSet) : sorterTestSetDto =
+        match sorterTestSet with
+        | sorterTestSet.Ints intTestSet -> Ints (SorterIntTestSetDto.toDto intTestSet)
+        | sorterTestSet.Bools boolTestSet -> Bools (SorterBoolTestSetDto.toDto boolTestSet)
 
-    let fromDto (dto: SorterTestSetDto) : SorterTestSet =
-        let sorterTests = dto.sorterTestDtos |> Array.map SorterTestDto.fromDto
-        let id = UMX.tag<sorterTestSetId> dto.Id
-        SorterTestSet.create id sorterTests
+    let fromDto (dto: sorterTestSetDto) : sorterTestSet =
+        match dto with
+        | Ints intTestSetDto -> sorterTestSet.Ints (SorterIntTestSetDto.fromDto intTestSetDto)
+        | Bools boolTestSetDto -> sorterTestSet.Bools (SorterBoolTestSetDto.fromDto boolTestSetDto)

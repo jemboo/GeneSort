@@ -100,12 +100,17 @@ module Exp2 =
                         async {
                             try
                                 use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                                let! dto = MessagePackSerializer.DeserializeAsync<SorterTestSetDto>(stream, options).AsTask() |> Async.AwaitTask
+                                let! dto = MessagePackSerializer.DeserializeAsync<sorterTestSetDto>(stream, options).AsTask() |> Async.AwaitTask
                                 let sorterTestSet = SorterTestSetDto.fromDto dto
+                                let sorterIntTestSet = 
+                                    match sorterTestSet with
+                                    | sorterTestSet.Ints intTestSet -> intTestSet
+                                    | sorterTestSet.Bools _ -> failwith "Expected Ints sorterTestSet"
+
                                 let sorterTestData =
-                                    sorterTestSet.sorterTests
+                                    sorterIntTestSet.sorterTests
                                     |> Array.map (fun sorterTest ->
-                                        (%sorterTest.Id, %sorterTestSet.SortingWidth, sorterTest.Count))
+                                        (%sorterTest.Id, %(sorterTestSet |> SorterTestset.getSortingWidth), sorterTest.Count))
                                 return Some sorterTestData
                             with e ->
                                 printfn "Error processing file %s: %s" filePath e.Message
