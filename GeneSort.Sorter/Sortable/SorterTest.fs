@@ -1,6 +1,7 @@
 ﻿
 namespace GeneSort.Sorter.Sortable
 
+
 type sorterTest = 
     | Ints of sorterIntTest
     | Bools of sorterBoolTest

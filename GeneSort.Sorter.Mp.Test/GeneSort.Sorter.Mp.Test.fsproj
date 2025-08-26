@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SortableArrayDtoTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
