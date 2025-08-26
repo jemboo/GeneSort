@@ -45,7 +45,7 @@ type MsasF =
         member this.Equals(other) = 
             this.sortingWidth = other.sortingWidth
 
-    member this.MakeSorterTestSet (sortingWidth: int<sortingWidth>) : SorterTest =
+    member this.MakeSorterTest (sortingWidth: int<sortingWidth>) : SorterTest =
         let sortableArrays = 
                 SortableBoolArray.getAllSortableBoolArrays sortingWidth |> Array.map(SortableArray.Bools)
         SorterTest.create ( %this.id |> UMX.tag<sorterTestId>) sortableArrays

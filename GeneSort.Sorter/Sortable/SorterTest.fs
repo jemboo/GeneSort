@@ -6,7 +6,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
 
-[<Struct; CustomEquality; NoComparison>]
+//[<Struct; CustomEquality; NoComparison>]
 type SorterTest =
     { id: Guid<sorterTestId>
       sortingWidth: int<sortingWidth>
@@ -23,24 +23,11 @@ type SorterTest =
         //    invalidArg "arrays" "All SortableArrays must have the same type (Ints or Bools)."
         { id = id; sortingWidth = sortingWidth; sortableArrays = Array.copy arrays }
 
-    override this.Equals(obj) =
-        match obj with
-        | :? SorterTest as other ->
-            this.Id = other.Id && Array.forall2 (=) this.sortableArrays other.sortableArrays
-        | _ -> false
-
-    override this.GetHashCode() =
-        hash (this.Id, hash this.sortableArrays)
 
     member this.SortableArrayType with get() = SortableArray.getSortableArrayType this.sortableArrays.[0]
 
     member this.Count with get() = this.sortableArrays.Length
 
     member this.Id with get() = this.id
-
-    interface IEquatable<SorterTest> with
-        member this.Equals(other) =
-            this.Id = other.Id && Array.forall2 (=) this.sortableArrays other.sortableArrays
-
 
 module SorterTest = ()

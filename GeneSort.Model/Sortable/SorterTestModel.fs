@@ -26,7 +26,7 @@ module SorterTestModel =
         | MsasF msasF -> 
                 match sortableArrayType with
                 | SortableArrayType.Bools ->        
-                        msasF.MakeSorterTestSet(getSortingWidth model)
+                        msasF.MakeSorterTest(getSortingWidth model)
                 | SortableArrayType.Ints ->
                     failwith "Ints SortableArrayType not supported"
 

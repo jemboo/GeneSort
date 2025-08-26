@@ -9,11 +9,11 @@ open GeneSort.Sorter
 type SorterBoolTestSet =
 
     { Id: Guid<sorterTestSetId>
-      sorterTests: SorterIntTest[] }
+      sorterTests: SorterBoolTest[] }
 
     static member create 
                     (id: Guid<sorterTestSetId>) 
-                    (arrays: SorterIntTest[]) : SorterBoolTestSet =
+                    (arrays: SorterBoolTest[]) : SorterBoolTestSet =
         if Array.isEmpty arrays then
             invalidArg "arrays" "Arrays must not be empty."
         let sortingWidth = arrays.[0].sortableArrays.[0]
@@ -21,7 +21,7 @@ type SorterBoolTestSet =
 
     member this.SortableArrayType with get() = SortableArrayType.Bools
 
-    member this.SortingWidth with get() = this.sorterTests.[0].sortableArrays.[0]
+    member this.SortingWidth with get() = this.sorterTests.[0].sortableArrays.[0].SortingWidth
 
 
 module SorterBoolTestSet = ()

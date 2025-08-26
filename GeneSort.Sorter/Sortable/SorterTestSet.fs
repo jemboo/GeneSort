@@ -25,6 +25,23 @@ type SorterTestSet =
     member this.SortingWidth with get() = SortableArray.sortingWidth (this.sorterTests.[0]).sortableArrays.[0]
 
 
-module SorterTestset = ()
+
+//type SorterTestSet = 
+//    | Ints of SorterIntTestSet
+//    | Bools of SorterBoolTestSet
 
 
+
+
+//module SorterTestset =
+
+//    let getSortableArrayType (testSet: SorterTestSet) =
+//        match testSet with
+//        | Ints intTestSet -> intTestSet.SortableArrayType
+//        | Bools boolTestSet -> boolTestSet.SortableArrayType
+
+//    let getSortingWidth (testSet: SorterTestSet) =
+//        match testSet with
+//        | Ints intTestSet -> intTestSet.SortingWidth
+//        | Bools boolTestSet -> boolTestSet.SortingWidth
+        
