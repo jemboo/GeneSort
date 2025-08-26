@@ -18,7 +18,11 @@
     <Compile Include="Sortable\SortableIntArray.fs" />
     <Compile Include="Sortable\SortableArray.fs" />
     <Compile Include="Sortable\SorterTest.fs" />
+    <Compile Include="Sortable\SorterBoolTest.fs" />
+    <Compile Include="Sortable\SorterIntTest.fs" />
     <Compile Include="Sortable\SorterTestSet.fs" />
+    <Compile Include="Sortable\SorterBoolTestSet.fs" />
+    <Compile Include="Sortable\SorterIntTestSet.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

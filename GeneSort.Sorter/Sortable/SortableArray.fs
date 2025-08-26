@@ -95,23 +95,3 @@ module SortableArray =
     /// <exception cref="ArgumentException">Thrown when sortingWidth is negative.</exception>
     let getAllBools (sortingWidth: int<sortingWidth>) : SortableArray[] =
         SortableBoolArray.getAllSortableBoolArrays sortingWidth |> Array.map Bools
-
-
-    open System.Linq
-    open System.Collections.Generic
-
-    // Custom comparer for sortableBoolArray based only on Values
-    type SortableBoolArrayValueComparer() =
-        interface IEqualityComparer<sortableBoolArray> with
-            member _.Equals(x, y) =
-                Array.forall2 (=) x.Values y.Values
-            member _.GetHashCode(obj) =
-                // Efficiently hash the Values bool array
-                let mutable hash = 17
-                for v in obj.Values do
-                    hash <- hash * 23 + v.GetHashCode()
-                hash
-
-    // Function to remove duplicates based on Values
-    let removeDuplicatesByValues (arr: sortableBoolArray[]) : sortableBoolArray[] =
-        arr.Distinct(SortableBoolArrayValueComparer()).ToArray()

@@ -115,6 +115,39 @@ module SortableBoolArray =
         result.ToArray()
 
 
+    open System.Linq
+    open System.Collections.Generic
+
+    // Custom comparer for sortableBoolArray based only on Values
+    type SortableBoolArrayValueComparer() =
+        interface IEqualityComparer<sortableBoolArray> with
+            member _.Equals(x, y) =
+                Array.forall2 (=) x.Values y.Values
+            member _.GetHashCode(obj) =
+                // Efficiently hash the Values bool array
+                let mutable hash = 17
+                for v in obj.Values do
+                    hash <- hash * 23 + v.GetHashCode()
+                hash
+
+    // Function to remove duplicates based on Values
+    let removeDuplicatesByValues (arr: sortableBoolArray[]) : sortableBoolArray[] =
+        arr.Distinct(SortableBoolArrayValueComparer()).ToArray()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //module SortableBoolArray =
 
 
@@ -139,21 +172,3 @@ module SortableBoolArray =
 //              order = order })
 
 
-//    let allBooleanVersions (sortableInts: sortableIntArray) =
-//        let order = sortableInts |> SortableIntArray.getOrder |> UMX.untag
-//        let values = sortableInts |> SortableIntArray.getValues
-//        let threshHolds = values |> Set.ofArray |> Set.toArray |> Array.sort |> Array.skip 1
-
-//        threshHolds
-//        |> Seq.map (fun thresh -> Array.init order (fun dex -> if (values.[dex] >= thresh) then true else false))
-
-
-
-//    let expandToSortableBits (sortableIntsSeq: seq<sortableIntArray>) =
-//        let order = sortableIntsSeq |> Seq.head |> SortableIntArray.getOrder
-
-//        sortableIntsSeq
-//        |> Seq.map (allBooleanVersions)
-//        |> Seq.concat
-//        |> Seq.distinct
-//        |> Seq.map (make order)
