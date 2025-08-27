@@ -12,6 +12,10 @@ open System.Collections.Generic
 
 
 
+type CeBlockEval = { ceBlock: ceBlock}
+
+
+
 
 
 module CeBlockEval = ()

@@ -34,7 +34,7 @@ type SorterModelMakerDtoTests() =
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     // Helper function to perform round-trip serialization
-    let roundTrip (sorterModelSetMaker: SorterModelSetMaker) : SorterModelSetMaker =
+    let roundTrip (sorterModelSetMaker: sorterModelSetMaker) : sorterModelSetMaker =
         let dto = SorterModelSetMakerDto.fromDomain sorterModelSetMaker
         let bytes = MessagePackSerializer.Serialize(dto, options)
         let deserializedDto = MessagePackSerializer.Deserialize<SorterModelSetMakerDto>(bytes, options)
@@ -45,7 +45,7 @@ type SorterModelMakerDtoTests() =
         let excludeSelfCe = true 
         let msceRandGen = MsceRandGen.create rngType.Lcg (UMX.tag<sortingWidth> 16) excludeSelfCe (UMX.tag<ceCount> 10)
         let sorterModelMaker = SorterModelMaker.SmmMsceRandGen msceRandGen
-        let sorterModelSetMaker = SorterModelSetMaker.create sorterModelMaker 0<sorterCount> 5<sorterCount>
+        let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker 0<sorterCount> 5<sorterCount>
         let result = roundTrip sorterModelSetMaker
         Assert.Equal(sorterModelSetMaker.Id, result.Id)
         Assert.Equal(sorterModelSetMaker.FirstIndex, result.FirstIndex)

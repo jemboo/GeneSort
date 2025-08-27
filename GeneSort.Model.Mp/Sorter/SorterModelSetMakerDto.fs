@@ -28,19 +28,19 @@ module SorterModelSetMakerDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toDomain (dto: SorterModelSetMakerDto) : SorterModelSetMaker =
+    let toDomain (dto: SorterModelSetMakerDto) : sorterModelSetMaker =
         if dto.Count <= 0 then
             failwith "Count must be greater than 0"
         if dto.FirstIndex < 0 then
             failwith "FirstIndex must be non-negative"
         let sorterModelMaker = SorterModelMakerDto.fromSorterModelMakerDto dto.SorterModelMaker
 
-        SorterModelSetMaker.create
+        sorterModelSetMaker.create
             sorterModelMaker
             (dto.FirstIndex |> UMX.tag<sorterCount>)
             (dto.Count |> UMX.tag<sorterCount>)
 
-    let fromDomain (domain: SorterModelSetMaker) : SorterModelSetMakerDto =
+    let fromDomain (domain: sorterModelSetMaker) : SorterModelSetMakerDto =
         { Id = %domain.Id
           SorterModelMaker = SorterModelMakerDto.toSorterModelMakerDto domain.SorterModelMaker
           FirstIndex = %domain.FirstIndex

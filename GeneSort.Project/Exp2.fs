@@ -54,7 +54,7 @@ module Exp2 =
 
                 let firstIndex = (%cycle * %testModelCount) |> UMX.tag<sorterTestModelCount>
                 let sorterTestModelGen = MsasORandGen.create randomType sortingWidth maxOrbiit |> SorterTestModelGen.MsasORandGen
-                let sorterTestModelSetMaker = SorterTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
+                let sorterTestModelSetMaker = sorterTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
                 let sorterTestModelSet = sorterTestModelSetMaker.MakeSorterTestModelSet
                 let sorterTestSet = sorterTestModelSet.makeSorterTestSet sortableArrayType
                 do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestSet |> OutputData.SorterTestSet)

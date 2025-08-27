@@ -10,7 +10,7 @@ type SorterModelSet =
       SorterModels : SorterModel[] }
 
 module SorterModelSet =
-    let makeSorterSet (modelSet: SorterModelSet) : SorterSet =
+    let makeSorterSet (modelSet: SorterModelSet) : sorterSet =
         let sorters = modelSet.SorterModels 
                         |> Array.map (fun sm -> sm |> SorterModel.makeSorter)
         SorterSet.create (%modelSet.Id |> UMX.tag<sorterSetId>) sorters

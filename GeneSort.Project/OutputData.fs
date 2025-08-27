@@ -22,11 +22,11 @@ open GeneSort.Sorter.Mp.Sortable
 
 type OutputData =
     | Run of Run
-    | SorterSet of SorterSet
+    | SorterSet of sorterSet
     | SorterTestSet of sorterTestSet
-    | SorterModelSetMaker of SorterModelSetMaker
-    | SorterTestModelSet of SorterTestModelSet
-    | SorterTestModelSetMaker of SorterTestModelSetMaker
+    | SorterModelSetMaker of sorterModelSetMaker
+    | SorterTestModelSet of sorterTestModelSet
+    | SorterTestModelSetMaker of sorterTestModelSetMaker
 
 
      

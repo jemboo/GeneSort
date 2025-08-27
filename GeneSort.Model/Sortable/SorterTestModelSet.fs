@@ -6,7 +6,7 @@ open GeneSort.Sorter
 open GeneSort.Core
 open GeneSort.Sorter.Sortable
 
-type SorterTestModelSet =
+type sorterTestModelSet =
     private
         { 
           id : Guid<sorterTestModelSetID>

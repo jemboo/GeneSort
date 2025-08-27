@@ -11,23 +11,23 @@ open System.Collections.Generic
 [<Measure>] type ceBlockSize
 
 
-type CeBlock = { ces: Ce array }
+type ceBlock = { ces: Ce array }
 
 
-module CeBlock = ()
+module CeBlock =
 
     //let getSingleCeBlock (sorter:Sorter) =
     //    { ces = sorter.Ces }
         
 
-    //let breakUpIntoBlocks (ces:Ce[]) (blockSize:int<ceBlockSize>) =
-    //    let totalCes = ces.Length
-    //    let blocks = 
-    //        [|
-    //            let mutable index = 0
-    //            while index < totalCes do
-    //                let blockCes = ces.[index .. Math.Min(index + %blockSize - 1, totalCes - 1)]
-    //                yield { ces = blockCes }
-    //                index <- index + %blockSize
-    //        |]
-    //    blocks
+    let breakUpIntoBlocks (ces:Ce[]) (blockSize:int<ceBlockSize>) =
+        let totalCes = ces.Length
+        let blocks = 
+            [|
+                let mutable index = 0
+                while index < totalCes do
+                    let blockCes = ces.[index .. Math.Min(index + %blockSize - 1, totalCes - 1)]
+                    yield { ces = blockCes }
+                    index <- index + %blockSize
+            |]
+        blocks

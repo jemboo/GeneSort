@@ -59,7 +59,7 @@ module Exp1 =
             let sorterCount = swFull |> SorterCount.getSorterCountForSwFull
             let firstIndex = (%cycle * %sorterCount) |> UMX.tag<sorterCount>
             
-            let sorterModelSetMaker = SorterModelSetMaker.create modelMaker firstIndex sorterCount
+            let sorterModelSetMaker = sorterModelSetMaker.create modelMaker firstIndex sorterCount
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 

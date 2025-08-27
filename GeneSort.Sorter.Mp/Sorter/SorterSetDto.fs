@@ -17,11 +17,11 @@ type SorterSetDto = {
 }
 
 module SorterSetDto =
-    let fromDomain (sorterSet: SorterSet) : SorterSetDto =
+    let fromDomain (sorterSet: sorterSet) : SorterSetDto =
         { SorterSetId = %sorterSet.SorterSetId
           Sorters = sorterSet.Sorters |> Array.map SorterDto.toSorterDto }
 
-    let fromSorterSetDto (dto: SorterSetDto) : SorterSet =
+    let fromSorterSetDto (dto: SorterSetDto) : sorterSet =
         if dto.SorterSetId = Guid.Empty then
             failwith "SorterSet ID must not be empty"
         if Array.isEmpty dto.Sorters then
