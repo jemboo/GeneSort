@@ -42,26 +42,24 @@ type sortableBoolArray =
     /// Checks if the values array is sorted in non-decreasing order.
     member this.IsSorted = ArrayProperties.isSorted this.values
      
-    // sorts one sortable (this) by a sequence of ces, and returns an array
-    // tracking how many times each ce was used (useCounter)
+   // mutates a copy of values in placeby a sequence of ces, and returns the resulting sortable.
+   // records the number of uses of each ce in useCounter, starting at useCounterOffset
     member this.SortByCes
                 (ces: Ce[]) 
-                (startIndex: int) 
-                (extent: int) 
+                (useCounterOffsest: int) 
                 (useCounter: int[]) : sortableBoolArray =
-        let sortedValues = Ce.sortBy ces startIndex extent useCounter this.values
+        let sortedValues = Ce.sortBy ces useCounter useCounterOffsest (Array.copy this.values)
         sortableBoolArray.Create(sortedValues, this.SortingWidth)
 
-    // sorts one sortable (this) by a sequence of ces, and returns an array of the intermediate results (sortableBoolArray[])
-    // as well as tracking how many times each ce was used (useCounter)
+
     member this.SortByCesWithHistory 
-                (ces: Ce[]) 
-                (startIndex: int) 
-                (extent: int) 
-                (useCounter: int[]) : sortableBoolArray[] =
-        let history = Ce.sortByWithHistory ces startIndex extent useCounter this.values
+                (ces: Ce[])
+                (useCounter: int[]) 
+                (useCounterOffset: int) : sortableBoolArray[] =
+        let history = Ce.sortByWithHistory ces useCounter useCounterOffset this.values
         let sw = this.SortingWidth
         history |> Array.map (fun values -> sortableBoolArray.Create(values, sw))
+
 
     override this.Equals(obj) =
         match obj with

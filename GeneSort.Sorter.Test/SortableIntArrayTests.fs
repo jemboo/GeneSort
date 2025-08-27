@@ -63,56 +63,37 @@ type SortableIntArrayTests() =
         let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
         let ces = [| Ce.create 1 2; Ce.create 0 1 |]
         let useCounter = [| 0; 0 |]
-        let sorted = arr.SortByCes ces 0 2 useCounter
+        let sorted = arr.SortByCes ces 0 useCounter
         Assert.Equal<int>([| 0; 1; 2 |], sorted.Values)
         Assert.True(sorted.IsSorted)
         Assert.Equal(arr.SortingWidth, sorted.SortingWidth)
-        Assert.Equal(arr.SymbolSetSize, sorted.SymbolSetSize)
+        Assert.Equal(arr.SymbolSetSize, sorted.SymbolSetSize) 
         Assert.Equal<int>([| 1; 0 |], useCounter)
 
     [<Fact>]
     let ``SortByCes with empty ces returns copy`` () =
         let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
         let useCounter = [||]
-        let sorted = arr.SortByCes [||] 0 0 useCounter
+        let sorted = arr.SortByCes [||] 0 useCounter
         Assert.Equal<int>(arr.Values, sorted.Values)
         Assert.Equal(arr.SortingWidth, sorted.SortingWidth)
         Assert.Equal(arr.SymbolSetSize, sorted.SymbolSetSize)
         Assert.Equal<int>([||], useCounter)
 
     [<Fact>]
-    let ``SortByCes with partial extent sorts correctly`` () =
-        let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
-        let ces = [| Ce.create 1 2; Ce.create 0 1 |]
-        let useCounter = [| 0; 0 |]
-        let sorted = arr.SortByCes ces 0 1 useCounter
-        Assert.Equal<int>([| 0; 1; 2 |], sorted.Values)
-        Assert.Equal<int>([| 1; 0 |], useCounter)
-
-    [<Fact>]
     let ``SortByCesWithHistory captures sorting steps correctly`` () =
         let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
-        let ces = [| Ce.create 1 2; Ce.create 0 1 |]
-        let useCounter = [| 0; 0 |]
-        let history = arr.SortByCesWithHistory ces 0 2 useCounter
-        Assert.Equal(3, history.Length)
+        let ces = [| Ce.create 1 2; Ce.create 0 1 ; Ce.create 0 1 |]
+        let useCounter = [| 0; 0; 0 |]
+        let history = arr.SortByCesWithHistory ces useCounter 0
+        Assert.Equal(4, history.Length)
         Assert.Equal<int>([| 0; 2; 1 |], history.[0].Values)
         Assert.Equal<int>([| 0; 1; 2 |], history.[1].Values)
         Assert.Equal<int>([| 0; 1; 2 |], history.[2].Values)
+        Assert.Equal<int>([| 0; 1; 2 |], history.[3].Values)
         Assert.True(history.[2].IsSorted)
         Assert.True(history |> Array.forall (fun x -> x.SortingWidth = arr.SortingWidth && x.SymbolSetSize = arr.SymbolSetSize))
-        Assert.Equal<int>([| 1; 0 |], useCounter)
-
-    [<Fact>]
-    let ``SortByCesWithHistory with partial extent captures correctly`` () =
-        let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
-        let ces = [| Ce.create 1 2; Ce.create 0 1 |]
-        let useCounter = [| 0; 0 |]
-        let history = arr.SortByCesWithHistory ces 1 1 useCounter
-        Assert.Equal(2, history.Length)
-        Assert.Equal<int>([| 0; 2; 1 |], history.[0].Values)
-        Assert.Equal<int>([| 0; 2; 1 |], history.[1].Values)
-        Assert.Equal<int>([| 0; 0 |], useCounter)
+        Assert.Equal<int>([| 1; 0; 0 |], useCounter)
 
 
     [<Fact>]

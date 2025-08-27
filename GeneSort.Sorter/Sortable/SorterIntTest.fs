@@ -5,6 +5,7 @@ open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
+open GeneSort.Sorter.Sorter
 
 [<Struct; CustomEquality; NoComparison>]
 type sorterIntTest =
@@ -40,9 +41,19 @@ type sorterIntTest =
     
     member this.SortingWidth with get() = this.sortingWidth
 
+    member this.SortableArrays with get() : sortableIntArray[] = Array.copy this.sortableArrays
+     
+    //member this.ApplyCes 
+    //                (ces: Ce[])                 
+    //                (useCounter: int[]) 
+    //                (useCounterOffset: int) =
+    //    let newArrays =  Array.copy this.sortableArrays
+    //    sorterIntTest.create (Guid.NewGuid()) newArrays 
+
     interface IEquatable<sorterIntTest> with
         member this.Equals(other) =
             this.Id = other.Id && Array.forall2 (=) this.sortableArrays other.sortableArrays
 
 
 module SorterIntTest = ()
+ 

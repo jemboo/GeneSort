@@ -54,27 +54,25 @@ type sortableIntArray =
     /// Checks if the values array is sorted in non-decreasing order.
     member this.IsSorted = ArrayProperties.isSorted this.values
     
-    // sorts one sortable (this) by a sequence of ces, and returns an array
-    // tracking how many times each ce was used (useCounter)
+   // mutates a copy of values in placeby a sequence of ces, and returns the resulting sortable.
+   // records the number of uses of each ce in useCounter, starting at useCounterOffset
     member this.SortByCes
                 (ces: Ce[]) 
-                (startIndex: int) 
-                (extent: int) 
+                (useCounterOffsest: int) 
                 (useCounter: int[]) : sortableIntArray =
-        let sortedValues = Ce.sortBy ces startIndex extent useCounter this.values
+        let sortedValues = Ce.sortBy ces useCounter useCounterOffsest (Array.copy this.values)
         sortableIntArray.Create(sortedValues, this.SortingWidth, this.symbolSetSize)
 
-    // sorts one sortable (this) by a sequence of ces, and returns an array of the intermediate results (sortableIntArray[])
-    // as well as tracking how many times each ce was used (useCounter)
+
     member this.SortByCesWithHistory 
-                        (ces: Ce[]) 
-                        (startIndex: int) 
-                        (extent: int) 
-                        (useCounter: int[]) : sortableIntArray[] =
-        let history = Ce.sortByWithHistory ces startIndex extent useCounter this.values
+                (ces: Ce[])
+                (useCounter: int[]) 
+                (useCounterOffset: int) : sortableIntArray[] =
+        let history = Ce.sortByWithHistory ces useCounter useCounterOffset this.values
         let sw = this.SortingWidth
         let sss = this.SymbolSetSize
         history |> Array.map (fun values -> sortableIntArray.Create(values, sw, sss))
+
 
     member this.ToSortableBoolArrays() : sortableBoolArray[] =
         if this.SortingWidth <= 1<sortingWidth> then

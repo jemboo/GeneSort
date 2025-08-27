@@ -41,6 +41,8 @@ type sorterBoolTest =
 
     member this.SortingWidth with get() = this.sortingWidth
 
+    member this.SortableArrays with get() : sortableBoolArray[] = Array.copy this.sortableArrays
+
     interface IEquatable<sorterBoolTest> with
         member this.Equals(other) =
             this.Id = other.Id && Array.forall2 (=) this.sortableArrays other.sortableArrays

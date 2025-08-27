@@ -41,36 +41,42 @@ module Ce =
     let toString (ce: Ce) : string =
         sprintf "(%d, %d)" ce.Low ce.Hi
 
+
+   // mutates in placeby a sequence of ces, and returns the resulting sortable (values[]),
+   // records the number of uses of each ce in useCounter, starting at useCounterOffset
     let inline sortBy< ^a when ^a: comparison> 
                 (ces: Ce[]) 
-                (startIndex: int) (extent: int) 
-                (useCounter: int[]) (values: ^a[]) : ^a[] =
-        let result = Array.copy values
-        for i = startIndex to startIndex + extent - 1 do
+                (useCounter: int[]) 
+                (useCounterOffset: int)
+                (values: ^a[]) : ^a[] =
+
+        for i = 0 to ces.Length - 1 do
             let ce = ces.[i]
-            if result.[ce.Low] > result.[ce.Hi] then
-                let temp = result.[ce.Low]
-                result.[ce.Low] <- result.[ce.Hi]
-                result.[ce.Hi] <- temp
-                useCounter.[i] <- useCounter.[i] + 1
-        result
+            if values.[ce.Low] > values.[ce.Hi] then
+                let temp = values.[ce.Low]
+                values.[ce.Low] <- values.[ce.Hi]
+                values.[ce.Hi] <- temp
+                useCounter.[i + useCounterOffset] <- useCounter.[i + useCounterOffset] + 1
+        values
          
-    // sorts one sortable (values[]) by a sequence of ces, 
-    // returning an array of the intermediate results (values[][]) 
+
+   // mutates in placeby a sequence of ces, returning an array of the final and
+   // intermediate results (values[][]) 
+   // records the number of uses of each ce in useCounter, starting at useCounterOffset
     let inline sortByWithHistory< ^a when ^a: comparison> 
                 (ces: Ce[]) 
-                (startIndex: int) (extent: int) 
                 (useCounter: int[]) 
+                (useCounterOffset: int)
                 (values: ^a[]) : ^a[][] =
-        let result = Array.init (extent + 1) (fun _ -> Array.copy values)
-        for i = 0 to extent - 1 do
-            let ce = ces.[startIndex + i]
+        let result = Array.init (ces.Length + 1) (fun _ -> Array.copy values)
+        for i = 0 to ces.Length - 1 do
+            let ce = ces.[i]
             result.[i + 1] <- Array.copy result.[i]
             if result.[i + 1].[ce.Low] > result.[i + 1].[ce.Hi] then
                 let temp = result.[i + 1].[ce.Low]
                 result.[i + 1].[ce.Low] <- result.[i + 1].[ce.Hi]
                 result.[i + 1].[ce.Hi] <- temp
-                useCounter.[startIndex + i] <- useCounter.[startIndex + i] + 1
+                useCounter.[useCounterOffset + i] <- useCounter.[useCounterOffset + i] + 1
         result
 
 
