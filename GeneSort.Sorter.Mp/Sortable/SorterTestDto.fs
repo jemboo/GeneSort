@@ -14,12 +14,12 @@ type sorterTestDto =
     | Bools of sorterBoolTestDto
 
 module SorterTestDto =
-    let toDto (sorterTest: sorterTest) : sorterTestDto =
+    let toDto (sorterTest: sorterTests) : sorterTestDto =
         match sorterTest with
-        | sorterTest.Ints intTest -> Ints (SorterIntTestDto.toDto intTest)
-        | sorterTest.Bools boolTest -> Bools (SorterBoolTestDto.toDto boolTest)
+        | sorterTests.Ints intTest -> Ints (SorterIntTestDto.toDto intTest)
+        | sorterTests.Bools boolTest -> Bools (SorterBoolTestDto.toDto boolTest)
 
-    let fromDto (dto: sorterTestDto) : sorterTest =
+    let fromDto (dto: sorterTestDto) : sorterTests =
         match dto with
-        | Ints intTestDto -> sorterTest.Ints (SorterIntTestDto.fromDto intTestDto)
-        | Bools boolTestDto -> sorterTest.Bools (SorterBoolTestDto.fromDto boolTestDto)
+        | Ints intTestDto -> sorterTests.Ints (SorterIntTestDto.fromDto intTestDto)
+        | Bools boolTestDto -> sorterTests.Bools (SorterBoolTestDto.fromDto boolTestDto)

@@ -42,14 +42,11 @@ type MsasF =
         hash (this.sortingWidth)
 
     interface IEquatable<MsasF> with
-        member this.Equals(other) = 
-            this.sortingWidth = other.sortingWidth
+        member this.Equals(other) =  this.sortingWidth = other.sortingWidth
 
-    member this.MakeSorterTest (sortingWidth: int<sortingWidth>) : sorterTest =
-        let sortableArrays = 
-                SortableBoolArray.getAllSortableBoolArrays sortingWidth
-
-        sorterBoolTest.create ( %this.id |> UMX.tag<sorterTestId>) sortableArrays |> sorterTest.Bools
+    member this.MakeSorterTest (sortingWidth: int<sortingWidth>) : sorterTests =
+        let sortableArrays =  SortableBoolArray.getAllSortableBoolArrays sortingWidth
+        sorterBoolTests.create ( %this.id |> UMX.tag<sorterTestId>) sortableArrays |> sorterTests.Bools
 
 module MsasF = ()
  

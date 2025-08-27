@@ -21,7 +21,7 @@ module SorterTestModel =
         | MsasO msasO -> %msasO.SeedPermutation.Order |> UMX.tag<sortingWidth>
 
 
-    let makeSorterTest (model: SorterTestModel) (sortableArrayType:SortableArrayType) : sorterTest =
+    let makeSorterTest (model: SorterTestModel) (sortableArrayType:SortableArrayType) : sorterTests =
         match model with
         | MsasF msasF -> 
                 match sortableArrayType with
@@ -33,6 +33,6 @@ module SorterTestModel =
         | MsasO msasO ->
                 match sortableArrayType with
                 | SortableArrayType.Bools ->        
-                     msasO.MakeSortableBoolArraySet(getSortingWidth model) |> sorterTest.Bools
+                     msasO.MakeSortableBoolArraySet(getSortingWidth model) |> sorterTests.Bools
                 | SortableArrayType.Ints ->
-                     msasO.MakeSortableIntArraySet(getSortingWidth model) |> sorterTest.Ints
+                     msasO.MakeSortableIntArraySet(getSortingWidth model) |> sorterTests.Ints

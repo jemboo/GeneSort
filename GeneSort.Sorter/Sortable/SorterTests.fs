@@ -2,29 +2,29 @@
 namespace GeneSort.Sorter.Sortable
 
 
-type sorterTest = 
-    | Ints of sorterIntTest
-    | Bools of sorterBoolTest
+type sorterTests = 
+    | Ints of sorterIntTests
+    | Bools of sorterBoolTests
 
 
-module SorterTest = 
+module SorterTests = 
 
-    let getSortableArrayType (test: sorterTest) =
+    let getSortableArrayType (test: sorterTests) =
         match test with
         | Ints intTest -> intTest.SortableArrayType
         | Bools boolTest -> boolTest.SortableArrayType
 
-    let getSortingWidth (test: sorterTest) =
+    let getSortingWidth (test: sorterTests) =
         match test with
         | Ints intTest -> intTest.SortingWidth
         | Bools boolTest -> boolTest.SortingWidth
 
-    let getId (test: sorterTest) =
+    let getId (test: sorterTests) =
         match test with
         | Ints intTest -> intTest.Id
         | Bools boolTest -> boolTest.Id
 
-    let getCount (test: sorterTest) =
+    let getCount (test: sorterTests) =
         match test with
         | Ints intTest -> intTest.Count
         | Bools boolTest -> boolTest.Count

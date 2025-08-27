@@ -15,12 +15,12 @@ type sorterBoolTestDto = {
 }
 
 module SorterBoolTestDto =
-    let toDto (sbt: sorterBoolTest) : sorterBoolTestDto =
+    let toDto (sbt: sorterBoolTests) : sorterBoolTestDto =
         { Id = %sbt.Id
           SortingWidth = int sbt.SortingWidth
           SortableArrays = sbt.sortableArrays |> Array.map SortableBoolArrayDto.toDtoBoolArray }
 
-    let fromDto (dto: sorterBoolTestDto) : sorterBoolTest =
-        sorterBoolTest.create
+    let fromDto (dto: sorterBoolTestDto) : sorterBoolTests =
+        sorterBoolTests.create
             (UMX.tag<sorterTestId> dto.Id)
             (dto.SortableArrays |> Array.map SortableBoolArrayDto.fromDtoBoolArray)

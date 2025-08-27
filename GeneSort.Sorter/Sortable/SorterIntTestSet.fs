@@ -8,11 +8,11 @@ open GeneSort.Sorter
 
 type sorterIntTestSet =
     { Id: Guid<sorterTestSetId>
-      sorterTests: sorterIntTest[] }
+      sorterTests: sorterIntTests[] }
 
     static member create 
                     (id: Guid<sorterTestSetId>) 
-                    (arrays: sorterIntTest[]) : sorterIntTestSet =
+                    (arrays: sorterIntTests[]) : sorterIntTestSet =
         if Array.isEmpty arrays then
             invalidArg "arrays" "Arrays must not be empty."
         { Id = id; sorterTests = Array.copy arrays; }

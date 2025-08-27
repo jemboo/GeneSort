@@ -49,22 +49,20 @@ type MsasO =
             this.id = other.id
 
     member this.MakeSortableBoolArraySet 
-            (sortingWidth: int<sortingWidth>) : sorterBoolTest =
+            (sortingWidth: int<sortingWidth>) : sorterBoolTests =
         let ssId = %this.Id |> UMX.tag<sorterTestId>
         let bArrays =
             this.sortableIntArrays 
             |> Array.map(fun sia -> sia.ToSortableBoolArrays())
             |> Array.collect id
             |> Array.distinct
-        sorterBoolTest.create ssId bArrays
-        //SorterTest.create ssId (bArrays |> Array.map(SortableArray.Bools))
+        sorterBoolTests.create ssId bArrays
 
 
     member this.MakeSortableIntArraySet 
-            (sortingWidth: int<sortingWidth>) : sorterIntTest =
+            (sortingWidth: int<sortingWidth>) : sorterIntTests =
         let ssId = %this.Id |> UMX.tag<sorterTestId>
-        sorterIntTest.create ssId this.sortableIntArrays
-        //SorterTest.create ssId (this.sortableIntArrays |> Array.map(SortableArray.Ints))
+        sorterIntTests.create ssId this.sortableIntArrays
 
 
 module MsasO = ()
