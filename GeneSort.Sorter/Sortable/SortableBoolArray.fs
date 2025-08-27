@@ -1,18 +1,21 @@
-﻿
-namespace GeneSort.Sorter.Sortable
+﻿namespace GeneSort.Sorter.Sortable
 
 open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Sorter.Sorter
+open System.Linq
+open System.Collections.Generic
 
 [<Struct; CustomEquality; NoComparison>]
 type sortableBoolArray =
     private { 
         values: bool[] 
-        sortingWidth: int<sortingWidth> 
+        sortingWidth: int<sortingWidth>
+        mutable valuesHash: int option // Lazily computed hash code for Values
     }
+
     /// Creates a sortableBoolArray, throwing if values length does not match order.
     /// <exception cref="ArgumentException">Thrown when order is negative or values length does not equal order.</exception>
     static member Create(values: bool[], sortingWidth: int<sortingWidth>) =
@@ -20,7 +23,7 @@ type sortableBoolArray =
             invalidArg "order" "SortingWidth must be non-negative."
         if values.Length <> int sortingWidth then
             invalidArg "values" $"Values length ({values.Length}) must equal order ({int sortingWidth})."
-        { values = Array.copy values; sortingWidth = sortingWidth }
+        { values = Array.copy values; sortingWidth = sortingWidth; valuesHash = None }
 
     /// Gets the values array.
     member this.Values with get() = this.values
@@ -28,10 +31,9 @@ type sortableBoolArray =
     member this.ArrayLength with get() = this.values.Length
 
     /// Gets the sorting order.
-    member this.SortingWidth with get()  = this.sortingWidth
+    member this.SortingWidth with get() = this.sortingWidth
 
     /// Computes the squared distance between this array and another sortableBoolArray, treating true as 1 and false as 0.
-    /// <exception cref="ArgumentException">Thrown when the other array's order does not match this array's order.</exception>
     member this.DistanceSquared(other: sortableBoolArray) =
         if other.SortingWidth <> this.SortingWidth then
             invalidArg "other" $"Other array SortingWidth ({int other.SortingWidth}) must equal this SortingWidth ({int this.SortingWidth})."
@@ -42,15 +44,12 @@ type sortableBoolArray =
     /// Checks if the values array is sorted in non-decreasing order.
     member this.IsSorted = ArrayProperties.isSorted this.values
      
-   // mutates a copy of values in placeby a sequence of ces, and returns the resulting sortable.
-   // records the number of uses of each ce in useCounter, starting at useCounterOffset
     member this.SortByCes
                 (ces: Ce[]) 
-                (useCounterOffsest: int) 
+                (useCounterOffset: int) 
                 (useCounter: int[]) : sortableBoolArray =
-        let sortedValues = Ce.sortBy ces useCounter useCounterOffsest (Array.copy this.values)
+        let sortedValues = Ce.sortBy ces useCounter useCounterOffset (Array.copy this.values)
         sortableBoolArray.Create(sortedValues, this.SortingWidth)
-
 
     member this.SortByCesWithHistory 
                 (ces: Ce[])
@@ -60,7 +59,6 @@ type sortableBoolArray =
         let sw = this.SortingWidth
         history |> Array.map (fun values -> sortableBoolArray.Create(values, sw))
 
-
     override this.Equals(obj) =
         match obj with
         | :? sortableBoolArray as other ->
@@ -68,15 +66,34 @@ type sortableBoolArray =
         | _ -> false
 
     override this.GetHashCode() =
-        hash (this.sortingWidth, hash this.values)
+        // Use cached hash if available, otherwise compute and cache
+        match this.valuesHash with
+        | Some h -> h
+        | None ->
+            let mutable h = 17
+            for v in this.values do
+                h <- h * 23 + v.GetHashCode()
+            this.valuesHash <- Some h
+            h
 
     interface IEquatable<sortableBoolArray> with
         member this.Equals(other) =
             this.sortingWidth = other.sortingWidth && Array.forall2 (=) this.values other.values
 
-
-
 module SortableBoolArray =
+    // Custom comparer for sortableBoolArray based only on Values
+    type SortableBoolArrayValueComparer() =
+        interface IEqualityComparer<sortableBoolArray> with
+            member _.Equals(x, y) =
+                x.SortingWidth = y.SortingWidth && // Prevent Array.forall2 crash
+                Array.forall2 (=) x.Values y.Values
+            member _.GetHashCode(obj) =
+                // Use the struct's GetHashCode, which caches the hash of Values
+                obj.GetHashCode()
+
+    // Function to remove duplicates based on Values
+    let removeDuplicates (arr: sortableBoolArray[]) : sortableBoolArray[] =
+        arr.Distinct(SortableBoolArrayValueComparer()).ToArray()
 
     /// Returns all possible sortableBoolArray instances for a given sorting width.
     /// <exception cref="ArgumentException">Thrown when sortingWidth is negative.</exception>
@@ -111,62 +128,3 @@ module SortableBoolArray =
                 let sba = sortableBoolArray.Create(boolArray, sortingWidth)
                 result.Add(sba)
         result.ToArray()
-
-
-    open System.Linq
-    open System.Collections.Generic
-
-    // Custom comparer for sortableBoolArray based only on Values
-    type SortableBoolArrayValueComparer() =
-        interface IEqualityComparer<sortableBoolArray> with
-            member _.Equals(x, y) =
-                Array.forall2 (=) x.Values y.Values
-            member _.GetHashCode(obj) =
-                // Efficiently hash the Values bool array
-                let mutable hash = 17
-                for v in obj.Values do
-                    hash <- hash * 23 + v.GetHashCode()
-                hash
-
-    // Function to remove duplicates based on Values
-    let removeDuplicatesByValues (arr: sortableBoolArray[]) : sortableBoolArray[] =
-        arr.Distinct(SortableBoolArrayValueComparer()).ToArray()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//module SortableBoolArray =
-
-
-//    let makeSortedStacks (orderStack: int<sortingWidth>[]) =
-//        let stackedOrder = Order.add orderStack
-
-//        CollectionOps.stackSortedBlocks orderStack
-//        |> Seq.map (fun arr ->
-//            { sortableBoolArray.values = arr
-//              order = stackedOrder })
-
-
-//    let makeRandomBits 
-//            (order: int<sortingWidth>) 
-//            (pctTrue: float) 
-//            (randy: IRando) 
-//        =
-//        let arrayLength = order |> UMX.untag
-
-//        Seq.initInfinite (fun _ ->
-//            { sortableBoolArray.values = RandVars.randBits pctTrue randy arrayLength |> Seq.toArray
-//              order = order })
-
-

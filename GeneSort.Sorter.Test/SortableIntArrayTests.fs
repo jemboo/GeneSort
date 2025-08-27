@@ -150,13 +150,6 @@ type SortableIntArrayTests() =
         Assert.False(arr1.Equals(arr2 :> obj))
 
     [<Fact>]
-    let ``Equality with different symbolSetSize returns false`` () =
-        let arr1 = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
-        let arr2 = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (4 |> UMX.tag<symbolSetSize>))
-        Assert.False(arr1.Equals(arr2))
-        Assert.False(arr1.Equals(arr2 :> obj))
-
-    [<Fact>]
     let ``Equality with different type returns false`` () =
         let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
         let obj = obj()

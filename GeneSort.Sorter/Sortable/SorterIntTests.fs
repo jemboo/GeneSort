@@ -9,11 +9,11 @@ open GeneSort.Sorter.Sorter
 
 [<Struct; CustomEquality; NoComparison>]
 type sorterIntTests =
-    { id: Guid<sorterTestId>
+    { id: Guid<sorterTestIsd>
       sortingWidth: int<sortingWidth>
       sortableArrays: sortableIntArray[] }
 
-    static member create (id: Guid<sorterTestId>) (arrays: sortableIntArray[]) : sorterIntTests =
+    static member create (id: Guid<sorterTestIsd>) (arrays: sortableIntArray[]) : sorterIntTests =
         //if Array.isEmpty arrays then
         //    invalidArg "arrays" "Arrays must not be empty."
         //let arrayType = SortableArray.getSortableArrayType arrays.[0]
@@ -43,13 +43,19 @@ type sorterIntTests =
 
     member this.SortableArrays with get() : sortableIntArray[] = Array.copy this.sortableArrays
      
-    //member this.ApplyCes 
-    //                (ces: Ce[])                 
-    //                (useCounter: int[]) 
-    //                (useCounterOffset: int) =
-    //    let newArrays =  Array.copy this.sortableArrays
-    //    sorterIntTest.create (Guid.NewGuid()) newArrays 
+    member this.ApplyCes 
+                    (removeDuplicates: bool)
+                    (ces: Ce[])   
+                    (useCounterOffset: int) 
+                    (useCounter: int[])           : sorterIntTests =
+          let newArrays =
+                this.sortableArrays 
+                |> Array.map(fun sia -> sia.SortByCes ces useCounterOffset useCounter )
+                |> (fun arr -> if removeDuplicates then SortableIntArray.removeDuplicates arr else arr)
 
+          sorterIntTests.create (Guid.NewGuid() |> UMX.tag<sorterTestIsd>) newArrays 
+
+     
     interface IEquatable<sorterIntTests> with
         member this.Equals(other) =
             this.Id = other.Id && Array.forall2 (=) this.sortableArrays other.sortableArrays

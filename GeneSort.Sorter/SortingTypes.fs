@@ -9,7 +9,7 @@ open FSharp.UMX
 [<Measure>] type ceCount
 [<Measure>] type symbolSetSize
 [<Measure>] type sortableCount
-[<Measure>] type sorterTestId
+[<Measure>] type sorterTestIsd
 [<Measure>] type sorterTestSetId
 
 
