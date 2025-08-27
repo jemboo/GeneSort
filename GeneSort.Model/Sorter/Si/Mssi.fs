@@ -71,7 +71,7 @@ module Mssi =
                 (%mssi.SortingWidth) 
                 mssi.StageCount
 
-    let makeSorter (mssi: Mssi) : Sorter =
+    let makeSorter (mssi: Mssi) : sorter =
         let ces = mssi.perm_Sis
                     |> Array.map (fun psi -> psi |> Perm_Si.getTwoOrbits)
                     |> Array.collect(id)

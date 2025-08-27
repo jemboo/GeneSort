@@ -22,7 +22,7 @@ type SorterModel =
 
 
 module SorterModel =
-    let makeSorter (model: SorterModel) : Sorter =
+    let makeSorter (model: SorterModel) : sorter =
         match model with
         | Msce msce -> msce.MakeSorter()
         | Mssi mssi -> mssi.MakeSorter()

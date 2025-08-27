@@ -5,7 +5,6 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Sorter.Sorter
-open GeneSort.Sorter.Sortable
 open GeneSort.Model.Sorter
 
 /// Represents a rank-swap-based sorting model composed of an array of Perm_Rs instances.
@@ -81,7 +80,7 @@ module Msrs =
     /// Converts an Msrs instance to a Sorter by mapping each Perm_Rs to comparison elements (Ce) via TwoOrbits.
     /// <param name="msrs">The Msrs instance to convert.</param>
     /// <returns>A Sorter instance with the same width and derived comparison elements.</returns>
-    let makeSorter (msrs: Msrs) : Sorter =
+    let makeSorter (msrs: Msrs) : sorter =
         let ces = 
             msrs.Perm_Rss
             |> Array.collect (fun prs -> 

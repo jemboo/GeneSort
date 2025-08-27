@@ -153,4 +153,4 @@ type SortableIntArrayTests() =
     let ``Equality with different type returns false`` () =
         let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
         let obj = obj()
-        Assert.False(arr.Equals(obj))
+        Assert.False(arr.Equals (obj))

@@ -104,7 +104,7 @@ type Msuf4Tests() =
         let msuf4 = Msuf4.create id width [| tou |]
         let sorter = msuf4.MakeSorter()
         Assert.Equal(%id |> UMX.tag<sorterId>, sorter.SorterId)
-        Assert.Equal(width, sorter.Width)
+        Assert.Equal(width, sorter.SortingWidth)
         let expectedCes = [| Ce.create low1 hi1; Ce.create low2 hi2 |]
         Assert.Equal<Ce>(expectedCes, sorter.Ces)
 
@@ -119,7 +119,7 @@ type Msuf4Tests() =
         let expectedCes = [| Ce.create 0 6; Ce.create 1 7; Ce.create 2 4; Ce.create 3 5 |]
         Assert.Equal<Ce>(expectedCes, sorter.Ces)
         Assert.Equal(%id |> UMX.tag<sorterId>, sorter.SorterId)
-        Assert.Equal(width, sorter.Width)
+        Assert.Equal(width, sorter.SortingWidth)
 
     [<Fact>]
     let ``makeSorter handles order 8 correctly with Ortho seed and Ortho unfolding`` () =
@@ -132,7 +132,7 @@ type Msuf4Tests() =
         let expectedCes = [| Ce.create 0 1; Ce.create 2 3; Ce.create 4 5; Ce.create 6 7 |]
         Assert.Equal<Ce>(expectedCes, sorter.Ces)
         Assert.Equal(%id |> UMX.tag<sorterId>, sorter.SorterId)
-        Assert.Equal(width, sorter.Width)
+        Assert.Equal(width, sorter.SortingWidth)
 
     [<Fact>]
     let ``makeSorter handles order 8 correctly with Ortho seed and SelfRefl unfolding`` () =
@@ -145,7 +145,7 @@ type Msuf4Tests() =
         let expectedCes = [| Ce.create 0 7; Ce.create 1 6; Ce.create 2 5; Ce.create 3 4 |]
         Assert.Equal<Ce>(expectedCes, sorter.Ces)
         Assert.Equal(%id |> UMX.tag<sorterId>, sorter.SorterId)
-        Assert.Equal(width, sorter.Width)
+        Assert.Equal(width, sorter.SortingWidth)
 
     [<Fact>]
     let ``makeSorter handles order 16 correctly with Ortho seed and Para unfolding`` () =
@@ -160,7 +160,7 @@ type Msuf4Tests() =
                              Ce.create 4 13; Ce.create 5 12; Ce.create 6 15; Ce.create 7 14 |]
         Assert.Equal<Ce>(expectedCes, sorter.Ces)
         Assert.Equal(%id |> UMX.tag<sorterId>, sorter.SorterId)
-        Assert.Equal(width, sorter.Width)
+        Assert.Equal(width, sorter.SortingWidth)
 
     [<Fact>]
     let ``equality based on id`` () =

@@ -7,12 +7,12 @@ open GeneSort.Sorter
 
 type SorterSet =
         { SorterSetId: Guid<sorterSetId>
-          Sorters: Sorter array }
+          Sorters: sorter array }
 
 
 module SorterSet =
 
-    let create (sorterSetId: Guid<sorterSetId>) (sorters: Sorter array) : SorterSet =
+    let create (sorterSetId: Guid<sorterSetId>) (sorters: sorter array) : SorterSet =
         if %sorterSetId = Guid.Empty then
             failwith "SorterSet ID must not be empty"
         else if Array.isEmpty sorters then
@@ -20,10 +20,9 @@ module SorterSet =
         else
             { SorterSetId = sorterSetId; Sorters = sorters }
 
-
-    let createWithNewId (sorters: Sorter array) : SorterSet =
+    let createWithNewId (sorters: sorter array) : SorterSet =
         create (UMX.tag<sorterSetId> (Guid.NewGuid())) sorters
 
     let toString (sorterSet: SorterSet) : string =
-        let sortersStr = sorterSet.Sorters |> Array.map Sorter.toString |> String.concat "; "
+        let sortersStr = sorterSet.Sorters |> Array.map(fun sorter -> sorter.ToString()) |> String.concat "; "
         sprintf "SorterSet(Id=%A, Sorters=[%s])" (%sorterSet.SorterSetId) sortersStr

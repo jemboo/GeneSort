@@ -18,12 +18,12 @@ type SorterDto = {
 }
 
 module SorterDto =
-    let toSorterDto (sorter: Sorter) : SorterDto =
+    let toSorterDto (sorter: sorter) : SorterDto =
         { SorterId = %sorter.SorterId
-          Width = %sorter.Width
+          Width = %sorter.SortingWidth
           Ces = sorter.Ces |> Array.map CeDto.toCeDto }
 
-    let fromSorterDto (dto: SorterDto) : Sorter =
+    let fromSorterDto (dto: SorterDto) : sorter =
         if dto.SorterId = Guid.Empty then
             failwith "Sorter ID must not be empty"
         if dto.Width < 1 then
