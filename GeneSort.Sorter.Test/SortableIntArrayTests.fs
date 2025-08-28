@@ -63,7 +63,7 @@ type SortableIntArrayTests() =
         let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
         let ces = [| Ce.create 1 2; Ce.create 0 1 |]
         let useCounter = [| 0; 0 |]
-        let sorted = arr.SortByCes ces 0 useCounter
+        let sorted = arr.SortByCes ces useCounter
         Assert.Equal<int>([| 0; 1; 2 |], sorted.Values)
         Assert.True(sorted.IsSorted)
         Assert.Equal(arr.SortingWidth, sorted.SortingWidth)
@@ -74,7 +74,7 @@ type SortableIntArrayTests() =
     let ``SortByCes with empty ces returns copy`` () =
         let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
         let useCounter = [||]
-        let sorted = arr.SortByCes [||] 0 useCounter
+        let sorted = arr.SortByCes [||] useCounter
         Assert.Equal<int>(arr.Values, sorted.Values)
         Assert.Equal(arr.SortingWidth, sorted.SortingWidth)
         Assert.Equal(arr.SymbolSetSize, sorted.SymbolSetSize)
@@ -85,7 +85,7 @@ type SortableIntArrayTests() =
         let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
         let ces = [| Ce.create 1 2; Ce.create 0 1 ; Ce.create 0 1 |]
         let useCounter = [| 0; 0; 0 |]
-        let history = arr.SortByCesWithHistory ces useCounter 0
+        let history = arr.SortByCesWithHistory ces useCounter
         Assert.Equal(4, history.Length)
         Assert.Equal<int>([| 0; 2; 1 |], history.[0].Values)
         Assert.Equal<int>([| 0; 1; 2 |], history.[1].Values)

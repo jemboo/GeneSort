@@ -53,17 +53,15 @@ type sortableIntArray =
     member this.IsSorted = ArrayProperties.isSorted this.values
     
     member this.SortByCes
-                (ces: Ce[]) 
-                (useCounterOffset: int) 
+                (ces: Ce[])
                 (useCounter: int[]) : sortableIntArray =
-        let sortedValues = Ce.sortBy ces useCounter useCounterOffset (Array.copy this.values)
+        let sortedValues = Ce.sortBy ces useCounter (Array.copy this.values)
         sortableIntArray.Create(sortedValues, this.SortingWidth, this.SymbolSetSize)
 
     member this.SortByCesWithHistory 
                 (ces: Ce[])
-                (useCounter: int[]) 
-                (useCounterOffset: int) : sortableIntArray[] =
-        let history = Ce.sortByWithHistory ces useCounter useCounterOffset this.values
+                (useCounter: int[]) : sortableIntArray[] =
+        let history = Ce.sortByWithHistory ces useCounter this.values
         let sw = this.SortingWidth
         let sss = this.SymbolSetSize
         history |> Array.map (fun values -> sortableIntArray.Create(values, sw, sss))

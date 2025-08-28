@@ -1,9 +1,7 @@
 ﻿namespace GeneSort.Model.Sortable
 
-open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorter
 
 type sorterTestModelSetMaker =
     private

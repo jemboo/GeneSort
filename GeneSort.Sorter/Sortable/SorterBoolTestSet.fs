@@ -16,12 +16,12 @@ type sorterBoolTestSet =
                     (arrays: sorterBoolTests[]) : sorterBoolTestSet =
         if Array.isEmpty arrays then
             invalidArg "arrays" "Arrays must not be empty."
-        let sortingWidth = arrays.[0].sortableArrays.[0]
+        let sortingWidth = arrays.[0].sortableBoolArrays.[0]
         { Id = id; sorterTests = Array.copy arrays; }
 
     member this.SortableArrayType with get() = SortableArrayType.Bools
 
-    member this.SortingWidth with get() = this.sorterTests.[0].sortableArrays.[0].SortingWidth
+    member this.SortingWidth with get() = this.sorterTests.[0].sortableBoolArrays.[0].SortingWidth
 
 
 module SorterBoolTestSet = ()

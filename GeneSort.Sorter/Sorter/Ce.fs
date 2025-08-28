@@ -46,8 +46,7 @@ module Ce =
    // records the number of uses of each ce in useCounter, starting at useCounterOffset
     let inline sortBy< ^a when ^a: comparison> 
                 (ces: Ce[]) 
-                (useCounter: int[]) 
-                (useCounterOffset: int)
+                (useCounter: int[])
                 (values: ^a[]) : ^a[] =
 
         for i = 0 to ces.Length - 1 do
@@ -56,7 +55,7 @@ module Ce =
                 let temp = values.[ce.Low]
                 values.[ce.Low] <- values.[ce.Hi]
                 values.[ce.Hi] <- temp
-                useCounter.[i + useCounterOffset] <- useCounter.[i + useCounterOffset] + 1
+                useCounter.[i] <- useCounter.[i] + 1
         values
          
 
@@ -65,8 +64,7 @@ module Ce =
    // records the number of uses of each ce in useCounter, starting at useCounterOffset
     let inline sortByWithHistory< ^a when ^a: comparison> 
                 (ces: Ce[]) 
-                (useCounter: int[]) 
-                (useCounterOffset: int)
+                (useCounter: int[])
                 (values: ^a[]) : ^a[][] =
         let result = Array.init (ces.Length + 1) (fun _ -> Array.copy values)
         for i = 0 to ces.Length - 1 do
@@ -76,7 +74,7 @@ module Ce =
                 let temp = result.[i + 1].[ce.Low]
                 result.[i + 1].[ce.Low] <- result.[i + 1].[ce.Hi]
                 result.[i + 1].[ce.Hi] <- temp
-                useCounter.[useCounterOffset + i] <- useCounter.[useCounterOffset + i] + 1
+                useCounter.[i] <- useCounter.[i] + 1
         result
 
 

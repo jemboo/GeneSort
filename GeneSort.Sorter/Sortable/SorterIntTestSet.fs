@@ -21,7 +21,7 @@ type sorterIntTestSet =
 
     member this.SortableArrayType with get() = SortableArrayType.Ints
 
-    member this.SortingWidth with get() = this.sorterTests.[0].sortableArrays.[0].SortingWidth
+    member this.SortingWidth with get() = this.sorterTests.[0].sortableIntArrays.[0].SortingWidth
 
 
 module SorterIntTestset = ()

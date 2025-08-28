@@ -18,7 +18,7 @@ module SorterBoolTestDto =
     let toDto (sbt: sorterBoolTests) : sorterBoolTestDto =
         { Id = %sbt.Id
           SortingWidth = int sbt.SortingWidth
-          SortableArrays = sbt.sortableArrays |> Array.map SortableBoolArrayDto.toDtoBoolArray }
+          SortableArrays = sbt.sortableBoolArrays |> Array.map SortableBoolArrayDto.toDtoBoolArray }
 
     let fromDto (dto: sorterBoolTestDto) : sorterBoolTests =
         sorterBoolTests.create

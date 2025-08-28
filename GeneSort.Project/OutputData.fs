@@ -1,17 +1,13 @@
 ﻿
 namespace GeneSort.Project
 
-open System
 open FSharp.UMX
-open GeneSort.Sorter
 open GeneSort.Sorter.Sorter
 open GeneSort.Sorter.Sortable
 open MessagePack
 open MessagePack.FSharp
 open MessagePack.Resolvers
 open System.IO
-open GeneSort.Core.Combinatorics
-open System.Threading.Tasks
 open GeneSort.Model.Sorter
 open GeneSort.Model.Sortable
 open GeneSort.Model.Mp.Sorter

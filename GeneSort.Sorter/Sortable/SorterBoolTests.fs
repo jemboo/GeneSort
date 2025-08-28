@@ -10,7 +10,7 @@ open GeneSort.Sorter
 type sorterBoolTests =
     { id: Guid<sorterTestIsd>
       sortingWidth: int<sortingWidth>
-      sortableArrays: sortableBoolArray[] }
+      sortableBoolArrays: sortableBoolArray[] }
 
     static member create (id: Guid<sorterTestIsd>) (arrays: sortableBoolArray[]) : sorterBoolTests =
         //if Array.isEmpty arrays then
@@ -21,19 +21,19 @@ type sorterBoolTests =
         //    invalidArg "arrays" "All SortableArrays must have the same SortingWidth."
         //if arrays |> Array.exists (fun arr -> SortableArray.getSortableArrayType arr <> arrayType) then
         //    invalidArg "arrays" "All SortableArrays must have the same type (Ints or Bools)."
-        { id = id; sortingWidth = sortingWidth; sortableArrays = Array.copy arrays }
+        { id = id; sortingWidth = sortingWidth; sortableBoolArrays = Array.copy arrays }
 
     override this.Equals(obj) =
         match obj with
         | :? sorterBoolTests as other ->
-            this.Id = other.Id && Array.forall2 (=) this.sortableArrays other.sortableArrays
+            this.Id = other.Id && Array.forall2 (=) this.sortableBoolArrays other.sortableBoolArrays
         | _ -> false
 
     override this.GetHashCode() =
-        hash this.sortableArrays
+        hash this.sortableBoolArrays
 
 
-    member this.Count with get() = this.sortableArrays.Length
+    member this.Count with get() = this.sortableBoolArrays.Length
 
     member this.Id with get() = this.id
     
@@ -41,11 +41,11 @@ type sorterBoolTests =
 
     member this.SortingWidth with get() = this.sortingWidth
 
-    member this.SortableArrays with get() : sortableBoolArray[] = Array.copy this.sortableArrays
+    member this.SortableArrays with get() = this.sortableBoolArrays
 
     interface IEquatable<sorterBoolTests> with
         member this.Equals(other) =
-            this.Id = other.Id && Array.forall2 (=) this.sortableArrays other.sortableArrays
+            this.Id = other.Id && Array.forall2 (=) this.sortableBoolArrays other.sortableBoolArrays
 
 
 module SorterBoolTest = ()

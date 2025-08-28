@@ -2,32 +2,34 @@
 
 open System
 open FSharp.UMX
-open GeneSort.Core
-open GeneSort.Sorter
 open GeneSort.Sorter.Sorter
-open System.Linq
-open System.Collections.Generic
 
-[<Measure>] type ceBlockSize
+[<Measure>] type ceBlockLength
 
+type ceBlock = 
+    private { 
+        ces: Ce array 
+    }
 
-type ceBlock = { ces: Ce array }
+    static member create(length: int<ceBlockLength>) =
+        if %length < 0 then
+            invalidArg "length" "ceBlockLength must be non-negative"
+        { ces = Array.zeroCreate %length }
+
+    member this.Ces with get()  = this.ces
+    member this.Length with get() = this.ces.Length |> UMX.tag<ceBlockLength>
 
 
 module CeBlock =
 
-    //let getSingleCeBlock (sorter:Sorter) =
-    //    { ces = sorter.Ces }
-        
-
-    let breakUpIntoBlocks (ces:Ce[]) (blockSize:int<ceBlockSize>) =
+    let breakUpIntoBlocks (ces:Ce[]) (blockLength:int<ceBlockLength>) =
         let totalCes = ces.Length
         let blocks = 
             [|
                 let mutable index = 0
                 while index < totalCes do
-                    let blockCes = ces.[index .. Math.Min(index + %blockSize - 1, totalCes - 1)]
+                    let blockCes = ces.[index .. Math.Min(index + %blockLength - 1, totalCes - 1)]
                     yield { ces = blockCes }
-                    index <- index + %blockSize
+                    index <- index + %blockLength
             |]
         blocks

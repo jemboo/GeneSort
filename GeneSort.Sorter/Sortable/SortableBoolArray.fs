@@ -46,16 +46,14 @@ type sortableBoolArray =
      
     member this.SortByCes
                 (ces: Ce[]) 
-                (useCounterOffset: int) 
                 (useCounter: int[]) : sortableBoolArray =
-        let sortedValues = Ce.sortBy ces useCounter useCounterOffset (Array.copy this.values)
+        let sortedValues = Ce.sortBy ces useCounter (Array.copy this.values)
         sortableBoolArray.Create(sortedValues, this.SortingWidth)
 
     member this.SortByCesWithHistory 
                 (ces: Ce[])
-                (useCounter: int[]) 
-                (useCounterOffset: int) : sortableBoolArray[] =
-        let history = Ce.sortByWithHistory ces useCounter useCounterOffset this.values
+                (useCounter: int[]) : sortableBoolArray[] =
+        let history = Ce.sortByWithHistory ces useCounter this.values
         let sw = this.SortingWidth
         history |> Array.map (fun values -> sortableBoolArray.Create(values, sw))
 
