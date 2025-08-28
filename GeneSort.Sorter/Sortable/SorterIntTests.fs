@@ -41,7 +41,7 @@ type sorterIntTests =
     
     member this.SortingWidth with get() = this.sortingWidth
 
-    member this.SortableArrays with get() = this.sortableIntArrays
+    member this.SortableIntArrays with get() = this.sortableIntArrays
      
     member this.ApplyCes 
                     (removeDuplicates: bool)

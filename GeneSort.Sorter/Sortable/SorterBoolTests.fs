@@ -41,7 +41,7 @@ type sorterBoolTests =
 
     member this.SortingWidth with get() = this.sortingWidth
 
-    member this.SortableArrays with get() = this.sortableBoolArrays
+    member this.SortableBoolArrays with get() = this.sortableBoolArrays
 
     interface IEquatable<sorterBoolTests> with
         member this.Equals(other) =

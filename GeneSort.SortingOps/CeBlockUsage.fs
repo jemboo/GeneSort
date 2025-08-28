@@ -1,7 +1,7 @@
 ﻿namespace GeneSort.Sorter.Sortable
 open FSharp.UMX
 
-type ceUsage = 
+type ceBlockUsage = 
     private { 
         uses: int array
     }

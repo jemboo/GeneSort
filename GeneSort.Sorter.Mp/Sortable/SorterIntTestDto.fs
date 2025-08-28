@@ -19,7 +19,7 @@ module SorterIntTestDto =
     let toDto (sit: sorterIntTests) : sorterIntTestDto =
         { Id = %sit.Id
           SortingWidth = int sit.SortingWidth
-          SortableArrays = sit.SortableArrays |> Array.map SortableIntArrayDto.toDtoIntArray }
+          SortableArrays = sit.SortableIntArrays |> Array.map SortableIntArrayDto.toDtoIntArray }
 
     let fromDto (dto: sorterIntTestDto) : sorterIntTests =
         sorterIntTests.create
