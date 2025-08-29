@@ -11,12 +11,13 @@ type ceBlock =
         ces: ce array 
     }
 
-    static member create(length: int<ceBlockLength>) =
-        if %length < 0 then
-            invalidArg "length" "ceBlockLength must be non-negative"
-        { ces = Array.zeroCreate %length }
+    static member create(ces: ce array ) = { ces = ces }
 
-    member this.Ces with get()  = this.ces
+    member this.getCe (dex:int) = 
+        if dex < 0 || dex >= this.ces.Length then
+            invalidArg "dex" $"Index {dex} is out of bounds for Ce array of length {this.ces.Length}."
+        this.ces.[dex]
+
     member this.Length with get() = this.ces.Length |> UMX.tag<ceBlockLength>
 
 

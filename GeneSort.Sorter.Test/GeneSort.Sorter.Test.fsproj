@@ -12,6 +12,7 @@
     <Compile Include="SorterSetTests.fs" />
     <Compile Include="SortableBoolArrayTests.fs" />
     <Compile Include="SortableIntArrayTests.fs" />
+    <Compile Include="StageSequenceTests.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />
   </ItemGroup>
 

@@ -21,7 +21,7 @@ type stage =
         member this.CeCount with get() = this.ces.Count
 
         member this.IsOccupied(index: int) = 
-            if index < 0 || index >= this.ces.Count then
+            if index < 0 || index >= %this.sortingWidth then
                 invalidArg "index" $"Index {index} is out of bounds for Ce array of length {this.ces.Count}."
             this.occupied.[index]
 

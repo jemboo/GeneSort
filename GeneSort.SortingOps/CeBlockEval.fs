@@ -1,5 +1,7 @@
 ﻿namespace GeneSort.SortingOps
 
+open FSharp.UMX
+open GeneSort.Sorter.Sorter
 open GeneSort.Sorter.Sortable
 
 type ceBlockEval = 
@@ -22,3 +24,12 @@ type ceBlockEval =
 
     member this.Increment(index: int) =
         this.ceBlockUsage.Increment(index)
+
+    member this.getUsedCes() : ce[] =
+        let usedCes = ResizeArray<ce>()
+
+        for i in 0 .. (%this.ceBlock.Length - 1) do
+            if this.ceBlockUsage.IsUsed(i) then
+                usedCes.Add(this.ceBlock.getCe i)
+
+        usedCes.ToArray()

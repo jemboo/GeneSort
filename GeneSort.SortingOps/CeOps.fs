@@ -16,7 +16,7 @@ module CeOps =
                 (values: ^a[]) : ^a[] =
 
         for i = 0 to %ceBlock.Length - 1 do
-            let ce = ceBlock.Ces.[i]
+            let ce = ceBlock.getCe i
             if values.[ce.Low] > values.[ce.Hi] then
                 let temp = values.[ce.Low]
                 values.[ce.Low] <- values.[ce.Hi]
