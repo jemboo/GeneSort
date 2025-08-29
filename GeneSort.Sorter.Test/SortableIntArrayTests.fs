@@ -61,7 +61,7 @@ type SortableIntArrayTests() =
     [<Fact>]
     let ``SortByCes sorts unsorted array correctly`` () =
         let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
-        let ces = [| Ce.create 1 2; Ce.create 0 1 |]
+        let ces = [| ce.create 1 2; ce.create 0 1 |]
         let useCounter = [| 0; 0 |]
         let sorted = arr.SortByCes ces useCounter
         Assert.Equal<int>([| 0; 1; 2 |], sorted.Values)
@@ -83,7 +83,7 @@ type SortableIntArrayTests() =
     [<Fact>]
     let ``SortByCesWithHistory captures sorting steps correctly`` () =
         let arr = sortableIntArray.Create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
-        let ces = [| Ce.create 1 2; Ce.create 0 1 ; Ce.create 0 1 |]
+        let ces = [| ce.create 1 2; ce.create 0 1 ; ce.create 0 1 |]
         let useCounter = [| 0; 0; 0 |]
         let history = arr.SortByCesWithHistory ces useCounter
         Assert.Equal(4, history.Length)

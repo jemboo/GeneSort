@@ -45,13 +45,13 @@ type sortableBoolArray =
     member this.IsSorted = ArrayProperties.isSorted this.values
      
     member this.SortByCes
-                (ces: Ce[]) 
+                (ces: ce[]) 
                 (useCounter: int[]) : sortableBoolArray =
         let sortedValues = Ce.sortBy ces useCounter (Array.copy this.values)
         sortableBoolArray.Create(sortedValues, this.SortingWidth)
 
     member this.SortByCesWithHistory 
-                (ces: Ce[])
+                (ces: ce[])
                 (useCounter: int[]) : sortableBoolArray[] =
         let history = Ce.sortByWithHistory ces useCounter this.values
         let sw = this.SortingWidth

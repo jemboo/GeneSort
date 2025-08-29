@@ -27,7 +27,7 @@ type CeTests() =
         let indices = [|0; 1; 2|] // Corresponds to Ces: (0,1), (0,2), (1,2)
         let picker = indexPicker indices
         let result = Ce.generateCeCode true width picker
-        let expectedCe = Ce.create 0 1 // index 0 maps to (0,0), shifted to (0,1)
+        let expectedCe = ce.create 0 1 // index 0 maps to (0,0), shifted to (0,1)
         let expectedIndex = Ce.toIndex expectedCe
         result |> should equal expectedIndex
         let ce = Ce.fromIndex result
@@ -57,20 +57,20 @@ type CeTests() =
         let indices = [|0|] // Maps to (0,1) when excludeSelfCe is true
         let picker = indexPicker indices
         let result = Ce.generateCeCode true width picker
-        let ce = Ce.fromIndex result
-        ce |> should equal (Ce.create 0 1)
-        ce.Low |> should not' (equal ce.Hi)
+        let cet = Ce.fromIndex result
+        cet |> should equal (ce.create 0 1)
+        cet.Low |> should not' (equal cet.Hi)
 
 
     [<Fact>]
     let ``toIndex and fromIndex round-trip for valid Ce including Low = Hi``() =
         let ces = [ 
-                Ce.create 0 0; Ce.create 0 1; Ce.create 0 2; Ce.create 0 3; Ce.create 0 4; Ce.create 0 5; 
-                Ce.create 1 1; Ce.create 1 2; Ce.create 1 3; Ce.create 1 4; Ce.create 1 5; Ce.create 1 6; 
-                Ce.create 2 2; Ce.create 2 3; Ce.create 2 4; Ce.create 2 5; Ce.create 2 6; Ce.create 2 7; 
-                Ce.create 3 3; Ce.create 3 4; Ce.create 3 5; Ce.create 3 6; Ce.create 3 7; Ce.create 3 8; 
-                Ce.create 4 4; Ce.create 4 5; Ce.create 4 6; Ce.create 4 7; Ce.create 4 8; Ce.create 4 9; 
-                Ce.create 5 5; Ce.create 5 6; Ce.create 5 7; Ce.create 5 8; Ce.create 5 9; Ce.create 5 10; 
+                ce.create 0 0; ce.create 0 1; ce.create 0 2; ce.create 0 3; ce.create 0 4; ce.create 0 5; 
+                ce.create 1 1; ce.create 1 2; ce.create 1 3; ce.create 1 4; ce.create 1 5; ce.create 1 6; 
+                ce.create 2 2; ce.create 2 3; ce.create 2 4; ce.create 2 5; ce.create 2 6; ce.create 2 7; 
+                ce.create 3 3; ce.create 3 4; ce.create 3 5; ce.create 3 6; ce.create 3 7; ce.create 3 8; 
+                ce.create 4 4; ce.create 4 5; ce.create 4 6; ce.create 4 7; ce.create 4 8; ce.create 4 9; 
+                ce.create 5 5; ce.create 5 6; ce.create 5 7; ce.create 5 8; ce.create 5 9; ce.create 5 10; 
             ]
 
         for ce in ces do
@@ -82,8 +82,8 @@ type CeTests() =
     [<InlineData(-1, 0, "Indices must be non-negative")>]
     [<InlineData(0, -1, "Indices must be non-negative")>]
     [<InlineData(-1, -1, "Indices must be non-negative")>]
-    let ``Ce.create rejects negative indices`` (low: int, hi: int, expectedMsg: string) =
-        let ex = Assert.Throws<Exception>(fun () -> Ce.create low hi |> ignore)
+    let ``ce.create rejects negative indices`` (low: int, hi: int, expectedMsg: string) =
+        let ex = Assert.Throws<Exception>(fun () -> ce.create low hi |> ignore)
         Assert.Equal(expectedMsg, ex.Message)
 
     [<Theory>]
@@ -100,12 +100,12 @@ type CeTests() =
         let picker = indexPicker indices
         let ces = Ce.generateCes picker width |> Seq.take 6 |> Seq.toList
         let expected = [
-            Ce.create 0 0
-            Ce.create 0 1
-            Ce.create 1 1
-            Ce.create 0 2
-            Ce.create 1 2
-            Ce.create 2 2
+            ce.create 0 0
+            ce.create 0 1
+            ce.create 1 1
+            ce.create 0 2
+            ce.create 1 2
+            ce.create 2 2
         ]
         ces |> should equal expected
         ces |> List.iter (fun ce -> 
@@ -119,9 +119,9 @@ type CeTests() =
         let picker = indexPicker indices
         let ces = Ce.generateCes picker width |> Seq.take 3 |> Seq.toList
         let expected = [
-            Ce.create 0 0
-            Ce.create 0 2
-            Ce.create 0 3
+            ce.create 0 0
+            ce.create 0 2
+            ce.create 0 3
         ]
         ces |> should equal expected
 
@@ -138,10 +138,10 @@ type CeTests() =
         let picker = indexPicker indices
         let ces = Ce.generateCesExcludeSelf picker width |> Seq.take 4 |> Seq.toList
         let expected = [
-            Ce.create 0 1
-            Ce.create 0 2
-            Ce.create 1 2
-            Ce.create 0 3
+            ce.create 0 1
+            ce.create 0 2
+            ce.create 1 2
+            ce.create 0 3
         ]
         ces |> should equal expected
         ces |> List.iter (fun ce -> 

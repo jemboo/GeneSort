@@ -60,7 +60,7 @@ type Msrs =
             |> Array.collect (fun prs -> 
                 prs.Perm_Si 
                 |> Perm_Si.getTwoOrbits
-                |> Array.map (fun tbit -> Ce.create tbit.First tbit.Second))
+                |> Array.map (fun tbit -> ce.create tbit.First tbit.Second))
         Sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
 
 
@@ -86,5 +86,5 @@ module Msrs =
             |> Array.collect (fun prs -> 
                 prs.Perm_Si 
                 |> Perm_Si.getTwoOrbits
-                |> Array.map (fun tbit -> Ce.create tbit.First tbit.Second))
+                |> Array.map (fun tbit -> ce.create tbit.First tbit.Second))
         Sorter.create (%msrs.Id |> UMX.tag<sorterId>) msrs.SortingWidth ces

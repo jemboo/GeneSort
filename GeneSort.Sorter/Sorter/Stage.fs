@@ -10,7 +10,7 @@ open GeneSort.Sorter
 type stage = 
         private { 
                     sortingWidth: int<sortingWidth>; 
-                    ces: ResizeArray<Ce>;  
+                    ces: ResizeArray<ce>;  
                     occupied: bool[] 
                 } with
 
@@ -25,7 +25,7 @@ type stage =
                 invalidArg "index" $"Index {index} is out of bounds for Ce array of length {this.ces.Count}."
             this.occupied.[index]
 
-        member this.AddCe(ce: Ce) =
+        member this.AddCe(ce: ce) =
             if this.occupied.[ce.Low] then
                 invalidArg "ce" $"Cannot add CE {ce} because position {ce.Low} is already occupied."
             if this.occupied.[ce.Hi] then 
@@ -34,7 +34,7 @@ type stage =
             this.occupied.[ce.Low] <- true
             this.occupied.[ce.Hi] <- true
 
-        member this.CanAddCe(ce: Ce) =
+        member this.CanAddCe(ce: ce) =
             not (this.occupied.[ce.Low] || this.occupied.[ce.Hi])
 
 // Core module for Stage operations

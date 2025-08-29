@@ -8,9 +8,9 @@ open GeneSort.Sorter
 
 // Type definitions
 [<Struct; CustomEquality; NoComparison>]
-type Ce = private { low: int; hi: int } with
+type ce = private { low: int; hi: int } with
 
-    static member create (lv: int) (hv: int) : Ce =
+    static member create (lv: int) (hv: int) : ce =
         if lv < 0 || hv < 0 then
             failwith "Indices must be non-negative"
         else if lv < hv then
@@ -26,11 +26,11 @@ type Ce = private { low: int; hi: int } with
 
     override this.Equals(obj) = 
         match obj with
-        | :? Ce as other -> this.low = other.low && this.hi = other.hi
+        | :? ce as other -> this.low = other.low && this.hi = other.hi
         | _ -> false
     override this.GetHashCode() = 
         hash (this.low, this.hi)
-    interface IEquatable<Ce> with
+    interface IEquatable<ce> with
         member this.Equals(other) = 
             this.low = other.low && this.hi = other.hi
 
@@ -38,14 +38,14 @@ type Ce = private { low: int; hi: int } with
 // Core module for Ce operations
 module Ce =
 
-    let toString (ce: Ce) : string =
+    let toString (ce: ce) : string =
         sprintf "(%d, %d)" ce.Low ce.Hi
 
 
    // mutates in placeby a sequence of ces, and returns the resulting sortable (values[]),
    // records the number of uses of each ce in useCounter, starting at useCounterOffset
     let inline sortBy< ^a when ^a: comparison> 
-                (ces: Ce[]) 
+                (ces: ce[]) 
                 (useCounter: int[])
                 (values: ^a[]) : ^a[] =
 
@@ -63,7 +63,7 @@ module Ce =
    // intermediate results (values[][]) 
    // records the number of uses of each ce in useCounter, starting at useCounterOffset
     let inline sortByWithHistory< ^a when ^a: comparison> 
-                (ces: Ce[]) 
+                (ces: ce[]) 
                 (useCounter: int[])
                 (values: ^a[]) : ^a[][] =
         let result = Array.init (ces.Length + 1) (fun _ -> Array.copy values)
@@ -81,7 +81,7 @@ module Ce =
     let maxIndexForWdith (width: int) : int =
         width*(width - 1) / 2
 
-    let toIndex (ce: Ce) : int =
+    let toIndex (ce: ce) : int =
         let i = ce.Low
         let j = ce.Hi
         (j * (j + 1)) / 2 + i
@@ -94,19 +94,19 @@ module Ce =
         let p = (sqrt (1.0 + 8.0 * indexFlt) - 1.0) / 2.0
         let pfloor = int p
         if (p = pfloor) then 
-            Ce.create (pfloor - 1) (pfloor - 1)
+            ce.create (pfloor - 1) (pfloor - 1)
         else
             let lo = (float dex) - (float (pfloor * (pfloor + 1))) / 2.0 |> int
             let hi = (int pfloor)
-            Ce.create (lo) (hi)
+            ce.create (lo) (hi)
 
     let reflect 
             (sortingWidth: int<sortingWidth>) 
-            (ce: Ce) 
-        : Ce =
-        Ce.create 
-                (ce.Hi |> GeneSort.Core.Combinatorics.reflect %sortingWidth) 
-                (ce.Low |>  GeneSort.Core.Combinatorics.reflect %sortingWidth)
+            (cer: ce) 
+        : ce =
+            ce.create 
+                (cer.Hi |> GeneSort.Core.Combinatorics.reflect %sortingWidth) 
+                (cer.Low |>  GeneSort.Core.Combinatorics.reflect %sortingWidth)
 
 
     let generateCeCode (excludeSelfCe:bool)
@@ -119,7 +119,7 @@ module Ce =
         let dex = indexPicker indexMax
         if excludeSelfCe then
             let ceTemp = fromIndex dex
-            Ce.create (ceTemp.Low) (ceTemp.Hi + 1) |> toIndex
+            ce.create (ceTemp.Low) (ceTemp.Hi + 1) |> toIndex
         else
             dex
 
@@ -148,14 +148,14 @@ module Ce =
         seq {
             while true do
                 let ceTemp = indexPicker indexMax |> fromIndex
-                Ce.create (ceTemp.Low) (ceTemp.Hi + 1) |> toIndex
+                ce.create (ceTemp.Low) (ceTemp.Hi + 1) |> toIndex
         }
 
 
     /// returns random Ce's to make Sorters, including Ce's where low=hi
     /// <param name="width">The Sorter width</param>
     let generateCes (indexPicker: int -> int) 
-                    (width:int) : Ce seq =
+                    (width:int) : ce seq =
         generateCeCodes indexPicker width |> Seq.map(fromIndex)
 
 
@@ -163,9 +163,9 @@ module Ce =
     /// <param name="width">The Sorter width</param>
     let generateCesExcludeSelf 
                     (indexPicker: int -> int) 
-                    (width:int) : Ce seq =
+                    (width:int) : ce seq =
         generateCeCodesExcludeSelf indexPicker width |> Seq.map(fromIndex)
 
 
-    let fromTwoOrbit (twoOrbit:TwoOrbit) :Ce = 
-            Ce.create (twoOrbit.First) (twoOrbit.Second)
+    let fromTwoOrbit (twoOrbit:TwoOrbit) :ce = 
+            ce.create (twoOrbit.First) (twoOrbit.Second)

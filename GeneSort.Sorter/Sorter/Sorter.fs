@@ -13,18 +13,18 @@ type sorter =
     private { 
         sorterId: Guid<sorterId>
         sortingWidth: int<sortingWidth>
-        ces: Ce array
+        ces: ce array
         mutable cesHash: int option // Lazily computed hash code for Ces
     }
 
-    static member create (sorterId: Guid<sorterId>) (width: int<sortingWidth>) (ces: Ce array) : sorter =
+    static member create (sorterId: Guid<sorterId>) (width: int<sortingWidth>) (ces: ce array) : sorter =
         if %sorterId = Guid.Empty then
             invalidArg "sorterId" "Sorter ID must not be empty"
         if %width < 1 then
             invalidArg "width" "Width must be at least 1"
         { sorterId = sorterId; sortingWidth = width; ces = Array.copy ces; cesHash = None }
 
-    static member createWithNewId (width: int<sortingWidth>) (ces: Ce array) : sorter =
+    static member createWithNewId (width: int<sortingWidth>) (ces: ce array) : sorter =
         sorter.create (UMX.tag<sorterId> (Guid.NewGuid())) width ces
 
     override this.ToString() : string =
@@ -33,7 +33,7 @@ type sorter =
 
     member this.SorterId with get() = this.sorterId
     member this.SortingWidth with get() = this.sortingWidth
-    member this.Ces with get() : Ce[] = this.ces
+    member this.Ces with get() : ce[] = this.ces
 
     override this.Equals(obj) =
         match obj with
@@ -74,10 +74,10 @@ module Sorter =
     let removeDuplicates (arr: sorter[]) : sorter[] =
         arr.Distinct(SorterValueComparer()).ToArray()
 
-    let create (sorterId: Guid<sorterId>) (width: int<sortingWidth>) (ces: Ce array) : sorter =
+    let create (sorterId: Guid<sorterId>) (width: int<sortingWidth>) (ces: ce array) : sorter =
         sorter.create sorterId width ces
 
-    let createWithNewId (width: int<sortingWidth>) (ces: Ce array) : sorter =
+    let createWithNewId (width: int<sortingWidth>) (ces: ce array) : sorter =
         sorter.createWithNewId width ces
 
     let toString (sorter: sorter) : string =

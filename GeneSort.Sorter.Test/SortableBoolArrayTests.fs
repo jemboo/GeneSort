@@ -59,7 +59,7 @@ type SortableBoolArrayTests() =
     [<Fact>]
     let ``SortByCes sorts unsorted array correctly`` () =
         let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
-        let ces = [| Ce.create 0 1; Ce.create 1 2 |]
+        let ces = [| ce.create 0 1; ce.create 1 2 |]
         let useCounter = [| 0; 0 |]
         let sorted = arr.SortByCes ces useCounter
         Assert.Equal<bool>([| false; true; true |], sorted.Values)
@@ -79,7 +79,7 @@ type SortableBoolArrayTests() =
     [<Fact>]
     let ``SortByCes with partial extent sorts correctly`` () =
         let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
-        let ces = [| Ce.create 0 1; Ce.create 1 2 |]
+        let ces = [| ce.create 0 1; ce.create 1 2 |]
         let useCounter = [| 0; 0 |]
         let sorted = arr.SortByCes ces useCounter
         Assert.Equal<bool>([| false; true; true |], sorted.Values)
@@ -88,7 +88,7 @@ type SortableBoolArrayTests() =
     [<Fact>]
     let ``SortByCesWithHistory captures sorting steps correctly`` () =
         let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
-        let ces = [| Ce.create 0 1; Ce.create 1 2; Ce.create 1 2 |]
+        let ces = [| ce.create 0 1; ce.create 1 2; ce.create 1 2 |]
         let useCounter = [| 0; 0; 0 |]
         let history = arr.SortByCesWithHistory ces useCounter
         Assert.Equal(4, history.Length)

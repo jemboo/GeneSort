@@ -54,7 +54,7 @@ type Msce =
 
     member this.MakeSorter() = 
         let sw = %this.sortingWidth
-        let ces = this.CeCodes |> Array.map (fun code -> Ce.create code sw)
+        let ces = this.CeCodes |> Array.map (fun code -> ce.create code sw)
         Sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
 
 

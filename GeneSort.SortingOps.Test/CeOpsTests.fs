@@ -4,7 +4,6 @@ open System
 open FSharp.UMX
 open Xunit
 open FsUnit.Xunit   
-open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Sorter.Sorter
 open GeneSort.SortingOps
@@ -13,7 +12,7 @@ open GeneSort.Sorter.Sortable
 type CeOpsTests() =
 
     let createCe (low: int) (hi: int) =
-       Ce.create low hi
+       ce.create low hi
 
     [<Fact>]
     let ``sortBy sorts bool array correctly and updates usage`` () =

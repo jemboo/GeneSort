@@ -14,8 +14,8 @@ type SorterSetTests() =
         let createSorter ces =
             Sorter.createWithNewId (UMX.tag<sortingWidth> 4) ces
         
-        let ces1 = [| Ce.create 0 1; Ce.create 1 1 |]
-        let ces2 = [| Ce.create 0 2; Ce.create 1 2 |]
+        let ces1 = [| ce.create 0 1; ce.create 1 1 |]
+        let ces2 = [| ce.create 0 2; ce.create 1 2 |]
         let sorters = [| createSorter ces1; createSorter ces2 |]
         
         let sorterSet = SorterSet.createWithNewId sorters

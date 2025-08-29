@@ -8,7 +8,7 @@ open GeneSort.Sorter.Sorter
 
 type ceBlock = 
     private { 
-        ces: Ce array 
+        ces: ce array 
     }
 
     static member create(length: int<ceBlockLength>) =
@@ -22,7 +22,7 @@ type ceBlock =
 
 module CeBlock =
 
-    let breakUpIntoBlocks (ces:Ce[]) (blockLength:int<ceBlockLength>) =
+    let breakUpIntoBlocks (ces:ce[]) (blockLength:int<ceBlockLength>) =
         let totalCes = ces.Length
         let blocks = 
             [|

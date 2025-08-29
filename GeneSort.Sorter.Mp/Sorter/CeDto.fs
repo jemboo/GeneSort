@@ -15,8 +15,8 @@ type CeDto = {
 }
 
 module CeDto =
-    let toCeDto (ce: Ce) : CeDto =
+    let toCeDto (ce: ce) : CeDto =
         { Index = Ce.toIndex ce }
 
-    let fromCeDto (dto: CeDto) : Ce =
+    let fromCeDto (dto: CeDto) : ce =
         Ce.fromIndex dto.Index

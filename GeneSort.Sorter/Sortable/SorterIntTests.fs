@@ -44,7 +44,7 @@ type sorterIntTests =
      
     member this.ApplyCes 
                     (removeDuplicates: bool)
-                    (ces: Ce[]) 
+                    (ces: ce[]) 
                     (useCounter: int[])    : sorterIntTests =
           let newArrays =
                 this.sortableIntArrays 
