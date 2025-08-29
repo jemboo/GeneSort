@@ -108,6 +108,8 @@ type sortableIntArray =
             this.symbolSetSize = other.symbolSetSize &&
             Array.forall2 (=) this.values other.values
 
+
+
 module SortableIntArray =
     // Custom comparer for sortableIntArray based only on Values
     type SortableIntArrayValueComparer() =

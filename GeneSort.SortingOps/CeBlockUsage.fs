@@ -1,4 +1,5 @@
-﻿namespace GeneSort.Sorter.Sortable
+﻿namespace GeneSort.SortingOps
+
 open FSharp.UMX
 
 type ceBlockUsage = 

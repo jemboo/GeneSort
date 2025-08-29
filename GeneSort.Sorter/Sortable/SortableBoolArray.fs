@@ -78,6 +78,8 @@ type sortableBoolArray =
         member this.Equals(other) =
             this.sortingWidth = other.sortingWidth && Array.forall2 (=) this.values other.values
 
+
+
 module SortableBoolArray =
     // Custom comparer for sortableBoolArray based only on Values
     type SortableBoolArrayValueComparer() =

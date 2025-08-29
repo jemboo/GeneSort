@@ -12,6 +12,8 @@
   <ItemGroup>
     <Compile Include="SortingTypes.fs" />
     <Compile Include="Sorter\Ce.fs" />
+    <Compile Include="Sorter\Stage.fs" />
+    <Compile Include="Sorter\StageSequence.fs" />
     <Compile Include="Sorter\Sorter.fs" />
     <Compile Include="Sorter\SorterSet.fs" />
     <Compile Include="Sortable\SortableArrayType.fs" />
