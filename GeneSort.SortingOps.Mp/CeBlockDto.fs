@@ -6,14 +6,14 @@ open GeneSort.Sorter.Mp.Sorter
 
 
 [<MessagePackObject>]
-type CeBlockDto = {
+type ceBlockDto = {
     [<Key(0)>]
     Ces: CeDto array
 }
 
 module CeBlockDto =
-    let toCeBlockDto (ceBlock: ceBlock) : CeBlockDto =
+    let toCeBlockDto (ceBlock: ceBlock) : ceBlockDto =
         { Ces = ceBlock.CeArray |> Array.map CeDto.toCeDto }
 
-    let fromCeBlockDto (dto: CeBlockDto) : ceBlock =
+    let fromCeBlockDto (dto: ceBlockDto) : ceBlock =
         ceBlock.create (dto.Ces |> Array.map CeDto.fromCeDto)

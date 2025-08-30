@@ -1,7 +1,5 @@
 ﻿namespace GeneSort.SortingOps
 
-open FSharp.UMX
-open GeneSort.Sorter.Sorter
 open GeneSort.Sorter.Sortable
 
 type ceBlockEval = 
