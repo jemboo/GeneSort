@@ -28,18 +28,19 @@ type sorter =
         sorter.create (UMX.tag<sorterId> (Guid.NewGuid())) width ces
 
     override this.ToString() : string =
-        let cesStr = this.Ces |> Array.map Ce.toString |> String.concat "; "
-        sprintf "Sorter(Id=%A, Width=%d, Ces=[%s])" (%this.sorterId) (%this.sortingWidth) cesStr
+        sprintf "Sorter(Id=%A, Width=%d)" (%this.sorterId) (%this.sortingWidth)
 
     member this.SorterId with get() = this.sorterId
     member this.SortingWidth with get() = this.sortingWidth
-    member this.Ces with get() : ce[] = this.ces
+    member this.Ce (dex : int) = this.ces.[dex]
+    member this.ceCount with get() : int<ceCount> = this.ces.Length |> UMX.tag<ceCount>
+    member this.Ces with get() = Array.copy this.ces
 
     override this.Equals(obj) =
         match obj with
         | :? sorter as other ->
             this.SortingWidth = other.SortingWidth &&
-            Array.forall2 (=) this.Ces other.Ces
+            Array.forall2 (=) this.ces other.ces
         | _ -> false
 
     override this.GetHashCode() =
@@ -48,7 +49,7 @@ type sorter =
         | Some h -> h
         | None ->
             let mutable h = 17
-            for ce in this.Ces do
+            for ce in this.ces do
                 h <- h * 23 + ce.GetHashCode()
             this.cesHash <- Some h
             h
@@ -57,7 +58,7 @@ type sorter =
         member this.Equals(other) =
             this.SortingWidth = other.SortingWidth &&
             this.SorterId = other.SorterId &&
-            Array.forall2 (=) this.Ces other.Ces
+            Array.forall2 (=) this.ces other.ces
 
 module Sorter =
     // Custom comparer for Sorter based only on Ces
@@ -65,7 +66,7 @@ module Sorter =
         interface IEqualityComparer<sorter> with
             member _.Equals(x, y) =
                 x.SortingWidth = y.SortingWidth && // Prevent Array.forall2 crash
-                Array.forall2 (=) x.Ces y.Ces
+                Array.forall2 (=) x.ces y.ces
             member _.GetHashCode(obj) =
                 // Use the struct's GetHashCode, which caches the hash of Ces
                 obj.GetHashCode()

@@ -23,23 +23,3 @@ open System.Linq
 
     member this.SorterSetId with get() = this.sorterSetId
     member this.Sorters with get() : sorter[] = this.sorters
-
-    member this.ToString() : string =
-        let sortersStr = this.sorters |> Array.map (fun sorter -> sorter.ToString()) |> String.concat "; "
-        sprintf "SorterSet(Id=%A, Sorters=[%s])" (%this.sorterSetId) sortersStr
-
-
-
-module SorterSet =
-    // Function to remove duplicates based on sorters
-    let removeDuplicates (arr: sorterSet[]) : sorterSet[] =
-        arr.Distinct().ToArray()
-
-    let create (sorterSetId: Guid<sorterSetId>) (sorters: sorter array) : sorterSet =
-        sorterSet.create sorterSetId sorters
-
-    let createWithNewId (sorters: sorter array) : sorterSet =
-        sorterSet.createWithNewId sorters
-
-    let toString (sorterSet: sorterSet) : string =
-        sorterSet.ToString()

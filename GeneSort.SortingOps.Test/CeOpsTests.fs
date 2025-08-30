@@ -20,10 +20,10 @@ type CeOpsTests() =
         let values = [| true; false; true |]
         let sortingWidth = 3<sortingWidth>
         let ceBlock = ceBlock.create [| createCe 0 1; createCe 1 2 |]
-        let ceBlockUsage = ceBlockUsage.create 2<ceBlockLength>
+        let ceUseCounts = ceUseCounts.create 2<ceBlockLength>
         
         // Act
-        let result = CeOps.sortBy ceBlock ceBlockUsage values
+        let result = CeBlockOps.sortBy ceBlock ceUseCounts values
         
         // Assert
         result |> should equal [| false; true; true |]
@@ -37,10 +37,10 @@ type CeOpsTests() =
         let symbolSetSize = 3<symbolSetSize>
         let ceBlock = ceBlock.create [| createCe 0 1; createCe 1 2 |]
 
-        let ceBlockUsage = ceBlockUsage.create 2<ceBlockLength>
+        let ceUseCounts = ceUseCounts.create 2<ceBlockLength>
         
         // Act
-        let result = CeOps.sortBy ceBlock ceBlockUsage values
+        let result = CeBlockOps.sortBy ceBlock ceUseCounts values
         
         // Assert
         result |> should equal [| 0; 1; 2 |]
@@ -59,13 +59,13 @@ type CeOpsTests() =
         let ceBlock = ceBlock.create [| createCe 0 1 |]
         
         // Act
-        let result = CeOps.evalWithSorterTests sorterTests ceBlock
+        let ceBlockEval = CeBlockOps.evalWithSorterTest sorterTests ceBlock
         
         // Assert
-        let boolTests = match result.SorterTests with | sorterTests.Bools bt -> bt | _ -> failwith "Expected Bools"
+        let boolTests = match ceBlockEval.SorterTests with | sorterTests.Bools bt -> bt | _ -> failwith "Expected Bools"
         boolTests.SortableBoolArrays.Length |> should equal 1 // Duplicate removed
         boolTests.SortableBoolArrays |> Array.forall (fun sba -> sba.Values = [| false; true |]) |> should be True
-        result.CeBlockUsage.getUse 0 |> should be (greaterThanOrEqualTo 1) // At least one swap occurred
+        ceBlockEval.CeUseCounts.[0]  |> should be (greaterThanOrEqualTo 1) // At least one swap occurred
 
     [<Fact>]
     let ``evalWithSorterTests handles int arrays and removes duplicates`` () =
@@ -81,13 +81,13 @@ type CeOpsTests() =
         let ceBlock = ceBlock.create [| createCe 0 1 |]
         
         // Act
-        let result = CeOps.evalWithSorterTests sorterTests ceBlock
+        let ceBlockEval = CeBlockOps.evalWithSorterTest sorterTests ceBlock
         
         // Assert
-        let intTests = match result.SorterTests with | sorterTests.Ints it -> it | _ -> failwith "Expected Ints"
+        let intTests = match ceBlockEval.SorterTests with | sorterTests.Ints it -> it | _ -> failwith "Expected Ints"
         intTests.SortableIntArrays.Length |> should equal 1 // Duplicates removed
         intTests.SortableIntArrays |> Array.forall (fun sia -> sia.Values = [| 0; 1 |]) |> should be True
-        result.CeBlockUsage.getUse 0 |> should be (greaterThanOrEqualTo 1) // At least one swap occurred
+        ceBlockEval.CeUseCounts.[0] |> should be (greaterThanOrEqualTo 1) // At least one swap occurred
 
 
     [<Fact>]
@@ -100,7 +100,7 @@ type CeOpsTests() =
         let ceBlock = ceBlock.create [| createCe 0 1 |]
 
         // Act
-        let result = CeOps.evalWithSorterTests sorterTests ceBlock
+        let result = CeBlockOps.evalWithSorterTest sorterTests ceBlock
         
         // Assert
         let intTests = match result.SorterTests with | sorterTests.Ints it -> it | _ -> failwith "Expected Ints"

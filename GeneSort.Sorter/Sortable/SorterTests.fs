@@ -29,3 +29,8 @@ module SorterTests =
         | Ints intTest -> intTest.Count
         | Bools boolTest -> boolTest.Count
 
+    let getUnsortedCount (test: sorterTests) =
+        match test with
+        | Ints intTest -> intTest.UnsortedCount
+        | Bools boolTest -> boolTest.UnsortedCount
+

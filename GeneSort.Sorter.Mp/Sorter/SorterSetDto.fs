@@ -26,6 +26,6 @@ module SorterSetDto =
             failwith "SorterSet ID must not be empty"
         if Array.isEmpty dto.Sorters then
             failwith "Sorter set must contain at least one sorter"
-        SorterSet.create
+        sorterSet.create
             (UMX.tag<sorterSetId> dto.SorterSetId)
             (dto.Sorters |> Array.map SorterDto.fromSorterDto)

@@ -7,9 +7,10 @@
 
   <ItemGroup>
     <Compile Include="CeBlock.fs" />
+    <Compile Include="CeUseCounts.fs" />
     <Compile Include="CeBlockUsage.fs" />
     <Compile Include="CeBlockEval.fs" />
-    <Compile Include="CeOps.fs" />
+    <Compile Include="CeBlockOps.fs" />
     <Compile Include="SorterEval.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

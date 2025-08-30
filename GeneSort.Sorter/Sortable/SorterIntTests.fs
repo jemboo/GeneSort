@@ -41,19 +41,12 @@ type sorterIntTests =
     member this.SortingWidth with get() = this.sortingWidth
 
     member this.SortableIntArrays with get() = this.sortableIntArrays
-     
-    member this.ApplyCes 
-                    (removeDuplicates: bool)
-                    (ces: ce[]) 
-                    (useCounter: int[])    : sorterIntTests =
-          let newArrays =
-                this.sortableIntArrays 
-                |> Array.map(fun sia -> sia.SortByCes ces useCounter )
-                |> (fun arr -> if removeDuplicates then SortableIntArray.removeDuplicates arr else arr)
+    
+    member this.UnsortedCount with get() = 
+                    this.SortableIntArrays 
+                    |> Seq.filter(fun sa -> not sa.IsSorted)
+                    |> Seq.length
 
-          sorterIntTests.create (Guid.NewGuid() |> UMX.tag<sorterTestIsd>) newArrays 
-
-     
     interface IEquatable<sorterIntTests> with
         member this.Equals(other) =
             this.Id = other.Id && Array.forall2 (=) this.sortableIntArrays other.sortableIntArrays

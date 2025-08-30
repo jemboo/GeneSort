@@ -34,6 +34,12 @@ type sorterBoolTests =
 
     member this.Count with get() = this.sortableBoolArrays.Length
 
+    member this.UnsortedCount with get() = 
+                this.sortableBoolArrays 
+                |> Seq.filter(fun sa -> not sa.IsSorted)
+                |> Seq.length
+
+
     member this.Id with get() = this.id
     
     member this.SortableArrayType with get() = SortableArrayType.Bools

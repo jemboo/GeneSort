@@ -22,7 +22,7 @@ type stageSequence =
 
         member this.Stages with get() = this.stages.ToArray()
 
-        member this.StageCount with get() = this.stages.Count
+        member this.StageCount with get() = this.stages.Count |> UMX.tag<stageCount>
 
         member this.AddCe (ce: ce) =
             if ce.Low >= (this.sortingWidth |> int) || ce.Hi >= (this.sortingWidth |> int) then
@@ -51,9 +51,8 @@ type stageSequence =
 // Core module for Stage operations
 module StageSequence =
 
-    let fromSorter (sorter: sorter) : stageSequence =
-        let stageSeq = stageSequence.create(sorter.SortingWidth)
-        for ce in sorter.Ces do
-            stageSeq.AddCe(ce)
+    let fromCes (sortingWidth : int<sortingWidth>) (ces: ce array) : stageSequence =
+        let stageSeq = stageSequence.create(sortingWidth)
+        ces |> Array.iter stageSeq.AddCe
         stageSeq
 
