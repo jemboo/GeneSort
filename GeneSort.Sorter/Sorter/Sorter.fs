@@ -60,6 +60,7 @@ type sorter =
             this.SorterId = other.SorterId &&
             Array.forall2 (=) this.ces other.ces
 
+
 module Sorter =
     // Custom comparer for Sorter based only on Ces
     type SorterValueComparer() =

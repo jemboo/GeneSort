@@ -2,37 +2,41 @@
 
 open System
 open FSharp.UMX
-open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Sorter.Sorter
 open GeneSort.Sorter.Sortable
-open System.Linq
-open System.Collections.Generic
 
 
-type sorterEval = 
+type sorterEval =
+
     private { 
-        sorter: sorter
+        sorterId: Guid<sorterId>
+        sortingWidth: int<sortingWidth>
         ceBlockUsage: ceBlockUsage
         stageSequence: Lazy<stageSequence>
     }
 
-    static member create (sorter: sorter) (ceBlockUsage: ceBlockUsage) =
+    static member create 
+                (sorterId: Guid<sorterId>) 
+                (sortingWidth: int<sortingWidth>)  
+                (ceBlockUsage: ceBlockUsage) =
         { 
-            sorter = sorter
+            sorterId = sorterId
+            sortingWidth = sortingWidth
             ceBlockUsage = ceBlockUsage
-            stageSequence = Lazy<stageSequence>(
-                    fun () -> 
-                        let refined = ceBlockUsage.getUsedCes()
-                        StageSequence.fromCes sorter.SortingWidth refined)
+            stageSequence = Lazy<stageSequence>(StageSequence.fromCes sortingWidth ceBlockUsage.UsedCes)
         }
 
     member this.getRefinedSorter() : sorter =
              sorter.create
-                    (Guid.NewGuid() |> UMX.tag<sorterId>) this.sorter.SortingWidth (this.ceBlockUsage.getUsedCes()) 
+                    (Guid.NewGuid() |> UMX.tag<sorterId>) this.sortingWidth (this.ceBlockUsage.UsedCes) 
 
-    member this.getSortingWidth() : int<sortingWidth> =
-        this.sorter.SortingWidth
+    member this.SorterId with get() : Guid<sorterId> = this.sorterId
+    member this.SortingWidth with get() : int<sortingWidth> =  this.sortingWidth
+    member this.CeBlockUsage with get() = this.ceBlockUsage
+
+    member this.getUsedCeCount() : int<ceCount> =
+        this.ceBlockUsage.UsedCes.Length |> UMX.tag<ceCount>
 
     member this.getStageCount() : int<stageCount> =
         this.getStageSequence().StageCount 
@@ -49,6 +53,6 @@ module SorterEval =
 
         let ceBlockEval = CeBlockOps.evalWithSorterTest sorterTests (ceBlock.create(sorter.Ces))
 
-        sorterEval.create sorter ceBlockEval.ceBlockUsage
+        sorterEval.create sorter.SorterId sorter.SortingWidth ceBlockEval.ceBlockUsage
 
 

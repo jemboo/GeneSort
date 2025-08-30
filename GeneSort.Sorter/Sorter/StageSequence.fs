@@ -24,6 +24,7 @@ type stageSequence =
 
         member this.StageCount with get() = this.stages.Count |> UMX.tag<stageCount>
 
+
         member this.AddCe (ce: ce) =
             if ce.Low >= (this.sortingWidth |> int) || ce.Hi >= (this.sortingWidth |> int) then
                 invalidArg "ce" $"CE {ce} has indices out of bounds for sorting width {this.sortingWidth}."

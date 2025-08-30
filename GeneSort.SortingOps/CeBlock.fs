@@ -18,6 +18,8 @@ type ceBlock =
             invalidArg "dex" $"Index {dex} is out of bounds for Ce array of length {this.ces.Length}."
         this.ces.[dex]
 
+    member this.CeArray with get() = Array.copy this.ces
+
     member this.Length with get() = this.ces.Length |> UMX.tag<ceBlockLength>
 
 
