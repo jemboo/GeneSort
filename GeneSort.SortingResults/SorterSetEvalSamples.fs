@@ -16,17 +16,17 @@ type sorterEvalBin = {
     mutable sorterEvals: ResizeArray<sorterEval>
 }
 
-type sorterEvalSamples = {
+type sorterSetEvalSamples = {
     sorterSetEvalId: Guid<sorterSetEvalId>
     mutable totalSampleCount: int
     maxBinCount: int
     evalBins: Dictionary<sorterEvalKey, sorterEvalBin>
 }
 
-module sorterSetEvalSamples =
+module SorterSetEvalSamples =
 
     let addSorterEval (sorterEval: sorterEval) 
-                      (sorterEvalSamples: sorterEvalSamples) : unit =
+                      (sorterEvalSamples: sorterSetEvalSamples) : unit =
         let key = {
             ceCount = sorterEval.getUsedCeCount()
             stageCount = sorterEval.getStageCount()
@@ -48,7 +48,7 @@ module sorterSetEvalSamples =
         
         sorterEvalSamples.totalSampleCount <- sorterEvalSamples.totalSampleCount + 1
 
-    let create (maxBinCount: int) (sorterSetEval:sorterSetEval) : sorterEvalSamples =
+    let create (maxBinCount: int) (sorterSetEval:sorterSetEval) : sorterSetEvalSamples =
         let sorterEvalSamples = {
             sorterSetEvalId = sorterSetEval.SorterSetEvalId
             totalSampleCount = 0
