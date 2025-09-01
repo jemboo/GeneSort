@@ -11,6 +11,7 @@ type sorterEval =
 
     private { 
         sorterId: Guid<sorterId>
+        sorterTestsId: Guid<sorterTestsId>
         sortingWidth: int<sortingWidth>
         ceBlockUsage: ceBlockUsage
         stageSequence: Lazy<stageSequence>
@@ -18,20 +19,24 @@ type sorterEval =
 
     static member create 
                 (sorterId: Guid<sorterId>) 
+                (sorterTestsId: Guid<sorterTestsId>)
                 (sortingWidth: int<sortingWidth>)  
                 (ceBlockUsage: ceBlockUsage) =
         { 
             sorterId = sorterId
+            sorterTestsId = sorterTestsId
             sortingWidth = sortingWidth
             ceBlockUsage = ceBlockUsage
             stageSequence = Lazy<stageSequence>(StageSequence.fromCes sortingWidth ceBlockUsage.UsedCes)
         }
+
 
     member this.getRefinedSorter() : sorter =
              sorter.create
                     (Guid.NewGuid() |> UMX.tag<sorterId>) this.sortingWidth (this.ceBlockUsage.UsedCes) 
 
     member this.SorterId with get() : Guid<sorterId> = this.sorterId
+    member this.SorterTestsId with get() : Guid<sorterTestsId> = this.sorterTestsId
     member this.SortingWidth with get() : int<sortingWidth> =  this.sortingWidth
     member this.CeBlockUsage with get() = this.ceBlockUsage
 
@@ -47,12 +52,12 @@ type sorterEval =
 
 module SorterEval =
 
-    let getSorterEval
+    let makeSorterEval
             (sorter: sorter)
             (sorterTests: sorterTests) : sorterEval =
 
         let ceBlockEval = CeBlockOps.evalWithSorterTest sorterTests (ceBlock.create(sorter.Ces))
 
-        sorterEval.create sorter.SorterId sorter.SortingWidth ceBlockEval.ceBlockUsage
+        sorterEval.create sorter.SorterId (sorterTests |> SorterTests.getId ) sorter.SortingWidth ceBlockEval.ceBlockUsage
 
 

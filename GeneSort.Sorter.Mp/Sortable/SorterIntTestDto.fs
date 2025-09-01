@@ -23,5 +23,5 @@ module SorterIntTestDto =
 
     let fromDto (dto: sorterIntTestDto) : sorterIntTests =
         sorterIntTests.create
-            (UMX.tag<sorterTestIsd> dto.Id)
+            (UMX.tag<sorterTestsId> dto.Id)
             (dto.SortableArrays |> Array.map SortableIntArrayDto.fromDtoIntArray)

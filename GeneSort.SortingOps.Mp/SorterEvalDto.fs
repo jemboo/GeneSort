@@ -7,21 +7,24 @@ open GeneSort.SortingOps
 open GeneSort.Sorter
 
 
-
 [<MessagePackObject>]
 type sorterEvalDto = {
     [<Key(0)>]
     SorterId: Guid
     [<Key(1)>]
-    SortingWidth: int
+    SorterTestsId: Guid
     [<Key(2)>]
+    SortingWidth: int
+    [<Key(3)>]
     CeBlockUsage: ceBlockUsageDto
 }
 
 module SorterEvalDto =
+
     let toSorterEvalDto (sorterEval: sorterEval) : sorterEvalDto =
         { 
             SorterId = %sorterEval.SorterId
+            SorterTestsId = %sorterEval.SorterTestsId
             SortingWidth = %sorterEval.SortingWidth
             CeBlockUsage = CeBlockUsageDto.toCeBlockUsageDto sorterEval.CeBlockUsage
         }
@@ -32,6 +35,7 @@ module SorterEvalDto =
         if dto.SortingWidth < 1 then
             failwith "SortingWidth must be at least 1"
         sorterEval.create
-            (UMX.tag<sorterId> dto.SorterId)
+            (UMX.tag<sorterId> dto.SorterId)  
+            (UMX.tag<sorterTestsId> dto.SorterTestsId)
             (UMX.tag<sortingWidth> dto.SortingWidth)
             (CeBlockUsageDto.fromCeBlockUsageDto dto.CeBlockUsage)

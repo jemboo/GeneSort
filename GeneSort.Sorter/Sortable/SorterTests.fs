@@ -1,6 +1,9 @@
 ﻿
 namespace GeneSort.Sorter.Sortable
 
+open FSharp.UMX
+open GeneSort.Sorter
+
 
 type sorterTests = 
     | Ints of sorterIntTests
@@ -19,7 +22,7 @@ module SorterTests =
         | Ints intTest -> intTest.SortingWidth
         | Bools boolTest -> boolTest.SortingWidth
 
-    let getId (test: sorterTests) =
+    let getId (test: sorterTests) : Guid<sorterTestsId> =
         match test with
         | Ints intTest -> intTest.Id
         | Bools boolTest -> boolTest.Id

@@ -6,12 +6,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="SorterSetEvalSamples.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FSharp.UMX" Version="1.1.0" />
     <PackageReference Include="FsToolkit.ErrorHandling" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+    <ProjectReference Include="..\GeneSort.Sorter\GeneSort.Sorter.fsproj" />
+    <ProjectReference Include="..\GeneSort.SortingOps\GeneSort.SortingOps.fsproj" />
   </ItemGroup>
 
 </Project>

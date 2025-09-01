@@ -7,11 +7,11 @@ open GeneSort.Sorter
 
 [<Struct; CustomEquality; NoComparison>]
 type sorterBoolTests =
-    { id: Guid<sorterTestIsd>
+    { id: Guid<sorterTestsId>
       sortingWidth: int<sortingWidth>
       sortableBoolArrays: sortableBoolArray[] }
 
-    static member create (id: Guid<sorterTestIsd>) (arrays: sortableBoolArray[]) : sorterBoolTests =
+    static member create (id: Guid<sorterTestsId>) (arrays: sortableBoolArray[]) : sorterBoolTests =
         //if Array.isEmpty arrays then
         //    invalidArg "arrays" "Arrays must not be empty."
         //let arrayType = SortableArray.getSortableArrayType arrays.[0]

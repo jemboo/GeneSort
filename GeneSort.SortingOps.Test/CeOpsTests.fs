@@ -55,7 +55,7 @@ type CeOpsTests() =
             sortableBoolArray.Create([| false; true |], sortingWidth)
             sortableBoolArray.Create([| true; false |], sortingWidth) // Duplicate
         |]
-        let sorterTests = sorterBoolTests.create (Guid.NewGuid() |> UMX.tag<sorterTestIsd>) boolArrays |> sorterTests.Bools
+        let sorterTests = sorterBoolTests.create (Guid.NewGuid() |> UMX.tag<sorterTestsId>) boolArrays |> sorterTests.Bools
         let ceBlock = ceBlock.create [| createCe 0 1 |]
         
         // Act
@@ -77,7 +77,7 @@ type CeOpsTests() =
             sortableIntArray.Create([| 0; 1 |], sortingWidth, symbolSetSize)
             sortableIntArray.Create([| 1; 0 |], sortingWidth, symbolSetSize) // Duplicate
         |]
-        let sorterTests = sorterIntTests.create (Guid.NewGuid() |> UMX.tag<sorterTestIsd>) intArrays |> sorterTests.Ints
+        let sorterTests = sorterIntTests.create (Guid.NewGuid() |> UMX.tag<sorterTestsId>) intArrays |> sorterTests.Ints
         let ceBlock = ceBlock.create [| createCe 0 1 |]
         
         // Act
@@ -96,7 +96,7 @@ type CeOpsTests() =
         let sortingWidth = 2<sortingWidth>
         let symbolSetSize = 2<symbolSetSize>
         let intArrays = [| sortableIntArray.Create([| 1; 0 |], sortingWidth, symbolSetSize) |]
-        let sorterTests = sorterIntTests.create (Guid.NewGuid() |> UMX.tag<sorterTestIsd>) intArrays |> sorterTests.Ints
+        let sorterTests = sorterIntTests.create (Guid.NewGuid() |> UMX.tag<sorterTestsId>) intArrays |> sorterTests.Ints
         let ceBlock = ceBlock.create [| createCe 0 1 |]
 
         // Act

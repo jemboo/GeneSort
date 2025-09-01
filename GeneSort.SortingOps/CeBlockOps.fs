@@ -44,7 +44,7 @@ module CeBlockOps =
                             sortableIntArray.Create(valuesCopy, sia.SortingWidth, sia.SymbolSetSize)
                         ) |> SortableIntArray.removeDuplicates
 
-                sorterIntTests.create (Guid.NewGuid() |> UMX.tag<sorterTestIsd>) newSortableIntArray   
+                sorterIntTests.create (Guid.NewGuid() |> UMX.tag<sorterTestsId>) newSortableIntArray   
                 |> GeneSort.Sorter.Sortable.sorterTests.Ints
                  
             | sorterTests.Bools sbts ->
@@ -56,7 +56,7 @@ module CeBlockOps =
                             sortableBoolArray.Create(valuesCopy, sba.SortingWidth)
                         ) |> SortableBoolArray.removeDuplicates
 
-                sorterBoolTests.create (Guid.NewGuid() |> UMX.tag<sorterTestIsd>) newSortableBoolArray   
+                sorterBoolTests.create (Guid.NewGuid() |> UMX.tag<sorterTestsId>) newSortableBoolArray   
                 |> GeneSort.Sorter.Sortable.sorterTests.Bools
             
         let ceBlockUsage = ceBlockUsage.create ceBlock (ceUseCounts.UseCounts)
