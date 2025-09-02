@@ -14,10 +14,11 @@ type OpsGenRatesDto = {
 }
 
 module OpsGenRatesDto =
-    let toOpsGenRates (dto: OpsGenRatesDto) : OpsGenRates =
+
+    let fromDomain (dto: OpsGenRatesDto) : OpsGenRates =
         OpsGenRates.create (dto.OrthoThresh, dto.ParaThresh - dto.OrthoThresh, dto.SelfReflThresh - dto.ParaThresh)
 
-    let fromOpsGenRates (domain: OpsGenRates) : OpsGenRatesDto = {
+    let toDomain (domain: OpsGenRates) : OpsGenRatesDto = {
         OrthoThresh = domain.OrthoRate
         ParaThresh = domain.OrthoRate + domain.ParaRate
         SelfReflThresh = domain.OrthoRate + domain.ParaRate + domain.SelfReflRate

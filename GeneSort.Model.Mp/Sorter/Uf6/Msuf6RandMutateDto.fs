@@ -24,14 +24,14 @@ module Msuf6RandMutateDto =
         { Id = %msuf6RandMutate.Id
           RngType = msuf6RandMutate.RngType
           Msuf6 = Msuf6Dto.toMsuf6Dto msuf6RandMutate.Msuf6
-          Uf6MutationRatesArray = Uf6MutationRatesArrayDto.toUf6MutationRatesArrayDto msuf6RandMutate.Uf6MutationRatesArray }
+          Uf6MutationRatesArray = Uf6MutationRatesArrayDto.fromDomain msuf6RandMutate.Uf6MutationRatesArray }
 
     let fromMsuf6RandMutateDto (dto: Msuf6RandMutateDto) : Msuf6RandMutate =
         try
             if dto.RngType = Unchecked.defaultof<rngType> then
                 failwith "rngType must be specified"
             let msuf6 = Msuf6Dto.fromMsuf6Dto dto.Msuf6 |> Result.toOption |> Option.get
-            let uf6MutationRatesArray = Uf6MutationRatesArrayDto.fromUf6MutationRatesArrayDto dto.Uf6MutationRatesArray
+            let uf6MutationRatesArray = Uf6MutationRatesArrayDto.toDomain dto.Uf6MutationRatesArray
 
             Msuf6RandMutate.create dto.RngType msuf6 uf6MutationRatesArray
         with

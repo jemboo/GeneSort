@@ -18,19 +18,19 @@ module Uf4MutationRatesDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toUf4MutationRatesDto (uf4MutationRates: Uf4MutationRates) : Uf4MutationRatesDto =
+    let fromDomain (uf4MutationRates: Uf4MutationRates) : Uf4MutationRatesDto =
         { Order = uf4MutationRates.order
-          SeedOpsTransitionRates = OpsTransitionRatesDto.fromOpsTransitionRates uf4MutationRates.seedOpsTransitionRates
-          TwoOrbitPairOpsTransitionRates = OpsTransitionRatesArrayDto.fromOpsTransitionRatesArray uf4MutationRates.twoOrbitPairOpsTransitionRates }
+          SeedOpsTransitionRates = OpsTransitionRatesDto.fromDomain uf4MutationRates.seedOpsTransitionRates
+          TwoOrbitPairOpsTransitionRates = OpsTransitionRatesArrayDto.fromDomain uf4MutationRates.twoOrbitPairOpsTransitionRates }
 
-    let fromUf4MutationRatesDto (dto: Uf4MutationRatesDto) : Uf4MutationRates =
+    let toDomain (dto: Uf4MutationRatesDto) : Uf4MutationRates =
         try
             if dto.Order < 4 || dto.Order % 4 <> 0 then
                 failwith $"Order must be at least 4 and divisible by 4, got {dto.Order}"
             if dto.TwoOrbitPairOpsTransitionRates.Rates.Length <> MathUtils.exactLog2 (dto.Order / 4) && dto.Order <> 4 then
                 failwith $"TwoOrbitPairOpsTransitionRates length ({dto.TwoOrbitPairOpsTransitionRates.Rates.Length}) must match log2(order/4) ({MathUtils.exactLog2 (dto.Order / 4)})"
             { order = dto.Order
-              seedOpsTransitionRates = OpsTransitionRatesDto.toOpsTransitionRates dto.SeedOpsTransitionRates
-              twoOrbitPairOpsTransitionRates = OpsTransitionRatesArrayDto.toOpsTransitionRatesArray dto.TwoOrbitPairOpsTransitionRates }
+              seedOpsTransitionRates = OpsTransitionRatesDto.toDomain dto.SeedOpsTransitionRates
+              twoOrbitPairOpsTransitionRates = OpsTransitionRatesArrayDto.toDomain dto.TwoOrbitPairOpsTransitionRates }
         with
         | ex -> failwith $"Failed to convert Uf4MutationRatesDto: {ex.Message}"

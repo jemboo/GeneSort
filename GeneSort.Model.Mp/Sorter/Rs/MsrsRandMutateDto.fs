@@ -24,7 +24,7 @@ module MsrsRandMutateDto =
     let toMsrsRandMutateDto (msrsRandMutate: MsrsRandMutate) : MsrsRandMutateDto =
         { Msrs = MsrsDto.toMsrsDto msrsRandMutate.Msrs
           RngType = msrsRandMutate.RngType
-          OpsActionRatesArray = OpsActionRatesArrayDto.fromOpsActionRatesArray msrsRandMutate.OpsActionRates }
+          OpsActionRatesArray = OpsActionRatesArrayDto.toDomain msrsRandMutate.OpsActionRates }
 
     let fromMsrsRandMutateDto (dto: MsrsRandMutateDto) : MsrsRandMutate =
         try
@@ -36,7 +36,7 @@ module MsrsRandMutateDto =
                 MsrsRandMutate.create
                     (dto.RngType)
                     msrs
-                    (OpsActionRatesArrayDto.toOpsActionRatesArray dto.OpsActionRatesArray)
+                    (OpsActionRatesArrayDto.fromDomain dto.OpsActionRatesArray)
             | Error err ->
                 let msg = match err with
                           | MsrsDto.NullPermRssArray m -> m

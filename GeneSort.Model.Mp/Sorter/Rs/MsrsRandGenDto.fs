@@ -23,7 +23,7 @@ module MsrsRandGenDto =
     let toMsrsRandGenDto (msrsRandGen: MsrsRandGen) : MsrsRandGenDto =
         { SortingWidth = %msrsRandGen.SortingWidth
           RngType = msrsRandGen.RngType
-          OpsGenRatesArray = OpsGenRatesArrayDto.fromOpsGenRatesArray msrsRandGen.OpsGenRatesArray }
+          OpsGenRatesArray = OpsGenRatesArrayDto.toDomain msrsRandGen.OpsGenRatesArray }
 
     let fromMsrsRandGenDto (dto: MsrsRandGenDto) : MsrsRandGen =
         try
@@ -34,6 +34,6 @@ module MsrsRandGenDto =
             MsrsRandGen.create
                 (dto.RngType)
                 (UMX.tag<sortingWidth> dto.SortingWidth)
-                (OpsGenRatesArrayDto.toOpsGenRatesArray dto.OpsGenRatesArray)
+                (OpsGenRatesArrayDto.fromDomain dto.OpsGenRatesArray)
         with
         | ex -> failwith $"Failed to convert MsrsRandGenDto: {ex.Message}"

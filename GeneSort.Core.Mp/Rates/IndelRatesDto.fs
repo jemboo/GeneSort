@@ -15,10 +15,11 @@ type IndelRatesDto = {
 }
 
 module IndelRatesDto =
-    let toIndelRates (dto: IndelRatesDto) : IndelRates =
+
+    let toDomain (dto: IndelRatesDto) : IndelRates =
         IndelRates.create (dto.MutationThresh, dto.InsertionThresh - dto.MutationThresh, dto.DeletionThresh - dto.InsertionThresh)
 
-    let fromIndelRates (domain: IndelRates) : IndelRatesDto = {
+    let fromDomain (domain: IndelRates) : IndelRatesDto = {
         MutationThresh = domain.MutationRate
         InsertionThresh = domain.MutationRate + domain.InsertionRate
         DeletionThresh = domain.MutationRate + domain.InsertionRate + domain.DeletionRate

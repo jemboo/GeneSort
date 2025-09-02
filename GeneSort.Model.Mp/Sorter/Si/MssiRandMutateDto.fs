@@ -24,21 +24,21 @@ module MssiRandMutateDto =
     let toMssiRandMutateDto (mssiRandMutate: MssiRandMutate) : MssiRandMutateDto =
         { Mssi = MssiDto.toMssiDto mssiRandMutate.Mssi
           RngType = mssiRandMutate.RngType
-          OpActionRatesArray = OpActionRatesArrayDto.fromOpActionRatesArray mssiRandMutate.OpActionRates }
+          OpActionRatesArray = OpActionRatesArrayDto.toDomain mssiRandMutate.OpActionRates }
 
     let fromMssiRandMutateDto (dto: MssiRandMutateDto) : Result<MssiRandMutate, string> =
         try
             let mssiResult = MssiDto.toMssi dto.Mssi
             match mssiResult with
             | Ok mssi ->
-                if %mssi.StageCount <> (OpActionRatesArrayDto.toOpActionRatesArray dto.OpActionRatesArray).Length then
+                if %mssi.StageCount <> (OpActionRatesArrayDto.fromDomain dto.OpActionRatesArray).Length then
                     Error "StageCount must match OpActionRatesArray.Length"
                 else
                     let mssiRandMutate = 
                         MssiRandMutate.create
                             (dto.RngType)
                             mssi
-                            (OpActionRatesArrayDto.toOpActionRatesArray dto.OpActionRatesArray)
+                            (OpActionRatesArrayDto.fromDomain dto.OpActionRatesArray)
                     Ok mssiRandMutate
             | Error err ->
                 Error (match err with

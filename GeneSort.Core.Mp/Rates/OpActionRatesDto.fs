@@ -12,10 +12,11 @@ type OpActionRatesDto = {
 }
 
 module OpActionRatesDto =
-    let toOpActionRates (dto: OpActionRatesDto) : OpActionRates =
+
+    let fromDomain (dto: OpActionRatesDto) : OpActionRates =
         OpActionRates.create (dto.OrthoThresh, dto.ParaThresh - dto.OrthoThresh)
 
-    let fromOpActionRates (domain: OpActionRates) : OpActionRatesDto = {
+    let toDomain (domain: OpActionRates) : OpActionRatesDto = {
         OrthoThresh = domain.OrthoRate
         ParaThresh = domain.OrthoRate + domain.ParaRate
     }

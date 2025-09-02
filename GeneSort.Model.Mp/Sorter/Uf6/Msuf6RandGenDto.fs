@@ -27,7 +27,7 @@ module Msuf6RandGenDto =
           RngType = msuf6RandGen.RngType
           SortingWidth = %msuf6RandGen.SortingWidth
           StageCount = %msuf6RandGen.StageCount
-          GenRates = Uf6GenRatesArrayDto.toUf6GenRatesArrayDto msuf6RandGen.GenRates }
+          GenRates = Uf6GenRatesArrayDto.fromDomain msuf6RandGen.GenRates }
 
     let fromMsuf6RandGenDto (dto: Msuf6RandGenDto) : Msuf6RandGen =
         try
@@ -35,7 +35,7 @@ module Msuf6RandGenDto =
                 failwith $"SortingWidth must be at least 6 and divisible by 6, got {dto.SortingWidth}"
             if dto.StageCount < 1 then
                 failwith $"StageCount must be at least 1, got {dto.StageCount}"
-            let genRates = Uf6GenRatesArrayDto.fromUf6GenRatesArrayDto dto.GenRates
+            let genRates = Uf6GenRatesArrayDto.toDomain dto.GenRates
             if genRates.Length <> dto.StageCount then
                 failwith $"GenRates array length ({genRates.Length}) must equal StageCount ({dto.StageCount})"
             if genRates.RatesArray |> Array.exists (fun gr -> gr.order <> dto.SortingWidth) then

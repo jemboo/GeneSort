@@ -21,23 +21,24 @@ type Seed6TransitionRatesDto = {
 }
 
 module Seed6TransitionRatesDto =
-    let toSeed6TransitionRates (dto: Seed6TransitionRatesDto) : Seed6TransitionRates =
+
+    let fromDomain (dto: Seed6TransitionRatesDto) : Seed6TransitionRates =
         Seed6TransitionRates.create(
-            Seed6ActionRatesDto.toSeed6ActionRates dto.Ortho1Rates,
-            Seed6ActionRatesDto.toSeed6ActionRates dto.Ortho2Rates,
-            Seed6ActionRatesDto.toSeed6ActionRates dto.Para1Rates,
-            Seed6ActionRatesDto.toSeed6ActionRates dto.Para2Rates,
-            Seed6ActionRatesDto.toSeed6ActionRates dto.Para3Rates,
-            Seed6ActionRatesDto.toSeed6ActionRates dto.Para4Rates,
-            Seed6ActionRatesDto.toSeed6ActionRates dto.SelfReflRates
+            Seed6ActionRatesDto.fromDomain dto.Ortho1Rates,
+            Seed6ActionRatesDto.fromDomain dto.Ortho2Rates,
+            Seed6ActionRatesDto.fromDomain dto.Para1Rates,
+            Seed6ActionRatesDto.fromDomain dto.Para2Rates,
+            Seed6ActionRatesDto.fromDomain dto.Para3Rates,
+            Seed6ActionRatesDto.fromDomain dto.Para4Rates,
+            Seed6ActionRatesDto.fromDomain dto.SelfReflRates
         )
 
-    let fromSeed6TransitionRates (domain: Seed6TransitionRates) : Seed6TransitionRatesDto = {
-        Ortho1Rates = Seed6ActionRatesDto.fromSeed6ActionRates domain.Ortho1Rates
-        Ortho2Rates = Seed6ActionRatesDto.fromSeed6ActionRates domain.Ortho2Rates
-        Para1Rates = Seed6ActionRatesDto.fromSeed6ActionRates domain.Para1Rates
-        Para2Rates = Seed6ActionRatesDto.fromSeed6ActionRates domain.Para2Rates
-        Para3Rates = Seed6ActionRatesDto.fromSeed6ActionRates domain.Para3Rates
-        Para4Rates = Seed6ActionRatesDto.fromSeed6ActionRates domain.Para4Rates
-        SelfReflRates = Seed6ActionRatesDto.fromSeed6ActionRates domain.SelfReflRates
+    let toDomain (domain: Seed6TransitionRates) : Seed6TransitionRatesDto = {
+        Ortho1Rates = Seed6ActionRatesDto.toDomain domain.Ortho1Rates
+        Ortho2Rates = Seed6ActionRatesDto.toDomain domain.Ortho2Rates
+        Para1Rates = Seed6ActionRatesDto.toDomain domain.Para1Rates
+        Para2Rates = Seed6ActionRatesDto.toDomain domain.Para2Rates
+        Para3Rates = Seed6ActionRatesDto.toDomain domain.Para3Rates
+        Para4Rates = Seed6ActionRatesDto.toDomain domain.Para4Rates
+        SelfReflRates = Seed6ActionRatesDto.toDomain domain.SelfReflRates
     }

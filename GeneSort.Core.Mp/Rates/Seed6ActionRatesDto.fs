@@ -21,7 +21,8 @@ type Seed6ActionRatesDto = {
 }
 
 module Seed6ActionRatesDto =
-    let toSeed6ActionRates (dto: Seed6ActionRatesDto) : Seed6ActionRates =
+
+    let fromDomain (dto: Seed6ActionRatesDto) : Seed6ActionRates =
         Seed6ActionRates.create(
             dto.Ortho1Thresh,
             dto.Ortho2Thresh - dto.Ortho1Thresh,
@@ -32,7 +33,7 @@ module Seed6ActionRatesDto =
             dto.SelfReflThresh - dto.Para4Thresh
         )
 
-    let fromSeed6ActionRates (domain: Seed6ActionRates) : Seed6ActionRatesDto = {
+    let toDomain (domain: Seed6ActionRates) : Seed6ActionRatesDto = {
         Ortho1Thresh = domain.Ortho1Rate
         Ortho2Thresh = domain.Ortho1Rate + domain.Ortho2Rate
         Para1Thresh = domain.Ortho1Rate + domain.Ortho2Rate + domain.Para1Rate

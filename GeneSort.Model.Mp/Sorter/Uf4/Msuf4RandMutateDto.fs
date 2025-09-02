@@ -24,14 +24,14 @@ module Msuf4RandMutateDto =
         { Id = %msuf4RandMutate.Id
           RngType = msuf4RandMutate.RngType
           Msuf4 = Msuf4Dto.toMsuf4Dto msuf4RandMutate.Msuf4
-          Uf4MutationRatesArray = Uf4MutationRatesArrayDto.toUf4MutationRatesArrayDto msuf4RandMutate.Uf4MutationRatesArray }
+          Uf4MutationRatesArray = Uf4MutationRatesArrayDto.fromDomain msuf4RandMutate.Uf4MutationRatesArray }
 
     let fromMsuf4RandMutateDto (dto: Msuf4RandMutateDto) : Msuf4RandMutate =
         try
             if dto.RngType = Unchecked.defaultof<rngType> then
                 failwith "rngType must be specified"
             let msuf4 = Msuf4Dto.fromMsuf4Dto dto.Msuf4 |> Result.toOption |> Option.get
-            let uf4MutationRatesArray = Uf4MutationRatesArrayDto.fromUf4MutationRatesArrayDto dto.Uf4MutationRatesArray
+            let uf4MutationRatesArray = Uf4MutationRatesArrayDto.toDomain dto.Uf4MutationRatesArray
             if uf4MutationRatesArray.Length <> %msuf4.StageCount then
                 failwith $"Uf4MutationRatesArray length ({uf4MutationRatesArray.Length}) must equal StageCount ({%msuf4.StageCount})"
 

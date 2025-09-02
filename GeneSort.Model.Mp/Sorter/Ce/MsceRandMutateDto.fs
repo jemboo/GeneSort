@@ -24,7 +24,7 @@ module MsceRandMutateDto =
     let toMsceRandMutateDto (msceRandMutate: MsceRandMutate) : MsceRandMutateDto =
         { Msce = MsceDto.toMsceDto msceRandMutate.Msce
           RngType = msceRandMutate.RngType
-          IndelRatesArray = IndelRatesArrayDto.fromIndelRatesArray msceRandMutate.IndelRatesArray
+          IndelRatesArray = IndelRatesArrayDto.toDomain msceRandMutate.IndelRatesArray
           ExcludeSelfCe = msceRandMutate.ExcludeSelfCe }
 
     let fromMsceRandMutateDto (dto: MsceRandMutateDto) : Result<MsceRandMutate, string> =
@@ -32,13 +32,13 @@ module MsceRandMutateDto =
             let msceResult = MsceDto.toMsce dto.Msce
             match msceResult with
             | Ok msce ->
-                if %msce.CeCount <> (IndelRatesArrayDto.toIndelRatesArray dto.IndelRatesArray).Length then
+                if %msce.CeCount <> (IndelRatesArrayDto.fromDomain dto.IndelRatesArray).Length then
                     Error "CeCount must match IndelRatesArray.Length"
                 else
                     let msceRandMutate = 
                         MsceRandMutate.create
                             (dto.RngType)
-                            (IndelRatesArrayDto.toIndelRatesArray dto.IndelRatesArray)
+                            (IndelRatesArrayDto.fromDomain dto.IndelRatesArray)
                             (dto.ExcludeSelfCe)
                             msce
                     Ok msceRandMutate

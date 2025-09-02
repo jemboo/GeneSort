@@ -11,10 +11,11 @@ type OpsActionRatesArrayDto = {
 }
 
 module OpsActionRatesArrayDto =
-    let toOpsActionRatesArray (dto: OpsActionRatesArrayDto) : OpsActionRatesArray =
-        let rates = Array.map OpsActionRatesDto.toOpsActionRates dto.Rates
+
+    let fromDomain (dto: OpsActionRatesArrayDto) : OpsActionRatesArray =
+        let rates = Array.map OpsActionRatesDto.fromDomain dto.Rates
         OpsActionRatesArray.create rates
 
-    let fromOpsActionRatesArray (domain: OpsActionRatesArray) : OpsActionRatesArrayDto = {
-        Rates = Array.map OpsActionRatesDto.fromOpsActionRates domain.RatesArray
+    let toDomain (domain: OpsActionRatesArray) : OpsActionRatesArrayDto = {
+        Rates = Array.map OpsActionRatesDto.toDomain domain.RatesArray
     }
