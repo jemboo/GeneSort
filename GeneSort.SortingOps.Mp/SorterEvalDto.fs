@@ -16,7 +16,7 @@ type sorterEvalDto = {
     [<Key(2)>]
     SortingWidth: int
     [<Key(3)>]
-    CeBlockUsage: ceBlockUsageDto
+    CeBlockUsage: ceBlockWithUsageDto
 }
 
 module SorterEvalDto =
@@ -26,7 +26,7 @@ module SorterEvalDto =
             SorterId = %sorterEval.SorterId
             SorterTestsId = %sorterEval.SorterTestsId
             SortingWidth = %sorterEval.SortingWidth
-            CeBlockUsage = CeBlockUsageDto.toCeBlockUsageDto sorterEval.CeBlockUsage
+            CeBlockUsage = CeBlockWithUsageDto.toCeBlockUsageDto sorterEval.CeBlockUsage
         }
 
     let fromSorterEvalDto (dto: sorterEvalDto) : sorterEval =
@@ -38,4 +38,4 @@ module SorterEvalDto =
             (UMX.tag<sorterId> dto.SorterId)  
             (UMX.tag<sorterTestsId> dto.SorterTestsId)
             (UMX.tag<sortingWidth> dto.SortingWidth)
-            (CeBlockUsageDto.fromCeBlockUsageDto dto.CeBlockUsage)
+            (CeBlockWithUsageDto.fromCeBlockUsageDto dto.CeBlockUsage)

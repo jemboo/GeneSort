@@ -74,7 +74,7 @@ type MsceRandGen =
         let ceCodes = 
             if this.ExcludeSelfCe then
                 Ce.generateCeCodesExcludeSelf (rando.NextIndex) %this.SortingWidth
-                |> Seq.take %this.sortingWidth
+                |> Seq.take %this.CeCount
                 |> Seq.toArray
             else
                 Ce.generateCeCodes (rando.NextIndex) %this.SortingWidth

@@ -31,14 +31,14 @@ module MssiRandMutateDto =
             let mssiResult = MssiDto.toMssi dto.Mssi
             match mssiResult with
             | Ok mssi ->
-                if %mssi.StageCount <> (OpActionRatesArrayDto.fromDomain dto.OpActionRatesArray).Length then
+                if %mssi.StageCount <> (OpActionRatesArrayDto.toDomain dto.OpActionRatesArray).Length then
                     Error "StageCount must match OpActionRatesArray.Length"
                 else
                     let mssiRandMutate = 
                         MssiRandMutate.create
                             (dto.RngType)
                             mssi
-                            (OpActionRatesArrayDto.fromDomain dto.OpActionRatesArray)
+                            (OpActionRatesArrayDto.toDomain dto.OpActionRatesArray)
                     Ok mssiRandMutate
             | Error err ->
                 Error (match err with

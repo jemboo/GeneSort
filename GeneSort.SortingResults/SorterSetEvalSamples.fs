@@ -58,3 +58,12 @@ module SorterSetEvalSamples =
         sorterSetEval.SorterEvals
         |> Array.iter (fun se -> addSorterEval se sorterEvalSamples)
         sorterEvalSamples
+
+
+    /// Returns an array of int arrays, each inner array containing [| ceCount; stageCount; binCount |]
+    let getBinCountReport (sorterEvalSamples: sorterSetEvalSamples) : string array array =
+        let lines = 
+            sorterEvalSamples.evalBins
+            |> Seq.map (fun kvp -> [| (%kvp.Key.ceCount).ToString(); (%kvp.Key.stageCount).ToString(); (kvp.Value.binCount).ToString()|])
+            |> Seq.toArray
+        lines

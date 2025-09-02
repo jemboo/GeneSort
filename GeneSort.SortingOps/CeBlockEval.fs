@@ -4,11 +4,11 @@ open GeneSort.Sorter.Sortable
 
 type ceBlockEval = 
     private { 
-        ceBlockUsage: ceBlockUsage
+        ceBlockUsage: ceBlockWithUsage
         sorterTests: sorterTests
     }
 
-    static member create (ceBlockUsage: ceBlockUsage) (sorterTests: sorterTests) =
+    static member create (ceBlockUsage: ceBlockWithUsage) (sorterTests: sorterTests) =
         { 
             ceBlockUsage = ceBlockUsage; 
             sorterTests = sorterTests; 

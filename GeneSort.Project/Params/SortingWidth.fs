@@ -82,7 +82,7 @@ module SwFull =
        ("SortingWidth", ["8"; "16"; "32"; "64"]) 
        
    let practicalFullTestVals() : string*string list =
-       ("SortingWidth", ["8"; "16";]) 
+       ("SortingWidth", ["16";]) 
 
 
 

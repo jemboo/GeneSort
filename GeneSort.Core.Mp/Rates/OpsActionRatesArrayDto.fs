@@ -19,3 +19,4 @@ module OpsActionRatesArrayDto =
     let fromDomain (domain: OpsActionRatesArray) : OpsActionRatesArrayDto = {
         Rates = Array.map OpsActionRatesDto.fromDomain domain.RatesArray
     }
+     

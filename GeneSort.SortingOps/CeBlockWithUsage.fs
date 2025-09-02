@@ -3,7 +3,7 @@
 open FSharp.UMX
 open GeneSort.Sorter.Sorter
 
-type ceBlockUsage =
+type ceBlockWithUsage =
 
     private { 
         ceBlock: ceBlock
@@ -15,7 +15,7 @@ type ceBlockUsage =
         { 
             ceBlock = ceBlock; 
             useCounts = useCounts;
-            usedCes = Lazy<ce[]>(ceBlockUsage.getUsedCes ceBlock useCounts)
+            usedCes = Lazy<ce[]>(ceBlockWithUsage.getUsedCes ceBlock useCounts)
         }
 
     member this.useCount (dex:int) = 

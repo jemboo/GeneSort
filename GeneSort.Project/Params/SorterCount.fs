@@ -22,7 +22,7 @@ module SorterCount =
         | swFull.Sw6 -> 1000<sorterCount>
         | swFull.Sw8 -> 1000<sorterCount>
         | swFull.Sw12 -> 1000<sorterCount>
-        | swFull.Sw16 -> 10<sorterCount>
+        | swFull.Sw16 -> 50<sorterCount>
         | swFull.Sw24 -> 10<sorterCount>
         | swFull.Sw32 -> 10<sorterCount>
         | swFull.Sw48 -> 2<sorterCount>

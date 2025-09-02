@@ -73,6 +73,6 @@ module CeBlockOps =
                 sorterBoolTests.create (Guid.NewGuid() |> UMX.tag<sorterTestsId>) newSortableBoolArray   
                 |> GeneSort.Sorter.Sortable.sorterTests.Bools
             
-        let ceBlockUsage = ceBlockUsage.create ceBlock (ceUseCounts.UseCounts)
+        let ceBlockUsage = ceBlockWithUsage.create ceBlock (ceUseCounts.UseCounts)
         ceBlockEval.create ceBlockUsage newSorterTests
 

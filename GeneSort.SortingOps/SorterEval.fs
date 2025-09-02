@@ -13,7 +13,7 @@ type sorterEval =
         sorterId: Guid<sorterId>
         sorterTestsId: Guid<sorterTestsId>
         sortingWidth: int<sortingWidth>
-        ceBlockUsage: ceBlockUsage
+        ceBlockUsage: ceBlockWithUsage
         stageSequence: Lazy<stageSequence>
     }
 
@@ -21,7 +21,7 @@ type sorterEval =
                 (sorterId: Guid<sorterId>) 
                 (sorterTestsId: Guid<sorterTestsId>)
                 (sortingWidth: int<sortingWidth>)  
-                (ceBlockUsage: ceBlockUsage) =
+                (ceBlockUsage: ceBlockWithUsage) =
         { 
             sorterId = sorterId
             sorterTestsId = sorterTestsId

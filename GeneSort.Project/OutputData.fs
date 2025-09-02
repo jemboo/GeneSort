@@ -58,6 +58,14 @@ module OutputData =
         Path.Combine(folder, outputDataName, fileName)
 
 
+    let getRunFileNameForOutputName  (folder:string) (outputName:string) : string =
+        let pcs = outputName.Split('_')
+        let cycle = pcs.[1]
+        let index = pcs.[2].Split('.').[0]
+        let fileName = sprintf "Run_%s_%s.msgpack" cycle index 
+        Path.Combine(folder, "Run", fileName)
+
+
     let saveToFile 
             (workspaceFolder: string) 
             (index: int) 

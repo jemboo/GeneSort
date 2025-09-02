@@ -5,21 +5,21 @@ open GeneSort.SortingOps
 
 
 [<MessagePackObject>]
-type ceBlockUsageDto = {
+type ceBlockWithUsageDto = {
     [<Key(0)>]
     CeBlock: ceBlockDto
     [<Key(1)>]
     UseCounts: int array
 }
 
-module CeBlockUsageDto =
-    let toCeBlockUsageDto (ceBlockUsage: ceBlockUsage) : ceBlockUsageDto =
+module CeBlockWithUsageDto =
+    let toCeBlockUsageDto (ceBlockUsage: ceBlockWithUsage) : ceBlockWithUsageDto =
         { 
             CeBlock = CeBlockDto.toCeBlockDto ceBlockUsage.CeBlock
             UseCounts = ceBlockUsage.UseCounts
         }
 
-    let fromCeBlockUsageDto (dto: ceBlockUsageDto) : ceBlockUsage =
-        ceBlockUsage.create 
+    let fromCeBlockUsageDto (dto: ceBlockWithUsageDto) : ceBlockWithUsage =
+        ceBlockWithUsage.create 
             (CeBlockDto.fromCeBlockDto dto.CeBlock)
             dto.UseCounts
