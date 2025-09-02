@@ -9,6 +9,7 @@ open System.Collections.Generic
 type sorterEvalKey = {
     ceCount: int<ceCount>
     stageCount: int<stageCount>
+    unsortedCount: int
 }
 
 type sorterEvalBin = {
@@ -30,6 +31,7 @@ module SorterSetEvalSamples =
         let key = {
             ceCount = sorterEval.getUsedCeCount()
             stageCount = sorterEval.getStageCount()
+            unsortedCount = 0 // sorterEval. |> SorterEval.
         }
         let sorterEvalBin =
             if sorterEvalSamples.evalBins.ContainsKey(key) then

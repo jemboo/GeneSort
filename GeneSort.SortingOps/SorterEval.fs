@@ -13,35 +13,45 @@ type sorterEval =
         sorterId: Guid<sorterId>
         sorterTestsId: Guid<sorterTestsId>
         sortingWidth: int<sortingWidth>
-        ceBlockUsage: ceBlockWithUsage
+        ceBlockWithUsage: ceBlockWithUsage
         stageSequence: Lazy<stageSequence>
+        unsortedCount: int
     }
 
     static member create 
                 (sorterId: Guid<sorterId>) 
                 (sorterTestsId: Guid<sorterTestsId>)
                 (sortingWidth: int<sortingWidth>)  
-                (ceBlockUsage: ceBlockWithUsage) =
+                (ceBlockUsage: ceBlockWithUsage)
+                (unsortedCount:int) =
         { 
             sorterId = sorterId
             sorterTestsId = sorterTestsId
             sortingWidth = sortingWidth
-            ceBlockUsage = ceBlockUsage
+            ceBlockWithUsage = ceBlockUsage
             stageSequence = Lazy<stageSequence>(StageSequence.fromCes sortingWidth ceBlockUsage.UsedCes)
+            unsortedCount = unsortedCount
         }
 
 
     member this.getRefinedSorter() : sorter =
              sorter.create
-                    (Guid.NewGuid() |> UMX.tag<sorterId>) this.sortingWidth (this.ceBlockUsage.UsedCes) 
+                    (Guid.NewGuid() |> UMX.tag<sorterId>) this.sortingWidth (this.ceBlockWithUsage.UsedCes) 
 
+                    
+    member this.CeBlockUsage with get() = this.ceBlockWithUsage
     member this.SorterId with get() : Guid<sorterId> = this.sorterId
     member this.SorterTestsId with get() : Guid<sorterTestsId> = this.sorterTestsId
     member this.SortingWidth with get() : int<sortingWidth> =  this.sortingWidth
-    member this.CeBlockUsage with get() = this.ceBlockUsage
 
     member this.getUsedCeCount() : int<ceCount> =
-        this.ceBlockUsage.UsedCes.Length |> UMX.tag<ceCount>
+        this.ceBlockWithUsage.UsedCes.Length |> UMX.tag<ceCount>
+
+    member this.getLastUsedCeIndex : int = 
+            this.ceBlockWithUsage.LastUsedCeIndex
+        
+
+    member this.UnsortedCount with get() = this.unsortedCount
 
     member this.getStageCount() : int<stageCount> =
         this.getStageSequence().StageCount 
@@ -57,7 +67,9 @@ module SorterEval =
             (sorterTests: sorterTests) : sorterEval =
 
         let ceBlockEval = CeBlockOps.evalWithSorterTest sorterTests (ceBlock.create(sorter.Ces))
-
-        sorterEval.create sorter.SorterId (sorterTests |> SorterTests.getId ) sorter.SortingWidth ceBlockEval.ceBlockUsage
-
+        sorterEval.create 
+            sorter.SorterId 
+            (sorterTests |> SorterTests.getId ) 
+            sorter.SortingWidth ceBlockEval.ceBlockUsage
+            (sorterTests |> SorterTests.getUnsortedCount)
 

@@ -63,3 +63,13 @@ module ArrayProperties =
                 isSorted <- (values.[i + offset - 1] <= values.[i + offset])
                 i <- i + 1
             isSorted
+
+    let lastNonZeroIndex (arr: int array) : int =
+        let rec loop i =
+            if i < 0 then
+                -1  // Return -1 if no non-zero value is found
+            elif arr.[i] <> 0 then
+                i
+            else
+                loop (i - 1)
+        loop (arr.Length - 1)

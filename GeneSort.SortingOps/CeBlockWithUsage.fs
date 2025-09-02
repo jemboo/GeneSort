@@ -1,7 +1,8 @@
 ﻿namespace GeneSort.SortingOps
 
-open FSharp.UMX
+open GeneSort.Core
 open GeneSort.Sorter.Sorter
+open FSharp.UMX
 
 type ceBlockWithUsage =
 
@@ -9,6 +10,7 @@ type ceBlockWithUsage =
         ceBlock: ceBlock
         useCounts: int array
         usedCes: Lazy<ce array>
+        lastUsedIndex: Lazy<int>
     }
 
     static member create (ceBlock: ceBlock) (useCounts: int[]) =
@@ -16,6 +18,7 @@ type ceBlockWithUsage =
             ceBlock = ceBlock; 
             useCounts = useCounts;
             usedCes = Lazy<ce[]>(ceBlockWithUsage.getUsedCes ceBlock useCounts)
+            lastUsedIndex = Lazy<int>(ArrayProperties.lastNonZeroIndex useCounts)
         }
 
     member this.useCount (dex:int) = 
@@ -24,6 +27,9 @@ type ceBlockWithUsage =
         this.useCounts.[dex]
 
     member this.CeBlock with get() = this.ceBlock
+
+    member this.LastUsedCeIndex with get() : int = 
+        this.lastUsedIndex.Value
 
     member this.UseCounts with get() = Array.copy this.useCounts
 
