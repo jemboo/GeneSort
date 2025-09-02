@@ -20,7 +20,7 @@ module Uf6MutationRatesDto =
 
     let fromDomain (uf6MutationRates: Uf6MutationRates) : Uf6MutationRatesDto =
         { Order = uf6MutationRates.order
-          Seed6TransitionRates = Seed6TransitionRatesDto.toDomain uf6MutationRates.seed6TransitionRates
+          Seed6TransitionRates = Seed6TransitionRatesDto.fromDomain uf6MutationRates.seed6TransitionRates
           OpsTransitionRates = OpsTransitionRatesArrayDto.fromDomain uf6MutationRates.opsTransitionRates }
 
     let toDomain (dto: Uf6MutationRatesDto) : Uf6MutationRates =
@@ -30,7 +30,7 @@ module Uf6MutationRatesDto =
             if dto.OpsTransitionRates.Rates.Length <> MathUtils.exactLog2 (dto.Order / 6) && dto.Order <> 6 then
                 failwith $"OpsTransitionRates length ({dto.OpsTransitionRates.Rates.Length}) must match log2(order/6) ({MathUtils.exactLog2 (dto.Order / 6)})"
             { order = dto.Order
-              seed6TransitionRates = Seed6TransitionRatesDto.fromDomain dto.Seed6TransitionRates
+              seed6TransitionRates = Seed6TransitionRatesDto.toDomain dto.Seed6TransitionRates
               opsTransitionRates = OpsTransitionRatesArrayDto.toDomain dto.OpsTransitionRates }
         with
         | ex -> failwith $"Failed to convert Uf6MutationRatesDto: {ex.Message}"

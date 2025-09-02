@@ -24,7 +24,7 @@ module MssiRandMutateDto =
     let toMssiRandMutateDto (mssiRandMutate: MssiRandMutate) : MssiRandMutateDto =
         { Mssi = MssiDto.toMssiDto mssiRandMutate.Mssi
           RngType = mssiRandMutate.RngType
-          OpActionRatesArray = OpActionRatesArrayDto.toDomain mssiRandMutate.OpActionRates }
+          OpActionRatesArray = OpActionRatesArrayDto.fromDomain mssiRandMutate.OpActionRates }
 
     let fromMssiRandMutateDto (dto: MssiRandMutateDto) : Result<MssiRandMutate, string> =
         try

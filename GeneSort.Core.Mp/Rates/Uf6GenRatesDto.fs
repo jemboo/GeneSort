@@ -19,8 +19,8 @@ module Uf6GenRatesDto =
 
     let fromDomain (uf6GenRates: Uf6GenRates) : Uf6GenRatesDto =
         { Order = uf6GenRates.order
-          SeedGenRatesUf6 = Seed6GenRatesDto.toDomain uf6GenRates.seedGenRatesUf6
-          OpsGenRatesArray = OpsGenRatesArrayDto.toDomain uf6GenRates.opsGenRatesArray }
+          SeedGenRatesUf6 = Seed6GenRatesDto.fromDomain uf6GenRates.seedGenRatesUf6
+          OpsGenRatesArray = OpsGenRatesArrayDto.fromDomain uf6GenRates.opsGenRatesArray }
 
     let toDomain (dto: Uf6GenRatesDto) : Uf6GenRates =
         try
@@ -29,7 +29,7 @@ module Uf6GenRatesDto =
             if dto.OpsGenRatesArray.Rates.Length <> MathUtils.exactLog2 (dto.Order / 6) then
                 failwith $"OpsGenRatesArray length ({dto.OpsGenRatesArray.Rates.Length}) must match log2(order/6) ({MathUtils.exactLog2 (dto.Order / 6)})"
             { order = dto.Order
-              seedGenRatesUf6 = Seed6GenRatesDto.fromDomain dto.SeedGenRatesUf6
-              opsGenRatesArray = OpsGenRatesArrayDto.fromDomain dto.OpsGenRatesArray }
+              seedGenRatesUf6 = Seed6GenRatesDto.toDomain dto.SeedGenRatesUf6
+              opsGenRatesArray = OpsGenRatesArrayDto.toDomain dto.OpsGenRatesArray }
         with
         | ex -> failwith $"Failed to convert Uf6GenRatesDto: {ex.Message}"

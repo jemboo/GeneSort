@@ -16,13 +16,13 @@ module OpsTransitionRatesDto =
 
     let toDomain (dto: OpsTransitionRatesDto) : OpsTransitionRates =
         OpsTransitionRates.create(
-            OpsActionRatesDto.fromDomain dto.OrthoRates,
-            OpsActionRatesDto.fromDomain dto.ParaRates,
-            OpsActionRatesDto.fromDomain dto.SelfReflRates
+            OpsActionRatesDto.toDomain dto.OrthoRates,
+            OpsActionRatesDto.toDomain dto.ParaRates,
+            OpsActionRatesDto.toDomain dto.SelfReflRates
         )
 
     let fromDomain (domain: OpsTransitionRates) : OpsTransitionRatesDto = {
-        OrthoRates = OpsActionRatesDto.toDomain domain.OrthoRates
-        ParaRates = OpsActionRatesDto.toDomain domain.ParaRates
-        SelfReflRates = OpsActionRatesDto.toDomain domain.SelfReflRates
+        OrthoRates = OpsActionRatesDto.fromDomain domain.OrthoRates
+        ParaRates = OpsActionRatesDto.fromDomain domain.ParaRates
+        SelfReflRates = OpsActionRatesDto.fromDomain domain.SelfReflRates
     }

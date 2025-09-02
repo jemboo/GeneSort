@@ -20,8 +20,8 @@ module Uf4GenRatesDto =
 
     let fromDomain (uf4GenRates: Uf4GenRates) : Uf4GenRatesDto =
         { Order = uf4GenRates.order
-          SeedOpsGenRates = OpsGenRatesDto.toDomain uf4GenRates.seedOpsGenRates
-          OpsGenRatesArray = OpsGenRatesArrayDto.toDomain uf4GenRates.opsGenRatesArray }
+          SeedOpsGenRates = OpsGenRatesDto.fromDomain uf4GenRates.seedOpsGenRates
+          OpsGenRatesArray = OpsGenRatesArrayDto.fromDomain uf4GenRates.opsGenRatesArray }
 
     let toDomain (dto: Uf4GenRatesDto) : Uf4GenRates =
         try
@@ -30,7 +30,7 @@ module Uf4GenRatesDto =
             if dto.OpsGenRatesArray.Rates.Length <> MathUtils.exactLog2 (dto.Order / 4) then
                 failwith $"OpsGenRatesArray length ({dto.OpsGenRatesArray.Rates.Length}) must match log2(order/4) ({MathUtils.exactLog2 (dto.Order / 4)})"
             { order = dto.Order
-              seedOpsGenRates = OpsGenRatesDto.fromDomain dto.SeedOpsGenRates
-              opsGenRatesArray = OpsGenRatesArrayDto.fromDomain dto.OpsGenRatesArray }
+              seedOpsGenRates = OpsGenRatesDto.toDomain dto.SeedOpsGenRates
+              opsGenRatesArray = OpsGenRatesArrayDto.toDomain dto.OpsGenRatesArray }
         with
         | ex -> failwith $"Failed to convert Uf4GenRatesDto: {ex.Message}"
