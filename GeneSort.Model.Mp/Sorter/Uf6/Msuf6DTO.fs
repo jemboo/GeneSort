@@ -45,12 +45,12 @@ module Msuf6Dto =
     let toMsuf6Dto (msuf6: Msuf6) : Msuf6Dto =
         { Id = %msuf6.Id
           SortingWidth = %msuf6.SortingWidth
-          TwoOrbitUnfolder6s = msuf6.TwoOrbitUnfolder6s |> Array.map TwoOrbitUf6Dto.toTwoOrbitUf6Dto }
+          TwoOrbitUnfolder6s = msuf6.TwoOrbitUnfolder6s |> Array.map TwoOrbitUf6Dto.fromDomain }
 
     let fromMsuf6Dto (dto: Msuf6Dto) : Result<Msuf6, Msuf6DtoError> =
         let twoOrbitUnfolder6sResult = 
             dto.TwoOrbitUnfolder6s 
-            |> Array.map TwoOrbitUf6Dto.toTwoOrbitUf6
+            |> Array.map TwoOrbitUf6Dto.toDomain
             |> Array.fold (fun acc res ->
                 match acc, res with
                 | Ok arr, Ok tou -> Ok (Array.append arr [|tou|])

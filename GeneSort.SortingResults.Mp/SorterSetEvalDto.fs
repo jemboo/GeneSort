@@ -22,7 +22,7 @@ type sorterSetEvalDto = {
 }
 
 module SorterSetEvalDto =
-    let toSorterSetEvalDto (sorterSetEval: sorterSetEval) : sorterSetEvalDto =
+    let fromDomain (sorterSetEval: sorterSetEval) : sorterSetEvalDto =
         { 
             SorterSetEvalId = %sorterSetEval.SorterSetEvalId
             SorterSetId = %sorterSetEval.SorterSetId
@@ -30,7 +30,7 @@ module SorterSetEvalDto =
             SorterEvals = sorterSetEval.SorterEvals |> Array.map SorterEvalDto.toSorterEvalDto
         }
 
-    let fromSorterSetEvalDto (dto: sorterSetEvalDto) : sorterSetEval =
+    let toDomain (dto: sorterSetEvalDto) : sorterSetEval =
         if dto.SorterSetEvalId = Guid.Empty then
             failwith "SorterSetEvalId must not be empty"
         if dto.SorterSetId = Guid.Empty then

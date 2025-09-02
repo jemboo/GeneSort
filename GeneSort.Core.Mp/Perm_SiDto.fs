@@ -20,6 +20,7 @@ type Perm_SiDto =
                 Ok { Permutation = permDto }
 
 module Perm_SiDto =
+
     type Perm_SiDtoError =
         | NullArray of string
         | EmptyArray of string
@@ -27,11 +28,11 @@ module Perm_SiDto =
         | NotSelfInverse of string
         | PermutationConversionError of PermutationDto.PermutationDtoError
 
-    let toPerm_SiDto (permSi: Perm_Si) : Perm_SiDto =
-        { Permutation = PermutationDto.toPermutationDto permSi.Permutation }
+    let fromDomain (permSi: Perm_Si) : Perm_SiDto =
+        { Permutation = PermutationDto.fromDomain permSi.Permutation }
 
-    let toPerm_Si (dto: Perm_SiDto) : Result<Perm_Si, Perm_SiDtoError> =
-        match PermutationDto.toPermutation dto.Permutation with
+    let toDomain (dto: Perm_SiDto) : Result<Perm_Si, Perm_SiDtoError> =
+        match PermutationDto.toDomain dto.Permutation with
         | Error e -> Error (PermutationConversionError e)
         | Ok perm ->
             try

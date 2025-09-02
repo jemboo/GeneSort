@@ -43,13 +43,14 @@ type sorterEvalBinDto = {
 }
 
 module SorterEvalBinDto =
-    let toSorterEvalBinDto (bin: sorterEvalBin) : sorterEvalBinDto =
+
+    let fromDomain (bin: sorterEvalBin) : sorterEvalBinDto =
         { 
             BinCount = bin.binCount
             SorterEvals = bin.sorterEvals.ToArray() |> Array.map SorterEvalDto.toSorterEvalDto
         }
 
-    let fromSorterEvalBinDto (dto: sorterEvalBinDto) : sorterEvalBin =
+    let toDomain (dto: sorterEvalBinDto) : sorterEvalBin =
         if dto.BinCount < 0 then
             failwith "BinCount must not be negative"
         { 

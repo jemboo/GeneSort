@@ -18,8 +18,8 @@ type SorterTestModelSetDto = {
 module SorterTestModelSetDto =
 
     let fromDomain (set: sorterTestModelSet) : SorterTestModelSetDto =
-        { Id = %set.Id; SorterTestModels = set.SorterTestModels |> Array.map SorterTestModelDto.toDto }
+        { Id = %set.Id; SorterTestModels = set.SorterTestModels |> Array.map SorterTestModelDto.toDomain }
 
-    let fromDtoSorterTestModelSet (dto: SorterTestModelSetDto) : sorterTestModelSet =
-        let models = dto.SorterTestModels |> Array.map SorterTestModelDto.fromDto
+    let toDomain (dto: SorterTestModelSetDto) : sorterTestModelSet =
+        let models = dto.SorterTestModels |> Array.map SorterTestModelDto.fromDomain
         sorterTestModelSet.create (UMX.tag<sorterTestModelSetID> dto.Id) models

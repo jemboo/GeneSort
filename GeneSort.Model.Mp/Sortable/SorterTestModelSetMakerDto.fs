@@ -19,9 +19,10 @@ type SorterTestModelSetMakerDto = {
 }
 
 module SorterTestModelSetMakerDto =
+
     let fromDomain (maker: sorterTestModelSetMaker) : SorterTestModelSetMakerDto =
         { Id = %maker.Id
-          SorterTestModelGenDto = SorterTestModelGenDto.toDtoSorterTestModelGen maker.SorterTestModelGen
+          SorterTestModelGenDto = SorterTestModelGenDto.fromDomain maker.SorterTestModelGen
           FirstIndex = int maker.FirstIndex
           Count = int maker.Count }
 
@@ -30,5 +31,5 @@ module SorterTestModelSetMakerDto =
             invalidArg "FirstIndex" "First index must be non-negative."
         if dto.Count < 0 then
             invalidArg "Count" "Count must be non-negative."
-        let sorterTestModelGen = SorterTestModelGenDto.fromDtoSorterTestModelGen dto.SorterTestModelGenDto
+        let sorterTestModelGen = SorterTestModelGenDto.toDomain dto.SorterTestModelGenDto
         sorterTestModelSetMaker.create sorterTestModelGen (UMX.tag<sorterTestModelCount> dto.FirstIndex) (UMX.tag<sorterTestModelCount> dto.Count)

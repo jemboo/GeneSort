@@ -24,19 +24,20 @@ type TwoOrbitUf6Dto =
 
 
 module TwoOrbitUf6Dto =
+
     type TwoOrbitUf6DtoError =
         | EmptyTwoOrbitUnfolderSteps of string
         | InvalidStepOrder of string
         | StepConversionError of TwoOrbitUnfolderStepDto.TwoOrbitUnfolderStepDtoError
 
-    let toTwoOrbitUf6Dto (tou: TwoOrbitUf6) : TwoOrbitUf6Dto =
+    let fromDomain (tou: TwoOrbitUf6) : TwoOrbitUf6Dto =
         { SeedType = tou.Seed6TwoOrbitType
-          TwoOrbitUfSteps = tou.TwoOrbitUnfolderSteps |> Array.map TwoOrbitUnfolderStepDto.toTwoOrbitUnfolderStepDto }
+          TwoOrbitUfSteps = tou.TwoOrbitUnfolderSteps |> Array.map TwoOrbitUnfolderStepDto.fromDomain }
 
-    let toTwoOrbitUf6 (dto: TwoOrbitUf6Dto) : Result<TwoOrbitUf6, TwoOrbitUf6DtoError> =
+    let toDomain (dto: TwoOrbitUf6Dto) : Result<TwoOrbitUf6, TwoOrbitUf6DtoError> =
         let stepsResult = 
             dto.TwoOrbitUfSteps 
-            |> Array.map TwoOrbitUnfolderStepDto.toTwoOrbitUnfolderStep
+            |> Array.map TwoOrbitUnfolderStepDto.toDomain
             |> Array.fold (fun acc res ->
                 match acc, res with
                 | Ok arr, Ok step -> Ok (arr @ [step])

@@ -31,14 +31,14 @@ module MssiDto =
         | InvalidWidth of string
 
     let toMssiDto (mssi: Mssi) : MssiDto =
-        let mssiDtos = mssi.Perm_Sis |> Array.map Perm_SiDto.toPerm_SiDto
+        let mssiDtos = mssi.Perm_Sis |> Array.map Perm_SiDto.fromDomain
         { Id = %mssi.Id
           Width = %mssi.SortingWidth
           Perm_SiDtos = mssiDtos }
 
     let toMssi (mssiDto: MssiDto) : Result<Mssi, MssiDtoError> =
         try
-            let perm_SisR = mssiDto.Perm_SiDtos |> Array.map (Perm_SiDto.toPerm_Si)
+            let perm_SisR = mssiDto.Perm_SiDtos |> Array.map (Perm_SiDto.toDomain)
             let perm_Sis =
                 perm_SisR 
                 |> Array.map (function

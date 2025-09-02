@@ -28,10 +28,10 @@ module PermutationDto =
         | EmptyArray of string
         | InvalidPermutation of string
 
-    let toPermutationDto (perm: Permutation) : PermutationDto =
+    let fromDomain (perm: Permutation) : PermutationDto =
         { Array = perm.Array }
 
-    let toPermutation (dto: PermutationDto) : Result<Permutation, PermutationDtoError> =
+    let toDomain (dto: PermutationDto) : Result<Permutation, PermutationDtoError> =
         try
             let perm = Permutation.create dto.Array
             Ok perm

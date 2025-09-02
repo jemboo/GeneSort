@@ -23,16 +23,17 @@ type TwoOrbitUfStepDto =
 
 
 module TwoOrbitUnfolderStepDto =
+
     type TwoOrbitUnfolderStepDtoError =
         | InvalidOrder of string
         | NotEvenOrder of string
         | InvalidTwoOrbitTypesLength of string
 
-    let toTwoOrbitUnfolderStepDto (step: TwoOrbitUfStep) : TwoOrbitUfStepDto =
+    let fromDomain (step: TwoOrbitUfStep) : TwoOrbitUfStepDto =
         { TwoOrbitPairTypes = step.TwoOrbitPairTypes
           Order = step.Order }
 
-    let toTwoOrbitUnfolderStep (dto: TwoOrbitUfStepDto) : Result<TwoOrbitUfStep, TwoOrbitUnfolderStepDtoError> =
+    let toDomain (dto: TwoOrbitUfStepDto) : Result<TwoOrbitUfStep, TwoOrbitUnfolderStepDtoError> =
         try
             let step = TwoOrbitUfStep.create dto.TwoOrbitPairTypes dto.Order
             Ok step

@@ -32,10 +32,10 @@ module Perm_RsDto =
         | PermSiConversionError of Perm_SiDto.Perm_SiDtoError
 
     let toPerm_RsDto (permRs: Perm_Rs) : Perm_RsDto =
-        { Perm_Si = Perm_SiDto.toPerm_SiDto permRs.Perm_Si }
+        { Perm_Si = Perm_SiDto.fromDomain permRs.Perm_Si }
 
     let toPerm_Rs (dto: Perm_RsDto) : Result<Perm_Rs, Perm_RsDtoError> =
-        match Perm_SiDto.toPerm_Si dto.Perm_Si with
+        match Perm_SiDto.toDomain dto.Perm_Si with
         | Error e -> Error (PermSiConversionError e)
         | Ok permSi ->
             try

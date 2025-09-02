@@ -28,11 +28,11 @@ module SorterSetEvalSamplesDto =
             MaxBinCount = samples.maxBinCount
             EvalBins = 
                 samples.evalBins
-                |> Seq.map (fun kvp -> (SorterEvalKeyDto.toSorterEvalKeyDto kvp.Key, SorterEvalBinDto.toSorterEvalBinDto kvp.Value))
+                |> Seq.map (fun kvp -> (SorterEvalKeyDto.toSorterEvalKeyDto kvp.Key, SorterEvalBinDto.fromDomain kvp.Value))
                 |> Seq.toArray
         }
 
-    let fromSorterSetEvalSamplesDto (dto: sorterSetEvalSamplesDto) : sorterSetEvalSamples =
+    let toDomain (dto: sorterSetEvalSamplesDto) : sorterSetEvalSamples =
         if dto.SorterSetEvalId = Guid.Empty then
             failwith "SorterSetEvalId must not be empty"
         if dto.TotalSampleCount < 0 then
@@ -41,7 +41,7 @@ module SorterSetEvalSamplesDto =
             failwith "MaxBinCount must be at least 1"
         let evalBins = Dictionary<sorterEvalKey, sorterEvalBin>()
         for (keyDto, binDto) in dto.EvalBins do
-            evalBins.[SorterEvalKeyDto.fromSorterEvalKeyDto keyDto] <- SorterEvalBinDto.fromSorterEvalBinDto binDto
+            evalBins.[SorterEvalKeyDto.fromSorterEvalKeyDto keyDto] <- SorterEvalBinDto.toDomain binDto
         { 
             sorterSetEvalId = UMX.tag<sorterSetEvalId> dto.SorterSetEvalId
             totalSampleCount = dto.TotalSampleCount

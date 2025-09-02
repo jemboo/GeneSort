@@ -29,13 +29,14 @@ type SorterTestModelDto = {
 }
 
 module MsasFDtoConv =
-    let toDto (m: MsasF) : MsasFDto =
+
+    let fromDomain (m: MsasF) : MsasFDto =
         {
             Id = %m.Id
             SortingWidth = %m.SortingWidth
         }
 
-    let fromDto (dto: MsasFDto) : MsasF =
+    let toDomain (dto: MsasFDto) : MsasF =
         // Id is deterministic from SortingWidth via MsasF.create; dto.Id is informational
         MsasF.create (dto.SortingWidth |> UMX.tag<sortingWidth>)
 
@@ -49,30 +50,30 @@ module MsasODtoConv =
     let toDto (m: MsasO) : MsasODto =
         {
             Id = %m.Id
-            SeedPermutation = m.SeedPermutation |> PermutationDto.toPermutationDto
+            SeedPermutation = m.SeedPermutation |> PermutationDto.fromDomain
             MaxOrbit = getMaxOrbit m
         }
 
     let fromDto (dto: MsasODto) : MsasO =
-        let perm = dto.SeedPermutation |> PermutationDto.toPermutation |> Result.toOption |> Option.get
+        let perm = dto.SeedPermutation |> PermutationDto.toDomain |> Result.toOption |> Option.get
         MsasO.create perm dto.MaxOrbit
 
 
 module SorterTestModelDto =
 
-    let fromDto (dto: SorterTestModelDto) : SorterTestModel =
+    let fromDomain (dto: SorterTestModelDto) : SorterTestModel =
         match dto.Kind with
-        | 0 -> dto.MsasF |> MsasFDtoConv.fromDto |> SorterTestModel.MsasF
+        | 0 -> dto.MsasF |> MsasFDtoConv.toDomain |> SorterTestModel.MsasF
         | 1 -> dto.MsasO |> MsasODtoConv.fromDto |> SorterTestModel.MsasO
         | k -> failwithf "Unknown SorterTestModelDto.Kind = %d" k
 
 
-    let toDto (m: SorterTestModel) : SorterTestModelDto =
+    let toDomain (m: SorterTestModel) : SorterTestModelDto =
         match m with
         | SorterTestModel.MsasF msasF ->
             {
                 Kind = 0
-                MsasF = msasF |> MsasFDtoConv.toDto
+                MsasF = msasF |> MsasFDtoConv.fromDomain
                 MsasO = Unchecked.defaultof<MsasODto>
             }
         | SorterTestModel.MsasO msasO ->

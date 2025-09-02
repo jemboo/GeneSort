@@ -3,6 +3,7 @@ open GeneSort.Project
 
 //Exp2.RunSorterTestCountReport()
 //Exp2.RunAll()
-Exp3.RunAll()
+//Exp3.RunAll()
+Exp3.RunSorterEvalReport()
 printfn "Hello from F#"
  

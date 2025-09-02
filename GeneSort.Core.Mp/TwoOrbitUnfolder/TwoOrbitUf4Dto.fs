@@ -22,14 +22,14 @@ module TwoOrbitUf4Dto =
         | EmptyTwoOrbitUfSteps of string
         | StepConversionError of TwoOrbitUnfolderStepDto.TwoOrbitUnfolderStepDtoError
 
-    let toTwoOrbitUnfolder4Dto (tou: TwoOrbitUf4) : TwoOrbitUf4Dto =
+    let fromDomain (tou: TwoOrbitUf4) : TwoOrbitUf4Dto =
         { SeedType = tou.TwoOrbitPairType
-          TwoOrbitUfSteps = tou.TwoOrbitUnfolderSteps |> Array.map TwoOrbitUnfolderStepDto.toTwoOrbitUnfolderStepDto }
+          TwoOrbitUfSteps = tou.TwoOrbitUnfolderSteps |> Array.map TwoOrbitUnfolderStepDto.fromDomain }
 
-    let toTwoOrbitUnfolder4 (dto: TwoOrbitUf4Dto) : Result<TwoOrbitUf4, TwoOrbitUf4DtoError> =
+    let toDomain (dto: TwoOrbitUf4Dto) : Result<TwoOrbitUf4, TwoOrbitUf4DtoError> =
         let stepsResult = 
             dto.TwoOrbitUfSteps 
-            |> Array.map TwoOrbitUnfolderStepDto.toTwoOrbitUnfolderStep
+            |> Array.map TwoOrbitUnfolderStepDto.toDomain
             |> Array.fold (fun acc res ->
                 match acc, res with
                 | Ok arr, Ok step -> Ok (arr @ [step])

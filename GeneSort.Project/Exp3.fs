@@ -132,21 +132,24 @@ module Exp3 =
 
 
 
-
-
-
-
-
-
-
-
-
-
-                let reportContent = ""
+                // Generate the Markdown report, one line per SorterTest
+                let reportContent =
+                    [ "# sorterEval Report"
+                      sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+                      sprintf "Workspace: %s" workspace.WorkspaceFolder
+                      ""
+                      "| Id | Sorting Width | Count |"
+                      "|----|---------------|-------|"
+                    ]
+                    @ (summaries
+                       |> Array.map (fun (id, sortingWidth, count) ->
+                           sprintf "| %s | %d | %d |" (id.ToString()) sortingWidth count)
+                       |> Array.toList)
+                    |> String.concat "\n"
 
 
                 // Save the report to a file
-                let reportFilePath = Path.Combine(workspace.WorkspaceFolder, sprintf "%s_SorterTestCountReport_%s.md" outputDataType (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
+                let reportFilePath = Path.Combine(workspace.WorkspaceFolder, sprintf "%s_SorterEvalReport_%s.md" outputDataType (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
                 do! File.WriteAllTextAsync(reportFilePath, reportContent) |> Async.AwaitTask
 
                 Console.WriteLine(sprintf "SorterTest count report saved to %s" reportFilePath)
@@ -163,9 +166,8 @@ module Exp3 =
             WorkspaceOps.executeWorkspace workspace cycle 6 executor
 
 
-
-
-
+    let RunSorterEvalReport() =
+        Async.RunSynchronously (sorterEvalReportExecutor workspace)
 
 
 
