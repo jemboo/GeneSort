@@ -14,11 +14,12 @@ type sorterIntTestSetDto = {
 }
 
 module SorterIntTestSetDto =
-    let toDto (sits: sorterIntTestSet) : sorterIntTestSetDto =
-        { Id = %sits.Id
-          SorterTests = sits.sorterTests |> Array.map SorterIntTestDto.toDto }
 
-    let fromDto (dto: sorterIntTestSetDto) : sorterIntTestSet =
+    let fromDomain (sits: sorterIntTestSet) : sorterIntTestSetDto =
+        { Id = %sits.Id
+          SorterTests = sits.sorterTests |> Array.map SorterIntTestDto.fromDomain }
+
+    let toDomain (dto: sorterIntTestSetDto) : sorterIntTestSet =
         sorterIntTestSet.create
             (UMX.tag<sorterTestSetId> dto.Id)
-            (dto.SorterTests |> Array.map SorterIntTestDto.fromDto)
+            (dto.SorterTests |> Array.map SorterIntTestDto.toDomain)

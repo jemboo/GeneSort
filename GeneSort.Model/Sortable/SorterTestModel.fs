@@ -9,9 +9,8 @@ open GeneSort.Sorter.Sortable
 
 
 type SorterTestModel =
-     | MsasF of MsasF
-     | MsasO of MsasO
-
+     | MsasF of MsasF   // MsasF = a full bool test set for a given sorting width
+     | MsasO of MsasO   // MsasO = generated from a seed permutation; for bool models, it's expanded from the integer permutations
 
 module SorterTestModel =
 

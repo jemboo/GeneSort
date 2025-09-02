@@ -13,7 +13,7 @@ type ceBlockDto = {
 
 module CeBlockDto =
     let toCeBlockDto (ceBlock: ceBlock) : ceBlockDto =
-        { Ces = ceBlock.CeArray |> Array.map CeDto.toCeDto }
+        { Ces = ceBlock.CeArray |> Array.map CeDto.fromDomain }
 
     let fromCeBlockDto (dto: ceBlockDto) : ceBlock =
-        ceBlock.create (dto.Ces |> Array.map CeDto.fromCeDto)
+        ceBlock.create (dto.Ces |> Array.map CeDto.toDomain)

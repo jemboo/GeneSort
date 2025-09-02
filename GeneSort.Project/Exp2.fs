@@ -94,14 +94,14 @@ module Exp2 =
                 let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
                 // Process each file and collect data for each SorterTest
-                let summaries =
+                let (summaries : (Guid*int*int) array) =
                     files
                     |> Seq.map (fun filePath ->
                         async {
                             try
                                 use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)
                                 let! dto = MessagePackSerializer.DeserializeAsync<sorterTestSetDto>(stream, options).AsTask() |> Async.AwaitTask
-                                let sorterTestSet = SorterTestSetDto.fromDto dto
+                                let sorterTestSet = SorterTestSetDto.toDomain dto
                                 let sorterIntTestSet = 
                                     match sorterTestSet with
                                     | sorterTestSet.Ints intTestSet -> intTestSet

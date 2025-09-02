@@ -14,6 +14,8 @@ open GeneSort.Model.Mp.Sorter
 open GeneSort.Model.Mp.Sortable
 open GeneSort.Sorter.Mp.Sorter
 open GeneSort.Sorter.Mp.Sortable
+open GeneSort.SortingResults
+open GeneSort.SortingResults.Mp
 
 
 type OutputData =
@@ -23,6 +25,7 @@ type OutputData =
     | SorterModelSetMaker of sorterModelSetMaker
     | SorterTestModelSet of sorterTestModelSet
     | SorterTestModelSetMaker of sorterTestModelSetMaker
+    | SorterSetEvalSamples of sorterSetEvalSamples
 
 
      
@@ -35,12 +38,13 @@ module OutputData =
         match outputData with
         | Run _ -> "Run"
         | SorterSet _ -> "SorterSet"
+        | SorterTestSet _ -> "SorterTestSet"
         | SorterModelSetMaker _ -> "SorterModelSet"
         | SorterTestModelSet _ -> "SorterTestModelSet"
         | SorterTestModelSetMaker _ -> "SorterTestModelSetMaker"
-        | SorterTestSet _ -> "SorterTestSet"
+        | SorterSetEvalSamples _ -> "SorterSetEvalSamples"
         | _ -> failwith "Unknown OutputData type"
-
+         
 
     let getOutputDataFolder (workspace:Workspace) (outputDataFolder: string) 
                     : string =
@@ -73,7 +77,7 @@ module OutputData =
                     let dto = SorterSetDto.fromDomain ss
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterTestSet sts ->
-                    let dto = SorterTestSetDto.toDto sts
+                    let dto = SorterTestSetDto.fromDomain sts
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterModelSetMaker sms -> 
                     let dto = SorterModelSetMakerDto.fromDomain sms
@@ -83,6 +87,9 @@ module OutputData =
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterTestModelSetMaker stsm ->
                     let dto = SorterTestModelSetMakerDto.fromDomain stsm
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | SorterSetEvalSamples sse ->
+                    let dto = SorterSetEvalSamplesDto.fromDomain sse
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
 
             with e ->

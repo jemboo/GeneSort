@@ -20,7 +20,7 @@ module SorterDto =
     let toSorterDto (sorter: sorter) : SorterDto =
         { SorterId = %sorter.SorterId
           Width = %sorter.SortingWidth
-          Ces = sorter.Ces |> Array.map CeDto.toCeDto }
+          Ces = sorter.Ces |> Array.map CeDto.fromDomain }
 
     let fromSorterDto (dto: SorterDto) : sorter =
         if dto.SorterId = Guid.Empty then
@@ -30,4 +30,4 @@ module SorterDto =
         Sorter.create
             (UMX.tag<sorterId> dto.SorterId)
             (UMX.tag<sortingWidth> dto.Width)
-            (dto.Ces |> Array.map CeDto.fromCeDto)
+            (dto.Ces |> Array.map CeDto.toDomain)

@@ -15,9 +15,10 @@ type sortableBoolArrayDto = {
 }
 
 module SortableBoolArrayDto =
-    let toDtoBoolArray (sba: sortableBoolArray) : sortableBoolArrayDto =
+
+    let fromDomain (sba: sortableBoolArray) : sortableBoolArrayDto =
         { Values = sba.Values; SortingWidth = int sba.SortingWidth }
 
-    let fromDtoBoolArray (dto: sortableBoolArrayDto) : sortableBoolArray =
+    let toDomain (dto: sortableBoolArrayDto) : sortableBoolArray =
         sortableBoolArray.Create(dto.Values, UMX.tag<sortingWidth> dto.SortingWidth)
 

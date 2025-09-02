@@ -86,7 +86,7 @@ module Ce =
         let j = ce.Hi
         (j * (j + 1)) / 2 + i
 
-    let fromIndex (dex:int) = 
+    let fromIndex (dex:int) : ce = 
         if dex < 0 then
             failwith "Index must be non-negative"
         else

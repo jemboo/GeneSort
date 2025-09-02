@@ -81,6 +81,9 @@ module SwFull =
    let standardMapVals() : string*string list =
        ("SortingWidth", ["8"; "16"; "32"; "64"]) 
        
+   let practicalFullTestVals() : string*string list =
+       ("SortingWidth", ["8"; "16";]) 
+
 
 
 type swMerege =

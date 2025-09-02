@@ -14,12 +14,12 @@ type sorterTestSetDto =
     | Bools of sorterBoolTestSetDto
 
 module SorterTestSetDto =
-    let toDto (sorterTestSet: sorterTestSet) : sorterTestSetDto =
+    let fromDomain (sorterTestSet: sorterTestSet) : sorterTestSetDto =
         match sorterTestSet with
-        | sorterTestSet.Ints intTestSet -> Ints (SorterIntTestSetDto.toDto intTestSet)
-        | sorterTestSet.Bools boolTestSet -> Bools (SorterBoolTestSetDto.toDto boolTestSet)
+        | sorterTestSet.Ints intTestSet -> Ints (SorterIntTestSetDto.fromDomain intTestSet)
+        | sorterTestSet.Bools boolTestSet -> Bools (SorterBoolTestSetDto.fromDomain boolTestSet)
 
-    let fromDto (dto: sorterTestSetDto) : sorterTestSet =
+    let toDomain (dto: sorterTestSetDto) : sorterTestSet =
         match dto with
-        | Ints intTestSetDto -> sorterTestSet.Ints (SorterIntTestSetDto.fromDto intTestSetDto)
-        | Bools boolTestSetDto -> sorterTestSet.Bools (SorterBoolTestSetDto.fromDto boolTestSetDto)
+        | Ints intTestSetDto -> sorterTestSet.Ints (SorterIntTestSetDto.toDomain intTestSetDto)
+        | Bools boolTestSetDto -> sorterTestSet.Bools (SorterBoolTestSetDto.toDomain boolTestSetDto)

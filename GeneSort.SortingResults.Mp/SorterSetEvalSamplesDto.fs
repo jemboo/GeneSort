@@ -21,7 +21,7 @@ type sorterSetEvalSamplesDto = {
 }
 
 module SorterSetEvalSamplesDto =
-    let toSorterSetEvalSamplesDto (samples: sorterSetEvalSamples) : sorterSetEvalSamplesDto =
+    let fromDomain (samples: sorterSetEvalSamples) : sorterSetEvalSamplesDto =
         { 
             SorterSetEvalId = %samples.sorterSetEvalId
             TotalSampleCount = samples.totalSampleCount

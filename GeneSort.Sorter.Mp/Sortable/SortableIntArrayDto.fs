@@ -18,9 +18,9 @@ type sortableIntArrayDto = {
 
 module SortableIntArrayDto =
 
-    let toDtoIntArray (sia: sortableIntArray) : sortableIntArrayDto =
+    let fromDomain (sia: sortableIntArray) : sortableIntArrayDto =
         { Values = sia.Values; SortingWidth = int sia.SortingWidth; SymbolSetSize = %sia.SymbolSetSize }
 
-    let fromDtoIntArray (dto: sortableIntArrayDto) : sortableIntArray =
+    let toDomain (dto: sortableIntArrayDto) : sortableIntArray =
         sortableIntArray.Create(dto.Values, UMX.tag<sortingWidth> dto.SortingWidth, UMX.tag<symbolSetSize> dto.SymbolSetSize)
 

@@ -24,6 +24,20 @@ module CeBlockOps =
                 ceUseCounts.Increment i
         values
 
+    let sortByBools
+                (ceBlock: ceBlock) 
+                (ceUseCounts: ceUseCounts)
+                (values: bool[]) : bool[] =
+
+        for i = 0 to %ceBlock.Length - 1 do
+            let ce = ceBlock.getCe i
+            if values.[ce.Low] > values.[ce.Hi] then
+                let temp = values.[ce.Low]
+                values.[ce.Low] <- values.[ce.Hi]
+                values.[ce.Hi] <- temp
+                ceUseCounts.Increment i
+        values
+
 
     /// Evaluates a ceBlock against sorterTests, returning a new ceBlockEval with updated sorterTests and ceBlockUsage.
     /// Any duplicates in the resulting sorterTests are removed.
@@ -52,7 +66,7 @@ module CeBlockOps =
                     sbts.SortableBoolArrays |> Array.map(
                             fun sba ->
                             let valuesCopy = Array.copy sba.Values
-                            let _ = sortBy ceBlock ceUseCounts valuesCopy |> ignore
+                            let _ = sortByBools ceBlock ceUseCounts valuesCopy |> ignore
                             sortableBoolArray.Create(valuesCopy, sba.SortingWidth)
                         ) |> SortableBoolArray.removeDuplicates
 
