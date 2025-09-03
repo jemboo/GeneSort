@@ -39,7 +39,7 @@ module SorterEvalDto =
             failwith "SortingWidth must be at least 1"
         sorterEval.create
             (UMX.tag<sorterId> dto.SorterId)  
-            (UMX.tag<sorterTestsId> dto.SorterTestsId)
+            (UMX.tag<sortableTestsId> dto.SorterTestsId)
             (UMX.tag<sortingWidth> dto.SortingWidth)
             (CeBlockWithUsageDto.fromCeBlockUsageDto dto.CeBlockUsage)
             dto.UnsortedCount

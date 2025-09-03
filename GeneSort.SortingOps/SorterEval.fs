@@ -11,7 +11,7 @@ type sorterEval =
 
     private { 
         sorterId: Guid<sorterId>
-        sorterTestsId: Guid<sorterTestsId>
+        sorterTestsId: Guid<sortableTestsId>
         sortingWidth: int<sortingWidth>
         ceBlockWithUsage: ceBlockWithUsage
         stageSequence: Lazy<stageSequence>
@@ -20,16 +20,16 @@ type sorterEval =
 
     static member create 
                 (sorterId: Guid<sorterId>) 
-                (sorterTestsId: Guid<sorterTestsId>)
+                (sorterTestsId: Guid<sortableTestsId>)
                 (sortingWidth: int<sortingWidth>)  
-                (ceBlockUsage: ceBlockWithUsage)
+                (ceBlockWithUsage: ceBlockWithUsage)
                 (unsortedCount:int) =
         { 
             sorterId = sorterId
             sorterTestsId = sorterTestsId
             sortingWidth = sortingWidth
-            ceBlockWithUsage = ceBlockUsage
-            stageSequence = Lazy<stageSequence>(StageSequence.fromCes sortingWidth ceBlockUsage.UsedCes)
+            ceBlockWithUsage = ceBlockWithUsage
+            stageSequence = Lazy<stageSequence>(StageSequence.fromCes sortingWidth ceBlockWithUsage.UsedCes)
             unsortedCount = unsortedCount
         }
 
@@ -41,7 +41,7 @@ type sorterEval =
                     
     member this.CeBlockUsage with get() = this.ceBlockWithUsage
     member this.SorterId with get() : Guid<sorterId> = this.sorterId
-    member this.SorterTestsId with get() : Guid<sorterTestsId> = this.sorterTestsId
+    member this.SorterTestsId with get() : Guid<sortableTestsId> = this.sorterTestsId
     member this.SortingWidth with get() : int<sortingWidth> =  this.sortingWidth
 
     member this.getUsedCeCount() : int<ceCount> =
@@ -64,12 +64,13 @@ module SorterEval =
 
     let makeSorterEval
             (sorter: sorter)
-            (sorterTests: sorterTests) : sorterEval =
+            (sortableTests: sortableTests) : sorterEval =
 
-        let ceBlockEval = CeBlockOps.evalWithSorterTest sorterTests (ceBlock.create(sorter.Ces))
+        let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTests (ceBlock.create(sorter.Ces))
         sorterEval.create 
             sorter.SorterId 
-            (sorterTests |> SorterTests.getId ) 
-            sorter.SortingWidth ceBlockEval.ceBlockUsage
-            (sorterTests |> SorterTests.getUnsortedCount)
+            (sortableTests |> SortableTests.getId ) 
+            sorter.SortingWidth 
+            ceBlockEval.CeBlockWithUsage
+            (sortableTests |> SortableTests.getUnsortedCount)
 

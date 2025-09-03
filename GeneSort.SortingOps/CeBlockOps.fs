@@ -39,17 +39,17 @@ module CeBlockOps =
         values
 
 
-    /// Evaluates a ceBlock against sorterTests, returning a new ceBlockEval with updated sorterTests and ceBlockUsage.
+    /// Evaluates a ceBlock against sortableTests, returning a new ceBlockEval with updated sorterTests and ceBlockUsage.
     /// Any duplicates in the resulting sorterTests are removed.
     let evalWithSorterTest
-        (sorterTests: sorterTests)  
+        (sortableTests: sortableTests)  
         (ceBlock: ceBlock) : ceBlockEval =
 
         let ceUseCounts = ceUseCounts.create ceBlock.Length 
 
         let newSorterTests =
-            match sorterTests with
-            | sorterTests.Ints sits -> 
+            match sortableTests with
+            | sortableTests.Ints sits -> 
                 let newSortableIntArray = 
                     sits.SortableIntArrays |> Array.map(
                             fun sia ->
@@ -58,10 +58,10 @@ module CeBlockOps =
                             sortableIntArray.Create(valuesCopy, sia.SortingWidth, sia.SymbolSetSize)
                         ) |> SortableIntArray.removeDuplicates
 
-                sorterIntTests.create (Guid.NewGuid() |> UMX.tag<sorterTestsId>) newSortableIntArray   
-                |> GeneSort.Sorter.Sortable.sorterTests.Ints
+                sortableIntTests.create (Guid.NewGuid() |> UMX.tag<sortableTestsId>) newSortableIntArray   
+                |> GeneSort.Sorter.Sortable.sortableTests.Ints
                  
-            | sorterTests.Bools sbts ->
+            | sortableTests.Bools sbts ->
                 let newSortableBoolArray = 
                     sbts.SortableBoolArrays |> Array.map(
                             fun sba ->
@@ -70,8 +70,8 @@ module CeBlockOps =
                             sortableBoolArray.Create(valuesCopy, sba.SortingWidth)
                         ) |> SortableBoolArray.removeDuplicates
 
-                sorterBoolTests.create (Guid.NewGuid() |> UMX.tag<sorterTestsId>) newSortableBoolArray   
-                |> GeneSort.Sorter.Sortable.sorterTests.Bools
+                sortableBoolTests.create (Guid.NewGuid() |> UMX.tag<sortableTestsId>) newSortableBoolArray   
+                |> GeneSort.Sorter.Sortable.sortableTests.Bools
             
         let ceBlockUsage = ceBlockWithUsage.create ceBlock (ceUseCounts.UseCounts)
         ceBlockEval.create ceBlockUsage newSorterTests

@@ -21,7 +21,7 @@ open GeneSort.SortingResults.Mp
 type OutputData =
     | Run of Run
     | SorterSet of sorterSet
-    | SorterTestSet of sorterTestSet
+    | SorterTestSet of sortableTestSet
     | SorterModelSetMaker of sorterModelSetMaker
     | SorterTestModelSet of sorterTestModelSet
     | SorterTestModelSetMaker of sorterTestModelSetMaker
@@ -85,7 +85,7 @@ module OutputData =
                     let dto = SorterSetDto.fromDomain ss
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterTestSet sts ->
-                    let dto = SorterTestSetDto.fromDomain sts
+                    let dto = SortableTestSetDto.fromDomain sts
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterModelSetMaker sms -> 
                     let dto = SorterModelSetMakerDto.fromDomain sms

@@ -14,13 +14,13 @@ type sorterSetEval =
     private { 
         sorterSetEvalId: Guid<sorterSetEvalId>
         sorterSetId: Guid<sorterSetId>
-        sorterTestsId: Guid<sorterTestsId>
+        sorterTestsId: Guid<sortableTestsId>
         sorterEvals: sorterEval[]
     }
 
     static member create 
                 (sorterSetId: Guid<sorterSetId>) 
-                (sorterTestsId: Guid<sorterTestsId>) 
+                (sorterTestsId: Guid<sortableTestsId>) 
                 (sorterEval: sorterEval[]) =
         let id =
             [
@@ -37,7 +37,7 @@ type sorterSetEval =
 
     member this.SorterSetEvalId with get() : Guid<sorterSetEvalId> = this.sorterSetEvalId
     member this.SorterSetId with get() : Guid<sorterSetId> = this.sorterSetId
-    member this.SorterTestsId with get() : Guid<sorterTestsId> = this.sorterTestsId
+    member this.SorterTestsId with get() : Guid<sortableTestsId> = this.sorterTestsId
     member this.SorterEvals with get() : sorterEval[] = this.sorterEvals
 
  
@@ -46,19 +46,21 @@ module SorterSetEval =
 
     let makeSorterSetEval
             (sorterSet: sorterSet)
-            (sorterTests: sorterTests) : sorterSetEval =
+            (sortableTests: sortableTests) : sorterSetEval =
 
         let ceBlockEvals = 
                 sorterSet.Sorters 
-                |> Array.map (fun s -> (s,  CeBlockOps.evalWithSorterTest sorterTests (ceBlock.create(s.Ces))))
+                |> Array.map (fun s -> (s,  CeBlockOps.evalWithSorterTest sortableTests (ceBlock.create(s.Ces))))
 
         let sorterEvals = 
             ceBlockEvals |> Array.map (
                 fun (sorter, ce ) -> 
                         sorterEval.create 
                             sorter.SorterId 
-                            (sorterTests |> SorterTests.getId ) 
-                            sorter.SortingWidth ce.ceBlockUsage
+                            (sortableTests |> SortableTests.getId ) 
+                            sorter.SortingWidth 
+                            ce.CeBlockWithUsage
+                            0
                 )
 
-        sorterSetEval.create sorterSet.SorterSetId (sorterTests |> SorterTests.getId ) sorterEvals
+        sorterSetEval.create sorterSet.SorterSetId (sortableTests |> SortableTests.getId ) sorterEvals

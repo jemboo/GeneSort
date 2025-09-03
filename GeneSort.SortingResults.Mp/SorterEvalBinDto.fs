@@ -32,6 +32,7 @@ module SorterEvalKeyDto =
         { 
             ceCount = UMX.tag<ceCount> dto.CeCount
             stageCount = UMX.tag<stageCount> dto.StageCount
+            unsortedCount = 0
         }
 
 [<MessagePackObject>]

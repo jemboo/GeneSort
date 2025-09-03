@@ -6,16 +6,16 @@ type ceBlockEval =
 
     private { 
         ceBlockWithUsage: ceBlockWithUsage
-        sorterTests: sorterTests
+        sortableTests: sortableTests
     }
 
-    static member create (ceBlockUsage: ceBlockWithUsage) (sorterTests: sorterTests) =
+    static member create (ceBlockUsage: ceBlockWithUsage) (sortableTests: sortableTests) =
         { 
             ceBlockWithUsage = ceBlockUsage; 
-            sorterTests = sorterTests; 
+            sortableTests = sortableTests; 
         }
 
-    member this.CeBlock with get() = this.ceBlockWithUsage.ceBlock
-    member this.SorterTests with get() = this.sorterTests
+    member this.CeBlockWithUsage with get() = this.ceBlockWithUsage
+    member this.SortableTests with get() = this.sortableTests
     member this.CeUseCounts with get() : int[] = this.ceBlockWithUsage.useCounts
 

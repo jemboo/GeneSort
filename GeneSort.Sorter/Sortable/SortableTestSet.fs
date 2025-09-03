@@ -7,20 +7,20 @@ open GeneSort.Core
 open GeneSort.Sorter
 
 
-type sorterTestSet = 
-    | Ints of sorterIntTestSet
-    | Bools of sorterBoolTestSet
+type sortableTestSet = 
+    | Ints of sortableIntTestSet
+    | Bools of sortableBoolTestSet
 
 
 
-module SorterTestset =
+module SortableTestset =
 
-    let getSortableArrayType (testSet: sorterTestSet) =
+    let getSortableArrayType (testSet: sortableTestSet) =
         match testSet with
         | Ints intTestSet -> intTestSet.SortableArrayType
         | Bools boolTestSet -> boolTestSet.SortableArrayType
 
-    let getSortingWidth (testSet: sorterTestSet) =
+    let getSortingWidth (testSet: sortableTestSet) =
         match testSet with
         | Ints intTestSet -> intTestSet.SortingWidth
         | Bools boolTestSet -> boolTestSet.SortingWidth

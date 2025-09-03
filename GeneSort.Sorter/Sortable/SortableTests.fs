@@ -5,34 +5,34 @@ open FSharp.UMX
 open GeneSort.Sorter
 
 
-type sorterTests = 
-    | Ints of sorterIntTests
-    | Bools of sorterBoolTests
+type sortableTests = 
+    | Ints of sortableIntTests
+    | Bools of sortableBoolTests
 
 
-module SorterTests = 
+module SortableTests = 
 
-    let getSortableArrayType (test: sorterTests) =
+    let getSortableArrayType (test: sortableTests) =
         match test with
         | Ints intTest -> intTest.SortableArrayType
         | Bools boolTest -> boolTest.SortableArrayType
 
-    let getSortingWidth (test: sorterTests) =
+    let getSortingWidth (test: sortableTests) =
         match test with
         | Ints intTest -> intTest.SortingWidth
         | Bools boolTest -> boolTest.SortingWidth
 
-    let getId (test: sorterTests) : Guid<sorterTestsId> =
+    let getId (test: sortableTests) : Guid<sortableTestsId> =
         match test with
         | Ints intTest -> intTest.Id
         | Bools boolTest -> boolTest.Id
 
-    let getCount (test: sorterTests) =
+    let getCount (test: sortableTests) =
         match test with
         | Ints intTest -> intTest.Count
         | Bools boolTest -> boolTest.Count
 
-    let getUnsortedCount (test: sorterTests) =
+    let getUnsortedCount (test: sortableTests) =
         match test with
         | Ints intTest -> intTest.UnsortedCount
         | Bools boolTest -> boolTest.UnsortedCount

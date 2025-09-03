@@ -8,20 +8,20 @@ open GeneSort.Sorter.Sortable
 open MessagePack
 
 [<MessagePackObject>]
-type sorterBoolTestDto = {
+type sortableBoolTestDto = {
     [<Key(0)>] Id: Guid
     [<Key(1)>] SortingWidth: int
     [<Key(2)>] SortableArrays: sortableBoolArrayDto[]
 }
 
-module SorterBoolTestDto =
+module SortableBoolTestDto =
 
-    let fromDomain (sbt: sorterBoolTests) : sorterBoolTestDto =
+    let fromDomain (sbt: sortableBoolTests) : sortableBoolTestDto =
         { Id = %sbt.Id
           SortingWidth = int sbt.SortingWidth
           SortableArrays = sbt.sortableBoolArrays |> Array.map SortableBoolArrayDto.fromDomain }
 
-    let toDomain (dto: sorterBoolTestDto) : sorterBoolTests =
-        sorterBoolTests.create
-            (UMX.tag<sorterTestsId> dto.Id)
+    let toDomain (dto: sortableBoolTestDto) : sortableBoolTests =
+        sortableBoolTests.create
+            (UMX.tag<sortableTestsId> dto.Id)
             (dto.SortableArrays |> Array.map SortableBoolArrayDto.toDomain)

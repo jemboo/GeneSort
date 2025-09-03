@@ -9,20 +9,20 @@ open MessagePack
 
 
 [<MessagePackObject>]
-type sorterIntTestDto = {
+type sortableIntTestDto = {
     [<Key(0)>] Id: Guid
     [<Key(1)>] SortingWidth: int
     [<Key(2)>] SortableArrays: sortableIntArrayDto[]
 }
 
-module SorterIntTestDto =
+module SortableIntTestDto =
 
-    let fromDomain (sit: sorterIntTests) : sorterIntTestDto =
+    let fromDomain (sit: sortableIntTests) : sortableIntTestDto =
         { Id = %sit.Id
           SortingWidth = int sit.SortingWidth
           SortableArrays = sit.SortableIntArrays |> Array.map SortableIntArrayDto.fromDomain }
 
-    let toDomain (dto: sorterIntTestDto) : sorterIntTests =
-        sorterIntTests.create
-            (UMX.tag<sorterTestsId> dto.Id)
+    let toDomain (dto: sortableIntTestDto) : sortableIntTests =
+        sortableIntTests.create
+            (UMX.tag<sortableTestsId> dto.Id)
             (dto.SortableArrays |> Array.map SortableIntArrayDto.toDomain)

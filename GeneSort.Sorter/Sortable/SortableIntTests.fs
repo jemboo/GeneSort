@@ -6,12 +6,12 @@ open FSharp.UMX
 open GeneSort.Sorter
 
 [<Struct; CustomEquality; NoComparison>]
-type sorterBoolTests =
-    { id: Guid<sorterTestsId>
+type sortableIntTests =
+    { id: Guid<sortableTestsId>
       sortingWidth: int<sortingWidth>
-      sortableBoolArrays: sortableBoolArray[] }
+      sortableIntArrays: sortableIntArray[] }
 
-    static member create (id: Guid<sorterTestsId>) (arrays: sortableBoolArray[]) : sorterBoolTests =
+    static member create (id: Guid<sortableTestsId>) (arrays: sortableIntArray[]) : sortableIntTests =
         //if Array.isEmpty arrays then
         //    invalidArg "arrays" "Arrays must not be empty."
         //let arrayType = SortableArray.getSortableArrayType arrays.[0]
@@ -20,37 +20,36 @@ type sorterBoolTests =
         //    invalidArg "arrays" "All SortableArrays must have the same SortingWidth."
         //if arrays |> Array.exists (fun arr -> SortableArray.getSortableArrayType arr <> arrayType) then
         //    invalidArg "arrays" "All SortableArrays must have the same type (Ints or Bools)."
-        { id = id; sortingWidth = sortingWidth; sortableBoolArrays = Array.copy arrays }
+        { id = id; sortingWidth = sortingWidth; sortableIntArrays = Array.copy arrays }
 
     override this.Equals(obj) =
         match obj with
-        | :? sorterBoolTests as other ->
-            this.Id = other.Id && Array.forall2 (=) this.sortableBoolArrays other.sortableBoolArrays
+        | :? sortableIntTests as other ->
+            this.Id = other.Id && Array.forall2 (=) this.sortableIntArrays other.sortableIntArrays
         | _ -> false
 
     override this.GetHashCode() =
-        hash this.sortableBoolArrays
+        hash this.sortableIntArrays
 
+    member this.SortableArrayType with get() = SortableArrayType.Ints
 
-    member this.Count with get() = this.sortableBoolArrays.Length
-
-    member this.UnsortedCount with get() = 
-                this.sortableBoolArrays 
-                |> Seq.filter(fun sa -> not sa.IsSorted)
-                |> Seq.length
-
+    member this.Count with get() = this.sortableIntArrays.Length
 
     member this.Id with get() = this.id
     
-    member this.SortableArrayType with get() = SortableArrayType.Bools
-
     member this.SortingWidth with get() = this.sortingWidth
 
-    member this.SortableBoolArrays with get() = this.sortableBoolArrays
+    member this.SortableIntArrays with get() = this.sortableIntArrays
+    
+    member this.UnsortedCount with get() = 
+                    this.SortableIntArrays 
+                    |> Seq.filter(fun sa -> not sa.IsSorted)
+                    |> Seq.length
 
-    interface IEquatable<sorterBoolTests> with
+    interface IEquatable<sortableIntTests> with
         member this.Equals(other) =
-            this.Id = other.Id && Array.forall2 (=) this.sortableBoolArrays other.sortableBoolArrays
+            this.Id = other.Id && Array.forall2 (=) this.sortableIntArrays other.sortableIntArrays
 
 
-module SorterBoolTest = ()
+module SortableIntTest = ()
+ 

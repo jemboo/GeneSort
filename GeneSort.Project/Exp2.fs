@@ -100,18 +100,18 @@ module Exp2 =
                         async {
                             try
                                 use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                                let! dto = MessagePackSerializer.DeserializeAsync<sorterTestSetDto>(stream, options).AsTask() |> Async.AwaitTask
-                                let sorterTestSet = SorterTestSetDto.toDomain dto
-                                let sorterIntTestSet = 
+                                let! dto = MessagePackSerializer.DeserializeAsync<sortableTestSetDto>(stream, options).AsTask() |> Async.AwaitTask
+                                let sorterTestSet = SortableTestSetDto.toDomain dto
+                                let sortableIntTestSet = 
                                     match sorterTestSet with
-                                    | sorterTestSet.Ints intTestSet -> intTestSet
-                                    | sorterTestSet.Bools _ -> failwith "Expected Ints sorterTestSet"
+                                    | sortableTestSet.Ints intTestSet -> intTestSet
+                                    | sortableTestSet.Bools _ -> failwith "Expected Ints sorterTestSet"
 
-                                let sorterTestData =
-                                    sorterIntTestSet.sorterTests
+                                let sortableTestData =
+                                    sortableIntTestSet.sortableTests
                                     |> Array.map (fun sorterTest ->
-                                        (%sorterTest.Id, %(sorterTestSet |> SorterTestset.getSortingWidth), sorterTest.Count))
-                                return Some sorterTestData
+                                        (%sorterTest.Id, %(sorterTestSet |> SortableTestset.getSortingWidth), sorterTest.Count))
+                                return Some sortableTestData
                             with e ->
                                 printfn "Error processing file %s: %s" filePath e.Message
                                 return None
@@ -148,77 +148,6 @@ module Exp2 =
                 Console.WriteLine(sprintf "Error generating SorterTest count report for %s: %s" "SorterTestSet" ex.Message)
                 raise ex
         }
-
-
-
-    //// New executor to generate a length report for SorterTestSet
-    //let lengthReportExecutor (workspace: Workspace) : Async<unit> =
-    //    async {
-    //        try
-    //            let outputDataType = "SorterTestSet"
-    //            Console.WriteLine(sprintf "Generating length report for %s in workspace %s" outputDataType workspace.WorkspaceFolder)
-
-    //            // Get the folder for SorterTestSet
-    //            let outputFolder = OutputData.getOutputDataFolder workspace outputDataType
-    //            if not (Directory.Exists outputFolder) then
-    //                failwith (sprintf "Output folder %s does not exist" outputFolder)
-
-    //            // Find all .msgpack files in the output folder
-    //            let files = Directory.GetFiles(outputFolder, "*.msgpack")
-
-    //            // Initialize the MessagePack resolver
-    //            let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-    //            let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-
-    //            // Process each file and collect length data
-    //            let summaries =
-    //                files
-    //                |> Seq.map (fun filePath ->
-    //                    async {
-    //                        try
-    //                            use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)
-    //                            let! dto = MessagePackSerializer.DeserializeAsync<SorterTestSetDto>(stream, options).AsTask() |> Async.AwaitTask
-    //                            let sorterTestSet = SorterTestSetDto.fromDto dto
-    //                            let id = %sorterTestSet.Id
-    //                            let sortingWidth = %sorterTestSet.SortingWidth
-    //                            let count = sorterTestSet.sorterTests.Length
-    //                            return Some (id, sortingWidth, count)
-    //                        with e ->
-    //                            printfn "Error processing file %s: %s" filePath e.Message
-    //                            return None
-    //                    }
-    //                )
-    //                |> Seq.toList
-    //                |> Async.Parallel
-    //                |> Async.RunSynchronously
-    //                |> Array.choose id // Filter out None values
-
-    //            // Generate the Markdown report
-    //            let reportContent =
-    //                [ "# SorterTestSet Length Report"
-    //                  sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-    //                  sprintf "Workspace: %s" workspace.WorkspaceFolder
-    //                  ""
-    //                  "| Id | Sorting Width | Count |"
-    //                  "|----|---------------|-------|"
-    //                ]
-    //                @ (summaries
-    //                   |> Array.map (fun (id, sortingWidth, count) ->
-    //                       sprintf "| %s | %d | %d |" (id.ToString()) %sortingWidth count)
-    //                   |> Array.toList)
-    //                |> String.concat "\n"
-
-    //            // Save the report to a file
-    //            let reportFilePath = Path.Combine(workspace.WorkspaceFolder, sprintf "%s_LengthReport_%s.md" outputDataType (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
-    //            do! File.WriteAllTextAsync(reportFilePath, reportContent) |> Async.AwaitTask
-
-    //            Console.WriteLine(sprintf "Length report saved to %s" reportFilePath)
-    //        with ex ->
-    //            Console.WriteLine(sprintf "Error generating length report for %s: %s" "SorterTestSet" ex.Message)
-    //            raise ex
-    //    }
-
-
 
     // Function to run the SorterTest count report executor
     let RunSorterTestCountReport() =
