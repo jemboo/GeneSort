@@ -4,9 +4,7 @@ open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
-open GeneSort.Sorter.Sorter
 open GeneSort.Sorter.Sortable
-open GeneSort.Model.Sorter
 
 
 [<Struct; CustomEquality; NoComparison>]
@@ -35,7 +33,7 @@ type MsasO =
     member this.SeedPermutation with get() = this.seedPermutation
     member this.SortingWidth with get() = (%this.seedPermutation.Order |> UMX.tag<sortingWidth>)
 
-    override this.Equals(obj) = 
+    override this.Equals(obj) =
         match obj with
         | :? MsasO as other -> 
             this.id = other.id
@@ -56,13 +54,19 @@ type MsasO =
             |> Array.map(fun sia -> sia.ToSortableBoolArrays())
             |> Array.collect id
             |> Array.distinct
-        sortableBoolTests.create ssId bArrays
+        sortableBoolTests.create 
+                ssId 
+                sortingWidth
+                bArrays
 
 
     member this.MakeSortableIntArraySet 
             (sortingWidth: int<sortingWidth>) : sortableIntTests =
         let ssId = %this.Id |> UMX.tag<sortableTestsId>
-        sortableIntTests.create ssId this.sortableIntArrays
+        sortableIntTests.create 
+                ssId 
+                sortingWidth
+                this.sortableIntArrays
 
 
 module MsasO = ()

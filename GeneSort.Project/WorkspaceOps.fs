@@ -52,13 +52,13 @@ module WorkspaceOps =
                 : unit =
         let runs = getRuns workspace cycle
         let executeRun (run:Run) = async {
-            let filePathRun = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run |> OutputData.toString)
+            let filePathRun = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (outputDataType.Run |> OutputDataType.toString)
             if File.Exists filePathRun then
                         printfn "Skipping Run %d: Output file %s already exists" run.Index filePathRun
             else
                 try
                     do! executor workspace cycle run
-                    do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (run |> OutputData.Run)
+                    do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (run |> outputData.Run)
                 with e ->
                     printfn "Error processing Run %d: %s" run.Index e.Message
         }

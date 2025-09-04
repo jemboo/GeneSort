@@ -9,7 +9,7 @@ open GeneSort.SortingOps
 
 
 [<MessagePackObject>]
-type sorterSetEvalSamplesDto = {
+type sorterSetEvalBinsDto = {
     [<Key(0)>]
     SorterSetEvalId: Guid
     [<Key(1)>]
@@ -20,8 +20,8 @@ type sorterSetEvalSamplesDto = {
     EvalBins: (sorterEvalKeyDto * sorterEvalBinDto) array
 }
 
-module SorterSetEvalSamplesDto =
-    let fromDomain (samples: sorterSetEvalSamples) : sorterSetEvalSamplesDto =
+module SorterSetEvalBinsDto =
+    let fromDomain (samples: sorterSetEvalBins) : sorterSetEvalBinsDto =
         { 
             SorterSetEvalId = %samples.sorterSetEvalId
             TotalSampleCount = samples.totalSampleCount
@@ -32,7 +32,7 @@ module SorterSetEvalSamplesDto =
                 |> Seq.toArray
         }
 
-    let toDomain (dto: sorterSetEvalSamplesDto) : sorterSetEvalSamples =
+    let toDomain (dto: sorterSetEvalBinsDto) : sorterSetEvalBins =
         if dto.SorterSetEvalId = Guid.Empty then
             failwith "SorterSetEvalId must not be empty"
         if dto.TotalSampleCount < 0 then

@@ -2,6 +2,7 @@
 
 open System
 open FSharp.UMX
+open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Sorter.Sortable
 
@@ -56,9 +57,12 @@ module CeBlockOps =
                             let valuesCopy = Array.copy sia.Values
                             let _ = sortBy ceBlock ceUseCounts valuesCopy |> ignore
                             sortableIntArray.Create(valuesCopy, sia.SortingWidth, sia.SymbolSetSize)
-                        ) |> SortableIntArray.removeDuplicates
+                        ) |> Array.filter(fun a -> not a.IsSorted) |> SortableIntArray.removeDuplicates
 
-                sortableIntTests.create (Guid.NewGuid() |> UMX.tag<sortableTestsId>) newSortableIntArray   
+                sortableIntTests.create 
+                        (Guid.NewGuid() |> UMX.tag<sortableTestsId>) 
+                        (sortableTests |> SortableTests.getSortingWidth)
+                        newSortableIntArray   
                 |> GeneSort.Sorter.Sortable.sortableTests.Ints
                  
             | sortableTests.Bools sbts ->
@@ -68,9 +72,12 @@ module CeBlockOps =
                             let valuesCopy = Array.copy sba.Values
                             let _ = sortByBools ceBlock ceUseCounts valuesCopy |> ignore
                             sortableBoolArray.Create(valuesCopy, sba.SortingWidth)
-                        ) |> SortableBoolArray.removeDuplicates
+                        ) |> Array.filter(fun a -> not a.IsSorted) |> SortableBoolArray.removeDuplicates
 
-                sortableBoolTests.create (Guid.NewGuid() |> UMX.tag<sortableTestsId>) newSortableBoolArray   
+                sortableBoolTests.create 
+                        (Guid.NewGuid() |> UMX.tag<sortableTestsId>) 
+                        (sortableTests |> SortableTests.getSortingWidth)
+                        newSortableBoolArray   
                 |> GeneSort.Sorter.Sortable.sortableTests.Bools
             
         let ceBlockUsage = ceBlockWithUsage.create ceBlock (ceUseCounts.UseCounts)

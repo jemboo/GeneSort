@@ -11,11 +11,10 @@ type sortableIntTests =
       sortingWidth: int<sortingWidth>
       sortableIntArrays: sortableIntArray[] }
 
-    static member create (id: Guid<sortableTestsId>) (arrays: sortableIntArray[]) : sortableIntTests =
-        //if Array.isEmpty arrays then
-        //    invalidArg "arrays" "Arrays must not be empty."
-        //let arrayType = SortableArray.getSortableArrayType arrays.[0]
-        let sortingWidth = arrays.[0].SortingWidth
+    static member create 
+                    (id: Guid<sortableTestsId>) 
+                    (sortingWidth:int<sortingWidth>)
+                    (arrays: sortableIntArray[]) : sortableIntTests =
         //if arrays |> Array.exists (fun arr -> SortableArray.sortingWidth arr <> sortingWidth) then
         //    invalidArg "arrays" "All SortableArrays must have the same SortingWidth."
         //if arrays |> Array.exists (fun arr -> SortableArray.getSortableArrayType arr <> arrayType) then

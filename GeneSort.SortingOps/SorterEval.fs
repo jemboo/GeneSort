@@ -50,7 +50,6 @@ type sorterEval =
     member this.getLastUsedCeIndex : int = 
             this.ceBlockWithUsage.LastUsedCeIndex
         
-
     member this.UnsortedCount with get() = this.unsortedCount
 
     member this.getStageCount() : int<stageCount> =

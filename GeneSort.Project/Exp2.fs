@@ -57,9 +57,9 @@ module Exp2 =
                 let sorterTestModelSetMaker = sorterTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
                 let sorterTestModelSet = sorterTestModelSetMaker.MakeSorterTestModelSet
                 let sorterTestSet = sorterTestModelSet.makeSorterTestSet sortableArrayType
-                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestSet |> OutputData.SorterTestSet)
-                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestModelSet |> OutputData.SorterTestModelSet)
-                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestModelSetMaker |> OutputData.SorterTestModelSetMaker)
+                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestSet |> outputData.SorterTestSet)
+                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestModelSet |> outputData.SorterTestModelSet)
+                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestModelSetMaker |> outputData.SorterTestModelSetMaker)
 
                 Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %cycle)
             with ex ->
@@ -78,11 +78,13 @@ module Exp2 =
     let sorterTestCountReportExecutor (workspace: Workspace) : Async<unit> =
         async {
             try
-                let outputDataType = "SorterTestSet"
-                Console.WriteLine(sprintf "Generating SorterTest count report for %s in workspace %s" outputDataType workspace.WorkspaceFolder)
+                Console.WriteLine(sprintf 
+                                    "Generating SorterTest count report for %s in workspace %s" 
+                                    (outputDataType.SorterTestSet |> OutputDataType.toString ) 
+                                    workspace.WorkspaceFolder)
 
                 // Get the folder for SorterTestSet
-                let outputFolder = OutputData.getOutputDataFolder workspace outputDataType
+                let outputFolder = OutputData.getOutputDataFolder workspace outputDataType.SorterTestSet
                 if not (Directory.Exists outputFolder) then
                     failwith (sprintf "Output folder %s does not exist" outputFolder)
 
@@ -140,7 +142,12 @@ module Exp2 =
 
 
                 // Save the report to a file
-                let reportFilePath = Path.Combine(workspace.WorkspaceFolder, sprintf "%s_SorterTestCountReport_%s.md" outputDataType (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
+                let reportFilePath = Path.Combine(
+                        workspace.WorkspaceFolder, 
+                        sprintf "%s_SorterTestCountReport_%s.md" 
+                                    (outputDataType.SorterTestSet |> OutputDataType.toString )
+                                    (DateTime.Now.ToString("yyyyMMdd_HHmmss"))
+                        )
                 do! File.WriteAllTextAsync(reportFilePath, reportContent) |> Async.AwaitTask
 
                 Console.WriteLine(sprintf "SorterTest count report saved to %s" reportFilePath)

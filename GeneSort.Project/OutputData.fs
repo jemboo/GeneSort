@@ -17,38 +17,64 @@ open GeneSort.Sorter.Mp.Sortable
 open GeneSort.SortingResults
 open GeneSort.SortingResults.Mp
 
+type outputDataType =
+    | Run
+    | SorterSet
+    | SorterTestSet
+    | SorterModelSetMaker
+    | SorterTestModelSet
+    | SorterTestModelSetMaker
+    | SorterSetEvalSamples
 
-type OutputData =
+
+     
+module OutputDataType =
+    
+    let toString (outputDataType: outputDataType) : string =
+        match outputDataType with
+        | Run -> "Run"
+        | SorterSet -> "SorterSet"
+        | SorterTestSet -> "SorterTestSet"
+        | SorterModelSetMaker -> "SorterModelSet"
+        | SorterTestModelSet -> "SorterTestModelSet"
+        | SorterTestModelSetMaker -> "SorterTestModelSetMaker"
+        | SorterSetEvalSamples -> "SorterSetEvalSamples"
+        | _ -> failwith "Unknown OutputData type"
+
+
+type outputData =
     | Run of Run
     | SorterSet of sorterSet
     | SorterTestSet of sortableTestSet
     | SorterModelSetMaker of sorterModelSetMaker
     | SorterTestModelSet of sorterTestModelSet
     | SorterTestModelSetMaker of sorterTestModelSetMaker
-    | SorterSetEvalSamples of sorterSetEvalSamples
+    | SorterSetEvalSamples of sorterSetEvalBins
 
 
      
 module OutputData =
+
+    let getOutputDataType (outputData: outputData) : outputDataType =
+        match outputData with
+        | Run _ -> outputDataType.Run
+        | SorterSet _ -> outputDataType.SorterSet
+        | SorterTestSet _ -> outputDataType.SorterTestSet
+        | SorterModelSetMaker _ -> outputDataType.SorterModelSetMaker
+        | SorterTestModelSet _ -> outputDataType.SorterTestModelSet
+        | SorterTestModelSetMaker _ -> outputDataType.SorterTestModelSetMaker
+        | SorterSetEvalSamples _ -> outputDataType.SorterSetEvalSamples
+
+
         /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-    
-    let toString (outputData: OutputData) : string =
-        match outputData with
-        | Run _ -> "Run"
-        | SorterSet _ -> "SorterSet"
-        | SorterTestSet _ -> "SorterTestSet"
-        | SorterModelSetMaker _ -> "SorterModelSet"
-        | SorterTestModelSet _ -> "SorterTestModelSet"
-        | SorterTestModelSetMaker _ -> "SorterTestModelSetMaker"
-        | SorterSetEvalSamples _ -> "SorterSetEvalSamples"
-        | _ -> failwith "Unknown OutputData type"
+
          
 
-    let getOutputDataFolder (workspace:Workspace) (outputDataFolder: string) 
+    let getOutputDataFolder (workspace:Workspace) (outputDataType: outputDataType) 
                     : string =
-        Path.Combine(workspace.WorkspaceFolder, outputDataFolder)
+        Path.Combine(workspace.WorkspaceFolder, outputDataType |> OutputDataType.toString)
 
     let getOutputFileName 
                 (folder:string) (index:int) (cycle: int<cycleNumber>) 
@@ -70,9 +96,9 @@ module OutputData =
             (workspaceFolder: string) 
             (index: int) 
             (cycle: int<cycleNumber>) 
-            (outputData: OutputData) : Async<unit> =
+            (outputData: outputData) : Async<unit> =
         async {
-            let filePath = getOutputFileName workspaceFolder index cycle (toString outputData)
+            let filePath = getOutputFileName workspaceFolder index cycle (outputData |> getOutputDataType |> OutputDataType.toString)
             let directory = Path.GetDirectoryName filePath
             Directory.CreateDirectory directory |> ignore
             try
@@ -97,7 +123,7 @@ module OutputData =
                     let dto = SorterTestModelSetMakerDto.fromDomain stsm
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterSetEvalSamples sse ->
-                    let dto = SorterSetEvalSamplesDto.fromDomain sse
+                    let dto = SorterSetEvalBinsDto.fromDomain sse
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
 
             with e ->

@@ -17,17 +17,32 @@ type sorterEvalBin = {
     mutable sorterEvals: ResizeArray<sorterEval>
 }
 
-type sorterSetEvalSamples = {
+
+module SorterEvalBin =
+    //returns [(uuct1, ct1), (uuct2. ct2) ... ], a histogram report of
+    // unsortedCount properties of sorterEvalBin.sorterEvals, where ct1 is the
+    // number of sorterEvals that have unsortedCount = ct1
+    let getUnsortedHistogram (seb: sorterEvalBin) :string =
+            seb.sorterEvals
+            |> Seq.groupBy (fun se -> se.UnsortedCount)
+            |> Seq.sortBy fst
+            |> Seq.map (fun (key, group) -> sprintf "(%d, %d)" key (Seq.length group))
+            |> String.concat "; "
+            |> sprintf "[%s]"
+
+
+
+type sorterSetEvalBins = {
     sorterSetEvalId: Guid<sorterSetEvalId>
     mutable totalSampleCount: int
     maxBinCount: int
     evalBins: Dictionary<sorterEvalKey, sorterEvalBin>
 }
 
-module SorterSetEvalSamples =
+module SorterSetEvalBins =
 
     let addSorterEval (sorterEval: sorterEval) 
-                      (sorterEvalSamples: sorterSetEvalSamples) : unit =
+                      (sorterEvalSamples: sorterSetEvalBins) : unit =
         let key = {
             ceCount = sorterEval.getUsedCeCount()
             stageCount = sorterEval.getStageCount()
@@ -50,7 +65,7 @@ module SorterSetEvalSamples =
         
         sorterEvalSamples.totalSampleCount <- sorterEvalSamples.totalSampleCount + 1
 
-    let create (maxBinCount: int) (sorterSetEval:sorterSetEval) : sorterSetEvalSamples =
+    let create (maxBinCount: int) (sorterSetEval:sorterSetEval) : sorterSetEvalBins =
         let sorterEvalSamples = {
             sorterSetEvalId = sorterSetEval.SorterSetEvalId
             totalSampleCount = 0
@@ -63,9 +78,15 @@ module SorterSetEvalSamples =
 
 
     /// Returns an array of int arrays, each inner array containing [| ceCount; stageCount; binCount |]
-    let getBinCountReport (sorterEvalSamples: sorterSetEvalSamples) : string array array =
+    let getBinCountReport (sorterEvalSamples: sorterSetEvalBins) : string array array =
         let lines = 
             sorterEvalSamples.evalBins
-            |> Seq.map (fun kvp -> [| (%kvp.Key.ceCount).ToString(); (%kvp.Key.stageCount).ToString(); (kvp.Value.binCount).ToString()|])
+            |> Seq.map (fun kvp -> 
+                        [| 
+                            (%kvp.Key.ceCount).ToString(); 
+                            (%kvp.Key.stageCount).ToString(); 
+                            (kvp.Value.binCount).ToString();
+                            (kvp.Value |> SorterEvalBin.getUnsortedHistogram)
+                        |])
             |> Seq.toArray
         lines
