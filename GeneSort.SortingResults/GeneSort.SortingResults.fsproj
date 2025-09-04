@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <Compile Include="SorterSetEvalBins.fs" />
-    <Compile Include="CeUsageProfile.fs" />
+    <Compile Include="SorterSetCeUseProfile.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

@@ -24,7 +24,8 @@ type outputDataType =
     | SorterModelSetMaker
     | SorterTestModelSet
     | SorterTestModelSetMaker
-    | SorterSetEvalSamples
+    | SorterSetEvalBins
+    | SorterSetCeUseProfile
 
 
      
@@ -38,7 +39,8 @@ module OutputDataType =
         | SorterModelSetMaker -> "SorterModelSet"
         | SorterTestModelSet -> "SorterTestModelSet"
         | SorterTestModelSetMaker -> "SorterTestModelSetMaker"
-        | SorterSetEvalSamples -> "SorterSetEvalSamples"
+        | SorterSetEvalBins -> "SorterSetEvalBins"
+        | SorterSetCeUseProfile -> "SorterSetCeUseProfile"
         | _ -> failwith "Unknown OutputData type"
 
 
@@ -49,7 +51,8 @@ type outputData =
     | SorterModelSetMaker of sorterModelSetMaker
     | SorterTestModelSet of sorterTestModelSet
     | SorterTestModelSetMaker of sorterTestModelSetMaker
-    | SorterSetEvalSamples of sorterSetEvalBins
+    | SorterSetEvalBins of sorterSetEvalBins
+    | SorterSetCeUseProfile of sorterSetCeUseProfile
 
 
      
@@ -63,8 +66,8 @@ module OutputData =
         | SorterModelSetMaker _ -> outputDataType.SorterModelSetMaker
         | SorterTestModelSet _ -> outputDataType.SorterTestModelSet
         | SorterTestModelSetMaker _ -> outputDataType.SorterTestModelSetMaker
-        | SorterSetEvalSamples _ -> outputDataType.SorterSetEvalSamples
-
+        | SorterSetEvalBins _ -> outputDataType.SorterSetEvalBins
+        | SorterSetCeUseProfile _ -> outputDataType.SorterSetCeUseProfile
 
         /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
@@ -122,7 +125,7 @@ module OutputData =
                 | SorterTestModelSetMaker stsm ->
                     let dto = SorterTestModelSetMakerDto.fromDomain stsm
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SorterSetEvalSamples sse ->
+                | SorterSetEvalBins sse ->
                     let dto = SorterSetEvalBinsDto.fromDomain sse
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
 

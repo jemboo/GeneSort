@@ -74,7 +74,7 @@ module Exp3 =
 
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSet |> outputData.SorterSet)
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterModelSetMaker |> outputData.SorterModelSetMaker)
-            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSetEvalSamples |> outputData.SorterSetEvalSamples)
+            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSetEvalSamples |> outputData.SorterSetEvalBins)
 
             Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %cycle)
         }
@@ -84,7 +84,7 @@ module Exp3 =
     let binReportExecutor (workspace: Workspace) =
             try
                 Console.WriteLine(sprintf "Generating SorterEval report in workspace %s"  workspace.WorkspaceFolder)
-                let sorterSetEvalSamplesFolder = OutputData.getOutputDataFolder workspace outputDataType.SorterSetEvalSamples
+                let sorterSetEvalSamplesFolder = OutputData.getOutputDataFolder workspace outputDataType.SorterSetEvalBins
                 if not (Directory.Exists sorterSetEvalSamplesFolder) then
                     failwith (sprintf "Output folder %s does not exist" sorterSetEvalSamplesFolder)
 
@@ -154,7 +154,7 @@ module Exp3 =
     let ceUseProfileReportExecutor (workspace: Workspace) =
             try
                 Console.WriteLine(sprintf "Generating SorterEval report in workspace %s"  workspace.WorkspaceFolder)
-                let sorterSetEvalSamplesFolder = OutputData.getOutputDataFolder workspace outputDataType.SorterSetEvalSamples
+                let sorterSetEvalSamplesFolder = OutputData.getOutputDataFolder workspace outputDataType.SorterSetCeUseProfile
                 if not (Directory.Exists sorterSetEvalSamplesFolder) then
                     failwith (sprintf "Output folder %s does not exist" sorterSetEvalSamplesFolder)
 
