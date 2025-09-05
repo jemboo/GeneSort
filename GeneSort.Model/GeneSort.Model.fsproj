@@ -32,8 +32,8 @@
     <Compile Include="Sortable\SorterTestModel.fs" />
     <Compile Include="Sortable\MsasORandGen.fs" />
     <Compile Include="Sortable\SorterTestModelGen.fs" />
-    <Compile Include="Sortable\SorterTestModelSet.fs" />
-    <Compile Include="Sortable\SorterTestModelSetMaker.fs" />
+    <Compile Include="Sortable\SortableTestModelSet.fs" />
+    <Compile Include="Sortable\SortableTestModelSetMaker.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />
   </ItemGroup>
 

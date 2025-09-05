@@ -1,12 +1,10 @@
 ﻿namespace GeneSort.Model.Sortable
 
-open System
 open FSharp.UMX
 open GeneSort.Sorter
-open GeneSort.Core
 open GeneSort.Sorter.Sortable
 
-type sorterTestModelSet =
+type sortableTestModelSet =
     private
         { 
           id : Guid<sorterTestModelSetID>
@@ -22,7 +20,7 @@ type sorterTestModelSet =
     member this.Id with get() = this.id
     member this.SorterTestModels with get() = this.sorterTestModels
 
-    member this.makeSorterTestSet (sortableArrayType:SortableArrayType) : sortableTestSet =
+    member this.makeSortableTestSet (sortableArrayType:SortableArrayType) : sortableTestSet =
         let id = (%this.id) |> UMX.tag<sortableTestSetId>
         match sortableArrayType with
         | SortableArrayType.Bools -> 

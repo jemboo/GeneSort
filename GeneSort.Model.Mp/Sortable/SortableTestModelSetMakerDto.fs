@@ -11,25 +11,25 @@ open GeneSort.Sorter
 
 
 [<MessagePackObject>]
-type SorterTestModelSetMakerDto = {
+type sortableTestModelSetMakerDto = {
     [<Key(0)>] Id: Guid
-    [<Key(1)>] SorterTestModelGenDto: SorterTestModelGenDto
+    [<Key(1)>] SorterTestModelGenDto: sortableTestModelGenDto
     [<Key(2)>] FirstIndex: int
     [<Key(3)>] Count: int
 }
 
 module SorterTestModelSetMakerDto =
 
-    let fromDomain (maker: sorterTestModelSetMaker) : SorterTestModelSetMakerDto =
+    let fromDomain (maker: sortableTestModelSetMaker) : sortableTestModelSetMakerDto =
         { Id = %maker.Id
-          SorterTestModelGenDto = SorterTestModelGenDto.fromDomain maker.SorterTestModelGen
+          SorterTestModelGenDto = SortableTestModelGenDto.fromDomain maker.SorterTestModelGen
           FirstIndex = int maker.FirstIndex
           Count = int maker.Count }
 
-    let toDomain (dto: SorterTestModelSetMakerDto) (msasORandGen: MsasORandGen) : sorterTestModelSetMaker =
+    let toDomain (dto: sortableTestModelSetMakerDto) (msasORandGen: MsasORandGen) : sortableTestModelSetMaker =
         if dto.FirstIndex < 0 then
             invalidArg "FirstIndex" "First index must be non-negative."
         if dto.Count < 0 then
             invalidArg "Count" "Count must be non-negative."
-        let sorterTestModelGen = SorterTestModelGenDto.toDomain dto.SorterTestModelGenDto
-        sorterTestModelSetMaker.create sorterTestModelGen (UMX.tag<sorterTestModelCount> dto.FirstIndex) (UMX.tag<sorterTestModelCount> dto.Count)
+        let sorterTestModelGen = SortableTestModelGenDto.toDomain dto.SorterTestModelGenDto
+        sortableTestModelSetMaker.create sorterTestModelGen (UMX.tag<sorterTestModelCount> dto.FirstIndex) (UMX.tag<sorterTestModelCount> dto.Count)

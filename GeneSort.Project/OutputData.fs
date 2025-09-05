@@ -20,10 +20,10 @@ open GeneSort.SortingResults.Mp
 type outputDataType =
     | Run
     | SorterSet
-    | SorterTestSet
+    | SortableTestSet
     | SorterModelSetMaker
-    | SorterTestModelSet
-    | SorterTestModelSetMaker
+    | SortableTestModelSet
+    | SortableTestModelSetMaker
     | SorterSetEvalBins
     | SorterSetCeUseProfile
 
@@ -35,10 +35,10 @@ module OutputDataType =
         match outputDataType with
         | Run -> "Run"
         | SorterSet -> "SorterSet"
-        | SorterTestSet -> "SorterTestSet"
+        | SortableTestSet -> "SortableTestSet"
         | SorterModelSetMaker -> "SorterModelSet"
-        | SorterTestModelSet -> "SorterTestModelSet"
-        | SorterTestModelSetMaker -> "SorterTestModelSetMaker"
+        | SortableTestModelSet -> "SortableTestModelSet"
+        | SortableTestModelSetMaker -> "SortableTestModelSetMaker"
         | SorterSetEvalBins -> "SorterSetEvalBins"
         | SorterSetCeUseProfile -> "SorterSetCeUseProfile"
         | _ -> failwith "Unknown OutputData type"
@@ -47,10 +47,10 @@ module OutputDataType =
 type outputData =
     | Run of Run
     | SorterSet of sorterSet
-    | SorterTestSet of sortableTestSet
+    | SortableTestSet of sortableTestSet
     | SorterModelSetMaker of sorterModelSetMaker
-    | SorterTestModelSet of sorterTestModelSet
-    | SorterTestModelSetMaker of sorterTestModelSetMaker
+    | SortableTestModelSet of sortableTestModelSet
+    | SortableTestModelSetMaker of sortableTestModelSetMaker
     | SorterSetEvalBins of sorterSetEvalBins
     | SorterSetCeUseProfile of sorterSetCeUseProfile
 
@@ -62,10 +62,10 @@ module OutputData =
         match outputData with
         | Run _ -> outputDataType.Run
         | SorterSet _ -> outputDataType.SorterSet
-        | SorterTestSet _ -> outputDataType.SorterTestSet
+        | SortableTestSet _ -> outputDataType.SortableTestSet
         | SorterModelSetMaker _ -> outputDataType.SorterModelSetMaker
-        | SorterTestModelSet _ -> outputDataType.SorterTestModelSet
-        | SorterTestModelSetMaker _ -> outputDataType.SorterTestModelSetMaker
+        | SortableTestModelSet _ -> outputDataType.SortableTestModelSet
+        | SortableTestModelSetMaker _ -> outputDataType.SortableTestModelSetMaker
         | SorterSetEvalBins _ -> outputDataType.SorterSetEvalBins
         | SorterSetCeUseProfile _ -> outputDataType.SorterSetCeUseProfile
 
@@ -113,16 +113,16 @@ module OutputData =
                 | SorterSet ss ->
                     let dto = SorterSetDto.fromDomain ss
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SorterTestSet sts ->
+                | SortableTestSet sts ->
                     let dto = SortableTestSetDto.fromDomain sts
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterModelSetMaker sms -> 
                     let dto = SorterModelSetMakerDto.fromDomain sms
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SorterTestModelSet sts ->
+                | SortableTestModelSet sts ->
                     let dto = SorterTestModelSetDto.fromDomain sts
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SorterTestModelSetMaker stsm ->
+                | SortableTestModelSetMaker stsm ->
                     let dto = SorterTestModelSetMakerDto.fromDomain stsm
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterSetEvalBins sse ->

@@ -1,11 +1,5 @@
 ﻿namespace GeneSort.Model.Sortable
 
-open System
-open FSharp.UMX
-open GeneSort.Sorter
-
-
-
 type SorterTestModelGen =
      | MsasORandGen of MsasORandGen
 

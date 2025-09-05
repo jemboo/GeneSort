@@ -10,16 +10,16 @@ open GeneSort.Sorter
 
 
 [<MessagePackObject>]
-type SorterTestModelSetDto = {
+type sortableTestModelSetDto = {
     [<Key(0)>] Id: Guid
     [<Key(1)>] SorterTestModels: SorterTestModelDto[]
 }
 
 module SorterTestModelSetDto =
 
-    let fromDomain (set: sorterTestModelSet) : SorterTestModelSetDto =
+    let fromDomain (set: sortableTestModelSet) : sortableTestModelSetDto =
         { Id = %set.Id; SorterTestModels = set.SorterTestModels |> Array.map SorterTestModelDto.toDomain }
 
-    let toDomain (dto: SorterTestModelSetDto) : sorterTestModelSet =
+    let toDomain (dto: sortableTestModelSetDto) : sortableTestModelSet =
         let models = dto.SorterTestModels |> Array.map SorterTestModelDto.fromDomain
-        sorterTestModelSet.create (UMX.tag<sorterTestModelSetID> dto.Id) models
+        sortableTestModelSet.create (UMX.tag<sorterTestModelSetID> dto.Id) models

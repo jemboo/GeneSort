@@ -3,7 +3,7 @@
 open FSharp.UMX
 open GeneSort.Core
 
-type sorterTestModelSetMaker =
+type sortableTestModelSetMaker =
     private
         { 
           id : Guid<sorterTestModelSetMakerID>
@@ -15,7 +15,7 @@ type sorterTestModelSetMaker =
     static member create 
                 (sorterTestModelGen: SorterTestModelGen) 
                 (firstIndex: int<sorterTestModelCount>) 
-                (count: int<sorterTestModelCount>) : sorterTestModelSetMaker =
+                (count: int<sorterTestModelCount>) : sortableTestModelSetMaker =
         let id = 
             // Generate a unique ID based on the SorterModelMaker and indices
             GuidUtils.guidFromObjs [
@@ -31,7 +31,7 @@ type sorterTestModelSetMaker =
     member this.FirstIndex with get() = this.firstIndex
     member this.Count with get() = this.count
 
-    member this.MakeSorterTestModelSet: sorterTestModelSet =
+    member this.MakeSortableTestModelSet: sortableTestModelSet =
 
         let id = (%this.id) |> UMX.tag<sorterTestModelSetID>
 
