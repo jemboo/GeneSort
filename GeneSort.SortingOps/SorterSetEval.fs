@@ -9,6 +9,7 @@ open GeneSort.Sorter.Sortable
 
 
 [<Measure>] type sorterSetEvalId
+
 type sorterSetEval =
 
     private { 

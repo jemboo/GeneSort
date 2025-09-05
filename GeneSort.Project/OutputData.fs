@@ -16,6 +16,7 @@ open GeneSort.Sorter.Mp.Sorter
 open GeneSort.Sorter.Mp.Sortable
 open GeneSort.SortingResults
 open GeneSort.SortingResults.Mp
+open GeneSort.SortingOps
 
 type outputDataType =
     | Run
@@ -24,8 +25,9 @@ type outputDataType =
     | SorterModelSetMaker
     | SortableTestModelSet
     | SortableTestModelSetMaker
+    | SorterSetEval
     | SorterSetEvalBins
-    | SorterSetCeUseProfile
+   // | SorterSetCeUseProfile
 
 
      
@@ -39,8 +41,9 @@ module OutputDataType =
         | SorterModelSetMaker -> "SorterModelSet"
         | SortableTestModelSet -> "SortableTestModelSet"
         | SortableTestModelSetMaker -> "SortableTestModelSetMaker"
+        | SorterSetEval -> "SorterSetEval"
         | SorterSetEvalBins -> "SorterSetEvalBins"
-        | SorterSetCeUseProfile -> "SorterSetCeUseProfile"
+       // | SorterSetCeUseProfile -> "SorterSetCeUseProfile"
         | _ -> failwith "Unknown OutputData type"
 
 
@@ -51,8 +54,9 @@ type outputData =
     | SorterModelSetMaker of sorterModelSetMaker
     | SortableTestModelSet of sortableTestModelSet
     | SortableTestModelSetMaker of sortableTestModelSetMaker
+    | SorterSetEval of sorterSetEval
     | SorterSetEvalBins of sorterSetEvalBins
-    | SorterSetCeUseProfile of sorterSetCeUseProfile
+    //| SorterSetCeUseProfile of sorterSetCeUseProfile
 
 
      
@@ -66,8 +70,9 @@ module OutputData =
         | SorterModelSetMaker _ -> outputDataType.SorterModelSetMaker
         | SortableTestModelSet _ -> outputDataType.SortableTestModelSet
         | SortableTestModelSetMaker _ -> outputDataType.SortableTestModelSetMaker
+        | SorterSetEval _ -> outputDataType.SorterSetEval
         | SorterSetEvalBins _ -> outputDataType.SorterSetEvalBins
-        | SorterSetCeUseProfile _ -> outputDataType.SorterSetCeUseProfile
+       // | SorterSetCeUseProfile _ -> outputDataType.SorterSetCeUseProfile
 
         /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
@@ -124,6 +129,9 @@ module OutputData =
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SortableTestModelSetMaker stsm ->
                     let dto = SorterTestModelSetMakerDto.fromDomain stsm
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | SorterSetEval sse ->
+                    let dto = SorterSetEvalDto.fromDomain sse
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterSetEvalBins sse ->
                     let dto = SorterSetEvalBinsDto.fromDomain sse
