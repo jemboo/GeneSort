@@ -95,23 +95,23 @@ module ArrayProperties =
     /// 
     /// Returns:
     /// - An array of Segment records. If the input array is empty, returns an empty array.
-    let breakIntoExponentialSegments (n: int) (rate: float) (intData: int[])  : segment[] =
+    let breakIntoExponentialSegments (n: int) (rate: float) (unbrokenLength: int)  : segment[] =
         if n <= 0 then invalidArg "n" "Number of segments must be positive"
         if rate <= 1.0 then invalidArg "rate" "Rate must be greater than 1.0"
-        let len = intData.Length
-        if len = 0 then [||]
+        if unbrokenLength = 0 then [||]
         else
             let rn = Math.Pow(rate, float n)
             let denom = rn - 1.0
             let mutable prev = 0
             let segments = ResizeArray<segment>()
             for k = 1 to n do
-                let cumFloat = if k = n then float len else float len * (Math.Pow(rate, float k) - 1.0) / denom
+                let cumFloat = if k = n then float unbrokenLength else float unbrokenLength * (Math.Pow(rate, float k) - 1.0) / denom
                 let current = int (Math.Round cumFloat)
-                let clamped = max prev (min current len)
+                let clamped = max prev (min current unbrokenLength)
                 segments.Add { start = prev; endIndex = clamped; }
                 prev <- clamped
             segments.ToArray()
+
 
     let getSegmentReportHeader (segments: segment[]) : string =
         segments

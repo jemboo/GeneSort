@@ -28,7 +28,7 @@ type Msce =
     member this.Id with get () = this.id
     member this.SortingWidth with get () = this.sortingWidth
     member this.CeCodes with get () = this.ceCodes
-    member this.CeCount with get () = (this.ceCodes.Length |> UMX.tag<ceCount>)
+    member this.CeLength with get () = (this.ceCodes.Length |> UMX.tag<ceLength>)
     member this.toString() =
         sprintf "msce(Id=%A, SortingWidth=%d, SorterLength=%d)" 
                 (%this.Id) 

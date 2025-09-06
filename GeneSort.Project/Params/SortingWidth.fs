@@ -64,17 +64,17 @@ module SwFull =
         | _ -> failwith "Unsupported sorting width"
 
 
-   let getRecordCeCountForFull (swFull:swFull) : int<ceCount> =
+   let getRecordCeCountForFull (swFull:swFull) : int<ceLength> =
        match swFull with
-        | swFull.Sw4 -> 5<ceCount>
-        | swFull.Sw6 -> 12<ceCount>
-        | swFull.Sw8 -> 19<ceCount>
-        | swFull.Sw12 -> 39<ceCount>
-        | swFull.Sw16 -> 60<ceCount>
-        | swFull.Sw24 -> 120<ceCount>
-        | swFull.Sw32 -> 185<ceCount>
-        | swFull.Sw48 -> 346<ceCount>
-        | swFull.Sw64 -> 521<ceCount>
+        | swFull.Sw4 -> 5<ceLength>
+        | swFull.Sw6 -> 12<ceLength>
+        | swFull.Sw8 -> 19<ceLength>
+        | swFull.Sw12 -> 39<ceLength>
+        | swFull.Sw16 -> 60<ceLength>
+        | swFull.Sw24 -> 120<ceLength>
+        | swFull.Sw32 -> 185<ceLength>
+        | swFull.Sw48 -> 346<ceLength>
+        | swFull.Sw64 -> 521<ceLength>
 
 
 

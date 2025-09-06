@@ -34,7 +34,7 @@ type MsceRandMutateTests() =
         let result = msceMutate.MakeSorterModel mockRando 0
         result.CeCodes |> should equal [| newCeCode |]
         result.SortingWidth |> should equal sortingWidth
-        result.CeCount |> should equal (1 |> UMX.tag<ceCount>)
+        result.CeLength |> should equal (1 |> UMX.tag<ceLength>)
 
     [<Fact>]
     let ``mutate applies Insertion mode and trims to ceCount`` () =
@@ -45,7 +45,7 @@ type MsceRandMutateTests() =
         let mockRando = createMockRando [newCeCode; newCeCode] [0.9; 0.9]
         let result = msceMutate.MakeSorterModel mockRando 0
         result.CeCodes |> should equal [| newCeCode; mockCeCode; |] // Two insertions, trimmed to ceCount
-        result.CeCount |> should equal (2 |> UMX.tag<ceCount>)
+        result.CeLength |> should equal (2 |> UMX.tag<ceLength>)
         result.SortingWidth |> should equal sortingWidth
 
     [<Fact>]
@@ -57,7 +57,7 @@ type MsceRandMutateTests() =
         let mockRando = createMockRando [newCeCode] [0.9; 0.9]
         let result = msceMutate.MakeSorterModel mockRando 0
         result.CeCodes |> should equal [| newCeCode; mockCeCode |] // Deletion + Insertion
-        result.CeCount |> should equal (2 |> UMX.tag<ceCount>)
+        result.CeLength |> should equal (2 |> UMX.tag<ceLength>)
         result.SortingWidth |> should equal sortingWidth
 
     [<Fact>]
@@ -69,7 +69,7 @@ type MsceRandMutateTests() =
         let mockRando = createMockRando [0] [0.9]
         let result = msceMutate.MakeSorterModel mockRando 0
         result.CeCodes |> should equal [| mockCeCode |] // Unchanged
-        result.CeCount |> should equal (1 |> UMX.tag<ceCount>)
+        result.CeLength |> should equal (1 |> UMX.tag<ceLength>)
         result.SortingWidth |> should equal sortingWidth
 
 

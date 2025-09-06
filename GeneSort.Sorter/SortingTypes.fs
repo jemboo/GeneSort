@@ -6,7 +6,7 @@ open FSharp.UMX
 [<Measure>] type sorterCount
 [<Measure>] type sorterId
 [<Measure>] type stageCount
-[<Measure>] type ceCount
+[<Measure>] type ceLength
 [<Measure>] type symbolSetSize
 [<Measure>] type sortableCount
 [<Measure>] type sortableTestsId
@@ -28,21 +28,21 @@ open FSharp.UMX
 
 
 
-module CeCount =
+module CeLength =
     
-    let toStageCount (sortingWidth:int<sortingWidth>) (ceCount: int<ceCount>) 
+    let toStageCount (sortingWidth:int<sortingWidth>) (ceLength: int<ceLength>) 
             : int<stageCount> =
-        if %ceCount < 1 then
-            failwith "CeCount must be at least 1"
+        if %ceLength < 1 then
+            failwith "ceLength must be at least 1"
         else
-            ((%ceCount * 2) / %sortingWidth) |> UMX.tag<stageCount> 
+            ((%ceLength * 2) / %sortingWidth) |> UMX.tag<stageCount> 
 
 module StageCount =
 
-    let toCeCount (sortingWidth:int<sortingWidth>) (stageCount: int<stageCount>) 
-            : int<ceCount> =
+    let toCeLength (sortingWidth:int<sortingWidth>) (stageCount: int<stageCount>) 
+            : int<ceLength> =
         if %stageCount < 1 then
             failwith "StageCount must be at least 1"
         else
-            ((%stageCount * %sortingWidth) / 2) |> UMX.tag<ceCount> 
+            ((%stageCount * %sortingWidth) / 2) |> UMX.tag<ceLength> 
 

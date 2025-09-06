@@ -42,7 +42,7 @@ module Exp1 =
             let sorterModelKey = (run.Parameters["SorterModel"]) |> SorterModelKey.fromString
             let swFull = (run.Parameters["SortingWidth"]) |> SwFull.fromString
             let sortingWidth = swFull |> SwFull.toSortingWidth
-            let ceCount = SortingSuccess.getCeCountForFull sortingSuccess.P999 sortingWidth
+            let ceLength = SortingSuccess.getCeLengthForFull sortingSuccess.P999 sortingWidth
 
             let stageCount = SortingSuccess.getStageCountForFull sortingSuccess.P999 sortingWidth
             let opsGenRatesArray = OpsGenRatesArray.createUniform %stageCount
@@ -50,7 +50,7 @@ module Exp1 =
 
             let modelMaker =
                 match sorterModelKey with
-                | SorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceCount) |> SorterModelMaker.SmmMsceRandGen
+                | SorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> SorterModelMaker.SmmMsceRandGen
                 | SorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
                 | SorterModelKey.Msrs -> (MsrsRandGen.create randomType sortingWidth opsGenRatesArray) |> SorterModelMaker.SmmMsrsRandGen
                 | SorterModelKey.Msuf4 -> (Msuf4RandGen.create randomType sortingWidth stageCount uf4GenRatesArray) |> SorterModelMaker.SmmMsuf4RandGen

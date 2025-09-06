@@ -33,7 +33,7 @@ type sorter =
     member this.SorterId with get() = this.sorterId
     member this.SortingWidth with get() = this.sortingWidth
     member this.Ce (dex : int) = this.ces.[dex]
-    member this.ceCount with get() : int<ceCount> = this.ces.Length |> UMX.tag<ceCount>
+    member this.ceCount with get() : int<ceLength> = this.ces.Length |> UMX.tag<ceLength>
     member this.Ces with get() = Array.copy this.ces
 
     override this.Equals(obj) =

@@ -7,7 +7,7 @@ open System.Collections.Generic
 
 [<Struct; StructuralEquality; NoComparison>]
 type sorterEvalKey = {
-    ceCount: int<ceCount>
+    ceCount: int<ceLength>
     stageCount: int<stageCount>
     unsortedCount: int
 }

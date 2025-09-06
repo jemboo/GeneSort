@@ -1,7 +1,5 @@
 ﻿namespace GeneSort.Model.Mp.Sorter.Tests
 
-
-open System
 open Xunit
 open MessagePack
 open MessagePack.Resolvers
@@ -10,21 +8,8 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Model.Sorter
-open GeneSort.Model.Sorter.Uf4
-open GeneSort.Model.Sorter.Rs
-open GeneSort.Model.Sorter.Si
 open GeneSort.Model.Sorter.Ce
-
 open GeneSort.Model.Mp.Sorter
-open GeneSort.Model.Mp.Sorter.Ce
-open GeneSort.Model.Mp.Sorter.Si
-open GeneSort.Model.Mp.Sorter.Rs
-open GeneSort.Model.Mp.Sorter.Uf4
-open GeneSort.Model.Mp.Sorter.Uf6
-
-open GeneSort.Model.Mp.Sorter
-open GeneSort.Model.Mp.Sorter.Uf6
-open GeneSort.Model.Sorter.Uf6
 
 
 
@@ -43,7 +28,7 @@ type SorterModelMakerDtoTests() =
     [<Fact>]
     let ``SorterModelSetMakerDto with MsceRandGen round-trip serialization and deserialization should succeed`` () =
         let excludeSelfCe = true 
-        let msceRandGen = MsceRandGen.create rngType.Lcg (UMX.tag<sortingWidth> 16) excludeSelfCe (UMX.tag<ceCount> 10)
+        let msceRandGen = MsceRandGen.create rngType.Lcg (UMX.tag<sortingWidth> 16) excludeSelfCe (UMX.tag<ceLength> 10)
         let sorterModelMaker = SorterModelMaker.SmmMsceRandGen msceRandGen
         let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker 0<sorterCount> 5<sorterCount>
         let result = roundTrip sorterModelSetMaker
@@ -55,6 +40,6 @@ type SorterModelMakerDtoTests() =
             Assert.Equal(msceRandGen.Id, resultMsceRandGen.Id)
             Assert.Equal(msceRandGen.RngType, resultMsceRandGen.RngType)
             Assert.Equal(msceRandGen.SortingWidth, resultMsceRandGen.SortingWidth)
-            Assert.Equal(msceRandGen.CeCount, resultMsceRandGen.CeCount)
+            Assert.Equal(msceRandGen.CeLength, resultMsceRandGen.CeLength)
         | _ -> Assert.True(false, "Expected MsceRandGen case")
 

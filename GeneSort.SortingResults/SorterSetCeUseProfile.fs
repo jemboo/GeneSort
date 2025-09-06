@@ -17,8 +17,12 @@ module SorterCeUseProfile =
 
     //all segments will be equal size if blockGrowthRate = 1. As blockGrowthRate gets larger, the last segments get larger.
     let makeProfileSegments 
-            (segmentCount:int) (blockGrowthRate:float) (ceBlockWithUsage: ceBlockWithUsage) = 
-        ceBlockWithUsage.UseCounts |> ArrayProperties.breakIntoExponentialSegments segmentCount blockGrowthRate
+            (segmentCount:int) 
+            (blockGrowthRate:float) 
+            (unbrokenLength: int) 
+                    : ArrayProperties.segment [] = 
+        ArrayProperties.breakIntoExponentialSegments segmentCount blockGrowthRate unbrokenLength
+
 
     let makeSorterCeUseProfile 
             (profileSegments:ArrayProperties.segment [])
@@ -32,13 +36,10 @@ module SorterCeUseProfile =
             sorterTestsId = sorterTestsId
         }
 
-    let getUsageProfileHeader (arraySegments: ArrayProperties.segment[]) : string =
-        sprintf "SorterId \tSorterSetId \tSorterTestsId \t%s" 
-                    (arraySegments |> ArrayProperties.getSegmentReportHeader )
-
     
-    let getUsageProfileData (profile: sorterCeUseProfile) : string =
-        sprintf "%s \t%s \t%s \t%s" 
+    let getUsageProfileData (prefix:string) (profile: sorterCeUseProfile) : string =
+        sprintf "%s \t%s \t%s \t%s \t%s" 
+                prefix
                 (%profile.sorterId.ToString()) 
                 (%profile.sorterSetId.ToString()) 
                 (%profile.sorterTestsId.ToString())
@@ -60,29 +61,18 @@ module SorterSetCeUseProfile =
     //all segments will be equal size if blockGrowthRate = 1. As blockGrowthRate gets larger, the last segments get larger.
     let makeProfileSegments 
             (segmentCount:int) (blockGrowthRate:float) (ceBlockWithUsage: ceBlockWithUsage) = 
-        ceBlockWithUsage.UseCounts |> ArrayProperties.breakIntoExponentialSegments segmentCount blockGrowthRate
+        ArrayProperties.breakIntoExponentialSegments segmentCount blockGrowthRate ceBlockWithUsage.UseCounts.Length
 
     let makeSorterSetCeUseProfile
-            (profileSegments:ArrayProperties.segment [])
-            (sorterSetId: Guid<sorterSetId>)
-            (sorterTestsId: Guid<sortableTestsId>)
-            (sorterEval : sorterEval) =
-        {   
-            profileSegments = ArrayProperties.getSegmentSums sorterEval.CeBlockUsage.UseCounts profileSegments
-            sorterId = sorterEval.SorterId
-            sorterSetId = sorterSetId
-            sorterTestsId = sorterTestsId
-        }
+            (sorterSetEval:sorterSetEval) =
+
+       // let yab = sorterSetEval.SorterEvals |> Array.map(fun se -> se |> SorterCeUseProfile.makeSorterCeUseProfile sorterSetEval)
+
+
+        None
 
     let getUsageProfileHeader (arraySegments: ArrayProperties.segment[]) : string =
         sprintf "SorterId \tSorterSetId \tSorterTestsId \t%s" 
                     (arraySegments |> ArrayProperties.getSegmentReportHeader )
 
-    
-    let getUsageProfileData (profile: sorterCeUseProfile) : string =
-        sprintf "%s \t%s \t%s \t%s" 
-                (%profile.sorterId.ToString()) 
-                (%profile.sorterSetId.ToString()) 
-                (%profile.sorterTestsId.ToString())
-                (profile.profileSegments |> ArrayProperties.getSegmentPayloadReportData (fun (i:int) -> i.ToString()))
-
+   

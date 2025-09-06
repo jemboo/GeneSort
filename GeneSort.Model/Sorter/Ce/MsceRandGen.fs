@@ -16,15 +16,15 @@ type MsceRandGen =
           rngType: rngType
           sortingWidth: int<sortingWidth>
           excludeSelfCe: bool
-          ceCount: int<ceCount> } 
+          ceLength: int<ceLength> } 
     with
     static member create 
             (rngType: rngType) 
             (sortingWidth: int<sortingWidth>) 
             (excludeSelfCe: bool) 
-            (ceCount: int<ceCount>) : MsceRandGen =
-        if %ceCount < 1 then
-            failwith "ceCount length must be at least 1"
+            (ceLength: int<ceLength>) : MsceRandGen =
+        if %ceLength < 1 then
+            failwith "ceLength length must be at least 1"
         else if %sortingWidth < 1 then
             failwith "Width must be at least 1"
         else
@@ -33,21 +33,21 @@ type MsceRandGen =
                     rngType :> obj
                     sortingWidth :> obj
                     excludeSelfCe :> obj
-                    %ceCount :> obj
+                    %ceLength :> obj
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
 
             { id = id;
               rngType = rngType; 
               sortingWidth = sortingWidth; 
               excludeSelfCe = excludeSelfCe; 
-              ceCount = ceCount }
+              ceLength = ceLength }
     
 
     member this.Id with get () = this.id
     member this.RngType with get () = this.rngType
     member this.SortingWidth with get () = this.sortingWidth
     member this.ExcludeSelfCe with get () = this.excludeSelfCe
-    member this.CeCount with get () = this.ceCount
+    member this.CeLength with get () = this.ceLength
 
     override this.Equals(obj) = 
         match obj with
@@ -55,18 +55,18 @@ type MsceRandGen =
             this.rngType = other.rngType && 
             this.sortingWidth = other.sortingWidth && 
             this.excludeSelfCe = other.excludeSelfCe && 
-            this.ceCount = other.ceCount
+            this.ceLength = other.ceLength
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.rngType, this.sortingWidth, this.excludeSelfCe, this.ceCount)
+        hash (this.rngType, this.sortingWidth, this.excludeSelfCe, this.ceLength)
 
     interface IEquatable<MsceRandGen> with
         member this.Equals(other) = 
             this.rngType = other.rngType && 
             this.sortingWidth = other.sortingWidth && 
             this.excludeSelfCe = other.excludeSelfCe && 
-            this.ceCount = other.ceCount
+            this.ceLength = other.ceLength
 
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : Msce =
         let id = Common.makeSorterModelId this.Id index
@@ -74,11 +74,11 @@ type MsceRandGen =
         let ceCodes = 
             if this.ExcludeSelfCe then
                 Ce.generateCeCodesExcludeSelf (rando.NextIndex) %this.SortingWidth
-                |> Seq.take %this.CeCount
+                |> Seq.take %this.ceLength
                 |> Seq.toArray
             else
                 Ce.generateCeCodes (rando.NextIndex) %this.SortingWidth
-                |> Seq.take %this.CeCount
+                |> Seq.take %this.ceLength
                 |> Seq.toArray
 
         Msce.create
@@ -93,6 +93,6 @@ module MsceRandGen =
 
     let toString (msceRandGen: MsceRandGen) : string =
         sprintf "Model_CeGen(rngType=%A, Width=%d, Length=[%d])" 
-                    (msceRandGen.RngType) (%msceRandGen.SortingWidth) (%msceRandGen.CeCount)
+                    (msceRandGen.RngType) (%msceRandGen.SortingWidth) (%msceRandGen.ceLength)
 
          

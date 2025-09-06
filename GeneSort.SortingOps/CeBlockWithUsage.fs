@@ -1,6 +1,7 @@
 ﻿namespace GeneSort.SortingOps
 
 open GeneSort.Core
+open GeneSort.Sorter
 open GeneSort.Sorter.Sorter
 open FSharp.UMX
 
@@ -33,7 +34,7 @@ type ceBlockWithUsage =
 
     member this.UseCounts with get() = Array.copy this.useCounts
 
-    member this.BlockLength with get() = this.useCounts.Length |> UMX.tag<ceBlockLength>
+    member this.CeLength with get() = this.useCounts.Length |> UMX.tag<ceLength>
 
     member this.UsedCes with get() = this.usedCes.Value
 

@@ -32,7 +32,7 @@ module MsceRandMutateDto =
             let msceResult = MsceDto.toMsce dto.Msce
             match msceResult with
             | Ok msce ->
-                if %msce.CeCount <> (IndelRatesArrayDto.toDomain dto.IndelRatesArray).Length then
+                if %msce.CeLength <> (IndelRatesArrayDto.toDomain dto.IndelRatesArray).Length then
                     Error "CeCount must match IndelRatesArray.Length"
                 else
                     let msceRandMutate = 

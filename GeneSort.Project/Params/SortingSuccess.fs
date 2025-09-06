@@ -6,7 +6,7 @@ open GeneSort.Sorter
 open GeneSort.Model.Sorter
 open SwFull
 open SwMerege
-open CeCount
+open CeLength
 open StageCount
 
 type sortingSuccess = 
@@ -17,8 +17,8 @@ type sortingSuccess =
 
 module SortingSuccess =
 
-   let getCeCountForFull (sortingSuccess:sortingSuccess) 
-                (sortingWidth:int<sortingWidth>) : int<ceCount> =
+   let getCeLengthForFull (sortingSuccess:sortingSuccess) 
+                (sortingWidth:int<sortingWidth>) : int<ceLength> =
        match sortingSuccess with
         | sortingSuccess.Record -> 
             let swFull = getSwFullForSortingWidth sortingWidth
@@ -31,8 +31,8 @@ module SortingSuccess =
             getP999CeCountForFull swFull
 
 
-   let getCeCountForMerge (sortingSuccess:sortingSuccess) 
-            (sortingWidth:int<sortingWidth>) : int<ceCount> = 
+   let getCeLengthForMerge (sortingSuccess:sortingSuccess) 
+            (sortingWidth:int<sortingWidth>) : int<ceLength> = 
        match sortingSuccess with
         | sortingSuccess.Record -> 
             let swMerege = getSwMergeForSortingWidth sortingWidth

@@ -5,7 +5,6 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Sorter.Sorter
-open GeneSort.Sorter.Sortable
 open GeneSort.Model.Sorter
 
 [<Struct; CustomEquality; NoComparison>]
@@ -22,7 +21,7 @@ type MsceRandMutate =
             (indelRatesArray: IndelRatesArray)
             (excludeSelfCe: bool) 
             (msce : Msce): MsceRandMutate = 
-        if %msce.CeCount <> indelRatesArray.Length then failwith "CeCount must match indelRatesArray.Length"
+        if %msce.CeLength <> indelRatesArray.Length then failwith "CeCount must match indelRatesArray.Length"
         let id =
             [
                 msce :> obj
@@ -42,7 +41,7 @@ type MsceRandMutate =
     member this.Id with get () = this.id
     member this.Msce with get () = this.msce
     member this.RngType with get () = this.rngType
-    member this.CeCount with get () = this.msce.CeCount
+    member this.CeLength with get () = this.msce.CeLength
     member this.IndelRatesArray with get () = this.indelRatesArray
     member this.ExcludeSelfCe with get () = this.excludeSelfCe
 
@@ -88,6 +87,6 @@ module MsceRandMutate =
     let toString (msceMutate: MsceRandMutate) : string = 
         sprintf "MsceRandMutate(%s, %d, %s, %b)"
             (msceMutate.RngType.ToString())
-            (%msceMutate.CeCount)
+            (%msceMutate.CeLength)
             (msceMutate.IndelRatesArray.toString())
             msceMutate.ExcludeSelfCe

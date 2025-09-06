@@ -1,7 +1,5 @@
 ﻿namespace GeneSort.SortingResults.Mp
 
-open System
-open System.Collections.Generic
 open FSharp.UMX
 open MessagePack
 open GeneSort.Sorter
@@ -30,7 +28,7 @@ module SorterEvalKeyDto =
         if dto.StageCount < 0 then
             failwith "StageCount must not be negative"
         { 
-            ceCount = UMX.tag<ceCount> dto.CeCount
+            ceCount = UMX.tag<ceLength> dto.CeCount
             stageCount = UMX.tag<stageCount> dto.StageCount
             unsortedCount = 0
         }

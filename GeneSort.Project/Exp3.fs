@@ -46,7 +46,7 @@ module Exp3 =
             let sorterModelKey = (run.Parameters["SorterModel"]) |> SorterModelKey.fromString
             let swFull = (run.Parameters["SortingWidth"]) |> SwFull.fromString
             let sortingWidth = swFull |> SwFull.toSortingWidth
-            let ceCount = SortingSuccess.getCeCountForFull sortingSuccess.P999 sortingWidth
+            let ceLength = SortingSuccess.getCeLengthForFull sortingSuccess.P999 sortingWidth
 
             let stageCount = SortingSuccess.getStageCountForFull sortingSuccess.P999 sortingWidth
             let opsGenRatesArray = OpsGenRatesArray.createUniform %stageCount
@@ -54,7 +54,7 @@ module Exp3 =
 
             let modelMaker =
                 match sorterModelKey with
-                | SorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceCount) |> SorterModelMaker.SmmMsceRandGen
+                | SorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> SorterModelMaker.SmmMsceRandGen
                 | SorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
                 | SorterModelKey.Msrs -> (MsrsRandGen.create randomType sortingWidth opsGenRatesArray) |> SorterModelMaker.SmmMsrsRandGen
                 | SorterModelKey.Msuf4 -> (Msuf4RandGen.create randomType sortingWidth stageCount uf4GenRatesArray) |> SorterModelMaker.SmmMsuf4RandGen
@@ -133,12 +133,12 @@ module Exp3 =
                       sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                       sprintf "Workspace: %s" workspace.WorkspaceFolder
                       ""
-                      "Sorting Width\t SorterModel\t ceCount\t stageCount\t binCount\t unsortedReport"
+                      "Sorting Width\t SorterModel\t ceLength\t stageCount\t binCount\t unsortedReport"
                     ]
                     @ (summaries
                        |> List.map (
-                            fun (sortingWidth, sorterModelKey, ceCount, stageCount, binCount, unsortedReport) ->
-                                    sprintf "%s \t %s \t %s \t %s \t %s \t %s " sortingWidth sorterModelKey ceCount stageCount binCount unsortedReport))
+                            fun (sortingWidth, sorterModelKey, ceLength, stageCount, binCount, unsortedReport) ->
+                                    sprintf "%s \t %s \t %s \t %s \t %s \t %s " sortingWidth sorterModelKey ceLength stageCount binCount unsortedReport))
                     |> String.concat "\n"
 
 
@@ -177,7 +177,9 @@ module Exp3 =
                             try
                                 use ssEvalStream = new FileStream(ssEvalPath, FileMode.Open, FileAccess.Read, FileShare.Read)
                                 let ssEvalDto = MessagePackSerializer.Deserialize<sorterSetEvalDto>(ssEvalStream, options)
-                                let sorterSetEval = SorterSetEvalDto.toDomain ssEvalDto          
+                                let sorterSetEval = SorterSetEvalDto.toDomain ssEvalDto     
+                                
+
                                 let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
                                 let runPath = OutputData.getRunFileNameForOutputName workspace.WorkspaceFolder (Path.GetFileNameWithoutExtension ssEvalPath)
                                 if not (File.Exists runPath) then
@@ -205,12 +207,12 @@ module Exp3 =
                       sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                       sprintf "Workspace: %s" workspace.WorkspaceFolder
                       ""
-                      "Sorting Width\t SorterModel\t ceCount\t stageCount\t binCount\t unsortedReport"
+                      "Sorting Width\t SorterModel\t ceLength\t stageCount\t binCount\t unsortedReport"
                     ]
                     @ (summaries
                        |> List.map (
-                            fun (sortingWidth, sorterModelKey, ceCount, stageCount, binCount, unsortedReport) ->
-                                    sprintf "%s \t %s \t %s \t %s \t %s \t %s " sortingWidth sorterModelKey ceCount stageCount binCount unsortedReport))
+                            fun (sortingWidth, sorterModelKey, ceLength, stageCount, binCount, unsortedReport) ->
+                                    sprintf "%s \t %s \t %s \t %s \t %s \t %s " sortingWidth sorterModelKey ceLength stageCount binCount unsortedReport))
                     |> String.concat "\n"
 
 
