@@ -40,12 +40,11 @@ type sorterEval =
 
                     
     member this.CeBlockUsage with get() = this.ceBlockWithUsage
+    member this.CeLength with get() = this.ceBlockWithUsage.CeLength
     member this.SorterId with get() : Guid<sorterId> = this.sorterId
     member this.SorterTestsId with get() : Guid<sortableTestsId> = this.sorterTestsId
     member this.SortingWidth with get() : int<sortingWidth> =  this.sortingWidth
 
-    //member this.getTotalceLength() : int<ceLength> =
-    //    this.ceBlockWithUsage.BlockLength
 
     member this.getUsedCeCount() : int<ceLength> =
         this.ceBlockWithUsage.UsedCes.Length |> UMX.tag<ceLength>

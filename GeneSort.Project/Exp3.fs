@@ -196,7 +196,6 @@ module Exp3 =
                             with e ->
                                 failwith (sprintf "Error processing file %s: %s" ssEvalPath e.Message)
                     )
-                    
                     |> Array.concat
                     |> Seq.toList
 

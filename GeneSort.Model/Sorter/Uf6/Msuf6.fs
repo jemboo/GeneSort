@@ -4,7 +4,6 @@ open System
 open FSharp.UMX
 open GeneSort.Sorter
 open GeneSort.Sorter.Sorter
-open GeneSort.Sorter.Sortable
 open GeneSort.Core
 open GeneSort.Model.Sorter
 
@@ -32,6 +31,7 @@ type Msuf6 =
             { id = id; sortingWidth = sortingWidth; twoOrbitUnfolder6s = twoOrbitUnfolder6s }
 
     member this.Id with get () = this.id
+    member this.CeLength with get () = (this.StageCount * %this.SortingWidth / 2) |> UMX.tag<ceLength>
     member this.SortingWidth with get () = this.sortingWidth
     member this.TwoOrbitUnfolder6s with get () = this.twoOrbitUnfolder6s
     member this.StageCount with get () = (this.twoOrbitUnfolder6s.Length |> UMX.tag<stageCount>)

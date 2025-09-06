@@ -32,6 +32,7 @@ type Msrs =
             { id = id; sortingWidth = width; perm_Rss = perm_Rss }
 
     member this.Id with get () = this.id
+    member this.CeLength with get () = (this.StageCount * %this.SortingWidth / 2) |> UMX.tag<ceLength>
     member this.StageCount with get () = this.perm_Rss.Length |> UMX.tag<stageCount>
     member this.SortingWidth with get () = this.sortingWidth
     member this.Perm_Rss with get () = this.perm_Rss

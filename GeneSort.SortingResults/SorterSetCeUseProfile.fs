@@ -47,6 +47,7 @@ module SorterCeUseProfile =
 
 
 
+
 type sorterSetCeUseProfile = {
     profileSegments: ArrayProperties.segmentWithPayload<int> []
     sorterId: Guid<sorterId>
@@ -54,14 +55,8 @@ type sorterSetCeUseProfile = {
     sorterTestsId: Guid<sortableTestsId>
 }
 
-
-
 module SorterSetCeUseProfile =
 
-    //all segments will be equal size if blockGrowthRate = 1. As blockGrowthRate gets larger, the last segments get larger.
-    let makeProfileSegments 
-            (segmentCount:int) (blockGrowthRate:float) (ceBlockWithUsage: ceBlockWithUsage) = 
-        ArrayProperties.breakIntoExponentialSegments segmentCount blockGrowthRate ceBlockWithUsage.UseCounts.Length
 
     let makeSorterSetCeUseProfile
             (sorterSetEval:sorterSetEval) =
