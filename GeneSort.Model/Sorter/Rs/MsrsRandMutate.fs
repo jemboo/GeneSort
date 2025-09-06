@@ -40,6 +40,7 @@ type MsrsRandMutate =
         }
 
     member this.Id with get () = this.id
+    member this.CeLength with get () = this.msrs.CeLength
     member this.Msrs with get () = this.msrs
     member this.RngType with get () = this.rngType
     member this.StageCount with get () = this.msrs.StageCount 

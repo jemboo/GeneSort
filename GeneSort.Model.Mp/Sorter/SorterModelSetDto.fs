@@ -4,17 +4,19 @@ open System
 open GeneSort.Model.Sorter
 open MessagePack
 open FSharp.UMX
+open GeneSort.Sorter
 
 [<MessagePackObject>]
 type SorterModelSetDto = 
     { 
         [<Key(0)>] Id: Guid
-        [<Key(1)>] SorterModels: SorterModelDto[]
+        [<Key(1)>] CeLength: int
+        [<Key(2)>] SorterModels: SorterModelDto[]
     }
 
 module SorterModelSetDto =
 
-    let toDomain (dto: SorterModelSetDto) : SorterModelSet =
+    let toDomain (dto: SorterModelSetDto) : sorterModelSet =
         if dto.SorterModels = null then
             failwith "SorterModels array cannot be null or empty"
         if Array.isEmpty dto.SorterModels then
@@ -22,11 +24,16 @@ module SorterModelSetDto =
         let sorterModels = 
             dto.SorterModels 
             |> Array.map SorterModelDto.fromSorterModelDto
-        { SorterModelSet.Id = UMX.tag<sorterModelSetID> dto.Id
-          SorterModels = sorterModels }
+        sorterModelSet.create
+                (UMX.tag<sorterModelSetID> dto.Id)
+                (dto.CeLength |> UMX.tag<ceLength>)
+                (sorterModels)
 
-    let fromDomain (domain: SorterModelSet) : SorterModelSetDto =
-        { Id = %domain.Id
-          SorterModels = domain.SorterModels |> Array.map SorterModelDto.toSorterModelDto }
+
+    let fromDomain (domain: sorterModelSet) : SorterModelSetDto =
+        { 
+            Id = %domain.Id
+            CeLength = %domain.CeLength
+            SorterModels = domain.SorterModels |> Array.map SorterModelDto.toSorterModelDto }
 
 

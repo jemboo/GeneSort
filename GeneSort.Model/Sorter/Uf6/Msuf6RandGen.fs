@@ -41,6 +41,7 @@ type Msuf6RandGen =
           genRates = genRates }
 
     member this.Id with get() = this.id
+    member this.CeLength with get () = (this.SortingWidth * %this.StageCount / 2) |> UMX.tag<ceLength>
     member this.RngType with get() = this.rngType
     member this.SortingWidth with get() = this.sortingWidth
     member this.StageCount with get() = this.stageCount

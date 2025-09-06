@@ -47,6 +47,7 @@ type Msuf6RandMutate =
         Msuf6RandMutate.create rngType msuf6 mutationRates
 
     member this.Id with get () = this.id
+    member this.CeLength with get () = this.msuf6.CeLength
     member this.Msuf6 with get () = this.msuf6
     member this.RngType with get () = this.rngType
     member this.StageCount with get () = this.msuf6.StageCount

@@ -40,6 +40,7 @@ type MssiRandMutate =
         }
         
     member this.Id with get () = this.id
+    member this.CeLength with get () = this.mssi.CeLength
     member this.Mssi with get () = this.mssi
     member this.RngType with get () = this.rngType
     member this.StageCount with get () = this.opActionRates.Length

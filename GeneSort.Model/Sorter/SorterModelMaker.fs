@@ -8,6 +8,7 @@ open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Uf6
 open GeneSort.Core
 open FSharp.UMX
+open GeneSort.Sorter
 
 
 type SorterModelMaker =
@@ -24,6 +25,7 @@ type SorterModelMaker =
 
 
 module SorterModelMaker =
+
     let makeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int)  (model: SorterModelMaker) : SorterModel =
         match model with
         | SmmMsceRandGen msce -> msce.MakeSorterModel rngFactory index |> SorterModel.Msce
@@ -36,5 +38,18 @@ module SorterModelMaker =
         | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModel rngFactory index |> SorterModel.Msuf4
         | SmmMsuf6RandGen msuf6 -> msuf6.MakeSorterModel rngFactory index |> SorterModel.Msuf6
         | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModel rngFactory index |> SorterModel.Msuf6
+
+    let getCeLength (model: SorterModelMaker) : int<ceLength> =
+        match model with
+        | SmmMsceRandGen msce -> msce.CeLength
+        | SmmMsceRandMutate msce -> msce.CeLength
+        | SmmMssiRandGen mssi -> mssi.CeLength
+        | SmmMssiRandMutate mssi -> mssi.CeLength
+        | SmmMsrsRandGen msrs -> msrs.CeLength
+        | SmmMsrsRandMutate msrs -> msrs.CeLength
+        | SmmMsuf4RandGen msuf4 -> msuf4.CeLength
+        | SmmMsuf4RandMutate msuf4 -> msuf4.CeLength
+        | SmmMsuf6RandGen msuf6 -> msuf6.CeLength
+        | SmmMsuf6RandMutate msuf6 -> msuf6.CeLength
 
 

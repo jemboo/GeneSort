@@ -41,7 +41,7 @@ module CeBlockOps =
 
 
     /// Evaluates a ceBlock against sortableTests, returning a new ceBlockEval with updated sorterTests and ceBlockUsage.
-    /// Any duplicates in the resulting sorterTests are removed.
+    /// Any sorted and duplicate unsorted sortables in the resulting sorterTests are removed.
     let evalWithSorterTest
         (sortableTests: sortableTests)  
         (ceBlock: ceBlock) : ceBlockEval =
