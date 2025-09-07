@@ -52,11 +52,11 @@ module SortingSuccess =
             let swFull = getSwFullForSortingWidth sortingWidth
             getRecordStageCountForFull swFull
         | sortingSuccess.P900 -> 
-            let swMerege = getSwMergeForSortingWidth sortingWidth
-            getP900StageCountForMerge swMerege
+            let swFull = getSwFullForSortingWidth sortingWidth
+            getP900StageCountForFull swFull
         | sortingSuccess.P999 -> 
-            let swMerege = getSwMergeForSortingWidth sortingWidth
-            getP999StageCountForMerge swMerege
+            let swFull = getSwFullForSortingWidth sortingWidth
+            getP999StageCountForFull swFull
 
 
    let getStageCountForMerge (sortingSuccess:sortingSuccess)

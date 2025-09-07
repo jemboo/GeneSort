@@ -141,4 +141,4 @@ module ArrayProperties =
         |> Array.sortBy(fun seg -> seg.start)
         |> Array.map (fun seg -> formatter seg.payload)
                         |> String.concat "\t"
-                        |> sprintf "[%s]"
+                        |> sprintf "%s"

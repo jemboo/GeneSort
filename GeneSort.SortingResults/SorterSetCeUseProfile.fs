@@ -7,10 +7,12 @@ open GeneSort.SortingOps
 
 
 type sorterCeUseProfile = {
-    segmentTotals: ArrayProperties.segmentWithPayload<int> []
     sorterId: Guid<sorterId>
     sorterSetId: Guid<sorterSetId>
     sorterTestsId: Guid<sortableTestsId>
+    lastUsedCeIndex: int
+    segmentTotals: ArrayProperties.segmentWithPayload<int> []
+
 }
 
 module SorterCeUseProfile =
@@ -19,8 +21,8 @@ module SorterCeUseProfile =
     let makeProfileSegments 
             (segmentCount:int) 
             (blockGrowthRate:float) 
-            (unbrokenLength: int) 
-                    : ArrayProperties.segment [] = 
+            (unbrokenLength: int) : ArrayProperties.segment [] = 
+
         ArrayProperties.breakIntoExponentialSegments segmentCount blockGrowthRate unbrokenLength
 
 
@@ -30,21 +32,23 @@ module SorterCeUseProfile =
             (sorterTestsId: Guid<sortableTestsId>)
             (sorterEval : sorterEval) : sorterCeUseProfile =
         {   
-            segmentTotals = ArrayProperties.getSegmentSums sorterEval.CeBlockUsage.UseCounts profileSegments
+            sorterCeUseProfile.segmentTotals = 
+                    ArrayProperties.getSegmentSums sorterEval.CeBlockUsage.UseCounts profileSegments
             sorterId = sorterEval.SorterId
             sorterSetId = sorterSetId
+            lastUsedCeIndex = sorterEval.getLastUsedCeIndex
             sorterTestsId = sorterTestsId
         }
 
     
-    let getUsageProfileData (prefix:string) (profile: sorterCeUseProfile) : string =
-        sprintf "%s \t%s \t%s \t%s \t%s" 
+    let makeCsvLine (prefix:string) (profile: sorterCeUseProfile) : string =
+        sprintf "%s \t%s \t%s \t%s \t%s \t%s" 
                 prefix
                 (%profile.sorterId.ToString()) 
                 (%profile.sorterSetId.ToString()) 
                 (%profile.sorterTestsId.ToString())
+                (profile.lastUsedCeIndex.ToString())
                 (profile.segmentTotals |> ArrayProperties.getSegmentPayloadReportData (fun (i:int) -> i.ToString()))
-
 
 
 
@@ -56,7 +60,6 @@ type sorterSetCeUseProfile = {
 }
 
 module SorterSetCeUseProfile =
-
 
     let makeSorterSetCeUseProfile
             (segmentCount:int)
@@ -76,6 +79,13 @@ module SorterSetCeUseProfile =
                                             sorterSetEval.SorterTestsId 
                                             se |]
         }
+
+
+    let makeCsvLines (prefix:string) (sorterSetCeUseProfile: sorterSetCeUseProfile) : string [] =
+        [|
+                for profile in sorterSetCeUseProfile.sorterCeUseProfiles do
+                    yield SorterCeUseProfile.makeCsvLine prefix profile
+        |]
 
     let getUsageProfileHeader (arraySegments: ArrayProperties.segment[]) : string =
         sprintf "SorterId \tSorterSetId \tSorterTestsId \t%s" 

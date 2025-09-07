@@ -114,7 +114,6 @@ module Exp3 =
                                 let runStream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
                                 let runDto = MessagePackSerializer.Deserialize<RunDto>(runStream, options)
                                 let run = RunDto.fromDto runDto
-                                let res = OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSetEvalBins |> outputData.SorterSetEvalBins)
                                 let sorterModelKey = (run.Parameters["SorterModel"])
                                 let swFull = (run.Parameters["SortingWidth"])
                                 let prpt = SorterSetEvalBins.getBinCountReport sorterSetEvalBins
@@ -159,7 +158,7 @@ module Exp3 =
             try
                 let binCount = 20
                 let blockGrowthRate = 1.2
-                Console.WriteLine(sprintf "Generating SorterEval report in workspace %s"  workspace.WorkspaceFolder)
+                Console.WriteLine(sprintf "Generating Ce Profile report in workspace %s"  workspace.WorkspaceFolder)
                 let sorterSetEvalSamplesFolder = OutputData.getOutputDataFolder workspace outputDataType.SorterSetEval
                 if not (Directory.Exists sorterSetEvalSamplesFolder) then
                     failwith (sprintf "Output folder %s does not exist" sorterSetEvalSamplesFolder)
@@ -171,9 +170,6 @@ module Exp3 =
                 let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
                 let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
                 
-               // let profileSegments = ArrayProperties.breakIntoExponentialSegments binCount blockGrowthRate (sorterSetEval.CeLength |> int)
-
-                // Process each file and collect data for each SorterTest
                 let summaries = // : (string*string*string) array) =
                     files
                     |> Seq.map (
@@ -183,26 +179,23 @@ module Exp3 =
                                 let ssEvalDto = MessagePackSerializer.Deserialize<sorterSetEvalDto>(ssEvalStream, options)
                                 let sorterSetEval = SorterSetEvalDto.toDomain ssEvalDto     
                                 let sorterSetCeUseProfile = SorterSetCeUseProfile.makeSorterSetCeUseProfile binCount blockGrowthRate sorterSetEval
-
-                                let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
+  
                                 let runPath = OutputData.getRunFileNameForOutputName workspace.WorkspaceFolder (Path.GetFileNameWithoutExtension ssEvalPath)
                                 if not (File.Exists runPath) then
                                     failwith (sprintf "Expected Run file %s to exist" runPath)
                                 let runStream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
                                 let runDto = MessagePackSerializer.Deserialize<RunDto>(runStream, options)
                                 let run = RunDto.fromDto runDto
-                                let res = OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSetEvalBins |> outputData.SorterSetEvalBins)
+
                                 let sorterModelKey = (run.Parameters["SorterModel"])
                                 let swFull = (run.Parameters["SortingWidth"])
-                                let prpt = SorterSetEvalBins.getBinCountReport sorterSetEvalBins
-                                let appended = prpt |> Array.map(fun aa -> (swFull, sorterModelKey, aa.[0], aa.[1], aa.[2], aa.[3]))
-                                appended
+                                let linePrefix = sprintf "%s \t %s" swFull sorterModelKey
+                                SorterSetCeUseProfile.makeCsvLines linePrefix sorterSetCeUseProfile
                             with e ->
                                 failwith (sprintf "Error processing file %s: %s" ssEvalPath e.Message)
                     )
                     |> Array.concat
                     |> Seq.toList
-
 
                 // Generate the Markdown report, one line per SorterTest
                 let reportContent =
@@ -210,22 +203,19 @@ module Exp3 =
                       sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                       sprintf "Workspace: %s" workspace.WorkspaceFolder
                       ""
-                      "Sorting Width\t SorterModel\t ceCount\t stageCount\t binCount\t unsortedReport"
+                      "Sorting Width\t SorterModel\t lastCe"
                     ]
-                    @ (summaries
-                       |> List.map (
-                            fun (sortingWidth, sorterModelKey, ceCount, stageCount, binCount, unsortedReport) ->
-                                    sprintf "%s \t %s \t %s \t %s \t %s \t %s " sortingWidth sorterModelKey ceCount stageCount binCount unsortedReport))
+                    @ summaries
                     |> String.concat "\n"
 
 
                 // Save the report to a file
-                let reportFilePath = Path.Combine(workspace.WorkspaceFolder, sprintf "%s_SorterEvalReport_%s.txt" "SorterSetEvalSamples" (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
+                let reportFilePath = Path.Combine(workspace.WorkspaceFolder, sprintf "SorterCeUseReport_%s.txt" (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
                 File.WriteAllText(reportFilePath, reportContent)
 
-                Console.WriteLine(sprintf "SorterTest count report saved to %s" reportFilePath)
+                Console.WriteLine(sprintf "Ce Profile report saved to %s" reportFilePath)
             with ex ->
-                Console.WriteLine(sprintf "Error generating SorterTest count report for %s: %s" "SorterTestSet" ex.Message)
+                Console.WriteLine(sprintf "Error generating Ce Profile report for %s: %s" "SorterTestSet" ex.Message)
                 raise ex
 
 
@@ -234,14 +224,14 @@ module Exp3 =
 
 
     let RunAll() =
-        for i in 0 .. 4 do
+        for i in 0 .. 19 do
             let cycle = i |> UMX.tag<cycleNumber>
             WorkspaceOps.executeWorkspace workspace cycle 8 executor
 
 
     let RunSorterEvalReport() =
-          (binReportExecutor workspace)
-    //    (ceUseProfileReportExecutor workspace)
+    //      (binReportExecutor workspace)
+        (ceUseProfileReportExecutor workspace)
 
 
 
