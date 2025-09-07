@@ -17,6 +17,7 @@ open GeneSort.Sorter.Mp.Sortable
 open GeneSort.SortingResults
 open GeneSort.SortingResults.Mp
 open GeneSort.SortingOps
+open GeneSort.SortingOps.Mp
 
 type outputDataType =
     | Run

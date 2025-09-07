@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <Compile Include="SorterEvalBinDto.fs" />
-    <Compile Include="SorterSetEvalDto.fs" />
     <Compile Include="SorterSetEvalBinsDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

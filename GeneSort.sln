@@ -43,6 +43,10 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.SortingOps.Test", 
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.SortingResults.Test", "GeneSort.SortingResults.Test\GeneSort.SortingResults.Test.fsproj", "{B6C2370C-E66C-4FCA-AD51-6BC3C1C93EA5}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.SortingResults.Mp.Test", "GeneSort.SortingResults.Mp.Test\GeneSort.SortingResults.Mp.Test.fsproj", "{BDC814CF-2345-4C7A-8631-5DF882F2D637}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.SortingOps.Mp.Test", "GeneSort.SortingOps.Mp.Test\GeneSort.SortingOps.Mp.Test.fsproj", "{8ED6F03B-5190-415D-A3D6-7EDF7C0465D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,6 +133,14 @@ Global
 		{B6C2370C-E66C-4FCA-AD51-6BC3C1C93EA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6C2370C-E66C-4FCA-AD51-6BC3C1C93EA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6C2370C-E66C-4FCA-AD51-6BC3C1C93EA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDC814CF-2345-4C7A-8631-5DF882F2D637}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDC814CF-2345-4C7A-8631-5DF882F2D637}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDC814CF-2345-4C7A-8631-5DF882F2D637}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDC814CF-2345-4C7A-8631-5DF882F2D637}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8ED6F03B-5190-415D-A3D6-7EDF7C0465D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8ED6F03B-5190-415D-A3D6-7EDF7C0465D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8ED6F03B-5190-415D-A3D6-7EDF7C0465D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8ED6F03B-5190-415D-A3D6-7EDF7C0465D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

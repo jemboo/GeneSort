@@ -17,12 +17,14 @@ type sorterSetEval =
         sorterSetId: Guid<sorterSetId>
         sorterTestsId: Guid<sortableTestsId>
         sorterEvals: sorterEval[]
+        ceLength: int<ceLength>
     }
 
     static member create 
                 (sorterSetId: Guid<sorterSetId>) 
                 (sorterTestsId: Guid<sortableTestsId>) 
-                (sorterEval: sorterEval[]) =
+                (sorterEval: sorterEval[])
+                (ceLength: int<ceLength>) =
         let id =
             [
                 sorterSetId :> obj
@@ -34,12 +36,14 @@ type sorterSetEval =
             sorterSetId = sorterSetId
             sorterTestsId = sorterTestsId
             sorterEvals = sorterEval
+            ceLength = ceLength
         }
 
     member this.SorterSetEvalId with get() : Guid<sorterSetEvalId> = this.sorterSetEvalId
     member this.SorterSetId with get() : Guid<sorterSetId> = this.sorterSetId
     member this.SorterTestsId with get() : Guid<sortableTestsId> = this.sorterTestsId
     member this.SorterEvals with get() : sorterEval[] = this.sorterEvals
+    member this.CeLength with get() : int<ceLength> = this.ceLength
 
  
 
@@ -64,4 +68,4 @@ module SorterSetEval =
                             0
                 )
 
-        sorterSetEval.create sorterSet.SorterSetId (sortableTests |> SortableTests.getId ) sorterEvals
+        sorterSetEval.create sorterSet.SorterSetId (sortableTests |> SortableTests.getId ) sorterEvals (sorterSet.CeLength)

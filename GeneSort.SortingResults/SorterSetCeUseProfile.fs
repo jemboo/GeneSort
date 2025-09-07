@@ -7,7 +7,7 @@ open GeneSort.SortingOps
 
 
 type sorterCeUseProfile = {
-    profileSegments: ArrayProperties.segmentWithPayload<int> []
+    segmentTotals: ArrayProperties.segmentWithPayload<int> []
     sorterId: Guid<sorterId>
     sorterSetId: Guid<sorterSetId>
     sorterTestsId: Guid<sortableTestsId>
@@ -30,7 +30,7 @@ module SorterCeUseProfile =
             (sorterTestsId: Guid<sortableTestsId>)
             (sorterEval : sorterEval) : sorterCeUseProfile =
         {   
-            profileSegments = ArrayProperties.getSegmentSums sorterEval.CeBlockUsage.UseCounts profileSegments
+            segmentTotals = ArrayProperties.getSegmentSums sorterEval.CeBlockUsage.UseCounts profileSegments
             sorterId = sorterEval.SorterId
             sorterSetId = sorterSetId
             sorterTestsId = sorterTestsId
@@ -43,28 +43,39 @@ module SorterCeUseProfile =
                 (%profile.sorterId.ToString()) 
                 (%profile.sorterSetId.ToString()) 
                 (%profile.sorterTestsId.ToString())
-                (profile.profileSegments |> ArrayProperties.getSegmentPayloadReportData (fun (i:int) -> i.ToString()))
+                (profile.segmentTotals |> ArrayProperties.getSegmentPayloadReportData (fun (i:int) -> i.ToString()))
 
 
 
 
 type sorterSetCeUseProfile = {
-    profileSegments: ArrayProperties.segmentWithPayload<int> []
-    sorterId: Guid<sorterId>
+    profileSegments: ArrayProperties.segment []
     sorterSetId: Guid<sorterSetId>
     sorterTestsId: Guid<sortableTestsId>
+    sorterCeUseProfiles : sorterCeUseProfile []
 }
 
 module SorterSetCeUseProfile =
 
 
     let makeSorterSetCeUseProfile
+            (segmentCount:int)
+            (blockGrowthRate:float)
             (sorterSetEval:sorterSetEval) =
 
-       // let yab = sorterSetEval.SorterEvals |> Array.map(fun se -> se |> SorterCeUseProfile.makeSorterCeUseProfile sorterSetEval)
+        let profileSegments = ArrayProperties.breakIntoExponentialSegments segmentCount blockGrowthRate (sorterSetEval.CeLength |> int)
 
-
-        None
+        {
+            sorterSetCeUseProfile.profileSegments = profileSegments
+            sorterSetId = sorterSetEval.SorterSetId
+            sorterTestsId = sorterSetEval.SorterTestsId
+            sorterCeUseProfiles = [| for se in sorterSetEval.SorterEvals -> 
+                                        SorterCeUseProfile.makeSorterCeUseProfile 
+                                            profileSegments 
+                                            sorterSetEval.SorterSetId 
+                                            sorterSetEval.SorterTestsId 
+                                            se |]
+        }
 
     let getUsageProfileHeader (arraySegments: ArrayProperties.segment[]) : string =
         sprintf "SorterId \tSorterSetId \tSorterTestsId \t%s" 
