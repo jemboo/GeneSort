@@ -1,9 +1,7 @@
 ﻿namespace GeneSort.Project.Params
 open System
 open FSharp.UMX
-open GeneSort.Core
 open GeneSort.Sorter
-open GeneSort.Model.Sorter
 
 
 module CeLength =
@@ -105,7 +103,7 @@ module CeLength =
         | swFull.Sw6 -> 600<ceLength>
         | swFull.Sw8 -> 700<ceLength>
         | swFull.Sw12 -> 1000<ceLength>
-        | swFull.Sw16 -> 2400<ceLength>
+        | swFull.Sw16 -> 400<ceLength>
         | swFull.Sw24 -> 3000<ceLength>
         | swFull.Sw32 -> 10000<ceLength>
         | swFull.Sw48 -> 100000<ceLength>

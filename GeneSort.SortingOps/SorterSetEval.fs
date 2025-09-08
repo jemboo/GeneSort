@@ -53,7 +53,7 @@ module SorterSetEval =
             (sorterSet: sorterSet)
             (sortableTests: sortableTests) : sorterSetEval =
 
-        let ceBlockEvals = 
+        let ceBlockEvals : (sorter * ceBlockEval) array = 
                 sorterSet.Sorters 
                 |> Array.map (fun s -> (s,  CeBlockOps.evalWithSorterTest sortableTests (ceBlock.create(s.Ces))))
 
@@ -65,7 +65,7 @@ module SorterSetEval =
                             (sortableTests |> SortableTests.getId ) 
                             sorter.SortingWidth 
                             ce.CeBlockWithUsage
-                            0
+                            (ce.SortableTests |> SortableTests.getUnsortedCount)
                 )
 
         sorterSetEval.create sorterSet.SorterSetId (sortableTests |> SortableTests.getId ) sorterEvals (sorterSet.CeLength)

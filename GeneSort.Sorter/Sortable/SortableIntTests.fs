@@ -9,17 +9,20 @@ open GeneSort.Sorter
 type sortableIntTests =
     { id: Guid<sortableTestsId>
       sortingWidth: int<sortingWidth>
-      sortableIntArrays: sortableIntArray[] }
+      sortableIntArrays: sortableIntArray[] 
+      unsortedCount: Lazy<int>
+    }
 
     static member create 
                     (id: Guid<sortableTestsId>) 
                     (sortingWidth:int<sortingWidth>)
                     (arrays: sortableIntArray[]) : sortableIntTests =
-        //if arrays |> Array.exists (fun arr -> SortableArray.sortingWidth arr <> sortingWidth) then
-        //    invalidArg "arrays" "All SortableArrays must have the same SortingWidth."
-        //if arrays |> Array.exists (fun arr -> SortableArray.getSortableArrayType arr <> arrayType) then
-        //    invalidArg "arrays" "All SortableArrays must have the same type (Ints or Bools)."
-        { id = id; sortingWidth = sortingWidth; sortableIntArrays = Array.copy arrays }
+        { 
+            id = id; 
+            sortingWidth = sortingWidth; 
+            sortableIntArrays = Array.copy arrays 
+            unsortedCount = Lazy<int>(fun () -> arrays |> Seq.filter(fun sa -> not sa.IsSorted) |> Seq.length)
+        }
 
     override this.Equals(obj) =
         match obj with
@@ -40,10 +43,7 @@ type sortableIntTests =
 
     member this.SortableIntArrays with get() = this.sortableIntArrays
     
-    member this.UnsortedCount with get() = 
-                    this.SortableIntArrays 
-                    |> Seq.filter(fun sa -> not sa.IsSorted)
-                    |> Seq.length
+    member this.UnsortedCount with get() = this.unsortedCount.Value
 
     interface IEquatable<sortableIntTests> with
         member this.Equals(other) =

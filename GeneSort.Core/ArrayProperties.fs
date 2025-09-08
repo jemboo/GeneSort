@@ -140,5 +140,5 @@ module ArrayProperties =
         segWithPayload
         |> Array.sortBy(fun seg -> seg.start)
         |> Array.map (fun seg -> formatter seg.payload)
-                        |> String.concat "\t"
-                        |> sprintf "%s"
+        |> String.concat "\t"
+        |> sprintf "%s"

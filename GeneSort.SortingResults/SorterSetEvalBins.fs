@@ -9,7 +9,6 @@ open System.Collections.Generic
 type sorterEvalKey = {
     ceCount: int<ceLength>
     stageCount: int<stageCount>
-    unsortedCount: int
 }
 
 type sorterEvalBin = {
@@ -19,7 +18,7 @@ type sorterEvalBin = {
 
 
 module SorterEvalBin =
-    //returns [(uuct1, ct1), (uuct2. ct2) ... ], a histogram report of
+    //returns [(uuct1, ct1); (uuct2, ct2) ... ], a histogram report of
     // unsortedCount properties of sorterEvalBin.sorterEvals, where ct1 is the
     // number of sorterEvals that have unsortedCount = ct1
     let getUnsortedHistogram (seb: sorterEvalBin) :string =
@@ -42,45 +41,46 @@ type sorterSetEvalBins = {
 module SorterSetEvalBins =
 
     let addSorterEval (sorterEval: sorterEval) 
-                      (sorterEvalSamples: sorterSetEvalBins) : unit =
+                      (sorterSetEvalBins: sorterSetEvalBins) : unit =
         let key = {
             ceCount = sorterEval.getUsedCeCount()
             stageCount = sorterEval.getStageCount()
-            unsortedCount = 0 // sorterEval. |> SorterEval.
         }
+
         let sorterEvalBin =
-            if sorterEvalSamples.evalBins.ContainsKey(key) then
-                sorterEvalSamples.evalBins.[key]
+            if sorterSetEvalBins.evalBins.ContainsKey(key) then
+                sorterSetEvalBins.evalBins.[key]
             else
                 let newBin = {
                     binCount = 0
                     sorterEvals = ResizeArray<sorterEval>()
                 }
-                sorterEvalSamples.evalBins.[key] <- newBin
+                sorterSetEvalBins.evalBins.[key] <- newBin
                 newBin
         
-        sorterEvalBin.binCount <- sorterEvalBin.binCount + 1
-        if sorterEvalBin.sorterEvals.Count < sorterEvalSamples.maxBinCount then
+        if sorterEvalBin.sorterEvals.Count < sorterSetEvalBins.maxBinCount then
             sorterEvalBin.sorterEvals.Add(sorterEval)
+            sorterEvalBin.binCount <- sorterEvalBin.binCount + 1
         
-        sorterEvalSamples.totalSampleCount <- sorterEvalSamples.totalSampleCount + 1
+        sorterSetEvalBins.totalSampleCount <- sorterSetEvalBins.totalSampleCount + 1
+
 
     let create (maxBinCount: int) (sorterSetEval:sorterSetEval) : sorterSetEvalBins =
-        let sorterEvalSamples = {
+        let sorterSetEvalBins = {
             sorterSetEvalId = sorterSetEval.SorterSetEvalId
             totalSampleCount = 0
             maxBinCount = maxBinCount
             evalBins = Dictionary<sorterEvalKey, sorterEvalBin>()
         }
         sorterSetEval.SorterEvals
-        |> Array.iter (fun se -> addSorterEval se sorterEvalSamples)
-        sorterEvalSamples
+        |> Array.iter (fun se -> addSorterEval se sorterSetEvalBins)
+        sorterSetEvalBins
 
 
     /// Returns an array of int arrays, each inner array containing [| ceCount; stageCount; binCount |]
-    let getBinCountReport (sorterEvalSamples: sorterSetEvalBins) : string array array =
+    let getBinCountReport (sorterSetEvalBins: sorterSetEvalBins) : string array array =
         let lines = 
-            sorterEvalSamples.evalBins
+            (sorterSetEvalBins.evalBins : Dictionary<sorterEvalKey, sorterEvalBin>)
             |> Seq.map (fun kvp -> 
                         [| 
                             (%kvp.Key.ceCount).ToString(); 

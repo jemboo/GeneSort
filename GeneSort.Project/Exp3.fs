@@ -23,7 +23,6 @@ open GeneSort.Model.Sorter
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.SortingResults
-open GeneSort.SortingResults.Mp
 open GeneSort.SortingOps.Mp
 
 module Exp3 = 
@@ -32,11 +31,11 @@ module Exp3 =
     let randomType = rngType.Lcg
     let excludeSelfCe = true
     let sortableArrayType = SortableArrayType.Bools
-    //let testModelCount = 10<sorterTestModelCount>
+  
     let parameterSet = 
         [ SwFull.practicalFullTestVals(); SorterModelKey.allButMusf6Kvps() ]
 
-    let workspace = Workspace.create "Exp3" "Exp3 descr" projectDir parameterSet
+    let workspace = Workspace.create "Exp3a" "Exp3 descr" projectDir parameterSet
 
 
     let executor (workspace: Workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
@@ -71,12 +70,10 @@ module Exp3 =
             let sorterTestModel = MsasF.create sortingWidth |> SorterTestModel.MsasF
             let sorterTest = SorterTestModel.makeSorterTest sorterTestModel sortableArrayType
             let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sorterTest
-            let sorterSetEvalSamples = SorterSetEvalBins.create 10 sorterSetEval
 
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSet |> outputData.SorterSet)
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSetEval |> outputData.SorterSetEval)
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterModelSetMaker |> outputData.SorterModelSetMaker)
-            //do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSetEvalSamples |> outputData.SorterSetEvalBins)
 
             Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %cycle)
         }
@@ -99,7 +96,7 @@ module Exp3 =
 
 
                 // Process each file and collect data for each SorterTest
-                let summaries = // : (string*string*string) array) =
+                let summaries : (string*string*string*string*string*string) list =
                     files
                     |> Seq.map (
                         fun ssEvalPath ->
@@ -170,7 +167,7 @@ module Exp3 =
                 let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
                 let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
                 
-                let summaries = // : (string*string*string) array) =
+                let summaries : string list =
                     files
                     |> Seq.map (
                         fun ssEvalPath ->
@@ -224,14 +221,14 @@ module Exp3 =
 
 
     let RunAll() =
-        for i in 0 .. 19 do
+        for i in 0 .. 1 do
             let cycle = i |> UMX.tag<cycleNumber>
             WorkspaceOps.executeWorkspace workspace cycle 8 executor
 
 
     let RunSorterEvalReport() =
-    //      (binReportExecutor workspace)
-        (ceUseProfileReportExecutor workspace)
+         (binReportExecutor workspace)
+    //    (ceUseProfileReportExecutor workspace)
 
 
 
