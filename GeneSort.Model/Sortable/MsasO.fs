@@ -46,7 +46,7 @@ type MsasO =
         member this.Equals(other) = 
             this.id = other.id
 
-    member this.MakeSortableBoolArraySet 
+    member this.MakeSortableBoolTests 
             (sortingWidth: int<sortingWidth>) : sortableBoolTests =
         let ssId = %this.Id |> UMX.tag<sortableTestsId>
         let bArrays =
@@ -60,7 +60,7 @@ type MsasO =
                 bArrays
 
 
-    member this.MakeSortableIntArraySet 
+    member this.MakeSortableIntTests 
             (sortingWidth: int<sortingWidth>) : sortableIntTests =
         let ssId = %this.Id |> UMX.tag<sortableTestsId>
         sortableIntTests.create 

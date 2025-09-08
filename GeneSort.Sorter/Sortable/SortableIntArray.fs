@@ -137,7 +137,7 @@ module SortableIntArray =
         let perm = Permutation.randomPermutation indexShuffler %sortingWidth
         fromPermutation perm
 
-    let getIntArrayMergeCases (sortingWidth: int<sortingWidth>) =
+    let getIntArrayMergeCases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
         let halfWidth = %sortingWidth / 2
         [|
             for i = 0 to (halfWidth - 1) do

@@ -9,8 +9,11 @@ open GeneSort.Sorter.Sortable
 
 
 type SorterTestModel =
-     | MsasF of MsasF   // MsasF = a full bool test set for a given sorting width
-     | MsasO of MsasO   // MsasO = generated from a seed permutation; for bool models, it's expanded from the integer permutations
+     | MsasF of MsasF     // MsasF = a full bool test set for a given sorting width
+     | MsasO of MsasO     // MsasO = generated from a seed permutation; for bool models, it's expanded from the integer permutations
+     | MsasMb of MsasMb   // All (sorting width)/2 merge test cases as bool arrays
+     | MsasMi of MsasMi   // All (sorting width)/2 merge test cases as int arrays
+
 
 module SorterTestModel =
 
@@ -25,13 +28,27 @@ module SorterTestModel =
         | MsasF msasF -> 
                 match sortableArrayType with
                 | SortableArrayType.Bools ->        
-                        msasF.MakeSorterTest(getSortingWidth model)
+                        msasF.MakeSortableTests(getSortingWidth model)
                 | SortableArrayType.Ints ->
                     failwith "Ints SortableArrayType not supported"
 
         | MsasO msasO ->
                 match sortableArrayType with
                 | SortableArrayType.Bools ->        
-                     msasO.MakeSortableBoolArraySet(getSortingWidth model) |> sortableTests.Bools
+                     msasO.MakeSortableBoolTests(getSortingWidth model) |> sortableTests.Bools
                 | SortableArrayType.Ints ->
-                     msasO.MakeSortableIntArraySet(getSortingWidth model) |> sortableTests.Ints
+                     msasO.MakeSortableIntTests(getSortingWidth model) |> sortableTests.Ints
+
+        | MsasMb msasMb ->
+                match sortableArrayType with
+                | SortableArrayType.Bools ->        
+                        msasMb.MakeSortableTests(getSortingWidth model)
+                | SortableArrayType.Ints ->
+                    failwith "Ints SortableArrayType not supported"
+
+        | MsasMi msasMi ->
+                match sortableArrayType with
+                | SortableArrayType.Bools ->        
+                        msasMi.MakeSortableTests(getSortingWidth model)
+                | SortableArrayType.Ints ->
+                    failwith "Ints SortableArrayType not supported"

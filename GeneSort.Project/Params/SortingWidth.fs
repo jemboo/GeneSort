@@ -84,7 +84,8 @@ module SwFull =
    let practicalFullTestVals() : string*string list =
        ("SortingWidth", ["16";]) 
 
-
+   let mergeTestVals() : string*string list =
+       ("SortingWidth", ["8"; "16";]) 
 
 type swMerege =
     | Sw4  | Sw6  | Sw8  | Sw12  | Sw16  | Sw24  | Sw32  | Sw48  | Sw64  | Sw96

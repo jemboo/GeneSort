@@ -78,7 +78,7 @@ module StageCount =
          | swFull.Sw6 -> 50<stageCount>
          | swFull.Sw8 -> 70<stageCount>
          | swFull.Sw12 -> 120<stageCount>
-         | swFull.Sw16 -> 40<stageCount>
+         | swFull.Sw16 -> 200<stageCount>
          | swFull.Sw24 -> 200<stageCount>
          | swFull.Sw32 -> 300<stageCount>
          | swFull.Sw48 -> 600<stageCount>

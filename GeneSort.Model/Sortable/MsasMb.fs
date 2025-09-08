@@ -4,26 +4,24 @@ open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
-open GeneSort.Sorter.Sorter
 open GeneSort.Sorter.Sortable
-open GeneSort.Model.Sorter
 
 
 [<Struct; CustomEquality; NoComparison>]
-type MsasF = 
+type MsasMb = 
     private 
         { id: Guid<sorterTestModelID>
           sortingWidth: int<sortingWidth> }
 
     static member create 
             (sortingWidth: int<sortingWidth>)
-            : MsasF =
+            : MsasMb =
         if %sortingWidth < 2 then
             failwith "SortingWidth must be at least 2"
         else
             let id = 
                 [
-                    "MsasF" :> obj
+                    "MsasMb" :> obj
                     sortingWidth :> obj
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
             { id = id; sortingWidth = sortingWidth; }
@@ -34,23 +32,24 @@ type MsasF =
 
     override this.Equals(obj) = 
         match obj with
-        | :? MsasF as other -> 
+        | :? MsasMb as other -> 
             this.sortingWidth = other.sortingWidth
         | _ -> false
 
     override this.GetHashCode() = 
         hash (this.sortingWidth)
 
-    interface IEquatable<MsasF> with
+    interface IEquatable<MsasMb> with
         member this.Equals(other) =  this.sortingWidth = other.sortingWidth
 
     member this.MakeSortableTests (sortingWidth: int<sortingWidth>) : sortableTests =
-        let sortableArrays =  SortableBoolArray.getAllSortableBoolArrays sortingWidth
+        let sortableArrays =  SortableBoolArray.getMergeSortTestCases sortingWidth
         sortableBoolTests.create 
                 ( %this.id |> UMX.tag<sortableTestsId>) 
                 sortingWidth
                 sortableArrays |> sortableTests.Bools
 
-module MsasF = ()
+
+module MsasMb = ()
  
  

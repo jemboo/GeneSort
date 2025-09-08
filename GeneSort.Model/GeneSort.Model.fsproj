@@ -28,6 +28,8 @@
     <Compile Include="Sorter\SorterModelSetMaker.fs" />
     <Compile Include="Sortable\Common.fs" />
     <Compile Include="Sortable\MsasF.fs" />
+    <Compile Include="Sortable\MsasMi.fs" />
+    <Compile Include="Sortable\MsasMb.fs" />
     <Compile Include="Sortable\MsasO.fs" />
     <Compile Include="Sortable\SorterTestModel.fs" />
     <Compile Include="Sortable\MsasORandGen.fs" />

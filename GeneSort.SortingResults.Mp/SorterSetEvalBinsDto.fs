@@ -25,7 +25,7 @@ module SorterSetEvalBinsDto =
         { 
             SorterSetEvalId = %samples.sorterSetEvalId
             TotalSampleCount = samples.totalSampleCount
-            MaxBinCount = samples.maxBinCount
+            MaxBinCount = samples.maxSorterEvalCount
             EvalBins = 
                 samples.evalBins
                 |> Seq.map (fun kvp -> (SorterEvalKeyDto.toSorterEvalKeyDto kvp.Key, SorterEvalBinDto.fromDomain kvp.Value))
@@ -45,7 +45,7 @@ module SorterSetEvalBinsDto =
         { 
             sorterSetEvalId = UMX.tag<sorterSetEvalId> dto.SorterSetEvalId
             totalSampleCount = dto.TotalSampleCount
-            maxBinCount = dto.MaxBinCount
+            maxSorterEvalCount = dto.MaxBinCount
             evalBins = evalBins
         }
 

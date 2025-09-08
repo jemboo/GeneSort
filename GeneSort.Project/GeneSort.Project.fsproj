@@ -24,6 +24,7 @@
     <Compile Include="Exp1.fs" />
     <Compile Include="Exp2.fs" />
     <Compile Include="Exp3.fs" />
+    <Compile Include="Exp4.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

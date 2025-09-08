@@ -34,7 +34,7 @@ module SorterEvalBin =
 type sorterSetEvalBins = {
     sorterSetEvalId: Guid<sorterSetEvalId>
     mutable totalSampleCount: int
-    maxBinCount: int
+    maxSorterEvalCount: int
     evalBins: Dictionary<sorterEvalKey, sorterEvalBin>
 }
 
@@ -58,7 +58,7 @@ module SorterSetEvalBins =
                 sorterSetEvalBins.evalBins.[key] <- newBin
                 newBin
         
-        if sorterEvalBin.sorterEvals.Count < sorterSetEvalBins.maxBinCount then
+        if sorterEvalBin.sorterEvals.Count < sorterSetEvalBins.maxSorterEvalCount then
             sorterEvalBin.sorterEvals.Add(sorterEval)
             sorterEvalBin.binCount <- sorterEvalBin.binCount + 1
         
@@ -69,9 +69,12 @@ module SorterSetEvalBins =
         let sorterSetEvalBins = {
             sorterSetEvalId = sorterSetEval.SorterSetEvalId
             totalSampleCount = 0
-            maxBinCount = maxBinCount
+            maxSorterEvalCount = maxBinCount
             evalBins = Dictionary<sorterEvalKey, sorterEvalBin>()
         }
+
+        let gps = sorterSetEval.SorterEvals |> Array.groupBy (fun se -> (se.getUsedCeCount(), se.getStageCount()))
+
         sorterSetEval.SorterEvals
         |> Array.iter (fun se -> addSorterEval se sorterSetEvalBins)
         sorterSetEvalBins
