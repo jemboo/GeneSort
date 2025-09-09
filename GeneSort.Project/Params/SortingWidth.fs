@@ -84,23 +84,23 @@ module SwFull =
    let practicalFullTestVals() : string*string list =
        ("SortingWidth", ["16";]) 
 
-   let mergeTestVals() : string*string list =
-       ("SortingWidth", ["8"; "16";]) 
-
-type swMerege =
+type swMerge =
     | Sw4  | Sw6  | Sw8  | Sw12  | Sw16  | Sw24  | Sw32  | Sw48  | Sw64  | Sw96
     | Sw128 | Sw192  | Sw256  | Sw384  | Sw512  | Sw768  | Sw1024  | Sw1536
     | Sw2048  | Sw3072  | Sw4096  | Sw6144  | Sw8192
 
-module SwMerege =
+module SwMerge =
+
+   let tst4 = 
+        [Sw4; Sw8; Sw16; Sw32; Sw64;
+         Sw128; Sw256; Sw512; Sw1024;]
 
    let all = 
         [Sw4; Sw6; Sw8; Sw12; Sw16; Sw24; Sw32; Sw48; Sw64; Sw96;
          Sw128; Sw192; Sw256; Sw384; Sw512; Sw768; Sw1024; Sw1536;
          Sw2048; Sw3072; Sw4096; Sw6144; Sw8192]
 
-
-   let fromString (s: string) : swMerege =
+   let fromString (s: string) : swMerge =
         match s with
         | "4" -> Sw4  | "6" -> Sw6  | "8" -> Sw8  | "12" -> Sw12
         | "16" -> Sw16  | "24" -> Sw24  | "32" -> Sw32  | "48" -> Sw48
@@ -111,7 +111,7 @@ module SwMerege =
         | _ -> failwithf "Unsupported swMerege string: %s" s
 
 
-   let toString (swMerege:swMerege) : string =
+   let toString (swMerege:swMerge) : string =
         match swMerege with
         | Sw4 -> "4"  | Sw6 -> "6"  | Sw8 -> "8"  | Sw12 -> "12"
         | Sw16 -> "16"  | Sw24 -> "24"  | Sw32 -> "32"  | Sw48 -> "48"
@@ -121,13 +121,44 @@ module SwMerege =
         | Sw4096 -> "4096" | Sw6144 -> "6144"  | Sw8192 -> "8192"
 
 
-   let getSwMergeForSortingWidth (sortingWidth:int<sortingWidth>) : swMerege =
+   let getSwMergeForSortingWidth (sortingWidth:int<sortingWidth>) : swMerge =
         match %sortingWidth with
-        | 4 -> swMerege.Sw4  | 6 -> swMerege.Sw6  | 8 -> swMerege.Sw8  | 12 -> swMerege.Sw12
-        | 16 -> swMerege.Sw16  | 24 -> swMerege.Sw24  | 32 -> swMerege.Sw32  | 48 -> swMerege.Sw48
-        | 64 -> swMerege.Sw64  | 96 -> swMerege.Sw96  | 128 -> swMerege.Sw128  | 192 -> swMerege.Sw192
-        | 256 -> swMerege.Sw256 | 384 -> swMerege.Sw384  | 512 -> swMerege.Sw512  | 768 -> swMerege.Sw768
-        | 1024 -> swMerege.Sw1024 | 1536 -> swMerege.Sw1536  | 2048 -> swMerege.Sw2048  | 3072 -> swMerege.Sw3072
-        | 4096 -> swMerege.Sw4096 | 6144 -> swMerege.Sw6144  | 8192 -> swMerege.Sw8192
+        | 4 -> swMerge.Sw4  | 6 -> swMerge.Sw6  | 8 -> swMerge.Sw8  | 12 -> swMerge.Sw12
+        | 16 -> swMerge.Sw16  | 24 -> swMerge.Sw24  | 32 -> swMerge.Sw32  | 48 -> swMerge.Sw48
+        | 64 -> swMerge.Sw64  | 96 -> swMerge.Sw96  | 128 -> swMerge.Sw128  | 192 -> swMerge.Sw192
+        | 256 -> swMerge.Sw256 | 384 -> swMerge.Sw384  | 512 -> swMerge.Sw512  | 768 -> swMerge.Sw768
+        | 1024 -> swMerge.Sw1024 | 1536 -> swMerge.Sw1536  | 2048 -> swMerge.Sw2048  | 3072 -> swMerge.Sw3072
+        | 4096 -> swMerge.Sw4096 | 6144 -> swMerge.Sw6144  | 8192 -> swMerge.Sw8192
         | _ -> failwith "Unsupported sorting width"
+
+   let toSortingWidth (swMerege:swMerge) : int<sortingWidth> =
+        match swMerege with
+        | Sw4 -> 4<sortingWidth>
+        | Sw6 -> 6<sortingWidth>
+        | Sw8 -> 8<sortingWidth>
+        | Sw12 -> 12<sortingWidth>
+        | Sw16 -> 16<sortingWidth>
+        | Sw24 -> 24<sortingWidth>
+        | Sw32 -> 32<sortingWidth>
+        | Sw48 -> 48<sortingWidth>
+        | Sw64 -> 64<sortingWidth>
+        | Sw96 -> 96<sortingWidth>
+        | Sw128 -> 128<sortingWidth>
+        | Sw192 -> 192<sortingWidth>
+        | Sw256 -> 256<sortingWidth>
+        | Sw384 -> 384<sortingWidth>
+        | Sw512 -> 512<sortingWidth>
+        | Sw768 -> 768<sortingWidth>
+        | Sw1024 -> 1024<sortingWidth>
+        | Sw1536 -> 1536<sortingWidth>
+        | Sw2048 -> 2048<sortingWidth>
+        | Sw3072 -> 3072<sortingWidth>
+        | Sw4096 -> 4096<sortingWidth>
+        | Sw6144 -> 6144<sortingWidth>
+        | Sw8192 -> 8192<sortingWidth>
+
+
+
+   let testVals() : string*string list =
+       ("SortingWidth", ["8"; "16"; "32"; "64";]) 
          

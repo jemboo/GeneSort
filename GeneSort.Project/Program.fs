@@ -9,6 +9,7 @@ printfn $"***************** {System.DateTime.Now.ToString()}"
 //Exp3.RunAll()
 //Exp3.RunSorterEvalReport()
 Exp4.RunAll()
+//Exp4.RunSorterEvalReport()
 printfn $"****************  {System.DateTime.Now.ToString()}"
 
 let yab = Console.ReadLine()

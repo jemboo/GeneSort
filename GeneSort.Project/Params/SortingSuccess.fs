@@ -5,7 +5,7 @@ open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Model.Sorter
 open SwFull
-open SwMerege
+open SwMerge
 open CeLength
 open StageCount
 

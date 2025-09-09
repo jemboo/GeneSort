@@ -28,28 +28,28 @@ module SorterCount =
         | swFull.Sw48 -> 2<sorterCount>
         | swFull.Sw64 -> 1<sorterCount>
 
-    let getSorterCountForSwMerge (swMerege:swMerege) : int<sorterCount> =
+    let getSorterCountForSwMerge (swMerege:swMerge) : int<sorterCount> =
         match swMerege with
-        | swMerege.Sw4 -> 1000<sorterCount>
-        | swMerege.Sw6 -> 1000<sorterCount>
-        | swMerege.Sw8 -> 1000<sorterCount>
-        | swMerege.Sw12 -> 1000<sorterCount>
-        | swMerege.Sw16 -> 1000<sorterCount>
-        | swMerege.Sw24 -> 1000<sorterCount>
-        | swMerege.Sw32 -> 1000<sorterCount>
-        | swMerege.Sw48 -> 1000<sorterCount>
-        | swMerege.Sw64 -> 1000<sorterCount>
-        | swMerege.Sw96 -> 500<sorterCount>
-        | swMerege.Sw128 -> 500<sorterCount>
-        | swMerege.Sw192 -> 250<sorterCount>
-        | swMerege.Sw256 -> 250<sorterCount>
-        | swMerege.Sw384 -> 100<sorterCount>
-        | swMerege.Sw512 -> 100<sorterCount>
-        | swMerege.Sw768 -> 50<sorterCount>
-        | swMerege.Sw1024 -> 50<sorterCount>
-        | swMerege.Sw1536 -> 25<sorterCount>
-        | swMerege.Sw2048 -> 25<sorterCount>
-        | swMerege.Sw3072 -> 10<sorterCount>
-        | swMerege.Sw4096 -> 5<sorterCount>
-        | swMerege.Sw6144 -> 2<sorterCount>
-        | swMerege.Sw8192 -> 1<sorterCount>
+        | swMerge.Sw4 -> 1000<sorterCount>
+        | swMerge.Sw6 -> 1000<sorterCount>
+        | swMerge.Sw8 -> 1000<sorterCount>
+        | swMerge.Sw12 -> 1000<sorterCount>
+        | swMerge.Sw16 -> 1000<sorterCount>
+        | swMerge.Sw24 -> 1000<sorterCount>
+        | swMerge.Sw32 -> 1000<sorterCount>
+        | swMerge.Sw48 -> 1000<sorterCount>
+        | swMerge.Sw64 -> 1000<sorterCount>
+        | swMerge.Sw96 -> 500<sorterCount>
+        | swMerge.Sw128 -> 500<sorterCount>
+        | swMerge.Sw192 -> 250<sorterCount>
+        | swMerge.Sw256 -> 250<sorterCount>
+        | swMerge.Sw384 -> 100<sorterCount>
+        | swMerge.Sw512 -> 100<sorterCount>
+        | swMerge.Sw768 -> 50<sorterCount>
+        | swMerge.Sw1024 -> 50<sorterCount>
+        | swMerge.Sw1536 -> 25<sorterCount>
+        | swMerge.Sw2048 -> 25<sorterCount>
+        | swMerge.Sw3072 -> 10<sorterCount>
+        | swMerge.Sw4096 -> 5<sorterCount>
+        | swMerge.Sw6144 -> 2<sorterCount>
+        | swMerge.Sw8192 -> 1<sorterCount>

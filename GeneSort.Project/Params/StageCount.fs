@@ -32,31 +32,31 @@ module StageCount =
          | swFull.Sw64 -> 20<stageCount>
 
 
-    let getRecordStageCountForMerge (swMerege:swMerege) : int<stageCount> =
+    let getRecordStageCountForMerge (swMerege:swMerge) : int<stageCount> =
         match swMerege with
-         | swMerege.Sw4 -> 1<stageCount>
-         | swMerege.Sw6 -> 3<stageCount>
-         | swMerege.Sw8 -> 6<stageCount>
-         | swMerege.Sw12 -> 4<stageCount>
-         | swMerege.Sw16 -> 4<stageCount>
-         | swMerege.Sw24 -> 5<stageCount>
-         | swMerege.Sw32 -> 6<stageCount>
-         | swMerege.Sw48 -> 7<stageCount>
-         | swMerege.Sw64 -> 8<stageCount>
-         | swMerege.Sw96 -> 10<stageCount>
-         | swMerege.Sw128 -> 12<stageCount>
-         | swMerege.Sw192 -> 14<stageCount>
-         | swMerege.Sw256 -> 19<stageCount>
-         | swMerege.Sw384 -> 20<stageCount>
-         | swMerege.Sw512 -> 21<stageCount>
-         | swMerege.Sw768 -> 22<stageCount>
-         | swMerege.Sw1024 -> 23<stageCount>
-         | swMerege.Sw1536 -> 24<stageCount>
-         | swMerege.Sw2048 -> 25<stageCount>
-         | swMerege.Sw3072 -> 26<stageCount>
-         | swMerege.Sw4096 -> 27<stageCount>
-         | swMerege.Sw6144 -> 28<stageCount>
-         | swMerege.Sw8192 -> 29<stageCount>
+         | swMerge.Sw4 -> 1<stageCount>
+         | swMerge.Sw6 -> 3<stageCount>
+         | swMerge.Sw8 -> 6<stageCount>
+         | swMerge.Sw12 -> 4<stageCount>
+         | swMerge.Sw16 -> 4<stageCount>
+         | swMerge.Sw24 -> 5<stageCount>
+         | swMerge.Sw32 -> 6<stageCount>
+         | swMerge.Sw48 -> 7<stageCount>
+         | swMerge.Sw64 -> 8<stageCount>
+         | swMerge.Sw96 -> 10<stageCount>
+         | swMerge.Sw128 -> 12<stageCount>
+         | swMerge.Sw192 -> 14<stageCount>
+         | swMerge.Sw256 -> 19<stageCount>
+         | swMerge.Sw384 -> 20<stageCount>
+         | swMerge.Sw512 -> 21<stageCount>
+         | swMerge.Sw768 -> 22<stageCount>
+         | swMerge.Sw1024 -> 23<stageCount>
+         | swMerge.Sw1536 -> 24<stageCount>
+         | swMerge.Sw2048 -> 25<stageCount>
+         | swMerge.Sw3072 -> 26<stageCount>
+         | swMerge.Sw4096 -> 27<stageCount>
+         | swMerge.Sw6144 -> 28<stageCount>
+         | swMerge.Sw8192 -> 29<stageCount>
 
 
     let getP900StageCountForFull (swFull:swFull) : int<stageCount> =
@@ -85,56 +85,56 @@ module StageCount =
          | swFull.Sw64 -> 1000<stageCount>
 
 
-    let getP900StageCountForMerge (swMerege:swMerege) : int<stageCount> =
+    let getP900StageCountForMerge (swMerege:swMerge) : int<stageCount> =
          match swMerege with
-         | swMerege.Sw4 -> 5<stageCount>
-         | swMerege.Sw6 -> 10<stageCount>
-         | swMerege.Sw8 -> 20<stageCount>
-         | swMerege.Sw12 -> 30<stageCount>
-         | swMerege.Sw16 -> 50<stageCount>
-         | swMerege.Sw24 -> 70<stageCount>
-         | swMerege.Sw32 -> 100<stageCount>
-         | swMerege.Sw48 -> 200<stageCount>
-         | swMerege.Sw64 -> 300<stageCount>
-         | swMerege.Sw96 -> 400<stageCount>
-         | swMerege.Sw128 -> 500<stageCount>
-         | swMerege.Sw192 -> 600<stageCount>
-         | swMerege.Sw256 -> 700<stageCount>
-         | swMerege.Sw384 -> 800<stageCount>
-         | swMerege.Sw512 -> 900<stageCount>
-         | swMerege.Sw768 -> 1000<stageCount>
-         | swMerege.Sw1024 -> 1200<stageCount>
-         | swMerege.Sw1536 -> 1400<stageCount>
-         | swMerege.Sw2048 -> 1600<stageCount>
-         | swMerege.Sw3072 -> 1800<stageCount>
-         | swMerege.Sw4096 -> 2000<stageCount>
-         | swMerege.Sw6144 -> 2500<stageCount>
-         | swMerege.Sw8192 -> 3000<stageCount>
+         | swMerge.Sw4 -> 5<stageCount>
+         | swMerge.Sw6 -> 10<stageCount>
+         | swMerge.Sw8 -> 20<stageCount>
+         | swMerge.Sw12 -> 30<stageCount>
+         | swMerge.Sw16 -> 100<stageCount>
+         | swMerge.Sw24 -> 70<stageCount>
+         | swMerge.Sw32 -> 200<stageCount>
+         | swMerge.Sw48 -> 200<stageCount>
+         | swMerge.Sw64 -> 400<stageCount>
+         | swMerge.Sw96 -> 400<stageCount>
+         | swMerge.Sw128 -> 500<stageCount>
+         | swMerge.Sw192 -> 600<stageCount>
+         | swMerge.Sw256 -> 700<stageCount>
+         | swMerge.Sw384 -> 800<stageCount>
+         | swMerge.Sw512 -> 900<stageCount>
+         | swMerge.Sw768 -> 1000<stageCount>
+         | swMerge.Sw1024 -> 1200<stageCount>
+         | swMerge.Sw1536 -> 1400<stageCount>
+         | swMerge.Sw2048 -> 1600<stageCount>
+         | swMerge.Sw3072 -> 1800<stageCount>
+         | swMerge.Sw4096 -> 2000<stageCount>
+         | swMerge.Sw6144 -> 2500<stageCount>
+         | swMerge.Sw8192 -> 3000<stageCount>
 
 
-    let getP999StageCountForMerge (swMerege:swMerege) : int<stageCount> =
+    let getP999StageCountForMerge (swMerege:swMerge) : int<stageCount> =
          match swMerege with
-         | swMerege.Sw4 -> 10<stageCount>
-         | swMerege.Sw6 -> 20<stageCount>
-         | swMerege.Sw8 -> 40<stageCount>
-         | swMerege.Sw12 -> 60<stageCount>
-         | swMerege.Sw16 -> 100<stageCount>
-         | swMerege.Sw24 -> 140<stageCount>
-         | swMerege.Sw32 -> 200<stageCount>
-         | swMerege.Sw48 -> 400<stageCount>
-         | swMerege.Sw64 -> 600<stageCount>
-         | swMerege.Sw96 -> 800<stageCount>
-         | swMerege.Sw128 -> 1000<stageCount>
-         | swMerege.Sw192 -> 1200<stageCount>
-         | swMerege.Sw256 -> 1400<stageCount>
-         | swMerege.Sw384 -> 1600<stageCount>
-         | swMerege.Sw512 -> 1800<stageCount>
-         | swMerege.Sw768 -> 2000<stageCount>
-         | swMerege.Sw1024 -> 2500<stageCount>
-         | swMerege.Sw1536 -> 3000<stageCount>
-         | swMerege.Sw2048 -> 3500<stageCount>
-         | swMerege.Sw3072 -> 4000<stageCount>
-         | swMerege.Sw4096 -> 5000<stageCount>
-         | swMerege.Sw6144 -> 6000<stageCount>
-         | swMerege.Sw8192 -> 7000<stageCount>
+         | swMerge.Sw4 -> 10<stageCount>
+         | swMerge.Sw6 -> 20<stageCount>
+         | swMerge.Sw8 -> 60<stageCount>
+         | swMerge.Sw12 -> 80<stageCount>
+         | swMerge.Sw16 -> 300<stageCount>
+         | swMerge.Sw24 -> 140<stageCount>
+         | swMerge.Sw32 -> 600<stageCount>
+         | swMerge.Sw48 -> 400<stageCount>
+         | swMerge.Sw64 -> 1200<stageCount>
+         | swMerge.Sw96 -> 800<stageCount>
+         | swMerge.Sw128 -> 1000<stageCount>
+         | swMerge.Sw192 -> 1200<stageCount>
+         | swMerge.Sw256 -> 1400<stageCount>
+         | swMerge.Sw384 -> 1600<stageCount>
+         | swMerge.Sw512 -> 1800<stageCount>
+         | swMerge.Sw768 -> 2000<stageCount>
+         | swMerge.Sw1024 -> 2500<stageCount>
+         | swMerge.Sw1536 -> 3000<stageCount>
+         | swMerge.Sw2048 -> 3500<stageCount>
+         | swMerge.Sw3072 -> 4000<stageCount>
+         | swMerge.Sw4096 -> 5000<stageCount>
+         | swMerge.Sw6144 -> 6000<stageCount>
+         | swMerge.Sw8192 -> 7000<stageCount>
          
