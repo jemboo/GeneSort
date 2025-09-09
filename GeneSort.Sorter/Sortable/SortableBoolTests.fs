@@ -38,7 +38,7 @@ type sortableBoolTests =
 
     member this.Id with get() = this.id
     
-    member this.SortableArrayType with get() = SortableArrayType.Bools
+    member this.SortableArrayType with get() = sortableArrayType.Bools
 
     member this.SortingWidth with get() = this.sortingWidth
 

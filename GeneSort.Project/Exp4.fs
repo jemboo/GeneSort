@@ -30,10 +30,9 @@ module Exp4 =
     let projectDir = "c:\Projects"
     let randomType = rngType.Lcg
     let excludeSelfCe = true
-    let sortableArrayType = SortableArrayType.Bools
   
     let parameterSet = 
-        [ SwFull.mergeTestVals(); SorterModelKey.allButMusf6Kvps() ]
+        [ SwFull.mergeTestVals(); SorterModelKey.allButMusf6Kvps(); SorterTestModelKey.sortableArrayTypes() ]
 
     let workspace = Workspace.create "Exp4" "Exp4 descr" projectDir parameterSet
 
@@ -45,6 +44,8 @@ module Exp4 =
 
             let sorterModelKey = (run.Parameters["SorterModel"]) |> SorterModelKey.fromString
             let swFull = (run.Parameters["SortingWidth"]) |> SwFull.fromString
+            let sortableArrayType = (run.Parameters["SortableArrayType"]) |> SortableArrayType.fromString
+
             let sortingWidth = swFull |> SwFull.toSortingWidth
             let ceLength = SortingSuccess.getCeLengthForFull sortingSuccess.P999 sortingWidth
 
@@ -67,9 +68,8 @@ module Exp4 =
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 
-            let sorterTestModel = MsasF.create sortingWidth |> SorterTestModel.MsasF
-            let sorterTest = SorterTestModel.makeSorterTest sorterTestModel sortableArrayType
-            let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sorterTest
+            let sortableTests = SortableTestModel.makeSortableTestsForMerge sortableArrayType sortingWidth
+            let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
 
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSet |> outputData.SorterSet)
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSetEval |> outputData.SorterSetEval)

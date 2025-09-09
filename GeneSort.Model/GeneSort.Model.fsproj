@@ -31,7 +31,7 @@
     <Compile Include="Sortable\MsasMi.fs" />
     <Compile Include="Sortable\MsasMb.fs" />
     <Compile Include="Sortable\MsasO.fs" />
-    <Compile Include="Sortable\SorterTestModel.fs" />
+    <Compile Include="Sortable\SortableTestModel.fs" />
     <Compile Include="Sortable\MsasORandGen.fs" />
     <Compile Include="Sortable\SorterTestModelGen.fs" />
     <Compile Include="Sortable\SortableTestModelSet.fs" />

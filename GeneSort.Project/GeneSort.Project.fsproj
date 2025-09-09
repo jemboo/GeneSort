@@ -12,8 +12,8 @@
     <Compile Include="Params\CeLength.fs" />
     <Compile Include="Params\StageCount.fs" />
     <Compile Include="Params\SortingSuccess.fs" />
-    <Compile Include="Params\SorterModels.fs" />
-    <Compile Include="Params\SorterTestModels.fs" />
+    <Compile Include="Params\SorterModelKey.fs" />
+    <Compile Include="Params\SorterTestModelKey.fs" />
     <Compile Include="MapStringTransformer.fs" />
     <Compile Include="Run.fs" />
     <Compile Include="RunDto.fs" />

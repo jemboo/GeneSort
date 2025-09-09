@@ -30,7 +30,7 @@ module Exp3 =
     let projectDir = "c:\Projects"
     let randomType = rngType.Lcg
     let excludeSelfCe = true
-    let sortableArrayType = SortableArrayType.Bools
+    let sortableArrayType = sortableArrayType.Bools
   
     let parameterSet = 
         [ SwFull.practicalFullTestVals(); SorterModelKey.allButMusf6Kvps() ]
@@ -67,8 +67,8 @@ module Exp3 =
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 
-            let sorterTestModel = MsasF.create sortingWidth |> SorterTestModel.MsasF
-            let sorterTest = SorterTestModel.makeSorterTest sorterTestModel sortableArrayType
+            let sorterTestModel = MsasF.create sortingWidth |> sortableTestModel.MsasF
+            let sorterTest = SortableTestModel.makeSortableTests sorterTestModel sortableArrayType
             let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sorterTest
 
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSet |> outputData.SorterSet)

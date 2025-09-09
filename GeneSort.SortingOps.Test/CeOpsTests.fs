@@ -119,4 +119,4 @@ type CeOpsTests() =
         // Assert
         let intTests = match result.SortableTests with | sortableTests.Ints it -> it | _ -> failwith "Expected Ints"
         intTests.SortingWidth |> should equal sortingWidth
-        intTests.SortableArrayType |> should equal SortableArrayType.Ints
+        intTests.SortableArrayType |> should equal sortableArrayType.Ints

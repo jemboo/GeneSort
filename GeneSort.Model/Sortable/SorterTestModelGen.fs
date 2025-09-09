@@ -10,7 +10,7 @@ module SorterTestModelGen =
                 (firstIndex: int) 
                 (count: int) 
                 (gen: SorterTestModelGen) : 
-                SorterTestModel seq =
+                sortableTestModel seq =
         match gen with
         | MsasORandGen msasORandGen ->
                 msasORandGen.getMsasOs(firstIndex) |> Seq.take(count)

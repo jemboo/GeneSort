@@ -61,22 +61,22 @@ module MsasODtoConv =
 
 module SorterTestModelDto =
 
-    let fromDomain (dto: SorterTestModelDto) : SorterTestModel =
+    let fromDomain (dto: SorterTestModelDto) : sortableTestModel =
         match dto.Kind with
-        | 0 -> dto.MsasF |> MsasFDtoConv.toDomain |> SorterTestModel.MsasF
-        | 1 -> dto.MsasO |> MsasODtoConv.fromDto |> SorterTestModel.MsasO
+        | 0 -> dto.MsasF |> MsasFDtoConv.toDomain |> sortableTestModel.MsasF
+        | 1 -> dto.MsasO |> MsasODtoConv.fromDto |> sortableTestModel.MsasO
         | k -> failwithf "Unknown SorterTestModelDto.Kind = %d" k
 
 
-    let toDomain (m: SorterTestModel) : SorterTestModelDto =
+    let toDomain (m: sortableTestModel) : SorterTestModelDto =
         match m with
-        | SorterTestModel.MsasF msasF ->
+        | sortableTestModel.MsasF msasF ->
             {
                 Kind = 0
                 MsasF = msasF |> MsasFDtoConv.fromDomain
                 MsasO = Unchecked.defaultof<MsasODto>
             }
-        | SorterTestModel.MsasO msasO ->
+        | sortableTestModel.MsasO msasO ->
             {
                 Kind = 1
                 MsasF = Unchecked.defaultof<MsasFDto>

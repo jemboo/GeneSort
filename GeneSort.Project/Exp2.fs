@@ -31,10 +31,10 @@ module Exp2 =
 
     let projectDir = "c:\Projects"
     let randomType = rngType.Lcg
-    let sortableArrayType = SortableArrayType.Ints
+    let sortableArrayType = sortableArrayType.Ints
     let testModelCount = 10<sorterTestModelCount>
     let parameterSet = 
-        [ SwFull.standardMapVals(); SorterTestModels.maxOrbit() ]
+        [ SwFull.standardMapVals(); SorterTestModelKey.maxOrbit() ]
 
     let workspace = Workspace.create "Exp2" "Exp2" projectDir parameterSet
 

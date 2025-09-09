@@ -8,35 +8,35 @@ type sortableTestModelSet =
     private
         { 
           id : Guid<sorterTestModelSetID>
-          sorterTestModels : SorterTestModel array
+          sorterTestModels : sortableTestModel array
         }
     with
     static member create 
                 (id : Guid<sorterTestModelSetID>)
-                (sorterTestModels : SorterTestModel array) =
+                (sorterTestModels : sortableTestModel array) =
 
         { id = id; sorterTestModels = sorterTestModels; }
 
     member this.Id with get() = this.id
     member this.SorterTestModels with get() = this.sorterTestModels
 
-    member this.makeSortableTestSet (sortableArrayType:SortableArrayType) : sortableTestSet =
+    member this.makeSortableTestSet (sortableArrayType:sortableArrayType) : sortableTestSet =
         let id = (%this.id) |> UMX.tag<sortableTestSetId>
         match sortableArrayType with
-        | SortableArrayType.Bools -> 
+        | sortableArrayType.Bools -> 
             let boolTests = 
                 this.SorterTestModels 
-                |> Array.map (fun model -> SorterTestModel.makeSorterTest model sortableArrayType)
+                |> Array.map (fun model -> SortableTestModel.makeSortableTests model sortableArrayType)
                 |> Array.map (fun st -> 
                     match st with
                     | sortableTests.Bools bt -> bt
                     | _ -> failwith "Inconsistent SorterTestModelSet: expected Bools")
             sortableTestSet.Bools (sortableBoolTestSet.create id boolTests)
 
-        | SortableArrayType.Ints -> 
+        | sortableArrayType.Ints -> 
             let intTests = 
                 this.SorterTestModels 
-                |> Array.map (fun model -> SorterTestModel.makeSorterTest model sortableArrayType)
+                |> Array.map (fun model -> SortableTestModel.makeSortableTests model sortableArrayType)
                 |> Array.map (fun st -> 
                     match st with
                     | sortableTests.Ints it -> it

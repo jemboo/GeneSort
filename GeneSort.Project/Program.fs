@@ -7,7 +7,8 @@ printfn $"***************** {System.DateTime.Now.ToString()}"
 //Exp2.RunSorterTestCountReport()
 //Exp2.RunAll()
 //Exp3.RunAll()
-Exp3.RunSorterEvalReport()
+//Exp3.RunSorterEvalReport()
+Exp4.RunAll()
 printfn $"****************  {System.DateTime.Now.ToString()}"
 
 let yab = Console.ReadLine()

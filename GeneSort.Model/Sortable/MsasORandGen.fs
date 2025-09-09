@@ -48,7 +48,7 @@ type MsasORandGen =
         member this.Equals(other) = 
             this.id = other.id
 
-    member this.getMsasOs (offset: int) : SorterTestModel seq =
+    member this.getMsasOs (offset: int) : sortableTestModel seq =
             let randy = Rando.create this.RngType (%this.id)
             let sw = %this.sortingWidth
             let maxO = this.maxOrbit
@@ -56,7 +56,7 @@ type MsasORandGen =
                 seq {   while true do
                             yield  Permutation.randomPermutation (randy.NextIndex) sw
                     }
-            permSeq |> Seq.skip offset |> Seq.map(fun perm -> MsasO.create perm maxO |> SorterTestModel.MsasO)
+            permSeq |> Seq.skip offset |> Seq.map(fun perm -> MsasO.create perm maxO |> sortableTestModel.MsasO)
 
 
 module MsasORandGen = ()
