@@ -4,7 +4,7 @@ open System
 
 printfn $"***************** {System.DateTime.Now.ToString()}"
 
-RandomSortersProject.RunAll4()
+PermutationCyclesProject.RunSorterTestCountReport()
 //Exp2.RunAll()
 //Exp3.RunAll()
 //Exp3.RunSorterEvalReport()

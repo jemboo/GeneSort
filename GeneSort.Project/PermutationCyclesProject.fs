@@ -3,8 +3,6 @@ namespace GeneSort.Project
 
 open System
 open System.IO
-open System.Threading
-open System.Threading.Tasks
 
 open FSharp.UMX
 open MessagePack
@@ -12,31 +10,32 @@ open MessagePack.FSharp
 open MessagePack.Resolvers
 
 open GeneSort.Core
-open GeneSort.Sorter
 open GeneSort.Sorter.Sortable
-open GeneSort.Sorter.Sorter
-open GeneSort.Model
 open GeneSort.Model.Sortable
-open GeneSort.Project.Params
-open GeneSort.Model.Sorter.Ce
-open GeneSort.Model.Sorter.Si
-open GeneSort.Model.Sorter.Uf4
-open GeneSort.Model.Sorter.Rs
-open GeneSort.Model.Sortable
-open GeneSort.Model.Mp.Sortable
 open GeneSort.Sorter.Mp.Sortable
 
 
-module Exp2 = 
+module PermutationCyclesProject = 
 
     let projectDir = "c:\Projects"
+    let experimentName = "PermutationCycles"
+    let experimentDesc = "Count PermutationCycles"
+
     let randomType = rngType.Lcg
     let sortableArrayType = sortableArrayType.Ints
     let testModelCount = 10<sorterTestModelCount>
-    let parameterSet = 
-        [ SwFull.standardMapVals(); SorterTestModelKey.maxOrbit() ]
+    let maxOrbiit = 100000
+    
+    let sortingWidthValues = 
+        [4; 8; 16; 32; 64] |> List.map(fun d -> d.ToString())
 
-    let workspace = Workspace.create "Exp2" "Exp2" projectDir parameterSet
+    let sortingWidths() : string*string list =
+        (Run.sortingWidthKey, sortingWidthValues)
+
+    let parameterSet = 
+        [ sortingWidths(); ]
+
+    let workspace = Workspace.create experimentName experimentDesc projectDir parameterSet
 
     let executor (workspace: Workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
         async {
@@ -44,14 +43,7 @@ module Exp2 =
                 Console.WriteLine(sprintf "Executing Run %d   %A" run.Index run.Parameters)
                 Run.setCycle run cycle
 
-                let sortingWidth =
-                    match run.Parameters.TryGetValue("SortingWidth") with
-                    | true, value -> value |> SwFull.fromString |> SwFull.toSortingWidth
-                    | false, _ -> failwith "SortingWidth parameter not found"
-                let maxOrbiit =
-                    match Int32.TryParse(run.Parameters["MaxOrbiit"]) with
-                    | true, value -> value
-                    | false, _ -> failwith "Invalid MaxOrbiit value"
+                let sortingWidth = run |> Run.getSortingWidth
 
                 let firstIndex = (%cycle * %testModelCount) |> UMX.tag<sorterTestModelCount>
                 let sorterTestModelGen = MsasORandGen.create randomType sortingWidth maxOrbiit |> SorterTestModelGen.MsasORandGen
@@ -70,7 +62,7 @@ module Exp2 =
 
 
     let RunAll() =
-        for i in 0 .. 20 do
+        for i in 0 .. 1 do
             let cycle = i |> UMX.tag<cycleNumber>
             WorkspaceOps.executeWorkspace workspace cycle 6 executor
 
@@ -80,7 +72,7 @@ module Exp2 =
         async {
             try
                 Console.WriteLine(sprintf 
-                                    "Generating SorterTest count report for %s in workspace %s" 
+                                    "Generating Permutation orbit count report for %s in workspace %s" 
                                     (outputDataType.SortableTestSet |> OutputDataType.toString ) 
                                     workspace.WorkspaceFolder)
 
@@ -97,63 +89,71 @@ module Exp2 =
                 let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
                 // Process each file and collect data for each SorterTest
-                let (summaries : (Guid*int*int) array) =
+                let summaries : (Guid*int*string*int) list =
                     files
-                    |> Seq.map (fun filePath ->
-                        async {
+                    |> Seq.map (
+                        fun filePath ->
                             try
                                 use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                                let! dto = MessagePackSerializer.DeserializeAsync<sortableTestSetDto>(stream, options).AsTask() |> Async.AwaitTask
+                                let dto = MessagePackSerializer.Deserialize<sortableTestSetDto>(stream, options)
                                 let sorterTestSet = SortableTestSetDto.toDomain dto
-                                let sortableIntTestSet = 
+
+                                let runPath = OutputData.getRunFileNameForOutputName 
+                                                    workspace.WorkspaceFolder 
+                                                    (Path.GetFileNameWithoutExtension filePath)
+                                if not (File.Exists runPath) then
+                                    failwith (sprintf "Expected Run file %s to exist" runPath)
+                                let runStream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
+                                let runDto = MessagePackSerializer.Deserialize<RunDto>(runStream, options)
+                                let run = RunDto.fromDto runDto
+                                let cycle = (run.Parameters["Cycle"])
+
+                                let sortableIntTestSet =
                                     match sorterTestSet with
                                     | sortableTestSet.Ints intTestSet -> intTestSet
                                     | sortableTestSet.Bools _ -> failwith "Expected Ints sorterTestSet"
 
                                 let sortableTestData =
-                                    sortableIntTestSet.sortableTests
-                                    |> Array.map (fun sorterTest ->
-                                        (%sorterTest.Id, %(sorterTestSet |> SortableTestset.getSortingWidth), sorterTest.Count))
-                                return Some sortableTestData
+                                    sortableIntTestSet.sortableTests |> Array.map (
+                                        fun sorterTest ->
+                                            (%sorterTest.Id, 
+                                             %(sorterTestSet |> SortableTestset.getSortingWidth), 
+                                             cycle, 
+                                             sorterTest.Count))
+
+                                sortableTestData
                             with e ->
-                                printfn "Error processing file %s: %s" filePath e.Message
-                                return None
-                        }
+                                failwith (sprintf "Error processing file %s: %s" filePath e.Message)
                     )
+                    |> Array.concat
                     |> Seq.toList
-                    |> Async.Parallel
-                    |> Async.RunSynchronously
-                    |> Array.choose id
-                    |> Array.concat // Combine all SorterTest data from all SorterTestSets
 
                 // Generate the Markdown report, one line per SorterTest
                 let reportContent =
-                    [ "# SorterTest Count Report"
+                    [ "Permutation orbit count report"
                       sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                       sprintf "Workspace: %s" workspace.WorkspaceFolder
                       ""
-                      "| Id | Sorting Width | Count |"
-                      "|----|---------------|-------|"
+                      "Id\t Sorting\t Width\t Cycle\t Count"
                     ]
                     @ (summaries
-                       |> Array.map (fun (id, sortingWidth, count) ->
-                           sprintf "| %s | %d | %d |" (id.ToString()) sortingWidth count)
-                       |> Array.toList)
+                       |> List.map (fun (id, sortingWidth, cycle, count) ->
+                           sprintf "%s \t%d \t%s \t%d" (id.ToString()) sortingWidth cycle count))
                     |> String.concat "\n"
 
 
                 // Save the report to a file
                 let reportFilePath = Path.Combine(
                         workspace.WorkspaceFolder, 
-                        sprintf "%s_SorterTestCountReport_%s.md" 
+                        sprintf "%s_SorterTestCountReport_%s.txt" 
                                     (outputDataType.SortableTestSet |> OutputDataType.toString )
                                     (DateTime.Now.ToString("yyyyMMdd_HHmmss"))
                         )
                 do! File.WriteAllTextAsync(reportFilePath, reportContent) |> Async.AwaitTask
 
-                Console.WriteLine(sprintf "SorterTest count report saved to %s" reportFilePath)
+                Console.WriteLine(sprintf "Permutation orbit count report saved to %s" reportFilePath)
             with ex ->
-                Console.WriteLine(sprintf "Error generating SorterTest count report for %s: %s" "SorterTestSet" ex.Message)
+                Console.WriteLine(sprintf "Error generating Permutation orbit count report for %s: %s" "SorterTestSet" ex.Message)
                 raise ex
         }
 

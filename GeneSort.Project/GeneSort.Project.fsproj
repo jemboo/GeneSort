@@ -22,8 +22,7 @@
     <Compile Include="OutputData.fs" />
     <Compile Include="WorkspaceOps.fs" />
     <Compile Include="RandomSortersProject.fs" />
-    <Compile Include="Exp1o.fs" />
-    <Compile Include="Exp2o.fs" />
+    <Compile Include="PermutationCyclesProject.fs" />
     <Compile Include="Exp3o.fs" />
     <Compile Include="Exp4o.fs" />
     <Compile Include="Exp5o.fs" />

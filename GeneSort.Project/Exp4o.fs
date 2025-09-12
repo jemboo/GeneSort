@@ -105,7 +105,9 @@ module Exp4 =
                                 let ssEvalDto = MessagePackSerializer.Deserialize<sorterSetEvalDto>(ssEvalStream, options)
                                 let sorterSetEval = SorterSetEvalDto.toDomain ssEvalDto  
                                 
-                                let runPath = OutputData.getRunFileNameForOutputName workspace.WorkspaceFolder (Path.GetFileNameWithoutExtension ssEvalPath)
+                                let runPath = OutputData.getRunFileNameForOutputName 
+                                                    workspace.WorkspaceFolder 
+                                                    (Path.GetFileNameWithoutExtension ssEvalPath)
                                 if not (File.Exists runPath) then
                                     failwith (sprintf "Expected Run file %s to exist" runPath)
                                 let runStream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
@@ -114,6 +116,8 @@ module Exp4 =
                                 let sorterModelKey = (run.Parameters["SorterModel"])
                                 let swFull = (run.Parameters["SortingWidth"])
                                 let cycle = (run.Parameters["Cycle"])
+
+
                                 let sortableArrayType = (run.Parameters["SortableArrayType"])
 
                                 let prpt = sorterSetEval.SorterEvals |> Array.map (fun se -> SorterEval.reportLine se)
@@ -122,7 +126,6 @@ module Exp4 =
                             with e ->
                                 failwith (sprintf "Error processing file %s: %s" ssEvalPath e.Message)
                     )
-                    
                     |> Array.concat
                     |> Seq.toList
 
