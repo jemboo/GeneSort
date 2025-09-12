@@ -40,7 +40,7 @@ module Exp4 =
     let executor (workspace: Workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
         async {
             Console.WriteLine(sprintf "Executing Run %d  Cycle %d  %A" run.Index %cycle run.Parameters)
-            run.Parameters <- (run.Parameters |> Map.add "Cycle" (cycle.ToString()))
+            Run.setCycle run cycle
 
             let sorterModelKey = (run.Parameters["SorterModel"]) |> SorterModelKey.fromString
             let swMerge = (run.Parameters["SortingWidth"]) |> SwMerge.fromString

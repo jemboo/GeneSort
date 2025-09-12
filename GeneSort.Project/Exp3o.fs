@@ -42,6 +42,7 @@ module Exp3 =
         async {
 
             Console.WriteLine(sprintf "Executing Run %d  Cycle %d  %A" run.Index %cycle run.Parameters)
+            Run.setCycle run cycle
 
             let sorterModelKey = (run.Parameters["SorterModel"]) |> SorterModelKey.fromString
             let swFull = (run.Parameters["SortingWidth"]) |> SwFull.fromString

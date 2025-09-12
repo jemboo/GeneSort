@@ -37,6 +37,7 @@ module Exp1o =
         async {
 
             Console.WriteLine(sprintf "Executing Run %d   %A" run.Index run.Parameters)
+            Run.setCycle run cycle
 
 
             let sorterModelKey = (run.Parameters["SorterModel"]) |> SorterModelKey.fromString

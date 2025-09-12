@@ -42,6 +42,7 @@ module Exp2 =
         async {
             try
                 Console.WriteLine(sprintf "Executing Run %d   %A" run.Index run.Parameters)
+                Run.setCycle run cycle
 
                 let sortingWidth =
                     match run.Parameters.TryGetValue("SortingWidth") with

@@ -40,40 +40,39 @@ module Exp5 =
     let executor (workspace: Workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
         async {
             Console.WriteLine(sprintf "Executing Run %d  Cycle %d  %A" run.Index %cycle run.Parameters)
-            run.Parameters <- (run.Parameters |> Map.add "Cycle" (cycle.ToString()))
+            Run.setCycle run cycle
 
-            let sorterModelKey = (run.Parameters["SorterModel"]) |> SorterModelKey.fromString
-            let swMerge = (run.Parameters["SortingWidth"]) |> SwMerge.fromString
-            let sortableArrayType = (run.Parameters["SortableArrayType"]) |> SortableArrayType.fromString
+            let sorterModelKey = Run.getSorterModelName run
+            let sortingWidth =  Run.getSortingWidth run
+            let sortableArrayType = Run.getSortableArrayType run
 
-            let sortingWidth = swMerge |> SwMerge.toSortingWidth
-            let ceLength = SortingSuccess.getCeLengthForMerge sortingSuccess.P999 sortingWidth
+            //let ceLength = SortingSuccess.getCeLengthForMerge sortingSuccess.P999 sortingWidth
 
-            let stageCount = SortingSuccess.getStageCountForMergeSw4 sortingSuccess.P999 sortingWidth
-            let opsGenRatesArray = OpsGenRatesArray.createUniform %stageCount
-            let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageCount %sortingWidth
+            //let stageCount = SortingSuccess.getStageCountForMergeSw4 sortingSuccess.P999 sortingWidth
+            //let opsGenRatesArray = OpsGenRatesArray.createUniform %stageCount
+            //let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageCount %sortingWidth
 
-            let modelMaker =
-                match sorterModelKey with
-                | SorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> SorterModelMaker.SmmMsceRandGen
-                | SorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
-                | SorterModelKey.Msrs -> (MsrsRandGen.create randomType sortingWidth opsGenRatesArray) |> SorterModelMaker.SmmMsrsRandGen
-                | SorterModelKey.Msuf4 -> (Msuf4RandGen.create randomType sortingWidth stageCount uf4GenRatesArray) |> SorterModelMaker.SmmMsuf4RandGen
-                | SorterModelKey.Msuf6 -> failwith "Msuf6 not supported in this experiment"
+            //let modelMaker =
+            //    match sorterModelKey with
+            //    | SorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> SorterModelMaker.SmmMsceRandGen
+            //    | SorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
+            //    | SorterModelKey.Msrs -> (MsrsRandGen.create randomType sortingWidth opsGenRatesArray) |> SorterModelMaker.SmmMsrsRandGen
+            //    | SorterModelKey.Msuf4 -> (Msuf4RandGen.create randomType sortingWidth stageCount uf4GenRatesArray) |> SorterModelMaker.SmmMsuf4RandGen
+            //    | SorterModelKey.Msuf6 -> failwith "Msuf6 not supported in this experiment"
 
-            let sorterCount = swMerge |> SorterCount.getSorterCountForSwMerge
-            let firstIndex = (%cycle * %sorterCount) |> UMX.tag<sorterCount>
+            //let sorterCount = swMerge |> SorterCount.getSorterCountForSwMerge
+            //let firstIndex = (%cycle * %sorterCount) |> UMX.tag<sorterCount>
             
-            let sorterModelSetMaker = sorterModelSetMaker.create modelMaker firstIndex sorterCount
-            let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
-            let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
+            //let sorterModelSetMaker = sorterModelSetMaker.create modelMaker firstIndex sorterCount
+            //let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
+            //let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 
-            let sortableTests = SortableTestModel.makeSortableTestsForMerge sortableArrayType sortingWidth
-            let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
+            //let sortableTests = SortableTestModel.makeSortableTestsForMerge sortableArrayType sortingWidth
+            //let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
 
-            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSet |> outputData.SorterSet)
-            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSetEval |> outputData.SorterSetEval)
-            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            //do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSet |> outputData.SorterSet)
+            //do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSetEval |> outputData.SorterSetEval)
+            //do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %cycle)
         }
