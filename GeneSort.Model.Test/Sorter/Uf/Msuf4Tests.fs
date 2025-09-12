@@ -23,7 +23,7 @@ type Msuf4Tests() =
     let mockFloatPicker () = 0.5
 
     // Helper function to create a TwoOrbitUf4GenRates for a given order
-    let createTestGenRates (order: int) :Uf4GenRates =
+    let createTestGenRates (order: int) :uf4GenRates =
         Uf4GenRates.makeUniform order
 
     // Helper function that uses mockFloatPicker to create a random TwoOrbitUnfolder4 for a given order, 
@@ -33,7 +33,7 @@ type Msuf4Tests() =
             (twoOrbitPairType: TwoOrbitPairType) 
             (twoOrbitPairTypeOverride: TwoOrbitPairType option) 
             : TwoOrbitUf4  =
-        let baseGenRates = createTestGenRates order
+        let baseGenRates : uf4GenRates = createTestGenRates order
         let orthoRate = if twoOrbitPairType = TwoOrbitPairType.Ortho then 1.0 else 0.0
         let paraRate = if twoOrbitPairType = TwoOrbitPairType.Para then 1.0 else 0.0
         let selfSyymRate = if twoOrbitPairType = TwoOrbitPairType.SelfRefl then 1.0 else 0.0
@@ -44,16 +44,14 @@ type Msuf4Tests() =
                     let orthoRate = if twoOrbitPairType = TwoOrbitPairType.Ortho then 1.0 else 0.0
                     let paraRate = if twoOrbitPairType = TwoOrbitPairType.Para then 1.0 else 0.0
                     let selfSyymRate = if twoOrbitPairType = TwoOrbitPairType.SelfRefl then 1.0 else 0.0
-                    Array.init baseGenRates.opsGenRatesArray.RatesArray.Length (
+                    Array.init baseGenRates.OpsGenRatesArray.RatesArray.Length (
                         fun _ -> OpsGenRates.create(orthoRate, paraRate, selfSyymRate))
-                | None -> baseGenRates.opsGenRatesArray.RatesArray
+                | None -> baseGenRates.OpsGenRatesArray.RatesArray
 
-        let genRates : Uf4GenRates = 
-            { 
-              Uf4GenRates.order = baseGenRates.order
-              seedOpsGenRates = OpsGenRates.create(orthoRate, paraRate, selfSyymRate)
-              opsGenRatesArray = OpsGenRatesArray.create(ratesArray)
-            }
+        let genRates : uf4GenRates = uf4GenRates.create 
+                                        order
+                                        (OpsGenRates.create(orthoRate, paraRate, selfSyymRate))
+                                        (OpsGenRatesArray.create ratesArray)
 
         RandomUnfolderOps4.makeRandomTwoOrbitUf4 mockFloatPicker genRates
 

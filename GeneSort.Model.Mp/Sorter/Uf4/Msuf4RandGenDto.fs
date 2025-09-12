@@ -8,7 +8,6 @@ open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 open GeneSort.Core.Mp.RatesAndOps
-open GeneSort.Model.Sorter
 open GeneSort.Sorter
 
 [<MessagePackObject>]
@@ -42,9 +41,9 @@ module Msuf4RandGenDto =
             let genRates = Uf4GenRatesArrayDto.toDomain dto.GenRates
             if genRates.Length <> dto.StageCount then
                 failwith $"GenRates array length ({genRates.Length}) must equal StageCount ({dto.StageCount})"
-            if genRates.RatesArray |> Array.exists (fun gr -> gr.order <> dto.SortingWidth) then
+            if genRates.RatesArray |> Array.exists (fun gr -> gr.Order <> dto.SortingWidth) then
                 failwith $"All GenRates must have order {dto.SortingWidth}"
-            if genRates.RatesArray |> Array.exists (fun gr -> gr.opsGenRatesArray.Length <> MathUtils.exactLog2(gr.order / 4)) then
+            if genRates.RatesArray |> Array.exists (fun gr -> gr.OpsGenRatesArray.Length <> MathUtils.exactLog2(gr.Order / 4)) then
                 failwith "opsGenRatesArray length must equal log2(order/4)"
 
             Msuf4RandGen.create dto.RngType (UMX.tag<sortingWidth> dto.SortingWidth) (UMX.tag<stageCount> dto.StageCount) genRates

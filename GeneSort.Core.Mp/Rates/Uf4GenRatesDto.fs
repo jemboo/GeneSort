@@ -18,19 +18,22 @@ module Uf4GenRatesDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let fromDomain (uf4GenRates: Uf4GenRates) : Uf4GenRatesDto =
-        { Order = uf4GenRates.order
-          SeedOpsGenRates = OpsGenRatesDto.fromDomain uf4GenRates.seedOpsGenRates
-          OpsGenRatesArray = OpsGenRatesArrayDto.fromDomain uf4GenRates.opsGenRatesArray }
+    let fromDomain (uf4GenRates: uf4GenRates) : Uf4GenRatesDto =
+        { Order = uf4GenRates.Order
+          SeedOpsGenRates = OpsGenRatesDto.fromDomain uf4GenRates.SeedOpsGenRates
+          OpsGenRatesArray = OpsGenRatesArrayDto.fromDomain uf4GenRates.OpsGenRatesArray }
 
-    let toDomain (dto: Uf4GenRatesDto) : Uf4GenRates =
+    let toDomain (dto: Uf4GenRatesDto) : uf4GenRates =
         try
             if dto.Order < 4 || dto.Order % 4 <> 0 then
                 failwith $"Order must be at least 4 and divisible by 4, got {dto.Order}"
             if dto.OpsGenRatesArray.Rates.Length <> MathUtils.exactLog2 (dto.Order / 4) then
                 failwith $"OpsGenRatesArray length ({dto.OpsGenRatesArray.Rates.Length}) must match log2(order/4) ({MathUtils.exactLog2 (dto.Order / 4)})"
-            { order = dto.Order
-              seedOpsGenRates = OpsGenRatesDto.toDomain dto.SeedOpsGenRates
-              opsGenRatesArray = OpsGenRatesArrayDto.toDomain dto.OpsGenRatesArray }
+
+            uf4GenRates.create 
+                dto.Order 
+                (OpsGenRatesDto.toDomain dto.SeedOpsGenRates) 
+                (OpsGenRatesArrayDto.toDomain dto.OpsGenRatesArray)
+
         with
         | ex -> failwith $"Failed to convert Uf4GenRatesDto: {ex.Message}"

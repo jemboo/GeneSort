@@ -4,11 +4,11 @@ open System
 open MathUtils
 
 [<Struct; CustomEquality; NoComparison>]
-type Uf4GenRatesArray =
+type uf4GenRatesArray =
     private 
-        { rates: Uf4GenRates array }
+        { rates: uf4GenRates array }
 
-    static member create (rates: Uf4GenRates array) : Uf4GenRatesArray =
+    static member create (rates: uf4GenRates array) : uf4GenRatesArray =
         if Array.exists (fun r -> r.order < 4 || r.order % 4 <> 0) rates then
             failwith "All Uf4GenRates orders must be at least 4 and divisible by 4"
         let arrayLengths = rates |> Array.map (fun r -> r.opsGenRatesArray.Length)
@@ -27,7 +27,7 @@ type Uf4GenRatesArray =
 
     override this.Equals(obj) =
         match obj with
-        | :? Uf4GenRatesArray as other ->
+        | :? uf4GenRatesArray as other ->
             if this.rates.Length <> other.rates.Length then false
             else
                 Array.forall2 (fun a b -> 
@@ -44,7 +44,7 @@ type Uf4GenRatesArray =
             hash <- hash * 23 + rate.opsGenRatesArray.GetHashCode()
         hash
 
-    interface IEquatable<Uf4GenRatesArray> with
+    interface IEquatable<uf4GenRatesArray> with
         member this.Equals(other) =
             if this.rates.Length <> other.rates.Length then false
             else
@@ -59,18 +59,12 @@ module Uf4GenRatesArray =
         Math.Max(min, Math.Min(max, value))
 
 
-    let createUniform (length: int) (order: int) : Uf4GenRatesArray =
-        if length <= 0 then failwith "Length must be positive"
-        if order < 4 || order % 4 <> 0 then failwith "Order must be at least 4 and divisible by 4"
-        let arrayLength = MathUtils.exactLog2 (order / 4)
-        let rates = Array.init length (fun _ -> 
-            { Uf4GenRates.order = order
-              seedOpsGenRates = OpsGenRates.createUniform()
-              opsGenRatesArray = OpsGenRatesArray.create (Array.init arrayLength (fun _ -> OpsGenRates.createUniform())) })
-        Uf4GenRatesArray.create rates
+    let createUniform (length: int) (order: int) : uf4GenRatesArray =
+        let rates = Array.init length (fun _ -> Uf4GenRates.makeUniform order)
+        uf4GenRatesArray.create rates
 
 
-    let createLinearVariation (length: int) (order: int) (startRates: Uf4GenRates) (endRates: Uf4GenRates) : Uf4GenRatesArray =
+    let createLinearVariation (length: int) (order: int) (startRates: uf4GenRates) (endRates: uf4GenRates) : uf4GenRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if order < 4 || order % 4 <> 0 then failwith "Order must be at least 4 and divisible by 4"
         if startRates.order <> order || endRates.order <> order then failwith "Start and end rates must have the same order"
@@ -92,12 +86,12 @@ module Uf4GenRatesArray =
                             startArray.[j].OrthoRate + t * (endArray.[j].OrthoRate - startArray.[j].OrthoRate),
                             startArray.[j].ParaRate + t * (endArray.[j].ParaRate - startArray.[j].ParaRate),
                             startArray.[j].SelfReflRate + t * (endArray.[j].SelfReflRate - startArray.[j].SelfReflRate)))
-                { Uf4GenRates.order = order
-                  seedOpsGenRates = seed
-                  opsGenRatesArray = OpsGenRatesArray.create opsGenRatesArray })
-        Uf4GenRatesArray.create rates
 
-    let createSinusoidalVariation (length: int) (order: int) (baseRates: Uf4GenRates) (amplitudes: Uf4GenRates) (frequency: float) : Uf4GenRatesArray =
+                uf4GenRates.create order seed (OpsGenRatesArray.create opsGenRatesArray) )
+        uf4GenRatesArray.create rates
+
+
+    let createSinusoidalVariation (length: int) (order: int) (baseRates: uf4GenRates) (amplitudes: uf4GenRates) (frequency: float) : uf4GenRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if order < 4 || order % 4 <> 0 then failwith "Order must be at least 4 and divisible by 4"
         if baseRates.order <> order || amplitudes.order <> order then failwith "Base and amplitudes must have the same order"
@@ -119,12 +113,10 @@ module Uf4GenRatesArray =
                             clamp (baseArray.[j].OrthoRate + ampArray.[j].OrthoRate * Math.Sin(t)) 0.0 1.0,
                             clamp (baseArray.[j].ParaRate + ampArray.[j].ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
                             clamp (baseArray.[j].SelfReflRate + ampArray.[j].SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0))
-                { Uf4GenRates.order = order
-                  seedOpsGenRates = seed
-                  opsGenRatesArray = OpsGenRatesArray.create opsGenRatesArray })
-        Uf4GenRatesArray.create rates
+                uf4GenRates.create order seed (OpsGenRatesArray.create opsGenRatesArray) )
+        uf4GenRatesArray.create rates
 
-    let createGaussianHotSpot (length: int) (order: int) (baseRates: Uf4GenRates) (hotSpotIndex: int) (hotSpotRates: Uf4GenRates) (sigma: float) : Uf4GenRatesArray =
+    let createGaussianHotSpot (length: int) (order: int) (baseRates: uf4GenRates) (hotSpotIndex: int) (hotSpotRates: uf4GenRates) (sigma: float) : uf4GenRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if order < 4 || order % 4 <> 0 then failwith "Order must be at least 4 and divisible by 4"
         if baseRates.order <> order || hotSpotRates.order <> order then failwith "Base and hotspot rates must have the same order"
@@ -149,12 +141,11 @@ module Uf4GenRatesArray =
                             baseArray.[j].OrthoRate + (hotSpotArray.[j].OrthoRate - baseArray.[j].OrthoRate) * weight,
                             baseArray.[j].ParaRate + (hotSpotArray.[j].ParaRate - baseArray.[j].ParaRate) * weight,
                             baseArray.[j].SelfReflRate + (hotSpotArray.[j].SelfReflRate - baseArray.[j].SelfReflRate) * weight))
-                { Uf4GenRates.order = order
-                  seedOpsGenRates = seed
-                  opsGenRatesArray = OpsGenRatesArray.create opsGenRatesArray })
-        Uf4GenRatesArray.create rates
+                uf4GenRates.create order seed (OpsGenRatesArray.create opsGenRatesArray) )
 
-    let createStepHotSpot (length: int) (order: int) (baseRates: Uf4GenRates) (hotSpotStart: int) (hotSpotEnd: int) (hotSpotRates: Uf4GenRates) : Uf4GenRatesArray =
+        uf4GenRatesArray.create rates
+
+    let createStepHotSpot (length: int) (order: int) (baseRates: uf4GenRates) (hotSpotStart: int) (hotSpotEnd: int) (hotSpotRates: uf4GenRates) : uf4GenRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if order < 4 || order % 4 <> 0 then failwith "Order must be at least 4 and divisible by 4"
         if baseRates.order <> order || hotSpotRates.order <> order then failwith "Base and hotspot rates must have the same order"
@@ -170,11 +161,11 @@ module Uf4GenRatesArray =
                       rates.seedOpsGenRates.ParaRate,
                       rates.seedOpsGenRates.SelfReflRate)
                   opsGenRatesArray = rates.opsGenRatesArray })
-        Uf4GenRatesArray.create rates
+        uf4GenRatesArray.create rates
 
     let createNewItems<'a> 
-        (uf4GenRatesArray: Uf4GenRatesArray)
-        (itemChooser: Uf4GenRates -> 'a)
+        (uf4GenRatesArray: uf4GenRatesArray)
+        (itemChooser: uf4GenRates -> 'a)
             : 'a[] =
         Array.init uf4GenRatesArray.Length (fun i ->
             itemChooser (uf4GenRatesArray.Item(i)))

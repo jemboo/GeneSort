@@ -25,6 +25,7 @@ open GeneSort.Model.Mp.Sorter.Uf6
 open GeneSort.Model.Mp.Sorter
 open GeneSort.Model.Mp.Sorter.Uf6
 open GeneSort.Model.Sorter.Uf6
+open GeneSort.Core
 
 
 
@@ -132,8 +133,7 @@ type SorterModelSetMakerDtoTests() =
     [<Fact>]
     let ``Msuf4RandGen round-trip serialization and deserialization should succeed`` () =
         let order = 8
-        let uf4GenRatesArray = [|Uf4GenRates.makeUniform order|]
-        let genRates = Uf4GenRatesArray.create uf4GenRatesArray
+        let genRates = uf4GenRatesArray.create [|Uf4GenRates.makeUniform order|]
         let msuf4RandGen = Msuf4RandGen.create rngType.Lcg (UMX.tag<sortingWidth> order) (UMX.tag<stageCount> 1) genRates
         let sorterModelMaker = SorterModelMaker.SmmMsuf4RandGen msuf4RandGen
         let result = roundTrip sorterModelMaker
@@ -167,7 +167,7 @@ type SorterModelSetMakerDtoTests() =
     [<Fact>]
     let ``Msuf6RandGen round-trip serialization and deserialization should succeed`` () =
         let order = 12
-        let genRates = Uf6GenRatesArray.create  [|Uf6GenRates.makeUniform order|]
+        let genRates = uf6GenRatesArray.create  [|Uf6GenRates.makeUniform order|]
         let msuf6RandGen = Msuf6RandGen.create rngType.Lcg (UMX.tag<sortingWidth> order) (UMX.tag<stageCount> 1) genRates
         let sorterModelMaker = SorterModelMaker.SmmMsuf6RandGen msuf6RandGen
         let result = roundTrip sorterModelMaker
@@ -187,7 +187,7 @@ type SorterModelSetMakerDtoTests() =
         let twoOrbitUfSteps = TwoOrbitUfStep.create [|TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; |] order
         let twoOrbitUf6s = [| TwoOrbitUf6.create TwoOrbitTripleType.Ortho1 [|twoOrbitUfSteps|] |]
         let msuf6 = Msuf6.create id (UMX.tag<sortingWidth> order) twoOrbitUf6s
-        let mutationRates = Uf6MutationRatesArray.create [| Uf6MutationRates.makeUniform order 0.1 0.05 |]
+        let mutationRates = uf6MutationRatesArray.create [| Uf6MutationRates.makeUniform order 0.1 0.05 |]
         let msuf6RandMutate = Msuf6RandMutate.create rngType.Lcg msuf6 mutationRates
         let sorterModelMaker = SorterModelMaker.SmmMsuf6RandMutate msuf6RandMutate
         let result = roundTrip sorterModelMaker 

@@ -118,13 +118,13 @@ module CeLength =
         | swMerge.Sw12 -> 700<ceLength>
         | swMerge.Sw16 -> 1800<ceLength>
         | swMerge.Sw24 -> 2000<ceLength>
-        | swMerge.Sw32 -> 16000<ceLength>
+        | swMerge.Sw32 -> 12000<ceLength>
         | swMerge.Sw48 -> 8000<ceLength>
-        | swMerge.Sw64 -> 48000<ceLength>
+        | swMerge.Sw64 -> 24000<ceLength>
         | swMerge.Sw96 -> 8000<ceLength>
-        | swMerge.Sw128 -> 48000<ceLength>
+        | swMerge.Sw128 -> 100000<ceLength>
         | swMerge.Sw192 -> 8000<ceLength>
-        | swMerge.Sw256 -> 100000<ceLength>
+        | swMerge.Sw256 -> 300000<ceLength>
         | swMerge.Sw384 -> 8000<ceLength>
         | swMerge.Sw512 -> 8000<ceLength>
         | swMerge.Sw768 -> 8000<ceLength>

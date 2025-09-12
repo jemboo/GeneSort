@@ -14,7 +14,7 @@ type Msuf4RandGen =
           rngType: rngType
           sortingWidth: int<sortingWidth>
           stageCount: int<stageCount> 
-          genRates: Uf4GenRatesArray } 
+          genRates: uf4GenRatesArray } 
     with
     /// Creates an Msuf4RandGen with the specified parameters.
     /// Throws an exception if rngType is invalid, width is not a power of 2, stageCount is less than 1, 
@@ -27,7 +27,7 @@ type Msuf4RandGen =
             (rngType: rngType) 
             (sortingWidth: int<sortingWidth>)
             (stageCount: int<stageCount>) 
-            (genRates: Uf4GenRatesArray) 
+            (genRates: uf4GenRatesArray) 
             : Msuf4RandGen =
         if %sortingWidth < 1 then
             failwith $"SortingWidth must be at least 1, got {%sortingWidth}"
@@ -37,9 +37,9 @@ type Msuf4RandGen =
             failwith $"StageCount must be at least 1, got {%stageCount}"
         else if genRates.Length <> %stageCount then
             failwith $"genRates array length (%d{genRates.Length}) must equal stageCount ({%stageCount})"
-        else if genRates.RatesArray |> Array.exists (fun gr -> gr.order <> %sortingWidth) then
+        else if genRates.RatesArray |> Array.exists (fun gr -> gr.Order <> %sortingWidth) then
             failwith $"All genRates must have order {%sortingWidth}"
-        else if genRates.RatesArray |> Array.exists (fun gr -> gr.opsGenRatesArray.Length <> exactLog2(gr.order / 4)) then
+        else if genRates.RatesArray |> Array.exists (fun gr -> gr.OpsGenRatesArray.Length <> exactLog2(gr.Order / 4)) then
             failwith "twoOrbitTypeGenRatesList length must equal log2(order/4)"
         else
             let id =
@@ -102,7 +102,7 @@ module Msuf4RandGen =
             msuf4Gen.GenRates.RatesArray 
             |> Array.mapi (fun i gr -> 
                 sprintf "[%d: Ortho=%f, Para=%f, SelfRefl=%f]" 
-                    i gr.seedOpsGenRates.OrthoRate gr.seedOpsGenRates.ParaRate gr.seedOpsGenRates.SelfReflRate)
+                    i gr.SeedOpsGenRates.OrthoRate gr.SeedOpsGenRates.ParaRate gr.SeedOpsGenRates.SelfReflRate)
             |> String.concat ", "
         sprintf "Msuf4RandGen(RngType=%A, Width=%d, StageCount=%d, GenRates=%s)" 
                 msuf4Gen.RngType 

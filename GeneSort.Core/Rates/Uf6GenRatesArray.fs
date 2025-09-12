@@ -4,11 +4,11 @@ open System
 open MathUtils
 
 [<Struct; CustomEquality; NoComparison>]
-type Uf6GenRatesArray =
+type uf6GenRatesArray =
     private 
-        { rates: Uf6GenRates array }
+        { rates: uf6GenRates array }
 
-    static member create (rates: Uf6GenRates array) : Uf6GenRatesArray =
+    static member create (rates: uf6GenRates array) : uf6GenRatesArray =
         if Array.exists (fun r -> r.order < 6 || r.order % 6 <> 0) rates then
             failwith "All Uf6GenRates orders must be at least 6 and divisible by 6"
         { rates = rates }
@@ -24,7 +24,7 @@ type Uf6GenRatesArray =
 
     override this.Equals(obj) =
         match obj with
-        | :? Uf6GenRatesArray as other ->
+        | :? uf6GenRatesArray as other ->
             if this.rates.Length <> other.rates.Length then false
             else
                 Array.forall2 (fun a b -> 
@@ -41,7 +41,7 @@ type Uf6GenRatesArray =
             hash <- hash * 23 + rate.opsGenRatesArray.GetHashCode()
         hash
 
-    interface IEquatable<Uf6GenRatesArray> with
+    interface IEquatable<uf6GenRatesArray> with
         member this.Equals(other) =
             if this.rates.Length <> other.rates.Length then false
             else
@@ -57,7 +57,12 @@ module Uf6GenRatesArray =
     let private clamp (value: float) (min: float) (max: float) =
         Math.Max(min, Math.Min(max, value))
 
-    let createLinearVariation (length: int) (order: int) (startRates: Uf6GenRates) (endRates: Uf6GenRates) : Uf6GenRatesArray =
+    let createUniform (length: int) (order: int) : uf6GenRatesArray =
+        let rates = Array.init length (fun _ -> Uf6GenRates.makeUniform order)
+        uf6GenRatesArray.create rates
+
+
+    let createLinearVariation (length: int) (order: int) (startRates: uf6GenRates) (endRates: uf6GenRates) : uf6GenRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if order < 6 || order % 6 <> 0 then failwith "Order must be at least 6 and divisible by 6"
         if startRates.order <> order || endRates.order <> order then failwith "Start and end rates must have the same order"
@@ -83,12 +88,10 @@ module Uf6GenRatesArray =
                             startArray.[j].OrthoRate + t * (endArray.[j].OrthoRate - startArray.[j].OrthoRate),
                             startArray.[j].ParaRate + t * (endArray.[j].ParaRate - startArray.[j].ParaRate),
                             startArray.[j].SelfReflRate + t * (endArray.[j].SelfReflRate - startArray.[j].SelfReflRate)))
-                { Uf6GenRates.order = order
-                  seedGenRatesUf6 = seed
-                  opsGenRatesArray = OpsGenRatesArray.create opsGenRatesArray })
-        Uf6GenRatesArray.create rates
+                uf6GenRates.create order seed (OpsGenRatesArray.create opsGenRatesArray) )
+        uf6GenRatesArray.create rates
 
-    let createSinusoidalVariation (length: int) (order: int) (baseRates: Uf6GenRates) (amplitudes: Uf6GenRates) (frequency: float) : Uf6GenRatesArray =
+    let createSinusoidalVariation (length: int) (order: int) (baseRates: uf6GenRates) (amplitudes: uf6GenRates) (frequency: float) : uf6GenRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if order < 6 || order % 6 <> 0 then failwith "Order must be at least 6 and divisible by 6"
         if baseRates.order <> order || amplitudes.order <> order then failwith "Base and amplitudes must have the same order"
@@ -115,12 +118,11 @@ module Uf6GenRatesArray =
                             clamp (baseArray.[j].OrthoRate + ampArray.[j].OrthoRate * Math.Sin(t)) 0.0 1.0,
                             clamp (baseArray.[j].ParaRate + ampArray.[j].ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
                             clamp (baseArray.[j].SelfReflRate + ampArray.[j].SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0))
-                { Uf6GenRates.order = order
-                  seedGenRatesUf6 = seed
-                  opsGenRatesArray = OpsGenRatesArray.create opsGenRatesArray })
-        Uf6GenRatesArray.create rates
+                uf6GenRates.create order seed (OpsGenRatesArray.create opsGenRatesArray))
 
-    let createGaussianHotSpot (length: int) (order: int) (baseRates: Uf6GenRates) (hotSpotIndex: int) (hotSpotRates: Uf6GenRates) (sigma: float) : Uf6GenRatesArray =
+        uf6GenRatesArray.create rates
+
+    let createGaussianHotSpot (length: int) (order: int) (baseRates: uf6GenRates) (hotSpotIndex: int) (hotSpotRates: uf6GenRates) (sigma: float) : uf6GenRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if order < 6 || order % 6 <> 0 then failwith "Order must be at least 6 and divisible by 6"
         if baseRates.order <> order || hotSpotRates.order <> order then failwith "Base and hotspot rates must have the same order"
@@ -149,12 +151,11 @@ module Uf6GenRatesArray =
                             baseArray.[j].OrthoRate + (hotSpotArray.[j].OrthoRate - baseArray.[j].OrthoRate) * weight,
                             baseArray.[j].ParaRate + (hotSpotArray.[j].ParaRate - baseArray.[j].ParaRate) * weight,
                             baseArray.[j].SelfReflRate + (hotSpotArray.[j].SelfReflRate - baseArray.[j].SelfReflRate) * weight))
-                { Uf6GenRates.order = order
-                  seedGenRatesUf6 = seed
-                  opsGenRatesArray = OpsGenRatesArray.create opsGenRatesArray })
-        Uf6GenRatesArray.create rates
+                uf6GenRates.create order seed (OpsGenRatesArray.create opsGenRatesArray) )
 
-    let createStepHotSpot (length: int) (order: int) (baseRates: Uf6GenRates) (hotSpotStart: int) (hotSpotEnd: int) (hotSpotRates: Uf6GenRates) : Uf6GenRatesArray =
+        uf6GenRatesArray.create rates
+
+    let createStepHotSpot (length: int) (order: int) (baseRates: uf6GenRates) (hotSpotStart: int) (hotSpotEnd: int) (hotSpotRates: uf6GenRates) : uf6GenRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if order < 6 || order % 6 <> 0 then failwith "Order must be at least 6 and divisible by 6"
         if baseRates.order <> order || hotSpotRates.order <> order then failwith "Base and hotspot rates must have the same order"
@@ -174,10 +175,10 @@ module Uf6GenRatesArray =
                       rates.seedGenRatesUf6.Para4Rate,
                       rates.seedGenRatesUf6.SelfReflRate)
                   opsGenRatesArray = rates.opsGenRatesArray })
-        Uf6GenRatesArray.create rates
+        uf6GenRatesArray.create rates
 
     let mutate<'a> 
-        (uf6GenRatesArray: Uf6GenRatesArray) 
+        (uf6GenRatesArray: uf6GenRatesArray) 
         (ortho1Mutator: 'a -> 'a) 
         (ortho2Mutator: 'a -> 'a) 
         (para1Mutator: 'a -> 'a) 
@@ -202,8 +203,8 @@ module Uf6GenRatesArray =
             | Seed6GenMode.SelfRefl -> selfReflMutator arrayToMutate.[i])
 
     let createNewItems<'a> 
-        (uf6GenRatesArray: Uf6GenRatesArray)
-        (itemChooser: Uf6GenRates -> 'a)
+        (uf6GenRatesArray: uf6GenRatesArray)
+        (itemChooser: uf6GenRates -> 'a)
             : 'a[] =
         Array.init uf6GenRatesArray.Length (fun i ->
             itemChooser (uf6GenRatesArray.Item(i)))

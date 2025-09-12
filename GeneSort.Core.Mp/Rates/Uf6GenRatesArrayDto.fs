@@ -17,14 +17,14 @@ module Uf6GenRatesArrayDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let fromDomain (uf6GenRatesArray: Uf6GenRatesArray) : Uf6GenRatesArrayDto =
-        { Rates = uf6GenRatesArray.RatesArray |> Array.map Uf6GenRatesDto.fromDomain }
+    let fromDomain (gen6RatesArray: uf6GenRatesArray) : Uf6GenRatesArrayDto =
+        { Rates = gen6RatesArray.RatesArray |> Array.map Uf6GenRatesDto.fromDomain }
 
-    let toDomain (dto: Uf6GenRatesArrayDto) : Uf6GenRatesArray =
+    let toDomain (dto: Uf6GenRatesArrayDto) : uf6GenRatesArray =
         try
             if Array.isEmpty dto.Rates then
                 failwith "Rates array cannot be empty"
             let rates = dto.Rates |> Array.map Uf6GenRatesDto.toDomain
-            Uf6GenRatesArray.create rates
+            uf6GenRatesArray.create rates
         with
         | ex -> failwith $"Failed to convert Uf6GenRatesArrayDto: {ex.Message}"

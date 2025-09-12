@@ -30,21 +30,21 @@ module SorterCount =
 
     let getSorterCountForSwMerge (swMerege:swMerge) : int<sorterCount> =
         match swMerege with
-        | swMerge.Sw4 -> 1000<sorterCount>
-        | swMerge.Sw6 -> 1000<sorterCount>
-        | swMerge.Sw8 -> 1000<sorterCount>
-        | swMerge.Sw12 -> 1000<sorterCount>
+        | swMerge.Sw4 -> 10<sorterCount>
+        | swMerge.Sw6 -> 10<sorterCount>
+        | swMerge.Sw8 -> 100<sorterCount>
+        | swMerge.Sw12 -> 100<sorterCount>
         | swMerge.Sw16 -> 1000<sorterCount>
         | swMerge.Sw24 -> 1000<sorterCount>
-        | swMerge.Sw32 -> 1000<sorterCount>
+        | swMerge.Sw32 -> 100<sorterCount>
         | swMerge.Sw48 -> 1000<sorterCount>
-        | swMerge.Sw64 -> 1000<sorterCount>
+        | swMerge.Sw64 -> 100<sorterCount>
         | swMerge.Sw96 -> 500<sorterCount>
-        | swMerge.Sw128 -> 500<sorterCount>
+        | swMerge.Sw128 -> 100<sorterCount>
         | swMerge.Sw192 -> 250<sorterCount>
-        | swMerge.Sw256 -> 250<sorterCount>
+        | swMerge.Sw256 -> 50<sorterCount>
         | swMerge.Sw384 -> 100<sorterCount>
-        | swMerge.Sw512 -> 100<sorterCount>
+        | swMerge.Sw512 -> 20<sorterCount>
         | swMerge.Sw768 -> 50<sorterCount>
         | swMerge.Sw1024 -> 50<sorterCount>
         | swMerge.Sw1536 -> 25<sorterCount>

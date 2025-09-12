@@ -12,20 +12,20 @@ type Msuf6RandGen =
           rngType: rngType
           sortingWidth: int<sortingWidth>
           stageCount: int<stageCount> 
-          genRates: Uf6GenRatesArray }
+          genRates: uf6GenRatesArray }
 
     static member create 
             (rngType: rngType) 
             (sortingWidth: int<sortingWidth>) 
             (stageCount: int<stageCount>) 
-            (genRates: Uf6GenRatesArray) : Msuf6RandGen =
+            (genRates: uf6GenRatesArray) : Msuf6RandGen =
         if %sortingWidth < 6 || %sortingWidth % 2 <> 0 then
             failwith $"SortingWidth must be at least 6 and even, got {%sortingWidth}"
         if %stageCount < 1 then
             failwith $"StageCount must be at least 1, got {%stageCount}"
         if genRates.Length <> %stageCount then
             failwith $"Uf6GenRatesArray length (%d{genRates.Length}) must equal stageCount (%d{%stageCount})"
-        if genRates.RatesArray |> Array.exists (fun r -> r.order <> %sortingWidth) then
+        if genRates.RatesArray |> Array.exists (fun r -> r.Order <> %sortingWidth) then
             failwith $"All Uf6GenRates in genRates must have order {%sortingWidth}"
         let id =
             [

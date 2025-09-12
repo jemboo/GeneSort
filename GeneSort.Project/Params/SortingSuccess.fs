@@ -71,3 +71,17 @@ module SortingSuccess =
         | sortingSuccess.P999 -> 
             let swMerege = getSwMergeForSortingWidth sortingWidth
             getP999StageCountForMerge swMerege
+
+
+   let getStageCountForMergeSw4 (sortingSuccess:sortingSuccess)
+            (sortingWidth:int<sortingWidth>) : int<stageCount> =
+       match sortingSuccess with
+        | sortingSuccess.Record -> 
+            let swMerege = getSwMergeForSortingWidth sortingWidth
+            getRecordStageCountForMerge swMerege
+        | sortingSuccess.P900 -> 
+            let swMerege = getSwMergeForSortingWidth sortingWidth
+            getP900StageCountForMerge swMerege
+        | sortingSuccess.P999 -> 
+            let swMerege = getSwMergeForSortingWidth sortingWidth
+            getP999StageCountForMergeSw4 swMerege

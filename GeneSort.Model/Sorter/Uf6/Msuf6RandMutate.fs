@@ -13,11 +13,11 @@ type Msuf6RandMutate =
           id : Guid<sorterModelMakerID>
           msuf6 : Msuf6
           rngType: rngType
-          uf6MutationRatesArray: Uf6MutationRatesArray } 
+          uf6MutationRatesArray: uf6MutationRatesArray } 
     static member create 
             (rngType: rngType)
             (msuf6 : Msuf6)
-            (uf6MutationRatesArray: Uf6MutationRatesArray) 
+            (uf6MutationRatesArray: uf6MutationRatesArray) 
             : Msuf6RandMutate =
         if rngType = Unchecked.defaultof<rngType> then
             failwith "rngType must be specified"
@@ -41,9 +41,9 @@ type Msuf6RandMutate =
     static member createFromSingleRate
             (rngType: rngType)
             (msuf6 : Msuf6)
-            (rates: Uf6MutationRates) 
+            (rates: uf6MutationRates) 
             : Msuf6RandMutate =
-        let mutationRates = Uf6MutationRatesArray.create (Array.create (%msuf6.StageCount) rates)
+        let mutationRates = uf6MutationRatesArray.create (Array.create (%msuf6.StageCount) rates)
         Msuf6RandMutate.create rngType msuf6 mutationRates
 
     member this.Id with get () = this.id
@@ -96,12 +96,12 @@ module Msuf6RandMutate =
             |> Array.mapi (fun i rates -> 
                 sprintf "[%d: OrthoToPara=%f, OrthoToSelfRefl=%f, ParaToOrtho=%f, ParaToSelfRefl=%f, SelfReflToOrtho=%f, SelfReflToPara=%f]" 
                     i 
-                    rates.seed6TransitionRates.Ortho1Rates.Ortho2Rate
-                    rates.seed6TransitionRates.Ortho2Rates.SelfReflRate
-                    rates.seed6TransitionRates.Para1Rates.Ortho1Rate
-                    rates.seed6TransitionRates.Para2Rates.SelfReflRate
-                    rates.seed6TransitionRates.SelfReflRates.Ortho1Rate
-                    rates.seed6TransitionRates.SelfReflRates.Para1Rate)
+                    rates.Seed6TransitionRates.Ortho1Rates.Ortho2Rate
+                    rates.Seed6TransitionRates.Ortho2Rates.SelfReflRate
+                    rates.Seed6TransitionRates.Para1Rates.Ortho1Rate
+                    rates.Seed6TransitionRates.Para2Rates.SelfReflRate
+                    rates.Seed6TransitionRates.SelfReflRates.Ortho1Rate
+                    rates.Seed6TransitionRates.SelfReflRates.Para1Rate)
             |> String.concat ", "
         sprintf "Msuf6RandMutate(RngType=%A, StageCount=%d, MutationRates=%s)" 
                 msuf6RandMutate.RngType 

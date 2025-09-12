@@ -38,9 +38,9 @@ module Msuf6RandGenDto =
             let genRates = Uf6GenRatesArrayDto.toDomain dto.GenRates
             if genRates.Length <> dto.StageCount then
                 failwith $"GenRates array length ({genRates.Length}) must equal StageCount ({dto.StageCount})"
-            if genRates.RatesArray |> Array.exists (fun gr -> gr.order <> dto.SortingWidth) then
+            if genRates.RatesArray |> Array.exists (fun gr -> gr.Order <> dto.SortingWidth) then
                 failwith $"All GenRates must have order {dto.SortingWidth}"
-            if genRates.RatesArray |> Array.exists (fun gr -> gr.opsGenRatesArray.Length <> MathUtils.exactLog2(gr.order / 6)) then
+            if genRates.RatesArray |> Array.exists (fun gr -> gr.OpsGenRatesArray.Length <> MathUtils.exactLog2(gr.Order / 6)) then
                 failwith "opsGenRatesArray length must equal log2(order/6)"
 
             Msuf6RandGen.create dto.RngType (UMX.tag<sortingWidth> dto.SortingWidth) (UMX.tag<stageCount> dto.StageCount) genRates

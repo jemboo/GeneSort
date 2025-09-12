@@ -23,7 +23,7 @@ type sorterEval =
                 (sorterTestsId: Guid<sortableTestsId>)
                 (sortingWidth: int<sortingWidth>)  
                 (ceBlockWithUsage: ceBlockWithUsage)
-                (unsortedCount:int) =
+                (unsortedCount: int) =
         { 
             sorterId = sorterId
             sorterTestsId = sorterTestsId
@@ -44,7 +44,6 @@ type sorterEval =
     member this.SorterId with get() : Guid<sorterId> = this.sorterId
     member this.SorterTestsId with get() : Guid<sortableTestsId> = this.sorterTestsId
     member this.SortingWidth with get() : int<sortingWidth> =  this.sortingWidth
-
 
     member this.getUsedCeCount() : int<ceLength> =
         this.ceBlockWithUsage.UsedCes.Length |> UMX.tag<ceLength>
@@ -74,4 +73,10 @@ module SorterEval =
             sorter.SortingWidth 
             ceBlockEval.CeBlockWithUsage
             (sortableTests |> SortableTests.getUnsortedCount)
+
+    let reportHeader : string =
+        "SorterId \tSorterTestsId \tSortingWidth \tCeLengthUsed \tCeCount \tLastUsedCeIndex \tStageCount \tUnsortedCount"
+
+    let reportLine (se: sorterEval) : string =
+        $"{se.SorterId} \t{se.SorterTestsId} \t{se.SortingWidth} \t{se.getUsedCeCount()} \t{se.CeLength} \t{se.getLastUsedCeIndex} \t{se.getStageCount()} \t{se.UnsortedCount}"
 

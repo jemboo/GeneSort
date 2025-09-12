@@ -120,13 +120,13 @@ module StageCount =
          | swMerge.Sw12 -> 80<stageCount>
          | swMerge.Sw16 -> 300<stageCount>
          | swMerge.Sw24 -> 140<stageCount>
-         | swMerge.Sw32 -> 600<stageCount>
+         | swMerge.Sw32 -> 800<stageCount>
          | swMerge.Sw48 -> 400<stageCount>
-         | swMerge.Sw64 -> 1200<stageCount>
+         | swMerge.Sw64 -> 3000<stageCount>
          | swMerge.Sw96 -> 800<stageCount>
-         | swMerge.Sw128 -> 1000<stageCount>
+         | swMerge.Sw128 -> 10000<stageCount>
          | swMerge.Sw192 -> 1200<stageCount>
-         | swMerge.Sw256 -> 1400<stageCount>
+         | swMerge.Sw256 -> 30000<stageCount>
          | swMerge.Sw384 -> 1600<stageCount>
          | swMerge.Sw512 -> 1800<stageCount>
          | swMerge.Sw768 -> 2000<stageCount>
@@ -138,3 +138,31 @@ module StageCount =
          | swMerge.Sw6144 -> 6000<stageCount>
          | swMerge.Sw8192 -> 7000<stageCount>
          
+
+
+
+    let getP999StageCountForMergeSw4 (swMerege:swMerge) : int<stageCount> =
+         match swMerege with
+         | swMerge.Sw4 -> 10<stageCount>
+         | swMerge.Sw6 -> 20<stageCount>
+         | swMerge.Sw8 -> 60<stageCount>
+         | swMerge.Sw12 -> 80<stageCount>
+         | swMerge.Sw16 -> 300<stageCount>
+         | swMerge.Sw24 -> 140<stageCount>
+         | swMerge.Sw32 -> 200<stageCount>
+         | swMerge.Sw48 -> 400<stageCount>
+         | swMerge.Sw64 -> 500<stageCount>
+         | swMerge.Sw96 -> 800<stageCount>
+         | swMerge.Sw128 -> 2000<stageCount>
+         | swMerge.Sw192 -> 1200<stageCount>
+         | swMerge.Sw256 -> 9000<stageCount>
+         | swMerge.Sw384 -> 1600<stageCount>
+         | swMerge.Sw512 -> 35000<stageCount>
+         | swMerge.Sw768 -> 2000<stageCount>
+         | swMerge.Sw1024 -> 2500<stageCount>
+         | swMerge.Sw1536 -> 3000<stageCount>
+         | swMerge.Sw2048 -> 3500<stageCount>
+         | swMerge.Sw3072 -> 4000<stageCount>
+         | swMerge.Sw4096 -> 5000<stageCount>
+         | swMerge.Sw6144 -> 6000<stageCount>
+         | swMerge.Sw8192 -> 7000<stageCount>

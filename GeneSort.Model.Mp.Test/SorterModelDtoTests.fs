@@ -44,16 +44,15 @@ type SorterModelDtoTests() =
                     let orthoRate = if twoOrbitPairType = TwoOrbitPairType.Ortho then 1.0 else 0.0
                     let paraRate = if twoOrbitPairType = TwoOrbitPairType.Para then 1.0 else 0.0
                     let selfSyymRate = if twoOrbitPairType = TwoOrbitPairType.SelfRefl then 1.0 else 0.0
-                    Array.init baseGenRates.opsGenRatesArray.RatesArray.Length (
+                    Array.init baseGenRates.OpsGenRatesArray.RatesArray.Length (
                         fun _ -> OpsGenRates.create(orthoRate, paraRate, selfSyymRate))
-                | None -> baseGenRates.opsGenRatesArray.RatesArray
+                | None -> baseGenRates.OpsGenRatesArray.RatesArray
 
-        let genRates : Uf4GenRates = 
-            { 
-              Uf4GenRates.order = baseGenRates.order
-              seedOpsGenRates = OpsGenRates.create(orthoRate, paraRate, selfSyymRate)
-              opsGenRatesArray = OpsGenRatesArray.create(ratesArray)
-            }
+        let genRates : uf4GenRates = 
+                    uf4GenRates.create 
+                        order
+                        (OpsGenRates.create(orthoRate, paraRate, selfSyymRate))
+                        (OpsGenRatesArray.create ratesArray)
 
         RandomUnfolderOps4.makeRandomTwoOrbitUf4 mockFloatPicker genRates
 
@@ -65,7 +64,7 @@ type SorterModelDtoTests() =
             (twoOrbitPairType: TwoOrbitPairType) 
             (twoOrbitPairTypeOverride: TwoOrbitPairType option) 
      : TwoOrbitUf6  =
-        let genRates : Uf6GenRates = 
+        let genRates : uf6GenRates = 
             Uf6GenRates.makeUniform order
 
         RandomUnfolderOps6.makeRandomTwoOrbitUf6 mockFloatPicker genRates

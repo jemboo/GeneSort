@@ -159,6 +159,12 @@ module SwMerge =
 
 
 
-   let testVals() : string*string list =
-       ("SortingWidth", ["8"; "16"; "32"; "64";]) 
+   let exp4Vals() : string*string list =
+       ("SortingWidth", ["16"; "32"; "64"; "128"; "256"]) 
+
+
+
+   let exp5Vals() : string*string list =
+       ("SortingWidth", ["64"; "128"; "256"; "512"]) 
+
          
