@@ -46,6 +46,6 @@ module Msuf4RandGenDto =
             if genRates.RatesArray |> Array.exists (fun gr -> gr.OpsGenRatesArray.Length <> MathUtils.exactLog2(gr.Order / 4)) then
                 failwith "opsGenRatesArray length must equal log2(order/4)"
 
-            Msuf4RandGen.create dto.RngType (UMX.tag<sortingWidth> dto.SortingWidth) (UMX.tag<stageCount> dto.StageCount) genRates
+            Msuf4RandGen.create dto.RngType (UMX.tag<sortingWidth> dto.SortingWidth) (UMX.tag<stageLength> dto.StageCount) genRates
         with
         | ex -> failwith $"Failed to convert Msuf4RandGenDto: {ex.Message}"

@@ -87,15 +87,15 @@ module Run =
             run.Parameters <- (run.Parameters |> Map.add maxOrbiitKey (maxOrbiit.ToString()))
 
 
-    let getStageCount (run: Run) : int<stageCount> =
+    let getStageCount (run: Run) : int<stageLength> =
         match run.Parameters.TryFind stageCountKey with
         | Some value -> 
             match System.Int32.TryParse(value) with
-            | true, stageCount -> stageCount |> UMX.tag<stageCount>
+            | true, stageCount -> stageCount |> UMX.tag<stageLength>
             | false, _ -> failwith "Invalid stageCount value"
         | None -> failwith "SortingWidth parameter not found"
 
-    let setStageCount (run: Run) (stageCount:int<stageCount>) : unit =
+    let setStageCount (run: Run) (stageCount:int<stageLength>) : unit =
             run.Parameters <- (run.Parameters |> Map.add stageCountKey (%stageCount.ToString()))
 
 

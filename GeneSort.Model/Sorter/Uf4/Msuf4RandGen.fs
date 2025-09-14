@@ -13,7 +13,7 @@ type Msuf4RandGen =
           id: Guid<sorterModelMakerID>
           rngType: rngType
           sortingWidth: int<sortingWidth>
-          stageCount: int<stageCount> 
+          stageCount: int<stageLength> 
           genRates: uf4GenRatesArray } 
     with
     /// Creates an Msuf4RandGen with the specified parameters.
@@ -26,7 +26,7 @@ type Msuf4RandGen =
     static member create 
             (rngType: rngType) 
             (sortingWidth: int<sortingWidth>)
-            (stageCount: int<stageCount>) 
+            (stageCount: int<stageLength>) 
             (genRates: uf4GenRatesArray) 
             : Msuf4RandGen =
         if %sortingWidth < 1 then

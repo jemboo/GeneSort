@@ -35,7 +35,7 @@ module MssiRandGenDto =
                     MssiRandGen.create
                         (dto.RngType)
                         (UMX.tag<sortingWidth> dto.SortingWidth)
-                        (UMX.tag<stageCount> dto.StageCount)
+                        (UMX.tag<stageLength> dto.StageCount)
                 Ok mssiRandGen
         with
         | ex -> Error ex.Message

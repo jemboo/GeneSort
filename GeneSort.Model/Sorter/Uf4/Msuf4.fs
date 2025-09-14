@@ -35,7 +35,7 @@ type Msuf4 =
     member this.CeLength with get () = (this.StageCount * %this.SortingWidth / 2) |> UMX.tag<ceLength>
     member this.SortingWidth with get () = this.sortingWidth
     member this.TwoOrbitUnfolder4s with get () = this.twoOrbitUnfolder4s
-    member this.StageCount with get () = (this.twoOrbitUnfolder4s.Length |> UMX.tag<stageCount>)
+    member this.StageCount with get () = (this.twoOrbitUnfolder4s.Length |> UMX.tag<stageLength>)
     member this.toString() =
         sprintf "msuf4(Id=%A, SortingWidth=%d, TwoOrbitUnfolder4Count=%d)" 
                 (%this.Id) 

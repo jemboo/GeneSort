@@ -53,7 +53,7 @@ type sorterEval =
         
     member this.UnsortedCount with get() = this.unsortedCount
 
-    member this.getStageCount() : int<stageCount> =
+    member this.getStageCount() : int<stageLength> =
         this.getStageSequence().StageCount 
 
     member this.getStageSequence() : stageSequence =

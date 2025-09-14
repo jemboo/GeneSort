@@ -11,13 +11,13 @@ type Msuf6RandGen =
         { id: Guid<sorterModelMakerID>
           rngType: rngType
           sortingWidth: int<sortingWidth>
-          stageCount: int<stageCount> 
+          stageCount: int<stageLength> 
           genRates: uf6GenRatesArray }
 
     static member create 
             (rngType: rngType) 
             (sortingWidth: int<sortingWidth>) 
-            (stageCount: int<stageCount>) 
+            (stageCount: int<stageLength>) 
             (genRates: uf6GenRatesArray) : Msuf6RandGen =
         if %sortingWidth < 6 || %sortingWidth % 2 <> 0 then
             failwith $"SortingWidth must be at least 6 and even, got {%sortingWidth}"

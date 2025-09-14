@@ -29,7 +29,7 @@ type Mssi =
     member this.Id with get () = this.id
     member this.SortingWidth with get () = this.sortingWidth
     member this.CeLength with get () = (this.StageCount * %this.SortingWidth / 2) |> UMX.tag<ceLength>
-    member this.StageCount with get () = this.perm_Sis.Length |> UMX.tag<stageCount>
+    member this.StageCount with get () = this.perm_Sis.Length |> UMX.tag<stageLength>
     member this.Perm_Sis with get () = this.perm_Sis
     member this.toString() =
         sprintf "mssi(Id=%A, SortingWidth=%d, StageCount=%d)" 

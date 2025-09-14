@@ -29,7 +29,7 @@ module SorterEvalKeyDto =
             failwith "StageCount must not be negative"
         { 
             ceCount = UMX.tag<ceLength> dto.CeCount
-            stageCount = UMX.tag<stageCount> dto.StageCount
+            stageCount = UMX.tag<stageLength> dto.StageCount
             //unsortedCount = 0
         }
 

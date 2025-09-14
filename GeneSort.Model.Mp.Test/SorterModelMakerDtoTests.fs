@@ -72,7 +72,7 @@ type SorterModelSetMakerDtoTests() =
 
     [<Fact>]
     let ``MssiRandGen round-trip serialization and deserialization should succeed`` () =
-        let mssiRandGen = MssiRandGen.create rngType.Lcg (UMX.tag<sortingWidth> 2) (UMX.tag<stageCount> 5)
+        let mssiRandGen = MssiRandGen.create rngType.Lcg (UMX.tag<sortingWidth> 2) (UMX.tag<stageLength> 5)
         let sorterModelMaker = SorterModelMaker.SmmMssiRandGen mssiRandGen
         let result = roundTrip sorterModelMaker
         match result with
@@ -134,7 +134,7 @@ type SorterModelSetMakerDtoTests() =
     let ``Msuf4RandGen round-trip serialization and deserialization should succeed`` () =
         let order = 8
         let genRates = uf4GenRatesArray.create [|Uf4GenRates.makeUniform order|]
-        let msuf4RandGen = Msuf4RandGen.create rngType.Lcg (UMX.tag<sortingWidth> order) (UMX.tag<stageCount> 1) genRates
+        let msuf4RandGen = Msuf4RandGen.create rngType.Lcg (UMX.tag<sortingWidth> order) (UMX.tag<stageLength> 1) genRates
         let sorterModelMaker = SorterModelMaker.SmmMsuf4RandGen msuf4RandGen
         let result = roundTrip sorterModelMaker
         match result with
@@ -168,7 +168,7 @@ type SorterModelSetMakerDtoTests() =
     let ``Msuf6RandGen round-trip serialization and deserialization should succeed`` () =
         let order = 12
         let genRates = uf6GenRatesArray.create  [|Uf6GenRates.makeUniform order|]
-        let msuf6RandGen = Msuf6RandGen.create rngType.Lcg (UMX.tag<sortingWidth> order) (UMX.tag<stageCount> 1) genRates
+        let msuf6RandGen = Msuf6RandGen.create rngType.Lcg (UMX.tag<sortingWidth> order) (UMX.tag<stageLength> 1) genRates
         let sorterModelMaker = SorterModelMaker.SmmMsuf6RandGen msuf6RandGen
         let result = roundTrip sorterModelMaker
         match result with

@@ -14,14 +14,14 @@ type MssiRandGen =
           id : Guid<sorterModelMakerID>
           rngType: rngType
           sortingWidth: int<sortingWidth>
-          stageCount: int<stageCount> 
+          stageCount: int<stageLength> 
         } 
     with
 
     static member create 
             (rngType: rngType) 
             (sortingWidth: int<sortingWidth>)
-            (stageCount: int<stageCount>) 
+            (stageCount: int<stageLength>) 
                 : MssiRandGen =
         if %sortingWidth < 2 then
             failwith $"SortingWidth must be at least 2, got {%sortingWidth}"

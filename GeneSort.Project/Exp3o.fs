@@ -70,18 +70,18 @@ module Exp3 =
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
 
-    let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageCount> =
+    let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageLength> =
         match %sortingWidth with
-        | 4 -> 5 |> UMX.tag<stageCount>
-        | 6 -> 10 |> UMX.tag<stageCount>
-        | 8 -> 20 |> UMX.tag<stageCount>
-        | 12 -> 30 |> UMX.tag<stageCount>
-        | 16 -> 100 |> UMX.tag<stageCount>
-        | 24 -> 150 |> UMX.tag<stageCount>
-        | 32 -> 200 |> UMX.tag<stageCount>
-        | 48 -> 300 |> UMX.tag<stageCount>
-        | 64 -> 400 |> UMX.tag<stageCount>
-        | 96 -> 600 |> UMX.tag<stageCount>
+        | 4 -> 5 |> UMX.tag<stageLength>
+        | 6 -> 10 |> UMX.tag<stageLength>
+        | 8 -> 20 |> UMX.tag<stageLength>
+        | 12 -> 30 |> UMX.tag<stageLength>
+        | 16 -> 100 |> UMX.tag<stageLength>
+        | 24 -> 150 |> UMX.tag<stageLength>
+        | 32 -> 200 |> UMX.tag<stageLength>
+        | 48 -> 300 |> UMX.tag<stageLength>
+        | 64 -> 400 |> UMX.tag<stageLength>
+        | 96 -> 600 |> UMX.tag<stageLength>
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
 
