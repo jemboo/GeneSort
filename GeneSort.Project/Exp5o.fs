@@ -37,12 +37,12 @@ module Exp5 =
     let workspace = Workspace.create "Exp5" "Exp5 descr" projectDir parameterSet
 
 
-    let executor (workspace: Workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
+    let executor (workspace: workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
         async {
             Console.WriteLine(sprintf "Executing Run %d  Cycle %d  %A" run.Index %cycle run.Parameters)
             Run.setCycle run cycle
 
-            let sorterModelKey = Run.getSorterModelName run
+            let sorterModelKey = Run.getSorterModelKey run
             let sortingWidth =  Run.getSortingWidth run
             let sortableArrayType = Run.getSortableArrayType run
 
@@ -79,7 +79,7 @@ module Exp5 =
 
 
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    let evalReportExecutor (workspace: Workspace) =
+    let evalReportExecutor (workspace: workspace) =
             try
                 Console.WriteLine(sprintf "Generating SorterEval report in workspace %s"  workspace.WorkspaceFolder)
                 let sorterSetEvalSamplesFolder = OutputData.getOutputDataFolder workspace outputDataType.SorterSetEval
@@ -104,16 +104,11 @@ module Exp5 =
                                 let ssEvalDto = MessagePackSerializer.Deserialize<sorterSetEvalDto>(ssEvalStream, options)
                                 let sorterSetEval = SorterSetEvalDto.toDomain ssEvalDto  
                                 
-                                let runPath = OutputData.getRunFileNameForOutputName workspace.WorkspaceFolder (Path.GetFileNameWithoutExtension ssEvalPath)
-                                if not (File.Exists runPath) then
-                                    failwith (sprintf "Expected Run file %s to exist" runPath)
-                                let runStream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                                let runDto = MessagePackSerializer.Deserialize<RunDto>(runStream, options)
-                                let run = RunDto.fromDto runDto
-                                let sorterModelKey = (run.Parameters["SorterModel"])
-                                let swFull = (run.Parameters["SortingWidth"])
-                                let cycle = (run.Parameters["Cycle"])
-                                let sortableArrayType = (run.Parameters["SortableArrayType"])
+                                let runParams = OutputData.getRunParametersForOutputDataPath ssEvalPath
+                                let sorterModelKey = runParams[Run.sorterModelTypeKey]
+                                let swFull = runParams[Run.sortingWidthKey]
+                                let cycle = runParams[Run.cycleKey]
+                                let sortableArrayType = runParams[Run.sortableArrayTypeKey]
 
                                 let prpt = sorterSetEval.SorterEvals |> Array.map (fun se -> SorterEval.reportLine se)
                                 let appended = prpt |> Array.map(fun aa -> (cycle, swFull, sorterModelKey, sortableArrayType, aa))
@@ -154,7 +149,7 @@ module Exp5 =
 
 
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    let binReportExecutor (workspace: Workspace) =
+    let binReportExecutor (workspace: workspace) =
             try
                 Console.WriteLine(sprintf "Generating SorterEval report in workspace %s"  workspace.WorkspaceFolder)
                 let sorterSetEvalSamplesFolder = OutputData.getOutputDataFolder workspace outputDataType.SorterSetEval
@@ -179,16 +174,13 @@ module Exp5 =
                                 let ssEvalDto = MessagePackSerializer.Deserialize<sorterSetEvalDto>(ssEvalStream, options)
                                 let sorterSetEval = SorterSetEvalDto.toDomain ssEvalDto          
                                 let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
-                                let runPath = OutputData.getRunFileNameForOutputName workspace.WorkspaceFolder (Path.GetFileNameWithoutExtension ssEvalPath)
-                                if not (File.Exists runPath) then
-                                    failwith (sprintf "Expected Run file %s to exist" runPath)
-                                let runStream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                                let runDto = MessagePackSerializer.Deserialize<RunDto>(runStream, options)
-                                let run = RunDto.fromDto runDto
-                                let sorterModelKey = (run.Parameters["SorterModel"])
-                                let swFull = (run.Parameters["SortingWidth"])
-                                let cycle = (run.Parameters["Cycle"])
-                                let sortableArrayType = (run.Parameters["SortableArrayType"])
+
+                                let runParams = OutputData.getRunParametersForOutputDataPath ssEvalPath
+                                let sorterModelKey = runParams[Run.sorterModelTypeKey]
+                                let swFull = runParams[Run.sortingWidthKey]
+                                let cycle = runParams[Run.cycleKey]
+                                let sortableArrayType = runParams[Run.sortableArrayTypeKey]
+
                                 let prpt = SorterSetEvalBins.getBinCountReport sorterSetEvalBins
                                 let appended = prpt |> Array.map(fun aa -> (cycle, swFull, sorterModelKey, sortableArrayType, aa.[0], aa.[1], aa.[2], aa.[3]))
                                 appended
@@ -224,7 +216,7 @@ module Exp5 =
 
 
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    let ceUseProfileReportExecutor (workspace: Workspace) =
+    let ceUseProfileReportExecutor (workspace: workspace) =
             try
                 let binCount = 20
                 let blockGrowthRate = 1.2
@@ -249,16 +241,11 @@ module Exp5 =
                                 let ssEvalDto = MessagePackSerializer.Deserialize<sorterSetEvalDto>(ssEvalStream, options)
                                 let sorterSetEval = SorterSetEvalDto.toDomain ssEvalDto     
                                 let sorterSetCeUseProfile = SorterSetCeUseProfile.makeSorterSetCeUseProfile binCount blockGrowthRate sorterSetEval
-  
-                                let runPath = OutputData.getRunFileNameForOutputName workspace.WorkspaceFolder (Path.GetFileNameWithoutExtension ssEvalPath)
-                                if not (File.Exists runPath) then
-                                    failwith (sprintf "Expected Run file %s to exist" runPath)
-                                let runStream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                                let runDto = MessagePackSerializer.Deserialize<RunDto>(runStream, options)
-                                let run = RunDto.fromDto runDto
 
-                                let sorterModelKey = (run.Parameters["SorterModel"])
-                                let swFull = (run.Parameters["SortingWidth"])
+                                let runParams = OutputData.getRunParametersForOutputDataPath ssEvalPath
+                                let sorterModelKey = runParams[Run.sorterModelTypeKey]
+                                let swFull = runParams[Run.sortingWidthKey]
+      
                                 let linePrefix = sprintf "%s \t %s" swFull sorterModelKey
                                 SorterSetCeUseProfile.makeCsvLines linePrefix sorterSetCeUseProfile
                             with e ->

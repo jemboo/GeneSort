@@ -1,12 +1,6 @@
 ﻿
 namespace GeneSort.Project
 
-open System
-open FSharp.UMX
-open GeneSort.Sorter
-open MessagePack
-open MessagePack.FSharp
-open MessagePack.Resolvers
 open System.IO
 open GeneSort.Core.Combinatorics
 open System.Threading.Tasks
@@ -15,11 +9,9 @@ open System.Threading.Tasks
 module WorkspaceOps =  
 
     /// Returns a sequence of Runs made from all possible parameter combinations
-    let getRuns (workspace: Workspace) (cycle: int<cycleNumber>) : Run seq =
-        workspace.ParameterSets 
-        |> cartesianProductMaps
+    let getRuns (workspace: workspace) (cycle: int<cycleNumber>) : Run seq =
+        workspace.ParamMapArray 
         |> Seq.mapi (fun i paramsMap -> { Index = i; Cycle = cycle; Parameters = paramsMap })
-
 
     /// Executes async computations in parallel, limited to maxDegreeOfParallelism at a time
     let private ParallelWithThrottle (maxDegreeOfParallelism: int) (computations: seq<Async<unit>>) : Async<unit> =
@@ -45,10 +37,10 @@ module WorkspaceOps =
     /// Executes all runs from the workspace, running up to atTheSameTime runs concurrently
     /// Skips runs if their output file already exists; saves runs to .msgpack files after execution
     let executeWorkspace 
-                (workspace: Workspace) 
+                (workspace: workspace) 
                 (cycle: int<cycleNumber>)
                 (maxDegreeOfParallelism: int) 
-                (executor: Workspace -> int<cycleNumber> -> Run -> Async<unit>)
+                (executor: workspace -> int<cycleNumber> -> Run -> Async<unit>)
                 : unit =
         let runs = getRuns workspace cycle
         let executeRun (run:Run) = async {

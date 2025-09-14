@@ -95,7 +95,7 @@ type WorkspaceTests() =
             if File.Exists filePath then
                 printfn "File already exists for Run %d: %s" run.Index filePath
         let mutable executedRuns = []
-        let executor (_: Workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
+        let executor (_: workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
             async {
                 printfn "Executing Run index: %d cycle: %d" run.Index %cycle
                 lock (obj()) (fun () ->
@@ -130,7 +130,7 @@ type WorkspaceTests() =
         use stream = new FileStream(filePath, FileMode.Create, FileAccess.Write)
         MessagePackSerializer.Serialize(stream, RunDto.toRunDto run, options)
         let mutable executedCount = 0
-        let executor (_: Workspace) (_: int<cycleNumber>) (_: Run) : Async<unit> = 
+        let executor (_: workspace) (_: int<cycleNumber>) (_: Run) : Async<unit> = 
             async {
                 executedCount <- executedCount + 1
             }

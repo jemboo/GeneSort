@@ -2,46 +2,59 @@
 namespace GeneSort.Project
 
 open System
-open FSharp.UMX
-open GeneSort.Sorter
-open MessagePack
-open MessagePack.FSharp
-open MessagePack.Resolvers
 open System.IO
-open GeneSort.Core.Combinatorics
-open System.Threading.Tasks
+open GeneSort.Core
 
 // Workspace type
-type Workspace = 
+type workspace = 
     private
         { 
           name: string
           description: string
           rootDirectory: string
-          parameterSets: list<string * list<string>>
+          paramMapArray: Map<string, string> []
         }
     with
     static member create 
             (name: string) 
             (description: string) 
             (rootDirectory: string) 
-            (parameterSets: list<string * list<string>>) : Workspace =
+            (paramMapArray: Map<string, string> []) : workspace =
         if String.IsNullOrWhiteSpace name then
             failwith "Workspace name cannot be empty"
-        else if String.IsNullOrWhiteSpace rootDirectory then
-            failwith "Root directory cannot be empty"
-        else if parameterSets.Length = 0 then
-            failwith "Parameter sets cannot be empty"
-        else if parameterSets |> List.exists (fun (_, values) -> values.Length = 0) then
-            failwith "Each parameter must have at least one value"
         else
             { name = name
               description = description
               rootDirectory = rootDirectory
-              parameterSets = parameterSets }
+              //parameterArray = parameterSets |> cartesianProductMaps |> Seq.toArray 
+              paramMapArray = paramMapArray
+            }
 
     member this.Name with get () = this.name
     member this.Description with get () = this.description
+    member this.ParamMapArray with get () = this.paramMapArray
     member this.RootDirectory with get () = this.rootDirectory
-    member this.ParameterSets with get () = this.parameterSets
     member this.WorkspaceFolder with get() = Path.Combine(this.RootDirectory, this.Name)
+
+
+module Workspace =  
+    let create 
+            (name: string) 
+            (description: string) 
+            (rootDirectory: string) 
+            (parameterSpans: (string * string list) list) : workspace =
+        workspace.create 
+                name 
+                description 
+                rootDirectory 
+                (parameterSpans |> Combinatorics.cartesianProductMaps |> Seq.toArray )
+                 
+
+    let filterByParameters (workspace: workspace) (filter: (string * string) array) : Map<string, string> [] =
+            workspace.ParamMapArray
+            |> Array.filter (fun paramMap ->
+                filter
+                |> Array.forall (fun (key, value) ->
+                    paramMap.ContainsKey key && paramMap.[key] = value
+                )
+            )

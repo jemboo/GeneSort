@@ -44,6 +44,36 @@ module RandomSortersProject =
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
 
+    let getCeLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<ceLength> =
+        match %sortingWidth with
+        | 4 -> 300 |> UMX.tag<ceLength>
+        | 6 -> 600 |> UMX.tag<ceLength>
+        | 8 -> 16 |> UMX.tag<ceLength>
+        | 12 -> 24 |> UMX.tag<ceLength>
+        | 16 -> 32 |> UMX.tag<ceLength>
+        | 24 -> 48 |> UMX.tag<ceLength>
+        | 32 -> 64 |> UMX.tag<ceLength>
+        | 48 -> 96 |> UMX.tag<ceLength>
+        | 64 -> 128 |> UMX.tag<ceLength>
+        | 96 -> 192 |> UMX.tag<ceLength>
+        | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
+
+
+    let getStageCountForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageCount> =
+        match %sortingWidth with
+        | 4 -> 5 |> UMX.tag<stageCount>
+        | 6 -> 10 |> UMX.tag<stageCount>
+        | 8 -> 20 |> UMX.tag<stageCount>
+        | 12 -> 30 |> UMX.tag<stageCount>
+        | 16 -> 100 |> UMX.tag<stageCount>
+        | 24 -> 150 |> UMX.tag<stageCount>
+        | 32 -> 200 |> UMX.tag<stageCount>
+        | 48 -> 300 |> UMX.tag<stageCount>
+        | 64 -> 400 |> UMX.tag<stageCount>
+        | 96 -> 600 |> UMX.tag<stageCount>
+        | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
+
+
     let sortingWidthValues4 = 
         [4; 8; 16; 32; 64] |> List.map(fun d -> d.ToString())
 
@@ -58,22 +88,22 @@ module RandomSortersProject =
 
 
     let sorterModelKeyValues4 () : string list =
-        [ SorterModelKey.Mcse; 
-          SorterModelKey.Mssi;
-          SorterModelKey.Msrs; 
-          SorterModelKey.Msuf4; ]      |> List.map(SorterModelKey.toString)
+        [ sorterModelKey.Mcse; 
+          sorterModelKey.Mssi;
+          sorterModelKey.Msrs; 
+          sorterModelKey.Msuf4; ]      |> List.map(SorterModelKey.toString)
 
     let sorterModelKeys4 () : string*string list =
-        (Run.sorterModelNameKey, sorterModelKeyValues4() )
+        (Run.sorterModelTypeKey, sorterModelKeyValues4() )
 
     let sorterModelKeyValues6 () : string list =
-        [ SorterModelKey.Mcse; 
-          SorterModelKey.Mssi;
-          SorterModelKey.Msrs; 
-          SorterModelKey.Msuf6; ]      |> List.map(SorterModelKey.toString)
+        [ sorterModelKey.Mcse; 
+          sorterModelKey.Mssi;
+          sorterModelKey.Msrs; 
+          sorterModelKey.Msuf6; ]      |> List.map(SorterModelKey.toString)
 
     let sorterModelKeys6 () : string*string list =
-        (Run.sorterModelNameKey, sorterModelKeyValues6() )
+        (Run.sorterModelTypeKey, sorterModelKeyValues6() )
 
 
     let parameterSet4 = 
@@ -87,89 +117,90 @@ module RandomSortersProject =
     let workspace6 = Workspace.create experimentName6 experimentDesc6 projectDir parameterSet6
 
 
-    let executor4 (workspace: Workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
+    let executor4 (workspace: workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
         async {
 
             Console.WriteLine(sprintf "Executing Run %d   %A" run.Index run.Parameters)
             Run.setCycle run cycle
 
-            let sorterModelKey = Run.getSorterModelName run
-            let sortingWidth = run |> Run.getSortingWidth
-            let ceLength = SortingSuccess.getCeLengthForFull sortingSuccess.P999 sortingWidth
+            let sorterModelKey = Run.getSorterModelKey run
+            let sortingWidth = Run.getSortingWidth run
 
-            let stageCount = SortingSuccess.getStageCountForFull sortingSuccess.P999 sortingWidth
+            let ceLength = getCeLengthForSortingWidth sortingWidth
+            Run.setCeLength run ceLength
 
-            let modelMaker =
+            let stageCount = getStageCountForSortingWidth sortingWidth
+            Run.setStageCount run stageCount
+
+            let sorterModelMaker =
                 match sorterModelKey with
-                | SorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> SorterModelMaker.SmmMsceRandGen
-                | SorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
-                | SorterModelKey.Msrs -> 
+                | sorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> SorterModelMaker.SmmMsceRandGen
+                | sorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
+                | sorterModelKey.Msrs -> 
                     let opsGenRatesArray = OpsGenRatesArray.createUniform %stageCount
                     (MsrsRandGen.create randomType sortingWidth opsGenRatesArray) |> SorterModelMaker.SmmMsrsRandGen
-                | SorterModelKey.Msuf4 -> 
+                | sorterModelKey.Msuf4 -> 
                     let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageCount %sortingWidth
                     (Msuf4RandGen.create randomType sortingWidth stageCount uf4GenRatesArray) |> SorterModelMaker.SmmMsuf4RandGen
-                | SorterModelKey.Msuf6 -> 
+                | sorterModelKey.Msuf6 -> 
                     failwith "Msuf6 not supported in this experiment"
 
             let cycleFactor = if (%cycle = 0) then 1 else 10
-
             let sorterCount = sortingWidth |> getSorterCountForSortingWidth cycleFactor
-
+            Run.setSorterCount run sorterCount
 
             let firstIndex = (%cycle * %sorterCount) |> UMX.tag<sorterCount>
             
-            let sorterModelSetMaker = sorterModelSetMaker.create modelMaker firstIndex sorterCount
+            let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSet |> outputData.SorterSet)
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterModelSetMaker |> outputData.SorterModelSetMaker)
-
 
             Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %cycle)
         }
 
 
-    let executor6 (workspace: Workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
+    let executor6 (workspace: workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
         async {
-
             Console.WriteLine(sprintf "Executing Run %d   %A" run.Index run.Parameters)
             Run.setCycle run cycle
 
-            let sorterModelKey = Run.getSorterModelName run
-            let sortingWidth = run |> Run.getSortingWidth
-            let ceLength = SortingSuccess.getCeLengthForFull sortingSuccess.P999 sortingWidth
+            let sorterModelKey = Run.getSorterModelKey run
+            let sortingWidth = Run.getSortingWidth run
 
-            let stageCount = SortingSuccess.getStageCountForFull sortingSuccess.P999 sortingWidth
+            let ceLength = getCeLengthForSortingWidth sortingWidth
+            Run.setCeLength run ceLength
 
-            let modelMaker =
+            let stageCount = getStageCountForSortingWidth sortingWidth
+            Run.setStageCount run stageCount
+
+            let sorterModelMaker =
                 match sorterModelKey with
-                | SorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> SorterModelMaker.SmmMsceRandGen
-                | SorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
-                | SorterModelKey.Msrs -> 
+                | sorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> SorterModelMaker.SmmMsceRandGen
+                | sorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
+                | sorterModelKey.Msrs -> 
                     let opsGenRatesArray = OpsGenRatesArray.createUniform %stageCount
                     (MsrsRandGen.create randomType sortingWidth opsGenRatesArray) |> SorterModelMaker.SmmMsrsRandGen
-                | SorterModelKey.Msuf4 -> 
+                | sorterModelKey.Msuf4 -> 
                     failwith "Msuf4 not supported in this experiment"
-                | SorterModelKey.Msuf6 -> 
+                | sorterModelKey.Msuf6 -> 
                     let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageCount %sortingWidth
                     (Msuf6RandGen.create randomType sortingWidth stageCount uf6GenRatesArray) |> SorterModelMaker.SmmMsuf6RandGen
 
             let cycleFactor = if (%cycle = 0) then 1 else 10
-
             let sorterCount = sortingWidth |> getSorterCountForSortingWidth cycleFactor
-
+            Run.setSorterCount run sorterCount
 
             let firstIndex = (%cycle * %sorterCount) |> UMX.tag<sorterCount>
             
-            let sorterModelSetMaker = sorterModelSetMaker.create modelMaker firstIndex sorterCount
+            let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSet |> outputData.SorterSet)
             do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterModelSetMaker |> outputData.SorterModelSetMaker)
-
 
             Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %cycle)
         }
@@ -178,13 +209,12 @@ module RandomSortersProject =
 
 
     let RunAll4() =
-        for i in 0 .. 1 do
+        for i in 0 .. 0 do
             let cycle = i |> UMX.tag<cycleNumber>
             WorkspaceOps.executeWorkspace workspace4 cycle 6 executor4
 
 
-
     let RunAll6() =
-        for i in 0 .. 1 do
+        for i in 0 .. 0 do
             let cycle = i |> UMX.tag<cycleNumber>
             WorkspaceOps.executeWorkspace workspace6 cycle 6 executor6

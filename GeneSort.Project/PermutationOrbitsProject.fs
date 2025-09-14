@@ -13,21 +13,22 @@ open GeneSort.Core
 open GeneSort.Sorter.Sortable
 open GeneSort.Model.Sortable
 open GeneSort.Sorter.Mp.Sortable
+open GeneSort.Model.Mp.Sortable
 
 
-module PermutationCyclesProject = 
+module PermutationOrbitsProject = 
 
     let projectDir = "c:\Projects"
-    let experimentName = "PermutationCycles"
-    let experimentDesc = "Count PermutationCycles"
+    let experimentName = "PermutationOrbits"
+    let experimentDesc = "Count Permutation Orbit lengths"
 
     let randomType = rngType.Lcg
     let sortableArrayType = sortableArrayType.Ints
-    let testModelCount = 10<sorterTestModelCount>
-    let maxOrbiit = 100000
+    let testModelCount = 20<sorterTestModelCount>
+    let maxOrbiit = 200000
     
     let sortingWidthValues = 
-        [4; 8; 16; 32; 64] |> List.map(fun d -> d.ToString())
+        [4; 8; 16; 32; 64; 128; 256; 512; 1024] |> List.map(fun d -> d.ToString())
 
     let sortingWidths() : string*string list =
         (Run.sortingWidthKey, sortingWidthValues)
@@ -37,7 +38,7 @@ module PermutationCyclesProject =
 
     let workspace = Workspace.create experimentName experimentDesc projectDir parameterSet
 
-    let executor (workspace: Workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
+    let executor (workspace: workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
         async {
             try
                 Console.WriteLine(sprintf "Executing Run %d   %A" run.Index run.Parameters)
@@ -49,10 +50,12 @@ module PermutationCyclesProject =
                 let sorterTestModelGen = MsasORandGen.create randomType sortingWidth maxOrbiit |> SorterTestModelGen.MsasORandGen
                 let sorterTestModelSetMaker = sortableTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
                 let sorterTestModelSet = sorterTestModelSetMaker.MakeSortableTestModelSet
-                let sorterTestSet = sorterTestModelSet.makeSortableTestSet sortableArrayType
-                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestSet |> outputData.SortableTestSet)
-                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestModelSet |> outputData.SortableTestModelSet)
-                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestModelSetMaker |> outputData.SortableTestModelSetMaker)
+                //let sorterTestSet = sorterTestModelSet.makeSortableTestSet sortableArrayType
+                //do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestSet |> outputData.SortableTestSet)
+                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle 
+                                          (sorterTestModelSet |> outputData.SortableTestModelSet)
+                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle 
+                                          (sorterTestModelSetMaker |> outputData.SortableTestModelSetMaker)
 
                 Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %cycle)
             with ex ->
@@ -60,24 +63,16 @@ module PermutationCyclesProject =
                 raise ex
         }
 
-
-    let RunAll() =
-        for i in 0 .. 1 do
-            let cycle = i |> UMX.tag<cycleNumber>
-            WorkspaceOps.executeWorkspace workspace cycle 6 executor
-
-
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    let sorterTestCountReportExecutor (workspace: Workspace) : Async<unit> =
-        async {
+    let sorterTestCountReportExecutor (workspace: workspace) =
             try
                 Console.WriteLine(sprintf 
                                     "Generating Permutation orbit count report for %s in workspace %s" 
-                                    (outputDataType.SortableTestSet |> OutputDataType.toString ) 
+                                    (outputDataType.SortableTestModelSet |> OutputDataType.toString ) 
                                     workspace.WorkspaceFolder)
 
                 // Get the folder for SorterTestSet
-                let outputFolder = OutputData.getOutputDataFolder workspace outputDataType.SortableTestSet
+                let outputFolder = OutputData.getOutputDataFolder workspace outputDataType.SortableTestModelSet
                 if not (Directory.Exists outputFolder) then
                     failwith (sprintf "Output folder %s does not exist" outputFolder)
 
@@ -95,18 +90,12 @@ module PermutationCyclesProject =
                         fun filePath ->
                             try
                                 use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                                let dto = MessagePackSerializer.Deserialize<sortableTestSetDto>(stream, options)
-                                let sorterTestSet = SortableTestSetDto.toDomain dto
+                                let dto = MessagePackSerializer.Deserialize<sortableTestModelSetDto>(stream, options)
+                                let sorterTestModelSet = SortableTestModelSetDto.toDomain dto
+                                let sorterTestSet = sorterTestModelSet.makeSortableTestSet sortableArrayType
 
-                                let runPath = OutputData.getRunFileNameForOutputName 
-                                                    workspace.WorkspaceFolder 
-                                                    (Path.GetFileNameWithoutExtension filePath)
-                                if not (File.Exists runPath) then
-                                    failwith (sprintf "Expected Run file %s to exist" runPath)
-                                let runStream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                                let runDto = MessagePackSerializer.Deserialize<RunDto>(runStream, options)
-                                let run = RunDto.fromDto runDto
-                                let cycle = (run.Parameters["Cycle"])
+                                let runParams = OutputData.getRunParametersForOutputDataPath filePath
+                                let cycle = runParams[Run.cycleKey]
 
                                 let sortableIntTestSet =
                                     match sorterTestSet with
@@ -145,21 +134,29 @@ module PermutationCyclesProject =
                 // Save the report to a file
                 let reportFilePath = Path.Combine(
                         workspace.WorkspaceFolder, 
-                        sprintf "%s_SorterTestCountReport_%s.txt" 
+                        sprintf "%s_PermutationOrbitCountReport_%s.txt" 
                                     (outputDataType.SortableTestSet |> OutputDataType.toString )
                                     (DateTime.Now.ToString("yyyyMMdd_HHmmss"))
                         )
-                do! File.WriteAllTextAsync(reportFilePath, reportContent) |> Async.AwaitTask
+                File.WriteAllText(reportFilePath, reportContent)
 
                 Console.WriteLine(sprintf "Permutation orbit count report saved to %s" reportFilePath)
             with ex ->
                 Console.WriteLine(sprintf "Error generating Permutation orbit count report for %s: %s" "SorterTestSet" ex.Message)
                 raise ex
-        }
+
+        
+
+    let RunAll() =
+        for i in 0 .. 0 do
+            let cycle = i |> UMX.tag<cycleNumber>
+            WorkspaceOps.executeWorkspace workspace cycle 6 executor
+
+
 
     // Function to run the SorterTest count report executor
-    let RunSorterTestCountReport() =
-        Async.RunSynchronously (sorterTestCountReportExecutor workspace)
+    let RunPermuationOrbitCountReport() =
+        sorterTestCountReportExecutor workspace
 
 
 

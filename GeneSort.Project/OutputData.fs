@@ -81,7 +81,7 @@ module OutputData =
 
          
 
-    let getOutputDataFolder (workspace:Workspace) (outputDataType: outputDataType) 
+    let getOutputDataFolder (workspace:workspace) (outputDataType: outputDataType) 
                     : string =
         Path.Combine(workspace.WorkspaceFolder, outputDataType |> OutputDataType.toString)
 
@@ -93,7 +93,9 @@ module OutputData =
         Path.Combine(folder, outputDataName, fileName)
 
 
-    let getRunFileNameForOutputName  (folder:string) (outputName:string) : string =
+    let getRunFileNameForOutputDataFileName  (outputFilePath:string) : string =
+        let folder = Path.GetDirectoryName (Path.GetDirectoryName outputFilePath)
+        let outputName = Path.GetFileName outputFilePath
         let pcs = outputName.Split('_')
         let cycle = pcs.[1]
         let index = pcs.[2].Split('.').[0]
@@ -126,7 +128,7 @@ module OutputData =
                     let dto = SorterModelSetMakerDto.fromDomain sms
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SortableTestModelSet sts ->
-                    let dto = SorterTestModelSetDto.fromDomain sts
+                    let dto = SortableTestModelSetDto.fromDomain sts
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SortableTestModelSetMaker stsm ->
                     let dto = SorterTestModelSetMakerDto.fromDomain stsm
@@ -142,3 +144,18 @@ module OutputData =
                 printfn "Error saving to file %s: %s" filePath e.Message
                 raise e // Re-throw to ensure the caller is aware of the failure
         }
+
+
+    let getRunParametersForOutputDataPath
+            (outputDataPath: string) =
+            let runPath = getRunFileNameForOutputDataFileName outputDataPath
+            if not (File.Exists runPath) then
+                failwith (sprintf "Run file %s does not exist" runPath)
+            try
+                use stream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
+                let dto = MessagePackSerializer.Deserialize<RunDto>(stream, options)
+                let run = RunDto.fromDto dto
+                run.Parameters
+            with e ->
+                failwith "Error reading Run file %s: %s" runPath e.Message
+

@@ -10,6 +10,7 @@ module SortableArrayType =
         match t with
         | Ints -> "Ints"
         | Bools -> "Bools"
+
     let fromString (s:string) : sortableArrayType =
         match s with
         | "Ints" -> Ints

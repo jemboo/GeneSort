@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="MapStringTransformerTests.fs" />
     <Compile Include="WorkspaceTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

@@ -6,7 +6,7 @@ open GeneSort.Sorter
 open GeneSort.Model.Sorter
 
 
-type SorterModelKey = 
+type sorterModelKey = 
     | Mcse
     | Mssi
     | Msrs
@@ -16,7 +16,7 @@ type SorterModelKey =
 
 module SorterModelKey =
 
-    let toString (model:SorterModelKey) : string =
+    let toString (model:sorterModelKey) : string =
         match model with
         | Mcse -> "Mcse"
         | Mssi -> "Mssi"
@@ -24,7 +24,7 @@ module SorterModelKey =
         | Msuf4 -> "Msuf4"
         | Msuf6 -> "Msuf6"
 
-    let fromString (s:string) : SorterModelKey =
+    let fromString (s:string) : sorterModelKey =
         match s with
         | "Mcse" -> Mcse
         | "Mssi" -> Mssi
@@ -33,10 +33,10 @@ module SorterModelKey =
         | "Msuf6" -> Msuf6
         | _ -> failwithf "Unknown SorterModelKey: %s" s
 
-    let all () : SorterModelKey list =
+    let all () : sorterModelKey list =
         [ Mcse; Mssi; Msrs; Msuf4; Msuf6 ]
 
-    let allButMusf6 () : SorterModelKey list =
+    let allButMusf6 () : sorterModelKey list =
         [ Mcse; Mssi; Msrs; Msuf4; ]
 
     let allButMusf6Kvps () : string*string list =

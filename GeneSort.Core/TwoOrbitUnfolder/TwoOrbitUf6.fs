@@ -11,8 +11,8 @@ type TwoOrbitUf6 = private { seed6TwoOrbitType: TwoOrbitTripleType; twoOrbitUnfo
             (seed6TwoOrbitType: TwoOrbitTripleType) 
             (twoOrbitUnfolderSteps: TwoOrbitUfStep array) 
             : TwoOrbitUf6 =
-        if Array.length twoOrbitUnfolderSteps  < 1 then
-            failwith "twoOrbitUnfolderSteps must not be empty"
+        //if Array.length twoOrbitUnfolderSteps  < 1 then
+        //    failwith "twoOrbitUnfolderSteps must not be empty"
         { seed6TwoOrbitType = seed6TwoOrbitType; twoOrbitUnfolderSteps = twoOrbitUnfolderSteps; }
 
     member this.Order with get() : int  =

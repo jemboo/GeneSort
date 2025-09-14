@@ -37,7 +37,7 @@ module Exp4 =
     let workspace = Workspace.create "Exp4a" "Exp4 descr" projectDir parameterSet
 
 
-    let executor (workspace: Workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
+    let executor (workspace: workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
         async {
             Console.WriteLine(sprintf "Executing Run %d  Cycle %d  %A" run.Index %cycle run.Parameters)
             Run.setCycle run cycle
@@ -55,11 +55,11 @@ module Exp4 =
 
             let modelMaker =
                 match sorterModelKey with
-                | SorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> SorterModelMaker.SmmMsceRandGen
-                | SorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
-                | SorterModelKey.Msrs -> (MsrsRandGen.create randomType sortingWidth opsGenRatesArray) |> SorterModelMaker.SmmMsrsRandGen
-                | SorterModelKey.Msuf4 -> (Msuf4RandGen.create randomType sortingWidth stageCount uf4GenRatesArray) |> SorterModelMaker.SmmMsuf4RandGen
-                | SorterModelKey.Msuf6 -> failwith "Msuf6 not supported in this experiment"
+                | sorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> SorterModelMaker.SmmMsceRandGen
+                | sorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
+                | sorterModelKey.Msrs -> (MsrsRandGen.create randomType sortingWidth opsGenRatesArray) |> SorterModelMaker.SmmMsrsRandGen
+                | sorterModelKey.Msuf4 -> (Msuf4RandGen.create randomType sortingWidth stageCount uf4GenRatesArray) |> SorterModelMaker.SmmMsuf4RandGen
+                | sorterModelKey.Msuf6 -> failwith "Msuf6 not supported in this experiment"
 
             let sorterCount = swMerge |> SorterCount.getSorterCountForSwMerge
             let firstIndex = (%cycle * %sorterCount) |> UMX.tag<sorterCount>
@@ -80,7 +80,7 @@ module Exp4 =
 
 
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    let evalReportExecutor (workspace: Workspace) =
+    let evalReportExecutor (workspace: workspace) =
             try
                 Console.WriteLine(sprintf "Generating SorterEval report in workspace %s"  workspace.WorkspaceFolder)
                 let sorterSetEvalSamplesFolder = OutputData.getOutputDataFolder workspace outputDataType.SorterSetEval
@@ -104,21 +104,12 @@ module Exp4 =
                                 use ssEvalStream = new FileStream(ssEvalPath, FileMode.Open, FileAccess.Read, FileShare.Read)
                                 let ssEvalDto = MessagePackSerializer.Deserialize<sorterSetEvalDto>(ssEvalStream, options)
                                 let sorterSetEval = SorterSetEvalDto.toDomain ssEvalDto  
-                                
-                                let runPath = OutputData.getRunFileNameForOutputName 
-                                                    workspace.WorkspaceFolder 
-                                                    (Path.GetFileNameWithoutExtension ssEvalPath)
-                                if not (File.Exists runPath) then
-                                    failwith (sprintf "Expected Run file %s to exist" runPath)
-                                let runStream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                                let runDto = MessagePackSerializer.Deserialize<RunDto>(runStream, options)
-                                let run = RunDto.fromDto runDto
-                                let sorterModelKey = (run.Parameters["SorterModel"])
-                                let swFull = (run.Parameters["SortingWidth"])
-                                let cycle = (run.Parameters["Cycle"])
-
-
-                                let sortableArrayType = (run.Parameters["SortableArrayType"])
+                                                                
+                                let runParams = OutputData.getRunParametersForOutputDataPath ssEvalPath
+                                let sorterModelKey = runParams[Run.sorterModelTypeKey]
+                                let swFull = runParams[Run.sortingWidthKey]
+                                let cycle = runParams[Run.cycleKey]
+                                let sortableArrayType = runParams[Run.sortableArrayTypeKey]
 
                                 let prpt = sorterSetEval.SorterEvals |> Array.map (fun se -> SorterEval.reportLine se)
                                 let appended = prpt |> Array.map(fun aa -> (cycle, swFull, sorterModelKey, sortableArrayType, aa))
@@ -158,7 +149,7 @@ module Exp4 =
 
 
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    let binReportExecutor (workspace: Workspace) =
+    let binReportExecutor (workspace: workspace) =
             try
                 Console.WriteLine(sprintf "Generating SorterEval report in workspace %s"  workspace.WorkspaceFolder)
                 let sorterSetEvalSamplesFolder = OutputData.getOutputDataFolder workspace outputDataType.SorterSetEval
@@ -183,16 +174,13 @@ module Exp4 =
                                 let ssEvalDto = MessagePackSerializer.Deserialize<sorterSetEvalDto>(ssEvalStream, options)
                                 let sorterSetEval = SorterSetEvalDto.toDomain ssEvalDto          
                                 let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
-                                let runPath = OutputData.getRunFileNameForOutputName workspace.WorkspaceFolder (Path.GetFileNameWithoutExtension ssEvalPath)
-                                if not (File.Exists runPath) then
-                                    failwith (sprintf "Expected Run file %s to exist" runPath)
-                                let runStream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                                let runDto = MessagePackSerializer.Deserialize<RunDto>(runStream, options)
-                                let run = RunDto.fromDto runDto
-                                let sorterModelKey = (run.Parameters["SorterModel"])
-                                let swFull = (run.Parameters["SortingWidth"])
-                                let cycle = (run.Parameters["Cycle"])
-                                let sortableArrayType = (run.Parameters["SortableArrayType"])
+
+                                let runParams = OutputData.getRunParametersForOutputDataPath ssEvalPath
+                                let sorterModelKey = runParams["SorterModel"]
+                                let swFull = runParams["SortingWidth"]
+                                let cycle = runParams[Run.cycleKey]
+                                let sortableArrayType = runParams["SortableArrayType"]
+
                                 let prpt = SorterSetEvalBins.getBinCountReport sorterSetEvalBins
                                 let appended = prpt |> Array.map(fun aa -> (cycle, swFull, sorterModelKey, sortableArrayType, aa.[0], aa.[1], aa.[2], aa.[3]))
                                 appended
@@ -228,7 +216,7 @@ module Exp4 =
 
 
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    let ceUseProfileReportExecutor (workspace: Workspace) =
+    let ceUseProfileReportExecutor (workspace: workspace) =
             try
                 let binCount = 20
                 let blockGrowthRate = 1.2
@@ -254,15 +242,10 @@ module Exp4 =
                                 let sorterSetEval = SorterSetEvalDto.toDomain ssEvalDto     
                                 let sorterSetCeUseProfile = SorterSetCeUseProfile.makeSorterSetCeUseProfile binCount blockGrowthRate sorterSetEval
   
-                                let runPath = OutputData.getRunFileNameForOutputName workspace.WorkspaceFolder (Path.GetFileNameWithoutExtension ssEvalPath)
-                                if not (File.Exists runPath) then
-                                    failwith (sprintf "Expected Run file %s to exist" runPath)
-                                let runStream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                                let runDto = MessagePackSerializer.Deserialize<RunDto>(runStream, options)
-                                let run = RunDto.fromDto runDto
+                                let runParams = OutputData.getRunParametersForOutputDataPath ssEvalPath
+                                let sorterModelKey = runParams[Run.sorterModelTypeKey]
+                                let swFull = runParams[Run.sortingWidthKey]
 
-                                let sorterModelKey = (run.Parameters["SorterModel"])
-                                let swFull = (run.Parameters["SortingWidth"])
                                 let linePrefix = sprintf "%s \t %s" swFull sorterModelKey
                                 SorterSetCeUseProfile.makeCsvLines linePrefix sorterSetCeUseProfile
                             with e ->
@@ -284,7 +267,10 @@ module Exp4 =
 
 
                 // Save the report to a file
-                let reportFilePath = Path.Combine(workspace.WorkspaceFolder, sprintf "SorterCeUseReport_%s.txt" (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
+                let reportFilePath = Path.Combine( workspace.WorkspaceFolder, 
+                                                   sprintf "SorterCeUseReport_%s.txt" 
+                                                  (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
+
                 File.WriteAllText(reportFilePath, reportContent)
 
                 Console.WriteLine(sprintf "Ce Profile report saved to %s" reportFilePath)

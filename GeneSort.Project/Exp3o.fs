@@ -28,17 +28,117 @@ open GeneSort.SortingOps.Mp
 module Exp3 = 
 
     let projectDir = "c:\Projects"
+
+    let experimentName4 = "RandomSorterEvals4"
+    let experimentDesc4 = "RandomSorters with SortingWidth divisibe by 4, with full (0,1)^n evaluations"
+
+    let experimentName6 = "RandomSorterEvals6"
+    let experimentDesc6 = "RandomSorters with SortingWidth divisibe by 6, with full (0,1)^n evaluations"
+
+
     let randomType = rngType.Lcg
     let excludeSelfCe = true
+
+
+    let getSorterCountForSortingWidth (factor:int) (sortingWidth: int<sortingWidth>) : int<sorterCount> =
+        match %sortingWidth with
+        | 4 -> (10 * factor) |> UMX.tag<sorterCount>
+        | 6 -> (10 * factor) |> UMX.tag<sorterCount>
+        | 8 -> (10 * factor) |> UMX.tag<sorterCount>
+        | 12 -> (10 * factor) |> UMX.tag<sorterCount>
+        | 16 -> (50 * factor) |> UMX.tag<sorterCount>
+        | 24 -> (50 * factor) |> UMX.tag<sorterCount>
+        | 32 -> (50 * factor) |> UMX.tag<sorterCount>
+        | 48 -> (10 * factor) |> UMX.tag<sorterCount>
+        | 64 -> (10 * factor) |> UMX.tag<sorterCount>
+        | 96 -> (10 * factor) |> UMX.tag<sorterCount>
+        | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
+
+
+    let getCeLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<ceLength> =
+        match %sortingWidth with
+        | 4 -> 300 |> UMX.tag<ceLength>
+        | 6 -> 600 |> UMX.tag<ceLength>
+        | 8 -> 16 |> UMX.tag<ceLength>
+        | 12 -> 24 |> UMX.tag<ceLength>
+        | 16 -> 32 |> UMX.tag<ceLength>
+        | 24 -> 48 |> UMX.tag<ceLength>
+        | 32 -> 64 |> UMX.tag<ceLength>
+        | 48 -> 96 |> UMX.tag<ceLength>
+        | 64 -> 128 |> UMX.tag<ceLength>
+        | 96 -> 192 |> UMX.tag<ceLength>
+        | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
+
+
+    let getStageCountForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageCount> =
+        match %sortingWidth with
+        | 4 -> 5 |> UMX.tag<stageCount>
+        | 6 -> 10 |> UMX.tag<stageCount>
+        | 8 -> 20 |> UMX.tag<stageCount>
+        | 12 -> 30 |> UMX.tag<stageCount>
+        | 16 -> 100 |> UMX.tag<stageCount>
+        | 24 -> 150 |> UMX.tag<stageCount>
+        | 32 -> 200 |> UMX.tag<stageCount>
+        | 48 -> 300 |> UMX.tag<stageCount>
+        | 64 -> 400 |> UMX.tag<stageCount>
+        | 96 -> 600 |> UMX.tag<stageCount>
+        | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
+
+
+
     let sortableArrayType = sortableArrayType.Bools
   
-    let parameterSet = 
-        [ SwFull.practicalFullTestVals(); SorterModelKey.allButMusf6Kvps() ]
-
-    let workspace = Workspace.create "Exp3a" "Exp3 descr" projectDir parameterSet
 
 
-    let executor (workspace: Workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
+    let sortingWidthValues4 = 
+        [4; 8; 16; 32; 64] |> List.map(fun d -> d.ToString()) 
+
+    let sortingWidths4() : string*string list =
+        (Run.sortingWidthKey, sortingWidthValues4)
+        
+    let sortingWidthValues6 = 
+        [6; 12; 24; 48; 96] |> List.map(fun d -> d.ToString())
+
+    let sortingWidths6() : string*string list =
+        (Run.sortingWidthKey, sortingWidthValues6)
+
+
+    let sorterModelKeyValues4 () : string list =
+        [ sorterModelKey.Mcse; 
+          sorterModelKey.Mssi;
+          sorterModelKey.Msrs; 
+          sorterModelKey.Msuf4; ]      |> List.map(SorterModelKey.toString)
+
+    let sorterModelKeys4 () : string*string list =
+        (Run.sorterModelTypeKey, sorterModelKeyValues4() )
+
+    let sorterModelKeyValues6 () : string list =
+        [ sorterModelKey.Mcse; 
+          sorterModelKey.Mssi;
+          sorterModelKey.Msrs; 
+          sorterModelKey.Msuf6; ]      |> List.map(SorterModelKey.toString)
+
+    let sorterModelKeys6 () : string*string list =
+        (Run.sorterModelTypeKey, sorterModelKeyValues6() )
+
+
+    let parameterSet4 = 
+        [ sortingWidths4(); sorterModelKeys4() ]
+
+    let parameterSet6 = 
+        [ sortingWidths6(); sorterModelKeys6() ]
+
+    let workspace4 = 
+            Workspace.create 
+                "Exp3a" 
+                "Exp3 descr" 
+                projectDir 
+                parameterSet4
+
+    let workspace6 = Workspace.create experimentName6 experimentDesc6 projectDir parameterSet6
+
+
+    let executor (workspace: workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
         async {
 
             Console.WriteLine(sprintf "Executing Run %d  Cycle %d  %A" run.Index %cycle run.Parameters)
@@ -55,11 +155,11 @@ module Exp3 =
 
             let modelMaker =
                 match sorterModelKey with
-                | SorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> SorterModelMaker.SmmMsceRandGen
-                | SorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
-                | SorterModelKey.Msrs -> (MsrsRandGen.create randomType sortingWidth opsGenRatesArray) |> SorterModelMaker.SmmMsrsRandGen
-                | SorterModelKey.Msuf4 -> (Msuf4RandGen.create randomType sortingWidth stageCount uf4GenRatesArray) |> SorterModelMaker.SmmMsuf4RandGen
-                | SorterModelKey.Msuf6 -> failwith "Msuf6 not supported in this experiment"
+                | sorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> SorterModelMaker.SmmMsceRandGen
+                | sorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
+                | sorterModelKey.Msrs -> (MsrsRandGen.create randomType sortingWidth opsGenRatesArray) |> SorterModelMaker.SmmMsrsRandGen
+                | sorterModelKey.Msuf4 -> (Msuf4RandGen.create randomType sortingWidth stageCount uf4GenRatesArray) |> SorterModelMaker.SmmMsuf4RandGen
+                | sorterModelKey.Msuf6 -> failwith "Msuf6 not supported in this experiment"
 
             let sorterCount = swFull |> SorterCount.getSorterCountForSwFull
             let firstIndex = (%cycle * %sorterCount) |> UMX.tag<sorterCount>
@@ -81,7 +181,7 @@ module Exp3 =
 
 
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    let binReportExecutor (workspace: Workspace) =
+    let binReportExecutor (workspace: workspace) =
             try
                 Console.WriteLine(sprintf "Generating SorterEval report in workspace %s"  workspace.WorkspaceFolder)
                 let sorterSetEvalSamplesFolder = OutputData.getOutputDataFolder workspace outputDataType.SorterSetEval
@@ -106,14 +206,11 @@ module Exp3 =
                                 let ssEvalDto = MessagePackSerializer.Deserialize<sorterSetEvalDto>(ssEvalStream, options)
                                 let sorterSetEval = SorterSetEvalDto.toDomain ssEvalDto          
                                 let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
-                                let runPath = OutputData.getRunFileNameForOutputName workspace.WorkspaceFolder (Path.GetFileNameWithoutExtension ssEvalPath)
-                                if not (File.Exists runPath) then
-                                    failwith (sprintf "Expected Run file %s to exist" runPath)
-                                let runStream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                                let runDto = MessagePackSerializer.Deserialize<RunDto>(runStream, options)
-                                let run = RunDto.fromDto runDto
-                                let sorterModelKey = (run.Parameters["SorterModel"])
-                                let swFull = (run.Parameters["SortingWidth"])
+
+                                let runParams = OutputData.getRunParametersForOutputDataPath ssEvalPath
+                                let sorterModelKey = runParams[Run.sorterModelTypeKey]
+                                let swFull = runParams[Run.sortingWidthKey]
+
                                 let prpt = SorterSetEvalBins.getBinCountReport sorterSetEvalBins
                                 let appended = prpt |> Array.map(fun aa -> (swFull, sorterModelKey, aa.[0], aa.[1], aa.[2], aa.[3]))
                                 appended
@@ -152,7 +249,7 @@ module Exp3 =
 
 
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    let ceUseProfileReportExecutor (workspace: Workspace) =
+    let ceUseProfileReportExecutor (workspace: workspace) =
             try
                 let binCount = 20
                 let blockGrowthRate = 1.2
@@ -178,15 +275,10 @@ module Exp3 =
                                 let sorterSetEval = SorterSetEvalDto.toDomain ssEvalDto     
                                 let sorterSetCeUseProfile = SorterSetCeUseProfile.makeSorterSetCeUseProfile binCount blockGrowthRate sorterSetEval
   
-                                let runPath = OutputData.getRunFileNameForOutputName workspace.WorkspaceFolder (Path.GetFileNameWithoutExtension ssEvalPath)
-                                if not (File.Exists runPath) then
-                                    failwith (sprintf "Expected Run file %s to exist" runPath)
-                                let runStream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                                let runDto = MessagePackSerializer.Deserialize<RunDto>(runStream, options)
-                                let run = RunDto.fromDto runDto
+                                let runParams = OutputData.getRunParametersForOutputDataPath ssEvalPath
+                                let sorterModelKey = runParams[Run.sorterModelTypeKey]
+                                let swFull = runParams[Run.sortingWidthKey]
 
-                                let sorterModelKey = (run.Parameters["SorterModel"])
-                                let swFull = (run.Parameters["SortingWidth"])
                                 let linePrefix = sprintf "%s \t %s" swFull sorterModelKey
                                 SorterSetCeUseProfile.makeCsvLines linePrefix sorterSetCeUseProfile
                             with e ->
@@ -224,11 +316,11 @@ module Exp3 =
     let RunAll() =
         for i in 0 .. 10 do
             let cycle = i |> UMX.tag<cycleNumber>
-            WorkspaceOps.executeWorkspace workspace cycle 8 executor
+            WorkspaceOps.executeWorkspace workspace4 cycle 8 executor
 
 
     let RunSorterEvalReport() =
-         (binReportExecutor workspace)
+         (binReportExecutor workspace4)
     //    (ceUseProfileReportExecutor workspace)
 
 

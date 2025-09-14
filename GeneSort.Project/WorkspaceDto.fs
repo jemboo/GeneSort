@@ -19,22 +19,24 @@ type WorkspaceDto =
         [<MessagePack.Key("Name")>] Name: string
         [<MessagePack.Key("Description")>]  Description: string
         [<MessagePack.Key("RootDirectory")>] RootDirectory: string
-        [<MessagePack.Key("ParameterSets")>] ParameterSets: list<string * list<string>>
+        [<MessagePack.Key("ParameterArray")>] ParameterArray: Map<string, string> []
     }
 
 
 module WorkspaceDto =  
 
-    let toWorkspaceDto (workspace: Workspace) : WorkspaceDto =
-        { Name = workspace.Name
+    let toWorkspaceDto (workspace: workspace) : WorkspaceDto =
+        { 
+          Name = workspace.Name
           Description = workspace.Description
           RootDirectory = workspace.RootDirectory
-          ParameterSets = workspace.ParameterSets }
+          ParameterArray = workspace.ParamMapArray 
+        }
 
-    let fromWorkspaceDto (dto: WorkspaceDto) : Workspace =
-        Workspace.create
+    let fromWorkspaceDto (dto: WorkspaceDto) : workspace =
+        workspace.create
           dto.Name
           dto.Description
           dto.RootDirectory
-          dto.ParameterSets
+          dto.ParameterArray
 
