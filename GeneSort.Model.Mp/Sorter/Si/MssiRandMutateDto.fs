@@ -12,9 +12,9 @@ open MessagePack.FSharp
 
 [<MessagePackObject>]
 type mssiRandMutateDto = 
-    { [<Key(0)>] Mssi: mssiDto
-      [<Key(1)>] RngType: rngType
-      [<Key(2)>] OpActionRatesArray: OpActionRatesArrayDto }
+    { [<Key(0)>] mssiDto: mssiDto
+      [<Key(1)>] rngType: rngType
+      [<Key(2)>] opActionRatesArrayDto: OpActionRatesArrayDto }
 
 module MssiRandMutateDto =
 
@@ -22,23 +22,23 @@ module MssiRandMutateDto =
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let toMssiRandMutateDto (mssiRandMutate: MssiRandMutate) : mssiRandMutateDto =
-        { Mssi = MssiDto.toMssiDto mssiRandMutate.Mssi
-          RngType = mssiRandMutate.RngType
-          OpActionRatesArray = OpActionRatesArrayDto.fromDomain mssiRandMutate.OpActionRates }
+        { mssiDto = MssiDto.toMssiDto mssiRandMutate.Mssi
+          rngType = mssiRandMutate.RngType
+          opActionRatesArrayDto = OpActionRatesArrayDto.fromDomain mssiRandMutate.OpActionRates }
 
     let fromMssiRandMutateDto (dto: mssiRandMutateDto) : Result<MssiRandMutate, string> =
         try
-            let mssiResult = MssiDto.toMssi dto.Mssi
+            let mssiResult = MssiDto.toMssi dto.mssiDto
             match mssiResult with
             | Ok mssi ->
-                if %mssi.StageCount <> (OpActionRatesArrayDto.toDomain dto.OpActionRatesArray).Length then
+                if %mssi.StageLength <> (OpActionRatesArrayDto.toDomain dto.opActionRatesArrayDto).Length then
                     Error "StageLength must match OpActionRatesArray.Length"
                 else
                     let mssiRandMutate = 
                         MssiRandMutate.create
-                            (dto.RngType)
+                            (dto.rngType)
                             mssi
-                            (OpActionRatesArrayDto.toDomain dto.OpActionRatesArray)
+                            (OpActionRatesArrayDto.toDomain dto.opActionRatesArrayDto)
                     Ok mssiRandMutate
             | Error err ->
                 Error (match err with

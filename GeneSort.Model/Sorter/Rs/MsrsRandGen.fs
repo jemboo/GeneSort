@@ -41,11 +41,11 @@ type msrsRandGen =
         }
         
     member this.Id with get () = this.id
-    member this.CeLength with get () = (this.SortingWidth * %this.StageCount / 2) |> UMX.tag<ceLength>
+    member this.CeLength with get () = (this.SortingWidth * %this.StageLength / 2) |> UMX.tag<ceLength>
     member this.RngType with get () = this.rngType
     member this.OpsGenRatesArray with get () = this.opsGenRatesArray
     member this.SortingWidth with get () = this.sortingWidth
-    member this.StageCount with get () = this.opsGenRatesArray.Length
+    member this.StageLength with get () = this.opsGenRatesArray.Length
 
     override this.Equals(obj) = 
         match obj with
@@ -66,10 +66,10 @@ type msrsRandGen =
         let id = Common.makeSorterModelId this.Id index
         let rng = rngFactory this.RngType %id
         let genRatesArray = this.OpsGenRatesArray
-        let stageCount = %this.StageCount
+        let stageLength = %this.StageLength
         let sortingWidth = %this.SortingWidth
         let perm_Rss =
-            [| for dex in 0 .. (stageCount - 1) ->
+            [| for dex in 0 .. (stageLength - 1) ->
                 Perm_RsOps.makeRandomPerm_Rs
                     (rng.NextIndex)
                     (rng.NextFloat)
@@ -83,5 +83,5 @@ module MsrsRandGen =
 
     /// Returns a string representation of the MsrsRandGen configuration.
     let toString (msrsGen: msrsRandGen) : string =
-        sprintf "MsrsRandGen(RngType=%A, Width=%d, StageCount=%d, OpActionRatesArray=%s)" 
-                msrsGen.RngType (%msrsGen.SortingWidth) (%msrsGen.StageCount) (msrsGen.OpsGenRatesArray.toString())
+        sprintf "MsrsRandGen(RngType=%A, Width=%d, StageLength=%d, OpActionRatesArray=%s)" 
+                msrsGen.RngType (%msrsGen.SortingWidth) (%msrsGen.StageLength) (msrsGen.OpsGenRatesArray.toString())

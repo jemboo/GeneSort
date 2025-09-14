@@ -25,7 +25,7 @@ module Run =
     let sorterModelTypeKey = "SorterModelType"
     let sortableArrayTypeKey = "SortableArrayType"
     let sortingWidthKey = "SortingWidth"
-    let stageCountKey = "StageCount"
+    let stageLengthKey = "StageLength"
     let ceLengthKey = "CeLength"
 
     
@@ -87,16 +87,16 @@ module Run =
             run.Parameters <- (run.Parameters |> Map.add maxOrbiitKey (maxOrbiit.ToString()))
 
 
-    let getStageCount (run: Run) : int<stageLength> =
-        match run.Parameters.TryFind stageCountKey with
+    let getStageLength (run: Run) : int<stageLength> =
+        match run.Parameters.TryFind stageLengthKey with
         | Some value -> 
             match System.Int32.TryParse(value) with
-            | true, stageCount -> stageCount |> UMX.tag<stageLength>
-            | false, _ -> failwith "Invalid stageCount value"
+            | true, stageLength -> stageLength |> UMX.tag<stageLength>
+            | false, _ -> failwith "Invalid stageLength value"
         | None -> failwith "SortingWidth parameter not found"
 
-    let setStageCount (run: Run) (stageCount:int<stageLength>) : unit =
-            run.Parameters <- (run.Parameters |> Map.add stageCountKey (%stageCount.ToString()))
+    let setStageLength (run: Run) (stageLength:int<stageLength>) : unit =
+            run.Parameters <- (run.Parameters |> Map.add stageLengthKey (%stageLength.ToString()))
 
 
     let getCeLength (run: Run) : int<ceLength> =

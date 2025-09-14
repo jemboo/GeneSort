@@ -155,7 +155,7 @@ type SorterModelDtoTests() =
 
 
     [<Fact>]
-    let ``Deserialization with invalid Msuf6Dto should throw exception`` () =
+    let ``Deserialization wit h invalid Msuf6Dto should throw exception`` () =
         let invalidMsuf6Dto = { msuf6Dto.id = Guid.NewGuid(); sortingWidth = 5; twoOrbitUf6Dtos = [||] } // Invalid: SortingWidth not divisible by 6
         let dto = sorterModelDto.Msuf6 invalidMsuf6Dto
         let bytes = MessagePackSerializer.Serialize(dto, options)

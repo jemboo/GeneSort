@@ -28,14 +28,14 @@ type Mssi =
 
     member this.Id with get () = this.id
     member this.SortingWidth with get () = this.sortingWidth
-    member this.CeLength with get () = (this.StageCount * %this.SortingWidth / 2) |> UMX.tag<ceLength>
-    member this.StageCount with get () = this.perm_Sis.Length |> UMX.tag<stageLength>
+    member this.CeLength with get () = (this.StageLength * %this.SortingWidth / 2) |> UMX.tag<ceLength>
+    member this.StageLength with get () = this.perm_Sis.Length |> UMX.tag<stageLength>
     member this.Perm_Sis with get () = this.perm_Sis
     member this.toString() =
-        sprintf "mssi(Id=%A, SortingWidth=%d, StageCount=%d)" 
+        sprintf "mssi(Id=%A, SortingWidth=%d, StageLength=%d)" 
                 (%this.Id) 
                 (%this.SortingWidth)
-                (this.StageCount)
+                (this.StageLength)
 
     override this.Equals(obj) = 
         match obj with
@@ -67,10 +67,10 @@ type Mssi =
 module Mssi =
 
     let toString (mssi: Mssi) : string =
-        sprintf "Mssi(Id=%A, Width=%d, StageCount=%d)" 
+        sprintf "Mssi(Id=%A, Width=%d, StageLength=%d)" 
                 (%mssi.Id) 
                 (%mssi.SortingWidth) 
-                mssi.StageCount
+                mssi.StageLength
 
     let makeSorter (mssi: Mssi) : sorter =
         let ces = mssi.perm_Sis

@@ -22,9 +22,9 @@ type msuf6RandGen =
         if %sortingWidth < 6 || %sortingWidth % 2 <> 0 then
             failwith $"SortingWidth must be at least 6 and even, got {%sortingWidth}"
         if %stageLength < 1 then
-            failwith $"StageCount must be at least 1, got {%stageLength}"
+            failwith $"StageLength must be at least 1, got {%stageLength}"
         if genRates.Length <> %stageLength then
-            failwith $"Uf6GenRatesArray length (%d{genRates.Length}) must equal stageCount (%d{%stageLength})"
+            failwith $"Uf6GenRatesArray length (%d{genRates.Length}) must equal stageLength (%d{%stageLength})"
         if genRates.RatesArray |> Array.exists (fun r -> r.Order <> %sortingWidth) then
             failwith $"All Uf6GenRates in genRates must have order {%sortingWidth}"
         let id =
@@ -48,7 +48,7 @@ type msuf6RandGen =
     member this.GenRates with get() = this.genRates
 
     member this.toString() =
-        sprintf "Msuf6RandGen(Id=%A, RngType=%A, SortingWidth=%d, StageCount=%d, GenRates=%s)"
+        sprintf "Msuf6RandGen(Id=%A, RngType=%A, SortingWidth=%d, StageLength=%d, GenRates=%s)"
                 (%this.id)
                 this.rngType
                 (%this.sortingWidth)
@@ -72,9 +72,9 @@ type msuf6RandGen =
         let id = Common.makeSorterModelId this.Id index
         let rng = rngFactory this.RngType %id
         let genRatesArray = this.GenRates
-        let stageCount = %this.StageLength
+        let stageLength = %this.StageLength
         let twoOrbitUnfolder6s =
-            [| for dex in 0 .. (stageCount - 1) ->
+            [| for dex in 0 .. (stageLength - 1) ->
                 RandomUnfolderOps6.makeRandomTwoOrbitUf6
                     rng.NextFloat
                     (genRatesArray.Item(dex)) |]
@@ -84,7 +84,7 @@ type msuf6RandGen =
 module Msuf6RandGen =
 
     let toString (msuf6RandGen: msuf6RandGen) : string =
-        sprintf "Msuf6RandGen(Id=%A, RngType=%A, SortingWidth=%d, StageCount=%d, GenRates=%s)"
+        sprintf "Msuf6RandGen(Id=%A, RngType=%A, SortingWidth=%d, StageLength=%d, GenRates=%s)"
                 (%msuf6RandGen.Id)
                 msuf6RandGen.RngType
                 (%msuf6RandGen.SortingWidth)

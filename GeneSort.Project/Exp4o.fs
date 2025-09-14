@@ -80,16 +80,16 @@ module Exp4 =
             let sortingWidth = swMerge |> SwMerge.toSortingWidth
             let ceLength = getCeLengthForSortingWidth sortingWidth
 
-            let stageCount = getStageLengthForSortingWidth sortingWidth
-            let opsGenRatesArray = OpsGenRatesArray.createUniform %stageCount
-            let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageCount %sortingWidth
+            let stageLength = getStageLengthForSortingWidth sortingWidth
+            let opsGenRatesArray = OpsGenRatesArray.createUniform %stageLength
+            let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageLength %sortingWidth
 
             let modelMaker =
                 match sorterModelKey with
                 | sorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> sorterModelMaker.SmmMsceRandGen
-                | sorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> sorterModelMaker.SmmMssiRandGen
+                | sorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageLength) |> sorterModelMaker.SmmMssiRandGen
                 | sorterModelKey.Msrs -> (msrsRandGen.create randomType sortingWidth opsGenRatesArray) |> sorterModelMaker.SmmMsrsRandGen
-                | sorterModelKey.Msuf4 -> (msuf4RandGen.create randomType sortingWidth stageCount uf4GenRatesArray) |> sorterModelMaker.SmmMsuf4RandGen
+                | sorterModelKey.Msuf4 -> (msuf4RandGen.create randomType sortingWidth stageLength uf4GenRatesArray) |> sorterModelMaker.SmmMsuf4RandGen
                 | sorterModelKey.Msuf6 -> failwith "Msuf6 not supported in this experiment"
 
             let sorterCount = swMerge |> SorterCount.getSorterCountForSwMerge
@@ -227,12 +227,12 @@ module Exp4 =
                       sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                       sprintf "Workspace: %s" workspace.WorkspaceFolder
                       ""
-                      "Cycle\t Sorting Width\t SorterModel\t SortableArrayType\t  ceLength\t stageCount\t binCount\t unsortedReport"
+                      "Cycle\t Sorting Width\t SorterModel\t SortableArrayType\t  ceLength\t stageLength\t binCount\t unsortedReport"
                     ]
                     @ (summaries
                        |> List.map (
-                            fun (cycle, sortingWidth, sorterModelKey, sortableArrayType, ceLength, stageCount, binCount, unsortedReport) ->
-                                    sprintf "%s \t %s \t %s \t  %s \t %s \t %s \t %s \t %s " cycle sortingWidth sorterModelKey sortableArrayType ceLength stageCount binCount unsortedReport))
+                            fun (cycle, sortingWidth, sorterModelKey, sortableArrayType, ceLength, stageLength, binCount, unsortedReport) ->
+                                    sprintf "%s \t %s \t %s \t  %s \t %s \t %s \t %s \t %s " cycle sortingWidth sorterModelKey sortableArrayType ceLength stageLength binCount unsortedReport))
                     |> String.concat "\n"
 
                 // Save the report to a file

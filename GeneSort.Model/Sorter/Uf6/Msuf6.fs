@@ -31,10 +31,10 @@ type msuf6 =
             { id = id; sortingWidth = sortingWidth; twoOrbitUnfolder6s = twoOrbitUnfolder6s }
 
     member this.Id with get () = this.id
-    member this.CeLength with get () = (this.StageCount * %this.SortingWidth / 2) |> UMX.tag<ceLength>
+    member this.CeLength with get () = (this.StageLength * %this.SortingWidth / 2) |> UMX.tag<ceLength>
     member this.SortingWidth with get () = this.sortingWidth
     member this.TwoOrbitUnfolder6s with get () = this.twoOrbitUnfolder6s
-    member this.StageCount with get () = (this.twoOrbitUnfolder6s.Length |> UMX.tag<stageLength>)
+    member this.StageLength with get () = (this.twoOrbitUnfolder6s.Length |> UMX.tag<stageLength>)
     member this.toString() =
         sprintf "msuf6(Id=%A, SortingWidth=%d, TwoOrbitUnfolder6Count=%d)" 
                 (%this.Id) 
@@ -72,4 +72,4 @@ module Msuf6 =
         sprintf "Msuf6(Id=%A, SortingWidth=%d, TwoOrbitUnfolder6Count=%d)" 
                 (%msuf6.Id) 
                 (%msuf6.SortingWidth) 
-                msuf6.StageCount
+                msuf6.StageLength

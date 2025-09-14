@@ -21,8 +21,8 @@ type msuf6RandMutate =
             : msuf6RandMutate =
         if rngType = Unchecked.defaultof<rngType> then
             failwith "rngType must be specified"
-        else if uf6MutationRatesArray.Length <> %msuf6.StageCount then
-            failwith $"mutationRates array length (%d{uf6MutationRatesArray.Length}) must equal stageCount ({%msuf6.StageCount})"
+        else if uf6MutationRatesArray.Length <> %msuf6.StageLength then
+            failwith $"mutationRates array length (%d{uf6MutationRatesArray.Length}) must equal stageLength ({%msuf6.StageLength})"
 
         let id =
             [
@@ -43,14 +43,14 @@ type msuf6RandMutate =
             (msuf6 : msuf6)
             (rates: uf6MutationRates) 
             : msuf6RandMutate =
-        let mutationRates = uf6MutationRatesArray.create (Array.create (%msuf6.StageCount) rates)
+        let mutationRates = uf6MutationRatesArray.create (Array.create (%msuf6.StageLength) rates)
         msuf6RandMutate.create rngType msuf6 mutationRates
 
     member this.Id with get () = this.id
     member this.CeLength with get () = this.msuf6.CeLength
     member this.Msuf6 with get () = this.msuf6
     member this.RngType with get () = this.rngType
-    member this.StageCount with get () = this.msuf6.StageCount
+    member this.StageLength with get () = this.msuf6.StageLength
     member this.Uf6MutationRatesArray with get () = this.uf6MutationRatesArray
 
     override this.Equals(obj) = 
@@ -75,8 +75,8 @@ type msuf6RandMutate =
     /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
                     : msuf6 =
-        if %this.StageCount <> this.Uf6MutationRatesArray.Length then
-            failwith $"Stage count of Msuf6 {%this.StageCount} must match Msuf6RandMutate length {this.Uf6MutationRatesArray.Length}"
+        if %this.StageLength <> this.Uf6MutationRatesArray.Length then
+            failwith $"Stage count of Msuf6 {%this.StageLength} must match Msuf6RandMutate length {this.Uf6MutationRatesArray.Length}"
         let id = Common.makeSorterModelId this.Id index
         let rng = rngFactory this.RngType %id
         let mutatedUnfolders = 
@@ -103,7 +103,7 @@ module Msuf6RandMutate =
                     rates.Seed6TransitionRates.SelfReflRates.Ortho1Rate
                     rates.Seed6TransitionRates.SelfReflRates.Para1Rate)
             |> String.concat ", "
-        sprintf "Msuf6RandMutate(RngType=%A, StageCount=%d, MutationRates=%s)" 
+        sprintf "Msuf6RandMutate(RngType=%A, StageLength=%d, MutationRates=%s)" 
                 msuf6RandMutate.RngType 
-                (%msuf6RandMutate.StageCount)
+                (%msuf6RandMutate.StageLength)
                 ratesStr

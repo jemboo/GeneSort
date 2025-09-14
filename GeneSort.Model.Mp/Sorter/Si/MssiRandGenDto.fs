@@ -22,7 +22,7 @@ module MssiRandGenDto =
     let toMssiRandGenDto (mssiRandGen: MssiRandGen) : mssiRandGenDto =
         { sortingWidth = %mssiRandGen.SortingWidth
           rngType = mssiRandGen.RngType
-          stageLength = %mssiRandGen.StageCount }
+          stageLength = %mssiRandGen.StageLength }
 
     let fromMssiRandGenDto (dto: mssiRandGenDto) : Result<MssiRandGen, string> =
         try

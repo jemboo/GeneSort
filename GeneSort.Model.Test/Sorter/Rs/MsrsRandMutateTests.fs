@@ -122,7 +122,7 @@ type MsrsRandMutateTests() =
     let ``Throws on mismatched stage count`` () =
         let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let width = 4<sortingWidth>
-        let permRss = [| [| 1; 0; 3; 2 |] |] |> Array.map createPermRs // StageCount = 1
+        let permRss = [| [| 1; 0; 3; 2 |] |] |> Array.map createPermRs // StageLength = 1
         let modelRs = createModelRs id width permRss
         let opsActionRates = OpsActionRates.create (0.0, 0.0, 0.0)
         let ratesArray = OpsActionRatesArray.create [| opsActionRates; opsActionRates |] // Length = 2

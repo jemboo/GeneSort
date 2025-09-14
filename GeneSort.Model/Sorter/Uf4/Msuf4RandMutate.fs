@@ -21,7 +21,7 @@ type msuf4RandMutate =
         if rngType = Unchecked.defaultof<rngType> then
             failwith "rngType must be specified"
         else if uf4MutationRatesArray.Length <> %msuf4.StageLength then
-            failwith $"mutationRates array length (%d{uf4MutationRatesArray.Length}) must equal stageCount ({%msuf4.StageLength})"
+            failwith $"mutationRates array length (%d{uf4MutationRatesArray.Length}) must equal stageLength ({%msuf4.StageLength})"
 
         let id =
             [
@@ -49,7 +49,7 @@ type msuf4RandMutate =
     member this.CeLength with get () = this.msuf4.CeLength
     member this.Msuf4 with get () = this.msuf4
     member this.RngType with get () = this.rngType
-    member this.StageCount with get () = this.msuf4.StageLength
+    member this.StageLength with get () = this.msuf4.StageLength
     member this.Uf4MutationRatesArray with get () = this.uf4MutationRatesArray
 
     override this.Equals(obj) = 
@@ -74,8 +74,8 @@ type msuf4RandMutate =
     /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
                     : msuf4 =
-        if %this.StageCount <> this.Uf4MutationRatesArray.Length then
-            failwith $"Stage count of Msuf4 {%this.StageCount} must match Msuf4RandMutate length {this.Uf4MutationRatesArray.Length}"
+        if %this.StageLength <> this.Uf4MutationRatesArray.Length then
+            failwith $"Stage count of Msuf4 {%this.StageLength} must match Msuf4RandMutate length {this.Uf4MutationRatesArray.Length}"
         let id = Common.makeSorterModelId this.Id index
         let rng = rngFactory this.RngType %id
         let mutatedUnfolders = 
@@ -101,7 +101,7 @@ module Msuf4RandMutate =
                     rates.seedOpsTransitionRates.SelfReflRates.OrthoRate
                     rates.seedOpsTransitionRates.SelfReflRates.ParaRate)
             |> String.concat ", "
-        sprintf "Msuf4RandMutate(RngType=%A, StageCount=%d, MutationRates=%s)" 
+        sprintf "Msuf4RandMutate(RngType=%A, StageLength=%d, MutationRates=%s)" 
                 msuf4RandMutate.RngType 
-                (%msuf4RandMutate.StageCount)
+                (%msuf4RandMutate.StageLength)
                 ratesStr

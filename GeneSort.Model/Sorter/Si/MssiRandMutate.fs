@@ -43,7 +43,7 @@ type MssiRandMutate =
     member this.CeLength with get () = this.mssi.CeLength
     member this.Mssi with get () = this.mssi
     member this.RngType with get () = this.rngType
-    member this.StageCount with get () = this.opActionRates.Length
+    member this.StageLength with get () = this.opActionRates.Length
     member this.OpActionRates with get () = this.opActionRates
 
     override this.Equals(obj) = 
@@ -82,8 +82,8 @@ type MssiRandMutate =
 module MssiRandMutate =
 
     let toString (mssiRandMutate: MssiRandMutate) : string = 
-        sprintf "MssiRandMutate(RngType=%A, Width=%d, StageCount=%d, OpActionRates=%s)" 
+        sprintf "MssiRandMutate(RngType=%A, Width=%d, StageLength=%d, OpActionRates=%s)" 
                 mssiRandMutate.RngType 
                 (%mssiRandMutate.Mssi.SortingWidth) 
-                (mssiRandMutate.StageCount)
+                (mssiRandMutate.StageLength)
                 (mssiRandMutate.OpActionRates.ToString())

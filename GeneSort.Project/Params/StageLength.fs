@@ -6,7 +6,7 @@ open GeneSort.Sorter
 open GeneSort.Model.Sorter
 
 
-module StageCount =
+module StageLength =
 
     let fromString (s: string) : int<stageLength> =
         // Ensure the string is not null or empty
@@ -24,7 +24,7 @@ module StageCount =
     //// **********  Full sort   *****************
 
 
-    let getRecordStageCountForFull (sw:int<sortingWidth>) : int<stageLength> =
+    let getRecordStageLengthForFull (sw:int<sortingWidth>) : int<stageLength> =
         match %sw with
          | 4 -> 3<stageLength>
          | 6 -> 5<stageLength>
@@ -38,7 +38,7 @@ module StageCount =
          | _ -> failwith (sprintf "sortingWidth %d not handled" %sw)
 
 
-    let get0P5StageCountForFull (sw:int<sortingWidth>) : int<stageLength> =
+    let get0P5StageLengthForFull (sw:int<sortingWidth>) : int<stageLength> =
         match %sw with
          | 4 -> 3<stageLength>
          | 6 -> 5<stageLength>
@@ -53,7 +53,7 @@ module StageCount =
 
 
          
-    let get0P9StageCountForFull (sw:int<sortingWidth>) : int<stageLength> =
+    let get0P9StageLengthForFull (sw:int<sortingWidth>) : int<stageLength> =
         match %sw with
          | 4 -> 3<stageLength>
          | 6 -> 5<stageLength>
@@ -67,7 +67,7 @@ module StageCount =
          | _ -> failwith (sprintf "sortingWidth %d not handled" %sw)
 
          
-    let get0P99StageCountForFull (sw:int<sortingWidth>) : int<stageLength> =
+    let get0P99StageLengthForFull (sw:int<sortingWidth>) : int<stageLength> =
         match %sw with
          | 4 -> 3<stageLength>
          | 6 -> 5<stageLength>
@@ -80,7 +80,7 @@ module StageCount =
          | 64 -> 20<stageLength>
          | _ -> failwith (sprintf "sortingWidth %d not handled" %sw)
 
-    let get0P999StageCountForFull (sw:int<sortingWidth>) : int<stageLength> =
+    let get0P999StageLengthForFull (sw:int<sortingWidth>) : int<stageLength> =
         match %sw with
          | 4 -> 3<stageLength>
          | 6 -> 5<stageLength>
@@ -100,7 +100,7 @@ module StageCount =
     //// ********** n/2 Merge sort   *****************
 
 
-    let getRecordStageCountForMerge (sw:int<sortingWidth>) : int<stageLength> =
+    let getRecordStageLengthForMerge (sw:int<sortingWidth>) : int<stageLength> =
         match %sw with
          | 4 -> 1<stageLength>
          | 6 -> 3<stageLength>
@@ -128,7 +128,7 @@ module StageCount =
          | _ -> failwith (sprintf "sortingWidth %d not handled" %sw)
 
 
-    let get0P5StageCountForMerge (sw:int<sortingWidth>) : int<stageLength> =
+    let get0P5StageLengthForMerge (sw:int<sortingWidth>) : int<stageLength> =
         match %sw with
          | 4 -> 1<stageLength>
          | 6 -> 3<stageLength>
@@ -156,7 +156,7 @@ module StageCount =
          | _ -> failwith (sprintf "sortingWidth %d not handled" %sw)
 
 
-    let get0P9StageCountForMerge (sw:int<sortingWidth>) : int<stageLength> =
+    let get0P9StageLengthForMerge (sw:int<sortingWidth>) : int<stageLength> =
         match %sw with
          | 4 -> 1<stageLength>
          | 6 -> 3<stageLength>
@@ -185,7 +185,7 @@ module StageCount =
 
 
 
-    let get0P99StageCountForMerge (sw:int<sortingWidth>) : int<stageLength> =
+    let get0P99StageLengthForMerge (sw:int<sortingWidth>) : int<stageLength> =
         match %sw with
          | 4 -> 1<stageLength>
          | 6 -> 3<stageLength>
@@ -214,7 +214,7 @@ module StageCount =
 
 
          
-    let get0P999StageCountForMerge (sw:int<sortingWidth>) : int<stageLength> =
+    let get0P999StageLengthForMerge (sw:int<sortingWidth>) : int<stageLength> =
         match %sw with
          | 4 -> 1<stageLength>
          | 6 -> 3<stageLength>

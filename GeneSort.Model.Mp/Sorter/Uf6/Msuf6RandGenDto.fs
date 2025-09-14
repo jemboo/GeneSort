@@ -34,10 +34,10 @@ module Msuf6RandGenDto =
             if dto.sortingWidth < 6 || dto.sortingWidth % 6 <> 0 then
                 failwith $"SortingWidth must be at least 6 and divisible by 6, got {dto.sortingWidth}"
             if dto.stageLength < 1 then
-                failwith $"StageCount must be at least 1, got {dto.stageLength}"
+                failwith $"StageLength must be at least 1, got {dto.stageLength}"
             let genRates = Uf6GenRatesArrayDto.toDomain dto.uf6GenRatesArrayDto
             if genRates.Length <> dto.stageLength then
-                failwith $"GenRates array length ({genRates.Length}) must equal StageCount ({dto.stageLength})"
+                failwith $"GenRates array length ({genRates.Length}) must equal StageLength ({dto.stageLength})"
             if genRates.RatesArray |> Array.exists (fun gr -> gr.Order <> dto.sortingWidth) then
                 failwith $"All GenRates must have order {dto.sortingWidth}"
             if genRates.RatesArray |> Array.exists (fun gr -> gr.OpsGenRatesArray.Length <> MathUtils.exactLog2(gr.Order / 6)) then

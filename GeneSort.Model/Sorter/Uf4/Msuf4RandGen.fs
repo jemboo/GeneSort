@@ -17,11 +17,11 @@ type msuf4RandGen =
           genRates: uf4GenRatesArray } 
     with
     /// Creates an Msuf4RandGen with the specified parameters.
-    /// Throws an exception if rngType is invalid, width is not a power of 2, stageCount is less than 1, 
-    /// or genRates array length does not match stageCount or contains invalid entries.
+    /// Throws an exception if rngType is invalid, width is not a power of 2, stageLength is less than 1, 
+    /// or genRates array length does not match stageLength or contains invalid entries.
     /// <param name="rngType">The type of random number generator to use.</param>
     /// <param name="sortingWidth">The sorting width for the Msuf4 instance (must be a power of 2).</param>
-    /// <param name="stageCount">The number of TwoOrbitUnfolder4 instances in the Msuf4 instance.</param>
+    /// <param name="stageLength">The number of TwoOrbitUnfolder4 instances in the Msuf4 instance.</param>
     /// <param name="genRates">Array of generation rates for each TwoOrbitUnfolder4.</param>
     static member create 
             (rngType: rngType) 
@@ -34,9 +34,9 @@ type msuf4RandGen =
         else if (%sortingWidth - 1) &&& %sortingWidth <> 0 then
             failwith $"SortingWidth must be a power of 2, got {%sortingWidth}"
         else if %stageLength < 1 then
-            failwith $"StageCount must be at least 1, got {%stageLength}"
+            failwith $"StageLength must be at least 1, got {%stageLength}"
         else if genRates.Length <> %stageLength then
-            failwith $"genRates array length (%d{genRates.Length}) must equal stageCount ({%stageLength})"
+            failwith $"genRates array length (%d{genRates.Length}) must equal stageLength ({%stageLength})"
         else if genRates.RatesArray |> Array.exists (fun gr -> gr.Order <> %sortingWidth) then
             failwith $"All genRates must have order {%sortingWidth}"
         else if genRates.RatesArray |> Array.exists (fun gr -> gr.OpsGenRatesArray.Length <> exactLog2(gr.Order / 4)) then
@@ -104,7 +104,7 @@ module Msuf4RandGen =
                 sprintf "[%d: Ortho=%f, Para=%f, SelfRefl=%f]" 
                     i gr.SeedOpsGenRates.OrthoRate gr.SeedOpsGenRates.ParaRate gr.SeedOpsGenRates.SelfReflRate)
             |> String.concat ", "
-        sprintf "Msuf4RandGen(RngType=%A, Width=%d, StageCount=%d, GenRates=%s)" 
+        sprintf "Msuf4RandGen(RngType=%A, Width=%d, StageLength=%d, GenRates=%s)" 
                 msuf4Gen.RngType 
                 (%msuf4Gen.SortingWidth) 
                 (%msuf4Gen.StageLength)
