@@ -59,7 +59,7 @@ module RandomSortersProject =
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
 
-    let getStageCountForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageCount> =
+    let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageCount> =
         match %sortingWidth with
         | 4 -> 5 |> UMX.tag<stageCount>
         | 6 -> 10 |> UMX.tag<stageCount>
@@ -129,7 +129,7 @@ module RandomSortersProject =
             let ceLength = getCeLengthForSortingWidth sortingWidth
             Run.setCeLength run ceLength
 
-            let stageCount = getStageCountForSortingWidth sortingWidth
+            let stageCount = getStageLengthForSortingWidth sortingWidth
             Run.setStageCount run stageCount
 
             let sorterModelMaker =
@@ -173,7 +173,7 @@ module RandomSortersProject =
             let ceLength = getCeLengthForSortingWidth sortingWidth
             Run.setCeLength run ceLength
 
-            let stageCount = getStageCountForSortingWidth sortingWidth
+            let stageCount = getStageLengthForSortingWidth sortingWidth
             Run.setStageCount run stageCount
 
             let sorterModelMaker =

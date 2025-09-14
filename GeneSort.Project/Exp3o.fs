@@ -70,7 +70,7 @@ module Exp3 =
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
 
-    let getStageCountForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageCount> =
+    let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageCount> =
         match %sortingWidth with
         | 4 -> 5 |> UMX.tag<stageCount>
         | 6 -> 10 |> UMX.tag<stageCount>
@@ -147,9 +147,9 @@ module Exp3 =
             let sorterModelKey = (run.Parameters["SorterModel"]) |> SorterModelKey.fromString
             let swFull = (run.Parameters["SortingWidth"]) |> SwFull.fromString
             let sortingWidth = swFull |> SwFull.toSortingWidth
-            let ceLength = SortingSuccess.getCeLengthForFull sortingSuccess.P999 sortingWidth
-
-            let stageCount = SortingSuccess.getStageCountForFull sortingSuccess.P999 sortingWidth
+            let ceLength = getCeLengthForSortingWidth sortingWidth
+            
+            let stageCount = getStageLengthForSortingWidth sortingWidth
             let opsGenRatesArray = OpsGenRatesArray.createUniform %stageCount
             let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageCount %sortingWidth
 

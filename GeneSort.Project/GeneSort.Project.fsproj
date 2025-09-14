@@ -10,8 +10,7 @@
     <Compile Include="Params\SortingWidth.fs" />
     <Compile Include="Params\SorterCount.fs" />
     <Compile Include="Params\CeLength.fs" />
-    <Compile Include="Params\StageCount.fs" />
-    <Compile Include="Params\SortingSuccess.fs" />
+    <Compile Include="Params\StageLength.fs" />
     <Compile Include="Params\SorterModelKey.fs" />
     <Compile Include="Params\SorterTestModelKey.fs" />
     <Compile Include="Run.fs" />

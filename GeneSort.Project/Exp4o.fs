@@ -31,6 +31,37 @@ module Exp4 =
     let randomType = rngType.Lcg
     let excludeSelfCe = true
   
+
+
+    let getCeLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<ceLength> =
+        match %sortingWidth with
+        | 4 -> 300 |> UMX.tag<ceLength>
+        | 6 -> 600 |> UMX.tag<ceLength>
+        | 8 -> 16 |> UMX.tag<ceLength>
+        | 12 -> 24 |> UMX.tag<ceLength>
+        | 16 -> 32 |> UMX.tag<ceLength>
+        | 24 -> 48 |> UMX.tag<ceLength>
+        | 32 -> 64 |> UMX.tag<ceLength>
+        | 48 -> 96 |> UMX.tag<ceLength>
+        | 64 -> 128 |> UMX.tag<ceLength>
+        | 96 -> 192 |> UMX.tag<ceLength>
+        | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
+
+
+    let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageCount> =
+        match %sortingWidth with
+        | 4 -> 5 |> UMX.tag<stageCount>
+        | 6 -> 10 |> UMX.tag<stageCount>
+        | 8 -> 20 |> UMX.tag<stageCount>
+        | 12 -> 30 |> UMX.tag<stageCount>
+        | 16 -> 100 |> UMX.tag<stageCount>
+        | 24 -> 150 |> UMX.tag<stageCount>
+        | 32 -> 200 |> UMX.tag<stageCount>
+        | 48 -> 300 |> UMX.tag<stageCount>
+        | 64 -> 400 |> UMX.tag<stageCount>
+        | 96 -> 600 |> UMX.tag<stageCount>
+        | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
+
     let parameterSet = 
         [ SwMerge.exp4Vals(); SorterModelKey.allButMusf6Kvps(); ("SortableArrayType", ["Ints"]) ]
 
@@ -47,9 +78,9 @@ module Exp4 =
             let sortableArrayType = (run.Parameters["SortableArrayType"]) |> SortableArrayType.fromString
 
             let sortingWidth = swMerge |> SwMerge.toSortingWidth
-            let ceLength = SortingSuccess.getCeLengthForMerge sortingSuccess.P999 sortingWidth
+            let ceLength = getCeLengthForSortingWidth sortingWidth
 
-            let stageCount = SortingSuccess.getStageCountForMerge sortingSuccess.P999 sortingWidth
+            let stageCount = getStageLengthForSortingWidth sortingWidth
             let opsGenRatesArray = OpsGenRatesArray.createUniform %stageCount
             let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageCount %sortingWidth
 
