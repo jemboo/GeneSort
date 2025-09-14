@@ -86,10 +86,10 @@ module Exp4 =
 
             let modelMaker =
                 match sorterModelKey with
-                | sorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> SorterModelMaker.SmmMsceRandGen
-                | sorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
-                | sorterModelKey.Msrs -> (MsrsRandGen.create randomType sortingWidth opsGenRatesArray) |> SorterModelMaker.SmmMsrsRandGen
-                | sorterModelKey.Msuf4 -> (Msuf4RandGen.create randomType sortingWidth stageCount uf4GenRatesArray) |> SorterModelMaker.SmmMsuf4RandGen
+                | sorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> sorterModelMaker.SmmMsceRandGen
+                | sorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> sorterModelMaker.SmmMssiRandGen
+                | sorterModelKey.Msrs -> (msrsRandGen.create randomType sortingWidth opsGenRatesArray) |> sorterModelMaker.SmmMsrsRandGen
+                | sorterModelKey.Msuf4 -> (msuf4RandGen.create randomType sortingWidth stageCount uf4GenRatesArray) |> sorterModelMaker.SmmMsuf4RandGen
                 | sorterModelKey.Msuf6 -> failwith "Msuf6 not supported in this experiment"
 
             let sorterCount = swMerge |> SorterCount.getSorterCountForSwMerge

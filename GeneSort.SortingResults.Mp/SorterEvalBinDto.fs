@@ -10,26 +10,26 @@ open GeneSort.SortingOps.Mp
 [<MessagePackObject>]
 type sorterEvalKeyDto = {
     [<Key(0)>]
-    CeCount: int
+    ceLength: int
     [<Key(1)>]
-    StageCount: int
+    stageLength: int
 }
 
 module SorterEvalKeyDto =
     let toSorterEvalKeyDto (key: sorterEvalKey) : sorterEvalKeyDto =
         { 
-            CeCount = %key.ceCount
-            StageCount = %key.stageCount
+            ceLength = %key.ceCount
+            stageLength = %key.stageLength
         }
 
     let fromSorterEvalKeyDto (dto: sorterEvalKeyDto) : sorterEvalKey =
-        if dto.CeCount < 0 then
-            failwith "CeCount must not be negative"
-        if dto.StageCount < 0 then
-            failwith "StageCount must not be negative"
+        if dto.ceLength < 0 then
+            failwith "CeLength must not be negative"
+        if dto.stageLength < 0 then
+            failwith "StageLength must not be negative"
         { 
-            ceCount = UMX.tag<ceLength> dto.CeCount
-            stageCount = UMX.tag<stageLength> dto.StageCount
+            ceCount = UMX.tag<ceLength> dto.ceLength
+            stageLength = UMX.tag<stageLength> dto.stageLength
             //unsortedCount = 0
         }
 

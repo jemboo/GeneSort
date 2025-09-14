@@ -61,17 +61,17 @@ type Msuf4Tests() =
         let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let width = 4<sortingWidth>
         let tou = createRandomTestTwoOrbitUf4 4 TwoOrbitPairType.Ortho None
-        let msuf4 = Msuf4.create id width [| tou |]
+        let msuf4 = msuf4.create id width [| tou |]
         Assert.Equal(id, msuf4.Id)
         Assert.Equal(width, msuf4.SortingWidth)
-        Assert.Equal(1, %msuf4.StageCount)
+        Assert.Equal(1, %msuf4.StageLength)
         Assert.Equal<TwoOrbitUf4 array>([| tou |], msuf4.TwoOrbitUnfolder4s)
 
     [<Fact>]
     let ``create fails with empty TwoOrbitUnfolder4 array`` () =
         let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let width = 4<sortingWidth>
-        let ex = Assert.Throws<Exception>(fun () -> Msuf4.create id width [||] |> ignore)
+        let ex = Assert.Throws<Exception>(fun () -> msuf4.create id width [||] |> ignore)
         Assert.Equal("Must have at least 1 TwoOrbitUnfolder4, got 0", ex.Message)
 
     [<Fact>]
@@ -79,7 +79,7 @@ type Msuf4Tests() =
         let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let width = 0<sortingWidth>
         let tou = createRandomTestTwoOrbitUf4 4 TwoOrbitPairType.Ortho None
-        let ex = Assert.Throws<Exception>(fun () -> Msuf4.create id width [| tou |] |> ignore)
+        let ex = Assert.Throws<Exception>(fun () -> msuf4.create id width [| tou |] |> ignore)
         Assert.Equal("SortingWidth must be at least 1, got 0", ex.Message)
 
     [<Fact>]
@@ -87,7 +87,7 @@ type Msuf4Tests() =
         let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let width = 8<sortingWidth>
         let tou = createRandomTestTwoOrbitUf4 4 TwoOrbitPairType.Ortho None
-        let ex = Assert.Throws<Exception>(fun () -> Msuf4.create id width [| tou |] |> ignore)
+        let ex = Assert.Throws<Exception>(fun () -> msuf4.create id width [| tou |] |> ignore)
         Assert.Equal("All TwoOrbitUnfolder4 must have order 8", ex.Message)
 
     [<Theory>]
@@ -99,7 +99,7 @@ type Msuf4Tests() =
         let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let width = 4<sortingWidth>
         let tou = createRandomTestTwoOrbitUf4 4 seedType None
-        let msuf4 = Msuf4.create id width [| tou |]
+        let msuf4 = msuf4.create id width [| tou |]
         let sorter = msuf4.MakeSorter()
         Assert.Equal(%id |> UMX.tag<sorterId>, sorter.SorterId)
         Assert.Equal(width, sorter.SortingWidth)
@@ -112,7 +112,7 @@ type Msuf4Tests() =
         let width = 8<sortingWidth>
         let seedType = TwoOrbitPairType.Ortho
         let tou = TwoOrbitUnfolder4.makeTestTwoOrbitUf4 seedType TwoOrbitPairType.Para 8
-        let msuf4 = Msuf4.create id width [| tou |]
+        let msuf4 = msuf4.create id width [| tou |]
         let sorter = msuf4.MakeSorter()
         let expectedCes = [| ce.create 0 6; ce.create 1 7; ce.create 2 4; ce.create 3 5 |]
         Assert.Equal<ce>(expectedCes, sorter.Ces)
@@ -125,7 +125,7 @@ type Msuf4Tests() =
         let width = 8<sortingWidth>
         let seedType = TwoOrbitPairType.Ortho
         let tou = TwoOrbitUnfolder4.makeTestTwoOrbitUf4 seedType TwoOrbitPairType.Ortho 8
-        let msuf4 = Msuf4.create id width [| tou |]
+        let msuf4 = msuf4.create id width [| tou |]
         let sorter = msuf4.MakeSorter()
         let expectedCes = [| ce.create 0 1; ce.create 2 3; ce.create 4 5; ce.create 6 7 |]
         Assert.Equal<ce>(expectedCes, sorter.Ces)
@@ -138,7 +138,7 @@ type Msuf4Tests() =
         let width = 8<sortingWidth>
         let seedType = TwoOrbitPairType.Ortho
         let tou = TwoOrbitUnfolder4.makeTestTwoOrbitUf4 seedType TwoOrbitPairType.SelfRefl 8
-        let msuf4 = Msuf4.create id width [| tou |]
+        let msuf4 = msuf4.create id width [| tou |]
         let sorter = msuf4.MakeSorter()
         let expectedCes = [| ce.create 0 7; ce.create 1 6; ce.create 2 5; ce.create 3 4 |]
         Assert.Equal<ce>(expectedCes, sorter.Ces)
@@ -152,7 +152,7 @@ type Msuf4Tests() =
         let width = 16<sortingWidth>
         let seedType = TwoOrbitPairType.Ortho
         let tou = TwoOrbitUnfolder4.makeTestTwoOrbitUf4 seedType TwoOrbitPairType.Para order
-        let msuf4 = Msuf4.create id width [| tou |]
+        let msuf4 = msuf4.create id width [| tou |]
         let sorter = msuf4.MakeSorter()
         let expectedCes = [| ce.create 0 9; ce.create 1 8; ce.create 2 11; ce.create 3 10
                              ce.create 4 13; ce.create 5 12; ce.create 6 15; ce.create 7 14 |]
@@ -167,8 +167,8 @@ type Msuf4Tests() =
         let width = 16<sortingWidth>
         let tou1 = TwoOrbitUnfolder4.makeTestTwoOrbitUf4 TwoOrbitPairType.Ortho TwoOrbitPairType.Para order
         let tou2 = TwoOrbitUnfolder4.makeTestTwoOrbitUf4 TwoOrbitPairType.Para TwoOrbitPairType.Para order
-        let msuf4_1 = Msuf4.create id width [| tou1 |]
-        let msuf4_2 = Msuf4.create id width [| tou1; tou2 |]
+        let msuf4_1 = msuf4.create id width [| tou1 |]
+        let msuf4_2 = msuf4.create id width [| tou1; tou2 |]
         Assert.Equal(msuf4_1, msuf4_2)
         Assert.Equal(msuf4_1.GetHashCode(), msuf4_2.GetHashCode())
 
@@ -179,7 +179,7 @@ type Msuf4Tests() =
         let order = 16
         let width = 16<sortingWidth>
         let tou = TwoOrbitUnfolder4.makeTestTwoOrbitUf4 TwoOrbitPairType.Ortho TwoOrbitPairType.Para order
-        let msuf4_1 = Msuf4.create id1 width [| tou |]
-        let msuf4_2 = Msuf4.create id2 width [| tou |]
+        let msuf4_1 = msuf4.create id1 width [| tou |]
+        let msuf4_2 = msuf4.create id2 width [| tou |]
         Assert.NotEqual(msuf4_1, msuf4_2)
         Assert.NotEqual(msuf4_1.GetHashCode(), msuf4_2.GetHashCode())

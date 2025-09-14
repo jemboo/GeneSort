@@ -11,30 +11,30 @@ open MessagePack.FSharp
 
 
 [<MessagePackObject>]
-type MsceRandGenDto = 
-    { [<Key(0)>] SortingWidth: int
-      [<Key(1)>] RngType: rngType
-      [<Key(2)>] CeLength: int
-      [<Key(3)>] ExcludeSelfCe: bool }
+type msceRandGenDto = 
+    { [<Key(0)>] sortingWidth: int
+      [<Key(1)>] rngType: rngType
+      [<Key(2)>] ceLength: int
+      [<Key(3)>] excludeSelfCe: bool }
 
 module MsceRandGenDto =
 
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toMsceRandGenDto (msceRandGen: MsceRandGen) : MsceRandGenDto =
-        { SortingWidth = %msceRandGen.SortingWidth
-          CeLength = %msceRandGen.CeLength
-          RngType = msceRandGen.RngType
-          ExcludeSelfCe = msceRandGen.ExcludeSelfCe }
+    let toMsceRandGenDto (msceRandGen: MsceRandGen) : msceRandGenDto =
+        { sortingWidth = %msceRandGen.SortingWidth
+          ceLength = %msceRandGen.CeLength
+          rngType = msceRandGen.RngType
+          excludeSelfCe = msceRandGen.ExcludeSelfCe }
 
-    let fromMsceRandGenDto (dto: MsceRandGenDto) : MsceRandGen =
-        if dto.SortingWidth < 1 then
+    let fromMsceRandGenDto (dto: msceRandGenDto) : MsceRandGen =
+        if dto.sortingWidth < 1 then
             failwith "SortingWidth must be at least 1"
-        if dto.CeLength < 1 then
+        if dto.ceLength < 1 then
             failwith "CeCount must be at least 1"
-        if dto.ExcludeSelfCe && dto.SortingWidth < 2 then
+        if dto.excludeSelfCe && dto.sortingWidth < 2 then
             failwith "SortingWidth must be at least 2 when ExcludeSelfCe is true"
-        MsceRandGen.create (dto.RngType) (UMX.tag<sortingWidth> dto.SortingWidth) (dto.ExcludeSelfCe) (UMX.tag<ceLength> dto.CeLength)
+        MsceRandGen.create (dto.rngType) (UMX.tag<sortingWidth> dto.sortingWidth) (dto.excludeSelfCe) (UMX.tag<ceLength> dto.ceLength)
 
 

@@ -11,7 +11,7 @@ open GeneSort.Core.Mp.RatesAndOps
 
 [<MessagePackObject>]
 type MsceRandMutateDto = 
-    { [<Key(0)>] Msce: MsceDto
+    { [<Key(0)>] Msce: msceDto
       [<Key(1)>] RngType: rngType
       [<Key(2)>] IndelRatesArray: IndelRatesArrayDto
       [<Key(3)>] ExcludeSelfCe: bool }

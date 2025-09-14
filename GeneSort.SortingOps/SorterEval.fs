@@ -53,8 +53,8 @@ type sorterEval =
         
     member this.UnsortedCount with get() = this.unsortedCount
 
-    member this.getStageCount() : int<stageLength> =
-        this.getStageSequence().StageCount 
+    member this.getStageLength() : int<stageLength> =
+        this.getStageSequence().StageLength 
 
     member this.getStageSequence() : stageSequence =
         this.stageSequence.Value
@@ -78,5 +78,5 @@ module SorterEval =
         "SorterId \tSorterTestsId \tSortingWidth \tCeLengthUsed \tCeCount \tLastUsedCeIndex \tStageCount \tUnsortedCount"
 
     let reportLine (se: sorterEval) : string =
-        $"{se.SorterId} \t{se.SorterTestsId} \t{se.SortingWidth} \t{se.getUsedCeCount()} \t{se.CeLength} \t{se.getLastUsedCeIndex} \t{se.getStageCount()} \t{se.UnsortedCount}"
+        $"{se.SorterId} \t{se.SorterTestsId} \t{se.SortingWidth} \t{se.getUsedCeCount()} \t{se.CeLength} \t{se.getLastUsedCeIndex} \t{se.getStageLength()} \t{se.UnsortedCount}"
 

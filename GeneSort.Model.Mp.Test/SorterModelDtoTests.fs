@@ -76,19 +76,19 @@ type SorterModelDtoTests() =
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     // Helper function to perform round-trip serialization
-    let roundTrip (sorterModel: SorterModel) : SorterModel =
+    let roundTrip (sorterModel: sorterModel) : sorterModel =
         let dto = SorterModelDto.toSorterModelDto sorterModel
         let bytes = MessagePackSerializer.Serialize(dto, options)
-        let deserializedDto = MessagePackSerializer.Deserialize<SorterModelDto>(bytes, options)
+        let deserializedDto = MessagePackSerializer.Deserialize<sorterModelDto>(bytes, options)
         SorterModelDto.fromSorterModelDto deserializedDto
 
     [<Fact>]
     let ``Msce round-trip serialization and deserialization should succeed`` () =
         let msce = Msce.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|1;2;3|]
-        let sorterModel = SorterModel.Msce msce
+        let sorterModel = sorterModel.Msce msce
         let result = roundTrip sorterModel
         match result with
-        | SorterModel.Msce resultMsce ->
+        | sorterModel.Msce resultMsce ->
             Assert.Equal(msce.Id, resultMsce.Id)
             Assert.Equal(msce.SortingWidth, resultMsce.SortingWidth)
             Assert.Equal<int array>(msce.CeCodes, resultMsce.CeCodes)
@@ -98,10 +98,10 @@ type SorterModelDtoTests() =
     let ``Mssi round-trip serialization and deserialization should succeed`` () =
         let permSi = Perm_Si.create [|1; 0; 2; 3|] // (0 1)
         let mssi = Mssi.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|permSi|]
-        let sorterModel = SorterModel.Mssi mssi
+        let sorterModel = sorterModel.Mssi mssi
         let result = roundTrip sorterModel
         match result with
-        | SorterModel.Mssi resultMssi ->
+        | sorterModel.Mssi resultMssi ->
             Assert.Equal(mssi.Id, resultMssi.Id)
             Assert.Equal(mssi.SortingWidth, resultMssi.SortingWidth)
             Assert.Equal<Perm_Si>(mssi.Perm_Sis, resultMssi.Perm_Sis)
@@ -110,11 +110,11 @@ type SorterModelDtoTests() =
     [<Fact>]
     let ``Msrs round-trip serialization and deserialization should succeed`` () =
         let permRss = [| Perm_Rs.create([| 3; 2; 1; 0 |]); Perm_Rs.create([| 1; 0; 3; 2 |]) |]
-        let msrs = Msrs.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 4) permRss
-        let sorterModel = SorterModel.Msrs msrs
+        let msrs = msrs.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 4) permRss
+        let sorterModel = sorterModel.Msrs msrs
         let result = roundTrip sorterModel
         match result with
-        | SorterModel.Msrs resultMsrs ->
+        | sorterModel.Msrs resultMsrs ->
             Assert.Equal(msrs.Id, resultMsrs.Id)
             Assert.Equal(msrs.SortingWidth, resultMsrs.SortingWidth)
             Assert.Equal<Perm_Rs>(msrs.Perm_Rss, resultMsrs.Perm_Rss)
@@ -125,11 +125,11 @@ type SorterModelDtoTests() =
         let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let width = 16<sortingWidth>
         let tou = createTestTwoOrbitUnfolder4 16 TwoOrbitPairType.Ortho (Some TwoOrbitPairType.Para)
-        let msuf4 = Msuf4.create id width [|tou|] 
-        let sorterModel = SorterModel.Msuf4 msuf4
+        let msuf4 = msuf4.create id width [|tou|] 
+        let sorterModel = sorterModel.Msuf4 msuf4
         let result = roundTrip sorterModel
         match result with
-        | SorterModel.Msuf4 resultMsuf4 ->
+        | sorterModel.Msuf4 resultMsuf4 ->
             Assert.Equal(msuf4.Id, resultMsuf4.Id)
             Assert.Equal(msuf4.SortingWidth, resultMsuf4.SortingWidth)
             Assert.Equal<TwoOrbitUf4>(msuf4.TwoOrbitUnfolder4s, resultMsuf4.TwoOrbitUnfolder4s)
@@ -143,11 +143,11 @@ type SorterModelDtoTests() =
         let width = 12<sortingWidth>
         let tou = createTestTwoOrbitUnfolder6 order TwoOrbitPairType.Ortho (Some TwoOrbitPairType.Para)
 
-        let msuf6 = Msuf6.create id width [|tou|]
-        let sorterModel = SorterModel.Msuf6 msuf6
+        let msuf6 = msuf6.create id width [|tou|]
+        let sorterModel = sorterModel.Msuf6 msuf6
         let result = roundTrip sorterModel
         match result with
-        | SorterModel.Msuf6 resultMsuf6 ->
+        | sorterModel.Msuf6 resultMsuf6 ->
             Assert.Equal(msuf6.Id, resultMsuf6.Id)
             Assert.Equal(msuf6.SortingWidth, resultMsuf6.SortingWidth)
             Assert.Equal<TwoOrbitUf6 array>(msuf6.TwoOrbitUnfolder6s, resultMsuf6.TwoOrbitUnfolder6s)
@@ -156,8 +156,8 @@ type SorterModelDtoTests() =
 
     [<Fact>]
     let ``Deserialization with invalid Msuf6Dto should throw exception`` () =
-        let invalidMsuf6Dto = { Msuf6Dto.Id = Guid.NewGuid(); SortingWidth = 5; TwoOrbitUnfolder6s = [||] } // Invalid: SortingWidth not divisible by 6
-        let dto = SorterModelDto.Msuf6 invalidMsuf6Dto
+        let invalidMsuf6Dto = { msuf6Dto.id = Guid.NewGuid(); sortingWidth = 5; twoOrbitUf6Dtos = [||] } // Invalid: SortingWidth not divisible by 6
+        let dto = sorterModelDto.Msuf6 invalidMsuf6Dto
         let bytes = MessagePackSerializer.Serialize(dto, options)
-        let deserializedDto = MessagePackSerializer.Deserialize<SorterModelDto>(bytes, options)
+        let deserializedDto = MessagePackSerializer.Deserialize<sorterModelDto>(bytes, options)
         Assert.ThrowsAny<Exception>(fun () -> SorterModelDto.fromSorterModelDto deserializedDto |> ignore)

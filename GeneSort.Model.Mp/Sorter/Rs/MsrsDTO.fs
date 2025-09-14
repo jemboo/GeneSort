@@ -9,12 +9,12 @@ open GeneSort.Core.Mp
 open GeneSort.Model.Sorter
 
 [<MessagePackObject; Struct>]
-type MsrsDto =
+type msrsDto =
     { [<Key(0)>] Id: Guid
       [<Key(1)>] Width: int
       [<Key(2)>] Perm_Rss: Perm_RsDto array }
     
-    static member Create(id: Guid, width: int, permRss: Perm_RsDto array) : Result<MsrsDto, string> =
+    static member Create(id: Guid, width: int, permRss: Perm_RsDto array) : Result<msrsDto, string> =
         if isNull permRss then
             Error "Perm_Rss array cannot be null"
         else if permRss.Length < 1 then
@@ -37,12 +37,12 @@ module MsrsDto =
         | MismatchedPermRsOrder of string
         | PermRsConversionError of Perm_RsDto.Perm_RsDtoError
 
-    let toMsrsDto (msrs: Msrs) : MsrsDto =
+    let toMsrsDto (msrs: msrs) : msrsDto =
         { Id = %msrs.Id
           Width = %msrs.SortingWidth
           Perm_Rss = msrs.Perm_Rss |> Array.map Perm_RsDto.toPerm_RsDto }
 
-    let toMsrs (dto: MsrsDto) : Result<Msrs, MsrsDtoError> =
+    let toMsrs (dto: msrsDto) : Result<msrs, MsrsDtoError> =
         let permRssResult = 
             dto.Perm_Rss 
             |> Array.map Perm_RsDto.toPerm_Rs
@@ -57,7 +57,7 @@ module MsrsDto =
         | Error e -> Error e
         | Ok permRss ->
             try
-                let msrs = Msrs.create
+                let msrs = msrs.create
                                 (UMX.tag<sorterModelID> dto.Id)
                                 (UMX.tag<sortingWidth> dto.Width)
                                 permRss

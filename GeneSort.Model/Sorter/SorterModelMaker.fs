@@ -11,35 +11,35 @@ open FSharp.UMX
 open GeneSort.Sorter
 
 
-type SorterModelMaker =
+type sorterModelMaker =
      | SmmMsceRandGen of MsceRandGen
      | SmmMsceRandMutate of MsceRandMutate
      | SmmMssiRandGen of MssiRandGen
      | SmmMssiRandMutate of MssiRandMutate
-     | SmmMsrsRandGen of MsrsRandGen
-     | SmmMsrsRandMutate of MsrsRandMutate
-     | SmmMsuf4RandGen of Msuf4RandGen
-     | SmmMsuf4RandMutate of Msuf4RandMutate
-     | SmmMsuf6RandGen of Msuf6RandGen
-     | SmmMsuf6RandMutate of Msuf6RandMutate
+     | SmmMsrsRandGen of msrsRandGen
+     | SmmMsrsRandMutate of msrsRandMutate
+     | SmmMsuf4RandGen of msuf4RandGen
+     | SmmMsuf4RandMutate of msuf4RandMutate
+     | SmmMsuf6RandGen of msuf6RandGen
+     | SmmMsuf6RandMutate of msuf6RandMutate
 
 
 module SorterModelMaker =
 
-    let makeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int)  (model: SorterModelMaker) : SorterModel =
+    let makeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int)  (model: sorterModelMaker) : sorterModel =
         match model with
-        | SmmMsceRandGen msce -> msce.MakeSorterModel rngFactory index |> SorterModel.Msce
-        | SmmMsceRandMutate msce -> msce.MakeSorterModel rngFactory index |> SorterModel.Msce
-        | SmmMssiRandGen mssi -> mssi.MakeSorterModel rngFactory index |> SorterModel.Mssi
-        | SmmMssiRandMutate mssi -> mssi.MakeSorterModel rngFactory index |> SorterModel.Mssi
-        | SmmMsrsRandGen msrs -> msrs.MakeSorterModel rngFactory index |> SorterModel.Msrs
-        | SmmMsrsRandMutate msrs -> msrs.MakeSorterModel rngFactory index |> SorterModel.Msrs
-        | SmmMsuf4RandGen msuf4 -> msuf4.MakeSorterModel rngFactory index |> SorterModel.Msuf4
-        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModel rngFactory index |> SorterModel.Msuf4
-        | SmmMsuf6RandGen msuf6 -> msuf6.MakeSorterModel rngFactory index |> SorterModel.Msuf6
-        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModel rngFactory index |> SorterModel.Msuf6
+        | SmmMsceRandGen msce -> msce.MakeSorterModel rngFactory index |> sorterModel.Msce
+        | SmmMsceRandMutate msce -> msce.MakeSorterModel rngFactory index |> sorterModel.Msce
+        | SmmMssiRandGen mssi -> mssi.MakeSorterModel rngFactory index |> sorterModel.Mssi
+        | SmmMssiRandMutate mssi -> mssi.MakeSorterModel rngFactory index |> sorterModel.Mssi
+        | SmmMsrsRandGen msrs -> msrs.MakeSorterModel rngFactory index |> sorterModel.Msrs
+        | SmmMsrsRandMutate msrs -> msrs.MakeSorterModel rngFactory index |> sorterModel.Msrs
+        | SmmMsuf4RandGen msuf4 -> msuf4.MakeSorterModel rngFactory index |> sorterModel.Msuf4
+        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModel rngFactory index |> sorterModel.Msuf4
+        | SmmMsuf6RandGen msuf6 -> msuf6.MakeSorterModel rngFactory index |> sorterModel.Msuf6
+        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModel rngFactory index |> sorterModel.Msuf6
 
-    let getCeLength (model: SorterModelMaker) : int<ceLength> =
+    let getCeLength (model: sorterModelMaker) : int<ceLength> =
         match model with
         | SmmMsceRandGen msce -> msce.CeLength
         | SmmMsceRandMutate msce -> msce.CeLength

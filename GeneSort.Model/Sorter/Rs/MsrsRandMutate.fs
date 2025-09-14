@@ -9,19 +9,19 @@ open GeneSort.Model.Sorter.Rs
       
 /// Represents a configuration for mutating Msrs instances with specified mutation probabilities.
 [<Struct; CustomEquality; NoComparison>]
-type MsrsRandMutate = 
+type msrsRandMutate = 
     private 
         { 
           id : Guid<sorterModelMakerID>
-          msrs : Msrs
+          msrs : msrs
           rngType: rngType
           opsActionRatesArray: OpsActionRatesArray
         } 
     static member create 
             (rngType: rngType)
-            (msrs: Msrs)
+            (msrs: msrs)
             (opsActionRatesArray: OpsActionRatesArray)
-             : MsrsRandMutate =
+             : msrsRandMutate =
         
         if %msrs.Perm_Rss.Length <> opsActionRatesArray.Length then failwith "Perm_Rss length must match opsActionRatesArray.Length"
 
@@ -43,19 +43,19 @@ type MsrsRandMutate =
     member this.CeLength with get () = this.msrs.CeLength
     member this.Msrs with get () = this.msrs
     member this.RngType with get () = this.rngType
-    member this.StageCount with get () = this.msrs.StageCount 
+    member this.StageCount with get () = this.msrs.StageLength 
     member this.OpsActionRates with get () = this.opsActionRatesArray
 
     override this.Equals(obj) = 
         match obj with
-        | :? MsrsRandMutate as other -> 
+        | :? msrsRandMutate as other -> 
             this.Id = other.Id
         | _ -> false
 
     override this.GetHashCode() = 
         hash (this.rngType, this.msrs, this.opsActionRatesArray)
 
-    interface IEquatable<MsrsRandMutate> with
+    interface IEquatable<msrsRandMutate> with
         member this.Equals(other) = 
             this.Id = other.Id
 
@@ -65,7 +65,7 @@ type MsrsRandMutate =
     /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
     /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
-                    : Msrs =
+                    : msrs =
         let id = Common.makeSorterModelId this.Id index
         let rng = rngFactory this.RngType %id
         let orthoMutator = fun psi ->   Perm_RsOps.mutatePerm_Rs (rng.NextIndex) OpsActionMode.Ortho psi 
@@ -79,12 +79,12 @@ type MsrsRandMutate =
                         (rng.NextFloat) 
                         this.Msrs.Perm_Rss
 
-        Msrs.create id this.Msrs.SortingWidth mutated
+        msrs.create id this.Msrs.SortingWidth mutated
 
             
 module MsrsRandMutate =
 
-    let toString (msrsRandMutate: MsrsRandMutate) : string =
+    let toString (msrsRandMutate: msrsRandMutate) : string =
         let actionRates = msrsRandMutate.OpsActionRates.toString()
         sprintf "MsrsRandMutate(RngType=%A, Msrs=%s, OpsActionRates=%s)" 
                 msrsRandMutate.RngType 

@@ -15,10 +15,10 @@ type MsrsRandGenTests() =
         fun _ _ -> new MockRando(floats, indices) :> IRando
 
     // Helper function to create an MsrsRandGen instance
-    let createModelRsGen rngType (width:int) stageCount orthoRate paraRate selfSymRate =
+    let createModelRsGen rngType (width:int) stageLength orthoRate paraRate selfSymRate =
         let rates = OpsGenRates.create (orthoRate, paraRate, selfSymRate)
-        let ratesArray = OpsGenRatesArray.create (Array.create stageCount rates)
-        MsrsRandGen.create rngType (UMX.tag<sortingWidth> width)  ratesArray
+        let ratesArray = OpsGenRatesArray.create (Array.create stageLength rates)
+        msrsRandGen.create rngType (UMX.tag<sortingWidth> width)  ratesArray
 
     [<Fact>]
     let ``MakeSorterModel creates correct number of stages`` () =

@@ -6,10 +6,10 @@ open MessagePack
 
 
 [<MessagePackObject; Struct>]
-type Perm_SiDto =
+type permSiDto =
     { [<Key(0)>] Permutation: PermutationDto }
     
-    static member Create(arr: int array) : Result<Perm_SiDto, string> =
+    static member Create(arr: int array) : Result<permSiDto, string> =
         match PermutationDto.Create(arr) with
         | Error e -> Error e
         | Ok permDto ->
@@ -19,7 +19,7 @@ type Perm_SiDto =
             else
                 Ok { Permutation = permDto }
 
-module Perm_SiDto =
+module PermSiDto =
 
     type Perm_SiDtoError =
         | NullArray of string
@@ -28,10 +28,10 @@ module Perm_SiDto =
         | NotSelfInverse of string
         | PermutationConversionError of PermutationDto.PermutationDtoError
 
-    let fromDomain (permSi: Perm_Si) : Perm_SiDto =
+    let fromDomain (permSi: Perm_Si) : permSiDto =
         { Permutation = PermutationDto.fromDomain permSi.Permutation }
 
-    let toDomain (dto: Perm_SiDto) : Result<Perm_Si, Perm_SiDtoError> =
+    let toDomain (dto: permSiDto) : Result<Perm_Si, Perm_SiDtoError> =
         match PermutationDto.toDomain dto.Permutation with
         | Error e -> Error (PermutationConversionError e)
         | Ok perm ->

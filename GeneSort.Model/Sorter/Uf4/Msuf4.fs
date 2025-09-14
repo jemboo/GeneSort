@@ -10,7 +10,7 @@ open GeneSort.Model.Sorter
 
 /// Represents a collection of TwoOrbitUnfolder4 instances with a consistent sorting width.
 [<Struct; CustomEquality; NoComparison>]
-type Msuf4 = 
+type msuf4 = 
     private 
         { id: Guid<sorterModelID>
           sortingWidth: int<sortingWidth>
@@ -21,7 +21,7 @@ type Msuf4 =
     static member create 
             (id: Guid<sorterModelID>) 
             (sortingWidth: int<sortingWidth>) 
-            (twoOrbitUnfolder4s: TwoOrbitUf4 array) : Msuf4 =
+            (twoOrbitUnfolder4s: TwoOrbitUf4 array) : msuf4 =
         if twoOrbitUnfolder4s.Length < 1 then
             failwith $"Must have at least 1 TwoOrbitUnfolder4, got %d{twoOrbitUnfolder4s.Length}"
         else if %sortingWidth < 1 then
@@ -32,10 +32,10 @@ type Msuf4 =
             { id = id; sortingWidth = sortingWidth; twoOrbitUnfolder4s = twoOrbitUnfolder4s }
 
     member this.Id with get () = this.id
-    member this.CeLength with get () = (this.StageCount * %this.SortingWidth / 2) |> UMX.tag<ceLength>
+    member this.CeLength with get () = (this.StageLength * %this.SortingWidth / 2) |> UMX.tag<ceLength>
     member this.SortingWidth with get () = this.sortingWidth
     member this.TwoOrbitUnfolder4s with get () = this.twoOrbitUnfolder4s
-    member this.StageCount with get () = (this.twoOrbitUnfolder4s.Length |> UMX.tag<stageLength>)
+    member this.StageLength with get () = (this.twoOrbitUnfolder4s.Length |> UMX.tag<stageLength>)
     member this.toString() =
         sprintf "msuf4(Id=%A, SortingWidth=%d, TwoOrbitUnfolder4Count=%d)" 
                 (%this.Id) 
@@ -44,14 +44,14 @@ type Msuf4 =
 
     override this.Equals(obj) = 
         match obj with
-        | :? Msuf4 as other -> 
+        | :? msuf4 as other -> 
             this.id = other.id
         | _ -> false
 
     override this.GetHashCode() = 
         hash (this.GetType(), this.id)
 
-    interface IEquatable<Msuf4> with
+    interface IEquatable<msuf4> with
         member this.Equals(other) = 
             this.id = other.id
 
@@ -69,8 +69,8 @@ type Msuf4 =
 module Msuf4 =
 
     /// Returns a string representation of the Msuf4 instance.
-    let toString (msuf4: Msuf4) : string =
+    let toString (msuf4: msuf4) : string =
         sprintf "Msuf4(Id=%A, SortingWidth=%d, TwoOrbitUnfolder4Count=%d)" 
                 (%msuf4.Id) 
                 (%msuf4.SortingWidth) 
-                msuf4.StageCount
+                msuf4.StageLength

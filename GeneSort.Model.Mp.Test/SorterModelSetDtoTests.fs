@@ -26,13 +26,13 @@ type SorterModelSetDtoTests() =
     [<Fact>]
     let ``SorterModelSetDto with Msce round-trip serialization and deserialization should succeed`` () =
         let msce = Msce.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|1;2;3|]
-        let sorterModel = SorterModel.Msce msce
+        let sorterModel = sorterModel.Msce msce
         let sorterModelSet = sorterModelSet.create (Guid.NewGuid() |> UMX.tag<sorterModelSetID>) (msce.CeLength) [| sorterModel |]
         let result = roundTrip sorterModelSet
         Assert.Equal(sorterModelSet.Id, result.Id)
         Assert.Equal(sorterModelSet.SorterModels.Length, result.SorterModels.Length)
         match result.SorterModels.[0] with
-        | SorterModel.Msce resultMsce ->
+        | sorterModel.Msce resultMsce ->
             Assert.Equal(msce.Id, resultMsce.Id)
             Assert.Equal(msce.SortingWidth, resultMsce.SortingWidth)
             Assert.Equal<int>(msce.CeCodes, resultMsce.CeCodes)

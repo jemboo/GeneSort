@@ -11,32 +11,32 @@ open GeneSort.Model.Sorter.Si
 open GeneSort.Core.Mp
 
 [<MessagePackObject>]
-type MsrsRandMutateDto = 
-    { [<Key(0)>] Msrs: MsrsDto
-      [<Key(1)>] RngType: rngType
-      [<Key(2)>] OpsActionRatesArray: OpsActionRatesArrayDto }
+type msrsRandMutateDto = 
+    { [<Key(0)>] msrsDto: msrsDto
+      [<Key(1)>] rngType: rngType
+      [<Key(2)>] opsActionRatesArray: opsActionRatesArrayDto }
 
 module MsrsRandMutateDto =
 
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toMsrsRandMutateDto (msrsRandMutate: MsrsRandMutate) : MsrsRandMutateDto =
-        { Msrs = MsrsDto.toMsrsDto msrsRandMutate.Msrs
-          RngType = msrsRandMutate.RngType
-          OpsActionRatesArray = OpsActionRatesArrayDto.fromDomain msrsRandMutate.OpsActionRates }
+    let toMsrsRandMutateDto (msrsRandMutate: msrsRandMutate) : msrsRandMutateDto =
+        { msrsDto = MsrsDto.toMsrsDto msrsRandMutate.Msrs
+          rngType = msrsRandMutate.RngType
+          opsActionRatesArray = OpsActionRatesArrayDto.fromDomain msrsRandMutate.OpsActionRates }
 
-    let fromMsrsRandMutateDto (dto: MsrsRandMutateDto) : MsrsRandMutate =
+    let fromMsrsRandMutateDto (dto: msrsRandMutateDto) : msrsRandMutate =
         try
-            let msrsResult = MsrsDto.toMsrs dto.Msrs
+            let msrsResult = MsrsDto.toMsrs dto.msrsDto
             match msrsResult with
             | Ok msrs ->
-                if %msrs.StageCount <> dto.OpsActionRatesArray.Rates.Length then
-                    failwith $"StageCount ({%msrs.StageCount}) must match OpsActionRatesArray length ({dto.OpsActionRatesArray.Rates.Length})"
-                MsrsRandMutate.create
-                    (dto.RngType)
+                if %msrs.StageLength <> dto.opsActionRatesArray.Rates.Length then
+                    failwith $"StageLength ({%msrs.StageLength}) must match OpsActionRatesArray length ({dto.opsActionRatesArray.Rates.Length})"
+                msrsRandMutate.create
+                    (dto.rngType)
                     msrs
-                    (OpsActionRatesArrayDto.toDomain dto.OpsActionRatesArray)
+                    (OpsActionRatesArrayDto.toDomain dto.opsActionRatesArray)
             | Error err ->
                 let msg = match err with
                           | MsrsDto.NullPermRssArray m -> m
@@ -50,11 +50,11 @@ module MsrsRandMutateDto =
                               | Perm_RsDto.Perm_RsDtoError.NotReflectionSymmetric m -> m
                               | Perm_RsDto.Perm_RsDtoError.PermSiConversionError e' ->
                                   match e' with
-                                  | Perm_SiDto.Perm_SiDtoError.EmptyArray m -> m
-                                  | Perm_SiDto.Perm_SiDtoError.InvalidPermutation m -> m
-                                  | Perm_SiDto.Perm_SiDtoError.NotSelfInverse m -> m
-                                  | Perm_SiDto.Perm_SiDtoError.NullArray m -> m
-                                  | Perm_SiDto.Perm_SiDtoError.PermutationConversionError e'' ->
+                                  | PermSiDto.Perm_SiDtoError.EmptyArray m -> m
+                                  | PermSiDto.Perm_SiDtoError.InvalidPermutation m -> m
+                                  | PermSiDto.Perm_SiDtoError.NotSelfInverse m -> m
+                                  | PermSiDto.Perm_SiDtoError.NullArray m -> m
+                                  | PermSiDto.Perm_SiDtoError.PermutationConversionError e'' ->
                                       match e'' with
                                       | PermutationDto.PermutationDtoError.EmptyArray m -> m
                                       | PermutationDto.PermutationDtoError.InvalidPermutation m -> m

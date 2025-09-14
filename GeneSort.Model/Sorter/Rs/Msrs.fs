@@ -9,7 +9,7 @@ open GeneSort.Model.Sorter
 
 /// Represents a rank-swap-based sorting model composed of an array of Perm_Rs instances.
 [<Struct; CustomEquality; NoComparison>]
-type Msrs = 
+type msrs = 
     private 
         { id: Guid<sorterModelID>
           sortingWidth: int<sortingWidth>
@@ -20,7 +20,7 @@ type Msrs =
     static member create 
             (id: Guid<sorterModelID>) 
             (width: int<sortingWidth>) 
-            (perm_Rss: Perm_Rs array) : Msrs =
+            (perm_Rss: Perm_Rs array) : msrs =
 
         if perm_Rss.Length < 1 then
             failwith $"Must have at least 1 Perm_Rs, got %d{perm_Rss.Length}"
@@ -32,8 +32,8 @@ type Msrs =
             { id = id; sortingWidth = width; perm_Rss = perm_Rss }
 
     member this.Id with get () = this.id
-    member this.CeLength with get () = (this.StageCount * %this.SortingWidth / 2) |> UMX.tag<ceLength>
-    member this.StageCount with get () = this.perm_Rss.Length |> UMX.tag<stageLength>
+    member this.CeLength with get () = (this.StageLength * %this.SortingWidth / 2) |> UMX.tag<ceLength>
+    member this.StageLength with get () = this.perm_Rss.Length |> UMX.tag<stageLength>
     member this.SortingWidth with get () = this.sortingWidth
     member this.Perm_Rss with get () = this.perm_Rss
     member this.toString() =
@@ -44,14 +44,14 @@ type Msrs =
 
     override this.Equals(obj) = 
         match obj with
-        | :? Msrs as other -> 
+        | :? msrs as other -> 
             this.id = other.id
         | _ -> false
 
     override this.GetHashCode() = 
         hash (this.GetType(), this.id)
 
-    interface IEquatable<Msrs> with
+    interface IEquatable<msrs> with
         member this.Equals(other) = 
             this.id = other.id
 
@@ -68,20 +68,20 @@ type Msrs =
 module Msrs =
 
     /// Returns a string representation of the Msrs instance.
-    let toString (msrs: Msrs) : string =
+    let toString (msrs: msrs) : string =
         sprintf "Msrs(Id=%A, Width=%d, Perm_Rs_count=%d)" 
                 (%msrs.Id) 
                 (%msrs.SortingWidth) 
                 msrs.Perm_Rss.Length 
 
     /// Returns the number of Perm_Rs instances in the Msrs.
-    let getLength (msrs: Msrs) : int =
+    let getLength (msrs: msrs) : int =
         msrs.Perm_Rss.Length
 
     /// Converts an Msrs instance to a Sorter by mapping each Perm_Rs to comparison elements (Ce) via TwoOrbits.
     /// <param name="msrs">The Msrs instance to convert.</param>
     /// <returns>A Sorter instance with the same width and derived comparison elements.</returns>
-    let makeSorter (msrs: Msrs) : sorter =
+    let makeSorter (msrs: msrs) : sorter =
         let ces = 
             msrs.Perm_Rss
             |> Array.collect (fun prs -> 

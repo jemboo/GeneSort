@@ -11,7 +11,7 @@ type SorterModelSetDto =
     { 
         [<Key(0)>] Id: Guid
         [<Key(1)>] CeLength: int
-        [<Key(2)>] SorterModels: SorterModelDto[]
+        [<Key(2)>] SorterModels: sorterModelDto[]
     }
 
 module SorterModelSetDto =

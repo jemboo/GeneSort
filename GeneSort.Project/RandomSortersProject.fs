@@ -134,14 +134,14 @@ module RandomSortersProject =
 
             let sorterModelMaker =
                 match sorterModelKey with
-                | sorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> SorterModelMaker.SmmMsceRandGen
-                | sorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
+                | sorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> sorterModelMaker.SmmMsceRandGen
+                | sorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> sorterModelMaker.SmmMssiRandGen
                 | sorterModelKey.Msrs -> 
                     let opsGenRatesArray = OpsGenRatesArray.createUniform %stageCount
-                    (MsrsRandGen.create randomType sortingWidth opsGenRatesArray) |> SorterModelMaker.SmmMsrsRandGen
+                    (msrsRandGen.create randomType sortingWidth opsGenRatesArray) |> sorterModelMaker.SmmMsrsRandGen
                 | sorterModelKey.Msuf4 -> 
                     let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageCount %sortingWidth
-                    (Msuf4RandGen.create randomType sortingWidth stageCount uf4GenRatesArray) |> SorterModelMaker.SmmMsuf4RandGen
+                    (msuf4RandGen.create randomType sortingWidth stageCount uf4GenRatesArray) |> sorterModelMaker.SmmMsuf4RandGen
                 | sorterModelKey.Msuf6 -> 
                     failwith "Msuf6 not supported in this experiment"
 
@@ -178,16 +178,16 @@ module RandomSortersProject =
 
             let sorterModelMaker =
                 match sorterModelKey with
-                | sorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> SorterModelMaker.SmmMsceRandGen
-                | sorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> SorterModelMaker.SmmMssiRandGen
+                | sorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> sorterModelMaker.SmmMsceRandGen
+                | sorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageCount) |> sorterModelMaker.SmmMssiRandGen
                 | sorterModelKey.Msrs -> 
                     let opsGenRatesArray = OpsGenRatesArray.createUniform %stageCount
-                    (MsrsRandGen.create randomType sortingWidth opsGenRatesArray) |> SorterModelMaker.SmmMsrsRandGen
+                    (msrsRandGen.create randomType sortingWidth opsGenRatesArray) |> sorterModelMaker.SmmMsrsRandGen
                 | sorterModelKey.Msuf4 -> 
                     failwith "Msuf4 not supported in this experiment"
                 | sorterModelKey.Msuf6 -> 
                     let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageCount %sortingWidth
-                    (Msuf6RandGen.create randomType sortingWidth stageCount uf6GenRatesArray) |> SorterModelMaker.SmmMsuf6RandGen
+                    (msuf6RandGen.create randomType sortingWidth stageCount uf6GenRatesArray) |> sorterModelMaker.SmmMsuf6RandGen
 
             let cycleFactor = if (%cycle = 0) then 1 else 10
             let sorterCount = sortingWidth |> getSorterCountForSortingWidth cycleFactor

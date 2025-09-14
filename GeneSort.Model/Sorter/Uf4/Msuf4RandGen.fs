@@ -7,13 +7,13 @@ open GeneSort.Sorter
 open MathUtils
 
 [<Struct; CustomEquality; NoComparison>]
-type Msuf4RandGen = 
+type msuf4RandGen = 
     private 
         { 
           id: Guid<sorterModelMakerID>
           rngType: rngType
           sortingWidth: int<sortingWidth>
-          stageCount: int<stageLength> 
+          stageLength: int<stageLength> 
           genRates: uf4GenRatesArray } 
     with
     /// Creates an Msuf4RandGen with the specified parameters.
@@ -26,17 +26,17 @@ type Msuf4RandGen =
     static member create 
             (rngType: rngType) 
             (sortingWidth: int<sortingWidth>)
-            (stageCount: int<stageLength>) 
+            (stageLength: int<stageLength>) 
             (genRates: uf4GenRatesArray) 
-            : Msuf4RandGen =
+            : msuf4RandGen =
         if %sortingWidth < 1 then
             failwith $"SortingWidth must be at least 1, got {%sortingWidth}"
         else if (%sortingWidth - 1) &&& %sortingWidth <> 0 then
             failwith $"SortingWidth must be a power of 2, got {%sortingWidth}"
-        else if %stageCount < 1 then
-            failwith $"StageCount must be at least 1, got {%stageCount}"
-        else if genRates.Length <> %stageCount then
-            failwith $"genRates array length (%d{genRates.Length}) must equal stageCount ({%stageCount})"
+        else if %stageLength < 1 then
+            failwith $"StageCount must be at least 1, got {%stageLength}"
+        else if genRates.Length <> %stageLength then
+            failwith $"genRates array length (%d{genRates.Length}) must equal stageCount ({%stageLength})"
         else if genRates.RatesArray |> Array.exists (fun gr -> gr.Order <> %sortingWidth) then
             failwith $"All genRates must have order {%sortingWidth}"
         else if genRates.RatesArray |> Array.exists (fun gr -> gr.OpsGenRatesArray.Length <> exactLog2(gr.Order / 4)) then
@@ -46,58 +46,58 @@ type Msuf4RandGen =
                 [
                     rngType :> obj
                     sortingWidth :> obj
-                    stageCount :> obj
+                    stageLength :> obj
                     genRates :> obj
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
 
             { id = id
               rngType = rngType
               sortingWidth = sortingWidth
-              stageCount = stageCount
+              stageLength = stageLength
               genRates = genRates }
               
     member this.Id with get () = this.id
-    member this.CeLength with get () = (this.SortingWidth * %this.StageCount / 2) |> UMX.tag<ceLength>
+    member this.CeLength with get () = (this.SortingWidth * %this.StageLength / 2) |> UMX.tag<ceLength>
     member this.RngType with get () = this.rngType
     member this.SortingWidth with get () = this.sortingWidth
-    member this.StageCount with get () = this.stageCount
+    member this.StageLength with get () = this.stageLength
     member this.GenRates with get () = this.genRates
 
     override this.Equals(obj) = 
         match obj with
-        | :? Msuf4RandGen as other -> 
+        | :? msuf4RandGen as other -> 
             this.rngType = other.rngType && 
             this.sortingWidth = other.sortingWidth &&
-            this.stageCount = other.stageCount &&
+            this.stageLength = other.stageLength &&
             this.genRates.Equals(other.genRates)
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.rngType, this.sortingWidth, this.stageCount, this.genRates)
+        hash (this.rngType, this.sortingWidth, this.stageLength, this.genRates)
 
-    interface IEquatable<Msuf4RandGen> with
+    interface IEquatable<msuf4RandGen> with
         member this.Equals(other) = 
             this.rngType = other.rngType && 
             this.sortingWidth = other.sortingWidth &&
-            this.stageCount = other.stageCount &&
+            this.stageLength = other.stageLength &&
             this.genRates.Equals(other.genRates)
 
 
-    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : Msuf4 =
+    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : msuf4 =
         let id = Common.makeSorterModelId this.Id index
         let rando = rngFactory this.RngType %id
-        let sc = %this.StageCount
+        let sc = %this.StageLength
         let genRts = this.GenRates
         let twoOrbitUnfolder4s =
                 [| for dex in 0 .. (sc - 1) ->
                     RandomUnfolderOps4.makeRandomTwoOrbitUf4 rando.NextFloat (genRts.Item(dex)) |]
-        Msuf4.create id this.SortingWidth twoOrbitUnfolder4s
+        msuf4.create id this.SortingWidth twoOrbitUnfolder4s
 
 
 module Msuf4RandGen =
 
     /// Returns a string representation of the Msuf4RandGen configuration.
-    let toString (msuf4Gen: Msuf4RandGen) : string =
+    let toString (msuf4Gen: msuf4RandGen) : string =
         let genRatesStr = 
             msuf4Gen.GenRates.RatesArray 
             |> Array.mapi (fun i gr -> 
@@ -107,5 +107,5 @@ module Msuf4RandGen =
         sprintf "Msuf4RandGen(RngType=%A, Width=%d, StageCount=%d, GenRates=%s)" 
                 msuf4Gen.RngType 
                 (%msuf4Gen.SortingWidth) 
-                (%msuf4Gen.StageCount)
+                (%msuf4Gen.StageLength)
                 genRatesStr

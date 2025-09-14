@@ -6,7 +6,7 @@ open MessagePack
 
 [<MessagePackObject; Struct>]
 type Perm_RsDto =
-    { [<Key(0)>] Perm_Si: Perm_SiDto }
+    { [<Key(0)>] Perm_Si: permSiDto }
     
     static member Create(arr: int array) : Result<Perm_RsDto, string> =
         if arr.Length < 4 then
@@ -14,7 +14,7 @@ type Perm_RsDto =
         else if arr.Length % 2 <> 0 then
             Error "Perm_Rs order must be divisible by 2"
         else
-            match Perm_SiDto.Create(arr) with
+            match permSiDto.Create(arr) with
             | Error e -> Error e
             | Ok permSiDto ->
                 let permSi = Perm_Si.create arr
@@ -29,13 +29,13 @@ module Perm_RsDto =
         | OrderTooSmall of string
         | OrderNotDivisibleByTwo of string
         | NotReflectionSymmetric of string
-        | PermSiConversionError of Perm_SiDto.Perm_SiDtoError
+        | PermSiConversionError of PermSiDto.Perm_SiDtoError
 
     let toPerm_RsDto (permRs: Perm_Rs) : Perm_RsDto =
-        { Perm_Si = Perm_SiDto.fromDomain permRs.Perm_Si }
+        { Perm_Si = PermSiDto.fromDomain permRs.Perm_Si }
 
     let toPerm_Rs (dto: Perm_RsDto) : Result<Perm_Rs, Perm_RsDtoError> =
-        match Perm_SiDto.toDomain dto.Perm_Si with
+        match PermSiDto.toDomain dto.Perm_Si with
         | Error e -> Error (PermSiConversionError e)
         | Ok permSi ->
             try

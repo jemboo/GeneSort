@@ -9,7 +9,7 @@ open GeneSort.Model.Sorter
 
 /// Represents a collection of TwoOrbitUnfolder4 instances with a consistent sorting width.
 [<Struct; CustomEquality; NoComparison>]
-type Msuf6 = 
+type msuf6 = 
     private 
         { id: Guid<sorterModelID>
           sortingWidth: int<sortingWidth>
@@ -20,7 +20,7 @@ type Msuf6 =
     static member create 
             (id: Guid<sorterModelID>) 
             (sortingWidth: int<sortingWidth>) 
-            (twoOrbitUnfolder6s: TwoOrbitUf6 array) : Msuf6 =
+            (twoOrbitUnfolder6s: TwoOrbitUf6 array) : msuf6 =
         if twoOrbitUnfolder6s.Length < 1 then
             failwith $"Must have at least 1 TwoOrbitUnfolder6, got %d{twoOrbitUnfolder6s.Length}"
         else if %sortingWidth < 1 then
@@ -43,14 +43,14 @@ type Msuf6 =
 
     override this.Equals(obj) = 
         match obj with
-        | :? Msuf6 as other -> 
+        | :? msuf6 as other -> 
             this.id = other.id
         | _ -> false
 
     override this.GetHashCode() = 
         hash (this.GetType(), this.id)
 
-    interface IEquatable<Msuf6> with
+    interface IEquatable<msuf6> with
         member this.Equals(other) = 
             this.id = other.id
 
@@ -68,7 +68,7 @@ type Msuf6 =
 module Msuf6 =
 
     /// Returns a string representation of the Msuf6 instance.
-    let toString (msuf6: Msuf6) : string =
+    let toString (msuf6: msuf6) : string =
         sprintf "Msuf6(Id=%A, SortingWidth=%d, TwoOrbitUnfolder6Count=%d)" 
                 (%msuf6.Id) 
                 (%msuf6.SortingWidth) 

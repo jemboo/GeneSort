@@ -8,13 +8,13 @@ open GeneSort.Sorter.Sortable
 type sorterModelSet =
     private 
         { id : Guid<sorterModelSetID>
-          sorterModels : SorterModel[] 
+          sorterModels : sorterModel[] 
           ceLength: int<ceLength>  }
     with
     static member create 
             (id : Guid<sorterModelSetID>) 
             (ceLength: int<ceLength>)
-            (sorterModels : SorterModel[]) : sorterModelSet =
+            (sorterModels : sorterModel[]) : sorterModelSet =
         if sorterModels.Length < 1 then
             failwith "Must have at least 1 SorterModel"
         if sorterModels |> Array.exists (fun sm -> (SorterModel.getCeLength sm ) <> ceLength) then

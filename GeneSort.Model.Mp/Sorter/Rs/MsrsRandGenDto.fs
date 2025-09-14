@@ -10,7 +10,7 @@ open MessagePack.Resolvers
 open MessagePack.FSharp
 
 [<MessagePackObject>]
-type MsrsRandGenDto = 
+type msrsRandGenDto = 
     { [<Key(0)>] SortingWidth: int
       [<Key(1)>] RngType: rngType
       [<Key(2)>] OpsGenRatesArray: OpsGenRatesArrayDto }
@@ -20,18 +20,18 @@ module MsrsRandGenDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toMsrsRandGenDto (msrsRandGen: MsrsRandGen) : MsrsRandGenDto =
+    let toMsrsRandGenDto (msrsRandGen: msrsRandGen) : msrsRandGenDto =
         { SortingWidth = %msrsRandGen.SortingWidth
           RngType = msrsRandGen.RngType
           OpsGenRatesArray = OpsGenRatesArrayDto.fromDomain msrsRandGen.OpsGenRatesArray }
 
-    let fromMsrsRandGenDto (dto: MsrsRandGenDto) : MsrsRandGen =
+    let fromMsrsRandGenDto (dto: msrsRandGenDto) : msrsRandGen =
         try
             if dto.SortingWidth < 2 then
                 failwith $"SortingWidth must be at least 2, got {dto.SortingWidth}"
             if (dto.OpsGenRatesArray.Rates.Length) < 1 then
                 failwith $"OpsGenRatesArray must have at least 1 rate, got {dto.OpsGenRatesArray.Rates.Length}"
-            MsrsRandGen.create
+            msrsRandGen.create
                 (dto.RngType)
                 (UMX.tag<sortingWidth> dto.SortingWidth)
                 (OpsGenRatesArrayDto.toDomain dto.OpsGenRatesArray)

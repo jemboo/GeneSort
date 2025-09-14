@@ -10,12 +10,12 @@ open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter
 
 [<MessagePackObject>]
-type Msuf4Dto =
-    { [<Key(0)>] Id: Guid
-      [<Key(1)>] SortingWidth: int
-      [<Key(2)>] TwoOrbitUnfolder4s: TwoOrbitUf4Dto array }
+type msuf4Dto =
+    { [<Key(0)>] id: Guid
+      [<Key(1)>] sortingWidth: int
+      [<Key(2)>] twoOrbitUf4Dtos: TwoOrbitUf4Dto array }
     
-    static member Create(id: Guid, sortingWidth: int, twoOrbitUnfolder4s: TwoOrbitUf4Dto array) : Result<Msuf4Dto, string> =
+    static member Create(id: Guid, sortingWidth: int, twoOrbitUnfolder4s: TwoOrbitUf4Dto array) : Result<msuf4Dto, string> =
         if isNull twoOrbitUnfolder4s then
             Error "TwoOrbitUnfolder4s array cannot be null"
         else if twoOrbitUnfolder4s.Length < 1 then
@@ -27,9 +27,9 @@ type Msuf4Dto =
                 if twoOrbitUnfolder4s |> Array.exists (fun tou -> (tou |> TwoOrbitUf4Dto.getOrder) <> sortingWidth) then
                     Error $"All TwoOrbitUnfolder4 must have order {sortingWidth}"
                 else
-                    Ok { Id = id
-                         SortingWidth = sortingWidth
-                         TwoOrbitUnfolder4s = twoOrbitUnfolder4s }
+                    Ok { id = id
+                         sortingWidth = sortingWidth
+                         twoOrbitUf4Dtos = twoOrbitUnfolder4s }
             with
             | :? ArgumentException as ex ->
                 Error ex.Message
@@ -42,14 +42,14 @@ module Msuf4Dto =
         | MismatchedTwoOrbitUnfolder4Order of string
         | TwoOrbitUnfolder4ConversionError of TwoOrbitUf4Dto.TwoOrbitUf4DtoError
 
-    let toMsuf4Dto (msuf4: Msuf4) : Msuf4Dto =
-        { Id = %msuf4.Id
-          SortingWidth = %msuf4.SortingWidth
-          TwoOrbitUnfolder4s = msuf4.TwoOrbitUnfolder4s |> Array.map TwoOrbitUf4Dto.fromDomain }
+    let toMsuf4Dto (msuf4: msuf4) : msuf4Dto =
+        { id = %msuf4.Id
+          sortingWidth = %msuf4.SortingWidth
+          twoOrbitUf4Dtos = msuf4.TwoOrbitUnfolder4s |> Array.map TwoOrbitUf4Dto.fromDomain }
 
-    let fromMsuf4Dto (dto: Msuf4Dto)   = // : Result<Msuf4, Msuf4DtoError> =
+    let fromMsuf4Dto (dto: msuf4Dto)   = // : Result<Msuf4, Msuf4DtoError> =
         let twoOrbitUnfolder4sResult = 
-            dto.TwoOrbitUnfolder4s 
+            dto.twoOrbitUf4Dtos 
             |> Array.map TwoOrbitUf4Dto.toDomain
             |> Array.fold (fun acc res ->
                 match acc, res with
@@ -62,9 +62,9 @@ module Msuf4Dto =
         | Ok twoOrbitUnfolder4s ->
             try
                 let msuf4 = 
-                    Msuf4.create
-                        (UMX.tag<sorterModelID> dto.Id)
-                        (UMX.tag<sortingWidth> dto.SortingWidth)
+                    msuf4.create
+                        (UMX.tag<sorterModelID> dto.id)
+                        (UMX.tag<sortingWidth> dto.sortingWidth)
                         twoOrbitUnfolder4s
                 Ok msuf4
             with

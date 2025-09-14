@@ -15,7 +15,7 @@ type StageSequenceTests() =
         
         stageSeq.AddCe(ce)
         
-        stageSeq.StageCount |> should equal 1
+        stageSeq.StageLength |> should equal 1
         stageSeq.Stages.[0].CeCount |> should equal 1
         stageSeq.Stages.[0].Ces.[0] |> should equal ce
         stageSeq.Stages.[0].IsOccupied(0) |> should equal true
@@ -31,7 +31,7 @@ type StageSequenceTests() =
         
         stageSeq.AddCe(secondCe)
         
-        stageSeq.StageCount |> should equal 1
+        stageSeq.StageLength |> should equal 1
         stageSeq.Stages.[0].CeCount |> should equal 2
         stageSeq.Stages.[0].Ces |> should contain firstCe
         stageSeq.Stages.[0].Ces |> should contain secondCe
@@ -50,7 +50,7 @@ type StageSequenceTests() =
         
         stageSeq.AddCe(secondCe)
         
-        stageSeq.StageCount |> should equal 2
+        stageSeq.StageLength |> should equal 2
         stageSeq.Stages.[0].CeCount |> should equal 1
         stageSeq.Stages.[0].Ces.[0] |> should equal firstCe
         stageSeq.Stages.[1].CeCount |> should equal 1
@@ -70,7 +70,7 @@ type StageSequenceTests() =
         stageSeq.AddCe(ce3)
         stageSeq.AddCe(ce4)
         
-        stageSeq.StageCount |> should equal 2
+        stageSeq.StageLength |> should equal 2
         stageSeq.Stages.[0].CeCount |> should equal 2
         stageSeq.Stages.[0].Ces |> should contain ce1
         stageSeq.Stages.[0].Ces |> should contain ce2
@@ -92,7 +92,7 @@ type StageSequenceTests() =
         stageSeq.AddCe(ce3)
         stageSeq.AddCe(ce4)
         
-        stageSeq.StageCount |> should equal 2
+        stageSeq.StageLength |> should equal 2
         stageSeq.Stages.[0].CeCount |> should equal 3
         stageSeq.Stages.[0].Ces |> should contain ce1
         stageSeq.Stages.[0].Ces |> should contain ce2

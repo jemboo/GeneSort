@@ -9,13 +9,13 @@ type sorterModelSetMaker =
     private
         { 
           id : Guid<sorterModelSetMakerID>
-          sorterModelMaker : SorterModelMaker
+          sorterModelMaker : sorterModelMaker
           firstIndex : int<sorterCount>
           count : int<sorterCount>
         }
     with
     static member create 
-                (sorterModelMaker: SorterModelMaker) 
+                (sorterModelMaker: sorterModelMaker) 
                 (firstIndex: int<sorterCount>) 
                 (count: int<sorterCount>) : sorterModelSetMaker =
         let id = 

@@ -9,17 +9,17 @@ open GeneSort.Model.Sorter.Uf6
 open GeneSort.Sorter
 
 
-type SorterModel =
+type sorterModel =
      | Msce of Msce
      | Mssi of Mssi
-     | Msrs of Msrs
-     | Msuf4 of Msuf4
-     | Msuf6 of Msuf6
+     | Msrs of msrs
+     | Msuf4 of msuf4
+     | Msuf6 of msuf6
 
 
 module SorterModel =
 
-    let makeSorter (model: SorterModel) : sorter =
+    let makeSorter (model: sorterModel) : sorter =
         match model with
         | Msce msce -> msce.MakeSorter()
         | Mssi mssi -> mssi.MakeSorter()
@@ -27,7 +27,7 @@ module SorterModel =
         | Msuf4 msuf4 -> msuf4.MakeSorter()
         | Msuf6 msuf6 -> msuf6.MakeSorter()
 
-    let getSortingWidth (model: SorterModel) : int<sortingWidth> =
+    let getSortingWidth (model: sorterModel) : int<sortingWidth> =
         match model with
         | Msce msce -> msce.SortingWidth
         | Mssi mssi -> mssi.SortingWidth
@@ -35,7 +35,7 @@ module SorterModel =
         | Msuf4 msuf4 -> msuf4.SortingWidth
         | Msuf6 msuf6 -> msuf6.SortingWidth
 
-    let getCeLength (model: SorterModel) : int<ceLength> =
+    let getCeLength (model: sorterModel) : int<ceLength> =
         match model with
         | Msce msce -> msce.CeLength
         | Mssi mssi -> mssi.CeLength

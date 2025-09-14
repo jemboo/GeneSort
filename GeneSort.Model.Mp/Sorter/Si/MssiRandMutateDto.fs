@@ -11,8 +11,8 @@ open MessagePack.Resolvers
 open MessagePack.FSharp
 
 [<MessagePackObject>]
-type MssiRandMutateDto = 
-    { [<Key(0)>] Mssi: MssiDto
+type mssiRandMutateDto = 
+    { [<Key(0)>] Mssi: mssiDto
       [<Key(1)>] RngType: rngType
       [<Key(2)>] OpActionRatesArray: OpActionRatesArrayDto }
 
@@ -21,18 +21,18 @@ module MssiRandMutateDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toMssiRandMutateDto (mssiRandMutate: MssiRandMutate) : MssiRandMutateDto =
+    let toMssiRandMutateDto (mssiRandMutate: MssiRandMutate) : mssiRandMutateDto =
         { Mssi = MssiDto.toMssiDto mssiRandMutate.Mssi
           RngType = mssiRandMutate.RngType
           OpActionRatesArray = OpActionRatesArrayDto.fromDomain mssiRandMutate.OpActionRates }
 
-    let fromMssiRandMutateDto (dto: MssiRandMutateDto) : Result<MssiRandMutate, string> =
+    let fromMssiRandMutateDto (dto: mssiRandMutateDto) : Result<MssiRandMutate, string> =
         try
             let mssiResult = MssiDto.toMssi dto.Mssi
             match mssiResult with
             | Ok mssi ->
                 if %mssi.StageCount <> (OpActionRatesArrayDto.toDomain dto.OpActionRatesArray).Length then
-                    Error "StageCount must match OpActionRatesArray.Length"
+                    Error "StageLength must match OpActionRatesArray.Length"
                 else
                     let mssiRandMutate = 
                         MssiRandMutate.create

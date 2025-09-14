@@ -8,7 +8,7 @@ open System.Collections.Generic
 [<Struct; StructuralEquality; NoComparison>]
 type sorterEvalKey = {
     ceCount: int<ceLength>
-    stageCount: int<stageLength>
+    stageLength: int<stageLength>
 }
 
 type sorterEvalBin = {
@@ -44,7 +44,7 @@ module SorterSetEvalBins =
                       (sorterSetEvalBins: sorterSetEvalBins) : unit =
         let key = {
             ceCount = sorterEval.getUsedCeCount()
-            stageCount = sorterEval.getStageCount()
+            stageLength = sorterEval.getStageLength()
         }
 
         let sorterEvalBin =
@@ -73,21 +73,21 @@ module SorterSetEvalBins =
             evalBins = Dictionary<sorterEvalKey, sorterEvalBin>()
         }
 
-        let gps = sorterSetEval.SorterEvals |> Array.groupBy (fun se -> (se.getUsedCeCount(), se.getStageCount()))
+        let gps = sorterSetEval.SorterEvals |> Array.groupBy (fun se -> (se.getUsedCeCount(), se.getStageLength()))
 
         sorterSetEval.SorterEvals
         |> Array.iter (fun se -> addSorterEval se sorterSetEvalBins)
         sorterSetEvalBins
 
 
-    /// Returns an array of int arrays, each inner array containing [| ceCount; stageCount; binCount |]
+    /// Returns an array of int arrays, each inner array containing [| ceCount; stageLength; binCount |]
     let getBinCountReport (sorterSetEvalBins: sorterSetEvalBins) : string array array =
         let lines = 
             (sorterSetEvalBins.evalBins : Dictionary<sorterEvalKey, sorterEvalBin>)
             |> Seq.map (fun kvp -> 
                         [| 
                             (%kvp.Key.ceCount).ToString(); 
-                            (%kvp.Key.stageCount).ToString(); 
+                            (%kvp.Key.stageLength).ToString(); 
                             (kvp.Value.binCount).ToString();
                             (kvp.Value |> SorterEvalBin.getUnsortedHistogram)
                         |])

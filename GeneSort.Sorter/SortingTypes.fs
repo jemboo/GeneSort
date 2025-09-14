@@ -30,19 +30,19 @@ open FSharp.UMX
 
 module CeLength =
     
-    let toStageCount (sortingWidth:int<sortingWidth>) (ceLength: int<ceLength>) 
+    let toStageLength (sortingWidth:int<sortingWidth>) (ceLength: int<ceLength>) 
             : int<stageLength> =
         if %ceLength < 1 then
             failwith "ceLength must be at least 1"
         else
             ((%ceLength * 2) / %sortingWidth) |> UMX.tag<stageLength> 
 
-module StageCount =
+module StageLength =
 
-    let toCeLength (sortingWidth:int<sortingWidth>) (stageCount: int<stageLength>) 
+    let toCeLength (sortingWidth:int<sortingWidth>) (stageLength: int<stageLength>) 
             : int<ceLength> =
-        if %stageCount < 1 then
-            failwith "StageCount must be at least 1"
+        if %stageLength < 1 then
+            failwith "StageLength must be at least 1"
         else
-            ((%stageCount * %sortingWidth) / 2) |> UMX.tag<ceLength> 
+            ((%stageLength * %sortingWidth) / 2) |> UMX.tag<ceLength> 
 

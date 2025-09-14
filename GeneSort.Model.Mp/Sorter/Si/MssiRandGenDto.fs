@@ -9,33 +9,33 @@ open MessagePack.Resolvers
 open MessagePack.FSharp
 
 [<MessagePackObject>]
-type MssiRandGenDto = 
-    { [<Key(0)>] SortingWidth: int
-      [<Key(1)>] RngType: rngType
-      [<Key(2)>] StageCount: int }
+type mssiRandGenDto = 
+    { [<Key(0)>] sortingWidth: int
+      [<Key(1)>] rngType: rngType
+      [<Key(2)>] stageLength: int }
 
 module MssiRandGenDto =
 
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toMssiRandGenDto (mssiRandGen: MssiRandGen) : MssiRandGenDto =
-        { SortingWidth = %mssiRandGen.SortingWidth
-          RngType = mssiRandGen.RngType
-          StageCount = %mssiRandGen.StageCount }
+    let toMssiRandGenDto (mssiRandGen: MssiRandGen) : mssiRandGenDto =
+        { sortingWidth = %mssiRandGen.SortingWidth
+          rngType = mssiRandGen.RngType
+          stageLength = %mssiRandGen.StageCount }
 
-    let fromMssiRandGenDto (dto: MssiRandGenDto) : Result<MssiRandGen, string> =
+    let fromMssiRandGenDto (dto: mssiRandGenDto) : Result<MssiRandGen, string> =
         try
-            if dto.SortingWidth < 2 then
+            if dto.sortingWidth < 2 then
                 Error "SortingWidth must be at least 2"
-            else if dto.StageCount < 1 then
-                Error "StageCount must be at least 1"
+            else if dto.stageLength < 1 then
+                Error "StageLength must be at least 1"
             else
                 let mssiRandGen = 
                     MssiRandGen.create
-                        (dto.RngType)
-                        (UMX.tag<sortingWidth> dto.SortingWidth)
-                        (UMX.tag<stageLength> dto.StageCount)
+                        (dto.rngType)
+                        (UMX.tag<sortingWidth> dto.sortingWidth)
+                        (UMX.tag<stageLength> dto.stageLength)
                 Ok mssiRandGen
         with
         | ex -> Error ex.Message

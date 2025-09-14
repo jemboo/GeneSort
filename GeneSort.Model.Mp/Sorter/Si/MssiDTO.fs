@@ -10,43 +10,33 @@ open MessagePack
 open GeneSort.Core.Mp
 
 [<MessagePackObject; Struct>]
-type MssiDto =
-    { [<Key(0)>] Id: Guid
-      [<Key(1)>] Width: int
-      [<Key(2)>] Perm_SiDtos: Perm_SiDto array }
-    
-    //static member Create(id: Guid, width: int, perm_Sis: Perm_Si array) : Result<MssiDto, string> =
-    //    if isNull perm_Sis || perm_Sis.Length < 1 then
-    //        Error "Must have at least 1 Perm_Si"
-    //    else if width < 1 then
-    //        Error "Width must be at least 1"
-    //    else
-    //        Ok { Id = id; Width = width; Perm_SiDtos = perm_Sis }
-    
-    //member this.StageCount = this.Perm_Sis.Length
+type mssiDto =
+    { [<Key(0)>] id: Guid
+      [<Key(1)>] sortingWidth: int
+      [<Key(2)>] permSiDtos: permSiDto array }
 
 module MssiDto =
     type MssiDtoError =
         | InvalidPermSiCount of string
         | InvalidWidth of string
 
-    let toMssiDto (mssi: Mssi) : MssiDto =
-        let mssiDtos = mssi.Perm_Sis |> Array.map Perm_SiDto.fromDomain
-        { Id = %mssi.Id
-          Width = %mssi.SortingWidth
-          Perm_SiDtos = mssiDtos }
+    let toMssiDto (mssi: Mssi) : mssiDto =
+        let mssiDtos = mssi.Perm_Sis |> Array.map PermSiDto.fromDomain
+        { id = %mssi.Id
+          sortingWidth = %mssi.SortingWidth
+          permSiDtos = mssiDtos }
 
-    let toMssi (mssiDto: MssiDto) : Result<Mssi, MssiDtoError> =
+    let toMssi (mssiDto: mssiDto) : Result<Mssi, MssiDtoError> =
         try
-            let perm_SisR = mssiDto.Perm_SiDtos |> Array.map (Perm_SiDto.toDomain)
+            let perm_SisR = mssiDto.permSiDtos |> Array.map (PermSiDto.toDomain)
             let perm_Sis =
                 perm_SisR 
                 |> Array.map (function
                     | Ok ps -> ps
                     | Error e -> raise (ArgumentException(sprintf "Error converting Perm_SiDto: %A" e)))
             let mssi = GeneSort.Model.Sorter.Si.Mssi.create
-                            (UMX.tag<sorterModelID> mssiDto.Id)
-                            (UMX.tag<sortingWidth> mssiDto.Width)
+                            (UMX.tag<sorterModelID> mssiDto.id)
+                            (UMX.tag<sortingWidth> mssiDto.sortingWidth)
                             perm_Sis
             Ok mssi
         with

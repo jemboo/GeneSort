@@ -22,7 +22,7 @@ type stageSequence =
 
         member this.Stages with get() = this.stages.ToArray()
 
-        member this.StageCount with get() = this.stages.Count |> UMX.tag<stageLength>
+        member this.StageLength with get() = this.stages.Count |> UMX.tag<stageLength>
 
 
         member this.AddCe (ce: ce) =

@@ -17,8 +17,8 @@ type MsrsRandMutateTests() =
         Perm_Rs.create arr
 
     // Helper to create a Model_Rs
-    let createModelRs (id: Guid<sorterModelID>) (width: int<sortingWidth>) (permRss: Perm_Rs array) : Msrs =
-        Msrs.create id width permRss
+    let createModelRs (id: Guid<sorterModelID>) (width: int<sortingWidth>) (permRss: Perm_Rs array) : msrs =
+        msrs.create id width permRss
 
     // Helper to check if a permutation is self-inverse
     let isSelfInverse (perm: Perm_Rs) : bool =
@@ -37,12 +37,12 @@ type MsrsRandMutateTests() =
         let modelRs = createModelRs id width permRss
         let opsActionRates = OpsActionRates.create (0.0, 0.0, 0.0) // NoActionRate = 1.0
         let ratesArray = OpsActionRatesArray.create [| opsActionRates; opsActionRates |]
-        let modelRsMutate = MsrsRandMutate.create rngType.Lcg modelRs ratesArray
+        let modelRsMutate = msrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick NoAction
         let result = modelRsMutate.MakeSorterModel randoGen 0
         Assert.Equal(width, result.SortingWidth)
-        Assert.Equal(2<stageLength>, result.StageCount)
+        Assert.Equal(2<stageLength>, result.StageLength)
         Assert.Equal<Perm_Rs array>(permRss, result.Perm_Rss)
 
     [<Fact>]
@@ -54,12 +54,12 @@ type MsrsRandMutateTests() =
         let modelRs = createModelRs id width permRss
         let opsActionRates = OpsActionRates.create (0.0, 0.0, 1.0) // SelfSymRate = 1.0
         let ratesArray = OpsActionRatesArray.create [| opsActionRates; opsActionRates |]
-        let modelRsMutate = MsrsRandMutate.create rngType.Lcg modelRs ratesArray
+        let modelRsMutate = msrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick SelfSym
         let result = modelRsMutate.MakeSorterModel randoGen 0
         Assert.Equal(width, result.SortingWidth)
-        Assert.Equal(2<stageLength>, result.StageCount)
+        Assert.Equal(2<stageLength>, result.StageLength)
         Assert.Equal<Perm_Rs array>(expectedPermRss, result.Perm_Rss)
         Assert.True(result.Perm_Rss |> Array.forall isSelfInverse)
 
@@ -72,12 +72,12 @@ type MsrsRandMutateTests() =
         let modelRs = createModelRs id width permRss
         let opsActionRates = OpsActionRates.create (1.0, 0.0, 0.0) // OrthoRate = 1.0
         let ratesArray = OpsActionRatesArray.create [| opsActionRates; opsActionRates |]
-        let modelRsMutate = MsrsRandMutate.create rngType.Lcg modelRs ratesArray
+        let modelRsMutate = msrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick Ortho
         let result = modelRsMutate.MakeSorterModel randoGen 0
         Assert.Equal(width, result.SortingWidth)
-        Assert.Equal(2<stageLength>, result.StageCount)
+        Assert.Equal(2<stageLength>, result.StageLength)
         Assert.Equal<Perm_Rs array>(expectedPermRss, result.Perm_Rss)
         Assert.True(result.Perm_Rss |> Array.forall isSelfInverse)
 
@@ -90,12 +90,12 @@ type MsrsRandMutateTests() =
         let modelRs = createModelRs id width permRss
         let opsActionRates = OpsActionRates.create (0.0, 1.0, 0.0) // ParaRate = 1.0
         let ratesArray = OpsActionRatesArray.create [| opsActionRates; opsActionRates |]
-        let modelRsMutate = MsrsRandMutate.create rngType.Lcg modelRs ratesArray
+        let modelRsMutate = msrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick Para
         let result = modelRsMutate.MakeSorterModel randoGen 0
         Assert.Equal(width, result.SortingWidth)
-        Assert.Equal(2<stageLength>, result.StageCount)
+        Assert.Equal(2<stageLength>, result.StageLength)
         Assert.Equal<Perm_Rs array>(expectedPermRss, result.Perm_Rss)
         Assert.True(result.Perm_Rss |> Array.forall isSelfInverse)
 
@@ -108,13 +108,13 @@ type MsrsRandMutateTests() =
         let opsActionRates1 = OpsActionRates.create (0.0, 0.0, 1.0) // SelfSymRate = 1.0
         let opsActionRates2 = OpsActionRates.create (0.0, 1.0, 0.0) // ParaRate = 1.0
         let ratesArray = OpsActionRatesArray.create [| opsActionRates1; opsActionRates2 |]
-        let modelRsMutate = MsrsRandMutate.create rngType.Lcg modelRs ratesArray
+        let modelRsMutate = msrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Picks SelfSym for first, Para for second
         let result = modelRsMutate.MakeSorterModel randoGen 0
         let expectedPermRss = [| [| 3; 2; 1; 0 |]; [| 2; 3; 0; 1 |] |] |> Array.map createPermRs
         Assert.Equal(width, result.SortingWidth)
-        Assert.Equal(2<stageLength>, result.StageCount)
+        Assert.Equal(2<stageLength>, result.StageLength)
         Assert.Equal<Perm_Rs array>(expectedPermRss, result.Perm_Rss)
         Assert.True(result.Perm_Rss |> Array.forall isSelfInverse)
 
@@ -127,7 +127,7 @@ type MsrsRandMutateTests() =
         let opsActionRates = OpsActionRates.create (0.0, 0.0, 0.0)
         let ratesArray = OpsActionRatesArray.create [| opsActionRates; opsActionRates |] // Length = 2
         Assert.ThrowsAny<exn>(fun () ->
-            MsrsRandMutate.create rngType.Lcg modelRs ratesArray|> ignore
+            msrsRandMutate.create rngType.Lcg modelRs ratesArray|> ignore
         )
 
     [<Fact>]
@@ -138,7 +138,7 @@ type MsrsRandMutateTests() =
         let modelRs = createModelRs id width permRss
         let opsActionRates = OpsActionRates.create (0.0, 0.0, 0.0) // NoActionRate = 1.0
         let ratesArray = OpsActionRatesArray.create [| opsActionRates |]
-        let modelRsMutate = MsrsRandMutate.create rngType.Lcg modelRs ratesArray
+        let modelRsMutate = msrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1 ] [ 0.9 ]
         let result = modelRsMutate.MakeSorterModel randoGen 0
