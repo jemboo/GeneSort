@@ -1,13 +1,15 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace GeneSort.UI.Models
 {
-    public class ProjectModel
+    public partial class ProjectModel : ObservableObject
     {
-        public string ProjectFolder { get; set; } = string.Empty;
+        [ObservableProperty]
+        private string? projectFolder;
     }
 }
