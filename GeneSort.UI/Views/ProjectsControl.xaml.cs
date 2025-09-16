@@ -1,4 +1,8 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -8,20 +12,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using GeneSort.UI.ViewModels;
-using GeneSort.UI.ViewModels.GeneSort.UI.ViewModels;
 
 namespace GeneSort.UI.Views
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for ProjectsControl.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class ProjectsControl : UserControl
     {
-        public MainWindow()
+        public ProjectsControl()
         {
             InitializeComponent();
-            DataContext = new MainWindowVm();
         }
     }
 }
