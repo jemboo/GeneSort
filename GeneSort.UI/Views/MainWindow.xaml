@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GeneSort.UI.Views"
         xmlns:vm="clr-namespace:GeneSort.UI.ViewModels"
+        xmlns:converters="clr-namespace:GeneSort.UI.Converters"
         mc:Ignorable="d"
-        Title="GeneSort - Main Window" Height="450" Width="800"
+        Title="GeneSort - Main Window" Height="750" Width="800"
         WindowStyle="SingleBorderWindow"
         ResizeMode="CanResize"
         Background="#F5F5F5">
@@ -26,12 +27,21 @@
 
             <!-- TabControl Item and Content Templates -->
             <DataTemplate x:Key="TabHeaderTemplate">
-                <TextBlock Text="{Binding Header}" FontWeight="SemiBold" Margin="8,4"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Header}" FontWeight="SemiBold" Margin="8,4,0,0" VerticalAlignment="Center"/>
+                    <Button Content="×" 
+                            Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType=TabControl}}" 
+                            CommandParameter="{Binding}"
+                            Style="{StaticResource CloseButtonStyle}"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding Header, Converter={x:Static converters:StringToVisibilityConverter.Instance}, ConverterParameter=Projects}"/>
+                </StackPanel>
             </DataTemplate>
             <DataTemplate x:Key="TabContentTemplate">
                 <ContentControl Content="{Binding ContentVm}"/>
             </DataTemplate>
         </ResourceDictionary>
+        
     </Window.Resources>
     <Grid Margin="20">
         <TabControl ItemsSource="{Binding Tabs}"

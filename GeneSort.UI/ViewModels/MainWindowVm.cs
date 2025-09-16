@@ -44,6 +44,15 @@ namespace GeneSort.UI.ViewModels
                 };
                 Tabs.Add(expTab);
             }
+
+            [RelayCommand]
+            private void CloseTab(TabViewModel tab)
+            {
+                if (tab.Header != "Projects")
+                {
+                    Tabs.Remove(tab);
+                }
+            }
         }
     }
 

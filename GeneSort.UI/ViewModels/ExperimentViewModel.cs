@@ -1,5 +1,6 @@
 ﻿
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using GeneSort.UI.Models;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -55,6 +56,12 @@ namespace GeneSort.UI.ViewModels
                 FileTabs.Add(newTab);
                 SelectedFileTab = newTab;
             }
+        }
+
+        [RelayCommand]
+        private void CloseFileTab(TabViewModel tab)
+        {
+            FileTabs.Remove(tab);
         }
 
         private ExperimentDirectoryItem LoadDirectory(string path)
