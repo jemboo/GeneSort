@@ -1,9 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GeneSort.UI.Models;
 using Ookii.Dialogs.Wpf;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 
 namespace GeneSort.UI.ViewModels
 {
