@@ -29,17 +29,21 @@ namespace GeneSort.UI.ViewModels
             }
 
             [RelayCommand]
-            private void OpenExperiment(string? experimentName)
+            private void OpenExperiment(ExperimentInfoViewModel? experimentInfo)
             {
-                if (string.IsNullOrEmpty(experimentName))
+                if (experimentInfo == null || string.IsNullOrEmpty(Projects.ProjectFolder))
                 {
                     return;
                 }
 
-                var expVm = new ExperimentViewModel { ExperimentName = experimentName };
+                var expVm = new ExperimentViewModel
+                {
+                    ExperimentName = experimentInfo.Name,
+                    ExperimentPath = experimentInfo.FullPath
+                };
                 var expTab = new TabViewModel
                 {
-                    Header = experimentName,
+                    Header = experimentInfo.Name,
                     ContentVm = expVm
                 };
                 Tabs.Add(expTab);

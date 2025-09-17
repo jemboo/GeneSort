@@ -18,10 +18,10 @@ namespace GeneSort.UI.ViewModels
         private string? projectFolder;
 
         [ObservableProperty]
-        private ObservableCollection<string>? experiments = new();
+        private ObservableCollection<ExperimentInfoViewModel>? experiments = new();
 
         [ObservableProperty]
-        private string? selectedExperiment;
+        private ExperimentInfoViewModel? selectedExperiment;
 
         partial void OnProjectFolderChanged(string? value)
         {
@@ -39,11 +39,17 @@ namespace GeneSort.UI.ViewModels
             try
             {
                 var directories = Directory.GetDirectories(ProjectFolder);
-                foreach (var dir in directories)
+                foreach (var dir in directories.OrderBy(d => Path.GetFileName(d)))
                 {
-                    Experiments.Add(Path.GetFileName(dir));
+                    Experiments.Add(new ExperimentInfoViewModel
+                    {
+                        Name = Path.GetFileName(dir),
+                        FullPath = dir,
+                        Description = string.Empty // TODO: Load from metadata if available
+                    });
                 }
             }
+
             catch (Exception)
             {
                 // Handle directory access errors if needed

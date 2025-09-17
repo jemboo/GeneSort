@@ -71,7 +71,29 @@
                              ItemsSource="{Binding Experiments}"
                              SelectedItem="{Binding SelectedExperiment, Mode=TwoWay}"
                              Style="{StaticResource ModernListBox}"
-                             Margin="0,0,0,16"/>
+                             Margin="0,0,0,16">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,2">
+                                    <TextBlock Text="{Binding Name}"
+                                               FontWeight="Bold"
+                                               FontSize="14"
+                                               Foreground="#333333"/>
+                                    <TextBlock Text="{Binding Description}"
+                                               FontSize="12"
+                                               Foreground="#666666"
+                                               TextWrapping="Wrap"
+                                               Margin="0,2,0,0"/>
+                                    <TextBlock Text="{Binding FullPath}"
+                                               FontSize="10"
+                                               Foreground="#999999"
+                                               TextWrapping="Wrap"
+                                               Margin="0,2,0,0"
+                                               ToolTip="{Binding FullPath}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
 
                     <!-- Open Experiment Button -->
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
