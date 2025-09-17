@@ -65,7 +65,7 @@ module Exp4 =
     let parameterSet = 
         [ SwMerge.exp4Vals(); SorterModelKey.allButMusf6Kvps(); ("SortableArrayType", ["Ints"]) ]
 
-    let workspace = Workspace.create "Exp4a" "Exp4 descr" projectDir parameterSet
+    let workspace = Workspace.create "Exp4a" "Exp4 descr" projectDir parameterSet (fun s -> Some s)
 
 
     let executor (workspace: workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
@@ -137,8 +137,8 @@ module Exp4 =
                                 let sorterSetEval = SorterSetEvalDto.toDomain ssEvalDto  
                                                                 
                                 let runParams = OutputData.getRunParametersForOutputDataPath ssEvalPath
-                                let sorterModelKey = runParams[Run.sorterModelTypeKey]
-                                let swFull = runParams[Run.sortingWidthKey]
+                                let sorterModelKey = // runParams[Run.sorterModelTypeKey]
+                                let swFull = // runParams[Run.sortingWidthKey]
                                 let cycle = runParams[Run.cycleKey]
                                 let sortableArrayType = runParams[Run.sortableArrayTypeKey]
 

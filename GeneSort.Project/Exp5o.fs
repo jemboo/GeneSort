@@ -34,7 +34,7 @@ module Exp5 =
     let parameterSet = 
         [ SwMerge.exp5Vals(); ("SortableArrayType", ["Ints"]); ("SorterModel", ["Msuf4"]) ]
 
-    let workspace = Workspace.create "Exp5" "Exp5 descr" projectDir parameterSet
+    let workspace = Workspace.create "Exp5" "Exp5 descr" projectDir parameterSet (fun s -> Some s)
 
 
     let executor (workspace: workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =

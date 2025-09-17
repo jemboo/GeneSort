@@ -10,11 +10,11 @@ open MessagePack.Resolvers
 
 
 [<MessagePackObject>]
-type RunDto = 
+type runDto = 
     { 
-      [<Key("0")>] Index: int
-      [<Key("1")>] Cycle: int
-      [<Key("2")>] Properties: Map<string, string>
+      [<Key("0")>] index: int
+      [<Key("1")>] cycle: int
+      [<Key("2")>] runParametersDto: runParametersDto
     }
 
 module RunDto =
@@ -22,12 +22,10 @@ module RunDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
     // Convert Run to a Dto for serialization
-    let toRunDto (run: Run) : RunDto =
-        { Index = run.Index
-          Cycle = %run.Cycle
-          Properties = run.Parameters }
+    let toRunDto (run: run) : runDto =
+        { index = run.Index
+          cycle = %run.Cycle
+          runParametersDto = run.RunParameters |> RunParametersDto.toRunParametersDto }
 
-    let fromDto (dto: RunDto) : Run =
-        { Index = dto.Index
-          Cycle = dto.Cycle |> UMX.tag<cycleNumber>
-          Parameters = dto.Properties }
+    let fromDto (dto: runDto) : run =
+        run.create dto.index (dto.cycle |> UMX.tag<cycleNumber>) (RunParametersDto.fromDto dto.runParametersDto)

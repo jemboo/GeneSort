@@ -6,7 +6,7 @@ printfn $"***************** {System.DateTime.Now.ToString()}"
 
 
 //RandomSortersProject.RunAll4()
-RandomSortersProject.RunAll6()
+//RandomSorters4n6Project.RunAll6()
 //PermutationOrbitsProject.RunAll()
 //PermutationOrbitsProject.RunPermuationOrbitCountReport()
 

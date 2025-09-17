@@ -2,16 +2,15 @@
 namespace GeneSort.Project
 
 open System.IO
-open GeneSort.Core.Combinatorics
 open System.Threading.Tasks
 
 
 module WorkspaceOps =  
 
     /// Returns a sequence of Runs made from all possible parameter combinations
-    let getRuns (workspace: workspace) (cycle: int<cycleNumber>) : Run seq =
-        workspace.ParamMapArray 
-        |> Seq.mapi (fun i paramsMap -> { Index = i; Cycle = cycle; Parameters = paramsMap })
+    let getRuns (workspace: workspace) (cycle: int<cycleNumber>) : run seq =
+        workspace.RunParametersArray 
+        |> Seq.mapi (fun i paramsMap -> run.create i cycle paramsMap )
 
     /// Executes async computations in parallel, limited to maxDegreeOfParallelism at a time
     let private ParallelWithThrottle (maxDegreeOfParallelism: int) (computations: seq<Async<unit>>) : Async<unit> =
@@ -40,11 +39,19 @@ module WorkspaceOps =
                 (workspace: workspace) 
                 (cycle: int<cycleNumber>)
                 (maxDegreeOfParallelism: int) 
-                (executor: workspace -> int<cycleNumber> -> Run -> Async<unit>)
+                (executor: workspace -> int<cycleNumber> -> run -> Async<unit>)
                 : unit =
+
         let runs = getRuns workspace cycle
-        let executeRun (run:Run) = async {
-            let filePathRun = OutputData.getOutputFileName workspace.WorkspaceFolder run.Index run.Cycle (outputDataType.Run |> OutputDataType.toString)
+
+        let executeRun (run:run) = async {
+
+            let filePathRun = OutputData.getOutputFileName 
+                                workspace.WorkspaceFolder
+                                run.Index 
+                                run.Cycle 
+                                (outputDataType.Run |> OutputDataType.toString)
+
             if File.Exists filePathRun then
                         printfn "Skipping Run %d: Output file %s already exists" run.Index filePathRun
             else

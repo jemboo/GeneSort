@@ -13,6 +13,8 @@
     <Compile Include="Params\StageLength.fs" />
     <Compile Include="Params\SorterModelKey.fs" />
     <Compile Include="Params\SorterTestModelKey.fs" />
+    <Compile Include="RunParameters.fs" />
+    <Compile Include="RunParametersDto.fs" />
     <Compile Include="Run.fs" />
     <Compile Include="RunDto.fs" />
     <Compile Include="Workspace.fs" />
@@ -21,9 +23,6 @@
     <Compile Include="WorkspaceOps.fs" />
     <Compile Include="RandomSortersProject.fs" />
     <Compile Include="PermutationOrbitsProject.fs" />
-    <Compile Include="Exp3o.fs" />
-    <Compile Include="Exp4o.fs" />
-    <Compile Include="Exp5o.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

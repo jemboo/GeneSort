@@ -31,20 +31,20 @@ module PermutationOrbitsProject =
         [4; 8; 16; 32; 64; 128; 256; 512; 1024] |> List.map(fun d -> d.ToString())
 
     let sortingWidths() : string*string list =
-        (Run.sortingWidthKey, sortingWidthValues)
+        (runParameters.sortingWidthKey, sortingWidthValues)
 
     let parameterSet = 
         [ sortingWidths(); ]
 
-    let workspace = Workspace.create experimentName experimentDesc projectDir parameterSet
+    let workspace = Workspace.create experimentName experimentDesc projectDir parameterSet (fun s -> Some s)
 
-    let executor (workspace: workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
+    let executor (workspace: workspace) (cycle: int<cycleNumber>) (run: run) : Async<unit> =
         async {
             try
-                Console.WriteLine(sprintf "Executing Run %d   %A" run.Index run.Parameters)
-                Run.setCycle run cycle
+                Console.WriteLine(sprintf "Executing Run %d   %s" run.Index (run.RunParameters.toString()))
+                run.RunParameters.SetCycle cycle
 
-                let sortingWidth = run |> Run.getSortingWidth
+                let sortingWidth = run.RunParameters.GetSortingWidth()
 
                 let firstIndex = (%cycle * %testModelCount) |> UMX.tag<sorterTestModelCount>
                 let sorterTestModelGen = MsasORandGen.create randomType sortingWidth maxOrbiit |> SorterTestModelGen.MsasORandGen
@@ -95,7 +95,7 @@ module PermutationOrbitsProject =
                                 let sorterTestSet = sorterTestModelSet.makeSortableTestSet sortableArrayType
 
                                 let runParams = OutputData.getRunParametersForOutputDataPath filePath
-                                let cycle = runParams[Run.cycleKey]
+                                let cycle = runParams.GetCycle()
 
                                 let sortableIntTestSet =
                                     match sorterTestSet with
@@ -107,7 +107,7 @@ module PermutationOrbitsProject =
                                         fun sorterTest ->
                                             (%sorterTest.Id, 
                                              %(sorterTestSet |> SortableTestset.getSortingWidth), 
-                                             cycle, 
+                                             (%cycle.ToString()), 
                                              sorterTest.Count))
 
                                 sortableTestData

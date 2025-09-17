@@ -94,13 +94,13 @@ module Exp3 =
         [4; 8; 16; 32; 64] |> List.map(fun d -> d.ToString()) 
 
     let sortingWidths4() : string*string list =
-        (Run.sortingWidthKey, sortingWidthValues4)
+        (runParameters.sortingWidthKey , sortingWidthValues4)
         
     let sortingWidthValues6 = 
         [6; 12; 24; 48; 96] |> List.map(fun d -> d.ToString())
 
     let sortingWidths6() : string*string list =
-        (Run.sortingWidthKey, sortingWidthValues6)
+        (runParameters.sortingWidthKey, sortingWidthValues6)
 
 
     let sorterModelKeyValues4 () : string list =
@@ -110,7 +110,7 @@ module Exp3 =
           sorterModelKey.Msuf4; ]      |> List.map(SorterModelKey.toString)
 
     let sorterModelKeys4 () : string*string list =
-        (Run.sorterModelTypeKey, sorterModelKeyValues4() )
+        (runParameters.sorterModelTypeKey, sorterModelKeyValues4() )
 
     let sorterModelKeyValues6 () : string list =
         [ sorterModelKey.Mcse; 
@@ -119,7 +119,7 @@ module Exp3 =
           sorterModelKey.Msuf6; ]      |> List.map(SorterModelKey.toString)
 
     let sorterModelKeys6 () : string*string list =
-        (Run.sorterModelTypeKey, sorterModelKeyValues6() )
+        (runParameters.sorterModelTypeKey, sorterModelKeyValues6() )
 
 
     let parameterSet4 = 
@@ -134,19 +134,19 @@ module Exp3 =
                 "Exp3 descr" 
                 projectDir 
                 parameterSet4
+                (fun s -> Some s)
 
     let workspace6 = Workspace.create experimentName6 experimentDesc6 projectDir parameterSet6
 
 
-    let executor (workspace: workspace) (cycle: int<cycleNumber>) (run: Run) : Async<unit> =
+    let executor (workspace: workspace) (cycle: int<cycleNumber>) (run: run) : Async<unit> =
         async {
 
-            Console.WriteLine(sprintf "Executing Run %d  Cycle %d  %A" run.Index %cycle run.Parameters)
-            Run.setCycle run cycle
+            Console.WriteLine(sprintf "Executing Run %d  Cycle %d  %s" run.Index %cycle (run.RunParameters.toString()))
+            run.RunParameters.SetCycle cycle
 
-            let sorterModelKey = (run.Parameters["SorterModel"]) |> SorterModelKey.fromString
-            let swFull = (run.Parameters["SortingWidth"]) |> SwFull.fromString
-            let sortingWidth = swFull |> SwFull.toSortingWidth
+            let sorterModelKey = run.RunParameters.GetSorterModelKey()
+            let sortingWidth = run.RunParameters.GetSortingWidth()
             let ceLength = getCeLengthForSortingWidth sortingWidth
             
             let stageLength = getStageLengthForSortingWidth sortingWidth
@@ -161,7 +161,8 @@ module Exp3 =
                 | sorterModelKey.Msuf4 -> (msuf4RandGen.create randomType sortingWidth stageLength uf4GenRatesArray) |> sorterModelMaker.SmmMsuf4RandGen
                 | sorterModelKey.Msuf6 -> failwith "Msuf6 not supported in this experiment"
 
-            let sorterCount = swFull |> SorterCount.getSorterCountForSwFull
+            let cycleFactor = if (%cycle = 0) then 1 else 10
+            let sorterCount = getSorterCountForSortingWidth cycleFactor sortingWidth
             let firstIndex = (%cycle * %sorterCount) |> UMX.tag<sorterCount>
             
             let sorterModelSetMaker = sorterModelSetMaker.create modelMaker firstIndex sorterCount
@@ -208,8 +209,8 @@ module Exp3 =
                                 let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
 
                                 let runParams = OutputData.getRunParametersForOutputDataPath ssEvalPath
-                                let sorterModelKey = runParams[Run.sorterModelTypeKey]
-                                let swFull = runParams[Run.sortingWidthKey]
+                                let sorterModelKey = runParams.GetSorterModelKey() |> SorterModelKey.toString
+                                let swFull = (%runParams.GetSortingWidth()).ToString()
 
                                 let prpt = SorterSetEvalBins.getBinCountReport sorterSetEvalBins
                                 let appended = prpt |> Array.map(fun aa -> (swFull, sorterModelKey, aa.[0], aa.[1], aa.[2], aa.[3]))
@@ -276,10 +277,10 @@ module Exp3 =
                                 let sorterSetCeUseProfile = SorterSetCeUseProfile.makeSorterSetCeUseProfile binCount blockGrowthRate sorterSetEval
   
                                 let runParams = OutputData.getRunParametersForOutputDataPath ssEvalPath
-                                let sorterModelKey = runParams[Run.sorterModelTypeKey]
-                                let swFull = runParams[Run.sortingWidthKey]
+                                let sorterModelKey =   runParams.GetSorterModelKey() 
+                                let swFull = runParams.GetSortingWidth() 
 
-                                let linePrefix = sprintf "%s \t %s" swFull sorterModelKey
+                                let linePrefix = sprintf "%s \t %s" (%swFull.ToString()) (sorterModelKey |> SorterModelKey.toString)
                                 SorterSetCeUseProfile.makeCsvLines linePrefix sorterSetCeUseProfile
                             with e ->
                                 failwith (sprintf "Error processing file %s: %s" ssEvalPath e.Message)

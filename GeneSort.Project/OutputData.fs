@@ -49,7 +49,7 @@ module OutputDataType =
 
 
 type outputData =
-    | Run of Run
+    | Run of run
     | SorterSet of sorterSet
     | SortableTestSet of sortableTestSet
     | SorterModelSetMaker of sorterModelSetMaker
@@ -147,15 +147,15 @@ module OutputData =
 
 
     let getRunParametersForOutputDataPath
-            (outputDataPath: string) =
+            (outputDataPath: string) : runParameters =
             let runPath = getRunFileNameForOutputDataFileName outputDataPath
             if not (File.Exists runPath) then
                 failwith (sprintf "Run file %s does not exist" runPath)
             try
                 use stream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                let dto = MessagePackSerializer.Deserialize<RunDto>(stream, options)
+                let dto = MessagePackSerializer.Deserialize<runDto>(stream, options)
                 let run = RunDto.fromDto dto
-                run.Parameters
+                run.RunParameters
             with e ->
                 failwith "Error reading Run file %s: %s" runPath e.Message
 
