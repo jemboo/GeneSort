@@ -21,7 +21,7 @@
     <Compile Include="WorkspaceDto.fs" />
     <Compile Include="OutputData.fs" />
     <Compile Include="WorkspaceOps.fs" />
-    <Compile Include="RandomSortersProject.fs" />
+    <Compile Include="RandomSorters4to64.fs" />
     <Compile Include="PermutationOrbitsProject.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

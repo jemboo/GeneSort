@@ -8,9 +8,11 @@ open System.Threading.Tasks
 module WorkspaceOps =  
 
     /// Returns a sequence of Runs made from all possible parameter combinations
-    let getRuns (workspace: workspace) (cycle: int<cycleNumber>) : run seq =
+    let getRuns (workspace: workspace) (repl: int<replNumber>) : run seq =
         workspace.RunParametersArray 
-        |> Seq.mapi (fun i paramsMap -> run.create i cycle paramsMap )
+        |> Seq.mapi (fun i runParams  -> 
+                        (runParams.SetRepl repl )
+                        run.create i repl runParams)
 
     /// Executes async computations in parallel, limited to maxDegreeOfParallelism at a time
     let private ParallelWithThrottle (maxDegreeOfParallelism: int) (computations: seq<Async<unit>>) : Async<unit> =
@@ -37,27 +39,27 @@ module WorkspaceOps =
     /// Skips runs if their output file already exists; saves runs to .msgpack files after execution
     let executeWorkspace 
                 (workspace: workspace) 
-                (cycle: int<cycleNumber>)
+                (repl: int<replNumber>)
                 (maxDegreeOfParallelism: int) 
-                (executor: workspace -> int<cycleNumber> -> run -> Async<unit>)
+                (executor: workspace -> int<replNumber> -> run -> Async<unit>)
                 : unit =
 
-        let runs = getRuns workspace cycle
+        let runs = getRuns workspace repl
 
         let executeRun (run:run) = async {
 
             let filePathRun = OutputData.getOutputFileName 
                                 workspace.WorkspaceFolder
                                 run.Index 
-                                run.Cycle 
-                                (outputDataType.Run |> OutputDataType.toString)
+                                run.Repl 
+                                (outputDataType.Run |> OutputDataType.toString) 
 
             if File.Exists filePathRun then
                         printfn "Skipping Run %d: Output file %s already exists" run.Index filePathRun
             else
                 try
-                    do! executor workspace cycle run
-                    do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (run |> outputData.Run)
+                    do! executor workspace repl run
+                    do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Repl (run |> outputData.Run)
                 with e ->
                     printfn "Error processing Run %d: %s" run.Index e.Message
         }

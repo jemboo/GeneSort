@@ -28,7 +28,7 @@ type outputDataType =
     | SortableTestModelSetMaker
     | SorterSetEval
     | SorterSetEvalBins
-   // | SorterSetCeUseProfile
+    | Workspace
 
 
      
@@ -44,8 +44,7 @@ module OutputDataType =
         | SortableTestModelSetMaker -> "SortableTestModelSetMaker"
         | SorterSetEval -> "SorterSetEval"
         | SorterSetEvalBins -> "SorterSetEvalBins"
-       // | SorterSetCeUseProfile -> "SorterSetCeUseProfile"
-        | _ -> failwith "Unknown OutputData type"
+        | Workspace -> "Workspace"
 
 
 type outputData =
@@ -57,7 +56,7 @@ type outputData =
     | SortableTestModelSetMaker of sortableTestModelSetMaker
     | SorterSetEval of sorterSetEval
     | SorterSetEvalBins of sorterSetEvalBins
-    //| SorterSetCeUseProfile of sorterSetCeUseProfile
+    | Workspace of workspace
 
 
      
@@ -73,7 +72,7 @@ module OutputData =
         | SortableTestModelSetMaker _ -> outputDataType.SortableTestModelSetMaker
         | SorterSetEval _ -> outputDataType.SorterSetEval
         | SorterSetEvalBins _ -> outputDataType.SorterSetEvalBins
-       // | SorterSetCeUseProfile _ -> outputDataType.SorterSetCeUseProfile
+        | Workspace _ -> outputDataType.Workspace
 
         /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
@@ -86,10 +85,10 @@ module OutputData =
         Path.Combine(workspace.WorkspaceFolder, outputDataType |> OutputDataType.toString)
 
     let getOutputFileName 
-                (folder:string) (index:int) (cycle: int<cycleNumber>) 
+                (folder:string) (index:int) (repl: int<replNumber>) 
                 (outputDataName: string) 
                 : string =
-        let fileName = sprintf "%s_%d_%d.msgpack" outputDataName %cycle index 
+        let fileName = sprintf "%s_%d_%d.msgpack" outputDataName %repl index 
         Path.Combine(folder, outputDataName, fileName)
 
 
@@ -97,19 +96,19 @@ module OutputData =
         let folder = Path.GetDirectoryName (Path.GetDirectoryName outputFilePath)
         let outputName = Path.GetFileName outputFilePath
         let pcs = outputName.Split('_')
-        let cycle = pcs.[1]
+        let repl = pcs.[1]
         let index = pcs.[2].Split('.').[0]
-        let fileName = sprintf "Run_%s_%s.msgpack" cycle index 
+        let fileName = sprintf "Run_%s_%s.msgpack" repl index 
         Path.Combine(folder, "Run", fileName)
 
 
     let saveToFile 
             (workspaceFolder: string) 
             (index: int) 
-            (cycle: int<cycleNumber>) 
+            (repl: int<replNumber>) 
             (outputData: outputData) : Async<unit> =
         async {
-            let filePath = getOutputFileName workspaceFolder index cycle (outputData |> getOutputDataType |> OutputDataType.toString)
+            let filePath = getOutputFileName workspaceFolder index repl (outputData |> getOutputDataType |> OutputDataType.toString)
             let directory = Path.GetDirectoryName filePath
             Directory.CreateDirectory directory |> ignore
             try
@@ -138,6 +137,9 @@ module OutputData =
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterSetEvalBins sse ->
                     let dto = SorterSetEvalBinsDto.fromDomain sse
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | Workspace w ->
+                    let dto = WorkspaceDto.toWorkspaceDto w
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
 
             with e ->

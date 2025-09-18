@@ -13,7 +13,7 @@ open MessagePack.Resolvers
 type runDto = 
     { 
       [<Key("0")>] index: int
-      [<Key("1")>] cycle: int
+      [<Key("1")>] repl: int
       [<Key("2")>] runParametersDto: runParametersDto
     }
 
@@ -24,8 +24,8 @@ module RunDto =
     // Convert Run to a Dto for serialization
     let toRunDto (run: run) : runDto =
         { index = run.Index
-          cycle = %run.Cycle
+          repl = %run.Repl
           runParametersDto = run.RunParameters |> RunParametersDto.toRunParametersDto }
 
     let fromDto (dto: runDto) : run =
-        run.create dto.index (dto.cycle |> UMX.tag<cycleNumber>) (RunParametersDto.fromDto dto.runParametersDto)
+        run.create dto.index (dto.repl |> UMX.tag<replNumber>) (RunParametersDto.fromDto dto.runParametersDto)

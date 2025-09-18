@@ -38,28 +38,28 @@ module PermutationOrbitsProject =
 
     let workspace = Workspace.create experimentName experimentDesc projectDir parameterSet (fun s -> Some s)
 
-    let executor (workspace: workspace) (cycle: int<cycleNumber>) (run: run) : Async<unit> =
+    let executor (workspace: workspace) (repl: int<replNumber>) (run: run) : Async<unit> =
         async {
             try
                 Console.WriteLine(sprintf "Executing Run %d   %s" run.Index (run.RunParameters.toString()))
-                run.RunParameters.SetCycle cycle
+                run.RunParameters.SetRepl repl
 
                 let sortingWidth = run.RunParameters.GetSortingWidth()
 
-                let firstIndex = (%cycle * %testModelCount) |> UMX.tag<sorterTestModelCount>
+                let firstIndex = (%repl * %testModelCount) |> UMX.tag<sorterTestModelCount>
                 let sorterTestModelGen = MsasORandGen.create randomType sortingWidth maxOrbiit |> SorterTestModelGen.MsasORandGen
                 let sorterTestModelSetMaker = sortableTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
                 let sorterTestModelSet = sorterTestModelSetMaker.MakeSortableTestModelSet
                 //let sorterTestSet = sorterTestModelSet.makeSortableTestSet sortableArrayType
-                //do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterTestSet |> outputData.SortableTestSet)
-                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle 
+                //do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Repl (sorterTestSet |> outputData.SortableTestSet)
+                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Repl 
                                           (sorterTestModelSet |> outputData.SortableTestModelSet)
-                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle 
+                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Repl 
                                           (sorterTestModelSetMaker |> outputData.SortableTestModelSetMaker)
 
-                Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %cycle)
+                Console.WriteLine(sprintf "Finished executing Run %d  Repl  %d \n" run.Index %repl)
             with ex ->
-                Console.WriteLine(sprintf "Error in Run %d, Cycle %d: %s" run.Index %cycle ex.Message)
+                Console.WriteLine(sprintf "Error in Run %d, Repl %d: %s" run.Index %repl ex.Message)
                 raise ex
         }
 
@@ -95,7 +95,7 @@ module PermutationOrbitsProject =
                                 let sorterTestSet = sorterTestModelSet.makeSortableTestSet sortableArrayType
 
                                 let runParams = OutputData.getRunParametersForOutputDataPath filePath
-                                let cycle = runParams.GetCycle()
+                                let repl = runParams.GetRepl()
 
                                 let sortableIntTestSet =
                                     match sorterTestSet with
@@ -107,7 +107,7 @@ module PermutationOrbitsProject =
                                         fun sorterTest ->
                                             (%sorterTest.Id, 
                                              %(sorterTestSet |> SortableTestset.getSortingWidth), 
-                                             (%cycle.ToString()), 
+                                             (%repl.ToString()), 
                                              sorterTest.Count))
 
                                 sortableTestData
@@ -123,11 +123,11 @@ module PermutationOrbitsProject =
                       sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                       sprintf "Workspace: %s" workspace.WorkspaceFolder
                       ""
-                      "Id\t Sorting\t Width\t Cycle\t Count"
+                      "Id\t Sorting\t Width\t Repl\t Count"
                     ]
                     @ (summaries
-                       |> List.map (fun (id, sortingWidth, cycle, count) ->
-                           sprintf "%s \t%d \t%s \t%d" (id.ToString()) sortingWidth cycle count))
+                       |> List.map (fun (id, sortingWidth, repl, count) ->
+                           sprintf "%s \t%d \t%s \t%d" (id.ToString()) sortingWidth repl count))
                     |> String.concat "\n"
 
 
@@ -149,8 +149,8 @@ module PermutationOrbitsProject =
 
     let RunAll() =
         for i in 0 .. 0 do
-            let cycle = i |> UMX.tag<cycleNumber>
-            WorkspaceOps.executeWorkspace workspace cycle 6 executor
+            let repl = i |> UMX.tag<replNumber>
+            WorkspaceOps.executeWorkspace workspace repl 6 executor
 
 
 

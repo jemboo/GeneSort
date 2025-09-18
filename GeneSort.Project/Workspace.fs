@@ -42,15 +42,15 @@ module Workspace =
             (description: string) 
             (rootDirectory: string) 
             (parameterSpans: (string * string list) list) 
-            (paramRefiner: Map<string, string> -> Map<string, string> option)        
+            (paramRefiner: runParameters -> runParameters option)        
              : workspace =
 
         let refinedParameters = 
             parameterSpans |> Combinatorics.cartesianProductMaps
+                           |> Seq.map (fun paramMap -> runParameters.create paramMap)
                            |> Seq.map (paramRefiner)
                            |> Seq.choose id
                            |> Seq.toArray
-                           |> Array.map (fun paramMap -> runParameters.create paramMap)
         workspace.create 
                 name 
                 description 

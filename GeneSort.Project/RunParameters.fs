@@ -6,7 +6,7 @@ open GeneSort.Project.Params
 open FSharp.UMX
 open GeneSort.Sorter.Sortable
 
-[<Measure>] type cycleNumber
+[<Measure>] type replNumber
 
 
 type runParameters =
@@ -17,7 +17,7 @@ type runParameters =
         { paramMap = paramMap }
 
     /// Keys for parameters (internal)
-    static member cycleKey = "Cycle"
+    static member replKey = "Repl"
     static member maxOrbitKey = "MaxOrbit" // Corrected from "MaxOrbiit"
     static member sorterCountKey = "SorterCount"
     static member sorterModelTypeKey = "SorterModelType"
@@ -34,18 +34,18 @@ type runParameters =
         |> List.map (fun (k, v) -> sprintf "%s: %s" k v)
         |> String.concat ", "
 
-    /// Gets the Cycle value.
-    member this.GetCycle() : int<cycleNumber> =
-        match this.paramMap.TryFind runParameters.cycleKey with
+    /// Gets the Repl value.
+    member this.GetRepl() : int<replNumber> =
+        match this.paramMap.TryFind runParameters.replKey with
         | Some value -> 
             match Int32.TryParse(value) with
-            | true, v -> LanguagePrimitives.Int32WithMeasure v |> UMX.tag<cycleNumber>
-            | false, _ -> failwith "Invalid Cycle value"
-        | None -> failwith "Cycle parameter not found"
+            | true, v -> LanguagePrimitives.Int32WithMeasure v |> UMX.tag<replNumber>
+            | false, _ -> failwith "Invalid Repl value"
+        | None -> failwith "Repl parameter not found"
 
-    /// Sets the Cycle value.
-    member this.SetCycle(cycle: int<cycleNumber>) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.cycleKey, (UMX.untag cycle).ToString())
+    /// Sets the Repl value.
+    member this.SetRepl(repl: int<replNumber>) : unit =
+        this.paramMap <- this.paramMap.Add(runParameters.replKey, (UMX.untag repl).ToString())
 
     /// Gets the SortableArrayType value.
     member this.GetSortableArrayType() : sortableArrayType =

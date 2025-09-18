@@ -16,14 +16,11 @@ open GeneSort.Model.Sorter.Rs
 open GeneSort.Model.Sorter.Uf6
 
 
-module RandomSortersProject =
+module RandomSorters4to64 =
 
     let projectDir = "c:\Projects"
-    let experimentName4 = "RandomSorters4"
-    let experimentDesc4 = "RandomSorters with SortingWidth divisibe by 4"
-
-    let experimentName6 = "RandomSorters6"
-    let experimentDesc6 = "RandomSorters with SortingWidth divisibe by 6"
+    let experimentName = "RandomSorters4to64"
+    let experimentDesc = "RandomSorters with SortingWidth from 4 to 64"
 
     let randomType = rngType.Lcg
     let excludeSelfCe = true
@@ -92,21 +89,38 @@ module RandomSortersProject =
         (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
 
 
-    let mapRefiner (raw: Map<string, string>) = 
-        
-        None
+    let paramMapRefiner (runParameters: runParameters) = 
+        let sorterModelKey = runParameters.GetSorterModelKey()
+        let sortingWidth = %runParameters.GetSortingWidth()
+        let has3factor = (sortingWidth % 3 = 0)
+
+
+
+        match sorterModelKey with
+        | sorterModelKey.Mcse -> Some runParameters
+        | sorterModelKey.Mssi -> Some runParameters
+        | sorterModelKey.Msrs -> Some runParameters
+        | sorterModelKey.Msuf4 ->
+                if has3factor then None else
+                Some runParameters
+        | sorterModelKey.Msuf6 -> 
+                if has3factor then Some runParameters else
+                None
+
+
 
     let parameterSet = 
         [ sortingWidths(); sorterModelKeys() ]
 
-    let workspace = Workspace.create experimentName4 experimentDesc4 projectDir parameterSet (fun s -> Some s)
+
+    let workspace = Workspace.create experimentName experimentDesc projectDir parameterSet paramMapRefiner
 
 
-    let executor (workspace: workspace) (cycle: int<cycleNumber>) (run: run) : Async<unit> =
+    let executor (workspace: workspace) (repl: int<replNumber>) (run: run) : Async<unit> =
         async {
 
             Console.WriteLine(sprintf "Executing Run %d  %s" run.Index (run.RunParameters.toString()))
-            run.RunParameters.SetCycle cycle
+            run.RunParameters.SetRepl repl
 
             let sorterModelKey = run.RunParameters.GetSorterModelKey()
             let sortingWidth = run.RunParameters.GetSortingWidth()
@@ -131,25 +145,25 @@ module RandomSortersProject =
                     let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
                     (msuf6RandGen.create randomType sortingWidth stageLength uf6GenRatesArray) |> sorterModelMaker.SmmMsuf6RandGen
 
-            let cycleFactor = if (%cycle = 0) then 1 else 10
-            let sorterCount = sortingWidth |> getSorterCountForSortingWidth cycleFactor
+            let replFactor = if (%repl = 0) then 1 else 10
+            let sorterCount = sortingWidth |> getSorterCountForSortingWidth replFactor
             run.RunParameters.SetSorterCount sorterCount
 
-            let firstIndex = (%cycle * %sorterCount) |> UMX.tag<sorterCount>
+            let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
             
             let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 
-            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterSet |> outputData.SorterSet)
-            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Cycle (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Repl (sorterSet |> outputData.SorterSet)
+            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Repl (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
-            Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %cycle)
+            Console.WriteLine(sprintf "Finished executing Run %d  Repl  %d \n" run.Index %repl)
         }
 
 
     let RunAll() =
         for i in 0 .. 0 do
-            let cycle = i |> UMX.tag<cycleNumber>
-            WorkspaceOps.executeWorkspace workspace cycle 6 executor
+            let repl = i |> UMX.tag<replNumber>
+            WorkspaceOps.executeWorkspace workspace repl 6 executor
 
