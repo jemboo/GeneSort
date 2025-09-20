@@ -25,4 +25,5 @@ namespace GeneSort.UI.Converters
             throw new NotImplementedException();
         }
     }
+
 }

@@ -66,7 +66,7 @@ namespace GeneSort.UI.ViewModels
 
             if (dialog.ShowDialog() == true)
             {
-                project.ProjectFolder = dialog.SelectedPath;
+                Project.ProjectFolder = dialog.SelectedPath;
                 ProjectFolder = dialog.SelectedPath;
             }
         }

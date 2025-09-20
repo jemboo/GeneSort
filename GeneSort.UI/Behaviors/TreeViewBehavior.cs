@@ -17,11 +17,11 @@ namespace GeneSort.UI.Behaviors
         {
             if (sender is TreeView treeView)
             {
-                // Unsubscribe temporarily to avoid recursion
-                treeView.SelectedItemChanged -= OnTreeViewSelectedItemChanged;
+                // Unsubscribe temporarily to avoid recursion 
+              //  treeView.SelectedItemChanged -= OnTreeViewSelectedItemChanged;
 
                 // Subscribe
-                treeView.SelectedItemChanged += OnTreeViewSelectedItemChanged;
+              //  treeView.SelectedItemChanged += OnTreeViewSelectedItemChanged;
             }
         }
 

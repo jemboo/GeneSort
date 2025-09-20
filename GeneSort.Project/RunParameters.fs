@@ -7,7 +7,7 @@ open FSharp.UMX
 open GeneSort.Sorter.Sortable
 
 [<Measure>] type replNumber
-
+[<Measure>] type generationNumber
 
 type runParameters =
         private { mutable paramMap : Map<string, string> }
@@ -16,15 +16,18 @@ type runParameters =
     static member create (paramMap: Map<string, string>) : runParameters =
         { paramMap = paramMap }
 
-    /// Keys for parameters (internal)
+    /// Keys for parameters
     static member replKey = "Repl"
-    static member maxOrbitKey = "MaxOrbit" // Corrected from "MaxOrbiit"
+    static member generationKey = "Generation"
+    static member runFinishedKey = "RunFinished"
+    static member maxOrbitKey = "MaxOrbit"
     static member sorterCountKey = "SorterCount"
     static member sorterModelTypeKey = "SorterModelType"
     static member sortableArrayTypeKey = "SortableArrayType"
     static member sortingWidthKey = "SortingWidth"
     static member stageLengthKey = "StageLength"
     static member ceLengthKey = "CeLength"
+
 
     member this.ParamMap with get() = this.paramMap
 
@@ -46,6 +49,30 @@ type runParameters =
     /// Sets the Repl value.
     member this.SetRepl(repl: int<replNumber>) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.replKey, (UMX.untag repl).ToString())
+
+    /// Gets the Repl value.
+    member this.GetGeneration() : int<generationNumber> =
+        match this.paramMap.TryFind runParameters.replKey with
+        | Some value -> 
+            match Int32.TryParse(value) with
+            | true, v -> LanguagePrimitives.Int32WithMeasure v |> UMX.tag<generationNumber>
+            | false, _ -> failwith "Invalid Repl value"
+        | None -> failwith "Repl parameter not found"
+
+    /// Sets the Repl value.
+    member this.SetGeneration(repl: int<generationNumber>) : unit =
+        this.paramMap <- this.paramMap.Add(runParameters.replKey, (UMX.untag repl).ToString())
+
+    member this.IsRunFinished() : bool =
+        match this.paramMap.TryFind runParameters.runFinishedKey with
+        | Some value -> 
+            match Boolean.TryParse(value) with
+            | true, v -> v
+            | false, _ -> failwith "Invalid RunFinished value"
+        | None -> false
+
+    member this.SetRunFinished(finished: bool) : unit =
+        this.paramMap <- this.paramMap.Add(runParameters.runFinishedKey, finished.ToString())
 
     /// Gets the SortableArrayType value.
     member this.GetSortableArrayType() : sortableArrayType =

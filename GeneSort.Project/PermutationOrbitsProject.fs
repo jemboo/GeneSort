@@ -52,11 +52,13 @@ module PermutationOrbitsProject =
                 let sorterTestModelSet = sorterTestModelSetMaker.MakeSortableTestModelSet
                 //let sorterTestSet = sorterTestModelSet.makeSortableTestSet sortableArrayType
                 //do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Repl (sorterTestSet |> outputData.SortableTestSet)
-                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Repl 
+                do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl 
                                           (sorterTestModelSet |> outputData.SortableTestModelSet)
-                do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Repl 
+                do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl 
                                           (sorterTestModelSetMaker |> outputData.SortableTestModelSetMaker)
 
+                
+                run.RunParameters.SetRunFinished true
                 Console.WriteLine(sprintf "Finished executing Run %d  Repl  %d \n" run.Index %repl)
             with ex ->
                 Console.WriteLine(sprintf "Error in Run %d, Repl %d: %s" run.Index %repl ex.Message)
@@ -64,7 +66,7 @@ module PermutationOrbitsProject =
         }
 
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    let sorterTestCountReportExecutor (workspace: workspace) =
+    let sorterTestCountReporter (workspace: workspace) =
             try
                 Console.WriteLine(sprintf 
                                     "Generating Permutation orbit count report for %s in workspace %s" 
@@ -139,7 +141,7 @@ module PermutationOrbitsProject =
                                     (DateTime.Now.ToString("yyyyMMdd_HHmmss"))
                         )
                 File.WriteAllText(reportFilePath, reportContent)
-
+                
                 Console.WriteLine(sprintf "Permutation orbit count report saved to %s" reportFilePath)
             with ex ->
                 Console.WriteLine(sprintf "Error generating Permutation orbit count report for %s: %s" "SorterTestSet" ex.Message)
@@ -156,7 +158,7 @@ module PermutationOrbitsProject =
 
     // Function to run the SorterTest count report executor
     let RunPermuationOrbitCountReport() =
-        sorterTestCountReportExecutor workspace
+        sorterTestCountReporter workspace
 
 
 

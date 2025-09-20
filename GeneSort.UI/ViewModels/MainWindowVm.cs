@@ -13,6 +13,9 @@ namespace GeneSort.UI.ViewModels
         public partial class MainWindowVm : ObservableObject
         {
             [ObservableProperty]
+            private int selectedTabIndex;
+
+            [ObservableProperty]
             private ObservableCollection<TabViewModel> tabs = new();
 
             [ObservableProperty]
@@ -47,6 +50,7 @@ namespace GeneSort.UI.ViewModels
                     ContentVm = expVm
                 };
                 Tabs.Add(expTab);
+                SelectedTabIndex = Tabs.Count - 1;
             }
 
             [RelayCommand]

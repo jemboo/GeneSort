@@ -4,8 +4,8 @@ open System
 
 printfn $"***************** {System.DateTime.Now.ToString()}"
 
-
-RandomSorters4to64.RunAll()
+WorkspaceOps.saveWorkspace RandomSorters4to64.workspace
+//RandomSorters4to64.RunAll()
 //RandomSorters4n6Project.RunAll6()
 //PermutationOrbitsProject.RunAll()
 //PermutationOrbitsProject.RunPermuationOrbitCountReport()

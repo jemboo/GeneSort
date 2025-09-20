@@ -10,6 +10,9 @@ namespace GeneSort.UI.ViewModels
     public partial class ExperimentViewModel : ObservableObject
     {
         [ObservableProperty]
+        private bool canOpenSelectedFile;
+
+        [ObservableProperty]
         private string experimentName;
 
         [ObservableProperty]
@@ -19,7 +22,7 @@ namespace GeneSort.UI.ViewModels
         private ExperimentDirectoryItem? root;
 
         [ObservableProperty]
-        private ExperimentDirectoryItem? selectedDirectory;
+        private ExperimentDirectoryItem? selectedFileItem;
 
         [ObservableProperty]
         private ObservableCollection<TabViewModel> fileTabs = new();
@@ -35,11 +38,12 @@ namespace GeneSort.UI.ViewModels
             FileTabs.Clear();
         }
 
-        partial void OnSelectedDirectoryChanged(ExperimentDirectoryItem? value)
+        [RelayCommand]
+        private void OpenSelectedFile()
         {
-            if (value == null || value.IsDirectory) return;
+            if (SelectedFileItem == null || SelectedFileItem.IsDirectory) return;
 
-            var path = value.FullPath;
+            var path = SelectedFileItem.FullPath;
             var existingTab = FileTabs.FirstOrDefault(t => t.ContentVm is FileViewerViewModel fv && fv.FilePath == path);
             if (existingTab != null)
             {
@@ -50,13 +54,14 @@ namespace GeneSort.UI.ViewModels
                 var fvVm = new FileViewerViewModel { FilePath = path };
                 var newTab = new TabViewModel
                 {
-                    Header = value.Name,
+                    Header = SelectedFileItem.Name,
                     ContentVm = fvVm
                 };
                 FileTabs.Add(newTab);
                 SelectedFileTab = newTab;
             }
         }
+
 
         [RelayCommand]
         private void CloseFileTab(TabViewModel tab)

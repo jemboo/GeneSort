@@ -102,7 +102,7 @@ module OutputData =
         Path.Combine(folder, "Run", fileName)
 
 
-    let saveToFile 
+    let saveToFileO 
             (workspaceFolder: string) 
             (index: int) 
             (repl: int<replNumber>) 
@@ -146,6 +146,57 @@ module OutputData =
                 printfn "Error saving to file %s: %s" filePath e.Message
                 raise e // Re-throw to ensure the caller is aware of the failure
         }
+
+
+    let saveToFile
+            (filePath: string)
+            (outputData: outputData) : Async<unit> =
+        async {
+            let directory = Path.GetDirectoryName filePath
+            Directory.CreateDirectory directory |> ignore
+            try
+                use stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None)
+                match outputData with
+                | Run r -> 
+                    let dto = RunDto.toRunDto r
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | SorterSet ss ->
+                    let dto = SorterSetDto.fromDomain ss
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | SortableTestSet sts ->
+                    let dto = SortableTestSetDto.fromDomain sts
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | SorterModelSetMaker sms -> 
+                    let dto = SorterModelSetMakerDto.fromDomain sms
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | SortableTestModelSet sts ->
+                    let dto = SortableTestModelSetDto.fromDomain sts
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | SortableTestModelSetMaker stsm ->
+                    let dto = SorterTestModelSetMakerDto.fromDomain stsm
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | SorterSetEval sse ->
+                    let dto = SorterSetEvalDto.fromDomain sse
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | SorterSetEvalBins sse ->
+                    let dto = SorterSetEvalBinsDto.fromDomain sse
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | Workspace w ->
+                    let dto = WorkspaceDto.toWorkspaceDto w
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+
+            with e ->
+                printfn "Error saving to file %s: %s" filePath e.Message
+                raise e // Re-throw to ensure the caller is aware of the failure
+        }
+
+
+
+
+
+
+
+
 
 
     let getRunParametersForOutputDataPath

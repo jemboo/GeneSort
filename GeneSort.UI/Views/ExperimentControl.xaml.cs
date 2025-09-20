@@ -24,5 +24,16 @@ namespace GeneSort.UI.Views
         {
             InitializeComponent();
         }
+
+        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            var s = "selected item changed";
+            var qua = this.DataContext as ViewModels.ExperimentViewModel;
+            if (qua != null)
+            {
+                qua.SelectedFileItem = e.NewValue as Models.ExperimentDirectoryItem;
+                qua.CanOpenSelectedFile = qua.SelectedFileItem != null && !qua.SelectedFileItem.IsDirectory;
+            }
+        }
     }
 }

@@ -47,6 +47,6 @@
         <TabControl ItemsSource="{Binding Tabs}"
                     ItemTemplate="{StaticResource TabHeaderTemplate}"
                     ContentTemplate="{StaticResource TabContentTemplate}"
-                    SelectedIndex="0"/>
+                    SelectedIndex="{Binding SelectedTabIndex}"/>
     </Grid>
 </Window>

@@ -155,8 +155,10 @@ module RandomSorters4to64 =
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 
-            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Repl (sorterSet |> outputData.SorterSet)
-            do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Repl (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl (sorterSet |> outputData.SorterSet)
+            do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+
+            run.RunParameters.SetRunFinished true
 
             Console.WriteLine(sprintf "Finished executing Run %d  Repl  %d \n" run.Index %repl)
         }

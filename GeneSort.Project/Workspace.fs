@@ -13,6 +13,7 @@ type workspace =
           description: string
           rootDirectory: string
           runParametersArray: runParameters []
+          parameterKeys: string array
         }
     with
     static member create 
@@ -27,10 +28,16 @@ type workspace =
               description = description
               rootDirectory = rootDirectory
               runParametersArray = runParametersArray
+              parameterKeys = 
+                    if runParametersArray.Length = 0 then
+                        [||]
+                    else
+                        runParametersArray.[0].ParamMap |> Map.toSeq |> Seq.map fst |> Seq.toArray
             }
 
     member this.Name with get () = this.name
     member this.Description with get () = this.description
+    member this.ParameterKeys with get() = this.parameterKeys
     member this.RunParametersArray with get () = this.runParametersArray
     member this.RootDirectory with get () = this.rootDirectory
     member this.WorkspaceFolder with get() = Path.Combine(this.RootDirectory, this.Name)

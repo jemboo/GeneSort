@@ -14,6 +14,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Resources/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid Margin="8">
@@ -23,18 +25,33 @@
             <ColumnDefinition Width="2*" MinWidth="300"/>
         </Grid.ColumnDefinitions>
 
-         <!--Left: Directory Tree-->
-        <TreeView Grid.Column="0" 
-                  ItemsSource="{Binding Root.Children}"
-                  behaviors:TreeViewBehavior.BindableSelectedItem="{Binding SelectedDirectory, Mode=OneWayToSource}"
-                  Margin="8">
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type models:ExperimentDirectoryItem}">
-                    <TextBlock Text="{Binding Name}" 
-                               FontWeight="{Binding IsDirectory, Converter={x:Static converters:BooleanToFontWeightConverter.Instance}}"/>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
+<!-- Left: Directory Tree and Open Button -->
+        <Grid Grid.Column="0" Margin="8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <!--behaviors:TreeViewBehavior.BindableSelectedItem="{Binding SelectedFileItem, Mode=TwoWay}"-->
+
+            <TreeView Grid.Row="0" ItemsSource="{Binding Root.Children}"
+                    Height="Auto" SelectedItemChanged="TreeView_SelectedItemChanged">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type models:ExperimentDirectoryItem}">
+                        <TextBlock Text="{Binding Name}" 
+                                    FontWeight="{Binding IsDirectory, Converter={x:Static converters:BooleanToFontWeightConverter.Instance}}"/>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+            
+            <Button Grid.Row="1" Content="Open File"
+                    Height="30"
+                    Command="{Binding OpenSelectedFileCommand}"
+                    Style="{StaticResource ModernButton}"
+                    Margin="0,8,0,0"
+                    IsEnabled="{Binding CanOpenSelectedFile}"/>
+                    <!--IsEnabled="{Binding SelectedFileItem.IsDirectory, Converter={StaticResource InverseBooleanConverter}}"/>-->
+        </Grid>
 
         <!-- Splitter -->
         <GridSplitter Grid.Column="1" 
