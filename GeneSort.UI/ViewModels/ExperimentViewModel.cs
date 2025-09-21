@@ -30,6 +30,28 @@ namespace GeneSort.UI.ViewModels
         [ObservableProperty]
         private TabViewModel? selectedFileTab;
 
+        [ObservableProperty]
+        public Action<object> selectionAction;
+
+
+        public ExperimentViewModel()
+        {
+            selectionAction = _selectionAction;
+        }   
+
+        private Action<object> _selectionAction
+        {
+            get
+            {
+                return obj =>
+                {
+                    SelectedFileItem = obj as ExperimentDirectoryItem;
+                    CanOpenSelectedFile = SelectedFileItem != null && !SelectedFileItem.IsDirectory;
+                };
+            }
+        }
+
+
         partial void OnExperimentPathChanged(string? value)
         {
             if (string.IsNullOrEmpty(value)) return;
@@ -38,23 +60,74 @@ namespace GeneSort.UI.ViewModels
             FileTabs.Clear();
         }
 
+        //[RelayCommand]
+        //private void OpenSelectedFile()
+        //{
+        //    if (SelectedFileItem == null || SelectedFileItem.IsDirectory) return;
+
+        //    var path = SelectedFileItem.FullPath;
+        //    var existingTab = FileTabs.FirstOrDefault(t => t.ContentVm is FileViewerViewModel fv && fv.FilePath == path);
+        //    if (existingTab != null)
+        //    {
+        //        SelectedFileTab = existingTab;
+        //    }
+        //    else
+        //    {
+        //        var fvVm = new FileViewerViewModel { FilePath = path };
+        //        var newTab = new TabViewModel
+        //        {
+        //            Header = SelectedFileItem.Name,
+        //            ContentVm = fvVm
+        //        };
+        //        FileTabs.Add(newTab);
+        //        SelectedFileTab = newTab;
+        //    }
+        //}
+
         [RelayCommand]
-        private void OpenSelectedFile()
+        private async void OpenSelectedFile()
         {
             if (SelectedFileItem == null || SelectedFileItem.IsDirectory) return;
 
             var path = SelectedFileItem.FullPath;
-            var existingTab = FileTabs.FirstOrDefault(t => t.ContentVm is FileViewerViewModel fv && fv.FilePath == path);
+            var fileName = SelectedFileItem.Name;
+
+            // Check if tab already exists
+            var existingTab = FileTabs.FirstOrDefault(t =>
+                (t.ContentVm is FileViewerViewModel fv && fv.FilePath == path) ||
+                (t.ContentVm is WorkspaceViewerViewModel wv && wv.FilePath == path));
+
             if (existingTab != null)
             {
                 SelectedFileTab = existingTab;
+                return;
+            }
+
+            // Determine if this is a WorkspaceDto file based on extension or content
+            // You might want to adjust this logic based on your file naming convention
+            if (IsWorkspaceFile(path, fileName))
+            {
+                // Create WorkspaceViewer tab
+                var workspaceVm = new WorkspaceViewerViewModel();
+                var newTab = new TabViewModel
+                {
+                    Header = fileName,
+                    ContentVm = workspaceVm
+                };
+
+                FileTabs.Add(newTab);
+                SelectedFileTab = newTab;
+
+                // Load the workspace data asynchronously
+                await workspaceVm.LoadWorkspaceAsync(path);
             }
             else
             {
+                // Create regular FileViewer tab
                 var fvVm = new FileViewerViewModel { FilePath = path };
                 var newTab = new TabViewModel
                 {
-                    Header = SelectedFileItem.Name,
+                    Header = fileName,
                     ContentVm = fvVm
                 };
                 FileTabs.Add(newTab);
@@ -62,6 +135,28 @@ namespace GeneSort.UI.ViewModels
             }
         }
 
+        private bool IsWorkspaceFile(string filePath, string fileName)
+        {
+            // Implement your logic to determine if this is a WorkspaceDto file
+            // This could be based on file extension, naming convention, or file content inspection
+
+            // Example: Check file extension
+            return Path.GetExtension(filePath).ToLowerInvariant() == ".workspace" ||
+                   fileName.ToLowerInvariant().Contains("workspace") ||
+                   fileName.ToLowerInvariant().EndsWith(".msgpack");
+
+            // Alternative: You could try to deserialize and catch exceptions
+            // try
+            // {
+            //     var bytes = File.ReadAllBytes(filePath);
+            //     MessagePackSerializer.Deserialize<dynamic>(bytes);
+            //     return true; // If deserialization succeeds, assume it's a workspace file
+            // }
+            // catch
+            // {
+            //     return false;
+            // }
+        }
 
         [RelayCommand]
         private void CloseFileTab(TabViewModel tab)

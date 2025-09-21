@@ -5,23 +5,42 @@ namespace GeneSort.UI.Behaviors
 {
     public static class TreeViewBehavior
     {
+
+        #region
+
         public static readonly DependencyProperty BindableSelectedItemProperty =
-            DependencyProperty.RegisterAttached("BindableSelectedItem", typeof(object), typeof(TreeViewBehavior),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnBindableSelectedItemChanged));
+            DependencyProperty.RegisterAttached("BindableSelectedItem", typeof(bool), typeof(TreeViewBehavior),
+                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnBindableSelectedItemChanged));
 
         public static object? GetBindableSelectedItem(DependencyObject obj) => (object?)obj.GetValue(BindableSelectedItemProperty);
 
         public static void SetBindableSelectedItem(DependencyObject obj, object? value) => obj.SetValue(BindableSelectedItemProperty, value);
 
+        #endregion
+
+
+        #region
+
+        public static readonly DependencyProperty SelectionActionProperty =
+            DependencyProperty.RegisterAttached("SelectionAction", typeof(Action<object>), typeof(TreeViewBehavior),
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnBindableSelectedItemChanged));
+        public static Action<object>? GetSelectionAction(DependencyObject obj)
+            => (Action<object>?)obj.GetValue(SelectionActionProperty);
+
+        public static void SetSelectionAction(DependencyObject obj, Action<object>? value)
+            => obj.SetValue(SelectionActionProperty, value);
+        #endregion
+
+
+
         private static void OnBindableSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             if (sender is TreeView treeView)
             {
-                // Unsubscribe temporarily to avoid recursion 
-              //  treeView.SelectedItemChanged -= OnTreeViewSelectedItemChanged;
-
-                // Subscribe
-              //  treeView.SelectedItemChanged += OnTreeViewSelectedItemChanged;
+                var qua = treeView.DataContext as ViewModels.ExperimentViewModel;
+                //Unsubscribe temporarily to avoid recursion
+                treeView.SelectedItemChanged -= OnTreeViewSelectedItemChanged;
+                treeView.SelectedItemChanged += OnTreeViewSelectedItemChanged;
             }
         }
 
@@ -29,7 +48,11 @@ namespace GeneSort.UI.Behaviors
         {
             if (sender is TreeView treeView)
             {
-                SetBindableSelectedItem(treeView, e.NewValue);
+                var selectionAction = GetSelectionAction(treeView);
+                if (selectionAction != null)
+                {
+                    selectionAction(e.NewValue);
+                }
             }
         }
     }

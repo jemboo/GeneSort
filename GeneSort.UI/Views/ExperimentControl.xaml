@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:GeneSort.UI.Views"
              xmlns:models="clr-namespace:GeneSort.UI.Models"
              xmlns:converters="clr-namespace:GeneSort.UI.Converters"
-             xmlns:behaviors="clr-namespace:GeneSort.UI.Behaviors"
+             xmlns:behaviors="clr-namespace:GeneSort.UI.Behaviors" xmlns:vm="clr-namespace:GeneSort.UI.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -34,8 +34,12 @@
             
             <!--behaviors:TreeViewBehavior.BindableSelectedItem="{Binding SelectedFileItem, Mode=TwoWay}"-->
 
-            <TreeView Grid.Row="0" ItemsSource="{Binding Root.Children}"
-                    Height="Auto" SelectedItemChanged="TreeView_SelectedItemChanged">
+            <TreeView Grid.Row="0"
+                    DataContext="{Binding .}"
+                    ItemsSource="{Binding Root.Children}"
+                    behaviors:TreeViewBehavior.BindableSelectedItem= "True"
+                    behaviors:TreeViewBehavior.SelectionAction="{Binding SelectionAction, Mode=OneWay}"
+                    Height="Auto">
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type models:ExperimentDirectoryItem}">
                         <TextBlock Text="{Binding Name}" 
@@ -73,9 +77,26 @@
                                FontWeight="SemiBold"/>
                 </DataTemplate>
             </TabControl.ItemTemplate>
-            <TabControl.ContentTemplate>
+            <!--<TabControl.ContentTemplate>
                 <DataTemplate>
                     <ContentControl Content="{Binding ContentVm}"/>
+                </DataTemplate>
+            </TabControl.ContentTemplate>-->
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <ContentControl Content="{Binding ContentVm}">
+                        <ContentControl.Resources>
+                            <!-- Template for WorkspaceViewerViewModel -->
+                            <DataTemplate DataType="{x:Type vm:WorkspaceViewerViewModel}">
+                                <local:WorkspaceViewerControl />
+                            </DataTemplate>
+
+                            <!-- Template for FileViewerViewModel (your existing one) -->
+                            <DataTemplate DataType="{x:Type vm:FileViewerViewModel}">
+                                <local:FileViewerControl />
+                            </DataTemplate>
+                        </ContentControl.Resources>
+                    </ContentControl>
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </TabControl>

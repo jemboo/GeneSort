@@ -34,7 +34,7 @@ module WorkspaceOps =
             let underscoreWorkspaceLen = 10
             let extractedName = fileNameWithoutExt.[.. fileNameWithoutExt.Length - underscoreWorkspaceLen - 1]
             use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)
-            let dto = MessagePackSerializer.Deserialize<WorkspaceDto>(stream, options)
+            let dto = MessagePackSerializer.Deserialize<workspaceDto>(stream, options)
             let loaded = WorkspaceDto.fromWorkspaceDto dto
             if loaded.Name <> extractedName then
                 failwithf "Workspace name mismatch: file '%s', loaded '%s'" extractedName loaded.Name
