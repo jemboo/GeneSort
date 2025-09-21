@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using GeneSort.Project;
 using MessagePack;
 using System.Collections.ObjectModel;
@@ -33,8 +34,20 @@ namespace GeneSort.UI.ViewModels
         [ObservableProperty]
         private DataGrid? parametersDataGrid;
 
+        [ObservableProperty]
+        private bool canRunSelected;
+
+        [ObservableProperty]
+        private string selectedRunsText = "No runs selected";
+
         // Store the domain object for potential future operations
         public workspace? Workspace { get; private set; }
+
+        public WorkspaceViewerViewModel()
+        {
+            // Initialize with default state
+            CanRunSelected = false;
+        }
 
         public async Task LoadWorkspaceAsync(string filePath)
         {
@@ -175,7 +188,90 @@ namespace GeneSort.UI.ViewModels
             }
 
             dataGrid.ItemsSource = dataRows;
+
+            // Subscribe to selection changes
+            dataGrid.SelectionChanged += DataGrid_SelectionChanged;
+            dataGrid.SelectionMode = DataGridSelectionMode.Extended; // Allow multiple selections
+
             ParametersDataGrid = dataGrid;
+        }
+
+        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is DataGrid dataGrid)
+            {
+                var selectedCount = dataGrid.SelectedItems.Count;
+                CanRunSelected = selectedCount > 0;
+                SelectedRunsText = selectedCount switch
+                {
+                    0 => "No runs selected",
+                    1 => "1 run selected",
+                    _ => $"{selectedCount} runs selected"
+                };
+            }
+        }
+
+        [RelayCommand]
+        private async Task RunSelected()
+        {
+            if (ParametersDataGrid == null || Workspace == null)
+                return;
+
+            var selectedItems = ParametersDataGrid.SelectedItems.Cast<Dictionary<string, object>>().ToList();
+            if (!selectedItems.Any())
+                return;
+
+            // Extract the runParameters for the selected rows
+            var selectedRunParameters = new List<runParameters>();
+
+            foreach (var selectedItem in selectedItems)
+            {
+                // Get the index (1-based in UI, 0-based in array)
+                if (selectedItem.TryGetValue("Index", out var indexObj) && indexObj is int index)
+                {
+                    var arrayIndex = index - 1; // Convert to 0-based
+                    if (arrayIndex >= 0 && arrayIndex < Workspace.RunParametersArray.Length)
+                    {
+                        selectedRunParameters.Add(Workspace.RunParametersArray[arrayIndex]);
+                    }
+                }
+            }
+
+            // Call your run method here
+            await ExecuteRunParameters(selectedRunParameters);
+        }
+
+        private async Task ExecuteRunParameters(List<runParameters> runParameters)
+        {
+            try
+            {
+                IsLoading = true;
+
+                // TODO: Implement your actual run logic here
+                // For now, just simulate some work
+                await Task.Delay(2000);
+
+                // Example of what you might do:
+                // foreach (var runParam in runParameters)
+                // {
+                //     // Execute the run with this parameter set
+                //     // await YourRunEngine.ExecuteAsync(runParam);
+                // }
+
+                System.Diagnostics.Debug.WriteLine($"Would execute {runParameters.Count} parameter sets:");
+                foreach (var runParam in runParameters)
+                {
+                    System.Diagnostics.Debug.WriteLine($"  - {runParam.toString()}");
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Error executing runs: {ex.Message}";
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
     }
 }
