@@ -5,7 +5,6 @@ open System
 open System.IO
 open GeneSort.Core
 
-// Workspace type
 type workspace = 
     private
         { 
@@ -14,13 +13,15 @@ type workspace =
           rootDirectory: string
           runParametersArray: runParameters []
           parameterKeys: string array
+          reportKeys: string array
         }
     with
     static member create 
             (name: string) 
             (description: string) 
             (rootDirectory: string) 
-            (runParametersArray: runParameters []) : workspace =
+            (runParametersArray: runParameters []) 
+            (reportKeys: string array) : workspace =
         if String.IsNullOrWhiteSpace name then
             failwith "Workspace name cannot be empty"
         else
@@ -28,6 +29,7 @@ type workspace =
               description = description
               rootDirectory = rootDirectory
               runParametersArray = runParametersArray
+              reportKeys = reportKeys
               parameterKeys = 
                     if runParametersArray.Length = 0 then
                         [||]
@@ -38,6 +40,7 @@ type workspace =
     member this.Name with get () = this.name
     member this.Description with get () = this.description
     member this.ParameterKeys with get() = this.parameterKeys
+    member this.ReportKeys with get() = this.reportKeys
     member this.RunParametersArray with get () = this.runParametersArray
     member this.RootDirectory with get () = this.rootDirectory
     member this.WorkspaceFolder with get() = Path.Combine(this.RootDirectory, this.Name)
@@ -48,6 +51,7 @@ module Workspace =
             (name: string) 
             (description: string) 
             (rootDirectory: string) 
+            (reportKeys: string array)
             (parameterSpans: (string * string list) list) 
             (paramRefiner: runParameters -> runParameters option)        
              : workspace =
@@ -63,6 +67,7 @@ module Workspace =
                 description 
                 rootDirectory 
                 refinedParameters
+                reportKeys
 
                  
     let filterByParameters (workspace: workspace) (filter: (string * string) array) : runParameters [] =

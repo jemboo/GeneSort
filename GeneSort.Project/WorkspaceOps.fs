@@ -1,5 +1,4 @@
-﻿
-namespace GeneSort.Project
+﻿namespace GeneSort.Project
 
 open System.IO
 open System.Threading.Tasks
@@ -39,7 +38,7 @@ module WorkspaceOps =
             if loaded.Name <> extractedName then
                 failwithf "Workspace name mismatch: file '%s', loaded '%s'" extractedName loaded.Name
             let newRootDirectory = Path.GetFullPath(Path.Combine(fileFolder, ".."))
-            workspace.create loaded.Name loaded.Description newRootDirectory loaded.RunParametersArray
+            workspace.create loaded.Name loaded.Description newRootDirectory loaded.RunParametersArray loaded.ReportKeys
         with e ->
             printfn "Error loading workspace from folder %s: %s" fileFolder e.Message
             raise e

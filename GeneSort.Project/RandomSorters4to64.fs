@@ -113,7 +113,7 @@ module RandomSorters4to64 =
         [ sortingWidths(); sorterModelKeys() ]
 
 
-    let workspace = Workspace.create experimentName experimentDesc projectDir parameterSet paramMapRefiner
+    let workspace = Workspace.create experimentName experimentDesc projectDir [|"Rep1"; "Rep2"; "Rep3"; "Rep4"|] parameterSet paramMapRefiner
 
 
     let executor (workspace: workspace) (repl: int<replNumber>) (run: run) : Async<unit> =

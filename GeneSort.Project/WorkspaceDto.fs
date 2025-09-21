@@ -10,7 +10,8 @@ type workspaceDto =
         [<MessagePack.Key(0)>] Name: string
         [<MessagePack.Key(1)>] Description: string
         [<MessagePack.Key(2)>] RootDirectory: string
-        [<MessagePack.Key(3)>] RunParametersDtos: runParametersDto []
+        [<MessagePack.Key(3)>] ReportKeys: string []
+        [<MessagePack.Key(4)>] RunParametersDtos: runParametersDto []
     }
 
 
@@ -21,6 +22,7 @@ module WorkspaceDto =
           Name = workspace.Name
           Description = workspace.Description
           RootDirectory = workspace.RootDirectory
+          ReportKeys = workspace.ReportKeys
           RunParametersDtos = workspace.RunParametersArray 
                                 |> Array.map(RunParametersDto.toRunParametersDto) 
         }
@@ -31,4 +33,5 @@ module WorkspaceDto =
           dto.Description
           dto.RootDirectory
           (dto.RunParametersDtos |> Array.map(RunParametersDto.fromDto))
+          dto.ReportKeys
 

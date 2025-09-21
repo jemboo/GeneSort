@@ -36,7 +36,7 @@ module PermutationOrbitsProject =
     let parameterSet = 
         [ sortingWidths(); ]
 
-    let workspace = Workspace.create experimentName experimentDesc projectDir parameterSet (fun s -> Some s)
+    let workspace = Workspace.create experimentName experimentDesc projectDir [||] parameterSet (fun s -> Some s)
 
     let executor (workspace: workspace) (repl: int<replNumber>) (run: run) : Async<unit> =
         async {
