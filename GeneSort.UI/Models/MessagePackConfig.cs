@@ -1,4 +1,4 @@
-﻿using MessagePack;
+﻿ using MessagePack;
 using MessagePack.Resolvers;
 
 namespace GeneSort.UI.Models

@@ -60,32 +60,9 @@ namespace GeneSort.UI.ViewModels
             FileTabs.Clear();
         }
 
-        //[RelayCommand]
-        //private void OpenSelectedFile()
-        //{
-        //    if (SelectedFileItem == null || SelectedFileItem.IsDirectory) return;
-
-        //    var path = SelectedFileItem.FullPath;
-        //    var existingTab = FileTabs.FirstOrDefault(t => t.ContentVm is FileViewerViewModel fv && fv.FilePath == path);
-        //    if (existingTab != null)
-        //    {
-        //        SelectedFileTab = existingTab;
-        //    }
-        //    else
-        //    {
-        //        var fvVm = new FileViewerViewModel { FilePath = path };
-        //        var newTab = new TabViewModel
-        //        {
-        //            Header = SelectedFileItem.Name,
-        //            ContentVm = fvVm
-        //        };
-        //        FileTabs.Add(newTab);
-        //        SelectedFileTab = newTab;
-        //    }
-        //}
 
         [RelayCommand]
-        private async void OpenSelectedFile()
+        private async Task OpenSelectedFile()
         {
             if (SelectedFileItem == null || SelectedFileItem.IsDirectory) return;
 

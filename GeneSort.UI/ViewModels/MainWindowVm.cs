@@ -1,9 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using GeneSort.UI.Models;
-using Ookii.Dialogs.Wpf;
 using System.Collections.ObjectModel;
-using System.IO;
 
 namespace GeneSort.UI.ViewModels
 {
@@ -19,14 +16,14 @@ namespace GeneSort.UI.ViewModels
             private ObservableCollection<TabViewModel> tabs = new();
 
             [ObservableProperty]
-            private ProjectsViewModel projects = new();
+            private ExperimentSelectionVm experimentSelectionVm = new();
 
             public MainWindowVm()
             {
                 var projectsTab = new TabViewModel
                 {
                     Header = "Projects",
-                    ContentVm = Projects
+                    ContentVm = ExperimentSelectionVm
                 };
                 Tabs.Add(projectsTab);
             }
@@ -34,7 +31,7 @@ namespace GeneSort.UI.ViewModels
             [RelayCommand]
             private void OpenExperiment(ExperimentInfoViewModel? experimentInfo)
             {
-                if (experimentInfo == null || string.IsNullOrEmpty(Projects.ProjectFolder))
+                if (experimentInfo == null || string.IsNullOrEmpty(ExperimentSelectionVm.RootFolder))
                 {
                     return;
                 }

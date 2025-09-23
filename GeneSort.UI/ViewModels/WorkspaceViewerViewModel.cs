@@ -40,6 +40,11 @@ namespace GeneSort.UI.ViewModels
         [ObservableProperty]
         private string selectedRunsText = "No runs selected";
 
+        [ObservableProperty]
+        private ObservableCollection<string> reportKeys = new();
+
+        private CancellationTokenSource? _runCancellationTokenSource;
+
         // Store the domain object for potential future operations
         public workspace? Workspace { get; private set; }
 
@@ -73,6 +78,65 @@ namespace GeneSort.UI.ViewModels
             }
         }
 
+        [RelayCommand]
+        private async Task GenerateReport(string reportKey)
+        {
+            if (ParametersDataGrid == null || Workspace == null || string.IsNullOrEmpty(reportKey))
+                return;
+
+            var selectedItems = ParametersDataGrid.SelectedItems.Cast<Dictionary<string, object>>().ToList();
+            if (!selectedItems.Any())
+                return;
+
+            // Extract the runParameters for the selected rows
+            var selectedRunParameters = new List<runParameters>();
+
+            foreach (var selectedItem in selectedItems)
+            {
+                // Get the index (1-based in UI, 0-based in array)
+                if (selectedItem.TryGetValue("Index", out var indexObj) && indexObj is int index)
+                {
+                    var arrayIndex = index - 1; // Convert to 0-based
+                    if (arrayIndex >= 0 && arrayIndex < Workspace.RunParametersArray.Length)
+                    {
+                        selectedRunParameters.Add(Workspace.RunParametersArray[arrayIndex]);
+                    }
+                }
+            }
+
+            // Call your report generation method here
+            await ExecuteReportGeneration(reportKey, selectedRunParameters);
+        }
+
+        private async Task ExecuteReportGeneration(string reportKey, List<runParameters> runParameters)
+        {
+            try
+            {
+                IsLoading = true;
+
+                // TODO: Implement your actual report generation logic here
+                // For now, just simulate some work
+                await Task.Delay(1000);
+
+                // Example of what you might do:
+                // await YourReportEngine.GenerateReportAsync(reportKey, runParameters);
+
+                System.Diagnostics.Debug.WriteLine($"Would generate report '{reportKey}' for {runParameters.Count} parameter sets:");
+                foreach (var runParam in runParameters)
+                {
+                    System.Diagnostics.Debug.WriteLine($"  - {runParam.toString()}");
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Error generating report '{reportKey}': {ex.Message}";
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
         private async Task LoadWorkspaceData(workspaceDto workspaceDto)
         {
             await Task.Run(() =>
@@ -87,6 +151,13 @@ namespace GeneSort.UI.ViewModels
                     WorkspaceName = workspace.Name;
                     WorkspaceDescription = workspace.Description;
                     RootDirectory = workspace.RootDirectory;
+
+                    // Load report keys
+                    ReportKeys.Clear();
+                    foreach (var reportKey in workspace.ReportKeys)
+                    {
+                        ReportKeys.Add(reportKey);
+                    }
 
                     // Create the DataGrid with all columns and data
                     CreateParametersDataGrid(workspace);
@@ -201,19 +272,32 @@ namespace GeneSort.UI.ViewModels
             if (sender is DataGrid dataGrid)
             {
                 var selectedCount = dataGrid.SelectedItems.Count;
-                CanRunSelected = selectedCount > 0;
-                SelectedRunsText = selectedCount switch
-                {
-                    0 => "No runs selected",
-                    1 => "1 run selected",
-                    _ => $"{selectedCount} runs selected"
-                };
+                UpdateButtonStates(selectedCount);
             }
+        }
+
+        private void UpdateButtonStates(int selectedCount)
+        {
+            // Run button is enabled if we have selections OR if we're currently running (for cancellation)
+            CanRunSelected = selectedCount > 0; //|| IsLoading;
+
+            SelectedRunsText = selectedCount switch
+            {
+                0 => IsLoading ? "Running..." : "No runs selected",
+                1 => IsLoading ? "Running 1 parameter set..." : "1 run selected",
+                _ => IsLoading ? $"Running {selectedCount} parameter sets..." : $"{selectedCount} runs selected"
+            };
         }
 
         [RelayCommand]
         private async Task RunSelected()
         {
+            if (IsLoading) // If already running, cancel
+            {
+                _runCancellationTokenSource?.Cancel();
+                return;
+            }
+
             if (ParametersDataGrid == null || Workspace == null)
                 return;
 
@@ -237,32 +321,45 @@ namespace GeneSort.UI.ViewModels
                 }
             }
 
+            // Create new cancellation token for this run
+            _runCancellationTokenSource = new CancellationTokenSource();
+
             // Call your run method here
-            await ExecuteRunParameters(selectedRunParameters);
+            await ExecuteRunParameters(selectedRunParameters, _runCancellationTokenSource.Token);
         }
 
-        private async Task ExecuteRunParameters(List<runParameters> runParameters)
+        private async Task ExecuteRunParameters(List<runParameters> runParameters, CancellationToken cancellationToken)
         {
             try
             {
                 IsLoading = true;
 
-                // TODO: Implement your actual run logic here
-                // For now, just simulate some work
-                await Task.Delay(2000);
+                // TODO: Implement your actual run logic here with cancellation support
+                // For now, just simulate some work with cancellation
+                for (int i = 0; i < runParameters.Count; i++)
+                {
+                    // Check for cancellation before processing each parameter set
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    // Simulate work (replace with actual run logic)
+                    await Task.Delay(2000, cancellationToken);
+
+                    System.Diagnostics.Debug.WriteLine($"Executed parameter set {i + 1} of {runParameters.Count}: {runParameters[i].toString()}");
+                }
 
                 // Example of what you might do:
                 // foreach (var runParam in runParameters)
                 // {
-                //     // Execute the run with this parameter set
-                //     // await YourRunEngine.ExecuteAsync(runParam);
+                //     cancellationToken.ThrowIfCancellationRequested();
+                //     await YourRunEngine.ExecuteAsync(runParam, cancellationToken);
                 // }
 
-                System.Diagnostics.Debug.WriteLine($"Would execute {runParameters.Count} parameter sets:");
-                foreach (var runParam in runParameters)
-                {
-                    System.Diagnostics.Debug.WriteLine($"  - {runParam.toString()}");
-                }
+                System.Diagnostics.Debug.WriteLine($"Completed execution of {runParameters.Count} parameter sets");
+            }
+            catch (OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine("Run execution was cancelled");
+                // Don't set ErrorMessage for cancellation - it's expected
             }
             catch (Exception ex)
             {
@@ -271,6 +368,24 @@ namespace GeneSort.UI.ViewModels
             finally
             {
                 IsLoading = false;
+                _runCancellationTokenSource?.Dispose();
+                _runCancellationTokenSource = null;
+
+                // Update button states with actual selection count
+                if (ParametersDataGrid != null)
+                {
+                    var selectedCount = ParametersDataGrid.SelectedItems.Count;
+                    UpdateButtonStates(selectedCount);
+                }
+            }
+        }
+        partial void OnIsLoadingChanged(bool value)
+        {
+            // Update button states when loading state changes
+            if (ParametersDataGrid != null)
+            {
+                var selectedCount = ParametersDataGrid.SelectedItems.Count;
+                UpdateButtonStates(selectedCount);
             }
         }
     }

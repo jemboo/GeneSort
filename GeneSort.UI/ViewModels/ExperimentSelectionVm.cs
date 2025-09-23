@@ -9,13 +9,10 @@ using System.Linq;
 
 namespace GeneSort.UI.ViewModels
 {
-    public partial class ProjectsViewModel : ObservableObject
+    public partial class ExperimentSelectionVm : ObservableObject
     {
         [ObservableProperty]
-        private ProjectModel? project = new();
-
-        [ObservableProperty]
-        private string? projectFolder;
+        private string? rootFolder;
 
         [ObservableProperty]
         private ObservableCollection<ExperimentInfoViewModel>? experiments = new();
@@ -23,7 +20,7 @@ namespace GeneSort.UI.ViewModels
         [ObservableProperty]
         private ExperimentInfoViewModel? selectedExperiment;
 
-        partial void OnProjectFolderChanged(string? value)
+        partial void OnRootFolderChanged(string? value)
         {
             LoadExperiments();
         }
@@ -31,14 +28,14 @@ namespace GeneSort.UI.ViewModels
         private void LoadExperiments()
         {
             Experiments?.Clear();
-            if (string.IsNullOrEmpty(ProjectFolder))
+            if (string.IsNullOrEmpty(RootFolder))
             {
                 return;
             }
 
             try
             {
-                var directories = Directory.GetDirectories(ProjectFolder);
+                var directories = Directory.GetDirectories(RootFolder);
                 foreach (var dir in directories.OrderBy(d => Path.GetFileName(d)))
                 {
                     Experiments.Add(new ExperimentInfoViewModel
@@ -66,8 +63,7 @@ namespace GeneSort.UI.ViewModels
 
             if (dialog.ShowDialog() == true)
             {
-                Project.ProjectFolder = dialog.SelectedPath;
-                ProjectFolder = dialog.SelectedPath;
+                RootFolder = dialog.SelectedPath;
             }
         }
     }

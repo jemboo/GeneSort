@@ -10,17 +10,16 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace GeneSort.UI.Views
 {
     /// <summary>
-    /// Interaction logic for ProjectsControl.xaml
+    /// Interaction logic for SandboxWindow.xaml
     /// </summary>
-    public partial class ProjectsControl : UserControl
+    public partial class SandboxWindow : Window
     {
-        public ProjectsControl()
+        public SandboxWindow()
         {
             InitializeComponent();
         }
