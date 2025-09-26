@@ -9,6 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\WorkspaceParametersControl.xaml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="Views\WorkspaceParametersControl.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="MessagePack" Version="3.1.4" />
     <PackageReference Include="MessagePack.FSharpExtensions" Version="4.0.0" />

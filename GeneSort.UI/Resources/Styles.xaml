@@ -1,5 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:GeneSort.UI.Views.Common"
                     xmlns:converters="clr-namespace:GeneSort.UI.Converters">
     <!-- Basic Styles for a clean, modern look -->
     <Style x:Key="ModernButton" TargetType="{x:Type Button}">
@@ -161,4 +162,60 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style x:Key="DefaultRunButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Green"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Padding" Value="10"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+
+    <Style x:Key="DisabledRunButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Gray"/>
+        <Setter Property="Foreground" Value="LightGray"/>
+        <Setter Property="Padding" Value="10"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+
+    <Style x:Key="CancelButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Red"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Padding" Value="10"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+
+    <Style TargetType="{x:Type local:RunCancelButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:RunCancelButton}">
+                    <Grid>
+                        <Button x:Name="PART_RunButton"
+                                    Command="{TemplateBinding RunCommand}"
+                                    Content="{TemplateBinding RunContent}"
+                                    Style="{TemplateBinding RunButtonStyle}"/>
+                        <Button x:Name="PART_CancelButton"
+                                    Command="{TemplateBinding CancelCommand}"
+                                    Content="{TemplateBinding CancelContent}"
+                                    Style="{TemplateBinding CancelButtonStyle}"
+                                    Visibility="Collapsed"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsRunning, RelativeSource={RelativeSource TemplatedParent}}" Value="True"/>
+                                <Condition Binding="{Binding CanCancel, RelativeSource={RelativeSource TemplatedParent}}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="PART_CancelButton" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="PART_RunButton" Property="Visibility" Value="Collapsed"/>
+                        </MultiDataTrigger>
+                        <Trigger SourceName="PART_RunButton" Property="IsEnabled" Value="False">
+                            <Setter TargetName="PART_RunButton" Property="Style" Value="{Binding DisabledRunButtonStyle, RelativeSource={RelativeSource TemplatedParent}}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
 </ResourceDictionary>

@@ -11,7 +11,7 @@ using System.Windows.Data;
 
 namespace GeneSort.UI.ViewModels
 {
-    public partial class WorkspaceViewerViewModel : ObservableObject
+    public partial class WorkspaceParamsVim : ObservableObject
     {
         [ObservableProperty]
         private string workspaceName = string.Empty;
@@ -48,7 +48,7 @@ namespace GeneSort.UI.ViewModels
         // Store the domain object for potential future operations
         public workspace? Workspace { get; private set; }
 
-        public WorkspaceViewerViewModel()
+        public WorkspaceParamsVim()
         {
             // Initialize with default state
             CanRunSelected = false;

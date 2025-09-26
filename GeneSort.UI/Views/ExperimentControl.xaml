@@ -32,8 +32,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             
-            <!--behaviors:TreeViewBehavior.BindableSelectedItem="{Binding SelectedFileItem, Mode=TwoWay}"-->
-
+  
             <TreeView Grid.Row="0"
                     DataContext="{Binding .}"
                     ItemsSource="{Binding Root.Children}"
@@ -87,7 +86,7 @@
                     <ContentControl Content="{Binding ContentVm}">
                         <ContentControl.Resources>
                             <!-- Template for WorkspaceViewerViewModel -->
-                            <DataTemplate DataType="{x:Type vm:WorkspaceViewerViewModel}">
+                            <DataTemplate DataType="{x:Type vm:WorkspaceParamsVim}">
                                 <local:WorkspaceViewerControl />
                             </DataTemplate>
 

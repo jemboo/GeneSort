@@ -34,8 +34,9 @@
         <StackPanel Grid.Row="1" Orientation="Vertical">
             <Label Content="Project Folder:" Style="{StaticResource ModernLabel}"/>
             <StackPanel Orientation="Horizontal">
-                <TextBox Text="{Binding ProjectFolder, Mode=OneWay}"
+                <TextBox Text="{Binding RootFolder, Mode=OneWay}"
                          Style="{StaticResource ModernTextBox}"
+                         Foreground="Black"
                          Width="500"
                          IsReadOnly="True"/>
                 <Button Content="Browse..."
