@@ -138,8 +138,8 @@
                     </Button>
 
                     <common:RunCancelButton HorizontalAlignment="Center" VerticalAlignment="Center"
-                               RunCommand="{Binding RunCommand}"
-                               CancelCommand="{Binding CancelCommand}"
+                               RunCommand="{Binding RunOperationCommand}"
+                               CancelCommand="{Binding CancelOperationCommand}"
                                IsRunning="{Binding IsRunning, Mode=TwoWay}"
                                CanCancel="{Binding CanCancel, Mode=TwoWay}"
                                RunContent="Run Operation"

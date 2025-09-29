@@ -42,13 +42,13 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.UMX" Version="1.1.0" />
-    <PackageReference Include="FsToolkit.ErrorHandling" Version="5.0.1" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="5.1.0" />
     <PackageReference Include="MessagePack" Version="3.1.4" />
     <PackageReference Include="MessagePack.FSharpExtensions" Version="4.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="9.0.303" />
+    <PackageReference Update="FSharp.Core" Version="10.0.100-preview7.25451.107" />
   </ItemGroup>
 
 </Project>

@@ -388,5 +388,60 @@ namespace GeneSort.UI.ViewModels
                 UpdateButtonStates(selectedCount);
             }
         }
+
+
+
+
+
+
+
+
+
+        [ObservableProperty]
+        private bool _isRunning;
+
+        [ObservableProperty]
+        private bool _canCancel;
+
+        private CancellationTokenSource _cts;
+
+        [RelayCommand(CanExecute = nameof(CanRunOperation))]
+        private async Task RunOperation()
+        {
+            IsRunning = true;
+            CanCancel = true;
+            _cts = new CancellationTokenSource();
+
+            try
+            {
+                await Task.Delay(10000, _cts.Token); // Simulate long-running operation
+            }
+            catch (TaskCanceledException)
+            {
+                // Operation canceled
+            }
+            finally
+            {
+                IsRunning = false;
+                CanCancel = false;
+                _cts = null;
+            }
+        }
+
+        private bool CanRunOperation()
+        {
+            return !IsRunning;
+        }
+
+        [RelayCommand(CanExecute = nameof(CanCancelOperation))]
+        private void CancelOperation()
+        {
+            _cts?.Cancel();
+        }
+
+        private bool CanCancelOperation()
+        {
+            return IsRunning && CanCancel;
+        }
     }
 }
