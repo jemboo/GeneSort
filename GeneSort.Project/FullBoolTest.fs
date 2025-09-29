@@ -314,7 +314,7 @@ module FullBoolTest =
 
 
     let RunAll() =
-        for i in 0 .. 1 do
+        for i in 0 .. 2 do
             let repl = i |> UMX.tag<replNumber>
             WorkspaceOps.executeWorkspace workspace repl 6 executor
 

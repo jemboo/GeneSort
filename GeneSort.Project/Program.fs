@@ -2,18 +2,22 @@
 open GeneSort.Project
 open System
 
-printfn $"***************** {System.DateTime.Now.ToString()}"
+let startTime = System.DateTime.Now
+printfn $"***************** {startTime.ToString()}"
 
 WorkspaceOps.saveWorkspace FullBoolTest.workspace
-//FullBoolTest.RunAll()
-FullBoolTest.RunSorterEvalReport()
+FullBoolTest.RunAll()
+//FullBoolTest.RunSorterEvalReport()
 //RandomSorters4to64.RunAll()
 //RandomSorters4n6Project.RunAll6()
 //PermutationOrbitsProject.RunAll()
 //PermutationOrbitsProject.RunPermuationOrbitCountReport()
 
+
+let endTime = System.DateTime.Now
+let duration = endTime - startTime
 printfn $"**************** All done ******************"
-printfn $"****************  {System.DateTime.Now.ToString()} ******************"
+printfn $"****************  {duration.ToString()} ******************"
 
 let yab = Console.ReadLine()
  
