@@ -99,7 +99,7 @@
                                FontWeight="SemiBold"/>
                     
 
-                    <common:RunCancelButton HorizontalAlignment="Center" VerticalAlignment="Center"
+                    <common:RunCancelButton0 HorizontalAlignment="Center" VerticalAlignment="Center"
                                RunCommand="{Binding RunOperationCommand}"
                                CancelCommand="{Binding CancelOperationCommand}"
                                IsRunning="{Binding IsRunning, Mode=TwoWay}"

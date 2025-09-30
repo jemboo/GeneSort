@@ -4,11 +4,11 @@ using System.Windows.Input;
 
 namespace GeneSort.UI.Views.Common
 {
-    public class RunCancelButton : Control
+    public class RunCancelButton0 : Control
     {
-        static RunCancelButton()
+        static RunCancelButton0()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(RunCancelButton), new FrameworkPropertyMetadata(typeof(RunCancelButton)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(RunCancelButton0), new FrameworkPropertyMetadata(typeof(RunCancelButton0)));
         }
 
         public ICommand RunCommand
@@ -17,7 +17,7 @@ namespace GeneSort.UI.Views.Common
             set => SetValue(RunCommandProperty, value);
         }
         public static readonly DependencyProperty RunCommandProperty =
-            DependencyProperty.Register(nameof(RunCommand), typeof(ICommand), typeof(RunCancelButton));
+            DependencyProperty.Register(nameof(RunCommand), typeof(ICommand), typeof(RunCancelButton0));
 
         public ICommand CancelCommand
         {
@@ -25,7 +25,7 @@ namespace GeneSort.UI.Views.Common
             set => SetValue(CancelCommandProperty, value);
         }
         public static readonly DependencyProperty CancelCommandProperty =
-            DependencyProperty.Register(nameof(CancelCommand), typeof(ICommand), typeof(RunCancelButton));
+            DependencyProperty.Register(nameof(CancelCommand), typeof(ICommand), typeof(RunCancelButton0));
 
         public bool IsRunning
         {
@@ -33,7 +33,7 @@ namespace GeneSort.UI.Views.Common
             set => SetValue(IsRunningProperty, value);
         }
         public static readonly DependencyProperty IsRunningProperty =
-            DependencyProperty.Register(nameof(IsRunning), typeof(bool), typeof(RunCancelButton));
+            DependencyProperty.Register(nameof(IsRunning), typeof(bool), typeof(RunCancelButton0));
 
         public bool CanCancel
         {
@@ -41,7 +41,7 @@ namespace GeneSort.UI.Views.Common
             set => SetValue(CanCancelProperty, value);
         }
         public static readonly DependencyProperty CanCancelProperty =
-            DependencyProperty.Register(nameof(CanCancel), typeof(bool), typeof(RunCancelButton));
+            DependencyProperty.Register(nameof(CanCancel), typeof(bool), typeof(RunCancelButton0));
 
         public object RunContent
         {
@@ -49,7 +49,7 @@ namespace GeneSort.UI.Views.Common
             set => SetValue(RunContentProperty, value);
         }
         public static readonly DependencyProperty RunContentProperty =
-            DependencyProperty.Register(nameof(RunContent), typeof(object), typeof(RunCancelButton));
+            DependencyProperty.Register(nameof(RunContent), typeof(object), typeof(RunCancelButton0));
 
         public object CancelContent
         {
@@ -57,7 +57,7 @@ namespace GeneSort.UI.Views.Common
             set => SetValue(CancelContentProperty, value);
         }
         public static readonly DependencyProperty CancelContentProperty =
-            DependencyProperty.Register(nameof(CancelContent), typeof(object), typeof(RunCancelButton));
+            DependencyProperty.Register(nameof(CancelContent), typeof(object), typeof(RunCancelButton0));
 
         public Style RunButtonStyle
         {
@@ -65,7 +65,7 @@ namespace GeneSort.UI.Views.Common
             set => SetValue(RunButtonStyleProperty, value);
         }
         public static readonly DependencyProperty RunButtonStyleProperty =
-            DependencyProperty.Register(nameof(RunButtonStyle), typeof(Style), typeof(RunCancelButton));
+            DependencyProperty.Register(nameof(RunButtonStyle), typeof(Style), typeof(RunCancelButton0));
 
         public Style DisabledRunButtonStyle
         {
@@ -73,7 +73,7 @@ namespace GeneSort.UI.Views.Common
             set => SetValue(DisabledRunButtonStyleProperty, value);
         }
         public static readonly DependencyProperty DisabledRunButtonStyleProperty =
-            DependencyProperty.Register(nameof(DisabledRunButtonStyle), typeof(Style), typeof(RunCancelButton));
+            DependencyProperty.Register(nameof(DisabledRunButtonStyle), typeof(Style), typeof(RunCancelButton0));
 
         public Style CancelButtonStyle
         {
@@ -81,6 +81,6 @@ namespace GeneSort.UI.Views.Common
             set => SetValue(CancelButtonStyleProperty, value);
         }
         public static readonly DependencyProperty CancelButtonStyleProperty =
-            DependencyProperty.Register(nameof(CancelButtonStyle), typeof(Style), typeof(RunCancelButton));
+            DependencyProperty.Register(nameof(CancelButtonStyle), typeof(Style), typeof(RunCancelButton0));
     }
 }
