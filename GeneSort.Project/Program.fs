@@ -3,11 +3,12 @@ open GeneSort.Project
 open System
 
 let startTime = System.DateTime.Now
-printfn $"***************** {startTime.ToString()}"
+printfn $"****G************* {startTime.ToString()}"
 
 WorkspaceOps.saveWorkspace FullBoolTest.workspace
 FullBoolTest.RunAll()
 //FullBoolTest.RunSorterEvalReport()
+//FullBoolTest.RunAll()
 //RandomSorters4to64.RunAll()
 //RandomSorters4n6Project.RunAll6()
 //PermutationOrbitsProject.RunAll()

@@ -95,22 +95,61 @@ module ArrayProperties =
     /// 
     /// Returns:
     /// - An array of Segment records. If the input array is empty, returns an empty array.
-    let breakIntoExponentialSegments (n: int) (rate: float) (unbrokenLength: int)  : segment[] =
-        if n <= 0 then invalidArg "n" "Number of segments must be positive"
+    let breakIntoExponentialSegments (segmentCt: int) (rate: float) (unbrokenLength: int)  : segment[] =
+        if segmentCt <= 0 then invalidArg "n" "Number of segments must be positive"
         if rate <= 1.0 then invalidArg "rate" "Rate must be greater than 1.0"
         if unbrokenLength = 0 then [||]
         else
-            let rn = Math.Pow(rate, float n)
+            let rn = Math.Pow(rate, float segmentCt)
             let denom = rn - 1.0
             let mutable prev = 0
             let segments = ResizeArray<segment>()
-            for k = 1 to n do
-                let cumFloat = if k = n then float unbrokenLength else float unbrokenLength * (Math.Pow(rate, float k) - 1.0) / denom
+            for k = 1 to segmentCt do
+                let cumFloat = if k = segmentCt then float unbrokenLength else float unbrokenLength * (Math.Pow(rate, float k) - 1.0) / denom
                 let current = int (Math.Round cumFloat)
                 let clamped = max prev (min current unbrokenLength)
                 segments.Add { start = prev; endIndex = clamped; }
                 prev <- clamped
             segments.ToArray()
+
+
+    /// Breaks the input array into n segments with exponentially increasing lengths.
+    /// The segments are shortest at the beginning and grow longer based on the rate parameter.
+    /// Returns an array of Segment records containing the bounds for each segment.
+    /// 
+    /// Parameters:
+    /// - result: The input integer array to segment.
+    /// - n: The number of segments (must be positive).
+    /// - rate: The exponential growth rate (must be greater than 1.0).
+    /// 
+    /// Throws:
+    /// - ArgumentException if n <= 0 or rate <= 1.0.
+    /// 
+    /// Returns:
+    /// - An array of Segment records. If the input array is empty, returns an empty array.
+    /// This version makes the last segment [unbrokenLength - 2, unbrokenLength]
+    let breakIntoExponentialSegments2 (segmentCt: int) (rate: float) (unbrokenLength: int)  : segment[] =
+        if segmentCt <= 1 then invalidArg "n" "Number of segments must be positive"
+        let trimCt = segmentCt - 1
+        if rate <= 1.0 then invalidArg "rate" "Rate must be greater than 1.0"
+        if unbrokenLength = 0 then [||]
+        else
+            let rn = Math.Pow(rate, float trimCt)
+            let denom = rn - 1.0
+            let mutable prev = 0
+            let segments = ResizeArray<segment>()
+            for k = 1 to trimCt do
+                let cumFloat = if k = segmentCt then float unbrokenLength else float unbrokenLength * (Math.Pow(rate, float k) - 1.0) / denom
+                let current = int (Math.Round cumFloat)
+                let clamped = max prev (min current unbrokenLength)
+                segments.Add { start = prev; endIndex = clamped; }
+                prev <- clamped
+            //segments.[trimCt -1] <- {start = segments.[trimCt -1].start; endIndex = unbrokenLength; }}
+            let yab = { start = segments.[(trimCt - 1)].start; endIndex = unbrokenLength - 1; }
+            segments.[trimCt - 1] <- yab
+            segments.Add { start = unbrokenLength - 1; endIndex = unbrokenLength; }
+            segments.ToArray()
+
 
 
     let getSegmentReportHeader (segments: segment[]) : string =

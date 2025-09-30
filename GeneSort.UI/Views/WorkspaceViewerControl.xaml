@@ -98,44 +98,6 @@
                                Margin="0,0,15,0"
                                FontWeight="SemiBold"/>
                     
-                    
-                    
-                    <Button Command="{Binding RunSelectedCommand}"
-                            IsEnabled="{Binding CanRunSelected}"
-                            Padding="15,8"
-                            FontWeight="Bold"
-                            BorderThickness="0">
-                        <Button.Content>
-                            <TextBlock>
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Text" Value="Run Selected Parameters"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsLoading}" Value="True">
-                                                <Setter Property="Text" Value="Cancel"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </Button.Content>
-                        <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                                <Setter Property="Background" Value="DarkGreen"/>
-                                <Setter Property="Foreground" Value="White"/>
-                                <Style.Triggers>
-                                    <Trigger Property="IsEnabled" Value="False">
-                                        <Setter Property="Background" Value="Gray"/>
-                                        <Setter Property="Foreground" Value="White"/>
-                                    </Trigger>
-                                    <DataTrigger Binding="{Binding IsLoading}" Value="True">
-                                        <Setter Property="Background" Value="DarkRed"/>
-                                        <Setter Property="Foreground" Value="White"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
 
                     <common:RunCancelButton HorizontalAlignment="Center" VerticalAlignment="Center"
                                RunCommand="{Binding RunOperationCommand}"

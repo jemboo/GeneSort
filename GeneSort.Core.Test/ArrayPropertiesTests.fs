@@ -118,26 +118,6 @@ type ArrayPropertiesTests() =
         let values: int[] = null
         (fun () -> isSortedOffset values 0 1 |> ignore) |> should throw typeof<System.Exception>
 
-    let breakIntoExponentialSegments (n: int) (rate: float) (intData: int[]) : segment[] =
-        if n <= 0 then invalidArg "n" "Number of segments must be positive"
-        if rate <= 1.0 then invalidArg "rate" "Rate must be greater than 1.0"
-        let len = intData.Length
-        if len = 0 then [||]
-        else
-            let rn = Math.Pow(rate, float n)
-            let denom = rn - 1.0
-            let mutable prev = 0
-            let segments = ResizeArray<segment>()
-            for k = 1 to n do
-                let cumFloat = if k = n then float len else float len * (Math.Pow(rate, float k) - 1.0) / denom
-                let current = int (Math.Round cumFloat)
-                let clamped = max prev (min current len)
-                segments.Add { start = prev; endIndex = clamped; }
-                prev <- clamped
-            segments.ToArray()
-
-
-
     ////////// Segment Tests //////////
 
     let getSegmentSums (intData: int[]) (segments: segment[]) : segmentWithPayload<int>[] =
@@ -147,31 +127,26 @@ type ArrayPropertiesTests() =
             { start = seg.start; endIndex = seg.endIndex; payload = segSum })
 
     [<Fact>]
-    let ``breakIntoExponentialSegments throws for n <= 0`` () =
-        let action = fun () -> breakIntoExponentialSegments 0 2.0 [|1;2;3|] |> ignore
+    let ``breakIntoExponentialSegments throws for segmentCt <= 1`` () =
+        let action = fun () -> breakIntoExponentialSegments 0 2.0 3 |> ignore
         action |> should throw typeof<ArgumentException>
 
     [<Fact>]
     let ``breakIntoExponentialSegments throws for rate <= 1.0`` () =
-        let action = fun () -> breakIntoExponentialSegments 3 1.0 [|1;2;3|] |> ignore
+        let action = fun () -> breakIntoExponentialSegments 3 1.0 3 |> ignore
         action |> should throw typeof<ArgumentException>
 
     [<Fact>]
-    let ``breakIntoExponentialSegments returns empty for empty array`` () =
-        let result = breakIntoExponentialSegments 3 2.0 [||]
-        result |> should be Empty
-
-    [<Fact>]
-    let ``breakIntoExponentialSegments for n=1 covers whole array`` () =
+    let ``breakIntoExponentialSegments for segmentCt=1 covers whole array`` () =
         let data = [|1..10|]
-        let segments = breakIntoExponentialSegments 1 2.0 data
+        let segments = breakIntoExponentialSegments 1 2.0 data.Length
         segments |> should haveLength 1
         segments.[0] |> should equal { start = 0; endIndex = 10 }
 
     [<Fact>]
     let ``breakIntoExponentialSegments creates exponential segments`` () =
         let data = Array.zeroCreate<int> 10  // Length 10, values irrelevant for bounds
-        let segments = breakIntoExponentialSegments 3 2.0 data
+        let segments = breakIntoExponentialSegments 3 2.0 data.Length
         segments |> should haveLength 3
         segments.[0].endIndex - segments.[0].start |> should equal 1  // Approx 10*(2-1)/7 ≈1
         segments.[1].endIndex - segments.[1].start |> should equal 3  // Approx 10*(4-1)/7 ≈4-1=3
@@ -179,9 +154,16 @@ type ArrayPropertiesTests() =
 
 
     [<Fact>]
+    let ``breakIntoExponentialSegments2 creates exponential segments`` () =
+        let data = Array.zeroCreate<int> 10  // Length 10, values irrelevant for bounds
+        let segments = breakIntoExponentialSegments2 3 2.0 data.Length
+        segments |> should haveLength 3
+
+
+    [<Fact>]
     let ``breakIntoExponentialSegments segments are contiguous`` () =
         let data = [|1..10|]
-        let segments = breakIntoExponentialSegments 4 1.5 data
+        let segments = breakIntoExponentialSegments 4 1.5 data.Length
         for i in 1 .. segments.Length - 1 do
             segments.[i].start |> should equal segments.[i-1].endIndex
         segments.[segments.Length-1].endIndex |> should equal 10

@@ -11,7 +11,7 @@ using System.Windows.Data;
 
 namespace GeneSort.UI.ViewModels
 {
-    public partial class WorkspaceParamsVim : ObservableObject
+    public partial class WorkspaceParamsVm : ObservableObject
     {
         [ObservableProperty]
         private string workspaceName = string.Empty;
@@ -48,7 +48,7 @@ namespace GeneSort.UI.ViewModels
         // Store the domain object for potential future operations
         public workspace? Workspace { get; private set; }
 
-        public WorkspaceParamsVim()
+        public WorkspaceParamsVm()
         {
             // Initialize with default state
             CanRunSelected = false;
@@ -272,15 +272,12 @@ namespace GeneSort.UI.ViewModels
             if (sender is DataGrid dataGrid)
             {
                 var selectedCount = dataGrid.SelectedItems.Count;
-                UpdateButtonStates(selectedCount);
+                UpdateSelectedRunsText(selectedCount);
             }
         }
 
-        private void UpdateButtonStates(int selectedCount)
+        private void UpdateSelectedRunsText(int selectedCount)
         {
-            // Run button is enabled if we have selections OR if we're currently running (for cancellation)
-            CanRunSelected = selectedCount > 0; //|| IsLoading;
-
             SelectedRunsText = selectedCount switch
             {
                 0 => IsLoading ? "Running..." : "No runs selected",
@@ -288,113 +285,6 @@ namespace GeneSort.UI.ViewModels
                 _ => IsLoading ? $"Running {selectedCount} parameter sets..." : $"{selectedCount} runs selected"
             };
         }
-
-        [RelayCommand]
-        private async Task RunSelected()
-        {
-            if (IsLoading) // If already running, cancel
-            {
-                _runCancellationTokenSource?.Cancel();
-                return;
-            }
-
-            if (ParametersDataGrid == null || Workspace == null)
-                return;
-
-            var selectedItems = ParametersDataGrid.SelectedItems.Cast<Dictionary<string, object>>().ToList();
-            if (!selectedItems.Any())
-                return;
-
-            // Extract the runParameters for the selected rows
-            var selectedRunParameters = new List<runParameters>();
-
-            foreach (var selectedItem in selectedItems)
-            {
-                // Get the index (1-based in UI, 0-based in array)
-                if (selectedItem.TryGetValue("Index", out var indexObj) && indexObj is int index)
-                {
-                    var arrayIndex = index - 1; // Convert to 0-based
-                    if (arrayIndex >= 0 && arrayIndex < Workspace.RunParametersArray.Length)
-                    {
-                        selectedRunParameters.Add(Workspace.RunParametersArray[arrayIndex]);
-                    }
-                }
-            }
-
-            // Create new cancellation token for this run
-            _runCancellationTokenSource = new CancellationTokenSource();
-
-            // Call your run method here
-            await ExecuteRunParameters(selectedRunParameters, _runCancellationTokenSource.Token);
-        }
-
-        private async Task ExecuteRunParameters(List<runParameters> runParameters, CancellationToken cancellationToken)
-        {
-            try
-            {
-                IsLoading = true;
-
-                // TODO: Implement your actual run logic here with cancellation support
-                // For now, just simulate some work with cancellation
-                for (int i = 0; i < runParameters.Count; i++)
-                {
-                    // Check for cancellation before processing each parameter set
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    // Simulate work (replace with actual run logic)
-                    await Task.Delay(2000, cancellationToken);
-
-                    System.Diagnostics.Debug.WriteLine($"Executed parameter set {i + 1} of {runParameters.Count}: {runParameters[i].toString()}");
-                }
-
-                // Example of what you might do:
-                // foreach (var runParam in runParameters)
-                // {
-                //     cancellationToken.ThrowIfCancellationRequested();
-                //     await YourRunEngine.ExecuteAsync(runParam, cancellationToken);
-                // }
-
-                System.Diagnostics.Debug.WriteLine($"Completed execution of {runParameters.Count} parameter sets");
-            }
-            catch (OperationCanceledException)
-            {
-                System.Diagnostics.Debug.WriteLine("Run execution was cancelled");
-                // Don't set ErrorMessage for cancellation - it's expected
-            }
-            catch (Exception ex)
-            {
-                ErrorMessage = $"Error executing runs: {ex.Message}";
-            }
-            finally
-            {
-                IsLoading = false;
-                _runCancellationTokenSource?.Dispose();
-                _runCancellationTokenSource = null;
-
-                // Update button states with actual selection count
-                if (ParametersDataGrid != null)
-                {
-                    var selectedCount = ParametersDataGrid.SelectedItems.Count;
-                    UpdateButtonStates(selectedCount);
-                }
-            }
-        }
-        partial void OnIsLoadingChanged(bool value)
-        {
-            // Update button states when loading state changes
-            if (ParametersDataGrid != null)
-            {
-                var selectedCount = ParametersDataGrid.SelectedItems.Count;
-                UpdateButtonStates(selectedCount);
-            }
-        }
-
-
-
-
-
-
-
 
 
         [ObservableProperty]

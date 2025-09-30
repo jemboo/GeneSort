@@ -66,8 +66,10 @@ module SorterSetCeUseProfile =
             (blockGrowthRate:float)
             (sorterSetEval:sorterSetEval) =
 
-        let profileSegments = ArrayProperties.breakIntoExponentialSegments segmentCount blockGrowthRate (sorterSetEval.CeLength |> int)
-
+        let profileSegments = ArrayProperties.breakIntoExponentialSegments2 
+                                    segmentCount 
+                                    blockGrowthRate 
+                                    (sorterSetEval.CeLength |> int)
         {
             sorterSetCeUseProfile.profileSegments = profileSegments
             sorterSetId = sorterSetEval.SorterSetId

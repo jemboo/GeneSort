@@ -72,7 +72,7 @@ namespace GeneSort.UI.ViewModels
             // Check if tab already exists
             var existingTab = FileTabs.FirstOrDefault(t =>
                 (t.ContentVm is FileViewerViewModel fv && fv.FilePath == path) ||
-                (t.ContentVm is WorkspaceParamsVim wv && wv.FilePath == path));
+                (t.ContentVm is WorkspaceParamsVm wv && wv.FilePath == path));
 
             if (existingTab != null)
             {
@@ -85,7 +85,7 @@ namespace GeneSort.UI.ViewModels
             if (IsWorkspaceFile(path, fileName))
             {
                 // Create WorkspaceViewer tab
-                var workspaceVm = new WorkspaceParamsVim();
+                var workspaceVm = new WorkspaceParamsVm();
                 var newTab = new TabViewModel
                 {
                     Header = fileName,

@@ -43,8 +43,8 @@ module FullBoolTest =
         | 6 -> (10 * factor) |> UMX.tag<sorterCount>
         | 8 -> (10 * factor) |> UMX.tag<sorterCount>
         | 12 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 16 -> (50 * factor) |> UMX.tag<sorterCount>
-        | 24 -> (50 * factor) |> UMX.tag<sorterCount>
+        | 16 -> (10 * factor) |> UMX.tag<sorterCount>
+        | 24 -> (2 * factor) |> UMX.tag<sorterCount>
         | 32 -> (50 * factor) |> UMX.tag<sorterCount>
         | 48 -> (10 * factor) |> UMX.tag<sorterCount>
         | 64 -> (10 * factor) |> UMX.tag<sorterCount>
@@ -52,35 +52,19 @@ module FullBoolTest =
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
 
-    let getCeLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<ceLength> =
-        match %sortingWidth with
-        | 4 -> 300 |> UMX.tag<ceLength>
-        | 6 -> 600 |> UMX.tag<ceLength>
-        | 8 -> 16 |> UMX.tag<ceLength>
-        | 12 -> 24 |> UMX.tag<ceLength>
-        | 16 -> 32 |> UMX.tag<ceLength>
-        | 24 -> 48 |> UMX.tag<ceLength>
-        | 32 -> 64 |> UMX.tag<ceLength>
-        | 48 -> 96 |> UMX.tag<ceLength>
-        | 64 -> 128 |> UMX.tag<ceLength>
-        | 96 -> 192 |> UMX.tag<ceLength>
-        | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
-
-
     let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageLength> =
         match %sortingWidth with
-        | 4 -> 5 |> UMX.tag<stageLength>
-        | 6 -> 10 |> UMX.tag<stageLength>
-        | 8 -> 20 |> UMX.tag<stageLength>
-        | 12 -> 30 |> UMX.tag<stageLength>
-        | 16 -> 100 |> UMX.tag<stageLength>
-        | 24 -> 150 |> UMX.tag<stageLength>
-        | 32 -> 200 |> UMX.tag<stageLength>
-        | 48 -> 300 |> UMX.tag<stageLength>
-        | 64 -> 400 |> UMX.tag<stageLength>
-        | 96 -> 600 |> UMX.tag<stageLength>
+        | 4 -> 15 |> UMX.tag<stageLength>
+        | 6 -> 20 |> UMX.tag<stageLength>
+        | 8 -> 60 |> UMX.tag<stageLength>
+        | 12 -> 80 |> UMX.tag<stageLength>
+        | 16 -> 200 |> UMX.tag<stageLength>
+        | 24 -> 400 |> UMX.tag<stageLength>
+        | 32 -> 600 |> UMX.tag<stageLength>
+        | 48 -> 2000 |> UMX.tag<stageLength>
+        | 64 -> 4000 |> UMX.tag<stageLength>
+        | 96 -> 10000 |> UMX.tag<stageLength>
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
-
 
 
     let sortableArrayType = sortableArrayType.Bools
@@ -141,11 +125,12 @@ module FullBoolTest =
             let sorterModelKey = run.RunParameters.GetSorterModelKey()
             let sortingWidth = run.RunParameters.GetSortingWidth()
 
-            let ceLength = getCeLengthForSortingWidth sortingWidth
-            run.RunParameters.SetCeLength ceLength
-
             let stageLength = getStageLengthForSortingWidth sortingWidth
             run.RunParameters.SetStageLength stageLength
+
+            let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
+            run.RunParameters.SetCeLength ceLength
+
 
             let sorterModelMaker =
                 match sorterModelKey with
@@ -314,14 +299,14 @@ module FullBoolTest =
 
 
     let RunAll() =
-        for i in 0 .. 2 do
+        for i in 0 .. 0 do
             let repl = i |> UMX.tag<replNumber>
-            WorkspaceOps.executeWorkspace workspace repl 6 executor
+            WorkspaceOps.executeWorkspace workspace repl 8 executor
 
 
     let RunSorterEvalReport() =
-         (binReportExecutor workspace)
-    //    (ceUseProfileReportExecutor workspace)
+    //     (binReportExecutor workspace)
+       (ceUseProfileReportExecutor workspace)
 
 
 

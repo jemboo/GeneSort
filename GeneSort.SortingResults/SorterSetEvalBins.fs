@@ -20,7 +20,7 @@ type sorterEvalBin = {
 module SorterEvalBin =
     //returns [(uuct1, ct1); (uuct2, ct2) ... ], a histogram report of
     // unsortedCount properties of sorterEvalBin.sorterEvals, where ct1 is the
-    // number of sorterEvals that have unsortedCount = ct1
+    // number of sorterEvals that have unsortedCount = uuct1
     let getUnsortedHistogram (seb: sorterEvalBin) :string =
             seb.sorterEvals
             |> Seq.groupBy (fun se -> se.UnsortedCount)

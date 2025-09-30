@@ -86,7 +86,7 @@
                     <ContentControl Content="{Binding ContentVm}">
                         <ContentControl.Resources>
                             <!-- Template for WorkspaceViewerViewModel -->
-                            <DataTemplate DataType="{x:Type vm:WorkspaceParamsVim}">
+                            <DataTemplate DataType="{x:Type vm:WorkspaceParamsVm}">
                                 <local:WorkspaceViewerControl />
                             </DataTemplate>
 
