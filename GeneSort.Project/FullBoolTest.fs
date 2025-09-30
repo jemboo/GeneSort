@@ -70,7 +70,7 @@ module FullBoolTest =
     let sortableArrayType = sortableArrayType.Bools
   
     let sortingWidthValues = 
-        [4; 6; 8; 12; 16;] |> List.map(fun d -> d.ToString())
+        [4; 6; 8; 12; 16; 24] |> List.map(fun d -> d.ToString())
 
     let sortingWidths() : string*string list =
         (runParameters.sortingWidthKey, sortingWidthValues)
@@ -299,9 +299,9 @@ module FullBoolTest =
 
 
     let RunAll() =
-        for i in 0 .. 0 do
+        for i in 0 .. 4 do
             let repl = i |> UMX.tag<replNumber>
-            WorkspaceOps.executeWorkspace workspace repl 8 executor
+            WorkspaceOps.executeWorkspace workspace repl 12 executor
 
 
     let RunSorterEvalReport() =
