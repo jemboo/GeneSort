@@ -46,5 +46,29 @@ namespace GeneSort.UI.Views.Common
             bool newValue = (bool)e.NewValue;
             // You can add logging or other logic here if needed, but this callback is invoked whenever the property value changes.
         }
+
+        public Style RunButtonStyle
+        {
+            get => (Style)GetValue(RunButtonStyleProperty);
+            set => SetValue(RunButtonStyleProperty, value);
+        }
+        public static readonly DependencyProperty RunButtonStyleProperty =
+            DependencyProperty.Register(nameof(RunButtonStyle), typeof(Style), typeof(RunCancelControl));
+
+        public Style DisabledRunButtonStyle
+        {
+            get => (Style)GetValue(DisabledRunButtonStyleProperty);
+            set => SetValue(DisabledRunButtonStyleProperty, value);
+        }
+        public static readonly DependencyProperty DisabledRunButtonStyleProperty =
+            DependencyProperty.Register(nameof(DisabledRunButtonStyle), typeof(Style), typeof(RunCancelControl));
+
+        public Style CancelButtonStyle
+        {
+            get => (Style)GetValue(CancelButtonStyleProperty);
+            set => SetValue(CancelButtonStyleProperty, value);
+        }
+        public static readonly DependencyProperty CancelButtonStyleProperty =
+            DependencyProperty.Register(nameof(CancelButtonStyle), typeof(Style), typeof(RunCancelControl));
     }
 }

@@ -157,8 +157,8 @@ module FullBoolTest =
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 
             let sorterTestModel = MsasF.create sortingWidth |> sortableTestModel.MsasF
-            let sorterTest = SortableTestModel.makeSortableTests sorterTestModel sortableArrayType
-            let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sorterTest
+            let sortableTests = SortableTestModel.makeSortableTests sorterTestModel sortableArrayType
+            let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
 
             do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl (sorterSet |> outputData.SorterSet)
             do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl (sorterSetEval |> outputData.SorterSetEval)

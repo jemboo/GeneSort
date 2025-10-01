@@ -3,16 +3,16 @@ open GeneSort.Project
 open System
 
 let startTime = System.DateTime.Now
-printfn $"****G************* {startTime.ToString()}"
+printfn $"**** QQQ ******** {startTime.ToString()}"
 
-WorkspaceOps.saveWorkspace FullBoolTest.workspace
-FullBoolTest.RunAll()
-//FullBoolTest.RunSorterEvalReport()
+//WorkspaceOps.saveWorkspace FullBoolTest.workspace
 //FullBoolTest.RunAll()
-//RandomSorters4to64.RunAll()
-//RandomSorters4n6Project.RunAll6()
-//PermutationOrbitsProject.RunAll()
-//PermutationOrbitsProject.RunPermuationOrbitCountReport()
+//FullBoolTest.RunSorterEvalReport()
+
+
+WorkspaceOps.saveWorkspace MergeIntTests.workspace
+//MergeIntTests.RunAll()
+MergeIntTests.RunSorterEvalReport()
 
 
 let endTime = System.DateTime.Now

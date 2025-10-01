@@ -5,6 +5,14 @@ open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Model.Sorter
 
+// Stage lengths for different sorting widths and probabilities for full sort
+//SortProb	4-Mcse	4-Msrs	4-Mssi	4-Msuf4	6-Mcse	6-Msrs	 6-Mssi	 6-Msuf6  8-Mcse	8-Msrs	8-Mssi	8-Msuf4	12-Mcse	12-Msrs	12-Mssi	12-Msuf6  16-Mcse  16-Msrs	16-Mssi	 16-Msuf4  24-Mcse	24-Msrs	24-Mssi	24-Msuf6
+//0.25	    1	    3	    3	    3	     6	     9	      9	      7	        13	     16	     18	     16	     31	     37	     36	     41	        51	      63	  58	   71	     96	     120	 104	 192
+//0.5	    2	    4	    4	    4	     8	    12	     12	      9	        17	     21	     22	     21	     37	     46	     43	     52	        60	      77	  67	   88	    111	     145	 120	 231
+//0.75	    2	    6	    5	    6	    11	    15	     15	     13	        21	     28	     27	     28	     45	     56	     52	     64	        71	      94	  80	  111	    129	     174	 141	 279
+//0.9	    4	    8	    7	    8	    14	    18	     17	     16	        26	     35	     33	     35	     53	     68	     62 	 73	        83	     113	  93	  136	    149	     211	 162	 332
+//0.99	    6	    12	    12	    13	    20	    19	     19	     19	        40	     51	     49	     51	     71	     77	     75	     79	       112	     149	  133	  180	    187	     291	 215	 388
+
 
 module StageLength =
 
