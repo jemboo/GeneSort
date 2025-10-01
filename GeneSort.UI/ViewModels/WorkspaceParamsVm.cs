@@ -8,6 +8,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Input;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace GeneSort.UI.ViewModels
 {
@@ -38,10 +40,25 @@ namespace GeneSort.UI.ViewModels
         private bool canRunSelected;
 
         [ObservableProperty]
-        private string selectedRunsText = "No runs selected";
+        private string runMessage = "No runs selected";
+
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(RunOperationCommand))]
+        private int _selectedCount;
+
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(RunOperationCommand))]
+        [NotifyCanExecuteChangedFor(nameof(CancelOperationCommand))]
+        private bool _isRunning;
+
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(CancelOperationCommand))]
+        private bool _canCancel;
 
         [ObservableProperty]
         private ObservableCollection<string> reportKeys = new();
+
+
 
         private CancellationTokenSource? _runCancellationTokenSource;
 
@@ -52,6 +69,7 @@ namespace GeneSort.UI.ViewModels
         {
             // Initialize with default state
             CanRunSelected = false;
+            IsRunning = false;
         }
 
         public async Task LoadWorkspaceAsync(string filePath)
@@ -164,7 +182,6 @@ namespace GeneSort.UI.ViewModels
                 });
             });
         }
-
         private void CreateParametersDataGrid(workspace workspace)
         {
             var dataGrid = new DataGrid
@@ -260,11 +277,24 @@ namespace GeneSort.UI.ViewModels
 
             dataGrid.ItemsSource = dataRows;
 
+            // Make selected rows visible even when unfocused
+            dataGrid.Resources[SystemColors.InactiveSelectionHighlightBrushKey] = SystemColors.HighlightBrush;
+            dataGrid.Resources[SystemColors.InactiveSelectionHighlightTextBrushKey] = SystemColors.HighlightTextBrush;
+
             // Subscribe to selection changes
             dataGrid.SelectionChanged += DataGrid_SelectionChanged;
+            dataGrid.PreviewMouseDown += DataGrid_PreviewMouseDown;
             dataGrid.SelectionMode = DataGridSelectionMode.Extended; // Allow multiple selections
 
             ParametersDataGrid = dataGrid;
+        }
+        private void DataGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (IsRunning)
+            {
+                e.Handled = true; // Prevent selection changes while running
+                return;
+            }
         }
 
         private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -272,13 +302,14 @@ namespace GeneSort.UI.ViewModels
             if (sender is DataGrid dataGrid)
             {
                 var selectedCount = dataGrid.SelectedItems.Count;
-                UpdateSelectedRunsText(selectedCount);
+                SelectedCount = selectedCount; // Update the observable property (this will trigger command requery)
+                UpdateSelectedRuns(selectedCount);
             }
         }
 
-        private void UpdateSelectedRunsText(int selectedCount)
+        private void UpdateSelectedRuns(int selectedCount)
         {
-            SelectedRunsText = selectedCount switch
+            RunMessage = selectedCount switch
             {
                 0 => IsLoading ? "Running..." : "No runs selected",
                 1 => IsLoading ? "Running 1 parameter set..." : "1 run selected",
@@ -287,13 +318,11 @@ namespace GeneSort.UI.ViewModels
         }
 
 
-        [ObservableProperty]
-        private bool _isRunning;
-
-        [ObservableProperty]
-        private bool _canCancel;
-
         private CancellationTokenSource _cts;
+
+
+
+        #region Run Command
 
         [RelayCommand(CanExecute = nameof(CanRunOperation))]
         private async Task RunOperation()
@@ -304,11 +333,21 @@ namespace GeneSort.UI.ViewModels
 
             try
             {
-                await Task.Delay(10000, _cts.Token); // Simulate long-running operation
+                foreach (var selectedRow in ParametersDataGrid!.SelectedItems)
+                {
+                    if (_cts.Token.IsCancellationRequested)
+                        break;
+                    // Simulate processing each selected item
+                    var qua = selectedRow as Dictionary<string, object>;
+                    var yab = (int)qua["Index"];
+                    RunMessage = $"Executing Run {yab}";
+                    await Task.Delay(1000, _cts.Token); // Simulate work per item
+                }
+                RunMessage = $"Finished";
             }
             catch (TaskCanceledException)
             {
-                // Operation canceled
+                RunMessage = "Operation canceled";
             }
             finally
             {
@@ -320,8 +359,15 @@ namespace GeneSort.UI.ViewModels
 
         private bool CanRunOperation()
         {
-            return !IsRunning;
+            return !IsRunning && SelectedCount > 0;
         }
+
+        #endregion
+
+
+
+
+        #region Cancel
 
         [RelayCommand(CanExecute = nameof(CanCancelOperation))]
         private void CancelOperation()
@@ -333,5 +379,7 @@ namespace GeneSort.UI.ViewModels
         {
             return IsRunning && CanCancel;
         }
+
+        #endregion
     }
 }

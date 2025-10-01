@@ -64,7 +64,7 @@ module SorterSetCeUseProfile =
     let makeSorterSetCeUseProfile
             (segmentCount:int)
             (blockGrowthRate:float)
-            (sorterSetEval:sorterSetEval) =
+            (sorterSetEval:sorterSetEval) : sorterSetCeUseProfile  =
 
         let profileSegments = ArrayProperties.breakIntoExponentialSegments2 
                                     segmentCount 

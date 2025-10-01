@@ -164,7 +164,7 @@
     </Style>
 
     <Style x:Key="DefaultRunButtonStyle" TargetType="Button">
-        <Setter Property="Background" Value="Green"/>
+        <Setter Property="Background" Value="Pink"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="Padding" Value="10"/>
         <Setter Property="FontWeight" Value="Bold"/>
@@ -192,12 +192,14 @@
                         <Button x:Name="PART_RunButton"
                                     Command="{TemplateBinding RunCommand}"
                                     Content="{TemplateBinding RunContent}"
-                                    Style="{TemplateBinding RunButtonStyle}"/>
+                                    Style="{TemplateBinding RunButtonStyle}"
+                                    Visibility="Visible"/>
+                        
                         <Button x:Name="PART_CancelButton"
                                     Command="{TemplateBinding CancelCommand}"
                                     Content="{TemplateBinding CancelContent}"
                                     Style="{TemplateBinding CancelButtonStyle}"
-                                    Visibility="Collapsed"/>
+                                    Visibility="Visible"/>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <MultiDataTrigger>
@@ -208,6 +210,7 @@
                             <Setter TargetName="PART_CancelButton" Property="Visibility" Value="Visible"/>
                             <Setter TargetName="PART_RunButton" Property="Visibility" Value="Collapsed"/>
                         </MultiDataTrigger>
+                        
                         <Trigger SourceName="PART_RunButton" Property="IsEnabled" Value="False">
                             <Setter TargetName="PART_RunButton" Property="Style" Value="{Binding DisabledRunButtonStyle, RelativeSource={RelativeSource TemplatedParent}}"/>
                         </Trigger>

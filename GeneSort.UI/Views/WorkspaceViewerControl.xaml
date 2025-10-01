@@ -86,49 +86,35 @@
                 Padding="10" 
                 Margin="0,10,0,0">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
                 <!-- Run Button Section -->
-                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding SelectedRunsText}" 
-                               VerticalAlignment="Center" 
-                               Margin="0,0,15,0"
-                               FontWeight="SemiBold"/>
-                    
+                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
 
-                    <common:RunCancelButton0 HorizontalAlignment="Center" VerticalAlignment="Center"
+                    <common:RunCancelControl HorizontalAlignment="Center" VerticalAlignment="Center"
                                RunCommand="{Binding RunOperationCommand}"
                                CancelCommand="{Binding CancelOperationCommand}"
-                               IsRunning="{Binding IsRunning, Mode=TwoWay}"
-                               CanCancel="{Binding CanCancel, Mode=TwoWay}"
-                               RunContent="Run Operation"
-                               CancelContent="Cancel Operation"
-                               RunButtonStyle="{StaticResource DefaultRunButtonStyle}"
-                               DisabledRunButtonStyle="{StaticResource DisabledRunButtonStyle}"
-                               CancelButtonStyle="{StaticResource CancelButtonStyle}"/>
+                               IsRunning="{Binding IsRunning, Mode=TwoWay}" />
 
 
 
-
-                </StackPanel>
-
-                <!-- Report Buttons Section -->
-                <ScrollViewer Grid.Column="1" 
+                    <!-- Report Buttons Section -->
+                    <ScrollViewer Grid.Column="1" 
                              HorizontalScrollBarVisibility="Auto" 
                              VerticalScrollBarVisibility="Disabled"
                              Margin="20,0,0,0">
-                    <ItemsControl ItemsSource="{Binding ReportKeys}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Button Content="{Binding}" 
+                        <ItemsControl ItemsSource="{Binding ReportKeys}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Content="{Binding}" 
                                         Command="{Binding DataContext.GenerateReportCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}"
                                         IsEnabled="{Binding DataContext.CanRunSelected, RelativeSource={RelativeSource AncestorType=UserControl}}"
@@ -136,23 +122,31 @@
                                         Margin="5,0"
                                         FontWeight="SemiBold"
                                         BorderThickness="0">
-                                    <Button.Style>
-                                        <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                                            <Setter Property="Background" Value="DarkBlue"/>
-                                            <Setter Property="Foreground" Value="White"/>
-                                            <Style.Triggers>
-                                                <Trigger Property="IsEnabled" Value="False">
-                                                    <Setter Property="Background" Value="Gray"/>
-                                                    <Setter Property="Foreground" Value="White"/>
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Style>
-                                </Button>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                <Setter Property="Background" Value="DarkBlue"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsEnabled" Value="False">
+                                                        <Setter Property="Background" Value="Gray"/>
+                                                        <Setter Property="Foreground" Value="White"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                </StackPanel>
+
+                <TextBlock Grid.Row="1" Text="{Binding RunMessage}" 
+                               VerticalAlignment="Center" 
+                               Margin="0,5,0,0"
+                               FontWeight="SemiBold"/>
+
             </Grid>
         </Border>
     </Grid>
