@@ -44,15 +44,15 @@ module MergeIntTests =
         | 8 -> (10 * factor) |> UMX.tag<sorterCount>
         | 12 -> (10 * factor) |> UMX.tag<sorterCount>
         | 16 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 24 -> (2 * factor) |> UMX.tag<sorterCount>
-        | 32 -> (50 * factor) |> UMX.tag<sorterCount>
+        | 24 -> (10 * factor) |> UMX.tag<sorterCount>
+        | 32 -> (10 * factor) |> UMX.tag<sorterCount>
         | 48 -> (10 * factor) |> UMX.tag<sorterCount>
         | 64 -> (10 * factor) |> UMX.tag<sorterCount>
         | 96 -> (10 * factor) |> UMX.tag<sorterCount>
         | 128 -> (10 * factor) |> UMX.tag<sorterCount>
         | 192 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 256 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 384 -> (10 * factor) |> UMX.tag<sorterCount>
+        | 256 -> (2 * factor) |> UMX.tag<sorterCount>
+        | 384 -> (2 * factor) |> UMX.tag<sorterCount>
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
 
@@ -70,8 +70,8 @@ module MergeIntTests =
         | 96 -> 5000 |> UMX.tag<stageLength>
         | 128 -> 10000 |> UMX.tag<stageLength>
         | 192 -> 20000 |> UMX.tag<stageLength>
-        | 256 -> 40000 |> UMX.tag<stageLength>
-        | 384 -> 100000 |> UMX.tag<stageLength>
+        | 256 -> 30000 |> UMX.tag<stageLength>
+        | 384 -> 60000 |> UMX.tag<stageLength>
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
         
 
