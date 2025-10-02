@@ -68,8 +68,8 @@ module MergeIntTests =
         | 48 -> 1000 |> UMX.tag<stageLength>
         | 64 -> 2000 |> UMX.tag<stageLength>
         | 96 -> 5000 |> UMX.tag<stageLength>
-        | 128 -> 10000 |> UMX.tag<stageLength>
-        | 192 -> 20000 |> UMX.tag<stageLength>
+        | 128 -> 6000 |> UMX.tag<stageLength>
+        | 192 -> 15000 |> UMX.tag<stageLength>
         | 256 -> 30000 |> UMX.tag<stageLength>
         | 384 -> 60000 |> UMX.tag<stageLength>
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
