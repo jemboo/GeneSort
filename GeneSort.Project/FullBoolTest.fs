@@ -301,7 +301,7 @@ module FullBoolTest =
     let RunAll() =
         for i in 0 .. 0 do
             let repl = i |> UMX.tag<replNumber>
-            WorkspaceOps.executeWorkspace workspace repl 8 executor
+            WorkspaceOps.executeWorkspace2 workspace 8 executor
 
 
     let RunSorterEvalReport() =
