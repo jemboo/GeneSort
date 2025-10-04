@@ -21,6 +21,7 @@ open GeneSort.SortingOps.Mp
 
 type outputDataType =
     | Run
+    | Run2
     | SorterSet
     | SortableTestSet
     | SorterModelSetMaker
@@ -37,6 +38,7 @@ module OutputDataType =
     let toString (outputDataType: outputDataType) : string =
         match outputDataType with
         | Run -> "Run"
+        | Run2 -> "Run2"
         | SorterSet -> "SorterSet"
         | SortableTestSet -> "SortableTestSet"
         | SorterModelSetMaker -> "SorterModelSet"
@@ -49,6 +51,7 @@ module OutputDataType =
 
 type outputData =
     | Run of run
+    | Run2 of run2
     | SorterSet of sorterSet
     | SortableTestSet of sortableTestSet
     | SorterModelSetMaker of sorterModelSetMaker
@@ -65,6 +68,7 @@ module OutputData =
     let getOutputDataType (outputData: outputData) : outputDataType =
         match outputData with
         | Run _ -> outputDataType.Run
+        | Run2 _ -> outputDataType.Run2
         | SorterSet _ -> outputDataType.SorterSet
         | SortableTestSet _ -> outputDataType.SortableTestSet
         | SorterModelSetMaker _ -> outputDataType.SorterModelSetMaker
@@ -117,6 +121,9 @@ module OutputData =
                 | Run r -> 
                     let dto = RunDto.toRunDto r
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | Run2 r -> 
+                    let dto = Run2Dto.toRunDto r
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterSet ss ->
                     let dto = SorterSetDto.fromDomain ss
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
@@ -160,6 +167,9 @@ module OutputData =
                 | Run r -> 
                     let dto = RunDto.toRunDto r
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | Run2 r -> 
+                    let dto = Run2Dto.toRunDto r
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterSet ss ->
                     let dto = SorterSetDto.fromDomain ss
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
@@ -189,12 +199,6 @@ module OutputData =
                 printfn "Error saving to file %s: %s" filePath e.Message
                 raise e // Re-throw to ensure the caller is aware of the failure
         }
-
-
-
-
-
-
 
 
 

@@ -111,15 +111,15 @@ module MergeIntTests =
 
     let parameterSet = 
         [ sortingWidths(); sorterModelKeys() ]
-
-    let repls = [|"Rep1"; "Rep2"; "Rep3"; "Rep4"|]
+        
+    let reportNames = [|"Report1"; "Report2"; "Report3"; "Report4"|]
 
     let workspace = 
             Workspace.create 
                 experimentName 
                 experimentDesc 
                 projectDir
-                repls 
+                reportNames 
                 parameterSet 
                 paramMapRefiner
 

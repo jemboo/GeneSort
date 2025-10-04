@@ -51,6 +51,15 @@ module WorkspaceOps =
                         (runParams.SetRepl repl )
                         run.create i repl runParams)
 
+
+
+    /// Returns a sequence of Runs made from all possible parameter combinations
+    let getRuns2 (workspace: workspace) : run2 seq =
+        workspace.RunParametersArray 
+        |> Seq.mapi (fun i runParams  -> 
+                        run2.create i runParams)
+
+
     /// Executes async computations in parallel, limited to maxDegreeOfParallelism at a time
     let private ParallelWithThrottle (maxDegreeOfParallelism: int) (computations: seq<Async<unit>>) : Async<unit> =
         async {
@@ -114,25 +123,26 @@ module WorkspaceOps =
     let executeWorkspace2
                 (workspace: workspace)
                 (maxDegreeOfParallelism: int) 
-                (executor: workspace -> int<replNumber> -> run -> Async<unit>)
+                (executor: workspace -> run2 -> Async<unit>)
                 : unit =
 
-        let runs = getRuns workspace repl
+        let runs = getRuns2 workspace
 
-        let executeRun (run:run) = async {
+        let executeRun (run:run2) = async {
 
+            let repl = run.RunParameters.GetRepl()
             let filePathRun = OutputData.getOutputFileName 
                                 workspace.WorkspaceFolder
                                 run.Index 
-                                run.Repl 
+                                repl 
                                 (outputDataType.Run |> OutputDataType.toString) 
 
             if File.Exists filePathRun then
                         printfn "Skipping Run %d: Output file %s already exists" run.Index filePathRun
             else
                 try
-                    do! executor workspace repl run
-                    do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl (run |> outputData.Run)
+                    do! executor workspace run
+                    do! OutputData.saveToFile filePathRun (run |> outputData.Run2)
                 with e ->
                     printfn "Error processing Run %d: %s" run.Index e.Message
         }

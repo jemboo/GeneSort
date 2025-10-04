@@ -7,11 +7,11 @@ printfn $"**** QQQ ******** {startTime.ToString()}"
 
 //WorkspaceOps.saveWorkspace FullBoolTest.workspace
 //FullBoolTest.RunAll()
-//FullBoolTest.RunSorterEvalReport()
+FullBoolTest.RunSorterEvalReport()
 
 
-WorkspaceOps.saveWorkspace FullBoolTest.workspace
-FullBoolTest.RunAll()
+//WorkspaceOps.saveWorkspace MergeIntTests.workspace
+//MergeIntTests.RunAll()
 //MergeIntTests.RunSorterEvalReport()
 
 
