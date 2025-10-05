@@ -111,7 +111,7 @@ module FullBoolTest =
     let parameterSet = 
         [ repls();  sortingWidths(); sorterModelKeys();]
 
-    let reportNames = [|"Report1"; "Report2"; "Report3"; "Report4"|]
+    let reportNames = [|"Bins"; "Profiles"; "Report3"; "Report4"|]
 
     let workspace = 
             Workspace.create 
@@ -121,59 +121,6 @@ module FullBoolTest =
                 reportNames
                 parameterSet
                 paramMapRefiner
-
-
-    let executor (workspace: workspace) (repl: int<replNumber>) (run: run) : Async<unit> =
-        async {
-
-            Console.WriteLine(sprintf "Executing Run %d  %s" run.Index (run.RunParameters.toString()))
-            run.RunParameters.SetRepl repl
-
-            let sorterModelKey = run.RunParameters.GetSorterModelKey()
-            let sortingWidth = run.RunParameters.GetSortingWidth()
-
-            let stageLength = getStageLengthForSortingWidth sortingWidth
-            run.RunParameters.SetStageLength stageLength
-
-            let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
-            run.RunParameters.SetCeLength ceLength
-
-
-            let sorterModelMaker =
-                match sorterModelKey with
-                | sorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> sorterModelMaker.SmmMsceRandGen
-                | sorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageLength) |> sorterModelMaker.SmmMssiRandGen
-                | sorterModelKey.Msrs -> 
-                    let opsGenRatesArray = OpsGenRatesArray.createUniform %stageLength
-                    (msrsRandGen.create randomType sortingWidth opsGenRatesArray) |> sorterModelMaker.SmmMsrsRandGen
-                | sorterModelKey.Msuf4 -> 
-                    let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageLength %sortingWidth
-                    (msuf4RandGen.create randomType sortingWidth stageLength uf4GenRatesArray) |> sorterModelMaker.SmmMsuf4RandGen
-                | sorterModelKey.Msuf6 -> 
-                    let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
-                    (msuf6RandGen.create randomType sortingWidth stageLength uf6GenRatesArray) |> sorterModelMaker.SmmMsuf6RandGen
-
-            let replFactor = if (%repl = 0) then 1 else 10
-            let sorterCount = sortingWidth |> getSorterCountForSortingWidth replFactor
-            run.RunParameters.SetSorterCount sorterCount
-
-            let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-            
-            let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
-            let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
-            let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
-
-            let sorterTestModel = MsasF.create sortingWidth |> sortableTestModel.MsasF
-            let sortableTests = SortableTestModel.makeSortableTests sorterTestModel sortableArrayType
-            let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
-
-            do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl (sorterSet |> outputData.SorterSet)
-            do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl (sorterSetEval |> outputData.SorterSetEval)
-            do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl (sorterModelSetMaker |> outputData.SorterModelSetMaker)
-
-            Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %repl)
-        }
-
 
 
     let executor2 (workspace: workspace) (run: run2) : Async<unit> =
@@ -205,7 +152,7 @@ module FullBoolTest =
                     let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
                     (msuf6RandGen.create randomType sortingWidth stageLength uf6GenRatesArray) |> sorterModelMaker.SmmMsuf6RandGen
 
-            let replFactor = if (%repl = 0) then 1 else 10
+            let replFactor = if (%repl = 0) then 1 else 1
             let sorterCount = sortingWidth |> getSorterCountForSortingWidth replFactor
             run.RunParameters.SetSorterCount sorterCount
 

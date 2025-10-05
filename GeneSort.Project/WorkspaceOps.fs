@@ -38,7 +38,7 @@ module WorkspaceOps =
             if loaded.Name <> extractedName then
                 failwithf "Workspace name mismatch: file '%s', loaded '%s'" extractedName loaded.Name
             let newRootDirectory = Path.GetFullPath(Path.Combine(fileFolder, ".."))
-            workspace.create loaded.Name loaded.Description newRootDirectory loaded.RunParametersArray loaded.ReportKeys
+            workspace.create loaded.Name loaded.Description newRootDirectory loaded.RunParametersArray loaded.ReportNames
         with e ->
             printfn "Error loading workspace from folder %s: %s" fileFolder e.Message
             raise e
@@ -115,6 +115,7 @@ module WorkspaceOps =
             |> Seq.map executeRun
             |> Seq.toList
             |> ParallelWithThrottle maxDegreeOfParallelism
+
         Async.RunSynchronously limitedParallel
 
 
@@ -152,4 +153,5 @@ module WorkspaceOps =
             |> Seq.map executeRun
             |> Seq.toList
             |> ParallelWithThrottle maxDegreeOfParallelism
+
         Async.RunSynchronously limitedParallel

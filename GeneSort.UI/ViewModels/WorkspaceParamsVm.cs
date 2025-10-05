@@ -172,7 +172,7 @@ namespace GeneSort.UI.ViewModels
 
                     // Load report keys
                     ReportKeys.Clear();
-                    foreach (var reportKey in workspace.ReportKeys)
+                    foreach (var reportKey in workspace.ReportNames)
                     {
                         ReportKeys.Add(reportKey);
                     }

@@ -5,9 +5,9 @@ open System
 let startTime = System.DateTime.Now
 printfn $"**** QQQ ******** {startTime.ToString()}"
 
-//WorkspaceOps.saveWorkspace FullBoolTest.workspace
-//FullBoolTest.RunAll()
-FullBoolTest.RunSorterEvalReport()
+WorkspaceOps.saveWorkspace FullBoolTest.workspace
+FullBoolTest.RunAll()
+//FullBoolTest.RunSorterEvalReport()
 
 
 //WorkspaceOps.saveWorkspace MergeIntTests.workspace

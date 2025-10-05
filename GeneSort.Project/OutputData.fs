@@ -49,6 +49,8 @@ module OutputDataType =
         | Workspace -> "Workspace"
 
 
+
+
 type outputData =
     | Run of run
     | Run2 of run2
@@ -65,6 +67,14 @@ type outputData =
      
 module OutputData =
 
+    let getFilesSortedByCreationTime (directoryPath: string) : string list =
+        Directory.GetFiles(directoryPath)
+        |> Array.map (fun filePath -> filePath, File.GetCreationTime(filePath))
+        |> Array.sortBy snd
+        |> Array.map fst
+        |> Array.toList
+
+
     let getOutputDataType (outputData: outputData) : outputDataType =
         match outputData with
         | Run _ -> outputDataType.Run
@@ -77,6 +87,26 @@ module OutputData =
         | SorterSetEval _ -> outputDataType.SorterSetEval
         | SorterSetEvalBins _ -> outputDataType.SorterSetEvalBins
         | Workspace _ -> outputDataType.Workspace
+
+
+    let getOutputFilePath (rootFolder) (run:run2) (outputData: outputData) =
+        let index = run.Index
+        let repl = %run.RunParameters.GetRepl()
+        let dataTypeName = outputData |> getOutputDataType |> OutputDataType.toString
+        match outputData with
+        | Run _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
+        | Run2 _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
+        | SorterSet _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
+        | SortableTestSet _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
+        | SorterModelSetMaker _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
+        | SortableTestModelSet _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
+        | SortableTestModelSetMaker _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
+        | SorterSetEval _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
+        | SorterSetEvalBins _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
+        | Workspace _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s.msgpack" dataTypeName)
+
+
+
 
         /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
