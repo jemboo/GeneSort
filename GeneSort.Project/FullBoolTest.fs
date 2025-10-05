@@ -307,8 +307,8 @@ module FullBoolTest =
 
 
     let RunAll() =
-        for i in 0 .. 0 do
-            WorkspaceOps.executeWorkspace2 workspace 8 executor2
+        let runs = WorkspaceOps.getRuns2 workspace
+        WorkspaceOps.executeWorkspace2 workspace 8 executor2 runs
 
 
     let RunSorterEvalReport() =

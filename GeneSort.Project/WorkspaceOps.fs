@@ -125,9 +125,8 @@ module WorkspaceOps =
                 (workspace: workspace)
                 (maxDegreeOfParallelism: int) 
                 (executor: workspace -> run2 -> Async<unit>)
+                (runs: run2 seq)
                 : unit =
-
-        let runs = getRuns2 workspace
 
         let executeRun (run:run2) = async {
 
