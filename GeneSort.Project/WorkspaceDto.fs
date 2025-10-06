@@ -27,7 +27,7 @@ module WorkspaceDto =
                                 |> Array.map(RunParametersDto.toRunParametersDto) 
         }
 
-    let fromWorkspaceDto (dto: workspaceDto) : workspace =
+    let toDomain (dto: workspaceDto) : workspace =
         workspace.create
           dto.Name
           dto.Description

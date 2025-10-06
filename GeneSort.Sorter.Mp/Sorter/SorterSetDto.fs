@@ -9,7 +9,7 @@ open MessagePack
 
 
 [<MessagePackObject>]
-type SorterSetDto = {
+type sorterSetDto = {
     [<Key(0)>]
     SorterSetId: Guid
     [<Key(1)>]
@@ -19,12 +19,12 @@ type SorterSetDto = {
 }
 
 module SorterSetDto =
-    let fromDomain (sorterSet: sorterSet) : SorterSetDto =
+    let fromDomain (sorterSet: sorterSet) : sorterSetDto =
         { SorterSetId = %sorterSet.SorterSetId
           CeLength = %sorterSet.CeLength
           Sorters = sorterSet.Sorters |> Array.map SorterDto.toSorterDto }
 
-    let fromSorterSetDto (dto: SorterSetDto) : sorterSet =
+    let toDomain (dto: sorterSetDto) : sorterSet =
         if dto.SorterSetId = Guid.Empty then
             failwith "SorterSet ID must not be empty"
         if Array.isEmpty dto.Sorters then

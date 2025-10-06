@@ -6,6 +6,7 @@ open GeneSort.Project.Params
 open FSharp.UMX
 open GeneSort.Sorter.Sortable
 
+[<Measure>] type indexNumber
 [<Measure>] type replNumber
 [<Measure>] type generationNumber
 
@@ -17,6 +18,7 @@ type runParameters =
         { paramMap = paramMap }
 
     /// Keys for parameters
+    static member indexKey = "Index"
     static member replKey = "Repl"
     static member generationKey = "Generation"
     static member runFinishedKey = "RunFinished"
@@ -37,6 +39,18 @@ type runParameters =
         |> List.map (fun (k, v) -> sprintf "%s: %s" k v)
         |> String.concat ", "
 
+    /// Gets the Index value.
+    member this.GetIndex() : int<indexNumber> =
+        match this.paramMap.TryFind runParameters.indexKey with
+        | Some value -> 
+            match Int32.TryParse(value) with
+            | true, v -> LanguagePrimitives.Int32WithMeasure v |> UMX.tag<indexNumber>
+            | false, _ -> failwith "Invalid Index value"
+        | None -> failwith "Index parameter not found"
+    /// Sets the Index value.
+    member this.SetIndex(index: int<indexNumber>) : unit =
+        this.paramMap <- this.paramMap.Add(runParameters.indexKey, (UMX.untag index).ToString())
+
     /// Gets the Repl value.
     member this.GetRepl() : int<replNumber> =
         match this.paramMap.TryFind runParameters.replKey with
@@ -52,16 +66,16 @@ type runParameters =
 
     /// Gets the Repl value.
     member this.GetGeneration() : int<generationNumber> =
-        match this.paramMap.TryFind runParameters.replKey with
+        match this.paramMap.TryFind runParameters.generationKey with
         | Some value -> 
             match Int32.TryParse(value) with
             | true, v -> LanguagePrimitives.Int32WithMeasure v |> UMX.tag<generationNumber>
-            | false, _ -> failwith "Invalid Repl value"
+            | false, _ -> failwith "Invalid Generation value"
         | None -> failwith "Repl parameter not found"
 
     /// Sets the Repl value.
     member this.SetGeneration(repl: int<generationNumber>) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.replKey, (UMX.untag repl).ToString())
+        this.paramMap <- this.paramMap.Add(runParameters.generationKey, (UMX.untag repl).ToString())
 
     member this.IsRunFinished() : bool =
         match this.paramMap.TryFind runParameters.runFinishedKey with

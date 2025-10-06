@@ -1,20 +1,22 @@
 ﻿
 namespace GeneSort.Project
 
+open FSharp.UMX
+
 // Run type
 type run = 
     private
-        { index: int
+        { index: int<indexNumber>
           repl: int<replNumber>
           runParameters: runParameters }
 
     with
 
     static member create 
-            (index: int) 
+            (index: int<indexNumber>) 
             (repl: int<replNumber>) 
             (runParameters: runParameters) : run =
-        if index < 0 then
+        if %index < 0 then
             failwith "Run index cannot be negative"
         else
             { index = index
@@ -29,15 +31,15 @@ type run =
 // Run type
 type run2 = 
     private
-        { index: int
+        { index: int<indexNumber>
           runParameters: runParameters }
 
     with
 
     static member create 
-            (index: int) 
+            (index: int<indexNumber>) 
             (runParameters: runParameters) : run2 =
-        if index < 0 then
+        if %index < 0 then
             failwith "Run index cannot be negative"
         else
             { index = index

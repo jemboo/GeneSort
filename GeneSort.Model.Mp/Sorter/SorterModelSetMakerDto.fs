@@ -2,11 +2,6 @@
 
 open System
 open GeneSort.Model.Sorter
-open GeneSort.Model.Mp.Sorter.Ce
-open GeneSort.Model.Mp.Sorter.Si
-open GeneSort.Model.Mp.Sorter.Rs
-open GeneSort.Model.Mp.Sorter.Uf4
-open GeneSort.Model.Mp.Sorter.Uf6
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
@@ -15,7 +10,7 @@ open GeneSort.Sorter
 
 
 [<MessagePackObject>]
-type SorterModelSetMakerDto = 
+type sorterModelSetMakerDto = 
     { 
         [<Key(0)>] Id: Guid
         [<Key(1)>] SorterModelMaker: SorterModelMakerDto
@@ -28,7 +23,7 @@ module SorterModelSetMakerDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toDomain (dto: SorterModelSetMakerDto) : sorterModelSetMaker =
+    let toDomain (dto: sorterModelSetMakerDto) : sorterModelSetMaker =
         if dto.Count <= 0 then
             failwith "Count must be greater than 0"
         if dto.FirstIndex < 0 then
@@ -40,7 +35,7 @@ module SorterModelSetMakerDto =
             (dto.FirstIndex |> UMX.tag<sorterCount>)
             (dto.Count |> UMX.tag<sorterCount>)
 
-    let fromDomain (domain: sorterModelSetMaker) : SorterModelSetMakerDto =
+    let fromDomain (domain: sorterModelSetMaker) : sorterModelSetMakerDto =
         { Id = %domain.Id
           SorterModelMaker = SorterModelMakerDto.toSorterModelMakerDto domain.SorterModelMaker
           FirstIndex = %domain.FirstIndex

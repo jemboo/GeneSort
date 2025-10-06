@@ -37,6 +37,15 @@ type workspace =
                         runParametersArray.[0].ParamMap |> Map.toSeq |> Seq.map fst |> Seq.toArray
             }
 
+    static member Test = 
+        workspace.create 
+            "FullBoolTest" 
+            "A test workspace" 
+            $"C:\Projects"
+            [| runParameters.create (Map.ofList [ ("Param1", "Value1"); ("Param2", "ValueA") ])
+               runParameters.create (Map.ofList [ ("Param1", "Value2"); ("Param2", "ValueB") ]) |]
+            [| "Report1"; "Report2" |]
+
     member this.Name with get () = this.name
     member this.Description with get () = this.description
     member this.ParameterKeys with get() = this.parameterKeys

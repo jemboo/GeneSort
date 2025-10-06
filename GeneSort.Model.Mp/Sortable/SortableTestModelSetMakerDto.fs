@@ -18,7 +18,7 @@ type sortableTestModelSetMakerDto = {
     [<Key(3)>] Count: int
 }
 
-module SorterTestModelSetMakerDto =
+module SortableTestModelSetMakerDto =
 
     let fromDomain (maker: sortableTestModelSetMaker) : sortableTestModelSetMakerDto =
         { Id = %maker.Id
@@ -26,7 +26,7 @@ module SorterTestModelSetMakerDto =
           FirstIndex = int maker.FirstIndex
           Count = int maker.Count }
 
-    let toDomain (dto: sortableTestModelSetMakerDto) (msasORandGen: MsasORandGen) : sortableTestModelSetMaker =
+    let toDomain (dto: sortableTestModelSetMakerDto) : sortableTestModelSetMaker =
         if dto.FirstIndex < 0 then
             invalidArg "FirstIndex" "First index must be non-negative."
         if dto.Count < 0 then

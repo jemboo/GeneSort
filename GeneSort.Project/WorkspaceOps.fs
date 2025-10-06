@@ -5,6 +5,7 @@ open System.Threading.Tasks
 open MessagePack
 open MessagePack.FSharp
 open MessagePack.Resolvers
+open FSharp.UMX
 
 
 module WorkspaceOps =  
@@ -34,7 +35,7 @@ module WorkspaceOps =
             let extractedName = fileNameWithoutExt.[.. fileNameWithoutExt.Length - underscoreWorkspaceLen - 1]
             use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)
             let dto = MessagePackSerializer.Deserialize<workspaceDto>(stream, options)
-            let loaded = WorkspaceDto.fromWorkspaceDto dto
+            let loaded = WorkspaceDto.toDomain dto
             if loaded.Name <> extractedName then
                 failwithf "Workspace name mismatch: file '%s', loaded '%s'" extractedName loaded.Name
             let newRootDirectory = Path.GetFullPath(Path.Combine(fileFolder, ".."))
@@ -48,16 +49,19 @@ module WorkspaceOps =
     let getRuns (workspace: workspace) (repl: int<replNumber>) : run seq =
         workspace.RunParametersArray 
         |> Seq.mapi (fun i runParams  -> 
-                        (runParams.SetRepl repl )
-                        run.create i repl runParams)
-
+                        let indexNumber = UMX.tag<indexNumber> i              
+                        (runParams.SetIndex indexNumber)
+                        (runParams.SetRepl repl)
+                        run.create indexNumber repl runParams)
 
 
     /// Returns a sequence of Runs made from all possible parameter combinations
     let getRuns2 (workspace: workspace) : run2 seq =
         workspace.RunParametersArray 
         |> Seq.mapi (fun i runParams  -> 
-                        run2.create i runParams)
+                        let indexNumber = UMX.tag<indexNumber> i
+                        (runParams.SetIndex indexNumber)
+                        run2.create indexNumber runParams)
 
 
     /// Executes async computations in parallel, limited to maxDegreeOfParallelism at a time
@@ -94,7 +98,7 @@ module WorkspaceOps =
 
         let executeRun (run:run) = async {
 
-            let filePathRun = OutputData.getOutputFileName 
+            let filePathRun = OutputData.makeOutputDataFileName 
                                 workspace.WorkspaceFolder
                                 run.Index 
                                 run.Repl 
@@ -131,7 +135,7 @@ module WorkspaceOps =
         let executeRun (run:run2) = async {
 
             let repl = run.RunParameters.GetRepl()
-            let filePathRun = OutputData.getOutputFileName 
+            let filePathRun = OutputData.makeOutputDataFileName 
                                 workspace.WorkspaceFolder
                                 run.Index 
                                 repl 

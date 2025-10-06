@@ -160,7 +160,7 @@ namespace GeneSort.UI.ViewModels
             await Task.Run(() =>
             {
                 // Convert DTO to workspace domain object
-                var workspace = WorkspaceDto.fromWorkspaceDto(workspaceDto);
+                var workspace = WorkspaceDto.toDomain(workspaceDto);
                 Workspace = workspace; // Store for future use
 
                 Application.Current.Dispatcher.Invoke(() =>
