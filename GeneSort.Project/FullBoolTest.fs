@@ -174,48 +174,31 @@ module FullBoolTest =
         }
 
 
-
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    let binReportExecutor (workspace: workspace) =
+    let binReportExecutor (workspace: workspace) (cts: CancellationTokenSource) (progress: IProgress<string>) : unit =
             try
-                Console.WriteLine(sprintf "Generating SorterEval report in workspace %s"  workspace.WorkspaceFolder)
-                let sorterSetEvalSamplesFolder = OutputData.getOutputDataFolder workspace outputDataType.SorterSetEval
-                if not (Directory.Exists sorterSetEvalSamplesFolder) then
-                    failwith (sprintf "Output folder %s does not exist" sorterSetEvalSamplesFolder)
+                progress.Report(sprintf "Generating Bin report in workspace %s"  workspace.WorkspaceFolder)
+                let runParamsA = getRunParametersAsync workspace cts.Token progress |> Async.RunSynchronously
 
-                // Find all .msgpack files in the output folder
-                let files = Directory.GetFiles(sorterSetEvalSamplesFolder, "*.msgpack")
+                let summaries = 
+                    runParamsA
+                    |> Seq.map (fun runParams ->
+                        let ssEvalPath = OutputData.getOutputDataFileName workspace runParams outputDataType.SorterSetEval
+                        progress.Report (sprintf "Checking for file %s" ssEvalPath)
+                        try
+                            let swFull = runParams.GetSortingWidth() 
+                            let sorterModelKey =  runParams.GetSorterModelKey()
+                            let sorterSetEval = getSorterSetEval workspace runParams
+                            let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
 
-                // Initialize the MessagePack resolver
-                let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-                let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-
-
-                // Process each file and collect data for each SorterTest
-                let summaries : (string*string*string*string*string*string) list =
-                    files
-                    |> Seq.map (
-                        fun ssEvalPath ->
-                            try
-                                use ssEvalStream = new FileStream(ssEvalPath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                                let ssEvalDto = MessagePackSerializer.Deserialize<sorterSetEvalDto>(ssEvalStream, options)
-                                let sorterSetEval = SorterSetEvalDto.toDomain ssEvalDto          
-                                let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
-
-                                let runParams = OutputData.getRunParametersForOutputDataPath ssEvalPath
-                                let sorterModelKey = runParams.GetSorterModelKey() |> SorterModelKey.toString
-                                let swFull = (%runParams.GetSortingWidth()).ToString()
-
-                                let prpt = SorterSetEvalBins.getBinCountReport sorterSetEvalBins
-                                let appended = prpt |> Array.map(fun aa -> (swFull, sorterModelKey, aa.[0], aa.[1], aa.[2], aa.[3]))
-                                appended
-                            with e ->
-                                failwith (sprintf "Error processing file %s: %s" ssEvalPath e.Message)
-                    )
-                    
+                            let prpt = SorterSetEvalBins.getBinCountReport sorterSetEvalBins
+                            let appended = prpt |> Array.map(fun aa -> (swFull, (sorterModelKey |> SorterModelKey.toString), aa.[0], aa.[1], aa.[2], aa.[3]))
+                            appended
+                        with e ->
+                         failwith (sprintf "Error processing file %s: %s" ssEvalPath e.Message)
+                    )   
                     |> Array.concat
                     |> Seq.toList
-
 
                 // Generate the Markdown report, one line per SorterTest
                 let reportContent =
@@ -228,18 +211,22 @@ module FullBoolTest =
                     @ (summaries
                        |> List.map (
                             fun (sortingWidth, sorterModelKey, ceLength, stageLength, binCount, unsortedReport) ->
-                                    sprintf "%s \t %s \t %s \t %s \t %s \t %s " sortingWidth sorterModelKey ceLength stageLength binCount unsortedReport))
+                                    sprintf "%d \t %s \t %s \t %s \t %s \t %s " %sortingWidth sorterModelKey ceLength stageLength binCount unsortedReport))
                     |> String.concat "\n"
-
 
                 // Save the report to a file
                 let reportFilePath = Path.Combine(workspace.WorkspaceFolder, sprintf "%s_SorterEvalReport_%s.txt" "SorterSetEvalSamples" (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
                 File.WriteAllText(reportFilePath, reportContent)
 
-                Console.WriteLine(sprintf "SorterTest count report saved to %s" reportFilePath)
+                Console.WriteLine(sprintf "SorterTest bin report saved to %s" reportFilePath)
+
             with ex ->
-                Console.WriteLine(sprintf "Error generating SorterTest count report for %s: %s" "SorterTestSet" ex.Message)
+                progress.Report(sprintf "Error generating Bin report for %s: %s" "SorterTestSet" ex.Message)
                 raise ex
+
+
+
+
 
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
     let ceUseProfileReportExecutor (workspace: workspace) (cts: CancellationTokenSource) (progress: IProgress<string>) : unit =
@@ -306,8 +293,8 @@ module FullBoolTest =
 
     let RunSorterEvalReport() =
        let cts = new CancellationTokenSource()
-    //     (binReportExecutor workspace)
-       (ceUseProfileReportExecutor workspace cts progress)
+       (binReportExecutor workspace cts progress)
+    //   (ceUseProfileReportExecutor workspace cts progress)
 
 
 

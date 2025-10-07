@@ -256,7 +256,7 @@ module OutputData =
         let repl = pcs.[1]
         let index = pcs.[2].Split('.').[0]
         let fileName = sprintf "Run_%s_%s.msgpack" repl index 
-        Path.Combine(folder, "Run", fileName)
+        Path.Combine(folder, "Run2", fileName)
 
 
     let saveToFileO 
