@@ -114,7 +114,7 @@ module RandomSorters4to64 =
     let workspace = Workspace.create experimentName experimentDesc projectDir [|"Rep1"; "Rep2"; "Rep3"; "Rep4"|] parameterSet paramMapRefiner
 
 
-    let executor (workspace: workspace) (repl: int<replNumber>) (run: run) : Async<unit> =
+    let executor (workspace: workspace) (repl: int<replNumber>) (run: run2) : Async<unit> =
         async {
 
             Console.WriteLine(sprintf "Executing Run %d  %s" run.Index (run.RunParameters.toString()))
