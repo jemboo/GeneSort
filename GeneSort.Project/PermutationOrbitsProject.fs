@@ -50,11 +50,9 @@ module PermutationOrbitsProject =
                 let sorterTestModelGen = MsasORandGen.create randomType sortingWidth maxOrbiit |> SorterTestModelGen.MsasORandGen
                 let sorterTestModelSetMaker = sortableTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
                 let sorterTestModelSet = sorterTestModelSetMaker.MakeSortableTestModelSet
-                //let sorterTestSet = sorterTestModelSet.makeSortableTestSet sortableArrayType
-                //do! OutputData.saveToFile workspace.WorkspaceFolder run.Index run.Repl (sorterTestSet |> outputData.SortableTestSet)
-                do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl 
+                do! OutputData.saveToFileO workspace.WorkspaceFolder run.RunParameters
                                           (sorterTestModelSet |> outputData.SortableTestModelSet)
-                do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl 
+                do! OutputData.saveToFileO workspace.WorkspaceFolder run.RunParameters
                                           (sorterTestModelSetMaker |> outputData.SortableTestModelSetMaker)
 
                 

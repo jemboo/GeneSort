@@ -100,16 +100,18 @@ module WorkspaceOps =
 
             let filePathRun = OutputData.makeOutputDataFileName 
                                 workspace.WorkspaceFolder
-                                run.Index 
-                                run.Repl 
-                                (outputDataType.Run |> OutputDataType.toString) 
+                                run.RunParameters
+                                outputDataType.Run
 
             if File.Exists filePathRun then
                         printfn "Skipping Run %d: Output file %s already exists" run.Index filePathRun
             else
                 try
                     do! executor workspace repl run
-                    do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl (run |> outputData.Run)
+                    do! OutputData.saveToFileO 
+                            workspace.WorkspaceFolder 
+                            run.RunParameters 
+                            (run |> outputData.Run)
                 with e ->
                     printfn "Error processing Run %d: %s" run.Index e.Message
         }
@@ -134,12 +136,10 @@ module WorkspaceOps =
 
         let executeRun (run:run2) = async {
 
-            let repl = run.RunParameters.GetRepl()
             let filePathRun = OutputData.makeOutputDataFileName 
                                 workspace.WorkspaceFolder
-                                run.Index 
-                                repl 
-                                (outputDataType.Run |> OutputDataType.toString) 
+                                run.RunParameters
+                                outputDataType.Run
 
             if File.Exists filePathRun then
                         printfn "Skipping Run %d: Output file %s already exists" run.Index filePathRun

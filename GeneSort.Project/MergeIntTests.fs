@@ -166,9 +166,9 @@ module MergeIntTests =
             let sortableTests = SortableTestModel.makeSortableTestsForMerge sortableArrayType sortingWidth
             let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
 
-            do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl (sorterSet |> outputData.SorterSet)
-            do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl (sorterSetEval |> outputData.SorterSetEval)
-            do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! OutputData.saveToFileO workspace.WorkspaceFolder run.RunParameters (sorterSet |> outputData.SorterSet)
+            do! OutputData.saveToFileO workspace.WorkspaceFolder run.RunParameters (sorterSetEval |> outputData.SorterSetEval)
+            do! OutputData.saveToFileO workspace.WorkspaceFolder run.RunParameters (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %repl)
         }

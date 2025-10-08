@@ -128,12 +128,23 @@ module OutputData =
         Directory.GetFiles(getOutputDataFolder workspace outputDataType, "*.msgpack")
 
 
+    //let makeOutputDataFileName 
+    //            (folder:string) 
+    //            (index:int<indexNumber>) 
+    //            (repl: int<replNumber>) 
+    //            (outputDataName: string) 
+    //                : string =
+    //    let fileName = sprintf "%s_%d_%d.msgpack" outputDataName %repl %index 
+    //    Path.Combine(folder, outputDataName, fileName)
+
     let makeOutputDataFileName 
                 (folder:string) 
-                (index:int<indexNumber>) 
-                (repl: int<replNumber>) 
-                (outputDataName: string) 
+                (runParameters:runParameters)
+                (outputDataType: outputDataType) 
                     : string =
+        let index = runParameters.GetIndex()
+        let repl = runParameters.GetRepl()
+        let outputDataName = outputDataType |> OutputDataType.toString
         let fileName = sprintf "%s_%d_%d.msgpack" outputDataName %repl %index 
         Path.Combine(folder, outputDataName, fileName)
 
@@ -143,11 +154,7 @@ module OutputData =
             (runParameters: runParameters)
             (outputDataType: outputDataType) 
                 : string =
-        let outputDataName = outputDataType |> OutputDataType.toString
-        let folder = workspace.WorkspaceFolder
-        let index = runParameters.GetIndex()
-        let repl = runParameters.GetRepl()
-        makeOutputDataFileName folder index repl outputDataName
+        makeOutputDataFileName workspace.WorkspaceFolder runParameters outputDataType
 
 
     let getOutputData
@@ -261,11 +268,10 @@ module OutputData =
 
     let saveToFileO 
             (workspaceFolder: string) 
-            (index: int<indexNumber>) 
-            (repl: int<replNumber>) 
+            (runParameters: runParameters)
             (outputData: outputData) : Async<unit> =
         async {
-            let filePath = makeOutputDataFileName workspaceFolder index repl (outputData |> getOutputDataType |> OutputDataType.toString)
+            let filePath = makeOutputDataFileName workspaceFolder runParameters (outputData |> getOutputDataType)
             let directory = Path.GetDirectoryName filePath
             Directory.CreateDirectory directory |> ignore
             try

@@ -166,9 +166,9 @@ module FullBoolTest =
             let sortableTests = SortableTestModel.makeSortableTests sorterTestModel sortableArrayType
             let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
 
-            do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl (sorterSet |> outputData.SorterSet)
-            do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl (sorterSetEval |> outputData.SorterSetEval)
-            do! OutputData.saveToFileO workspace.WorkspaceFolder run.Index run.Repl (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! OutputData.saveToFileO workspace.WorkspaceFolder run.RunParameters (sorterSet |> outputData.SorterSet)
+            do! OutputData.saveToFileO workspace.WorkspaceFolder run.RunParameters (sorterSetEval |> outputData.SorterSetEval)
+            do! OutputData.saveToFileO workspace.WorkspaceFolder run.RunParameters (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %repl)
         }
@@ -294,7 +294,7 @@ module FullBoolTest =
     let RunSorterEvalReport() =
        let cts = new CancellationTokenSource()
        (binReportExecutor workspace cts progress)
-    //   (ceUseProfileReportExecutor workspace cts progress)
+       (ceUseProfileReportExecutor workspace cts progress)
 
 
 
