@@ -9,12 +9,12 @@ printfn $"**** QQQ ******** {startTime.ToString()}"
 
 //WorkspaceOps.saveWorkspace FullBoolEvals.workspace
 //FullBoolEvals.RunAll()
-FullBoolEvals.RunSorterEvalReport()
+//FullBoolEvals.RunSorterEvalReport()
 
 
-//WorkspaceOps.saveWorkspace MergeIntTests.workspace
+WorkspaceOps.saveWorkspace MergeIntEvals.workspace
 //MergeIntEvals.RunAll()
-//MergeIntEvals.RunSorterEvalReport()
+MergeIntEvals.RunSorterEvalReport()
 
 
 let endTime = System.DateTime.Now

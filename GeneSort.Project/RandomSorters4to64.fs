@@ -162,8 +162,8 @@ module RandomSorters4to64 =
         }
 
 
-    let RunAll() =
-        for i in 0 .. 0 do
-            let repl = i |> UMX.tag<replNumber>
-            WorkspaceOps.executeWorkspace workspace repl 6 executor
+    //let RunAll() =
+    //    for i in 0 .. 0 do
+    //        let repl = i |> UMX.tag<replNumber>
+    //        WorkspaceOps.executeWorkspace workspace repl 6 executor
 

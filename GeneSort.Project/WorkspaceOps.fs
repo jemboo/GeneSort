@@ -46,16 +46,6 @@ module WorkspaceOps =
 
 
     /// Returns a sequence of Runs made from all possible parameter combinations
-    let getRuns (workspace: workspace) (repl: int<replNumber>) : run seq =
-        workspace.RunParametersArray 
-        |> Seq.mapi (fun i runParams  -> 
-                        let indexNumber = UMX.tag<indexNumber> i              
-                        (runParams.SetIndex indexNumber)
-                        (runParams.SetRepl repl)
-                        run.create indexNumber repl runParams)
-
-
-    /// Returns a sequence of Runs made from all possible parameter combinations
     let getRuns2 (workspace: workspace) : run2 seq =
         workspace.RunParametersArray 
         |> Seq.mapi (fun i runParams  -> 
@@ -87,46 +77,6 @@ module WorkspaceOps =
 
     /// Executes all runs from the workspace, running up to atTheSameTime runs concurrently
     /// Skips runs if their output file already exists; saves runs to .msgpack files after execution
-    let executeWorkspace
-                (workspace: workspace) 
-                (repl: int<replNumber>)
-                (maxDegreeOfParallelism: int) 
-                (executor: workspace -> int<replNumber> -> run -> Async<unit>)
-                : unit =
-
-        let runs = getRuns workspace repl
-
-        let executeRun (run:run) = async {
-
-            let filePathRun = OutputData.getOutputDataFileName 
-                                workspace
-                                (Some run.RunParameters)
-                                outputDataType.Run
-
-            if File.Exists filePathRun then
-                        printfn "Skipping Run %d: Output file %s already exists" run.Index filePathRun
-            else
-                try
-                    do! executor workspace repl run
-                    do! OutputData.saveToFileO 
-                            workspace 
-                            run.RunParameters 
-                            (run |> outputData.Run)
-                with e ->
-                    printfn "Error processing Run %d: %s" run.Index e.Message
-        }
-
-        let limitedParallel =
-            runs
-            |> Seq.map executeRun
-            |> Seq.toList
-            |> ParallelWithThrottle maxDegreeOfParallelism
-
-        Async.RunSynchronously limitedParallel
-
-
-    /// Executes all runs from the workspace, running up to atTheSameTime runs concurrently
-    /// Skips runs if their output file already exists; saves runs to .msgpack files after execution
     let executeWorkspace2
                 (workspace: workspace)
                 (maxDegreeOfParallelism: int) 
@@ -139,7 +89,7 @@ module WorkspaceOps =
             let filePathRun = OutputData.getOutputDataFileName 
                                 workspace
                                 (Some run.RunParameters)
-                                outputDataType.Run
+                                outputDataType.Run2
 
             if File.Exists filePathRun then
                         printfn "Skipping Run %d: Output file %s already exists" run.Index filePathRun

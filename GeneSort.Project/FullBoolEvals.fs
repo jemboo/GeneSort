@@ -175,7 +175,10 @@ module FullBoolEvals =
 
 
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    let binReportExecutor (workspace: workspace) (cts: CancellationTokenSource) (progress: IProgress<string>) : unit =
+    let binReportExecutor 
+            (workspace: workspace) 
+            (cts: CancellationTokenSource) 
+            (progress: IProgress<string>) : unit =
             try
                 progress.Report(sprintf "Generating Bin report in workspace %s"  workspace.WorkspaceFolder)
                 let runParamsA = getRunParametersAsync workspace cts.Token progress |> Async.RunSynchronously
@@ -274,10 +277,10 @@ module FullBoolEvals =
 
                 progress.Report(sprintf "Ce Profile report saved to %s" reportFilePath)
 
-
             with ex ->
                 progress.Report(sprintf "Error generating Ce Profile report for %s: %s" "SorterTestSet" ex.Message)
                 raise ex
+
 
     // Progress reporter that prints to console
     let progress = 

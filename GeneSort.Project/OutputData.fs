@@ -25,7 +25,6 @@ open GeneSort.SortingOps.Mp
 
 
 type outputDataType =
-    | Run
     | Run2
     | SorterSet
     | SortableTestSet
@@ -42,7 +41,6 @@ module OutputDataType =
     
     let toString (outputDataType: outputDataType) : string =
         match outputDataType with
-        | Run -> "Run"
         | Run2 -> "Run2"
         | SorterSet -> "SorterSet"
         | SortableTestSet -> "SortableTestSet"
@@ -57,7 +55,6 @@ module OutputDataType =
 
 
 type outputData =
-    | Run of run
     | Run2 of run2
     | SorterSet of sorterSet
     | SortableTestSet of sortableTestSet
@@ -82,7 +79,6 @@ module OutputData =
 
     let getOutputDataType (outputData: outputData) : outputDataType =
         match outputData with
-        | Run _ -> outputDataType.Run
         | Run2 _ -> outputDataType.Run2
         | SorterSet _ -> outputDataType.SorterSet
         | SortableTestSet _ -> outputDataType.SortableTestSet
@@ -99,7 +95,6 @@ module OutputData =
         let repl = %run.RunParameters.GetRepl()
         let dataTypeName = outputData |> getOutputDataType |> OutputDataType.toString
         match outputData with
-        | Run _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
         | Run2 _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
         | SorterSet _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
         | SortableTestSet _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
@@ -163,9 +158,6 @@ module OutputData =
         try
             use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)
             match outputDataType with
-            | outputDataType.Run ->
-                let dto = MessagePackSerializer.Deserialize<runDto>(stream, options)
-                Run (RunDto.fromDto dto)
             | outputDataType.Run2 ->
                 let dto = MessagePackSerializer.Deserialize<run2Dto>(stream, options)
                 Run2 (Run2Dto.fromDto dto)
@@ -196,12 +188,6 @@ module OutputData =
         with e ->
             failwithf "Error reading file %s: %s" filePath e.Message
 
-
-
-    let getRun (workspace: workspace) (runParameters: runParameters) : run =
-        match getOutputData workspace (Some runParameters) outputDataType.Run with
-        | Run r -> r
-        | _ -> failwith "Unexpected output data type: expected Run"
 
     let getRun2 (workspace: workspace) (runParameters: runParameters) : run2 =
         match getOutputData workspace (Some runParameters) outputDataType.Run2 with
@@ -261,9 +247,6 @@ module OutputData =
             try
                 use stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None)
                 match outputData with
-                | Run r -> 
-                    let dto = RunDto.toRunDto r
-                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | Run2 r -> 
                     let dto = Run2Dto.toRunDto r
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
@@ -308,9 +291,6 @@ module OutputData =
             try
                 use stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None)
                 match outputData with
-                | Run r -> 
-                    let dto = RunDto.toRunDto r
-                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | Run2 r -> 
                     let dto = Run2Dto.toRunDto r
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
@@ -349,8 +329,8 @@ module OutputData =
         async {
             try
                 use stream = new FileStream(runFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                let! dto = MessagePackSerializer.DeserializeAsync<runDto>(stream, options, ct).AsTask() |> Async.AwaitTask
-                let run = RunDto.fromDto dto
+                let! dto = MessagePackSerializer.DeserializeAsync<run2Dto>(stream, options, ct).AsTask() |> Async.AwaitTask
+                let run = Run2Dto.fromDto dto
                 return Ok run.RunParameters
             with
             | :? FileNotFoundException -> return Error (sprintf "File not found: %s" runFilePath)
