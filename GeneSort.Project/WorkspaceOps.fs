@@ -46,12 +46,12 @@ module WorkspaceOps =
 
 
     /// Returns a sequence of Runs made from all possible parameter combinations
-    let getRuns2 (workspace: workspace) : run2 seq =
+    let getRuns2 (workspace: workspace) : run seq =
         workspace.RunParametersArray 
         |> Seq.mapi (fun i runParams  -> 
                         let indexNumber = UMX.tag<indexNumber> i
                         (runParams.SetIndex indexNumber)
-                        run2.create indexNumber runParams)
+                        run.create indexNumber runParams)
 
 
     /// Executes async computations in parallel, limited to maxDegreeOfParallelism at a time
@@ -80,23 +80,23 @@ module WorkspaceOps =
     let executeWorkspace2
                 (workspace: workspace)
                 (maxDegreeOfParallelism: int) 
-                (executor: workspace -> run2 -> Async<unit>)
-                (runs: run2 seq)
+                (executor: workspace -> run -> Async<unit>)
+                (runs: run seq)
                 : unit =
 
-        let executeRun (run:run2) = async {
+        let executeRun (run:run) = async {
 
             let filePathRun = OutputData.getOutputDataFileName 
                                 workspace
                                 (Some run.RunParameters)
-                                outputDataType.Run2
+                                outputDataType.Run
 
             if File.Exists filePathRun then
                         printfn "Skipping Run %d: Output file %s already exists" run.Index filePathRun
             else
                 try
                     do! executor workspace run
-                    do! OutputData.saveToFile filePathRun (Some run.RunParameters) (run |> outputData.Run2)
+                    do! OutputData.saveToFile filePathRun (Some run.RunParameters) (run |> outputData.Run)
                 with e ->
                     printfn "Error processing Run %d: %s" run.Index e.Message
         }

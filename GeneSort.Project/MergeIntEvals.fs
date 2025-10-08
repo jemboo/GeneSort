@@ -131,7 +131,7 @@ module MergeIntEvals =
                 paramMapRefiner
 
 
-    let executor (workspace: workspace) (run: run2) : Async<unit> =
+    let executor (workspace: workspace) (run: run) : Async<unit> =
         async {
             let repl = run.Repl
             Console.WriteLine(sprintf "Executing Run %d  %s" run.Index (run.RunParameters.toString()))

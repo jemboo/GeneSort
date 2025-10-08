@@ -38,7 +38,7 @@ module PermutationOrbitsProject =
 
     let workspace = Workspace.create experimentName experimentDesc projectDir [||] parameterSet (fun s -> Some s)
 
-    let executor (workspace: workspace) (repl: int<replNumber>) (run: run2) : Async<unit> =
+    let executor (workspace: workspace) (repl: int<replNumber>) (run: run) : Async<unit> =
         async {
             try
                 Console.WriteLine(sprintf "Executing Run %d   %s" run.Index (run.RunParameters.toString()))

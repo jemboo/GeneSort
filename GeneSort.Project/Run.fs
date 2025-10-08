@@ -4,7 +4,7 @@ namespace GeneSort.Project
 open FSharp.UMX
 
 // Run type
-type run2 = 
+type run = 
     private
         { index: int<indexNumber>
           runParameters: runParameters }
@@ -13,7 +13,7 @@ type run2 =
 
     static member create 
             (index: int<indexNumber>) 
-            (runParameters: runParameters) : run2 =
+            (runParameters: runParameters) : run =
         if %index < 0 then
             failwith "Run index cannot be negative"
         else

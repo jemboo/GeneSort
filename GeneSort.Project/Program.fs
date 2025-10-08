@@ -12,7 +12,7 @@ printfn $"**** QQQ ******** {startTime.ToString()}"
 //FullBoolEvals.RunSorterEvalReport()
 
 
-WorkspaceOps.saveWorkspace MergeIntEvals.workspace
+//WorkspaceOps.saveWorkspace MergeIntEvals.workspace
 //MergeIntEvals.RunAll()
 MergeIntEvals.RunSorterEvalReport()
 
