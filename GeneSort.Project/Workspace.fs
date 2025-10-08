@@ -39,7 +39,7 @@ type workspace =
 
     static member Test = 
         workspace.create 
-            "FullBoolTest" 
+            "FullBoolEvals" 
             "A test workspace" 
             $"C:\Projects"
             [| runParameters.create (Map.ofList [ ("Param1", "Value1"); ("Param2", "ValueA") ])

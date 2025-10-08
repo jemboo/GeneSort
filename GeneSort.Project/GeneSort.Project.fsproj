@@ -23,8 +23,8 @@
     <Compile Include="WorkspaceOps.fs" />
     <Compile Include="RandomSorters4to64.fs" />
     <Compile Include="PermutationOrbitsProject.fs" />
-    <Compile Include="FullBoolTest.fs" />
-    <Compile Include="MergeIntTests.fs" />
+    <Compile Include="FullBoolEvals.fs" />
+    <Compile Include="MergeIntEvals.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

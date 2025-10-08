@@ -117,27 +117,13 @@ module OutputData =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-         
 
     let getOutputDataFolder (workspace:workspace) (outputDataType: outputDataType) 
                     : string =
         Path.Combine(workspace.WorkspaceFolder, outputDataType |> OutputDataType.toString)
 
-    let getOutputDataFiles (workspace:workspace) (outputDataType: outputDataType) 
-                    : string[] =
-        Directory.GetFiles(getOutputDataFolder workspace outputDataType, "*.msgpack")
 
-
-    //let makeOutputDataFileName 
-    //            (folder:string) 
-    //            (index:int<indexNumber>) 
-    //            (repl: int<replNumber>) 
-    //            (outputDataName: string) 
-    //                : string =
-    //    let fileName = sprintf "%s_%d_%d.msgpack" outputDataName %repl %index 
-    //    Path.Combine(folder, outputDataName, fileName)
-
-    let makeOutputDataFileName 
+    let makeIndexAndReplName 
                 (folder:string) 
                 (runParameters:runParameters)
                 (outputDataType: outputDataType) 
@@ -150,16 +136,24 @@ module OutputData =
 
 
     let getOutputDataFileName
-            (workspace: workspace)
-            (runParameters: runParameters)
+            (workspaceP: workspace)
+            (runParameters: runParameters option)
             (outputDataType: outputDataType) 
                 : string =
-        makeOutputDataFileName workspace.WorkspaceFolder runParameters outputDataType
+
+        match outputDataType with
+        | outputDataType.Workspace -> 
+            let fileName = sprintf "%s.msgpack" (outputDataType |> OutputDataType.toString)
+            Path.Combine(workspaceP.WorkspaceFolder, fileName)
+        | _ -> 
+            if runParameters.IsNone then
+                failwithf "Run parameters must be provided for output data type %s" (outputDataType |> OutputDataType.toString)
+            makeIndexAndReplName workspaceP.WorkspaceFolder runParameters.Value outputDataType
 
 
     let getOutputData
             (workspace: workspace)
-            (runParameters: runParameters)
+            (runParameters: runParameters option)
             (outputDataType: outputDataType) 
                 : outputData =
         let filePath = getOutputDataFileName workspace runParameters outputDataType
@@ -205,73 +199,63 @@ module OutputData =
 
 
     let getRun (workspace: workspace) (runParameters: runParameters) : run =
-        match getOutputData workspace runParameters outputDataType.Run with
+        match getOutputData workspace (Some runParameters) outputDataType.Run with
         | Run r -> r
         | _ -> failwith "Unexpected output data type: expected Run"
 
     let getRun2 (workspace: workspace) (runParameters: runParameters) : run2 =
-        match getOutputData workspace runParameters outputDataType.Run2 with
+        match getOutputData workspace (Some runParameters) outputDataType.Run2 with
         | Run2 r -> r
         | _ -> failwith "Unexpected output data type: expected Run2"
 
     let getSorterSet (workspace: workspace) (runParameters: runParameters) : sorterSet =
-        match getOutputData workspace runParameters outputDataType.SorterSet with
+        match getOutputData workspace (Some runParameters) outputDataType.SorterSet with
         | SorterSet ss -> ss
         | _ -> failwith "Unexpected output data type: expected SorterSet"
 
     let getSortableTestSet (workspace: workspace) (runParameters: runParameters) : sortableTestSet =
-        match getOutputData workspace runParameters outputDataType.SortableTestSet with
+        match getOutputData workspace (Some runParameters) outputDataType.SortableTestSet with
         | SortableTestSet sts -> sts
         | _ -> failwith "Unexpected output data type: expected SortableTestSet"
 
     let getSorterModelSetMaker (workspace: workspace) (runParameters: runParameters) : sorterModelSetMaker =
-        match getOutputData workspace runParameters outputDataType.SorterModelSetMaker with
+        match getOutputData workspace (Some runParameters) outputDataType.SorterModelSetMaker with
         | SorterModelSetMaker sms -> sms
         | _ -> failwith "Unexpected output data type: expected SorterModelSetMaker"
 
     let getSortableTestModelSet (workspace: workspace) (runParameters: runParameters) : sortableTestModelSet =
-        match getOutputData workspace runParameters outputDataType.SortableTestModelSet with
+        match getOutputData workspace (Some runParameters) outputDataType.SortableTestModelSet with
         | SortableTestModelSet sts -> sts
         | _ -> failwith "Unexpected output data type: expected SortableTestModelSet"
 
     let getSortableTestModelSetMaker (workspace: workspace) (runParameters: runParameters) : sortableTestModelSetMaker =
-        match getOutputData workspace runParameters outputDataType.SortableTestModelSetMaker with
+        match getOutputData workspace (Some runParameters) outputDataType.SortableTestModelSetMaker with
         | SortableTestModelSetMaker stsm -> stsm
         | _ -> failwith "Unexpected output data type: expected SortableTestModelSetMaker"
 
     let getSorterSetEval (workspace: workspace) (runParameters: runParameters) : sorterSetEval =
-        match getOutputData workspace runParameters outputDataType.SorterSetEval with
+        match getOutputData workspace (Some runParameters) outputDataType.SorterSetEval with
         | SorterSetEval sse -> sse
         | _ -> failwith "Unexpected output data type: expected SorterSetEval"
 
     let getSorterSetEvalBins (workspace: workspace) (runParameters: runParameters) : sorterSetEvalBins =
-        match getOutputData workspace runParameters outputDataType.SorterSetEvalBins with
+        match getOutputData workspace (Some runParameters) outputDataType.SorterSetEvalBins with
         | SorterSetEvalBins sse -> sse
         | _ -> failwith "Unexpected output data type: expected SorterSetEvalBins"
 
     let getWorkspace (workspace: workspace) (runParameters: runParameters) : workspace =
-        match getOutputData workspace runParameters outputDataType.Workspace with
+        match getOutputData workspace (Some runParameters) outputDataType.Workspace with
         | Workspace w -> w
         | _ -> failwith "Unexpected output data type: expected Workspace"
 
 
 
-    let getRunFileNameForOutputDataFileName  (outputFilePath:string) : string =
-        let folder = Path.GetDirectoryName (Path.GetDirectoryName outputFilePath)
-        let outputName = Path.GetFileName outputFilePath
-        let pcs = outputName.Split('_')
-        let repl = pcs.[1]
-        let index = pcs.[2].Split('.').[0]
-        let fileName = sprintf "Run_%s_%s.msgpack" repl index 
-        Path.Combine(folder, "Run2", fileName)
-
-
     let saveToFileO 
-            (workspaceFolder: string) 
+            (workspace: workspace) 
             (runParameters: runParameters)
             (outputData: outputData) : Async<unit> =
         async {
-            let filePath = makeOutputDataFileName workspaceFolder runParameters (outputData |> getOutputDataType)
+            let filePath = getOutputDataFileName workspace (Some runParameters) (outputData |> getOutputDataType)
             let directory = Path.GetDirectoryName filePath
             Directory.CreateDirectory directory |> ignore
             try
@@ -316,6 +300,7 @@ module OutputData =
 
     let saveToFile
             (filePath: string)
+            (runParameters: runParameters option)
             (outputData: outputData) : Async<unit> =
         async {
             let directory = Path.GetDirectoryName filePath
@@ -398,19 +383,4 @@ module OutputData =
         
             return results |> List.rev |> List.toArray  // Reverse to maintain original order
         }
-
-
-
-    let getRunParametersForOutputDataPath
-            (outputDataPath: string) : runParameters =
-            let runPath = getRunFileNameForOutputDataFileName outputDataPath
-            if not (File.Exists runPath) then
-                failwith (sprintf "Run file %s does not exist" runPath)
-            try
-                use stream = new FileStream(runPath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                let dto = MessagePackSerializer.Deserialize<runDto>(stream, options)
-                let run = RunDto.fromDto dto
-                run.RunParameters
-            with e ->
-                failwith "Error reading Run file %s: %s" runPath e.Message
 

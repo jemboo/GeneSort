@@ -16,7 +16,7 @@ module WorkspaceOps =
 
     let saveWorkspace (workspace: workspace) = // : Async<unit> =
         let filePath = Path.Combine(workspace.WorkspaceFolder, sprintf "%s_Workspace.msgpack" workspace.Name)
-        Async.RunSynchronously (OutputData.saveToFile filePath (workspace |> outputData.Workspace))
+        Async.RunSynchronously (OutputData.saveToFile filePath None (workspace |> outputData.Workspace))
 
     /// Loads a workspace from the specified folder, expecting exactly one *_Workspace.msgpack file
     /// The workspace name is extracted from the file name and must match the name inside the file
@@ -98,9 +98,9 @@ module WorkspaceOps =
 
         let executeRun (run:run) = async {
 
-            let filePathRun = OutputData.makeOutputDataFileName 
-                                workspace.WorkspaceFolder
-                                run.RunParameters
+            let filePathRun = OutputData.getOutputDataFileName 
+                                workspace
+                                (Some run.RunParameters)
                                 outputDataType.Run
 
             if File.Exists filePathRun then
@@ -109,7 +109,7 @@ module WorkspaceOps =
                 try
                     do! executor workspace repl run
                     do! OutputData.saveToFileO 
-                            workspace.WorkspaceFolder 
+                            workspace 
                             run.RunParameters 
                             (run |> outputData.Run)
                 with e ->
@@ -136,9 +136,9 @@ module WorkspaceOps =
 
         let executeRun (run:run2) = async {
 
-            let filePathRun = OutputData.makeOutputDataFileName 
-                                workspace.WorkspaceFolder
-                                run.RunParameters
+            let filePathRun = OutputData.getOutputDataFileName 
+                                workspace
+                                (Some run.RunParameters)
                                 outputDataType.Run
 
             if File.Exists filePathRun then
@@ -146,7 +146,7 @@ module WorkspaceOps =
             else
                 try
                     do! executor workspace run
-                    do! OutputData.saveToFile filePathRun (run |> outputData.Run2)
+                    do! OutputData.saveToFile filePathRun (Some run.RunParameters) (run |> outputData.Run2)
                 with e ->
                     printfn "Error processing Run %d: %s" run.Index e.Message
         }

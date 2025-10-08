@@ -7,14 +7,14 @@ open GeneSort.Project.OutputData
 let startTime = System.DateTime.Now
 printfn $"**** QQQ ******** {startTime.ToString()}"
 
-//WorkspaceOps.saveWorkspace FullBoolTest.workspace
-//FullBoolTest.RunAll()
-FullBoolTest.RunSorterEvalReport()
+//WorkspaceOps.saveWorkspace FullBoolEvals.workspace
+//FullBoolEvals.RunAll()
+FullBoolEvals.RunSorterEvalReport()
 
 
 //WorkspaceOps.saveWorkspace MergeIntTests.workspace
-//MergeIntTests.RunAll()
-//MergeIntTests.RunSorterEvalReport()
+//MergeIntEvals.RunAll()
+//MergeIntEvals.RunSorterEvalReport()
 
 
 let endTime = System.DateTime.Now
