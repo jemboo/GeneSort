@@ -123,19 +123,20 @@ module FullBoolEvals =
                 paramMapRefiner
 
 
-    let executor (workspace: workspace) (run: run) : Async<unit> = // (cts: CancellationTokenSource) (progress: IProgress<string>) : Async<unit> =
+    let executor (workspace: workspace) (runParameters: runParameters) : Async<unit> = // (cts: CancellationTokenSource) (progress: IProgress<string>) : Async<unit> =
         async {
-            let repl = run.Repl
-            Console.WriteLine(sprintf "Executing Run %d  %s" run.Index (run.RunParameters.toString()))
+            let index = runParameters.GetIndex()
+            let repl = runParameters.GetRepl()  
+            Console.WriteLine(sprintf "Executing Run %d  %s" index (runParameters.toString()))
 
-            let sorterModelKey = run.RunParameters.GetSorterModelKey()
-            let sortingWidth = run.RunParameters.GetSortingWidth()
+            let sorterModelKey = runParameters.GetSorterModelKey()
+            let sortingWidth = runParameters.GetSortingWidth()
 
             let stageLength = getStageLengthForSortingWidth sortingWidth
-            run.RunParameters.SetStageLength stageLength
+            runParameters.SetStageLength stageLength
 
             let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
-            run.RunParameters.SetCeLength ceLength
+            runParameters.SetCeLength ceLength
 
 
             let sorterModelMaker =
@@ -154,7 +155,7 @@ module FullBoolEvals =
 
             let replFactor = if (%repl = 0) then 1 else 1
             let sorterCount = sortingWidth |> getSorterCountForSortingWidth replFactor
-            run.RunParameters.SetSorterCount sorterCount
+            runParameters.SetSorterCount sorterCount
 
             let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
             
@@ -166,11 +167,11 @@ module FullBoolEvals =
             let sortableTests = SortableTestModel.makeSortableTests sorterTestModel sortableArrayType
             let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
 
-            do! OutputData.saveToFile workspace (Some run.RunParameters) (sorterSet |> outputData.SorterSet)
-            do! OutputData.saveToFile workspace (Some run.RunParameters) (sorterSetEval |> outputData.SorterSetEval)
-            do! OutputData.saveToFile workspace (Some run.RunParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! OutputData.saveToFile workspace (Some runParameters) (sorterSet |> outputData.SorterSet)
+            do! OutputData.saveToFile workspace (Some runParameters) (sorterSetEval |> outputData.SorterSetEval)
+            do! OutputData.saveToFile workspace (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
-            Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %repl)
+            Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" index %repl)
         }
 
 
@@ -290,8 +291,8 @@ module FullBoolEvals =
 
     let RunAll() =
         let cts = new CancellationTokenSource()
-        let runs = WorkspaceOps.getRuns2 workspace
-        WorkspaceOps.executeWorkspace2 workspace 8 executor runs //cts progress
+        let runParams = WorkspaceOps.getRuns workspace |> Seq.map(fun r -> r.RunParameters)
+        WorkspaceOps.executeWorkspace workspace 8 executor runParams //cts progress
 
 
     let RunSorterEvalReport() =

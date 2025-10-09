@@ -85,9 +85,9 @@
                 <DataTemplate>
                     <ContentControl Content="{Binding ContentVm}">
                         <ContentControl.Resources>
-                            <!-- Template for WorkspaceViewerViewModel -->
+                            <!-- Template for WorkspaceViewViewModel -->
                             <DataTemplate DataType="{x:Type vm:WorkspaceParamsVm}">
-                                <local:WorkspaceViewerControl />
+                                <local:WorkspaceViewControl />
                             </DataTemplate>
 
                             <!-- Template for FileViewerViewModel (your existing one) -->

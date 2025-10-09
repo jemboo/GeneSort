@@ -5,9 +5,9 @@ using System.Windows.Data;
 
 namespace GeneSort.UI.Views
 {
-    public partial class WorkspaceViewerControl : UserControl
+    public partial class WorkspaceViewControl : UserControl
     {
-        public WorkspaceViewerControl()
+        public WorkspaceViewControl()
         {
             InitializeComponent();
         }

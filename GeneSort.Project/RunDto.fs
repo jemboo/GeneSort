@@ -23,7 +23,7 @@ module RunDto =
     let toRunDto (run: run) : runDto =
         { index = %run.Index
           repl = %run.Repl
-          runParametersDto = run.RunParameters |> RunParametersDto.toRunParametersDto }
+          runParametersDto = run.RunParameters |> RunParametersDto.fromDomain }
 
     let fromDto (dto: runDto) : run =
         run.create 

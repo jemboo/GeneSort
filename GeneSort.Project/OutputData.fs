@@ -25,7 +25,7 @@ open GeneSort.SortingOps.Mp
 
 
 type outputDataType =
-    | Run
+    | RunParameters
     | SorterSet
     | SortableTestSet
     | SorterModelSetMaker
@@ -41,7 +41,7 @@ module OutputDataType =
     
     let toString (outputDataType: outputDataType) : string =
         match outputDataType with
-        | Run -> "Run"
+        | RunParameters -> "RunParameters"
         | SorterSet -> "SorterSet"
         | SortableTestSet -> "SortableTestSet"
         | SorterModelSetMaker -> "SorterModelSet"
@@ -55,7 +55,7 @@ module OutputDataType =
 
 
 type outputData =
-    | Run of run
+    | RunParameters of runParameters
     | SorterSet of sorterSet
     | SortableTestSet of sortableTestSet
     | SorterModelSetMaker of sorterModelSetMaker
@@ -79,7 +79,7 @@ module OutputData =
 
     let getOutputDataType (outputData: outputData) : outputDataType =
         match outputData with
-        | Run _ -> outputDataType.Run
+        | RunParameters _ -> outputDataType.RunParameters
         | SorterSet _ -> outputDataType.SorterSet
         | SortableTestSet _ -> outputDataType.SortableTestSet
         | SorterModelSetMaker _ -> outputDataType.SorterModelSetMaker
@@ -95,7 +95,7 @@ module OutputData =
         let repl = %run.RunParameters.GetRepl()
         let dataTypeName = outputData |> getOutputDataType |> OutputDataType.toString
         match outputData with
-        | Run _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
+        | RunParameters _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
         | SorterSet _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
         | SortableTestSet _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
         | SorterModelSetMaker _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
@@ -158,9 +158,9 @@ module OutputData =
         try
             use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)
             match outputDataType with
-            | outputDataType.Run ->
-                let dto = MessagePackSerializer.Deserialize<runDto>(stream, options)
-                Run (RunDto.fromDto dto)
+            | outputDataType.RunParameters ->
+                let dto = MessagePackSerializer.Deserialize<runParametersDto>(stream, options)
+                RunParameters (RunParametersDto.fromDto dto)
             | outputDataType.SorterSet ->
                 let dto = MessagePackSerializer.Deserialize<sorterSetDto>(stream, options)
                 SorterSet (SorterSetDto.toDomain dto)
@@ -189,10 +189,10 @@ module OutputData =
             failwithf "Error reading file %s: %s" filePath e.Message
 
 
-    let getRun (workspace: workspace) (runParameters: runParameters) : run =
-        match getOutputData workspace (Some runParameters) outputDataType.Run with
-        | Run r -> r
-        | _ -> failwith "Unexpected output data type: expected Run"
+    let getRunParameters (workspace: workspace) (runParameters: runParameters) : runParameters =
+        match getOutputData workspace (Some runParameters) outputDataType.RunParameters with
+        | RunParameters r -> r
+        | _ -> failwith "Unexpected output data type: expected RunParameters"
 
     let getSorterSet (workspace: workspace) (runParameters: runParameters) : sorterSet =
         match getOutputData workspace (Some runParameters) outputDataType.SorterSet with
@@ -247,8 +247,8 @@ module OutputData =
             try
                 use stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None)
                 match outputData with
-                | Run r -> 
-                    let dto = RunDto.toRunDto r
+                | RunParameters r -> 
+                    let dto = RunParametersDto.fromDomain r
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterSet ss ->
                     let dto = SorterSetDto.fromDomain ss
@@ -272,7 +272,7 @@ module OutputData =
                     let dto = SorterSetEvalBinsDto.fromDomain sse
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | Workspace w ->
-                    let dto = WorkspaceDto.toWorkspaceDto w
+                    let dto = WorkspaceDto.fromDomain w
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
 
             with e ->
@@ -280,58 +280,13 @@ module OutputData =
                 raise e // Re-throw to ensure the caller is aware of the failure
         }
 
-
-    let saveToFile
-            (filePath: string)
-            (runParameters: runParameters option)
-            (outputData: outputData) : Async<unit> =
-        async {
-            let directory = Path.GetDirectoryName filePath
-            Directory.CreateDirectory directory |> ignore
-            try
-                use stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None)
-                match outputData with
-                | Run r -> 
-                    let dto = RunDto.toRunDto r
-                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SorterSet ss ->
-                    let dto = SorterSetDto.fromDomain ss
-                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SortableTestSet sts ->
-                    let dto = SortableTestSetDto.fromDomain sts
-                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SorterModelSetMaker sms -> 
-                    let dto = SorterModelSetMakerDto.fromDomain sms
-                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SortableTestModelSet sts ->
-                    let dto = SortableTestModelSetDto.fromDomain sts
-                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SortableTestModelSetMaker stsm ->
-                    let dto = SortableTestModelSetMakerDto.fromDomain stsm
-                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SorterSetEval sse ->
-                    let dto = SorterSetEvalDto.fromDomain sse
-                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SorterSetEvalBins sse ->
-                    let dto = SorterSetEvalBinsDto.fromDomain sse
-                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | Workspace w ->
-                    let dto = WorkspaceDto.toWorkspaceDto w
-                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-
-            with e ->
-                printfn "Error saving to file %s: %s" filePath e.Message
-                raise e // Re-throw to ensure the caller is aware of the failure
-        }
-
-
-    let getRunFileAsync (runFilePath: string) (ct: CancellationToken) : Async<Result<runParameters, string>> =
+    let getRunParametersFileAsync (runFilePath: string) (ct: CancellationToken) : Async<Result<runParameters, string>> =
         async {
             try
                 use stream = new FileStream(runFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)
-                let! dto = MessagePackSerializer.DeserializeAsync<runDto>(stream, options, ct).AsTask() |> Async.AwaitTask
-                let run = RunDto.fromDto dto
-                return Ok run.RunParameters
+                let! dto = MessagePackSerializer.DeserializeAsync<runParametersDto>(stream, options, ct).AsTask() |> Async.AwaitTask
+                let runParameters = RunParametersDto.fromDto dto
+                return Ok runParameters
             with
             | :? FileNotFoundException -> return Error (sprintf "File not found: %s" runFilePath)
             | :? IOException as e -> return Error (sprintf "IO error reading %s: %s" runFilePath e.Message)
@@ -345,7 +300,7 @@ module OutputData =
                 (ct: CancellationToken) 
                 (progress: IProgress<string>) : Async<runParameters[]> =
         async {
-            let folder = getOutputDataFolder workspace outputDataType.Run
+            let folder = getOutputDataFolder workspace outputDataType.RunParameters
             let filePaths = getFilesSortedByCreationTime folder |> List.toArray  // Snapshot to array for safety
         
             progress.Report(sprintf "Found %d files in %s" filePaths.Length folder)
@@ -356,7 +311,7 @@ module OutputData =
                 let filePath = filePaths.[i]
                // progress.Report(sprintf "Processing file %d/%d: %s" (i+1) filePaths.Length (Path.GetFileName filePath))
             
-                let! result = getRunFileAsync filePath ct
+                let! result = getRunParametersFileAsync filePath ct
                 match result with
                 | Ok runParams -> results <- runParams :: results
                 | Error msg -> progress.Report(sprintf "Skipped due to error: %s" msg)  // Log error, continue

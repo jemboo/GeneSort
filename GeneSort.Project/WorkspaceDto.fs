@@ -17,14 +17,14 @@ type workspaceDto =
 
 module WorkspaceDto =  
 
-    let toWorkspaceDto (workspace: workspace) : workspaceDto =
+    let fromDomain (workspace: workspace) : workspaceDto =
         { 
           Name = workspace.Name
           Description = workspace.Description
           RootDirectory = workspace.RootDirectory
           ReportNames = workspace.ReportNames
           RunParametersDtos = workspace.RunParametersArray 
-                                |> Array.map(RunParametersDto.toRunParametersDto) 
+                                |> Array.map(RunParametersDto.fromDomain) 
         }
 
     let toDomain (dto: workspaceDto) : workspace =

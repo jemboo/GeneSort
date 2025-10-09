@@ -46,7 +46,7 @@ module WorkspaceOps =
 
 
     /// Returns a sequence of Runs made from all possible parameter combinations
-    let getRuns2 (workspace: workspace) : run seq =
+    let getRuns (workspace: workspace) : run seq =
         workspace.RunParametersArray 
         |> Seq.mapi (fun i runParams  -> 
                         let indexNumber = UMX.tag<indexNumber> i
@@ -77,32 +77,32 @@ module WorkspaceOps =
 
     /// Executes all runs from the workspace, running up to atTheSameTime runs concurrently
     /// Skips runs if their output file already exists; saves runs to .msgpack files after execution
-    let executeWorkspace2
+    let executeWorkspace
                 (workspace: workspace)
                 (maxDegreeOfParallelism: int) 
-                (executor: workspace -> run -> Async<unit>)
-                (runs: run seq)
+                (executor: workspace -> runParameters -> Async<unit>)
+                (runParameters: runParameters seq)
                 : unit =
 
-        let executeRun (run:run) = async {
+        let executeRun (runParameters:runParameters) = async {
 
             let filePathRun = OutputData.getOutputDataFileName 
                                 workspace
-                                (Some run.RunParameters)
-                                outputDataType.Run
+                                (Some runParameters)
+                                outputDataType.RunParameters
 
             if File.Exists filePathRun then
-                        printfn "Skipping Run %d: Output file %s already exists" run.Index filePathRun
+                        printfn "Skipping Run %d: Output file %s already exists" (runParameters.GetIndex()) filePathRun
             else
                 try
-                    do! executor workspace run
-                    do! OutputData.saveToFile workspace (Some run.RunParameters) (run |> outputData.Run)
+                    do! executor workspace runParameters
+                    do! OutputData.saveToFile workspace (Some runParameters) (runParameters |> outputData.RunParameters)
                 with e ->
-                    printfn "Error processing Run %d: %s" run.Index e.Message
+                    printfn "Error processing Run %d: %s" (runParameters.GetIndex()) e.Message
         }
 
         let limitedParallel =
-            runs
+            runParameters
             |> Seq.map executeRun
             |> Seq.toList
             |> ParallelWithThrottle maxDegreeOfParallelism

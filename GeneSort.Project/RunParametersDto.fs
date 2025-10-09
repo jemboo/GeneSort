@@ -17,7 +17,7 @@ module RunParametersDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
     // Convert Run to a Dto for serialization
-    let toRunParametersDto (runParameters: runParameters) : runParametersDto =
+    let fromDomain (runParameters: runParameters) : runParametersDto =
         { paramMap = runParameters.ParamMap }
 
     let fromDto (dto: runParametersDto) : runParameters =

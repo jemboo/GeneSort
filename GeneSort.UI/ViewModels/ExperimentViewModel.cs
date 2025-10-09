@@ -84,7 +84,7 @@ namespace GeneSort.UI.ViewModels
             // You might want to adjust this logic based on your file naming convention
             if (IsWorkspaceFile(path, fileName))
             {
-                // Create WorkspaceViewer tab
+                // Create WorkspaceView tab
                 var workspaceVm = new WorkspaceParamsVm();
                 var newTab = new TabViewModel
                 {
