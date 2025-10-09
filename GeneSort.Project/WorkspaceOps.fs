@@ -16,7 +16,7 @@ module WorkspaceOps =
 
     let saveWorkspace (workspace: workspace) = // : Async<unit> =
         let filePath = Path.Combine(workspace.WorkspaceFolder, sprintf "%s_Workspace.msgpack" workspace.Name)
-        Async.RunSynchronously (OutputData.saveToFile filePath None (workspace |> outputData.Workspace))
+        Async.RunSynchronously (OutputData.saveToFile workspace None (workspace |> outputData.Workspace))
 
     /// Loads a workspace from the specified folder, expecting exactly one *_Workspace.msgpack file
     /// The workspace name is extracted from the file name and must match the name inside the file
@@ -96,7 +96,7 @@ module WorkspaceOps =
             else
                 try
                     do! executor workspace run
-                    do! OutputData.saveToFile filePathRun (Some run.RunParameters) (run |> outputData.Run)
+                    do! OutputData.saveToFile workspace (Some run.RunParameters) (run |> outputData.Run)
                 with e ->
                     printfn "Error processing Run %d: %s" run.Index e.Message
         }

@@ -236,12 +236,12 @@ module OutputData =
 
 
 
-    let saveToFileO 
+    let saveToFile 
             (workspace: workspace) 
-            (runParameters: runParameters)
+            (runParameters: runParameters option)
             (outputData: outputData) : Async<unit> =
         async {
-            let filePath = getOutputDataFileName workspace (Some runParameters) (outputData |> getOutputDataType)
+            let filePath = getOutputDataFileName workspace runParameters (outputData |> getOutputDataType)
             let directory = Path.GetDirectoryName filePath
             Directory.CreateDirectory directory |> ignore
             try
@@ -354,7 +354,7 @@ module OutputData =
             for i = 0 to filePaths.Length - 1 do
                 ct.ThrowIfCancellationRequested()  // Check cancellation
                 let filePath = filePaths.[i]
-                progress.Report(sprintf "Processing file %d/%d: %s" (i+1) filePaths.Length (Path.GetFileName filePath))
+               // progress.Report(sprintf "Processing file %d/%d: %s" (i+1) filePaths.Length (Path.GetFileName filePath))
             
                 let! result = getRunFileAsync filePath ct
                 match result with

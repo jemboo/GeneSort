@@ -173,9 +173,9 @@ module MergeIntEvals =
             let sortableTests = SortableTestModel.makeSortableTestsForMerge sortableArrayType sortingWidth
             let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
 
-            do! OutputData.saveToFileO workspace run.RunParameters (sorterSet |> outputData.SorterSet)
-            do! OutputData.saveToFileO workspace run.RunParameters (sorterSetEval |> outputData.SorterSetEval)
-            do! OutputData.saveToFileO workspace run.RunParameters (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! OutputData.saveToFile workspace (Some run.RunParameters) (sorterSet |> outputData.SorterSet)
+            do! OutputData.saveToFile workspace (Some run.RunParameters) (sorterSetEval |> outputData.SorterSetEval)
+            do! OutputData.saveToFile workspace (Some run.RunParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" run.Index %repl)
         }
