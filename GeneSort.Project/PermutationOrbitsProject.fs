@@ -14,6 +14,7 @@ open GeneSort.Sorter.Sortable
 open GeneSort.Model.Sortable
 open GeneSort.Sorter.Mp.Sortable
 open GeneSort.Model.Mp.Sortable
+open System.Threading
 
 
 module PermutationOrbitsProject = 
@@ -36,30 +37,37 @@ module PermutationOrbitsProject =
     let parameterSet = 
         [ sortingWidths(); ]
 
-    let workspace = Workspace.create experimentName experimentDesc projectDir [||] parameterSet (fun s -> Some s)
+    let workspace = Workspace.create experimentName experimentDesc projectDir [||] parameterSet (fun s -> s)
 
-    let executor (workspace: workspace) (repl: int<replNumber>) (run: run) : Async<unit> =
+    let executor 
+            (workspace: workspace) 
+            (runParameters: runParameters) 
+            (cts: CancellationTokenSource) 
+            (progress: IProgress<string>) : Async<unit> =
         async {
-            try
-                Console.WriteLine(sprintf "Executing Run %d   %s" run.Index (run.RunParameters.toString()))
-                run.RunParameters.SetRepl repl
 
-                let sortingWidth = run.RunParameters.GetSortingWidth()
+            try
+                let index = runParameters.GetIndex()
+                let repl = runParameters.GetRepl()  
+                let sortingWidth = runParameters.GetSortingWidth()
+
+                progress.Report(sprintf "Executing Run %d  %s" index (runParameters.toString()))
 
                 let firstIndex = (%repl * %testModelCount) |> UMX.tag<sorterTestModelCount>
                 let sorterTestModelGen = MsasORandGen.create randomType sortingWidth maxOrbiit |> SorterTestModelGen.MsasORandGen
                 let sorterTestModelSetMaker = sortableTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
                 let sorterTestModelSet = sorterTestModelSetMaker.MakeSortableTestModelSet
-                do! OutputData.saveToFile workspace (Some run.RunParameters)
+                do! OutputData.saveToFile workspace (Some runParameters)
                                           (sorterTestModelSet |> outputData.SortableTestModelSet)
-                do! OutputData.saveToFile workspace (Some run.RunParameters)
+                do! OutputData.saveToFile workspace (Some runParameters)
                                           (sorterTestModelSetMaker |> outputData.SortableTestModelSetMaker)
 
                 
-                run.RunParameters.SetRunFinished true
-                Console.WriteLine(sprintf "Finished executing Run %d  Repl  %d \n" run.Index %repl)
+                runParameters.SetRunFinished true
+
+                progress.Report(sprintf "Finished executing Run %d  Repl  %d \n" %index %repl)
             with ex ->
-                Console.WriteLine(sprintf "Error in Run %d, Repl %d: %s" run.Index %repl ex.Message)
+                progress.Report(sprintf "Error in Run") // %d, Repl %d: %s" index %repl ex.Message)
                 raise ex
         }
 

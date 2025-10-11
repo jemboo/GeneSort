@@ -100,7 +100,7 @@ module MergeIntEvals =
         (runParameters.replKey, replValues() )
 
 
-    let paramMapRefiner (runParameters: runParameters) = 
+    let paramMapFilter (runParameters: runParameters) = 
         let sorterModelKey = runParameters.GetSorterModelKey()
         let sortingWidth = %runParameters.GetSortingWidth()
         let has3factor = (sortingWidth % 3 = 0)
@@ -115,6 +115,37 @@ module MergeIntEvals =
         | sorterModelKey.Msuf6 -> 
                 if has3factor then Some runParameters else
                 None
+
+
+
+    let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
+        let mutable index = 0
+
+        let enhancer (runParameters : runParameters) : runParameters =
+            let repl = runParameters.GetRepl()
+            let sorterModelKey = runParameters.GetSorterModelKey()
+            let sortingWidth = runParameters.GetSortingWidth()
+
+            let stageLength = getStageLengthForSortingWidth sortingWidth
+            runParameters.SetStageLength stageLength
+
+            let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
+            runParameters.SetCeLength ceLength
+
+            let replFactor = if (%repl = 0) then 1 else 10
+            let sorterCount = sortingWidth |> getSorterCountForSortingWidth replFactor
+            runParameters.SetSorterCount sorterCount
+            runParameters
+
+        seq {
+            for runParameters in runParametersSeq do
+                    let filtrate = paramMapFilter runParameters
+                    if filtrate.IsSome then
+                        let retVal = enhancer filtrate.Value
+                        retVal.SetIndex (UMX.tag<indexNumber> index)
+                        yield filtrate.Value
+                        index <- index + 1
+        }
 
     let parameterSet = 
         [ repls(); sortingWidths(); sorterModelKeys() ]
@@ -131,11 +162,15 @@ module MergeIntEvals =
                 paramMapRefiner
 
 
-    let executor (workspace: workspace) (runParameters: runParameters) : Async<unit> =
+    let executor 
+            (workspace: workspace) 
+            (runParameters: runParameters) 
+            (cts: CancellationTokenSource) 
+            (progress: IProgress<string>) : Async<unit> =
         async {
             let repl = runParameters.GetIndex()
             let index = runParameters.GetIndex()
-            Console.WriteLine(sprintf "Executing Run %d  %s" index (runParameters.toString()))
+            progress.Report(sprintf "Executing Run %d  %s" index (runParameters.toString()))
 
             let sorterModelKey = runParameters.GetSorterModelKey()
             let sortingWidth = runParameters.GetSortingWidth()
@@ -178,7 +213,7 @@ module MergeIntEvals =
             do! OutputData.saveToFile workspace (Some runParameters) (sorterSetEval |> outputData.SorterSetEval)
             do! OutputData.saveToFile workspace (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
-            Console.WriteLine(sprintf "Finished executing Run %d  Cycle  %d \n" index %repl)
+            progress.Report(sprintf "Finished executing Run %d  Cycle  %d \n" index %repl)
         }
 
 
@@ -297,8 +332,7 @@ module MergeIntEvals =
 
     let RunAll() =
         let cts = new CancellationTokenSource()
-        let runParams = WorkspaceOps.getRuns workspace |> Seq.map(fun r -> r.RunParameters)
-        WorkspaceOps.executeWorkspace workspace 8 executor runParams //cts progress
+        WorkspaceOps.executeWorkspace workspace 8 executor workspace.RunParametersArray cts progress
 
 
     let RunSorterEvalReport() =

@@ -6,6 +6,8 @@ open MessagePack
 open MessagePack.FSharp
 open MessagePack.Resolvers
 open FSharp.UMX
+open System
+open System.Threading
 
 
 module WorkspaceOps =  
@@ -45,15 +47,6 @@ module WorkspaceOps =
             raise e
 
 
-    /// Returns a sequence of Runs made from all possible parameter combinations
-    let getRuns (workspace: workspace) : run seq =
-        workspace.RunParametersArray 
-        |> Seq.mapi (fun i runParams  -> 
-                        let indexNumber = UMX.tag<indexNumber> i
-                        (runParams.SetIndex indexNumber)
-                        run.create indexNumber runParams)
-
-
     /// Executes async computations in parallel, limited to maxDegreeOfParallelism at a time
     let private ParallelWithThrottle (maxDegreeOfParallelism: int) (computations: seq<Async<unit>>) : Async<unit> =
         async {
@@ -80,11 +73,16 @@ module WorkspaceOps =
     let executeWorkspace
                 (workspace: workspace)
                 (maxDegreeOfParallelism: int) 
-                (executor: workspace -> runParameters -> Async<unit>)
+                (executor: workspace -> runParameters -> CancellationTokenSource -> IProgress<string> ->Async<unit>)
                 (runParameters: runParameters seq)
+                (cts: CancellationTokenSource)
+                (progress: IProgress<string>)
                 : unit =
 
-        let executeRun (runParameters:runParameters) = async {
+        let executeRun 
+                (runParameters:runParameters) 
+                (cts: CancellationTokenSource)  
+                (progress: IProgress<string>)   = async {
 
             let filePathRun = OutputData.getOutputDataFileName 
                                 workspace
@@ -95,7 +93,7 @@ module WorkspaceOps =
                         printfn "Skipping Run %d: Output file %s already exists" (runParameters.GetIndex()) filePathRun
             else
                 try
-                    do! executor workspace runParameters
+                    do! executor workspace runParameters cts progress
                     do! OutputData.saveToFile workspace (Some runParameters) (runParameters |> outputData.RunParameters)
                 with e ->
                     printfn "Error processing Run %d: %s" (runParameters.GetIndex()) e.Message
@@ -103,7 +101,7 @@ module WorkspaceOps =
 
         let limitedParallel =
             runParameters
-            |> Seq.map executeRun
+            |> Seq.map (fun rps -> executeRun rps cts progress)
             |> Seq.toList
             |> ParallelWithThrottle maxDegreeOfParallelism
 

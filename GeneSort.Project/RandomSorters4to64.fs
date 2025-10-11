@@ -14,6 +14,7 @@ open GeneSort.Model.Sorter.Si
 open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Rs
 open GeneSort.Model.Sorter.Uf6
+open System.Threading
 
 
 module RandomSorters4to64 =
@@ -89,7 +90,7 @@ module RandomSorters4to64 =
         (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
 
 
-    let paramMapRefiner (runParameters: runParameters) = 
+    let paramMapFilter (runParameters: runParameters) = 
         let sorterModelKey = runParameters.GetSorterModelKey()
         let sortingWidth = %runParameters.GetSortingWidth()
         let has3factor = (sortingWidth % 3 = 0)
@@ -106,6 +107,35 @@ module RandomSorters4to64 =
                 None
 
 
+    let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
+        let mutable index = 0
+
+        let enhancer (runParameters : runParameters) : runParameters =
+            let repl = runParameters.GetRepl()
+            let sorterModelKey = runParameters.GetSorterModelKey()
+            let sortingWidth = runParameters.GetSortingWidth()
+
+            let stageLength = getStageLengthForSortingWidth sortingWidth
+            runParameters.SetStageLength stageLength
+
+            let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
+            runParameters.SetCeLength ceLength
+
+            let replFactor = if (%repl = 0) then 1 else 10
+            let sorterCount = sortingWidth |> getSorterCountForSortingWidth replFactor
+            runParameters.SetSorterCount sorterCount
+            runParameters
+
+        seq {
+            for runParameters in runParametersSeq do
+                    let filtrate = paramMapFilter runParameters
+                    if filtrate.IsSome then
+                        let retVal = enhancer filtrate.Value
+                        retVal.SetIndex (UMX.tag<indexNumber> index)
+                        yield filtrate.Value
+                        index <- index + 1
+        }
+
 
     let parameterSet = 
         [ sortingWidths(); sorterModelKeys() ]
@@ -114,20 +144,23 @@ module RandomSorters4to64 =
     let workspace = Workspace.create experimentName experimentDesc projectDir [|"Rep1"; "Rep2"; "Rep3"; "Rep4"|] parameterSet paramMapRefiner
 
 
-    let executor (workspace: workspace) (repl: int<replNumber>) (run: run) : Async<unit> =
+    let executor 
+            (workspace: workspace) 
+            (runParameters: runParameters) 
+            (cts: CancellationTokenSource) 
+            (progress: IProgress<string>) : Async<unit> =
         async {
 
-            Console.WriteLine(sprintf "Executing Run %d  %s" run.Index (run.RunParameters.toString()))
-            run.RunParameters.SetRepl repl
+            let index = runParameters.GetIndex()
+            let repl = runParameters.GetRepl()  
+            let sorterModelKey = runParameters.GetSorterModelKey()
+            let sortingWidth = runParameters.GetSortingWidth()
+            let stageLength = runParameters.GetStageLength()
+            let ceLength = runParameters.GetCeLength()
+            let sorterCount = runParameters.GetSorterCount()
 
-            let sorterModelKey = run.RunParameters.GetSorterModelKey()
-            let sortingWidth = run.RunParameters.GetSortingWidth()
+            progress.Report(sprintf "Executing Run %d  %s" index (runParameters.toString()))
 
-            let ceLength = getCeLengthForSortingWidth sortingWidth
-            run.RunParameters.SetCeLength ceLength
-
-            let stageLength = getStageLengthForSortingWidth sortingWidth
-            run.RunParameters.SetStageLength stageLength
 
             let sorterModelMaker =
                 match sorterModelKey with
@@ -143,22 +176,18 @@ module RandomSorters4to64 =
                     let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
                     (msuf6RandGen.create randomType sortingWidth stageLength uf6GenRatesArray) |> sorterModelMaker.SmmMsuf6RandGen
 
-            let replFactor = if (%repl = 0) then 1 else 10
-            let sorterCount = sortingWidth |> getSorterCountForSortingWidth replFactor
-            run.RunParameters.SetSorterCount sorterCount
-
             let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
             
             let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 
-            do! OutputData.saveToFile workspace (Some run.RunParameters) (sorterSet |> outputData.SorterSet)
-            do! OutputData.saveToFile workspace (Some run.RunParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! OutputData.saveToFile workspace (Some runParameters) (sorterSet |> outputData.SorterSet)
+            do! OutputData.saveToFile workspace (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
-            run.RunParameters.SetRunFinished true
+            runParameters.SetRunFinished true
 
-            Console.WriteLine(sprintf "Finished executing Run %d  Repl  %d \n" run.Index %repl)
+            progress.Report(sprintf "Finished executing Run %d  Repl  %d \n" index %repl)
         }
 
 

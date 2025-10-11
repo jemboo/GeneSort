@@ -90,24 +90,6 @@ module OutputData =
         | Workspace _ -> outputDataType.Workspace
 
 
-    let getOutputFilePath (rootFolder) (run:run) (outputData: outputData) =
-        let index = run.Index
-        let repl = %run.RunParameters.GetRepl()
-        let dataTypeName = outputData |> getOutputDataType |> OutputDataType.toString
-        match outputData with
-        | RunParameters _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
-        | SorterSet _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
-        | SortableTestSet _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
-        | SorterModelSetMaker _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
-        | SortableTestModelSet _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
-        | SortableTestModelSetMaker _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
-        | SorterSetEval _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
-        | SorterSetEvalBins _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s_%d_%d.msgpack" dataTypeName %repl index)
-        | Workspace _ -> Path.Combine(rootFolder, dataTypeName, sprintf "%s.msgpack" dataTypeName)
-
-
-
-
         /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)

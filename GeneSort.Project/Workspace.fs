@@ -62,15 +62,15 @@ module Workspace =
             (rootDirectory: string) 
             (reportKeys: string array)
             (parameterSpans: (string * string list) list) 
-            (paramRefiner: runParameters -> runParameters option)        
+            (paramRefiner: runParameters seq -> runParameters seq)        
              : workspace =
 
         let refinedParameters = 
             parameterSpans |> Combinatorics.cartesianProductMaps
                            |> Seq.map (fun paramMap -> runParameters.create paramMap)
-                           |> Seq.map (paramRefiner)
-                           |> Seq.choose id
+                           |> paramRefiner
                            |> Seq.toArray
+
         workspace.create 
                 name 
                 description 

@@ -37,9 +37,8 @@ type WorkspaceTests() =
                     printfn "Failed to delete directory %s after %d retries: %s" path maxRetries ex.Message
             tryDelete maxRetries
 
-    let paramMapRefiner (runParameters: runParameters) = 
-        Some runParameters
-
+    let paramMapRefiner (runParametersSet: runParameters seq) = 
+        runParametersSet
 
 
     // Helper to create a sample workspace
