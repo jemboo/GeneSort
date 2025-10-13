@@ -56,6 +56,7 @@ type workspace =
 
 
 module Workspace =  
+
     let create 
             (name: string) 
             (description: string) 
@@ -78,11 +79,9 @@ module Workspace =
                 refinedParameters
                 reportKeys
 
-                 
-    let filterByParameters (workspace: workspace) (filter: (string * string) array) : runParameters [] =
-        workspace.RunParametersArray
-        |> Array.filter (
-            fun runParameters ->
-                filter |> Array.forall (fun (key, value) ->
-                    runParameters.ParamMap.ContainsKey key && runParameters.ParamMap.[key] = value
-                ))
+
+    let repl1s() : string*string list =
+            (runParameters.replKey, [0;] |> List.map(fun d -> d.ToString()))
+
+    let repl4s() : string*string list =
+            (runParameters.replKey, [0; 1; 2; 3;] |> List.map(fun d -> d.ToString()))

@@ -51,6 +51,8 @@ type runParameters =
     member this.SetIndex(index: int<indexNumber>) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.indexKey, (UMX.untag index).ToString())
 
+
+
     /// Gets the Repl value.
     member this.GetRepl() : int<replNumber> =
         match this.paramMap.TryFind runParameters.replKey with
@@ -60,9 +62,17 @@ type runParameters =
             | false, _ -> failwith "Invalid Repl value"
         | None -> failwith "Repl parameter not found"
 
+    member this.GetReplKvp() : string*string =
+        match this.paramMap.TryFind runParameters.replKey with
+        | Some value -> 
+            (runParameters.replKey, value)
+        | None -> failwith "Repl parameter not found"
+
     /// Sets the Repl value.
     member this.SetRepl(repl: int<replNumber>) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.replKey, (UMX.untag repl).ToString())
+
+
 
     /// Gets the Repl value.
     member this.GetGeneration() : int<generationNumber> =
@@ -77,6 +87,8 @@ type runParameters =
     member this.SetGeneration(repl: int<generationNumber>) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.generationKey, (UMX.untag repl).ToString())
 
+
+
     member this.IsRunFinished() : bool =
         match this.paramMap.TryFind runParameters.runFinishedKey with
         | Some value -> 
@@ -88,6 +100,8 @@ type runParameters =
     member this.SetRunFinished(finished: bool) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.runFinishedKey, finished.ToString())
 
+
+
     /// Gets the SortableArrayType value.
     member this.GetSortableArrayType() : sortableArrayType =
         match this.paramMap.TryFind runParameters.sortableArrayTypeKey with
@@ -98,15 +112,25 @@ type runParameters =
     member this.SetSortableArrayType(sortableArrayType: sortableArrayType) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.sortableArrayTypeKey, SortableArrayType.toString sortableArrayType)
 
+
+
     /// Gets the SorterModelKey value.
     member this.GetSorterModelKey() : sorterModelKey =
         match this.paramMap.TryFind runParameters.sorterModelTypeKey with
         | Some value -> SorterModelKey.fromString value
         | None -> failwith "SorterModel parameter not found"
 
+    member this.GetSorterModelKvp() : string*string =
+        match this.paramMap.TryFind runParameters.sorterModelTypeKey with
+        | Some value -> 
+            (runParameters.sorterModelTypeKey, value)
+        | None -> failwith "Repl parameter not found"
+
     /// Sets the SorterModelKey value.
     member this.SetSorterModelKey(sorterModelKey: sorterModelKey) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.sorterModelTypeKey, SorterModelKey.toString sorterModelKey)
+
+
 
     /// Gets the SortingWidth value.
     member this.GetSortingWidth() : int<sortingWidth> =
@@ -117,9 +141,17 @@ type runParameters =
             | false, _ -> failwith "Invalid SortingWidth value"
         | None -> failwith "SortingWidth parameter not found"
 
+    member this.GetSortingWidthKvp() : string*string =
+        match this.paramMap.TryFind runParameters.sortingWidthKey with
+        | Some value -> 
+            (runParameters.sortingWidthKey, value)
+        | None -> failwith "Repl parameter not found"
+
     /// Sets the SortingWidth value.
     member this.SetSortingWidth(sortingWidth: int<sortingWidth>) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.sortingWidthKey, (UMX.untag sortingWidth).ToString())
+
+
 
     /// Gets the MaxOrbit value.
     member this.GetMaxOrbit() : int =
@@ -134,6 +166,8 @@ type runParameters =
     member this.SetMaxOrbit(maxOrbit: int) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.maxOrbitKey, maxOrbit.ToString())
 
+
+
     /// Gets the StageLength value.
     member this.GetStageLength() : int<stageLength> =
         match this.paramMap.TryFind runParameters.stageLengthKey with
@@ -146,6 +180,8 @@ type runParameters =
     /// Sets the StageLength value.
     member this.SetStageLength(stageLength: int<stageLength>) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.stageLengthKey, (UMX.untag stageLength).ToString())
+
+
 
     /// Gets the CeLength value.
     member this.GetCeLength() : int<ceLength> =
@@ -160,6 +196,12 @@ type runParameters =
     member this.SetCeLength(ceLength: int<ceLength>) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.ceLengthKey, (UMX.untag ceLength).ToString())
 
+
+
+    /// Sets the SorterCount value.
+    member this.SetSorterCount(sorterCount: int<sorterCount>) : unit =
+       this. paramMap <- this.paramMap.Add(runParameters.sorterCountKey, (UMX.untag sorterCount).ToString())
+
     /// Gets the SorterCount value.
     member this.GetSorterCount() : int<sorterCount> =
         match this.paramMap.TryFind runParameters.sorterCountKey with
@@ -169,6 +211,30 @@ type runParameters =
             | false, _ -> failwith "Invalid SorterCount value"
         | None -> failwith "SorterCount parameter not found"
 
-    /// Sets the SorterCount value.
-    member this.SetSorterCount(sorterCount: int<sorterCount>) : unit =
-       this. paramMap <- this.paramMap.Add(runParameters.sorterCountKey, (UMX.untag sorterCount).ToString())
+
+
+
+module RunParameters =  
+                 
+    let filterByParameters 
+            (runParametersSet: runParameters array) 
+            (filter: (string * string) array) : runParameters [] =
+        runParametersSet
+        |> Array.filter (
+            fun runParameters ->
+                filter |> Array.forall (fun (key, value) ->
+                    runParameters.ParamMap.ContainsKey key && runParameters.ParamMap.[key] = value
+                ))
+
+    let pickByParameters 
+            (runParametersSet: runParameters array) 
+            (filter: (string * string) array) : runParameters =
+        let filtrate = filterByParameters runParametersSet filter
+        if filtrate.Length = 1 then
+            filtrate.[0]
+        else
+            failwithf "Expected exactly one runParameters to match filter, but found %d" filtrate.Length
+
+
+
+        

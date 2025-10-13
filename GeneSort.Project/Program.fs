@@ -9,13 +9,14 @@ printfn $"**** QQQ ******** {startTime.ToString()}"
 
 //WorkspaceOps.saveWorkspace FullBoolEvals.workspace
 //FullBoolEvals.RunAll()
-//FullBoolEvals.RunSorterEvalReport()
+FullBoolEvals.RunSorterEvalReport()
 
 
 //WorkspaceOps.saveWorkspace MergeIntEvals.workspace
 //MergeIntEvals.RunAll()
-MergeIntEvals.RunSorterEvalReport()
+//MergeIntEvals.RunSorterEvalReport()
 
+//RandomSorters4to64.RunAll()
 
 let endTime = System.DateTime.Now
 let duration = endTime - startTime

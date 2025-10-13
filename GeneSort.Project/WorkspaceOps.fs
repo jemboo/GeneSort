@@ -18,7 +18,7 @@ module WorkspaceOps =
 
     let saveWorkspace (workspace: workspace) = // : Async<unit> =
         let filePath = Path.Combine(workspace.WorkspaceFolder, sprintf "%s_Workspace.msgpack" workspace.Name)
-        Async.RunSynchronously (OutputData.saveToFile workspace None (workspace |> outputData.Workspace))
+        Async.RunSynchronously (OutputData.saveToFile workspace.WorkspaceFolder None (workspace |> outputData.Workspace))
 
     /// Loads a workspace from the specified folder, expecting exactly one *_Workspace.msgpack file
     /// The workspace name is extracted from the file name and must match the name inside the file
@@ -68,40 +68,44 @@ module WorkspaceOps =
         }
 
 
+    let executeRunParameters
+            (workspaceFolder: string)
+            (executor: string -> runParameters -> CancellationTokenSource -> IProgress<string> ->Async<unit>)
+            (runParameters:runParameters) 
+            (cts: CancellationTokenSource)  
+            (progress: IProgress<string>) = async {
+
+        let filePathRun = OutputData.getOutputDataFileName 
+                            workspaceFolder
+                            (Some runParameters)
+                            outputDataType.RunParameters
+
+        if File.Exists filePathRun then
+                    printfn "Skipping Run %d: Output file %s already exists" (runParameters.GetIndex()) filePathRun
+        else
+            try
+                do! executor workspaceFolder runParameters cts progress
+                do! OutputData.saveToFile workspaceFolder (Some runParameters) (runParameters |> outputData.RunParameters)
+            with e ->
+                printfn "Error processing Run %d: %s" (runParameters.GetIndex()) e.Message
+    }
+
+
     /// Executes all runs from the workspace, running up to atTheSameTime runs concurrently
     /// Skips runs if their output file already exists; saves runs to .msgpack files after execution
-    let executeWorkspace
+    let executeRunParametersSeq
                 (workspace: workspace)
                 (maxDegreeOfParallelism: int) 
-                (executor: workspace -> runParameters -> CancellationTokenSource -> IProgress<string> ->Async<unit>)
+                (executor: string -> runParameters -> CancellationTokenSource -> IProgress<string> ->Async<unit>)
                 (runParameters: runParameters seq)
                 (cts: CancellationTokenSource)
                 (progress: IProgress<string>)
                 : unit =
 
-        let executeRun 
-                (runParameters:runParameters) 
-                (cts: CancellationTokenSource)  
-                (progress: IProgress<string>)   = async {
-
-            let filePathRun = OutputData.getOutputDataFileName 
-                                workspace
-                                (Some runParameters)
-                                outputDataType.RunParameters
-
-            if File.Exists filePathRun then
-                        printfn "Skipping Run %d: Output file %s already exists" (runParameters.GetIndex()) filePathRun
-            else
-                try
-                    do! executor workspace runParameters cts progress
-                    do! OutputData.saveToFile workspace (Some runParameters) (runParameters |> outputData.RunParameters)
-                with e ->
-                    printfn "Error processing Run %d: %s" (runParameters.GetIndex()) e.Message
-        }
 
         let limitedParallel =
             runParameters
-            |> Seq.map (fun rps -> executeRun rps cts progress)
+            |> Seq.map (fun rps -> executeRunParameters workspace.WorkspaceFolder executor rps cts progress)
             |> Seq.toList
             |> ParallelWithThrottle maxDegreeOfParallelism
 

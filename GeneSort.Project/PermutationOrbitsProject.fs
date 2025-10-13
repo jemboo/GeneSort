@@ -19,7 +19,7 @@ open System.Threading
 
 module PermutationOrbitsProject = 
 
-    let projectDir = "c:\Projects"
+    let rootDir = "c:\Projects"
     let experimentName = "PermutationOrbits"
     let experimentDesc = "Count Permutation Orbit lengths"
 
@@ -37,10 +37,10 @@ module PermutationOrbitsProject =
     let parameterSet = 
         [ sortingWidths(); ]
 
-    let workspace = Workspace.create experimentName experimentDesc projectDir [||] parameterSet (fun s -> s)
+    let workspace = Workspace.create experimentName experimentDesc rootDir [||] parameterSet (fun s -> s)
 
     let executor 
-            (workspace: workspace) 
+            (workspaceFolder: string)
             (runParameters: runParameters) 
             (cts: CancellationTokenSource) 
             (progress: IProgress<string>) : Async<unit> =
@@ -57,9 +57,9 @@ module PermutationOrbitsProject =
                 let sorterTestModelGen = MsasORandGen.create randomType sortingWidth maxOrbiit |> SorterTestModelGen.MsasORandGen
                 let sorterTestModelSetMaker = sortableTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
                 let sorterTestModelSet = sorterTestModelSetMaker.MakeSortableTestModelSet
-                do! OutputData.saveToFile workspace (Some runParameters)
+                do! OutputData.saveToFile workspaceFolder (Some runParameters)
                                           (sorterTestModelSet |> outputData.SortableTestModelSet)
-                do! OutputData.saveToFile workspace (Some runParameters)
+                do! OutputData.saveToFile workspaceFolder (Some runParameters)
                                           (sorterTestModelSetMaker |> outputData.SortableTestModelSetMaker)
 
                 
