@@ -9,7 +9,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace GeneSort.UI.ViewModels
 {
@@ -59,15 +58,11 @@ namespace GeneSort.UI.ViewModels
         private ObservableCollection<string> reportKeys = new();
 
 
-
-        private CancellationTokenSource? _runCancellationTokenSource;
-
-        // Store the domain object for potential future operations
         public workspace? Workspace { get; private set; }
 
         public WorkspaceParamsVm()
         {
-            // Initialize with default state
+            _cts = new CancellationTokenSource();
             CanRunSelected = false;
             IsRunning = false;
         }
@@ -182,6 +177,7 @@ namespace GeneSort.UI.ViewModels
                 });
             });
         }
+
         private void CreateParametersDataGrid(workspace workspace)
         {
             var dataGrid = new DataGrid
@@ -288,6 +284,7 @@ namespace GeneSort.UI.ViewModels
 
             ParametersDataGrid = dataGrid;
         }
+
         private void DataGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (IsRunning)
@@ -319,7 +316,6 @@ namespace GeneSort.UI.ViewModels
 
 
         private CancellationTokenSource _cts;
-
 
 
         #region Run Command
@@ -363,7 +359,6 @@ namespace GeneSort.UI.ViewModels
         }
 
         #endregion
-
 
 
 

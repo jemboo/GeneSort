@@ -12,7 +12,8 @@ namespace GeneSort.UI.ViewModels
         [ObservableProperty]
         private string _description;
 
-        public ObservableCollection<Dictionary<string, string>> RunParametersData { get; } = new ObservableCollection<Dictionary<string, string>>();
+        public ObservableCollection<Dictionary<string, string>> RunParametersData { get; } 
+                        = new ObservableCollection<Dictionary<string, string>>();
 
         public IReadOnlyList<string> ParameterKeys { get; private set; } = new List<string>();
 

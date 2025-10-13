@@ -22,7 +22,7 @@ open GeneSort.SortingResults
 open GeneSort.Model.Sorter.Uf6
 open OutputData
 
-module FullBoolEvalsOld =
+module FullBoolGenAndEvals =
 
     let rootDir = "c:\Projects"
 
