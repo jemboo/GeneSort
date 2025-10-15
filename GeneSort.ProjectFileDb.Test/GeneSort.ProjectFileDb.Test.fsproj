@@ -7,13 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Sorter\Ce\MsceRandMutateTests.fs" />
-    <Compile Include="Sorter\Ce\MsceRandGenTests.fs" />
-    <Compile Include="Sorter\Si\MssiMutateTests.fs" />
-    <Compile Include="Sorter\Rs\MsrsRandGenTests.fs" />
-    <Compile Include="Sorter\Rs\MsrsRandMutateTests.fs" />
-    <Compile Include="Program.fs" CompileOrder="CompileLast" />
-    <Compile Include="Sorter\Uf\Msuf4Tests.fs" />
+    <Compile Include="Tests.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,20 +17,14 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="FSharp.UMX" Version="1.1.0" />
-    <PackageReference Include="FsToolkit.ErrorHandling" Version="5.1.0" />
     <PackageReference Include="FsUnit.xUnit" Version="7.1.1" />
+    <PackageReference Include="MessagePack" Version="3.1.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
-    <ProjectReference Include="..\GeneSort.Model\GeneSort.Model.fsproj" />
-    <ProjectReference Include="..\GeneSort.Sorter\GeneSort.Sorter.fsproj" />
   </ItemGroup>
 
   <ItemGroup>
