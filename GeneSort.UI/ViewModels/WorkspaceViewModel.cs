@@ -17,15 +17,15 @@ namespace GeneSort.UI.ViewModels
 
         public IReadOnlyList<string> ParameterKeys { get; private set; } = new List<string>();
 
-        public WorkspaceViewModel(project workspace)
+        public WorkspaceViewModel(project project)
         {
-            if (workspace == null) throw new ArgumentNullException(nameof(workspace));
+            if (project == null) throw new ArgumentNullException(nameof(project));
 
-            Name = workspace.Name;
-            Description = workspace.Description;
-            ParameterKeys = workspace.ParameterKeys.ToList();
+            Name = project.Name;
+            Description = project.Description;
+            ParameterKeys = project.ParameterKeys.ToList();
 
-            foreach (var rp in workspace.RunParametersArray)
+            foreach (var rp in project.RunParametersArray)
             {
                 var dict = new Dictionary<string, string>();
                 foreach (var kvp in rp.ParamMap)

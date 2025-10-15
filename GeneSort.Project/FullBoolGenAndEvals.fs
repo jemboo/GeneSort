@@ -134,7 +134,7 @@ module FullBoolGenAndEvals =
 
     let reportNames = [|"Bins"; "Profiles"; "Report3"; "Report4"|]
 
-    let workspace = 
+    let project = 
             Project.create 
                 experimentName
                 experimentDesc 
@@ -203,9 +203,9 @@ module FullBoolGenAndEvals =
             (cts: CancellationTokenSource) 
             (progress: IProgress<string>) : unit =
             try
-                progress.Report(sprintf "Generating Bin report in workspace %s"  workspace.WorkspaceFolder)
+                progress.Report(sprintf "Generating Bin report in workspace %s"  project.WorkspaceFolder)
                 let runParamsA = getRunParametersAsync 
-                                    workspace.WorkspaceFolder 
+                                    project.WorkspaceFolder 
                                     (Some cts.Token) (Some progress) |> Async.RunSynchronously
 
                 let summaries = 
@@ -233,7 +233,7 @@ module FullBoolGenAndEvals =
                 let reportContent =
                     [ "# sorterEval Report"
                       sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-                      sprintf "Workspace: %s" workspace.WorkspaceFolder
+                      sprintf "Workspace: %s" project.WorkspaceFolder
                       ""
                       "Sorting Width\t SorterModel\t ceLength\t stageLength\t binCount\t unsortedReport"
                     ]
@@ -245,7 +245,7 @@ module FullBoolGenAndEvals =
                     |> String.concat "\n"
 
                 // Save the report to a file
-                let reportFilePath = Path.Combine(workspace.WorkspaceFolder, 
+                let reportFilePath = Path.Combine(project.WorkspaceFolder, 
                                                   sprintf "%s_SorterEvalReport_%s.txt" 
                                                             "SorterSetEvalSamples" (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
                 File.WriteAllText(reportFilePath, reportContent)
@@ -268,7 +268,7 @@ module FullBoolGenAndEvals =
                 let blockGrowthRate = 1.2
 
                 let runParamsA = getRunParametersAsync 
-                                    workspace.WorkspaceFolder 
+                                    project.WorkspaceFolder 
                                     (Some cts.Token) 
                                     (Some progress) |> Async.RunSynchronously
 
@@ -296,7 +296,7 @@ module FullBoolGenAndEvals =
                 let reportContent =
                     [ "# sorterCeProfile Report"
                       sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-                      sprintf "Workspace: %s" workspace.WorkspaceFolder
+                      sprintf "Workspace: %s" project.WorkspaceFolder
                       ""
                       "Sorting Width\tSorterModel\tsorterId\tsorterSetId\tsorterTestsId\tlastCe"
                     ]
@@ -306,7 +306,7 @@ module FullBoolGenAndEvals =
 
                 // Save the report to a file
                 let reportFilePath = 
-                         Path.Combine(workspace.WorkspaceFolder, 
+                         Path.Combine(project.WorkspaceFolder, 
                                         sprintf "SorterCeUseReport_%s.txt" 
                                                     (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
 
@@ -328,13 +328,13 @@ module FullBoolGenAndEvals =
     let RunAll() =
         let cts = new CancellationTokenSource()
         //let runParams = WorkspaceOps.getRuns workspace |> Seq.map(fun r -> r.RunParameters)
-        WorkspaceOps.executeRunParametersSeq workspace 8 executor workspace.RunParametersArray cts progress
+        WorkspaceOps.executeRunParametersSeq project 8 executor project.RunParametersArray cts progress
 
 
     let RunSorterEvalReport() =
        let cts = new CancellationTokenSource()
-       (binReportExecutor workspace.WorkspaceFolder cts progress)
-       (ceUseProfileReportExecutor workspace.WorkspaceFolder cts progress)
+       (binReportExecutor project.WorkspaceFolder cts progress)
+       (ceUseProfileReportExecutor project.WorkspaceFolder cts progress)
 
 
 

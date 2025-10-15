@@ -16,10 +16,10 @@ namespace GeneSort.UI.ViewModels
     {
         private bool _disposed;
         [ObservableProperty]
-        private string workspaceName = string.Empty;
+        private string projectName = string.Empty;
 
         [ObservableProperty]
-        private string workspaceDescription = string.Empty;
+        private string projectDescription = string.Empty;
 
         [ObservableProperty]
         private string rootDirectory = string.Empty;
@@ -87,9 +87,9 @@ namespace GeneSort.UI.ViewModels
 
                 // Read the serialized WorkspaceDto
                 var fileBytes = await File.ReadAllBytesAsync(filePath);
-                var workspaceDto = MessagePackSerializer.Deserialize<projectDto>(fileBytes, Models.MessagePackConfig.Options);
+                var projectDto = MessagePackSerializer.Deserialize<projectDto>(fileBytes, Models.MessagePackConfig.Options);
 
-                await LoadWorkspaceData(workspaceDto);
+                await LoadProjectDto(projectDto);
             }
             catch (Exception ex)
             {
@@ -178,7 +178,7 @@ namespace GeneSort.UI.ViewModels
             }
         }
 
-        private async Task LoadWorkspaceData(projectDto workspaceDto)
+        private async Task LoadProjectDto(projectDto workspaceDto)
         {
             try
             {
@@ -187,44 +187,44 @@ namespace GeneSort.UI.ViewModels
                     // Validate input
                     if (workspaceDto == null)
                     {
-                        throw new ArgumentNullException(nameof(workspaceDto), "Workspace data cannot be null");
+                        throw new ArgumentNullException(nameof(workspaceDto), "Project data cannot be null");
                     }
 
                     // Convert DTO to workspace domain object
-                    var workspace = ProjectDto.toDomain(workspaceDto);
+                    var project = ProjectDto.toDomain(workspaceDto);
 
-                    if (workspace == null)
+                    if (project == null)
                     {
-                        throw new InvalidOperationException("Failed to convert workspace DTO to domain object");
+                        throw new InvalidOperationException("Failed to convert project DTO to domain object");
                     }
 
                     // Validate workspace data
-                    if (string.IsNullOrWhiteSpace(workspace.Name))
+                    if (string.IsNullOrWhiteSpace(project.Name))
                     {
                         throw new InvalidDataException("Workspace name is required");
                     }
 
-                    if (workspace.RunParametersArray == null || workspace.RunParametersArray.Length == 0)
+                    if (project.RunParametersArray == null || project.RunParametersArray.Length == 0)
                     {
                         throw new InvalidDataException("Workspace must contain at least one run parameter set");
                     }
 
-                    Workspace = workspace; // Store for future use
+                    Workspace = project; // Store for future use
 
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         try
                         {
                             // Extract workspace info from domain object
-                            WorkspaceName = workspace.Name ?? string.Empty;
-                            WorkspaceDescription = workspace.Description ?? string.Empty;
-                            RootDirectory = workspace.RootDirectory ?? string.Empty;
+                            ProjectName = project.Name ?? string.Empty;
+                            ProjectDescription = project.Description ?? string.Empty;
+                            RootDirectory = project.RootDirectory ?? string.Empty;
 
                             // Load report keys
                             ReportKeys.Clear();
-                            if (workspace.ReportNames != null)
+                            if (project.ReportNames != null)
                             {
-                                foreach (var reportKey in workspace.ReportNames)
+                                foreach (var reportKey in project.ReportNames)
                                 {
                                     if (!string.IsNullOrWhiteSpace(reportKey))
                                     {
@@ -234,7 +234,7 @@ namespace GeneSort.UI.ViewModels
                             }
 
                             // Create the DataGrid with all columns and data
-                            CreateParametersDataGrid(workspace);
+                            CreateParametersDataGrid(project);
                         }
                         catch (Exception ex)
                         {
@@ -245,12 +245,12 @@ namespace GeneSort.UI.ViewModels
             }
             catch (ArgumentNullException ex)
             {
-                ErrorMessage = $"Invalid workspace data: {ex.Message}";
+                ErrorMessage = $"Invalid project data: {ex.Message}";
                 throw;
             }
             catch (InvalidDataException ex)
             {
-                ErrorMessage = $"Workspace validation failed: {ex.Message}";
+                ErrorMessage = $"Project validation failed: {ex.Message}";
                 throw;
             }
             catch (InvalidOperationException ex)
@@ -260,16 +260,16 @@ namespace GeneSort.UI.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Unexpected error loading workspace data: {ex.Message}";
+                ErrorMessage = $"Unexpected error loading project data: {ex.Message}";
                 throw;
             }
         }
 
-        private void CreateParametersDataGrid(project workspace)
+        private void CreateParametersDataGrid(project project)
         {
-            if (workspace == null)
+            if (project == null)
             {
-                throw new ArgumentNullException(nameof(workspace));
+                throw new ArgumentNullException(nameof(project));
             }
 
             var dataGrid = new DataGrid
@@ -321,7 +321,7 @@ namespace GeneSort.UI.ViewModels
             //dataGrid.Columns.Add(indexColumn);
 
             // Add columns for each parameter key
-            var parameterKeys = workspace.ParameterKeys;
+            var parameterKeys = project.ParameterKeys;
             if (parameterKeys != null)
             {
                 foreach (var key in parameterKeys.OrderBy(k => k))
@@ -340,7 +340,7 @@ namespace GeneSort.UI.ViewModels
 
             // Create data rows
             var dataRows = new ObservableCollection<Dictionary<string, object>>();
-            var runParametersArray = workspace.RunParametersArray;
+            var runParametersArray = project.RunParametersArray;
 
             for (int i = 0; i < runParametersArray.Length; i++)
             {

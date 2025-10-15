@@ -146,7 +146,7 @@ module RandomSorters4to64 =
         [ Project.repl1s(); sortingWidths(); sorterModelKeys() ]
 
 
-    let workspace = Project.create experimentName experimentDesc rootDir reportNames parameterSpans paramMapRefiner
+    let project = Project.create experimentName experimentDesc rootDir reportNames parameterSpans paramMapRefiner
 
 
     let executor 
@@ -204,5 +204,5 @@ module RandomSorters4to64 =
     let RunAll() =
         let cts = new CancellationTokenSource()
         //let runParams = WorkspaceOps.getRuns workspace |> Seq.map(fun r -> r.RunParameters)
-        WorkspaceOps.executeRunParametersSeq workspace 8 executor workspace.RunParametersArray cts progress
+        WorkspaceOps.executeRunParametersSeq project 8 executor project.RunParametersArray cts progress
 

@@ -23,7 +23,7 @@ type project =
             (runParametersArray: runParameters []) 
             (reportKeys: string array) : project =
         if String.IsNullOrWhiteSpace name then
-            failwith "Workspace name cannot be empty"
+            failwith "Project name cannot be empty"
         else
             { name = name
               description = description
@@ -40,7 +40,7 @@ type project =
     static member Test = 
         project.create 
             "FullBoolEvals" 
-            "A test workspace" 
+            "A test project" 
             $"C:\Projects"
             [| runParameters.create (Map.ofList [ ("Param1", "Value1"); ("Param2", "ValueA") ])
                runParameters.create (Map.ofList [ ("Param1", "Value2"); ("Param2", "ValueB") ]) |]

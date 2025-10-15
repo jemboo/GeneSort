@@ -94,7 +94,7 @@ module WorkspaceOps =
     /// Executes all runs from the workspace, running up to atTheSameTime runs concurrently
     /// Skips runs if their output file already exists; saves runs to .msgpack files after execution
     let executeRunParametersSeq
-                (workspace: project)
+                (project: project)
                 (maxDegreeOfParallelism: int) 
                 (executor: string -> runParameters -> CancellationTokenSource -> IProgress<string> ->Async<unit>)
                 (runParameters: runParameters seq)
@@ -105,7 +105,7 @@ module WorkspaceOps =
 
         let limitedParallel =
             runParameters
-            |> Seq.map (fun rps -> executeRunParameters workspace.WorkspaceFolder executor rps cts progress)
+            |> Seq.map (fun rps -> executeRunParameters project.WorkspaceFolder executor rps cts progress)
             |> Seq.toList
             |> ParallelWithThrottle maxDegreeOfParallelism
 

@@ -103,7 +103,7 @@ namespace GeneSort.UI.ViewModels
                 FileTabs.Add(newTab);
                 SelectedFileTab = newTab;
 
-                // Load the workspace data asynchronously
+                // Load the project data asynchronously
                 await workspaceVm.LoadWorkspaceAsync(path);
             }
             else
