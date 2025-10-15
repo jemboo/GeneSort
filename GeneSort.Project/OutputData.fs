@@ -33,7 +33,7 @@ type outputDataType =
     | SortableTestModelSetMaker
     | SorterSetEval
     | SorterSetEvalBins
-    | Workspace
+    | Project
 
 
      
@@ -49,7 +49,7 @@ module OutputDataType =
         | SortableTestModelSetMaker -> "SortableTestModelSetMaker"
         | SorterSetEval -> "SorterSetEval"
         | SorterSetEvalBins -> "SorterSetEvalBins"
-        | Workspace -> "Workspace"
+        | Project -> "Project"
 
 
 
@@ -63,7 +63,7 @@ type outputData =
     | SortableTestModelSetMaker of sortableTestModelSetMaker
     | SorterSetEval of sorterSetEval
     | SorterSetEvalBins of sorterSetEvalBins
-    | Workspace of project
+    | Project of project
 
 
      
@@ -87,7 +87,7 @@ module OutputData =
         | SortableTestModelSetMaker _ -> outputDataType.SortableTestModelSetMaker
         | SorterSetEval _ -> outputDataType.SorterSetEval
         | SorterSetEvalBins _ -> outputDataType.SorterSetEvalBins
-        | Workspace _ -> outputDataType.Workspace
+        | Project _ -> outputDataType.Project
 
 
         /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
@@ -120,7 +120,7 @@ module OutputData =
                 : string =
 
         match outputDataType with
-        | outputDataType.Workspace -> 
+        | outputDataType.Project -> 
             let fileName = sprintf "%s.msgpack" (outputDataType |> OutputDataType.toString)
             Path.Combine(workspaceFolder, fileName)
         | _ -> 
@@ -165,9 +165,9 @@ module OutputData =
             | outputDataType.SorterSetEvalBins ->
                 let dto = MessagePackSerializer.Deserialize<sorterSetEvalBinsDto>(stream, options)
                 SorterSetEvalBins (SorterSetEvalBinsDto.toDomain dto)
-            | outputDataType.Workspace ->
+            | outputDataType.Project ->
                 let dto = MessagePackSerializer.Deserialize<projectDto>(stream, options)
-                Workspace (ProjectDto.toDomain dto)
+                Project (ProjectDto.toDomain dto)
         with e ->
             failwithf "Error reading file %s: %s" filePath e.Message
 
@@ -213,8 +213,8 @@ module OutputData =
         | _ -> failwith "Unexpected output data type: expected SorterSetEvalBins"
 
     let getWorkspace (workspaceFolder: string) (runParameters: runParameters) : project =
-        match getOutputData workspaceFolder (Some runParameters) outputDataType.Workspace with
-        | Workspace w -> w
+        match getOutputData workspaceFolder (Some runParameters) outputDataType.Project with
+        | Project w -> w
         | _ -> failwith "Unexpected output data type: expected Workspace"
 
 
@@ -254,7 +254,7 @@ module OutputData =
                 | SorterSetEvalBins sse ->
                     let dto = SorterSetEvalBinsDto.fromDomain sse
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | Workspace w ->
+                | Project w ->
                     let dto = ProjectDto.fromDomain w
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
 

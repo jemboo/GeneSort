@@ -55,7 +55,7 @@ type project =
     member this.WorkspaceFolder with get() = Path.Combine(this.RootDirectory, this.Name)
 
 
-module Workspace =  
+module Project =  
 
     let create 
             (name: string) 

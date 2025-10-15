@@ -143,10 +143,10 @@ module RandomSorters4to64 =
     let reportNames = [||]
 
     let parameterSpans = 
-        [ Workspace.repl1s(); sortingWidths(); sorterModelKeys() ]
+        [ Project.repl1s(); sortingWidths(); sorterModelKeys() ]
 
 
-    let workspace = Workspace.create experimentName experimentDesc rootDir reportNames parameterSpans paramMapRefiner
+    let workspace = Project.create experimentName experimentDesc rootDir reportNames parameterSpans paramMapRefiner
 
 
     let executor 

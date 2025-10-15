@@ -144,12 +144,12 @@ module MergeIntEvals =
         }
 
     let parameterSet = 
-        [ Workspace.repl1s(); sortingWidths(); sorterModelKeys() ]
+        [ Project.repl1s(); sortingWidths(); sorterModelKeys() ]
         
     let reportNames = [|"Report1"; "Report2"; "Report3"; "Report4"|]
 
     let workspace = 
-            Workspace.create 
+            Project.create 
                 experimentName 
                 experimentDesc 
                 rootDir

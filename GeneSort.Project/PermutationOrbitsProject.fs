@@ -37,7 +37,7 @@ module PermutationOrbitsProject =
     let parameterSet = 
         [ sortingWidths(); ]
 
-    let workspace = Workspace.create experimentName experimentDesc rootDir [||] parameterSet (fun s -> s)
+    let project = Project.create experimentName experimentDesc rootDir [||] parameterSet (fun s -> s)
 
     let executor 
             (workspaceFolder: string)

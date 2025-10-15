@@ -18,7 +18,7 @@ module WorkspaceOps =
 
     let saveWorkspace (workspace: project) = // : Async<unit> =
         let filePath = Path.Combine(workspace.WorkspaceFolder, sprintf "%s_Workspace.msgpack" workspace.Name)
-        Async.RunSynchronously (OutputData.saveToFile workspace.WorkspaceFolder None (workspace |> outputData.Workspace))
+        Async.RunSynchronously (OutputData.saveToFile workspace.WorkspaceFolder None (workspace |> outputData.Project))
 
     /// Loads a workspace from the specified folder, expecting exactly one *_Workspace.msgpack file
     /// The workspace name is extracted from the file name and must match the name inside the file

@@ -130,12 +130,12 @@ module FullBoolGenAndEvals =
 
 
     let parameterSpans = 
-        [ Workspace.repl1s() ;  sortingWidths(); sorterModelKeys();]
+        [ Project.repl1s() ;  sortingWidths(); sorterModelKeys();]
 
     let reportNames = [|"Bins"; "Profiles"; "Report3"; "Report4"|]
 
     let workspace = 
-            Workspace.create 
+            Project.create 
                 experimentName
                 experimentDesc 
                 rootDir

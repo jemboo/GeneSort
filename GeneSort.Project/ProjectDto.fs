@@ -17,13 +17,13 @@ type projectDto =
 
 module ProjectDto =  
 
-    let fromDomain (workspace: project) : projectDto =
+    let fromDomain (project: project) : projectDto =
         { 
-          Name = workspace.Name
-          Description = workspace.Description
-          RootDirectory = workspace.RootDirectory
-          ReportNames = workspace.ReportNames
-          RunParametersDtos = workspace.RunParametersArray 
+          Name = project.Name
+          Description = project.Description
+          RootDirectory = project.RootDirectory
+          ReportNames = project.ReportNames
+          RunParametersDtos = project.RunParametersArray 
                                 |> Array.map(RunParametersDto.fromDomain) 
         }
 
