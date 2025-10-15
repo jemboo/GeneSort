@@ -16,13 +16,13 @@ module WorkspaceOps =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let saveWorkspace (workspace: workspace) = // : Async<unit> =
+    let saveWorkspace (workspace: project) = // : Async<unit> =
         let filePath = Path.Combine(workspace.WorkspaceFolder, sprintf "%s_Workspace.msgpack" workspace.Name)
         Async.RunSynchronously (OutputData.saveToFile workspace.WorkspaceFolder None (workspace |> outputData.Workspace))
 
     /// Loads a workspace from the specified folder, expecting exactly one *_Workspace.msgpack file
     /// The workspace name is extracted from the file name and must match the name inside the file
-    let loadWorkspace (fileFolder: string) : workspace =
+    let loadWorkspace (fileFolder: string) : project =
         try
             let files = Directory.GetFiles(fileFolder, "*_Workspace.msgpack")
             if Array.isEmpty files then
@@ -36,12 +36,12 @@ module WorkspaceOps =
             let underscoreWorkspaceLen = 10
             let extractedName = fileNameWithoutExt.[.. fileNameWithoutExt.Length - underscoreWorkspaceLen - 1]
             use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)
-            let dto = MessagePackSerializer.Deserialize<workspaceDto>(stream, options)
-            let loaded = WorkspaceDto.toDomain dto
+            let dto = MessagePackSerializer.Deserialize<projectDto>(stream, options)
+            let loaded = ProjectDto.toDomain dto
             if loaded.Name <> extractedName then
                 failwithf "Workspace name mismatch: file '%s', loaded '%s'" extractedName loaded.Name
             let newRootDirectory = Path.GetFullPath(Path.Combine(fileFolder, ".."))
-            workspace.create loaded.Name loaded.Description newRootDirectory loaded.RunParametersArray loaded.ReportNames
+            project.create loaded.Name loaded.Description newRootDirectory loaded.RunParametersArray loaded.ReportNames
         with e ->
             printfn "Error loading workspace from folder %s: %s" fileFolder e.Message
             raise e
@@ -94,7 +94,7 @@ module WorkspaceOps =
     /// Executes all runs from the workspace, running up to atTheSameTime runs concurrently
     /// Skips runs if their output file already exists; saves runs to .msgpack files after execution
     let executeRunParametersSeq
-                (workspace: workspace)
+                (workspace: project)
                 (maxDegreeOfParallelism: int) 
                 (executor: string -> runParameters -> CancellationTokenSource -> IProgress<string> ->Async<unit>)
                 (runParameters: runParameters seq)

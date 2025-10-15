@@ -17,7 +17,7 @@ namespace GeneSort.UI.ViewModels
 
         public IReadOnlyList<string> ParameterKeys { get; private set; } = new List<string>();
 
-        public WorkspaceViewModel(workspace workspace)
+        public WorkspaceViewModel(project workspace)
         {
             if (workspace == null) throw new ArgumentNullException(nameof(workspace));
 

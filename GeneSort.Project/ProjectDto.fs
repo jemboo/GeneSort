@@ -5,7 +5,7 @@ open MessagePack
 
 
 [<MessagePackObject>]
-type workspaceDto = 
+type projectDto = 
     { 
         [<MessagePack.Key(0)>] Name: string
         [<MessagePack.Key(1)>] Description: string
@@ -15,9 +15,9 @@ type workspaceDto =
     }
 
 
-module WorkspaceDto =  
+module ProjectDto =  
 
-    let fromDomain (workspace: workspace) : workspaceDto =
+    let fromDomain (workspace: project) : projectDto =
         { 
           Name = workspace.Name
           Description = workspace.Description
@@ -27,8 +27,8 @@ module WorkspaceDto =
                                 |> Array.map(RunParametersDto.fromDomain) 
         }
 
-    let toDomain (dto: workspaceDto) : workspace =
-        workspace.create
+    let toDomain (dto: projectDto) : project =
+        project.create
           dto.Name
           dto.Description
           dto.RootDirectory

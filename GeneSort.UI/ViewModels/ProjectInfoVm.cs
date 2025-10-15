@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GeneSort.UI.ViewModels
 {
-    public partial class ExperimentInfoViewModel : ObservableObject
+    public partial class ProjectInfoVm : ObservableObject
     {
         [ObservableProperty]
         private string name = string.Empty;

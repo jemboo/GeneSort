@@ -25,14 +25,15 @@
             <ColumnDefinition Width="2*" MinWidth="300"/>
         </Grid.ColumnDefinitions>
 
-<!-- Left: Directory Tree and Open Button -->
+        <!-- Left: Directory Tree and Open Button -->
         <Grid Grid.Column="0" Margin="8">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            
-  
+
+
             <TreeView Grid.Row="0"
                     DataContext="{Binding .}"
                     ItemsSource="{Binding Root.Children}"
@@ -46,14 +47,22 @@
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
-            
+
             <Button Grid.Row="1" Content="Open File"
                     Height="30"
                     Command="{Binding OpenSelectedFileCommand}"
                     Style="{StaticResource ModernButton}"
                     Margin="0,8,0,0"
                     IsEnabled="{Binding CanOpenSelectedFile}"/>
-                    <!--IsEnabled="{Binding SelectedFileItem.IsDirectory, Converter={StaticResource InverseBooleanConverter}}"/>-->
+
+            <TextBlock 
+                    Grid.Row="2"
+                    Text="{Binding ErrorMessage}"
+                    TextWrapping="Wrap" 
+                    FontWeight="SemiBold" 
+                    FontSize="10" 
+                    Foreground="#FFF40E0E" />
+
         </Grid>
 
         <!-- Splitter -->
@@ -71,22 +80,22 @@
                     Margin="8">
             <TabControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Header}" 
-                               Margin="8,4" 
-                               FontWeight="SemiBold"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Header}" FontWeight="SemiBold" Margin="8,4,0,0" VerticalAlignment="Center"/>
+                        <Button Content="×" 
+                            Command="{Binding DataContext.CloseFileTabCommand, RelativeSource={RelativeSource AncestorType=TabControl}}" 
+                            CommandParameter="{Binding}"
+                            Style="{StaticResource CloseButtonStyle}"
+                            VerticalAlignment="Center"/>
+                    </StackPanel>
                 </DataTemplate>
             </TabControl.ItemTemplate>
-            <!--<TabControl.ContentTemplate>
-                <DataTemplate>
-                    <ContentControl Content="{Binding ContentVm}"/>
-                </DataTemplate>
-            </TabControl.ContentTemplate>-->
             <TabControl.ContentTemplate>
                 <DataTemplate>
                     <ContentControl Content="{Binding ContentVm}">
                         <ContentControl.Resources>
                             <!-- Template for WorkspaceViewViewModel -->
-                            <DataTemplate DataType="{x:Type vm:WorkspaceParamsVm}">
+                            <DataTemplate DataType="{x:Type vm:ProjectParamsVm}">
                                 <local:WorkspaceViewControl />
                             </DataTemplate>
 

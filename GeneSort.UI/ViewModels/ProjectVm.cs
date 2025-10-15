@@ -7,13 +7,16 @@ using System.IO;
 
 namespace GeneSort.UI.ViewModels
 {
-    public partial class ExperimentViewModel : ObservableObject
+    public partial class ProjectVm : ObservableObject
     {
         [ObservableProperty]
         private bool canOpenSelectedFile;
 
         [ObservableProperty]
         private string experimentName;
+
+        [ObservableProperty]
+        private string errorMessage;
 
         [ObservableProperty]
         private string? experimentPath;
@@ -34,8 +37,13 @@ namespace GeneSort.UI.ViewModels
         public Action<object> selectionAction;
 
 
-        public ExperimentViewModel()
+        public ProjectVm(string experimentName, string expperimentPath)
         {
+            ExperimentName = experimentName;
+            ExperimentPath = expperimentPath;
+
+            Root = LoadDirectory(ExperimentPath);
+
             selectionAction = _selectionAction;
         }   
 
@@ -52,13 +60,13 @@ namespace GeneSort.UI.ViewModels
         }
 
 
-        partial void OnExperimentPathChanged(string? value)
-        {
-            if (string.IsNullOrEmpty(value)) return;
+        //partial void OnExperimentPathChanged(string? value)
+        //{
+        //    if (string.IsNullOrEmpty(value)) return;
 
-            Root = LoadDirectory(value);
-            FileTabs.Clear();
-        }
+        //    Root = LoadDirectory(value);
+        //    FileTabs.Clear();
+        //}
 
 
         [RelayCommand]
@@ -72,7 +80,7 @@ namespace GeneSort.UI.ViewModels
             // Check if tab already exists
             var existingTab = FileTabs.FirstOrDefault(t =>
                 (t.ContentVm is FileViewerViewModel fv && fv.FilePath == path) ||
-                (t.ContentVm is WorkspaceParamsVm wv && wv.FilePath == path));
+                (t.ContentVm is ProjectParamsVm wv && wv.FilePath == path));
 
             if (existingTab != null)
             {
@@ -85,7 +93,7 @@ namespace GeneSort.UI.ViewModels
             if (IsWorkspaceFile(path, fileName))
             {
                 // Create WorkspaceView tab
-                var workspaceVm = new WorkspaceParamsVm();
+                var workspaceVm = new ProjectParamsVm();
                 var newTab = new TabViewModel
                 {
                     Header = fileName,
@@ -171,9 +179,9 @@ namespace GeneSort.UI.ViewModels
                     });
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Ignore errors like access denied
+                ErrorMessage = $"Error in LoadDirectory: {ex.Message}";
             }
 
             return item;

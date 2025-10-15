@@ -37,7 +37,7 @@ namespace GeneSort.UI.Behaviors
         {
             if (sender is TreeView treeView)
             {
-                var qua = treeView.DataContext as ViewModels.ExperimentViewModel;
+                var qua = treeView.DataContext as ViewModels.ProjectVm;
                 //Unsubscribe temporarily to avoid recursion
                 treeView.SelectedItemChanged -= OnTreeViewSelectedItemChanged;
                 treeView.SelectedItemChanged += OnTreeViewSelectedItemChanged;

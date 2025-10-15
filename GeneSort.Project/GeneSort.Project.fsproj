@@ -15,8 +15,8 @@
     <Compile Include="Params\SorterTestModelKey.fs" />
     <Compile Include="RunParameters.fs" />
     <Compile Include="RunParametersDto.fs" />
-    <Compile Include="Workspace.fs" />
-    <Compile Include="WorkspaceDto.fs" />
+    <Compile Include="Project.fs" />
+    <Compile Include="ProjectDto.fs" />
     <Compile Include="OutputData.fs" />
     <Compile Include="WorkspaceOps.fs" />
     <Compile Include="PermutationOrbitsProject.fs" />

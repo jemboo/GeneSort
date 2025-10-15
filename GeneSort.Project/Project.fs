@@ -5,7 +5,7 @@ open System
 open System.IO
 open GeneSort.Core
 
-type workspace = 
+type project = 
     private
         { 
           name: string
@@ -21,7 +21,7 @@ type workspace =
             (description: string) 
             (rootDirectory: string) 
             (runParametersArray: runParameters []) 
-            (reportKeys: string array) : workspace =
+            (reportKeys: string array) : project =
         if String.IsNullOrWhiteSpace name then
             failwith "Workspace name cannot be empty"
         else
@@ -38,7 +38,7 @@ type workspace =
             }
 
     static member Test = 
-        workspace.create 
+        project.create 
             "FullBoolEvals" 
             "A test workspace" 
             $"C:\Projects"
@@ -64,7 +64,7 @@ module Workspace =
             (reportKeys: string array)
             (parameterSpans: (string * string list) list) 
             (paramRefiner: runParameters seq -> runParameters seq)        
-             : workspace =
+             : project =
 
         let refinedParameters = 
             parameterSpans |> Combinatorics.cartesianProductMaps
@@ -72,7 +72,7 @@ module Workspace =
                            |> paramRefiner
                            |> Seq.toArray
 
-        workspace.create 
+        project.create 
                 name 
                 description 
                 rootDirectory 

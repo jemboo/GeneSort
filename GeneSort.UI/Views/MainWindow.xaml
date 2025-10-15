@@ -18,10 +18,10 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!-- DataTemplates for Tab Contents -->
-            <DataTemplate DataType="{x:Type vm:ExperimentSelectionVm}">
+            <DataTemplate DataType="{x:Type vm:ProjectSelectionVm}">
                 <local:ExperimentSelectionControl />
             </DataTemplate>
-            <DataTemplate DataType="{x:Type vm:ExperimentViewModel}">
+            <DataTemplate DataType="{x:Type vm:ProjectVm}">
                 <local:ExperimentControl />
             </DataTemplate>
 

@@ -89,6 +89,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition />
                     <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
 
                 <!-- Run Button Section -->
@@ -98,8 +100,6 @@
                                RunCommand="{Binding RunOperationCommand}"
                                CancelCommand="{Binding CancelOperationCommand}"
                                IsRunning="{Binding IsRunning, Mode=TwoWay}" />
-
-
 
                     <!-- Report Buttons Section -->
                     <ScrollViewer Grid.Column="1" 
@@ -141,11 +141,22 @@
                     </ScrollViewer>
 
                 </StackPanel>
+                
 
                 <TextBlock Grid.Row="1" Text="{Binding RunMessage}" 
                                VerticalAlignment="Center" 
                                Margin="0,5,0,0"
                                FontWeight="SemiBold"/>
+
+                <ProgressBar 
+                     Grid.Row="2"
+                     Maximum="{Binding ProgressMaximum}" 
+                     Value="{Binding ProgressValue}" 
+                     Visibility="{Binding IsRunning, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                
+                <TextBlock 
+                    Grid.Row="3"
+                    Text="{Binding ProgressMessage}" />
 
             </Grid>
         </Border>

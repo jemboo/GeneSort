@@ -9,16 +9,16 @@ using System.Linq;
 
 namespace GeneSort.UI.ViewModels
 {
-    public partial class ExperimentSelectionVm : ObservableObject
+    public partial class ProjectSelectionVm : ObservableObject
     {
         [ObservableProperty]
         private string? rootFolder;
 
         [ObservableProperty]
-        private ObservableCollection<ExperimentInfoViewModel>? experiments = new();
+        private ObservableCollection<ProjectInfoVm>? experiments = new();
 
         [ObservableProperty]
-        private ExperimentInfoViewModel? selectedExperiment;
+        private ProjectInfoVm? selectedExperiment;
 
         partial void OnRootFolderChanged(string? value)
         {
@@ -38,7 +38,7 @@ namespace GeneSort.UI.ViewModels
                 var directories = Directory.GetDirectories(RootFolder);
                 foreach (var dir in directories.OrderBy(d => Path.GetFileName(d)))
                 {
-                    Experiments.Add(new ExperimentInfoViewModel
+                    Experiments.Add(new ProjectInfoVm
                     {
                         Name = Path.GetFileName(dir),
                         FullPath = dir,

@@ -63,7 +63,7 @@ type outputData =
     | SortableTestModelSetMaker of sortableTestModelSetMaker
     | SorterSetEval of sorterSetEval
     | SorterSetEvalBins of sorterSetEvalBins
-    | Workspace of workspace
+    | Workspace of project
 
 
      
@@ -166,8 +166,8 @@ module OutputData =
                 let dto = MessagePackSerializer.Deserialize<sorterSetEvalBinsDto>(stream, options)
                 SorterSetEvalBins (SorterSetEvalBinsDto.toDomain dto)
             | outputDataType.Workspace ->
-                let dto = MessagePackSerializer.Deserialize<workspaceDto>(stream, options)
-                Workspace (WorkspaceDto.toDomain dto)
+                let dto = MessagePackSerializer.Deserialize<projectDto>(stream, options)
+                Workspace (ProjectDto.toDomain dto)
         with e ->
             failwithf "Error reading file %s: %s" filePath e.Message
 
@@ -212,7 +212,7 @@ module OutputData =
         | SorterSetEvalBins sse -> sse
         | _ -> failwith "Unexpected output data type: expected SorterSetEvalBins"
 
-    let getWorkspace (workspaceFolder: string) (runParameters: runParameters) : workspace =
+    let getWorkspace (workspaceFolder: string) (runParameters: runParameters) : project =
         match getOutputData workspaceFolder (Some runParameters) outputDataType.Workspace with
         | Workspace w -> w
         | _ -> failwith "Unexpected output data type: expected Workspace"
@@ -255,7 +255,7 @@ module OutputData =
                     let dto = SorterSetEvalBinsDto.fromDomain sse
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | Workspace w ->
-                    let dto = WorkspaceDto.fromDomain w
+                    let dto = ProjectDto.fromDomain w
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
 
             with e ->

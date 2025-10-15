@@ -16,31 +16,30 @@ namespace GeneSort.UI.ViewModels
             private ObservableCollection<TabViewModel> tabs = new();
 
             [ObservableProperty]
-            private ExperimentSelectionVm experimentSelectionVm = new();
+            private ProjectSelectionVm projectSelectionVm = new();
 
             public MainWindowVm()
             {
                 var projectsTab = new TabViewModel
                 {
                     Header = "Projects",
-                    ContentVm = ExperimentSelectionVm
+                    ContentVm = projectSelectionVm
                 };
                 Tabs.Add(projectsTab);
             }
 
             [RelayCommand]
-            private void OpenExperiment(ExperimentInfoViewModel? experimentInfo)
+            private void OpenExperiment(ProjectInfoVm? experimentInfo)
             {
-                if (experimentInfo == null || string.IsNullOrEmpty(ExperimentSelectionVm.RootFolder))
+                if (experimentInfo == null || string.IsNullOrEmpty(projectSelectionVm.RootFolder))
                 {
                     return;
                 }
 
-                var expVm = new ExperimentViewModel
-                {
-                    ExperimentName = experimentInfo.Name,
-                    ExperimentPath = experimentInfo.FullPath
-                };
+                var expVm = new ProjectVm(
+                    experimentName:experimentInfo.Name,
+                    expperimentPath: experimentInfo.FullPath);
+
                 var expTab = new TabViewModel
                 {
                     Header = experimentInfo.Name,
