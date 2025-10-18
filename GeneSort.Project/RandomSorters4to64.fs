@@ -151,7 +151,7 @@ module RandomSorters4to64 =
 
 
     let executor 
-            (workspaceFolder:string)
+            (projectFolder:string)
             (runParameters: runParameters) 
             (cts: CancellationTokenSource) 
             (progress: IProgress<string>) : Async<unit> =
@@ -188,8 +188,8 @@ module RandomSorters4to64 =
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 
-            do! OutputData.saveToFile workspaceFolder (Some runParameters) (sorterSet |> outputData.SorterSet)
-            do! OutputData.saveToFile workspaceFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! OutputData.saveToFile projectFolder (Some runParameters) (sorterSet |> outputData.SorterSet)
+            do! OutputData.saveToFile projectFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             runParameters.SetRunFinished true
 
@@ -204,6 +204,6 @@ module RandomSorters4to64 =
 
     let RunAll() =
         let cts = new CancellationTokenSource()
-        //let runParams = WorkspaceOps.getRuns workspace |> Seq.map(fun r -> r.RunParameters)
-        WorkspaceOps.executeRunParametersSeq project 8 executor project.RunParametersArray cts progress
+        //let runParams = ProjectOps.getRuns project |> Seq.map(fun r -> r.RunParameters)
+        ProjectOps.executeRunParametersSeq project 8 executor project.RunParametersArray cts progress
 

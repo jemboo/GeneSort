@@ -12,40 +12,36 @@ open GeneSort.Runs.Params
 open GeneSort.Runs
 
 
-module WorkspaceOps =  
+module ProjectOps =  
 
     /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let saveWorkspace (project: project) = // : Async<unit> =
-        let filePath = Path.Combine(project.WorkspaceFolder, sprintf "%s_Workspace.msgpack" project.Name)
-        Async.RunSynchronously (OutputData.saveToFile project.WorkspaceFolder None (project |> outputData.Project))
-
-    /// Loads a workspace from the specified folder, expecting exactly one *_Workspace.msgpack file
-    /// The workspace name is extracted from the file name and must match the name inside the file
-    let loadWorkspace (fileFolder: string) : project =
+    /// Loads a project from the specified folder, expecting exactly one *_Project.msgpack file
+    /// The project name is extracted from the file name and must match the name inside the file
+    let loadProject (fileFolder: string) : project =
         try
-            let files = Directory.GetFiles(fileFolder, "*_Workspace.msgpack")
+            let files = Directory.GetFiles(fileFolder, "*_Project.msgpack")
             if Array.isEmpty files then
-                failwithf "No workspace file found in %s" fileFolder
+                failwithf "No project file found in %s" fileFolder
             if files.Length > 1 then
-                failwithf "Multiple workspace files found in %s: %A" fileFolder files
+                failwithf "Multiple project files found in %s: %A" fileFolder files
             let filePath = files.[0]
             let fileNameWithoutExt = Path.GetFileNameWithoutExtension(filePath)
-            if not (fileNameWithoutExt.EndsWith "_Workspace") then
-                failwithf "Invalid workspace file name: %s" filePath
-            let underscoreWorkspaceLen = 10
-            let extractedName = fileNameWithoutExt.[.. fileNameWithoutExt.Length - underscoreWorkspaceLen - 1]
+            if not (fileNameWithoutExt.EndsWith "_Project") then
+                failwithf "Invalid project file name: %s" filePath
+            let underscoreProjectLen = 10
+            let extractedName = fileNameWithoutExt.[.. fileNameWithoutExt.Length - underscoreProjectLen - 1]
             use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)
             let dto = MessagePackSerializer.Deserialize<projectDto>(stream, options)
             let loaded = ProjectDto.toDomain dto
             if loaded.Name <> extractedName then
-                failwithf "Workspace name mismatch: file '%s', loaded '%s'" extractedName loaded.Name
+                failwithf "Project name mismatch: file '%s', loaded '%s'" extractedName loaded.Name
             let newRootDirectory = Path.GetFullPath(Path.Combine(fileFolder, ".."))
             project.create loaded.Name loaded.Description newRootDirectory loaded.RunParametersArray loaded.ReportNames
         with e ->
-            printfn "Error loading workspace from folder %s: %s" fileFolder e.Message
+            printfn "Error loading project from folder %s: %s" fileFolder e.Message
             raise e
 
 
@@ -71,14 +67,14 @@ module WorkspaceOps =
 
 
     let executeRunParameters
-            (workspaceFolder: string)
+            (projectFolder: string)
             (executor: string -> runParameters -> CancellationTokenSource -> IProgress<string> ->Async<unit>)
             (runParameters:runParameters) 
             (cts: CancellationTokenSource)  
             (progress: IProgress<string>) = async {
 
         let filePathRun = OutputData.getOutputDataFileName 
-                            workspaceFolder
+                            projectFolder
                             (Some runParameters)
                             outputDataType.RunParameters
 
@@ -86,14 +82,14 @@ module WorkspaceOps =
                     printfn "Skipping Run %d: Output file %s already exists" (runParameters.GetIndex()) filePathRun
         else
             try
-                do! executor workspaceFolder runParameters cts progress
-                do! OutputData.saveToFile workspaceFolder (Some runParameters) (runParameters |> outputData.RunParameters)
+                do! executor projectFolder runParameters cts progress
+                do! OutputData.saveToFile projectFolder (Some runParameters) (runParameters |> outputData.RunParameters)
             with e ->
                 printfn "Error processing Run %d: %s" (runParameters.GetIndex()) e.Message
     }
 
 
-    /// Executes all runs from the workspace, running up to atTheSameTime runs concurrently
+    /// Executes all runs from the project, running up to atTheSameTime runs concurrently
     /// Skips runs if their output file already exists; saves runs to .msgpack files after execution
     let executeRunParametersSeq
                 (project: project)
@@ -107,7 +103,7 @@ module WorkspaceOps =
 
         let limitedParallel =
             runParameters
-            |> Seq.map (fun rps -> executeRunParameters project.WorkspaceFolder executor rps cts progress)
+            |> Seq.map (fun rps -> executeRunParameters project.ProjectFolder executor rps cts progress)
             |> Seq.toList
             |> ParallelWithThrottle maxDegreeOfParallelism
 

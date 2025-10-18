@@ -146,7 +146,7 @@ module FullBoolGenAndEvals =
 
 
     let executor 
-            (workspaceFolder: string)
+            (projectFolder: string)
             (runParameters: runParameters) 
             (cts: CancellationTokenSource) 
             (progress: IProgress<string>) : Async<unit> =
@@ -190,9 +190,9 @@ module FullBoolGenAndEvals =
 
             cts.Token.ThrowIfCancellationRequested()
 
-            do! OutputData.saveToFile workspaceFolder (Some runParameters) (sorterSet |> outputData.SorterSet)
-            do! OutputData.saveToFile workspaceFolder (Some runParameters) (sorterSetEval |> outputData.SorterSetEval)
-            do! OutputData.saveToFile workspaceFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! OutputData.saveToFile projectFolder (Some runParameters) (sorterSet |> outputData.SorterSet)
+            do! OutputData.saveToFile projectFolder (Some runParameters) (sorterSetEval |> outputData.SorterSetEval)
+            do! OutputData.saveToFile projectFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             progress.Report(sprintf "Finished executing Run %d  Cycle  %d \n" %index %repl)
         }
@@ -200,24 +200,24 @@ module FullBoolGenAndEvals =
 
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
     let binReportExecutor 
-            (workspaceFolder: string)
+            (projectFolder: string)
             (cts: CancellationTokenSource) 
             (progress: IProgress<string>) : unit =
             try
-                progress.Report(sprintf "Generating Bin report in workspace %s"  project.WorkspaceFolder)
+                progress.Report(sprintf "Generating Bin report in project %s"  project.ProjectFolder)
                 let runParamsA = getRunParametersAsync 
-                                    project.WorkspaceFolder 
+                                    project.ProjectFolder 
                                     (Some cts.Token) (Some progress) |> Async.RunSynchronously
 
                 let summaries = 
                     runParamsA
                     |> Seq.map (fun runParams ->
-                        let ssEvalPath = OutputData.getOutputDataFileName workspaceFolder (Some runParams) outputDataType.SorterSetEval
+                        let ssEvalPath = OutputData.getOutputDataFileName projectFolder (Some runParams) outputDataType.SorterSetEval
                         progress.Report (sprintf "Checking for file %s" ssEvalPath)
                         try
                             let swFull = runParams.GetSortingWidth() 
                             let sorterModelKey =  runParams.GetSorterModelKey()
-                            let sorterSetEval = getSorterSetEval workspaceFolder runParams
+                            let sorterSetEval = getSorterSetEval projectFolder runParams
                             let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
 
                             let prpt = SorterSetEvalBins.getBinCountReport sorterSetEvalBins
@@ -234,7 +234,7 @@ module FullBoolGenAndEvals =
                 let reportContent =
                     [ "# sorterEval Report"
                       sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-                      sprintf "Workspace: %s" project.WorkspaceFolder
+                      sprintf "Project: %s" project.ProjectFolder
                       ""
                       "Sorting Width\t SorterModel\t ceLength\t stageLength\t binCount\t unsortedReport"
                     ]
@@ -246,7 +246,7 @@ module FullBoolGenAndEvals =
                     |> String.concat "\n"
 
                 // Save the report to a file
-                let reportFilePath = Path.Combine(project.WorkspaceFolder, 
+                let reportFilePath = Path.Combine(project.ProjectFolder, 
                                                   sprintf "%s_SorterEvalReport_%s.txt" 
                                                             "SorterSetEvalSamples" (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
                 File.WriteAllText(reportFilePath, reportContent)
@@ -261,7 +261,7 @@ module FullBoolGenAndEvals =
 
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
     let ceUseProfileReportExecutor 
-            (workspaceFolder: string)
+            (projectFolder: string)
             (cts: CancellationTokenSource) 
             (progress: IProgress<string>) : unit =
             try
@@ -269,19 +269,19 @@ module FullBoolGenAndEvals =
                 let blockGrowthRate = 1.2
 
                 let runParamsA = getRunParametersAsync 
-                                    project.WorkspaceFolder 
+                                    project.ProjectFolder 
                                     (Some cts.Token) 
                                     (Some progress) |> Async.RunSynchronously
 
                 let summaries = 
                     runParamsA
                     |> Seq.map (fun runParams ->
-                        let ssEvalPath = OutputData.getOutputDataFileName workspaceFolder (Some runParams) outputDataType.SorterSetEval
+                        let ssEvalPath = OutputData.getOutputDataFileName projectFolder (Some runParams) outputDataType.SorterSetEval
                         progress.Report (sprintf "Checking for file %s" ssEvalPath)
                         try
                             let swFull = runParams.GetSortingWidth() 
                             let sorterModelKey =  runParams.GetSorterModelKey()
-                            let sorterSetEval = getSorterSetEval workspaceFolder runParams
+                            let sorterSetEval = getSorterSetEval projectFolder runParams
                             let sorterSetCeUseProfile = SorterSetCeUseProfile.makeSorterSetCeUseProfile binCount blockGrowthRate sorterSetEval
                             let linePrefix = sprintf "%s \t %s" (%swFull.ToString()) (sorterModelKey |> SorterModelKey.toString)
 
@@ -297,7 +297,7 @@ module FullBoolGenAndEvals =
                 let reportContent =
                     [ "# sorterCeProfile Report"
                       sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-                      sprintf "Workspace: %s" project.WorkspaceFolder
+                      sprintf "Project: %s" project.ProjectFolder
                       ""
                       "Sorting Width\tSorterModel\tsorterId\tsorterSetId\tsorterTestsId\tlastCe"
                     ]
@@ -307,7 +307,7 @@ module FullBoolGenAndEvals =
 
                 // Save the report to a file
                 let reportFilePath = 
-                         Path.Combine(project.WorkspaceFolder, 
+                         Path.Combine(project.ProjectFolder, 
                                         sprintf "SorterCeUseReport_%s.txt" 
                                                     (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
 
@@ -328,14 +328,14 @@ module FullBoolGenAndEvals =
 
     let RunAll() =
         let cts = new CancellationTokenSource()
-        //let runParams = WorkspaceOps.getRuns workspace |> Seq.map(fun r -> r.RunParameters)
-        WorkspaceOps.executeRunParametersSeq project 8 executor project.RunParametersArray cts progress
+        //let runParams = ProjectOps.getRuns project |> Seq.map(fun r -> r.RunParameters)
+        ProjectOps.executeRunParametersSeq project 8 executor project.RunParametersArray cts progress
 
 
     let RunSorterEvalReport() =
        let cts = new CancellationTokenSource()
-       (binReportExecutor project.WorkspaceFolder cts progress)
-       (ceUseProfileReportExecutor project.WorkspaceFolder cts progress)
+       (binReportExecutor project.ProjectFolder cts progress)
+       (ceUseProfileReportExecutor project.ProjectFolder cts progress)
 
 
 

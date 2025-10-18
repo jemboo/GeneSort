@@ -98,17 +98,17 @@ module OutputData =
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
 
-    let getOutputDataFolder (workspaceFolder:string) (outputDataType: outputDataType) 
+    let getOutputDataFolder (projectFolder:string) (outputDataType: outputDataType) 
                     : string =
-        Path.Combine(workspaceFolder, outputDataType |> OutputDataType.toString)
+        Path.Combine(projectFolder, outputDataType |> OutputDataType.toString)
 
 
     let makeIndexAndReplName 
-                (workspaceFolder:string) 
+                (projectFolder:string) 
                 (runParameters:runParameters)
                 (outputDataType: outputDataType) : string =
 
-        let outputDataFolder = getOutputDataFolder workspaceFolder outputDataType
+        let outputDataFolder = getOutputDataFolder projectFolder outputDataType
         let index = runParameters.GetIndex()
         let repl = runParameters.GetRepl()
         let outputDataName = outputDataType |> OutputDataType.toString
@@ -117,7 +117,7 @@ module OutputData =
 
 
     let getOutputDataFileName
-            (workspaceFolder: string)
+            (projectFolder: string)
             (runParameters: runParameters option)
             (outputDataType: outputDataType) 
                 : string =
@@ -125,19 +125,19 @@ module OutputData =
         match outputDataType with
         | outputDataType.Project -> 
             let fileName = sprintf "%s.msgpack" (outputDataType |> OutputDataType.toString)
-            Path.Combine(workspaceFolder, fileName)
+            Path.Combine(projectFolder, fileName)
         | _ -> 
             if runParameters.IsNone then
                 failwithf "Run parameters must be provided for output data type %s" (outputDataType |> OutputDataType.toString)
-            makeIndexAndReplName workspaceFolder runParameters.Value outputDataType
+            makeIndexAndReplName projectFolder runParameters.Value outputDataType
 
 
     let getOutputData
-            (workspaceFolder: string)
+            (projectFolder: string)
             (runParameters: runParameters option)
             (outputDataType: outputDataType) 
                 : outputData =
-        let filePath = getOutputDataFileName workspaceFolder runParameters outputDataType
+        let filePath = getOutputDataFileName projectFolder runParameters outputDataType
         if not (File.Exists filePath) then
             failwithf "File not found: %s" filePath
         
@@ -175,59 +175,59 @@ module OutputData =
             failwithf "Error reading file %s: %s" filePath e.Message
 
 
-    let getRunParameters (workspaceFolder: string) (runParameters: runParameters) : runParameters =
-        match getOutputData workspaceFolder (Some runParameters) outputDataType.RunParameters with
+    let getRunParameters (projectFolder: string) (runParameters: runParameters) : runParameters =
+        match getOutputData projectFolder (Some runParameters) outputDataType.RunParameters with
         | RunParameters r -> r
         | _ -> failwith "Unexpected output data type: expected RunParameters"
 
-    let getSorterSet (workspaceFolder: string) (runParameters: runParameters) : sorterSet =
-        match getOutputData workspaceFolder (Some runParameters) outputDataType.SorterSet with
+    let getSorterSet (projectFolder: string) (runParameters: runParameters) : sorterSet =
+        match getOutputData projectFolder (Some runParameters) outputDataType.SorterSet with
         | SorterSet ss -> ss
         | _ -> failwith "Unexpected output data type: expected SorterSet"
 
-    let getSortableTestSet (workspaceFolder: string) (runParameters: runParameters) : sortableTestSet =
-        match getOutputData workspaceFolder (Some runParameters) outputDataType.SortableTestSet with
+    let getSortableTestSet (projectFolder: string) (runParameters: runParameters) : sortableTestSet =
+        match getOutputData projectFolder (Some runParameters) outputDataType.SortableTestSet with
         | SortableTestSet sts -> sts
         | _ -> failwith "Unexpected output data type: expected SortableTestSet"
 
-    let getSorterModelSetMaker (workspaceFolder: string) (runParameters: runParameters) : sorterModelSetMaker =
-        match getOutputData workspaceFolder (Some runParameters) outputDataType.SorterModelSetMaker with
+    let getSorterModelSetMaker (projectFolder: string) (runParameters: runParameters) : sorterModelSetMaker =
+        match getOutputData projectFolder (Some runParameters) outputDataType.SorterModelSetMaker with
         | SorterModelSetMaker sms -> sms
         | _ -> failwith "Unexpected output data type: expected SorterModelSetMaker"
 
-    let getSortableTestModelSet (workspaceFolder: string) (runParameters: runParameters) : sortableTestModelSet =
-        match getOutputData workspaceFolder (Some runParameters) outputDataType.SortableTestModelSet with
+    let getSortableTestModelSet (projectFolder: string) (runParameters: runParameters) : sortableTestModelSet =
+        match getOutputData projectFolder (Some runParameters) outputDataType.SortableTestModelSet with
         | SortableTestModelSet sts -> sts
         | _ -> failwith "Unexpected output data type: expected SortableTestModelSet"
 
-    let getSortableTestModelSetMaker (workspaceFolder: string) (runParameters: runParameters) : sortableTestModelSetMaker =
-        match getOutputData workspaceFolder (Some runParameters) outputDataType.SortableTestModelSetMaker with
+    let getSortableTestModelSetMaker (projectFolder: string) (runParameters: runParameters) : sortableTestModelSetMaker =
+        match getOutputData projectFolder (Some runParameters) outputDataType.SortableTestModelSetMaker with
         | SortableTestModelSetMaker stsm -> stsm
         | _ -> failwith "Unexpected output data type: expected SortableTestModelSetMaker"
 
-    let getSorterSetEval (workspaceFolder: string) (runParameters: runParameters) : sorterSetEval =
-        match getOutputData workspaceFolder (Some runParameters) outputDataType.SorterSetEval with
+    let getSorterSetEval (projectFolder: string) (runParameters: runParameters) : sorterSetEval =
+        match getOutputData projectFolder (Some runParameters) outputDataType.SorterSetEval with
         | SorterSetEval sse -> sse
         | _ -> failwith "Unexpected output data type: expected SorterSetEval"
 
-    let getSorterSetEvalBins (workspaceFolder: string) (runParameters: runParameters) : sorterSetEvalBins =
-        match getOutputData workspaceFolder (Some runParameters) outputDataType.SorterSetEvalBins with
+    let getSorterSetEvalBins (projectFolder: string) (runParameters: runParameters) : sorterSetEvalBins =
+        match getOutputData projectFolder (Some runParameters) outputDataType.SorterSetEvalBins with
         | SorterSetEvalBins sse -> sse
         | _ -> failwith "Unexpected output data type: expected SorterSetEvalBins"
 
-    let getWorkspace (workspaceFolder: string) (runParameters: runParameters) : project =
-        match getOutputData workspaceFolder (Some runParameters) outputDataType.Project with
+    let getProject (projectFolder: string) (runParameters: runParameters) : project =
+        match getOutputData projectFolder (Some runParameters) outputDataType.Project with
         | Project w -> w
-        | _ -> failwith "Unexpected output data type: expected Workspace"
+        | _ -> failwith "Unexpected output data type: expected Project"
 
 
 
     let saveToFile 
-            (workspaceFolder: string)
+            (projectFolder: string)
             (runParameters: runParameters option)
             (outputData: outputData) : Async<unit> =
         async {
-            let filePath = getOutputDataFileName workspaceFolder runParameters (outputData |> getOutputDataType)
+            let filePath = getOutputDataFileName projectFolder runParameters (outputData |> getOutputDataType)
             let directory = Path.GetDirectoryName filePath
             Directory.CreateDirectory directory |> ignore
             try
@@ -285,11 +285,11 @@ module OutputData =
 
 
     let getRunParametersAsync 
-                (workspaceFolder: string) 
+                (projectFolder: string) 
                 (ct: CancellationToken option) 
                 (progress: IProgress<string> option) : Async<runParameters[]> =
         async {
-            let folder = getOutputDataFolder workspaceFolder outputDataType.RunParameters
+            let folder = getOutputDataFolder projectFolder outputDataType.RunParameters
             let filePaths = getFilesSortedByCreationTime folder |> List.toArray  // Snapshot to array for safety
         
             match progress with

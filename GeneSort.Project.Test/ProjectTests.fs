@@ -12,7 +12,7 @@ open System.Threading
 open GeneSort.Runs.Params
 open GeneSort.Runs
 
-type WorkspaceTests() =
+type ProjectTests() =
 
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
@@ -43,8 +43,8 @@ type WorkspaceTests() =
         runParametersSet
 
 
-    // Helper to create a sample workspace
-    let createWorkspace (rootDir: string) (parameterSets: list<string * list<string>>) =
+    // Helper to create a sample project
+    let createProject (rootDir: string) (parameterSets: list<string * list<string>>) =
 
         let repls = [|"Rep1"|]
 

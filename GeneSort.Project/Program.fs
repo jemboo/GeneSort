@@ -7,12 +7,12 @@ open GeneSort.Project.OutputData
 let startTime = System.DateTime.Now
 printfn $"**** QQQ ******** {startTime.ToString()}"
 
-//WorkspaceOps.saveWorkspace FullBoolEvals.workspace
+//ProjectOps.saveProject FullBoolEvals.project
 //FullBoolEvals.RunAll()
 FullBoolEvals.RunSorterEvalReport()
 
 
-//WorkspaceOps.saveWorkspace MergeIntEvals.workspace
+//ProjectOps.saveProject MergeIntEvals.project
 //MergeIntEvals.RunAll()
 //MergeIntEvals.RunSorterEvalReport()
 
@@ -31,8 +31,8 @@ let yab = Console.ReadLine()
 
 
 
-//// Test reading run parameters from a workspace and printing them
-//let testWorkspace = workspace.Test
+//// Test reading run parameters from a project and printing them
+//let testProject = project.Test
     
 //// Cancellation token source (press Ctrl+C to cancel)
 //let cts = new CancellationTokenSource()
@@ -45,7 +45,7 @@ let yab = Console.ReadLine()
     
 //// Run the async function synchronously for console (use Async.RunSynchronously)
 //try
-//    let result = getRunParametersAsync testWorkspace cts.Token progress |> Async.RunSynchronously
+//    let result = getRunParametersAsync testProject cts.Token progress |> Async.RunSynchronously
 //    printfn "Successfully retrieved %d run parameters:" result.Length
 //    for param in result do
 //        printfn "%A" param  // Print each RunParameters (adjust based on your type)

@@ -53,7 +53,7 @@ type project =
     member this.ReportNames with get() = this.reportNames
     member this.RunParametersArray with get () = this.runParametersArray
     member this.RootDirectory with get () = this.rootDirectory
-    member this.WorkspaceFolder with get() = Path.Combine(this.RootDirectory, this.Name)
+    member this.ProjectFolder with get() = Path.Combine(this.RootDirectory, this.Name)
 
 
 module Project =  

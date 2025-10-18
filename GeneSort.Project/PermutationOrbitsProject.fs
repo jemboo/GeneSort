@@ -40,7 +40,7 @@ module PermutationOrbitsProject =
     let project = Project.create experimentName experimentDesc rootDir [||] parameterSet (fun s -> s)
 
     let executor 
-            (workspaceFolder: string)
+            (projectFolder: string)
             (runParameters: runParameters) 
             (cts: CancellationTokenSource) 
             (progress: IProgress<string>) : Async<unit> =
@@ -57,9 +57,9 @@ module PermutationOrbitsProject =
                 let sorterTestModelGen = MsasORandGen.create randomType sortingWidth maxOrbiit |> SorterTestModelGen.MsasORandGen
                 let sorterTestModelSetMaker = sortableTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
                 let sorterTestModelSet = sorterTestModelSetMaker.MakeSortableTestModelSet
-                do! OutputData.saveToFile workspaceFolder (Some runParameters)
+                do! OutputData.saveToFile projectFolder (Some runParameters)
                                           (sorterTestModelSet |> outputData.SortableTestModelSet)
-                do! OutputData.saveToFile workspaceFolder (Some runParameters)
+                do! OutputData.saveToFile projectFolder (Some runParameters)
                                           (sorterTestModelSetMaker |> outputData.SortableTestModelSetMaker)
 
                 
@@ -72,15 +72,15 @@ module PermutationOrbitsProject =
         }
 
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    //let sorterTestCountReporter (workspace: workspace) =
+    //let sorterTestCountReporter (project: project) =
     //        try
     //            Console.WriteLine(sprintf 
-    //                                "Generating Permutation orbit count report for %s in workspace %s" 
+    //                                "Generating Permutation orbit count report for %s in project %s" 
     //                                (outputDataType.SortableTestModelSet |> OutputDataType.toString ) 
-    //                                workspace.WorkspaceFolder)
+    //                                project.ProjectFolder)
 
     //            // Get the folder for SorterTestSet
-    //            let outputFolder = OutputData.getOutputDataFolder workspace outputDataType.SortableTestModelSet
+    //            let outputFolder = OutputData.getOutputDataFolder project outputDataType.SortableTestModelSet
     //            if not (Directory.Exists outputFolder) then
     //                failwith (sprintf "Output folder %s does not exist" outputFolder)
 
@@ -129,7 +129,7 @@ module PermutationOrbitsProject =
     //            let reportContent =
     //                [ "Permutation orbit count report"
     //                  sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-    //                  sprintf "Workspace: %s" workspace.WorkspaceFolder
+    //                  sprintf "Project: %s" project.ProjectFolder
     //                  ""
     //                  "Id\t Sorting\t Width\t Repl\t Count"
     //                ]
@@ -141,7 +141,7 @@ module PermutationOrbitsProject =
 
     //            // Save the report to a file
     //            let reportFilePath = Path.Combine(
-    //                    workspace.WorkspaceFolder, 
+    //                    project.ProjectFolder, 
     //                    sprintf "%s_PermutationOrbitCountReport_%s.txt" 
     //                                (outputDataType.SortableTestSet |> OutputDataType.toString )
     //                                (DateTime.Now.ToString("yyyyMMdd_HHmmss"))
@@ -158,13 +158,13 @@ module PermutationOrbitsProject =
     //let RunAll() =
     //    for i in 0 .. 0 do
     //        let repl = i |> UMX.tag<replNumber>
-    //        WorkspaceOps.executeWorkspace workspace repl 6 executor
+    //        ProjectOps.executeProject project repl 6 executor
 
 
 
     // Function to run the SorterTest count report executor
     //let RunPermuationOrbitCountReport() =
-    //    sorterTestCountReporter workspace
+    //    sorterTestCountReporter project
 
 
 
