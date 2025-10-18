@@ -8,6 +8,7 @@ open MessagePack.Resolvers
 open FSharp.UMX
 open System
 open System.Threading
+open GeneSort.Runs.Params
 
 
 module WorkspaceOps =  

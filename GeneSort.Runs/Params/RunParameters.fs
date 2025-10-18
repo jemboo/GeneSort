@@ -1,8 +1,7 @@
-﻿namespace GeneSort.Project
+﻿namespace GeneSort.Runs.Params
 
 open System
 open GeneSort.Sorter
-open GeneSort.Runs.Params
 open FSharp.UMX
 open GeneSort.Sorter.Sortable
 

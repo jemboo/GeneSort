@@ -12,9 +12,8 @@ open MessagePack.Resolvers
 open GeneSort.Core
 open GeneSort.Sorter.Sortable
 open GeneSort.Model.Sortable
-open GeneSort.Sorter.Mp.Sortable
-open GeneSort.Model.Mp.Sortable
 open System.Threading
+open GeneSort.Runs.Params
 
 
 module PermutationOrbitsProject = 

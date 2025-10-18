@@ -6,12 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Params\CeLength.fs" />
     <Compile Include="Params\Math.fs" />
     <Compile Include="Params\SorterCount.fs" />
     <Compile Include="Params\SorterModelKey.fs" />
-    <Compile Include="Params\SorterTestModelKey.fs" />
     <Compile Include="Params\StageLength.fs" />
+    <Compile Include="Params\RunParameters.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

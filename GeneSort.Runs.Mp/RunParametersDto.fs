@@ -1,9 +1,10 @@
 ﻿
-namespace GeneSort.Project
+namespace GeneSort.Runs.Mp
 
 open MessagePack
 open MessagePack.FSharp
 open MessagePack.Resolvers
+open GeneSort.Runs.Params
 
 
 [<MessagePackObject>]

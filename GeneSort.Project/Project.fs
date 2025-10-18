@@ -4,6 +4,7 @@ namespace GeneSort.Project
 open System
 open System.IO
 open GeneSort.Core
+open GeneSort.Runs.Params
 
 type project = 
     private

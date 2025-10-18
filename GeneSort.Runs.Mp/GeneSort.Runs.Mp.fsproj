@@ -6,24 +6,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="RunParametersDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FSharp.UMX" Version="1.1.0" />
     <PackageReference Include="MessagePack" Version="3.1.4" />
+    <PackageReference Include="MessagePack.FSharpExtensions" Version="4.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GeneSort.Core.Mp\GeneSort.Core.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
-    <ProjectReference Include="..\GeneSort.Model.Mp\GeneSort.Model.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Model\GeneSort.Model.fsproj" />
-    <ProjectReference Include="..\GeneSort.Project\GeneSort.Project.fsproj" />
-    <ProjectReference Include="..\GeneSort.Sorter.Mp\GeneSort.Sorter.Mp.fsproj" />
+    <ProjectReference Include="..\GeneSort.Runs\GeneSort.Runs.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorter\GeneSort.Sorter.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingOps\GeneSort.SortingOps.fsproj" />
-    <ProjectReference Include="..\GeneSort.SortingResults.Mp\GeneSort.SortingResults.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingResults\GeneSort.SortingResults.fsproj" />
   </ItemGroup>
 

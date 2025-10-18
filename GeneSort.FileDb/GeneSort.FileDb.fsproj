@@ -19,9 +19,9 @@
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
     <ProjectReference Include="..\GeneSort.Model.Mp\GeneSort.Model.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Model\GeneSort.Model.fsproj" />
-    <ProjectReference Include="..\GeneSort.Project\GeneSort.Project.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorter.Mp\GeneSort.Sorter.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorter\GeneSort.Sorter.fsproj" />
+    <ProjectReference Include="..\GeneSort.SortingOps.Mp\GeneSort.SortingOps.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingOps\GeneSort.SortingOps.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingResults.Mp\GeneSort.SortingResults.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingResults\GeneSort.SortingResults.fsproj" />

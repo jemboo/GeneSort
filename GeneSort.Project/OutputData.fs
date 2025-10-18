@@ -22,6 +22,8 @@ open GeneSort.SortingResults
 open GeneSort.SortingResults.Mp
 open GeneSort.SortingOps
 open GeneSort.SortingOps.Mp
+open GeneSort.Runs.Params
+open GeneSort.Runs.Mp
 
 
 type outputDataType =

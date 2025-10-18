@@ -6,8 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="RunParameters.fs" />
-    <Compile Include="RunParametersDto.fs" />
     <Compile Include="Project.fs" />
     <Compile Include="ProjectDto.fs" />
     <Compile Include="OutputData.fs" />
@@ -17,7 +15,6 @@
     <Compile Include="FullBoolEvals.fs" />
     <Compile Include="FullBoolGenAndEvals.fs" />
     <Compile Include="MergeIntEvals.fs" />
-    <Compile Include="Dispatch.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -31,7 +28,9 @@
   <ItemGroup>
     <ProjectReference Include="..\GeneSort.Core.Mp\GeneSort.Core.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+    <ProjectReference Include="..\GeneSort.FileDb\GeneSort.FileDb.fsproj" />
     <ProjectReference Include="..\GeneSort.Model.Mp\GeneSort.Model.Mp.fsproj" />
+    <ProjectReference Include="..\GeneSort.Runs.Mp\GeneSort.Runs.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Runs\GeneSort.Runs.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorter.Mp\GeneSort.Sorter.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorter\GeneSort.Sorter.fsproj" />

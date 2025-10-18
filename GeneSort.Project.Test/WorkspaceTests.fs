@@ -9,6 +9,7 @@ open MessagePack.FSharp
 open System.IO
 open GeneSort.Project
 open System.Threading
+open GeneSort.Runs.Params
 
 type WorkspaceTests() =
 
