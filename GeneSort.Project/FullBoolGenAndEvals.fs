@@ -10,7 +10,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Sorter.Sortable
-open GeneSort.Project.Params
+open GeneSort.Runs.Params
 open GeneSort.Model.Sorter.Ce
 open GeneSort.Model.Sorter.Si
 open GeneSort.Model.Sorter.Uf4

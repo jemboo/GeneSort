@@ -2,7 +2,7 @@
 
 open System
 open GeneSort.Sorter
-open GeneSort.Project.Params
+open GeneSort.Runs.Params
 open FSharp.UMX
 open GeneSort.Sorter.Sortable
 
