@@ -21,6 +21,7 @@ open GeneSort.SortingOps
 open GeneSort.SortingResults
 open GeneSort.Model.Sorter.Uf6
 open OutputData
+open GeneSort.Runs
 
 module FullBoolGenAndEvals =
 

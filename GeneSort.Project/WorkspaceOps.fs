@@ -9,6 +9,7 @@ open FSharp.UMX
 open System
 open System.Threading
 open GeneSort.Runs.Params
+open GeneSort.Runs
 
 
 module WorkspaceOps =  
@@ -17,9 +18,9 @@ module WorkspaceOps =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let saveWorkspace (workspace: project) = // : Async<unit> =
-        let filePath = Path.Combine(workspace.WorkspaceFolder, sprintf "%s_Workspace.msgpack" workspace.Name)
-        Async.RunSynchronously (OutputData.saveToFile workspace.WorkspaceFolder None (workspace |> outputData.Project))
+    let saveWorkspace (project: project) = // : Async<unit> =
+        let filePath = Path.Combine(project.WorkspaceFolder, sprintf "%s_Workspace.msgpack" project.Name)
+        Async.RunSynchronously (OutputData.saveToFile project.WorkspaceFolder None (project |> outputData.Project))
 
     /// Loads a workspace from the specified folder, expecting exactly one *_Workspace.msgpack file
     /// The workspace name is extracted from the file name and must match the name inside the file

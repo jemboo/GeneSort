@@ -14,6 +14,7 @@ open GeneSort.SortingResults
 open OutputData
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
+open GeneSort.Runs
 
 module FullBoolEvals =
 

@@ -24,6 +24,7 @@ open GeneSort.SortingOps.Mp
 open GeneSort.Model.Sorter.Uf6
 open System.Threading
 open OutputData
+open GeneSort.Runs
 
 module MergeIntEvals = 
 

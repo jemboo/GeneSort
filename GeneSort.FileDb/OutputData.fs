@@ -257,8 +257,8 @@ module OutputData =
                 | SorterSetEvalBins sse ->
                     let dto = SorterSetEvalBinsDto.fromDomain sse
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | Project w ->
-                    let dto = ProjectDto.fromDomain w
+                | Project p ->
+                    let dto = ProjectDto.fromDomain p
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
 
             with e ->

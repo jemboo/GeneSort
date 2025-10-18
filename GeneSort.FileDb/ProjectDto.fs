@@ -2,6 +2,7 @@
 namespace GeneSort.Project
 
 open MessagePack
+open GeneSort.Runs
 open GeneSort.Runs.Mp
 
 

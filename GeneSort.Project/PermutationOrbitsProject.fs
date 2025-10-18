@@ -14,6 +14,7 @@ open GeneSort.Sorter.Sortable
 open GeneSort.Model.Sortable
 open System.Threading
 open GeneSort.Runs.Params
+open GeneSort.Runs
 
 
 module PermutationOrbitsProject = 

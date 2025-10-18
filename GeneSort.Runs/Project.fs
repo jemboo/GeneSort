@@ -1,5 +1,5 @@
 ﻿
-namespace GeneSort.Project
+namespace GeneSort.Runs
 
 open System
 open System.IO
