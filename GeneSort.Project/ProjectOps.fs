@@ -82,3 +82,26 @@ module ProjectOps =
             |> ParallelWithThrottle maxDegreeOfParallelism
 
         Async.RunSynchronously limitedParallel
+
+
+
+
+    let executeRunParametersSeqAsync
+        (project: project)
+        (maxDegreeOfParallelism: int) 
+        (executor: string -> runParameters -> CancellationTokenSource -> IProgress<string> -> Async<unit>)
+        (runParameters: runParameters seq)
+        (cts: CancellationTokenSource)
+        (progress: IProgress<string>)
+        : Async<unit> =
+
+        async {
+            cts.Token.ThrowIfCancellationRequested()  // Early cancel check
+
+            let tasks =
+                runParameters
+                |> Seq.map (fun rps -> executor project.ProjectFolder rps cts progress)
+                |> Seq.toList
+
+            do! ParallelWithThrottle maxDegreeOfParallelism tasks
+        }

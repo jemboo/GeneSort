@@ -5,18 +5,43 @@ open System.Threading
 open GeneSort.Project.OutputDataFile
 open GeneSort.Db
 
+
+// Progress reporter that prints to console
+let createThreadSafeProgress() =
+    let agent = MailboxProcessor.Start(fun inbox ->
+        async {
+            while true do
+                let! msg = inbox.Receive()
+                printfn "%s" msg
+        })
+    
+    { new IProgress<string> with
+        member _.Report(msg) = agent.Post(msg) }
+
+// Usage:
+let progress = createThreadSafeProgress()
+
 let startTime = System.DateTime.Now
 printfn $"**** QQQ ******** {startTime.ToString()}"
 
-//OutputData.saveToFile FullBoolEvals.project.ProjectFolder None (FullBoolEvals.project |> outputData.Project)
-//FullBoolEvals.RunAll()
-//FullBoolEvals.RunSorterEvalReport()
 
-//let wak = 
+
+
+//OutputDataFile.saveToFileAsyncUnit 
+//                    FullBoolEvals.project.ProjectFolder
+//                    None 
+//                    (FullBoolEvals.project |> outputData.Project)
+//                    progress
+//               |> Async.RunSynchronously       
+               
+//FullBoolEvals.RunAll(progress) |> Async.RunSynchronously
+//FullBoolEvals.RunSorterEvalReport(progress)
+
+
 OutputDataFile.saveToFile MergeIntEvals.project.ProjectFolder None (MergeIntEvals.project |> outputData.Project)
         |> Async.RunSynchronously
-//MergeIntEvals.RunAll()
-//MergeIntEvals.RunSorterEvalReport()
+MergeIntEvals.RunAll()
+MergeIntEvals.RunSorterEvalReport()
 
 //let res = OutputData.saveToFile RandomSorters4to64.project.ProjectFolder None (FullBoolEvals.project |> outputData.Project) |> Async.RunSynchronously
 //RandomSorters4to64.RunAll()

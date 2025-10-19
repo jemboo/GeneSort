@@ -5,6 +5,6 @@
 
 
 
-//type IOutputDataSource =
+//type IGeneSortDb =
 //        abstract member save :  outputData -> outputDataType -> Async<unit>
 
