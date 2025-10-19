@@ -5,6 +5,7 @@ open GeneSort.Sorter
 open FSharp.UMX
 open GeneSort.Sorter.Sortable
 
+[<Measure>] type projectName
 [<Measure>] type indexNumber
 [<Measure>] type replNumber
 [<Measure>] type generationNumber

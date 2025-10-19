@@ -15,9 +15,10 @@ open GeneSort.Model.Sortable
 open System.Threading
 open GeneSort.Runs.Params
 open GeneSort.Runs
+open GeneSort.Db
 
 
-module PermutationOrbitsProject = 
+module PermutationOrbits = 
 
     let rootDir = "c:\Projects"
     let experimentName = "PermutationOrbits"
@@ -57,9 +58,9 @@ module PermutationOrbitsProject =
                 let sorterTestModelGen = MsasORandGen.create randomType sortingWidth maxOrbiit |> SorterTestModelGen.MsasORandGen
                 let sorterTestModelSetMaker = sortableTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
                 let sorterTestModelSet = sorterTestModelSetMaker.MakeSortableTestModelSet
-                do! OutputData.saveToFile projectFolder (Some runParameters)
+                do! OutputDataFile.saveToFile projectFolder (Some runParameters)
                                           (sorterTestModelSet |> outputData.SortableTestModelSet)
-                do! OutputData.saveToFile projectFolder (Some runParameters)
+                do! OutputDataFile.saveToFile projectFolder (Some runParameters)
                                           (sorterTestModelSetMaker |> outputData.SortableTestModelSetMaker)
 
                 

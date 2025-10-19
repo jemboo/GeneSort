@@ -6,9 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="OutputData.fs" />
     <Compile Include="ProjectOps.fs" />
-    <Compile Include="PermutationOrbitsProject.fs" />
+    <Compile Include="PermutationOrbits.fs" />
     <Compile Include="RandomSorters4to64.fs" />
     <Compile Include="FullBoolEvals.fs" />
     <Compile Include="FullBoolGenAndEvals.fs" />
@@ -26,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GeneSort.Core.Mp\GeneSort.Core.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+    <ProjectReference Include="..\GeneSort.Db\GeneSort.Db.fsproj" />
     <ProjectReference Include="..\GeneSort.FileDb\GeneSort.FileDb.fsproj" />
     <ProjectReference Include="..\GeneSort.Model.Mp\GeneSort.Model.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Runs.Mp\GeneSort.Runs.Mp.fsproj" />

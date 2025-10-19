@@ -20,8 +20,9 @@ open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.SortingResults
 open GeneSort.Model.Sorter.Uf6
-open OutputData
+open OutputDataFile
 open GeneSort.Runs
+open GeneSort.Db
 
 module FullBoolGenAndEvals =
 
@@ -190,9 +191,9 @@ module FullBoolGenAndEvals =
 
             cts.Token.ThrowIfCancellationRequested()
 
-            do! OutputData.saveToFile projectFolder (Some runParameters) (sorterSet |> outputData.SorterSet)
-            do! OutputData.saveToFile projectFolder (Some runParameters) (sorterSetEval |> outputData.SorterSetEval)
-            do! OutputData.saveToFile projectFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! OutputDataFile.saveToFile projectFolder (Some runParameters) (sorterSet |> outputData.SorterSet)
+            do! OutputDataFile.saveToFile projectFolder (Some runParameters) (sorterSetEval |> outputData.SorterSetEval)
+            do! OutputDataFile.saveToFile projectFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             progress.Report(sprintf "Finished executing Run %d  Cycle  %d \n" %index %repl)
         }
@@ -212,7 +213,7 @@ module FullBoolGenAndEvals =
                 let summaries = 
                     runParamsA
                     |> Seq.map (fun runParams ->
-                        let ssEvalPath = OutputData.getOutputDataFileName projectFolder (Some runParams) outputDataType.SorterSetEval
+                        let ssEvalPath = OutputDataFile.getOutputDataFileName projectFolder (Some runParams) outputDataType.SorterSetEval
                         progress.Report (sprintf "Checking for file %s" ssEvalPath)
                         try
                             let swFull = runParams.GetSortingWidth() 
@@ -276,7 +277,7 @@ module FullBoolGenAndEvals =
                 let summaries = 
                     runParamsA
                     |> Seq.map (fun runParams ->
-                        let ssEvalPath = OutputData.getOutputDataFileName projectFolder (Some runParams) outputDataType.SorterSetEval
+                        let ssEvalPath = OutputDataFile.getOutputDataFileName projectFolder (Some runParams) outputDataType.SorterSetEval
                         progress.Report (sprintf "Checking for file %s" ssEvalPath)
                         try
                             let swFull = runParams.GetSortingWidth() 

@@ -11,10 +11,11 @@ open GeneSort.Core
 open GeneSort.Sorter.Sortable
 open GeneSort.Runs.Params
 open GeneSort.SortingResults
-open OutputData
+open OutputDataFile
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.Runs
+open GeneSort.Db
 
 module FullBoolEvals =
 
@@ -97,7 +98,10 @@ module FullBoolEvals =
 
     let sorterSetSourceProjectName = "RandomSorters4to64"
     let sorterSetSourceProjectFolder = getProjectFolder sorterSetSourceProjectName
-    let sorterSetSourceProject = lazy(ProjectOps.loadProject sorterSetSourceProjectFolder)
+
+    //let sorterSetSourceProject = lazy(ProjectOps.loadProject sorterSetSourceProjectFolder)
+
+    let sorterSetSourceProject = lazy(getProject sorterSetSourceProjectFolder)
 
     let getSorterSetGenRunParams = 
             lazy (
@@ -122,7 +126,7 @@ module FullBoolEvals =
                             sorterSetGenParams 
                             [|runParameters.GetSorterModelKvp(); runParameters.GetReplKvp(); runParameters.GetSortingWidthKvp() |]
 
-            let sorterSet = OutputData.getSorterSet
+            let sorterSet = OutputDataFile.getSorterSet
                                 sorterSetSourceProjectFolder
                                 sourceRunParams
 
@@ -132,7 +136,7 @@ module FullBoolEvals =
 
             cts.Token.ThrowIfCancellationRequested()
 
-            do! OutputData.saveToFile projectFolder (Some runParameters) (sorterSetEval |> outputData.SorterSetEval)
+            do! OutputDataFile.saveToFile projectFolder (Some runParameters) (sorterSetEval |> outputData.SorterSetEval)
 
             progress.Report(sprintf "Finished executing Run %d  Cycle  %d \n" %index %repl)
         }
@@ -153,7 +157,7 @@ module FullBoolEvals =
                 let summaries = 
                     runParamsA
                     |> Seq.map (fun runParams ->
-                        let ssEvalPath = OutputData.getOutputDataFileName projectFolder (Some runParams) outputDataType.SorterSetEval
+                        let ssEvalPath = OutputDataFile.getOutputDataFileName projectFolder (Some runParams) outputDataType.SorterSetEval
                         progress.Report (sprintf "Checking for file %s" ssEvalPath)
                         try
                             let swFull = runParams.GetSortingWidth() 
@@ -218,7 +222,7 @@ module FullBoolEvals =
                     |> Seq.map 
                         (
                             fun runParams ->
-                                let ssEvalPath = OutputData.getOutputDataFileName 
+                                let ssEvalPath = OutputDataFile.getOutputDataFileName 
                                                     projectFolder 
                                                     (Some runParams) outputDataType.SorterSetEval
 

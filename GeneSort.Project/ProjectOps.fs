@@ -10,6 +10,7 @@ open System
 open System.Threading
 open GeneSort.Runs.Params
 open GeneSort.Runs
+open GeneSort.Db
 
 
 module ProjectOps =  
@@ -17,33 +18,6 @@ module ProjectOps =
     /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-
-    /// Loads a project from the specified folder, expecting exactly one *_Project.msgpack file
-    /// The project name is extracted from the file name and must match the name inside the file
-    let loadProject (fileFolder: string) : project =
-        try
-            let files = Directory.GetFiles(fileFolder, "*_Project.msgpack")
-            if Array.isEmpty files then
-                failwithf "No project file found in %s" fileFolder
-            if files.Length > 1 then
-                failwithf "Multiple project files found in %s: %A" fileFolder files
-            let filePath = files.[0]
-            let fileNameWithoutExt = Path.GetFileNameWithoutExtension(filePath)
-            if not (fileNameWithoutExt.EndsWith "_Project") then
-                failwithf "Invalid project file name: %s" filePath
-            let underscoreProjectLen = 10
-            let extractedName = fileNameWithoutExt.[.. fileNameWithoutExt.Length - underscoreProjectLen - 1]
-            use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)
-            let dto = MessagePackSerializer.Deserialize<projectDto>(stream, options)
-            let loaded = ProjectDto.toDomain dto
-            if loaded.Name <> extractedName then
-                failwithf "Project name mismatch: file '%s', loaded '%s'" extractedName loaded.Name
-            let newRootDirectory = Path.GetFullPath(Path.Combine(fileFolder, ".."))
-            project.create loaded.Name loaded.Description newRootDirectory loaded.RunParametersArray loaded.ReportNames
-        with e ->
-            printfn "Error loading project from folder %s: %s" fileFolder e.Message
-            raise e
-
 
     /// Executes async computations in parallel, limited to maxDegreeOfParallelism at a time
     let private ParallelWithThrottle (maxDegreeOfParallelism: int) (computations: seq<Async<unit>>) : Async<unit> =
@@ -73,7 +47,7 @@ module ProjectOps =
             (cts: CancellationTokenSource)  
             (progress: IProgress<string>) = async {
 
-        let filePathRun = OutputData.getOutputDataFileName 
+        let filePathRun = OutputDataFile.getOutputDataFileName 
                             projectFolder
                             (Some runParameters)
                             outputDataType.RunParameters
@@ -83,7 +57,7 @@ module ProjectOps =
         else
             try
                 do! executor projectFolder runParameters cts progress
-                do! OutputData.saveToFile projectFolder (Some runParameters) (runParameters |> outputData.RunParameters)
+                do! OutputDataFile.saveToFile projectFolder (Some runParameters) (runParameters |> outputData.RunParameters)
             with e ->
                 printfn "Error processing Run %d: %s" (runParameters.GetIndex()) e.Message
     }

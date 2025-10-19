@@ -10,6 +10,7 @@ open MessagePack
 open MessagePack.FSharp
 open MessagePack.Resolvers
 
+open GeneSort.Db
 open GeneSort.Sorter.Sorter
 open GeneSort.Sorter.Sortable
 open GeneSort.Model.Sorter
@@ -25,52 +26,11 @@ open GeneSort.SortingOps.Mp
 open GeneSort.Runs.Params
 open GeneSort.Runs.Mp
 open GeneSort.Runs
-
-
-type outputDataType =
-    | RunParameters
-    | SorterSet
-    | SortableTestSet
-    | SorterModelSetMaker
-    | SortableTestModelSet
-    | SortableTestModelSetMaker
-    | SorterSetEval
-    | SorterSetEvalBins
-    | Project
+open GeneSort.Db.OutputData
 
 
      
-module OutputDataType =
-    
-    let toString (outputDataType: outputDataType) : string =
-        match outputDataType with
-        | RunParameters -> "RunParameters"
-        | SorterSet -> "SorterSet"
-        | SortableTestSet -> "SortableTestSet"
-        | SorterModelSetMaker -> "SorterModelSet"
-        | SortableTestModelSet -> "SortableTestModelSet"
-        | SortableTestModelSetMaker -> "SortableTestModelSetMaker"
-        | SorterSetEval -> "SorterSetEval"
-        | SorterSetEvalBins -> "SorterSetEvalBins"
-        | Project -> "Project"
-
-
-
-
-type outputData =
-    | RunParameters of runParameters
-    | SorterSet of sorterSet
-    | SortableTestSet of sortableTestSet
-    | SorterModelSetMaker of sorterModelSetMaker
-    | SortableTestModelSet of sortableTestModelSet
-    | SortableTestModelSetMaker of sortableTestModelSetMaker
-    | SorterSetEval of sorterSetEval
-    | SorterSetEvalBins of sorterSetEvalBins
-    | Project of project
-
-
-     
-module OutputData =
+module OutputDataFile =
 
     let getFilesSortedByCreationTime (directoryPath: string) : string list =
         Directory.GetFiles(directoryPath)
@@ -78,19 +38,6 @@ module OutputData =
         |> Array.sortBy snd
         |> Array.map fst
         |> Array.toList
-
-
-    let getOutputDataType (outputData: outputData) : outputDataType =
-        match outputData with
-        | RunParameters _ -> outputDataType.RunParameters
-        | SorterSet _ -> outputDataType.SorterSet
-        | SortableTestSet _ -> outputDataType.SortableTestSet
-        | SorterModelSetMaker _ -> outputDataType.SorterModelSetMaker
-        | SortableTestModelSet _ -> outputDataType.SortableTestModelSet
-        | SortableTestModelSetMaker _ -> outputDataType.SortableTestModelSetMaker
-        | SorterSetEval _ -> outputDataType.SorterSetEval
-        | SorterSetEvalBins _ -> outputDataType.SorterSetEvalBins
-        | Project _ -> outputDataType.Project
 
 
         /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
@@ -216,7 +163,7 @@ module OutputData =
         | _ -> failwith "Unexpected output data type: expected SorterSetEvalBins"
 
     let getProject (projectFolder: string) (runParameters: runParameters) : project =
-        match getOutputData projectFolder (Some runParameters) outputDataType.Project with
+        match getOutputData projectFolder None outputDataType.Project with
         | Project w -> w
         | _ -> failwith "Unexpected output data type: expected Project"
 

@@ -2,20 +2,23 @@
 open GeneSort.Project
 open System
 open System.Threading
-open GeneSort.Project.OutputData
+open GeneSort.Project.OutputDataFile
+open GeneSort.Db
 
 let startTime = System.DateTime.Now
 printfn $"**** QQQ ******** {startTime.ToString()}"
 
-//ProjectOps.saveProject FullBoolEvals.project
+//OutputData.saveToFile FullBoolEvals.project.ProjectFolder None (FullBoolEvals.project |> outputData.Project)
 //FullBoolEvals.RunAll()
-FullBoolEvals.RunSorterEvalReport()
+//FullBoolEvals.RunSorterEvalReport()
 
-
-//ProjectOps.saveProject MergeIntEvals.project
+//let wak = 
+OutputDataFile.saveToFile MergeIntEvals.project.ProjectFolder None (MergeIntEvals.project |> outputData.Project)
+        |> Async.RunSynchronously
 //MergeIntEvals.RunAll()
 //MergeIntEvals.RunSorterEvalReport()
 
+//let res = OutputData.saveToFile RandomSorters4to64.project.ProjectFolder None (FullBoolEvals.project |> outputData.Project) |> Async.RunSynchronously
 //RandomSorters4to64.RunAll()
 
 let endTime = System.DateTime.Now
