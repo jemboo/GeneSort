@@ -203,8 +203,10 @@ module RandomSorters4to64 =
             member _.Report(msg) = printfn "%s" msg }
 
 
-    let RunAll() =
+    let RunAll(progress: IProgress<string>) =
         let cts = new CancellationTokenSource()
-        //let runParams = ProjectOps.getRuns project |> Seq.map(fun r -> r.RunParameters)
         ProjectOps.executeRunParametersSeq project 8 executor project.RunParametersArray cts progress
+
+
+
 

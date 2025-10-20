@@ -63,30 +63,8 @@ module ProjectOps =
     }
 
 
-    /// Executes all runs from the project, running up to atTheSameTime runs concurrently
-    /// Skips runs if their output file already exists; saves runs to .msgpack files after execution
+
     let executeRunParametersSeq
-                (project: project)
-                (maxDegreeOfParallelism: int) 
-                (executor: string -> runParameters -> CancellationTokenSource -> IProgress<string> ->Async<unit>)
-                (runParameters: runParameters seq)
-                (cts: CancellationTokenSource)
-                (progress: IProgress<string>)
-                : unit =
-
-
-        let limitedParallel =
-            runParameters
-            |> Seq.map (fun rps -> executeRunParameters project.ProjectFolder executor rps cts progress)
-            |> Seq.toList
-            |> ParallelWithThrottle maxDegreeOfParallelism
-
-        Async.RunSynchronously limitedParallel
-
-
-
-
-    let executeRunParametersSeqAsync
         (project: project)
         (maxDegreeOfParallelism: int) 
         (executor: string -> runParameters -> CancellationTokenSource -> IProgress<string> -> Async<unit>)

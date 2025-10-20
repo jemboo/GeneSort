@@ -44,7 +44,7 @@ printfn $"**** QQQ ******** {startTime.ToString()}"
 OutputDataFile.saveToFile MergeIntEvals.project.ProjectFolder None (MergeIntEvals.project |> outputData.Project)
         |> Async.RunSynchronously
 
-MergeIntEvals.RunAll()
+MergeIntEvals.RunAll(progress) |> Async.RunSynchronously
 MergeIntEvals.RunSorterEvalReport()
 
 OutputDataFile.saveToFileAsyncUnit 

@@ -336,9 +336,11 @@ module MergeIntEvals =
             member _.Report(msg) = printfn "%s" msg }
 
 
-    let RunAll() =
+
+    let RunAll(progress: IProgress<string>) =
         let cts = new CancellationTokenSource()
         ProjectOps.executeRunParametersSeq project 8 executor project.RunParametersArray cts progress
+
 
 
     let RunSorterEvalReport() =
