@@ -206,9 +206,11 @@ module MergeIntEvals =
 
             cts.Token.ThrowIfCancellationRequested()
 
-            do! OutputDataFile.saveToFile projectFolder (Some runParameters) (sorterSet |> outputData.SorterSet)
-            do! OutputDataFile.saveToFile projectFolder (Some runParameters) (sorterSetEval |> outputData.SorterSetEval)
-            do! OutputDataFile.saveToFile projectFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! OutputDataFile.saveToFileAsyncUnit projectFolder (Some runParameters) (sorterSet |> outputData.SorterSet) progress
+
+            do! OutputDataFile.saveToFileAsyncUnit projectFolder (Some runParameters) (sorterSetEval |> outputData.SorterSetEval) progress
+
+            do! OutputDataFile.saveToFileAsyncUnit projectFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker) progress
 
             progress.Report(sprintf "Finished executing Run %d  Cycle  %d \n" index %repl)
         }

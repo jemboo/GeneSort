@@ -45,7 +45,7 @@ module ProjectOps =
             (executor: string -> runParameters -> CancellationTokenSource -> IProgress<string> ->Async<unit>)
             (runParameters:runParameters) 
             (cts: CancellationTokenSource)  
-            (progress: IProgress<string>) = async {
+            (progress: IProgress<string>) : Async<unit> = async {
 
         let filePathRun = OutputDataFile.getOutputDataFileName 
                             projectFolder
@@ -100,7 +100,7 @@ module ProjectOps =
 
             let tasks =
                 runParameters
-                |> Seq.map (fun rps -> executor project.ProjectFolder rps cts progress)
+                |> Seq.map (fun rps -> executeRunParameters project.ProjectFolder executor rps cts progress)
                 |> Seq.toList
 
             do! ParallelWithThrottle maxDegreeOfParallelism tasks

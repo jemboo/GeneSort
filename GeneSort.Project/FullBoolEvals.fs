@@ -177,13 +177,7 @@ module FullBoolEvals =
 
                 cts.Token.ThrowIfCancellationRequested()
 
-                // Assuming saveToFile is made async similarly: saveToFileAsync returning Async<Result<unit, OutputError>>
-                let! saveRes = OutputDataFile.saveToFileAsync projectFolder (Some runParameters) (sorterSetEval |> outputData.SorterSetEval)
-                match saveRes with
-                | Ok () -> ()
-                | Error err -> 
-                    progress.Report(sprintf "Error saving to file: %s" err)
-                    failwith err
+                do! OutputDataFile.saveToFileAsyncUnit projectFolder (Some runParameters) (sorterSetEval |> outputData.SorterSetEval) progress
 
                 progress.Report(sprintf "Finished executing Run %d  Cycle  %d \n" index repl)  // Note: fixed %index %repl to index repl
             with 

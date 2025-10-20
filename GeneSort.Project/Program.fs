@@ -38,12 +38,25 @@ printfn $"**** QQQ ******** {startTime.ToString()}"
 //FullBoolEvals.RunSorterEvalReport(progress)
 
 
+
+
+
 OutputDataFile.saveToFile MergeIntEvals.project.ProjectFolder None (MergeIntEvals.project |> outputData.Project)
         |> Async.RunSynchronously
+
 MergeIntEvals.RunAll()
 MergeIntEvals.RunSorterEvalReport()
 
-//let res = OutputData.saveToFile RandomSorters4to64.project.ProjectFolder None (FullBoolEvals.project |> outputData.Project) |> Async.RunSynchronously
+OutputDataFile.saveToFileAsyncUnit 
+                    RandomSorters4to64.project.ProjectFolder
+                    None 
+                    (RandomSorters4to64.project |> outputData.Project)
+                    progress
+               |> Async.RunSynchronously      
+
+
+
+
 //RandomSorters4to64.RunAll()
 
 let endTime = System.DateTime.Now
