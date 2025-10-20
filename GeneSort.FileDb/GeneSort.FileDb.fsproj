@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="ProjectDto.fs" />
     <Compile Include="OutputDataFile.fs" />
+    <Compile Include="GeneSortDbMp.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

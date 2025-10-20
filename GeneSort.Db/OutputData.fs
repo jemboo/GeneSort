@@ -1,7 +1,6 @@
 ﻿
 namespace GeneSort.Db
 
-open FSharp.UMX
 open GeneSort.Sorter.Sortable
 open GeneSort.Sorter.Sorter
 open GeneSort.Model.Sorter
@@ -10,7 +9,6 @@ open GeneSort.SortingOps
 open GeneSort.SortingResults
 open GeneSort.Runs.Params
 open GeneSort.Runs
-open System.IO
 
 
 type outputDataType =

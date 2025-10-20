@@ -1,9 +1,9 @@
 ﻿// For more information see https://aka.ms/fsharp-console-apps
 open GeneSort.Project
 open System
-open System.Threading
-open GeneSort.Project.OutputDataFile
 open GeneSort.Db
+open GeneSort.Core
+open GeneSort.FileDb
 
 
 // Progress reporter that prints to console
@@ -27,32 +27,31 @@ printfn $"**** QQQ ******** {startTime.ToString()}"
 
 
 
-//OutputDataFile.saveToFileAsyncUnit 
-//                    FullBoolEvals.project.ProjectFolder
-//                    None 
-//                    (FullBoolEvals.project |> outputData.Project)
-//                    progress
-//               |> Async.RunSynchronously       
-               
-//FullBoolEvals.RunAll(progress) |> Async.RunSynchronously
-//FullBoolEvals.RunSorterEvalReport(progress)
-
-
-
-
-
-OutputDataFile.saveToFile MergeIntEvals.project.ProjectFolder None (MergeIntEvals.project |> outputData.Project)
-        |> Async.RunSynchronously
-
-MergeIntEvals.RunAll(progress) |> Async.RunSynchronously
-MergeIntEvals.RunSorterEvalReport()
-
-OutputDataFile.saveToFileAsyncUnit 
-                    RandomSorters4to64.project.ProjectFolder
+OutputDataFile.saveToFileAsync
+                    FullBoolEvals.project.ProjectFolder
                     None 
-                    (RandomSorters4to64.project |> outputData.Project)
-                    progress
-               |> Async.RunSynchronously      
+                    (FullBoolEvals.project |> outputData.Project)
+               |> Async.RunSynchronously       
+
+
+FullBoolEvals.RunAll(progress) |> Async.RunSynchronously
+FullBoolEvals.RunSorterEvalReport(progress)
+
+
+
+
+//OutputDataFile.saveToFile MergeIntEvals.project.ProjectFolder None (MergeIntEvals.project |> outputData.Project)
+//        |> Async.RunSynchronously
+
+//MergeIntEvals.RunAll(progress) |> Async.RunSynchronously
+//MergeIntEvals.RunSorterEvalReport()
+
+//OutputDataFile.saveToFileAsyncUnit 
+//                    RandomSorters4to64.project.ProjectFolder
+//                    None 
+//                    (RandomSorters4to64.project |> outputData.Project)
+//                    progress
+//               |> Async.RunSynchronously      
 
 
 

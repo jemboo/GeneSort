@@ -2,12 +2,8 @@
 namespace GeneSort.Project
 
 open System
-open System.IO
 
 open FSharp.UMX
-open MessagePack
-open MessagePack.FSharp
-open MessagePack.Resolvers
 
 open GeneSort.Core
 open GeneSort.Sorter.Sortable
@@ -16,6 +12,7 @@ open System.Threading
 open GeneSort.Runs.Params
 open GeneSort.Runs
 open GeneSort.Db
+open GeneSort.FileDb
 
 
 module PermutationOrbits = 
@@ -58,9 +55,9 @@ module PermutationOrbits =
                 let sorterTestModelGen = MsasORandGen.create randomType sortingWidth maxOrbiit |> SorterTestModelGen.MsasORandGen
                 let sorterTestModelSetMaker = sortableTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
                 let sorterTestModelSet = sorterTestModelSetMaker.MakeSortableTestModelSet
-                do! OutputDataFile.saveToFile projectFolder (Some runParameters)
+                do! OutputDataFile.saveToFileAsync projectFolder (Some runParameters)
                                           (sorterTestModelSet |> outputData.SortableTestModelSet)
-                do! OutputDataFile.saveToFile projectFolder (Some runParameters)
+                do! OutputDataFile.saveToFileAsync projectFolder (Some runParameters)
                                           (sorterTestModelSetMaker |> outputData.SortableTestModelSetMaker)
 
                 

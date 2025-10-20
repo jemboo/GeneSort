@@ -18,6 +18,7 @@ open GeneSort.Model.Sorter.Uf6
 open System.Threading
 open GeneSort.Runs
 open GeneSort.Db
+open GeneSort.FileDb
 
 
 module RandomSorters4to64 =
@@ -189,8 +190,8 @@ module RandomSorters4to64 =
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 
-            do! OutputDataFile.saveToFile projectFolder (Some runParameters) (sorterSet |> outputData.SorterSet)
-            do! OutputDataFile.saveToFile projectFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! OutputDataFile.saveToFileAsync projectFolder (Some runParameters) (sorterSet |> outputData.SorterSet)
+            do! OutputDataFile.saveToFileAsync projectFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             runParameters.SetRunFinished true
 

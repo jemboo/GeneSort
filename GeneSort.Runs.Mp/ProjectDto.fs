@@ -1,5 +1,5 @@
 ﻿
-namespace GeneSort.Project
+namespace GeneSort.Runs.Mp
 
 open MessagePack
 open GeneSort.Runs

@@ -20,9 +20,9 @@ open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.SortingResults
 open GeneSort.Model.Sorter.Uf6
-open OutputDataFile
 open GeneSort.Runs
 open GeneSort.Db
+open GeneSort.FileDb
 
 module FullBoolGenAndEvals =
 
@@ -191,9 +191,9 @@ module FullBoolGenAndEvals =
 
             cts.Token.ThrowIfCancellationRequested()
 
-            do! OutputDataFile.saveToFile projectFolder (Some runParameters) (sorterSet |> outputData.SorterSet)
-            do! OutputDataFile.saveToFile projectFolder (Some runParameters) (sorterSetEval |> outputData.SorterSetEval)
-            do! OutputDataFile.saveToFile projectFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! OutputDataFile.saveToFileAsync projectFolder (Some runParameters) (sorterSet |> outputData.SorterSet)
+            do! OutputDataFile.saveToFileAsync projectFolder (Some runParameters) (sorterSetEval |> outputData.SorterSetEval)
+            do! OutputDataFile.saveToFileAsync projectFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             progress.Report(sprintf "Finished executing Run %d  Cycle  %d \n" %index %repl)
         }
@@ -206,7 +206,7 @@ module FullBoolGenAndEvals =
             (progress: IProgress<string>) : unit =
             try
                 progress.Report(sprintf "Generating Bin report in project %s"  project.ProjectFolder)
-                let runParamsA = getRunParametersAsync 
+                let runParamsA = OutputDataFile.getAllRunParametersAsync 
                                     project.ProjectFolder 
                                     (Some cts.Token) (Some progress) |> Async.RunSynchronously
 
@@ -218,7 +218,8 @@ module FullBoolGenAndEvals =
                         try
                             let swFull = runParams.GetSortingWidth() 
                             let sorterModelKey =  runParams.GetSorterModelKey()
-                            let sorterSetEval = getSorterSetEval projectFolder runParams
+                            let sorterSetEval = (OutputDataFile.getSorterSetEvalAsync projectFolder runParams)
+                                                  |> MonadUtils.getValue
                             let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
 
                             let prpt = SorterSetEvalBins.getBinCountReport sorterSetEvalBins
@@ -269,7 +270,7 @@ module FullBoolGenAndEvals =
                 let binCount = 20
                 let blockGrowthRate = 1.2
 
-                let runParamsA = getRunParametersAsync 
+                let runParamsA = OutputDataFile.getAllRunParametersAsync 
                                     project.ProjectFolder 
                                     (Some cts.Token) 
                                     (Some progress) |> Async.RunSynchronously
@@ -282,7 +283,8 @@ module FullBoolGenAndEvals =
                         try
                             let swFull = runParams.GetSortingWidth() 
                             let sorterModelKey =  runParams.GetSorterModelKey()
-                            let sorterSetEval = getSorterSetEval projectFolder runParams
+                            let sorterSetEval = (OutputDataFile.getSorterSetEvalAsync projectFolder runParams) 
+                                                |> MonadUtils.getValue
                             let sorterSetCeUseProfile = SorterSetCeUseProfile.makeSorterSetCeUseProfile binCount blockGrowthRate sorterSetEval
                             let linePrefix = sprintf "%s \t %s" (%swFull.ToString()) (sorterModelKey |> SorterModelKey.toString)
 

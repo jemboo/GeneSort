@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="SysExt.fs" />
     <Compile Include="UMXext.fs" />
+    <Compile Include="MonadUtils.fs" />
     <Compile Include="Rando.fs" />
     <Compile Include="ByteUtils.fs" />
     <Compile Include="GuidUtils.fs" />

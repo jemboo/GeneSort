@@ -11,6 +11,7 @@ open System.Threading
 open GeneSort.Runs.Params
 open GeneSort.Runs
 open GeneSort.Db
+open GeneSort.FileDb
 
 
 module ProjectOps =  
@@ -57,7 +58,7 @@ module ProjectOps =
         else
             try
                 do! executor projectFolder runParameters cts progress
-                do! OutputDataFile.saveToFile projectFolder (Some runParameters) (runParameters |> outputData.RunParameters)
+                do! OutputDataFile.saveToFileAsync projectFolder (Some runParameters) (runParameters |> outputData.RunParameters)
             with e ->
                 printfn "Error processing Run %d: %s" (runParameters.GetIndex()) e.Message
     }
