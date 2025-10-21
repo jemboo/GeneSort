@@ -45,25 +45,25 @@ printfn $"**** QQQ ******** {startTime.ToString()}"
 
 
 
-OutputDataFile.saveToFileAsync 
-            (Path.Combine(rootDir, MergeIntEvals.project.ProjectName))
-            None (MergeIntEvals.project |> outputData.Project)
-        |> Async.RunSynchronously
-
-MergeIntEvals.RunAll rootDir progress |> Async.RunSynchronously
-MergeIntEvals.RunSorterEvalReport (Path.Combine(rootDir, MergeIntEvals.project.ProjectName)) progress
-
 //OutputDataFile.saveToFileAsync 
-//                    RandomSorters4to64.project.ProjectFolder
-//                    None 
-//                    (RandomSorters4to64.project |> outputData.Project)
-//                    progress
-//               |> Async.RunSynchronously      
+//            (Path.Combine(rootDir, MergeIntEvals.project.ProjectName))
+//            None 
+//            (MergeIntEvals.project |> outputData.Project)
+//        |> Async.RunSynchronously
+
+//MergeIntEvals.RunAll rootDir progress |> Async.RunSynchronously
+//MergeIntEvals.RunSorterEvalReport (Path.Combine(rootDir, MergeIntEvals.project.ProjectName)) progress
 
 
+OutputDataFile.saveToFileAsync 
+                    (Path.Combine(rootDir, RandomSorters4to64.project.ProjectName))
+                    None 
+                    (RandomSorters4to64.project |> outputData.Project)
+               |> Async.RunSynchronously      
+
+RandomSorters4to64.RunAll rootDir progress |> Async.RunSynchronously
 
 
-//RandomSorters4to64.RunAll()
 
 let endTime = System.DateTime.Now
 let duration = endTime - startTime

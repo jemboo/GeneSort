@@ -22,7 +22,7 @@ namespace GeneSort.UI.ViewModels
         {
             if (project == null) throw new ArgumentNullException(nameof(project));
 
-            Name = project.Name;
+            Name = project.ProjectName;
             Description = project.Description;
             ParameterKeys = project.ParameterKeys.ToList();
 

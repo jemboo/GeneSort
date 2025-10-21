@@ -202,7 +202,7 @@ namespace GeneSort.UI.ViewModels
                     }
 
                     // Validate workspace data
-                    if (string.IsNullOrWhiteSpace(project.Name))
+                    if (string.IsNullOrWhiteSpace(project.ProjectName))
                     {
                         throw new InvalidDataException("Workspace name is required");
                     }
@@ -221,7 +221,7 @@ namespace GeneSort.UI.ViewModels
                             // Extract workspace info from domain object
                             ProjectName = project.ProjectName ?? string.Empty;
                             ProjectDescription = project.Description ?? string.Empty;
-                            RootDirectory = project.RootDirectory ?? string.Empty;
+                            RootDirectory = RootDirectory ?? string.Empty;
 
                             // Load report keys
                             ReportKeys.Clear();
