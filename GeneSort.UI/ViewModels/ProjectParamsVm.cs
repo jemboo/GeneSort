@@ -219,7 +219,7 @@ namespace GeneSort.UI.ViewModels
                         try
                         {
                             // Extract workspace info from domain object
-                            ProjectName = project.Name ?? string.Empty;
+                            ProjectName = project.ProjectName ?? string.Empty;
                             ProjectDescription = project.Description ?? string.Empty;
                             RootDirectory = project.RootDirectory ?? string.Empty;
 

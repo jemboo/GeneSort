@@ -1,11 +1,15 @@
 ﻿// For more information see https://aka.ms/fsharp-console-apps
 open GeneSort.Project
 open System
+open System.IO
 open System.Threading
 open GeneSort.Project.OutputDataFile
 open GeneSort.Db
 open GeneSort.Core
 
+
+
+let rootDir = "c:\Projects"
 
 // Progress reporter that prints to console
 let createThreadSafeProgress() =
@@ -29,25 +33,27 @@ printfn $"**** QQQ ******** {startTime.ToString()}"
 
 
 //OutputDataFile.saveToFileAsync
-//                    FullBoolEvals.project.ProjectFolder
+//                    (Path.Combine(rootDir, FullBoolEvals.project.ProjectName))
 //                    None 
 //                    (FullBoolEvals.project |> outputData.Project)
 //               |> Async.RunSynchronously       
 
 
-//FullBoolEvals.RunAll(progress) |> Async.RunSynchronously
-FullBoolEvals.RunSorterEvalReport(progress)
+//FullBoolEvals.RunAll rootDir progress |> Async.RunSynchronously
+//FullBoolEvals.RunSorterEvalReport (Path.Combine(rootDir, FullBoolEvals.project.ProjectName)) progress
 
 
 
 
-//OutputDataFile.saveToFile MergeIntEvals.project.ProjectFolder None (MergeIntEvals.project |> outputData.Project)
-//        |> Async.RunSynchronously
+OutputDataFile.saveToFileAsync 
+            (Path.Combine(rootDir, MergeIntEvals.project.ProjectName))
+            None (MergeIntEvals.project |> outputData.Project)
+        |> Async.RunSynchronously
 
-//MergeIntEvals.RunAll(progress) |> Async.RunSynchronously
-//MergeIntEvals.RunSorterEvalReport()
+MergeIntEvals.RunAll rootDir progress |> Async.RunSynchronously
+MergeIntEvals.RunSorterEvalReport (Path.Combine(rootDir, MergeIntEvals.project.ProjectName)) progress
 
-//OutputDataFile.saveToFileAsyncUnit 
+//OutputDataFile.saveToFileAsync 
 //                    RandomSorters4to64.project.ProjectFolder
 //                    None 
 //                    (RandomSorters4to64.project |> outputData.Project)

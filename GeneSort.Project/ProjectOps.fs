@@ -47,7 +47,7 @@ module ProjectOps =
             (cts: CancellationTokenSource)  
             (progress: IProgress<string>) : Async<unit> = async {
 
-        let filePathRun = OutputDataFile.getOutputDataFileName 
+        let filePathRun = OutputDataFile.getAllOutputDataFilePaths 
                             projectFolder
                             (Some runParameters)
                             outputDataType.RunParameters
@@ -65,6 +65,7 @@ module ProjectOps =
 
 
     let executeRunParametersSeq
+        (rootFolder:string)
         (project: project)
         (maxDegreeOfParallelism: int) 
         (executor: string -> runParameters -> CancellationTokenSource -> IProgress<string> -> Async<unit>)
@@ -75,10 +76,10 @@ module ProjectOps =
 
         async {
             cts.Token.ThrowIfCancellationRequested()  // Early cancel check
-
+            let projectFolder = Path.Combine(rootFolder, UMX.untag project.ProjectName)
             let tasks =
                 runParameters
-                |> Seq.map (fun rps -> executeRunParameters project.ProjectFolder executor rps cts progress)
+                |> Seq.map (fun rps -> executeRunParameters projectFolder executor rps cts progress)
                 |> Seq.toList
 
             do! ParallelWithThrottle maxDegreeOfParallelism tasks

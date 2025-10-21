@@ -51,7 +51,9 @@ module OutputDataFile =
         Path.Combine(projectFolder, outputDataType |> OutputDataType.toString)
 
 
-    let makeIndexAndReplName 
+
+
+    let makeIndexAndReplPath 
                 (projectFolder:string) 
                 (runParameters:runParameters)
                 (outputDataType: outputDataType) : string =
@@ -64,7 +66,7 @@ module OutputDataFile =
         Path.Combine(outputDataFolder, fileName)
 
 
-    let getOutputDataFileName
+    let getAllOutputDataFilePaths
             (projectFolder: string)
             (runParameters: runParameters option)
             (outputDataType: outputDataType) 
@@ -77,7 +79,26 @@ module OutputDataFile =
         | _ -> 
             if runParameters.IsNone then
                 failwithf "Run parameters must be provided for output data type %s" (outputDataType |> OutputDataType.toString)
-            makeIndexAndReplName projectFolder runParameters.Value outputDataType
+            makeIndexAndReplPath projectFolder runParameters.Value outputDataType
+
+
+    let getAllOutputDataFilePathsFromQueryParameters
+            (projectFolder: string)
+            (runParameters: runParameters option)
+            (outputDataType: outputDataType) 
+                : string =
+
+        match outputDataType with
+        | outputDataType.Project -> 
+            let fileName = sprintf "%s.msgpack" (outputDataType |> OutputDataType.toString)
+            Path.Combine(projectFolder, fileName)
+        | _ -> 
+            if runParameters.IsNone then
+                failwithf "Run parameters must be provided for output data type %s" (outputDataType |> OutputDataType.toString)
+            makeIndexAndReplPath projectFolder runParameters.Value outputDataType
+
+
+
 
 
 
@@ -87,7 +108,7 @@ module OutputDataFile =
             (outputDataType: outputDataType) 
                 : Async<Result<outputData, OutputError>> =
         async {
-            let filePath = getOutputDataFileName projectFolder runParameters outputDataType
+            let filePath = getAllOutputDataFilePaths projectFolder runParameters outputDataType
             if not (File.Exists filePath) then
                 return Error (sprintf "File not found: %s" filePath)
             else
@@ -232,7 +253,7 @@ module OutputDataFile =
             (runParameters: runParameters option)
             (outputData: outputData) : Async<unit> =
         async {
-            let filePath = getOutputDataFileName projectFolder runParameters (outputData |> getOutputDataType)
+            let filePath = getAllOutputDataFilePaths projectFolder runParameters (outputData |> getOutputDataType)
             let directory = Path.GetDirectoryName filePath
             Directory.CreateDirectory directory |> ignore
             try

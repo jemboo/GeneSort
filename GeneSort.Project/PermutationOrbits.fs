@@ -20,7 +20,6 @@ open GeneSort.Db
 
 module PermutationOrbits = 
 
-    let rootDir = "c:\Projects"
     let experimentName = "PermutationOrbits"
     let experimentDesc = "Count Permutation Orbit lengths"
 
@@ -38,7 +37,7 @@ module PermutationOrbits =
     let parameterSet = 
         [ sortingWidths(); ]
 
-    let project = Project.create experimentName experimentDesc rootDir [||] parameterSet (fun s -> s)
+    let project = Project.create experimentName experimentDesc [||] parameterSet (fun s -> s)
 
     let executor 
             (projectFolder: string)

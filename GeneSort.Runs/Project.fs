@@ -9,26 +9,23 @@ open GeneSort.Runs.Params
 type project = 
     private
         { 
-          name: string
+          projectName: string
           description: string
-          rootDirectory: string
           runParametersArray: runParameters []
           parameterKeys: string array
           reportNames: string array
         }
     with
     static member create 
-            (name: string) 
+            (projectName: string) 
             (description: string) 
-            (rootDirectory: string) 
             (runParametersArray: runParameters []) 
             (reportKeys: string array) : project =
-        if String.IsNullOrWhiteSpace name then
+        if String.IsNullOrWhiteSpace projectName then
             failwith "Project name cannot be empty"
         else
-            { name = name
+            { projectName = projectName
               description = description
-              rootDirectory = rootDirectory
               runParametersArray = runParametersArray
               reportNames = reportKeys
               parameterKeys = 
@@ -41,19 +38,16 @@ type project =
     static member Test = 
         project.create 
             "FullBoolEvals" 
-            "A test project" 
-            $"C:\Projects"
+            "A test project"
             [| runParameters.create (Map.ofList [ ("Param1", "Value1"); ("Param2", "ValueA") ])
                runParameters.create (Map.ofList [ ("Param1", "Value2"); ("Param2", "ValueB") ]) |]
             [| "Report1"; "Report2" |]
 
-    member this.Name with get () = this.name
+    member this.ProjectName with get () = this.projectName
     member this.Description with get () = this.description
     member this.ParameterKeys with get() = this.parameterKeys
     member this.ReportNames with get() = this.reportNames
     member this.RunParametersArray with get () = this.runParametersArray
-    member this.RootDirectory with get () = this.rootDirectory
-    member this.ProjectFolder with get() = Path.Combine(this.RootDirectory, this.Name)
 
 
 module Project =  
@@ -61,7 +55,6 @@ module Project =
     let create 
             (name: string) 
             (description: string) 
-            (rootDirectory: string) 
             (reportKeys: string array)
             (parameterSpans: (string * string list) list) 
             (paramRefiner: runParameters seq -> runParameters seq)        
@@ -75,8 +68,7 @@ module Project =
 
         project.create 
                 name 
-                description 
-                rootDirectory 
+                description
                 refinedParameters
                 reportKeys
 
