@@ -18,7 +18,6 @@ open GeneSort.Model.Sorter.Uf6
 open System.Threading
 open GeneSort.Runs
 open GeneSort.Db
-open GeneSort.FileDb
 
 
 module RandomSorters4to64 =

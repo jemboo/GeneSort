@@ -1,9 +1,10 @@
 ﻿// For more information see https://aka.ms/fsharp-console-apps
 open GeneSort.Project
 open System
+open System.Threading
+open GeneSort.Project.OutputDataFile
 open GeneSort.Db
 open GeneSort.Core
-open GeneSort.FileDb
 
 
 // Progress reporter that prints to console
@@ -27,14 +28,14 @@ printfn $"**** QQQ ******** {startTime.ToString()}"
 
 
 
-OutputDataFile.saveToFileAsync
-                    FullBoolEvals.project.ProjectFolder
-                    None 
-                    (FullBoolEvals.project |> outputData.Project)
-               |> Async.RunSynchronously       
+//OutputDataFile.saveToFileAsync
+//                    FullBoolEvals.project.ProjectFolder
+//                    None 
+//                    (FullBoolEvals.project |> outputData.Project)
+//               |> Async.RunSynchronously       
 
 
-FullBoolEvals.RunAll(progress) |> Async.RunSynchronously
+//FullBoolEvals.RunAll(progress) |> Async.RunSynchronously
 FullBoolEvals.RunSorterEvalReport(progress)
 
 

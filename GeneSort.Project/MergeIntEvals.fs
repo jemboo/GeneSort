@@ -14,15 +14,18 @@ open GeneSort.Model.Sorter.Ce
 open GeneSort.Model.Sorter.Si
 open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Rs
+
+
 open GeneSort.Model.Sorter
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.SortingResults
+open GeneSort.SortingOps.Mp
 open GeneSort.Model.Sorter.Uf6
 open System.Threading
+open OutputDataFile
 open GeneSort.Runs
 open GeneSort.Db
-open GeneSort.FileDb
 
 module MergeIntEvals = 
 
@@ -220,7 +223,7 @@ module MergeIntEvals =
             (progress: IProgress<string>) : unit =
             try
                 progress.Report(sprintf "Generating Bin report in project %s"  project.ProjectFolder)
-                let runParamsA = OutputDataFile.getAllRunParametersAsync 
+                let runParamsA = getAllRunParametersAsync 
                                     project.ProjectFolder
                                     (Some cts.Token) (Some progress) |> Async.RunSynchronously
 
@@ -280,7 +283,7 @@ module MergeIntEvals =
                 let binCount = 20
                 let blockGrowthRate = 1.2
 
-                let runParamsA = OutputDataFile.getAllRunParametersAsync 
+                let runParamsA = getAllRunParametersAsync 
                                         project.ProjectFolder
                                         (Some cts.Token) (Some progress) |> Async.RunSynchronously
 

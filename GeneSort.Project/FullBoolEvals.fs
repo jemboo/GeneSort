@@ -15,7 +15,6 @@ open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.Runs
 open GeneSort.Db
-open GeneSort.FileDb
 
 
 module FullBoolEvals =
@@ -266,7 +265,7 @@ module FullBoolEvals =
                 let reportFilePath = Path.Combine(
                                         project.ProjectFolder, 
                                         sprintf "SorterCeUseReport_%s.txt" 
-                                        (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
+                                                (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
 
                 File.WriteAllText(reportFilePath, reportContent)
 

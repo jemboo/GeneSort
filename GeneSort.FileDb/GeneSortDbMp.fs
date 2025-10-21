@@ -6,15 +6,16 @@ open System.Threading
 open GeneSort.Core
 open GeneSort.Db
 open GeneSort.Runs.Params
+open GeneSort.Project
 
 type private DbMessage =
-    | Save of runParameters option * outputData * outputDataType * AsyncReplyChannel<unit>
+    | Save of runParameters option * outputData * AsyncReplyChannel<unit>
     | Load of runParameters option * outputDataType * AsyncReplyChannel<Result<outputData, OutputError>>
     | GetAllRunParameters of CancellationToken option * IProgress<string> option * AsyncReplyChannel<runParameters[]>
 
 type GeneSortDbMp(projectFolder: string) =
     
-    let saveAsync (runParams: runParameters option) (data: outputData) (dataType: outputDataType) =
+    let saveAsync (runParams: runParameters option) (data: outputData) =
         OutputDataFile.saveToFileAsync projectFolder runParams data
     
     let loadAsync (runParams: runParameters option) (dataType: outputDataType) =
@@ -29,8 +30,8 @@ type GeneSortDbMp(projectFolder: string) =
                 let! msg = inbox.Receive()
                 
                 match msg with
-                | Save (runParams, data, dataType, replyChannel) ->
-                    do! saveAsync runParams data dataType
+                | Save (runParams, data, replyChannel) ->
+                    do! saveAsync runParams data
                     replyChannel.Reply()
                     
                 | Load (runParams, dataType, replyChannel) ->
@@ -48,9 +49,9 @@ type GeneSortDbMp(projectFolder: string) =
     
     member _.ProjectFolder = projectFolder
     
-    interface IGeneSortDb with
-        member _.saveAsync (runParams: runParameters option) (data: outputData) (dataType: outputDataType) : Async<unit> =
-            mailbox.PostAndAsyncReply(fun channel -> Save(runParams, data, dataType, channel))
+    interface IGeneSortDb2 with
+        member _.saveAsync (runParams: runParameters option) (data: outputData) : Async<unit> =
+            mailbox.PostAndAsyncReply(fun channel -> Save(runParams, data, channel))
         
         member _.loadAsync (runParams: runParameters option) (dataType: outputDataType) : Async<Result<outputData, OutputError>> =
             mailbox.PostAndAsyncReply(fun channel -> Load(runParams, dataType, channel))

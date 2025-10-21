@@ -20,9 +20,9 @@ open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.SortingResults
 open GeneSort.Model.Sorter.Uf6
+open OutputDataFile
 open GeneSort.Runs
 open GeneSort.Db
-open GeneSort.FileDb
 
 module FullBoolGenAndEvals =
 
@@ -206,7 +206,7 @@ module FullBoolGenAndEvals =
             (progress: IProgress<string>) : unit =
             try
                 progress.Report(sprintf "Generating Bin report in project %s"  project.ProjectFolder)
-                let runParamsA = OutputDataFile.getAllRunParametersAsync 
+                let runParamsA = getAllRunParametersAsync 
                                     project.ProjectFolder 
                                     (Some cts.Token) (Some progress) |> Async.RunSynchronously
 
@@ -270,7 +270,7 @@ module FullBoolGenAndEvals =
                 let binCount = 20
                 let blockGrowthRate = 1.2
 
-                let runParamsA = OutputDataFile.getAllRunParametersAsync 
+                let runParamsA = getAllRunParametersAsync 
                                     project.ProjectFolder 
                                     (Some cts.Token) 
                                     (Some progress) |> Async.RunSynchronously

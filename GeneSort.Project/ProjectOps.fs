@@ -11,7 +11,6 @@ open System.Threading
 open GeneSort.Runs.Params
 open GeneSort.Runs
 open GeneSort.Db
-open GeneSort.FileDb
 
 
 module ProjectOps =  

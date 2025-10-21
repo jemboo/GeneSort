@@ -1,5 +1,5 @@
 ﻿
-namespace GeneSort.FileDb
+namespace GeneSort.Project
 
 open System
 open System.IO
@@ -27,6 +27,7 @@ open GeneSort.SortingOps.Mp
 open GeneSort.Runs.Params
 open GeneSort.Runs.Mp
 open GeneSort.Runs
+open GeneSort.Db.OutputData
 
 
      
@@ -231,7 +232,7 @@ module OutputDataFile =
             (runParameters: runParameters option)
             (outputData: outputData) : Async<unit> =
         async {
-            let filePath = getOutputDataFileName projectFolder runParameters (outputData |> OutputData.getOutputDataType)
+            let filePath = getOutputDataFileName projectFolder runParameters (outputData |> getOutputDataType)
             let directory = Path.GetDirectoryName filePath
             Directory.CreateDirectory directory |> ignore
             try

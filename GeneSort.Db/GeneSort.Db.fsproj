@@ -7,7 +7,9 @@
 
   <ItemGroup>
     <Compile Include="OutputData.fs" />
+    <Compile Include="QueryParams.fs" />
     <Compile Include="IGeneSortDb.fs" />
+    <Compile Include="IGeneSortDb2.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
