@@ -8,7 +8,7 @@ open GeneSort.Db
 open GeneSort.Runs.Params
 open GeneSort.Project
 
-type private DbMessage =
+type private DbMessage2 =
     | Save of runParameters option * outputData * AsyncReplyChannel<unit>
     | Load of runParameters option * outputDataType * AsyncReplyChannel<Result<outputData, OutputError>>
     | GetAllRunParameters of CancellationToken option * IProgress<string> option * AsyncReplyChannel<runParameters[]>
