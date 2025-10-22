@@ -5,49 +5,70 @@ open System
 open System.IO
 open System.Threading
 
+open FSharp.UMX
 open MessagePack
 open MessagePack.FSharp
 open MessagePack.Resolvers
 
 open GeneSort.Core
 open GeneSort.Db
+open GeneSort.Sorter.Sorter
+open GeneSort.Sorter.Sortable
+open GeneSort.Model.Sorter
+open GeneSort.Model.Sortable
 open GeneSort.Model.Mp.Sorter
 open GeneSort.Model.Mp.Sortable
 open GeneSort.Sorter.Mp.Sorter
 open GeneSort.Sorter.Mp.Sortable
+open GeneSort.SortingResults
 open GeneSort.SortingResults.Mp
+open GeneSort.SortingOps
 open GeneSort.SortingOps.Mp
 open GeneSort.Runs.Params
 open GeneSort.Runs.Mp
+open GeneSort.Runs
+open GeneSort.Db.OutputData
 
 
      
-module OutputDataFile =
-    /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
+module OutputDataFile2 =
+
+    let getFilesSortedByCreationTime (directoryPath: string) : string list =
+        Directory.GetFiles(directoryPath)
+        |> Array.map (fun filePath -> filePath, File.GetCreationTime(filePath))
+        |> Array.sortBy snd
+        |> Array.map fst
+        |> Array.toList
+
+
+        /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
+
 
     let getOutputDataFolder (projectFolder:string) (outputDataType: outputDataType) 
                     : string =
         Path.Combine(projectFolder, outputDataType |> OutputDataType.toString)
 
-    let makeIndexAndReplPathFromQueryParams 
+
+
+
+    let makeIndexAndReplPath 
                 (projectFolder:string) 
-                (queryParams:queryParams)
+                (runParameters:runParameters)
                 (outputDataType: outputDataType) : string =
 
         let outputDataFolder = getOutputDataFolder projectFolder outputDataType
-        match queryParams.index, queryParams.repl with
-        | Some index, Some repl ->
-            let outputDataName = outputDataType |> OutputDataType.toString
-            let fileName = sprintf "%s_%d_%d.msgpack" outputDataName repl index 
-            Path.Combine(outputDataFolder, fileName)
-        | _ -> 
-            failwithf "Index and Repl must be provided in queryParams for output data type %s" (outputDataType |> OutputDataType.toString)
+        let index = runParameters.GetIndex()
+        let repl = runParameters.GetRepl()
+        let outputDataName = outputDataType |> OutputDataType.toString
+        let fileName = sprintf "%s_%d_%d.msgpack" outputDataName %repl %index 
+        Path.Combine(outputDataFolder, fileName)
 
-    let getOutputDataFilePath
+
+    let getAllOutputDataFilePaths
             (projectFolder: string)
-            (queryParams: queryParams)
+            (runParameters: runParameters option)
             (outputDataType: outputDataType) 
                 : string =
 
@@ -56,15 +77,35 @@ module OutputDataFile =
             let fileName = sprintf "%s.msgpack" (outputDataType |> OutputDataType.toString)
             Path.Combine(projectFolder, fileName)
         | _ -> 
-            makeIndexAndReplPathFromQueryParams projectFolder queryParams outputDataType
+            if runParameters.IsNone then
+                failwithf "Run parameters must be provided for output data type %s" (outputDataType |> OutputDataType.toString)
+            makeIndexAndReplPath projectFolder runParameters.Value outputDataType
+
+
+    let getAllOutputDataFilePathsFromQueryParameters
+            (projectFolder: string)
+            (runParameters: runParameters option)
+            (outputDataType: outputDataType) 
+                : string =
+
+        match outputDataType with
+        | outputDataType.Project -> 
+            let fileName = sprintf "%s.msgpack" (outputDataType |> OutputDataType.toString)
+            Path.Combine(projectFolder, fileName)
+        | _ -> 
+            if runParameters.IsNone then
+                failwithf "Run parameters must be provided for output data type %s" (outputDataType |> OutputDataType.toString)
+            makeIndexAndReplPath projectFolder runParameters.Value outputDataType
+
+
 
     let getOutputDataAsync
             (projectFolder: string)
-            (queryParams: queryParams)
+            (runParameters: runParameters option)
             (outputDataType: outputDataType) 
                 : Async<Result<outputData, OutputError>> =
         async {
-            let filePath = getOutputDataFilePath projectFolder queryParams outputDataType
+            let filePath = getAllOutputDataFilePaths projectFolder runParameters outputDataType
             if not (File.Exists filePath) then
                 return Error (sprintf "File not found: %s" filePath)
             else
@@ -112,13 +153,104 @@ module OutputDataFile =
                 return Error (sprintf "Error reading file %s: %s" filePath e.Message)
         }
 
+
+    let getRunParametersAsync (projectFolder: string) (runParameters: runParameters) : Async<Result<runParameters, OutputError>> =
+        async {
+            let! result = getOutputDataAsync projectFolder (Some runParameters) outputDataType.RunParameters
+            return 
+                match result with
+                | Ok (RunParameters r) -> Ok r
+                | Ok _ -> Error "Unexpected output data type: expected RunParameters"
+                | Error err -> Error err
+        }
+
+    let getSorterSetAsync (projectFolder: string) (runParameters: runParameters) : Async<Result<sorterSet, OutputError>> =
+        async {
+            let! result = getOutputDataAsync projectFolder (Some runParameters) outputDataType.SorterSet
+            return 
+                match result with
+                | Ok (SorterSet ss) -> Ok ss
+                | Ok _ -> Error "Unexpected output data type: expected SorterSet"
+                | Error err -> Error err
+        }
+
+    let getSortableTestSetAsync (projectFolder: string) (runParameters: runParameters) : Async<Result<sortableTestSet, OutputError>> =
+        async {
+            let! result = getOutputDataAsync projectFolder (Some runParameters) outputDataType.SortableTestSet
+            return 
+                match result with
+                | Ok (SortableTestSet sts) -> Ok sts
+                | Ok _ -> Error "Unexpected output data type: expected SortableTestSet"
+                | Error err -> Error err
+        }
+
+    let getSorterModelSetMakerAsync (projectFolder: string) (runParameters: runParameters) : Async<Result<sorterModelSetMaker, OutputError>> =
+        async {
+            let! result = getOutputDataAsync projectFolder (Some runParameters) outputDataType.SorterModelSetMaker
+            return 
+                match result with
+                | Ok (SorterModelSetMaker sms) -> Ok sms
+                | Ok _ -> Error "Unexpected output data type: expected SorterModelSetMaker"
+                | Error err -> Error err
+        }
+
+    let getSortableTestModelSetAsync (projectFolder: string) (runParameters: runParameters) : Async<Result<sortableTestModelSet, OutputError>> =
+        async {
+            let! result = getOutputDataAsync projectFolder (Some runParameters) outputDataType.SortableTestModelSet
+            return 
+                match result with
+                | Ok (SortableTestModelSet sts) -> Ok sts
+                | Ok _ -> Error "Unexpected output data type: expected SortableTestModelSet"
+                | Error err -> Error err
+        }
+
+    let getSortableTestModelSetMakerAsync (projectFolder: string) (runParameters: runParameters) : Async<Result<sortableTestModelSetMaker, OutputError>> =
+        async {
+            let! result = getOutputDataAsync projectFolder (Some runParameters) outputDataType.SortableTestModelSetMaker
+            return 
+                match result with
+                | Ok (SortableTestModelSetMaker stsm) -> Ok stsm
+                | Ok _ -> Error "Unexpected output data type: expected SortableTestModelSetMaker"
+                | Error err -> Error err
+        }
+
+    let getSorterSetEvalAsync (projectFolder: string) (runParameters: runParameters) : Async<Result<sorterSetEval, OutputError>> =
+        async {
+            let! result = getOutputDataAsync projectFolder (Some runParameters) outputDataType.SorterSetEval
+            return 
+                match result with
+                | Ok (SorterSetEval sse) -> Ok sse
+                | Ok _ -> Error "Unexpected output data type: expected SorterSetEval"
+                | Error err -> Error err
+        }
+
+    let getSorterSetEvalBinsAsync (projectFolder: string) (runParameters: runParameters) : Async<Result<sorterSetEvalBins, OutputError>> =
+        async {
+            let! result = getOutputDataAsync projectFolder (Some runParameters) outputDataType.SorterSetEvalBins
+            return 
+                match result with
+                | Ok (SorterSetEvalBins sse) -> Ok sse
+                | Ok _ -> Error "Unexpected output data type: expected SorterSetEvalBins"
+                | Error err -> Error err
+        }
+
+    let getProjectAsync (projectFolder: string) : Async<Result<project, OutputError>> =
+        async {
+            let! result = getOutputDataAsync projectFolder None outputDataType.Project
+            return 
+                match result with
+                | Ok (Project w) -> Ok w
+                | Ok _ -> Error "Unexpected output data type: expected Project"
+                | Error err -> Error err
+        }
+
+
     let saveToFileAsync 
             (projectFolder: string)
-            (queryParams: queryParams)
+            (runParameters: runParameters option)
             (outputData: outputData) : Async<unit> =
         async {
-            let outputDataType = outputData |> OutputData.getOutputDataType
-            let filePath = getOutputDataFilePath projectFolder queryParams outputDataType
+            let filePath = getAllOutputDataFilePaths projectFolder runParameters (outputData |> getOutputDataType)
             let directory = Path.GetDirectoryName filePath
             Directory.CreateDirectory directory |> ignore
             try
@@ -157,17 +289,13 @@ module OutputDataFile =
                 raise e // Re-throw to ensure the caller is aware of the failure
         }
 
-    let getFilesSortedByCreationTime (directoryPath: string) : string list =
-        Directory.GetFiles(directoryPath)
-        |> Array.map (fun filePath -> filePath, File.GetCreationTime(filePath))
-        |> Array.sortBy snd
-        |> Array.map fst
-        |> Array.toList
+
 
     let getAllRunParametersAsync 
                 (projectFolder: string) 
                 (ct: CancellationToken option) 
                 (progress: IProgress<string> option) : Async<runParameters[]> =
+
 
         let _getRPFileAsync (runFilePath: string) (ct: CancellationToken option) : Async<Result<runParameters, string>> =
             async {

@@ -13,17 +13,17 @@ open GeneSort.SortingResults
 open GeneSort.Runs
 
 type IGeneSortDb =
-        abstract member saveAsync :  runParameters option -> outputData -> Async<unit>
-        abstract member loadAsync : runParameters option -> outputDataType -> Async<Result<outputData, OutputError>>
+        abstract member saveAsync :  queryParams -> outputData -> Async<unit>
+        abstract member loadAsync : queryParams -> outputDataType -> Async<Result<outputData, OutputError>>
         abstract member getAllRunParametersAsync : CancellationToken option -> IProgress<string> option -> Async<runParameters[]>
 
 
 
 module GeneSortDb =
     
-    let getRunParametersAsync (geneSortDb: IGeneSortDb) (runParameters: runParameters) : Async<Result<runParameters, OutputError>> =
+    let getRunParametersAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<runParameters, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync (Some runParameters) outputDataType.RunParameters
+            let! result = geneSortDb.loadAsync queryParams outputDataType.RunParameters
             return 
                 match result with
                 | Ok (RunParameters rp) -> Ok rp
@@ -31,9 +31,9 @@ module GeneSortDb =
                 | Error err -> Error err
         }
     
-    let getSorterSetAsync (geneSortDb: IGeneSortDb) (runParameters: runParameters) : Async<Result<sorterSet, OutputError>> =
+    let getSorterSetAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sorterSet, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync (Some runParameters) outputDataType.SorterSet
+            let! result = geneSortDb.loadAsync queryParams outputDataType.SorterSet
             return 
                 match result with
                 | Ok (SorterSet ss) -> Ok ss
@@ -41,9 +41,9 @@ module GeneSortDb =
                 | Error err -> Error err
         }
     
-    let getSortableTestSetAsync (geneSortDb: IGeneSortDb) (runParameters: runParameters) : Async<Result<sortableTestSet, OutputError>> =
+    let getSortableTestSetAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sortableTestSet, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync (Some runParameters) outputDataType.SortableTestSet
+            let! result = geneSortDb.loadAsync queryParams outputDataType.SortableTestSet
             return 
                 match result with
                 | Ok (SortableTestSet sts) -> Ok sts
@@ -51,9 +51,9 @@ module GeneSortDb =
                 | Error err -> Error err
         }
     
-    let getSorterModelSetMakerAsync (geneSortDb: IGeneSortDb) (runParameters: runParameters) : Async<Result<sorterModelSetMaker, OutputError>> =
+    let getSorterModelSetMakerAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sorterModelSetMaker, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync (Some runParameters) outputDataType.SorterModelSetMaker
+            let! result = geneSortDb.loadAsync queryParams outputDataType.SorterModelSetMaker
             return 
                 match result with
                 | Ok (SorterModelSetMaker smsm) -> Ok smsm
@@ -61,9 +61,9 @@ module GeneSortDb =
                 | Error err -> Error err
         }
     
-    let getSortableTestModelSetAsync (geneSortDb: IGeneSortDb) (runParameters: runParameters) : Async<Result<sortableTestModelSet, OutputError>> =
+    let getSortableTestModelSetAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sortableTestModelSet, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync (Some runParameters) outputDataType.SortableTestModelSet
+            let! result = geneSortDb.loadAsync queryParams outputDataType.SortableTestModelSet
             return 
                 match result with
                 | Ok (SortableTestModelSet stms) -> Ok stms
@@ -71,9 +71,9 @@ module GeneSortDb =
                 | Error err -> Error err
         }
     
-    let getSortableTestModelSetMakerAsync (geneSortDb: IGeneSortDb) (runParameters: runParameters) : Async<Result<sortableTestModelSetMaker, OutputError>> =
+    let getSortableTestModelSetMakerAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sortableTestModelSetMaker, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync (Some runParameters) outputDataType.SortableTestModelSetMaker
+            let! result = geneSortDb.loadAsync queryParams outputDataType.SortableTestModelSetMaker
             return 
                 match result with
                 | Ok (SortableTestModelSetMaker stmsm) -> Ok stmsm
@@ -81,9 +81,9 @@ module GeneSortDb =
                 | Error err -> Error err
         }
     
-    let getSorterSetEvalAsync (geneSortDb: IGeneSortDb) (runParameters: runParameters) : Async<Result<sorterSetEval, OutputError>> =
+    let getSorterSetEvalAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sorterSetEval, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync (Some runParameters) outputDataType.SorterSetEval
+            let! result = geneSortDb.loadAsync queryParams outputDataType.SorterSetEval
             return 
                 match result with
                 | Ok (SorterSetEval sse) -> Ok sse
@@ -91,9 +91,9 @@ module GeneSortDb =
                 | Error err -> Error err
         }
     
-    let getSorterSetEvalBinsAsync (geneSortDb: IGeneSortDb) (runParameters: runParameters) : Async<Result<sorterSetEvalBins, OutputError>> =
+    let getSorterSetEvalBinsAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sorterSetEvalBins, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync (Some runParameters) outputDataType.SorterSetEvalBins
+            let! result = geneSortDb.loadAsync queryParams outputDataType.SorterSetEvalBins
             return 
                 match result with
                 | Ok (SorterSetEvalBins sseb) -> Ok sseb
@@ -101,9 +101,9 @@ module GeneSortDb =
                 | Error err -> Error err
         }
     
-    let getProjectAsync (geneSortDb: IGeneSortDb) : Async<Result<project, OutputError>> =
+    let getProjectAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<project, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync None outputDataType.Project
+            let! result = geneSortDb.loadAsync queryParams outputDataType.Project
             return 
                 match result with
                 | Ok (Project p) -> Ok p

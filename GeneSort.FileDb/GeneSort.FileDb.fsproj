@@ -6,7 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="OutputDataFile2.fs" />
     <Compile Include="OutputDataFile.fs" />
+    <Compile Include="GeneSortDbMp2.fs" />
     <Compile Include="GeneSortDbMp.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

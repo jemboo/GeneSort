@@ -3,7 +3,7 @@ open GeneSort.Project
 open System
 open System.IO
 open System.Threading
-open GeneSort.Project.OutputDataFile
+open GeneSort.Project.OutputDataFile2
 open GeneSort.Db
 open GeneSort.Core
 
@@ -55,7 +55,7 @@ printfn $"**** QQQ ******** {startTime.ToString()}"
 //MergeIntEvals.RunSorterEvalReport (Path.Combine(rootDir, MergeIntEvals.project.ProjectName)) progress
 
 
-OutputDataFile.saveToFileAsync 
+OutputDataFile2.saveToFileAsync 
                     (Path.Combine(rootDir, RandomSorters4to64.project.ProjectName))
                     None 
                     (RandomSorters4to64.project |> outputData.Project)

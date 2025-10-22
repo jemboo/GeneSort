@@ -185,8 +185,8 @@ module RandomSorters4to64 =
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 
-            do! OutputDataFile.saveToFileAsync projectFolder (Some runParameters) (sorterSet |> outputData.SorterSet)
-            do! OutputDataFile.saveToFileAsync projectFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! OutputDataFile2.saveToFileAsync projectFolder (Some runParameters) (sorterSet |> outputData.SorterSet)
+            do! OutputDataFile2.saveToFileAsync projectFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             runParameters.SetRunFinished true
 

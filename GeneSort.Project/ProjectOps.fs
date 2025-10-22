@@ -47,7 +47,7 @@ module ProjectOps =
             (cts: CancellationTokenSource)  
             (progress: IProgress<string>) : Async<unit> = async {
 
-        let filePathRun = OutputDataFile.getAllOutputDataFilePaths 
+        let filePathRun = OutputDataFile2.getAllOutputDataFilePaths 
                             projectFolder
                             (Some runParameters)
                             outputDataType.RunParameters
@@ -57,7 +57,7 @@ module ProjectOps =
         else
             try
                 do! executor projectFolder runParameters cts progress
-                do! OutputDataFile.saveToFileAsync projectFolder (Some runParameters) (runParameters |> outputData.RunParameters)
+                do! OutputDataFile2.saveToFileAsync projectFolder (Some runParameters) (runParameters |> outputData.RunParameters)
             with e ->
                 printfn "Error processing Run %d: %s" (runParameters.GetIndex()) e.Message
     }

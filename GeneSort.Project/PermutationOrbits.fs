@@ -57,9 +57,9 @@ module PermutationOrbits =
                 let sorterTestModelGen = MsasORandGen.create randomType sortingWidth maxOrbiit |> SorterTestModelGen.MsasORandGen
                 let sorterTestModelSetMaker = sortableTestModelSetMaker.create sorterTestModelGen firstIndex testModelCount
                 let sorterTestModelSet = sorterTestModelSetMaker.MakeSortableTestModelSet
-                do! OutputDataFile.saveToFileAsync projectFolder (Some runParameters)
+                do! OutputDataFile2.saveToFileAsync projectFolder (Some runParameters)
                                           (sorterTestModelSet |> outputData.SortableTestModelSet)
-                do! OutputDataFile.saveToFileAsync projectFolder (Some runParameters)
+                do! OutputDataFile2.saveToFileAsync projectFolder (Some runParameters)
                                           (sorterTestModelSetMaker |> outputData.SortableTestModelSetMaker)
 
                 

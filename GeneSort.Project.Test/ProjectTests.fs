@@ -1,13 +1,10 @@
 ﻿namespace GeneSort.Project.Test
 
 open System
-open FSharp.UMX
-open Xunit
 open MessagePack.Resolvers
 open MessagePack
 open MessagePack.FSharp
 open System.IO
-open GeneSort.Project
 open System.Threading
 open GeneSort.Runs.Params
 open GeneSort.Runs
@@ -44,14 +41,13 @@ type ProjectTests() =
 
 
     // Helper to create a sample project
-    let createProject (rootDir: string) (parameterSets: list<string * list<string>>) =
+    let createProject (parameterSets: list<string * list<string>>) =
 
         let repls = [|"Rep1"|]
 
         Project.create
             "TestProject"
             "Test Description"
-            rootDir
             repls
             parameterSets
             paramMapRefiner
