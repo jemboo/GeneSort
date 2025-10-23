@@ -4,7 +4,7 @@ open GeneSort.Project
 open System
 open System.IO
 open System.Threading
-open GeneSort.Project.OutputDataFile2
+open GeneSort.Project.OutputDataFile
 open GeneSort.Db
 open GeneSort.Core
 open GeneSort.FileDb
@@ -57,18 +57,21 @@ printfn $"**** QQQ ******** {startTime.ToString()}"
 //MergeIntEvals.RunSorterEvalReport (Path.Combine(rootDir, MergeIntEvals.project.ProjectName)) progress
 
 
+
+
+
+//let geneSortDb = new GeneSortDbMp(Path.Combine(rootDir, PermutationOrbits.project.ProjectName)) :> IGeneSortDb
+//let projParams = queryParams.CreateForProject PermutationOrbits.project.ProjectName
+//geneSortDb.saveAsync projParams (PermutationOrbits.project |> outputData.Project) |> Async.RunSynchronously
+//PermutationOrbits.RunAll progress |> Async.RunSynchronously
+
+
+
 let geneSortDb = new GeneSortDbMp(Path.Combine(rootDir, RandomSorters4to64.project.ProjectName)) :> IGeneSortDb
 let projParams = queryParams.CreateForProject RandomSorters4to64.project.ProjectName
 geneSortDb.saveAsync projParams (RandomSorters4to64.project |> outputData.Project) |> Async.RunSynchronously
+RandomSorters4to64.RunAll geneSortDb progress |> Async.RunSynchronously
 
-
-//OutputDataFile2.saveToFileAsync 
-//                    (Path.Combine(rootDir, RandomSorters4to64.project.ProjectName))
-//                    None 
-//                    (RandomSorters4to64.project |> outputData.Project)
-//               |> Async.RunSynchronously      
-
-RandomSorters4to64.RunAll geneSortDb rootDir progress |> Async.RunSynchronously
 
 
 

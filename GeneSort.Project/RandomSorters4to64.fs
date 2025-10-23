@@ -204,10 +204,9 @@ module RandomSorters4to64 =
 
     let RunAll
         (db:IGeneSortDb)
-        (rootFolder:string)
         (progress: IProgress<string>) =
         let cts = new CancellationTokenSource()
-        ProjectOps.executeRunParametersSeq db rootFolder project 8 executor project.RunParametersArray cts progress
+        ProjectOps.executeRunParametersSeq db project 8 executor project.RunParametersArray cts progress
 
 
 

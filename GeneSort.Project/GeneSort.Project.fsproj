@@ -6,13 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Remove="Old\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="ProjectOps.fs" />
-    <Compile Include="Old\RandomSorters4to64.fs" />
-    <Compile Include="Old\PermutationOrbits.fs" />
-    <Compile Include="Old\FullBoolEvals.fs" />
-    <Compile Include="Old\FullBoolGenAndEvals.fs" />
-    <Compile Include="Old\MergeIntEvals.fs" />
+    <Compile Include="PermutationOrbits.fs" />
+    <Compile Include="MergeIntEvals.fs" />
+    <Compile Include="FullBoolGenAndEvals.fs" />
     <Compile Include="RandomSorters4to64.fs" />
+    <Compile Include="FullBoolEvals.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

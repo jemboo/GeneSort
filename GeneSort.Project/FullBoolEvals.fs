@@ -271,11 +271,11 @@ module FullBoolEvals =
     //            raise ex
 
 
-    let RunAll
-        (rootFolder: string)
-        (progress: IProgress<string>) =
-        let cts = new CancellationTokenSource()
-        ProjectOps.executeRunParametersSeq2 rootFolder project 8 executor project.RunParametersArray cts progress
+    //let RunAll
+    //    (rootFolder: string)
+    //    (progress: IProgress<string>) =
+    //    let cts = new CancellationTokenSource()
+    //    ProjectOps.executeRunParametersSeq2 rootFolder project 8 executor project.RunParametersArray cts progress
 
 
 
