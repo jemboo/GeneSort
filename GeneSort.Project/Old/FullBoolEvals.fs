@@ -1,5 +1,5 @@
 ﻿
-namespace GeneSort.Project
+namespace GeneSort.Project.Old
 
 open System
 open System.IO
@@ -14,6 +14,7 @@ open GeneSort.SortingResults
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.Runs
+open GeneSort.Project
 open GeneSort.Db
 
 

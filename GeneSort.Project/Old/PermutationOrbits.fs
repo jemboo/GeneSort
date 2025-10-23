@@ -1,5 +1,5 @@
 ﻿
-namespace GeneSort.Project
+namespace GeneSort.Project.Old
 
 open System
 open System.IO
@@ -16,6 +16,7 @@ open System.Threading
 open GeneSort.Runs.Params
 open GeneSort.Runs
 open GeneSort.Db
+open GeneSort.Project
 
 
 module PermutationOrbits = 

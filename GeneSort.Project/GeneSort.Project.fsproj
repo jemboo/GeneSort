@@ -7,11 +7,12 @@
 
   <ItemGroup>
     <Compile Include="ProjectOps.fs" />
-    <Compile Include="PermutationOrbits.fs" />
+    <Compile Include="Old\RandomSorters4to64.fs" />
+    <Compile Include="Old\PermutationOrbits.fs" />
+    <Compile Include="Old\FullBoolEvals.fs" />
+    <Compile Include="Old\FullBoolGenAndEvals.fs" />
+    <Compile Include="Old\MergeIntEvals.fs" />
     <Compile Include="RandomSorters4to64.fs" />
-    <Compile Include="FullBoolEvals.fs" />
-    <Compile Include="FullBoolGenAndEvals.fs" />
-    <Compile Include="MergeIntEvals.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -28,6 +29,7 @@
     <ProjectReference Include="..\GeneSort.Db\GeneSort.Db.fsproj" />
     <ProjectReference Include="..\GeneSort.FileDb\GeneSort.FileDb.fsproj" />
     <ProjectReference Include="..\GeneSort.Model.Mp\GeneSort.Model.Mp.fsproj" />
+    <ProjectReference Include="..\GeneSort.Model.Test\GeneSort.Model.Test.fsproj" />
     <ProjectReference Include="..\GeneSort.Runs.Mp\GeneSort.Runs.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Runs\GeneSort.Runs.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorter.Mp\GeneSort.Sorter.Mp.fsproj" />
