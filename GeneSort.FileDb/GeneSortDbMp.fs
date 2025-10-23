@@ -48,6 +48,10 @@ type GeneSortDbMp(projectFolder: string) =
     )
     
     member _.ProjectFolder = projectFolder
+
+    member this.ProjectName 
+        with get() = 
+            System.IO.Path.GetFileName(this.ProjectFolder.TrimEnd('/', '\\'))
     
     interface IGeneSortDb with
         member _.saveAsync (queryParams: queryParams) (data: outputData) : Async<unit> =
@@ -58,4 +62,6 @@ type GeneSortDbMp(projectFolder: string) =
         
         member _.getAllRunParametersAsync (ct: CancellationToken option) (progress: IProgress<string> option) : Async<runParameters[]> =
             mailbox.PostAndAsyncReply(fun channel -> GetAllRunParameters(ct, progress, channel))
+
+        member this.ProjectName : string = this.ProjectName
 

@@ -332,7 +332,7 @@ module FullBoolGenAndEvals =
         (rootFolder:string)
         (progress: IProgress<string>) =
         let cts = new CancellationTokenSource()
-        ProjectOps.executeRunParametersSeq rootFolder project 8 executor project.RunParametersArray cts progress
+        ProjectOps.executeRunParametersSeq2 rootFolder project 8 executor project.RunParametersArray cts progress
 
 
     let RunSorterEvalReport (projectFolder: string) =

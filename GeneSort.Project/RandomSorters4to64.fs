@@ -148,7 +148,7 @@ module RandomSorters4to64 =
 
 
     let executor 
-            (projectFolder:string)
+            (db:IGeneSortDb)
             (runParameters: runParameters) 
             (cts: CancellationTokenSource) 
             (progress: IProgress<string>) : Async<unit> =
@@ -185,8 +185,11 @@ module RandomSorters4to64 =
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 
-            do! OutputDataFile2.saveToFileAsync projectFolder (Some runParameters) (sorterSet |> outputData.SorterSet)
-            do! OutputDataFile2.saveToFileAsync projectFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            let queryParamsForSorterSet = queryParams.Create(db.ProjectName, Some (runParameters.GetIndex()), Some (runParameters.GetRepl()), None, outputDataType.SorterSet)
+            do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet)
+            
+            let queryParamsForSorterModelSetMaker = queryParams.Create(db.ProjectName, Some (runParameters.GetIndex()), Some (runParameters.GetRepl()), None, outputDataType.SorterModelSetMaker)
+            do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             runParameters.SetRunFinished true
 
@@ -200,10 +203,11 @@ module RandomSorters4to64 =
 
 
     let RunAll
+        (db:IGeneSortDb)
         (rootFolder:string)
         (progress: IProgress<string>) =
         let cts = new CancellationTokenSource()
-        ProjectOps.executeRunParametersSeq rootFolder project 8 executor project.RunParametersArray cts progress
+        ProjectOps.executeRunParametersSeq db rootFolder project 8 executor project.RunParametersArray cts progress
 
 
 

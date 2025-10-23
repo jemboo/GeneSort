@@ -41,8 +41,9 @@ module ProjectOps =
 
 
     let executeRunParameters
+            (db:IGeneSortDb)
             (projectFolder: string)
-            (executor: string -> runParameters -> CancellationTokenSource -> IProgress<string> ->Async<unit>)
+            (executor: IGeneSortDb -> runParameters -> CancellationTokenSource -> IProgress<string> ->Async<unit>)
             (runParameters:runParameters) 
             (cts: CancellationTokenSource)  
             (progress: IProgress<string>) : Async<unit> = async {
@@ -56,15 +57,62 @@ module ProjectOps =
                     printfn "Skipping Run %d: Output file %s already exists" (runParameters.GetIndex()) filePathRun
         else
             try
-                do! executor projectFolder runParameters cts progress
+                do! executor db runParameters cts progress
+                let queryParamsForRunParams = queryParams.Create(db.ProjectName, Some (runParameters.GetIndex()), Some (runParameters.GetRepl()), None, outputDataType.RunParameters)
+                do! db.saveAsync queryParamsForRunParams (runParameters |> outputData.RunParameters)
+            with e ->
+                printfn "Error processing Run %d: %s" (runParameters.GetIndex()) e.Message
+    }
+
+
+    let executeRunParameters2
+            (projectFolder: string)
+            (executor2: string -> runParameters -> CancellationTokenSource -> IProgress<string> ->Async<unit>)
+            (runParameters:runParameters) 
+            (cts: CancellationTokenSource)  
+            (progress: IProgress<string>) : Async<unit> = async {
+
+        let filePathRun = OutputDataFile2.getAllOutputDataFilePaths 
+                            projectFolder
+                            (Some runParameters)
+                            outputDataType.RunParameters
+
+        if File.Exists filePathRun then
+                    printfn "Skipping Run %d: Output file %s already exists" (runParameters.GetIndex()) filePathRun
+        else
+            try
+                do! executor2 projectFolder runParameters cts progress
+                //let runParamQueryParams = queryParams.Create 
+                //do! db.saveAsync (runParameters |> queryParams.FromRunParameters) (runParameters |> outputData.RunParameters)
                 do! OutputDataFile2.saveToFileAsync projectFolder (Some runParameters) (runParameters |> outputData.RunParameters)
             with e ->
                 printfn "Error processing Run %d: %s" (runParameters.GetIndex()) e.Message
     }
 
 
-
     let executeRunParametersSeq
+        (db:IGeneSortDb)
+        (rootFolder:string)
+        (project: project)
+        (maxDegreeOfParallelism: int) 
+        (executor: IGeneSortDb -> runParameters -> CancellationTokenSource -> IProgress<string> -> Async<unit>)
+        (runParameters: runParameters seq)
+        (cts: CancellationTokenSource)
+        (progress: IProgress<string>)
+        : Async<unit> =
+
+        async {
+            cts.Token.ThrowIfCancellationRequested()  // Early cancel check
+            let projectFolder = Path.Combine(rootFolder, UMX.untag project.ProjectName)
+            let tasks =
+                runParameters
+                |> Seq.map (fun rps -> executeRunParameters db projectFolder executor rps cts progress)
+                |> Seq.toList
+
+            do! ParallelWithThrottle maxDegreeOfParallelism tasks
+        }
+
+    let executeRunParametersSeq2
         (rootFolder:string)
         (project: project)
         (maxDegreeOfParallelism: int) 
@@ -79,7 +127,7 @@ module ProjectOps =
             let projectFolder = Path.Combine(rootFolder, UMX.untag project.ProjectName)
             let tasks =
                 runParameters
-                |> Seq.map (fun rps -> executeRunParameters projectFolder executor rps cts progress)
+                |> Seq.map (fun rps -> executeRunParameters2 projectFolder executor rps cts progress)
                 |> Seq.toList
 
             do! ParallelWithThrottle maxDegreeOfParallelism tasks

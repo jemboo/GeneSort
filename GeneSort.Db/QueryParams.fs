@@ -10,15 +10,39 @@ open GeneSort.SortingResults
 open GeneSort.Runs.Params
 open GeneSort.Runs
 
-
 type queryParams =
-     { 
+    private {
         projectName: string
-        index: int option
-        repl: int option
-        generation: int option
+        index: int<indexNumber> option
+        repl: int<replNumber> option
+        generation: int<generationNumber> option
         outputDataType: outputDataType
     }
-
-     
-module QueryParams = ()
+    member this.ProjectName with get() = this.projectName
+    member this.Index with get() = this.index
+    member this.Repl with get() = this.repl
+    member this.Generation with get() = this.generation
+    member this.OutputDataType with get() = this.outputDataType
+    
+    static member Create(
+            projectName: string, 
+            index: int<indexNumber> option, 
+            repl: int<replNumber> option, 
+            generation: int<generationNumber> option, 
+            outputDataType: outputDataType) : queryParams =
+        {
+            projectName = projectName
+            index = index
+            repl = repl
+            generation = generation
+            outputDataType = outputDataType
+        }
+    
+    static member CreateForProject(projectName: string) : queryParams =
+        {
+            projectName = projectName
+            index = None
+            repl = None
+            generation = None
+            outputDataType = outputDataType.Project
+        }

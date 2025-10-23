@@ -37,7 +37,7 @@ module OutputDataFile =
                 (outputDataType: outputDataType) : string =
 
         let outputDataFolder = getOutputDataFolder projectFolder outputDataType
-        match queryParams.index, queryParams.repl with
+        match queryParams.Index, queryParams.Repl with
         | Some index, Some repl ->
             let outputDataName = outputDataType |> OutputDataType.toString
             let fileName = sprintf "%s_%d_%d.msgpack" outputDataName repl index 

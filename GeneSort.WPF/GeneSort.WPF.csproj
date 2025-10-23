@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
-    <ProjectReference Include="..\GeneSort.Dispatch\GeneSort.Dispatch.fsproj" />
     <ProjectReference Include="..\GeneSort.Model\GeneSort.Model.fsproj" />
     <ProjectReference Include="..\GeneSort.Project\GeneSort.Project.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorter\GeneSort.Sorter.fsproj" />
