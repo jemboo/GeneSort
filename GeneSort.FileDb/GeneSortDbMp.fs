@@ -1,28 +1,30 @@
 ﻿namespace GeneSort.FileDb
-
 open System
 open System.Threading
+open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Db
 open GeneSort.Runs.Params
 open GeneSort.Project
+open System.IO
 
 type private DbMessage =
     | Save of queryParams * outputData * AsyncReplyChannel<unit>
     | Load of queryParams * outputDataType * AsyncReplyChannel<Result<outputData, OutputError>>
-    | GetAllRunParameters of CancellationToken option * IProgress<string> option * AsyncReplyChannel<runParameters[]>
+    | GetAllRunParameters of string<projectName> * CancellationToken option * IProgress<string> option * AsyncReplyChannel<runParameters[]>
 
-
-type GeneSortDbMp(projectFolder: string) =
-    
+type GeneSortDbMp(rootFolder: string) =
     let saveAsync (queryParams: queryParams) (data: outputData) =
-        OutputDataFile.saveToFileAsync projectFolder queryParams data
+        OutputDataFile.saveToFileAsync rootFolder queryParams data
     
     let loadAsync (queryParams: queryParams) (dataType: outputDataType) =
-        OutputDataFile.getOutputDataAsync projectFolder queryParams dataType
+        OutputDataFile.getOutputDataAsync rootFolder queryParams dataType
     
-    let getAllRunParametersAsync (ct: CancellationToken option) (progress: IProgress<string> option) =
-        OutputDataFile.getAllRunParametersAsync projectFolder ct progress
+    let getProjectFolder (projectName: string<projectName>) = 
+        Path.Combine(rootFolder, %projectName)
+    
+    let getAllRunParametersAsync (projectName: string<projectName>) (ct: CancellationToken option) (progress: IProgress<string> option) =
+        OutputDataFile.getAllRunParametersAsync (getProjectFolder projectName) ct progress
     
     let mailbox = MailboxProcessor.Start(fun inbox ->
         let rec loop () =
@@ -38,8 +40,8 @@ type GeneSortDbMp(projectFolder: string) =
                     let! result = loadAsync queryParams dataType
                     replyChannel.Reply(result)
                     
-                | GetAllRunParameters (ct, progress, replyChannel) ->
-                    let! result = getAllRunParametersAsync ct progress
+                | GetAllRunParameters (projectName, ct, progress, replyChannel) ->
+                    let! result = getAllRunParametersAsync projectName ct progress
                     replyChannel.Reply(result)
                 
                 return! loop ()
@@ -47,11 +49,7 @@ type GeneSortDbMp(projectFolder: string) =
         loop ()
     )
     
-    member _.ProjectFolder = projectFolder
-
-    member this.ProjectName 
-        with get() = 
-            System.IO.Path.GetFileName(this.ProjectFolder.TrimEnd('/', '\\'))
+    member _.RootFolder = rootFolder
     
     interface IGeneSortDb with
         member _.saveAsync (queryParams: queryParams) (data: outputData) : Async<unit> =
@@ -60,8 +58,7 @@ type GeneSortDbMp(projectFolder: string) =
         member _.loadAsync (queryParams: queryParams) (dataType: outputDataType) : Async<Result<outputData, OutputError>> =
             mailbox.PostAndAsyncReply(fun channel -> Load(queryParams, dataType, channel))
         
-        member _.getAllRunParametersAsync (ct: CancellationToken option) (progress: IProgress<string> option) : Async<runParameters[]> =
-            mailbox.PostAndAsyncReply(fun channel -> GetAllRunParameters(ct, progress, channel))
+        member _.getAllRunParametersAsync (projectName: string<projectName>) (ct: CancellationToken option) (progress: IProgress<string> option) : Async<runParameters[]> =
+            mailbox.PostAndAsyncReply(fun channel -> GetAllRunParameters(projectName, ct, progress, channel))
 
-        member this.ProjectName : string = this.ProjectName
 

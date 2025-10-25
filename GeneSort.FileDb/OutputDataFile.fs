@@ -211,3 +211,44 @@ module OutputDataFile =
             return results |> List.rev |> List.toArray  // Reverse to maintain original order
         }
 
+
+
+    //let saveAllRunParametersAsync 
+    //        (projectFolder: string) 
+    //        (runParametersArray: runParameters[])
+    //        (ct: CancellationToken option) 
+    //        (progress: IProgress<string> option) : Async<unit> =
+    //    async {
+    //        let folder = getOutputDataFolder projectFolder outputDataType.RunParameters
+    //        Directory.CreateDirectory folder |> ignore
+            
+    //        match progress with
+    //        | None -> ()
+    //        | Some p -> p.Report(sprintf "Saving %d run parameters to %s" runParametersArray.Length folder)
+            
+    //        for i = 0 to runParametersArray.Length - 1 do
+    //            match ct with
+    //            | None -> ()
+    //            | Some t -> t.ThrowIfCancellationRequested()
+                
+    //            let runParams = runParametersArray.[i]
+    //            let qps = queryParams.Create(runParams.GetProjectName(), (Some runParams.GetIndex()), (Some runParams.GetRepl()), None, outputDataType.RunParameters) |> ignore
+
+                
+    //            let filePath = getOutputDataFilePath projectFolder queryParams outputDataType.RunParameters
+                
+    //            try
+    //                use stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None)
+    //                let dto = RunParametersDto.fromDomain runParams
+    //                do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                    
+    //                match progress with
+    //                | None -> ()
+    //                | Some p -> p.Report(sprintf "Saved %d/%d" (i + 1) runParametersArray.Length)
+    //            with e ->
+    //                let errorMsg = sprintf "Error saving run parameters %d/%d to %s: %s" (i + 1) runParametersArray.Length filePath e.Message
+    //                match progress with
+    //                | None -> ()
+    //                | Some p -> p.Report(errorMsg)
+    //                // Decide: continue or fail-fast? Currently continuing...
+    //    }

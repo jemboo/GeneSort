@@ -49,7 +49,7 @@ module ProjectOps =
 
         try
             do! executor db runParameters cts progress
-            let queryParamsForRunParams = queryParams.Create(db.ProjectName, Some (runParameters.GetIndex()), Some (runParameters.GetRepl()), None, outputDataType.RunParameters)
+            let queryParamsForRunParams = queryParams.Create(runParameters.GetProjectName(), Some (runParameters.GetIndex()), Some (runParameters.GetRepl()), None, outputDataType.RunParameters)
             do! db.saveAsync queryParamsForRunParams (runParameters |> outputData.RunParameters)
         with e ->
             printfn "Error processing Run %d: %s" (runParameters.GetIndex()) e.Message
@@ -58,7 +58,6 @@ module ProjectOps =
 
     let executeRunParametersSeq
         (db:IGeneSortDb)
-        (project: project)
         (maxDegreeOfParallelism: int) 
         (executor: IGeneSortDb -> runParameters -> CancellationTokenSource -> IProgress<string> -> Async<unit>)
         (runParameters: runParameters seq)

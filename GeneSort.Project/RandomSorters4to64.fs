@@ -112,6 +112,7 @@ module RandomSorters4to64 =
         let mutable index = 0
 
         let enhancer (runParameters : runParameters) : runParameters =
+            runParameters.SetRunFinished false
             let repl = runParameters.GetRepl()
             runParameters.SetProjectName projectName
             let sortingWidth = runParameters.GetSortingWidth()
@@ -152,7 +153,7 @@ module RandomSorters4to64 =
             (cts: CancellationTokenSource) 
             (progress: IProgress<string>) : Async<unit> =
         async {
-
+            let projectName = runParameters.GetProjectName()
             let index = runParameters.GetIndex()
             let repl = runParameters.GetRepl()  
             let sorterModelKey = runParameters.GetSorterModelKey()
@@ -184,10 +185,10 @@ module RandomSorters4to64 =
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 
-            let queryParamsForSorterSet = queryParams.Create(db.ProjectName, Some (runParameters.GetIndex()), Some (runParameters.GetRepl()), None, outputDataType.SorterSet)
+            let queryParamsForSorterSet = queryParams.Create(projectName, Some (runParameters.GetIndex()), Some (runParameters.GetRepl()), None, outputDataType.SorterSet)
             do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet)
             
-            let queryParamsForSorterModelSetMaker = queryParams.Create(db.ProjectName, Some (runParameters.GetIndex()), Some (runParameters.GetRepl()), None, outputDataType.SorterModelSetMaker)
+            let queryParamsForSorterModelSetMaker = queryParams.Create(projectName, Some (runParameters.GetIndex()), Some (runParameters.GetRepl()), None, outputDataType.SorterModelSetMaker)
             do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             runParameters.SetRunFinished true
@@ -205,7 +206,7 @@ module RandomSorters4to64 =
         (db:IGeneSortDb)
         (progress: IProgress<string>) =
         let cts = new CancellationTokenSource()
-        ProjectOps.executeRunParametersSeq db project 8 executor project.RunParametersArray cts progress
+        ProjectOps.executeRunParametersSeq db 8 executor project.RunParametersArray cts progress
 
 
 
