@@ -29,6 +29,8 @@ type runParameters =
     static member sortingWidthKey = "SortingWidth"
     static member stageLengthKey = "StageLength"
     static member ceLengthKey = "CeLength"
+    static member projectNameKey = "ProjectName"
+    static member textReportNameKey = "ReportName"
 
 
     member this.ParamMap with get() = this.paramMap
@@ -38,6 +40,8 @@ type runParameters =
         |> Map.toList
         |> List.map (fun (k, v) -> sprintf "%s: %s" k v)
         |> String.concat ", "
+
+
 
     /// Gets the Index value.
     member this.GetIndex() : int<indexNumber> =
@@ -74,7 +78,7 @@ type runParameters =
 
 
 
-    /// Gets the Repl value.
+    /// Gets the Generation value.
     member this.GetGeneration() : int<generationNumber> =
         match this.paramMap.TryFind runParameters.generationKey with
         | Some value -> 
@@ -83,7 +87,7 @@ type runParameters =
             | false, _ -> failwith "Invalid Generation value"
         | None -> failwith "Repl parameter not found"
 
-    /// Sets the Repl value.
+    /// Sets the Generation value.
     member this.SetGeneration(repl: int<generationNumber>) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.generationKey, (UMX.untag repl).ToString())
 
@@ -210,6 +214,38 @@ type runParameters =
             | true, v -> LanguagePrimitives.Int32WithMeasure v |> UMX.tag<sorterCount>
             | false, _ -> failwith "Invalid SorterCount value"
         | None -> failwith "SorterCount parameter not found"
+
+
+
+    /// Sets the ProjectName value.
+    member this.SetProjectName(projectName: string) : unit =
+       this.paramMap <- this.paramMap.Add(runParameters.projectNameKey, projectName)
+
+    /// Gets the ProjectName value.
+    member this.GetProjectName() : string =
+        match this.paramMap.TryFind runParameters.projectNameKey with
+        | Some value -> value
+        | None -> failwith "ProjectName parameter not found"
+
+
+
+    /// Sets the TextReportName value.
+    member this.SetTextReportName(reportName: string) : unit =
+       this.paramMap <- this.paramMap.Add(runParameters.textReportNameKey, reportName)
+
+    /// Gets the TextReportName value.
+    member this.GetTextReportName() : string =
+        match this.paramMap.TryFind runParameters.textReportNameKey with
+        | Some value -> value
+        | None -> failwith "TextReportName parameter not found"
+
+
+
+
+
+
+
+
 
 
 

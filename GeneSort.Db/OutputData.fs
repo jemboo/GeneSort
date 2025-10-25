@@ -21,6 +21,7 @@ type outputDataType =
     | SorterSetEval
     | SorterSetEvalBins
     | Project
+    | TextReport
 
 
      
@@ -37,6 +38,7 @@ module OutputDataType =
         | SorterSetEval -> "SorterSetEval"
         | SorterSetEvalBins -> "SorterSetEvalBins"
         | Project -> "Project"
+        | TextReport -> "TextReport"
 
 
 type outputData =
@@ -49,6 +51,7 @@ type outputData =
     | SorterSetEval of sorterSetEval
     | SorterSetEvalBins of sorterSetEvalBins
     | Project of project
+    | TextReport of string
 
 
      
@@ -65,3 +68,4 @@ module OutputData =
         | SorterSetEval _ -> outputDataType.SorterSetEval
         | SorterSetEvalBins _ -> outputDataType.SorterSetEvalBins
         | Project _ -> outputDataType.Project
+        | TextReport _ -> outputDataType.TextReport

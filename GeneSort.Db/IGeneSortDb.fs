@@ -2,6 +2,9 @@
 
 open System
 open System.Threading
+
+open FSharp.UMX
+
 open GeneSort.Core
 open GeneSort.Runs.Params
 open GeneSort.Sorter.Sorter
@@ -15,8 +18,7 @@ open GeneSort.Runs
 type IGeneSortDb =
         abstract member saveAsync :  queryParams -> outputData -> Async<unit>
         abstract member loadAsync : queryParams -> outputDataType -> Async<Result<outputData, OutputError>>
-        abstract member getAllRunParametersAsync : CancellationToken option -> IProgress<string> option -> Async<runParameters[]>
-        abstract member ProjectName : string  
+        abstract member getAllRunParametersAsync : string<projectName> ->  CancellationToken option -> IProgress<string> option -> Async<runParameters[]>
 
 
 module GeneSortDb =
