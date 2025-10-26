@@ -14,18 +14,26 @@ type private DbMessage =
     | GetAllRunParameters of string<projectName> * CancellationToken option * IProgress<string> option * AsyncReplyChannel<runParameters[]>
 
 type GeneSortDbMp(rootFolder: string) =
+
+    let getProjectFolder (queryParams: queryParams) =
+        Path.Combine(rootFolder, %queryParams.ProjectName)
+
     let saveAsync (queryParams: queryParams) (data: outputData) =
-        OutputDataFile.saveToFileAsync rootFolder queryParams data
+        OutputDataFile.saveToFileAsync (getProjectFolder queryParams) queryParams data
     
     let loadAsync (queryParams: queryParams) (dataType: outputDataType) =
-        OutputDataFile.getOutputDataAsync rootFolder queryParams dataType
+        OutputDataFile.getOutputDataAsync (getProjectFolder queryParams) queryParams dataType
     
     let getProjectFolder (projectName: string<projectName>) = 
         Path.Combine(rootFolder, %projectName)
     
-    let getAllRunParametersAsync (projectName: string<projectName>) (ct: CancellationToken option) (progress: IProgress<string> option) =
+    let getAllRunParametersAsync 
+                (projectName: string<projectName>) 
+                (ct: CancellationToken option) 
+                (progress: IProgress<string> option) =
         OutputDataFile.getAllRunParametersAsync (getProjectFolder projectName) ct progress
     
+
     let mailbox = MailboxProcessor.Start(fun inbox ->
         let rec loop () =
             async {
@@ -60,5 +68,25 @@ type GeneSortDbMp(rootFolder: string) =
         
         member _.getAllRunParametersAsync (projectName: string<projectName>) (ct: CancellationToken option) (progress: IProgress<string> option) : Async<runParameters[]> =
             mailbox.PostAndAsyncReply(fun channel -> GetAllRunParameters(projectName, ct, progress, channel))
+
+        member this.saveAllRunParametersAsync 
+                        (projectName: string<projectName>) 
+                        (runParamsArray: runParameters[]) 
+                        (ct: CancellationToken option) 
+                        (progress: IProgress<string> option) : Async<unit> =
+            async {
+                for runParams in runParamsArray do
+                    let queryParamsForRunParams = queryParams.Create(
+                                runParams.GetProjectName().Value,
+                                runParams.GetIndex(),
+                                runParams.GetRepl(), 
+                                None, 
+                                outputDataType.RunParameters)
+                    do! (this :> IGeneSortDb).saveAsync queryParamsForRunParams (runParams |> outputData.RunParameters)
+                    match progress with
+                    | Some p -> p.Report(sprintf "Saved RunParameters for Run %d" (runParams.GetIndex().Value))
+                    | None -> ()
+                return ()
+            }
 
 

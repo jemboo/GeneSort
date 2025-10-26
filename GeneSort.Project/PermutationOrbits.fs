@@ -2,26 +2,20 @@
 namespace GeneSort.Project
 
 open System
-open System.IO
 
 open FSharp.UMX
-open MessagePack
-open MessagePack.FSharp
-open MessagePack.Resolvers
 
 open GeneSort.Core
 open GeneSort.Sorter.Sortable
 open GeneSort.Model.Sortable
-open System.Threading
 open GeneSort.Runs.Params
 open GeneSort.Runs
 open GeneSort.Db
-open GeneSort.Project
 
 
 module PermutationOrbits = 
 
-    let experimentName = "PermutationOrbits"
+    let projectName = "PermutationOrbits"  |> UMX.tag<projectName>
     let experimentDesc = "Count Permutation Orbit lengths"
 
     let randomType = rngType.Lcg
@@ -38,7 +32,7 @@ module PermutationOrbits =
     let parameterSet = 
         [ sortingWidths(); ]
 
-    let project = Project.create experimentName experimentDesc [||] parameterSet (fun s -> s)
+    let project = Project.create projectName experimentDesc [||] parameterSet (fun s -> s)
 
     //let executor 
     //        (projectFolder: string)
@@ -79,7 +73,7 @@ module PermutationOrbits =
                 Console.WriteLine(sprintf 
                                     "Generating Permutation orbit count report for %s in project %s" 
                                     (outputDataType.SortableTestModelSet |> OutputDataType.toString ) 
-                                    project.ProjectName)
+                                    %project.ProjectName)
                 
                 let reportFilePath = ""
 

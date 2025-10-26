@@ -6,6 +6,7 @@ open FSharp.UMX
 open GeneSort.Sorter.Sortable
 
 [<Measure>] type projectName
+[<Measure>] type textReportName
 [<Measure>] type indexNumber
 [<Measure>] type replNumber
 [<Measure>] type generationNumber
@@ -44,13 +45,14 @@ type runParameters =
 
 
     /// Gets the Index value.
-    member this.GetIndex() : int<indexNumber> =
+    member this.GetIndex() : int<indexNumber> option =
         match this.paramMap.TryFind runParameters.indexKey with
         | Some value -> 
             match Int32.TryParse(value) with
-            | true, v -> LanguagePrimitives.Int32WithMeasure v |> UMX.tag<indexNumber>
-            | false, _ -> failwith "Invalid Index value"
-        | None -> failwith "Index parameter not found"
+            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<indexNumber>)
+            | false, _ -> None
+        | None -> None
+    
     /// Sets the Index value.
     member this.SetIndex(index: int<indexNumber>) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.indexKey, (UMX.untag index).ToString())
@@ -58,19 +60,18 @@ type runParameters =
 
 
     /// Gets the Repl value.
-    member this.GetRepl() : int<replNumber> =
+    member this.GetRepl() : int<replNumber> option =
         match this.paramMap.TryFind runParameters.replKey with
         | Some value -> 
             match Int32.TryParse(value) with
-            | true, v -> LanguagePrimitives.Int32WithMeasure v |> UMX.tag<replNumber>
-            | false, _ -> failwith "Invalid Repl value"
-        | None -> failwith "Repl parameter not found"
+            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<replNumber>)
+            | false, _ -> None
+        | None -> None
 
-    member this.GetReplKvp() : string*string =
+    member this.GetReplKvp() : (string * string) option =
         match this.paramMap.TryFind runParameters.replKey with
-        | Some value -> 
-            (runParameters.replKey, value)
-        | None -> failwith "Repl parameter not found"
+        | Some value -> Some (runParameters.replKey, value)
+        | None -> None
 
     /// Sets the Repl value.
     member this.SetRepl(repl: int<replNumber>) : unit =
@@ -79,27 +80,27 @@ type runParameters =
 
 
     /// Gets the Generation value.
-    member this.GetGeneration() : int<generationNumber> =
+    member this.GetGeneration() : int<generationNumber> option =
         match this.paramMap.TryFind runParameters.generationKey with
         | Some value -> 
             match Int32.TryParse(value) with
-            | true, v -> LanguagePrimitives.Int32WithMeasure v |> UMX.tag<generationNumber>
-            | false, _ -> failwith "Invalid Generation value"
-        | None -> failwith "Repl parameter not found"
+            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<generationNumber>)
+            | false, _ -> None
+        | None -> None
 
     /// Sets the Generation value.
-    member this.SetGeneration(repl: int<generationNumber>) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.generationKey, (UMX.untag repl).ToString())
+    member this.SetGeneration(generation: int<generationNumber>) : unit =
+        this.paramMap <- this.paramMap.Add(runParameters.generationKey, (UMX.untag generation).ToString())
 
 
 
-    member this.IsRunFinished() : bool =
+    member this.IsRunFinished() : bool option =
         match this.paramMap.TryFind runParameters.runFinishedKey with
         | Some value -> 
             match Boolean.TryParse(value) with
-            | true, v -> v
-            | false, _ -> failwith "Invalid RunFinished value"
-        | None -> false
+            | true, v -> Some v
+            | false, _ -> None
+        | None -> None
 
     member this.SetRunFinished(finished: bool) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.runFinishedKey, finished.ToString())
@@ -107,10 +108,14 @@ type runParameters =
 
 
     /// Gets the SortableArrayType value.
-    member this.GetSortableArrayType() : sortableArrayType =
+    member this.GetSortableArrayType() : sortableArrayType option =
         match this.paramMap.TryFind runParameters.sortableArrayTypeKey with
-        | Some value -> SortableArrayType.fromString value
-        | None -> failwith "SortableArrayType parameter not found"
+        | Some value -> 
+            try
+                Some (SortableArrayType.fromString value)
+            with
+            | _ -> None
+        | None -> None
 
     /// Sets the SortableArrayType value.
     member this.SetSortableArrayType(sortableArrayType: sortableArrayType) : unit =
@@ -119,16 +124,19 @@ type runParameters =
 
 
     /// Gets the SorterModelKey value.
-    member this.GetSorterModelKey() : sorterModelKey =
-        match this.paramMap.TryFind runParameters.sorterModelTypeKey with
-        | Some value -> SorterModelKey.fromString value
-        | None -> failwith "SorterModel parameter not found"
-
-    member this.GetSorterModelKvp() : string*string =
+    member this.GetSorterModelKey() : sorterModelKey option =
         match this.paramMap.TryFind runParameters.sorterModelTypeKey with
         | Some value -> 
-            (runParameters.sorterModelTypeKey, value)
-        | None -> failwith "Repl parameter not found"
+            try
+                Some (SorterModelKey.fromString value)
+            with
+            | _ -> None
+        | None -> None
+
+    member this.GetSorterModelKvp() : (string * string) option =
+        match this.paramMap.TryFind runParameters.sorterModelTypeKey with
+        | Some value -> Some (runParameters.sorterModelTypeKey, value)
+        | None -> None
 
     /// Sets the SorterModelKey value.
     member this.SetSorterModelKey(sorterModelKey: sorterModelKey) : unit =
@@ -137,19 +145,18 @@ type runParameters =
 
 
     /// Gets the SortingWidth value.
-    member this.GetSortingWidth() : int<sortingWidth> =
+    member this.GetSortingWidth() : int<sortingWidth> option =
         match this.paramMap.TryFind runParameters.sortingWidthKey with
         | Some value -> 
             match Int32.TryParse(value) with
-            | true, v -> LanguagePrimitives.Int32WithMeasure v |> UMX.tag<sortingWidth>
-            | false, _ -> failwith "Invalid SortingWidth value"
-        | None -> failwith "SortingWidth parameter not found"
+            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<sortingWidth>)
+            | false, _ -> None
+        | None -> None
 
-    member this.GetSortingWidthKvp() : string*string =
+    member this.GetSortingWidthKvp() : (string * string) option =
         match this.paramMap.TryFind runParameters.sortingWidthKey with
-        | Some value -> 
-            (runParameters.sortingWidthKey, value)
-        | None -> failwith "Repl parameter not found"
+        | Some value -> Some (runParameters.sortingWidthKey, value)
+        | None -> None
 
     /// Sets the SortingWidth value.
     member this.SetSortingWidth(sortingWidth: int<sortingWidth>) : unit =
@@ -158,13 +165,13 @@ type runParameters =
 
 
     /// Gets the MaxOrbit value.
-    member this.GetMaxOrbit() : int =
+    member this.GetMaxOrbit() : int option =
         match this.paramMap.TryFind runParameters.maxOrbitKey with
         | Some value -> 
             match Int32.TryParse(value) with
-            | true, v -> v
-            | false, _ -> failwith "Invalid MaxOrbit value"
-        | None -> failwith "MaxOrbit parameter not found"
+            | true, v -> Some v
+            | false, _ -> None
+        | None -> None
 
     /// Sets the MaxOrbit value.
     member this.SetMaxOrbit(maxOrbit: int) : unit =
@@ -173,13 +180,13 @@ type runParameters =
 
 
     /// Gets the StageLength value.
-    member this.GetStageLength() : int<stageLength> =
+    member this.GetStageLength() : int<stageLength> option =
         match this.paramMap.TryFind runParameters.stageLengthKey with
         | Some value -> 
             match Int32.TryParse(value) with
-            | true, v -> LanguagePrimitives.Int32WithMeasure v |> UMX.tag<stageLength>
-            | false, _ -> failwith "Invalid StageLength value"
-        | None -> failwith "StageLength parameter not found"
+            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<stageLength>)
+            | false, _ -> None
+        | None -> None
 
     /// Sets the StageLength value.
     member this.SetStageLength(stageLength: int<stageLength>) : unit =
@@ -188,13 +195,13 @@ type runParameters =
 
 
     /// Gets the CeLength value.
-    member this.GetCeLength() : int<ceLength> =
+    member this.GetCeLength() : int<ceLength> option =
         match this.paramMap.TryFind runParameters.ceLengthKey with
         | Some value -> 
             match Int32.TryParse(value) with
-            | true, v -> LanguagePrimitives.Int32WithMeasure v |> UMX.tag<ceLength>
-            | false, _ -> failwith "Invalid CeLength value"
-        | None -> failwith "CeLength parameter not found"
+            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<ceLength>)
+            | false, _ -> None
+        | None -> None
 
     /// Sets the CeLength value.
     member this.SetCeLength(ceLength: int<ceLength>) : unit =
@@ -204,49 +211,40 @@ type runParameters =
 
     /// Sets the SorterCount value.
     member this.SetSorterCount(sorterCount: int<sorterCount>) : unit =
-       this. paramMap <- this.paramMap.Add(runParameters.sorterCountKey, (UMX.untag sorterCount).ToString())
+       this.paramMap <- this.paramMap.Add(runParameters.sorterCountKey, (UMX.untag sorterCount).ToString())
 
     /// Gets the SorterCount value.
-    member this.GetSorterCount() : int<sorterCount> =
+    member this.GetSorterCount() : int<sorterCount> option =
         match this.paramMap.TryFind runParameters.sorterCountKey with
         | Some value -> 
             match Int32.TryParse(value) with
-            | true, v -> LanguagePrimitives.Int32WithMeasure v |> UMX.tag<sorterCount>
-            | false, _ -> failwith "Invalid SorterCount value"
-        | None -> failwith "SorterCount parameter not found"
+            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<sorterCount>)
+            | false, _ -> None
+        | None -> None
 
 
 
     /// Sets the ProjectName value.
-    member this.SetProjectName(projectName: string) : unit =
-       this.paramMap <- this.paramMap.Add(runParameters.projectNameKey, projectName)
+    member this.SetProjectName(projectName: string<projectName>) : unit =
+       this.paramMap <- this.paramMap.Add(runParameters.projectNameKey, %projectName)
 
     /// Gets the ProjectName value.
-    member this.GetProjectName() : string =
-        match this.paramMap.TryFind runParameters.projectNameKey with
-        | Some value -> value
-        | None -> failwith "ProjectName parameter not found"
+    member this.GetProjectName() : string<projectName> option =
+        match (this.paramMap.TryFind runParameters.projectNameKey) with
+        | Some value -> Some (UMX.tag<projectName> value)
+        | None -> None
 
 
 
     /// Sets the TextReportName value.
-    member this.SetTextReportName(reportName: string) : unit =
-       this.paramMap <- this.paramMap.Add(runParameters.textReportNameKey, reportName)
+    member this.SetTextReportName(reportName: string<textReportName>) : unit =
+       this.paramMap <- this.paramMap.Add(runParameters.textReportNameKey, %reportName)
 
     /// Gets the TextReportName value.
-    member this.GetTextReportName() : string =
-        match this.paramMap.TryFind runParameters.textReportNameKey with
-        | Some value -> value
-        | None -> failwith "TextReportName parameter not found"
-
-
-
-
-
-
-
-
-
+    member this.GetTextReportName() : string<textReportName> option =
+        match (this.paramMap.TryFind runParameters.textReportNameKey) with
+        | Some value -> Some (UMX.tag<textReportName> value)
+        | None -> None
 
 
 
@@ -262,15 +260,10 @@ module RunParameters =
                     runParameters.ParamMap.ContainsKey key && runParameters.ParamMap.[key] = value
                 ))
 
-    let pickByParameters 
+    let pickByParameters
             (runParametersSet: runParameters array) 
-            (filter: (string * string) array) : runParameters =
+            (filter: (string * string) array) : runParameters option =
         let filtrate = filterByParameters runParametersSet filter
-        if filtrate.Length = 1 then
-            filtrate.[0]
-        else
-            failwithf "Expected exactly one runParameters to match filter, but found %d" filtrate.Length
-
-
-
-        
+        match filtrate.Length with
+        | 1 -> Some filtrate.[0]
+        | _ -> None

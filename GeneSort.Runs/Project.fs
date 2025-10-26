@@ -2,14 +2,14 @@
 namespace GeneSort.Runs
 
 open System
-open System.IO
+open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Runs.Params
 
 type project = 
     private
         { 
-          projectName: string
+          projectName: string<projectName>
           description: string
           runParametersArray: runParameters []
           parameterKeys: string array
@@ -17,14 +17,15 @@ type project =
         }
     with
     static member create 
-            (projectName: string) 
+            (projectName: string<projectName>) 
             (description: string) 
             (runParametersArray: runParameters []) 
             (reportKeys: string array) : project =
-        if String.IsNullOrWhiteSpace projectName then
+        if String.IsNullOrWhiteSpace %projectName then
             failwith "Project name cannot be empty"
         else
-            { projectName = projectName
+            { 
+              projectName = projectName
               description = description
               runParametersArray = runParametersArray
               reportNames = reportKeys
@@ -37,7 +38,7 @@ type project =
 
     static member Test = 
         project.create 
-            "FullBoolEvals" 
+            ("FullBoolEvals" |> UMX.tag<projectName>)
             "A test project"
             [| runParameters.create (Map.ofList [ ("Param1", "Value1"); ("Param2", "ValueA") ])
                runParameters.create (Map.ofList [ ("Param1", "Value2"); ("Param2", "ValueB") ]) |]
@@ -53,7 +54,7 @@ type project =
 module Project =  
 
     let create 
-            (name: string) 
+            (projectName: string<projectName>) 
             (description: string) 
             (reportKeys: string array)
             (parameterSpans: (string * string list) list) 
@@ -67,7 +68,7 @@ module Project =
                            |> Seq.toArray
 
         project.create 
-                name 
+                projectName 
                 description
                 refinedParameters
                 reportKeys

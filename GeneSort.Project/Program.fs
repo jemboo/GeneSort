@@ -1,13 +1,13 @@
 ﻿module Program
 
-open GeneSort.Project
 open System
 open System.IO
-open System.Threading
-open GeneSort.Project.OutputDataFile
+open FSharp.UMX
+
 open GeneSort.Db
 open GeneSort.Core
 open GeneSort.FileDb
+open GeneSort.Project
 
 
 
@@ -67,7 +67,7 @@ printfn $"**** QQQ ******** {startTime.ToString()}"
 
 
 
-let geneSortDb = new GeneSortDbMp(Path.Combine(rootDir, RandomSorters4to64.project.ProjectName)) :> IGeneSortDb
+let geneSortDb = new GeneSortDbMp(Path.Combine(rootDir, %RandomSorters4to64.project.ProjectName)) :> IGeneSortDb
 let projParams = queryParams.CreateForProject RandomSorters4to64.project.ProjectName
 geneSortDb.saveAsync projParams (RandomSorters4to64.project |> outputData.Project) |> Async.RunSynchronously
 RandomSorters4to64.RunAll geneSortDb progress |> Async.RunSynchronously

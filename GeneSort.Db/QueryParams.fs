@@ -1,6 +1,7 @@
 ﻿
 namespace GeneSort.Db
 
+open FSharp.UMX
 open GeneSort.Sorter.Sortable
 open GeneSort.Sorter.Sorter
 open GeneSort.Model.Sorter
@@ -12,7 +13,7 @@ open GeneSort.Runs
 
 type queryParams =
     private {
-        projectName: string
+        projectName: string<projectName>
         index: int<indexNumber> option
         repl: int<replNumber> option
         generation: int<generationNumber> option
@@ -25,7 +26,7 @@ type queryParams =
     member this.OutputDataType with get() = this.outputDataType
     
     static member Create(
-            projectName: string, 
+            projectName: string<projectName>, 
             index: int<indexNumber> option, 
             repl: int<replNumber> option, 
             generation: int<generationNumber> option, 
@@ -38,7 +39,7 @@ type queryParams =
             outputDataType = outputDataType
         }
     
-    static member CreateForProject(projectName: string) : queryParams =
+    static member CreateForProject(projectName: string<projectName>) : queryParams =
         {
             projectName = projectName
             index = None

@@ -48,11 +48,17 @@ module ProjectOps =
             (progress: IProgress<string>) : Async<unit> = async {
 
         try
+            if (runParameters.IsRunFinished().Value) then
+                progress.Report (sprintf "Skipping Run %d: already finished." (runParameters.GetIndex().Value))
+                return ()
             do! executor db runParameters cts progress
-            let queryParamsForRunParams = queryParams.Create(runParameters.GetProjectName(), Some (runParameters.GetIndex()), Some (runParameters.GetRepl()), None, outputDataType.RunParameters)
+            let queryParamsForRunParams = queryParams.Create( 
+                            runParameters.GetProjectName().Value, 
+                            runParameters.GetIndex(), 
+                            runParameters.GetRepl(), None, outputDataType.RunParameters)
             do! db.saveAsync queryParamsForRunParams (runParameters |> outputData.RunParameters)
         with e ->
-            printfn "Error processing Run %d: %s" (runParameters.GetIndex()) e.Message
+            printfn "Error processing Run %d: %s" (runParameters.GetIndex().Value) e.Message
     }
 
 

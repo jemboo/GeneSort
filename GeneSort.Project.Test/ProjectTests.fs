@@ -1,6 +1,8 @@
 ﻿namespace GeneSort.Project.Test
 
 open System
+open FSharp.UMX
+
 open MessagePack.Resolvers
 open MessagePack
 open MessagePack.FSharp
@@ -46,7 +48,7 @@ type ProjectTests() =
         let repls = [|"Rep1"|]
 
         Project.create
-            "TestProject"
+            ("TestProject"  |> UMX.tag<projectName>)
             "Test Description"
             repls
             parameterSets
