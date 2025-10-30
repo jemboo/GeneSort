@@ -5,6 +5,7 @@ open System
 open System.IO
 open System.Threading
 
+open FSharp.UMX
 open MessagePack
 open MessagePack.FSharp
 open MessagePack.Resolvers
@@ -21,58 +22,63 @@ open GeneSort.Runs.Params
 open GeneSort.Runs.Mp
 
 
+[<Measure>] type fullPathToFolder
+[<Measure>] type pathToRootFolder
+[<Measure>] type pathToProjectFolder
+[<Measure>] type fullPathToFile // e.g., "C:\GeneSortData\Project1\RunParameters_0_0.msgpack"
      
 module OutputDataFile =
     /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let getOutputDataFolder (projectFolder:string) (outputDataType: outputDataType) 
-                    : string =
-        Path.Combine(projectFolder, outputDataType |> OutputDataType.toString)
+    let getPathToOutputDataFolder 
+                (projectFolder:string<pathToProjectFolder>) 
+                (outputDataType: outputDataType) : string<fullPathToFolder> =
+        Path.Combine(%projectFolder, outputDataType |> OutputDataType.toString) |> UMX.tag<fullPathToFolder>
+
 
     let makeIndexAndReplPathFromQueryParams 
-                (projectFolder:string) 
+                (projectFolder:string<pathToProjectFolder>)
                 (queryParams:queryParams)
-                (outputDataType: outputDataType) : string =
+                (outputDataType: outputDataType) : string<fullPathToFile> =
 
-        let outputDataFolder = getOutputDataFolder projectFolder outputDataType
+        let outputDataFolder = getPathToOutputDataFolder projectFolder outputDataType
         match queryParams.Index, queryParams.Repl with
         | Some index, Some repl ->
             let outputDataName = outputDataType |> OutputDataType.toString
             let fileName = sprintf "%s_%d_%d.msgpack" outputDataName repl index 
-            Path.Combine(outputDataFolder, fileName)
+            Path.Combine(%outputDataFolder, fileName) |> UMX.tag<fullPathToFile>
         | _ -> 
             failwithf "Index and Repl must be provided in queryParams for output data type %s" (outputDataType |> OutputDataType.toString)
 
 
     let getOutputDataFilePath
-            (projectFolder: string)
+            (projectFolder: string<pathToProjectFolder>)
             (queryParams: queryParams)
             (outputDataType: outputDataType) 
-                : string =
+                : string<fullPathToFile> =
 
         match outputDataType with
         | outputDataType.Project -> 
             let fileName = sprintf "%s.msgpack" (outputDataType |> OutputDataType.toString)
-            Path.Combine(projectFolder, fileName)
+            Path.Combine(%projectFolder, fileName) |> UMX.tag<fullPathToFile>
         | _ -> 
             makeIndexAndReplPathFromQueryParams projectFolder queryParams outputDataType
 
 
-
     let getOutputDataAsync
-            (projectFolder: string)
+            (projectFolder:string<pathToProjectFolder>)
             (queryParams: queryParams)
             (outputDataType: outputDataType) 
                 : Async<Result<outputData, OutputError>> =
         async {
             let filePath = getOutputDataFilePath projectFolder queryParams outputDataType
-            if not (File.Exists filePath) then
-                return Error (sprintf "File not found: %s" filePath)
+            if not (File.Exists %filePath) then
+                return Error (sprintf "File not found: %s" %filePath)
             else
             try
-                use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync = true)
+                use stream = new FileStream(%filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync = true)
                 let! fileBytes = 
                     async {
                         use ms = new MemoryStream()
@@ -109,25 +115,28 @@ module OutputDataFile =
                     | outputDataType.Project ->
                         let dto = MessagePackSerializer.Deserialize<projectDto>(fileBytes, options)
                         Project (ProjectDto.toDomain dto)
+                    | outputDataType.TextReport ->
+                        let text = System.Text.Encoding.UTF8.GetString(fileBytes)
+                        TextReport text
             
                 return Ok domainData
             with e ->
-                return Error (sprintf "Error reading file %s: %s" filePath e.Message)
+                return Error (sprintf "Error reading file %s: %s" %filePath e.Message)
         }
 
 
 
     let saveToFileAsync 
-            (projectFolder: string)
+            (projectFolder:string<pathToProjectFolder>)
             (queryParams: queryParams)
             (outputData: outputData) : Async<unit> =
         async {
             let outputDataType = outputData |> OutputData.getOutputDataType
             let filePath = getOutputDataFilePath projectFolder queryParams outputDataType
-            let directory = Path.GetDirectoryName filePath
+            let directory = Path.GetDirectoryName %filePath
             Directory.CreateDirectory directory |> ignore
             try
-                use stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None)
+                use stream = new FileStream(%filePath, FileMode.Create, FileAccess.Write, FileShare.None)
                 match outputData with
                 | RunParameters r -> 
                     let dto = RunParametersDto.fromDomain r
@@ -156,16 +165,19 @@ module OutputDataFile =
                 | Project p ->
                     let dto = ProjectDto.fromDomain p
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | TextReport text ->
+                    let textBytes = System.Text.Encoding.UTF8.GetBytes(text)
+                    do! stream.WriteAsync(textBytes, 0, textBytes.Length) |> Async.AwaitTask
 
             with e ->
-                printfn "Error saving to file %s: %s" filePath e.Message
+                printfn "Error saving to file %s: %s" %filePath e.Message
                 raise e // Re-throw to ensure the caller is aware of the failure
         }
 
 
 
-    let getFilesSortedByCreationTime (directoryPath: string) : string list =
-        Directory.GetFiles(directoryPath)
+    let getFilesSortedByCreationTime (pathToFolder: string) : string list =
+        Directory.GetFiles(pathToFolder)
         |> Array.map (fun filePath -> filePath, File.GetCreationTime(filePath))
         |> Array.sortBy snd
         |> Array.map fst
@@ -173,8 +185,8 @@ module OutputDataFile =
 
 
 
-    let getAllRunParametersAsync 
-                (projectFolder: string) 
+    let getAllProjectRunParametersAsync 
+                (projectFolder:string<pathToProjectFolder>)
                 (ct: CancellationToken option) 
                 (progress: IProgress<string> option) : Async<runParameters[]> =
 
@@ -196,12 +208,12 @@ module OutputDataFile =
             }
 
         async {
-            let folder = getOutputDataFolder projectFolder outputDataType.RunParameters
-            let filePaths = getFilesSortedByCreationTime folder |> List.toArray  // Snapshot to array for safety
+            let folder = getPathToOutputDataFolder projectFolder outputDataType.RunParameters
+            let filePaths = getFilesSortedByCreationTime %folder |> List.toArray  // Snapshot to array for safety
         
             match progress with
             | None -> ()
-            | Some p -> p.Report(sprintf "Found %d files in %s" filePaths.Length folder)
+            | Some p -> p.Report(sprintf "Found %d files in %s" filePaths.Length %folder)
         
             let mutable results = []
             for i = 0 to filePaths.Length - 1 do

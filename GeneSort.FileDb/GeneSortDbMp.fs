@@ -13,25 +13,22 @@ type private DbMessage =
     | Load of queryParams * outputDataType * AsyncReplyChannel<Result<outputData, OutputError>>
     | GetAllRunParameters of string<projectName> * CancellationToken option * IProgress<string> option * AsyncReplyChannel<runParameters[]>
 
-type GeneSortDbMp(rootFolder: string) =
+type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
 
-    let getProjectFolder (queryParams: queryParams) =
-        Path.Combine(rootFolder, %queryParams.ProjectName)
+    let getPathToProjectFolder (projectName: string<projectName>) = 
+        Path.Combine(%rootFolder, %projectName) |> UMX.tag<pathToProjectFolder>
 
     let saveAsync (queryParams: queryParams) (data: outputData) =
-        OutputDataFile.saveToFileAsync (getProjectFolder queryParams) queryParams data
+        OutputDataFile.saveToFileAsync (getPathToProjectFolder queryParams.ProjectName) queryParams data
     
     let loadAsync (queryParams: queryParams) (dataType: outputDataType) =
-        OutputDataFile.getOutputDataAsync (getProjectFolder queryParams) queryParams dataType
-    
-    let getProjectFolder (projectName: string<projectName>) = 
-        Path.Combine(rootFolder, %projectName)
+        OutputDataFile.getOutputDataAsync (getPathToProjectFolder queryParams.ProjectName) queryParams dataType
     
     let getAllRunParametersAsync 
                 (projectName: string<projectName>) 
                 (ct: CancellationToken option) 
                 (progress: IProgress<string> option) =
-        OutputDataFile.getAllRunParametersAsync (getProjectFolder projectName) ct progress
+        OutputDataFile.getAllProjectRunParametersAsync (getPathToProjectFolder projectName) ct progress
     
 
     let mailbox = MailboxProcessor.Start(fun inbox ->

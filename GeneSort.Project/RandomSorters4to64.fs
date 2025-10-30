@@ -197,17 +197,50 @@ module RandomSorters4to64 =
             progress.Report(sprintf "Finished executing Run %d  Repl  %d \n" index %repl)
         }
 
+
+    let initParamertsFiles 
+            (db:IGeneSortDb)
+            (projectName:string<projectName>)
+            (runParameterArray: runParameters[]) 
+            (cts: CancellationTokenSource) 
+            (progress: IProgress<string>) : Async<unit> =
+        async {
+
+            progress.Report(sprintf "Saving RunParameter files for %s" %projectName)
+
+            do! db.saveAllRunParametersAsync projectName runParameterArray (Some cts.Token) (Some progress)
+            
+            progress.Report(sprintf "Finished saving RunParameter files")
+        }
+
+
     // Progress reporter that prints to console
     let progress = 
         { new IProgress<string> with
             member _.Report(msg) = printfn "%s" msg }
 
 
-    let RunAll
+    let InitProjectFiles
         (db:IGeneSortDb)
+        (queryParams:queryParams)
+        (cts: CancellationTokenSource) 
         (progress: IProgress<string>) =
-        let cts = new CancellationTokenSource()
-        ProjectOps.executeRunParametersSeq db 8 executor project.RunParametersArray cts progress
+        async {
+            progress.Report(sprintf "Saving project file: %s" %projectName)
+            do! db.saveAsync queryParams (project |> outputData.Project)
+            progress.Report(sprintf "Saving run parameters files: (%d)" project.RunParametersArray.Length)
+            do! initParamertsFiles db projectName project.RunParametersArray cts progress
+        }
+
+
+    let ExecuteRuns
+        (db:IGeneSortDb)
+        (cts: CancellationTokenSource) 
+        (progress: IProgress<string>) =
+        progress.Report(sprintf "Executing Runs for %s" %projectName)
+        let runParametersArray = (db.getAllRunParametersAsync projectName None (Some progress)) |> Async.RunSynchronously
+
+        ProjectOps.executeRunParametersSeq db 8 executor runParametersArray cts progress
 
 
 

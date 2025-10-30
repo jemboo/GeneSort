@@ -12,10 +12,10 @@
   <ItemGroup>
     <Compile Include="ProjectOps.fs" />
     <Compile Include="PermutationOrbits.fs" />
-    <Compile Include="MergeIntEvals.fs" />
-    <Compile Include="FullBoolGenAndEvals.fs" />
     <Compile Include="RandomSorters4to64.fs" />
+    <Compile Include="MergeIntEvals.fs" />
     <Compile Include="FullBoolEvals.fs" />
+    <Compile Include="FullBoolGenAndEvals.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

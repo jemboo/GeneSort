@@ -8,10 +8,12 @@ open GeneSort.Db
 open GeneSort.Core
 open GeneSort.FileDb
 open GeneSort.Project
+open GeneSort.Project.Old
+open System.Threading
 
 
 
-let rootDir = "c:\Projects"
+let rootDir = "c:\Projects" |> UMX.tag<pathToRootFolder>
 
 // Progress reporter that prints to console
 let createThreadSafeProgress() =
@@ -67,10 +69,20 @@ printfn $"**** QQQ ******** {startTime.ToString()}"
 
 
 
-let geneSortDb = new GeneSortDbMp(Path.Combine(rootDir, %RandomSorters4to64.project.ProjectName)) :> IGeneSortDb
-let projParams = queryParams.CreateForProject RandomSorters4to64.project.ProjectName
-geneSortDb.saveAsync projParams (RandomSorters4to64.project |> outputData.Project) |> Async.RunSynchronously
-RandomSorters4to64.RunAll geneSortDb progress |> Async.RunSynchronously
+//////// New code for GeneSortDbMp usage
+
+
+/// **********     RandomSorters4to64   ****************
+let geneSortDb = new GeneSortDbMp(rootDir) :> IGeneSortDb
+let cts = new CancellationTokenSource()
+
+let queryParams = queryParams.CreateForProject RandomSorters4to64.project.ProjectName
+//RandomSorters4to64.InitProjectFiles geneSortDb queryParams cts progress |> Async.RunSynchronously
+RandomSorters4to64.ExecuteRuns geneSortDb cts progress |> Async.RunSynchronously
+
+
+
+
 
 
 
@@ -80,7 +92,7 @@ let duration = endTime - startTime
 printfn $"**************** All done ******************"
 printfn $"****************  {duration.ToString()} ******************"
 
-let yab = Console.ReadLine()
+Console.ReadLine() |> ignore
 
 
 

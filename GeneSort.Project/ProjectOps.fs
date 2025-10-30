@@ -1,15 +1,12 @@
 ﻿namespace GeneSort.Project
 
-open System.IO
 open System.Threading.Tasks
 open MessagePack
 open MessagePack.FSharp
 open MessagePack.Resolvers
-open FSharp.UMX
 open System
 open System.Threading
 open GeneSort.Runs.Params
-open GeneSort.Runs
 open GeneSort.Db
 
 
@@ -49,14 +46,15 @@ module ProjectOps =
 
         try
             if (runParameters.IsRunFinished().Value) then
-                progress.Report (sprintf "Skipping Run %d: already finished." (runParameters.GetIndex().Value))
+                progress.Report (sprintf "Skipping Run %d_%d: already finished." (runParameters.GetIndex().Value) (runParameters.GetRepl().Value))
                 return ()
-            do! executor db runParameters cts progress
-            let queryParamsForRunParams = queryParams.Create( 
-                            runParameters.GetProjectName().Value, 
-                            runParameters.GetIndex(), 
-                            runParameters.GetRepl(), None, outputDataType.RunParameters)
-            do! db.saveAsync queryParamsForRunParams (runParameters |> outputData.RunParameters)
+            else
+                do! executor db runParameters cts progress
+                let queryParamsForRunParams = queryParams.Create( 
+                                runParameters.GetProjectName().Value, 
+                                runParameters.GetIndex(), 
+                                runParameters.GetRepl(), None, outputDataType.RunParameters)
+                do! db.saveAsync queryParamsForRunParams (runParameters |> outputData.RunParameters)
         with e ->
             printfn "Error processing Run %d: %s" (runParameters.GetIndex().Value) e.Message
     }
