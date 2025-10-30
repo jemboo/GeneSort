@@ -176,100 +176,137 @@ module OutputDataFile =
 
 
 
-    let getFilesSortedByCreationTime (pathToFolder: string) : string list =
-        Directory.GetFiles(pathToFolder)
-        |> Array.map (fun filePath -> filePath, File.GetCreationTime(filePath))
-        |> Array.sortBy snd
-        |> Array.map fst
-        |> Array.toList
+    let getFilesSortedByCreationTime (pathToFolder: string) : Result<string list, string> =
+        try
+            if not (Directory.Exists(pathToFolder)) then
+                Error (sprintf "Directory does not exist: %s" pathToFolder)
+            else
+                let files = 
+                    Directory.GetFiles(pathToFolder)
+                    |> Array.map (fun filePath -> filePath, File.GetCreationTime(filePath))
+                    |> Array.sortBy snd
+                    |> Array.map fst
+                    |> Array.toList
+                Ok files
+        with
+        | :? UnauthorizedAccessException as e -> 
+            Error (sprintf "Access denied to directory %s: %s" pathToFolder e.Message)
+        | :? IOException as e -> 
+            Error (sprintf "IO error accessing directory %s: %s" pathToFolder e.Message)
+        | e -> 
+            Error (sprintf "Unexpected error accessing directory %s: %s" pathToFolder e.Message)
 
 
 
     let getAllProjectRunParametersAsync 
-                (projectFolder:string<pathToProjectFolder>)
+                (projectFolder: string<pathToProjectFolder>)
                 (ct: CancellationToken option) 
-                (progress: IProgress<string> option) : Async<runParameters[]> =
-
+                (progress: IProgress<string> option) : Async<Result<runParameters[], string>> =
+    
         let _getRPFileAsync (runFilePath: string) (ct: CancellationToken option) : Async<Result<runParameters, string>> =
             async {
                 try
                     use stream = new FileStream(runFilePath, FileMode.Open, FileAccess.Read, FileShare.Read)
-
                     let token = defaultArg ct CancellationToken.None
                     let! dto = MessagePackSerializer.DeserializeAsync<runParametersDto>(stream, options, token).AsTask() |> Async.AwaitTask
-
                     let runParameters = RunParametersDto.fromDto dto
                     return Ok runParameters
                 with
-                | :? FileNotFoundException -> return Error (sprintf "File not found: %s" runFilePath)
-                | :? IOException as e -> return Error (sprintf "IO error reading %s: %s" runFilePath e.Message)
-                | :? MessagePackSerializationException as e -> return Error (sprintf "Deserialization error in %s: %s" runFilePath e.Message)
-                | e -> return Error (sprintf "Unexpected error in %s: %s" runFilePath e.Message)
+                | :? FileNotFoundException -> 
+                    return Error (sprintf "File not found: %s" runFilePath)
+                | :? UnauthorizedAccessException as e -> 
+                    return Error (sprintf "Access denied to %s: %s" runFilePath e.Message)
+                | :? IOException as e -> 
+                    return Error (sprintf "IO error reading %s: %s" runFilePath e.Message)
+                | :? MessagePackSerializationException as e -> 
+                    return Error (sprintf "Deserialization error in %s: %s" runFilePath e.Message)
+                | :? OperationCanceledException -> 
+                    return Error (sprintf "Operation cancelled while reading %s" runFilePath)
+                | e -> 
+                    return Error (sprintf "Unexpected error in %s: %s" runFilePath e.Message)
             }
-
+    
         async {
-            let folder = getPathToOutputDataFolder projectFolder outputDataType.RunParameters
-            let filePaths = getFilesSortedByCreationTime %folder |> List.toArray  // Snapshot to array for safety
-        
-            match progress with
-            | None -> ()
-            | Some p -> p.Report(sprintf "Found %d files in %s" filePaths.Length %folder)
-        
-            let mutable results = []
-            for i = 0 to filePaths.Length - 1 do
-                match ct with
+            try
+                let folder = getPathToOutputDataFolder projectFolder outputDataType.RunParameters
+            
+                match progress with
+                | Some p -> p.Report(sprintf "Scanning directory: %s" %folder)
                 | None -> ()
-                | Some t -> t.ThrowIfCancellationRequested()  // Check cancellation
-                let filePath = filePaths.[i]
-                let! result = _getRPFileAsync filePath ct
-                match result with
-                | Ok runParams -> results <- runParams :: results
-                | Error msg ->  
+            
+                // Get file paths with error handling
+                let! filePaths = 
+                    async {
+                        match getFilesSortedByCreationTime %folder with
+                        | Ok files -> return Ok (files |> List.toArray)
+                        | Error msg -> return Error msg
+                    }
+            
+                match filePaths with
+                | Error msg ->
                     match progress with
+                    | Some p -> p.Report(sprintf "Error: %s" msg)
                     | None -> ()
-                    | Some p -> p.Report(sprintf "Skipped due to error: %s" msg)  // Log error, continue
-        
-            return results |> List.rev |> List.toArray  // Reverse to maintain original order
-        }
-
-
-
-    //let saveAllRunParametersAsync 
-    //        (projectFolder: string) 
-    //        (runParametersArray: runParameters[])
-    //        (ct: CancellationToken option) 
-    //        (progress: IProgress<string> option) : Async<unit> =
-    //    async {
-    //        let folder = getOutputDataFolder projectFolder outputDataType.RunParameters
-    //        Directory.CreateDirectory folder |> ignore
-            
-    //        match progress with
-    //        | None -> ()
-    //        | Some p -> p.Report(sprintf "Saving %d run parameters to %s" runParametersArray.Length folder)
-            
-    //        for i = 0 to runParametersArray.Length - 1 do
-    //            match ct with
-    //            | None -> ()
-    //            | Some t -> t.ThrowIfCancellationRequested()
+                    return Error msg
                 
-    //            let runParams = runParametersArray.[i]
-    //            let qps = queryParams.Create(runParams.GetProjectName(), (Some runParams.GetIndex()), (Some runParams.GetRepl()), None, outputDataType.RunParameters) |> ignore
-
+                | Ok files ->
+                    match progress with
+                    | Some p -> p.Report(sprintf "Found %d RunParameter files" files.Length)
+                    | None -> ()
                 
-    //            let filePath = getOutputDataFilePath projectFolder queryParams outputDataType.RunParameters
-                
-    //            try
-    //                use stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None)
-    //                let dto = RunParametersDto.fromDomain runParams
-    //                do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                    if files.Length = 0 then
+                        return Ok [||]
+                    else
+                        let mutable successCount = 0
+                        let mutable errorCount = 0
+                        let mutable results = []
                     
-    //                match progress with
-    //                | None -> ()
-    //                | Some p -> p.Report(sprintf "Saved %d/%d" (i + 1) runParametersArray.Length)
-    //            with e ->
-    //                let errorMsg = sprintf "Error saving run parameters %d/%d to %s: %s" (i + 1) runParametersArray.Length filePath e.Message
-    //                match progress with
-    //                | None -> ()
-    //                | Some p -> p.Report(errorMsg)
-    //                // Decide: continue or fail-fast? Currently continuing...
-    //    }
+                        for i = 0 to files.Length - 1 do
+                            // Check cancellation
+                            match ct with
+                            | Some t -> t.ThrowIfCancellationRequested()
+                            | None -> ()
+                        
+                            let filePath = files.[i]
+                            let! result = _getRPFileAsync filePath ct
+                        
+                            match result with
+                            | Ok runParams -> 
+                                results <- runParams :: results
+                                successCount <- successCount + 1
+                                match progress with
+                                | Some p when (i + 1) % 10 = 0 || (i + 1) = files.Length -> 
+                                    p.Report(sprintf "Loaded %d/%d RunParameter files" (i + 1) files.Length)
+                                | _ -> ()
+                            
+                            | Error msg ->  
+                                errorCount <- errorCount + 1
+                                match progress with
+                                | Some p -> p.Report(sprintf "⚠ Skipped file %d/%d: %s" (i + 1) files.Length msg)
+                                | None -> ()
+                    
+                        // Final summary
+                        match progress with
+                        | Some p -> 
+                            if errorCount > 0 then
+                                p.Report(sprintf "Completed: %d loaded, %d skipped due to errors" successCount errorCount)
+                            else
+                                p.Report(sprintf "Successfully loaded all %d RunParameter files" successCount)
+                        | None -> ()
+                    
+                        return Ok (results |> List.rev |> List.toArray)
+        
+            with 
+            | :? OperationCanceledException ->
+                let msg = "Loading RunParameters was cancelled"
+                match progress with
+                | Some p -> p.Report(msg)
+                | None -> ()
+                return Error msg
+            | e ->
+                let msg = sprintf "Unexpected error loading RunParameters: %s" e.Message
+                match progress with
+                | Some p -> p.Report(msg)
+                | None -> ()
+                return Error msg
+        }

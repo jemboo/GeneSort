@@ -19,8 +19,8 @@ open GeneSort.Runs
 type IGeneSortDb =
     abstract member saveAsync : queryParams -> outputData -> Async<unit>
     abstract member loadAsync : queryParams -> outputDataType -> Async<Result<outputData, OutputError>>
-    abstract member getAllRunParametersAsync : string<projectName> -> CancellationToken option -> IProgress<string> option -> Async<runParameters[]>
-    abstract member saveAllRunParametersAsync : string<projectName> -> runParameters[] -> CancellationToken option -> IProgress<string> option -> Async<unit>
+    abstract member getAllRunParametersForProjectAsync : string<projectName> -> CancellationToken option -> IProgress<string> option -> Async<runParameters[]>
+    abstract member saveAllRunParametersAsync : runParameters[] -> CancellationToken option -> IProgress<string> option -> Async<unit>
 
 
 module GeneSortDb =

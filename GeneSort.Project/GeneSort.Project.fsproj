@@ -10,6 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="RunResult.fs" />
+    <Compile Include="ProgressMessage.fs" />
     <Compile Include="ProjectOps.fs" />
     <Compile Include="PermutationOrbits.fs" />
     <Compile Include="RandomSorters4to64.fs" />
