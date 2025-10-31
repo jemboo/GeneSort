@@ -77,13 +77,8 @@ let geneSortDb = new GeneSortDbMp(rootDir) :> IGeneSortDb
 let cts = new CancellationTokenSource()
 
 let queryParams = queryParams.CreateForProject RandomSorters4to64.project.ProjectName
-//RandomSorters4to64.InitProjectFiles geneSortDb queryParams cts (Some progress) |> Async.RunSynchronously
+RandomSorters4to64.InitProjectFiles geneSortDb queryParams cts (Some progress) |> Async.RunSynchronously
 RandomSorters4to64.ExecuteRuns geneSortDb cts (Some progress) |> Async.RunSynchronously
-
-
-
-
-
 
 
 

@@ -11,7 +11,9 @@ open System.IO
 type private DbMessage =
     | Save of queryParams * outputData * AsyncReplyChannel<unit>
     | Load of queryParams * outputDataType * AsyncReplyChannel<Result<outputData, OutputError>>
-    | GetAllRunParametersForProject of string<projectName> * CancellationToken option * IProgress<string> option * AsyncReplyChannel<runParameters[]>
+    | GetAllProjectRunParameters of 
+            string<projectName> * CancellationToken option * 
+            IProgress<string> option * AsyncReplyChannel<Result<runParameters[], string>>
 
 type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
 
@@ -24,20 +26,20 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
     let loadAsync (queryParams: queryParams) (dataType: outputDataType) =
         OutputDataFile.getOutputDataAsync (getPathToProjectFolder queryParams.ProjectName) queryParams dataType
     
-    let getAllRunParametersAsync 
-                (projectName: string<projectName>) 
-                (ct: CancellationToken option) 
-                (progress: IProgress<string> option) : Async<runParameters[]> =
-        async {
-            let! result = OutputDataFile.getAllProjectRunParametersAsync (getPathToProjectFolder projectName) ct progress
-            match result with
-            | Ok runParams -> return runParams
-            | Error msg ->
-                match progress with
-                | Some p -> p.Report(sprintf "Failed to load RunParameters: %s" msg)
-                | None -> ()
-                return [||] // Return empty array on error, or you could throw an exception
-        }
+    //let getAllProjectRunParametersAsync 
+    //            (projectName: string<projectName>) 
+    //            (ct: CancellationToken option) 
+    //            (progress: IProgress<string> option) : Async<Result<runParameters[], string>> =
+    //    async {
+    //        let! result = OutputDataFile.getAllProjectRunParametersAsync (getPathToProjectFolder projectName) ct progress
+    //        match result with
+    //        | Ok runParams -> return runParams
+    //        | Error msg ->
+    //            match progress with
+    //            | Some p -> p.Report(sprintf "Failed to load RunParameters: %s" msg)
+    //            | None -> ()
+    //            return [||] // Return empty array on error, or you could throw an exception
+    //    }
     
 
     let mailbox = MailboxProcessor.Start(fun inbox ->
@@ -54,8 +56,8 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
                     let! result = loadAsync queryParams dataType
                     replyChannel.Reply(result)
                     
-                | GetAllRunParametersForProject (projectName, ct, progress, replyChannel) ->
-                    let! result = getAllRunParametersAsync projectName ct progress
+                | GetAllProjectRunParameters (projectName, ct, progress, replyChannel) ->
+                    let! result = OutputDataFile.getAllProjectRunParametersAsync (getPathToProjectFolder projectName) ct progress
                     replyChannel.Reply(result)
                 
                 return! loop ()
@@ -72,8 +74,11 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
         member _.loadAsync (queryParams: queryParams) (dataType: outputDataType) : Async<Result<outputData, OutputError>> =
             mailbox.PostAndAsyncReply(fun channel -> Load(queryParams, dataType, channel))
         
-        member _.getAllRunParametersForProjectAsync (projectName: string<projectName>) (ct: CancellationToken option) (progress: IProgress<string> option) : Async<runParameters[]> =
-            mailbox.PostAndAsyncReply(fun channel -> GetAllRunParametersForProject(projectName, ct, progress, channel))
+        member _.getAllRunParametersForProjectAsync 
+                        (projectName: string<projectName>) 
+                        (ct: CancellationToken option) 
+                        (progress: IProgress<string> option) : Async<Result<runParameters[], string>> =
+            mailbox.PostAndAsyncReply(fun channel -> GetAllProjectRunParameters(projectName, ct, progress, channel))
 
         member this.saveAllRunParametersAsync 
                         (runParamsArray: runParameters[]) 

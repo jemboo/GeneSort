@@ -365,30 +365,43 @@ module RandomSorters4to64 =
         }
 
 
-
     let ExecuteRuns
         (db: IGeneSortDb)
         (cts: CancellationTokenSource) 
-        (progress: IProgress<string> option) : Async<RunResult[]> =
+        (progress: IProgress<string> option) : Async<Result<RunResult[], string>> =
         async {
             try
                 match progress with
                 | Some p -> p.Report(sprintf "Executing Runs for %s" %projectName)
                 | None -> ()
             
-                let! runParametersArray = db.getAllRunParametersForProjectAsync projectName None progress
+                let! runParamsResult = db.getAllRunParametersForProjectAsync projectName None progress
             
-                match progress with
-                | Some p -> p.Report(sprintf "Found %d runs to execute" runParametersArray.Length)
-                | None -> ()
-            
-                let! results = ProjectOps.executeRunParametersSeq db 8 executor runParametersArray cts progress
-            
-                return results
+                match runParamsResult with
+                | Error msg ->
+                    match progress with
+                    | Some p -> p.Report(sprintf "Failed to load run parameters: %s" msg)
+                    | None -> ()
+                    return Error msg
+                
+                | Ok runParametersArray ->
+                    match progress with
+                    | Some p -> p.Report(sprintf "Found %d runs to execute" runParametersArray.Length)
+                    | None -> ()
+                
+                    if runParametersArray.Length = 0 then
+                        match progress with
+                        | Some p -> p.Report("No runs found to execute")
+                        | None -> ()
+                        return Ok [||]
+                    else
+                        let! results = ProjectOps.executeRunParametersSeq db 8 executor runParametersArray cts progress
+                        return Ok results
             
             with e ->
+                let msg = sprintf "Fatal error executing runs: %s" e.Message
                 match progress with
-                | Some p -> p.Report(sprintf "Fatal error executing runs: %s" e.Message)
+                | Some p -> p.Report(msg)
                 | None -> ()
-                return [||]
+                return Error msg
         }
