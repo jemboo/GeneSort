@@ -12,6 +12,16 @@ open GeneSort.Runs.Params
 
 
 open GeneSort.Runs
+open System.Threading
+open GeneSort.Db
+open GeneSort.Model.Sorter.Ce
+open GeneSort.Model.Sorter.Si
+open GeneSort.Model.Sorter.Rs
+open GeneSort.Model.Sorter
+open GeneSort.Model.Sorter.Uf4
+open GeneSort.Model.Sorter.Uf6
+open GeneSort.Model.Sortable
+open GeneSort.SortingOps
 
 
 module MergeIntEvals =
@@ -103,8 +113,10 @@ module MergeIntEvals =
         let mutable index = 0
 
         let enhancer (runParameters : runParameters) : runParameters =
+            runParameters.SetRunFinished false
+            runParameters.SetProjectName projectName
+
             let repl = runParameters.GetRepl().Value
-            let sorterModelKey = runParameters.GetSorterModelKey().Value
             let sortingWidth = runParameters.GetSortingWidth().Value
 
             let stageLength = getStageLengthForSortingWidth sortingWidth
@@ -140,6 +152,109 @@ module MergeIntEvals =
                 reportNames 
                 parameterSet 
                 paramMapRefiner
+
+
+
+    let executor
+            (db: IGeneSortDb)
+            (runParameters: runParameters) 
+            (cts: CancellationTokenSource) 
+            (progress: IProgress<string> option) : Async<unit> =
+
+        async {
+            let projectName = runParameters.GetProjectName().Value
+            let index = runParameters.GetIndex().Value  
+            let repl = runParameters.GetRepl().Value
+            let sorterModelKey = runParameters.GetSorterModelKey().Value
+            let sortingWidth = runParameters.GetSortingWidth().Value
+            let stageLength = runParameters.GetStageLength().Value
+            let ceLength = runParameters.GetCeLength().Value
+            let sorterCount = runParameters.GetSorterCount().Value
+        
+            match progress with
+            | Some p -> p.Report(sprintf "Executing Run %d_%d  %s" index %repl (runParameters.toString()))
+            | None -> ()
+        
+            // Check cancellation before starting expensive operations
+            cts.Token.ThrowIfCancellationRequested()
+
+            // Create sorter model maker
+            let sorterModelMaker =
+                match sorterModelKey with
+                | sorterModelKey.Mcse -> 
+                    (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) 
+                    |> sorterModelMaker.SmmMsceRandGen
+                | sorterModelKey.Mssi -> 
+                    (MssiRandGen.create randomType sortingWidth stageLength) 
+                    |> sorterModelMaker.SmmMssiRandGen
+                | sorterModelKey.Msrs -> 
+                    let opsGenRatesArray = OpsGenRatesArray.createUniform %stageLength
+                    (msrsRandGen.create randomType sortingWidth opsGenRatesArray) 
+                    |> sorterModelMaker.SmmMsrsRandGen
+                | sorterModelKey.Msuf4 -> 
+                    let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageLength %sortingWidth
+                    (msuf4RandGen.create randomType sortingWidth stageLength uf4GenRatesArray) 
+                    |> sorterModelMaker.SmmMsuf4RandGen
+                | sorterModelKey.Msuf6 -> 
+                    let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
+                    (msuf6RandGen.create randomType sortingWidth stageLength uf6GenRatesArray) 
+                    |> sorterModelMaker.SmmMsuf6RandGen
+        
+            match progress with
+            | Some p -> p.Report(sprintf "Run %d_%d: Creating sorter set" index %repl)
+            | None -> ()
+        
+            // Check cancellation before generating sorters
+            cts.Token.ThrowIfCancellationRequested()
+        
+            let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
+            let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
+            let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
+            let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
+            let sortableTests = SortableTestModel.makeSortableTestsForMerge sortableArrayType sortingWidth
+
+        
+            match progress with
+            | Some p -> p.Report(sprintf "Run %d_%d: Evaluating sorter set" index %repl)
+            | None -> ()
+
+
+            let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
+
+            cts.Token.ThrowIfCancellationRequested()
+            match progress with
+            | Some p -> p.Report(sprintf "Run %d_%d: Saving sorterSet test results" index %repl)
+            | None -> ()
+
+            // Save sorter set
+            let queryParamsForSorterSet = 
+                queryParams.Create(projectName, Some index, Some repl, None, outputDataType.SorterSet)
+            do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet)
+
+            // Save sorterSetEval
+            let queryParamsForSorterSetEval = 
+                queryParams.Create(projectName, Some index, Some repl, None, outputDataType.SorterSetEval)
+            do! db.saveAsync queryParamsForSorterSetEval (sorterSetEval |> outputData.SorterSetEval)
+
+            // Save sorter set
+            let queryParamsForSorterModelSetMaker = 
+                queryParams.Create(projectName, Some index, Some repl, None, outputDataType.SorterModelSetMaker)
+            do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+
+            // Mark run as finished
+            runParameters.SetRunFinished true
+        
+            match progress with
+            | Some p -> p.Report(sprintf "✓ Finished executing Run %d_%d" index %repl)
+            | None -> ()
+        }
+
+
+
+
+
+
+
 
 
     //let executor 
@@ -312,28 +427,6 @@ module MergeIntEvals =
     //            progress.Report(sprintf "Error generating Ce Profile report for %s: %s" "SorterTestSet" ex.Message)
     //            raise ex
 
-
-
-    // Progress reporter that prints to console
-    let progress = 
-        { new IProgress<string> with
-            member _.Report(msg) = printfn "%s" msg }
-
-
-    //let RunAll
-    //    (rootFolder: string)
-    //    (progress: IProgress<string>) =
-    //    let cts = new CancellationTokenSource()
-    //    ProjectOps.executeRunParametersSeq2 rootFolder project 8 executor project.RunParametersArray cts progress
-
-
-
-    //let RunSorterEvalReport
-    //    (projectFolder: string)
-    //    (progress: IProgress<string>) =
-    //   let cts = new CancellationTokenSource()
-    //   (binReportExecutor projectFolder cts progress)
-    //   (ceUseProfileReportExecutor projectFolder cts progress)
 
 
 

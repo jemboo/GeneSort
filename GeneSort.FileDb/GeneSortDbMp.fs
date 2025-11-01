@@ -74,7 +74,7 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
         member _.loadAsync (queryParams: queryParams) (dataType: outputDataType) : Async<Result<outputData, OutputError>> =
             mailbox.PostAndAsyncReply(fun channel -> Load(queryParams, dataType, channel))
         
-        member _.getAllRunParametersForProjectAsync 
+        member _.getAllProjectRunParametersAsync 
                         (projectName: string<projectName>) 
                         (ct: CancellationToken option) 
                         (progress: IProgress<string> option) : Async<Result<runParameters[], string>> =

@@ -155,60 +155,13 @@ module RandomSorters4to64 =
     let project = Project.create projectName projectDesc reportNames parameterSpans paramMapRefiner
 
 
-    let executorOld 
-            (db:IGeneSortDb)
-            (runParameters: runParameters) 
-            (cts: CancellationTokenSource) 
-            (progress: IProgress<string>) : Async<unit> =
-        async {
-            let projectName = runParameters.GetProjectName().Value
-            let index = runParameters.GetIndex().Value  
-            let repl = runParameters.GetRepl().Value
-            let sorterModelKey = runParameters.GetSorterModelKey().Value
-            let sortingWidth = runParameters.GetSortingWidth().Value
-            let stageLength = runParameters.GetStageLength().Value
-            let ceLength = runParameters.GetCeLength().Value
-            let sorterCount = runParameters.GetSorterCount().Value
-
-            progress.Report(sprintf "Executing Run %d  %s" index (runParameters.toString()))
-
-
-            let sorterModelMaker =
-                match sorterModelKey with
-                | sorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> sorterModelMaker.SmmMsceRandGen
-                | sorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageLength) |> sorterModelMaker.SmmMssiRandGen
-                | sorterModelKey.Msrs -> 
-                    let opsGenRatesArray = OpsGenRatesArray.createUniform %stageLength
-                    (msrsRandGen.create randomType sortingWidth opsGenRatesArray) |> sorterModelMaker.SmmMsrsRandGen
-                | sorterModelKey.Msuf4 -> 
-                    let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageLength %sortingWidth
-                    (msuf4RandGen.create randomType sortingWidth stageLength uf4GenRatesArray) |> sorterModelMaker.SmmMsuf4RandGen
-                | sorterModelKey.Msuf6 -> 
-                    let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
-                    (msuf6RandGen.create randomType sortingWidth stageLength uf6GenRatesArray) |> sorterModelMaker.SmmMsuf6RandGen
-
-            let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-            
-            let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
-            let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
-            let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
-
-            let queryParamsForSorterSet = queryParams.Create(projectName, Some index, Some repl, None, outputDataType.SorterSet)
-            do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet)
-            
-            let queryParamsForSorterModelSetMaker = queryParams.Create(projectName, Some index, Some repl, None, outputDataType.SorterModelSetMaker)
-            do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker)
-
-            runParameters.SetRunFinished true
-
-            progress.Report(sprintf "Finished executing Run %d  Repl  %d \n" index %repl)
-        }
 
     let executor
             (db: IGeneSortDb)
             (runParameters: runParameters) 
             (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<unit> =
+
         async {
             let projectName = runParameters.GetProjectName().Value
             let index = runParameters.GetIndex().Value  
@@ -249,7 +202,7 @@ module RandomSorters4to64 =
                     |> sorterModelMaker.SmmMsuf6RandGen
         
             match progress with
-            | Some p -> p.Report(sprintf "Run %d_%d: Creating sorter model set" index %repl)
+            | Some p -> p.Report(sprintf "Run %d_%d: Creating sorter set" index %repl)
             | None -> ()
         
             // Check cancellation before generating sorters
@@ -290,118 +243,4 @@ module RandomSorters4to64 =
         }
 
 
-    let initParametersFiles 
-            (db: IGeneSortDb)
-            (projectName: string<projectName>)
-            (runParameterArray: runParameters[]) 
-            (cts: CancellationTokenSource) 
-            (progress: IProgress<string> option) : Async<Result<unit, string>> =
-        async {
-            try
-                match progress with
-                | Some p -> p.Report(sprintf "Saving RunParameter files for %s" %projectName)
-                | None -> ()
-            
-                cts.Token.ThrowIfCancellationRequested()
-            
-                do! db.saveAllRunParametersAsync runParameterArray (Some cts.Token) progress
-            
-                match progress with
-                | Some p -> p.Report(sprintf "Successfully saved %d RunParameter files" runParameterArray.Length)
-                | None -> ()
-            
-                return Ok ()
-            
-            with 
-            | :? OperationCanceledException ->
-                let msg = sprintf "Saving RunParameter files was cancelled"
-                match progress with
-                | Some p -> p.Report(msg)
-                | None -> ()
-                return Error msg
-            | e ->
-                let msg = sprintf "Failed to save RunParameter files for %s: %s" %projectName e.Message
-                match progress with
-                | Some p -> p.Report(msg)
-                | None -> ()
-                return Error msg
-        }
 
-
-    let InitProjectFiles
-        (db: IGeneSortDb)
-        (queryParams: queryParams)
-        (cts: CancellationTokenSource) 
-        (progress: IProgress<string> option) : Async<Result<unit, string>> =
-        async {
-            try
-                match progress with
-                | Some p -> p.Report(sprintf "Saving project file: %s" %projectName)
-                | None -> ()
-            
-                do! db.saveAsync queryParams (project |> outputData.Project)
-            
-                match progress with
-                | Some p -> p.Report(sprintf "Saving run parameters files: (%d)" project.RunParametersArray.Length)
-                | None -> ()
-            
-                let! initResult = initParametersFiles db projectName project.RunParametersArray cts progress
-            
-                match initResult with
-                | Ok () ->
-                    match progress with
-                    | Some p -> p.Report("Project initialization completed successfully")
-                    | None -> ()
-                    return Ok ()
-                | Error msg ->
-                    return Error (sprintf "Project initialization failed: %s" msg)
-            
-            with e ->
-                let errorMsg = sprintf "Failed to initialize project files: %s" e.Message
-                match progress with
-                | Some p -> p.Report(errorMsg)
-                | None -> ()
-                return Error errorMsg
-        }
-
-
-    let ExecuteRuns
-        (db: IGeneSortDb)
-        (cts: CancellationTokenSource) 
-        (progress: IProgress<string> option) : Async<Result<RunResult[], string>> =
-        async {
-            try
-                match progress with
-                | Some p -> p.Report(sprintf "Executing Runs for %s" %projectName)
-                | None -> ()
-            
-                let! runParamsResult = db.getAllRunParametersForProjectAsync projectName None progress
-            
-                match runParamsResult with
-                | Error msg ->
-                    match progress with
-                    | Some p -> p.Report(sprintf "Failed to load run parameters: %s" msg)
-                    | None -> ()
-                    return Error msg
-                
-                | Ok runParametersArray ->
-                    match progress with
-                    | Some p -> p.Report(sprintf "Found %d runs to execute" runParametersArray.Length)
-                    | None -> ()
-                
-                    if runParametersArray.Length = 0 then
-                        match progress with
-                        | Some p -> p.Report("No runs found to execute")
-                        | None -> ()
-                        return Ok [||]
-                    else
-                        let! results = ProjectOps.executeRunParametersSeq db 8 executor runParametersArray cts progress
-                        return Ok results
-            
-            with e ->
-                let msg = sprintf "Fatal error executing runs: %s" e.Message
-                match progress with
-                | Some p -> p.Report(msg)
-                | None -> ()
-                return Error msg
-        }
