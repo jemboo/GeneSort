@@ -16,13 +16,14 @@ type sorterModelKey =
 
 module SorterModelKey =
 
-    let toString (model:sorterModelKey) : string =
+    let toString (model:sorterModelKey option) : string =
         match model with
-        | Mcse -> "Mcse"
-        | Mssi -> "Mssi"
-        | Msrs -> "Msrs"
-        | Msuf4 -> "Msuf4"
-        | Msuf6 -> "Msuf6"
+        | Some Mcse -> "Mcse"
+        | Some Mssi -> "Mssi"
+        | Some Msrs -> "Msrs"
+        | Some Msuf4 -> "Msuf4"
+        | Some Msuf6 -> "Msuf6"
+        | None -> "None"
 
     let fromString (s:string) : sorterModelKey =
         match s with
@@ -36,8 +37,8 @@ module SorterModelKey =
     let all () : sorterModelKey list =
         [ Mcse; Mssi; Msrs; Msuf4; Msuf6 ]
 
-    let allButMusf6 () : sorterModelKey list =
-        [ Mcse; Mssi; Msrs; Msuf4; ]
+    let allButMusf6 () : sorterModelKey option list =
+        [ Some Mcse; Some Mssi; Some Msrs; Some Msuf4; ]
 
     let allButMusf6Kvps () : string*string list =
         ("SorterModel", allButMusf6() |> List.map(toString))

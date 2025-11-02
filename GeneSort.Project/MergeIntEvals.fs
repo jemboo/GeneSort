@@ -22,6 +22,7 @@ open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Uf6
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
+open GeneSort.SortingResults
 
 
 module MergeIntEvals =
@@ -81,11 +82,11 @@ module MergeIntEvals =
         (runParameters.sortingWidthKey, sortingWidthValues)
 
     let sorterModelKeyValues () : string list =
-        [ sorterModelKey.Mcse; 
-          sorterModelKey.Mssi;
-          sorterModelKey.Msrs; 
-          sorterModelKey.Msuf4; 
-          sorterModelKey.Msuf6; ]      |> List.map(SorterModelKey.toString)
+        [ Some sorterModelKey.Mcse; 
+          Some sorterModelKey.Mssi;
+          Some sorterModelKey.Msrs; 
+          Some sorterModelKey.Msuf4; 
+          Some sorterModelKey.Msuf6; ]      |> List.map(SorterModelKey.toString)
 
     let sorterModelKeys () : string*string list =
         (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
@@ -152,7 +153,6 @@ module MergeIntEvals =
                 reportNames 
                 parameterSet 
                 paramMapRefiner
-
 
 
     let executor
@@ -227,18 +227,16 @@ module MergeIntEvals =
             | None -> ()
 
             // Save sorter set
-            let queryParamsForSorterSet = 
-                queryParams.Create(projectName, Some index, Some repl, None, outputDataType.SorterSet)
+            let queryParamsForSorterSet = queryParams.createFromRunParams outputDataType.SorterSet runParameters
             do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet)
 
             // Save sorterSetEval
-            let queryParamsForSorterSetEval = 
-                queryParams.Create(projectName, Some index, Some repl, None, outputDataType.SorterSetEval)
+            let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval runParameters
             do! db.saveAsync queryParamsForSorterSetEval (sorterSetEval |> outputData.SorterSetEval)
 
-            // Save sorter set
+            // Save sorterModelSetMaker
             let queryParamsForSorterModelSetMaker = 
-                queryParams.Create(projectName, Some index, Some repl, None, outputDataType.SorterModelSetMaker)
+                queryParams.createFromRunParams outputDataType.SorterModelSetMaker runParameters
             do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             // Mark run as finished
@@ -250,125 +248,70 @@ module MergeIntEvals =
         }
 
 
+    let binReportExecutor
+            (db: IGeneSortDb)
+            (projectName: string<projectName>) 
+            (cts: CancellationTokenSource) 
+            (progress: IProgress<string> option) : Async<unit> =
+
+        async {
+            match progress with
+            | Some p -> p.Report(sprintf "Making performace bin report for project: %s" %projectName)
+            | None -> ()
+
+            let! runParamsResult = db.getAllProjectRunParametersAsync projectName (Some cts.Token) progress
+            let runParamsArray =
+                match runParamsResult with
+                | Ok rpArray -> rpArray
+                | Error msg -> failwithf "Error retrieving RunParameters for project %s: %s" %projectName msg
 
 
+            let summaries = 
+                runParamsArray
+                |> Seq.map (fun runParams ->
 
+                    let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval runParams
+                    let sorterModelKey =  runParams.GetSorterModelKey()
+                    let swFull = runParams.GetSortingWidth() 
+                    let sorterSetEval = 
+                        match db.loadAsync queryParamsForSorterSetEval outputDataType.SorterSetEval 
+                                |> Async.RunSynchronously with
+                        | Ok (SorterSetEval sse) -> sse
+                        | Ok _ -> failwith (sprintf "Unexpected output data type for SorterSetEval")
+                        | Error err -> failwith (sprintf "Error loading SorterSetEval: %s" err)
+                    let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
+                    let prpt = SorterSetEvalBins.getBinCountReport sorterSetEvalBins
+                    let appended = prpt |> Array.map(fun aa -> (swFull, (sorterModelKey |> SorterModelKey.toString), aa.[0], aa.[1], aa.[2], aa.[3]))
+                    appended
+                )   
+                |> Array.concat
+                |> Seq.toList
 
+            db.saveAsync (queryParams.create(
+                    Some projectName,
+                    None,
+                    None,
+                    None,
+                    outputDataType.TextReport))
+                ( 
+                    let reportContent =
+                        [ "# sorterEval Report"
+                          sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+                          sprintf "Project: %s" %projectName
+                          ""
+                          "Sorting Width\t SorterModel\t ceLength\t stageLength\t binCount\t unsortedReport"
+                        ]
+                        @ (summaries
+                           |> List.map (
+                                fun (sortingWidth, sorterModelKey, ceLength, stageLength, binCount, unsortedReport) ->
+                                        sprintf "%d \t %s \t %s \t %s \t %s \t %s " %(sortingWidth.Value) sorterModelKey ceLength stageLength binCount unsortedReport))
+                        |> String.concat "\n"
+                    reportContent |> outputData.TextReport
+                )
+                |> Async.RunSynchronously
 
-
-
-    //let executor 
-    //        (projectFolder: string)
-    //        (runParameters: runParameters) 
-    //        (cts: CancellationTokenSource) 
-    //        (progress: IProgress<string>) : Async<unit> =
-
-    //    async {
-
-    //        let index = runParameters.GetIndex()
-    //        let repl = runParameters.GetRepl()  
-    //        let sorterModelKey = runParameters.GetSorterModelKey()
-    //        let sortingWidth = runParameters.GetSortingWidth()
-    //        let stageLength = runParameters.GetStageLength()
-    //        let ceLength = runParameters.GetCeLength()
-    //        let sorterCount = runParameters.GetSorterCount()
-
-    //        cts.Token.ThrowIfCancellationRequested()
-    //        progress.Report(sprintf "Executing Run %d  %s" index (runParameters.toString()))
-
-
-    //        let sorterModelMaker =
-    //            match sorterModelKey with
-    //            | sorterModelKey.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> sorterModelMaker.SmmMsceRandGen
-    //            | sorterModelKey.Mssi -> (MssiRandGen.create randomType sortingWidth stageLength) |> sorterModelMaker.SmmMssiRandGen
-    //            | sorterModelKey.Msrs -> 
-    //                let opsGenRatesArray = OpsGenRatesArray.createUniform %stageLength
-    //                (msrsRandGen.create randomType sortingWidth opsGenRatesArray) |> sorterModelMaker.SmmMsrsRandGen
-    //            | sorterModelKey.Msuf4 -> 
-    //                let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageLength %sortingWidth
-    //                (msuf4RandGen.create randomType sortingWidth stageLength uf4GenRatesArray) |> sorterModelMaker.SmmMsuf4RandGen
-    //            | sorterModelKey.Msuf6 -> 
-    //                let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
-    //                (msuf6RandGen.create randomType sortingWidth stageLength uf6GenRatesArray) |> sorterModelMaker.SmmMsuf6RandGen
-
-
-    //        let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-            
-    //        let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
-    //        let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
-    //        let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
-
-    //        let sortableTests = SortableTestModel.makeSortableTestsForMerge sortableArrayType sortingWidth
-    //        let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
-
-    //        cts.Token.ThrowIfCancellationRequested()
-
-    //        do! OutputDataFile2.saveToFileAsync projectFolder (Some runParameters) (sorterSet |> outputData.SorterSet)
-
-    //        do! OutputDataFile2.saveToFileAsync projectFolder (Some runParameters) (sorterSetEval |> outputData.SorterSetEval)
-
-    //        do! OutputDataFile2.saveToFileAsync projectFolder (Some runParameters) (sorterModelSetMaker |> outputData.SorterModelSetMaker)
-
-    //        progress.Report(sprintf "Finished executing Run %d  Cycle  %d \n" index %repl)
-    //    }
-
-
-    //// Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    //let binReportExecutor 
-    //        (projectFolder: string)
-    //        (cts: CancellationTokenSource) 
-    //        (progress: IProgress<string>) : unit =
-    //        try
-    //            progress.Report(sprintf "Generating Bin report in project %s"  projectFolder)
-    //            let runParamsA = OutputDataFile2.getAllRunParametersAsync 
-    //                                projectFolder
-    //                                (Some cts.Token) (Some progress) |> Async.RunSynchronously
-
-    //            let summaries = 
-    //                runParamsA
-    //                |> Seq.map (fun runParams ->
-    //                    let ssEvalPath = OutputDataFile2.getAllOutputDataFilePaths projectFolder (Some runParams) outputDataType.SorterSetEval
-    //                    progress.Report (sprintf "Checking for file %s" ssEvalPath)
-    //                    try
-    //                        let swFull = runParams.GetSortingWidth() 
-    //                        let sorterModelKey =  runParams.GetSorterModelKey()
-    //                        let sorterSetEval = (OutputDataFile2.getSorterSetEvalAsync projectFolder runParams)
-    //                                            |> MonadUtils.getValue
-    //                        let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
-
-    //                        let prpt = SorterSetEvalBins.getBinCountReport sorterSetEvalBins
-    //                        let appended = prpt |> Array.map(fun aa -> (swFull, (sorterModelKey |> SorterModelKey.toString), aa.[0], aa.[1], aa.[2], aa.[3]))
-    //                        appended
-    //                    with e ->
-    //                     failwith (sprintf "Error processing file %s: %s" ssEvalPath e.Message)
-    //                )   
-    //                |> Array.concat
-    //                |> Seq.toList
-
-    //            // Generate the Markdown report, one line per SorterTest
-    //            let reportContent =
-    //                [ "# sorterEval Report"
-    //                  sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-    //                  sprintf "Project: %s" project.ProjectName
-    //                  ""
-    //                  "Sorting Width\t SorterModel\t ceLength\t stageLength\t binCount\t unsortedReport"
-    //                ]
-    //                @ (summaries
-    //                   |> List.map (
-    //                        fun (sortingWidth, sorterModelKey, ceLength, stageLength, binCount, unsortedReport) ->
-    //                                sprintf "%d \t %s \t %s \t %s \t %s \t %s " %sortingWidth sorterModelKey ceLength stageLength binCount unsortedReport))
-    //                |> String.concat "\n"
-
-    //            // Save the report to a file
-    //            let reportFilePath = Path.Combine(projectFolder, sprintf "%s_SorterEvalReport_%s.txt" "SorterSetEvalSamples" (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
-    //            File.WriteAllText(reportFilePath, reportContent)
-
-    //            Console.WriteLine(sprintf "SorterTest bin report saved to %s" reportFilePath)
-
-    //        with ex ->
-    //            progress.Report(sprintf "Error generating Bin report for %s: %s" "SorterTestSet" ex.Message)
-    //            raise ex
-
+            return ()
+        }
 
 
     //// Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest

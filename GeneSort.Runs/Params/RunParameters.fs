@@ -139,7 +139,7 @@ type runParameters =
         | None -> None
 
     /// Sets the SorterModelKey value.
-    member this.SetSorterModelKey(sorterModelKey: sorterModelKey) : unit =
+    member this.SetSorterModelKey(sorterModelKey: sorterModelKey option) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.sorterModelTypeKey, SorterModelKey.toString sorterModelKey)
 
 

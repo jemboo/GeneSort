@@ -13,7 +13,7 @@ open GeneSort.Runs
 
 type queryParams =
     private {
-        projectName: string<projectName>
+        projectName: string<projectName> option
         index: int<indexNumber> option
         repl: int<replNumber> option
         generation: int<generationNumber> option
@@ -25,8 +25,8 @@ type queryParams =
     member this.Generation with get() = this.generation
     member this.OutputDataType with get() = this.outputDataType
     
-    static member Create(
-            projectName: string<projectName>, 
+    static member create(
+            projectName: string<projectName> option, 
             index: int<indexNumber> option, 
             repl: int<replNumber> option, 
             generation: int<generationNumber> option, 
@@ -39,11 +39,22 @@ type queryParams =
             outputDataType = outputDataType
         }
     
-    static member CreateForProject(projectName: string<projectName>) : queryParams =
+    static member createForProject(projectName: string<projectName>) : queryParams =
         {
-            projectName = projectName
+            projectName = (Some projectName)
             index = None
             repl = None
             generation = None
             outputDataType = outputDataType.Project
+        }
+
+    static member createFromRunParams 
+                (outputDataType:outputDataType) 
+                (runParams: runParameters) : queryParams =
+        {
+            projectName = runParams.GetProjectName()
+            index = runParams.GetIndex()
+            repl = runParams.GetRepl()
+            generation = runParams.GetGeneration()
+            outputDataType = outputDataType
         }

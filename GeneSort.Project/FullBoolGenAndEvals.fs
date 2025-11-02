@@ -59,11 +59,11 @@ module FullBoolGenAndEvals =
         (runParameters.sortingWidthKey, sortingWidthValues)
         
     let sorterModelKeyValues() : string list =
-        [ sorterModelKey.Mcse; 
-          sorterModelKey.Mssi;
-          sorterModelKey.Msrs; 
-          sorterModelKey.Msuf4; 
-          sorterModelKey.Msuf6; ]  |> List.map(SorterModelKey.toString)
+        [ Some sorterModelKey.Mcse; 
+          Some sorterModelKey.Mssi;
+          Some sorterModelKey.Msrs; 
+          Some sorterModelKey.Msuf4; 
+          Some sorterModelKey.Msuf6; ]  |> List.map(SorterModelKey.toString)
 
     let sorterModelKeys() : string*string list =
         (runParameters.sorterModelTypeKey, sorterModelKeyValues() )

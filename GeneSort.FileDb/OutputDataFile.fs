@@ -63,6 +63,11 @@ module OutputDataFile =
         | outputDataType.Project -> 
             let fileName = sprintf "%s.msgpack" (outputDataType |> OutputDataType.toString)
             Path.Combine(%projectFolder, fileName) |> UMX.tag<fullPathToFile>
+
+        | outputDataType.TextReport -> 
+            let outputDataFolder = getPathToOutputDataFolder projectFolder outputDataType
+            let fileName = sprintf "%s.txt" (outputDataType |> OutputDataType.toString)
+            Path.Combine(%outputDataFolder, fileName) |> UMX.tag<fullPathToFile>
         | _ -> 
             makeIndexAndReplPathFromQueryParams projectFolder queryParams outputDataType
 

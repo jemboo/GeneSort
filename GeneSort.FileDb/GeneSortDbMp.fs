@@ -21,26 +21,10 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
         Path.Combine(%rootFolder, %projectName) |> UMX.tag<pathToProjectFolder>
 
     let saveAsync (queryParams: queryParams) (data: outputData) =
-        OutputDataFile.saveToFileAsync (getPathToProjectFolder queryParams.ProjectName) queryParams data
+        OutputDataFile.saveToFileAsync (getPathToProjectFolder queryParams.ProjectName.Value) queryParams data
     
     let loadAsync (queryParams: queryParams) (dataType: outputDataType) =
-        OutputDataFile.getOutputDataAsync (getPathToProjectFolder queryParams.ProjectName) queryParams dataType
-    
-    //let getAllProjectRunParametersAsync 
-    //            (projectName: string<projectName>) 
-    //            (ct: CancellationToken option) 
-    //            (progress: IProgress<string> option) : Async<Result<runParameters[], string>> =
-    //    async {
-    //        let! result = OutputDataFile.getAllProjectRunParametersAsync (getPathToProjectFolder projectName) ct progress
-    //        match result with
-    //        | Ok runParams -> return runParams
-    //        | Error msg ->
-    //            match progress with
-    //            | Some p -> p.Report(sprintf "Failed to load RunParameters: %s" msg)
-    //            | None -> ()
-    //            return [||] // Return empty array on error, or you could throw an exception
-    //    }
-    
+        OutputDataFile.getOutputDataAsync (getPathToProjectFolder queryParams.ProjectName.Value) queryParams dataType
 
     let mailbox = MailboxProcessor.Start(fun inbox ->
         let rec loop () =
@@ -86,8 +70,8 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
                         (progress: IProgress<string> option) : Async<unit> =
             async {
                 for runParams in runParamsArray do
-                    let queryParamsForRunParams = queryParams.Create(
-                                runParams.GetProjectName().Value,
+                    let queryParamsForRunParams = queryParams.create(
+                                runParams.GetProjectName(),
                                 runParams.GetIndex(),
                                 runParams.GetRepl(), 
                                 None, 

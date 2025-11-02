@@ -51,8 +51,11 @@ let project = MergeIntEvals.project
 let projectName = MergeIntEvals.project.ProjectName
 
 
-ProjectOps.initProjectFiles geneSortDb project cts (Some progress) |> Async.RunSynchronously
-ProjectOps.executeRuns geneSortDb projectName cts (Some progress) RandomSorters4to64.executor |> Async.RunSynchronously
+//ProjectOps.initProjectFiles geneSortDb project cts (Some progress) |> Async.RunSynchronously
+//ProjectOps.executeRuns geneSortDb projectName cts (Some progress) MergeIntEvals.executor |> Async.RunSynchronously
+
+MergeIntEvals.binReportExecutor geneSortDb projectName cts (Some progress) |> Async.RunSynchronously
+
 
 let endTime = System.DateTime.Now
 let duration = endTime - startTime

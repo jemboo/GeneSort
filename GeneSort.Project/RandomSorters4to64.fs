@@ -88,11 +88,11 @@ module RandomSorters4to64 =
 
 
     let sorterModelKeyValues () : string list =
-        [ sorterModelKey.Mcse; 
-          sorterModelKey.Mssi;
-          sorterModelKey.Msrs; 
-          sorterModelKey.Msuf4; 
-          sorterModelKey.Msuf6; ]      |> List.map(SorterModelKey.toString)
+        [ Some sorterModelKey.Mcse; 
+          Some sorterModelKey.Mssi;
+          Some sorterModelKey.Msrs; 
+          Some sorterModelKey.Msuf4; 
+          Some sorterModelKey.Msuf6; ]      |> List.map(SorterModelKey.toString)
 
     let sorterModelKeys () : string*string list =
         (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
@@ -221,17 +221,16 @@ module RandomSorters4to64 =
             cts.Token.ThrowIfCancellationRequested()
         
             // Save sorter set
-            let queryParamsForSorterSet = 
-                queryParams.Create(projectName, Some index, Some repl, None, outputDataType.SorterSet)
+            let queryParamsForSorterSet = queryParams.createFromRunParams outputDataType.SorterSet runParameters
             do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet)
         
             match progress with
             | Some p -> p.Report(sprintf "Run %d_%d: Saving sorter model set maker" index %repl)
             | None -> ()
         
-            // Save sorter model set maker
+            // Save sorterModelSetMaker
             let queryParamsForSorterModelSetMaker = 
-                queryParams.Create(projectName, Some index, Some repl, None, outputDataType.SorterModelSetMaker)
+                queryParams.createFromRunParams outputDataType.SorterModelSetMaker runParameters
             do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker)
         
             // Mark run as finished

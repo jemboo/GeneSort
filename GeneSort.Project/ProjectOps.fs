@@ -62,8 +62,8 @@ module ProjectOps =
                     do! executor db runParameters cts progress
                 
                     let queryParamsForRunParams = 
-                        queryParams.Create( 
-                            runParameters.GetProjectName().Value, 
+                        queryParams.create( 
+                            runParameters.GetProjectName(), 
                             runParameters.GetIndex(), 
                             runParameters.GetRepl(), 
                             None, 
@@ -201,7 +201,7 @@ module ProjectOps =
                 | Some p -> p.Report(sprintf "Saving project file: %s" %project.ProjectName)
                 | None -> ()
             
-                let queryParams = queryParams.CreateForProject project.ProjectName
+                let queryParams = queryParams.createForProject project.ProjectName
                 do! db.saveAsync queryParams (project |> outputData.Project)
             
                 match progress with
