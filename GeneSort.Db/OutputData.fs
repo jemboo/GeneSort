@@ -9,6 +9,7 @@ open GeneSort.SortingOps
 open GeneSort.SortingResults
 open GeneSort.Runs.Params
 open GeneSort.Runs
+open GeneSort.Core
 
 
 type outputDataType =
@@ -51,7 +52,7 @@ type outputData =
     | SorterSetEval of sorterSetEval
     | SorterSetEvalBins of sorterSetEvalBins
     | Project of project
-    | TextReport of string
+    | TextReport of dataTableFile
 
 
      

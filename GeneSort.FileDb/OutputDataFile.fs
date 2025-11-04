@@ -53,7 +53,7 @@ module OutputDataFile =
             failwithf "Index and Repl must be provided in queryParams for output data type %s" (outputDataType |> OutputDataType.toString)
 
 
-    let getOutputDataFilePath
+    let getOutputDataFileFullPath
             (projectFolder: string<pathToProjectFolder>)
             (queryParams: queryParams)
             (outputDataType: outputDataType) 
@@ -66,7 +66,7 @@ module OutputDataFile =
 
         | outputDataType.TextReport -> 
             let outputDataFolder = getPathToOutputDataFolder projectFolder outputDataType
-            let fileName = sprintf "%s.txt" (outputDataType |> OutputDataType.toString)
+            let fileName = sprintf "%s.txt" queryParams.TextReportName
             Path.Combine(%outputDataFolder, fileName) |> UMX.tag<fullPathToFile>
         | _ -> 
             makeIndexAndReplPathFromQueryParams projectFolder queryParams outputDataType
@@ -78,7 +78,7 @@ module OutputDataFile =
             (outputDataType: outputDataType) 
                 : Async<Result<outputData, OutputError>> =
         async {
-            let filePath = getOutputDataFilePath projectFolder queryParams outputDataType
+            let filePath = getOutputDataFileFullPath projectFolder queryParams outputDataType
             if not (File.Exists %filePath) then
                 return Error (sprintf "File not found: %s" %filePath)
             else
@@ -122,7 +122,7 @@ module OutputDataFile =
                         Project (ProjectDto.toDomain dto)
                     | outputDataType.TextReport ->
                         let text = System.Text.Encoding.UTF8.GetString(fileBytes)
-                        TextReport text
+                        failwith "TextReport should be handled separately"
             
                 return Ok domainData
             with e ->
@@ -137,7 +137,7 @@ module OutputDataFile =
             (outputData: outputData) : Async<unit> =
         async {
             let outputDataType = outputData |> OutputData.getOutputDataType
-            let filePath = getOutputDataFilePath projectFolder queryParams outputDataType
+            let filePath = getOutputDataFileFullPath projectFolder queryParams outputDataType
             let directory = Path.GetDirectoryName %filePath
             Directory.CreateDirectory directory |> ignore
             try
@@ -170,8 +170,8 @@ module OutputDataFile =
                 | Project p ->
                     let dto = ProjectDto.fromDomain p
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | TextReport text ->
-                    let textBytes = System.Text.Encoding.UTF8.GetBytes(text)
+                | TextReport dataTableFile ->
+                    let textBytes = System.Text.Encoding.UTF8.GetBytes(dataTableFile.ToText())
                     do! stream.WriteAsync(textBytes, 0, textBytes.Length) |> Async.AwaitTask
 
             with e ->

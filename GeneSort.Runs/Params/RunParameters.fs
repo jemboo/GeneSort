@@ -43,7 +43,6 @@ type runParameters =
         |> String.concat ", "
 
 
-
     /// Gets the Index value.
     member this.GetIndex() : int<indexNumber> option =
         match this.paramMap.TryFind runParameters.indexKey with
@@ -267,3 +266,56 @@ module RunParameters =
         match filtrate.Length with
         | 1 -> Some filtrate.[0]
         | _ -> None
+
+    let getAllKeys (runParams :runParameters seq) : string[] =
+        runParams
+        |> Seq.collect (fun rp -> rp.ParamMap |> Map.toSeq |> Seq.map fst)
+        |> Seq.distinct
+        |> Seq.toArray
+
+    let getIndexAndReplName (runParams: runParameters) : string =
+        let indexStr = 
+            match runParams.GetIndex() with
+            | Some index -> sprintf "Index_%d" (UMX.untag index)
+            | None -> "Index_None"
+        let replStr = 
+            match runParams.GetRepl() with
+            | Some repl -> sprintf "Repl_%d" (UMX.untag repl)
+            | None -> "Repl_None"
+        sprintf "%s_%s" indexStr replStr 
+
+
+    let tableToTabDelimited (table: string[][]) : string[] =
+        table
+        |> Array.map (fun row -> String.concat "\t" row)
+
+
+    //creates a table with the getIndexAndReplName as the row headers, and the array from
+    //getAllKeys as the column headers
+    let makeIndexAndReplTable(runParams :runParameters seq) : string[][] 
+        =
+        let keys = getAllKeys runParams
+        let headerRow = Array.append [| "Run" |] keys
+        let dataRows =
+            runParams
+            |> Seq.map (fun rp ->
+                let rowHeader = getIndexAndReplName rp
+                let rowValues =
+                    keys
+                    |> Array.map (fun key ->
+                        match rp.ParamMap.TryFind key with
+                        | Some value -> value
+                        | None -> "N/A"
+                    )
+                Array.append [| rowHeader |] rowValues
+            )
+            |> Seq.toArray
+        Array.append [| headerRow |] dataRows
+    
+
+    let toStringTable(runParams :runParameters seq) : string =
+        let table = makeIndexAndReplTable runParams
+        let sb = System.Text.StringBuilder()
+        for row in table do
+            sb.AppendLine(String.Join("\t", row)) |> ignore
+        sb.ToString()

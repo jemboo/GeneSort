@@ -17,14 +17,14 @@ type private DbMessage =
 
 type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
 
-    let getPathToProjectFolder (projectName: string<projectName>) = 
-        Path.Combine(%rootFolder, %projectName) |> UMX.tag<pathToProjectFolder>
+    let getPathToProjectFolder (projectName: string) = 
+        Path.Combine(%rootFolder, projectName) |> UMX.tag<pathToProjectFolder>
 
     let saveAsync (queryParams: queryParams) (data: outputData) =
-        OutputDataFile.saveToFileAsync (getPathToProjectFolder queryParams.ProjectName.Value) queryParams data
+        OutputDataFile.saveToFileAsync (getPathToProjectFolder (queryParams.ProjectName)) queryParams data
     
     let loadAsync (queryParams: queryParams) (dataType: outputDataType) =
-        OutputDataFile.getOutputDataAsync (getPathToProjectFolder queryParams.ProjectName.Value) queryParams dataType
+        OutputDataFile.getOutputDataAsync (getPathToProjectFolder queryParams.ProjectName) queryParams dataType
 
     let mailbox = MailboxProcessor.Start(fun inbox ->
         let rec loop () =
@@ -41,7 +41,7 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
                     replyChannel.Reply(result)
                     
                 | GetAllProjectRunParameters (projectName, ct, progress, replyChannel) ->
-                    let! result = OutputDataFile.getAllProjectRunParametersAsync (getPathToProjectFolder projectName) ct progress
+                    let! result = OutputDataFile.getAllProjectRunParametersAsync (getPathToProjectFolder %projectName) ct progress
                     replyChannel.Reply(result)
                 
                 return! loop ()
@@ -70,8 +70,10 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
                         (progress: IProgress<string> option) : Async<unit> =
             async {
                 for runParams in runParamsArray do
-                    let queryParamsForRunParams = queryParams.create(
+                    let queryParamsForRunParams = 
+                        queryParams.create(
                                 runParams.GetProjectName(),
+                                None,
                                 runParams.GetIndex(),
                                 runParams.GetRepl(), 
                                 None, 

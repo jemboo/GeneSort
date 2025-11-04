@@ -248,6 +248,7 @@ module MergeIntEvals =
         }
 
 
+
     let binReportExecutor
             (db: IGeneSortDb)
             (projectName: string<projectName>) 
@@ -265,53 +266,137 @@ module MergeIntEvals =
                 | Ok rpArray -> rpArray
                 | Error msg -> failwithf "Error retrieving RunParameters for project %s: %s" %projectName msg
 
+            let dataTableFile1 = 
+                        DataTableFile.create "SorterEval_Bin_Report" 
+                                [| "Sorting Width"; "SorterModel"; "ceLength"; "stageLength"; "binCount"; "unsortedReport" |]
+                                |> DataTableFile.addSource (sprintf "Generated: %s" (DateTime.Now.ToLongTimeString()))
+                                |> DataTableFile.addSource (sprintf "Sources (%d):" runParamsArray.Length)
 
-            let summaries = 
-                runParamsArray
-                |> Seq.map (fun runParams ->
 
-                    let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval runParams
-                    let sorterModelKey =  runParams.GetSorterModelKey()
-                    let swFull = runParams.GetSortingWidth() 
-                    let sorterSetEval = 
-                        match db.loadAsync queryParamsForSorterSetEval outputDataType.SorterSetEval 
-                                |> Async.RunSynchronously with
-                        | Ok (SorterSetEval sse) -> sse
-                        | Ok _ -> failwith (sprintf "Unexpected output data type for SorterSetEval")
-                        | Error err -> failwith (sprintf "Error loading SorterSetEval: %s" err)
-                    let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
-                    let prpt = SorterSetEvalBins.getBinCountReport sorterSetEvalBins
-                    let appended = prpt |> Array.map(fun aa -> (swFull, (sorterModelKey |> SorterModelKey.toString), aa.[0], aa.[1], aa.[2], aa.[3]))
-                    appended
-                )   
-                |> Array.concat
-                |> Seq.toList
 
-            db.saveAsync (queryParams.create(
-                    Some projectName,
-                    None,
-                    None,
-                    None,
-                    outputDataType.TextReport))
-                ( 
-                    let reportContent =
-                        [ "# sorterEval Report"
-                          sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-                          sprintf "Project: %s" %projectName
-                          ""
-                          "Sorting Width\t SorterModel\t ceLength\t stageLength\t binCount\t unsortedReport"
-                        ]
-                        @ (summaries
-                           |> List.map (
-                                fun (sortingWidth, sorterModelKey, ceLength, stageLength, binCount, unsortedReport) ->
-                                        sprintf "%d \t %s \t %s \t %s \t %s \t %s " %(sortingWidth.Value) sorterModelKey ceLength stageLength binCount unsortedReport))
-                        |> String.concat "\n"
-                    reportContent |> outputData.TextReport
-                )
-                |> Async.RunSynchronously
+            let csvRows = (RunParameters.makeIndexAndReplTable runParamsArray) |> RunParameters.tableToTabDelimited
+
+
+            let dataTableFile2 = DataTableFile.addSources csvRows dataTableFile1
+
+            let queryParams = queryParams.createForTextReport projectName ("SorterEval_Bin_Report" |> UMX.tag<textReportName> )
+            let outputData =  dataTableFile2 |> outputData.TextReport
+            do! db.saveAsync queryParams outputData
+
+                
+            //let summaries =
+            //    runParamsArray
+            //    |> Seq.map (fun runParams ->
+            //        dataTable
+            //        let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval runParams
+            //        let sorterModelKey =  runParams.GetSorterModelKey()
+            //        let swFull = runParams.GetSortingWidth() 
+            //        let sorterSetEval = 
+            //            match db.loadAsync queryParamsForSorterSetEval outputDataType.SorterSetEval 
+            //                    |> Async.RunSynchronously with
+            //            | Ok (SorterSetEval sse) -> sse
+            //            | Ok _ -> failwith (sprintf "Unexpected output data type for SorterSetEval")
+            //            | Error err -> failwith (sprintf "Error loading SorterSetEval: %s" err)
+            //        let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
+            //        let prpt = SorterSetEvalBins.getBinCountReport sorterSetEvalBins
+            //        let appended = prpt |> Array.map(fun aa -> (swFull, (sorterModelKey |> SorterModelKey.toString), aa.[0], aa.[1], aa.[2], aa.[3]))
+            //        appended
+            //    )   
+            //    |> Array.concat
+            //    |> Seq.toList
+
+            //db.saveAsync (queryParams.create(
+            //        Some projectName,
+            //        None,
+            //        None,
+            //        None,
+            //        outputDataType.TextReport))
+            //    ( 
+            //        let reportContent =
+            //            [ "# sorterEval Report"
+            //              sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+            //              sprintf "Project: %s" %projectName
+            //              ""
+            //              "Sorting Width\t SorterModel\t ceLength\t stageLength\t binCount\t unsortedReport"
+            //            ]
+            //            @ (summaries
+            //               |> List.map (
+            //                    fun (sortingWidth, sorterModelKey, ceLength, stageLength, binCount, unsortedReport) ->
+            //                            sprintf "%d \t %s \t %s \t %s \t %s \t %s " %(sortingWidth.Value) sorterModelKey ceLength stageLength binCount unsortedReport))
+            //            |> String.concat "\n"
+            //        reportContent |> outputData.TextReport
+            //    )
+            //    |> Async.RunSynchronously
 
             return ()
         }
+
+
+
+    //let binReportExecutor
+    //        (db: IGeneSortDb)
+    //        (projectName: string<projectName>) 
+    //        (cts: CancellationTokenSource) 
+    //        (progress: IProgress<string> option) : Async<unit> =
+
+    //    async {
+    //        match progress with
+    //        | Some p -> p.Report(sprintf "Making performace bin report for project: %s" %projectName)
+    //        | None -> ()
+
+    //        let! runParamsResult = db.getAllProjectRunParametersAsync projectName (Some cts.Token) progress
+    //        let runParamsArray =
+    //            match runParamsResult with
+    //            | Ok rpArray -> rpArray
+    //            | Error msg -> failwithf "Error retrieving RunParameters for project %s: %s" %projectName msg
+
+
+    //        let summaries = 
+    //            runParamsArray
+    //            |> Seq.map (fun runParams ->
+
+    //                let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval runParams
+    //                let sorterModelKey =  runParams.GetSorterModelKey()
+    //                let swFull = runParams.GetSortingWidth() 
+    //                let sorterSetEval = 
+    //                    match db.loadAsync queryParamsForSorterSetEval outputDataType.SorterSetEval 
+    //                            |> Async.RunSynchronously with
+    //                    | Ok (SorterSetEval sse) -> sse
+    //                    | Ok _ -> failwith (sprintf "Unexpected output data type for SorterSetEval")
+    //                    | Error err -> failwith (sprintf "Error loading SorterSetEval: %s" err)
+    //                let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
+    //                let prpt = SorterSetEvalBins.getBinCountReport sorterSetEvalBins
+    //                let appended = prpt |> Array.map(fun aa -> (swFull, (sorterModelKey |> SorterModelKey.toString), aa.[0], aa.[1], aa.[2], aa.[3]))
+    //                appended
+    //            )   
+    //            |> Array.concat
+    //            |> Seq.toList
+
+    //        db.saveAsync (queryParams.create(
+    //                Some projectName,
+    //                None,
+    //                None,
+    //                None,
+    //                outputDataType.TextReport))
+    //            ( 
+    //                let reportContent =
+    //                    [ "# sorterEval Report"
+    //                      sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+    //                      sprintf "Project: %s" %projectName
+    //                      ""
+    //                      "Sorting Width\t SorterModel\t ceLength\t stageLength\t binCount\t unsortedReport"
+    //                    ]
+    //                    @ (summaries
+    //                       |> List.map (
+    //                            fun (sortingWidth, sorterModelKey, ceLength, stageLength, binCount, unsortedReport) ->
+    //                                    sprintf "%d \t %s \t %s \t %s \t %s \t %s " %(sortingWidth.Value) sorterModelKey ceLength stageLength binCount unsortedReport))
+    //                    |> String.concat "\n"
+    //                reportContent |> outputData.TextReport
+    //            )
+    //            |> Async.RunSynchronously
+
+    //        return ()
+    //    }
 
 
     //// Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
