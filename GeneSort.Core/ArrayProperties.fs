@@ -175,9 +175,15 @@ module ArrayProperties =
             { start = seg.start; endIndex = seg.endIndex; payload = segSum })
 
 
-    let getSegmentPayloadReportData<'u> (formatter: 'u -> string) (segWithPayload: segmentWithPayload<'u>[]) : string =
+    let getSegmentPayloadReportDataOld<'u> (formatter: 'u -> string) (segWithPayload: segmentWithPayload<'u>[]) : string =
         segWithPayload
         |> Array.sortBy(fun seg -> seg.start)
         |> Array.map (fun seg -> formatter seg.payload)
         |> String.concat "\t"
         |> sprintf "%s"
+
+
+    let getSegmentPayloadReportData<'u> (formatter: 'u -> string) (segWithPayload: segmentWithPayload<'u>[]) : string[] =
+        segWithPayload
+        |> Array.sortBy(fun seg -> seg.start)
+        |> Array.map (fun seg -> formatter seg.payload)
