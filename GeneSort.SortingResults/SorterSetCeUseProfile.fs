@@ -53,16 +53,6 @@ module SorterCeUseProfile =
             yield! (profile.segmentTotals |> ArrayProperties.getSegmentPayloadReportData (fun (i:int) -> i.ToString()))
         |]
 
-    
-    let makeCsvLine (prefix:string) (profile: sorterCeUseProfile) : string =
-        sprintf "%s \t%s \t%s \t%s \t%s \t%s" 
-                prefix
-                (%profile.sorterId.ToString()) 
-                (%profile.sorterSetId.ToString()) 
-                (%profile.sorterTestsId.ToString())
-                (profile.lastUsedCeIndex.ToString())
-                (profile.segmentTotals |> ArrayProperties.getSegmentPayloadReportDataOld (fun (i:int) -> i.ToString()))
-
 
 
 type sorterSetCeUseProfile = {
@@ -94,13 +84,6 @@ module SorterSetCeUseProfile =
                                             sorterSetEval.SorterTestsId 
                                             se |]
         }
-
-
-    let makeCsvLines (prefix:string) (sorterSetCeUseProfile: sorterSetCeUseProfile) : string [] =
-        [|
-                for profile in sorterSetCeUseProfile.sorterCeUseProfiles do
-                    yield SorterCeUseProfile.makeCsvLine prefix profile
-        |]
 
     let makeReportLines (sortingWidth:int<sortingWidth> option) (sorterModelKey:string) 
                         (sorterSetCeUseProfile: sorterSetCeUseProfile) : string [][] =

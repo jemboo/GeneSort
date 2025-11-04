@@ -38,6 +38,7 @@ type sorterSetEvalBins = {
     evalBins: Dictionary<sorterEvalKey, sorterEvalBin>
 }
 
+
 module SorterSetEvalBins =
 
     let addSorterEval (sorterEval: sorterEval) 
@@ -81,22 +82,7 @@ module SorterSetEvalBins =
 
 
     /// Returns an array of int arrays, each inner array containing [| ceCount; stageLength; binCount |]
-    let getBinCountReport (sorterSetEvalBins: sorterSetEvalBins) : string array array =
-        let lines = 
-            (sorterSetEvalBins.evalBins : Dictionary<sorterEvalKey, sorterEvalBin>)
-            |> Seq.map (fun kvp -> 
-                        [| 
-                            (%kvp.Key.ceCount).ToString(); 
-                            (%kvp.Key.stageLength).ToString(); 
-                            (kvp.Value.binCount).ToString();
-                            (kvp.Value |> SorterEvalBin.getUnsortedHistogram)
-                        |])
-            |> Seq.toArray
-        lines
-
-
-    /// Returns an array of int arrays, each inner array containing [| ceCount; stageLength; binCount |]
-    let getBinCountReport2 
+    let getBinCountReport 
                 (sortingWidth:int<sortingWidth> option) 
                 (sorterModelKey:string) 
                 (sorterSetEvalBins: sorterSetEvalBins) : string array array =

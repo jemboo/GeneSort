@@ -289,7 +289,7 @@ module MergeIntEvals =
                         | Error err -> failwith (sprintf "Error loading SorterSetEval: %s" err)
         
                     let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
-                    let reportLines = SorterSetEvalBins.getBinCountReport2 sortingWidth sorterModelKey sorterSetEvalBins
+                    let reportLines = SorterSetEvalBins.getBinCountReport sortingWidth sorterModelKey sorterSetEvalBins
                     dataTableFile <- DataTableFile.addRows reportLines dataTableFile
                     ()
                 })
@@ -372,73 +372,6 @@ module MergeIntEvals =
 
             return ()
         }
-
-
-
-
-    //// Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    //let ceUseProfileReportExecutor 
-    //            (projectFolder: string)
-    //            (cts: CancellationTokenSource) 
-    //            (progress: IProgress<string>) : unit =
-    //        try
-    //            let binCount = 20
-    //            let blockGrowthRate = 1.2
-
-    //            let runParamsA = OutputDataFile2.getAllRunParametersAsync 
-    //                                    projectFolder
-    //                                    (Some cts.Token) (Some progress) |> Async.RunSynchronously
-
-    //            let summaries = 
-    //                runParamsA
-    //                |> Seq.map (fun runParams ->
-    //                    let ssEvalPath = OutputDataFile2.getAllOutputDataFilePaths projectFolder (Some runParams) outputDataType.SorterSetEval
-    //                    progress.Report (sprintf "Checking for file %s" ssEvalPath)
-    //                    try
-    //                        let swFull = runParams.GetSortingWidth() 
-    //                        let sorterModelKey =  runParams.GetSorterModelKey()
-    //                        let sorterSetEval = (OutputDataFile2.getSorterSetEvalAsync projectFolder runParams)
-    //                                            |> MonadUtils.getValue
-    //                        let sorterSetCeUseProfile = SorterSetCeUseProfile.makeSorterSetCeUseProfile binCount blockGrowthRate sorterSetEval
-    //                        let linePrefix = sprintf "%s \t %s" (%swFull.ToString()) (sorterModelKey |> SorterModelKey.toString)
-
-    //                        SorterSetCeUseProfile.makeCsvLines linePrefix sorterSetCeUseProfile
-    //                    with e ->
-    //                     failwith (sprintf "Error processing file %s: %s" ssEvalPath e.Message)
-    //                )   
-    //                |> Array.concat
-    //                |> Seq.toList
-
-
-    //            // Generate the Markdown report, one line per SorterTest
-    //            let reportContent =
-    //                [ "# sorterCeProfile Report"
-    //                  sprintf "Generated on %s" (DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-    //                  sprintf "Project: %s" project.ProjectName
-    //                  ""
-    //                  "Sorting Width\tSorterModel\tsorterId\tsorterSetId\tsorterTestsId\tlastCe"
-    //                ]
-    //                @ summaries
-    //                |> String.concat "\n"
-
-
-    //            // Save the report to a file
-    //            let reportFilePath = Path.Combine(projectFolder, sprintf "SorterCeUseReport_%s.txt" (DateTime.Now.ToString("yyyyMMdd_HHmmss")))
-    //            File.WriteAllText(reportFilePath, reportContent)
-
-    //            progress.Report(sprintf "Ce Profile report saved to %s" reportFilePath)
-
-    //        with ex ->
-    //            progress.Report(sprintf "Error generating Ce Profile report for %s: %s" "SorterTestSet" ex.Message)
-    //            raise ex
-
-
-
-
-
-
-
-
 
 
 
