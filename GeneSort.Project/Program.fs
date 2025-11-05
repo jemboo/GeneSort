@@ -1,14 +1,11 @@
 ﻿module Program
 
 open System
-open System.IO
 open FSharp.UMX
 
 open GeneSort.Db
-open GeneSort.Core
 open GeneSort.FileDb
 open GeneSort.Project
-open GeneSort.Project.Old
 open System.Threading
 
 
@@ -46,15 +43,21 @@ let cts = new CancellationTokenSource()
 
 
 /// **********     MergeIntEvals   ****************
-let executor = MergeIntEvals.executor
-let project = MergeIntEvals.project
-let projectName = MergeIntEvals.project.ProjectName
+//let executor = MergeIntEvals.executor
+//let project = MergeIntEvals.project
+//let projectName = MergeIntEvals.project.ProjectName
+
+/// **********    FullBoolEvals   ****************
+let executor = FullBoolEvals.executor
+let project = FullBoolEvals.project
+let projectName = FullBoolEvals.project.ProjectName
 
 
 //ProjectOps.initProjectFiles geneSortDb project cts (Some progress) |> Async.RunSynchronously
-//ProjectOps.executeRuns geneSortDb projectName cts (Some progress) MergeIntEvals.executor |> Async.RunSynchronously
+//ProjectOps.executeRuns geneSortDb projectName cts (Some progress) executor |> Async.RunSynchronously
 
-MergeIntEvals.ceUseProfileReportExecutor geneSortDb projectName cts (Some progress) |> Async.RunSynchronously
+Reporters.ceUseProfileReportExecutor geneSortDb projectName cts (Some progress) |> Async.RunSynchronously
+Reporters.binReportExecutor geneSortDb projectName cts (Some progress) |> Async.RunSynchronously
 
 
 let endTime = System.DateTime.Now

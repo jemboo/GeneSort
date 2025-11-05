@@ -1,5 +1,4 @@
-﻿
-namespace GeneSort.Project.Old
+﻿namespace GeneSort.Project
 
 open System
 

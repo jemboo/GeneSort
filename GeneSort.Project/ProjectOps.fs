@@ -71,7 +71,7 @@ module ProjectOps =
                             outputDataType.RunParameters)
                 
                     do! db.saveAsync queryParamsForRunParams (runParameters |> outputData.RunParameters)
-                
+
                     let result = Success (index, repl)
                     reportRunResult progress result
                     return result
