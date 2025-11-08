@@ -7,17 +7,11 @@ open GeneSort.Runs.Params
 type queryParams =
     private {
         projectName: string<projectName> option
-        textReportName: string<textReportName> option
         index: int<indexNumber> option
         repl: int<replNumber> option
         generation: int<generationNumber> option
         outputDataType: outputDataType
     }
-    member this.TextReportName with get() = 
-                    match this.textReportName with
-                        | Some name -> %name 
-                        | None -> "NoName"
-
     member this.ProjectName with get() = 
                     match this.projectName with
                         | Some name -> %name
@@ -29,15 +23,13 @@ type queryParams =
     member this.OutputDataType with get() = this.outputDataType
     
     static member create(
-            projectName: string<projectName> option, 
-            textReportName: string<textReportName> option,
+            projectName: string<projectName> option,
             index: int<indexNumber> option, 
             repl: int<replNumber> option, 
             generation: int<generationNumber> option, 
             outputDataType: outputDataType) : queryParams =
         {
             projectName = projectName
-            textReportName = textReportName
             index = index
             repl = repl
             generation = generation
@@ -47,7 +39,6 @@ type queryParams =
     static member createForProject(projectName: string<projectName>) : queryParams =
         {
             projectName = (Some projectName)
-            textReportName = None
             index = None
             repl = None
             generation = None
@@ -59,20 +50,17 @@ type queryParams =
             (textReportName: string<textReportName>) : queryParams =
         {
             projectName = (Some projectName)
-            textReportName = (Some textReportName)
             index = None
             repl = None
             generation = None
-            outputDataType = outputDataType.TextReport
+            outputDataType = outputDataType.TextReport textReportName
         }
 
     static member createFromRunParams 
-                (outputDataType:outputDataType) 
-                (outputDataSubType:string option) 
+                (outputDataType:outputDataType)
                 (runParams: runParameters) : queryParams =
         {
             projectName = runParams.GetProjectName()
-            textReportName = None
             index = runParams.GetIndex()
             repl = runParams.GetRepl()
             generation = runParams.GetGeneration()

@@ -43,18 +43,18 @@ let cts = new CancellationTokenSource()
 
 
 /// **********     MergeIntEvals   ****************
-//let executor = MergeIntEvals.executor
-//let project = MergeIntEvals.project
-//let projectName = MergeIntEvals.project.ProjectName
+let executor = MergeIntEvals.executor
+let project = MergeIntEvals.project
+let projectName = MergeIntEvals.project.ProjectName
 
 /// **********    FullBoolEvals   ****************
-let executor = FullBoolEvals.executor
-let project = FullBoolEvals.project
-let projectName = FullBoolEvals.project.ProjectName
+//let executor = FullBoolEvals.executor
+//let project = FullBoolEvals.project
+//let projectName = FullBoolEvals.project.ProjectName
 
 
-ProjectOps.initProjectFiles geneSortDb project cts (Some progress) |> Async.RunSynchronously
-ProjectOps.executeRuns geneSortDb projectName cts (Some progress) executor |> Async.RunSynchronously
+//ProjectOps.initProjectFiles geneSortDb project cts (Some progress) |> Async.RunSynchronously
+//ProjectOps.executeRuns geneSortDb projectName cts (Some progress) executor |> Async.RunSynchronously
 
 Reporters.ceUseProfileReportExecutor geneSortDb projectName cts (Some progress) |> Async.RunSynchronously
 Reporters.binReportExecutor geneSortDb projectName cts (Some progress) |> Async.RunSynchronously

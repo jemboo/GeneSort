@@ -41,11 +41,11 @@ module Reporters =
 
             do! runParamsArray
                 |> Array.map (fun runParams -> async {
-                    let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval None runParams
+                    let queryParamsForSorterSetEval = queryParams.createFromRunParams (outputDataType.SorterSetEval None) runParams
                     let sortingWidth = runParams.GetSortingWidth()
                     let sorterModelKey =  runParams.GetSorterModelKey() |> SorterModelKey.toString
         
-                    let! sorterSetEvalResult = db.loadAsync queryParamsForSorterSetEval outputDataType.SorterSetEval
+                    let! sorterSetEvalResult = db.loadAsync queryParamsForSorterSetEval
                     let sorterSetEval = 
                         match sorterSetEvalResult with
                         | Ok (SorterSetEval sse) -> sse
@@ -102,7 +102,7 @@ module Reporters =
 
             do! runParamsArray
                 |> Array.map (fun runParams -> async {
-                    let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval None runParams
+                    let queryParamsForSorterSetEval = queryParams.createFromRunParams (outputDataType.SorterSetEval None) runParams
                     let sortingWidth = runParams.GetSortingWidth()
                     let sorterModelKey = runParams.GetSorterModelKey() |> SorterModelKey.toString
 
@@ -110,7 +110,7 @@ module Reporters =
                     | Some p -> p.Report(sprintf "Processing SorterSetEval for %s %s" (%sortingWidth.ToString()) sorterModelKey)
                     | None -> ()
 
-                    let! sorterSetEvalResult = db.loadAsync queryParamsForSorterSetEval outputDataType.SorterSetEval
+                    let! sorterSetEvalResult = db.loadAsync queryParamsForSorterSetEval
                     let sorterSetEval = 
                         match sorterSetEvalResult with
                         | Ok (SorterSetEval sse) -> sse

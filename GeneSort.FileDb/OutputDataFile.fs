@@ -36,7 +36,7 @@ module OutputDataFile =
                 (projectFolder:string<pathToProjectFolder>) 
                 (outputDataType: outputDataType) 
                  : string<fullPathToFolder> =
-        Path.Combine(%projectFolder, outputDataType |> OutputDataType.toString) |> UMX.tag<fullPathToFolder>
+        Path.Combine(%projectFolder, outputDataType |> OutputDataType.toFolderName) |> UMX.tag<fullPathToFolder>
 
 
     let makeIndexAndReplPathFromQueryParams 
@@ -47,11 +47,11 @@ module OutputDataFile =
         let outputDataFolder = getPathToOutputDataFolder projectFolder outputDataType
         match queryParams.Index, queryParams.Repl with
         | Some index, Some repl ->
-            let outputDataName = outputDataType |> OutputDataType.toString
+            let outputDataName = outputDataType |> OutputDataType.toFolderName
             let fileName = sprintf "%s_%d_%d.msgpack" outputDataName repl index 
             Path.Combine(%outputDataFolder, fileName) |> UMX.tag<fullPathToFile>
         | _ -> 
-            failwithf "Index and Repl must be provided in queryParams for output data type %s" (outputDataType |> OutputDataType.toString)
+            failwithf "Index and Repl must be provided in queryParams for output data type %s" (outputDataType |> OutputDataType.toFolderName)
 
 
     let getOutputDataFileFullPath
@@ -62,12 +62,12 @@ module OutputDataFile =
 
         match outputDataType with
         | outputDataType.Project -> 
-            let fileName = sprintf "%s.msgpack" (outputDataType |> OutputDataType.toString)
+            let fileName = sprintf "%s.msgpack" (outputDataType |> OutputDataType.toFolderName)
             Path.Combine(%projectFolder, fileName) |> UMX.tag<fullPathToFile>
 
-        | outputDataType.TextReport -> 
+        | outputDataType.TextReport reportName -> 
             let outputDataFolder = getPathToOutputDataFolder projectFolder outputDataType
-            let fileName = sprintf "%s.txt" queryParams.TextReportName
+            let fileName = sprintf "%s.txt" %reportName
             Path.Combine(%outputDataFolder, fileName) |> UMX.tag<fullPathToFile>
         | _ -> 
             makeIndexAndReplPathFromQueryParams projectFolder queryParams outputDataType
@@ -76,10 +76,9 @@ module OutputDataFile =
     let getOutputDataAsync
             (projectFolder:string<pathToProjectFolder>)
             (queryParams: queryParams)
-            (outputDataType: outputDataType) 
                 : Async<Result<outputData, OutputError>> =
         async {
-            let filePath = getOutputDataFileFullPath projectFolder queryParams outputDataType
+            let filePath = getOutputDataFileFullPath projectFolder queryParams queryParams.OutputDataType
             if not (File.Exists %filePath) then
                 return Error (sprintf "File not found: %s" %filePath)
             else
@@ -92,36 +91,37 @@ module OutputDataFile =
                         return ms.ToArray()
                     }
             
+                let outputDataType = queryParams.OutputDataType
                 let domainData =
                     match outputDataType with
-                    | outputDataType.RunParameters ->
+                    | outputDataType.RunParameters _ ->
                         let dto = MessagePackSerializer.Deserialize<runParametersDto>(fileBytes, options)
                         RunParameters (RunParametersDto.fromDto dto)
-                    | outputDataType.SorterSet ->
+                    | outputDataType.SorterSet _ ->
                         let dto = MessagePackSerializer.Deserialize<sorterSetDto>(fileBytes, options)
                         SorterSet (SorterSetDto.toDomain dto)
-                    | outputDataType.SortableTestSet ->
+                    | outputDataType.SortableTestSet _ ->
                         let dto = MessagePackSerializer.Deserialize<sortableTestSetDto>(fileBytes, options)
                         SortableTestSet (SortableTestSetDto.toDomain dto)
-                    | outputDataType.SorterModelSetMaker ->
+                    | outputDataType.SorterModelSetMaker _ ->
                         let dto = MessagePackSerializer.Deserialize<sorterModelSetMakerDto>(fileBytes, options)
                         SorterModelSetMaker (SorterModelSetMakerDto.toDomain dto)
-                    | outputDataType.SortableTestModelSet ->
+                    | outputDataType.SortableTestModelSet _ ->
                         let dto = MessagePackSerializer.Deserialize<sortableTestModelSetDto>(fileBytes, options)
                         SortableTestModelSet (SortableTestModelSetDto.toDomain dto)
-                    | outputDataType.SortableTestModelSetMaker ->
+                    | outputDataType.SortableTestModelSetMaker _ ->
                         let dto = MessagePackSerializer.Deserialize<sortableTestModelSetMakerDto>(fileBytes, options)
                         SortableTestModelSetMaker (SortableTestModelSetMakerDto.toDomain dto)
-                    | outputDataType.SorterSetEval ->
+                    | outputDataType.SorterSetEval _ ->
                         let dto = MessagePackSerializer.Deserialize<sorterSetEvalDto>(fileBytes, options)
                         SorterSetEval (SorterSetEvalDto.toDomain dto)
-                    | outputDataType.SorterSetEvalBins ->
+                    | outputDataType.SorterSetEvalBins _ ->
                         let dto = MessagePackSerializer.Deserialize<sorterSetEvalBinsDto>(fileBytes, options)
                         SorterSetEvalBins (SorterSetEvalBinsDto.toDomain dto)
                     | outputDataType.Project ->
                         let dto = MessagePackSerializer.Deserialize<projectDto>(fileBytes, options)
                         Project (ProjectDto.toDomain dto)
-                    | outputDataType.TextReport ->
+                    | outputDataType.TextReport _ ->
                         let text = System.Text.Encoding.UTF8.GetString(fileBytes)
                         failwith "TextReport should be handled separately"
             
@@ -137,8 +137,7 @@ module OutputDataFile =
             (queryParams: queryParams)
             (outputData: outputData) : Async<unit> =
         async {
-            let outputDataType = outputData |> OutputData.getOutputDataType
-            let filePath = getOutputDataFileFullPath projectFolder queryParams outputDataType
+            let filePath = getOutputDataFileFullPath projectFolder queryParams queryParams.OutputDataType
             let directory = Path.GetDirectoryName %filePath
             Directory.CreateDirectory directory |> ignore
             try

@@ -64,7 +64,6 @@ module ProjectOps =
                     let queryParamsForRunParams = 
                         queryParams.create( 
                             runParameters.GetProjectName(),
-                            None,
                             runParameters.GetIndex(), 
                             runParameters.GetRepl(), 
                             None, 

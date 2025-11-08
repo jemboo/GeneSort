@@ -10,7 +10,7 @@ open System.IO
 
 type private DbMessage =
     | Save of queryParams * outputData * AsyncReplyChannel<unit>
-    | Load of queryParams * outputDataType * AsyncReplyChannel<Result<outputData, OutputError>>
+    | Load of queryParams * AsyncReplyChannel<Result<outputData, OutputError>>
     | GetAllProjectRunParameters of 
             string<projectName> * CancellationToken option * 
             IProgress<string> option * AsyncReplyChannel<Result<runParameters[], string>>
@@ -23,8 +23,8 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
     let saveAsync (queryParams: queryParams) (data: outputData) =
         OutputDataFile.saveToFileAsync (getPathToProjectFolder (queryParams.ProjectName)) queryParams data
     
-    let loadAsync (queryParams: queryParams) (dataType: outputDataType) =
-        OutputDataFile.getOutputDataAsync (getPathToProjectFolder queryParams.ProjectName) queryParams dataType
+    let loadAsync (queryParams: queryParams) =
+        OutputDataFile.getOutputDataAsync (getPathToProjectFolder queryParams.ProjectName) queryParams
 
     let mailbox = MailboxProcessor.Start(fun inbox ->
         let rec loop () =
@@ -36,8 +36,8 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
                     do! saveAsync queryParams data
                     replyChannel.Reply()
                     
-                | Load (queryParams, dataType, replyChannel) ->
-                    let! result = loadAsync queryParams dataType
+                | Load (queryParams, replyChannel) ->
+                    let! result = loadAsync queryParams
                     replyChannel.Reply(result)
                     
                 | GetAllProjectRunParameters (projectName, ct, progress, replyChannel) ->
@@ -55,8 +55,8 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
         member _.saveAsync (queryParams: queryParams) (data: outputData) : Async<unit> =
             mailbox.PostAndAsyncReply(fun channel -> Save(queryParams, data, channel))
         
-        member _.loadAsync (queryParams: queryParams) (dataType: outputDataType) : Async<Result<outputData, OutputError>> =
-            mailbox.PostAndAsyncReply(fun channel -> Load(queryParams, dataType, channel))
+        member _.loadAsync (queryParams: queryParams) : Async<Result<outputData, OutputError>> =
+            mailbox.PostAndAsyncReply(fun channel -> Load(queryParams, channel))
         
         member _.getAllProjectRunParametersAsync 
                         (projectName: string<projectName>) 
@@ -73,10 +73,9 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
                     let queryParamsForRunParams = 
                         queryParams.create(
                                 runParams.GetProjectName(),
-                                None,
                                 runParams.GetIndex(),
-                                runParams.GetRepl(), 
-                                None, 
+                                runParams.GetRepl(),
+                                None,
                                 outputDataType.RunParameters)
                     do! (this :> IGeneSortDb).saveAsync queryParamsForRunParams (runParams |> outputData.RunParameters)
                     match progress with

@@ -162,7 +162,6 @@ module RandomSorters4to64 =
             (progress: IProgress<string> option) : Async<unit> =
 
         async {
-            let projectName = runParameters.GetProjectName().Value
             let index = runParameters.GetIndex().Value  
             let repl = runParameters.GetRepl().Value
             let sorterModelKey = runParameters.GetSorterModelKey().Value
@@ -220,7 +219,7 @@ module RandomSorters4to64 =
             cts.Token.ThrowIfCancellationRequested()
         
             // Save sorter set
-            let queryParamsForSorterSet = queryParams.createFromRunParams outputDataType.SorterSet None runParameters
+            let queryParamsForSorterSet = queryParams.createFromRunParams (outputDataType.SorterSet None) runParameters
             do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet)
         
             match progress with
@@ -229,7 +228,7 @@ module RandomSorters4to64 =
         
             // Save sorterModelSetMaker
             let queryParamsForSorterModelSetMaker = 
-                queryParams.createFromRunParams outputDataType.SorterModelSetMaker None runParameters
+                queryParams.createFromRunParams (outputDataType.SorterModelSetMaker None) runParameters
             do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker)
         
             // Mark run as finished

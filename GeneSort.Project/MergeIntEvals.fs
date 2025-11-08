@@ -19,7 +19,6 @@ open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Uf6
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
-open GeneSort.SortingResults
 
 
 module MergeIntEvals =
@@ -223,16 +222,16 @@ module MergeIntEvals =
             | None -> ()
 
             // Save sorter set
-            let queryParamsForSorterSet = queryParams.createFromRunParams outputDataType.SorterSet None runParameters
+            let queryParamsForSorterSet = queryParams.createFromRunParams (outputDataType.SorterSet None) runParameters
             do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet)
 
             // Save sorterSetEval
-            let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval None runParameters
+            let queryParamsForSorterSetEval = queryParams.createFromRunParams (outputDataType.SorterSetEval None) runParameters
             do! db.saveAsync queryParamsForSorterSetEval (sorterSetEval |> outputData.SorterSetEval)
 
             // Save sorterModelSetMaker
             let queryParamsForSorterModelSetMaker = 
-                queryParams.createFromRunParams outputDataType.SorterModelSetMaker None runParameters
+                queryParams.createFromRunParams (outputDataType.SorterModelSetMaker None) runParameters
             do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             // Mark run as finished
