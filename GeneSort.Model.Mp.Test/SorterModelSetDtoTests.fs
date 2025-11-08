@@ -20,7 +20,7 @@ type SorterModelSetDtoTests() =
     let roundTrip (sorterModelSet: sorterModelSet) : sorterModelSet =
         let dto = SorterModelSetDto.fromDomain sorterModelSet
         let bytes = MessagePackSerializer.Serialize(dto, options)
-        let deserializedDto = MessagePackSerializer.Deserialize<SorterModelSetDto>(bytes, options)
+        let deserializedDto = MessagePackSerializer.Deserialize<sorterModelSetDto>(bytes, options)
         SorterModelSetDto.toDomain deserializedDto
 
     [<Fact>]

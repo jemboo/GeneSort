@@ -103,6 +103,9 @@ module OutputDataFile =
                     | outputDataType.SortableTestSet _ ->
                         let dto = MessagePackSerializer.Deserialize<sortableTestSetDto>(fileBytes, options)
                         SortableTestSet (SortableTestSetDto.toDomain dto)
+                    | outputDataType.SorterModelSet _ ->
+                        let dto = MessagePackSerializer.Deserialize<sorterModelSetDto>(fileBytes, options)
+                        SorterModelSet (SorterModelSetDto.toDomain dto)
                     | outputDataType.SorterModelSetMaker _ ->
                         let dto = MessagePackSerializer.Deserialize<sorterModelSetMakerDto>(fileBytes, options)
                         SorterModelSetMaker (SorterModelSetMakerDto.toDomain dto)
@@ -151,6 +154,9 @@ module OutputDataFile =
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SortableTestSet sts ->
                     let dto = SortableTestSetDto.fromDomain sts
+                    do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+                | SorterModelSet sms ->
+                    let dto = SorterModelSetDto.fromDomain sms
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
                 | SorterModelSetMaker sms -> 
                     let dto = SorterModelSetMakerDto.fromDomain sms

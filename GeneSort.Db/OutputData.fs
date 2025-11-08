@@ -18,6 +18,7 @@ type outputDataType =
     | RunParameters
     | SorterSet of string option
     | SortableTestSet of string option
+    | SorterModelSet of string option
     | SorterModelSetMaker of string option
     | SortableTestModelSet of string option
     | SortableTestModelSetMaker of string option
@@ -37,6 +38,7 @@ module OutputDataType =
         | SorterSet (Some s) -> "SorterSet_" + s
         | SortableTestSet None -> "SortableTestSet"
         | SortableTestSet (Some s) -> "SortableTestSet_" + s
+        | SorterModelSet (Some s) -> "SorterModelSet_" + s
         | SorterModelSetMaker None -> "SorterModelSetMaker"
         | SorterModelSetMaker (Some s) -> "SorterModelSetMaker_" + s
         | SortableTestModelSet None -> "SortableTestModelSet"
@@ -67,6 +69,7 @@ module OutputDataType =
             | _ -> None
         | "SorterSet" -> Some (SorterSet param)
         | "SortableTestSet" -> Some (SortableTestSet param)
+        | "SorterModelSet" -> Some (SorterModelSet param)
         | "SorterModelSetMaker" -> Some (SorterModelSetMaker param)
         | "SortableTestModelSet" -> Some (SortableTestModelSet param)
         | "SortableTestModelSetMaker" -> Some (SortableTestModelSetMaker param)
@@ -85,6 +88,7 @@ type outputData =
     | RunParameters of runParameters
     | SorterSet of sorterSet
     | SortableTestSet of sortableTestSet
+    | SorterModelSet of sorterModelSet
     | SorterModelSetMaker of sorterModelSetMaker
     | SortableTestModelSet of sortableTestModelSet
     | SortableTestModelSetMaker of sortableTestModelSetMaker

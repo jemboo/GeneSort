@@ -7,7 +7,7 @@ open FSharp.UMX
 open GeneSort.Sorter
 
 [<MessagePackObject>]
-type SorterModelSetDto = 
+type sorterModelSetDto = 
     { 
         [<Key(0)>] Id: Guid
         [<Key(1)>] CeLength: int
@@ -16,7 +16,7 @@ type SorterModelSetDto =
 
 module SorterModelSetDto =
 
-    let toDomain (dto: SorterModelSetDto) : sorterModelSet =
+    let toDomain (dto: sorterModelSetDto) : sorterModelSet =
         if dto.SorterModels = null then
             failwith "SorterModels array cannot be null or empty"
         if Array.isEmpty dto.SorterModels then
@@ -30,7 +30,7 @@ module SorterModelSetDto =
                 (sorterModels)
 
 
-    let fromDomain (domain: sorterModelSet) : SorterModelSetDto =
+    let fromDomain (domain: sorterModelSet) : sorterModelSetDto =
         { 
             Id = %domain.Id
             CeLength = %domain.CeLength

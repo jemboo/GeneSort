@@ -64,6 +64,16 @@ module GeneSortDb =
                 | Ok _ -> Error "Unexpected output data type: expected SortableTestSet"
                 | Error err -> Error err
         }
+
+    let getSorterModelSetAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sorterModelSet, OutputError>> =
+        async {
+            let! result = geneSortDb.loadAsync queryParams
+            return 
+                match result with
+                | Ok (SorterModelSet smsm) -> Ok smsm
+                | Ok _ -> Error "Unexpected output data type: expected SorterModelSet"
+                | Error err -> Error err
+        }
     
     let getSorterModelSetMakerAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sorterModelSetMaker, OutputError>> =
         async {
