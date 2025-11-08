@@ -12,7 +12,6 @@ type queryParams =
         repl: int<replNumber> option
         generation: int<generationNumber> option
         outputDataType: outputDataType
-        outputDataSubType: string option
     }
     member this.TextReportName with get() = 
                     match this.textReportName with
@@ -35,8 +34,7 @@ type queryParams =
             index: int<indexNumber> option, 
             repl: int<replNumber> option, 
             generation: int<generationNumber> option, 
-            outputDataType: outputDataType,
-            outputDataSubType: string option) : queryParams =
+            outputDataType: outputDataType) : queryParams =
         {
             projectName = projectName
             textReportName = textReportName
@@ -44,7 +42,6 @@ type queryParams =
             repl = repl
             generation = generation
             outputDataType = outputDataType
-            outputDataSubType = outputDataSubType
         }
     
     static member createForProject(projectName: string<projectName>) : queryParams =
@@ -55,7 +52,6 @@ type queryParams =
             repl = None
             generation = None
             outputDataType = outputDataType.Project
-            outputDataSubType = None
         }
     
     static member createForTextReport
@@ -68,7 +64,6 @@ type queryParams =
             repl = None
             generation = None
             outputDataType = outputDataType.TextReport
-            outputDataSubType = None
         }
 
     static member createFromRunParams 
@@ -82,5 +77,4 @@ type queryParams =
             repl = runParams.GetRepl()
             generation = runParams.GetGeneration()
             outputDataType = outputDataType
-            outputDataSubType = outputDataSubType
         }

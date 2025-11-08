@@ -68,8 +68,7 @@ module ProjectOps =
                             runParameters.GetIndex(), 
                             runParameters.GetRepl(), 
                             None, 
-                            outputDataType.RunParameters,
-                            None)
+                            outputDataType.RunParameters)
                 
                     do! db.saveAsync queryParamsForRunParams (runParameters |> outputData.RunParameters)
 
