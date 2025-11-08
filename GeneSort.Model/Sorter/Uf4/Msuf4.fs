@@ -62,7 +62,7 @@ type msuf4 =
                 tou.MakePerm_Si
                 |> Perm_Si.getTwoOrbits
                 |> Array.map Ce.fromTwoOrbit)
-        Sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
+        sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
 
 
 

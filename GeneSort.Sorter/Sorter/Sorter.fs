@@ -71,16 +71,3 @@ module Sorter =
             member _.GetHashCode(obj) =
                 // Use the struct's GetHashCode, which caches the hash of Ces
                 obj.GetHashCode()
-
-    // Function to remove duplicates based on Ces
-    let removeDuplicates (arr: sorter[]) : sorter[] =
-        arr.Distinct(SorterValueComparer()).ToArray()
-
-    let create (sorterId: Guid<sorterId>) (width: int<sortingWidth>) (ces: ce array) : sorter =
-        sorter.create sorterId width ces
-
-    let createWithNewId (width: int<sortingWidth>) (ces: ce array) : sorter =
-        sorter.createWithNewId width ces
-
-    let toString (sorter: sorter) : string =
-        sorter.ToString()

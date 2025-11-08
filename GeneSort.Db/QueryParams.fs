@@ -2,14 +2,7 @@
 namespace GeneSort.Db
 
 open FSharp.UMX
-open GeneSort.Sorter.Sortable
-open GeneSort.Sorter.Sorter
-open GeneSort.Model.Sorter
-open GeneSort.Model.Sortable
-open GeneSort.SortingOps
-open GeneSort.SortingResults
 open GeneSort.Runs.Params
-open GeneSort.Runs
 
 type queryParams =
     private {
@@ -19,6 +12,7 @@ type queryParams =
         repl: int<replNumber> option
         generation: int<generationNumber> option
         outputDataType: outputDataType
+        outputDataSubType: string option
     }
     member this.TextReportName with get() = 
                     match this.textReportName with
@@ -41,7 +35,8 @@ type queryParams =
             index: int<indexNumber> option, 
             repl: int<replNumber> option, 
             generation: int<generationNumber> option, 
-            outputDataType: outputDataType) : queryParams =
+            outputDataType: outputDataType,
+            outputDataSubType: string option) : queryParams =
         {
             projectName = projectName
             textReportName = textReportName
@@ -49,6 +44,7 @@ type queryParams =
             repl = repl
             generation = generation
             outputDataType = outputDataType
+            outputDataSubType = outputDataSubType
         }
     
     static member createForProject(projectName: string<projectName>) : queryParams =
@@ -59,6 +55,7 @@ type queryParams =
             repl = None
             generation = None
             outputDataType = outputDataType.Project
+            outputDataSubType = None
         }
     
     static member createForTextReport
@@ -71,10 +68,12 @@ type queryParams =
             repl = None
             generation = None
             outputDataType = outputDataType.TextReport
+            outputDataSubType = None
         }
 
     static member createFromRunParams 
                 (outputDataType:outputDataType) 
+                (outputDataSubType:string option) 
                 (runParams: runParameters) : queryParams =
         {
             projectName = runParams.GetProjectName()
@@ -83,4 +82,5 @@ type queryParams =
             repl = runParams.GetRepl()
             generation = runParams.GetGeneration()
             outputDataType = outputDataType
+            outputDataSubType = outputDataSubType
         }

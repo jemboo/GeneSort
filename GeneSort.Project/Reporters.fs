@@ -41,7 +41,7 @@ module Reporters =
 
             do! runParamsArray
                 |> Array.map (fun runParams -> async {
-                    let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval runParams
+                    let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval None runParams
                     let sortingWidth = runParams.GetSortingWidth()
                     let sorterModelKey =  runParams.GetSorterModelKey() |> SorterModelKey.toString
         
@@ -102,7 +102,7 @@ module Reporters =
 
             do! runParamsArray
                 |> Array.map (fun runParams -> async {
-                    let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval runParams
+                    let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval None runParams
                     let sortingWidth = runParams.GetSortingWidth()
                     let sorterModelKey = runParams.GetSorterModelKey() |> SorterModelKey.toString
 

@@ -5,14 +5,13 @@ open Xunit
 open FSharp.UMX
 open GeneSort.Sorter
 open GeneSort.Sorter.Sorter
-open GeneSort.Sorter.Sortable
 
 type SorterSetTests() =
 
     [<Fact>]
     let ``SorterSet.create creates valid SorterSet``() =
         let createSorter ces =
-            Sorter.createWithNewId (UMX.tag<sortingWidth> 4) ces
+            sorter.createWithNewId (UMX.tag<sortingWidth> 4) ces
         
         let ces1 = [| ce.create 0 1; ce.create 1 1 |]
         let ces2 = [| ce.create 0 2; ce.create 1 2 |]

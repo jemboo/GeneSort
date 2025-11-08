@@ -131,7 +131,7 @@ module FullBoolEvals =
                   |> Option.defaultWith(fun () -> 
                         failwith (sprintf "No matching source run parameters found for Run %d_%d" index %repl))
 
-            let queryParamsForSorterSet = queryParams.createFromRunParams outputDataType.SorterSet sourceRunParams
+            let queryParamsForSorterSet = queryParams.createFromRunParams outputDataType.SorterSet None sourceRunParams
             let sorterSet = db.loadAsync queryParamsForSorterSet outputDataType.SorterSet
                             |> Async.RunSynchronously
                             |> function
@@ -149,7 +149,7 @@ module FullBoolEvals =
             | Some p -> p.Report(sprintf "Run %d_%d: Saving sorterSet test results" index %repl)
             | None -> ()
 
-            let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval runParameters
+            let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval None runParameters
             do! db.saveAsync queryParamsForSorterSetEval (sorterSetEval |> outputData.SorterSetEval)
 
             // Mark run as finished

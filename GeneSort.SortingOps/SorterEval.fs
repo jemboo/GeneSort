@@ -36,7 +36,9 @@ type sorterEval =
 
     member this.getRefinedSorter() : sorter =
              sorter.create
-                    (Guid.NewGuid() |> UMX.tag<sorterId>) this.sortingWidth (this.ceBlockWithUsage.UsedCes) 
+                    (Guid.NewGuid() |> UMX.tag<sorterId>) 
+                    this.sortingWidth 
+                    (this.ceBlockWithUsage.UsedCes) 
 
                     
     member this.CeBlockUsage with get() = this.ceBlockWithUsage

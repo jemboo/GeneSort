@@ -27,7 +27,7 @@ module SorterDto =
             failwith "Sorter ID must not be empty"
         if dto.Width < 1 then
             failwith "Width must be at least 1"
-        Sorter.create
+        sorter.create
             (UMX.tag<sorterId> dto.SorterId)
             (UMX.tag<sortingWidth> dto.Width)
             (dto.Ces |> Array.map CeDto.toDomain)

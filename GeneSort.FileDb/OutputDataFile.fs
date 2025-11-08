@@ -34,7 +34,8 @@ module OutputDataFile =
 
     let getPathToOutputDataFolder 
                 (projectFolder:string<pathToProjectFolder>) 
-                (outputDataType: outputDataType) : string<fullPathToFolder> =
+                (outputDataType: outputDataType) 
+                 : string<fullPathToFolder> =
         Path.Combine(%projectFolder, outputDataType |> OutputDataType.toString) |> UMX.tag<fullPathToFolder>
 
 

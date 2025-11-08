@@ -223,16 +223,16 @@ module MergeIntEvals =
             | None -> ()
 
             // Save sorter set
-            let queryParamsForSorterSet = queryParams.createFromRunParams outputDataType.SorterSet runParameters
+            let queryParamsForSorterSet = queryParams.createFromRunParams outputDataType.SorterSet None runParameters
             do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet)
 
             // Save sorterSetEval
-            let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval runParameters
+            let queryParamsForSorterSetEval = queryParams.createFromRunParams outputDataType.SorterSetEval None runParameters
             do! db.saveAsync queryParamsForSorterSetEval (sorterSetEval |> outputData.SorterSetEval)
 
             // Save sorterModelSetMaker
             let queryParamsForSorterModelSetMaker = 
-                queryParams.createFromRunParams outputDataType.SorterModelSetMaker runParameters
+                queryParams.createFromRunParams outputDataType.SorterModelSetMaker None runParameters
             do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             // Mark run as finished

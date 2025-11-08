@@ -220,7 +220,7 @@ module RandomSorters4to64 =
             cts.Token.ThrowIfCancellationRequested()
         
             // Save sorter set
-            let queryParamsForSorterSet = queryParams.createFromRunParams outputDataType.SorterSet runParameters
+            let queryParamsForSorterSet = queryParams.createFromRunParams outputDataType.SorterSet None runParameters
             do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet)
         
             match progress with
@@ -229,7 +229,7 @@ module RandomSorters4to64 =
         
             // Save sorterModelSetMaker
             let queryParamsForSorterModelSetMaker = 
-                queryParams.createFromRunParams outputDataType.SorterModelSetMaker runParameters
+                queryParams.createFromRunParams outputDataType.SorterModelSetMaker None runParameters
             do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker)
         
             // Mark run as finished

@@ -59,7 +59,7 @@ type Mssi =
                     |> Array.map (fun psi -> psi |> Perm_Si.getTwoOrbits)
                     |> Array.collect(id)
                     |> Array.map(fun tbit -> ce.create tbit.First tbit.Second)
-        Sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
+        sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
 
 
 
@@ -77,5 +77,5 @@ module Mssi =
                     |> Array.map (fun psi -> psi |> Perm_Si.getTwoOrbits)
                     |> Array.collect(id)
                     |> Array.map(fun tbit -> ce.create tbit.First tbit.Second)
-        Sorter.create (%mssi.Id |> UMX.tag<sorterId>) mssi.SortingWidth ces
+        sorter.create (%mssi.Id |> UMX.tag<sorterId>) mssi.SortingWidth ces
          
