@@ -1,9 +1,9 @@
 ﻿namespace GeneSort.Project
 
 open System
+open System.Threading
 
 open FSharp.UMX
-open System.Threading
 
 open GeneSort.Core
 open GeneSort.Runs

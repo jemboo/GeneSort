@@ -145,7 +145,15 @@ module RandomSorters4to64 =
                         index <- index + 1
         }
 
-    let reportNames = [||]
+    let reportNames = 
+            [|
+                outputDataType.SorterModelSetMaker None;
+                outputDataType.SorterSet None;
+                outputDataType.TextReport ("Bins" |> UMX.tag<textReportName>); 
+                outputDataType.TextReport ("Profiles" |> UMX.tag<textReportName>); 
+                outputDataType.TextReport ("Report3" |> UMX.tag<textReportName>); 
+                outputDataType.TextReport ("Report4" |> UMX.tag<textReportName>);
+            |]
 
     let parameterSpans = 
         [ Project.repl1s(); sortingWidths(); sorterModelKeys() ]

@@ -225,13 +225,13 @@ namespace GeneSort.UI.ViewModels
 
                             // Load report keys
                             ReportKeys.Clear();
-                            if (project.ReportNames != null)
+                            if (project.OutputDataTypes != null)
                             {
-                                foreach (var reportKey in project.ReportNames)
+                                foreach (var textReportName in OutputDataType.extractTextReportNames(project.OutputDataTypes))
                                 {
-                                    if (!string.IsNullOrWhiteSpace(reportKey))
+                                    if (!string.IsNullOrWhiteSpace(textReportName))
                                     {
-                                        ReportKeys.Add(reportKey);
+                                        ReportKeys.Add(textReportName);
                                     }
                                 }
                             }

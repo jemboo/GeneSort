@@ -140,13 +140,22 @@ module MergeIntEvals =
     let parameterSet = 
         [ Project.repl1s(); sortingWidths(); sorterModelKeys() ]
         
-    let reportNames = [|"Report1"; "Report2"; "Report3"; "Report4"|]
+    let outputDataTypes = 
+            [|                
+                outputDataType.SorterModelSetMaker None;
+                outputDataType.SorterSet None;
+                outputDataType.SorterSetEval None;
+                outputDataType.TextReport ("Bins" |> UMX.tag<textReportName>); 
+                outputDataType.TextReport ("Profiles" |> UMX.tag<textReportName>); 
+                outputDataType.TextReport ("Report3" |> UMX.tag<textReportName>); 
+                outputDataType.TextReport ("Report4" |> UMX.tag<textReportName>);
+            |]
 
     let project = 
             Project.create 
                 projectName 
                 experimentDesc
-                reportNames 
+                outputDataTypes 
                 parameterSet 
                 paramMapRefiner
 

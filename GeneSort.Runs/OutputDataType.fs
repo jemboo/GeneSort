@@ -3,15 +3,7 @@ namespace GeneSort.Runs
 
 open FSharp.UMX
 
-open GeneSort.Sorter.Sortable
-open GeneSort.Sorter.Sorter
-open GeneSort.Model.Sorter
-open GeneSort.Model.Sortable
-open GeneSort.SortingOps
-open GeneSort.SortingResults
 open GeneSort.Runs.Params
-open GeneSort.Runs
-open GeneSort.Core
 
 
 type outputDataType =
@@ -82,3 +74,10 @@ module OutputDataType =
             | _ -> None
         | "TextReport" -> Some (TextReport %"Unknown")
         | _ -> None
+
+    let extractTextReportNames (outputDataTypes: outputDataType array) : string<textReportName> list =
+        outputDataTypes
+        |> Array.choose (function
+            | TextReport name -> Some name
+            | _ -> None)
+        |> Array.toList

@@ -82,7 +82,14 @@ module FullBoolEvals =
     let parameterSpans = 
         [ Project.repl1s(); sortingWidths(); sorterModelKeys();]
 
-    let reportNames = [|"Bins"; "Profiles"; "Report3"; "Report4"|]
+    let reportNames = 
+            [|
+                outputDataType.SorterSetEval None;
+                outputDataType.TextReport ("Bins" |> UMX.tag<textReportName>); 
+                outputDataType.TextReport ("Profiles" |> UMX.tag<textReportName>); 
+                outputDataType.TextReport ("Report3" |> UMX.tag<textReportName>); 
+                outputDataType.TextReport ("Report4" |> UMX.tag<textReportName>);
+            |]
 
     let project = 
             Project.create 
