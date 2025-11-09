@@ -6,6 +6,7 @@ open FSharp.UMX
 open System.Threading
 
 open GeneSort.Core
+open GeneSort.Runs
 open GeneSort.Runs.Params
 open GeneSort.Db
 open GeneSort.SortingResults
@@ -48,7 +49,7 @@ module Reporters =
                     let! sorterSetEvalResult = db.loadAsync queryParamsForSorterSetEval
                     let sorterSetEval = 
                         match sorterSetEvalResult with
-                        | Ok (SorterSetEval sse) -> sse
+                        | Ok (outputData.SorterSetEval sse) -> sse
                         | Ok _ -> failwith (sprintf "Unexpected output data type for SorterSetEval")
                         | Error err -> failwith (sprintf "Error loading SorterSetEval: %s" err)
         
@@ -113,7 +114,7 @@ module Reporters =
                     let! sorterSetEvalResult = db.loadAsync queryParamsForSorterSetEval
                     let sorterSetEval = 
                         match sorterSetEvalResult with
-                        | Ok (SorterSetEval sse) -> sse
+                        | Ok (outputData.SorterSetEval sse) -> sse
                         | Ok _ -> failwith (sprintf "Unexpected output data type for SorterSetEval")
                         | Error err -> failwith (sprintf "Error loading SorterSetEval: %s" err)
 

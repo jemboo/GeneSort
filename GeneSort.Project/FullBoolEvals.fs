@@ -135,7 +135,7 @@ module FullBoolEvals =
             let sorterSet = db.loadAsync queryParamsForSorterSet
                             |> Async.RunSynchronously
                             |> function
-                                | Ok (SorterSet ss) -> ss
+                                | Ok (outputData.SorterSet ss) -> ss
                                 | Ok _ -> failwith "Unexpected output data type: expected SorterSet"
                                 | Error err -> failwith (sprintf "Error loading SorterSet: %s" err)
 

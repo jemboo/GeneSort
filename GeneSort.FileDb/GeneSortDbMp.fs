@@ -4,6 +4,7 @@ open System.Threading
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Db
+open GeneSort.Runs
 open GeneSort.Runs.Params
 open GeneSort.Project
 open System.IO

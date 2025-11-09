@@ -6,6 +6,7 @@ open System.Threading
 open FSharp.UMX
 
 open GeneSort.Core
+open GeneSort.Runs
 open GeneSort.Runs.Params
 open GeneSort.Sorter.Sorter
 open GeneSort.Model.Sorter
@@ -13,7 +14,6 @@ open GeneSort.Sorter.Sortable
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.SortingResults
-open GeneSort.Runs
 
 
 type IGeneSortDb =
@@ -40,7 +40,7 @@ module GeneSortDb =
             let! result = geneSortDb.loadAsync queryParams
             return 
                 match result with
-                | Ok (RunParameters rp) -> Ok rp
+                | Ok (outputData.RunParameters rp) -> Ok rp
                 | Ok _ -> Error "Unexpected output data type: expected RunParameters"
                 | Error err -> Error err
         }
@@ -50,7 +50,7 @@ module GeneSortDb =
             let! result = geneSortDb.loadAsync queryParams
             return 
                 match result with
-                | Ok (SorterSet ss) -> Ok ss
+                | Ok (outputData.SorterSet ss) -> Ok ss
                 | Ok _ -> Error "Unexpected output data type: expected SorterSet"
                 | Error err -> Error err
         }
@@ -60,7 +60,7 @@ module GeneSortDb =
             let! result = geneSortDb.loadAsync queryParams
             return 
                 match result with
-                | Ok (SortableTestSet sts) -> Ok sts
+                | Ok (outputData.SortableTestSet sts) -> Ok sts
                 | Ok _ -> Error "Unexpected output data type: expected SortableTestSet"
                 | Error err -> Error err
         }
@@ -70,7 +70,7 @@ module GeneSortDb =
             let! result = geneSortDb.loadAsync queryParams
             return 
                 match result with
-                | Ok (SorterModelSet smsm) -> Ok smsm
+                | Ok (outputData.SorterModelSet smsm) -> Ok smsm
                 | Ok _ -> Error "Unexpected output data type: expected SorterModelSet"
                 | Error err -> Error err
         }
@@ -80,7 +80,7 @@ module GeneSortDb =
             let! result = geneSortDb.loadAsync queryParams
             return 
                 match result with
-                | Ok (SorterModelSetMaker smsm) -> Ok smsm
+                | Ok (outputData.SorterModelSetMaker smsm) -> Ok smsm
                 | Ok _ -> Error "Unexpected output data type: expected SorterModelSetMaker"
                 | Error err -> Error err
         }
@@ -90,7 +90,7 @@ module GeneSortDb =
             let! result = geneSortDb.loadAsync queryParams
             return 
                 match result with
-                | Ok (SortableTestModelSet stms) -> Ok stms
+                | Ok (outputData.SortableTestModelSet stms) -> Ok stms
                 | Ok _ -> Error "Unexpected output data type: expected SortableTestModelSet"
                 | Error err -> Error err
         }
@@ -100,7 +100,7 @@ module GeneSortDb =
             let! result = geneSortDb.loadAsync queryParams
             return 
                 match result with
-                | Ok (SortableTestModelSetMaker stmsm) -> Ok stmsm
+                | Ok (outputData.SortableTestModelSetMaker stmsm) -> Ok stmsm
                 | Ok _ -> Error "Unexpected output data type: expected SortableTestModelSetMaker"
                 | Error err -> Error err
         }
@@ -110,7 +110,7 @@ module GeneSortDb =
             let! result = geneSortDb.loadAsync queryParams
             return 
                 match result with
-                | Ok (SorterSetEval sse) -> Ok sse
+                | Ok (outputData.SorterSetEval sse) -> Ok sse
                 | Ok _ -> Error "Unexpected output data type: expected SorterSetEval"
                 | Error err -> Error err
         }
@@ -120,7 +120,7 @@ module GeneSortDb =
             let! result = geneSortDb.loadAsync queryParams
             return 
                 match result with
-                | Ok (SorterSetEvalBins sseb) -> Ok sseb
+                | Ok (outputData.SorterSetEvalBins sseb) -> Ok sseb
                 | Ok _ -> Error "Unexpected output data type: expected SorterSetEvalBins"
                 | Error err -> Error err
         }
@@ -130,7 +130,7 @@ module GeneSortDb =
             let! result = geneSortDb.loadAsync queryParams
             return 
                 match result with
-                | Ok (Project p) -> Ok p
+                | Ok (outputData.Project p) -> Ok p
                 | Ok _ -> Error "Unexpected output data type: expected Project"
                 | Error err -> Error err
         }

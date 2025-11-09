@@ -18,6 +18,7 @@ open GeneSort.Sorter.Mp.Sorter
 open GeneSort.Sorter.Mp.Sortable
 open GeneSort.SortingResults.Mp
 open GeneSort.SortingOps.Mp
+open GeneSort.Runs
 open GeneSort.Runs.Params
 open GeneSort.Runs.Mp
 
@@ -96,34 +97,34 @@ module OutputDataFile =
                     match outputDataType with
                     | outputDataType.RunParameters _ ->
                         let dto = MessagePackSerializer.Deserialize<runParametersDto>(fileBytes, options)
-                        RunParameters (RunParametersDto.fromDto dto)
+                        outputData.RunParameters (RunParametersDto.fromDto dto)
                     | outputDataType.SorterSet _ ->
                         let dto = MessagePackSerializer.Deserialize<sorterSetDto>(fileBytes, options)
-                        SorterSet (SorterSetDto.toDomain dto)
+                        outputData.SorterSet (SorterSetDto.toDomain dto)
                     | outputDataType.SortableTestSet _ ->
                         let dto = MessagePackSerializer.Deserialize<sortableTestSetDto>(fileBytes, options)
-                        SortableTestSet (SortableTestSetDto.toDomain dto)
+                        outputData.SortableTestSet (SortableTestSetDto.toDomain dto)
                     | outputDataType.SorterModelSet _ ->
                         let dto = MessagePackSerializer.Deserialize<sorterModelSetDto>(fileBytes, options)
-                        SorterModelSet (SorterModelSetDto.toDomain dto)
+                        outputData.SorterModelSet (SorterModelSetDto.toDomain dto)
                     | outputDataType.SorterModelSetMaker _ ->
                         let dto = MessagePackSerializer.Deserialize<sorterModelSetMakerDto>(fileBytes, options)
-                        SorterModelSetMaker (SorterModelSetMakerDto.toDomain dto)
+                        outputData.SorterModelSetMaker (SorterModelSetMakerDto.toDomain dto)
                     | outputDataType.SortableTestModelSet _ ->
                         let dto = MessagePackSerializer.Deserialize<sortableTestModelSetDto>(fileBytes, options)
-                        SortableTestModelSet (SortableTestModelSetDto.toDomain dto)
+                        outputData.SortableTestModelSet (SortableTestModelSetDto.toDomain dto)
                     | outputDataType.SortableTestModelSetMaker _ ->
                         let dto = MessagePackSerializer.Deserialize<sortableTestModelSetMakerDto>(fileBytes, options)
-                        SortableTestModelSetMaker (SortableTestModelSetMakerDto.toDomain dto)
+                        outputData.SortableTestModelSetMaker (SortableTestModelSetMakerDto.toDomain dto)
                     | outputDataType.SorterSetEval _ ->
                         let dto = MessagePackSerializer.Deserialize<sorterSetEvalDto>(fileBytes, options)
-                        SorterSetEval (SorterSetEvalDto.toDomain dto)
+                        outputData.SorterSetEval (SorterSetEvalDto.toDomain dto)
                     | outputDataType.SorterSetEvalBins _ ->
                         let dto = MessagePackSerializer.Deserialize<sorterSetEvalBinsDto>(fileBytes, options)
-                        SorterSetEvalBins (SorterSetEvalBinsDto.toDomain dto)
+                        outputData.SorterSetEvalBins (SorterSetEvalBinsDto.toDomain dto)
                     | outputDataType.Project ->
                         let dto = MessagePackSerializer.Deserialize<projectDto>(fileBytes, options)
-                        Project (ProjectDto.toDomain dto)
+                        outputData.Project (ProjectDto.toDomain dto)
                     | outputDataType.TextReport _ ->
                         let text = System.Text.Encoding.UTF8.GetString(fileBytes)
                         failwith "TextReport should be handled separately"
@@ -146,37 +147,37 @@ module OutputDataFile =
             try
                 use stream = new FileStream(%filePath, FileMode.Create, FileAccess.Write, FileShare.None)
                 match outputData with
-                | RunParameters r -> 
+                | outputData.RunParameters r -> 
                     let dto = RunParametersDto.fromDomain r
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SorterSet ss ->
+                | outputData.SorterSet ss ->
                     let dto = SorterSetDto.fromDomain ss
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SortableTestSet sts ->
+                | outputData.SortableTestSet sts ->
                     let dto = SortableTestSetDto.fromDomain sts
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SorterModelSet sms ->
+                | outputData.SorterModelSet sms ->
                     let dto = SorterModelSetDto.fromDomain sms
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SorterModelSetMaker sms -> 
+                | outputData.SorterModelSetMaker sms -> 
                     let dto = SorterModelSetMakerDto.fromDomain sms
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SortableTestModelSet sts ->
+                | outputData.SortableTestModelSet sts ->
                     let dto = SortableTestModelSetDto.fromDomain sts
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SortableTestModelSetMaker stsm ->
+                | outputData.SortableTestModelSetMaker stsm ->
                     let dto = SortableTestModelSetMakerDto.fromDomain stsm
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SorterSetEval sse ->
+                | outputData.SorterSetEval sse ->
                     let dto = SorterSetEvalDto.fromDomain sse
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | SorterSetEvalBins sse ->
+                | outputData.SorterSetEvalBins sse ->
                     let dto = SorterSetEvalBinsDto.fromDomain sse
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | Project p ->
+                | outputData.Project p ->
                     let dto = ProjectDto.fromDomain p
                     do! MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
-                | TextReport dataTableFile ->
+                | outputData.TextReport dataTableFile ->
                     let textBytes = System.Text.Encoding.UTF8.GetBytes(dataTableFile.ToText())
                     do! stream.WriteAsync(textBytes, 0, textBytes.Length) |> Async.AwaitTask
 

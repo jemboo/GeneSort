@@ -1,5 +1,5 @@
 ﻿
-namespace GeneSort.Db
+namespace GeneSort.Runs
 
 open FSharp.UMX
 
@@ -38,6 +38,7 @@ module OutputDataType =
         | SorterSet (Some s) -> "SorterSet_" + s
         | SortableTestSet None -> "SortableTestSet"
         | SortableTestSet (Some s) -> "SortableTestSet_" + s
+        | SorterModelSet None -> "SorterModelSet"
         | SorterModelSet (Some s) -> "SorterModelSet_" + s
         | SorterModelSetMaker None -> "SorterModelSetMaker"
         | SorterModelSetMaker (Some s) -> "SorterModelSetMaker_" + s
@@ -81,18 +82,3 @@ module OutputDataType =
             | _ -> None
         | "TextReport" -> Some (TextReport %"Unknown")
         | _ -> None
-
-
-
-type outputData =
-    | RunParameters of runParameters
-    | SorterSet of sorterSet
-    | SortableTestSet of sortableTestSet
-    | SorterModelSet of sorterModelSet
-    | SorterModelSetMaker of sorterModelSetMaker
-    | SortableTestModelSet of sortableTestModelSet
-    | SortableTestModelSetMaker of sortableTestModelSetMaker
-    | SorterSetEval of sorterSetEval
-    | SorterSetEvalBins of sorterSetEvalBins
-    | Project of project
-    | TextReport of dataTableFile

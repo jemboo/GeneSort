@@ -2,6 +2,7 @@
 namespace GeneSort.Db
 
 open FSharp.UMX
+open GeneSort.Runs
 open GeneSort.Runs.Params
 
 type queryParams =
