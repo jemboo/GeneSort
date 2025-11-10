@@ -1,13 +1,6 @@
 ﻿namespace GeneSort.Project
 
-open System.Threading.Tasks
-open MessagePack
-open MessagePack.FSharp
-open MessagePack.Resolvers
-open System
-open System.Threading
-open GeneSort.Runs.Params
-open GeneSort.Db
+open GeneSort.Runs
 
 
 

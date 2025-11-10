@@ -6,9 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Params\SorterModelKey.fs" />
-    <Compile Include="Params\StageLength.fs" />
-    <Compile Include="Params\RunParameters.fs" />
+    <Compile Include="SorterModelKey.fs" />
+    <Compile Include="StageLength.fs" />
+    <Compile Include="RunParameters.fs" />
     <Compile Include="OutputDataType.fs" />
     <Compile Include="Project.fs" />
     <Compile Include="OutputData.fs" />

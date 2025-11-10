@@ -3,8 +3,6 @@ namespace GeneSort.Runs
 
 open FSharp.UMX
 
-open GeneSort.Runs.Params
-
 
 type outputDataType =
     | RunParameters

@@ -7,7 +7,6 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter.Sortable
 open GeneSort.Model.Sortable
-open GeneSort.Runs.Params
 open GeneSort.Runs
 open GeneSort.Db
 

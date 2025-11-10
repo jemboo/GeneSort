@@ -4,7 +4,7 @@ namespace GeneSort.Runs.Mp
 open MessagePack
 open MessagePack.FSharp
 open MessagePack.Resolvers
-open GeneSort.Runs.Params
+open GeneSort.Runs
 
 
 [<MessagePackObject>]

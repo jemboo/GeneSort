@@ -9,7 +9,6 @@ open GeneSort.Model.Sorter
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.SortingResults
-open GeneSort.Runs.Params
 open GeneSort.Runs
 open GeneSort.Core
 

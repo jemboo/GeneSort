@@ -8,7 +8,6 @@ open System.Threading
 open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Sorter.Sortable
-open GeneSort.Runs.Params
 open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.Model.Sorter.Ce

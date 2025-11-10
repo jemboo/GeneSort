@@ -19,7 +19,6 @@ open GeneSort.Sorter.Mp.Sortable
 open GeneSort.SortingResults.Mp
 open GeneSort.SortingOps.Mp
 open GeneSort.Runs
-open GeneSort.Runs.Params
 open GeneSort.Runs.Mp
 
 

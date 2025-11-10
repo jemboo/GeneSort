@@ -3,7 +3,6 @@
 open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Runs.Params
 
 type project =
     private

@@ -5,7 +5,6 @@ open FSharp.UMX
 open MessagePack
 open GeneSort.Runs
 open GeneSort.Runs.Mp
-open GeneSort.Runs.Params
 
 [<MessagePackObject>]
 type parameterSpanDto =

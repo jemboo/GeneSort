@@ -2,45 +2,14 @@
 
 open System
 open System.Threading
-open System.Threading.Tasks
 
 open FSharp.UMX
 
-open MessagePack
-open MessagePack.FSharp
-open MessagePack.Resolvers
-
-open GeneSort.Runs.Params
 open GeneSort.Db
 open GeneSort.Runs
 
 
 module ProjectOps =  
-
-    /// Options for MessagePack serialization, using FSharpResolver and StandardResolver.
-    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-
-    /// Executes async computations in parallel, limited to maxDegreeOfParallelism at a time
-    let private ParallelWithThrottle (maxDegreeOfParallelism: int) (computations: seq<Async<unit>>) : Async<unit> =
-        async {
-            use semaphore = new System.Threading.SemaphoreSlim(maxDegreeOfParallelism)
-            let tasks =
-                computations
-                |> Seq.map (fun comp ->
-                    async {
-                        try
-                            do! Async.AwaitTask (semaphore.WaitAsync())
-                            do! comp
-                        finally
-                            semaphore.Release() |> ignore
-                    }
-                    |> Async.StartAsTask : Task<unit>)
-                |> Seq.toArray
-            let! _ = Async.AwaitTask (Task.WhenAll(tasks))
-            return ()
-        }
-
 
     let executeRunParameters
             (db: IGeneSortDb)

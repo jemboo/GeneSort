@@ -8,7 +8,6 @@ open MessagePack
 open MessagePack.FSharp
 open System.IO
 open System.Threading
-open GeneSort.Runs.Params
 open GeneSort.Runs
 
 type ProjectTests() =
