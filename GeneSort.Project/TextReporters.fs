@@ -12,7 +12,7 @@ open GeneSort.Db
 open GeneSort.SortingResults
 
 
-module Reporters =
+module TextReporters =
 
     let binReportExecutor
             (db: IGeneSortDb)

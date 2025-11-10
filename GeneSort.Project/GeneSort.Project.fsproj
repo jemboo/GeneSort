@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Reporters.fs" />
+    <Compile Include="TextReporters.fs" />
     <Compile Include="RunResult.fs" />
     <Compile Include="ProgressMessage.fs" />
     <Compile Include="ProjectOps.fs" />

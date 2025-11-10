@@ -59,8 +59,8 @@ let projectName = FullBoolEvals.project.ProjectName
 //ProjectOps.initProjectFiles geneSortDb project cts (Some progress) |> Async.RunSynchronously
 //ProjectOps.executeRuns geneSortDb projectName cts (Some progress) executor |> Async.RunSynchronously
 
-Reporters.ceUseProfileReportExecutor geneSortDb projectName cts (Some progress) |> Async.RunSynchronously
-Reporters.binReportExecutor geneSortDb projectName cts (Some progress) |> Async.RunSynchronously
+TextReporters.ceUseProfileReportExecutor geneSortDb projectName cts (Some progress) |> Async.RunSynchronously
+TextReporters.binReportExecutor geneSortDb projectName cts (Some progress) |> Async.RunSynchronously
 
 
 let endTime = System.DateTime.Now

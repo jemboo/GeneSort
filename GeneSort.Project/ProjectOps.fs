@@ -12,7 +12,6 @@ open MessagePack.Resolvers
 
 open GeneSort.Runs.Params
 open GeneSort.Db
-open ProgressMessage
 open GeneSort.Runs
 
 
@@ -56,7 +55,7 @@ module ProjectOps =
             try
                 if runParameters.IsRunFinished().Value then
                     let result = Skipped (index, repl, "already finished")
-                    reportRunResult progress result
+                    ProgressMessage.reportRunResult progress result
                     return result
                 else
                     do! executor db runParameters cts progress
@@ -72,13 +71,13 @@ module ProjectOps =
                     do! db.saveAsync queryParamsForRunParams (runParameters |> outputData.RunParameters)
 
                     let result = Success (index, repl)
-                    reportRunResult progress result
+                    ProgressMessage.reportRunResult progress result
                     return result
                 
             with e ->
                 let errorMsg = sprintf "%s: %s" (e.GetType().Name) e.Message
                 let result = Failure (index, repl, errorMsg)
-                reportRunResult progress result
+                ProgressMessage.reportRunResult progress result
                 return result
         }
 
