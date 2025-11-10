@@ -31,7 +31,7 @@ module PermutationOrbits =
     let parameterSet = 
         [ sortingWidths(); ]
 
-    let project = Project.create projectName experimentDesc [||] parameterSet (fun s -> s)
+   // let project = Project.create projectName experimentDesc [||] parameterSet 1<replNumber> //(fun s -> s)
 
     //let executor 
     //        (projectFolder: string)

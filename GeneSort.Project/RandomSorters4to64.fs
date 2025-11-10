@@ -145,7 +145,7 @@ module RandomSorters4to64 =
                         index <- index + 1
         }
 
-    let reportNames = 
+    let outputDataTypes = 
             [|
                 outputDataType.SorterModelSetMaker None;
                 outputDataType.SorterSet None;
@@ -159,8 +159,14 @@ module RandomSorters4to64 =
         [ Project.repl1s(); sortingWidths(); sorterModelKeys() ]
 
 
-    let project = Project.create projectName projectDesc reportNames parameterSpans paramMapRefiner
-
+    let project = 
+            Project.create 
+                projectName 
+                projectDesc
+                parameterSpans
+                1<replNumber>
+                outputDataTypes
+                paramMapRefiner
 
 
     let executor

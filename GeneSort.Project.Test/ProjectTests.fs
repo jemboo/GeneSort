@@ -43,7 +43,7 @@ type ProjectTests() =
 
 
     // Helper to create a sample project
-    let createProject (parameterSets: list<string * list<string>>) =
+    let createProject (parameterSpans: list<string * list<string>>) =
 
         let outputDataTypes = 
             [|
@@ -56,6 +56,6 @@ type ProjectTests() =
         Project.create
             ("TestProject"  |> UMX.tag<projectName>)
             "Test Description"
+            parameterSpans
+            3<replNumber>
             outputDataTypes
-            parameterSets
-            paramMapRefiner
