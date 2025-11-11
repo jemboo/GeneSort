@@ -5,6 +5,7 @@ open FSharp.UMX
 
 
 type outputDataType =
+    | Project
     | RunParameters
     | SorterSet of string option
     | SortableTestSet of string option
@@ -14,7 +15,6 @@ type outputDataType =
     | SortableTestModelSetMaker of string option
     | SorterSetEval of string option
     | SorterSetEvalBins of string option
-    | Project
     | TextReport of string<textReportName>
 
 

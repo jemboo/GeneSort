@@ -59,17 +59,15 @@ module OutputDataFile =
             (projectFolder: string<pathToProjectFolder>)
             (queryParams: queryParams) : string<fullPathToFile> =
 
-        match queryParams.OutputDataType with
-        | outputDataType.Project -> 
-            let fileName = sprintf "%s.msgpack" (queryParams.OutputDataType |> OutputDataType.toFolderName)
-            Path.Combine(%projectFolder, fileName) |> UMX.tag<fullPathToFile>
+        let fileNameWithExtension =
+            match queryParams.OutputDataType with
+            | outputDataType.TextReport reportName -> sprintf "%s.txt" %reportName
+            | _ -> 
+                GeneSortDb.makeOutputDataName queryParams + ".msgpack"
 
-        | outputDataType.TextReport reportName -> 
-            let outputDataFolder = getPathToOutputDataFolder projectFolder queryParams.OutputDataType
-            let fileName = sprintf "%s.txt" %reportName
-            Path.Combine(%outputDataFolder, fileName) |> UMX.tag<fullPathToFile>
-        | _ -> 
-            makeIndexAndReplPathFromQueryParams projectFolder queryParams
+        let outputDataFolder = getPathToOutputDataFolder projectFolder queryParams.OutputDataType
+        Path.Combine(%outputDataFolder, fileNameWithExtension) |> UMX.tag<fullPathToFile>
+
 
 
     let getOutputDataAsync
@@ -92,7 +90,7 @@ module OutputDataFile =
             
                 let domainData =
                     match queryParams.OutputDataType with
-                    | outputDataType.RunParameters _ ->
+                    | outputDataType.RunParameters ->
                         let dto = MessagePackSerializer.Deserialize<runParametersDto>(fileBytes, options)
                         outputData.RunParameters (RunParametersDto.fromDto dto)
                     | outputDataType.SorterSet _ ->
