@@ -18,6 +18,9 @@ open GeneSort.SortingResults
 type IGeneSortDb =
     abstract member saveAsync : queryParams -> outputData -> Async<unit>
     abstract member loadAsync : queryParams -> Async<Result<outputData, OutputError>>
+    abstract member getAllProjectNamesAsync : 
+                unit -> Async<Result<string<projectName>[], string>>
+
     abstract member getAllProjectRunParametersAsync : 
             string<projectName> -> 
             CancellationToken option -> 

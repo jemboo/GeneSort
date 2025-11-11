@@ -10,7 +10,7 @@ type project =
           projectName: string<projectName>
           description: string
           parameterSpans: (string * string list) list
-          maxReplicate: int<replNumber>
+          maxReplicas: int<replNumber>
           runParametersArray: runParameters []
           parameterKeys: string array
           outputDataTypes: outputDataType array
@@ -32,7 +32,7 @@ type project =
           projectName = projectName
           description = description
           parameterSpans = parameterSpans
-          maxReplicate = maxReplicate
+          maxReplicas = maxReplicate
           runParametersArray = runParametersArray
           outputDataTypes = outputDataTypes
           parameterKeys =
@@ -45,7 +45,7 @@ type project =
     member this.ProjectName with get () = this.projectName
     member this.Description with get () = this.description
     member this.ParameterSpans with get() = this.parameterSpans
-    member this.MaxReplicate with get() = this.maxReplicate
+    member this.MaxReplicate with get() = this.maxReplicas
     member this.ParameterKeys with get() = this.parameterKeys
     member this.OutputDataTypes with get() = this.outputDataTypes
     member this.RunParametersArray with get () = this.runParametersArray
@@ -78,14 +78,14 @@ module Project =
             (projectName: string<projectName>)
             (description: string)
             (parameterSpans: (string * string list) list)
-            (maxReplicate: int<replNumber>)
+            (maxReplicas: int<replNumber>)
             (outputDataTypes: outputDataType array)
             (paramRefiner: runParameters seq -> runParameters seq)
              : project =
 
-        if %maxReplicate < 0 then
+        if %maxReplicas < 0 then
             failwith "maxReplicate must not be negative"
-        let replicateSpan = [ runParameters.replKey, [0 .. %maxReplicate - 1] |> List.map string ]
+        let replicateSpan = [ runParameters.replKey, [0 .. %maxReplicas - 1] |> List.map string ]
 
         let fullSpans = replicateSpan @ parameterSpans
         let runParametersArray =
@@ -107,12 +107,12 @@ module Project =
                 projectName
                 description
                 parameterSpans
-                maxReplicate
+                maxReplicas
                 refinedParameters
                 outputDataTypes
 
 
-    let updateMaxReplicate (project: project) (newMaxReplicate: int<replNumber>) 
+    let updateMaxReplicas (project: project) (newMaxReplicate: int<replNumber>) 
             (paramRefiner: runParameters seq -> runParameters seq) : project =
         create
             project.ProjectName

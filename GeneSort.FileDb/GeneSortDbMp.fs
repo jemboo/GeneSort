@@ -52,6 +52,21 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
     member _.RootFolder = rootFolder
     
     interface IGeneSortDb with
+
+        member this.getAllProjectNamesAsync(): Async<Result<string<projectName> array,string>> =
+            async {
+                try
+                    let root = %rootFolder
+                    if not (Directory.Exists(root)) then
+                        return Result.Error(sprintf "Root folder '%s' does not exist" root)
+                    else
+                        let dirs = Directory.GetDirectories(root)
+                        let names = dirs |> Array.map (Path.GetFileName >> UMX.tag<projectName>)
+                        return Result.Ok names
+                with
+                | ex -> return Result.Error ex.Message
+            }
+
         member _.saveAsync (queryParams: queryParams) (data: outputData) : Async<unit> =
             mailbox.PostAndAsyncReply(fun channel -> Save(queryParams, data, channel))
         
