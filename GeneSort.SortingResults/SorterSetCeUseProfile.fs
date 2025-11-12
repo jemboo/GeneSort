@@ -11,8 +11,10 @@ type sorterCeUseProfile = {
     sorterSetId: Guid<sorterSetId>
     sorterTestsId: Guid<sortableTestsId>
     lastUsedCeIndex: int
+    unsortedCount: int
+    ceCount: int<ceLength>
+    stageLength: int<stageLength>
     segmentTotals: ArrayProperties.segmentWithPayload<int> []
-
 }
 
 module SorterCeUseProfile =
@@ -37,6 +39,9 @@ module SorterCeUseProfile =
             sorterId = sorterEval.SorterId
             sorterSetId = sorterSetId
             lastUsedCeIndex = sorterEval.getLastUsedCeIndex
+            unsortedCount = sorterEval.UnsortedCount
+            ceCount = sorterEval.getUsedCeCount()
+            stageLength = sorterEval.getStageLength()
             sorterTestsId = sorterTestsId
         }
 
@@ -49,6 +54,9 @@ module SorterCeUseProfile =
             yield (%profile.sorterId.ToString()) 
             yield (%profile.sorterSetId.ToString()) 
             yield (%profile.sorterTestsId.ToString())
+            yield (profile.unsortedCount.ToString())
+            yield (profile.ceCount.ToString())
+            yield (profile.stageLength.ToString())
             yield (profile.lastUsedCeIndex.ToString())
             yield! (profile.segmentTotals |> ArrayProperties.getSegmentPayloadReportData (fun (i:int) -> i.ToString()))
         |]
@@ -91,9 +99,4 @@ module SorterSetCeUseProfile =
                 for profile in sorterSetCeUseProfile.sorterCeUseProfiles do
                     yield SorterCeUseProfile.makeReportLine sortingWidth sorterModelKey profile
         |]
-
-    let getUsageProfileHeader (arraySegments: ArrayProperties.segment[]) : string =
-        sprintf "SorterId \tSorterSetId \tSorterTestsId \t%s" 
-                    (arraySegments |> ArrayProperties.getSegmentReportHeader )
-
    

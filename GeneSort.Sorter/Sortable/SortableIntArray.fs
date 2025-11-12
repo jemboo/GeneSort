@@ -50,7 +50,10 @@ type sortableIntArray =
         ArrayProperties.distanceSquared this.values other.values
 
     /// Checks if the values array is sorted in non-decreasing order.
-    member this.IsSorted = ArrayProperties.isSorted this.values
+    member this.IsSorted = ArrayProperties.isSorted this.Values
+    
+    
+    //ArrayProperties.isSorted this.values
     
     member this.SortByCes
                 (ces: ce[])

@@ -92,7 +92,7 @@ module TextReporters =
                         DataTableFile.create "SorterCeUseProfile_Report" 
                               (  (Array.init 20 (fun i -> i.ToString()))
                                     |> Array.append 
-                                  [| "Sorting Width"; "SorterModel"; "sorterId"; "sorterSetId"; "sorterTestsId"; "lastCe" |]
+                                  [| "Sorting Width"; "SorterModel"; "sorterId"; "sorterSetId"; "sorterTestsId"; "UnsortedCount"; "CeCount"; "StageCount";"lastCe" |]
                               )
                               |> DataTableFile.addSource (sprintf "Generated: %s" (DateTime.Now.ToLongTimeString()))
                               |> DataTableFile.addSource (sprintf "Sources (%d):" runParamsArray.Length)

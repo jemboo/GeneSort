@@ -47,6 +47,34 @@ module ArrayProperties =
             isSorted
 
 
+    let areBoolsSorted  (values: bool[]) : bool =
+        if isNull values then 
+            failwith "Array cannot be null"
+        elif values.Length <= 1 then true
+        else
+            let mutable i = 1
+            let mutable isSorted = true
+            while (i < values.Length && isSorted) do
+                isSorted <- (values.[i - 1] <= values.[i])
+                i <- i + 1
+            isSorted
+
+
+    let areIntsSorted  (values: int[]) : bool =
+        if isNull values then 
+            failwith "Array cannot be null"
+        elif values.Length <= 1 then true
+        else
+            let mutable i = 1
+            let mutable isSorted = true
+            while (i < values.Length && isSorted) do
+                isSorted <- (values.[i - 1] <= values.[i])
+                i <- i + 1
+            isSorted
+
+
+
+
     let inline isSortedOffset< ^a when ^a: comparison> 
                     (values: ^a[]) 
                     (offset:int) 

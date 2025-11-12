@@ -50,15 +50,15 @@ module MergeIntEvals =
 
     let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageLength> =
         match %sortingWidth with
-        | 4 -> 7 |> UMX.tag<stageLength>
-        | 6 -> 10 |> UMX.tag<stageLength>
-        | 8 -> 25 |> UMX.tag<stageLength>
-        | 12 -> 40 |> UMX.tag<stageLength>
-        | 16 -> 100 |> UMX.tag<stageLength>
-        | 24 -> 200 |> UMX.tag<stageLength>
-        | 32 -> 400 |> UMX.tag<stageLength>
-        | 48 -> 1000 |> UMX.tag<stageLength>
-        | 64 -> 2000 |> UMX.tag<stageLength>
+        | 4 -> 6 |> UMX.tag<stageLength>
+        | 6 -> 8 |> UMX.tag<stageLength>
+        | 8 -> 20 |> UMX.tag<stageLength>
+        | 12 -> 35 |> UMX.tag<stageLength>
+        | 16 -> 80 |> UMX.tag<stageLength>
+        | 24 -> 180 |> UMX.tag<stageLength>
+        | 32 -> 300 |> UMX.tag<stageLength>
+        | 48 -> 800 |> UMX.tag<stageLength>
+        | 64 -> 1200 |> UMX.tag<stageLength>
         | 96 -> 5000 |> UMX.tag<stageLength>
         | 128 -> 6000 |> UMX.tag<stageLength>
         | 192 -> 15000 |> UMX.tag<stageLength>
@@ -70,7 +70,7 @@ module MergeIntEvals =
     let sortableArrayType = sortableArrayType.Ints
   
     let sortingWidthValues = 
-        [4; 6; 8; 12; 16; 24; 32; 48; 64;] |> List.map(fun d -> d.ToString())
+       [4; 6; 8; 12; 16; 24; 32; 48; 64;] |> List.map(fun d -> d.ToString())
        // [32; 48; 64; 96; 128; 192; 256; 384] |> List.map(fun d -> d.ToString())
 
     let sortingWidths() : string*string list =
@@ -82,6 +82,9 @@ module MergeIntEvals =
           Some sorterModelKey.Msrs; 
           Some sorterModelKey.Msuf4; 
           Some sorterModelKey.Msuf6; ]      |> List.map(SorterModelKey.toString)
+
+    //let sorterModelKeyValues () : string list =
+    //    [ Some sorterModelKey.Mcse;]      |> List.map(SorterModelKey.toString)
 
     let sorterModelKeys () : string*string list =
         (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
@@ -121,7 +124,7 @@ module MergeIntEvals =
             let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
             runParameters.SetCeLength ceLength
 
-            let replFactor = if (%repl = 0) then 1 else 10
+            let replFactor = if (%repl = 0) then 10 else 10
             let sorterCount = sortingWidth |> getSorterCountForSortingWidth replFactor
             runParameters.SetSorterCount sorterCount
             runParameters

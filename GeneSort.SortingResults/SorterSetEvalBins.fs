@@ -74,7 +74,7 @@ module SorterSetEvalBins =
             evalBins = Dictionary<sorterEvalKey, sorterEvalBin>()
         }
 
-        let gps = sorterSetEval.SorterEvals |> Array.groupBy (fun se -> (se.getUsedCeCount(), se.getStageLength()))
+        //let gps = sorterSetEval.SorterEvals |> Array.groupBy (fun se -> (se.getUsedCeCount(), se.getStageLength()))
 
         sorterSetEval.SorterEvals
         |> Array.iter (fun se -> addSorterEval se sorterSetEvalBins)

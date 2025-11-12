@@ -144,7 +144,7 @@ module Ce =
                     (width:int) : int seq =
         if width < 2 then
             failwith "Width must be at least 2"
-        let indexMax = maxIndexForWdith (width - 1)
+        let indexMax = maxIndexForWdith width
         seq {
             while true do
                 let ceTemp = indexPicker indexMax |> fromIndex

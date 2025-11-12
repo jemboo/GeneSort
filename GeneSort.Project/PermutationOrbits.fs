@@ -65,22 +65,6 @@ module PermutationOrbits =
     //    }
 
 
-    ////Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
-    //let sorterTestCountReporter (project: project) =
-    //        try
-    //            Console.WriteLine(sprintf 
-    //                                "Generating Permutation orbit count report for %s in project %s" 
-    //                                (outputDataType.SortableTestModelSet |> OutputDataType.toDescription)
-    //                                %project.ProjectName)
-                
-    //            let reportFilePath = ""
-
-    //            Console.WriteLine(sprintf "Permutation orbit count report saved to %s" reportFilePath)
-    //        with ex ->
-    //            Console.WriteLine(sprintf "Error generating Permutation orbit count report for %s: %s" "SorterTestSet" ex.Message)
-    //            raise ex
-
-
     // Executor to generate a report for each SorterTest across all SorterTestSets, one line per SorterTest
     //let sorterTestCountReporter (project: project) =
     //        try

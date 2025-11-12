@@ -75,10 +75,3 @@ module SorterEval =
             sorter.SortingWidth 
             ceBlockEval.CeBlockWithUsage
             (sortableTests |> SortableTests.getUnsortedCount)
-
-    let reportHeader : string =
-        "SorterId \tSorterTestsId \tSortingWidth \tCeLengthUsed \tCeCount \tLastUsedCeIndex \tStageLength \tUnsortedCount"
-
-    let reportLine (se: sorterEval) : string =
-        $"{se.SorterId} \t{se.SorterTestsId} \t{se.SortingWidth} \t{se.getUsedCeCount()} \t{se.CeLength} \t{se.getLastUsedCeIndex} \t{se.getStageLength()} \t{se.UnsortedCount}"
-
