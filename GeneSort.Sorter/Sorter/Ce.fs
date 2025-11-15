@@ -42,6 +42,33 @@ module Ce =
         sprintf "(%d, %d)" ce.Low ce.Hi
 
 
+    // combine the upper and lower arrays, but increase the low and hi indexes of the ce's in cesLower
+    // by sortingWidthUpper. Verify that ce.Low, and ce.Hi in cesUpper are between 0 and (sortingWidthUpper - 1).
+    // Verify that ce.Low, and ce.Hi in cesLower are between 0 and (sortingWidthLower - 1).
+    let stack (cesUpper: ce[]) (cesLower: ce[]) 
+              (lowerOffset: int<sortingWidth>)  : ce[] =
+
+        // Shift cesLower indices by lowerOffset
+        let shiftedLower =
+            cesLower |> Array.map (fun _ce -> ce.create (_ce.Low + %lowerOffset) (_ce.Hi + %lowerOffset))
+
+        // Combine the arrays
+        Array.append cesUpper shiftedLower
+
+
+// use stack to combine arrays of ce arrays
+    let multiStack (cesUpper: ce[][]) (cesLower: ce[][]) 
+                   (lowerOffset: int<sortingWidth>) : ce[][] =
+
+        if cesUpper.Length <> cesLower.Length then
+            failwith "cesUpper and cesLower must have the same length"
+        
+        Array.map2 (fun upper lower -> 
+            stack upper lower lowerOffset
+        ) cesUpper cesLower
+
+
+
    // mutates in placeby a sequence of ces, and returns the resulting sortable (values[]),
    // records the number of uses of each ce in useCounter, starting at useCounterOffset
     let inline sortBy< ^a when ^a: comparison> 

@@ -47,7 +47,7 @@ type stageSequence =
                 // Add to the earliest stage that can accept the CE
                 this.stages.[targetStageIndex].AddCe(ce)
 
-// Core module for Stage operations
+
 module StageSequence =
 
     let fromCes (sortingWidth : int<sortingWidth>) (ces: ce array) : stageSequence =

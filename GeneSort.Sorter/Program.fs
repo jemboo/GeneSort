@@ -1,15 +1,17 @@
-﻿open GeneSort.Sorter
+﻿open FSharp.UMX
+open GeneSort.Sorter
 open GeneSort.Sorter.Sorter
 
-let yab () = 
-    let sortingWidth = 10
-    let ceCount = 100000000
-    for i in 0 .. ceCount - 1 do
-        let ce = Ce.fromIndex i
-        if Ce.toIndex ce <> i then
-            printfn " *********************  Error at index %d: expected %d, got %d" i i (Ce.toIndex ce)  
-        //printfn "Ce %d: %s  %d" i (GeneSort.Sorter.Ce.toString ce)  (Ce.toIndex ce)
 
-    printfn "done"
-// For more information see https://aka.ms/fsharp-console-apps
-(yab())
+
+let sortingWidth = 32<sortingWidth>
+let offset = 0<sortingWidth>
+
+//let wak = BitonicSorter2.bitonicMerge1 offset sortingWidth
+let wak = BitonicSorter.bitonicSort2 sortingWidth
+
+for i in 0 .. wak.Length - 1 do
+printfn "%A \n" wak[i]
+
+//let network = BitonicSorter.generateBitonicStageSequence (16 |> UMX.tag<sortingWidth>)
+//printfn "%A" network

@@ -15,6 +15,7 @@
     <Compile Include="Sorter\Stage.fs" />
     <Compile Include="Sorter\Sorter.fs" />
     <Compile Include="Sorter\StageSequence.fs" />
+    <Compile Include="Sorter\BitonicSorter.fs" />
     <Compile Include="Sorter\SorterSet.fs" />
     <Compile Include="Sortable\SortableArrayType.fs" />
     <Compile Include="Sortable\SortableBoolArray.fs" />

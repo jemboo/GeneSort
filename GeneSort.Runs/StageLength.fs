@@ -21,6 +21,33 @@ open GeneSort.Sorter
 //0.99	    290	        351	        289	        398	        445	        615	        467	        984	        645	        853	        714	        1901	    933	        1482	    981	        4600	    1404	    1824	    1404	    6818	    2220	    2976	    2132	    16480	    2700	    3717	    3304	    21553	    4793	    5873	    4884	    46606
 
 
+//Excellent! I've found and retrieved the Van Voorhis paper. Here's what it contains:
+//Overview
+//The paper "Large [g,d] Sorting Networks" by David C. Van Voorhis from August 1971 describes special constructions for [2^r, 2^r] f-networks that reduce the number of comparators required by large N-sorter networks. Stanford
+//Key Results for Powers of 2
+//Van Voorhis provides a table (Table 3) showing G(2^m) values for m ≤ 16, where G(N) represents the minimum number of comparators required by an N-sorter network using the [g,d] strategy. Stanford Here are the specific values:
+
+//N=16 (m=4): 61 comparators (though Green's network uses 60)
+//N=32 (m=5): 187 comparators
+//N=64 (m=6): 525 comparators
+//N=128 (m=7): 1,427 comparators
+//N=256 (m=8): 3,705 comparators
+//N=512 (m=9): 9,457 comparators
+//N=1,024 (m=10): 23,357 comparators
+//N=2,048 (m=11): 56,787 comparators
+//N=4,096 (m=12): 135,417 comparators
+//N=8,192 (m=13): 319,827 comparators
+//N=16,384 (m=14): 743,421 comparators
+//N=32,768 (m=15): 1,714,003 comparators
+//N=65,536 (m=16): 3,899,397 comparators
+
+//Asymptotic Formula
+//The paper derives that the asymptotic growth of S(N) (the most economical N-sorter network known) is: S(N) = 0.250 N (log₂N)² - 0.372 N (log₂N) + O(N) Stanford
+//This was a significant improvement over Batcher's sorting networks, which were the best known at the time.
+
+
+
+
 
 
 
