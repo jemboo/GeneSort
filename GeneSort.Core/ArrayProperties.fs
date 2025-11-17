@@ -73,8 +73,6 @@ module ArrayProperties =
             isSorted
 
 
-
-
     let inline isSortedOffset< ^a when ^a: comparison> 
                     (values: ^a[]) 
                     (offset:int) 

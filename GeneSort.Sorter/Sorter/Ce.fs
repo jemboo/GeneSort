@@ -56,7 +56,7 @@ module Ce =
         Array.append cesUpper shiftedLower
 
 
-// use stack to combine arrays of ce arrays
+    // use stack to combine arrays of ce arrays
     let multiStack (cesUpper: ce[][]) (cesLower: ce[][]) 
                    (lowerOffset: int<sortingWidth>) : ce[][] =
 

@@ -4,6 +4,7 @@ namespace GeneSort.Sorter.Sorter
 open FSharp.UMX
 open GeneSort.Sorter
 open GeneSort.Sorter.Sorter
+open GeneSort.Core
 
 
 module BitonicSorter =
@@ -17,6 +18,7 @@ module BitonicSorter =
             | h1::t1, h2::t2 -> mergeHelper t1 t2 (h1::h2::acc)
         mergeHelper list1 list2 []
     
+
     ///// Generate comparators for a bitonic merge (scheme 1)
     //// For the full merge sequence for a given soringWidth, set upperOffset = 0<sortingWidth>
     let rec bitonicMerge1 (upperOffset: int<sortingWidth>) (fullWidth: int<sortingWidth>) : ce [][] =
@@ -29,6 +31,7 @@ module BitonicSorter =
         else
             [||]
 
+
     ///// Generate comparators for a bitonic merge (scheme 2)
     //// For the full merge sequence for a given soringWidth, set upperOffset = 0<sortingWidth>
     let bitonicMerge2 (upperOffset: int<sortingWidth>) (fullWidth: int<sortingWidth>) : ce [][] =
@@ -40,6 +43,7 @@ module BitonicSorter =
             Array.append [| prefix |] (Ce.multiStack upperSuffix upperSuffix halfWidth)
         else
             [||]
+
 
     ///// Generate comparators for a bitonic sort (scheme 1)
     let bitonicSort1 (sortingWidth: int<sortingWidth>) : ce [][] =
@@ -73,3 +77,114 @@ module BitonicSorter =
                Array.append fullPrefix suffix
 
         bitonicSortHelper 0<sortingWidth> sortingWidth
+
+
+    let prefix1 : sorter =
+        let sorterId =
+            [
+                "prefix1-bitonic-sorter"  :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
+
+        let sortingWidth = 2<sortingWidth>
+        let ces = bitonicSort1 sortingWidth |> Array.concat
+        sorter.create sorterId sortingWidth ces
+
+
+    let prefix2 : sorter =
+        let sorterId =
+            [
+                "prefix2-bitonic-sorter"  :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
+
+        let sortingWidth = 4<sortingWidth>
+        let ces = bitonicSort1 sortingWidth |> Array.take 2 |> Array.concat
+        sorter.create sorterId sortingWidth ces
+
+
+    let prefix3 : sorter =
+        let sorterId =
+            [
+                "prefix3-bitonic-sorter"  :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
+
+        let sortingWidth = 4<sortingWidth>
+        let ces = bitonicSort1 sortingWidth |> Array.take 3 |> Array.concat
+        sorter.create sorterId sortingWidth ces
+
+
+    let prefix4 : sorter =
+        let sorterId =
+            [
+                "prefix4-bitonic-sorter"  :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
+
+        let sortingWidth = 8<sortingWidth>
+        let ces = bitonicSort1 sortingWidth |> Array.take 4 |> Array.concat
+        sorter.create sorterId sortingWidth ces
+
+
+    let prefix5 : sorter =
+        let sorterId =
+            [
+                "prefix5-bitonic-sorter"  :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
+
+        let sortingWidth = 8<sortingWidth>
+        let ces = bitonicSort1 sortingWidth |> Array.take 5 |> Array.concat
+        sorter.create sorterId sortingWidth ces
+
+
+    let prefix6 : sorter =
+        let sorterId =
+            [
+                "prefix6-bitonic-sorter"  :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
+
+        let sortingWidth = 8<sortingWidth>
+        let ces = bitonicSort1 sortingWidth |> Array.take 6 |> Array.concat
+        sorter.create sorterId sortingWidth ces
+
+
+    let prefix7 : sorter =
+        let sorterId =
+            [
+                "prefix7-bitonic-sorter"  :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
+
+        let sortingWidth = 16<sortingWidth>
+        let ces = bitonicSort1 sortingWidth |> Array.take 7 |> Array.concat
+        sorter.create sorterId sortingWidth ces
+
+
+    let prefix8 : sorter =
+        let sorterId =
+            [
+                "prefix8-bitonic-sorter"  :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
+
+        let sortingWidth = 8<sortingWidth>
+        let ces = bitonicSort1 sortingWidth |> Array.take 8 |> Array.concat
+        sorter.create sorterId sortingWidth ces
+
+
+    let prefix9 : sorter =
+        let sorterId =
+            [
+                "prefix9-bitonic-sorter"  :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
+
+        let sortingWidth = 8<sortingWidth>
+        let ces = bitonicSort1 sortingWidth |> Array.take 9 |> Array.concat
+        sorter.create sorterId sortingWidth ces
+
+
+    let prefix10 : sorter =
+        let sorterId =
+            [
+                "prefix10-bitonic-sorter"  :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
+
+        let sortingWidth = 16<sortingWidth>
+        let ces = bitonicSort1 sortingWidth |> Array.take 10 |> Array.concat
+        sorter.create sorterId sortingWidth ces
+

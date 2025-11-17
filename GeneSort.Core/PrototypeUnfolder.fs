@@ -19,7 +19,7 @@ module PrototypeUnfolder =
     let allTwoOrbitPairTypeLists n =
         let allValues = [TwoOrbitPairType.Ortho; TwoOrbitPairType.Para; TwoOrbitPairType.SelfRefl]
         let inputLists = List.replicate n allValues
-        cartesianProduct inputLists
+        cartesianProductLists inputLists
 
 
     // creates TwoOrbitPairs from TwoOrbits by reflection

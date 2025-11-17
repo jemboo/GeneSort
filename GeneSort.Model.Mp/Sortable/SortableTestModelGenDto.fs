@@ -1,12 +1,7 @@
 ﻿namespace GeneSort.Model.Mp.Sortable
 
-open System
-open GeneSort.Model.Sorter
 open MessagePack
-open FSharp.UMX
 open GeneSort.Model.Sortable
-open GeneSort.Core.Mp
-open GeneSort.Sorter
 
 
 [<MessagePackObject>]
@@ -18,13 +13,13 @@ type sortableTestModelGenDto = {
 
 module SortableTestModelGenDto =
 
-    let fromDomain (gen: SorterTestModelGen) : sortableTestModelGenDto =
+    let fromDomain (gen: sortableTestModelGen) : sortableTestModelGenDto =
         match gen with
-        | SorterTestModelGen.MsasORandGen msas ->
+        | sortableTestModelGen.MsasORandGen msas ->
             { Kind = 0; MsasORandGen = MsasORandGenDto.fromDomain msas }
 
 
-    let toDomain (dto: sortableTestModelGenDto) : SorterTestModelGen =
+    let toDomain (dto: sortableTestModelGenDto) : sortableTestModelGen =
         match dto.Kind with
-        | 0 -> SorterTestModelGen.MsasORandGen (MsasORandGenDto.toDomain dto.MsasORandGen)
-        | k -> failwith "Unknown SorterTestModelGenDto.Kind = %d" 
+        | 0 -> sortableTestModelGen.MsasORandGen (MsasORandGenDto.toDomain dto.MsasORandGen)
+        | k -> failwith (sprintf "Unknown SorterTestModelGenDto.Kind = %d" dto.Kind)

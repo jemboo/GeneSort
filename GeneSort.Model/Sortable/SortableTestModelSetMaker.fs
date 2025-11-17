@@ -7,13 +7,13 @@ type sortableTestModelSetMaker =
     private
         { 
           id : Guid<sorterTestModelSetMakerID>
-          sorterTestModelGen : SorterTestModelGen
+          sorterTestModelGen : sortableTestModelGen
           firstIndex : int<sorterTestModelCount>
           count : int<sorterTestModelCount>
         }
     with
     static member create 
-                (sorterTestModelGen: SorterTestModelGen) 
+                (sorterTestModelGen: sortableTestModelGen) 
                 (firstIndex: int<sorterTestModelCount>) 
                 (count: int<sorterTestModelCount>) : sortableTestModelSetMaker =
         let id = 
@@ -37,7 +37,7 @@ type sortableTestModelSetMaker =
 
         let sorterTestModels = 
                     this.SorterTestModelGen 
-                    |> SorterTestModelGen.makeSorterTestModels %this.firstIndex %this.count
+                    |> SortableTestModelGen.makeSorterTestModels %this.firstIndex %this.count
                     |> Seq.toArray
 
         { id = id; sorterTestModels = sorterTestModels }

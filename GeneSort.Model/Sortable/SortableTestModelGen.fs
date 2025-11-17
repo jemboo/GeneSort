@@ -1,15 +1,15 @@
 ﻿namespace GeneSort.Model.Sortable
 
-type SorterTestModelGen =
+type sortableTestModelGen =
      | MsasORandGen of MsasORandGen
 
 
-module SorterTestModelGen =
+module SortableTestModelGen =
 
     let makeSorterTestModels 
                 (firstIndex: int) 
                 (count: int) 
-                (gen: SorterTestModelGen) : 
+                (gen: sortableTestModelGen) : 
                 sortableTestModel seq =
         match gen with
         | MsasORandGen msasORandGen ->
