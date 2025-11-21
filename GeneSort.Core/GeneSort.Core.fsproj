@@ -19,6 +19,7 @@
     <Compile Include="BytePack.fs" />
     <Compile Include="Combinatorics.fs" />
     <Compile Include="ArrayOps.fs" />
+    <Compile Include="SubSortedArray.fs" />
     <Compile Include="Orbit.fs" />
     <Compile Include="OrbitSet.fs" />
     <Compile Include="TwoOrbit\TwoOrbit.fs" />

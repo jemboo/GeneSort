@@ -59,7 +59,6 @@ type MsasO =
                 sortingWidth
                 bArrays
 
-
     member this.MakeSortableIntTests 
             (sortingWidth: int<sortingWidth>) : sortableIntTests =
         let ssId = %this.Id |> UMX.tag<sortableTestsId>

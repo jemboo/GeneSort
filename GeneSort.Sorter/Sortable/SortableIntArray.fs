@@ -26,6 +26,9 @@ type sortableIntArray =
             invalidArg "symbolSetSize" "Symbol set size must be positive."
         { values = values; sortingWidth = sortingWidth; symbolSetSize = symbolSetSize; valuesHash = None }
 
+    static member CreateFromPermutation(perm: Permutation) =
+        sortableIntArray.Create(perm.Array, (%perm.Order |> UMX.tag<sortingWidth>), (%perm.Order |> UMX.tag<symbolSetSize>))
+
     static member CreateSorted(sortingWidth: int<sortingWidth>) =
         if sortingWidth < 0<sortingWidth> then
             invalidArg "sortingWidth" "Sorting width must be non-negative."
@@ -52,9 +55,6 @@ type sortableIntArray =
     /// Checks if the values array is sorted in non-decreasing order.
     member this.IsSorted = ArrayProperties.isSorted this.Values
     
-    
-    //ArrayProperties.isSorted this.values
-    
     member this.SortByCes
                 (ces: ce[])
                 (useCounter: int[]) : sortableIntArray =
@@ -74,18 +74,24 @@ type sortableIntArray =
             [||]
         else
             let minValue = Array.min this.values
-            let thresholds = 
-                this.values 
-                |> Array.filter (fun v -> v > minValue) 
-                |> Array.distinct
-                |> Array.sort
+            //let thresholds = 
+            //    this.values 
+            //    |> Array.filter (fun v -> v >= minValue) 
+            //    |> Array.distinct
+            //    |> Array.sort
+            let thresholds = [| 0 .. (%this.sortingWidth + 1) |]
+
             let vals = this.Values
             let sw = this.SortingWidth
             thresholds 
             |> Array.map (
                 fun threshold ->
-                    let boolValues = vals |> Array.map (fun v -> v >= threshold)
+                    let boolValues = vals |> Array.map (fun v -> v >= (threshold - 1))
                     sortableBoolArray.Create(boolValues, sw))
+
+
+    member this.ToPermutation() : Permutation =
+        Permutation.createUnsafe this.values
 
     override this.Equals(obj) =
         match obj with
@@ -93,6 +99,7 @@ type sortableIntArray =
             this.sortingWidth = other.sortingWidth &&
             Array.forall2 (=) this.values other.values
         | _ -> false
+
 
     override this.GetHashCode() =
         // Use cached hash if available, otherwise compute and cache
@@ -113,6 +120,7 @@ type sortableIntArray =
 
 
 
+
 module SortableIntArray =
     // Custom comparer for sortableIntArray based only on Values
     type SortableIntArrayValueComparer() =
@@ -124,29 +132,29 @@ module SortableIntArray =
                 // Use the struct's GetHashCode, which caches the hash of Values
                 obj.GetHashCode()
 
+
     // Function to remove duplicates based on Values
     let removeDuplicates (arr: sortableIntArray[]) : sortableIntArray[] =
         arr.Distinct(SortableIntArrayValueComparer()).ToArray()
 
-    let fromPermutation (perm: Permutation) : sortableIntArray =
-        sortableIntArray.Create(perm.Array, (%perm.Order |> UMX.tag<sortingWidth>), (%perm.Order |> UMX.tag<symbolSetSize>))
 
     let getOrbit (maxCount: int) (perm: Permutation) : sortableIntArray seq =
         Permutation.powerSequence perm  
         |> CollectionUtils.takeUpToOrWhile maxCount (fun perm -> not (Permutation.isIdentity perm))
-        |> Seq.map fromPermutation
+        |> Seq.map sortableIntArray.CreateFromPermutation
+
 
     let randomSortableIntArray (indexShuffler: int -> int) (sortingWidth: int<sortingWidth>) : sortableIntArray =
         let perm = Permutation.randomPermutation indexShuffler %sortingWidth
-        fromPermutation perm
+        sortableIntArray.CreateFromPermutation perm
 
-    let getIntArrayMergeCases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
-        let halfWidth = %sortingWidth / 2
+
+    let getIntArrayMerge2Cases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
+        let hw = %sortingWidth / 2
+        let sw = %sortingWidth
         [|
-            for i = 0 to (halfWidth - 1) do
-                let arrayData = 
-                    [| (%sortingWidth - i) .. (%sortingWidth - 1) |] 
-                    |> Array.append [| 0 .. (halfWidth - 1 - i) |] 
-                    |> Array.append [| (halfWidth - i) .. (%sortingWidth - 1 - i) |]
+            for i = 0 to hw do
+                let ad1 = Array.append [| 0 .. (%hw - 1 - i) |] [| (sw - i) .. (sw - 1) |]
+                let arrayData = Array.append ad1  [| (sw - hw - i) .. (sw - i - 1) |]
                 sortableIntArray.Create(arrayData, sortingWidth, (%sortingWidth |> UMX.tag<symbolSetSize>))
         |]

@@ -63,7 +63,7 @@ module Permutation =
             failwith "Permutation order must be positive"
         Permutation.create [|0 .. order-1|]
 
-
+    // Check if a permutation is the identity permutation
     let isIdentity (permutation: Permutation) : bool =
         let arr = permutation.Array
         let mutable isIdentity = true

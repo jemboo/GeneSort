@@ -6,6 +6,7 @@ type sortableArrayType =
     | Bools
 
 module SortableArrayType =
+
     let toString (t:sortableArrayType) : string =
         match t with
         | Ints -> "Ints"

@@ -6,7 +6,7 @@ open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Sorter.Sortable
 
-
+// MsasMi = all int array merge cases
 [<Struct; CustomEquality; NoComparison>]
 type MsasMi = 
     private 
@@ -46,7 +46,7 @@ type MsasMi =
         sortableIntTests.create 
                 ( %this.id |> UMX.tag<sortableTestsId>) 
                 sortingWidth
-                (SortableIntArray.getIntArrayMergeCases sortingWidth)
+                (SortableIntArray.getIntArrayMerge2Cases sortingWidth)
         |> sortableTests.Ints
 
 

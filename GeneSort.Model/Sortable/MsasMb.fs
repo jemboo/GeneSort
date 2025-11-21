@@ -6,7 +6,7 @@ open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Sorter.Sortable
 
-
+// MsasMb = merge bool array test cases
 [<Struct; CustomEquality; NoComparison>]
 type MsasMb = 
     private 
