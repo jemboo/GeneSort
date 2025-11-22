@@ -47,11 +47,6 @@ open GeneSort.Sorter
 
 
 
-
-
-
-
-
 module StageLength =
 
     let fromString (s: string) : int<stageLength> =

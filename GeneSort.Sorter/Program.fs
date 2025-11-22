@@ -5,7 +5,7 @@ open GeneSort.Sorter.Sorter
 
 
 
-let sortingWidth = 8<sortingWidth>
+let sortingWidth = 4<sortingWidth>
 //let offset = 0<sortingWidth>
 
 //let bs = BitonicSorter2.bitonicMerge1 offset sortingWidth

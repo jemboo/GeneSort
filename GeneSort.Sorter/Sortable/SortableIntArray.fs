@@ -86,7 +86,7 @@ type sortableIntArray =
             thresholds 
             |> Array.map (
                 fun threshold ->
-                    let boolValues = vals |> Array.map (fun v -> v >= (threshold - 1))
+                    let boolValues = vals |> Array.map (fun v -> v >= threshold )
                     sortableBoolArray.Create(boolValues, sw))
 
 
@@ -157,4 +157,18 @@ module SortableIntArray =
                 let ad1 = Array.append [| 0 .. (%hw - 1 - i) |] [| (sw - i) .. (sw - 1) |]
                 let arrayData = Array.append ad1  [| (sw - hw - i) .. (sw - i - 1) |]
                 sortableIntArray.Create(arrayData, sortingWidth, (%sortingWidth |> UMX.tag<symbolSetSize>))
+        |]
+
+
+    let getIntArrayMerge3Cases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
+        let ot = %sortingWidth / 3
+        let tt = ot * 2
+        let sw = %sortingWidth
+        [|
+            for i = 0 to ot do
+                for j = 0 to ot do
+
+                    let ad1 = Array.append [| 0 .. (%ot - 1 - j) |] [| (sw - j) .. (sw - 1) |]
+                    let arrayData = Array.append ad1  [| (sw - ot - j) .. (sw - j - 1) |]
+                    sortableIntArray.Create(arrayData, sortingWidth, (%sortingWidth |> UMX.tag<symbolSetSize>))
         |]

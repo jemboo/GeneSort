@@ -17,15 +17,17 @@ type sortableTestModel =
 
 module SortableTestModel =
 
-    let getSortingWidth (sorterTestModel: sortableTestModel) : int<sortingWidth> =
-        match sorterTestModel with
+    let getSortingWidth (sortableTestModel: sortableTestModel): int<sortingWidth> =
+        match sortableTestModel with
         | MsasF msasF -> msasF.sortingWidth
         | MsasO msasO -> %msasO.SeedPermutation.Order |> UMX.tag<sortingWidth>
         | MsasMb msasMb -> msasMb.sortingWidth
         | MsasMi msasMi -> msasMi.sortingWidth
 
 
-    let makeSortableTests (sortableTestModel: sortableTestModel) (sortableArrayType:sortableArrayType) : sortableTests =
+    let makeSortableTests 
+            (sortableTestModel: sortableTestModel) 
+            (sortableArrayType: sortableArrayType) : sortableTests =
         match sortableTestModel with
         | MsasF msasF -> 
                 match sortableArrayType with
@@ -54,18 +56,3 @@ module SortableTestModel =
                     failwith "Bools SortableArrayType not supported"
                 | sortableArrayType.Ints ->
                         msasMi.MakeSortableTests(getSortingWidth sortableTestModel)
-
-
-
-    let makeSortableTestsForMerge 
-                (sortableArrayType:sortableArrayType) 
-                (sortingWidth : int<sortingWidth>): sortableTests =
-
-        match sortableArrayType with
-        | sortableArrayType.Bools ->     
-                let msasMb = MsasMb.create sortingWidth
-                msasMb.MakeSortableTests(sortingWidth)
-
-        | sortableArrayType.Ints ->
-                let msasMi = MsasMi.create sortingWidth
-                msasMi.MakeSortableTests(sortingWidth)
