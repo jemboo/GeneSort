@@ -8,7 +8,7 @@ open GeneSort.Sorter.Sortable
 
 
 [<Struct; CustomEquality; NoComparison>]
-type MsasO = 
+type msasO = 
     private 
         { id: Guid<sorterTestModelID>
           sortableIntArrays : sortableIntArray array
@@ -18,7 +18,7 @@ type MsasO =
     static member create
             (seedPermutation : Permutation)
             (maxOrbit : int )
-            : MsasO =
+            : msasO =
             let sias = seedPermutation |> SortableIntArray.getOrbit maxOrbit |> Seq.toArray
             let id =
                 [
@@ -35,14 +35,14 @@ type MsasO =
 
     override this.Equals(obj) =
         match obj with
-        | :? MsasO as other -> 
+        | :? msasO as other -> 
             this.id = other.id
         | _ -> false
 
     override this.GetHashCode() = 
         hash (this.id, this.seedPermutation, this.maxOrbit)
 
-    interface IEquatable<MsasO> with
+    interface IEquatable<msasO> with
         member this.Equals(other) = 
             this.id = other.id
 

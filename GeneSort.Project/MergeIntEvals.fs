@@ -278,7 +278,8 @@ module MergeIntEvals =
             let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
-            let sortableTestModel = MsasMi.create sortingWidth |> sortableTestModel.MsasMi
+            let sorterMergeFactor = 2 |> UMX.tag<sorterMergeFactor>
+            let sortableTestModel = msasM.create sortingWidth sorterMergeFactor |> sortableTestModel.MsasMi
             let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableArrayType
 
         

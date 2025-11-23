@@ -56,7 +56,7 @@ type MsasORandGen =
                 seq {   while true do
                             yield  Permutation.randomPermutation (randy.NextIndex) sw
                     }
-            permSeq |> Seq.skip offset |> Seq.map(fun perm -> MsasO.create perm maxO |> sortableTestModel.MsasO)
+            permSeq |> Seq.skip offset |> Seq.map(fun perm -> msasO.create perm maxO |> sortableTestModel.MsasO)
 
 
 module MsasORandGen = ()

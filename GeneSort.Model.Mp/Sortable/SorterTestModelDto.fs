@@ -30,33 +30,33 @@ type SorterTestModelDto = {
 
 module MsasFDtoConv =
 
-    let fromDomain (m: MsasF) : MsasFDto =
+    let fromDomain (m: msasF) : MsasFDto =
         {
             Id = %m.Id
             SortingWidth = %m.SortingWidth
         }
 
-    let toDomain (dto: MsasFDto) : MsasF =
+    let toDomain (dto: MsasFDto) : msasF =
         // Id is deterministic from SortingWidth via MsasF.create; dto.Id is informational
-        MsasF.create (dto.SortingWidth |> UMX.tag<sortingWidth>)
+        msasF.create (dto.SortingWidth |> UMX.tag<sortingWidth>)
 
 
 module MsasODtoConv =
 
-    let private getMaxOrbit (m: MsasO) : int =
+    let private getMaxOrbit (m: msasO) : int =
         let p = m.GetType().GetProperty("maxOrbit", Reflection.BindingFlags.NonPublic ||| Reflection.BindingFlags.Instance)
         p.GetValue(m) :?> int
 
-    let toDto (m: MsasO) : MsasODto =
+    let toDto (m: msasO) : MsasODto =
         {
             Id = %m.Id
             SeedPermutation = m.SeedPermutation |> PermutationDto.fromDomain
             MaxOrbit = getMaxOrbit m
         }
 
-    let fromDto (dto: MsasODto) : MsasO =
+    let fromDto (dto: MsasODto) : msasO =
         let perm = dto.SeedPermutation |> PermutationDto.toDomain |> Result.toOption |> Option.get
-        MsasO.create perm dto.MaxOrbit
+        msasO.create perm dto.MaxOrbit
 
 
 module SorterTestModelDto =

@@ -8,14 +8,14 @@ open GeneSort.Sorter.Sortable
 
 // MsasF = a full bool test set for a given sorting width
 [<Struct; CustomEquality; NoComparison>]
-type MsasF = 
+type msasF = 
     private 
         { id: Guid<sorterTestModelID>
           sortingWidth: int<sortingWidth> }
 
     static member create 
             (sortingWidth: int<sortingWidth>)
-            : MsasF =
+            : msasF =
         if %sortingWidth < 2 then
             failwith "SortingWidth must be at least 2"
         else
@@ -32,22 +32,22 @@ type MsasF =
 
     override this.Equals(obj) = 
         match obj with
-        | :? MsasF as other -> 
+        | :? msasF as other -> 
             this.sortingWidth = other.sortingWidth
         | _ -> false
 
     override this.GetHashCode() = 
         hash (this.sortingWidth)
 
-    interface IEquatable<MsasF> with
+    interface IEquatable<msasF> with
         member this.Equals(other) =  this.sortingWidth = other.sortingWidth
 
-    member this.MakeSortableTests (sortingWidth: int<sortingWidth>) : sortableTests =
+    member this.MakeSortableBoolTests (sortingWidth: int<sortingWidth>) : sortableBoolTests =
         let sortableArrays =  SortableBoolArray.getAllSortableBoolArrays sortingWidth
         sortableBoolTests.create 
                 ( %this.id |> UMX.tag<sortableTestsId>) 
                 sortingWidth
-                sortableArrays |> sortableTests.Bools
+                sortableArrays
 
 module MsasF = ()
  

@@ -22,6 +22,17 @@ type sortableTestModelSet =
 
     member this.makeSortableTestSet (sortableArrayType:sortableArrayType) : sortableTestSet =
         let id = (%this.id) |> UMX.tag<sortableTestSetId>
+
+        let sortableTestArray = 
+                this.SorterTestModels
+                |> Array.map(fun model -> SortableTestModel.makeSortableTests model sortableArrayType)
+
+        //match sortableArrayType with
+        //| sortableArrayType.Bools ->
+        //    (sortableBoolTestSet.create id sortableTestArray) |> sortableTestSet.Bools
+        //| sortableArrayType.Ints -> 
+
+
         match sortableArrayType with
         | sortableArrayType.Bools -> 
             let boolTests = 

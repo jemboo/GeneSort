@@ -166,7 +166,7 @@ module FullBoolEvals =
                                 | Error err -> failwith (sprintf "Error loading SorterSet: %s" err)
 
 
-            let sorterTestModel = MsasF.create sortingWidth |> sortableTestModel.MsasF
+            let sorterTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
             let sortableTests = SortableTestModel.makeSortableTests sorterTestModel sortableArrayType
             let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
 
