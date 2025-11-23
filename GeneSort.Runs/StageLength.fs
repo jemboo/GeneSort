@@ -45,6 +45,23 @@ open GeneSort.Sorter
 //The paper derives that the asymptotic growth of S(N) (the most economical N-sorter network known) is: S(N) = 0.250 N (log₂N)² - 0.372 N (log₂N) + O(N) Stanford
 //This was a significant improvement over Batcher's sorting networks, which were the best known at the time.
 
+// StageLength (divided by 2 !!) needed for 50% sort success rate
+//SortingWidth	    Mcse	Msrs	Mssi
+//32	            81	    93	    79
+//48	            136	    171	    134
+//64	            195	    246	    189
+//96	            319	    420	    315
+//128	            445	    593	    451
+//192	            720	    959	    723
+//256	            985	    1353	996
+//384	            1628	2159	1628
+
+
+
+
+
+
+
 
 
 module StageLength =

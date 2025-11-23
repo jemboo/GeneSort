@@ -29,6 +29,25 @@ module MergeIntEvals =
     let excludeSelfCe = true
 
     
+    //let getSorterCountForSortingWidth (factor:int) (sortingWidth: int<sortingWidth>) : int<sorterCount> =
+    //    match %sortingWidth with
+    //    | 4 -> (10 * factor) |> UMX.tag<sorterCount>
+    //    | 6 -> (10 * factor) |> UMX.tag<sorterCount>
+    //    | 8 -> (10 * factor) |> UMX.tag<sorterCount>
+    //    | 12 -> (10 * factor) |> UMX.tag<sorterCount>
+    //    | 16 -> (10 * factor) |> UMX.tag<sorterCount>
+    //    | 24 -> (10 * factor) |> UMX.tag<sorterCount>
+    //    | 32 -> (10 * factor) |> UMX.tag<sorterCount>
+    //    | 48 -> (10 * factor) |> UMX.tag<sorterCount>
+    //    | 64 -> (10 * factor) |> UMX.tag<sorterCount>
+    //    | 96 -> (10 * factor) |> UMX.tag<sorterCount>
+    //    | 128 -> (10 * factor) |> UMX.tag<sorterCount>
+    //    | 192 -> (10 * factor) |> UMX.tag<sorterCount>
+    //    | 256 -> (2 * factor) |> UMX.tag<sorterCount>
+    //    | 384 -> (2 * factor) |> UMX.tag<sorterCount>
+    //    | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
+
+        
     let getSorterCountForSortingWidth (factor:int) (sortingWidth: int<sortingWidth>) : int<sorterCount> =
         match %sortingWidth with
         | 4 -> (10 * factor) |> UMX.tag<sorterCount>
@@ -43,10 +62,29 @@ module MergeIntEvals =
         | 96 -> (10 * factor) |> UMX.tag<sorterCount>
         | 128 -> (10 * factor) |> UMX.tag<sorterCount>
         | 192 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 256 -> (2 * factor) |> UMX.tag<sorterCount>
-        | 384 -> (2 * factor) |> UMX.tag<sorterCount>
+        | 256 -> (10 * factor) |> UMX.tag<sorterCount>
+        | 384 -> (4 * factor) |> UMX.tag<sorterCount>
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
+
+    //let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageLength> =
+    //    match %sortingWidth with
+    //    | 4 -> 6 |> UMX.tag<stageLength>
+    //    | 6 -> 8 |> UMX.tag<stageLength>
+    //    | 8 -> 20 |> UMX.tag<stageLength>
+    //    | 12 -> 35 |> UMX.tag<stageLength>
+    //    | 16 -> 80 |> UMX.tag<stageLength>
+    //    | 24 -> 180 |> UMX.tag<stageLength>
+    //    | 32 -> 300 |> UMX.tag<stageLength>
+    //    | 48 -> 800 |> UMX.tag<stageLength>
+    //    | 64 -> 1200 |> UMX.tag<stageLength>
+    //    | 96 -> 5000 |> UMX.tag<stageLength>
+    //    | 128 -> 6000 |> UMX.tag<stageLength>
+    //    | 192 -> 15000 |> UMX.tag<stageLength>
+    //    | 256 -> 30000 |> UMX.tag<stageLength>
+    //    | 384 -> 60000 |> UMX.tag<stageLength>
+    //    | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
+        
 
     let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageLength> =
         match %sortingWidth with
@@ -58,20 +96,23 @@ module MergeIntEvals =
         | 24 -> 180 |> UMX.tag<stageLength>
         | 32 -> 300 |> UMX.tag<stageLength>
         | 48 -> 800 |> UMX.tag<stageLength>
-        | 64 -> 1200 |> UMX.tag<stageLength>
-        | 96 -> 5000 |> UMX.tag<stageLength>
-        | 128 -> 6000 |> UMX.tag<stageLength>
-        | 192 -> 15000 |> UMX.tag<stageLength>
-        | 256 -> 30000 |> UMX.tag<stageLength>
-        | 384 -> 60000 |> UMX.tag<stageLength>
+        | 64 -> 1000 |> UMX.tag<stageLength>
+        | 96 -> 2000 |> UMX.tag<stageLength>
+        | 128 -> 2500 |> UMX.tag<stageLength>
+        | 192 -> 4000 |> UMX.tag<stageLength>
+        | 256 -> 6000 |> UMX.tag<stageLength>
+        | 384 -> 10000 |> UMX.tag<stageLength>
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
         
+
+
+
 
     let sortableArrayType = sortableArrayType.Ints
   
     let sortingWidthValues = 
-       [4; 6; 8; 12; 16; 24; 32; 48; 64;] |> List.map(fun d -> d.ToString())
-       // [32; 48; 64; 96; 128; 192; 256; 384] |> List.map(fun d -> d.ToString())
+      // [4; 6; 8; 12; 16; 24; 32; 48; 64;] |> List.map(fun d -> d.ToString())
+      [32; 48; 64; 96; 128; 192; 256; 384] |> List.map(fun d -> d.ToString())
 
     let sortingWidths() : string*string list =
         (runParameters.sortingWidthKey, sortingWidthValues)
@@ -109,7 +150,28 @@ module MergeIntEvals =
 
 
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
+        let mutable lastRepl: int<replNumber> option = None
         let mutable index = 0
+
+        let assignRepl (runParams: runParameters) : runParameters =
+            match lastRepl with
+            | None ->
+                lastRepl <- runParams.GetRepl()
+                runParams.SetIndex (UMX.tag<indexNumber> index)
+
+            | Some lastRplV ->
+                match runParams.GetRepl() with
+                | None ->
+                    failwith "repl should be present"
+                | Some paramRpl ->
+                    if not (%paramRpl = %lastRplV) then 
+                        index <- 0
+                        lastRepl <- runParams.GetRepl()
+                    runParams.SetIndex (UMX.tag<indexNumber> index)
+
+            index <- index + 1
+            runParams
+
 
         let enhancer (runParameters : runParameters) : runParameters =
             runParameters.SetRunFinished false
@@ -124,7 +186,7 @@ module MergeIntEvals =
             let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
             runParameters.SetCeLength ceLength
 
-            let replFactor = if (%repl = 0) then 10 else 10
+            let replFactor = 1 // if (%repl = 0) then 10 else 10
             let sorterCount = sortingWidth |> getSorterCountForSortingWidth replFactor
             runParameters.SetSorterCount sorterCount
             runParameters
@@ -133,10 +195,8 @@ module MergeIntEvals =
             for runParameters in runParametersSeq do
                     let filtrate = paramMapFilter runParameters
                     if filtrate.IsSome then
-                        let retVal = enhancer filtrate.Value
-                        retVal.SetIndex (UMX.tag<indexNumber> index)
-                        yield filtrate.Value
-                        index <- index + 1
+                        let retVal = filtrate.Value |> enhancer |> assignRepl
+                        yield retVal
         }
 
     let parameterSpans = 
@@ -158,7 +218,7 @@ module MergeIntEvals =
                 projectName 
                 projectDesc
                 parameterSpans
-                1<replNumber>
+                4<replNumber>
                 outputDataTypes
                 paramMapRefiner
 

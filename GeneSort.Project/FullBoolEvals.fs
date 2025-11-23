@@ -58,23 +58,41 @@ module FullBoolEvals =
 
 
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
+        let mutable lastRepl: int<replNumber> option = None
         let mutable index = 0
+
+        let assignRepl (runParams: runParameters) : runParameters =
+            match lastRepl with
+            | None ->
+                lastRepl <- runParams.GetRepl()
+                runParams.SetIndex (UMX.tag<indexNumber> index)
+
+            | Some lastRplV ->
+                match runParams.GetRepl() with
+                | None ->
+                    failwith "repl should be present"
+                | Some paramRpl ->
+                    if not (%paramRpl = %lastRplV) then 
+                        index <- 0
+                        lastRepl <- runParams.GetRepl()
+                    runParams.SetIndex (UMX.tag<indexNumber> index)
+
+            index <- index + 1
+            runParams
+
 
         let enhancer (runParameters : runParameters) : runParameters =
             runParameters.SetRunFinished false
             runParameters.SetProjectName projectName
-
-
             runParameters
+
 
         seq {
             for runParameters in runParametersSeq do
                     let filtrate = paramMapFilter runParameters
                     if filtrate.IsSome then
-                        let retVal = enhancer filtrate.Value
-                        retVal.SetIndex (UMX.tag<indexNumber> index)
-                        yield filtrate.Value
-                        index <- index + 1
+                        let retVal = filtrate.Value |> enhancer |> assignRepl
+                        yield retVal
         }
 
 
