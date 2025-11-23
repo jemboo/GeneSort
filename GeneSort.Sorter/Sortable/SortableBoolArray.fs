@@ -115,7 +115,7 @@ module SortableBoolArray =
             let boolArray = Array.init n (fun i -> i >= n - k)
             sortableBoolArray.Create(boolArray, sortingWidth))
 
-    let getMergeSortTestCases (sortingWidth: int<sortingWidth>) : sortableBoolArray[] =
+    let getMerge2TestCases (sortingWidth: int<sortingWidth>) : sortableBoolArray[] =
         if %sortingWidth % 2 <> 0 then
             invalidArg "sortingWidth" "Sorting width must be even."
         let n = int sortingWidth

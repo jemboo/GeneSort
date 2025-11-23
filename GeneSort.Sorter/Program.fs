@@ -17,7 +17,7 @@ let sortingWidth = 4<sortingWidth>
 //let network = BitonicSorter.generateBitonicStageSequence (16 |> UMX.tag<sortingWidth>)
 //printfn "%A" network
 
-let mergeCases = SortableIntArray.getIntArrayMerge2Cases sortingWidth
+let mergeCases = SortableIntArray.getMerge2TestCases sortingWidth
 
 let boolArrays = mergeCases |> Array.map(fun mc -> mc.ToSortableBoolArrays()) |> Array.concat
 

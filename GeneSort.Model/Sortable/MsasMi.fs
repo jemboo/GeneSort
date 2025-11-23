@@ -42,12 +42,21 @@ type MsasMi =
     interface IEquatable<MsasMi> with
         member this.Equals(other) =  this.sortingWidth = other.sortingWidth
 
-    member this.MakeSortableTests (sortingWidth: int<sortingWidth>) : sortableTests =
+    member this.MakeSortableIntTests 
+                (sortingWidth: int<sortingWidth>) : sortableTests =
         sortableIntTests.create 
                 ( %this.id |> UMX.tag<sortableTestsId>) 
                 sortingWidth
-                (SortableIntArray.getIntArrayMerge2Cases sortingWidth)
+                (SortableIntArray.getMerge2TestCases sortingWidth)
         |> sortableTests.Ints
+
+    member this.MakeSortableBoolTests (sortingWidth: int<sortingWidth>) : sortableTests =
+        let sortableArrays =  SortableBoolArray.getMerge2TestCases sortingWidth
+        sortableBoolTests.create 
+                ( %this.id |> UMX.tag<sortableTestsId>) 
+                sortingWidth
+                sortableArrays |> sortableTests.Bools
+
 
 
 module MsasMi = ()

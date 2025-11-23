@@ -11,8 +11,8 @@ open GeneSort.Sorter.Sortable
 type sortableTestModel =
      | MsasF of MsasF     // MsasF = a full bool test set for a given sorting width
      | MsasO of MsasO     // MsasO = generated from a seed permutation; for bool models, it's expanded from the integer permutations
-     | MsasMb of MsasMb   // All (sorting width)/2 merge test cases as bool arrays
-     | MsasMi of MsasMi   // All (sorting width)/2 merge test cases as int arrays
+     | MsasMb of MsasMb   // All (sorting width)/2 merge test cases
+     | MsasMi of MsasMi   // All (sorting width)/2 merge test cases
 
 
 module SortableTestModel =
@@ -46,13 +46,13 @@ module SortableTestModel =
         | MsasMb msasMb ->
                 match sortableArrayType with
                 | sortableArrayType.Bools ->        
-                        msasMb.MakeSortableTests(getSortingWidth sortableTestModel)
+                        msasMb.MakeSortableBoolTests(getSortingWidth sortableTestModel)
                 | sortableArrayType.Ints ->
                     failwith "Ints SortableArrayType not supported"
 
         | MsasMi msasMi ->
                 match sortableArrayType with
                 | sortableArrayType.Bools ->        
-                    failwith "Bools SortableArrayType not supported"
+                    msasMi.MakeSortableBoolTests (getSortingWidth sortableTestModel)
                 | sortableArrayType.Ints ->
-                        msasMi.MakeSortableTests(getSortingWidth sortableTestModel)
+                        msasMi.MakeSortableIntTests(getSortingWidth sortableTestModel)

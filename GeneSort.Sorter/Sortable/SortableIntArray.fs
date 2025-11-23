@@ -149,7 +149,7 @@ module SortableIntArray =
         sortableIntArray.CreateFromPermutation perm
 
 
-    let getIntArrayMerge2Cases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
+    let getMerge2TestCases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
         let hw = %sortingWidth / 2
         let sw = %sortingWidth
         [|

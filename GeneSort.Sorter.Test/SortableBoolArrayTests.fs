@@ -163,7 +163,7 @@ type SortableBoolArrayTests() =
 
     [<Fact>]
     let ``getMergeSortTestCases with sortingWidth 2 returns correct test cases`` () =
-        let arrays = SortableBoolArray.getMergeSortTestCases 2<sortingWidth>
+        let arrays = SortableBoolArray.getMerge2TestCases 2<sortingWidth>
         let expected = [|
             sortableBoolArray.Create([| false; false |], 2<sortingWidth>) // [false], [false]
             sortableBoolArray.Create([| false; true |], 2<sortingWidth>)  // [false], [true]
@@ -178,7 +178,7 @@ type SortableBoolArrayTests() =
 
     [<Fact>]
     let ``getMergeSortTestCases with sortingWidth 4 returns correct test cases`` () =
-        let arrays = SortableBoolArray.getMergeSortTestCases 4<sortingWidth>
+        let arrays = SortableBoolArray.getMerge2TestCases 4<sortingWidth>
         Assert.Equal(9, arrays.Length) // (2+1) * (2+1) = 9
         let expected = [|
             sortableBoolArray.Create([| false; false; false; false |], 4<sortingWidth>) // [false; false], [false; false]
