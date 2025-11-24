@@ -15,10 +15,10 @@
     <Compile Include="GuidUtils.fs" />
     <Compile Include="MathUtils.fs" />
     <Compile Include="ArrayProperties.fs" />
+    <Compile Include="ArrayUtils.fs" />
     <Compile Include="CollectionUtils.fs" />
     <Compile Include="BytePack.fs" />
     <Compile Include="Combinatorics.fs" />
-    <Compile Include="ArrayOps.fs" />
     <Compile Include="SubSortedArray.fs" />
     <Compile Include="Orbit.fs" />
     <Compile Include="OrbitSet.fs" />

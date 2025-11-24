@@ -11,6 +11,7 @@
     <Compile Include="RandoTests.fs" />
     <Compile Include="ByteUtilsTests.fs" />
     <Compile Include="ArrayPropertiesTests.fs" />
+    <Compile Include="ArrayUtilsTests.fs" />
     <Compile Include="CollectionUtilsTests.fs" />
     <Compile Include="BytePackTests.fs" />
     <Compile Include="CombinatoricsTests.fs" />

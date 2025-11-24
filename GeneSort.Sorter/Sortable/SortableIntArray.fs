@@ -161,14 +161,34 @@ module SortableIntArray =
 
 
     let getIntArrayMerge3Cases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
-        let ot = %sortingWidth / 3
-        let tt = ot * 2
-        let sw = %sortingWidth
-        [|
-            for i = 0 to ot do
-                for j = 0 to ot do
-
-                    let ad1 = Array.append [| 0 .. (%ot - 1 - j) |] [| (sw - j) .. (sw - 1) |]
-                    let arrayData = Array.append ad1  [| (sw - ot - j) .. (sw - j - 1) |]
-                    sortableIntArray.Create(arrayData, sortingWidth, (%sortingWidth |> UMX.tag<symbolSetSize>))
+        if %sortingWidth % 3 <> 0 then
+            invalidArg "sortingWidth" "Sorting width must be divisible by 3 for merge3 test cases."
+        let segLen = %sortingWidth / 3
+        let input = [| 0 .. (%sortingWidth - 1) |]
+        let outers = [| 
+            for wkR = 0 to segLen do
+                    ArrayUtils.arrayPinch input segLen wkR (0) (2 * segLen)
         |]
+        let fullSet = 
+            outers |> Array.collect (fun outer ->
+                [|
+                    for gen = 0 to segLen do
+                        let pinched = ArrayUtils.arrayPinch outer segLen gen (segLen) (2 * segLen)
+                        sortableIntArray.Create(pinched, sortingWidth, (%sortingWidth |> UMX.tag<symbolSetSize>))
+                |]
+            )
+        fullSet
+                        
+
+
+    //let getIntArrayMerge3Cases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
+    //    if %sortingWidth % 3 <> 0 then
+    //        invalidArg "sortingWidth" "Sorting width must be divisible by 3 for merge3 test cases."
+    //    let segLen = %sortingWidth / 3
+    //    let input = [| 0 .. (%sortingWidth - 1) |]
+    //    [| 
+    //        for wkR = 0 to segLen do
+    //            for wkU = 0 to segLen do
+    //                let pinched = ArrayUtils.arrayPinch input segLen wkR (0) (segLen + wkU)
+    //                sortableIntArray.Create(pinched, sortingWidth, (%sortingWidth |> UMX.tag<symbolSetSize>))
+    //    |]
