@@ -110,5 +110,28 @@ module Example =
             let percentage = (float count / float sampleSize) * 100.0
             printfn "  %3d successes: %4d times (%.2f%%)" successes count percentage)
 
-Example.printBinomialHistogramReport()
+
+
+let sortingWidth = 256
+let level = 128
+let mergeWay = 4
+
+let levelSetPoints = LatticePoint.boundedLevelSet mergeWay level (sortingWidth / mergeWay) |> Seq.toArray
+let levelSetPointsVV = LatticePoint.boundedLevelSetVV mergeWay level (sortingWidth / mergeWay) |> Seq.toArray
+
+
+
+//let lpTest = latticePoint.Create [|0; 1; 2; 3|]
+
+//let lpUnders = LatticePoint.getUnderCovers lpTest
+
+//let lpOvers = LatticePoint.getOverCovers lpTest 7
+
+let wak = 5
+
+
+
+
+
+//Example.printBinomialHistogramReport()
 Console.ReadLine() |> ignore

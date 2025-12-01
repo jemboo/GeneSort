@@ -321,3 +321,98 @@ module Combinatorics =
 
 
 
+    // returns all arrays containing 0 .. (arrayLen - 1) that sum to sumTotal 
+    let latticeLevelSet (arrayLen:int) (sumTotal:int) : seq<int[]> =
+        seq {
+            let maxVal = sumTotal - 1
+            let current = Array.zeroCreate arrayLen
+
+            let rec loop pos sumRemaining =
+                seq {
+                    if pos = arrayLen then
+                        if sumRemaining = 0 then
+                            yield Array.copy current
+                    else
+                        let slotsLeft = arrayLen - pos
+
+                        let lower =
+                            max 0 (sumRemaining - maxVal * (slotsLeft - 1))
+
+                        let upper =
+                            min maxVal sumRemaining
+
+                        for v in lower .. upper do
+                            current.[pos] <- v
+                            yield! loop (pos + 1) (sumRemaining - v)
+                }
+
+            yield! loop 0 sumTotal
+        }
+
+    // predicate: true iff array is non-decreasing (a[i] <= a[i+1] for all i)
+    let private isNonDecreasing (arr: int[]) =
+        let n = arr.Length
+        let mutable i = 0
+        let mutable ok = true
+        while i < n - 1 && ok do
+            if arr.[i] > arr.[i+1] then ok <- false
+            i <- i + 1
+        ok
+
+
+    // reuse latticeLevelSet and filter to produce only non-decreasing sequences
+    let latticeLevelSetVV (arrayLen:int) (sumTotal:int) : seq<int[]> =
+        latticeLevelSet arrayLen sumTotal
+        |> Seq.filter isNonDecreasing
+
+
+    /// Given an integer array "subject" and a maximum value "maxVal",
+    /// generates all integer arrays that can be formed by incrementing
+    /// a single element of "subject" by 1, without exceeding "maxVal - 1".
+    let getOverCovers (subject:int[]) (maxVal:int) : int[][] =
+        let n = subject.Length
+        let results = ResizeArray<int[]>()
+
+        for i in 0 .. n-1 do
+            // Only valid if increment doesn't exceed maxVal-1
+            if subject.[i] + 1 < maxVal then
+                let arr = Array.copy subject
+                arr.[i] <- arr.[i] + 1
+                results.Add arr
+
+        results.ToArray()
+
+    /// Given an integer array "subject",
+    /// generates all integer arrays that can be formed by decrementing
+    /// a single element of "subject" by 1, without going below 0.
+    let getUnderCovers (subject:int[]) : int[][] =
+        let n = subject.Length
+        let results = ResizeArray<int[]>()
+        for i in 0 .. n-1 do
+            // Only valid if decrement doesn't go below 0
+            if subject.[i] - 1 >= 0 then
+                let arr = Array.copy subject
+                arr.[i] <- arr.[i] - 1
+                results.Add arr
+        results.ToArray()
+
+
+
+    /// Non-decreasing version of getUnderCovers
+    let getUnderCoversVV (subject:int[]) : int[][] =
+        getUnderCovers subject
+        |> Array.filter isNonDecreasing
+
+
+    /// Non-decreasing version of getOverCovers
+    let getOverCoversVV (subject:int[]) (maxVal:int) : int[][] =
+        // simple +1 approach
+        let candidate = Array.map (fun x -> x + 1) subject
+        if Array.exists (fun x -> x >= maxVal) candidate then
+            [||]  // violates maxVal constraint
+        else if isNonDecreasing candidate then
+            [| candidate |]
+        else
+            [||]
+
+

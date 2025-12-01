@@ -36,6 +36,7 @@ type subSortedArray<'a when 'a : comparison> =
 
 
 module SubSortedArray =
+
     let private isSorted (arr: 'a[]) =
         arr |> Array.pairwise |> Array.forall (fun (a, b) -> a <= b)
     

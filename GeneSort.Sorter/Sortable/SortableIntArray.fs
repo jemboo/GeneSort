@@ -149,18 +149,26 @@ module SortableIntArray =
         sortableIntArray.CreateFromPermutation perm
 
 
+    //let getMerge2TestCases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
+    //    let hw = %sortingWidth / 2
+    //    let sw = %sortingWidth
+    //    [|
+    //        for i = 0 to hw do
+    //            let ad1 = Array.append [| 0 .. (%hw - 1 - i) |] [| (sw - i) .. (sw - 1) |]
+    //            let arrayData = Array.append ad1  [| (sw - hw - i) .. (sw - i - 1) |]
+    //            sortableIntArray.Create(arrayData, sortingWidth, (%sortingWidth |> UMX.tag<symbolSetSize>))
+    //    |]
+
     let getMerge2TestCases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
-        let hw = %sortingWidth / 2
-        let sw = %sortingWidth
+        let segLen = %sortingWidth / 2
+        let input = [| 0 .. (%sortingWidth - 1) |]
         [|
-            for i = 0 to hw do
-                let ad1 = Array.append [| 0 .. (%hw - 1 - i) |] [| (sw - i) .. (sw - 1) |]
-                let arrayData = Array.append ad1  [| (sw - hw - i) .. (sw - i - 1) |]
+            for gen = 0 to segLen do
+                let arrayData = ArrayUtils.arrayPinch input segLen gen (0) (segLen)
                 sortableIntArray.Create(arrayData, sortingWidth, (%sortingWidth |> UMX.tag<symbolSetSize>))
         |]
 
-
-    let getIntArrayMerge3Cases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
+    let getMerge3TestCases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
         if %sortingWidth % 3 <> 0 then
             invalidArg "sortingWidth" "Sorting width must be divisible by 3 for merge3 test cases."
         let segLen = %sortingWidth / 3
@@ -180,15 +188,28 @@ module SortableIntArray =
         fullSet
                         
 
-
-    //let getIntArrayMerge3Cases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
-    //    if %sortingWidth % 3 <> 0 then
-    //        invalidArg "sortingWidth" "Sorting width must be divisible by 3 for merge3 test cases."
-    //    let segLen = %sortingWidth / 3
-    //    let input = [| 0 .. (%sortingWidth - 1) |]
-    //    [| 
-    //        for wkR = 0 to segLen do
-    //            for wkU = 0 to segLen do
-    //                let pinched = ArrayUtils.arrayPinch input segLen wkR (0) (segLen + wkU)
-    //                sortableIntArray.Create(pinched, sortingWidth, (%sortingWidth |> UMX.tag<symbolSetSize>))
-    //    |]
+    let getMerge4TestCases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
+        if %sortingWidth % 4 <> 0 then
+            invalidArg "sortingWidth" "Sorting width must be divisible by 4 for merge3 test cases."
+        let segLen = %sortingWidth / 4
+        let input = [| 0 .. (%sortingWidth - 1) |]
+        let outers = [| 
+            for wkR = 0 to segLen do
+                    ArrayUtils.arrayPinch input segLen wkR (0) (3 * segLen)
+        |]
+        let mids = 
+            outers |> Array.collect (fun outer ->
+                [|
+                    for gen = 0 to segLen do
+                        ArrayUtils.arrayPinch outer segLen gen (segLen) (3 * segLen)
+                |]
+            )
+        let fullSet = 
+            mids |> Array.collect (fun outer ->
+                [|
+                    for gen = 0 to segLen do
+                        let pinched = ArrayUtils.arrayPinch outer segLen gen (2 * segLen) (3 * segLen)
+                        sortableIntArray.Create(pinched, sortingWidth, (%sortingWidth |> UMX.tag<symbolSetSize>))
+                |]
+            )
+        fullSet

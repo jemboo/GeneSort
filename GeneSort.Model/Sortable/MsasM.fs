@@ -37,6 +37,8 @@ type msasM =
 
     member this.Id with get() = this.id
 
+    member this.SorterMergeFactor with get() = this.sorterMergeFactor
+
     member this.SortingWidth with get() = this.sortingWidth
 
     override this.Equals(obj) = 
@@ -53,19 +55,36 @@ type msasM =
 
     member this.MakeSortableIntTests 
                 (sortingWidth: int<sortingWidth>) : sortableIntTests =
-        sortableIntTests.create 
-                ( %this.id |> UMX.tag<sortableTestsId>) 
-                sortingWidth
-                (SortableIntArray.getMerge2TestCases sortingWidth)
+
+        if %this.SorterMergeFactor = 2 then
+            sortableIntTests.create 
+                    ( %this.id |> UMX.tag<sortableTestsId>) 
+                    sortingWidth
+                    (SortableIntArray.getMerge2TestCases sortingWidth)
+        elif %this.SorterMergeFactor = 3 then
+            sortableIntTests.create 
+                    ( %this.id |> UMX.tag<sortableTestsId>) 
+                    sortingWidth
+                    (SortableIntArray.getMerge3TestCases sortingWidth)
+        else
+              failwith "Unsupported sorterMergeFactor for sortableIntTests"
 
 
     member this.MakeSortableBoolTests (sortingWidth: int<sortingWidth>) : sortableBoolTests =
-        let sortableArrays =  SortableBoolArray.getMerge2TestCases sortingWidth
+        failwith "Not implemented yet"
+        let sortableArrays =  
+            if %this.SorterMergeFactor = 2 then
+                SortableBoolArray.getMerge2TestCases sortingWidth
+
+            elif %this.SorterMergeFactor = 3 then
+                SortableBoolArray.getMerge2TestCases sortingWidth
+            else
+                  failwith "Unsupported sorterMergeFactor for sortableIntTests"
+
         sortableBoolTests.create 
                 ( %this.id |> UMX.tag<sortableTestsId>) 
                 sortingWidth
                 sortableArrays
-
 
 
 module MsasMi = ()

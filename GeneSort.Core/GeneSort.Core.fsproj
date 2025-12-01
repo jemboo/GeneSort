@@ -19,6 +19,8 @@
     <Compile Include="CollectionUtils.fs" />
     <Compile Include="BytePack.fs" />
     <Compile Include="Combinatorics.fs" />
+    <Compile Include="LatticePoint.fs" />
+    <Compile Include="LatticeLevelSetMap.fs" />
     <Compile Include="SubSortedArray.fs" />
     <Compile Include="Orbit.fs" />
     <Compile Include="OrbitSet.fs" />
