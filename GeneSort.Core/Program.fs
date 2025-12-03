@@ -112,20 +112,23 @@ module Example =
 
 
 
-let sortingWidth = 256
-let level = 128
-let mergeWay = 4
+    let edgeLength = 8<latticeDistance>
+    let dimension = 4<latticeDimension>
 
-let levelSetPoints = LatticePoint.boundedLevelSet mergeWay level (sortingWidth / mergeWay) |> Seq.toArray
-let levelSetPointsVV = LatticePoint.boundedLevelSetVV mergeWay level (sortingWidth / mergeWay) |> Seq.toArray
+    let yab = LatticeLevelSetMap.getAllLevelSetMapsStandard dimension edgeLength
+
+    //let zack = latticeLevelSetMap.create
+    //                dimension
+    //                edgeLength
+    //                (11<latticeDistance>)
+    //                (10<latticeDistance>)
+    //                LatticePoint.boundedLevelSet
 
 
+    let lvl10 = LatticePoint.boundedLevelSet dimension (38<latticeDistance>) edgeLength |> Seq.toArray
+    let lvl11 = LatticePoint.boundedLevelSet dimension (40<latticeDistance>) edgeLength |> Seq.toArray
 
-//let lpTest = latticePoint.Create [|0; 1; 2; 3|]
 
-//let lpUnders = LatticePoint.getUnderCovers lpTest
-
-//let lpOvers = LatticePoint.getOverCovers lpTest 7
 
 let wak = 5
 

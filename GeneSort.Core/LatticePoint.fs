@@ -2,12 +2,16 @@
 open FSharp.UMX
 open System
 
+
+[<Measure>] type latticeDistance
+[<Measure>] type latticeDimension
+
 [<Struct; CustomEquality; NoComparison>]
 type latticePoint = { coords: int[] }
     with
         static member Create(arr:int[]) = { coords = Array.copy arr }
         member p.Sum = Array.sum p.coords
-        member p.Length = p.coords.Length
+        member p.Dimension = p.coords.Length
         member this.Item
             with get(i:int) = this.coords.[i]
         override p.ToString() = sprintf "[|%s|]" (String.Join("; ", p.coords))
@@ -15,7 +19,7 @@ type latticePoint = { coords: int[] }
             match obj with
             | :? latticePoint as other ->
                 // structural equality on array contents
-                p.Length = other.coords.Length &&
+                p.Dimension = other.Dimension &&
                 Array.forall2 (=) p.coords other.coords
             | _ -> false
 
@@ -52,6 +56,7 @@ module LatticePoint =
                 i <- i + 1
             ok
 
+
     let latticePointHash (p:latticePoint) : int =
         let mutable h = 17
         for x in p.coords do
@@ -59,16 +64,16 @@ module LatticePoint =
         h
 
     /// Generate all lattice points where each coordinate is in 0..maxValue
-    let latticeRect (dim:int) (maxValue:int) : seq<latticePoint> =
+    let latticeRect (dim:int<latticeDimension>) (maxValue:int<latticeDistance>) : seq<latticePoint> =
         seq {
-            let current = Array.zeroCreate dim
+            let current = Array.zeroCreate %dim
 
             let rec loop pos =
                 seq {
-                    if pos = dim then
+                    if pos = %dim then
                         yield { coords = Array.copy current }
                     else
-                        for v in 0 .. maxValue do
+                        for v in 0 .. %maxValue do
                             current.[pos] <- v
                             yield! loop (pos + 1)
                 }
@@ -77,88 +82,56 @@ module LatticePoint =
         }
 
 
-
     /// Generates all lattice points of length dim whose entries:
-    /// • sum to levelSum
-    /// • lie in 0 .. maxValue
-    let boundedLevelSet (dim:int) (levelSum:int) (maxValue:int) : seq<latticePoint> =
+    /// • sum to latticelevel
+    /// • lie in 0 .. maxDistance
+    let boundedLevelSet 
+                (dim:int<latticeDimension>) 
+                (latticelevel:int<latticeDistance>) 
+                (edgeLength:int<latticeDistance>) : seq<latticePoint> =
         seq {
-            let current = Array.zeroCreate dim
+            let current = Array.zeroCreate %dim
 
             let rec loop pos sumRemaining =
                 seq {
-                    if pos = dim then
+                    if pos = %dim then
                         if sumRemaining = 0 then
                             yield { coords = Array.copy current }
                     else
                         // The remaining slots count
-                        let slotsLeft = dim - pos
+                        let slotsLeft = %dim - pos
 
                         // Lowest legal value is 0 or whatever
                         let lowerBound =
-                            max 0 (sumRemaining - maxValue * (slotsLeft - 1))
+                            max 0 (sumRemaining - %edgeLength * (slotsLeft - 1))
 
                         // Upper bound is limited by maxValue and remaining sum
                         let upperBound =
-                            min maxValue sumRemaining
+                            min %edgeLength sumRemaining
 
                         for v in lowerBound .. upperBound do
                             current.[pos] <- v
                             yield! loop (pos + 1) (sumRemaining - v)
                 }
 
-            yield! loop 0 levelSum
+            yield! loop 0 %latticelevel
         }
-
-
 
 
 
     /// Generates all lattice points of length dim whose entries:
     /// • sum to levelSum
     /// • lie in 0 .. maxValue
-    let boundedLevelSetVV (dim:int) (levelSum:int) (maxValue:int) : seq<latticePoint> =
-        boundedLevelSet dim levelSum maxValue |> Seq.filter isNonDecreasing
+    let boundedLevelSetVV 
+                    (dim:int<latticeDimension>) 
+                    (latticelevel:int<latticeDistance>) 
+                    (maxDistance:int<latticeDistance>) : seq<latticePoint> =
+        boundedLevelSet dim latticelevel maxDistance |> Seq.filter isNonDecreasing
 
-
-
-
-
-
-
-
-
-
-    /// Returns all lattice points of length arrayLen, entries 0 .. (sumTotal-1), summing to sumTotal
-    let latticeLevelSet (arrayLen:int) (sumTotal:int) : seq<latticePoint> =
-        seq {
-            let current = Array.zeroCreate arrayLen
-
-            let rec loop pos sumRemaining =
-                seq {
-                    if pos = arrayLen then
-                        if sumRemaining = 0 then
-                            yield { coords = Array.copy current }
-                    else
-                        let slotsLeft = arrayLen - pos
-                        let lower = max 0 (sumRemaining - sumTotal * (slotsLeft - 1))
-                        let upper = min sumTotal sumRemaining
-                        for v in lower .. upper do
-                            current.[pos] <- v
-                            yield! loop (pos + 1) (sumRemaining - v)
-                }
-            yield! loop 0 sumTotal
-        }
-
-
-
-    let latticeLevelSetVV (arrayLen:int) (sumTotal:int) : seq<latticePoint> =
-        latticeLevelSet arrayLen sumTotal
-        |> Seq.filter isNonDecreasing
 
 
     let getUnderCovers (subject:latticePoint) : latticePoint[] =
-        let n = subject.Length
+        let n = subject.Dimension
         let results = ResizeArray<latticePoint>()
         for i in 0 .. n-1 do
             if subject.[i] - 1 >= 0 then
@@ -169,7 +142,7 @@ module LatticePoint =
 
 
     let getOverCovers (subject:latticePoint) (maxVal:int) : latticePoint[] =
-        let n = subject.Length
+        let n = subject.Dimension
         let results = ResizeArray<latticePoint>()
         for i in 0 .. n-1 do
             if subject.[i] + 1 < maxVal then
