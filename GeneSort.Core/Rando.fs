@@ -189,7 +189,7 @@ type randomNet(seed: int32<randomSeed>) =
         member this.rngType = Net
 
 
-    module Rando =
+module Rando =
         
         let create (rngType:rngType) (guid:Guid) : IRando =
             let seed = RandomSeed.fromGuid guid
