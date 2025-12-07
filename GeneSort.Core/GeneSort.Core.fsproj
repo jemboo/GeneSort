@@ -19,8 +19,6 @@
     <Compile Include="CollectionUtils.fs" />
     <Compile Include="BytePack.fs" />
     <Compile Include="Combinatorics.fs" />
-    <Compile Include="LatticePoint.fs" />
-    <Compile Include="LatticeLevelSetMap.fs" />
     <Compile Include="SubSortedArray.fs" />
     <Compile Include="Orbit.fs" />
     <Compile Include="OrbitSet.fs" />
@@ -29,6 +27,10 @@
     <Compile Include="TwoOrbit\TwoOrbitPairOps.fs" />
     <Compile Include="TwoOrbit\TwoOrbitTriple.fs" />
     <Compile Include="Permutation.fs" />
+    <Compile Include="LatticePoint.fs" />
+    <Compile Include="LatticePathToPermutation.fs" />
+    <Compile Include="LatticeLevelSetMap.fs" />
+    <Compile Include="MergeLattice.fs" />
     <Compile Include="PermutationSets.fs" />
     <Compile Include="Perm_Si.fs" />
     <Compile Include="Perm_Rs.fs" />

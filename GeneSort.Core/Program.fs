@@ -112,23 +112,49 @@ module Example =
 
 
 
-    let edgeLength = 8<latticeDistance>
+    let edgeLength = 64<latticeDistance>
     let dimension = 4<latticeDimension>
 
     let yab = LatticeLevelSetMap.getAllLevelSetMapsStandard dimension edgeLength
 
-    //let zack = latticeLevelSetMap.create
-    //                dimension
-    //                edgeLength
-    //                (11<latticeDistance>)
-    //                (10<latticeDistance>)
-    //                LatticePoint.boundedLevelSet
+    let zack = latticeLevelSetMap.create
+                    dimension
+                    edgeLength
+                    (3<latticeDistance>)
+                    (4<latticeDistance>)
+                    LatticePoint.boundedLevelSet
+                    LatticePoint.getOverCovers
+                    LatticePoint.getUnderCovers
 
+    let shuffles dex = 0
 
-    let lvl10 = LatticePoint.boundedLevelSet dimension (38<latticeDistance>) edgeLength |> Seq.toArray
-    let lvl11 = LatticePoint.boundedLevelSet dimension (40<latticeDistance>) edgeLength |> Seq.toArray
+    let res = yab |> Array.map (fun llsm -> LatticeLevelSetMap.updateCenterSideMap llsm shuffles)
 
+    let cmps = 
+        yab 
+        |> Array.map (fun llsm -> 
+            LatticeLevelSetMap.missingPoleCount llsm
+        )
 
+    let success = cmps |> Array.forall(fun v -> v = 0)
+
+    let res2 = yab |> Array.map (fun llsm -> LatticeLevelSetMap.updatePoleSideMap llsm shuffles)
+
+    let cmps2 = 
+        yab 
+        |> Array.map (fun llsm -> 
+            LatticeLevelSetMap.missingPoleCount llsm
+        )
+
+    let cmps3 = 
+        yab 
+        |> Array.map (fun llsm -> 
+            LatticeLevelSetMap.missingCenterCount llsm
+        )
+
+    let success2 = cmps2 |> Array.forall(fun v -> v = 0)
+
+    let success3 = cmps3 |> Array.forall(fun v -> v = 0)
 
 let wak = 5
 

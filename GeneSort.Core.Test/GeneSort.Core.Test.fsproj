@@ -19,6 +19,7 @@
     <Compile Include="OrbitSetTests.fs" />
     <Compile Include="PermutationTests.fs" />
     <Compile Include="PermutationSetsTests.fs" />
+    <Compile Include="LatticePointTests.fs" />
     <Compile Include="Perm_SiTests.fs" />
     <Compile Include="Perm_RsTests.fs" />
     <Compile Include="PermRsGen_oldTests.fs" />

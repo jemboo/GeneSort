@@ -9,7 +9,7 @@ open System
 [<Struct; CustomEquality; NoComparison>]
 type latticePoint = { coords: int[] }
     with
-        static member Create(arr:int[]) = { coords = Array.copy arr }
+        static member create(arr:int[]) = { coords = Array.copy arr }
         member p.Sum = Array.sum p.coords
         member p.Dimension = p.coords.Length
         member this.Item
@@ -30,8 +30,8 @@ type latticePoint = { coords: int[] }
                 h <- h * 31 + x
             h
 
-module LatticePoint =
 
+module LatticePoint =
 
     /// Predicate: true iff latticePoint's coords are non-decreasing
     let isNonDecreasing (p:latticePoint) =
@@ -141,11 +141,11 @@ module LatticePoint =
         results.ToArray()
 
 
-    let getOverCovers (subject:latticePoint) (maxVal:int) : latticePoint[] =
+    let getOverCovers (subject:latticePoint) (maxDistance:int<latticeDistance>) : latticePoint[] =
         let n = subject.Dimension
         let results = ResizeArray<latticePoint>()
         for i in 0 .. n-1 do
-            if subject.[i] + 1 < maxVal then
+            if subject.[i] + 1 < %maxDistance then
                 let arr = Array.copy subject.coords
                 arr.[i] <- arr.[i] + 1
                 results.Add { coords = arr }
@@ -157,6 +157,46 @@ module LatticePoint =
         getUnderCovers subject |> Array.filter isNonDecreasing
 
 
-    let getOverCoversVV (subject:latticePoint) (maxVal:int) : latticePoint[] =
-        getOverCovers subject maxVal |> Array.filter isNonDecreasing
+    let getOverCoversVV (subject:latticePoint) (maxDistance:int<latticeDistance>) : latticePoint[] =
+        getOverCovers subject maxDistance |> Array.filter isNonDecreasing
+
+
+    /// returns the (unique) index i where lowPoint.[i] + 1 = hiPoint.[i]
+    let getOverIndex (lowPoint:latticePoint) (hiPoint:latticePoint) : int =
+    
+        // First check same dimension
+        let dim = lowPoint.Dimension
+        if hiPoint.Dimension <> dim then
+            invalidArg "hiPoint" "latticePoints must have the same dimension"
+
+        // Scan coordinates
+        let mutable foundIndex = -1
+
+        for i in 0 .. dim - 1 do
+            let a = lowPoint.[i]
+            let b = hiPoint.[i]
+
+            if a + 1 = b then
+                // First candidate?
+                if foundIndex = -1 then
+                    foundIndex <- i
+                else
+                    // More than one coordinate differs by +1 → invalid
+                    invalidArg "hiPoint" "More than one coordinate is increased by 1."
+            elif a <> b then
+                // Any other mismatch → invalid
+                invalidArg "hiPoint" "Points differ in a coordinate not equal to +1."
+
+        if foundIndex = -1 then
+            invalidArg "hiPoint" "No coordinate was incremented by exactly 1."
+
+        foundIndex
+
+
+    // This is used by latticePointToPermtation to convert a path in the mergeLattice to a permutation.
+    // Place (level - 1) in the index returned, where level here is the level of the lowPoint
+    let getPermutationIndex (edgeLength: int<latticeDistance>) (lowPoint:latticePoint) (hiPoint:latticePoint) : int =
+        let index = getOverIndex lowPoint hiPoint
+        %edgeLength * index +  %edgeLength - lowPoint.coords.[index] - 1
+
 
