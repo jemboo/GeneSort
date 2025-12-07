@@ -259,3 +259,24 @@ module LatticeLevelSetMap =
             |> Seq.length
         centerMissing
 
+
+    let optimize
+             (llsm: latticeLevelSetMap) 
+             (indexShuffler: int -> int): bool =
+
+        let res = updateCenterSideMap llsm indexShuffler
+        let missingPoles = missingPoleCount llsm
+        if missingPoles = 0 then
+            true
+        else
+            let res2 = updatePoleSideMap llsm indexShuffler
+            let missingCenters = missingCenterCount llsm
+            if missingCenters = 0 then
+                true
+            else
+                let res3 = updateCenterSideMap llsm indexShuffler
+                let missingPoles2 = missingPoleCount llsm
+                if missingPoles2 = 0 then
+                    true
+                else
+                    false

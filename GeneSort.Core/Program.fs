@@ -112,10 +112,10 @@ module Example =
 
 
 
-    let edgeLength = 64<latticeDistance>
+    let edgeLength = 128<latticeDistance>
     let dimension = 4<latticeDimension>
 
-    let yab = LatticeLevelSetMap.getAllLevelSetMapsStandard dimension edgeLength
+    let allLevelSets = LatticeLevelSetMap.getAllLevelSetMapsVV dimension edgeLength
 
     let zack = latticeLevelSetMap.create
                     dimension
@@ -128,33 +128,13 @@ module Example =
 
     let shuffles dex = 0
 
-    let res = yab |> Array.map (fun llsm -> LatticeLevelSetMap.updateCenterSideMap llsm shuffles)
+    let res = allLevelSets |> Array.map (fun llsm -> LatticeLevelSetMap.optimize llsm shuffles)
 
-    let cmps = 
-        yab 
-        |> Array.map (fun llsm -> 
-            LatticeLevelSetMap.missingPoleCount llsm
-        )
+    let allGood = 
+        res 
+        |> Array.forall (id)
 
-    let success = cmps |> Array.forall(fun v -> v = 0)
-
-    let res2 = yab |> Array.map (fun llsm -> LatticeLevelSetMap.updatePoleSideMap llsm shuffles)
-
-    let cmps2 = 
-        yab 
-        |> Array.map (fun llsm -> 
-            LatticeLevelSetMap.missingPoleCount llsm
-        )
-
-    let cmps3 = 
-        yab 
-        |> Array.map (fun llsm -> 
-            LatticeLevelSetMap.missingCenterCount llsm
-        )
-
-    let success2 = cmps2 |> Array.forall(fun v -> v = 0)
-
-    let success3 = cmps3 |> Array.forall(fun v -> v = 0)
+    printfn "All level sets optimized: %b" (allGood)
 
 let wak = 5
 
