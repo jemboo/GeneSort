@@ -112,17 +112,17 @@ module Example =
 
 
 
-    let edgeLength = 128<latticeDistance>
-    let dimension = 4<latticeDimension>
+    let edgeLength = 16<latticeDistance>
+    let dimension = 8<latticeDimension>
 
     let mergeLattice = 
         MergeLattice.create dimension edgeLength
 
-    let allGood = MergeLattice.getOptimalLevelSetMapsStandard mergeLattice
+    let allGood = MergeLattice.getOptimalLevelSetMapsVV mergeLattice
 
     for lsm in allGood do
         let isGood = LatticeLevelSetMap.isComplete lsm
-        printfn "Level set %d optimized: %b" %lsm.PoleSideLevel (isGood)
+        printfn "Level set %d optimized: %b; count: %d" %lsm.PoleSideLevel (isGood) lsm.CenterSideMap.Count
 
     let wak = 5
 
