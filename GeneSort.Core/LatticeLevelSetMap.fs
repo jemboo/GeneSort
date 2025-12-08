@@ -104,53 +104,48 @@ module LatticeLevelSetMap =
                 printfn "%d\t%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level2) (%edgeLength) (levelSetPoints2.Length) (levelSetPointsVV2.Length)
 
 
-    
+
     let getAllLevelSetMaps 
             (latticeDimension: int<latticeDimension>) 
             (edgeLength: int<latticeDistance>) 
             (keyMaker: int<latticeDimension> -> int<latticeDistance> -> int<latticeDistance> -> latticePoint seq)
             (overCoverMap: latticePoint -> int<latticeDistance> -> latticePoint [])
             (underCoverMap: latticePoint -> latticePoint [])
-            : latticeLevelSetMap [] = 
+            : latticeLevelSetMap seq = 
 
         let maxPathLength = %edgeLength * %latticeDimension
         let midPoint = maxPathLength / 2
         
-        let lowerMaps =
-            [| 1 .. (midPoint - 1) |] 
-                |> Array.map(UMX.tag<latticeDistance>)
-                |> Array.map (fun level -> 
-                latticeLevelSetMap.create 
+        seq {
+            for level in 1 .. (midPoint - 1) do
+                let levelTag = UMX.tag<latticeDistance> level
+                yield latticeLevelSetMap.create 
                         latticeDimension 
                         edgeLength 
-                        (level - 1<latticeDistance>) 
-                        (level) 
+                        (levelTag - 1<latticeDistance>) //poleSideLevel
+                        (levelTag)                      //centerSideLevel
                         keyMaker 
                         overCoverMap 
                         underCoverMap
-            )
-        
-        let upperMaps =
-            [| %midPoint .. (%maxPathLength - 1) |]
-                |> Array.map(UMX.tag<latticeDistance>)
-                |> Array.map (fun level -> 
-                latticeLevelSetMap.create 
-                        latticeDimension 
-                        edgeLength 
-                        (level + 1<latticeDistance>) 
-                        (level) 
-                        keyMaker 
-                        overCoverMap 
-                        underCoverMap
-            )
 
-        Array.append lowerMaps upperMaps
+            for level in %midPoint .. (%maxPathLength - 1) do
+                let levelTag = UMX.tag<latticeDistance> level
+                yield latticeLevelSetMap.create 
+                        latticeDimension 
+                        edgeLength 
+                        (levelTag + 1<latticeDistance>)  //poleSideLevel
+                        (levelTag)                       //centerSideLevel
+                        keyMaker 
+                        overCoverMap 
+                        underCoverMap
+        }
+
 
 
     let getAllLevelSetMapsStandard 
             (latticeDimension: int<latticeDimension>) 
             (edgeLength: int<latticeDistance>) 
-            : latticeLevelSetMap [] = 
+            : latticeLevelSetMap seq = 
         getAllLevelSetMaps 
             latticeDimension 
             edgeLength
@@ -160,11 +155,12 @@ module LatticeLevelSetMap =
     let getAllLevelSetMapsVV 
             (latticeDimension: int<latticeDimension>) 
             (edgeLength: int<latticeDistance>) 
-            : latticeLevelSetMap [] =
+            : latticeLevelSetMap seq =
         getAllLevelSetMaps 
             latticeDimension 
             edgeLength 
             LatticePoint.boundedLevelSetVV LatticePoint.getOverCoversVV LatticePoint.getUnderCoversVV
+
 
 
     // return true if updated, false if the center side map is complete
@@ -233,15 +229,6 @@ module LatticeLevelSetMap =
 
 
 
-    let isComplete
-            (llsm: latticeLevelSetMap) : bool =
-        llsm.CenterSideMap
-        |> Seq.forall(fun kvp -> kvp.Value.IsSome)
-        &&
-        llsm.PoleSideMap
-        |> Seq.forall(fun kvp -> kvp.Value.Length > 0)
-
-
     let missingPoleCount
             (llsm: latticeLevelSetMap) : int =
         let poleMissing =
@@ -258,6 +245,16 @@ module LatticeLevelSetMap =
             |> Seq.filter(fun kvp -> kvp.Value.IsNone)
             |> Seq.length
         centerMissing
+
+
+
+    let isComplete
+            (llsm: latticeLevelSetMap) : bool =
+        llsm.CenterSideMap
+        |> Seq.forall(fun kvp -> kvp.Value.IsSome)
+        &&
+        llsm.PoleSideMap
+        |> Seq.forall(fun kvp -> kvp.Value.Length > 0)
 
 
     let optimize

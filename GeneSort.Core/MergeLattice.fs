@@ -9,27 +9,17 @@ type mergeLattice =
         { 
           latticeDimension: int<latticeDimension>
           edgeLength: int<latticeDistance> 
-          dictByCenterSideLevel: Dictionary<int<latticeDistance>, latticeLevelSetMap>
         }
 
           static member create
             (latticeDimension: int<latticeDimension>)
             (edgeLength: int<latticeDistance>)
-            (latticeLevelSetMaps: latticeLevelSetMap [])
             : mergeLattice =
             if %latticeDimension < 2 then
                 invalidArg "latticeDimension" "latticeDimension length must be at least 2."
-
-            // Build dictionary keyed by centerSideLevel
-            let dictByCenterSideLevel = Dictionary<int<latticeDistance>, latticeLevelSetMap>()
-            for levelSetMap in latticeLevelSetMaps do
-                let key = Math.Min(%levelSetMap.CenterSideLevel, %levelSetMap.PoleSideLevel) * 1<latticeDistance>
-                dictByCenterSideLevel.[key] <- levelSetMap
-        
             { 
               latticeDimension = latticeDimension
-              edgeLength = edgeLength 
-              dictByCenterSideLevel = dictByCenterSideLevel
+              edgeLength = edgeLength
             }
 
           member this.LatticeDimension with get() = this.latticeDimension
@@ -39,30 +29,40 @@ type mergeLattice =
 
 module MergeLattice =
 
-       let createStandardMergeLattice
-            (latticeDimension: int<latticeDimension>)
-            (edgeLength: int<latticeDistance>)
-            : mergeLattice =
-            let levelSetMaps = 
-                            LatticeLevelSetMap.getAllLevelSetMapsStandard
-                                latticeDimension
-                                edgeLength
-            mergeLattice.create
-                latticeDimension
-                edgeLength
-                levelSetMaps
+    let create  (latticeDimension: int<latticeDimension>)
+                (edgeLength: int<latticeDistance>)
+        : mergeLattice =
+        mergeLattice.create latticeDimension edgeLength
 
 
-       let createVVMergeLattice
-            (latticeDimension: int<latticeDimension>)
-            (edgeLength: int<latticeDistance>)
-            : mergeLattice =
-            let levelSetMaps = 
-                            LatticeLevelSetMap.getAllLevelSetMapsVV
-                                latticeDimension
-                                edgeLength
-            mergeLattice.create
-                latticeDimension
-                edgeLength
-                levelSetMaps
+    let getOptimalLevelSetMapsStandard
+        (ml: mergeLattice)
+        : latticeLevelSetMap seq =
+        
+        let shuffles dex = 0
+        seq {
+            for yab in LatticeLevelSetMap.getAllLevelSetMapsStandard ml.LatticeDimension ml.EdgeLength do
+
+                    let qua = LatticeLevelSetMap.optimize yab shuffles
+                    if qua then
+                        yield yab
+                    else
+                        failwith "Failed to optimize level set map."
+        }
+
+
+    let getOptimalLevelSetMapsVV
+        (ml: mergeLattice)
+        : latticeLevelSetMap seq =
+        
+        let shuffles dex = 0
+        seq {
+            for yab in LatticeLevelSetMap.getAllLevelSetMapsVV ml.LatticeDimension ml.EdgeLength do
+
+                    let qua = LatticeLevelSetMap.optimize yab shuffles
+                    if qua then
+                        yield yab
+                    else
+                        failwith "Failed to optimize level set map."
+        }
 

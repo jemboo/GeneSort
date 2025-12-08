@@ -115,28 +115,16 @@ module Example =
     let edgeLength = 128<latticeDistance>
     let dimension = 4<latticeDimension>
 
-    let allLevelSets = LatticeLevelSetMap.getAllLevelSetMapsVV dimension edgeLength
+    let mergeLattice = 
+        MergeLattice.create dimension edgeLength
 
-    let zack = latticeLevelSetMap.create
-                    dimension
-                    edgeLength
-                    (3<latticeDistance>)
-                    (4<latticeDistance>)
-                    LatticePoint.boundedLevelSet
-                    LatticePoint.getOverCovers
-                    LatticePoint.getUnderCovers
+    let allGood = MergeLattice.getOptimalLevelSetMapsStandard mergeLattice
 
-    let shuffles dex = 0
+    for lsm in allGood do
+        let isGood = LatticeLevelSetMap.isComplete lsm
+        printfn "Level set %d optimized: %b" %lsm.PoleSideLevel (isGood)
 
-    let res = allLevelSets |> Array.map (fun llsm -> LatticeLevelSetMap.optimize llsm shuffles)
-
-    let allGood = 
-        res 
-        |> Array.forall (id)
-
-    printfn "All level sets optimized: %b" (allGood)
-
-let wak = 5
+    let wak = 5
 
 
 
