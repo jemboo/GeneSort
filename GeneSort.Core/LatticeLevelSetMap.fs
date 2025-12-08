@@ -117,7 +117,7 @@ module LatticeLevelSetMap =
         let midPoint = maxPathLength / 2
         
         seq {
-            for level in 1 .. (midPoint - 1) do
+            for level in 1 .. (midPoint) do
                 let levelTag = UMX.tag<latticeDistance> level
                 yield latticeLevelSetMap.create 
                         latticeDimension 

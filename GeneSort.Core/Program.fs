@@ -122,7 +122,7 @@ module Example =
 
     for lsm in allGood do
         let isGood = LatticeLevelSetMap.isComplete lsm
-        printfn "Level set %d optimized: %b; count: %d" %lsm.PoleSideLevel (isGood) lsm.CenterSideMap.Count
+        printfn "PoleSide %d CenterSide %d optimized: %b; count: %d" %lsm.PoleSideLevel %lsm.CenterSideLevel (isGood) lsm.CenterSideMap.Count
 
     let wak = 5
 
