@@ -62,7 +62,7 @@ type latticeLevelSetMap =
           member this.MaxDistance with get() = this.edgeLength * this.latticeDimension
           member this.PoleSideLevel with get() = this.poleSideLevel
           member this.CenterSideLevel with get() = this.centerSideLevel
-          member this.getPoleSidePoints
+          member this.getPoleSidePointCandidates
                 (centerPoint: latticePoint) : latticePoint [] =
               if (%this.CenterSideLevel > %this.PoleSideLevel) then
                   this.underCoverMap centerPoint
@@ -70,7 +70,7 @@ type latticeLevelSetMap =
            
                   this.overCoverMap centerPoint (this.EdgeLength + 1<latticeDistance>)
           
-          member this.getCenterSidePoint
+          member this.getCenterSidePointCandidates
                 (polePoint: latticePoint) : latticePoint [] =
               if (%this.CenterSideLevel < %this.PoleSideLevel) then
                   this.underCoverMap polePoint
@@ -176,13 +176,13 @@ module LatticeLevelSetMap =
         if keysNeedingUpdate.Length > 0 then
             for key in keysNeedingUpdate do
                 let openSlots =
-                    llsm.getPoleSidePoints key
+                    llsm.getPoleSidePointCandidates key
                     |> Array.filter(fun polePoint ->
                         llsm.PoleSideMap.[polePoint].Length = 0
                     )
                 let poleSideTarget =
                     if openSlots.Length = 0 then
-                         (llsm.getPoleSidePoints key).[0]
+                         (llsm.getPoleSidePointCandidates key).[0]
                     else
                         openSlots.[indexShuffler openSlots.Length]
 
@@ -208,13 +208,13 @@ module LatticeLevelSetMap =
         if keysNeedingUpdate.Length > 0 then
             for key in keysNeedingUpdate do
                 let openSlots =
-                    llsm.getCenterSidePoint key
+                    llsm.getCenterSidePointCandidates key
                     |> Array.filter(fun centerPoint ->
                         llsm.CenterSideMap.[centerPoint].IsNone
                     )
                 let centerSideTarget =
                     if openSlots.Length = 0 then
-                         (llsm.getCenterSidePoint key).[0]
+                         (llsm.getCenterSidePointCandidates key).[0]
                     else
                         let cst = openSlots.[indexShuffler openSlots.Length]
                         let oldPoleList = llsm.PoleSideMap.[cst]

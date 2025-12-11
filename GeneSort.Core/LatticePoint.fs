@@ -193,9 +193,12 @@ module LatticePoint =
         foundIndex
 
 
-    // This is used by latticePointToPermtation to convert a path in the mergeLattice to a permutation.
+    // This is used by updateWithLatticePoint to convert a path in the mergeLattice to a permutation.
     // Place (level - 1) in the index returned, where level here is the level of the lowPoint
-    let getPermutationIndex (edgeLength: int<latticeDistance>) (lowPoint:latticePoint) (hiPoint:latticePoint) : int =
+    let getPermutationIndex 
+                (edgeLength: int<latticeDistance>) 
+                (lowPoint:latticePoint) 
+                (hiPoint:latticePoint) : int =
         let index = getOverIndex lowPoint hiPoint
         %edgeLength * index +  %edgeLength - lowPoint.coords.[index] - 1
 

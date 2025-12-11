@@ -3,13 +3,14 @@ open FSharp.UMX
 open System
 
 
-type latticePathToPermtation = 
+type latticePathPermtation = 
     private {mutable latticePoint: latticePoint; perm: int option [] }
     with
-        static member createEmpty(latticePoint:latticePoint) (pathLength:int) = 
-            {latticePoint = latticePoint; perm = Array.create<int option> pathLength None}
+        static member createEmpty (latticeDimension: int<latticeDimension>) (pathLength:int<latticeDistance>) = 
+            { latticePoint = latticePoint.create(Array.zeroCreate %latticeDimension); 
+              perm = Array.create<int option> %pathLength None}
 
-        static member create(latticePoint:latticePoint) (perm:int option []) = 
+        static member create (latticePoint:latticePoint) (perm:int option []) = 
             {latticePoint = latticePoint; perm = perm}
 
         member this.Length with get() = this.perm.Length
@@ -33,27 +34,27 @@ type latticePathToPermtation =
 
 
 
-module latticePointToPermtation =
+module LatticePathPermtation =
 
-    let copy (lptp:latticePathToPermtation) =
+    let copy (lptp:latticePathPermtation) =
         let newPerm = Array.copy lptp.PermutationArray
         {latticePoint = lptp.LatticePoint; perm = newPerm}
         
-    let update (edgeLength: int<latticeDistance>) 
-               (lptp:latticePathToPermtation)
+    let updateWithLatticePoint (edgeLength: int<latticeDistance>) 
                (newLevel:int)
-               (newLp:latticePoint) : latticePathToPermtation =
-        let newLptp = copy lptp
+               (newLp:latticePoint) 
+               (lpPerm:latticePathPermtation) : latticePathPermtation =
+        let newLptp = copy lpPerm
         newLptp.LatticePoint <- newLp
-        let index = LatticePoint.getPermutationIndex edgeLength lptp.LatticePoint newLp
+        let index = LatticePoint.getPermutationIndex edgeLength lpPerm.LatticePoint newLp
         newLptp.[index] <- Some newLevel
         newLptp
 
-    let toPermutation (lptp:latticePathToPermtation) =
+
+    let toPermutation (lptp:latticePathPermtation) : Permutation =
         let indexes = 
             seq {
                 for i = 0 to (lptp.Length - 1) do
-                    yield i
-            
+                    yield lptp[i].Value
             }
         Permutation.create (Array.ofSeq indexes)

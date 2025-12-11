@@ -28,8 +28,9 @@
     <Compile Include="TwoOrbit\TwoOrbitTriple.fs" />
     <Compile Include="Permutation.fs" />
     <Compile Include="LatticePoint.fs" />
-    <Compile Include="LatticePathToPermutation.fs" />
     <Compile Include="LatticeLevelSetMap.fs" />
+    <Compile Include="LatticePathPermutation.fs" />
+    <Compile Include="LatticePathPermutations.fs" />
     <Compile Include="MergeLattice.fs" />
     <Compile Include="PermutationSets.fs" />
     <Compile Include="Perm_Si.fs" />

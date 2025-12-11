@@ -24,7 +24,8 @@ type mergeLattice =
 
           member this.LatticeDimension with get() = this.latticeDimension
           member this.EdgeLength with get() = this.edgeLength
-          member this.MaxDistance with get() = this.edgeLength * this.latticeDimension
+          // one less than the number of lattice points along a path from (0,0,...,0) to (edgeLength, edgeLength, ..., edgeLength)
+          member this.MaxPathLength with get() = %this.edgeLength * %this.latticeDimension
 
 
 module MergeLattice =
@@ -35,7 +36,7 @@ module MergeLattice =
         mergeLattice.create latticeDimension edgeLength
 
 
-    let getOptimalLevelSetMapsStandard
+    let getCompletedLevelSetMapsStandard
         (ml: mergeLattice)
         : latticeLevelSetMap seq =
         
@@ -51,7 +52,7 @@ module MergeLattice =
         }
 
 
-    let getOptimalLevelSetMapsVV
+    let getCompletedLevelSetMapsVV
         (ml: mergeLattice)
         : latticeLevelSetMap seq =
         
@@ -66,3 +67,38 @@ module MergeLattice =
                         failwith "Failed to optimize level set map."
         }
 
+
+    let getPermutationsStandard 
+            (reporter: (string -> unit) option)
+            (ml: mergeLattice) : latticePathPermtations =
+        let mutable lpsCurrent = LatticePathPermtations.createLevelZero ml.LatticeDimension ml.MaxPathLength
+
+        getCompletedLevelSetMapsStandard ml |> Seq.iter (
+            if reporter.IsSome then
+                fun lssm ->
+                    reporter.Value (sprintf "Processing level set map at PoleSideLevel %d and CenterSideLevel%d"
+                                        (%lssm.PoleSideLevel) (%lssm.CenterSideLevel))
+                    lpsCurrent <- LatticePathPermtations.update lpsCurrent lssm
+            else
+            fun lssm ->
+                lpsCurrent <- LatticePathPermtations.update lpsCurrent lssm
+        )
+        lpsCurrent
+
+
+    let getPermutationsVV 
+            (reporter: (string -> unit) option)
+            (ml: mergeLattice) : latticePathPermtations =
+        let mutable lpsCurrent = LatticePathPermtations.createLevelZero ml.LatticeDimension ml.MaxPathLength
+
+        getCompletedLevelSetMapsVV ml |> Seq.iter (
+            if reporter.IsSome then
+                fun lssm ->
+                    reporter.Value (sprintf "Processing level set map at PoleSideLevel %d and CenterSideLevel%d"
+                                        (%lssm.PoleSideLevel) (%lssm.CenterSideLevel))
+                    lpsCurrent <- LatticePathPermtations.update lpsCurrent lssm
+            else
+            fun lssm ->
+                lpsCurrent <- LatticePathPermtations.update lpsCurrent lssm
+        )
+        lpsCurrent

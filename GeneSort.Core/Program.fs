@@ -112,17 +112,40 @@ module Example =
 
 
 
-    let edgeLength = 16<latticeDistance>
-    let dimension = 8<latticeDimension>
+    let runLevelSetMapsExample () =
+        let edgeLength = 16<latticeDistance>
+        let dimension = 8<latticeDimension>
 
-    let mergeLattice = 
-        MergeLattice.create dimension edgeLength
+        let mergeLattice = MergeLattice.create dimension edgeLength
 
-    let allGood = MergeLattice.getOptimalLevelSetMapsVV mergeLattice
+        let allGood = MergeLattice.getCompletedLevelSetMapsVV mergeLattice
 
-    for lsm in allGood do
+        for lsm in allGood do
         let isGood = LatticeLevelSetMap.isComplete lsm
-        printfn "PoleSide %d CenterSide %d optimized: %b; count: %d" %lsm.PoleSideLevel %lsm.CenterSideLevel (isGood) lsm.CenterSideMap.Count
+        printfn "%s: PoleSide %d CenterSide %d optimized: %b; count: %d" (DateTime.Now.ToLongTimeString()) %lsm.PoleSideLevel %lsm.CenterSideLevel (isGood) lsm.CenterSideMap.Count
+
+
+    let reporter (msg:string) =
+        printfn "%s: %s" (DateTime.Now.ToLongTimeString()) msg
+
+    let runMergePermutationsExample () =
+        let edgeLength = 8<latticeDistance>
+        let dimension = 8<latticeDimension>
+
+        let mergeLattice = MergeLattice.create dimension edgeLength
+        let allGood = MergeLattice.getPermutationsVV (Some reporter) mergeLattice
+        allGood |> LatticePathPermtations.toPermutations
+
+
+
+
+    printfn "start: %s" (DateTime.Now.ToLongTimeString())
+
+    let res = runMergePermutationsExample ()
+
+    printfn "end: %s" (DateTime.Now.ToShortTimeString())
+
+
 
     let wak = 5
 
