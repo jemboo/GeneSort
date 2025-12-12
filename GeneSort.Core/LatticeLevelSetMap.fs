@@ -87,24 +87,34 @@ module LatticeLevelSetMap =
 
     let getStats =
 
-        let latticeDimensions = [3; 4] |> List.map UMX.tag<latticeDimension>
-        let edgeLengths = [16; 24; 32; 48; 64; 96; 128] |> List.map UMX.tag<latticeDistance>
+        let latticeDimensions = [3; 4; 8] |> List.map UMX.tag<latticeDimension>
+        //let edgeLengths = [16; 24; 32; 48; 64; 96; 128] |> List.map UMX.tag<latticeDistance>
+        let edgeLengths = [4; 8; 16; 24; 32;] |> List.map UMX.tag<latticeDistance>
 
-        printfn "SortingWidth\tDimension\tlevel\tMaxPerTuple\tLevelSet\tLevelSetVV"
+        //printfn "SortingWidth\tDimension\tlevel\tMaxPerTuple\tLevelSet\tLevelSetVV"
+        //for dim in latticeDimensions do
+        //    for edgeLength in edgeLengths do
+        //        let sortingWidth = (%dim * %edgeLength) |> UMX.tag<latticeDistance>
+        //        let level = (%sortingWidth / 2) |> UMX.tag<latticeDistance>
+        //        let levelSetPoints = LatticePoint.boundedLevelSet dim level edgeLength |> Seq.toArray
+        //        let levelSetPointsVV = LatticePoint.boundedLevelSetVV dim level edgeLength |> Seq.toArray
+        //        printfn "%d\t%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level) (%edgeLength) (levelSetPoints.Length) (levelSetPointsVV.Length)
+        //        let level2 = (24 + (%sortingWidth / 2)) |> UMX.tag<latticeDistance>
+        //        let levelSetPoints2 = LatticePoint.boundedLevelSet dim level2 edgeLength |> Seq.toArray
+        //        let levelSetPointsVV2 = LatticePoint.boundedLevelSetVV dim level2 edgeLength |> Seq.toArray
+        //        printfn "%d\t%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level2) (%edgeLength) (levelSetPoints2.Length) (levelSetPointsVV2.Length)
+
+        printfn "SortingWidth\tDimension\tlevel\tMaxPerTuple\tLevelSetVV"
         for dim in latticeDimensions do
             for edgeLength in edgeLengths do
                 let sortingWidth = (%dim * %edgeLength) |> UMX.tag<latticeDistance>
                 let level = (%sortingWidth / 2) |> UMX.tag<latticeDistance>
-                let levelSetPoints = LatticePoint.boundedLevelSet dim level edgeLength |> Seq.toArray
                 let levelSetPointsVV = LatticePoint.boundedLevelSetVV dim level edgeLength |> Seq.toArray
-                printfn "%d\t%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level) (%edgeLength) (levelSetPoints.Length) (levelSetPointsVV.Length)
-                let level2 = (24 + (%sortingWidth / 2)) |> UMX.tag<latticeDistance>
-                let levelSetPoints2 = LatticePoint.boundedLevelSet dim level2 edgeLength |> Seq.toArray
-                let levelSetPointsVV2 = LatticePoint.boundedLevelSetVV dim level2 edgeLength |> Seq.toArray
-                printfn "%d\t%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level2) (%edgeLength) (levelSetPoints2.Length) (levelSetPointsVV2.Length)
-
-
-
+                printfn "%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level) (%edgeLength) (levelSetPointsVV.Length)
+                //let level2 = (24 + (%sortingWidth / 2)) |> UMX.tag<latticeDistance>
+                //let levelSetPointsVV2 = LatticePoint.boundedLevelSetVV dim level2 edgeLength |> Seq.toArray
+                //printfn "%d\t%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level2) (%edgeLength) (levelSetPointsVV2.Length)
+                
     let getAllLevelSetMaps 
             (latticeDimension: int<latticeDimension>) 
             (edgeLength: int<latticeDistance>) 

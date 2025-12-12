@@ -141,7 +141,9 @@ module Example =
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
-    let res = runMergePermutationsExample ()
+    //let res = runMergePermutationsExample ()
+
+    LatticeLevelSetMap.getStats
 
     printfn "end: %s" (DateTime.Now.ToShortTimeString())
 
