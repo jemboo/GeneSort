@@ -64,7 +64,9 @@ module LatticePoint =
         h
 
     /// Generate all lattice points where each coordinate is in 0..maxValue
-    let latticeRect (dim:int<latticeDimension>) (maxValue:int<latticeDistance>) : seq<latticePoint> =
+    let latticeCube 
+            (dim:int<latticeDimension>) 
+            (edgeLength:int<latticeDistance>) : seq<latticePoint> =
         seq {
             let current = Array.zeroCreate %dim
 
@@ -73,13 +75,20 @@ module LatticePoint =
                     if pos = %dim then
                         yield { coords = Array.copy current }
                     else
-                        for v in 0 .. %maxValue do
+                        for v in 0 .. %edgeLength do
                             current.[pos] <- v
                             yield! loop (pos + 1)
                 }
 
             yield! loop 0
         }
+
+    /// Generates all lattice points of length dim whose entries lie in 0 .. maxValue
+    /// and are non-decreasing
+    let latticeCubeVV 
+                (dim:int<latticeDimension>) 
+                (edgeLength:int<latticeDistance>) : seq<latticePoint> =
+        latticeCube dim edgeLength |> Seq.filter isNonDecreasing
 
 
     /// Generates all lattice points of length dim whose entries:

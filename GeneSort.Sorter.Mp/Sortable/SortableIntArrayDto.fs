@@ -19,5 +19,5 @@ module SortableIntArrayDto =
         { Values = sia.Values; SortingWidth = int sia.SortingWidth; SymbolSetSize = %sia.SymbolSetSize }
 
     let toDomain (dto: sortableIntArrayDto) : sortableIntArray =
-        sortableIntArray.Create(dto.Values, UMX.tag<sortingWidth> dto.SortingWidth, UMX.tag<symbolSetSize> dto.SymbolSetSize)
+        sortableIntArray.create(dto.Values, UMX.tag<sortingWidth> dto.SortingWidth, UMX.tag<symbolSetSize> dto.SymbolSetSize)
 

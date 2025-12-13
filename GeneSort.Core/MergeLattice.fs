@@ -70,35 +70,35 @@ module MergeLattice =
 
     let getPermutationsStandard 
             (reporter: (string -> unit) option)
-            (ml: mergeLattice) : latticePathPermtations =
-        let mutable lpsCurrent = LatticePathPermtations.createLevelZero ml.LatticeDimension ml.MaxPathLength
+            (ml: mergeLattice) : latticePathPermutations =
+        let mutable lpsCurrent = LatticePathPermutations.createLevelZero ml.LatticeDimension ml.MaxPathLength
 
         getCompletedLevelSetMapsStandard ml |> Seq.iter (
             if reporter.IsSome then
                 fun lssm ->
                     reporter.Value (sprintf "Processing level set map at PoleSideLevel %d and CenterSideLevel%d"
                                         (%lssm.PoleSideLevel) (%lssm.CenterSideLevel))
-                    lpsCurrent <- LatticePathPermtations.update lpsCurrent lssm
+                    lpsCurrent <- LatticePathPermutations.update lpsCurrent lssm
             else
             fun lssm ->
-                lpsCurrent <- LatticePathPermtations.update lpsCurrent lssm
+                lpsCurrent <- LatticePathPermutations.update lpsCurrent lssm
         )
         lpsCurrent
 
 
     let getPermutationsVV 
             (reporter: (string -> unit) option)
-            (ml: mergeLattice) : latticePathPermtations =
-        let mutable lpsCurrent = LatticePathPermtations.createLevelZero ml.LatticeDimension ml.MaxPathLength
+            (ml: mergeLattice) : latticePathPermutations =
+        let mutable lpsCurrent = LatticePathPermutations.createLevelZero ml.LatticeDimension ml.MaxPathLength
 
         getCompletedLevelSetMapsVV ml |> Seq.iter (
             if reporter.IsSome then
                 fun lssm ->
                     reporter.Value (sprintf "Processing level set map at PoleSideLevel %d and CenterSideLevel%d"
                                         (%lssm.PoleSideLevel) (%lssm.CenterSideLevel))
-                    lpsCurrent <- LatticePathPermtations.update lpsCurrent lssm
+                    lpsCurrent <- LatticePathPermutations.update lpsCurrent lssm
             else
             fun lssm ->
-                lpsCurrent <- LatticePathPermtations.update lpsCurrent lssm
+                lpsCurrent <- LatticePathPermutations.update lpsCurrent lssm
         )
         lpsCurrent

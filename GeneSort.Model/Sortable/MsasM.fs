@@ -6,13 +6,6 @@ open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Sorter.Sortable
 
-[<Measure>] type mergeDimension
-
-type mergeFillType =
-    | Full
-    | VanVoorhis
-
-
 [<Struct; CustomEquality; NoComparison>]
 type msasM = 
     private 
@@ -34,6 +27,8 @@ type msasM =
             let id = 
                 [
                     "MsasMi" :> obj
+                    mergeDimension :> obj
+                    mergeFillType :> obj
                     sortingWidth :> obj
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
             { 
@@ -62,37 +57,28 @@ type msasM =
     interface IEquatable<msasM> with
         member this.Equals(other) =  this.sortingWidth = other.sortingWidth
 
-    member this.MakeSortableIntTests 
-                (sortingWidth: int<sortingWidth>) : sortableIntTests =
+    member this.MakeSortableIntTests : sortableIntTests =
+        let intArrays = SortableIntArray.getMergeTestCases 
+                            this.SortingWidth
+                            this.MergeDimension
+                            this.mergeFillType
 
-        if %this.MergeDimension = 2 then
-            sortableIntTests.create 
-                    ( %this.id |> UMX.tag<sortableTestsId>) 
-                    sortingWidth
-                    (SortableIntArray.getMerge2TestCases sortingWidth)
-        elif %this.MergeDimension = 3 then
-            sortableIntTests.create 
-                    ( %this.id |> UMX.tag<sortableTestsId>) 
-                    sortingWidth
-                    (SortableIntArray.getMerge3TestCases sortingWidth)
-        else
-              failwith "Unsupported sorterMergeFactor for sortableIntTests"
+        sortableIntTests.create 
+                ( %this.id |> UMX.tag<sortableTestsId>) 
+                this.SortingWidth
+                intArrays
 
 
-    member this.MakeSortableBoolTests (sortingWidth: int<sortingWidth>) : sortableBoolTests =
+    member this.MakeSortableBoolTests : sortableBoolTests =
         failwith "Not implemented yet"
-        let sortableArrays =  
-            if %this.MergeDimension = 2 then
-                SortableBoolArray.getMerge2TestCases sortingWidth
-
-            elif %this.MergeDimension = 3 then
-                SortableBoolArray.getMerge2TestCases sortingWidth
-            else
-                  failwith "Unsupported sorterMergeFactor for sortableIntTests"
+        let sortableArrays = SortableBoolArray.getMergeTestCases
+                                    this.sortingWidth
+                                    this.mergeDimension
+                                    this.mergeFillType  
 
         sortableBoolTests.create 
                 ( %this.id |> UMX.tag<sortableTestsId>) 
-                sortingWidth
+                this.sortingWidth
                 sortableArrays
 
 

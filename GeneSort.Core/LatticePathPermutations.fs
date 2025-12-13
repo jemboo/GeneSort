@@ -2,7 +2,7 @@
 open FSharp.UMX
 
 
-type latticePathPermtations =  private { items: latticePathPermtation []; level: int<latticeDistance> }
+type latticePathPermutations =  private { items: latticePathPermtation []; level: int<latticeDistance> }
      with
         static member create(items: latticePathPermtation [], level: int<latticeDistance>) =
             { items = items; level = level }
@@ -14,16 +14,16 @@ type latticePathPermtations =  private { items: latticePathPermtation []; level:
 
 
 
-module LatticePathPermtations =
+module LatticePathPermutations =
 
    let createLevelZero 
             (latticeDimension: int<latticeDimension>) 
-            (pathLength:int<latticeDistance>) : latticePathPermtations =
+            (pathLength:int<latticeDistance>) : latticePathPermutations =
        let lpPerms = [| latticePathPermtation.createEmpty latticeDimension pathLength |]
-       latticePathPermtations.create(lpPerms, 0<latticeDistance>)
+       latticePathPermutations.create(lpPerms, 0<latticeDistance>)
 
-   let update (lpPerms : latticePathPermtations)
-              (lssm:latticeLevelSetMap) : latticePathPermtations =
+   let update (lpPerms : latticePathPermutations)
+              (lssm:latticeLevelSetMap) : latticePathPermutations =
 
        if %lssm.PoleSideLevel < %lssm.CenterSideLevel then
 
@@ -42,7 +42,7 @@ module LatticePathPermtations =
                                             (mappedPoints.[x]) 
                                             lpPerm
                   } |> Seq.toArray
-          latticePathPermtations.create(newLpPerms, lpPerms.Level + 1<latticeDistance>)
+          latticePathPermutations.create(newLpPerms, lpPerms.Level + 1<latticeDistance>)
 
        else
           if %lpPerms.Level <> %lssm.CenterSideLevel then
@@ -59,10 +59,10 @@ module LatticePathPermtations =
                                     mappedPoint 
                                     lpPerm
                   } |> Seq.toArray
-          latticePathPermtations.create(newLpPerms, lpPerms.Level + 1<latticeDistance>)
+          latticePathPermutations.create(newLpPerms, lpPerms.Level + 1<latticeDistance>)
 
 
-   let toPermutations (lpPerms:latticePathPermtations) : Permutation [] =
+   let toPermutations (lpPerms:latticePathPermutations) : Permutation [] =
         seq {
             for dex in 0 .. lpPerms.Count - 1 do
                 let lpPerm = lpPerms.[dex]

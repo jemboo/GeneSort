@@ -133,8 +133,8 @@ module Example =
         let dimension = 8<latticeDimension>
 
         let mergeLattice = MergeLattice.create dimension edgeLength
-        let allGood = MergeLattice.getPermutationsVV (Some reporter) mergeLattice
-        allGood |> LatticePathPermtations.toPermutations
+        let latticePathPermutations = MergeLattice.getPermutationsVV (Some reporter) mergeLattice
+        latticePathPermutations |> LatticePathPermutations.toPermutations
 
 
 

@@ -27,6 +27,12 @@ open FSharp.UMX
 [<Measure>] type switchFrequency
 
 
+[<Measure>] type mergeDimension
+
+type mergeFillType =
+    | Full
+    | VanVoorhis
+
 
 module CeLength =
     

@@ -95,6 +95,43 @@ module SortableBoolArray =
     let removeDuplicates (arr: sortableBoolArray[]) : sortableBoolArray[] =
         arr.Distinct(SortableBoolArrayValueComparer()).ToArray()
 
+
+    let fromLatticePoint 
+                (p: GeneSort.Core.latticePoint) 
+                (maxValue:int<latticeDistance>) : sortableBoolArray =
+        let boolArray = 
+                [| 
+                    for x in p.coords -> 
+                        [| for y in 0 .. (%maxValue - 1) -> y < x |] |> Array.rev
+                |] 
+                |> Array.concat
+                    
+        sortableBoolArray.Create(boolArray, (%p.Dimension * %maxValue) |> UMX.tag<sortingWidth>)
+
+
+    let fromLatticeCubeFull 
+                (dim:int<latticeDimension>) 
+                (maxValue:int<latticeDistance>) : sortableBoolArray[] =
+        let latticePoints = 
+            GeneSort.Core.LatticePoint.latticeCube dim maxValue
+            |> Seq.toArray
+
+        latticePoints
+        |> Array.map (fun p -> fromLatticePoint p maxValue)
+
+
+    let fromLatticeCubeVV 
+                (dim:int<latticeDimension>) 
+                (maxValue:int<latticeDistance>) : sortableBoolArray[] =
+        let latticePoints = 
+            GeneSort.Core.LatticePoint.latticeCube dim maxValue
+            |> Seq.filter GeneSort.Core.LatticePoint.isNonDecreasing
+            |> Seq.toArray
+
+        latticePoints
+        |> Array.map (fun p -> fromLatticePoint p maxValue)
+
+
     /// Returns all possible sortableBoolArray instances for a given sorting width.
     /// <exception cref="ArgumentException">Thrown when sortingWidth is negative.</exception>
     let getAllSortableBoolArrays (sortingWidth: int<sortingWidth>) : sortableBoolArray[] =
@@ -115,17 +152,23 @@ module SortableBoolArray =
             let boolArray = Array.init n (fun i -> i >= n - k)
             sortableBoolArray.Create(boolArray, sortingWidth))
 
-    let getMerge2TestCases (sortingWidth: int<sortingWidth>) : sortableBoolArray[] =
-        failwith "Not implemented correctly"
-        if %sortingWidth % 2 <> 0 then
-            invalidArg "sortingWidth" "Sorting width must be even."
-        let n = int sortingWidth
-        let m = n / 2
-        let sortedHalfArrays = getAllSortedSortableBoolArrays (m * 1<sortingWidth>)
-        let result = ResizeArray<sortableBoolArray>()
-        for left in sortedHalfArrays do
-            for right in sortedHalfArrays do
-                let boolArray = Array.concat [left.Values; right.Values]
-                let sba = sortableBoolArray.Create(boolArray, sortingWidth)
-                result.Add(sba)
-        result.ToArray()
+    let getMergeTestCases 
+            (sortingWidth: int<sortingWidth>) 
+            (mergeDimension: int<mergeDimension>)
+            (mergeFillType: mergeFillType)
+            : sortableBoolArray [] =
+
+        if %sortingWidth % %mergeDimension <> 0 then
+            invalidArg "sortingWidth" (sprintf "Sorting width: %d must be divisible by mergeDimension : %d " %sortingWidth  %mergeDimension)
+
+        let latticeDimension = %mergeDimension |> UMX.tag<latticeDimension>
+        let edgeLength = %sortingWidth / %mergeDimension |> UMX.tag<latticeDistance>
+
+        let sortableBoolArrays =
+            match mergeFillType with
+            | Full -> 
+                fromLatticeCubeFull latticeDimension edgeLength
+            | VanVoorhis ->
+                fromLatticeCubeVV latticeDimension edgeLength
+
+        sortableBoolArrays

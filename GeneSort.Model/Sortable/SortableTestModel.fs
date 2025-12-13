@@ -43,6 +43,6 @@ module SortableTestModel =
         | MsasMi msasMi ->
                 match sortableArrayType with
                 | sortableArrayType.Bools ->        
-                    msasMi.MakeSortableBoolTests (getSortingWidth sortableTestModel) |> sortableTests.Bools
+                    msasMi.MakeSortableBoolTests |> sortableTests.Bools
                 | sortableArrayType.Ints ->
-                    msasMi.MakeSortableIntTests (getSortingWidth sortableTestModel) |> sortableTests.Ints
+                    msasMi.MakeSortableIntTests |> sortableTests.Ints

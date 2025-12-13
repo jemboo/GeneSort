@@ -17,7 +17,7 @@ type sortableIntArray =
         mutable valuesHash: int option // Lazily computed hash code for Values
     }
 
-    static member Create(values: int[], sortingWidth: int<sortingWidth>, symbolSetSize: int<symbolSetSize>) =
+    static member create(values: int[], sortingWidth: int<sortingWidth>, symbolSetSize: int<symbolSetSize>) =
         if sortingWidth < 0<sortingWidth> then
             invalidArg "sortingWidth" "Sorting width must be non-negative."
         if values.Length <> int sortingWidth then
@@ -26,8 +26,8 @@ type sortableIntArray =
             invalidArg "symbolSetSize" "Symbol set size must be positive."
         { values = values; sortingWidth = sortingWidth; symbolSetSize = symbolSetSize; valuesHash = None }
 
-    static member CreateFromPermutation(perm: Permutation) =
-        sortableIntArray.Create(perm.Array, (%perm.Order |> UMX.tag<sortingWidth>), (%perm.Order |> UMX.tag<symbolSetSize>))
+    static member createFromPermutation(perm: Permutation) =
+        sortableIntArray.create(perm.Array, (%perm.Order |> UMX.tag<sortingWidth>), (%perm.Order |> UMX.tag<symbolSetSize>))
 
     static member CreateSorted(sortingWidth: int<sortingWidth>) =
         if sortingWidth < 0<sortingWidth> then
@@ -59,7 +59,7 @@ type sortableIntArray =
                 (ces: ce[])
                 (useCounter: int[]) : sortableIntArray =
         let sortedValues = Ce.sortBy ces useCounter (Array.copy this.values)
-        sortableIntArray.Create(sortedValues, this.SortingWidth, this.SymbolSetSize)
+        sortableIntArray.create(sortedValues, this.SortingWidth, this.SymbolSetSize)
 
     member this.SortByCesWithHistory 
                 (ces: ce[])
@@ -67,19 +67,13 @@ type sortableIntArray =
         let history = Ce.sortByWithHistory ces useCounter this.values
         let sw = this.SortingWidth
         let sss = this.SymbolSetSize
-        history |> Array.map (fun values -> sortableIntArray.Create(values, sw, sss))
+        history |> Array.map (fun values -> sortableIntArray.create(values, sw, sss))
 
     member this.ToSortableBoolArrays() : sortableBoolArray[] =
         if this.SortingWidth <= 1<sortingWidth> then
             [||]
         else
-            let minValue = Array.min this.values
-            //let thresholds = 
-            //    this.values 
-            //    |> Array.filter (fun v -> v >= minValue) 
-            //    |> Array.distinct
-            //    |> Array.sort
-            let thresholds = [| 0 .. (%this.sortingWidth + 1) |]
+            let thresholds = [| 0 .. %this.sortingWidth |]
 
             let vals = this.Values
             let sw = this.SortingWidth
@@ -141,75 +135,35 @@ module SortableIntArray =
     let getOrbit (maxCount: int) (perm: Permutation) : sortableIntArray seq =
         Permutation.powerSequence perm  
         |> CollectionUtils.takeUpToOrWhile maxCount (fun perm -> not (Permutation.isIdentity perm))
-        |> Seq.map sortableIntArray.CreateFromPermutation
+        |> Seq.map sortableIntArray.createFromPermutation
 
 
     let randomSortableIntArray (indexShuffler: int -> int) (sortingWidth: int<sortingWidth>) : sortableIntArray =
         let perm = Permutation.randomPermutation indexShuffler %sortingWidth
-        sortableIntArray.CreateFromPermutation perm
+        sortableIntArray.createFromPermutation perm
+      
 
+    let getMergeTestCases 
+            (sortingWidth: int<sortingWidth>) 
+            (mergeDimension: int<mergeDimension>)
+            (mergeFillType: mergeFillType)
+            : sortableIntArray [] =
 
-    //let getMerge2TestCases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
-    //    let hw = %sortingWidth / 2
-    //    let sw = %sortingWidth
-    //    [|
-    //        for i = 0 to hw do
-    //            let ad1 = Array.append [| 0 .. (%hw - 1 - i) |] [| (sw - i) .. (sw - 1) |]
-    //            let arrayData = Array.append ad1  [| (sw - hw - i) .. (sw - i - 1) |]
-    //            sortableIntArray.Create(arrayData, sortingWidth, (%sortingWidth |> UMX.tag<symbolSetSize>))
-    //    |]
+        if %sortingWidth % %mergeDimension <> 0 then
+            invalidArg "sortingWidth" (sprintf "Sorting width: %d must be divisible by mergeDimension : %d " %sortingWidth  %mergeDimension)
 
-    let getMerge2TestCases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
-        let segLen = %sortingWidth / 2
-        let input = [| 0 .. (%sortingWidth - 1) |]
-        [|
-            for gen = 0 to segLen do
-                let arrayData = ArrayUtils.arrayPinch input segLen gen (0) (segLen)
-                sortableIntArray.Create(arrayData, sortingWidth, (%sortingWidth |> UMX.tag<symbolSetSize>))
-        |]
+        let latticeDimension = %mergeDimension |> UMX.tag<latticeDimension>
+        let edgeLength = %sortingWidth / %mergeDimension |> UMX.tag<latticeDistance>
+        let mergeLattice = MergeLattice.create latticeDimension edgeLength
+        let sortableIntArrays =
+            match mergeFillType with
+            | Full -> 
+                MergeLattice.getPermutationsStandard None mergeLattice
+                |> LatticePathPermutations.toPermutations
+                |> Array.map(sortableIntArray.createFromPermutation)
+            | VanVoorhis ->
+                MergeLattice.getPermutationsVV None mergeLattice
+                |> LatticePathPermutations.toPermutations
+                |> Array.map(sortableIntArray.createFromPermutation)
 
-    let getMerge3TestCases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
-        if %sortingWidth % 3 <> 0 then
-            invalidArg "sortingWidth" "Sorting width must be divisible by 3 for merge3 test cases."
-        let segLen = %sortingWidth / 3
-        let input = [| 0 .. (%sortingWidth - 1) |]
-        let outers = [| 
-            for wkR = 0 to segLen do
-                    ArrayUtils.arrayPinch input segLen wkR (0) (2 * segLen)
-        |]
-        let fullSet = 
-            outers |> Array.collect (fun outer ->
-                [|
-                    for gen = 0 to segLen do
-                        let pinched = ArrayUtils.arrayPinch outer segLen gen (segLen) (2 * segLen)
-                        sortableIntArray.Create(pinched, sortingWidth, (%sortingWidth |> UMX.tag<symbolSetSize>))
-                |]
-            )
-        fullSet
-                        
-
-    let getMerge4TestCases (sortingWidth: int<sortingWidth>) : sortableIntArray [] =
-        if %sortingWidth % 4 <> 0 then
-            invalidArg "sortingWidth" "Sorting width must be divisible by 4 for merge3 test cases."
-        let segLen = %sortingWidth / 4
-        let input = [| 0 .. (%sortingWidth - 1) |]
-        let outers = [| 
-            for wkR = 0 to segLen do
-                    ArrayUtils.arrayPinch input segLen wkR (0) (3 * segLen)
-        |]
-        let mids = 
-            outers |> Array.collect (fun outer ->
-                [|
-                    for gen = 0 to segLen do
-                        ArrayUtils.arrayPinch outer segLen gen (segLen) (3 * segLen)
-                |]
-            )
-        let fullSet = 
-            mids |> Array.collect (fun outer ->
-                [|
-                    for gen = 0 to segLen do
-                        let pinched = ArrayUtils.arrayPinch outer segLen gen (2 * segLen) (3 * segLen)
-                        sortableIntArray.Create(pinched, sortingWidth, (%sortingWidth |> UMX.tag<symbolSetSize>))
-                |]
-            )
-        fullSet
+        sortableIntArrays

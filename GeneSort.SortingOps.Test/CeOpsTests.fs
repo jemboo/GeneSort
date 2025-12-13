@@ -78,10 +78,10 @@ type CeOpsTests() =
         let sortingWidth = 3<sortingWidth>
         let symbolSetSize = 2<symbolSetSize>
         let intArrays = [|
-            sortableIntArray.Create([| 1; 0; 1 |], sortingWidth, symbolSetSize)
-            sortableIntArray.Create([| 0; 1; 0 |], sortingWidth, symbolSetSize)
-            sortableIntArray.Create([| 1; 0; 1 |], sortingWidth, symbolSetSize) // Duplicate
-            sortableIntArray.Create([| 0; 0; 1 |], sortingWidth, symbolSetSize) // Already sorted
+            sortableIntArray.create([| 1; 0; 1 |], sortingWidth, symbolSetSize)
+            sortableIntArray.create([| 0; 1; 0 |], sortingWidth, symbolSetSize)
+            sortableIntArray.create([| 1; 0; 1 |], sortingWidth, symbolSetSize) // Duplicate
+            sortableIntArray.create([| 0; 0; 1 |], sortingWidth, symbolSetSize) // Already sorted
         |]
         let sortableTests = 
             sortableIntTests.create 
@@ -105,7 +105,7 @@ type CeOpsTests() =
         // Arrange
         let sortingWidth = 2<sortingWidth>
         let symbolSetSize = 2<symbolSetSize>
-        let intArrays = [| sortableIntArray.Create([| 1; 0 |], sortingWidth, symbolSetSize) |]
+        let intArrays = [| sortableIntArray.create([| 1; 0 |], sortingWidth, symbolSetSize) |]
         let sortableTests = (sortableIntTests.create 
                                 (Guid.NewGuid() |> UMX.tag<sortableTestsId>)
                                 sortingWidth

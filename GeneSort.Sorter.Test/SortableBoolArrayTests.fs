@@ -162,36 +162,19 @@ type SortableBoolArrayTests() =
         Assert.False(arr.Equals(obj))
 
     [<Fact>]
-    let ``getMergeSortTestCases with sortingWidth 2 returns correct test cases`` () =
-        let arrays = SortableBoolArray.getMerge2TestCases 2<sortingWidth>
-        let expected = [|
-            sortableBoolArray.Create([| false; false |], 2<sortingWidth>) // [false], [false]
-            sortableBoolArray.Create([| false; true |], 2<sortingWidth>)  // [false], [true]
-            sortableBoolArray.Create([| true; false |], 2<sortingWidth>)  // [true], [false]
-            sortableBoolArray.Create([| true; true |], 2<sortingWidth>)   // [true], [true]
-        |]
-        Assert.Equal(4, arrays.Length)
-        Assert.Equal<sortableBoolArray[]>(expected, arrays)
-        Assert.True(arrays |> Array.forall (fun x -> 
-            let half = int x.SortingWidth / 2
-            x.IsSorted || (ArrayProperties.isSorted (x.Values.[0 .. half-1]) && ArrayProperties.isSorted (x.Values.[half ..]))))
+    let ``fromLatticePoint is correct`` () =
+        let targetArray = sortableBoolArray.Create([| false; false; true; true; true; true; false; false; false |], 9<sortingWidth>)
+        let lp = latticePoint.create([| 1; 3; 0 |])
+        let maxValue = 3<latticeDistance>
+        let res = SortableBoolArray.fromLatticePoint lp maxValue
+        Assert.True(res.Equals targetArray)
+
 
     [<Fact>]
-    let ``getMergeSortTestCases with sortingWidth 4 returns correct test cases`` () =
-        let arrays = SortableBoolArray.getMerge2TestCases 4<sortingWidth>
-        Assert.Equal(9, arrays.Length) // (2+1) * (2+1) = 9
-        let expected = [|
-            sortableBoolArray.Create([| false; false; false; false |], 4<sortingWidth>) // [false; false], [false; false]
-            sortableBoolArray.Create([| false; false; false; true |], 4<sortingWidth>)  // [false; false], [false; true]
-            sortableBoolArray.Create([| false; false; true; true |], 4<sortingWidth>)   // [false; false], [true; true]
-            sortableBoolArray.Create([| false; true; false; false |], 4<sortingWidth>)  // [false; true], [false; false]
-            sortableBoolArray.Create([| false; true; false; true |], 4<sortingWidth>)   // [false; true], [false; true]
-            sortableBoolArray.Create([| false; true; true; true |], 4<sortingWidth>)    // [false; true], [true; true]
-            sortableBoolArray.Create([| true; true; false; false |], 4<sortingWidth>)   // [true; true], [false; false]
-            sortableBoolArray.Create([| true; true; false; true |], 4<sortingWidth>)    // [true; true], [false; true]
-            sortableBoolArray.Create([| true; true; true; true |], 4<sortingWidth>)     // [true; true], [true; true]
-        |]
-        Assert.Equal<sortableBoolArray[]>(expected, arrays)
-        Assert.True(arrays |> Array.forall (fun x -> 
-            let half = int x.SortingWidth / 2
-            x.IsSorted || (ArrayProperties.isSorted (x.Values.[0 .. half-1]) && ArrayProperties.isSorted (x.Values.[half ..]))))
+    let ``fromLatticeCube is correct`` () =
+        let maxValue = 3<latticeDistance>
+        let dim = 3<latticeDimension>
+        let res = SortableBoolArray.fromLatticeCubeFull dim maxValue
+        Assert.True(res.Length = 64)
+        let res2 = SortableBoolArray.fromLatticeCubeVV dim maxValue
+        Assert.True(res2.Length = 20)

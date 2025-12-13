@@ -60,7 +60,7 @@ module CeBlockOps =
                             fun sia ->
                             let valuesCopy = Array.copy sia.Values
                             let _ = sortBy ceBlock ceUseCounts valuesCopy |> ignore
-                            sortableIntArray.Create(valuesCopy, sia.SortingWidth, sia.SymbolSetSize)
+                            sortableIntArray.create(valuesCopy, sia.SortingWidth, sia.SymbolSetSize)
                         ) |> Array.filter(fun a -> not a.IsSorted) |> SortableIntArray.removeDuplicates
 
                 sortableIntTests.create 
