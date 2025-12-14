@@ -17,7 +17,7 @@ module PermutationOrbits =
     let experimentDesc = "Count Permutation Orbit lengths"
 
     let randomType = rngType.Lcg
-    let sortableArrayType = sortableArrayType.Ints
+    let sortableArrayDataType = sortableArrayDataType.Ints
     let testModelCount = 20<sorterTestModelCount>
     let maxOrbiit = 200000
     
@@ -94,7 +94,7 @@ module PermutationOrbits =
     //                            use stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)
     //                            let dto = MessagePackSerializer.Deserialize<sortableTestModelSetDto>(stream, options)
     //                            let sorterTestModelSet = SortableTestModelSetDto.toDomain dto
-    //                            let sorterTestSet = sorterTestModelSet.makeSortableTestSet sortableArrayType
+    //                            let sorterTestSet = sorterTestModelSet.makeSortableTestSet sortableArrayDataType
 
     //                            let runParams = OutputData.getRunParametersForOutputDataPath filePath
     //                            let repl = runParams.GetRepl()

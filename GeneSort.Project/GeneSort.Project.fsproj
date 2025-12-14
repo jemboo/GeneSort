@@ -17,6 +17,7 @@
     <Compile Include="PermutationOrbits.fs" />
     <Compile Include="RandomSorters4to64.fs" />
     <Compile Include="MergeIntEvals.fs" />
+    <Compile Include="MergeIntQa.fs" />
     <Compile Include="FullBoolEvals.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

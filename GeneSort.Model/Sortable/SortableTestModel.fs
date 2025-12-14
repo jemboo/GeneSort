@@ -8,7 +8,7 @@ open GeneSort.Sorter.Sortable
 type sortableTestModel =
      | MsasF of msasF     // MsasF = a full bool test set for a given sorting width
      | MsasO of msasO     // MsasO = generated from a seed permutation; for bool models, it's expanded from the integer permutations
-     | MsasMi of msasM   // All (sorting width)/2 merge test cases
+     | MsasMi of msasM    // All (sorting width)/2 merge test cases
 
 
 module SortableTestModel =
@@ -22,27 +22,27 @@ module SortableTestModel =
 
     let makeSortableTests 
             (sortableTestModel: sortableTestModel) 
-            (sortableArrayType: sortableArrayType) : sortableTests =
+            (sortableArrayDataType: sortableArrayDataType) : sortableTests =
 
         match sortableTestModel with
 
         | MsasF msasF -> 
-                match sortableArrayType with
-                | sortableArrayType.Bools ->        
+                match sortableArrayDataType with
+                | sortableArrayDataType.Bools ->        
                         msasF.MakeSortableBoolTests (getSortingWidth sortableTestModel) |> sortableTests.Bools
-                | sortableArrayType.Ints ->
+                | sortableArrayDataType.Ints ->
                     failwith "Ints SortableArrayType not supported"
 
         | MsasO msasO ->
-                match sortableArrayType with
-                | sortableArrayType.Bools ->        
+                match sortableArrayDataType with
+                | sortableArrayDataType.Bools ->        
                      msasO.MakeSortableBoolTests (getSortingWidth sortableTestModel) |> sortableTests.Bools
-                | sortableArrayType.Ints ->
+                | sortableArrayDataType.Ints ->
                      msasO.MakeSortableIntTests (getSortingWidth sortableTestModel) |> sortableTests.Ints
 
         | MsasMi msasMi ->
-                match sortableArrayType with
-                | sortableArrayType.Bools ->        
+                match sortableArrayDataType with
+                | sortableArrayDataType.Bools ->        
                     msasMi.MakeSortableBoolTests |> sortableTests.Bools
-                | sortableArrayType.Ints ->
+                | sortableArrayDataType.Ints ->
                     msasMi.MakeSortableIntTests |> sortableTests.Ints

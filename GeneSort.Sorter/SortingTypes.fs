@@ -34,6 +34,24 @@ type mergeFillType =
     | VanVoorhis
 
 
+module MergeFillType =
+
+    let toString (t:mergeFillType option) : string =
+        match t with
+        | Some Full -> "Full"
+        | Some VanVoorhis -> "VanVoorhis"
+        | None -> "None"
+
+    let fromString (s:string) : mergeFillType =
+        match s with
+        | "Full" -> mergeFillType.Full
+        | "VanVoorhis" -> mergeFillType.VanVoorhis
+        | _ -> failwithf "Unknown MergeFillType: %s" s
+
+    let all () : mergeFillType list =
+        [ mergeFillType.Full; mergeFillType.VanVoorhis ]
+
+
 module CeLength =
     
     let toStageLength (sortingWidth:int<sortingWidth>) (ceLength: int<ceLength>) 

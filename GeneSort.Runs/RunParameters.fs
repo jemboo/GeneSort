@@ -28,6 +28,9 @@ type runParameters =
     static member sorterModelTypeKey = "SorterModelType"
     static member sortableArrayTypeKey = "SortableArrayType"
     static member sortingWidthKey = "SortingWidth"
+    static member sortableArrayDataTypeKey = "SortingWidthDataType"
+    static member mergeDimensionKey = "MergeDimension"
+    static member mergeFillTypeKey = "MergeFillType"
     static member stageLengthKey = "StageLength"
     static member ceLengthKey = "CeLength"
     static member projectNameKey = "ProjectName"
@@ -106,19 +109,27 @@ type runParameters =
 
 
 
-    /// Gets the SortableArrayType value.
-    member this.GetSortableArrayType() : sortableArrayType option =
-        match this.paramMap.TryFind runParameters.sortableArrayTypeKey with
+    /// Gets the mergeFillType value.
+    member this.GetMergeFillType() : mergeFillType option =
+        match this.paramMap.TryFind runParameters.mergeFillTypeKey with
         | Some value -> 
             try
-                Some (SortableArrayType.fromString value)
+                Some (MergeFillType.fromString value)
             with
             | _ -> None
         | None -> None
 
+
+    member this.GetMergeFillTypeKvp() : (string * string) option =
+        match this.paramMap.TryFind runParameters.mergeFillTypeKey with
+        | Some value -> Some (runParameters.mergeFillTypeKey, value)
+        | None -> None
+
+
     /// Sets the SortableArrayType value.
-    member this.SetSortableArrayType(sortableArrayType: sortableArrayType) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.sortableArrayTypeKey, SortableArrayType.toString sortableArrayType)
+    member this.SetMergeFillType(mergeFillType: mergeFillType option) : unit =
+        this.paramMap <- this.paramMap.Add(runParameters.mergeFillTypeKey, MergeFillType.toString mergeFillType)
+
 
 
 
@@ -140,6 +151,76 @@ type runParameters =
     /// Sets the SorterModelKey value.
     member this.SetSorterModelKey(sorterModelKey: sorterModelKey option) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.sorterModelTypeKey, SorterModelKey.toString sorterModelKey)
+
+
+
+
+    /// Gets the mergeDimension value.
+    member this.GetMergeDimensionKey() : int<mergeDimension> option =
+        match this.paramMap.TryFind runParameters.mergeDimensionKey with
+        | Some value -> 
+            match Int32.TryParse(value) with
+            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<mergeDimension>)
+            | false, _ -> None
+        | None -> None
+
+    member this.GetMergeDimensionKvp() : (string * string) option =
+        match this.paramMap.TryFind runParameters.mergeDimensionKey with
+        | Some value -> Some (runParameters.mergeDimensionKey, value)
+        | None -> None
+
+    /// Sets the mergeDimension value.
+    member this.SetMergeDimension(mergeDimension: int<mergeDimension> option) : unit =
+        this.paramMap <- this.paramMap.Add(runParameters.mergeDimensionKey, (%mergeDimension).ToString())
+
+
+
+
+
+    /// Gets the GetSortableArrayDataType value.
+    member this.GetSortableArrayDataTypeKey() : sortableArrayDataType option =
+        match this.paramMap.TryFind runParameters.sortableArrayDataTypeKey with
+        | Some value -> 
+            try
+                Some (SortableArrayDataType.fromString value)
+            with
+            | _ -> None
+        | None -> None
+
+    member this.GetSortableArrayDataTypeKvp() : (string * string) option =
+        match this.paramMap.TryFind runParameters.sortableArrayDataTypeKey with
+        | Some value -> Some (runParameters.sortableArrayDataTypeKey, value)
+        | None -> None
+
+    /// Sets the GetSortableArrayDataType value.
+    member this.GetSortableArrayDataTypeKey(sortableArrayDataType: sortableArrayDataType option) : unit =
+        this.paramMap <- this.paramMap.Add(runParameters.sortableArrayDataTypeKey, SortableArrayDataType.toString sortableArrayDataType)
+
+
+
+
+
+
+    /// Gets the SorterModelKey value.
+    member this.GetSorterModelKey() : sorterModelKey option =
+        match this.paramMap.TryFind runParameters.sorterModelTypeKey with
+        | Some value -> 
+            try
+                Some (SorterModelKey.fromString value)
+            with
+            | _ -> None
+        | None -> None
+
+    member this.GetSorterModelKvp() : (string * string) option =
+        match this.paramMap.TryFind runParameters.sorterModelTypeKey with
+        | Some value -> Some (runParameters.sorterModelTypeKey, value)
+        | None -> None
+
+    /// Sets the SorterModelKey value.
+    member this.SetSorterModelKey(sorterModelKey: sorterModelKey option) : unit =
+        this.paramMap <- this.paramMap.Add(runParameters.sorterModelTypeKey, SorterModelKey.toString sorterModelKey)
+
+
 
 
 

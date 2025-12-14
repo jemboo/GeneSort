@@ -19,7 +19,7 @@ type sortableBoolTestSet =
         let sortingWidth = arrays.[0].sortableBoolArrays.[0]
         { Id = id; sortableTests = Array.copy arrays; }
 
-    member this.SortableArrayType with get() = sortableArrayType.Bools
+    member this.SortableArrayType with get() = sortableArrayDataType.Bools
 
     member this.SortingWidth with get() = this.sortableTests.[0].sortableBoolArrays.[0].SortingWidth
 

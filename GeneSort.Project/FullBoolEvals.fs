@@ -21,7 +21,7 @@ module FullBoolEvals =
 
 
     let randomType = rngType.Lcg
-    let sortableArrayType = sortableArrayType.Bools
+    let sortableArrayDataType = sortableArrayDataType.Bools
   
     let sortingWidthValues = 
         [4; 6; 8; 12; 16;] |> List.map(fun d -> d.ToString())
@@ -167,7 +167,7 @@ module FullBoolEvals =
 
 
             let sorterTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-            let sortableTests = SortableTestModel.makeSortableTests sorterTestModel sortableArrayType
+            let sortableTests = SortableTestModel.makeSortableTests sorterTestModel sortableArrayDataType
             let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
 
             cts.Token.ThrowIfCancellationRequested()
