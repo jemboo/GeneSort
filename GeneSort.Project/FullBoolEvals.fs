@@ -6,7 +6,7 @@ open System.Threading
 open FSharp.UMX
 
 open GeneSort.Core
-open GeneSort.Sorter.Sortable
+open GeneSort.Sorter
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.Runs

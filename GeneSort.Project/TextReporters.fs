@@ -6,6 +6,7 @@ open System.Threading
 open FSharp.UMX
 
 open GeneSort.Core
+open GeneSort.Sorter
 open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.SortingResults
@@ -92,7 +93,12 @@ module TextReporters =
                         DataTableFile.create "SorterCeUseProfile_Report" 
                               (  (Array.init 20 (fun i -> i.ToString()))
                                     |> Array.append 
-                                  [| "Sorting Width"; "SorterModel"; "sorterId"; "sorterSetId"; "sorterTestsId"; "UnsortedCount"; "CeCount"; "StageCount";"lastCe" |]
+                                  [| 
+                                        "Repl"; "Sorting Width"; "SorterModel"; "DataType"; 
+                                        "MergeFillType"; "MergeDimension"; "sorterId"; 
+                                        "sorterSetId"; "sorterTestsId"; "UnsortedCount"; 
+                                        "CeCount"; "StageCount";"lastCe" 
+                                  |]
                               )
                               |> DataTableFile.addSource (sprintf "Generated: %s" (DateTime.Now.ToLongTimeString()))
                               |> DataTableFile.addSource (sprintf "Sources (%d):" runParamsArray.Length)
@@ -103,9 +109,12 @@ module TextReporters =
             do! runParamsArray
                 |> Array.map (fun runParams -> async {
                     let queryParamsForSorterSetEval = queryParams.createFromRunParams (outputDataType.SorterSetEval None) runParams
-                    let sortingWidth = runParams.GetSortingWidth()
+                    let repl = runParams.GetRepl() |> Repl.toString
+                    let sortingWidth = runParams.GetSortingWidth() |> SortingWidth.toString
                     let sorterModelKey = runParams.GetSorterModelKey() |> SorterModelKey.toString
-
+                    let sortableArrayDataType = runParams.GetSortableArrayDataType() |> SortableArrayDataType.toString
+                    let mergeFillType = runParams.GetMergeFillType() |> MergeFillType.toString
+                    let mergeDimension = runParams.GetMergeDimension() |> MergeDimension.toString
                     match progress with
                     | Some p -> p.Report(sprintf "Processing SorterSetEval for %s %s" (%sortingWidth.ToString()) sorterModelKey)
                     | None -> ()
@@ -118,7 +127,14 @@ module TextReporters =
                         | Error err -> failwith (sprintf "Error loading SorterSetEval: %s" err)
 
                     let sorterSetCeUseProfile = SorterSetCeUseProfile.makeSorterSetCeUseProfile binCount blockGrowthRate sorterSetEval
-                    let reportLines = SorterSetCeUseProfile.makeReportLines sortingWidth sorterModelKey sorterSetCeUseProfile
+                    let reportLines = SorterSetCeUseProfile.makeReportLines 
+                                            repl
+                                            sortingWidth 
+                                            sorterModelKey
+                                            sortableArrayDataType
+                                            mergeFillType
+                                            mergeDimension
+                                            sorterSetCeUseProfile
                 
                     dataTableFile <- DataTableFile.addRows reportLines dataTableFile
                     ()

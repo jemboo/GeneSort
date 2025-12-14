@@ -45,12 +45,21 @@ module SorterCeUseProfile =
             sorterTestsId = sorterTestsId
         }
 
-    let makeReportLine (sortingWidth:int<sortingWidth> option) (sorterModelKey:string) (profile: sorterCeUseProfile) : string[] =
+    let makeReportLine 
+            (repl:string)
+            (sortingWidth:string) 
+            (sorterModelKey:string)
+            (sortableArrayDataType:string)
+            (mergeFillType:string)
+            (mergeDimension:string)
+            (profile: sorterCeUseProfile) : string[] =
         [|
-            match sortingWidth with
-            | Some sw -> yield (%sw.ToString())
-            | None -> ()
+            yield repl
+            yield sortingWidth
             yield sorterModelKey
+            yield sortableArrayDataType
+            yield mergeFillType
+            yield mergeDimension
             yield (%profile.sorterId.ToString()) 
             yield (%profile.sorterSetId.ToString()) 
             yield (%profile.sorterTestsId.ToString())
@@ -93,10 +102,23 @@ module SorterSetCeUseProfile =
                                             se |]
         }
 
-    let makeReportLines (sortingWidth:int<sortingWidth> option) (sorterModelKey:string) 
-                        (sorterSetCeUseProfile: sorterSetCeUseProfile) : string [][] =
+    let makeReportLines 
+            (repl:string) 
+            (sortingWidth:string) 
+            (sorterModelKey:string)
+            (sortableArrayDataType:string)
+            (mergeFillType:string)
+            (mergeDimension:string)
+            (sorterSetCeUseProfile: sorterSetCeUseProfile) : string [][] =
         [|
                 for profile in sorterSetCeUseProfile.sorterCeUseProfiles do
-                    yield SorterCeUseProfile.makeReportLine sortingWidth sorterModelKey profile
+                    yield SorterCeUseProfile.makeReportLine 
+                                                repl    
+                                                sortingWidth 
+                                                sorterModelKey
+                                                sortableArrayDataType
+                                                mergeFillType
+                                                mergeDimension 
+                                                profile
         |]
    

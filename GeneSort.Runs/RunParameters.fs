@@ -11,6 +11,13 @@ open GeneSort.Sorter.Sortable
 [<Measure>] type replNumber
 [<Measure>] type generationNumber
 
+
+module Repl = 
+    let toString (r: int<replNumber> option) : string =
+        match r with
+        | Some v -> (UMX.untag v).ToString()
+        | None -> "None"
+
 type runParameters =
         private { mutable paramMap : Map<string, string> }
     with
@@ -132,31 +139,8 @@ type runParameters =
 
 
 
-
-    /// Gets the SorterModelKey value.
-    member this.GetSorterModelKey() : sorterModelKey option =
-        match this.paramMap.TryFind runParameters.sorterModelTypeKey with
-        | Some value -> 
-            try
-                Some (SorterModelKey.fromString value)
-            with
-            | _ -> None
-        | None -> None
-
-    member this.GetSorterModelKvp() : (string * string) option =
-        match this.paramMap.TryFind runParameters.sorterModelTypeKey with
-        | Some value -> Some (runParameters.sorterModelTypeKey, value)
-        | None -> None
-
-    /// Sets the SorterModelKey value.
-    member this.SetSorterModelKey(sorterModelKey: sorterModelKey option) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.sorterModelTypeKey, SorterModelKey.toString sorterModelKey)
-
-
-
-
     /// Gets the mergeDimension value.
-    member this.GetMergeDimensionKey() : int<mergeDimension> option =
+    member this.GetMergeDimension() : int<mergeDimension> option =
         match this.paramMap.TryFind runParameters.mergeDimensionKey with
         | Some value -> 
             match Int32.TryParse(value) with
@@ -170,7 +154,7 @@ type runParameters =
         | None -> None
 
     /// Sets the mergeDimension value.
-    member this.SetMergeDimension(mergeDimension: int<mergeDimension> option) : unit =
+    member this.SetMergeDimension(mergeDimension: int<mergeDimension>) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.mergeDimensionKey, (%mergeDimension).ToString())
 
 
@@ -178,7 +162,7 @@ type runParameters =
 
 
     /// Gets the GetSortableArrayDataType value.
-    member this.GetSortableArrayDataTypeKey() : sortableArrayDataType option =
+    member this.GetSortableArrayDataType() : sortableArrayDataType option =
         match this.paramMap.TryFind runParameters.sortableArrayDataTypeKey with
         | Some value -> 
             try
@@ -193,7 +177,7 @@ type runParameters =
         | None -> None
 
     /// Sets the GetSortableArrayDataType value.
-    member this.GetSortableArrayDataTypeKey(sortableArrayDataType: sortableArrayDataType option) : unit =
+    member this.SetSortableArrayDataTypeKey(sortableArrayDataType: sortableArrayDataType option) : unit =
         this.paramMap <- this.paramMap.Add(runParameters.sortableArrayDataTypeKey, SortableArrayDataType.toString sortableArrayDataType)
 
 

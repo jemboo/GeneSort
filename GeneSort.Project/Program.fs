@@ -43,9 +43,18 @@ let cts = new CancellationTokenSource()
 
 
 /// **********     MergeIntEvals   ****************
-let executor = MergeIntEvals.executor
-let project = MergeIntEvals.project
-let projectName = MergeIntEvals.project.ProjectName
+//let executor = MergeIntEvals.executor
+//let project = MergeIntEvals.project
+//let projectName = MergeIntEvals.project.ProjectName
+
+
+
+
+/// **********     MergeIntQa   ****************
+let executor = MergeIntQa.executor
+let project = MergeIntQa.project
+let projectName = MergeIntQa.project.ProjectName
+
 
 
 
