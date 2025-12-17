@@ -111,50 +111,27 @@ module Example =
             printfn "  %3d successes: %4d times (%.2f%%)" successes count percentage)
 
 
-
-    let runLevelSetMapsExample () =
-        let edgeLength = 16<latticeDistance>
-        let dimension = 8<latticeDimension>
-
-        let mergeLattice = MergeLattice.create dimension edgeLength
-
-        let allGood = MergeLattice.getCompletedLevelSetMapsVV mergeLattice
-
-        for lsm in allGood do
-        let isGood = LatticeLevelSetMap.isComplete lsm
-        printfn "%s: PoleSide %d CenterSide %d optimized: %b; count: %d" (DateTime.Now.ToLongTimeString()) %lsm.PoleSideLevel %lsm.CenterSideLevel (isGood) lsm.CenterSideMap.Count
-
-
     let reporter (msg:string) =
         printfn "%s: %s" (DateTime.Now.ToLongTimeString()) msg
 
+
     let runMergePermutationsExample () =
-        let edgeLength = 8<latticeDistance>
-        let dimension = 4<latticeDimension>
+        let edgeLength = 64<latticeDistance>
+        let dimension = 3<latticeDimension>
 
         let mergeLattice = MergeLattice.create dimension edgeLength
-        let latticePathPermutations = MergeLattice.getPermutationsVV (Some reporter) mergeLattice
-        latticePathPermutations |> LatticePathPermutations.toPermutations
-
-
-    let runMergePermutationsExample2 () =
-        let edgeLength = 16<latticeDistance>
-        let dimension = 4<latticeDimension>
-
-        let mergeLattice = MergeLattice.create dimension edgeLength
-        let latticePathPermutations = MergeLattice.getPermutationsStandard2 (Some reporter) mergeLattice
+        let latticePathPermutations = MergeLattice.getPermutationsStandard (Some reporter) mergeLattice
         latticePathPermutations |> LatticePathPermutations.toPermutations
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
-    let res = runMergePermutationsExample2 ()
+    let res = runMergePermutationsExample ()
 
     let yow = res |> Array.map(fun p -> Permutation.toBoolArrays p) 
                   |> Array.concat
                   |> Seq.distinctBy (fun arr -> System.String.Join(",", arr))
                   |> Seq.toArray
 
-    //LatticeLevelSetMap.getStats
 
     printfn "end: %s" (DateTime.Now.ToShortTimeString())
 
