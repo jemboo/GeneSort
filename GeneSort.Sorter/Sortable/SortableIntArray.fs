@@ -74,7 +74,6 @@ type sortableIntArray =
             [||]
         else
             let thresholds = [| 0 .. %this.sortingWidth |]
-
             let vals = this.Values
             let sw = this.SortingWidth
             thresholds 

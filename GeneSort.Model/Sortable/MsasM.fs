@@ -70,7 +70,7 @@ type msasM =
 
 
     member this.MakeSortableBoolTests : sortableBoolTests =
-        failwith "Not implemented yet"
+
         let sortableArrays = SortableBoolArray.getMergeTestCases
                                     this.sortingWidth
                                     this.mergeDimension

@@ -150,3 +150,31 @@ type SortableIntArrayTests() =
         let arr = sortableIntArray.create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
         let obj = obj()
         Assert.False(arr.Equals (obj))
+
+
+    [<Fact>]
+    let ``compare bool and int merged sorterTests`` () =
+        
+        let sortableBoolArrays = SortableBoolArray.getMergeTestCases
+                                    6<sortingWidth>
+                                    3<mergeDimension>
+                                    mergeFillType.Full
+
+
+        let sortableIntArrays = SortableIntArray.getMergeTestCases
+                                    6<sortingWidth>
+                                    3<mergeDimension>
+                                    mergeFillType.Full
+
+        let boolConv = 
+            sortableIntArrays 
+            |> Array.map (fun sia -> 
+                sia.ToSortableBoolArrays()
+            ) |> Array.concat |> SortableBoolArray.removeDuplicates
+
+        let mutable report = ""
+        boolConv |> Array.iter (fun sba ->
+            report <- report + sprintf "%A\n" sba.Values
+        )
+
+        Assert.Contains("M", "ex.Message")

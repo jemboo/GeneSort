@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="SortableIntMerges.fs" />
     <Compile Include="TextReporters.fs" />
     <Compile Include="RunResult.fs" />
     <Compile Include="ProgressMessage.fs" />

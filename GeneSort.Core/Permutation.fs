@@ -187,3 +187,16 @@ module Permutation =
                 let orbit = Orbit.create orbitIndices
                 findOrbits (i + 1) (orbit :: acc)
         OrbitSet.create (List.rev (findOrbits 0 [])) n
+
+
+    let toBoolArrays (perm: Permutation) : bool[][] =
+        let n = %perm.Order
+        if perm.Order <= 1<Order> then
+            [||]
+        else
+            let thresholds = [| 0 .. %perm.Order |]
+            let vals = perm.Array
+            thresholds 
+            |> Array.map (
+                fun threshold ->
+                    vals |> Array.map (fun v -> v >= threshold ) )

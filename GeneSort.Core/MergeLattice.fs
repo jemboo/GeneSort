@@ -40,13 +40,13 @@ module MergeLattice =
         (ml: mergeLattice)
         : latticeLevelSetMap seq =
         
-        let shuffles dex = 0
+        let randy = Rando.create rngType.Lcg (Guid.NewGuid())
         seq {
-            for yab in LatticeLevelSetMap.getAllLevelSetMapsStandard ml.LatticeDimension ml.EdgeLength do
-
-                    let qua = LatticeLevelSetMap.optimize yab shuffles
-                    if qua then
-                        yield yab
+            for llsm in LatticeLevelSetMap.getAllLevelSetMapsStandard ml.LatticeDimension ml.EdgeLength do
+                    let res = LatticeLevelSetMap.initCenterSideMapStandard llsm
+                    let res = LatticeLevelSetMap.optimize llsm (randy.NextIndex)
+                    if res then
+                        yield llsm
                     else
                         failwith "Failed to optimize level set map."
         }
@@ -58,14 +58,40 @@ module MergeLattice =
         
         let shuffles dex = 0
         seq {
-            for yab in LatticeLevelSetMap.getAllLevelSetMapsVV ml.LatticeDimension ml.EdgeLength do
-
-                    let qua = LatticeLevelSetMap.optimize yab shuffles
-                    if qua then
-                        yield yab
+            for llsm in LatticeLevelSetMap.getAllLevelSetMapsVV ml.LatticeDimension ml.EdgeLength do
+                    let res = LatticeLevelSetMap.initCenterSideMapVV llsm
+                    let res = LatticeLevelSetMap.optimize llsm shuffles
+                    if res then
+                        yield llsm
                     else
                         failwith "Failed to optimize level set map."
         }
+
+
+    let getCompletedLevelSetMapsStandard2
+        (ml: mergeLattice)
+        : latticeLevelSetMap seq =
+        
+        let randy = Rando.create rngType.Lcg (Guid.NewGuid())
+        seq {
+            for llsm in LatticeLevelSetMap.getAllLevelSetMapsStandard ml.LatticeDimension ml.EdgeLength do
+                    LatticeLevelSetMap.initMapsStandard llsm
+                    yield llsm  
+        }
+
+
+
+    let getCompletedLevelSetMapsVV2
+        (ml: mergeLattice)
+        : latticeLevelSetMap seq =
+        
+        let shuffles dex = 0
+        seq {
+            for llsm in LatticeLevelSetMap.getAllLevelSetMapsVV ml.LatticeDimension ml.EdgeLength do
+                    LatticeLevelSetMap.initMapsVV llsm
+                    yield llsm
+        }
+
 
 
     let getPermutationsStandard 
@@ -92,6 +118,45 @@ module MergeLattice =
         let mutable lpsCurrent = LatticePathPermutations.createLevelZero ml.LatticeDimension ml.MaxPathLength
 
         getCompletedLevelSetMapsVV ml |> Seq.iter (
+            if reporter.IsSome then
+                fun lssm ->
+                    reporter.Value (sprintf "Processing level set map at PoleSideLevel %d and CenterSideLevel%d"
+                                        (%lssm.PoleSideLevel) (%lssm.CenterSideLevel))
+                    lpsCurrent <- LatticePathPermutations.update lpsCurrent lssm
+            else
+            fun lssm ->
+                lpsCurrent <- LatticePathPermutations.update lpsCurrent lssm
+        )
+        lpsCurrent
+
+
+    let getPermutationsStandard2 
+            (reporter: (string -> unit) option)
+            (ml: mergeLattice) : latticePathPermutations =
+        let mutable lpsCurrent = LatticePathPermutations.createLevelZero ml.LatticeDimension ml.MaxPathLength
+
+        //let yab = getCompletedLevelSetMapsStandard2 ml |> Seq.toArray
+
+
+        getCompletedLevelSetMapsStandard2 ml |> Seq.iter (
+            if reporter.IsSome then
+                fun lssm ->
+                    reporter.Value (sprintf "Processing level set map at PoleSideLevel %d and CenterSideLevel%d"
+                                        (%lssm.PoleSideLevel) (%lssm.CenterSideLevel))
+                    lpsCurrent <- LatticePathPermutations.update lpsCurrent lssm
+            else
+            fun lssm ->
+                lpsCurrent <- LatticePathPermutations.update lpsCurrent lssm
+        )
+        lpsCurrent
+
+
+    let getPermutationsVV2
+            (reporter: (string -> unit) option)
+            (ml: mergeLattice) : latticePathPermutations =
+        let mutable lpsCurrent = LatticePathPermutations.createLevelZero ml.LatticeDimension ml.MaxPathLength
+
+        getCompletedLevelSetMapsVV2 ml |> Seq.iter (
             if reporter.IsSome then
                 fun lssm ->
                     reporter.Value (sprintf "Processing level set map at PoleSideLevel %d and CenterSideLevel%d"

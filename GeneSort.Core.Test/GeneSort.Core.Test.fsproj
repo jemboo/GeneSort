@@ -8,22 +8,22 @@
 
   <ItemGroup>
     <Compile Include="SysExtTests.fs" />
-    <Compile Include="RandoTests.fs" />
     <Compile Include="ByteUtilsTests.fs" />
     <Compile Include="ArrayPropertiesTests.fs" />
     <Compile Include="ArrayUtilsTests.fs" />
-    <Compile Include="CollectionUtilsTests.fs" />
     <Compile Include="BytePackTests.fs" />
+    <Compile Include="CollectionUtilsTests.fs" />
     <Compile Include="CombinatoricsTests.fs" />
+    <Compile Include="CoreGenTests.fs" />
+    <Compile Include="LatticePointTests.fs" />
     <Compile Include="OrbitTests.fs" />
     <Compile Include="OrbitSetTests.fs" />
     <Compile Include="PermutationTests.fs" />
     <Compile Include="PermutationSetsTests.fs" />
-    <Compile Include="LatticePointTests.fs" />
     <Compile Include="Perm_SiTests.fs" />
     <Compile Include="Perm_RsTests.fs" />
     <Compile Include="PermRsGen_oldTests.fs" />
-    <Compile Include="CoreGenTests.fs" />
+    <Compile Include="RandoTests.fs" />
     <Compile Include="TwoOrbit\PermSiTests.fs" />
     <Compile Include="TwoOrbit\TwoOrbitPairTests.fs" />
     <Compile Include="RatesAndOps\IndelRatesTests.fs" />

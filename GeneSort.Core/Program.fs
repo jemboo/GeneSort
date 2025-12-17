@@ -130,20 +130,31 @@ module Example =
 
     let runMergePermutationsExample () =
         let edgeLength = 8<latticeDistance>
-        let dimension = 8<latticeDimension>
+        let dimension = 4<latticeDimension>
 
         let mergeLattice = MergeLattice.create dimension edgeLength
         let latticePathPermutations = MergeLattice.getPermutationsVV (Some reporter) mergeLattice
         latticePathPermutations |> LatticePathPermutations.toPermutations
 
 
+    let runMergePermutationsExample2 () =
+        let edgeLength = 16<latticeDistance>
+        let dimension = 4<latticeDimension>
 
+        let mergeLattice = MergeLattice.create dimension edgeLength
+        let latticePathPermutations = MergeLattice.getPermutationsStandard2 (Some reporter) mergeLattice
+        latticePathPermutations |> LatticePathPermutations.toPermutations
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
-    //let res = runMergePermutationsExample ()
+    let res = runMergePermutationsExample2 ()
 
-    LatticeLevelSetMap.getStats
+    let yow = res |> Array.map(fun p -> Permutation.toBoolArrays p) 
+                  |> Array.concat
+                  |> Seq.distinctBy (fun arr -> System.String.Join(",", arr))
+                  |> Seq.toArray
+
+    //LatticeLevelSetMap.getStats
 
     printfn "end: %s" (DateTime.Now.ToShortTimeString())
 

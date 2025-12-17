@@ -1,35 +1,60 @@
-﻿namespace GeneSort.Core
+﻿
+namespace GeneSort.Core
+
 open FSharp.UMX
 open System
-
 
 [<Measure>] type latticeDistance
 [<Measure>] type latticeDimension
 
-[<Struct; CustomEquality; NoComparison>]
-type latticePoint = { coords: int[] }
+[<CustomEquality; CustomComparison>]
+type latticePoint = 
+    { coords: int[] }
+    
     with
         static member create(arr:int[]) = { coords = Array.copy arr }
+        
         member p.Sum = Array.sum p.coords
         member p.Dimension = p.coords.Length
         member this.Item
             with get(i:int) = this.coords.[i]
-        override p.ToString() = sprintf "[|%s|]" (String.Join("; ", p.coords))
+            
+        override p.ToString() = 
+            sprintf "[|%s|]" (String.Join("; ", p.coords))
+            
         override p.Equals(obj) =
             match obj with
             | :? latticePoint as other ->
-                // structural equality on array contents
                 p.Dimension = other.Dimension &&
                 Array.forall2 (=) p.coords other.coords
             | _ -> false
-
+            
         override p.GetHashCode() =
-            // robust structural hash built from coords
             let mutable h = 17
             for x in p.coords do
                 h <- h * 31 + x
             h
-
+        
+        // Dictionary (lexicographic) comparison
+        interface System.IComparable with
+            member this.CompareTo(obj) =
+                match obj with
+                | :? latticePoint as other ->
+                    let minLen = min this.Dimension other.Dimension
+                    let mutable i = 0
+                    let mutable result = 0
+                    
+                    // Compare coordinate by coordinate
+                    while i < minLen && result = 0 do
+                        result <- compare this.coords.[i] other.coords.[i]
+                        i <- i + 1
+                    
+                    // If all compared coords are equal, longer array is "greater"
+                    if result = 0 then
+                        compare this.Dimension other.Dimension
+                    else
+                        result
+                | _ -> invalidArg "obj" "Cannot compare latticePoint with different type"
 
 module LatticePoint =
 
@@ -43,8 +68,7 @@ module LatticePoint =
             if a.[i] > a.[i+1] then ok <- false
             i <- i + 1
         ok
-
-
+    
     /// helper to compare latticePoints by coords (value equality)
     let equalCoords (a:int[]) (b:int[]) =
         if a.Length <> b.Length then false
@@ -55,13 +79,13 @@ module LatticePoint =
                 if a.[i] <> b.[i] then ok <- false
                 i <- i + 1
             ok
-
-
+    
     let latticePointHash (p:latticePoint) : int =
         let mutable h = 17
         for x in p.coords do
             h <- (h * 31) + x
         h
+
 
     /// Generate all lattice points where each coordinate is in 0..maxValue
     let latticeCube 
@@ -154,7 +178,7 @@ module LatticePoint =
         let n = subject.Dimension
         let results = ResizeArray<latticePoint>()
         for i in 0 .. n-1 do
-            if subject.[i] + 1 < %maxDistance then
+            if subject.[i] < %maxDistance then
                 let arr = Array.copy subject.coords
                 arr.[i] <- arr.[i] + 1
                 results.Add { coords = arr }
