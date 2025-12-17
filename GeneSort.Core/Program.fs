@@ -116,11 +116,11 @@ module Example =
 
 
     let runMergePermutationsExample () =
-        let edgeLength = 64<latticeDistance>
-        let dimension = 3<latticeDimension>
+        let edgeLength = 4<latticeDistance>
+        let dimension = 4<latticeDimension>
 
         let mergeLattice = MergeLattice.create dimension edgeLength
-        let latticePathPermutations = MergeLattice.getPermutationsStandard (Some reporter) mergeLattice
+        let latticePathPermutations = MergeLattice.getPermutationsVV (Some reporter) mergeLattice
         latticePathPermutations |> LatticePathPermutations.toPermutations
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
@@ -132,6 +132,8 @@ module Example =
                   |> Seq.distinctBy (fun arr -> System.String.Join(",", arr))
                   |> Seq.toArray
 
+    for aa in yow do
+        printfn "%s" (System.String.Join("", aa |> Array.map (fun b -> if b then "1 " else "0 ")))
 
     printfn "end: %s" (DateTime.Now.ToShortTimeString())
 
