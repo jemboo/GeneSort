@@ -42,7 +42,7 @@ module MergeLattice =
 
         seq {
             for llsm in LatticeLevelSetMap.getAllLevelSetMapsStandard ml.LatticeDimension ml.EdgeLength do
-                    LatticeLevelSetMap.initMaps llsm
+                    LatticeLevelSetMap.setupMaps llsm
                     yield llsm  
         }
 
@@ -53,7 +53,7 @@ module MergeLattice =
         
         seq {
             for llsm in LatticeLevelSetMap.getAllLevelSetMapsVV ml.LatticeDimension ml.EdgeLength do
-                    LatticeLevelSetMap.initMaps llsm
+                    LatticeLevelSetMap.setupMaps llsm
                     yield llsm
         }
 

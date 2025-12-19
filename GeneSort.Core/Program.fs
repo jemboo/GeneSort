@@ -115,25 +115,57 @@ module Example =
         printfn "%s: %s" (DateTime.Now.ToLongTimeString()) msg
 
 
-    let runMergePermutationsExample () =
-        let edgeLength = 4<latticeDistance>
-        let dimension = 4<latticeDimension>
+    let initLevelSetMapExample () =
+        let edgeLength = 9<latticeDistance>
+        let dimension = 9<latticeDimension>
+        let keyMaker = LatticePoint.boundedLevelSetVV
+        let lowLevel = ( (%edgeLength * %dimension) / 2  - 1) |> UMX.tag<latticeDistance>
+        let highLevel =  ( (%edgeLength * %dimension) / 2 - 0) |> UMX.tag<latticeDistance>
+        let overCoverMap = LatticePoint.getOverCoversVV
+        let underCoverMap = LatticePoint.getUnderCoversVV
+
+        let llsm = latticeLevelSetMap.create 
+                            dimension 
+                            edgeLength 
+                            lowLevel 
+                            highLevel 
+                            keyMaker 
+                            overCoverMap 
+                            underCoverMap
+
+        llsm |> LatticeLevelSetMap.setupMaps
+        ()
+
+
+    let runMergePermutationsExample () : Permutation []  =
+        let edgeLength = 9<latticeDistance>
+        let dimension = 9<latticeDimension>
 
         let mergeLattice = MergeLattice.create dimension edgeLength
         let latticePathPermutations = MergeLattice.getPermutationsVV (Some reporter) mergeLattice
-        latticePathPermutations |> LatticePathPermutations.toPermutations
+        let result = latticePathPermutations |> LatticePathPermutations.toPermutations
+        
+        let boolEq = 
+            result 
+            |> Array.map (fun p -> Permutation.toBoolArrays p) 
+            |> Array.concat
+            |> Seq.distinctBy (fun arr -> System.String.Join(",", arr))
+            |> Seq.toArray
+
+        for aa in boolEq do
+            printfn "%s" (System.String.Join("", aa |> Array.map (fun b -> if b then "1 " else "0 ")))
+
+        result
+
+
+
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
-    let res = runMergePermutationsExample ()
+    let res = initLevelSetMapExample ()
 
-    let yow = res |> Array.map(fun p -> Permutation.toBoolArrays p) 
-                  |> Array.concat
-                  |> Seq.distinctBy (fun arr -> System.String.Join(",", arr))
-                  |> Seq.toArray
+   
 
-    for aa in yow do
-        printfn "%s" (System.String.Join("", aa |> Array.map (fun b -> if b then "1 " else "0 ")))
 
     printfn "end: %s" (DateTime.Now.ToShortTimeString())
 

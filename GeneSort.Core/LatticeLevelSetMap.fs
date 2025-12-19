@@ -103,6 +103,8 @@ module LatticeLevelSetMap =
                 //let levelSetPointsVV2 = LatticePoint.boundedLevelSetVV dim level2 edgeLength |> Seq.toArray
                 //printfn "%d\t%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level2) (%edgeLength) (levelSetPointsVV2.Length)
                 
+
+
     let getAllLevelSetMaps 
             (latticeDimension: int<latticeDimension>) 
             (edgeLength: int<latticeDistance>) 
@@ -164,12 +166,15 @@ module LatticeLevelSetMap =
             LatticePoint.getUnderCoversVV
 
 
-    let initMaps
+    let setupMaps
             (llsm: latticeLevelSetMap) : unit =
 
         let poleSideKeys = llsm.PoleSideMap.Keys |> Seq.toArray |> Array.sort
         for lp in poleSideKeys do
-            let ccps = llsm.getCenterSidePointCandidates lp
+            let ccpCandidates =
+                llsm.getCenterSidePointCandidates lp
+            let ccpWinners = 
+                       ccpCandidates
                        |> Array.sort
                        |> Array.filter(fun ccp ->
                             match llsm.CenterSideMap.[ccp] with
@@ -177,10 +182,11 @@ module LatticeLevelSetMap =
                             | None -> true
                        )
 
-            let ccp = if (ccps.Length > 0) then 
-                          ccps.[0]
+            let ccp = if (ccpWinners.Length > 0) then 
+                          ccpWinners.[0]
                       else
-                          failwith "Failed to initialize level set map: no available center side points."
+                         ccpCandidates.[0]
+                         // failwith "Failed to initialize level set map: no available center side points."
 
             llsm.PoleSideMap.[lp] <- ccp :: llsm.PoleSideMap.[lp]
             llsm.CenterSideMap.[ccp] <- Some lp
