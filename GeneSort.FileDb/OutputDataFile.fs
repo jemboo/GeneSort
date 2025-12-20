@@ -55,6 +55,67 @@ module OutputDataFile =
                             (queryParams.OutputDataType |> OutputDataType.toFolderName)
 
 
+
+    let makeOutputDataName (queryParams: queryParams) : string =
+        match queryParams.OutputDataType with
+        | outputDataType.Project -> "Project"
+        | outputDataType.RunParameters ->
+            match queryParams.Index, queryParams.Repl with
+                | Some idx, Some rpl -> sprintf "RunParameters_Index%d_Repl%d" (%idx) (%rpl)
+                | _ -> failwith "Index and Repl must be specified for RunParameters output data type"
+
+        | outputDataType.SorterSet _ ->
+            match queryParams.Index, queryParams.Repl, queryParams.Generation with
+                | Some idx, Some rpl, Some gen -> sprintf "SorterSet_Index%d_Repl%d_Gen%d" (%idx) (%rpl) (%gen)
+                | Some idx, Some rpl, None -> sprintf "SorterSet_Index%d_Repl%d" (%idx) (%rpl)
+                | _ -> failwith "Index and Repl must be specified for SorterSet output data type"
+
+        | outputDataType.SortableTestSet _ ->
+            match queryParams.Index, queryParams.Repl, queryParams.Generation with
+                | Some idx, Some rpl, Some gen -> sprintf "SortableTestSet_Index%d_Repl%d_Gen%d" (%idx) (%rpl) (%gen)
+                | Some idx, Some rpl, None -> sprintf "SortableTestSet_Index%d_Repl%d" (%idx) (%rpl)
+                | _ -> failwith "Index and Repl must be specified for SortableTestSet output data type"
+    
+        | outputDataType.SorterModelSet _ ->
+            match queryParams.Index, queryParams.Repl, queryParams.Generation with
+                | Some idx, Some rpl, Some gen -> sprintf "SorterModelSet_Index%d_Repl%d_Gen%d" (%idx) (%rpl) (%gen)
+                | Some idx, Some rpl, None -> sprintf "SorterModelSet_Index%d_Repl%d" (%idx) (%rpl)
+                | _ -> failwith "Index and Repl must be specified for SorterModelSet output data type"
+
+        | outputDataType.SorterModelSetMaker _ ->
+            match queryParams.Index, queryParams.Repl, queryParams.Generation with
+                | Some idx, Some rpl, Some gen -> sprintf "SorterModelSetMaker_Index%d_Repl%d_Gen%d" (%idx) (%rpl) (%gen)
+                | Some idx, Some rpl, None -> sprintf "SorterModelSetMaker_Index%d_Repl%d" (%idx) (%rpl)
+                | _ -> failwith "Index and Repl must be specified for SorterModelSetMaker output data type"
+
+        | outputDataType.SortableTestModelSet _ ->
+            match queryParams.Index, queryParams.Repl, queryParams.Generation with
+                | Some idx, Some rpl, Some gen -> sprintf "SortableTestModelSet_Index%d_Repl%d_Gen%d" (%idx) (%rpl) (%gen)
+                | Some idx, Some rpl, None -> sprintf "SortableTestModelSet_Index%d_Repl%d" (%idx) (%rpl)
+                | _ -> failwith "Index and Repl must be specified for SortableTestModelSet output data type"
+
+        | outputDataType.SortableTestModelSetMaker _ ->
+            match queryParams.Index, queryParams.Repl, queryParams.Generation with
+                | Some idx, Some rpl, Some gen -> sprintf "SortableTestModelSetMaker_Index%d_Repl%d_Gen%d" (%idx) (%rpl) (%gen)
+                | Some idx, Some rpl, None -> sprintf "SortableTestModelSetMaker_Index%d_Repl%d" (%idx) (%rpl)
+                | _ -> failwith "Index and Repl must be specified for SortableTestModelSetMaker output data type"
+
+        | outputDataType.SorterSetEval _ ->
+            match queryParams.Index, queryParams.Repl, queryParams.Generation with
+                | Some idx, Some rpl, Some gen -> sprintf "SorterSetEval_Index%d_Repl%d_Gen%d" (%idx) (%rpl) (%gen)
+                | Some idx, Some rpl, None -> sprintf "SorterSetEval_Index%d_Repl%d" (%idx) (%rpl)
+                | _ -> failwith "Index and Repl must be specified for SorterSetEval output data type"
+
+        | outputDataType.SorterSetEvalBins _ ->
+            match queryParams.Index, queryParams.Repl, queryParams.Generation with
+                | Some idx, Some rpl, Some gen -> sprintf "SorterSetEvalBins_Index%d_Repl%d_Gen%d" (%idx) (%rpl) (%gen)
+                | Some idx, Some rpl, None -> sprintf "SorterSetEvalBins_Index%d_Repl%d" (%idx) (%rpl)
+                | _ -> failwith "Index and Repl must be specified for SorterSetEvalBins output data type"
+
+        | outputDataType.TextReport tr -> %tr
+
+
+
     let getFullOutputDataFilePath
             (projectFolder: string<pathToProjectFolder>)
             (queryParams: queryParams) : string<fullPathToFile> =
@@ -63,7 +124,7 @@ module OutputDataFile =
             match queryParams.OutputDataType with
             | outputDataType.TextReport reportName -> sprintf "%s.txt" %reportName
             | _ -> 
-                GeneSortDb.makeOutputDataName queryParams + ".msgpack"
+                makeOutputDataName queryParams + ".msgpack"
 
         let outputDataFolder = getPathToOutputDataFolder projectFolder queryParams.OutputDataType
         Path.Combine(%outputDataFolder, fileNameWithExtension) |> UMX.tag<fullPathToFile>

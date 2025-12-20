@@ -28,7 +28,7 @@ let createThreadSafeProgress() =
 let progress = createThreadSafeProgress()
 
 let startTime = System.DateTime.Now
-printfn $"**** Q22QQ ******** {startTime.ToString()}"
+printfn $"**** Q22Qr ******** {startTime.ToString()}"
 
 
 let geneSortDb = new GeneSortDbMp(rootDir) :> IGeneSortDb

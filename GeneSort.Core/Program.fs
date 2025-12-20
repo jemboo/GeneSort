@@ -116,8 +116,8 @@ module Example =
 
 
     let initLevelSetMapExample () =
-        let edgeLength = 9<latticeDistance>
-        let dimension = 9<latticeDimension>
+        let edgeLength = 8<latticeDistance>
+        let dimension = 8<latticeDimension>
         let keyMaker = LatticePoint.boundedLevelSetVV
         let lowLevel = ( (%edgeLength * %dimension) / 2  - 1) |> UMX.tag<latticeDistance>
         let highLevel =  ( (%edgeLength * %dimension) / 2 - 0) |> UMX.tag<latticeDistance>
@@ -138,8 +138,8 @@ module Example =
 
 
     let runMergePermutationsExample () : Permutation []  =
-        let edgeLength = 9<latticeDistance>
-        let dimension = 9<latticeDimension>
+        let edgeLength = 4<latticeDistance>
+        let dimension = 4<latticeDimension>
 
         let mergeLattice = MergeLattice.create dimension edgeLength
         let latticePathPermutations = MergeLattice.getPermutationsVV (Some reporter) mergeLattice

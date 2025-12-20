@@ -98,7 +98,7 @@ module MergeIntQa =
 
 
     let mergeFillTypeValues = 
-         [mergeFillType.Full; mergeFillType.VanVoorhis;] |> List.map(fun d -> d.ToString())
+         [mergeFillType.VanVoorhis;] |> List.map(fun d -> d.ToString())
 
     let mergeFillTypes() : string*string list =
         (runParameters.mergeFillTypeKey, mergeFillTypeValues)
@@ -191,7 +191,7 @@ module MergeIntQa =
                 projectName 
                 projectDesc
                 parameterSpans
-                2<replNumber>
+                1<replNumber>
                 outputDataTypes
                 paramMapRefiner
 

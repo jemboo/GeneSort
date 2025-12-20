@@ -5,7 +5,7 @@ open System.Collections.Generic
 
 type latticeLevelSetMap =
     private 
-        { centerSideMap: Dictionary<latticePoint, latticePoint option>
+        { centerSideMap: Dictionary<latticePoint, latticePoint list>
           poleSideMap: Dictionary<latticePoint, latticePoint list>
           latticeDimension: int<latticeDimension>
           edgeLength: int<latticeDistance>
@@ -26,24 +26,26 @@ type latticeLevelSetMap =
             if %latticeDimension < 2 then
                 invalidArg "latticeDimension" "latticeDimension length must be at least 2."
 
-            let centerSideMap = Dictionary<latticePoint,latticePoint option>()
+            let centerSideMap = Dictionary<latticePoint,latticePoint list>()
             // Initialize centerSideMap with keys from latticeLevelSet
             for point in keyMaker latticeDimension centerSideLevel edgeLength do
-                centerSideMap.[point] <- None
+                centerSideMap.[point] <- []
 
             let poleSideMap = Dictionary<latticePoint, latticePoint list>()
             // Initialize poleSideMap with keys from latticeLevelSet
             for point in keyMaker latticeDimension poleSideLevel edgeLength do
                 poleSideMap.[point] <- []
 
-            { centerSideMap = centerSideMap
+            { 
+              centerSideMap = centerSideMap
               poleSideMap = poleSideMap
               latticeDimension = latticeDimension
               edgeLength = edgeLength
               poleSideLevel = poleSideLevel
               centerSideLevel = centerSideLevel  
               overCoverMap = overCoverMap
-              underCoverMap = underCoverMap }
+              underCoverMap = underCoverMap 
+            }
 
           member this.CenterSideMap with get() = this.centerSideMap
           member this.PoleSideMap with get() = this.poleSideMap
@@ -66,9 +68,9 @@ type latticeLevelSetMap =
               else
                   this.overCoverMap polePoint this.EdgeLength
 
-          member this.mapToPoleSide
-                (centerPoint: latticePoint) : latticePoint option =
-              this.centerSideMap.[centerPoint]
+          //member this.mapToPoleSide
+          //      (centerPoint: latticePoint) : latticePoint option =
+          //    this.centerSideMap.[centerPoint]
 
 
 module LatticeLevelSetMap =
@@ -178,8 +180,8 @@ module LatticeLevelSetMap =
                        |> Array.sort
                        |> Array.filter(fun ccp ->
                             match llsm.CenterSideMap.[ccp] with
-                            | Some _ -> false
-                            | None -> true
+                            | [] -> false
+                            | _ -> true
                        )
 
             let ccp = if (ccpWinners.Length > 0) then 
@@ -189,21 +191,21 @@ module LatticeLevelSetMap =
                          // failwith "Failed to initialize level set map: no available center side points."
 
             llsm.PoleSideMap.[lp] <- ccp :: llsm.PoleSideMap.[lp]
-            llsm.CenterSideMap.[ccp] <- Some lp
+            llsm.CenterSideMap.[ccp] <- lp :: llsm.CenterSideMap.[ccp]
 
         for lp in llsm.CenterSideMap.Keys do
             match llsm.CenterSideMap.[lp] with
-            | Some psp -> ()
-            | None ->
+            | [] ->
                 let pspCandidates = llsm.getPoleSidePointCandidates lp
                 if (not (llsm.PoleSideMap.ContainsKey(pspCandidates.[0]))) then
                     failwith "Failed to initialize level set map: pole side point not found in map."    
 
-
-                llsm.CenterSideMap.[lp] <- Some pspCandidates.[0]
+                llsm.CenterSideMap.[lp] <- [ pspCandidates.[0] ]
 
                 llsm.PoleSideMap.[pspCandidates.[0]] <-
                     lp :: llsm.PoleSideMap.[pspCandidates.[0]]
+
+            | _ -> ()
 
 
     let missingPoleCount
@@ -219,16 +221,15 @@ module LatticeLevelSetMap =
             (llsm: latticeLevelSetMap) : int =
         let centerMissing =
             llsm.CenterSideMap
-            |> Seq.filter(fun kvp -> kvp.Value.IsNone)
+            |> Seq.filter(fun kvp -> kvp.Value.Length = 0)
             |> Seq.length
         centerMissing
-
 
 
     let isComplete
             (llsm: latticeLevelSetMap) : bool =
         llsm.CenterSideMap
-        |> Seq.forall(fun kvp -> kvp.Value.IsSome)
+        |> Seq.forall(fun kvp -> kvp.Value.Length > 0)
         &&
         llsm.PoleSideMap
         |> Seq.forall(fun kvp -> kvp.Value.Length > 0)

@@ -16,14 +16,15 @@ module ProgressMessage =
     let reportRunResult (progress: IProgress<string> option) (result: RunResult) =
         match progress with
         | Some p ->
+            let timeStamp = DateTime.Now.ToLongTimeString ()
             let msg = 
                 match result with
                 | Success (idx, repl) -> 
-                    sprintf "✓ Run %d_%d completed successfully" %idx %repl
+                    sprintf "✓ %s  Run %d_%d completed successfully" timeStamp %idx %repl 
                 | Failure (idx, repl, error) -> 
-                    sprintf "✗ Run %d_%d failed: %s" %idx %repl error
+                    sprintf "✗ %s  Run %d_%d failed: %s" timeStamp %idx %repl error
                 | Skipped (idx, repl, reason) -> 
-                    sprintf "⊘ Run %d_%d skipped: %s" %idx %repl reason
+                    sprintf "⊘ %s  Run %d_%d skipped: %s" timeStamp %idx %repl reason
             p.Report(msg)
         | None -> ()
 
