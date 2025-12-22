@@ -16,7 +16,8 @@ module TextReporters =
 
     let binReportExecutor
             (db: IGeneSortDb)
-            (projectName: string<projectName>) 
+            (projectName: string<projectName>)
+            (yab: runParameters -> outputDataType -> queryParams)
             (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<unit> =
 
@@ -42,9 +43,10 @@ module TextReporters =
 
             do! runParamsArray
                 |> Array.map (fun runParams -> async {
-                    let queryParamsForSorterSetEval = queryParams.createFromRunParams (outputDataType.SorterSetEval None) runParams
+
+                    let queryParamsForSorterSetEval = yab runParams (outputDataType.SorterSetEval None) 
                     let sortingWidth = runParams.GetSortingWidth()
-                    let sorterModelKey =  runParams.GetSorterModelKey() |> SorterModelKey.toString
+                    let sorterModelKey =  runParams.GetSorterModelType() |> SorterModelType.toString
         
                     let! sorterSetEvalResult = db.loadAsync queryParamsForSorterSetEval
                     let sorterSetEval = 
@@ -72,6 +74,7 @@ module TextReporters =
     let ceUseProfileReportExecutor
             (db: IGeneSortDb)
             (projectName: string<projectName>) 
+            (yab: runParameters -> outputDataType -> queryParams)
             (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<unit> =
 
@@ -108,10 +111,10 @@ module TextReporters =
 
             do! runParamsArray
                 |> Array.map (fun runParams -> async {
-                    let queryParamsForSorterSetEval = queryParams.createFromRunParams (outputDataType.SorterSetEval None) runParams
+                    let queryParamsForSorterSetEval = yab runParams (outputDataType.SorterSetEval None) 
                     let repl = runParams.GetRepl() |> Repl.toString
                     let sortingWidth = runParams.GetSortingWidth() |> SortingWidth.toString
-                    let sorterModelKey = runParams.GetSorterModelKey() |> SorterModelKey.toString
+                    let sorterModelKey = runParams.GetSorterModelType() |> SorterModelType.toString
                     let sortableArrayDataType = runParams.GetSortableArrayDataType() |> SortableArrayDataType.toString
                     let mergeFillType = runParams.GetMergeFillType() |> MergeFillType.toString
                     let mergeDimension = runParams.GetMergeDimension() |> MergeDimension.toString

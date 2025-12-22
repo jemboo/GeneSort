@@ -54,7 +54,7 @@ let cts = new CancellationTokenSource()
 let executor = MergeIntQa.executor
 let project = MergeIntQa.project
 let projectName = MergeIntQa.project.ProjectName
-
+let yab = MergeIntQa.makeQueryParamsFromRunParams
 
 
 
@@ -65,11 +65,11 @@ let projectName = MergeIntQa.project.ProjectName
 
 
 
-ProjectOps.initProjectFiles geneSortDb project cts (Some progress) |> Async.RunSynchronously
+ProjectOps.initProjectFiles geneSortDb project yab cts (Some progress) |> Async.RunSynchronously
 ProjectOps.executeRuns geneSortDb projectName cts (Some progress) executor |> Async.RunSynchronously
 
-TextReporters.ceUseProfileReportExecutor geneSortDb projectName cts (Some progress) |> Async.RunSynchronously
-TextReporters.binReportExecutor geneSortDb projectName cts (Some progress) |> Async.RunSynchronously
+TextReporters.ceUseProfileReportExecutor geneSortDb projectName yab cts (Some progress) |> Async.RunSynchronously
+TextReporters.binReportExecutor geneSortDb projectName yab cts (Some progress) |> Async.RunSynchronously
 
 
 let endTime = System.DateTime.Now

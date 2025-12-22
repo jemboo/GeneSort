@@ -28,6 +28,33 @@ module MergeIntEvals =
     let randomType = rngType.Lcg
     let excludeSelfCe = true
 
+    let makeQueryParams 
+            (repl: int<replNumber> option) 
+            (sortingWidth:int<sortingWidth> option)
+            (sorterModelType:sorterModelType option)
+            (outputDataType: outputDataType) =
+             
+        queryParams.create(
+            Some projectName,
+            repl,
+            outputDataType,
+            [|
+                (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
+                (runParameters.sorterModelTypeKey, sorterModelType |> SorterModelType.toString);
+            |])
+
+
+    let makeQueryParamsFromRunParams
+            (runParams: runParameters) 
+            (outputDataType: outputDataType) =
+        makeQueryParams
+            (runParams.GetRepl())
+            (runParams.GetSortingWidth())
+            (runParams.GetSorterModelType())
+            outputDataType
+
+
+
     
     //let getSorterCountForSortingWidth (factor:int) (sortingWidth: int<sortingWidth>) : int<sorterCount> =
     //    match %sortingWidth with
@@ -142,27 +169,27 @@ module MergeIntEvals =
     //      Some sorterModelKey.Msuf6; ]      |> List.map(SorterModelKey.toString)
 
     let sorterModelKeyValues () : string list =
-        [ Some sorterModelKey.Mcse;
-          Some sorterModelKey.Mssi;
-          Some sorterModelKey.Msrs;]      |> List.map(SorterModelKey.toString)
+        [ Some sorterModelType.Mcse;
+          Some sorterModelType.Mssi;
+          Some sorterModelType.Msrs;]      |> List.map(SorterModelType.toString)
 
     let sorterModelKeys () : string*string list =
         (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
 
 
     let paramMapFilter (runParameters: runParameters) = 
-        let sorterModelKey = runParameters.GetSorterModelKey().Value
+        let sorterModelKey = runParameters.GetSorterModelType().Value
         let sortingWidth = %runParameters.GetSortingWidth().Value
         let has3factor = (sortingWidth % 3 = 0)
 
         match sorterModelKey with
-        | sorterModelKey.Mcse -> Some runParameters
-        | sorterModelKey.Mssi -> Some runParameters
-        | sorterModelKey.Msrs -> Some runParameters
-        | sorterModelKey.Msuf4 ->
+        | sorterModelType.Mcse -> Some runParameters
+        | sorterModelType.Mssi -> Some runParameters
+        | sorterModelType.Msrs -> Some runParameters
+        | sorterModelType.Msuf4 ->
                 if has3factor then None else
                 Some runParameters
-        | sorterModelKey.Msuf6 -> 
+        | sorterModelType.Msuf6 -> 
                 if has3factor then Some runParameters else
                 None
 
@@ -219,7 +246,7 @@ module MergeIntEvals =
         }
 
     let parameterSpans = 
-        [ Project.repl1s(); sortingWidths(); sorterModelKeys() ]
+        [ sortingWidths(); sorterModelKeys() ]
         
     let outputDataTypes = 
             [|                
@@ -251,7 +278,7 @@ module MergeIntEvals =
         async {
             let index = runParameters.GetIndex().Value  
             let repl = runParameters.GetRepl().Value
-            let sorterModelKey = runParameters.GetSorterModelKey().Value
+            let sorterModelKey = runParameters.GetSorterModelType().Value
             let sortingWidth = runParameters.GetSortingWidth().Value
             let stageLength = runParameters.GetStageLength().Value
             let ceLength = runParameters.GetCeLength().Value
@@ -267,21 +294,21 @@ module MergeIntEvals =
             // Create sorter model maker
             let sorterModelMaker =
                 match sorterModelKey with
-                | sorterModelKey.Mcse -> 
+                | sorterModelType.Mcse -> 
                     (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) 
                     |> sorterModelMaker.SmmMsceRandGen
-                | sorterModelKey.Mssi -> 
+                | sorterModelType.Mssi -> 
                     (MssiRandGen.create randomType sortingWidth stageLength) 
                     |> sorterModelMaker.SmmMssiRandGen
-                | sorterModelKey.Msrs -> 
+                | sorterModelType.Msrs -> 
                     let opsGenRatesArray = OpsGenRatesArray.createUniform %stageLength
                     (msrsRandGen.create randomType sortingWidth opsGenRatesArray) 
                     |> sorterModelMaker.SmmMsrsRandGen
-                | sorterModelKey.Msuf4 -> 
+                | sorterModelType.Msuf4 -> 
                     let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageLength %sortingWidth
                     (msuf4RandGen.create randomType sortingWidth stageLength uf4GenRatesArray) 
                     |> sorterModelMaker.SmmMsuf4RandGen
-                | sorterModelKey.Msuf6 -> 
+                | sorterModelType.Msuf6 -> 
                     let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
                     (msuf6RandGen.create randomType sortingWidth stageLength uf6GenRatesArray) 
                     |> sorterModelMaker.SmmMsuf6RandGen
@@ -316,22 +343,17 @@ module MergeIntEvals =
             | None -> ()
 
             // Save sorter set
-            let queryParamsForSorterSet = queryParams.createFromRunParams (outputDataType.SorterSet None) runParameters
+            let queryParamsForSorterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet None) 
             do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet)
 
             // Save sorterSetEval
-            let queryParamsForSorterSetEval = queryParams.createFromRunParams (outputDataType.SorterSetEval None) runParameters
+            let queryParamsForSorterSetEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval None)
             do! db.saveAsync queryParamsForSorterSetEval (sorterSetEval |> outputData.SorterSetEval)
 
             // Save sorterModelSetMaker
-            let queryParamsForSorterModelSetMaker = 
-                queryParams.createFromRunParams (outputDataType.SorterModelSetMaker None) runParameters
+            let queryParamsForSorterModelSetMaker = makeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSetMaker None)
             do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker)
 
             // Mark run as finished
             runParameters.SetRunFinished true
-        
-            match progress with
-            | Some p -> p.Report(sprintf "✓ Finished executing Run %d_%d" index %repl)
-            | None -> ()
         }

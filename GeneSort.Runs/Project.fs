@@ -120,10 +120,4 @@ module Project =
             project.ParameterSpans
             newMaxReplicate
             project.OutputDataTypes
-            paramRefiner    
-
-
-    let repl1s() : string*string list =
-            (runParameters.replKey, [0;] |> List.map(fun d -> d.ToString()))
-    let repl4s() : string*string list =
-            (runParameters.replKey, [0; 1; 2; 3;] |> List.map(fun d -> d.ToString()))
+            paramRefiner

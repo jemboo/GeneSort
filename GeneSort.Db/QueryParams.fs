@@ -1,68 +1,77 @@
-﻿
-namespace GeneSort.Db
+﻿namespace GeneSort.Db
 
 open FSharp.UMX
 open GeneSort.Runs
+open GeneSort.Core
 
-type queryParams =
-    private {
+type queryParams = 
+    private { 
         projectName: string<projectName> option
-        index: int<indexNumber> option
         repl: int<replNumber> option
-        generation: int<generationNumber> option
         outputDataType: outputDataType
+        properties: Map<string, string>
+        mutable idCache: System.Guid option
     }
-    member this.ProjectName with get() = 
-                    match this.projectName with
-                        | Some name -> %name
-                        | None -> "NoName"
-
-    member this.Index with get() = this.index
-    member this.Repl with get() = this.repl
-    member this.Generation with get() = this.generation
-    member this.OutputDataType with get() = this.outputDataType
     
-    static member create(
-            projectName: string<projectName> option,
-            index: int<indexNumber> option, 
-            repl: int<replNumber> option, 
-            generation: int<generationNumber> option, 
-            outputDataType: outputDataType) : queryParams =
-        {
+    member this.ProjectName 
+        with get() = 
+            match this.projectName with
+            | Some name -> %name
+            | None -> "NoName"
+    
+    member this.Repl 
+        with get() = this.repl
+    
+    member this.OutputDataType 
+        with get() = this.outputDataType
+    
+    member this.Properties 
+        with get() = this.properties
+    
+    member this.Id 
+        with get() : System.Guid = 
+            match this.idCache with
+            | Some guid -> guid
+            | None ->
+                let guid = 
+                    GuidUtils.guidFromObjs [
+                        box this.projectName
+                        box this.repl
+                        box this.outputDataType
+                        box (this.properties |> Map.toSeq |> Seq.sortBy fst |> Seq.toArray)
+                    ]
+                this.idCache <- Some guid
+                guid
+    
+    static member create (
+        projectName: string<projectName> option,
+        repl: int<replNumber> option,
+        outputDataType: outputDataType,
+        properties: (string*string) []) : queryParams = 
+        { 
             projectName = projectName
-            index = index
             repl = repl
-            generation = generation
             outputDataType = outputDataType
+            properties = properties |> Map.ofArray
+            idCache = None
         }
     
-    static member createForProject(projectName: string<projectName>) : queryParams =
-        {
+    static member createForProject(projectName: string<projectName>) : queryParams = 
+        { 
             projectName = (Some projectName)
-            index = None
             repl = None
-            generation = None
             outputDataType = outputDataType.Project
+            properties = Map.empty
+            idCache = None
         }
     
-    static member createForTextReport
-            (projectName: string<projectName>) 
-            (textReportName: string<textReportName>) : queryParams =
-        {
+    static member createForTextReport 
+        (projectName: string<projectName>) 
+        (textReportName: string<textReportName>) : queryParams = 
+        { 
             projectName = (Some projectName)
-            index = None
             repl = None
-            generation = None
             outputDataType = outputDataType.TextReport textReportName
-        }
-
-    static member createFromRunParams 
-                (outputDataType:outputDataType)
-                (runParams: runParameters) : queryParams =
-        {
-            projectName = runParams.GetProjectName()
-            index = runParams.GetIndex()
-            repl = runParams.GetRepl()
-            generation = runParams.GetGeneration()
-            outputDataType = outputDataType
+            properties = Map.empty
+            idCache = None
         }

@@ -186,11 +186,11 @@ type runParameters =
 
 
     /// Gets the SorterModelKey value.
-    member this.GetSorterModelKey() : sorterModelKey option =
+    member this.GetSorterModelType() : sorterModelType option =
         match this.paramMap.TryFind runParameters.sorterModelTypeKey with
         | Some value -> 
             try
-                Some (SorterModelKey.fromString value)
+                Some (SorterModelType.fromString value)
             with
             | _ -> None
         | None -> None
@@ -201,8 +201,8 @@ type runParameters =
         | None -> None
 
     /// Sets the SorterModelKey value.
-    member this.SetSorterModelKey(sorterModelKey: sorterModelKey option) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.sorterModelTypeKey, SorterModelKey.toString sorterModelKey)
+    member this.SetSorterModelKey(sorterModelKey: sorterModelType option) : unit =
+        this.paramMap <- this.paramMap.Add(runParameters.sorterModelTypeKey, SorterModelType.toString sorterModelKey)
 
 
 

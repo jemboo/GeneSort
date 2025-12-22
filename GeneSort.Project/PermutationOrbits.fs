@@ -18,6 +18,36 @@ module PermutationOrbits =
 
     let randomType = rngType.Lcg
     let sortableArrayDataType = sortableArrayDataType.Ints
+
+
+
+    let makeQueryParams 
+            (repl: int<replNumber> option) 
+            (sortingWidth:int<sortingWidth> option)
+            (sorterModelType:sorterModelType option)
+            (outputDataType: outputDataType) =
+             
+        queryParams.create(
+            Some projectName,
+            repl,
+            outputDataType,
+            [|
+                (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
+                (runParameters.sorterModelTypeKey, sorterModelType |> SorterModelType.toString);
+            |])
+
+
+    let makeQueryParamsFromRunParams
+            (runParams: runParameters) 
+            (outputDataType: outputDataType) =
+        makeQueryParams
+            (runParams.GetRepl())
+            (runParams.GetSortingWidth())
+            (runParams.GetSorterModelType())
+            outputDataType
+
+
+
     let testModelCount = 20<sorterTestModelCount>
     let maxOrbiit = 200000
     

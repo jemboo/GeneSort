@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SorterModelKey.fs" />
+    <Compile Include="SorterModelType.fs" />
     <Compile Include="StageLength.fs" />
     <Compile Include="RunParameters.fs" />
     <Compile Include="OutputDataType.fs" />

@@ -29,10 +29,9 @@ type IGeneSortDb =
 
     abstract member saveAllRunParametersAsync : 
             runParameters[] -> 
+            (runParameters -> outputDataType -> queryParams) ->
             CancellationToken option -> 
             IProgress<string> option -> Async<unit>
-
-
 
 
 module GeneSortDb =

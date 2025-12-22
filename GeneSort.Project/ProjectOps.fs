@@ -32,10 +32,9 @@ module ProjectOps =
                     let queryParamsForRunParams = 
                         queryParams.create( 
                             runParameters.GetProjectName(),
-                            runParameters.GetIndex(), 
                             runParameters.GetRepl(), 
-                            None, 
-                            outputDataType.RunParameters)
+                            outputDataType.RunParameters,
+                            [||])
                 
                     do! db.saveAsync queryParamsForRunParams (runParameters |> outputData.RunParameters)
 
@@ -123,6 +122,7 @@ module ProjectOps =
             (db: IGeneSortDb)
             (projectName: string<projectName>)
             (runParameterArray: runParameters[]) 
+            (yab: runParameters -> outputDataType -> queryParams)
             (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<Result<unit, string>> =
         async {
@@ -133,7 +133,7 @@ module ProjectOps =
             
                 cts.Token.ThrowIfCancellationRequested()
             
-                do! db.saveAllRunParametersAsync runParameterArray (Some cts.Token) progress
+                do! db.saveAllRunParametersAsync runParameterArray yab (Some cts.Token) progress
             
                 match progress with
                 | Some p -> p.Report(sprintf "Successfully saved %d RunParameter files" runParameterArray.Length)
@@ -161,6 +161,7 @@ module ProjectOps =
     let initProjectFiles
         (db: IGeneSortDb)
         (project: project)
+        (yab: runParameters -> outputDataType -> queryParams)
         (cts: CancellationTokenSource) 
         (progress: IProgress<string> option) : Async<Result<unit, string>> =
         async {
@@ -169,6 +170,7 @@ module ProjectOps =
                 | Some p -> p.Report(sprintf "Saving project file: %s" %project.ProjectName)
                 | None -> ()
             
+                // Save project
                 let queryParams = queryParams.createForProject project.ProjectName
                 do! db.saveAsync queryParams (project |> outputData.Project)
             
@@ -176,7 +178,8 @@ module ProjectOps =
                 | Some p -> p.Report(sprintf "Saving run parameters files: (%d)" project.RunParametersArray.Length)
                 | None -> ()
             
-                let! initResult = initParametersFiles db project.ProjectName project.RunParametersArray cts progress
+                let! initResult = initParametersFiles 
+                                    db project.ProjectName project.RunParametersArray yab cts progress
             
                 match initResult with
                 | Ok () ->

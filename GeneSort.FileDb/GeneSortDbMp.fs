@@ -81,17 +81,12 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
 
         member this.saveAllRunParametersAsync 
                         (runParamsArray: runParameters[]) 
+                        (yab: runParameters -> outputDataType -> queryParams)
                         (ct: CancellationToken option) 
                         (progress: IProgress<string> option) : Async<unit> =
             async {
                 for runParams in runParamsArray do
-                    let queryParamsForRunParams = 
-                        queryParams.create(
-                                runParams.GetProjectName(),
-                                runParams.GetIndex(),
-                                runParams.GetRepl(),
-                                None,
-                                outputDataType.RunParameters)
+                    let queryParamsForRunParams = yab runParams outputDataType.RunParameters
                     do! (this :> IGeneSortDb).saveAsync queryParamsForRunParams (runParams |> outputData.RunParameters)
                     match progress with
                     | Some p -> p.Report(sprintf "Saved RunParameters for Run %d" (runParams.GetIndex().Value))

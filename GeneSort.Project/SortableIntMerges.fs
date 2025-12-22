@@ -97,7 +97,6 @@ module SortableIntMerges =
 
     let parameterSpans = 
         [
-                Project.repl1s(); 
                 sortingWidths();
                 sortableArrayDataTypeKeys(); 
                 mergeDimensions(); 
@@ -180,8 +179,5 @@ module SortableIntMerges =
 
             // Mark run as finished
             runParameters.SetRunFinished true
-        
-            match progress with
-            | Some p -> p.Report(sprintf "✓ Finished executing Run %d_%d" index %repl)
-            | None -> ()
+       
         }
