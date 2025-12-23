@@ -60,8 +60,8 @@ type runParameters =
         | None -> None
     
     /// Sets the Index value.
-    member this.SetIndex(index: string<idValue>) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.idKey, (UMX.untag index).ToString())
+    member this.SetId(id: string<idValue>) : unit =
+        this.paramMap <- this.paramMap.Add(runParameters.idKey, (UMX.untag id).ToString())
 
 
 
@@ -335,17 +335,6 @@ module RunParameters =
         |> Seq.distinct
         |> Seq.toArray
 
-    let getIndexAndReplName (runParams: runParameters) : string =
-        let indexStr = 
-            match runParams.GetId() with
-            | Some index -> sprintf "Index_%s" (UMX.untag index)
-            | None -> "Index_None"
-        let replStr = 
-            match runParams.GetRepl() with
-            | Some repl -> sprintf "Repl_%d" (UMX.untag repl)
-            | None -> "Repl_None"
-        sprintf "%s_%s" indexStr replStr 
-
 
     let tableToTabDelimited (table: string[][]) : string[] =
         table
@@ -361,7 +350,6 @@ module RunParameters =
         let dataRows =
             runParams
             |> Seq.map (fun rp ->
-                let rowHeader = getIndexAndReplName rp
                 let rowValues =
                     keys
                     |> Array.map (fun key ->
@@ -369,10 +357,10 @@ module RunParameters =
                         | Some value -> value
                         | None -> "N/A"
                     )
-                Array.append [| rowHeader |] rowValues
+                rowValues
             )
             |> Seq.toArray
-        Array.append [| headerRow |] dataRows
+        Array.append [| keys |] dataRows
     
 
     let toStringTable(runParams :runParameters seq) : string =

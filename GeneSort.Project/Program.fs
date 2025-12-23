@@ -57,8 +57,8 @@ let executor = MergeIntQa.executor
 let projectName = MergeIntQa.projectName
 let yab = MergeIntQa.makeQueryParamsFromRunParams
 let paramRefiner = MergeIntQa.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+let minReplica = 2<replNumber>
+let maxReplica = 4<replNumber>
 
 
 

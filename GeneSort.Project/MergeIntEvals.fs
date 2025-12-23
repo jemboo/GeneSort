@@ -223,7 +223,7 @@ module MergeIntEvals =
 
         let enhancer (runParameters : runParameters) : runParameters =
             let queryParams = makeQueryParamsFromRunParams runParameters (outputDataType.RunParameters)
-            runParameters.SetIndex ((queryParams.Id.ToString()) |> UMX.tag<idValue>)
+            runParameters.SetId ((queryParams.Id.ToString()) |> UMX.tag<idValue>)
 
             runParameters.SetRunFinished false
             runParameters.SetProjectName projectName

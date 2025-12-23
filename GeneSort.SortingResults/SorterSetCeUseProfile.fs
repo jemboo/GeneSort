@@ -46,6 +46,7 @@ module SorterCeUseProfile =
         }
 
     let makeReportLine 
+            (id:string)
             (repl:string)
             (sortingWidth:string) 
             (sorterModelKey:string)
@@ -54,6 +55,7 @@ module SorterCeUseProfile =
             (mergeDimension:string)
             (profile: sorterCeUseProfile) : string[] =
         [|
+            yield id
             yield repl
             yield sortingWidth
             yield sorterModelKey
@@ -103,6 +105,7 @@ module SorterSetCeUseProfile =
         }
 
     let makeReportLines 
+            (id: string)
             (repl:string) 
             (sortingWidth:string) 
             (sorterModelKey:string)
@@ -113,6 +116,7 @@ module SorterSetCeUseProfile =
         [|
                 for profile in sorterSetCeUseProfile.sorterCeUseProfiles do
                     yield SorterCeUseProfile.makeReportLine 
+                                                id
                                                 repl    
                                                 sortingWidth 
                                                 sorterModelKey

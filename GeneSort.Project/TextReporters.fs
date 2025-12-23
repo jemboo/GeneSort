@@ -97,7 +97,7 @@ module TextReporters =
                               (  (Array.init 20 (fun i -> i.ToString()))
                                     |> Array.append 
                                   [| 
-                                        "Repl"; "Sorting Width"; "SorterModel"; "DataType"; 
+                                        "Id"; "Repl"; "SortingWidth"; "SorterModel"; "DataType"; 
                                         "MergeFillType"; "MergeDimension"; "sorterId"; 
                                         "sorterSetId"; "sorterTestsId"; "UnsortedCount"; 
                                         "CeCount"; "StageCount";"lastCe" 
@@ -112,6 +112,7 @@ module TextReporters =
             do! runParamsArray
                 |> Array.map (fun runParams -> async {
                     let queryParamsForSorterSetEval = yab runParams (outputDataType.SorterSetEval None) 
+                    let id = %runParams.GetId().Value
                     let repl = runParams.GetRepl() |> Repl.toString
                     let sortingWidth = runParams.GetSortingWidth() |> SortingWidth.toString
                     let sorterModelKey = runParams.GetSorterModelType() |> SorterModelType.toString
@@ -130,7 +131,8 @@ module TextReporters =
                         | Error err -> failwith (sprintf "Error loading SorterSetEval: %s" err)
 
                     let sorterSetCeUseProfile = SorterSetCeUseProfile.makeSorterSetCeUseProfile binCount blockGrowthRate sorterSetEval
-                    let reportLines = SorterSetCeUseProfile.makeReportLines 
+                    let reportLines = SorterSetCeUseProfile.makeReportLines
+                                            id
                                             repl
                                             sortingWidth 
                                             sorterModelKey
