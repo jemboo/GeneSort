@@ -7,7 +7,7 @@ open GeneSort.Sorter.Sortable
 
 [<Measure>] type projectName
 [<Measure>] type textReportName
-[<Measure>] type indexNumber
+[<Measure>] type idValue
 [<Measure>] type replNumber
 [<Measure>] type generationNumber
 
@@ -26,7 +26,7 @@ type runParameters =
         { paramMap = paramMap }
 
     /// Keys for parameters
-    static member indexKey = "Index"
+    static member idKey = "Id"
     static member replKey = "Repl"
     static member generationKey = "Generation"
     static member runFinishedKey = "RunFinished"
@@ -54,17 +54,14 @@ type runParameters =
 
 
     /// Gets the Index value.
-    member this.GetIndex() : int<indexNumber> option =
-        match this.paramMap.TryFind runParameters.indexKey with
-        | Some value -> 
-            match Int32.TryParse(value) with
-            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<indexNumber>)
-            | false, _ -> None
+    member this.GetId() : string<idValue> option =
+        match this.paramMap.TryFind runParameters.idKey with
+        | Some value -> Some (value |> UMX.tag<idValue>)
         | None -> None
     
     /// Sets the Index value.
-    member this.SetIndex(index: int<indexNumber>) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.indexKey, (UMX.untag index).ToString())
+    member this.SetIndex(index: string<idValue>) : unit =
+        this.paramMap <- this.paramMap.Add(runParameters.idKey, (UMX.untag index).ToString())
 
 
 
@@ -340,8 +337,8 @@ module RunParameters =
 
     let getIndexAndReplName (runParams: runParameters) : string =
         let indexStr = 
-            match runParams.GetIndex() with
-            | Some index -> sprintf "Index_%d" (UMX.untag index)
+            match runParams.GetId() with
+            | Some index -> sprintf "Index_%s" (UMX.untag index)
             | None -> "Index_None"
         let replStr = 
             match runParams.GetRepl() with

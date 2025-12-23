@@ -52,9 +52,8 @@ type ProjectTests() =
                 outputDataType.TextReport ("Report4" |> UMX.tag<textReportName>);
             |]
 
-        Project.create
+        project.create
             ("TestProject"  |> UMX.tag<projectName>)
             "Test Description"
             parameterSpans
-            3<replNumber>
             outputDataTypes

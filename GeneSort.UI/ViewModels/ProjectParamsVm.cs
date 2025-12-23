@@ -115,18 +115,18 @@ namespace GeneSort.UI.ViewModels
             // Extract the runParameters for the selected rows
             var selectedRunParameters = new List<runParameters>();
 
-            foreach (var selectedItem in selectedItems)
-            {
-                // Get the index (1-based in UI, 0-based in array)
-                if (selectedItem.TryGetValue("Index", out var indexObj) && indexObj is int index)
-                {
-                    var arrayIndex = index - 1; // Convert to 0-based
-                    if (arrayIndex >= 0 && arrayIndex < Workspace.RunParametersArray.Length)
-                    {
-                        selectedRunParameters.Add(Workspace.RunParametersArray[arrayIndex]);
-                    }
-                }
-            }
+            //foreach (var selectedItem in selectedItems)
+            //{
+            //    // Get the index (1-based in UI, 0-based in array)
+            //    if (selectedItem.TryGetValue("Index", out var indexObj) && indexObj is int index)
+            //    {
+            //        var arrayIndex = index - 1; // Convert to 0-based
+            //        if (arrayIndex >= 0 && arrayIndex < Workspace.RunParametersArray.Length)
+            //        {
+            //            selectedRunParameters.Add(Workspace.RunParametersArray[arrayIndex]);
+            //        }
+            //    }
+            //}
 
             // Call your report generation method here
             await ExecuteReportGeneration(reportKey, selectedRunParameters);
@@ -205,10 +205,10 @@ namespace GeneSort.UI.ViewModels
                         throw new InvalidDataException("Workspace name is required");
                     }
 
-                    if (project.RunParametersArray == null || project.RunParametersArray.Length == 0)
-                    {
-                        throw new InvalidDataException("Workspace must contain at least one run parameter set");
-                    }
+                    //if (project.RunParametersArray == null || project.RunParametersArray.Length == 0)
+                    //{
+                    //    throw new InvalidDataException("Workspace must contain at least one run parameter set");
+                    //}
 
                     Workspace = project; // Store for future use
 
@@ -341,35 +341,35 @@ namespace GeneSort.UI.ViewModels
 
             // Create data rows
             var dataRows = new ObservableCollection<Dictionary<string, object>>();
-            var runParametersArray = project.RunParametersArray;
+            //var runParametersArray = project.RunParametersArray;
 
-            for (int i = 0; i < runParametersArray.Length; i++)
-            {
-                var runParam = runParametersArray[i];
-                var row = new Dictionary<string, object>
-                {
-                    ["Index"] = i + 1,
-                    ["RunParams"] = runParam
-                };
+            //for (int i = 0; i < runParametersArray.Length; i++)
+            //{
+            //    var runParam = runParametersArray[i];
+            //    var row = new Dictionary<string, object>
+            //    {
+            //        ["Index"] = i + 1,
+            //        ["RunParams"] = runParam
+            //    };
 
-                // Add parameter values for each key
-                if (parameterKeys != null)
-                {
-                    foreach (var key in parameterKeys)
-                    {
-                        if (runParam.ParamMap != null && runParam.ParamMap.TryGetValue(key, out var value))
-                        {
-                            row[key] = value ?? string.Empty;
-                        }
-                        else
-                        {
-                            row[key] = string.Empty;
-                        }
-                    }
-                }
+            //    // Add parameter values for each key
+            //    if (parameterKeys != null)
+            //    {
+            //        foreach (var key in parameterKeys)
+            //        {
+            //            if (runParam.ParamMap != null && runParam.ParamMap.TryGetValue(key, out var value))
+            //            {
+            //                row[key] = value ?? string.Empty;
+            //            }
+            //            else
+            //            {
+            //                row[key] = string.Empty;
+            //            }
+            //        }
+            //    }
 
-                dataRows.Add(row);
-            }
+            //    dataRows.Add(row);
+            //}
 
             dataGrid.ItemsSource = dataRows;
 

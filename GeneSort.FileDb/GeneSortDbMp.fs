@@ -89,7 +89,7 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
                     let queryParamsForRunParams = yab runParams outputDataType.RunParameters
                     do! (this :> IGeneSortDb).saveAsync queryParamsForRunParams (runParams |> outputData.RunParameters)
                     match progress with
-                    | Some p -> p.Report(sprintf "Saved RunParameters for Run %d" (runParams.GetIndex().Value))
+                    | Some p -> p.Report(sprintf "Saved RunParameters for Run %s" %(runParams.GetId().Value))
                     | None -> ()
                 return ()
             }

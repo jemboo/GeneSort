@@ -7,6 +7,7 @@ open GeneSort.Db
 open GeneSort.FileDb
 open GeneSort.Project
 open System.Threading
+open GeneSort.Runs
 
 
 
@@ -51,10 +52,14 @@ let cts = new CancellationTokenSource()
 
 
 /// **********     MergeIntQa   ****************
-let executor = MergeIntQa.executor
 let project = MergeIntQa.project
-let projectName = MergeIntQa.project.ProjectName
+let executor = MergeIntQa.executor
+let projectName = MergeIntQa.projectName
 let yab = MergeIntQa.makeQueryParamsFromRunParams
+let paramRefiner = MergeIntQa.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
+
 
 
 
@@ -65,7 +70,7 @@ let yab = MergeIntQa.makeQueryParamsFromRunParams
 
 
 
-ProjectOps.initProjectFiles geneSortDb project yab cts (Some progress) |> Async.RunSynchronously
+ProjectOps.initProjectFiles geneSortDb yab cts (Some progress) project minReplica maxReplica paramRefiner |> Async.RunSynchronously
 ProjectOps.executeRuns geneSortDb projectName cts (Some progress) executor |> Async.RunSynchronously
 
 TextReporters.ceUseProfileReportExecutor geneSortDb projectName yab cts (Some progress) |> Async.RunSynchronously

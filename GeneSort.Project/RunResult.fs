@@ -1,13 +1,14 @@
 ﻿namespace GeneSort.Project
 
+open FSharp.UMX
 open GeneSort.Runs
 
 
 
 type RunResult =
-    | Success of runIndex: int<indexNumber> * runRepl: int<replNumber>
-    | Failure of runIndex: int<indexNumber> * runRepl: int<replNumber> * error: string
-    | Skipped of runIndex: int<indexNumber> * runRepl: int<replNumber> * reason: string
+    | Success of runId: string<idValue> * runRepl: int<replNumber>
+    | Failure of runId: string<idValue> * runRepl: int<replNumber> * error: string
+    | Skipped of runId: string<idValue> * runRepl: int<replNumber> * reason: string
 
 
 

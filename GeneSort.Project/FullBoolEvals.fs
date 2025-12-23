@@ -84,28 +84,6 @@ module FullBoolEvals =
 
 
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
-        let mutable lastRepl: int<replNumber> option = None
-        let mutable index = 0
-
-        let assignRepl (runParams: runParameters) : runParameters =
-            match lastRepl with
-            | None ->
-                lastRepl <- runParams.GetRepl()
-                runParams.SetIndex (UMX.tag<indexNumber> index)
-
-            | Some lastRplV ->
-                match runParams.GetRepl() with
-                | None ->
-                    failwith "repl should be present"
-                | Some paramRpl ->
-                    if not (%paramRpl = %lastRplV) then 
-                        index <- 0
-                        lastRepl <- runParams.GetRepl()
-                    runParams.SetIndex (UMX.tag<indexNumber> index)
-
-            index <- index + 1
-            runParams
-
 
         let enhancer (runParameters : runParameters) : runParameters =
             runParameters.SetRunFinished false
@@ -117,7 +95,7 @@ module FullBoolEvals =
             for runParameters in runParametersSeq do
                     let filtrate = paramMapFilter runParameters
                     if filtrate.IsSome then
-                        let retVal = filtrate.Value |> enhancer |> assignRepl
+                        let retVal = filtrate.Value |> enhancer
                         yield retVal
         }
 
@@ -136,13 +114,11 @@ module FullBoolEvals =
 
 
     let project = 
-            Project.create 
+            project.create 
                 projectName 
                 projectDesc
                 parameterSpans
-                1<replNumber>
                 outputDataTypes
-                paramMapRefiner
 
 
     let executor
@@ -152,12 +128,12 @@ module FullBoolEvals =
             (progress: IProgress<string> option) : Async<unit> =
 
         async {
-            let index = runParameters.GetIndex().Value  
+            let index = runParameters.GetId().Value  
             let repl = runParameters.GetRepl().Value
             let sortingWidth = runParameters.GetSortingWidth().Value
         
             match progress with
-            | Some p -> p.Report(sprintf "Executing Run %d_%d  %s" index %repl (runParameters.toString()))
+            | Some p -> p.Report(sprintf "Executing Run %s_%d  %s" %index %repl (runParameters.toString()))
             | None -> ()
         
             // Check cancellation before starting expensive operations
@@ -181,7 +157,7 @@ module FullBoolEvals =
                               runParameters.GetReplKvp().Value; 
                               runParameters.GetSortingWidthKvp().Value |]
                   |> Option.defaultWith(fun () -> 
-                        failwith (sprintf "No matching source run parameters found for Run %d_%d" index %repl))
+                        failwith (sprintf "No matching source run parameters found for Run %s_%d" %index %repl))
 
 
             // Load sorter set
@@ -200,7 +176,7 @@ module FullBoolEvals =
 
             cts.Token.ThrowIfCancellationRequested()
             match progress with
-            | Some p -> p.Report(sprintf "Run %d_%d: Saving sorterSet test results" index %repl)
+            | Some p -> p.Report(sprintf "Run %s_%d: Saving sorterSet test results" %index %repl)
             | None -> ()
 
             
@@ -211,6 +187,6 @@ module FullBoolEvals =
             // Mark run as finished
             runParameters.SetRunFinished true
 
-
+    }
 
 

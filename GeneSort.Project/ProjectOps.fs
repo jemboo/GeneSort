@@ -18,7 +18,7 @@ module ProjectOps =
             (cts: CancellationTokenSource)  
             (progress: IProgress<string> option) : Async<RunResult> = 
         async {
-            let index = runParameters.GetIndex().Value
+            let index = runParameters.GetId().Value
             let repl = runParameters.GetRepl().Value
         
             try
@@ -118,7 +118,7 @@ module ProjectOps =
 
 
 
-    let initParametersFiles 
+    let saveParametersFiles 
             (db: IGeneSortDb)
             (projectName: string<projectName>)
             (runParameterArray: runParameters[]) 
@@ -160,10 +160,14 @@ module ProjectOps =
 
     let initProjectFiles
         (db: IGeneSortDb)
-        (project: project)
         (yab: runParameters -> outputDataType -> queryParams)
         (cts: CancellationTokenSource) 
-        (progress: IProgress<string> option) : Async<Result<unit, string>> =
+        (progress: IProgress<string> option) 
+        (project: project) 
+        (minReplica: int<replNumber>) 
+        (maxReplica: int<replNumber>)
+        (paramRefiner: runParameters seq -> runParameters seq) : Async<Result<unit, string>> =
+
         async {
             try
                 match progress with
@@ -174,12 +178,13 @@ module ProjectOps =
                 let queryParams = queryParams.createForProject project.ProjectName
                 do! db.saveAsync queryParams (project |> outputData.Project)
             
+                let runParametersArray = Project.makeRunParameters minReplica maxReplica project.ParameterSpans paramRefiner
                 match progress with
-                | Some p -> p.Report(sprintf "Saving run parameters files: (%d)" project.RunParametersArray.Length)
+                | Some p -> p.Report(sprintf "Saving run parameters files: (%d)" runParametersArray.Length)
                 | None -> ()
-            
-                let! initResult = initParametersFiles 
-                                    db project.ProjectName project.RunParametersArray yab cts progress
+
+                let! initResult = saveParametersFiles 
+                                    db project.ProjectName runParametersArray yab cts progress
             
                 match initResult with
                 | Ok () ->

@@ -61,7 +61,6 @@ module RandomSorters4to64 =
 
 
 
-
     // Parameter spans:
     
     let sortingWidthValues = 
@@ -80,40 +79,6 @@ module RandomSorters4to64 =
 
     let sorterModelKeys () : string*string list =
         (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
-
-
-    let getIndex 
-            (sortingWidth:int<sortingWidth> option) 
-            (smk:sorterModelType option) : int<indexNumber> =
-        
-        let sortingWidthIndex = 
-            match sortingWidth with
-            | None -> failwith "sortingWidth is needed for index"
-            | Some sw ->
-                match %sw with
-                | 4 -> 1
-                | 6 -> 2
-                | 8 -> 3
-                | 12 -> 4
-                | 16 -> 5
-                | 24 -> 6
-                | 32 -> 7
-                | 48 -> 8
-                | 64 -> 9
-                | _ -> failwith (sprintf "sortingWidth: %d not handled" %sw)
-
-        let smkIndex = 
-            match smk with
-            | None -> failwith "sorterModel key is needed for index"
-            | Some smkv ->
-                match smkv with
-                | sorterModelType.Mcse -> 1
-                | sorterModelType.Mssi -> 2
-                | sorterModelType.Msrs -> 3
-                | sorterModelType.Msuf4 -> 4
-                | sorterModelType.Msuf6 -> 5
-
-        (sortingWidthIndex * smkIndex) |> UMX.tag<indexNumber>
 
 
     let getSorterCountForSortingWidth (factor:int) (sortingWidth: int<sortingWidth>) : int<sorterCount> =
@@ -180,31 +145,10 @@ module RandomSorters4to64 =
 
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
 
-        let mutable lastRepl: int<replNumber> option = None
-
-        let assignRepl (runParams: runParameters) : runParameters =
-            
-            let sw = runParams.GetSortingWidth()
-            let smk = runParams.GetSorterModelType()
-            let index = getIndex sw smk
-
-            match lastRepl with
-            | None ->
-                lastRepl <- runParams.GetRepl()
-                runParams.SetIndex index
-
-            | Some lastRplV ->
-                match runParams.GetRepl() with
-                | None ->
-                    failwith "repl should be present"
-                | Some paramRpl ->
-                    if not (%paramRpl = %lastRplV) then 
-                        lastRepl <- runParams.GetRepl()
-                    runParams.SetIndex index
-            runParams
-
-
         let enhancer (runParameters : runParameters) : runParameters =
+            let queryParams = makeQueryParamsFromRunParams runParameters (outputDataType.RunParameters)
+            runParameters.SetIndex ((queryParams.Id.ToString()) |> UMX.tag<idValue>)
+
             runParameters.SetRunFinished false
             runParameters.SetProjectName projectName
 
@@ -226,7 +170,7 @@ module RandomSorters4to64 =
             for runParameters in runParametersSeq do
                     let filtrate = paramMapFilter runParameters
                     if filtrate.IsSome then
-                        let retVal = filtrate.Value |> enhancer |> assignRepl
+                        let retVal = filtrate.Value |> enhancer
                         yield retVal
         }
 
@@ -243,16 +187,12 @@ module RandomSorters4to64 =
     let parameterSpans = 
         [ sortingWidths(); sorterModelKeys() ]
 
-
     let project = 
-            Project.create 
+            project.create 
                 projectName 
                 projectDesc
                 parameterSpans
-                1<replNumber>
                 outputDataTypes
-                paramMapRefiner
-
 
     let executor
             (db: IGeneSortDb)
@@ -261,7 +201,7 @@ module RandomSorters4to64 =
             (progress: IProgress<string> option) : Async<unit> =
 
         async {
-            let index = runParameters.GetIndex().Value  
+            let index = runParameters.GetId().Value  
             let repl = runParameters.GetRepl().Value
             let sorterModelKey = runParameters.GetSorterModelType().Value
             let sortingWidth = runParameters.GetSortingWidth().Value
@@ -270,7 +210,7 @@ module RandomSorters4to64 =
             let sorterCount = runParameters.GetSorterCount().Value
         
             match progress with
-            | Some p -> p.Report(sprintf "Executing Run %d_%d  %s" index %repl (runParameters.toString()))
+            | Some p -> p.Report(sprintf "Executing Run %s_%d  %s" %index %repl (runParameters.toString()))
             | None -> ()
         
             // Check cancellation before starting expensive operations
@@ -299,7 +239,7 @@ module RandomSorters4to64 =
                     |> sorterModelMaker.SmmMsuf6RandGen
         
             match progress with
-            | Some p -> p.Report(sprintf "Run %d_%d: Creating sorter set" index %repl)
+            | Some p -> p.Report(sprintf "Run %s_%d: Creating sorter set" %index %repl)
             | None -> ()
         
             // Check cancellation before generating sorters
@@ -311,7 +251,7 @@ module RandomSorters4to64 =
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
         
             match progress with
-            | Some p -> p.Report(sprintf "Run %d_%d: Saving sorter set" index %repl)
+            | Some p -> p.Report(sprintf "Run %s_%d: Saving sorter set" %index %repl)
             | None -> ()
         
             // Check cancellation before saving
@@ -322,7 +262,7 @@ module RandomSorters4to64 =
             do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet)
         
             match progress with
-            | Some p -> p.Report(sprintf "Run %d_%d: Saving sorter model set maker" index %repl)
+            | Some p -> p.Report(sprintf "Run %s_%d: Saving sorter model set maker" %index %repl)
             | None -> ()
         
             // Save sorterModelSetMaker

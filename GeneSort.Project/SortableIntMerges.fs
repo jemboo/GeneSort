@@ -26,6 +26,39 @@ module SortableIntMerges =
     let projectDesc = "Calc and save large SortableIntMerges"
 
 
+    let makeQueryParams 
+            (repl: int<replNumber> option) 
+            (sortingWidth:int<sortingWidth> option)
+            (sorterModelType:sorterModelType option)
+            (outputDataType: outputDataType) =
+             
+        queryParams.create(
+            Some projectName,
+            repl,
+            outputDataType,
+            [|
+                (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
+                (runParameters.mergeDimensionKey, sorterModelType |> SorterModelType.toString);
+            |])
+
+
+    let makeQueryParamsFromRunParams
+            (runParams: runParameters) 
+            (outputDataType: outputDataType) =
+        makeQueryParams
+            (runParams.GetRepl())
+            (runParams.GetSortingWidth())
+            (runParams.GetSorterModelType())
+            outputDataType
+
+
+
+
+
+
+
+
+
     let sortableArrayDataTypeKeyValues = 
             [ Some sortableArrayDataType.Ints; ] |> List.map(SortableArrayDataType.toString)
   
@@ -58,30 +91,13 @@ module SortableIntMerges =
 
 
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
-        let mutable lastRepl: int<replNumber> option = None
-        let mutable index = 0
-
-        let assignRepl (runParams: runParameters) : runParameters =
-            match lastRepl with
-            | None ->
-                lastRepl <- runParams.GetRepl()
-                runParams.SetIndex (UMX.tag<indexNumber> index)
-
-            | Some lastRplV ->
-                match runParams.GetRepl() with
-                | None ->
-                    failwith "repl should be present"
-                | Some paramRpl ->
-                    if not (%paramRpl = %lastRplV) then 
-                        index <- 0
-                        lastRepl <- runParams.GetRepl()
-                    runParams.SetIndex (UMX.tag<indexNumber> index)
-
-            index <- index + 1
-            runParams
-
 
         let enhancer (runParameters : runParameters) : runParameters =
+            let queryParams = makeQueryParamsFromRunParams runParameters (outputDataType.RunParameters)
+            runParameters.SetIndex ((queryParams.Id.ToString()) |> UMX.tag<idValue>)
+
+
+
             runParameters.SetRunFinished false
             runParameters.SetProjectName projectName
             runParameters
@@ -91,7 +107,7 @@ module SortableIntMerges =
             for runParameters in runParametersSeq do
                     let filtrate = paramMapFilter runParameters
                     if filtrate.IsSome then
-                        let retVal = filtrate.Value |> enhancer |> assignRepl
+                        let retVal = filtrate.Value |> enhancer
                         yield retVal
         }
 
@@ -114,13 +130,11 @@ module SortableIntMerges =
             |]
 
     let project = 
-            Project.create 
+            project.create 
                 projectName 
                 projectDesc
                 parameterSpans
-                2<replNumber>
                 outputDataTypes
-                paramMapRefiner
 
 
     let executor
@@ -130,21 +144,21 @@ module SortableIntMerges =
             (progress: IProgress<string> option) : Async<unit> =
 
         async {
-            let index = runParameters.GetIndex().Value  
+            let index = runParameters.GetId().Value  
             let repl = runParameters.GetRepl().Value
             let sortingWidth = runParameters.GetSortingWidth().Value
             let mergeDimension = runParameters.GetMergeDimension().Value
             let mergeFillType = runParameters.GetMergeFillType().Value
 
             match progress with
-            | Some p -> p.Report(sprintf "Executing Run %d_%d  %s" index %repl (runParameters.toString()))
+            | Some p -> p.Report(sprintf "Executing Run %s_%d  %s" %index %repl (runParameters.toString()))
             | None -> ()
         
             // Check cancellation before starting expensive operations
             cts.Token.ThrowIfCancellationRequested()
         
             match progress with
-            | Some p -> p.Report(sprintf "Run %d_%d: Creating sorter set" index %repl)
+            | Some p -> p.Report(sprintf "Run %s_%d: Creating sorter set" %index %repl)
             | None -> ()
         
             // Check cancellation before generating sorters
@@ -155,13 +169,13 @@ module SortableIntMerges =
 
         
             match progress with
-            | Some p -> p.Report(sprintf "Run %d_%d: Evaluating sorter set" index %repl)
+            | Some p -> p.Report(sprintf "Run %s_%d: Evaluating sorter set" %index %repl)
             | None -> ()
 
 
             cts.Token.ThrowIfCancellationRequested()
             match progress with
-            | Some p -> p.Report(sprintf "Run %d_%d: Saving sorterSet test results" index %repl)
+            | Some p -> p.Report(sprintf "Run %s_%d: Saving sorterSet test results" %index %repl)
             | None -> ()
 
             //// Save sorter set

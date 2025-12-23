@@ -26,15 +26,15 @@ namespace GeneSort.UI.ViewModels
             Description = project.Description;
             ParameterKeys = project.ParameterKeys.ToList();
 
-            foreach (var rp in project.RunParametersArray)
-            {
-                var dict = new Dictionary<string, string>();
-                foreach (var kvp in rp.ParamMap)
-                {
-                    dict[kvp.Key] = kvp.Value;
-                }
-                RunParametersData.Add(dict);
-            }
+            //foreach (var rp in project.RunParametersArray)
+            //{
+            //    var dict = new Dictionary<string, string>();
+            //    foreach (var kvp in rp.ParamMap)
+            //    {
+            //        dict[kvp.Key] = kvp.Value;
+            //    }
+            //    RunParametersData.Add(dict);
+            //}
         }
     }
 }

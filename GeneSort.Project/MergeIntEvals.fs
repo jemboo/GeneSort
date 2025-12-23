@@ -150,7 +150,14 @@ module MergeIntEvals =
         | 64 -> 25000 |> UMX.tag<stageLength>
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
-    let sortableArrayDataType = sortableArrayDataType.Ints
+    let sortableArrayDataTypeKeyValues = 
+            [ 
+                Some sortableArrayDataType.Ints; 
+                Some sortableArrayDataType.Bools ] |> List.map(SortableArrayDataType.toString)
+  
+    let sortableArrayDataTypeKeys () : string*string list =
+        (runParameters.sortableArrayDataTypeKey, sortableArrayDataTypeKeyValues )
+
   
     let sortingWidthValues = 
         [16; 24; 32; 48; 64;] |> List.map(fun d -> d.ToString())
@@ -161,6 +168,26 @@ module MergeIntEvals =
     let sortingWidths() : string*string list =
         (runParameters.sortingWidthKey, sortingWidthValues)
 
+
+    let mergeDimensionValues = 
+        [2; 4; ] |> List.map(fun d -> d.ToString())
+
+
+    let mergeDimensions() : string*string list =
+        (runParameters.mergeDimensionKey, mergeDimensionValues)
+
+    let mergeFillTypeValues = 
+         [mergeFillType.VanVoorhis;] |> List.map(fun d -> d.ToString())
+
+    let mergeFillTypes() : string*string list =
+        (runParameters.mergeFillTypeKey, mergeFillTypeValues)
+
+
+    let sorterModelKeyValues () : string list =
+        [ Some sorterModelType.Mcse;]      |> List.map(SorterModelType.toString)
+
+
+
     //let sorterModelKeyValues () : string list =
     //    [ Some sorterModelKey.Mcse; 
     //      Some sorterModelKey.Mssi;
@@ -168,10 +195,6 @@ module MergeIntEvals =
     //      Some sorterModelKey.Msuf4; 
     //      Some sorterModelKey.Msuf6; ]      |> List.map(SorterModelKey.toString)
 
-    let sorterModelKeyValues () : string list =
-        [ Some sorterModelType.Mcse;
-          Some sorterModelType.Mssi;
-          Some sorterModelType.Msrs;]      |> List.map(SorterModelType.toString)
 
     let sorterModelKeys () : string*string list =
         (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
@@ -196,30 +219,12 @@ module MergeIntEvals =
 
 
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
-        let mutable lastRepl: int<replNumber> option = None
-        let mutable index = 0
-
-        let assignRepl (runParams: runParameters) : runParameters =
-            match lastRepl with
-            | None ->
-                lastRepl <- runParams.GetRepl()
-                runParams.SetIndex (UMX.tag<indexNumber> index)
-
-            | Some lastRplV ->
-                match runParams.GetRepl() with
-                | None ->
-                    failwith "repl should be present"
-                | Some paramRpl ->
-                    if not (%paramRpl = %lastRplV) then 
-                        index <- 0
-                        lastRepl <- runParams.GetRepl()
-                    runParams.SetIndex (UMX.tag<indexNumber> index)
-
-            index <- index + 1
-            runParams
 
 
         let enhancer (runParameters : runParameters) : runParameters =
+            let queryParams = makeQueryParamsFromRunParams runParameters (outputDataType.RunParameters)
+            runParameters.SetIndex ((queryParams.Id.ToString()) |> UMX.tag<idValue>)
+
             runParameters.SetRunFinished false
             runParameters.SetProjectName projectName
 
@@ -241,12 +246,18 @@ module MergeIntEvals =
             for runParameters in runParametersSeq do
                     let filtrate = paramMapFilter runParameters
                     if filtrate.IsSome then
-                        let retVal = filtrate.Value |> enhancer |> assignRepl
+                        let retVal = filtrate.Value |> enhancer
                         yield retVal
         }
 
     let parameterSpans = 
-        [ sortingWidths(); sorterModelKeys() ]
+        [
+            sortingWidths(); 
+            sorterModelKeys(); 
+            sortableArrayDataTypeKeys(); 
+            mergeDimensions(); 
+            mergeFillTypes(); 
+        ]
         
     let outputDataTypes = 
             [|                
@@ -259,14 +270,13 @@ module MergeIntEvals =
                 outputDataType.TextReport ("Report4" |> UMX.tag<textReportName>);
             |]
 
+
     let project = 
-            Project.create 
+            project.create 
                 projectName 
                 projectDesc
                 parameterSpans
-                10<replNumber>
                 outputDataTypes
-                paramMapRefiner
 
 
     let executor
@@ -276,16 +286,21 @@ module MergeIntEvals =
             (progress: IProgress<string> option) : Async<unit> =
 
         async {
-            let index = runParameters.GetIndex().Value  
+
+            let index = runParameters.GetId().Value  
             let repl = runParameters.GetRepl().Value
             let sorterModelKey = runParameters.GetSorterModelType().Value
             let sortingWidth = runParameters.GetSortingWidth().Value
             let stageLength = runParameters.GetStageLength().Value
             let ceLength = runParameters.GetCeLength().Value
             let sorterCount = runParameters.GetSorterCount().Value
-        
+            let mergeDimension = runParameters.GetMergeDimension().Value
+            let mergeFillType = runParameters.GetMergeFillType().Value
+            let sortableArrayDataType = runParameters.GetSortableArrayDataType().Value
+
+
             match progress with
-            | Some p -> p.Report(sprintf "Executing Run %d_%d  %s" index %repl (runParameters.toString()))
+            | Some p -> p.Report(sprintf "Executing Run %s_%d  %s" %index %repl (runParameters.toString()))
             | None -> ()
         
             // Check cancellation before starting expensive operations
@@ -314,7 +329,7 @@ module MergeIntEvals =
                     |> sorterModelMaker.SmmMsuf6RandGen
         
             match progress with
-            | Some p -> p.Report(sprintf "Run %d_%d: Creating sorter set" index %repl)
+            | Some p -> p.Report(sprintf "Run %s_%d: Creating sorter set" %index %repl)
             | None -> ()
         
             // Check cancellation before generating sorters
@@ -324,14 +339,12 @@ module MergeIntEvals =
             let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
-            let mergeDimension = 4 |> UMX.tag<mergeDimension>
-            let mergeFillType = mergeFillType.Full
             let sortableTestModel = msasM.create sortingWidth mergeDimension mergeFillType |> sortableTestModel.MsasMi
             let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableArrayDataType
 
         
             match progress with
-            | Some p -> p.Report(sprintf "Run %d_%d: Evaluating sorter set" index %repl)
+            | Some p -> p.Report(sprintf "Run %s_%d: Evaluating sorter set" %index %repl)
             | None -> ()
 
 
@@ -339,7 +352,7 @@ module MergeIntEvals =
 
             cts.Token.ThrowIfCancellationRequested()
             match progress with
-            | Some p -> p.Report(sprintf "Run %d_%d: Saving sorterSet test results" index %repl)
+            | Some p -> p.Report(sprintf "Run %s_%d: Saving sorterSet test results" %index %repl)
             | None -> ()
 
             // Save sorter set

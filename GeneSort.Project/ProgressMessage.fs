@@ -4,7 +4,7 @@
 open System
 open FSharp.UMX
 
-type ProgressMessage =
+type progressMessage =
     | Info of string
     | RunCompleted of RunResult
     | BatchCompleted of successCount: int * failureCount: int * skippedCount: int
@@ -20,11 +20,11 @@ module ProgressMessage =
             let msg = 
                 match result with
                 | Success (idx, repl) -> 
-                    sprintf "✓ %s  Run %d_%d completed successfully" timeStamp %idx %repl 
+                    sprintf "✓ %s  Run %s_%d completed successfully" timeStamp %idx %repl 
                 | Failure (idx, repl, error) -> 
-                    sprintf "✗ %s  Run %d_%d failed: %s" timeStamp %idx %repl error
+                    sprintf "✗ %s  Run %s_%d failed: %s" timeStamp %idx %repl error
                 | Skipped (idx, repl, reason) -> 
-                    sprintf "⊘ %s  Run %d_%d skipped: %s" timeStamp %idx %repl reason
+                    sprintf "⊘ %s  Run %s_%d skipped: %s" timeStamp %idx %repl reason
             p.Report(msg)
         | None -> ()
 

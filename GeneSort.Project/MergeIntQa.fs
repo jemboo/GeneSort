@@ -111,7 +111,7 @@ module MergeIntQa =
 
 
     let sortingWidthValues = 
-        [16; 32;] |> List.map(fun d -> d.ToString())
+        [8; 16; 32;] |> List.map(fun d -> d.ToString())
 
     //let sortingWidthValues = 
         //[64;] |> List.map(fun d -> d.ToString())
@@ -151,30 +151,11 @@ module MergeIntQa =
 
 
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
-        let mutable lastRepl: int<replNumber> option = None
-        let mutable index = 0
-
-        let assignRepl (runParams: runParameters) : runParameters =
-            match lastRepl with
-            | None ->
-                lastRepl <- runParams.GetRepl()
-                runParams.SetIndex (UMX.tag<indexNumber> index)
-
-            | Some lastRplV ->
-                match runParams.GetRepl() with
-                | None ->
-                    failwith "repl should be present"
-                | Some paramRpl ->
-                    if not (%paramRpl = %lastRplV) then 
-                        index <- 0
-                        lastRepl <- runParams.GetRepl()
-                    runParams.SetIndex (UMX.tag<indexNumber> index)
-
-            index <- index + 1
-            runParams
-
 
         let enhancer (runParameters : runParameters) : runParameters =
+            let queryParams = makeQueryParamsFromRunParams runParameters (outputDataType.RunParameters)
+            runParameters.SetIndex ((queryParams.Id.ToString()) |> UMX.tag<idValue>)
+
             runParameters.SetRunFinished false
             runParameters.SetProjectName projectName
 
@@ -197,17 +178,18 @@ module MergeIntQa =
             for runParameters in runParametersSeq do
                     let filtrate = paramMapFilter runParameters
                     if filtrate.IsSome then
-                        let retVal = filtrate.Value |> enhancer |> assignRepl
+                        let retVal = filtrate.Value |> enhancer
                         yield retVal
         }
 
     let parameterSpans = 
         [
-                sortingWidths(); 
-                sorterModelKeys(); 
-                sortableArrayDataTypeKeys(); 
-                mergeDimensions(); 
-                mergeFillTypes(); ]
+            sortingWidths(); 
+            sorterModelKeys(); 
+            sortableArrayDataTypeKeys(); 
+            mergeDimensions(); 
+            mergeFillTypes(); 
+        ]
         
     let outputDataTypes = 
             [|                
@@ -220,14 +202,13 @@ module MergeIntQa =
                 outputDataType.TextReport ("Report4" |> UMX.tag<textReportName>);
             |]
 
+
     let project = 
-            Project.create 
+            project.create 
                 projectName 
                 projectDesc
                 parameterSpans
-                1<replNumber>
                 outputDataTypes
-                paramMapRefiner
 
 
     let executor
@@ -237,7 +218,7 @@ module MergeIntQa =
             (progress: IProgress<string> option) : Async<unit> =
 
         async {
-            let index = runParameters.GetIndex().Value  
+            let index = runParameters.GetId().Value  
             let repl = runParameters.GetRepl().Value
             let sorterModelKey = runParameters.GetSorterModelType().Value
             let sortingWidth = runParameters.GetSortingWidth().Value
@@ -249,7 +230,7 @@ module MergeIntQa =
             let sortableArrayDataType = runParameters.GetSortableArrayDataType().Value
 
             match progress with
-            | Some p -> p.Report(sprintf "Executing Run %d_%d  %s" index %repl (runParameters.toString()))
+            | Some p -> p.Report(sprintf "Executing Run %s_%d  %s" %index %repl (runParameters.toString()))
             | None -> ()
         
             // Check cancellation before starting expensive operations
@@ -278,7 +259,7 @@ module MergeIntQa =
                     |> sorterModelMaker.SmmMsuf6RandGen
         
             match progress with
-            | Some p -> p.Report(sprintf "Run %d_%d: Creating sorter set" index %repl)
+            | Some p -> p.Report(sprintf "Run %s_%d: Creating sorter set" %index %repl)
             | None -> ()
         
             // Check cancellation before generating sorters
@@ -293,7 +274,7 @@ module MergeIntQa =
 
         
             match progress with
-            | Some p -> p.Report(sprintf "Run %d_%d: Evaluating sorter set" index %repl)
+            | Some p -> p.Report(sprintf "Run %s_%d: Evaluating sorter set" %index %repl)
             | None -> ()
 
 
@@ -301,7 +282,7 @@ module MergeIntQa =
 
             cts.Token.ThrowIfCancellationRequested()
             match progress with
-            | Some p -> p.Report(sprintf "Run %d_%d: Saving sorterSet test results" index %repl)
+            | Some p -> p.Report(sprintf "Run %s_%d: Saving sorterSet test results" %index %repl)
             | None -> ()
 
             // Save sorter set
