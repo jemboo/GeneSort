@@ -71,7 +71,7 @@ let maxReplica = 1<replNumber>
 
 
 ProjectOps.initProjectFiles geneSortDb yab cts (Some progress) project minReplica maxReplica paramRefiner |> Async.RunSynchronously
-ProjectOps.executeRuns geneSortDb projectName cts (Some progress) executor |> Async.RunSynchronously
+ProjectOps.executeRuns geneSortDb yab projectName cts (Some progress) executor |> Async.RunSynchronously
 
 TextReporters.ceUseProfileReportExecutor geneSortDb projectName yab cts (Some progress) |> Async.RunSynchronously
 TextReporters.binReportExecutor geneSortDb projectName yab cts (Some progress) |> Async.RunSynchronously

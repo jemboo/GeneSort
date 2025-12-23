@@ -13,6 +13,7 @@ module ProjectOps =
 
     let executeRunParameters
             (db: IGeneSortDb)
+            (yab: runParameters -> outputDataType -> queryParams)
             (executor: IGeneSortDb -> runParameters -> CancellationTokenSource -> IProgress<string> option -> Async<unit>)
             (runParameters: runParameters) 
             (cts: CancellationTokenSource)  
@@ -29,13 +30,8 @@ module ProjectOps =
                 else
                     do! executor db runParameters cts progress
                 
-                    let queryParamsForRunParams = 
-                        queryParams.create( 
-                            runParameters.GetProjectName(),
-                            runParameters.GetRepl(), 
-                            outputDataType.RunParameters,
-                            [||])
-                
+                    let queryParamsForRunParams = yab runParameters outputDataType.RunParameters
+   
                     do! db.saveAsync queryParamsForRunParams (runParameters |> outputData.RunParameters)
 
                     let result = Success (index, repl)
@@ -57,6 +53,7 @@ module ProjectOps =
         (maxDegreeOfParallelism: int) 
         (executor: IGeneSortDb -> runParameters -> CancellationTokenSource -> IProgress<string> option -> Async<unit>)
         (runParameters: runParameters seq)
+        (yab: runParameters -> outputDataType -> queryParams)
         (cts: CancellationTokenSource)
         (progress: IProgress<string> option)
         : Async<RunResult[]> =
@@ -67,7 +64,7 @@ module ProjectOps =
             
                 let tasks =
                     runParameters
-                    |> Seq.map (fun rps -> executeRunParameters db executor rps cts progress)
+                    |> Seq.map (fun rps -> executeRunParameters db yab executor rps cts progress)
                     |> Seq.toList
 
                 // Execute with throttling, collecting results
@@ -207,6 +204,7 @@ module ProjectOps =
 
     let executeRuns
         (db: IGeneSortDb)
+        (yab: runParameters -> outputDataType -> queryParams)
         (projectName: string<projectName>)
         (cts: CancellationTokenSource) 
         (progress: IProgress<string> option) 
@@ -238,7 +236,7 @@ module ProjectOps =
                         | None -> ()
                         return Ok [||]
                     else
-                        let! results = executeRunParametersSeq db 8 executor runParametersArray cts progress
+                        let! results = executeRunParametersSeq db 8 executor runParametersArray yab cts progress
                         return Ok results
             
             with e ->

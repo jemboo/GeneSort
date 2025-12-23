@@ -354,7 +354,7 @@ module RunParameters =
 
     //creates a table with the getIndexAndReplName as the row headers, and the array from
     //getAllKeys as the column headers
-    let makeIndexAndReplTable(runParams :runParameters seq) : string[][] 
+    let makeIndexAndReplTable(runParams : runParameters seq) : string[][] 
         =
         let keys = getAllKeys runParams
         let headerRow = Array.append [| "Run" |] keys
