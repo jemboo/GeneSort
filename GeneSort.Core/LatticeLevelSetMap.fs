@@ -178,16 +178,12 @@ module LatticeLevelSetMap =
             let ccpWinners = 
                        ccpCandidates
                        |> Array.sort
-                       |> Array.filter(fun ccp ->
-                            match llsm.CenterSideMap.[ccp] with
-                            | [] -> false
-                            | _ -> true
-                       )
+                       |> Array.filter(fun ccp -> llsm.CenterSideMap.[ccp].Length = 0)
 
-            let ccp = if (ccpWinners.Length > 0) then 
-                          ccpWinners.[0]
+            let ccp = if (ccpWinners.Length = 0) then 
+                          ccpCandidates.[0]
                       else
-                         ccpCandidates.[0]
+                         ccpWinners.[0]
                          // failwith "Failed to initialize level set map: no available center side points."
 
             llsm.PoleSideMap.[lp] <- ccp :: llsm.PoleSideMap.[lp]

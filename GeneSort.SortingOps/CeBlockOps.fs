@@ -51,10 +51,6 @@ module CeBlockOps =
         let newSorterTests =
             match sortableTests with
             | sortableTests.Ints sits -> 
-
-                let yab = Array.copy sits.SortableIntArrays.[0].Values
-                let yabc = sortBy ceBlock ceUseCounts yab |> ignore
-
                 let newSortableIntArray = 
                     sits.SortableIntArrays |> Array.map(
                             fun sia ->

@@ -139,10 +139,10 @@ module Example =
 
     let runMergePermutationsExample () : Permutation []  =
         let edgeLength = 4<latticeDistance>
-        let dimension = 4<latticeDimension>
+        let dimension = 8<latticeDimension>
 
         let mergeLattice = MergeLattice.create dimension edgeLength
-        let latticePathPermutations = MergeLattice.getPermutationsVV (Some reporter) mergeLattice
+        let latticePathPermutations = MergeLattice.getPermutationsStandard (Some reporter) mergeLattice
         let result = latticePathPermutations |> LatticePathPermutations.toPermutations
         
         let boolEq = 
@@ -152,8 +152,10 @@ module Example =
             |> Seq.distinctBy (fun arr -> System.String.Join(",", arr))
             |> Seq.toArray
 
-        for aa in boolEq do
-            printfn "%s" (System.String.Join("", aa |> Array.map (fun b -> if b then "1 " else "0 ")))
+        //for aa in boolEq do
+        //    printfn "%s" (System.String.Join("", aa |> Array.map (fun b -> if b then "1 " else "0 ")))
+
+        printfn "EdgeLen: %d Dimension: %d Perm count: %d Bool Count: %d" %edgeLength dimension %result.Length boolEq.Length
 
         result
 
@@ -162,7 +164,7 @@ module Example =
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
-    let res = initLevelSetMapExample ()
+    let res = runMergePermutationsExample ()
 
    
 

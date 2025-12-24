@@ -39,7 +39,7 @@ module MergeLattice =
     let getCompletedLevelSetMapsStandard
         (ml: mergeLattice)
         : latticeLevelSetMap seq =
-
+        
         seq {
             for llsm in LatticeLevelSetMap.getAllLevelSetMapsStandard ml.LatticeDimension ml.EdgeLength do
                     LatticeLevelSetMap.setupMaps llsm
