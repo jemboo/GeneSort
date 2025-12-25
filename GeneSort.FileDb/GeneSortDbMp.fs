@@ -9,7 +9,7 @@ open GeneSort.Project
 open System.IO
 
 type private DbMessage =
-    | Save of queryParams * outputData * AsyncReplyChannel<unit>
+    | Save of queryParams * outputData * AsyncReplyChannel<unit> * bool<allowOverwrite>
     | Load of queryParams * AsyncReplyChannel<Result<outputData, OutputError>>
     | GetAllProjectRunParameters of 
             string<projectName> * CancellationToken option * 
@@ -20,8 +20,8 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
     let getPathToProjectFolder (projectName: string) = 
         Path.Combine(%rootFolder, projectName) |> UMX.tag<pathToProjectFolder>
 
-    let saveAsync (queryParams: queryParams) (data: outputData) =
-        OutputDataFile.saveToFileAsync (getPathToProjectFolder (queryParams.ProjectName)) queryParams data
+    let saveAsync (queryParams: queryParams) (data: outputData) (allowOverwrite: bool<allowOverwrite>) =
+        OutputDataFile.saveToFileAsync (getPathToProjectFolder (queryParams.ProjectName)) queryParams data allowOverwrite
     
     let loadAsync (queryParams: queryParams) =
         OutputDataFile.getOutputDataAsync (getPathToProjectFolder queryParams.ProjectName) queryParams
@@ -32,8 +32,8 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
                 let! msg = inbox.Receive()
                 
                 match msg with
-                | Save (queryParams, data, replyChannel) ->
-                    do! saveAsync queryParams data
+                | Save (queryParams, data, replyChannel, allowOverwrite) ->
+                    do! saveAsync queryParams data allowOverwrite
                     replyChannel.Reply()
                     
                 | Load (queryParams, replyChannel) ->
@@ -67,8 +67,11 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
                 | ex -> return Result.Error ex.Message
             }
 
-        member _.saveAsync (queryParams: queryParams) (data: outputData) : Async<unit> =
-            mailbox.PostAndAsyncReply(fun channel -> Save(queryParams, data, channel))
+        member _.saveAsync 
+                    (queryParams: queryParams) 
+                    (data: outputData) 
+                    (allowOverwrite: bool<allowOverwrite>) : Async<unit> =
+            mailbox.PostAndAsyncReply(fun channel -> Save(queryParams, data, channel, allowOverwrite))
         
         member _.loadAsync (queryParams: queryParams) : Async<Result<outputData, OutputError>> =
             mailbox.PostAndAsyncReply(fun channel -> Load(queryParams, channel))
@@ -82,12 +85,13 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
         member this.saveAllRunParametersAsync 
                         (runParamsArray: runParameters[]) 
                         (yab: runParameters -> outputDataType -> queryParams)
+                        (allowOverwrite: bool<allowOverwrite>)
                         (ct: CancellationToken option) 
                         (progress: IProgress<string> option) : Async<unit> =
             async {
                 for runParams in runParamsArray do
                     let queryParamsForRunParams = yab runParams outputDataType.RunParameters
-                    do! (this :> IGeneSortDb).saveAsync queryParamsForRunParams (runParams |> outputData.RunParameters)
+                    do! (this :> IGeneSortDb).saveAsync queryParamsForRunParams (runParams |> outputData.RunParameters) allowOverwrite
                     match progress with
                     | Some p -> p.Report(sprintf "Saved RunParameters for Run %s" %(runParams.GetId().Value))
                     | None -> ()

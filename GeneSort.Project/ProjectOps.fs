@@ -14,8 +14,9 @@ module ProjectOps =
     let executeRunParameters
             (db: IGeneSortDb)
             (yab: runParameters -> outputDataType -> queryParams)
-            (executor: IGeneSortDb -> runParameters -> CancellationTokenSource -> IProgress<string> option -> Async<unit>)
-            (runParameters: runParameters) 
+            (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option -> Async<unit>)
+            (runParameters: runParameters)
+            (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource)  
             (progress: IProgress<string> option) : Async<RunResult> = 
         async {
@@ -28,11 +29,11 @@ module ProjectOps =
                     ProgressMessage.reportRunResult progress result
                     return result
                 else
-                    do! executor db runParameters cts progress
+                    do! executor db runParameters allowOverwrite cts progress
                 
                     let queryParamsForRunParams = yab runParameters outputDataType.RunParameters
    
-                    do! db.saveAsync queryParamsForRunParams (runParameters |> outputData.RunParameters)
+                    do! db.saveAsync queryParamsForRunParams (runParameters |> outputData.RunParameters) (true |> UMX.tag<allowOverwrite>)
 
                     let result = Success (index, repl)
                     ProgressMessage.reportRunResult progress result
@@ -51,9 +52,10 @@ module ProjectOps =
     let executeRunParametersSeq
         (db: IGeneSortDb)
         (maxDegreeOfParallelism: int) 
-        (executor: IGeneSortDb -> runParameters -> CancellationTokenSource -> IProgress<string> option -> Async<unit>)
+        (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option -> Async<unit>)
         (runParameters: runParameters seq)
         (yab: runParameters -> outputDataType -> queryParams)
+        (allowOverwrite: bool<allowOverwrite>)
         (cts: CancellationTokenSource)
         (progress: IProgress<string> option)
         : Async<RunResult[]> =
@@ -64,7 +66,7 @@ module ProjectOps =
             
                 let tasks =
                     runParameters
-                    |> Seq.map (fun rps -> executeRunParameters db yab executor rps cts progress)
+                    |> Seq.map (fun rps -> executeRunParameters db yab executor rps allowOverwrite cts progress)
                     |> Seq.toList
 
                 // Execute with throttling, collecting results
@@ -120,6 +122,7 @@ module ProjectOps =
             (projectName: string<projectName>)
             (runParameterArray: runParameters[]) 
             (yab: runParameters -> outputDataType -> queryParams)
+            (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<Result<unit, string>> =
         async {
@@ -130,7 +133,7 @@ module ProjectOps =
             
                 cts.Token.ThrowIfCancellationRequested()
             
-                do! db.saveAllRunParametersAsync runParameterArray yab (Some cts.Token) progress
+                do! db.saveAllRunParametersAsync runParameterArray yab allowOverwrite (Some cts.Token) progress
             
                 match progress with
                 | Some p -> p.Report(sprintf "Successfully saved %d RunParameter files" runParameterArray.Length)
@@ -163,6 +166,7 @@ module ProjectOps =
         (project: project) 
         (minReplica: int<replNumber>) 
         (maxReplica: int<replNumber>)
+        (allowOverwrite: bool<allowOverwrite>)
         (paramRefiner: runParameters seq -> runParameters seq) : Async<Result<unit, string>> =
 
         async {
@@ -173,7 +177,7 @@ module ProjectOps =
             
                 // Save project
                 let queryParams = queryParams.createForProject project.ProjectName
-                do! db.saveAsync queryParams (project |> outputData.Project)
+                do! db.saveAsync queryParams (project |> outputData.Project) allowOverwrite
             
                 let runParametersArray = Project.makeRunParameters minReplica maxReplica project.ParameterSpans paramRefiner
                 match progress with
@@ -181,7 +185,7 @@ module ProjectOps =
                 | None -> ()
 
                 let! initResult = saveParametersFiles 
-                                    db project.ProjectName runParametersArray yab cts progress
+                                    db project.ProjectName runParametersArray yab allowOverwrite cts progress
             
                 match initResult with
                 | Ok () ->
@@ -206,9 +210,11 @@ module ProjectOps =
         (db: IGeneSortDb)
         (yab: runParameters -> outputDataType -> queryParams)
         (projectName: string<projectName>)
+        (allowOverwrite: bool<allowOverwrite>)
         (cts: CancellationTokenSource) 
         (progress: IProgress<string> option) 
-        (executor: IGeneSortDb -> runParameters -> CancellationTokenSource -> IProgress<string> option -> Async<unit>)
+        (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> -> 
+                                  CancellationTokenSource -> IProgress<string> option -> Async<unit>)
                    : Async<Result<RunResult[], string>>  =
         async {
             try
@@ -236,7 +242,7 @@ module ProjectOps =
                         | None -> ()
                         return Ok [||]
                     else
-                        let! results = executeRunParametersSeq db 8 executor runParametersArray yab cts progress
+                        let! results = executeRunParametersSeq db 8 executor runParametersArray yab allowOverwrite cts progress
                         return Ok results
             
             with e ->

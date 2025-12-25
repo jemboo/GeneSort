@@ -21,6 +21,7 @@ module FullBoolEvals =
 
     let randomType = rngType.Lcg
     let sortableDataType = sortableDataType.Bools
+    let allowOverwrite = false |> UMX.tag<allowOverwrite>
 
 
     let makeQueryParams 
@@ -183,7 +184,7 @@ module FullBoolEvals =
             
             // Save sorterSetEval
             let queryParamsForSorterSetEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval None)
-            do! db.saveAsync queryParamsForSorterSetEval (sorterSetEval |> outputData.SorterSetEval)
+            do! db.saveAsync queryParamsForSorterSetEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
             // Mark run as finished
             runParameters.SetRunFinished true

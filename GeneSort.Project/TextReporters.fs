@@ -18,6 +18,7 @@ module TextReporters =
             (db: IGeneSortDb)
             (projectName: string<projectName>)
             (yab: runParameters -> outputDataType -> queryParams)
+            (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<unit> =
 
@@ -66,7 +67,7 @@ module TextReporters =
 
             let queryParams = queryParams.createForTextReport projectName ("SorterEval_Bin_Report" |> UMX.tag<textReportName> )
             let outputData =  dataTableFile |> outputData.TextReport
-            do! db.saveAsync queryParams outputData
+            do! db.saveAsync queryParams outputData allowOverwrite
             return ()
         }
 
@@ -75,6 +76,7 @@ module TextReporters =
             (db: IGeneSortDb)
             (projectName: string<projectName>) 
             (yab: runParameters -> outputDataType -> queryParams)
+            (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<unit> =
 
@@ -149,7 +151,7 @@ module TextReporters =
 
             let queryParams = queryParams.createForTextReport projectName ("SorterCeUseProfile_Report" |> UMX.tag<textReportName>)
             let outputData = dataTableFile |> outputData.TextReport
-            do! db.saveAsync queryParams outputData
+            do! db.saveAsync queryParams outputData allowOverwrite
         
             match progress with
             | Some p -> p.Report(sprintf "CE use profile report saved for project: %s" %projectName)

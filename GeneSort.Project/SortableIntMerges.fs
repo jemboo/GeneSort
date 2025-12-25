@@ -60,7 +60,7 @@ module SortableIntMerges =
         (runParameters.sortableDataTypeKey, sortableArrayDataTypeKeyValues )
 
     let sortingWidthValues = 
-        [16; 18; 24; 32; 36; 48; 64] |> List.map(fun d -> d.ToString())
+        [16; 18; 24; 32; 36; 48; 64; 128] |> List.map(fun d -> d.ToString())
 
     let sortingWidths() : string*string list =
         (runParameters.sortingWidthKey, sortingWidthValues)
@@ -79,17 +79,52 @@ module SortableIntMerges =
     let mergeFillTypes() : string*string list =
         (runParameters.mergeFillTypeKey, mergeFillTypeValues)
 
+    let mergeDimensionDividesSortingWidth (runParameters: runParameters option) =
+        match runParameters with
+        | None -> None
+        | Some rp ->
+            let sortingWidth = rp.GetSortingWidth().Value
+            let mergeDimension = rp.GetMergeDimension().Value
+            if (%sortingWidth % %mergeDimension = 0) then runParameters else None
+
+
+    let limitForBoolenDataType (runParameters: runParameters option) =
+        match runParameters with
+        | None -> None
+        | Some rp ->
+            let sortingWidth = rp.GetSortingWidth().Value
+            let sortableDataType = rp.GetSortableDataType().Value
+            if (sortableDataType.IsBools && %sortingWidth > 32) then None else runParameters
+
+
+    let limitForMergeFillType (runParameters: runParameters option) =
+        match runParameters with
+        | None -> None
+        | Some rp ->
+            let sortingWidth = rp.GetSortingWidth().Value
+            let mergeDimension = rp.GetMergeDimension().Value
+            let sortableDataType = rp.GetSortableDataType().Value
+            let mergeFillType = rp.GetMergeFillType().Value
+            if (mergeFillType.IsNoFill && %sortingWidth > 16) then None else runParameters
+
+
+    let limitForMergeDimension (runParameters: runParameters option) =
+        match runParameters with
+        | None -> None
+        | Some rp ->
+            let sortingWidth = rp.GetSortingWidth().Value
+            let mergeDimension = rp.GetMergeDimension().Value
+            let sortableDataType = rp.GetSortableDataType().Value
+            let mergeFillType = rp.GetMergeFillType().Value
+            if (%mergeDimension > 2 && %sortingWidth > 32) then None else runParameters
+
 
     let paramMapFilter (runParameters: runParameters) = 
-        let sortingWidth = runParameters.GetSortingWidth().Value
-        let mergeDimension = runParameters.GetMergeDimension().Value
-        let sortableDataType = runParameters.GetSortableDataType().Value
-        if (%sortingWidth % %mergeDimension = 0) then 
-            if ((sortableDataType.IsBools) && %sortingWidth > 32 ) then
-                None
-            else
-                Some runParameters 
-        else None
+        (Some runParameters) 
+        |> mergeDimensionDividesSortingWidth
+        |> limitForBoolenDataType
+        |> limitForMergeFillType
+        |> limitForMergeDimension
 
 
 
@@ -136,6 +171,7 @@ module SortableIntMerges =
     let executor
             (db: IGeneSortDb)
             (runParameters: runParameters) 
+            (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<unit> =
 
@@ -177,7 +213,7 @@ module SortableIntMerges =
 
             //// Save sortableTest
             let queryParamsForSortableTestSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTest None) 
-            do! db.saveAsync queryParamsForSortableTestSet (sortableTests |> outputData.SortableTest)
+            do! db.saveAsync queryParamsForSortableTestSet (sortableTests |> outputData.SortableTest) allowOverwrite
 
             //// Save sorterModelSetMaker
             //let queryParamsForSorterModelSetMaker = 

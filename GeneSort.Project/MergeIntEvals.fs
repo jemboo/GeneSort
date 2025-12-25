@@ -27,6 +27,7 @@ module MergeIntEvals =
 
     let randomType = rngType.Lcg
     let excludeSelfCe = true
+    let allowOverwrite = false |> UMX.tag<allowOverwrite>
 
     let makeQueryParams 
             (repl: int<replNumber> option) 
@@ -358,15 +359,15 @@ module MergeIntEvals =
 
             // Save sorter set
             let queryParamsForSorterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet None) 
-            do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet)
+            do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet) allowOverwrite
 
             // Save sorterSetEval
             let queryParamsForSorterSetEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval None)
-            do! db.saveAsync queryParamsForSorterSetEval (sorterSetEval |> outputData.SorterSetEval)
+            do! db.saveAsync queryParamsForSorterSetEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
             // Save sorterModelSetMaker
             let queryParamsForSorterModelSetMaker = makeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSetMaker None)
-            do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker) allowOverwrite
 
             // Mark run as finished
             runParameters.SetRunFinished true

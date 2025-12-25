@@ -34,7 +34,7 @@ printfn $"**** Q22Qr ******** {startTime.ToString()}"
 
 let geneSortDb = new GeneSortDbMp(rootDir) :> IGeneSortDb
 let cts = new CancellationTokenSource()
-
+let allowOverwrite = false |> UMX.tag<allowOverwrite>
 
 ///// **********     RandomSorters4to64   ****************
 //let executor = RandomSorters4to64.executor
@@ -79,11 +79,11 @@ let maxReplica = 1<replNumber>
 
 
 
-ProjectOps.initProjectFiles geneSortDb yab cts (Some progress) project minReplica maxReplica paramRefiner |> Async.RunSynchronously
-ProjectOps.executeRuns geneSortDb yab projectName cts (Some progress) executor |> Async.RunSynchronously
+ProjectOps.initProjectFiles geneSortDb yab cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner |> Async.RunSynchronously
+ProjectOps.executeRuns geneSortDb yab projectName allowOverwrite cts (Some progress) executor |> Async.RunSynchronously
 
-TextReporters.ceUseProfileReportExecutor geneSortDb projectName yab cts (Some progress) |> Async.RunSynchronously
-TextReporters.binReportExecutor geneSortDb projectName yab cts (Some progress) |> Async.RunSynchronously
+//TextReporters.ceUseProfileReportExecutor geneSortDb projectName yab allowOverwrite cts (Some progress) |> Async.RunSynchronously
+//TextReporters.binReportExecutor geneSortDb projectName yab allowOverwrite cts (Some progress) |> Async.RunSynchronously
 
 
 let endTime = System.DateTime.Now

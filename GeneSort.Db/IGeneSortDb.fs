@@ -15,8 +15,12 @@ open GeneSort.SortingOps
 open GeneSort.SortingResults
 
 
+
+[<Measure>] type allowOverwrite
+
+
 type IGeneSortDb =
-    abstract member saveAsync : queryParams -> outputData -> Async<unit>
+    abstract member saveAsync : queryParams -> outputData -> bool<allowOverwrite> -> Async<unit>
     abstract member loadAsync : queryParams -> Async<Result<outputData, OutputError>>
     abstract member getAllProjectNamesAsync : 
                 unit -> Async<Result<string<projectName>[], string>>
@@ -30,6 +34,7 @@ type IGeneSortDb =
     abstract member saveAllRunParametersAsync : 
             runParameters[] -> 
             (runParameters -> outputDataType -> queryParams) ->
+            bool<allowOverwrite> ->
             CancellationToken option -> 
             IProgress<string> option -> Async<unit>
 

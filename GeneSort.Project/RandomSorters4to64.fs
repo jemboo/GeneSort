@@ -31,6 +31,7 @@ module RandomSorters4to64 =
     // Fixed parameters:
     let randomType = rngType.Lcg
     let excludeSelfCe = true
+    let allowOverwrite = false |> UMX.tag<allowOverwrite>
 
 
 
@@ -260,7 +261,7 @@ module RandomSorters4to64 =
         
             // Save sorter set
             let queryParamsForSorterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet None) 
-            do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet)
+            do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet) allowOverwrite
         
             match progress with
             | Some p -> p.Report(sprintf "Run %s_%d: Saving sorter model set maker" %index %repl)
@@ -268,7 +269,7 @@ module RandomSorters4to64 =
         
             // Save sorterModelSetMaker
             let queryParamsForSorterModelSetMaker = makeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSetMaker None) 
-            do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker)
+            do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker) allowOverwrite
         
             // Mark run as finished
             runParameters.SetRunFinished true

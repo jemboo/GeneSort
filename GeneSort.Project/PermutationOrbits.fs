@@ -18,6 +18,7 @@ module PermutationOrbits =
 
     let randomType = rngType.Lcg
     let sortableDataType = sortableDataType.Ints
+    let allowOverwrite = false |> UMX.tag<allowOverwrite>
 
 
 
