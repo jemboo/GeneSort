@@ -33,7 +33,7 @@ type sortableIntTests =
     override this.GetHashCode() =
         hash this.sortableIntArrays
 
-    member this.SortableArrayType with get() = sortableArrayDataType.Ints
+    member this.SortableArrayType with get() = sortableDataType.Ints
 
     member this.Count with get() = this.sortableIntArrays.Length
 

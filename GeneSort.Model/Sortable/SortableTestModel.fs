@@ -22,27 +22,27 @@ module SortableTestModel =
 
     let makeSortableTests 
             (sortableTestModel: sortableTestModel) 
-            (sortableArrayDataType: sortableArrayDataType) : sortableTests =
+            (sortableDataType: sortableDataType) : sortableTests =
 
         match sortableTestModel with
 
         | MsasF msasF -> 
-                match sortableArrayDataType with
-                | sortableArrayDataType.Bools ->        
+                match sortableDataType with
+                | sortableDataType.Bools ->        
                         msasF.MakeSortableBoolTests (getSortingWidth sortableTestModel) |> sortableTests.Bools
-                | sortableArrayDataType.Ints ->
+                | sortableDataType.Ints ->
                     failwith "Ints SortableArrayType not supported"
 
         | MsasO msasO ->
-                match sortableArrayDataType with
-                | sortableArrayDataType.Bools ->        
+                match sortableDataType with
+                | sortableDataType.Bools ->        
                      msasO.MakeSortableBoolTests (getSortingWidth sortableTestModel) |> sortableTests.Bools
-                | sortableArrayDataType.Ints ->
+                | sortableDataType.Ints ->
                      msasO.MakeSortableIntTests (getSortingWidth sortableTestModel) |> sortableTests.Ints
 
         | MsasMi msasMi ->
-                match sortableArrayDataType with
-                | sortableArrayDataType.Bools ->        
+                match sortableDataType with
+                | sortableDataType.Bools ->        
                     msasMi.MakeSortableBoolTests |> sortableTests.Bools
-                | sortableArrayDataType.Ints ->
+                | sortableDataType.Ints ->
                     msasMi.MakeSortableIntTests |> sortableTests.Ints

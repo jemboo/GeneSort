@@ -20,34 +20,34 @@ type sortableTestModelSet =
     member this.Id with get() = this.id
     member this.SorterTestModels with get() = this.sorterTestModels
 
-    member this.makeSortableTestSet (sortableArrayDataType:sortableArrayDataType) : sortableTestSet =
+    member this.makeSortableTestSet (sortableDataType:sortableDataType) : sortableTestSet =
         let id = (%this.id) |> UMX.tag<sortableTestSetId>
 
         let sortableTestArray = 
                 this.SorterTestModels
-                |> Array.map(fun model -> SortableTestModel.makeSortableTests model sortableArrayDataType)
+                |> Array.map(fun model -> SortableTestModel.makeSortableTests model sortableDataType)
 
-        //match sortableArrayDataType with
-        //| sortableArrayDataType.Bools ->
+        //match sortableDataType with
+        //| sortableDataType.Bools ->
         //    (sortableBoolTestSet.create id sortableTestArray) |> sortableTestSet.Bools
-        //| sortableArrayDataType.Ints -> 
+        //| sortableDataType.Ints -> 
 
 
-        match sortableArrayDataType with
-        | sortableArrayDataType.Bools -> 
+        match sortableDataType with
+        | sortableDataType.Bools -> 
             let boolTests = 
                 this.SorterTestModels 
-                |> Array.map (fun model -> SortableTestModel.makeSortableTests model sortableArrayDataType)
+                |> Array.map (fun model -> SortableTestModel.makeSortableTests model sortableDataType)
                 |> Array.map (fun st -> 
                     match st with
                     | sortableTests.Bools bt -> bt
                     | _ -> failwith "Inconsistent SorterTestModelSet: expected Bools")
             sortableTestSet.Bools (sortableBoolTestSet.create id boolTests)
 
-        | sortableArrayDataType.Ints -> 
+        | sortableDataType.Ints -> 
             let intTests = 
                 this.SorterTestModels 
-                |> Array.map (fun model -> SortableTestModel.makeSortableTests model sortableArrayDataType)
+                |> Array.map (fun model -> SortableTestModel.makeSortableTests model sortableDataType)
                 |> Array.map (fun st -> 
                     match st with
                     | sortableTests.Ints it -> it

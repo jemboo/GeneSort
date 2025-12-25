@@ -31,28 +31,28 @@ open FSharp.UMX
 
 
 type mergeFillType =
-    | Full
+    | NoFill
     | VanVoorhis
 
 
-type sortableArrayDataType = 
+type sortableDataType = 
     | Ints
     | Bools
 
-module SortableArrayDataType =
+module SortableDataType =
 
-    let toString (t:sortableArrayDataType option) : string =
+    let toString (t:sortableDataType option) : string =
         match t with
         | Some Ints -> "Ints"
         | Some Bools -> "Bools"
         | None -> "None"
 
-    let fromString (s:string) : sortableArrayDataType =
+    let fromString (s:string) : sortableDataType =
         match s with
         | "Ints" -> Ints
         | "Bools" -> Bools
         | _ -> failwithf "Unknown SortableArrayType: %s" s
-    let all () : sortableArrayDataType list =
+    let all () : sortableDataType list =
         [ Ints; Bools ]
 
 
@@ -83,18 +83,18 @@ module MergeFillType =
 
     let toString (t:mergeFillType option) : string =
         match t with
-        | Some Full -> "Full"
+        | Some NoFill -> "NoFill"
         | Some VanVoorhis -> "VanVoorhis"
         | None -> "None"
 
     let fromString (s:string) : mergeFillType =
         match s with
-        | "Full" -> mergeFillType.Full
+        | "NoFill" -> mergeFillType.NoFill
         | "VanVoorhis" -> mergeFillType.VanVoorhis
         | _ -> failwithf "Unknown MergeFillType: %s" s
 
     let all () : mergeFillType list =
-        [ mergeFillType.Full; mergeFillType.VanVoorhis ]
+        [ mergeFillType.NoFill; mergeFillType.VanVoorhis ]
 
 
 module CeLength =

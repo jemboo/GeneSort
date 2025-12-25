@@ -8,6 +8,7 @@ type outputDataType =
     | Project
     | RunParameters
     | SorterSet of string option
+    | SortableTest of string option
     | SortableTestSet of string option
     | SorterModelSet of string option
     | SorterModelSetMaker of string option
@@ -26,6 +27,8 @@ module OutputDataType =
         | RunParameters -> "RunParameters"
         | SorterSet None -> "SorterSet"
         | SorterSet (Some s) -> "SorterSet_" + s
+        | SortableTest None -> "SortableTestSet"
+        | SortableTest (Some s) -> "SortableTestSet_" + s
         | SortableTestSet None -> "SortableTestSet"
         | SortableTestSet (Some s) -> "SortableTestSet_" + s
         | SorterModelSet None -> "SorterModelSet"
@@ -59,6 +62,7 @@ module OutputDataType =
             | None -> Some RunParameters
             | _ -> None
         | "SorterSet" -> Some (SorterSet param)
+        | "SortableTest" -> Some (SortableTest param)
         | "SortableTestSet" -> Some (SortableTestSet param)
         | "SorterModelSet" -> Some (SorterModelSet param)
         | "SorterModelSetMaker" -> Some (SorterModelSetMaker param)

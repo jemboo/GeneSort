@@ -17,6 +17,7 @@ open GeneSort.Core
 type outputData =
     | RunParameters of runParameters
     | SorterSet of sorterSet
+    | SortableTest of sortableTests
     | SortableTestSet of sortableTestSet
     | SorterModelSet of sorterModelSet
     | SorterModelSetMaker of sorterModelSetMaker

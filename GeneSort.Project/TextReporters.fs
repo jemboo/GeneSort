@@ -116,7 +116,7 @@ module TextReporters =
                     let repl = runParams.GetRepl() |> Repl.toString
                     let sortingWidth = runParams.GetSortingWidth() |> SortingWidth.toString
                     let sorterModelKey = runParams.GetSorterModelType() |> SorterModelType.toString
-                    let sortableArrayDataType = runParams.GetSortableArrayDataType() |> SortableArrayDataType.toString
+                    let sortableDataType = runParams.GetSortableDataType() |> SortableDataType.toString
                     let mergeFillType = runParams.GetMergeFillType() |> MergeFillType.toString
                     let mergeDimension = runParams.GetMergeDimension() |> MergeDimension.toString
                     match progress with
@@ -136,7 +136,7 @@ module TextReporters =
                                             repl
                                             sortingWidth 
                                             sorterModelKey
-                                            sortableArrayDataType
+                                            sortableDataType
                                             mergeFillType
                                             mergeDimension
                                             sorterSetCeUseProfile

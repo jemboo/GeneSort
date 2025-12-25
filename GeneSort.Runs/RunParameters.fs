@@ -35,7 +35,7 @@ type runParameters =
     static member sorterModelTypeKey = "SorterModelType"
     static member sortableArrayTypeKey = "SortableArrayType"
     static member sortingWidthKey = "SortingWidth"
-    static member sortableArrayDataTypeKey = "SortingWidthDataType"
+    static member sortableDataTypeKey = "SortingWidthDataType"
     static member mergeDimensionKey = "MergeDimension"
     static member mergeFillTypeKey = "MergeFillType"
     static member stageLengthKey = "StageLength"
@@ -159,23 +159,23 @@ type runParameters =
 
 
     /// Gets the GetSortableArrayDataType value.
-    member this.GetSortableArrayDataType() : sortableArrayDataType option =
-        match this.paramMap.TryFind runParameters.sortableArrayDataTypeKey with
+    member this.GetSortableDataType() : sortableDataType option =
+        match this.paramMap.TryFind runParameters.sortableDataTypeKey with
         | Some value -> 
             try
-                Some (SortableArrayDataType.fromString value)
+                Some (SortableDataType.fromString value)
             with
             | _ -> None
         | None -> None
 
     member this.GetSortableArrayDataTypeKvp() : (string * string) option =
-        match this.paramMap.TryFind runParameters.sortableArrayDataTypeKey with
-        | Some value -> Some (runParameters.sortableArrayDataTypeKey, value)
+        match this.paramMap.TryFind runParameters.sortableDataTypeKey with
+        | Some value -> Some (runParameters.sortableDataTypeKey, value)
         | None -> None
 
     /// Sets the GetSortableArrayDataType value.
-    member this.SetSortableArrayDataTypeKey(sortableArrayDataType: sortableArrayDataType option) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.sortableArrayDataTypeKey, SortableArrayDataType.toString sortableArrayDataType)
+    member this.SetSortableArrayDataTypeKey(sortableDataType: sortableDataType option) : unit =
+        this.paramMap <- this.paramMap.Add(runParameters.sortableDataTypeKey, SortableDataType.toString sortableDataType)
 
 
 

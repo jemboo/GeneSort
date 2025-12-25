@@ -152,11 +152,11 @@ module MergeIntEvals =
 
     let sortableArrayDataTypeKeyValues = 
             [ 
-                Some sortableArrayDataType.Ints; 
-                Some sortableArrayDataType.Bools ] |> List.map(SortableArrayDataType.toString)
+                Some sortableDataType.Ints; 
+                Some sortableDataType.Bools ] |> List.map(SortableDataType.toString)
   
     let sortableArrayDataTypeKeys () : string*string list =
-        (runParameters.sortableArrayDataTypeKey, sortableArrayDataTypeKeyValues )
+        (runParameters.sortableDataTypeKey, sortableArrayDataTypeKeyValues )
 
   
     let sortingWidthValues = 
@@ -260,7 +260,8 @@ module MergeIntEvals =
         ]
         
     let outputDataTypes = 
-            [|                
+            [| 
+                outputDataType.RunParameters;
                 outputDataType.SorterModelSetMaker None;
                 outputDataType.SorterSet None;
                 outputDataType.SorterSetEval None;
@@ -296,7 +297,7 @@ module MergeIntEvals =
             let sorterCount = runParameters.GetSorterCount().Value
             let mergeDimension = runParameters.GetMergeDimension().Value
             let mergeFillType = runParameters.GetMergeFillType().Value
-            let sortableArrayDataType = runParameters.GetSortableArrayDataType().Value
+            let sortableDataType = runParameters.GetSortableDataType().Value
 
 
             match progress with
@@ -340,7 +341,7 @@ module MergeIntEvals =
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
             let sortableTestModel = msasM.create sortingWidth mergeDimension mergeFillType |> sortableTestModel.MsasMi
-            let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableArrayDataType
+            let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataType
 
         
             match progress with

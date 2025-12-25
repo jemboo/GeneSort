@@ -20,7 +20,7 @@ module FullBoolEvals =
     let sorterSetSourceProjectName = "RandomSorters4to64" |> UMX.tag<projectName>
 
     let randomType = rngType.Lcg
-    let sortableArrayDataType = sortableArrayDataType.Bools
+    let sortableDataType = sortableDataType.Bools
 
 
     let makeQueryParams 
@@ -105,6 +105,7 @@ module FullBoolEvals =
 
     let outputDataTypes = 
             [|
+                outputDataType.RunParameters;
                 outputDataType.SorterSetEval None;
                 outputDataType.TextReport ("Bins" |> UMX.tag<textReportName>); 
                 outputDataType.TextReport ("Profiles" |> UMX.tag<textReportName>); 
@@ -171,7 +172,7 @@ module FullBoolEvals =
 
 
             let sorterTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-            let sortableTests = SortableTestModel.makeSortableTests sorterTestModel sortableArrayDataType
+            let sortableTests = SortableTestModel.makeSortableTests sorterTestModel sortableDataType
             let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
 
             cts.Token.ThrowIfCancellationRequested()

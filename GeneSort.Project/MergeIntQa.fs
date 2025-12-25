@@ -33,7 +33,7 @@ module MergeIntQa =
             (repl: int<replNumber> option) 
             (sortingWidth: int<sortingWidth> option)
             (sorterModelType: sorterModelType option)
-            (sortableArrayDataType: sortableArrayDataType option)
+            (sortableDataType: sortableDataType option)
             (mergeDimension: int<mergeDimension> option)
             (mergeFillType: mergeFillType option)
             (outputDataType: outputDataType) =
@@ -45,7 +45,7 @@ module MergeIntQa =
             [|
                 (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
                 (runParameters.sorterModelTypeKey, sorterModelType |> SorterModelType.toString);
-                (runParameters.sortableArrayDataTypeKey, sortableArrayDataType |> SortableArrayDataType.toString); 
+                (runParameters.sortableDataTypeKey, sortableDataType |> SortableDataType.toString); 
                 (runParameters.mergeDimensionKey, mergeDimension |> MergeDimension.toString); 
                 (runParameters.mergeFillTypeKey, mergeFillType |> MergeFillType.toString);
             |])
@@ -58,7 +58,7 @@ module MergeIntQa =
             (runParams.GetRepl())
             (runParams.GetSortingWidth())
             (runParams.GetSorterModelType())
-            (runParams.GetSortableArrayDataType())
+            (runParams.GetSortableDataType())
             (runParams.GetMergeDimension())
             (runParams.GetMergeFillType())
             outputDataType
@@ -102,11 +102,11 @@ module MergeIntQa =
 
     let sortableArrayDataTypeKeyValues = 
             [ 
-                Some sortableArrayDataType.Ints; 
-                Some sortableArrayDataType.Bools ] |> List.map(SortableArrayDataType.toString)
+                Some sortableDataType.Ints; 
+                Some sortableDataType.Bools ] |> List.map(SortableDataType.toString)
   
     let sortableArrayDataTypeKeys () : string*string list =
-        (runParameters.sortableArrayDataTypeKey, sortableArrayDataTypeKeyValues )
+        (runParameters.sortableDataTypeKey, sortableArrayDataTypeKeyValues )
 
 
 
@@ -192,7 +192,8 @@ module MergeIntQa =
         ]
         
     let outputDataTypes = 
-            [|                
+            [|  
+                outputDataType.RunParameters;              
                 outputDataType.SorterModelSetMaker None;
                 outputDataType.SorterSet None;
                 outputDataType.SorterSetEval None;
@@ -227,7 +228,7 @@ module MergeIntQa =
             let sorterCount = runParameters.GetSorterCount().Value
             let mergeDimension = runParameters.GetMergeDimension().Value
             let mergeFillType = runParameters.GetMergeFillType().Value
-            let sortableArrayDataType = runParameters.GetSortableArrayDataType().Value
+            let sortableDataType = runParameters.GetSortableDataType().Value
 
             match progress with
             | Some p -> p.Report(sprintf "Executing Run %s_%d  %s" %index %repl (runParameters.toString()))
@@ -270,7 +271,7 @@ module MergeIntQa =
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
             let sortableTestModel = msasM.create sortingWidth mergeDimension mergeFillType |> sortableTestModel.MsasMi
-            let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableArrayDataType
+            let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataType
 
         
             match progress with

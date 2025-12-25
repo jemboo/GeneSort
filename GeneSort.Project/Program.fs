@@ -50,15 +50,24 @@ let cts = new CancellationTokenSource()
 
 
 
-
-/// **********     MergeIntQa   ****************
-let project = MergeIntQa.project
-let executor = MergeIntQa.executor
-let projectName = MergeIntQa.projectName
-let yab = MergeIntQa.makeQueryParamsFromRunParams
-let paramRefiner = MergeIntQa.paramMapRefiner
+/// **********     SortableIntMerges   ****************
+let project = SortableIntMerges.project
+let executor = SortableIntMerges.executor
+let projectName = SortableIntMerges.projectName
+let yab = SortableIntMerges.makeQueryParamsFromRunParams
+let paramRefiner = SortableIntMerges.paramMapRefiner
 let minReplica = 0<replNumber>
 let maxReplica = 1<replNumber>
+
+
+/// **********     MergeIntQa   ****************
+//let project = MergeIntQa.project
+//let executor = MergeIntQa.executor
+//let projectName = MergeIntQa.projectName
+//let yab = MergeIntQa.makeQueryParamsFromRunParams
+//let paramRefiner = MergeIntQa.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 

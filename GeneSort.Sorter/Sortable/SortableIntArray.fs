@@ -156,7 +156,7 @@ module SortableIntArray =
         let mergeLattice = MergeLattice.create latticeDimension edgeLength
         let sortableIntArrays =
             match mergeFillType with
-            | Full -> 
+            | NoFill -> 
                 MergeLattice.getPermutationsStandard None mergeLattice
                 |> LatticePathPermutations.toPermutations
                 |> Array.map(sortableIntArray.createFromPermutation)

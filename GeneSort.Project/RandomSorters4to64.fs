@@ -176,6 +176,7 @@ module RandomSorters4to64 =
 
     let outputDataTypes = 
             [|
+                outputDataType.RunParameters;
                 outputDataType.SorterModelSetMaker None;
                 outputDataType.SorterSet None;
                 outputDataType.TextReport ("Bins" |> UMX.tag<textReportName>); 

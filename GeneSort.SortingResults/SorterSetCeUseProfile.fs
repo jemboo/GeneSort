@@ -50,7 +50,7 @@ module SorterCeUseProfile =
             (repl:string)
             (sortingWidth:string) 
             (sorterModelKey:string)
-            (sortableArrayDataType:string)
+            (sortableDataType:string)
             (mergeFillType:string)
             (mergeDimension:string)
             (profile: sorterCeUseProfile) : string[] =
@@ -59,7 +59,7 @@ module SorterCeUseProfile =
             yield repl
             yield sortingWidth
             yield sorterModelKey
-            yield sortableArrayDataType
+            yield sortableDataType
             yield mergeFillType
             yield mergeDimension
             yield (%profile.sorterId.ToString()) 
@@ -109,7 +109,7 @@ module SorterSetCeUseProfile =
             (repl:string) 
             (sortingWidth:string) 
             (sorterModelKey:string)
-            (sortableArrayDataType:string)
+            (sortableDataType:string)
             (mergeFillType:string)
             (mergeDimension:string)
             (sorterSetCeUseProfile: sorterSetCeUseProfile) : string [][] =
@@ -120,7 +120,7 @@ module SorterSetCeUseProfile =
                                                 repl    
                                                 sortingWidth 
                                                 sorterModelKey
-                                                sortableArrayDataType
+                                                sortableDataType
                                                 mergeFillType
                                                 mergeDimension 
                                                 profile

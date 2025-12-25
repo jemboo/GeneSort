@@ -166,7 +166,7 @@ module SortableBoolArray =
 
         let sortableBoolArrays =
             match mergeFillType with
-            | Full -> 
+            | NoFill -> 
                 fromLatticeCubeFull latticeDimension edgeLength
             | VanVoorhis ->
                 fromLatticeCubeVV latticeDimension edgeLength
