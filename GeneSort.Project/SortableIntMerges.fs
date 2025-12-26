@@ -60,7 +60,7 @@ module SortableIntMerges =
         (runParameters.sortableDataTypeKey, sortableArrayDataTypeKeyValues )
 
     let sortingWidthValues = 
-        [16; 18; 24; 32; 36; 48; 64; 128] |> List.map(fun d -> d.ToString())
+        [16; 18; 24; 32; 36; 48; 64; 96; 128; 144; 192; 256] |> List.map(fun d -> d.ToString())
 
     let sortingWidths() : string*string list =
         (runParameters.sortingWidthKey, sortingWidthValues)
@@ -105,7 +105,7 @@ module SortableIntMerges =
             let mergeDimension = rp.GetMergeDimension().Value
             let sortableDataType = rp.GetSortableDataType().Value
             let mergeFillType = rp.GetMergeFillType().Value
-            if (mergeFillType.IsNoFill && %sortingWidth > 16) then None else runParameters
+            if (mergeFillType.IsNoFill && %sortingWidth > 32) then None else runParameters
 
 
     let limitForMergeDimension (runParameters: runParameters option) =
@@ -116,7 +116,7 @@ module SortableIntMerges =
             let mergeDimension = rp.GetMergeDimension().Value
             let sortableDataType = rp.GetSortableDataType().Value
             let mergeFillType = rp.GetMergeFillType().Value
-            if (%mergeDimension > 2 && %sortingWidth > 32) then None else runParameters
+            if (%mergeDimension > 6 && %sortingWidth > 144) then None else runParameters
 
 
     let paramMapFilter (runParameters: runParameters) = 
