@@ -183,15 +183,11 @@ module SortableIntMerges =
             let mergeFillType = runParameters.GetMergeFillType().Value
             let sortableDataType = runParameters.GetSortableDataType().Value
 
-            match progress with
-            | Some p -> p.Report(sprintf "Executing Run %s_%d  %s" %index %repl (runParameters.toString()))
-            | None -> ()
-        
             // Check cancellation before starting expensive operations
             cts.Token.ThrowIfCancellationRequested()
         
             match progress with
-            | Some p -> p.Report(sprintf "Run %s_%d: Creating sorter set" %index %repl)
+            | Some p -> p.Report(sprintf "Run %s_%d - %s: Creating sortable set" %index %repl (runParameters.toString()))
             | None -> ()
         
             // Check cancellation before generating sorters
@@ -199,11 +195,6 @@ module SortableIntMerges =
 
             let sortableTestModel = msasM.create sortingWidth mergeDimension mergeFillType |> sortableTestModel.MsasMi
             let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataType
-
-        
-            match progress with
-            | Some p -> p.Report(sprintf "Run %s_%d: Evaluating sorter set" %index %repl)
-            | None -> ()
 
 
             cts.Token.ThrowIfCancellationRequested()

@@ -11,6 +11,28 @@ open GeneSort.Runs
 
 module ProjectOps =  
 
+    let inline report (progress: IProgress<string> option) msg =
+        progress |> Option.iter (fun p -> p.Report msg)
+
+
+    let reportRunParameters 
+            (runParameters: runParameters) 
+            (progress: IProgress<string> option)  : Async<RunResult> = 
+        async {
+            let index = runParameters.GetId().Value
+            let repl = runParameters.GetRepl().Value
+
+            try
+                report progress (runParameters.toString())
+                return Success (index, repl)
+            with e ->
+                let msg = $"{e.GetType().Name}: {e.Message}"
+                let result = Failure (index, repl, msg)
+                ProgressMessage.reportRunResult progress result
+                return result
+        }
+
+
     let executeRunParameters
             (db: IGeneSortDb)
             (yab: runParameters -> outputDataType -> queryParams)
@@ -47,6 +69,63 @@ module ProjectOps =
         }
 
 
+    let reportRunParametersSeq
+        (maxDegreeOfParallelism: int) 
+        (runParameters: runParameters seq)
+        (cts: CancellationTokenSource)
+        (progress: IProgress<string> option)
+        : Async<RunResult[]> =
+    
+        async {
+            try
+                cts.Token.ThrowIfCancellationRequested()
+            
+                let tasks =
+                    runParameters
+                    |> Seq.map (fun rps -> reportRunParameters rps progress)
+                    |> Seq.toList
+
+                // Execute with throttling, collecting results
+                let! results = 
+                    async {
+                        use semaphore = new System.Threading.SemaphoreSlim(maxDegreeOfParallelism)
+                        let taskResults =
+                            tasks
+                            |> List.map (fun comp ->
+                                async {
+                                    try
+                                        do! Async.AwaitTask (semaphore.WaitAsync())
+                                        return! comp
+                                    finally
+                                        semaphore.Release() |> ignore
+                                }
+                                |> Async.StartAsTask)
+                            |> List.toArray
+                    
+                        return! Async.AwaitTask (System.Threading.Tasks.Task.WhenAll(taskResults))
+                    }
+            
+                // Report summary
+                let successCount = results |> Array.filter (function Success _ -> true | _ -> false) |> Array.length
+                let failureCount = results |> Array.filter (function Failure _ -> true | _ -> false) |> Array.length
+                let skippedCount = results |> Array.filter (function Skipped _ -> true | _ -> false) |> Array.length
+            
+                match progress with
+                | Some p -> 
+                    p.Report(sprintf "\n=== Batch Complete: %d succeeded, %d failed, %d skipped ===" 
+                        successCount failureCount skippedCount)
+                | None -> ()
+            
+                return results
+            
+            with 
+            | :? OperationCanceledException ->
+                report progress "Execution cancelled by user"
+                return [||]
+            | e ->
+                report progress (sprintf "Fatal error in batch execution: %s" e.Message)
+                return [||]
+        }
 
 
     let executeRunParametersSeq
@@ -94,27 +173,18 @@ module ProjectOps =
                 let failureCount = results |> Array.filter (function Failure _ -> true | _ -> false) |> Array.length
                 let skippedCount = results |> Array.filter (function Skipped _ -> true | _ -> false) |> Array.length
             
-                match progress with
-                | Some p -> 
-                    p.Report(sprintf "\n=== Batch Complete: %d succeeded, %d failed, %d skipped ===" 
-                        successCount failureCount skippedCount)
-                | None -> ()
-            
+                report progress (sprintf "\n=== Batch Complete: %d succeeded, %d failed, %d skipped ===" 
+                                            successCount failureCount skippedCount)
                 return results
             
             with 
             | :? OperationCanceledException ->
-                match progress with
-                | Some p -> p.Report("Execution cancelled by user")
-                | None -> ()
+                report progress "Execution cancelled by user"
                 return [||]
             | e ->
-                match progress with
-                | Some p -> p.Report(sprintf "Fatal error in batch execution: %s" e.Message)
-                | None -> ()
+                report progress (sprintf "Fatal error in batch execution: %s" e.Message)
                 return [||]
         }
-
 
 
     let saveParametersFiles 
@@ -127,32 +197,23 @@ module ProjectOps =
             (progress: IProgress<string> option) : Async<Result<unit, string>> =
         async {
             try
-                match progress with
-                | Some p -> p.Report(sprintf "Saving RunParameter files for %s" %projectName)
-                | None -> ()
+                report progress (sprintf "Saving RunParameter files for %s" %projectName)
             
                 cts.Token.ThrowIfCancellationRequested()
             
                 do! db.saveAllRunParametersAsync runParameterArray yab allowOverwrite (Some cts.Token) progress
             
-                match progress with
-                | Some p -> p.Report(sprintf "Successfully saved %d RunParameter files" runParameterArray.Length)
-                | None -> ()
-            
+                report progress (sprintf "Successfully saved %d RunParameter files" runParameterArray.Length)
                 return Ok ()
             
             with 
             | :? OperationCanceledException ->
                 let msg = sprintf "Saving RunParameter files was cancelled"
-                match progress with
-                | Some p -> p.Report(msg)
-                | None -> ()
+                report progress msg
                 return Error msg
             | e ->
                 let msg = sprintf "Failed to save RunParameter files for %s: %s" %projectName e.Message
-                match progress with
-                | Some p -> p.Report(msg)
-                | None -> ()
+                report progress msg
                 return Error msg
         }
 
@@ -171,18 +232,14 @@ module ProjectOps =
 
         async {
             try
-                match progress with
-                | Some p -> p.Report(sprintf "Saving project file: %s" %project.ProjectName)
-                | None -> ()
+                report progress (sprintf "Saving project file: %s" %project.ProjectName)
             
                 // Save project
                 let queryParams = queryParams.createForProject project.ProjectName
                 do! db.saveAsync queryParams (project |> outputData.Project) allowOverwrite
             
                 let runParametersArray = Project.makeRunParameters minReplica maxReplica project.ParameterSpans paramRefiner
-                match progress with
-                | Some p -> p.Report(sprintf "Saving run parameters files: (%d)" runParametersArray.Length)
-                | None -> ()
+                report progress (sprintf "Saving run parameters files: (%d)" runParametersArray.Length)
 
                 let! initResult = saveParametersFiles 
                                     db project.ProjectName runParametersArray yab allowOverwrite cts progress
@@ -198,11 +255,54 @@ module ProjectOps =
             
             with e ->
                 let errorMsg = sprintf "Failed to initialize project files: %s" e.Message
-                match progress with
-                | Some p -> p.Report(errorMsg)
-                | None -> ()
+                report progress errorMsg
                 return Error errorMsg
         }
+
+
+    let reportRuns
+        (db: IGeneSortDb)
+        (projectName: string<projectName>)
+        (cts: CancellationTokenSource) 
+        (progress: IProgress<string> option) 
+                   : Async<Result<RunResult[], string>>  =
+        async {
+            try
+                match progress with
+                | Some p -> p.Report(sprintf "Executing Runs for %s" %projectName)
+                | None -> ()
+            
+                let! runParamsResult = db.getAllProjectRunParametersAsync projectName None progress
+            
+                match runParamsResult with
+                | Error msg ->
+                    match progress with
+                    | Some p -> p.Report(sprintf "Failed to load run parameters: %s" msg)
+                    | None -> ()
+                    return Error msg
+                
+                | Ok runParametersArray ->
+                    match progress with
+                    | Some p -> p.Report(sprintf "Found %d runs to execute" runParametersArray.Length)
+                    | None -> ()
+                
+                    if runParametersArray.Length = 0 then
+                        match progress with
+                        | Some p -> p.Report("No runs found to execute")
+                        | None -> ()
+                        return Ok [||]
+                    else
+                        let! results = reportRunParametersSeq 8 runParametersArray cts progress
+                        return Ok results
+            
+            with e ->
+                let msg = sprintf "Fatal error executing runs: %s" e.Message
+                match progress with
+                | Some p -> p.Report(msg)
+                | None -> ()
+                return Error msg
+        }
+
 
 
 
@@ -247,9 +347,10 @@ module ProjectOps =
             
             with e ->
                 let msg = sprintf "Fatal error executing runs: %s" e.Message
-                match progress with
-                | Some p -> p.Report(msg)
-                | None -> ()
+                report progress (msg)
                 return Error msg
         }
+
+
+
 

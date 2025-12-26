@@ -81,7 +81,7 @@ let maxReplica = 1<replNumber>
 
 ProjectOps.initProjectFiles geneSortDb yab cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner |> Async.RunSynchronously
 ProjectOps.executeRuns geneSortDb yab projectName allowOverwrite cts (Some progress) executor |> Async.RunSynchronously
-
+ProjectOps.reportRuns geneSortDb projectName cts (Some progress) |> Async.RunSynchronously
 //TextReporters.ceUseProfileReportExecutor geneSortDb projectName yab allowOverwrite cts (Some progress) |> Async.RunSynchronously
 //TextReporters.binReportExecutor geneSortDb projectName yab allowOverwrite cts (Some progress) |> Async.RunSynchronously
 
