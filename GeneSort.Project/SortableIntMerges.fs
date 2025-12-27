@@ -93,6 +93,8 @@ module SortableIntMerges =
         |> Option.bind limitForMergeFillType
         |> Option.bind limitForMergeDimension
 
+
+
     // --- Project Refinement ---
 
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
@@ -100,8 +102,8 @@ module SortableIntMerges =
         let enhancer (rp : runParameters) =
             // Use empty string for RunParameters case if required by your model
             let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
-            ((rp.WithProjectName projectName)
-              .WithRunFinished false)
+            rp.WithProjectName(projectName)
+              .WithRunFinished(false)
               .WithId (qp.Id.ToString() |> UMX.tag<idValue>)
 
         runParametersSeq 
@@ -135,7 +137,7 @@ module SortableIntMerges =
             (runParams: runParameters) 
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource) 
-            (progress: IProgress<string> option) : Async<runParameters> = // Now returns updated state
+            (progress: IProgress<string> option) : Async<runParameters> =
 
         async {
             let runId = runParams.GetId() |> Option.defaultValue (% "unknown")

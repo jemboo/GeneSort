@@ -126,46 +126,58 @@ module RandomSorters4to64 =
         | 96 -> 600 |> UMX.tag<stageLength>
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
+     
+     // --- Filters ---
 
-    let paramMapFilter (runParameters: runParameters) = 
-        let sorterModelKey = runParameters.GetSorterModelType().Value
-        let sortingWidth = runParameters.GetSortingWidth().Value
-        let has3factor = (%sortingWidth % 3 = 0)
+    let mergeDimensionDividesSortingWidth (rp: runParameters) =
+        let sw = rp.GetSortingWidth().Value
+        let md = rp.GetMergeDimension().Value
+        if (%sw % %md = 0) then Some rp else None
+
+
+    let sorterModelTypeForSortingWidth (rp: runParameters) =
+        let sorterModelKey = rp.GetSorterModelType().Value
+        let sortingWidth = rp.GetSortingWidth().Value
+        let has2factor = (%sortingWidth % 2 = 0)
+        let isMuf4able = (%sortingWidth % 4 = 0) && (MathUtils.isAPowerOfTwo (%sortingWidth / 2))
+        let isMuf6able = (%sortingWidth % 3 = 0) && (MathUtils.isAPowerOfTwo (%sortingWidth / 3))
 
         match sorterModelKey with
-        | sorterModelType.Mcse -> Some runParameters
-        | sorterModelType.Mssi -> Some runParameters
-        | sorterModelType.Msrs -> Some runParameters
+        | sorterModelType.Mcse -> Some rp
+        | sorterModelType.Mssi
+        | sorterModelType.Msrs -> if has2factor then Some rp else None
         | sorterModelType.Msuf4 ->
-                if has3factor then None else
-                Some runParameters
+                if isMuf4able then Some rp else None
         | sorterModelType.Msuf6 -> 
-                if has3factor then Some runParameters else
-                None
+                if isMuf6able then Some rp else None
+                
 
+
+    let paramMapFilter (rp: runParameters) = 
+        Some rp
+        |> Option.bind sorterModelTypeForSortingWidth
+
+
+    // --- Project Refinement ---
 
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
 
-        let enhancer (runParameters : runParameters) : runParameters =
-            let queryParams = makeQueryParamsFromRunParams runParameters (outputDataType.RunParameters)
-            runParameters.SetId ((queryParams.Id.ToString()) |> UMX.tag<idValue>)
-
-            runParameters.SetRunFinished false
-            runParameters.SetProjectName projectName
-
-            let repl = runParameters.GetRepl().Value
-            let sortingWidth = runParameters.GetSortingWidth().Value
-
+        let enhancer (rp : runParameters) : runParameters =
+            let repl = rp.GetRepl().Value
+            let sortingWidth = rp.GetSortingWidth().Value
+            let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
             let stageLength = getStageLengthForSortingWidth sortingWidth
-            runParameters.SetStageLength stageLength
-
             let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
-            runParameters.SetCeLength ceLength
-
             let replFactor = if (%repl = 0) then 1 else 10
             let sorterCount = sortingWidth |> getSorterCountForSortingWidth replFactor
-            runParameters.SetSorterCount sorterCount
-            runParameters
+
+            rp.WithProjectName(projectName)
+              .WithRunFinished(false)
+              .WithCeLength(ceLength)
+              .WithStageLength(stageLength)
+              .WithSorterCount(sorterCount)
+              .WithId (qp.Id.ToString() |> UMX.tag<idValue>)
+
 
         seq {
             for runParameters in runParametersSeq do
@@ -178,8 +190,8 @@ module RandomSorters4to64 =
     let outputDataTypes = 
             [|
                 outputDataType.RunParameters;
-                outputDataType.SorterModelSetMaker None;
-                outputDataType.SorterSet None;
+                outputDataType.SorterModelSetMaker "";
+                outputDataType.SorterSet "";
                 outputDataType.TextReport ("Bins" |> UMX.tag<textReportName>); 
                 outputDataType.TextReport ("Profiles" |> UMX.tag<textReportName>); 
                 outputDataType.TextReport ("Report3" |> UMX.tag<textReportName>); 
@@ -199,8 +211,9 @@ module RandomSorters4to64 =
     let executor
             (db: IGeneSortDb)
             (runParameters: runParameters) 
+            (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource) 
-            (progress: IProgress<string> option) : Async<unit> =
+            (progress: IProgress<string> option) : Async<runParameters> =
 
         async {
             let index = runParameters.GetId().Value  
@@ -210,10 +223,11 @@ module RandomSorters4to64 =
             let stageLength = runParameters.GetStageLength().Value
             let ceLength = runParameters.GetCeLength().Value
             let sorterCount = runParameters.GetSorterCount().Value
+            let runId = runParameters.GetId().Value
         
-            match progress with
-            | Some p -> p.Report(sprintf "Executing Run %s_%d  %s" %index %repl (runParameters.toString()))
-            | None -> ()
+            progress |> Option.iter(fun p ->  
+                p.Report(sprintf "Executing Run %s_%d  %s" %index %repl (runParameters.toString())))
+
         
             // Check cancellation before starting expensive operations
             cts.Token.ThrowIfCancellationRequested()
@@ -240,40 +254,47 @@ module RandomSorters4to64 =
                     (msuf6RandGen.create randomType sortingWidth stageLength uf6GenRatesArray) 
                     |> sorterModelMaker.SmmMsuf6RandGen
         
-            match progress with
-            | Some p -> p.Report(sprintf "Run %s_%d: Creating sorter set" %index %repl)
-            | None -> ()
-        
-            // Check cancellation before generating sorters
-            cts.Token.ThrowIfCancellationRequested()
         
             let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
             let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
             let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
             let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
         
-            match progress with
-            | Some p -> p.Report(sprintf "Run %s_%d: Saving sorter set" %index %repl)
-            | None -> ()
-        
             // Check cancellation before saving
             cts.Token.ThrowIfCancellationRequested()
         
             // Save sorter set
-            let queryParamsForSorterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet None) 
-            do! db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet) allowOverwrite
-        
-            match progress with
-            | Some p -> p.Report(sprintf "Run %s_%d: Saving sorter model set maker" %index %repl)
-            | None -> ()
-        
-            // Save sorterModelSetMaker
-            let queryParamsForSorterModelSetMaker = makeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSetMaker None) 
-            do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker) allowOverwrite
-        
-            // Mark run as finished
-            runParameters.SetRunFinished true
-        
+            let queryParamsForSorterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "") 
+            let! saveResult = db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet) allowOverwrite
+            match saveResult with
+            | Ok _ ->
+                progress |> Option.iter (
+                                fun p -> p.Report(sprintf "Saved sorterSet %s for run: %s" 
+                                                    (%sorterSet.Id.ToString()) 
+                                                    %runId))
+
+                // Save sorterModelSetMaker
+                let queryParamsForSorterModelSetMaker = makeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSetMaker "") 
+                let! saveResult = db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker) allowOverwrite
+                match saveResult with
+                | Ok _ ->
+                    progress |> Option.iter (
+                                fun p -> p.Report(sprintf "Saved SorterModelSetMaker %s for run: %s" 
+                                                    (%sorterModelSetMaker.Id.ToString()) 
+                                                    %runId))
+                    return runParameters.WithRunFinished true
+                | Error err ->
+                    progress |> Option.iter (fun p -> p.Report(sprintf "Failed to save SorterModelSetMaker %s: %s" %runId err))
+                    // Return original state on failure (or you could add an Error status key)
+                    return runParameters
+
+            | Error err ->
+                progress |> Option.iter (
+                                fun p -> p.Report(sprintf "Failed to save sorterSet %s for run: %s with error %s" 
+                                                    (%sorterSet.Id.ToString())
+                                                    %runId err))                                  
+                // Return original state on failure (or you could add an Error status key)
+                return runParameters
         }
 
 

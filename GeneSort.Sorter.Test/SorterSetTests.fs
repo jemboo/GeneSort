@@ -18,7 +18,7 @@ type SorterSetTests() =
         let sorters = [| createSorter ces1; createSorter ces2 |]
         
         let sorterSet = sorterSet.createWithNewId 2<ceLength> sorters
-        Assert.NotEqual(Guid.Empty, %sorterSet.SorterSetId)
+        Assert.NotEqual(Guid.Empty, %sorterSet.Id)
         Assert.Equal(2, (%sorterSet.Sorters.Length * 1<sorterCount>))
         Assert.Equal(ces1 |> Array.toList, sorterSet.Sorters.[0].Ces)
         Assert.Equal(ces2 |> Array.toList, sorterSet.Sorters.[1].Ces)

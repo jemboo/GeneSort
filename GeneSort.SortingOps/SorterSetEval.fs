@@ -68,4 +68,4 @@ module SorterSetEval =
                             (ce.SortableTests |> SortableTests.getUnsortedCount)
                 )
 
-        sorterSetEval.create sorterSet.SorterSetId (sortableTests |> SortableTests.getId ) sorterEvals (sorterSet.CeLength)
+        sorterSetEval.create sorterSet.Id (sortableTests |> SortableTests.getId ) sorterEvals (sorterSet.CeLength)

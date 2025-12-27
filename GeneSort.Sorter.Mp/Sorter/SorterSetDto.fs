@@ -20,7 +20,7 @@ type sorterSetDto = {
 
 module SorterSetDto =
     let fromDomain (sorterSet: sorterSet) : sorterSetDto =
-        { SorterSetId = %sorterSet.SorterSetId
+        { SorterSetId = %sorterSet.Id
           CeLength = %sorterSet.CeLength
           Sorters = sorterSet.Sorters |> Array.map SorterDto.toSorterDto }
 

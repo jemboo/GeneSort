@@ -38,10 +38,13 @@ let allowOverwrite = false |> UMX.tag<allowOverwrite>
 let maxParallel = 4 // Set a reasonable limit for your machine
 
 ///// **********     RandomSorters4to64   ****************
-//let executor = RandomSorters4to64.executor
-//let project = RandomSorters4to64.project
-//let projectName = RandomSorters4to64.project.ProjectName
-
+let executor = RandomSorters4to64.executor
+let project = RandomSorters4to64.project
+let projectName = RandomSorters4to64.project.ProjectName
+let yab = RandomSorters4to64.makeQueryParamsFromRunParams
+let paramRefiner = RandomSorters4to64.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
 /// **********     MergeIntEvals   ****************
@@ -51,14 +54,14 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 
 
 
-/// **********     SortableIntMerges   ****************
-let project = SortableIntMerges.project
-let executor = SortableIntMerges.executor
-let projectName = SortableIntMerges.projectName
-let yab = SortableIntMerges.makeQueryParamsFromRunParams
-let paramRefiner = SortableIntMerges.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+///// **********     SortableIntMerges   ****************
+//let project = SortableIntMerges.project
+//let executor = SortableIntMerges.executor
+//let projectName = SortableIntMerges.projectName
+//let yab = SortableIntMerges.makeQueryParamsFromRunParams
+//let paramRefiner = SortableIntMerges.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 /// **********     MergeIntQa   ****************
 //let project = MergeIntQa.project

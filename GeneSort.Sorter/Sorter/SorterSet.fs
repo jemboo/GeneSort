@@ -25,5 +25,5 @@ open System.Linq
         sorterSet.create (UMX.tag<sorterSetId> (Guid.NewGuid())) ceLength sorters
 
     member this.CeLength with get() = this.ceLength
-    member this.SorterSetId with get() = this.sorterSetId
+    member this.Id with get() = this.sorterSetId
     member this.Sorters with get() : sorter[] = this.sorters
