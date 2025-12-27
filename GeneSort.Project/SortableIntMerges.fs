@@ -1,21 +1,19 @@
 ﻿namespace GeneSort.Project
 
 open System
-
-open FSharp.UMX
 open System.Threading
+open FSharp.UMX
 
+open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.Model.Sortable
 
-
 module SortableIntMerges =
 
-    let projectName = "SortableIntMerges"  |> UMX.tag<projectName>
+    let projectName = "SortableIntMerges" |> UMX.tag<projectName>
     let projectDesc = "Calc and save large SortableIntMerges"
-
 
     let makeQueryParams 
             (repl: int<replNumber> option) 
@@ -36,7 +34,6 @@ module SortableIntMerges =
                 (runParameters.sortableDataTypeKey, sortableDataType |> SortableDataType.toString);
             |])
 
-
     let makeQueryParamsFromRunParams
             (runParams: runParameters) 
             (outputDataType: outputDataType) =
@@ -47,104 +44,68 @@ module SortableIntMerges =
             (runParams.GetMergeDimension())
             (runParams.GetMergeFillType())
             (runParams.GetSortableDataType())
-
             outputDataType
 
+    // --- Parameter Spans ---
 
+    let sortableArrayDataTypeKeys () : string * string list =
+        let values = [ Some sortableDataType.Ints; Some sortableDataType.Bools ] |> List.map SortableDataType.toString
+        (runParameters.sortableDataTypeKey, values)
 
+    let sortingWidths () : string * string list =
+        let values = [16; 18; 24; 32; 36; ] |> List.map string
+        (runParameters.sortingWidthKey, values)
 
-    let sortableArrayDataTypeKeyValues = 
-            [ Some sortableDataType.Ints; Some sortableDataType.Bools;] |> List.map(SortableDataType.toString)
-  
-    let sortableArrayDataTypeKeys () : string*string list =
-        (runParameters.sortableDataTypeKey, sortableArrayDataTypeKeyValues )
+    let mergeDimensions () : string * string list =
+        let values = [2; 3; 4; 6; 8] |> List.map string
+        (runParameters.mergeDimensionKey, values)
 
-    let sortingWidthValues = 
-        [16; 18; 24; 32; 36; 48; 64; 96; 128; 144; 192; 256] |> List.map(fun d -> d.ToString())
+    let mergeFillTypes () : string * string list =
+        let values = [ Some mergeFillType.NoFill; Some mergeFillType.VanVoorhis ] |> List.map MergeFillType.toString
+        (runParameters.mergeFillTypeKey, values)
 
-    let sortingWidths() : string*string list =
-        (runParameters.sortingWidthKey, sortingWidthValues)
+    // --- Filters ---
 
+    let mergeDimensionDividesSortingWidth (rp: runParameters) =
+        let sw = rp.GetSortingWidth().Value
+        let md = rp.GetMergeDimension().Value
+        if (%sw % %md = 0) then Some rp else None
 
-    let mergeDimensionValues = 
-        [2; 3; 4; 6; 8;] |> List.map(fun d -> d.ToString())
+    let limitForBoolenDataType (rp: runParameters) =
+        let sw = rp.GetSortingWidth().Value
+        let dt = rp.GetSortableDataType().Value
+        if (dt.IsBools && %sw > 32) then None else Some rp
 
-    let mergeDimensions() : string*string list =
-        (runParameters.mergeDimensionKey, mergeDimensionValues)
+    let limitForMergeFillType (rp: runParameters) =
+        let sw = rp.GetSortingWidth().Value
+        let ft = rp.GetMergeFillType().Value
+        if (ft.IsNoFill && %sw > 32) then None else Some rp
 
+    let limitForMergeDimension (rp: runParameters) =
+        let sw = rp.GetSortingWidth().Value
+        let md = rp.GetMergeDimension().Value
+        if (%md > 6 && %sw > 144) then None else Some rp
 
-    let mergeFillTypeValues = 
-         [mergeFillType.NoFill; mergeFillType.VanVoorhis;] |> List.map(fun d -> d.ToString())
+    let paramMapFilter (rp: runParameters) = 
+        Some rp
+        |> Option.bind mergeDimensionDividesSortingWidth
+        |> Option.bind limitForBoolenDataType
+        |> Option.bind limitForMergeFillType
+        |> Option.bind limitForMergeDimension
 
-    let mergeFillTypes() : string*string list =
-        (runParameters.mergeFillTypeKey, mergeFillTypeValues)
-
-    let mergeDimensionDividesSortingWidth (runParameters: runParameters option) =
-        match runParameters with
-        | None -> None
-        | Some rp ->
-            let sortingWidth = rp.GetSortingWidth().Value
-            let mergeDimension = rp.GetMergeDimension().Value
-            if (%sortingWidth % %mergeDimension = 0) then runParameters else None
-
-
-    let limitForBoolenDataType (runParameters: runParameters option) =
-        match runParameters with
-        | None -> None
-        | Some rp ->
-            let sortingWidth = rp.GetSortingWidth().Value
-            let sortableDataType = rp.GetSortableDataType().Value
-            if (sortableDataType.IsBools && %sortingWidth > 32) then None else runParameters
-
-
-    let limitForMergeFillType (runParameters: runParameters option) =
-        match runParameters with
-        | None -> None
-        | Some rp ->
-            let sortingWidth = rp.GetSortingWidth().Value
-            let mergeDimension = rp.GetMergeDimension().Value
-            let sortableDataType = rp.GetSortableDataType().Value
-            let mergeFillType = rp.GetMergeFillType().Value
-            if (mergeFillType.IsNoFill && %sortingWidth > 32) then None else runParameters
-
-
-    let limitForMergeDimension (runParameters: runParameters option) =
-        match runParameters with
-        | None -> None
-        | Some rp ->
-            let sortingWidth = rp.GetSortingWidth().Value
-            let mergeDimension = rp.GetMergeDimension().Value
-            let sortableDataType = rp.GetSortableDataType().Value
-            let mergeFillType = rp.GetMergeFillType().Value
-            if (%mergeDimension > 6 && %sortingWidth > 144) then None else runParameters
-
-
-    let paramMapFilter (runParameters: runParameters) = 
-        (Some runParameters) 
-        |> mergeDimensionDividesSortingWidth
-        |> limitForBoolenDataType
-        |> limitForMergeFillType
-        |> limitForMergeDimension
-
-
+    // --- Project Refinement ---
 
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
 
-        let enhancer (runParameters : runParameters) : runParameters =
-            let queryParams = makeQueryParamsFromRunParams runParameters (outputDataType.RunParameters)
-            runParameters.SetId ((queryParams.Id.ToString()) |> UMX.tag<idValue>)
-            runParameters.SetRunFinished false
-            runParameters.SetProjectName projectName
-            runParameters
+        let enhancer (rp : runParameters) =
+            // Use empty string for RunParameters case if required by your model
+            let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
+            ((rp.WithProjectName projectName)
+              .WithRunFinished false)
+              .WithId (qp.Id.ToString() |> UMX.tag<idValue>)
 
-
-        seq {
-            for runParameters in runParametersSeq do
-                    let filtrate = paramMapFilter runParameters
-                    if filtrate.IsSome then
-                        let retVal = filtrate.Value |> enhancer
-                        yield retVal
-        }
+        runParametersSeq 
+        |> Seq.choose (paramMapFilter >> Option.map enhancer)
 
     let parameterSpans = 
         [
@@ -156,7 +117,7 @@ module SortableIntMerges =
         
     let outputDataTypes = 
             [|                
-                outputDataType.SortableTestSet None;
+                outputDataType.SortableTestSet ""; // Adjusted for string param
                 outputDataType.RunParameters;
             |]
 
@@ -167,51 +128,44 @@ module SortableIntMerges =
                 parameterSpans
                 outputDataTypes
 
+    // --- Executor ---
 
     let executor
             (db: IGeneSortDb)
-            (runParameters: runParameters) 
+            (runParams: runParameters) 
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource) 
-            (progress: IProgress<string> option) : Async<unit> =
+            (progress: IProgress<string> option) : Async<runParameters> = // Now returns updated state
 
         async {
-            let index = runParameters.GetId().Value  
-            let repl = runParameters.GetRepl().Value
-            let sortingWidth = runParameters.GetSortingWidth().Value
-            let mergeDimension = runParameters.GetMergeDimension().Value
-            let mergeFillType = runParameters.GetMergeFillType().Value
-            let sortableDataType = runParameters.GetSortableDataType().Value
+            let runId = runParams.GetId() |> Option.defaultValue (% "unknown")
+            let repl = runParams.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
+            
+            let sortingWidth = runParams.GetSortingWidth().Value
+            let mergeDimension = runParams.GetMergeDimension().Value
+            let mergeFillType = runParams.GetMergeFillType().Value
+            let sortableDataType = runParams.GetSortableDataType().Value
 
-            // Check cancellation before starting expensive operations
             cts.Token.ThrowIfCancellationRequested()
         
-            match progress with
-            | Some p -> p.Report(sprintf "Run %s_%d - %s: Creating sortable set" %index %repl (runParameters.toString()))
-            | None -> ()
+            progress |> Option.iter (fun p -> 
+                p.Report(sprintf "Run %s (Repl %s): Creating sortable set" %runId (Repl.toString (Some repl))))
         
-            // Check cancellation before generating sorters
-            cts.Token.ThrowIfCancellationRequested()
-
             let sortableTestModel = msasM.create sortingWidth mergeDimension mergeFillType |> sortableTestModel.MsasMi
             let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataType
 
-
             cts.Token.ThrowIfCancellationRequested()
-            match progress with
-            | Some p -> p.Report(sprintf "Run %s_%d: Saving sorterSet test results" %index %repl)
-            | None -> ()
 
-            //// Save sortableTest
-            let queryParamsForSortableTestSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTest None) 
-            do! db.saveAsync queryParamsForSortableTestSet (sortableTests |> outputData.SortableTest) allowOverwrite
+            let qpForSortableTest = makeQueryParamsFromRunParams runParams (outputDataType.SortableTestSet "") 
+            let! saveResult = db.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
 
-            //// Save sorterModelSetMaker
-            //let queryParamsForSorterModelSetMaker = 
-            //    queryParams.createFromRunParams (outputDataType.SorterModelSetMaker None) runParameters
-            //do! db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker)
-
-            // Mark run as finished
-            runParameters.SetRunFinished true
-       
+            match saveResult with
+            | Ok _ ->
+                progress |> Option.iter (fun p -> p.Report(sprintf "Run %s finished successfully." %runId))
+                // Return the "Finished" version of the parameters
+                return runParams.WithRunFinished true
+            | Error err ->
+                progress |> Option.iter (fun p -> p.Report(sprintf "Failed to save run %s: %s" %runId err))
+                // Return original state on failure (or you could add an Error status key)
+                return runParams 
         }

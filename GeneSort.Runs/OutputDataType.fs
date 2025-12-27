@@ -1,66 +1,46 @@
-﻿
-namespace GeneSort.Runs
-
+﻿namespace GeneSort.Runs
 open FSharp.UMX
-
+open System
 
 type outputDataType =
     | Project
     | RunParameters
-    | SorterSet of string option
-    | SortableTest of string option
-    | SortableTestSet of string option
-    | SorterModelSet of string option
-    | SorterModelSetMaker of string option
-    | SortableTestModelSet of string option
-    | SortableTestModelSetMaker of string option
-    | SorterSetEval of string option
-    | SorterSetEvalBins of string option
+    | SorterSet of string  // Made string mandatory; use "" for none.
+    | SortableTest of string
+    | SortableTestSet of string
+    | SorterModelSet of string
+    | SorterModelSetMaker of string
+    | SortableTestModelSet of string
+    | SortableTestModelSetMaker of string
+    | SorterSetEval of string
+    | SorterSetEvalBins of string
     | TextReport of string<textReportName>
 
-
-     
 module OutputDataType =
-   
+    let private appendParam (prefix: string) (param: string) =
+        if String.IsNullOrEmpty param then prefix else prefix + "_" + param
+
     let toFolderName (outputDataType: outputDataType) : string =
         match outputDataType with
         | RunParameters -> "RunParameters"
-        | SorterSet None -> "SorterSet"
-        | SorterSet (Some s) -> "SorterSet_" + s
-        | SortableTest None -> "SortableTestSet"
-        | SortableTest (Some s) -> "SortableTestSet_" + s
-        | SortableTestSet None -> "SortableTestSet"
-        | SortableTestSet (Some s) -> "SortableTestSet_" + s
-        | SorterModelSet None -> "SorterModelSet"
-        | SorterModelSet (Some s) -> "SorterModelSet_" + s
-        | SorterModelSetMaker None -> "SorterModelSetMaker"
-        | SorterModelSetMaker (Some s) -> "SorterModelSetMaker_" + s
-        | SortableTestModelSet None -> "SortableTestModelSet"
-        | SortableTestModelSet (Some s) -> "SortableTestModelSet_" + s
-        | SortableTestModelSetMaker None -> "SortableTestModelSetMaker"
-        | SortableTestModelSetMaker (Some s) -> "SortableTestModelSetMaker_" + s
-        | SorterSetEval None -> "SorterSetEval"
-        | SorterSetEval (Some s) -> "SorterSetEval_" + s
-        | SorterSetEvalBins None -> "SorterSetEvalBins"
-        | SorterSetEvalBins (Some s) -> "SorterSetEvalBins_" + s
+        | SorterSet s -> appendParam "SorterSet" s
+        | SortableTest s -> appendParam "SortableTestSet" s
+        | SortableTestSet s -> appendParam "SortableTestSet" s
+        | SorterModelSet s -> appendParam "SorterModelSet" s
+        | SorterModelSetMaker s -> appendParam "SorterModelSetMaker" s
+        | SortableTestModelSet s -> appendParam "SortableTestModelSet" s
+        | SortableTestModelSetMaker s -> appendParam "SortableTestModelSetMaker" s
+        | SorterSetEval s -> appendParam "SorterSetEval" s
+        | SorterSetEvalBins s -> appendParam "SorterSetEvalBins" s
         | Project -> "Project"
-        | TextReport tr -> "TextReport"
-
+        | TextReport _ -> "TextReport"
 
     let fromFolderName (description: string) : outputDataType option =
-        let parts = description.Split([|'_'|], 2)
-        let prefix = parts.[0].Trim()
-        let param = 
-            if parts.Length = 2 then 
-                let trimmed = parts.[1].Trim()
-                if trimmed = "" then None else Some trimmed
-            else 
-                None
+        let parts = description.Split([|'_'|], StringSplitOptions.RemoveEmptyEntries)
+        let prefix = parts.[0]
+        let param = if parts.Length > 1 then String.Join("_", parts.[1..]) else ""
         match prefix with
-        | "RunParameters" -> 
-            match param with
-            | None -> Some RunParameters
-            | _ -> None
+        | "RunParameters" when param = "" -> Some RunParameters
         | "SorterSet" -> Some (SorterSet param)
         | "SortableTest" -> Some (SortableTest param)
         | "SortableTestSet" -> Some (SortableTestSet param)
@@ -70,16 +50,11 @@ module OutputDataType =
         | "SortableTestModelSetMaker" -> Some (SortableTestModelSetMaker param)
         | "SorterSetEval" -> Some (SorterSetEval param)
         | "SorterSetEvalBins" -> Some (SorterSetEvalBins param)
-        | "Project" -> 
-            match param with
-            | None -> Some Project
-            | _ -> None
+        | "Project" when param = "" -> Some Project
         | "TextReport" -> Some (TextReport %"Unknown")
         | _ -> None
 
     let extractTextReportNames (outputDataTypes: outputDataType array) : string<textReportName> list =
         outputDataTypes
-        |> Array.choose (function
-            | TextReport name -> Some name
-            | _ -> None)
+        |> Array.choose (function TextReport name -> Some name | _ -> None)
         |> Array.toList

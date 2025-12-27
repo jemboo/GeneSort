@@ -1,9 +1,7 @@
 ﻿namespace GeneSort.Runs
-
 open System
-open GeneSort.Sorter
 open FSharp.UMX
-open GeneSort.Sorter.Sortable
+open GeneSort.Sorter
 
 [<Measure>] type projectName
 [<Measure>] type textReportName
@@ -11,21 +9,19 @@ open GeneSort.Sorter.Sortable
 [<Measure>] type replNumber
 [<Measure>] type generationNumber
 
-
-module Repl = 
+module Repl =
     let toString (r: int<replNumber> option) : string =
         match r with
         | Some v -> (UMX.untag v).ToString()
         | None -> "None"
 
 type runParameters =
-        private { mutable paramMap : Map<string, string> }
-    with
+    private { paramMap : Map<string, string> } // Made immutable.
 
     static member create (paramMap: Map<string, string>) : runParameters =
-        { paramMap = paramMap }
+        { paramMap = paramMap } // Validation: could add checks for required keys.
 
-    /// Keys for parameters
+    /// Keys for parameters (constants for consistency).
     static member idKey = "Id"
     static member replKey = "Repl"
     static member generationKey = "Generation"
@@ -43,8 +39,7 @@ type runParameters =
     static member projectNameKey = "ProjectName"
     static member textReportNameKey = "ReportName"
 
-
-    member this.ParamMap with get() = this.paramMap
+    member this.ParamMap = this.paramMap
 
     member this.toString() =
         this.paramMap
@@ -52,320 +47,192 @@ type runParameters =
         |> List.map (fun (k, v) -> sprintf "%s: %s" k v)
         |> String.concat ", "
 
-
-    /// Gets the Index value.
+    /// Gets the Id value.
     member this.GetId() : string<idValue> option =
-        match this.paramMap.TryFind runParameters.idKey with
-        | Some value -> Some (value |> UMX.tag<idValue>)
-        | None -> None
-    
-    /// Sets the Index value.
-    member this.SetId(id: string<idValue>) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.idKey, (UMX.untag id).ToString())
+        this.paramMap.TryFind runParameters.idKey |> Option.map UMX.tag<idValue>
 
-
+    /// Returns a new instance with Id set.
+    member this.WithId(id: string<idValue>) : runParameters =
+        { paramMap = this.paramMap.Add(runParameters.idKey, %id) }
 
     /// Gets the Repl value.
     member this.GetRepl() : int<replNumber> option =
-        match this.paramMap.TryFind runParameters.replKey with
-        | Some value -> 
-            match Int32.TryParse(value) with
-            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<replNumber>)
-            | false, _ -> None
-        | None -> None
+        this.paramMap.TryFind runParameters.replKey
+        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some (UMX.tag<replNumber> i) | _ -> None)
 
     member this.GetReplKvp() : (string * string) option =
-        match this.paramMap.TryFind runParameters.replKey with
-        | Some value -> Some (runParameters.replKey, value)
-        | None -> None
+        this.paramMap.TryFind runParameters.replKey |> Option.map (fun v -> runParameters.replKey, v)
 
-    /// Sets the Repl value.
-    member this.SetRepl(repl: int<replNumber>) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.replKey, (UMX.untag repl).ToString())
-
-
+    /// Returns a new instance with Repl set.
+    member this.WithRepl(repl: int<replNumber>) : runParameters =
+        { paramMap = this.paramMap.Add(runParameters.replKey, (UMX.untag repl).ToString()) }
 
     /// Gets the Generation value.
     member this.GetGeneration() : int<generationNumber> option =
-        match this.paramMap.TryFind runParameters.generationKey with
-        | Some value -> 
-            match Int32.TryParse(value) with
-            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<generationNumber>)
-            | false, _ -> None
-        | None -> None
+        this.paramMap.TryFind runParameters.generationKey
+        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some (UMX.tag<generationNumber> i) | _ -> None)
 
-    /// Sets the Generation value.
-    member this.SetGeneration(generation: int<generationNumber>) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.generationKey, (UMX.untag generation).ToString())
-
-
+    /// Returns a new instance with Generation set.
+    member this.WithGeneration(generation: int<generationNumber>) : runParameters =
+        { paramMap = this.paramMap.Add(runParameters.generationKey, (UMX.untag generation).ToString()) }
 
     member this.IsRunFinished() : bool option =
-        match this.paramMap.TryFind runParameters.runFinishedKey with
-        | Some value -> 
-            match Boolean.TryParse(value) with
-            | true, v -> Some v
-            | false, _ -> None
-        | None -> None
+        this.paramMap.TryFind runParameters.runFinishedKey
+        |> Option.bind (fun v -> Boolean.TryParse v |> function | true, b -> Some b | _ -> None)
 
-    member this.SetRunFinished(finished: bool) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.runFinishedKey, finished.ToString())
-
-
+    member this.WithRunFinished(finished: bool) : runParameters =
+        { paramMap = this.paramMap.Add(runParameters.runFinishedKey, finished.ToString()) }
 
     /// Gets the mergeFillType value.
     member this.GetMergeFillType() : mergeFillType option =
-        match this.paramMap.TryFind runParameters.mergeFillTypeKey with
-        | Some value -> 
-            try
-                Some (MergeFillType.fromString value)
-            with
-            | _ -> None
-        | None -> None
-
+        this.paramMap.TryFind runParameters.mergeFillTypeKey
+        |> Option.bind (fun v -> try Some (MergeFillType.fromString v) with _ -> None)
 
     member this.GetMergeFillTypeKvp() : (string * string) option =
-        match this.paramMap.TryFind runParameters.mergeFillTypeKey with
-        | Some value -> Some (runParameters.mergeFillTypeKey, value)
-        | None -> None
+        this.paramMap.TryFind runParameters.mergeFillTypeKey |> Option.map (fun v -> runParameters.mergeFillTypeKey, v)
 
-
-    /// Sets the SortableArrayType value.
-    member this.SetMergeFillType(mergeFillType: mergeFillType option) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.mergeFillTypeKey, MergeFillType.toString mergeFillType)
-
-
+    /// Returns a new instance with MergeFillType set.
+    member this.WithMergeFillType(mergeFillType: mergeFillType option) : runParameters =
+        { paramMap = this.paramMap.Add(runParameters.mergeFillTypeKey, MergeFillType.toString mergeFillType) }
 
     /// Gets the mergeDimension value.
     member this.GetMergeDimension() : int<mergeDimension> option =
-        match this.paramMap.TryFind runParameters.mergeDimensionKey with
-        | Some value -> 
-            match Int32.TryParse(value) with
-            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<mergeDimension>)
-            | false, _ -> None
-        | None -> None
+        this.paramMap.TryFind runParameters.mergeDimensionKey
+        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some (UMX.tag<mergeDimension> i) | _ -> None)
 
     member this.GetMergeDimensionKvp() : (string * string) option =
-        match this.paramMap.TryFind runParameters.mergeDimensionKey with
-        | Some value -> Some (runParameters.mergeDimensionKey, value)
-        | None -> None
+        this.paramMap.TryFind runParameters.mergeDimensionKey |> Option.map (fun v -> runParameters.mergeDimensionKey, v)
 
-    /// Sets the mergeDimension value.
-    member this.SetMergeDimension(mergeDimension: int<mergeDimension>) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.mergeDimensionKey, (%mergeDimension).ToString())
+    /// Returns a new instance with MergeDimension set.
+    member this.WithMergeDimension(mergeDimension: int<mergeDimension>) : runParameters =
+        { paramMap = this.paramMap.Add(runParameters.mergeDimensionKey, (UMX.untag mergeDimension).ToString()) }
 
-
-
-
-
-    /// Gets the GetSortableArrayDataType value.
+    /// Gets the SortableDataType value.
     member this.GetSortableDataType() : sortableDataType option =
-        match this.paramMap.TryFind runParameters.sortableDataTypeKey with
-        | Some value -> 
-            try
-                Some (SortableDataType.fromString value)
-            with
-            | _ -> None
-        | None -> None
+        this.paramMap.TryFind runParameters.sortableDataTypeKey
+        |> Option.bind (fun v -> try Some (SortableDataType.fromString v) with _ -> None)
 
     member this.GetSortableArrayDataTypeKvp() : (string * string) option =
-        match this.paramMap.TryFind runParameters.sortableDataTypeKey with
-        | Some value -> Some (runParameters.sortableDataTypeKey, value)
-        | None -> None
+        this.paramMap.TryFind runParameters.sortableDataTypeKey |> Option.map (fun v -> runParameters.sortableDataTypeKey, v)
 
-    /// Sets the GetSortableArrayDataType value.
-    member this.SetSortableArrayDataTypeKey(sortableDataType: sortableDataType option) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.sortableDataTypeKey, SortableDataType.toString sortableDataType)
+    /// Returns a new instance with SortableDataType set.
+    member this.WithSortableDataType(sortableDataType: sortableDataType option) : runParameters =
+        { paramMap = this.paramMap.Add(runParameters.sortableDataTypeKey, SortableDataType.toString sortableDataType) }
 
-
-
-
-
-
-    /// Gets the SorterModelKey value.
+    /// Gets the SorterModelType value.
     member this.GetSorterModelType() : sorterModelType option =
-        match this.paramMap.TryFind runParameters.sorterModelTypeKey with
-        | Some value -> 
-            try
-                Some (SorterModelType.fromString value)
-            with
-            | _ -> None
-        | None -> None
+        this.paramMap.TryFind runParameters.sorterModelTypeKey
+        |> Option.bind (fun v -> try Some (SorterModelType.fromString v) with _ -> None)
 
     member this.GetSorterModelKvp() : (string * string) option =
-        match this.paramMap.TryFind runParameters.sorterModelTypeKey with
-        | Some value -> Some (runParameters.sorterModelTypeKey, value)
-        | None -> None
+        this.paramMap.TryFind runParameters.sorterModelTypeKey |> Option.map (fun v -> runParameters.sorterModelTypeKey, v)
 
-    /// Sets the SorterModelKey value.
-    member this.SetSorterModelKey(sorterModelKey: sorterModelType option) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.sorterModelTypeKey, SorterModelType.toString sorterModelKey)
-
-
-
-
+    /// Returns a new instance with SorterModelType set.
+    member this.WithSorterModelType(sorterModelType: sorterModelType option) : runParameters =
+        { paramMap = this.paramMap.Add(runParameters.sorterModelTypeKey, SorterModelType.toString sorterModelType) }
 
     /// Gets the SortingWidth value.
     member this.GetSortingWidth() : int<sortingWidth> option =
-        match this.paramMap.TryFind runParameters.sortingWidthKey with
-        | Some value -> 
-            match Int32.TryParse(value) with
-            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<sortingWidth>)
-            | false, _ -> None
-        | None -> None
+        this.paramMap.TryFind runParameters.sortingWidthKey
+        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some (UMX.tag<sortingWidth> i) | _ -> None)
 
     member this.GetSortingWidthKvp() : (string * string) option =
-        match this.paramMap.TryFind runParameters.sortingWidthKey with
-        | Some value -> Some (runParameters.sortingWidthKey, value)
-        | None -> None
+        this.paramMap.TryFind runParameters.sortingWidthKey |> Option.map (fun v -> runParameters.sortingWidthKey, v)
 
-    /// Sets the SortingWidth value.
-    member this.SetSortingWidth(sortingWidth: int<sortingWidth>) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.sortingWidthKey, (UMX.untag sortingWidth).ToString())
-
-
+    /// Returns a new instance with SortingWidth set.
+    member this.WithSortingWidth(sortingWidth: int<sortingWidth>) : runParameters =
+        { paramMap = this.paramMap.Add(runParameters.sortingWidthKey, (UMX.untag sortingWidth).ToString()) }
 
     /// Gets the MaxOrbit value.
     member this.GetMaxOrbit() : int option =
-        match this.paramMap.TryFind runParameters.maxOrbitKey with
-        | Some value -> 
-            match Int32.TryParse(value) with
-            | true, v -> Some v
-            | false, _ -> None
-        | None -> None
+        this.paramMap.TryFind runParameters.maxOrbitKey
+        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some i | _ -> None)
 
-    /// Sets the MaxOrbit value.
-    member this.SetMaxOrbit(maxOrbit: int) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.maxOrbitKey, maxOrbit.ToString())
-
-
+    /// Returns a new instance with MaxOrbit set.
+    member this.WithMaxOrbit(maxOrbit: int) : runParameters =
+        { paramMap = this.paramMap.Add(runParameters.maxOrbitKey, maxOrbit.ToString()) }
 
     /// Gets the StageLength value.
     member this.GetStageLength() : int<stageLength> option =
-        match this.paramMap.TryFind runParameters.stageLengthKey with
-        | Some value -> 
-            match Int32.TryParse(value) with
-            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<stageLength>)
-            | false, _ -> None
-        | None -> None
+        this.paramMap.TryFind runParameters.stageLengthKey
+        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some (UMX.tag<stageLength> i) | _ -> None)
 
-    /// Sets the StageLength value.
-    member this.SetStageLength(stageLength: int<stageLength>) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.stageLengthKey, (UMX.untag stageLength).ToString())
-
-
+    /// Returns a new instance with StageLength set.
+    member this.WithStageLength(stageLength: int<stageLength>) : runParameters =
+        { paramMap = this.paramMap.Add(runParameters.stageLengthKey, (UMX.untag stageLength).ToString()) }
 
     /// Gets the CeLength value.
     member this.GetCeLength() : int<ceLength> option =
-        match this.paramMap.TryFind runParameters.ceLengthKey with
-        | Some value -> 
-            match Int32.TryParse(value) with
-            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<ceLength>)
-            | false, _ -> None
-        | None -> None
+        this.paramMap.TryFind runParameters.ceLengthKey
+        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some (UMX.tag<ceLength> i) | _ -> None)
 
-    /// Sets the CeLength value.
-    member this.SetCeLength(ceLength: int<ceLength>) : unit =
-        this.paramMap <- this.paramMap.Add(runParameters.ceLengthKey, (UMX.untag ceLength).ToString())
-
-
-
-    /// Sets the SorterCount value.
-    member this.SetSorterCount(sorterCount: int<sorterCount>) : unit =
-       this.paramMap <- this.paramMap.Add(runParameters.sorterCountKey, (UMX.untag sorterCount).ToString())
+    /// Returns a new instance with CeLength set.
+    member this.WithCeLength(ceLength: int<ceLength>) : runParameters =
+        { paramMap = this.paramMap.Add(runParameters.ceLengthKey, (UMX.untag ceLength).ToString()) }
 
     /// Gets the SorterCount value.
     member this.GetSorterCount() : int<sorterCount> option =
-        match this.paramMap.TryFind runParameters.sorterCountKey with
-        | Some value -> 
-            match Int32.TryParse(value) with
-            | true, v -> Some (LanguagePrimitives.Int32WithMeasure v |> UMX.tag<sorterCount>)
-            | false, _ -> None
-        | None -> None
+        this.paramMap.TryFind runParameters.sorterCountKey
+        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some (UMX.tag<sorterCount> i) | _ -> None)
 
-
-
-    /// Sets the ProjectName value.
-    member this.SetProjectName(projectName: string<projectName>) : unit =
-       this.paramMap <- this.paramMap.Add(runParameters.projectNameKey, %projectName)
+    /// Returns a new instance with SorterCount set.
+    member this.WithSorterCount(sorterCount: int<sorterCount>) : runParameters =
+        { paramMap = this.paramMap.Add(runParameters.sorterCountKey, (UMX.untag sorterCount).ToString()) }
 
     /// Gets the ProjectName value.
     member this.GetProjectName() : string<projectName> option =
-        match (this.paramMap.TryFind runParameters.projectNameKey) with
-        | Some value -> Some (UMX.tag<projectName> value)
-        | None -> None
+        this.paramMap.TryFind runParameters.projectNameKey |> Option.map UMX.tag<projectName>
 
-
-
-    /// Sets the TextReportName value.
-    member this.SetTextReportName(reportName: string<textReportName>) : unit =
-       this.paramMap <- this.paramMap.Add(runParameters.textReportNameKey, %reportName)
+    /// Returns a new instance with ProjectName set.
+    member this.WithProjectName(projectName: string<projectName>) : runParameters =
+        { paramMap = this.paramMap.Add(runParameters.projectNameKey, %projectName) }
 
     /// Gets the TextReportName value.
     member this.GetTextReportName() : string<textReportName> option =
-        match (this.paramMap.TryFind runParameters.textReportNameKey) with
-        | Some value -> Some (UMX.tag<textReportName> value)
-        | None -> None
+        this.paramMap.TryFind runParameters.textReportNameKey |> Option.map UMX.tag<textReportName>
 
+    /// Returns a new instance with TextReportName set.
+    member this.WithTextReportName(reportName: string<textReportName>) : runParameters =
+        { paramMap = this.paramMap.Add(runParameters.textReportNameKey, %reportName) }
 
+module RunParameters =
 
-module RunParameters =  
-                 
-    let filterByParameters 
-            (runParametersSet: runParameters array) 
+    let filterByParameters
+            (runParametersSet: runParameters array)
             (filter: (string * string) array) : runParameters [] =
         runParametersSet
-        |> Array.filter (
-            fun runParameters ->
-                filter |> Array.forall (fun (key, value) ->
-                    runParameters.ParamMap.ContainsKey key && runParameters.ParamMap.[key] = value
-                ))
+        |> Array.filter (fun rp ->
+            filter |> Array.forall (fun (key, value) ->
+                rp.ParamMap.ContainsKey key && rp.ParamMap.[key] = value))
 
     let pickByParameters
-            (runParametersSet: runParameters array) 
+            (runParametersSet: runParameters array)
             (filter: (string * string) array) : runParameters option =
         let filtrate = filterByParameters runParametersSet filter
-        match filtrate.Length with
-        | 1 -> Some filtrate.[0]
-        | _ -> None
+        if filtrate.Length = 1 then Some filtrate.[0] else None
 
     let getAllKeys (runParams :runParameters seq) : string[] =
         runParams
-        |> Seq.collect (fun rp -> rp.ParamMap |> Map.toSeq |> Seq.map fst)
+        |> Seq.collect (fun rp -> rp.ParamMap.Keys)
         |> Seq.distinct
         |> Seq.toArray
 
-
     let tableToTabDelimited (table: string[][]) : string[] =
-        table
-        |> Array.map (fun row -> String.concat "\t" row)
+        table |> Array.map (String.concat "\t")
 
-
-    //creates a table with the getIndexAndReplName as the row headers, and the array from
-    //getAllKeys as the column headers
-    let makeIndexAndReplTable(runParams : runParameters seq) : string[][] 
+    let makeIndexAndReplTable(runParams : runParameters seq) : string[][]
         =
         let keys = getAllKeys runParams
         let headerRow = Array.append [| "Run" |] keys
         let dataRows =
             runParams
             |> Seq.map (fun rp ->
-                let rowValues =
-                    keys
-                    |> Array.map (fun key ->
-                        match rp.ParamMap.TryFind key with
-                        | Some value -> value
-                        | None -> "N/A"
-                    )
-                rowValues
-            )
+                keys
+                |> Array.map (fun key -> rp.ParamMap.TryFind key |> Option.defaultValue "N/A"))
             |> Seq.toArray
-        Array.append [| keys |] dataRows
-    
+        Array.append [| headerRow |] dataRows // Fixed: header was wrong.
 
     let toStringTable(runParams :runParameters seq) : string =
-        let table = makeIndexAndReplTable runParams
-        let sb = System.Text.StringBuilder()
-        for row in table do
-            sb.AppendLine(String.Join("\t", row)) |> ignore
-        sb.ToString()
+        makeIndexAndReplTable runParams
+        |> Array.map (fun row -> String.Join("\t", row))
+        |> String.concat "\n"

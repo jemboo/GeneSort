@@ -1,77 +1,57 @@
 ﻿namespace GeneSort.Db
-
 open FSharp.UMX
 open GeneSort.Runs
 open GeneSort.Core
 
-type queryParams = 
-    private { 
+type queryParams =
+    private {
         projectName: string<projectName> option
         repl: int<replNumber> option
         outputDataType: outputDataType
         properties: Map<string, string>
-        mutable idCache: System.Guid option
+        idCache: Lazy<System.Guid> 
     }
-    
-    member this.ProjectName 
-        with get() = 
-            match this.projectName with
-            | Some name -> %name
-            | None -> "NoName"
-    
-    member this.Repl 
-        with get() = this.repl
-    
-    member this.OutputDataType 
-        with get() = this.outputDataType
-    
-    member this.Properties 
-        with get() = this.properties
-    
-    member this.Id 
-        with get() : System.Guid = 
-            match this.idCache with
-            | Some guid -> guid
-            | None ->
-                let guid = 
-                    GuidUtils.guidFromObjs [
-                        box this.projectName
-                        box this.repl
-                        box this.outputDataType
-                        box (this.properties |> Map.toSeq |> Seq.sortBy fst |> Seq.toArray)
-                    ]
-                this.idCache <- Some guid
-                guid
-    
+
+    /// Gets the project name, defaulting to "NoName" if none.
+    member this.ProjectName =
+        match this.projectName with
+        | Some name -> %name
+        | None -> "NoName"
+
+    member this.Repl = this.repl
+
+    member this.OutputDataType = this.outputDataType
+
+    member this.Properties = this.properties
+
+    member this.Id : System.Guid = this.idCache.Value
+
+    /// Creates a new queryParams instance.
     static member create (
         projectName: string<projectName> option,
         repl: int<replNumber> option,
         outputDataType: outputDataType,
-        properties: (string*string) []) : queryParams = 
-        { 
+        properties: (string*string) []) : queryParams =
+        let props = properties |> Array.filter (fst >> isNull >> not) |> Map.ofArray
+        {   // Added validation: no null keys in properties.
             projectName = projectName
             repl = repl
             outputDataType = outputDataType
-            properties = properties |> Map.ofArray
-            idCache = None
+            properties = props
+            idCache = lazy (
+                GuidUtils.guidFromObjs [
+                    box projectName; box repl; box outputDataType
+                    box (props |> Map.toSeq |> Seq.sortBy fst |> Seq.toArray)
+                ])
         }
-    
-    static member createForProject(projectName: string<projectName>) : queryParams = 
-        { 
-            projectName = (Some projectName)
-            repl = None
-            outputDataType = outputDataType.Project
-            properties = Map.empty
-            idCache = None
-        }
-    
-    static member createForTextReport 
-        (projectName: string<projectName>) 
-        (textReportName: string<textReportName>) : queryParams = 
-        { 
-            projectName = (Some projectName)
-            repl = None
-            outputDataType = outputDataType.TextReport textReportName
-            properties = Map.empty
-            idCache = None
-        }
+
+    /// Creates queryParams for a project.
+    static member createForProject(projectName: string<projectName>) : queryParams =
+        queryParams.create(Some projectName, None, outputDataType.Project, [||])
+
+
+    /// Creates queryParams for a text report.
+    static member createForTextReport
+        (projectName: string<projectName>)
+        (textReportName: string<textReportName>) : queryParams =
+        queryParams.create(Some projectName, None, outputDataType.TextReport textReportName, [||])

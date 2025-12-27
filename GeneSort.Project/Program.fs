@@ -35,6 +35,7 @@ printfn $"**** Q22Qr ******** {startTime.ToString()}"
 let geneSortDb = new GeneSortDbMp(rootDir) :> IGeneSortDb
 let cts = new CancellationTokenSource()
 let allowOverwrite = false |> UMX.tag<allowOverwrite>
+let maxParallel = 4 // Set a reasonable limit for your machine
 
 ///// **********     RandomSorters4to64   ****************
 //let executor = RandomSorters4to64.executor
@@ -59,7 +60,6 @@ let paramRefiner = SortableIntMerges.paramMapRefiner
 let minReplica = 0<replNumber>
 let maxReplica = 1<replNumber>
 
-
 /// **********     MergeIntQa   ****************
 //let project = MergeIntQa.project
 //let executor = MergeIntQa.executor
@@ -78,12 +78,25 @@ let maxReplica = 1<replNumber>
 //let projectName = FullBoolEvals.project.ProjectName
 
 
+printfn "Initializing Project..."
+let initResult = 
+    ProjectOps.initProjectFiles geneSortDb yab cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
+    |> Async.RunSynchronously
 
-ProjectOps.initProjectFiles geneSortDb yab cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner |> Async.RunSynchronously
-ProjectOps.executeRuns geneSortDb yab projectName allowOverwrite cts (Some progress) executor |> Async.RunSynchronously
-ProjectOps.reportRuns geneSortDb projectName cts (Some progress) |> Async.RunSynchronously
-//TextReporters.ceUseProfileReportExecutor geneSortDb projectName yab allowOverwrite cts (Some progress) |> Async.RunSynchronously
-//TextReporters.binReportExecutor geneSortDb projectName yab allowOverwrite cts (Some progress) |> Async.RunSynchronously
+match initResult with
+| Ok () -> printfn "Project files initialized successfully."
+| Error e -> printfn "Init Failed: %s" e
+
+
+printfn "Executing Runs..."
+let execResult = 
+    ProjectOps.executeRuns geneSortDb yab projectName allowOverwrite cts (Some progress) executor maxParallel
+    |> Async.RunSynchronously
+
+match execResult with
+| Ok results -> printfn "Execution complete. %d results processed." results.Length
+| Error e -> printfn "Execution Failed: %s" e
+
 
 
 let endTime = System.DateTime.Now

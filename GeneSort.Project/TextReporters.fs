@@ -2,17 +2,22 @@
 
 open System
 open System.Threading
-
 open FSharp.UMX
-
 open GeneSort.Core
 open GeneSort.Sorter
 open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.SortingResults
 
-
 module TextReporters =
+
+    /// Helper to append a failure section to the data table
+    let private appendFailureSummary (failures: (string * string) list) (dt: dataTableFile) =
+        if failures.IsEmpty then dt
+        else
+            dt 
+            |> DataTableFile.addSource "--- ERRORS ENCOUNTERED DURING GENERATION ---"
+            |> DataTableFile.addSources (failures |> List.map (fun (id, msg) -> sprintf "Run ID %s: %s" id msg) |> List.toArray)
 
     let binReportExecutor
             (db: IGeneSortDb)
@@ -23,54 +28,40 @@ module TextReporters =
             (progress: IProgress<string> option) : Async<unit> =
 
         async {
-            match progress with
-            | Some p -> p.Report(sprintf "Making performace bin report for project: %s" %projectName)
-            | None -> ()
+            let reportName = "SorterEval_Bin_Report"
+            progress |> Option.iter (fun p -> p.Report(sprintf "Starting %s for: %s" reportName %projectName))
 
             let! runParamsResult = db.getAllProjectRunParametersAsync projectName (Some cts.Token) progress
-            let runParamsArray =
-                match runParamsResult with
-                | Ok rpArray -> rpArray
-                | Error msg -> failwithf "Error retrieving RunParameters for project %s: %s" %projectName msg
+            match runParamsResult with
+            | Error msg -> failwithf "Critical Error: Could not retrieve project parameters: %s" msg
+            | Ok runParamsArray ->
 
-            let mutable dataTableFile = 
-                        DataTableFile.create "SorterEval_Bin_Report" 
-                                [| "Sorting Width"; "SorterModel"; "ceLength"; "stageLength"; "binCount"; "unsortedReport" |]
-                                |> DataTableFile.addSource (sprintf "Generated: %s" (DateTime.Now.ToLongTimeString()))
-                                |> DataTableFile.addSource (sprintf "Sources (%d):" runParamsArray.Length)
+                let mutable dataTable = 
+                    dataTableFile.createFromList reportName 
+                        [| "Sorting Width"; "SorterModel"; "ceLength"; "stageLength"; "binCount"; "unsortedReport" |]
+                        |> DataTableFile.addSource (sprintf "Generated: %s" (DateTime.Now.ToString("G")))
 
-            let csvRows = (RunParameters.makeIndexAndReplTable runParamsArray) |> RunParameters.tableToTabDelimited
-            dataTableFile <- DataTableFile.addSources csvRows dataTableFile
+                let mutable failures = []
 
-            do! runParamsArray
-                |> Array.map (fun runParams -> async {
+                for runParams in runParamsArray do
+                    let runId = runParams.GetId() |> Option.map (fun x -> %x) |> Option.defaultValue "Unknown"
+                    let qp = yab runParams (outputDataType.SorterSetEval "") 
+                    
+                    let! result = GeneSortDb.getSorterSetEvalAsync db qp
+                    match result with
+                    | Ok sse ->
+                        let bins = SorterSetEvalBins.create 1 sse
+                        let lines = SorterSetEvalBins.getBinCountReport (runParams.GetSortingWidth()) (runParams.GetSorterModelType() |> SorterModelType.toString) bins
+                        dataTable <- DataTableFile.addRows lines dataTable
+                    | Error err ->
+                        failures <- (runId, err) :: failures
+                        progress |> Option.iter (fun p -> p.Report(sprintf "Warning: Failed run %s: %s" runId err))
 
-                    let queryParamsForSorterSetEval = yab runParams (outputDataType.SorterSetEval None) 
-                    let sortingWidth = runParams.GetSortingWidth()
-                    let sorterModelKey =  runParams.GetSorterModelType() |> SorterModelType.toString
-        
-                    let! sorterSetEvalResult = db.loadAsync queryParamsForSorterSetEval
-                    let sorterSetEval = 
-                        match sorterSetEvalResult with
-                        | Ok (outputData.SorterSetEval sse) -> sse
-                        | Ok _ -> failwith (sprintf "Unexpected output data type for SorterSetEval")
-                        | Error err -> failwith (sprintf "Error loading SorterSetEval: %s" err)
-        
-                    let sorterSetEvalBins = SorterSetEvalBins.create 1 sorterSetEval
-                    let reportLines = SorterSetEvalBins.getBinCountReport sortingWidth sorterModelKey sorterSetEvalBins
-                    dataTableFile <- DataTableFile.addRows reportLines dataTableFile
-                    ()
-                })
-                |> Async.Sequential
-                |> Async.Ignore  // Convert Async<unit[]> to Async<unit>
-
-
-            let queryParams = queryParams.createForTextReport projectName ("SorterEval_Bin_Report" |> UMX.tag<textReportName> )
-            let outputData =  dataTableFile |> outputData.TextReport
-            do! db.saveAsync queryParams outputData allowOverwrite
-            return ()
+                // Finalize report with failure summary
+                let finalDataTable = appendFailureSummary (List.rev failures) dataTable
+                let saveQp = queryParams.createForTextReport projectName (reportName |> UMX.tag)
+                do! db.saveAsync saveQp (outputData.TextReport finalDataTable) allowOverwrite |> Async.Ignore
         }
-
 
     let ceUseProfileReportExecutor
             (db: IGeneSortDb)
@@ -81,84 +72,44 @@ module TextReporters =
             (progress: IProgress<string> option) : Async<unit> =
 
         async {
-            match progress with
-            | Some p -> p.Report(sprintf "Making CE use profile report for project: %s" %projectName)
-            | None -> ()
-
-            let binCount = 20
-            let blockGrowthRate = 1.2
+            let reportName = "SorterCeUseProfile_Report"
+            let binCount, blockGrowthRate = 20, 1.2
+            progress |> Option.iter (fun p -> p.Report(sprintf "Starting %s for: %s" reportName %projectName))
 
             let! runParamsResult = db.getAllProjectRunParametersAsync projectName (Some cts.Token) progress
-            let runParamsArray =
-                match runParamsResult with
-                | Ok rpArray -> rpArray
-                | Error msg -> failwithf "Error retrieving RunParameters for project %s: %s" %projectName msg
+            match runParamsResult with
+            | Error msg -> failwithf "Critical Error: Could not retrieve project parameters: %s" msg
+            | Ok runParamsArray ->
 
-            let mutable dataTableFile = 
-                        DataTableFile.create "SorterCeUseProfile_Report" 
-                              (  (Array.init 20 (fun i -> i.ToString()))
-                                    |> Array.append 
-                                  [| 
-                                        "Id"; "Repl"; "SortingWidth"; "SorterModel"; "DataType"; 
-                                        "MergeFillType"; "MergeDimension"; "sorterId"; 
-                                        "sorterSetId"; "sorterTestsId"; "UnsortedCount"; 
-                                        "CeCount"; "StageCount";"lastCe" 
-                                  |]
-                              )
-                              |> DataTableFile.addSource (sprintf "Generated: %s" (DateTime.Now.ToLongTimeString()))
-                              |> DataTableFile.addSource (sprintf "Sources (%d):" runParamsArray.Length)
+                let mutable dataTable = 
+                    dataTableFile.createFromList reportName 
+                        (Array.append [| "Id"; "Repl"; "SortingWidth"; "SorterModel"; "DataType"; "MergeFillType"; "MergeDimension"; "sorterId"; "sorterSetId"; "sorterTestsId"; "UnsortedCount"; "CeCount"; "StageCount"; "lastCe" |]
+                                      (Array.init 20 (fun i -> i.ToString())))
+                        |> DataTableFile.addSource (sprintf "Generated: %s" (DateTime.Now.ToString("G")))
 
-            let csvRows = (RunParameters.makeIndexAndReplTable runParamsArray) |> RunParameters.tableToTabDelimited
-            dataTableFile <- DataTableFile.addSources csvRows dataTableFile
+                let mutable failures = []
 
-            do! runParamsArray
-                |> Array.map (fun runParams -> async {
-                    let queryParamsForSorterSetEval = yab runParams (outputDataType.SorterSetEval None) 
-                    let id = %runParams.GetId().Value
-                    let repl = runParams.GetRepl() |> Repl.toString
-                    let sortingWidth = runParams.GetSortingWidth() |> SortingWidth.toString
-                    let sorterModelKey = runParams.GetSorterModelType() |> SorterModelType.toString
-                    let sortableDataType = runParams.GetSortableDataType() |> SortableDataType.toString
-                    let mergeFillType = runParams.GetMergeFillType() |> MergeFillType.toString
-                    let mergeDimension = runParams.GetMergeDimension() |> MergeDimension.toString
-                    match progress with
-                    | Some p -> p.Report(sprintf "Processing SorterSetEval for %s %s" (%sortingWidth.ToString()) sorterModelKey)
-                    | None -> ()
+                for runParams in runParamsArray do
+                    let runId = runParams.GetId() |> Option.map (fun x -> %x) |> Option.defaultValue "Unknown"
+                    let qp = yab runParams (outputDataType.SorterSetEval "") 
+                    
+                    let! result = GeneSortDb.getSorterSetEvalAsync db qp
+                    match result with
+                    | Ok sse ->
+                        let profile = SorterSetCeUseProfile.makeSorterSetCeUseProfile binCount blockGrowthRate sse
+                        let lines = SorterSetCeUseProfile.makeReportLines 
+                                        runId (runParams.GetRepl() |> Repl.toString) 
+                                        (runParams.GetSortingWidth() |> SortingWidth.toString)
+                                        (runParams.GetSorterModelType() |> SorterModelType.toString)
+                                        (runParams.GetSortableDataType() |> SortableDataType.toString)
+                                        (runParams.GetMergeFillType() |> MergeFillType.toString)
+                                        (runParams.GetMergeDimension() |> MergeDimension.toString)
+                                        profile
+                        dataTable <- DataTableFile.addRows lines dataTable
+                    | Error err ->
+                        failures <- (runId, err) :: failures
 
-                    let! sorterSetEvalResult = db.loadAsync queryParamsForSorterSetEval
-                    let sorterSetEval = 
-                        match sorterSetEvalResult with
-                        | Ok (outputData.SorterSetEval sse) -> sse
-                        | Ok _ -> failwith (sprintf "Unexpected output data type for SorterSetEval")
-                        | Error err -> failwith (sprintf "Error loading SorterSetEval: %s" err)
-
-                    let sorterSetCeUseProfile = SorterSetCeUseProfile.makeSorterSetCeUseProfile binCount blockGrowthRate sorterSetEval
-                    let reportLines = SorterSetCeUseProfile.makeReportLines
-                                            id
-                                            repl
-                                            sortingWidth 
-                                            sorterModelKey
-                                            sortableDataType
-                                            mergeFillType
-                                            mergeDimension
-                                            sorterSetCeUseProfile
-                
-                    dataTableFile <- DataTableFile.addRows reportLines dataTableFile
-                    ()
-                })
-                |> Async.Sequential
-                |> Async.Ignore
-
-            let queryParams = queryParams.createForTextReport projectName ("SorterCeUseProfile_Report" |> UMX.tag<textReportName>)
-            let outputData = dataTableFile |> outputData.TextReport
-            do! db.saveAsync queryParams outputData allowOverwrite
-        
-            match progress with
-            | Some p -> p.Report(sprintf "CE use profile report saved for project: %s" %projectName)
-            | None -> ()
-
-            return ()
+                let finalDataTable = appendFailureSummary (List.rev failures) dataTable
+                let saveQp = queryParams.createForTextReport projectName (reportName |> UMX.tag)
+                do! db.saveAsync saveQp (outputData.TextReport finalDataTable) allowOverwrite |> Async.Ignore
         }
-
-
-
