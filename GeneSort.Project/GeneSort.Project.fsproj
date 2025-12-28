@@ -14,8 +14,9 @@
     <Compile Include="RunResult.fs" />
     <Compile Include="ProgressMessage.fs" />
     <Compile Include="ProjectOps.fs" />
-    <Compile Include="RandomSorters4to64.fs" />
     <Compile Include="PermutationOrbits.fs" />
+    <Compile Include="RandomSorters4to64.fs" />
+    <Compile Include="FullBoolEvals.fs" />
     <Compile Include="SortableIntMerges.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

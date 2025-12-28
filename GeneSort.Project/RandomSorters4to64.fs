@@ -34,7 +34,6 @@ module RandomSorters4to64 =
     let allowOverwrite = false |> UMX.tag<allowOverwrite>
 
 
-
     let makeQueryParams 
             (repl: int<replNumber> option) 
             (sortingWidth:int<sortingWidth> option)
@@ -64,8 +63,11 @@ module RandomSorters4to64 =
 
     // Parameter spans:
     
+    //let sortingWidthValues = 
+    //    [4; 6; 8; 12; 16; 24; 32; 48; 64] |> List.map(fun d -> d.ToString())
     let sortingWidthValues = 
-        [4; 6; 8; 12; 16; 24; 32; 48; 64] |> List.map(fun d -> d.ToString())
+        [4; 6; 8; ] |> List.map(fun d -> d.ToString())
+
 
     let sortingWidths() : string*string list =
         (runParameters.sortingWidthKey, sortingWidthValues)
@@ -139,7 +141,7 @@ module RandomSorters4to64 =
         let sorterModelKey = rp.GetSorterModelType().Value
         let sortingWidth = rp.GetSortingWidth().Value
         let has2factor = (%sortingWidth % 2 = 0)
-        let isMuf4able = (%sortingWidth % 4 = 0) && (MathUtils.isAPowerOfTwo (%sortingWidth / 2))
+        let isMuf4able = (MathUtils.isAPowerOfTwo %sortingWidth)
         let isMuf6able = (%sortingWidth % 3 = 0) && (MathUtils.isAPowerOfTwo (%sortingWidth / 3))
 
         match sorterModelKey with
