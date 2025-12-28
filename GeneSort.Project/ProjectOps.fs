@@ -31,8 +31,9 @@ module ProjectOps =
 
     let executeRunParameters
             (db: IGeneSortDb)
-            (buildQueryParams: runParameters -> outputDataType -> queryParams)             
-            (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option -> Async<runParameters>)
+            (buildQueryParams: runParameters -> outputDataType -> queryParams) 
+            (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option 
+                                -> Async<Result<runParameters, string>>)
             (runParameters: runParameters)
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource)
@@ -40,79 +41,33 @@ module ProjectOps =
         async {
             let index = runParameters.GetId() |> Option.defaultValue (% "unknown")
             let repl = runParameters.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
-            try
-                let qua = runParameters.IsRunFinished().Value 
-                if runParameters.IsRunFinished().Value then
-                    let result = Skipped (index, repl, "already finished")
+        
+            // 1. Check if already done
+            if runParameters.IsRunFinished() |> Option.defaultValue false then
+                return Skipped (index, repl, "already finished")
+            else
+                // 2. Run the executor
+                let! execResult = executor db runParameters allowOverwrite cts progress
+            
+                match execResult with
+                | Error msg -> 
+                    let result = Failure (index, repl, msg)
                     ProgressMessage.reportRunResult progress result
                     return result
-                else
-                    // 1. Capture the UPDATED runParameters from the executor
-                    let! updatedRunParams = executor db runParameters allowOverwrite cts progress
-                    
-                    // 2. Build QueryParams using the NEW state (contains new ID/Status)
-                    let qp = buildQueryParams updatedRunParams outputDataType.RunParameters
-                    
-                    let allowOverwriteRunParameters = true |> UMX.tag<allowOverwrite>
-                    let! saveRes = db.saveAsync qp (updatedRunParams |> outputData.RunParameters) allowOverwriteRunParameters
+                | Ok updatedParams ->
+                    // 3. Only save the "Finished" status if the executor actually succeeded
+                    let qp = buildQueryParams updatedParams outputDataType.RunParameters
+                    let! saveRes = db.saveAsync qp (updatedParams |> outputData.RunParameters) (true |> UMX.tag<allowOverwrite>)
+                
                     match saveRes with
                     | Error err -> 
-                        let result = Failure (index, repl, err)
-                        ProgressMessage.reportRunResult progress result
-                        return result
+                        return Failure (index, repl, sprintf "Work succeeded but failed to save status: %s" err)
                     | Ok () ->
                         let result = Success (index, repl)
                         ProgressMessage.reportRunResult progress result
                         return result
-            with e ->
-                let errorMsg = sprintf "%s: %s" (e.GetType().Name) e.Message
-                let result = Failure (index, repl, errorMsg)
-                ProgressMessage.reportRunResult progress result
-                return result
         }
 
-
-    //let private processRunParametersSeq
-    //    (maxDegreeOfParallelism: int)
-    //    (runParameters: runParameters seq)
-    //    (cts: CancellationTokenSource)
-    //    (progress: IProgress<string> option)
-    //    (processor: runParameters -> Async<RunResult>)
-    //    : Async<RunResult[]> =
-    //    async {
-    //        try
-    //            cts.Token.ThrowIfCancellationRequested()
-    //            let tasks = runParameters |> Seq.map processor |> Seq.toList
-    //            let! results =
-    //                async {
-    //                    use semaphore = new SemaphoreSlim(maxDegreeOfParallelism)
-    //                    let taskResults =
-    //                        tasks
-    //                        |> List.map (fun comp ->
-    //                            async {
-    //                                try
-    //                                    do! Async.AwaitTask (semaphore.WaitAsync(cts.Token))
-    //                                    return! comp
-    //                                finally
-    //                                    semaphore.Release() |> ignore
-    //                            }
-    //                            |> Async.StartAsTask)
-    //                        |> List.toArray
-    //                    return! Async.AwaitTask (Task.WhenAll(taskResults))
-    //                }
-    //            let successCount = results |> Array.filter (function Success _ -> true | _ -> false) |> Array.length
-    //            let failureCount = results |> Array.filter (function Failure _ -> true | _ -> false) |> Array.length
-    //            let skippedCount = results |> Array.filter (function Skipped _ -> true | _ -> false) |> Array.length
-    //            report progress (sprintf "\n=== Batch Complete: %d succeeded, %d failed, %d skipped ===" successCount failureCount skippedCount)
-    //            return results
-    //        with
-    //        | :? OperationCanceledException ->
-    //            report progress "Execution cancelled by user"
-    //            return [||]
-    //        | e ->
-    //            report progress (sprintf "Fatal error in batch execution: %s" e.Message)
-    //            return [||]
-    //    }
 
     let private processRunParametersSeq
             (maxDegreeOfParallelism: int)
@@ -170,16 +125,18 @@ module ProjectOps =
 
 
     let executeRunParametersSeq
-        (db: IGeneSortDb)
-        (maxDegreeOfParallelism: int)
-        (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option ->  Async<runParameters>)
-        (runParameters: runParameters seq)
-        (buildQueryParams: runParameters -> outputDataType -> queryParams)  // Renamed.
-        (allowOverwrite: bool<allowOverwrite>)
-        (cts: CancellationTokenSource)
-        (progress: IProgress<string> option)
-        : Async<RunResult[]> =
-        processRunParametersSeq 
+                (db: IGeneSortDb)
+                (maxDegreeOfParallelism: int)
+                // Updated signature: Result<runParameters, string>
+                (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option -> Async<Result<runParameters, string>>)
+                (runParameters: runParameters seq)
+                (buildQueryParams: runParameters -> outputDataType -> queryParams)
+                (allowOverwrite: bool<allowOverwrite>)
+                (cts: CancellationTokenSource)
+                (progress: IProgress<string> option)
+                : Async<RunResult[]> =
+        
+            processRunParametersSeq 
                 maxDegreeOfParallelism 
                 runParameters cts progress 
                 (fun rp -> executeRunParameters db buildQueryParams executor rp allowOverwrite cts progress)
@@ -271,39 +228,41 @@ module ProjectOps =
                 return Error msg
         }
 
-
     let executeRuns
-        (db: IGeneSortDb)
-        (buildQueryParams: runParameters -> outputDataType -> queryParams)
-        (projectName: string<projectName>)
-        (allowOverwrite: bool<allowOverwrite>)
-        (cts: CancellationTokenSource)
-        (progress: IProgress<string> option)
-        (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> -> 
-                   CancellationTokenSource -> IProgress<string> option -> Async<runParameters>)
-        (maxDegreeOfParallelism:int)
-                   : Async<Result<RunResult[], string>> =
-        async {
-            try
-                report progress (sprintf "Executing Runs for %s" %projectName)
-                let! runParamsResult = db.getAllProjectRunParametersAsync projectName (Some cts.Token) progress
-                match runParamsResult with
-                | Error msg ->
-                    report progress (sprintf "Failed to load run parameters: %s" msg)
+                (db: IGeneSortDb)
+                (buildQueryParams: runParameters -> outputDataType -> queryParams)
+                (projectName: string<projectName>)
+                (allowOverwrite: bool<allowOverwrite>)
+                (cts: CancellationTokenSource)
+                (progress: IProgress<string> option)
+                // Updated signature: Result<runParameters, string>
+                (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option
+                                -> Async<Result<runParameters, string>>)
+                (maxDegreeOfParallelism: int)
+                : Async<Result<RunResult[], string>> =
+            async {
+                try
+                    report progress (sprintf "Executing Runs for %s" %projectName)
+                    let! runParamsResult = db.getAllProjectRunParametersAsync projectName (Some cts.Token) progress
+                
+                    match runParamsResult with
+                    | Error msg ->
+                        report progress (sprintf "Failed to load run parameters: %s" msg)
+                        return Error msg
+                    | Ok runParametersArray ->
+                        report progress (sprintf "Found %d runs to execute" runParametersArray.Length)
+                        if runParametersArray.Length = 0 then
+                            report progress "No runs found to execute"
+                            return Ok [||]
+                        else
+                            // This call now passes the Result-based executor down the chain
+                            let! results = 
+                                executeRunParametersSeq 
+                                    db maxDegreeOfParallelism executor 
+                                    runParametersArray buildQueryParams allowOverwrite cts progress
+                            return Ok results
+                with e ->
+                    let msg = sprintf "Fatal error executing runs: %s" e.Message
+                    report progress msg
                     return Error msg
-                | Ok runParametersArray ->
-                    report progress (sprintf "Found %d runs to execute" runParametersArray.Length)
-                    if runParametersArray.Length = 0 then
-                        report progress "No runs found to execute"
-                        return Ok [||]
-                    else
-                        let! results = executeRunParametersSeq 
-                                                db maxDegreeOfParallelism 
-                                                executor 
-                                                runParametersArray buildQueryParams allowOverwrite cts progress
-                        return Ok results
-            with e ->
-                let msg = sprintf "Fatal error executing runs: %s" e.Message
-                report progress msg
-                return Error msg
-        }
+            }

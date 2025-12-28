@@ -21,7 +21,7 @@ module FullBoolEvals =
     let randomType = rngType.Lcg
     let sortableDataType = sortableDataType.Bools
 
-    let makeQueryParamsForFullBoolEvals 
+    let makeQueryParams 
             (repl: int<replNumber> option) 
             (sortingWidth:int<sortingWidth> option)
             (sorterModelType:sorterModelType option)
@@ -36,35 +36,10 @@ module FullBoolEvals =
             |])
 
 
-    let makeQueryParamsForFullBoolEvalsFromRunParams
+    let makeQueryParamsFromRunParams
             (runParams: runParameters) 
             (outputDataType: outputDataType) =
-        makeQueryParamsForFullBoolEvals
-            (runParams.GetRepl())
-            (runParams.GetSortingWidth())
-            (runParams.GetSorterModelType())
-            outputDataType
-
-
-    let makeQueryParamsForRandomSorters4to64ProjectName
-            (repl: int<replNumber> option) 
-            (sortingWidth:int<sortingWidth> option)
-            (sorterModelType:sorterModelType option)
-            (outputDataType: outputDataType) =
-        queryParams.create(
-            Some randomSorters4to64ProjectName,
-            repl,
-            outputDataType,
-            [|
-                (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
-                (runParameters.sorterModelTypeKey, sorterModelType |> SorterModelType.toString);
-            |])
-
-
-    let makeQueryParamsForRandomSorters4to64FromRunParams
-            (runParams: runParameters) 
-            (outputDataType: outputDataType) =
-        makeQueryParamsForRandomSorters4to64ProjectName
+        makeQueryParams
             (runParams.GetRepl())
             (runParams.GetSortingWidth())
             (runParams.GetSorterModelType())
@@ -115,7 +90,7 @@ module FullBoolEvals =
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
 
         let enhancer (rp : runParameters) : runParameters =
-            let qp = makeQueryParamsForFullBoolEvalsFromRunParams rp (outputDataType.RunParameters)
+            let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
 
             rp.WithProjectName(fullBoolEvalsProjectName)
               .WithRunFinished(false)
@@ -160,52 +135,51 @@ module FullBoolEvals =
             (runParameters: runParameters) 
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource) 
-            (progress: IProgress<string> option) : Async<runParameters> =
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
         async {
-            let runId = runParameters.GetId() |> Option.defaultValue (% "unknown")
-            let repl = runParameters.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
-            let sortingWidth = runParameters.GetSortingWidth().Value
-            let sortableDataType = runParameters.GetSortableDataType().Value
-
-            // Check cancellation before starting expensive operations
-            cts.Token.ThrowIfCancellationRequested()
-            progress |> Option.iter (fun p -> 
-                p.Report(sprintf "Run: %s Repl: %d: Querying sortable set" %runId %repl ))
-
-
-
-            // FIX: Use let! instead of Async.RunSynchronously to keep the workflow non-blocking
-            let queryParamsForSorterSet = makeQueryParamsForRandomSorters4to64FromRunParams runParameters (outputDataType.SorterSet "")
-            let! loadResult = db.loadAsync queryParamsForSorterSet
-            let sorterSet = 
-                match loadResult with
-                | Ok (outputData.SorterSet ss) -> ss
-                | Ok _ -> failwith "Unexpected output data type: expected SorterSet"
-                | Error err -> failwithf "Error loading SorterSet for run %s: %s" %runId err
-
-
-            let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-            let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataType
-            let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
-
-            cts.Token.ThrowIfCancellationRequested()
-            progress |> Option.iter (fun p -> p.Report(sprintf "Run %s_%d: Saving sorterSet test results" %runId %repl))
-
+            try
+                // 1. Safe extraction of IDs
+                let runId = runParameters.GetId() |> Option.defaultValue (% (sprintf "unknown_%O" (Guid.NewGuid())))
+                let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
+                
+                progress |> Option.iter (fun p -> p.Report(sprintf "Executing Run %s, Repl %d:\n  %s" %runId %repl (runParameters.toString())))
+                cts.Token.ThrowIfCancellationRequested()
             
-            // Save sorterSetEval
-            let queryParamsForSorterSetEval = makeQueryParamsForFullBoolEvalsFromRunParams runParameters (outputDataType.SorterSetEval "")
-            let! saveResult = db.saveAsync queryParamsForSorterSetEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
-            match saveResult with
-            | Ok _ ->
-                progress |> Option.iter (fun p -> p.Report(sprintf "Run %s finished successfully." %runId))
-                // Return the "Finished" version of the parameters
-                return runParameters.WithRunFinished true
-            | Error err ->
-                progress |> Option.iter (fun p -> p.Report(sprintf "Failed to save run %s: %s" %runId err))
-                // Return original state on failure (or you could add an Error status key)
-                return runParameters 
+                // 2. Safe extraction of all domain parameters
+                let domainParams = maybe {
+                    let! sorterModelType = runParameters.GetSorterModelType()
+                    let! sortingWidth = runParameters.GetSortingWidth()
+                    let! sortableDataType = runParameters.GetSortableDataType()
+                    return (sorterModelType, sortingWidth, sortableDataType)
+                }
 
-    }
+                match domainParams with
+                | None -> return Error (sprintf "Run %s, Repl %d: Missing one or more required parameters in paramMap" %runId %repl)
+                | Some (sorterModelType, sortingWidth, sortableDataType) ->
 
+                    // 3. Load SorterSet
+                    let queryParamsForSorterSet = RandomSorters4to64.makeQueryParams (Some repl) (Some sortingWidth) (Some sorterModelType) (outputDataType.SorterSet "")
+                    let! loadResult = db.loadAsync queryParamsForSorterSet
+            
+                    return! match loadResult with
+                            | Error err -> async { return Error (sprintf "SortableSet Load failed: %s" err) }
+                            | Ok (outputData.SorterSet ss) -> 
+                                async {
+                                    // 2. Perform Computation
+                                    let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
+                                    let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataType
+                                    let sorterSetEval = SorterSetEval.makeSorterSetEval ss sortableTests
 
+                                    // 3. Save Results
+                                    let queryParamsEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
+                                    let! saveResult = db.saveAsync queryParamsEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
+                            
+                                    match saveResult with
+                                    | Ok _ -> return Ok (runParameters.WithRunFinished true)
+                                    | Error err -> return Error (sprintf "Save results failed: %s" err)
+                                }
+                            | Ok _ -> async { return Error "Unexpected data type loaded from DB" }
+                with e -> 
+                    return Error (sprintf "Execution exception: %s" e.Message)
+        }

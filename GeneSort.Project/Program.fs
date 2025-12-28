@@ -48,10 +48,13 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 
 
 /// **********     MergeIntEvals   ****************
-//let executor = MergeIntEvals.executor
-//let project = MergeIntEvals.project
-//let projectName = MergeIntEvals.project.ProjectName
-
+let executor = MergeIntEvals.executor
+let project = MergeIntEvals.project
+let projectName = MergeIntEvals.project.ProjectName
+let yab = MergeIntEvals.makeQueryParamsFromRunParams
+let paramRefiner = MergeIntEvals.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
 ///// **********     SortableIntMerges   ****************
@@ -74,16 +77,14 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 //let maxReplica = 1<replNumber>
 
 
-
-
 /// **********    FullBoolEvals   ****************
-let executor = FullBoolEvals.executor
-let project = FullBoolEvals.project
-let projectName = FullBoolEvals.project.ProjectName
-let yab = FullBoolEvals.makeQueryParamsForFullBoolEvalsFromRunParams
-let paramRefiner = FullBoolEvals.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+//let executor = FullBoolEvals.executor
+//let project = FullBoolEvals.project
+//let projectName = FullBoolEvals.project.ProjectName
+//let yab = FullBoolEvals.makeQueryParamsFromRunParams
+//let paramRefiner = FullBoolEvals.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 printfn "Initializing Project..."

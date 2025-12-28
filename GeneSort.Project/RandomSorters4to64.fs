@@ -210,94 +210,207 @@ module RandomSorters4to64 =
                 parameterSpans
                 outputDataTypes
 
+
     let executor
             (db: IGeneSortDb)
             (runParameters: runParameters) 
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource) 
-            (progress: IProgress<string> option) : Async<runParameters> =
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
         async {
-            let index = runParameters.GetId().Value  
-            let repl = runParameters.GetRepl().Value
-            let sorterModelKey = runParameters.GetSorterModelType().Value
-            let sortingWidth = runParameters.GetSortingWidth().Value
-            let stageLength = runParameters.GetStageLength().Value
-            let ceLength = runParameters.GetCeLength().Value
-            let sorterCount = runParameters.GetSorterCount().Value
-            let runId = runParameters.GetId().Value
-        
-            progress |> Option.iter(fun p ->  
-                p.Report(sprintf "Executing Run %s_%d  %s" %index %repl (runParameters.toString())))
+            try
+                // 1. Safe Parameter Extraction
+                let runId = runParameters.GetId() |> Option.defaultValue (% (sprintf "unknown_%O" (Guid.NewGuid())))
+                let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
 
-        
-            // Check cancellation before starting expensive operations
-            cts.Token.ThrowIfCancellationRequested()
-        
-            // Create sorter model maker
-            let sorterModelMaker =
-                match sorterModelKey with
-                | sorterModelType.Mcse -> 
-                    (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) 
-                    |> sorterModelMaker.SmmMsceRandGen
-                | sorterModelType.Mssi -> 
-                    (MssiRandGen.create randomType sortingWidth stageLength) 
-                    |> sorterModelMaker.SmmMssiRandGen
-                | sorterModelType.Msrs -> 
-                    let opsGenRatesArray = OpsGenRatesArray.createUniform %stageLength
-                    (msrsRandGen.create randomType sortingWidth opsGenRatesArray) 
-                    |> sorterModelMaker.SmmMsrsRandGen
-                | sorterModelType.Msuf4 -> 
-                    let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageLength %sortingWidth
-                    (msuf4RandGen.create randomType sortingWidth stageLength uf4GenRatesArray) 
-                    |> sorterModelMaker.SmmMsuf4RandGen
-                | sorterModelType.Msuf6 -> 
-                    let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
-                    (msuf6RandGen.create randomType sortingWidth stageLength uf6GenRatesArray) 
-                    |> sorterModelMaker.SmmMsuf6RandGen
-        
-        
-            let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-            let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
-            let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
-            let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
-        
-            // Check cancellation before saving
-            cts.Token.ThrowIfCancellationRequested()
-        
-            // Save sorter set
-            let queryParamsForSorterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "") 
-            let! saveResult = db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet) allowOverwrite
-            match saveResult with
-            | Ok _ ->
-                progress |> Option.iter (
-                                fun p -> p.Report(sprintf "Saved sorterSet %s for run: %s" 
-                                                    (%sorterSet.Id.ToString()) 
-                                                    %runId))
+                let maybeParams = 
+                    maybe {
+                        let! sorterModelKey = runParameters.GetSorterModelType()
+                        let! sortingWidth = runParameters.GetSortingWidth()
+                        let! stageLength = runParameters.GetStageLength()
+                        let! ceLength = runParameters.GetCeLength()
+                        let! sorterCount = runParameters.GetSorterCount()
+                        return (sorterModelKey, sortingWidth, stageLength, ceLength, sorterCount)
+                    }
 
-                // Save sorterModelSetMaker
-                let queryParamsForSorterModelSetMaker = makeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSetMaker "") 
-                let! saveResult = db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker) allowOverwrite
-                match saveResult with
-                | Ok _ ->
-                    progress |> Option.iter (
-                                fun p -> p.Report(sprintf "Saved SorterModelSetMaker %s for run: %s" 
-                                                    (%sorterModelSetMaker.Id.ToString()) 
-                                                    %runId))
-                    return runParameters.WithRunFinished true
-                | Error err ->
-                    progress |> Option.iter (fun p -> p.Report(sprintf "Failed to save SorterModelSetMaker %s: %s" %runId err))
-                    // Return original state on failure (or you could add an Error status key)
-                    return runParameters
+                match maybeParams with
+                | None -> return Error (sprintf "Run %s: Missing required parameters in paramMap" %runId)
+                | Some (sorterModelKey, sortingWidth, stageLength, ceLength, sorterCount) ->
 
-            | Error err ->
-                progress |> Option.iter (
-                                fun p -> p.Report(sprintf "Failed to save sorterSet %s for run: %s with error %s" 
-                                                    (%sorterSet.Id.ToString())
-                                                    %runId err))                                  
-                // Return original state on failure (or you could add an Error status key)
-                return runParameters
+                    progress |> Option.iter (fun p ->  
+                        p.Report(sprintf "Executing Run %s, Repl %d: %s" %runId %repl (runParameters.toString())))
+
+                    cts.Token.ThrowIfCancellationRequested()
+            
+                    // 2. Sorter Model Logic
+                    let sorterModelMaker =
+                        match sorterModelKey with
+                        | sorterModelType.Mcse -> 
+                            (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) 
+                            |> sorterModelMaker.SmmMsceRandGen
+                        | sorterModelType.Mssi -> 
+                            (MssiRandGen.create randomType sortingWidth stageLength) 
+                            |> sorterModelMaker.SmmMssiRandGen
+                        | sorterModelType.Msrs -> 
+                            let opsGenRatesArray = OpsGenRatesArray.createUniform %stageLength
+                            (msrsRandGen.create randomType sortingWidth opsGenRatesArray) 
+                            |> sorterModelMaker.SmmMsrsRandGen
+                        | sorterModelType.Msuf4 -> 
+                            let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageLength %sortingWidth
+                            (msuf4RandGen.create randomType sortingWidth stageLength uf4GenRatesArray) 
+                            |> sorterModelMaker.SmmMsuf4RandGen
+                        | sorterModelType.Msuf6 -> 
+                            let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
+                            (msuf6RandGen.create randomType sortingWidth stageLength uf6GenRatesArray) 
+                            |> sorterModelMaker.SmmMsuf6RandGen
+            
+                    let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
+                    let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
+                    let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
+                    let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
+
+                    cts.Token.ThrowIfCancellationRequested()
+            
+                    // 3. Sequential Saves
+                    // SAVE 1: Sorter Set
+                    let queryParamsForSorterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "") 
+                    let! saveSorterRes = db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet) allowOverwrite
+                
+                    match saveSorterRes with
+                    | Error err -> return Error (sprintf "Failed to save sorterSet for %s: %s" %runId err)
+                    | Ok () ->
+                        progress |> Option.iter (fun p -> p.Report(sprintf "Saved sorterSet %s for run: %s" (%sorterSet.Id.ToString()) %runId))
+
+                        // SAVE 2: Sorter Model Set Maker
+                        let queryParamsForMaker = makeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSetMaker "") 
+                        let! saveMakerRes = db.saveAsync queryParamsForMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker) allowOverwrite
+                    
+                        match saveMakerRes with
+                        | Error err -> return Error (sprintf "Failed to save Maker for %s: %s" %runId err)
+                        | Ok () ->
+                            progress |> Option.iter (fun p -> p.Report(sprintf "Saved SorterModelSetMaker %s for run: %s" (%sorterModelSetMaker.Id.ToString()) %runId))
+                            // FINAL RETURN for the success path
+                            return Ok (runParameters.WithRunFinished true)
+
+            with e -> 
+                let rawId = runParameters.GetId() |> Option.map UMX.untag |> Option.defaultValue "unknown"
+                return Error (sprintf "Unexpected error in run %s: %s" rawId e.Message)
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //let executor
+    //        (db: IGeneSortDb)
+    //        (runParameters: runParameters) 
+    //        (allowOverwrite: bool<allowOverwrite>)
+    //        (cts: CancellationTokenSource) 
+    //        (progress: IProgress<string> option) : Async<runParameters> =
+
+    //    async {
+    //        let index = runParameters.GetId().Value  
+    //        let repl = runParameters.GetRepl().Value
+    //        let sorterModelKey = runParameters.GetSorterModelType().Value
+    //        let sortingWidth = runParameters.GetSortingWidth().Value
+    //        let stageLength = runParameters.GetStageLength().Value
+    //        let ceLength = runParameters.GetCeLength().Value
+    //        let sorterCount = runParameters.GetSorterCount().Value
+    //        let runId = runParameters.GetId().Value
+        
+    //        progress |> Option.iter(fun p ->  
+    //            p.Report(sprintf "Executing Run %s_%d  %s" %index %repl (runParameters.toString())))
+
+        
+    //        // Check cancellation before starting expensive operations
+    //        cts.Token.ThrowIfCancellationRequested()
+        
+    //        // Create sorter model maker
+    //        let sorterModelMaker =
+    //            match sorterModelKey with
+    //            | sorterModelType.Mcse -> 
+    //                (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) 
+    //                |> sorterModelMaker.SmmMsceRandGen
+    //            | sorterModelType.Mssi -> 
+    //                (MssiRandGen.create randomType sortingWidth stageLength) 
+    //                |> sorterModelMaker.SmmMssiRandGen
+    //            | sorterModelType.Msrs -> 
+    //                let opsGenRatesArray = OpsGenRatesArray.createUniform %stageLength
+    //                (msrsRandGen.create randomType sortingWidth opsGenRatesArray) 
+    //                |> sorterModelMaker.SmmMsrsRandGen
+    //            | sorterModelType.Msuf4 -> 
+    //                let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageLength %sortingWidth
+    //                (msuf4RandGen.create randomType sortingWidth stageLength uf4GenRatesArray) 
+    //                |> sorterModelMaker.SmmMsuf4RandGen
+    //            | sorterModelType.Msuf6 -> 
+    //                let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
+    //                (msuf6RandGen.create randomType sortingWidth stageLength uf6GenRatesArray) 
+    //                |> sorterModelMaker.SmmMsuf6RandGen
+        
+        
+    //        let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
+    //        let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
+    //        let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
+    //        let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
+        
+    //        // Check cancellation before saving
+    //        cts.Token.ThrowIfCancellationRequested()
+        
+    //        // Save sorter set
+    //        let queryParamsForSorterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "") 
+    //        let! saveResult = db.saveAsync queryParamsForSorterSet (sorterSet |> outputData.SorterSet) allowOverwrite
+    //        match saveResult with
+    //        | Ok _ ->
+    //            progress |> Option.iter (
+    //                            fun p -> p.Report(sprintf "Saved sorterSet %s for run: %s" 
+    //                                                (%sorterSet.Id.ToString()) 
+    //                                                %runId))
+
+    //            // Save sorterModelSetMaker
+    //            let queryParamsForSorterModelSetMaker = makeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSetMaker "") 
+    //            let! saveResult = db.saveAsync queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker) allowOverwrite
+    //            match saveResult with
+    //            | Ok _ ->
+    //                progress |> Option.iter (
+    //                            fun p -> p.Report(sprintf "Saved SorterModelSetMaker %s for run: %s" 
+    //                                                (%sorterModelSetMaker.Id.ToString()) 
+    //                                                %runId))
+    //                return runParameters.WithRunFinished true
+    //            | Error err ->
+    //                progress |> Option.iter (fun p -> p.Report(sprintf "Failed to save SorterModelSetMaker %s: %s" %runId err))
+    //                // Return original state on failure (or you could add an Error status key)
+    //                return runParameters
+
+    //        | Error err ->
+    //            progress |> Option.iter (
+    //                            fun p -> p.Report(sprintf "Failed to save sorterSet %s for run: %s with error %s" 
+    //                                                (%sorterSet.Id.ToString())
+    //                                                %runId err))                                  
+    //            // Return original state on failure (or you could add an Error status key)
+    //            return runParameters
+    //    }
 
 
 

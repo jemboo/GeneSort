@@ -46,6 +46,7 @@ module SortableIntMerges =
             (runParams.GetSortableDataType())
             outputDataType
 
+
     // --- Parameter Spans ---
 
     let sortableArrayDataTypeKeys () : string * string list =
@@ -63,6 +64,7 @@ module SortableIntMerges =
     let mergeFillTypes () : string * string list =
         let values = [ Some mergeFillType.NoFill; Some mergeFillType.VanVoorhis ] |> List.map MergeFillType.toString
         (runParameters.mergeFillTypeKey, values)
+
 
     // --- Filters ---
 
@@ -130,44 +132,60 @@ module SortableIntMerges =
                 parameterSpans
                 outputDataTypes
 
-    // --- Executor ---
-
+        // --- Executor ---
     let executor
             (db: IGeneSortDb)
             (runParams: runParameters) 
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource) 
-            (progress: IProgress<string> option) : Async<runParameters> =
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
         async {
-            let runId = runParams.GetId() |> Option.defaultValue (% "unknown")
-            let repl = runParams.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
+            try
+                // 1. Safe extraction of metadata
+                let runId = runParams.GetId() |> Option.defaultValue (% "unknown")
+                let repl = runParams.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
             
-            let sortingWidth = runParams.GetSortingWidth().Value
-            let mergeDimension = runParams.GetMergeDimension().Value
-            let mergeFillType = runParams.GetMergeFillType().Value
-            let sortableDataType = runParams.GetSortableDataType().Value
+                // 2. Safe extraction of domain parameters using your new 'maybe' builder
+                let domainParams = maybe {
+                    let! width = runParams.GetSortingWidth()
+                    let! dim = runParams.GetMergeDimension()
+                    let! fill = runParams.GetMergeFillType()
+                    let! dataType = runParams.GetSortableDataType()
+                    return (width, dim, fill, dataType)
+                }
 
-            cts.Token.ThrowIfCancellationRequested()
-        
-            progress |> Option.iter (fun p -> 
-                p.Report(sprintf "Run %s (Repl %s): Creating sortable set" %runId (Repl.toString (Some repl))))
-        
-            let sortableTestModel = msasM.create sortingWidth mergeDimension mergeFillType |> sortableTestModel.MsasMi
-            let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataType
+                match domainParams with
+                | None -> 
+                    return Error (sprintf "Run %s: Missing required parameters (Width, Dimension, Fill, or DataType)" %runId)
+                | Some (sortingWidth, mergeDimension, mergeFillType, sortableDataType) ->
 
-            cts.Token.ThrowIfCancellationRequested()
+                    cts.Token.ThrowIfCancellationRequested()
+            
+                    progress |> Option.iter (fun p -> 
+                        p.Report(sprintf "Run %s (Repl %s): Creating sortable tests" %runId (Repl.toString (Some repl))))
+            
+                    // 3. Logic Execution
+                    let sortableTestModel = msasM.create sortingWidth mergeDimension mergeFillType |> sortableTestModel.MsasMi
+                    let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataType
 
-            let qpForSortableTest = makeQueryParamsFromRunParams runParams (outputDataType.SortableTestSet "") 
-            let! saveResult = db.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
+                    cts.Token.ThrowIfCancellationRequested()
 
-            match saveResult with
-            | Ok _ ->
-                progress |> Option.iter (fun p -> p.Report(sprintf "Run %s finished successfully." %runId))
-                // Return the "Finished" version of the parameters
-                return runParams.WithRunFinished true
-            | Error err ->
-                progress |> Option.iter (fun p -> p.Report(sprintf "Failed to save run %s: %s" %runId err))
-                // Return original state on failure (or you could add an Error status key)
-                return runParams 
+                    // 4. Save with proper Result propagation
+                    let qpForSortableTest = makeQueryParamsFromRunParams runParams (outputDataType.SortableTest "") 
+                    let! saveResult = db.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
+
+                    match saveResult with
+                    | Ok () ->
+                        progress |> Option.iter (fun p -> p.Report(sprintf "Run %s finished successfully." %runId))
+                        return Ok (runParams.WithRunFinished true)
+                    | Error err ->
+                        let msg = sprintf "Failed to save run %s: %s" %runId err
+                        progress |> Option.iter (fun p -> p.Report(msg))
+                        return Error msg
+
+            with e -> 
+                // Correctly untagging runId for the string format specifier
+                let rawId = runParams.GetId() |> Option.map UMX.untag |> Option.defaultValue "unknown"
+                return Error (sprintf "Unexpected exception in run %s: %s" rawId e.Message)
         }
