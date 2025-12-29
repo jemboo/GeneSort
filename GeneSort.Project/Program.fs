@@ -48,7 +48,7 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 
 
 /// **********     MergeIntEvals   ****************
-let executor = MergeIntEvals.executor
+let executor = MergeIntEvals.executor2
 let project = MergeIntEvals.project
 let projectName = MergeIntEvals.project.ProjectName
 let yab = MergeIntEvals.makeQueryParamsFromRunParams

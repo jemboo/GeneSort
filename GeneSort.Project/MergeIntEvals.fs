@@ -31,9 +31,12 @@ module MergeIntEvals =
 
     let makeQueryParams 
             (repl: int<replNumber> option) 
-            (sortingWidth:int<sortingWidth> option)
-            (sorterModelType:sorterModelType option)
-            (outputDataType: outputDataType) =
+            (outputDataType: outputDataType)
+            (sortingWidth: int<sortingWidth> option)
+            (sorterModelType: sorterModelType option)
+            (sortableDataType: sortableDataType option)
+            (mergeDimension: int<mergeDimension> option)
+            (mergeFillType: mergeFillType option) =
              
         queryParams.create(
             Some projectName,
@@ -42,17 +45,23 @@ module MergeIntEvals =
             [|
                 (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
                 (runParameters.sorterModelTypeKey, sorterModelType |> SorterModelType.toString);
+                (runParameters.sortableDataTypeKey, sortableDataType |> SortableDataType.toString);
+                (runParameters.mergeDimensionKey, mergeDimension |> MergeDimension.toString);
+                (runParameters.mergeFillTypeKey, mergeFillType |> MergeFillType.toString);
             |])
 
 
     let makeQueryParamsFromRunParams
             (runParams: runParameters) 
-            (outputDataType: outputDataType) =
+            (outputDataType: outputDataType)  =
         makeQueryParams
             (runParams.GetRepl())
+            outputDataType
             (runParams.GetSortingWidth())
             (runParams.GetSorterModelType())
-            outputDataType
+            (runParams.GetSortableDataType())
+            (runParams.GetMergeDimension())
+            (runParams.GetMergeFillType())
 
 
 
@@ -151,13 +160,13 @@ module MergeIntEvals =
         | 64 -> 25000 |> UMX.tag<stageLength>
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
-    let sortableArrayDataTypeKeyValues = 
+    let sortableDataTypeKeyValues = 
             [ 
                 Some sortableDataType.Ints; 
                 Some sortableDataType.Bools ] |> List.map(SortableDataType.toString)
   
-    let sortableArrayDataTypeKeys () : string*string list =
-        (runParameters.sortableDataTypeKey, sortableArrayDataTypeKeyValues )
+    let sortableDataTypeKeys () : string*string list =
+        (runParameters.sortableDataTypeKey, sortableDataTypeKeyValues )
 
   
     let sortingWidthValues = 
@@ -197,7 +206,7 @@ module MergeIntEvals =
     //      Some sorterModelKey.Msuf6; ]      |> List.map(SorterModelKey.toString)
 
 
-    let sorterModelKeys () : string*string list =
+    let sorterModelTypeKeys () : string*string list =
         (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
 
     let sorterModelTypeForSortingWidth (rp: runParameters) =
@@ -254,8 +263,8 @@ module MergeIntEvals =
     let parameterSpans = 
         [
             sortingWidths(); 
-            sorterModelKeys(); 
-            sortableArrayDataTypeKeys(); 
+            sorterModelTypeKeys(); 
+            sortableDataTypeKeys(); 
             mergeDimensions(); 
             mergeFillTypes(); 
         ]
@@ -384,7 +393,10 @@ module MergeIntEvals =
                 // 1. Safe extraction of IDs
                 let runId = runParameters.GetId() |> Option.defaultValue (% (sprintf "unknown_%O" (Guid.NewGuid())))
                 let repl = runParameters.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
-            
+                            
+                progress |> Option.iter (fun p -> p.Report(sprintf "Executing Run %s, Repl %d:\n  %s" %runId %repl (runParameters.toString())))
+                cts.Token.ThrowIfCancellationRequested()
+
                 // 2. Safe extraction of all domain parameters
                 let domainParams = maybe {
                     let! sorterModelKey = runParameters.GetSorterModelType()
@@ -408,16 +420,12 @@ module MergeIntEvals =
             
                     return! match loadResult with
                             | Error err -> async { return Error (sprintf "SortableTests Load failed: %s" err) }
-                            | Ok (outputData.SorterSet ss) -> 
+                            | Ok (outputData.SortableTest sortableTest) -> 
                                 async {
-                                    // 2. Perform Computation
-                                    let sortableTestModel = msasF.create (runParameters.GetSortingWidth().Value) |> sortableTestModel.MsasF
-                                    let sortableTests = SortableTestModel.makeSortableTests sortableTestModel (runParameters.GetSortableDataType().Value)
-                                    let sorterSetEval = SorterSetEval.makeSorterSetEval ss sortableTests
 
                                     // 3. Save Results
-                                    let queryParamsEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
-                                    let! saveResult = db.saveAsync queryParamsEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
+                                    let queryParamsSoratbleTest = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTest "")
+                                    let! saveResult = db.saveAsync queryParamsSoratbleTest (sortableTest |> outputData.SortableTest) allowOverwrite
                             
                                     match saveResult with
                                     | Ok _ -> return Ok (runParameters.WithRunFinished true)

@@ -24,7 +24,7 @@ module OutputDataType =
         match outputDataType with
         | RunParameters -> "RunParameters"
         | SorterSet s -> appendParam "SorterSet" s
-        | SortableTest s -> appendParam "SortableTestSet" s
+        | SortableTest s -> appendParam "SortableTest" s
         | SortableTestSet s -> appendParam "SortableTestSet" s
         | SorterModelSet s -> appendParam "SorterModelSet" s
         | SorterModelSetMaker s -> appendParam "SorterModelSetMaker" s
