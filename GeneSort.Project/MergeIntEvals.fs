@@ -290,6 +290,8 @@ module MergeIntEvals =
                 outputDataTypes
 
 
+
+
     let executor
             (db: IGeneSortDb)
             (runParameters: runParameters) 
@@ -297,142 +299,53 @@ module MergeIntEvals =
             (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
-        async {
+        asyncResult {
             try
-                // 1. Safe extraction of IDs
-                let runId = runParameters.GetId() |> Option.defaultValue (% (sprintf "unknown_%O" (Guid.NewGuid())))
-                let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
-            
-                progress |> Option.iter (fun p -> p.Report(sprintf "Executing Run %s, Repl %d:\n  %s" %runId %repl (runParameters.toString())))
-                cts.Token.ThrowIfCancellationRequested()
+                // 1. Setup
+                let! _ = checkCancellation cts.Token
+                let runId = runParameters.GetId() |> Option.defaultValue (% "unknown")
+                progress |> Option.iter (fun p -> p.Report(sprintf "Starting Run %s" %runId))
 
-                // 2. Safe extraction of all domain parameters
-                let domainParams = maybe {
-                    let! sorterModelKey = runParameters.GetSorterModelType()
-                    let! sortingWidth = runParameters.GetSortingWidth()
-                    let! stageLength = runParameters.GetStageLength()
-                    let! ceLength = runParameters.GetCeLength()
-                    let! sorterCount = runParameters.GetSorterCount()
-                    let! mergeDim = runParameters.GetMergeDimension()
-                    let! mergeFill = runParameters.GetMergeFillType()
-                    let! sortableDataType = runParameters.GetSortableDataType()
-                    return (sorterModelKey, sortingWidth, stageLength, ceLength, sorterCount, mergeDim, mergeFill, sortableDataType)
-                }
+                // 2. Safe Param Extraction
+                // Note: No async.Return needed anymore because of the Bind overload
+                let! (repl, width, mDim, mFill, dType, sModel) = 
+                    maybe {
+                        let! r = runParameters.GetRepl()
+                        let! w = runParameters.GetSortingWidth()
+                        let! dt = runParameters.GetSortableDataType()
+                        let! md = runParameters.GetMergeDimension()
+                        let! mf = runParameters.GetMergeFillType()
+                        let! sm = runParameters.GetSorterModelType()
+                        return (r, w, md, mf, dt, sm)
+                    } |> Result.ofOption "Missing domain parameters"
 
-                match domainParams with
-                | None -> return Error (sprintf "Run %s, Repl %d: Missing one or more required parameters in paramMap" %runId %repl)
-                | Some (sorterModelKey, sortingWidth, stageLength, ceLength, sorterCount, mergeDimension, mergeFillType, sortableDataType) ->
+                // 3. Load Sortable Tests (Cross-project query)
+                let qpTests = SortableIntMerges.makeQueryParams (Some repl) (Some width) (Some mDim) (Some mFill) (Some dType) (outputDataType.SortableTest "")
+                let! rawTestData = db.loadAsync qpTests 
+                let! sortableTest = rawTestData |> OutputData.asSortableTest
 
+                // 4. Load Sorter Set (Cross-project query)
+                let qpSorters = RandomSorters4to64.makeQueryParams (Some repl) (Some width) (Some sModel) (outputDataType.SorterSet "")
+                let! rawSorterData = db.loadAsync qpSorters
+                let! sorterSet = rawSorterData |> OutputData.asSorterSet
 
-                    // 3. Sorter Generation Logic
-                    let sorterModelMaker =
-                        match sorterModelKey with
-                        | sorterModelType.Mcse -> (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) |> sorterModelMaker.SmmMsceRandGen
-                        | sorterModelType.Mssi -> (MssiRandGen.create randomType sortingWidth stageLength) |> sorterModelMaker.SmmMssiRandGen
-                        | sorterModelType.Msrs -> 
-                            let rates = OpsGenRatesArray.createUniform %stageLength
-                            (msrsRandGen.create randomType sortingWidth rates) |> sorterModelMaker.SmmMsrsRandGen
-                        | sorterModelType.Msuf4 -> 
-                            let rates = Uf4GenRatesArray.createUniform %stageLength %sortingWidth
-                            (msuf4RandGen.create randomType sortingWidth stageLength rates) |> sorterModelMaker.SmmMsuf4RandGen
-                        | sorterModelType.Msuf6 -> 
-                            let rates = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
-                            (msuf6RandGen.create randomType sortingWidth stageLength rates) |> sorterModelMaker.SmmMsuf6RandGen
-            
-                    let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-                    let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
-                    let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
-                    let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
+                // 5. Computation
+                let! _ = checkCancellation cts.Token
+                let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTest
 
-                    // 4. Sortable Test & Eval Logic
-                    let sortableTestModel = msasM.create sortingWidth mergeDimension mergeFillType |> sortableTestModel.MsasMi
-                    let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataType
-                    let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests
+                // 6. Save
+                let! _ = checkCancellation cts.Token
+                let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
+                let! _ = db.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
-                    cts.Token.ThrowIfCancellationRequested()
+                // 7. Success
+                progress |> Option.iter (fun p -> p.Report(sprintf "Run %s completed." %runId))
+                return runParameters.WithRunFinished true
 
-                    // 5. Sequential Saves (Atomic Flow)
-                    // Save SorterSet
-                    let qpSS = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "") 
-                    let! res1 = db.saveAsync qpSS (sorterSet |> outputData.SorterSet) allowOverwrite
-                    match res1 with
-                    | Error e -> return Error (sprintf "Failed SorterSet save: %s" e)
-                    | Ok () ->
-                    
-                        // Save SorterSetEval
-                        let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
-                        let! res2 = db.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
-                        match res2 with
-                        | Error e -> return Error (sprintf "Failed SorterSetEval save: %s" e)
-                        | Ok () ->
-
-                            // Save SorterModelSetMaker
-                            let qpMaker = makeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSetMaker "")
-                            let! res3 = db.saveAsync qpMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker) allowOverwrite
-                            match res3 with
-                            | Error e -> return Error (sprintf "Failed SorterModelSetMaker save: %s" e)
-                            | Ok () ->
-                                progress |> Option.iter (fun p -> p.Report(sprintf "Run %s finished successfully." %runId))
-                                // Final Success Return
-                                return Ok (runParameters.WithRunFinished true)
-
-            with e -> 
+            with e ->
                 let rawId = runParameters.GetId() |> Option.map UMX.untag |> Option.defaultValue "unknown"
-                return Error (sprintf "Unexpected error in run %s: %s" rawId e.Message)
-        }
-
-    let executor2
-            (db: IGeneSortDb)
-            (runParameters: runParameters) 
-            (allowOverwrite: bool<allowOverwrite>)
-            (cts: CancellationTokenSource) 
-            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
-
-        async {
-            try
-                // 1. Safe extraction of IDs
-                let runId = runParameters.GetId() |> Option.defaultValue (% (sprintf "unknown_%O" (Guid.NewGuid())))
-                let repl = runParameters.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
-                            
-                progress |> Option.iter (fun p -> p.Report(sprintf "Executing Run %s, Repl %d:\n  %s" %runId %repl (runParameters.toString())))
-                cts.Token.ThrowIfCancellationRequested()
-
-                // 2. Safe extraction of all domain parameters
-                let domainParams = maybe {
-                    let! sorterModelKey = runParameters.GetSorterModelType()
-                    let! sortingWidth = runParameters.GetSortingWidth()
-                    let! stageLength = runParameters.GetStageLength()
-                    let! ceLength = runParameters.GetCeLength()
-                    let! sorterCount = runParameters.GetSorterCount()
-                    let! mergeDim = runParameters.GetMergeDimension()
-                    let! mergeFill = runParameters.GetMergeFillType()
-                    let! sortableDataType = runParameters.GetSortableDataType()
-                    return (sorterModelKey, sortingWidth, stageLength, ceLength, sorterCount, mergeDim, mergeFill, sortableDataType)
-                }
-
-                match domainParams with
-                | None -> return Error (sprintf "Run %s: Missing one or more required parameters in paramMap" %runId)
-                | Some (sorterModelKey, sortingWidth, stageLength, ceLength, sorterCount, mergeDimension, mergeFillType, sortableDataType) ->
-
-                    // 3. Load merge type SortableTests
-                    let queryParamsForSortableTests = SortableIntMerges.makeQueryParamsFromRunParams runParameters (outputDataType.SortableTest "")
-                    let! loadResult = db.loadAsync queryParamsForSortableTests
+                let msg = sprintf "Fatal error in Run %s: %s" rawId e.Message
             
-                    return! match loadResult with
-                            | Error err -> async { return Error (sprintf "SortableTests Load failed: %s" err) }
-                            | Ok (outputData.SortableTest sortableTest) -> 
-                                async {
-
-                                    // 3. Save Results
-                                    let queryParamsSoratbleTest = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTest "")
-                                    let! saveResult = db.saveAsync queryParamsSoratbleTest (sortableTest |> outputData.SortableTest) allowOverwrite
-                            
-                                    match saveResult with
-                                    | Ok _ -> return Ok (runParameters.WithRunFinished true)
-                                    | Error err -> return Error (sprintf "Save results failed: %s" err)
-                                }
-                            | Ok _ -> async { return Error "Unexpected data type loaded from DB" }
-
-            with e -> 
-                return Error (sprintf "Execution exception: %s" e.Message)
+                // Bypass the builder's ReturnFrom ambiguity by wrapping manually
+                return! async { return Error msg }
         }

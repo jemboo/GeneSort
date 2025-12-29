@@ -129,7 +129,6 @@ module FullBoolEvals =
                 parameterSpans
                 outputDataTypes
 
-
     let executor
             (db: IGeneSortDb)
             (runParameters: runParameters) 
@@ -137,49 +136,47 @@ module FullBoolEvals =
             (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
-        async {
+        asyncResult {
             try
-                // 1. Safe extraction of IDs
+                // 1. Setup & ID Extraction
+                let! _ = checkCancellation cts.Token
                 let runId = runParameters.GetId() |> Option.defaultValue (% (sprintf "unknown_%O" (Guid.NewGuid())))
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
-                
-                progress |> Option.iter (fun p -> p.Report(sprintf "Executing Run %s, Repl %d:\n  %s" %runId %repl (runParameters.toString())))
-                cts.Token.ThrowIfCancellationRequested()
             
-                // 2. Safe extraction of all domain parameters
-                let domainParams = maybe {
-                    let! sorterModelType = runParameters.GetSorterModelType()
-                    let! sortingWidth = runParameters.GetSortingWidth()
-                    let! sortableDataType = runParameters.GetSortableDataType()
-                    return (sorterModelType, sortingWidth, sortableDataType)
-                }
+                progress |> Option.iter (fun p -> 
+                    p.Report(sprintf "Executing Run %s, Repl %d:\n  %s" %runId %repl (runParameters.toString())))
 
-                match domainParams with
-                | None -> return Error (sprintf "Run %s, Repl %d: Missing one or more required parameters in paramMap" %runId %repl)
-                | Some (sorterModelType, sortingWidth, sortableDataType) ->
+                // 2. Safe Domain Parameter Extraction
+                let! (sorterModelType, sortingWidth, sortableDataType) = 
+                    maybe {
+                        let! smt = runParameters.GetSorterModelType()
+                        let! sw = runParameters.GetSortingWidth()
+                        let! sdt = runParameters.GetSortableDataType()
+                        return (smt, sw, sdt)
+                    } |> Result.ofOption (sprintf "Run %s, Repl %d: Missing required parameters" %runId %repl)
 
-                    // 3. Load SorterSet
-                    let queryParamsForSorterSet = RandomSorters4to64.makeQueryParams (Some repl) (Some sortingWidth) (Some sorterModelType) (outputDataType.SorterSet "")
-                    let! loadResult = db.loadAsync queryParamsForSorterSet
-            
-                    return! match loadResult with
-                            | Error err -> async { return Error (sprintf "SortableSet Load failed: %s" err) }
-                            | Ok (outputData.SorterSet ss) -> 
-                                async {
-                                    // 2. Perform Computation
-                                    let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-                                    let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataType
-                                    let sorterSetEval = SorterSetEval.makeSorterSetEval ss sortableTests
+                // 3. Load SorterSet
+                let qpSorters = RandomSorters4to64.makeQueryParams (Some repl) (Some sortingWidth) (Some sorterModelType) (outputDataType.SorterSet "")
+                let! loadRes = db.loadAsync qpSorters
 
-                                    // 3. Save Results
-                                    let queryParamsEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
-                                    let! saveResult = db.saveAsync queryParamsEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
-                            
-                                    match saveResult with
-                                    | Ok _ -> return Ok (runParameters.WithRunFinished true)
-                                    | Error err -> return Error (sprintf "Save results failed: %s" err)
-                                }
-                            | Ok _ -> async { return Error "Unexpected data type loaded from DB" }
-                with e -> 
-                    return Error (sprintf "Execution exception: %s" e.Message)
+                let! ss = loadRes |> OutputData.asSorterSet |> asAsync
+
+                // 4. Perform Computation
+                let! _ = checkCancellation cts.Token
+                let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
+                let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataType
+                let sorterSetEval = SorterSetEval.makeSorterSetEval ss sortableTests
+
+                // 5. Save Results
+                let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
+                let! _ = db.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
+
+                // 6. Final Success
+                progress |> Option.iter (fun p -> p.Report(sprintf "Run %s successfully evaluated and saved." %runId))
+                return runParameters.WithRunFinished true
+
+            with e ->
+                let rawId = runParameters.GetId() |> Option.map UMX.untag |> Option.defaultValue "unknown"
+                let msg = sprintf "Execution exception in Run %s: %s" rawId e.Message
+                return! async { return Error msg }
         }

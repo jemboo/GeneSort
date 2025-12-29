@@ -37,24 +37,25 @@ let cts = new CancellationTokenSource()
 let allowOverwrite = false |> UMX.tag<allowOverwrite>
 let maxParallel = 4 // Set a reasonable limit for your machine
 
+
 ///// **********     RandomSorters4to64   ****************
-//let executor = RandomSorters4to64.executor
-//let project = RandomSorters4to64.project
-//let projectName = RandomSorters4to64.project.ProjectName
-//let yab = RandomSorters4to64.makeQueryParamsFromRunParams
-//let paramRefiner = RandomSorters4to64.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+let executor = RandomSorters4to64.executor
+let project = RandomSorters4to64.project
+let projectName = RandomSorters4to64.project.ProjectName
+let yab = RandomSorters4to64.makeQueryParamsFromRunParams
+let paramRefiner = RandomSorters4to64.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
 /// **********     MergeIntEvals   ****************
-let executor = MergeIntEvals.executor2
-let project = MergeIntEvals.project
-let projectName = MergeIntEvals.project.ProjectName
-let yab = MergeIntEvals.makeQueryParamsFromRunParams
-let paramRefiner = MergeIntEvals.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+//let executor = MergeIntEvals.executor
+//let project = MergeIntEvals.project
+//let projectName = MergeIntEvals.project.ProjectName
+//let yab = MergeIntEvals.makeQueryParamsFromRunParams
+//let paramRefiner = MergeIntEvals.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 ///// **********     SortableIntMerges   ****************
@@ -77,7 +78,7 @@ let maxReplica = 1<replNumber>
 //let maxReplica = 1<replNumber>
 
 
-/// **********    FullBoolEvals   ****************
+///// **********    FullBoolEvals   ****************
 //let executor = FullBoolEvals.executor
 //let project = FullBoolEvals.project
 //let projectName = FullBoolEvals.project.ProjectName

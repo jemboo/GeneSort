@@ -140,52 +140,44 @@ module SortableIntMerges =
             (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
-        async {
+        asyncResult {
             try
-                // 1. Safe extraction of metadata
+                // 1. Setup
+                let! _ = checkCancellation cts.Token
                 let runId = runParams.GetId() |> Option.defaultValue (% "unknown")
-                let repl = runParams.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
+                progress |> Option.iter (fun p -> p.Report(sprintf "Starting Run %s (Generation)" %runId))
+
+                // 2. Safe extraction of domain parameters
+                // We use the Bind(Result) overload to flatten this
+                let! (sortingWidth, mergeDimension, mergeFillType, sortableDataType) = 
+                    maybe {
+                        let! width = runParams.GetSortingWidth()
+                        let! dim = runParams.GetMergeDimension()
+                        let! fill = runParams.GetMergeFillType()
+                        let! dataType = runParams.GetSortableDataType()
+                        return (width, dim, fill, dataType)
+                    } |> Result.ofOption "Missing domain parameters required for generation"
+
+                // 3. Logic Execution (Pure CPU work)
+                let sortableTestModel = 
+                    msasM.create sortingWidth mergeDimension mergeFillType 
+                    |> sortableTestModel.MsasMi
             
-                // 2. Safe extraction of domain parameters using your new 'maybe' builder
-                let domainParams = maybe {
-                    let! width = runParams.GetSortingWidth()
-                    let! dim = runParams.GetMergeDimension()
-                    let! fill = runParams.GetMergeFillType()
-                    let! dataType = runParams.GetSortableDataType()
-                    return (width, dim, fill, dataType)
-                }
+                let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataType
 
-                match domainParams with
-                | None -> 
-                    return Error (sprintf "Run %s: Missing required parameters (Width, Dimension, Fill, or DataType)" %runId)
-                | Some (sortingWidth, mergeDimension, mergeFillType, sortableDataType) ->
-
-                    cts.Token.ThrowIfCancellationRequested()
+                // 4. Save
+                let! _ = checkCancellation cts.Token
+                let qpForSortableTest = makeQueryParamsFromRunParams runParams (outputDataType.SortableTest "") 
             
-                    progress |> Option.iter (fun p -> 
-                        p.Report(sprintf "Run %s (Repl %s): Creating sortable tests" %runId (Repl.toString (Some repl))))
-            
-                    // 3. Logic Execution
-                    let sortableTestModel = msasM.create sortingWidth mergeDimension mergeFillType |> sortableTestModel.MsasMi
-                    let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataType
+                // The builder automatically handles short-circuiting if saveAsync returns Error
+                let! _ = db.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
 
-                    cts.Token.ThrowIfCancellationRequested()
+                // 5. Success
+                progress |> Option.iter (fun p -> p.Report(sprintf "Run %s generation completed and saved." %runId))
+                return runParams.WithRunFinished true
 
-                    // 4. Save with proper Result propagation
-                    let qpForSortableTest = makeQueryParamsFromRunParams runParams (outputDataType.SortableTest "") 
-                    let! saveResult = db.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
-
-                    match saveResult with
-                    | Ok () ->
-                        progress |> Option.iter (fun p -> p.Report(sprintf "Run %s finished successfully." %runId))
-                        return Ok (runParams.WithRunFinished true)
-                    | Error err ->
-                        let msg = sprintf "Failed to save run %s: %s" %runId err
-                        progress |> Option.iter (fun p -> p.Report(msg))
-                        return Error msg
-
-            with e -> 
-                // Correctly untagging runId for the string format specifier
+            with e ->
                 let rawId = runParams.GetId() |> Option.map UMX.untag |> Option.defaultValue "unknown"
-                return Error (sprintf "Unexpected exception in run %s: %s" rawId e.Message)
+                let msg = sprintf "Fatal error in Generation Run %s: %s" rawId e.Message
+                return! async { return Error msg }
         }

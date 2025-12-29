@@ -186,7 +186,7 @@ module ProjectOps =
             try
                 report progress (sprintf "Saving project file: %s" %project.ProjectName)
                 let queryParams = queryParams.createForProject project.ProjectName
-                let! saveProjRes = db.saveAsync queryParams (project |> outputData.Project) allowOverwrite
+                let! saveProjRes = db.saveAsync queryParams (project |> outputData.Project) (true |> UMX.tag<allowOverwrite>)
                 match saveProjRes with
                 | Error err -> return Error err
                 | Ok () ->

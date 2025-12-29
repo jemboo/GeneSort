@@ -27,3 +27,24 @@ type outputData =
     | SorterSetEvalBins of sorterSetEvalBins
     | Project of project
     | TextReport of dataTableFile
+
+
+
+module OutputData =
+
+    let asSorterSet = function
+        | SorterSet ss -> Ok ss
+        | _ -> Error "Database returned data, but it was not a SorterSet."
+
+    let asSortableTest = function
+        | SortableTest st -> Ok st
+        | _ -> Error "Database returned data, but it was not a SortableTest."
+
+    let asSorterSetEval = function
+        | SorterSetEval sse -> Ok sse
+        | _ -> Error "Database returned data, but it was not a SorterSetEval."
+        
+    let asRunParameters = function
+        | RunParameters rp -> Ok rp
+        | _ -> Error "Database returned data, but it was not RunParameters."
+
