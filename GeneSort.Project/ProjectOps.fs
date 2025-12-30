@@ -5,6 +5,7 @@ open FSharp.UMX
 open GeneSort.Db
 open GeneSort.Runs
 open System.Threading.Tasks
+open GeneSort.Core
 
 module ProjectOps =
     let inline report (progress: IProgress<string> option) msg =
@@ -33,7 +34,7 @@ module ProjectOps =
             (db: IGeneSortDb)
             (buildQueryParams: runParameters -> outputDataType -> queryParams) 
             (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option 
-                                -> Async<Result<runParameters, string>>)
+                                    -> Async<Result<runParameters, string>>)
             (runParameters: runParameters)
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource)
@@ -42,74 +43,91 @@ module ProjectOps =
             let index = runParameters.GetId() |> Option.defaultValue (% "unknown")
             let repl = runParameters.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
         
-            // 1. Check if already done
+            // 1. Check if already done (Synchronous check remains the same)
             if runParameters.IsRunFinished() |> Option.defaultValue false then
                 return Skipped (index, repl, "already finished")
             else
-                // 2. Run the executor
-                let! execResult = executor db runParameters allowOverwrite cts progress
-            
-                match execResult with
-                | Error msg -> 
-                    let result = Failure (index, repl, msg)
-                    ProgressMessage.reportRunResult progress result
-                    return result
-                | Ok updatedParams ->
-                    // 3. Only save the "Finished" status if the executor actually succeeded
-                    let qp = buildQueryParams updatedParams outputDataType.RunParameters
-                    let! saveRes = db.saveAsync qp (updatedParams |> outputData.RunParameters) (true |> UMX.tag<allowOverwrite>)
+                // 2. Use the builder to handle the execution + status save sequence
+                let! finalResult = asyncResult {
+                    // Execute the main work
+                    let! updatedParams = executor db runParameters allowOverwrite cts progress
                 
-                    match saveRes with
-                    | Error err -> 
-                        return Failure (index, repl, sprintf "Work succeeded but failed to save status: %s" err)
-                    | Ok () ->
-                        let result = Success (index, repl)
-                        ProgressMessage.reportRunResult progress result
-                        return result
+                    // If main work succeeded, save the "Finished" status
+                    let qp = buildQueryParams updatedParams outputDataType.RunParameters
+                    let! _ = 
+                        db.saveAsync qp (updatedParams |> outputData.RunParameters) (true |> UMX.tag<allowOverwrite>)
+                        |> AsyncResult.mapError (fun err -> sprintf "Work succeeded but failed to save status: %s" err)
+
+                    return updatedParams
+                }
+
+                // 3. Map the AsyncResult back to the RunResult DU
+                match finalResult with
+                | Ok _ ->
+                    let res = Success (index, repl)
+                    ProgressMessage.reportRunResult progress res
+                    return res
+                | Error msg ->
+                    let res = Failure (index, repl, msg)
+                    ProgressMessage.reportRunResult progress res
+                    return res
         }
 
 
     let private processRunParametersSeq
-            (maxDegreeOfParallelism: int)
-            (runParameters: runParameters seq)
-            (cts: CancellationTokenSource)
-            (progress: IProgress<string> option)
-            (processor: runParameters -> Async<RunResult>)
-            : Async<RunResult[]> =
+        (maxDegreeOfParallelism: int)
+        (runParameters: runParameters seq)
+        (cts: CancellationTokenSource)
+        (progress: IProgress<string> option)
+        (processor: runParameters -> Async<RunResult>)
+        : Async<RunResult[]> =
         async {
-            try
-                cts.Token.ThrowIfCancellationRequested()
-                
-                // Using a Semaphore with Async.Parallel is often cleaner in F# 
-                // than converting everything to Tasks manually.
-                use semaphore = new SemaphoreSlim(maxDegreeOfParallelism)
-                
-                let! results = 
-                    runParameters 
-                    |> Seq.map (fun rp -> 
-                        async {
-                            let! _ = semaphore.WaitAsync(cts.Token) |> Async.AwaitTask
-                            try 
-                                return! processor rp
-                            finally 
-                                semaphore.Release() |> ignore
-                        })
-                    |> Async.Parallel
+            use semaphore = new SemaphoreSlim(maxDegreeOfParallelism)
+        
+            let processInternal (rp: runParameters) = async {
+                let index = rp.GetId() |> Option.defaultValue (% "unknown")
+                let repl = rp.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
+            
+                try 
+                    // Wait for slot, but respect cancellation
+                    let! _ = semaphore.WaitAsync(cts.Token) |> Async.AwaitTask
+                    try 
+                        return! processor rp
+                    finally 
+                        semaphore.Release() |> ignore
+                with 
+                | :? OperationCanceledException ->
+                    // Return a specific result instead of letting the exception bubble up
+                    return Skipped (index, repl, "Cancelled by user")
+                | e ->
+                    // Handle unexpected errors within a single task so others can continue
+                    return Failure (index, repl, sprintf "Inner fault: %s" e.Message)
+            }
 
-                let successCount = results |> Array.filter (function Success _ -> true | _ -> false) |> Array.length
-                let failureCount = results |> Array.filter (function Failure _ -> true | _ -> false) |> Array.length
-                let skippedCount = results |> Array.filter (function Skipped _ -> true | _ -> false) |> Array.length
-                
-                report progress (sprintf "\n=== Batch Complete: %d succeeded, %d failed, %d skipped ===" successCount failureCount skippedCount)
-                return results
-            with
-            | :? OperationCanceledException ->
-                report progress "Execution cancelled by user"
-                return [||]
-            | e ->
-                report progress (sprintf "Fatal error in batch execution: %s" e.Message)
-                return [||]
+            // 1. Run in parallel - this will no longer throw on cancellation
+            let! results = 
+                runParameters 
+                |> Seq.map processInternal
+                |> Async.Parallel
+
+            // 2. Tally results
+            let success, failure, skipped = 
+                results |> Array.fold (fun (s, f, sk) res ->
+                    match res with
+                    | Success _ -> (s + 1, f, sk)
+                    | Failure _ -> (s, f + 1, sk)
+                    | Skipped _ -> (s, f, sk + 1)
+                ) (0, 0, 0)
+
+            // 3. Final reporting
+            if cts.IsCancellationRequested then
+                report progress (sprintf "\n=== Batch Halted: %d finished, %d cancelled/skipped ===" success (failure + skipped))
+            else
+                report progress (sprintf "\n=== Batch Complete: %d succeeded, %d failed, %d skipped ===" success failure skipped)
+            
+            return results
         }
+
 
 
     let reportRunParametersSeq
@@ -127,14 +145,12 @@ module ProjectOps =
     let executeRunParametersSeq
                 (db: IGeneSortDb)
                 (maxDegreeOfParallelism: int)
-                // Updated signature: Result<runParameters, string>
                 (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option -> Async<Result<runParameters, string>>)
                 (runParameters: runParameters seq)
                 (buildQueryParams: runParameters -> outputDataType -> queryParams)
                 (allowOverwrite: bool<allowOverwrite>)
                 (cts: CancellationTokenSource)
-                (progress: IProgress<string> option)
-                : Async<RunResult[]> =
+                (progress: IProgress<string> option)    : Async<RunResult[]> =
         
             processRunParametersSeq 
                 maxDegreeOfParallelism 
@@ -149,7 +165,7 @@ module ProjectOps =
             (buildQueryParams: runParameters -> outputDataType -> queryParams)
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource)
-            (progress: IProgress<string> option) : Async<Result<unit, string>> =
+            (progress: IProgress<string> option)          : Async<Result<unit, string>> =
         async {
             try
                 report progress (sprintf "Saving RunParameter files for %s" %projectName)
@@ -228,6 +244,7 @@ module ProjectOps =
                 return Error msg
         }
 
+
     let executeRuns
                 (db: IGeneSortDb)
                 (buildQueryParams: runParameters -> outputDataType -> queryParams)
@@ -235,7 +252,6 @@ module ProjectOps =
                 (allowOverwrite: bool<allowOverwrite>)
                 (cts: CancellationTokenSource)
                 (progress: IProgress<string> option)
-                // Updated signature: Result<runParameters, string>
                 (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option
                                 -> Async<Result<runParameters, string>>)
                 (maxDegreeOfParallelism: int)
