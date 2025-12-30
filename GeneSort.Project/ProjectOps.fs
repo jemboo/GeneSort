@@ -4,10 +4,10 @@ open System.Threading
 open FSharp.UMX
 open GeneSort.Db
 open GeneSort.Runs
-open System.Threading.Tasks
 open GeneSort.Core
 
 module ProjectOps =
+
     let inline report (progress: IProgress<string> option) msg =
         progress |> Option.iter (fun p -> p.Report msg)
 
@@ -17,14 +17,14 @@ module ProjectOps =
             (progress: IProgress<string> option) : Async<RunResult> =
         async {
             cts.Token.ThrowIfCancellationRequested()
-            let index = runParameters.GetId().Value
+            let id = runParameters.GetId().Value
             let repl = runParameters.GetRepl().Value
             try
                 report progress (runParameters.toString())
-                return Success (index, repl)
+                return Success (id, repl, "")
             with e ->
                 let msg = $"{e.GetType().Name}: {e.Message}"
-                let result = Failure (index, repl, msg)
+                let result = Failure (id, repl, msg)
                 ProgressMessage.reportRunResult progress result
                 return result
         }
@@ -40,12 +40,12 @@ module ProjectOps =
             (cts: CancellationTokenSource)
             (progress: IProgress<string> option) : Async<RunResult> =
         async {
-            let index = runParameters.GetId() |> Option.defaultValue (% "unknown")
+            let id = runParameters.GetId() |> Option.defaultValue (% "unknown")
             let repl = runParameters.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
         
             // 1. Check if already done (Synchronous check remains the same)
             if runParameters.IsRunFinished() |> Option.defaultValue false then
-                return Skipped (index, repl, "already finished")
+                return Skipped (id, repl, "already finished")
             else
                 // 2. Use the builder to handle the execution + status save sequence
                 let! finalResult = asyncResult {
@@ -64,70 +64,70 @@ module ProjectOps =
                 // 3. Map the AsyncResult back to the RunResult DU
                 match finalResult with
                 | Ok _ ->
-                    let res = Success (index, repl)
+                    let res = Success (id, repl, "")
                     ProgressMessage.reportRunResult progress res
                     return res
                 | Error msg ->
-                    let res = Failure (index, repl, msg)
+                    let res = Failure (id, repl, msg)
                     ProgressMessage.reportRunResult progress res
                     return res
         }
 
 
     let private processRunParametersSeq
-        (maxDegreeOfParallelism: int)
-        (runParameters: runParameters seq)
-        (cts: CancellationTokenSource)
-        (progress: IProgress<string> option)
-        (processor: runParameters -> Async<RunResult>)
-        : Async<RunResult[]> =
+            (maxDegreeOfParallelism: int)
+            (runParameters: runParameters seq)
+            (cts: CancellationTokenSource)
+            (progress: IProgress<string> option)
+            (processor: runParameters -> Async<RunResult>)
+            : Async<RunResult[]> =
         async {
             use semaphore = new SemaphoreSlim(maxDegreeOfParallelism)
         
             let processInternal (rp: runParameters) = async {
-                let index = rp.GetId() |> Option.defaultValue (% "unknown")
-                let repl = rp.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
+                let id = rp.GetId() |> Option.defaultValue (% "unknown")
+                let repl = (rp.GetRepl() |> Option.defaultValue (-1 |> UMX.tag))
             
                 try 
-                    // Wait for slot, but respect cancellation
+                    // 1. Wait for slot
                     let! _ = semaphore.WaitAsync(cts.Token) |> Async.AwaitTask
                     try 
+                        // 2. Execute work
                         return! processor rp
                     finally 
+                        // 3. Always release the slot
                         semaphore.Release() |> ignore
                 with 
                 | :? OperationCanceledException ->
-                    // Return a specific result instead of letting the exception bubble up
-                    return Skipped (index, repl, "Cancelled by user")
+                    return Cancelled (id, repl)
                 | e ->
-                    // Handle unexpected errors within a single task so others can continue
-                    return Failure (index, repl, sprintf "Inner fault: %s" e.Message)
+                    return Failure (id, repl, sprintf "Inner fault: %s" e.Message)
             }
 
-            // 1. Run in parallel - this will no longer throw on cancellation
+            // Run all in parallel (throttled by semaphore)
             let! results = 
                 runParameters 
                 |> Seq.map processInternal
                 |> Async.Parallel
 
-            // 2. Tally results
-            let success, failure, skipped = 
-                results |> Array.fold (fun (s, f, sk) res ->
+            // Tally results using the new Cancelled case
+            let s, f, sk, c = 
+                results |> Array.fold (fun (s, f, sk, c) res ->
                     match res with
-                    | Success _ -> (s + 1, f, sk)
-                    | Failure _ -> (s, f + 1, sk)
-                    | Skipped _ -> (s, f, sk + 1)
-                ) (0, 0, 0)
+                    | Success _   -> (s + 1, f, sk, c)
+                    | Failure _   -> (s, f + 1, sk, c)
+                    | Skipped _   -> (s, f, sk + 1, c)
+                    | Cancelled _ -> (s, f, sk, c + 1)
+                ) (0, 0, 0, 0)
 
-            // 3. Final reporting
-            if cts.IsCancellationRequested then
-                report progress (sprintf "\n=== Batch Halted: %d finished, %d cancelled/skipped ===" success (failure + skipped))
-            else
-                report progress (sprintf "\n=== Batch Complete: %d succeeded, %d failed, %d skipped ===" success failure skipped)
+            // Final summary report
+            let summary = 
+                sprintf "\n=== Batch Complete ===\nSucceeded: %d\nFailed:    %d\nSkipped:   %d\nCancelled: %d" 
+                    s f sk c
+            report progress summary
             
             return results
         }
-
 
 
     let reportRunParametersSeq
@@ -215,70 +215,94 @@ module ProjectOps =
                 return Error errorMsg
         }
 
+
     let reportRuns
-        (db: IGeneSortDb)
-        (projectName: string<projectName>)
-        (cts: CancellationTokenSource)
-        (progress: IProgress<string> option)
-                   : Async<Result<RunResult[], string>> =
-        async {
+            (db: IGeneSortDb)
+            (projectName: string<projectName>)
+            (cts: CancellationTokenSource)
+            (progress: IProgress<string> option)
+            (maxDegreeOfParallelism: int)
+                               : Async<Result<RunResult[], string>> =
+        asyncResult {
             try
                 report progress (sprintf "Reporting Runs for %s" %projectName)
-                let! runParamsResult = db.getAllProjectRunParametersAsync projectName (Some cts.Token) progress
-                match runParamsResult with
-                | Error msg ->
-                    report progress (sprintf "Failed to load run parameters: %s" msg)
-                    return Error msg
-                | Ok runParametersArray ->
-                    report progress (sprintf "Found %d runs to report" runParametersArray.Length)
-                    if runParametersArray.Length = 0 then
-                        report progress "No runs found to report"
-                        return Ok [||]
-                    else
-                        let maxDegree = 8
-                        let! results = reportRunParametersSeq maxDegree runParametersArray cts progress
-                        return Ok results
+
+                // 1. Load Parameters (Auto-handles Error short-circuit)
+                let! runParametersArray = 
+                    db.getAllProjectRunParametersAsync projectName (Some cts.Token) progress
+
+                report progress (sprintf "Found %d runs to report" runParametersArray.Length)
+
+                if runParametersArray.Length = 0 then
+                    report progress "No runs found to report"
+                    return [||]
+                else
+                let! results = 
+                    reportRunParametersSeq maxDegreeOfParallelism runParametersArray cts progress
+                    |> Async.map Ok
+
+                // --- NEW ANALYSIS BLOCK ---
+                let summary = RunResult.analyze results
+                
+                report progress (sprintf "--- Report Summary ---")
+                report progress (sprintf "Successfully verified: %d/%d" summary.Successes summary.Total)
+                
+                if summary.MissingLog.Length > 0 then
+                    report progress (sprintf "\nFound %d missing runs:" summary.MissingLog.Length)
+                    summary.MissingLog |> Array.iter (report progress)
+
+                if summary.IssueLog.Length > 0 then
+                    report progress (sprintf "\nFound %d issues/crashes:" summary.IssueLog.Length)
+                    summary.IssueLog |> Array.iter (report progress)
+
+                return results
+
             with e ->
                 let msg = sprintf "Fatal error reporting runs: %s" e.Message
                 report progress msg
-                return Error msg
+                return! async { return Error msg }
         }
 
 
     let executeRuns
-                (db: IGeneSortDb)
-                (buildQueryParams: runParameters -> outputDataType -> queryParams)
-                (projectName: string<projectName>)
-                (allowOverwrite: bool<allowOverwrite>)
-                (cts: CancellationTokenSource)
-                (progress: IProgress<string> option)
-                (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option
-                                -> Async<Result<runParameters, string>>)
-                (maxDegreeOfParallelism: int)
-                : Async<Result<RunResult[], string>> =
-            async {
-                try
-                    report progress (sprintf "Executing Runs for %s" %projectName)
-                    let! runParamsResult = db.getAllProjectRunParametersAsync projectName (Some cts.Token) progress
-                
-                    match runParamsResult with
-                    | Error msg ->
-                        report progress (sprintf "Failed to load run parameters: %s" msg)
-                        return Error msg
-                    | Ok runParametersArray ->
-                        report progress (sprintf "Found %d runs to execute" runParametersArray.Length)
-                        if runParametersArray.Length = 0 then
-                            report progress "No runs found to execute"
-                            return Ok [||]
-                        else
-                            // This call now passes the Result-based executor down the chain
-                            let! results = 
-                                executeRunParametersSeq 
-                                    db maxDegreeOfParallelism executor 
-                                    runParametersArray buildQueryParams allowOverwrite cts progress
-                            return Ok results
-                with e ->
-                    let msg = sprintf "Fatal error executing runs: %s" e.Message
-                    report progress msg
-                    return Error msg
-            }
+            (db: IGeneSortDb)
+            (buildQueryParams: runParameters -> outputDataType -> queryParams)
+            (projectName: string<projectName>)
+            (allowOverwrite: bool<allowOverwrite>)
+            (cts: CancellationTokenSource)
+            (progress: IProgress<string> option)
+            (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option
+                            -> Async<Result<runParameters, string>>)
+            (maxDegreeOfParallelism: int)
+            : Async<Result<RunResult[], string>> =
+    
+        asyncResult {
+            try
+                report progress (sprintf "Executing Runs for %s" %projectName)
+
+                // 1. Load Parameters
+                // If this returns Error, the whole block exits here automatically
+                let! runParametersArray = 
+                    db.getAllProjectRunParametersAsync projectName (Some cts.Token) progress
+
+                report progress (sprintf "Found %d runs to execute" runParametersArray.Length)
+
+                if runParametersArray.Length = 0 then
+                    report progress "No runs found to execute"
+                    return [||]
+                else
+                    // 1. Run the sequence (returns Async<RunResult[]>)
+                    let! results = 
+                        executeRunParametersSeq 
+                            db maxDegreeOfParallelism executor 
+                            runParametersArray buildQueryParams allowOverwrite cts progress
+                        |> Async.map Ok // Wrap the naked array in a Result.Ok
+
+                    return results
+
+            with e ->
+                // Consistent with your executors, handle the unexpected
+                let msg = sprintf "Fatal error executing runs: %s" e.Message
+                report progress msg
+                return! async { return Error msg }
+        }

@@ -1,5 +1,4 @@
-﻿namespace GeneSort.Project
-
+﻿namespace GeneSort.Runs
 
 open System
 open FSharp.UMX
@@ -19,8 +18,8 @@ module ProgressMessage =
             let timeStamp = DateTime.Now.ToLongTimeString ()
             let msg = 
                 match result with
-                | Success (idx, repl) -> 
-                    sprintf "✓ %s  Run %s_%d completed successfully" timeStamp %idx %repl 
+                | Success (idx, repl, congrats) -> 
+                    sprintf "✓ %s  Run %s_%d completed successfully %s" timeStamp %idx %repl congrats
                 | Failure (idx, repl, error) -> 
                     sprintf "✗ %s  Run %s_%d failed: %s" timeStamp %idx %repl error
                 | Skipped (idx, repl, reason) -> 

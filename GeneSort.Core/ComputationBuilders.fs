@@ -2,8 +2,10 @@
 
 open System.Threading
 
+
 [<AutoOpen>]
 module ComputationBuilders =
+
 
     /// Helper to bridge CancellationTokens into the AsyncResult flow
     let checkCancellation (token: CancellationToken) =
@@ -23,8 +25,18 @@ module ComputationBuilders =
 
     let maybe = MaybeBuilder()
 
+
     type AsyncResultBuilder() =
-        member _.Bind(x: Async<Result<'T, 'E>>, f: 'T -> Async<Result<'U, 'E>>) =
+
+        member this.Zero() = async { return Ok () }
+
+        member this.Return(v) = async { return Ok v }
+    
+        member this.ReturnFrom(x: Async<Result<'T, 'E>>) = x
+    
+        member this.ReturnFrom(x: Result<'T, 'E>) = async { return x }
+
+        member this.Bind(x: Async<Result<'T, 'E>>, f: 'T -> Async<Result<'U, 'E>>) =
             async {
                 let! res = x
                 match res with
@@ -32,35 +44,78 @@ module ComputationBuilders =
                 | Ok v -> return! f v
             }
 
-        member _.Bind(x: Result<'T, 'E>, f: 'T -> Async<Result<'U, 'E>>) =
+        member this.Bind(x: Result<'T, 'E>, f: 'T -> Async<Result<'U, 'E>>) =
             match x with
             | Error e -> async { return Error e }
             | Ok v -> f v
 
-        member _.Return(v) = async { return Ok v }
-        
-        // 1. This handles: return! async { return Ok 1 }
-        member _.ReturnFrom(x: Async<Result<'T, 'E>>) = x
-        
-        // 2. This handles: return! Ok 1
-        member _.ReturnFrom(x: Result<'T, 'E>) = async { return x }
-    
-        // --- Error Handling Support ---
-    
-        /// Handles 'try ... with'
-        member _.TryWith(computation: Async<Result<'T, 'E>>, handler: exn -> Async<Result<'T, 'E>>) =
+        member this.Delay(f: unit -> 'T) = f
+
+        member this.Run(f: unit -> Async<Result<'T, 'E>>) = f()
+
+        member this.Combine(step1: Async<Result<unit, 'E>>, step2: unit -> Async<Result<'T, 'E>>) : Async<Result<'T, 'E>> =
+            async {
+                let! res1 = step1
+                match res1 with
+                | Ok () -> return! step2()
+                | Error e -> return Error e
+            }
+
+        member this.While(guard: unit -> bool, body: unit -> Async<Result<unit, 'E>>) : Async<Result<unit, 'E>> =
+            if not (guard()) then 
+                this.Zero()
+            else 
+                this.Combine(body(), fun () -> this.While(guard, body))
+
+
+    // The # symbol means "This type or any subtype" (Flexible Type)
+        member this.Using(resource: #System.IDisposable, binder: #System.IDisposable -> Async<Result<'V, 'E>>) =
+            async {
+                use _d = resource
+                return! binder resource
+            }
+
+        member this.For(sequence: seq<'T>, body: 'T -> Async<Result<unit, 'E>>) : Async<Result<unit, 'E>> =
+            // Use the 'use' keyword directly or ensure Using doesn't over-constrain the enum
+            this.Using(sequence.GetEnumerator(), fun enum ->
+                this.While((fun () -> enum.MoveNext()), (fun () -> body enum.Current)))
+
+
+        member this.TryWith(computation: Async<Result<'T, 'E>>, handler: exn -> Async<Result<'T, 'E>>) =
             async.TryWith(computation, handler)
 
-        /// Handles 'try ... finally'
-        member _.TryFinally(computation: Async<Result<'T, 'E>>, compensation: unit -> unit) =
+        member this.TryFinally(computation: Async<Result<'T, 'E>>, compensation: unit -> unit) =
             async.TryFinally(computation, compensation)
 
-        /// Handles 'using' (disposable objects)
-        member this.Using(resource: #System.IDisposable, binder: #System.IDisposable -> Async<Result<'V, 'E>>) =
-            this.TryFinally(binder resource, (fun () -> if not (isNull resource) then resource.Dispose()))
 
-        member _.Delay(f) = async.Delay(f)
-        member _.Run(f) = f
+        /// Handles 'try ... with' for delayed computations
+        member this.TryWith(computation: unit -> Async<Result<'T, 'E>>, handler: exn -> Async<Result<'T, 'E>>) : Async<Result<'T, 'E>> =
+            async {
+                try 
+                    return! computation()
+                with e -> 
+                    return! handler e
+            }
+
+        /// Handles 'try ... finally' for delayed computations
+        member this.TryFinally(computation: unit -> Async<Result<'T, 'E>>, compensation: unit -> unit) : Async<Result<'T, 'E>> =
+            async {
+                try 
+                    return! computation()
+                finally 
+                    compensation()
+            }
+
+
+
+
+
+
+
+
+
+
+
 
     let asyncResult = AsyncResultBuilder()
 
@@ -86,6 +141,19 @@ module ComputationBuilders =
         member _.ReturnFrom(x) = x
 
     let asyncOption = AsyncOptionBuilder()
+
+
+
+[<RequireQualifiedAccess>]
+module Async =
+    /// Transforms the result of an async computation
+    let map (f: 'T -> 'U) (operation: Async<'T>) : Async<'U> =
+        async {
+            let! result = operation
+            return f result
+        }
+
+
 
 [<RequireQualifiedAccess>]
 module AsyncResult =
