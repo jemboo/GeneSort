@@ -168,12 +168,12 @@ module ProjectOps =
             (progress: IProgress<string> option)          : Async<Result<unit, string>> =
         async {
             try
-                report progress (sprintf "Saving RunParameter files for %s" %projectName)
+                report progress (sprintf "%s Saving RunParameter files for %s" (MathUtils.getTimestampString()) %projectName)
                 cts.Token.ThrowIfCancellationRequested()
                 let! res = db.saveAllRunParametersAsync runParameterArray buildQueryParams allowOverwrite (Some cts.Token) progress
                 match res with
                 | Ok () -> 
-                    report progress (sprintf "Successfully saved %d RunParameter files" runParameterArray.Length)
+                    report progress (sprintf "%s Successfully saved %d RunParameter files" (MathUtils.getTimestampString()) runParameterArray.Length)
                     return Ok ()
                 | Error msg -> return Error msg
             with
@@ -182,7 +182,7 @@ module ProjectOps =
                 report progress msg
                 return Error msg
             | e ->
-                let msg = sprintf "Failed to save RunParameter files for %s: %s" %projectName e.Message
+                let msg = sprintf "%s Failed to save RunParameter files for %s: %s" (MathUtils.getTimestampString()) %projectName e.Message
                 report progress msg
                 return Error msg
         }
@@ -200,14 +200,14 @@ module ProjectOps =
         (paramRefiner: runParameters seq -> runParameters seq) : Async<Result<unit, string>> =
         async {
             try
-                report progress (sprintf "Saving project file: %s" %project.ProjectName)
+                report progress (sprintf "%s Saving project file: %s" (MathUtils.getTimestampString()) %project.ProjectName)
                 let queryParams = queryParams.createForProject project.ProjectName
                 let! saveProjRes = db.saveAsync queryParams (project |> outputData.Project) (true |> UMX.tag<allowOverwrite>)
                 match saveProjRes with
                 | Error err -> return Error err
                 | Ok () ->
                     let runParametersArray = Project.makeRunParameters minReplica maxReplica project.ParameterSpans paramRefiner |> Seq.toArray
-                    report progress (sprintf "Saving run parameters files: (%d)" runParametersArray.Length)
+                    report progress (sprintf "%s Saving run parameters files: (%d)" (MathUtils.getTimestampString()) runParametersArray.Length)
                     return! saveParametersFiles db project.ProjectName runParametersArray buildQueryParams allowOverwrite cts progress
             with e ->
                 let errorMsg = sprintf "Failed to initialize project files: %s" e.Message
@@ -216,12 +216,11 @@ module ProjectOps =
         }
 
 
-    let reportRuns
+    let printRunParams
             (db: IGeneSortDb)
             (projectName: string<projectName>)
             (cts: CancellationTokenSource)
             (progress: IProgress<string> option)
-            (maxDegreeOfParallelism: int)
                                : Async<Result<RunResult[], string>> =
         asyncResult {
             try
@@ -237,6 +236,7 @@ module ProjectOps =
                     report progress "No runs found to report"
                     return [||]
                 else
+                let maxDegreeOfParallelism = 1
                 let! results = 
                     reportRunParametersSeq maxDegreeOfParallelism runParametersArray cts progress
                     |> Async.map Ok
@@ -278,7 +278,7 @@ module ProjectOps =
     
         asyncResult {
             try
-                report progress (sprintf "Executing Runs for %s" %projectName)
+                report progress (sprintf "%s Executing Runs for %s" (MathUtils.getTimestampString()) %projectName)
 
                 // 1. Load Parameters
                 // If this returns Error, the whole block exits here automatically
@@ -302,7 +302,7 @@ module ProjectOps =
 
             with e ->
                 // Consistent with your executors, handle the unexpected
-                let msg = sprintf "Fatal error executing runs: %s" e.Message
+                let msg = sprintf "%s Fatal error executing runs: %s" (MathUtils.getTimestampString()) e.Message
                 report progress msg
                 return! async { return Error msg }
         }

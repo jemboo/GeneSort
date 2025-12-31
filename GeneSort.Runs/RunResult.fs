@@ -1,6 +1,7 @@
 ﻿namespace GeneSort.Runs
 
 open FSharp.UMX
+open GeneSort.Core
 open GeneSort.Runs
 
 
@@ -16,17 +17,18 @@ module RunResult =
 
 /// Analyzes results to identify what needs attention
     let analyze (results: RunResult[]) =
+        let timeStamp = MathUtils.getTimestampString()
         // 1. Extract specifically which ones failed or were cancelled
         let issues = 
             results |> Array.choose (function
-                | Failure (idx, r, msg) -> Some (sprintf "Run %s (Repl %d) FAILED: %s" %idx r msg)
-                | Cancelled (idx, r)    -> Some (sprintf "Run %s (Repl %d) was CANCELLED" %idx r)
+                | Failure (idx, r, msg) -> Some (sprintf "%s Run %s (Repl %d) FAILED: %s" timeStamp %idx r msg)
+                | Cancelled (idx, r)    -> Some (sprintf "%s Run %s (Repl %d) was CANCELLED" timeStamp %idx r)
                 | _ -> None)
 
         // 2. Extract specifically which ones are "Missing" (Skipped)
         let missing = 
             results |> Array.choose (function
-                | Skipped (idx, r, msg) -> Some (sprintf "Run %s (Repl %d) is MISSING: %s" %idx r msg)
+                | Skipped (idx, r, msg) -> Some (sprintf "%s Run %s (Repl %d) is MISSING: %s" timeStamp %idx r msg)
                 | _ -> None)
 
         // 3. Simple counts

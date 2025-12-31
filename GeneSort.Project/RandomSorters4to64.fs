@@ -15,6 +15,7 @@ open GeneSort.Model.Sorter.Uf6
 open System.Threading
 open GeneSort.Runs
 open GeneSort.Db
+open ProjectOps
 
 
 module RandomSorters4to64 =
@@ -222,11 +223,12 @@ module RandomSorters4to64 =
             try
                 // 1. Setup & ID Extraction
                 let! _ = checkCancellation cts.Token
-                let runId = runParameters.GetId() |> Option.defaultValue (% (sprintf "unknown_%O" (Guid.NewGuid())))
+                let runId = runParameters.GetId() |> Option.defaultValue (% "unknown")
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
+                report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
 
                 // 2. Safe Parameter Extraction
-                let! (sorterModelKey, sortingWidth, stageLength, ceLength, sorterCount) = 
+                let! (sorterModelType, sortingWidth, stageLength, ceLength, sorterCount) = 
                     maybe {
                         let! smk = runParameters.GetSorterModelType()
                         let! sw = runParameters.GetSortingWidth()
@@ -237,11 +239,11 @@ module RandomSorters4to64 =
                     } |> Result.ofOption (sprintf "Run %s: Missing required parameters" %runId) |> asAsync
 
                 progress |> Option.iter (fun p ->  
-                    p.Report(sprintf "Executing Run %s, Repl %d: %s" %runId %repl (runParameters.toString())))
+                    p.Report(sprintf "%s Executing Run %s, Repl %d: %s" (MathUtils.getTimestampString()) %runId %repl (runParameters.toString())))
 
                 // 3. Sorter Model Logic (Pure Computation)
                 let sorterModelMaker =
-                    match sorterModelKey with
+                    match sorterModelType with
                     | sorterModelType.Mcse -> 
                         MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength 
                         |> sorterModelMaker.SmmMsceRandGen
@@ -269,14 +271,12 @@ module RandomSorters4to64 =
                 let! _ = checkCancellation cts.Token
 
                 // 4. Sequential Saves
-                // SAVE 1: Sorter Set
                 let qpSorterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "") 
                 let! _ = db.saveAsync qpSorterSet (sorterSet |> outputData.SorterSet) allowOverwrite
             
                 progress |> Option.iter (fun p -> 
                     p.Report(sprintf "Saved sorterSet %s for run: %s" (%sorterSet.Id.ToString()) %runId))
 
-                // SAVE 2: Sorter Model Set Maker
                 let qpMaker = makeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSetMaker "") 
                 let! _ = db.saveAsync qpMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker) allowOverwrite
             
@@ -284,6 +284,7 @@ module RandomSorters4to64 =
                     p.Report(sprintf "Saved SorterModelSetMaker %s for run: %s" (%sorterModelSetMaker.Id.ToString()) %runId))
 
                 // 5. Final Return
+                report progress (sprintf "%s Finished Run %s Repl %d" (MathUtils.getTimestampString()) %runId %repl)
                 return runParameters.WithRunFinished true
 
             with e -> 

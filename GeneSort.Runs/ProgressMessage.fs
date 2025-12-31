@@ -2,6 +2,7 @@
 
 open System
 open FSharp.UMX
+open GeneSort.Core
 
 type progressMessage =
     | Info of string
@@ -15,7 +16,7 @@ module ProgressMessage =
     let reportRunResult (progress: IProgress<string> option) (result: RunResult) =
         match progress with
         | Some p ->
-            let timeStamp = DateTime.Now.ToLongTimeString ()
+            let timeStamp = MathUtils.getTimestampString()
             let msg = 
                 match result with
                 | Success (idx, repl, congrats) -> 

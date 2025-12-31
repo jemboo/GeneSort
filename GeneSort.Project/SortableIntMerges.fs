@@ -173,7 +173,7 @@ module SortableIntMerges =
                 let! _ = db.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
 
                 // 5. Success
-                progress |> Option.iter (fun p -> p.Report(sprintf "Run %s generation completed and saved." %runId))
+                progress |> Option.iter (fun p -> p.Report(sprintf "%s Run %s generation completed and saved." (MathUtils.getTimestampString()) %runId))
                 return runParams.WithRunFinished true
 
             with e ->

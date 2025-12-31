@@ -11,6 +11,7 @@ open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.Runs
 open GeneSort.Db
+open ProjectOps
 
 
 module FullBoolEvals =
@@ -140,11 +141,9 @@ module FullBoolEvals =
             try
                 // 1. Setup & ID Extraction
                 let! _ = checkCancellation cts.Token
-                let runId = runParameters.GetId() |> Option.defaultValue (% (sprintf "unknown_%O" (Guid.NewGuid())))
+                let runId = runParameters.GetId() |> Option.defaultValue (% "unknown")
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
-            
-                progress |> Option.iter (fun p -> 
-                    p.Report(sprintf "Executing Run %s, Repl %d:\n  %s" %runId %repl (runParameters.toString())))
+                report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
 
                 // 2. Safe Domain Parameter Extraction
                 let! (sorterModelType, sortingWidth, sortableDataType) = 
@@ -172,7 +171,7 @@ module FullBoolEvals =
                 let! _ = db.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
                 // 6. Final Success
-                progress |> Option.iter (fun p -> p.Report(sprintf "Run %s successfully evaluated and saved." %runId))
+                report progress (sprintf "%s Finished Run %s Repl %d" (MathUtils.getTimestampString()) %runId %repl)
                 return runParameters.WithRunFinished true
 
             with e ->

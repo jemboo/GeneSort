@@ -88,25 +88,44 @@ let maxReplica = 1<replNumber>
 //let maxReplica = 1<replNumber>
 
 
-printfn "Initializing Project..."
-let initResult = 
-    ProjectOps.initProjectFiles geneSortDb yab cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
+//printfn "Initializing Project..."
+//let initResult = 
+//    ProjectOps.initProjectFiles geneSortDb yab cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
+//    |> Async.RunSynchronously
+
+//match initResult with
+//| Ok () -> printfn "Project files initialized successfully."
+//| Error e -> printfn "Init Failed: %s" e
+
+
+//printfn "Executing Runs..."
+//let execResult = 
+//    ProjectOps.executeRuns geneSortDb yab projectName allowOverwrite cts (Some progress) executor maxParallel
+//    |> Async.RunSynchronously
+
+//match execResult with
+//| Ok results -> printfn "Execution complete. %d results processed." results.Length
+//| Error e -> printfn "Execution Failed: %s" e
+
+
+//printfn "Printing RunParams..."
+//let reportResult = 
+//    ProjectOps.printRunParams geneSortDb projectName cts (Some progress)
+//    |> Async.RunSynchronously
+
+
+//printfn "Making Use Profile report ..."
+
+//let reportResult = 
+//    TextReporters.ceUseProfileReportExecutor geneSortDb projectName yab allowOverwrite cts (Some progress)
+//    |> Async.RunSynchronously
+
+
+printfn "Making Use Bin report ..."
+
+let reportResultBins = 
+    TextReporters.binReportExecutor geneSortDb projectName yab allowOverwrite cts (Some progress)
     |> Async.RunSynchronously
-
-match initResult with
-| Ok () -> printfn "Project files initialized successfully."
-| Error e -> printfn "Init Failed: %s" e
-
-
-printfn "Executing Runs..."
-let execResult = 
-    ProjectOps.executeRuns geneSortDb yab projectName allowOverwrite cts (Some progress) executor maxParallel
-    |> Async.RunSynchronously
-
-match execResult with
-| Ok results -> printfn "Execution complete. %d results processed." results.Length
-| Error e -> printfn "Execution Failed: %s" e
-
 
 
 let endTime = System.DateTime.Now

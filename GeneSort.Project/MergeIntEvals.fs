@@ -18,6 +18,7 @@ open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Uf6
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
+open ProjectOps
 
 
 module MergeIntEvals =
@@ -304,8 +305,8 @@ module MergeIntEvals =
                 // 1. Setup
                 let! _ = checkCancellation cts.Token
                 let runId = runParameters.GetId() |> Option.defaultValue (% "unknown")
-                progress |> Option.iter (fun p -> p.Report(sprintf "Starting Run %s" %runId))
-
+                let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
+                report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
                 // 2. Safe Param Extraction
                 // Note: No async.Return needed anymore because of the Bind overload
                 let! (repl, width, mDim, mFill, dType, sModel) = 
@@ -339,7 +340,7 @@ module MergeIntEvals =
                 let! _ = db.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
                 // 7. Success
-                progress |> Option.iter (fun p -> p.Report(sprintf "Run %s completed." %runId))
+                report progress (sprintf "%s Finished Run %s Repl %d" (MathUtils.getTimestampString()) %runId %repl)
                 return runParameters.WithRunFinished true
 
             with e ->
