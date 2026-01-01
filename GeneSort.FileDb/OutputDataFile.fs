@@ -26,6 +26,7 @@ open GeneSort.SortingResults
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
+[<Measure>] type projectFolder
 [<Measure>] type pathToProjectFolder
 [<Measure>] type fileNameWithoutExtension
 [<Measure>] type fullPathToFile // e.g., "C:\GeneSortData\Project1\RunParameters_0_0.msgpack"
@@ -35,10 +36,10 @@ module OutputDataFile =
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let getPathToOutputDataFolder
-                (projectFolder:string<pathToProjectFolder>)
+                (pathToProjectFolder:string<pathToProjectFolder>)
                 (outputDataType: outputDataType)
-                 : string<fullPathToFolder> =
-        Path.Combine(%projectFolder, outputDataType |> OutputDataType.toFolderName) |> UMX.tag<fullPathToFolder>
+                 :string<fullPathToFolder> =
+        Path.Combine(%pathToProjectFolder, outputDataType |> OutputDataType.toFolderName) |> UMX.tag<fullPathToFolder>
 
     let makeOutputDataName (queryParams: queryParams) : string =
         let idPart = queryParams.Id.ToString()
@@ -47,13 +48,13 @@ module OutputDataFile =
         | _ -> idPart
 
     let getFullOutputDataFilePath
-            (projectFolder: string<pathToProjectFolder>)
+            (pathToProjectFolder: string<pathToProjectFolder>)
             (queryParams: queryParams) : string<fullPathToFile> =
         let fileNameWithExtension =
             match queryParams.OutputDataType with
             | outputDataType.TextReport reportName -> sprintf "%s.txt" %reportName
             | _ -> makeOutputDataName queryParams + ".msgpack"
-        let outputDataFolder = getPathToOutputDataFolder projectFolder queryParams.OutputDataType
+        let outputDataFolder = getPathToOutputDataFolder pathToProjectFolder queryParams.OutputDataType
         Path.Combine(%outputDataFolder, fileNameWithExtension) |> UMX.tag<fullPathToFile>
 
     /// Helper to deserialize DTO and convert to domain.
@@ -64,12 +65,12 @@ module OutputDataFile =
         }
 
     let getOutputDataAsync
-            (projectFolder:string<pathToProjectFolder>)
-            (queryParams: queryParams)
-            (ct: CancellationToken option)
-                : Async<Result<outputData, string>> =
+            (pathToProjectFolder :string<pathToProjectFolder>)
+            (queryParams :queryParams)
+            (ct :CancellationToken option)
+                :Async<Result<outputData, string>> =
         async {
-            let filePath = getFullOutputDataFilePath projectFolder queryParams
+            let filePath = getFullOutputDataFilePath pathToProjectFolder queryParams
             if not (File.Exists %filePath) then
                 return Error (sprintf "File not found: %s" %filePath)
             else
@@ -151,14 +152,14 @@ module OutputDataFile =
         MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
 
     let saveToFileAsync
-        (projectFolder:string<pathToProjectFolder>)
+        (pathToProjectFolder:string<pathToProjectFolder>)
         (queryParams: queryParams)
         (outputData: outputData)
         (allowOverwrite: bool<allowOverwrite>) : Async<Result<unit, string>> =
 
         async {
 
-            let filePath = getFullOutputDataFilePath projectFolder queryParams
+            let filePath = getFullOutputDataFilePath pathToProjectFolder queryParams
             let directory = Path.GetDirectoryName %filePath
             let dirRes =
                 try
