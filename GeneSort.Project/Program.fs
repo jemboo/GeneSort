@@ -42,7 +42,7 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 //let executor = RandomSorters4to64.executor
 //let project = RandomSorters4to64.project
 //let projectName = RandomSorters4to64.project.ProjectName
-//let yab = RandomSorters4to64.makeQueryParamsFromRunParams
+//let buildQueryParams = RandomSorters4to64.makeQueryParamsFromRunParams
 //let paramRefiner = RandomSorters4to64.paramMapRefiner
 //let minReplica = 0<replNumber>
 //let maxReplica = 1<replNumber>
@@ -52,7 +52,7 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 let executor = MergeIntEvals.executor
 let project = MergeIntEvals.project
 let projectName = MergeIntEvals.project.ProjectName
-let yab = MergeIntEvals.makeQueryParamsFromRunParams
+let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
 let paramRefiner = MergeIntEvals.paramMapRefiner
 let minReplica = 0<replNumber>
 let maxReplica = 1<replNumber>
@@ -62,7 +62,7 @@ let maxReplica = 1<replNumber>
 //let project = SortableIntMerges.project
 //let executor = SortableIntMerges.executor
 //let projectName = SortableIntMerges.projectName
-//let yab = SortableIntMerges.makeQueryParamsFromRunParams
+//let buildQueryParams = SortableIntMerges.makeQueryParamsFromRunParams
 //let paramRefiner = SortableIntMerges.paramMapRefiner
 //let minReplica = 0<replNumber>
 //let maxReplica = 1<replNumber>
@@ -72,7 +72,7 @@ let maxReplica = 1<replNumber>
 //let project = MergeIntQa.project
 //let executor = MergeIntQa.executor
 //let projectName = MergeIntQa.projectName
-//let yab = MergeIntQa.makeQueryParamsFromRunParams
+//let buildQueryParams = MergeIntQa.makeQueryParamsFromRunParams
 //let paramRefiner = MergeIntQa.paramMapRefiner
 //let minReplica = 0<replNumber>
 //let maxReplica = 1<replNumber>
@@ -82,7 +82,7 @@ let maxReplica = 1<replNumber>
 //let executor = FullBoolEvals.executor
 //let project = FullBoolEvals.project
 //let projectName = FullBoolEvals.project.ProjectName
-//let yab = FullBoolEvals.makeQueryParamsFromRunParams
+//let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
 //let paramRefiner = FullBoolEvals.paramMapRefiner
 //let minReplica = 0<replNumber>
 //let maxReplica = 1<replNumber>
@@ -90,7 +90,7 @@ let maxReplica = 1<replNumber>
 
 //printfn "Initializing Project..."
 //let initResult = 
-//    ProjectOps.initProjectFiles geneSortDb yab cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
+//    ProjectOps.initProjectFiles geneSortDb buildQueryParams cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
 //    |> Async.RunSynchronously
 
 //match initResult with
@@ -100,7 +100,7 @@ let maxReplica = 1<replNumber>
 
 //printfn "Executing Runs..."
 //let execResult = 
-//    ProjectOps.executeRuns geneSortDb yab projectName allowOverwrite cts (Some progress) executor maxParallel
+//    ProjectOps.executeRuns geneSortDb buildQueryParams projectName allowOverwrite cts (Some progress) executor maxParallel
 //    |> Async.RunSynchronously
 
 //match execResult with
@@ -117,14 +117,14 @@ let maxReplica = 1<replNumber>
 //printfn "Making Use Profile report ..."
 
 //let reportResult = 
-//    TextReporters.ceUseProfileReportExecutor geneSortDb projectName yab allowOverwrite cts (Some progress)
+//    TextReporters.ceUseProfileReportExecutor geneSortDb projectName buildQueryParams allowOverwrite cts (Some progress)
 //    |> Async.RunSynchronously
 
 
 printfn "Making Use Bin report ..."
 
 let reportResultBins = 
-    TextReporters.binReportExecutor geneSortDb projectName yab allowOverwrite cts (Some progress)
+    TextReporters.binReportExecutor geneSortDb projectName buildQueryParams allowOverwrite cts (Some progress)
     |> Async.RunSynchronously
 
 

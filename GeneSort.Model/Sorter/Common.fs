@@ -14,7 +14,7 @@ open GeneSort.Core
 module Common =
     let makeSorterModelId 
                 (id:  Guid<sorterModelMakerID>) 
-                (index:int): Guid<sorterModelID> = 
+                (index:int) : Guid<sorterModelID> = 
         [
             id  :> obj
             index :> obj

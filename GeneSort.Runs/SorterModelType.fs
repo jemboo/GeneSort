@@ -1,9 +1,5 @@
 ﻿namespace GeneSort.Runs
-open System
-open FSharp.UMX
-open GeneSort.Core
-open GeneSort.Sorter
-open GeneSort.Model.Sorter
+
 
 
 type sorterModelType = 

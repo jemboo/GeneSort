@@ -241,7 +241,6 @@ module ProjectOps =
                     reportRunParametersSeq maxDegreeOfParallelism runParametersArray cts progress
                     |> Async.map Ok
 
-                // --- NEW ANALYSIS BLOCK ---
                 let summary = RunResult.analyze results
                 
                 report progress (sprintf "--- Report Summary ---")
@@ -281,7 +280,6 @@ module ProjectOps =
                 report progress (sprintf "%s Executing Runs for %s" (MathUtils.getTimestampString()) %projectName)
 
                 // 1. Load Parameters
-                // If this returns Error, the whole block exits here automatically
                 let! runParametersArray = 
                     db.getAllProjectRunParametersAsync projectName (Some cts.Token) progress
 

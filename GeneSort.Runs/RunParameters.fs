@@ -230,7 +230,8 @@ module RunParameters =
                 keys
                 |> Array.map (fun key -> rp.ParamMap.TryFind key |> Option.defaultValue "N/A"))
             |> Seq.toArray
-        Array.append [| headerRow |] dataRows // Fixed: header was wrong.
+        Array.append [| keys |] dataRows // Fixed: header was wrong.
+
 
     let toStringTable(runParams :runParameters seq) : string =
         makeIndexAndReplTable runParams

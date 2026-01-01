@@ -13,6 +13,7 @@ type private DbMessage =
     | GetAllProjectRunParameters of string<projectName> * CancellationToken option * IProgress<string> option * AsyncReplyChannel<Result<runParameters[], string>>
 
 type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
+
     let getPathToProjectFolder (projectName: string) =
         Path.Combine(%rootFolder, projectName) |> UMX.tag<pathToProjectFolder>
 
@@ -68,7 +69,7 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
 
         member this.saveAllRunParametersAsync
                         (runParamsArray: runParameters[])
-                        (buildQueryParams: runParameters -> outputDataType -> queryParams)  // Renamed yab.
+                        (buildQueryParams: runParameters -> outputDataType -> queryParams)
                         (allowOverwrite: bool<allowOverwrite>)
                         (ct: CancellationToken option)
                         (progress: IProgress<string> option) : Async<Result<unit, string>> =
