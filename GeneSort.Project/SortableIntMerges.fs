@@ -135,6 +135,7 @@ module SortableIntMerges =
         // --- Executor ---
     let executor
             (db: IGeneSortDb)
+            (projectFolder: string<projectFolder>)
             (runParams: runParameters) 
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource) 
@@ -170,7 +171,7 @@ module SortableIntMerges =
                 let qpForSortableTest = makeQueryParamsFromRunParams runParams (outputDataType.SortableTest "") 
             
                 // The builder automatically handles short-circuiting if saveAsync returns Error
-                let! _ = db.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
+                let! _ = db.saveAsync projectFolder qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
 
                 // 5. Success
                 progress |> Option.iter (fun p -> p.Report(sprintf "%s Run %s generation completed and saved." (MathUtils.getTimestampString()) %runId))

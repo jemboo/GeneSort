@@ -132,6 +132,7 @@ module FullBoolEvals =
 
     let executor
             (db: IGeneSortDb)
+            (projectFolder: string<projectFolder>)
             (runParameters: runParameters) 
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource) 
@@ -156,7 +157,7 @@ module FullBoolEvals =
 
                 // 3. Load SorterSet
                 let qpSorters = RandomSorters4to64.makeQueryParams (Some repl) (Some sortingWidth) (Some sorterModelType) (outputDataType.SorterSet "")
-                let! loadRes = db.loadAsync qpSorters
+                let! loadRes = db.loadAsync projectFolder qpSorters
 
                 let! ss = loadRes |> OutputData.asSorterSet |> asAsync
 
@@ -168,7 +169,7 @@ module FullBoolEvals =
 
                 // 5. Save Results
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
-                let! _ = db.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
+                let! _ = db.saveAsync projectFolder qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
                 // 6. Final Success
                 report progress (sprintf "%s Finished Run %s Repl %d" (MathUtils.getTimestampString()) %runId %repl)

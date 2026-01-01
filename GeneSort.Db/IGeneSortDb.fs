@@ -2,7 +2,6 @@
 open System
 open System.Threading
 open FSharp.UMX
-open GeneSort.Core
 open GeneSort.Runs
 open GeneSort.Sorter.Sorter
 open GeneSort.Model.Sorter
@@ -11,20 +10,22 @@ open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.SortingResults
 
+[<Measure>] type projectFolder
 [<Measure>] type allowOverwrite
 
 type OutputError = string
 
 type IGeneSortDb =
-    abstract member saveAsync : queryParams -> outputData -> bool<allowOverwrite> -> Async<Result<unit, string>>
-    abstract member loadAsync : queryParams -> Async<Result<outputData, OutputError>>
+    abstract member saveAsync : string<projectFolder> -> queryParams -> outputData -> bool<allowOverwrite> -> Async<Result<unit, string>>
+    abstract member loadAsync : string<projectFolder> -> queryParams -> Async<Result<outputData, OutputError>>
     abstract member getAllProjectNamesAsync : unit -> Async<Result<string<projectName>[], string>>
     abstract member getAllProjectRunParametersAsync :
-            string<projectName> ->
+            string<projectFolder> ->
             CancellationToken option ->
             IProgress<string> option ->
             Async<Result<runParameters[], string>>
     abstract member saveAllRunParametersAsync :
+            string<projectFolder> ->
             runParameters[] ->
             (runParameters -> outputDataType -> queryParams) ->
             bool<allowOverwrite> ->
@@ -41,62 +42,62 @@ module GeneSortDb =
             | None -> Error "Unexpected output data type"
         | Error err -> Error err
 
-    let getRunParametersAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<runParameters, OutputError>> =
+    let getRunParametersAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<runParameters, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync queryParams
+            let! result = geneSortDb.loadAsync projectFolder queryParams
             return unwrapOutput (function | outputData.RunParameters rp -> Some rp | _ -> None) result
         }
 
-    let getSorterSetAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sorterSet, OutputError>> =
+    let getSorterSetAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sorterSet, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync queryParams
+            let! result = geneSortDb.loadAsync projectFolder queryParams
             return unwrapOutput (function | outputData.SorterSet ss -> Some ss | _ -> None) result
         }
 
-    let getSortableTestSetAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sortableTestSet, OutputError>> =
+    let getSortableTestSetAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sortableTestSet, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync queryParams
+            let! result = geneSortDb.loadAsync projectFolder queryParams
             return unwrapOutput (function | outputData.SortableTestSet sts -> Some sts | _ -> None) result
         }
 
-    let getSorterModelSetAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sorterModelSet, OutputError>> =
+    let getSorterModelSetAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sorterModelSet, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync queryParams
+            let! result = geneSortDb.loadAsync projectFolder queryParams
             return unwrapOutput (function | outputData.SorterModelSet smsm -> Some smsm | _ -> None) result
         }
 
-    let getSorterModelSetMakerAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sorterModelSetMaker, OutputError>> =
+    let getSorterModelSetMakerAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sorterModelSetMaker, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync queryParams
+            let! result = geneSortDb.loadAsync projectFolder queryParams
             return unwrapOutput (function | outputData.SorterModelSetMaker smsm -> Some smsm | _ -> None) result
         }
 
-    let getSortableTestModelSetAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sortableTestModelSet, OutputError>> =
+    let getSortableTestModelSetAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sortableTestModelSet, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync queryParams
+            let! result = geneSortDb.loadAsync projectFolder queryParams
             return unwrapOutput (function | outputData.SortableTestModelSet stms -> Some stms | _ -> None) result
         }
 
-    let getSortableTestModelSetMakerAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sortableTestModelSetMaker, OutputError>> =
+    let getSortableTestModelSetMakerAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sortableTestModelSetMaker, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync queryParams
+            let! result = geneSortDb.loadAsync projectFolder queryParams
             return unwrapOutput (function | outputData.SortableTestModelSetMaker stmsm -> Some stmsm | _ -> None) result
         }
 
-    let getSorterSetEvalAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sorterSetEval, OutputError>> =
+    let getSorterSetEvalAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sorterSetEval, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync queryParams
+            let! result = geneSortDb.loadAsync projectFolder queryParams
             return unwrapOutput (function | outputData.SorterSetEval sse -> Some sse | _ -> None) result
         }
 
-    let getSorterSetEvalBinsAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<sorterSetEvalBins, OutputError>> =
+    let getSorterSetEvalBinsAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sorterSetEvalBins, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync queryParams
+            let! result = geneSortDb.loadAsync projectFolder queryParams
             return unwrapOutput (function | outputData.SorterSetEvalBins sseb -> Some sseb | _ -> None) result
         }
 
-    let getProjectAsync (geneSortDb: IGeneSortDb) (queryParams: queryParams) : Async<Result<project, OutputError>> =
+    let getProjectAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<project, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync queryParams
+            let! result = geneSortDb.loadAsync projectFolder queryParams
             return unwrapOutput (function | outputData.Project p -> Some p | _ -> None) result
         }

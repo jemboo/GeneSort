@@ -214,6 +214,7 @@ module RandomSorters4to64 =
 
     let executor
             (db: IGeneSortDb)
+            (projectFolder: string<projectFolder>)
             (runParameters: runParameters) 
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource) 
@@ -272,13 +273,13 @@ module RandomSorters4to64 =
 
                 // 4. Sequential Saves
                 let qpSorterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "") 
-                let! _ = db.saveAsync qpSorterSet (sorterSet |> outputData.SorterSet) allowOverwrite
+                let! _ = db.saveAsync projectFolder qpSorterSet (sorterSet |> outputData.SorterSet) allowOverwrite
             
                 progress |> Option.iter (fun p -> 
                     p.Report(sprintf "Saved sorterSet %s for run: %s" (%sorterSet.Id.ToString()) %runId))
 
                 let qpMaker = makeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSetMaker "") 
-                let! _ = db.saveAsync qpMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker) allowOverwrite
+                let! _ = db.saveAsync projectFolder qpMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker) allowOverwrite
             
                 progress |> Option.iter (fun p -> 
                     p.Report(sprintf "Saved SorterModelSetMaker %s for run: %s" (%sorterModelSetMaker.Id.ToString()) %runId))

@@ -49,13 +49,13 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 
 
 /// **********     MergeIntEvals   ****************
-let executor = MergeIntEvals.executor
-let project = MergeIntEvals.project
-let projectName = MergeIntEvals.project.ProjectName
-let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
-let paramRefiner = MergeIntEvals.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+//let executor = MergeIntEvals.executor
+//let project = MergeIntEvals.project
+//let projectName = MergeIntEvals.project.ProjectName
+//let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
+//let paramRefiner = MergeIntEvals.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 ///// **********     SortableIntMerges   ****************
@@ -79,52 +79,54 @@ let maxReplica = 1<replNumber>
 
 
 ///// **********    FullBoolEvals   ****************
-//let executor = FullBoolEvals.executor
-//let project = FullBoolEvals.project
-//let projectName = FullBoolEvals.project.ProjectName
-//let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
-//let paramRefiner = FullBoolEvals.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+let executor = FullBoolEvals.executor
+let project = FullBoolEvals.project
+let projectName = FullBoolEvals.project.ProjectName
+let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
+let paramRefiner = FullBoolEvals.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
-//printfn "Initializing Project..."
-//let initResult = 
-//    ProjectOps.initProjectFiles geneSortDb buildQueryParams cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
-//    |> Async.RunSynchronously
+let projectFolder = %projectName |> UMX.tag<projectFolder>
 
-//match initResult with
-//| Ok () -> printfn "Project files initialized successfully."
-//| Error e -> printfn "Init Failed: %s" e
+printfn "Initializing Project..."
+let initResult = 
+    ProjectOps.initProjectFiles geneSortDb projectFolder buildQueryParams cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
+    |> Async.RunSynchronously
 
-
-//printfn "Executing Runs..."
-//let execResult = 
-//    ProjectOps.executeRuns geneSortDb buildQueryParams projectName allowOverwrite cts (Some progress) executor maxParallel
-//    |> Async.RunSynchronously
-
-//match execResult with
-//| Ok results -> printfn "Execution complete. %d results processed." results.Length
-//| Error e -> printfn "Execution Failed: %s" e
+match initResult with
+| Ok () -> printfn "Project files initialized successfully."
+| Error e -> printfn "Init Failed: %s" e
 
 
-//printfn "Printing RunParams..."
-//let reportResult = 
-//    ProjectOps.printRunParams geneSortDb projectName cts (Some progress)
-//    |> Async.RunSynchronously
+printfn "Executing Runs..."
+let execResult = 
+    ProjectOps.executeRuns geneSortDb projectFolder buildQueryParams projectName allowOverwrite cts (Some progress) executor maxParallel
+    |> Async.RunSynchronously
+
+match execResult with
+| Ok results -> printfn "Execution complete. %d results processed." results.Length
+| Error e -> printfn "Execution Failed: %s" e
 
 
-//printfn "Making Use Profile report ..."
+printfn "Printing RunParams..."
+let reportResult = 
+    ProjectOps.printRunParams geneSortDb projectFolder cts (Some progress)
+    |> Async.RunSynchronously
 
-//let reportResult = 
-//    TextReporters.ceUseProfileReportExecutor geneSortDb projectName buildQueryParams allowOverwrite cts (Some progress)
-//    |> Async.RunSynchronously
+
+printfn "Making Use Profile report ..."
+
+let uPReportResult = 
+    TextReporters.ceUseProfileReportExecutor geneSortDb projectFolder buildQueryParams allowOverwrite cts (Some progress)
+    |> Async.RunSynchronously
 
 
 printfn "Making Use Bin report ..."
 
 let reportResultBins = 
-    TextReporters.binReportExecutor geneSortDb projectName buildQueryParams allowOverwrite cts (Some progress)
+    TextReporters.binReportExecutor geneSortDb projectFolder buildQueryParams allowOverwrite cts (Some progress)
     |> Async.RunSynchronously
 
 

@@ -26,7 +26,6 @@ open GeneSort.SortingResults
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
-[<Measure>] type projectFolder
 [<Measure>] type pathToProjectFolder
 [<Measure>] type fileNameWithoutExtension
 [<Measure>] type fullPathToFile // e.g., "C:\GeneSortData\Project1\RunParameters_0_0.msgpack"

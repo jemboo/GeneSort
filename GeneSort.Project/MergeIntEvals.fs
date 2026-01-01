@@ -291,10 +291,9 @@ module MergeIntEvals =
                 outputDataTypes
 
 
-
-
     let executor
             (db: IGeneSortDb)
+            (projectFolder: string<projectFolder>)
             (runParameters: runParameters) 
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource) 
@@ -322,12 +321,12 @@ module MergeIntEvals =
 
                 // 3. Load Sortable Tests (Cross-project query)
                 let qpTests = SortableIntMerges.makeQueryParams (Some repl) (Some width) (Some mDim) (Some mFill) (Some dType) (outputDataType.SortableTest "")
-                let! rawTestData = db.loadAsync qpTests 
+                let! rawTestData = db.loadAsync projectFolder qpTests 
                 let! sortableTest = rawTestData |> OutputData.asSortableTest
 
                 // 4. Load Sorter Set (Cross-project query)
                 let qpSorters = RandomSorters4to64.makeQueryParams (Some repl) (Some width) (Some sModel) (outputDataType.SorterSet "")
-                let! rawSorterData = db.loadAsync qpSorters
+                let! rawSorterData = db.loadAsync projectFolder qpSorters
                 let! sorterSet = rawSorterData |> OutputData.asSorterSet
 
                 // 5. Computation
@@ -337,7 +336,7 @@ module MergeIntEvals =
                 // 6. Save
                 let! _ = checkCancellation cts.Token
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
-                let! _ = db.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
+                let! _ = db.saveAsync projectFolder qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
                 // 7. Success
                 report progress (sprintf "%s Finished Run %s Repl %d" (MathUtils.getTimestampString()) %runId %repl)

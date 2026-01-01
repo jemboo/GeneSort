@@ -52,7 +52,7 @@ module TextReporters =
 
     let binReportExecutor
         (db: IGeneSortDb)
-        (projectName: string<projectName>)
+        (projectFolder: string<projectFolder>)
         (buildQueryParams: runParameters -> outputDataType -> queryParams)
         (allowOverwrite: bool<allowOverwrite>)
         (cts: CancellationTokenSource) 
@@ -62,11 +62,11 @@ module TextReporters =
             let reportName = "SorterEval_Bin_Report"
             let timestamp () = MathUtils.getTimestampString()
         
-            report progress (sprintf "%s Starting %s for: %s" (timestamp()) reportName %projectName)
+            report progress (sprintf "%s Starting %s for: %s" (timestamp()) reportName %projectFolder)
 
             // 1. Get Parameters (Handles Error track automatically)
             let! runParamsArray = 
-                db.getAllProjectRunParametersAsync projectName (Some cts.Token) progress
+                db.getAllProjectRunParametersAsync projectFolder (Some cts.Token) progress
 
             // 2. Initialize DataTable
             let initialTable = 
@@ -83,7 +83,7 @@ module TextReporters =
                 let qp = buildQueryParams runParams (outputDataType.SorterSetEval "") 
             
                 // Map the naked Async result to the builder's track
-                let! result = GeneSortDb.getSorterSetEvalAsync db qp |> Async.map Ok
+                let! result = GeneSortDb.getSorterSetEvalAsync db projectFolder qp |> Async.map Ok
 
                 match result with
                 | Ok sse ->
@@ -97,17 +97,17 @@ module TextReporters =
             // 4. Finalize and Save
             let semiFinalDataTable = appendSourceRunParamsTable (List.ofArray runParamsArray) dataTable
             let finalDataTable = appendFailureSummary (List.rev failures)  semiFinalDataTable
-            let saveQp = queryParams.createForTextReport projectName (reportName |> UMX.tag)
-            let! _ = db.saveAsync saveQp (outputData.TextReport finalDataTable) allowOverwrite |> Async.map Ok
+            let saveQp = buildQueryParams (runParamsArray.[0]) (outputDataType.TextReport (reportName |> UMX.tag))
+            let! _ = db.saveAsync projectFolder saveQp (outputData.TextReport finalDataTable) allowOverwrite |> Async.map Ok
 
-            report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %projectName)
+            report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %projectFolder)
             return ()
         }
 
 
     let ceUseProfileReportExecutor
         (db: IGeneSortDb)
-        (projectName: string<projectName>) 
+        (projectFolder: string<projectFolder>) 
         (buildQueryParams: runParameters -> outputDataType -> queryParams)
         (allowOverwrite: bool<allowOverwrite>)
         (cts: CancellationTokenSource) 
@@ -118,11 +118,11 @@ module TextReporters =
             let binCount, blockGrowthRate = 20, 1.2
             let timestamp () = MathUtils.getTimestampString()
         
-            report progress (sprintf "%s Starting %s for: %s" (timestamp()) reportName %projectName)
+            report progress (sprintf "%s Starting %s for: %s" (timestamp()) reportName %projectFolder)
 
             // 1. Get Parameters (automatically handles Error exit)
             let! runParamsArray = 
-                db.getAllProjectRunParametersAsync projectName (Some cts.Token) progress
+                db.getAllProjectRunParametersAsync projectFolder (Some cts.Token) progress
 
             // 2. Setup Initial DataTable
             let initialTable = 
@@ -145,7 +145,7 @@ module TextReporters =
                 let qp = buildQueryParams runParams (outputDataType.SorterSetEval "") 
             
                 // Try to get the eval data
-                let! evalResult = GeneSortDb.getSorterSetEvalAsync db qp |> Async.map Ok
+                let! evalResult = GeneSortDb.getSorterSetEvalAsync db projectFolder qp |> Async.map Ok
             
                 match evalResult with
                 | Ok sse ->
@@ -168,9 +168,9 @@ module TextReporters =
             // 4. Finalize and Save
             let semiFinalDataTable = appendSourceRunParamsTable (List.ofArray runParamsArray) dataTable
             let finalDataTable = appendFailureSummary (List.rev failures)  semiFinalDataTable
-            let saveQp = queryParams.createForTextReport projectName (reportName |> UMX.tag)
-            let! _ = db.saveAsync saveQp (outputData.TextReport finalDataTable) allowOverwrite |> Async.map Ok
+            let saveQp = buildQueryParams (runParamsArray.[0]) (outputDataType.TextReport (reportName |> UMX.tag))
+            let! _ = db.saveAsync projectFolder saveQp (outputData.TextReport finalDataTable) allowOverwrite |> Async.map Ok
 
-            report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %projectName)
+            report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %projectFolder)
             return ()
         }
