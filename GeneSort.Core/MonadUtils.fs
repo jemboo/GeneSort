@@ -15,7 +15,6 @@ module MonadUtils =
             | Error err -> return failwith err
         }
 
-
     let tryGetValueAsync (asyncResult: Async<Result<'T, OutputError>>) : Async<'T option> =
         async {
             let! result = asyncResult

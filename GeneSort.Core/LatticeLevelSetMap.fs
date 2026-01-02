@@ -68,9 +68,6 @@ type latticeLevelSetMap =
               else
                   this.overCoverMap polePoint this.EdgeLength
 
-          //member this.mapToPoleSide
-          //      (centerPoint: latticePoint) : latticePoint option =
-          //    this.centerSideMap.[centerPoint]
 
 
 module LatticeLevelSetMap =
