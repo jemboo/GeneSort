@@ -1,5 +1,6 @@
 ﻿namespace GeneSort.Core
 
+open System
 open System.IO
 open System.Security.Cryptography
 
@@ -14,5 +15,10 @@ module GuidUtils =
         md5.ComputeHash(stream.ToArray())
 
     // structural equality
-    let guidFromObjs (objs: seq<obj>) : System.Guid = 
+    let guidFromObjs (objs: seq<obj>) : Guid = 
         System.Guid(hashObjs objs)
+
+    let guidOptionFromString (gstr: string) : Guid option =
+            match System.Guid.TryParse(gstr) with
+            | (true, g) -> Some g
+            | _ -> None

@@ -1,4 +1,6 @@
 ﻿namespace GeneSort.Db
+
+open System
 open FSharp.UMX
 open GeneSort.Runs
 open GeneSort.Core
@@ -13,18 +15,21 @@ type queryParams =
     }
 
     /// Gets the project name, defaulting to "NoName" if none.
-    member this.ProjectName =
-        match this.projectName with
-        | Some name -> %name
-        | None -> "NoName"
+    static member ProjectNameString (projectName:string<projectName> option) = 
+           match projectName with
+              | Some pn -> %pn
+              | None -> "None"
 
-    member this.Repl = this.repl
+    static member ReplString (repl:int<replNumber> option) = 
+            match repl with
+               | Some r -> (%r).ToString()
+               | None -> "None"
 
     member this.OutputDataType = this.outputDataType
 
     member this.Properties = this.properties
 
-    member this.Id : System.Guid = this.idCache.Value
+    member this.Id : Guid<idValue> = this.idCache.Value |> UMX.tag<idValue>
 
     /// Creates a new queryParams instance.
     static member create (
@@ -40,7 +45,9 @@ type queryParams =
             properties = props
             idCache = lazy (
                 GuidUtils.guidFromObjs [
-                    box projectName; box repl; box outputDataType
+                    box (projectName |> queryParams.ProjectNameString); 
+                    box (repl |> queryParams.ReplString); 
+                    box (outputDataType |> OutputDataType.toFolderName);
                     box (props |> Map.toSeq |> Seq.sortBy fst |> Seq.toArray)
                 ])
         }

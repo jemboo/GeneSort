@@ -89,7 +89,7 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
                         try
                             let qp = buildQueryParams rp outputDataType.RunParameters
                             let! res = (this :> IGeneSortDb).saveAsync projectFolder qp (rp |> outputData.RunParameters) allowOverwrite
-                            progress |> Option.iter (fun p -> p.Report(sprintf "Saved RunParameters for Run %s" %(rp.GetId().Value) ))
+                            progress |> Option.iter (fun p -> p.Report(sprintf "Saved RunParameters for Run %s" (rp  |> RunParameters.getIdString)))
                             return res
                         finally semaphore.Release() |> ignore
                     })

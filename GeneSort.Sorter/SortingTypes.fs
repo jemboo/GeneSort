@@ -41,11 +41,10 @@ type sortableDataType =
 
 module SortableDataType =
 
-    let toString (t:sortableDataType option) : string =
+    let toString (t:sortableDataType) : string =
         match t with
-        | Some Ints -> "Ints"
-        | Some Bools -> "Bools"
-        | None -> "None"
+        | Ints -> "Ints"
+        | Bools -> "Bools"
 
     let fromString (s:string) : sortableDataType =
         match s with
@@ -81,11 +80,10 @@ module MergeDimension =
 
 module MergeFillType =
 
-    let toString (t:mergeFillType option) : string =
+    let toString (t:mergeFillType) : string =
         match t with
-        | Some NoFill -> "NoFill"
-        | Some VanVoorhis -> "VanVoorhis"
-        | None -> "None"
+        | NoFill -> "NoFill"
+        | VanVoorhis -> "VanVoorhis"
 
     let fromString (s:string) : mergeFillType =
         match s with

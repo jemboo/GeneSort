@@ -33,7 +33,7 @@ module OutputDataType =
         | SorterSetEval s -> appendParam "SorterSetEval" s
         | SorterSetEvalBins s -> appendParam "SorterSetEvalBins" s
         | Project -> "Project"
-        | TextReport _ -> "TextReport"
+        | TextReport s -> appendParam "TextReport" %s
 
     let fromFolderName (description: string) : outputDataType option =
         let parts = description.Split([|'_'|], StringSplitOptions.RemoveEmptyEntries)
@@ -51,7 +51,7 @@ module OutputDataType =
         | "SorterSetEval" -> Some (SorterSetEval param)
         | "SorterSetEvalBins" -> Some (SorterSetEvalBins param)
         | "Project" when param = "" -> Some Project
-        | "TextReport" -> Some (TextReport %"Unknown")
+        | "TextReport" -> Some (TextReport (param |> UMX.tag<textReportName>))
         | _ -> None
 
     let extractTextReportNames (outputDataTypes: outputDataType array) : string<textReportName> list =

@@ -175,7 +175,7 @@ namespace GeneSort.UI.ViewModels
                 // Simulate work
                 await Task.Delay(1000);
 
-                System.Diagnostics.Debug.WriteLine($"  - {runParam.toString()}");
+                System.Diagnostics.Debug.WriteLine($"  - {RunParameters.getIdString(runParam)}");
             }
         }
 

@@ -13,6 +13,7 @@ open GeneSort.Model.Sortable
 module SortableIntMerges =
 
     let projectName = "SortableIntMerges" |> UMX.tag<projectName>
+    let projectFolder = "SortableIntMerges" |> UMX.tag<projectFolder>
     let projectDesc = "Calc and save large SortableIntMerges"
 
     let makeQueryParams 
@@ -30,8 +31,8 @@ module SortableIntMerges =
             [|
                 (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
                 (runParameters.mergeDimensionKey, mergeDimension |> MergeDimension.toString);
-                (runParameters.mergeFillTypeKey, mergeFillType |> MergeFillType.toString);
-                (runParameters.sortableDataTypeKey, sortableDataType |> SortableDataType.toString);
+                (runParameters.mergeFillTypeKey, mergeFillType |> Option.map MergeFillType.toString |> UmxExt.stringToString );
+                (runParameters.sortableDataTypeKey, sortableDataType |> Option.map SortableDataType.toString |> UmxExt.stringToString );
             |])
 
     let makeQueryParamsFromRunParams
@@ -50,7 +51,7 @@ module SortableIntMerges =
     // --- Parameter Spans ---
 
     let sortableArrayDataTypeKeys () : string * string list =
-        let values = [ Some sortableDataType.Ints; Some sortableDataType.Bools ] |> List.map SortableDataType.toString
+        let values = [ sortableDataType.Ints; sortableDataType.Bools ] |> List.map SortableDataType.toString
         (runParameters.sortableDataTypeKey, values)
 
     let sortingWidths () : string * string list =
@@ -62,7 +63,7 @@ module SortableIntMerges =
         (runParameters.mergeDimensionKey, values)
 
     let mergeFillTypes () : string * string list =
-        let values = [ Some mergeFillType.NoFill; Some mergeFillType.VanVoorhis ] |> List.map MergeFillType.toString
+        let values = [ mergeFillType.NoFill; mergeFillType.VanVoorhis ] |> List.map MergeFillType.toString
         (runParameters.mergeFillTypeKey, values)
 
 
@@ -104,9 +105,9 @@ module SortableIntMerges =
         let enhancer (rp : runParameters) =
             // Use empty string for RunParameters case if required by your model
             let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
-            rp.WithProjectName(projectName)
-              .WithRunFinished(false)
-              .WithId (qp.Id.ToString() |> UMX.tag<idValue>)
+            rp.WithProjectName(Some projectName)
+              .WithRunFinished(Some false)
+              .WithId (Some qp.Id)
 
         runParametersSeq 
         |> Seq.choose (paramMapFilter >> Option.map enhancer)
@@ -145,7 +146,7 @@ module SortableIntMerges =
             try
                 // 1. Setup
                 let! _ = checkCancellation cts.Token
-                let runId = runParams.GetId() |> Option.defaultValue (% "unknown")
+                let runId = runParams |> RunParameters.getIdString
                 progress |> Option.iter (fun p -> p.Report(sprintf "Starting Run %s (Generation)" %runId))
 
                 // 2. Safe extraction of domain parameters
@@ -175,10 +176,10 @@ module SortableIntMerges =
 
                 // 5. Success
                 progress |> Option.iter (fun p -> p.Report(sprintf "%s Run %s generation completed and saved." (MathUtils.getTimestampString()) %runId))
-                return runParams.WithRunFinished true
+                return runParams.WithRunFinished (Some true)
 
             with e ->
-                let rawId = runParams.GetId() |> Option.map UMX.untag |> Option.defaultValue "unknown"
-                let msg = sprintf "Fatal error in Generation Run %s: %s" rawId e.Message
+                let runId = runParams |> RunParameters.getIdString
+                let msg = sprintf "Fatal error in Generation Run %s: %s" runId e.Message
                 return! async { return Error msg }
         }

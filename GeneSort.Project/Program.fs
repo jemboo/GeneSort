@@ -52,6 +52,7 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 //let executor = MergeIntEvals.executor
 //let project = MergeIntEvals.project
 //let projectName = MergeIntEvals.project.ProjectName
+//let projectFolder = MergeIntEvals.projectFolder
 //let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
 //let paramRefiner = MergeIntEvals.paramMapRefiner
 //let minReplica = 0<replNumber>
@@ -62,6 +63,7 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 //let project = SortableIntMerges.project
 //let executor = SortableIntMerges.executor
 //let projectName = SortableIntMerges.projectName
+//let projectFolder = SortableIntMerges.projectFolder
 //let buildQueryParams = SortableIntMerges.makeQueryParamsFromRunParams
 //let paramRefiner = SortableIntMerges.paramMapRefiner
 //let minReplica = 0<replNumber>
@@ -72,6 +74,7 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 //let project = MergeIntQa.project
 //let executor = MergeIntQa.executor
 //let projectName = MergeIntQa.projectName
+//let projectFolder = MergeIntQa.projectFolder
 //let buildQueryParams = MergeIntQa.makeQueryParamsFromRunParams
 //let paramRefiner = MergeIntQa.paramMapRefiner
 //let minReplica = 0<replNumber>
@@ -82,13 +85,13 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 let executor = FullBoolEvals.executor
 let project = FullBoolEvals.project
 let projectName = FullBoolEvals.project.ProjectName
+let projectFolder = FullBoolEvals.projectFolder
 let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
 let paramRefiner = FullBoolEvals.paramMapRefiner
 let minReplica = 0<replNumber>
 let maxReplica = 1<replNumber>
 
 
-let projectFolder = %projectName |> UMX.tag<projectFolder>
 
 printfn "Initializing Project..."
 let initResult = 

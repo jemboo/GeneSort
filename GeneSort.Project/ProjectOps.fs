@@ -20,7 +20,7 @@ module ProjectOps =
             let id = runParameters.GetId().Value
             let repl = runParameters.GetRepl().Value
             try
-                report progress (runParameters.toString())
+                report progress (runParameters |> RunParameters.getIdString)
                 return Success (id, repl, "")
             with e ->
                 let msg = $"{e.GetType().Name}: {e.Message}"
@@ -42,12 +42,12 @@ module ProjectOps =
             (cts: CancellationTokenSource)
             (progress: IProgress<string> option) : Async<RunResult> =
         async {
-            let id = runParameters.GetId() |> Option.defaultValue (% "unknown")
-            let repl = runParameters.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
+            let runId = runParameters.GetId() |> Option.defaultValue ( Guid.Empty |> UMX.tag<idValue>)
+            let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
         
             // 1. Check if already done (Synchronous check remains the same)
             if runParameters.IsRunFinished() |> Option.defaultValue false then
-                return Skipped (id, repl, "already finished")
+                return Skipped (runId, repl, "already finished")
             else
                 // 2. Use the builder to handle the execution + status save sequence
                 let! finalResult = asyncResult {
@@ -66,11 +66,11 @@ module ProjectOps =
                 // 3. Map the AsyncResult back to the RunResult DU
                 match finalResult with
                 | Ok _ ->
-                    let res = Success (id, repl, "")
+                    let res = Success (runId, repl, "")
                     ProgressMessage.reportRunResult progress res
                     return res
                 | Error msg ->
-                    let res = Failure (id, repl, msg)
+                    let res = Failure (runId, repl, msg)
                     ProgressMessage.reportRunResult progress res
                     return res
         }
@@ -87,7 +87,7 @@ module ProjectOps =
             use semaphore = new SemaphoreSlim(maxDegreeOfParallelism)
         
             let processInternal (rp: runParameters) = async {
-                let id = rp.GetId() |> Option.defaultValue (% "unknown")
+                let id = rp.GetId() |> Option.defaultValue ( Guid.Empty |> UMX.tag<idValue>)
                 let repl = (rp.GetRepl() |> Option.defaultValue (-1 |> UMX.tag))
             
                 try 

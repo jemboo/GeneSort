@@ -1,6 +1,8 @@
 ﻿namespace GeneSort.Runs
+
 open System
 open FSharp.UMX
+open GeneSort.Core
 open GeneSort.Sorter
 
 [<Measure>] type projectName
@@ -9,19 +11,13 @@ open GeneSort.Sorter
 [<Measure>] type replNumber
 [<Measure>] type generationNumber
 
-module Repl =
-    let toString (r: int<replNumber> option) : string =
-        match r with
-        | Some v -> (UMX.untag v).ToString()
-        | None -> "None"
-
 type runParameters =
-    private { paramMap : Map<string, string> } // Made immutable.
+    private { paramMap : Map<string, string> }
 
     static member create (paramMap: Map<string, string>) : runParameters =
-        { paramMap = paramMap } // Validation: could add checks for required keys.
+        { paramMap = paramMap }
 
-    /// Keys for parameters (constants for consistency).
+    // Constants for consistency
     static member idKey = "Id"
     static member replKey = "Repl"
     static member generationKey = "Generation"
@@ -39,201 +35,121 @@ type runParameters =
     static member projectNameKey = "ProjectName"
     static member textReportNameKey = "ReportName"
 
+    // Private Parsing Helpers
+    static member private tryGetGuid (key: string) (map: Map<string, string>) =
+        map.TryFind key |> Option.bind (fun v -> match Guid.TryParse v with true, g -> Some g | _ -> None)
+
+    static member private tryGetInt (key: string) (map: Map<string, string>) =
+        map.TryFind key |> Option.bind (fun v -> match Int32.TryParse v with true, i -> Some i | _ -> None)
+    
+    static member private tryGetBool (key: string) (map: Map<string, string>) =
+        map.TryFind key |> Option.bind (fun v -> match Boolean.TryParse v with true, b -> Some b | _ -> None)
+
+    static member private addIfSome key valueOpt map =
+        valueOpt |> Option.fold (fun m v -> Map.add key v m) map
+
     member this.ParamMap = this.paramMap
 
-    member this.toString() =
-        this.paramMap
-        |> Map.toList
-        |> List.map (fun (k, v) -> sprintf "%s: %s" k v)
-        |> String.concat ", "
+    // --- Getters ---
+    member this.GetId() = runParameters.tryGetGuid runParameters.idKey this.paramMap |> Option.map UMX.tag<idValue>
+    member this.GetRepl() = runParameters.tryGetInt runParameters.replKey this.paramMap |> Option.map UMX.tag<replNumber>
+    member this.GetGeneration() = runParameters.tryGetInt runParameters.generationKey this.paramMap |> Option.map UMX.tag<generationNumber>
+    member this.IsRunFinished() = runParameters.tryGetBool runParameters.runFinishedKey this.paramMap
+    member this.GetSortingWidth() = runParameters.tryGetInt runParameters.sortingWidthKey this.paramMap |> Option.map UMX.tag<sortingWidth>
+    member this.GetMergeDimension() = runParameters.tryGetInt runParameters.mergeDimensionKey this.paramMap |> Option.map UMX.tag<mergeDimension>
+    member this.GetMaxOrbit() = runParameters.tryGetInt runParameters.maxOrbitKey this.paramMap
+    member this.GetStageLength() = runParameters.tryGetInt runParameters.stageLengthKey this.paramMap |> Option.map UMX.tag<stageLength>
+    member this.GetCeLength() = runParameters.tryGetInt runParameters.ceLengthKey this.paramMap |> Option.map UMX.tag<ceLength>
+    member this.GetSorterCount() = runParameters.tryGetInt runParameters.sorterCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
+    
+    member this.GetProjectName() = this.paramMap.TryFind runParameters.projectNameKey |> Option.map UMX.tag<projectName>
+    member this.GetTextReportName() = this.paramMap.TryFind runParameters.textReportNameKey |> Option.map UMX.tag<textReportName>
 
-    /// Gets the Id value.
-    member this.GetId() : string<idValue> option =
-        this.paramMap.TryFind runParameters.idKey |> Option.map UMX.tag<idValue>
+    member this.GetSorterModelType() = 
+        this.paramMap.TryFind runParameters.sorterModelTypeKey |> Option.bind (fun v -> try Some (SorterModelType.fromString v) with _ -> None)
+    
+    member this.GetMergeFillType() = 
+        this.paramMap.TryFind runParameters.mergeFillTypeKey |> Option.bind (fun v -> try Some (MergeFillType.fromString v) with _ -> None)
 
-    /// Returns a new instance with Id set.
-    member this.WithId(id: string<idValue>) : runParameters =
-        { paramMap = this.paramMap.Add(runParameters.idKey, %id) }
+    member this.GetSortableDataType() = 
+        this.paramMap.TryFind runParameters.sortableDataTypeKey |> Option.bind (fun v -> try Some (SortableDataType.fromString v) with _ -> None)
 
-    /// Gets the Repl value.
-    member this.GetRepl() : int<replNumber> option =
-        this.paramMap.TryFind runParameters.replKey
-        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some (UMX.tag<replNumber> i) | _ -> None)
+// --- Functional Updates (Fluent API) ---
+    member this.WithMergeDimension(md: int<mergeDimension> option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.mergeDimensionKey (md |> Option.map UmxExt.intToRaw) }
 
-    member this.GetReplKvp() : (string * string) option =
-        this.paramMap.TryFind runParameters.replKey |> Option.map (fun v -> runParameters.replKey, v)
+    member this.WithMergeFillType(mft: mergeFillType option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.mergeFillTypeKey (mft |> Option.map MergeFillType.toString) }
 
-    /// Returns a new instance with Repl set.
-    member this.WithRepl(repl: int<replNumber>) : runParameters =
-        { paramMap = this.paramMap.Add(runParameters.replKey, (UMX.untag repl).ToString()) }
+    member this.WithStageLength(sl: int<stageLength> option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.stageLengthKey (sl |> Option.map UmxExt.intToRaw) }
 
-    /// Gets the Generation value.
-    member this.GetGeneration() : int<generationNumber> option =
-        this.paramMap.TryFind runParameters.generationKey
-        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some (UMX.tag<generationNumber> i) | _ -> None)
+    member this.WithCeLength(cl: int<ceLength> option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.ceLengthKey (cl |> Option.map UmxExt.intToRaw) }
 
-    /// Returns a new instance with Generation set.
-    member this.WithGeneration(generation: int<generationNumber>) : runParameters =
-        { paramMap = this.paramMap.Add(runParameters.generationKey, (UMX.untag generation).ToString()) }
+    member this.WithProjectName(pn: string<projectName> option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.projectNameKey (pn |> Option.map UmxExt.stringToRaw) }
 
-    member this.IsRunFinished() : bool option =
-        this.paramMap.TryFind runParameters.runFinishedKey
-        |> Option.bind (fun v -> Boolean.TryParse v |> function | true, b -> Some b | _ -> None)
+    member this.WithId(id: Guid<idValue> option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.idKey (id |> Option.map UmxExt.guidToRaw) }
 
-    member this.WithRunFinished(finished: bool) : runParameters =
-        { paramMap = this.paramMap.Add(runParameters.runFinishedKey, finished.ToString()) }
+    member this.WithRepl(repl: int<replNumber> option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.replKey (repl |> Option.map UmxExt.intToRaw) }
 
-    /// Gets the mergeFillType value.
-    member this.GetMergeFillType() : mergeFillType option =
-        this.paramMap.TryFind runParameters.mergeFillTypeKey
-        |> Option.bind (fun v -> try Some (MergeFillType.fromString v) with _ -> None)
+    member this.WithGeneration(gen: int<generationNumber> option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.generationKey (gen |> Option.map UmxExt.intToRaw) }
 
-    member this.GetMergeFillTypeKvp() : (string * string) option =
-        this.paramMap.TryFind runParameters.mergeFillTypeKey |> Option.map (fun v -> runParameters.mergeFillTypeKey, v)
+    member this.WithRunFinished(fin: bool option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.runFinishedKey (fin |> Option.map string) }
 
-    /// Returns a new instance with MergeFillType set.
-    member this.WithMergeFillType(mergeFillType: mergeFillType option) : runParameters =
-        { paramMap = this.paramMap.Add(runParameters.mergeFillTypeKey, MergeFillType.toString mergeFillType) }
+    member this.WithMaxOrbit(mo: int option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.maxOrbitKey (mo |> Option.map string) }
 
-    /// Gets the mergeDimension value.
-    member this.GetMergeDimension() : int<mergeDimension> option =
-        this.paramMap.TryFind runParameters.mergeDimensionKey
-        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some (UMX.tag<mergeDimension> i) | _ -> None)
+    member this.WithSorterCount(sc: int<sorterCount> option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.sorterCountKey (sc |> Option.map UmxExt.intToRaw) }
 
-    member this.GetMergeDimensionKvp() : (string * string) option =
-        this.paramMap.TryFind runParameters.mergeDimensionKey |> Option.map (fun v -> runParameters.mergeDimensionKey, v)
+    member this.WithSorterModelType(smt: sorterModelType option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.sorterModelTypeKey (smt |> Option.map SorterModelType.toString) }
 
-    /// Returns a new instance with MergeDimension set.
-    member this.WithMergeDimension(mergeDimension: int<mergeDimension>) : runParameters =
-        { paramMap = this.paramMap.Add(runParameters.mergeDimensionKey, (UMX.untag mergeDimension).ToString()) }
+    member this.WithSortableDataType(sdt: sortableDataType option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.sortableDataTypeKey (sdt |> Option.map SortableDataType.toString) }
 
-    /// Gets the SortableDataType value.
-    member this.GetSortableDataType() : sortableDataType option =
-        this.paramMap.TryFind runParameters.sortableDataTypeKey
-        |> Option.bind (fun v -> try Some (SortableDataType.fromString v) with _ -> None)
+    member this.WithSortingWidth(w: int<sortingWidth> option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.sortingWidthKey (w |> Option.map UmxExt.intToRaw) }
 
-    member this.GetSortableArrayDataTypeKvp() : (string * string) option =
-        this.paramMap.TryFind runParameters.sortableDataTypeKey |> Option.map (fun v -> runParameters.sortableDataTypeKey, v)
-
-    /// Returns a new instance with SortableDataType set.
-    member this.WithSortableDataType(sortableDataType: sortableDataType option) : runParameters =
-        { paramMap = this.paramMap.Add(runParameters.sortableDataTypeKey, SortableDataType.toString sortableDataType) }
-
-    /// Gets the SorterModelType value.
-    member this.GetSorterModelType() : sorterModelType option =
-        this.paramMap.TryFind runParameters.sorterModelTypeKey
-        |> Option.bind (fun v -> try Some (SorterModelType.fromString v) with _ -> None)
-
-    member this.GetSorterModelKvp() : (string * string) option =
-        this.paramMap.TryFind runParameters.sorterModelTypeKey |> Option.map (fun v -> runParameters.sorterModelTypeKey, v)
-
-    /// Returns a new instance with SorterModelType set.
-    member this.WithSorterModelType(sorterModelType: sorterModelType option) : runParameters =
-        { paramMap = this.paramMap.Add(runParameters.sorterModelTypeKey, SorterModelType.toString sorterModelType) }
-
-    /// Gets the SortingWidth value.
-    member this.GetSortingWidth() : int<sortingWidth> option =
-        this.paramMap.TryFind runParameters.sortingWidthKey
-        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some (UMX.tag<sortingWidth> i) | _ -> None)
-
-    member this.GetSortingWidthKvp() : (string * string) option =
-        this.paramMap.TryFind runParameters.sortingWidthKey |> Option.map (fun v -> runParameters.sortingWidthKey, v)
-
-    /// Returns a new instance with SortingWidth set.
-    member this.WithSortingWidth(sortingWidth: int<sortingWidth>) : runParameters =
-        { paramMap = this.paramMap.Add(runParameters.sortingWidthKey, (UMX.untag sortingWidth).ToString()) }
-
-    /// Gets the MaxOrbit value.
-    member this.GetMaxOrbit() : int option =
-        this.paramMap.TryFind runParameters.maxOrbitKey
-        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some i | _ -> None)
-
-    /// Returns a new instance with MaxOrbit set.
-    member this.WithMaxOrbit(maxOrbit: int) : runParameters =
-        { paramMap = this.paramMap.Add(runParameters.maxOrbitKey, maxOrbit.ToString()) }
-
-    /// Gets the StageLength value.
-    member this.GetStageLength() : int<stageLength> option =
-        this.paramMap.TryFind runParameters.stageLengthKey
-        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some (UMX.tag<stageLength> i) | _ -> None)
-
-    /// Returns a new instance with StageLength set.
-    member this.WithStageLength(stageLength: int<stageLength>) : runParameters =
-        { paramMap = this.paramMap.Add(runParameters.stageLengthKey, (UMX.untag stageLength).ToString()) }
-
-    /// Gets the CeLength value.
-    member this.GetCeLength() : int<ceLength> option =
-        this.paramMap.TryFind runParameters.ceLengthKey
-        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some (UMX.tag<ceLength> i) | _ -> None)
-
-    /// Returns a new instance with CeLength set.
-    member this.WithCeLength(ceLength: int<ceLength>) : runParameters =
-        { paramMap = this.paramMap.Add(runParameters.ceLengthKey, (UMX.untag ceLength).ToString()) }
-
-    /// Gets the SorterCount value.
-    member this.GetSorterCount() : int<sorterCount> option =
-        this.paramMap.TryFind runParameters.sorterCountKey
-        |> Option.bind (fun v -> Int32.TryParse v |> function | true, i -> Some (UMX.tag<sorterCount> i) | _ -> None)
-
-    /// Returns a new instance with SorterCount set.
-    member this.WithSorterCount(sorterCount: int<sorterCount>) : runParameters =
-        { paramMap = this.paramMap.Add(runParameters.sorterCountKey, (UMX.untag sorterCount).ToString()) }
-
-    /// Gets the ProjectName value.
-    member this.GetProjectName() : string<projectName> option =
-        this.paramMap.TryFind runParameters.projectNameKey |> Option.map UMX.tag<projectName>
-
-    /// Returns a new instance with ProjectName set.
-    member this.WithProjectName(projectName: string<projectName>) : runParameters =
-        { paramMap = this.paramMap.Add(runParameters.projectNameKey, %projectName) }
-
-    /// Gets the TextReportName value.
-    member this.GetTextReportName() : string<textReportName> option =
-        this.paramMap.TryFind runParameters.textReportNameKey |> Option.map UMX.tag<textReportName>
-
-    /// Returns a new instance with TextReportName set.
-    member this.WithTextReportName(reportName: string<textReportName>) : runParameters =
-        { paramMap = this.paramMap.Add(runParameters.textReportNameKey, %reportName) }
-
+// --- 3. The Logic Module ---
 module RunParameters =
 
-    let filterByParameters
-            (runParametersSet: runParameters array)
-            (filter: (string * string) array) : runParameters [] =
+    /// Filters a set of parameters based on a list of key-value pairs.
+    let filterByParameters (runParametersSet: runParameters array) (filter: (string * string) array) =
         runParametersSet
         |> Array.filter (fun rp ->
-            filter |> Array.forall (fun (key, value) ->
-                rp.ParamMap.ContainsKey key && rp.ParamMap.[key] = value))
+            filter |> Array.forall (fun (k, v) -> rp.ParamMap.TryFind k = Some v))
 
-    let pickByParameters
-            (runParametersSet: runParameters array)
-            (filter: (string * string) array) : runParameters option =
-        let filtrate = filterByParameters runParametersSet filter
-        if filtrate.Length = 1 then Some filtrate.[0] else None
+    let pickByParameters (runParametersSet: runParameters array) (filter: (string * string) array) =
+        let results = filterByParameters runParametersSet filter
+        if results.Length = 1 then Some results.[0] else None
 
-    let getAllKeys (runParams :runParameters seq) : string[] =
-        runParams
-        |> Seq.collect (fun rp -> rp.ParamMap.Keys)
-        |> Seq.distinct
-        |> Seq.toArray
+    let getAllKeys (runParams: runParameters seq) =
+        runParams |> Seq.collect (fun rp -> rp.ParamMap.Keys) |> Seq.distinct |> Seq.toArray
 
-    let tableToTabDelimited (table: string[][]) : string[] =
-        table |> Array.map (String.concat "\t")
-
-    let makeIndexAndReplTable(runParams : runParameters seq) : string[][]
-        =
+    /// Generates a structured table where rows represent individual runs and columns represent parameter keys.
+    let makeIndexAndReplTable (runParams: runParameters seq) : string[][] =
         let keys = getAllKeys runParams
-        let headerRow = Array.append [| "Run" |] keys
+        let headerRow = Array.append [| "Run_Index" |] keys
         let dataRows =
             runParams
-            |> Seq.map (fun rp ->
-                keys
-                |> Array.map (fun key -> rp.ParamMap.TryFind key |> Option.defaultValue "N/A"))
+            |> Seq.mapi (fun i rp ->
+                Array.append 
+                    [| string i |] 
+                    (keys |> Array.map (fun k -> rp.ParamMap.TryFind k |> Option.defaultValue "N/A")))
             |> Seq.toArray
-        Array.append [| keys |] dataRows // Fixed: header was wrong.
+        Array.append [| headerRow |] dataRows
 
-
-    let toStringTable(runParams :runParameters seq) : string =
+    let toStringTable (runParams: runParameters seq) : string =
         makeIndexAndReplTable runParams
-        |> Array.map (fun row -> String.Join("\t", row))
-        |> String.concat "\n"
+        |> Array.map (String.concat "\t")
+        |> String.concat Environment.NewLine
+
+    let getIdString (runParameters:runParameters) =
+        runParameters.GetId() |> UmxExt.guidToString

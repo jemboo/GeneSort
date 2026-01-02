@@ -21,18 +21,6 @@ module TextReporters =
             |> DataTableFile.addSources (failures |> List.map (fun (id, msg) -> sprintf "Run ID %s: %s" id msg) |> List.toArray)
             |> DataTableFile.addSource "--- ************************ ---"
 
-
-
-    ///// Helper to append a failure section to the data table
-    //let private appendSourceRunParamsTable (runParams : runParameters list) (dt: dataTableFile) =
-    //    if runParams.IsEmpty then dt
-    //    else
-    //        let tableRows = RunParameters.makeIndexAndReplTable runParams
-    //                         |> Array.map (fun row -> String.Join("\t", row))
-    //        dt 
-    //        |> DataTableFile.addSource "--- Source Runs ---"
-    //        |> DataTableFile.addSources tableRows
-    //        |> DataTableFile.addSource "--- ********* ---"
     
     /// Helper to append a failure section to the data table
     let private appendSourceRunParamsTable (runParams : runParameters list) (dt: dataTableFile) =
@@ -79,7 +67,7 @@ module TextReporters =
 
             // 3. Process each run parameter
             for runParams in runParamsArray do
-                let runId = runParams.GetId() |> Option.map (fun x -> %x) |> Option.defaultValue "Unknown"
+                let runId = runParams |> RunParameters.getIdString
                 let qp = buildQueryParams runParams (outputDataType.SorterSetEval "") 
             
                 // Map the naked Async result to the builder's track
@@ -88,7 +76,10 @@ module TextReporters =
                 match result with
                 | Ok sse ->
                     let bins = SorterSetEvalBins.create 1 sse
-                    let lines = SorterSetEvalBins.getBinCountReport (runParams.GetSortingWidth()) (runParams.GetSorterModelType() |> SorterModelType.toString) bins
+                    let lines = SorterSetEvalBins.getBinCountReport
+                                    (runParams.GetSortingWidth()) 
+                                    (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringToString )
+                                    bins
                     dataTable <- DataTableFile.addRows lines dataTable
                 | Error err ->
                     failures <- (runId, err) :: failures
@@ -141,7 +132,7 @@ module TextReporters =
             let mutable failures = []
 
             for runParams in runParamsArray do
-                let runId = runParams.GetId() |> Option.map (fun x -> %x) |> Option.defaultValue (sprintf "Unknown_%s" (Guid.NewGuid().ToString()))
+                let runId = runParams |> RunParameters.getIdString
                 let qp = buildQueryParams runParams (outputDataType.SorterSetEval "") 
             
                 // Try to get the eval data
@@ -153,12 +144,12 @@ module TextReporters =
                     let lines = 
                         SorterSetCeUseProfile.makeReportLines 
                             runId 
-                            (runParams.GetRepl() |> Repl.toString) 
-                            (runParams.GetSortingWidth() |> SortingWidth.toString)
-                            (runParams.GetSorterModelType() |> SorterModelType.toString)
-                            (runParams.GetSortableDataType() |> SortableDataType.toString)
-                            (runParams.GetMergeFillType() |> MergeFillType.toString)
-                            (runParams.GetMergeDimension() |> MergeDimension.toString)
+                            (runParams.GetRepl() |> UmxExt.intToString) 
+                            (runParams.GetSortingWidth() |> UmxExt.intToString)
+                            (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringToString)
+                            (runParams.GetSortableDataType() |> Option.map SortableDataType.toString |> UmxExt.stringToString)
+                            (runParams.GetMergeFillType() |> Option.map MergeFillType.toString |> UmxExt.stringToString)
+                            (runParams.GetMergeDimension() |> UmxExt.intToString)
                             profile
                     dataTable <- DataTableFile.addRows lines dataTable
                 | Error err ->

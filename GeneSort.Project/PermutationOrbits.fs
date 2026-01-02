@@ -14,6 +14,7 @@ open GeneSort.Db
 module PermutationOrbits = 
 
     let projectName = "PermutationOrbits"  |> UMX.tag<projectName>
+    let projectFolder = "PermutationOrbits" |> UMX.tag<projectFolder>
     let experimentDesc = "Count Permutation Orbit lengths"
 
     let randomType = rngType.Lcg
@@ -34,7 +35,7 @@ module PermutationOrbits =
             outputDataType,
             [|
                 (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
-                (runParameters.sorterModelTypeKey, sorterModelType |> SorterModelType.toString);
+                (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString );
             |])
 
 
