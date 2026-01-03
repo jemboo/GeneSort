@@ -111,8 +111,8 @@ type CoreGenTests() =
         let id = identity 4
         let cycles = makeCyclicGroup id |> Seq.toList
         let expected = [identity 4]
-        Assert.Equal<int array list>(List.map (fun (p: Permutation) -> p.Array) expected, 
-                                     List.map (fun (p: Permutation) -> p.Array) cycles)
+        Assert.Equal<int array list>(List.map (fun (p: permutation) -> p.Array) expected, 
+                                     List.map (fun (p: permutation) -> p.Array) cycles)
 
 
     [<Fact>]

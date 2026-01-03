@@ -186,5 +186,5 @@ type PermSiTests() =
 
     [<Fact>]
     let ``mutatePerm_Sis throws on invalid input permutation`` () =
-        let invalidPerm = Permutation.createUnsafe [|1; 1; 2; 3|] // Not a valid permutation
+        let invalidPerm = permutation.createUnsafe [|1; 1; 2; 3|] // Not a valid permutation
         Assert.Throws<Exception>(fun () -> Perm_Si.create invalidPerm.Array |> ignore)

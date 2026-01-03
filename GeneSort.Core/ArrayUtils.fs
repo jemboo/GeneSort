@@ -4,28 +4,6 @@ open System
 
 module ArrayUtils =
 
-
-    let arrayPinch (input: 'a[]) (segLen: int) (gen: int) (fsL: int) (ssL: int) :'a[] =
-        
-        let preSeg = [| for i = 0 to fsL - 1 do input.[i] |]
-        let segLa = [| for i = (fsL) to (fsL + segLen - gen - 1) do input.[i] |]
-        let segLb = [| for i = (ssL + segLen - gen) to (ssL + segLen - 1) do input.[i] |]
-        let j1 = Array.append preSeg (Array.append segLa segLb |> Array.sort)  
-
-        let interSeg = [| for i = (fsL + segLen) to (ssL - 1) do input.[i] |]
-
-        let j2 = Array.append j1 interSeg
-        
-        let segUa = [| for i = (fsL + segLen - gen) to (fsL + segLen - 1) do input.[i] |]
-        let segUb = [| for i = (ssL) to (ssL + segLen - gen - 1) do input.[i] |]
-        let j3 = Array.append j2 (Array.append segUa segUb |> Array.sort)
-
-        let postSeg = [| for i = (ssL + segLen) to (input.Length - 1) do input.[i] |]
-        let j4 = Array.append  j3 postSeg
-        j4
-
-
-
     type segment = {
         start: int
         endIndex: int

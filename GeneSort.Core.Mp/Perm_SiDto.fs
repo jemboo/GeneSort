@@ -13,7 +13,7 @@ type permSiDto =
         match PermutationDto.Create(arr) with
         | Error e -> Error e
         | Ok permDto ->
-            let perm = Permutation.create arr
+            let perm = permutation.create arr
             if not (Permutation.isSelfInverse perm) then
                 Error "Invalid: permutation must be self-inverse"
             else

@@ -22,7 +22,6 @@
     <Compile Include="PermutationSetsTests.fs" />
     <Compile Include="Perm_SiTests.fs" />
     <Compile Include="Perm_RsTests.fs" />
-    <Compile Include="PermRsGen_oldTests.fs" />
     <Compile Include="RandoTests.fs" />
     <Compile Include="TwoOrbit\PermSiTests.fs" />
     <Compile Include="TwoOrbit\TwoOrbitPairTests.fs" />
@@ -40,7 +39,7 @@
     <PackageReference Include="FSharp.UMX" Version="1.1.0" />
     <PackageReference Include="FsToolkit.ErrorHandling" Version="5.1.0" />
     <PackageReference Include="FsUnit.xUnit" Version="7.1.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>
@@ -53,7 +52,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="10.0.100-rc2.25502.107" />
+    <PackageReference Update="FSharp.Core" Version="10.0.101" />
   </ItemGroup>
 
 </Project>

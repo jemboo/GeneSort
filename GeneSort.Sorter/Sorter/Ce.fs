@@ -69,6 +69,27 @@ module Ce =
 
 
 
+    let inline sortByBranchless 
+            (ces: ce[]) 
+            (useCounter: int[]) 
+            (values: int[]) : int[] =
+
+        for i = 0 to ces.Length - 1 do
+            let ce = ces.[i]
+            let a = values.[ce.Low]
+            let b = values.[ce.Hi]
+        
+            // Tracking "uses" still requires a branch, but we can make it branchless too!
+            let diff = if a > b then 1 else 0
+            useCounter.[i] <- useCounter.[i] + diff
+        
+            let mask = -diff
+            let t = (a ^^^ b) &&& mask
+            values.[ce.Low] <- a ^^^ t
+            values.[ce.Hi] <- b ^^^ t
+        values
+
+
    // mutates in placeby a sequence of ces, and returns the resulting sortable (values[]),
    // records the number of uses of each ce in useCounter, starting at useCounterOffset
     let inline sortBy< ^a when ^a: comparison> 
@@ -84,7 +105,7 @@ module Ce =
                 values.[ce.Hi] <- temp
                 useCounter.[i] <- useCounter.[i] + 1
         values
-         
+
 
    // mutates in placeby a sequence of ces, returning an array of the final and
    // intermediate results (values[][]) 

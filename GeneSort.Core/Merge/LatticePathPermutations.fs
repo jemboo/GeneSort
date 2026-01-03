@@ -62,7 +62,7 @@ module LatticePathPermutations =
           latticePathPermutations.create(newLpPerms, lpPerms.Level + 1<latticeDistance>)
 
 
-   let toPermutations (lpPerms:latticePathPermutations) : Permutation [] =
+   let toPermutations (lpPerms:latticePathPermutations) : permutation [] =
         seq {
             for dex in 0 .. lpPerms.Count - 1 do
                 let lpPerm = lpPerms.[dex]

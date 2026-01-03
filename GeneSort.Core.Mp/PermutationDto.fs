@@ -28,12 +28,12 @@ module PermutationDto =
         | EmptyArray of string
         | InvalidPermutation of string
 
-    let fromDomain (perm: Permutation) : PermutationDto =
+    let fromDomain (perm: permutation) : PermutationDto =
         { Array = perm.Array }
 
-    let toDomain (dto: PermutationDto) : Result<Permutation, PermutationDtoError> =
+    let toDomain (dto: PermutationDto) : Result<permutation, PermutationDtoError> =
         try
-            let perm = Permutation.create dto.Array
+            let perm = permutation.create dto.Array
             Ok perm
         with
         | :? ArgumentException as ex when ex.Message.Contains("empty") ->

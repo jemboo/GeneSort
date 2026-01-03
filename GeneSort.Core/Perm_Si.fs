@@ -5,20 +5,20 @@ open FSharp.UMX
 open Combinatorics
 
 // Perm_Si: a permutation that is its own inverse (p ∘ p = identity)
-type Perm_Si = private Perm_Si of Permutation with
+type Perm_Si = private Perm_Si of permutation with
 
     // Static method to create a Perm_Rs, validating self-inverse property
     static member create (arr: int array) : Perm_Si =
         if arr.Length < 1 then
             failwith "array must contain items"
-        let perm = Permutation.create arr
+        let perm = permutation.create arr
         if not (Permutation.isSelfInverse perm) then
             failwith "Invalid: permutation must be self-inverse"
         Perm_Si perm
 
     // Static method to create a Perm_Rs, validating self-inverse property
     static member createUnsafe (arr: int array) : Perm_Si =
-        let perm = Permutation.createUnsafe arr
+        let perm = permutation.createUnsafe arr
         Perm_Si perm
 
     // Property to access the underlying permutation
@@ -152,7 +152,7 @@ module Perm_Si =
 
     // Conjugate a Perm_Si (t) with a permutation (p) : p^-1 ∘ t ∘ p
     // This always makes a Perm_Si
-    let conjugate (t: Perm_Si) (p: Permutation) : Perm_Si =
+    let conjugate (t: Perm_Si) (p: permutation) : Perm_Si =
         let arrT = t.Permutation.Array
         let arrP = p.Array
         if Array.length arrT <> Array.length arrP then

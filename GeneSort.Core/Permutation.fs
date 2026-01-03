@@ -8,145 +8,137 @@ open FSharp.UMX
 
 [<Measure>] type Order
 
-// Permutation type as a single-case discriminated union with Guid Id
-type Permutation = private Permutation of arr: int array * id: Guid ref with
-    // Compute Guid from int array
+// --- Struct DU for Zero-Allocation Wrapping ---
+[<Struct>]
+type permutation = private Perm of arr: int array * id: Guid with
+    
     static member private ComputeGuid (arr: int array) : Guid =
         use sha256 = SHA256.Create()
-        // Convert int array to byte array (4 bytes per int, little-endian)
         let bytes = Array.zeroCreate (arr.Length * 4)
         Buffer.BlockCopy(arr, 0, bytes, 0, arr.Length * 4)
-        // Compute SHA256 hash and take first 16 bytes for Guid
         let hash = sha256.ComputeHash(bytes)
         Guid(hash.[0..15])
 
-    // Static method to create a permutation, validating input
-    static member create (arr: int array) : Permutation =
+    static member create (arr: int array) : permutation =
         let n = Array.length arr
-        if n = 0 then
-            failwith "array cannot be empty"
+        if n = 0 then failwith "array cannot be empty"
         let sorted = Array.sort arr
         let isValid = Array.forall2 (fun i v -> i = v) [|0 .. n-1|] sorted
-        if not isValid then
+        if not isValid then 
             failwith "Invalid permutation: must contain each integer from 0 to n-1 exactly once"
-        Permutation (arr, ref Guid.Empty)
+        Perm (arr, permutation.ComputeGuid arr)
 
-    static member createUnsafe (arr: int array) : Permutation =
-        Permutation (arr, ref Guid.Empty)
+    static member createUnsafe (arr: int array) : permutation =
+        Perm (arr, permutation.ComputeGuid arr)
 
-    // Property to access the underlying array
-    member this.Array =
-        match this with
-        | Permutation (arr, _) -> arr
+    member this.Array = match this with Perm (arr, _) -> arr
+    member this.Id = match this with Perm (_, id) -> id
+    member this.Order = UMX.tag<Order> this.Array.Length
 
-    // Property to access or compute the Id
-    member this.Id
-        with get () =
-            match this with
-            | Permutation (arr, idRef) ->
-                if !idRef = Guid.Empty then
-                    idRef := Permutation.ComputeGuid arr
-                !idRef
-
-    member this.Order =
-        UMX.tag<Order> this.Array.Length
-
-    member this.equals (other: Permutation) : bool =
+    member this.equals (other: permutation) : bool =
             this.Array.Length = other.Array.Length &&
             arrayEquals this.Array other.Array
 
 
 module Permutation =
-    // Create identity permutation of order n
-    let identity (order: int) : Permutation =
-        if order <= 0 then
-            failwith "Permutation order must be positive"
-        Permutation.create [|0 .. order-1|]
+    
+    // --- Identity Optimization ---
+    
+    // Pre-cache IDs for common orders to make identity check O(1)
+    let private identityIdCache = 
+        use sha = SHA256.Create() // Create once for the entire initialization
+        [1..128] 
+        |> List.map (fun n -> 
+            let arr = Array.init n id
+            let bytes = Array.zeroCreate (arr.Length * 4)
+            Buffer.BlockCopy(arr, 0, bytes, 0, arr.Length * 4)
+            let hash = sha.ComputeHash(bytes)
+            n, Guid(hash.[0..15]))
+        |> Map.ofList
 
-    // Check if a permutation is the identity permutation
-    let isIdentity (permutation: Permutation) : bool =
-        let arr = permutation.Array
-        let mutable isIdentity = true
-        let mutable i = 0
-        while i < arr.Length && isIdentity do
-            if arr.[i] <> i then
-                isIdentity <- false
-            i <- i + 1
-        isIdentity
+    let getIdentityId (order: int) =
+        match identityIdCache.TryFind order with
+        | Some id -> id
+        | None -> 
+            let arr = Array.init order id
+            // Manual computation for rare large orders
+            let bytes = Array.zeroCreate (arr.Length * 4)
+            Buffer.BlockCopy(arr, 0, bytes, 0, arr.Length * 4)
+            use sha = SHA256.Create()
+            Guid(sha.ComputeHash(bytes).[0..15])
 
+    let identity (order: int) : permutation =
+        if order <= 0 then failwith "Permutation order must be positive"
+        Perm (Array.init order id, getIdentityId order)
 
-    // returns a random Permutation by shuffling the identity Permutation
-    let randomPermutation (indexShuffler: int -> int) (order: int) : Permutation =
-        let initialPerm = identity order
-        let shuffled = fisherYatesShuffle indexShuffler initialPerm.Array
-                       |> Seq.toArray
-        Permutation.createUnsafe shuffled
+    let isIdentity (perm: permutation) : bool =
+        perm.Id = getIdentityId (int perm.Order)
 
-    // Returns a "rotated" identity permutation of given by k positions (positive k for left, negative for right)
-    let rotated (k: int) (order:int) : Permutation =
-        let arr = (identity order).Array
-        if order <= 0 then
-            failwith "Permutation order must be positive"
-        let k = k % order // Normalize k to avoid unnecessary cycles
-        let k = if k < 0 then k + order else k // Handle negative k
-        Permutation.createUnsafe (Array.init order (fun i -> arr.[(i + k + order) % order]))
+    // --- Core Operations ---
 
-    // Compose two permutations: applies p1 then p2 (p2 ∘ p1)
-    let compose (p1: Permutation) (p2: Permutation) : Permutation =
+    let compose (p1: permutation) (p2: permutation) : permutation =
         let arr1 = p1.Array
         let arr2 = p2.Array
-        if Array.length arr1 <> Array.length arr2 then
-            failwith "Permutations must have the same order"
-        Permutation.createUnsafe (Array.init (Array.length arr1) (fun i -> arr2.[arr1.[i]]))
+        if arr1.Length <> arr2.Length then failwith "Orders must match"
+        permutation.createUnsafe (Array.init arr1.Length (fun i -> arr2.[arr1.[i]]))
 
-    let powerSequence (perm: Permutation) : Permutation seq =
-        let mutable curPerm = perm
-        seq
-            {
-                while true do
-                    yield curPerm
-                    curPerm <- compose perm curPerm
-            }
-        
-    let isSelfInverse (perm: Permutation) : bool =
+    let inverse (perm: permutation) : permutation =
         let arr = perm.Array
-        let n = Array.length arr
-        let composed = compose perm perm
-        composed.Array = (identity n).Array
-
-    // Inverse of a permutation
-    let inverse (perm: Permutation) : Permutation =
-        let arr = perm.Array
-        let n = Array.length arr
+        let n = arr.Length
         let inv = Array.zeroCreate n
         for i in 0 .. n-1 do
             inv.[arr.[i]] <- i
-        Permutation.createUnsafe inv
+        permutation.createUnsafe inv
 
-    // Conjugate a permutation: q^-1 ∘ p ∘ q
-    let conjugate (p: Permutation) (q: Permutation) : Permutation =
-        let arr1 = p.Array
-        let arr2 = q.Array
-        if Array.length arr1 <> Array.length arr2 then
-            failwith "Permutations must have the same order"
+    let conjugate (p: permutation) (q: permutation) : permutation =
         compose (compose (inverse q) p) q
 
+    // --- Sequence & Analysis ---
 
-    // Returns an array of indices where the permutation fixes the element (perm[i] = i)
-    let getFixedPoints (perm: Permutation) : int array =
-        perm.Array
-        |> Array.indexed
-        |> Array.filter (fun (i, x) -> i = x)
+    let powerSequence (perm: permutation) : permutation seq =
+        seq {
+            let mutable cur = perm
+            while true do
+                yield cur
+                cur <- compose perm cur
+        }
+        
+    let isSelfInverse (perm: permutation) : bool =
+        let n = int perm.Order
+        (compose perm perm).Id = getIdentityId n
+
+    let getFixedPoints (perm: permutation) : int array =
+        perm.Array 
+        |> Array.indexed 
+        |> Array.filter (fun (i, x) -> i = x) 
         |> Array.map fst
 
-    // Helper to print permutation in array notation
-    let toArrayNotation (perm: Permutation) : string =
+    let toArrayNotation (perm: permutation) : string =
         sprintf "[%s]" (perm.Array |> Array.map string |> String.concat "; ")
+
+    // --- Visualization & Orbits ---
+
+    let toOrbitSet (perm: permutation) : OrbitSet =
+        let arr = perm.Array
+        let n = arr.Length
+        let visited = Array.create n false
+        let rec build i acc =
+            if visited.[i] then acc
+            else
+                visited.[i] <- true
+                build arr.[i] (i :: acc)
+        
+        let orbits = [
+            for i in 0 .. n-1 do
+                if not visited.[i] then
+                    yield Orbit.create (build i [] |> List.rev)
+        ]
+        OrbitSet.create orbits n
 
 
     /// Converts an OrbitSet to a Permutation.
     /// The orbits must cover indices from 0 to order-1.
-    let fromOrbitSet (orbitSet:OrbitSet) : Permutation =
+    let fromOrbitSet (orbitSet:OrbitSet) : permutation =
         let indices = 
             orbitSet.Orbits 
             |> List.collect (fun orbit -> orbit.Indices)
@@ -163,40 +155,30 @@ module Permutation =
                 for i in 0 .. indices.Length - 2 do
                     permArray.[indices.[i]] <- indices.[i + 1]
                 permArray.[indices.[indices.Length - 1]] <- indices.[0]
-        Permutation.create permArray
-
-        
-    // Find orbits of the elements of a permutation, including fixed points
-    let toOrbitSet (perm: Permutation) : OrbitSet =
-        let arr = perm.Array
-        let n = Array.length arr
-        let visited = Array.create n false
-        let rec buildOrbit current orbit =
-            if visited.[current] then orbit
-            else
-                visited.[current] <- true
-                if orbit |> List.head = current then
-                    buildOrbit arr.[current] orbit
-                else
-                    buildOrbit arr.[current] (current :: orbit)
-        let rec findOrbits i acc =
-            if i >= n then acc
-            elif visited.[i] then findOrbits (i + 1) acc
-            else
-                let orbitIndices = buildOrbit i [i] |> List.rev
-                let orbit = Orbit.create orbitIndices
-                findOrbits (i + 1) (orbit :: acc)
-        OrbitSet.create (List.rev (findOrbits 0 [])) n
+        permutation.create permArray
 
 
-    let toBoolArrays (perm: Permutation) : bool[][] =
-        let n = %perm.Order
-        if perm.Order <= 1<Order> then
-            [||]
+    let toBoolArrays (perm: permutation) : bool[][] =
+        let n = int perm.Order
+        if n <= 1 then [||]
         else
-            let thresholds = [| 0 .. %perm.Order |]
             let vals = perm.Array
-            thresholds 
-            |> Array.map (
-                fun threshold ->
-                    vals |> Array.map (fun v -> v >= threshold ) )
+            Array.init (n + 1) (fun threshold ->
+                vals |> Array.map (fun v -> v >= threshold))
+
+
+    // returns a random Permutation by shuffling the identity Permutation
+    let randomPermutation (indexShuffler: int -> int) (order: int) : permutation =
+        let initialPerm = identity order
+        let shuffled = fisherYatesShuffle indexShuffler initialPerm.Array
+                       |> Seq.toArray
+        permutation.createUnsafe shuffled
+
+    // Returns a "rotated" identity permutation of given by k positions (positive k for left, negative for right)
+    let rotated (k: int) (order:int) : permutation =
+        let arr = (identity order).Array
+        if order <= 0 then
+            failwith "Permutation order must be positive"
+        let k = k % order // Normalize k to avoid unnecessary cycles
+        let k = if k < 0 then k + order else k // Handle negative k
+        permutation.createUnsafe (Array.init order (fun i -> arr.[(i + k + order) % order]))

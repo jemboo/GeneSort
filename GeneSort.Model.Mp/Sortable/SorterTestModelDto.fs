@@ -43,15 +43,11 @@ module MsasFDtoConv =
 
 module MsasODtoConv =
 
-    let private getMaxOrbit (m: msasO) : int =
-        let p = m.GetType().GetProperty("maxOrbit", Reflection.BindingFlags.NonPublic ||| Reflection.BindingFlags.Instance)
-        p.GetValue(m) :?> int
-
     let toDto (m: msasO) : MsasODto =
         {
             Id = %m.Id
             SeedPermutation = m.SeedPermutation |> PermutationDto.fromDomain
-            MaxOrbit = getMaxOrbit m
+            MaxOrbit = m.MaxOrbit
         }
 
     let fromDto (dto: MsasODto) : msasO =

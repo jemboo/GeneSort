@@ -4,11 +4,11 @@ open Permutation
 module PermutationSets =
 
     // Get the sequence of powers p, p^2, ..., e (identity)
-    let makeCyclicGroup (perm: Permutation) : Permutation seq =
+    let makeCyclicGroup (perm: permutation) : permutation seq =
         let arr = perm.Array
         let n = Array.length arr
         let id = identity n
-        let rec generatePowers (current: Permutation) acc =
+        let rec generatePowers (current: permutation) acc =
             if current.Array = id.Array then
                 seq { yield! acc; yield current }
             else

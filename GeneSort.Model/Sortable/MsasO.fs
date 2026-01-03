@@ -12,11 +12,11 @@ type msasO =
     private 
         { id: Guid<sorterTestModelID>
           sortableIntArrays : sortableIntArray array
-          seedPermutation : Permutation
+          seedPermutation : permutation
           maxOrbit: int; }
 
     static member create
-            (seedPermutation : Permutation)
+            (seedPermutation : permutation)
             (maxOrbit : int )
             : msasO =
             let sias = seedPermutation |> SortableIntArray.getOrbit maxOrbit |> Seq.toArray
@@ -30,6 +30,7 @@ type msasO =
             { id = id; seedPermutation = seedPermutation; maxOrbit = maxOrbit; sortableIntArrays = sias}
 
     member this.Id with get() = this.id
+    member this.MaxOrbit with get() = this.maxOrbit 
     member this.SeedPermutation with get() = this.seedPermutation
     member this.SortingWidth with get() = (%this.seedPermutation.Order |> UMX.tag<sortingWidth>)
 

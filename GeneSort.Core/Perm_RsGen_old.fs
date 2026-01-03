@@ -101,7 +101,7 @@ module PermRsGen_old =
 
 
     // Creates a TwoCycleRS, often containing lots of fixed points
-    let decodePermutation (permutation: Permutation) : Perm_Si =
+    let decodePermutation (permutation: permutation) : Perm_Si =
         let permLength = permutation.Array.Length
         let availableFlags = Array.init permLength (fun i -> true)
         let arrayRS = Array.init<int> permLength (fun i -> i)

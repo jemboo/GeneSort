@@ -12,8 +12,8 @@ module Example =
     let one () =
         let conjT = GeneSort.Core.Permutation.conjugate
 
-        let p = Permutation.create [|1; 2; 0; 3|] // Permutation (0 1 2)(3)
-        let q = Permutation.create [|1; 0; 3; 2|] // Permutation (0 1)(2 3)
+        let p = permutation.create [|1; 2; 0; 3|] // Permutation (0 1 2)(3)
+        let q = permutation.create [|1; 0; 3; 2|] // Permutation (0 1)(2 3)
 
         let r = rotated 1 4 // Rotate p by 1 position
         printfn "Permutation p: %s; %s" (p |> compose r |> _notation) (p |> compose r |>  toArrayNotation)
@@ -137,7 +137,7 @@ module Example =
         ()
 
 
-    let runMergePermutationsExample () : Permutation []  =
+    let runMergePermutationsExample () : permutation []  =
         let edgeLength = 8<latticeDistance>
         let dimension = 8<latticeDimension>
 

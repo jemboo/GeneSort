@@ -51,10 +51,10 @@ module LatticePathPermtation =
         newLptp
 
 
-    let toPermutation (lptp:latticePathPermtation) : Permutation =
+    let toPermutation (lptp:latticePathPermtation) : permutation =
         let indexes = 
             seq {
                 for i = 0 to (lptp.Length - 1) do
                     yield lptp[i].Value
             }
-        Permutation.create (Array.ofSeq indexes)
+        permutation.create (Array.ofSeq indexes)

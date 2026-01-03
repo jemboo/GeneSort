@@ -4,7 +4,7 @@ open Permutation
 module CoreGen =
 
 
-    let randomPermutations (order:int) (randy:IRando) : seq<Permutation> =
+    let randomPermutations (order:int) (randy:IRando) : seq<permutation> =
         seq {
                 while true do
                     yield randomPermutation (fun n -> randy.NextIndex n) order

@@ -26,7 +26,7 @@ type sortableIntArray =
             invalidArg "symbolSetSize" "Symbol set size must be positive."
         { values = values; sortingWidth = sortingWidth; symbolSetSize = symbolSetSize; valuesHash = None }
 
-    static member createFromPermutation(perm: Permutation) =
+    static member createFromPermutation(perm: permutation) =
         sortableIntArray.create(perm.Array, (%perm.Order |> UMX.tag<sortingWidth>), (%perm.Order |> UMX.tag<symbolSetSize>))
 
     static member CreateSorted(sortingWidth: int<sortingWidth>) =
@@ -83,8 +83,8 @@ type sortableIntArray =
                     sortableBoolArray.Create(boolValues, sw))
 
 
-    member this.ToPermutation() : Permutation =
-        Permutation.createUnsafe this.values
+    member this.ToPermutation() : permutation =
+        permutation.createUnsafe this.values
 
     override this.Equals(obj) =
         match obj with
@@ -131,7 +131,7 @@ module SortableIntArray =
         arr.Distinct(SortableIntArrayValueComparer()).ToArray()
 
 
-    let getOrbit (maxCount: int) (perm: Permutation) : sortableIntArray seq =
+    let getOrbit (maxCount: int) (perm: permutation) : sortableIntArray seq =
         Permutation.powerSequence perm  
         |> CollectionUtils.takeUpToOrWhile maxCount (fun perm -> not (Permutation.isIdentity perm))
         |> Seq.map sortableIntArray.createFromPermutation
