@@ -230,8 +230,9 @@ module MergeIntQa =
 
 
                 // 3. Load Sortable Tests (Cross-project query)
+                let rpl0 = 0 |> UMX.tag<replNumber>
                 let qpTests = SortableIntMerges.makeQueryParams 
-                                        (Some repl) 
+                                        (Some rpl0) 
                                         (Some sortingWidth) 
                                         (Some mergeDimension) 
                                         (Some mergeFillType) 

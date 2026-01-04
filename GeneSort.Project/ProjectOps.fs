@@ -20,7 +20,7 @@ module ProjectOps =
             let id = runParameters.GetId().Value
             let repl = runParameters.GetRepl().Value
             try
-                report progress (runParameters |> RunParameters.getIdString)
+                report progress (runParameters |> RunParameters.reportKvps)
                 return Success (id, repl, "")
             with e ->
                 let msg = $"{e.GetType().Name}: {e.Message}"

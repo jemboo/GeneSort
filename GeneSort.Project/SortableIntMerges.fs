@@ -59,7 +59,7 @@ module SortableIntMerges =
         (runParameters.sortingWidthKey, values)
 
     let mergeDimensions () : string * string list =
-        let values = [2; 3; 4; 6; 8] |> List.map string
+        let values = [2; 3; 4; 8; ] |> List.map string
         (runParameters.mergeDimensionKey, values)
 
     let mergeFillTypes () : string * string list =

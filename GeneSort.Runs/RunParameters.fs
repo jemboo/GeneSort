@@ -133,6 +133,9 @@ module RunParameters =
     let getAllKeys (runParams: runParameters seq) =
         runParams |> Seq.collect (fun rp -> rp.ParamMap.Keys) |> Seq.distinct |> Seq.toArray
 
+    let reportKvps (runParameters: runParameters) : string =
+        runParameters.ParamMap.Keys |> Seq.map(fun k -> sprintf "%s: %s" k (runParameters.ParamMap.[k])) |> String.concat "\n"
+
     /// Generates a structured table where rows represent individual runs and columns represent parameter keys.
     let makeIndexAndReplTable (runParams: runParameters seq) : string[][] =
         let keys = getAllKeys runParams
