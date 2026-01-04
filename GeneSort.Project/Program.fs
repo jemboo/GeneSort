@@ -42,6 +42,7 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 //let executor = RandomSorters4to64.executor
 //let project = RandomSorters4to64.project
 //let projectName = RandomSorters4to64.project.ProjectName
+//let projectFolder = RandomSorters4to64.projectFolder
 //let buildQueryParams = RandomSorters4to64.makeQueryParamsFromRunParams
 //let paramRefiner = RandomSorters4to64.paramMapRefiner
 //let minReplica = 0<replNumber>
@@ -71,52 +72,52 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 
 
 /// **********     MergeIntQa   ****************
-//let project = MergeIntQa.project
-//let executor = MergeIntQa.executor
-//let projectName = MergeIntQa.projectName
-//let projectFolder = MergeIntQa.projectFolder
-//let buildQueryParams = MergeIntQa.makeQueryParamsFromRunParams
-//let paramRefiner = MergeIntQa.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
-
-
-///// **********    FullBoolEvals   ****************
-let executor = FullBoolEvals.executor
-let project = FullBoolEvals.project
-let projectName = FullBoolEvals.project.ProjectName
-let projectFolder = FullBoolEvals.projectFolder
-let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
-let paramRefiner = FullBoolEvals.paramMapRefiner
+let project = MergeIntQa.project
+let executor = MergeIntQa.executor
+let projectName = MergeIntQa.projectName
+let projectFolder = MergeIntQa.projectFolder
+let buildQueryParams = MergeIntQa.makeQueryParamsFromRunParams
+let paramRefiner = MergeIntQa.paramMapRefiner
 let minReplica = 0<replNumber>
 let maxReplica = 1<replNumber>
 
 
-
-printfn "Initializing Project..."
-let initResult = 
-    ProjectOps.initProjectFiles geneSortDb projectFolder buildQueryParams cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
-    |> Async.RunSynchronously
-
-match initResult with
-| Ok () -> printfn "Project files initialized successfully."
-| Error e -> printfn "Init Failed: %s" e
-
-
-printfn "Executing Runs..."
-let execResult = 
-    ProjectOps.executeRuns geneSortDb projectFolder buildQueryParams projectName allowOverwrite cts (Some progress) executor maxParallel
-    |> Async.RunSynchronously
-
-match execResult with
-| Ok results -> printfn "Execution complete. %d results processed." results.Length
-| Error e -> printfn "Execution Failed: %s" e
+///// **********    FullBoolEvals   ****************
+//let executor = FullBoolEvals.executor
+//let project = FullBoolEvals.project
+//let projectName = FullBoolEvals.project.ProjectName
+//let projectFolder = FullBoolEvals.projectFolder
+//let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
+//let paramRefiner = FullBoolEvals.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
-printfn "Printing RunParams..."
-let reportResult = 
-    ProjectOps.printRunParams geneSortDb projectFolder cts (Some progress)
-    |> Async.RunSynchronously
+
+//printfn "Initializing Project..."
+//let initResult = 
+//    ProjectOps.initProjectFiles geneSortDb projectFolder buildQueryParams cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
+//    |> Async.RunSynchronously
+
+//match initResult with
+//| Ok () -> printfn "Project files initialized successfully."
+//| Error e -> printfn "Init Failed: %s" e
+
+
+//printfn "Executing Runs..."
+//let execResult = 
+//    ProjectOps.executeRuns geneSortDb projectFolder buildQueryParams projectName allowOverwrite cts (Some progress) executor maxParallel
+//    |> Async.RunSynchronously
+
+//match execResult with
+//| Ok results -> printfn "Execution complete. %d results processed." results.Length
+//| Error e -> printfn "Execution Failed: %s" e
+
+
+//printfn "Printing RunParams..."
+//let reportResult = 
+//    ProjectOps.printRunParams geneSortDb projectFolder cts (Some progress)
+//    |> Async.RunSynchronously
 
 
 printfn "Making Use Profile report ..."

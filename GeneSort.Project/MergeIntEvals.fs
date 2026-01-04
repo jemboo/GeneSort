@@ -57,27 +57,6 @@ module MergeIntEvals =
             (runParams.GetMergeDimension())
             (runParams.GetMergeFillType())
 
-
-
-    
-    //let getSorterCountForSortingWidth (factor:int) (sortingWidth: int<sortingWidth>) : int<sorterCount> =
-    //    match %sortingWidth with
-    //    | 4 -> (10 * factor) |> UMX.tag<sorterCount>
-    //    | 6 -> (10 * factor) |> UMX.tag<sorterCount>
-    //    | 8 -> (10 * factor) |> UMX.tag<sorterCount>
-    //    | 12 -> (10 * factor) |> UMX.tag<sorterCount>
-    //    | 16 -> (10 * factor) |> UMX.tag<sorterCount>
-    //    | 24 -> (10 * factor) |> UMX.tag<sorterCount>
-    //    | 32 -> (10 * factor) |> UMX.tag<sorterCount>
-    //    | 48 -> (10 * factor) |> UMX.tag<sorterCount>
-    //    | 64 -> (10 * factor) |> UMX.tag<sorterCount>
-    //    | 96 -> (10 * factor) |> UMX.tag<sorterCount>
-    //    | 128 -> (10 * factor) |> UMX.tag<sorterCount>
-    //    | 192 -> (10 * factor) |> UMX.tag<sorterCount>
-    //    | 256 -> (2 * factor) |> UMX.tag<sorterCount>
-    //    | 384 -> (2 * factor) |> UMX.tag<sorterCount>
-    //    | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
-
         
     let getSorterCountForSortingWidth (factor:int) (sortingWidth: int<sortingWidth>) : int<sorterCount> =
         match %sortingWidth with
@@ -97,53 +76,6 @@ module MergeIntEvals =
         | 384 -> (4 * factor) |> UMX.tag<sorterCount>
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
-
-    //let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageLength> =
-    //    match %sortingWidth with
-    //    | 4 -> 6 |> UMX.tag<stageLength>
-    //    | 6 -> 8 |> UMX.tag<stageLength>
-    //    | 8 -> 20 |> UMX.tag<stageLength>
-    //    | 12 -> 35 |> UMX.tag<stageLength>
-    //    | 16 -> 80 |> UMX.tag<stageLength>
-    //    | 24 -> 180 |> UMX.tag<stageLength>
-    //    | 32 -> 300 |> UMX.tag<stageLength>
-    //    | 48 -> 800 |> UMX.tag<stageLength>
-    //    | 64 -> 1200 |> UMX.tag<stageLength>
-    //    | 96 -> 5000 |> UMX.tag<stageLength>
-    //    | 128 -> 6000 |> UMX.tag<stageLength>
-    //    | 192 -> 15000 |> UMX.tag<stageLength>
-    //    | 256 -> 30000 |> UMX.tag<stageLength>
-    //    | 384 -> 60000 |> UMX.tag<stageLength>
-    //    | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
-        
-
-    //let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageLength> =
-    //    match %sortingWidth with
-    //    | 4 -> 6 |> UMX.tag<stageLength>
-    //    | 6 -> 8 |> UMX.tag<stageLength>
-    //    | 8 -> 20 |> UMX.tag<stageLength>
-    //    | 12 -> 35 |> UMX.tag<stageLength>
-    //    | 16 -> 80 |> UMX.tag<stageLength>
-    //    | 24 -> 180 |> UMX.tag<stageLength>
-    //    | 32 -> 300 |> UMX.tag<stageLength>
-    //    | 48 -> 800 |> UMX.tag<stageLength>
-    //    | 64 -> 1000 |> UMX.tag<stageLength>
-    //    | 96 -> 2000 |> UMX.tag<stageLength>
-    //    | 128 -> 2500 |> UMX.tag<stageLength>
-    //    | 192 -> 4000 |> UMX.tag<stageLength>
-    //    | 256 -> 6000 |> UMX.tag<stageLength>
-    //    | 384 -> 10000 |> UMX.tag<stageLength>
-    //    | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
-        
-    //let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageLength> =
-    //    match %sortingWidth with
-    //    | 12 -> 300 |> UMX.tag<stageLength>
-    //    | 24 -> 1500 |> UMX.tag<stageLength>
-    //    | 48 -> 10000 |> UMX.tag<stageLength>
-    //    | 96 -> 30000 |> UMX.tag<stageLength>
-    //    | 192 -> 15000 |> UMX.tag<stageLength>
-    //    | 384 -> 40000 |> UMX.tag<stageLength>
-    //    | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
     let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageLength> =
         match %sortingWidth with
@@ -189,16 +121,6 @@ module MergeIntEvals =
 
     let sorterModelKeyValues () : string list =
         [ sorterModelType.Mcse;]      |> List.map(SorterModelType.toString)
-
-
-
-    //let sorterModelKeyValues () : string list =
-    //    [ Some sorterModelKey.Mcse; 
-    //      Some sorterModelKey.Mssi;
-    //      Some sorterModelKey.Msrs; 
-    //      Some sorterModelKey.Msuf4; 
-    //      Some sorterModelKey.Msuf6; ]      |> List.map(SorterModelKey.toString)
-
 
     let sorterModelTypeKeys () : string*string list =
         (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
@@ -301,7 +223,6 @@ module MergeIntEvals =
                 report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) runId %repl)
 
                 // 2. Safe Param Extraction
-                // Note: No async.Return needed anymore because of the Bind overload
                 let! (repl, width, mDim, mFill, dType, sModel) = 
                     maybe {
                         let! r = runParameters.GetRepl()
@@ -314,7 +235,14 @@ module MergeIntEvals =
                     } |> Result.ofOption "Missing domain parameters"
 
                 // 3. Load Sortable Tests (Cross-project query)
-                let qpTests = SortableIntMerges.makeQueryParams (Some repl) (Some width) (Some mDim) (Some mFill) (Some dType) (outputDataType.SortableTest "")
+                let qpTests = SortableIntMerges.makeQueryParams 
+                                            (Some repl) 
+                                            (Some width) 
+                                            (Some mDim) 
+                                            (Some mFill) 
+                                            (Some dType) 
+                                            (outputDataType.SortableTest "")
+
                 let! rawTestData = db.loadAsync SortableIntMerges.projectFolder qpTests 
                 let! sortableTest = rawTestData |> OutputData.asSortableTest
 
