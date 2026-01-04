@@ -7,54 +7,48 @@ open System
 [<Measure>] type latticeDistance
 [<Measure>] type latticeDimension
 
-[<CustomEquality; CustomComparison>]
+[<Struct; CustomEquality; CustomComparison>]
 type latticePoint = 
-    { coords: int[] }
-    
+    private { 
+        coords: int[]
+        hashCode: int 
+    }
     with
-        static member create(arr:int[]) = { coords = Array.copy arr }
-        
-        member p.Sum = Array.sum p.coords
+        static member create(arr: int[]) = 
+            let copy = Array.copy arr
+            // Use Span-based hashing for speed if available, or manual loop
+            let mutable h = 17
+            for x in copy do h <- h * 31 + x
+            { coords = copy; hashCode = h }
+
+        member p.Coords = p.coords
         member p.Dimension = p.coords.Length
-        member this.Item
-            with get(i:int) = this.coords.[i]
-            
-        override p.ToString() = 
-            sprintf "[|%s|]" (String.Join("; ", p.coords))
-            
+        member this.Item with get(i:int) = this.coords.[i]
+        member this.Sum with get() = Array.sum this.coords
+
+        override p.GetHashCode() = p.hashCode
+        
         override p.Equals(obj) =
             match obj with
             | :? latticePoint as other ->
-                p.Dimension = other.Dimension &&
-                Array.forall2 (=) p.coords other.coords
+                p.hashCode = other.hashCode && 
+                ReadOnlySpan(p.coords).SequenceEqual(ReadOnlySpan(other.coords))
             | _ -> false
-            
-        override p.GetHashCode() =
-            let mutable h = 17
-            for x in p.coords do
-                h <- h * 31 + x
-            h
-        
-        // Dictionary (lexicographic) comparison
-        interface System.IComparable with
+
+        interface IComparable with
             member this.CompareTo(obj) =
                 match obj with
                 | :? latticePoint as other ->
-                    let minLen = min this.Dimension other.Dimension
-                    let mutable i = 0
-                    let mutable result = 0
-                    
-                    // Compare coordinate by coordinate
-                    while i < minLen && result = 0 do
-                        result <- compare this.coords.[i] other.coords.[i]
-                        i <- i + 1
-                    
-                    // If all compared coords are equal, longer array is "greater"
-                    if result = 0 then
-                        compare this.Dimension other.Dimension
+                    let lenCompare = compare this.coords.Length other.coords.Length
+                    if lenCompare <> 0 then lenCompare
                     else
-                        result
-                | _ -> invalidArg "obj" "Cannot compare latticePoint with different type"
+                        ReadOnlySpan(this.coords).SequenceCompareTo(ReadOnlySpan(other.coords))
+                | _ -> invalidArg "obj" "Cannot compare latticePoint"
+
+
+
+
+
 
 module LatticePoint =
 
@@ -97,7 +91,7 @@ module LatticePoint =
             let rec loop pos =
                 seq {
                     if pos = %dim then
-                        yield { coords = Array.copy current }
+                        yield latticePoint.create (Array.copy current)
                     else
                         for v in 0 .. %edgeLength do
                             current.[pos] <- v
@@ -129,7 +123,7 @@ module LatticePoint =
                 seq {
                     if pos = %dim then
                         if sumRemaining = 0 then
-                            yield { coords = Array.copy current }
+                            yield latticePoint.create (Array.copy current)
                     else
                         // The remaining slots count
                         let slotsLeft = %dim - pos
@@ -151,7 +145,6 @@ module LatticePoint =
         }
 
 
-
     /// Generates all lattice points of length dim whose entries:
     /// • sum to levelSum
     /// • lie in 0 .. maxValue
@@ -170,7 +163,7 @@ module LatticePoint =
             if subject.[i] - 1 >= 0 then
                 let arr = Array.copy subject.coords
                 arr.[i] <- arr.[i] - 1
-                results.Add { coords = arr }
+                results.Add (latticePoint.create arr)
         results.ToArray()
 
 
@@ -181,7 +174,7 @@ module LatticePoint =
             if subject.[i] < %maxDistance then
                 let arr = Array.copy subject.coords
                 arr.[i] <- arr.[i] + 1
-                results.Add { coords = arr }
+                results.Add (latticePoint.create arr)
         results.ToArray()
 
 

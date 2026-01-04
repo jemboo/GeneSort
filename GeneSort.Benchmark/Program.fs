@@ -1,2 +1,10 @@
-﻿// For more information see https://aka.ms/fsharp-console-apps
-printfn "Hello from F#"
+﻿open System
+open BenchmarkDotNet.Running
+
+[<EntryPoint>]
+let main argv =
+    let summary = BenchmarkRunner.Run<PermutationBench>()
+
+    printfn "%A" summary
+    Console.Read() |> ignore
+    0

@@ -29,8 +29,8 @@
     <Compile Include="Permutation.fs" />
     <Compile Include="PermutationSets.fs" />
     <Compile Include="Merge\LatticePoint.fs" />
-    <Compile Include="Merge\LatticePathPermutation.fs" />
     <Compile Include="Merge\LatticeLevelSetMap.fs" />
+    <Compile Include="Merge\LatticePathPermutation.fs" />
     <Compile Include="Merge\LatticePathPermutations.fs" />
     <Compile Include="Merge\MergeLattice.fs" />
     <Compile Include="Perm_Si.fs" />

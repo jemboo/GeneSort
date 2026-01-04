@@ -101,7 +101,7 @@ module SortableBoolArray =
                 (maxValue:int<latticeDistance>) : sortableBoolArray =
         let boolArray = 
                 [| 
-                    for x in p.coords -> 
+                    for x in p.Coords -> 
                         [| for y in 0 .. (%maxValue - 1) -> y < x |] |> Array.rev
                 |] 
                 |> Array.concat

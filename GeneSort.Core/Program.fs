@@ -142,7 +142,7 @@ module Example =
         let dimension = 8<latticeDimension>
 
         let mergeLattice = MergeLattice.create dimension edgeLength
-        let latticePathPermutations = MergeLattice.getPermutationsVV (Some reporter) mergeLattice
+        let latticePathPermutations = MergeLattice.getPermutationsStandard (Some reporter) mergeLattice
         let result = latticePathPermutations |> LatticePathPermutations.toPermutations
         
         let boolEq = 

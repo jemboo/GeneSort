@@ -3,23 +3,25 @@
 open BenchmarkDotNet.Attributes
 open System.Security.Cryptography
 open System
+open GeneSort.Core
 
 
-//|          Method |   size |         Mean |        Error |       StdDev | Allocated |
-//|---------------- |------- |-------------:|-------------:|-------------:|----------:|
-//| arrayProductInt |     10 |     13.53 ns |     0.143 ns |     0.134 ns |         - |
-//|    arrayProduct |     10 |     12.79 ns |     0.287 ns |     0.269 ns |         - |
-//| arrayProductInt |    100 |     89.23 ns |     1.315 ns |     1.098 ns |         - |
-//|    arrayProduct |    100 |     93.98 ns |     0.660 ns |     0.585 ns |         - |
-//| arrayProductInt |   1000 |    760.74 ns |     8.464 ns |     7.917 ns |         - |
-//|    arrayProduct |   1000 |    768.17 ns |     7.140 ns |     6.679 ns |         - |
-//| arrayProductInt |  10000 |  7,553.64 ns |    57.999 ns |    51.414 ns |         - |
-//|    arrayProduct |  10000 |  7,713.10 ns |   151.992 ns |   162.630 ns |         - |
-//| arrayProductInt | 100000 | 75,923.11 ns | 1,458.919 ns | 1,996.985 ns |         - |
-//|    arrayProduct | 100000 | 77,145.02 ns |   619.630 ns |   549.286 ns |         - |
+
+//| Method           | size   | Mean           | Error        | StdDev       | Gen0     | Gen1     | Gen2     | Allocated |
+//|----------------- |------- |---------------:|-------------:|-------------:|---------:|---------:|---------:|----------:|
+//| createPermSafe   | 10     |       374.3 ns |      7.45 ns |     18.00 ns |   0.0286 |        - |        - |     480 B |
+//| createPermUnsafe | 10     |       310.3 ns |      7.52 ns |     21.70 ns |   0.0210 |        - |        - |     352 B |
+//| createPermSafe   | 100    |       985.1 ns |     27.57 ns |     81.28 ns |   0.0916 |        - |        - |    1560 B |
+//| createPermUnsafe | 100    |       508.9 ns |     15.50 ns |     45.44 ns |   0.0420 |        - |        - |     712 B |
+//| createPermSafe   | 1000   |     7,709.3 ns |    152.71 ns |    425.69 ns |   0.7324 |        - |        - |   12360 B |
+//| createPermUnsafe | 1000   |     2,111.6 ns |     40.30 ns |     33.66 ns |   0.2556 |   0.0038 |        - |    4312 B |
+//| createPermSafe   | 10000  |    83,858.5 ns |  1,668.36 ns |  1,638.55 ns |   7.0801 |   0.6104 |        - |  120362 B |
+//| createPermUnsafe | 10000  |    18,781.2 ns |    373.80 ns |    654.67 ns |   2.3804 |        - |        - |   40313 B |
+//| createPermSafe   | 100000 | 1,084,067.6 ns | 21,191.29 ns | 41,331.99 ns | 330.0781 | 330.0781 | 330.0781 | 1200535 B |
+//| createPermUnsafe | 100000 |   175,756.3 ns |  1,150.11 ns |  1,019.54 ns | 110.8398 | 110.8398 | 110.8398 |  400374 B |
 
 [<MemoryDiagnoser>]
-type ArrayCompBench() =
+type PermutationBench() =
 
     [<Params(10, 100, 1000, 10000, 100000)>]
     member val size = 0 with get, set
@@ -35,12 +37,14 @@ type ArrayCompBench() =
         this.arrayC <- Array.zeroCreate this.size
 
 
-    //[<Benchmark>]
-    //member this.createPermSafe() =
-    //    let yab = Permutation
+    [<Benchmark>]
+    member this.createPermSafe() =
+        let yab = permutation.create this.arrayA
+        yab.Order
 
 
-    //[<Benchmark>]
-    //member this.createPermUnsafe() =
-    //    CollectionOps.arrayProduct this.arrayA this.arrayB this.arrayC
-    //    |> ignore
+    [<Benchmark>]
+    member this.createPermUnsafe() =
+        let yab = permutation.createUnsafe this.arrayA
+        yab.Order
+

@@ -3,6 +3,10 @@ open FSharp.UMX
 open System.Collections.Generic
 
 
+type coverType =
+    | FullCover
+    | VVCover
+
 type latticeLevelSetMap =
     private 
         { centerSideMap: Dictionary<latticePoint, latticePoint list>
