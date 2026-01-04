@@ -47,13 +47,10 @@ type latticePoint =
 
 
 
-
-
-
 module LatticePoint =
 
     /// Predicate: true iff latticePoint's coords are non-decreasing
-    let isNonDecreasing (p:latticePoint) =
+    let isNonDecreasing0 (p:latticePoint) =
         let a = p.coords
         let n = a.Length
         let mutable i = 0
@@ -62,7 +59,17 @@ module LatticePoint =
             if a.[i] > a.[i+1] then ok <- false
             i <- i + 1
         ok
-    
+
+    let isNonDecreasing (p: latticePoint) =
+        let span = ReadOnlySpan(p.Coords)
+        let mutable ok = true
+        let mutable i = 0
+        while i < span.Length - 1 && ok do
+            if span.[i] > span.[i+1] then ok <- false
+            i <- i + 1
+        ok
+
+
     /// helper to compare latticePoints by coords (value equality)
     let equalCoords (a:int[]) (b:int[]) =
         if a.Length <> b.Length then false
