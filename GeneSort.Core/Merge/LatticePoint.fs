@@ -195,34 +195,22 @@ module LatticePoint =
 
 
     /// returns the (unique) index i where lowPoint.[i] + 1 = hiPoint.[i]
-    let getOverIndex (lowPoint:latticePoint) (hiPoint:latticePoint) : int =
-    
-        // First check same dimension
-        let dim = lowPoint.Dimension
-        if hiPoint.Dimension <> dim then
-            invalidArg "hiPoint" "latticePoints must have the same dimension"
-
-        // Scan coordinates
+    let getOverIndex (lowPoint: latticePoint) (hiPoint: latticePoint) : int =
+        let lowArr = lowPoint.Coords
+        let hiArr = hiPoint.Coords
+        let dim = lowArr.Length
         let mutable foundIndex = -1
 
         for i in 0 .. dim - 1 do
-            let a = lowPoint.[i]
-            let b = hiPoint.[i]
-
+            let a = lowArr.[i]
+            let b = hiArr.[i]
             if a + 1 = b then
-                // First candidate?
-                if foundIndex = -1 then
-                    foundIndex <- i
-                else
-                    // More than one coordinate differs by +1 → invalid
-                    invalidArg "hiPoint" "More than one coordinate is increased by 1."
+                if foundIndex = -1 then foundIndex <- i
+                else invalidArg "hiPoint" "Multiple increments"
             elif a <> b then
-                // Any other mismatch → invalid
-                invalidArg "hiPoint" "Points differ in a coordinate not equal to +1."
-
-        if foundIndex = -1 then
-            invalidArg "hiPoint" "No coordinate was incremented by exactly 1."
-
+                invalidArg "hiPoint" "Mismatch"
+            
+        if foundIndex = -1 then failwith "No increment found"
         foundIndex
 
 

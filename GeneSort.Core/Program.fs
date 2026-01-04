@@ -115,34 +115,12 @@ module Example =
         printfn "%s: %s" (DateTime.Now.ToLongTimeString()) msg
 
 
-    let initLevelSetMapExample () =
-        let edgeLength = 8<latticeDistance>
-        let dimension = 8<latticeDimension>
-        let keyMaker = LatticePoint.boundedLevelSetVV
-        let lowLevel = ( (%edgeLength * %dimension) / 2  - 1) |> UMX.tag<latticeDistance>
-        let highLevel =  ( (%edgeLength * %dimension) / 2 - 0) |> UMX.tag<latticeDistance>
-        let overCoverMap = LatticePoint.getOverCoversVV
-        let underCoverMap = LatticePoint.getUnderCoversVV
-
-        let llsm = latticeLevelSetMap.create 
-                            dimension 
-                            edgeLength 
-                            lowLevel 
-                            highLevel 
-                            keyMaker 
-                            overCoverMap 
-                            underCoverMap
-
-        llsm |> LatticeLevelSetMap.setupMaps
-        ()
-
-
     let runMergePermutationsExample () : permutation []  =
         let edgeLength = 4<latticeDistance>
         let dimension = 8<latticeDimension>
 
         let mergeLattice = MergeLattice.create dimension edgeLength
-        let latticePathPermutations = MergeLattice.getPermutationsVV (Some reporter) mergeLattice
+        let latticePathPermutations = MergeLattice.getPermutationsStandard (Some reporter) mergeLattice
         let result = latticePathPermutations |> LatticePathPermutations.toPermutations
         
         let boolEq = 

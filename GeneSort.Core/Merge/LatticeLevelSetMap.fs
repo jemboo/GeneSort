@@ -1,11 +1,11 @@
 ﻿namespace GeneSort.Core
+
 open FSharp.UMX
 open System.Collections.Generic
 
-
 type coverType =
-    | FullCover
-    | VVCover
+    | FullCover = 0
+    | VVCover = 1
 
 type latticeLevelSetMap =
     private 
@@ -15,158 +15,121 @@ type latticeLevelSetMap =
           edgeLength: int<latticeDistance>
           poleSideLevel: int<latticeDistance>
           centerSideLevel: int<latticeDistance> 
-          overCoverMap: latticePoint -> int<latticeDistance> -> latticePoint []
-          underCoverMap: latticePoint -> latticePoint[] }
+          coverStrategy: coverType }
 
-          static member create
-            (latticeDimension: int<latticeDimension>)
-            (edgeLength: int<latticeDistance>)
-            (poleSideLevel: int<latticeDistance>)
-            (centerSideLevel: int<latticeDistance>)
-            (keyMaker: int<latticeDimension> -> int<latticeDistance> -> int<latticeDistance> -> latticePoint seq)
-            (overCoverMap: latticePoint -> int<latticeDistance> -> latticePoint [])
-            (underCoverMap: latticePoint -> latticePoint [])
-            : latticeLevelSetMap =
-            if %latticeDimension < 2 then
-                invalidArg "latticeDimension" "latticeDimension length must be at least 2."
+    static member create
+        (latticeDimension: int<latticeDimension>)
+        (edgeLength: int<latticeDistance>)
+        (poleSideLevel: int<latticeDistance>)
+        (centerSideLevel: int<latticeDistance>)
+        (strategy: coverType)
+        : latticeLevelSetMap =
+        
+        if %latticeDimension < 2 then
+            invalidArg "latticeDimension" "Dimension must be at least 2."
 
-            let centerSideMap = Dictionary<latticePoint,latticePoint list>()
-            // Initialize centerSideMap with keys from latticeLevelSet
-            for point in keyMaker latticeDimension centerSideLevel edgeLength do
-                centerSideMap.[point] <- []
+        // Determine which keyMaker to use based on strategy
+        let keyMaker = 
+            match strategy with
+            | coverType.FullCover -> LatticePoint.boundedLevelSet
+            | coverType.VVCover   -> LatticePoint.boundedLevelSetVV
+            | _ -> failwith "Unknown cover strategy"
 
-            let poleSideMap = Dictionary<latticePoint, latticePoint list>()
-            // Initialize poleSideMap with keys from latticeLevelSet
-            for point in keyMaker latticeDimension poleSideLevel edgeLength do
-                poleSideMap.[point] <- []
+        let centerSideMap = Dictionary<latticePoint, latticePoint list>()
+        for point in keyMaker latticeDimension centerSideLevel edgeLength do
+            centerSideMap.[point] <- []
 
-            { 
-              centerSideMap = centerSideMap
-              poleSideMap = poleSideMap
-              latticeDimension = latticeDimension
-              edgeLength = edgeLength
-              poleSideLevel = poleSideLevel
-              centerSideLevel = centerSideLevel  
-              overCoverMap = overCoverMap
-              underCoverMap = underCoverMap 
-            }
+        let poleSideMap = Dictionary<latticePoint, latticePoint list>()
+        for point in keyMaker latticeDimension poleSideLevel edgeLength do
+            poleSideMap.[point] <- []
 
-          member this.CenterSideMap with get() = this.centerSideMap
-          member this.PoleSideMap with get() = this.poleSideMap
-          member this.LatticeDimension with get() = this.latticeDimension
-          member this.EdgeLength with get() = this.edgeLength
-          member this.MaxDistance with get() = this.edgeLength * this.latticeDimension
-          member this.PoleSideLevel with get() = this.poleSideLevel
-          member this.CenterSideLevel with get() = this.centerSideLevel
-          member this.getPoleSidePointCandidates
-                (centerPoint: latticePoint) : latticePoint [] =
-              if (%this.CenterSideLevel > %this.PoleSideLevel) then
-                  this.underCoverMap centerPoint
-              else
-                  this.overCoverMap centerPoint this.EdgeLength 
-          
-          member this.getCenterSidePointCandidates
-                (polePoint: latticePoint) : latticePoint [] =
-              if (%this.CenterSideLevel < %this.PoleSideLevel) then
-                  this.underCoverMap polePoint
-              else
-                  this.overCoverMap polePoint this.EdgeLength
+        { centerSideMap = centerSideMap
+          poleSideMap = poleSideMap
+          latticeDimension = latticeDimension
+          edgeLength = edgeLength
+          poleSideLevel = poleSideLevel
+          centerSideLevel = centerSideLevel
+          coverStrategy = strategy }
+
+    // --- Logic Dispatchers ---
+
+    member private this.UnderCover(p: latticePoint) =
+        match this.coverStrategy with
+        | coverType.FullCover -> LatticePoint.getUnderCovers p
+        | coverType.VVCover   -> LatticePoint.getUnderCoversVV p
+        | _ -> [||]
+
+    member private this.OverCover(p: latticePoint) =
+        match this.coverStrategy with
+        | coverType.FullCover -> LatticePoint.getOverCovers p this.EdgeLength
+        | coverType.VVCover   -> LatticePoint.getOverCoversVV p this.EdgeLength
+        | _ -> [||]
+
+    // --- Public Members ---
+
+    member this.CenterSideMap = this.centerSideMap
+    member this.PoleSideMap = this.poleSideMap
+    member this.CoverStrategy = this.coverStrategy
+    member this.LatticeDimension = this.latticeDimension
+    member this.EdgeLength = this.edgeLength    
+    member this.MaxDistance with get() = this.edgeLength * this.latticeDimension
+    member this.PoleSideLevel = this.poleSideLevel
+    member this.CenterSideLevel = this.centerSideLevel
+    
+    member this.getPoleSidePointCandidates (centerPoint: latticePoint) =
+        if (%this.CenterSideLevel > %this.PoleSideLevel) then
+            this.UnderCover centerPoint
+        else
+            this.OverCover centerPoint
+
+    member this.getCenterSidePointCandidates (polePoint: latticePoint) =
+        if (%this.CenterSideLevel < %this.PoleSideLevel) then
+            this.UnderCover polePoint
+        else
+            this.OverCover polePoint
+
 
 
 
 module LatticeLevelSetMap =
 
-    let getStats =
-
-        let latticeDimensions = [3; 4; 8] |> List.map UMX.tag<latticeDimension>
-        //let edgeLengths = [16; 24; 32; 48; 64; 96; 128] |> List.map UMX.tag<latticeDistance>
-        let edgeLengths = [4; 8; 16; 24; 32;] |> List.map UMX.tag<latticeDistance>
-
-        //printfn "SortingWidth\tDimension\tlevel\tMaxPerTuple\tLevelSet\tLevelSetVV"
-        //for dim in latticeDimensions do
-        //    for edgeLength in edgeLengths do
-        //        let sortingWidth = (%dim * %edgeLength) |> UMX.tag<latticeDistance>
-        //        let level = (%sortingWidth / 2) |> UMX.tag<latticeDistance>
-        //        let levelSetPoints = LatticePoint.boundedLevelSet dim level edgeLength |> Seq.toArray
-        //        let levelSetPointsVV = LatticePoint.boundedLevelSetVV dim level edgeLength |> Seq.toArray
-        //        printfn "%d\t%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level) (%edgeLength) (levelSetPoints.Length) (levelSetPointsVV.Length)
-        //        let level2 = (24 + (%sortingWidth / 2)) |> UMX.tag<latticeDistance>
-        //        let levelSetPoints2 = LatticePoint.boundedLevelSet dim level2 edgeLength |> Seq.toArray
-        //        let levelSetPointsVV2 = LatticePoint.boundedLevelSetVV dim level2 edgeLength |> Seq.toArray
-        //        printfn "%d\t%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level2) (%edgeLength) (levelSetPoints2.Length) (levelSetPointsVV2.Length)
-
-        printfn "SortingWidth\tDimension\tlevel\tMaxPerTuple\tLevelSetVV"
-        for dim in latticeDimensions do
-            for edgeLength in edgeLengths do
-                let sortingWidth = (%dim * %edgeLength) |> UMX.tag<latticeDistance>
-                let level = (%sortingWidth / 2) |> UMX.tag<latticeDistance>
-                let levelSetPointsVV = LatticePoint.boundedLevelSetVV dim level edgeLength |> Seq.toArray
-                printfn "%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level) (%edgeLength) (levelSetPointsVV.Length)
-                //let level2 = (24 + (%sortingWidth / 2)) |> UMX.tag<latticeDistance>
-                //let levelSetPointsVV2 = LatticePoint.boundedLevelSetVV dim level2 edgeLength |> Seq.toArray
-                //printfn "%d\t%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level2) (%edgeLength) (levelSetPointsVV2.Length)
-                
-
-
     let getAllLevelSetMaps 
             (latticeDimension: int<latticeDimension>) 
             (edgeLength: int<latticeDistance>) 
-            (keyMaker: int<latticeDimension> -> int<latticeDistance> -> int<latticeDistance> -> latticePoint seq)
-            (overCoverMap: latticePoint -> int<latticeDistance> -> latticePoint [])
-            (underCoverMap: latticePoint -> latticePoint [])
+            (strategy: coverType)
             : latticeLevelSetMap seq = 
 
         let maxPathLength = %edgeLength * %latticeDimension
         let midPoint = maxPathLength / 2
         
         seq {
-            for level in 1 .. (midPoint) do
+            // Toward Center
+            for level in 1 .. midPoint do
                 let levelTag = UMX.tag<latticeDistance> level
                 yield latticeLevelSetMap.create 
                         latticeDimension 
                         edgeLength 
-                        (levelTag - 1<latticeDistance>) //poleSideLevel
-                        (levelTag)                      //centerSideLevel
-                        keyMaker 
-                        overCoverMap 
-                        underCoverMap
+                        (levelTag - 1<latticeDistance>)
+                        levelTag
+                        strategy
 
-            for level in %midPoint .. (%maxPathLength - 1) do
+            // Toward Pole
+            for level in midPoint .. (%maxPathLength - 1) do
                 let levelTag = UMX.tag<latticeDistance> level
                 yield latticeLevelSetMap.create 
                         latticeDimension 
                         edgeLength 
-                        (levelTag + 1<latticeDistance>)  //poleSideLevel
-                        (levelTag)                       //centerSideLevel
-                        keyMaker 
-                        overCoverMap 
-                        underCoverMap
+                        (levelTag + 1<latticeDistance>)
+                        levelTag
+                        strategy
         }
 
+    // Facade methods are now just passing an Enum
+    let getAllLevelSetMapsStandard dim edge = 
+        getAllLevelSetMaps dim edge coverType.FullCover
 
-
-    let getAllLevelSetMapsStandard 
-            (latticeDimension: int<latticeDimension>) 
-            (edgeLength: int<latticeDistance>) 
-            : latticeLevelSetMap seq = 
-        getAllLevelSetMaps 
-            latticeDimension 
-            edgeLength
-            LatticePoint.boundedLevelSet 
-            LatticePoint.getOverCovers 
-            LatticePoint.getUnderCovers
-
-
-    let getAllLevelSetMapsVV 
-            (latticeDimension: int<latticeDimension>) 
-            (edgeLength: int<latticeDistance>) 
-            : latticeLevelSetMap seq =
-        getAllLevelSetMaps 
-            latticeDimension 
-            edgeLength 
-            LatticePoint.boundedLevelSetVV 
-            LatticePoint.getOverCoversVV 
-            LatticePoint.getUnderCoversVV
+    let getAllLevelSetMapsVV dim edge = 
+        getAllLevelSetMaps dim edge coverType.VVCover
 
 
     let setupMaps
@@ -230,4 +193,42 @@ module LatticeLevelSetMap =
         &&
         llsm.PoleSideMap
         |> Seq.forall(fun kvp -> kvp.Value.Length > 0)
+
+
+
+
+    let getStats =
+
+        let latticeDimensions = [3; 4; 8] |> List.map UMX.tag<latticeDimension>
+        //let edgeLengths = [16; 24; 32; 48; 64; 96; 128] |> List.map UMX.tag<latticeDistance>
+        let edgeLengths = [4; 8; 16; 24; 32;] |> List.map UMX.tag<latticeDistance>
+
+        //printfn "SortingWidth\tDimension\tlevel\tMaxPerTuple\tLevelSet\tLevelSetVV"
+        //for dim in latticeDimensions do
+        //    for edgeLength in edgeLengths do
+        //        let sortingWidth = (%dim * %edgeLength) |> UMX.tag<latticeDistance>
+        //        let level = (%sortingWidth / 2) |> UMX.tag<latticeDistance>
+        //        let levelSetPoints = LatticePoint.boundedLevelSet dim level edgeLength |> Seq.toArray
+        //        let levelSetPointsVV = LatticePoint.boundedLevelSetVV dim level edgeLength |> Seq.toArray
+        //        printfn "%d\t%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level) (%edgeLength) (levelSetPoints.Length) (levelSetPointsVV.Length)
+        //        let level2 = (24 + (%sortingWidth / 2)) |> UMX.tag<latticeDistance>
+        //        let levelSetPoints2 = LatticePoint.boundedLevelSet dim level2 edgeLength |> Seq.toArray
+        //        let levelSetPointsVV2 = LatticePoint.boundedLevelSetVV dim level2 edgeLength |> Seq.toArray
+        //        printfn "%d\t%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level2) (%edgeLength) (levelSetPoints2.Length) (levelSetPointsVV2.Length)
+
+        printfn "SortingWidth\tDimension\tlevel\tMaxPerTuple\tLevelSetVV"
+        for dim in latticeDimensions do
+            for edgeLength in edgeLengths do
+                let sortingWidth = (%dim * %edgeLength) |> UMX.tag<latticeDistance>
+                let level = (%sortingWidth / 2) |> UMX.tag<latticeDistance>
+                let levelSetPointsVV = LatticePoint.boundedLevelSetVV dim level edgeLength |> Seq.toArray
+                printfn "%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level) (%edgeLength) (levelSetPointsVV.Length)
+                //let level2 = (24 + (%sortingWidth / 2)) |> UMX.tag<latticeDistance>
+                //let levelSetPointsVV2 = LatticePoint.boundedLevelSetVV dim level2 edgeLength |> Seq.toArray
+                //printfn "%d\t%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level2) (%edgeLength) (levelSetPointsVV2.Length)
+                
+
+
+
+
 
