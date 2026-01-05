@@ -31,6 +31,18 @@ type queryParams =
 
     member this.Id : Guid<idValue> = this.idCache.Value |> UMX.tag<idValue>
 
+    member this.ToString : string =
+        let projStr = this.projectName |> queryParams.ProjectNameString
+        let replStr = this.repl |> queryParams.ReplString
+        let outTypeStr = this.outputDataType |> OutputDataType.toFolderName
+        let propsStr =
+            this.properties
+            |> Map.toSeq
+            |> Seq.map (fun (k,v) -> $"{k}={v}")
+            |> String.concat ";"
+        $"Project: {projStr}, Repl: {replStr}, OutputType: {outTypeStr}, Properties: [{propsStr}]"
+
+
     /// Creates a new queryParams instance.
     static member create (
         projectName: string<projectName> option,

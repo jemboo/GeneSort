@@ -82,7 +82,7 @@ module SortableIntMerges =
     let limitForMergeFillType (rp: runParameters) =
         let sw = rp.GetSortingWidth().Value
         let ft = rp.GetMergeFillType().Value
-        if (ft.IsNoFill && %sw > 32) then None else Some rp
+        if (ft.IsNoFill && %sw > 64) then None else Some rp
 
     let limitForMergeDimension (rp: runParameters) =
         let sw = rp.GetSortingWidth().Value

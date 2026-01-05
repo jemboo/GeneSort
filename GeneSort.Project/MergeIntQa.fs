@@ -72,8 +72,10 @@ module MergeIntQa =
         | 9 -> (10 * factor) |> UMX.tag<sorterCount>
         | 12 -> (10 * factor) |> UMX.tag<sorterCount>
         | 16 -> (10 * factor) |> UMX.tag<sorterCount>
+        | 18 -> (10 * factor) |> UMX.tag<sorterCount>
         | 24 -> (10 * factor) |> UMX.tag<sorterCount>
         | 32 -> (10 * factor) |> UMX.tag<sorterCount>
+        | 36 -> (10 * factor) |> UMX.tag<sorterCount>
         | 48 -> (10 * factor) |> UMX.tag<sorterCount>
         | 64 -> (10 * factor) |> UMX.tag<sorterCount>
         | 96 -> (10 * factor) |> UMX.tag<sorterCount>
@@ -92,8 +94,10 @@ module MergeIntQa =
         | 9 -> 120 |> UMX.tag<stageLength>
         | 12 -> 150 |> UMX.tag<stageLength>
         | 16 -> 200 |> UMX.tag<stageLength>
+        | 18 -> 230 |> UMX.tag<stageLength>
         | 24 -> 300 |> UMX.tag<stageLength>
         | 32 -> 450 |> UMX.tag<stageLength>
+        | 36 -> 500 |> UMX.tag<stageLength>
         | 48 -> 800 |> UMX.tag<stageLength>
         | 64 -> 1000 |> UMX.tag<stageLength>
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
@@ -117,7 +121,7 @@ module MergeIntQa =
         (runParameters.sortingWidthKey, sortingWidthValues)
 
     let mergeDimensionValues = 
-        [2; 3; 4; 6; 8 ] |> List.map(fun d -> d.ToString())
+        [2; 3; 4; ] |> List.map(fun d -> d.ToString())
 
     let mergeDimensions() : string*string list =
         (runParameters.mergeDimensionKey, mergeDimensionValues)
@@ -239,6 +243,7 @@ module MergeIntQa =
                                         (Some sortableDataType) 
                                         (outputDataType.SortableTest "")
 
+                report progress (sprintf "%s: %s" runId  qpTests.ToString)
                 let! rawTestData = db.loadAsync SortableIntMerges.projectFolder qpTests 
                 let! sortableTest = rawTestData |> OutputData.asSortableTest
 
