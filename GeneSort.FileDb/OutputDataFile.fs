@@ -36,9 +36,10 @@ module OutputDataFile =
 
     let getPathToOutputDataFolder
                 (pathToProjectFolder:string<pathToProjectFolder>)
+                (replString: string)
                 (outputDataType: outputDataType)
                  :string<fullPathToFolder> =
-        Path.Combine(%pathToProjectFolder, outputDataType |> OutputDataType.toFolderName) |> UMX.tag<fullPathToFolder>
+        Path.Combine(%pathToProjectFolder, outputDataType |> OutputDataType.toFolderName, replString) |> UMX.tag<fullPathToFolder>
 
     let makeOutputDataName (queryParams: queryParams) : string =
         let idPart = queryParams.Id.ToString()
@@ -53,7 +54,7 @@ module OutputDataFile =
             match queryParams.OutputDataType with
             | outputDataType.TextReport reportName -> sprintf "%s_%s.txt" %reportName (DateTime.Now.ToString("yyyyMMdd_HHmm"))
             | _ -> makeOutputDataName queryParams + ".msgpack"
-        let outputDataFolder = getPathToOutputDataFolder pathToProjectFolder queryParams.OutputDataType
+        let outputDataFolder = getPathToOutputDataFolder pathToProjectFolder queryParams.ReplAsString queryParams.OutputDataType
         Path.Combine(%outputDataFolder, fileNameWithExtension) |> UMX.tag<fullPathToFile>
 
     /// Helper to deserialize DTO and convert to domain.
@@ -235,12 +236,13 @@ module OutputDataFile =
             with e -> return Error (sprintf "Error loading file %s: %s" runFilePath e.Message)
         }
 
-    let getAllProjectRunParametersAsync
+    let getProjectRunParametersForReplAsync
                 (projectFolder: string<pathToProjectFolder>)
+                (repl: int<replNumber> option)
                 (ct: CancellationToken option)
                 (progress: IProgress<string> option) : Async<Result<runParameters[], string>> =
         async {
-            let folder = getPathToOutputDataFolder projectFolder outputDataType.RunParameters
+            let folder = getPathToOutputDataFolder projectFolder (repl |> queryParams.ReplString) outputDataType.RunParameters
             progress |> Option.iter (fun p -> p.Report(sprintf "Scanning directory: %s" %folder))
             let! filePathsRes = getFilesSortedByCreationTimeAsync %folder ct
             match filePathsRes with
@@ -271,4 +273,49 @@ module OutputDataFile =
                         else p.Report(sprintf "Successfully loaded all %d RunParameter files" successCount))
                     if errors.Length > 0 then return Error (String.concat "; " errors)
                     else return Ok results
+        }
+
+
+    let getProjectRunParametersForReplRangeAsync
+            (projectFolder: string<pathToProjectFolder>)
+            (minRepl: int<replNumber> option)
+            (maxRepl: int<replNumber> option) // Note: ensured unit matching
+            (ct: CancellationToken option)
+            (progress: IProgress<string> option) : Async<Result<runParameters[], string>> =
+        async {
+            // 1. Resolve replication range
+            let start = defaultArg minRepl 0<replNumber>
+            let stop = defaultArg maxRepl start
+        
+            let repls = [| %start .. (%stop - 1) |] |> Array.map UMX.tag<replNumber>
+        
+            progress |> Option.iter (fun p -> 
+                p.Report(sprintf "Starting bulk load for %d replicates (Range: %d to %d)" repls.Length %start %stop))
+
+            // 2. Map replicates to your existing async function
+            let! allResults = 
+                repls 
+                |> Array.map (fun r -> 
+                    getProjectRunParametersForReplAsync projectFolder (Some r) ct progress)
+                |> Async.Parallel
+
+            // 3. Aggregate Results
+            let successes = 
+                allResults 
+                |> Array.choose (function Ok rps -> Some rps | _ -> None) 
+                |> Array.concat
+
+            let errors = 
+                allResults 
+                |> Array.choose (function Error msg -> Some msg | _ -> None)
+
+            // 4. Final Reporting
+            if errors.Length > 0 then
+                let errorMsg = sprintf "Partial failure: %d replicate(s) failed. Errors: %s" errors.Length (String.concat " | " errors)
+                progress |> Option.iter (fun p -> p.Report errorMsg)
+                return Error errorMsg
+            else
+                progress |> Option.iter (fun p -> 
+                    p.Report(sprintf "Bulk load complete. Total parameters loaded: %d" successes.Length))
+                return Ok successes
         }

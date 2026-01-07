@@ -41,6 +41,8 @@ module TextReporters =
     let binReportExecutor
         (db: IGeneSortDb)
         (projectFolder: string<projectFolder>)
+        (minReplNumber: int<replNumber>)
+        (maxReplNumber: int<replNumber>)
         (buildQueryParams: runParameters -> outputDataType -> queryParams)
         (allowOverwrite: bool<allowOverwrite>)
         (cts: CancellationTokenSource) 
@@ -54,7 +56,7 @@ module TextReporters =
 
             // 1. Get Parameters (Handles Error track automatically)
             let! runParamsArray = 
-                db.getAllProjectRunParametersAsync projectFolder (Some cts.Token) progress
+                db.getProjectRunParametersForReplRangeAsync  projectFolder (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
 
             // 2. Initialize DataTable
             let initialTable = 
@@ -99,6 +101,8 @@ module TextReporters =
     let ceUseProfileReportExecutor
         (db: IGeneSortDb)
         (projectFolder: string<projectFolder>) 
+        (minReplNumber: int<replNumber>)
+        (maxReplNumber: int<replNumber>)
         (buildQueryParams: runParameters -> outputDataType -> queryParams)
         (allowOverwrite: bool<allowOverwrite>)
         (cts: CancellationTokenSource) 
@@ -113,7 +117,7 @@ module TextReporters =
 
             // 1. Get Parameters (automatically handles Error exit)
             let! runParamsArray = 
-                db.getAllProjectRunParametersAsync projectFolder (Some cts.Token) progress
+                db.getProjectRunParametersForReplRangeAsync projectFolder (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
 
             // 2. Setup Initial DataTable
             let initialTable = 

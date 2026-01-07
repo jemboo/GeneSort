@@ -19,8 +19,10 @@ type IGeneSortDb =
     abstract member saveAsync : string<projectFolder> -> queryParams -> outputData -> bool<allowOverwrite> -> Async<Result<unit, string>>
     abstract member loadAsync : string<projectFolder> -> queryParams -> Async<Result<outputData, OutputError>>
     abstract member getAllProjectNamesAsync : unit -> Async<Result<string<projectName>[], string>>
-    abstract member getAllProjectRunParametersAsync :
+    abstract member getProjectRunParametersForReplRangeAsync :
             string<projectFolder> ->
+            int<replNumber> option ->
+            int<replNumber> option ->
             CancellationToken option ->
             IProgress<string> option ->
             Async<Result<runParameters[], string>>

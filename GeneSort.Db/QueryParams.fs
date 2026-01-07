@@ -23,13 +23,18 @@ type queryParams =
     static member ReplString (repl:int<replNumber> option) = 
             match repl with
                | Some r -> (%r).ToString()
-               | None -> "None"
+               | None -> ""
 
-    member this.OutputDataType = this.outputDataType
+    member this.Id with get() : Guid<idValue> = this.idCache.Value |> UMX.tag<idValue>
 
-    member this.Properties = this.properties
+    member this.OutputDataType with get() = this.outputDataType
 
-    member this.Id : Guid<idValue> = this.idCache.Value |> UMX.tag<idValue>
+    member this.Properties with get() = this.properties
+    
+    member this.Repl with get() = this.repl
+
+    member this.ReplAsString with get() : string =
+        queryParams.ReplString this.repl
 
     member this.ToString : string =
         let projStr = this.projectName |> queryParams.ProjectNameString

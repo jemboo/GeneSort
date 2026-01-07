@@ -21,6 +21,7 @@ module ProjectOps =
             let repl = runParameters.GetRepl().Value
             try
                 report progress (runParameters |> RunParameters.reportKvps)
+                report progress ""
                 return Success (id, repl, "")
             with e ->
                 let msg = $"{e.GetType().Name}: {e.Message}"
@@ -47,9 +48,11 @@ module ProjectOps =
     
             // 1. Check if already done (Synchronous check remains the same)
             if runParameters.IsRunFinished() |> Option.defaultValue false then
-                return Skipped (runId, repl, sprintf "already finished: %s" (runParameters |> RunParameters.reportKvps))
+                let runRes = Skipped (runId, repl, sprintf "\n%s" (sprintf "%s\n" (runParameters |> RunParameters.reportKvps)) )
+                ProgressMessage.reportRunResult progress runRes
+                return runRes
             else
-                report progress (sprintf "%s Run %s Repl %d started %s" (MathUtils.getTimestampString()) (%runId.ToString()) %repl (runParameters |> RunParameters.reportKvps))
+                report progress (sprintf "%s Run %s Repl %d started %s" (MathUtils.getTimestampString()) (%runId.ToString()) %repl (sprintf "%s\n" (runParameters |> RunParameters.reportKvps)))
                 // 2. Use the builder to handle the execution + status save sequence
                 let! finalResult = asyncResult {
                     // Execute the main work
@@ -173,7 +176,7 @@ module ProjectOps =
             (buildQueryParams: runParameters -> outputDataType -> queryParams)
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource)
-            (progress: IProgress<string> option)          : Async<Result<unit, string>> =
+            (progress: IProgress<string> option) : Async<Result<unit, string>> =
         async {
             try
                 report progress (sprintf "%s Saving RunParameter files in %s" (MathUtils.getTimestampString()) %projectFolder)
@@ -222,7 +225,7 @@ module ProjectOps =
                                 runParametersArray buildQueryParams 
                                 allowOverwrite cts progress
             with e ->
-                let errorMsg = sprintf "Failed to initialize project files: %s" e.Message
+                let errorMsg = sprintf "Failed to initialize project files: %s\n" e.Message
                 report progress errorMsg
                 return Error errorMsg
         }
@@ -231,21 +234,23 @@ module ProjectOps =
     let printRunParams
             (db: IGeneSortDb)
             (projectFolder: string<projectFolder>)
+            (minReplNumber: int<replNumber>)
+            (maxReplNumber: int<replNumber>)
             (cts: CancellationTokenSource)
             (progress: IProgress<string> option)
                                : Async<Result<RunResult[], string>> =
         asyncResult {
             try
-                report progress (sprintf "Reporting Runs from %s" %projectFolder)
+                report progress (sprintf "Reporting Runs from %s\n" %projectFolder)
 
                 // 1. Load Parameters (Auto-handles Error short-circuit)
                 let! runParametersArray = 
-                    db.getAllProjectRunParametersAsync projectFolder (Some cts.Token) progress
+                    db.getProjectRunParametersForReplRangeAsync projectFolder (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
 
-                report progress (sprintf "Found %d runs to report" runParametersArray.Length)
+                report progress (sprintf "Found %d runs to report\n" runParametersArray.Length)
 
                 if runParametersArray.Length = 0 then
-                    report progress "No runs found to report"
+                    report progress "No runs found to report\n"
                     return [||]
                 else
                 let maxDegreeOfParallelism = 1
@@ -278,6 +283,8 @@ module ProjectOps =
     let executeRuns
             (db: IGeneSortDb)
             (projectFolder: string<projectFolder>)
+            (minRepl: int<replNumber>)
+            (maxRepl: int<replNumber>)
             (buildQueryParams: runParameters -> outputDataType -> queryParams)
             (projectName: string<projectName>)
             (allowOverwrite: bool<allowOverwrite>)
@@ -291,13 +298,13 @@ module ProjectOps =
     
         asyncResult {
             try
-                report progress (sprintf "%s Executing Runs for %s" (MathUtils.getTimestampString()) %projectName)
+                report progress (sprintf "%s Executing Runs for %s\n" (MathUtils.getTimestampString()) %projectName)
 
                 // 1. Load Parameters
                 let! runParametersArray = 
-                    db.getAllProjectRunParametersAsync projectFolder (Some cts.Token) progress
+                    db.getProjectRunParametersForReplRangeAsync projectFolder (Some minRepl) (Some maxRepl) (Some cts.Token) progress
 
-                report progress (sprintf "Found %d runs to execute" runParametersArray.Length)
+                report progress (sprintf "Found %d runs to execute\n" runParametersArray.Length)
 
                 if runParametersArray.Length = 0 then
                     report progress "No runs found to execute"
@@ -314,7 +321,7 @@ module ProjectOps =
 
             with e ->
                 // Consistent with your executors, handle the unexpected
-                let msg = sprintf "%s Fatal error executing runs: %s" (MathUtils.getTimestampString()) e.Message
+                let msg = sprintf "%s Fatal error executing runs: %s\n" (MathUtils.getTimestampString()) e.Message
                 report progress msg
                 return! async { return Error msg }
         }
