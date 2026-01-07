@@ -27,10 +27,10 @@ module SortableTests =
         | Ints intTest -> intTest.Id
         | Bools boolTest -> boolTest.Id
 
-    let getCount (test: sortableTests) =
+    let getSortableCount (test: sortableTests) =
         match test with
-        | Ints intTest -> intTest.Count
-        | Bools boolTest -> boolTest.Count
+        | Ints intTest -> intTest.SoratbleCount
+        | Bools boolTest -> boolTest.SoratbleCount
 
     let getUnsortedCount (test: sortableTests) =
         match test with

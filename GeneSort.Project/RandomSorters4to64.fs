@@ -283,7 +283,6 @@ module RandomSorters4to64 =
                     p.Report(sprintf "Saved SorterModelSetMaker %s for run: %s" (%sorterModelSetMaker.Id.ToString()) %runId))
 
                 // 5. Final Return
-                report progress (sprintf "%s Finished Run %s Repl %d" (MathUtils.getTimestampString()) %runId %repl)
                 return runParameters.WithRunFinished (Some true)
 
             with e -> 

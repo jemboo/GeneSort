@@ -35,7 +35,7 @@ type sortableIntTests =
 
     member this.SortableArrayType with get() = sortableDataType.Ints
 
-    member this.Count with get() = this.sortableIntArrays.Length
+    member this.SoratbleCount with get() = this.sortableIntArrays.Length |> UMX.tag<sortableCount>
 
     member this.Id with get() = this.id
     

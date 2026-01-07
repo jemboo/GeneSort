@@ -34,7 +34,7 @@ type sortableBoolTests =
         hash this.sortableBoolArrays
 
 
-    member this.Count with get() = this.sortableBoolArrays.Length
+    member this.SoratbleCount with get() = this.sortableBoolArrays.Length  |> UMX.tag<sortableCount>
 
     member this.Id with get() = this.id
     

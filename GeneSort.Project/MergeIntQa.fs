@@ -298,7 +298,6 @@ module MergeIntQa =
 
 
                 // 7. Success
-                report progress (sprintf "%s Finished Run %s Repl %d" (MathUtils.getTimestampString()) %runId %repl)
                 return runParameters.WithRunFinished (Some true)
 
 

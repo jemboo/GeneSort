@@ -44,11 +44,12 @@ module ProjectOps =
         async {
             let runId = runParameters.GetId() |> Option.defaultValue ( Guid.Empty |> UMX.tag<idValue>)
             let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
-        
+    
             // 1. Check if already done (Synchronous check remains the same)
             if runParameters.IsRunFinished() |> Option.defaultValue false then
-                return Skipped (runId, repl, "already finished")
+                return Skipped (runId, repl, sprintf "already finished: %s" (runParameters |> RunParameters.reportKvps))
             else
+                report progress (sprintf "%s Run %s Repl %d started %s" (MathUtils.getTimestampString()) (%runId.ToString()) %repl (runParameters |> RunParameters.reportKvps))
                 // 2. Use the builder to handle the execution + status save sequence
                 let! finalResult = asyncResult {
                     // Execute the main work
@@ -65,14 +66,15 @@ module ProjectOps =
 
                 // 3. Map the AsyncResult back to the RunResult DU
                 match finalResult with
-                | Ok _ ->
-                    let res = Success (runId, repl, "")
-                    ProgressMessage.reportRunResult progress res
-                    return res
+                | Ok newRunParams ->
+                    let runRes = Success (runId, repl, (newRunParams |> RunParameters.reportKvps))
+                    ProgressMessage.reportRunResult progress runRes
+                    return runRes
                 | Error msg ->
-                    let res = Failure (runId, repl, msg)
-                    ProgressMessage.reportRunResult progress res
-                    return res
+                    let msgFail = sprintf "%s %s" msg (runParameters |> RunParameters.reportKvps)
+                    let runRes = Failure (runId, repl, msgFail)
+                    ProgressMessage.reportRunResult progress runRes
+                    return runRes
         }
 
 

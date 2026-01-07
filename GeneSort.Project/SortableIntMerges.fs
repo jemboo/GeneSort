@@ -9,6 +9,7 @@ open GeneSort.Sorter
 open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.Model.Sortable
+open GeneSort.Sorter.Sortable
 
 module SortableIntMerges =
 
@@ -166,17 +167,17 @@ module SortableIntMerges =
                     |> sortableTestModel.MsasMi
             
                 let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataType
+                let newRunParams = runParams.WithSortableCount (sortableTests |> SortableTests.getSortableCount |> Some)
 
                 // 4. Save
                 let! _ = checkCancellation cts.Token
-                let qpForSortableTest = makeQueryParamsFromRunParams runParams (outputDataType.SortableTest "") 
+                let qpForSortableTest = makeQueryParamsFromRunParams newRunParams (outputDataType.SortableTest "") 
             
                 // The builder automatically handles short-circuiting if saveAsync returns Error
                 let! _ = db.saveAsync projectFolder qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
 
                 // 5. Success
-                progress |> Option.iter (fun p -> p.Report(sprintf "%s Run %s generation completed and saved." (MathUtils.getTimestampString()) %runId))
-                return runParams.WithRunFinished (Some true)
+                return newRunParams.WithRunFinished (Some true)
 
             with e ->
                 let runId = runParams |> RunParameters.getIdString

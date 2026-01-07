@@ -27,6 +27,7 @@ type runParameters =
     static member sorterModelTypeKey = "SorterModelType"
     static member sortableArrayTypeKey = "SortableArrayType"
     static member sortingWidthKey = "SortingWidth"
+    static member sortableCountKey = "SortableCount"
     static member sortableDataTypeKey = "SortingWidthDataType"
     static member mergeDimensionKey = "MergeDimension"
     static member mergeFillTypeKey = "MergeFillType"
@@ -60,6 +61,7 @@ type runParameters =
     member this.GetMaxOrbit() = runParameters.tryGetInt runParameters.maxOrbitKey this.paramMap
     member this.GetStageLength() = runParameters.tryGetInt runParameters.stageLengthKey this.paramMap |> Option.map UMX.tag<stageLength>
     member this.GetCeLength() = runParameters.tryGetInt runParameters.ceLengthKey this.paramMap |> Option.map UMX.tag<ceLength>
+    member this.GetSortableCount() = runParameters.tryGetInt runParameters.sortableCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     member this.GetSorterCount() = runParameters.tryGetInt runParameters.sorterCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     
     member this.GetProjectName() = this.paramMap.TryFind runParameters.projectNameKey |> Option.map UMX.tag<projectName>
@@ -105,14 +107,17 @@ type runParameters =
     member this.WithMaxOrbit(mo: int option) = 
         { paramMap = this.paramMap |> runParameters.addIfSome runParameters.maxOrbitKey (mo |> Option.map string) }
 
+    member this.WithSortableCount(sc: int<sortableCount> option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.sortableCountKey (sc |> Option.map UmxExt.intToRaw) }
+
+    member this.WithSortableDataType(sdt: sortableDataType option) = 
+        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.sortableDataTypeKey (sdt |> Option.map SortableDataType.toString) }
+
     member this.WithSorterCount(sc: int<sorterCount> option) = 
         { paramMap = this.paramMap |> runParameters.addIfSome runParameters.sorterCountKey (sc |> Option.map UmxExt.intToRaw) }
 
     member this.WithSorterModelType(smt: sorterModelType option) = 
         { paramMap = this.paramMap |> runParameters.addIfSome runParameters.sorterModelTypeKey (smt |> Option.map SorterModelType.toString) }
-
-    member this.WithSortableDataType(sdt: sortableDataType option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.sortableDataTypeKey (sdt |> Option.map SortableDataType.toString) }
 
     member this.WithSortingWidth(w: int<sortingWidth> option) = 
         { paramMap = this.paramMap |> runParameters.addIfSome runParameters.sortingWidthKey (w |> Option.map UmxExt.intToRaw) }

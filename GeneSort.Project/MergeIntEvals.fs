@@ -261,7 +261,6 @@ module MergeIntEvals =
                 let! _ = db.saveAsync projectFolder qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
                 // 7. Success
-                report progress (sprintf "%s Finished Run %s Repl %d" (MathUtils.getTimestampString()) %runId %repl)
                 return runParameters.WithRunFinished (Some true)
 
             with e ->
