@@ -64,14 +64,14 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 
 
 ///// **********     SortableIntMerges   ****************
-//let project = SortableIntMerges.project
-//let executor = SortableIntMerges.executor
-//let projectName = SortableIntMerges.projectName
-//let projectFolder = SortableIntMerges.projectFolder
-//let buildQueryParams = SortableIntMerges.makeQueryParamsFromRunParams
-//let paramRefiner = SortableIntMerges.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 2<replNumber>
+let project = SortableIntMerges.project
+let executor = SortableIntMerges.executor
+let projectName = SortableIntMerges.projectName
+let projectFolder = SortableIntMerges.projectFolder
+let buildQueryParams = SortableIntMerges.makeQueryParamsFromRunParams
+let paramRefiner = SortableIntMerges.paramMapRefiner
+let minReplica = 3<replNumber>
+let maxReplica = 4<replNumber>
 
 
 /// **********     MergeIntQa   ****************
@@ -86,14 +86,14 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 
 
 ///// **********    FullBoolEvals   ****************
-let executor = FullBoolEvals.executor
-let project = FullBoolEvals.project
-let projectName = FullBoolEvals.project.ProjectName
-let projectFolder = FullBoolEvals.projectFolder
-let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
-let paramRefiner = FullBoolEvals.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+//let executor = FullBoolEvals.executor
+//let project = FullBoolEvals.project
+//let projectName = FullBoolEvals.project.ProjectName
+//let projectFolder = FullBoolEvals.projectFolder
+//let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
+//let paramRefiner = FullBoolEvals.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 

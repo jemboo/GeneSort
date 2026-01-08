@@ -47,7 +47,7 @@ module ProjectOps =
             let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
     
             // 1. Check if already done (Synchronous check remains the same)
-            if runParameters.IsRunFinished() |> Option.defaultValue false then
+            if runParameters.GetRunFinished() |> Option.defaultValue false then
                 let runRes = Skipped (runId, repl, sprintf "\n%s" (sprintf "%s\n" (runParameters |> RunParameters.reportKvps)) )
                 ProgressMessage.reportRunResult progress runRes
                 return runRes

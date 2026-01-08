@@ -18,23 +18,26 @@ type runParameters =
         { paramMap = paramMap }
 
     // Constants for consistency
-    static member idKey = "Id"
-    static member replKey = "Repl"
+    static member ceLengthKey = "CeLength"
     static member generationKey = "Generation"
-    static member runFinishedKey = "RunFinished"
+    static member idKey = "Id"
+    static member latticeDistanceKey = "LatticeDistance"
     static member maxOrbitKey = "MaxOrbit"
+    static member mergeDimensionKey = "MergeDimension"
+    static member mergeFillTypeKey = "MergeFillType"
+    static member projectNameKey = "ProjectName"
+    static member replKey = "Repl"
+    static member runFinishedKey = "RunFinished"
     static member sorterCountKey = "SorterCount"
     static member sorterModelTypeKey = "SorterModelType"
     static member sortableArrayTypeKey = "SortableArrayType"
     static member sortingWidthKey = "SortingWidth"
     static member sortableCountKey = "SortableCount"
     static member sortableDataTypeKey = "SortingWidthDataType"
-    static member mergeDimensionKey = "MergeDimension"
-    static member mergeFillTypeKey = "MergeFillType"
     static member stageLengthKey = "StageLength"
-    static member ceLengthKey = "CeLength"
-    static member projectNameKey = "ProjectName"
-    static member textReportNameKey = "ReportName"
+    static member textReportNameKey = "TextReportName"
+
+
 
     // Private Parsing Helpers
     static member private tryGetGuid (key: string) (map: Map<string, string>) =
@@ -54,29 +57,31 @@ type runParameters =
         | Some v -> Map.add key v map
         | None   -> Map.remove key map
 
-    member this.ParamMap = this.paramMap
+    member this.ParamMap with get() = this.paramMap
 
     // --- Getters ---
-    member this.GetId() = runParameters.tryGetGuid runParameters.idKey this.paramMap |> Option.map UMX.tag<idValue>
-    member this.GetRepl() = runParameters.tryGetInt runParameters.replKey this.paramMap |> Option.map UMX.tag<replNumber>
-    member this.GetGeneration() = runParameters.tryGetInt runParameters.generationKey this.paramMap |> Option.map UMX.tag<generationNumber>
-    member this.IsRunFinished() = runParameters.tryGetBool runParameters.runFinishedKey this.paramMap
-    member this.GetSortingWidth() = runParameters.tryGetInt runParameters.sortingWidthKey this.paramMap |> Option.map UMX.tag<sortingWidth>
-    member this.GetMergeDimension() = runParameters.tryGetInt runParameters.mergeDimensionKey this.paramMap |> Option.map UMX.tag<mergeDimension>
-    member this.GetMaxOrbit() = runParameters.tryGetInt runParameters.maxOrbitKey this.paramMap
-    member this.GetStageLength() = runParameters.tryGetInt runParameters.stageLengthKey this.paramMap |> Option.map UMX.tag<stageLength>
     member this.GetCeLength() = runParameters.tryGetInt runParameters.ceLengthKey this.paramMap |> Option.map UMX.tag<ceLength>
+    member this.GetGeneration() = runParameters.tryGetInt runParameters.generationKey this.paramMap |> Option.map UMX.tag<generationNumber>
+    member this.GetId() = runParameters.tryGetGuid runParameters.idKey this.paramMap |> Option.map UMX.tag<idValue>
+    member this.GetLatticeDistance() = runParameters.tryGetInt runParameters.latticeDistanceKey this.paramMap |> Option.map UMX.tag<latticeDistance>
+    member this.GetMaxOrbit() = runParameters.tryGetInt runParameters.maxOrbitKey this.paramMap
+    member this.GetMergeDimension() = runParameters.tryGetInt runParameters.mergeDimensionKey this.paramMap |> Option.map UMX.tag<mergeDimension>
+    
+    member this.GetMergeFillType() = 
+        this.paramMap.TryFind runParameters.mergeFillTypeKey |> Option.bind (fun v -> try Some (MergeFillType.fromString v) with _ -> None)
+    member this.GetProjectName() = this.paramMap.TryFind runParameters.projectNameKey |> Option.map UMX.tag<projectName>
+    member this.GetRepl() = runParameters.tryGetInt runParameters.replKey this.paramMap |> Option.map UMX.tag<replNumber>
+    member this.GetRunFinished() = runParameters.tryGetBool runParameters.runFinishedKey this.paramMap
+    member this.GetSortingWidth() = runParameters.tryGetInt runParameters.sortingWidthKey this.paramMap |> Option.map UMX.tag<sortingWidth>
+    member this.GetStageLength() = runParameters.tryGetInt runParameters.stageLengthKey this.paramMap |> Option.map UMX.tag<stageLength>
     member this.GetSortableCount() = runParameters.tryGetInt runParameters.sortableCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     member this.GetSorterCount() = runParameters.tryGetInt runParameters.sorterCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     
-    member this.GetProjectName() = this.paramMap.TryFind runParameters.projectNameKey |> Option.map UMX.tag<projectName>
     member this.GetTextReportName() = this.paramMap.TryFind runParameters.textReportNameKey |> Option.map UMX.tag<textReportName>
 
     member this.GetSorterModelType() = 
         this.paramMap.TryFind runParameters.sorterModelTypeKey |> Option.bind (fun v -> try Some (SorterModelType.fromString v) with _ -> None)
-    
-    member this.GetMergeFillType() = 
-        this.paramMap.TryFind runParameters.mergeFillTypeKey |> Option.bind (fun v -> try Some (MergeFillType.fromString v) with _ -> None)
+
 
     member this.GetSortableDataType() = 
         this.paramMap.TryFind runParameters.sortableDataTypeKey |> Option.bind (fun v -> try Some (SortableDataType.fromString v) with _ -> None)
@@ -99,6 +104,9 @@ type runParameters =
 
     member this.WithId(id: Guid<idValue> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.idKey (id |> Option.map UmxExt.guidToRaw) }
+
+    member this.WithLatticeDistance(ld: int<latticeDistance> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.latticeDistanceKey (ld |> Option.map UmxExt.intToRaw) }
 
     member this.WithRepl(repl: int<replNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.replKey (repl |> Option.map UmxExt.intToRaw) }

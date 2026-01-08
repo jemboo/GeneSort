@@ -16,7 +16,6 @@ type latticePoint =
     with
         static member create(arr: int[]) = 
             let copy = Array.copy arr
-            // Use Span-based hashing for speed if available, or manual loop
             let mutable h = 17
             for x in copy do h <- h * 31 + x
             { coords = copy; hashCode = h }
@@ -49,17 +48,6 @@ type latticePoint =
 
 module LatticePoint =
 
-    /// Predicate: true iff latticePoint's coords are non-decreasing
-    let isNonDecreasing0 (p:latticePoint) =
-        let a = p.coords
-        let n = a.Length
-        let mutable i = 0
-        let mutable ok = true
-        while i < n - 1 && ok do
-            if a.[i] > a.[i+1] then ok <- false
-            i <- i + 1
-        ok
-
     let isNonDecreasing (p: latticePoint) =
         let span = ReadOnlySpan(p.Coords)
         let mutable ok = true
@@ -81,13 +69,6 @@ module LatticePoint =
                 i <- i + 1
             ok
     
-    let latticePointHash (p:latticePoint) : int =
-        let mutable h = 17
-        for x in p.coords do
-            h <- (h * 31) + x
-        h
-
-
     /// Generate all lattice points where each coordinate is in 0..maxValue
     let latticeCube 
             (dim:int<latticeDimension>) 
@@ -119,7 +100,7 @@ module LatticePoint =
     /// Generates all lattice points of length dim whose entries:
     /// • sum to latticelevel
     /// • lie in 0 .. maxDistance
-    let boundedLevelSet 
+    let getLevelSet 
                 (dim:int<latticeDimension>) 
                 (latticelevel:int<latticeDistance>) 
                 (edgeLength:int<latticeDistance>) : seq<latticePoint> =
@@ -155,11 +136,11 @@ module LatticePoint =
     /// Generates all lattice points of length dim whose entries:
     /// • sum to levelSum
     /// • lie in 0 .. maxValue
-    let boundedLevelSetVV 
+    let getLevelSetVV 
                     (dim:int<latticeDimension>) 
                     (latticelevel:int<latticeDistance>) 
                     (maxDistance:int<latticeDistance>) : seq<latticePoint> =
-        boundedLevelSet dim latticelevel maxDistance |> Seq.filter isNonDecreasing
+        getLevelSet dim latticelevel maxDistance |> Seq.filter isNonDecreasing
 
 
 

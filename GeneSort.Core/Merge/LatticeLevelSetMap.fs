@@ -31,8 +31,8 @@ type latticeLevelSetMap =
         // Determine which keyMaker to use based on strategy
         let keyMaker = 
             match strategy with
-            | coverType.FullCover -> LatticePoint.boundedLevelSet
-            | coverType.VVCover   -> LatticePoint.boundedLevelSetVV
+            | coverType.FullCover -> LatticePoint.getLevelSet
+            | coverType.VVCover   -> LatticePoint.getLevelSetVV
             | _ -> failwith "Unknown cover strategy"
 
         let centerSideMap = Dictionary<latticePoint, latticePoint list>()
@@ -221,7 +221,7 @@ module LatticeLevelSetMap =
             for edgeLength in edgeLengths do
                 let sortingWidth = (%dim * %edgeLength) |> UMX.tag<latticeDistance>
                 let level = (%sortingWidth / 2) |> UMX.tag<latticeDistance>
-                let levelSetPointsVV = LatticePoint.boundedLevelSetVV dim level edgeLength |> Seq.toArray
+                let levelSetPointsVV = LatticePoint.getLevelSetVV dim level edgeLength |> Seq.toArray
                 printfn "%d\t%d\t%d\t%d\t%d" (%sortingWidth) (%dim) (%level) (%edgeLength) (levelSetPointsVV.Length)
                 //let level2 = (24 + (%sortingWidth / 2)) |> UMX.tag<latticeDistance>
                 //let levelSetPointsVV2 = LatticePoint.boundedLevelSetVV dim level2 edgeLength |> Seq.toArray
