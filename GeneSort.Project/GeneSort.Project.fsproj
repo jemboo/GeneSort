@@ -13,7 +13,7 @@
     <Compile Include="ProjectOps.fs" />
     <Compile Include="TextReporters.fs" />
     <Compile Include="PermutationOrbits.fs" />
-    <Compile Include="RandomSorters4to64.fs" />
+    <Compile Include="RandomSorters.fs" />
     <Compile Include="FullBoolEvals.fs" />
     <Compile Include="SortableIntMerges.fs" />
     <Compile Include="MergeIntEvals.fs" />

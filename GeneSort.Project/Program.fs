@@ -41,13 +41,24 @@ let allowOverwrite = false |> UMX.tag<allowOverwrite>
 let maxParallel = 4 // Set a reasonable limit for your machine
 
 
-///// **********     RandomSorters4to64   ****************
-//let executor = RandomSorters4to64.executor
-//let project = RandomSorters4to64.project
-//let projectName = RandomSorters4to64.project.ProjectName
-//let projectFolder = RandomSorters4to64.projectFolder
-//let buildQueryParams = RandomSorters4to64.makeQueryParamsFromRunParams
-//let paramRefiner = RandomSorters4to64.paramMapRefiner
+///// **********     RandomSorters   ****************
+//let executor = RandomSorters.executor
+//let project = RandomSorters.project
+//let projectName = RandomSorters.project.ProjectName
+//let projectFolder = RandomSorters.projectFolder
+//let buildQueryParams = RandomSorters.makeQueryParamsFromRunParams
+//let paramRefiner = RandomSorters.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
+
+
+///// **********     SortableIntMerges   ****************
+//let project = SortableIntMerges.project
+//let executor = SortableIntMerges.executor
+//let projectName = SortableIntMerges.projectName
+//let projectFolder = SortableIntMerges.projectFolder
+//let buildQueryParams = SortableIntMerges.makeQueryParamsFromRunParams
+//let paramRefiner = SortableIntMerges.paramMapRefiner
 //let minReplica = 0<replNumber>
 //let maxReplica = 1<replNumber>
 
@@ -62,16 +73,6 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 //let minReplica = 0<replNumber>
 //let maxReplica = 1<replNumber>
 
-
-///// **********     SortableIntMerges   ****************
-//let project = SortableIntMerges.project
-//let executor = SortableIntMerges.executor
-//let projectName = SortableIntMerges.projectName
-//let projectFolder = SortableIntMerges.projectFolder
-//let buildQueryParams = SortableIntMerges.makeQueryParamsFromRunParams
-//let paramRefiner = SortableIntMerges.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
 
 
 /// **********     MergeIntQa   ****************

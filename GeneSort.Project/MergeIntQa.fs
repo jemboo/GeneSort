@@ -173,9 +173,7 @@ module MergeIntQa =
         
     let outputDataTypes = 
             [|  
-                outputDataType.RunParameters;              
-                outputDataType.SorterModelSetMaker "";
-                outputDataType.SorterSet "";
+                outputDataType.RunParameters;
                 outputDataType.SorterSetEval "";
                 outputDataType.TextReport ("Profiles" |> UMX.tag<textReportName>); 
             |]
@@ -231,36 +229,16 @@ module MergeIntQa =
                                         (Some sortableDataType) 
                                         (outputDataType.SortableTest "")
 
-                report progress (sprintf "%s: %s" runId  qpTests.ToString)
+                // 4. Load Sorter Set (Cross-project query)
+                let qpSorters = RandomSorters.makeQueryParams 
+                                        (Some repl) 
+                                        (Some sortingWidth) 
+                                        (Some sModel) 
+                                        (outputDataType.SorterSet "")
+                let! rawSorterData = db.loadAsync RandomSorters.projectFolder qpSorters
+                let! sorterSet = rawSorterData |> OutputData.asSorterSet
                 let! rawTestData = db.loadAsync SortableIntMerges.projectFolder qpTests 
                 let! sortableTest = rawTestData |> OutputData.asSortableTest
-
-                // 4. Make the sorterSet
-                let sorterModelMaker =
-                    match sModel with
-                    | sorterModelType.Mcse -> 
-                        (MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength) 
-                        |> sorterModelMaker.SmmMsceRandGen
-                    | sorterModelType.Mssi -> 
-                        (MssiRandGen.create randomType sortingWidth stageLength) 
-                        |> sorterModelMaker.SmmMssiRandGen
-                    | sorterModelType.Msrs -> 
-                        let opsGenRatesArray = OpsGenRatesArray.createUniform %stageLength
-                        (msrsRandGen.create randomType sortingWidth opsGenRatesArray) 
-                        |> sorterModelMaker.SmmMsrsRandGen
-                    | sorterModelType.Msuf4 -> 
-                        let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageLength %sortingWidth
-                        (msuf4RandGen.create randomType sortingWidth stageLength uf4GenRatesArray) 
-                        |> sorterModelMaker.SmmMsuf4RandGen
-                    | sorterModelType.Msuf6 -> 
-                        let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
-                        (msuf6RandGen.create randomType sortingWidth stageLength uf6GenRatesArray) 
-                        |> sorterModelMaker.SmmMsuf6RandGen
-        
-                let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-                let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
-                let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
-                let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
 
                 let! _ = checkCancellation cts.Token
 
@@ -271,19 +249,8 @@ module MergeIntQa =
                 let! _ = checkCancellation cts.Token
 
                 // 6. Save
-
-                // Save sorter set
-                let queryParamsForSorterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "")
-                let! _ = db.saveAsync projectFolder queryParamsForSorterSet (sorterSet |> outputData.SorterSet) allowOverwrite
-
-                // Save sorterSetEval
                 let queryParamsForSorterSetEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
                 let! _ = db.saveAsync projectFolder queryParamsForSorterSetEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
-
-                // Save sorterModelSetMaker
-                let queryParamsForSorterModelSetMaker = makeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSetMaker "")
-                let! _ = db.saveAsync projectFolder queryParamsForSorterModelSetMaker (sorterModelSetMaker |> outputData.SorterModelSetMaker) allowOverwrite
-
 
                 // 7. Success
                 return runParameters.WithRunFinished (Some true)

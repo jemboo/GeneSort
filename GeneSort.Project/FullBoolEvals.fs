@@ -150,8 +150,8 @@ module FullBoolEvals =
                     } |> Result.ofOption (sprintf "Run %s, Repl %d: Missing required parameters" %runId %repl)
 
                 // 3. Load SorterSet
-                let qpSorters = RandomSorters4to64.makeQueryParams (Some repl) (Some sortingWidth) (Some sorterModelType) (outputDataType.SorterSet "")
-                let! loadRes = db.loadAsync RandomSorters4to64.projectFolder qpSorters
+                let qpSorters = RandomSorters.makeQueryParams (Some repl) (Some sortingWidth) (Some sorterModelType) (outputDataType.SorterSet "")
+                let! loadRes = db.loadAsync RandomSorters.projectFolder qpSorters
 
                 let! ss = loadRes |> OutputData.asSorterSet |> asAsync
 
