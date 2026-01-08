@@ -47,24 +47,6 @@ module FullBoolEvals =
             outputDataType
 
 
-    let sortingWidthValues = 
-        [4; 6; 8; 12; ] |> List.map(fun d -> d.ToString())
-
-    let sortingWidths() : string*string list =
-        (runParameters.sortingWidthKey, sortingWidthValues)
-        
-    let sorterModelKeyValues() : string list =
-        [ sorterModelType.Mcse; 
-          sorterModelType.Mssi;
-          sorterModelType.Msrs; 
-          sorterModelType.Msuf4; 
-          sorterModelType.Msuf6; ]  |> List.map(SorterModelType.toString)
-
-    let sorterModelKeys() : string*string list =
-        (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
-
-
-
     let sorterModelTypeForSortingWidth (rp: runParameters) =
         let sorterModelKey = rp.GetSorterModelType().Value
         let sortingWidth = rp.GetSortingWidth().Value
@@ -98,8 +80,6 @@ module FullBoolEvals =
               .WithSortableDataType(Some sortableDataType)
               .WithId (Some qp.Id)
 
-
-
         seq {
             for runParameters in runParametersSeq do
                     let filtrate = paramMapFilter runParameters
@@ -108,6 +88,22 @@ module FullBoolEvals =
                         yield retVal
         }
 
+    
+    let sortingWidthValues = 
+        [4; 6; 8; 12; ] |> List.map(fun d -> d.ToString())
+
+    let sortingWidths() : string*string list =
+        (runParameters.sortingWidthKey, sortingWidthValues)
+        
+    let sorterModelKeyValues() : string list =
+        [ sorterModelType.Mcse; 
+          sorterModelType.Mssi;
+          sorterModelType.Msrs; 
+          sorterModelType.Msuf4; 
+          sorterModelType.Msuf6; ]  |> List.map(SorterModelType.toString)
+
+    let sorterModelKeys() : string*string list =
+        (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
 
     let parameterSpans = 
         [ sortingWidths(); sorterModelKeys();]
@@ -118,8 +114,6 @@ module FullBoolEvals =
                 outputDataType.SorterSetEval "";
                 outputDataType.TextReport ("Bins" |> UMX.tag<textReportName>); 
                 outputDataType.TextReport ("Profiles" |> UMX.tag<textReportName>); 
-                outputDataType.TextReport ("Report3" |> UMX.tag<textReportName>); 
-                outputDataType.TextReport ("Report4" |> UMX.tag<textReportName>);
             |]
 
 

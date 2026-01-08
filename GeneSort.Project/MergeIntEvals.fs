@@ -57,34 +57,51 @@ module MergeIntEvals =
             (runParams.GetMergeDimension())
             (runParams.GetMergeFillType())
 
-        
-    let getSorterCountForSortingWidth (factor:int) (sortingWidth: int<sortingWidth>) : int<sorterCount> =
-        match %sortingWidth with
-        | 4 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 6 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 8 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 12 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 16 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 24 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 32 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 48 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 64 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 96 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 128 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 192 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 256 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 384 -> (4 * factor) |> UMX.tag<sorterCount>
-        | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
 
-    let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageLength> =
-        match %sortingWidth with
-        | 16 -> 400 |> UMX.tag<stageLength>
-        | 24 -> 1800 |> UMX.tag<stageLength>
-        | 32 -> 10000 |> UMX.tag<stageLength>
-        | 48 -> 15000 |> UMX.tag<stageLength>
-        | 64 -> 25000 |> UMX.tag<stageLength>
-        | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
+    let sorterModelTypeForSortingWidth (rp: runParameters) =
+        let sorterModelKey = rp.GetSorterModelType().Value
+        let sortingWidth = rp.GetSortingWidth().Value
+        let has2factor = (%sortingWidth % 2 = 0)
+        let isMuf4able = (MathUtils.isAPowerOfTwo %sortingWidth)
+        let isMuf6able = (%sortingWidth % 3 = 0) && (MathUtils.isAPowerOfTwo (%sortingWidth / 3))
+
+        match sorterModelKey with
+        | sorterModelType.Mcse -> Some rp
+        | sorterModelType.Mssi
+        | sorterModelType.Msrs -> if has2factor then Some rp else None
+        | sorterModelType.Msuf4 ->
+                if isMuf4able then Some rp else None
+        | sorterModelType.Msuf6 -> 
+                if isMuf6able then Some rp else None
+                
+
+
+    let paramMapFilter (rp: runParameters) = 
+        Some rp
+        |> Option.bind sorterModelTypeForSortingWidth
+
+
+
+    let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
+
+        let enhancer (rp : runParameters) : runParameters =
+
+            let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
+
+            rp.WithProjectName(Some projectName)
+              .WithRunFinished(Some false)
+              .WithId (Some qp.Id )
+
+        seq {
+            for runParameters in runParametersSeq do
+                    let filtrate = paramMapFilter runParameters
+                    if filtrate.IsSome then
+                        let retVal = filtrate.Value |> enhancer
+                        yield retVal
+        }
+
+
 
     let sortableDataTypeKeyValues = 
             [ 
@@ -125,56 +142,6 @@ module MergeIntEvals =
     let sorterModelTypeKeys () : string*string list =
         (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
 
-    let sorterModelTypeForSortingWidth (rp: runParameters) =
-        let sorterModelKey = rp.GetSorterModelType().Value
-        let sortingWidth = rp.GetSortingWidth().Value
-        let has2factor = (%sortingWidth % 2 = 0)
-        let isMuf4able = (MathUtils.isAPowerOfTwo %sortingWidth)
-        let isMuf6able = (%sortingWidth % 3 = 0) && (MathUtils.isAPowerOfTwo (%sortingWidth / 3))
-
-        match sorterModelKey with
-        | sorterModelType.Mcse -> Some rp
-        | sorterModelType.Mssi
-        | sorterModelType.Msrs -> if has2factor then Some rp else None
-        | sorterModelType.Msuf4 ->
-                if isMuf4able then Some rp else None
-        | sorterModelType.Msuf6 -> 
-                if isMuf6able then Some rp else None
-                
-
-
-    let paramMapFilter (rp: runParameters) = 
-        Some rp
-        |> Option.bind sorterModelTypeForSortingWidth
-
-
-
-    let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
-
-        let enhancer (rp : runParameters) : runParameters =
-            let repl = rp.GetRepl().Value
-            let sortingWidth = rp.GetSortingWidth().Value
-            let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
-            let stageLength = getStageLengthForSortingWidth sortingWidth
-            let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
-            let replFactor = if (%repl = 0) then 1 else 10
-            let sorterCount = sortingWidth |> getSorterCountForSortingWidth replFactor
-
-            rp.WithProjectName(Some projectName)
-              .WithRunFinished(Some false)
-              .WithCeLength(Some ceLength)
-              .WithStageLength(Some stageLength)
-              .WithSorterCount(Some sorterCount)
-              .WithId (Some qp.Id )
-
-        seq {
-            for runParameters in runParametersSeq do
-                    let filtrate = paramMapFilter runParameters
-                    if filtrate.IsSome then
-                        let retVal = filtrate.Value |> enhancer
-                        yield retVal
-        }
-
 
     let parameterSpans = 
         [
@@ -188,13 +155,9 @@ module MergeIntEvals =
     let outputDataTypes = 
             [| 
                 outputDataType.RunParameters;
-                outputDataType.SorterModelSetMaker "";
-                outputDataType.SorterSet "";
                 outputDataType.SorterSetEval "";
                 outputDataType.TextReport ("Bins" |> UMX.tag<textReportName>); 
                 outputDataType.TextReport ("Profiles" |> UMX.tag<textReportName>); 
-                outputDataType.TextReport ("Report3" |> UMX.tag<textReportName>); 
-                outputDataType.TextReport ("Report4" |> UMX.tag<textReportName>);
             |]
 
 

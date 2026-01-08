@@ -64,14 +64,14 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 
 
 ///// **********     SortableIntMerges   ****************
-let project = SortableIntMerges.project
-let executor = SortableIntMerges.executor
-let projectName = SortableIntMerges.projectName
-let projectFolder = SortableIntMerges.projectFolder
-let buildQueryParams = SortableIntMerges.makeQueryParamsFromRunParams
-let paramRefiner = SortableIntMerges.paramMapRefiner
-let minReplica = 3<replNumber>
-let maxReplica = 4<replNumber>
+//let project = SortableIntMerges.project
+//let executor = SortableIntMerges.executor
+//let projectName = SortableIntMerges.projectName
+//let projectFolder = SortableIntMerges.projectFolder
+//let buildQueryParams = SortableIntMerges.makeQueryParamsFromRunParams
+//let paramRefiner = SortableIntMerges.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 /// **********     MergeIntQa   ****************
@@ -86,14 +86,14 @@ let maxReplica = 4<replNumber>
 
 
 ///// **********    FullBoolEvals   ****************
-//let executor = FullBoolEvals.executor
-//let project = FullBoolEvals.project
-//let projectName = FullBoolEvals.project.ProjectName
-//let projectFolder = FullBoolEvals.projectFolder
-//let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
-//let paramRefiner = FullBoolEvals.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+let executor = FullBoolEvals.executor
+let project = FullBoolEvals.project
+let projectName = FullBoolEvals.project.ProjectName
+let projectFolder = FullBoolEvals.projectFolder
+let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
+let paramRefiner = FullBoolEvals.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
 
@@ -117,24 +117,24 @@ match execResult with
 | Error e -> printfn "Execution Failed: %s" e
 
 
-printfn "Printing RunParams..."
-let reportResult = 
-    ProjectOps.printRunParams geneSortDb projectFolder minReplica maxReplica cts (Some progress)
-    |> Async.RunSynchronously
+//printfn "Printing RunParams..."
+//let reportResult = 
+//    ProjectOps.printRunParams geneSortDb projectFolder minReplica maxReplica cts (Some progress)
+//    |> Async.RunSynchronously
 
 
-printfn "Making Use Profile report ..."
+//printfn "Making Use Profile report ..."
 
-let uPReportResult = 
-    TextReporters.ceUseProfileReportExecutor geneSortDb projectFolder minReplica maxReplica buildQueryParams allowOverwrite cts (Some progress)
-    |> Async.RunSynchronously
+//let uPReportResult = 
+//    TextReporters.ceUseProfileReportExecutor geneSortDb projectFolder minReplica maxReplica buildQueryParams allowOverwrite cts (Some progress)
+//    |> Async.RunSynchronously
 
 
-printfn "Making Use Bin report ..."
+//printfn "Making Use Bin report ..."
 
-let reportResultBins = 
-    TextReporters.binReportExecutor geneSortDb projectFolder minReplica maxReplica buildQueryParams allowOverwrite cts (Some progress)
-    |> Async.RunSynchronously
+//let reportResultBins = 
+//    TextReporters.binReportExecutor geneSortDb projectFolder minReplica maxReplica buildQueryParams allowOverwrite cts (Some progress)
+//    |> Async.RunSynchronously
 
 
 let endTime = System.DateTime.Now

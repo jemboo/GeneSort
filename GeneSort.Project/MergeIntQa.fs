@@ -15,7 +15,6 @@ open GeneSort.Model.Sorter.Rs
 open GeneSort.Model.Sorter
 open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Uf6
-open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open ProjectOps
 
@@ -64,25 +63,25 @@ module MergeIntQa =
             outputDataType
 
         
-    let getSorterCountForSortingWidth (factor:int) (sortingWidth: int<sortingWidth>) : int<sorterCount> =
+    let getSorterCountForSortingWidth (sortingWidth: int<sortingWidth>) : int<sorterCount> =
         match %sortingWidth with
-        | 4 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 6 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 8 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 9 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 12 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 16 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 18 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 24 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 32 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 36 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 48 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 64 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 96 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 128 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 192 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 256 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 384 -> (4 * factor) |> UMX.tag<sorterCount>
+        | 4 -> 10 |> UMX.tag<sorterCount>
+        | 6 -> 10 |> UMX.tag<sorterCount>
+        | 8 -> 10 |> UMX.tag<sorterCount>
+        | 9 -> 10 |> UMX.tag<sorterCount>
+        | 12 -> 10 |> UMX.tag<sorterCount>
+        | 16 -> 10 |> UMX.tag<sorterCount>
+        | 18 -> 10 |> UMX.tag<sorterCount>
+        | 24 -> 10 |> UMX.tag<sorterCount>
+        | 32 -> 10 |> UMX.tag<sorterCount>
+        | 36 -> 10 |> UMX.tag<sorterCount>
+        | 48 -> 10 |> UMX.tag<sorterCount>
+        | 64 -> 10 |> UMX.tag<sorterCount>
+        | 96 -> 10 |> UMX.tag<sorterCount>
+        | 128 -> 10 |> UMX.tag<sorterCount>
+        | 192 -> 10 |> UMX.tag<sorterCount>
+        | 256 -> 10 |> UMX.tag<sorterCount>
+        | 384 -> 4 |> UMX.tag<sorterCount>
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
 
@@ -133,14 +132,6 @@ module MergeIntQa =
     let mergeFillTypes() : string*string list =
         (runParameters.mergeFillTypeKey, mergeFillTypeValues)
 
-
-    let sorterModelKeyValues () : string list =
-        [ sorterModelType.Mcse;]      |> List.map(SorterModelType.toString)
-
-    let sorterModelKeys () : string*string list =
-        (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
-
-
     let paramMapFilter (runParameters: runParameters) = 
         Some runParameters
 
@@ -154,13 +145,14 @@ module MergeIntQa =
             let stageLength = getStageLengthForSortingWidth sortingWidth
             let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
             let replFactor = if (%repl = 0) then 1 else 10
-            let sorterCount = sortingWidth |> getSorterCountForSortingWidth replFactor
+            let sorterCount = sortingWidth |> getSorterCountForSortingWidth |> (*) replFactor
 
             rp.WithProjectName(Some projectName)
               .WithRunFinished(Some false)
               .WithCeLength(Some ceLength)
               .WithStageLength(Some stageLength)
               .WithSorterCount(Some sorterCount)
+              .WithSorterModelType(Some sorterModelType.Mcse)
               .WithId (Some qp.Id )
 
         seq {
@@ -173,8 +165,7 @@ module MergeIntQa =
 
     let parameterSpans = 
         [
-            sortingWidths(); 
-            sorterModelKeys(); 
+            sortingWidths();
             sortableArrayDataTypeKeys(); 
             mergeDimensions(); 
             mergeFillTypes(); 
@@ -186,10 +177,7 @@ module MergeIntQa =
                 outputDataType.SorterModelSetMaker "";
                 outputDataType.SorterSet "";
                 outputDataType.SorterSetEval "";
-                outputDataType.TextReport ("Bins" |> UMX.tag<textReportName>); 
                 outputDataType.TextReport ("Profiles" |> UMX.tag<textReportName>); 
-                outputDataType.TextReport ("Report3" |> UMX.tag<textReportName>); 
-                outputDataType.TextReport ("Report4" |> UMX.tag<textReportName>);
             |]
 
 
@@ -306,7 +294,6 @@ module MergeIntQa =
                 let runId = runParameters |> RunParameters.getIdString
                 let msg = sprintf "Fatal error in Run %s: %s" runId e.Message
             
-                // Bypass the builder's ReturnFrom ambiguity by wrapping manually
                 return! async { return Error msg }
         
         }

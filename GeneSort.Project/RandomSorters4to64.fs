@@ -75,15 +75,15 @@ module RandomSorters4to64 =
         (runParameters.sortingWidthKey, sortingWidthValues)
 
 
-    let sorterModelKeyValues () : string list =
+    let sorterModelTypeValues () : string list =
         [ sorterModelType.Mcse; 
           sorterModelType.Mssi;
           sorterModelType.Msrs; 
           sorterModelType.Msuf4; 
           sorterModelType.Msuf6; ]      |> List.map(SorterModelType.toString)
 
-    let sorterModelKeys () : string*string list =
-        (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
+    let sorterModelTypes () : string*string list =
+        (runParameters.sorterModelTypeKey, sorterModelTypeValues() )
 
 
     let getSorterCountForSortingWidth (factor:int) (sortingWidth: int<sortingWidth>) : int<sorterCount> =
@@ -203,7 +203,7 @@ module RandomSorters4to64 =
             |]
 
     let parameterSpans = 
-        [ sortingWidths(); sorterModelKeys() ]
+        [ sortingWidths(); sorterModelTypes() ]
 
     let project = 
             project.create 
