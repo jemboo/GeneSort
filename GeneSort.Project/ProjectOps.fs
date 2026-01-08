@@ -74,7 +74,7 @@ module ProjectOps =
                     ProgressMessage.reportRunResult progress runRes
                     return runRes
                 | Error msg ->
-                    let msgFail = sprintf "%s %s" msg (runParameters |> RunParameters.reportKvps)
+                    let msgFail = sprintf "%s\n%s" msg (runParameters |> RunParameters.reportKvps)
                     let runRes = Failure (runId, repl, msgFail)
                     ProgressMessage.reportRunResult progress runRes
                     return runRes

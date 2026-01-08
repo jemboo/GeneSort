@@ -46,8 +46,13 @@ type runParameters =
     static member private tryGetBool (key: string) (map: Map<string, string>) =
         map.TryFind key |> Option.bind (fun v -> match Boolean.TryParse v with true, b -> Some b | _ -> None)
 
-    static member private addIfSome key valueOpt map =
-        valueOpt |> Option.fold (fun m v -> Map.add key v m) map
+    //static member private addIfSome key valueOpt map =
+    //    valueOpt |> Option.fold (fun m v -> Map.add key v m) map
+
+    static member private addOrRemove key valueOpt map =
+        match valueOpt with
+        | Some v -> Map.add key v map
+        | None   -> Map.remove key map
 
     member this.ParamMap = this.paramMap
 
@@ -78,49 +83,49 @@ type runParameters =
 
 // --- Functional Updates (Fluent API) ---
     member this.WithMergeDimension(md: int<mergeDimension> option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.mergeDimensionKey (md |> Option.map UmxExt.intToRaw) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeDimensionKey (md |> Option.map UmxExt.intToRaw) }
 
     member this.WithMergeFillType(mft: mergeFillType option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.mergeFillTypeKey (mft |> Option.map MergeFillType.toString) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeFillTypeKey (mft |> Option.map MergeFillType.toString) }
 
     member this.WithStageLength(sl: int<stageLength> option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.stageLengthKey (sl |> Option.map UmxExt.intToRaw) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.stageLengthKey (sl |> Option.map UmxExt.intToRaw) }
 
     member this.WithCeLength(cl: int<ceLength> option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.ceLengthKey (cl |> Option.map UmxExt.intToRaw) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.ceLengthKey (cl |> Option.map UmxExt.intToRaw) }
 
     member this.WithProjectName(pn: string<projectName> option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.projectNameKey (pn |> Option.map UmxExt.stringToRaw) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.projectNameKey (pn |> Option.map UmxExt.stringToRaw) }
 
     member this.WithId(id: Guid<idValue> option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.idKey (id |> Option.map UmxExt.guidToRaw) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.idKey (id |> Option.map UmxExt.guidToRaw) }
 
     member this.WithRepl(repl: int<replNumber> option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.replKey (repl |> Option.map UmxExt.intToRaw) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.replKey (repl |> Option.map UmxExt.intToRaw) }
 
     member this.WithGeneration(gen: int<generationNumber> option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.generationKey (gen |> Option.map UmxExt.intToRaw) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationKey (gen |> Option.map UmxExt.intToRaw) }
 
     member this.WithRunFinished(fin: bool option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.runFinishedKey (fin |> Option.map string) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.runFinishedKey (fin |> Option.map string) }
 
     member this.WithMaxOrbit(mo: int option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.maxOrbitKey (mo |> Option.map string) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.maxOrbitKey (mo |> Option.map string) }
 
     member this.WithSortableCount(sc: int<sortableCount> option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.sortableCountKey (sc |> Option.map UmxExt.intToRaw) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortableCountKey (sc |> Option.map UmxExt.intToRaw) }
 
     member this.WithSortableDataType(sdt: sortableDataType option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.sortableDataTypeKey (sdt |> Option.map SortableDataType.toString) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortableDataTypeKey (sdt |> Option.map SortableDataType.toString) }
 
     member this.WithSorterCount(sc: int<sorterCount> option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.sorterCountKey (sc |> Option.map UmxExt.intToRaw) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountKey (sc |> Option.map UmxExt.intToRaw) }
 
     member this.WithSorterModelType(smt: sorterModelType option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.sorterModelTypeKey (smt |> Option.map SorterModelType.toString) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterModelTypeKey (smt |> Option.map SorterModelType.toString) }
 
     member this.WithSortingWidth(w: int<sortingWidth> option) = 
-        { paramMap = this.paramMap |> runParameters.addIfSome runParameters.sortingWidthKey (w |> Option.map UmxExt.intToRaw) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortingWidthKey (w |> Option.map UmxExt.intToRaw) }
 
 // --- 3. The Logic Module ---
 module RunParameters =

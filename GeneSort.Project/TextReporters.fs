@@ -90,7 +90,7 @@ module TextReporters =
             // 4. Finalize and Save
             let semiFinalDataTable = appendSourceRunParamsTable (List.ofArray runParamsArray) dataTable
             let finalDataTable = appendFailureSummary (List.rev failures)  semiFinalDataTable
-            let saveQp = buildQueryParams (runParamsArray.[0]) (outputDataType.TextReport (reportName |> UMX.tag))
+            let saveQp = buildQueryParams (runParamsArray.[0].WithRepl None) (outputDataType.TextReport (reportName |> UMX.tag))
             let! _ = db.saveAsync projectFolder saveQp (outputData.TextReport finalDataTable) allowOverwrite |> Async.map Ok
 
             report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %projectFolder)
@@ -163,7 +163,7 @@ module TextReporters =
             // 4. Finalize and Save
             let semiFinalDataTable = appendSourceRunParamsTable (List.ofArray runParamsArray) dataTable
             let finalDataTable = appendFailureSummary (List.rev failures)  semiFinalDataTable
-            let saveQp = buildQueryParams (runParamsArray.[0]) (outputDataType.TextReport (reportName |> UMX.tag))
+            let saveQp = buildQueryParams (runParamsArray.[0].WithRepl None) (outputDataType.TextReport (reportName |> UMX.tag))
             let! _ = db.saveAsync projectFolder saveQp (outputData.TextReport finalDataTable) allowOverwrite |> Async.map Ok
 
             report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %projectFolder)

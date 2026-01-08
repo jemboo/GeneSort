@@ -20,11 +20,11 @@ module ProgressMessage =
             let msg = 
                 match result with
                 | Success (idx, repl, congrats) -> 
-                    sprintf "%s Run %s Repl %d completed %s\n" timeStamp ((%idx).ToString()) %repl congrats
+                    sprintf "%s Run %s Repl %d completed:%s\n" timeStamp ((%idx).ToString()) %repl congrats
                 | Failure (idx, repl, error) -> 
-                    sprintf "%s Run %s Repl %d failed: %s\n" timeStamp ((%idx).ToString()) %repl error
+                    sprintf "%s Run %s Repl %d failed:%s\n" timeStamp ((%idx).ToString()) %repl error
                 | Skipped (idx, repl, reason) -> 
-                    sprintf "%s Run %s Repl %d skipped: %s\n" timeStamp ((%idx).ToString()) %repl reason
+                    sprintf "%s Run %s Repl %d skipped:%s\n" timeStamp ((%idx).ToString()) %repl reason
                 | Cancelled (idx, repl) ->
                     sprintf "%s Run %s Repl %d cancelled\n" timeStamp ((%idx).ToString()) %repl
             p.Report(msg)
