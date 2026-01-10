@@ -42,8 +42,6 @@ type permutation = private Perm of arr: int array * id: Guid with
 
 module Permutation =
     
-    // --- Identity Optimization ---
-    
     // Pre-cache IDs for common orders to make identity check O(1)
     let private identityIdCache = 
         use sha = SHA256.Create() // Create once for the entire initialization

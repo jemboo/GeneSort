@@ -20,6 +20,8 @@ type latticePoint =
             for x in copy do h <- h * 31 + x
             { coords = copy; hashCode = h }
 
+        static member createUnsafe(arr: int[], h: int) = 
+                { coords = arr; hashCode = h }
         member p.Coords = p.coords
         member p.Dimension = p.coords.Length
         member this.Item with get(i:int) = this.coords.[i]
@@ -101,47 +103,69 @@ module LatticePoint =
     /// • sum to latticelevel
     /// • lie in 0 .. maxDistance
     let getLevelSet 
-                (dim:int<latticeDimension>) 
-                (latticelevel:int<latticeDistance>) 
-                (edgeLength:int<latticeDistance>) : seq<latticePoint> =
-        seq {
-            let current = Array.zeroCreate %dim
+            (dim: int<latticeDimension>) 
+            (latticeLevel: int<latticeDistance>) 
+            (edgeLength: int<latticeDistance>) : seq<latticePoint> =
+    
+        let results = ResizeArray<latticePoint>()
+        let d = %dim
+        let edge = %edgeLength
+        let level = %latticeLevel
+    
+        // Pre-allocate a single buffer to work in
+        let current = Array.zeroCreate d
 
-            let rec loop pos sumRemaining =
-                seq {
-                    if pos = %dim then
-                        if sumRemaining = 0 then
-                            yield latticePoint.create (Array.copy current)
-                    else
-                        // The remaining slots count
-                        let slotsLeft = %dim - pos
+        let rec loop pos sumRemaining =
+            if pos = d then
+                if sumRemaining = 0 then
+                    // Only copy and create the struct when we have a winner
+                    results.Add(latticePoint.create current)
+            else
+                let slotsLeft = d - pos
+            
+                // Tighten bounds to avoid impossible branches
+                let lowerBound = max 0 (sumRemaining - edge * (slotsLeft - 1))
+                let upperBound = min edge sumRemaining
 
-                        // Lowest legal value is 0 or whatever
-                        let lowerBound =
-                            max 0 (sumRemaining - %edgeLength * (slotsLeft - 1))
+                for v in lowerBound .. upperBound do
+                    current.[pos] <- v
+                    loop (pos + 1) (sumRemaining - v)
 
-                        // Upper bound is limited by maxValue and remaining sum
-                        let upperBound =
-                            min %edgeLength sumRemaining
-
-                        for v in lowerBound .. upperBound do
-                            current.[pos] <- v
-                            yield! loop (pos + 1) (sumRemaining - v)
-                }
-
-            yield! loop 0 %latticelevel
-        }
+        loop 0 level
+        results :> seq<latticePoint>
 
 
     /// Generates all lattice points of length dim whose entries:
     /// • sum to levelSum
     /// • lie in 0 .. maxValue
-    let getLevelSetVV 
+    let getLevelSetVV
                     (dim:int<latticeDimension>) 
                     (latticelevel:int<latticeDistance>) 
                     (maxDistance:int<latticeDistance>) : seq<latticePoint> =
         getLevelSet dim latticelevel maxDistance |> Seq.filter isNonDecreasing
 
+
+
+
+    let getUnderCoversNew (subject: latticePoint) : latticePoint list =
+        let n = subject.Dimension
+        let mutable results = []
+        let currentCoords = subject.Coords
+        let currentHash = subject.GetHashCode()
+    
+        for i in 0 .. n - 1 do
+            let v = currentCoords.[i]
+            if v > 0 then
+                // Allocate the NEW array for the neighbor
+                let newArr = Array.copy currentCoords
+                newArr.[i] <- v - 1
+            
+                // Calculate new hash incrementally to avoid the full loop
+                // Since h = h * 31 + x, we subtract the old contribution and add the new
+                // But for simplicity, we can just use your existing logic or re-hash
+                let newPoint = latticePoint.create newArr 
+                results <- newPoint :: results
+        results
 
 
     let getUnderCovers (subject:latticePoint) : latticePoint[] =

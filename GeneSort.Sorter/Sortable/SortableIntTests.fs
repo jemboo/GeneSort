@@ -24,6 +24,10 @@ type sortableIntTests =
             unsortedCount = Lazy<int>(fun () -> arrays |> Seq.filter(fun sa -> not sa.IsSorted) |> Seq.length)
         }
 
+    static member Empty =
+        let id = Guid.NewGuid() |> UMX.tag<sortableTestsId>
+        sortableIntTests.create id 0<sortingWidth> [||]
+
     override this.Equals(obj) =
         match obj with
         | :? sortableIntTests as other ->

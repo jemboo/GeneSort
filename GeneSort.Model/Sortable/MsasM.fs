@@ -64,7 +64,7 @@ type msasM =
                             this.mergeFillType
 
         sortableIntTests.create 
-                ( %this.id |> UMX.tag<sortableTestsId>) 
+                (%this.id |> UMX.tag<sortableTestsId>) 
                 this.SortingWidth
                 intArrays
 

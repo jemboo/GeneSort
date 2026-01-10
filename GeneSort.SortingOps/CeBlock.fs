@@ -13,9 +13,11 @@ type ceBlock =
 
     static member create(ces: ce array ) = { ces = ces }
 
+    static member Empty = { ces = [||] }
+
     member this.getCe (dex:int) = 
-        if dex < 0 || dex >= this.ces.Length then
-            invalidArg "dex" $"Index {dex} is out of bounds for Ce array of length {this.ces.Length}."
+        //if dex < 0 || dex >= this.ces.Length then
+        //    invalidArg "dex" $"Index {dex} is out of bounds for Ce array of length {this.ces.Length}."
         this.ces.[dex]
 
     member this.CeArray with get() = Array.copy this.ces

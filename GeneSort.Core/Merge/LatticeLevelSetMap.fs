@@ -22,7 +22,7 @@ type latticeLevelSetMap =
         (edgeLength: int<latticeDistance>)
         (poleSideLevel: int<latticeDistance>)
         (centerSideLevel: int<latticeDistance>)
-        (strategy: coverType)
+        (coverType: coverType)
         : latticeLevelSetMap =
         
         if %latticeDimension < 2 then
@@ -30,7 +30,7 @@ type latticeLevelSetMap =
 
         // Determine which keyMaker to use based on strategy
         let keyMaker = 
-            match strategy with
+            match coverType with
             | coverType.FullCover -> LatticePoint.getLevelSet
             | coverType.VVCover   -> LatticePoint.getLevelSetVV
             | _ -> failwith "Unknown cover strategy"
@@ -49,9 +49,7 @@ type latticeLevelSetMap =
           edgeLength = edgeLength
           poleSideLevel = poleSideLevel
           centerSideLevel = centerSideLevel
-          coverStrategy = strategy }
-
-    // --- Logic Dispatchers ---
+          coverStrategy = coverType }
 
     member private this.UnderCover(p: latticePoint) =
         match this.coverStrategy with
@@ -96,7 +94,7 @@ module LatticeLevelSetMap =
     let getAllLevelSetMaps 
             (latticeDimension: int<latticeDimension>) 
             (edgeLength: int<latticeDistance>) 
-            (strategy: coverType)
+            (coverType: coverType)
             : latticeLevelSetMap seq = 
 
         let maxPathLength = %edgeLength * %latticeDimension
@@ -111,7 +109,7 @@ module LatticeLevelSetMap =
                         edgeLength 
                         (levelTag - 1<latticeDistance>)
                         levelTag
-                        strategy
+                        coverType
 
             // Toward Pole
             for level in midPoint .. (%maxPathLength - 1) do
@@ -121,7 +119,7 @@ module LatticeLevelSetMap =
                         edgeLength 
                         (levelTag + 1<latticeDistance>)
                         levelTag
-                        strategy
+                        coverType
         }
 
     // Facade methods are now just passing an Enum

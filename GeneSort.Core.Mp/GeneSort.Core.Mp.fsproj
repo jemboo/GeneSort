@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <Compile Include="PermutationDto.fs" />
+    <Compile Include="LatticePointDto.fs" />
+    <Compile Include="LatticeLevelSetMapDto.fs" />
     <Compile Include="Perm_SiDto.fs" />
     <Compile Include="Perm_RsDto.fs" />
     <Compile Include="TwoOrbitUnfolder\TwoOrbitUfStepDto.fs" />
