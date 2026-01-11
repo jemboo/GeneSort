@@ -109,6 +109,7 @@ type SorterEvalBench() =
     member val id = Guid.NewGuid() with get, set
 
     member val sortableIntTests = sortableIntTests.Empty |> sortableTests.Ints with get, set
+    member val sortablePackedIntTests = sortableIntTests.Empty |> sortableTests.Ints with get, set
 
     member val ceBlock = ceBlock.Empty with get, set
 
@@ -125,6 +126,14 @@ type SorterEvalBench() =
                                         intArrays
                                   |> sortableTests.Ints
 
+
+        this.sortablePackedIntTests <- packedSortableIntTests.create
+                                        (this.sortingWidth |> UMX.tag<sortingWidth>)
+                                        intArrays
+                                        (1<sortableCount>)
+                                  |> sortableTests.PackedInts
+
+
         let bitonics = BitonicSorter.bitonicSort1
                             (this.sortingWidth |> UMX.tag<sortingWidth>)
 
@@ -139,8 +148,8 @@ type SorterEvalBench() =
 
 
     [<Benchmark>]
-    member this.evalPool() =
-        let ceBlockEval = CeBlockOps.evalWithSorterTest this.sortableIntTests this.ceBlock
+    member this.evalNewerer() =
+        let ceBlockEval = CeBlockOpsPacked.evalWithSorterTestNewer this.sortableIntTests this.ceBlock
         ceBlockEval.CeUseCounts
 
 
@@ -160,6 +169,8 @@ type SorterEvalBench2Blocks() =
 
     member val sortableIntTests = sortableIntTests.Empty |> sortableTests.Ints with get, set
 
+    member val sortablePackedIntTests = sortableIntTests.Empty |> sortableTests.Ints with get, set
+
     member val ceBlock1 = ceBlock.Empty with get, set
 
     member val ceBlock2 = ceBlock.Empty with get, set
@@ -177,6 +188,12 @@ type SorterEvalBench2Blocks() =
                                         intArrays
                                   |> sortableTests.Ints
 
+        this.sortablePackedIntTests <- packedSortableIntTests.create
+                                        (this.sortingWidth |> UMX.tag<sortingWidth>)
+                                        intArrays
+                                        (1<sortableCount>)
+                                  |> sortableTests.PackedInts
+
         let bitonics = BitonicSorter.bitonicSort1
                             (this.sortingWidth |> UMX.tag<sortingWidth>)
         let halfLength = bitonics.Length / 2
@@ -193,9 +210,9 @@ type SorterEvalBench2Blocks() =
 
 
     [<Benchmark>]
-    member this.evalPool() =
-       let ceBlockEval1 = CeBlockOps.evalWithSorterTest this.sortableIntTests this.ceBlock1
-       let ceBlockEval2 = CeBlockOps.evalWithSorterTest ceBlockEval1.SortableTests this.ceBlock2
+    member this.evalNewPacked() =
+       let ceBlockEval1 = CeBlockOps.evalWithSorterTestNew this.sortablePackedIntTests this.ceBlock1
+       let ceBlockEval2 = CeBlockOps.evalWithSorterTestNew ceBlockEval1.SortableTests this.ceBlock2
        ceBlockEval2.CeUseCounts
 
 

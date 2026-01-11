@@ -15,7 +15,7 @@ type sorterEval =
         sortingWidth: int<sortingWidth>
         ceBlockWithUsage: ceBlockWithUsage
         stageSequence: Lazy<stageSequence>
-        unsortedCount: int
+        unsortedCount: int<sortableCount>
     }
 
     static member create 
@@ -23,7 +23,7 @@ type sorterEval =
                 (sorterTestsId: Guid<sortableTestsId>)
                 (sortingWidth: int<sortingWidth>)  
                 (ceBlockWithUsage: ceBlockWithUsage)
-                (unsortedCount: int) =
+                (unsortedCount: int<sortableCount>) =
         { 
             sorterId = sorterId
             sorterTestsId = sorterTestsId

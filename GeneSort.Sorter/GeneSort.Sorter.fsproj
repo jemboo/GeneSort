@@ -21,6 +21,7 @@
     <Compile Include="Sortable\SortableIntArray.fs" />
     <Compile Include="Sortable\SortableBoolTests.fs" />
     <Compile Include="Sortable\SortableIntTests.fs" />
+    <Compile Include="Sortable\PackedSortableIntTests.fs" />
     <Compile Include="Sortable\SortableTests.fs" />
     <Compile Include="Sortable\SortableBoolTestSet.fs" />
     <Compile Include="Sortable\SortableIntTestSet.fs" />

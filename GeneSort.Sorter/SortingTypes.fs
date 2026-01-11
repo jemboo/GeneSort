@@ -36,13 +36,18 @@ type mergeFillType =
 
 
 type sortableDataType = 
-    | Ints
     | Bools
+    | Ints
+    | PackedBools
+    | PackedInts
+
 
 module SortableDataType =
 
     let toString (t:sortableDataType) : string =
         match t with
+        | PackedInts -> "PackedInts"
+        | PackedBools -> "PackedBools"
         | Ints -> "Ints"
         | Bools -> "Bools"
 
@@ -50,6 +55,8 @@ module SortableDataType =
         match s with
         | "Ints" -> Ints
         | "Bools" -> Bools
+        | "PackedInts" -> PackedInts
+        | "PackedBools" -> PackedBools
         | _ -> failwithf "Unknown SortableArrayType: %s" s
     let all () : sortableDataType list =
         [ Ints; Bools ]

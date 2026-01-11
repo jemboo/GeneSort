@@ -11,6 +11,7 @@
     <Compile Include="CeUseCounts.fs" />
     <Compile Include="CeBlockEval.fs" />
     <Compile Include="CeBlockOps.fs" />
+    <Compile Include="CeBlockOpsPacked.fs" />
     <Compile Include="SorterEval.fs" />
     <Compile Include="SorterSetEval.fs" />
     <Compile Include="Program.fs" />

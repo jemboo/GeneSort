@@ -47,7 +47,7 @@ type sortableIntTests =
 
     member this.SortableIntArrays with get() = this.sortableIntArrays
     
-    member this.UnsortedCount with get() = this.unsortedCount.Value
+    member this.UnsortedCount with get() = this.unsortedCount.Value |> UMX.tag<sortableCount>
 
     interface IEquatable<sortableIntTests> with
         member this.Equals(other) =

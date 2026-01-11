@@ -29,7 +29,7 @@ module SorterEvalDto =
             SorterTestsId = %sorterEval.SorterTestsId
             SortingWidth = %sorterEval.SortingWidth
             CeBlockUsage = CeBlockWithUsageDto.toCeBlockUsageDto sorterEval.CeBlockUsage
-            UnsortedCount = sorterEval.UnsortedCount
+            UnsortedCount = %sorterEval.UnsortedCount
         }
 
     let fromSorterEvalDto (dto: sorterEvalDto) : sorterEval =
@@ -42,4 +42,4 @@ module SorterEvalDto =
             (UMX.tag<sortableTestsId> dto.SorterTestsId)
             (UMX.tag<sortingWidth> dto.SortingWidth)
             (CeBlockWithUsageDto.fromCeBlockUsageDto dto.CeBlockUsage)
-            dto.UnsortedCount
+            (dto.UnsortedCount |> UMX.tag<sortableCount>)

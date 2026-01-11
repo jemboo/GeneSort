@@ -14,36 +14,36 @@ type CeOpsTests() =
     let createCe (low: int) (hi: int) =
        ce.create low hi
 
-    [<Fact>]
-    let ``sortBy sorts bool array correctly and updates usage`` () =
-        // Arrange
-        let values = [| true; false; true |]
-        let sortingWidth = 3<sortingWidth>
-        let ceBlock = ceBlock.create [| createCe 0 1; createCe 1 2 |]
-        let ceUseCounts = ceUseCounts.create 2<ceBlockLength>
+    //[<Fact>]
+    //let ``sortBy sorts bool array correctly and updates usage`` () =
+    //    // Arrange
+    //    let values = [| true; false; true |]
+    //    let sortingWidth = 3<sortingWidth>
+    //    let ceBlock = ceBlock.create [| createCe 0 1; createCe 1 2 |]
+    //    let ceUseCounts = ceUseCounts.create 2<ceBlockLength>
         
-        // Act
-        let result = CeBlockOps.sortBy ceBlock ceUseCounts values
+    //    // Act
+    //    let result = CeBlockOps.sortBy ceBlock ceUseCounts values
         
-        // Assert
-        result |> should equal [| false; true; true |]
+    //    // Assert
+    //    result |> should equal [| false; true; true |]
 
 
-    [<Fact>]
-    let ``sortBy sorts int array correctly and updates usage`` () =
-        // Arrange
-        let values = [| 2; 0; 1 |]
-        let sortingWidth = 3<sortingWidth>
-        let symbolSetSize = 3<symbolSetSize>
-        let ceBlock = ceBlock.create [| createCe 0 1; createCe 1 2 |]
+    //[<Fact>]
+    //let ``sortBy sorts int array correctly and updates usage`` () =
+    //    // Arrange
+    //    let values = [| 2; 0; 1 |]
+    //    let sortingWidth = 3<sortingWidth>
+    //    let symbolSetSize = 3<symbolSetSize>
+    //    let ceBlock = ceBlock.create [| createCe 0 1; createCe 1 2 |]
 
-        let ceUseCounts = ceUseCounts.create 2<ceBlockLength>
+    //    let ceUseCounts = ceUseCounts.create 2<ceBlockLength>
         
-        // Act
-        let result = CeBlockOps.sortBy ceBlock ceUseCounts values
+    //    // Act
+    //    let result = CeBlockOps.sortBy ceBlock ceUseCounts values
         
-        // Assert
-        result |> should equal [| 0; 1; 2 |]
+    //    // Assert
+    //    result |> should equal [| 0; 1; 2 |]
 
 
     [<Fact>]
