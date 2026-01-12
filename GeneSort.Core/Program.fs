@@ -6,7 +6,16 @@ open GeneSort.Core
 open FSharp.UMX
 open System
 
+
+open System
+open System.Runtime.Intrinsics
+open System.Runtime.Intrinsics.X86
+open System.Runtime.Intrinsics.Arm
+
 module Example =
+    // Helper function to print vector capabilities
+
+
     let _notation p = p |> Permutation.toOrbitSet |> OrbitSet.toOrbitNotation
 
     let one () =
@@ -142,9 +151,10 @@ module Example =
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
-    let res = runMergePermutationsExample ()
+    //let res = runMergePermutationsExample ()
 
-   
+    SimdUtils.printCapabilities ()
+    let yow = SimdUtils.testStackTileByK ()
 
 
     printfn "end: %s" (DateTime.Now.ToShortTimeString())

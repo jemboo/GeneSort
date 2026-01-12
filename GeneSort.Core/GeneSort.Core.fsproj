@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="SimdUtils.fs" />
     <Compile Include="ComputationBuilders.fs" />
     <Compile Include="DataTableFile.fs" />
     <Compile Include="SysExt.fs" />

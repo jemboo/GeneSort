@@ -9,6 +9,9 @@ open GeneSort.Sorter
 open GeneSort.Sorter.Sortable
 open GeneSort.SortingOps
 open GeneSort.Sorter.Sorter
+open System.Runtime.Intrinsics
+open System.Buffers
+open System.Threading.Tasks
 
 
 
@@ -141,15 +144,15 @@ type SorterEvalBench() =
 
 
     [<Benchmark(Baseline = true)>]
-    member this.evalBranchy() =
+    member this.evalStandard() =
        let ceBlockEval = CeBlockOps.evalWithSorterTest this.sortableIntTests this.ceBlock
        ceBlockEval.CeUseCounts
 
 
 
     [<Benchmark>]
-    member this.evalNewerer() =
-        let ceBlockEval = CeBlockOpsPacked.evalWithSorterTestNewer this.sortableIntTests this.ceBlock
+    member this.evalUnsafe() =
+        let ceBlockEval = CeBlockOps.evalWithSorterTestUnsafe this.sortableIntTests this.ceBlock
         ceBlockEval.CeUseCounts
 
 
@@ -211,8 +214,8 @@ type SorterEvalBench2Blocks() =
 
     [<Benchmark>]
     member this.evalNewPacked() =
-       let ceBlockEval1 = CeBlockOps.evalWithSorterTestNew this.sortablePackedIntTests this.ceBlock1
-       let ceBlockEval2 = CeBlockOps.evalWithSorterTestNew ceBlockEval1.SortableTests this.ceBlock2
+       let ceBlockEval1 = CeBlockOps.evalWithSorterTestUnsafe this.sortablePackedIntTests this.ceBlock1
+       let ceBlockEval2 = CeBlockOps.evalWithSorterTestUnsafe ceBlockEval1.SortableTests this.ceBlock2
        ceBlockEval2.CeUseCounts
 
 
@@ -281,3 +284,113 @@ type SorterEvalBench2Blocks() =
 //|             |                |              |                  |                |                |       |         |            |            |           |               |             |
 //| evalBranchy | 8              | 64           | 3,786,698.979 us | 34,145.4561 us | 30,269.0574 us |  1.00 |    0.01 | 84000.0000 | 79000.0000 | 1000.0000 | 1964760.91 KB |        1.00 |
 //| evalPool    | 8              | 64           | 3,355,995.086 us | 35,679.2938 us | 31,628.7647 us |  0.89 |    0.01 | 84000.0000 | 83000.0000 | 1000.0000 | 1972066.33 KB |        1.00 |
+
+
+
+
+
+
+
+
+[<MemoryDiagnoser>]
+type Simda() =
+
+    [<Params(64, 6400, 64000)>]
+    member val arrayLength = 0 with get, set
+
+    member val array256A = [||] with get, set
+    member val array256B = [||] with get, set
+    member val array512A = [||] with get, set
+    member val array512B = [||] with get, set
+
+    [<GlobalSetup>]
+    member this.Setup() =
+        this.array256A <- SimdUtils.tile256uy (Array.init this.arrayLength (fun dex -> byte (dex % 256)))
+        this.array256B <- SimdUtils.tile256uy (Array.init this.arrayLength (fun dex -> byte (dex % 256)))
+        this.array512A <- SimdUtils.tile512uy (Array.init this.arrayLength (fun dex -> byte (dex % 256)))
+        this.array512B <- SimdUtils.tile512uy (Array.init this.arrayLength (fun dex -> byte (dex % 256)))
+
+
+    [<Benchmark(Baseline = true)>]
+    member this.eval_copyArray512uy() =
+        let yow = SimdUtils.copyArray512uy this.array512A
+        yow.Length
+
+
+    [<Benchmark>]
+    member this.eval_copyWithSpan512uy() =
+        let yow = SimdUtils.copyWithSpan512uy this.array512A
+        yow.Length
+
+
+
+    [<Benchmark>]
+    member this.eval_fastGenericCopy() =
+        let yow = SimdUtils.fastGenericCopy this.array512A
+        yow.Length
+
+
+    //[<Benchmark(Baseline = true)>]
+    //member this.eval256() =
+    //    let yow = this.array256A |> Array.mapi(fun i v -> Vector256.Add<byte>(v, this.array256B.[i]))
+    //    yow.Length
+
+
+
+    //[<Benchmark>]
+    //member this.eval512() =
+    //    let yow = this.array512A |> Array.mapi(fun i v -> Vector512.Add<byte>(v, this.array512B.[i]))
+    //    yow.Length
+
+
+
+//| Method  | arrayLength | Mean       | Error     | StdDev     | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
+//|-------- |------------ |-----------:|----------:|-----------:|------:|--------:|-------:|----------:|------------:|
+//| eval256 | 64          |   8.888 ns | 0.1859 ns |  0.3962 ns |  1.00 |    0.06 | 0.0067 |     112 B |        1.00 |
+//| eval512 | 64          |   7.847 ns | 0.0962 ns |  0.0900 ns |  0.88 |    0.04 | 0.0067 |     112 B |        1.00 |
+//|         |             |            |           |            |       |         |        |           |             |
+//| eval256 | 640         |  38.380 ns | 0.1484 ns |  0.1316 ns |  1.00 |    0.00 | 0.0411 |     688 B |        1.00 |
+//| eval512 | 640         |  30.696 ns | 0.6202 ns |  1.4497 ns |  0.80 |    0.04 | 0.0411 |     688 B |        1.00 |
+//|         |             |            |           |            |       |         |        |           |             |
+//| eval256 | 6400        | 355.873 ns | 5.1978 ns |  4.8621 ns |  1.00 |    0.02 | 0.3853 |    6448 B |        1.00 |
+//| eval512 | 6400        | 309.881 ns | 6.1795 ns | 16.1708 ns |  0.87 |    0.05 | 0.3853 |    6448 B |        1.00 |
+
+
+[<MemoryDiagnoser>] // Tracks GC allocations
+[<SimpleJob(warmupCount = 3, iterationCount = 10)>]
+type ParallelCopyBenchmark() =
+    
+    // Adjust these for your hardware: 
+    // DataSize * ParallelTracks should fit in RAM but exceed L3 cache to test bandwidth.
+    let DataSize = 100_000 
+    let ParallelTracks = 64 
+    
+    let mutable sourceData : Vector512<uint16>[] = [||]
+    
+    [<Params(1, 2, 4, 8, 12, 16)>] 
+    member val DegreeOfParallelism = 1 with get, set
+
+    [<GlobalSetup>]
+    member self.Setup() =
+        sourceData <- Array.init DataSize (fun i -> Vector512.Create(uint16 i))
+
+    [<Benchmark>]
+    member self.BenchmarkParallelCopy() =
+        let pool = ArrayPool<Vector512<uint16>>.Shared
+        let options = ParallelOptions(MaxDegreeOfParallelism = self.DegreeOfParallelism)
+        
+        Parallel.For(0, ParallelTracks, options, fun i ->
+            // 1. Rent from pool (prevents GC pressure)
+            let buffer = pool.Rent(DataSize)
+            try
+                // 2. Perform the ultra-fast copy
+                SimdUtils.fastGenericCopyToBuffer sourceData buffer
+                
+                // 3. Simulate work (e.g., a SIMD operation) 
+                // to prevent the JIT from optimizing the copy away
+                let result = buffer.[0] 
+                ()
+            finally
+                // 4. Return to pool
+                pool.Return(buffer)
+        ) |> ignore
