@@ -375,7 +375,7 @@ type ParallelCopyBenchmark() =
         sourceData <- Array.init DataSize (fun i -> Vector512.Create(uint16 i))
 
     [<Benchmark>]
-    member self.BenchmarkParallelCopy() =
+    member self.fastGenericCopyToBuffer() =
         let pool = ArrayPool<Vector512<uint16>>.Shared
         let options = ParallelOptions(MaxDegreeOfParallelism = self.DegreeOfParallelism)
         
@@ -388,7 +388,35 @@ type ParallelCopyBenchmark() =
                 
                 // 3. Simulate work (e.g., a SIMD operation) 
                 // to prevent the JIT from optimizing the copy away
-                let result = buffer.[0] 
+                // Perform your Sorter logic here on the slice:
+                let workArea = buffer.AsSpan(0, DataSize)
+                // Example: let sorted = MySimdSorter.Sort(workArea)
+                ()
+            finally
+                // 4. Return to pool
+                pool.Return(buffer)
+        ) |> ignore
+
+
+
+
+    [<Benchmark>]
+    member self.UltraFastCopy() =
+        let pool = ArrayPool<Vector512<uint16>>.Shared
+        let options = ParallelOptions(MaxDegreeOfParallelism = self.DegreeOfParallelism)
+        
+        Parallel.For(0, ParallelTracks, options, fun i ->
+            // 1. Rent from pool (prevents GC pressure)
+            let buffer = pool.Rent(DataSize)
+            try
+                // 2. Perform the ultra-fast copy
+                SimdUtils.ultraFastCopy sourceData buffer
+                
+                // 3. Simulate work (e.g., a SIMD operation) 
+                // to prevent the JIT from optimizing the copy away
+                // Perform your Sorter logic here on the slice:
+                let workArea = buffer.AsSpan(0, DataSize)
+                // Example: let sorted = MySimdSorter.Sort(workArea)
                 ()
             finally
                 // 4. Return to pool

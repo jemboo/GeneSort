@@ -9,6 +9,7 @@ open Microsoft.FSharp.NativeInterop
 open System.Runtime.CompilerServices
 open System.Runtime.Intrinsics
 open Microsoft.FSharp.NativeInterop
+open System.Runtime.InteropServices
 
 
 [<Measure>] type simdLength
@@ -254,7 +255,7 @@ module SimdUtils =
 
 
     // You must use the 'unmanaged' constraint for NativePtr operations
-    let fastGenericCopy (source: 'T[]) : 'T[] when 'T : unmanaged =
+    let fastGenericCopy0 (source: 'T[]) : 'T[] when 'T : unmanaged =
         if source.Length = 0 then [||]
         else
             let dest = System.GC.AllocateUninitializedArray<'T>(source.Length)
@@ -274,7 +275,7 @@ module SimdUtils =
 
 
     // You must use the 'unmanaged' constraint for NativePtr operations
-    let fastGenericCopyToBuffer (source: 'T[]) (dest: 'T[]) : unit when 'T : unmanaged =
+    let fastGenericCopyToBuffer0 (source: 'T[]) (dest: 'T[]) : unit when 'T : unmanaged =
         let byteCount = uint32 (source.Length * Unsafe.SizeOf<'T>())
         
         // Pin the arrays
@@ -286,6 +287,29 @@ module SimdUtils =
         let destVoidPtr = NativePtr.toVoidPtr pDest
         
         Unsafe.CopyBlock(destVoidPtr, srcVoidPtr, byteCount)
+
+
+/// High-performance generic copy using Span logic.
+    /// This is safer than raw pointers but usually just as fast.
+    let fastGenericCopyToBuffer (source: 'T[]) (dest: 'T[]) =
+        // source.AsSpan() creates a span of exact length.
+        // dest.AsSpan(0, source.Length) slices the pool buffer to match.
+        source.AsSpan().CopyTo(dest.AsSpan(0, source.Length))
+
+    /// The "Nuclear" version if Span.CopyTo isn't fast enough for your specific CPU.
+    let ultraFastCopy (source: 'T[]) (dest: 'T[]) : unit when 'T : unmanaged =
+        let count = source.Length
+        let byteCount = uint32 (count * Unsafe.SizeOf<'T>())
+        
+        // Get refs to the actual data start points
+        let mutable srcRef = MemoryMarshal.GetArrayDataReference(source)
+        let mutable destRef = MemoryMarshal.GetArrayDataReference(dest)
+        
+        // This emits the same IL as a native memcpy
+        Unsafe.CopyBlock(Unsafe.AsPointer(&destRef), Unsafe.AsPointer(&srcRef), byteCount)
+
+
+
 
 
 
