@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SimdUtils.fs" />
     <Compile Include="ComputationBuilders.fs" />
     <Compile Include="DataTableFile.fs" />
     <Compile Include="SysExt.fs" />
@@ -17,7 +16,8 @@
     <Compile Include="GuidUtils.fs" />
     <Compile Include="MathUtils.fs" />
     <Compile Include="ArrayProperties.fs" />
-    <Compile Include="ArrayUtils.fs" />
+    <Compile Include="SimdUtils.fs" />
+    <Compile Include="Segment.fs" />
     <Compile Include="CollectionUtils.fs" />
     <Compile Include="BytePack.fs" />
     <Compile Include="Combinatorics.fs" />

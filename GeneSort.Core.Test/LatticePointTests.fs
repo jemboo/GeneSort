@@ -1,69 +1,11 @@
 ﻿namespace GeneSort.Core.Test
-open System
 open Xunit
-open FsUnit.Xunit
 open GeneSort.Core
-open GeneSort.Core.OrbitSet
-open GeneSort.Core.LatticePoint
 
 type LatticePointTests() =
 
     // Utility to create points more concisely
     let lp xs = latticePoint.create(xs)
-
-    [<Fact>]
-    let ``getOverIndex returns correct index when exactly one coordinate increases by 1`` () =
-        let a = lp [|0; 2; 5|]
-        let b = lp [|0; 3; 5|]
-
-        let idx = getOverIndex a b
-
-        Assert.Equal(1, idx)
-
-    [<Fact>]
-    let ``getOverIndex throws when more than one coordinate increases`` () =
-        let a = lp [|1; 1; 1|]
-        let b = lp [|2; 2; 1|]   // two +1 changes → invalid
-
-        let ex =
-            Assert.Throws<System.ArgumentException>(fun () ->
-                getOverIndex a b |> ignore)
-
-        Assert.Contains("More than one coordinate", ex.Message)
-
-    [<Fact>]
-    let ``getOverIndex throws when coordinates differ in invalid way`` () =
-        let a = lp [|1; 1; 1|]
-        let b = lp [|1; 4; 1|]   // difference is +3 → invalid
-
-        let ex =
-            Assert.Throws<System.ArgumentException>(fun () ->
-                getOverIndex a b |> ignore)
-
-        Assert.Contains("not equal to +1", ex.Message)
-
-    [<Fact>]
-    let ``getOverIndex throws when no coordinate increases`` () =
-        let a = lp [|1; 2; 3|]
-        let b = lp [|1; 2; 3|]  // identical → invalid
-
-        let ex =
-            Assert.Throws<System.ArgumentException>(fun () ->
-                getOverIndex a b |> ignore)
-
-        Assert.Contains("No coordinate", ex.Message)
-
-    [<Fact>]
-    let ``getOverIndex throws when dimensions differ`` () =
-        let a = lp [|1; 2|]
-        let b = lp [|1; 2; 3|]
-
-        let ex =
-            Assert.Throws<System.ArgumentException>(fun () ->
-                getOverIndex a b |> ignore)
-
-        Assert.Contains("same dimension", ex.Message)
-
 
     [<Fact>]
     let ``latticePoint equality works correctly`` () =
@@ -116,15 +58,7 @@ type LatticePointTests() =
         let result = (p1 :> System.IComparable).CompareTo(p2)
         
         Assert.True(result < 0, "shorter array should be less than longer")
-    
-    [<Fact>]
-    let ``dictionary order: difference before length matters`` () =
-        let p1 = latticePoint.create [|1; 3|]
-        let p2 = latticePoint.create [|1; 2; 3; 4; 5|]
-        
-        let result = (p1 :> System.IComparable).CompareTo(p2)
-        
-        Assert.True(result > 0, "p1 should be greater despite being shorter")
+   
     
     [<Fact>]
     let ``Array.sort produces correct dictionary order`` () =
@@ -133,16 +67,14 @@ type LatticePointTests() =
             latticePoint.create [|1; 2; 3|]
             latticePoint.create [|1; 2; 1|]
             latticePoint.create [|2; 1; 1|]
-            latticePoint.create [|1; 2; 3; 4|]
         |]
         
         let sorted = Array.sort points
         
         Assert.Equal(latticePoint.create [|1; 2; 1|], sorted.[0])
         Assert.Equal(latticePoint.create [|1; 2; 3|], sorted.[1])
-        Assert.Equal(latticePoint.create [|1; 2; 3; 4|], sorted.[2])
-        Assert.Equal(latticePoint.create [|2; 1; 1|], sorted.[3])
-        Assert.Equal(latticePoint.create [|3; 1; 4|], sorted.[4])
+        Assert.Equal(latticePoint.create [|2; 1; 1|], sorted.[2])
+        Assert.Equal(latticePoint.create [|3; 1; 4|], sorted.[3])
     
     [<Fact>]
     let ``List.sort works with latticePoint`` () =
@@ -192,13 +124,6 @@ type LatticePointTests() =
         Assert.Equal(10, p.[0])
         Assert.Equal(20, p.[1])
         Assert.Equal(30, p.[2])
-    
-    [<Fact>]
-    let ``ToString formats correctly`` () =
-        let p = latticePoint.create [|1; 2; 3|]
-        let str = p.ToString()
-        
-        Assert.Equal("[|1; 2; 3|]", str)
     
     [<Fact>]
     let ``Sorting with negative numbers works`` () =

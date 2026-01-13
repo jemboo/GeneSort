@@ -199,24 +199,9 @@ module LatticePoint =
         getOverCovers subject maxDistance |> Array.filter isNonDecreasing
 
 
-    /// returns the (unique) index i where lowPoint.[i] + 1 = hiPoint.[i]
-    let getOverIndex (lowPoint: latticePoint) (hiPoint: latticePoint) : int =
-        let lowArr = lowPoint.Coords
-        let hiArr = hiPoint.Coords
-        let dim = lowArr.Length
-        let mutable foundIndex = -1
-
-        for i in 0 .. dim - 1 do
-            let a = lowArr.[i]
-            let b = hiArr.[i]
-            if a + 1 = b then
-                if foundIndex = -1 then foundIndex <- i
-                else invalidArg "hiPoint" "Multiple increments"
-            elif a <> b then
-                invalidArg "hiPoint" "Mismatch"
-            
-        if foundIndex = -1 then failwith "No increment found"
-        foundIndex
+    /// the two lattice points must be the same dimension and differ in at least one coordinate
+    let getFirstDifferingIndex (lowPoint: latticePoint) (hiPoint: latticePoint) : int =
+        ArrayProperties.firstDiffIndexOrThrow lowPoint.Coords hiPoint.Coords
 
 
     // This is used by updateWithLatticePoint to convert a path in the mergeLattice to a permutation.
@@ -225,7 +210,7 @@ module LatticePoint =
                 (edgeLength: int<latticeDistance>) 
                 (lowPoint:latticePoint) 
                 (hiPoint:latticePoint) : int =
-        let index = getOverIndex lowPoint hiPoint
+        let index = getFirstDifferingIndex lowPoint hiPoint
         %edgeLength * index +  %edgeLength - lowPoint.coords.[index] - 1
 
 

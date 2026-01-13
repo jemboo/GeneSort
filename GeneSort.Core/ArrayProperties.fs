@@ -18,9 +18,9 @@ module ArrayProperties =
 
 
     let inline distanceSquaredOffset< ^a when ^a: (static member Zero: ^a)
-                                                    and ^a: (static member (+): ^a * ^a -> ^a)
-                                                    and ^a: (static member (-): ^a * ^a -> ^a)
-                                                    and ^a: (static member (*): ^a * ^a -> ^a)>
+                                        and ^a: (static member (+): ^a * ^a -> ^a)
+                                        and ^a: (static member (-): ^a * ^a -> ^a)
+                                        and ^a: (static member (*): ^a * ^a -> ^a)>
             (longArray: ^a[]) (shortArray: ^a[]) : ^a[] =
         let n = shortArray.Length
         let m = longArray.Length / n
@@ -34,19 +34,6 @@ module ArrayProperties =
         result
 
 
-    let inline isSorted0< ^a when ^a: comparison> (values: ^a[]) : bool =
-        if isNull values then 
-            failwith "Array cannot be null"
-        elif values.Length <= 1 then true
-        else
-            let mutable i = 1
-            let mutable isSorted = true
-            while (i < values.Length && isSorted) do
-                isSorted <- (values.[i - 1] <= values.[i])
-                i <- i + 1
-            isSorted
-
-
     let inline isSorted< ^a when ^a: comparison> (values: ^a[]) : bool =
         let len = values.Length
         let mutable ok = true
@@ -57,32 +44,6 @@ module ArrayProperties =
             else 
                 i <- i + 1
         ok
-
-
-    let areBoolsSorted  (values: bool[]) : bool =
-        if isNull values then 
-            failwith "Array cannot be null"
-        elif values.Length <= 1 then true
-        else
-            let mutable i = 1
-            let mutable isSorted = true
-            while (i < values.Length && isSorted) do
-                isSorted <- (values.[i - 1] <= values.[i])
-                i <- i + 1
-            isSorted
-
-
-    let areIntsSorted  (values: int[]) : bool =
-        if isNull values then 
-            failwith "Array cannot be null"
-        elif values.Length <= 1 then true
-        else
-            let mutable i = 1
-            let mutable isSorted = true
-            while (i < values.Length && isSorted) do
-                isSorted <- (values.[i - 1] <= values.[i])
-                i <- i + 1
-            isSorted
 
 
     let inline isSortedOffset< ^a when ^a: comparison> 
@@ -103,6 +64,7 @@ module ArrayProperties =
                 i <- i + 1
             isSorted
 
+
     let lastNonZeroIndex (arr: int array) : int =
         let rec loop i =
             if i < 0 then
@@ -112,4 +74,23 @@ module ArrayProperties =
             else
                 loop (i - 1)
         loop (arr.Length - 1)
+
+    /// Finds the first index at which two arrays differ. 
+    /// Throws an exception if the arrays are identical or of different lengths.
+    let firstDiffIndexOrThrow (a: 'T[]) (b: 'T[]) =
+        if a.Length <> b.Length then
+            invalidArg "b" "Arrays must have the same length"
+
+        let mutable i = 0
+        let mutable found = -1
+
+        while i < a.Length && found = -1 do
+            if a.[i] <> b.[i] then
+                found <- i
+            i <- i + 1
+
+        if found >= 0 then
+            found
+        else
+            invalidOp "Arrays are identical; no differing index found"
 

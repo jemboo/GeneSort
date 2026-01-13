@@ -14,28 +14,19 @@ type sorterCeUseProfile = {
     unsortedCount: int
     ceCount: int<ceLength>
     stageLength: int<stageLength>
-    segmentTotals: ArrayUtils.segmentWithPayload<int> []
+    segmentTotals: segmentWithPayload<int> []
 }
 
 module SorterCeUseProfile =
 
-    //all segments will be equal size if blockGrowthRate = 1. As blockGrowthRate gets larger, the last segments get larger.
-    let makeProfileSegments 
-            (segmentCount:int) 
-            (blockGrowthRate:float) 
-            (unbrokenLength: int) : ArrayUtils.segment [] = 
-
-        ArrayUtils.breakIntoExponentialSegments segmentCount blockGrowthRate unbrokenLength
-
-
     let makeSorterCeUseProfile 
-            (profileSegments:ArrayUtils.segment [])
+            (profileSegments: segment [])
             (sorterSetId: Guid<sorterSetId>)
             (sorterTestsId: Guid<sortableTestsId>)
             (sorterEval : sorterEval) : sorterCeUseProfile =
         {   
             sorterCeUseProfile.segmentTotals = 
-                    ArrayUtils.getSegmentSums sorterEval.CeBlockUsage.UseCounts profileSegments
+                    SegmentWithPayload.getSegmentSums sorterEval.CeBlockUsage.UseCounts profileSegments
             sorterId = sorterEval.SorterId
             sorterSetId = sorterSetId
             lastUsedCeIndex = sorterEval.getLastUsedCeIndex
@@ -69,13 +60,13 @@ module SorterCeUseProfile =
             yield (profile.ceCount.ToString())
             yield (profile.stageLength.ToString())
             yield (profile.lastUsedCeIndex.ToString())
-            yield! (profile.segmentTotals |> ArrayUtils.getSegmentPayloadReportData (fun (i:int) -> i.ToString()))
+            yield! (profile.segmentTotals |> SegmentWithPayload.getSegmentPayloadReportData (fun (i:int) -> i.ToString()))
         |]
 
 
 
 type sorterSetCeUseProfile = {
-    profileSegments: ArrayUtils.segment []
+    profileSegments: segment []
     sorterSetId: Guid<sorterSetId>
     sorterTestsId: Guid<sortableTestsId>
     sorterCeUseProfiles : sorterCeUseProfile []
@@ -88,10 +79,12 @@ module SorterSetCeUseProfile =
             (blockGrowthRate:float)
             (sorterSetEval:sorterSetEval) : sorterSetCeUseProfile  =
 
-        let profileSegments = ArrayUtils.breakIntoExponentialSegments2 
+        let lastLength = 1
+        let profileSegments = Segment.breakIntoExponentialSegments
                                     segmentCount 
                                     blockGrowthRate 
                                     (sorterSetEval.CeLength |> int)
+                                    lastLength
         {
             sorterSetCeUseProfile.profileSegments = profileSegments
             sorterSetId = sorterSetEval.SorterSetId

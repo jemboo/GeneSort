@@ -326,7 +326,7 @@ type Simda() =
 
     [<Benchmark>]
     member this.eval_fastGenericCopy() =
-        let yow = SimdUtils.fastGenericCopy this.array512A
+        let yow = SimdUtils.fastGenericCopy0 this.array512A
         yow.Length
 
 
@@ -371,13 +371,13 @@ type ParallelCopyBenchmark() =
     member val DegreeOfParallelism = 1 with get, set
 
     [<GlobalSetup>]
-    member self.Setup() =
+    member this.Setup() =
         sourceData <- Array.init DataSize (fun i -> Vector512.Create(uint16 i))
 
     [<Benchmark>]
-    member self.fastGenericCopyToBuffer() =
+    member this.fastGenericCopyToBuffer() =
         let pool = ArrayPool<Vector512<uint16>>.Shared
-        let options = ParallelOptions(MaxDegreeOfParallelism = self.DegreeOfParallelism)
+        let options = ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
         
         Parallel.For(0, ParallelTracks, options, fun i ->
             // 1. Rent from pool (prevents GC pressure)
