@@ -3,7 +3,7 @@ open BenchmarkDotNet.Running
 
 [<EntryPoint>]
 let main argv =
-    let summary = BenchmarkRunner.Run<ParallelCopyBenchmark>()
+    let summary = BenchmarkRunner.Run<ParallelPipelineBenchmark>()
 
     printfn "%A" summary
     Console.Read() |> ignore

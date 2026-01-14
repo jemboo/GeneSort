@@ -41,208 +41,145 @@ module SimdUtils =
                 raise (ArgumentException(sprintf "Input array must have exactly %d elements." Vector512<'T>.Count))
             Vector512.Create<'T>(data)
 
-        let tile512uy (data: uint8[]) : Vector512<uint8>[] =
-            let vectorSize = Vector512<uint8>.Count
+        let inline tile512<'T when 'T : struct>
+            (data: Span<'T>) : Vector512<'T>[] =
+
+            let vectorSize = Vector512<'T>.Count
             let totalVectors = (data.Length + vectorSize - 1) / vectorSize
-            Array.init totalVectors (fun i ->
-                let startIdx = i * vectorSize
-                let length = Math.Min(vectorSize, data.Length - startIdx)
-                let segment = Array.zeroCreate<uint8> vectorSize
-                Array.Copy(data, startIdx, segment, 0, length)
-                Vector512.Create<uint8>(segment)
-            )
+
+            let result = Array.zeroCreate<Vector512<'T>> totalVectors
+
+            // scratch buffer for the final (partial) vector only
+            let scratch = Array.zeroCreate<'T> vectorSize
+            let scratchSpan = scratch.AsSpan()
+
+            for i = 0 to totalVectors - 1 do
+                let start = i * vectorSize
+                let remaining = data.Length - start
+
+                if remaining >= vectorSize then
+                    // fast path: full vector, no copy
+                    let slice = data.Slice(start, vectorSize)
+                    result.[i] <- Vector512.Create<'T>(slice)
+                else
+                    // tail: copy once into zeroed scratch
+                    scratchSpan.Clear()
+                    data.Slice(start, remaining).CopyTo(scratchSpan)
+                    result.[i] <- Vector512.Create<'T>(scratch)
+
+            result
 
 
-    let tile256uy (data: uint8[]) : Vector256<uint8>[] =
-        let vectorSize = Vector256<uint8>.Count
-        let totalVectors = (data.Length + vectorSize - 1) / vectorSize
-        Array.init totalVectors (fun i ->
-            let startIdx = i * vectorSize
-            let length = Math.Min(vectorSize, data.Length - startIdx)
-            let segment = Array.zeroCreate<uint8> vectorSize
-            Array.Copy(data, startIdx, segment, 0, length)
-            Vector256.Create<uint8>(segment)
-        )
+        /// data: [vectorIndex][i][j]
+        let packToVector512<'T when 'T : struct>
+            (data: 'T[][][]) : Vector512<'T>[][] =
 
-    let tile512us (data: uint16[]) : Vector512<uint16>[] =
-        let vectorSize = Vector512<uint16>.Count
-        let totalVectors = (data.Length + vectorSize - 1) / vectorSize
-        Array.init totalVectors (fun i ->
-            let startIdx = i * vectorSize
-            let length = Math.Min(vectorSize, data.Length - startIdx)
-            let segment = Array.zeroCreate<uint16> vectorSize
-            Array.Copy(data, startIdx, segment, 0, length)
-            Vector512.Create<uint16>(segment)
-        )
+            let lanes = data.Length
+            let vectorSize = Vector512<'T>.Count
 
+            if lanes <> vectorSize then
+                invalidArg "data"
+                    (sprintf "First dimension must be %d for Vector512<%s>"
+                        vectorSize typeof<'T>.Name)
 
-    let tile256us (data: uint16[]) : Vector256<uint16>[] =
-        let vectorSize = Vector256<uint16>.Count
-        let totalVectors = (data.Length + vectorSize - 1) / vectorSize
-        Array.init totalVectors (fun i ->
-            let startIdx = i * vectorSize
-            let length = Math.Min(vectorSize, data.Length - startIdx)
-            let segment = Array.zeroCreate<uint16> vectorSize
-            Array.Copy(data, startIdx, segment, 0, length)
-            Vector256.Create<uint16>(segment)
-        )
+            let a = if lanes > 0 then data.[0].Length else 0
+            let b = if a > 0 then data.[0].[0].Length else 0
 
-
-    // Vector256<uint16>: 16 elements
-    let packToVector256_uint16 (data: uint16[][][]) : Vector256<uint16>[][] =
-        let k = data.Length
-        if k <> 16 then
-            failwith "First dimension must be 16 for Vector256<uint16>"
-    
-        let a = if k > 0 then data.[0].Length else 0
-        let b = if a > 0 then data.[0].[0].Length else 0
-    
-        Array.init a (fun i ->
-            Array.init b (fun j ->
-                let values = Array.init 16 (fun idx -> data.[idx].[i].[j])
-                Vector256.Create(
-                    values.[0], values.[1], values.[2], values.[3],
-                    values.[4], values.[5], values.[6], values.[7],
-                    values.[8], values.[9], values.[10], values.[11],
-                    values.[12], values.[13], values.[14], values.[15]
+            Array.init a (fun i ->
+                Array.init b (fun j ->
+                    let values = Array.init vectorSize (fun idx ->
+                        data.[idx].[i].[j])
+                    Vector512.Create<'T>(values)
                 )
             )
-        )
-
-    // Vector256<uint8>: 32 elements
-    let packToVector256_uint8 (data: uint8[][][]) : Vector256<uint8>[][] =
-        let k = data.Length
-        if k <> 32 then
-            failwith "First dimension must be 32 for Vector256<uint8>"
-    
-        let a = if k > 0 then data.[0].Length else 0
-        let b = if a > 0 then data.[0].[0].Length else 0
-    
-        Array.init a (fun i ->
-            Array.init b (fun j ->
-                let values = Array.init 32 (fun idx -> data.[idx].[i].[j])
-                Vector256.Create(
-                    values.[0], values.[1], values.[2], values.[3],
-                    values.[4], values.[5], values.[6], values.[7],
-                    values.[8], values.[9], values.[10], values.[11],
-                    values.[12], values.[13], values.[14], values.[15],
-                    values.[16], values.[17], values.[18], values.[19],
-                    values.[20], values.[21], values.[22], values.[23],
-                    values.[24], values.[25], values.[26], values.[27],
-                    values.[28], values.[29], values.[30], values.[31]
-                )
-            )
-        )
-
-    // Vector512<uint8>: 64 elements
-    let packToVector512_uint8 (data: uint8[][][]) : Vector512<uint8>[][] =
-        let k = data.Length
-        if k <> 64 then
-            failwith "First dimension must be 64 for Vector512<uint8>"
-    
-        let a = if k > 0 then data.[0].Length else 0
-        let b = if a > 0 then data.[0].[0].Length else 0
-    
-        Array.init a (fun i ->
-            Array.init b (fun j ->
-                let values = Array.init 64 (fun idx -> data.[idx].[i].[j])
-                Vector512.Create(
-                    values.[0], values.[1], values.[2], values.[3],
-                    values.[4], values.[5], values.[6], values.[7],
-                    values.[8], values.[9], values.[10], values.[11],
-                    values.[12], values.[13], values.[14], values.[15],
-                    values.[16], values.[17], values.[18], values.[19],
-                    values.[20], values.[21], values.[22], values.[23],
-                    values.[24], values.[25], values.[26], values.[27],
-                    values.[28], values.[29], values.[30], values.[31],
-                    values.[32], values.[33], values.[34], values.[35],
-                    values.[36], values.[37], values.[38], values.[39],
-                    values.[40], values.[41], values.[42], values.[43],
-                    values.[44], values.[45], values.[46], values.[47],
-                    values.[48], values.[49], values.[50], values.[51],
-                    values.[52], values.[53], values.[54], values.[55],
-                    values.[56], values.[57], values.[58], values.[59],
-                    values.[60], values.[61], values.[62], values.[63]
-                )
-            )
-        )
-
-    // Vector512<uint16>: 32 elements
-    let packToVector512_uint16 (data: uint16[][][]) : Vector512<uint16>[][] =
-        let k = data.Length
-        if k <> 32 then
-            failwith "First dimension must be 32 for Vector512<uint16>"
-    
-        let a = if k > 0 then data.[0].Length else 0
-        let b = if a > 0 then data.[0].[0].Length else 0
-    
-        Array.init a (fun i ->
-            Array.init b (fun j ->
-                let values = Array.init 32 (fun idx -> data.[idx].[i].[j])
-                Vector512.Create(
-                    values.[0], values.[1], values.[2], values.[3],
-                    values.[4], values.[5], values.[6], values.[7],
-                    values.[8], values.[9], values.[10], values.[11],
-                    values.[12], values.[13], values.[14], values.[15],
-                    values.[16], values.[17], values.[18], values.[19],
-                    values.[20], values.[21], values.[22], values.[23],
-                    values.[24], values.[25], values.[26], values.[27],
-                    values.[28], values.[29], values.[30], values.[31]
-                )
-            )
-        )
 
 
-    let copyArray512uy (source: Vector512<uint8>[]) =
-        let dest = Array.zeroCreate source.Length
-        Array.blit source 0 dest 0 source.Length
-        dest
-
-
-    let copyWithSpan512uy (source: Vector512<uint8>[]) =
-        let dest = Array.zeroCreate source.Length
-        source.AsSpan().CopyTo(dest.AsSpan())
-        dest
-
-
-    let fastUnsafeCopy512uy (source: Vector512<uint8>[]) =
-        let dest = Array.zeroCreate source.Length
-        let byteCount = uint32 (source.Length * 64) // Vector512 is 64 bytes
-    
-        let srcPtr = &&source.[0] |> NativePtr.toVoidPtr
-        let destPtr = &&dest.[0] |> NativePtr.toVoidPtr
-    
-        Unsafe.CopyBlock(destPtr, srcPtr, byteCount)
-        dest
-
-
-    // You must use the 'unmanaged' constraint for NativePtr operations
-    let fastGenericCopy0 (source: 'T[]) : 'T[] when 'T : unmanaged =
-        if source.Length = 0 then [||]
-        else
-            let dest = System.GC.AllocateUninitializedArray<'T>(source.Length)
-            let byteCount = uint32 (source.Length * Unsafe.SizeOf<'T>())
+       /// Multiply each vector by a scalar and add offset
+        let inline multiplyAdd (data: Span<Vector512<uint16>>) (multiplier: uint16) (offset: uint16) =
+            let mult = Vector512.Create(multiplier)
+            let off = Vector512.Create(offset)
+            for i = 0 to data.Length - 1 do
+                data.[i] <- Vector512.Add(Vector512.Multiply(data.[i], mult), off)
         
-            // Pin the arrays
-            use pSrc = fixed source
-            use pDest = fixed dest
+        /// Bitwise operations: XOR with pattern
+        let inline xorPattern (data: Span<Vector512<uint16>>) (pattern: uint16) =
+            let pat = Vector512.Create(pattern)
+            for i = 0 to data.Length - 1 do
+                data.[i] <- Vector512.Xor(data.[i], pat)
         
-            // Convert nativeptr<'T> to void* 
-            let srcVoidPtr = NativePtr.toVoidPtr pSrc
-            let destVoidPtr = NativePtr.toVoidPtr pDest
+        /// Min/Max clamping
+        let inline clamp (data: Span<Vector512<uint16>>) (minVal: uint16) (maxVal: uint16) =
+            let minVec = Vector512.Create(minVal)
+            let maxVec = Vector512.Create(maxVal)
+            for i = 0 to data.Length - 1 do
+                data.[i] <- Vector512.Min(Vector512.Max(data.[i], minVec), maxVec)
         
-            Unsafe.CopyBlock(destVoidPtr, srcVoidPtr, byteCount)
-            dest
+        /// Shift operations
+        let inline shiftAndAdd (data: Span<Vector512<uint16>>) (shiftAmount: int) =
+            for i = 0 to data.Length - 1 do
+                let shifted = Vector512.ShiftRightLogical(data.[i], shiftAmount)
+                data.[i] <- Vector512.Add(data.[i], shifted)
+        
+        /// Complex pipeline: multiply, clamp, xor
+        let inline complexPipeline (data: Span<Vector512<uint16>>) =
+            let mult = Vector512.Create(3us)
+            let minVec = Vector512.Create(100us)
+            let maxVec = Vector512.Create(60000us)
+            let xorPat = Vector512.Create(0xAAAAus)
+            
+            for i = 0 to data.Length - 1 do
+                // Multiply by 3
+                let temp = Vector512.Multiply(data.[i], mult)
+                // Clamp
+                let temp2 = Vector512.Min(Vector512.Max(temp, minVec), maxVec)
+                // XOR
+                data.[i] <- Vector512.Xor(temp2, xorPat)
 
 
 
 
-
-
-
-
-
-
+    /// SIMD operations on Vector512<uint16>
+    module SimdOps =
+        /// Multiply each vector by a scalar and add offset
+        let inline multiplyAdd (data: Span<Vector512<uint16>>) (multiplier: uint16) (offset: uint16) =
+            let mult = Vector512.Create(multiplier)
+            let off = Vector512.Create(offset)
+            for i = 0 to data.Length - 1 do
+                data.[i] <- Vector512.Add(Vector512.Multiply(data.[i], mult), off)
+        
+        /// Bitwise operations: XOR with pattern
+        let inline xorPattern (data: Span<Vector512<uint16>>) (pattern: uint16) =
+            let pat = Vector512.Create(pattern)
+            for i = 0 to data.Length - 1 do
+                data.[i] <- Vector512.Xor(data.[i], pat)
+        
+        /// Min/Max clamping
+        let inline clamp (data: Span<Vector512<uint16>>) (minVal: uint16) (maxVal: uint16) =
+            let minVec = Vector512.Create(minVal)
+            let maxVec = Vector512.Create(maxVal)
+            for i = 0 to data.Length - 1 do
+                data.[i] <- Vector512.Min(Vector512.Max(data.[i], minVec), maxVec)
+        
+        /// Shift operations
+        let inline shiftAndAdd (data: Span<Vector512<uint16>>) (shiftAmount: int) =
+            for i = 0 to data.Length - 1 do
+                let shifted = Vector512.ShiftRightLogical(data.[i], shiftAmount)
+                data.[i] <- Vector512.Add(data.[i], shifted)
+        
+        /// Complex pipeline: multiply, clamp, xor
+        let inline complexPipeline (data: Span<Vector512<uint16>>) =
+            let mult = Vector512.Create(3us)
+            let minVec = Vector512.Create(100us)
+            let maxVec = Vector512.Create(60000us)
+            let xorPat = Vector512.Create(0xAAAAus)
+            
+            for i = 0 to data.Length - 1 do
+                // Multiply by 3
+                let temp = Vector512.Multiply(data.[i], mult)
+                // Clamp
+                let temp2 = Vector512.Min(Vector512.Max(temp, minVec), maxVec)
+                // XOR
+                data.[i] <- Vector512.Xor(temp2, xorPat)
 
 
 
@@ -269,17 +206,7 @@ module SimdUtils =
     let yab () =
 
         let daterByte = [| 0 .. 999|] |> Array.map uint8
-        let daterInt = [| 0 .. 999|] |> Array.map uint16
-
-        let quab = V512.tile512uy daterByte
-        let quint = tile512us daterInt
-
-        //let hoo = qua.[5]
-        //let boo = qua.[6]
-        //let coo = Vector512.Add<byte>(hoo, boo)
-
-        //// take the array qua and fold over it to produce the sum of all elements in the vectors
-        //let yow = qua |> Array.mapi(fun i v -> Vector512.Add<byte>(v, qua.[i]))
+        let quab = V512.tile512 (daterByte.AsSpan())
         1
 
 
