@@ -183,6 +183,109 @@ module SimdUtils =
 
 
 
+    module SimdOps2 =
+        /// Multiply each vector by a scalar and add offset
+        let inline multiplyAdd<'T when 'T : struct>
+            (data: Span<Vector512<'T>>)
+            (multiplier: 'T)
+            (offset: 'T) =
+
+            let mult = Vector512.Create(multiplier)
+            let off  = Vector512.Create(offset)
+
+            for i = 0 to data.Length - 1 do
+                data.[i] <-
+                    Vector512.Add(
+                        Vector512.Multiply(data.[i], mult),
+                        off
+                    )
+
+
+        /// Bitwise XOR with a scalar pattern
+        /// Valid for integral SIMD element types
+        let inline xorPattern<'T when 'T : struct>
+            (data: Span<Vector512<'T>>)
+            (pattern: 'T) =
+
+            let pat = Vector512.Create(pattern)
+
+            for i = 0 to data.Length - 1 do
+                data.[i] <- Vector512.Xor(data.[i], pat)
+
+        /// Clamp values to [minVal, maxVal]
+        /// Valid for numeric SIMD element types
+        let inline clamp<'T when 'T : struct>
+            (data: Span<Vector512<'T>>)
+            (minVal: 'T)
+            (maxVal: 'T) =
+
+            let minVec = Vector512.Create(minVal)
+            let maxVec = Vector512.Create(maxVal)
+
+            for i = 0 to data.Length - 1 do
+                data.[i] <-
+                    Vector512.Min(
+                        Vector512.Max(data.[i], minVec),
+                        maxVec
+                    )
+
+        ///// Shift right logically and add original value
+        ///// Valid for *unsigned* integral SIMD element types
+        //let inline shiftAndAdd<'T when 'T : struct>
+        //    (data: Span<Vector512<'T>>)
+        //    (shiftAmount: int) =
+
+        //    for i = 0 to data.Length - 1 do
+        //        let shifted =
+        //            Vector512.ShiftRightLogical(data.[i], shiftAmount)
+        //        data.[i] <- Vector512.Add(data.[i], shifted)
+
+
+        /// Complex pipeline: multiply, clamp, xor
+        /// Valid for integral SIMD element types
+        let inline complexPipeline<'T when 'T : struct>
+            (data: Span<Vector512<'T>>)
+            (multiplier: 'T)
+            (minVal: 'T)
+            (maxVal: 'T)
+            (xorPattern: 'T) =
+
+            let mult   = Vector512.Create(multiplier)
+            let minVec = Vector512.Create(minVal)
+            let maxVec = Vector512.Create(maxVal)
+            let xorVec = Vector512.Create(xorPattern)
+
+            for i = 0 to data.Length - 1 do
+                let t1 = Vector512.Multiply(data.[i], mult)
+                let t2 = Vector512.Min(Vector512.Max(t1, minVec), maxVec)
+                data.[i] <- Vector512.Xor(t2, xorVec)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     let testStackTileByK () =
