@@ -230,15 +230,23 @@ module SimdUtils =
                     )
 
         ///// Shift right logically and add original value
-        ///// Valid for *unsigned* integral SIMD element types
-        //let inline shiftAndAdd<'T when 'T : struct>
-        //    (data: Span<Vector512<'T>>)
-        //    (shiftAmount: int) =
+        let inline shiftAndAdd_u8
+            (data: Span<Vector512<uint8>>)
+            (shiftAmount: int) =
 
-        //    for i = 0 to data.Length - 1 do
-        //        let shifted =
-        //            Vector512.ShiftRightLogical(data.[i], shiftAmount)
-        //        data.[i] <- Vector512.Add(data.[i], shifted)
+            for i = 0 to data.Length - 1 do
+                let shifted =
+                    Vector512.ShiftRightLogical(data.[i], shiftAmount)
+                data.[i] <- Vector512.Add(data.[i], shifted)
+
+        let inline shiftAndAdd_u16
+            (data: Span<Vector512<uint16>>)
+            (shiftAmount: int) =
+
+            for i = 0 to data.Length - 1 do
+                let shifted =
+                    Vector512.ShiftRightLogical(data.[i], shiftAmount)
+                data.[i] <- Vector512.Add(data.[i], shifted)
 
 
         /// Complex pipeline: multiply, clamp, xor

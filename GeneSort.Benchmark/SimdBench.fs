@@ -182,29 +182,61 @@ type ParallelPipelineBenchmark() =
     //            pool.Return(buffer)
     //    ) |> ignore
     
-    //[<Benchmark>]
-    //member this.BlockProcessingClamp() =
-    //    let blockSize = DataSize / ParallelTracks
-    //    let pool = ArrayPool<Vector512<uint16>>.Shared
-    //    let options = ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
+    [<Benchmark>]
+    member this.BlockProcessingClamp() =
+        let blockSize = DataSize / ParallelTracks
+        let pool = ArrayPool<Vector512<uint16>>.Shared
+        let options = ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
         
-    //    Parallel.For(0, ParallelTracks, options, fun trackIdx ->
-    //        let startIdx = trackIdx * blockSize
-    //        let endIdx = if trackIdx = ParallelTracks - 1 then DataSize else (trackIdx + 1) * blockSize
-    //        let currentBlockSize = endIdx - startIdx
+        Parallel.For(0, ParallelTracks, options, fun trackIdx ->
+            let startIdx = trackIdx * blockSize
+            let endIdx = if trackIdx = ParallelTracks - 1 then DataSize else (trackIdx + 1) * blockSize
+            let currentBlockSize = endIdx - startIdx
             
-    //        let buffer = pool.Rent(currentBlockSize)
-    //        try
-    //            sourceData.AsSpan(startIdx, currentBlockSize).CopyTo(buffer.AsSpan(0, currentBlockSize))
-    //            let workArea = buffer.AsSpan(0, currentBlockSize)
+            let buffer = pool.Rent(currentBlockSize)
+            try
+                sourceData.AsSpan(startIdx, currentBlockSize).CopyTo(buffer.AsSpan(0, currentBlockSize))
+                let workArea = buffer.AsSpan(0, currentBlockSize)
                 
-    //            // SIMD operation: clamp values between 1000 and 50000
-    //            SimdUtils.SimdOps.clamp workArea 1000us 50000us
+                // SIMD operation: clamp values between 1000 and 50000
+                SimdUtils.SimdOps.clamp workArea 1000us 50000us
                 
-    //            workArea.CopyTo(destData.AsSpan(startIdx, currentBlockSize))
-    //        finally
-    //            pool.Return(buffer)
-    //    ) |> ignore
+                workArea.CopyTo(destData.AsSpan(startIdx, currentBlockSize))
+            finally
+                pool.Return(buffer)
+        ) |> ignore
+
+    [<Benchmark>]
+    member this.BlockProcessingClampGeneric() =
+        let blockSize = DataSize / ParallelTracks
+        let pool = ArrayPool<Vector512<uint16>>.Shared
+        let options = ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
+        
+        Parallel.For(0, ParallelTracks, options, fun trackIdx ->
+            let startIdx = trackIdx * blockSize
+            let endIdx = if trackIdx = ParallelTracks - 1 then DataSize else (trackIdx + 1) * blockSize
+            let currentBlockSize = endIdx - startIdx
+            
+            let buffer = pool.Rent(currentBlockSize)
+            try
+                sourceData.AsSpan(startIdx, currentBlockSize).CopyTo(buffer.AsSpan(0, currentBlockSize))
+                let workArea = buffer.AsSpan(0, currentBlockSize)
+                
+                // SIMD operation: clamp values between 1000 and 50000
+                SimdUtils.SimdOps.clamp workArea 1000us 50000us
+                
+                workArea.CopyTo(destData.AsSpan(startIdx, currentBlockSize))
+            finally
+                pool.Return(buffer)
+        ) |> ignore
+
+
+
+
+
+
+
+
     
     //[<Benchmark>]
     //member this.BlockProcessingShiftAndAdd() =
