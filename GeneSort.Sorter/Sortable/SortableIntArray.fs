@@ -50,10 +50,10 @@ type sortableIntArray =
     member this.DistanceSquared(other: sortableIntArray) =
         if other.sortingWidth <> this.sortingWidth then
             invalidArg "other" $"Other array sorting width ({int other.sortingWidth}) must equal this sorting width ({int this.sortingWidth})."
-        ArrayProperties.distanceSquared this.values other.values
+        ArrayUtils.distanceSquared this.values other.values
 
     /// Checks if the values array is sorted in non-decreasing order.
-    member this.IsSorted = ArrayProperties.isSorted this.Values
+    member this.IsSorted = ArrayUtils.isSorted this.Values
     
     member this.SortByCes
                 (ces: ce[])

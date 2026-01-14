@@ -2,7 +2,7 @@
 
 open Xunit
 open FsUnit.Xunit
-open GeneSort.Core.ArrayProperties
+open GeneSort.Core.ArrayUtils
 open System
 
 type ArrayPropertiesTests() =

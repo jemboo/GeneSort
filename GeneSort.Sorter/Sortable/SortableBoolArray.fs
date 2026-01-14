@@ -39,10 +39,10 @@ type sortableBoolArray =
             invalidArg "other" $"Other array SortingWidth ({int other.SortingWidth}) must equal this SortingWidth ({int this.SortingWidth})."
         let thisNumeric = this.values |> Array.map (fun b -> if b then 1 else 0)
         let otherNumeric = other.values |> Array.map (fun b -> if b then 1 else 0)
-        ArrayProperties.distanceSquared thisNumeric otherNumeric
+        ArrayUtils.distanceSquared thisNumeric otherNumeric
 
     /// Checks if the values array is sorted in non-decreasing order.
-    member this.IsSorted = ArrayProperties.isSorted this.values
+    member this.IsSorted = ArrayUtils.isSorted this.values
      
     member this.SortByCes
                 (ces: ce[]) 

@@ -19,7 +19,7 @@ type ceBlockWithUsage =
             ceBlock = ceBlock; 
             useCounts = useCounts;
             usedCes = Lazy<ce[]>(ceBlockWithUsage.getUsedCes ceBlock useCounts)
-            lastUsedIndex = Lazy<int>(ArrayProperties.lastNonZeroIndex useCounts)
+            lastUsedIndex = Lazy<int>(ArrayUtils.lastNonZeroIndex useCounts)
         }
 
     member this.useCount (dex:int) = 

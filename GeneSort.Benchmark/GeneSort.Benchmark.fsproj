@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="SimdBench.fs" />
     <Compile Include="SorterBench.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

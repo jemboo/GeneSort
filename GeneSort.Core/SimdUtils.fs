@@ -1,15 +1,12 @@
 ﻿namespace GeneSort.Core
 open System
-open FSharp.UMX
 open System.Runtime.Intrinsics
 open System.Runtime.Intrinsics.X86
 open System.Runtime.Intrinsics.Arm
 open System.Runtime.CompilerServices
 open Microsoft.FSharp.NativeInterop
-open System.Runtime.CompilerServices
-open System.Runtime.Intrinsics
-open Microsoft.FSharp.NativeInterop
-open System.Runtime.InteropServices
+
+open ArrayUtils
 
 
 [<Measure>] type simdLength
@@ -37,18 +34,23 @@ module SimdUtils =
         printfn "ARM NEON: %b (128-bit)" AdvSimd.IsSupported
         printfn ""
 
+    module V512 =
 
+        let inline Create<'T when 'T : struct> (data: 'T[]) : Vector512<'T> =
+            if data.Length <> Vector512<'T>.Count then
+                raise (ArgumentException(sprintf "Input array must have exactly %d elements." Vector512<'T>.Count))
+            Vector512.Create<'T>(data)
 
-    let tile512uy (data: uint8[]) : Vector512<uint8>[] =
-        let vectorSize = Vector512<uint8>.Count
-        let totalVectors = (data.Length + vectorSize - 1) / vectorSize
-        Array.init totalVectors (fun i ->
-            let startIdx = i * vectorSize
-            let length = Math.Min(vectorSize, data.Length - startIdx)
-            let segment = Array.zeroCreate<uint8> vectorSize
-            Array.Copy(data, startIdx, segment, 0, length)
-            Vector512.Create<uint8>(segment)
-        )
+        let tile512uy (data: uint8[]) : Vector512<uint8>[] =
+            let vectorSize = Vector512<uint8>.Count
+            let totalVectors = (data.Length + vectorSize - 1) / vectorSize
+            Array.init totalVectors (fun i ->
+                let startIdx = i * vectorSize
+                let length = Math.Min(vectorSize, data.Length - startIdx)
+                let segment = Array.zeroCreate<uint8> vectorSize
+                Array.Copy(data, startIdx, segment, 0, length)
+                Vector512.Create<uint8>(segment)
+            )
 
 
     let tile256uy (data: uint8[]) : Vector256<uint8>[] =
@@ -84,46 +86,6 @@ module SimdUtils =
             Array.Copy(data, startIdx, segment, 0, length)
             Vector256.Create<uint16>(segment)
         )
-
-
-
-    let inline stackTileByK (data: ^a[][]) (k: int) : ^a[][][] * int =
-        let n = data.Length
-        let w = if n > 0 then data.[0].Length else 0
-        let numBlocks = (n + k - 1) / k  // ceiling division
-    
-        // Create output array: numBlocks by w by k
-        let result = Array.init numBlocks (fun _ -> 
-            Array.init w (fun _ -> 
-                Array.zeroCreate k))
-    
-        // Fill the result array
-        for blockIdx = 0 to numBlocks - 1 do
-            for i = 0 to k - 1 do
-                let rowIdx = blockIdx * k + i
-                if rowIdx < n then
-                    for j = 0 to w - 1 do
-                        result.[blockIdx].[j].[i] <- data.[rowIdx].[j]
-    
-        (result, n)
-
-
-    let inline unstackTileByK (tiled: ^a[][][]) (n: int) : ^a[][] =
-        let numBlocks = tiled.Length
-        let w = if numBlocks > 0 then tiled.[0].Length else 0
-        let k = if w > 0 then tiled.[0].[0].Length else 0
-
-        // Output: n × w
-        let result = Array.init n (fun _ -> Array.zeroCreate w)
-
-        for blockIdx = 0 to numBlocks - 1 do
-            for i = 0 to k - 1 do
-                let rowIdx = blockIdx * k + i
-                if rowIdx < n then
-                    for j = 0 to w - 1 do
-                        result.[rowIdx].[j] <- tiled.[blockIdx].[j].[i]
-
-        result
 
 
     // Vector256<uint16>: 16 elements
@@ -274,66 +236,9 @@ module SimdUtils =
 
 
 
-    // You must use the 'unmanaged' constraint for NativePtr operations
-    let fastGenericCopyToBuffer0 (source: 'T[]) (dest: 'T[]) : unit when 'T : unmanaged =
-        let byteCount = uint32 (source.Length * Unsafe.SizeOf<'T>())
-        
-        // Pin the arrays
-        use pSrc = fixed source
-        use pDest = fixed dest
-        
-        // Convert nativeptr<'T> to void* 
-        let srcVoidPtr = NativePtr.toVoidPtr pSrc
-        let destVoidPtr = NativePtr.toVoidPtr pDest
-        
-        Unsafe.CopyBlock(destVoidPtr, srcVoidPtr, byteCount)
-
-
-/// High-performance generic copy using Span logic.
-    /// This is safer than raw pointers but usually just as fast.
-    let fastGenericCopyToBuffer (source: 'T[]) (dest: 'T[]) =
-        // source.AsSpan() creates a span of exact length.
-        // dest.AsSpan(0, source.Length) slices the pool buffer to match.
-        source.AsSpan().CopyTo(dest.AsSpan(0, source.Length))
-
-    /// The "Nuclear" version if Span.CopyTo isn't fast enough for your specific CPU.
-    let ultraFastCopy (source: 'T[]) (dest: 'T[]) : unit when 'T : unmanaged =
-        let count = source.Length
-        let byteCount = uint32 (count * Unsafe.SizeOf<'T>())
-        
-        // Get refs to the actual data start points
-        let mutable srcRef = MemoryMarshal.GetArrayDataReference(source)
-        let mutable destRef = MemoryMarshal.GetArrayDataReference(dest)
-        
-        // This emits the same IL as a native memcpy
-        Unsafe.CopyBlock(Unsafe.AsPointer(&destRef), Unsafe.AsPointer(&srcRef), byteCount)
 
 
 
-
-
-
-    let copyArray512us (source: Vector512<uint16>[]) =
-        let dest = Array.zeroCreate source.Length
-        Array.blit source 0 dest 0 source.Length
-        dest
-
-
-    let copyWithSpan512us (source: Vector512<uint16>[]) =
-        let dest = Array.zeroCreate source.Length
-        source.AsSpan().CopyTo(dest.AsSpan())
-        dest
-
-
-    let fastUnsafeCopy512us (source: Vector512<uint16>[]) =
-        let dest = Array.zeroCreate source.Length
-        let byteCount = uint32 (source.Length * 64) // Vector512 is 64 bytes
-    
-        let srcPtr = &&source.[0] |> NativePtr.toVoidPtr
-        let destPtr = &&dest.[0] |> NativePtr.toVoidPtr
-    
-        Unsafe.CopyBlock(destPtr, srcPtr, byteCount)
-        dest
 
 
 
@@ -366,7 +271,7 @@ module SimdUtils =
         let daterByte = [| 0 .. 999|] |> Array.map uint8
         let daterInt = [| 0 .. 999|] |> Array.map uint16
 
-        let quab = tile512uy daterByte
+        let quab = V512.tile512uy daterByte
         let quint = tile512us daterInt
 
         //let hoo = qua.[5]

@@ -1,8 +1,14 @@
 ﻿namespace GeneSort.Core
+
 open LanguagePrimitives
+open System
+open System.Runtime.CompilerServices
+open Microsoft.FSharp.NativeInterop
+open System.Runtime.InteropServices
+open System.Runtime.Intrinsics
 
 
-module ArrayProperties =
+module ArrayUtils =
 
     let inline distanceSquared< ^a when ^a: (static member Zero: ^a)
                                         and ^a: (static member (+): ^a * ^a -> ^a)
@@ -93,4 +99,89 @@ module ArrayProperties =
             found
         else
             invalidOp "Arrays are identical; no differing index found"
+
+
+
+    let inline stackTileByK (data: ^a[][]) (k: int) : ^a[][][] * int =
+        let n = data.Length
+        let w = if n > 0 then data.[0].Length else 0
+        let numBlocks = (n + k - 1) / k  // ceiling division
+    
+        // Create output array: numBlocks by w by k
+        let result = Array.init numBlocks (fun _ -> 
+            Array.init w (fun _ -> 
+                Array.zeroCreate k))
+    
+        // Fill the result array
+        for blockIdx = 0 to numBlocks - 1 do
+            for i = 0 to k - 1 do
+                let rowIdx = blockIdx * k + i
+                if rowIdx < n then
+                    for j = 0 to w - 1 do
+                        result.[blockIdx].[j].[i] <- data.[rowIdx].[j]
+    
+        (result, n)
+
+
+    let inline unstackTileByK (tiled: ^a[][][]) (n: int) : ^a[][] =
+        let numBlocks = tiled.Length
+        let w = if numBlocks > 0 then tiled.[0].Length else 0
+        let k = if w > 0 then tiled.[0].[0].Length else 0
+
+        // Output: n × w
+        let result = Array.init n (fun _ -> Array.zeroCreate w)
+
+        for blockIdx = 0 to numBlocks - 1 do
+            for i = 0 to k - 1 do
+                let rowIdx = blockIdx * k + i
+                if rowIdx < n then
+                    for j = 0 to w - 1 do
+                        result.[rowIdx].[j] <- tiled.[blockIdx].[j].[i]
+
+        result
+
+
+
+
+    // You must use the 'unmanaged' constraint for NativePtr operations
+    let fastGenericCopyToBuffer0 (source: 'T[]) (dest: 'T[]) : unit when 'T : unmanaged =
+        let byteCount = uint32 (source.Length * Unsafe.SizeOf<'T>())
+        
+        // Pin the arrays
+        use pSrc = fixed source
+        use pDest = fixed dest
+        
+        // Convert nativeptr<'T> to void* 
+        let srcVoidPtr = NativePtr.toVoidPtr pSrc
+        let destVoidPtr = NativePtr.toVoidPtr pDest
+        
+        Unsafe.CopyBlock(destVoidPtr, srcVoidPtr, byteCount)
+
+
+    /// High-performance generic copy using Span logic.
+    /// This is safer than raw pointers but usually just as fast.
+    let fastGenericCopyToBuffer (source: 'T[]) (dest: 'T[]) =
+        // source.AsSpan() creates a span of exact length.
+        // dest.AsSpan(0, source.Length) slices the pool buffer to match.
+        source.AsSpan().CopyTo(dest.AsSpan(0, source.Length))
+
+
+    /// The "Nuclear" version if Span.CopyTo isn't fast enough for your specific CPU.
+    let ultraFastCopy (source: 'T[]) (dest: 'T[]) : unit when 'T : unmanaged =
+        let count = source.Length
+        let byteCount = uint32 (count * Unsafe.SizeOf<'T>())
+        
+        // Get refs to the actual data start points
+        let mutable srcRef = MemoryMarshal.GetArrayDataReference(source)
+        let mutable destRef = MemoryMarshal.GetArrayDataReference(dest)
+        
+        // This emits the same IL as a native memcpy
+        Unsafe.CopyBlock(Unsafe.AsPointer(&destRef), Unsafe.AsPointer(&srcRef), byteCount)
+
+
+
+
+
+
+
 

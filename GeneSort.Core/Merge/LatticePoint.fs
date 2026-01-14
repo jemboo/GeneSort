@@ -201,7 +201,7 @@ module LatticePoint =
 
     /// the two lattice points must be the same dimension and differ in at least one coordinate
     let getFirstDifferingIndex (lowPoint: latticePoint) (hiPoint: latticePoint) : int =
-        ArrayProperties.firstDiffIndexOrThrow lowPoint.Coords hiPoint.Coords
+        ArrayUtils.firstDiffIndexOrThrow lowPoint.Coords hiPoint.Coords
 
 
     // This is used by updateWithLatticePoint to convert a path in the mergeLattice to a permutation.
