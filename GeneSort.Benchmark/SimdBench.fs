@@ -12,6 +12,7 @@ open GeneSort.Sorter.Sorter
 open System.Runtime.Intrinsics
 open System.Buffers
 open System.Threading.Tasks
+open System.Runtime.InteropServices
 
 
 
@@ -170,79 +171,78 @@ type ParallelPipelineBenchmark() =
     // Vector256 Copy-On-Write
     // ---------------------------
 
-    [<Benchmark>]
-    member this.Vector256_MultiplyAdd_CopyOnWrite() =
-        let options =
-            ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
-
-        let chunkSize =
-            (DataSize256 + this.ParallelTracks - 1)
-            / this.ParallelTracks
-
-        Parallel.For(0, this.ParallelTracks, options, fun trackId ->
-            let startIdx = trackId * chunkSize
-            let endIdx   = min DataSize256 (startIdx + chunkSize)
-
-            if startIdx < endIdx then
-                let src =
-                    sourceData256.AsSpan(startIdx, endIdx - startIdx)
-
-                let dst =
-                    destData256.AsSpan(startIdx, endIdx - startIdx)
-
-                // Copy-on-write
-                src.CopyTo(dst)
-
-                SimdUtils.SimdOps256.multiplyAdd<uint16> dst 5us 100us
-        ) |> ignore
-
-
-    [<Benchmark(Baseline = true)>]
-    member this.Vector256_MultiplyAdd_Fused() =
-        let options =
-            ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
-
-        let chunkSize =
-            (DataSize256 + this.ParallelTracks - 1)
-            / this.ParallelTracks
-
-        Parallel.For(0, this.ParallelTracks, options, fun trackId ->
-            let startIdx = trackId * chunkSize
-            let endIdx   = min DataSize256 (startIdx + chunkSize)
-
-            if startIdx < endIdx then
-                let src =
-                    sourceData256.AsSpan(startIdx, endIdx - startIdx)
-
-                let dst =
-                    destData256.AsSpan(startIdx, endIdx - startIdx)
-
-                Fused256.multiplyAddCopy src dst 5us 100us
-        ) |> ignore
-
-
     //[<Benchmark>]
-    //member this.Vector512_MultiplyAdd_Fused() =
+    //member this.Vector256_MultiplyAdd_CopyOnWrite() =
     //    let options =
     //        ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
 
     //    let chunkSize =
-    //        (DataSize512 + this.ParallelTracks - 1)
+    //        (DataSize256 + this.ParallelTracks - 1)
     //        / this.ParallelTracks
 
     //    Parallel.For(0, this.ParallelTracks, options, fun trackId ->
     //        let startIdx = trackId * chunkSize
-    //        let endIdx   = min DataSize512 (startIdx + chunkSize)
+    //        let endIdx   = min DataSize256 (startIdx + chunkSize)
 
     //        if startIdx < endIdx then
     //            let src =
-    //                sourceData512.AsSpan(startIdx, endIdx - startIdx)
+    //                sourceData256.AsSpan(startIdx, endIdx - startIdx)
 
     //            let dst =
-    //                destData512.AsSpan(startIdx, endIdx - startIdx)
+    //                destData256.AsSpan(startIdx, endIdx - startIdx)
 
-    //            Fused512.multiplyAddCopy src dst 5us 100us
+    //            // Copy-on-write
+    //            src.CopyTo(dst)
+
+    //            SimdUtils.SimdOps256.multiplyAdd<uint16> dst 5us 100us
     //    ) |> ignore
+
+
+    [<Benchmark>]
+    member this.Vector256_MultiplyAdd_Unrolled() =
+        let options =
+            ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
+
+        let chunkSize =
+            (DataSize256 + this.ParallelTracks - 1)
+            / this.ParallelTracks
+
+        Parallel.For(0, this.ParallelTracks, options, fun trackId ->
+            let startIdx = trackId * chunkSize
+            let endIdx   = min DataSize256 (startIdx + chunkSize)
+
+            if startIdx < endIdx then
+                let src =
+                    sourceData256.AsSpan(startIdx, endIdx - startIdx)
+
+                let dst =
+                    destData256.AsSpan(startIdx, endIdx - startIdx)
+
+                Fused256.multiplyAddCopyUnrolled (MemoryMarshal.CreateReadOnlySpan(&src.GetPinnableReference(), src.Length)) dst 5us 100us
+        ) |> ignore
+
+    [<Benchmark>]
+    member this.Vector256_MultiplyAdd_Uint16_Unrolled() =
+        let options =
+            ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
+
+        let chunkSize =
+            (DataSize512 + this.ParallelTracks - 1)
+            / this.ParallelTracks
+
+        Parallel.For(0, this.ParallelTracks, options, fun trackId ->
+            let startIdx = trackId * chunkSize
+            let endIdx   = min DataSize512 (startIdx + chunkSize)
+
+            if startIdx < endIdx then
+                let src =
+                    sourceData256.AsSpan(startIdx, endIdx - startIdx)
+
+                let dst =
+                    destData256.AsSpan(startIdx, endIdx - startIdx)
+                    
+                Fused256.multiplyAddCopyUint16Unrolled (MemoryMarshal.CreateReadOnlySpan(&src.GetPinnableReference(), src.Length)) dst 5us 100us
+        ) |> ignore
 
 
 

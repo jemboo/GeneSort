@@ -7,6 +7,7 @@ open System.Runtime.CompilerServices
 open Microsoft.FSharp.NativeInterop
 
 open ArrayUtils
+open System.Runtime.InteropServices
 
 
 [<Measure>] type simdLength
@@ -366,39 +367,243 @@ module SimdUtils =
 
 module Fused256 =
 
-
     /// dst[i] = src[i] * multiplier + offset
-    let inline multiplyAddCopy
+    let inline multiplyAddCopy<'T when 'T : struct>
+        (src: ReadOnlySpan<Vector256<'T>>)
+        (dst: Span<Vector256<'T>>)
+        (multiplier: 'T)
+        (offset: 'T) =
+
+        let len = src.Length
+        if len > 0 then
+            // Create the vectors once outside the loop
+            let mult = Vector256.Create(multiplier)
+            let off  = Vector256.Create(offset)
+
+            // Get raw references to the start of the spans
+            let mutable srcRef = &MemoryMarshal.GetReference(src)
+            let mutable dstRef = &MemoryMarshal.GetReference(dst)
+
+            let mutable i = 0
+            while i < len do
+                // Directly access memory via offset pointers
+                let v = Unsafe.Add(&srcRef, i)
+                let r = Vector256.Add(Vector256.Multiply(v, mult), off)
+                Unsafe.Add(&dstRef, i) <- r
+                i <- i + 1
+
+
+    let inline multiplyAddCopyUnrolled<'T when 'T : struct>
+        (src: ReadOnlySpan<Vector256<'T>>)
+        (dst: Span<Vector256<'T>>)
+        (multiplier: 'T)
+        (offset: 'T) =
+
+        let len = src.Length
+        if len > 0 then
+            let mult = Vector256.Create(multiplier)
+            let off  = Vector256.Create(offset)
+
+            let mutable srcRef = &MemoryMarshal.GetReference(src)
+            let mutable dstRef = &MemoryMarshal.GetReference(dst)
+
+            let mutable i = 0
+            
+            // 1. MAIN LOOP: Process 4 vectors at a time
+            while i <= len - 4 do
+                // Load 4 vectors
+                let v0 = Unsafe.Add(&srcRef, i)
+                let v1 = Unsafe.Add(&srcRef, i + 1)
+                let v2 = Unsafe.Add(&srcRef, i + 2)
+                let v3 = Unsafe.Add(&srcRef, i + 3)
+
+                // Math for 4 vectors
+                let r0 = Vector256.Add(Vector256.Multiply(v0, mult), off)
+                let r1 = Vector256.Add(Vector256.Multiply(v1, mult), off)
+                let r2 = Vector256.Add(Vector256.Multiply(v2, mult), off)
+                let r3 = Vector256.Add(Vector256.Multiply(v3, mult), off)
+
+                // Store 4 vectors
+                Unsafe.Add(&dstRef, i)     <- r0
+                Unsafe.Add(&dstRef, i + 1) <- r1
+                Unsafe.Add(&dstRef, i + 2) <- r2
+                Unsafe.Add(&dstRef, i + 3) <- r3
+                
+                i <- i + 4
+
+            // 2. REMAINDER LOOP: Handle cases where length is not a multiple of 4
+            while i < len do
+                let v = Unsafe.Add(&srcRef, i)
+                let r = Vector256.Add(Vector256.Multiply(v, mult), off)
+                Unsafe.Add(&dstRef, i) <- r
+                i <- i + 1
+
+
+    let inline multiplyAddCopyUint16Unrolled
         (src: ReadOnlySpan<Vector256<uint16>>)
         (dst: Span<Vector256<uint16>>)
         (multiplier: uint16)
         (offset: uint16) =
 
-        let mult = Vector256.Create(multiplier)
-        let off  = Vector256.Create(offset)
-
         let len = src.Length
-        for i = 0 to len - 1 do
-            let v = src.[i]
-            let r = Vector256.Add(Vector256.Multiply(v, mult), off)
-            dst.[i] <- r
+        if len > 0 then
+            let mult = Vector256.Create(multiplier)
+            let off  = Vector256.Create(offset)
+
+            let mutable srcRef = &MemoryMarshal.GetReference(src)
+            let mutable dstRef = &MemoryMarshal.GetReference(dst)
+
+            let mutable i = 0
+            
+            // Main unrolled loop
+            while i <= len - 4 do
+                // Simultaneous loads
+                let v0 = Unsafe.Add(&srcRef, i)
+                let v1 = Unsafe.Add(&srcRef, i + 1)
+                let v2 = Unsafe.Add(&srcRef, i + 2)
+                let v3 = Unsafe.Add(&srcRef, i + 3)
+
+                // Math: Multiply + Add
+                // Note: The JIT will attempt to use VPMULLW if available
+                let r0 = Vector256.Add(Vector256.Multiply(v0, mult), off)
+                let r1 = Vector256.Add(Vector256.Multiply(v1, mult), off)
+                let r2 = Vector256.Add(Vector256.Multiply(v2, mult), off)
+                let r3 = Vector256.Add(Vector256.Multiply(v3, mult), off)
+
+                // Simultaneous stores
+                Unsafe.Add(&dstRef, i)     <- r0
+                Unsafe.Add(&dstRef, i + 1) <- r1
+                Unsafe.Add(&dstRef, i + 2) <- r2
+                Unsafe.Add(&dstRef, i + 3) <- r3
+                
+                i <- i + 4
+
+            // Cleanup
+            while i < len do
+                let v = Unsafe.Add(&srcRef, i)
+                dst.[i] <- Vector256.Add(Vector256.Multiply(v, mult), off)
+                i <- i + 1
+
+
 
 
 
 module Fused512 =
 
     /// dst[i] = src[i] * multiplier + offset
-    let inline multiplyAddCopy
+    let inline multiplyAddCopy<'T when 'T : struct>
+        (src: ReadOnlySpan<Vector512<'T>>)
+        (dst: Span<Vector512<'T>>)
+        (multiplier: 'T)
+        (offset: 'T) =
+
+        let len = src.Length
+        if len > 0 then
+            // Create the vectors once outside the loop
+            let mult = Vector512.Create(multiplier)
+            let off  = Vector512.Create(offset)
+
+            // Get raw references to the start of the spans
+            let mutable srcRef = &MemoryMarshal.GetReference(src)
+            let mutable dstRef = &MemoryMarshal.GetReference(dst)
+
+            let mutable i = 0
+            while i < len do
+                // Directly access memory via offset pointers
+                let v = Unsafe.Add(&srcRef, i)
+                let r = Vector512.Add(Vector512.Multiply(v, mult), off)
+                Unsafe.Add(&dstRef, i) <- r
+                i <- i + 1
+
+    let inline multiplyAddCopyUnrolled<'T when 'T : struct>
+        (src: ReadOnlySpan<Vector512<'T>>)
+        (dst: Span<Vector512<'T>>)
+        (multiplier: 'T)
+        (offset: 'T) =
+
+        let len = src.Length
+        if len > 0 then
+            let mult = Vector512.Create(multiplier)
+            let off  = Vector512.Create(offset)
+
+            let mutable srcRef = &MemoryMarshal.GetReference(src)
+            let mutable dstRef = &MemoryMarshal.GetReference(dst)
+
+            let mutable i = 0
+            
+            // 1. MAIN LOOP: Process 4 vectors at a time
+            while i <= len - 4 do
+                // Load 4 vectors
+                let v0 = Unsafe.Add(&srcRef, i)
+                let v1 = Unsafe.Add(&srcRef, i + 1)
+                let v2 = Unsafe.Add(&srcRef, i + 2)
+                let v3 = Unsafe.Add(&srcRef, i + 3)
+
+                // Math for 4 vectors
+                let r0 = Vector512.Add(Vector512.Multiply(v0, mult), off)
+                let r1 = Vector512.Add(Vector512.Multiply(v1, mult), off)
+                let r2 = Vector512.Add(Vector512.Multiply(v2, mult), off)
+                let r3 = Vector512.Add(Vector512.Multiply(v3, mult), off)
+
+                // Store 4 vectors
+                Unsafe.Add(&dstRef, i)     <- r0
+                Unsafe.Add(&dstRef, i + 1) <- r1
+                Unsafe.Add(&dstRef, i + 2) <- r2
+                Unsafe.Add(&dstRef, i + 3) <- r3
+                
+                i <- i + 4
+
+            // 2. REMAINDER LOOP: Handle cases where length is not a multiple of 4
+            while i < len do
+                let v = Unsafe.Add(&srcRef, i)
+                let r = Vector512.Add(Vector512.Multiply(v, mult), off)
+                Unsafe.Add(&dstRef, i) <- r
+                i <- i + 1
+
+
+
+
+    let inline multiplyAddCopyUint16Unrolled
         (src: ReadOnlySpan<Vector512<uint16>>)
         (dst: Span<Vector512<uint16>>)
         (multiplier: uint16)
         (offset: uint16) =
 
-        let mult = Vector512.Create(multiplier)
-        let off  = Vector512.Create(offset)
-
         let len = src.Length
-        for i = 0 to len - 1 do
-            let v = src.[i]
-            let r = Vector512.Add(Vector512.Multiply(v, mult), off)
-            dst.[i] <- r
+        if len > 0 then
+            let mult = Vector512.Create(multiplier)
+            let off  = Vector512.Create(offset)
+
+            let mutable srcRef = &MemoryMarshal.GetReference(src)
+            let mutable dstRef = &MemoryMarshal.GetReference(dst)
+
+            let mutable i = 0
+            
+            // Main unrolled loop
+            while i <= len - 4 do
+                // Simultaneous loads
+                let v0 = Unsafe.Add(&srcRef, i)
+                let v1 = Unsafe.Add(&srcRef, i + 1)
+                let v2 = Unsafe.Add(&srcRef, i + 2)
+                let v3 = Unsafe.Add(&srcRef, i + 3)
+
+                // Math: Multiply + Add
+                // Note: The JIT will attempt to use VPMULLW if available
+                let r0 = Vector512.Add(Vector512.Multiply(v0, mult), off)
+                let r1 = Vector512.Add(Vector512.Multiply(v1, mult), off)
+                let r2 = Vector512.Add(Vector512.Multiply(v2, mult), off)
+                let r3 = Vector512.Add(Vector512.Multiply(v3, mult), off)
+
+                // Simultaneous stores
+                Unsafe.Add(&dstRef, i)     <- r0
+                Unsafe.Add(&dstRef, i + 1) <- r1
+                Unsafe.Add(&dstRef, i + 2) <- r2
+                Unsafe.Add(&dstRef, i + 3) <- r3
+                
+                i <- i + 4
+
+            // Cleanup
+            while i < len do
+                let v = Unsafe.Add(&srcRef, i)
+                dst.[i] <- Vector512.Add(Vector512.Multiply(v, mult), off)
+                i <- i + 1
