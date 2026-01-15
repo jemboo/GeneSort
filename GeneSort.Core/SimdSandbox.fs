@@ -9,10 +9,6 @@ open Microsoft.FSharp.NativeInterop
 open ArrayUtils
 
 
-[<Measure>] type simdLength
-
-
-
 //let a = 10y         // int8
 //let a = 10uy        // uint8
 //let a = 10          // int
@@ -24,17 +20,7 @@ open ArrayUtils
 //let g = 10I         // bigint
 
 
-module SimdUtils = 
-
-    let printCapabilities () =
-        printfn "=== CPU SIMD Capabilities ==="
-        printfn "SSE2:    %b (128-bit)" Sse2.IsSupported
-        printfn "AVX2:    %b (256-bit)" Avx2.IsSupported
-        printfn "AVX-512: %b (512-bit)" Avx512F.IsSupported
-        printfn "ARM NEON: %b (128-bit)" AdvSimd.IsSupported
-        printfn "Vector512 IsHardwareAccelerated: %b" Vector512.IsHardwareAccelerated
-        printfn "Vector256 IsHardwareAccelerated: %b" Vector256.IsHardwareAccelerated
-        printfn ""
+module SimdSandbox = 
 
 
     module V512 =
@@ -389,43 +375,3 @@ module SimdUtils =
         let daterByte = [| 0 .. 999|] |> Array.map uint8
         let quab = V512.tile512 (daterByte.AsSpan())
         1
-
-
-module Fused256 =
-
-
-    /// dst[i] = src[i] * multiplier + offset
-    let inline multiplyAddCopy
-        (src: ReadOnlySpan<Vector256<uint16>>)
-        (dst: Span<Vector256<uint16>>)
-        (multiplier: uint16)
-        (offset: uint16) =
-
-        let mult = Vector256.Create(multiplier)
-        let off  = Vector256.Create(offset)
-
-        let len = src.Length
-        for i = 0 to len - 1 do
-            let v = src.[i]
-            let r = Vector256.Add(Vector256.Multiply(v, mult), off)
-            dst.[i] <- r
-
-
-
-module Fused512 =
-
-    /// dst[i] = src[i] * multiplier + offset
-    let inline multiplyAddCopy
-        (src: ReadOnlySpan<Vector512<uint16>>)
-        (dst: Span<Vector512<uint16>>)
-        (multiplier: uint16)
-        (offset: uint16) =
-
-        let mult = Vector512.Create(multiplier)
-        let off  = Vector512.Create(offset)
-
-        let len = src.Length
-        for i = 0 to len - 1 do
-            let v = src.[i]
-            let r = Vector512.Add(Vector512.Multiply(v, mult), off)
-            dst.[i] <- r

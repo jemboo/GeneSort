@@ -364,33 +364,6 @@ module SimdUtils =
 
 
 
-
-
-    let testStackTileByK () =
-        printfn "=== Testing stackTileByK ==="
-    
-        // Test 1: Simple small example
-        printfn "\nTest 1: 5x3 array with k=2"
-        let test1 = [|
-            [| 1; 2; 3 |]
-            [| 4; 5; 6 |]
-            [| 7; 8; 9 |]
-            [| 10; 11; 12 |]
-            [| 13; 14; 15 |]
-        |]
-        let result1 = stackTileByK test1 2
-        8
-
-
-
-
-    let yab () =
-
-        let daterByte = [| 0 .. 999|] |> Array.map uint8
-        let quab = V512.tile512 (daterByte.AsSpan())
-        1
-
-
 module Fused256 =
 
 
