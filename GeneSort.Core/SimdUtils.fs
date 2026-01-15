@@ -183,7 +183,8 @@ module SimdUtils =
 
 
 
-    module SimdOps2 =
+    module SimdOps512 =
+
         /// Multiply each vector by a scalar and add offset
         let inline multiplyAdd<'T when 'T : struct>
             (data: Span<Vector512<'T>>)
@@ -272,6 +273,95 @@ module SimdUtils =
 
 
 
+    module SimdOps256 =
+
+        /// Multiply each vector by a scalar and add offset
+        let inline multiplyAdd<'T when 'T : struct>
+            (data: Span<Vector256<'T>>)
+            (multiplier: 'T)
+            (offset: 'T) =
+
+            let mult = Vector256.Create(multiplier)
+            let off  = Vector256.Create(offset)
+
+            for i = 0 to data.Length - 1 do
+                data.[i] <-
+                    Vector256.Add(
+                        Vector256.Multiply(data.[i], mult),
+                        off
+                    )
+
+
+        /// Bitwise XOR with a scalar pattern
+        /// Valid for integral SIMD element types
+        let inline xorPattern<'T when 'T : struct>
+            (data: Span<Vector256<'T>>)
+            (pattern: 'T) =
+
+            let pat = Vector256.Create(pattern)
+
+            for i = 0 to data.Length - 1 do
+                data.[i] <- Vector256.Xor(data.[i], pat)
+
+        /// Clamp values to [minVal, maxVal]
+        /// Valid for numeric SIMD element types
+        let inline clamp<'T when 'T : struct>
+            (data: Span<Vector256<'T>>)
+            (minVal: 'T)
+            (maxVal: 'T) =
+
+            let minVec = Vector256.Create(minVal)
+            let maxVec = Vector256.Create(maxVal)
+
+            for i = 0 to data.Length - 1 do
+                data.[i] <-
+                    Vector256.Min(
+                        Vector256.Max(data.[i], minVec),
+                        maxVec
+                    )
+
+        ///// Shift right logically and add original value
+        let inline shiftAndAdd_u8
+            (data: Span<Vector256<uint8>>)
+            (shiftAmount: int) =
+
+            for i = 0 to data.Length - 1 do
+                let shifted =
+                    Vector256.ShiftRightLogical(data.[i], shiftAmount)
+                data.[i] <- Vector256.Add(data.[i], shifted)
+
+        let inline shiftAndAdd_u16
+            (data: Span<Vector256<uint16>>)
+            (shiftAmount: int) =
+
+            for i = 0 to data.Length - 1 do
+                let shifted =
+                    Vector256.ShiftRightLogical(data.[i], shiftAmount)
+                data.[i] <- Vector256.Add(data.[i], shifted)
+
+
+        /// Complex pipeline: multiply, clamp, xor
+        /// Valid for integral SIMD element types
+        let inline complexPipeline<'T when 'T : struct>
+            (data: Span<Vector256<'T>>)
+            (multiplier: 'T)
+            (minVal: 'T)
+            (maxVal: 'T)
+            (xorPattern: 'T) =
+
+            let mult   = Vector256.Create(multiplier)
+            let minVec = Vector256.Create(minVal)
+            let maxVec = Vector256.Create(maxVal)
+            let xorVec = Vector256.Create(xorPattern)
+
+            for i = 0 to data.Length - 1 do
+                let t1 = Vector256.Multiply(data.[i], mult)
+                let t2 = Vector256.Min(Vector256.Max(t1, minVec), maxVec)
+                data.[i] <- Vector256.Xor(t2, xorVec)
+
+
+
+
 
 
 
@@ -322,4 +412,22 @@ module SimdUtils =
 
 
 
+module Fused512 =
 
+    open System.Runtime.Intrinsics
+
+    /// dst[i] = src[i] * multiplier + offset
+    let inline multiplyAddCopy
+        (src: ReadOnlySpan<Vector512<uint16>>)
+        (dst: Span<Vector512<uint16>>)
+        (multiplier: uint16)
+        (offset: uint16) =
+
+        let mult = Vector512.Create(multiplier)
+        let off  = Vector512.Create(offset)
+
+        let len = src.Length
+        for i = 0 to len - 1 do
+            let v = src.[i]
+            let r = Vector512.Add(Vector512.Multiply(v, mult), off)
+            dst.[i] <- r
