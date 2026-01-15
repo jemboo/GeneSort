@@ -154,7 +154,10 @@ module Example =
     //let res = runMergePermutationsExample ()
 
     SimdUtils.printCapabilities ()
-    let yow = SimdUtils.testStackTileByK ()
+
+
+
+    //let yow = SimdUtils.testStackTileByK ()
 
 
     printfn "end: %s" (DateTime.Now.ToShortTimeString())

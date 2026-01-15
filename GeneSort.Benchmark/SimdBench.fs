@@ -101,7 +101,7 @@ type ParallelPipelineBenchmark() =
     [<Params(4, 16)>] 
     member val DegreeOfParallelism = 1 with get, set
 
-    [<Params(8, 16, 32, 64, 128)>] 
+    [<Params(8, 16, 24, 32, 48, 64, 128)>] 
     member val ParallelTracks = 1 with get, set
     
     [<GlobalSetup>]
@@ -197,28 +197,52 @@ type ParallelPipelineBenchmark() =
         ) |> ignore
 
 
-    [<Benchmark>]
-    member this.Vector512_MultiplyAdd_Fused() =
+    [<Benchmark(Baseline = true)>]
+    member this.Vector256_MultiplyAdd_Fused() =
         let options =
             ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
 
         let chunkSize =
-            (DataSize512 + this.ParallelTracks - 1)
+            (DataSize256 + this.ParallelTracks - 1)
             / this.ParallelTracks
 
         Parallel.For(0, this.ParallelTracks, options, fun trackId ->
             let startIdx = trackId * chunkSize
-            let endIdx   = min DataSize512 (startIdx + chunkSize)
+            let endIdx   = min DataSize256 (startIdx + chunkSize)
 
             if startIdx < endIdx then
                 let src =
-                    sourceData512.AsSpan(startIdx, endIdx - startIdx)
+                    sourceData256.AsSpan(startIdx, endIdx - startIdx)
 
                 let dst =
-                    destData512.AsSpan(startIdx, endIdx - startIdx)
+                    destData256.AsSpan(startIdx, endIdx - startIdx)
 
-                Fused512.multiplyAddCopy src dst 5us 100us
+                Fused256.multiplyAddCopy src dst 5us 100us
         ) |> ignore
+
+
+    //[<Benchmark>]
+    //member this.Vector512_MultiplyAdd_Fused() =
+    //    let options =
+    //        ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
+
+    //    let chunkSize =
+    //        (DataSize512 + this.ParallelTracks - 1)
+    //        / this.ParallelTracks
+
+    //    Parallel.For(0, this.ParallelTracks, options, fun trackId ->
+    //        let startIdx = trackId * chunkSize
+    //        let endIdx   = min DataSize512 (startIdx + chunkSize)
+
+    //        if startIdx < endIdx then
+    //            let src =
+    //                sourceData512.AsSpan(startIdx, endIdx - startIdx)
+
+    //            let dst =
+    //                destData512.AsSpan(startIdx, endIdx - startIdx)
+
+    //            Fused512.multiplyAddCopy src dst 5us 100us
+    //    ) |> ignore
 
 
 

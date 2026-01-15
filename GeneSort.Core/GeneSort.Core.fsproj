@@ -17,6 +17,7 @@
     <Compile Include="MathUtils.fs" />
     <Compile Include="ArrayUtils.fs" />
     <Compile Include="SimdUtils.fs" />
+    <Compile Include="SimdSandbox.fs" />
     <Compile Include="Segment.fs" />
     <Compile Include="CollectionUtils.fs" />
     <Compile Include="BytePack.fs" />
