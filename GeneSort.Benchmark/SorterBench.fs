@@ -1,7 +1,6 @@
 ﻿namespace global
 
 open BenchmarkDotNet.Attributes
-open System.Security.Cryptography
 open System
 open GeneSort.Core
 open FSharp.UMX
@@ -9,10 +8,6 @@ open GeneSort.Sorter
 open GeneSort.Sorter.Sortable
 open GeneSort.SortingOps
 open GeneSort.Sorter.Sorter
-open System.Runtime.Intrinsics
-open System.Buffers
-open System.Threading.Tasks
-
 
 
 //| Method           | size   | Mean           | Error        | StdDev       | Gen0     | Gen1     | Gen2     | Allocated |
@@ -146,14 +141,14 @@ type SorterEvalBench() =
     [<Benchmark(Baseline = true)>]
     member this.evalStandard() =
        let ceBlockEval = CeBlockOps.evalWithSorterTest this.sortableIntTests this.ceBlock
-       ceBlockEval.CeUseCounts
+       ceBlockEval
 
 
 
     [<Benchmark>]
     member this.evalUnsafe() =
         let ceBlockEval = CeBlockOps.evalWithSorterTestUnsafe this.sortableIntTests this.ceBlock
-        ceBlockEval.CeUseCounts
+        ceBlockEval
 
 
 
@@ -208,7 +203,7 @@ type SorterEvalBench2Blocks() =
     member this.evalBranchy() =
        let ceBlockEval1 = CeBlockOps.evalWithSorterTest this.sortableIntTests this.ceBlock1
        let ceBlockEval2 = CeBlockOps.evalWithSorterTest ceBlockEval1.SortableTests this.ceBlock2
-       ceBlockEval2.CeUseCounts
+       ceBlockEval2
 
 
 
@@ -216,7 +211,7 @@ type SorterEvalBench2Blocks() =
     member this.evalNewPacked() =
        let ceBlockEval1 = CeBlockOps.evalWithSorterTestUnsafe this.sortablePackedIntTests this.ceBlock1
        let ceBlockEval2 = CeBlockOps.evalWithSorterTestUnsafe ceBlockEval1.SortableTests this.ceBlock2
-       ceBlockEval2.CeUseCounts
+       ceBlockEval2
 
 
 

@@ -13,13 +13,14 @@ type ceBlockWithUsageDto = {
 }
 
 module CeBlockWithUsageDto =
+
     let toCeBlockUsageDto (ceBlockUsage: ceBlockWithUsage) : ceBlockWithUsageDto =
         { 
             CeBlock = CeBlockDto.toCeBlockDto ceBlockUsage.CeBlock
-            UseCounts = ceBlockUsage.UseCounts
+            UseCounts = ceBlockUsage.UseCounts.ToArray()
         }
 
     let fromCeBlockUsageDto (dto: ceBlockWithUsageDto) : ceBlockWithUsage =
         ceBlockWithUsage.create 
             (CeBlockDto.fromCeBlockDto dto.CeBlock)
-            dto.UseCounts
+            (ceUseCounts.CreateFromArray dto.UseCounts)

@@ -26,7 +26,7 @@ module SorterCeUseProfile =
             (sorterEval : sorterEval) : sorterCeUseProfile =
         {   
             sorterCeUseProfile.segmentTotals = 
-                    SegmentWithPayload.getSegmentSums sorterEval.CeBlockUsage.UseCounts profileSegments
+                    SegmentWithPayload.getSegmentSums (sorterEval.CeBlockUsage.UseCounts.ToArray()) profileSegments
             sorterId = sorterEval.SorterId
             sorterSetId = sorterSetId
             lastUsedCeIndex = sorterEval.getLastUsedCeIndex

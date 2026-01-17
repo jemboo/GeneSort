@@ -17,5 +17,4 @@ type ceBlockEval =
 
     member this.CeBlockWithUsage with get() = this.ceBlockWithUsage
     member this.SortableTests with get() = this.sortableTests
-    member this.CeUseCounts with get() : int[] = this.ceBlockWithUsage.useCounts
 

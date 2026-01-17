@@ -70,7 +70,7 @@ type CeOpsTests() =
         let boolTests = match ceBlockEval.SortableTests with | sortableTests.Bools bt -> bt | _ -> failwith "Expected Bools"
         boolTests.SortableBoolArrays.Length |> should equal 1 // Duplicate removed
         boolTests.SortableBoolArrays |> Array.forall (fun sba -> sba.Values = [| false; true; false |]) |> should be True
-        ceBlockEval.CeUseCounts.[0]  |> should be (greaterThanOrEqualTo 1) // At least one swap occurred
+        ceBlockEval.CeBlockWithUsage.UseCounts.[0 |> UMX.tag<ceIndex>]  |> should be (greaterThanOrEqualTo 1) // At least one swap occurred
 
     [<Fact>]
     let ``evalWithSorterTests handles int arrays and removes duplicates`` () =
@@ -97,7 +97,7 @@ type CeOpsTests() =
         // Assert
         let intTests = match ceBlockEval.SortableTests with | sortableTests.Ints it -> it | _ -> failwith "Expected Ints"
         intTests.SortableIntArrays.Length |> should equal 1
-        ceBlockEval.CeUseCounts.[0] |> should be (greaterThanOrEqualTo 1) // At least one swap occurred
+        ceBlockEval.CeBlockWithUsage.UseCounts.[0 |> UMX.tag<ceIndex>]  |> should be (greaterThanOrEqualTo 1) // At least one swap occurred
 
 
     [<Fact>]

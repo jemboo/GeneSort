@@ -51,7 +51,7 @@ type sorterEval =
         this.ceBlockWithUsage.UsedCes.Length |> UMX.tag<ceLength>
 
     member this.getLastUsedCeIndex : int = 
-            this.ceBlockWithUsage.LastUsedCeIndex
+            this.ceBlockWithUsage.UseCounts.LastUsedCeIndex
         
     member this.UnsortedCount with get() = this.unsortedCount
 

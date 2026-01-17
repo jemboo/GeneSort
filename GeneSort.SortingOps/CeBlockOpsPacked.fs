@@ -73,7 +73,7 @@ module CeBlockOpsPacked =
 
 
     let evalWithSorterTest (sortableTs: sortableTests) (ceBlock: ceBlock) =
-        let counts = ceUseCounts.create ceBlock.Length
+        let ceUseCounts = ceUseCounts.Create ceBlock.Length
         let ces = ceBlock.CeArray
     
         match sortableTs with
@@ -93,7 +93,7 @@ module CeBlockOpsPacked =
                     if a > b then
                         workArray.[ce.Low] <- b
                         workArray.[ce.Hi] <- a
-                        counts.Increment i 1
+                        ceUseCounts.Increment (i |> UMX.tag<ceIndex>)
 
                 let isSorted = 
                     let mutable ok = true
@@ -113,7 +113,7 @@ module CeBlockOpsPacked =
 
             let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sw
             let yab = sortableTests.Ints newTests
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock (counts.UseCounts)) yab
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
 
         | sortableTests.Bools sbts ->
             let sw = sbts.SortingWidth
@@ -131,7 +131,7 @@ module CeBlockOpsPacked =
                     if workArray.[ce.Low] && not workArray.[ce.Hi] then
                         workArray.[ce.Low] <- false
                         workArray.[ce.Hi] <- true
-                        counts.Increment i 1
+                        ceUseCounts.Increment (i |> UMX.tag<ceIndex>)
 
                 // A bool array is sorted if it's in the form [false, false, ..., true, true]
                 let isSorted = 
@@ -153,19 +153,17 @@ module CeBlockOpsPacked =
 
             let newTests = Seq.toArray results |> sortableBoolTests.create (Guid.NewGuid() |> UMX.tag) sw
             let yab = sortableTests.Bools newTests
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock (counts.UseCounts)) yab
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
 
 
     let evalWithSorterTestRefined (sortableTs: sortableTests) (ceBlock: ceBlock) =
-        // PRE-DECONSTRUCT: Fetch indices into flat arrays once.
-        // This avoids the overhead of property access (ce.Low/ce.Hi) in the hot loop.
+
         let ces = ceBlock.CeArray
-        let ceLen = ces.Length
-        let lows = Array.init ceLen (fun i -> ces.[i].Low)
-        let highs = Array.init ceLen (fun i -> ces.[i].Hi)
+        let lows = Array.init %ceBlock.Length (fun i -> ces.[i].Low)
+        let highs = Array.init %ceBlock.Length (fun i -> ces.[i].Hi)
         
         // Local counts array is significantly faster than using an object-based counter.
-        let localCounts = Array.zeroCreate ceLen
+        let ceUseCounts = ceUseCounts.Create ceBlock.Length
 
         match sortableTs with
         | sortableTests.Ints sits ->
@@ -178,7 +176,7 @@ module CeBlockOpsPacked =
                 Array.blit sia.Values 0 workArray 0 %sw
 
                 // HOT LOOP: Logic reduced to simple primitive array lookups
-                for i = 0 to ceLen - 1 do
+                for i = 0 to %ceBlock.Length - 1 do
                     let lIdx = lows.[i]
                     let hIdx = highs.[i]
                     let a = workArray.[lIdx]
@@ -186,7 +184,7 @@ module CeBlockOpsPacked =
                     if a > b then
                         workArray.[lIdx] <- b
                         workArray.[hIdx] <- a
-                        localCounts.[i] <- localCounts.[i] + 1
+                        ceUseCounts.Increment (i |> UMX.tag<ceIndex>)
 
                 let isSorted = 
                     let mutable ok = true
@@ -207,7 +205,8 @@ module CeBlockOpsPacked =
             let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sw
             let yab = sortableTests.Ints newTests
             // Create usage using the local counts array we populated
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock localCounts) yab
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
+
 
         | sortableTests.Bools sbts ->
             let sw = sbts.SortingWidth
@@ -217,15 +216,15 @@ module CeBlockOpsPacked =
             for sba in sbts.SortableBoolArrays do
                 let workArray = pool.Rent(%sw)
                 Array.blit sba.Values 0 workArray 0 %sw
-
-                for i = 0 to ceLen - 1 do
+                
+                for i = 0 to %ceBlock.Length - 1 do
                     let lIdx = lows.[i]
                     let hIdx = highs.[i]
                     // Boolean Comparison: true (1) > false (0)
                     if workArray.[lIdx] && not workArray.[hIdx] then
                         workArray.[lIdx] <- false
                         workArray.[hIdx] <- true
-                        localCounts.[i] <- localCounts.[i] + 1
+                        ceUseCounts.Increment (i |> UMX.tag<ceIndex>)
 
                 let isSorted = 
                     let mutable ok = true
@@ -245,7 +244,7 @@ module CeBlockOpsPacked =
 
             let newTests = Seq.toArray results |> sortableBoolTests.create (Guid.NewGuid() |> UMX.tag) sw
             let yab = sortableTests.Bools newTests
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock localCounts) yab
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
 
         | sortableTests.PackedInts _ -> 
             failwith "PackedInts should use evalPacked for maximum efficiency."
@@ -258,9 +257,7 @@ module CeBlockOpsPacked =
                     (sortableTs: sortableTests) 
                     (ceBlock: ceBlock) : ceBlockEval =
         let ces = ceBlock.CeArray
-        let ceCount = ces.Length
-        // Hoist the raw counts array to avoid method call overhead in the hot loop
-        let countsArray = Array.zeroCreate ceCount 
+        let ceUseCounts = ceUseCounts.Create ceBlock.Length
 
         match sortableTs with
         | sortableTests.Ints sits ->
@@ -279,8 +276,7 @@ module CeBlockOpsPacked =
                 if not sia.IsSorted then
                     sia.Values.AsSpan().CopyTo(workSpan)
 
-                    // POINT 1: Inner HOT LOOP with Unsafe Access
-                    for i = 0 to ceCount - 1 do
+                    for i = 0 to %ceBlock.Length - 1 do
                         let ce = ces.[i]
                         let lIdx = ce.Low
                         let hIdx = ce.Hi
@@ -292,7 +288,7 @@ module CeBlockOpsPacked =
                         if a > b then
                             Unsafe.Add(&baseRef, lIdx) <- b
                             Unsafe.Add(&baseRef, hIdx) <- a
-                            countsArray.[i] <- countsArray.[i] + 1
+                            ceUseCounts.Increment (i |> UMX.tag<ceIndex>)
 
                     // Post-sort sorted check
                     let isSortedNow = 
@@ -311,7 +307,8 @@ module CeBlockOpsPacked =
             pool.Return(workArray)
             let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sits.SortingWidth
             let yab = sortableTests.Ints newTests
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock countsArray) yab
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
+
 
         | sortableTests.Bools sbts ->
             let sw = %sbts.SortingWidth
@@ -324,8 +321,8 @@ module CeBlockOpsPacked =
 
             for sba in sbts.SortableBoolArrays do
                 sba.Values.AsSpan().CopyTo(workSpan)
-
-                for i = 0 to ceCount - 1 do
+                
+                for i = 0 to %ceBlock.Length - 1 do
                     let ce = ces.[i]
                     let a = Unsafe.Add(&baseRef, ce.Low)
                     let b = Unsafe.Add(&baseRef, ce.Hi)
@@ -333,7 +330,7 @@ module CeBlockOpsPacked =
                     if a && not b then
                         Unsafe.Add(&baseRef, ce.Low) <- false
                         Unsafe.Add(&baseRef, ce.Hi) <- true
-                        countsArray.[i] <- countsArray.[i] + 1
+                        ceUseCounts.Increment (i |> UMX.tag<ceIndex>)
 
                 let isSortedNow = 
                     let mutable ok = true
@@ -351,14 +348,13 @@ module CeBlockOpsPacked =
             pool.Return(workArray)
             let newTests = Seq.toArray results |> (sortableBoolTests.create (Guid.NewGuid() |> UMX.tag) sbts.SortingWidth)
             let yab = sortableTests.Bools newTests
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock countsArray) yab
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
+
 
         | sortableTests.PackedInts packedTs ->
             let sw = %packedTs.SortingWidth
             let totalTests = packedTs.SoratbleCount
             let ces = ceBlock.CeArray
-            let ceCount = ces.Length
-            let countsArray = Array.zeroCreate ceCount
         
             // Work on a copy of the values so the original 'tests' remain immutable
             let resultsBuffer = Array.copy packedTs.PackedValues
@@ -368,7 +364,7 @@ module CeBlockOpsPacked =
             for t = 0 to %totalTests - 1 do
                 let offset = t * sw
             
-                for i = 0 to ceCount - 1 do
+                for i = 0 to ces.Length - 1 do
                     let ce = ces.[i]
                     // Compute exact memory locations once per CE
                     let lPtr = &Unsafe.Add(&dataRef, offset + ce.Low)
@@ -380,8 +376,7 @@ module CeBlockOpsPacked =
                     if a > b then
                         lPtr <- b
                         hPtr <- a
-                        // Incrementing the local countsArray
-                        countsArray.[i] <- countsArray.[i] + 1
+                        ceUseCounts.Increment (i |> UMX.tag<ceIndex>) 
 
             let uniqueUnsorted = HashSet<sortableIntArray>(SortableIntArray.SortableIntArrayValueComparer())
             let dataSpan = resultsBuffer.AsSpan()
@@ -413,13 +408,7 @@ module CeBlockOpsPacked =
             let unsortedCount = finalArrays.Length |> UMX.tag<sortableCount>
             let newPacked = packedSortableIntTests.create packedTs.SortingWidth finalArrays unsortedCount
             let yab = sortableTests.PackedInts newPacked
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock countsArray) yab
-
-
-
-
-
-
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
 
 
 
@@ -428,12 +417,11 @@ module CeBlockOpsPacked =
         let sw = %tests.SortingWidth
         let totalTests = tests.SoratbleCount
         let ces = ceBlock.CeArray
-        let ceLen = ces.Length
     
         // Pre-deconstruct CEs for the hot loop
-        let lows = Array.init ceLen (fun i -> ces.[i].Low)
-        let highs = Array.init ceLen (fun i -> ces.[i].Hi)
-        let localCounts = Array.zeroCreate ceLen
+        let lows = Array.init %ceBlock.Length (fun i -> ces.[i].Low)
+        let highs = Array.init %ceBlock.Length (fun i -> ces.[i].Hi)
+        let ceUseCounts = ceUseCounts.Create ceBlock.Length
     
         // Work on a mutable copy
         let resultsBuffer = Array.copy tests.PackedValues
@@ -442,7 +430,7 @@ module CeBlockOpsPacked =
         // PHASE 1: THE SORTING (Hot Loop)
         for t = 0 to %totalTests - 1 do
             let offset = t * sw
-            for i = 0 to ceLen - 1 do
+            for i = 0 to %ceBlock.Length - 1 do
                 let lPtr = &Unsafe.Add(&dataRef, offset + lows.[i])
                 let hPtr = &Unsafe.Add(&dataRef, offset + highs.[i])
                 let a = lPtr
@@ -450,7 +438,7 @@ module CeBlockOpsPacked =
                 if a > b then
                     lPtr <- b
                     hPtr <- a
-                    localCounts.[i] <- localCounts.[i] + 1
+                    ceUseCounts.Increment (i |> UMX.tag<ceIndex>)
 
         // PHASE 2: IN-PLACE DEDUPLICATION
         let comparer = PackedOffsetComparer(resultsBuffer, sw)
@@ -481,8 +469,7 @@ module CeBlockOpsPacked =
                                                     newPackedData
                                                     (newCount |> UMX.tag<sortableCount>)
        
-        ceBlockEval.create (ceBlockWithUsage.create ceBlock localCounts) (sortableTests.PackedInts newPacked)
-
+        ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTests.PackedInts newPacked)
 
 
 
@@ -490,10 +477,7 @@ module CeBlockOpsPacked =
                     (sortableTs: sortableTests) 
                     (ceBlock: ceBlock) : ceBlockEval =
         let ces = ceBlock.CeArray
-        let ceCount = ces.Length
-        // Hoist the raw counts array to avoid method call overhead in the hot loop
-        let countsArray = Array.zeroCreate ceCount 
-        // PRE-DECONSTRUCT (The 10% Winner)
+        let ceUseCounts = ceUseCounts.Create ceBlock.Length
         let ceLen = ces.Length
         let lows = Array.init ceLen (fun i -> ces.[i].Low)
         let highs = Array.init ceLen (fun i -> ces.[i].Hi)
@@ -519,7 +503,7 @@ module CeBlockOpsPacked =
                     if a > b then
                         workArray.[lIdx] <- b
                         workArray.[hIdx] <- a
-                        localCounts.[i] <- localCounts.[i] + 1
+                        ceUseCounts.Increment (i |> UMX.tag<ceIndex>)
 
                 // 3. Check sortedness and deduplicate
                 let mutable isSorted = true
@@ -536,56 +520,8 @@ module CeBlockOpsPacked =
                 pool.Return(workArray)
 
             let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sits.SortingWidth
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock localCounts) (sortableTests.Ints newTests)
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTests.Ints newTests)
 
-            //let sw = %sits.SortingWidth
-            //let pool = ArrayPool<int>.Shared
-            //let results = HashSet<sortableIntArray>(SortableIntArray.SortableIntArrayValueComparer())
-        
-            //// POINT 2: Hoist Renting outside the loop
-            //let workArray = pool.Rent(sw)
-            //let workSpan = workArray.AsSpan(0, sw)
-            //// Get a reference to the first element for Unsafe access
-            //let baseRef = &MemoryMarshal.GetReference(workSpan)
-
-            //for sia in sits.SortableIntArrays do
-            //    // Skip logic: if already sorted, don't bother processing
-            //    if not sia.IsSorted then
-            //        sia.Values.AsSpan().CopyTo(workSpan)
-
-            //        // POINT 1: Inner HOT LOOP with Unsafe Access
-            //        for i = 0 to ceCount - 1 do
-            //            let ce = ces.[i]
-            //            let lIdx = ce.Low
-            //            let hIdx = ce.Hi
-                    
-            //            // Direct pointer offset access
-            //            let a = Unsafe.Add(&baseRef, lIdx)
-            //            let b = Unsafe.Add(&baseRef, hIdx)
-                    
-            //            if a > b then
-            //                Unsafe.Add(&baseRef, lIdx) <- b
-            //                Unsafe.Add(&baseRef, hIdx) <- a
-            //                countsArray.[i] <- countsArray.[i] + 1
-
-            //        // Post-sort sorted check
-            //        let isSortedNow = 
-            //            let mutable ok = true
-            //            let mutable j = 0
-            //            while j < sw - 1 && ok do
-            //                if Unsafe.Add(&baseRef, j) > Unsafe.Add(&baseRef, j + 1) then ok <- false
-            //                else j <- j + 1
-            //            ok
-
-            //        if not isSortedNow then
-            //            let finalValues = Array.zeroCreate sw
-            //            workSpan.CopyTo(finalValues.AsSpan())
-            //            results.Add(sortableIntArray.create(finalValues, sits.SortingWidth, sia.SymbolSetSize)) |> ignore
-
-            //pool.Return(workArray)
-            //let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sits.SortingWidth
-            //let yab = sortableTests.Ints newTests
-            //ceBlockEval.create (ceBlockWithUsage.create ceBlock countsArray) yab
 
         | sortableTests.Bools sbts ->
             let sw = %sbts.SortingWidth
@@ -599,7 +535,7 @@ module CeBlockOpsPacked =
             for sba in sbts.SortableBoolArrays do
                 sba.Values.AsSpan().CopyTo(workSpan)
 
-                for i = 0 to ceCount - 1 do
+                for i = 0 to %ceBlock.Length - 1 do
                     let ce = ces.[i]
                     let a = Unsafe.Add(&baseRef, ce.Low)
                     let b = Unsafe.Add(&baseRef, ce.Hi)
@@ -607,7 +543,7 @@ module CeBlockOpsPacked =
                     if a && not b then
                         Unsafe.Add(&baseRef, ce.Low) <- false
                         Unsafe.Add(&baseRef, ce.Hi) <- true
-                        countsArray.[i] <- countsArray.[i] + 1
+                        ceUseCounts.Increment (i |> UMX.tag<ceIndex>)
 
                 let isSortedNow = 
                     let mutable ok = true
@@ -625,7 +561,7 @@ module CeBlockOpsPacked =
             pool.Return(workArray)
             let newTests = Seq.toArray results |> (sortableBoolTests.create (Guid.NewGuid() |> UMX.tag) sbts.SortingWidth)
             let yab = sortableTests.Bools newTests
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock countsArray) yab
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
 
         | sortableTests.PackedInts packedTs ->
             evalPackedOptimized packedTs ceBlock

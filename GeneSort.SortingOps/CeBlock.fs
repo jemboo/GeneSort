@@ -4,6 +4,9 @@ open System
 open FSharp.UMX
 open GeneSort.Sorter.Sorter
 
+[<Measure>]
+type ceIndex
+
 [<Measure>] type ceBlockLength
 
 type ceBlock = 
