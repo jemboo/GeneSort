@@ -22,156 +22,6 @@ open ArrayUtils
 
 module SimdSandbox = 
 
-
-    module V512 =
-
-        let inline Create<'T when 'T : struct> (data: 'T[]) : Vector512<'T> =
-            if data.Length <> Vector512<'T>.Count then
-                raise (ArgumentException(sprintf "Input array must have exactly %d elements." Vector512<'T>.Count))
-            Vector512.Create<'T>(data)
-
-        let inline tile512<'T when 'T : struct>
-            (data: Span<'T>) : Vector512<'T>[] =
-
-            let vectorSize = Vector512<'T>.Count
-            let totalVectors = (data.Length + vectorSize - 1) / vectorSize
-
-            let result = Array.zeroCreate<Vector512<'T>> totalVectors
-
-            // scratch buffer for the final (partial) vector only
-            let scratch = Array.zeroCreate<'T> vectorSize
-            let scratchSpan = scratch.AsSpan()
-
-            for i = 0 to totalVectors - 1 do
-                let start = i * vectorSize
-                let remaining = data.Length - start
-
-                if remaining >= vectorSize then
-                    // fast path: full vector, no copy
-                    let slice = data.Slice(start, vectorSize)
-                    result.[i] <- Vector512.Create<'T>(slice)
-                else
-                    // tail: copy once into zeroed scratch
-                    scratchSpan.Clear()
-                    data.Slice(start, remaining).CopyTo(scratchSpan)
-                    result.[i] <- Vector512.Create<'T>(scratch)
-
-            result
-
-
-        /// data: [vectorIndex][i][j]
-        let packToVector512<'T when 'T : struct>
-            (data: 'T[][][]) : Vector512<'T>[][] =
-
-            let lanes = data.Length
-            let vectorSize = Vector512<'T>.Count
-
-            if lanes <> vectorSize then
-                invalidArg "data"
-                    (sprintf "First dimension must be %d for Vector512<%s>"
-                        vectorSize typeof<'T>.Name)
-
-            let a = if lanes > 0 then data.[0].Length else 0
-            let b = if a > 0 then data.[0].[0].Length else 0
-
-            Array.init a (fun i ->
-                Array.init b (fun j ->
-                    let values = Array.init vectorSize (fun idx ->
-                        data.[idx].[i].[j])
-                    Vector512.Create<'T>(values)
-                )
-            )
-
-
-       /// Multiply each vector by a scalar and add offset
-        let inline multiplyAdd (data: Span<Vector512<uint16>>) (multiplier: uint16) (offset: uint16) =
-            let mult = Vector512.Create(multiplier)
-            let off = Vector512.Create(offset)
-            for i = 0 to data.Length - 1 do
-                data.[i] <- Vector512.Add(Vector512.Multiply(data.[i], mult), off)
-        
-        /// Bitwise operations: XOR with pattern
-        let inline xorPattern (data: Span<Vector512<uint16>>) (pattern: uint16) =
-            let pat = Vector512.Create(pattern)
-            for i = 0 to data.Length - 1 do
-                data.[i] <- Vector512.Xor(data.[i], pat)
-        
-        /// Min/Max clamping
-        let inline clamp (data: Span<Vector512<uint16>>) (minVal: uint16) (maxVal: uint16) =
-            let minVec = Vector512.Create(minVal)
-            let maxVec = Vector512.Create(maxVal)
-            for i = 0 to data.Length - 1 do
-                data.[i] <- Vector512.Min(Vector512.Max(data.[i], minVec), maxVec)
-        
-        /// Shift operations
-        let inline shiftAndAdd (data: Span<Vector512<uint16>>) (shiftAmount: int) =
-            for i = 0 to data.Length - 1 do
-                let shifted = Vector512.ShiftRightLogical(data.[i], shiftAmount)
-                data.[i] <- Vector512.Add(data.[i], shifted)
-        
-        /// Complex pipeline: multiply, clamp, xor
-        let inline complexPipeline (data: Span<Vector512<uint16>>) =
-            let mult = Vector512.Create(3us)
-            let minVec = Vector512.Create(100us)
-            let maxVec = Vector512.Create(60000us)
-            let xorPat = Vector512.Create(0xAAAAus)
-            
-            for i = 0 to data.Length - 1 do
-                // Multiply by 3
-                let temp = Vector512.Multiply(data.[i], mult)
-                // Clamp
-                let temp2 = Vector512.Min(Vector512.Max(temp, minVec), maxVec)
-                // XOR
-                data.[i] <- Vector512.Xor(temp2, xorPat)
-
-
-
-
-    /// SIMD operations on Vector512<uint16>
-    module SimdOps =
-        /// Multiply each vector by a scalar and add offset
-        let inline multiplyAdd (data: Span<Vector512<uint16>>) (multiplier: uint16) (offset: uint16) =
-            let mult = Vector512.Create(multiplier)
-            let off = Vector512.Create(offset)
-            for i = 0 to data.Length - 1 do
-                data.[i] <- Vector512.Add(Vector512.Multiply(data.[i], mult), off)
-        
-        /// Bitwise operations: XOR with pattern
-        let inline xorPattern (data: Span<Vector512<uint16>>) (pattern: uint16) =
-            let pat = Vector512.Create(pattern)
-            for i = 0 to data.Length - 1 do
-                data.[i] <- Vector512.Xor(data.[i], pat)
-        
-        /// Min/Max clamping
-        let inline clamp (data: Span<Vector512<uint16>>) (minVal: uint16) (maxVal: uint16) =
-            let minVec = Vector512.Create(minVal)
-            let maxVec = Vector512.Create(maxVal)
-            for i = 0 to data.Length - 1 do
-                data.[i] <- Vector512.Min(Vector512.Max(data.[i], minVec), maxVec)
-        
-        /// Shift operations
-        let inline shiftAndAdd (data: Span<Vector512<uint16>>) (shiftAmount: int) =
-            for i = 0 to data.Length - 1 do
-                let shifted = Vector512.ShiftRightLogical(data.[i], shiftAmount)
-                data.[i] <- Vector512.Add(data.[i], shifted)
-        
-        /// Complex pipeline: multiply, clamp, xor
-        let inline complexPipeline (data: Span<Vector512<uint16>>) =
-            let mult = Vector512.Create(3us)
-            let minVec = Vector512.Create(100us)
-            let maxVec = Vector512.Create(60000us)
-            let xorPat = Vector512.Create(0xAAAAus)
-            
-            for i = 0 to data.Length - 1 do
-                // Multiply by 3
-                let temp = Vector512.Multiply(data.[i], mult)
-                // Clamp
-                let temp2 = Vector512.Min(Vector512.Max(temp, minVec), maxVec)
-                // XOR
-                data.[i] <- Vector512.Xor(temp2, xorPat)
-
-
-
     module SimdOps512 =
 
         /// Multiply each vector by a scalar and add offset
@@ -257,8 +107,6 @@ module SimdSandbox =
                 let t1 = Vector512.Multiply(data.[i], mult)
                 let t2 = Vector512.Min(Vector512.Max(t1, minVec), maxVec)
                 data.[i] <- Vector512.Xor(t2, xorVec)
-
-
 
 
 
@@ -364,14 +212,89 @@ module SimdSandbox =
             [| 10; 11; 12 |]
             [| 13; 14; 15 |]
         |]
-        let result1 = stackTileByK test1 2
+        let result1 = stackAndBlock test1 2
         8
+
+    // Type definitions
+    [<Struct; CustomEquality; NoComparison>]
+    type ce = private { low: int; hi: int } with
+
+        static member create (lv: int) (hv: int) : ce =
+            if lv < 0 || hv < 0 then
+                failwith "Indices must be non-negative"
+            else if lv < hv then
+                { low = lv; hi = hv }
+            else
+                { low = hv; hi = lv }
+
+        /// Gets the first TwoOrbit.
+        member this.Low with get () = this.low
+
+        /// Gets the second TwoOrbit (if present).
+        member this.Hi with get () = this.hi
+
+        override this.Equals(obj) = 
+            match obj with
+            | :? ce as other -> this.low = other.low && this.hi = other.hi
+            | _ -> false
+        override this.GetHashCode() = 
+            hash (this.low, this.hi)
+        interface IEquatable<ce> with
+            member this.Equals(other) = 
+                this.low = other.low && this.hi = other.hi
+
+
+
+    let sortBy (block: Vector256<uint32> []) (cex: ce) : unit =
+        let vLow = block.[cex.Low]
+        let vHi = block.[cex.Hi]
+        // SIMD Compare-and-Swap
+        block.[cex.Low] <- Vector256.MinNumber(vLow, vHi)
+        block.[cex.Hi] <- Vector256.MaxNumber(vLow, vHi)
+
+
+    let sortBlock (block: Vector256<uint32> []) (cexs: ce []) : unit =
+        for i = 0 to cexs.Length - 1 do
+            sortBy block cexs.[i]
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
     let yab () =
 
-        let daterByte = [| 0 .. 999|] |> Array.map uint8
-        let quab = V512.tile512 (daterByte.AsSpan())
+        let test1 = [|
+                        [| 1; 2; 3 |]
+                        [| 3; 2; 1 |]
+                        [| 4; 5; 6 |]
+                        [| 6; 5; 4 |]
+                        [| 7; 8; 9 |]
+                        [| 9; 8; 7 |]
+                        [| 10; 11; 12 |]
+                        [| 12; 11; 10 |]
+                        [| 15; 14; 13 |]
+                        [| 13; 14; 15 |]
+                    |] |> Array.map(fun v -> Array.map uint32 v)
+        let result1 = stackAndBlock test1 8 |> Seq.toArray
+
+        let qua = SimdUtils.V256.packToVector256 result1
+
+        let block = qua.[0]
+
+        let minny = Vector256.MinNumber (block.[0], block.[1])
+        let maxy = Vector256.MaxNumber (block.[0], block.[1])
+
+        let test1Back = unstackAndBlock result1 (Some 10) |> Seq.toArray
+
+       // let qua = result1.
         1

@@ -101,46 +101,47 @@ module ArrayUtils =
             invalidOp "Arrays are identical; no differing index found"
 
 
+    let stackAndBlock (data: 'a[] seq) (blockWidth: int) : ('a[][] seq) =
+        if Seq.isEmpty data then 
+            Seq.empty 
+        else
+            // 1. Group the sequence into chunks of size blockWidth
+            data
+            |> Seq.chunkBySize blockWidth
+            |> Seq.map (fun chunk ->
+                let k = chunk.[0].Length
+            
+                // 2. Prepare the output: k rows, each of length blockWidth
+                Array.init k (fun rowIdx ->
+                    Array.init blockWidth (fun colIdx ->
+                        // 3. Fill from chunk if data exists, otherwise use 'zero' (default)
+                        if colIdx < chunk.Length then
+                            chunk.[colIdx].[rowIdx]
+                        else
+                            Unchecked.defaultof<'a>
+                    )
+                )
+            )
 
-    let inline stackTileByK (data: ^a[][]) (k: int) : ^a[][][] * int =
-        let n = data.Length
-        let w = if n > 0 then data.[0].Length else 0
-        let numBlocks = (n + k - 1) / k  // ceiling division
-    
-        // Create output array: numBlocks by w by k
-        let result = Array.init numBlocks (fun _ -> 
-            Array.init w (fun _ -> 
-                Array.zeroCreate k))
-    
-        // Fill the result array
-        for blockIdx = 0 to numBlocks - 1 do
-            for i = 0 to k - 1 do
-                let rowIdx = blockIdx * k + i
-                if rowIdx < n then
-                    for j = 0 to w - 1 do
-                        result.[blockIdx].[j].[i] <- data.[rowIdx].[j]
-    
-        (result, n)
-
-
-    let inline unstackTileByK (tiled: ^a[][][]) (n: int) : ^a[][] =
-        let numBlocks = tiled.Length
-        let w = if numBlocks > 0 then tiled.[0].Length else 0
-        let k = if w > 0 then tiled.[0].[0].Length else 0
-
-        // Output: n × w
-        let result = Array.init n (fun _ -> Array.zeroCreate w)
-
-        for blockIdx = 0 to numBlocks - 1 do
-            for i = 0 to k - 1 do
-                let rowIdx = blockIdx * k + i
-                if rowIdx < n then
-                    for j = 0 to w - 1 do
-                        result.[rowIdx].[j] <- tiled.[blockIdx].[j].[i]
-
-        result
-
-
+    let unstackAndBlock (blockedData: 'a[][] seq) (originalCount: int option) : ('a[] seq) =
+        blockedData
+        |> Seq.collect (fun block ->
+            // 1. Determine dimensions
+            let k = block.Length          // The length of original arrays
+            let blockWidth = block.[0].Length // The width of the block
+        
+            // 2. Transpose the block back to the original array format
+            Array.init blockWidth (fun colIdx ->
+                Array.init k (fun rowIdx ->
+                    block.[rowIdx].[colIdx]
+                )
+            )
+        )
+        // 3. If we know the original count (m), truncate the padding
+        |> (fun fullSeq -> 
+            match originalCount with
+            | Some m -> Seq.truncate m fullSeq
+            | None   -> fullSeq)
 
 
     // You must use the 'unmanaged' constraint for NativePtr operations

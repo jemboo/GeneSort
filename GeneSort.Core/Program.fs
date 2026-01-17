@@ -152,11 +152,7 @@ module Example =
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
     //let res = runMergePermutationsExample ()
-
-    SimdUtils.printCapabilities ()
-
-
-
+    //SimdUtils.printCapabilities ()
     //let yow = SimdUtils.testStackTileByK ()
 
 
@@ -164,7 +160,7 @@ module Example =
 
 
 
-    let wak = 5
+    let wak = SimdSandbox.yab ()
 
 
 

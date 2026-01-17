@@ -88,7 +88,7 @@ type ParallelCopyBenchmark() =
 
 [<MemoryDiagnoser>]
 [<SimpleJob(warmupCount = 3, iterationCount = 10)>]
-type ParallelPipelineBenchmark() =
+type ParallelPipelineBenchmark_uint16() =
     
     let DataSize256 = 200_000 
     let DataSize512 = 100_000 
@@ -112,91 +112,6 @@ type ParallelPipelineBenchmark() =
         destData512 <- Array.zeroCreate DataSize512
         sourceData256 <- Array.init DataSize256 (fun i -> Vector256.Create(uint16 (i % 65535)))
         destData256 <- Array.zeroCreate DataSize256
-    
-    //[<Benchmark(Baseline = true)>]
-    //member this.BlockProcessingMultiplyAdd512() =
-    //    let blockSize = DataSize512 / this.ParallelTracks
-    //    let pool = ArrayPool<Vector512<uint16>>.Shared
-    //    let options = ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
-        
-    //    Parallel.For(0, this.ParallelTracks, options, fun trackIdx ->
-    //        let startIdx = trackIdx * blockSize
-    //        let endIdx = if trackIdx = this.ParallelTracks - 1 then DataSize512 else (trackIdx + 1) * blockSize
-    //        let currentBlockSize = endIdx - startIdx
-            
-    //        let buffer = pool.Rent(currentBlockSize)
-    //        try
-    //            // Copy source block to work buffer
-    //            sourceData512.AsSpan(startIdx, currentBlockSize).CopyTo(buffer.AsSpan(0, currentBlockSize))
-    //            let workArea = buffer.AsSpan(0, currentBlockSize)
-                
-    //            // SIMD operation: multiply by 5, add 100
-    //            SimdUtils.SimdOps.multiplyAdd workArea 5us 100us
-                
-    //            // Copy results back to destination block
-    //            workArea.CopyTo(destData512.AsSpan(startIdx, currentBlockSize))
-    //        finally
-    //            pool.Return(buffer)
-    //    ) |> ignore
-
-        
-    //[<Benchmark>]
-    //member this.BlockProcessingMultiplyAdd256() =
-    //    let blockSize = DataSize256 / this.ParallelTracks
-    //    let pool = ArrayPool<Vector256<uint16>>.Shared
-    //    let options = ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
-        
-    //    Parallel.For(0, this.ParallelTracks, options, fun trackIdx ->
-    //        let startIdx = trackIdx * blockSize
-    //        let endIdx = if trackIdx = this.ParallelTracks - 1 then DataSize256 else (trackIdx + 1) * blockSize
-    //        let currentBlockSize = endIdx - startIdx
-            
-    //        let buffer = pool.Rent(currentBlockSize)
-    //        try
-    //            // Copy source block to work buffer
-    //            sourceData256.AsSpan(startIdx, currentBlockSize).CopyTo(buffer.AsSpan(0, currentBlockSize))
-    //            let workArea = buffer.AsSpan(0, currentBlockSize)
-                
-    //            // SIMD operation: multiply by 5, add 100
-    //            SimdUtils.SimdOps256.multiplyAdd<uint16> workArea 5us 100us
-                
-    //            // Copy results back to destination block
-    //            workArea.CopyTo(destData256.AsSpan(startIdx, currentBlockSize))
-    //        finally
-    //            pool.Return(buffer)
-    //    ) |> ignore
-
-
-    // ---------------------------
-    // Vector256 Copy-On-Write
-    // ---------------------------
-
-    //[<Benchmark>]
-    //member this.Vector256_MultiplyAdd_CopyOnWrite() =
-    //    let options =
-    //        ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
-
-    //    let chunkSize =
-    //        (DataSize256 + this.ParallelTracks - 1)
-    //        / this.ParallelTracks
-
-    //    Parallel.For(0, this.ParallelTracks, options, fun trackId ->
-    //        let startIdx = trackId * chunkSize
-    //        let endIdx   = min DataSize256 (startIdx + chunkSize)
-
-    //        if startIdx < endIdx then
-    //            let src =
-    //                sourceData256.AsSpan(startIdx, endIdx - startIdx)
-
-    //            let dst =
-    //                destData256.AsSpan(startIdx, endIdx - startIdx)
-
-    //            // Copy-on-write
-    //            src.CopyTo(dst)
-
-    //            SimdUtils.SimdOps256.multiplyAdd<uint16> dst 5us 100us
-    //    ) |> ignore
-
 
     [<Benchmark>]
     member this.Vector256_MultiplyAdd_Unrolled() =
@@ -248,225 +163,77 @@ type ParallelPipelineBenchmark() =
 
 
 
-
-    //// ---------------------------
-    //// Vector512 Copy-On-Write
-    //// ---------------------------
-    //[<Benchmark>]
-    //member this.Vector512_MultiplyAdd_CopyOnWrite() =
-    //    let options =
-    //        ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
-
-    //    let chunkSize =
-    //        (DataSize512 + this.ParallelTracks - 1)
-    //        / this.ParallelTracks
-
-    //    Parallel.For(0, this.ParallelTracks, options, fun trackId ->
-    //        let startIdx = trackId * chunkSize
-    //        let endIdx   = min DataSize512 (startIdx + chunkSize)
-
-    //        if startIdx < endIdx then
-    //            let src =
-    //                sourceData512.AsSpan(startIdx, endIdx - startIdx)
-
-    //            let dst =
-    //                destData512.AsSpan(startIdx, endIdx - startIdx)
-
-    //            // Copy-on-write
-    //            src.CopyTo(dst)
-
-    //            // SIMD operates on private cache lines
-    //            SimdUtils.SimdOps.multiplyAdd dst 5us 100us
-    //    ) |> ignore
-
-
-
-
+[<MemoryDiagnoser>]
+[<SimpleJob(warmupCount = 3, iterationCount = 10)>]
+type ParallelPipelineBenchmark_uint8() =
     
-    //[<Benchmark>]
-    //member this.BlockProcessingXorPattern() =
-    //    let blockSize = DataSize / ParallelTracks
-    //    let pool = ArrayPool<Vector512<uint16>>.Shared
-    //    let options = ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
+    let DataSize256 = 200_000 
+    let DataSize512 = 100_000 
+
+    let mutable sourceData512 : Vector512<uint8>[] = [||]
+    let mutable destData512 : Vector512<uint8>[] = [||]
         
-    //    Parallel.For(0, ParallelTracks, options, fun trackIdx ->
-    //        let startIdx = trackIdx * blockSize
-    //        let endIdx = if trackIdx = ParallelTracks - 1 then DataSize else (trackIdx + 1) * blockSize
-    //        let currentBlockSize = endIdx - startIdx
-            
-    //        let buffer = pool.Rent(currentBlockSize)
-    //        try
-    //            sourceData.AsSpan(startIdx, currentBlockSize).CopyTo(buffer.AsSpan(0, currentBlockSize))
-    //            let workArea = buffer.AsSpan(0, currentBlockSize)
-                
-    //            // SIMD operation: XOR with pattern
-    //            SimdUtils.SimdOps.xorPattern workArea 0x5555us
-                
-    //            workArea.CopyTo(destData.AsSpan(startIdx, currentBlockSize))
-    //        finally
-    //            pool.Return(buffer)
-    //    ) |> ignore
+    let mutable sourceData256 : Vector256<uint8>[] = [||]
+    let mutable destData256 : Vector256<uint8>[] = [||]
+
+    [<Params(4, 16)>] 
+    member val DegreeOfParallelism = 1 with get, set
+
+    [<Params(8, 16, 24, 32, 48, 64, 128)>] 
+    member val ParallelTracks = 1 with get, set
     
-    //[<Benchmark>]
-    //member this.BlockProcessingClamp() =
-    //    let blockSize = DataSize256 / ParallelTracks
-    //    let pool = ArrayPool<Vector512<uint16>>.Shared
-    //    let options = ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
-        
-    //    Parallel.For(0, ParallelTracks, options, fun trackIdx ->
-    //        let startIdx = trackIdx * blockSize
-    //        let endIdx = if trackIdx = ParallelTracks - 1 then DataSize256 else (trackIdx + 1) * blockSize
-    //        let currentBlockSize = endIdx - startIdx
-            
-    //        let buffer = pool.Rent(currentBlockSize)
-    //        try
-    //            sourceData512.AsSpan(startIdx, currentBlockSize).CopyTo(buffer.AsSpan(0, currentBlockSize))
-    //            let workArea = buffer.AsSpan(0, currentBlockSize)
-                
-    //            // SIMD operation: clamp values between 1000 and 50000
-    //            SimdUtils.SimdOps.clamp workArea 1000us 50000us
-                
-    //            workArea.CopyTo(destData512.AsSpan(startIdx, currentBlockSize))
-    //        finally
-    //            pool.Return(buffer)
-    //    ) |> ignore
+    [<GlobalSetup>]
+    member this.Setup() =
 
-    //[<Benchmark>]
-    //member this.BlockProcessingClampGeneric() =
-    //    let blockSize = DataSize256 / ParallelTracks
-    //    let pool = ArrayPool<Vector512<uint16>>.Shared
-    //    let options = ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
-        
-    //    Parallel.For(0, ParallelTracks, options, fun trackIdx ->
-    //        let startIdx = trackIdx * blockSize
-    //        let endIdx = if trackIdx = ParallelTracks - 1 then DataSize256 else (trackIdx + 1) * blockSize
-    //        let currentBlockSize = endIdx - startIdx
-            
-    //        let buffer = pool.Rent(currentBlockSize)
-    //        try
-    //            sourceData512.AsSpan(startIdx, currentBlockSize).CopyTo(buffer.AsSpan(0, currentBlockSize))
-    //            let workArea = buffer.AsSpan(0, currentBlockSize)
-                
-    //            // SIMD operation: clamp values between 1000 and 50000
-    //            SimdUtils.SimdOps.clamp workArea 1000us 50000us
-                
-    //            workArea.CopyTo(destData512.AsSpan(startIdx, currentBlockSize))
-    //        finally
-    //            pool.Return(buffer)
-    //    ) |> ignore
+        sourceData512 <- Array.init DataSize512 (fun i -> Vector512.Create(uint8 (i % 65535)))
+        destData512 <- Array.zeroCreate DataSize512
+        sourceData256 <- Array.init DataSize256 (fun i -> Vector256.Create(uint8 (i % 65535)))
+        destData256 <- Array.zeroCreate DataSize256
+
+    [<Benchmark>]
+    member this.Vector256_MultiplyAdd_Unrolled() =
+        let options =
+            ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
+
+        let chunkSize =
+            (DataSize256 + this.ParallelTracks - 1)
+            / this.ParallelTracks
+
+        Parallel.For(0, this.ParallelTracks, options, fun trackId ->
+            let startIdx = trackId * chunkSize
+            let endIdx   = min DataSize256 (startIdx + chunkSize)
+
+            if startIdx < endIdx then
+                let src =
+                    sourceData256.AsSpan(startIdx, endIdx - startIdx)
+
+                let dst =
+                    destData256.AsSpan(startIdx, endIdx - startIdx)
+
+                Fused256.multiplyAddCopyUnrolled (MemoryMarshal.CreateReadOnlySpan(&src.GetPinnableReference(), src.Length)) dst 5uy 100uy
+        ) |> ignore
+
+    [<Benchmark>]
+    member this.Vector256_MultiplyAdd_Uint8_Unrolled() =
+        let options =
+            ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
+
+        let chunkSize =
+            (DataSize512 + this.ParallelTracks - 1)
+            / this.ParallelTracks
+
+        Parallel.For(0, this.ParallelTracks, options, fun trackId ->
+            let startIdx = trackId * chunkSize
+            let endIdx   = min DataSize512 (startIdx + chunkSize)
+
+            if startIdx < endIdx then
+                let src =
+                    sourceData256.AsSpan(startIdx, endIdx - startIdx)
+
+                let dst =
+                    destData256.AsSpan(startIdx, endIdx - startIdx)
+                    
+                Fused256.multiplyAddCopyUint8Unrolled (MemoryMarshal.CreateReadOnlySpan(&src.GetPinnableReference(), src.Length)) dst 5uy 100uy
+        ) |> ignore
 
 
-
-
-
-
-
-
-    
-    //[<Benchmark>]
-    //member this.BlockProcessingShiftAndAdd() =
-    //    let blockSize = DataSize / ParallelTracks
-    //    let pool = ArrayPool<Vector512<uint16>>.Shared
-    //    let options = ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
-        
-    //    Parallel.For(0, ParallelTracks, options, fun trackIdx ->
-    //        let startIdx = trackIdx * blockSize
-    //        let endIdx = if trackIdx = ParallelTracks - 1 then DataSize else (trackIdx + 1) * blockSize
-    //        let currentBlockSize = endIdx - startIdx
-            
-    //        let buffer = pool.Rent(currentBlockSize)
-    //        try
-    //            sourceData.AsSpan(startIdx, currentBlockSize).CopyTo(buffer.AsSpan(0, currentBlockSize))
-    //            let workArea = buffer.AsSpan(0, currentBlockSize)
-                
-    //            // SIMD operation: shift right by 2 and add to original
-    //            SimdUtils.SimdOps.shiftAndAdd workArea 2
-                
-    //            workArea.CopyTo(destData.AsSpan(startIdx, currentBlockSize))
-    //        finally
-    //            pool.Return(buffer)
-    //    ) |> ignore
-    
-    //[<Benchmark>]
-    //member this.BlockProcessingComplexPipeline() =
-    //    let blockSize = DataSize / ParallelTracks
-    //    let pool = ArrayPool<Vector512<uint16>>.Shared
-    //    let options = ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
-        
-    //    Parallel.For(0, ParallelTracks, options, fun trackIdx ->
-    //        let startIdx = trackIdx * blockSize
-    //        let endIdx = if trackIdx = ParallelTracks - 1 then DataSize else (trackIdx + 1) * blockSize
-    //        let currentBlockSize = endIdx - startIdx
-            
-    //        let buffer = pool.Rent(currentBlockSize)
-    //        try
-    //            sourceData.AsSpan(startIdx, currentBlockSize).CopyTo(buffer.AsSpan(0, currentBlockSize))
-    //            let workArea = buffer.AsSpan(0, currentBlockSize)
-                
-    //            // SIMD operation: complex pipeline (multiply, clamp, xor)
-    //            SimdUtils.SimdOps.complexPipeline workArea
-                
-    //            workArea.CopyTo(destData.AsSpan(startIdx, currentBlockSize))
-    //        finally
-    //            pool.Return(buffer)
-    //    ) |> ignore
-    
-    //[<Benchmark>]
-    //member this.BlockProcessingMultipleOperations() =
-    //    let blockSize = DataSize / ParallelTracks
-    //    let pool = ArrayPool<Vector512<uint16>>.Shared
-    //    let options = ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
-        
-    //    Parallel.For(0, ParallelTracks, options, fun trackIdx ->
-    //        let startIdx = trackIdx * blockSize
-    //        let endIdx = if trackIdx = ParallelTracks - 1 then DataSize else (trackIdx + 1) * blockSize
-    //        let currentBlockSize = endIdx - startIdx
-            
-    //        let buffer = pool.Rent(currentBlockSize)
-    //        try
-    //            sourceData.AsSpan(startIdx, currentBlockSize).CopyTo(buffer.AsSpan(0, currentBlockSize))
-    //            let workArea = buffer.AsSpan(0, currentBlockSize)
-                
-    //            // Chain multiple SIMD operations
-    //            SimdUtils.SimdOps.multiplyAdd workArea 2us 50us
-    //            SimdUtils.SimdOps.xorPattern workArea 0xFFFFus
-    //            SimdUtils.SimdOps.clamp workArea 500us 40000us
-                
-    //            workArea.CopyTo(destData.AsSpan(startIdx, currentBlockSize))
-    //        finally
-    //            pool.Return(buffer)
-    //    ) |> ignore
-    
-    //[<Benchmark>]
-    //member this.BlockProcessingWithVariableTrackLoad() =
-    //    // Simulate variable workload per track (some blocks need more processing)
-    //    let blockSize = DataSize / ParallelTracks
-    //    let pool = ArrayPool<Vector512<uint16>>.Shared
-    //    let options = ParallelOptions(MaxDegreeOfParallelism = this.DegreeOfParallelism)
-        
-    //    Parallel.For(0, ParallelTracks, options, fun trackIdx ->
-    //        let startIdx = trackIdx * blockSize
-    //        let endIdx = if trackIdx = ParallelTracks - 1 then DataSize else (trackIdx + 1) * blockSize
-    //        let currentBlockSize = endIdx - startIdx
-            
-    //        let buffer = pool.Rent(currentBlockSize)
-    //        try
-    //            sourceData.AsSpan(startIdx, currentBlockSize).CopyTo(buffer.AsSpan(0, currentBlockSize))
-    //            let workArea = buffer.AsSpan(0, currentBlockSize)
-                
-    //            // Variable workload based on track index
-    //            if trackIdx % 4 = 0 then
-    //                // Heavy processing for every 4th track
-    //                SimdUtils.SimdOps.complexPipeline workArea
-    //                SimdUtils.SimdOps.multiplyAdd workArea 2us 100us
-    //            elif trackIdx % 2 = 0 then
-    //                // Medium processing
-    //                SimdUtils.SimdOps.multiplyAdd workArea 3us 50us
-    //            else
-    //                // Light processing
-    //                SimdUtils.SimdOps.xorPattern workArea 0xAAAAus
-                
-    //            workArea.CopyTo(destData.AsSpan(startIdx, currentBlockSize))
-    //        finally
-    //            pool.Return(buffer)
-    //    ) |> ignore

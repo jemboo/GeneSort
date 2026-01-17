@@ -7,7 +7,34 @@ open GeneSort.Core
 open GeneSort.Sorter
 
 // Type definitions
-[<Struct; CustomEquality; NoComparison>]
+//[<Struct; CustomEquality; NoComparison>]
+//type ce = private { low: int; hi: int } with
+
+//    static member create (lv: int) (hv: int) : ce =
+//        if lv < 0 || hv < 0 then
+//            failwith "Indices must be non-negative"
+//        else if lv < hv then
+//            { low = lv; hi = hv }
+//        else
+//            { low = hv; hi = lv }
+
+//    /// Gets the first TwoOrbit.
+//    member this.Low with get () = this.low
+
+//    /// Gets the second TwoOrbit (if present).
+//    member this.Hi with get () = this.hi
+
+//    override this.Equals(obj) = 
+//        match obj with
+//        | :? ce as other -> this.low = other.low && this.hi = other.hi
+//        | _ -> false
+//    override this.GetHashCode() = 
+//        hash (this.low, this.hi)
+//    interface IEquatable<ce> with
+//        member this.Equals(other) = 
+//            this.low = other.low && this.hi = other.hi
+// Type definitions
+[<Struct>]
 type ce = private { low: int; hi: int } with
 
     static member create (lv: int) (hv: int) : ce =
@@ -24,18 +51,7 @@ type ce = private { low: int; hi: int } with
     /// Gets the second TwoOrbit (if present).
     member this.Hi with get () = this.hi
 
-    override this.Equals(obj) = 
-        match obj with
-        | :? ce as other -> this.low = other.low && this.hi = other.hi
-        | _ -> false
-    override this.GetHashCode() = 
-        hash (this.low, this.hi)
-    interface IEquatable<ce> with
-        member this.Equals(other) = 
-            this.low = other.low && this.hi = other.hi
 
-
-// Core module for Ce operations
 module Ce =
 
     let toString (ce: ce) : string =
