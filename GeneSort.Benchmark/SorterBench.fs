@@ -135,7 +135,7 @@ type SorterEvalBench() =
         let bitonics = BitonicSorter.bitonicSort1
                             (this.sortingWidth |> UMX.tag<sortingWidth>)
 
-        this.ceBlock <- bitonics |> Array.concat |> ceBlock.create  
+        this.ceBlock <- bitonics |> Array.concat |> ceBlock.create  (Guid.NewGuid() |> UMX.tag<ceBlockId>)
 
 
     [<Benchmark(Baseline = true)>]
@@ -195,8 +195,8 @@ type SorterEvalBench2Blocks() =
         let bitonics = BitonicSorter.bitonicSort1
                             (this.sortingWidth |> UMX.tag<sortingWidth>)
         let halfLength = bitonics.Length / 2
-        this.ceBlock1 <- bitonics |> Array.take(halfLength) |> Array.concat |> ceBlock.create  
-        this.ceBlock2 <- bitonics |> Array.skip(halfLength) |> Array.take(halfLength) |> Array.concat |> ceBlock.create  
+        this.ceBlock1 <- bitonics |> Array.take(halfLength) |> Array.concat |> ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>)
+        this.ceBlock2 <- bitonics |> Array.skip(halfLength) |> Array.take(halfLength) |> Array.concat |> ceBlock.create  (Guid.NewGuid() |> UMX.tag<ceBlockId>)
 
 
     [<Benchmark(Baseline = true)>]

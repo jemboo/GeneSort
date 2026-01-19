@@ -55,7 +55,7 @@ module SorterSetEval =
 
         let ceBlockEvals : (sorter * ceBlockEval) array = 
                 sorterSet.Sorters 
-                |> Array.map (fun s -> (s,  CeBlockOps.evalWithSorterTest sortableTests (ceBlock.create(s.Ces))))
+                |> Array.map (fun s -> (s,  CeBlockOps.evalWithSorterTest sortableTests  (ceBlock.create (%s.SorterId |> UMX.tag<ceBlockId>) (s.Ces) )))
 
         let sorterEvals = 
             ceBlockEvals |> Array.map (

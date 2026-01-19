@@ -22,7 +22,6 @@ type ceBlockWithUsage =
 
     member this.CeBlock with get() = this.ceBlock
 
-
     member this.UseCounts with get() = this.useCounts
 
     member this.CeLength with get() = this.useCounts.Length |> UMX.tag<ceLength>

@@ -112,8 +112,8 @@ module CeBlockOpsPacked =
                 pool.Return(workArray)
 
             let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sw
-            let yab = sortableTests.Ints newTests
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTests.Ints newTests)
+
 
         | sortableTests.Bools sbts ->
             let sw = sbts.SortingWidth
@@ -152,8 +152,7 @@ module CeBlockOpsPacked =
                 pool.Return(workArray)
 
             let newTests = Seq.toArray results |> sortableBoolTests.create (Guid.NewGuid() |> UMX.tag) sw
-            let yab = sortableTests.Bools newTests
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTests.Bools newTests)
 
 
     let evalWithSorterTestRefined (sortableTs: sortableTests) (ceBlock: ceBlock) =
@@ -162,7 +161,6 @@ module CeBlockOpsPacked =
         let lows = Array.init %ceBlock.Length (fun i -> ces.[i].Low)
         let highs = Array.init %ceBlock.Length (fun i -> ces.[i].Hi)
         
-        // Local counts array is significantly faster than using an object-based counter.
         let ceUseCounts = ceUseCounts.Create ceBlock.Length
 
         match sortableTs with
@@ -203,9 +201,7 @@ module CeBlockOpsPacked =
                 pool.Return(workArray)
 
             let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sw
-            let yab = sortableTests.Ints newTests
-            // Create usage using the local counts array we populated
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTests.Ints newTests)
 
 
         | sortableTests.Bools sbts ->
@@ -407,8 +403,7 @@ module CeBlockOpsPacked =
             let finalArrays = Seq.toArray uniqueUnsorted
             let unsortedCount = finalArrays.Length |> UMX.tag<sortableCount>
             let newPacked = packedSortableIntTests.create packedTs.SortingWidth finalArrays unsortedCount
-            let yab = sortableTests.PackedInts newPacked
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTests.PackedInts newPacked)
 
 
 
@@ -481,7 +476,6 @@ module CeBlockOpsPacked =
         let ceLen = ces.Length
         let lows = Array.init ceLen (fun i -> ces.[i].Low)
         let highs = Array.init ceLen (fun i -> ces.[i].Hi)
-        let localCounts = Array.zeroCreate ceLen
 
         match sortableTs with
         | sortableTests.Ints sits ->

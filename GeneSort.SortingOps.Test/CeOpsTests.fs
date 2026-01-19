@@ -61,7 +61,7 @@ type CeOpsTests() =
                         (Guid.NewGuid() |> UMX.tag<sortableTestsId>)
                         sortingWidth
                         boolArrays |> sortableTests.Bools
-        let ceBlock = ceBlock.create [| createCe 0 1 |]
+        let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) [| createCe 0 1 |]
         
         // Act
         let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTests ceBlock
@@ -89,7 +89,7 @@ type CeOpsTests() =
                 sortingWidth
                 intArrays |> sortableTests.Ints
 
-        let ceBlock = ceBlock.create [| createCe 0 1 |]
+        let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) [| createCe 0 1 |]
         
         // Act
         let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTests ceBlock
@@ -111,7 +111,7 @@ type CeOpsTests() =
                                 sortingWidth
                                 intArrays ) |> sortableTests.Ints
 
-        let ceBlock = ceBlock.create [| createCe 0 1 |]
+        let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) [| createCe 0 1 |]
 
         // Act
         let result = CeBlockOps.evalWithSorterTest sortableTests ceBlock

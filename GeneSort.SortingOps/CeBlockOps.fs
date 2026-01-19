@@ -13,38 +13,40 @@ open GeneSort.Sorter
 
 module CeBlockOps = 
 
-    let inline sortBy2< ^a when ^a: comparison> 
-                (ceBlock: ceBlock) 
-                (ceUseCounts: ceUseCounts)
-                (values: ^a[]) : ^a[] =
+    //let inline sortBy2< ^a when ^a: comparison> 
+    //            (ceBlock: ceBlock) 
+    //            (ceUseCounts: ceUseCounts)
+    //            (values: ^a[]) : ^a[] =
 
-        for i = 0 to %ceBlock.Length - 1 do
-            let ce = ceBlock.getCe i
-            if values.[ce.Low] > values.[ce.Hi] then
-                let temp = values.[ce.Low]
-                values.[ce.Low] <- values.[ce.Hi]
-                values.[ce.Hi] <- temp
-                ceUseCounts.Increment (i |> UMX.tag<ceIndex>)
-        values
-
-
-    let inline sortBy
-                (ceBlock: ceBlock)
-                (values: int[]) : int[] * int[] =
-
-        let localCounts = Array.zeroCreate %ceBlock.Length
-        for i = 0 to %ceBlock.Length - 1 do
-            let ce = ceBlock.getCe i
-            if values.[ce.Low] > values.[ce.Hi] then
-                let temp = values.[ce.Low]
-                values.[ce.Low] <- values.[ce.Hi]
-                values.[ce.Hi] <- temp
-                localCounts.[i] <- localCounts.[i] + 1
-        (values, localCounts)
+    //    for i = 0 to %ceBlock.Length - 1 do
+    //        let ce = ceBlock.getCe i
+    //        if values.[ce.Low] > values.[ce.Hi] then
+    //            let temp = values.[ce.Low]
+    //            values.[ce.Low] <- values.[ce.Hi]
+    //            values.[ce.Hi] <- temp
+    //            ceUseCounts.Increment (i |> UMX.tag<ceIndex>)
+    //    values
 
 
+    //let inline sortBy
+    //            (ceBlock: ceBlock)
+    //            (values: int[]) : int[] * int[] =
 
-    let evalWithSorterTest (sortableTs: sortableTests) (ceBlock: ceBlock) =
+    //    let localCounts = Array.zeroCreate %ceBlock.Length
+    //    for i = 0 to %ceBlock.Length - 1 do
+    //        let ce = ceBlock.getCe i
+    //        if values.[ce.Low] > values.[ce.Hi] then
+    //            let temp = values.[ce.Low]
+    //            values.[ce.Low] <- values.[ce.Hi]
+    //            values.[ce.Hi] <- temp
+    //            localCounts.[i] <- localCounts.[i] + 1
+    //    (values, localCounts)
+
+
+
+    let evalWithSorterTest 
+                (sortableTs: sortableTests) 
+                (ceBlock: ceBlock) : ceBlockEval =
         let ceUseCounts = ceUseCounts.Create ceBlock.Length
         let ces = ceBlock.CeArray
     
@@ -132,8 +134,10 @@ module CeBlockOps =
 
 
 
-    let evalWithSorterTestCeFetch (sortableTs: sortableTests) (ceBlock: ceBlock) =
-        // PRE-DECONSTRUCT: Fetch indices into flat arrays once.
+    let evalWithSorterTestCeFetch 
+                            (sortableTs: sortableTests) 
+                            (ceBlock: ceBlock) : ceBlockEval =
+        // Fetch indices into flat arrays once.
         // This avoids the overhead of property access (ce.Low/ce.Hi) in the hot loop.
         let ces = ceBlock.CeArray
         let lows = Array.init %ceBlock.Length (fun i -> ces.[i].Low)
@@ -183,6 +187,7 @@ module CeBlockOps =
             let yab = sortableTests.Ints newTests
             // Create usage using the local counts array we populated
             ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
+
 
         | sortableTests.Bools sbts ->
             let sw = sbts.SortingWidth
@@ -285,6 +290,7 @@ module CeBlockOps =
             let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sits.SortingWidth
             let yab = sortableTests.Ints newTests
             ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
+
 
         | sortableTests.Bools sbts ->
             let sw = %sbts.SortingWidth
