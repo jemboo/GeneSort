@@ -23,7 +23,7 @@ type sorterEvalDto = {
 
 module SorterEvalDto =
 
-    let toSorterEvalDto (sorterEval: sorterEval) : sorterEvalDto =
+    let toSorterEvalDto (sorterEval: sorterEvalOld) : sorterEvalDto =
         { 
             SorterId = %sorterEval.SorterId
             SorterTestsId = %sorterEval.SorterTestId
@@ -32,12 +32,12 @@ module SorterEvalDto =
             UnsortedCount = %sorterEval.UnsortedCount
         }
 
-    let fromSorterEvalDto (dto: sorterEvalDto) : sorterEval =
+    let fromSorterEvalDto (dto: sorterEvalDto) : sorterEvalOld =
         if dto.SorterId = Guid.Empty then
             failwith "Sorter ID must not be empty"
         if dto.SortingWidth < 1 then
             failwith "SortingWidth must be at least 1"
-        sorterEval.create
+        sorterEvalOld.create
             (UMX.tag<sorterId> dto.SorterId)  
             (UMX.tag<sorterTestId> dto.SorterTestsId)
             (UMX.tag<sortingWidth> dto.SortingWidth)

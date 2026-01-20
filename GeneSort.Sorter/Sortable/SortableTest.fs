@@ -31,7 +31,7 @@ module SortableTests =
         | Bools boolTest -> boolTest.Id
         | PackedInts packedIntTest -> packedIntTest.Id
 
-    let getSortableCount (test: sortableTest) =
+    let getSortableCount (test: sortableTest) : int<sortableCount> =
         match test with
         | Ints intTest -> intTest.SoratbleCount
         | Bools boolTest -> boolTest.SoratbleCount

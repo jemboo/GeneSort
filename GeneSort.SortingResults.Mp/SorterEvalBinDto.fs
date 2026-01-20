@@ -54,5 +54,5 @@ module SorterEvalBinDto =
             failwith "BinCount must not be negative"
         { 
             binCount = dto.BinCount
-            sorterEvals = ResizeArray<sorterEval>(dto.SorterEvals |> Array.map SorterEvalDto.fromSorterEvalDto)
+            sorterEvals = ResizeArray<sorterEvalOld>(dto.SorterEvals |> Array.map SorterEvalDto.fromSorterEvalDto)
         }

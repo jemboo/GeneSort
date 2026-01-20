@@ -23,7 +23,7 @@ module SorterCeUseProfile =
             (profileSegments: segment [])
             (sorterSetId: Guid<sorterSetId>)
             (sorterTestsId: Guid<sorterTestId>)
-            (sorterEval : sorterEval) : sorterCeUseProfile =
+            (sorterEval : sorterEvalOld) : sorterCeUseProfile =
         {   
             sorterCeUseProfile.segmentTotals = 
                     SegmentWithPayload.getSegmentSums (sorterEval.CeBlockUsage.UseCounts.ToArray()) profileSegments
@@ -88,12 +88,12 @@ module SorterSetCeUseProfile =
         {
             sorterSetCeUseProfile.profileSegments = profileSegments
             sorterSetId = sorterSetEval.SorterSetId
-            sorterTestsId = sorterSetEval.SorterTestsId
+            sorterTestsId = sorterSetEval.SorterTestId
             sorterCeUseProfiles = [| for se in sorterSetEval.SorterEvals -> 
                                         SorterCeUseProfile.makeSorterCeUseProfile 
                                             profileSegments 
                                             sorterSetEval.SorterSetId 
-                                            sorterSetEval.SorterTestsId 
+                                            sorterSetEval.SorterTestId 
                                             se |]
         }
 

@@ -5,6 +5,7 @@ open System.Runtime.Intrinsics
 open System.Threading.Tasks
 open FSharp.UMX
 open GeneSort.Sorter.Sorter
+open GeneSort.Sorter
 
 
 module CeBlockOpsSIMD256 =
@@ -146,13 +147,13 @@ module CeBlockOpsSIMD256 =
     let EvalChunkedWithTypes 
         (chunkedStream: seq<Vector256<uint8>[][]>) 
         (ceBlocks: ceBlock array) 
-        : (ceBlockWithUsage * int64)[] =
+        : ceBlockWithUsage [] =
         
         let numNetworks = ceBlocks.Length
         // Use your ceUseCounts type for global storage
         let globalUsage = Array.init numNetworks (fun i -> 
             ceUseCounts.Create(ceBlocks.[i].Length))
-        let globalUnsorted = Array.zeroCreate<int64> numNetworks
+        let globalUnsorted = Array.zeroCreate<int> numNetworks
         let locks = Array.init numNetworks (fun _ -> obj())
 
         Parallel.ForEach(chunkedStream, (fun (chunk: Vector256<uint8> array array) ->
@@ -162,7 +163,7 @@ module CeBlockOpsSIMD256 =
                 
                 // Local tracking for this chunk
                 let localCounts = Array.zeroCreate<int> len
-                let mutable localUnsorted = 0L
+                let mutable localUnsorted = 0
                 
                 for bIdx = 0 to chunk.Length - 1 do
                     let testBlock = Array.copy chunk.[bIdx]
@@ -178,7 +179,7 @@ module CeBlockOpsSIMD256 =
                             testBlock.[cex.Hi] <- Vector256.Max(vLow, vHi)
                     
                     if not (IsBlockSorted testBlock) then
-                        localUnsorted <- localUnsorted + 1L
+                        localUnsorted <- localUnsorted + 1
 
                 // Sync local results to the ceUseCounts container
                 lock locks.[nIdx] (fun () ->
@@ -191,6 +192,9 @@ module CeBlockOpsSIMD256 =
 
         // Return the high-level ceBlockWithUsage type
         Array.init numNetworks (fun i ->
-            let usageWithBlock = ceBlockWithUsage.create ceBlocks.[i] globalUsage.[i]
-            (usageWithBlock, globalUnsorted.[i])
+            let usageWithBlock = ceBlockWithUsage.create 
+                                        ceBlocks.[i] 
+                                        globalUsage.[i]
+                                        (globalUnsorted.[i] |> UMX.tag<sortableCount>)
+            usageWithBlock
         )

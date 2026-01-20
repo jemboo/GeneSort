@@ -10,18 +10,25 @@ type ceBlockWithUsage =
         ceBlock: ceBlock
         useCounts: ceUseCounts
         usedCes: Lazy<ce array>
+        unsortedCount: int<sortableCount>
     }
 
-    static member create (ceBlock: ceBlock) (ceUseCounts: ceUseCounts) =
+    static member create 
+            (ceBlock: ceBlock) 
+            (ceUseCounts: ceUseCounts) 
+            (unsortedCount: int<sortableCount>) =
         { 
             ceBlock = ceBlock; 
             useCounts = ceUseCounts;
             usedCes = Lazy<ce[]>(ceBlockWithUsage.getUsedCes ceBlock ceUseCounts)
+            unsortedCount = unsortedCount
         }
 
     member this.CeBlock with get() = this.ceBlock
 
     member this.UseCounts with get() = this.useCounts
+
+    member this.UnsortedCount with get() = this.unsortedCount
 
     member this.CeLength with get() = this.useCounts.Length |> UMX.tag<ceLength>
 

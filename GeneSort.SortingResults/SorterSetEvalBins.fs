@@ -13,7 +13,7 @@ type sorterEvalKey = {
 
 type sorterEvalBin = {
     mutable binCount: int
-    mutable sorterEvals: ResizeArray<sorterEval>
+    mutable sorterEvals: ResizeArray<sorterEvalOld>
 }
 
 
@@ -41,7 +41,7 @@ type sorterSetEvalBins = {
 
 module SorterSetEvalBins =
 
-    let addSorterEval (sorterEval: sorterEval) 
+    let addSorterEval (sorterEval: sorterEvalOld) 
                       (sorterSetEvalBins: sorterSetEvalBins) : unit =
         let key = {
             ceCount = sorterEval.getUsedCeCount()
@@ -54,7 +54,7 @@ module SorterSetEvalBins =
             else
                 let newBin = {
                     binCount = 0
-                    sorterEvals = ResizeArray<sorterEval>()
+                    sorterEvals = ResizeArray<sorterEvalOld>()
                 }
                 sorterSetEvalBins.evalBins.[key] <- newBin
                 newBin

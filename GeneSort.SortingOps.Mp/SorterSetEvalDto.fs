@@ -27,7 +27,7 @@ module SorterSetEvalDto =
         { 
             SorterSetEvalId = %sorterSetEval.SorterSetEvalId
             SorterSetId = %sorterSetEval.SorterSetId
-            SorterTestsId = %sorterSetEval.SorterTestsId
+            SorterTestsId = %sorterSetEval.SorterTestId
             SorterEvals = sorterSetEval.SorterEvals |> Array.map SorterEvalDto.toSorterEvalDto
             CeLength = %sorterSetEval.CeLength
         }
