@@ -49,7 +49,7 @@ type msasO =
 
     member this.MakeSortableBoolTests 
             (sortingWidth: int<sortingWidth>) : sortableBoolTest =
-        let ssId = %this.Id |> UMX.tag<sortableTestsId>
+        let ssId = %this.Id |> UMX.tag<sorterTestId>
         let bArrays =
             this.sortableIntArrays 
             |> Array.map(fun sia -> sia.ToSortableBoolArrays())
@@ -62,7 +62,7 @@ type msasO =
 
     member this.MakeSortableIntTests 
             (sortingWidth: int<sortingWidth>) : sortableIntTest =
-        let ssId = %this.Id |> UMX.tag<sortableTestsId>
+        let ssId = %this.Id |> UMX.tag<sorterTestId>
         sortableIntTest.create 
                 ssId 
                 sortingWidth

@@ -7,14 +7,14 @@ open GeneSort.Sorter
 
 [<Struct; CustomEquality; NoComparison>]
 type sortableBoolTest =
-    { id: Guid<sortableTestsId>
-      sortingWidth: int<sortingWidth>
-      sortableBoolArrays: sortableBoolArray[]
-      unsortedCount: Lazy<int>
-    }
+    private { id: Guid<sorterTestId>
+              sortingWidth: int<sortingWidth>
+              sortableBoolArrays: sortableBoolArray[]
+              unsortedCount: Lazy<int>
+            }
 
     static member create 
-                    (id: Guid<sortableTestsId>) 
+                    (id: Guid<sorterTestId>) 
                     (sortingWidth:int<sortingWidth>)
                     (arrays: sortableBoolArray[]) : sortableBoolTest =
         { 

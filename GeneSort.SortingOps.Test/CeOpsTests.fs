@@ -58,7 +58,7 @@ type CeOpsTests() =
         |]
         let sortableTests = 
                 sortableBoolTest.create 
-                        (Guid.NewGuid() |> UMX.tag<sortableTestsId>)
+                        (Guid.NewGuid() |> UMX.tag<sorterTestId>)
                         sortingWidth
                         boolArrays |> sortableTest.Bools
         let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) [| createCe 0 1 |]
@@ -85,7 +85,7 @@ type CeOpsTests() =
         |]
         let sortableTests = 
             sortableIntTest.create 
-                (Guid.NewGuid() |> UMX.tag<sortableTestsId>) 
+                (Guid.NewGuid() |> UMX.tag<sorterTestId>) 
                 sortingWidth
                 intArrays |> sortableTest.Ints
 
@@ -107,7 +107,7 @@ type CeOpsTests() =
         let symbolSetSize = 2<symbolSetSize>
         let intArrays = [| sortableIntArray.create([| 1; 0 |], sortingWidth, symbolSetSize) |]
         let sortableTests = (sortableIntTest.create 
-                                (Guid.NewGuid() |> UMX.tag<sortableTestsId>)
+                                (Guid.NewGuid() |> UMX.tag<sorterTestId>)
                                 sortingWidth
                                 intArrays ) |> sortableTest.Ints
 

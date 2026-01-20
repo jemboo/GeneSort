@@ -41,6 +41,6 @@ module SorterSetEvalDto =
             failwith "SorterTestsId must not be empty"
         sorterSetEval.create
             (UMX.tag<sorterSetId> dto.SorterSetId)
-            (UMX.tag<sortableTestsId> dto.SorterTestsId)
+            (UMX.tag<sorterTestId> dto.SorterTestsId)
             (dto.SorterEvals |> Array.map SorterEvalDto.fromSorterEvalDto)
             (UMX.tag<ceLength> dto.CeLength)

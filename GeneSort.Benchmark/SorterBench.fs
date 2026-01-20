@@ -119,7 +119,7 @@ type SorterEvalBench() =
                             this.mergeFillType
 
         this.sortableIntTests <- sortableIntTest.create
-                                        (Guid.NewGuid() |> UMX.tag<sortableTestsId>)
+                                        (Guid.NewGuid() |> UMX.tag<sorterTestId>)
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         intArrays
                                   |> sortableTest.Ints
@@ -181,7 +181,7 @@ type SorterEvalBench2Blocks() =
                             this.mergeFillType
 
         this.sortableIntTests <- sortableIntTest.create
-                                        (Guid.NewGuid() |> UMX.tag<sortableTestsId>)
+                                        (Guid.NewGuid() |> UMX.tag<sorterTestId>)
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         intArrays
                                   |> sortableTest.Ints

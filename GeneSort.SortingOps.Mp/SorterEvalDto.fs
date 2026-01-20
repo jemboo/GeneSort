@@ -26,7 +26,7 @@ module SorterEvalDto =
     let toSorterEvalDto (sorterEval: sorterEval) : sorterEvalDto =
         { 
             SorterId = %sorterEval.SorterId
-            SorterTestsId = %sorterEval.SorterTestsId
+            SorterTestsId = %sorterEval.SorterTestId
             SortingWidth = %sorterEval.SortingWidth
             CeBlockUsage = CeBlockWithUsageDto.toCeBlockUsageDto sorterEval.CeBlockUsage
             UnsortedCount = %sorterEval.UnsortedCount
@@ -39,7 +39,7 @@ module SorterEvalDto =
             failwith "SortingWidth must be at least 1"
         sorterEval.create
             (UMX.tag<sorterId> dto.SorterId)  
-            (UMX.tag<sortableTestsId> dto.SorterTestsId)
+            (UMX.tag<sorterTestId> dto.SorterTestsId)
             (UMX.tag<sortingWidth> dto.SortingWidth)
             (CeBlockWithUsageDto.fromCeBlockUsageDto dto.CeBlockUsage)
             (dto.UnsortedCount |> UMX.tag<sortableCount>)

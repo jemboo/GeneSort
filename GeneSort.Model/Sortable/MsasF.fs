@@ -45,7 +45,7 @@ type msasF =
     member this.MakeSortableBoolTests (sortingWidth: int<sortingWidth>) : sortableBoolTest =
         let sortableArrays =  SortableBoolArray.getAllSortableBoolArrays sortingWidth
         sortableBoolTest.create 
-                ( %this.id |> UMX.tag<sortableTestsId>) 
+                ( %this.id |> UMX.tag<sorterTestId>) 
                 sortingWidth
                 sortableArrays
 

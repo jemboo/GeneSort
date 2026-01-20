@@ -7,7 +7,7 @@ open GeneSort.Sorter
 
 [<Struct>]
 type packedSortableIntTests =
-    private { id: Guid<sortableTestsId>
+    private { id: Guid<sorterTestId>
               sortingWidth: int<sortingWidth>
               count: int<sortableCount>
               unsortedCount: int<sortableCount>

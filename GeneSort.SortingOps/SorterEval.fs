@@ -11,7 +11,7 @@ type sorterEval =
 
     private { 
         sorterId: Guid<sorterId>
-        sorterTestsId: Guid<sortableTestsId>
+        sorterTestsId: Guid<sorterTestId>
         sortingWidth: int<sortingWidth>
         ceBlockWithUsage: ceBlockWithUsage
         stageSequence: Lazy<stageSequence>
@@ -20,13 +20,13 @@ type sorterEval =
 
     static member create 
                 (sorterId: Guid<sorterId>) 
-                (sorterTestsId: Guid<sortableTestsId>)
+                (sorterTestId: Guid<sorterTestId>)
                 (sortingWidth: int<sortingWidth>)  
                 (ceBlockWithUsage: ceBlockWithUsage)
                 (unsortedCount: int<sortableCount>) =
         { 
             sorterId = sorterId
-            sorterTestsId = sorterTestsId
+            sorterTestsId = sorterTestId
             sortingWidth = sortingWidth
             ceBlockWithUsage = ceBlockWithUsage
             stageSequence = Lazy<stageSequence>(StageSequence.fromCes sortingWidth ceBlockWithUsage.UsedCes)
@@ -44,7 +44,7 @@ type sorterEval =
     member this.CeBlockUsage with get() = this.ceBlockWithUsage
     member this.CeLength with get() = this.ceBlockWithUsage.CeLength
     member this.SorterId with get() : Guid<sorterId> = this.sorterId
-    member this.SorterTestsId with get() : Guid<sortableTestsId> = this.sorterTestsId
+    member this.SorterTestId with get() : Guid<sorterTestId> = this.sorterTestsId
     member this.SortingWidth with get() : int<sortingWidth> =  this.sortingWidth
 
     member this.getUsedCeCount() : int<ceLength> =

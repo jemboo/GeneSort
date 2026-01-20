@@ -25,7 +25,7 @@ module SortableTests =
         | Bools boolTest -> boolTest.SortingWidth
         | PackedInts packedIntTest -> packedIntTest.SortingWidth
 
-    let getId (test: sortableTest) : Guid<sortableTestsId> =
+    let getId (test: sortableTest) : Guid<sorterTestId> =
         match test with
         | Ints intTest -> intTest.Id
         | Bools boolTest -> boolTest.Id

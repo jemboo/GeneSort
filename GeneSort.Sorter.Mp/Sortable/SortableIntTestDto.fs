@@ -24,6 +24,6 @@ module SortableIntTestDto =
 
     let toDomain (dto: sortableIntTestDto) : sortableIntTest =
         sortableIntTest.create
-            (UMX.tag<sortableTestsId> dto.Id)
+            (UMX.tag<sorterTestId> dto.Id)
             (UMX.tag<sortingWidth> dto.SortingWidth)
             (dto.SortableArrays |> Array.map SortableIntArrayDto.toDomain)
