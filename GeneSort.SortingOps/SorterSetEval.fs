@@ -51,7 +51,7 @@ module SorterSetEval =
 
     let makeSorterSetEval
             (sorterSet: sorterSet)
-            (sortableTests: sortableTests) : sorterSetEval =
+            (sortableTests: sortableTest) : sorterSetEval =
 
         let ceBlockEvals : (sorter * ceBlockEval) array = 
                 sorterSet.Sorters 

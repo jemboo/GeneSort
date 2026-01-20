@@ -6,10 +6,10 @@ type ceBlockEval =
 
     private { 
         ceBlockWithUsage: ceBlockWithUsage
-        sortableTests: sortableTests
+        sortableTests: sortableTest
     }
 
-    static member create (ceBlockUsage: ceBlockWithUsage) (sortableTests: sortableTests) =
+    static member create (ceBlockUsage: ceBlockWithUsage) (sortableTests: sortableTest) =
         { 
             ceBlockWithUsage = ceBlockUsage; 
             sortableTests = sortableTests; 

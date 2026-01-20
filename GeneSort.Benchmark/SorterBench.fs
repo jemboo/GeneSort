@@ -106,8 +106,8 @@ type SorterEvalBench() =
 
     member val id = Guid.NewGuid() with get, set
 
-    member val sortableIntTests = sortableIntTests.Empty |> sortableTests.Ints with get, set
-    member val sortablePackedIntTests = sortableIntTests.Empty |> sortableTests.Ints with get, set
+    member val sortableIntTests = sortableIntTest.Empty |> sortableTest.Ints with get, set
+    member val sortablePackedIntTests = sortableIntTest.Empty |> sortableTest.Ints with get, set
 
     member val ceBlock = ceBlock.Empty with get, set
 
@@ -118,18 +118,18 @@ type SorterEvalBench() =
                             (this.mergeDimension |> UMX.tag<mergeDimension>)
                             this.mergeFillType
 
-        this.sortableIntTests <- sortableIntTests.create
+        this.sortableIntTests <- sortableIntTest.create
                                         (Guid.NewGuid() |> UMX.tag<sortableTestsId>)
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         intArrays
-                                  |> sortableTests.Ints
+                                  |> sortableTest.Ints
 
 
         this.sortablePackedIntTests <- packedSortableIntTests.create
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         intArrays
                                         (1<sortableCount>)
-                                  |> sortableTests.PackedInts
+                                  |> sortableTest.PackedInts
 
 
         let bitonics = BitonicSorter.bitonicSort1
@@ -165,9 +165,9 @@ type SorterEvalBench2Blocks() =
 
     member val id = Guid.NewGuid() with get, set
 
-    member val sortableIntTests = sortableIntTests.Empty |> sortableTests.Ints with get, set
+    member val sortableIntTests = sortableIntTest.Empty |> sortableTest.Ints with get, set
 
-    member val sortablePackedIntTests = sortableIntTests.Empty |> sortableTests.Ints with get, set
+    member val sortablePackedIntTests = sortableIntTest.Empty |> sortableTest.Ints with get, set
 
     member val ceBlock1 = ceBlock.Empty with get, set
 
@@ -180,17 +180,17 @@ type SorterEvalBench2Blocks() =
                             (this.mergeDimension |> UMX.tag<mergeDimension>)
                             this.mergeFillType
 
-        this.sortableIntTests <- sortableIntTests.create
+        this.sortableIntTests <- sortableIntTest.create
                                         (Guid.NewGuid() |> UMX.tag<sortableTestsId>)
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         intArrays
-                                  |> sortableTests.Ints
+                                  |> sortableTest.Ints
 
         this.sortablePackedIntTests <- packedSortableIntTests.create
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         intArrays
                                         (1<sortableCount>)
-                                  |> sortableTests.PackedInts
+                                  |> sortableTest.PackedInts
 
         let bitonics = BitonicSorter.bitonicSort1
                             (this.sortingWidth |> UMX.tag<sortingWidth>)

@@ -72,12 +72,12 @@ module CeBlockOpsPacked =
                                            
 
 
-    let evalWithSorterTest (sortableTs: sortableTests) (ceBlock: ceBlock) =
+    let evalWithSorterTest (sortableTs: sortableTest) (ceBlock: ceBlock) =
         let ceUseCounts = ceUseCounts.Create ceBlock.Length
         let ces = ceBlock.CeArray
     
         match sortableTs with
-        | sortableTests.Ints sits ->
+        | sortableTest.Ints sits ->
             let sw = sits.SortingWidth
             let pool = ArrayPool<int>.Shared
             let results = HashSet<sortableIntArray>(SortableIntArray.SortableIntArrayValueComparer())
@@ -111,11 +111,11 @@ module CeBlockOpsPacked =
 
                 pool.Return(workArray)
 
-            let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sw
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTests.Ints newTests)
+            let newTests = Seq.toArray results |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sw
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTest.Ints newTests)
 
 
-        | sortableTests.Bools sbts ->
+        | sortableTest.Bools sbts ->
             let sw = sbts.SortingWidth
             let pool = ArrayPool<bool>.Shared
             // Ensure SortableBoolArrayValueComparer is defined similarly to the Int version
@@ -151,11 +151,11 @@ module CeBlockOpsPacked =
 
                 pool.Return(workArray)
 
-            let newTests = Seq.toArray results |> sortableBoolTests.create (Guid.NewGuid() |> UMX.tag) sw
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTests.Bools newTests)
+            let newTests = Seq.toArray results |> sortableBoolTest.create (Guid.NewGuid() |> UMX.tag) sw
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTest.Bools newTests)
 
 
-    let evalWithSorterTestRefined (sortableTs: sortableTests) (ceBlock: ceBlock) =
+    let evalWithSorterTestRefined (sortableTs: sortableTest) (ceBlock: ceBlock) =
 
         let ces = ceBlock.CeArray
         let lows = Array.init %ceBlock.Length (fun i -> ces.[i].Low)
@@ -164,7 +164,7 @@ module CeBlockOpsPacked =
         let ceUseCounts = ceUseCounts.Create ceBlock.Length
 
         match sortableTs with
-        | sortableTests.Ints sits ->
+        | sortableTest.Ints sits ->
             let sw = sits.SortingWidth
             let pool = ArrayPool<int>.Shared
             let results = HashSet<sortableIntArray>(SortableIntArray.SortableIntArrayValueComparer())
@@ -200,11 +200,11 @@ module CeBlockOpsPacked =
 
                 pool.Return(workArray)
 
-            let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sw
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTests.Ints newTests)
+            let newTests = Seq.toArray results |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sw
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTest.Ints newTests)
 
 
-        | sortableTests.Bools sbts ->
+        | sortableTest.Bools sbts ->
             let sw = sbts.SortingWidth
             let pool = ArrayPool<bool>.Shared
             let results = HashSet<sortableBoolArray>(SortableBoolArray.SortableBoolArrayValueComparer())
@@ -238,11 +238,11 @@ module CeBlockOpsPacked =
 
                 pool.Return(workArray)
 
-            let newTests = Seq.toArray results |> sortableBoolTests.create (Guid.NewGuid() |> UMX.tag) sw
-            let yab = sortableTests.Bools newTests
+            let newTests = Seq.toArray results |> sortableBoolTest.create (Guid.NewGuid() |> UMX.tag) sw
+            let yab = sortableTest.Bools newTests
             ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
 
-        | sortableTests.PackedInts _ -> 
+        | sortableTest.PackedInts _ -> 
             failwith "PackedInts should use evalPacked for maximum efficiency."
 
 
@@ -250,13 +250,13 @@ module CeBlockOpsPacked =
 
 
     let evalWithSorterTestNew 
-                    (sortableTs: sortableTests) 
+                    (sortableTs: sortableTest) 
                     (ceBlock: ceBlock) : ceBlockEval =
         let ces = ceBlock.CeArray
         let ceUseCounts = ceUseCounts.Create ceBlock.Length
 
         match sortableTs with
-        | sortableTests.Ints sits ->
+        | sortableTest.Ints sits ->
             let sw = %sits.SortingWidth
             let pool = ArrayPool<int>.Shared
             let results = HashSet<sortableIntArray>(SortableIntArray.SortableIntArrayValueComparer())
@@ -301,12 +301,12 @@ module CeBlockOpsPacked =
                         results.Add(sortableIntArray.create(finalValues, sits.SortingWidth, sia.SymbolSetSize)) |> ignore
 
             pool.Return(workArray)
-            let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sits.SortingWidth
-            let yab = sortableTests.Ints newTests
+            let newTests = Seq.toArray results |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sits.SortingWidth
+            let yab = sortableTest.Ints newTests
             ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
 
 
-        | sortableTests.Bools sbts ->
+        | sortableTest.Bools sbts ->
             let sw = %sbts.SortingWidth
             let pool = ArrayPool<bool>.Shared
             let results = HashSet<sortableBoolArray>(SortableBoolArray.SortableBoolArrayValueComparer())
@@ -342,12 +342,12 @@ module CeBlockOpsPacked =
                     results.Add(sortableBoolArray.Create(finalValues, sbts.SortingWidth)) |> ignore
 
             pool.Return(workArray)
-            let newTests = Seq.toArray results |> (sortableBoolTests.create (Guid.NewGuid() |> UMX.tag) sbts.SortingWidth)
-            let yab = sortableTests.Bools newTests
+            let newTests = Seq.toArray results |> (sortableBoolTest.create (Guid.NewGuid() |> UMX.tag) sbts.SortingWidth)
+            let yab = sortableTest.Bools newTests
             ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
 
 
-        | sortableTests.PackedInts packedTs ->
+        | sortableTest.PackedInts packedTs ->
             let sw = %packedTs.SortingWidth
             let totalTests = packedTs.SoratbleCount
             let ces = ceBlock.CeArray
@@ -403,7 +403,7 @@ module CeBlockOpsPacked =
             let finalArrays = Seq.toArray uniqueUnsorted
             let unsortedCount = finalArrays.Length |> UMX.tag<sortableCount>
             let newPacked = packedSortableIntTests.create packedTs.SortingWidth finalArrays unsortedCount
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTests.PackedInts newPacked)
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTest.PackedInts newPacked)
 
 
 
@@ -464,12 +464,12 @@ module CeBlockOpsPacked =
                                                     newPackedData
                                                     (newCount |> UMX.tag<sortableCount>)
        
-        ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTests.PackedInts newPacked)
+        ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTest.PackedInts newPacked)
 
 
 
     let evalWithSorterTestNewer
-                    (sortableTs: sortableTests) 
+                    (sortableTs: sortableTest) 
                     (ceBlock: ceBlock) : ceBlockEval =
         let ces = ceBlock.CeArray
         let ceUseCounts = ceUseCounts.Create ceBlock.Length
@@ -478,7 +478,7 @@ module CeBlockOpsPacked =
         let highs = Array.init ceLen (fun i -> ces.[i].Hi)
 
         match sortableTs with
-        | sortableTests.Ints sits ->
+        | sortableTest.Ints sits ->
             let sw = %sits.SortingWidth
             let pool = ArrayPool<int>.Shared
             let results = HashSet<sortableIntArray>(SortableIntArray.SortableIntArrayValueComparer())
@@ -513,11 +513,11 @@ module CeBlockOpsPacked =
 
                 pool.Return(workArray)
 
-            let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sits.SortingWidth
-            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTests.Ints newTests)
+            let newTests = Seq.toArray results |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sits.SortingWidth
+            ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) (sortableTest.Ints newTests)
 
 
-        | sortableTests.Bools sbts ->
+        | sortableTest.Bools sbts ->
             let sw = %sbts.SortingWidth
             let pool = ArrayPool<bool>.Shared
             let results = HashSet<sortableBoolArray>(SortableBoolArray.SortableBoolArrayValueComparer())
@@ -553,11 +553,11 @@ module CeBlockOpsPacked =
                     results.Add(sortableBoolArray.Create(finalValues, sbts.SortingWidth)) |> ignore
 
             pool.Return(workArray)
-            let newTests = Seq.toArray results |> (sortableBoolTests.create (Guid.NewGuid() |> UMX.tag) sbts.SortingWidth)
-            let yab = sortableTests.Bools newTests
+            let newTests = Seq.toArray results |> (sortableBoolTest.create (Guid.NewGuid() |> UMX.tag) sbts.SortingWidth)
+            let yab = sortableTest.Bools newTests
             ceBlockEval.create (ceBlockWithUsage.create ceBlock ceUseCounts) yab
 
-        | sortableTests.PackedInts packedTs ->
+        | sortableTest.PackedInts packedTs ->
             evalPackedOptimized packedTs ceBlock
 
 

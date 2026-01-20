@@ -5,39 +5,39 @@ open FSharp.UMX
 open GeneSort.Sorter
 
 
-type sortableTests = 
-    | Ints of sortableIntTests
+type sortableTest = 
+    | Ints of sortableIntTest
     | PackedInts of packedSortableIntTests
-    | Bools of sortableBoolTests
+    | Bools of sortableBoolTest
 
 
 module SortableTests = 
 
-    let getSortableArrayType (test: sortableTests) =
+    let getSortableArrayType (test: sortableTest) =
         match test with
         | Ints intTest -> intTest.SortableArrayType
         | Bools boolTest -> boolTest.SortableArrayType
         | PackedInts packedIntTest -> packedIntTest.SortableArrayType
 
-    let getSortingWidth (test: sortableTests) =
+    let getSortingWidth (test: sortableTest) =
         match test with
         | Ints intTest -> intTest.SortingWidth
         | Bools boolTest -> boolTest.SortingWidth
         | PackedInts packedIntTest -> packedIntTest.SortingWidth
 
-    let getId (test: sortableTests) : Guid<sortableTestsId> =
+    let getId (test: sortableTest) : Guid<sortableTestsId> =
         match test with
         | Ints intTest -> intTest.Id
         | Bools boolTest -> boolTest.Id
         | PackedInts packedIntTest -> packedIntTest.Id
 
-    let getSortableCount (test: sortableTests) =
+    let getSortableCount (test: sortableTest) =
         match test with
         | Ints intTest -> intTest.SoratbleCount
         | Bools boolTest -> boolTest.SoratbleCount
         | PackedInts packedIntTest -> packedIntTest.SoratbleCount
 
-    let getUnsortedCount (test: sortableTests) =
+    let getUnsortedCount (test: sortableTest) =
         match test with
         | Ints intTest -> intTest.UnsortedCount
         | Bools boolTest -> boolTest.UnsortedCount

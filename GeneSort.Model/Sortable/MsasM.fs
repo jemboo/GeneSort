@@ -57,26 +57,26 @@ type msasM =
     interface IEquatable<msasM> with
         member this.Equals(other) =  this.sortingWidth = other.sortingWidth
 
-    member this.MakeSortableIntTests : sortableIntTests =
+    member this.MakeSortableIntTests : sortableIntTest =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
                             this.mergeFillType
 
-        sortableIntTests.create 
+        sortableIntTest.create 
                 (%this.id |> UMX.tag<sortableTestsId>) 
                 this.SortingWidth
                 intArrays
 
 
-    member this.MakeSortableBoolTests : sortableBoolTests =
+    member this.MakeSortableBoolTests : sortableBoolTest =
 
         let sortableArrays = SortableBoolArray.getMergeTestCases
                                     this.sortingWidth
                                     this.mergeDimension
                                     this.mergeFillType  
 
-        sortableBoolTests.create 
+        sortableBoolTest.create 
                 ( %this.id |> UMX.tag<sortableTestsId>) 
                 this.sortingWidth
                 sortableArrays

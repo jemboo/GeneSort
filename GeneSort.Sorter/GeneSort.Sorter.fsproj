@@ -19,10 +19,10 @@
     <Compile Include="Sorter\SorterSet.fs" />
     <Compile Include="Sortable\SortableBoolArray.fs" />
     <Compile Include="Sortable\SortableIntArray.fs" />
-    <Compile Include="Sortable\SortableBoolTests.fs" />
-    <Compile Include="Sortable\SortableIntTests.fs" />
-    <Compile Include="Sortable\PackedSortableIntTests.fs" />
-    <Compile Include="Sortable\SortableTests.fs" />
+    <Compile Include="Sortable\SortableBoolTest.fs" />
+    <Compile Include="Sortable\SortableIntTest.fs" />
+    <Compile Include="Sortable\PackedSortableIntTest.fs" />
+    <Compile Include="Sortable\SortableTest.fs" />
     <Compile Include="Sortable\SortableBoolTestSet.fs" />
     <Compile Include="Sortable\SortableIntTestSet.fs" />
     <Compile Include="Sortable\SortableTestSet.fs" />

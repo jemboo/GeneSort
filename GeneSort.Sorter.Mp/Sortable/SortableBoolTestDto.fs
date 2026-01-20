@@ -16,13 +16,13 @@ type sortableBoolTestDto = {
 
 module SortableBoolTestDto =
 
-    let fromDomain (sbt: sortableBoolTests) : sortableBoolTestDto =
+    let fromDomain (sbt: sortableBoolTest) : sortableBoolTestDto =
         { Id = %sbt.Id
           SortingWidth = int sbt.SortingWidth
           SortableArrays = sbt.sortableBoolArrays |> Array.map SortableBoolArrayDto.fromDomain }
 
-    let toDomain (dto: sortableBoolTestDto) : sortableBoolTests =
-        sortableBoolTests.create
+    let toDomain (dto: sortableBoolTestDto) : sortableBoolTest =
+        sortableBoolTest.create
             (UMX.tag<sortableTestsId> dto.Id)
             (UMX.tag<sortingWidth> dto.SortingWidth)
             (dto.SortableArrays |> Array.map SortableBoolArrayDto.toDomain)

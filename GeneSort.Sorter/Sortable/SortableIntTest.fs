@@ -6,7 +6,7 @@ open FSharp.UMX
 open GeneSort.Sorter
 
 [<Struct; CustomEquality; NoComparison>]
-type sortableIntTests =
+type sortableIntTest =
     { id: Guid<sortableTestsId>
       sortingWidth: int<sortingWidth>
       sortableIntArrays: sortableIntArray[] 
@@ -16,7 +16,7 @@ type sortableIntTests =
     static member create 
                     (id: Guid<sortableTestsId>) 
                     (sortingWidth:int<sortingWidth>)
-                    (arrays: sortableIntArray[]) : sortableIntTests =
+                    (arrays: sortableIntArray[]) : sortableIntTest =
         { 
             id = id; 
             sortingWidth = sortingWidth; 
@@ -26,11 +26,11 @@ type sortableIntTests =
 
     static member Empty =
         let id = Guid.NewGuid() |> UMX.tag<sortableTestsId>
-        sortableIntTests.create id 0<sortingWidth> [||]
+        sortableIntTest.create id 0<sortingWidth> [||]
 
     override this.Equals(obj) =
         match obj with
-        | :? sortableIntTests as other ->
+        | :? sortableIntTest as other ->
             this.Id = other.Id && Array.forall2 (=) this.sortableIntArrays other.sortableIntArrays
         | _ -> false
 
@@ -49,7 +49,7 @@ type sortableIntTests =
     
     member this.UnsortedCount with get() = this.unsortedCount.Value |> UMX.tag<sortableCount>
 
-    interface IEquatable<sortableIntTests> with
+    interface IEquatable<sortableIntTest> with
         member this.Equals(other) =
             this.Id = other.Id && Array.forall2 (=) this.sortableIntArrays other.sortableIntArrays
 

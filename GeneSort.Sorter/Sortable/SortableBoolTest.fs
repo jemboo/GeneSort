@@ -6,7 +6,7 @@ open FSharp.UMX
 open GeneSort.Sorter
 
 [<Struct; CustomEquality; NoComparison>]
-type sortableBoolTests =
+type sortableBoolTest =
     { id: Guid<sortableTestsId>
       sortingWidth: int<sortingWidth>
       sortableBoolArrays: sortableBoolArray[]
@@ -16,7 +16,7 @@ type sortableBoolTests =
     static member create 
                     (id: Guid<sortableTestsId>) 
                     (sortingWidth:int<sortingWidth>)
-                    (arrays: sortableBoolArray[]) : sortableBoolTests =
+                    (arrays: sortableBoolArray[]) : sortableBoolTest =
         { 
             id = id; 
             sortingWidth = sortingWidth; 
@@ -26,7 +26,7 @@ type sortableBoolTests =
 
     override this.Equals(obj) =
         match obj with
-        | :? sortableBoolTests as other ->
+        | :? sortableBoolTest as other ->
             this.Id = other.Id && Array.forall2 (=) this.sortableBoolArrays other.sortableBoolArrays
         | _ -> false
 
@@ -46,7 +46,7 @@ type sortableBoolTests =
 
     member this.UnsortedCount with get() = this.unsortedCount.Value |> UMX.tag<sortableCount>
 
-    interface IEquatable<sortableBoolTests> with
+    interface IEquatable<sortableBoolTest> with
         member this.Equals(other) =
             this.Id = other.Id && Array.forall2 (=) this.sortableBoolArrays other.sortableBoolArrays
 

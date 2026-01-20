@@ -10,12 +10,12 @@ type sortableTestsDto =
 
 module SortableTestsDto =
 
-    let fromDomain (sorterTest: sortableTests) : sortableTestsDto =
+    let fromDomain (sorterTest: sortableTest) : sortableTestsDto =
         match sorterTest with
-        | sortableTests.Ints intTest -> Ints (SortableIntTestDto.fromDomain intTest)
-        | sortableTests.Bools boolTest -> Bools (SortableBoolTestDto.fromDomain boolTest)
+        | sortableTest.Ints intTest -> Ints (SortableIntTestDto.fromDomain intTest)
+        | sortableTest.Bools boolTest -> Bools (SortableBoolTestDto.fromDomain boolTest)
 
-    let toDomain (dto: sortableTestsDto) : sortableTests =
+    let toDomain (dto: sortableTestsDto) : sortableTest =
         match dto with
-        | Ints intTestDto -> sortableTests.Ints (SortableIntTestDto.toDomain intTestDto)
-        | Bools boolTestDto -> sortableTests.Bools (SortableBoolTestDto.toDomain boolTestDto)
+        | Ints intTestDto -> sortableTest.Ints (SortableIntTestDto.toDomain intTestDto)
+        | Bools boolTestDto -> sortableTest.Bools (SortableBoolTestDto.toDomain boolTestDto)

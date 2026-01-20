@@ -66,7 +66,7 @@ module SorterEval =
 
     let makeSorterEval
             (sorter: sorter)
-            (sortableTests: sortableTests) : sorterEval =
+            (sortableTests: sortableTest) : sorterEval =
 
         let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTests (ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) (sorter.Ces))
         sorterEval.create 

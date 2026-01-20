@@ -96,7 +96,7 @@ module OutputDataFile =
                         }
                     | outputDataType.SortableTest _ ->
                         async {
-                            let! domain = deserializeDto<sortableTestsDto, sortableTests> stream token SortableTestsDto.toDomain
+                            let! domain = deserializeDto<sortableTestsDto, sortableTest> stream token SortableTestsDto.toDomain
                             return outputData.SortableTest domain
                         }
                     | outputDataType.SorterModelSet _ ->

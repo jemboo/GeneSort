@@ -1,6 +1,5 @@
 ﻿namespace GeneSort.SortingOps
 
-open System
 open System.Threading
 open FSharp.UMX
 open GeneSort.Core
