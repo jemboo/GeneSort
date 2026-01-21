@@ -53,6 +53,31 @@ module SorterSetEval =
             (sorterSet: sorterSet)
             (sortableTest: sortableTest) : sorterSetEval =
 
+
+        let ceBlockAs = 
+                sorterSet.Sorters 
+                |> Array.map (fun sorter ->
+                        ceBlock.create (%sorter.SorterId |> UMX.tag<ceBlockId>) sorter.SortingWidth sorter.Ces )
+
+        let ceBlockEvals : ceBlockEval array = CeBlockOps.evalWithSorterTests sortableTest ceBlockAs    
+
+        let zipped = Array.zip sorterSet.Sorters ceBlockEvals
+
+        let sorterEvals = 
+            zipped |> Array.map (
+                fun (sorter, ceBlockEval ) -> 
+                        sorterEval.create 
+                            sorter.SorterId
+                            ceBlockEval
+                )
+        sorterSetEval.create sorterSet.Id (sortableTest |> SortableTests.getId ) sorterEvals (sorterSet.CeLength)
+
+
+
+    let makeSorterSetEval0
+            (sorterSet: sorterSet)
+            (sortableTest: sortableTest) : sorterSetEval =
+
         let ceBlockEvals : (sorter * ceBlockEval) array = 
                 sorterSet.Sorters 
                 |> Array.map (fun sorter ->
