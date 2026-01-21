@@ -8,12 +8,10 @@
   <ItemGroup>
     <Compile Include="CeBlock.fs" />
     <Compile Include="CeUseCounts.fs" />
-    <Compile Include="CeBlockWithUsage.fs" />
     <Compile Include="CeBlockEval.fs" />
     <Compile Include="CeBlockOps.fs" />
     <Compile Include="CeBlockOpsPacked.fs" />
     <Compile Include="CeBlockOpsSIMD.fs" />
-    <Compile Include="SorterEvalOld.fs" />
     <Compile Include="SorterEval.fs" />
     <Compile Include="SorterSetEval.fs" />
     <Compile Include="Program.fs" />

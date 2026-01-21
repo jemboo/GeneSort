@@ -10,8 +10,8 @@ type sorterCeUseProfile = {
     sorterId: Guid<sorterId>
     sorterSetId: Guid<sorterSetId>
     sorterTestsId: Guid<sorterTestId>
-    lastUsedCeIndex: int
-    unsortedCount: int
+    lastUsedCeIndex: int<ceIndex>
+    unsortedCount: int<sortableCount>
     ceCount: int<ceLength>
     stageLength: int<stageLength>
     segmentTotals: segmentWithPayload<int> []
@@ -23,16 +23,16 @@ module SorterCeUseProfile =
             (profileSegments: segment [])
             (sorterSetId: Guid<sorterSetId>)
             (sorterTestsId: Guid<sorterTestId>)
-            (sorterEval : sorterEvalOld) : sorterCeUseProfile =
+            (sorterEval : sorterEval) : sorterCeUseProfile =
         {   
             sorterCeUseProfile.segmentTotals = 
-                    SegmentWithPayload.getSegmentSums (sorterEval.CeBlockUsage.UseCounts.ToArray()) profileSegments
+                    SegmentWithPayload.getSegmentSums (sorterEval.CeBlockEval.CeUseCounts.ToArray()) profileSegments
             sorterId = sorterEval.SorterId
             sorterSetId = sorterSetId
-            lastUsedCeIndex = sorterEval.getLastUsedCeIndex
-            unsortedCount = %sorterEval.UnsortedCount
-            ceCount = sorterEval.getUsedCeCount()
-            stageLength = sorterEval.getStageLength()
+            lastUsedCeIndex = sorterEval.CeBlockEval.CeUseCounts.LastUsedCeIndex
+            unsortedCount = sorterEval.CeBlockEval.UnsortedCount
+            ceCount = sorterEval.CeBlockEval.CeUseCounts.UsedCeCount
+            stageLength = sorterEval.CeBlockEval.getStageSequence.StageLength
             sorterTestsId = sorterTestsId
         }
 

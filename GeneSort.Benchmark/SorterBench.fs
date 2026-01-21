@@ -135,7 +135,10 @@ type SorterEvalBench() =
         let bitonics = BitonicSorter.bitonicSort1
                             (this.sortingWidth |> UMX.tag<sortingWidth>)
 
-        this.ceBlock <- bitonics |> Array.concat |> ceBlock.create  (Guid.NewGuid() |> UMX.tag<ceBlockId>)
+        this.ceBlock <- bitonics |> Array.concat 
+                        |> ceBlock.create  
+                                    (Guid.NewGuid() |> UMX.tag<ceBlockId>) 
+                                    (this.sortingWidth |> UMX.tag<sortingWidth>)
 
 
     [<Benchmark(Baseline = true)>]
@@ -195,14 +198,17 @@ type SorterEvalBench2Blocks() =
         let bitonics = BitonicSorter.bitonicSort1
                             (this.sortingWidth |> UMX.tag<sortingWidth>)
         let halfLength = bitonics.Length / 2
-        this.ceBlock1 <- bitonics |> Array.take(halfLength) |> Array.concat |> ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>)
-        this.ceBlock2 <- bitonics |> Array.skip(halfLength) |> Array.take(halfLength) |> Array.concat |> ceBlock.create  (Guid.NewGuid() |> UMX.tag<ceBlockId>)
+        let firstHalf = bitonics |> Array.take(halfLength) |> Array.concat
+        let secondHalf = bitonics |> Array.skip(halfLength) |> Array.take(halfLength) |> Array.concat
+        let blockMaker = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) (this.sortingWidth |> UMX.tag<sortingWidth>)
+        this.ceBlock1 <- blockMaker firstHalf
+        this.ceBlock2 <- blockMaker secondHalf
 
 
     [<Benchmark(Baseline = true)>]
     member this.evalBranchy() =
        let ceBlockEval1 = CeBlockOps.evalWithSorterTest this.sortableIntTests this.ceBlock1
-       let ceBlockEval2 = CeBlockOps.evalWithSorterTest ceBlockEval1.SortableTests this.ceBlock2
+       let ceBlockEval2 = CeBlockOps.evalWithSorterTest ceBlockEval1.SortableTest.Value this.ceBlock2
        ceBlockEval2
 
 
@@ -210,7 +216,7 @@ type SorterEvalBench2Blocks() =
     [<Benchmark>]
     member this.evalNewPacked() =
        let ceBlockEval1 = CeBlockOps.evalWithSorterTestUnsafe this.sortablePackedIntTests this.ceBlock1
-       let ceBlockEval2 = CeBlockOps.evalWithSorterTestUnsafe ceBlockEval1.SortableTests this.ceBlock2
+       let ceBlockEval2 = CeBlockOps.evalWithSorterTestUnsafe ceBlockEval1.SortableTest.Value this.ceBlock2
        ceBlockEval2
 
 

@@ -3,6 +3,7 @@
 open System.Threading
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Sorter
 
 
 // -----------------------------
@@ -33,6 +34,12 @@ type ceUseCounts =
     // ----------------
     // Basic properties
     // ----------------
+
+    /// Number of CEs that have been used at least once
+    member this.UsedCeCount : int<ceLength> =
+        (Array.fold (fun acc count -> if count > 0 then acc + 1 else acc) 0 this.useCounts)
+        |> UMX.tag<ceLength>
+ 
 
     /// Number of CEs tracked
     member this.Length : int =
@@ -70,5 +77,8 @@ type ceUseCounts =
     member this.IncrementAtomic (index: int<ceIndex>) : unit =
         Interlocked.Increment(&this.useCounts.[%index]) |> ignore
 
-    member this.LastUsedCeIndex : int =
+    member this.LastUsedCeIndex : int<ceIndex> =
         ArrayUtils.lastNonZeroIndex this.useCounts
+        |> UMX.tag<ceIndex>
+
+

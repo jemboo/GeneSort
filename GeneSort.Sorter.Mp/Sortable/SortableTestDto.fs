@@ -8,7 +8,7 @@ type sortableTestsDto =
     | Ints of sortableIntTestDto
     | Bools of sortableBoolTestDto
 
-module SortableTestsDto =
+module SortableTestDto =
 
     let fromDomain (sorterTest: sortableTest) : sortableTestsDto =
         match sorterTest with

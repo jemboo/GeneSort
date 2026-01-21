@@ -13,7 +13,7 @@
     <Compile Include="Sortable\SortableIntArrayDto.fs" />
     <Compile Include="Sortable\SortableBoolTestDto.fs" />
     <Compile Include="Sortable\SortableIntTestDto.fs" />
-    <Compile Include="Sortable\SortableTestsDto.fs" />
+    <Compile Include="Sortable\SortableTestDto.fs" />
     <Compile Include="Sortable\SortableIntTestSetDto.fs" />
     <Compile Include="Sortable\SortableBoolTestSetDto.fs" />
     <Compile Include="Sortable\SortableTestSetDto.fs" />

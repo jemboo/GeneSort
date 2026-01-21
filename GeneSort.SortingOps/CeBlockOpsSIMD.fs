@@ -147,7 +147,7 @@ module CeBlockOpsSIMD256 =
     let EvalChunkedWithTypes 
         (chunkedStream: seq<Vector256<uint8>[][]>) 
         (ceBlocks: ceBlock array) 
-        : ceBlockWithUsage [] =
+        : ceBlockEval [] =
         
         let numNetworks = ceBlocks.Length
         // Use your ceUseCounts type for global storage
@@ -192,9 +192,10 @@ module CeBlockOpsSIMD256 =
 
         // Return the high-level ceBlockWithUsage type
         Array.init numNetworks (fun i ->
-            let usageWithBlock = ceBlockWithUsage.create 
+            let usageWithBlock = ceBlockEval.create 
                                         ceBlocks.[i] 
                                         globalUsage.[i]
                                         (globalUnsorted.[i] |> UMX.tag<sortableCount>)
+                                        None
             usageWithBlock
         )

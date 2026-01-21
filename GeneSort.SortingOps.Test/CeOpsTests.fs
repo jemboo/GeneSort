@@ -61,16 +61,16 @@ type CeOpsTests() =
                         (Guid.NewGuid() |> UMX.tag<sorterTestId>)
                         sortingWidth
                         boolArrays |> sortableTest.Bools
-        let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) [| createCe 0 1 |]
+        let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) sortingWidth [| createCe 0 1 |]
         
         // Act
         let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTests ceBlock
         
         // Assert
-        let boolTests = match ceBlockEval.SortableTests with | sortableTest.Bools bt -> bt | _ -> failwith "Expected Bools"
+        let boolTests = match ceBlockEval.SortableTest.Value with | sortableTest.Bools bt -> bt | _ -> failwith "Expected Bools"
         boolTests.SortableBoolArrays.Length |> should equal 1 // Duplicate removed
         boolTests.SortableBoolArrays |> Array.forall (fun sba -> sba.Values = [| false; true; false |]) |> should be True
-        ceBlockEval.CeBlockWithUsage.UseCounts.[0 |> UMX.tag<ceIndex>]  |> should be (greaterThanOrEqualTo 1) // At least one swap occurred
+        %ceBlockEval.CeUseCounts.UsedCeCount |> should be (greaterThanOrEqualTo 1) // At least one swap occurred
 
     [<Fact>]
     let ``evalWithSorterTests handles int arrays and removes duplicates`` () =
@@ -83,21 +83,22 @@ type CeOpsTests() =
             sortableIntArray.create([| 1; 0; 1 |], sortingWidth, symbolSetSize) // Duplicate
             sortableIntArray.create([| 0; 0; 1 |], sortingWidth, symbolSetSize) // Already sorted
         |]
-        let sortableTests = 
+        let sortableTest = 
             sortableIntTest.create 
                 (Guid.NewGuid() |> UMX.tag<sorterTestId>) 
                 sortingWidth
                 intArrays |> sortableTest.Ints
 
-        let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) [| createCe 0 1 |]
+        let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) sortingWidth [| createCe 0 1 |]
         
         // Act
-        let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTests ceBlock
+        let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock 
         
         // Assert
-        let intTests = match ceBlockEval.SortableTests with | sortableTest.Ints it -> it | _ -> failwith "Expected Ints"
+        let intTests = match ceBlockEval.SortableTest.Value with | sortableTest.Ints it -> it | _ -> failwith "Expected Ints"
         intTests.SortableIntArrays.Length |> should equal 1
-        ceBlockEval.CeBlockWithUsage.UseCounts.[0 |> UMX.tag<ceIndex>]  |> should be (greaterThanOrEqualTo 1) // At least one swap occurred
+        %ceBlockEval.CeUseCounts.UsedCeCount |> should be (greaterThanOrEqualTo 1) // At least one swap occurred
+
 
 
     [<Fact>]
@@ -106,17 +107,17 @@ type CeOpsTests() =
         let sortingWidth = 2<sortingWidth>
         let symbolSetSize = 2<symbolSetSize>
         let intArrays = [| sortableIntArray.create([| 1; 0 |], sortingWidth, symbolSetSize) |]
-        let sortableTests = (sortableIntTest.create 
+        let sortableTest = (sortableIntTest.create 
                                 (Guid.NewGuid() |> UMX.tag<sorterTestId>)
                                 sortingWidth
                                 intArrays ) |> sortableTest.Ints
 
-        let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) [| createCe 0 1 |]
+        let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) sortingWidth [| createCe 0 1 |] 
 
         // Act
-        let result = CeBlockOps.evalWithSorterTest sortableTests ceBlock
+        let result = CeBlockOps.evalWithSorterTest sortableTest ceBlock
         
         // Assert
-        let intTests = match result.SortableTests with | sortableTest.Ints it -> it | _ -> failwith "Expected Ints"
+        let intTests = match result.SortableTest.Value with | sortableTest.Ints it -> it | _ -> failwith "Expected Ints"
         intTests.SortingWidth |> should equal sortingWidth
         intTests.SortableArrayType |> should equal sortableDataType.Ints

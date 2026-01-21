@@ -3,6 +3,7 @@
 open System
 open FSharp.UMX
 open GeneSort.Sorter.Sorter
+open GeneSort.Sorter
 
 [<Measure>]
 type ceIndex
@@ -17,11 +18,20 @@ type ceBlock =
     private { 
         ces: ce array 
         ceBlockId: Guid<ceBlockId>
+        sortingWidth: int<sortingWidth>
     }
 
-    static member create (ceBlockId: Guid<ceBlockId>) (ces: ce array) = { ceBlockId = ceBlockId; ces = ces }
+    static member create 
+            (ceBlockId: Guid<ceBlockId>) 
+            (sortingWidth: int<sortingWidth>)
+            (ces: ce array)  = 
+            { 
+                ceBlockId = ceBlockId; 
+                ces = ces;
+                sortingWidth = sortingWidth
+            }
 
-    static member Empty = { ceBlockId = Guid.Empty |> UMX.tag<ceBlockId>; ces = [||] }
+    static member Empty = ceBlock.create (Guid.Empty |> UMX.tag<ceBlockId>) (0 |> UMX.tag<sortingWidth>) [||]
 
     member this.getCe (dex:int) = 
         //if dex < 0 || dex >= this.ces.Length then
@@ -34,17 +44,19 @@ type ceBlock =
 
     member this.Length with get() = this.ces.Length |> UMX.tag<ceBlockLength>
 
+    member this.SortingWidth with get() = this.sortingWidth
+
 
 module CeBlock =
 
-    let breakUpIntoBlocks (ces:ce[]) (blockLength:int<ceBlockLength>) =
+    let breakUpIntoBlocks (sortingWidth: int<sortingWidth>) (ces:ce[]) (blockLength:int<ceBlockLength>) =
         let totalCes = ces.Length
         let blocks = 
             [|
                 let mutable index = 0
                 while index < totalCes do
                     let blockCes = ces.[index .. Math.Min(index + %blockLength - 1, totalCes - 1)]
-                    yield ceBlock.create (Guid.NewGuid() |> UMX.tag) blockCes
+                    yield ceBlock.create (Guid.NewGuid() |> UMX.tag) sortingWidth blockCes
                     index <- index + %blockLength
             |]
         blocks

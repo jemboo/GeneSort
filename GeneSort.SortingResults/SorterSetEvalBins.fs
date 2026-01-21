@@ -13,7 +13,7 @@ type sorterEvalKey = {
 
 type sorterEvalBin = {
     mutable binCount: int
-    mutable sorterEvals: ResizeArray<sorterEvalOld>
+    mutable sorterEvals: ResizeArray<sorterEval>
 }
 
 
@@ -23,7 +23,7 @@ module SorterEvalBin =
     // number of sorterEvals that have unsortedCount = uuct1
     let getUnsortedHistogram (seb: sorterEvalBin) :string =
             seb.sorterEvals
-            |> Seq.groupBy (fun se -> se.UnsortedCount)
+            |> Seq.groupBy (fun se -> se.CeBlockEval.UnsortedCount)
             |> Seq.sortBy fst
             |> Seq.map (fun (key, group) -> sprintf "(%d, %d)" key (Seq.length group))
             |> String.concat "; "
@@ -41,11 +41,11 @@ type sorterSetEvalBins = {
 
 module SorterSetEvalBins =
 
-    let addSorterEval (sorterEval: sorterEvalOld) 
+    let addSorterEval (sorterEval: sorterEval) 
                       (sorterSetEvalBins: sorterSetEvalBins) : unit =
         let key = {
-            ceCount = sorterEval.getUsedCeCount()
-            stageLength = sorterEval.getStageLength()
+            ceCount = sorterEval.CeBlockEval.CeUseCounts.UsedCeCount
+            stageLength = sorterEval.CeBlockEval.getStageSequence.StageLength
         }
 
         let sorterEvalBin =
@@ -54,7 +54,7 @@ module SorterSetEvalBins =
             else
                 let newBin = {
                     binCount = 0
-                    sorterEvals = ResizeArray<sorterEvalOld>()
+                    sorterEvals = ResizeArray<sorterEval>()
                 }
                 sorterSetEvalBins.evalBins.[key] <- newBin
                 newBin

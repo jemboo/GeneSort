@@ -16,14 +16,14 @@ type sorterSetEval =
         sorterSetEvalId: Guid<sorterSetEvalId>
         sorterSetId: Guid<sorterSetId>
         sorterTestId: Guid<sorterTestId>
-        sorterEvals: sorterEvalOld[]
+        sorterEvals: sorterEval[]
         ceLength: int<ceLength>
     }
 
     static member create 
                 (sorterSetId: Guid<sorterSetId>) 
                 (sorterTestsId: Guid<sorterTestId>) 
-                (sorterEval: sorterEvalOld[])
+                (sorterEval: sorterEval[])
                 (ceLength: int<ceLength>) =
         let id =
             [
@@ -42,7 +42,7 @@ type sorterSetEval =
     member this.SorterSetEvalId with get() : Guid<sorterSetEvalId> = this.sorterSetEvalId
     member this.SorterSetId with get() : Guid<sorterSetId> = this.sorterSetId
     member this.SorterTestId with get() : Guid<sorterTestId> = this.sorterTestId
-    member this.SorterEvals with get() : sorterEvalOld[] = this.sorterEvals
+    member this.SorterEvals with get() : sorterEval[] = this.sorterEvals
     member this.CeLength with get() : int<ceLength> = this.ceLength
 
  
@@ -55,17 +55,19 @@ module SorterSetEval =
 
         let ceBlockEvals : (sorter * ceBlockEval) array = 
                 sorterSet.Sorters 
-                |> Array.map (fun s -> (s,  CeBlockOps.evalWithSorterTest sortableTest  (ceBlock.create (%s.SorterId |> UMX.tag<ceBlockId>) (s.Ces) )))
+                |> Array.map (fun sorter ->
+                        let ceBlock = ceBlock.create (%sorter.SorterId |> UMX.tag<ceBlockId>) sorter.SortingWidth sorter.Ces 
+                        (
+                            sorter,  
+                            CeBlockOps.evalWithSorterTest sortableTest ceBlock
+                        ))
 
         let sorterEvals = 
             ceBlockEvals |> Array.map (
                 fun (sorter, ceBlockEval ) -> 
-                        sorterEvalOld.create 
-                            sorter.SorterId 
-                            (sortableTest |> SortableTests.getId ) 
-                            sorter.SortingWidth 
-                            ceBlockEval.CeBlockWithUsage
-                            (ceBlockEval.SortableTests |> SortableTests.getUnsortedCount)
+                        sorterEval.create 
+                            sorter.SorterId
+                            ceBlockEval
                 )
 
         sorterSetEval.create sorterSet.Id (sortableTest |> SortableTests.getId ) sorterEvals (sorterSet.CeLength)
