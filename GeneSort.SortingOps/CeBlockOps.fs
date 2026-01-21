@@ -8,6 +8,7 @@ open System.Buffers
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 open GeneSort.Sorter
+open CeBlockOpsPacked
 
 
 
@@ -223,8 +224,9 @@ module CeBlockOps =
             let newTests = Seq.toArray results |> sortableBoolTest.create (Guid.NewGuid() |> UMX.tag) sw
             ceBlockEval.create ceBlock ceUseCounts (results.Count |> UMX.tag<sortableCount>) (Some (sortableTest.Bools newTests))
 
-        | sortableTest.PackedInts _ -> 
-            failwith "PackedInts should use evalPacked for maximum efficiency."
+
+        | sortableTest.PackedInts packedTs ->
+            evalPackedOptimized packedTs ceBlock
 
 
 
@@ -328,66 +330,7 @@ module CeBlockOps =
 
 
         | sortableTest.PackedInts packedTs ->
-            let sw = %packedTs.SortingWidth
-            let totalTests = packedTs.SoratbleCount
-            let ces = ceBlock.CeArray
-            let ceCount = ces.Length
-            let countsArray = Array.zeroCreate ceCount
-        
-            // Work on a copy of the values so the original 'tests' remain immutable
-            let resultsBuffer = Array.copy packedTs.PackedValues
-            let mutable dataRef = &MemoryMarshal.GetReference(resultsBuffer.AsSpan())
-
-            // Inner loop optimization: Cache ces locally to improve L1 cache hit rate
-            for t = 0 to %totalTests - 1 do
-                let offset = t * sw
-            
-                for i = 0 to ceCount - 1 do
-                    let ce = ces.[i]
-                    // Compute exact memory locations once per CE
-                    let lPtr = &Unsafe.Add(&dataRef, offset + ce.Low)
-                    let hPtr = &Unsafe.Add(&dataRef, offset + ce.Hi)
-                
-                    let a = lPtr
-                    let b = hPtr
-                
-                    if a > b then
-                        lPtr <- b
-                        hPtr <- a
-                        // Incrementing the local countsArray
-                        countsArray.[i] <- countsArray.[i] + 1
-
-            let uniqueUnsorted = HashSet<sortableIntArray>(SortableIntArray.SortableIntArrayValueComparer())
-            let dataSpan = resultsBuffer.AsSpan()
-        
-            for t = 0 to %totalTests - 1 do
-                let offset = t * sw
-                // Get a slice of the flattened buffer for this specific test case
-                let testSlice = dataSpan.Slice(offset, sw)
-
-                // 1. Check sortedness IN-PLACE
-                let mutable isSorted = true
-                let mutable j = 0
-                while j < sw - 1 && isSorted do
-                    // Using Unsafe or indexed access on the slice
-                    if testSlice.[j] > testSlice.[j+1] then 
-                        isSorted <- false
-                    else 
-                        j <- j + 1
-
-                // 2. ONLY if unsorted, do we allocate and deduplicate
-                if not isSorted then
-                    let finalValues = testSlice.ToArray() // Only allocates for failures
-                    let resultSia = sortableIntArray.create(finalValues, packedTs.SortingWidth, 16<symbolSetSize>)
-                    uniqueUnsorted.Add(resultSia) |> ignore
-
-            // Return a fresh packed structure for the next generation/block
-       
-            let finalArrays = Seq.toArray uniqueUnsorted
-            let unsortedCount = finalArrays.Length |> UMX.tag<sortableCount>
-            let newPacked = packedSortableIntTests.create packedTs.SortingWidth finalArrays unsortedCount
-            ceBlockEval.create ceBlock ceUseCounts (uniqueUnsorted.Count |> UMX.tag<sortableCount>) (Some (sortableTest.PackedInts newPacked))
-
+            evalPackedOptimized packedTs ceBlock
 
 
 

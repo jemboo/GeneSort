@@ -9,8 +9,9 @@
     <Compile Include="CeBlock.fs" />
     <Compile Include="CeUseCounts.fs" />
     <Compile Include="CeBlockEval.fs" />
-    <Compile Include="CeBlockOps.fs" />
     <Compile Include="CeBlockOpsPacked.fs" />
+    <Compile Include="CeBlockOps.fs" />
+    <Compile Include="CeBlockOpsPackedOld.fs" />
     <Compile Include="CeBlockOpsSIMD.fs" />
     <Compile Include="SorterEval.fs" />
     <Compile Include="SorterSetEval.fs" />
