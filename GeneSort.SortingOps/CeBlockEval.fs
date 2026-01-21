@@ -2,9 +2,9 @@
 
 open FSharp.UMX
 
-open GeneSort.Sorter.Sortable
-open GeneSort.Sorter
-open GeneSort.Sorter.Sorter
+open GeneSort.Sorting.Sortable
+open GeneSort.Sorting
+open GeneSort.Sorting.Sorter
 
 type ceBlockEval =
 

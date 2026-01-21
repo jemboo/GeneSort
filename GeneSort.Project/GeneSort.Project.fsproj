@@ -36,17 +36,17 @@
     <ProjectReference Include="..\GeneSort.Model.Mp\GeneSort.Model.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Runs.Mp\GeneSort.Runs.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Runs\GeneSort.Runs.fsproj" />
-    <ProjectReference Include="..\GeneSort.Sorter.Mp\GeneSort.Sorter.Mp.fsproj" />
-    <ProjectReference Include="..\GeneSort.Sorter\GeneSort.Sorter.fsproj" />
     <ProjectReference Include="..\GeneSort.Model\GeneSort.Model.fsproj" />
+    <ProjectReference Include="..\GeneSort.Sorting.Mp\GeneSort.Sorting.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingOps.Mp\GeneSort.SortingOps.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingOps\GeneSort.SortingOps.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingResults.Mp\GeneSort.SortingResults.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingResults\GeneSort.SortingResults.fsproj" />
+    <ProjectReference Include="..\GeneSort.Sorting\GeneSort.Sorting.fsproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="10.0.101" />
+    <PackageReference Update="FSharp.Core" Version="10.0.102" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="SortingTypes.fs" />
+    <Compile Include="Sorter\Ce.fs" />
+    <Compile Include="Sorter\Stage.fs" />
+    <Compile Include="Sorter\Sorter.fs" />
+    <Compile Include="Sorter\StageSequence.fs" />
+    <Compile Include="Sorter\BitonicSorter.fs" />
+    <Compile Include="Sorter\SorterSet.fs" />
+    <Compile Include="Sortable\SortableBoolArray.fs" />
+    <Compile Include="Sortable\SortableIntArray.fs" />
+    <Compile Include="Sortable\SortableBoolTest.fs" />
+    <Compile Include="Sortable\SortableIntTest.fs" />
+    <Compile Include="Sortable\PackedSortableIntTest.fs" />
+    <Compile Include="Sortable\SortableTest.fs" />
+    <Compile Include="Sortable\SortableBoolTestSet.fs" />
+    <Compile Include="Sortable\SortableIntTestSet.fs" />
+    <Compile Include="Sortable\SortableTestSet.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.UMX" Version="1.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="10.0.102" />
+  </ItemGroup>
+
+</Project>

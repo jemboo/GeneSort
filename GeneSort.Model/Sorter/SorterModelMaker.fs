@@ -8,7 +8,7 @@ open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Uf6
 open GeneSort.Core
 open FSharp.UMX
-open GeneSort.Sorter
+open GeneSort.Sorting
 
 
 type sorterModelMaker =

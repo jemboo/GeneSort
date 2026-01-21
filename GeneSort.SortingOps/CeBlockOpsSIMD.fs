@@ -4,8 +4,8 @@ open System.Runtime.CompilerServices
 open System.Runtime.Intrinsics
 open System.Threading.Tasks
 open FSharp.UMX
-open GeneSort.Sorter.Sorter
-open GeneSort.Sorter
+open GeneSort.Sorting.Sorter
+open GeneSort.Sorting
 
 
 module CeBlockOpsSIMD256 =

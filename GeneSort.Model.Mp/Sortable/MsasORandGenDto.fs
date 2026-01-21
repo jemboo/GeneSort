@@ -4,7 +4,7 @@ open System
 open MessagePack
 open FSharp.UMX
 open GeneSort.Model.Sortable
-open GeneSort.Sorter
+open GeneSort.Sorting
 open GeneSort.Core
 
 

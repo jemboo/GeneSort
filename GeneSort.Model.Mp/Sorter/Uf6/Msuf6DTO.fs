@@ -4,7 +4,7 @@ namespace GeneSort.Model.Mp.Sorter.Uf6
 open System
 open FSharp.UMX
 open MessagePack
-open GeneSort.Sorter
+open GeneSort.Sorting
 open GeneSort.Core.Mp.TwoOrbitUnfolder
 open GeneSort.Model.Sorter.Uf6
 open GeneSort.Model.Sorter

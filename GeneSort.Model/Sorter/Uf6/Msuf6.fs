@@ -2,8 +2,8 @@
 
 open System
 open FSharp.UMX
-open GeneSort.Sorter
-open GeneSort.Sorter.Sorter
+open GeneSort.Sorting
+open GeneSort.Sorting.Sorter
 open GeneSort.Core
 open GeneSort.Model.Sorter
 

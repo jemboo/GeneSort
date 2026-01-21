@@ -3,8 +3,8 @@ namespace GeneSort.Runs
 
 open FSharp.UMX
 
-open GeneSort.Sorter.Sortable
-open GeneSort.Sorter.Sorter
+open GeneSort.Sorting.Sortable
+open GeneSort.Sorting.Sorter
 open GeneSort.Model.Sorter
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps

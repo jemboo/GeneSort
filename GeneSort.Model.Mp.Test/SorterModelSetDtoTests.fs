@@ -8,7 +8,7 @@ open MessagePack.FSharp
 open GeneSort.Model.Sorter
 open GeneSort.Model.Mp.Sorter
 open FSharp.UMX
-open GeneSort.Sorter
+open GeneSort.Sorting
 open GeneSort.Model.Sorter.Ce
 
 type SorterModelSetDtoTests() =

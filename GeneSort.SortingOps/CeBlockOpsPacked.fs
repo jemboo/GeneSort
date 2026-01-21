@@ -2,12 +2,12 @@
 
 open System
 open FSharp.UMX
-open GeneSort.Sorter.Sortable
+open GeneSort.Sorting.Sortable
 open System.Collections.Generic
 open System.Buffers    
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
-open GeneSort.Sorter
+open GeneSort.Sorting
 
 
 type PackedOffsetComparer(data: int[], sw: int) =
@@ -73,7 +73,7 @@ module CeBlockOpsPacked =
 
 
 
-    let evalPackedOptimized (tests: packedSortableIntTests) (ceBlock: ceBlock) =
+    let evalAndDedupeBp (tests: packedSortableIntTests) (ceBlock: ceBlock) : ceBlockEval =
         let sw = %tests.SortingWidth
         let totalTests = tests.SoratbleCount
         let ces = ceBlock.CeArray

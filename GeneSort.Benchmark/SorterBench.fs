@@ -4,10 +4,10 @@ open BenchmarkDotNet.Attributes
 open System
 open GeneSort.Core
 open FSharp.UMX
-open GeneSort.Sorter
-open GeneSort.Sorter.Sortable
+open GeneSort.Sorting
+open GeneSort.Sorting.Sortable
 open GeneSort.SortingOps
-open GeneSort.Sorter.Sorter
+open GeneSort.Sorting.Sorter
 
 
 //| Method           | size   | Mean           | Error        | StdDev       | Gen0     | Gen1     | Gen2     | Allocated |
@@ -148,10 +148,6 @@ type SorterEvalBench() =
 
 
 
-    [<Benchmark>]
-    member this.evalUnsafe() =
-        let ceBlockEval = CeBlockOps.evalWithSorterTestUnsafe this.sortableIntTests this.ceBlock
-        ceBlockEval
 
 
 
@@ -213,11 +209,7 @@ type SorterEvalBench2Blocks() =
 
 
 
-    [<Benchmark>]
-    member this.evalNewPacked() =
-       let ceBlockEval1 = CeBlockOps.evalWithSorterTestUnsafe this.sortablePackedIntTests this.ceBlock1
-       let ceBlockEval2 = CeBlockOps.evalWithSorterTestUnsafe ceBlockEval1.SortableTest.Value this.ceBlock2
-       ceBlockEval2
+
 
 
 

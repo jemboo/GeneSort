@@ -3,7 +3,7 @@
 open System.Threading
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorter
+open GeneSort.Sorting
 
 
 // -----------------------------

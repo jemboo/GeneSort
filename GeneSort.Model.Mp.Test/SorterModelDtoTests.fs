@@ -11,7 +11,7 @@ open GeneSort.Model.Mp.Sorter
 open GeneSort.Model.Mp.Sorter.Uf6
 open GeneSort.Model.Sorter.Uf6
 open FSharp.UMX
-open GeneSort.Sorter
+open GeneSort.Sorting
 open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Rs
 open GeneSort.Model.Sorter.Si

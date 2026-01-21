@@ -9,10 +9,11 @@
     <Compile Include="CeBlock.fs" />
     <Compile Include="CeUseCounts.fs" />
     <Compile Include="CeBlockEval.fs" />
+    <Compile Include="CeBlockOpsInt.fs" />
+    <Compile Include="CeBlockOpsBool.fs" />
     <Compile Include="CeBlockOpsPacked.fs" />
-    <Compile Include="CeBlockOps.fs" />
-    <Compile Include="CeBlockOpsPackedOld.fs" />
     <Compile Include="CeBlockOpsSIMD.fs" />
+    <Compile Include="CeBlockOps.fs" />
     <Compile Include="SorterEval.fs" />
     <Compile Include="SorterSetEval.fs" />
     <Compile Include="Program.fs" />
@@ -25,11 +26,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
-    <ProjectReference Include="..\GeneSort.Sorter\GeneSort.Sorter.fsproj" />
+    <ProjectReference Include="..\GeneSort.Sorting\GeneSort.Sorting.fsproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="10.0.101" />
+    <PackageReference Update="FSharp.Core" Version="10.0.102" />
   </ItemGroup>
 
 </Project>

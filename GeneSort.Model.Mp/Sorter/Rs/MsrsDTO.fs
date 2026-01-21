@@ -2,7 +2,7 @@
 namespace GeneSort.Model.Mp.Sorter.Rs
 open System
 open FSharp.UMX
-open GeneSort.Sorter
+open GeneSort.Sorting
 open GeneSort.Model.Sorter.Rs
 open MessagePack
 open GeneSort.Core.Mp

@@ -6,7 +6,7 @@ open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 open FSharp.UMX
-open GeneSort.Sorter
+open GeneSort.Sorting
 
 
 [<MessagePackObject>]
