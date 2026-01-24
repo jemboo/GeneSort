@@ -103,13 +103,13 @@ module MergeIntQa =
 
 
 
-    let sortableArrayDataTypeKeyValues = 
+    let sortableDataTypeKeyValues = 
             [ 
                 sortableDataType.Ints; 
                 sortableDataType.Bools ] |> List.map(SortableDataType.toString)
   
-    let sortableArrayDataTypeKeys () : string*string list =
-        (runParameters.sortableDataTypeKey, sortableArrayDataTypeKeyValues )
+    let sortableDataTypeKeys () : string*string list =
+        (runParameters.sortableDataTypeKey, sortableDataTypeKeyValues )
 
 
 
@@ -120,7 +120,7 @@ module MergeIntQa =
         (runParameters.sortingWidthKey, sortingWidthValues)
 
     let mergeDimensionValues = 
-        [2; 3; 4; ] |> List.map(fun d -> d.ToString())
+        [2; 3; 4;] |> List.map(fun d -> d.ToString())
 
     let mergeDimensions() : string*string list =
         (runParameters.mergeDimensionKey, mergeDimensionValues)
@@ -166,7 +166,7 @@ module MergeIntQa =
     let parameterSpans = 
         [
             sortingWidths();
-            sortableArrayDataTypeKeys(); 
+            sortableDataTypeKeys(); 
             mergeDimensions(); 
             mergeFillTypes(); 
         ]

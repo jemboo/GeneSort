@@ -5,8 +5,8 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
-open System.Linq
 open System.Collections.Generic
+
 
 [<Struct; CustomEquality; NoComparison>]
 type sortableIntArray =
@@ -14,7 +14,8 @@ type sortableIntArray =
         values: int[] 
         sortingWidth: int<sortingWidth> 
         symbolSetSize: int<symbolSetSize>
-        mutable valuesHash: int option // Lazily computed hash code for Values
+        // Eagerly computed hash for thread-safety and struct consistency
+        vHash: int 
     }
 
     static member create(values: int[], sortingWidth: int<sortingWidth>, symbolSetSize: int<symbolSetSize>) =
@@ -24,7 +25,39 @@ type sortableIntArray =
             invalidArg "values" $"Values length ({values.Length}) must equal sorting width ({int sortingWidth})."
         if %symbolSetSize <= 0 then
             invalidArg "symbolSetSize" "Symbol set size must be positive."
-        { values = values; sortingWidth = sortingWidth; symbolSetSize = symbolSetSize; valuesHash = None }
+        let mutable h = 17
+        for v in values do
+            h <- h * 23 + v.GetHashCode()
+
+        { values = values; sortingWidth = sortingWidth; 
+          symbolSetSize = symbolSetSize; vHash = h }
+
+    override this.GetHashCode() = this.vHash
+
+    override this.Equals(obj) =
+        match obj with
+        | :? sortableIntArray as other ->
+            // Check hash first for fast short-circuit
+            if this.vHash <> other.vHash then false
+            else
+                this.sortingWidth = other.sortingWidth &&
+                ReadOnlySpan<int>(this.values).SequenceEqual(ReadOnlySpan<int>(other.values))
+        | _ -> false
+
+    member this.ToSortableBoolArrays() : sortableBoolArray[] =
+        if this.SortingWidth <= 1<sortingWidth> then
+            [||]
+        else
+            let thresholds = [| 0 .. %this.sortingWidth |]
+            let vals = this.Values
+            let sw = this.SortingWidth
+            thresholds 
+            |> Array.map (
+                fun threshold ->
+                    let boolValues = vals |> Array.map (fun v -> v >= threshold )
+                    sortableBoolArray.create(boolValues, sw))
+
+
 
     static member createFromPermutation(perm: permutation) =
         sortableIntArray.create(perm.Array, (%perm.Order |> UMX.tag<sortingWidth>), (%perm.Order |> UMX.tag<symbolSetSize>))
@@ -33,7 +66,7 @@ type sortableIntArray =
         if sortingWidth < 0<sortingWidth> then
             invalidArg "sortingWidth" "Sorting width must be non-negative."
         let values = [| 0 .. (%sortingWidth - 1) |]
-        { values = values; sortingWidth = sortingWidth; symbolSetSize = %sortingWidth |> UMX.tag<symbolSetSize>; valuesHash = None }
+        sortableIntArray.create(values, sortingWidth, %sortingWidth |> UMX.tag<symbolSetSize>)
 
     /// Gets the values array.
     member this.Values = this.values
@@ -69,66 +102,39 @@ type sortableIntArray =
         let sss = this.SymbolSetSize
         history |> Array.map (fun values -> sortableIntArray.create(values, sw, sss))
 
-    member this.ToSortableBoolArrays() : sortableBoolArray[] =
-        if this.SortingWidth <= 1<sortingWidth> then
-            [||]
-        else
-            let thresholds = [| 0 .. %this.sortingWidth |]
-            let vals = this.Values
-            let sw = this.SortingWidth
-            thresholds 
-            |> Array.map (
-                fun threshold ->
-                    let boolValues = vals |> Array.map (fun v -> v >= threshold )
-                    sortableBoolArray.Create(boolValues, sw))
-
 
     member this.ToPermutation() : permutation =
         permutation.createUnsafe this.values
-
-    override this.Equals(obj) =
-        match obj with
-        | :? sortableIntArray as other ->
-            this.sortingWidth = other.sortingWidth &&
-            Array.forall2 (=) this.values other.values
-        | _ -> false
-
-
-    override this.GetHashCode() =
-        // Use cached hash if available, otherwise compute and cache
-        match this.valuesHash with
-        | Some h -> h
-        | None ->
-            let mutable h = 17
-            for v in this.values do
-                h <- h * 23 + v.GetHashCode()
-            this.valuesHash <- Some h
-            h
-
-    interface IEquatable<sortableIntArray> with
-        member this.Equals(other) =
-            this.sortingWidth = other.sortingWidth &&
-            this.symbolSetSize = other.symbolSetSize &&
-            Array.forall2 (=) this.values other.values
 
 
 
 
 module SortableIntArray =
     // Custom comparer for sortableIntArray based only on Values
+
     type SortableIntArrayValueComparer() =
         interface IEqualityComparer<sortableIntArray> with
             member _.Equals(x, y) =
-                x.SortingWidth = y.SortingWidth && // Ensure same length to prevent Array.forall2 crash
-                Array.forall2 (=) x.Values y.Values
-            member _.GetHashCode(obj) =
-                // Use the struct's GetHashCode, which caches the hash of Values
-                obj.GetHashCode()
+                // Check hash first: if they differ, they cannot be equal.
+                if x.GetHashCode() <> y.GetHashCode() then false
+                else
+                    x.SortingWidth = y.SortingWidth && 
+                    ReadOnlySpan<int>(x.Values).SequenceEqual(ReadOnlySpan<int>(y.Values))
+            
+            member _.GetHashCode(obj) = obj.GetHashCode()
 
-
-    // Function to remove duplicates based on Values
+    /// Efficiently removes duplicate test cases using SIMD-accelerated equality checks.
     let removeDuplicates (arr: sortableIntArray[]) : sortableIntArray[] =
-        arr.Distinct(SortableIntArrayValueComparer()).ToArray()
+        if arr = null || arr.Length <= 1 then arr
+        else
+            // Using a HashSet with our optimized comparer is O(n)
+            let set = HashSet<sortableIntArray>(SortableIntArrayValueComparer())
+            for i = 0 to arr.Length - 1 do
+                set.Add(arr.[i]) |> ignore
+            
+            let result = Array.zeroCreate set.Count
+            set.CopyTo(result)
+            result
 
 
     let getOrbit (maxCount: int) (perm: permutation) : sortableIntArray seq =
@@ -166,3 +172,17 @@ module SortableIntArray =
                 |> Array.map(sortableIntArray.createFromPermutation)
 
         sortableIntArrays
+
+
+    module BinaryArrayUtils =
+
+        let toSortableBinaryArrays(sia:sortableIntArray) : sortableIntArray[] =
+            if sia.SortingWidth <= 1<sortingWidth> then
+                [||]
+            else
+                let thresholds = [| 0 .. %sia.sortingWidth |]
+                thresholds 
+                |> Array.map (
+                    fun threshold ->
+                        let z1Vals = sia.Values |> Array.map (fun v -> if v >= threshold then 1 else 0)
+                        sortableIntArray.create(z1Vals, sia.SortingWidth, 2 |> UMX.tag<symbolSetSize>))

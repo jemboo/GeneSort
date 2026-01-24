@@ -44,7 +44,7 @@ module CeBlockOpsBool =
                 if not isSorted then
                     let finalValues = Array.zeroCreate %sw
                     Array.blit workArray 0 finalValues 0 %sw
-                    let resultSba = sortableBoolArray.Create(finalValues, sw)
+                    let resultSba = sortableBoolArray.create(finalValues, sw)
                     results.Add(resultSba) |> ignore
 
                 pool.Return(workArray)
@@ -85,7 +85,7 @@ module CeBlockOpsBool =
                 if not isSorted then
                     let finalValues = Array.zeroCreate %sw
                     Array.blit workArray 0 finalValues 0 %sw
-                    let resultSba = sortableBoolArray.Create(finalValues, sw)
+                    let resultSba = sortableBoolArray.create(finalValues, sw)
                     results.Add(resultSba) |> ignore
 
                 pool.Return(workArray)
@@ -131,7 +131,7 @@ module CeBlockOpsBool =
             if not isSortedNow then
                 let finalValues = Array.zeroCreate sw
                 workSpan.CopyTo(finalValues.AsSpan())
-                results.Add(sortableBoolArray.Create(finalValues, sbts.SortingWidth)) |> ignore
+                results.Add(sortableBoolArray.create(finalValues, sbts.SortingWidth)) |> ignore
 
         pool.Return(workArray)
         let newTests = Seq.toArray results |> (sortableBoolTest.create (Guid.NewGuid() |> UMX.tag) sbts.SortingWidth)

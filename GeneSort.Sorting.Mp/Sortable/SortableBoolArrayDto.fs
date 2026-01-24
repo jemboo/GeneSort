@@ -18,5 +18,5 @@ module SortableBoolArrayDto =
         { Values = sba.Values; SortingWidth = int sba.SortingWidth }
 
     let toDomain (dto: sortableBoolArrayDto) : sortableBoolArray =
-        sortableBoolArray.Create(dto.Values, UMX.tag<sortingWidth> dto.SortingWidth)
+        sortableBoolArray.create(dto.Values, UMX.tag<sortingWidth> dto.SortingWidth)
 

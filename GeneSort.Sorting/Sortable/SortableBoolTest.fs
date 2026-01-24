@@ -10,7 +10,6 @@ type sortableBoolTest =
     private { id: Guid<sorterTestId>
               sortingWidth: int<sortingWidth>
               sortableBoolArrays: sortableBoolArray[]
-              unsortedCount: Lazy<int>
             }
 
     static member create 
@@ -21,7 +20,6 @@ type sortableBoolTest =
             id = id; 
             sortingWidth = sortingWidth; 
             sortableBoolArrays = Array.copy arrays
-            unsortedCount = Lazy<int>(fun () -> arrays |> Seq.filter(fun sa -> not sa.IsSorted) |> Seq.length)
         }
 
     override this.Equals(obj) =
@@ -43,8 +41,6 @@ type sortableBoolTest =
     member this.SortingWidth with get() = this.sortingWidth
 
     member this.SortableBoolArrays with get() = this.sortableBoolArrays
-
-    member this.UnsortedCount with get() = this.unsortedCount.Value |> UMX.tag<sortableCount>
 
     interface IEquatable<sortableBoolTest> with
         member this.Equals(other) =

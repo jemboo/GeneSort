@@ -29,20 +29,26 @@ module SortableTestModel =
         | MsasF msasF -> 
                 match sortableDataType with
                 | sortableDataType.Bools ->        
-                        msasF.MakeSortableBoolTests (getSortingWidth sortableTestModel) |> sortableTest.Bools
+                        msasF.MakeSortableBoolTest (getSortingWidth sortableTestModel) |> sortableTest.Bools
                 | sortableDataType.Ints ->
                     failwith "Ints SortableArrayType not supported"
+                | sortableDataType.Int8Vector256 ->
+                    failwith "Int8Vector256 SortableArrayType not supported"
 
         | MsasO msasO ->
                 match sortableDataType with
                 | sortableDataType.Bools ->        
-                     msasO.MakeSortableBoolTests (getSortingWidth sortableTestModel) |> sortableTest.Bools
+                     msasO.MakeSortableBoolTest (getSortingWidth sortableTestModel) |> sortableTest.Bools
                 | sortableDataType.Ints ->
-                     msasO.MakeSortableIntTests (getSortingWidth sortableTestModel) |> sortableTest.Ints
+                     msasO.MakeSortableIntTest (getSortingWidth sortableTestModel) |> sortableTest.Ints
+                | sortableDataType.Int8Vector256 ->
+                     failwith "Int8Vector256 SortableArrayType not supported"
 
         | MsasMi msasMi ->
                 match sortableDataType with
                 | sortableDataType.Bools ->        
-                    msasMi.MakeSortableBoolTests |> sortableTest.Bools
+                    msasMi.MakeSortableBoolTest |> sortableTest.Bools
                 | sortableDataType.Ints ->
-                    msasMi.MakeSortableIntTests |> sortableTest.Ints
+                    msasMi.MakeSortableIntTest |> sortableTest.Ints
+                | sortableDataType.Int8Vector256 -> 
+                    msasMi.MakeSortableUint8v256Test |> sortableTest.Uint8v256

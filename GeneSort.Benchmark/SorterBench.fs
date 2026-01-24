@@ -128,7 +128,6 @@ type SorterEvalBench() =
         this.sortablePackedIntTests <- packedSortableIntTests.create
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         intArrays
-                                        (1<sortableCount>)
                                   |> sortableTest.PackedInts
 
 
@@ -188,7 +187,6 @@ type SorterEvalBench2Blocks() =
         this.sortablePackedIntTests <- packedSortableIntTests.create
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         intArrays
-                                        (1<sortableCount>)
                                   |> sortableTest.PackedInts
 
         let bitonics = BitonicSorter.bitonicSort1

@@ -9,8 +9,7 @@ open GeneSort.Sorting
 type sortableIntTest =
     private { id: Guid<sorterTestId>
               sortingWidth: int<sortingWidth>
-              sortableIntArrays: sortableIntArray[] 
-              unsortedCount: Lazy<int>
+              sortableIntArrays: sortableIntArray[]
             }
 
     static member create 
@@ -20,8 +19,7 @@ type sortableIntTest =
         { 
             id = id; 
             sortingWidth = sortingWidth; 
-            sortableIntArrays = Array.copy arrays 
-            unsortedCount = Lazy<int>(fun () -> arrays |> Seq.filter(fun sa -> not sa.IsSorted) |> Seq.length)
+            sortableIntArrays = Array.copy arrays
         }
 
     static member Empty =
@@ -46,8 +44,6 @@ type sortableIntTest =
     member this.SortingWidth with get() = this.sortingWidth
 
     member this.SortableIntArrays with get() = this.sortableIntArrays
-    
-    member this.UnsortedCount with get() = this.unsortedCount.Value |> UMX.tag<sortableCount>
 
     interface IEquatable<sortableIntTest> with
         member this.Equals(other) =

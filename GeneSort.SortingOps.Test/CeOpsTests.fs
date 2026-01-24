@@ -51,10 +51,10 @@ type CeOpsTests() =
         // Arrange
         let sortingWidth = 3<sortingWidth>
         let boolArrays = [|
-            sortableBoolArray.Create([| true; false; true |], sortingWidth)
-            sortableBoolArray.Create([| false; true; false |], sortingWidth)
-            sortableBoolArray.Create([| true; false; true |], sortingWidth) // Duplicate
-            sortableBoolArray.Create([| false; false; true |], sortingWidth) // Already sorted
+            sortableBoolArray.create([| true; false; true |], sortingWidth)
+            sortableBoolArray.create([| false; true; false |], sortingWidth)
+            sortableBoolArray.create([| true; false; true |], sortingWidth) // Duplicate
+            sortableBoolArray.create([| false; false; true |], sortingWidth) // Already sorted
         |]
         let sortableTests = 
                 sortableBoolTest.create 

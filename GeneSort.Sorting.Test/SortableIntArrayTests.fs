@@ -102,11 +102,11 @@ type SortableIntArrayTests() =
         let boolArrays = arr.ToSortableBoolArrays()
         Assert.Equal(5, boolArrays.Length) 
         let expected = [|
-            sortableBoolArray.Create([| true; true; true; true |], 4<sortingWidth>) // threshold = 0
-            sortableBoolArray.Create([| false; true; true; true |], 4<sortingWidth>) // threshold = 1
-            sortableBoolArray.Create([| false; true; false; true |], 4<sortingWidth>) // threshold = 2
-            sortableBoolArray.Create([| false; false; false; true |], 4<sortingWidth>) // threshold = 3
-            sortableBoolArray.Create([| false; false; false; false |], 4<sortingWidth>) // threshold = 4
+            sortableBoolArray.create([| true; true; true; true |], 4<sortingWidth>) // threshold = 0
+            sortableBoolArray.create([| false; true; true; true |], 4<sortingWidth>) // threshold = 1
+            sortableBoolArray.create([| false; true; false; true |], 4<sortingWidth>) // threshold = 2
+            sortableBoolArray.create([| false; false; false; true |], 4<sortingWidth>) // threshold = 3
+            sortableBoolArray.create([| false; false; false; false |], 4<sortingWidth>) // threshold = 4
         |]
         Assert.Equal<sortableBoolArray[]>(expected, boolArrays)
 

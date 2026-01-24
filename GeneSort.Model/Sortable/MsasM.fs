@@ -57,7 +57,7 @@ type msasM =
     interface IEquatable<msasM> with
         member this.Equals(other) =  this.sortingWidth = other.sortingWidth
 
-    member this.MakeSortableIntTests : sortableIntTest =
+    member this.MakeSortableIntTest : sortableIntTest =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
@@ -69,7 +69,7 @@ type msasM =
                 intArrays
 
 
-    member this.MakeSortableBoolTests : sortableBoolTest =
+    member this.MakeSortableBoolTest : sortableBoolTest =
 
         let sortableArrays = SortableBoolArray.getMergeTestCases
                                     this.sortingWidth
@@ -80,6 +80,21 @@ type msasM =
                 ( %this.id |> UMX.tag<sorterTestId>) 
                 this.sortingWidth
                 sortableArrays
+
+
+    member this.MakeSortableUint8v256Test : sortableUint8v256Test =
+        let intArrays = SortableIntArray.getMergeTestCases 
+                            this.SortingWidth
+                            this.MergeDimension
+                            this.mergeFillType
+
+        SortableUint8v256Test.fromIntArrays 
+                (%this.id |> UMX.tag<sorterTestId>) 
+                this.SortingWidth
+                intArrays
+
+
+
 
 
 module MsasMi = ()

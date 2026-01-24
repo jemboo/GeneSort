@@ -84,7 +84,6 @@ module Ce =
         ) cesUpper cesLower
 
 
-
     let inline sortByBranchless 
             (ces: ce[]) 
             (useCounter: int[]) 

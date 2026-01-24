@@ -18,7 +18,7 @@ type sortableBoolArray =
 
     /// Creates a sortableBoolArray, throwing if values length does not match order.
     /// <exception cref="ArgumentException">Thrown when order is negative or values length does not equal order.</exception>
-    static member Create(values: bool[], sortingWidth: int<sortingWidth>) =
+    static member create(values: bool[], sortingWidth: int<sortingWidth>) =
         if sortingWidth < 0<sortingWidth> then
             invalidArg "order" "SortingWidth must be non-negative."
         if values.Length <> int sortingWidth then
@@ -48,14 +48,14 @@ type sortableBoolArray =
                 (ces: ce[]) 
                 (useCounter: int[]) : sortableBoolArray =
         let sortedValues = Ce.sortBy ces useCounter (Array.copy this.values)
-        sortableBoolArray.Create(sortedValues, this.SortingWidth)
+        sortableBoolArray.create(sortedValues, this.SortingWidth)
 
     member this.SortByCesWithHistory 
                 (ces: ce[])
                 (useCounter: int[]) : sortableBoolArray[] =
         let history = Ce.sortByWithHistory ces useCounter this.values
         let sw = this.SortingWidth
-        history |> Array.map (fun values -> sortableBoolArray.Create(values, sw))
+        history |> Array.map (fun values -> sortableBoolArray.create(values, sw))
 
     override this.Equals(obj) =
         match obj with
@@ -106,7 +106,7 @@ module SortableBoolArray =
                 |] 
                 |> Array.concat
                     
-        sortableBoolArray.Create(boolArray, (%p.Dimension * %maxValue) |> UMX.tag<sortingWidth>)
+        sortableBoolArray.create(boolArray, (%p.Dimension * %maxValue) |> UMX.tag<sortingWidth>)
 
 
     let fromLatticeCubeFull 
@@ -141,7 +141,7 @@ module SortableBoolArray =
         let result = Array.zeroCreate count
         for i = 0 to count - 1 do
             let boolArray = Array.init (int sortingWidth) (fun j -> (i >>> j) &&& 1 = 1)
-            result.[i] <- sortableBoolArray.Create(boolArray, sortingWidth)
+            result.[i] <- sortableBoolArray.create(boolArray, sortingWidth)
         result
 
     let getAllSortedSortableBoolArrays (sortingWidth: int<sortingWidth>) : sortableBoolArray[] =
@@ -150,7 +150,7 @@ module SortableBoolArray =
         let n = int sortingWidth
         Array.init (n + 1) (fun k ->
             let boolArray = Array.init n (fun i -> i >= n - k)
-            sortableBoolArray.Create(boolArray, sortingWidth))
+            sortableBoolArray.create(boolArray, sortingWidth))
 
     let getMergeTestCases 
             (sortingWidth: int<sortingWidth>) 

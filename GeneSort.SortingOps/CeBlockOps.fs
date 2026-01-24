@@ -55,6 +55,9 @@ module CeBlockOps =
         | sortableTest.PackedInts packedTs ->
             CeBlockOpsPacked.evalAndDedupeBp packedTs ceBlock
 
+        | sortableTest.Uint8v256 su8v256ts ->
+            failwith "CeBlockOps: evalWithSorterTest not implemented for sortableUint8v256Test"
+
 
 
     let evalWithSorterTests
@@ -73,12 +76,7 @@ module CeBlockOps =
             ceBlocks |> Array.map (fun ceBlock ->
                 CeBlockOpsPacked.evalAndDedupeBp packedTs ceBlock)
 
-
-
-
-
-
-
-
+        | sortableTest.Uint8v256 su8v256ts ->
+            failwith "CeBlockOps: evalWithSorterTest not implemented for sortableUint8v256Test"
 
 

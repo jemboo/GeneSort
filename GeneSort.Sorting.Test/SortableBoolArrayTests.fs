@@ -13,52 +13,52 @@ type SortableBoolArrayTests() =
 
     [<Fact>]
     let ``Create with valid inputs succeeds`` () =
-        let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
+        let arr = sortableBoolArray.create([| true; false; true |], 3<sortingWidth>)
         Assert.Equal<bool>([| true; false; true |], arr.Values)
         Assert.Equal(3<sortingWidth>, arr.SortingWidth)
 
     [<Fact>]
     let ``Create with mismatched length throws`` () =
-        let ex = Assert.Throws<ArgumentException>(fun () -> sortableBoolArray.Create([| true; false |], 3<sortingWidth>) |> ignore)
+        let ex = Assert.Throws<ArgumentException>(fun () -> sortableBoolArray.create([| true; false |], 3<sortingWidth>) |> ignore)
         Assert.Equal("Values length (2) must equal order (3). (Parameter 'values')", ex.Message)
 
     [<Fact>]
     let ``DistanceSquared with same array returns zero`` () =
-        let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
-        let other = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
+        let arr = sortableBoolArray.create([| true; false; true |], 3<sortingWidth>)
+        let other = sortableBoolArray.create([| true; false; true |], 3<sortingWidth>)
         let result = arr.DistanceSquared(other)
         Assert.Equal(0, result)
 
     [<Fact>]
     let ``DistanceSquared with different array computes correctly`` () =
-        let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
-        let other = sortableBoolArray.Create([| false; false; true |], 3<sortingWidth>)
+        let arr = sortableBoolArray.create([| true; false; true |], 3<sortingWidth>)
+        let other = sortableBoolArray.create([| false; false; true |], 3<sortingWidth>)
         let result = arr.DistanceSquared(other)
         Assert.Equal(1, result)
 
     [<Fact>]
     let ``IsSorted returns true for sorted array`` () =
-        let arr = sortableBoolArray.Create([| false; false; true |], 3<sortingWidth>)
+        let arr = sortableBoolArray.create([| false; false; true |], 3<sortingWidth>)
         Assert.True(arr.IsSorted)
 
     [<Fact>]
     let ``IsSorted returns false for unsorted array`` () =
-        let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
+        let arr = sortableBoolArray.create([| true; false; true |], 3<sortingWidth>)
         Assert.False(arr.IsSorted)
 
     [<Fact>]
     let ``IsSorted returns true for single element`` () =
-        let arr = sortableBoolArray.Create([| true |], 1<sortingWidth>)
+        let arr = sortableBoolArray.create([| true |], 1<sortingWidth>)
         Assert.True(arr.IsSorted)
 
     [<Fact>]
     let ``IsSorted returns true for empty array`` () =
-        let arr = sortableBoolArray.Create([||], 0<sortingWidth>)
+        let arr = sortableBoolArray.create([||], 0<sortingWidth>)
         Assert.True(arr.IsSorted)
 
     [<Fact>]
     let ``SortByCes sorts unsorted array correctly`` () =
-        let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
+        let arr = sortableBoolArray.create([| true; false; true |], 3<sortingWidth>)
         let ces = [| ce.create 0 1; ce.create 1 2 |]
         let useCounter = [| 0; 0 |]
         let sorted = arr.SortByCes ces useCounter
@@ -69,7 +69,7 @@ type SortableBoolArrayTests() =
 
     [<Fact>]
     let ``SortByCes with empty ces returns copy`` () =
-        let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
+        let arr = sortableBoolArray.create([| true; false; true |], 3<sortingWidth>)
         let useCounter = [||]
         let sorted = arr.SortByCes [||] useCounter
         Assert.Equal<bool>(arr.Values, sorted.Values)
@@ -78,7 +78,7 @@ type SortableBoolArrayTests() =
 
     [<Fact>]
     let ``SortByCes with partial extent sorts correctly`` () =
-        let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
+        let arr = sortableBoolArray.create([| true; false; true |], 3<sortingWidth>)
         let ces = [| ce.create 0 1; ce.create 1 2 |]
         let useCounter = [| 0; 0 |]
         let sorted = arr.SortByCes ces useCounter
@@ -87,7 +87,7 @@ type SortableBoolArrayTests() =
 
     [<Fact>]
     let ``SortByCesWithHistory captures sorting steps correctly`` () =
-        let arr = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
+        let arr = sortableBoolArray.create([| true; false; true |], 3<sortingWidth>)
         let ces = [| ce.create 0 1; ce.create 1 2; ce.create 1 2 |]
         let useCounter = [| 0; 0; 0 |]
         let history = arr.SortByCesWithHistory ces useCounter
@@ -111,8 +111,8 @@ type SortableBoolArrayTests() =
         let arrays = SortableBoolArray.getAllSortableBoolArrays 1<sortingWidth>
         Assert.Equal(2, arrays.Length)
         let expected = [|
-            sortableBoolArray.Create([| false |], 1<sortingWidth>)
-            sortableBoolArray.Create([| true |], 1<sortingWidth>)
+            sortableBoolArray.create([| false |], 1<sortingWidth>)
+            sortableBoolArray.create([| true |], 1<sortingWidth>)
         |]
         Assert.Equal<sortableBoolArray[]>(expected, arrays)
 
@@ -121,10 +121,10 @@ type SortableBoolArrayTests() =
         let arrays = SortableBoolArray.getAllSortableBoolArrays 2<sortingWidth>
         Assert.Equal(4, arrays.Length)
         let expected = [|
-            sortableBoolArray.Create([| false; false |], 2<sortingWidth>)
-            sortableBoolArray.Create([| true; false |], 2<sortingWidth>)
-            sortableBoolArray.Create([| false; true |], 2<sortingWidth>)
-            sortableBoolArray.Create([| true; true |], 2<sortingWidth>)
+            sortableBoolArray.create([| false; false |], 2<sortingWidth>)
+            sortableBoolArray.create([| true; false |], 2<sortingWidth>)
+            sortableBoolArray.create([| false; true |], 2<sortingWidth>)
+            sortableBoolArray.create([| true; true |], 2<sortingWidth>)
         |]
         Assert.Equal<sortableBoolArray[]>(expected, arrays)
 
@@ -135,35 +135,35 @@ type SortableBoolArrayTests() =
 
     [<Fact>]
     let ``Equality with same values returns true`` () =
-        let arr1 = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
-        let arr2 = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
+        let arr1 = sortableBoolArray.create([| true; false; true |], 3<sortingWidth>)
+        let arr2 = sortableBoolArray.create([| true; false; true |], 3<sortingWidth>)
         Assert.True(arr1.Equals(arr2))
         Assert.True(arr1.Equals(arr2 :> obj))
         Assert.Equal(arr1.GetHashCode(), arr2.GetHashCode())
 
     [<Fact>]
     let ``Equality with different values returns false`` () =
-        let arr1 = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
-        let arr2 = sortableBoolArray.Create([| false; false; true |], 3<sortingWidth>)
+        let arr1 = sortableBoolArray.create([| true; false; true |], 3<sortingWidth>)
+        let arr2 = sortableBoolArray.create([| false; false; true |], 3<sortingWidth>)
         Assert.False(arr1.Equals(arr2))
         Assert.False(arr1.Equals(arr2 :> obj))
 
     [<Fact>]
     let ``Equality with different order returns false`` () =
-        let arr1 = sortableBoolArray.Create([| true; false |], 2<sortingWidth>)
-        let arr2 = sortableBoolArray.Create([| true; false; true |], 3<sortingWidth>)
+        let arr1 = sortableBoolArray.create([| true; false |], 2<sortingWidth>)
+        let arr2 = sortableBoolArray.create([| true; false; true |], 3<sortingWidth>)
         Assert.False(arr1.Equals(arr2))
         Assert.False(arr1.Equals(arr2 :> obj))
 
     [<Fact>]
     let ``Equality with different type returns false`` () =
-        let arr = sortableBoolArray.Create([| true; false |], 2<sortingWidth>)
+        let arr = sortableBoolArray.create([| true; false |], 2<sortingWidth>)
         let obj = obj()
         Assert.False(arr.Equals(obj))
 
     [<Fact>]
     let ``fromLatticePoint is correct`` () =
-        let targetArray = sortableBoolArray.Create([| false; false; true; true; true; true; false; false; false |], 9<sortingWidth>)
+        let targetArray = sortableBoolArray.create([| false; false; true; true; true; true; false; false; false |], 9<sortingWidth>)
         let lp = latticePoint.create([| 1; 3; 0 |])
         let maxValue = 3<latticeDistance>
         let res = SortableBoolArray.fromLatticePoint lp maxValue

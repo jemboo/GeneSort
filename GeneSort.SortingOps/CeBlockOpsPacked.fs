@@ -68,7 +68,6 @@ module CeBlockOpsPacked =
         packedSortableIntTests.createFromPackedValues 
                         packedTs.SortingWidth 
                         newPackedData
-                        (newCount |> UMX.tag<sortableCount>)
                                            
 
 
@@ -127,7 +126,6 @@ module CeBlockOpsPacked =
         let newPacked = packedSortableIntTests.createFromPackedValues
                                                     tests.SortingWidth
                                                     newPackedData
-                                                    (newCount |> UMX.tag<sortableCount>)
        
         ceBlockEval.create ceBlock ceUseCounts (newCount |> UMX.tag<sortableCount>) (Some (sortableTest.PackedInts newPacked))
 
