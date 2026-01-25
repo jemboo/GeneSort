@@ -72,7 +72,7 @@ module CeBlockOpsPacked =
 
 
 
-    let evalAndDedupeBp (tests: packedSortableIntTests) (ceBlock: ceBlock) : ceBlockEval =
+    let evalAndCollectResults (tests: packedSortableIntTests) (ceBlock: ceBlock) : ceBlockEval =
         let sw = %tests.SortingWidth
         let totalTests = tests.SoratbleCount
         let ces = ceBlock.CeArray

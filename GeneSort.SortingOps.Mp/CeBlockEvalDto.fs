@@ -15,7 +15,7 @@ type ceBlockEvalDto = {
     [<Key(2)>]
     UnsortedCount: int
     [<Key(3)>]
-    SortableTest: sortableTestsDto option
+    SortableTest: sortableTestDto option
 }
 
 module CeBlockEvalDto =

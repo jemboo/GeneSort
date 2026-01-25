@@ -34,6 +34,8 @@ module SortableTestModel =
                     failwith "Ints SortableArrayType not supported"
                 | sortableDataFormat.Int8Vector256 ->
                     failwith "Int8Vector256 SortableArrayType not supported"
+                | _ -> 
+                    failwith "Unsupported SortableArrayType for MsasF"
 
         | MsasO msasO ->
                 match sortableDataType with
@@ -43,6 +45,8 @@ module SortableTestModel =
                      msasO.MakeSortableIntTest (getSortingWidth sortableTestModel) |> sortableTest.Ints
                 | sortableDataFormat.Int8Vector256 ->
                      failwith "Int8Vector256 SortableArrayType not supported"
+                | _ ->  
+                    failwith "Unsupported SortableArrayType for MsasO"
 
         | MsasMi msasMi ->
                 match sortableDataType with
@@ -52,3 +56,5 @@ module SortableTestModel =
                     msasMi.MakeSortableIntTest |> sortableTest.Ints
                 | sortableDataFormat.Int8Vector256 -> 
                     msasMi.MakeSortableUint8v256Test |> sortableTest.Uint8v256
+                | _ ->
+                    failwith "Unsupported SortableArrayType for MsasMi"

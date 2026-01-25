@@ -52,19 +52,29 @@ module SortableIntMerges =
     // --- Parameter Spans ---
 
     let sortableDataFormatKeys () : string * string list =
-        let values = [ sortableDataFormat.IntArray; sortableDataFormat.BoolArray ] |> List.map SortableDataFormat.toString
+        let values = [ 
+                        sortableDataFormat.IntArray; 
+                        sortableDataFormat.BoolArray;
+                        sortableDataFormat.Int8Vector256;
+                     ] |> List.map SortableDataFormat.toString
         (runParameters.sortableDataFormatKey, values)
+
 
     let sortingWidths () : string * string list =
         let values = [16; 18; 24; 32; ] |> List.map string
         (runParameters.sortingWidthKey, values)
 
+
     let mergeDimensions () : string * string list =
         let values = [2; 3; 4; ] |> List.map string
         (runParameters.mergeDimensionKey, values)
 
+
     let mergeFillTypes () : string * string list =
-        let values = [ mergeFillType.NoFill; mergeFillType.VanVoorhis ] |> List.map MergeFillType.toString
+        let values = [ 
+                        mergeFillType.NoFill; 
+                        mergeFillType.VanVoorhis 
+                     ] |> List.map MergeFillType.toString
         (runParameters.mergeFillTypeKey, values)
 
 

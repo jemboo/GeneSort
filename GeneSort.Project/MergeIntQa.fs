@@ -9,12 +9,6 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Runs
 open GeneSort.Db
-open GeneSort.Model.Sorter.Ce
-open GeneSort.Model.Sorter.Si
-open GeneSort.Model.Sorter.Rs
-open GeneSort.Model.Sorter
-open GeneSort.Model.Sorter.Uf4
-open GeneSort.Model.Sorter.Uf6
 open GeneSort.SortingOps
 open ProjectOps
 
@@ -102,23 +96,27 @@ module MergeIntQa =
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
 
-
-    let sortableDataTypeKeyValues = 
+    // sortableDataFormat
+    let sortableDataFormatKeyValues = 
             [ 
                 sortableDataFormat.IntArray; 
-                sortableDataFormat.BoolArray ] |> List.map(SortableDataFormat.toString)
+                sortableDataFormat.BoolArray;
+                sortableDataFormat.Int8Vector256 
+            ] |> List.map(SortableDataFormat.toString)
   
-    let sortableDataTypeKeys () : string*string list =
-        (runParameters.sortableDataFormatKey, sortableDataTypeKeyValues )
+    let sortableDataFormatKeys () : string*string list =
+        (runParameters.sortableDataFormatKey, sortableDataFormatKeyValues )
 
 
-
+    // sortingWidth
     let sortingWidthValues = 
         [16; 18; 24; 32; 36; 48; 64] |> List.map(fun d -> d.ToString())
 
     let sortingWidths() : string*string list =
         (runParameters.sortingWidthKey, sortingWidthValues)
 
+
+    // mergeDimension
     let mergeDimensionValues = 
         [2; 3; 4;] |> List.map(fun d -> d.ToString())
 
@@ -126,11 +124,14 @@ module MergeIntQa =
         (runParameters.mergeDimensionKey, mergeDimensionValues)
 
 
+    // mergeFillType
     let mergeFillTypeValues = 
          [mergeFillType.VanVoorhis; mergeFillType.NoFill] |> List.map(fun d -> d.ToString())
 
     let mergeFillTypes() : string*string list =
         (runParameters.mergeFillTypeKey, mergeFillTypeValues)
+
+
 
     let paramMapFilter (runParameters: runParameters) = 
         Some runParameters
@@ -166,7 +167,7 @@ module MergeIntQa =
     let parameterSpans = 
         [
             sortingWidths();
-            sortableDataTypeKeys(); 
+            sortableDataFormatKeys(); 
             mergeDimensions(); 
             mergeFillTypes(); 
         ]
@@ -204,7 +205,7 @@ module MergeIntQa =
                 report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) runId %repl)
 
                 // 2. Safe Param Extraction
-                let! (repl, sortingWidth, mergeDimension, mergeFillType, sortableDataType, sModel, stageLength, ceLength, sorterCount) = 
+                let! (repl, sortingWidth, mergeDimension, mergeFillType, sortableDataFormat, sModel, stageLength, ceLength, sorterCount) = 
                     maybe {
                         let! r = runParameters.GetRepl()
                         let! w = runParameters.GetSortingWidth()
@@ -226,7 +227,7 @@ module MergeIntQa =
                                         (Some sortingWidth) 
                                         (Some mergeDimension) 
                                         (Some mergeFillType) 
-                                        (Some sortableDataType) 
+                                        (Some sortableDataFormat) 
                                         (outputDataType.SortableTest "")
 
                 // 4. Load Sorter Set (Cross-project query)

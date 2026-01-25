@@ -11,7 +11,7 @@ open GeneSort.Sorting.Sortable
 
 module CeBlockOpsInt = 
 
-    let evalAndDedupeBp (sits: sortableIntTest) (ceBlock: ceBlock) =
+    let evalAndCollectResults (sits: sortableIntTest) (ceBlock: ceBlock) =
             let ceUseCounts = ceUseCounts.Create ceBlock.Length
             let ces = ceBlock.CeArray
             let sw = sits.SortingWidth

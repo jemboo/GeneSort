@@ -47,13 +47,13 @@ module CeBlockOps =
                 (ceBlock: ceBlock) : ceBlockEval =
         match sortableTs with
         | sortableTest.Ints sits ->
-            CeBlockOpsInt.evalAndDedupeBp sits ceBlock
+            CeBlockOpsInt.evalAndCollectResults sits ceBlock
 
         | sortableTest.Bools sbts ->
-            CeBlockOpsBinary.evalAndDedupeBp sbts ceBlock
+            CeBlockOpsBinary.evalAndCollectResults sbts ceBlock
 
         | sortableTest.PackedInts packedTs ->
-            CeBlockOpsPacked.evalAndDedupeBp packedTs ceBlock
+            CeBlockOpsPacked.evalAndCollectResults packedTs ceBlock
 
         | sortableTest.Uint8v256 su8v256ts ->
             failwith "CeBlockOps: evalWithSorterTest not implemented for sortableUint8v256Test"
@@ -66,17 +66,17 @@ module CeBlockOps =
         match sortableTs with
         | sortableTest.Ints sits ->
             ceBlocks |> Array.map (fun ceBlock ->
-                CeBlockOpsInt.evalAndDedupeBp sits ceBlock)
+                CeBlockOpsInt.evalAndCollectResults sits ceBlock)
 
         | sortableTest.Bools sbts ->
             ceBlocks |> Array.map (fun ceBlock ->
-                CeBlockOpsBinary.evalAndDedupeBp sbts ceBlock)
+                CeBlockOpsBinary.evalAndCollectResults sbts ceBlock)
 
         | sortableTest.PackedInts packedTs ->
             ceBlocks |> Array.map (fun ceBlock ->
-                CeBlockOpsPacked.evalAndDedupeBp packedTs ceBlock)
+                CeBlockOpsPacked.evalAndCollectResults packedTs ceBlock)
 
         | sortableTest.Uint8v256 su8v256ts ->
-            failwith "CeBlockOps: evalWithSorterTest not implemented for sortableUint8v256Test"
+            CeBlockOpsSIMD256.evalAndCollectResults su8v256ts ceBlocks
 
 

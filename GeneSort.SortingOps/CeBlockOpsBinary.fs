@@ -11,7 +11,7 @@ open GeneSort.Sorting.Sortable
 
 module CeBlockOpsBinary = 
 
-    let evalAndDedupeBp (sbts: sortableBinaryTest) (ceBlock: ceBlock) :ceBlockEval =
+    let evalAndCollectResults (sbts: sortableBinaryTest) (ceBlock: ceBlock) :ceBlockEval =
             let ceUseCounts = ceUseCounts.Create ceBlock.Length
             let ces = ceBlock.CeArray
             let sw = sbts.SortingWidth

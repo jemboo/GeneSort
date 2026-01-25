@@ -14,12 +14,16 @@ type sortableUint8v256Test =
         simdSortBlocks: simdSortBlock[]
     }
 
-    static member create (id: Guid<sorterTestId>) (sw: int<sortingWidth>) (blocks: simdSortBlock[]) =
+    static member create 
+            (id: Guid<sorterTestId>) 
+            (sw: int<sortingWidth>) 
+            (blocks: simdSortBlock[]) =
         { id = id
           sortingWidth = sw
           simdSortBlocks = blocks }
 
     member this.Id with get() = this.id
+    member this.SimdSortBlocks with get() = this.simdSortBlocks
     member this.SortableDataFormat with get() = sortableDataFormat.Int8Vector256
     member this.SoratbleCount with get() = 
         this.simdSortBlocks 
