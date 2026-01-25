@@ -35,28 +35,29 @@ type mergeFillType =
     | VanVoorhis
 
 
-type sortableDataType = 
-    | Bools
-    | Ints
+type sortableDataFormat = 
+    | BoolArray
+    | IntArray
+    | PackedIntArray
     | Int8Vector256
 
 
-module SortableDataType =
+module SortableDataFormat =
 
-    let toString (t:sortableDataType) : string =
+    let toString (t:sortableDataFormat) : string =
         match t with
         | Int8Vector256 -> "Int8Vector256"
-        | Ints -> "Ints"
-        | Bools -> "Bools"
+        | IntArray -> "Ints"
+        | BoolArray -> "Bools"
 
-    let fromString (s:string) : sortableDataType =
+    let fromString (s:string) : sortableDataFormat =
         match s with
-        | "Ints" -> Ints
-        | "Bools" -> Bools
+        | "Ints" -> IntArray
+        | "Bools" -> BoolArray
         | "Int8Vector256" -> Int8Vector256
-        | _ -> failwithf "Unknown SortableArrayType: %s" s
-    let all () : sortableDataType list =
-        [ Ints; Bools ]
+        | _ -> failwithf "Unknown SortableDataFormat: %s" s
+    let all () : sortableDataFormat list =
+        [ IntArray; BoolArray ]
 
 
 

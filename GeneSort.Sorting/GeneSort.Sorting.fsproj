@@ -15,10 +15,10 @@
     <Compile Include="Sorter\SorterSet.fs" />
     <Compile Include="Sortable\SortableBoolArray.fs" />
     <Compile Include="Sortable\SortableIntArray.fs" />
-    <Compile Include="Sortable\SortableBoolTest.fs" />
+    <Compile Include="Sortable\SimdSortBlock.fs" />
+    <Compile Include="Sortable\SortableBinaryTest.fs" />
     <Compile Include="Sortable\SortableIntTest.fs" />
     <Compile Include="Sortable\PackedSortableIntTest.fs" />
-    <Compile Include="Sortable\SimdSortBlock.fs" />
     <Compile Include="Sortable\SortableUint8v256Test.fs" />
     <Compile Include="Sortable\SortableTest.fs" />
     <Compile Include="Sortable\SortableBoolTestSet.fs" />

@@ -32,7 +32,7 @@ module MergeIntQa =
             (repl: int<replNumber> option) 
             (sortingWidth: int<sortingWidth> option)
             (sorterModelType: sorterModelType option)
-            (sortableDataType: sortableDataType option)
+            (sortableDataFormat: sortableDataFormat option)
             (mergeDimension: int<mergeDimension> option)
             (mergeFillType: mergeFillType option)
             (outputDataType: outputDataType) =
@@ -44,7 +44,7 @@ module MergeIntQa =
             [|
                 (runParameters.sortingWidthKey, sortingWidth |> UmxExt.intToString ); 
                 (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString );
-                (runParameters.sortableDataTypeKey, sortableDataType |> Option.map SortableDataType.toString |> UmxExt.stringToString );
+                (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringToString );
                 (runParameters.mergeDimensionKey, mergeDimension |> UmxExt.intToString );
                 (runParameters.mergeFillTypeKey, mergeFillType |> Option.map MergeFillType.toString |> UmxExt.stringToString );
             |])
@@ -57,7 +57,7 @@ module MergeIntQa =
             (runParams.GetRepl())
             (runParams.GetSortingWidth())
             (runParams.GetSorterModelType())
-            (runParams.GetSortableDataType())
+            (runParams.GetSortableDataFormat())
             (runParams.GetMergeDimension())
             (runParams.GetMergeFillType())
             outputDataType
@@ -105,11 +105,11 @@ module MergeIntQa =
 
     let sortableDataTypeKeyValues = 
             [ 
-                sortableDataType.Ints; 
-                sortableDataType.Bools ] |> List.map(SortableDataType.toString)
+                sortableDataFormat.IntArray; 
+                sortableDataFormat.BoolArray ] |> List.map(SortableDataFormat.toString)
   
     let sortableDataTypeKeys () : string*string list =
-        (runParameters.sortableDataTypeKey, sortableDataTypeKeyValues )
+        (runParameters.sortableDataFormatKey, sortableDataTypeKeyValues )
 
 
 
@@ -208,7 +208,7 @@ module MergeIntQa =
                     maybe {
                         let! r = runParameters.GetRepl()
                         let! w = runParameters.GetSortingWidth()
-                        let! dt = runParameters.GetSortableDataType()
+                        let! dt = runParameters.GetSortableDataFormat()
                         let! md = runParameters.GetMergeDimension()
                         let! mf = runParameters.GetMergeFillType()
                         let! sm = runParameters.GetSorterModelType()

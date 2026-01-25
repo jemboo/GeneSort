@@ -35,7 +35,7 @@ type sortableIntTest =
     override this.GetHashCode() =
         hash this.sortableIntArrays
 
-    member this.SortableArrayType with get() = sortableDataType.Ints
+    member this.SortableDataFormat with get() = sortableDataFormat.IntArray
 
     member this.SoratbleCount with get() = this.sortableIntArrays.Length |> UMX.tag<sortableCount>
 

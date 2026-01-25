@@ -22,33 +22,33 @@ module SortableTestModel =
 
     let makeSortableTests 
             (sortableTestModel: sortableTestModel) 
-            (sortableDataType: sortableDataType) : sortableTest =
+            (sortableDataType: sortableDataFormat) : sortableTest =
 
         match sortableTestModel with
 
         | MsasF msasF -> 
                 match sortableDataType with
-                | sortableDataType.Bools ->        
+                | sortableDataFormat.BoolArray ->        
                         msasF.MakeSortableBoolTest (getSortingWidth sortableTestModel) |> sortableTest.Bools
-                | sortableDataType.Ints ->
+                | sortableDataFormat.IntArray ->
                     failwith "Ints SortableArrayType not supported"
-                | sortableDataType.Int8Vector256 ->
+                | sortableDataFormat.Int8Vector256 ->
                     failwith "Int8Vector256 SortableArrayType not supported"
 
         | MsasO msasO ->
                 match sortableDataType with
-                | sortableDataType.Bools ->        
+                | sortableDataFormat.BoolArray ->        
                      msasO.MakeSortableBoolTest (getSortingWidth sortableTestModel) |> sortableTest.Bools
-                | sortableDataType.Ints ->
+                | sortableDataFormat.IntArray ->
                      msasO.MakeSortableIntTest (getSortingWidth sortableTestModel) |> sortableTest.Ints
-                | sortableDataType.Int8Vector256 ->
+                | sortableDataFormat.Int8Vector256 ->
                      failwith "Int8Vector256 SortableArrayType not supported"
 
         | MsasMi msasMi ->
                 match sortableDataType with
-                | sortableDataType.Bools ->        
+                | sortableDataFormat.BoolArray ->        
                     msasMi.MakeSortableBoolTest |> sortableTest.Bools
-                | sortableDataType.Ints ->
+                | sortableDataFormat.IntArray ->
                     msasMi.MakeSortableIntTest |> sortableTest.Ints
-                | sortableDataType.Int8Vector256 -> 
+                | sortableDataFormat.Int8Vector256 -> 
                     msasMi.MakeSortableUint8v256Test |> sortableTest.Uint8v256

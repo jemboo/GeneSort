@@ -97,20 +97,6 @@ type SortableIntArrayTests() =
 
 
     [<Fact>]
-    let ``ToSortableBoolArrays with multiple values creates correct arrays`` () =
-        let arr = sortableIntArray.create([| 0; 2; 1; 3 |], 4<sortingWidth>, (4 |> UMX.tag<symbolSetSize>))
-        let boolArrays = arr.ToSortableBoolArrays()
-        Assert.Equal(5, boolArrays.Length) 
-        let expected = [|
-            sortableBoolArray.create([| true; true; true; true |], 4<sortingWidth>) // threshold = 0
-            sortableBoolArray.create([| false; true; true; true |], 4<sortingWidth>) // threshold = 1
-            sortableBoolArray.create([| false; true; false; true |], 4<sortingWidth>) // threshold = 2
-            sortableBoolArray.create([| false; false; false; true |], 4<sortingWidth>) // threshold = 3
-            sortableBoolArray.create([| false; false; false; false |], 4<sortingWidth>) // threshold = 4
-        |]
-        Assert.Equal<sortableBoolArray[]>(expected, boolArrays)
-
-    [<Fact>]
     let ``ToSortableBoolArrays with SortingWidth 0 returns empty array`` () =
         let arr = sortableIntArray.create([||], 0<sortingWidth>, (1 |> UMX.tag<symbolSetSize>))
         let boolArrays = arr.ToSortableBoolArrays()

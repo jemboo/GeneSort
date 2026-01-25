@@ -8,18 +8,18 @@ open GeneSort.Sorting
 type sortableTest = 
     | Ints of sortableIntTest
     | PackedInts of packedSortableIntTests
-    | Bools of sortableBoolTest
+    | Bools of sortableBinaryTest
     | Uint8v256 of sortableUint8v256Test
 
 
 module SortableTests = 
 
-    let getSortableArrayType (test: sortableTest) =
+    let getSortableDataFormat (test: sortableTest) : sortableDataFormat =
         match test with
-        | Ints intTest -> intTest.SortableArrayType
+        | Ints intTest -> intTest.SortableDataFormat
         | Bools boolTest -> boolTest.SortableArrayType
-        | PackedInts packedIntTest -> packedIntTest.SortableArrayType
-        | Uint8v256 uint8v256Test -> uint8v256Test.SortableArrayType
+        | PackedInts packedIntTest -> packedIntTest.SortableDataFormat
+        | Uint8v256 uint8v256Test -> uint8v256Test.SortableDataFormat
 
     let getSortingWidth (test: sortableTest) =
         match test with
@@ -49,7 +49,7 @@ module SortableTests =
                             |> Array.length 
                             |> UMX.tag<sortableCount>
 
-        | Bools boolTest -> boolTest.SortableBoolArrays 
+        | Bools boolTest -> boolTest.SortableBinaryArrays 
                             |> Array.filter(fun sa -> not sa.IsSorted) 
                             |> Array.length 
                             |> UMX.tag<sortableCount>

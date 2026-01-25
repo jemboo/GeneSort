@@ -10,7 +10,7 @@
     <Compile Include="CeUseCounts.fs" />
     <Compile Include="CeBlockEval.fs" />
     <Compile Include="CeBlockOpsInt.fs" />
-    <Compile Include="CeBlockOpsBool.fs" />
+    <Compile Include="CeBlockOpsBinary.fs" />
     <Compile Include="CeBlockOpsPacked.fs" />
     <Compile Include="CeBlockOpsSIMD.fs" />
     <Compile Include="CeBlockOps.fs" />

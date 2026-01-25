@@ -20,7 +20,7 @@ type sortableUint8v256Test =
           simdSortBlocks = blocks }
 
     member this.Id with get() = this.id
-    member this.SortableArrayType with get() = sortableDataType.Int8Vector256
+    member this.SortableDataFormat with get() = sortableDataFormat.Int8Vector256
     member this.SoratbleCount with get() = 
         this.simdSortBlocks 
         |> Array.sumBy (fun block -> block.SortableCount) 

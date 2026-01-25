@@ -57,7 +57,7 @@ type CeOpsTests() =
             sortableBoolArray.create([| false; false; true |], sortingWidth) // Already sorted
         |]
         let sortableTests = 
-                sortableBoolTest.create 
+                sortableBinaryTest.create 
                         (Guid.NewGuid() |> UMX.tag<sorterTestId>)
                         sortingWidth
                         boolArrays |> sortableTest.Bools
@@ -68,8 +68,8 @@ type CeOpsTests() =
         
         // Assert
         let boolTests = match ceBlockEval.SortableTest.Value with | sortableTest.Bools bt -> bt | _ -> failwith "Expected Bools"
-        boolTests.SortableBoolArrays.Length |> should equal 1 // Duplicate removed
-        boolTests.SortableBoolArrays |> Array.forall (fun sba -> sba.Values = [| false; true; false |]) |> should be True
+        boolTests.SortableBinaryArrays.Length |> should equal 1 // Duplicate removed
+        boolTests.SortableBinaryArrays |> Array.forall (fun sba -> sba.Values = [| false; true; false |]) |> should be True
         %ceBlockEval.CeUseCounts.UsedCeCount |> should be (greaterThanOrEqualTo 1) // At least one swap occurred
 
     [<Fact>]
@@ -120,4 +120,4 @@ type CeOpsTests() =
         // Assert
         let intTests = match result.SortableTest.Value with | sortableTest.Ints it -> it | _ -> failwith "Expected Ints"
         intTests.SortingWidth |> should equal sortingWidth
-        intTests.SortableArrayType |> should equal sortableDataType.Ints
+        intTests.SortableDataFormat |> should equal sortableDataFormat.IntArray

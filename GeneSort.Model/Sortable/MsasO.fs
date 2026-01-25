@@ -48,14 +48,14 @@ type msasO =
             this.id = other.id
 
     member this.MakeSortableBoolTest 
-            (sortingWidth: int<sortingWidth>) : sortableBoolTest =
+            (sortingWidth: int<sortingWidth>) : sortableBinaryTest =
         let ssId = %this.Id |> UMX.tag<sorterTestId>
         let bArrays =
             this.sortableIntArrays 
             |> Array.map(fun sia -> sia.ToSortableBoolArrays())
             |> Array.collect id
             |> Array.distinct
-        sortableBoolTest.create 
+        sortableBinaryTest.create 
                 ssId 
                 sortingWidth
                 bArrays

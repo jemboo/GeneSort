@@ -50,7 +50,7 @@ module CeBlockOps =
             CeBlockOpsInt.evalAndDedupeBp sits ceBlock
 
         | sortableTest.Bools sbts ->
-            CeBlockOpsBool.evalAndDedupeBp sbts ceBlock
+            CeBlockOpsBinary.evalAndDedupeBp sbts ceBlock
 
         | sortableTest.PackedInts packedTs ->
             CeBlockOpsPacked.evalAndDedupeBp packedTs ceBlock
@@ -70,7 +70,7 @@ module CeBlockOps =
 
         | sortableTest.Bools sbts ->
             ceBlocks |> Array.map (fun ceBlock ->
-                CeBlockOpsBool.evalAndDedupeBp sbts ceBlock)
+                CeBlockOpsBinary.evalAndDedupeBp sbts ceBlock)
 
         | sortableTest.PackedInts packedTs ->
             ceBlocks |> Array.map (fun ceBlock ->

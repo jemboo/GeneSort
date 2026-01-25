@@ -20,7 +20,7 @@ type sortableTestModelSet =
     member this.Id with get() = this.id
     member this.SorterTestModels with get() = this.sorterTestModels
 
-    member this.makeSortableTestSet (sortableDataType:sortableDataType) : sortableTestSet =
+    member this.makeSortableTestSet (sortableDataType:sortableDataFormat) : sortableTestSet =
         let id = (%this.id) |> UMX.tag<sortableTestSetId>
 
         let sortableTestArray = 
@@ -34,7 +34,7 @@ type sortableTestModelSet =
 
 
         match sortableDataType with
-        | sortableDataType.Bools -> 
+        | sortableDataFormat.BoolArray -> 
             let boolTests = 
                 this.SorterTestModels 
                 |> Array.map (fun model -> SortableTestModel.makeSortableTests model sortableDataType)
@@ -44,7 +44,7 @@ type sortableTestModelSet =
                     | _ -> failwith "Inconsistent SorterTestModelSet: expected Bools")
             sortableTestSet.Bools (sortableBoolTestSet.create id boolTests)
 
-        | sortableDataType.Ints -> 
+        | sortableDataFormat.IntArray -> 
             let intTests = 
                 this.SorterTestModels 
                 |> Array.map (fun model -> SortableTestModel.makeSortableTests model sortableDataType)

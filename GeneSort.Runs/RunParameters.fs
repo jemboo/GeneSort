@@ -33,7 +33,7 @@ type runParameters =
     static member sortableArrayTypeKey = "SortableArrayType"
     static member sortingWidthKey = "SortingWidth"
     static member sortableCountKey = "SortableCount"
-    static member sortableDataTypeKey = "SortingWidthDataType"
+    static member sortableDataFormatKey = "SortableDataFormat"
     static member stageLengthKey = "StageLength"
     static member textReportNameKey = "TextReportName"
 
@@ -83,8 +83,8 @@ type runParameters =
         this.paramMap.TryFind runParameters.sorterModelTypeKey |> Option.bind (fun v -> try Some (SorterModelType.fromString v) with _ -> None)
 
 
-    member this.GetSortableDataType() = 
-        this.paramMap.TryFind runParameters.sortableDataTypeKey |> Option.bind (fun v -> try Some (SortableDataType.fromString v) with _ -> None)
+    member this.GetSortableDataFormat() = 
+        this.paramMap.TryFind runParameters.sortableDataFormatKey |> Option.bind (fun v -> try Some (SortableDataFormat.fromString v) with _ -> None)
 
 // --- Functional Updates (Fluent API) ---
     member this.WithMergeDimension(md: int<mergeDimension> option) = 
@@ -123,8 +123,8 @@ type runParameters =
     member this.WithSortableCount(sc: int<sortableCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortableCountKey (sc |> Option.map UmxExt.intToRaw) }
 
-    member this.WithSortableDataType(sdt: sortableDataType option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortableDataTypeKey (sdt |> Option.map SortableDataType.toString) }
+    member this.WithSortableDataFormat(sdt: sortableDataFormat option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortableDataFormatKey (sdt |> Option.map SortableDataFormat.toString) }
 
     member this.WithSorterCount(sc: int<sorterCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountKey (sc |> Option.map UmxExt.intToRaw) }

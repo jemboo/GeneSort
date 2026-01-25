@@ -22,7 +22,7 @@ module SortableIntMerges =
             (sortingWidth: int<sortingWidth> option)
             (mergeDimension: int<mergeDimension> option)
             (mergeFillType: mergeFillType option)
-            (sortableDataType: sortableDataType option)
+            (sortableDataFormat: sortableDataFormat option)
             (outputDataType: outputDataType) =
              
         queryParams.create(
@@ -33,7 +33,7 @@ module SortableIntMerges =
                 (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
                 (runParameters.mergeDimensionKey, mergeDimension |> MergeDimension.toString);
                 (runParameters.mergeFillTypeKey, mergeFillType |> Option.map MergeFillType.toString |> UmxExt.stringToString );
-                (runParameters.sortableDataTypeKey, sortableDataType |> Option.map SortableDataType.toString |> UmxExt.stringToString );
+                (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringToString );
             |])
 
     let makeQueryParamsFromRunParams
@@ -45,15 +45,15 @@ module SortableIntMerges =
             (runParams.GetSortingWidth())
             (runParams.GetMergeDimension())
             (runParams.GetMergeFillType())
-            (runParams.GetSortableDataType())
+            (runParams.GetSortableDataFormat())
             outputDataType
 
 
     // --- Parameter Spans ---
 
-    let sortableArrayDataTypeKeys () : string * string list =
-        let values = [ sortableDataType.Ints; sortableDataType.Bools ] |> List.map SortableDataType.toString
-        (runParameters.sortableDataTypeKey, values)
+    let sortableDataFormatKeys () : string * string list =
+        let values = [ sortableDataFormat.IntArray; sortableDataFormat.BoolArray ] |> List.map SortableDataFormat.toString
+        (runParameters.sortableDataFormatKey, values)
 
     let sortingWidths () : string * string list =
         let values = [16; 18; 24; 32; ] |> List.map string
@@ -77,8 +77,8 @@ module SortableIntMerges =
 
     let limitForBoolenDataType (rp: runParameters) =
         let sw = rp.GetSortingWidth().Value
-        let dt = rp.GetSortableDataType().Value
-        if (dt.IsBools && %sw > 32) then None else Some rp
+        let dt = rp.GetSortableDataFormat().Value
+        if (dt.IsBoolArray && %sw > 32) then None else Some rp
 
     let limitForMergeFillType (rp: runParameters) =
         let sw = rp.GetSortingWidth().Value
@@ -116,7 +116,7 @@ module SortableIntMerges =
     let parameterSpans = 
         [
             sortingWidths();
-            sortableArrayDataTypeKeys(); 
+            sortableDataFormatKeys(); 
             mergeDimensions(); 
             mergeFillTypes(); 
         ]
@@ -157,7 +157,7 @@ module SortableIntMerges =
                         let! width = runParams.GetSortingWidth()
                         let! dim = runParams.GetMergeDimension()
                         let! fill = runParams.GetMergeFillType()
-                        let! dataType = runParams.GetSortableDataType()
+                        let! dataType = runParams.GetSortableDataFormat()
                         return (width, dim, fill, dataType)
                     } |> Result.ofOption "Missing domain parameters required for generation"
 

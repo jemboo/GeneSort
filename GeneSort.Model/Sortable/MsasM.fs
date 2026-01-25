@@ -69,14 +69,14 @@ type msasM =
                 intArrays
 
 
-    member this.MakeSortableBoolTest : sortableBoolTest =
+    member this.MakeSortableBoolTest : sortableBinaryTest =
 
         let sortableArrays = SortableBoolArray.getMergeTestCases
                                     this.sortingWidth
                                     this.mergeDimension
                                     this.mergeFillType  
 
-        sortableBoolTest.create 
+        sortableBinaryTest.create 
                 ( %this.id |> UMX.tag<sorterTestId>) 
                 this.sortingWidth
                 sortableArrays

@@ -151,7 +151,7 @@ module TextReporters =
                             (runParams.GetRepl() |> UmxExt.intToString) 
                             (runParams.GetSortingWidth() |> UmxExt.intToString)
                             (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringToString)
-                            (runParams.GetSortableDataType() |> Option.map SortableDataType.toString |> UmxExt.stringToString)
+                            (runParams.GetSortableDataFormat() |> Option.map SortableDataFormat.toString |> UmxExt.stringToString)
                             (runParams.GetMergeFillType() |> Option.map MergeFillType.toString |> UmxExt.stringToString)
                             (runParams.GetMergeDimension() |> UmxExt.intToString)
                             profile

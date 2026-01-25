@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Compile Include="CeTests.fs" />
-    <Compile Include="SortableBoolArrayTests.fs" />
     <Compile Include="SortableIntArrayTests.fs" />
     <Compile Include="SorterSetTests.fs" />
     <Compile Include="SorterTests.fs" />

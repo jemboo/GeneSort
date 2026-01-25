@@ -18,7 +18,7 @@ module PermutationOrbits =
     let experimentDesc = "Count Permutation Orbit lengths"
 
     let randomType = rngType.Lcg
-    let sortableDataType = sortableDataType.Ints
+    let sortableDataFormat = sortableDataFormat.IntArray
     let allowOverwrite = false |> UMX.tag<allowOverwrite>
 
 
