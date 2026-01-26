@@ -120,12 +120,91 @@ module CeBlockOpsSIMD256 =
 
 
 
+
+    let evalSimdSortBlockChunks2
+        (simdSortBlockChunks: simdSortBlock array seq) 
+        (ceBlocks: ceBlock array) 
+        : ceBlockEval [] =
+
+        let numNetworks = ceBlocks.Length
+        if numNetworks = 0 then [||] else
+
+        let maxWidth = ceBlocks |> Array.maxBy (fun c -> %c.SortingWidth) |> (fun c -> %c.SortingWidth)
+        let networkData = ceBlocks |> Array.map (fun ceb -> 
+            {| Lows = ceb.CeArray |> Array.map (fun c -> c.Low)
+               Highs = ceb.CeArray |> Array.map (fun c -> c.Hi)
+               SortingWidth = ceb.SortingWidth
+               CeLen = ceb.CeArray.Length |})
+
+        // Final global storage
+        let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].Length))
+        let globalUnsorted = Array.zeroCreate<int> numNetworks
+
+        Parallel.ForEach(
+            simdSortBlockChunks, 
+            // 1. Initialize Thread-Local State
+            (fun () -> 
+                let usage = Array.init numNetworks (fun i -> Array.zeroCreate<int> networkData.[i].CeLen)
+                let unsorted = Array.zeroCreate<int> numNetworks
+                let buffer = Array.zeroCreate<Vector256<uint8>> maxWidth
+                (usage, unsorted, buffer)),
+        
+            // 2. The Hot Loop (ZERO LOCKS)
+            (fun chunk loopState ((localUsage: int [][]), (localUnsorted: int []), workBuffer) ->
+                for bIdx = 0 to chunk.Length - 1 do
+                    let currentBlock = chunk.[bIdx]
+                    let currentLen = currentBlock.Length
+                    Array.blit currentBlock.Vectors 0 workBuffer 0 currentLen
+
+                    for nIdx = 0 to numNetworks - 1 do
+                        let data = networkData.[nIdx]
+                        let ceCount = data.CeLen
+                        let hashes = SimdGoldenHashProvider.GetGoldenHashes data.SortingWidth
+                    
+                        // Sorting...
+                        for cIdx = 0 to ceCount - 1 do
+                            let lIdx = data.Lows.[cIdx]
+                            let hIdx = data.Highs.[cIdx]
+                            let vLow = workBuffer.[lIdx]
+                            let vHi = workBuffer.[hIdx]
+                            let vMin = Vector256.Min(vLow, vHi)
+                        
+                            if vLow <> vMin then
+                                localUsage.[nIdx].[cIdx] <- localUsage.[nIdx].[cIdx] + 1
+                                workBuffer.[lIdx] <- vMin
+                                workBuffer.[hIdx] <- Vector256.Max(vLow, vHi)
+
+                        // Verification...
+                        if not (IsBlockSortedMask currentLen workBuffer) then
+                            localUnsorted.[nIdx] <- localUnsorted.[nIdx] + 1
+            
+                (localUsage, localUnsorted, workBuffer)),
+
+            // 3. Final Merge (Happens once per thread at the end)
+            (fun ((localUsage: int [][]), (localUnsorted: int []), _) ->
+                for nIdx = 0 to numNetworks - 1 do
+                    Interlocked.Add(&globalUnsorted.[nIdx], localUnsorted.[nIdx]) |> ignore
+                    let globalArr = globalUsage.[nIdx]
+                    for i = 0 to localUsage.[nIdx].Length - 1 do
+                        globalArr.IncrementAtomicBy (i |> UMX.tag) localUsage.[nIdx].[i]
+            )
+        ) |> ignore
+
+        // 3. Assemble final domain objects
+        Array.init numNetworks (fun i ->
+            ceBlockEval.create 
+                ceBlocks.[i] 
+                globalUsage.[i] 
+                (globalUnsorted.[i] |> UMX.tag) 
+                None
+        )
+
     let eval 
             (test: sortableUint8v256Test) 
             (ceBlocks: ceBlock []) 
             (chunkSize: int) : ceBlockEval[] =
             let chunkedStream = test.SimdSortBlocks |> Seq.chunkBySize chunkSize
-            evalSimdSortBlockChunks chunkedStream ceBlocks
+            evalSimdSortBlockChunks2 chunkedStream ceBlocks
         
 
 
