@@ -56,25 +56,30 @@ type PermutationBench() =
 
 
 
-//SortingWidth    Dimension       level   MaxPerTuple     LevelSet        LevelSetVV
-//12      3       6       4       19      5
-//24      3       12      8       61      13
-//48      3       24      16      217     41
-//72      3       36      24      469     85
-//96      3       48      32      817     145
-//16      4       8       4       85      8
-//32      4       16      8       489     33
-//64      4       32      16      3281    177
-//96      4       48      24      10425   519
-//128     4       64      32      23969   1143
-//24      6       12      4       1751    18
-//48      6       24      8       32661   151
-//96      6       48      16      782153  2137
-//144     6       72      24      5375005 11963
-//192     6       96      32      21533457        42955
-//32      8       16      4       38165   33
-//64      8       32      8       2306025 526
 
+//SortingWidth    Dimension       EdgeLength      level   LevelSet        LevelSetVV
+//12                3               4               6       19              5
+//24                3               8               12      61              13
+//36                3               12              18      127             25
+//48                3               16              24      217             41
+//72                3               24              36      469             85
+//96                3               32              48      817             145
+//16                4               4               8       85              8
+//32                4               8               16      489             33
+//48                4               12              24      1469            86
+//64                4               16              32      3281            177
+//96                4               24              48      10425           519
+//128               4               32              64      23969           1143
+//24                6               4               12      1751            18
+//48                6               8               24      32661           151
+//72                6               12              36      204763          676
+//96                6               16              48      782153          2137
+//144               6               24              72      5375005         11963
+//192               6               32              96      21533457        42955
+//32                8               4               16      38165           33
+//64                8               8               32      2306025         526
+//96                8               12              48      30162301        3788
+//128               8               16              64      197018321       17575
 
 
 
@@ -215,6 +220,13 @@ type GetLevelSetBench() =
 
 
 
+
+
+
+
+
+
+
 [<MemoryDiagnoser>]
 [<SimpleJob(warmupCount = 3, iterationCount = 10)>]
 type SorterEvalBench() =
@@ -228,7 +240,7 @@ type SorterEvalBench() =
     [<Params(100)>]
     member val sorterCount = 0 with get, set
 
-    [<Params(10000)>]
+    [<Params(1000, 10000, 30000)>]
     member val ceLength = 0 with get, set
 
     [<Params(0)>]
@@ -295,7 +307,7 @@ type SorterEvalBench() =
 
     [<Benchmark(Baseline = true)>]
     member this.evalStandard() =
-       let ceBlockEval = CeBlockOps.evalWithSorterTests this.sortableIntTests this.ceBlocks None
+       let ceBlockEval = CeBlockOps.evalWithSorterTests this.sortableIntTests this.ceBlocks this.collectResults None
        ceBlockEval
 
 
