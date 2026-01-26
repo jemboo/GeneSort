@@ -47,16 +47,11 @@ module Example =
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
-    let res = runMergePermutationsExample ()
-    //SimdUtils.printCapabilities ()
-    //let yow = SimdUtils.testStackTileByK ()
+    LatticeLevelSetMap.getStats
 
 
     printfn "end: %s" (DateTime.Now.ToShortTimeString())
 
-
-
-    //let wak = SimdSandbox.yab ()
 
 
 

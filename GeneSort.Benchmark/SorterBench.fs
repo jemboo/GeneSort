@@ -56,6 +56,30 @@ type PermutationBench() =
 
 
 
+//SortingWidth    Dimension       level   MaxPerTuple     LevelSet        LevelSetVV
+//12      3       6       4       19      5
+//24      3       12      8       61      13
+//48      3       24      16      217     41
+//72      3       36      24      469     85
+//96      3       48      32      817     145
+//16      4       8       4       85      8
+//32      4       16      8       489     33
+//64      4       32      16      3281    177
+//96      4       48      24      10425   519
+//128     4       64      32      23969   1143
+//24      6       12      4       1751    18
+//48      6       24      8       32661   151
+//96      6       48      16      782153  2137
+//144     6       72      24      5375005 11963
+//192     6       96      32      21533457        42955
+//32      8       16      4       38165   33
+//64      8       32      8       2306025 526
+
+
+
+
+
+
 [<MemoryDiagnoser>]
 type GetLevelSetBench() =
 
@@ -201,6 +225,19 @@ type SorterEvalBench() =
     [<Params(48)>]
     member val sortingWidth = 0 with get, set
 
+    [<Params(100)>]
+    member val sorterCount = 0 with get, set
+
+    [<Params(10000)>]
+    member val ceLength = 0 with get, set
+
+    [<Params(0)>]
+    member val chunkSize = 0 with get, set
+
+    [<Params(true, false)>]
+    member val collectResults = false with get, set
+
+
     member val mergeFillType = mergeFillType.NoFill
 
     member val id = Guid.NewGuid() with get, set
@@ -240,61 +277,36 @@ type SorterEvalBench() =
         
         let randomType = rngType.Lcg
 
-        let sorterCount = 128 |> UMX.tag<sorterCount>
         let firstIndex = 0 |> UMX.tag<sorterCount>
-        let ceCount = 10000 |> UMX.tag<ceLength>
-
 
         let smm =
              MsceRandGen.create 
                         randomType 
                         (this.sortingWidth |> UMX.tag<sortingWidth>) 
                         true 
-                        ceCount
+                        (this.ceLength |> UMX.tag<ceLength>)
                         |> sorterModelMaker.SmmMsceRandGen
 
-        let sorterModelSetMaker = sorterModelSetMaker.create smm firstIndex sorterCount
+        let sorterModelSetMaker = sorterModelSetMaker.create smm firstIndex (this.sorterCount |> UMX.tag<sorterCount>)
         let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
         let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
         this.ceBlocks <- sorterSet.Sorters |> Array.map (CeBlock.fromSorter)
 
 
-        //let bitonics = BitonicSorter.bitonicSort1
-        //                    (this.sortingWidth |> UMX.tag<sortingWidth>)
-
-        //let ceBlock = bitonics |> Array.concat 
-        //                       |> ceBlock.create  
-        //                            (Guid.NewGuid() |> UMX.tag<ceBlockId>) 
-        //                            (this.sortingWidth |> UMX.tag<sortingWidth>)
-
-        //this.ceBlocks <- Array.init 128 (fun _ -> ceBlock)
+    [<Benchmark(Baseline = true)>]
+    member this.evalStandard() =
+       let ceBlockEval = CeBlockOps.evalWithSorterTests this.sortableIntTests this.ceBlocks None
+       ceBlockEval
 
 
-
-
-    //[<Benchmark(Baseline = true)>]
-    //member this.evalStandard() =
-    //   let ceBlockEval = CeBlockOps.evalWithSorterTests this.sortableIntTests this.ceBlocks None
+    //[<Benchmark>]
+    //member this.evalUint8v256() =
+    //   let ceBlockEval = CeBlockOps.evalWithSorterTests 
+    //                        this.sortableUint8v256Test 
+    //                        this.ceBlocks 
+    //                        this.collectResults 
+    //                        (Some this.chunkSize)
     //   ceBlockEval
-
-
-    [<Benchmark>]
-    member this.evalUint8v256_2() =
-       let ceBlockEval = CeBlockOps.evalWithSorterTests this.sortableUint8v256Test this.ceBlocks true (Some 2)
-       ceBlockEval
-
-    [<Benchmark>]
-    member this.evalUint8v256_4() =
-       let ceBlockEval = CeBlockOps.evalWithSorterTests this.sortableUint8v256Test this.ceBlocks true (Some 4)
-       ceBlockEval
-
-
-    [<Benchmark>]
-    member this.evalUint8v256_8() =
-       let ceBlockEval = CeBlockOps.evalWithSorterTests this.sortableUint8v256Test this.ceBlocks true (Some 8)
-       ceBlockEval
-
-
 
 
 [<MemoryDiagnoser>]
