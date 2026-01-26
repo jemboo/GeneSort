@@ -62,7 +62,8 @@ module CeBlockOps =
 
     let evalWithSorterTests
                 (sortableTs: sortableTest) 
-                (ceBlocks: ceBlock []) : ceBlockEval [] =
+                (ceBlocks: ceBlock []) 
+                (chunkSize: int option): ceBlockEval [] =
         match sortableTs with
         | sortableTest.Ints sits ->
             ceBlocks |> Array.map (fun ceBlock ->
@@ -77,6 +78,10 @@ module CeBlockOps =
                 CeBlockOpsPacked.evalAndCollectResults packedTs ceBlock)
 
         | sortableTest.Uint8v256 su8v256ts ->
-            CeBlockOpsSIMD256.evalAndCollectResults su8v256ts ceBlocks
+            match chunkSize with
+            | Some cs when cs > 0 ->
+                CeBlockOpsSIMD256.evalAndCollectResults su8v256ts ceBlocks cs
+            | _ -> 
+                 failwith "CeBlockOps: evalWithSorterTests requires chunkSize > 0 for sortableUint8v256Test"
 
 

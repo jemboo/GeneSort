@@ -22,6 +22,10 @@ type sortableUint8v256Test =
           sortingWidth = sw
           simdSortBlocks = blocks }
 
+    static member Empty =
+        let id = Guid.NewGuid() |> UMX.tag<sorterTestId>
+        sortableUint8v256Test.create id 0<sortingWidth> [||]
+
     member this.Id with get() = this.id
     member this.SimdSortBlocks with get() = this.simdSortBlocks
     member this.SortableDataFormat with get() = sortableDataFormat.Int8Vector256

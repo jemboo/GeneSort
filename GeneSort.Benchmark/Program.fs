@@ -3,7 +3,7 @@ open BenchmarkDotNet.Running
 
 [<EntryPoint>]
 let main argv =
-    let summary = BenchmarkRunner.Run<ParallelPipelineBenchmark_uint8>()
+    let summary = BenchmarkRunner.Run<SorterEvalBench>()
 
     printfn "%A" summary
     Console.Read() |> ignore

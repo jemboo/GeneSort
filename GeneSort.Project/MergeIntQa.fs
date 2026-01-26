@@ -244,7 +244,7 @@ module MergeIntQa =
                 let! _ = checkCancellation cts.Token
 
                 // 5. Computation
-                let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTest
+                let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTest None
                 
                 report progress (sprintf "%s Saving sorterSet test results %s repl %d" (MathUtils.getTimestampString()) runId %repl)
                 let! _ = checkCancellation cts.Token

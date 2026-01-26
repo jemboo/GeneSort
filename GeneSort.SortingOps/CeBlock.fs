@@ -62,3 +62,17 @@ module CeBlock =
                     index <- index + %blockLength
             |]
         blocks
+
+
+    let fromSorterSuffix (sorter:sorter) (offset:int<ceLength>) =
+        ceBlock.create 
+            (UMX.tag<ceBlockId> (Guid.NewGuid())) 
+            sorter.SortingWidth 
+            (sorter.Ces.[%offset .. %sorter.ceLength - 1 |> int])
+
+
+    let fromSorter (sorter:sorter) =
+        ceBlock.create 
+            (UMX.tag<ceBlockId> (Guid.NewGuid())) 
+            sorter.SortingWidth 
+            sorter.Ces

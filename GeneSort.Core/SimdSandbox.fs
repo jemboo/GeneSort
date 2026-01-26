@@ -260,17 +260,6 @@ module SimdSandbox =
 
 
 
-
-
-
-
-
-
-
-
-
-
-
     let yab () =
 
         let test1 = [|

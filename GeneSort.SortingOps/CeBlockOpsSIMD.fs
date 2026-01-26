@@ -10,6 +10,7 @@ open GeneSort.Sorting.Sortable
 open System.Collections.Concurrent
 open System.Collections.Generic
 open System
+open System.Threading
 
 
 module CeBlockOpsSIMD256 =
@@ -35,6 +36,54 @@ module CeBlockOpsSIMD256 =
                 sorted <- false
             i <- i + 1
         sorted
+
+    /// Check if all 32 lanes in the block are sorted.
+    let IsBlockSorted2 (len: int) (vectors: Vector256<uint8>[]) =
+        let mutable sorted = true
+        let mutable i = 0
+        while i < len - 1 && sorted do
+            // In a sorted lane, v[i] <= v[i+1]. 
+            // Therefore, Min(v[i], v[i+1]) must be equal to v[i].
+            let vLow = vectors.[i]
+            let vHi = vectors.[i+1]
+            if Vector256.Min(vLow, vHi) <> vLow then
+                sorted <- false
+            else
+                i <- i + 1
+        sorted
+
+/// Mask-optimized: Check if all 32 lanes in the block are sorted.
+    let IsBlockSorted3 (len: int) (vectors: Vector256<uint8>[]) =
+        let mutable sorted = true
+        let mutable i = 0
+        while i < len - 1 do
+            let vLow = vectors.[i]
+            let vHi = vectors.[i+1]
+            
+            // Mask: 0xFF where ordered (Low <= Hi), 0x00 otherwise
+            let mask = Vector256.Equals(Vector256.Min(vLow, vHi), vLow)
+            
+            // Extract the MSB of each of the 32 bytes into a 32-bit integer
+            let bitmask = Vector256.ExtractMostSignificantBits(mask)
+            
+            // If all 32 lanes are sorted, bitmask will be 0xFFFFFFFFu
+            if bitmask <> 0xffffffffu then
+                sorted <- false
+                i <- len // Break
+            else
+                i <- i + 1
+        sorted
+
+
+    /// Computes 32 separate hashes for the 32 lanes in the block.
+    let computeLaneHashes32 (len: int) (vectors: Vector256<uint8>[]) =
+        let hashes = Array.create 32 17u
+        for i = 0 to len - 1 do
+            let v = vectors.[i]
+            for lane = 0 to 31 do
+                hashes.[lane] <- hashes.[lane] * 31u + uint32 (v.GetElement(lane))
+        hashes
+
 
     /// Processes a stream of blocks through multiple networks.
     let EvalCeBlockStream 
@@ -148,62 +197,6 @@ module CeBlockOpsSIMD256 =
         Array.zip networkUseCounts networkUnsortedCounts
 
 
-    //let evalChunkedWithTypes 
-    //    (chunkedStream: seq<Vector256<uint8>[][]>) 
-    //    (ceBlocks: ceBlock array) 
-    //    : ceBlockEval [] =
-        
-    //    let numNetworks = ceBlocks.Length
-    //    // Use your ceUseCounts type for global storage
-    //    let globalUsage = Array.init numNetworks (fun i -> 
-    //        ceUseCounts.Create(ceBlocks.[i].Length))
-    //    let globalUnsorted = Array.zeroCreate<int> numNetworks
-    //    let locks = Array.init numNetworks (fun _ -> obj())
-
-    //    Parallel.ForEach(chunkedStream, (fun (chunk: Vector256<uint8> array array) ->
-    //        for nIdx = 0 to numNetworks - 1 do
-    //            let ceb = ceBlocks.[nIdx]
-    //            let len = %ceb.Length
-                
-    //            // Local tracking for this chunk
-    //            let localCounts = Array.zeroCreate<int> len
-    //            let mutable localUnsorted = 0
-                
-    //            for bIdx = 0 to chunk.Length - 1 do
-    //                let testBlock = Array.copy chunk.[bIdx]
-    //                for cIdx = 0 to len - 1 do
-    //                    let cex = ceb.getCe cIdx
-    //                    let vLow = testBlock.[cex.Low]
-    //                    let vHi = testBlock.[cex.Hi]
-    //                    let vMin = Vector256.Min(vLow, vHi)
-                        
-    //                    if vLow <> vMin then
-    //                        localCounts.[cIdx] <- localCounts.[cIdx] + 1
-    //                        testBlock.[cex.Low] <- vMin
-    //                        testBlock.[cex.Hi] <- Vector256.Max(vLow, vHi)
-                    
-    //                if not (IsBlockSorted testBlock) then
-    //                    localUnsorted <- localUnsorted + 1
-
-    //            // Sync local results to the ceUseCounts container
-    //            lock locks.[nIdx] (fun () ->
-    //                globalUnsorted.[nIdx] <- globalUnsorted.[nIdx] + localUnsorted
-    //                for i = 0 to len - 1 do
-    //                    // Using your custom IncrementBy
-    //                    globalUsage.[nIdx].IncrementBy (i |> UMX.tag<ceIndex>) localCounts.[i]
-    //            )
-    //    )) |> ignore
-
-    //    // Return the high-level ceBlockWithUsage type
-    //    Array.init numNetworks (fun i ->
-    //        let usageWithBlock = ceBlockEval.create 
-    //                                    ceBlocks.[i] 
-    //                                    globalUsage.[i]
-    //                                    (globalUnsorted.[i] |> UMX.tag<sortableCount>)
-    //                                    None
-    //        usageWithBlock
-    //    )
-
     let evalSimdSortBlockChunks 
         (simdSortBlockChunks: simdSortBlock array seq) 
         (ceBlocks: ceBlock array) 
@@ -262,91 +255,13 @@ module CeBlockOpsSIMD256 =
 
 
 
-    let evalBp (test: sortableUint8v256Test) (ceBlocks: ceBlock []) : ceBlockEval[] =
-        let chunkedStream = test.SimdSortBlocks |> Seq.chunkBySize 64
-        evalSimdSortBlockChunks chunkedStream ceBlocks
-
-
-
-
-    ///// Computes a hash for a single lane across all vectors in the block.
-    ///// This allows us to check for duplicates without extracting the full array.
-    //let inline hashLane (block: Vector256<uint8>[]) (lane: int) =
-    //    let mutable h = 17
-    //    for i = 0 to block.Length - 1 do
-    //        h <- h * 31 + int (block.[i].GetElement(lane))
-    //    h
-
-    //let EvalChunkedAndCollectUniqueFailures
-    //    (chunkedStream: seq<simdSortBlock[]>) 
-    //    (ceBlocks: ceBlock array) 
-    //    : ceBlockEval [] =
+    let evalBp 
+            (test: sortableUint8v256Test) 
+            (ceBlocks: ceBlock []) 
+            (chunkSize: int) : ceBlockEval[] =
+            let chunkedStream = test.SimdSortBlocks |> Seq.chunkBySize chunkSize
+            evalSimdSortBlockChunks chunkedStream ceBlocks
         
-    //    let numNetworks = ceBlocks.Length
-    //    let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].Length))
-    //    let globalUnsorted = Array.zeroCreate<int> numNetworks
-        
-    //    // A set of unique failing sequences (int[]) per network
-    //    // We use a custom comparer to ensure int[] equality is based on content
-    //    let failureSets = Array.init numNetworks (fun _ -> 
-    //        ConcurrentDictionary<int[], byte>(ArrayEqualityComparer<int>()))
-        
-    //    let locks = Array.init numNetworks (fun _ -> obj())
-
-    //    Parallel.ForEach(chunkedStream, (fun chunk ->
-    //        for nIdx = 0 to numNetworks - 1 do
-    //            let ceb = ceBlocks.[nIdx]
-    //            let networkLen = %ceb.Length
-    //            let localCounts = Array.zeroCreate<int> networkLen
-    //            let mutable localUnsortedCount = 0
-                
-    //            for bIdx = 0 to chunk.Length - 1 do
-    //                let testBlock = Array.copy chunk.[bIdx].Vectors
-                    
-    //                // ... [Standard CAS Sorting Logic] ...
-
-    //                // Check if the block is sorted
-    //                if not (IsBlockSorted testBlock) then
-    //                    localUnsortedCount <- localUnsortedCount + 1
-                        
-    //                    // Check each of the 32 lanes
-    //                    for lane = 0 to 31 do
-    //                        // We only extract and add if the lane is actually unsorted
-    //                        // A block being "unsorted" only means AT LEAST one lane failed.
-    //                        let mutable laneSorted = true
-    //                        let mutable vIdx = 0
-    //                        while laneSorted && vIdx < testBlock.Length - 1 do
-    //                            if testBlock.[vIdx].GetElement(lane) > testBlock.[vIdx+1].GetElement(lane) then
-    //                                laneSorted <- false
-    //                            vIdx <- vIdx + 1
-                            
-    //                        if not laneSorted then
-    //                            // Extract the lane to an array
-    //                            let laneArray = Array.init testBlock.Length (fun i -> 
-    //                                int (testBlock.[i].GetElement(lane)))
-                                
-    //                            // TryAdd acts as our Set "Insert"
-    //                            failureSets.[nIdx].TryAdd(laneArray, 0uy) |> ignore
-
-    //            lock locks.[nIdx] (fun () ->
-    //                globalUnsorted.[nIdx] <- globalUnsorted.[nIdx] + localUnsortedCount
-    //                for i = 0 to networkLen - 1 do
-    //                    globalUsage.[nIdx].IncrementBy (i |> UMX.tag<ceIndex>) localCounts.[i]
-    //            )
-    //    )) |> ignore
-
-    //    // Assemble ceBlockEval
-    //    Array.init numNetworks (fun i ->
-    //        let uniqueFailures = failureSets.[i].Keys |> Seq.toArray
-    //        // Map uniqueFailures (int[][]) into your sortableTest.Ints or similar here
-    //        let failTest = None // TODO: Wrap uniqueFailures
-
-    //        ceBlockEval.create 
-    //            ceBlocks.[i] 
-    //            globalUsage.[i] 
-    //            (globalUnsorted.[i] |> UMX.tag<sortableCount>) 
-    //            failTest
-    //    )
 
 
 
@@ -469,6 +384,108 @@ module CeBlockOpsSIMD256 =
         )
 
 
-    let evalAndCollectResults (test: sortableUint8v256Test) (ceBlocks: ceBlock []) : ceBlockEval[] =
-        let chunkedStream = test.SimdSortBlocks |> Seq.chunkBySize 64
-        evalChunkedAndCollectUniqueFailures chunkedStream ceBlocks
+
+    let evalChunkedAndCollectUniqueFailures2
+        (simdSortBlockChunks: simdSortBlock array seq) 
+        (ceBlocks: ceBlock array) 
+        : ceBlockEval [] =
+
+        let numNetworks = ceBlocks.Length
+        if numNetworks = 0 then [||] else
+
+        let maxWidth = ceBlocks |> Array.maxBy (fun c -> %c.SortingWidth) |> (fun c -> %c.SortingWidth)
+        let networkData = ceBlocks |> Array.map (fun ceb -> 
+            {| Lows = ceb.CeArray |> Array.map (fun c -> c.Low)
+               Highs = ceb.CeArray |> Array.map (fun c -> c.Hi)
+               SortingWidth = ceb.SortingWidth
+               CeLen = ceb.CeArray.Length |})
+
+        // Final global storage
+        let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].Length))
+        let globalUnsorted = Array.zeroCreate<int> numNetworks
+        let failureSets = Array.init numNetworks (fun _ -> ConcurrentDictionary<int[], byte>(ArrayContentComparer<int>()))
+
+        Parallel.ForEach(
+            simdSortBlockChunks, 
+            // 1. Initialize Thread-Local State
+            (fun () -> 
+                let usage = Array.init numNetworks (fun i -> Array.zeroCreate<int> networkData.[i].CeLen)
+                let unsorted = Array.zeroCreate<int> numNetworks
+                let buffer = Array.zeroCreate<Vector256<uint8>> maxWidth
+                (usage, unsorted, buffer)),
+        
+            // 2. The Hot Loop (ZERO LOCKS)
+            (fun chunk loopState ((localUsage: int [][]), (localUnsorted: int []), workBuffer) ->
+                for bIdx = 0 to chunk.Length - 1 do
+                    let currentBlock = chunk.[bIdx]
+                    let currentLen = currentBlock.Length
+                    Array.blit currentBlock.Vectors 0 workBuffer 0 currentLen
+
+                    for nIdx = 0 to numNetworks - 1 do
+                        let data = networkData.[nIdx]
+                        let ceCount = data.CeLen
+                        let hashes = SimdGoldenHashProvider.GetGoldenHashes data.SortingWidth
+                    
+                        // Sorting...
+                        for cIdx = 0 to ceCount - 1 do
+                            let lIdx = data.Lows.[cIdx]
+                            let hIdx = data.Highs.[cIdx]
+                            let vLow = workBuffer.[lIdx]
+                            let vHi = workBuffer.[hIdx]
+                            let vMin = Vector256.Min(vLow, vHi)
+                        
+                            if vLow <> vMin then
+                                localUsage.[nIdx].[cIdx] <- localUsage.[nIdx].[cIdx] + 1
+                                workBuffer.[lIdx] <- vMin
+                                workBuffer.[hIdx] <- Vector256.Max(vLow, vHi)
+
+                        // Verification...
+                        if not (IsBlockSorted3 currentLen workBuffer) then
+                            localUnsorted.[nIdx] <- localUnsorted.[nIdx] + 1
+                            let currentHashes = computeLaneHashes32 currentLen workBuffer
+                            for lane = 0 to currentBlock.SortableCount - 1 do
+                                if currentHashes.[lane] <> hashes.[lane] then
+                                    let laneArray = Array.init currentLen (fun i -> int (workBuffer.[i].GetElement(lane)))
+                                    failureSets.[nIdx].TryAdd(laneArray, 0uy) |> ignore
+            
+                (localUsage, localUnsorted, workBuffer)),
+
+            // 3. Final Merge (Happens once per thread at the end)
+            (fun ((localUsage: int [][]), (localUnsorted: int []), _) ->
+                for nIdx = 0 to numNetworks - 1 do
+                    Interlocked.Add(&globalUnsorted.[nIdx], localUnsorted.[nIdx]) |> ignore
+                    let globalArr = globalUsage.[nIdx]
+                    for i = 0 to localUsage.[nIdx].Length - 1 do
+                        globalArr.IncrementAtomicBy (i |> UMX.tag) localUsage.[nIdx].[i]
+            )
+        ) |> ignore
+
+        // 3. Assemble final domain objects
+        Array.init numNetworks (fun i ->
+            let uniqueFailures = failureSets.[i].Keys |> Seq.toArray
+            let failTest = 
+                if uniqueFailures.Length > 0 then
+                    let sw = ceBlocks.[i].SortingWidth
+                    let sss = int sw |> UMX.tag<symbolSetSize>
+                    uniqueFailures 
+                    |> Array.map (fun arr -> sortableIntArray.create(arr, sw, sss))
+                    |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sw
+                    |> sortableTest.Ints
+                    |> Some
+                else None
+
+            ceBlockEval.create 
+                ceBlocks.[i] 
+                globalUsage.[i] 
+                (globalUnsorted.[i] |> UMX.tag) 
+                failTest
+        )
+
+
+
+    let evalAndCollectResults 
+                    (test: sortableUint8v256Test) 
+                    (ceBlocks: ceBlock []) 
+                    (chunkSize: int) : ceBlockEval[] =
+        let chunkedStream = test.SimdSortBlocks |> Seq.chunkBySize chunkSize
+        evalChunkedAndCollectUniqueFailures2 chunkedStream ceBlocks
