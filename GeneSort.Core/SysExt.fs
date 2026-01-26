@@ -1,6 +1,16 @@
 ﻿
 module SysExt
 
+//let a = 10y         // int8
+//let a = 10uy        // uint8
+//let a = 10          // int
+//let b = 10u         // uint32
+//let c = 10L         // int64
+//let d = 10UL        // uint64
+//let e = 3.14f       // float32
+//let f = 3.14m       // decimal
+//let g = 10I         // bigint
+
 type System.Byte with
     (* bit manipulation methods *)
     member x.isset i = x &&& (1uy <<< i) <> 0uy // test if bit set at a specified position
