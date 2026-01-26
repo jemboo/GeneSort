@@ -11,6 +11,44 @@ open GeneSort.Sorting.Sortable
 
 module CeBlockOpsBinary = 
 
+
+    let eval (sbts: sortableBinaryTest) (ceBlock: ceBlock) :ceBlockEval =
+            let ceUseCounts = ceUseCounts.Create ceBlock.Length
+            let mutable unsortedCount = 0
+            let ces = ceBlock.CeArray
+            let sw = sbts.SortingWidth
+            let pool = ArrayPool<bool>.Shared
+
+            for sba in sbts.SortableBinaryArrays do
+                let workArray = pool.Rent(%sw)
+                Array.blit sba.Values 0 workArray 0 %sw
+
+                for i = 0 to ces.Length - 1 do
+                    let ce = ces.[i]
+                    // Boolean Comparison: true (1) > false (0)
+                    if workArray.[ce.Low] && not workArray.[ce.Hi] then
+                        workArray.[ce.Low] <- false
+                        workArray.[ce.Hi] <- true
+                        ceUseCounts.Increment (i |> UMX.tag<ceIndex>) 
+
+                // A bool array is sorted if it's in the form [false, false, ..., true, true]
+                let isSorted = 
+                    let mutable ok = true
+                    let mutable j = 0
+                    while j < %sw - 1 && ok do
+                        // Check if we have a 'true' followed by a 'false'
+                        if workArray.[j] && not workArray.[j+1] then ok <- false
+                        else j <- j + 1
+                    ok
+
+                if not isSorted then
+                    unsortedCount <- unsortedCount + 1
+
+                pool.Return(workArray)
+
+            ceBlockEval.create ceBlock ceUseCounts (unsortedCount |> UMX.tag<sortableCount>) None
+
+
     let evalAndCollectResults (sbts: sortableBinaryTest) (ceBlock: ceBlock) :ceBlockEval =
             let ceUseCounts = ceUseCounts.Create ceBlock.Length
             let ces = ceBlock.CeArray

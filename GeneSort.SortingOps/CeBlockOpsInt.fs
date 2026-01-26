@@ -11,6 +11,44 @@ open GeneSort.Sorting.Sortable
 
 module CeBlockOpsInt = 
 
+
+    let eval (sits: sortableIntTest) (ceBlock: ceBlock) =
+            let ceUseCounts = ceUseCounts.Create ceBlock.Length
+            let mutable unsortedCount = 0
+            let ces = ceBlock.CeArray
+            let sw = sits.SortingWidth
+            let pool = ArrayPool<int>.Shared
+
+            for sia in sits.SortableIntArrays do
+                let workArray = pool.Rent(%sw)
+                Array.blit sia.Values 0 workArray 0 %sw
+
+                for i = 0 to ces.Length - 1 do
+                    let ce = ces.[i]
+                    let a = workArray.[ce.Low]
+                    let b = workArray.[ce.Hi]
+                    if a > b then
+                        workArray.[ce.Low] <- b
+                        workArray.[ce.Hi] <- a
+                        ceUseCounts.Increment (i |> UMX.tag<ceIndex>) 
+
+                let isSorted = 
+                    let mutable ok = true
+                    let mutable j = 0
+                    while j < %sw - 1 && ok do
+                        if workArray.[j] > workArray.[j+1] then ok <- false
+                        else j <- j + 1
+                    ok
+
+                if not isSorted then
+                    unsortedCount <- unsortedCount + 1
+
+                pool.Return(workArray)
+
+            ceBlockEval.create ceBlock ceUseCounts (unsortedCount |> UMX.tag<sortableCount>) None
+
+
+
     let evalAndCollectResults (sits: sortableIntTest) (ceBlock: ceBlock) =
             let ceUseCounts = ceUseCounts.Create ceBlock.Length
             let ces = ceBlock.CeArray

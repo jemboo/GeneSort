@@ -120,7 +120,7 @@ module CeBlockOpsSIMD256 =
 
 
 
-    let evalBp 
+    let eval 
             (test: sortableUint8v256Test) 
             (ceBlocks: ceBlock []) 
             (chunkSize: int) : ceBlockEval[] =

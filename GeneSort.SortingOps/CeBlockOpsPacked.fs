@@ -70,6 +70,48 @@ module CeBlockOpsPacked =
                         newPackedData
                                            
 
+    let eval (tests: packedSortableIntTests) (ceBlock: ceBlock) : ceBlockEval =
+        let sw = %tests.SortingWidth
+        let totalTests = tests.SoratbleCount
+        let ces = ceBlock.CeArray
+    
+        // Pre-deconstruct CEs for the hot loop
+        let lows = Array.init %ceBlock.Length (fun i -> ces.[i].Low)
+        let highs = Array.init %ceBlock.Length (fun i -> ces.[i].Hi)
+        let ceUseCounts = ceUseCounts.Create ceBlock.Length
+        let mutable unsortedCount = 0
+    
+        // Work on a mutable copy
+        let resultsBuffer = Array.copy tests.PackedValues
+        let mutable dataRef = &MemoryMarshal.GetReference(resultsBuffer.AsSpan())
+
+        // PHASE 1: THE SORTING (Hot Loop)
+        for t = 0 to %totalTests - 1 do
+            let offset = t * sw
+            for i = 0 to %ceBlock.Length - 1 do
+                let lPtr = &Unsafe.Add(&dataRef, offset + lows.[i])
+                let hPtr = &Unsafe.Add(&dataRef, offset + highs.[i])
+                let a = lPtr
+                let b = hPtr
+                if a > b then
+                    lPtr <- b
+                    hPtr <- a
+                    ceUseCounts.Increment (i |> UMX.tag<ceIndex>)
+    
+        for t = 0 to %totalTests - 1 do
+            let offset = t * sw
+            let mutable isSorted = true
+            let mutable j = 0
+            while j < sw - 1 && isSorted do
+                if resultsBuffer.[offset + j] > resultsBuffer.[offset + j + 1] then 
+                    isSorted <- false
+                else j <- j + 1
+
+            if not isSorted then
+                unsortedCount <- unsortedCount + 1
+       
+        ceBlockEval.create ceBlock ceUseCounts (unsortedCount |> UMX.tag<sortableCount>) None
+
 
 
     let evalAndCollectResults (tests: packedSortableIntTests) (ceBlock: ceBlock) : ceBlockEval =

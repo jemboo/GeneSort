@@ -280,18 +280,18 @@ type SorterEvalBench() =
 
     [<Benchmark>]
     member this.evalUint8v256_2() =
-       let ceBlockEval = CeBlockOps.evalWithSorterTests this.sortableUint8v256Test this.ceBlocks (Some 2)
+       let ceBlockEval = CeBlockOps.evalWithSorterTests this.sortableUint8v256Test this.ceBlocks true (Some 2)
        ceBlockEval
 
     [<Benchmark>]
     member this.evalUint8v256_4() =
-       let ceBlockEval = CeBlockOps.evalWithSorterTests this.sortableUint8v256Test this.ceBlocks (Some 4)
+       let ceBlockEval = CeBlockOps.evalWithSorterTests this.sortableUint8v256Test this.ceBlocks true (Some 4)
        ceBlockEval
 
 
     [<Benchmark>]
     member this.evalUint8v256_8() =
-       let ceBlockEval = CeBlockOps.evalWithSorterTests this.sortableUint8v256Test this.ceBlocks (Some 8)
+       let ceBlockEval = CeBlockOps.evalWithSorterTests this.sortableUint8v256Test this.ceBlocks true (Some 8)
        ceBlockEval
 
 
