@@ -40,6 +40,7 @@ type sortableDataFormat =
     | IntArray
     | PackedIntArray
     | Int8Vector256
+    | Int8Vector512
 
 
 module SortableDataFormat =
@@ -47,6 +48,7 @@ module SortableDataFormat =
     let toString (t:sortableDataFormat) : string =
         match t with
         | Int8Vector256 -> "Int8Vector256"
+        | Int8Vector512 -> "Int8Vector512"
         | IntArray -> "Ints"
         | BoolArray -> "Bools"
 
@@ -55,6 +57,7 @@ module SortableDataFormat =
         | "Ints" -> IntArray
         | "Bools" -> BoolArray
         | "Int8Vector256" -> Int8Vector256
+        | "Int8Vector512" -> Int8Vector512
         | _ -> failwithf "Unknown SortableDataFormat: %s" s
     let all () : sortableDataFormat list =
         [ IntArray; BoolArray ]

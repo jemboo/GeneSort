@@ -10,6 +10,7 @@ type sortableTest =
     | PackedInts of packedSortableIntTests
     | Bools of sortableBinaryTest
     | Uint8v256 of sortableUint8v256Test
+    | Uint8v512 of sortableUint8v512Test
 
 
 module SortableTests = 
@@ -20,6 +21,7 @@ module SortableTests =
         | Bools boolTest -> boolTest.SortableArrayType
         | PackedInts packedIntTest -> packedIntTest.SortableDataFormat
         | Uint8v256 uint8v256Test -> uint8v256Test.SortableDataFormat
+        | Uint8v512 uint8v512Test -> uint8v512Test.SortableDataFormat
 
     let getSortingWidth (test: sortableTest) =
         match test with
@@ -27,6 +29,7 @@ module SortableTests =
         | Bools boolTest -> boolTest.SortingWidth
         | PackedInts packedIntTest -> packedIntTest.SortingWidth
         | Uint8v256 uint8v256Test -> uint8v256Test.SortingWidth
+        | Uint8v512 uint8v512Test -> uint8v512Test.SortingWidth
 
     let getId (test: sortableTest) : Guid<sorterTestId> =
         match test with
@@ -34,6 +37,7 @@ module SortableTests =
         | Bools boolTest -> boolTest.Id
         | PackedInts packedIntTest -> packedIntTest.Id
         | Uint8v256 uint8v256Test -> uint8v256Test.Id
+        | Uint8v512 uint8v512Test -> uint8v512Test.Id
 
     let getSortableCount (test: sortableTest) : int<sortableCount> =
         match test with
@@ -41,6 +45,8 @@ module SortableTests =
         | Bools boolTest -> boolTest.SoratbleCount
         | PackedInts packedIntTest -> packedIntTest.SoratbleCount
         | Uint8v256 uint8v256Test -> uint8v256Test.SoratbleCount
+        | Uint8v512 uint8v512Test -> uint8v512Test.SoratbleCount
+
 
     let getUnsortedCount (test: sortableTest) =
         match test with
@@ -78,4 +84,7 @@ module SortableTests =
 
         | Uint8v256 uint8v256Test -> 
                 failwith "UnsortedCount not implemented for Uint8v256."
+
+        | Uint8v512 uint8v512Test ->
+                failwith "UnsortedCount not implemented for Uint8v512."
 

@@ -62,7 +62,7 @@ module CeBlockOpsSIMD256 =
 
 
     let evalSimdSortBlockChunks
-        (simdSortBlockChunks: simdSortBlock array seq) 
+        (simdSortBlockChunks: simd256SortBlock array seq) 
         (ceBlocks: ceBlock array) 
         : ceBlockEval [] =
 
@@ -99,7 +99,7 @@ module CeBlockOpsSIMD256 =
                     for nIdx = 0 to numNetworks - 1 do
                         let data = networkData.[nIdx]
                         let ceCount = data.CeLen
-                        let hashes = SimdGoldenHashProvider.GetGoldenHashes data.SortingWidth
+                        let hashes = Simd256GoldenHashProvider.GetGoldenHashes data.SortingWidth
                     
                         // Sorting...
                         for cIdx = 0 to ceCount - 1 do
@@ -141,7 +141,7 @@ module CeBlockOpsSIMD256 =
 
 
     let evalSimdSortBlocks
-        (simdSortBlocks: simdSortBlock seq) 
+        (simdSortBlocks: simd256SortBlock seq) 
         (ceBlocks: ceBlock array) 
         : ceBlockEval [] =
     
@@ -211,18 +211,16 @@ module CeBlockOpsSIMD256 =
         )
 
 
-
-
-
-
-
     let eval 
             (test: sortableUint8v256Test) 
-            (ceBlocks: ceBlock []) 
-            (chunkSize: int) : ceBlockEval[] =
+            (ceBlocks: ceBlock []) =
             //let chunkedStream = test.SimdSortBlocks |> Seq.chunkBySize chunkSize
             //evalSimdSortBlockChunks chunkedStream ceBlocks
             evalSimdSortBlocks test.SimdSortBlocks ceBlocks
+
+
+
+
 
 
 
@@ -253,7 +251,7 @@ module CeBlockOpsSIMD256 =
 
 
     let evalChunkedAndCollectUniqueFailures
-        (simdSortBlockChunks: simdSortBlock array seq) 
+        (simdSortBlockChunks: simd256SortBlock array seq) 
         (ceBlocks: ceBlock array) 
         : ceBlockEval [] =
 
@@ -291,7 +289,7 @@ module CeBlockOpsSIMD256 =
                     for nIdx = 0 to numNetworks - 1 do
                         let data = networkData.[nIdx]
                         let ceCount = data.CeLen
-                        let hashes = SimdGoldenHashProvider.GetGoldenHashes data.SortingWidth
+                        let hashes = Simd256GoldenHashProvider.GetGoldenHashes data.SortingWidth
                     
                         // Sorting...
                         for cIdx = 0 to ceCount - 1 do
@@ -350,7 +348,7 @@ module CeBlockOpsSIMD256 =
 
 
     let evalAndCollectUniqueFailures
-        (simdSortBlocks: simdSortBlock seq) 
+        (simdSortBlocks: simd256SortBlock seq) 
         (ceBlocks: ceBlock array) 
         : ceBlockEval [] =
     
@@ -393,7 +391,7 @@ module CeBlockOpsSIMD256 =
                 for nIdx = 0 to numNetworks - 1 do
                     let data = networkData.[nIdx]
                     let ceCount = data.CeLen
-                    let goldenHashes = SimdGoldenHashProvider.GetGoldenHashes data.SortingWidth
+                    let goldenHashes = Simd256GoldenHashProvider.GetGoldenHashes data.SortingWidth
             
                     // --- Hot Loop: CAS Sorting ---
                     for cIdx = 0 to ceCount - 1 do
@@ -461,8 +459,5 @@ module CeBlockOpsSIMD256 =
 
     let evalAndCollectResults 
                     (test: sortableUint8v256Test) 
-                    (ceBlocks: ceBlock []) 
-                    (chunkSize: int) : ceBlockEval[] =
+                    (ceBlocks: ceBlock []) =
         evalAndCollectUniqueFailures test.SimdSortBlocks ceBlocks
-        //let chunkedStream = test.SimdSortBlocks |> Seq.chunkBySize chunkSize
-        //evalChunkedAndCollectUniqueFailures chunkedStream ceBlocks

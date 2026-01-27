@@ -201,9 +201,6 @@ type SorterEvalBench() =
     [<Params(1000, 10000, 30000)>]
     member val ceLength = 0 with get, set
 
-    [<Params(1, 2, 4)>]
-    member val chunkSize = 0 with get, set
-
     [<Params(true, false)>]
     member val collectResults = false with get, set
 
@@ -274,8 +271,7 @@ type SorterEvalBench() =
        let ceBlockEval = CeBlockOps.evalWithSorterTests 
                             this.sortableUint8v256Test 
                             this.ceBlocks 
-                            this.collectResults 
-                            (Some this.chunkSize)
+                            this.collectResults
        ceBlockEval
 
 
