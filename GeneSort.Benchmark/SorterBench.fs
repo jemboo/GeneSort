@@ -188,6 +188,7 @@ type SorterEvalBench() =
     member val sortableIntTests = sortableIntTest.Empty |> sortableTest.Ints with get, set
     member val sortablePackedIntTests = sortableIntTest.Empty |> sortableTest.Ints with get, set
     member val sortableUint8v256Test = sortableUint8v256Test.Empty |> sortableTest.Uint8v256 with get, set
+    member val sortableUint8v512Test = sortableUint8v512Test.Empty |> sortableTest.Uint8v512 with get, set
 
     member val ceBlocks = [||] with get, set
 
@@ -217,6 +218,12 @@ type SorterEvalBench() =
                                         intArrays
                                   |> sortableTest.Uint8v256
 
+        this.sortableUint8v512Test <- SortableUint8v512Test.fromIntArrays
+                                        (Guid.NewGuid() |> UMX.tag<sorterTestId>)
+                                        (this.sortingWidth |> UMX.tag<sortingWidth>)
+                                        intArrays
+                                  |> sortableTest.Uint8v512
+
         
         let randomType = rngType.Lcg
 
@@ -241,14 +248,23 @@ type SorterEvalBench() =
     //   let ceBlockEval = CeBlockOps.evalWithSorterTests this.sortableIntTests this.ceBlocks this.collectResults None
     //   ceBlockEval
 
-
-    [<Benchmark>]
+    
+    [<Benchmark(Baseline = true)>]
     member this.evalUint8v256() =
        let ceBlockEval = CeBlockOps.evalWithSorterTests 
                             this.sortableUint8v256Test 
                             this.ceBlocks 
                             this.collectResults
        ceBlockEval
+
+    [<Benchmark>]
+    member this.evalUint8v512() =
+       let ceBlockEval = CeBlockOps.evalWithSorterTests 
+                            this.sortableUint8v256Test 
+                            this.ceBlocks 
+                            this.collectResults
+       ceBlockEval
+
 
 
 [<MemoryDiagnoser>]
