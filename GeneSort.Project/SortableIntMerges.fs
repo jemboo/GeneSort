@@ -56,6 +56,8 @@ module SortableIntMerges =
                         sortableDataFormat.IntArray; 
                         sortableDataFormat.BoolArray;
                         sortableDataFormat.Int8Vector256;
+                        sortableDataFormat.Int8Vector512;
+
                      ] |> List.map SortableDataFormat.toString
         (runParameters.sortableDataFormatKey, values)
 

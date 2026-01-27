@@ -13,6 +13,7 @@
     <Compile Include="CeBlockOpsBinary.fs" />
     <Compile Include="CeBlockOpsPacked.fs" />
     <Compile Include="CeBlockOpsSIMD256.fs" />
+    <Compile Include="CeBlockOpsSIMD512.fs" />
     <Compile Include="CeBlockOps.fs" />
     <Compile Include="SorterEval.fs" />
     <Compile Include="SorterSetEval.fs" />

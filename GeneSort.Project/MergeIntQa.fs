@@ -101,7 +101,8 @@ module MergeIntQa =
             [ 
                 sortableDataFormat.IntArray; 
                 sortableDataFormat.BoolArray;
-                sortableDataFormat.Int8Vector256 
+                sortableDataFormat.Int8Vector256;
+                sortableDataFormat.Int8Vector512
             ] |> List.map(SortableDataFormat.toString)
   
     let sortableDataFormatKeys () : string*string list =
@@ -244,7 +245,8 @@ module MergeIntQa =
                 let! _ = checkCancellation cts.Token
 
                 // 5. Computation
-                let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTest false
+                let collectResults = false
+                let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTest collectResults
                 
                 report progress (sprintf "%s Saving sorterSet test results %s repl %d" (MathUtils.getTimestampString()) runId %repl)
                 let! _ = checkCancellation cts.Token

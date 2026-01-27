@@ -106,7 +106,10 @@ module MergeIntEvals =
     let sortableDataTypeKeyValues = 
             [ 
                 sortableDataFormat.IntArray; 
-                sortableDataFormat.BoolArray ] |> List.map(SortableDataFormat.toString)
+                sortableDataFormat.BoolArray;
+                sortableDataFormat.Int8Vector256;
+                sortableDataFormat.Int8Vector512
+            ] |> List.map(SortableDataFormat.toString)
   
     let sortableDataTypeKeys () : string*string list =
         (runParameters.sortableDataFormatKey, sortableDataTypeKeyValues )

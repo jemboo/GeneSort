@@ -94,6 +94,16 @@ type msasM =
                 intArrays
 
 
+    member this.MakeSortableUint8v512Test : sortableUint8v512Test =
+        let intArrays = SortableIntArray.getMergeTestCases 
+                            this.SortingWidth
+                            this.MergeDimension
+                            this.mergeFillType
+
+        SortableUint8v512Test.fromIntArrays 
+                (%this.id |> UMX.tag<sorterTestId>) 
+                this.SortingWidth
+                intArrays
 
 
 

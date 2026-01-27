@@ -56,7 +56,10 @@ module CeBlockOps =
             CeBlockOpsPacked.evalAndCollectResults packedTs ceBlock
 
         | sortableTest.Uint8v256 su8v256ts ->
-            failwith "CeBlockOps: evalWithSorterTest not implemented for sortableUint8v256Test"
+            CeBlockOpsSIMD256.evalAndCollectResults su8v256ts [| ceBlock |] |> Array.head
+
+        | sortableTest.Uint8v512 su8by512ts ->
+            CeBlockOpsSIMD512.evalAndCollectResults su8by512ts [| ceBlock |] |> Array.head
 
 
 
@@ -92,5 +95,11 @@ module CeBlockOps =
                     CeBlockOpsSIMD256.evalAndCollectResults su8v256ts ceBlocks
                 else
                     CeBlockOpsSIMD256.eval su8v256ts ceBlocks
+
+        | sortableTest.Uint8v512 su8by512ts ->
+                if collectResults then
+                    CeBlockOpsSIMD512.evalAndCollectResults su8by512ts ceBlocks
+                else
+                    CeBlockOpsSIMD512.eval su8by512ts ceBlocks
 
 

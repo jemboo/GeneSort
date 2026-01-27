@@ -61,154 +61,85 @@ module CeBlockOpsSIMD256 =
         hashes
 
 
-    let evalSimdSortBlockChunks
-        (simdSortBlockChunks: simd256SortBlock array seq) 
-        (ceBlocks: ceBlock array) 
-        : ceBlockEval [] =
+    let evalSimdSortBlocks
+            (simdSortBlocks: simd256SortBlock seq) 
+            (ceBlocks: ceBlock array) 
+            : ceBlockEval [] =
+    
+            let numNetworks = ceBlocks.Length
+            if numNetworks = 0 then [||] else
 
-        let numNetworks = ceBlocks.Length
-        if numNetworks = 0 then [||] else
+            let maxWidth = ceBlocks |> Array.maxBy (fun c -> %c.SortingWidth) |> (fun c -> %c.SortingWidth)
+            let networkData = ceBlocks |> Array.map (fun ceb -> 
+                {| Lows = ceb.CeArray |> Array.map (fun c -> c.Low)
+                   Highs = ceb.CeArray |> Array.map (fun c -> c.Hi)
+                   CeLen = ceb.CeArray.Length |})
 
-        let maxWidth = ceBlocks |> Array.maxBy (fun c -> %c.SortingWidth) |> (fun c -> %c.SortingWidth)
-        let networkData = ceBlocks |> Array.map (fun ceb -> 
-            {| Lows = ceb.CeArray |> Array.map (fun c -> c.Low)
-               Highs = ceb.CeArray |> Array.map (fun c -> c.Hi)
-               SortingWidth = ceb.SortingWidth
-               CeLen = ceb.CeArray.Length |})
+            let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].Length))
+            let globalUnsorted = Array.zeroCreate<int> numNetworks
 
-        // Final global storage
-        let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].Length))
-        let globalUnsorted = Array.zeroCreate<int> numNetworks
-
-        Parallel.ForEach(
-            simdSortBlockChunks, 
-            // 1. Initialize Thread-Local State
-            (fun () -> 
-                let usage = Array.init numNetworks (fun i -> Array.zeroCreate<int> networkData.[i].CeLen)
-                let unsorted = Array.zeroCreate<int> numNetworks
-                let buffer = Array.zeroCreate<Vector256<uint8>> maxWidth
-                (usage, unsorted, buffer)),
-        
-            // 2. The Hot Loop (ZERO LOCKS)
-            (fun chunk loopState ((localUsage: int [][]), (localUnsorted: int []), workBuffer) ->
-                for bIdx = 0 to chunk.Length - 1 do
-                    let currentBlock = chunk.[bIdx]
+            Parallel.ForEach(
+                simdSortBlocks, 
+                // 1. Initialize Thread-Local State (TLS)
+                (fun () -> 
+                    let usage = Array.init numNetworks (fun i -> Array.zeroCreate<int> networkData.[i].CeLen)
+                    let unsorted = Array.zeroCreate<int> numNetworks
+                    let buffer = Array.zeroCreate<Vector256<uint8>> maxWidth
+                    (usage, unsorted, buffer)),
+    
+                // 2. The Hot Loop
+                // Explicit type annotations for the state tuple to satisfy the F# compiler
+                (fun currentBlock loopState ((localUsage: int [][]), (localUnsorted: int []), (workBuffer: Vector256<uint8> [])) ->
                     let currentLen = currentBlock.Length
-                    Array.blit currentBlock.Vectors 0 workBuffer 0 currentLen
 
                     for nIdx = 0 to numNetworks - 1 do
+                        // Copy source vectors to local work buffer
+                        Array.blit currentBlock.Vectors 0 workBuffer 0 currentLen
                         let data = networkData.[nIdx]
                         let ceCount = data.CeLen
-                        let hashes = Simd256GoldenHashProvider.GetGoldenHashes data.SortingWidth
-                    
-                        // Sorting...
+                        let currentNetUsage = localUsage.[nIdx]
+                
+                        // --- Hot Loop: Compare and Swap ---
                         for cIdx = 0 to ceCount - 1 do
                             let lIdx = data.Lows.[cIdx]
                             let hIdx = data.Highs.[cIdx]
                             let vLow = workBuffer.[lIdx]
                             let vHi = workBuffer.[hIdx]
-                            let vMin = Vector256.Min(vLow, vHi)
                         
+                            let vMin = Vector256.Min(vLow, vHi)
+                
+                            // If vLow is not the minimum, at least one lane swapped
                             if vLow <> vMin then
-                                localUsage.[nIdx].[cIdx] <- localUsage.[nIdx].[cIdx] + 1
+                                currentNetUsage.[cIdx] <- currentNetUsage.[cIdx] + 1
                                 workBuffer.[lIdx] <- vMin
                                 workBuffer.[hIdx] <- Vector256.Max(vLow, vHi)
 
-                        // Verification...
+                        // Verification
                         if not (IsBlockSortedMask currentLen workBuffer) then
                             localUnsorted.[nIdx] <- localUnsorted.[nIdx] + 1
-            
-                (localUsage, localUnsorted, workBuffer)),
-
-            // 3. Final Merge (Happens once per thread at the end)
-            (fun ((localUsage: int [][]), (localUnsorted: int []), _) ->
-                for nIdx = 0 to numNetworks - 1 do
-                    Interlocked.Add(&globalUnsorted.[nIdx], localUnsorted.[nIdx]) |> ignore
-                    let globalArr = globalUsage.[nIdx]
-                    for i = 0 to localUsage.[nIdx].Length - 1 do
-                        globalArr.IncrementAtomicBy (i |> UMX.tag) localUsage.[nIdx].[i]
-            )
-        ) |> ignore
-
-        // 3. Assemble final domain objects
-        Array.init numNetworks (fun i ->
-            ceBlockEval.create 
-                ceBlocks.[i] 
-                globalUsage.[i] 
-                (globalUnsorted.[i] |> UMX.tag) 
-                None
-        )
-
-
-    let evalSimdSortBlocks
-        (simdSortBlocks: simd256SortBlock seq) 
-        (ceBlocks: ceBlock array) 
-        : ceBlockEval [] =
-    
-        let numNetworks = ceBlocks.Length
-        if numNetworks = 0 then [||] else
-
-        let maxWidth = ceBlocks |> Array.maxBy (fun c -> %c.SortingWidth) |> (fun c -> %c.SortingWidth)
-        let networkData = ceBlocks |> Array.map (fun ceb -> 
-            {| Lows = ceb.CeArray |> Array.map (fun c -> c.Low)
-               Highs = ceb.CeArray |> Array.map (fun c -> c.Hi)
-               CeLen = ceb.CeArray.Length |})
-
-        let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].Length))
-        let globalUnsorted = Array.zeroCreate<int> numNetworks
-
-        Parallel.ForEach(
-            simdSortBlocks, 
-            (fun () -> 
-                let usage = Array.init numNetworks (fun i -> Array.zeroCreate<int> networkData.[i].CeLen)
-                let unsorted = Array.zeroCreate<int> numNetworks
-                let buffer = Array.zeroCreate<Vector256<uint8>> maxWidth
-                (usage, unsorted, buffer)),
-    
-            (fun currentBlock loopState ((localUsage: int [][]), (localUnsorted: int []), workBuffer) ->
-                let currentLen = currentBlock.Length
-            
-                // Re-use the same local buffer to avoid allocations
-                Array.blit currentBlock.Vectors 0 workBuffer 0 currentLen
-
-                for nIdx = 0 to numNetworks - 1 do
-                    let data = networkData.[nIdx]
-                    let ceCount = data.CeLen
                 
-                    // --- Hot Loop: CAS Sorting ---
-                    // We keep this loop as clean as possible
-                    for cIdx = 0 to ceCount - 1 do
-                        let lIdx = data.Lows.[cIdx]
-                        let hIdx = data.Highs.[cIdx]
-                        let vLow = workBuffer.[lIdx]
-                        let vHi = workBuffer.[hIdx]
-                        let vMin = Vector256.Min(vLow, vHi)
-                
-                        if vLow <> vMin then
-                            localUsage.[nIdx].[cIdx] <- localUsage.[nIdx].[cIdx] + 1
-                            workBuffer.[lIdx] <- vMin
-                            workBuffer.[hIdx] <- Vector256.Max(vLow, vHi)
+                    // RETURN the state so it is available for the next iteration/merge
+                    (localUsage, localUnsorted, workBuffer)),
 
-                    // --- Simple Verification ---
-                    // Since we don't need to know WHICH lane failed, 
-                    // this mask-based check is the finish line.
-                    if not (IsBlockSortedMask currentLen workBuffer) then
-                        localUnsorted.[nIdx] <- localUnsorted.[nIdx] + 1
-            
-                (localUsage, localUnsorted, workBuffer)),
+                // 3. Final Merge (TLS to Global)
+                (fun ((localUsage: int [][]), (localUnsorted: int []), _) ->
+                    for nIdx = 0 to numNetworks - 1 do
+                        // Merge unsorted counts
+                        if localUnsorted.[nIdx] > 0 then
+                            Interlocked.Add(&globalUnsorted.[nIdx], localUnsorted.[nIdx]) |> ignore
+                    
+                        // Merge usage counts
+                        let globalArr = globalUsage.[nIdx]
+                        let threadLocalArr = localUsage.[nIdx]
+                        for i = 0 to threadLocalArr.Length - 1 do
+                            if threadLocalArr.[i] > 0 then
+                                globalArr.IncrementAtomicBy (i |> UMX.tag) threadLocalArr.[i]
+                )
+            ) |> ignore
 
-            (fun ((localUsage: int [][]), (localUnsorted: int []), _) ->
-                for nIdx = 0 to numNetworks - 1 do
-                    Interlocked.Add(&globalUnsorted.[nIdx], localUnsorted.[nIdx]) |> ignore
-                    let globalArr = globalUsage.[nIdx]
-                    for i = 0 to localUsage.[nIdx].Length - 1 do
-                        globalArr.IncrementAtomicBy (i |> UMX.tag) localUsage.[nIdx].[i]
+            Array.init numNetworks (fun i ->
+                ceBlockEval.create ceBlocks.[i] globalUsage.[i] (globalUnsorted.[i] |> UMX.tag) None
             )
-        ) |> ignore
-
-        Array.init numNetworks (fun i ->
-            ceBlockEval.create ceBlocks.[i] globalUsage.[i] (globalUnsorted.[i] |> UMX.tag) None
-        )
 
 
     let eval 
@@ -246,106 +177,6 @@ module CeBlockOpsSIMD256 =
                 for i = 0 to obj.Length - 1 do
                     h <- h * 31 + hash (obj.[i])
                 h
-
-
-
-
-    let evalChunkedAndCollectUniqueFailures
-        (simdSortBlockChunks: simd256SortBlock array seq) 
-        (ceBlocks: ceBlock array) 
-        : ceBlockEval [] =
-
-        let numNetworks = ceBlocks.Length
-        if numNetworks = 0 then [||] else
-
-        let maxWidth = ceBlocks |> Array.maxBy (fun c -> %c.SortingWidth) |> (fun c -> %c.SortingWidth)
-        let networkData = ceBlocks |> Array.map (fun ceb -> 
-            {| Lows = ceb.CeArray |> Array.map (fun c -> c.Low)
-               Highs = ceb.CeArray |> Array.map (fun c -> c.Hi)
-               SortingWidth = ceb.SortingWidth
-               CeLen = ceb.CeArray.Length |})
-
-        // Final global storage
-        let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].Length))
-        let globalUnsorted = Array.zeroCreate<int> numNetworks
-        let failureSets = Array.init numNetworks (fun _ -> ConcurrentDictionary<int[], byte>(ArrayContentComparer<int>()))
-
-        Parallel.ForEach(
-            simdSortBlockChunks, 
-            // 1. Initialize Thread-Local State
-            (fun () -> 
-                let usage = Array.init numNetworks (fun i -> Array.zeroCreate<int> networkData.[i].CeLen)
-                let unsorted = Array.zeroCreate<int> numNetworks
-                let buffer = Array.zeroCreate<Vector256<uint8>> maxWidth
-                (usage, unsorted, buffer)),
-        
-            // 2. The Hot Loop (ZERO LOCKS)
-            (fun chunk loopState ((localUsage: int [][]), (localUnsorted: int []), workBuffer) ->
-                for bIdx = 0 to chunk.Length - 1 do
-                    let currentBlock = chunk.[bIdx]
-                    let currentLen = currentBlock.Length
-                    Array.blit currentBlock.Vectors 0 workBuffer 0 currentLen
-
-                    for nIdx = 0 to numNetworks - 1 do
-                        let data = networkData.[nIdx]
-                        let ceCount = data.CeLen
-                        let hashes = Simd256GoldenHashProvider.GetGoldenHashes data.SortingWidth
-                    
-                        // Sorting...
-                        for cIdx = 0 to ceCount - 1 do
-                            let lIdx = data.Lows.[cIdx]
-                            let hIdx = data.Highs.[cIdx]
-                            let vLow = workBuffer.[lIdx]
-                            let vHi = workBuffer.[hIdx]
-                            let vMin = Vector256.Min(vLow, vHi)
-                        
-                            if vLow <> vMin then
-                                localUsage.[nIdx].[cIdx] <- localUsage.[nIdx].[cIdx] + 1
-                                workBuffer.[lIdx] <- vMin
-                                workBuffer.[hIdx] <- Vector256.Max(vLow, vHi)
-
-                        // Verification...
-                        if not (IsBlockSortedMask currentLen workBuffer) then
-                            localUnsorted.[nIdx] <- localUnsorted.[nIdx] + 1
-                            let currentHashes = computeLaneHashes32 currentLen workBuffer
-                            for lane = 0 to currentBlock.SortableCount - 1 do
-                                if currentHashes.[lane] <> hashes.[lane] then
-                                    let laneArray = Array.init currentLen (fun i -> int (workBuffer.[i].GetElement(lane)))
-                                    failureSets.[nIdx].TryAdd(laneArray, 0uy) |> ignore
-            
-                (localUsage, localUnsorted, workBuffer)),
-
-            // 3. Final Merge (Happens once per thread at the end)
-            (fun ((localUsage: int [][]), (localUnsorted: int []), _) ->
-                for nIdx = 0 to numNetworks - 1 do
-                    Interlocked.Add(&globalUnsorted.[nIdx], localUnsorted.[nIdx]) |> ignore
-                    let globalArr = globalUsage.[nIdx]
-                    for i = 0 to localUsage.[nIdx].Length - 1 do
-                        globalArr.IncrementAtomicBy (i |> UMX.tag) localUsage.[nIdx].[i]
-            )
-        ) |> ignore
-
-        // 3. Assemble final domain objects
-        Array.init numNetworks (fun i ->
-            let uniqueFailures = failureSets.[i].Keys |> Seq.toArray
-            let failTest = 
-                if uniqueFailures.Length > 0 then
-                    let sw = ceBlocks.[i].SortingWidth
-                    let sss = int sw |> UMX.tag<symbolSetSize>
-                    uniqueFailures 
-                    |> Array.map (fun arr -> sortableIntArray.create(arr, sw, sss))
-                    |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sw
-                    |> sortableTest.Ints
-                    |> Some
-                else None
-
-            ceBlockEval.create 
-                ceBlocks.[i] 
-                globalUsage.[i] 
-                (globalUnsorted.[i] |> UMX.tag) 
-                failTest
-        )
-
 
     let evalAndCollectUniqueFailures
         (simdSortBlocks: simd256SortBlock seq) 
@@ -385,10 +216,11 @@ module CeBlockOpsSIMD256 =
             (fun currentBlock loopState ((localUsage: int [][]), (localUnsorted: int []), workBuffer) ->
                 let currentLen = currentBlock.Length
             
-                // Blit current vectors into the reusable thread-local buffer
-                Array.blit currentBlock.Vectors 0 workBuffer 0 currentLen
+
 
                 for nIdx = 0 to numNetworks - 1 do
+                    // Blit current vectors into the reusable thread-local buffer
+                    Array.blit currentBlock.Vectors 0 workBuffer 0 currentLen
                     let data = networkData.[nIdx]
                     let ceCount = data.CeLen
                     let goldenHashes = Simd256GoldenHashProvider.GetGoldenHashes data.SortingWidth
