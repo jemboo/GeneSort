@@ -30,7 +30,6 @@ type runParameters =
     static member runFinishedKey = "RunFinished"
     static member sorterCountKey = "SorterCount"
     static member sorterModelTypeKey = "SorterModelType"
-    static member sortableArrayTypeKey = "SortableArrayType"
     static member sortingWidthKey = "SortingWidth"
     static member sortableCountKey = "SortableCount"
     static member sortableDataFormatKey = "SortableDataFormat"

@@ -188,58 +188,59 @@ module SortableIntArray =
                         sortableIntArray.create(z1Vals, sia.SortingWidth, 2 |> UMX.tag<symbolSetSize>))
 
 
-    /// Returns all possible sortableBoolArray instances for a given sorting width.
-    /// <exception cref="ArgumentException">Thrown when sortingWidth is negative.</exception>
-    let getAllSortableBoolArrays (sortingWidth: int<sortingWidth>) : sortableIntArray[] =
-        if sortingWidth < 0<sortingWidth> then
-            invalidArg "sortingWidth" "Sorting width must be non-negative."
-        let count = pown 2 (int sortingWidth)
-        let result = Array.zeroCreate count
-        for i = 0 to count - 1 do
-            let z1Vals = Array.init (int sortingWidth) (fun j -> (i >>> j) &&& 1)
-            result.[i] <- sortableIntArray.create(z1Vals, sortingWidth, 2 |> UMX.tag<symbolSetSize>)
-        result
-
-    let getAllSortedSortableBoolArrays (sortingWidth: int<sortingWidth>) : sortableIntArray[] =
-        if sortingWidth < 0<sortingWidth> then
-            invalidArg "sortingWidth" "Sorting width must be non-negative."
-        let n = int sortingWidth
-        Array.init (n + 1) (fun k ->
-            let z1Vals = Array.init n (fun i -> if i >= n - k then 1 else 0)
-            sortableIntArray.create(z1Vals, sortingWidth, 2 |> UMX.tag<symbolSetSize>))
+        /// Returns all possible sortableBoolArray instances for a given sorting width.
+        /// <exception cref="ArgumentException">Thrown when sortingWidth is negative.</exception>
+        let getAllSortableBinaryArrays (sortingWidth: int<sortingWidth>) : sortableIntArray[] =
+            if sortingWidth < 0<sortingWidth> then
+                invalidArg "sortingWidth" "Sorting width must be non-negative."
+            let count = pown 2 (int sortingWidth)
+            let result = Array.zeroCreate count
+            for i = 0 to count - 1 do
+                let z1Vals = Array.init (int sortingWidth) (fun j -> (i >>> j) &&& 1)
+                result.[i] <- sortableIntArray.create(z1Vals, sortingWidth, 2 |> UMX.tag<symbolSetSize>)
+            result
 
 
-    let fromLatticePoint 
-                (p: GeneSort.Core.latticePoint) 
-                (maxValue:int<latticeDistance>) : sortableIntArray =
-        let z1Vals = 
-                [| 
-                    for x in p.Coords -> 
-                        [| for y in 0 .. (%maxValue - 1) -> if y < x then 1 else 0 |] |> Array.rev
-                |] 
-                |> Array.concat
+        let getAllSortedSortableBoolArrays (sortingWidth: int<sortingWidth>) : sortableIntArray[] =
+            if sortingWidth < 0<sortingWidth> then
+                invalidArg "sortingWidth" "Sorting width must be non-negative."
+            let n = int sortingWidth
+            Array.init (n + 1) (fun k ->
+                let z1Vals = Array.init n (fun i -> if i >= n - k then 1 else 0)
+                sortableIntArray.create(z1Vals, sortingWidth, 2 |> UMX.tag<symbolSetSize>))
+
+
+        let fromLatticePoint 
+                    (p: GeneSort.Core.latticePoint) 
+                    (maxValue:int<latticeDistance>) : sortableIntArray =
+            let z1Vals = 
+                    [| 
+                        for x in p.Coords -> 
+                            [| for y in 0 .. (%maxValue - 1) -> if y < x then 1 else 0 |] |> Array.rev
+                    |] 
+                    |> Array.concat
                     
-        sortableIntArray.create(z1Vals, (%p.Dimension * %maxValue) |> UMX.tag<sortingWidth>, 2 |> UMX.tag<symbolSetSize>)
+            sortableIntArray.create(z1Vals, (%p.Dimension * %maxValue) |> UMX.tag<sortingWidth>, 2 |> UMX.tag<symbolSetSize>)
 
 
-    let fromLatticeCubeFull 
-                (dim:int<latticeDimension>) 
-                (maxValue:int<latticeDistance>) : sortableIntArray[] =
-        let latticePoints = 
-            GeneSort.Core.LatticePoint.latticeCube dim maxValue
-            |> Seq.toArray
+        let fromLatticeCubeFull 
+                    (dim:int<latticeDimension>) 
+                    (maxValue:int<latticeDistance>) : sortableIntArray[] =
+            let latticePoints = 
+                GeneSort.Core.LatticePoint.latticeCube dim maxValue
+                |> Seq.toArray
 
-        latticePoints
-        |> Array.map (fun p -> fromLatticePoint p maxValue)
+            latticePoints
+            |> Array.map (fun p -> fromLatticePoint p maxValue)
 
 
-    let fromLatticeCubeVV 
-                (dim:int<latticeDimension>) 
-                (maxValue:int<latticeDistance>) : sortableIntArray[] =
-        let latticePoints = 
-            GeneSort.Core.LatticePoint.latticeCube dim maxValue
-            |> Seq.filter GeneSort.Core.LatticePoint.isNonDecreasing
-            |> Seq.toArray
+        let fromLatticeCubeVV 
+                    (dim:int<latticeDimension>) 
+                    (maxValue:int<latticeDistance>) : sortableIntArray[] =
+            let latticePoints = 
+                GeneSort.Core.LatticePoint.latticeCube dim maxValue
+                |> Seq.filter GeneSort.Core.LatticePoint.isNonDecreasing
+                |> Seq.toArray
 
-        latticePoints
-        |> Array.map (fun p -> fromLatticePoint p maxValue)
+            latticePoints
+            |> Array.map (fun p -> fromLatticePoint p maxValue)

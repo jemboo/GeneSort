@@ -76,25 +76,25 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 
 
 /// **********     MergeIntQa   ****************
-let project = MergeIntQa.project
-let executor = MergeIntQa.executor
-let projectName = MergeIntQa.projectName
-let projectFolder = MergeIntQa.projectFolder
-let buildQueryParams = MergeIntQa.makeQueryParamsFromRunParams
-let paramRefiner = MergeIntQa.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+//let project = MergeIntQa.project
+//let executor = MergeIntQa.executor
+//let projectName = MergeIntQa.projectName
+//let projectFolder = MergeIntQa.projectFolder
+//let buildQueryParams = MergeIntQa.makeQueryParamsFromRunParams
+//let paramRefiner = MergeIntQa.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 ///// **********    FullBoolEvals   ****************
-//let executor = FullBoolEvals.executor
-//let project = FullBoolEvals.project
-//let projectName = FullBoolEvals.project.ProjectName
-//let projectFolder = FullBoolEvals.projectFolder
-//let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
-//let paramRefiner = FullBoolEvals.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+let executor = FullBoolEvals.executor
+let project = FullBoolEvals.project
+let projectName = FullBoolEvals.project.ProjectName
+let projectFolder = FullBoolEvals.projectFolder
+let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
+let paramRefiner = FullBoolEvals.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
 

@@ -5,6 +5,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
+open GeneSort.Sorting.Sortable.SortableIntArray
 
 // MsasF = a full bool test set for a given sorting width
 [<Struct; CustomEquality; NoComparison>]
@@ -48,6 +49,30 @@ type msasF =
                 ( %this.id |> UMX.tag<sorterTestId>) 
                 sortingWidth
                 sortableArrays
+
+    member this.MakeSortableIntTest (sortingWidth: int<sortingWidth>) : sortableIntTest =
+        let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
+        sortableIntTest.create
+                ( %this.id |> UMX.tag<sorterTestId>) 
+                sortingWidth
+                sortableArrays
+
+
+    member this.MakeSortableUint8v256Test (sortingWidth: int<sortingWidth>) : sortableUint8v256Test =
+        let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
+        SortableUint8v256Test.fromIntArrays
+                ( %this.id |> UMX.tag<sorterTestId>) 
+                sortingWidth
+                sortableArrays
+
+    member this.MakeSortableUint8v512Test (sortingWidth: int<sortingWidth>) : sortableUint8v512Test =
+        let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
+        SortableUint8v512Test.fromIntArrays
+                ( %this.id |> UMX.tag<sorterTestId>) 
+                sortingWidth
+                sortableArrays
+
+
 
 module MsasF = ()
  

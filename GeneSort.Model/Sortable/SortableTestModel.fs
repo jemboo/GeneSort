@@ -29,13 +29,13 @@ module SortableTestModel =
         | MsasF msasF -> 
                 match sortableDataType with
                 | sortableDataFormat.BoolArray ->        
-                        msasF.MakeSortableBoolTest (getSortingWidth sortableTestModel) |> sortableTest.Bools
+                    msasF.MakeSortableBoolTest (getSortingWidth sortableTestModel) |> sortableTest.Bools
                 | sortableDataFormat.IntArray ->
-                    failwith "Ints SortableArrayType not supported"
+                    msasF.MakeSortableIntTest (getSortingWidth sortableTestModel) |> sortableTest.Ints  
                 | sortableDataFormat.Int8Vector256 ->
-                    failwith "Int8Vector256 SortableArrayType not supported"
+                    msasF.MakeSortableUint8v256Test (getSortingWidth sortableTestModel) |> sortableTest.Uint8v256
                 | _ -> 
-                    failwith "Unsupported SortableArrayType for MsasF"
+                    msasF.MakeSortableUint8v512Test (getSortingWidth sortableTestModel) |> sortableTest.Uint8v512
 
         | MsasO msasO ->
                 match sortableDataType with
