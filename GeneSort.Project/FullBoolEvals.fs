@@ -115,6 +115,7 @@ module FullBoolEvals =
                         sortableDataFormat.BoolArray;
                         sortableDataFormat.Int8Vector256;
                         sortableDataFormat.Int8Vector512;
+                        sortableDataFormat.BitVector512;
 
                      ] |> List.map SortableDataFormat.toString
         (runParameters.sortableDataFormatKey, values)

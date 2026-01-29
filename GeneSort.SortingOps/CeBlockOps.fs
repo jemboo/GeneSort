@@ -69,12 +69,12 @@ module CeBlockOps =
                 (collectResults: bool) : ceBlockEval [] =
 
         match sortableTs with
-        | sortableTest.Ints sits ->
-            ceBlocks |> Array.map (fun ceBlock ->
+
+        | sortableTest.Bitv512 su8v256ts ->
                 if collectResults then
-                    CeBlockOpsInt.evalAndCollectResults sits ceBlock
+                    CeBlockOpsBitv512.evalAndCollectResults su8v256ts ceBlocks
                 else
-                    CeBlockOpsInt.eval sits ceBlock)
+                    CeBlockOpsBitv512.eval su8v256ts ceBlocks
 
         | sortableTest.Bools sbts ->
             ceBlocks |> Array.map (fun ceBlock ->
@@ -82,6 +82,13 @@ module CeBlockOps =
                     CeBlockOpsBinary.evalAndCollectResults sbts ceBlock
                 else
                     CeBlockOpsBinary.eval sbts ceBlock)
+
+        | sortableTest.Ints sits ->
+            ceBlocks |> Array.map (fun ceBlock ->
+                if collectResults then
+                    CeBlockOpsInt.evalAndCollectResults sits ceBlock
+                else
+                    CeBlockOpsInt.eval sits ceBlock)
 
         | sortableTest.PackedInts packedTs ->
             ceBlocks |> Array.map (fun ceBlock ->

@@ -22,23 +22,29 @@ module SortableTestModel =
 
     let makeSortableTests 
             (sortableTestModel: sortableTestModel) 
-            (sortableDataType: sortableDataFormat) : sortableTest =
+            (sortableDataFormat: sortableDataFormat) : sortableTest =
 
         match sortableTestModel with
 
         | MsasF msasF -> 
-                match sortableDataType with
+                match sortableDataFormat with
                 | sortableDataFormat.BoolArray ->        
                     msasF.MakeSortableBoolTest (getSortingWidth sortableTestModel) |> sortableTest.Bools
                 | sortableDataFormat.IntArray ->
-                    msasF.MakeSortableIntTest (getSortingWidth sortableTestModel) |> sortableTest.Ints  
+                    msasF.MakeSortableIntTest (getSortingWidth sortableTestModel) |> sortableTest.Ints
+                | sortableDataFormat.BitVector256 ->
+                    failwith "BitVector256 SortableArrayType not supported"
+                | sortableDataFormat.BitVector512 ->
+                    msasF.MakeSortableBitv512Test (getSortingWidth sortableTestModel) |> sortableTest.Bitv512
                 | sortableDataFormat.Int8Vector256 ->
                     msasF.MakeSortableUint8v256Test (getSortingWidth sortableTestModel) |> sortableTest.Uint8v256
-                | _ -> 
+                | sortableDataFormat.Int8Vector512  -> 
                     msasF.MakeSortableUint8v512Test (getSortingWidth sortableTestModel) |> sortableTest.Uint8v512
+                | sortableDataFormat.PackedIntArray ->
+                    failwith "PackedIntArray SortableArrayType not supported"
 
         | MsasO msasO ->
-                match sortableDataType with
+                match sortableDataFormat with
                 | sortableDataFormat.BoolArray ->        
                      msasO.MakeSortableBoolTest (getSortingWidth sortableTestModel) |> sortableTest.Bools
                 | sortableDataFormat.IntArray ->
@@ -49,7 +55,7 @@ module SortableTestModel =
                     failwith "Unsupported SortableArrayType for MsasO"
 
         | MsasMi msasMi ->
-                match sortableDataType with
+                match sortableDataFormat with
                 | sortableDataFormat.BoolArray ->        
                     msasMi.MakeSortableBoolTest |> sortableTest.Bools
                 | sortableDataFormat.IntArray ->

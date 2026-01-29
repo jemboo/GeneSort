@@ -57,6 +57,12 @@ type msasF =
                 sortingWidth
                 sortableArrays
 
+    member this.MakeSortableBitv512Test (sortingWidth: int<sortingWidth>) : sortableBitv512Test =
+        let grayBlocks = Sortable.GrayVectorGenerator.getAllSortBlockBitv512ForSortingWidth sortingWidth |> Seq.toArray
+        sortableBitv512Test.create
+                ( %this.id |> UMX.tag<sorterTestId>) 
+                sortingWidth
+                grayBlocks
 
     member this.MakeSortableUint8v256Test (sortingWidth: int<sortingWidth>) : sortableUint8v256Test =
         let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
