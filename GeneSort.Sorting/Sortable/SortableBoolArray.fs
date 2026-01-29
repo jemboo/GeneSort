@@ -135,7 +135,7 @@ module SortableBoolArray =
     /// Returns all possible sortableBoolArray instances for a given sorting width.
     /// <exception cref="ArgumentException">Thrown when sortingWidth is negative.</exception>
     let getAllSortableBoolArrays (sortingWidth: int<sortingWidth>) : sortableBoolArray[] =
-        if sortingWidth < 0<sortingWidth> then
+        if sortingWidth < (0<sortingWidth>) then
             invalidArg "sortingWidth" "Sorting width must be non-negative."
         let count = pown 2 (int sortingWidth)
         let result = Array.zeroCreate count

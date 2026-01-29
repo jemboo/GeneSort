@@ -3,7 +3,7 @@ open BenchmarkDotNet.Running
 
 [<EntryPoint>]
 let main argv =
-    let summary = BenchmarkRunner.Run<SorterEvalBench>()
+    let summary = BenchmarkRunner.Run<FullBoolEvalBench>()
 
     printfn "%A" summary
     Console.Read() |> ignore

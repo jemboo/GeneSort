@@ -22,6 +22,10 @@ type sortableBinaryTest =
             sortableBinaryArrays = Array.copy arrays
         }
 
+    static member Empty =
+        let id = Guid.NewGuid() |> UMX.tag<sorterTestId>
+        sortableBinaryTest.create id 0<sortingWidth> [||]
+
     override this.Equals(obj) =
         match obj with
         | :? sortableBinaryTest as other ->

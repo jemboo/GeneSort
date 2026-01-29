@@ -50,12 +50,14 @@ type msasF =
                 sortingWidth
                 sortableArrays
 
+
     member this.MakeSortableIntTest (sortingWidth: int<sortingWidth>) : sortableIntTest =
         let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
         sortableIntTest.create
                 ( %this.id |> UMX.tag<sorterTestId>) 
                 sortingWidth
                 sortableArrays
+
 
     member this.MakeSortableBitv512Test (sortingWidth: int<sortingWidth>) : sortableBitv512Test =
         let grayBlocks = Sortable.GrayVectorGenerator.getAllSortBlockBitv512ForSortingWidth sortingWidth |> Seq.toArray
@@ -64,6 +66,7 @@ type msasF =
                 sortingWidth
                 grayBlocks
 
+
     member this.MakeSortableUint8v256Test (sortingWidth: int<sortingWidth>) : sortableUint8v256Test =
         let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
         SortableUint8v256Test.fromIntArrays
@@ -71,13 +74,13 @@ type msasF =
                 sortingWidth
                 sortableArrays
 
+
     member this.MakeSortableUint8v512Test (sortingWidth: int<sortingWidth>) : sortableUint8v512Test =
         let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
         SortableUint8v512Test.fromIntArrays
                 ( %this.id |> UMX.tag<sorterTestId>) 
                 sortingWidth
                 sortableArrays
-
 
 
 module MsasF = ()
