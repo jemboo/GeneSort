@@ -11,7 +11,7 @@ open System
 open System.Threading
 
 
-module CeBlockOpsSIMD256 =
+module CeBlockOpsUint8v256 =
 
     /// Check if all 32 lanes in the block are sorted.
     let IsBlockSorted (len: int) (vectors: Vector256<uint8>[]) =
@@ -62,7 +62,7 @@ module CeBlockOpsSIMD256 =
 
 
     let evalSimdSortBlocks
-            (simdSortBlocks: simd256SortBlock seq) 
+            (simdSortBlocks: SortBlockUint8v256 seq) 
             (ceBlocks: ceBlock array) 
             : ceBlockEval [] =
     
@@ -179,7 +179,7 @@ module CeBlockOpsSIMD256 =
                 h
 
     let evalAndCollectUniqueFailures
-        (simdSortBlocks: simd256SortBlock seq) 
+        (simdSortBlocks: SortBlockUint8v256 seq) 
         (ceBlocks: ceBlock array) 
         : ceBlockEval [] =
     

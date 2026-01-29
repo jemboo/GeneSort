@@ -10,7 +10,7 @@ open System.Collections.Generic
 open System
 open System.Threading
 
-module CeBlockOpsSIMD512 =
+module CeBlockOpsUint8v512 =
 
     /// Check if all 64 lanes in the block are sorted.
     let IsBlockSorted (len: int) (vectors: Vector512<uint8>[]) =
@@ -77,7 +77,7 @@ module CeBlockOpsSIMD512 =
                 h
 
     let evalSimdSortBlocks
-        (simdSortBlocks: simd512SortBlock seq) 
+        (simdSortBlocks: SortBlockUint8v512 seq) 
         (ceBlocks: ceBlock array) 
         : ceBlockEval [] =
     
@@ -140,7 +140,7 @@ module CeBlockOpsSIMD512 =
         )
 
     let evalAndCollectUniqueFailures
-        (simdSortBlocks: simd512SortBlock seq) 
+        (simdSortBlocks: SortBlockUint8v512 seq) 
         (ceBlocks: ceBlock array) 
         : ceBlockEval [] =
     

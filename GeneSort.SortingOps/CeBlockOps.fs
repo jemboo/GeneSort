@@ -56,10 +56,10 @@ module CeBlockOps =
             CeBlockOpsPacked.evalAndCollectResults packedTs ceBlock
 
         | sortableTest.Uint8v256 su8v256ts ->
-            CeBlockOpsSIMD256.evalAndCollectResults su8v256ts [| ceBlock |] |> Array.head
+            CeBlockOpsUint8v256.evalAndCollectResults su8v256ts [| ceBlock |] |> Array.head
 
         | sortableTest.Uint8v512 su8by512ts ->
-            CeBlockOpsSIMD512.evalAndCollectResults su8by512ts [| ceBlock |] |> Array.head
+            CeBlockOpsUint8v512.evalAndCollectResults su8by512ts [| ceBlock |] |> Array.head
 
 
 
@@ -92,14 +92,14 @@ module CeBlockOps =
 
         | sortableTest.Uint8v256 su8v256ts ->
                 if collectResults then
-                    CeBlockOpsSIMD256.evalAndCollectResults su8v256ts ceBlocks
+                    CeBlockOpsUint8v256.evalAndCollectResults su8v256ts ceBlocks
                 else
-                    CeBlockOpsSIMD256.eval su8v256ts ceBlocks
+                    CeBlockOpsUint8v256.eval su8v256ts ceBlocks
 
         | sortableTest.Uint8v512 su8by512ts ->
                 if collectResults then
-                    CeBlockOpsSIMD512.evalAndCollectResults su8by512ts ceBlocks
+                    CeBlockOpsUint8v512.evalAndCollectResults su8by512ts ceBlocks
                 else
-                    CeBlockOpsSIMD512.eval su8by512ts ceBlocks
+                    CeBlockOpsUint8v512.eval su8by512ts ceBlocks
 
 

@@ -12,8 +12,9 @@
     <Compile Include="CeBlockOpsInt.fs" />
     <Compile Include="CeBlockOpsBinary.fs" />
     <Compile Include="CeBlockOpsPacked.fs" />
-    <Compile Include="CeBlockOpsSIMD256.fs" />
-    <Compile Include="CeBlockOpsSIMD512.fs" />
+    <Compile Include="CeBlockOpsBitv512.fs" />
+    <Compile Include="CeBlockOpsUint8v256.fs" />
+    <Compile Include="CeBlockOpsUint8v512.fs" />
     <Compile Include="CeBlockOps.fs" />
     <Compile Include="SorterEval.fs" />
     <Compile Include="SorterSetEval.fs" />

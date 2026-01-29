@@ -11,13 +11,13 @@ type sortableUint8v256Test =
     private { 
         id: Guid<sorterTestId>
         sortingWidth: int<sortingWidth>
-        simdSortBlocks: simd256SortBlock[]
+        simdSortBlocks: SortBlockUint8v256[]
     }
 
     static member create 
             (id: Guid<sorterTestId>) 
             (sw: int<sortingWidth>) 
-            (blocks: simd256SortBlock[]) =
+            (blocks: SortBlockUint8v256[]) =
         { id = id
           sortingWidth = sw
           simdSortBlocks = blocks }
@@ -48,7 +48,7 @@ module SortableUint8v256Test =
         let totalTests = allTests.Length
         // Calculate how many SIMD blocks we need (32 lanes per block)
         let totalBlocksCount = (totalTests + 31) / 32
-        let blocks = Array.zeroCreate<simd256SortBlock> totalBlocksCount
+        let blocks = Array.zeroCreate<SortBlockUint8v256> totalBlocksCount
 
         // Parallel Pack: use all cores to build the blocks
         Parallel.For(0, totalBlocksCount, (fun i ->
@@ -56,7 +56,7 @@ module SortableUint8v256Test =
             let length = min 32 (totalTests - startIdx)
             // Extract the slice for this block
             let slice = Array.sub allTests startIdx length
-            blocks.[i] <- simd256SortBlock.createFromIntArrays sw slice
+            blocks.[i] <- SortBlockUint8v256.createFromIntArrays sw slice
         )) |> ignore
 
         sortableUint8v256Test.create id sw blocks

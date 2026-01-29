@@ -9,7 +9,7 @@ open System.Runtime.Intrinsics.X86
 open System.Collections.Concurrent
 
 [<Struct>]
-type simd256SortBlock = 
+type SortBlockUint8v256 = 
     private { 
         vectors: Vector256<uint8>[] 
         sortableCount: int 
@@ -44,7 +44,7 @@ type simd256SortBlock =
     member this.SortableCount = this.sortableCount
 
 
-module Simd256SortBlock = 
+module SortBlockUint8v256 = 
 
     /// Computes 32 independent 32-bit hashes (one per lane) across all vectors in a block.
     let computeLaneHashes32 (vectors: Vector256<uint8>[]) : uint32[] =
@@ -103,10 +103,10 @@ module Simd256GoldenHashProvider =
         let vectors = Array.init w (fun i -> Vector256.Create(byte i))
         
         // We use the createFromVectors we added to simdSortBlock earlier
-        let tempBlock = simd256SortBlock.createFromVectors vectors 32
+        let tempBlock = SortBlockUint8v256.createFromVectors vectors 32
         
         // ComputeLaneHashes32 is the method using UnpackLow/High + MultiplyLow
-        Simd256SortBlock.computeLaneHashes32 tempBlock.Vectors
+        SortBlockUint8v256.computeLaneHashes32 tempBlock.Vectors
 
     /// Memoized access to the golden hashes. 
     /// Returns 32 uint32 values representing the 'sorted' state of each lane.

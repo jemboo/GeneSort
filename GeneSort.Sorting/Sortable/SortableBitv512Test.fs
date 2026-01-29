@@ -3,21 +3,19 @@
 open System
 open FSharp.UMX
 open GeneSort.Sorting
-open System.Threading.Tasks
-open System.Runtime.Intrinsics
 
 [<Struct>]
 type sortableBitv512Test =
     private { 
         id: Guid<sorterTestId>
         sortingWidth: int<sortingWidth>
-        simdSortBlocks: simd512SortBlock[]
+        simdSortBlocks: sortBlockBitv512[] 
     }
 
     static member create 
             (id: Guid<sorterTestId>) 
             (sw: int<sortingWidth>) 
-            (blocks: simd512SortBlock[]) =
+            (blocks: sortBlockBitv512[]) =
         { id = id
           sortingWidth = sw
           simdSortBlocks = blocks }

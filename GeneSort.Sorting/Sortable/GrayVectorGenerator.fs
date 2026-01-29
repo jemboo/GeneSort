@@ -1,6 +1,5 @@
 ﻿namespace GeneSort.Sorting.Sortable
 
-open System
 open System.Runtime.Intrinsics
 open FSharp.UMX
 open GeneSort.Sorting
@@ -8,60 +7,56 @@ open GeneSort.Sorting.Sortable
 
 module GrayVectorGenerator =
 
-    /// Generates the base block where bits 0-63 are a Gray code sequence.
-    /// This fills the 64 lanes of the Vector512.
-    let private generateInitialSeedBlock (sw: int<sortingWidth>) : Vector512<uint8>[] =
-            let width = int sw
-            let vectors = Array.init width (fun _ -> Array.zeroCreate<uint8> 64)
+    /// Seeds exactly 512 Gray code sequences into bit-packed vectors.
+    /// This always generates a full 512-lane block.
+    let private generateInitialSeedBlock (sw: int<sortingWidth>) : Vector512<uint64>[] =
+        let width = %sw
+        let vecs = Array.init width (fun _ -> Array.zeroCreate<uint64> 8)
         
-            for lane = 0 to 63 do
-                let laneUL = uint64 lane
-                // Use the explicit bitwise shift if the operator is being shadowed
-                let gray = laneUL ^^^ (laneUL >>> 1) 
-            
-                for wire = 0 to width - 1 do
-                    let mask = 1uL <<< wire
-                    if (gray &&& mask) <> 0uL then
-                        vectors.[wire].[lane] <- 255uy
-                    else
-                        vectors.[wire].[lane] <- 0uy
+        for i = 0 to 511 do
+            let gray = uint64 i ^^^ (uint64 i >>> 1)
+            let lane = i / 64
+            let bit = i % 64
+            for wire = 0 to width - 1 do
+                if (gray &&& (1uL <<< wire)) <> 0uL then
+                    vecs.[wire].[lane] <- vecs.[wire].[lane] ||| (1uL <<< bit)
         
-            vectors |> Array.map (fun v -> Vector512.Create<uint8>(v))
+        vecs |> Array.map (fun v -> 
+            Vector512.Create(v.[0], v.[1], v.[2], v.[3], v.[4], v.[5], v.[6], v.[7]))
 
 
-    /// Emits a sequence of tests, each containing one block of 64 parallel test cases.
-    let getAllSortableUint8v512TestForSortingWidth 
-        (sw: int<sortingWidth>) : seq<sortableUint8v512Test> =
-        
-        let width = int sw
-        // 2^width total cases / 64 cases per block
-        let totalBlocks = 1uL <<< (max 0 (width - 6))
 
+    /// Yields a sequence of bit-packed blocks covering exactly 2^n cases.
+    let getAllSortBlockBitv512ForSortingWidth (sw: int<sortingWidth>) : seq<sortBlockBitv512> =
+        let width = %sw
+        let totalSequences = 1uL <<< width
+        
         seq {
-            // Start with the seed block (the first 64 Gray codes)
-            let currentVectors = generateInitialSeedBlock sw
-            
-            for blockIdx = 0uL to totalBlocks - 1uL do
-                // 1. Create the SIMD block for the current state
-                // We must copy the vectors because we mutate currentVectors for the next step
-                let block = simd512SortBlock.create sw (Array.copy currentVectors) 64
+            let seedVectors = generateInitialSeedBlock sw
+            let firstBlock = sortBlockBitv512.createFromVectors seedVectors 512
+
+            if totalSequences < 512uL then
+                // CASE 1: The entire 0-1 space is smaller than one block.
+                // We generate the seed and truncate it immediately.
+                yield SortBlockBitv512.truncate firstBlock (int totalSequences)
+            else
+                // CASE 2: The 0-1 space is one or more full 512-lane blocks.
+                let totalBlocks = totalSequences >>> 9
+                let mutable currentVectors = seedVectors
                 
-                let testId = Guid.NewGuid() |> UMX.tag<sorterTestId>
-                yield sortableUint8v512Test.create testId sw [| block |]
+                for blockIdx = 0uL to totalBlocks - 1uL do
+                    // Yield the current full block
+                    yield sortBlockBitv512.createFromVectors (Array.copy currentVectors) 512
 
-                // 2. Compute the flip for the NEXT block
-                // In a Gray sequence of blocks, we flip the bit corresponding 
-                // to the lowest set bit of (blockIdx + 1)
-                if blockIdx < totalBlocks - 1uL then
-                    let mutable c = blockIdx + 1uL
-                    let mutable wireToFlip = 6 // Bits 0-5 are handled by the 64 lanes
-                    while (c &&& 1uL) = 0uL && wireToFlip < width do
-                        c <- c >>> 1
-                        wireToFlip <- wireToFlip + 1
-                    
-                    if wireToFlip < width then
-                        let flipMask = Vector512<uint8>.AllBitsSet
-                        currentVectors.[wireToFlip] <- currentVectors.[wireToFlip] ^^^ flipMask
+                    // Compute flip for next block
+                    if blockIdx < totalBlocks - 1uL then
+                        let mutable c = blockIdx + 1uL
+                        let mutable wireToFlip = 9 
+                        while (c &&& 1uL) = 0uL && wireToFlip < width do
+                            c <- c >>> 1
+                            wireToFlip <- wireToFlip + 1
+                        
+                        if wireToFlip < width then
+                            // XOR with AllBitsSet flips all 512 bits for this wire
+                            currentVectors.[wireToFlip] <- currentVectors.[wireToFlip] ^^^ Vector512<uint64>.AllBitsSet
         }
-
-

@@ -7,7 +7,7 @@ open System.Runtime.Intrinsics
 open System.Collections.Concurrent
 
 [<Struct>]
-type simd512SortBlock = 
+type SortBlockUint8v512 = 
     private { 
         vectors: Vector512<uint8>[] 
         sortableCount: int 
@@ -85,7 +85,7 @@ module Simd512SortBlock =
         result
 
 
-    let toSortableIntArrays (s512: simd512SortBlock) : sortableIntArray[] =
+    let toSortableIntArrays (s512: SortBlockUint8v512) : sortableIntArray[] =
         let result = Array.zeroCreate<sortableIntArray> s512.sortableCount
         
         // Explicitly create spans to avoid FS0406
@@ -117,7 +117,7 @@ module Simd512GoldenHashProvider =
     let private calculateGolden (width: int<sortingWidth>) : uint32[] =
         let w = %width
         let vectors = Array.init w (fun i -> Vector512.Create(byte i))
-        let tempBlock = simd512SortBlock.createFromVectors vectors 64
+        let tempBlock = SortBlockUint8v512.createFromVectors vectors 64
         Simd512SortBlock.computeLaneHashes64 tempBlock.Vectors
 
     let GetGoldenHashes (width: int<sortingWidth>) : uint32[] =

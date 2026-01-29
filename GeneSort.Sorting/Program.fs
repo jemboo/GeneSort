@@ -10,14 +10,14 @@ module Program =
 
     [<EntryPoint>]
     let main argv =
-        let stWidth = 13<sortingWidth>
+        let stWidth = 11<sortingWidth>
 
-        let yab = Sortable.GrayVectorGenerator.getAllSortableUint8v512TestForSortingWidth stWidth |> Seq.toArray
+        let grayBlocks = Sortable.GrayVectorGenerator.getAllSortBlockBitv512ForSortingWidth stWidth |> Seq.toArray
         let sortableInts = 
-            yab |> Array.map (fun su -> 
-                su.SimdSortBlocks |> Array.collect (fun block -> 
-                    Sortable.Simd512SortBlock.toSortableIntArrays block))
-                    |> Array.concat
+                grayBlocks 
+                |> Array.map (fun su -> 
+                    su |> SortBlockBitv512.toSortableIntArrays)
+                |> Array.concat
 
         printfn "Length: %d" sortableInts.Length
 
