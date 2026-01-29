@@ -36,6 +36,8 @@ type mergeFillType =
 
 
 type sortableDataFormat = 
+    | BitVector256
+    | BitVector512
     | BoolArray
     | IntArray
     | PackedIntArray
@@ -47,6 +49,8 @@ module SortableDataFormat =
 
     let toString (t:sortableDataFormat) : string =
         match t with
+        | BitVector256 -> "BitVector256"
+        | BitVector512 -> "BitVector512"
         | Int8Vector256 -> "Int8Vector256"
         | Int8Vector512 -> "Int8Vector512"
         | IntArray -> "Ints"
@@ -54,6 +58,8 @@ module SortableDataFormat =
 
     let fromString (s:string) : sortableDataFormat =
         match s with
+        | "BitVector256" -> BitVector256
+        | "BitVector512" -> BitVector512
         | "Ints" -> IntArray
         | "Bools" -> BoolArray
         | "Int8Vector256" -> Int8Vector256

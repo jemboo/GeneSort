@@ -6,9 +6,10 @@ open GeneSort.Sorting
 
 
 type sortableTest = 
+    | Bitv512 of sortableBitv512Test
+    | Bools of sortableBinaryTest
     | Ints of sortableIntTest
     | PackedInts of packedSortableIntTests
-    | Bools of sortableBinaryTest
     | Uint8v256 of sortableUint8v256Test
     | Uint8v512 of sortableUint8v512Test
 
@@ -17,32 +18,36 @@ module SortableTests =
 
     let getSortableDataFormat (test: sortableTest) : sortableDataFormat =
         match test with
-        | Ints intTest -> intTest.SortableDataFormat
+        | Bitv512 bitv512Test -> bitv512Test.SortableDataFormat
         | Bools boolTest -> boolTest.SortableArrayType
+        | Ints intTest -> intTest.SortableDataFormat
         | PackedInts packedIntTest -> packedIntTest.SortableDataFormat
         | Uint8v256 uint8v256Test -> uint8v256Test.SortableDataFormat
         | Uint8v512 uint8v512Test -> uint8v512Test.SortableDataFormat
 
     let getSortingWidth (test: sortableTest) =
         match test with
-        | Ints intTest -> intTest.SortingWidth
+        | Bitv512 bitv512Test -> bitv512Test.SortingWidth
         | Bools boolTest -> boolTest.SortingWidth
+        | Ints intTest -> intTest.SortingWidth
         | PackedInts packedIntTest -> packedIntTest.SortingWidth
         | Uint8v256 uint8v256Test -> uint8v256Test.SortingWidth
         | Uint8v512 uint8v512Test -> uint8v512Test.SortingWidth
 
     let getId (test: sortableTest) : Guid<sorterTestId> =
         match test with
-        | Ints intTest -> intTest.Id
+        | Bitv512 bitv512Test -> bitv512Test.Id
         | Bools boolTest -> boolTest.Id
+        | Ints intTest -> intTest.Id
         | PackedInts packedIntTest -> packedIntTest.Id
         | Uint8v256 uint8v256Test -> uint8v256Test.Id
         | Uint8v512 uint8v512Test -> uint8v512Test.Id
 
     let getSortableCount (test: sortableTest) : int<sortableCount> =
         match test with
-        | Ints intTest -> intTest.SoratbleCount
+        | Bitv512 bitv512Test -> bitv512Test.SoratbleCount
         | Bools boolTest -> boolTest.SoratbleCount
+        | Ints intTest -> intTest.SoratbleCount
         | PackedInts packedIntTest -> packedIntTest.SoratbleCount
         | Uint8v256 uint8v256Test -> uint8v256Test.SoratbleCount
         | Uint8v512 uint8v512Test -> uint8v512Test.SoratbleCount
@@ -50,12 +55,14 @@ module SortableTests =
 
     let getUnsortedCount (test: sortableTest) =
         match test with
-        | Ints intTest -> intTest.SortableIntArrays 
+        | Bitv512 bitv512Test -> 
+                failwith "UnsortedCount not implemented for Bitv512."
+        | Bools boolTest -> boolTest.SortableBinaryArrays 
                             |> Array.filter(fun sa -> not sa.IsSorted) 
                             |> Array.length 
                             |> UMX.tag<sortableCount>
 
-        | Bools boolTest -> boolTest.SortableBinaryArrays 
+        | Ints intTest -> intTest.SortableIntArrays 
                             |> Array.filter(fun sa -> not sa.IsSorted) 
                             |> Array.length 
                             |> UMX.tag<sortableCount>

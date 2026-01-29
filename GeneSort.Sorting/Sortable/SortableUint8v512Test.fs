@@ -4,6 +4,7 @@ open System
 open FSharp.UMX
 open GeneSort.Sorting
 open System.Threading.Tasks
+open System.Runtime.Intrinsics
 
 [<Struct>]
 type sortableUint8v512Test =
@@ -46,7 +47,7 @@ module SortableUint8v512Test =
         (sw: int<sortingWidth>) 
         (allTests: sortableIntArray[]) 
                     : sortableUint8v512Test =
-        
+
         let totalTests = allTests.Length
         
         // --- 64 Lanes per block for Vector512 ---

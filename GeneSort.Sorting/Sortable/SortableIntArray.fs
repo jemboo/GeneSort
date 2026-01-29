@@ -174,6 +174,14 @@ module SortableIntArray =
         sortableIntArrays
 
 
+    let toString (sia: sortableIntArray) : string =
+        let valuesStr = 
+            sia.Values 
+            |> Array.map string 
+            |> String.concat ", "
+        sprintf "[%s]" valuesStr
+
+
     module BinaryArrayUtils =
 
         let toSortableBinaryArrays(sia:sortableIntArray) : sortableIntArray[] =

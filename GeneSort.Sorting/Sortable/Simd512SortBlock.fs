@@ -1,11 +1,9 @@
 ﻿
 namespace GeneSort.Sorting.Sortable
 
-open System
 open FSharp.UMX
 open GeneSort.Sorting
 open System.Runtime.Intrinsics
-open System.Runtime.Intrinsics.X86
 open System.Collections.Concurrent
 
 [<Struct>]
@@ -14,6 +12,12 @@ type simd512SortBlock =
         vectors: Vector512<uint8>[] 
         sortableCount: int 
     }
+
+    static member create 
+            (sw: int<sortingWidth>) 
+            (arrays: Vector512<uint8>[]) 
+            (count: int) =
+        { vectors = arrays; sortableCount = count }
     
     static member createFromIntArrays (sw: int<sortingWidth>) (arrays: sortableIntArray[]) =
         let width = %sw
@@ -79,6 +83,31 @@ module Simd512SortBlock =
         h2.CopyTo(result, 32)
         h3.CopyTo(result, 48)
         result
+
+
+    let toSortableIntArrays (s512: simd512SortBlock) : sortableIntArray[] =
+        let result = Array.zeroCreate<sortableIntArray> s512.sortableCount
+        
+        // Explicitly create spans to avoid FS0406
+        let rawData : byte [][] = Array.init s512.Length (fun i -> 
+            let buf = Array.zeroCreate<byte> 64
+            // Convert the array to a Span explicitly
+            let span = System.Span<byte>(buf)
+            s512.Vectors.[i].CopyTo(span)
+            buf)
+
+        for lane = 0 to s512.sortableCount - 1 do
+            let values = Array.zeroCreate<int> s512.Length
+            for vIdx = 0 to s512.Length - 1 do
+                values.[vIdx] <- int rawData.[vIdx].[lane]
+            
+            result.[lane] <- sortableIntArray.create(
+                                values, 
+                                s512.Length |> UMX.tag<sortingWidth>, 
+                                2 |> UMX.tag<symbolSetSize>)
+        result
+
+
 
 
 module Simd512GoldenHashProvider =
