@@ -196,10 +196,11 @@ module LatticeLevelSetMap =
 
 
     let getStats =
-
-        let latticeDimensions = [3; 4; 6; 8] |> List.map UMX.tag<latticeDimension>
+    
+        //let latticeDimensions = [3; 4; 6; 8] |> List.map UMX.tag<latticeDimension>
+        let latticeDimensions = [6; 8;] |> List.map UMX.tag<latticeDimension>
         //let edgeLengths = [16; 24; 32; 48; 64; 96; 128] |> List.map UMX.tag<latticeDistance>
-        let edgeLengths = [4; 8; 12; 16; 24; 32;] |> List.map UMX.tag<latticeDistance>
+        let edgeLengths = [32;] |> List.map UMX.tag<latticeDistance>
 
 
         printfn "SortingWidth\tDimension\tEdgeLength\tlevel\tLevelSet\tLevelSetVV"
