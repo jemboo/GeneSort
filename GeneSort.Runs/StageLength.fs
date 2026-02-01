@@ -23,9 +23,11 @@ open GeneSort.Sorting
 
 //Excellent! I've found and retrieved the Van Voorhis paper. Here's what it contains:
 //Overview
-//The paper "Large [g,d] Sorting Networks" by David C. Van Voorhis from August 1971 describes special constructions for [2^r, 2^r] f-networks that reduce the number of comparators required by large N-sorter networks. Stanford
+//The paper "Large [g,d] Sorting Networks" by David C. Van Voorhis from August 1971 describes special constructions for [2^r, 2^r]
+//f-networks that reduce the number of comparators required by large N-sorter networks. Stanford
 //Key Results for Powers of 2
-//Van Voorhis provides a table (Table 3) showing G(2^m) values for m ≤ 16, where G(N) represents the minimum number of comparators required by an N-sorter network using the [g,d] strategy. Stanford Here are the specific values:
+//Van Voorhis provides a table (Table 3) showing G(2^m) values for m ≤ 16, where G(N) represents the minimum number of comparators 
+//required by an N-sorter network using the [g,d] strategy. Stanford Here are the specific values:
 
 //N=16 (m=4): 61 comparators (though Green's network uses 60)
 //N=32 (m=5): 187 comparators

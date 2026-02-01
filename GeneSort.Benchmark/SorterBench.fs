@@ -211,7 +211,7 @@ type MergeEvalBench() =
     member val collectResults = false with get, set
 
 
-    member val mergeFillType = mergeFillType.NoFill
+    member val mergeFillType = mergeSuffixType.NoSuffix
 
     member val id = Guid.NewGuid() with get, set
 
@@ -306,7 +306,7 @@ type Eval2Rounds() =
     [<Params(32, 64)>]
     member val sortingWidth = 0 with get, set
 
-    member val mergeFillType = mergeFillType.NoFill
+    member val mergeFillType = mergeSuffixType.NoSuffix
 
     member val id = Guid.NewGuid() with get, set
 
@@ -377,7 +377,7 @@ type FullBoolEvalBench() =
     member val collectResults = false with get, set
 
 
-    member val mergeFillType = mergeFillType.NoFill
+    member val mergeFillType = mergeSuffixType.NoSuffix
 
     member val id = Guid.NewGuid() with get, set
 

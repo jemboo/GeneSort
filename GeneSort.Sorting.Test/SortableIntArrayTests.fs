@@ -144,13 +144,13 @@ type SortableIntArrayTests() =
         let sortableBoolArrays = SortableBoolArray.getMergeTestCases
                                     6<sortingWidth>
                                     3<mergeDimension>
-                                    mergeFillType.NoFill
+                                    mergeSuffixType.NoSuffix
 
 
         let sortableIntArrays = SortableIntArray.getMergeTestCases
                                     6<sortingWidth>
                                     3<mergeDimension>
-                                    mergeFillType.NoFill
+                                    mergeSuffixType.NoSuffix
 
         let boolConv = 
             sortableIntArrays 

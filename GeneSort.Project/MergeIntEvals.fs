@@ -30,7 +30,7 @@ module MergeIntEvals =
             (sorterModelType: sorterModelType option)
             (sortableDataFormat: sortableDataFormat option)
             (mergeDimension: int<mergeDimension> option)
-            (mergeFillType: mergeFillType option) =
+            (mergeFillType: mergeSuffixType option) =
              
         queryParams.create(
             Some projectName,
@@ -41,7 +41,7 @@ module MergeIntEvals =
                 (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString );
                 (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringToString );
                 (runParameters.mergeDimensionKey, mergeDimension |> UmxExt.intToString );
-                (runParameters.mergeFillTypeKey, mergeFillType |> Option.map MergeFillType.toString |> UmxExt.stringToString );
+                (runParameters.mergeSuffixTypeKey, mergeFillType |> Option.map MergeFillType.toString |> UmxExt.stringToString );
             |])
 
 
@@ -55,7 +55,7 @@ module MergeIntEvals =
             (runParams.GetSorterModelType())
             (runParams.GetSortableDataFormat())
             (runParams.GetMergeDimension())
-            (runParams.GetMergeFillType())
+            (runParams.GetMergeSuffixType())
 
 
 
@@ -82,17 +82,16 @@ module MergeIntEvals =
         |> Option.bind sorterModelTypeForSortingWidth
 
 
+    // --- Project Refinement ---
+    let enhancer (rp : runParameters) : runParameters =
+        let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
+
+        rp.WithProjectName(Some projectName)
+            .WithRunFinished(Some false)
+            .WithId (Some qp.Id )
+
 
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
-
-        let enhancer (rp : runParameters) : runParameters =
-
-            let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
-
-            rp.WithProjectName(Some projectName)
-              .WithRunFinished(Some false)
-              .WithId (Some qp.Id )
-
         seq {
             for runParameters in runParametersSeq do
                     let filtrate = paramMapFilter runParameters
@@ -133,10 +132,10 @@ module MergeIntEvals =
         (runParameters.mergeDimensionKey, mergeDimensionValues)
 
     let mergeFillTypeValues = 
-         [mergeFillType.VanVoorhis;] |> List.map(fun d -> d.ToString())
+         [mergeSuffixType.VV_1;] |> List.map(fun d -> d.ToString())
 
     let mergeFillTypes() : string*string list =
-        (runParameters.mergeFillTypeKey, mergeFillTypeValues)
+        (runParameters.mergeSuffixTypeKey, mergeFillTypeValues)
 
 
     let sorterModelKeyValues () : string list =
@@ -195,7 +194,7 @@ module MergeIntEvals =
                         let! w = runParameters.GetSortingWidth()
                         let! dt = runParameters.GetSortableDataFormat()
                         let! md = runParameters.GetMergeDimension()
-                        let! mf = runParameters.GetMergeFillType()
+                        let! mf = runParameters.GetMergeSuffixType()
                         let! sm = runParameters.GetSorterModelType()
                         return (r, w, md, mf, dt, sm)
                     } |> Result.ofOption "Missing domain parameters"

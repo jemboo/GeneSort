@@ -30,9 +30,9 @@ open FSharp.UMX
 [<Measure>] type mergeDimension
 
 
-type mergeFillType =
-    | NoFill
-    | VanVoorhis
+type mergeSuffixType =
+    | NoSuffix
+    | VV_1
 
 
 type sortableDataFormat = 
@@ -94,19 +94,19 @@ module MergeDimension =
 
 module MergeFillType =
 
-    let toString (t:mergeFillType) : string =
+    let toString (t:mergeSuffixType) : string =
         match t with
-        | NoFill -> "NoFill"
-        | VanVoorhis -> "VanVoorhis"
+        | NoSuffix -> "NoSuffix"
+        | VV_1 -> "VV_1"
 
-    let fromString (s:string) : mergeFillType =
+    let fromString (s:string) : mergeSuffixType =
         match s with
-        | "NoFill" -> mergeFillType.NoFill
-        | "VanVoorhis" -> mergeFillType.VanVoorhis
+        | "NoSuffix" -> mergeSuffixType.NoSuffix
+        | "VV_1" -> mergeSuffixType.VV_1
         | _ -> failwithf "Unknown MergeFillType: %s" s
 
-    let all () : mergeFillType list =
-        [ mergeFillType.NoFill; mergeFillType.VanVoorhis ]
+    let all () : mergeSuffixType list =
+        [ mergeSuffixType.NoSuffix; mergeSuffixType.VV_1 ]
 
 
 module CeLength =

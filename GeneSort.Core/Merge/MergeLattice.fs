@@ -76,7 +76,7 @@ module MergeLattice =
         lpsCurrent
 
 
-    let getPermutationsVV
+    let getPermutationsVV_1
             (reporter: (string -> unit) option)
             (ml: mergeLattice) : latticePathPermutations =
         let mutable lpsCurrent = LatticePathPermutations.createLevelZero ml.LatticeDimension ml.MaxPathLength

@@ -24,7 +24,7 @@ type runParameters =
     static member latticeDistanceKey = "LatticeDistance"
     static member maxOrbitKey = "MaxOrbit"
     static member mergeDimensionKey = "MergeDimension"
-    static member mergeFillTypeKey = "MergeFillType"
+    static member mergeSuffixTypeKey = "MergeSuffixType"
     static member projectNameKey = "ProjectName"
     static member replKey = "Repl"
     static member runFinishedKey = "RunFinished"
@@ -37,7 +37,6 @@ type runParameters =
     static member textReportNameKey = "TextReportName"
 
 
-
     // Private Parsing Helpers
     static member private tryGetGuid (key: string) (map: Map<string, string>) =
         map.TryFind key |> Option.bind (fun v -> match Guid.TryParse v with true, g -> Some g | _ -> None)
@@ -48,8 +47,6 @@ type runParameters =
     static member private tryGetBool (key: string) (map: Map<string, string>) =
         map.TryFind key |> Option.bind (fun v -> match Boolean.TryParse v with true, b -> Some b | _ -> None)
 
-    //static member private addIfSome key valueOpt map =
-    //    valueOpt |> Option.fold (fun m v -> Map.add key v m) map
 
     static member private addOrRemove key valueOpt map =
         match valueOpt with
@@ -66,8 +63,8 @@ type runParameters =
     member this.GetMaxOrbit() = runParameters.tryGetInt runParameters.maxOrbitKey this.paramMap
     member this.GetMergeDimension() = runParameters.tryGetInt runParameters.mergeDimensionKey this.paramMap |> Option.map UMX.tag<mergeDimension>
     
-    member this.GetMergeFillType() = 
-        this.paramMap.TryFind runParameters.mergeFillTypeKey |> Option.bind (fun v -> try Some (MergeFillType.fromString v) with _ -> None)
+    member this.GetMergeSuffixType() = 
+        this.paramMap.TryFind runParameters.mergeSuffixTypeKey |> Option.bind (fun v -> try Some (MergeFillType.fromString v) with _ -> None)
     member this.GetProjectName() = this.paramMap.TryFind runParameters.projectNameKey |> Option.map UMX.tag<projectName>
     member this.GetRepl() = runParameters.tryGetInt runParameters.replKey this.paramMap |> Option.map UMX.tag<replNumber>
     member this.GetRunFinished() = runParameters.tryGetBool runParameters.runFinishedKey this.paramMap
@@ -89,8 +86,8 @@ type runParameters =
     member this.WithMergeDimension(md: int<mergeDimension> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeDimensionKey (md |> Option.map UmxExt.intToRaw) }
 
-    member this.WithMergeFillType(mft: mergeFillType option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeFillTypeKey (mft |> Option.map MergeFillType.toString) }
+    member this.WithMergeSuffixType(mft: mergeSuffixType option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeSuffixTypeKey (mft |> Option.map MergeFillType.toString) }
 
     member this.WithStageLength(sl: int<stageLength> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.stageLengthKey (sl |> Option.map UmxExt.intToRaw) }
@@ -133,6 +130,7 @@ type runParameters =
 
     member this.WithSortingWidth(w: int<sortingWidth> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortingWidthKey (w |> Option.map UmxExt.intToRaw) }
+
 
 // --- 3. The Logic Module ---
 module RunParameters =

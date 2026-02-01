@@ -72,16 +72,16 @@ module FullBoolEvals =
         |> Option.bind sorterModelTypeForSortingWidth
 
 
+    let enhancer (rp : runParameters) : runParameters =
+        let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
+
+        rp.WithProjectName(Some projectName)
+            .WithRunFinished(Some false)
+            .WithId (Some qp.Id)
+
+
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
-
-        let enhancer (rp : runParameters) : runParameters =
-            let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
-
-            rp.WithProjectName(Some projectName)
-              .WithRunFinished(Some false)
-              .WithId (Some qp.Id)
-
-        let yark =
+        let refined =
             seq {
                 for runParameters in runParametersSeq do
                         let filtrate = paramMapFilter runParameters
@@ -90,7 +90,7 @@ module FullBoolEvals =
                             yield retVal
             } |> Seq.toArray
 
-        yark
+        refined
 
     
     let sortingWidthValues = 

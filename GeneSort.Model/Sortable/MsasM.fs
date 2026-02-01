@@ -11,13 +11,13 @@ type msasM =
     private 
         { id: Guid<sorterTestModelID>
           mergeDimension: int<mergeDimension>
-          mergeFillType: mergeFillType
+          mergeFillType: mergeSuffixType
           sortingWidth: int<sortingWidth> }
 
     static member create 
             (sortingWidth: int<sortingWidth>)
             (mergeDimension: int<mergeDimension>)
-            (mergeFillType: mergeFillType)
+            (mergeFillType: mergeSuffixType)
             : msasM =
         if %sortingWidth < 2 then
             failwith "SortingWidth must be at least 2"

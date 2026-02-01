@@ -21,7 +21,7 @@ module SortableIntMerges =
             (repl: int<replNumber> option) 
             (sortingWidth: int<sortingWidth> option)
             (mergeDimension: int<mergeDimension> option)
-            (mergeFillType: mergeFillType option)
+            (mergeFillType: mergeSuffixType option)
             (sortableDataFormat: sortableDataFormat option)
             (outputDataType: outputDataType) =
              
@@ -32,7 +32,7 @@ module SortableIntMerges =
             [|
                 (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
                 (runParameters.mergeDimensionKey, mergeDimension |> MergeDimension.toString);
-                (runParameters.mergeFillTypeKey, mergeFillType |> Option.map MergeFillType.toString |> UmxExt.stringToString );
+                (runParameters.mergeSuffixTypeKey, mergeFillType |> Option.map MergeFillType.toString |> UmxExt.stringToString );
                 (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringToString );
             |])
 
@@ -44,7 +44,7 @@ module SortableIntMerges =
             (runParams.GetRepl())
             (runParams.GetSortingWidth())
             (runParams.GetMergeDimension())
-            (runParams.GetMergeFillType())
+            (runParams.GetMergeSuffixType())
             (runParams.GetSortableDataFormat())
             outputDataType
 
@@ -55,7 +55,7 @@ module SortableIntMerges =
         let values = [ 
                         sortableDataFormat.IntArray; 
                         sortableDataFormat.BoolArray;
-                        sortableDataFormat.Int8Vector256;
+                        sortableDataFormat.BitVector512;
                         sortableDataFormat.Int8Vector512;
 
                      ] |> List.map SortableDataFormat.toString
@@ -74,10 +74,10 @@ module SortableIntMerges =
 
     let mergeFillTypes () : string * string list =
         let values = [ 
-                        mergeFillType.NoFill; 
-                        mergeFillType.VanVoorhis 
+                        mergeSuffixType.NoSuffix; 
+                        mergeSuffixType.VV_1 
                      ] |> List.map MergeFillType.toString
-        (runParameters.mergeFillTypeKey, values)
+        (runParameters.mergeSuffixTypeKey, values)
 
 
     // --- Filters ---
@@ -94,8 +94,8 @@ module SortableIntMerges =
 
     let limitForMergeFillType (rp: runParameters) =
         let sw = rp.GetSortingWidth().Value
-        let ft = rp.GetMergeFillType().Value
-        if (ft.IsNoFill && %sw > 64) then None else Some rp
+        let ft = rp.GetMergeSuffixType().Value
+        if (ft.IsNoSuffix && %sw > 64) then None else Some rp
 
     let limitForMergeDimension (rp: runParameters) =
         let sw = rp.GetSortingWidth().Value
@@ -113,17 +113,16 @@ module SortableIntMerges =
 
     // --- Project Refinement ---
 
+    let enhancer (rp : runParameters) =
+        let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
+        rp.WithProjectName(Some projectName)
+            .WithRunFinished(Some false)
+            .WithId (Some qp.Id)
+
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
-
-        let enhancer (rp : runParameters) =
-            // Use empty string for RunParameters case if required by your model
-            let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
-            rp.WithProjectName(Some projectName)
-              .WithRunFinished(Some false)
-              .WithId (Some qp.Id)
-
         runParametersSeq 
         |> Seq.choose (paramMapFilter >> Option.map enhancer)
+
 
     let parameterSpans = 
         [
@@ -168,7 +167,7 @@ module SortableIntMerges =
                     maybe {
                         let! width = runParams.GetSortingWidth()
                         let! dim = runParams.GetMergeDimension()
-                        let! fill = runParams.GetMergeFillType()
+                        let! fill = runParams.GetMergeSuffixType()
                         let! dataType = runParams.GetSortableDataFormat()
                         return (width, dim, fill, dataType)
                     } |> Result.ofOption "Missing domain parameters required for generation"

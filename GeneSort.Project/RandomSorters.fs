@@ -86,21 +86,6 @@ module RandomSorters =
         (runParameters.sorterModelTypeKey, sorterModelTypeValues() )
 
 
-    let getSorterCountForSortingWidth (factor:int) (sortingWidth: int<sortingWidth>) : int<sorterCount> =
-        match %sortingWidth with
-        | 4 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 6 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 8 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 12 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 16 -> (50 * factor) |> UMX.tag<sorterCount>
-        | 24 -> (50 * factor) |> UMX.tag<sorterCount>
-        | 32 -> (50 * factor) |> UMX.tag<sorterCount>
-        | 48 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 64 -> (10 * factor) |> UMX.tag<sorterCount>
-        | 96 -> (10 * factor) |> UMX.tag<sorterCount>
-        | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
-
-
     let getCeLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<ceLength> =
         match %sortingWidth with
         | 4 -> 300 |> UMX.tag<ceLength>
@@ -147,9 +132,11 @@ module RandomSorters =
         let isMuf6able = (%sortingWidth % 3 = 0) && (MathUtils.isAPowerOfTwo (%sortingWidth / 3))
 
         match sorterModelKey with
-        | sorterModelType.Mcse -> Some rp
+        | sorterModelType.Mcse -> 
+                Some rp
         | sorterModelType.Mssi
-        | sorterModelType.Msrs -> if has2factor then Some rp else None
+        | sorterModelType.Msrs -> 
+                if has2factor then Some rp else None
         | sorterModelType.Msuf4 ->
                 if isMuf4able then Some rp else None
         | sorterModelType.Msuf6 -> 
@@ -164,23 +151,24 @@ module RandomSorters =
 
     // --- Project Refinement ---
 
+    let enhancer (rp : runParameters) : runParameters =
+        let repl = rp.GetRepl().Value
+        let sortingWidth = rp.GetSortingWidth().Value
+        let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
+        let stageLength = getStageLengthForSortingWidth sortingWidth
+        let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
+        let exp = Math.Min(%repl + 1, 3) |> float
+        let sorterCount = (int (10.0 ** exp)) |> UMX.tag<sorterCount>
+
+        rp.WithProjectName(Some projectName)
+            .WithRunFinished(Some false)
+            .WithCeLength(Some ceLength)
+            .WithStageLength(Some stageLength)
+            .WithSorterCount(Some sorterCount)
+            .WithId (Some qp.Id)
+
+
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
-
-        let enhancer (rp : runParameters) : runParameters =
-            let repl = rp.GetRepl().Value
-            let sortingWidth = rp.GetSortingWidth().Value
-            let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
-            let stageLength = getStageLengthForSortingWidth sortingWidth
-            let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
-            let replFactor = if (%repl = 0) then 1 else 10
-            let sorterCount = sortingWidth |> getSorterCountForSortingWidth replFactor
-
-            rp.WithProjectName(Some projectName)
-              .WithRunFinished(Some false)
-              .WithCeLength(Some ceLength)
-              .WithStageLength(Some stageLength)
-              .WithSorterCount(Some sorterCount)
-              .WithId (Some qp.Id)
 
 
         seq {

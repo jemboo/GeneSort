@@ -120,7 +120,7 @@ module SortableBoolArray =
         |> Array.map (fun p -> fromLatticePoint p maxValue)
 
 
-    let fromLatticeCubeVV 
+    let fromLatticeCubeVV_1 
                 (dim:int<latticeDimension>) 
                 (maxValue:int<latticeDistance>) : sortableBoolArray[] =
         let latticePoints = 
@@ -155,7 +155,7 @@ module SortableBoolArray =
     let getMergeTestCases 
             (sortingWidth: int<sortingWidth>) 
             (mergeDimension: int<mergeDimension>)
-            (mergeFillType: mergeFillType)
+            (mergeFillType: mergeSuffixType)
             : sortableBoolArray [] =
 
         if %sortingWidth % %mergeDimension <> 0 then
@@ -166,9 +166,9 @@ module SortableBoolArray =
 
         let sortableBoolArrays =
             match mergeFillType with
-            | NoFill -> 
+            | NoSuffix -> 
                 fromLatticeCubeFull latticeDimension edgeLength
-            | VanVoorhis ->
-                fromLatticeCubeVV latticeDimension edgeLength
+            | VV_1 ->
+                fromLatticeCubeVV_1 latticeDimension edgeLength
 
         sortableBoolArrays

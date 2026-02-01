@@ -152,7 +152,7 @@ module TextReporters =
                             (runParams.GetSortingWidth() |> UmxExt.intToString)
                             (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringToString)
                             (runParams.GetSortableDataFormat() |> Option.map SortableDataFormat.toString |> UmxExt.stringToString)
-                            (runParams.GetMergeFillType() |> Option.map MergeFillType.toString |> UmxExt.stringToString)
+                            (runParams.GetMergeSuffixType() |> Option.map MergeFillType.toString |> UmxExt.stringToString)
                             (runParams.GetMergeDimension() |> UmxExt.intToString)
                             profile
                     dataTable <- DataTableFile.addRows lines dataTable

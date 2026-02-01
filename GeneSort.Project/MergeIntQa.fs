@@ -28,7 +28,7 @@ module MergeIntQa =
             (sorterModelType: sorterModelType option)
             (sortableDataFormat: sortableDataFormat option)
             (mergeDimension: int<mergeDimension> option)
-            (mergeFillType: mergeFillType option)
+            (mergeFillType: mergeSuffixType option)
             (outputDataType: outputDataType) =
              
         queryParams.create(
@@ -40,7 +40,7 @@ module MergeIntQa =
                 (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString );
                 (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringToString );
                 (runParameters.mergeDimensionKey, mergeDimension |> UmxExt.intToString );
-                (runParameters.mergeFillTypeKey, mergeFillType |> Option.map MergeFillType.toString |> UmxExt.stringToString );
+                (runParameters.mergeSuffixTypeKey, mergeFillType |> Option.map MergeFillType.toString |> UmxExt.stringToString );
             |])
 
 
@@ -53,7 +53,7 @@ module MergeIntQa =
             (runParams.GetSorterModelType())
             (runParams.GetSortableDataFormat())
             (runParams.GetMergeDimension())
-            (runParams.GetMergeFillType())
+            (runParams.GetMergeSuffixType())
             outputDataType
 
         
@@ -127,10 +127,10 @@ module MergeIntQa =
 
     // mergeFillType
     let mergeFillTypeValues = 
-         [mergeFillType.VanVoorhis; mergeFillType.NoFill] |> List.map(fun d -> d.ToString())
+         [mergeSuffixType.VV_1; mergeSuffixType.NoSuffix] |> List.map(fun d -> d.ToString())
 
     let mergeFillTypes() : string*string list =
-        (runParameters.mergeFillTypeKey, mergeFillTypeValues)
+        (runParameters.mergeSuffixTypeKey, mergeFillTypeValues)
 
 
 
@@ -138,25 +138,27 @@ module MergeIntQa =
         Some runParameters
 
 
+
+    // --- Project Refinement ---
+    let enhancer (rp : runParameters) : runParameters =
+        let repl = rp.GetRepl().Value
+        let sortingWidth = rp.GetSortingWidth().Value
+        let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
+        let stageLength = getStageLengthForSortingWidth sortingWidth
+        let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
+        let replFactor = if (%repl = 0) then 1 else 10
+        let sorterCount = sortingWidth |> getSorterCountForSortingWidth |> (*) replFactor
+
+        rp.WithProjectName(Some projectName)
+            .WithRunFinished(Some false)
+            .WithCeLength(Some ceLength)
+            .WithStageLength(Some stageLength)
+            .WithSorterCount(Some sorterCount)
+            .WithSorterModelType(Some sorterModelType.Mcse)
+            .WithId (Some qp.Id )
+
+
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
-
-        let enhancer (rp : runParameters) : runParameters =
-            let repl = rp.GetRepl().Value
-            let sortingWidth = rp.GetSortingWidth().Value
-            let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
-            let stageLength = getStageLengthForSortingWidth sortingWidth
-            let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
-            let replFactor = if (%repl = 0) then 1 else 10
-            let sorterCount = sortingWidth |> getSorterCountForSortingWidth |> (*) replFactor
-
-            rp.WithProjectName(Some projectName)
-              .WithRunFinished(Some false)
-              .WithCeLength(Some ceLength)
-              .WithStageLength(Some stageLength)
-              .WithSorterCount(Some sorterCount)
-              .WithSorterModelType(Some sorterModelType.Mcse)
-              .WithId (Some qp.Id )
-
         seq {
             for runParameters in runParametersSeq do
                     let filtrate = paramMapFilter runParameters
@@ -164,6 +166,7 @@ module MergeIntQa =
                         let retVal = filtrate.Value |> enhancer
                         yield retVal
         }
+
 
     let parameterSpans = 
         [
@@ -212,7 +215,7 @@ module MergeIntQa =
                         let! w = runParameters.GetSortingWidth()
                         let! dt = runParameters.GetSortableDataFormat()
                         let! md = runParameters.GetMergeDimension()
-                        let! mf = runParameters.GetMergeFillType()
+                        let! mf = runParameters.GetMergeSuffixType()
                         let! sm = runParameters.GetSorterModelType()
                         let! sl = runParameters.GetStageLength()
                         let! ce = runParameters.GetCeLength()

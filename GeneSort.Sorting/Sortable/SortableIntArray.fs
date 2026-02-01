@@ -151,7 +151,7 @@ module SortableIntArray =
     let getMergeTestCases 
             (sortingWidth: int<sortingWidth>) 
             (mergeDimension: int<mergeDimension>)
-            (mergeFillType: mergeFillType)
+            (mergeFillType: mergeSuffixType)
             : sortableIntArray [] =
 
         if %sortingWidth % %mergeDimension <> 0 then
@@ -162,12 +162,12 @@ module SortableIntArray =
         let mergeLattice = MergeLattice.create latticeDimension edgeLength
         let sortableIntArrays =
             match mergeFillType with
-            | NoFill -> 
+            | NoSuffix -> 
                 MergeLattice.getPermutationsStandard None mergeLattice
                 |> LatticePathPermutations.toPermutations
                 |> Array.map(sortableIntArray.createFromPermutation)
-            | VanVoorhis ->
-                MergeLattice.getPermutationsVV None mergeLattice
+            | VV_1 ->
+                MergeLattice.getPermutationsVV_1 None mergeLattice
                 |> LatticePathPermutations.toPermutations
                 |> Array.map(sortableIntArray.createFromPermutation)
 
