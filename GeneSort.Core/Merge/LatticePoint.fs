@@ -138,13 +138,51 @@ module LatticePoint =
     /// Generates all lattice points of length dim whose entries:
     /// • sum to levelSum
     /// • lie in 0 .. maxValue
-    let getLevelSetVV
+    let getLevelSetVV0
                     (dim:int<latticeDimension>) 
                     (latticelevel:int<latticeDistance>) 
                     (maxDistance:int<latticeDistance>) : seq<latticePoint> =
         getLevelSet dim latticelevel maxDistance |> Seq.filter isNonDecreasing
 
 
+    let getLevelSetVV
+            (dim: int<latticeDimension>) 
+            (latticeLevel: int<latticeDistance>) 
+            (maxDistance: int<latticeDistance>) : seq<latticePoint> =
+        
+        let d = %dim
+        let edge = %maxDistance
+        let level = %latticeLevel
+
+        let rec generate (pos: int) (sumRemaining: int) (lastValue: int) (current: int[]) : seq<latticePoint> =
+            seq {
+                if pos = d - 1 then
+                    // The last element is determined by the remaining sum
+                    if sumRemaining >= lastValue && sumRemaining <= edge then
+                        current.[pos] <- sumRemaining
+                        // We MUST copy the array here so the yielded object 
+                        // owns its own data, independent of the recursive buffer.
+                        yield latticePoint.create (Array.copy current)
+                else
+                    let slotsLeft = d - pos
+                    
+                    // Standard non-decreasing bounds:
+                    // 1. v >= lastValue
+                    // 2. v <= average remaining (to allow room for non-decreasing growth)
+                    // 3. v <= edge
+                    let lowerBound = lastValue
+                    let upperBound = min edge (sumRemaining / slotsLeft)
+
+                    for v in lowerBound .. upperBound do
+                        current.[pos] <- v
+                        yield! generate (pos + 1) (sumRemaining - v) v current
+            }
+
+        if level < 0 || level > d * edge then
+            Seq.empty
+        else
+            let buffer = Array.zeroCreate d
+            generate 0 level 0 buffer
 
 
     let getUnderCoversNew (subject: latticePoint) : latticePoint list =
