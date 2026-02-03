@@ -5,6 +5,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
+open System.Runtime.Intrinsics
 
 [<Struct; CustomEquality; NoComparison>]
 type msasM = 
@@ -112,16 +113,46 @@ type msasM =
                             this.MergeDimension
                             this.mergeFillType
 
-        let boolArrays = 
+        let sw = this.SortingWidth
+        let id = %this.id |> UMX.tag<sorterTestId>
+    
+        // Instead of converting all to bool arrays first, we process intArrays in chunks
+        let blocks = 
             intArrays 
-            |> Array.map (fun intArr -> 
-                intArr.ToSortableBoolArrays())
-            |> Array.concat
+            |> Array.chunkBySize 512 
+            |> Array.collect (fun (chunk: sortableIntArray[]) ->
+                let inputCount = chunk.Length
+                let numThresholds = %sw + 1
+            
+                // We are building a sequence of blocks. 
+                // Since one chunk of 512 intArrays actually represents 512 * (width+1) bool cases,
+                // we yield multiple simdSortBlocks.
+                [| 
+                    for threshold = 0 to %sw do
+                        let vecs = Array.init %sw (fun wireIdx ->
+                            let buffer = Array.zeroCreate<uint64> 8
+                            for testIdx = 0 to inputCount - 1 do
+                                // Logic: thresholding the int value directly into the bit buffer
+                                if chunk.[testIdx].Values.[wireIdx] >= threshold then
+                                    let lane = testIdx / 64
+                                    let bit = testIdx % 64
+                                    buffer.[lane] <- buffer.[lane] ||| (1uL <<< bit)
+                        
+                            Vector512.Create(
+                                buffer.[0], buffer.[1], buffer.[2], buffer.[3],
+                                buffer.[4], buffer.[5], buffer.[6], buffer.[7]
+                            )
+                        )
+                        sortBlockBitv512.createFromVectors vecs inputCount
+                |]
+            )
 
-        SortableBitv512Test.fromBoolArrays 
-                (%this.id |> UMX.tag<sorterTestId>) 
-                this.SortingWidth
-                boolArrays
+        sortableBitv512Test.create id sw blocks
+
+
+
+
+
 
 
 module MsasMi = ()

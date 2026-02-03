@@ -97,16 +97,27 @@ module SortableBoolArray =
 
 
     let fromLatticePoint 
-                (p: GeneSort.Core.latticePoint) 
-                (maxValue:int<latticeDistance>) : sortableBoolArray =
-        let boolArray = 
-                [| 
-                    for x in p.Coords -> 
-                        [| for y in 0 .. (%maxValue - 1) -> y < x |] |> Array.rev
-                |] 
-                |> Array.concat
-                    
-        sortableBoolArray.create(boolArray, (%p.Dimension * %maxValue) |> UMX.tag<sortingWidth>)
+            (p: GeneSort.Core.latticePoint) 
+            (maxValue: int<latticeDistance>) : sortableBoolArray =
+    
+        let dim = p.Dimension
+        let mVal = %maxValue
+        let totalWidth = dim * mVal
+        let result = Array.zeroCreate<bool> totalWidth
+    
+        for i = 0 to dim - 1 do
+            let x = p.Coords.[i]
+            let offset = i * mVal
+            // The logic: "y < x" reversed means the first (mVal - x) are false, 
+            // and the last (x) are true.
+            // Example: mVal=4, x=1. 
+            // Original: [0<1; 1<1; 2<1; 3<1] -> [T; F; F; F] 
+            // Reversed: [F; F; F; T]
+            for j = 0 to mVal - 1 do
+                if (mVal - 1 - j) < x then
+                    result.[offset + j] <- true
+
+        sortableBoolArray.create(result, totalWidth |> UMX.tag<sortingWidth>)
 
 
     let fromLatticeCubeFull 
