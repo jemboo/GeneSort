@@ -94,7 +94,7 @@ module FullBoolEvals =
 
     
     let sortingWidthValues = 
-        [ 6; 8; 16; ] |> List.map(fun d -> d.ToString())
+        [ 4; 6; 8; 12; 16; 18; 20; 22; 24] |> List.map(fun d -> d.ToString())
 
     let sortingWidths() : string*string list =
         (runParameters.sortingWidthKey, sortingWidthValues)

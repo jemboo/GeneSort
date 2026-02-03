@@ -63,7 +63,9 @@ module SortableTestModel =
                 | sortableDataFormat.Int8Vector256 -> 
                     msasMi.MakeSortableUint8v256Test |> sortableTest.Uint8v256
                 | sortableDataFormat.Int8Vector512 -> 
-                    msasMi.MakeSortableUint8v512Test |> sortableTest.Uint8v512 
+                    msasMi.MakeSortableUint8v512Test |> sortableTest.Uint8v512
+                | sortableDataFormat.BitVector512 ->
+                    msasMi.MakeSortableBitv512Test |> sortableTest.Bitv512
                 | _ ->  
                     failwith "Unsupported SortableArrayType for MsasMi"
                     

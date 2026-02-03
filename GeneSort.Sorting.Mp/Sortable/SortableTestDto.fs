@@ -9,6 +9,7 @@ type sortableTestDto =
     | Bools of sortableBoolTestDto
     | Uint8v256 of sortableUint8v256TestDto
     | Uint8v512 of sortableUint8v512TestDto
+    | Bitv512 of sortableBitv512TestDto
 
 
 module SortableTestDto =
@@ -21,6 +22,8 @@ module SortableTestDto =
             Uint8v256 (SortableUint8v256TestDto.fromDomain uint8v256Test)
         | sortableTest.Uint8v512 uint8v512Test -> 
             Uint8v512 (SortableUint8v512TestDto.fromDomain uint8v512Test)
+        | sortableTest.Bitv512 bitv512Test  ->
+            Bitv512 (SortableBitv512TestDto.fromDomain bitv512Test)
         | _ -> failwith "Unsupported sortableTest variant for DTO conversion."
 
     let toDomain (dto: sortableTestDto) : sortableTest =
@@ -31,3 +34,5 @@ module SortableTestDto =
             sortableTest.Uint8v256 (SortableUint8v256TestDto.toDomain uint8v256TestDto)
         | Uint8v512 uint8v512TestDto ->
             sortableTest.Uint8v512 (SortableUint8v512TestDto.toDomain uint8v512TestDto)
+        | Bitv512 bitv512TestDto ->
+            sortableTest.Bitv512 (SortableBitv512TestDto.toDomain bitv512TestDto)

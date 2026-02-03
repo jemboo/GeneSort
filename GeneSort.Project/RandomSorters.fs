@@ -65,40 +65,19 @@ module RandomSorters =
 
     // Parameter spans:
     
-    //let sortingWidthValues = 
-    //    [4; 6; 8; 12; 16; 24; 32; 48; 64] |> List.map(fun d -> d.ToString())
-    let sortingWidthValues = 
-        [4; 6; 8; 16; 24; 32; 48; 64; ] |> List.map(fun d -> d.ToString())
-
-
     let sortingWidths() : string*string list =
-        (runParameters.sortingWidthKey, sortingWidthValues)
+        let values = [4; 6; 8; 12; 16; 18; 20; 22; 24; 32; 36; 48; 64; 72; 96; 128; 144; 192; 256] |> List.map(fun d -> d.ToString())
+        (runParameters.sortingWidthKey, values)
 
-
-    let sorterModelTypeValues () : string list =
-        [ sorterModelType.Mcse; 
-          sorterModelType.Mssi;
-          sorterModelType.Msrs; 
-          sorterModelType.Msuf4; 
-          sorterModelType.Msuf6; ]      |> List.map(SorterModelType.toString)
 
     let sorterModelTypes () : string*string list =
-        (runParameters.sorterModelTypeKey, sorterModelTypeValues() )
-
-
-    let getCeLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<ceLength> =
-        match %sortingWidth with
-        | 4 -> 300 |> UMX.tag<ceLength>
-        | 6 -> 600 |> UMX.tag<ceLength>
-        | 8 -> 16 |> UMX.tag<ceLength>
-        | 12 -> 24 |> UMX.tag<ceLength>
-        | 16 -> 32 |> UMX.tag<ceLength>
-        | 24 -> 48 |> UMX.tag<ceLength>
-        | 32 -> 64 |> UMX.tag<ceLength>
-        | 48 -> 96 |> UMX.tag<ceLength>
-        | 64 -> 128 |> UMX.tag<ceLength>
-        | 96 -> 192 |> UMX.tag<ceLength>
-        | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
+        let values =         
+            [ sorterModelType.Mcse; 
+              sorterModelType.Mssi;
+              sorterModelType.Msrs; 
+              sorterModelType.Msuf4; 
+              sorterModelType.Msuf6; ]  |> List.map(SorterModelType.toString)
+        (runParameters.sorterModelTypeKey, values )
 
 
     let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageLength> =
@@ -108,20 +87,24 @@ module RandomSorters =
         | 8 -> 20 |> UMX.tag<stageLength>
         | 12 -> 30 |> UMX.tag<stageLength>
         | 16 -> 100 |> UMX.tag<stageLength>
+        | 18 -> 120 |> UMX.tag<stageLength>
+        | 20 -> 130 |> UMX.tag<stageLength>
+        | 22 -> 140 |> UMX.tag<stageLength>
         | 24 -> 150 |> UMX.tag<stageLength>
         | 32 -> 200 |> UMX.tag<stageLength>
+        | 36 -> 220 |> UMX.tag<stageLength>
         | 48 -> 300 |> UMX.tag<stageLength>
         | 64 -> 400 |> UMX.tag<stageLength>
+        | 72 -> 500 |> UMX.tag<stageLength>
         | 96 -> 600 |> UMX.tag<stageLength>
+        | 128 -> 3800 |> UMX.tag<stageLength>
+        | 144 -> 6000 |> UMX.tag<stageLength>
+        | 192 -> 10000 |> UMX.tag<stageLength>
+        | 256 -> 12000 |> UMX.tag<stageLength>
         | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
      
      // --- Filters ---
-
-    let mergeDimensionDividesSortingWidth (rp: runParameters) =
-        let sw = rp.GetSortingWidth().Value
-        let md = rp.GetMergeDimension().Value
-        if (%sw % %md = 0) then Some rp else None
 
 
     let sorterModelTypeForSortingWidth (rp: runParameters) =

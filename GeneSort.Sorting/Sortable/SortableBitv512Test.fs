@@ -3,6 +3,8 @@
 open System
 open FSharp.UMX
 open GeneSort.Sorting
+open System.Threading.Tasks
+open System.Runtime.Intrinsics
 
 [<Struct>]
 type sortableBitv512Test =
@@ -38,28 +40,39 @@ type sortableBitv512Test =
     member this.SortingWidth with get() = this.sortingWidth
 
 
-//module SortableBitv512Test =
 
-//    let fromIntArrays
-//        (id: Guid<sorterTestId>)
-//        (sw: int<sortingWidth>) 
-//        (allTests: sortableIntArray[]) 
-//                    : sortableBitv512Test =
+module SortableBitv512Test =
 
-//        let totalTests = allTests.Length
+    let fromBoolArrays
+        (id: Guid<sorterTestId>)
+        (sw: int<sortingWidth>) 
+        (allTests: sortableBoolArray[]) : sortableBitv512Test =
         
-//        // --- 64 Lanes per block for Vector512 ---
-//        let totalBlocksCount = (totalTests + 63) / 64
-//        let blocks = Array.zeroCreate<simd512SortBlock> totalBlocksCount
+        let width = %sw
+        // Chunk the input arrays into groups of 512
+        let blocks = 
+            allTests 
+            |> Array.chunkBySize 512 
+            |> Array.map (fun chunk ->
+                let inputCount = chunk.Length
+                
+                // Map wires across the bit-lanes
+                let vecs = Array.init width (fun wireIdx ->
+                    let buffer = Array.zeroCreate<uint64> 8
+                    
+                    for testIdx = 0 to inputCount - 1 do
+                        // Direct bool check is faster than int conversion
+                        if chunk.[testIdx].Values.[wireIdx] then
+                            let lane = testIdx / 64
+                            let bit = testIdx % 64
+                            buffer.[lane] <- buffer.[lane] ||| (1uL <<< bit)
+                    
+                    Vector512.Create(
+                        buffer.[0], buffer.[1], buffer.[2], buffer.[3],
+                        buffer.[4], buffer.[5], buffer.[6], buffer.[7]
+                    )
+                )
+                sortBlockBitv512.createFromVectors vecs inputCount
+            )
 
-//        // Parallel Pack: use all cores to build the 64-lane blocks
-//        Parallel.For(0, totalBlocksCount, (fun i ->
-//            let startIdx = i * 64
-//            let length = min 64 (totalTests - startIdx)
-            
-//            // Extract the slice for this block
-//            let slice = Array.sub allTests startIdx length
-//            blocks.[i] <- simd512SortBlock.createFromIntArrays sw slice
-//        )) |> ignore
-
-//        sortableBitv512Test.create id sw blocks
+        sortableBitv512Test.create id sw blocks

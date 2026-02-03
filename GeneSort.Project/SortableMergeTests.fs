@@ -11,11 +11,11 @@ open GeneSort.Db
 open GeneSort.Model.Sortable
 open GeneSort.Sorting.Sortable
 
-module SortableIntMerges =
+module SortableMergeTests =
 
-    let projectName = "SortableIntMerges" |> UMX.tag<projectName>
-    let projectFolder = "SortableIntMerges" |> UMX.tag<projectFolder>
-    let projectDesc = "Calc and save large SortableIntMerges"
+    let projectName = "SortableMergeTests" |> UMX.tag<projectName>
+    let projectFolder = "SortableMergeTests" |> UMX.tag<projectFolder>
+    let projectDesc = "Calc and save large SortableMergeTests"
 
     let makeQueryParams 
             (repl: int<replNumber> option) 
@@ -57,18 +57,18 @@ module SortableIntMerges =
                         sortableDataFormat.BoolArray;
                         sortableDataFormat.BitVector512;
                         sortableDataFormat.Int8Vector512;
-
                      ] |> List.map SortableDataFormat.toString
         (runParameters.sortableDataFormatKey, values)
 
 
     let sortingWidths () : string * string list =
-        let values = [16; 18; 24; 32; ] |> List.map string
+       // let values = [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] |> List.map string
+        let values = [16; 18; 24; 32; 36;] |> List.map string
         (runParameters.sortingWidthKey, values)
 
 
     let mergeDimensions () : string * string list =
-        let values = [2; 3; 4; ] |> List.map string
+        let values = [2; 3; 4; 6; 8 ] |> List.map string
         (runParameters.mergeDimensionKey, values)
 
 
@@ -105,9 +105,9 @@ module SortableIntMerges =
     let paramMapFilter (rp: runParameters) = 
         Some rp
         |> Option.bind mergeDimensionDividesSortingWidth
-        |> Option.bind limitForBoolenDataType
+       // |> Option.bind limitForBoolenDataType
         |> Option.bind limitForMergeFillType
-        |> Option.bind limitForMergeDimension
+       // |> Option.bind limitForMergeDimension
 
 
 
@@ -163,7 +163,7 @@ module SortableIntMerges =
 
                 // 2. Safe extraction of domain parameters
                 // We use the Bind(Result) overload to flatten this
-                let! (sortingWidth, mergeDimension, mergeFillType, sortableDataType) = 
+                let! (sortingWidth, mergeDimension, mergeFillType, sortableDataFormat) = 
                     maybe {
                         let! width = runParams.GetSortingWidth()
                         let! dim = runParams.GetMergeDimension()
@@ -177,7 +177,7 @@ module SortableIntMerges =
                     msasM.create sortingWidth mergeDimension mergeFillType 
                     |> sortableTestModel.MsasMi
             
-                let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataType
+                let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataFormat
                 let newRunParams = runParams.WithSortableCount (sortableTests |> SortableTests.getSortableCount |> Some)
 
                 // 4. Save

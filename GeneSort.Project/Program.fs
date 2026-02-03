@@ -52,26 +52,26 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 //let maxReplica = 1<replNumber>
 
 
-///// **********     SortableIntMerges   ****************
-//let project = SortableIntMerges.project
-//let executor = SortableIntMerges.executor
-//let projectName = SortableIntMerges.projectName
-//let projectFolder = SortableIntMerges.projectFolder
-//let buildQueryParams = SortableIntMerges.makeQueryParamsFromRunParams
-//let paramRefiner = SortableIntMerges.paramMapRefiner
+///// **********     SortableMergeTests   ****************
+//let project = SortableMergeTests.project
+//let executor = SortableMergeTests.executor
+//let projectName = SortableMergeTests.projectName
+//let projectFolder = SortableMergeTests.projectFolder
+//let buildQueryParams = SortableMergeTests.makeQueryParamsFromRunParams
+//let paramRefiner = SortableMergeTests.paramMapRefiner
 //let minReplica = 0<replNumber>
 //let maxReplica = 1<replNumber>
 
 
 /// **********     MergeIntEvals   ****************
-//let executor = MergeIntEvals.executor
-//let project = MergeIntEvals.project
-//let projectName = MergeIntEvals.project.ProjectName
-//let projectFolder = MergeIntEvals.projectFolder
-//let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
-//let paramRefiner = MergeIntEvals.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+let executor = MergeIntEvals.executor
+let project = MergeIntEvals.project
+let projectName = MergeIntEvals.project.ProjectName
+let projectFolder = MergeIntEvals.projectFolder
+let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
+let paramRefiner = MergeIntEvals.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
 
@@ -87,14 +87,14 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 
 
 ///// **********    FullBoolEvals   ****************
-let executor = FullBoolEvals.executor
-let project = FullBoolEvals.project
-let projectName = FullBoolEvals.project.ProjectName
-let projectFolder = FullBoolEvals.projectFolder
-let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
-let paramRefiner = FullBoolEvals.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+//let executor = FullBoolEvals.executor
+//let project = FullBoolEvals.project
+//let projectName = FullBoolEvals.project.ProjectName
+//let projectFolder = FullBoolEvals.projectFolder
+//let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
+//let paramRefiner = FullBoolEvals.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 

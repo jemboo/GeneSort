@@ -13,7 +13,9 @@ type sortBlockBitv512 =
     
     /// Creates a SIMD block from a slice of 1-512 sortableIntArrays.
     /// Maps each input array to a specific bit across the Vector512 wires.
-    static member createFromIntArrays (sw: int<sortingWidth>) (arrays: sortableIntArray[]) =
+    static member createFromIntArrays 
+                (sw: int<sortingWidth>) 
+                (arrays: sortableIntArray[]) : sortBlockBitv512 =
         let width = %sw
         let inputCount = arrays.Length
         if inputCount > 512 then 
@@ -115,6 +117,41 @@ module SortBlockBitv512 =
     
             result.[testIdx] <- sortableIntArray.create(values, sw, sss)
         result
+
+
+
+
+    let toSortableBoolArrays (s512: sortBlockBitv512) : sortableBoolArray[] =
+        let sw = s512.Length |> UMX.tag<sortingWidth>
+        let result = Array.zeroCreate<sortableBoolArray> s512.SortableCount
+        
+        // Pre-extract the 8 uint64 lanes for each vector to avoid Repeated GetElement calls
+        // We use a local variable copy to avoid potential FS0406 struct-field access issues
+        let rawData = s512.Vectors |> Array.map (fun v ->
+            let buf = Array.zeroCreate<uint64> 8
+            let localV = v
+            localV.CopyTo(System.Span<uint64>(buf))
+            buf)
+
+        for testIdx = 0 to s512.SortableCount - 1 do
+            let lane = testIdx / 64
+            let bitPos = testIdx % 64
+            let mask = 1uL <<< bitPos
+            
+            let values = Array.zeroCreate<bool> %sw
+            for wireIdx = 0 to %sw - 1 do
+                // If the bit is set at this wire for this test case, set to true
+                if (rawData.[wireIdx].[lane] &&& mask) <> 0uL then
+                    values.[wireIdx] <- true
+                else
+                    values.[wireIdx] <- false
+            
+            result.[testIdx] <- sortableBoolArray.create(values, sw)
+            
+        result
+
+
+
 
 
 /// Returns true if all packed 0-1 sequences are sorted.

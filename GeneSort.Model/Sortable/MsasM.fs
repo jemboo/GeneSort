@@ -106,6 +106,23 @@ type msasM =
                 intArrays
 
 
+    member this.MakeSortableBitv512Test : sortableBitv512Test =
+        let intArrays = SortableIntArray.getMergeTestCases 
+                            this.SortingWidth
+                            this.MergeDimension
+                            this.mergeFillType
+
+        let boolArrays = 
+            intArrays 
+            |> Array.map (fun intArr -> 
+                intArr.ToSortableBoolArrays())
+            |> Array.concat
+
+        SortableBitv512Test.fromBoolArrays 
+                (%this.id |> UMX.tag<sorterTestId>) 
+                this.SortingWidth
+                boolArrays
+
 
 module MsasMi = ()
  

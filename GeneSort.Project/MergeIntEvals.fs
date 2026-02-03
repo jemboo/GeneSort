@@ -74,12 +74,22 @@ module MergeIntEvals =
                 if isMuf4able then Some rp else None
         | sorterModelType.Msuf6 -> 
                 if isMuf6able then Some rp else None
-                
-
+         
+    let mergeDimensionDividesSortingWidth (rp: runParameters) =
+        let sw = rp.GetSortingWidth().Value
+        let md = rp.GetMergeDimension().Value
+        if (%sw % %md = 0) then Some rp else None
+           
+    let limitForMergeFillType (rp: runParameters) =
+        let sw = rp.GetSortingWidth().Value
+        let ft = rp.GetMergeSuffixType().Value
+        if (ft.IsNoSuffix && %sw > 64) then None else Some rp
 
     let paramMapFilter (rp: runParameters) = 
         Some rp
         |> Option.bind sorterModelTypeForSortingWidth
+        |> Option.bind limitForMergeFillType
+        |> Option.bind mergeDimensionDividesSortingWidth
 
 
     // --- Project Refinement ---
@@ -100,56 +110,50 @@ module MergeIntEvals =
                         yield retVal
         }
 
-
-
-    let sortableDataTypeKeyValues = 
-            [ 
-                sortableDataFormat.IntArray; 
-                sortableDataFormat.BoolArray;
-                sortableDataFormat.Int8Vector256;
-                sortableDataFormat.Int8Vector512
-            ] |> List.map(SortableDataFormat.toString)
-  
-    let sortableDataTypeKeys () : string*string list =
-        (runParameters.sortableDataFormatKey, sortableDataTypeKeyValues )
+    let sortableDataTypes () : string*string list =
+        let values = [ 
+                        sortableDataFormat.IntArray; 
+                        sortableDataFormat.BoolArray;
+                        sortableDataFormat.Int8Vector512;
+                        sortableDataFormat.BitVector512
+                     ] |> List.map(SortableDataFormat.toString)
+        (runParameters.sortableDataFormatKey, values )
 
   
-    let sortingWidthValues = 
-        [16; 24; 32; 48; 64;] |> List.map(fun d -> d.ToString())
-      //[4; 6; 8; 12; 16; 24; 32; 48; 64;] |> List.map(fun d -> d.ToString())
-      // [32; 48; 64; 96; 128; 192; 256; 384] |> List.map(fun d -> d.ToString())
-      //[12; 24; 48; 96;] |> List.map(fun d -> d.ToString())
-
-    let sortingWidths() : string*string list =
-        (runParameters.sortingWidthKey, sortingWidthValues)
+    let sortingWidths () : string * string list =
+        //let values = [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] |> List.map string
+        let values = [16; 18; 24; 32; 36;] |> List.map string
+        (runParameters.sortingWidthKey, values)
 
 
-    let mergeDimensionValues = 
-        [2; 4; ] |> List.map(fun d -> d.ToString())
+    let mergeDimensions () : string * string list =
+        let values = [2; 3; 4; 6; 8 ] |> List.map string
+        (runParameters.mergeDimensionKey, values)
 
 
-    let mergeDimensions() : string*string list =
-        (runParameters.mergeDimensionKey, mergeDimensionValues)
-
-    let mergeFillTypeValues = 
-         [mergeSuffixType.VV_1;] |> List.map(fun d -> d.ToString())
-
-    let mergeFillTypes() : string*string list =
-        (runParameters.mergeSuffixTypeKey, mergeFillTypeValues)
+    let mergeFillTypes () : string * string list =
+        let values = [ 
+                        mergeSuffixType.NoSuffix; 
+                        mergeSuffixType.VV_1 
+                     ] |> List.map MergeFillType.toString
+        (runParameters.mergeSuffixTypeKey, values)
 
 
-    let sorterModelKeyValues () : string list =
-        [ sorterModelType.Mcse;]      |> List.map(SorterModelType.toString)
-
-    let sorterModelTypeKeys () : string*string list =
-        (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
+    let sorterModelTypes () : string*string list =
+        let values =         
+            [ sorterModelType.Mcse; 
+              sorterModelType.Mssi;
+              sorterModelType.Msrs; 
+              sorterModelType.Msuf4; 
+              sorterModelType.Msuf6; ]  |> List.map(SorterModelType.toString)
+        (runParameters.sorterModelTypeKey, values )
 
 
     let parameterSpans = 
         [
             sortingWidths(); 
-            sorterModelTypeKeys(); 
-            sortableDataTypeKeys(); 
+            sorterModelTypes(); 
+            sortableDataTypes(); 
             mergeDimensions(); 
             mergeFillTypes(); 
         ]
@@ -200,7 +204,7 @@ module MergeIntEvals =
                     } |> Result.ofOption "Missing domain parameters"
 
                 // 3. Load Sortable Tests (Cross-project query)
-                let qpTests = SortableIntMerges.makeQueryParams 
+                let qpTests = SortableMergeTests.makeQueryParams 
                                             (Some repl) 
                                             (Some width) 
                                             (Some mDim) 
@@ -208,7 +212,7 @@ module MergeIntEvals =
                                             (Some dType) 
                                             (outputDataType.SortableTest "")
 
-                let! rawTestData = db.loadAsync SortableIntMerges.projectFolder qpTests 
+                let! rawTestData = db.loadAsync SortableMergeTests.projectFolder qpTests 
                 let! sortableTest = rawTestData |> OutputData.asSortableTest
 
                 // 4. Load Sorter Set (Cross-project query)

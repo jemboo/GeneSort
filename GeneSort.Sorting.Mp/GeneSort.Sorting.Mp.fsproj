@@ -14,6 +14,7 @@
     <Compile Include="Sortable\SortableBinaryTestDto.fs" />
     <Compile Include="Sortable\SortableIntTestDto.fs" />
     <Compile Include="Sortable\SimdSortBlockDto.fs" />
+    <Compile Include="Sortable\SortableBitv512TestDto.fs" />
     <Compile Include="Sortable\SortableUint8v256TestDto.fs" />
     <Compile Include="Sortable\SortableUint8v512TestDto.fs" />
     <Compile Include="Sortable\SortableTestDto.fs" />

@@ -8,24 +8,17 @@ open MessagePack
 open System.Runtime.Intrinsics
 
 [<MessagePackObject>]
-type simd512SortBlockDto = {
-    /// Vectors flattened: each Vector512<uint8> becomes a 64-byte array
-    [<Key(0)>] RawVectors: byte[][] 
-    [<Key(1)>] SortableCount: int
-}
-
-[<MessagePackObject>]
 type sortableUint8v512TestDto = {
     [<Key(0)>] Id: Guid
     [<Key(1)>] SortingWidth: int
-    [<Key(2)>] Blocks: simd512SortBlockDto[]
+    [<Key(2)>] Blocks: simdSortBlockDto[]
 }
 
 module SortableUint8v512TestDto =
 
     // --- Helper for simd512SortBlock ---
 
-    let private blockFromDomain (block: SortBlockUint8v512) : simd512SortBlockDto =
+    let private blockFromDomain (block: SortBlockUint8v512) : simdSortBlockDto =
         let raw = 
             block.Vectors 
             |> Array.map (fun v -> 
@@ -34,7 +27,7 @@ module SortableUint8v512TestDto =
                 buf)
         { RawVectors = raw; SortableCount = block.SortableCount }
 
-    let private blockToDomain (dto: simd512SortBlockDto) : SortBlockUint8v512 =
+    let private blockToDomain (dto: simdSortBlockDto) : SortBlockUint8v512 =
         let vecs = 
             dto.RawVectors 
             |> Array.map (fun bytes -> Vector512.Create<byte>(ReadOnlySpan(bytes)))

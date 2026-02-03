@@ -226,7 +226,7 @@ module MergeIntQa =
 
                 // 3. Load Sortable Tests (Cross-project query)
                 let rpl0 = 0 |> UMX.tag<replNumber>
-                let qpTests = SortableIntMerges.makeQueryParams 
+                let qpTests = SortableMergeTests.makeQueryParams 
                                         (Some rpl0) 
                                         (Some sortingWidth) 
                                         (Some mergeDimension) 
@@ -242,7 +242,7 @@ module MergeIntQa =
                                         (outputDataType.SorterSet "")
                 let! rawSorterData = db.loadAsync RandomSorters.projectFolder qpSorters
                 let! sorterSet = rawSorterData |> OutputData.asSorterSet
-                let! rawTestData = db.loadAsync SortableIntMerges.projectFolder qpTests 
+                let! rawTestData = db.loadAsync SortableMergeTests.projectFolder qpTests 
                 let! sortableTest = rawTestData |> OutputData.asSortableTest
 
                 let! _ = checkCancellation cts.Token
