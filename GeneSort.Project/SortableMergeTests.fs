@@ -53,8 +53,8 @@ module SortableMergeTests =
 
     let sortableDataFormatKeys () : string * string list =
         let values = [ 
-                        sortableDataFormat.IntArray; 
-                        sortableDataFormat.BoolArray;
+                        //sortableDataFormat.IntArray; 
+                        //sortableDataFormat.BoolArray;
                         sortableDataFormat.BitVector512;
                         sortableDataFormat.Int8Vector512;
                      ] |> List.map SortableDataFormat.toString
@@ -63,7 +63,7 @@ module SortableMergeTests =
 
     let sortingWidths () : string * string list =
        // let values = [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] |> List.map string
-        let values = [16; 18; 24; 32; 36;] |> List.map string
+        let values = [ 96; 128; 192; 256;] |> List.map string
         (runParameters.sortingWidthKey, values)
 
 

@@ -38,7 +38,7 @@ printfn $"**** Q22Q888 ******** {startTime.ToString()}"
 let geneSortDb = new GeneSortDbMp(rootDir) :> IGeneSortDb
 let cts = new CancellationTokenSource()
 let allowOverwrite = false |> UMX.tag<allowOverwrite>
-let maxParallel = 4 // Set a reasonable limit for your machine
+let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 ///// **********     RandomSorters   ****************
@@ -48,8 +48,8 @@ let maxParallel = 4 // Set a reasonable limit for your machine
 //let projectFolder = RandomSorters.projectFolder
 //let buildQueryParams = RandomSorters.makeQueryParamsFromRunParams
 //let paramRefiner = RandomSorters.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+//let minReplica = 1<replNumber>
+//let maxReplica = 2<replNumber>
 
 
 ///// **********     SortableMergeTests   ****************
@@ -71,7 +71,7 @@ let projectFolder = MergeIntEvals.projectFolder
 let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
 let paramRefiner = MergeIntEvals.paramMapRefiner
 let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+let maxReplica = 2<replNumber>
 
 
 
@@ -124,11 +124,11 @@ match execResult with
 //    |> Async.RunSynchronously
 
 
-printfn "Making Use Profile report ..."
+//printfn "Making Use Profile report ..."
 
-let uPReportResult = 
-    TextReporters.ceUseProfileReportExecutor geneSortDb projectFolder minReplica maxReplica buildQueryParams allowOverwrite cts (Some progress)
-    |> Async.RunSynchronously
+//let uPReportResult = 
+//    TextReporters.ceUseProfileReportExecutor geneSortDb projectFolder minReplica maxReplica buildQueryParams allowOverwrite cts (Some progress)
+//    |> Async.RunSynchronously
 
 
 //printfn "Making Use Bin report ..."

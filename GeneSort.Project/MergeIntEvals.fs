@@ -112,9 +112,9 @@ module MergeIntEvals =
 
     let sortableDataTypes () : string*string list =
         let values = [ 
-                        sortableDataFormat.IntArray; 
-                        sortableDataFormat.BoolArray;
-                        sortableDataFormat.Int8Vector512;
+                        //sortableDataFormat.IntArray; 
+                        //sortableDataFormat.BoolArray;
+                        //sortableDataFormat.Int8Vector512;
                         sortableDataFormat.BitVector512
                      ] |> List.map(SortableDataFormat.toString)
         (runParameters.sortableDataFormatKey, values )
@@ -122,7 +122,7 @@ module MergeIntEvals =
   
     let sortingWidths () : string * string list =
         //let values = [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] |> List.map string
-        let values = [16; 18; 24; 32; 36;] |> List.map string
+        let values = [48; 64; 96; 128; 192; 256] |> List.map string
         (runParameters.sortingWidthKey, values)
 
 
@@ -203,9 +203,9 @@ module MergeIntEvals =
                         return (r, w, md, mf, dt, sm)
                     } |> Result.ofOption "Missing domain parameters"
 
-                // 3. Load Sortable Tests (Cross-project query)
+                // 3. Load Sortable Tests (Cross-project query) (MergeTests are all repl 0)
                 let qpTests = SortableMergeTests.makeQueryParams 
-                                            (Some repl) 
+                                            (Some (0 |> UMX.tag<replNumber>)) 
                                             (Some width) 
                                             (Some mDim) 
                                             (Some mFill) 

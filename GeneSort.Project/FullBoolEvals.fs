@@ -111,10 +111,10 @@ module FullBoolEvals =
 
     let sortableDataFormatKeys () : string * string list =
         let values = [ 
-                        sortableDataFormat.IntArray; 
-                        sortableDataFormat.BoolArray;
-                        sortableDataFormat.Int8Vector256;
-                        sortableDataFormat.Int8Vector512;
+                        //sortableDataFormat.IntArray; 
+                        //sortableDataFormat.BoolArray;
+                        //sortableDataFormat.Int8Vector256;
+                        //sortableDataFormat.Int8Vector512;
                         sortableDataFormat.BitVector512;
 
                      ] |> List.map SortableDataFormat.toString
