@@ -144,7 +144,8 @@ module MergeIntEvals =
               sorterModelType.Mssi;
               sorterModelType.Msrs; 
               sorterModelType.Msuf4; 
-              sorterModelType.Msuf6; ]  |> List.map(SorterModelType.toString)
+           //   sorterModelType.Msuf6;
+              ]  |> List.map(SorterModelType.toString)
         (runParameters.sorterModelTypeKey, values )
 
 

@@ -76,32 +76,44 @@ module RandomSorters =
               sorterModelType.Mssi;
               sorterModelType.Msrs; 
               sorterModelType.Msuf4; 
-              sorterModelType.Msuf6; ]  |> List.map(SorterModelType.toString)
+             // sorterModelType.Msuf6; 
+              ]  |> List.map(SorterModelType.toString)
         (runParameters.sorterModelTypeKey, values )
 
 
-    let getStageLengthForSortingWidth (sortingWidth: int<sortingWidth>) : int<stageLength> =
-        match %sortingWidth with
-        | 4 -> 5 |> UMX.tag<stageLength>
-        | 6 -> 10 |> UMX.tag<stageLength>
-        | 8 -> 20 |> UMX.tag<stageLength>
-        | 12 -> 30 |> UMX.tag<stageLength>
-        | 16 -> 100 |> UMX.tag<stageLength>
-        | 18 -> 120 |> UMX.tag<stageLength>
-        | 20 -> 130 |> UMX.tag<stageLength>
-        | 22 -> 140 |> UMX.tag<stageLength>
-        | 24 -> 150 |> UMX.tag<stageLength>
-        | 32 -> 200 |> UMX.tag<stageLength>
-        | 36 -> 220 |> UMX.tag<stageLength>
-        | 48 -> 300 |> UMX.tag<stageLength>
-        | 64 -> 400 |> UMX.tag<stageLength>
-        | 72 -> 500 |> UMX.tag<stageLength>
-        | 96 -> 600 |> UMX.tag<stageLength>
-        | 128 -> 3800 |> UMX.tag<stageLength>
-        | 144 -> 6000 |> UMX.tag<stageLength>
-        | 192 -> 10000 |> UMX.tag<stageLength>
-        | 256 -> 12000 |> UMX.tag<stageLength>
-        | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
+    let getStageLengthForSortingWidth (isMuf4:bool) (sortingWidth: int<sortingWidth>) : int<stageLength> =
+        if isMuf4 then
+            match %sortingWidth with
+            | 4 -> 5 |> UMX.tag<stageLength>
+            | 8 -> 20 |> UMX.tag<stageLength>
+            | 16 -> 100 |> UMX.tag<stageLength>
+            | 32 -> 600 |> UMX.tag<stageLength>
+            | 64 -> 2000 |> UMX.tag<stageLength>
+            | 128 -> 5000 |> UMX.tag<stageLength>
+            | 256 -> 18000 |> UMX.tag<stageLength>
+            | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
+        else
+            match %sortingWidth with
+            | 4 -> 5 |> UMX.tag<stageLength>
+            | 6 -> 10 |> UMX.tag<stageLength>
+            | 8 -> 20 |> UMX.tag<stageLength>
+            | 12 -> 30 |> UMX.tag<stageLength>
+            | 16 -> 100 |> UMX.tag<stageLength>
+            | 18 -> 120 |> UMX.tag<stageLength>
+            | 20 -> 130 |> UMX.tag<stageLength>
+            | 22 -> 140 |> UMX.tag<stageLength>
+            | 24 -> 150 |> UMX.tag<stageLength>
+            | 32 -> 300 |> UMX.tag<stageLength>
+            | 36 -> 220 |> UMX.tag<stageLength>
+            | 48 -> 300 |> UMX.tag<stageLength>
+            | 64 -> 1200 |> UMX.tag<stageLength>
+            | 72 -> 500 |> UMX.tag<stageLength>
+            | 96 -> 600 |> UMX.tag<stageLength>
+            | 128 -> 3000 |> UMX.tag<stageLength>
+            | 144 -> 4000 |> UMX.tag<stageLength>
+            | 192 -> 6000 |> UMX.tag<stageLength>
+            | 256 -> 8000 |> UMX.tag<stageLength>
+            | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
 
      
      // --- Filters ---
@@ -138,9 +150,13 @@ module RandomSorters =
         let repl = rp.GetRepl().Value
         let sortingWidth = rp.GetSortingWidth().Value
         let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
-        let stageLength = getStageLengthForSortingWidth sortingWidth
+        let isMuf4 = 
+            match rp.GetSorterModelType().Value with
+            | sorterModelType.Msuf4 -> true
+            | _ -> false
+        let stageLength = getStageLengthForSortingWidth isMuf4 sortingWidth
         let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
-        let exp = Math.Min(%repl + 1, 3) |> float
+        let exp = Math.Min(%repl + 1, 2) |> float
         let sorterCount = (int (10.0 ** exp)) |> UMX.tag<sorterCount>
 
         rp.WithProjectName(Some projectName)
