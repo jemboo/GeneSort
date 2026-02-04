@@ -3,7 +3,6 @@
 open System
 open FSharp.UMX
 open GeneSort.Sorting
-open System.Linq
 
  type sorterSet =
     private { 
@@ -17,8 +16,6 @@ open System.Linq
                          (sorters: sorter array) : sorterSet =
         if %sorterSetId = Guid.Empty then
             invalidArg "sorterSetId" "SorterSet ID must not be empty"
-        if Array.isEmpty sorters then
-            invalidArg "sorters" "Sorter set must contain at least one sorter"
         { sorterSetId = sorterSetId; ceLength = ceLength; sorters = Array.copy sorters; }
 
     static member createWithNewId (ceLength: int<ceLength>) (sorters: sorter array) : sorterSet =

@@ -120,8 +120,8 @@ module MergeIntEvals =
 
   
     let sortingWidths () : string * string list =
-        let values = [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] |> List.map string
-        //let values = [48; 64; 96; 128; 192; 256] |> List.map string
+        //let values = [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] |> List.map string
+        let values = [ 16; 32;]  |> List.map string
         (runParameters.sortingWidthKey, values)
 
 
@@ -228,6 +228,10 @@ module MergeIntEvals =
                 let! _ = checkCancellation cts.Token
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
                 let! _ = db.saveAsync projectFolder qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
+                let qpSorterSetPass = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "Pass")
+                let passingSorterSet = 
+                    SorterSetEval.makePassingSorterSet sorterSet sorterSetEval
+                let! _ = db.saveAsync projectFolder qpSorterSetPass (passingSorterSet |> outputData.SorterSet) allowOverwrite
 
                 // 7. Success
                 return runParameters.WithRunFinished (Some true)

@@ -66,7 +66,8 @@ module RandomSorters =
     // Parameter spans:
     
     let sortingWidths() : string*string list =
-        let values = [4; 6; 8; 12; 16; 18; 20; 22; 24; 32; 36; 48; 64; 72; 96; 128; 144; 192; 256] |> List.map(fun d -> d.ToString())
+       // let values = [4; 6; 8; 12; 16; 18; 20; 22; 24; 32; 36; 48; 64; 72; 96; 128; 144; 192; 256] |> List.map(fun d -> d.ToString())
+        let values = [4; 6; 8; 12; 16;] |> List.map(fun d -> d.ToString())
         (runParameters.sortingWidthKey, values)
 
 
@@ -76,7 +77,7 @@ module RandomSorters =
               sorterModelType.Mssi;
               sorterModelType.Msrs; 
               sorterModelType.Msuf4; 
-              sorterModelType.Msuf6; 
+              //sorterModelType.Msuf6; 
               ]  |> List.map(SorterModelType.toString)
         (runParameters.sorterModelTypeKey, values )
 
@@ -84,9 +85,9 @@ module RandomSorters =
     let getStageLengthForSortingWidth (isMuf4:bool) (sortingWidth: int<sortingWidth>) : int<stageLength> =
         if isMuf4 then
             match %sortingWidth with
-            | 4 -> 5 |> UMX.tag<stageLength>
-            | 8 -> 20 |> UMX.tag<stageLength>
-            | 16 -> 100 |> UMX.tag<stageLength>
+            | 4 -> 10 |> UMX.tag<stageLength>
+            | 8 -> 50 |> UMX.tag<stageLength>
+            | 16 -> 200 |> UMX.tag<stageLength>
             | 32 -> 600 |> UMX.tag<stageLength>
             | 64 -> 2000 |> UMX.tag<stageLength>
             | 128 -> 5000 |> UMX.tag<stageLength>
@@ -95,20 +96,20 @@ module RandomSorters =
         else
             match %sortingWidth with
             | 4 -> 5 |> UMX.tag<stageLength>
-            | 6 -> 10 |> UMX.tag<stageLength>
-            | 8 -> 20 |> UMX.tag<stageLength>
-            | 12 -> 30 |> UMX.tag<stageLength>
+            | 6 -> 20 |> UMX.tag<stageLength>
+            | 8 -> 40 |> UMX.tag<stageLength>
+            | 12 -> 80 |> UMX.tag<stageLength>
             | 16 -> 100 |> UMX.tag<stageLength>
             | 18 -> 120 |> UMX.tag<stageLength>
             | 20 -> 130 |> UMX.tag<stageLength>
             | 22 -> 140 |> UMX.tag<stageLength>
-            | 24 -> 150 |> UMX.tag<stageLength>
+            | 24 -> 200 |> UMX.tag<stageLength>
             | 32 -> 300 |> UMX.tag<stageLength>
-            | 36 -> 220 |> UMX.tag<stageLength>
-            | 48 -> 300 |> UMX.tag<stageLength>
+            | 36 -> 340 |> UMX.tag<stageLength>
+            | 48 -> 700 |> UMX.tag<stageLength>
             | 64 -> 1200 |> UMX.tag<stageLength>
             | 72 -> 500 |> UMX.tag<stageLength>
-            | 96 -> 600 |> UMX.tag<stageLength>
+            | 96 -> 1800 |> UMX.tag<stageLength>
             | 128 -> 3000 |> UMX.tag<stageLength>
             | 144 -> 4000 |> UMX.tag<stageLength>
             | 192 -> 6000 |> UMX.tag<stageLength>
@@ -157,7 +158,7 @@ module RandomSorters =
         let stageLength = getStageLengthForSortingWidth isMuf4 sortingWidth
         let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.6) |> int) |> UMX.tag<ceLength>
         let exp = Math.Min(%repl + 1, 2) |> float
-        let sorterCount = (int (10.0 ** exp)) |> UMX.tag<sorterCount>
+        let sorterCount = (int (20.0 ** exp)) |> UMX.tag<sorterCount>
 
         rp.WithProjectName(Some projectName)
             .WithRunFinished(Some false)

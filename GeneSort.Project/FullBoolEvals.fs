@@ -93,8 +93,11 @@ module FullBoolEvals =
         refined
 
     
+    //let sortingWidthValues = 
+    //    [ 4; 6; 8; 12; 16; 18; 20; 22; 24] |> List.map(fun d -> d.ToString())
+
     let sortingWidthValues = 
-        [ 4; 6; 8; 12; 16; 18; 20; 22; 24] |> List.map(fun d -> d.ToString())
+        [ 4; 6; 8; 12; 16; ] |> List.map(fun d -> d.ToString())
 
     let sortingWidths() : string*string list =
         (runParameters.sortingWidthKey, sortingWidthValues)
@@ -172,17 +175,21 @@ module FullBoolEvals =
                 let qpSorters = RandomSorters.makeQueryParams (Some repl) (Some sortingWidth) (Some sorterModelType) (outputDataType.SorterSet "")
                 let! loadRes = db.loadAsync RandomSorters.projectFolder qpSorters
 
-                let! ss = loadRes |> OutputData.asSorterSet |> asAsync
+                let! sorterSet = loadRes |> OutputData.asSorterSet |> asAsync
 
                 // 4. Perform Computation
                 let! _ = checkCancellation cts.Token
                 let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataFormat
-                let sorterSetEval = SorterSetEval.makeSorterSetEval ss sortableTests false
+                let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests false
 
                 // 5. Save Results
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
                 let! _ = db.saveAsync projectFolder qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
+                let qpSorterSetPass = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "Pass")
+                let passingSorterSet = 
+                    SorterSetEval.makePassingSorterSet sorterSet sorterSetEval
+                let! _ = db.saveAsync projectFolder qpSorterSetPass (passingSorterSet |> outputData.SorterSet) allowOverwrite
 
                 // 6. Final Success
                 return runParameters.WithRunFinished (Some true)
