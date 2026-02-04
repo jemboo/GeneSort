@@ -39,7 +39,6 @@ module MergeIntEvals =
             [|
                 (runParameters.sortingWidthKey, sortingWidth |> UmxExt.intToString ); 
                 (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString );
-                (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringToString );
                 (runParameters.mergeDimensionKey, mergeDimension |> UmxExt.intToString );
                 (runParameters.mergeSuffixTypeKey, mergeFillType |> Option.map MergeFillType.toString |> UmxExt.stringToString );
             |])
@@ -114,15 +113,15 @@ module MergeIntEvals =
         let values = [ 
                         //sortableDataFormat.IntArray; 
                         //sortableDataFormat.BoolArray;
-                        //sortableDataFormat.Int8Vector512;
-                        sortableDataFormat.BitVector512
+                        sortableDataFormat.Int8Vector512;
+                        //sortableDataFormat.BitVector512
                      ] |> List.map(SortableDataFormat.toString)
         (runParameters.sortableDataFormatKey, values )
 
   
     let sortingWidths () : string * string list =
-        //let values = [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] |> List.map string
-        let values = [48; 64; 96; 128; 192; 256] |> List.map string
+        let values = [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] |> List.map string
+        //let values = [48; 64; 96; 128; 192; 256] |> List.map string
         (runParameters.sortingWidthKey, values)
 
 

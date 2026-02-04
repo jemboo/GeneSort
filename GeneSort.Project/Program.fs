@@ -98,24 +98,24 @@ let maxReplica = 2<replNumber>
 
 
 
-printfn "Initializing Project..."
-let initResult = 
-    ProjectOps.initProjectFiles geneSortDb projectFolder buildQueryParams cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
-    |> Async.RunSynchronously
+//printfn "Initializing Project..."
+//let initResult = 
+//    ProjectOps.initProjectFiles geneSortDb projectFolder buildQueryParams cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
+//    |> Async.RunSynchronously
 
-match initResult with
-| Ok () -> printfn "Project files initialized successfully."
-| Error e -> printfn "Init Failed: %s" e
+//match initResult with
+//| Ok () -> printfn "Project files initialized successfully."
+//| Error e -> printfn "Init Failed: %s" e
 
 
-printfn "Executing Runs..."
-let execResult = 
-    ProjectOps.executeRuns geneSortDb projectFolder minReplica maxReplica buildQueryParams projectName allowOverwrite cts (Some progress) executor maxParallel
-    |> Async.RunSynchronously
+//printfn "Executing Runs..."
+//let execResult = 
+//    ProjectOps.executeRuns geneSortDb projectFolder minReplica maxReplica buildQueryParams projectName allowOverwrite cts (Some progress) executor maxParallel
+//    |> Async.RunSynchronously
 
-match execResult with
-| Ok results -> printfn "Execution complete. %d results processed." results.Length
-| Error e -> printfn "Execution Failed: %s" e
+//match execResult with
+//| Ok results -> printfn "Execution complete. %d results processed." results.Length
+//| Error e -> printfn "Execution Failed: %s" e
 
 
 //printfn "Printing RunParams..."
@@ -124,11 +124,11 @@ match execResult with
 //    |> Async.RunSynchronously
 
 
-//printfn "Making Use Profile report ..."
+printfn "Making Use Profile report ..."
 
-//let uPReportResult = 
-//    TextReporters.ceUseProfileReportExecutor geneSortDb projectFolder minReplica maxReplica buildQueryParams allowOverwrite cts (Some progress)
-//    |> Async.RunSynchronously
+let uPReportResult = 
+    TextReporters.ceUseProfileReportExecutor geneSortDb projectFolder minReplica maxReplica buildQueryParams allowOverwrite cts (Some progress)
+    |> Async.RunSynchronously
 
 
 //printfn "Making Use Bin report ..."
