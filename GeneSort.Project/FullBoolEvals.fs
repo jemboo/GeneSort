@@ -97,7 +97,7 @@ module FullBoolEvals =
     //    [ 4; 6; 8; 12; 16; 18; 20; 22; 24] |> List.map(fun d -> d.ToString())
 
     let sortingWidthValues = 
-        [ 4; 6; 8; 12; 16; ] |> List.map(fun d -> d.ToString())
+        [ 4; 6; 8; 12; 16; 18; 20; 22; 24 ] |> List.map(fun d -> d.ToString())
 
     let sortingWidths() : string*string list =
         (runParameters.sortingWidthKey, sortingWidthValues)
@@ -107,7 +107,8 @@ module FullBoolEvals =
           sorterModelType.Mssi;
           sorterModelType.Msrs; 
           sorterModelType.Msuf4; 
-          sorterModelType.Msuf6; ]  |> List.map(SorterModelType.toString)
+          //sorterModelType.Msuf6; 
+          ]  |> List.map(SorterModelType.toString)
 
     let sorterModelKeys() : string*string list =
         (runParameters.sorterModelTypeKey, sorterModelKeyValues() )
