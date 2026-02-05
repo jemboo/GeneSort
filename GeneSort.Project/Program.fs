@@ -42,14 +42,14 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 /// **********     RandomSorters   ****************
-//let executor = RandomSorters.executor
-//let project = RandomSorters.project
-//let projectName = RandomSorters.project.ProjectName
-//let projectFolder = RandomSorters.projectFolder
-//let buildQueryParams = RandomSorters.makeQueryParamsFromRunParams
-//let paramRefiner = RandomSorters.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 3<replNumber>
+let executor = RandomSorters.executor
+let project = RandomSorters.project
+let projectName = RandomSorters.project.ProjectName
+let projectFolder = RandomSorters.projectFolder
+let buildQueryParams = RandomSorters.makeQueryParamsFromRunParams
+let paramRefiner = RandomSorters.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 9<replNumber>
 
 
 ///// **********     SortableMergeTests   ****************
@@ -64,14 +64,14 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 /// **********     MergeIntEvals   ****************
-let executor = MergeIntEvals.executor
-let project = MergeIntEvals.project
-let projectName = MergeIntEvals.project.ProjectName
-let projectFolder = MergeIntEvals.projectFolder
-let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
-let paramRefiner = MergeIntEvals.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 3<replNumber>
+//let executor = MergeIntEvals.executor
+//let project = MergeIntEvals.project
+//let projectName = MergeIntEvals.project.ProjectName
+//let projectFolder = MergeIntEvals.projectFolder
+//let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
+//let paramRefiner = MergeIntEvals.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 9<replNumber>
 
 
 
@@ -94,7 +94,7 @@ let maxReplica = 3<replNumber>
 //let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
 //let paramRefiner = FullBoolEvals.paramMapRefiner
 //let minReplica = 0<replNumber>
-//let maxReplica = 3<replNumber>
+//let maxReplica = 9<replNumber>
 
 
 
