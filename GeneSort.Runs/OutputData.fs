@@ -32,6 +32,10 @@ type outputData =
 
 module OutputData =
 
+    let asSorterModelSet = function
+        | SorterModelSet sms -> Ok sms
+        | _ -> Error "Database returned data, but it was not a SorterModelSet."
+
     let asSorterSet = function
         | SorterSet ss -> Ok ss
         | _ -> Error "Database returned data, but it was not a SorterSet."

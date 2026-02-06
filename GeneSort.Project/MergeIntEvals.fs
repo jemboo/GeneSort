@@ -11,6 +11,7 @@ open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.SortingOps
 open ProjectOps
+open GeneSort.Model.Sorter
 
 
 module MergeIntEvals =
@@ -215,12 +216,18 @@ module MergeIntEvals =
                 let! rawTestData = db.loadAsync SortableMergeTests.projectFolder qpTests 
                 let! sortableTest = rawTestData |> OutputData.asSortableTest
 
-                // 4. Load Sorter Set (Cross-project query)
-                let qpSorters = RandomSorters.makeQueryParams (Some repl) (Some width) (Some sModel) (outputDataType.SorterSet "")
-                let! rawSorterData = db.loadAsync RandomSorters.projectFolder qpSorters
-                let! sorterSet = rawSorterData |> OutputData.asSorterSet
+                //// 4. Load Sorter Set (Cross-project query)
+                //let qpSorters = RandomSorters.makeQueryParams (Some repl) (Some width) (Some sModel) (outputDataType.SorterSet "")
+                //let! rawSorterData = db.loadAsync RandomSorters.projectFolder qpSorters
+                //let! sorterSet = rawSorterData |> OutputData.asSorterSet
+
+                // 4. Load SorterModelSet (Cross-project query)
+                let qpSorterModelSet = RandomSorters.makeQueryParams (Some repl) (Some width) (Some sModel) (outputDataType.SorterModelSet "")
+                let! smsOutput = db.loadAsync RandomSorters.projectFolder qpSorterModelSet
+                let! sorterModelSet = smsOutput |> OutputData.asSorterModelSet
 
                 // 5. Computation
+                let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
                 let! _ = checkCancellation cts.Token
                 let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTest false
 

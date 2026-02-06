@@ -280,11 +280,11 @@ module RandomSorters =
                 let! _ = checkCancellation cts.Token
 
                 // 4. Saves
-                let qpSorterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "") 
-                let! _ = db.saveAsync projectFolder qpSorterSet (sorterSet |> outputData.SorterSet) allowOverwrite
+                //let qpSorterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "") 
+                //let! _ = db.saveAsync projectFolder qpSorterSet (sorterSet |> outputData.SorterSet) allowOverwrite
             
-                progress |> Option.iter (fun p -> 
-                    p.Report(sprintf "Saved sorterSet %s for run: %s" (%sorterSet.Id.ToString()) %runId))
+                //progress |> Option.iter (fun p -> 
+                //    p.Report(sprintf "Saved sorterSet %s for run: %s" (%sorterSet.Id.ToString()) %runId))
 
                 let qpModelSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSet "") 
                 let! _ = db.saveAsync projectFolder qpModelSet (sorterModelSet |> outputData.SorterModelSet) allowOverwrite
