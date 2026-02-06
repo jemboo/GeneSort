@@ -7,6 +7,7 @@ open GeneSort.Model.Sorter.Rs
 open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Uf6
 open GeneSort.Sorting
+open FSharp.UMX
 
 
 type sorterModel =
@@ -18,6 +19,14 @@ type sorterModel =
 
 
 module SorterModel =
+    
+    let getId (model: sorterModel) : Guid<sorterModelID> =
+        match model with
+        | Msce msce -> msce.Id
+        | Mssi mssi -> mssi.Id
+        | Msrs msrs -> msrs.Id
+        | Msuf4 msuf4 -> msuf4.Id
+        | Msuf6 msuf6 -> msuf6.Id
 
     let makeSorter (model: sorterModel) : sorter =
         match model with

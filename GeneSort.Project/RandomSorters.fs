@@ -279,7 +279,7 @@ module RandomSorters =
 
                 let! _ = checkCancellation cts.Token
 
-                // 4. Sequential Saves
+                // 4. Saves
                 let qpSorterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "") 
                 let! _ = db.saveAsync projectFolder qpSorterSet (sorterSet |> outputData.SorterSet) allowOverwrite
             
