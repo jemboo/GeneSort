@@ -1,16 +1,15 @@
 ﻿namespace GeneSort.SortingOps
 
-open System
 open FSharp.UMX
 open GeneSort.Sorting
 
 
-type sorterModelEval =
+type sortingModelEval =
      | Sorter of sorterEval
 
 
-module SorterModelEval =
+module SoringModelEval =
 
-    let getId (modelEval: sorterModelEval) : Guid<sorterId> =
+    let getId (modelEval: sortingModelEval) : Guid<sorterId> =
         match modelEval with
         | Sorter eval -> eval.SorterId

@@ -8,7 +8,7 @@ open GeneSort.SortingOps
 open GeneSort.SortingOps.Mp
 
 [<MessagePackObject>]
-type sorterSetEvalDto = {
+type sorterModelSetEvalDto = {
     [<Key(0)>]
     SorterSetEvalId: Guid
     [<Key(1)>]
@@ -21,7 +21,7 @@ type sorterSetEvalDto = {
 
 module SorterSetEvalDto =
 
-    let fromDomain (sorterSetEval: sorterModelSetEval) : sorterSetEvalDto =
+    let fromDomain (sorterSetEval: sorterModelSetEval) : sorterModelSetEvalDto =
         { 
             SorterSetEvalId = %sorterSetEval.SorterModelSetEvalId
             SorterSetId = %sorterSetEval.SorterSetId
@@ -29,7 +29,7 @@ module SorterSetEvalDto =
             SorterEvals = sorterSetEval.SorterEvals |> Array.map SorterEvalDto.toSorterEvalDto
         }
 
-    let toDomain (dto: sorterSetEvalDto) : sorterModelSetEval =
+    let toDomain (dto: sorterModelSetEvalDto) : sorterModelSetEval =
         if dto.SorterSetEvalId = Guid.Empty then
             failwith "SorterSetEvalId must not be empty"
         if dto.SorterSetId = Guid.Empty then

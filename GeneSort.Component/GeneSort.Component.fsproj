@@ -16,19 +16,19 @@
     <Compile Include="Sortable\SortableBoolArray.fs" />
     <Compile Include="Sortable\SortableIntArray.fs" />
     <Compile Include="Sortable\SortBlockBitv512.fs" />
-    <Compile Include="Sortable\SortBlockUint8v256.fs" />
-    <Compile Include="Sortable\SortBlockUint8v512.fs" />
-    <Compile Include="Sortable\SortableBinaryTest.fs" />
-    <Compile Include="Sortable\SortableIntTest.fs" />
-    <Compile Include="Sortable\PackedSortableIntTest.fs" />
-    <Compile Include="Sortable\SortableBitv512Test.fs" />
-    <Compile Include="Sortable\SortableUint8v256Test.fs" />
-    <Compile Include="Sortable\SortableUint8v512Test.fs" />
     <Compile Include="Sortable\GrayVectorGenerator.fs" />
-    <Compile Include="Sortable\SortableTest.fs" />
+    <Compile Include="Sortable\PackedSortableIntTest.fs" />
+    <Compile Include="Sortable\SortableBinaryTest.fs" />
+    <Compile Include="Sortable\SortableBitv512Test.fs" />
     <Compile Include="Sortable\SortableBoolTestSet.fs" />
+    <Compile Include="Sortable\SortableIntTest.fs" />
     <Compile Include="Sortable\SortableIntTestSet.fs" />
     <Compile Include="Sortable\SortableTestSet.fs" />
+    <Compile Include="Sortable\SortBlockUint8v512.fs" />
+    <Compile Include="Sortable\SortBlockUint8v256.fs" />
+    <Compile Include="Sortable\SortableUint8v256Test.fs" />
+    <Compile Include="Sortable\SortableUint8v512Test.fs" />
+    <Compile Include="Sortable\SortableTest.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
