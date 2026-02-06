@@ -76,9 +76,9 @@ module CeBlockOpsPacked =
         let ces = ceBlock.CeArray
     
         // Pre-deconstruct CEs for the hot loop
-        let lows = Array.init %ceBlock.Length (fun i -> ces.[i].Low)
-        let highs = Array.init %ceBlock.Length (fun i -> ces.[i].Hi)
-        let ceUseCounts = ceUseCounts.Create ceBlock.Length
+        let lows = Array.init %ceBlock.CeLength (fun i -> ces.[i].Low)
+        let highs = Array.init %ceBlock.CeLength (fun i -> ces.[i].Hi)
+        let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
         let mutable unsortedCount = 0
     
         // Work on a mutable copy
@@ -88,7 +88,7 @@ module CeBlockOpsPacked =
         // PHASE 1: THE SORTING (Hot Loop)
         for t = 0 to %totalTests - 1 do
             let offset = t * sw
-            for i = 0 to %ceBlock.Length - 1 do
+            for i = 0 to %ceBlock.CeLength - 1 do
                 let lPtr = &Unsafe.Add(&dataRef, offset + lows.[i])
                 let hPtr = &Unsafe.Add(&dataRef, offset + highs.[i])
                 let a = lPtr
@@ -120,9 +120,9 @@ module CeBlockOpsPacked =
         let ces = ceBlock.CeArray
     
         // Pre-deconstruct CEs for the hot loop
-        let lows = Array.init %ceBlock.Length (fun i -> ces.[i].Low)
-        let highs = Array.init %ceBlock.Length (fun i -> ces.[i].Hi)
-        let ceUseCounts = ceUseCounts.Create ceBlock.Length
+        let lows = Array.init %ceBlock.CeLength (fun i -> ces.[i].Low)
+        let highs = Array.init %ceBlock.CeLength (fun i -> ces.[i].Hi)
+        let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
     
         // Work on a mutable copy
         let resultsBuffer = Array.copy tests.PackedValues
@@ -131,7 +131,7 @@ module CeBlockOpsPacked =
         // PHASE 1: THE SORTING (Hot Loop)
         for t = 0 to %totalTests - 1 do
             let offset = t * sw
-            for i = 0 to %ceBlock.Length - 1 do
+            for i = 0 to %ceBlock.CeLength - 1 do
                 let lPtr = &Unsafe.Add(&dataRef, offset + lows.[i])
                 let hPtr = &Unsafe.Add(&dataRef, offset + highs.[i])
                 let a = lPtr

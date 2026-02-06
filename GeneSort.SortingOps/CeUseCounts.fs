@@ -19,8 +19,8 @@ type ceUseCounts =
         mutable mutableHash: int 
     }
 
-    static member Create (ceBlockLength: int<ceBlockLength>) =
-        { useCounts = Array.zeroCreate %ceBlockLength; mutableHash = 0 }
+    static member Create (ceLength: int<ceLength>) =
+        { useCounts = Array.zeroCreate %ceLength; mutableHash = 0 }
 
     static member CreateFromArray (counts: int[]) =
         { useCounts = Array.copy counts; mutableHash = 0 }

@@ -75,7 +75,7 @@ module CeBlockOpsUint8v256 =
                    Highs = ceb.CeArray |> Array.map (fun c -> c.Hi)
                    CeLen = ceb.CeArray.Length |})
 
-            let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].Length))
+            let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].CeLength))
             let globalUnsorted = Array.zeroCreate<int> numNetworks
 
             Parallel.ForEach(
@@ -195,7 +195,7 @@ module CeBlockOpsUint8v256 =
                CeLen = ceb.CeArray.Length |})
 
         // Final global storage
-        let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].Length))
+        let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].CeLength))
         let globalUnsorted = Array.zeroCreate<int> numNetworks
     
         // ConcurrentDictionary with explicit type annotation and custom content comparer

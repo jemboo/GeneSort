@@ -121,7 +121,7 @@ module OutputDataFile =
                         }
                     | outputDataType.SorterSetEval _ ->
                         async {
-                            let! domain = deserializeDto<sorterSetEvalDto, sorterSetEval> stream token SorterSetEvalDto.toDomain
+                            let! domain = deserializeDto<sorterSetEvalDto, sorterModelSetEval> stream token SorterSetEvalDto.toDomain
                             return outputData.SorterSetEval domain
                         }
                     | outputDataType.SorterSetEvalBins _ ->

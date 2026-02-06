@@ -13,7 +13,7 @@ module CeBlockOpsInt =
 
 
     let eval (sits: sortableIntTest) (ceBlock: ceBlock) =
-            let ceUseCounts = ceUseCounts.Create ceBlock.Length
+            let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
             let mutable unsortedCount = 0
             let ces = ceBlock.CeArray
             let sw = sits.SortingWidth
@@ -50,7 +50,7 @@ module CeBlockOpsInt =
 
 
     let evalAndCollectResults (sits: sortableIntTest) (ceBlock: ceBlock) =
-            let ceUseCounts = ceUseCounts.Create ceBlock.Length
+            let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
             let ces = ceBlock.CeArray
             let sw = sits.SortingWidth
             let pool = ArrayPool<int>.Shared
@@ -91,9 +91,9 @@ module CeBlockOpsInt =
 
 
     let evalAndDedupeCeFetch (sits: sortableIntTest) (ceBlock: ceBlock) =
-            let ceUseCounts = ceUseCounts.Create ceBlock.Length
-            let lows = Array.init %ceBlock.Length (fun i -> ceBlock.CeArray.[i].Low)
-            let highs = Array.init %ceBlock.Length (fun i -> ceBlock.CeArray.[i].Hi)
+            let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
+            let lows = Array.init %ceBlock.CeLength (fun i -> ceBlock.CeArray.[i].Low)
+            let highs = Array.init %ceBlock.CeLength (fun i -> ceBlock.CeArray.[i].Hi)
             let sw = sits.SortingWidth
             let pool = ArrayPool<int>.Shared
             let results = HashSet<sortableIntArray>(SortableIntArray.SortableIntArrayValueComparer())
@@ -103,7 +103,7 @@ module CeBlockOpsInt =
                 Array.blit sia.Values 0 workArray 0 %sw
 
                 // HOT LOOP: Logic reduced to simple primitive array lookups
-                for i = 0 to %ceBlock.Length - 1 do
+                for i = 0 to %ceBlock.CeLength - 1 do
                     let lIdx = lows.[i]
                     let hIdx = highs.[i]
                     let a = workArray.[lIdx]
@@ -136,7 +136,7 @@ module CeBlockOpsInt =
 
     let evalAndDedupeUnsafe (sits: sortableIntTest) (ceBlock: ceBlock) =
         let ces = ceBlock.CeArray
-        let ceLen = ces.Length |> UMX.tag<ceBlockLength>
+        let ceLen = ces.Length |> UMX.tag<ceLength>
         let ceUseCounts = ceUseCounts.Create ceLen
         let sw = %sits.SortingWidth
         let pool = ArrayPool<int>.Shared

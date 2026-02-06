@@ -23,7 +23,7 @@ type outputData =
     | SorterModelSetMaker of sorterModelSetMaker
     | SortableTestModelSet of sortableTestModelSet
     | SortableTestModelSetMaker of sortableTestModelSetMaker
-    | SorterSetEval of sorterSetEval
+    | SorterSetEval of sorterModelSetEval
     | SorterSetEvalBins of sorterSetEvalBins
     | Project of project
     | TextReport of dataTableFile

@@ -55,7 +55,7 @@ module CeBlockOpsBitv512 =
                Highs = ceb.CeArray |> Array.map (fun c -> c.Hi)
                CeLen = ceb.CeArray.Length |})
 
-        let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].Length))
+        let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].CeLength))
         let globalUnsortedCount = Array.zeroCreate<int> numNetworks
 
         Parallel.ForEach(
@@ -150,7 +150,7 @@ module CeBlockOpsBitv512 =
                    SortingWidth = ceb.SortingWidth
                    CeLen = ceb.CeArray.Length |})
 
-            let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].Length))
+            let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].CeLength))
             let globalUnsortedCount = Array.zeroCreate<int> numNetworks
         
             // ConcurrentDictionary to store unique failed sequences

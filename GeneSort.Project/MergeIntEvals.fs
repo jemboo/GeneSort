@@ -229,7 +229,7 @@ module MergeIntEvals =
                 // 5. Computation
                 let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
                 let! _ = checkCancellation cts.Token
-                let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTest false
+                let sorterSetEval = SorterModelSetEval.makeSorterSetEval sorterSet sortableTest false
 
                 // 6. Save
                 let! _ = checkCancellation cts.Token
@@ -237,7 +237,7 @@ module MergeIntEvals =
                 let! _ = db.saveAsync projectFolder qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
                 let qpSorterSetPass = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "Pass")
                 let passingSorterSet = 
-                    SorterSetEval.makePassingSorterSet sorterSet sorterSetEval
+                    SorterModelSetEval.makePassingSorterSet sorterSet sorterSetEval
                 let! _ = db.saveAsync projectFolder qpSorterSetPass (passingSorterSet |> outputData.SorterSet) allowOverwrite
 
                 // 7. Success

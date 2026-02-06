@@ -8,51 +8,52 @@ open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
 
 
-[<Measure>] type sorterSetEvalId
+[<Measure>] type sorterModelSetEvalId
 
-type sorterSetEval =
+type sorterModelSetEval =
 
     private { 
-        sorterSetEvalId: Guid<sorterSetEvalId>
+        sorterModelSetEvalId: Guid<sorterModelSetEvalId>
         sorterSetId: Guid<sorterSetId>
         sorterTestId: Guid<sorterTestId>
         sorterEvals: sorterEval[]
-        ceLength: int<ceLength>
     }
 
     static member create 
                 (sorterSetId: Guid<sorterSetId>) 
                 (sorterTestsId: Guid<sorterTestId>) 
-                (sorterEval: sorterEval[])
-                (ceLength: int<ceLength>) =
+                (sorterEval: sorterEval[]) =
         let id =
             [
                 sorterSetId :> obj
                 sorterTestsId :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterSetEvalId>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelSetEvalId>
 
         { 
-            sorterSetEvalId = id
+            sorterModelSetEvalId = id
             sorterSetId = sorterSetId
             sorterTestId = sorterTestsId
             sorterEvals = sorterEval
-            ceLength = ceLength
         }
 
-    member this.SorterSetEvalId with get() : Guid<sorterSetEvalId> = this.sorterSetEvalId
+    member this.SorterModelSetEvalId with get() : Guid<sorterModelSetEvalId> = this.sorterModelSetEvalId
     member this.SorterSetId with get() : Guid<sorterSetId> = this.sorterSetId
     member this.SorterTestId with get() : Guid<sorterTestId> = this.sorterTestId
     member this.SorterEvals with get() : sorterEval[] = this.sorterEvals
-    member this.CeLength with get() : int<ceLength> = this.ceLength
 
  
 
-module SorterSetEval =
+module SorterModelSetEval =
+
+    let getCeLength (sorterModelSetEval: sorterModelSetEval) : int<ceLength> =
+        match sorterModelSetEval.SorterEvals |> Array.tryHead with
+        | Some firstEval -> firstEval.CeBlockEval.CeBlock.CeLength
+        | None -> failwith "SorterSetEval contains no SorterEvals"
 
     let makeSorterSetEval
             (sorterSet: sorterSet)
             (sortableTest: sortableTest) 
-            (collectResults: bool) : sorterSetEval =
+            (collectResults: bool) : sorterModelSetEval =
 
 
         let ceBlockAs = 
@@ -71,14 +72,14 @@ module SorterSetEval =
                             sorter.SorterId
                             ceBlockEval
                 )
-        sorterSetEval.create sorterSet.Id (sortableTest |> SortableTests.getId ) sorterEvals (sorterSet.CeLength)
+        sorterModelSetEval.create sorterSet.Id (sortableTest |> SortableTests.getId ) sorterEvals
 
 
     /// For the sorterSet and its corresponding sorterSetEval, this creates a subset 
     /// that consists of all the sorters with an UnsortedCount = 0
     let makePassingSorterSet
             (sorterSet: sorterSet)
-            (sorterSetEval: sorterSetEval) : sorterSet =
+            (sorterSetEval: sorterModelSetEval) : sorterSet =
         
         // 1. Identify the IDs of the sorters that passed (UnsortedCount = 0)
         let passingIds = 
@@ -97,7 +98,7 @@ module SorterSetEval =
         let newSetId = 
             [ 
                 sorterSet.Id :> obj
-                sorterSetEval.SorterSetEvalId :> obj
+                sorterSetEval.SorterModelSetEvalId :> obj
                 "PassingSubset" :> obj 
             ] 
             |> GuidUtils.guidFromObjs 

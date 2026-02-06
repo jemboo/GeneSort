@@ -11,10 +11,6 @@ type ceIndex
 [<Measure>] 
 type ceBlockId
 
-[<Measure>] 
-type ceBlockLength
-
-
 
 type ceBlock = 
     private { 
@@ -44,14 +40,14 @@ type ceBlock =
 
     member this.CeBlockId with get() = this.ceBlockId
 
-    member this.Length with get() = this.ces.Length |> UMX.tag<ceBlockLength>
+    member this.CeLength with get() = this.ces.Length |> UMX.tag<ceLength>
 
     member this.SortingWidth with get() = this.sortingWidth
 
 
 module CeBlock =
 
-    let breakUpIntoBlocks (sortingWidth: int<sortingWidth>) (ces:ce[]) (blockLength:int<ceBlockLength>) =
+    let breakUpIntoBlocks (sortingWidth: int<sortingWidth>) (ces:ce[]) (blockLength:int<ceLength>) =
         let totalCes = ces.Length
         let blocks = 
             [|

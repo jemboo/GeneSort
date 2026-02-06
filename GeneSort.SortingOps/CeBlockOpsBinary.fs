@@ -13,7 +13,7 @@ module CeBlockOpsBinary =
 
 
     let eval (sbts: sortableBinaryTest) (ceBlock: ceBlock) :ceBlockEval =
-            let ceUseCounts = ceUseCounts.Create ceBlock.Length
+            let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
             let mutable unsortedCount = 0
             let ces = ceBlock.CeArray
             let sw = sbts.SortingWidth
@@ -50,7 +50,7 @@ module CeBlockOpsBinary =
 
 
     let evalAndCollectResults (sbts: sortableBinaryTest) (ceBlock: ceBlock) :ceBlockEval =
-            let ceUseCounts = ceUseCounts.Create ceBlock.Length
+            let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
             let ces = ceBlock.CeArray
             let sw = sbts.SortingWidth
             let pool = ArrayPool<bool>.Shared
@@ -92,9 +92,9 @@ module CeBlockOpsBinary =
 
 
     let evalAndDedupeCeFetch (sbts: sortableBinaryTest) (ceBlock: ceBlock) :ceBlockEval =
-            let ceUseCounts = ceUseCounts.Create ceBlock.Length
-            let lows = Array.init %ceBlock.Length (fun i -> ceBlock.CeArray.[i].Low)
-            let highs = Array.init %ceBlock.Length (fun i -> ceBlock.CeArray.[i].Hi)
+            let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
+            let lows = Array.init %ceBlock.CeLength (fun i -> ceBlock.CeArray.[i].Low)
+            let highs = Array.init %ceBlock.CeLength (fun i -> ceBlock.CeArray.[i].Hi)
             let sw = sbts.SortingWidth
             let pool = ArrayPool<bool>.Shared
             let results = HashSet<sortableBoolArray>(SortableBoolArray.SortableBoolArrayValueComparer())
@@ -103,7 +103,7 @@ module CeBlockOpsBinary =
                 let workArray = pool.Rent(%sw)
                 Array.blit sba.Values 0 workArray 0 %sw
 
-                for i = 0 to %ceBlock.Length - 1 do
+                for i = 0 to %ceBlock.CeLength - 1 do
                     let lIdx = lows.[i]
                     let hIdx = highs.[i]
                     // Boolean Comparison: true (1) > false (0)
@@ -135,7 +135,7 @@ module CeBlockOpsBinary =
 
     let evalAndDedupeUnsafe (sbts: sortableBinaryTest) (ceBlock: ceBlock) :ceBlockEval =
         let ces = ceBlock.CeArray
-        let ceLen = ces.Length |> UMX.tag<ceBlockLength>
+        let ceLen = ces.Length |> UMX.tag<ceLength>
         let ceUseCounts = ceUseCounts.Create ceLen
         let sw = %sbts.SortingWidth
         let pool = ArrayPool<bool>.Shared

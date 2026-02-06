@@ -43,7 +43,7 @@ module SorterSetEvalBinsDto =
         for (keyDto, binDto) in dto.EvalBins do
             evalBins.[SorterEvalKeyDto.fromSorterEvalKeyDto keyDto] <- SorterEvalBinDto.toDomain binDto
         { 
-            sorterSetEvalId = UMX.tag<sorterSetEvalId> dto.SorterSetEvalId
+            sorterSetEvalId = UMX.tag<sorterModelSetEvalId> dto.SorterSetEvalId
             totalSampleCount = dto.TotalSampleCount
             maxSorterEvalCount = dto.MaxBinCount
             evalBins = evalBins

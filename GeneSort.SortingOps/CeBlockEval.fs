@@ -46,7 +46,7 @@ type ceBlockEval =
     static member getUsedCes (ceb: ceBlock) (useCounts: ceUseCounts) : ce[] =
         let usedCes = ResizeArray<ce>()
 
-        for i in 0 .. (%ceb.Length - 1) do
+        for i in 0 .. (%ceb.CeLength - 1) do
             if useCounts.[i |> UMX.tag<ceIndex>] > 0 then
                 usedCes.Add(ceb.getCe i)
         usedCes.ToArray()

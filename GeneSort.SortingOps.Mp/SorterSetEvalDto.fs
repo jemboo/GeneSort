@@ -16,31 +16,27 @@ type sorterSetEvalDto = {
     [<Key(2)>]
     SorterTestsId: Guid
     [<Key(3)>]
-    CeLength: int
-    [<Key(4)>]
     SorterEvals: sorterEvalDto array
 }
 
 module SorterSetEvalDto =
 
-    let fromDomain (sorterSetEval: sorterSetEval) : sorterSetEvalDto =
+    let fromDomain (sorterSetEval: sorterModelSetEval) : sorterSetEvalDto =
         { 
-            SorterSetEvalId = %sorterSetEval.SorterSetEvalId
+            SorterSetEvalId = %sorterSetEval.SorterModelSetEvalId
             SorterSetId = %sorterSetEval.SorterSetId
             SorterTestsId = %sorterSetEval.SorterTestId
             SorterEvals = sorterSetEval.SorterEvals |> Array.map SorterEvalDto.toSorterEvalDto
-            CeLength = %sorterSetEval.CeLength
         }
 
-    let toDomain (dto: sorterSetEvalDto) : sorterSetEval =
+    let toDomain (dto: sorterSetEvalDto) : sorterModelSetEval =
         if dto.SorterSetEvalId = Guid.Empty then
             failwith "SorterSetEvalId must not be empty"
         if dto.SorterSetId = Guid.Empty then
             failwith "SorterSetId must not be empty"
         if dto.SorterTestsId = Guid.Empty then
             failwith "SorterTestsId must not be empty"
-        sorterSetEval.create
+        sorterModelSetEval.create
             (UMX.tag<sorterSetId> dto.SorterSetId)
             (UMX.tag<sorterTestId> dto.SorterTestsId)
             (dto.SorterEvals |> Array.map SorterEvalDto.fromSorterEvalDto)
-            (UMX.tag<ceLength> dto.CeLength)

@@ -32,7 +32,7 @@ module SorterEvalBin =
 
 
 type sorterSetEvalBins = {
-    sorterSetEvalId: Guid<sorterSetEvalId>
+    sorterSetEvalId: Guid<sorterModelSetEvalId>
     mutable totalSampleCount: int
     maxSorterEvalCount: int
     evalBins: Dictionary<sorterEvalKey, sorterEvalBin>
@@ -66,9 +66,9 @@ module SorterSetEvalBins =
         sorterSetEvalBins.totalSampleCount <- sorterSetEvalBins.totalSampleCount + 1
 
 
-    let create (maxBinCount: int) (sorterSetEval:sorterSetEval) : sorterSetEvalBins =
+    let create (maxBinCount: int) (sorterSetEval:sorterModelSetEval) : sorterSetEvalBins =
         let sorterSetEvalBins = {
-            sorterSetEvalId = sorterSetEval.SorterSetEvalId
+            sorterSetEvalId = sorterSetEval.SorterModelSetEvalId
             totalSampleCount = 0
             maxSorterEvalCount = maxBinCount
             evalBins = Dictionary<sorterEvalKey, sorterEvalBin>()

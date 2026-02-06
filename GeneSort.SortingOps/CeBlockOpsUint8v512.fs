@@ -90,7 +90,7 @@ module CeBlockOpsUint8v512 =
                Highs = ceb.CeArray |> Array.map (fun c -> c.Hi)
                CeLen = ceb.CeArray.Length |})
 
-        let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].Length))
+        let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].CeLength))
         let globalUnsorted = Array.zeroCreate<int> numNetworks
 
         Parallel.ForEach(
@@ -154,7 +154,7 @@ module CeBlockOpsUint8v512 =
                SortingWidth = ceb.SortingWidth
                CeLen = ceb.CeArray.Length |})
 
-        let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].Length))
+        let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].CeLength))
         let globalUnsorted = Array.zeroCreate<int> numNetworks
         let failureSets = Array.init numNetworks (fun _ -> ConcurrentDictionary<int[], byte>(ArrayContentComparer<int>()))
 
