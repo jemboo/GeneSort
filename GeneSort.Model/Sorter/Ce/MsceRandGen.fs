@@ -3,9 +3,9 @@
 open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Component
-open GeneSort.Component.Sorter
-open GeneSort.Component.Sortable
+open GeneSort.Sorting
+open GeneSort.Sorting.Sorter
+open GeneSort.Sorting.Sortable
 open GeneSort.Model.Sorter
 
 [<Struct; CustomEquality; NoComparison>]

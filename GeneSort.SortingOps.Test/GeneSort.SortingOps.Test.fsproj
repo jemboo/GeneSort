@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Compile Include="CeOpsTests.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,9 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GeneSort.Component\GeneSort.Component.fsproj" />
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingOps\GeneSort.SortingOps.fsproj" />
+    <ProjectReference Include="..\GeneSort.Sorting\GeneSort.Sorting.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

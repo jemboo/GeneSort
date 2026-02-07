@@ -4,8 +4,8 @@ open System
 open FSharp.UMX
 open MessagePack
 open GeneSort.SortingOps
-open GeneSort.Component.Mp.Sorter
-open GeneSort.Component
+open GeneSort.Sorting.Mp.Sorter
+open GeneSort.Sorting
 
 
 [<MessagePackObject>]

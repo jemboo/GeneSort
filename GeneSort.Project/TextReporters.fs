@@ -4,7 +4,7 @@ open System
 open System.Threading
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Component
+open GeneSort.Sorting
 open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.SortingResults

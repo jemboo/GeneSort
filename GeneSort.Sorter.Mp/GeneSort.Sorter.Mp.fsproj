@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Sorter\CeDto.fs" />
+    <Compile Include="Sorter\SorterDto.fs" />
+    <Compile Include="Sorter\SorterSetDto.fs" />
+    <Compile Include="Sortable\SortableBoolArrayDto.fs" />
+    <Compile Include="Sortable\SortableIntArrayDto.fs" />
+    <Compile Include="Sortable\SortableBoolTestDto.fs" />
+    <Compile Include="Sortable\SortableIntTestDto.fs" />
+    <Compile Include="Sortable\SortableTestDto.fs" />
+    <Compile Include="Sortable\SortableIntTestSetDto.fs" />
+    <Compile Include="Sortable\SortableBoolTestSetDto.fs" />
+    <Compile Include="Sortable\SortableTestSetDto.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.UMX" Version="1.1.0" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="5.1.0" />
+    <PackageReference Include="MessagePack" Version="3.1.4" />
+    <PackageReference Include="MessagePack.FSharpExtensions" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GeneSort.Core.Mp\GeneSort.Core.Mp.fsproj" />
+    <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="10.0.102" />
+  </ItemGroup>
+
+</Project>

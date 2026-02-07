@@ -6,8 +6,8 @@ open System.Collections.Generic
 open System.Buffers    
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
-open GeneSort.Component
-open GeneSort.Component.Sortable
+open GeneSort.Sorting
+open GeneSort.Sorting.Sortable
 
 module CeBlockOpsBinary = 
 

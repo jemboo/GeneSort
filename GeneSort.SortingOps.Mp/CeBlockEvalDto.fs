@@ -3,8 +3,8 @@
 open FSharp.UMX
 open MessagePack
 open GeneSort.SortingOps
-open GeneSort.Component
-open GeneSort.Component.Mp.Sortable
+open GeneSort.Sorting
+open GeneSort.Sorting.Mp.Sortable
 
 [<MessagePackObject>]
 type ceBlockEvalDto = {

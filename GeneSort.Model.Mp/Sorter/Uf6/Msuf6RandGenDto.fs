@@ -7,7 +7,7 @@ open GeneSort.Model.Sorter.Uf6
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
-open GeneSort.Component
+open GeneSort.Sorting
 
 [<MessagePackObject>]
 type msuf6RandGenDto =

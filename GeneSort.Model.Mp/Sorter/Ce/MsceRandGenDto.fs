@@ -3,7 +3,7 @@ namespace GeneSort.Model.Mp.Sorter.Ce
 
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Component
+open GeneSort.Sorting
 open GeneSort.Model.Sorter.Ce
 open MessagePack
 open MessagePack.Resolvers

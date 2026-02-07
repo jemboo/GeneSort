@@ -1,0 +1,33 @@
+﻿namespace GeneSort.Sorting.Mp.Sorter
+
+open System
+open FSharp.UMX
+open GeneSort.Sorting
+open GeneSort.Sorting.Sorter
+open MessagePack
+
+[<MessagePackObject>]
+type SorterDto = {
+    [<Key(0)>]
+    SorterId: Guid
+    [<Key(1)>]
+    Width: int
+    [<Key(2)>]
+    Ces: CeDto array
+}
+
+module SorterDto =
+    let toSorterDto (sorter: sorter) : SorterDto =
+        { SorterId = %sorter.SorterId
+          Width = %sorter.SortingWidth
+          Ces = sorter.Ces |> Array.map CeDto.fromDomain }
+
+    let fromSorterDto (dto: SorterDto) : sorter =
+        if dto.SorterId = Guid.Empty then
+            failwith "Sorter ID must not be empty"
+        if dto.Width < 1 then
+            failwith "Width must be at least 1"
+        sorter.create
+            (UMX.tag<sorterId> dto.SorterId)
+            (UMX.tag<sortingWidth> dto.Width)
+            (dto.Ces |> Array.map CeDto.toDomain)

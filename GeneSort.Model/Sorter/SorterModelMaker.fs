@@ -7,7 +7,7 @@ open GeneSort.Model.Sorter.Rs
 open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Uf6
 open GeneSort.Core
-open GeneSort.Component
+open GeneSort.Sorting
 
 
 type sorterModelMaker =

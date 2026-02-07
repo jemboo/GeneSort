@@ -3,7 +3,7 @@
 open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Component
+open GeneSort.Sorting
 
 type sorterModelSetMaker =
     private

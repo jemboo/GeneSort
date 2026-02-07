@@ -7,11 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="CeTests.fs" />
-    <Compile Include="SortableIntArrayTests.fs" />
-    <Compile Include="SorterSetTests.fs" />
-    <Compile Include="SorterTests.fs" />
-    <Compile Include="StageSequenceTests.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

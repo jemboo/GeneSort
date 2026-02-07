@@ -5,10 +5,10 @@ open System.Runtime.Intrinsics
 open System.Threading
 open System.Threading.Tasks
 open FSharp.UMX
-open GeneSort.Component.Sortable
+open GeneSort.Sorting.Sortable
 open System.Collections.Concurrent
 open System.Collections.Generic
-open GeneSort.Component
+open GeneSort.Sorting
 
 module CeBlockOpsBitv512 =
 

@@ -2,7 +2,7 @@
 
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Component
+open GeneSort.Sorting
 open GeneSort.SortingOps
 
 

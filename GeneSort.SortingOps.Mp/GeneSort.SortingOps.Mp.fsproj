@@ -11,6 +11,7 @@
     <Compile Include="SorterEvalDto.fs" />
     <Compile Include="SorterModelEvalDto.fs" />
     <Compile Include="SorterModelSetEvalDto.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,10 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GeneSort.Component.Mp\GeneSort.Component.Mp.fsproj" />
-    <ProjectReference Include="..\GeneSort.Component\GeneSort.Component.fsproj" />
     <ProjectReference Include="..\GeneSort.Core.Mp\GeneSort.Core.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+    <ProjectReference Include="..\GeneSort.Sorting.Mp\GeneSort.Sorting.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingOps\GeneSort.SortingOps.fsproj" />
   </ItemGroup>
 

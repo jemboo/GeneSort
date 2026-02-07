@@ -3,7 +3,7 @@
 open FSharp.UMX
 open GeneSort.Core
 open System
-open GeneSort.Component
+open GeneSort.Sorting
 open GeneSort.Model.Sorter
 
 /// Represents a configuration for generating random Mssi instances with specified width and stage count.

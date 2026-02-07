@@ -4,7 +4,7 @@ open System
 open GeneSort.Model.Sorter
 open MessagePack
 open FSharp.UMX
-open GeneSort.Component
+open GeneSort.Sorting
 
 [<MessagePackObject>]
 type sorterModelSetDto = 
