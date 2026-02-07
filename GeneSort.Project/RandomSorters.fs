@@ -275,7 +275,7 @@ module RandomSorters =
                 let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
                 let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
                 let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
-                let sorterSet = SorterModelSet.makeSorterSet sorterModelSet
+                let sorterSet = SortingModelSet.makeSorterSet sorterModelSet
 
                 let! _ = checkCancellation cts.Token
 

@@ -1,21 +1,19 @@
 ﻿namespace GeneSort.Model.Sorter
 
-open System
 open FSharp.UMX
-open GeneSort.Sorting
 open GeneSort.Core
 
 
-[<Measure>] type sorterModelID
-[<Measure>] type sorterModelSetID
+[<Measure>] type sortingModelID
+[<Measure>] type sortingModelSetID
 [<Measure>] type sorterModelMakerID
 [<Measure>] type sorterModelSetMakerID
 
 module Common =
-    let makeSorterModelId 
+    let makeSortingModelId 
                 (id:  Guid<sorterModelMakerID>) 
-                (index:int) : Guid<sorterModelID> = 
+                (index:int) : Guid<sortingModelID> = 
         [
             id  :> obj
             index :> obj
-        ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+        ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingModelID>

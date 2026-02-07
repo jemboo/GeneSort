@@ -16,7 +16,7 @@ type sorterModelSetDto =
 
 module SorterModelSetDto =
 
-    let toDomain (dto: sorterModelSetDto) : sorterModelSet =
+    let toDomain (dto: sorterModelSetDto) : sortingModelSet =
         if dto.SorterModels = null then
             failwith "SorterModels array cannot be null or empty"
         if Array.isEmpty dto.SorterModels then
@@ -24,13 +24,13 @@ module SorterModelSetDto =
         let sorterModels = 
             dto.SorterModels 
             |> Array.map SorterModelDto.fromSorterModelDto
-        sorterModelSet.create
-                (UMX.tag<sorterModelSetID> dto.Id)
+        sortingModelSet.create
+                (UMX.tag<sortingModelSetID> dto.Id)
                 (dto.CeLength |> UMX.tag<ceLength>)
                 (sorterModels)
 
 
-    let fromDomain (domain: sorterModelSet) : sorterModelSetDto =
+    let fromDomain (domain: sortingModelSet) : sorterModelSetDto =
         { 
             Id = %domain.Id
             CeLength = %domain.CeLength

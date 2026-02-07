@@ -33,7 +33,7 @@ type sorterModelSetMaker =
     member this.FirstIndex with get() = this.firstIndex
     member this.Count with get() = this.count
 
-    member this.MakeSorterModelSet (rngFactory: rngType -> Guid -> IRando) : sorterModelSet =
+    member this.MakeSorterModelSet (rngFactory: rngType -> Guid -> IRando) : sortingModelSet =
         if %this.count <= 0 then
             failwith "Count must be greater than 0"
         if %this.firstIndex < 0 then
@@ -42,5 +42,5 @@ type sorterModelSetMaker =
             [| for i in 0 .. %this.count - 1 do
                 let index = %this.firstIndex + i
                 SorterModelMaker.makeSorterModel rngFactory index this.sorterModelMaker |]
-        let id = (%this.id) |> UMX.tag<sorterModelSetID>
-        sorterModelSet.create id (this.sorterModelMaker |> SorterModelMaker.getCeLength) sorterModels
+        let id = (%this.id) |> UMX.tag<sortingModelSetID>
+        sortingModelSet.create id (this.sorterModelMaker |> SorterModelMaker.getCeLength) sorterModels

@@ -11,14 +11,14 @@ open GeneSort.Model.Sorter
 [<Struct; CustomEquality; NoComparison>]
 type msuf6 = 
     private 
-        { id: Guid<sorterModelID>
+        { id: Guid<sortingModelID>
           sortingWidth: int<sortingWidth>
           twoOrbitUnfolder6s: TwoOrbitUf6 array } 
     with
     /// Creates an Msuf6 instance with the specified ID, sorting width, and array of TwoOrbitUnfolder4 instances.
     /// Throws an exception if the array is empty, width is less than 1, or any TwoOrbitUnfolder4 has a mismatched order.
     static member create 
-            (id: Guid<sorterModelID>) 
+            (id: Guid<sortingModelID>) 
             (sortingWidth: int<sortingWidth>) 
             (twoOrbitUnfolder6s: TwoOrbitUf6 array) : msuf6 =
         if twoOrbitUnfolder6s.Length < 1 then

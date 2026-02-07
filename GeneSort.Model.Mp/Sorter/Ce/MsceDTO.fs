@@ -39,7 +39,7 @@ module MsceDto =
     let toMsce (msceDto: msceDto) : Result<Msce, MsceDtoError> =
         try
             let msce = GeneSort.Model.Sorter.Ce.Msce.create
-                            (UMX.tag<sorterModelID> msceDto.Id)
+                            (UMX.tag<sortingModelID> msceDto.Id)
                             (UMX.tag<sortingWidth> msceDto.sortingWidth)
                             msceDto.ceCodes
             Ok msce

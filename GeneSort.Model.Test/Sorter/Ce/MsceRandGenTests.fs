@@ -11,7 +11,7 @@ open GeneSort.Model.Sorter
 type MsceRandGenTests() =
 
     // Helper to create a Model_Ce
-    let createModelCe (id: Guid<sorterModelID>) (width: int<sortingWidth>) (ceCodes: int array) : Msce =
+    let createModelCe (id: Guid<sortingModelID>) (width: int<sortingWidth>) (ceCodes: int array) : Msce =
         Msce.create id width ceCodes
 
     // Helper function to create a mock random number generator

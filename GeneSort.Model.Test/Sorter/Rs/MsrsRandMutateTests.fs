@@ -17,7 +17,7 @@ type MsrsRandMutateTests() =
         Perm_Rs.create arr
 
     // Helper to create a Model_Rs
-    let createModelRs (id: Guid<sorterModelID>) (width: int<sortingWidth>) (permRss: Perm_Rs array) : msrs =
+    let createModelRs (id: Guid<sortingModelID>) (width: int<sortingWidth>) (permRss: Perm_Rs array) : msrs =
         msrs.create id width permRss
 
     // Helper to check if a permutation is self-inverse
@@ -31,7 +31,7 @@ type MsrsRandMutateTests() =
 
     [<Fact>]
     let ``NoAction mode preserves all Perm_Rss`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
+        let id = Guid.NewGuid() |> UMX.tag<sortingModelID>
         let width = 4<sortingWidth>
         let permRss = [| [| 3; 2; 1; 0 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
         let modelRs = createModelRs id width permRss
@@ -47,7 +47,7 @@ type MsrsRandMutateTests() =
 
     [<Fact>]
     let ``SelfSym mode mutates Perm_Rss correctly`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
+        let id = Guid.NewGuid() |> UMX.tag<sortingModelID>
         let width = 4<sortingWidth>
         let permRss = [| [| 1; 0; 3; 2 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
         let expectedPermRss = [| [| 3; 2; 1; 0 |]; [| 3; 2; 1; 0 |] |] |> Array.map createPermRs
@@ -65,7 +65,7 @@ type MsrsRandMutateTests() =
 
     [<Fact>]
     let ``Ortho mode mutates Perm_Rss correctly`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
+        let id = Guid.NewGuid() |> UMX.tag<sortingModelID>
         let width = 4<sortingWidth>
         let permRss = [| [| 1; 0; 3; 2 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
         let expectedPermRss = [| [| 1; 0; 3; 2 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
@@ -83,7 +83,7 @@ type MsrsRandMutateTests() =
 
     [<Fact>]
     let ``Para mode mutates Perm_Rss correctly`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
+        let id = Guid.NewGuid() |> UMX.tag<sortingModelID>
         let width = 4<sortingWidth>
         let permRss = [| [| 1; 0; 3; 2 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
         let expectedPermRss = [| [| 2; 3; 0; 1 |]; [| 2; 3; 0; 1 |] |] |> Array.map createPermRs
@@ -101,7 +101,7 @@ type MsrsRandMutateTests() =
 
     [<Fact>]
     let ``Mixed mutation modes with varying probabilities`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
+        let id = Guid.NewGuid() |> UMX.tag<sortingModelID>
         let width = 4<sortingWidth>
         let permRss = [| [| 1; 0; 3; 2 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
         let modelRs = createModelRs id width permRss
@@ -120,7 +120,7 @@ type MsrsRandMutateTests() =
 
     [<Fact>]
     let ``Throws on mismatched stage count`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
+        let id = Guid.NewGuid() |> UMX.tag<sortingModelID>
         let width = 4<sortingWidth>
         let permRss = [| [| 1; 0; 3; 2 |] |] |> Array.map createPermRs // StageLength = 1
         let modelRs = createModelRs id width permRss
@@ -132,7 +132,7 @@ type MsrsRandMutateTests() =
 
     [<Fact>]
     let ``Generates new unique ID`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
+        let id = Guid.NewGuid() |> UMX.tag<sortingModelID>
         let width = 4<sortingWidth>
         let permRss = [| [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
         let modelRs = createModelRs id width permRss

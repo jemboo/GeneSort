@@ -22,7 +22,7 @@ type MsceRandMutateTests() =
     let newCeCode = 19 // Placeholder for mutated/inserted ceCode
     let sortingWidth = 10 |> UMX.tag<sortingWidth>
     let baseRates = IndelRates.create (0.2, 0.2, 0.2)
-    let msceId = Guid.NewGuid() |> UMX.tag<sorterModelID>
+    let msceId = Guid.NewGuid() |> UMX.tag<sortingModelID>
 
     [<Fact>]
     let ``mutate applies Mutation mode correctly`` () =

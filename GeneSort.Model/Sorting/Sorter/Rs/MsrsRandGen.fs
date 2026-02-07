@@ -63,7 +63,7 @@ type msrsRandGen =
         
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
                 : msrs =
-        let id = Common.makeSorterModelId this.Id index
+        let id = Common.makeSortingModelId this.Id index
         let rng = rngFactory this.RngType %id
         let genRatesArray = this.OpsGenRatesArray
         let stageLength = %this.StageLength

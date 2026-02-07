@@ -6,26 +6,27 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Sorter\Common.fs" />
-    <Compile Include="Sorter\Ce\Msce.fs" />
-    <Compile Include="Sorter\Ce\MsceRandGen.fs" />
-    <Compile Include="Sorter\Ce\MsceRandMutate.fs" />
-    <Compile Include="Sorter\Si\Mssi.fs" />
-    <Compile Include="Sorter\Si\MssiRandGen.fs" />
-    <Compile Include="Sorter\Si\MssiRandMutate.fs" />
-    <Compile Include="Sorter\Rs\Msrs.fs" />
-    <Compile Include="Sorter\Rs\MsrsRandGen.fs" />
-    <Compile Include="Sorter\Rs\MsrsRandMutate.fs" />
-    <Compile Include="Sorter\Uf4\Msuf4.fs" />
-    <Compile Include="Sorter\Uf4\Msuf4RandGen.fs" />
-    <Compile Include="Sorter\Uf4\Msuf4RandMutate.fs" />
-    <Compile Include="Sorter\Uf6\Msuf6.fs" />
-    <Compile Include="Sorter\Uf6\Msuf6RandGen.fs" />
-    <Compile Include="Sorter\Uf6\Msuf6RandMutate.fs" />
-    <Compile Include="Sorter\SorterModel.fs" />
-    <Compile Include="Sorter\SorterModelMaker.fs" />
-    <Compile Include="Sorter\SorterModelSet.fs" />
-    <Compile Include="Sorter\SorterModelSetMaker.fs" />
+    <Compile Include="Sorting\Sorter\Common.fs" />
+    <Compile Include="Sorting\Sorter\Ce\Msce.fs" />
+    <Compile Include="Sorting\Sorter\Ce\MsceRandGen.fs" />
+    <Compile Include="Sorting\Sorter\Ce\MsceRandMutate.fs" />
+    <Compile Include="Sorting\Sorter\Si\Mssi.fs" />
+    <Compile Include="Sorting\Sorter\Si\MssiRandGen.fs" />
+    <Compile Include="Sorting\Sorter\Si\MssiRandMutate.fs" />
+    <Compile Include="Sorting\Sorter\Rs\Msrs.fs" />
+    <Compile Include="Sorting\Sorter\Rs\MsrsRandGen.fs" />
+    <Compile Include="Sorting\Sorter\Rs\MsrsRandMutate.fs" />
+    <Compile Include="Sorting\Sorter\Uf4\Msuf4.fs" />
+    <Compile Include="Sorting\Sorter\Uf4\Msuf4RandGen.fs" />
+    <Compile Include="Sorting\Sorter\Uf4\Msuf4RandMutate.fs" />
+    <Compile Include="Sorting\Sorter\Uf6\Msuf6.fs" />
+    <Compile Include="Sorting\Sorter\Uf6\Msuf6RandGen.fs" />
+    <Compile Include="Sorting\Sorter\Uf6\Msuf6RandMutate.fs" />
+    <Compile Include="Sorting\Sorter\SorterModel.fs" />
+    <Compile Include="Sorting\Sorter\SorterModelMaker.fs" />
+    <Compile Include="Sorting\SortingModel.fs" />
+    <Compile Include="Sorting\SortingModelSet.fs" />
+    <Compile Include="Sorting\SorterModelSetMaker.fs" />
     <Compile Include="Sortable\Common.fs" />
     <Compile Include="Sortable\MsasF.fs" />
     <Compile Include="Sortable\MsasM.fs" />

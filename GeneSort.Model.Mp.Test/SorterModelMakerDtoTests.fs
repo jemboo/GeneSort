@@ -58,7 +58,7 @@ type SorterModelSetMakerDtoTests() =
     [<Fact>]
     let ``MsceRandMutate round-trip serialization and deserialization should succeed`` () =
         let excludeSelfCe = true
-        let msce = Msce.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|16|]
+        let msce = Msce.create (Guid.NewGuid() |> UMX.tag<sortingModelID>) (UMX.tag<sortingWidth> 16) [|16|]
         let arrayRates = IndelRatesArray.create [| IndelRates.create (1.0, 0.0, 0.0) |] // Always Mutation
         let msceRandMutate = MsceRandMutate.create rngType.Lcg arrayRates excludeSelfCe msce
         let sorterModelMaker = sorterModelMaker.SmmMsceRandMutate msceRandMutate
@@ -84,7 +84,7 @@ type SorterModelSetMakerDtoTests() =
 
     [<Fact>]
     let ``MssiRandMutate round-trip serialization and deserialization should succeed`` () =
-        let mssi = Mssi.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 2) [| Perm_Si.create [|0; 1|]|]
+        let mssi = Mssi.create (Guid.NewGuid() |> UMX.tag<sortingModelID>) (UMX.tag<sortingWidth> 2) [| Perm_Si.create [|0; 1|]|]
         let siMutationRates = OpActionRates.create (0.0, 0.0)
         let opActionRatesArray = OpActionRatesArray.create [|siMutationRates|]
         let mssiRandMutate = MssiRandMutate.create rngType.Lcg mssi opActionRatesArray
@@ -115,7 +115,7 @@ type SorterModelSetMakerDtoTests() =
     [<Fact>]
     let ``MsrsRandMutate round-trip serialization and deserialization should succeed`` () =
         let order = 8
-        let msrs = msrs.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> order) [| Perm_Rs.create [|0; 1; 2; 3; 4; 5; 6; 7|] |]
+        let msrs = msrs.create (Guid.NewGuid() |> UMX.tag<sortingModelID>) (UMX.tag<sortingWidth> order) [| Perm_Rs.create [|0; 1; 2; 3; 4; 5; 6; 7|] |]
         let opsActionRates = OpsActionRates.create (1.0, 0.0, 0.0)
         let opsActionRatesArray = OpsActionRatesArray.create [|opsActionRates|]
         let msrsRandMutate = msrsRandMutate.create rngType.Lcg msrs opsActionRatesArray
@@ -151,7 +151,7 @@ type SorterModelSetMakerDtoTests() =
         let order = 8
         let twoOrbitUfStep = TwoOrbitUfStep.create [|TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho|] order
         let twoOrbitUf4s = [| TwoOrbitUf4.create (TwoOrbitPairType.Ortho) [| twoOrbitUfStep |] |]
-        let msuf4 = msuf4.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> order) twoOrbitUf4s
+        let msuf4 = msuf4.create (Guid.NewGuid() |> UMX.tag<sortingModelID>) (UMX.tag<sortingWidth> order) twoOrbitUf4s
         let mutationRates = Uf4MutationRatesArray.create [| Uf4MutationRates.makeUniform order 0.1 0.05 |]
         let msuf4RandMutate = msuf4RandMutate.create rngType.Lcg msuf4 mutationRates
         let sorterModelMaker = sorterModelMaker.SmmMsuf4RandMutate msuf4RandMutate
@@ -183,7 +183,7 @@ type SorterModelSetMakerDtoTests() =
     [<Fact>]
     let ``Msuf6RandMutate round-trip serialization and deserialization should succeed`` () =
         let order = 12
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
+        let id = Guid.NewGuid() |> UMX.tag<sortingModelID>
         let twoOrbitUfSteps = TwoOrbitUfStep.create [|TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; TwoOrbitPairType.Ortho; |] order
         let twoOrbitUf6s = [| TwoOrbitUf6.create TwoOrbitTripleType.Ortho1 [|twoOrbitUfSteps|] |]
         let msuf6 = msuf6.create id (UMX.tag<sortingWidth> order) twoOrbitUf6s

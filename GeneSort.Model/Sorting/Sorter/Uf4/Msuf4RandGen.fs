@@ -84,7 +84,7 @@ type msuf4RandGen =
 
 
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : msuf4 =
-        let id = Common.makeSorterModelId this.Id index
+        let id = Common.makeSortingModelId this.Id index
         let rando = rngFactory this.RngType %id
         let sc = %this.StageLength
         let genRts = this.GenRates

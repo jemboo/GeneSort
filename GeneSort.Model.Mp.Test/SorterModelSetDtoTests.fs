@@ -17,7 +17,7 @@ type SorterModelSetDtoTests() =
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     // Helper function to perform round-trip serialization
-    let roundTrip (sorterModelSet: sorterModelSet) : sorterModelSet =
+    let roundTrip (sorterModelSet: sortingModelSet) : sortingModelSet =
         let dto = SorterModelSetDto.fromDomain sorterModelSet
         let bytes = MessagePackSerializer.Serialize(dto, options)
         let deserializedDto = MessagePackSerializer.Deserialize<sorterModelSetDto>(bytes, options)
@@ -25,9 +25,9 @@ type SorterModelSetDtoTests() =
 
     [<Fact>]
     let ``SorterModelSetDto with Msce round-trip serialization and deserialization should succeed`` () =
-        let msce = Msce.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|1;2;3|]
+        let msce = Msce.create (Guid.NewGuid() |> UMX.tag<sortingModelID>) (UMX.tag<sortingWidth> 16) [|1;2;3|]
         let sorterModel = sorterModel.Msce msce
-        let sorterModelSet = sorterModelSet.create (Guid.NewGuid() |> UMX.tag<sorterModelSetID>) (msce.CeLength) [| sorterModel |]
+        let sorterModelSet = sortingModelSet.create (Guid.NewGuid() |> UMX.tag<sortingModelSetID>) (msce.CeLength) [| sorterModel |]
         let result = roundTrip sorterModelSet
         Assert.Equal(sorterModelSet.Id, result.Id)
         Assert.Equal(sorterModelSet.SorterModels.Length, result.SorterModels.Length)

@@ -76,7 +76,7 @@ type msuf4RandMutate =
                     : msuf4 =
         if %this.StageLength <> this.Uf4MutationRatesArray.Length then
             failwith $"Stage count of Msuf4 {%this.StageLength} must match Msuf4RandMutate length {this.Uf4MutationRatesArray.Length}"
-        let id = Common.makeSorterModelId this.Id index
+        let id = Common.makeSortingModelId this.Id index
         let rng = rngFactory this.RngType %id
         let mutatedUnfolders = 
             Array.zip this.msuf4.TwoOrbitUnfolder4s this.Uf4MutationRatesArray.RatesArray

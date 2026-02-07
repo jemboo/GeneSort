@@ -101,7 +101,7 @@ module OutputDataFile =
                         }
                     | outputDataType.SorterModelSet _ ->
                         async {
-                            let! domain = deserializeDto<sorterModelSetDto, sorterModelSet> stream token SorterModelSetDto.toDomain
+                            let! domain = deserializeDto<sorterModelSetDto, sortingModelSet> stream token SorterModelSetDto.toDomain
                             return outputData.SorterModelSet domain
                         }
                     | outputDataType.SorterModelSetMaker _ ->

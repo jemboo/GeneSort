@@ -65,7 +65,7 @@ type MssiRandMutate =
     /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
     /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : Mssi =
-        let id = Common.makeSorterModelId this.Id index
+        let id = Common.makeSortingModelId this.Id index
         let rng = rngFactory this.RngType %id
         let orthoMutator = fun psi ->  Perm_Si.mutate (rng.NextIndex) MutationMode.Ortho psi 
         let paraMutator = fun psi ->   Perm_Si.mutate (rng.NextIndex) MutationMode.Para psi 
