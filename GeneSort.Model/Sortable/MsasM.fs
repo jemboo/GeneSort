@@ -3,8 +3,8 @@
 open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorting
-open GeneSort.Sorting.Sortable
+open GeneSort.Component
+open GeneSort.Component.Sortable
 open System.Runtime.Intrinsics
 
 [<Struct; CustomEquality; NoComparison>]

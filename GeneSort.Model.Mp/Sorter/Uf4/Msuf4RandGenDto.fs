@@ -8,7 +8,7 @@ open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 open GeneSort.Core.Mp.RatesAndOps
-open GeneSort.Sorting
+open GeneSort.Component
 
 [<MessagePackObject>]
 type msuf4RandGenDto =

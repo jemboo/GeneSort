@@ -1,8 +1,8 @@
 ﻿namespace GeneSort.Model.Sortable
 
 open FSharp.UMX
-open GeneSort.Sorting
-open GeneSort.Sorting.Sortable
+open GeneSort.Component
+open GeneSort.Component.Sortable
 
 type sortableTestModelSet =
     private

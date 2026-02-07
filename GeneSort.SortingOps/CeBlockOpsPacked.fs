@@ -2,12 +2,12 @@
 
 open System
 open FSharp.UMX
-open GeneSort.Sorting.Sortable
+open GeneSort.Component.Sortable
 open System.Collections.Generic
 open System.Buffers    
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
-open GeneSort.Sorting
+open GeneSort.Component
 
 
 type PackedOffsetComparer(data: int[], sw: int) =

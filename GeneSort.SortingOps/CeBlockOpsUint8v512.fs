@@ -3,8 +3,8 @@
 open System.Runtime.Intrinsics
 open System.Threading.Tasks
 open FSharp.UMX
-open GeneSort.Sorting
-open GeneSort.Sorting.Sortable
+open GeneSort.Component
+open GeneSort.Component.Sortable
 open System.Collections.Concurrent
 open System.Collections.Generic
 open System

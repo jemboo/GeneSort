@@ -2,7 +2,7 @@
 namespace GeneSort.Model.Sortable
 open System
 open FSharp.UMX
-open GeneSort.Sorting
+open GeneSort.Component
 open GeneSort.Core
 
 [<Measure>] type sorterTestModelID

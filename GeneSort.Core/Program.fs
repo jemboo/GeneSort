@@ -1,16 +1,10 @@
 ﻿// For more information see https://aka.ms/fsharp-console-apps
 
-open GeneSort.Core.Permutation
-open GeneSort.Core.PermutationSets
 open GeneSort.Core
 open FSharp.UMX
 open System
 
 
-open System
-open System.Runtime.Intrinsics
-open System.Runtime.Intrinsics.X86
-open System.Runtime.Intrinsics.Arm
 
 module Example =
     // Helper function to print vector capabilities

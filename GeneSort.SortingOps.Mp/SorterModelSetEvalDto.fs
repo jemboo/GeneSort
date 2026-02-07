@@ -3,7 +3,7 @@
 open System
 open FSharp.UMX
 open MessagePack
-open GeneSort.Sorting
+open GeneSort.Component
 open GeneSort.SortingOps
 open GeneSort.SortingOps.Mp
 

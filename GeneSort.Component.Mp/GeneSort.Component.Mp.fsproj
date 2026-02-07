@@ -6,6 +6,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Sortable\SimdSortBlockDto.fs" />
+    <Compile Include="Sortable\SortableBoolArrayDto.fs" />
+    <Compile Include="Sortable\SortableBinaryTestDto.fs" />
+    <Compile Include="Sortable\SortableBitv512TestDto.fs" />
+    <Compile Include="Sortable\SortableBoolTestSetDto.fs" />
+    <Compile Include="Sortable\SortableIntArrayDto.fs" />
+    <Compile Include="Sortable\SortableIntTestDto.fs" />
+    <Compile Include="Sortable\SortableIntTestSetDto.fs" />
+    <Compile Include="Sortable\SortableUint8v256TestDto.fs" />
+    <Compile Include="Sortable\SortableUint8v512TestDto.fs" />
+    <Compile Include="Sortable\SortableTestDto.fs" />
+    <Compile Include="Sortable\SortableTestSetDto.fs" />
+    <Compile Include="Sorter\CeDto.fs" />
+    <Compile Include="Sorter\SorterDto.fs" />
+    <Compile Include="Sorter\SorterSetDto.fs" />
+    <Compile Include="Tests.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FSharp.UMX" Version="1.1.0" />
     <PackageReference Include="FsUnit.xUnit" Version="7.1.1" />
     <PackageReference Include="MessagePack" Version="3.1.4" />

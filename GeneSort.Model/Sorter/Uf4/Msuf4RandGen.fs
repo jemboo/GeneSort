@@ -3,7 +3,7 @@ open System
 open FSharp.UMX
 open GeneSort.Model.Sorter
 open GeneSort.Core
-open GeneSort.Sorting
+open GeneSort.Component
 open MathUtils
 
 [<Struct; CustomEquality; NoComparison>]

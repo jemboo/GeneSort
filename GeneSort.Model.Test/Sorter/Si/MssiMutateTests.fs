@@ -5,7 +5,7 @@ open System
 open Xunit
 open FSharp.UMX
 open FsUnit.Xunit
-open GeneSort.Sorting
+open GeneSort.Component
 open GeneSort.Core
 open GeneSort.Model.Sorter
 open GeneSort.Model.Sorter.Si

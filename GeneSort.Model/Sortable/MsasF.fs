@@ -3,9 +3,9 @@
 open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorting
-open GeneSort.Sorting.Sortable
-open GeneSort.Sorting.Sortable.SortableIntArray
+open GeneSort.Component
+open GeneSort.Component.Sortable
+open GeneSort.Component.Sortable.SortableIntArray
 
 // MsasF = a full bool test set for a given sorting width
 [<Struct; CustomEquality; NoComparison>]

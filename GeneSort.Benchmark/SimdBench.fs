@@ -1,14 +1,8 @@
 ﻿namespace global
 
 open BenchmarkDotNet.Attributes
-open System.Security.Cryptography
 open System
 open GeneSort.Core
-open FSharp.UMX
-open GeneSort.Sorting
-open GeneSort.Sorting.Sortable
-open GeneSort.SortingOps
-open GeneSort.Sorting.Sorter
 open System.Runtime.Intrinsics
 open System.Buffers
 open System.Threading.Tasks

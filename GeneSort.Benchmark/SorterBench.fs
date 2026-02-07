@@ -4,13 +4,13 @@ open BenchmarkDotNet.Attributes
 open System
 open GeneSort.Core
 open FSharp.UMX
-open GeneSort.Sorting
-open GeneSort.Sorting.Sortable
+open GeneSort.Component
+open GeneSort.Component.Sortable
 open GeneSort.SortingOps
-open GeneSort.Sorting.Sorter
+open GeneSort.Component.Sorter
 open GeneSort.Model.Sorter.Ce
 open GeneSort.Model.Sorter
-open GeneSort.Sorting.Sortable.SortableIntArray
+open GeneSort.Component.Sortable.SortableIntArray
 
 
 //| Method       | mergeDimension | sortingWidth | sorterCount | ceLength | chunkSize | collectResults | Mean     | Error    | StdDev   | Ratio | Gen0       | Gen1       | Gen2      | Allocated  | Alloc Ratio |

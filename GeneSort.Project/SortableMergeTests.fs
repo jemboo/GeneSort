@@ -5,11 +5,11 @@ open System.Threading
 open FSharp.UMX
 
 open GeneSort.Core
-open GeneSort.Sorting
+open GeneSort.Component
 open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.Model.Sortable
-open GeneSort.Sorting.Sortable
+open GeneSort.Component.Sortable
 
 module SortableMergeTests =
 

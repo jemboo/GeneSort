@@ -1,7 +1,7 @@
 ﻿namespace GeneSort.Runs
 open System
 open FSharp.UMX
-open GeneSort.Sorting
+open GeneSort.Component
 
 // Stage lengths for different sorting widths and probabilities for full sort
 //SortProb	4-Mcse	4-Msrs	4-Mssi	4-Msuf4	6-Mcse	6-Msrs	 6-Mssi	 6-Msuf6  8-Mcse	8-Msrs	8-Mssi	8-Msuf4	12-Mcse	12-Msrs	12-Mssi	12-Msuf6  16-Mcse  16-Msrs	16-Mssi	 16-Msuf4  24-Mcse	24-Msrs	24-Mssi	24-Msuf6

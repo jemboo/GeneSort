@@ -3,9 +3,9 @@
 open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorting
-open GeneSort.Sorting.Sorter
-open GeneSort.Sorting.Sortable
+open GeneSort.Component
+open GeneSort.Component.Sorter
+open GeneSort.Component.Sortable
 
 
 [<Measure>] type sorterModelSetEvalId
@@ -104,7 +104,7 @@ module SorterModelSetEval =
             |> GuidUtils.guidFromObjs 
             |> UMX.tag<sorterSetId>
 
-        GeneSort.Sorting.Sorter.sorterSet.create 
+        GeneSort.Component.Sorter.sorterSet.create 
             newSetId 
             sorterSet.CeLength 
             passingSorters

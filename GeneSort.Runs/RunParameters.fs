@@ -3,7 +3,7 @@
 open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorting
+open GeneSort.Component
 
 [<Measure>] type projectName
 [<Measure>] type textReportName

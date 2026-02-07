@@ -1,9 +1,9 @@
-﻿namespace GeneSort.Sorting.Sortable
+﻿namespace GeneSort.Component.Sortable
 
 open System.Runtime.Intrinsics
 open FSharp.UMX
-open GeneSort.Sorting
-open GeneSort.Sorting.Sortable
+open GeneSort.Component
+open GeneSort.Component.Sortable
 
 module GrayVectorGenerator =
 

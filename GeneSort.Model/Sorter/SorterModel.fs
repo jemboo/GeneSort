@@ -1,12 +1,12 @@
 ﻿namespace GeneSort.Model.Sorter
 
-open GeneSort.Sorting.Sorter
+open GeneSort.Component.Sorter
 open GeneSort.Model.Sorter.Ce
 open GeneSort.Model.Sorter.Si
 open GeneSort.Model.Sorter.Rs
 open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Uf6
-open GeneSort.Sorting
+open GeneSort.Component
 open FSharp.UMX
 
 

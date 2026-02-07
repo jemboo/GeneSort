@@ -4,10 +4,10 @@ open System
 open FSharp.UMX
 open Xunit
 open FsUnit.Xunit   
-open GeneSort.Sorting
-open GeneSort.Sorting.Sorter
+open GeneSort.Component
+open GeneSort.Component.Sorter
 open GeneSort.SortingOps
-open GeneSort.Sorting.Sortable
+open GeneSort.Component.Sortable
 
 type CeOpsTests() =
 

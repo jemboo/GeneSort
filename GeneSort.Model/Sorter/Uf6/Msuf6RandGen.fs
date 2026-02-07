@@ -1,7 +1,7 @@
 ﻿namespace GeneSort.Model.Sorter.Uf6
 open System
 open FSharp.UMX
-open GeneSort.Sorting
+open GeneSort.Component
 open GeneSort.Core
 open GeneSort.Model.Sorter
 

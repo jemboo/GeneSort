@@ -1,9 +1,9 @@
 ﻿
-namespace GeneSort.Sorting.Sortable
+namespace GeneSort.Component.Sortable
 
 open System
 open FSharp.UMX
-open GeneSort.Sorting
+open GeneSort.Component
 open System.Threading.Tasks
 
 [<Struct>]

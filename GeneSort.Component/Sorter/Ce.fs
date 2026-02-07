@@ -1,10 +1,10 @@
 ﻿
-namespace GeneSort.Sorting.Sorter
+namespace GeneSort.Component.Sorter
 
 open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorting
+open GeneSort.Component
 
 // Type definitions
 //[<Struct; CustomEquality; NoComparison>]

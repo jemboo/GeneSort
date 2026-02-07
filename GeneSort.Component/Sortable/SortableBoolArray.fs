@@ -1,10 +1,10 @@
-﻿namespace GeneSort.Sorting.Sortable
+﻿namespace GeneSort.Component.Sortable
 
 open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorting
-open GeneSort.Sorting.Sorter
+open GeneSort.Component
+open GeneSort.Component.Sorter
 open System.Linq
 open System.Collections.Generic
 

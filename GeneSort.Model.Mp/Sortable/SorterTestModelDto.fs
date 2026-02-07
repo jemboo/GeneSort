@@ -5,7 +5,7 @@ open MessagePack
 open FSharp.UMX
 open GeneSort.Model.Sortable
 open GeneSort.Core.Mp
-open GeneSort.Sorting
+open GeneSort.Component
 
 
 [<MessagePackObject>]

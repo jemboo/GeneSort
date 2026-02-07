@@ -2,8 +2,8 @@
 
 open System
 open FSharp.UMX
-open GeneSort.Sorting.Sorter
-open GeneSort.Sorting
+open GeneSort.Component.Sorter
+open GeneSort.Component
 
 [<Measure>]
 type ceIndex
