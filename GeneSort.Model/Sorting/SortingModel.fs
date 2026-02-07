@@ -7,6 +7,7 @@ open FSharp.UMX
 
 type sortingModel =
      | Sorter of sorterModel
+     | SorterPair of sorterPairModel
 
 
 module SortingModel =

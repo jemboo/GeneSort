@@ -24,6 +24,7 @@
     <Compile Include="Sorting\Sorter\Uf6\Msuf6RandMutate.fs" />
     <Compile Include="Sorting\Sorter\SorterModel.fs" />
     <Compile Include="Sorting\Sorter\SorterModelMaker.fs" />
+    <Compile Include="Sorting\SorterPair\SorterPairModel.fs" />
     <Compile Include="Sorting\SortingModel.fs" />
     <Compile Include="Sorting\SortingModelSet.fs" />
     <Compile Include="Sorting\SorterModelSetMaker.fs" />

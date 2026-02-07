@@ -155,7 +155,7 @@ type MergeEvalBench() =
                         |> sorterModelMaker.SmmMsceRandGen
 
         let sorterModelSetMaker = sorterModelSetMaker.create smm firstIndex (this.sorterCount |> UMX.tag<sorterCount>)
-        let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
+        let sorterModelSet = sorterModelSetMaker.MakeSortingModelSet (Rando.create)
         let sorterSet = SortingModelSet.makeSorterSet sorterModelSet
         this.ceBlocks <- sorterSet.Sorters |> Array.map (CeBlock.fromSorter)
 
@@ -438,7 +438,7 @@ type FullBoolEvalBench() =
                         |> sorterModelMaker.SmmMsceRandGen
 
         let sorterModelSetMaker = sorterModelSetMaker.create smm firstIndex (this.sorterCount |> UMX.tag<sorterCount>)
-        let sorterModelSet = sorterModelSetMaker.MakeSorterModelSet (Rando.create)
+        let sorterModelSet = sorterModelSetMaker.MakeSortingModelSet (Rando.create)
         let sorterSet = SortingModelSet.makeSorterSet sorterModelSet
         this.ceBlocks <- sorterSet.Sorters |> Array.map (CeBlock.fromSorter)
 
