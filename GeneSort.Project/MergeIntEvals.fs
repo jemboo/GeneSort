@@ -222,7 +222,7 @@ module MergeIntEvals =
                 //let! sorterSet = rawSorterData |> OutputData.asSorterSet
 
                 // 4. Load SorterModelSet (Cross-project query)
-                let qpSorterModelSet = RandomSorters.makeQueryParams (Some repl) (Some width) (Some sModel) (outputDataType.SorterModelSet "")
+                let qpSorterModelSet = RandomSorters.makeQueryParams (Some repl) (Some width) (Some sModel) (outputDataType.SortingModelSet "")
                 let! smsOutput = db.loadAsync RandomSorters.projectFolder qpSorterModelSet
                 let! sorterModelSet = smsOutput |> OutputData.asSorterModelSet
 

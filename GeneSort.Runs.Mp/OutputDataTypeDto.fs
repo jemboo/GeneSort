@@ -18,7 +18,7 @@ module OutputDataTypeDto =
         | SorterSet so -> { Tag = "SorterSet"; Value = so }
         | SortableTest so -> { Tag = "SortableTest"; Value = so }
         | SortableTestSet so -> { Tag = "SortableTestSet"; Value = so }
-        | SorterModelSet so -> { Tag = "SorterModelSet"; Value = so }
+        | SortingModelSet so -> { Tag = "SorterModelSet"; Value = so }
         | SorterModelSetMaker so -> { Tag = "SorterModelSetMaker"; Value = so }
         | SortableTestModelSet so -> { Tag = "SortableTestModelSet"; Value = so }
         | SortableTestModelSetMaker so -> { Tag = "SortableTestModelSetMaker"; Value = so }
@@ -33,7 +33,7 @@ module OutputDataTypeDto =
         | "SorterSet" -> SorterSet dto.Value
         | "SortableTest" -> SortableTest dto.Value
         | "SortableTestSet" -> SortableTestSet dto.Value
-        | "SorterModelSet" -> SorterModelSet dto.Value
+        | "SorterModelSet" -> SortingModelSet dto.Value
         | "SorterModelSetMaker" -> SorterModelSetMaker dto.Value
         | "SortableTestModelSet" -> SortableTestModelSet dto.Value
         | "SortableTestModelSetMaker" -> SortableTestModelSetMaker dto.Value

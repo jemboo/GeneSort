@@ -286,7 +286,7 @@ module RandomSorters =
                 //progress |> Option.iter (fun p -> 
                 //    p.Report(sprintf "Saved sorterSet %s for run: %s" (%sorterSet.Id.ToString()) %runId))
 
-                let qpModelSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSet "") 
+                let qpModelSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingModelSet "") 
                 let! _ = db.saveAsync projectFolder qpModelSet (sorterModelSet |> outputData.SortingModelSet) allowOverwrite
             
                 progress |> Option.iter (fun p -> 
