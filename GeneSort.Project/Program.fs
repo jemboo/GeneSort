@@ -124,11 +124,11 @@ match execResult with
 //    |> Async.RunSynchronously
 
 
-//printfn "Making Use Profile report ..."
+printfn "Making Use Profile report ..."
 
-//let uPReportResult = 
-//    TextReporters.ceUseProfileReportExecutor geneSortDb projectFolder minReplica maxReplica buildQueryParams allowOverwrite cts (Some progress)
-//    |> Async.RunSynchronously
+let uPReportResult = 
+    TextReporters.ceUseProfileReportExecutor geneSortDb projectFolder minReplica maxReplica buildQueryParams allowOverwrite cts (Some progress)
+    |> Async.RunSynchronously
 
 
 //printfn "Making Use Bin report ..."

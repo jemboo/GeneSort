@@ -5,7 +5,6 @@ open System
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
-open System.Linq
 open System.Collections.Generic
 
 [<Struct; CustomEquality; NoComparison>]

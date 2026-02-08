@@ -26,7 +26,7 @@ module OutputDataType =
         | SorterSet s -> appendParam "SorterSet" s
         | SortableTest s -> appendParam "SortableTest" s
         | SortableTestSet s -> appendParam "SortableTestSet" s
-        | SortingModelSet s -> appendParam "SorterModelSet" s
+        | SortingModelSet s -> appendParam "SortingModelSet" s
         | SorterModelSetMaker s -> appendParam "SorterModelSetMaker" s
         | SortableTestModelSet s -> appendParam "SortableTestModelSet" s
         | SortableTestModelSetMaker s -> appendParam "SortableTestModelSetMaker" s
@@ -44,7 +44,7 @@ module OutputDataType =
         | "SorterSet" -> Some (SorterSet param)
         | "SortableTest" -> Some (SortableTest param)
         | "SortableTestSet" -> Some (SortableTestSet param)
-        | "SorterModelSet" -> Some (SortingModelSet param)
+        | "SortingModelSet" -> Some (SortingModelSet param)
         | "SorterModelSetMaker" -> Some (SorterModelSetMaker param)
         | "SortableTestModelSet" -> Some (SortableTestModelSet param)
         | "SortableTestModelSetMaker" -> Some (SortableTestModelSetMaker param)

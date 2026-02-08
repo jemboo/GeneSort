@@ -1,5 +1,6 @@
 ﻿namespace GeneSort.Model.Sorter
 
+open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 open GeneSort.Model.Sorter
 open FSharp.UMX
@@ -22,9 +23,13 @@ module SortingModel =
         | Single sms -> sms.SorterModel |> SorterModel.makeSorter |> Array.singleton
         | Pair smp -> smp.SorterPairModel |> SorterPairModel.makeSorters |> Array.singleton
 
-    let containsSorterModel (sorterModelId: Guid<sorterModelID>) (model: sortingModel) : bool =
+    let containsSorter (sorterId: Guid<sorterId>) (model: sortingModel) : bool =
         match model with
-        | Single sms -> sms.SorterModel |> SorterModel.getId |> (=) (%sorterModelId)
-        | Pair smp -> smp |> SortingModelPair.hasChild sorterModelId
+        | Single sms -> %(sms.SorterModel |> SorterModel.getId) = (%sorterId)
+        | Pair smp -> smp |> SortingModelPair.hasChild sorterId
 
 
+    let containsAnySorter (sorterIds: Guid<sorterId> []) (model: sortingModel) : bool =
+        match model with
+        | Single sms -> sorterIds |> Array.exists (fun id -> %(sms.SorterModel |> SorterModel.getId) = (%id))
+        | Pair smp -> sorterIds |> Array.exists (fun id -> smp |> SortingModelPair.hasChild id)

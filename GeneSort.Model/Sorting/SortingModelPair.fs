@@ -1,6 +1,7 @@
 ﻿namespace GeneSort.Model.Sorter
 
 open FSharp.UMX
+open GeneSort.Sorting
 
 
 type sortingModelPair =
@@ -19,11 +20,10 @@ type sortingModelPair =
 
 module SortingModelPair =
 
-   let getChildIds (model: sortingModelPair) : Guid<sorterModelID> array =
+   let getChildSorterIds (model: sortingModelPair) : Guid<sorterId> array =
         failwith "Not implemented yet"
 
-
-   let hasChild (id: Guid<sorterModelID>) (sortingModelPair:sortingModelPair) : bool =
-       sortingModelPair |> getChildIds |> Array.exists (fun childId -> %childId = %id)
+   let hasChild (sorterId: Guid<sorterId>) (sortingModelPair:sortingModelPair) : bool =
+       sortingModelPair |> getChildSorterIds |> Array.exists (fun childId -> %childId = %sorterId)
         
 

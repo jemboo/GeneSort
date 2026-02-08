@@ -6,7 +6,7 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
-
+open GeneSort.Model.Sorter
 
 [<Measure>] type sorterModelSetEvalId
 
@@ -107,3 +107,27 @@ module SorterModelSetEval =
         GeneSort.Sorting.Sorter.sorterSet.create 
             newSetId
             passingSorters
+
+
+
+    /// For the sorterSet and its corresponding sorterSetEval, this creates a subset 
+    /// that consists of all the sorters with an UnsortedCount = 0
+    let makePassingSortingModelSet
+            (sms: sortingModelSet)
+            (sorterSetEval: sorterModelSetEval) :sortingModelSet =
+        
+        // 1. Identify the IDs of the sorters that passed (UnsortedCount = 0)
+        let passingIds = 
+            sorterSetEval.SorterEvals 
+            |> Array.filter (fun se -> se.CeBlockEval.UnsortedCount = 0<sortableCount>)
+            |> Array.map (fun se -> se.SorterId)
+
+        // 2. Filter the original sorter collection based on the passing IDs
+        let passingSorterModels = 
+            sms.SortingModels 
+            |> Array.filter (fun stm -> SortingModel.containsAnySorter passingIds stm)
+
+        sortingModelSet.create 
+            (Guid.NewGuid() |> UMX.tag<sortingModelSetID>) 
+            passingSorterModels
+
