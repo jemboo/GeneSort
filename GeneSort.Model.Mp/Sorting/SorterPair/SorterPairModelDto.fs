@@ -1,6 +1,5 @@
 ﻿namespace GeneSort.Model.Mp.Sorter
 
-open GeneSort.Model.Sorter
 open GeneSort.Model.Mp.Sorter.Ce
 open GeneSort.Model.Mp.Sorter.Si
 open GeneSort.Model.Mp.Sorter.Rs
@@ -9,6 +8,7 @@ open GeneSort.Model.Mp.Sorter.Uf6
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
+open GeneSort.Model.Sorting.SorterPair
 
 [<MessagePackObject>]
 [<Union(0, typeof<msceDto>); Union(1, typeof<mssiDto>); Union(2, typeof<msrsDto>); Union(3, typeof<msuf4Dto>); Union(4, typeof<msuf6Dto>)>]

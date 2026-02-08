@@ -8,8 +8,8 @@ open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open GeneSort.SortingOps
 open GeneSort.Sorting.Sorter
-open GeneSort.Model.Sorter.Ce
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting.Sorter.Ce
+open GeneSort.Model.Sorting.Sorter
 open GeneSort.Sorting.Sortable.SortableIntArray
 
 

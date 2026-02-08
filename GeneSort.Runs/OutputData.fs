@@ -5,7 +5,7 @@ open FSharp.UMX
 
 open GeneSort.Sorting.Sortable
 open GeneSort.Sorting.Sorter
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.SortingResults

@@ -8,7 +8,7 @@ open FsUnit.Xunit
 open GeneSort.Sorting
 open GeneSort.Core
 open GeneSort.Model.Sorting
-open GeneSort.Model.Sorter.Si
+open GeneSort.Model.Sorting.Sorter.Si
 
 type MssiRandMutateTests() =
 

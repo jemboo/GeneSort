@@ -3,8 +3,8 @@
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
-open GeneSort.Model.Sorter
 open GeneSort.Model.Mp.Sorter
+open GeneSort.Model.Sorting
 
 type SorterModelSetDtoTests() =
 

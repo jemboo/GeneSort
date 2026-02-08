@@ -4,7 +4,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Mp.Sorter.Si
-open GeneSort.Model.Sorter.Si
+open GeneSort.Model.Sorting.Sorter.Si
 open GeneSort.Core.Mp.RatesAndOps
 open MessagePack
 open MessagePack.Resolvers

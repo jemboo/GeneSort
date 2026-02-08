@@ -7,8 +7,8 @@ open MessagePack.FSharp
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Model.Sorter
-open GeneSort.Model.Sorter.Ce
+open GeneSort.Model.Sorting
+open GeneSort.Model.Sorting.Sorter.Ce
 open GeneSort.Model.Mp.Sorter
 
 

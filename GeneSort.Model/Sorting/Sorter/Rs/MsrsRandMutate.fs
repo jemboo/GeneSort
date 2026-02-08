@@ -1,10 +1,10 @@
-﻿namespace GeneSort.Model.Sorter.Si
+﻿namespace GeneSort.Model.Sorting.Sorter.Si
 
 open FSharp.UMX
 open GeneSort.Core
 open System
 open GeneSort.Model.Sorting
-open GeneSort.Model.Sorter.Rs
+open GeneSort.Model.Sorting.Sorter.Rs
 
       
 /// Represents a configuration for mutating Msrs instances with specified mutation probabilities.

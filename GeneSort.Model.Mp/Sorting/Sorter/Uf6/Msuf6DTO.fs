@@ -6,7 +6,7 @@ open FSharp.UMX
 open MessagePack
 open GeneSort.Sorting
 open GeneSort.Core.Mp.TwoOrbitUnfolder
-open GeneSort.Model.Sorter.Uf6
+open GeneSort.Model.Sorting.Sorter.Uf6
 open GeneSort.Model.Sorting
 
 [<MessagePackObject>]

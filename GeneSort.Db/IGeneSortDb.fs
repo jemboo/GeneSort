@@ -4,11 +4,11 @@ open System.Threading
 open FSharp.UMX
 open GeneSort.Runs
 open GeneSort.Sorting.Sorter
-open GeneSort.Model.Sorter
 open GeneSort.Sorting.Sortable
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.SortingResults
+open GeneSort.Model.Sorting
 
 [<Measure>] type projectFolder
 [<Measure>] type allowOverwrite

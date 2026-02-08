@@ -6,7 +6,7 @@ open FSharp.UMX
 open FsUnit.Xunit
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Model.Sorter.Rs
+open GeneSort.Model.Sorting.Sorter.Rs
 
 type MsrsRandGenTests() =
     // Helper function to create a mock random number generator

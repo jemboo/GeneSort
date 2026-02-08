@@ -6,8 +6,8 @@ open FSharp.UMX
 open FsUnit.Xunit
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Model.Sorter.Rs
-open GeneSort.Model.Sorter.Si
+open GeneSort.Model.Sorting.Sorter.Rs
+open GeneSort.Model.Sorting.Sorter.Si
 open GeneSort.Model.Sorting
 
 type MsrsRandMutateTests() =

@@ -12,7 +12,7 @@ open GeneSort.SortingOps
 open GeneSort.Runs
 open GeneSort.Db
 open ProjectOps
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 
 
 module FullBoolEvals =

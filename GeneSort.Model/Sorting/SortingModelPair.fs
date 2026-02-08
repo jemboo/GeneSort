@@ -1,9 +1,8 @@
-﻿namespace GeneSort.Model.Sorter
+﻿namespace GeneSort.Model.Sorting
 
 open FSharp.UMX
 open GeneSort.Sorting
-open GeneSort.Model.Sorting
-
+open GeneSort.Model.Sorting.SorterPair
 
 type sortingModelPair =
     private 

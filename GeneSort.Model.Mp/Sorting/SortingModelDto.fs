@@ -1,5 +1,5 @@
 ﻿namespace GeneSort.Model.Mp.Sorter
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp

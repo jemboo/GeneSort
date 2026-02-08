@@ -3,7 +3,7 @@
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Model.Sorter.Ce
+open GeneSort.Model.Sorting.Sorter.Ce
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp

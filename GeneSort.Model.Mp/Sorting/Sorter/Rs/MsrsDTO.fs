@@ -3,10 +3,9 @@ namespace GeneSort.Model.Mp.Sorter.Rs
 open System
 open FSharp.UMX
 open GeneSort.Sorting
-open GeneSort.Model.Sorter.Rs
+open GeneSort.Model.Sorting.Sorter.Rs
 open MessagePack
 open GeneSort.Core.Mp
-open GeneSort.Model.Sorter
 open GeneSort.Model.Sorting
 
 [<MessagePackObject; Struct>]

@@ -3,12 +3,10 @@ namespace GeneSort.Model.Mp.Sorter.Ce
 
 open System
 open FSharp.UMX
-open GeneSort.Sorting
-open GeneSort.Model.Sorter.Ce
-
 open MessagePack
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting.Sorter.Ce
 open GeneSort.Model.Sorting
+open GeneSort.Sorting
 
 [<MessagePackObject; Struct>]
 type msceDto =
@@ -39,7 +37,7 @@ module MsceDto =
 
     let toMsce (msceDto: msceDto) : Result<Msce, MsceDtoError> =
         try
-            let msce = GeneSort.Model.Sorter.Ce.Msce.create
+            let msce = GeneSort.Model.Sorting.Sorter.Ce.Msce.create
                             (UMX.tag<sorterModelID> msceDto.Id)
                             (UMX.tag<sortingWidth> msceDto.sortingWidth)
                             msceDto.ceCodes

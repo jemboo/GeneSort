@@ -6,16 +6,16 @@ open FSharp.UMX
 
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Model.Sorter
-open GeneSort.Model.Sorter.Ce
-open GeneSort.Model.Sorter.Si
-open GeneSort.Model.Sorter.Uf4
-open GeneSort.Model.Sorter.Rs
-open GeneSort.Model.Sorter.Uf6
+open GeneSort.Model.Sorting.Sorter.Ce
+open GeneSort.Model.Sorting.Sorter.Si
+open GeneSort.Model.Sorting.Sorter.Uf4
+open GeneSort.Model.Sorting.Sorter.Rs
+open GeneSort.Model.Sorting.Sorter.Uf6
 open System.Threading
 open GeneSort.Runs
 open GeneSort.Db
 open ProjectOps
+open GeneSort.Model.Sorting
 
 
 module RandomSorters =

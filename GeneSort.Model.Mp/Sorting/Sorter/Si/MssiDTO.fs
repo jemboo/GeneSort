@@ -3,7 +3,7 @@
 open System
 open FSharp.UMX
 open GeneSort.Sorting
-open GeneSort.Model.Sorter.Si
+open GeneSort.Model.Sorting.Sorter.Si
 open MessagePack
 open GeneSort.Core.Mp
 open GeneSort.Model.Sorting
@@ -33,7 +33,7 @@ module MssiDto =
                 |> Array.map (function
                     | Ok ps -> ps
                     | Error e -> raise (ArgumentException(sprintf "Error converting Perm_SiDto: %A" e)))
-            let mssi = GeneSort.Model.Sorter.Si.Mssi.create
+            let mssi = GeneSort.Model.Sorting.Sorter.Si.Mssi.create
                             (UMX.tag<sorterModelID> mssiDto.id)
                             (UMX.tag<sortingWidth> mssiDto.sortingWidth)
                             perm_Sis

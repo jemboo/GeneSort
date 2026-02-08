@@ -3,7 +3,7 @@
 open System
 open FSharp.UMX
 open Xunit
-open GeneSort.Model.Sorter.Uf4
+open GeneSort.Model.Sorting.Sorter.Uf4
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 open GeneSort.Core

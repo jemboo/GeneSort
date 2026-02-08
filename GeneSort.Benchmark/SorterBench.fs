@@ -8,9 +8,10 @@ open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open GeneSort.SortingOps
 open GeneSort.Sorting.Sorter
-open GeneSort.Model.Sorter.Ce
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting.Sorter.Ce
+open GeneSort.Model.Sorting.Sorter
 open GeneSort.Sorting.Sortable.SortableIntArray
+open GeneSort.Model.Sorting
 
 
 //| Method       | mergeDimension | sortingWidth | sorterCount | ceLength | chunkSize | collectResults | Mean     | Error    | StdDev   | Ratio | Gen0       | Gen1       | Gen2      | Allocated  | Alloc Ratio |
