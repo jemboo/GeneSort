@@ -8,14 +8,13 @@ type sortingModelSet =
       private
         { id : Guid<sortingModelSetID>
           sortingModels : Map<Guid<sortingModelID>, sortingModel>
-          ceLength: int<ceLength> }
+        }
     with
-    static member create (id : Guid<sortingModelSetID>) (ceLength: int<ceLength>) (sortingModels : sortingModel[]) : sortingModelSet =
+    static member create 
+            (id : Guid<sortingModelSetID>) 
+            (sortingModels : sortingModel[]) : sortingModelSet =
         if sortingModels.Length < 1 then
             failwith "Must have at least 1 SorterModel"
-        
-        if sortingModels |> Array.exists (fun sm -> (SortingModel.getCeLength sm ) <> ceLength) then
-            failwith "All SorterModels must have the same CeLength"
         
         // Create map from sorterModels, keyed by their ID
         let modelMap = 
@@ -27,11 +26,10 @@ type sortingModelSet =
         if modelMap.Count <> sortingModels.Length then
             failwith "All SorterModels must have unique IDs"
         
-        { id = id; ceLength = ceLength; sortingModels = modelMap }
+        { id = id; sortingModels = modelMap }
     
     member this.Id with get() = this.id
-    member this.CeLength with get() = this.ceLength
-    member this.SorterModels with get() = this.sortingModels |> Map.toArray |> Array.map snd
+    member this.SortingModels with get() = this.sortingModels |> Map.toArray |> Array.map snd
 
     member this.tryFind (id: Guid<sortingModelID>) (modelSet: sortingModelSet) : sortingModel option =
         modelSet.sortingModels |> Map.tryFind id
@@ -45,6 +43,7 @@ type sortingModelSet =
 module SortingModelSet =
 
     let makeSorterSet (modelSet: sortingModelSet) : sorterSet =
-        let sorters = modelSet.SorterModels 
-                        |> Array.map (fun sm -> sm |> SortingModel.makeSorter)
-        sorterSet.create (%modelSet.Id |> UMX.tag<sorterSetId>) modelSet.CeLength sorters
+        let sorters = modelSet.SortingModels 
+                        |> Array.collect (fun sm -> sm |> SortingModel.makeSorters)
+
+        sorterSet.create (%modelSet.Id |> UMX.tag<sorterSetId>) sorters

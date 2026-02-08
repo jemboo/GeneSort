@@ -67,7 +67,8 @@ module RandomSorters =
     
     let sortingWidths() : string*string list =
        // let values = [4; 6; 8; 12; 16; 18; 20; 22; 24; 32; 36; 48; 64; 72; 96; 128; 144; 192; 256] |> List.map(fun d -> d.ToString())
-        let values = [4; 6; 8; 12; 16; 18; 20; 22; 24; 32; 64; 128; 256] |> List.map(fun d -> d.ToString())
+       // let values = [4; 6; 8; 12; 16; 18; 20; 22; 24; 32; 64; 128; 256] |> List.map(fun d -> d.ToString())
+        let values = [4; 6; 8; 12; 16; 18; 20; 22; 24; 32; 64;] |> List.map(fun d -> d.ToString())
         (runParameters.sortingWidthKey, values)
 
 
@@ -286,11 +287,11 @@ module RandomSorters =
                 //progress |> Option.iter (fun p -> 
                 //    p.Report(sprintf "Saved sorterSet %s for run: %s" (%sorterSet.Id.ToString()) %runId))
 
-                let qpModelSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingModelSet "") 
-                let! _ = db.saveAsync projectFolder qpModelSet (sorterModelSet |> outputData.SortingModelSet) allowOverwrite
+                let qpSortingModelSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingModelSet "") 
+                let! _ = db.saveAsync projectFolder qpSortingModelSet (sorterModelSet |> outputData.SortingModelSet) allowOverwrite
             
                 progress |> Option.iter (fun p -> 
-                    p.Report(sprintf "Saved SorterModelSet %s for run: %s" (%sorterModelSetMaker.Id.ToString()) %runId))
+                    p.Report(sprintf "Saved SortingModelSet %s for run: %s" (%qpSortingModelSet.Id.ToString()) %runId))
 
                 // 5. Final Return
                 return runParameters.WithRunFinished (Some true)

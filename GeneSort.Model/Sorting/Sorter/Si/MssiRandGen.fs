@@ -68,7 +68,7 @@ type MssiRandGen =
 
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) 
             (index: int) : Mssi =
-        let id = Common.makeSortingModelId this.Id index
+        let id = Common.makeSorterModelId this.Id index
         let rando = rngFactory this.RngType %id
         let perm_Sis = Perm_Si.makeRandoms (rando.NextIndex) (%this.SortingWidth) 
                         |> Seq.take (%this.StageLength)

@@ -105,6 +105,5 @@ module SorterModelSetEval =
             |> UMX.tag<sorterSetId>
 
         GeneSort.Sorting.Sorter.sorterSet.create 
-            newSetId 
-            sorterSet.CeLength 
+            newSetId
             passingSorters

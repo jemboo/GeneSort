@@ -20,7 +20,7 @@ type sorterPairModel =
 
 module SorterPairModel =
     
-    let getId (model: sorterPairModel) : Guid<sortingModelID> =
+    let getId (model: sorterPairModel) : Guid<sorterModelID> =
         match model with
         | Msce msce -> msce.Id
         | Mssi mssi -> mssi.Id
@@ -28,7 +28,7 @@ module SorterPairModel =
         | Msuf4 msuf4 -> msuf4.Id
         | Msuf6 msuf6 -> msuf6.Id
 
-    let makeSorter (model: sorterPairModel) : sorter =
+    let makeSorters (model: sorterPairModel) : sorter =
         match model with
         | Msce msce -> msce.MakeSorter()
         | Mssi mssi -> mssi.MakeSorter()
@@ -51,4 +51,8 @@ module SorterPairModel =
         | Msrs msrs -> msrs.CeLength
         | Msuf4 msuf4 -> msuf4.CeLength
         | Msuf6 msuf6 -> msuf6.CeLength
+
+    // Add a method to sorterPairModel that generates it's child sorter models.
+    let isAChildOf (parentModel: sorterPairModel) (sorterId: Guid<sorterId>) : bool =
+        failwith "Not implemented"
 

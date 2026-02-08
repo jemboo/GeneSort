@@ -41,7 +41,9 @@ type sorterModelSetMaker =
         let sortingModels = 
             [| for i in 0 .. %this.count - 1 do
                 let index = %this.firstIndex + i
-                SorterModelMaker.makeSorterModel rngFactory index this.sorterModelMaker 
-                |> sortingModel.Sorter |]
+                let sorterModel = SorterModelMaker.makeSorterModel rngFactory index this.sorterModelMaker 
+                let sortingModelId = Common.makeSortingModelId (this.sorterModelMaker |> SorterModelMaker.getSorterModelMakerId) index
+                sortingModelSingle.create sortingModelId sorterModel |> sortingModel.Single |]
+
         let id = (%this.id) |> UMX.tag<sortingModelSetID>
-        sortingModelSet.create id (this.sorterModelMaker |> SorterModelMaker.getCeLength) sortingModels
+        sortingModelSet.create id sortingModels

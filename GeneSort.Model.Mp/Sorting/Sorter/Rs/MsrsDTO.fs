@@ -58,7 +58,7 @@ module MsrsDto =
         | Ok permRss ->
             try
                 let msrs = msrs.create
-                                (UMX.tag<sortingModelID> dto.Id)
+                                (UMX.tag<sorterModelID> dto.Id)
                                 (UMX.tag<sortingWidth> dto.Width)
                                 permRss
                 Ok msrs

@@ -20,7 +20,7 @@ type sorterModel =
 
 module SorterModel =
     
-    let getId (model: sorterModel) : Guid<sortingModelID> =
+    let getId (model: sorterModel) : Guid<sorterModelID> =
         match model with
         | Msce msce -> msce.Id
         | Mssi mssi -> mssi.Id

@@ -1,6 +1,5 @@
 ﻿namespace GeneSort.Model.Mp.Sorter
 
-open System
 open GeneSort.Model.Sorter
 open GeneSort.Model.Mp.Sorter.Ce
 open GeneSort.Model.Mp.Sorter.Si

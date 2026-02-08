@@ -12,6 +12,7 @@ open GeneSort.SortingOps
 open GeneSort.Runs
 open GeneSort.Db
 open ProjectOps
+open GeneSort.Model.Sorter
 
 
 module FullBoolEvals =
@@ -172,14 +173,15 @@ module FullBoolEvals =
                         return (smt, sw, sdt)
                     } |> Result.ofOption (sprintf "Run %s, Repl %d: Missing required parameters" %runId %repl)
 
-                // 3. Load SorterSet
-                let qpSorters = RandomSorters.makeQueryParams (Some repl) (Some sortingWidth) (Some sorterModelType) (outputDataType.SorterSet "")
+                // 3. Load SortingModelSet
+                let qpSorters = RandomSorters.makeQueryParams (Some repl) (Some sortingWidth) (Some sorterModelType) (outputDataType.SortingModelSet "")
                 let! loadRes = db.loadAsync RandomSorters.projectFolder qpSorters
 
-                let! sorterSet = loadRes |> OutputData.asSorterSet |> asAsync
+                let! sortingModelSet = loadRes |> OutputData.asSortingModelSet |> asAsync
 
                 // 4. Perform Computation
                 let! _ = checkCancellation cts.Token
+                let sorterSet = sortingModelSet |> SortingModelSet.makeSorterSet
                 let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataFormat
                 let sorterSetEval = SorterModelSetEval.makeSorterSetEval sorterSet sortableTests false

@@ -1,33 +1,30 @@
 ﻿namespace GeneSort.Model.Sorter
 
 open GeneSort.Sorting.Sorter
-open GeneSort.Sorting
+open GeneSort.Model.Sorter
 open FSharp.UMX
 
 
 type sortingModel =
-     | Sorter of sorterModel
-     | SorterPair of sorterPairModel
+     | Single of sortingModelSingle
+     | Pair of sortingModelPair
 
 
 module SortingModel =
     
     let getId (model: sortingModel) : Guid<sortingModelID> =
         match model with
-        | Sorter sorter -> sorter |> SorterModel.getId
-
-
-    let makeSorter (model: sortingModel) : sorter =
+        | Single sms -> sms.Id
+        | Pair smp -> smp.Id
+                             
+    let makeSorters (model: sortingModel) : sorter []  =
         match model with
-        | Sorter sorter ->sorter |> SorterModel.makeSorter
+        | Single sms -> sms.SorterModel |> SorterModel.makeSorter |> Array.singleton
+        | Pair smp -> smp.SorterPairModel |> SorterPairModel.makeSorters |> Array.singleton
 
-
-    let getSortingWidth (model: sortingModel) : int<sortingWidth> =
+    let containsSorterModel (sorterModelId: Guid<sorterModelID>) (model: sortingModel) : bool =
         match model with
-        | Sorter sorter -> sorter |> SorterModel.getSortingWidth
+        | Single sms -> sms.SorterModel |> SorterModel.getId |> (=) (%sorterModelId)
+        | Pair smp -> smp |> SortingModelPair.hasChild sorterModelId
 
-
-    let getCeLength (model: sortingModel) : int<ceLength> =
-        match model with
-        | Sorter sorter -> sorter |> SorterModel.getCeLength
 

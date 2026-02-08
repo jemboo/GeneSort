@@ -42,14 +42,14 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 /// **********     RandomSorters   ****************
-let executor = RandomSorters.executor
-let project = RandomSorters.project
-let projectName = RandomSorters.project.ProjectName
-let projectFolder = RandomSorters.projectFolder
-let buildQueryParams = RandomSorters.makeQueryParamsFromRunParams
-let paramRefiner = RandomSorters.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 9<replNumber>
+//let executor = RandomSorters.executor
+//let project = RandomSorters.project
+//let projectName = RandomSorters.project.ProjectName
+//let projectFolder = RandomSorters.projectFolder
+//let buildQueryParams = RandomSorters.makeQueryParamsFromRunParams
+//let paramRefiner = RandomSorters.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 ///// **********     SortableMergeTests   ****************
@@ -64,14 +64,14 @@ let maxReplica = 9<replNumber>
 
 
 /// **********     MergeIntEvals   ****************
-//let executor = MergeIntEvals.executor
-//let project = MergeIntEvals.project
-//let projectName = MergeIntEvals.project.ProjectName
-//let projectFolder = MergeIntEvals.projectFolder
-//let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
-//let paramRefiner = MergeIntEvals.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 9<replNumber>
+let executor = MergeIntEvals.executor
+let project = MergeIntEvals.project
+let projectName = MergeIntEvals.project.ProjectName
+let projectFolder = MergeIntEvals.projectFolder
+let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
+let paramRefiner = MergeIntEvals.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
 
@@ -94,7 +94,7 @@ let maxReplica = 9<replNumber>
 //let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
 //let paramRefiner = FullBoolEvals.paramMapRefiner
 //let minReplica = 0<replNumber>
-//let maxReplica = 9<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 
@@ -124,11 +124,11 @@ match execResult with
 //    |> Async.RunSynchronously
 
 
-printfn "Making Use Profile report ..."
+//printfn "Making Use Profile report ..."
 
-let uPReportResult = 
-    TextReporters.ceUseProfileReportExecutor geneSortDb projectFolder minReplica maxReplica buildQueryParams allowOverwrite cts (Some progress)
-    |> Async.RunSynchronously
+//let uPReportResult = 
+//    TextReporters.ceUseProfileReportExecutor geneSortDb projectFolder minReplica maxReplica buildQueryParams allowOverwrite cts (Some progress)
+//    |> Async.RunSynchronously
 
 
 //printfn "Making Use Bin report ..."

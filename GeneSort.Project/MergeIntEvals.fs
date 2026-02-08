@@ -127,7 +127,8 @@ module MergeIntEvals =
 
 
     let mergeDimensions () : string * string list =
-        let values = [2; 3; 4; 6; 8 ] |> List.map string
+      //let values = [2; 3; 4; 6; 8 ] |> List.map string
+        let values = [2; 3;] |> List.map string
         (runParameters.mergeDimensionKey, values)
 
 
@@ -221,13 +222,13 @@ module MergeIntEvals =
                 //let! rawSorterData = db.loadAsync RandomSorters.projectFolder qpSorters
                 //let! sorterSet = rawSorterData |> OutputData.asSorterSet
 
-                // 4. Load SorterModelSet (Cross-project query)
+                // 4. Load SortingModelSet (Cross-project query)
                 let qpSorterModelSet = RandomSorters.makeQueryParams (Some repl) (Some width) (Some sModel) (outputDataType.SortingModelSet "")
                 let! smsOutput = db.loadAsync RandomSorters.projectFolder qpSorterModelSet
-                let! sorterModelSet = smsOutput |> OutputData.asSorterModelSet
+                let! sortingModelSet = smsOutput |> OutputData.asSortingModelSet
 
                 // 5. Computation
-                let sorterSet = SortingModelSet.makeSorterSet sorterModelSet
+                let sorterSet = SortingModelSet.makeSorterSet sortingModelSet
                 let! _ = checkCancellation cts.Token
                 let sorterSetEval = SorterModelSetEval.makeSorterSetEval sorterSet sortableTest false
 

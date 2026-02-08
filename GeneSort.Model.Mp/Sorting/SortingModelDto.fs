@@ -5,25 +5,27 @@ open MessagePack.Resolvers
 open MessagePack.FSharp
 
 
+
 [<MessagePackObject>]
-[<Union(0, typeof<sorterModelDto>); Union(1, typeof<sorterPairModelDto>)>]
+[<Union(0, typeof<sortingModelSingleDto>); Union(1, typeof<sortingModelPairDto>)>]
 type sortingModelDto =
-    | Sorter of sorterModelDto
-    | SorterPair of sorterPairModelDto
+    | Single of sortingModelSingleDto
+    | Pair of sortingModelPairDto
 
 module SortingModelDto =
+
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let toSortingModelDto (sortingModel: sortingModel) : sortingModelDto =
         match sortingModel with
-        | sortingModel.Sorter sorter -> Sorter (SorterModelDto.toSorterModelDto sorter)
-        | sortingModel.SorterPair sorterPair -> SorterPair (SorterPairModelDto.toSorterModelDto sorterPair)
+        | sortingModel.Single single -> Single (SortingModelSingleDto.toSortingModelSingleDto single)
+        | sortingModel.Pair pair -> Pair (SortingModelPairDto.toSortingModelPairDto pair)
 
     let fromSortingModelDto (dto: sortingModelDto) : sortingModel =
         try
             match dto with
-            | Sorter sorterDto -> sortingModel.Sorter (SorterModelDto.fromSorterModelDto sorterDto)
-            | SorterPair sorterPairDto -> sortingModel.SorterPair (SorterPairModelDto.fromSorterModelDto sorterPairDto)
+            | Single singleDto -> sortingModel.Single (SortingModelSingleDto.fromSortingModelSingleDto singleDto)
+            | Pair pairDto -> sortingModel.Pair (SortingModelPairDto.fromSortingModelPairDto pairDto)
         with
         | ex -> failwith $"Failed to convert SortingModelDto: {ex.Message}"

@@ -1,6 +1,7 @@
 ﻿namespace GeneSort.Model.Sorter
 
 open System
+open FSharp.UMX
 open GeneSort.Model.Sorter.Ce
 open GeneSort.Model.Sorter.Si
 open GeneSort.Model.Sorter.Rs
@@ -50,5 +51,19 @@ module SorterModelMaker =
         | SmmMsuf4RandMutate msuf4 -> msuf4.CeLength
         | SmmMsuf6RandGen msuf6 -> msuf6.CeLength
         | SmmMsuf6RandMutate msuf6 -> msuf6.CeLength
+
+
+    let getSorterModelMakerId (model: sorterModelMaker) : Guid<sorterModelMakerID> =
+        match model with
+        | SmmMsceRandGen msce -> msce.Id
+        | SmmMsceRandMutate msce -> msce.Id
+        | SmmMssiRandGen mssi -> mssi.Id
+        | SmmMssiRandMutate mssi -> mssi.Id
+        | SmmMsrsRandGen msrs -> msrs.Id
+        | SmmMsrsRandMutate msrs -> msrs.Id
+        | SmmMsuf4RandGen msuf4 -> msuf4.Id
+        | SmmMsuf4RandMutate msuf4 -> msuf4.Id
+        | SmmMsuf6RandGen msuf6 -> msuf6.Id
+        | SmmMsuf6RandMutate msuf6 -> msuf6.Id
 
 
