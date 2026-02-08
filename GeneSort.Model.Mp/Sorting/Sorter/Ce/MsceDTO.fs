@@ -8,6 +8,7 @@ open GeneSort.Model.Sorter.Ce
 
 open MessagePack
 open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 
 [<MessagePackObject; Struct>]
 type msceDto =

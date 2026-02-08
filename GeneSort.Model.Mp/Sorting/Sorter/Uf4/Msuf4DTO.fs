@@ -7,7 +7,7 @@ open MessagePack
 open GeneSort.Sorting
 open GeneSort.Core.Mp.TwoOrbitUnfolder
 open GeneSort.Model.Sorter.Uf4
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 
 [<MessagePackObject>]
 type msuf4Dto =

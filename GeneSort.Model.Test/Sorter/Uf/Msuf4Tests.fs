@@ -7,7 +7,7 @@ open GeneSort.Model.Sorter.Uf4
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 open GeneSort.Core
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 
 type Msuf4Tests() =
 

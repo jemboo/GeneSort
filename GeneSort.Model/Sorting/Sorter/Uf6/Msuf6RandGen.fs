@@ -3,7 +3,7 @@ open System
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Core
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 
 [<Struct; CustomEquality; NoComparison>]
 type msuf6RandGen = 

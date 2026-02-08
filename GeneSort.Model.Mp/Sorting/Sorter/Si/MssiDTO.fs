@@ -2,12 +2,11 @@
 
 open System
 open FSharp.UMX
-open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Model.Sorter
 open GeneSort.Model.Sorter.Si
 open MessagePack
 open GeneSort.Core.Mp
+open GeneSort.Model.Sorting
 
 [<MessagePackObject; Struct>]
 type mssiDto =

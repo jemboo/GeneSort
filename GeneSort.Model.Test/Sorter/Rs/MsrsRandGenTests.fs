@@ -7,7 +7,6 @@ open FsUnit.Xunit
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorter.Rs
-open GeneSort.Model.Sorter
 
 type MsrsRandGenTests() =
     // Helper function to create a mock random number generator

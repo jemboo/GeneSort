@@ -6,6 +6,7 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
+open GeneSort.Model.Sorting
 open GeneSort.Model.Sorter
 
 [<Measure>] type sorterModelSetEvalId

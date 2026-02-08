@@ -8,7 +8,7 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorter.Rs
 open GeneSort.Model.Sorter.Si
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 
 type MsrsRandMutateTests() =
 

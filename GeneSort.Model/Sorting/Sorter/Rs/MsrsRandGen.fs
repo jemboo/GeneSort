@@ -3,9 +3,8 @@
 open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Core.Perm_RsOps
 open GeneSort.Sorting
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 
 /// Represents a configuration for generating random Msrs instances with specified mutation rates.
 /// Combines random generation and mutation probabilities for Perm_Rs instances.

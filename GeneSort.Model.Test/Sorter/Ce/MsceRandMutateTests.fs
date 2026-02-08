@@ -7,7 +7,7 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorter.Ce
 open FsUnit.Xunit
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 
 
 type MsceRandMutateTests() =

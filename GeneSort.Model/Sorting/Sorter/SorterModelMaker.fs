@@ -9,6 +9,7 @@ open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Uf6
 open GeneSort.Core
 open GeneSort.Sorting
+open GeneSort.Model.Sorting
 
 
 type sorterModelMaker =

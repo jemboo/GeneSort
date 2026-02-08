@@ -3,9 +3,8 @@
 open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 
 [<Struct; CustomEquality; NoComparison>]
 type MsceRandMutate = 

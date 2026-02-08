@@ -1,6 +1,7 @@
 ﻿namespace GeneSort.Model.Sorter
 
 open FSharp.UMX
+open GeneSort.Model.Sorting
 
 
 type sortingModelSingle =

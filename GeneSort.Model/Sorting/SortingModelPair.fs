@@ -2,6 +2,7 @@
 
 open FSharp.UMX
 open GeneSort.Sorting
+open GeneSort.Model.Sorting
 
 
 type sortingModelPair =

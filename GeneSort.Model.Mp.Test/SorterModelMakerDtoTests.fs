@@ -1,6 +1,5 @@
 ﻿namespace GeneSort.Model.Mp.Sorter.Tests
 
-
 open System
 open Xunit
 open MessagePack
@@ -14,18 +13,9 @@ open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Rs
 open GeneSort.Model.Sorter.Si
 open GeneSort.Model.Sorter.Ce
-
 open GeneSort.Model.Mp.Sorter
-open GeneSort.Model.Mp.Sorter.Ce
-open GeneSort.Model.Mp.Sorter.Si
-open GeneSort.Model.Mp.Sorter.Rs
-open GeneSort.Model.Mp.Sorter.Uf4
-open GeneSort.Model.Mp.Sorter.Uf6
-
-open GeneSort.Model.Mp.Sorter
-open GeneSort.Model.Mp.Sorter.Uf6
 open GeneSort.Model.Sorter.Uf6
-open GeneSort.Core
+open GeneSort.Model.Sorting
 
 
 

@@ -1,4 +1,5 @@
 ﻿namespace GeneSort.Model.Sorter
+open FSharp.UMX
 
 open GeneSort.Sorting.Sorter
 open GeneSort.Model.Sorter.Ce
@@ -7,7 +8,7 @@ open GeneSort.Model.Sorter.Rs
 open GeneSort.Model.Sorter.Uf4
 open GeneSort.Model.Sorter.Uf6
 open GeneSort.Sorting
-open FSharp.UMX
+open GeneSort.Model.Sorting
 
 
 type sorterModel =

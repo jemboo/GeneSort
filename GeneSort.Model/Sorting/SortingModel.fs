@@ -2,6 +2,7 @@
 
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
+open GeneSort.Model.Sorting
 open GeneSort.Model.Sorter
 open FSharp.UMX
 

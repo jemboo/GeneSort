@@ -2,8 +2,9 @@
 
 open System
 open FSharp.UMX
-open GeneSort.Model.Sorter
 open MessagePack
+open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 
 [<MessagePackObject>]
 type sortingModelPairDto = {

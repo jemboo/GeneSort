@@ -3,7 +3,7 @@
 open FSharp.UMX
 open GeneSort.Core
 open System
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 open GeneSort.Model.Sorter.Rs
 
       

@@ -5,8 +5,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
-open GeneSort.Sorting.Sortable
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
  
 [<Struct; CustomEquality; NoComparison>]
 type Mssi = 

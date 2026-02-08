@@ -5,7 +5,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 
 /// Represents a rank-swap-based sorting model composed of an array of Perm_Rs instances.
 [<Struct; CustomEquality; NoComparison>]

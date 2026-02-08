@@ -1,7 +1,7 @@
 ﻿namespace GeneSort.Model.Sorter.Uf4
 open System
 open FSharp.UMX
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 open GeneSort.Core
 open GeneSort.Sorting
 open MathUtils

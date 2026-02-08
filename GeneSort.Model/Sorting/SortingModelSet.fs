@@ -3,6 +3,7 @@
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
+open GeneSort.Model.Sorting
 
 type sortingModelSet =
       private

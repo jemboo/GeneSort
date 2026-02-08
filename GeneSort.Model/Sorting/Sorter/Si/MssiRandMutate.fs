@@ -4,7 +4,7 @@ open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Core.Perm_Si
-open GeneSort.Model.Sorter
+open GeneSort.Model.Sorting
 
 
 /// Represents a configuration for mutating Mssi instances with specified mutation probabilities.
