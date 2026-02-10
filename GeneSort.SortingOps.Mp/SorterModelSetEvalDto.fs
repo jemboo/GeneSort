@@ -21,7 +21,7 @@ type sorterModelSetEvalDto = {
 
 module SorterSetEvalDto =
 
-    let fromDomain (sorterSetEval: sorterModelSetEval) : sorterModelSetEvalDto =
+    let fromDomain (sorterSetEval: sorterSetEval) : sorterModelSetEvalDto =
         { 
             SorterSetEvalId = %sorterSetEval.SorterModelSetEvalId
             SorterSetId = %sorterSetEval.SorterSetId
@@ -29,14 +29,14 @@ module SorterSetEvalDto =
             SorterEvals = sorterSetEval.SorterEvals |> Array.map SorterEvalDto.toSorterEvalDto
         }
 
-    let toDomain (dto: sorterModelSetEvalDto) : sorterModelSetEval =
+    let toDomain (dto: sorterModelSetEvalDto) : sorterSetEval =
         if dto.SorterSetEvalId = Guid.Empty then
             failwith "SorterSetEvalId must not be empty"
         if dto.SorterSetId = Guid.Empty then
             failwith "SorterSetId must not be empty"
         if dto.SorterTestsId = Guid.Empty then
             failwith "SorterTestsId must not be empty"
-        sorterModelSetEval.create
+        sorterSetEval.create
             (UMX.tag<sorterSetId> dto.SorterSetId)
             (UMX.tag<sorterTestId> dto.SorterTestsId)
             (dto.SorterEvals |> Array.map SorterEvalDto.fromSorterEvalDto)

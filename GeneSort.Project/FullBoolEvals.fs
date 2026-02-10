@@ -176,23 +176,23 @@ module FullBoolEvals =
                 // 3. Load SortingModelSet
                 let qpSorters = RandomSorters.makeQueryParams (Some repl) (Some sortingWidth) (Some sorterModelType) (outputDataType.SortingModelSet "")
                 let! loadRes = db.loadAsync RandomSorters.projectFolder qpSorters
-
                 let! sortingModelSet = loadRes |> OutputData.asSortingModelSet |> asAsync
 
                 // 4. Perform Computation
                 let! _ = checkCancellation cts.Token
-                let sorterSet = sortingModelSet |> SortingModelSet.makeSorterSet
                 let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataFormat
-                let sorterSetEval = SorterModelSetEval.makeSorterModelSetEval sorterSet sortableTests false
+                let sorterSet = sortingModelSet |> SortingModelSet.makeSorterSet
+                let sorterSetEval = SorterSetEval.makeSorterModelSetEval sorterSet sortableTests false
 
                 // 5. Save Results
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
                 let! _ = db.saveAsync projectFolder qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
-                let qpSorterSetPass = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "Pass")
-                let passingSorterSet = 
-                    SorterModelSetEval.makePassingSorterSet sorterSet sorterSetEval
-                let! _ = db.saveAsync projectFolder qpSorterSetPass (passingSorterSet |> outputData.SorterSet) allowOverwrite
+                let passingSortingModelSet = 
+                        SorterSetEval.makePassingSortingModelSet sortingModelSet sorterSetEval
+                let qpSorterModelSetPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingModelSet "Pass")
+                let! _ = db.saveAsync projectFolder qpSorterModelSetPass (passingSortingModelSet |> outputData.SortingModelSet) allowOverwrite
+
 
                 // 6. Final Success
                 return runParameters.WithRunFinished (Some true)

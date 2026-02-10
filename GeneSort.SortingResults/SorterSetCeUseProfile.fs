@@ -77,13 +77,13 @@ module SorterSetCeUseProfile =
     let makeSorterSetCeUseProfile
             (segmentCount:int)
             (blockGrowthRate:float)
-            (sorterSetEval:sorterModelSetEval) : sorterSetCeUseProfile  =
+            (sorterSetEval:sorterSetEval) : sorterSetCeUseProfile  =
 
         let lastLength = 1
         let profileSegments = Segment.breakIntoExponentialSegments
                                     segmentCount 
                                     blockGrowthRate 
-                                    (sorterSetEval |> SorterModelSetEval.getCeLength |> int)
+                                    (sorterSetEval |> SorterSetEval.getCeLength |> int)
                                     lastLength
         {
             sorterSetCeUseProfile.profileSegments = profileSegments

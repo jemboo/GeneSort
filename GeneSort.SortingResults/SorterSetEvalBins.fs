@@ -66,7 +66,7 @@ module SorterSetEvalBins =
         sorterSetEvalBins.totalSampleCount <- sorterSetEvalBins.totalSampleCount + 1
 
 
-    let create (maxBinCount: int) (sorterSetEval:sorterModelSetEval) : sorterSetEvalBins =
+    let create (maxBinCount: int) (sorterSetEval:sorterSetEval) : sorterSetEvalBins =
         let sorterSetEvalBins = {
             sorterSetEvalId = sorterSetEval.SorterModelSetEvalId
             totalSampleCount = 0

@@ -10,7 +10,7 @@ open GeneSort.Model.Sorting
 
 [<Measure>] type sorterModelSetEvalId
 
-type sorterModelSetEval =
+type sorterSetEval =
 
     private { 
         sorterModelSetEvalId: Guid<sorterModelSetEvalId>
@@ -43,9 +43,9 @@ type sorterModelSetEval =
 
  
 
-module SorterModelSetEval =
+module SorterSetEval =
 
-    let getCeLength (sorterModelSetEval: sorterModelSetEval) : int<ceLength> =
+    let getCeLength (sorterModelSetEval: sorterSetEval) : int<ceLength> =
         match sorterModelSetEval.SorterEvals |> Array.tryHead with
         | Some firstEval -> firstEval.CeBlockEval.CeBlock.CeLength
         | None -> failwith "SorterSetEval contains no SorterEvals"
@@ -53,7 +53,7 @@ module SorterModelSetEval =
     let makeSorterModelSetEval
             (sorterSet: sorterSet)
             (sortableTest: sortableTest) 
-            (collectResults: bool) : sorterModelSetEval =
+            (collectResults: bool) : sorterSetEval =
 
 
         let ceBlockAs = 
@@ -72,14 +72,14 @@ module SorterModelSetEval =
                             sorter.SorterId
                             ceBlockEval
                 )
-        sorterModelSetEval.create sorterSet.Id (sortableTest |> SortableTests.getId ) sorterEvals
+        sorterSetEval.create sorterSet.Id (sortableTest |> SortableTests.getId ) sorterEvals
 
 
     /// For the sorterSet and its corresponding sorterSetEval, this creates a subset 
     /// that consists of all the sorters with an UnsortedCount = 0
     let makePassingSorterSet
             (sorterSet: sorterSet)
-            (sorterSetEval: sorterModelSetEval) : sorterSet =
+            (sorterSetEval: sorterSetEval) : sorterSet =
         
         // 1. Identify the IDs of the sorters that passed (UnsortedCount = 0)
         let passingIds = 
@@ -114,7 +114,7 @@ module SorterModelSetEval =
     /// that consists of all the sorters with an UnsortedCount = 0
     let makePassingSortingModelSet
             (sms: sortingModelSet)
-            (sorterSetEval: sorterModelSetEval) :sortingModelSet =
+            (sorterSetEval: sorterSetEval) :sortingModelSet =
         
         // 1. Identify the IDs of the sorters that passed (UnsortedCount = 0)
         let passingIds = 

@@ -121,7 +121,9 @@ module RandomSorters =
 
 
 
-    let getStageLengthForSortingWidth (isMuf4:bool) (sortingWidth: int<sortingWidth>) : int<stageLength> =
+    let getStageLengthForSortingWidth 
+                        (smt:sorterModelType) 
+                        (sortingWidth: int<sortingWidth>) : int<stageLength> =
             match %sortingWidth with
             | 4 -> 5 |> UMX.tag<stageLength>
             | 6 -> 20 |> UMX.tag<stageLength>
@@ -132,11 +134,35 @@ module RandomSorters =
             | 20 -> 130 |> UMX.tag<stageLength>
             | 22 -> 140 |> UMX.tag<stageLength>
             | 24 -> 200 |> UMX.tag<stageLength>
-            | 32 -> 300 |> UMX.tag<stageLength>
-            | 64 -> 600 |> UMX.tag<stageLength>
-            | 128 -> 1200 |> UMX.tag<stageLength>
-            | 256 -> 3000 |> UMX.tag<stageLength>
+            | 32 ->  match smt with
+                        | sorterModelType.Mcse -> 300 |> UMX.tag<stageLength>
+                        | sorterModelType.Mssi -> 300 |> UMX.tag<stageLength>
+                        | sorterModelType.Msrs -> 300 |> UMX.tag<stageLength>
+                        | sorterModelType.Msuf4 -> 600 |> UMX.tag<stageLength>
+                        | _ -> failwithf "Unsupported sorter model type: %A" smt
+
+            | 64 -> match smt with
+                        | sorterModelType.Mcse -> 600 |> UMX.tag<stageLength>
+                        | sorterModelType.Mssi -> 600 |> UMX.tag<stageLength>
+                        | sorterModelType.Msrs -> 800 |> UMX.tag<stageLength>
+                        | sorterModelType.Msuf4 -> 2000 |> UMX.tag<stageLength>
+                        | _ -> failwithf "Unsupported sorter model type: %A" smt
+
+            | 128 -> match smt with
+                        | sorterModelType.Mcse -> 1200 |> UMX.tag<stageLength>
+                        | sorterModelType.Mssi -> 1500 |> UMX.tag<stageLength>
+                        | sorterModelType.Msrs -> 1800 |> UMX.tag<stageLength>
+                        | sorterModelType.Msuf4 -> 4000 |> UMX.tag<stageLength>
+                        | _ -> failwithf "Unsupported sorter model type: %A" smt
+
+            | 256 -> match smt with
+                        | sorterModelType.Mcse -> 3000 |> UMX.tag<stageLength>
+                        | sorterModelType.Mssi -> 3000 |> UMX.tag<stageLength>
+                        | sorterModelType.Msrs -> 4000 |> UMX.tag<stageLength>
+                        | sorterModelType.Msuf4 -> 6000 |> UMX.tag<stageLength>
+                        | _ -> failwithf "Unsupported sorter model type: %A" smt
             | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
+
 
 
 
@@ -172,14 +198,9 @@ module RandomSorters =
     // --- Project Refinement ---
 
     let enhancer (rp : runParameters) : runParameters =
-        let repl = rp.GetRepl().Value
         let sortingWidth = rp.GetSortingWidth().Value
         let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
-        let isMuf4 = 
-            match rp.GetSorterModelType().Value with
-            | sorterModelType.Msuf4 -> true
-            | _ -> false
-        let stageLength = getStageLengthForSortingWidth isMuf4 sortingWidth
+        let stageLength = getStageLengthForSortingWidth (rp.GetSorterModelType().Value) sortingWidth
         let ceLength = (((float %stageLength) * (float %sortingWidth) * 0.5) |> int) |> UMX.tag<ceLength>
         let sorterCount = 150 |> UMX.tag<sorterCount>
 
@@ -275,20 +296,11 @@ module RandomSorters =
 
                 let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
                 let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
-                let sorterModelSet = sorterModelSetMaker.MakeSortingModelSet (Rando.create)
-                let sorterSet = SortingModelSet.makeSorterSet sorterModelSet
-
-                let! _ = checkCancellation cts.Token
+                let sortingModelSet = sorterModelSetMaker.MakeSortingModelSet (Rando.create)
 
                 // 4. Saves
-                //let qpSorterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSet "") 
-                //let! _ = db.saveAsync projectFolder qpSorterSet (sorterSet |> outputData.SorterSet) allowOverwrite
-            
-                //progress |> Option.iter (fun p -> 
-                //    p.Report(sprintf "Saved sorterSet %s for run: %s" (%sorterSet.Id.ToString()) %runId))
-
                 let qpSortingModelSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingModelSet "") 
-                let! _ = db.saveAsync projectFolder qpSortingModelSet (sorterModelSet |> outputData.SortingModelSet) allowOverwrite
+                let! _ = db.saveAsync projectFolder qpSortingModelSet (sortingModelSet |> outputData.SortingModelSet) allowOverwrite
             
                 progress |> Option.iter (fun p -> 
                     p.Report(sprintf "Saved SortingModelSet %s for run: %s" (%qpSortingModelSet.Id.ToString()) %runId))
