@@ -12,11 +12,11 @@ type IndelRatesArrayDto = {
 
 module IndelRatesArrayDto =
 
-    let toDomain (dto: IndelRatesArrayDto) : IndelRatesArray =
+    let toDomain (dto: IndelRatesArrayDto) : indelRatesArray =
         let rates = Array.map IndelRatesDto.toDomain dto.Rates
-        IndelRatesArray.create rates
+        indelRatesArray.create rates
 
-    let fromDomain (domain: IndelRatesArray) : IndelRatesArrayDto = {
+    let fromDomain (domain: indelRatesArray) : IndelRatesArrayDto = {
         Rates = Array.map IndelRatesDto.fromDomain domain.RatesArray
     }
 

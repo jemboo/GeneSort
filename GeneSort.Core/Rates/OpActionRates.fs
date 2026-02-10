@@ -60,7 +60,7 @@ type OpActionRates =
     override this.GetHashCode() = 
         hash (this.orthoThresh, this.paraThresh)
 
-    interface IEquatable<IndelRates> with
+    interface IEquatable<indelRates> with
         member this.Equals(other) = 
             this.orthoThresh = other.mutationThresh &&
             this.paraThresh = other.insertionThresh

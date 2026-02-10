@@ -230,7 +230,7 @@ module MergeIntEvals =
                 // 5. Computation
                 let sorterSet = SortingModelSet.makeSorterSet sortingModelSet
                 let! _ = checkCancellation cts.Token
-                let sorterSetEval = SorterModelSetEval.makeSorterSetEval sorterSet sortableTest false
+                let sorterSetEval = SorterModelSetEval.makeSorterModelSetEval sorterSet sortableTest false
 
                 // 6. Save
                 let! _ = checkCancellation cts.Token

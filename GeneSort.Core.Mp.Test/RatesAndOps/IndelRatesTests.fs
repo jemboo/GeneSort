@@ -20,7 +20,7 @@ type IndelRatesTests() =
 
     [<Fact>]
     let ``IndelRatesDto fromIndelRates should correctly map to Dto`` () =
-        let rates = IndelRates.create (0.2, 0.3, 0.4)
+        let rates = indelRates.create (0.2, 0.3, 0.4)
         let dto = IndelRatesDto.fromDomain rates
         dto.MutationThresh |> should (equalWithin epsilon) 0.2
         dto.InsertionThresh |> should (equalWithin epsilon) 0.5 // 0.2 + 0.3
@@ -28,7 +28,7 @@ type IndelRatesTests() =
 
     [<Fact>]
     let ``Roundtrip conversion through IndelRatesDto should preserve rates`` () =
-        let original = IndelRates.create (0.2, 0.3, 0.4)
+        let original = indelRates.create (0.2, 0.3, 0.4)
         let dto = IndelRatesDto.fromDomain original
         let converted = IndelRatesDto.toDomain dto
         converted.MutationRate |> should (equalWithin epsilon) original.MutationRate

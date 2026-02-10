@@ -13,11 +13,11 @@ type MsceRandMutate =
           id : Guid<sorterModelMakerID>
           msce : Msce
           rngType: rngType
-          indelRatesArray: IndelRatesArray
+          indelRatesArray: indelRatesArray
           excludeSelfCe: bool }
     static member create 
             (rngType: rngType)
-            (indelRatesArray: IndelRatesArray)
+            (indelRatesArray: indelRatesArray)
             (excludeSelfCe: bool) 
             (msce : Msce): MsceRandMutate = 
         if %msce.CeLength <> indelRatesArray.Length then failwith "CeCount must match indelRatesArray.Length"

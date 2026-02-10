@@ -21,12 +21,12 @@ type MsceRandMutateTests() =
     let mockCeCode = 42 // Placeholder valid ceCode
     let newCeCode = 19 // Placeholder for mutated/inserted ceCode
     let sortingWidth = 10 |> UMX.tag<sortingWidth>
-    let baseRates = IndelRates.create (0.2, 0.2, 0.2)
+    let baseRates = indelRates.create (0.2, 0.2, 0.2)
     let msceId = Guid.NewGuid() |> UMX.tag<sorterModelID>
 
     [<Fact>]
     let ``mutate applies Mutation mode correctly`` () =
-        let arrayRates = IndelRatesArray.create [| IndelRates.create (1.0, 0.0, 0.0) |] // Always Mutation
+        let arrayRates = indelRatesArray.create [| indelRates.create (1.0, 0.0, 0.0) |] // Always Mutation
         let msce = Msce.create msceId sortingWidth [| mockCeCode |]
         let msceMutate = MsceRandMutate.create (rngType.Lcg) arrayRates false msce
         
@@ -38,7 +38,7 @@ type MsceRandMutateTests() =
 
     [<Fact>]
     let ``mutate applies Insertion mode and trims to ceCount`` () =
-        let arrayRates = IndelRatesArray.create [| IndelRates.create (0.0, 1.0, 0.0); IndelRates.create (0.0, 1.0, 0.0) |] // Insertion; Insertion
+        let arrayRates = indelRatesArray.create [| indelRates.create (0.0, 1.0, 0.0); indelRates.create (0.0, 1.0, 0.0) |] // Insertion; Insertion
         let msce = Msce.create msceId sortingWidth [| mockCeCode; mockCeCode |]
         let msceMutate = MsceRandMutate.create (rngType.Lcg) arrayRates false msce
         
@@ -50,7 +50,7 @@ type MsceRandMutateTests() =
 
     [<Fact>]
     let ``mutate applies Deletion mode and appends insertion`` () =
-        let arrayRates = IndelRatesArray.create [| IndelRates.create (0.0, 0.0, 1.0); IndelRates.create (0.0, 1.0, 0.0) |] // Deletion; Insertion
+        let arrayRates = indelRatesArray.create [| indelRates.create (0.0, 0.0, 1.0); indelRates.create (0.0, 1.0, 0.0) |] // Deletion; Insertion
         let msce = Msce.create msceId sortingWidth [| mockCeCode; mockCeCode |]
         let msceMutate = MsceRandMutate.create (rngType.Lcg) arrayRates false msce
         
@@ -62,7 +62,7 @@ type MsceRandMutateTests() =
 
     [<Fact>]
     let ``mutate applies NoAction mode correctly`` () =
-        let arrayRates = IndelRatesArray.create [| IndelRates.create (0.0, 0.0, 0.0) |] // Always NoAction
+        let arrayRates = indelRatesArray.create [| indelRates.create (0.0, 0.0, 0.0) |] // Always NoAction
         let msce = Msce.create msceId sortingWidth [| mockCeCode |]
         let msceMutate = MsceRandMutate.create (rngType.Lcg) arrayRates false msce
         

@@ -50,7 +50,7 @@ module SorterModelSetEval =
         | Some firstEval -> firstEval.CeBlockEval.CeBlock.CeLength
         | None -> failwith "SorterSetEval contains no SorterEvals"
 
-    let makeSorterSetEval
+    let makeSorterModelSetEval
             (sorterSet: sorterSet)
             (sortableTest: sortableTest) 
             (collectResults: bool) : sorterModelSetEval =

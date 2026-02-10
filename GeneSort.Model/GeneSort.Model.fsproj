@@ -39,6 +39,20 @@
     <Compile Include="Sortable\SortableTestModelGen.fs" />
     <Compile Include="Sortable\SortableTestModelSet.fs" />
     <Compile Include="Sortable\SortableTestModelSetMaker.fs" />
+    <Compile Include="Mutator\CommonMutator.fs" />
+    <Compile Include="Mutator\Sorting\CommonSorting.fs" />
+    <Compile Include="Mutator\Sorting\SorterPair\CommonSorterPair.fs" />
+    <Compile Include="Mutator\Sorting\SorterPair\MutateCe.fs" />
+    <Compile Include="Mutator\Sorting\SorterPair\MutateRs.fs" />
+    <Compile Include="Mutator\Sorting\SorterPair\MutateSi.fs" />
+    <Compile Include="Mutator\Sorting\SorterPair\MutateUf4.fs" />
+    <Compile Include="Mutator\Sorting\SorterPair\MutateUf6.fs" />
+    <Compile Include="Mutator\Sorting\Sorter\CommonSorter.fs" />
+    <Compile Include="Mutator\Sorting\Sorter\MutateCe.fs" />
+    <Compile Include="Mutator\Sorting\Sorter\MutateRs.fs" />
+    <Compile Include="Mutator\Sorting\Sorter\MutateSi.fs" />
+    <Compile Include="Mutator\Sorting\Sorter\MutateUf4.fs" />
+    <Compile Include="Mutator\Sorting\Sorter\MutateUf6.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />
   </ItemGroup>
 

@@ -10,11 +10,11 @@ type IndelMode =
 
 
 [<Struct; CustomEquality; NoComparison>]
-type IndelRates = 
+type indelRates = 
     private 
         { mutationThresh: float; insertionThresh: float; deletionThresh: float }
 
-    static member create (mutationRate: float, insertionRate: float, deletionRate: float) : IndelRates =
+    static member create (mutationRate: float, insertionRate: float, deletionRate: float) : indelRates =
         let noAction = 1.0 - mutationRate - insertionRate - deletionRate
         let epsilon = 1e-10
         if mutationRate < 0.0 || mutationRate > 1.0 then failwith "mutationRate must be between 0 and 1"
@@ -49,7 +49,7 @@ type IndelRates =
 
     override this.Equals(obj) = 
         match obj with
-        | :? IndelRates as other -> 
+        | :? indelRates as other -> 
             this.mutationThresh = other.mutationThresh &&
             this.insertionThresh = other.insertionThresh &&
             this.deletionThresh = other.deletionThresh
@@ -58,7 +58,7 @@ type IndelRates =
     override this.GetHashCode() = 
         hash (this.mutationThresh, this.insertionThresh, this.deletionThresh)
 
-    interface IEquatable<IndelRates> with
+    interface IEquatable<indelRates> with
         member this.Equals(other) = 
             this.mutationThresh = other.mutationThresh &&
             this.insertionThresh = other.insertionThresh &&
