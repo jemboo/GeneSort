@@ -4,6 +4,7 @@ open FSharp.UMX
 open GeneSort.Sorting.Sorter
 open GeneSort.Sorting
 open GeneSort.Model.Sorting
+open GeneSort.Model.Sorting.SorterPair.SplitPairs
 
 
 type sorterPairModel =

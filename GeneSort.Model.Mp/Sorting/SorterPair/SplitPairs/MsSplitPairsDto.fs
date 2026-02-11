@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Mp.Sorting.SorterPair
+﻿namespace GeneSort.Model.Mp.Sorting.SorterPair.SplitPairs
 
 open System
 open FSharp.UMX
@@ -9,6 +9,7 @@ open GeneSort.Model.Sorting.SorterPair
 open GeneSort.Model.Mp.Sorter
 open GeneSort.Model.Sorting
 open GeneSort.Sorting
+open GeneSort.Model.Sorting.SorterPair.SplitPairs
 
 [<MessagePackObject>]
 type msSplitPairsDto = {

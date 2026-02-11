@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.SorterPair
+﻿namespace GeneSort.Model.Sorting.SorterPair.SplitPairs
 
 open System
 open FSharp.UMX

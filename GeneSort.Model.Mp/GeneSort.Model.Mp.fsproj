@@ -24,7 +24,7 @@
     <Compile Include="Sorting\Sorter\SorterModelDto.fs" />
     <Compile Include="Sorting\Sorter\SorterModelMakerDto.fs" />
     <Compile Include="Sorting\Sorter\SorterModelSetMakerDto.fs" />
-    <Compile Include="Sorting\SorterPair\MsSplitPairsDto.fs" />
+    <Compile Include="Sorting\SorterPair\SplitPairs\MsSplitPairsDto.fs" />
     <Compile Include="Sorting\SorterPair\SorterPairModelDto.fs" />
     <Compile Include="Sorting\SortingModelDto.fs" />
     <Compile Include="Sorting\SortingModelSetDto.fs" />

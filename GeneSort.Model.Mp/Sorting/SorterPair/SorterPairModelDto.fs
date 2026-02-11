@@ -4,6 +4,7 @@ open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 open GeneSort.Model.Sorting.SorterPair
+open GeneSort.Model.Mp.Sorting.SorterPair.SplitPairs
 
 [<MessagePackObject>]
 [<Union(0, typeof<msSplitPairsDto>); Union(1, typeof<msSplitPairsDto>)>]
