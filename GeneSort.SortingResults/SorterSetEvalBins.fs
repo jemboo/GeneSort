@@ -32,7 +32,7 @@ module SorterEvalBin =
 
 
 type sorterSetEvalBins = {
-    sorterSetEvalId: Guid<sorterModelSetEvalId>
+    sorterSetEvalId: Guid<sorterSetEvalId>
     mutable totalSampleCount: int
     maxSorterEvalCount: int
     evalBins: Dictionary<sorterEvalKey, sorterEvalBin>

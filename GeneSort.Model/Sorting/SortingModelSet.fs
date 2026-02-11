@@ -13,9 +13,7 @@ type sortingModelSet =
     static member create 
             (id : Guid<sortingModelSetID>) 
             (sortingModels : sortingModel[]) : sortingModelSet =
-        //if sortingModels.Length < 1 then
-        //    failwith "Must have at least 1 SorterModel"
-        
+
         // Create map from sorterModels, keyed by their ID
         let modelMap = 
             sortingModels 

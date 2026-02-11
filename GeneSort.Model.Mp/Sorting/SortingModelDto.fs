@@ -3,14 +3,16 @@ open GeneSort.Model.Sorting
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
+open GeneSort.Model.Mp.Sorting.SorterPair
 
 
 
 [<MessagePackObject>]
-[<Union(0, typeof<sortingModelSingleDto>); Union(1, typeof<sortingModelPairDto>)>]
+[<Union(0, typeof<sorterModelDto>); Union(1, typeof<sorterPairModelDto>)>]
 type sortingModelDto =
-    | Single of sortingModelSingleDto
-    | Pair of sortingModelPairDto
+    | Single of sorterModelDto
+    | Pair of sorterPairModelDto
+
 
 module SortingModelDto =
 
@@ -19,13 +21,13 @@ module SortingModelDto =
 
     let toSortingModelDto (sortingModel: sortingModel) : sortingModelDto =
         match sortingModel with
-        | sortingModel.Single single -> Single (SortingModelSingleDto.toSortingModelSingleDto single)
-        | sortingModel.Pair pair -> Pair (SortingModelPairDto.toSortingModelPairDto pair)
+        | sortingModel.Single single -> Single (SorterModelDto.toSorterModelDto single)
+        | sortingModel.Pair pair -> Pair (SorterPairModelDto.toSorterPairModelDto pair)
 
     let fromSortingModelDto (dto: sortingModelDto) : sortingModel =
         try
             match dto with
-            | Single singleDto -> sortingModel.Single (SortingModelSingleDto.fromSortingModelSingleDto singleDto)
-            | Pair pairDto -> sortingModel.Pair (SortingModelPairDto.fromSortingModelPairDto pairDto)
+            | Single smDto -> sortingModel.Single (SorterModelDto.fromSorterModelDto smDto)
+            | Pair pairDto -> sortingModel.Pair (SorterPairModelDto.fromSorterPairModelDto pairDto)
         with
         | ex -> failwith $"Failed to convert SortingModelDto: {ex.Message}"

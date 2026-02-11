@@ -1,44 +1,30 @@
-﻿namespace GeneSort.Model.Mp.Sorter
+﻿namespace GeneSort.Model.Mp.Sorting.SorterPair
 
-open GeneSort.Model.Mp.Sorter.Ce
-open GeneSort.Model.Mp.Sorter.Si
-open GeneSort.Model.Mp.Sorter.Rs
-open GeneSort.Model.Mp.Sorter.Uf4
-open GeneSort.Model.Mp.Sorter.Uf6
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 open GeneSort.Model.Sorting.SorterPair
 
 [<MessagePackObject>]
-[<Union(0, typeof<msceDto>); Union(1, typeof<mssiDto>); Union(2, typeof<msrsDto>); Union(3, typeof<msuf4Dto>); Union(4, typeof<msuf6Dto>)>]
+[<Union(0, typeof<msSplitPairsDto>); Union(1, typeof<msSplitPairsDto>)>]
 type sorterPairModelDto =
-    | Msce of msceDto
-    | Mssi of mssiDto
-    | Msrs of msrsDto
-    | Msuf4 of msuf4Dto
-    | Msuf6 of msuf6Dto
+    | SplitPairs of msSplitPairsDto
+    | SplitPairs2 of msSplitPairsDto
 
 module SorterPairModelDto =
 
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toSorterModelDto (sorterPairModel: sorterPairModel) : sorterPairModelDto =
-        match sorterPairModel with
-        | sorterPairModel.Msce msce -> Msce (MsceDto.toMsceDto msce)
-        | sorterPairModel.Mssi mssi -> Mssi (MssiDto.toMssiDto mssi)
-        | sorterPairModel.Msrs msrs -> Msrs (MsrsDto.toMsrsDto msrs)
-        | sorterPairModel.Msuf4 msuf4 -> Msuf4 (Msuf4Dto.toMsuf4Dto msuf4)
-        | sorterPairModel.Msuf6 msuf6 -> Msuf6 (Msuf6Dto.toMsuf6Dto msuf6)
+    let toSorterPairModelDto (model: sorterPairModel) : sorterPairModelDto =
+        match model with
+        | sorterPairModel.SplitPairs sp -> SplitPairs (MsSplitPairsDto.toMsSplitPairsDto sp)
+        | sorterPairModel.SplitPairs2 sp -> SplitPairs2 (MsSplitPairsDto.toMsSplitPairsDto sp)
 
-    let fromSorterModelDto (dto: sorterPairModelDto) : sorterPairModel =
+    let fromSorterPairModelDto (dto: sorterPairModelDto) : sorterPairModel =
         try
             match dto with
-            | Msce msceDto -> sorterPairModel.Msce (MsceDto.toMsce msceDto |> Result.toOption |> Option.get)
-            | Mssi mssiDto -> sorterPairModel.Mssi (MssiDto.toMssi mssiDto |> Result.toOption |> Option.get)
-            | Msrs msrsDto -> sorterPairModel.Msrs (MsrsDto.toMsrs msrsDto |> Result.toOption |> Option.get)
-            | Msuf4 msuf4Dto -> sorterPairModel.Msuf4 (Msuf4Dto.fromMsuf4Dto msuf4Dto |> Result.toOption |> Option.get)
-            | Msuf6 msuf6Dto -> sorterPairModel.Msuf6 (Msuf6Dto.fromMsuf6Dto msuf6Dto |> Result.toOption |> Option.get)
+            | SplitPairs spDto -> sorterPairModel.SplitPairs (MsSplitPairsDto.fromMsSplitPairsDto spDto)
+            | SplitPairs2 spDto -> sorterPairModel.SplitPairs2 (MsSplitPairsDto.fromMsSplitPairsDto spDto)
         with
-        | ex -> failwith $"Failed to convert SorterModelDto: {ex.Message}"
+        | ex -> failwith $"Failed to convert SorterPairModelDto: {ex.Message}"

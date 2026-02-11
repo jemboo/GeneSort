@@ -8,12 +8,12 @@ open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
 open GeneSort.Model.Sorting
 
-[<Measure>] type sorterModelSetEvalId
+[<Measure>] type sorterSetEvalId
 
 type sorterSetEval =
 
     private { 
-        sorterModelSetEvalId: Guid<sorterModelSetEvalId>
+        sorterModelSetEvalId: Guid<sorterSetEvalId>
         sorterSetId: Guid<sorterSetId>
         sorterTestId: Guid<sorterTestId>
         sorterEvals: sorterEval[]
@@ -27,7 +27,7 @@ type sorterSetEval =
             [
                 sorterSetId :> obj
                 sorterTestsId :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelSetEvalId>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterSetEvalId>
 
         { 
             sorterModelSetEvalId = id
@@ -36,7 +36,7 @@ type sorterSetEval =
             sorterEvals = sorterEval
         }
 
-    member this.SorterModelSetEvalId with get() : Guid<sorterModelSetEvalId> = this.sorterModelSetEvalId
+    member this.SorterModelSetEvalId with get() : Guid<sorterSetEvalId> = this.sorterModelSetEvalId
     member this.SorterSetId with get() : Guid<sorterSetId> = this.sorterSetId
     member this.SorterTestId with get() : Guid<sorterTestId> = this.sorterTestId
     member this.SorterEvals with get() : sorterEval[] = this.sorterEvals

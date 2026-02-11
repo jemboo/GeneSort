@@ -70,3 +70,14 @@ module Sorter =
             member _.GetHashCode(obj) =
                 // Use the struct's GetHashCode, which caches the hash of Ces
                 obj.GetHashCode()
+
+    /// Concatenates two sorters by appending the suffix's CEs to the prefix's CEs.
+    /// The resulting sorter has the specified new ID.
+    /// Throws an exception if the sorters have different sorting widths.
+    let concatSorters (prefix: sorter) (suffix: sorter) (newId: Guid<sorterId>) : sorter =
+        if prefix.SortingWidth <> suffix.SortingWidth then
+            failwith $"Cannot concatenate sorters with different sorting widths. Prefix: {%prefix.SortingWidth}, Suffix: {%suffix.SortingWidth}"
+        
+        let concatenatedCes = Array.append prefix.Ces suffix.Ces
+        
+        sorter.create newId prefix.SortingWidth concatenatedCes
