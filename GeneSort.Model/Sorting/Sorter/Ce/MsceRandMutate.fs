@@ -7,11 +7,11 @@ open GeneSort.Sorting.Sorter
 open GeneSort.Model.Sorting
 
 [<Struct; CustomEquality; NoComparison>]
-type MsceRandMutate = 
+type msceRandMutate = 
     private 
         { 
           id : Guid<sorterModelMakerID>
-          msce : Msce
+          msce : msce
           rngType: rngType
           indelRatesArray: indelRatesArray
           excludeSelfCe: bool }
@@ -19,7 +19,7 @@ type MsceRandMutate =
             (rngType: rngType)
             (indelRatesArray: indelRatesArray)
             (excludeSelfCe: bool) 
-            (msce : Msce): MsceRandMutate = 
+            (msce : msce): msceRandMutate = 
         if %msce.CeLength <> indelRatesArray.Length then failwith "CeCount must match indelRatesArray.Length"
         let id =
             [
@@ -46,7 +46,7 @@ type MsceRandMutate =
 
     override this.Equals(obj) = 
         match obj with
-        | :? MsceRandMutate as other -> 
+        | :? msceRandMutate as other -> 
             this.Id = other.Id
 
         | _ -> false
@@ -54,7 +54,7 @@ type MsceRandMutate =
     override this.GetHashCode() = 
         hash (this.rngType, this.indelRatesArray, this.excludeSelfCe, this.msce)
 
-    interface IEquatable<MsceRandMutate> with
+    interface IEquatable<msceRandMutate> with
         member this.Equals(other) = 
             this.Id = other.Id
 
@@ -64,7 +64,7 @@ type MsceRandMutate =
     /// The ceCodes array is modified using the provided indelRatesArray, with insertions and mutations
     /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
-                : Msce =
+                : msce =
         let id = Common.makeSorterModelId this.Id index
         let rng = rngFactory this.RngType %id
         let excludeSelfCe = this.ExcludeSelfCe
@@ -77,13 +77,13 @@ type MsceRandMutate =
                         ceCodeMutator 
                         (rng.NextFloat) 
                         this.msce.CeCodes
-        Msce.create id this.msce.SortingWidth ceCodes
+        msce.create id this.msce.SortingWidth ceCodes
 
 
 module MsceRandMutate =
 
     /// Returns a string representation of the MsceRandMutate instance.
-    let toString (msceMutate: MsceRandMutate) : string = 
+    let toString (msceMutate: msceRandMutate) : string = 
         sprintf "MsceRandMutate(%s, %d, %s, %b)"
             (msceMutate.RngType.ToString())
             (%msceMutate.CeLength)

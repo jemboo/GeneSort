@@ -21,12 +21,12 @@ module MssiRandMutateDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toMssiRandMutateDto (mssiRandMutate: MssiRandMutate) : mssiRandMutateDto =
+    let toMssiRandMutateDto (mssiRandMutate: mssiRandMutate) : mssiRandMutateDto =
         { mssiDto = MssiDto.toMssiDto mssiRandMutate.Mssi
           rngType = mssiRandMutate.RngType
           opActionRatesArrayDto = OpActionRatesArrayDto.fromDomain mssiRandMutate.OpActionRates }
 
-    let fromMssiRandMutateDto (dto: mssiRandMutateDto) : Result<MssiRandMutate, string> =
+    let fromMssiRandMutateDto (dto: mssiRandMutateDto) : Result<mssiRandMutate, string> =
         try
             let mssiResult = MssiDto.toMssi dto.mssiDto
             match mssiResult with
@@ -35,7 +35,7 @@ module MssiRandMutateDto =
                     Error "StageLength must match OpActionRatesArray.Length"
                 else
                     let mssiRandMutate = 
-                        MssiRandMutate.create
+                        mssiRandMutate.create
                             (dto.rngType)
                             mssi
                             (OpActionRatesArrayDto.toDomain dto.opActionRatesArrayDto)

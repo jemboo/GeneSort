@@ -8,7 +8,7 @@ open GeneSort.Sorting.Sorter
 open GeneSort.Model.Sorting
  
 [<Struct; CustomEquality; NoComparison>]
-type Mssi = 
+type mssi = 
     private 
         { id: Guid<sorterModelID>
           sortingWidth: int<sortingWidth>
@@ -17,7 +17,7 @@ type Mssi =
     static member create 
             (id: Guid<sorterModelID>) 
             (sortingWidth: int<sortingWidth>) 
-            (perm_Sis: Perm_Si array) : Mssi =
+            (perm_Sis: Perm_Si array) : mssi =
         if perm_Sis.Length < 1 then
             failwith "Must have at least 1 Perm_Si"
         else if %sortingWidth < 1 then
@@ -38,7 +38,7 @@ type Mssi =
 
     override this.Equals(obj) = 
         match obj with
-        | :? Mssi as other -> 
+        | :? mssi as other -> 
             this.id = other.id && 
             this.sortingWidth = other.sortingWidth && 
             this.perm_Sis = other.perm_Sis
@@ -47,7 +47,7 @@ type Mssi =
     override this.GetHashCode() = 
         hash (this.GetType(), this.id, this.sortingWidth, this.perm_Sis)
 
-    interface IEquatable<Mssi> with
+    interface IEquatable<mssi> with
         member this.Equals(other) = 
             this.id = other.id &&  
             this.sortingWidth = other.sortingWidth && 
@@ -65,13 +65,13 @@ type Mssi =
 
 module Mssi =
 
-    let toString (mssi: Mssi) : string =
+    let toString (mssi: mssi) : string =
         sprintf "Mssi(Id=%A, Width=%d, StageLength=%d)" 
                 (%mssi.Id) 
                 (%mssi.SortingWidth) 
                 mssi.StageLength
 
-    let makeSorter (mssi: Mssi) : sorter =
+    let makeSorter (mssi: mssi) : sorter =
         let ces = mssi.perm_Sis
                     |> Array.map (fun psi -> psi |> Perm_Si.getTwoOrbits)
                     |> Array.collect(id)

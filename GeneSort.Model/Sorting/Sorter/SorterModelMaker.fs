@@ -13,10 +13,10 @@ open GeneSort.Model.Sorting
 
 
 type sorterModelMaker =
-     | SmmMsceRandGen of MsceRandGen
-     | SmmMsceRandMutate of MsceRandMutate
-     | SmmMssiRandGen of MssiRandGen
-     | SmmMssiRandMutate of MssiRandMutate
+     | SmmMsceRandGen of msceRandGen
+     | SmmMsceRandMutate of msceRandMutate
+     | SmmMssiRandGen of mssiRandGen
+     | SmmMssiRandMutate of mssiRandMutate
      | SmmMsrsRandGen of msrsRandGen
      | SmmMsrsRandMutate of msrsRandMutate
      | SmmMsuf4RandGen of msuf4RandGen

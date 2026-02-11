@@ -19,13 +19,13 @@ module MssiDto =
         | InvalidPermSiCount of string
         | InvalidWidth of string
 
-    let toMssiDto (mssi: Mssi) : mssiDto =
+    let toMssiDto (mssi: mssi) : mssiDto =
         let mssiDtos = mssi.Perm_Sis |> Array.map PermSiDto.fromDomain
         { id = %mssi.Id
           sortingWidth = %mssi.SortingWidth
           permSiDtos = mssiDtos }
 
-    let toMssi (mssiDto: mssiDto) : Result<Mssi, MssiDtoError> =
+    let toMssi (mssiDto: mssiDto) : Result<mssi, MssiDtoError> =
         try
             let perm_SisR = mssiDto.permSiDtos |> Array.map (PermSiDto.toDomain)
             let perm_Sis =
@@ -33,7 +33,7 @@ module MssiDto =
                 |> Array.map (function
                     | Ok ps -> ps
                     | Error e -> raise (ArgumentException(sprintf "Error converting Perm_SiDto: %A" e)))
-            let mssi = GeneSort.Model.Sorting.Sorter.Si.Mssi.create
+            let mssi = GeneSort.Model.Sorting.Sorter.Si.mssi.create
                             (UMX.tag<sorterModelID> mssiDto.id)
                             (UMX.tag<sortingWidth> mssiDto.sortingWidth)
                             perm_Sis

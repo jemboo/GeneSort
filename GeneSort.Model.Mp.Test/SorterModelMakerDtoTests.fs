@@ -33,7 +33,7 @@ type SorterModelSetMakerDtoTests() =
     [<Fact>]
     let ``MsceRandGen round-trip serialization and deserialization should succeed`` () =
         let excludeSelfCe = true
-        let msceRandGen = MsceRandGen.create rngType.Lcg (UMX.tag<sortingWidth> 16) excludeSelfCe (UMX.tag<ceLength> 10)
+        let msceRandGen = msceRandGen.create rngType.Lcg (UMX.tag<sortingWidth> 16) excludeSelfCe (UMX.tag<ceLength> 10)
         let sorterModelMaker = sorterModelMaker.SmmMsceRandGen msceRandGen
         let result = roundTrip sorterModelMaker
         match result with
@@ -47,9 +47,9 @@ type SorterModelSetMakerDtoTests() =
     [<Fact>]
     let ``MsceRandMutate round-trip serialization and deserialization should succeed`` () =
         let excludeSelfCe = true
-        let msce = Msce.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|16|]
+        let msce = msce.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|16|]
         let arrayRates = indelRatesArray.create [| indelRates.create (1.0, 0.0, 0.0) |] // Always Mutation
-        let msceRandMutate = MsceRandMutate.create rngType.Lcg arrayRates excludeSelfCe msce
+        let msceRandMutate = msceRandMutate.create rngType.Lcg arrayRates excludeSelfCe msce
         let sorterModelMaker = sorterModelMaker.SmmMsceRandMutate msceRandMutate
         let result = roundTrip sorterModelMaker
         match result with
@@ -61,7 +61,7 @@ type SorterModelSetMakerDtoTests() =
 
     [<Fact>]
     let ``MssiRandGen round-trip serialization and deserialization should succeed`` () =
-        let mssiRandGen = MssiRandGen.create rngType.Lcg (UMX.tag<sortingWidth> 2) (UMX.tag<stageLength> 5)
+        let mssiRandGen = mssiRandGen.create rngType.Lcg (UMX.tag<sortingWidth> 2) (UMX.tag<stageLength> 5)
         let sorterModelMaker = sorterModelMaker.SmmMssiRandGen mssiRandGen
         let result = roundTrip sorterModelMaker
         match result with
@@ -73,10 +73,10 @@ type SorterModelSetMakerDtoTests() =
 
     [<Fact>]
     let ``MssiRandMutate round-trip serialization and deserialization should succeed`` () =
-        let mssi = Mssi.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 2) [| Perm_Si.create [|0; 1|]|]
+        let mssi = mssi.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 2) [| Perm_Si.create [|0; 1|]|]
         let siMutationRates = OpActionRates.create (0.0, 0.0)
         let opActionRatesArray = OpActionRatesArray.create [|siMutationRates|]
-        let mssiRandMutate = MssiRandMutate.create rngType.Lcg mssi opActionRatesArray
+        let mssiRandMutate = mssiRandMutate.create rngType.Lcg mssi opActionRatesArray
         let sorterModelMaker = sorterModelMaker.SmmMssiRandMutate mssiRandMutate 
         let result = roundTrip sorterModelMaker
         match result with

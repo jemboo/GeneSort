@@ -12,8 +12,8 @@ open GeneSort.Model.Sorting
 
 
 type sorterModel =
-     | Msce of Msce
-     | Mssi of Mssi
+     | Msce of msce
+     | Mssi of mssi
      | Msrs of msrs
      | Msuf4 of msuf4
      | Msuf6 of msuf6

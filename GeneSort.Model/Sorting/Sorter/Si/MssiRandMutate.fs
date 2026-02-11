@@ -9,19 +9,19 @@ open GeneSort.Model.Sorting
 
 /// Represents a configuration for mutating Mssi instances with specified mutation probabilities.
 [<Struct; CustomEquality; NoComparison>]
-type MssiRandMutate = 
+type mssiRandMutate = 
     private 
         { 
               id : Guid<sorterModelMakerID>
-              mssi : Mssi
+              mssi : mssi
               rngType: rngType
               opActionRates: OpActionRatesArray
         } 
     static member create 
             (rngType: rngType)
-            (mssi: Mssi)
+            (mssi: mssi)
             (opActionRatesArray: OpActionRatesArray)
-            : MssiRandMutate =
+            : mssiRandMutate =
         
         if %mssi.Perm_Sis.Length <> opActionRatesArray.Length then failwith "Perm_Sis length must match opActionRatesArray.Length"
 
@@ -48,14 +48,14 @@ type MssiRandMutate =
 
     override this.Equals(obj) = 
         match obj with
-        | :? MssiRandMutate as other -> 
+        | :? mssiRandMutate as other -> 
             this.id = other.id
         | _ -> false
 
     override this.GetHashCode() = 
         hash (this.rngType, this.mssi, this.opActionRates)
 
-    interface IEquatable<MssiRandMutate> with
+    interface IEquatable<mssiRandMutate> with
         member this.Equals(other) = 
             this.Id = other.Id
 
@@ -64,7 +64,7 @@ type MssiRandMutate =
     /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
     /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
     /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
-    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : Mssi =
+    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : mssi =
         let id = Common.makeSorterModelId this.Id index
         let rng = rngFactory this.RngType %id
         let orthoMutator = fun psi ->  Perm_Si.mutate (rng.NextIndex) MutationMode.Ortho psi 
@@ -75,13 +75,13 @@ type MssiRandMutate =
                         paraMutator 
                         (rng.NextFloat) 
                         this.Mssi.Perm_Sis
-        Mssi.create id this.Mssi.SortingWidth mutated
+        mssi.create id this.Mssi.SortingWidth mutated
 
 
 
 module MssiRandMutate =
 
-    let toString (mssiRandMutate: MssiRandMutate) : string = 
+    let toString (mssiRandMutate: mssiRandMutate) : string = 
         sprintf "MssiRandMutate(RngType=%A, Width=%d, StageLength=%d, OpActionRates=%s)" 
                 mssiRandMutate.RngType 
                 (%mssiRandMutate.Mssi.SortingWidth) 

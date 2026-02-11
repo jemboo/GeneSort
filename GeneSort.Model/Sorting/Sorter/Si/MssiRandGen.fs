@@ -8,7 +8,7 @@ open GeneSort.Model.Sorting
 
 /// Represents a configuration for generating random Mssi instances with specified width and stage count.
 [<Struct; CustomEquality; NoComparison>]
-type MssiRandGen = 
+type mssiRandGen = 
     private 
         { 
           id : Guid<sorterModelMakerID>
@@ -22,7 +22,7 @@ type MssiRandGen =
             (rngType: rngType) 
             (sortingWidth: int<sortingWidth>)
             (stageLength: int<stageLength>) 
-                : MssiRandGen =
+                : mssiRandGen =
         if %sortingWidth < 2 then
             failwith $"SortingWidth must be at least 2, got {%sortingWidth}"
         else if %stageLength < 1 then
@@ -50,7 +50,7 @@ type MssiRandGen =
 
     override this.Equals(obj) = 
         match obj with
-        | :? MssiRandGen as other -> 
+        | :? mssiRandGen as other -> 
             this.rngType = other.rngType && 
             this.sortingWidth = other.sortingWidth &&
             this.stageLength = other.stageLength
@@ -59,7 +59,7 @@ type MssiRandGen =
     override this.GetHashCode() = 
         hash (this.GetType(), this.rngType, this.sortingWidth, this.stageLength)
 
-    interface IEquatable<MssiRandGen> with
+    interface IEquatable<mssiRandGen> with
         member this.Equals(other) = 
             this.rngType = other.rngType && 
             this.sortingWidth = other.sortingWidth &&
@@ -67,19 +67,19 @@ type MssiRandGen =
 
 
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) 
-            (index: int) : Mssi =
+            (index: int) : mssi =
         let id = Common.makeSorterModelId this.Id index
         let rando = rngFactory this.RngType %id
         let perm_Sis = Perm_Si.makeRandoms (rando.NextIndex) (%this.SortingWidth) 
                         |> Seq.take (%this.StageLength)
                         |> Seq.toArray
-        Mssi.create id this.SortingWidth perm_Sis
+        mssi.create id this.SortingWidth perm_Sis
 
 
 
 module MssiRandGen =
 
     /// Returns a string representation of the MssiRandGen.
-    let toString (mssiRandGen: MssiRandGen) : string =
+    let toString (mssiRandGen: mssiRandGen) : string =
         sprintf "MssiRandGen(RngType=%A, Width=%d, StageLength=%d)" 
                 mssiRandGen.RngType (%mssiRandGen.SortingWidth) (%mssiRandGen.StageLength)

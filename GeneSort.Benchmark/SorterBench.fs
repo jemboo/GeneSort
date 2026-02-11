@@ -148,7 +148,7 @@ type MergeEvalBench() =
         let firstIndex = 0 |> UMX.tag<sorterCount>
 
         let smm =
-             MsceRandGen.create 
+             msceRandGen.create 
                         randomType 
                         (this.sortingWidth |> UMX.tag<sortingWidth>) 
                         true 
@@ -431,7 +431,7 @@ type FullBoolEvalBench() =
         let firstIndex = 0 |> UMX.tag<sorterCount>
 
         let smm =
-             MsceRandGen.create 
+             msceRandGen.create 
                         randomType 
                         (this.sortingWidth |> UMX.tag<sortingWidth>) 
                         true 

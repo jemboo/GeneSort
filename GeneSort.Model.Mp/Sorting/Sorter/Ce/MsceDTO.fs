@@ -30,14 +30,14 @@ module MsceDto =
         | InvalidCeCodesLength of string
         | InvalidSortingWidth of string
 
-    let toMsceDto (msce: Msce) : msceDto =
+    let toMsceDto (msce: msce) : msceDto =
         { Id = %msce.Id
           sortingWidth = %msce.SortingWidth
           ceCodes = msce.CeCodes }
 
-    let toMsce (msceDto: msceDto) : Result<Msce, MsceDtoError> =
+    let toMsce (msceDto: msceDto) : Result<msce, MsceDtoError> =
         try
-            let msce = GeneSort.Model.Sorting.Sorter.Ce.Msce.create
+            let msce = GeneSort.Model.Sorting.Sorter.Ce.msce.create
                             (UMX.tag<sorterModelID> msceDto.Id)
                             (UMX.tag<sortingWidth> msceDto.sortingWidth)
                             msceDto.ceCodes

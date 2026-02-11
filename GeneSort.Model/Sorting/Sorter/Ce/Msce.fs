@@ -7,7 +7,7 @@ open GeneSort.Sorting.Sorter
 open GeneSort.Model.Sorting
 
 [<Struct; CustomEquality; NoComparison>]
-type Msce = 
+type msce = 
     private 
         { id: Guid<sorterModelID>
           sortingWidth: int<sortingWidth>
@@ -16,7 +16,7 @@ type Msce =
     static member create 
             (id: Guid<sorterModelID>) 
             (sortingWidth: int<sortingWidth>)
-            (ceCodes: int array) : Msce =
+            (ceCodes: int array) : msce =
         if ceCodes.Length < 1 then
             failwith "Must be at least 1 Ce"
         else if %sortingWidth < 1 then
@@ -36,7 +36,7 @@ type Msce =
 
     override this.Equals(obj) = 
         match obj with
-        | :? Msce as other -> 
+        | :? msce as other -> 
             this.id = other.id && 
             this.sortingWidth = other.sortingWidth &&
             this.ceCodes = other.ceCodes
@@ -45,7 +45,7 @@ type Msce =
     override this.GetHashCode() = 
         hash (this.GetType(), this.id, this.sortingWidth, this.ceCodes)
 
-    interface IEquatable<Msce> with
+    interface IEquatable<msce> with
         member this.Equals(other) = 
             this.id = other.id && 
             this.sortingWidth = other.sortingWidth &&
@@ -59,7 +59,7 @@ type Msce =
 
 module Msce =
 
-    let toString (msce: Msce) : string =
+    let toString (msce: msce) : string =
         sprintf "msce(Id=%A, SortingWidth=%d, SorterLength=%d)" 
                 (%msce.Id) 
                 (%msce.SortingWidth)

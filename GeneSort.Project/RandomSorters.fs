@@ -276,10 +276,10 @@ module RandomSorters =
                 let sorterModelMaker =
                     match sorterModelType with
                     | sorterModelType.Mcse -> 
-                        MsceRandGen.create randomType sortingWidth excludeSelfCe ceLength 
+                        msceRandGen.create randomType sortingWidth excludeSelfCe ceLength 
                         |> sorterModelMaker.SmmMsceRandGen
                     | sorterModelType.Mssi -> 
-                        MssiRandGen.create randomType sortingWidth stageLength 
+                        mssiRandGen.create randomType sortingWidth stageLength 
                         |> sorterModelMaker.SmmMssiRandGen
                     | sorterModelType.Msrs -> 
                         let opsGenRatesArray = OpsGenRatesArray.createUniform %stageLength

@@ -8,7 +8,7 @@ open GeneSort.Sorting.Sorter
 open GeneSort.Model.Sorting
 
 [<Struct; CustomEquality; NoComparison>]
-type MsceRandGen = 
+type msceRandGen = 
     private 
         { 
           id : Guid<sorterModelMakerID>
@@ -21,7 +21,7 @@ type MsceRandGen =
             (rngType: rngType) 
             (sortingWidth: int<sortingWidth>) 
             (excludeSelfCe: bool) 
-            (ceLength: int<ceLength>) : MsceRandGen =
+            (ceLength: int<ceLength>) : msceRandGen =
         if %ceLength < 1 then
             failwith "ceLength length must be at least 1"
         else if %sortingWidth < 1 then
@@ -50,7 +50,7 @@ type MsceRandGen =
 
     override this.Equals(obj) = 
         match obj with
-        | :? MsceRandGen as other -> 
+        | :? msceRandGen as other -> 
             this.rngType = other.rngType && 
             this.sortingWidth = other.sortingWidth && 
             this.excludeSelfCe = other.excludeSelfCe && 
@@ -60,14 +60,14 @@ type MsceRandGen =
     override this.GetHashCode() = 
         hash (this.rngType, this.sortingWidth, this.excludeSelfCe, this.ceLength)
 
-    interface IEquatable<MsceRandGen> with
+    interface IEquatable<msceRandGen> with
         member this.Equals(other) = 
             this.rngType = other.rngType && 
             this.sortingWidth = other.sortingWidth && 
             this.excludeSelfCe = other.excludeSelfCe && 
             this.ceLength = other.ceLength
 
-    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : Msce =
+    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : msce =
         let id = Common.makeSorterModelId this.Id index
         let rando = rngFactory this.RngType %id
         let ceCodes = 
@@ -80,7 +80,7 @@ type MsceRandGen =
                 |> Seq.take %this.ceLength
                 |> Seq.toArray
 
-        Msce.create
+        msce.create
             id 
             this.SortingWidth
             ceCodes
@@ -90,7 +90,7 @@ type MsceRandGen =
 
 module MsceRandGen =
 
-    let toString (msceRandGen: MsceRandGen) : string =
+    let toString (msceRandGen: msceRandGen) : string =
         sprintf "Model_CeGen(rngType=%A, Width=%d, Length=[%d])" 
                     (msceRandGen.RngType) (%msceRandGen.SortingWidth) (%msceRandGen.ceLength)
 

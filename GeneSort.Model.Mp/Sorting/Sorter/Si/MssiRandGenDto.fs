@@ -19,12 +19,12 @@ module MssiRandGenDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toMssiRandGenDto (mssiRandGen: MssiRandGen) : mssiRandGenDto =
+    let toMssiRandGenDto (mssiRandGen: mssiRandGen) : mssiRandGenDto =
         { sortingWidth = %mssiRandGen.SortingWidth
           rngType = mssiRandGen.RngType
           stageLength = %mssiRandGen.StageLength }
 
-    let fromMssiRandGenDto (dto: mssiRandGenDto) : Result<MssiRandGen, string> =
+    let fromMssiRandGenDto (dto: mssiRandGenDto) : Result<mssiRandGen, string> =
         try
             if dto.sortingWidth < 2 then
                 Error "SortingWidth must be at least 2"
@@ -32,7 +32,7 @@ module MssiRandGenDto =
                 Error "StageLength must be at least 1"
             else
                 let mssiRandGen = 
-                    MssiRandGen.create
+                    mssiRandGen.create
                         (dto.rngType)
                         (UMX.tag<sortingWidth> dto.sortingWidth)
                         (UMX.tag<stageLength> dto.stageLength)

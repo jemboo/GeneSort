@@ -84,7 +84,7 @@ type SorterModelDtoTests() =
 
     [<Fact>]
     let ``Msce round-trip serialization and deserialization should succeed`` () =
-        let msce = Msce.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|1;2;3|]
+        let msce = msce.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|1;2;3|]
         let sorterModel = sorterModel.Msce msce
         let result = roundTrip sorterModel
         match result with
@@ -97,7 +97,7 @@ type SorterModelDtoTests() =
     [<Fact>]
     let ``Mssi round-trip serialization and deserialization should succeed`` () =
         let permSi = Perm_Si.create [|1; 0; 2; 3|] // (0 1)
-        let mssi = Mssi.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|permSi|]
+        let mssi = mssi.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|permSi|]
         let sorterModel = sorterModel.Mssi mssi
         let result = roundTrip sorterModel
         match result with

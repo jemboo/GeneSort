@@ -20,13 +20,13 @@ module MsceRandMutateDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toMsceRandMutateDto (msceRandMutate: MsceRandMutate) : MsceRandMutateDto =
+    let toMsceRandMutateDto (msceRandMutate: msceRandMutate) : MsceRandMutateDto =
         { Msce = MsceDto.toMsceDto msceRandMutate.Msce
           RngType = msceRandMutate.RngType
           IndelRatesArray = IndelRatesArrayDto.fromDomain msceRandMutate.IndelRatesArray
           ExcludeSelfCe = msceRandMutate.ExcludeSelfCe }
 
-    let fromMsceRandMutateDto (dto: MsceRandMutateDto) : Result<MsceRandMutate, string> =
+    let fromMsceRandMutateDto (dto: MsceRandMutateDto) : Result<msceRandMutate, string> =
         try
             let msceResult = MsceDto.toMsce dto.Msce
             match msceResult with
@@ -35,7 +35,7 @@ module MsceRandMutateDto =
                     Error "CeCount must match IndelRatesArray.Length"
                 else
                     let msceRandMutate = 
-                        MsceRandMutate.create
+                        msceRandMutate.create
                             (dto.RngType)
                             (IndelRatesArrayDto.toDomain dto.IndelRatesArray)
                             (dto.ExcludeSelfCe)
