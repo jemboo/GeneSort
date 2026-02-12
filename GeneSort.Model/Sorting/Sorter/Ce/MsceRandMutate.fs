@@ -43,6 +43,7 @@ type msceRandMutate =
     member this.CeLength with get () = this.msce.CeLength
     member this.IndelRatesArray with get () = this.indelRatesArray
     member this.ExcludeSelfCe with get () = this.excludeSelfCe
+    member this.SortingWidth with get () = this.msce.SortingWidth
 
     override this.Equals(obj) = 
         match obj with

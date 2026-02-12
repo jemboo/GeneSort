@@ -45,6 +45,7 @@ type msrsRandMutate =
     member this.RngType with get () = this.rngType
     member this.StageLength with get () = this.msrs.StageLength 
     member this.OpsActionRates with get () = this.opsActionRatesArray
+    member this.SortingWidth with get () = this.msrs.SortingWidth
 
     override this.Equals(obj) = 
         match obj with

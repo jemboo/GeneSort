@@ -8,7 +8,7 @@ open GeneSort.Sorting
 type sorterModelSetMaker =
     private
         { 
-          id : Guid<sorterModelSetMakerID>
+          id : Guid<sortingModelSetMakerID>
           sorterModelMaker : sorterModelMaker
           firstIndex : int<sorterCount>
           count : int<sorterCount>
@@ -24,7 +24,7 @@ type sorterModelSetMaker =
                     sorterModelMaker :> obj
                     firstIndex :> obj
                     count :> obj
-                ] |> UMX.tag<sorterModelSetMakerID>
+                ] |> UMX.tag<sortingModelSetMakerID>
 
         { id = id; sorterModelMaker = sorterModelMaker; firstIndex = firstIndex; count = count }
 

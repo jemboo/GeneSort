@@ -45,6 +45,7 @@ type mssiRandMutate =
     member this.RngType with get () = this.rngType
     member this.StageLength with get () = this.opActionRates.Length
     member this.OpActionRates with get () = this.opActionRates
+    member this.SortingWidth with get () = this.mssi.SortingWidth
 
     override this.Equals(obj) = 
         match obj with

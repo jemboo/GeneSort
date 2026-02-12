@@ -9,7 +9,9 @@ open GeneSort.Core
 [<Measure>] type sortingModelID
 [<Measure>] type sortingModelSetID
 [<Measure>] type sorterModelMakerID
-[<Measure>] type sorterModelSetMakerID
+[<Measure>] type sorterPairModelMakerID
+[<Measure>] type sortingModelMakerID
+[<Measure>] type sortingModelSetMakerID
 
 module Common =
 

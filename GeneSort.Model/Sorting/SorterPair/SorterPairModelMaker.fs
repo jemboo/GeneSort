@@ -1,70 +1,47 @@
-﻿namespace GeneSort.Model.Sorting
+﻿namespace GeneSort.Model.Sorting.SorterPair
 
 open System
 open FSharp.UMX
-open GeneSort.Model.Sorting.Sorter.Ce
-open GeneSort.Model.Sorting.Sorter.Si
-open GeneSort.Model.Sorting.Sorter.Rs
-open GeneSort.Model.Sorting.Sorter.Uf4
-open GeneSort.Model.Sorting.Sorter.Uf6
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting
+open GeneSort.Model.Sorting.SorterPair.SplitPairs
 
 
 type sorterPairModelMaker =
-     | SmmMsceRandGen of msceRandGen
-     | SmmMsceRandMutate of msceRandMutate
-     | SmmMssiRandGen of mssiRandGen
-     | SmmMssiRandMutate of mssiRandMutate
-     | SmmMsrsRandGen of msrsRandGen
-     | SmmMsrsRandMutate of msrsRandMutate
-     | SmmMsuf4RandGen of msuf4RandGen
-     | SmmMsuf4RandMutate of msuf4RandMutate
-     | SmmMsuf6RandGen of msuf6RandGen
-     | SmmMsuf6RandMutate of msuf6RandMutate
+     | SplitPairs of msSplitPairsGen
+     | SplitPairs2 of msSplitPairsGen
+
 
 
 module SorterPairModelMaker =
 
-    let makeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int)  (model: sorterPairModelMaker) : sorterModel =
+    let makeSorterPairModel 
+                (rngFactory: rngType -> Guid -> IRando) 
+                (index: int)  
+                (model: sorterPairModelMaker) : sorterPairModel =
         match model with
-        | SmmMsceRandGen msce -> msce.MakeSorterModel rngFactory index |> sorterModel.Msce
-        | SmmMsceRandMutate msce -> msce.MakeSorterModel rngFactory index |> sorterModel.Msce
-        | SmmMssiRandGen mssi -> mssi.MakeSorterModel rngFactory index |> sorterModel.Mssi
-        | SmmMssiRandMutate mssi -> mssi.MakeSorterModel rngFactory index |> sorterModel.Mssi
-        | SmmMsrsRandGen msrs -> msrs.MakeSorterModel rngFactory index |> sorterModel.Msrs
-        | SmmMsrsRandMutate msrs -> msrs.MakeSorterModel rngFactory index |> sorterModel.Msrs
-        | SmmMsuf4RandGen msuf4 -> msuf4.MakeSorterModel rngFactory index |> sorterModel.Msuf4
-        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModel rngFactory index |> sorterModel.Msuf4
-        | SmmMsuf6RandGen msuf6 -> msuf6.MakeSorterModel rngFactory index |> sorterModel.Msuf6
-        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModel rngFactory index |> sorterModel.Msuf6
+        | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs rngFactory index 
+                                  |> sorterPairModel.SplitPairs
+        | SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs rngFactory index 
+                                   |> sorterPairModel.SplitPairs2
+
 
     let getCeLength (model: sorterPairModelMaker) : int<ceLength> =
         match model with
-        | SmmMsceRandGen msce -> msce.CeLength
-        | SmmMsceRandMutate msce -> msce.CeLength
-        | SmmMssiRandGen mssi -> mssi.CeLength
-        | SmmMssiRandMutate mssi -> mssi.CeLength
-        | SmmMsrsRandGen msrs -> msrs.CeLength
-        | SmmMsrsRandMutate msrs -> msrs.CeLength
-        | SmmMsuf4RandGen msuf4 -> msuf4.CeLength
-        | SmmMsuf4RandMutate msuf4 -> msuf4.CeLength
-        | SmmMsuf6RandGen msuf6 -> msuf6.CeLength
-        | SmmMsuf6RandMutate msuf6 -> msuf6.CeLength
+        | SplitPairs mspg -> MsSplitPairsGen.getCeLength mspg
+        | SplitPairs2 mspg -> MsSplitPairsGen.getCeLength mspg
 
 
-    let getSorterModelMakerId (model: sorterPairModelMaker) : Guid<sorterModelMakerID> =
+    let getId (model: sorterPairModelMaker) : Guid<sorterPairModelMakerID> =
         match model with
-        | SmmMsceRandGen msce -> msce.Id
-        | SmmMsceRandMutate msce -> msce.Id
-        | SmmMssiRandGen mssi -> mssi.Id
-        | SmmMssiRandMutate mssi -> mssi.Id
-        | SmmMsrsRandGen msrs -> msrs.Id
-        | SmmMsrsRandMutate msrs -> msrs.Id
-        | SmmMsuf4RandGen msuf4 -> msuf4.Id
-        | SmmMsuf4RandMutate msuf4 -> msuf4.Id
-        | SmmMsuf6RandGen msuf6 -> msuf6.Id
-        | SmmMsuf6RandMutate msuf6 -> msuf6.Id
+        | SplitPairs mspg -> mspg.Id
+        | SplitPairs2 mspg -> mspg.Id
+
+    let getSortingWidth (model: sorterPairModelMaker) : int<sortingWidth> =
+        match model with
+        | SplitPairs mspg -> MsSplitPairsGen.getSortingWidth mspg
+        | SplitPairs2 mspg -> MsSplitPairsGen.getSortingWidth mspg
+
 
 

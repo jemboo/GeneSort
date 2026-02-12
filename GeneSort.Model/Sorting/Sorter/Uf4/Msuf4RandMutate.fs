@@ -51,6 +51,7 @@ type msuf4RandMutate =
     member this.RngType with get () = this.rngType
     member this.StageLength with get () = this.msuf4.StageLength
     member this.Uf4MutationRatesArray with get () = this.uf4MutationRatesArray
+    member this.SortingWidth with get () = this.msuf4.SortingWidth
 
     override this.Equals(obj) = 
         match obj with
