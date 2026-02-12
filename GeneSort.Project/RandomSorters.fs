@@ -295,7 +295,10 @@ module RandomSorters =
                         |> sorterModelMaker.SmmMsuf6RandGen
 
                 let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-                let sorterModelSetMaker = sorterModelSetMaker.create sorterModelMaker firstIndex sorterCount
+                let sorterModelSetMaker = sortingModelSetMaker.create 
+                                            (sorterModelMaker |> sortingModelMaker.Single)
+                                            firstIndex 
+                                            sorterCount
                 let sortingModelSet = sorterModelSetMaker.MakeSortingModelSet (Rando.create)
 
                 // 4. Saves

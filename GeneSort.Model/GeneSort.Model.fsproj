@@ -32,7 +32,7 @@
     <Compile Include="Sorting\SortingModel.fs" />
     <Compile Include="Sorting\SortingModelSet.fs" />
     <Compile Include="Sorting\SortingModelMaker.fs" />
-    <Compile Include="Sorting\SorterModelSetMaker.fs" />
+    <Compile Include="Sorting\SortingModelSetMaker.fs" />
     <Compile Include="Sortable\Common.fs" />
     <Compile Include="Sortable\MsasF.fs" />
     <Compile Include="Sortable\MsasM.fs" />

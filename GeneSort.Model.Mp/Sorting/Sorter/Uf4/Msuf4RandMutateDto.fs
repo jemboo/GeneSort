@@ -1,12 +1,13 @@
-﻿namespace GeneSort.Model.Mp.Sorter.Uf4
+﻿namespace GeneSort.Model.Mp.Sorting.Sorter.Uf4
 
 open System
 open FSharp.UMX
-open GeneSort.Core
-open GeneSort.Model.Sorting.Sorter.Uf4
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
+open GeneSort.Core
+open GeneSort.Model.Sorting.Sorter.Uf4
+open GeneSort.Model.Mp.Sorter.Uf4
 
 [<MessagePackObject>]
 type msuf4RandMutateDto =

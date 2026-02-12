@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Mp.Sorter.Uf6
+﻿namespace GeneSort.Model.Mp.Sorting.Sorter.Uf6
 
 open System
 open FSharp.UMX
@@ -8,6 +8,7 @@ open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 open GeneSort.Sorting
+open GeneSort.Model.Mp.Sorter.Uf6
 
 [<MessagePackObject>]
 type msuf6RandGenDto =

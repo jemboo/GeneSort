@@ -1,9 +1,10 @@
-﻿namespace GeneSort.Model.Mp.Sorter
+﻿namespace GeneSort.Model.Mp.Sorting
 open GeneSort.Model.Sorting
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 open GeneSort.Model.Mp.Sorting.SorterPair
+open GeneSort.Model.Mp.Sorting.Sorter
 
 
 

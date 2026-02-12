@@ -11,12 +11,12 @@ type SorterModelSetDtoTests() =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    // Helper function to perform round-trip serialization
-    let roundTrip (sorterModelSet: sortingModelSet) : sortingModelSet =
-        let dto = SortingModelSetDto.fromDomain sorterModelSet
-        let bytes = MessagePackSerializer.Serialize(dto, options)
-        let deserializedDto = MessagePackSerializer.Deserialize<sortingModelSetDto>(bytes, options)
-        SortingModelSetDto.toDomain deserializedDto
+    //// Helper function to perform round-trip serialization
+    //let roundTrip (sorterModelSet: sortingModelSet) : sortingModelSet =
+    //    let dto = SortingModelSetDto.fromDomain sorterModelSet
+    //    let bytes = MessagePackSerializer.Serialize(dto, options)
+    //    let deserializedDto = MessagePackSerializer.Deserialize<sortingModelSetDto>(bytes, options)
+    //    SortingModelSetDto.toDomain deserializedDto
 
     //[<Fact>]
     //let ``SorterModelSetDto with Msce round-trip serialization and deserialization should succeed`` () =

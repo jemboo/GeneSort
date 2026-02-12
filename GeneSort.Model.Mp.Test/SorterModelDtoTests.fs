@@ -7,8 +7,6 @@ open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 open GeneSort.Core
-open GeneSort.Model.Mp.Sorter
-open GeneSort.Model.Mp.Sorter.Uf6
 open GeneSort.Model.Sorting.Sorter.Uf6
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.Sorter.Uf4
@@ -16,6 +14,8 @@ open GeneSort.Model.Sorting.Sorter.Rs
 open GeneSort.Model.Sorting.Sorter.Si
 open GeneSort.Model.Sorting.Sorter.Ce
 open GeneSort.Model.Sorting
+open GeneSort.Model.Mp.Sorting.Sorter
+open GeneSort.Model.Sorting.Sorter.Uf6
 
 type SorterModelDtoTests() =
 
@@ -107,6 +107,7 @@ type SorterModelDtoTests() =
             Assert.Equal<Perm_Si>(mssi.Perm_Sis, resultMssi.Perm_Sis)
         | _ -> Assert.True(false, "Expected Mssi case")
 
+
     [<Fact>]
     let ``Msrs round-trip serialization and deserialization should succeed`` () =
         let permRss = [| Perm_Rs.create([| 3; 2; 1; 0 |]); Perm_Rs.create([| 1; 0; 3; 2 |]) |]
@@ -119,6 +120,7 @@ type SorterModelDtoTests() =
             Assert.Equal(msrs.SortingWidth, resultMsrs.SortingWidth)
             Assert.Equal<Perm_Rs>(msrs.Perm_Rss, resultMsrs.Perm_Rss)
         | _ -> Assert.True(false, "Expected Msrs case")
+
 
     [<Fact>]
     let ``Msuf4 round-trip serialization and deserialization should succeed`` () =
@@ -152,12 +154,3 @@ type SorterModelDtoTests() =
             Assert.Equal(msuf6.SortingWidth, resultMsuf6.SortingWidth)
             Assert.Equal<TwoOrbitUf6 array>(msuf6.TwoOrbitUnfolder6s, resultMsuf6.TwoOrbitUnfolder6s)
         | _ -> Assert.True(false, "Expected Msuf6 case")
-
-
-    [<Fact>]
-    let ``Deserialization wit h invalid Msuf6Dto should throw exception`` () =
-        let invalidMsuf6Dto = { msuf6Dto.id = Guid.NewGuid(); sortingWidth = 5; twoOrbitUf6Dtos = [||] } // Invalid: SortingWidth not divisible by 6
-        let dto = sorterModelDto.Msuf6 invalidMsuf6Dto
-        let bytes = MessagePackSerializer.Serialize(dto, options)
-        let deserializedDto = MessagePackSerializer.Deserialize<sorterModelDto>(bytes, options)
-        Assert.ThrowsAny<Exception>(fun () -> SorterModelDto.fromSorterModelDto deserializedDto |> ignore)

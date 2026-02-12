@@ -1,11 +1,11 @@
 ﻿namespace GeneSort.Model.Mp.Sorter
 
 open GeneSort.Model.Sorting
-open GeneSort.Model.Mp.Sorter.Ce
-open GeneSort.Model.Mp.Sorter.Si
-open GeneSort.Model.Mp.Sorter.Rs
-open GeneSort.Model.Mp.Sorter.Uf4
-open GeneSort.Model.Mp.Sorter.Uf6
+open GeneSort.Model.Mp.Sorting.Sorter.Ce
+open GeneSort.Model.Mp.Sorting.Sorter.Si
+open GeneSort.Model.Mp.Sorting.Sorter.Rs
+open GeneSort.Model.Mp.Sorting.Sorter.Uf4
+open GeneSort.Model.Mp.Sorting.Sorter.Uf6
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp

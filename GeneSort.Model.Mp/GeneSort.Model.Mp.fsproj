@@ -23,11 +23,12 @@
     <Compile Include="Sorting\Sorter\Uf6\Msuf6RandMutateDto.fs" />
     <Compile Include="Sorting\Sorter\SorterModelDto.fs" />
     <Compile Include="Sorting\Sorter\SorterModelMakerDto.fs" />
-    <Compile Include="Sorting\Sorter\SorterModelSetMakerDto.fs" />
     <Compile Include="Sorting\SorterPair\SplitPairs\MsSplitPairsDto.fs" />
     <Compile Include="Sorting\SorterPair\SorterPairModelDto.fs" />
     <Compile Include="Sorting\SortingModelDto.fs" />
+    <Compile Include="Sorting\SortingModelMakerDto.fs" />
     <Compile Include="Sorting\SortingModelSetDto.fs" />
+    <Compile Include="Sorting\SortingModelSetMakerDto.fs" />
     <Compile Include="Sortable\MsasORandGenDto.fs" />
     <Compile Include="Sortable\SorterTestModelDto.fs" />
     <Compile Include="Sortable\SortableTestModelGenDto.fs" />

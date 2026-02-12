@@ -5,31 +5,31 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 
-type sorterModelSetMaker =
+type sortingModelSetMaker =
     private
         { 
           id : Guid<sortingModelSetMakerID>
-          sorterModelMaker : sorterModelMaker
+          sortingModelMaker : sortingModelMaker
           firstIndex : int<sorterCount>
           count : int<sorterCount>
         }
     with
     static member create 
-                (sorterModelMaker: sorterModelMaker) 
+                (sortingModelMaker: sortingModelMaker) 
                 (firstIndex: int<sorterCount>) 
-                (count: int<sorterCount>) : sorterModelSetMaker =
+                (count: int<sorterCount>) : sortingModelSetMaker =
         let id = 
             // Generate a unique ID based on the SorterModelMaker and indices
             GuidUtils.guidFromObjs [
-                    sorterModelMaker :> obj
+                    sortingModelMaker :> obj
                     firstIndex :> obj
                     count :> obj
                 ] |> UMX.tag<sortingModelSetMakerID>
 
-        { id = id; sorterModelMaker = sorterModelMaker; firstIndex = firstIndex; count = count }
+        { id = id; sortingModelMaker = sortingModelMaker; firstIndex = firstIndex; count = count }
 
     member this.Id with get() = this.id
-    member this.SorterModelMaker with get() = this.sorterModelMaker
+    member this.SortingModelMaker with get() = this.sortingModelMaker
     member this.FirstIndex with get() = this.firstIndex
     member this.Count with get() = this.count
 
@@ -41,8 +41,7 @@ type sorterModelSetMaker =
         let sortingModels = 
             [| for i in 0 .. %this.count - 1 do
                 let index = %this.firstIndex + i
-                let sorterModel = SorterModelMaker.makeSorterModel rngFactory index this.sorterModelMaker
-                sorterModel |> sortingModel.Single |]
+                SortingModelMaker.makeSortingModel rngFactory index this.sortingModelMaker |]
 
         let id = (%this.id) |> UMX.tag<sortingModelSetID>
         sortingModelSet.create id sortingModels

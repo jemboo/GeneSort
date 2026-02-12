@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Mp.Sorter
+﻿namespace GeneSort.Model.Mp.Sorting
 
 open System
 open MessagePack

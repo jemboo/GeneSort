@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Mp.Sorter.Ce
+﻿namespace GeneSort.Model.Mp.Sorting.Sorter.Ce
 
 open FSharp.UMX
 open GeneSort.Core

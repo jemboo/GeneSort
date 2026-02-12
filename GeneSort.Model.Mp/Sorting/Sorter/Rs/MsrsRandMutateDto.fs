@@ -1,8 +1,8 @@
-﻿namespace GeneSort.Model.Mp.Sorter.Rs
+﻿namespace GeneSort.Model.Mp.Sorting.Sorter.Rs
 
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Model.Mp.Sorter.Rs
+open GeneSort.Model.Mp.Sorting.Sorter.Rs
 open GeneSort.Core.Mp.RatesAndOps
 open MessagePack
 open MessagePack.Resolvers

@@ -9,7 +9,6 @@ open MessagePack.FSharp
 open MessagePack.Resolvers
 open GeneSort.Core
 open GeneSort.Db
-open GeneSort.Model.Mp.Sorter
 open GeneSort.Model.Mp.Sortable
 open GeneSort.Sorting.Mp.Sorter
 open GeneSort.Sorting.Mp.Sortable
@@ -23,6 +22,7 @@ open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.SortingResults
 open GeneSort.Model.Sorting
+open GeneSort.Model.Mp.Sorting
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
@@ -105,10 +105,11 @@ module OutputDataFile =
                             return outputData.SortingModelSet domain
                         }
                     | outputDataType.SorterModelSetMaker _ ->
-                        async {
-                            let! domain = deserializeDto<sorterModelSetMakerDto, sorterModelSetMaker> stream token SorterModelSetMakerDto.toDomain
-                            return outputData.SorterModelSetMaker domain
-                        }
+                        failwith "Not implemented: SorterModelSetMaker deserialization"
+                        //async {
+                        //    let! domain = deserializeDto<sorterModelSetMakerDto, sorterModelSetMaker> stream token SorterModelSetMakerDto.toDomain
+                        //    return outputData.SorterModelSetMaker domain
+                        //}
                     | outputDataType.SortableTestModelSet _ ->
                         async {
                             let! domain = deserializeDto<sortableTestModelSetDto, sortableTestModelSet> stream token SortableTestModelSetDto.toDomain
@@ -188,7 +189,8 @@ module OutputDataFile =
                             | outputData.SortingModelSet sms ->
                                 serializeDto stream sms SortingModelSetDto.fromDomain
                             | outputData.SorterModelSetMaker sms ->
-                                serializeDto stream sms SorterModelSetMakerDto.fromDomain
+                              //  serializeDto stream sms SorterModelSetMakerDto.fromDomain
+                                failwith "Not implemented: SorterModelSetMaker serialization"
                             | outputData.SortableTestModelSet sts ->
                                 serializeDto stream sts SortableTestModelSetDto.fromDomain
                             | outputData.SortableTestModelSetMaker stsm ->

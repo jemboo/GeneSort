@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Mp.Sorter.Uf6
+﻿namespace GeneSort.Model.Mp.Sorting.Sorter.Uf6
 
 open System
 open FSharp.UMX
@@ -7,6 +7,7 @@ open GeneSort.Model.Sorting.Sorter.Uf6
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
+open GeneSort.Model.Mp.Sorter.Uf6
 
 [<MessagePackObject>]
 type msuf6RandMutateDto =

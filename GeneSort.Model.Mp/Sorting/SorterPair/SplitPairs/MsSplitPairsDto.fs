@@ -5,11 +5,10 @@ open FSharp.UMX
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
-open GeneSort.Model.Sorting.SorterPair
-open GeneSort.Model.Mp.Sorter
 open GeneSort.Model.Sorting
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.SorterPair.SplitPairs
+open GeneSort.Model.Mp.Sorting.Sorter
 
 [<MessagePackObject>]
 type msSplitPairsDto = {
