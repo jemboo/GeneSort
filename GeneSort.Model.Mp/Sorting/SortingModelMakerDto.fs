@@ -1,34 +1,33 @@
 ﻿namespace GeneSort.Model.Mp.Sorting
-//open GeneSort.Model.Sorting
-//open MessagePack
-//open MessagePack.Resolvers
-//open MessagePack.FSharp
-//open GeneSort.Model.Mp.Sorting.SorterPair
-//open GeneSort.Model.Mp.Sorting.Sorter
+open MessagePack
+open MessagePack.Resolvers
+open MessagePack.FSharp
+open GeneSort.Model.Sorting
+open GeneSort.Model.Mp.Sorter
+open GeneSort.Model.Mp.SorterPair
 
+[<MessagePackObject; Union(0, typeof<SorterModelMakerDto>); Union(1, typeof<sorterPairModelMakerDto>)>]
+type sortingModelMakerDto =
+    | Single of SorterModelMakerDto
+    | Pair of sorterPairModelMakerDto
 
+module SortingModelMakerDto =
+    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
+    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-//[<MessagePackObject>]
-//[<Union(0, typeof<sorterModelDto>); Union(1, typeof<sorterPairModelDto>)>]
-//type sortingModelDto =
-//    | Single of sorterModelDto
-//    | Pair of sorterPairModelDto
+    let fromDomain (sortingModelMaker: sortingModelMaker) : sortingModelMakerDto =
+        match sortingModelMaker with
+        | sortingModelMaker.Single sorterModelMaker ->
+            Single (SorterModelMakerDto.toSorterModelMakerDto sorterModelMaker)
+        | sortingModelMaker.Pair sorterPairModelMaker ->
+            Pair (SorterPairModelMakerDto.fromDomain sorterPairModelMaker)
 
-
-//module SortingModelDto =
-
-//    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-//    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-
-//    let toSortingModelDto (sortingModel: sortingModel) : sortingModelDto =
-//        match sortingModel with
-//        | sortingModel.Single single -> Single (SorterModelDto.toSorterModelDto single)
-//        | sortingModel.Pair pair -> Pair (SorterPairModelDto.toSorterPairModelDto pair)
-
-//    let fromSortingModelDto (dto: sortingModelDto) : sortingModel =
-//        try
-//            match dto with
-//            | Single smDto -> sortingModel.Single (SorterModelDto.fromSorterModelDto smDto)
-//            | Pair pairDto -> sortingModel.Pair (SorterPairModelDto.fromSorterPairModelDto pairDto)
-//        with
-//        | ex -> failwith $"Failed to convert SortingModelDto: {ex.Message}"
+    let toDomain (dto: sortingModelMakerDto) : sortingModelMaker =
+        try
+            match dto with
+            | Single sorterModelMakerDto ->
+                sortingModelMaker.Single (SorterModelMakerDto.fromSorterModelMakerDto sorterModelMakerDto)
+            | Pair sorterPairModelMakerDto ->
+                sortingModelMaker.Pair (SorterPairModelMakerDto.toDomain sorterPairModelMakerDto)
+        with
+        | ex -> failwith $"Failed to convert sortingModelMakerDto: {ex.Message}"

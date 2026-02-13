@@ -20,7 +20,7 @@ type outputData =
     | SortableTest of sortableTest
     | SortableTestSet of sortableTestSet
     | SortingModelSet of sortingModelSet
-    | SorterModelSetMaker of sortingModelSetMaker
+    | SortingModelSetMaker of sortingModelSetMaker
     | SortableTestModelSet of sortableTestModelSet
     | SortableTestModelSetMaker of sortableTestModelSetMaker
     | SorterSetEval of sorterSetEval
