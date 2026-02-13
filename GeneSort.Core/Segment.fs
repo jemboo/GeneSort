@@ -10,8 +10,60 @@ type segment = {
 
 module Segment =
 
+     //The last segment returned is {start = lastIndex - lastLength - 1; endIndex = lastIndex - 1}.     
+     //The first (segmentCt - 1) segments grow exponentially with the specified rate, starting from a     
+     //length calculated to fit the last segment at the end     
+    let breakIntoExponentialSegments
+                (segmentCt: int)
+                (rate: float)
+                (lastIndex: int)
+                (lastLength: int) : segment[] =
+        // Validate inputs
+        if segmentCt < 2 then
+            invalidArg "segmentCt" "segmentCt must be 2 or more"
+        if rate <= 1.0 then
+            invalidArg "rate" "rate must be greater than 1"
+        if lastLength < 1 then
+            invalidArg "lastLength" "lastLength must be at least 1"
+        if lastIndex < lastLength - 1 then
+            invalidArg "lastIndex" "lastIndex must be at least lastLength - 1"
+    
+        // The last segment is fixed
+        let lastSegment = { start = lastIndex - lastLength + 1; endIndex = lastIndex }
+    
+        // Calculate the starting length for the exponential sequence
+        // We have (segmentCt - 1) segments growing exponentially
+        // Sum of geometric series: firstLen * (rate^(n-1) - 1) / (rate - 1) = totalLengthBeforeLast
+        let totalLengthBeforeLast = lastIndex - lastLength + 1
+        let n = segmentCt - 1
+    
+        // firstLen * (rate^(n-1) - 1) / (rate - 1) = totalLengthBeforeLast
+        // firstLen = totalLengthBeforeLast * (rate - 1) / (rate^(n-1) - 1)
+        let firstLen = 
+            float totalLengthBeforeLast * (rate - 1.0) / (Math.Pow(rate, float (n - 1)) - 1.0)
+    
+        // Generate the exponential segments
+        let mutable currentStart = 0
+        let segments = Array.zeroCreate segmentCt
+    
+        for i in 0 .. segmentCt - 2 do
+            let length = int (Math.Round(firstLen * Math.Pow(rate, float i)))
+            let length = max 1 length // Ensure at least length 1
+            let endIdx = currentStart + length - 1
+            segments.[i] <- { start = currentStart; endIndex = endIdx }
+            currentStart <- endIdx + 1
+    
+        // Set the last segment
+        segments.[segmentCt - 1] <- lastSegment
+    
+        segments
 
-    let breakIntoExponentialSegments 
+
+
+    //The last segment returned is {start = lastIndex - lastLength - 1; endIndex = lastIndex - 1}.
+    //The first (segmentCt - 1) segments grow exponentially with the specified rate, starting from a 
+    //length calculated to fit the last segment at the end
+    let breakIntoExponentialSegments0 
                 (segmentCt: int) 
                 (rate: float) 
                 (lastIndex: int) 
@@ -29,7 +81,7 @@ module Segment =
         // Calculate the first segment length using the geometric series formula
         // Given: last_length = first_length * rate^(n-1)
         // Solving for first_length: first_length = last_length / rate^(n-1)
-        let firstLength = float lastLength / (rate ** float (segmentCt - 1))
+        let firstLength = (float (lastIndex - lastLength) )/ (rate ** float (segmentCt - 1))
     
         // Generate segment lengths using exponential growth
         // Each segment length = firstLength * rate^i where i is the segment index
