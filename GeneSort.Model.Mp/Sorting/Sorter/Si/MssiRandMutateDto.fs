@@ -12,7 +12,7 @@ open MessagePack.FSharp
 type mssiRandMutateDto = 
     { [<Key(0)>] mssiDto: mssiDto
       [<Key(1)>] rngType: rngType
-      [<Key(2)>] opActionRatesArrayDto: OpActionRatesArrayDto }
+      [<Key(2)>] opActionRatesArrayDto: opActionRatesArrayDto }
 
 module MssiRandMutateDto =
 

@@ -18,12 +18,12 @@ module Uf4MutationRatesDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let fromDomain (uf4MutationRates: Uf4MutationRates) : Uf4MutationRatesDto =
-        { Order = uf4MutationRates.order
-          SeedOpsTransitionRates = OpsTransitionRatesDto.fromDomain uf4MutationRates.seedOpsTransitionRates
-          TwoOrbitPairOpsTransitionRates = OpsTransitionRatesArrayDto.fromDomain uf4MutationRates.twoOrbitPairOpsTransitionRates }
+    let fromDomain (uf4Mr: uf4MutationRates) : Uf4MutationRatesDto =
+        { Order = uf4Mr.order
+          SeedOpsTransitionRates = OpsTransitionRatesDto.fromDomain uf4Mr.seedOpsTransitionRates
+          TwoOrbitPairOpsTransitionRates = OpsTransitionRatesArrayDto.fromDomain uf4Mr.twoOrbitPairOpsTransitionRates }
 
-    let toDomain (dto: Uf4MutationRatesDto) : Uf4MutationRates =
+    let toDomain (dto: Uf4MutationRatesDto) : uf4MutationRates =
         try
             if dto.Order < 4 || dto.Order % 4 <> 0 then
                 failwith $"Order must be at least 4 and divisible by 4, got {dto.Order}"

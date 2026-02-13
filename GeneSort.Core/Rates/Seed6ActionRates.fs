@@ -1,7 +1,7 @@
 ﻿namespace GeneSort.Core
 open System
 
-type Seed6ActionMode =
+type seed6ActionMode =
     | Ortho1
     | Ortho2
     | Para1
@@ -13,7 +13,7 @@ type Seed6ActionMode =
 
 
 [<Struct; CustomEquality; NoComparison>]
-type Seed6ActionRates = 
+type seed6ActionRates = 
     private 
         { 
             ortho1Thresh: float
@@ -26,7 +26,7 @@ type Seed6ActionRates =
         }
 
     static member create (ortho1Rate: float, ortho2Rate: float, para1Rate: float, para2Rate: float, 
-                         para3Rate: float, para4Rate: float, selfReflRate: float) : Seed6ActionRates =
+                         para3Rate: float, para4Rate: float, selfReflRate: float) : seed6ActionRates =
         let noAction = 1.0 - ortho1Rate - ortho2Rate - para1Rate - para2Rate - para3Rate - para4Rate - selfReflRate
         let epsilon = 1e-10
         if ortho1Rate < 0.0 || ortho1Rate > 1.0 then failwith "ortho1Rate must be between 0 and 1"
@@ -47,25 +47,25 @@ type Seed6ActionRates =
             selfReflThresh = ortho1Rate + ortho2Rate + para1Rate + para2Rate + para3Rate + para4Rate + selfReflRate
         }
 
-    static member createUniform (amt: float) : Seed6ActionRates =
+    static member createUniform (amt: float) : seed6ActionRates =
         let rate = amt / 7.0
-        Seed6ActionRates.create(rate, rate, rate, rate, rate, rate, rate)
+        seed6ActionRates.create(rate, rate, rate, rate, rate, rate, rate)
 
-    static member createBiased (mode: Seed6ActionMode, baseAmt: float, biasAmt: float) : Seed6ActionRates =
+    static member createBiased (mode: seed6ActionMode, baseAmt: float, biasAmt: float) : seed6ActionRates =
         if baseAmt < 0.0 || baseAmt > 1.0 then failwith "baseAmt must be between 0 and 1"
         if biasAmt < 0.0 || biasAmt > 1.0 then failwith "biasAmt must be between 0 and 1"
         let adjustedBase = baseAmt - (biasAmt / 6.0)
         if adjustedBase < 0.0 then failwith "Adjusted base rate must not be negative"
         let biasedRate = baseAmt + biasAmt
         match mode with
-        | Seed6ActionMode.Ortho1 -> Seed6ActionRates.create(biasedRate, adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase)
-        | Seed6ActionMode.Ortho2 -> Seed6ActionRates.create(adjustedBase, biasedRate, adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase)
-        | Seed6ActionMode.Para1 -> Seed6ActionRates.create(adjustedBase, adjustedBase, biasedRate, adjustedBase, adjustedBase, adjustedBase, adjustedBase)
-        | Seed6ActionMode.Para2 -> Seed6ActionRates.create(adjustedBase, adjustedBase, adjustedBase, biasedRate, adjustedBase, adjustedBase, adjustedBase)
-        | Seed6ActionMode.Para3 -> Seed6ActionRates.create(adjustedBase, adjustedBase, adjustedBase, adjustedBase, biasedRate, adjustedBase, adjustedBase)
-        | Seed6ActionMode.Para4 -> Seed6ActionRates.create(adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase, biasedRate, adjustedBase)
-        | Seed6ActionMode.SelfRefl -> Seed6ActionRates.create(adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase, biasedRate)
-        | Seed6ActionMode.NoAction -> failwith "NoAction mode is not valid for Seed6ActionRates"
+        | seed6ActionMode.Ortho1 -> seed6ActionRates.create(biasedRate, adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase)
+        | seed6ActionMode.Ortho2 -> seed6ActionRates.create(adjustedBase, biasedRate, adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase)
+        | seed6ActionMode.Para1 -> seed6ActionRates.create(adjustedBase, adjustedBase, biasedRate, adjustedBase, adjustedBase, adjustedBase, adjustedBase)
+        | seed6ActionMode.Para2 -> seed6ActionRates.create(adjustedBase, adjustedBase, adjustedBase, biasedRate, adjustedBase, adjustedBase, adjustedBase)
+        | seed6ActionMode.Para3 -> seed6ActionRates.create(adjustedBase, adjustedBase, adjustedBase, adjustedBase, biasedRate, adjustedBase, adjustedBase)
+        | seed6ActionMode.Para4 -> seed6ActionRates.create(adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase, biasedRate, adjustedBase)
+        | seed6ActionMode.SelfRefl -> seed6ActionRates.create(adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase, biasedRate)
+        | seed6ActionMode.NoAction -> failwith "NoAction mode is not valid for Seed6ActionRates"
 
 
 
@@ -83,49 +83,49 @@ type Seed6ActionRates =
                 this.Ortho1Rate this.Ortho2Rate this.Para1Rate this.Para2Rate this.Para3Rate this.Para4Rate this.SelfReflRate this.NoActionRate
 
     /// Assumes that floatPicker returns a float in the range [0.0, 1.0).
-    member this.PickMode (floatPicker: unit -> float) : Seed6ActionMode =
+    member this.PickMode (floatPicker: unit -> float) : seed6ActionMode =
         let r = floatPicker()
         if r < this.ortho1Thresh then
-            Seed6ActionMode.Ortho1
+            seed6ActionMode.Ortho1
         elif r < this.ortho2Thresh then
-            Seed6ActionMode.Ortho2
+            seed6ActionMode.Ortho2
         elif r < this.para1Thresh then
-            Seed6ActionMode.Para1
+            seed6ActionMode.Para1
         elif r < this.para2Thresh then
-            Seed6ActionMode.Para2
+            seed6ActionMode.Para2
         elif r < this.para3Thresh then
-            Seed6ActionMode.Para3
+            seed6ActionMode.Para3
         elif r < this.para4Thresh then
-            Seed6ActionMode.Para4
+            seed6ActionMode.Para4
         elif r < this.selfReflThresh then
-            Seed6ActionMode.SelfRefl
+            seed6ActionMode.SelfRefl
         else
-            Seed6ActionMode.NoAction
+            seed6ActionMode.NoAction
 
 
-    member this.PickModeWithDefault  (floatPicker: unit -> float)  (defaultSeed6GenMode:Seed6GenMode): Seed6GenMode =
+    member this.PickModeWithDefault  (floatPicker: unit -> float)  (defaultSeed6GenMode:seed6GenMode): seed6GenMode =
         let r = floatPicker()
         if r < this.ortho1Thresh then
-            Seed6GenMode.Ortho1
+            seed6GenMode.Ortho1
         elif r < this.ortho2Thresh then
-            Seed6GenMode.Ortho2
+            seed6GenMode.Ortho2
         elif r < this.para1Thresh then
-            Seed6GenMode.Para1
+            seed6GenMode.Para1
         elif r < this.para2Thresh then
-            Seed6GenMode.Para2
+            seed6GenMode.Para2
         elif r < this.para3Thresh then
-            Seed6GenMode.Para3
+            seed6GenMode.Para3
         elif r < this.para4Thresh then
-            Seed6GenMode.Para4
+            seed6GenMode.Para4
         elif r < this.selfReflThresh then
-            Seed6GenMode.SelfRefl
+            seed6GenMode.SelfRefl
         else
             defaultSeed6GenMode
 
 
     override this.Equals(obj) = 
         match obj with
-        | :? Seed6ActionRates as other -> 
+        | :? seed6ActionRates as other -> 
             this.ortho1Thresh = other.ortho1Thresh &&
             this.ortho2Thresh = other.ortho2Thresh &&
             this.para1Thresh = other.para1Thresh &&
@@ -139,7 +139,7 @@ type Seed6ActionRates =
         hash (this.ortho1Thresh, this.ortho2Thresh, this.para1Thresh, this.para2Thresh, 
               this.para3Thresh, this.para4Thresh, this.selfReflThresh)
 
-    interface IEquatable<Seed6ActionRates> with
+    interface IEquatable<seed6ActionRates> with
         member this.Equals(other) = 
             this.ortho1Thresh = other.ortho1Thresh &&
             this.ortho2Thresh = other.ortho2Thresh &&

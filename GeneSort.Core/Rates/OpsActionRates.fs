@@ -1,7 +1,7 @@
 ﻿namespace GeneSort.Core
 open System
 
-type OpsActionMode =
+type opsActionMode =
     | NoAction
     | Ortho
     | Para
@@ -9,11 +9,11 @@ type OpsActionMode =
 
 
 [<Struct; CustomEquality; NoComparison>]
-type OpsActionRates = 
+type opsActionRates = 
     private 
         { orthoThresh: float; paraThresh: float; selfSymThresh: float; }
 
-    static member create (orthoRate: float, paraRate: float, selfSymRate: float) : OpsActionRates =
+    static member create (orthoRate: float, paraRate: float, selfSymRate: float) : opsActionRates =
         let noAction = 1.0 - orthoRate - paraRate - selfSymRate
         let epsilon = 1e-10
         if orthoRate < 0.0 || orthoRate > 1.0 then failwith "orthoRate must be between 0 and 1"
@@ -25,15 +25,15 @@ type OpsActionRates =
             selfSymThresh = orthoRate + paraRate + selfSymRate
         }
 
-    static member createUniform (amt:float) : OpsActionRates =
-            OpsActionRates.create(amt, amt, amt)
+    static member createUniform (amt:float) : opsActionRates =
+            opsActionRates.create(amt, amt, amt)
 
-    static member createBiased(opsActionMode: OpsActionMode, baseAmt:float, biasAmt: float) : OpsActionRates =
+    static member createBiased(opsActionMode: opsActionMode, baseAmt:float, biasAmt: float) : opsActionRates =
         match opsActionMode with
-        | OpsActionMode.Ortho -> OpsActionRates.create(baseAmt + biasAmt, baseAmt - (biasAmt / 2.0), baseAmt - (biasAmt / 2.0))
-        | OpsActionMode.Para -> OpsActionRates.create(baseAmt - (biasAmt / 2.0), baseAmt + biasAmt, baseAmt - (biasAmt / 2.0))
-        | OpsActionMode.SelfRefl -> OpsActionRates.create(baseAmt - (biasAmt / 2.0), baseAmt - (biasAmt / 2.0), baseAmt + biasAmt)
-        | OpsActionMode.NoAction -> failwith "NoAction mode is not valid for OpsActionRates"
+        | opsActionMode.Ortho -> opsActionRates.create(baseAmt + biasAmt, baseAmt - (biasAmt / 2.0), baseAmt - (biasAmt / 2.0))
+        | opsActionMode.Para -> opsActionRates.create(baseAmt - (biasAmt / 2.0), baseAmt + biasAmt, baseAmt - (biasAmt / 2.0))
+        | opsActionMode.SelfRefl -> opsActionRates.create(baseAmt - (biasAmt / 2.0), baseAmt - (biasAmt / 2.0), baseAmt + biasAmt)
+        | opsActionMode.NoAction -> failwith "NoAction mode is not valid for OpsActionRates"
 
 
     member this.OrthoRate with get() = this.orthoThresh
@@ -46,36 +46,36 @@ type OpsActionRates =
 
 
     /// Assumes that floatPicker returns a float in the range [0.0, 1.0).
-    member this.PickMode (floatPicker: unit -> float) : OpsActionMode =
+    member this.PickMode (floatPicker: unit -> float) : opsActionMode =
         let r = floatPicker()
         if r < this.orthoThresh then
-            OpsActionMode.Ortho
+            opsActionMode.Ortho
         elif r < this.paraThresh then
-            OpsActionMode.Para
+            opsActionMode.Para
         elif r < this.selfSymThresh then
-            OpsActionMode.SelfRefl
+            opsActionMode.SelfRefl
         else
-        OpsActionMode.NoAction
+        opsActionMode.NoAction
 
 
     member this.PickModeWithDefault 
-                (opsGenMode:OpsGenMode) 
-                (floatPicker: unit -> float) : OpsGenMode =
+                (opgm:opsGenMode) 
+                (floatPicker: unit -> float) : opsGenMode =
 
         let r = floatPicker()
         if r < this.orthoThresh then
-            OpsGenMode.Ortho
+            opsGenMode.Ortho
         elif r < this.paraThresh then
-            OpsGenMode.Para
+            opsGenMode.Para
         elif r < this.selfSymThresh then
-            OpsGenMode.SelfRefl
+            opsGenMode.SelfRefl
         else
-            opsGenMode
+            opgm
 
 
     override this.Equals(obj) = 
         match obj with
-        | :? OpsActionRates as other -> 
+        | :? opsActionRates as other -> 
             this.orthoThresh = other.orthoThresh &&
             this.paraThresh = other.paraThresh &&
             this.selfSymThresh = other.selfSymThresh
@@ -84,7 +84,7 @@ type OpsActionRates =
     override this.GetHashCode() = 
         hash (this.orthoThresh, this.paraThresh)
 
-    interface IEquatable<OpsActionRates> with
+    interface IEquatable<opsActionRates> with
         member this.Equals(other) = 
             this.orthoThresh = other.orthoThresh &&
             this.paraThresh = other.paraThresh &&

@@ -46,25 +46,25 @@ type IndelRatesTests() =
     let ``PickMode should return Mutation when random value is below mutationThresh`` () =
         let rates = indelRates.create (0.3, 0.2, 0.1)
         let floatPicker () = 0.15 // Within mutation range (0.0 to 0.3)
-        rates.PickMode floatPicker |> should equal IndelMode.Mutation
+        rates.PickMode floatPicker |> should equal indelMode.Mutation
 
     [<Fact>]
     let ``PickMode should return Insertion when random value is between mutationThresh and insertionThresh`` () =
         let rates = indelRates.create (0.3, 0.2, 0.1)
         let floatPicker () = 0.45 // Within insertion range (0.3 to 0.5)
-        rates.PickMode floatPicker |> should equal IndelMode.Insertion
+        rates.PickMode floatPicker |> should equal indelMode.Insertion
 
     [<Fact>]
     let ``PickMode should return Deletion when random value is between insertionThresh and deletionThresh`` () =
         let rates = indelRates.create (0.3, 0.2, 0.1)
         let floatPicker () = 0.55 // Within deletion range (0.5 to 0.6)
-        rates.PickMode floatPicker |> should equal IndelMode.Deletion
+        rates.PickMode floatPicker |> should equal indelMode.Deletion
 
     [<Fact>]
     let ``PickMode should return NoAction when random value is above deletionThresh`` () =
         let rates = indelRates.create (0.3, 0.2, 0.1)
         let floatPicker () = 0.75 // Above deletion range (0.6 to 1.0)
-        rates.PickMode floatPicker |> should equal IndelMode.NoAction
+        rates.PickMode floatPicker |> should equal indelMode.NoAction
 
     [<Fact>]
     let ``Equals should return true for identical IndelRates`` () =

@@ -45,13 +45,13 @@ type Msuf4Tests() =
                     let paraRate = if twoOrbitPairType = TwoOrbitPairType.Para then 1.0 else 0.0
                     let selfSyymRate = if twoOrbitPairType = TwoOrbitPairType.SelfRefl then 1.0 else 0.0
                     Array.init baseGenRates.OpsGenRatesArray.RatesArray.Length (
-                        fun _ -> OpsGenRates.create(orthoRate, paraRate, selfSyymRate))
+                        fun _ -> opsGenRates.create(orthoRate, paraRate, selfSyymRate))
                 | None -> baseGenRates.OpsGenRatesArray.RatesArray
 
         let genRates : uf4GenRates = uf4GenRates.create 
                                         order
-                                        (OpsGenRates.create(orthoRate, paraRate, selfSyymRate))
-                                        (OpsGenRatesArray.create ratesArray)
+                                        (opsGenRates.create(orthoRate, paraRate, selfSyymRate))
+                                        (opsGenRatesArray.create ratesArray)
 
         RandomUnfolderOps4.makeRandomTwoOrbitUf4 mockFloatPicker genRates
 

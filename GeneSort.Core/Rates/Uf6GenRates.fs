@@ -6,11 +6,11 @@ open FSharp.UMX
 type uf6GenRates = 
     private { 
         order: int
-        seedGenRatesUf6: Seed6GenRates
-        opsGenRatesArray: OpsGenRatesArray
+        seedGenRatesUf6: seed6GenRates
+        opsGenRatesArray: opsGenRatesArray
     }
 
-    static member create (order: int) (seedGenRatesUf6: Seed6GenRates) (opsGenRatesArray: OpsGenRatesArray) : uf6GenRates =
+    static member create (order: int) (seedGenRatesUf6: seed6GenRates) (opsGenRatesArray: opsGenRatesArray) : uf6GenRates =
         if order < 6 || order % 6 <> 0 then
             failwith $"Order must be at least 6 and divisible by 6, got {order}"
         { order = order; seedGenRatesUf6 = seedGenRatesUf6; opsGenRatesArray = opsGenRatesArray }
@@ -23,28 +23,28 @@ module Uf6GenRates =
 
     let makeUniform (order: int) : uf6GenRates =
         let genRatesArrayLength = MathUtils.exactLog2 (order / 6)
-        let genRatesArray = Array.init genRatesArrayLength (fun _ -> OpsGenRates.createUniform())
+        let genRatesArray = Array.init genRatesArrayLength (fun _ -> opsGenRates.createUniform())
         uf6GenRates.create 
             order 
-            (Seed6GenRates.createUniform())
-            (OpsGenRatesArray.create genRatesArray)
+            (seed6GenRates.createUniform())
+            (opsGenRatesArray.create genRatesArray)
 
-    let biasTowards (order: int) (opsGenMode: OpsGenMode) (biasAmt: float) : uf6GenRates =
+    let biasTowards (order: int) (opsGenMode: opsGenMode) (biasAmt: float) : uf6GenRates =
         let genRatesBaseArrayLength = MathUtils.exactLog2 (order / 6)
         if genRatesBaseArrayLength = 0 then
             uf6GenRates.create 
                 order 
-                (Seed6GenRates.createUniform())
-                (OpsGenRatesArray.create [||])
+                (seed6GenRates.createUniform())
+                (opsGenRatesArray.create [||])
         else
             let genRatesBaseArray =
                 if genRatesBaseArrayLength = 1 then
                     [||]
                 else
-                    Array.init (genRatesBaseArrayLength - 1) (fun _ -> OpsGenRates.createUniform())
-            let lastGenRates = OpsGenRates.createBiased(opsGenMode, biasAmt)
+                    Array.init (genRatesBaseArrayLength - 1) (fun _ -> opsGenRates.createUniform())
+            let lastGenRates = opsGenRates.createBiased(opsGenMode, biasAmt)
             let genRatesArray = Array.append genRatesBaseArray [|lastGenRates|]
             uf6GenRates.create 
                 order 
-                (Seed6GenRates.createUniform())
-                (OpsGenRatesArray.create genRatesArray)
+                (seed6GenRates.createUniform())
+                (opsGenRatesArray.create genRatesArray)

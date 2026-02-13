@@ -3,10 +3,10 @@
 open System
 
 [<Struct; CustomEquality; NoComparison>]
-type OpsActionRatesArray =
+type opsActionRatesArray =
 
-    private { rates: OpsActionRates array }
-    static member create (rates: OpsActionRates array) : OpsActionRatesArray =
+    private { rates: opsActionRates array }
+    static member create (rates: opsActionRates array) : opsActionRatesArray =
         { rates = rates }
     member this.Length = this.rates.Length
     member this.Item(index: int) = this.rates.[index]
@@ -16,7 +16,7 @@ type OpsActionRatesArray =
 
     override this.Equals(obj) =
         match obj with
-        | :? OpsActionRatesArray as other ->
+        | :? opsActionRatesArray as other ->
             if this.rates.Length <> other.rates.Length then false
             else
                 Array.forall2 (fun a b -> a.Equals(b)) this.rates other.rates
@@ -28,7 +28,7 @@ type OpsActionRatesArray =
             hash <- hash * 23 + rate.GetHashCode()
         hash
 
-    interface IEquatable<OpsActionRatesArray> with
+    interface IEquatable<opsActionRatesArray> with
         member this.Equals(other) =
             if this.rates.Length <> other.rates.Length then false
             else
@@ -40,13 +40,13 @@ module OpsActionRatesArray =
     let private clamp (value: float) (min: float) (max: float) =
         Math.Max(min, Math.Min(max, value))
 
-    let createUniform (length: int) (actionRate:float) : OpsActionRatesArray =
+    let createUniform (length: int) (actionRate:float) : opsActionRatesArray =
         if length <= 0 then failwith "Length must be positive"
-        let rates = Array.init length (fun _ -> OpsActionRates.createUniform(actionRate))
-        OpsActionRatesArray.create rates
+        let rates = Array.init length (fun _ -> opsActionRates.createUniform(actionRate))
+        opsActionRatesArray.create rates
 
     // Smooth variation: Linear interpolation from startRates to endRates
-    let createLinearVariation (length: int) (startRates: OpsActionRates) (endRates: OpsActionRates) : OpsActionRatesArray =
+    let createLinearVariation (length: int) (startRates: opsActionRates) (endRates: opsActionRates) : opsActionRatesArray =
         if length <= 0 then failwith "Length must be positive"
         let rates =
             Array.init length (fun i ->
@@ -54,11 +54,11 @@ module OpsActionRatesArray =
                 let o = startRates.OrthoRate + t * (endRates.OrthoRate - startRates.OrthoRate)
                 let p = startRates.ParaRate + t * (endRates.ParaRate - startRates.ParaRate)
                 let s = startRates.SelfReflRate + t * (endRates.SelfReflRate - startRates.SelfReflRate)
-                OpsActionRates.create (o, p, s))
-        OpsActionRatesArray.create rates
+                opsActionRates.create (o, p, s))
+        opsActionRatesArray.create rates
 
     // Smooth variation: Sinusoidal variation around base rates
-    let createSinusoidalVariation (length: int) (baseRates: OpsActionRates) (amplitudes: OpsActionRates) (frequency: float) : OpsActionRatesArray =
+    let createSinusoidalVariation (length: int) (baseRates: opsActionRates) (amplitudes: opsActionRates) (frequency: float) : opsActionRatesArray =
         if length <= 0 then failwith "Length must be positive"
         let rates =
             Array.init length (fun i ->
@@ -66,11 +66,11 @@ module OpsActionRatesArray =
                 let o = clamp (baseRates.OrthoRate + amplitudes.OrthoRate * Math.Sin(t)) 0.0 1.0
                 let p = clamp (baseRates.ParaRate + amplitudes.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0
                 let s = clamp (baseRates.SelfReflRate + amplitudes.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0
-                OpsActionRates.create (o, p, s))
-        OpsActionRatesArray.create rates
+                opsActionRates.create (o, p, s))
+        opsActionRatesArray.create rates
 
     // Hot spot: Gaussian peak at specified index
-    let createGaussianHotSpot (length: int) (baseRates: OpsActionRates) (hotSpotIndex: int) (hotSpotRates: OpsActionRates) (sigma: float) : OpsActionRatesArray =
+    let createGaussianHotSpot (length: int) (baseRates: opsActionRates) (hotSpotIndex: int) (hotSpotRates: opsActionRates) (sigma: float) : opsActionRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if hotSpotIndex < 0 || hotSpotIndex >= length then failwith "HotSpotIndex out of range"
         if sigma <= 0.0 then failwith "Sigma must be positive"
@@ -81,23 +81,23 @@ module OpsActionRatesArray =
                 let o = baseRates.OrthoRate + (hotSpotRates.OrthoRate - baseRates.OrthoRate) * weight
                 let p = baseRates.ParaRate + (hotSpotRates.ParaRate - baseRates.ParaRate) * weight
                 let s = baseRates.SelfReflRate + (hotSpotRates.SelfReflRate - baseRates.SelfReflRate) * weight
-                OpsActionRates.create (o, p, s))
-        OpsActionRatesArray.create rates
+                opsActionRates.create (o, p, s))
+        opsActionRatesArray.create rates
 
     // Hot spot: Step function creating a region of elevated rates
-    let createStepHotSpot (length: int) (baseRates: OpsActionRates) (hotSpotStart: int) (hotSpotEnd: int) (hotSpotRates: OpsActionRates) : OpsActionRatesArray =
+    let createStepHotSpot (length: int) (baseRates: opsActionRates) (hotSpotStart: int) (hotSpotEnd: int) (hotSpotRates: opsActionRates) : opsActionRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if hotSpotStart < 0 || hotSpotStart >= length || hotSpotEnd < hotSpotStart || hotSpotEnd >= length then failwith "Invalid hot spot range"
         let rates =
             Array.init length (fun i ->
                 let rates = if i >= hotSpotStart && i <= hotSpotEnd then hotSpotRates else baseRates
-                OpsActionRates.create (rates.OrthoRate, rates.ParaRate, rates.SelfReflRate))
-        OpsActionRatesArray.create rates
+                opsActionRates.create (rates.OrthoRate, rates.ParaRate, rates.SelfReflRate))
+        opsActionRatesArray.create rates
 
     /// Mutates an array based on the provided rates. Returns a new array.
     /// Unlike IndelRatesArray, no length adjustments are needed since OpsMutationMode does not include insertion or deletion.
     let mutate<'a> 
-        (opsActionRatesArray: OpsActionRatesArray) 
+        (opsActionRatesArray: opsActionRatesArray) 
         (orthoMutator: 'a -> 'a) 
         (paraMutator: 'a -> 'a) 
         (selfSymMutator: 'a -> 'a) 
@@ -109,15 +109,15 @@ module OpsActionRatesArray =
         Array.init arrayToMutate.Length (fun i ->
             let rate = opsActionRatesArray.Item(i)
             match rate.PickMode floatPicker with
-            | OpsActionMode.Ortho -> orthoMutator arrayToMutate.[i]
-            | OpsActionMode.Para -> paraMutator arrayToMutate.[i]
-            | OpsActionMode.SelfRefl -> selfSymMutator arrayToMutate.[i]
-            | OpsActionMode.NoAction -> arrayToMutate.[i])
+            | opsActionMode.Ortho -> orthoMutator arrayToMutate.[i]
+            | opsActionMode.Para -> paraMutator arrayToMutate.[i]
+            | opsActionMode.SelfRefl -> selfSymMutator arrayToMutate.[i]
+            | opsActionMode.NoAction -> arrayToMutate.[i])
 
 
     let createNewItems<'a> 
-        (opsActionRatesArray: OpsActionRatesArray)
-        (itemChooser: OpsActionRates -> 'a)
+        (opsActionRatesArray: opsActionRatesArray)
+        (itemChooser: opsActionRates -> 'a)
             : 'a[] =
         Array.init opsActionRatesArray.Length (fun i ->
             itemChooser (opsActionRatesArray.Item(i)) )

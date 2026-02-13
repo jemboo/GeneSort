@@ -15,12 +15,12 @@ type msrsRandMutate =
           id : Guid<sorterModelMakerID>
           msrs : msrs
           rngType: rngType
-          opsActionRatesArray: OpsActionRatesArray
+          opsActionRatesArray: opsActionRatesArray
         } 
     static member create 
             (rngType: rngType)
             (msrs: msrs)
-            (opsActionRatesArray: OpsActionRatesArray)
+            (opsActionRatesArray: opsActionRatesArray)
              : msrsRandMutate =
         
         if %msrs.Perm_Rss.Length <> opsActionRatesArray.Length then failwith "Perm_Rss length must match opsActionRatesArray.Length"
@@ -69,9 +69,9 @@ type msrsRandMutate =
                     : msrs =
         let id = Common.makeSorterModelId this.Id index
         let rng = rngFactory this.RngType %id
-        let orthoMutator = fun psi ->   Perm_RsOps.mutatePerm_Rs (rng.NextIndex) OpsActionMode.Ortho psi 
-        let paraMutator = fun psi ->    Perm_RsOps.mutatePerm_Rs (rng.NextIndex) OpsActionMode.Para psi 
-        let selfSymMutator = fun psi -> Perm_RsOps.mutatePerm_Rs  (rng.NextIndex) OpsActionMode.SelfRefl psi 
+        let orthoMutator = fun psi ->   Perm_RsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Ortho psi 
+        let paraMutator = fun psi ->    Perm_RsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Para psi 
+        let selfSymMutator = fun psi -> Perm_RsOps.mutatePerm_Rs  (rng.NextIndex) opsActionMode.SelfRefl psi 
         let mutated = OpsActionRatesArray.mutate 
                         this.OpsActionRates 
                         orthoMutator 

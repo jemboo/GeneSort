@@ -15,8 +15,8 @@ type MsrsRandGenTests() =
 
     // Helper function to create an MsrsRandGen instance
     let createModelRsGen rngType (width:int) stageLength orthoRate paraRate selfSymRate =
-        let rates = OpsGenRates.create (orthoRate, paraRate, selfSymRate)
-        let ratesArray = OpsGenRatesArray.create (Array.create stageLength rates)
+        let rates = opsGenRates.create (orthoRate, paraRate, selfSymRate)
+        let ratesArray = opsGenRatesArray.create (Array.create stageLength rates)
         msrsRandGen.create rngType (UMX.tag<sortingWidth> width)  ratesArray
 
     [<Fact>]

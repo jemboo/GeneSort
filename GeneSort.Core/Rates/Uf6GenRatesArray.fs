@@ -71,7 +71,7 @@ module Uf6GenRatesArray =
         let rates =
             Array.init length (fun i ->
                 let t = float i / float (length - 1)
-                let seed = Seed6GenRates.create(
+                let seed = seed6GenRates.create(
                     startRates.seedGenRatesUf6.Ortho1Rate + t * (endRates.seedGenRatesUf6.Ortho1Rate - startRates.seedGenRatesUf6.Ortho1Rate),
                     startRates.seedGenRatesUf6.Ortho2Rate + t * (endRates.seedGenRatesUf6.Ortho2Rate - startRates.seedGenRatesUf6.Ortho2Rate),
                     startRates.seedGenRatesUf6.Para1Rate + t * (endRates.seedGenRatesUf6.Para1Rate - startRates.seedGenRatesUf6.Para1Rate),
@@ -80,15 +80,15 @@ module Uf6GenRatesArray =
                     startRates.seedGenRatesUf6.Para4Rate + t * (endRates.seedGenRatesUf6.Para4Rate - startRates.seedGenRatesUf6.Para4Rate),
                     startRates.seedGenRatesUf6.SelfReflRate + t * (endRates.seedGenRatesUf6.SelfReflRate - startRates.seedGenRatesUf6.SelfReflRate))
                 let arrayLength = MathUtils.exactLog2 (order / 6)
-                let opsGenRatesArray =
+                let ogra =
                     Array.init arrayLength (fun j ->
                         let startArray = startRates.opsGenRatesArray.RatesArray
                         let endArray = endRates.opsGenRatesArray.RatesArray
-                        OpsGenRates.create(
+                        opsGenRates.create(
                             startArray.[j].OrthoRate + t * (endArray.[j].OrthoRate - startArray.[j].OrthoRate),
                             startArray.[j].ParaRate + t * (endArray.[j].ParaRate - startArray.[j].ParaRate),
                             startArray.[j].SelfReflRate + t * (endArray.[j].SelfReflRate - startArray.[j].SelfReflRate)))
-                uf6GenRates.create order seed (OpsGenRatesArray.create opsGenRatesArray) )
+                uf6GenRates.create order seed (opsGenRatesArray.create ogra) )
         uf6GenRatesArray.create rates
 
     let createSinusoidalVariation (length: int) (order: int) (baseRates: uf6GenRates) (amplitudes: uf6GenRates) (frequency: float) : uf6GenRatesArray =
@@ -101,7 +101,7 @@ module Uf6GenRatesArray =
             Array.init length (fun i ->
                 let t = float i / float (length - 1) * 2.0 * Math.PI * frequency
                 let phaseShift = 2.0 * Math.PI / 7.0
-                let seed = Seed6GenRates.create(
+                let seed = seed6GenRates.create(
                     clamp (baseRates.seedGenRatesUf6.Ortho1Rate + amplitudes.seedGenRatesUf6.Ortho1Rate * Math.Sin(t)) 0.0 1.0,
                     clamp (baseRates.seedGenRatesUf6.Ortho2Rate + amplitudes.seedGenRatesUf6.Ortho2Rate * Math.Sin(t + phaseShift)) 0.0 1.0,
                     clamp (baseRates.seedGenRatesUf6.Para1Rate + amplitudes.seedGenRatesUf6.Para1Rate * Math.Sin(t + 2.0 * phaseShift)) 0.0 1.0,
@@ -110,15 +110,15 @@ module Uf6GenRatesArray =
                     clamp (baseRates.seedGenRatesUf6.Para4Rate + amplitudes.seedGenRatesUf6.Para4Rate * Math.Sin(t + 5.0 * phaseShift)) 0.0 1.0,
                     clamp (baseRates.seedGenRatesUf6.SelfReflRate + amplitudes.seedGenRatesUf6.SelfReflRate * Math.Sin(t + 6.0 * phaseShift)) 0.0 1.0)
                 let arrayLength = MathUtils.exactLog2 (order / 6)
-                let opsGenRatesArray =
+                let ogra =
                     Array.init arrayLength (fun j ->
                         let baseArray = baseRates.opsGenRatesArray.RatesArray
                         let ampArray = amplitudes.opsGenRatesArray.RatesArray
-                        OpsGenRates.create(
+                        opsGenRates.create(
                             clamp (baseArray.[j].OrthoRate + ampArray.[j].OrthoRate * Math.Sin(t)) 0.0 1.0,
                             clamp (baseArray.[j].ParaRate + ampArray.[j].ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
                             clamp (baseArray.[j].SelfReflRate + ampArray.[j].SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0))
-                uf6GenRates.create order seed (OpsGenRatesArray.create opsGenRatesArray))
+                uf6GenRates.create order seed (opsGenRatesArray.create ogra))
 
         uf6GenRatesArray.create rates
 
@@ -134,7 +134,7 @@ module Uf6GenRatesArray =
             Array.init length (fun i ->
                 let x = float (i - hotSpotIndex)
                 let weight = Math.Exp(-x * x / (2.0 * sigma * sigma))
-                let seed = Seed6GenRates.create(
+                let seed = seed6GenRates.create(
                     baseRates.seedGenRatesUf6.Ortho1Rate + (hotSpotRates.seedGenRatesUf6.Ortho1Rate - baseRates.seedGenRatesUf6.Ortho1Rate) * weight,
                     baseRates.seedGenRatesUf6.Ortho2Rate + (hotSpotRates.seedGenRatesUf6.Ortho2Rate - baseRates.seedGenRatesUf6.Ortho2Rate) * weight,
                     baseRates.seedGenRatesUf6.Para1Rate + (hotSpotRates.seedGenRatesUf6.Para1Rate - baseRates.seedGenRatesUf6.Para1Rate) * weight,
@@ -143,15 +143,15 @@ module Uf6GenRatesArray =
                     baseRates.seedGenRatesUf6.Para4Rate + (hotSpotRates.seedGenRatesUf6.Para4Rate - baseRates.seedGenRatesUf6.Para4Rate) * weight,
                     baseRates.seedGenRatesUf6.SelfReflRate + (hotSpotRates.seedGenRatesUf6.SelfReflRate - baseRates.seedGenRatesUf6.SelfReflRate) * weight)
                 let arrayLength = MathUtils.exactLog2 (order / 6)
-                let opsGenRatesArray =
+                let ogra =
                     Array.init arrayLength (fun j ->
                         let baseArray = baseRates.opsGenRatesArray.RatesArray
                         let hotSpotArray = hotSpotRates.opsGenRatesArray.RatesArray
-                        OpsGenRates.create(
+                        opsGenRates.create(
                             baseArray.[j].OrthoRate + (hotSpotArray.[j].OrthoRate - baseArray.[j].OrthoRate) * weight,
                             baseArray.[j].ParaRate + (hotSpotArray.[j].ParaRate - baseArray.[j].ParaRate) * weight,
                             baseArray.[j].SelfReflRate + (hotSpotArray.[j].SelfReflRate - baseArray.[j].SelfReflRate) * weight))
-                uf6GenRates.create order seed (OpsGenRatesArray.create opsGenRatesArray) )
+                uf6GenRates.create order seed (opsGenRatesArray.create ogra) )
 
         uf6GenRatesArray.create rates
 
@@ -166,7 +166,7 @@ module Uf6GenRatesArray =
             Array.init length (fun i ->
                 let rates = if i >= hotSpotStart && i <= hotSpotEnd then hotSpotRates else baseRates
                 { order = order
-                  seedGenRatesUf6 = Seed6GenRates.create(
+                  seedGenRatesUf6 = seed6GenRates.create(
                       rates.seedGenRatesUf6.Ortho1Rate,
                       rates.seedGenRatesUf6.Ortho2Rate,
                       rates.seedGenRatesUf6.Para1Rate,
@@ -194,13 +194,13 @@ module Uf6GenRatesArray =
         Array.init arrayToMutate.Length (fun i ->
             let rate = uf6GenRatesArray.Item(i)
             match rate.seedGenRatesUf6.PickMode floatPicker with
-            | Seed6GenMode.Ortho1 -> ortho1Mutator arrayToMutate.[i]
-            | Seed6GenMode.Ortho2 -> ortho2Mutator arrayToMutate.[i]
-            | Seed6GenMode.Para1 -> para1Mutator arrayToMutate.[i]
-            | Seed6GenMode.Para2 -> para2Mutator arrayToMutate.[i]
-            | Seed6GenMode.Para3 -> para3Mutator arrayToMutate.[i]
-            | Seed6GenMode.Para4 -> para4Mutator arrayToMutate.[i]
-            | Seed6GenMode.SelfRefl -> selfReflMutator arrayToMutate.[i])
+            | seed6GenMode.Ortho1 -> ortho1Mutator arrayToMutate.[i]
+            | seed6GenMode.Ortho2 -> ortho2Mutator arrayToMutate.[i]
+            | seed6GenMode.Para1 -> para1Mutator arrayToMutate.[i]
+            | seed6GenMode.Para2 -> para2Mutator arrayToMutate.[i]
+            | seed6GenMode.Para3 -> para3Mutator arrayToMutate.[i]
+            | seed6GenMode.Para4 -> para4Mutator arrayToMutate.[i]
+            | seed6GenMode.SelfRefl -> selfReflMutator arrayToMutate.[i])
 
     let createNewItems<'a> 
         (uf6GenRatesArray: uf6GenRatesArray)

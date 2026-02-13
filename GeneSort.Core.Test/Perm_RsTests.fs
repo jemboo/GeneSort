@@ -22,7 +22,7 @@ type Perm_RsTests() =
         let originalArray = [| 3; 2; 1; 0 |] // Self-inverse permutation
         let permRs = Perm_Rs.create originalArray
         let indexPicker = indexPicker [|0; 1|] // Should not be used in NoAction
-        let result = Perm_RsOps.mutatePerm_Rs indexPicker OpsActionMode.NoAction permRs
+        let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.NoAction permRs
         Assert.True(result.equals permRs)
         Assert.Equal<int array>(originalArray, result.Array)
 
@@ -32,7 +32,7 @@ type Perm_RsTests() =
         let originalArray = [| 3; 2; 1; 0 |] // All self-symmetric pairs: (0,3), (1,2)
         let permRs = Perm_Rs.create originalArray
         let indexPicker = indexPicker  [|0; 1|] // Pick pairs (0,3) and (1,2)
-        let result = Perm_RsOps.mutatePerm_Rs indexPicker OpsActionMode.SelfRefl permRs
+        let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.SelfRefl permRs
         Assert.True(isSelfInverse result)
         Assert.Equal<int array>(originalArray, result.Array) // SelfSymmetric should not change SS_Pair
 
@@ -42,7 +42,7 @@ type Perm_RsTests() =
         let expectedArray = [| 1; 0; 3; 2 |]
         let permRs = Perm_Rs.create originalArray
         let indexPicker = indexPicker [|0; 1|]// Pick pairs (0,3) and (1,2)
-        let result = Perm_RsOps.mutatePerm_Rs indexPicker OpsActionMode.Ortho permRs
+        let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.Ortho permRs
         Assert.True(isSelfInverse result)
         Assert.Equal<int array>(expectedArray, result.Array) // Ortho should not change SS_Pair
 
@@ -52,7 +52,7 @@ type Perm_RsTests() =
         let expectedArray = [| 2; 3; 0; 1 |]
         let permRs = Perm_Rs.create originalArray
         let indexPicker = indexPicker [|0; 1|] // Pick pairs (0,3) and (1,2)
-        let result = Perm_RsOps.mutatePerm_Rs indexPicker OpsActionMode.Para permRs
+        let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.Para permRs
         Assert.True(isSelfInverse result)
         Assert.Equal<int array>(expectedArray, result.Array) // Para should not change SS_Pair
 
@@ -63,7 +63,7 @@ type Perm_RsTests() =
         let expectedArray = [| 5; 4; 3; 2; 1; 0 |]
         let permRs = Perm_Rs.create originalArray
         let indexPicker = indexPicker [|0; 1|] // Pick pairs (0,5) and (1,2)
-        let result = Perm_RsOps.mutatePerm_Rs indexPicker OpsActionMode.SelfRefl permRs
+        let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.SelfRefl permRs
         Assert.True(isSelfInverse result)
         Assert.Equal<int array>(expectedArray, result.Array)
 
@@ -73,7 +73,7 @@ type Perm_RsTests() =
         let expectedArray = [| 5; 2; 1; 4; 3; 0 |]
         let permRs = Perm_Rs.create originalArray
         let indexPicker = indexPicker [|0; 1|] // Pick (0,3) and (4,5)
-        let result = Perm_RsOps.mutatePerm_Rs indexPicker OpsActionMode.Ortho permRs
+        let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.Ortho permRs
         Assert.True(isSelfInverse result)
         Assert.Equal<int array>(expectedArray, result.Array)
 
@@ -83,7 +83,7 @@ type Perm_RsTests() =
         let expectedArray = [| 5; 3; 4; 1; 2; 0 |]
         let permRs = Perm_Rs.create originalArray
         let indexPicker = indexPicker [|0; 2|] // Pick (0,4) and (1,2)
-        let result = Perm_RsOps.mutatePerm_Rs indexPicker OpsActionMode.Para permRs
+        let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.Para permRs
         Assert.True(isSelfInverse result)
         Assert.Equal<int array>(expectedArray, result.Array)
 
@@ -94,7 +94,7 @@ type Perm_RsTests() =
         let expectedArray = [| 8; 2; 1; 11; 5; 4; 7; 6; 0; 10; 9; 3 |]
         let permRs = Perm_Rs.create originalArray
         let indexPicker = indexPicker [|0; 2; 0|] // Pick (0,4) and (1,2)
-        let result = Perm_RsOps.mutatePerm_Rs indexPicker OpsActionMode.Para permRs
+        let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.Para permRs
         Assert.True(isSelfInverse result)
         Assert.Equal<int array>(expectedArray, result.Array)
 
@@ -104,7 +104,7 @@ type Perm_RsTests() =
         let originalArray = [| 1; 0; 3; 2 |] // (0,1), (2,3)
         let permRs = Perm_Rs.create originalArray
         let indexPicker = indexPicker [|0; 1|] // Pick (0,1) and (2,3)
-        let result = Perm_RsOps.mutatePerm_Rs indexPicker OpsActionMode.Ortho permRs
+        let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.Ortho permRs
         let expectedArray = [| 1; 0; 3; 2 |] // Ortho swap should preserve for valid pairs
         Assert.True(isSelfInverse result)
         Assert.Equal<int array>(expectedArray, result.Array)
@@ -114,7 +114,7 @@ type Perm_RsTests() =
         let originalArray = [| 1; 0; 3; 2 |] // (0,1), (2,3)
         let permRs = Perm_Rs.create originalArray
         let indexPicker = indexPicker [|0; 1|] // Pick (0,1) and (2,3)
-        let result = Perm_RsOps.mutatePerm_Rs indexPicker OpsActionMode.Para permRs
+        let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.Para permRs
         let expectedArray = [| 2; 3; 0; 1 |] // Para swap should preserve for valid pairs
         Assert.True(isSelfInverse result)
         Assert.Equal<int array>(expectedArray, result.Array)
@@ -124,7 +124,7 @@ type Perm_RsTests() =
         let originalArray = [| 1; 0; 3; 2 |] // (0,1), (2,3)
         let permRs = Perm_Rs.create originalArray
         let indexPicker = indexPicker [|0; 1|] // Pick (0,1) and (2,3)
-        let result = Perm_RsOps.mutatePerm_Rs indexPicker OpsActionMode.SelfRefl permRs
+        let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.SelfRefl permRs
         let expectedArray = [| 3; 2; 1; 0 |] // Map 0->3, 1->2, 2->1, 3->0
         Assert.True(isSelfInverse result)
         Assert.Equal<int array>(expectedArray, result.Array)
@@ -137,6 +137,6 @@ type Perm_RsTests() =
         let permRs = Perm_Rs.createUnsafe invalidArray // Use unsafe to bypass create validation
         let indexPicker = indexPicker [|0; 1|]
         Assert.ThrowsAny<System.ArgumentException>(fun () ->
-            Perm_RsOps.mutatePerm_Rs indexPicker OpsActionMode.SelfRefl permRs |> ignore
+            Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.SelfRefl permRs |> ignore
         )
 

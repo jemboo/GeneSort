@@ -15,14 +15,14 @@ module Uf4MutationRatesArrayDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let fromDomain (uf4MutationRatesArray: Uf4MutationRatesArray) : Uf4MutationRatesArrayDto =
+    let fromDomain (uf4MutationRatesArray: uf4MutationRatesArray) : Uf4MutationRatesArrayDto =
         { Rates = uf4MutationRatesArray.RatesArray |> Array.map Uf4MutationRatesDto.fromDomain }
 
-    let toDomain (dto: Uf4MutationRatesArrayDto) : Uf4MutationRatesArray =
+    let toDomain (dto: Uf4MutationRatesArrayDto) : uf4MutationRatesArray =
         try
             if Array.isEmpty dto.Rates then
                 failwith "Rates array cannot be empty"
             let rates = dto.Rates |> Array.map Uf4MutationRatesDto.toDomain
-            Uf4MutationRatesArray.create rates
+            uf4MutationRatesArray.create rates
         with
         | ex -> failwith $"Failed to convert Uf4MutationRatesArrayDto: {ex.Message}"

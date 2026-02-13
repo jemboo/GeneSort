@@ -42,6 +42,11 @@ module IndelRatesArray =
     let private clamp (value: float) (min: float) (max: float) =
         Math.Max(min, Math.Min(max, value))
 
+    let createUniform (length: int) (rates: indelRates) : indelRatesArray =
+        if length <= 0 then failwith "Length must be positive"
+        let ratesArray = Array.create length rates
+        indelRatesArray.create ratesArray
+
     // Smooth variation: Linear interpolation from startRates to endRates
     let createLinearVariation (length: int) (startRates: indelRates) (endRates: indelRates) : indelRatesArray =
         if length <= 0 then failwith "Length must be positive"
@@ -111,15 +116,15 @@ module IndelRatesArray =
                 for i in 0 .. arrayToMutate.Length - 1 do
                     let rate = indelRatesArray.Item(i)
                     match rate.PickMode floatPicker with
-                    | IndelMode.Mutation -> 
+                    | indelMode.Mutation -> 
                         yield mutator arrayToMutate.[i]
-                    | IndelMode.Insertion -> 
+                    | indelMode.Insertion -> 
                         insertionCount <- insertionCount + 1
                         yield inserter ()
                         yield arrayToMutate.[i]
-                    | IndelMode.Deletion -> 
+                    | indelMode.Deletion -> 
                         deletionCount <- deletionCount + 1
-                    | IndelMode.NoAction -> 
+                    | indelMode.NoAction -> 
                         yield arrayToMutate.[i]
             } |> Seq.toArray
     

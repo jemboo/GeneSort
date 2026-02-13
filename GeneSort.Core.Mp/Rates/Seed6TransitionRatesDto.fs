@@ -22,8 +22,8 @@ type Seed6TransitionRatesDto = {
 
 module Seed6TransitionRatesDto =
 
-    let toDomain (dto: Seed6TransitionRatesDto) : Seed6TransitionRates =
-        Seed6TransitionRates.create(
+    let toDomain (dto: Seed6TransitionRatesDto) : seed6TransitionRates =
+        seed6TransitionRates.create(
             Seed6ActionRatesDto.toDomain dto.Ortho1Rates,
             Seed6ActionRatesDto.toDomain dto.Ortho2Rates,
             Seed6ActionRatesDto.toDomain dto.Para1Rates,
@@ -33,7 +33,7 @@ module Seed6TransitionRatesDto =
             Seed6ActionRatesDto.toDomain dto.SelfReflRates
         )
 
-    let fromDomain (domain: Seed6TransitionRates) : Seed6TransitionRatesDto = {
+    let fromDomain (domain: seed6TransitionRates) : Seed6TransitionRatesDto = {
         Ortho1Rates = Seed6ActionRatesDto.fromDomain domain.Ortho1Rates
         Ortho2Rates = Seed6ActionRatesDto.fromDomain domain.Ortho2Rates
         Para1Rates = Seed6ActionRatesDto.fromDomain domain.Para1Rates

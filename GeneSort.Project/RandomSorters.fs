@@ -169,7 +169,6 @@ module RandomSorters =
      
      // --- Filters ---
 
-
     let sorterModelTypeForSortingWidth (rp: runParameters) =
         let sorterModelKey = rp.GetSorterModelType().Value
         let sortingWidth = rp.GetSortingWidth().Value

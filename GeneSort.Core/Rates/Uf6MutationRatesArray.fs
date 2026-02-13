@@ -56,8 +56,8 @@ module Uf6MutationRatesArray =
     let private clamp (value: float) (min: float) (max: float) =
         Math.Max(min, Math.Min(max, value))
 
-    let private interpolateSeed6ActionRates (startRates: Seed6ActionRates) (endRates: Seed6ActionRates) (t: float) : Seed6ActionRates =
-        Seed6ActionRates.create(
+    let private interpolateSeed6ActionRates (startRates: seed6ActionRates) (endRates: seed6ActionRates) (t: float) : seed6ActionRates =
+        seed6ActionRates.create(
             startRates.Ortho1Rate + t * (endRates.Ortho1Rate - startRates.Ortho1Rate),
             startRates.Ortho2Rate + t * (endRates.Ortho2Rate - startRates.Ortho2Rate),
             startRates.Para1Rate + t * (endRates.Para1Rate - startRates.Para1Rate),
@@ -66,17 +66,17 @@ module Uf6MutationRatesArray =
             startRates.Para4Rate + t * (endRates.Para4Rate - startRates.Para4Rate),
             startRates.SelfReflRate + t * (endRates.SelfReflRate - startRates.SelfReflRate))
 
-    let private interpolateOpsTransitionRates (startRates: OpsTransitionRates) (endRates: OpsTransitionRates) (t: float) : OpsTransitionRates =
-        OpsTransitionRates.create(
-            OpsActionRates.create(
+    let private interpolateOpsTransitionRates (startRates: opsTransitionRates) (endRates: opsTransitionRates) (t: float) : opsTransitionRates =
+        opsTransitionRates.create(
+            opsActionRates.create(
                 startRates.OrthoRates.OrthoRate + t * (endRates.OrthoRates.OrthoRate - startRates.OrthoRates.OrthoRate),
                 startRates.OrthoRates.ParaRate + t * (endRates.OrthoRates.ParaRate - startRates.OrthoRates.ParaRate),
                 startRates.OrthoRates.SelfReflRate + t * (endRates.OrthoRates.SelfReflRate - startRates.OrthoRates.SelfReflRate)),
-            OpsActionRates.create(
+            opsActionRates.create(
                 startRates.ParaRates.OrthoRate + t * (endRates.ParaRates.OrthoRate - startRates.ParaRates.OrthoRate),
                 startRates.ParaRates.ParaRate + t * (endRates.ParaRates.ParaRate - startRates.ParaRates.ParaRate),
                 startRates.ParaRates.SelfReflRate + t * (endRates.ParaRates.SelfReflRate - startRates.ParaRates.SelfReflRate)),
-            OpsActionRates.create(
+            opsActionRates.create(
                 startRates.SelfReflRates.OrthoRate + t * (endRates.SelfReflRates.OrthoRate - startRates.SelfReflRates.OrthoRate),
                 startRates.SelfReflRates.ParaRate + t * (endRates.SelfReflRates.ParaRate - startRates.SelfReflRates.ParaRate),
                 startRates.SelfReflRates.SelfReflRate + t * (endRates.SelfReflRates.SelfReflRate - startRates.SelfReflRates.SelfReflRate)))
@@ -88,7 +88,7 @@ module Uf6MutationRatesArray =
         let rates =
             Array.init length (fun i ->
                 let t = float i / float (length - 1)
-                let seed = Seed6TransitionRates.create(
+                let seed = seed6TransitionRates.create(
                     interpolateSeed6ActionRates startRates.seed6TransitionRates.Ortho1Rates endRates.seed6TransitionRates.Ortho1Rates t,
                     interpolateSeed6ActionRates startRates.seed6TransitionRates.Ortho2Rates endRates.seed6TransitionRates.Ortho2Rates t,
                     interpolateSeed6ActionRates startRates.seed6TransitionRates.Para1Rates endRates.seed6TransitionRates.Para1Rates t,
@@ -101,10 +101,10 @@ module Uf6MutationRatesArray =
                     Array.init listLength (fun j ->
                         let startList = startRates.opsTransitionRates.RatesArray
                         let endList = endRates.opsTransitionRates.RatesArray
-                        if j >= startList.Length || j >= endList.Length then OpsTransitionRates.createUniform(0.1)
+                        if j >= startList.Length || j >= endList.Length then opsTransitionRates.createUniform(0.1)
                         else interpolateOpsTransitionRates startList.[j] endList.[j] t)
 
-                uf6MutationRates.create order seed (OpsTransitionRatesArray.create opsTransitionRates) )
+                uf6MutationRates.create order seed (opsTransitionRatesArray.create opsTransitionRates) )
         uf6MutationRatesArray.create rates
 
     let createSinusoidalVariation (length: int) (order: int) (baseRates: uf6MutationRates) (amplitudes: uf6MutationRates) (frequency: float) : uf6MutationRatesArray =
@@ -115,8 +115,8 @@ module Uf6MutationRatesArray =
             Array.init length (fun i ->
                 let t = float i / float (length - 1) * 2.0 * Math.PI * frequency
                 let phaseShift = 2.0 * Math.PI / 7.0
-                let seed = Seed6TransitionRates.create(
-                    Seed6ActionRates.create(
+                let seed = seed6TransitionRates.create(
+                    seed6ActionRates.create(
                         clamp (baseRates.seed6TransitionRates.Ortho1Rates.Ortho1Rate + amplitudes.seed6TransitionRates.Ortho1Rates.Ortho1Rate * Math.Sin(t)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Ortho1Rates.Ortho2Rate + amplitudes.seed6TransitionRates.Ortho1Rates.Ortho2Rate * Math.Sin(t + phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Ortho1Rates.Para1Rate + amplitudes.seed6TransitionRates.Ortho1Rates.Para1Rate * Math.Sin(t + 2.0 * phaseShift)) 0.0 1.0,
@@ -124,7 +124,7 @@ module Uf6MutationRatesArray =
                         clamp (baseRates.seed6TransitionRates.Ortho1Rates.Para3Rate + amplitudes.seed6TransitionRates.Ortho1Rates.Para3Rate * Math.Sin(t + 4.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Ortho1Rates.Para4Rate + amplitudes.seed6TransitionRates.Ortho1Rates.Para4Rate * Math.Sin(t + 5.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Ortho1Rates.SelfReflRate + amplitudes.seed6TransitionRates.Ortho1Rates.SelfReflRate * Math.Sin(t + 6.0 * phaseShift)) 0.0 1.0),
-                    Seed6ActionRates.create(
+                    seed6ActionRates.create(
                         clamp (baseRates.seed6TransitionRates.Ortho2Rates.Ortho1Rate + amplitudes.seed6TransitionRates.Ortho2Rates.Ortho1Rate * Math.Sin(t + phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Ortho2Rates.Ortho2Rate + amplitudes.seed6TransitionRates.Ortho2Rates.Ortho2Rate * Math.Sin(t + 2.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Ortho2Rates.Para1Rate + amplitudes.seed6TransitionRates.Ortho2Rates.Para1Rate * Math.Sin(t + 3.0 * phaseShift)) 0.0 1.0,
@@ -132,7 +132,7 @@ module Uf6MutationRatesArray =
                         clamp (baseRates.seed6TransitionRates.Ortho2Rates.Para3Rate + amplitudes.seed6TransitionRates.Ortho2Rates.Para3Rate * Math.Sin(t + 5.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Ortho2Rates.Para4Rate + amplitudes.seed6TransitionRates.Ortho2Rates.Para4Rate * Math.Sin(t + 6.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Ortho2Rates.SelfReflRate + amplitudes.seed6TransitionRates.Ortho2Rates.SelfReflRate * Math.Sin(t)) 0.0 1.0),
-                    Seed6ActionRates.create(
+                    seed6ActionRates.create(
                         clamp (baseRates.seed6TransitionRates.Para1Rates.Ortho1Rate + amplitudes.seed6TransitionRates.Para1Rates.Ortho1Rate * Math.Sin(t + 2.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para1Rates.Ortho2Rate + amplitudes.seed6TransitionRates.Para1Rates.Ortho2Rate * Math.Sin(t + 3.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para1Rates.Para1Rate + amplitudes.seed6TransitionRates.Para1Rates.Para1Rate * Math.Sin(t + 4.0 * phaseShift)) 0.0 1.0,
@@ -140,7 +140,7 @@ module Uf6MutationRatesArray =
                         clamp (baseRates.seed6TransitionRates.Para1Rates.Para3Rate + amplitudes.seed6TransitionRates.Para1Rates.Para3Rate * Math.Sin(t + 6.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para1Rates.Para4Rate + amplitudes.seed6TransitionRates.Para1Rates.Para4Rate * Math.Sin(t)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para1Rates.SelfReflRate + amplitudes.seed6TransitionRates.Para1Rates.SelfReflRate * Math.Sin(t + phaseShift)) 0.0 1.0),
-                    Seed6ActionRates.create(
+                    seed6ActionRates.create(
                         clamp (baseRates.seed6TransitionRates.Para2Rates.Ortho1Rate + amplitudes.seed6TransitionRates.Para2Rates.Ortho1Rate * Math.Sin(t + 3.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para2Rates.Ortho2Rate + amplitudes.seed6TransitionRates.Para2Rates.Ortho2Rate * Math.Sin(t + 4.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para2Rates.Para1Rate + amplitudes.seed6TransitionRates.Para2Rates.Para1Rate * Math.Sin(t + 5.0 * phaseShift)) 0.0 1.0,
@@ -148,7 +148,7 @@ module Uf6MutationRatesArray =
                         clamp (baseRates.seed6TransitionRates.Para2Rates.Para3Rate + amplitudes.seed6TransitionRates.Para2Rates.Para3Rate * Math.Sin(t)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para2Rates.Para4Rate + amplitudes.seed6TransitionRates.Para2Rates.Para4Rate * Math.Sin(t + phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para2Rates.SelfReflRate + amplitudes.seed6TransitionRates.Para2Rates.SelfReflRate * Math.Sin(t + 2.0 * phaseShift)) 0.0 1.0),
-                    Seed6ActionRates.create(
+                    seed6ActionRates.create(
                         clamp (baseRates.seed6TransitionRates.Para3Rates.Ortho1Rate + amplitudes.seed6TransitionRates.Para3Rates.Ortho1Rate * Math.Sin(t + 4.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para3Rates.Ortho2Rate + amplitudes.seed6TransitionRates.Para3Rates.Ortho2Rate * Math.Sin(t + 5.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para3Rates.Para1Rate + amplitudes.seed6TransitionRates.Para3Rates.Para1Rate * Math.Sin(t + 6.0 * phaseShift)) 0.0 1.0,
@@ -156,7 +156,7 @@ module Uf6MutationRatesArray =
                         clamp (baseRates.seed6TransitionRates.Para3Rates.Para3Rate + amplitudes.seed6TransitionRates.Para3Rates.Para3Rate * Math.Sin(t + phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para3Rates.Para4Rate + amplitudes.seed6TransitionRates.Para3Rates.Para4Rate * Math.Sin(t + 2.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para3Rates.SelfReflRate + amplitudes.seed6TransitionRates.Para3Rates.SelfReflRate * Math.Sin(t + 3.0 * phaseShift)) 0.0 1.0),
-                    Seed6ActionRates.create(
+                    seed6ActionRates.create(
                         clamp (baseRates.seed6TransitionRates.Para4Rates.Ortho1Rate + amplitudes.seed6TransitionRates.Para4Rates.Ortho1Rate * Math.Sin(t + 5.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para4Rates.Ortho2Rate + amplitudes.seed6TransitionRates.Para4Rates.Ortho2Rate * Math.Sin(t + 6.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para4Rates.Para1Rate + amplitudes.seed6TransitionRates.Para4Rates.Para1Rate * Math.Sin(t)) 0.0 1.0,
@@ -164,7 +164,7 @@ module Uf6MutationRatesArray =
                         clamp (baseRates.seed6TransitionRates.Para4Rates.Para3Rate + amplitudes.seed6TransitionRates.Para4Rates.Para3Rate * Math.Sin(t + 2.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para4Rates.Para4Rate + amplitudes.seed6TransitionRates.Para4Rates.Para4Rate * Math.Sin(t + 3.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.Para4Rates.SelfReflRate + amplitudes.seed6TransitionRates.Para4Rates.SelfReflRate * Math.Sin(t + 4.0 * phaseShift)) 0.0 1.0),
-                    Seed6ActionRates.create(
+                    seed6ActionRates.create(
                         clamp (baseRates.seed6TransitionRates.SelfReflRates.Ortho1Rate + amplitudes.seed6TransitionRates.SelfReflRates.Ortho1Rate * Math.Sin(t + 6.0 * phaseShift)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.SelfReflRates.Ortho2Rate + amplitudes.seed6TransitionRates.SelfReflRates.Ortho2Rate * Math.Sin(t)) 0.0 1.0,
                         clamp (baseRates.seed6TransitionRates.SelfReflRates.Para1Rate + amplitudes.seed6TransitionRates.SelfReflRates.Para1Rate * Math.Sin(t + phaseShift)) 0.0 1.0,
@@ -177,23 +177,23 @@ module Uf6MutationRatesArray =
                     Array.init listLength (fun j ->
                         let baseList = baseRates.opsTransitionRates.RatesArray
                         let ampList = amplitudes.opsTransitionRates.RatesArray
-                        if j >= baseList.Length || j >= ampList.Length then OpsTransitionRates.createUniform(0.1)
+                        if j >= baseList.Length || j >= ampList.Length then opsTransitionRates.createUniform(0.1)
                         else
-                            OpsTransitionRates.create(
-                                OpsActionRates.create(
+                            opsTransitionRates.create(
+                                opsActionRates.create(
                                     clamp (baseList.[j].OrthoRates.OrthoRate + ampList.[j].OrthoRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
                                     clamp (baseList.[j].OrthoRates.ParaRate + ampList.[j].OrthoRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
                                     clamp (baseList.[j].OrthoRates.SelfReflRate + ampList.[j].OrthoRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0),
-                                OpsActionRates.create(
+                                opsActionRates.create(
                                     clamp (baseList.[j].ParaRates.OrthoRate + ampList.[j].ParaRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
                                     clamp (baseList.[j].ParaRates.ParaRate + ampList.[j].ParaRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
                                     clamp (baseList.[j].ParaRates.SelfReflRate + ampList.[j].ParaRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0),
-                                OpsActionRates.create(
+                                opsActionRates.create(
                                     clamp (baseList.[j].SelfReflRates.OrthoRate + ampList.[j].SelfReflRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
                                     clamp (baseList.[j].SelfReflRates.ParaRate + ampList.[j].SelfReflRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
                                     clamp (baseList.[j].SelfReflRates.SelfReflRate + ampList.[j].SelfReflRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0)))
 
-                uf6MutationRates.create order seed (OpsTransitionRatesArray.create opsTransitionRates) )
+                uf6MutationRates.create order seed (opsTransitionRatesArray.create opsTransitionRates) )
         uf6MutationRatesArray.create rates
 
     let createGaussianHotSpot (length: int) (order: int) (baseRates: uf6MutationRates) (hotSpotIndex: int) (hotSpotRates: uf6MutationRates) (sigma: float) : uf6MutationRatesArray =
@@ -206,7 +206,7 @@ module Uf6MutationRatesArray =
             Array.init length (fun i ->
                 let x = float (i - hotSpotIndex)
                 let weight = Math.Exp(-x * x / (2.0 * sigma * sigma))
-                let seed = Seed6TransitionRates.create(
+                let seed = seed6TransitionRates.create(
                     interpolateSeed6ActionRates baseRates.seed6TransitionRates.Ortho1Rates hotSpotRates.seed6TransitionRates.Ortho1Rates weight,
                     interpolateSeed6ActionRates baseRates.seed6TransitionRates.Ortho2Rates hotSpotRates.seed6TransitionRates.Ortho2Rates weight,
                     interpolateSeed6ActionRates baseRates.seed6TransitionRates.Para1Rates hotSpotRates.seed6TransitionRates.Para1Rates weight,
@@ -219,9 +219,9 @@ module Uf6MutationRatesArray =
                     Array.init listLength (fun j ->
                         let baseList = baseRates.opsTransitionRates.RatesArray
                         let hotSpotList = hotSpotRates.opsTransitionRates.RatesArray
-                        if j >= baseList.Length || j >= hotSpotList.Length then OpsTransitionRates.createUniform(0.1)
+                        if j >= baseList.Length || j >= hotSpotList.Length then opsTransitionRates.createUniform(0.1)
                         else interpolateOpsTransitionRates baseList.[j] hotSpotList.[j] weight)
-                uf6MutationRates.create order seed (OpsTransitionRatesArray.create opsTransitionRates) )
+                uf6MutationRates.create order seed (opsTransitionRatesArray.create opsTransitionRates) )
         uf6MutationRatesArray.create rates
 
     let createStepHotSpot (length: int) (order: int) (baseRates: uf6MutationRates) (hotSpotStart: int) (hotSpotEnd: int) (hotSpotRates: uf6MutationRates) : uf6MutationRatesArray =
@@ -316,14 +316,14 @@ module Uf6MutationRatesArray =
         Array.init arrayToMutate.Length (fun i ->
             let rate = uf6MutationRatesArray.Item(i)
             match rate.seed6TransitionRates.PickMode floatPicker seed6TwoOrbitType with
-            | Seed6ActionMode.Ortho1 -> ortho1Mutator arrayToMutate.[i]
-            | Seed6ActionMode.Ortho2 -> ortho2Mutator arrayToMutate.[i]
-            | Seed6ActionMode.Para1 -> para1Mutator arrayToMutate.[i]
-            | Seed6ActionMode.Para2 -> para2Mutator arrayToMutate.[i]
-            | Seed6ActionMode.Para3 -> para3Mutator arrayToMutate.[i]
-            | Seed6ActionMode.Para4 -> para4Mutator arrayToMutate.[i]
-            | Seed6ActionMode.SelfRefl -> selfReflMutator arrayToMutate.[i]
-            | Seed6ActionMode.NoAction -> noActionMutator arrayToMutate.[i])
+            | seed6ActionMode.Ortho1 -> ortho1Mutator arrayToMutate.[i]
+            | seed6ActionMode.Ortho2 -> ortho2Mutator arrayToMutate.[i]
+            | seed6ActionMode.Para1 -> para1Mutator arrayToMutate.[i]
+            | seed6ActionMode.Para2 -> para2Mutator arrayToMutate.[i]
+            | seed6ActionMode.Para3 -> para3Mutator arrayToMutate.[i]
+            | seed6ActionMode.Para4 -> para4Mutator arrayToMutate.[i]
+            | seed6ActionMode.SelfRefl -> selfReflMutator arrayToMutate.[i]
+            | seed6ActionMode.NoAction -> noActionMutator arrayToMutate.[i])
 
     let createNewItems<'a> 
         (uf6MutationRatesArray: uf6MutationRatesArray)

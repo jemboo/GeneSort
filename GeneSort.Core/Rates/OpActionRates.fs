@@ -1,18 +1,18 @@
 ﻿namespace GeneSort.Core
 open System
 
-type OpActionMode =
+type opActionMode =
     | NoAction
     | Ortho
     | Para
 
 
 [<Struct; CustomEquality; NoComparison>]
-type OpActionRates = 
+type opActionRates = 
     private 
         { orthoThresh: float; paraThresh: float; }
 
-    static member create (orthoRate: float, paraRate: float) : OpActionRates =
+    static member create (orthoRate: float, paraRate: float) : opActionRates =
         let noAction = 1.0 - orthoRate - paraRate
         let epsilon = 1e-10
         if orthoRate < 0.0 || orthoRate > 1.0 then failwith "orthoRate must be between 0 and 1"
@@ -23,14 +23,14 @@ type OpActionRates =
             paraThresh = orthoRate + paraRate
         }
 
-    static member createUniform (amt:float) : OpActionRates =
-        OpActionRates.create(amt, amt)
+    static member createUniform (amt:float) : opActionRates =
+        opActionRates.create(amt, amt)
 
-    static member createBiased(opActionMode: OpActionMode, baseAmt:float, biasAmt: float) : OpActionRates =
+    static member createBiased(opActionMode: opActionMode, baseAmt:float, biasAmt: float) : opActionRates =
         match opActionMode with
-        | OpActionMode.Ortho -> OpActionRates.create(baseAmt + biasAmt, baseAmt - biasAmt)
-        | OpActionMode.Para -> OpActionRates.create(baseAmt - biasAmt, baseAmt + biasAmt)
-        | OpActionMode.NoAction -> failwith "NoAction mode is not valid for OpActionRates"
+        | opActionMode.Ortho -> opActionRates.create(baseAmt + biasAmt, baseAmt - biasAmt)
+        | opActionMode.Para -> opActionRates.create(baseAmt - biasAmt, baseAmt + biasAmt)
+        | opActionMode.NoAction -> failwith "NoAction mode is not valid for OpActionRates"
 
 
     member this.OrthoRate with get() = this.orthoThresh
@@ -41,18 +41,18 @@ type OpActionRates =
                 this.OrthoRate this.ParaRate    
 
     /// Assumes that floatPicker returns a float in the range [0.0, 1.0).
-    member this.PickMode (floatPicker: unit -> float) : OpActionMode =
+    member this.PickMode (floatPicker: unit -> float) : opActionMode =
         let r = floatPicker()
         if r < this.orthoThresh then
-            OpActionMode.Ortho
+            opActionMode.Ortho
         elif r < this.paraThresh then
-            OpActionMode.Para
+            opActionMode.Para
         else
-        OpActionMode.NoAction
+        opActionMode.NoAction
 
     override this.Equals(obj) = 
         match obj with
-        | :? OpActionRates as other -> 
+        | :? opActionRates as other -> 
             this.orthoThresh = other.orthoThresh &&
             this.paraThresh = other.paraThresh
         | _ -> false

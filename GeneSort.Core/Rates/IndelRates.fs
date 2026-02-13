@@ -2,7 +2,7 @@
 open System
 open Combinatorics
 
-type IndelMode =
+type indelMode =
     | NoAction
     | Mutation
     | Insertion
@@ -36,16 +36,16 @@ type indelRates =
                 this.MutationRate this.InsertionRate this.DeletionRate  
 
     /// Assumes that floatPicker returns a float in the range [0.0, 1.0).
-    member this.PickMode (floatPicker: unit -> float) : IndelMode =
+    member this.PickMode (floatPicker: unit -> float) : indelMode =
         let r = floatPicker()
         if r < this.mutationThresh then
-            IndelMode.Mutation
+            indelMode.Mutation
         elif r < this.insertionThresh then
-            IndelMode.Insertion
+            indelMode.Insertion
         elif r < this.deletionThresh then
-            IndelMode.Deletion
+            indelMode.Deletion
         else
-        IndelMode.NoAction
+        indelMode.NoAction
 
     override this.Equals(obj) = 
         match obj with

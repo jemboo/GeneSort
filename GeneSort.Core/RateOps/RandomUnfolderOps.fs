@@ -18,7 +18,7 @@ module RandomUnfolderOps4 =
     // mutateTwoOrbitUnfolder4
     let mutateTwoOrbitUf4
                 (floatPicker:unit -> float)
-                (uf4MutationRates:Uf4MutationRates) 
+                (uf4MutationRates:uf4MutationRates) 
                 (twoOrbitUf4:TwoOrbitUf4) : TwoOrbitUf4 =
 
         let twoOrbitTypeMutated = 

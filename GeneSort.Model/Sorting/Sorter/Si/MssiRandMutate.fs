@@ -15,12 +15,12 @@ type mssiRandMutate =
               id : Guid<sorterModelMakerID>
               mssi : mssi
               rngType: rngType
-              opActionRates: OpActionRatesArray
+              opActionRates: opActionRatesArray
         } 
     static member create 
             (rngType: rngType)
             (mssi: mssi)
-            (opActionRatesArray: OpActionRatesArray)
+            (opActionRatesArray: opActionRatesArray)
             : mssiRandMutate =
         
         if %mssi.Perm_Sis.Length <> opActionRatesArray.Length then failwith "Perm_Sis length must match opActionRatesArray.Length"

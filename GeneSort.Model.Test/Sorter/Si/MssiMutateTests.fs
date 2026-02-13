@@ -28,8 +28,8 @@ type MssiRandMutateTests() =
         let id = UMX.tag<sorterModelID> (Guid.NewGuid())
         let permSi = Perm_Si.create [|1; 0; 2; 3|] // (0 1)
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
-        let siMutationRates = OpActionRates.create (0.0, 0.0)
-        let arrayToMutate = OpActionRatesArray.create [|siMutationRates|]
+        let siMutationRates = opActionRates.create (0.0, 0.0)
+        let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
         let modelSiMutate = mssiRandMutate.create rngType.Lcg modelSi arrayToMutate
 
         let mock = randoGen [0; 1] [0.5] // Ensures NoAction (within NoActionRate)
@@ -42,8 +42,8 @@ type MssiRandMutateTests() =
         let id = UMX.tag<sorterModelID> (Guid.NewGuid())
         let permSi = Perm_Si.create [|1; 0; 3; 2|] // (0 1)(2 3)
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
-        let siMutationRates = OpActionRates.create (0.9, 0.0)
-        let arrayToMutate = OpActionRatesArray.create [|siMutationRates|]
+        let siMutationRates = opActionRates.create (0.9, 0.0)
+        let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
         let modelSiMutate = mssiRandMutate.create rngType.Lcg modelSi arrayToMutate
 
         let mock = randoGen [0; 2] [0.0] // Picks indices 0, 2 and Ortho mode
@@ -58,8 +58,8 @@ type MssiRandMutateTests() =
         let id = UMX.tag<sorterModelID> (Guid.NewGuid())
         let permSi = Perm_Si.create [|1; 0; 3; 2|] // (0 1)(2 3)
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
-        let siMutationRates = OpActionRates.create (0.0, 1.0)
-        let arrayToMutate = OpActionRatesArray.create [|siMutationRates|]
+        let siMutationRates = opActionRates.create (0.0, 1.0)
+        let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
         let modelSiMutate = mssiRandMutate.create rngType.Lcg modelSi arrayToMutate
 
         let mock = randoGen [0; 2] [0.5] // Picks indices 0, 2 and Para mode
@@ -75,8 +75,8 @@ type MssiRandMutateTests() =
         let permSi1 = Perm_Si.create [|1; 0; 3; 2|]
         let permSi2 = Perm_Si.create [|3; 2; 1; 0|]
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi1; permSi2|]
-        let siMutationRates = OpActionRates.create (0.5, 0.5)
-        let arrayToMutate = OpActionRatesArray.create [|siMutationRates; siMutationRates|]
+        let siMutationRates = opActionRates.create (0.5, 0.5)
+        let arrayToMutate = opActionRatesArray.create [|siMutationRates; siMutationRates|]
         let modelSiMutate = mssiRandMutate.create rngType.Lcg modelSi arrayToMutate
 
         let mock = randoGen [0; 2; 0; 2] [0.0; 0.0] // Ortho mode
@@ -89,8 +89,8 @@ type MssiRandMutateTests() =
         let id = UMX.tag<sorterModelID> (Guid.NewGuid())
         let permSi = Perm_Si.create [|1; 0; 2; 3|]
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
-        let siMutationRates = OpActionRates.create (0.0, 0.0)
-        let arrayToMutate = OpActionRatesArray.create [|siMutationRates|]
+        let siMutationRates = opActionRates.create (0.0, 0.0)
+        let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
         let modelSiMutate = mssiRandMutate.create rngType.Lcg modelSi arrayToMutate
 
         let mock = randoGen [0; 1] [0.5]
@@ -104,8 +104,8 @@ type MssiRandMutateTests() =
         let permSi1 = Perm_Si.create [|1; 0; 3; 2|] // (0 1)(2 3)
         let permSi2 = Perm_Si.create [|3; 2; 1; 0|] // (0 3)(1 2)
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi1; permSi2|]
-        let siMutationRates = OpActionRates.create (1.0, 0.0)
-        let arrayToMutate = OpActionRatesArray.create [|siMutationRates; siMutationRates|]
+        let siMutationRates = opActionRates.create (1.0, 0.0)
+        let arrayToMutate = opActionRatesArray.create [|siMutationRates; siMutationRates|]
         let modelSiMutate = mssiRandMutate.create rngType.Lcg modelSi arrayToMutate
 
         let mock = randoGen [0; 2; 0; 2] [0.0; 0.0] // Ortho mode, indices 0, 2
@@ -122,6 +122,6 @@ type MssiRandMutateTests() =
         let id = UMX.tag<sorterModelID> (Guid.NewGuid())
         let permSi = Perm_Si.create [|1; 0; 2; 3|]
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
-        let siMutationRates = OpActionRates.create (0.0, 0.0)
-        let array = OpActionRatesArray.create [|siMutationRates; siMutationRates|] // Length 2
+        let siMutationRates = opActionRates.create (0.0, 0.0)
+        let array = opActionRatesArray.create [|siMutationRates; siMutationRates|] // Length 2
         Assert.Throws<exn>(fun () -> mssiRandMutate.create rngType.Lcg modelSi array |> ignore)

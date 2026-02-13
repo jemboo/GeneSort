@@ -9,7 +9,7 @@ module Perm_RsOps =
     let makeRandomPerm_Rs
         (indexPicker: int -> int) 
         (floatPicker: unit -> float)
-        (opsGenRates: OpsGenRates) 
+        (opsGenRates: opsGenRates) 
         (order: int) : Perm_Rs =
         if order % 2 <> 0 then
             failwith "Perm_Rs order must be even"
@@ -37,15 +37,15 @@ module Perm_RsOps =
                         rsPairTracker.[origIndex2] <- (pair2, false)
                         let mode = mutationModePicker ()
                         match mode with
-                        | OpsGenMode.SelfRefl ->
+                        | opsGenMode.SelfRefl ->
                             // Return original self-symmetric pairs
                             yield pair1
                             yield pair2
-                        | OpsGenMode.Ortho ->
+                        | opsGenMode.Ortho ->
                             // Reconfigure pairs as Ortho pairs
                             yield (fst pair1, fst pair2)
                             yield (snd pair1, snd pair2)
-                        | OpsGenMode.Para ->
+                        | opsGenMode.Para ->
                             // Reconfigure pairs as Para pairs
                             yield (fst pair1, snd pair2)
                             yield (fst pair2, snd pair1)
@@ -111,10 +111,10 @@ module Perm_RsOps =
     // Mutates a Perm_Rs based on opsActionMode
     let mutatePerm_Rs
             (indexPicker: int -> int) 
-            (opsActionMode:OpsActionMode) 
+            (opam:opsActionMode) 
             (permRs: Perm_Rs) : Perm_Rs =
 
-        if (opsActionMode = OpsActionMode.NoAction) then
+        if (opam = opsActionMode.NoAction) then
             // for NoAction mode, return the permutation as is
             permRs
         else
@@ -137,8 +137,8 @@ module Perm_RsOps =
             let secondL = secondPair.First
             let secondH = secondPair.Second
 
-            match opsActionMode with
-            | OpsActionMode.Ortho -> 
+            match opam with
+            | opsActionMode.Ortho -> 
                 match twoOrbitPairTypeFound with
                 | TwoOrbitPairType.Ortho -> ()
 
@@ -148,7 +148,7 @@ module Perm_RsOps =
                     newArray.[firstH] <- secondH
                     newArray.[secondH] <- firstH 
 
-            | OpsActionMode.Para -> 
+            | opsActionMode.Para -> 
                 match twoOrbitPairTypeFound with
                 | TwoOrbitPairType.Ortho -> 
                     newArray.[firstL] <- secondL
@@ -164,7 +164,7 @@ module Perm_RsOps =
                     newArray.[firstH] <- secondL
                     newArray.[secondL] <- firstH 
 
-            | OpsActionMode.SelfRefl -> 
+            | opsActionMode.SelfRefl -> 
                 match twoOrbitPairTypeFound with
                 | TwoOrbitPairType.SelfRefl -> ()
                 | _ -> 
@@ -172,7 +172,7 @@ module Perm_RsOps =
                     newArray.[secondH] <- firstL 
                     newArray.[secondL] <- firstH
                     newArray.[firstH] <- secondL 
-            | OpsActionMode.NoAction -> failwith "NoAction mode should not reach here"
+            | opsActionMode.NoAction -> failwith "NoAction mode should not reach here"
 
             newArray |> Perm_Rs.createUnsafe
 

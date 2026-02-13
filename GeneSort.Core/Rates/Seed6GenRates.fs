@@ -1,7 +1,7 @@
 ﻿namespace GeneSort.Core
 open System
 
-type Seed6GenMode =
+type seed6GenMode =
     | Ortho1
     | Ortho2
     | Para1
@@ -12,7 +12,7 @@ type Seed6GenMode =
 
 
 [<Struct; CustomEquality; NoComparison>]
-type Seed6GenRates = 
+type seed6GenRates = 
     private 
         { 
             ortho1Thresh: float
@@ -25,7 +25,7 @@ type Seed6GenRates =
         }
 
     static member create (ortho1Rate: float, ortho2Rate: float, para1Rate: float, para2Rate: float, 
-                         para3Rate: float, para4Rate: float, selfReflRate: float) : Seed6GenRates =
+                         para3Rate: float, para4Rate: float, selfReflRate: float) : seed6GenRates =
         let sum = ortho1Rate + ortho2Rate + para1Rate + para2Rate + para3Rate + para4Rate + selfReflRate
         let epsilon = 1e-10
         if ortho1Rate < 0.0 || ortho1Rate > 1.0 then failwith "ortho1Rate must be between 0 and 1"
@@ -46,21 +46,21 @@ type Seed6GenRates =
             selfReflThresh = ortho1Rate + ortho2Rate + para1Rate + para2Rate + para3Rate + para4Rate + selfReflRate
         }
 
-    static member createUniform () : Seed6GenRates =
+    static member createUniform () : seed6GenRates =
         let rate = 1.0 / 7.0
-        Seed6GenRates.create(rate, rate, rate, rate, rate, rate, rate)
+        seed6GenRates.create(rate, rate, rate, rate, rate, rate, rate)
 
-    static member createBiased(field: string, bias: float) : Seed6GenRates =
+    static member createBiased(field: string, bias: float) : seed6GenRates =
         if bias < 0.0 || bias > 1.0 then failwith "bias must be between 0 and 1"
         let remaining = (1.0 - bias) / 6.0
         match field.ToLower() with
-        | "ortho1" -> Seed6GenRates.create(bias, remaining, remaining, remaining, remaining, remaining, remaining)
-        | "ortho2" -> Seed6GenRates.create(remaining, bias, remaining, remaining, remaining, remaining, remaining)
-        | "para1" -> Seed6GenRates.create(remaining, remaining, bias, remaining, remaining, remaining, remaining)
-        | "para2" -> Seed6GenRates.create(remaining, remaining, remaining, bias, remaining, remaining, remaining)
-        | "para3" -> Seed6GenRates.create(remaining, remaining, remaining, remaining, bias, remaining, remaining)
-        | "para4" -> Seed6GenRates.create(remaining, remaining, remaining, remaining, remaining, bias, remaining)
-        | "selfrefl" -> Seed6GenRates.create(remaining, remaining, remaining, remaining, remaining, remaining, bias)
+        | "ortho1" -> seed6GenRates.create(bias, remaining, remaining, remaining, remaining, remaining, remaining)
+        | "ortho2" -> seed6GenRates.create(remaining, bias, remaining, remaining, remaining, remaining, remaining)
+        | "para1" -> seed6GenRates.create(remaining, remaining, bias, remaining, remaining, remaining, remaining)
+        | "para2" -> seed6GenRates.create(remaining, remaining, remaining, bias, remaining, remaining, remaining)
+        | "para3" -> seed6GenRates.create(remaining, remaining, remaining, remaining, bias, remaining, remaining)
+        | "para4" -> seed6GenRates.create(remaining, remaining, remaining, remaining, remaining, bias, remaining)
+        | "selfrefl" -> seed6GenRates.create(remaining, remaining, remaining, remaining, remaining, remaining, bias)
         | _ -> failwith "Invalid field name for createBiased"
 
     member this.Ortho1Rate with get() = this.ortho1Thresh
@@ -76,7 +76,7 @@ type Seed6GenRates =
                 this.Ortho1Rate this.Ortho2Rate this.Para1Rate this.Para2Rate this.Para3Rate this.Para4Rate this.SelfReflRate
 
     /// Assumes that floatPicker returns a float in the range [0.0, 1.0).
-    member this.PickMode (floatPicker: unit -> float) : Seed6GenMode =
+    member this.PickMode (floatPicker: unit -> float) : seed6GenMode =
         let r = floatPicker()
         if r < this.ortho1Thresh then Ortho1
         elif r < this.ortho2Thresh then Ortho2
@@ -88,7 +88,7 @@ type Seed6GenRates =
 
     override this.Equals(obj) = 
         match obj with
-        | :? Seed6GenRates as other -> 
+        | :? seed6GenRates as other -> 
             this.ortho1Thresh = other.ortho1Thresh &&
             this.ortho2Thresh = other.ortho2Thresh &&
             this.para1Thresh = other.para1Thresh &&
@@ -102,7 +102,7 @@ type Seed6GenRates =
         hash (this.ortho1Thresh, this.ortho2Thresh, this.para1Thresh, this.para2Thresh, 
               this.para3Thresh, this.para4Thresh, this.selfReflThresh)
 
-    interface IEquatable<Seed6GenRates> with
+    interface IEquatable<seed6GenRates> with
         member this.Equals(other) = 
             this.ortho1Thresh = other.ortho1Thresh &&
             this.ortho2Thresh = other.ortho2Thresh &&
@@ -115,23 +115,23 @@ type Seed6GenRates =
 
 module Seed6GenMode =
 
-    let fromSeed6TwoOrbitType (seed6TwoOrbitType:TwoOrbitTripleType) : Seed6GenMode =
+    let fromSeed6TwoOrbitType (seed6TwoOrbitType:TwoOrbitTripleType) : seed6GenMode =
             match seed6TwoOrbitType with 
-            | TwoOrbitTripleType.Ortho1 -> Seed6GenMode.Ortho1
-            | TwoOrbitTripleType.Ortho2 -> Seed6GenMode.Ortho2
-            | TwoOrbitTripleType.Para1 -> Seed6GenMode.Para1
-            | TwoOrbitTripleType.Para2 -> Seed6GenMode.Para2
-            | TwoOrbitTripleType.Para3 -> Seed6GenMode.Para3
-            | TwoOrbitTripleType.Para4 -> Seed6GenMode.Para4
-            | TwoOrbitTripleType.SelfRefl -> Seed6GenMode.SelfRefl
+            | TwoOrbitTripleType.Ortho1 -> seed6GenMode.Ortho1
+            | TwoOrbitTripleType.Ortho2 -> seed6GenMode.Ortho2
+            | TwoOrbitTripleType.Para1 -> seed6GenMode.Para1
+            | TwoOrbitTripleType.Para2 -> seed6GenMode.Para2
+            | TwoOrbitTripleType.Para3 -> seed6GenMode.Para3
+            | TwoOrbitTripleType.Para4 -> seed6GenMode.Para4
+            | TwoOrbitTripleType.SelfRefl -> seed6GenMode.SelfRefl
             
 
-    let toSeed6TwoOrbitType (seed6GenMode:Seed6GenMode) : TwoOrbitTripleType =
+    let toSeed6TwoOrbitType (seed6GenMode:seed6GenMode) : TwoOrbitTripleType =
             match seed6GenMode with 
-            | Seed6GenMode.Ortho1 -> TwoOrbitTripleType.Ortho1
-            | Seed6GenMode.Ortho2 -> TwoOrbitTripleType.Ortho2
-            | Seed6GenMode.Para1 -> TwoOrbitTripleType.Para1
-            | Seed6GenMode.Para2 -> TwoOrbitTripleType.Para2
-            | Seed6GenMode.Para3 -> TwoOrbitTripleType.Para3
-            | Seed6GenMode.Para4 -> TwoOrbitTripleType.Para4
-            | Seed6GenMode.SelfRefl -> TwoOrbitTripleType.SelfRefl
+            | seed6GenMode.Ortho1 -> TwoOrbitTripleType.Ortho1
+            | seed6GenMode.Ortho2 -> TwoOrbitTripleType.Ortho2
+            | seed6GenMode.Para1 -> TwoOrbitTripleType.Para1
+            | seed6GenMode.Para2 -> TwoOrbitTripleType.Para2
+            | seed6GenMode.Para3 -> TwoOrbitTripleType.Para3
+            | seed6GenMode.Para4 -> TwoOrbitTripleType.Para4
+            | seed6GenMode.SelfRefl -> TwoOrbitTripleType.SelfRefl

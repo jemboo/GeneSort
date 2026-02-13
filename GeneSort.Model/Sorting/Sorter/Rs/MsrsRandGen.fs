@@ -14,13 +14,13 @@ type msrsRandGen =
         { 
               id : Guid<sorterModelMakerID>
               rngType: rngType
-              opsGenRatesArray: OpsGenRatesArray
+              opsGenRatesArray: opsGenRatesArray
               sortingWidth: int<sortingWidth> 
         } 
     static member create 
             (rngType: rngType)
             (sortingWidth: int<sortingWidth>)
-            (opsGenRatesArray: OpsGenRatesArray)
+            (opsGenRatesArray: opsGenRatesArray)
             : msrsRandGen =
 
         if %sortingWidth < 2 then

@@ -5,7 +5,7 @@ module TwoOrbitTypeOps =
     ///makeTwoOrbitTypeGen
     let makeRandomTwoOrbitPairTypes 
             (floatPicker:unit -> float)
-            (opsGenRates:OpsGenRates) 
+            (opsGenRates:opsGenRates) 
             : TwoOrbitPairType seq =
         seq {
             while true do
@@ -14,7 +14,7 @@ module TwoOrbitTypeOps =
 
     let mutateTwoOrbitPairTypes
             (floatPicker:unit -> float)
-            (opsTransitionRates:OpsTransitionRates)
+            (opsTransitionRates:opsTransitionRates)
             (twoOrbitTypes:TwoOrbitPairType seq)
              : TwoOrbitPairType seq =
 
@@ -22,20 +22,20 @@ module TwoOrbitTypeOps =
                 match topt with
                 | TwoOrbitPairType.Ortho -> 
                     match (opsTransitionRates.PickMode floatPicker TwoOrbitType.Ortho) with
-                    | OpsActionMode.Para -> TwoOrbitPairType.Para
-                    | OpsActionMode.SelfRefl -> TwoOrbitPairType.SelfRefl
+                    | opsActionMode.Para -> TwoOrbitPairType.Para
+                    | opsActionMode.SelfRefl -> TwoOrbitPairType.SelfRefl
                     | _ -> TwoOrbitPairType.Ortho
  
                 | TwoOrbitPairType.Para -> 
                     match (opsTransitionRates.PickMode floatPicker TwoOrbitType.Para) with
-                    | OpsActionMode.Ortho -> TwoOrbitPairType.Ortho
-                    | OpsActionMode.SelfRefl -> TwoOrbitPairType.SelfRefl
+                    | opsActionMode.Ortho -> TwoOrbitPairType.Ortho
+                    | opsActionMode.SelfRefl -> TwoOrbitPairType.SelfRefl
                     | _ -> TwoOrbitPairType.Para
 
                 | TwoOrbitPairType.SelfRefl -> 
                     match (opsTransitionRates.PickMode floatPicker TwoOrbitType.SelfRefl) with
-                    | OpsActionMode.Para -> TwoOrbitPairType.Para
-                    | OpsActionMode.Ortho -> TwoOrbitPairType.Ortho
+                    | opsActionMode.Para -> TwoOrbitPairType.Para
+                    | opsActionMode.Ortho -> TwoOrbitPairType.Ortho
                     | _ -> TwoOrbitPairType.SelfRefl
                 )
 
@@ -44,7 +44,7 @@ module TwoOrbitTypeOps =
     let makeRandomTwoOrbitUnfolderStep
                 (floatPicker:unit -> float)
                 (order:int) 
-                (opsGenRates:OpsGenRates) 
+                (opsGenRates:opsGenRates) 
                 : TwoOrbitUfStep =
         TwoOrbitUfStep.create 
                 (makeRandomTwoOrbitPairTypes floatPicker opsGenRates 
@@ -56,7 +56,7 @@ module TwoOrbitTypeOps =
     // mutateTwoOrbitUnfolderStep
     let mutateTwoOrbitUnfolderStep
                 (floatPicker:unit -> float)
-                (opsTransitionRates:OpsTransitionRates) 
+                (opsTransitionRates:opsTransitionRates) 
                 (twoOrbitUfStep:TwoOrbitUfStep) =
         TwoOrbitUfStep.create 
                 (mutateTwoOrbitPairTypes floatPicker opsTransitionRates twoOrbitUfStep.TwoOrbitPairTypes

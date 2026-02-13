@@ -1,18 +1,18 @@
 ﻿namespace GeneSort.Core
 open System
 
-type OpsGenMode =
+type opsGenMode =
 | Ortho
 | Para
 | SelfRefl
 
 
 [<Struct; CustomEquality; NoComparison>]
-type OpsGenRates = 
+type opsGenRates = 
     private 
         { orthoThresh: float; paraThresh: float; selfReflThresh: float }
 
-    static member create (orthoRate: float, paraRate: float, selfSymRate: float) : OpsGenRates =
+    static member create (orthoRate: float, paraRate: float, selfSymRate: float) : opsGenRates =
         let sum = orthoRate + paraRate + selfSymRate
         let epsilon = 1e-10
         if orthoRate < 0.0 || orthoRate > 1.0 then failwith "orthoRate must be between 0 and 1"
@@ -25,14 +25,14 @@ type OpsGenRates =
             selfReflThresh = orthoRate + paraRate + selfSymRate
         }
 
-    static member createUniform () : OpsGenRates =
-        OpsGenRates.create(1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0)
+    static member createUniform () : opsGenRates =
+        opsGenRates.create(1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0)
 
-    static member createBiased(opsGenMode: OpsGenMode, bias: float) : OpsGenRates =
+    static member createBiased(opsGenMode: opsGenMode, bias: float) : opsGenRates =
         match opsGenMode with
-        | OpsGenMode.Ortho -> OpsGenRates.create(bias, (1.0 - bias) / 2.0, (1.0 - bias) / 2.0)
-        | OpsGenMode.Para -> OpsGenRates.create((1.0 - bias) / 2.0, bias, (1.0 - bias) / 2.0)
-        | OpsGenMode.SelfRefl -> OpsGenRates.create((1.0 - bias) / 2.0, (1.0 - bias) / 2.0, bias)
+        | opsGenMode.Ortho -> opsGenRates.create(bias, (1.0 - bias) / 2.0, (1.0 - bias) / 2.0)
+        | opsGenMode.Para -> opsGenRates.create((1.0 - bias) / 2.0, bias, (1.0 - bias) / 2.0)
+        | opsGenMode.SelfRefl -> opsGenRates.create((1.0 - bias) / 2.0, (1.0 - bias) / 2.0, bias)
 
 
     member this.OrthoRate with get() = this.orthoThresh
@@ -43,18 +43,18 @@ type OpsGenRates =
                 this.OrthoRate this.ParaRate this.SelfReflRate
 
     /// Assumes that floatPicker returns a float in the range [0.0, 1.0).
-    member this.PickMode (floatPicker: unit -> float) : OpsGenMode =
+    member this.PickMode (floatPicker: unit -> float) : opsGenMode =
         let r = floatPicker()
         if r < this.orthoThresh then
-            OpsGenMode.Ortho
+            opsGenMode.Ortho
         elif r < this.paraThresh then
-            OpsGenMode.Para
+            opsGenMode.Para
         else
-            OpsGenMode.SelfRefl
+            opsGenMode.SelfRefl
 
     override this.Equals(obj) = 
         match obj with
-        | :? OpsGenRates as other -> 
+        | :? opsGenRates as other -> 
             this.orthoThresh = other.orthoThresh &&
             this.paraThresh = other.paraThresh &&
             this.selfReflThresh = other.selfReflThresh
@@ -63,7 +63,7 @@ type OpsGenRates =
     override this.GetHashCode() = 
         hash (this.orthoThresh, this.paraThresh, this.selfReflThresh)
 
-    interface IEquatable<OpsGenRates> with
+    interface IEquatable<opsGenRates> with
         member this.Equals(other) = 
             this.orthoThresh = other.orthoThresh &&
             this.paraThresh = other.paraThresh &&
@@ -72,15 +72,15 @@ type OpsGenRates =
 
 module OpsGenMode =
 
-    let fromTwoOrbitType (twoOrbitType:TwoOrbitPairType) : OpsGenMode =
+    let fromTwoOrbitType (twoOrbitType:TwoOrbitPairType) : opsGenMode =
             match twoOrbitType with
-            | TwoOrbitPairType.Ortho -> OpsGenMode.Ortho
-            | TwoOrbitPairType.Para -> OpsGenMode.Para
-            | TwoOrbitPairType.SelfRefl ->  OpsGenMode.SelfRefl
+            | TwoOrbitPairType.Ortho -> opsGenMode.Ortho
+            | TwoOrbitPairType.Para -> opsGenMode.Para
+            | TwoOrbitPairType.SelfRefl ->  opsGenMode.SelfRefl
 
-    let toTwoOrbitPairType (opsGenMode:OpsGenMode) : TwoOrbitPairType =
+    let toTwoOrbitPairType (opsGenMode:opsGenMode) : TwoOrbitPairType =
             match opsGenMode with
-            | OpsGenMode.Ortho -> TwoOrbitPairType.Ortho
-            | OpsGenMode.Para -> TwoOrbitPairType.Para
-            | OpsGenMode.SelfRefl ->  TwoOrbitPairType.SelfRefl
+            | opsGenMode.Ortho -> TwoOrbitPairType.Ortho
+            | opsGenMode.Para -> TwoOrbitPairType.Para
+            | opsGenMode.SelfRefl ->  TwoOrbitPairType.SelfRefl
 

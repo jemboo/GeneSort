@@ -14,14 +14,14 @@ type OpsTransitionRatesDto = {
 
 module OpsTransitionRatesDto =
 
-    let toDomain (dto: OpsTransitionRatesDto) : OpsTransitionRates =
-        OpsTransitionRates.create(
+    let toDomain (dto: OpsTransitionRatesDto) : opsTransitionRates =
+        opsTransitionRates.create(
             OpsActionRatesDto.toDomain dto.OrthoRates,
             OpsActionRatesDto.toDomain dto.ParaRates,
             OpsActionRatesDto.toDomain dto.SelfReflRates
         )
 
-    let fromDomain (domain: OpsTransitionRates) : OpsTransitionRatesDto = {
+    let fromDomain (domain: opsTransitionRates) : OpsTransitionRatesDto = {
         OrthoRates = OpsActionRatesDto.fromDomain domain.OrthoRates
         ParaRates = OpsActionRatesDto.fromDomain domain.ParaRates
         SelfReflRates = OpsActionRatesDto.fromDomain domain.SelfReflRates

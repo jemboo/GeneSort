@@ -73,21 +73,21 @@ module Uf4GenRatesArray =
         let rates =
             Array.init length (fun i ->
                 let t = float i / float (length - 1)
-                let seed = OpsGenRates.create(
+                let seed = opsGenRates.create(
                     startRates.seedOpsGenRates.OrthoRate + t * (endRates.seedOpsGenRates.OrthoRate - startRates.seedOpsGenRates.OrthoRate),
                     startRates.seedOpsGenRates.ParaRate + t * (endRates.seedOpsGenRates.ParaRate - startRates.seedOpsGenRates.ParaRate),
                     startRates.seedOpsGenRates.SelfReflRate + t * (endRates.seedOpsGenRates.SelfReflRate - startRates.seedOpsGenRates.SelfReflRate))
                 let arrayLength = MathUtils.exactLog2 (order / 4)
-                let opsGenRatesArray =
+                let ogra =
                     Array.init arrayLength (fun j ->
                         let startArray = startRates.opsGenRatesArray.RatesArray
                         let endArray = endRates.opsGenRatesArray.RatesArray
-                        OpsGenRates.create(
+                        opsGenRates.create(
                             startArray.[j].OrthoRate + t * (endArray.[j].OrthoRate - startArray.[j].OrthoRate),
                             startArray.[j].ParaRate + t * (endArray.[j].ParaRate - startArray.[j].ParaRate),
                             startArray.[j].SelfReflRate + t * (endArray.[j].SelfReflRate - startArray.[j].SelfReflRate)))
 
-                uf4GenRates.create order seed (OpsGenRatesArray.create opsGenRatesArray) )
+                uf4GenRates.create order seed (opsGenRatesArray.create ogra) )
         uf4GenRatesArray.create rates
 
 
@@ -100,20 +100,20 @@ module Uf4GenRatesArray =
         let rates =
             Array.init length (fun i ->
                 let t = float i / float (length - 1) * 2.0 * Math.PI * frequency
-                let seed = OpsGenRates.create(
+                let seed = opsGenRates.create(
                     clamp (baseRates.seedOpsGenRates.OrthoRate + amplitudes.seedOpsGenRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
                     clamp (baseRates.seedOpsGenRates.ParaRate + amplitudes.seedOpsGenRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
                     clamp (baseRates.seedOpsGenRates.SelfReflRate + amplitudes.seedOpsGenRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0)
                 let arrayLength = MathUtils.exactLog2 (order / 4)
-                let opsGenRatesArray =
+                let ogra =
                     Array.init arrayLength (fun j ->
                         let baseArray = baseRates.opsGenRatesArray.RatesArray
                         let ampArray = amplitudes.opsGenRatesArray.RatesArray
-                        OpsGenRates.create(
+                        opsGenRates.create(
                             clamp (baseArray.[j].OrthoRate + ampArray.[j].OrthoRate * Math.Sin(t)) 0.0 1.0,
                             clamp (baseArray.[j].ParaRate + ampArray.[j].ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
                             clamp (baseArray.[j].SelfReflRate + ampArray.[j].SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0))
-                uf4GenRates.create order seed (OpsGenRatesArray.create opsGenRatesArray) )
+                uf4GenRates.create order seed (opsGenRatesArray.create ogra) )
         uf4GenRatesArray.create rates
 
     let createGaussianHotSpot (length: int) (order: int) (baseRates: uf4GenRates) (hotSpotIndex: int) (hotSpotRates: uf4GenRates) (sigma: float) : uf4GenRatesArray =
@@ -128,20 +128,20 @@ module Uf4GenRatesArray =
             Array.init length (fun i ->
                 let x = float (i - hotSpotIndex)
                 let weight = Math.Exp(-x * x / (2.0 * sigma * sigma))
-                let seed = OpsGenRates.create(
+                let seed = opsGenRates.create(
                     baseRates.seedOpsGenRates.OrthoRate + (hotSpotRates.seedOpsGenRates.OrthoRate - baseRates.seedOpsGenRates.OrthoRate) * weight,
                     baseRates.seedOpsGenRates.ParaRate + (hotSpotRates.seedOpsGenRates.ParaRate - baseRates.seedOpsGenRates.ParaRate) * weight,
                     baseRates.seedOpsGenRates.SelfReflRate + (hotSpotRates.seedOpsGenRates.SelfReflRate - baseRates.seedOpsGenRates.SelfReflRate) * weight)
                 let arrayLength = MathUtils.exactLog2 (order / 4)
-                let opsGenRatesArray =
+                let ogra =
                     Array.init arrayLength (fun j ->
                         let baseArray = baseRates.opsGenRatesArray.RatesArray
                         let hotSpotArray = hotSpotRates.opsGenRatesArray.RatesArray
-                        OpsGenRates.create(
+                        opsGenRates.create(
                             baseArray.[j].OrthoRate + (hotSpotArray.[j].OrthoRate - baseArray.[j].OrthoRate) * weight,
                             baseArray.[j].ParaRate + (hotSpotArray.[j].ParaRate - baseArray.[j].ParaRate) * weight,
                             baseArray.[j].SelfReflRate + (hotSpotArray.[j].SelfReflRate - baseArray.[j].SelfReflRate) * weight))
-                uf4GenRates.create order seed (OpsGenRatesArray.create opsGenRatesArray) )
+                uf4GenRates.create order seed (opsGenRatesArray.create ogra) )
 
         uf4GenRatesArray.create rates
 
@@ -156,7 +156,7 @@ module Uf4GenRatesArray =
             Array.init length (fun i ->
                 let rates = if i >= hotSpotStart && i <= hotSpotEnd then hotSpotRates else baseRates
                 { order = order
-                  seedOpsGenRates = OpsGenRates.create(
+                  seedOpsGenRates = opsGenRates.create(
                       rates.seedOpsGenRates.OrthoRate,
                       rates.seedOpsGenRates.ParaRate,
                       rates.seedOpsGenRates.SelfReflRate)

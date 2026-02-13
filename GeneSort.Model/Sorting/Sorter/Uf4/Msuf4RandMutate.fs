@@ -12,11 +12,11 @@ type msuf4RandMutate =
           id : Guid<sorterModelMakerID>
           msuf4 : msuf4
           rngType: rngType
-          uf4MutationRatesArray: Uf4MutationRatesArray } 
+          uf4MutationRatesArray: uf4MutationRatesArray } 
     static member create 
             (rngType: rngType)
             (msuf4 : msuf4)
-            (uf4MutationRatesArray: Uf4MutationRatesArray) 
+            (uf4MutationRatesArray: uf4MutationRatesArray) 
             : msuf4RandMutate =
         if rngType = Unchecked.defaultof<rngType> then
             failwith "rngType must be specified"
@@ -40,9 +40,9 @@ type msuf4RandMutate =
     static member createFromSingleRate
             (rngType: rngType)
             (msuf4 : msuf4)
-            (rates: Uf4MutationRates) 
+            (rates: uf4MutationRates) 
             : msuf4RandMutate =
-        let mutationRates = Uf4MutationRatesArray.create (Array.create (%msuf4.StageLength) rates)
+        let mutationRates = uf4MutationRatesArray.create (Array.create (%msuf4.StageLength) rates)
         msuf4RandMutate.create rngType msuf4 mutationRates
 
     member this.Id with get () = this.id

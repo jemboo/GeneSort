@@ -35,8 +35,8 @@ type MsrsRandMutateTests() =
         let width = 4<sortingWidth>
         let permRss = [| [| 3; 2; 1; 0 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
         let modelRs = createModelRs id width permRss
-        let opsActionRates = OpsActionRates.create (0.0, 0.0, 0.0) // NoActionRate = 1.0
-        let ratesArray = OpsActionRatesArray.create [| opsActionRates; opsActionRates |]
+        let opsActionRates = opsActionRates.create (0.0, 0.0, 0.0) // NoActionRate = 1.0
+        let ratesArray = opsActionRatesArray.create [| opsActionRates; opsActionRates |]
         let modelRsMutate = msrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick NoAction
@@ -52,8 +52,8 @@ type MsrsRandMutateTests() =
         let permRss = [| [| 1; 0; 3; 2 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
         let expectedPermRss = [| [| 3; 2; 1; 0 |]; [| 3; 2; 1; 0 |] |] |> Array.map createPermRs
         let modelRs = createModelRs id width permRss
-        let opsActionRates = OpsActionRates.create (0.0, 0.0, 1.0) // SelfSymRate = 1.0
-        let ratesArray = OpsActionRatesArray.create [| opsActionRates; opsActionRates |]
+        let opsActionRates = opsActionRates.create (0.0, 0.0, 1.0) // SelfSymRate = 1.0
+        let ratesArray = opsActionRatesArray.create [| opsActionRates; opsActionRates |]
         let modelRsMutate = msrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick SelfSym
@@ -70,8 +70,8 @@ type MsrsRandMutateTests() =
         let permRss = [| [| 1; 0; 3; 2 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
         let expectedPermRss = [| [| 1; 0; 3; 2 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
         let modelRs = createModelRs id width permRss
-        let opsActionRates = OpsActionRates.create (1.0, 0.0, 0.0) // OrthoRate = 1.0
-        let ratesArray = OpsActionRatesArray.create [| opsActionRates; opsActionRates |]
+        let opsActionRates = opsActionRates.create (1.0, 0.0, 0.0) // OrthoRate = 1.0
+        let ratesArray = opsActionRatesArray.create [| opsActionRates; opsActionRates |]
         let modelRsMutate = msrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick Ortho
@@ -88,8 +88,8 @@ type MsrsRandMutateTests() =
         let permRss = [| [| 1; 0; 3; 2 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
         let expectedPermRss = [| [| 2; 3; 0; 1 |]; [| 2; 3; 0; 1 |] |] |> Array.map createPermRs
         let modelRs = createModelRs id width permRss
-        let opsActionRates = OpsActionRates.create (0.0, 1.0, 0.0) // ParaRate = 1.0
-        let ratesArray = OpsActionRatesArray.create [| opsActionRates; opsActionRates |]
+        let opsActionRates = opsActionRates.create (0.0, 1.0, 0.0) // ParaRate = 1.0
+        let ratesArray = opsActionRatesArray.create [| opsActionRates; opsActionRates |]
         let modelRsMutate = msrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick Para
@@ -105,9 +105,9 @@ type MsrsRandMutateTests() =
         let width = 4<sortingWidth>
         let permRss = [| [| 1; 0; 3; 2 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
         let modelRs = createModelRs id width permRss
-        let opsActionRates1 = OpsActionRates.create (0.0, 0.0, 1.0) // SelfSymRate = 1.0
-        let opsActionRates2 = OpsActionRates.create (0.0, 1.0, 0.0) // ParaRate = 1.0
-        let ratesArray = OpsActionRatesArray.create [| opsActionRates1; opsActionRates2 |]
+        let opsActionRates1 = opsActionRates.create (0.0, 0.0, 1.0) // SelfSymRate = 1.0
+        let opsActionRates2 = opsActionRates.create (0.0, 1.0, 0.0) // ParaRate = 1.0
+        let ratesArray = opsActionRatesArray.create [| opsActionRates1; opsActionRates2 |]
         let modelRsMutate = msrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Picks SelfSym for first, Para for second
@@ -124,8 +124,8 @@ type MsrsRandMutateTests() =
         let width = 4<sortingWidth>
         let permRss = [| [| 1; 0; 3; 2 |] |] |> Array.map createPermRs // StageLength = 1
         let modelRs = createModelRs id width permRss
-        let opsActionRates = OpsActionRates.create (0.0, 0.0, 0.0)
-        let ratesArray = OpsActionRatesArray.create [| opsActionRates; opsActionRates |] // Length = 2
+        let opsActionRates = opsActionRates.create (0.0, 0.0, 0.0)
+        let ratesArray = opsActionRatesArray.create [| opsActionRates; opsActionRates |] // Length = 2
         Assert.ThrowsAny<exn>(fun () ->
             msrsRandMutate.create rngType.Lcg modelRs ratesArray|> ignore
         )
@@ -136,8 +136,8 @@ type MsrsRandMutateTests() =
         let width = 4<sortingWidth>
         let permRss = [| [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
         let modelRs = createModelRs id width permRss
-        let opsActionRates = OpsActionRates.create (0.0, 0.0, 0.0) // NoActionRate = 1.0
-        let ratesArray = OpsActionRatesArray.create [| opsActionRates |]
+        let opsActionRates = opsActionRates.create (0.0, 0.0, 0.0) // NoActionRate = 1.0
+        let ratesArray = opsActionRatesArray.create [| opsActionRates |]
         let modelRsMutate = msrsRandMutate.create rngType.Lcg modelRs ratesArray
 
         let randoGen = createMockRando [ 0; 1 ] [ 0.9 ]
