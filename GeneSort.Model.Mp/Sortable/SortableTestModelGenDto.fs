@@ -7,7 +7,7 @@ open GeneSort.Model.Sortable
 [<MessagePackObject>]
 type sortableTestModelGenDto = {
     [<Key(0)>] Kind: int // 0 = MsasORandGen
-    [<Key(1)>] MsasORandGen: MsasORandGenDto // used when Kind=0
+    [<Key(1)>] MsasORandGen: msasORandGenDto // used when Kind=0
 }
 
 

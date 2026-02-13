@@ -9,7 +9,7 @@ open GeneSort.Model.Sortable
 [<MessagePackObject>]
 type sortableTestModelSetDto = {
     [<Key(0)>] Id: Guid
-    [<Key(1)>] SorterTestModels: SorterTestModelDto[]
+    [<Key(1)>] SorterTestModels: sorterTestModelDto[]
 }
 
 module SortableTestModelSetDto =
