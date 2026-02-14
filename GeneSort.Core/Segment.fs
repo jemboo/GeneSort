@@ -58,68 +58,6 @@ module Segment =
         segments
 
 
-
-    //The last segment returned is {start = itemsLength - lastLength - 1; endIndex = itemsLength - 1}.
-    //The first (segmentCt - 1) segments grow exponentially with the specified rate, starting from a 
-    //length calculated to fit the last segment at the end
-    let breakIntoExponentialSegments0 
-                (segmentCt: int) 
-                (rate: float) 
-                (itemsLength: int) 
-                (lastLength: int) : segment[] =
-        // Validate inputs
-        if segmentCt < 2 then
-            invalidArg "segmentCt" "segmentCt must be 2 or more"
-        if rate <= 1.0 then
-            invalidArg "rate" "rate must be greater than 1"
-        if lastLength < 1 then
-            invalidArg "lastLength" "lastLength must be at least 1"
-        if itemsLength < lastLength - 1 then
-            invalidArg "lastIndex" "lastIndex must be at least lastLength - 1"
-    
-        // Calculate the first segment length using the geometric series formula
-        // Given: last_length = first_length * rate^(n-1)
-        // Solving for first_length: first_length = last_length / rate^(n-1)
-        let firstLength = (float (itemsLength - lastLength) )/ (rate ** float (segmentCt - 1))
-    
-        // Generate segment lengths using exponential growth
-        // Each segment length = firstLength * rate^i where i is the segment index
-        let lengths = 
-            [| 0 .. segmentCt - 1 |]
-            |> Array.map (fun i -> firstLength * (rate ** float i))
-    
-        // Round lengths to integers, ensuring we maintain at least length 1
-        let intLengths = 
-            lengths 
-            |> Array.map (fun len -> max 1 (int (round len)))
-    
-        // Adjust the last length to exactly match the requested lastLength
-        // This compensates for rounding errors in earlier segments
-        intLengths.[segmentCt - 1] <- lastLength
-    
-        // Calculate the total length of all segments
-        let totalLength = Array.sum intLengths
-    
-        // Calculate where the first segment must start so that the last segment
-        // ends at lastIndex. Working backwards: startIndex = lastIndex - totalLength + 1
-        let startIndex = itemsLength - totalLength + 1
-    
-        // Build segments by computing cumulative positions from startIndex
-        // Each segment's start is the sum of all previous segment lengths plus startIndex
-        let segments = Array.zeroCreate segmentCt
-        let mutable currentStart = startIndex
-    
-        for i = 0 to segmentCt - 1 do
-            let length = intLengths.[i]
-            segments.[i] <- {
-                start = currentStart
-                endIndex = currentStart + length - 1  // endIndex is inclusive
-            }
-            currentStart <- currentStart + length
-    
-        segments
-
-
     let getSegmentReportHeader (segments: segment[]) : string =
         segments
         |> Array.sortBy(fun seg -> seg.start)

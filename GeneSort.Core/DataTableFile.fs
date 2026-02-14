@@ -35,12 +35,12 @@ type dataTableReport =
             this.AppendDataRow(r)
 
     member this.AddSources (data: string []) =
-        let cleanedData = dataTableReport.Sanitize data
-        this.sourceRows.AddRange(cleanedData)
+        //let cleanedData = dataTableReport.Sanitize data
+        this.sourceRows.AddRange(data)
 
     member this.AddErrors (data: string []) =
-        let cleanedData = dataTableReport.Sanitize data
-        this.errorRows.AddRange(cleanedData)
+        //let cleanedData = dataTableReport.Sanitize data
+        this.errorRows.AddRange(data)
 
     member this.AddSource (source: string) =
         let cleaned = if source = null then "" else source.Replace("\t", " ")

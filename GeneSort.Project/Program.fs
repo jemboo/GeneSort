@@ -124,18 +124,18 @@ let maxReplica = 1<replNumber>
 //    |> Async.RunSynchronously
 
 
-//printfn "Making Use Profile report ..."
+printfn "Making Use Profile report ..."
 
-//let uPReportResult = 
-//    TextReporters.ceUseProfileReportExecutor geneSortDb projectFolder minReplica maxReplica buildQueryParams allowOverwrite cts (Some progress)
-//    |> Async.RunSynchronously
-
-
-printfn "Making Use Bin report ..."
-
-let reportResultBins = 
-    TextReporters.binReportExecutor geneSortDb projectFolder minReplica maxReplica buildQueryParams allowOverwrite cts (Some progress)
+let uPReportResult = 
+    TextReporters.ceUseProfileReportExecutor geneSortDb projectFolder 0<replNumber> maxReplica buildQueryParams allowOverwrite cts (Some progress)
     |> Async.RunSynchronously
+
+
+//printfn "Making Use Bin report ..."
+
+//let reportResultBins = 
+//    TextReporters.binReportExecutor geneSortDb projectFolder 0<replNumber> maxReplica buildQueryParams allowOverwrite cts (Some progress)
+//    |> Async.RunSynchronously
 
 
 let endTime = System.DateTime.Now

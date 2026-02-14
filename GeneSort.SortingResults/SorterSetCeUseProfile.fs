@@ -12,6 +12,7 @@ type sorterCeUseProfile = {
     sorterTestsId: Guid<sorterTestId>
     lastUsedCeIndex: int<ceIndex>
     unsortedCount: int<sortableCount>
+    unsorted: bool
     ceCount: int<ceLength>
     stageLength: int<stageLength>
     segmentTotals: segmentWithPayload<int> []
@@ -31,6 +32,7 @@ module SorterCeUseProfile =
             sorterSetId = sorterSetId
             lastUsedCeIndex = sorterEval.CeBlockEval.CeUseCounts.LastUsedCeIndex
             unsortedCount = sorterEval.CeBlockEval.UnsortedCount
+            unsorted = %sorterEval.CeBlockEval.UnsortedCount > 0
             ceCount = sorterEval.CeBlockEval.CeUseCounts.UsedCeCount
             stageLength = sorterEval.CeBlockEval.getStageSequence.StageLength
             sorterTestsId = sorterTestsId
@@ -57,6 +59,7 @@ module SorterCeUseProfile =
             yield (%profile.sorterSetId.ToString()) 
             yield (%profile.sorterTestsId.ToString())
             yield (profile.unsortedCount.ToString())
+            yield (profile.unsorted.ToString())
             yield (profile.ceCount.ToString())
             yield (profile.stageLength.ToString())
             yield (profile.lastUsedCeIndex.ToString())

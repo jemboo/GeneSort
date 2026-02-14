@@ -126,7 +126,7 @@ module TextReporters =
                               [| 
                                 "Id"; "Repl"; "SortingWidth"; "SorterModel"; "DataType"; "MergeFillType"; 
                                 "MergeDimension"; "sorterId"; "sorterSetId"; "sorterTestsId"; "UnsortedCount"; 
-                                "CeCount"; "StageCount"; "lastCe" 
+                                "Unsorted"; "CeCount"; "StageCount"; "lastCe" 
                               |]
                               (Array.init 20 (fun i -> i.ToString()))
 
