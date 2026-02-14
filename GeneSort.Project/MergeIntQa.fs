@@ -154,7 +154,7 @@ module MergeIntQa =
             .WithCeLength(Some ceLength)
             .WithStageLength(Some stageLength)
             .WithSorterCount(Some sorterCount)
-            .WithSorterModelType(Some sorterModelType.Mcse)
+            .WithSorterModelType(Some sorterModelType.Msce)
             .WithId (Some qp.Id )
 
 

@@ -74,7 +74,7 @@ module RandomSorters =
 
     let sorterModelTypes () : string*string list =
         let values =         
-            [ sorterModelType.Mcse; 
+            [ sorterModelType.Msce; 
               sorterModelType.Mssi;
               sorterModelType.Msrs; 
               sorterModelType.Msuf4; 
@@ -135,28 +135,28 @@ module RandomSorters =
             | 22 -> 140 |> UMX.tag<stageLength>
             | 24 -> 200 |> UMX.tag<stageLength>
             | 32 ->  match smt with
-                        | sorterModelType.Mcse -> 300 |> UMX.tag<stageLength>
+                        | sorterModelType.Msce -> 300 |> UMX.tag<stageLength>
                         | sorterModelType.Mssi -> 300 |> UMX.tag<stageLength>
                         | sorterModelType.Msrs -> 300 |> UMX.tag<stageLength>
                         | sorterModelType.Msuf4 -> 600 |> UMX.tag<stageLength>
                         | _ -> failwithf "Unsupported sorter model type: %A" smt
 
             | 64 -> match smt with
-                        | sorterModelType.Mcse -> 600 |> UMX.tag<stageLength>
+                        | sorterModelType.Msce -> 600 |> UMX.tag<stageLength>
                         | sorterModelType.Mssi -> 600 |> UMX.tag<stageLength>
                         | sorterModelType.Msrs -> 800 |> UMX.tag<stageLength>
                         | sorterModelType.Msuf4 -> 2000 |> UMX.tag<stageLength>
                         | _ -> failwithf "Unsupported sorter model type: %A" smt
 
             | 128 -> match smt with
-                        | sorterModelType.Mcse -> 1200 |> UMX.tag<stageLength>
+                        | sorterModelType.Msce -> 1200 |> UMX.tag<stageLength>
                         | sorterModelType.Mssi -> 1500 |> UMX.tag<stageLength>
                         | sorterModelType.Msrs -> 1800 |> UMX.tag<stageLength>
                         | sorterModelType.Msuf4 -> 4000 |> UMX.tag<stageLength>
                         | _ -> failwithf "Unsupported sorter model type: %A" smt
 
             | 256 -> match smt with
-                        | sorterModelType.Mcse -> 3000 |> UMX.tag<stageLength>
+                        | sorterModelType.Msce -> 3000 |> UMX.tag<stageLength>
                         | sorterModelType.Mssi -> 3000 |> UMX.tag<stageLength>
                         | sorterModelType.Msrs -> 4000 |> UMX.tag<stageLength>
                         | sorterModelType.Msuf4 -> 6000 |> UMX.tag<stageLength>
@@ -177,7 +177,7 @@ module RandomSorters =
         let isMuf6able = (%sortingWidth % 3 = 0) && (MathUtils.isAPowerOfTwo (%sortingWidth / 3))
 
         match sorterModelKey with
-        | sorterModelType.Mcse -> 
+        | sorterModelType.Msce -> 
                 Some rp
         | sorterModelType.Mssi
         | sorterModelType.Msrs -> 
@@ -274,7 +274,7 @@ module RandomSorters =
                 // 3. Sorter Model Logic (Pure Computation)
                 let sorterModelMaker =
                     match sorterModelType with
-                    | sorterModelType.Mcse -> 
+                    | sorterModelType.Msce -> 
                         msceRandGen.create randomType sortingWidth excludeSelfCe ceLength 
                         |> sorterModelMaker.SmmMsceRandGen
                     | sorterModelType.Mssi -> 

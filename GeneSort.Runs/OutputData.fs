@@ -26,7 +26,7 @@ type outputData =
     | SorterSetEval of sorterSetEval
     | SorterSetEvalBins of sorterSetEvalBins
     | Project of project
-    | TextReport of dataTableFile
+    | TextReport of dataTableReport
 
 
 

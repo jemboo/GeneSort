@@ -13,28 +13,62 @@ open ProjectOps
 module TextReporters =
 
     /// Helper to append a failure section to the data table
-    let private appendFailureSummary (failures: (string * string) list) (dt: dataTableFile) =
+    let private appendFailureSummary (failures: (string * string) list) (dt: dataTableFile0) =
         if failures.IsEmpty then dt
         else
-            dt 
-            |> DataTableFile.addSource "--- ERRORS ENCOUNTERED DURING GENERATION ---"
-            |> DataTableFile.addSources (failures |> List.map (fun (id, msg) -> sprintf "Run ID %s: %s" id msg) |> List.toArray)
-            |> DataTableFile.addSource "--- ************************ ---"
+            let tableRows = [|"--- ********* ---"|]
+                            |> Array.append  (failures |> List.map (fun (id, msg) -> sprintf "Run ID %s: %s" id msg) |> List.toArray)
+                            |> Array.append  [|"--- ERRORS ENCOUNTERED DURING GENERATION ---"|] 
+
+            dt |> DataTableFile.addSources tableRows
 
     
     /// Helper to append a failure section to the data table
-    let private appendSourceRunParamsTable (runParams : runParameters list) (dt: dataTableFile) =
+    let private appendSourceRunParamsTable (runParams : runParameters list) (dt: dataTableFile0) =
         if runParams.IsEmpty then dt
         else
-            let tableRows = 
-                            [|"--- Source Runs ---"|]
-                            |> Array.append
+
+            let mutable tableRows =     
                                 (RunParameters.makeIndexAndReplTable runParams
                                 |> Array.map (fun row -> String.Join("\t", row)))
-                                |> Array.rev
-                            |> Array.append [|"--- ********* ---"|]
+
+            tableRows <- [|"--- Successful Runs ---"|] 
+                         |> Array.append  tableRows
+                         |> Array.append [|"--- ********* ---"|]
             dt 
             |> DataTableFile.addSources tableRows
+
+
+
+    let private makeErrorTable (failures: (runParameters * string) list) : string [] =
+        let mutable modRunParameters = []
+
+        for (rp, err) in failures do
+            modRunParameters <- (rp.WithMessage(err)) :: modRunParameters
+
+        let mutable tableRows =     
+                            (RunParameters.makeIndexAndReplTable modRunParameters
+                            |> Array.map (fun row -> String.Join("\t", row)))
+
+        tableRows <- [|"--- ********* ---"|]
+                     |> Array.append  tableRows
+                     |> Array.append [|"--- Error Runs ---"|] 
+
+        tableRows
+
+
+    
+    let private makeSourceTable (runParams : runParameters []) : string [] =
+        let mutable tableRows =     
+                            (RunParameters.makeIndexAndReplTable runParams
+                            |> Array.map (fun row -> String.Join("\t", row)))
+
+
+        tableRows <- [|"--- ********* ---"|]
+                     |> Array.append  tableRows
+                     |> Array.append [|"--- Successful Runs ---"|] 
+
+        tableRows
 
 
 
@@ -60,7 +94,7 @@ module TextReporters =
 
             // 2. Initialize DataTable
             let initialTable = 
-                dataTableFile.createFromList reportName 
+                dataTableFile0.createFromList reportName 
                     [| "Sorting Width"; "SorterModel"; "ceLength"; "stageLength"; "binCount"; "unsortedReport" |]
                 |> DataTableFile.addSource (sprintf "Generated: %s" (timestamp()))
 
@@ -89,9 +123,9 @@ module TextReporters =
 
             // 4. Finalize and Save
             let semiFinalDataTable = appendSourceRunParamsTable (List.ofArray runParamsArray) dataTable
-            let finalDataTable = appendFailureSummary (List.rev failures)  semiFinalDataTable
+            let finalDataTable = appendFailureSummary failures semiFinalDataTable
             let saveQp = buildQueryParams (runParamsArray.[0].WithRepl None) (outputDataType.TextReport (reportName |> UMX.tag))
-            let! _ = db.saveAsync projectFolder saveQp (outputData.TextReport finalDataTable) allowOverwrite |> Async.map Ok
+            let! _ = db.saveAsync projectFolder saveQp (outputData.TextReport (DataTableReport.create "" [||])) allowOverwrite |> Async.map Ok
 
             report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %projectFolder)
             return ()
@@ -118,22 +152,23 @@ module TextReporters =
             // 1. Get Parameters (automatically handles Error exit)
             let! runParamsArray = 
                 db.getProjectRunParametersForReplRangeAsync projectFolder (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
-
+                
             // 2. Setup Initial DataTable
-            let initialTable = 
-                dataTableFile.createFromList reportName 
-                    (Array.append [| 
-                            "Id"; "Repl"; "SortingWidth"; "SorterModel"; "DataType"; "MergeFillType"; 
-                            "MergeDimension"; "sorterId"; "sorterSetId"; "sorterTestsId"; "UnsortedCount"; 
-                            "CeCount"; "StageCount"; "lastCe" 
-                            |]
-                                  (Array.init 20 (fun i -> i.ToString())))
-                |> DataTableFile.addSource (sprintf "Generated: %s" (timestamp()))
+            let headers = Array.append
+                              [| 
+                                "Id"; "Repl"; "SortingWidth"; "SorterModel"; "DataType"; "MergeFillType"; 
+                                "MergeDimension"; "sorterId"; "sorterSetId"; "sorterTestsId"; "UnsortedCount"; 
+                                "CeCount"; "StageCount"; "lastCe" 
+                              |]
+                              (Array.init 20 (fun i -> i.ToString()))
+
+            let dtReport = DataTableReport.create reportName headers
+
+             
 
             // 3. Process the loop using our new 'For' support
             // We use a fold-like pattern inside the CE to handle the mutable dataTable and failures list
-            let mutable dataTable = initialTable
-            let mutable failures = []
+            let mutable newFailures = []
 
             for runParams in runParamsArray do
                 let runId = runParams |> RunParameters.getIdString
@@ -155,16 +190,17 @@ module TextReporters =
                             (runParams.GetMergeSuffixType() |> Option.map MergeFillType.toString |> UmxExt.stringToString)
                             (runParams.GetMergeDimension() |> UmxExt.intToString)
                             profile
-                    dataTable <- DataTableFile.addRows lines dataTable
+                    dtReport.AppendDataRows lines
                 | Error err ->
-                    failures <- (runId, err) :: failures
+                    newFailures <- (runParams, err) :: newFailures
    
 
             // 4. Finalize and Save
-            let semiFinalDataTable = appendSourceRunParamsTable (List.ofArray runParamsArray) dataTable
-            let finalDataTable = appendFailureSummary (List.rev failures)  semiFinalDataTable
+            dtReport.AddSources (makeSourceTable runParamsArray)
+            dtReport.AddErrors (makeErrorTable newFailures)
+
             let saveQp = buildQueryParams (runParamsArray.[0].WithRepl None) (outputDataType.TextReport (reportName |> UMX.tag))
-            let! _ = db.saveAsync projectFolder saveQp (outputData.TextReport finalDataTable) allowOverwrite |> Async.map Ok
+            let! _ = db.saveAsync projectFolder saveQp (outputData.TextReport dtReport) allowOverwrite |> Async.map Ok
 
             report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %projectFolder)
             return ()

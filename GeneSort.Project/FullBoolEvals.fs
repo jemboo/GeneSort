@@ -58,7 +58,7 @@ module FullBoolEvals =
         let isMuf6able = (%sortingWidth % 3 = 0) && (MathUtils.isAPowerOfTwo (%sortingWidth / 3))
 
         match sorterModelKey with
-        | sorterModelType.Mcse -> Some rp
+        | sorterModelType.Msce -> Some rp
         | sorterModelType.Mssi
         | sorterModelType.Msrs -> if has2factor then Some rp else None
         | sorterModelType.Msuf4 ->
@@ -104,7 +104,7 @@ module FullBoolEvals =
         (runParameters.sortingWidthKey, sortingWidthValues)
         
     let sorterModelKeyValues() : string list =
-        [ sorterModelType.Mcse; 
+        [ sorterModelType.Msce; 
           sorterModelType.Mssi;
           sorterModelType.Msrs; 
           sorterModelType.Msuf4; 

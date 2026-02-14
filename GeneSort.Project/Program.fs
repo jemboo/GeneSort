@@ -71,7 +71,7 @@ let projectFolder = MergeIntEvals.projectFolder
 let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
 let paramRefiner = MergeIntEvals.paramMapRefiner
 let minReplica = 0<replNumber>
-let maxReplica = 10<replNumber>
+let maxReplica = 1<replNumber>
 
 
 

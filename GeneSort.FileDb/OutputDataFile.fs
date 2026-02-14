@@ -138,7 +138,7 @@ module OutputDataFile =
                         async {
                             use reader = new StreamReader(stream, Encoding.UTF8)
                             let! text = reader.ReadToEndAsync() |> Async.AwaitTask
-                            return outputData.TextReport (dataTableFile.createFromList "to do ..." [||]) // Assume FromText; adjust if needed.
+                            return outputData.TextReport (DataTableReport.create "" [||]) // Assume FromText; adjust if needed.
                         }
                 return Ok domainData
             with
@@ -200,10 +200,11 @@ module OutputDataFile =
                                 serializeDto stream sse SorterSetEvalBinsDto.fromDomain
                             | outputData.Project p ->
                                 serializeDto stream p ProjectDto.fromDomain
-                            | outputData.TextReport dataTableFile ->
+                            | outputData.TextReport dataTableReport ->
                                 async {
-                                    let textBytes = Encoding.UTF8.GetBytes(dataTableFile.ToText())
-                                    do! stream.WriteAsync(textBytes, 0, textBytes.Length) |> Async.AwaitTask
+                                    dataTableReport.SaveToStream stream
+                                    //let textBytes = Encoding.UTF8.GetBytes("")
+                                    //do! stream.WriteAsync(textBytes, 0, textBytes.Length) |> Async.AwaitTask
                                 }
                         return Ok ()
                     with e -> return Error (sprintf "Error saving file %s: %s" %filePath e.Message)

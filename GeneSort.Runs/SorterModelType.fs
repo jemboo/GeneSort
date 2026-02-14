@@ -3,7 +3,7 @@
 
 
 type sorterModelType = 
-    | Mcse
+    | Msce
     | Mssi
     | Msrs
     | Msuf4
@@ -14,7 +14,7 @@ module SorterModelType =
 
     let toString (model:sorterModelType) : string =
         match model with
-        | Mcse -> "Mcse"
+        | Msce -> "Msce"
         | Mssi -> "Mssi"
         | Msrs -> "Msrs"
         | Msuf4 -> "Msuf4"
@@ -22,7 +22,7 @@ module SorterModelType =
 
     let fromString (s:string) : sorterModelType =
         match s with
-        | "Mcse" -> Mcse
+        | "Msce" -> Msce
         | "Mssi" -> Mssi
         | "Msrs" -> Msrs
         | "Msuf4" -> Msuf4
@@ -30,7 +30,7 @@ module SorterModelType =
         | _ -> failwithf "Unknown SorterModelType: %s" s
 
     let all () : sorterModelType list =
-        [ Mcse; Mssi; Msrs; Msuf4; Msuf6 ]
+        [ Msce; Mssi; Msrs; Msuf4; Msuf6 ]
 
 
 

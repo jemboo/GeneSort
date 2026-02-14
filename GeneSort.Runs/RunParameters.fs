@@ -25,6 +25,7 @@ type runParameters =
     static member maxOrbitKey = "MaxOrbit"
     static member mergeDimensionKey = "MergeDimension"
     static member mergeSuffixTypeKey = "MergeSuffixType"
+    static member messageKey = "Message"
     static member projectNameKey = "ProjectName"
     static member replKey = "Repl"
     static member runFinishedKey = "RunFinished"
@@ -83,20 +84,12 @@ type runParameters =
         this.paramMap.TryFind runParameters.sortableDataFormatKey |> Option.bind (fun v -> try Some (SortableDataFormat.fromString v) with _ -> None)
 
 // --- Functional Updates (Fluent API) ---
-    member this.WithMergeDimension(md: int<mergeDimension> option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeDimensionKey (md |> Option.map UmxExt.intToRaw) }
-
-    member this.WithMergeSuffixType(mft: mergeSuffixType option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeSuffixTypeKey (mft |> Option.map MergeFillType.toString) }
-
-    member this.WithStageLength(sl: int<stageLength> option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.stageLengthKey (sl |> Option.map UmxExt.intToRaw) }
 
     member this.WithCeLength(cl: int<ceLength> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.ceLengthKey (cl |> Option.map UmxExt.intToRaw) }
 
-    member this.WithProjectName(pn: string<projectName> option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.projectNameKey (pn |> Option.map UmxExt.stringToRaw) }
+    member this.WithGeneration(gen: int<generationNumber> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationKey (gen |> Option.map UmxExt.intToRaw) }
 
     member this.WithId(id: Guid<idValue> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.idKey (id |> Option.map UmxExt.guidToRaw) }
@@ -104,11 +97,20 @@ type runParameters =
     member this.WithLatticeDistance(ld: int<latticeDistance> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.latticeDistanceKey (ld |> Option.map UmxExt.intToRaw) }
 
+    member this.WithMergeDimension(md: int<mergeDimension> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeDimensionKey (md |> Option.map UmxExt.intToRaw) }
+
+    member this.WithMergeSuffixType(mft: mergeSuffixType option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeSuffixTypeKey (mft |> Option.map MergeFillType.toString) }
+
+    member this.WithMessage(message: string) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.messageKey (Some message) }
+
+    member this.WithProjectName(pn: string<projectName> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.projectNameKey (pn |> Option.map UmxExt.stringToRaw) }
+
     member this.WithRepl(repl: int<replNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.replKey (repl |> Option.map UmxExt.intToRaw) }
-
-    member this.WithGeneration(gen: int<generationNumber> option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationKey (gen |> Option.map UmxExt.intToRaw) }
 
     member this.WithRunFinished(fin: bool option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.runFinishedKey (fin |> Option.map string) }
@@ -130,6 +132,9 @@ type runParameters =
 
     member this.WithSortingWidth(w: int<sortingWidth> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortingWidthKey (w |> Option.map UmxExt.intToRaw) }
+
+    member this.WithStageLength(sl: int<stageLength> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.stageLengthKey (sl |> Option.map UmxExt.intToRaw) }
 
 
 // --- 3. The Logic Module ---
