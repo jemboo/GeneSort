@@ -19,6 +19,7 @@ type runParameters =
 
     // Constants for consistency
     static member ceLengthKey = "CeLength"
+    static member elapsedTimeKey = "ElapsedTime"
     static member generationKey = "Generation"
     static member idKey = "Id"
     static member latticeDistanceKey = "LatticeDistance"
@@ -88,6 +89,9 @@ type runParameters =
     member this.WithCeLength(cl: int<ceLength> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.ceLengthKey (cl |> Option.map UmxExt.intToRaw) }
 
+    member this.WithElapsedTime(time: string option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.elapsedTimeKey time }
+
     member this.WithGeneration(gen: int<generationNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationKey (gen |> Option.map UmxExt.intToRaw) }
 
@@ -103,8 +107,8 @@ type runParameters =
     member this.WithMergeSuffixType(mft: mergeSuffixType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeSuffixTypeKey (mft |> Option.map MergeFillType.toString) }
 
-    member this.WithMessage(message: string) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.messageKey (Some message) }
+    member this.WithMessage(message: string option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.messageKey message }
 
     member this.WithProjectName(pn: string<projectName> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.projectNameKey (pn |> Option.map UmxExt.stringToRaw) }

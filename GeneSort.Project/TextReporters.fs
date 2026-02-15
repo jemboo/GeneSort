@@ -16,7 +16,7 @@ module TextReporters =
         let mutable modRunParameters = []
 
         for (rp, err) in failures do
-            modRunParameters <- (rp.WithMessage(err)) :: modRunParameters
+            modRunParameters <- (rp.WithMessage(Some err)) :: modRunParameters
 
         let mutable tableRows =     
                             (RunParameters.makeIndexAndReplTable modRunParameters

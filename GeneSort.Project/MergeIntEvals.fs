@@ -190,6 +190,7 @@ module MergeIntEvals =
         asyncResult {
             try
                 // 1. Setup
+                let startTime = DateTime.Now
                 let! _ = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
@@ -245,7 +246,8 @@ module MergeIntEvals =
                 let! _ = db.saveAsync projectFolder qpSorterModelSetPass (passingSortingModelSet |> outputData.SortingModelSet) allowOverwrite
 
                 // 7. Success
-                return runParameters.WithRunFinished (Some true)
+                let duration = DateTime.Now - startTime
+                return (runParameters.WithRunFinished (Some true)).WithElapsedTime (Some (duration.TotalSeconds.ToString()))
 
             with e ->
                 let runId = runParameters |> RunParameters.getIdString
