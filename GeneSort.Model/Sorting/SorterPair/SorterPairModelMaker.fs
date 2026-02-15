@@ -29,8 +29,8 @@ module SorterPairModelMaker =
 
     let getCeLength (model: sorterPairModelMaker) : int<ceLength> =
         match model with
-        | SplitPairs mspg -> MsSplitPairsGen.getCeLength mspg
-        | SplitPairs2 mspg -> MsSplitPairsGen.getCeLength mspg
+        | sorterPairModelMaker.SplitPairs mspg -> MsSplitPairsGen.getCeLength mspg
+        | sorterPairModelMaker.SplitPairs2 mspg -> MsSplitPairsGen.getCeLength mspg
 
 
     let getId (model: sorterPairModelMaker) : Guid<sorterPairModelMakerID> =

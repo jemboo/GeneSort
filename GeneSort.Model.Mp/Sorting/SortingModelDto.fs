@@ -7,7 +7,6 @@ open GeneSort.Model.Mp.Sorting.SorterPair
 open GeneSort.Model.Mp.Sorting.Sorter
 
 
-
 [<MessagePackObject>]
 [<Union(0, typeof<sorterModelDto>); Union(1, typeof<sorterPairModelDto>)>]
 type sortingModelDto =

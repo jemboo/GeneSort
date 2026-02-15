@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.Sorter.Si
+﻿namespace GeneSort.Model.Sorting.Sorter.Rs
 
 open FSharp.UMX
 open GeneSort.Core
@@ -12,7 +12,7 @@ open GeneSort.Model.Sorting.Sorter.Rs
 type msrsRandMutate = 
     private 
         { 
-          id : Guid<sorterModelMakerID>
+          id : Guid<sorterModelMutatorID>
           msrs : msrs
           rngType: rngType
           opsActionRatesArray: opsActionRatesArray
@@ -23,14 +23,15 @@ type msrsRandMutate =
             (opsActionRatesArray: opsActionRatesArray)
              : msrsRandMutate =
         
-        if %msrs.Perm_Rss.Length <> opsActionRatesArray.Length then failwith "Perm_Rss length must match opsActionRatesArray.Length"
+        if %msrs.Perm_Rss.Length <> opsActionRatesArray.Length then 
+                failwith "Perm_Rss length must match opsActionRatesArray.Length"
 
         let id =
             [
                 rngType :> obj
                 msrs :> obj
                 opsActionRatesArray :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorID>
 
         {
             id = id
@@ -67,7 +68,7 @@ type msrsRandMutate =
     /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
                     : msrs =
-        let id = Common.makeSorterModelId this.Id index
+        let id = CommonMutator.makeSorterModelId this.Id index
         let rng = rngFactory this.RngType %id
         let orthoMutator = fun psi ->   Perm_RsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Ortho psi 
         let paraMutator = fun psi ->    Perm_RsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Para psi 

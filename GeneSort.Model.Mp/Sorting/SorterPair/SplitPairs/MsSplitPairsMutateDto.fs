@@ -2,29 +2,28 @@
 open FSharp.UMX
 open MessagePack
 open GeneSort.Model.Sorting.SorterPair.SplitPairs
-open GeneSort.Model.Mp.Sorter
 open GeneSort.Sorting
 open GeneSort.Model.Mp.Sorting.Sorter
 
 [<MessagePackObject>]
-type msSplitPairsGenDto =
+type msSplitPairsMutateDto =
     { [<Key(0)>] sortingWidth: int
       [<Key(1)>] firstPrefixMaker: sorterModelMakerDto
       [<Key(2)>] firstSuffixMaker: sorterModelMakerDto
       [<Key(3)>] secondPrefixMaker: sorterModelMakerDto
       [<Key(4)>] secondSuffixMaker: sorterModelMakerDto }
 
-module MsSplitPairsGenDto =
-    let toMsSplitPairsGenDto (gen: msSplitPairsGen) : msSplitPairsGenDto =
-        { sortingWidth = %(MsSplitPairsGen.getSortingWidth gen)
+module MsSplitPairsMutateDto =
+    let toMsSplitPairsGenDto (gen: msSplitPairsMutator) : msSplitPairsMutateDto =
+        { sortingWidth = %(MsSplitPairsMutator.getSortingWidth gen)
           firstPrefixMaker = SorterModelMakerDto.toSorterModelMakerDto gen.FirstPrefixMaker
           firstSuffixMaker = SorterModelMakerDto.toSorterModelMakerDto gen.FirstSuffixMaker
           secondPrefixMaker = SorterModelMakerDto.toSorterModelMakerDto gen.SecondPrefixMaker
           secondSuffixMaker = SorterModelMakerDto.toSorterModelMakerDto gen.SecondSuffixMaker }
 
-    let fromMsSplitPairsGenDto (dto: msSplitPairsGenDto) : msSplitPairsGen =
+    let fromMsSplitPairsGenDto (dto: msSplitPairsMutateDto) : msSplitPairsMutator =
         try
-            msSplitPairsGen.create
+            msSplitPairsMutator.create
                 (UMX.tag<sortingWidth> dto.sortingWidth)
                 (SorterModelMakerDto.fromSorterModelMakerDto dto.firstPrefixMaker)
                 (SorterModelMakerDto.fromSorterModelMakerDto dto.firstSuffixMaker)

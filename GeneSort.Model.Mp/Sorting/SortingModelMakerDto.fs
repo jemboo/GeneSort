@@ -5,10 +5,12 @@ open MessagePack.FSharp
 open GeneSort.Model.Sorting
 open GeneSort.Model.Mp.Sorter
 open GeneSort.Model.Mp.SorterPair
+open GeneSort.Model.Mp.Sorting.Sorter
+open GeneSort.Model.Mp.Sorting.SorterPair
 
-[<MessagePackObject; Union(0, typeof<SorterModelMakerDto>); Union(1, typeof<sorterPairModelMakerDto>)>]
+[<MessagePackObject; Union(0, typeof<sorterModelMakerDto>); Union(1, typeof<sorterPairModelMakerDto>)>]
 type sortingModelMakerDto =
-    | Single of SorterModelMakerDto
+    | Single of sorterModelMakerDto
     | Pair of sorterPairModelMakerDto
 
 module SortingModelMakerDto =

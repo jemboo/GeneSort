@@ -7,7 +7,7 @@ open GeneSort.Core.Mp.RatesAndOps
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
-open GeneSort.Model.Sorting.Sorter.Si
+open GeneSort.Model.Sorting.Sorter.Rs
 open GeneSort.Core.Mp
 
 [<MessagePackObject>]

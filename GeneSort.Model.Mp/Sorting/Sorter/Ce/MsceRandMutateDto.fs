@@ -1,5 +1,4 @@
 ﻿namespace GeneSort.Model.Mp.Sorting.Sorter.Ce
-
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Model.Sorting.Sorter.Ce
@@ -9,41 +8,36 @@ open MessagePack.FSharp
 open GeneSort.Core.Mp.RatesAndOps
 
 [<MessagePackObject>]
-type MsceRandMutateDto = 
+type msceRandMutateDto = 
     { [<Key(0)>] Msce: msceDto
       [<Key(1)>] RngType: rngType
       [<Key(2)>] IndelRatesArray: IndelRatesArrayDto
       [<Key(3)>] ExcludeSelfCe: bool }
 
 module MsceRandMutateDto =
-
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-
-    let toMsceRandMutateDto (msceRandMutate: msceRandMutate) : MsceRandMutateDto =
+    
+    let toMsceRandMutateDto (msceRandMutate: msceRandMutate) : msceRandMutateDto =
         { Msce = MsceDto.toMsceDto msceRandMutate.Msce
           RngType = msceRandMutate.RngType
           IndelRatesArray = IndelRatesArrayDto.fromDomain msceRandMutate.IndelRatesArray
           ExcludeSelfCe = msceRandMutate.ExcludeSelfCe }
-
-    let fromMsceRandMutateDto (dto: MsceRandMutateDto) : Result<msceRandMutate, string> =
-        try
-            let msceResult = MsceDto.toMsce dto.Msce
-            match msceResult with
-            | Ok msce ->
-                if %msce.CeLength <> (IndelRatesArrayDto.toDomain dto.IndelRatesArray).Length then
-                    Error "CeCount must match IndelRatesArray.Length"
-                else
-                    let msceRandMutate = 
-                        msceRandMutate.create
-                            (dto.RngType)
-                            (IndelRatesArrayDto.toDomain dto.IndelRatesArray)
-                            (dto.ExcludeSelfCe)
-                            msce
-                    Ok msceRandMutate
-            | Error err ->
-                Error (match err with
-                       | MsceDto.InvalidCeCodesLength msg -> msg
-                       | MsceDto.InvalidSortingWidth msg -> msg)
-        with
-        | ex -> Error ex.Message
+    
+    let fromMsceRandMutateDto (dto: msceRandMutateDto) : msceRandMutate =
+        match MsceDto.toMsce dto.Msce with
+        | Ok msce ->
+            let indelRatesArray = IndelRatesArrayDto.toDomain dto.IndelRatesArray
+        
+            if %msce.CeLength <> indelRatesArray.Length then
+                failwith "CeCount must match IndelRatesArray.Length"
+        
+            msceRandMutate.create
+                dto.RngType
+                indelRatesArray
+                dto.ExcludeSelfCe
+                msce
+        | Error err ->
+            failwith (match err with
+                      | MsceDto.InvalidCeCodesLength msg -> msg
+                      | MsceDto.InvalidSortingWidth msg -> msg)

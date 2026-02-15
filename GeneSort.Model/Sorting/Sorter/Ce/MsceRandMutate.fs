@@ -10,11 +10,12 @@ open GeneSort.Model.Sorting
 type msceRandMutate = 
     private 
         { 
-          id : Guid<sorterModelMakerID>
+          id : Guid<sorterModelMutatorID>
           msce : msce
           rngType: rngType
           indelRatesArray: indelRatesArray
           excludeSelfCe: bool }
+    with
     static member create 
             (rngType: rngType)
             (indelRatesArray: indelRatesArray)
@@ -27,7 +28,7 @@ type msceRandMutate =
                 rngType :> obj
                 indelRatesArray :> obj
                 excludeSelfCe :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorID>
 
         {
             id = id
@@ -66,7 +67,7 @@ type msceRandMutate =
     /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
                 : msce =
-        let id = Common.makeSorterModelId this.Id index
+        let id = CommonMutator.makeSorterModelId this.Id index
         let rng = rngFactory this.RngType %id
         let excludeSelfCe = this.ExcludeSelfCe
         let sortingWidth = %this.msce.SortingWidth

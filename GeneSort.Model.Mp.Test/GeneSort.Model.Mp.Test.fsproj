@@ -8,9 +8,6 @@
 
   <ItemGroup>
     <Compile Include="SorterModelDtoTests.fs" />
-    <Compile Include="SorterModelSetDtoTests.fs" />
-    <Compile Include="SorterModelMakerDtoTests.fs" />
-    <Compile Include="SorterModelSetMakerDtoTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

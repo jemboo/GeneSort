@@ -1,8 +1,9 @@
-﻿namespace GeneSort.Model.Mp.SorterPair
+﻿namespace GeneSort.Model.Mp.Sorting.SorterPair
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 open GeneSort.Model.Sorting.SorterPair
+open GeneSort.Model.Mp.SorterPair.SplitPairs
 
 [<MessagePackObject; Union(0, typeof<msSplitPairsGenDto>); Union(1, typeof<msSplitPairsGenDto>)>]
 type sorterPairModelMakerDto =

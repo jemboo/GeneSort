@@ -12,7 +12,7 @@ open GeneSort.Model.Sorting
 type mssiRandMutate = 
     private 
         { 
-              id : Guid<sorterModelMakerID>
+              id : Guid<sorterModelMutatorID>
               mssi : mssi
               rngType: rngType
               opActionRates: opActionRatesArray
@@ -23,14 +23,15 @@ type mssiRandMutate =
             (opActionRatesArray: opActionRatesArray)
             : mssiRandMutate =
         
-        if %mssi.Perm_Sis.Length <> opActionRatesArray.Length then failwith "Perm_Sis length must match opActionRatesArray.Length"
+        if %mssi.Perm_Sis.Length <> opActionRatesArray.Length then 
+                failwith "Perm_Sis length must match opActionRatesArray.Length"
 
         let id =
             [
                 rngType :> obj
                 mssi :> obj
                 opActionRatesArray :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorID>
 
         {
             id = id
@@ -66,7 +67,7 @@ type mssiRandMutate =
     /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
     /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
     member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : mssi =
-        let id = Common.makeSorterModelId this.Id index
+        let id = CommonMutator.makeSorterModelId this.Id index
         let rng = rngFactory this.RngType %id
         let orthoMutator = fun psi ->  Perm_Si.mutate (rng.NextIndex) MutationMode.Ortho psi 
         let paraMutator = fun psi ->   Perm_Si.mutate (rng.NextIndex) MutationMode.Para psi 

@@ -33,13 +33,6 @@ module SortingModelMaker =
         | Single smm -> smm |> SorterModelMaker.getCeLength
         | Pair spmm -> spmm |> SorterPairModelMaker.getCeLength
 
-
-    let getSorterModelMakerId (model: sortingModelMaker) : Guid<sortingModelMakerID> =
-        match model with
-        | Single smm -> %(SorterModelMaker.getId smm) |> UMX.tag<sortingModelMakerID>
-        | Pair spmm -> %(SorterPairModelMaker.getId spmm) |> UMX.tag<sortingModelMakerID>
-
-
     let makeSortingModel 
                 (rngFactory: rngType -> Guid -> IRando)
                 (index: int)  

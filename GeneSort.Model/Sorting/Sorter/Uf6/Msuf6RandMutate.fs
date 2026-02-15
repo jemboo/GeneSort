@@ -10,7 +10,7 @@ open GeneSort.Model.Sorting.Sorter.Uf6
 type msuf6RandMutate = 
     private 
         {
-          id : Guid<sorterModelMakerID>
+          id : Guid<sorterModelMutatorID>
           msuf6 : msuf6
           rngType: rngType
           uf6MutationRatesArray: uf6MutationRatesArray } 
@@ -29,7 +29,7 @@ type msuf6RandMutate =
                 rngType :> obj
                 msuf6 :> obj
                 uf6MutationRatesArray :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorID>
 
         {
             id = id
@@ -78,7 +78,7 @@ type msuf6RandMutate =
                     : msuf6 =
         if %this.StageLength <> this.Uf6MutationRatesArray.Length then
             failwith $"Stage count of Msuf6 {%this.StageLength} must match Msuf6RandMutate length {this.Uf6MutationRatesArray.Length}"
-        let id = Common.makeSorterModelId this.Id index
+        let id = CommonMutator.makeSorterModelId this.Id index
         let rng = rngFactory this.RngType %id
         let mutatedUnfolders = 
             Array.zip this.msuf6.TwoOrbitUnfolder6s this.Uf6MutationRatesArray.RatesArray
