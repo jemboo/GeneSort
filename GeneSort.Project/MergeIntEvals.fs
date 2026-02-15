@@ -83,7 +83,9 @@ module MergeIntEvals =
     let limitForMergeFillType (rp: runParameters) =
         let sw = rp.GetSortingWidth().Value
         let ft = rp.GetMergeSuffixType().Value
-        if (ft.IsNoSuffix && %sw > 64) then None else Some rp
+        let md = rp.GetMergeDimension().Value
+        //if (ft.IsNoSuffix && %sw > 64) then None else Some rp
+        if (ft.IsNoSuffix && %md > 4) then None else Some rp
 
     let paramMapFilter (rp: runParameters) = 
         Some rp
@@ -122,13 +124,13 @@ module MergeIntEvals =
   
     let sortingWidths () : string * string list =
         //let values = [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] |> List.map string
-        let values = [ 16; 32;]  |> List.map string
+        let values = [128; 256] |> List.map string
         (runParameters.sortingWidthKey, values)
 
 
     let mergeDimensions () : string * string list =
       //let values = [2; 3; 4; 6; 8 ] |> List.map string
-        let values = [2; 3;] |> List.map string
+        let values = [2; 4; 8;] |> List.map string
         (runParameters.mergeDimensionKey, values)
 
 
