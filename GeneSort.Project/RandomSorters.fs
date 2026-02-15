@@ -16,6 +16,7 @@ open GeneSort.Runs
 open GeneSort.Db
 open ProjectOps
 open GeneSort.Model.Sorting
+open GeneSort.Model.Sorting.ModelParams
 
 
 module RandomSorters =

@@ -19,7 +19,7 @@ type msceRandMutate =
             (rngType: rngType)
             (indelRatesArray: indelRatesArray)
             (excludeSelfCe: bool) 
-            (msce : msce): msceRandMutate = 
+            (msce : msce) : msceRandMutate = 
         if %msce.CeLength <> indelRatesArray.Length then failwith "CeCount must match indelRatesArray.Length"
         let id =
             [

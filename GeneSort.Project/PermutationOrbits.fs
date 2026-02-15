@@ -9,6 +9,7 @@ open GeneSort.Sorting
 open GeneSort.Model.Sortable
 open GeneSort.Runs
 open GeneSort.Db
+open GeneSort.Model.Sorting.ModelParams
 
 
 module PermutationOrbits = 
@@ -34,8 +35,10 @@ module PermutationOrbits =
             repl,
             outputDataType,
             [|
-                (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
-                (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString );
+                (runParameters.sortingWidthKey, 
+                 sortingWidth |> SortingWidth.toString); 
+                (runParameters.sorterModelTypeKey, 
+                 sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString );
             |])
 
 

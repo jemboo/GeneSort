@@ -4,6 +4,7 @@ open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
+open GeneSort.Model.Sorting.ModelParams
 
 [<Measure>] type projectName
 [<Measure>] type textReportName

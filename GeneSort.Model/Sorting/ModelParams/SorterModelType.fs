@@ -1,5 +1,4 @@
-﻿namespace GeneSort.Runs
-
+﻿namespace GeneSort.Model.Sorting.ModelParams
 
 
 type sorterModelType = 

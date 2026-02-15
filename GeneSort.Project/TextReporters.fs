@@ -9,6 +9,7 @@ open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.SortingResults
 open ProjectOps
+open GeneSort.Model.Sorting.ModelParams
 
 module TextReporters =
 

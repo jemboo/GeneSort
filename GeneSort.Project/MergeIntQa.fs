@@ -11,6 +11,7 @@ open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.SortingOps
 open ProjectOps
+open GeneSort.Model.Sorting.ModelParams
 
 
 module MergeIntQa =

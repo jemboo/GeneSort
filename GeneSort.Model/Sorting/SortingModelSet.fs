@@ -6,7 +6,8 @@ open GeneSort.Sorting.Sorter
 
 type sortingModelSet =
       private
-        { id : Guid<sortingModelSetID>
+        { 
+          id : Guid<sortingModelSetID>
           sortingModels : Map<Guid<sortingModelID>, sortingModel>
         }
     with
