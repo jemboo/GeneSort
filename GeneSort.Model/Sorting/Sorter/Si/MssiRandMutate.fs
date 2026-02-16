@@ -19,8 +19,8 @@ type mssiRandMutate =
         } 
     static member create 
             (rngType: rngType)
-            (mssi: mssi)
             (opActionRatesArray: opActionRatesArray)
+            (mssi: mssi)
             : mssiRandMutate =
         
         if %mssi.Perm_Sis.Length <> opActionRatesArray.Length then 

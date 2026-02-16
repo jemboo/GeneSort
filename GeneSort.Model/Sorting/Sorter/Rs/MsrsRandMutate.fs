@@ -18,9 +18,9 @@ type msrsRandMutate =
           opsActionRatesArray: opsActionRatesArray
         } 
     static member create 
-            (rngType: rngType)
-            (msrs: msrs)
+            (rngType:rngType)
             (opsActionRatesArray: opsActionRatesArray)
+            (msrs:msrs)
              : msrsRandMutate =
         
         if %msrs.Perm_Rss.Length <> opsActionRatesArray.Length then 

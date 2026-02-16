@@ -15,8 +15,8 @@ type msuf4RandMutate =
           uf4MutationRatesArray: uf4MutationRatesArray } 
     static member create 
             (rngType: rngType)
-            (msuf4 : msuf4)
             (uf4MutationRatesArray: uf4MutationRatesArray) 
+            (msuf4 : msuf4)
             : msuf4RandMutate =
         if rngType = Unchecked.defaultof<rngType> then
             failwith "rngType must be specified"

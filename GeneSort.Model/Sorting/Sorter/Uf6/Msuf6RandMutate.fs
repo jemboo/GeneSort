@@ -16,8 +16,8 @@ type msuf6RandMutate =
           uf6MutationRatesArray: uf6MutationRatesArray } 
     static member create 
             (rngType: rngType)
-            (msuf6 : msuf6)
             (uf6MutationRatesArray: uf6MutationRatesArray) 
+            (msuf6 : msuf6)
             : msuf6RandMutate =
         if rngType = Unchecked.defaultof<rngType> then
             failwith "rngType must be specified"
@@ -44,7 +44,7 @@ type msuf6RandMutate =
             (rates: uf6MutationRates) 
             : msuf6RandMutate =
         let mutationRates = uf6MutationRatesArray.create (Array.create (%msuf6.StageLength) rates)
-        msuf6RandMutate.create rngType msuf6 mutationRates
+        msuf6RandMutate.create rngType mutationRates msuf6
 
     member this.Id with get () = this.id
     member this.CeLength with get () = this.msuf6.CeLength

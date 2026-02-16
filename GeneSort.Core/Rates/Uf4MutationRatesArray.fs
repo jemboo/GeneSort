@@ -54,6 +54,13 @@ module Uf4MutationRatesArray =
     let private clamp (value: float) (min: float) (max: float) =
         Math.Max(min, Math.Min(max, value))
 
+    let createUniform (length: int) (order: int) (rates: uf4MutationRates) =
+        if length <= 0 then failwith "Length must be positive"
+        if order < 4 || order % 4 <> 0 then failwith "Order must be at least 4 and divisible by 4"
+        if rates.order <> order then failwith "Rates order must match specified order"
+        let ratesArray = Array.init length (fun _ -> rates)
+        uf4MutationRatesArray.create ratesArray
+
     let createLinearVariation (length: int) (order: int) (startRates: uf4MutationRates) (endRates: uf4MutationRates) : uf4MutationRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if order < 4 || order % 4 <> 0 then failwith "Order must be at least 4 and divisible by 4"

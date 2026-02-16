@@ -15,6 +15,9 @@ open GeneSort.Core
 [<Measure>] type sortingModelMutatorID
 [<Measure>] type sortingModelSetMakerID
 
+
+[<Measure>] type mutationRate
+
 module CommonMaker =
 
     let makeSorterModelId 

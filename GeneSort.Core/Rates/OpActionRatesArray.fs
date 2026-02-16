@@ -39,13 +39,16 @@ module OpActionRatesArray =
     let private clamp (value: float) (min: float) (max: float) =
         Math.Max(min, Math.Min(max, value))
 
-    let createUniform (length: int) (actionRate:float) : opActionRatesArray =
+    let createUniform (length: int) (orthoRate: float) (paraRate: float) :opActionRatesArray =
         if length <= 0 then failwith "Length must be positive"
-        let rates = Array.init length (fun _ -> opActionRates.createUniform(actionRate))
+        let rates = Array.init length (fun _ -> opActionRates.create(orthoRate, paraRate))
         opActionRatesArray.create rates
 
     // Smooth variation: Linear interpolation from startRates to endRates
-    let createLinearVariation (length: int) (startRates: opActionRates) (endRates: opActionRates) : opActionRatesArray =
+    let createLinearVariation 
+                (length: int) 
+                (startRates: opActionRates)
+                (endRates: opActionRates) : opActionRatesArray =
         if length <= 0 then failwith "Length must be positive"
         let rates =
             Array.init length (fun i ->
