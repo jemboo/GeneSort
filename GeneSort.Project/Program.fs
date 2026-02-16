@@ -71,7 +71,7 @@ let projectFolder = MergeIntEvals.projectFolder
 let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
 let paramRefiner = MergeIntEvals.paramMapRefiner
 let minReplica = 0<replNumber>
-let maxReplica = 20<replNumber>
+let maxReplica = 1<replNumber>
 
 
 
@@ -118,17 +118,17 @@ let maxReplica = 20<replNumber>
 //| Error e -> printfn "Execution Failed: %s" e
 
 
-//printfn "Printing RunParams..."
-//let reportResult = 
-//    ProjectOps.printRunParams geneSortDb projectFolder minReplica maxReplica cts (Some progress)
-//    |> Async.RunSynchronously
-
-
-printfn "Making Use Profile report ..."
-
-let uPReportResult = 
-    TextReporters.ceUseProfileReportExecutor geneSortDb projectFolder 0<replNumber> maxReplica buildQueryParams allowOverwrite cts (Some progress)
+printfn "Printing RunParams..."
+let reportResult = 
+    ProjectOps.printRunParams geneSortDb projectFolder minReplica maxReplica cts (Some progress)
     |> Async.RunSynchronously
+
+
+//printfn "Making Use Profile report ..."
+
+//let uPReportResult = 
+//    TextReporters.ceUseProfileReportExecutor geneSortDb projectFolder 0<replNumber> maxReplica buildQueryParams allowOverwrite cts (Some progress)
+//    |> Async.RunSynchronously
 
 
 //printfn "Making Use Bin report ..."

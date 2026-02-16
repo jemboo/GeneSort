@@ -13,36 +13,6 @@ open GeneSort.Model.Sorting.ModelParams
 
 module TextReporters =
 
-    let private makeErrorTable (failures: (runParameters * string) list) : string [] =
-        let mutable modRunParameters = []
-
-        for (rp, err) in failures do
-            modRunParameters <- (rp.WithMessage(Some err)) :: modRunParameters
-
-        let mutable tableRows =     
-                            (RunParameters.makeIndexAndReplTable modRunParameters
-                            |> Array.map (fun row -> String.Join("\t", row)))
-
-        tableRows <- [|"--- ********* ---"|]
-                     |> Array.append  tableRows
-                     |> Array.append [|"--- Error Runs ---"|] 
-
-        tableRows
-
-    
-    let private makeSourceTable (runParams : runParameters []) : string [] =
-        let mutable tableRows =     
-                            (RunParameters.makeIndexAndReplTable runParams
-                            |> Array.map (fun row -> String.Join("\t", row)))
-
-
-        tableRows <- [|"--- ********* ---"|]
-                     |> Array.append  tableRows
-                     |> Array.append [|"--- Successful Runs ---"|] 
-
-        tableRows
-
-
     let binReportExecutor
         (db: IGeneSortDb)
         (projectFolder: string<projectFolder>)
@@ -90,8 +60,8 @@ module TextReporters =
 
 
             // 4. Finalize and Save
-            dtReport.AddSources (makeSourceTable runParamsArray)
-            dtReport.AddErrors (makeErrorTable newFailures)
+            dtReport.AddSources (ProjectOps.makeSourceTable runParamsArray)
+            dtReport.AddErrors (ProjectOps.makeErrorTable newFailures)
 
             let saveQp = buildQueryParams (runParamsArray.[0].WithRepl None) (outputDataType.TextReport (reportName |> UMX.tag))
             let! _ = db.saveAsync projectFolder saveQp (outputData.TextReport dtReport) allowOverwrite |> Async.map Ok

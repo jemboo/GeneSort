@@ -8,6 +8,37 @@ open GeneSort.Core
 
 module ProjectOps =
 
+
+    let makeErrorTable (failures: (runParameters * string) list) : string [] =
+        let mutable modRunParameters = []
+
+        for (rp, err) in failures do
+            modRunParameters <- (rp.WithMessage(Some err)) :: modRunParameters
+
+        let mutable tableRows =     
+                            (RunParameters.makeIndexAndReplTable modRunParameters
+                            |> Array.map (fun row -> String.Join("\t", row)))
+
+        tableRows <- [|"\n--- ********* ---"|]
+                     |> Array.append  tableRows
+                     |> Array.append [|"--- Error Runs ---"|] 
+
+        tableRows
+
+    
+    let makeSourceTable (runParams : runParameters []) : string [] =
+        let mutable tableRows =     
+                            (RunParameters.makeIndexAndReplTable runParams
+                            |> Array.map (fun row -> String.Join("\t", row)))
+
+
+        tableRows <- [|"\n--- ********* ---"|]
+                     |> Array.append  tableRows
+                     |> Array.append [|"--- Successful Runs ---"|] 
+
+        tableRows
+
+
     let inline report (progress: IProgress<string> option) msg =
         progress |> Option.iter (fun p -> p.Report msg)
 
@@ -231,7 +262,7 @@ module ProjectOps =
         }
 
 
-    let printRunParams
+    let printRunParamsOld
             (db: IGeneSortDb)
             (projectFolder: string<projectFolder>)
             (minReplNumber: int<replNumber>)
@@ -254,6 +285,7 @@ module ProjectOps =
                     return [||]
                 else
                 let maxDegreeOfParallelism = 1
+
                 let! results = 
                     reportRunParametersSeq maxDegreeOfParallelism runParametersArray cts progress
                     |> Async.map Ok
@@ -278,6 +310,60 @@ module ProjectOps =
                 report progress msg
                 return! async { return Error msg }
         }
+
+
+    let printRunParams
+            (db: IGeneSortDb)
+            (projectFolder: string<projectFolder>)
+            (minReplNumber: int<replNumber>)
+            (maxReplNumber: int<replNumber>)
+            (cts: CancellationTokenSource)
+            (progress: IProgress<string> option) =
+        asyncResult {
+            try
+                report progress (sprintf "Reporting Runs from %s\n" %projectFolder)
+
+                // 1. Load Parameters (Auto-handles Error short-circuit)
+                let! runParametersArray = 
+                    db.getProjectRunParametersForReplRangeAsync projectFolder (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
+
+                report progress (sprintf "Found %d runs to report\n" runParametersArray.Length)
+
+                if runParametersArray.Length = 0 then
+                    report progress "No runs found to report\n"
+                    return [||]
+                else
+
+                // Format and print the source table
+                let sourceTableRows = makeSourceTable runParametersArray
+                sourceTableRows |> Array.iter (report progress)
+
+                let maxDegreeOfParallelism = 1
+                let! results = 
+                    reportRunParametersSeq maxDegreeOfParallelism runParametersArray cts progress
+                    |> Async.map Ok
+
+                let summary = RunResult.analyze results
+            
+                report progress (sprintf "--- Report Summary ---")
+                report progress (sprintf "Successfully verified: %d/%d" summary.Successes summary.Total)
+            
+                if summary.MissingLog.Length > 0 then
+                    report progress (sprintf "\nFound %d missing runs:" summary.MissingLog.Length)
+                    summary.MissingLog |> Array.iter (report progress)
+
+                if summary.IssueLog.Length > 0 then
+                    report progress (sprintf "\nFound %d issues/crashes:" summary.IssueLog.Length)
+                    summary.IssueLog |> Array.iter (report progress)
+
+                return results
+
+            with e ->
+                let msg = sprintf "Fatal error reporting runs: %s" e.Message
+                report progress msg
+                return! async { return Error msg }
+        }
+
 
 
     let executeRuns
