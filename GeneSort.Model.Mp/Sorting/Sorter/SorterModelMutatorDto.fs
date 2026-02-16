@@ -29,32 +29,33 @@ module SorterModelMutatorDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toSorterModelMutatorDto (sorterModelMutator: sorterModelMutator) : sorterModelMutatorDto =
+    let fromDomain (sorterModelMutator: sorterModelMutator) : sorterModelMutatorDto =
         match sorterModelMutator with
         | sorterModelMutator.SmmMsceRandMutate msceRandMutate ->
-            MsceRandMutate (MsceRandMutateDto.toMsceRandMutateDto msceRandMutate)
+            MsceRandMutate (MsceRandMutateDto.fromDomain msceRandMutate)
         | sorterModelMutator.SmmMssiRandMutate mssiRandMutate ->
-            MssiRandMutate (MssiRandMutateDto.toMssiRandMutateDto mssiRandMutate)
+            MssiRandMutate (MssiRandMutateDto.fromDomain mssiRandMutate)
         | sorterModelMutator.SmmMsrsRandMutate msrsRandMutate->
-            MsrsRandMutate (MsrsRandMutateDto.toMsrsRandMutateDto msrsRandMutate)
+            MsrsRandMutate (MsrsRandMutateDto.fromDomain msrsRandMutate)
         | sorterModelMutator.SmmMsuf4RandMutate msuf4RandMutate ->
-            Msuf4RandMutate (Msuf4RandMutateDto.toMsuf4RandMutateDto msuf4RandMutate)
+            Msuf4RandMutate (Msuf4RandMutateDto.fromDomain msuf4RandMutate)
         | sorterModelMutator.SmmMsuf6RandMutate msuf6RandMutate ->
-            Msuf6RandMutate (Msuf6RandMutateDto.toMsuf6RandMutateDto msuf6RandMutate)
+            Msuf6RandMutate (Msuf6RandMutateDto.fromDomain msuf6RandMutate)
 
-    let fromSorterModelMutatorDto (dto: sorterModelMutatorDto) : sorterModelMutator =
+
+    let toDomain (dto: sorterModelMutatorDto) : sorterModelMutator =
         try
             match dto with
             | MsceRandMutate msceRandMutateDto ->
-                sorterModelMutator.SmmMsceRandMutate (MsceRandMutateDto.fromMsceRandMutateDto msceRandMutateDto)
+                sorterModelMutator.SmmMsceRandMutate (MsceRandMutateDto.toDomain msceRandMutateDto)
             | MssiRandMutate mssiRandGenDto ->
-                sorterModelMutator.SmmMssiRandMutate (MssiRandMutateDto.fromMssiRandMutateDto mssiRandGenDto |> Result.toOption |> Option.get )
+                sorterModelMutator.SmmMssiRandMutate (MssiRandMutateDto.toDomain mssiRandGenDto |> Result.toOption |> Option.get )
             | MsrsRandMutate msrsRandGenDto ->
-                sorterModelMutator.SmmMsrsRandMutate (MsrsRandMutateDto.fromMsrsRandMutateDto msrsRandGenDto)
+                sorterModelMutator.SmmMsrsRandMutate (MsrsRandMutateDto.toDomain msrsRandGenDto)
             | Msuf4RandMutate msuf4RandGenDto ->
-                sorterModelMutator.SmmMsuf4RandMutate (Msuf4RandMutateDto.fromMsuf4RandMutateDto msuf4RandGenDto)
+                sorterModelMutator.SmmMsuf4RandMutate (Msuf4RandMutateDto.toDomain msuf4RandGenDto)
             | Msuf6RandMutate msuf6RandGenDto ->
-                sorterModelMutator.SmmMsuf6RandMutate (Msuf6RandMutateDto.fromMsuf6RandMutateDto msuf6RandGenDto)
+                sorterModelMutator.SmmMsuf6RandMutate (Msuf6RandMutateDto.toDomain msuf6RandGenDto)
 
         with
         | ex -> failwith $"Failed to convert SorterModelMakerDto: {ex.Message}"

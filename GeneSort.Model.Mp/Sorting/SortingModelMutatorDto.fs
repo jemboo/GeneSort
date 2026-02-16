@@ -18,7 +18,7 @@ module SortingModelMutatorDto =
     let fromDomain (sortingModelMaker: sortingModelMutator) : sortingModelMutatorDto =
         match sortingModelMaker with
         | sortingModelMutator.Single sorterModelMutator ->
-            Single (SorterModelMutatorDto.toSorterModelMutatorDto sorterModelMutator)
+            Single (SorterModelMutatorDto.fromDomain sorterModelMutator)
         | sortingModelMutator.Pair sorterPairModelMutator ->
             Pair (SorterPairModelMutatorDto.fromDomain sorterPairModelMutator)
 
@@ -26,7 +26,7 @@ module SortingModelMutatorDto =
         try
             match dto with
             | Single sorterModelMakerDto ->
-                sortingModelMutator.Single (SorterModelMutatorDto.fromSorterModelMutatorDto sorterModelMakerDto)
+                sortingModelMutator.Single (SorterModelMutatorDto.toDomain sorterModelMakerDto)
             | Pair sorterPairModelMakerDto ->
                 sortingModelMutator.Pair (SorterPairModelMutatorDto.toDomain sorterPairModelMakerDto)
         with

@@ -77,10 +77,10 @@ type SorterModelDtoTests() =
 
     // Helper function to perform round-trip serialization
     let roundTrip (sorterModel: sorterModel) : sorterModel =
-        let dto = SorterModelDto.toSorterModelDto sorterModel
+        let dto = SorterModelDto.fromDomain sorterModel
         let bytes = MessagePackSerializer.Serialize(dto, options)
         let deserializedDto = MessagePackSerializer.Deserialize<sorterModelDto>(bytes, options)
-        SorterModelDto.fromSorterModelDto deserializedDto
+        SorterModelDto.toDomain deserializedDto
 
     [<Fact>]
     let ``Msce round-trip serialization and deserialization should succeed`` () =

@@ -19,13 +19,13 @@ module MssiDto =
         | InvalidPermSiCount of string
         | InvalidWidth of string
 
-    let toMssiDto (mssi: mssi) : mssiDto =
+    let fromDomain (mssi: mssi) : mssiDto =
         let mssiDtos = mssi.Perm_Sis |> Array.map PermSiDto.fromDomain
         { id = %mssi.Id
           sortingWidth = %mssi.SortingWidth
           permSiDtos = mssiDtos }
 
-    let toMssi (mssiDto: mssiDto) : Result<mssi, MssiDtoError> =
+    let toDomain (mssiDto: mssiDto) : Result<mssi, MssiDtoError> =
         try
             let perm_SisR = mssiDto.permSiDtos |> Array.map (PermSiDto.toDomain)
             let perm_Sis =

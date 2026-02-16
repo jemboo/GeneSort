@@ -11,6 +11,7 @@ type sortingModelSetMakerDto =
       [<Key(2)>] count: int }
 
 module SortingModelSetMakerDto =
+
     let fromDomain (maker: sortingModelSetMaker) : sortingModelSetMakerDto =
         { sortingModelMaker = SortingModelMakerDto.fromDomain maker.SortingModelMaker
           firstIndex = %maker.FirstIndex

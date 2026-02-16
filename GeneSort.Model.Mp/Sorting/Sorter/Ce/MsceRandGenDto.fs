@@ -22,13 +22,13 @@ module MsceRandGenDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toMsceRandGenDto (msceRandGen: msceRandGen) : msceRandGenDto =
+    let fromDomain (msceRandGen: msceRandGen) : msceRandGenDto =
         { sortingWidth = %msceRandGen.SortingWidth
           ceLength = %msceRandGen.CeLength
           rngType = msceRandGen.RngType
           excludeSelfCe = msceRandGen.ExcludeSelfCe }
 
-    let fromMsceRandGenDto (dto: msceRandGenDto) : msceRandGen =
+    let toDomain (dto: msceRandGenDto) : msceRandGen =
         if dto.sortingWidth < 1 then
             failwith "SortingWidth must be at least 1"
         if dto.ceLength < 1 then

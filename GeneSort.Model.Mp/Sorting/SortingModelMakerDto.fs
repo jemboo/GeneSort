@@ -20,15 +20,16 @@ module SortingModelMakerDto =
     let fromDomain (sortingModelMaker: sortingModelMaker) : sortingModelMakerDto =
         match sortingModelMaker with
         | sortingModelMaker.Single sorterModelMaker ->
-            Single (SorterModelMakerDto.toSorterModelMakerDto sorterModelMaker)
+            Single (SorterModelMakerDto.fromDomain sorterModelMaker)
         | sortingModelMaker.Pair sorterPairModelMaker ->
             Pair (SorterPairModelMakerDto.fromDomain sorterPairModelMaker)
+
 
     let toDomain (dto: sortingModelMakerDto) : sortingModelMaker =
         try
             match dto with
             | Single sorterModelMakerDto ->
-                sortingModelMaker.Single (SorterModelMakerDto.fromSorterModelMakerDto sorterModelMakerDto)
+                sortingModelMaker.Single (SorterModelMakerDto.toDomain sorterModelMakerDto)
             | Pair sorterPairModelMakerDto ->
                 sortingModelMaker.Pair (SorterPairModelMakerDto.toDomain sorterPairModelMakerDto)
         with

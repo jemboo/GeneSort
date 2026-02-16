@@ -42,12 +42,12 @@ module Msuf6Dto =
         | MismatchedTwoOrbitUnfolder6Order of string
         | TwoOrbitUnfolder6ConversionError of TwoOrbitUf6Dto.TwoOrbitUf6DtoError
 
-    let toMsuf6Dto (msuf6: msuf6) : msuf6Dto =
+    let fromDomain (msuf6: msuf6) : msuf6Dto =
         { id = %msuf6.Id
           sortingWidth = %msuf6.SortingWidth
           twoOrbitUf6Dtos = msuf6.TwoOrbitUnfolder6s |> Array.map TwoOrbitUf6Dto.fromDomain }
 
-    let fromMsuf6Dto (dto: msuf6Dto) : Result<msuf6, Msuf6DtoError> =
+    let toDomain (dto: msuf6Dto) : Result<msuf6, Msuf6DtoError> =
         let twoOrbitUnfolder6sResult = 
             dto.twoOrbitUf6Dtos 
             |> Array.map TwoOrbitUf6Dto.toDomain

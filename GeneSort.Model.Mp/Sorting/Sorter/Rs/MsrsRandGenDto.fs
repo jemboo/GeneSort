@@ -20,12 +20,12 @@ module MsrsRandGenDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toMsrsRandGenDto (msrsRandGen: msrsRandGen) : msrsRandGenDto =
+    let fromDomain (msrsRandGen: msrsRandGen) : msrsRandGenDto =
         { SortingWidth = %msrsRandGen.SortingWidth
           RngType = msrsRandGen.RngType
           OpsGenRatesArray = OpsGenRatesArrayDto.fromDomain msrsRandGen.OpsGenRatesArray }
 
-    let fromMsrsRandGenDto (dto: msrsRandGenDto) : msrsRandGen =
+    let toDomain (dto: msrsRandGenDto) : msrsRandGen =
         try
             if dto.SortingWidth < 2 then
                 failwith $"SortingWidth must be at least 2, got {dto.SortingWidth}"

@@ -18,14 +18,14 @@ module MsceRandMutateDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
     
-    let toMsceRandMutateDto (msceRandMutate: msceRandMutate) : msceRandMutateDto =
-        { Msce = MsceDto.toMsceDto msceRandMutate.Msce
+    let fromDomain (msceRandMutate: msceRandMutate) : msceRandMutateDto =
+        { Msce = MsceDto.fromDomain msceRandMutate.Msce
           RngType = msceRandMutate.RngType
           IndelRatesArray = IndelRatesArrayDto.fromDomain msceRandMutate.IndelRatesArray
           ExcludeSelfCe = msceRandMutate.ExcludeSelfCe }
     
-    let fromMsceRandMutateDto (dto: msceRandMutateDto) : msceRandMutate =
-        match MsceDto.toMsce dto.Msce with
+    let toDomain (dto: msceRandMutateDto) : msceRandMutate =
+        match MsceDto.toDomain dto.Msce with
         | Ok msce ->
             let indelRatesArray = IndelRatesArrayDto.toDomain dto.IndelRatesArray
         

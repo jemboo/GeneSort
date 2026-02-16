@@ -31,24 +31,24 @@ module MsSplitPairsDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toMsSplitPairsDto (model: msSplitPairs) : msSplitPairsDto =
+    let fromDomain (model: msSplitPairs) : msSplitPairsDto =
         {
             Id = %model.Id
             SortingWidth = %model.SortingWidth
-            FirstPrefix = SorterModelDto.toSorterModelDto model.FirstPrefix
-            FirstSuffix = SorterModelDto.toSorterModelDto model.FirstSuffix
-            SecondPrefix = SorterModelDto.toSorterModelDto model.SecondPrefix
-            SecondSuffix = SorterModelDto.toSorterModelDto model.SecondSuffix
+            FirstPrefix = SorterModelDto.fromDomain model.FirstPrefix
+            FirstSuffix = SorterModelDto.fromDomain model.FirstSuffix
+            SecondPrefix = SorterModelDto.fromDomain model.SecondPrefix
+            SecondSuffix = SorterModelDto.fromDomain model.SecondSuffix
         }
 
-    let fromMsSplitPairsDto (dto: msSplitPairsDto) : msSplitPairs =
+    let toDomain (dto: msSplitPairsDto) : msSplitPairs =
         try
             msSplitPairs.create
                 (UMX.tag<sorterModelID> dto.Id)
                 (UMX.tag<sortingWidth> dto.SortingWidth)
-                (SorterModelDto.fromSorterModelDto dto.FirstPrefix)
-                (SorterModelDto.fromSorterModelDto dto.FirstSuffix)
-                (SorterModelDto.fromSorterModelDto dto.SecondPrefix)
-                (SorterModelDto.fromSorterModelDto dto.SecondSuffix)
+                (SorterModelDto.toDomain dto.FirstPrefix)
+                (SorterModelDto.toDomain dto.FirstSuffix)
+                (SorterModelDto.toDomain dto.SecondPrefix)
+                (SorterModelDto.toDomain dto.SecondSuffix)
         with
         | ex -> failwith $"Failed to convert MsSplitPairsDto: {ex.Message}"

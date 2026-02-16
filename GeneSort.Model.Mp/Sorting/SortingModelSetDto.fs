@@ -21,7 +21,7 @@ module SortingModelSetDto =
             failwith "SorterModels array cannot be null or empty"
         let sorterModels = 
             dto.sortingModelDtos 
-            |> Array.map SortingModelDto.fromSortingModelDto
+            |> Array.map SortingModelDto.toDomain
         sortingModelSet.create
                 (UMX.tag<sortingModelSetID> dto.Id)
                 (sorterModels)
@@ -30,7 +30,7 @@ module SortingModelSetDto =
     let fromDomain (domain: sortingModelSet) : sortingModelSetDto =
         { 
             Id = %domain.Id
-            sortingModelDtos = domain.SortingModels |> Array.map SortingModelDto.toSortingModelDto 
+            sortingModelDtos = domain.SortingModels |> Array.map SortingModelDto.fromDomain 
         }
 
 

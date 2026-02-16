@@ -21,14 +21,14 @@ module MsrsRandMutateDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toMsrsRandMutateDto (msrsRandMutate: msrsRandMutate) : msrsRandMutateDto =
-        { msrsDto = MsrsDto.toMsrsDto msrsRandMutate.Msrs
+    let fromDomain (msrsRandMutate: msrsRandMutate) : msrsRandMutateDto =
+        { msrsDto = MsrsDto.fromDomain msrsRandMutate.Msrs
           rngType = msrsRandMutate.RngType
           opsActionRatesArray = OpsActionRatesArrayDto.fromDomain msrsRandMutate.OpsActionRates }
 
-    let fromMsrsRandMutateDto (dto: msrsRandMutateDto) : msrsRandMutate =
+    let toDomain (dto: msrsRandMutateDto) : msrsRandMutate =
         try
-            let msrsResult = MsrsDto.toMsrs dto.msrsDto
+            let msrsResult = MsrsDto.toDomain dto.msrsDto
             match msrsResult with
             | Ok msrs ->
                 if %msrs.StageLength <> dto.opsActionRatesArray.Rates.Length then

@@ -21,17 +21,17 @@ module Msuf6RandMutateDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toMsuf6RandMutateDto (msuf6RandMutate: msuf6RandMutate) : msuf6RandMutateDto =
+    let fromDomain (msuf6RandMutate: msuf6RandMutate) : msuf6RandMutateDto =
         { id = %msuf6RandMutate.Id
           rngType = msuf6RandMutate.RngType
-          msuf6Dto = Msuf6Dto.toMsuf6Dto msuf6RandMutate.Msuf6
+          msuf6Dto = Msuf6Dto.fromDomain msuf6RandMutate.Msuf6
           uf6MutationRatesArray = Uf6MutationRatesArrayDto.fromDomain msuf6RandMutate.Uf6MutationRatesArray }
 
-    let fromMsuf6RandMutateDto (dto: msuf6RandMutateDto) : msuf6RandMutate =
+    let toDomain (dto: msuf6RandMutateDto) : msuf6RandMutate =
         try
             if dto.rngType = Unchecked.defaultof<rngType> then
                 failwith "rngType must be specified"
-            let msuf6 = Msuf6Dto.fromMsuf6Dto dto.msuf6Dto |> Result.toOption |> Option.get
+            let msuf6 = Msuf6Dto.toDomain dto.msuf6Dto |> Result.toOption |> Option.get
             let uf6MutationRatesArray = Uf6MutationRatesArrayDto.toDomain dto.uf6MutationRatesArray
 
             msuf6RandMutate.create dto.rngType msuf6 uf6MutationRatesArray

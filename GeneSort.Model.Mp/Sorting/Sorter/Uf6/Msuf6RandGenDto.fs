@@ -23,14 +23,14 @@ module Msuf6RandGenDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toMsuf6RandGenDto (msuf6RandGen: msuf6RandGen) : msuf6RandGenDto =
+    let fromDomain (msuf6RandGen: msuf6RandGen) : msuf6RandGenDto =
         { id = %msuf6RandGen.Id
           rngType = msuf6RandGen.RngType
           sortingWidth = %msuf6RandGen.SortingWidth
           stageLength = %msuf6RandGen.StageLength
           uf6GenRatesArrayDto = Uf6GenRatesArrayDto.fromDomain msuf6RandGen.GenRates }
 
-    let fromMsuf6RandGenDto (dto: msuf6RandGenDto) : msuf6RandGen =
+    let toDomain (dto: msuf6RandGenDto) : msuf6RandGen =
         try
             if dto.sortingWidth < 6 || dto.sortingWidth % 6 <> 0 then
                 failwith $"SortingWidth must be at least 6 and divisible by 6, got {dto.sortingWidth}"

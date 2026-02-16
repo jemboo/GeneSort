@@ -37,12 +37,12 @@ module MsrsDto =
         | MismatchedPermRsOrder of string
         | PermRsConversionError of Perm_RsDto.Perm_RsDtoError
 
-    let toMsrsDto (msrs: msrs) : msrsDto =
+    let fromDomain (msrs: msrs) : msrsDto =
         { Id = %msrs.Id
           Width = %msrs.SortingWidth
           Perm_Rss = msrs.Perm_Rss |> Array.map Perm_RsDto.toPerm_RsDto }
 
-    let toMsrs (dto: msrsDto) : Result<msrs, MsrsDtoError> =
+    let toDomain (dto: msrsDto) : Result<msrs, MsrsDtoError> =
         let permRssResult = 
             dto.Perm_Rss 
             |> Array.map Perm_RsDto.toPerm_Rs

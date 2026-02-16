@@ -17,15 +17,15 @@ module SorterPairModelDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toSorterPairModelDto (model: sorterPairModel) : sorterPairModelDto =
+    let fromDomain (model: sorterPairModel) : sorterPairModelDto =
         match model with
-        | sorterPairModel.SplitPairs sp -> SplitPairs (MsSplitPairsDto.toMsSplitPairsDto sp)
-        | sorterPairModel.SplitPairs2 sp -> SplitPairs2 (MsSplitPairsDto.toMsSplitPairsDto sp)
+        | sorterPairModel.SplitPairs sp -> SplitPairs (MsSplitPairsDto.fromDomain sp)
+        | sorterPairModel.SplitPairs2 sp -> SplitPairs2 (MsSplitPairsDto.fromDomain sp)
 
-    let fromSorterPairModelDto (dto: sorterPairModelDto) : sorterPairModel =
+    let toDomain (dto: sorterPairModelDto) : sorterPairModel =
         try
             match dto with
-            | SplitPairs spDto -> sorterPairModel.SplitPairs (MsSplitPairsDto.fromMsSplitPairsDto spDto)
-            | SplitPairs2 spDto -> sorterPairModel.SplitPairs2 (MsSplitPairsDto.fromMsSplitPairsDto spDto)
+            | SplitPairs spDto -> sorterPairModel.SplitPairs (MsSplitPairsDto.toDomain spDto)
+            | SplitPairs2 spDto -> sorterPairModel.SplitPairs2 (MsSplitPairsDto.toDomain spDto)
         with
         | ex -> failwith $"Failed to convert SorterPairModelDto: {ex.Message}"

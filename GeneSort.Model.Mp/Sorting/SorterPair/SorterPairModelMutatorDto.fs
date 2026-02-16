@@ -17,16 +17,16 @@ module SorterPairModelMutatorDto =
     let fromDomain (sorterPairModelMutator: sorterPairModelMutator) : sorterPairModelMutatorDto =
         match sorterPairModelMutator with
         | sorterPairModelMutator.SplitPairs msSplitPairsGen ->
-            SplitPairs (MsSplitPairsMutateDto.toMsSplitPairsGenDto msSplitPairsGen)
+            SplitPairs (MsSplitPairsMutateDto.fromDomain msSplitPairsGen)
         | sorterPairModelMutator.SplitPairs2 msSplitPairsGen ->
-            SplitPairs2 (MsSplitPairsMutateDto.toMsSplitPairsGenDto msSplitPairsGen)
+            SplitPairs2 (MsSplitPairsMutateDto.fromDomain msSplitPairsGen)
 
     let toDomain (dto: sorterPairModelMutatorDto) : sorterPairModelMutator =
         try
             match dto with
             | SplitPairs msSplitPairsMutateDto ->
-                sorterPairModelMutator.SplitPairs (MsSplitPairsMutateDto.fromMsSplitPairsGenDto msSplitPairsMutateDto)
+                sorterPairModelMutator.SplitPairs (MsSplitPairsMutateDto.toDomain msSplitPairsMutateDto)
             | SplitPairs2 msSplitPairsMutateDto ->
-                sorterPairModelMutator.SplitPairs2 (MsSplitPairsMutateDto.fromMsSplitPairsGenDto msSplitPairsMutateDto)
+                sorterPairModelMutator.SplitPairs2 (MsSplitPairsMutateDto.toDomain msSplitPairsMutateDto)
         with
         | ex -> failwith $"Failed to convert sorterPairModelMakerDto: {ex.Message}"

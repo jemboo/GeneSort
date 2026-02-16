@@ -23,14 +23,14 @@ module Msuf4RandGenDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toMsuf4RandGenDto (msuf4RandGen: msuf4RandGen) : msuf4RandGenDto =
+    let fromDomain (msuf4RandGen: msuf4RandGen) : msuf4RandGenDto =
         { id = %msuf4RandGen.Id
           rngType = msuf4RandGen.RngType
           sortingWidth = %msuf4RandGen.SortingWidth
           stageLength = %msuf4RandGen.StageLength
           uf4GenRatesArrayDto = Uf4GenRatesArrayDto.fromDomain msuf4RandGen.GenRates }
 
-    let fromMsuf4RandGenDto (dto: msuf4RandGenDto) : msuf4RandGen =
+    let toDomain (dto: msuf4RandGenDto) : msuf4RandGen =
         try
             if dto.sortingWidth < 1 then
                 failwith $"SortingWidth must be at least 1, got {dto.sortingWidth}"

@@ -29,31 +29,32 @@ module SorterModelMakerDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let toSorterModelMakerDto (sorterModelMaker: sorterModelMaker) : sorterModelMakerDto =
+    let fromDomain (sorterModelMaker: sorterModelMaker) : sorterModelMakerDto =
         match sorterModelMaker with
         | sorterModelMaker.SmmMsceRandGen msceRandGen ->
-            MsceRandGen (MsceRandGenDto.toMsceRandGenDto msceRandGen)
+            MsceRandGen (MsceRandGenDto.fromDomain msceRandGen)
         | sorterModelMaker.SmmMssiRandGen mssiRandGen ->
-            MssiRandGen (MssiRandGenDto.toMssiRandGenDto mssiRandGen)
+            MssiRandGen (MssiRandGenDto.fromDomain mssiRandGen)
         | sorterModelMaker.SmmMsrsRandGen msrsRandGen ->
-            MsrsRandGen (MsrsRandGenDto.toMsrsRandGenDto msrsRandGen)
+            MsrsRandGen (MsrsRandGenDto.fromDomain msrsRandGen)
         | sorterModelMaker.SmmMsuf4RandGen msuf4RandGen ->
-            Msuf4RandGen (Msuf4RandGenDto.toMsuf4RandGenDto msuf4RandGen)
+            Msuf4RandGen (Msuf4RandGenDto.fromDomain msuf4RandGen)
         | sorterModelMaker.SmmMsuf6RandGen msuf6RandGen ->
-            Msuf6RandGen (Msuf6RandGenDto.toMsuf6RandGenDto msuf6RandGen)
+            Msuf6RandGen (Msuf6RandGenDto.fromDomain msuf6RandGen)
 
-    let fromSorterModelMakerDto (dto: sorterModelMakerDto) : sorterModelMaker =
+
+    let toDomain (dto: sorterModelMakerDto) : sorterModelMaker =
         try
             match dto with
             | MsceRandGen msceRandGenDto ->
-                sorterModelMaker.SmmMsceRandGen (MsceRandGenDto.fromMsceRandGenDto msceRandGenDto)
+                sorterModelMaker.SmmMsceRandGen (MsceRandGenDto.toDomain msceRandGenDto)
             | MssiRandGen mssiRandGenDto ->
-                sorterModelMaker.SmmMssiRandGen (MssiRandGenDto.fromMssiRandGenDto mssiRandGenDto |> Result.toOption |> Option.get )
+                sorterModelMaker.SmmMssiRandGen (MssiRandGenDto.toDomain mssiRandGenDto |> Result.toOption |> Option.get )
             | MsrsRandGen msrsRandGenDto ->
-                sorterModelMaker.SmmMsrsRandGen (MsrsRandGenDto.fromMsrsRandGenDto msrsRandGenDto)
+                sorterModelMaker.SmmMsrsRandGen (MsrsRandGenDto.toDomain msrsRandGenDto)
             | Msuf4RandGen msuf4RandGenDto ->
-                sorterModelMaker.SmmMsuf4RandGen (Msuf4RandGenDto.fromMsuf4RandGenDto msuf4RandGenDto)
+                sorterModelMaker.SmmMsuf4RandGen (Msuf4RandGenDto.toDomain msuf4RandGenDto)
             | Msuf6RandGen msuf6RandGenDto ->
-                sorterModelMaker.SmmMsuf6RandGen (Msuf6RandGenDto.fromMsuf6RandGenDto msuf6RandGenDto)
+                sorterModelMaker.SmmMsuf6RandGen (Msuf6RandGenDto.toDomain msuf6RandGenDto)
         with
         | ex -> failwith $"Failed to convert SorterModelMakerDto: {ex.Message}"
