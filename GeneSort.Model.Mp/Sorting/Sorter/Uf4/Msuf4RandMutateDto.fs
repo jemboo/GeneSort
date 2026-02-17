@@ -36,6 +36,6 @@ module Msuf4RandMutateDto =
             if uf4MutationRatesArray.Length <> %msuf4.StageLength then
                 failwith $"Uf4MutationRatesArray length ({uf4MutationRatesArray.Length}) must equal StageLength ({%msuf4.StageLength})"
 
-            msuf4RandMutate.create dto.rngType msuf4 uf4MutationRatesArray
+            msuf4RandMutate.create dto.rngType uf4MutationRatesArray msuf4
         with
         | ex -> failwith $"Failed to convert Msuf4RandMutateDto: {ex.Message}"

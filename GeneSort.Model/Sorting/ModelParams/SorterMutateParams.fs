@@ -1,7 +1,9 @@
 ﻿namespace GeneSort.Model.Sorting.ModelParams
 
+open System
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Sorting
 open GeneSort.Model.Sorting.Sorter.Ce
 open GeneSort.Model.Sorting.Sorter.Si
 open GeneSort.Model.Sorting.Sorter.Rs
@@ -13,17 +15,14 @@ open GeneSort.Model.Sorting
 type mcseRandMutateParams = 
     private 
         { 
-          msce : msce
           rngType: rngType
           indelRatesArray: indelRatesArray
           excludeSelfCe: bool }
     static member create
-            (msce : msce)
             (rngType: rngType)
             (indelRatesArray: indelRatesArray)
             (excludeSelfCe: bool): mcseRandMutateParams = 
         {
-            msce = msce;
             rngType = rngType
             indelRatesArray = indelRatesArray
             excludeSelfCe = excludeSelfCe
@@ -37,16 +36,13 @@ type mcseRandMutateParams =
 type mssiRandMutateParams = 
     private 
         { 
-          mssi : mssi
           rngType: rngType
           opActionRatesArray: opActionRatesArray
          }
     static member create
-            (mssi: mssi)
             (rngType: rngType)
             (opActionRatesArray: opActionRatesArray): mssiRandMutateParams = 
         {
-            mssi = mssi
             rngType = rngType
             opActionRatesArray = opActionRatesArray
         }
@@ -58,16 +54,13 @@ type mssiRandMutateParams =
 type msrsRandMutateParams = 
     private 
         { 
-          msrs : msrs
           rngType: rngType
           opsActionRatesArray: opsActionRatesArray
          }
     static member create
-            (msrs: msrs)
             (rngType: rngType)
             (opsActionRatesArray: opsActionRatesArray): msrsRandMutateParams = 
         {
-            msrs = msrs
             rngType = rngType
             opsActionRatesArray = opsActionRatesArray
         }
@@ -79,16 +72,13 @@ type msrsRandMutateParams =
 type msuf4RandMutateParams = 
     private 
         {
-          msuf4 : msuf4
           rngType: rngType
           uf4MutationRatesArray: uf4MutationRatesArray
          }
     static member create
-            (msuf4 : msuf4)
             (rngType: rngType)
             (uf4MutationRatesArray: uf4MutationRatesArray): msuf4RandMutateParams = 
         {
-            msuf4 = msuf4
             rngType = rngType
             uf4MutationRatesArray = uf4MutationRatesArray
         }
@@ -100,16 +90,13 @@ type msuf4RandMutateParams =
 type msuf6RandMutateParams = 
     private 
         {
-          msuf6 : msuf6
           uf6MutationRatesArray: uf6MutationRatesArray
           rngType: rngType
          }
     static member create
-            (msuf6 : msuf6)
             (rngType: rngType)
             (uf6MutationRatesArray: uf6MutationRatesArray): msuf6RandMutateParams = 
         {
-            msuf6 = msuf6
             rngType = rngType
             uf6MutationRatesArray = uf6MutationRatesArray
         }
@@ -129,7 +116,7 @@ type sorterMutateParams =
 module SorterMutateParams = 
 
     let makeUniformMsceMutator 
-                (msce: msce)
+                (ceLength: int<ceLength>)
                 (mutationRate: float<mutationRate>)
                 (insertionRate: float<mutationRate>)
                 (deletionRate: float<mutationRate>)
@@ -137,68 +124,146 @@ module SorterMutateParams =
                 (excludeSelfCe: bool option) : sorterMutateParams =
 
         let indelRates = indelRates.create (%mutationRate, %insertionRate, %deletionRate)
-        let indelRatesArray = IndelRatesArray.createUniform %msce.CeLength indelRates
-        let mcseParams = mcseRandMutateParams.create msce rngType indelRatesArray (excludeSelfCe |> Option.defaultValue true)
+        let indelRatesArray = IndelRatesArray.createUniform %ceLength indelRates
+        let mcseParams = mcseRandMutateParams.create rngType indelRatesArray (excludeSelfCe |> Option.defaultValue true)
         McseRandMutateParams mcseParams
 
 
     let makeUniformMssiMutator 
-                (mssi: mssi)
+                (stageLength: int<stageLength>)
                 (orthoRate: float<mutationRate>)
                 (paraRate: float<mutationRate>)
                 (rngType: rngType) : sorterMutateParams =
-                let opActionRatesArray = OpActionRatesArray.createUniform %mssi.StageLength %orthoRate %paraRate
-                let mssiParams = mssiRandMutateParams.create mssi rngType opActionRatesArray
+                let opActionRatesArray = OpActionRatesArray.createUniform %stageLength %orthoRate %paraRate
+                let mssiParams = mssiRandMutateParams.create rngType opActionRatesArray
                 MssiRandMutateParams mssiParams
 
 
     let makeUniformMsrsMutator 
-                (msrs: msrs)
+                (stageLength: int<stageLength>)
                 (orthoRate: float<mutationRate>)
                 (paraRate: float<mutationRate>)
                 (selfSymRate: float<mutationRate>)
                 (rngType: rngType) : sorterMutateParams =
-                let opsActionRatesArray = OpsActionRatesArray.createUniform %msrs.StageLength %orthoRate %paraRate %selfSymRate
-                let msrsParams = msrsRandMutateParams.create msrs rngType opsActionRatesArray
+                let opsActionRatesArray = OpsActionRatesArray.createUniform %stageLength %orthoRate %paraRate %selfSymRate
+                let msrsParams = msrsRandMutateParams.create rngType opsActionRatesArray
                 MsrsRandMutateParams msrsParams
 
     let makeUniformMsuf4Mutator 
-                (msuf4: msuf4)
+                (stageLength: int<stageLength>)
+                (sortingWidth: int<sortingWidth>)
                 (perm_RsMutationRate: float<mutationRate>)
                 (twoOrbitMutationRate: float<mutationRate>)
                 (rngType: rngType) : sorterMutateParams =
-                let uf4MutationRates = Uf4MutationRates.makeUniform %msuf4.SortingWidth %perm_RsMutationRate %twoOrbitMutationRate
-                let uf4MutationRatesArray = Uf4MutationRatesArray.createUniform %msuf4.StageLength %msuf4.SortingWidth uf4MutationRates
-                let msuf4Params = msuf4RandMutateParams.create msuf4 rngType uf4MutationRatesArray
+                let uf4MutationRates = Uf4MutationRates.makeUniform %sortingWidth %perm_RsMutationRate %twoOrbitMutationRate
+                let uf4MutationRatesArray = Uf4MutationRatesArray.createUniform %stageLength %sortingWidth uf4MutationRates
+                let msuf4Params = msuf4RandMutateParams.create rngType uf4MutationRatesArray
                 Msuf4RandMutateParams msuf4Params
 
     //let makeUniformMsuf6Mutator 
-    //            (msuf6: msuf6)
+    //            (stageLength: int<stageLength>)
     //            (mutationRate: float<mutationRate>)
     //            (rngType: rngType) : sorterMutateParams =
     //            let uf6MutationRates = uf6MutationRates.create %mutationRate
-    //            let uf6MutationRatesArray = Uf6MutationRatesArray.createUniform %msuf6.StageLength uf6MutationRates
-    //            let msuf6Params = msuf6RandMutateParams.create msuf6 rngType uf6MutationRatesArray
+    //            let uf6MutationRatesArray = Uf6MutationRatesArray.createUniform %stageLength uf6MutationRates
+    //            let msuf6Params = msuf6RandMutateParams.create rngType uf6MutationRatesArray
     //            Msuf6RandMutateParams msuf6Params
 
 
-    let makeSorterModelMutator 
-                (sorterModelMutateParams: sorterMutateParams) : sorterModelMutator = 
-        match sorterModelMutateParams with
-        | McseRandMutateParams prams -> 
-            msceRandMutate.create prams.RngType prams.IndelRatesArray prams.ExcludeSelfCe prams.msce 
-            |> sorterModelMutator.SmmMsceRandMutate
-        | MssiRandMutateParams prams -> 
-            mssiRandMutate.create prams.RngType prams.OpActionRatesArray prams.mssi
-            |> sorterModelMutator.SmmMssiRandMutate
-        | MsrsRandMutateParams prams -> 
-            msrsRandMutate.create prams.RngType prams.OpsActionRatesArray prams.msrs
-            |> sorterModelMutator.SmmMsrsRandMutate
-        | Msuf4RandMutateParams prams -> 
-            msuf4RandMutate.create prams.RngType prams.Uf4MutationRatesArray prams.msuf4
-            |> sorterModelMutator.SmmMsuf4RandMutate
-        | Msuf6RandMutateParams prams -> 
-            msuf6RandMutate.create prams.RngType prams.Uf6MutationRatesArray prams.msuf6
-            |> sorterModelMutator.SmmMsuf6RandMutate
+    let makeSortingModelMutatorFromSorterModel
+                (sorterModel: sorterModel)
+                (sorterModelMutateParams: sorterMutateParams) : sortingModelMutator = 
+        match sorterModel, sorterModelMutateParams with
+        | Msce msce, McseRandMutateParams prams -> 
+            // Validate that ceLength matches indelRatesArray length
+            if %msce.CeLength <> prams.IndelRatesArray.Length then
+                failwith (sprintf "Msce ceLength (%d) must match IndelRatesArray length (%d)" 
+                            %msce.CeLength prams.IndelRatesArray.Length)
+            msceRandMutate.create prams.RngType prams.IndelRatesArray prams.ExcludeSelfCe msce 
+            |> sorterModelMutator.SmmMsceRandMutate |> sortingModelMutator.Single
+        
+        | Mssi mssi, MssiRandMutateParams prams -> 
+            // Validate that stageLength matches opActionRatesArray length
+            if %mssi.StageLength <> prams.OpActionRatesArray.Length then
+                failwith (sprintf "Mssi stageLength (%d) must match OpActionRatesArray length (%d)" 
+                            %mssi.StageLength prams.OpActionRatesArray.Length)
+            mssiRandMutate.create prams.RngType prams.OpActionRatesArray mssi
+            |> sorterModelMutator.SmmMssiRandMutate |> sortingModelMutator.Single
+        
+        | Msrs msrs, MsrsRandMutateParams prams -> 
+            // Validate that stageLength matches opsActionRatesArray length
+            if %msrs.StageLength <> prams.OpsActionRatesArray.Length then
+                failwith (sprintf "Msrs stageLength (%d) must match OpsActionRatesArray length (%d)" 
+                            %msrs.StageLength prams.OpsActionRatesArray.Length)
+            msrsRandMutate.create prams.RngType prams.OpsActionRatesArray msrs
+            |> sorterModelMutator.SmmMsrsRandMutate |> sortingModelMutator.Single
+        
+        | Msuf4 msuf4, Msuf4RandMutateParams prams -> 
+            // Validate that stageLength matches uf4MutationRatesArray length
+            if %msuf4.StageLength <> prams.Uf4MutationRatesArray.Length then
+                failwith (sprintf "Msuf4 stageLength (%d) must match Uf4MutationRatesArray length (%d)" 
+                            %msuf4.StageLength prams.Uf4MutationRatesArray.Length)
+            // Validate that sortingWidth matches (if Uf4MutationRatesArray has a width property)
+            // Assuming Uf4MutationRatesArray has a way to get sortingWidth, add check here if needed
+            msuf4RandMutate.create prams.RngType prams.Uf4MutationRatesArray msuf4
+            |> sorterModelMutator.SmmMsuf4RandMutate |> sortingModelMutator.Single
+        
+        | Msuf6 msuf6, Msuf6RandMutateParams prams -> 
+            // Validate that stageLength matches uf6MutationRatesArray length
+            if %msuf6.StageLength <> prams.Uf6MutationRatesArray.Length then
+                failwith (sprintf "Msuf6 stageLength (%d) must match Uf6MutationRatesArray length (%d)" 
+                            %msuf6.StageLength prams.Uf6MutationRatesArray.Length)
+            msuf6RandMutate.create prams.RngType prams.Uf6MutationRatesArray msuf6
+            |> sorterModelMutator.SmmMsuf6RandMutate |> sortingModelMutator.Single
+        
+        | _ -> failwith "Mismatched sorterModel and sorterMutateParams types"
+
+
+
+    let makeSortingModelSetMutatorFromSorterModel
+                (sorterModel: sorterModel)
+                (sorterModelMutateParams: sorterMutateParams) 
+                (firstIndex: int<sorterCount>) 
+                (count: int<sorterCount>) : sortingModelSetMutator =
+    
+        let sortingModelMutator = 
+            makeSortingModelMutatorFromSorterModel sorterModel sorterModelMutateParams
+    
+        sortingModelSetMutator.create sortingModelMutator firstIndex count
+
+
+    // Creates an array of sortingModelSets of size sortingModelSet.Count, each of which contains (count) mutated sortingModels. 
+    let mutateSortingModelSetWithSorterMutateParams
+                (rngFactory: rngType -> Guid -> IRando)
+                (sms: sortingModelSet)
+                (sorterModelMutateParams: sorterMutateParams) 
+                (firstIndex: int<sorterCount>) 
+                (count: int<sorterCount>) : sortingModelSet[] =
+    
+        if %count <= 0 then
+            failwith "Count must be greater than 0"
+        if %firstIndex < 0 then
+            failwith "FirstIndex must be non-negative"
+    
+        // For each sortingModel in the input set, create a sortingModelSet of mutations
+        sms.SortingModels
+        |> Array.map (fun sortingModel ->
+            match sortingModel with
+            | sortingModel.Single sorterModel ->
+                // Create a mutator for this specific sorterModel
+                let mutator = 
+                    makeSortingModelSetMutatorFromSorterModel 
+                        sorterModel 
+                        sorterModelMutateParams
+                        firstIndex 
+                        count
+            
+                // Generate the mutated models using the rngFactory
+                mutator.MakeSortingModelSet rngFactory
+            
+            | sortingModel.Pair _ ->
+                failwith "Mutation of Pair sortingModels not yet supported"
+        )
+
 
 

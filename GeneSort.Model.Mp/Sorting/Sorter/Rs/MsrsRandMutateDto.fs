@@ -35,8 +35,8 @@ module MsrsRandMutateDto =
                     failwith $"StageLength ({%msrs.StageLength}) must match OpsActionRatesArray length ({dto.opsActionRatesArray.Rates.Length})"
                 msrsRandMutate.create
                     (dto.rngType)
-                    msrs
                     (OpsActionRatesArrayDto.toDomain dto.opsActionRatesArray)
+                    msrs
             | Error err ->
                 let msg = match err with
                           | MsrsDto.NullPermRssArray m -> m

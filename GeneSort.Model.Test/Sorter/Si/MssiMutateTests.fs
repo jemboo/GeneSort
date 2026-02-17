@@ -30,7 +30,7 @@ type MssiRandMutateTests() =
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
         let siMutationRates = opActionRates.create (0.0, 0.0)
         let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
-        let modelSiMutate = mssiRandMutate.create rngType.Lcg modelSi arrayToMutate
+        let modelSiMutate = mssiRandMutate.create rngType.Lcg arrayToMutate modelSi
 
         let mock = randoGen [0; 1] [0.5] // Ensures NoAction (within NoActionRate)
         let result = modelSiMutate.MakeSorterModel mock 0
@@ -44,7 +44,7 @@ type MssiRandMutateTests() =
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
         let siMutationRates = opActionRates.create (0.9, 0.0)
         let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
-        let modelSiMutate = mssiRandMutate.create rngType.Lcg modelSi arrayToMutate
+        let modelSiMutate = mssiRandMutate.create rngType.Lcg arrayToMutate modelSi
 
         let mock = randoGen [0; 2] [0.0] // Picks indices 0, 2 and Ortho mode
         let result = modelSiMutate.MakeSorterModel mock 0
@@ -60,7 +60,7 @@ type MssiRandMutateTests() =
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
         let siMutationRates = opActionRates.create (0.0, 1.0)
         let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
-        let modelSiMutate = mssiRandMutate.create rngType.Lcg modelSi arrayToMutate
+        let modelSiMutate = mssiRandMutate.create rngType.Lcg arrayToMutate modelSi
 
         let mock = randoGen [0; 2] [0.5] // Picks indices 0, 2 and Para mode
         let result = modelSiMutate.MakeSorterModel mock 0
@@ -77,7 +77,7 @@ type MssiRandMutateTests() =
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi1; permSi2|]
         let siMutationRates = opActionRates.create (0.5, 0.5)
         let arrayToMutate = opActionRatesArray.create [|siMutationRates; siMutationRates|]
-        let modelSiMutate = mssiRandMutate.create rngType.Lcg modelSi arrayToMutate
+        let modelSiMutate = mssiRandMutate.create rngType.Lcg arrayToMutate modelSi
 
         let mock = randoGen [0; 2; 0; 2] [0.0; 0.0] // Ortho mode
         let result = modelSiMutate.MakeSorterModel mock 0
@@ -91,7 +91,7 @@ type MssiRandMutateTests() =
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
         let siMutationRates = opActionRates.create (0.0, 0.0)
         let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
-        let modelSiMutate = mssiRandMutate.create rngType.Lcg modelSi arrayToMutate
+        let modelSiMutate = mssiRandMutate.create rngType.Lcg arrayToMutate modelSi
 
         let mock = randoGen [0; 1] [0.5]
         let result = modelSiMutate.MakeSorterModel mock 0
@@ -106,7 +106,7 @@ type MssiRandMutateTests() =
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi1; permSi2|]
         let siMutationRates = opActionRates.create (1.0, 0.0)
         let arrayToMutate = opActionRatesArray.create [|siMutationRates; siMutationRates|]
-        let modelSiMutate = mssiRandMutate.create rngType.Lcg modelSi arrayToMutate
+        let modelSiMutate = mssiRandMutate.create rngType.Lcg arrayToMutate modelSi
 
         let mock = randoGen [0; 2; 0; 2] [0.0; 0.0] // Ortho mode, indices 0, 2
         let result = modelSiMutate.MakeSorterModel mock 0
@@ -124,4 +124,4 @@ type MssiRandMutateTests() =
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
         let siMutationRates = opActionRates.create (0.0, 0.0)
         let array = opActionRatesArray.create [|siMutationRates; siMutationRates|] // Length 2
-        Assert.Throws<exn>(fun () -> mssiRandMutate.create rngType.Lcg modelSi array |> ignore)
+        Assert.Throws<exn>(fun () -> mssiRandMutate.create rngType.Lcg array modelSi |> ignore)

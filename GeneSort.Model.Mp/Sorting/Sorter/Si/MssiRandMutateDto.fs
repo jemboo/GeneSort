@@ -35,8 +35,8 @@ module MssiRandMutateDto =
                     let mssiRandMutate = 
                         mssiRandMutate.create
                             (dto.rngType)
-                            mssi
                             (OpActionRatesArrayDto.toDomain dto.opActionRatesArrayDto)
+                            mssi
                     Ok mssiRandMutate
             | Error err ->
                 Error (match err with

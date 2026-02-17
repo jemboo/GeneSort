@@ -34,6 +34,6 @@ module Msuf6RandMutateDto =
             let msuf6 = Msuf6Dto.toDomain dto.msuf6Dto |> Result.toOption |> Option.get
             let uf6MutationRatesArray = Uf6MutationRatesArrayDto.toDomain dto.uf6MutationRatesArray
 
-            msuf6RandMutate.create dto.rngType msuf6 uf6MutationRatesArray
+            msuf6RandMutate.create dto.rngType uf6MutationRatesArray msuf6
         with
         | ex -> failwith $"Failed to convert Msuf6RandMutateDto: {ex.Message}"

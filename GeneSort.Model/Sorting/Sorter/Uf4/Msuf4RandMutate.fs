@@ -43,7 +43,7 @@ type msuf4RandMutate =
             (rates: uf4MutationRates) 
             : msuf4RandMutate =
         let mutationRates = uf4MutationRatesArray.create (Array.create (%msuf4.StageLength) rates)
-        msuf4RandMutate.create rngType msuf4 mutationRates
+        msuf4RandMutate.create rngType mutationRates msuf4
 
     member this.Id with get () = this.id
     member this.CeLength with get () = this.msuf4.CeLength

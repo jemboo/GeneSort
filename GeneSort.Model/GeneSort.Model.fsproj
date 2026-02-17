@@ -37,6 +37,7 @@
     <Compile Include="Sorting\SortingModelMaker.fs" />
     <Compile Include="Sorting\SortingModelMutator.fs" />
     <Compile Include="Sorting\SortingModelSetMaker.fs" />
+    <Compile Include="Sorting\SortingModelSetMutator.fs" />
     <Compile Include="Sorting\ModelParams\SorterModelType.fs" />
     <Compile Include="Sorting\ModelParams\SorterMutateParams.fs" />
     <Compile Include="Sortable\Common.fs" />

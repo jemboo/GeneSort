@@ -27,6 +27,7 @@ type sortingModelSet =
         
         { id = id; sortingModels = modelMap }
     
+    member this.Count with get() = this.sortingModels.Count
     member this.Id with get() = this.id
     member this.SortingModels with get() = this.sortingModels |> Map.toArray |> Array.map snd
 
