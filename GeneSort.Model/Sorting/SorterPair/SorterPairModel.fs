@@ -20,11 +20,15 @@ module SorterPairModel =
         | SplitPairs sp -> sp.Id
         | SplitPairs2 sp -> sp.Id
 
+    let getStageLength (model: sorterPairModel) : int<stageLength> =
+        match model with
+        | SplitPairs sp -> MsSplitPairs.getStageLength sp
+        | SplitPairs2 sp -> MsSplitPairs.getStageLength sp
+
     let makeSorters (model: sorterPairModel) : sorter =
         match model with
         | SplitPairs sp -> failwith "Not implemented"
         | SplitPairs2 sp -> failwith "Not implemented"
-
 
     let getSortingWidth (model: sorterPairModel) : int<sortingWidth> =
         match model with

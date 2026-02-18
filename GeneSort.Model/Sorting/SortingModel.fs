@@ -13,6 +13,16 @@ type sortingModel =
 
 
 module SortingModel =
+
+    let getSortingWidth (model: sortingModel) : int<sortingWidth> =
+        match model with
+        | Single sms -> sms |> SorterModel.getSortingWidth
+        | Pair smp -> smp |> SorterPairModel.getSortingWidth
+
+    let getStageLength (model: sortingModel) : int<stageLength> =
+        match model with
+        | Single sms -> sms |> SorterModel.getStageLength
+        | Pair smp -> smp |> SorterPairModel.getStageLength
     
     let getId (model: sortingModel) : Guid<sortingModelID> =
         match model with

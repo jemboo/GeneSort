@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.ModelParams
+﻿namespace GeneSort.Model.Sorting
 
 
 type sorterModelType = 

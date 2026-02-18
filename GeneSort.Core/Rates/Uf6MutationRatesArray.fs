@@ -81,6 +81,17 @@ module Uf6MutationRatesArray =
                 startRates.SelfReflRates.ParaRate + t * (endRates.SelfReflRates.ParaRate - startRates.SelfReflRates.ParaRate),
                 startRates.SelfReflRates.SelfReflRate + t * (endRates.SelfReflRates.SelfReflRate - startRates.SelfReflRates.SelfReflRate)))
 
+
+
+    let createUniform (length: int) (order: int) (rates: uf6MutationRates) =
+        if length <= 0 then failwith "Length must be positive"
+        if order < 6 || order % 3 <> 0 then failwith "Order must be at least 6 and divisible by 3"
+        if rates.order <> order then failwith "Rates order must match specified order"
+        let ratesArray = Array.init length (fun _ -> rates)
+        uf6MutationRatesArray.create ratesArray
+
+
+
     let createLinearVariation (length: int) (order: int) (startRates: uf6MutationRates) (endRates: uf6MutationRates) : uf6MutationRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if order < 6 || order % 2 <> 0 then failwith "Order must be at least 6 and even"

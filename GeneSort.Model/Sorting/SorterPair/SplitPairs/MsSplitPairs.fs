@@ -72,6 +72,12 @@ type msSplitPairs =
 
 module MsSplitPairs =
     
+    let getCeLength (model: msSplitPairs) : int<ceLength> =
+        (SorterModel.getCeLength model.FirstPrefix) + (SorterModel.getCeLength model.FirstSuffix)
+
+    let getStageLength (model: msSplitPairs) : int<stageLength> =
+        (SorterModel.getStageLength model.FirstPrefix) + (SorterModel.getStageLength model.FirstSuffix)
+
     let getPrefixCeLength (model: msSplitPairs) : int<ceLength> =
         SorterModel.getCeLength model.FirstPrefix
     

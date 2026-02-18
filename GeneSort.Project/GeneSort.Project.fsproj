@@ -17,6 +17,7 @@
     <Compile Include="FullBoolEvals.fs" />
     <Compile Include="SortableMergeTests.fs" />
     <Compile Include="MergeIntEvals.fs" />
+    <Compile Include="FullBoolMutate.fs" />
     <Compile Include="MergeIntQa.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

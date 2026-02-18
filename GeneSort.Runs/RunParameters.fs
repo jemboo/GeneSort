@@ -4,7 +4,7 @@ open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Model.Sorting.ModelParams
+open GeneSort.Model.Sorting
 
 [<Measure>] type projectName
 [<Measure>] type textReportName
@@ -28,6 +28,7 @@ type runParameters =
     static member mergeDimensionKey = "MergeDimension"
     static member mergeSuffixTypeKey = "MergeSuffixType"
     static member messageKey = "Message"
+    static member mutationRateKey = "MutationRate"
     static member projectNameKey = "ProjectName"
     static member replKey = "Repl"
     static member runFinishedKey = "RunFinished"
@@ -50,6 +51,8 @@ type runParameters =
     static member private tryGetBool (key: string) (map: Map<string, string>) =
         map.TryFind key |> Option.bind (fun v -> match Boolean.TryParse v with true, b -> Some b | _ -> None)
 
+    static member private tryGetFloat (key: string) (map: Map<string, string>) =
+        map.TryFind key |> Option.bind (fun v -> match Double.TryParse v with true, f -> Some f | _ -> None)
 
     static member private addOrRemove key valueOpt map =
         match valueOpt with
@@ -68,6 +71,8 @@ type runParameters =
     
     member this.GetMergeSuffixType() = 
         this.paramMap.TryFind runParameters.mergeSuffixTypeKey |> Option.bind (fun v -> try Some (MergeFillType.fromString v) with _ -> None)
+
+    member this.GetMutationRate() = runParameters.tryGetFloat runParameters.mutationRateKey this.paramMap |> Option.map UMX.tag<mutationRate>
     member this.GetProjectName() = this.paramMap.TryFind runParameters.projectNameKey |> Option.map UMX.tag<projectName>
     member this.GetRepl() = runParameters.tryGetInt runParameters.replKey this.paramMap |> Option.map UMX.tag<replNumber>
     member this.GetRunFinished() = runParameters.tryGetBool runParameters.runFinishedKey this.paramMap
@@ -110,6 +115,9 @@ type runParameters =
 
     member this.WithMessage(message: string option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.messageKey message }
+
+    member this.WithMutationRate(mr: float<mutationRate> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mutationRateKey (mr |> Option.map UmxExt.floatToRaw) }
 
     member this.WithProjectName(pn: string<projectName> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.projectNameKey (pn |> Option.map UmxExt.stringToRaw) }

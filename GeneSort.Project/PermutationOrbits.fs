@@ -9,7 +9,7 @@ open GeneSort.Sorting
 open GeneSort.Model.Sortable
 open GeneSort.Runs
 open GeneSort.Db
-open GeneSort.Model.Sorting.ModelParams
+open GeneSort.Model.Sorting
 
 
 module PermutationOrbits = 

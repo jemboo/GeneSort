@@ -12,7 +12,6 @@ open GeneSort.Db
 open GeneSort.SortingOps
 open ProjectOps
 open GeneSort.Model.Sorting
-open GeneSort.Model.Sorting.ModelParams
 
 
 module MergeIntEvals =
@@ -95,7 +94,6 @@ module MergeIntEvals =
         |> Option.bind mergeDimensionDividesSortingWidth
 
 
-    // --- Project Refinement ---
     let enhancer (rp : runParameters) : runParameters =
         let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
 

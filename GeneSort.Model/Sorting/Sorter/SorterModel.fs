@@ -53,3 +53,10 @@ module SorterModel =
         | Msuf4 msuf4 -> msuf4.CeLength
         | Msuf6 msuf6 -> msuf6.CeLength
 
+    let getStageLength (model: sorterModel) : int<stageLength> =
+        match model with
+        | Msce msce -> msce.StageLength
+        | Mssi mssi -> mssi.StageLength
+        | Msrs msrs -> msrs.StageLength
+        | Msuf4 msuf4 -> msuf4.StageLength
+        | Msuf6 msuf6 -> msuf6.StageLength
