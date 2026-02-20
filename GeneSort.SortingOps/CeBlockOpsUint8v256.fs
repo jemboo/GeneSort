@@ -289,7 +289,7 @@ module CeBlockOpsUint8v256 =
         )
 
 
-    let evalAndCollectResults 
+    let evalAndCollectNewSortableTests 
                     (test: sortableUint8v256Test) 
                     (ceBlocks: ceBlock []) =
         evalAndCollectUniqueFailures test.SimdSortBlocks ceBlocks

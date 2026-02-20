@@ -49,7 +49,7 @@ module CeBlockOpsInt =
 
 
 
-    let evalAndCollectResults (sits: sortableIntTest) (ceBlock: ceBlock) =
+    let evalAndCollectNewSortableTests (sits: sortableIntTest) (ceBlock: ceBlock) =
             let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
             let ces = ceBlock.CeArray
             let sw = sits.SortingWidth

@@ -53,7 +53,7 @@ module SorterSetEval =
     let makeSorterSetEval
             (sorterSet: sorterSet)
             (sortableTest: sortableTest) 
-            (collectResults: bool) : sorterSetEval =
+            (collectNewSortableTests: bool) : sorterSetEval =
 
 
         let ceBlockAs = 
@@ -61,7 +61,7 @@ module SorterSetEval =
                 |> Array.map (fun sorter ->
                         ceBlock.create (%sorter.SorterId |> UMX.tag<ceBlockId>) sorter.SortingWidth sorter.Ces )
 
-        let ceBlockEvals : ceBlockEval array = CeBlockOps.evalWithSorterTests sortableTest ceBlockAs collectResults  
+        let ceBlockEvals : ceBlockEval array = CeBlockOps.evalWithSorterTests sortableTest ceBlockAs collectNewSortableTests  
 
         let zipped = Array.zip sorterSet.Sorters ceBlockEvals
 

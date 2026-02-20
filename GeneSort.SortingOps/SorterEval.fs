@@ -26,13 +26,5 @@ type sorterEval =
     member this.SorterId with get() : Guid<sorterId> = this.sorterId
 
 
-module SorterEval =
+module SorterEval = ()
 
-    let makeSorterEval
-            (sorter: sorter)
-            (sortableTests: sortableTest) : sorterEval =
-        let ceBlock = ceBlock.create (%sorter.SorterId |> UMX.tag<ceBlockId>) sorter.SortingWidth sorter.Ces 
-        let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTests ceBlock
-        sorterEval.create
-            sorter.SorterId
-            ceBlockEval

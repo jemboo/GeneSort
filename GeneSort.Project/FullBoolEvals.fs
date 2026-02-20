@@ -184,7 +184,8 @@ module FullBoolEvals =
                 let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataFormat
                 let (sorterSet, _) = sortingModelSet |> SortingModelSet.makeSorterSet
-                let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests false
+                let collectNewSortableTests = false
+                let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests collectNewSortableTests
 
                 // 5. Save Results
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")

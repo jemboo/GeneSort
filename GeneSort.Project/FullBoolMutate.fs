@@ -192,7 +192,8 @@ module FullBoolMutate =
                 let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataFormat
                 let (sorterSetParent, _) = sortingModelSetParent |> SortingModelSet.makeSorterSet
-                let sorterSetEvalParent = SorterSetEval.makeSorterSetEval sorterSetParent sortableTests false
+                let collectNewSortableTests = false
+                let sorterSetEvalParent = SorterSetEval.makeSorterSetEval sorterSetParent sortableTests collectNewSortableTests
 
                 let sorterModelMutateParams = 
                     SorterModelMutateParams.makeUniformMutatorForSorterModel 

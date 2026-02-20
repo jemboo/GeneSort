@@ -49,7 +49,7 @@ module CeBlockOpsBinary =
             ceBlockEval.create ceBlock ceUseCounts (unsortedCount |> UMX.tag<sortableCount>) None
 
 
-    let evalAndCollectResults (sbts: sortableBinaryTest) (ceBlock: ceBlock) :ceBlockEval =
+    let evalAndCollectNewSortableTests (sbts: sortableBinaryTest) (ceBlock: ceBlock) :ceBlockEval =
             let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
             let ces = ceBlock.CeArray
             let sw = sbts.SortingWidth

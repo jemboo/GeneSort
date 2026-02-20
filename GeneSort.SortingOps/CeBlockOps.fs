@@ -44,68 +44,89 @@ module CeBlockOps =
 
     let evalWithSorterTest 
                 (sortableTs: sortableTest) 
-                (ceBlock: ceBlock) : ceBlockEval =
+                (ceBlock: ceBlock) 
+                (collectNewSortableTests: bool) : ceBlockEval =
         match sortableTs with
         | sortableTest.Ints sits ->
-            CeBlockOpsInt.evalAndCollectResults sits ceBlock
+            if collectNewSortableTests then
+                CeBlockOpsInt.evalAndCollectNewSortableTests sits ceBlock
+            else
+                CeBlockOpsInt.evalAndCollectNewSortableTests sits ceBlock
 
         | sortableTest.Bools sbts ->
-            CeBlockOpsBinary.evalAndCollectResults sbts ceBlock
+            if collectNewSortableTests then
+                CeBlockOpsBinary.evalAndCollectNewSortableTests sbts ceBlock
+            else
+                CeBlockOpsBinary.evalAndCollectNewSortableTests sbts ceBlock
 
         | sortableTest.PackedInts packedTs ->
-            CeBlockOpsPacked.evalAndCollectResults packedTs ceBlock
+            if collectNewSortableTests then
+                CeBlockOpsPacked.evalAndCollectNewSortableTests packedTs ceBlock
+            else
+                CeBlockOpsPacked.evalAndCollectNewSortableTests packedTs ceBlock
 
         | sortableTest.Uint8v256 su8v256ts ->
-            CeBlockOpsUint8v256.evalAndCollectResults su8v256ts [| ceBlock |] |> Array.head
+            if collectNewSortableTests then
+                CeBlockOpsUint8v256.evalAndCollectNewSortableTests su8v256ts [| ceBlock |] |> Array.head
+            else
+                CeBlockOpsUint8v256.evalAndCollectNewSortableTests su8v256ts [| ceBlock |] |> Array.head
 
         | sortableTest.Uint8v512 su8by512ts ->
-            CeBlockOpsUint8v512.evalAndCollectResults su8by512ts [| ceBlock |] |> Array.head
+            if collectNewSortableTests then
+                CeBlockOpsUint8v512.evalAndCollectNewSortableTests su8by512ts [| ceBlock |] |> Array.head
+            else
+            CeBlockOpsUint8v512.evalAndCollectNewSortableTests su8by512ts [| ceBlock |] |> Array.head
 
+        | sortableTest.Bitv512 su8v256ts ->
+            if collectNewSortableTests then
+                CeBlockOpsBitv512.evalAndCollectNewSortableTests su8v256ts [| ceBlock |] |> Array.head
+            else
+                CeBlockOpsBitv512.evalAndCollectNewSortableTests su8v256ts [| ceBlock |] |> Array.head
 
 
     let evalWithSorterTests
                 (sortableTs: sortableTest) 
                 (ceBlocks: ceBlock []) 
-                (collectResults: bool) : ceBlockEval [] =
+                (collectNewSortableTests: bool) : ceBlockEval [] =
 
         match sortableTs with
 
         | sortableTest.Bitv512 su8v256ts ->
-                if collectResults then
-                    CeBlockOpsBitv512.evalAndCollectResults su8v256ts ceBlocks
+                if collectNewSortableTests then
+                    CeBlockOpsBitv512.evalAndCollectNewSortableTests su8v256ts ceBlocks
                 else
                     CeBlockOpsBitv512.eval su8v256ts ceBlocks
 
         | sortableTest.Bools sbts ->
             ceBlocks |> Array.map (fun ceBlock ->
-                if collectResults then
-                    CeBlockOpsBinary.evalAndCollectResults sbts ceBlock
+                if collectNewSortableTests then
+                    CeBlockOpsBinary.evalAndCollectNewSortableTests sbts ceBlock
                 else
                     CeBlockOpsBinary.eval sbts ceBlock)
 
         | sortableTest.Ints sits ->
             ceBlocks |> Array.map (fun ceBlock ->
-                if collectResults then
-                    CeBlockOpsInt.evalAndCollectResults sits ceBlock
+                if collectNewSortableTests then
+                    CeBlockOpsInt.evalAndCollectNewSortableTests sits ceBlock
                 else
                     CeBlockOpsInt.eval sits ceBlock)
 
         | sortableTest.PackedInts packedTs ->
             ceBlocks |> Array.map (fun ceBlock ->
-                if collectResults then
-                    CeBlockOpsPacked.evalAndCollectResults packedTs ceBlock
+                if collectNewSortableTests then
+                    CeBlockOpsPacked.evalAndCollectNewSortableTests packedTs ceBlock
                 else
                     CeBlockOpsPacked.eval packedTs ceBlock)
 
         | sortableTest.Uint8v256 su8v256ts ->
-                if collectResults then
-                    CeBlockOpsUint8v256.evalAndCollectResults su8v256ts ceBlocks
+                if collectNewSortableTests then
+                    CeBlockOpsUint8v256.evalAndCollectNewSortableTests su8v256ts ceBlocks
                 else
                     CeBlockOpsUint8v256.eval su8v256ts ceBlocks
 
         | sortableTest.Uint8v512 su8by512ts ->
-                if collectResults then
-                    CeBlockOpsUint8v512.evalAndCollectResults su8by512ts ceBlocks
+                if collectNewSortableTests then
+                    CeBlockOpsUint8v512.evalAndCollectNewSortableTests su8by512ts ceBlocks
                 else
                     CeBlockOpsUint8v512.eval su8by512ts ceBlocks
 

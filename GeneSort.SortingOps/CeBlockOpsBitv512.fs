@@ -240,7 +240,7 @@ module CeBlockOpsBitv512 =
             )
 
 
-    let evalAndCollectResults
+    let evalAndCollectNewSortableTests
             (test: sortableBitv512Test) 
             (ceBlocks: ceBlock []) =
         evalAndCollectUniqueFailures test.SimdSortBlocks ceBlocks

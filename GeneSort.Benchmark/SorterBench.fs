@@ -237,7 +237,8 @@ type Eval2Rounds() =
 
     [<Benchmark(Baseline = true)>]
     member this.evalBranchy() =
-       let ceBlockEval1 = CeBlockOps.evalWithSorterTest this.sortableIntTests this.ceBlock1
+       let collectNewSortableTests = false
+       let ceBlockEval1 = CeBlockOps.evalWithSorterTest this.sortableIntTests this.ceBlock1 collectNewSortableTests
        let ceBlockEval2 = CeBlockOps.evalWithSorterTest ceBlockEval1.SortableTest.Value this.ceBlock2
        ceBlockEval2
 

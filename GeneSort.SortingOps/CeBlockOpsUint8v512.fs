@@ -230,5 +230,5 @@ module CeBlockOpsUint8v512 =
     let eval (test: sortableUint8v512Test) (ceBlocks: ceBlock []) =
         evalSimdSortBlocks test.SimdSortBlocks ceBlocks
 
-    let evalAndCollectResults (test: sortableUint8v512Test) (ceBlocks: ceBlock []) =
+    let evalAndCollectNewSortableTests (test: sortableUint8v512Test) (ceBlocks: ceBlock []) =
         evalAndCollectUniqueFailures test.SimdSortBlocks ceBlocks

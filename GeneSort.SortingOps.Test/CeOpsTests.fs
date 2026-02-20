@@ -64,10 +64,11 @@ type CeOpsTests() =
         let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) sortingWidth [| createCe 0 1 |]
         
         // Act
-        let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTests ceBlock
+        let collectNewSortableTests = false
+        let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTests ceBlock collectNewSortableTests
         
         // Assert
-        let boolTests = match ceBlockEval.SortableTest.Value with | sortableTest.Bools bt -> bt | _ -> failwith "Expected Bools"
+        let boolTests = match (ceBlockEval).SortableTest.Value with | sortableTest.Bools bt -> bt | _ -> failwith "Expected Bools"
         boolTests.SortableBinaryArrays.Length |> should equal 1 // Duplicate removed
         boolTests.SortableBinaryArrays |> Array.forall (fun sba -> sba.Values = [| false; true; false |]) |> should be True
         %ceBlockEval.CeUseCounts.UsedCeCount |> should be (greaterThanOrEqualTo 1) // At least one swap occurred
@@ -92,10 +93,11 @@ type CeOpsTests() =
         let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) sortingWidth [| createCe 0 1 |]
         
         // Act
-        let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock 
+        let collectNewSortableTests = false
+        let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
         
         // Assert
-        let intTests = match ceBlockEval.SortableTest.Value with | sortableTest.Ints it -> it | _ -> failwith "Expected Ints"
+        let intTests = match (ceBlockEval).SortableTest.Value with | sortableTest.Ints it -> it | _ -> failwith "Expected Ints"
         intTests.SortableIntArrays.Length |> should equal 1
         %ceBlockEval.CeUseCounts.UsedCeCount |> should be (greaterThanOrEqualTo 1) // At least one swap occurred
 
@@ -115,7 +117,8 @@ type CeOpsTests() =
         let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) sortingWidth [| createCe 0 1 |] 
 
         // Act
-        let result = CeBlockOps.evalWithSorterTest sortableTest ceBlock
+        let collectNewSortableTests = false
+        let result = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
         
         // Assert
         let intTests = match result.SortableTest.Value with | sortableTest.Ints it -> it | _ -> failwith "Expected Ints"
