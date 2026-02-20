@@ -101,19 +101,19 @@ module MsSplitPairs =
         msConcatenation.create model.SecondPrefix model.SecondSuffix
     
     /// Creates all four possible concatenations
-    let makeAllConcatenations (model: msSplitPairs) : msConcatenation array =
+    let makeAllConcatenations (model: msSplitPairs) : (msConcatenation * sortingModelTag) [] =
         [|
-            makeFirstFirst model
-            makeFirstSecond model
-            makeSecondFirst model
-            makeSecondSecond model
-        |]
+            (makeFirstFirst model, modelTag.SplitPair (prefixOrSuffix.Prefix, prefixOrSuffix.Prefix))
+            (makeFirstSecond model, modelTag.SplitPair (prefixOrSuffix.Prefix, prefixOrSuffix.Suffix))
+            (makeSecondFirst model, modelTag.SplitPair (prefixOrSuffix.Suffix, prefixOrSuffix.Prefix))
+            (makeSecondSecond model, modelTag.SplitPair (prefixOrSuffix.Suffix, prefixOrSuffix.Suffix))
+        |] |> Array.map (fun (concat, tag) -> (concat, SortingModelTag.create %model.Id tag))
 
-    let makeAllSorters (model: msSplitPairs) : sorter array =
+    let makeAllSorters (model: msSplitPairs) : (sorter * sortingModelTag) [] =
         makeAllConcatenations model
-        |> Array.map (MsConcatenation.makeSorter)
+        |> Array.map (fun (s,t) ->  (s |> MsConcatenation.makeSorter, t))
 
     // checks if childId identifies one of the outputs of makeAllSorters
     let isAChildOf (childId: Guid<sorterId>) (sprs: msSplitPairs) : bool =
         makeAllConcatenations sprs
-        |> Array.exists (fun concat -> %concat.Id = %childId)
+        |> Array.exists (fun (concat, _) -> %concat.Id = %childId)

@@ -13,7 +13,7 @@ open GeneSort.Model.Sorting
 type sorterSetEval =
 
     private { 
-        sorterModelSetEvalId: Guid<sorterSetEvalId>
+        sorterSetEvalId: Guid<sorterSetEvalId>
         sorterSetId: Guid<sorterSetId>
         sorterTestId: Guid<sorterTestId>
         sorterEvals: sorterEval[]
@@ -30,13 +30,13 @@ type sorterSetEval =
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterSetEvalId>
 
         { 
-            sorterModelSetEvalId = id
+            sorterSetEvalId = id
             sorterSetId = sorterSetId
             sorterTestId = sorterTestsId
             sorterEvals = sorterEval
         }
 
-    member this.SorterModelSetEvalId with get() : Guid<sorterSetEvalId> = this.sorterModelSetEvalId
+    member this.SorterSetEvalId with get() : Guid<sorterSetEvalId> = this.sorterSetEvalId
     member this.SorterSetId with get() : Guid<sorterSetId> = this.sorterSetId
     member this.SorterTestId with get() : Guid<sorterTestId> = this.sorterTestId
     member this.SorterEvals with get() : sorterEval[] = this.sorterEvals
@@ -45,12 +45,12 @@ type sorterSetEval =
 
 module SorterSetEval =
 
-    let getCeLength (sorterModelSetEval: sorterSetEval) : int<ceLength> =
-        match sorterModelSetEval.SorterEvals |> Array.tryHead with
+    let getCeLength (sorterSetEval: sorterSetEval) : int<ceLength> =
+        match sorterSetEval.SorterEvals |> Array.tryHead with
         | Some firstEval -> firstEval.CeBlockEval.CeBlock.CeLength
         | None -> failwith "SorterSetEval contains no SorterEvals"
 
-    let makeSorterModelSetEval
+    let makeSorterSetEval
             (sorterSet: sorterSet)
             (sortableTest: sortableTest) 
             (collectResults: bool) : sorterSetEval =
@@ -98,7 +98,7 @@ module SorterSetEval =
         let newSetId = 
             [ 
                 sorterSet.Id :> obj
-                sorterSetEval.SorterModelSetEvalId :> obj
+                sorterSetEval.SorterSetEvalId :> obj
                 "PassingSubset" :> obj 
             ] 
             |> GuidUtils.guidFromObjs 
@@ -114,7 +114,7 @@ module SorterSetEval =
     /// that consists of all the sorters with an UnsortedCount = 0
     let makePassingSortingModelSet
             (sms: sortingModelSet)
-            (sorterSetEval: sorterSetEval) :sortingModelSet =
+            (sorterSetEval: sorterSetEval) : sortingModelSet =
         
         // 1. Identify the IDs of the sorters that passed (UnsortedCount = 0)
         let passingIds = 

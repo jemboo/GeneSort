@@ -15,6 +15,9 @@ open GeneSort.Core
 [<Measure>] type sortingModelMutatorID
 [<Measure>] type sortingModelSetMakerID
 [<Measure>] type sortingModelSetMutatorID
+[<Measure>] type parentSorterSetEvalId
+[<Measure>] type sortingParamsId
+
 
 
 [<Measure>] type mutationRate

@@ -23,7 +23,7 @@ module SorterSetEvalDto =
 
     let fromDomain (sorterSetEval: sorterSetEval) : sorterModelSetEvalDto =
         { 
-            SorterSetEvalId = %sorterSetEval.SorterModelSetEvalId
+            SorterSetEvalId = %sorterSetEval.SorterSetEvalId
             SorterSetId = %sorterSetEval.SorterSetId
             SorterTestsId = %sorterSetEval.SorterTestId
             SorterEvals = sorterSetEval.SorterEvals |> Array.map SorterEvalDto.toSorterEvalDto

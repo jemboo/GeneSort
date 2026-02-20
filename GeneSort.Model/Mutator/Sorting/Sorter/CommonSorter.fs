@@ -3,6 +3,4 @@
 open FSharp.UMX
 open GeneSort.Core
 
-[<Measure>] type mutationRate
-
 module CommonSorter = ()

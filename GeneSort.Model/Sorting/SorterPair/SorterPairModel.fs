@@ -12,7 +12,6 @@ type sorterPairModel =
      | SplitPairs2 of msSplitPairs
 
 
-
 module SorterPairModel =
     
     let getId (model: sorterPairModel) : Guid<sorterModelID> =
@@ -25,9 +24,9 @@ module SorterPairModel =
         | SplitPairs sp -> MsSplitPairs.getStageLength sp
         | SplitPairs2 sp -> MsSplitPairs.getStageLength sp
 
-    let makeSorters (model: sorterPairModel) : sorter =
+    let makeSorters (model: sorterPairModel) : (sorter * sortingModelTag) []  =
         match model with
-        | SplitPairs sp -> failwith "Not implemented"
+        | SplitPairs sp -> MsSplitPairs.makeAllSorters sp
         | SplitPairs2 sp -> failwith "Not implemented"
 
     let getSortingWidth (model: sorterPairModel) : int<sortingWidth> =

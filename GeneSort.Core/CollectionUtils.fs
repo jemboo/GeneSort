@@ -5,6 +5,25 @@ open System.Collections
 open System.Runtime.CompilerServices
 open System.Collections.Generic
 
+module Map =
+    /// Merges a sequence of maps into a single map.
+    /// Throws an exception if any key appears in more than one map.
+    let mergeUnique (maps: Map<'Key, 'Value> seq) : Map<'Key, 'Value> =
+        let mutable result = Map.empty
+        let mutable duplicateKeys = []
+        
+        for map in maps do
+            for kvp in map do
+                if result.ContainsKey kvp.Key then
+                    duplicateKeys <- kvp.Key :: duplicateKeys
+                else
+                    result <- result.Add(kvp.Key, kvp.Value)
+        
+        if not (List.isEmpty duplicateKeys) then
+            failwith (sprintf "Duplicate keys found during map merge: %A" (List.distinct duplicateKeys))
+        
+        result
+
 module CollectionUtils =
 
     /// Stores a sequence of values in a dictionary using a key generator function.

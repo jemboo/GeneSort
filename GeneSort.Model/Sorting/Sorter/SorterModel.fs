@@ -19,6 +19,8 @@ type sorterModel =
      | Msuf6 of msuf6
 
 
+
+
 module SorterModel =
     
     let getId (model: sorterModel) : Guid<sorterModelID> =
@@ -29,13 +31,13 @@ module SorterModel =
         | Msuf4 msuf4 -> msuf4.Id
         | Msuf6 msuf6 -> msuf6.Id
 
-    let makeSorter (model: sorterModel) : sorter =
+    let makeSorter (model: sorterModel) : (sorter * sortingModelTag) =
         match model with
-        | Msce msce -> msce.MakeSorter()
-        | Mssi mssi -> mssi.MakeSorter()
-        | Msrs msrs -> msrs.MakeSorter()
-        | Msuf4 msuf4 -> msuf4.MakeSorter()
-        | Msuf6 msuf6 -> msuf6.MakeSorter()
+        | Msce msce -> (msce.MakeSorter(), SortingModelTag.create %msce.Id modelTag.Single)
+        | Mssi mssi -> (mssi.MakeSorter(), SortingModelTag.create %mssi.Id modelTag.Single)
+        | Msrs msrs -> (msrs.MakeSorter(), SortingModelTag.create %msrs.Id modelTag.Single)
+        | Msuf4 msuf4 -> (msuf4.MakeSorter(), SortingModelTag.create %msuf4.Id modelTag.Single)
+        | Msuf6 msuf6 -> (msuf6.MakeSorter(), SortingModelTag.create %msuf6.Id modelTag.Single)
 
     let getSortingWidth (model: sorterModel) : int<sortingWidth> =
         match model with

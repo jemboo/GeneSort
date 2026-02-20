@@ -35,6 +35,7 @@
     <Compile Include="Sorting\SortingModelMutatorDto.fs" />
     <Compile Include="Sorting\SortingModelSetDto.fs" />
     <Compile Include="Sorting\SortingModelSetMakerDto.fs" />
+    <Compile Include="Sorting\SortingModelTagDto.fs" />
     <Compile Include="Sortable\MsasORandGenDto.fs" />
     <Compile Include="Sortable\SorterTestModelDto.fs" />
     <Compile Include="Sortable\SortableTestModelGenDto.fs" />

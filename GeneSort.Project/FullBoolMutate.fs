@@ -191,11 +191,11 @@ module FullBoolMutate =
                 let! _ = checkCancellation cts.Token
                 let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataFormat
-                let sorterSetParent = sortingModelSetParent |> SortingModelSet.makeSorterSet
-                let sorterSetEvalParent = SorterSetEval.makeSorterModelSetEval sorterSetParent sortableTests false
+                let (sorterSetParent, _) = sortingModelSetParent |> SortingModelSet.makeSorterSet
+                let sorterSetEvalParent = SorterSetEval.makeSorterSetEval sorterSetParent sortableTests false
 
                 let sorterModelMutateParams = 
-                    SorterMutateParams.makeUniformMutatorForSorterModel 
+                    SorterModelMutateParams.makeUniformMutatorForSorterModel 
                                 sorterModelType 
                                 sortingModelSetParent.StageLength 
                                 sortingModelSetParent.SortingWidth 

@@ -1,20 +1,14 @@
 ﻿namespace GeneSort.Model.Sorting.ModelParams
 
-open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Model.Sorting.Sorter.Ce
-open GeneSort.Model.Sorting.Sorter.Si
-open GeneSort.Model.Sorting.Sorter.Rs
-open GeneSort.Model.Sorting.Sorter.Uf4
-open GeneSort.Model.Sorting.Sorter.Uf6
 open GeneSort.Model.Sorting
-
 
 type mcseRandMutateParams = 
     private 
         { 
+          id: Guid<sortingParamsId>
           rngType: rngType
           indelRatesArray: indelRatesArray
           excludeSelfCe: bool }
@@ -22,12 +16,20 @@ type mcseRandMutateParams =
             (rngType: rngType)
             (indelRatesArray: indelRatesArray)
             (excludeSelfCe: bool): mcseRandMutateParams = 
+        let id =
+            [
+                rngType :> obj
+                indelRatesArray :> obj
+                excludeSelfCe :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingParamsId>
         {
+            id = id
             rngType = rngType
             indelRatesArray = indelRatesArray
             excludeSelfCe = excludeSelfCe
         }
-        
+    
+    member this.Id with get () = this.id
     member this.RngType with get () = this.rngType
     member this.IndelRatesArray with get () = this.indelRatesArray
     member this.ExcludeSelfCe with get () = this.excludeSelfCe
@@ -36,17 +38,25 @@ type mcseRandMutateParams =
 type mssiRandMutateParams = 
     private 
         { 
+          id: Guid<sortingParamsId>
           rngType: rngType
           opActionRatesArray: opActionRatesArray
          }
     static member create
             (rngType: rngType)
             (opActionRatesArray: opActionRatesArray): mssiRandMutateParams = 
+        let id =
+            [
+                rngType :> obj
+                opActionRatesArray :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingParamsId>
         {
+            id = id
             rngType = rngType
             opActionRatesArray = opActionRatesArray
         }
-        
+
+    member this.Id with get () = this.id    
     member this.RngType with get () = this.rngType
     member this.OpActionRatesArray with get () = this.opActionRatesArray
 
@@ -54,17 +64,25 @@ type mssiRandMutateParams =
 type msrsRandMutateParams = 
     private 
         { 
+          id: Guid<sortingParamsId>
           rngType: rngType
           opsActionRatesArray: opsActionRatesArray
          }
     static member create
             (rngType: rngType)
             (opsActionRatesArray: opsActionRatesArray): msrsRandMutateParams = 
+        let id =
+            [
+                rngType :> obj
+                opsActionRatesArray :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingParamsId>
         {
+            id = id
             rngType = rngType
             opsActionRatesArray = opsActionRatesArray
         }
         
+    member this.Id with get () = this.id
     member this.RngType with get () = this.rngType
     member this.OpsActionRatesArray with get () = this.opsActionRatesArray
 
@@ -72,17 +90,25 @@ type msrsRandMutateParams =
 type msuf4RandMutateParams = 
     private 
         {
+          id: Guid<sortingParamsId>
           rngType: rngType
           uf4MutationRatesArray: uf4MutationRatesArray
          }
     static member create
             (rngType: rngType)
             (uf4MutationRatesArray: uf4MutationRatesArray): msuf4RandMutateParams = 
+        let id =
+            [
+                rngType :> obj
+                uf4MutationRatesArray :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingParamsId>
         {
+            id = id
             rngType = rngType
             uf4MutationRatesArray = uf4MutationRatesArray
         }
         
+    member this.Id with get () = this.id
     member this.RngType with get () = this.rngType
     member this.Uf4MutationRatesArray with get () = this.uf4MutationRatesArray 
 
@@ -90,17 +116,25 @@ type msuf4RandMutateParams =
 type msuf6RandMutateParams = 
     private 
         {
+          id: Guid<sortingParamsId>
           uf6MutationRatesArray: uf6MutationRatesArray
           rngType: rngType
          }
     static member create
             (rngType: rngType)
             (uf6MutationRatesArray: uf6MutationRatesArray): msuf6RandMutateParams = 
+        let id =
+            [
+                rngType :> obj
+                uf6MutationRatesArray :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingParamsId>
         {
+            id = id
             rngType = rngType
             uf6MutationRatesArray = uf6MutationRatesArray
         }
-        
+
+    member this.Id with get () = this.id
     member this.RngType with get () = this.rngType
     member this.Uf6MutationRatesArray with get () = this.uf6MutationRatesArray
 
@@ -113,8 +147,25 @@ type sorterModelMutateParams =
     | Msuf6RandMutateParams of msuf6RandMutateParams
 
 
-module SorterMutateParams = 
+module SorterModelMutateParams = 
+   
+    let getId (sorterModelMutateParams: sorterModelMutateParams) : Guid<sortingParamsId> =
 
+        match sorterModelMutateParams with
+        | McseRandMutateParams prams -> prams.Id
+        | MssiRandMutateParams prams -> prams.Id
+        | MsrsRandMutateParams prams -> prams.Id
+        | Msuf4RandMutateParams prams -> prams.Id
+        | Msuf6RandMutateParams prams -> prams.Id
+
+    let getRngType (sorterModelMutateParams: sorterModelMutateParams) : rngType =
+        match sorterModelMutateParams with
+        | McseRandMutateParams prams -> prams.RngType
+        | MssiRandMutateParams prams -> prams.RngType
+        | MsrsRandMutateParams prams -> prams.RngType
+        | Msuf4RandMutateParams prams -> prams.RngType
+        | Msuf6RandMutateParams prams -> prams.RngType
+        
     let makeUniformMsceMutator 
                 (ceLength: int<ceLength>)
                 (mutationRate: float<mutationRate>)

@@ -63,7 +63,7 @@ module MsConcatenation =
         model |> getChildIds |> Array.exists (fun childId -> %childId = %id)
 
     let makeSorter (concat: msConcatenation) : sorter =
-        let prefixSorter = SorterModel.makeSorter concat.Prefix
-        let suffixSorter = SorterModel.makeSorter concat.Suffix
+        let prefixSorter, _ = SorterModel.makeSorter concat.Prefix
+        let suffixSorter, _ = SorterModel.makeSorter concat.Suffix
         let sorterId = %concat.Id |> UMX.tag<sorterId>
         Sorter.concatSorters prefixSorter suffixSorter sorterId

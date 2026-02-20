@@ -68,7 +68,7 @@ module SorterSetEvalBins =
 
     let create (maxBinCount: int) (sorterSetEval:sorterSetEval) : sorterSetEvalBins =
         let sorterSetEvalBins = {
-            sorterSetEvalId = sorterSetEval.SorterModelSetEvalId
+            sorterSetEvalId = sorterSetEval.SorterSetEvalId
             totalSampleCount = 0
             maxSorterEvalCount = maxBinCount
             evalBins = Dictionary<sorterEvalKey, sorterEvalBin>()
