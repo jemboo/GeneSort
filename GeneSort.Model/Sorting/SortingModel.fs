@@ -44,3 +44,8 @@ module SortingModel =
         | Single sms -> sorterIds |> Array.exists (fun id -> %(sms |> SorterModel.getId) = (%id))
         | Pair smp -> 
             sorterIds |> Array.exists (fun id -> id |> SorterPairModel.isAChildOf smp)
+
+    let getSorterIdForModelTag  (model: sortingModel) (tag: modelTag) : Guid<sorterId> =
+        match model with
+        | Single sms -> SorterModel.getSorterIdForModelTag sms tag
+        | Pair smp -> SorterPairModel.getSorterIdForModelTag smp tag

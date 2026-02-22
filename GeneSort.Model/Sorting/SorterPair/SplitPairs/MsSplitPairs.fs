@@ -1,5 +1,6 @@
 ﻿namespace GeneSort.Model.Sorting.SorterPair.SplitPairs
 
+open System
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Model.Sorting
@@ -103,10 +104,10 @@ module MsSplitPairs =
     /// Creates all four possible concatenations
     let makeAllConcatenations (model: msSplitPairs) : (msConcatenation * sortingModelTag) [] =
         [|
-            (makeFirstFirst model, modelTag.SplitPair (prefixOrSuffix.Prefix, prefixOrSuffix.Prefix))
-            (makeFirstSecond model, modelTag.SplitPair (prefixOrSuffix.Prefix, prefixOrSuffix.Suffix))
-            (makeSecondFirst model, modelTag.SplitPair (prefixOrSuffix.Suffix, prefixOrSuffix.Prefix))
-            (makeSecondSecond model, modelTag.SplitPair (prefixOrSuffix.Suffix, prefixOrSuffix.Suffix))
+            (makeFirstFirst model, modelTag.SplitPair splitJoin.First_First)
+            (makeFirstSecond model, modelTag.SplitPair splitJoin.First_Second)
+            (makeSecondFirst model, modelTag.SplitPair splitJoin.Second_First)
+            (makeSecondSecond model, modelTag.SplitPair splitJoin.Second_Second)
         |] |> Array.map (fun (concat, tag) -> (concat, SortingModelTag.create %model.Id tag))
 
     let makeAllSorters (model: msSplitPairs) : (sorter * sortingModelTag) [] =
@@ -117,3 +118,15 @@ module MsSplitPairs =
     let isAChildOf (childId: Guid<sorterId>) (sprs: msSplitPairs) : bool =
         makeAllConcatenations sprs
         |> Array.exists (fun (concat, _) -> %concat.Id = %childId)
+
+
+    let getSorterModelIdForModelTag (model: msSplitPairs) (tag: modelTag) : Guid<sorterModelID> =
+        match tag with
+        | modelTag.SplitPair splitJoin.First_First -> 
+                msConcatenation.createId model.FirstPrefix model.FirstSuffix
+        | modelTag.SplitPair splitJoin.First_Second ->
+                msConcatenation.createId model.FirstPrefix model.SecondSuffix
+        | modelTag.SplitPair splitJoin.Second_First ->
+                msConcatenation.createId model.SecondPrefix model.FirstSuffix
+        | modelTag.SplitPair splitJoin.Second_Second ->
+                msConcatenation.createId model.SecondPrefix model.SecondSuffix

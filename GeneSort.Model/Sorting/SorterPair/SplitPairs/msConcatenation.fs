@@ -14,6 +14,16 @@ type msConcatenation =
           prefix: sorterModel
           suffix: sorterModel } 
     with
+
+    static member createId 
+            (prefix: sorterModel)
+            (suffix: sorterModel) : Guid<sorterModelID> =
+           [
+                "Concatenation" :> obj
+                %SorterModel.getId prefix :> obj
+                %SorterModel.getId suffix :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+
     /// Creates an msConcatenation instance with the specified prefix and suffix sorter models.
     /// The ID is deterministically calculated from the prefix and suffix IDs.
     /// Throws an exception if the models have mismatched sorting widths.
@@ -27,14 +37,7 @@ type msConcatenation =
         if prefixWidth <> suffixWidth then
             failwith $"Prefix and suffix must have the same sortingWidth. Prefix: {%prefixWidth}, Suffix: {%suffixWidth}"
         
-        let id =
-            [
-                "Concatenation" :> obj
-                %SorterModel.getId prefix :> obj
-                %SorterModel.getId suffix :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
-        
-        { id = id
+        { id = msConcatenation.createId prefix suffix
           sortingWidth = prefixWidth
           prefix = prefix
           suffix = suffix }
@@ -62,8 +65,10 @@ module MsConcatenation =
     let hasChild (id: Guid<sorterModelID>) (model: msConcatenation) : bool =
         model |> getChildIds |> Array.exists (fun childId -> %childId = %id)
 
+    let makeSorterId (concat: msConcatenation) : Guid<sorterId> =
+        %concat.Id |> UMX.tag<sorterId>
+
     let makeSorter (concat: msConcatenation) : sorter =
         let prefixSorter, _ = SorterModel.makeSorter concat.Prefix
         let suffixSorter, _ = SorterModel.makeSorter concat.Suffix
-        let sorterId = %concat.Id |> UMX.tag<sorterId>
-        Sorter.concatSorters prefixSorter suffixSorter sorterId
+        Sorter.concatSorters prefixSorter suffixSorter (makeSorterId concat)

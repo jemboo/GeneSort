@@ -6,47 +6,51 @@ open GeneSort.Model.Sorting
 open MessagePack
 
 [<MessagePackObject>]
-type prefixOrSuffixDto =
-    | Prefix = 0
-    | Suffix = 1
+type splitJoinDto =
+    | First_First = 0
+    | First_Second = 1
+    | Second_First = 2
+    | Second_Second = 3
 
-module PrefixOrSuffixDto =
-    let toDto (pos: prefixOrSuffix) : prefixOrSuffixDto =
-        match pos with
-        | Prefix -> prefixOrSuffixDto.Prefix
-        | Suffix -> prefixOrSuffixDto.Suffix
+module SplitJoinDto =
+    let toDto (sj: splitJoin) : splitJoinDto =
+        match sj with
+        | First_First -> splitJoinDto.First_First
+        | First_Second -> splitJoinDto.First_Second
+        | Second_First -> splitJoinDto.Second_First
+        | Second_Second -> splitJoinDto.Second_Second
     
-    let fromDto (dto: prefixOrSuffixDto) : prefixOrSuffix =
+    let fromDto (dto: splitJoinDto) : splitJoin =
         match dto with
-        | prefixOrSuffixDto.Prefix -> Prefix
-        | prefixOrSuffixDto.Suffix -> Suffix
-        | _ -> failwith "Invalid prefixOrSuffixDto value"
+        | splitJoinDto.First_First -> First_First
+        | splitJoinDto.First_Second -> First_Second
+        | splitJoinDto.Second_First -> Second_First
+        | splitJoinDto.Second_Second -> Second_Second
+        | _ -> failwith "Invalid splitJoinDto value"
 
 [<MessagePackObject>]
 type modelTagDto =
     { [<Key(0)>] Tag: string
-      [<Key(1)>] Prefix: prefixOrSuffixDto option
-      [<Key(2)>] Suffix: prefixOrSuffixDto option }
+      [<Key(1)>] SplitJoin: splitJoinDto option }
 
 module ModelTagDto =
     let toDto (tag: modelTag) : modelTagDto =
         match tag with
         | Single -> 
-            { Tag = "Single"; Prefix = None; Suffix = None }
-        | SplitPair (p, s) -> 
+            { Tag = "Single"; SplitJoin = None }
+        | SplitPair sj -> 
             { Tag = "SplitPair"
-              Prefix = Some (PrefixOrSuffixDto.toDto p)
-              Suffix = Some (PrefixOrSuffixDto.toDto s) }
+              SplitJoin = Some (SplitJoinDto.toDto sj) }
     
     let fromDto (dto: modelTagDto) : modelTag =
         match dto.Tag with
         | "Single" -> Single
         | "SplitPair" ->
-            match dto.Prefix, dto.Suffix with
-            | Some p, Some s -> 
-                SplitPair (PrefixOrSuffixDto.fromDto p, PrefixOrSuffixDto.fromDto s)
-            | _ -> failwith "SplitPair requires both Prefix and Suffix"
+            match dto.SplitJoin with
+            | Some sj -> SplitPair (SplitJoinDto.fromDto sj)
+            | None -> failwith "SplitPair requires a SplitJoin value"
         | _ -> failwithf "Invalid modelTag: %s" dto.Tag
+
 
 [<MessagePackObject>]
 type sortingModelTagDto =

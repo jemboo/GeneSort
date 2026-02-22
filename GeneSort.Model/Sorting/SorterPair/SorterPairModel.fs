@@ -1,4 +1,6 @@
 ﻿namespace GeneSort.Model.Sorting.SorterPair
+
+open System
 open FSharp.UMX
 
 open GeneSort.Sorting.Sorter
@@ -37,4 +39,9 @@ module SorterPairModel =
     // Add a method to sorterPairModel that generates it's child sorter models.
     let isAChildOf (parentModel: sorterPairModel) (sorterId: Guid<sorterId>) : bool =
         failwith "Not implemented"
+
+    let getSorterIdForModelTag (model: sorterPairModel) (tag: modelTag) : Guid<sorterId> =
+        match model with
+        | SplitPairs sp -> %(MsSplitPairs.getSorterModelIdForModelTag sp tag) |> UMX.tag<sorterId>
+        | SplitPairs2 sp -> failwith "Not implemented"
 

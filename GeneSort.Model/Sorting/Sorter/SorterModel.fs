@@ -1,4 +1,6 @@
 ﻿namespace GeneSort.Model.Sorting
+
+open System
 open FSharp.UMX
 
 open GeneSort.Sorting.Sorter
@@ -62,3 +64,9 @@ module SorterModel =
         | Msrs msrs -> msrs.StageLength
         | Msuf4 msuf4 -> msuf4.StageLength
         | Msuf6 msuf6 -> msuf6.StageLength
+
+    let getSorterIdForModelTag  (model: sorterModel) (tag: modelTag) : Guid<sorterId> =
+        match tag with
+        | modelTag.Single -> 
+            %(model |> getId) |> UMX.tag<sorterId>
+        | _ -> failwith "Invalid modelTag for sorterModel. Only modelTag.Single is valid."

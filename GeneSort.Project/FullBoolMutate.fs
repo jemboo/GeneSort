@@ -239,6 +239,16 @@ module FullBoolMutate =
                 let mutatedSorterSet = sorterSet.createWithNewId 
                                             (mutantSorters |> Array.map(fst))
 
+                let sorterSetEvalMutated = SorterSetEval.makeSorterSetEval mutatedSorterSet sortableTests collectNewSortableTests
+
+                let findParentEval (seval:sorterEval) : sorterEval option =
+                    let modelTag = mapMutantSorterIdToModelTag.[seval.SorterId]
+                    let parentModelId = modelTag |> SortingModelTag.getSortingModelParentId
+                    let modelSetMutatorId = mapSorterModelToModelSetMutators.[parentModelId]
+                    let modelSetMutator = mapOfSortingModelSetMutators.[modelSetMutatorId]
+                    let parentSorterId = modelSetMutator.SortingModelMutator |> SortingModelMutator.getSortingModelSeedId
+                    //sorterSetEvalParent.SorterEvals |> Array.tryFind (fun se -> se.SorterId = parentSorterId)
+                    None
                 //let yab = mapOfMutatedSortingModelSets |> Map.toArray
                 //          |> Array.map (fun (id, sm) -> (id, sm |> SortingModel.makeSorters))
 

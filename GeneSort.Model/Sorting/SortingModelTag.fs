@@ -4,46 +4,47 @@ open FSharp.UMX
 open System
 
 
-type prefixOrSuffix =
-     | Prefix
-     | Suffix
+type splitJoin =
+     | First_First
+     | First_Second
+     | Second_First
+     | Second_Second
 
-
-module PrefixOrSuffix =
-    let toString (prefixOrSuffix: prefixOrSuffix) : string =
+module SplitJoin =
+    let toString (prefixOrSuffix: splitJoin) : string =
         match prefixOrSuffix with
-        | Prefix -> "Prefix"
-        | Suffix -> "Suffix"
+        | First_First -> "First_First"
+        | First_Second -> "First_Second"
+        | Second_First -> "Second_First"
+        | Second_Second -> "Second_Second"
 
-    let fromString (str: string) : prefixOrSuffix =
+    let fromString (str: string) : splitJoin =
         match str with
-        | "Prefix" -> Prefix
-        | "Suffix" -> Suffix
+        | "First_First" -> First_First
+        | "First_Second" -> First_Second
+        | "Second_First" -> Second_First
+        | "Second_Second" -> Second_Second
         | _ -> failwithf "Invalid prefixOrSuffix value: %s" str
 
 // used to track how a sorter was made from a sortingModel
 type modelTag =
      | Single
-     | SplitPair of prefixOrSuffix*prefixOrSuffix
+     | SplitPair of splitJoin
 
 
 module ModelTag =
     let toString (modelTag: modelTag) : string =
         match modelTag with
         | Single -> "Single"
-        | SplitPair (p, s) -> sprintf "SplitPair(%s, %s)" (PrefixOrSuffix.toString p) (PrefixOrSuffix.toString s)
+        | SplitPair sj -> sprintf "SplitPair(%s)" (SplitJoin.toString sj)
 
     let fromString (str: string) : modelTag =
         if str = "Single" then
             Single
-        else if str.StartsWith("SplitPair") then
+        else if str.StartsWith("SplitPair(") && str.EndsWith(")") then
             let inner = str.Substring("SplitPair(".Length, str.Length - "SplitPair(".Length - 1)
-            let parts = inner.Split(',')
-            if parts.Length <> 2 then
-                failwithf "Invalid SplitPair format: %s" str
-            let p = PrefixOrSuffix.fromString (parts.[0].Trim())
-            let s = PrefixOrSuffix.fromString (parts.[1].Trim())
-            SplitPair (p, s)
+            let splitJoin = SplitJoin.fromString inner
+            SplitPair splitJoin
         else
             failwithf "Invalid modelTag format: %s" str
 
@@ -74,8 +75,7 @@ module SortingModelTag =
     let fromString (str: string) : sortingModelTag =
         let parts = str.Split('\t')
         if parts.Length <> 2 then
-            failwithf "Invalid sorterModelTag format: %s" str
-        let modelId = Guid.Parse(parts.[0])
+            failwithf "Invalid sortingModelTag format: %s" str
+        let modelId = Guid.Parse(parts.[0]) |> UMX.tag<sortingModelID>
         let tag = ModelTag.fromString parts.[1]
-        (modelId |> UMX.tag<sortingModelID>, tag)
-
+        (modelId, tag)
