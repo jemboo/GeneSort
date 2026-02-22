@@ -33,15 +33,13 @@ type sortingModelSetMutator =
     member this.FirstIndex with get() = this.firstIndex
     member this.Count with get() = this.count
 
-    member this.MakeSortingModelSet (rngFactory: rngType -> Guid -> IRando) : sortingModelSet =
-        if %this.count <= 0 then
-            failwith "Count must be greater than 0"
-        if %this.firstIndex < 0 then
-            failwith "FirstIndex must be non-negative"
-        let sortingModels = 
+    member this.MutateSortingModels (rngFactory: rngType -> Guid -> IRando)
+                : (Guid<sortingModelMutatorID> * sortingModel) [] =
+        let mutantSortingModels = 
             [| for i in 0 .. %this.count - 1 do
                 let index = %this.firstIndex + i
-                SortingModelMutator.makeSortingModel rngFactory index this.SortingModelMutator |]
+                ( this.SortingModelMutator |> SortingModelMutator.getId,
+                  SortingModelMutator.makeSortingModel rngFactory index this.SortingModelMutator )
+            |]
+        mutantSortingModels
 
-        let id = (%this.id) |> UMX.tag<sortingModelSetID>
-        sortingModelSet.create id sortingModels

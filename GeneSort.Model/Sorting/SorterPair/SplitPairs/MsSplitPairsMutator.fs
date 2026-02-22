@@ -8,7 +8,7 @@ open GeneSort.Model.Sorting
 
 type msSplitPairsMutator = 
     private 
-        { id: Guid<sorterPairModelMakerID>
+        { id: Guid<sorterPairModelMutatorID>
           sortingWidth: int<sortingWidth>
           firstPrefixMaker: sorterModelMaker
           firstSuffixMaker: sorterModelMaker
@@ -64,7 +64,7 @@ type msSplitPairsMutator =
                 %SorterModelMaker.getId firstSuffixMaker :> obj
                 %SorterModelMaker.getId secondPrefixMaker :> obj
                 %SorterModelMaker.getId secondSuffixMaker :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterPairModelMakerID>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterPairModelMutatorID>
         
         { id = id
           sortingWidth = sortingWidth
@@ -79,6 +79,7 @@ type msSplitPairsMutator =
     member this.FirstSuffixMaker with get () = this.firstSuffixMaker
     member this.SecondPrefixMaker with get () = this.secondPrefixMaker
     member this.SecondSuffixMaker with get () = this.secondSuffixMaker
+    member this.SortingModelSeedId with get() : Guid<sortingModelID> = failwith "not implemented."
 
 module MsSplitPairsMutator =
 

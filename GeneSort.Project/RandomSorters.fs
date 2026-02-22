@@ -69,16 +69,18 @@ module RandomSorters =
     let sortingWidths() : string*string list =
        // let values = [4; 6; 8; 12; 16; 18; 20; 22; 24; 32; 36; 48; 64; 72; 96; 128; 144; 192; 256] |> List.map(fun d -> d.ToString())
        // let values = [4; 6; 8; 12; 16; 18; 20; 22; 24; 32; 64; 128; 256] |> List.map(fun d -> d.ToString())
-        let values = [4; 6; 8; 12; 16; 18; 20; 22; 24; 32; 64;] |> List.map(fun d -> d.ToString())
+       // let values = [4; 6; 8; 12; 16; 18; 20; 22; 24; 32; 64;] |> List.map(fun d -> d.ToString())
+        let values = [16;] |> List.map(fun d -> d.ToString())
         (runParameters.sortingWidthKey, values)
 
 
     let sorterModelTypes () : string*string list =
         let values =         
-            [ sorterModelType.Msce; 
-              sorterModelType.Mssi;
-              sorterModelType.Msrs; 
-              sorterModelType.Msuf4; 
+            [ 
+              sorterModelType.Msce; 
+              //sorterModelType.Mssi;
+              //sorterModelType.Msrs; 
+              //sorterModelType.Msuf4; 
               //sorterModelType.Msuf6; 
               ]  |> List.map(SorterModelType.toString)
         (runParameters.sorterModelTypeKey, values )
@@ -202,7 +204,7 @@ module RandomSorters =
         let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
         let stageLength = getStageLengthForSortingWidth (rp.GetSorterModelType().Value) sortingWidth
         let ceLength = stageLength |> StageLength.toCeLength sortingWidth
-        let sorterCount = 150 |> UMX.tag<sorterCount>
+        let sorterCount = 2 |> UMX.tag<sorterCount>
 
         rp.WithProjectName(Some projectName)
             .WithRunFinished(Some false)

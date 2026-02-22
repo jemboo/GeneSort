@@ -32,7 +32,7 @@ module SortingModel =
     let makeSorters (model: sortingModel) : (sorter * sortingModelTag) []  =
         match model with
         | Single sms -> sms |> SorterModel.makeSorter |> Array.singleton
-        | Pair smp -> smp |> SorterPairModel.makeSorters
+        | Pair smp ->  smp |> SorterPairModel.makeSorters
 
     let containsSorter (sorterId: Guid<sorterId>) (model: sortingModel) : bool =
         match model with

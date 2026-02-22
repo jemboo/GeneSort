@@ -11,6 +11,7 @@ open GeneSort.Core
 [<Measure>] type sorterModelMakerID
 [<Measure>] type sorterModelMutatorID
 [<Measure>] type sorterPairModelMakerID
+[<Measure>] type sorterPairModelMutatorID
 [<Measure>] type sortingModelMakerID
 [<Measure>] type sortingModelMutatorID
 [<Measure>] type sortingModelSetMakerID

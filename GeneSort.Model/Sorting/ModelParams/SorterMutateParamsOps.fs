@@ -64,52 +64,26 @@ module SorterMutateParamsOps =
         
         | _ -> failwith "Mismatched sorterModel and sorterMutateParams types"
 
-    let makeSortingModelSetMutatorFromSorterModel
-                (sorterModel: sorterModel)
+
+
+    let makeSortingModelSetMutatorFromSortingModel
+                (sortingModel: sortingModel)
                 (sorterModelMutateParams: sorterModelMutateParams) 
                 (firstIndex: int<sorterCount>) 
                 (count: int<sorterCount>) : sortingModelSetMutator = 
-    
-        let sortingModelMutator = 
-            makeSortingModelMutatorFromSorterModel sorterModel sorterModelMutateParams
 
-        sortingModelSetMutator.create sortingModelMutator firstIndex count
-
-
-    // Creates an array of sortingModelSets of size sortingModelSet.Count, each of which
-    // contains (count) mutated sortingModels The sortingModelSets are paired with the 
-    // original parent sortingModel they were mutated from.
-    let mutateSortingModelsWithMutateParams
-                (rngFactory: rngType -> Guid -> IRando)
-                (sortingModels: sortingModel seq)
-                (sorterModelMutateParams: sorterModelMutateParams) 
-                (firstIndex: int<sorterCount>) 
-                (count: int<sorterCount>) : (sortingModelSet * sortingModelParentId) seq =
-    
         if %count <= 0 then
             failwith "Count must be greater than 0"
         if %firstIndex < 0 then
             failwith "FirstIndex must be non-negative"
-    
-        // For each sortingModel in the input set, create a sortingModelSet of mutations
-        sortingModels
-        |> Seq.map (fun sortingModel ->
-            match sortingModel with
-            | sortingModel.Single sorterModel ->
-                // Create a mutator for this specific sorterModel
-                let mutator = 
-                    makeSortingModelSetMutatorFromSorterModel 
-                        sorterModel 
-                        sorterModelMutateParams
-                        firstIndex 
-                        count
-            
-                // Generate the mutated models using the rngFactory
-                (mutator.MakeSortingModelSet rngFactory, sortingModel |> SortingModel.getId)
-            
-            | sortingModel.Pair _ ->
-                failwith "Mutation of Pair sortingModels not yet supported"
-        )
 
+        match sortingModel with
+        | sortingModel.Single sorterModel ->
+            let sortingModelMutator = 
+                makeSortingModelMutatorFromSorterModel sorterModel sorterModelMutateParams
+            sortingModelSetMutator.create sortingModelMutator firstIndex count
+
+        | sortingModel.Pair _ ->
+                failwith "Mutation of Pair sortingModels not yet supported"
 
 

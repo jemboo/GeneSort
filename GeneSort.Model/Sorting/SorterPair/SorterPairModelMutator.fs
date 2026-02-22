@@ -16,6 +16,27 @@ type sorterPairModelMutator =
 
 module SorterPairModelMutator =
 
+    let getId (model: sorterPairModelMutator) : Guid<sorterPairModelMutatorID> =
+        match model with
+        | sorterPairModelMutator.SplitPairs mspg -> mspg.Id
+        | sorterPairModelMutator.SplitPairs2 mspg -> mspg.Id
+
+    let getSortingModelSeedId (model: sorterPairModelMutator) : Guid<sortingModelID> =
+        match model with
+        | sorterPairModelMutator.SplitPairs mspg -> mspg.SortingModelSeedId
+        | sorterPairModelMutator.SplitPairs2 mspg -> mspg.SortingModelSeedId
+
+    let getCeLength (model: sorterPairModelMutator) : int<ceLength> =
+        match model with
+        | sorterPairModelMutator.SplitPairs mspg -> MsSplitPairsMutator.getCeLength mspg
+        | sorterPairModelMutator.SplitPairs2 mspg -> MsSplitPairsMutator.getCeLength mspg
+
+
+    let getSortingWidth (model: sorterPairModelMutator) : int<sortingWidth> =
+        match model with
+        | sorterPairModelMutator.SplitPairs mspg -> MsSplitPairsMutator.getSortingWidth mspg
+        | sorterPairModelMutator.SplitPairs2 mspg -> MsSplitPairsMutator.getSortingWidth mspg
+
     let makeSorterPairModel 
                 (rngFactory: rngType -> Guid -> IRando) 
                 (index: int)  
@@ -28,22 +49,6 @@ module SorterPairModelMutator =
                 mspg |> MsSplitPairsMutator.makeMsSplitPairs rngFactory index 
                      |> sorterPairModel.SplitPairs2
 
-
-    let getCeLength (model: sorterPairModelMutator) : int<ceLength> =
-        match model with
-        | sorterPairModelMutator.SplitPairs mspg -> MsSplitPairsMutator.getCeLength mspg
-        | sorterPairModelMutator.SplitPairs2 mspg -> MsSplitPairsMutator.getCeLength mspg
-
-
-    let getId (model: sorterPairModelMutator) : Guid<sorterPairModelMakerID> =
-        match model with
-        | sorterPairModelMutator.SplitPairs mspg -> mspg.Id
-        | sorterPairModelMutator.SplitPairs2 mspg -> mspg.Id
-
-    let getSortingWidth (model: sorterPairModelMutator) : int<sortingWidth> =
-        match model with
-        | sorterPairModelMutator.SplitPairs mspg -> MsSplitPairsMutator.getSortingWidth mspg
-        | sorterPairModelMutator.SplitPairs2 mspg -> MsSplitPairsMutator.getSortingWidth mspg
 
 
 

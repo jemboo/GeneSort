@@ -21,6 +21,10 @@ module SortingModelMutator =
         | Single smm -> %(smm |> SorterModelMutator.getId) |> UMX.tag<sortingModelMutatorID>
         | Pair spmm -> %(spmm |> SorterPairModelMutator.getId) |> UMX.tag<sortingModelMutatorID>
 
+    let getSortingModelSeedId (model: sortingModelMutator) : Guid<sortingModelID> =
+        match model with
+        | Single smm -> smm |> SorterModelMutator.getSortingModelSeedId
+        | Pair spmm -> failwith "SorterPairModelMutator does not have a single sorting model seed ID"
 
     let getSortingWidth (model: sortingModelMutator) : int<sortingWidth> =
         match model with

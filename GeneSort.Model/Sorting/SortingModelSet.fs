@@ -34,13 +34,15 @@ type sortingModelSet =
         if this.Count = 0 then
             failwith "Cannot determine sorting width of an empty sorting model set"
         else
-            // Assuming all models in the set have the same sorting width, return the sorting width of the first model
+            // Assuming all models in the set have the same sorting width, 
+            // return the sorting width of the first model
             this.SortingModels.[0] |> SortingModel.getSortingWidth
     member this.StageLength with get() = 
         if this.Count = 0 then
             failwith "Cannot determine stage length of an empty sorting model set"
         else
-            // Assuming all models in the set have the same stage length, return the stage length of the first model
+            // Assuming all models in the set have the same stage length, 
+            // return the stage length of the first model
             this.SortingModels.[0] |> SortingModel.getStageLength
     member this.tryFind (id: Guid<sortingModelID>) (modelSet: sortingModelSet) : sortingModel option =
         modelSet.sortingModels |> Map.tryFind id
@@ -75,3 +77,6 @@ module SortingModelSet =
         let sorterSet = sorterSet.create (%modelSet.Id |> UMX.tag<sorterSetId>) sorters
         
         (sorterSet, sorterTagMap)
+
+
+

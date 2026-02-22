@@ -31,6 +31,15 @@ module SorterModelMutator =
         | SmmMsuf6RandMutate msuf6 -> msuf6.Id
 
 
+    let getSortingModelSeedId (model: sorterModelMutator) : Guid<sortingModelID> =
+        match model with
+        | SmmMsceRandMutate msce -> %msce.Msce.Id |> UMX.tag<sortingModelID>
+        | SmmMssiRandMutate mssi -> %mssi.Mssi.Id |> UMX.tag<sortingModelID>
+        | SmmMsrsRandMutate msrs -> %msrs.Msrs.Id |> UMX.tag<sortingModelID>
+        | SmmMsuf4RandMutate msuf4 -> %msuf4.Msuf4.Id |> UMX.tag<sortingModelID>
+        | SmmMsuf6RandMutate msuf6 -> %msuf6.Msuf6.Id |> UMX.tag<sortingModelID>
+
+
     let getSortingWidth (model: sorterModelMutator) : int<sortingWidth> =
         match model with
         | SmmMsceRandMutate msce -> msce.SortingWidth
@@ -48,14 +57,6 @@ module SorterModelMutator =
         | SmmMsuf4RandMutate msuf4 -> msuf4.CeLength
         | SmmMsuf6RandMutate msuf6 -> msuf6.CeLength
 
-
-    let getSorterModelMakerId (model: sorterModelMutator) : Guid<sorterModelMutatorID> =
-        match model with
-        | SmmMsceRandMutate msce -> msce.Id
-        | SmmMssiRandMutate mssi -> mssi.Id
-        | SmmMsrsRandMutate msrs -> msrs.Id
-        | SmmMsuf4RandMutate msuf4 -> msuf4.Id
-        | SmmMsuf6RandMutate msuf6 -> msuf6.Id
 
     let makeSorterModel 
                 (rngFactory: rngType -> Guid -> IRando) 
