@@ -123,7 +123,7 @@ module MergeIntEvals =
   
     let sortingWidths () : string * string list =
         //let values = [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] |> List.map string
-        let values = [128; 256] |> List.map string
+        let values = [16; 128; 256] |> List.map string
         (runParameters.sortingWidthKey, values)
 
 

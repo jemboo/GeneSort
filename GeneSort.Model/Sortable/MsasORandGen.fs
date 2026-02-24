@@ -11,12 +11,12 @@ type MsasORandGen =
     private 
         { 
           id : Guid<sorterTestModelMakerID>
-          rngType: rngType
+          rngFactory: rngFactory
           sortingWidth: int<sortingWidth>
           maxOrbit: int } 
 
     static member create
-            (rngType : rngType)
+            (rngFactory : rngFactory)
             (sortingWidth : int<sortingWidth>)
             (maxOrbit : int )
             : MsasORandGen =
@@ -24,15 +24,15 @@ type MsasORandGen =
                 [
                     "MsasORandGen" :> obj
                     sortingWidth :> obj
-                    rngType :> obj
+                    rngFactory :> obj
                     maxOrbit :> obj
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelMakerID>
 
-            { id = id; rngType = rngType; maxOrbit = maxOrbit; sortingWidth = sortingWidth}
+            { id = id; rngFactory = rngFactory; maxOrbit = maxOrbit; sortingWidth = sortingWidth}
 
     member this.Id with get() = this.id
     member this.MaxOrbit with get() = this.maxOrbit
-    member this.RngType with get() = this.rngType
+    member this.RngFactory with get() = this.rngFactory
     member this.SortingWidth with get() = this.sortingWidth
 
     override this.Equals(obj) = 
@@ -42,14 +42,14 @@ type MsasORandGen =
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.id, this.rngType, this.sortingWidth, this.maxOrbit)
+        hash (this.id, this.RngFactory, this.sortingWidth, this.maxOrbit)
 
     interface IEquatable<MsasORandGen> with
         member this.Equals(other) = 
             this.id = other.id
 
     member this.getMsasOs (offset: int) : sortableTestModel seq =
-            let randy = Rando.create this.RngType (%this.id)
+            let randy = this.RngFactory.Create (%this.id)
             let sw = %this.sortingWidth
             let maxO = this.maxOrbit
             let permSeq = 

@@ -202,7 +202,7 @@ module FullBoolMutate =
                                 sortingModelSetParent.StageLength 
                                 sortingModelSetParent.SortingWidth 
                                 mutationRate 
-                                randomType
+                                rngFactory.LcgFactory
 
                 let mapOfSortingModelSetMutators = 
                     sortingModelSetParent.SortingModels
@@ -219,7 +219,7 @@ module FullBoolMutate =
                 let mmId_sm = 
                     mapOfSortingModelSetMutators
                     |> Map.toArray
-                    |> Array.collect (fun (smmId, smm) -> smm.MutateSortingModels (Rando.create))
+                    |> Array.collect (fun (smmId, smm) -> smm.MutateSortingModels rngFactory.LcgFactory)
 
                 let mapSorterModelToModelSetMutators = 
                     mmId_sm

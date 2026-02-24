@@ -58,13 +58,13 @@ module SorterModelMaker =
         | SmmMsuf6RandGen msuf6 -> msuf6.Id
 
 
-    let makeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int)  (model: sorterModelMaker) : sorterModel =
+    let makeSorterModel (rngFactory: rngFactory) (index: int)  (model: sorterModelMaker) : sorterModel =
         match model with
-        | SmmMsceRandGen msce -> msce.MakeSorterModel rngFactory index |> sorterModel.Msce
-        | SmmMssiRandGen mssi -> mssi.MakeSorterModel rngFactory index |> sorterModel.Mssi
-        | SmmMsrsRandGen msrs -> msrs.MakeSorterModel rngFactory index |> sorterModel.Msrs
-        | SmmMsuf4RandGen msuf4 -> msuf4.MakeSorterModel rngFactory index |> sorterModel.Msuf4
-        | SmmMsuf6RandGen msuf6 -> msuf6.MakeSorterModel rngFactory index |> sorterModel.Msuf6
+        | SmmMsceRandGen msce -> msce.MakeSorterModel index |> sorterModel.Msce
+        | SmmMssiRandGen mssi -> mssi.MakeSorterModel index |> sorterModel.Mssi
+        | SmmMsrsRandGen msrs -> msrs.MakeSorterModel index |> sorterModel.Msrs
+        | SmmMsuf4RandGen msuf4 -> msuf4.MakeSorterModel index |> sorterModel.Msuf4
+        | SmmMsuf6RandGen msuf6 -> msuf6.MakeSorterModel index |> sorterModel.Msuf6
 
 
 

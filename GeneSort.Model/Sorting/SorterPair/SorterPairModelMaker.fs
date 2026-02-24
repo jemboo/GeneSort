@@ -17,7 +17,7 @@ type sorterPairModelMaker =
 module SorterPairModelMaker =
 
     let makeSorterPairModel 
-                (rngFactory: rngType -> Guid -> IRando) 
+                (rngFactory: rngFactory) 
                 (index: int)  
                 (model: sorterPairModelMaker) : sorterPairModel =
         match model with

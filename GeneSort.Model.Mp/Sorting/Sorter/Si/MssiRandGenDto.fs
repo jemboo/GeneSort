@@ -1,17 +1,17 @@
 ﻿namespace GeneSort.Model.Mp.Sorting.Sorter.Si
 
 open FSharp.UMX
-open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.Sorter.Si
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
+open GeneSort.Core.Mp
 
 [<MessagePackObject>]
 type mssiRandGenDto = 
     { [<Key(0)>] sortingWidth: int
-      [<Key(1)>] rngType: rngType
+      [<Key(1)>] rngFactoryDto: rngFactoryDto
       [<Key(2)>] stageLength: int }
 
 module MssiRandGenDto =
@@ -21,7 +21,7 @@ module MssiRandGenDto =
 
     let fromDomain (mssiRandGen: mssiRandGen) : mssiRandGenDto =
         { sortingWidth = %mssiRandGen.SortingWidth
-          rngType = mssiRandGen.RngType
+          rngFactoryDto = mssiRandGen.RngFactory |> RngFactoryDto.fromDomain
           stageLength = %mssiRandGen.StageLength }
 
     let toDomain (dto: mssiRandGenDto) : Result<mssiRandGen, string> =
@@ -33,7 +33,7 @@ module MssiRandGenDto =
             else
                 let mssiRandGen = 
                     mssiRandGen.create
-                        (dto.rngType)
+                        (dto.rngFactoryDto |> RngFactoryDto.toDomain)
                         (UMX.tag<sortingWidth> dto.sortingWidth)
                         (UMX.tag<stageLength> dto.stageLength)
                 Ok mssiRandGen

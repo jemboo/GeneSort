@@ -14,11 +14,11 @@ type msrsRandMutate =
         { 
           id : Guid<sorterModelMutatorID>
           msrs : msrs
-          rngType: rngType
+          rngFactory: rngFactory
           opsActionRatesArray: opsActionRatesArray
         } 
     static member create 
-            (rngType:rngType)
+            (rngFactory:rngFactory)
             (opsActionRatesArray: opsActionRatesArray)
             (msrs:msrs)
              : msrsRandMutate =
@@ -28,7 +28,7 @@ type msrsRandMutate =
 
         let id =
             [
-                rngType :> obj
+                rngFactory :> obj
                 msrs :> obj
                 opsActionRatesArray :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorID>
@@ -36,14 +36,14 @@ type msrsRandMutate =
         {
             id = id
             msrs = msrs
-            rngType = rngType
+            rngFactory = rngFactory
             opsActionRatesArray = opsActionRatesArray
         }
 
     member this.Id with get () = this.id
     member this.CeLength with get () = this.msrs.CeLength
     member this.Msrs with get () = this.msrs
-    member this.RngType with get () = this.rngType
+    member this.RngFactory with get () = this.rngFactory
     member this.StageLength with get () = this.msrs.StageLength 
     member this.OpsActionRates with get () = this.opsActionRatesArray
     member this.SortingWidth with get () = this.msrs.SortingWidth
@@ -55,7 +55,7 @@ type msrsRandMutate =
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.rngType, this.msrs, this.opsActionRatesArray)
+        hash (this.RngFactory, this.msrs, this.opsActionRatesArray)
 
     interface IEquatable<msrsRandMutate> with
         member this.Equals(other) = 
@@ -66,10 +66,9 @@ type msrsRandMutate =
     /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
     /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
     /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
-    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
-                    : msrs =
+    member this.MakeSorterModel (index: int) : msrs =
         let id = CommonMutator.makeSorterModelId this.Id index
-        let rng = rngFactory this.RngType %id
+        let rng = this.RngFactory.Create %id
         let orthoMutator = fun psi ->   Perm_RsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Ortho psi 
         let paraMutator = fun psi ->    Perm_RsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Para psi 
         let selfSymMutator = fun psi -> Perm_RsOps.mutatePerm_Rs  (rng.NextIndex) opsActionMode.SelfRefl psi 
@@ -89,6 +88,6 @@ module MsrsRandMutate =
     let toString (msrsRandMutate: msrsRandMutate) : string =
         let actionRates = msrsRandMutate.OpsActionRates.toString()
         sprintf "MsrsRandMutate(RngType=%A, Msrs=%s, OpsActionRates=%s)" 
-                msrsRandMutate.RngType 
+                msrsRandMutate.RngFactory 
                 (%msrsRandMutate.Msrs.toString())
                 actionRates

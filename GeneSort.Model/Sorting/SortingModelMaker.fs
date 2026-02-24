@@ -34,7 +34,7 @@ module SortingModelMaker =
         | Pair spmm -> spmm |> SorterPairModelMaker.getCeLength
 
     let makeSortingModel 
-                (rngFactory: rngType -> Guid -> IRando)
+                (rngFactory: rngFactory)
                 (index: int)  
                 (model: sortingModelMaker) : sortingModel =
         match model with

@@ -39,11 +39,11 @@ module SortingModelMutator =
 
 
     let makeSortingModel 
-                (rngFactory: rngType -> Guid -> IRando)
+                (rngFactory: rngFactory) 
                 (index: int)  
                 (model: sortingModelMutator) : sortingModel =
         match model with
-        | Single smm -> smm |> SorterModelMutator.makeSorterModel rngFactory index |> sortingModel.Single
+        | Single smm -> smm |> SorterModelMutator.makeSorterModel index |> sortingModel.Single
         | Pair spmm -> spmm |> SorterPairModelMutator.makeSorterPairModel rngFactory index |> sortingModel.Pair
 
 

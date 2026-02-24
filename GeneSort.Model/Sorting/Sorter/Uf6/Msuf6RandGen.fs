@@ -9,13 +9,13 @@ open GeneSort.Model.Sorting
 type msuf6RandGen = 
     private 
         { id: Guid<sorterModelMakerID>
-          rngType: rngType
+          rngFactory: rngFactory
           sortingWidth: int<sortingWidth>
           stageLength: int<stageLength> 
           genRates: uf6GenRatesArray }
 
     static member create 
-            (rngType: rngType) 
+            (rngFactory: rngFactory) 
             (sortingWidth: int<sortingWidth>) 
             (stageLength: int<stageLength>) 
             (genRates: uf6GenRatesArray) : msuf6RandGen =
@@ -29,20 +29,20 @@ type msuf6RandGen =
             failwith $"All Uf6GenRates in genRates must have order {%sortingWidth}"
         let id =
             [
-                rngType :> obj
+                rngFactory :> obj
                 sortingWidth :> obj
                 stageLength :> obj
                 genRates :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
         { id = id
-          rngType = rngType
+          rngFactory = rngFactory
           sortingWidth = sortingWidth
           stageLength = stageLength
           genRates = genRates }
 
     member this.Id with get() = this.id
     member this.CeLength with get () = (this.SortingWidth * %this.StageLength / 2) |> UMX.tag<ceLength>
-    member this.RngType with get() = this.rngType
+    member this.RngFactory with get() = this.rngFactory
     member this.SortingWidth with get() = this.sortingWidth
     member this.StageLength with get() = this.stageLength
     member this.GenRates with get() = this.genRates
@@ -50,7 +50,7 @@ type msuf6RandGen =
     member this.toString() =
         sprintf "Msuf6RandGen(Id=%A, RngType=%A, SortingWidth=%d, StageLength=%d, GenRates=%s)"
                 (%this.id)
-                this.rngType
+                this.RngFactory
                 (%this.sortingWidth)
                 (%this.stageLength)
                 (this.genRates.toString())
@@ -68,9 +68,9 @@ type msuf6RandGen =
         member this.Equals(other) =
             this.id = other.id
 
-    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) : msuf6 =
+    member this.MakeSorterModel (index: int) : msuf6 =
         let id = CommonMaker.makeSorterModelId this.Id index
-        let rng = rngFactory this.RngType %id
+        let rng = this.RngFactory.Create %id
         let genRatesArray = this.GenRates
         let stageLength = %this.StageLength
         let twoOrbitUnfolder6s =
@@ -86,7 +86,7 @@ module Msuf6RandGen =
     let toString (msuf6RandGen: msuf6RandGen) : string =
         sprintf "Msuf6RandGen(Id=%A, RngType=%A, SortingWidth=%d, StageLength=%d, GenRates=%s)"
                 (%msuf6RandGen.Id)
-                msuf6RandGen.RngType
+                msuf6RandGen.RngFactory
                 (%msuf6RandGen.SortingWidth)
                 (%msuf6RandGen.StageLength)
                 (msuf6RandGen.GenRates.toString())

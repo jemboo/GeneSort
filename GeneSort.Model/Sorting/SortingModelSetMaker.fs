@@ -33,7 +33,7 @@ type sortingModelSetMaker =
     member this.FirstIndex with get() = this.firstIndex
     member this.Count with get() = this.count
 
-    member this.MakeSortingModelSet (rngFactory: rngType -> Guid -> IRando) : sortingModelSet =
+    member this.MakeSortingModelSet (rngFactory: rngFactory) : sortingModelSet =
         if %this.count <= 0 then
             failwith "Count must be greater than 0"
         if %this.firstIndex < 0 then

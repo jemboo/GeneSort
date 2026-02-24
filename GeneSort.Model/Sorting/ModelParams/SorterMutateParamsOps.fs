@@ -22,7 +22,7 @@ module SorterMutateParamsOps =
             if %msce.CeLength <> prams.IndelRatesArray.Length then
                 failwith (sprintf "Msce ceLength (%d) must match IndelRatesArray length (%d)" 
                             %msce.CeLength prams.IndelRatesArray.Length)
-            msceRandMutate.create prams.RngType prams.IndelRatesArray prams.ExcludeSelfCe msce 
+            msceRandMutate.create prams.RngFactory prams.IndelRatesArray prams.ExcludeSelfCe msce 
             |> sorterModelMutator.SmmMsceRandMutate |> sortingModelMutator.Single
 
         
@@ -31,7 +31,7 @@ module SorterMutateParamsOps =
             if %mssi.StageLength <> prams.OpActionRatesArray.Length then
                 failwith (sprintf "Mssi stageLength (%d) must match OpActionRatesArray length (%d)" 
                             %mssi.StageLength prams.OpActionRatesArray.Length)
-            mssiRandMutate.create prams.RngType prams.OpActionRatesArray mssi
+            mssiRandMutate.create prams.RngFactory prams.OpActionRatesArray mssi
             |> sorterModelMutator.SmmMssiRandMutate |> sortingModelMutator.Single
     
         
@@ -40,7 +40,7 @@ module SorterMutateParamsOps =
             if %msrs.StageLength <> prams.OpsActionRatesArray.Length then
                 failwith (sprintf "Msrs stageLength (%d) must match OpsActionRatesArray length (%d)" 
                             %msrs.StageLength prams.OpsActionRatesArray.Length)
-            msrsRandMutate.create prams.RngType prams.OpsActionRatesArray msrs
+            msrsRandMutate.create prams.RngFactory prams.OpsActionRatesArray msrs
             |> sorterModelMutator.SmmMsrsRandMutate |> sortingModelMutator.Single
 
         
@@ -49,7 +49,7 @@ module SorterMutateParamsOps =
             if %msuf4.StageLength <> prams.Uf4MutationRatesArray.Length then
                 failwith (sprintf "Msuf4 stageLength (%d) must match Uf4MutationRatesArray length (%d)" 
                             %msuf4.StageLength prams.Uf4MutationRatesArray.Length)
-            msuf4RandMutate.create prams.RngType prams.Uf4MutationRatesArray msuf4
+            msuf4RandMutate.create prams.RngFactory prams.Uf4MutationRatesArray msuf4
             |> sorterModelMutator.SmmMsuf4RandMutate |> sortingModelMutator.Single
     
         
@@ -58,7 +58,7 @@ module SorterMutateParamsOps =
             if %msuf6.StageLength <> prams.Uf6MutationRatesArray.Length then
                 failwith (sprintf "Msuf6 stageLength (%d) must match Uf6MutationRatesArray length (%d)" 
                             %msuf6.StageLength prams.Uf6MutationRatesArray.Length)
-            msuf6RandMutate.create prams.RngType prams.Uf6MutationRatesArray msuf6
+            msuf6RandMutate.create prams.RngFactory prams.Uf6MutationRatesArray msuf6
             |> sorterModelMutator.SmmMsuf6RandMutate |> sortingModelMutator.Single
 
         

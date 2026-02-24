@@ -8,11 +8,12 @@ open GeneSort.Core.Mp.RatesAndOps
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
+open GeneSort.Core.Mp
 
 [<MessagePackObject>]
 type msrsRandGenDto = 
     { [<Key(0)>] SortingWidth: int
-      [<Key(1)>] RngType: rngType
+      [<Key(1)>] rngFactoryDto: rngFactoryDto
       [<Key(2)>] OpsGenRatesArray: OpsGenRatesArrayDto }
 
 module MsrsRandGenDto =
@@ -22,7 +23,7 @@ module MsrsRandGenDto =
 
     let fromDomain (msrsRandGen: msrsRandGen) : msrsRandGenDto =
         { SortingWidth = %msrsRandGen.SortingWidth
-          RngType = msrsRandGen.RngType
+          rngFactoryDto = msrsRandGen.RngFactory |> RngFactoryDto.fromDomain
           OpsGenRatesArray = OpsGenRatesArrayDto.fromDomain msrsRandGen.OpsGenRatesArray }
 
     let toDomain (dto: msrsRandGenDto) : msrsRandGen =
@@ -32,7 +33,7 @@ module MsrsRandGenDto =
             if (dto.OpsGenRatesArray.Rates.Length) < 1 then
                 failwith $"OpsGenRatesArray must have at least 1 rate, got {dto.OpsGenRatesArray.Rates.Length}"
             msrsRandGen.create
-                (dto.RngType)
+                (dto.rngFactoryDto |> RngFactoryDto.toDomain)
                 (UMX.tag<sortingWidth> dto.SortingWidth)
                 (OpsGenRatesArrayDto.toDomain dto.OpsGenRatesArray)
         with

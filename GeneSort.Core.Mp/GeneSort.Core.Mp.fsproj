@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="RngFactoryDto.fs" />
     <Compile Include="PermutationDto.fs" />
     <Compile Include="LatticePointDto.fs" />
     <Compile Include="LatticeLevelSetMapDto.fs" />

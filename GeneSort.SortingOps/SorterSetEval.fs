@@ -10,19 +10,21 @@ open GeneSort.Model.Sorting
 
 [<Measure>] type sorterSetEvalId
 
+// This type represents the evaluation of a set of sorters (sorterSet) against a 
+// specific set of sortable tests (sortableTest).
 type sorterSetEval =
 
     private { 
         sorterSetEvalId: Guid<sorterSetEvalId>
         sorterSetId: Guid<sorterSetId>
         sorterTestId: Guid<sorterTestId>
-        sorterEvals: sorterEval[]
+        sorterEvals: Map<Guid<sorterId>, sorterEval>
     }
 
     static member create 
                 (sorterSetId: Guid<sorterSetId>) 
                 (sorterTestsId: Guid<sorterTestId>) 
-                (sorterEval: sorterEval[]) =
+                (sorterEvals: sorterEval[]) =
         let id =
             [
                 sorterSetId :> obj
@@ -33,13 +35,13 @@ type sorterSetEval =
             sorterSetEvalId = id
             sorterSetId = sorterSetId
             sorterTestId = sorterTestsId
-            sorterEvals = sorterEval
+            sorterEvals = sorterEvals |> Array.map (fun se -> (se.SorterId, se)) |> Map.ofArray
         }
 
     member this.SorterSetEvalId with get() : Guid<sorterSetEvalId> = this.sorterSetEvalId
     member this.SorterSetId with get() : Guid<sorterSetId> = this.sorterSetId
     member this.SorterTestId with get() : Guid<sorterTestId> = this.sorterTestId
-    member this.SorterEvals with get() : sorterEval[] = this.sorterEvals
+    member this.SorterEvals with get() : sorterEval[] = this.sorterEvals.Values |> Seq.toArray
 
  
 

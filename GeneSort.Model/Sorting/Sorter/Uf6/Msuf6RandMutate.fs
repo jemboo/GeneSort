@@ -12,44 +12,44 @@ type msuf6RandMutate =
         {
           id : Guid<sorterModelMutatorID>
           msuf6 : msuf6
-          rngType: rngType
-          uf6MutationRatesArray: uf6MutationRatesArray } 
+          rngFactory: rngFactory
+          uf6MutationRatesArray: uf6MutationRatesArray 
+        } 
     static member create 
-            (rngType: rngType)
+            (rngFactory: rngFactory)
             (uf6MutationRatesArray: uf6MutationRatesArray) 
             (msuf6 : msuf6)
             : msuf6RandMutate =
-        if rngType = Unchecked.defaultof<rngType> then
-            failwith "rngType must be specified"
-        else if uf6MutationRatesArray.Length <> %msuf6.StageLength then
+
+        if uf6MutationRatesArray.Length <> %msuf6.StageLength then
             failwith $"mutationRates array length (%d{uf6MutationRatesArray.Length}) must equal stageLength ({%msuf6.StageLength})"
 
         let id =
             [
-                rngType :> obj
+                rngFactory :> obj
                 msuf6 :> obj
                 uf6MutationRatesArray :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorID>
 
         {
             id = id
-            rngType = rngType
+            rngFactory = rngFactory
             msuf6 = msuf6
             uf6MutationRatesArray = uf6MutationRatesArray
         }
 
     static member createFromSingleRate
-            (rngType: rngType)
+            (rngFactory: rngFactory)
             (msuf6 : msuf6)
             (rates: uf6MutationRates) 
             : msuf6RandMutate =
         let mutationRates = uf6MutationRatesArray.create (Array.create (%msuf6.StageLength) rates)
-        msuf6RandMutate.create rngType mutationRates msuf6
+        msuf6RandMutate.create rngFactory mutationRates msuf6
 
     member this.Id with get () = this.id
     member this.CeLength with get () = this.msuf6.CeLength
     member this.Msuf6 with get () = this.msuf6
-    member this.RngType with get () = this.rngType
+    member this.RngFactory with get () = this.rngFactory
     member this.StageLength with get () = this.msuf6.StageLength
     member this.Uf6MutationRatesArray with get () = this.uf6MutationRatesArray
     member this.SortingWidth with get () = this.msuf6.SortingWidth
@@ -57,13 +57,13 @@ type msuf6RandMutate =
     override this.Equals(obj) = 
         match obj with
         | :? msuf6RandMutate as other -> 
-            this.rngType = other.rngType && 
+            this.rngFactory = other.RngFactory && 
             this.msuf6 = other.msuf6 &&
             this.uf6MutationRatesArray.Equals(other.uf6MutationRatesArray)
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.rngType, this.msuf6, this.uf6MutationRatesArray)
+        hash (this.RngFactory, this.msuf6, this.uf6MutationRatesArray)
 
     interface IEquatable<msuf6RandMutate> with
         member this.Equals(other) = 
@@ -74,12 +74,11 @@ type msuf6RandMutate =
     /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
     /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
     /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
-    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
-                    : msuf6 =
+    member this.MakeSorterModel (index: int) : msuf6 =
         if %this.StageLength <> this.Uf6MutationRatesArray.Length then
             failwith $"Stage count of Msuf6 {%this.StageLength} must match Msuf6RandMutate length {this.Uf6MutationRatesArray.Length}"
         let id = CommonMutator.makeSorterModelId this.Id index
-        let rng = rngFactory this.RngType %id
+        let rng = this.RngFactory.Create %id
         let mutatedUnfolders = 
             Array.zip this.msuf6.TwoOrbitUnfolder6s this.Uf6MutationRatesArray.RatesArray
             |> Array.map (fun (unfolder, mutationRates) ->
@@ -105,6 +104,6 @@ module Msuf6RandMutate =
                     rates.Seed6TransitionRates.SelfReflRates.Para1Rate)
             |> String.concat ", "
         sprintf "Msuf6RandMutate(RngType=%A, StageLength=%d, MutationRates=%s)" 
-                msuf6RandMutate.RngType 
+                msuf6RandMutate.RngFactory 
                 (%msuf6RandMutate.StageLength)
                 ratesStr

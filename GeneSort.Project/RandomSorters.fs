@@ -276,22 +276,22 @@ module RandomSorters =
                 let sorterModelMaker =
                     match sorterModelType with
                     | sorterModelType.Msce -> 
-                        msceRandGen.create randomType sortingWidth excludeSelfCe ceLength 
+                        msceRandGen.create rngFactory.LcgFactory sortingWidth excludeSelfCe ceLength 
                         |> sorterModelMaker.SmmMsceRandGen
                     | sorterModelType.Mssi -> 
-                        mssiRandGen.create randomType sortingWidth stageLength 
+                        mssiRandGen.create rngFactory.LcgFactory sortingWidth stageLength 
                         |> sorterModelMaker.SmmMssiRandGen
                     | sorterModelType.Msrs -> 
                         let opsGenRatesArray = OpsGenRatesArray.createUniform %stageLength
-                        msrsRandGen.create randomType sortingWidth opsGenRatesArray 
+                        msrsRandGen.create rngFactory.LcgFactory sortingWidth opsGenRatesArray 
                         |> sorterModelMaker.SmmMsrsRandGen
                     | sorterModelType.Msuf4 -> 
                         let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageLength %sortingWidth
-                        msuf4RandGen.create randomType sortingWidth stageLength uf4GenRatesArray 
+                        msuf4RandGen.create rngFactory.LcgFactory sortingWidth stageLength uf4GenRatesArray 
                         |> sorterModelMaker.SmmMsuf4RandGen
                     | sorterModelType.Msuf6 -> 
                         let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
-                        msuf6RandGen.create randomType sortingWidth stageLength uf6GenRatesArray 
+                        msuf6RandGen.create rngFactory.LcgFactory sortingWidth stageLength uf6GenRatesArray 
                         |> sorterModelMaker.SmmMsuf6RandGen
 
                 let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
@@ -299,7 +299,7 @@ module RandomSorters =
                                             (sorterModelMaker |> sortingModelMaker.Single)
                                             firstIndex 
                                             sorterCount
-                let sortingModelSet = sorterModelSetMaker.MakeSortingModelSet (Rando.create)
+                let sortingModelSet = sorterModelSetMaker.MakeSortingModelSet rngFactory.LcgFactory
 
                 // 4. Saves
                 let qpSortingModelSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingModelSet "") 

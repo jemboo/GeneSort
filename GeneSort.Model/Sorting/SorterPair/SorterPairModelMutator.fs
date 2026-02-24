@@ -38,7 +38,7 @@ module SorterPairModelMutator =
         | sorterPairModelMutator.SplitPairs2 mspg -> MsSplitPairsMutator.getSortingWidth mspg
 
     let makeSorterPairModel 
-                (rngFactory: rngType -> Guid -> IRando) 
+                (rngFactory: rngFactory) 
                 (index: int)  
                 (model: sorterPairModelMutator) : sorterPairModel =
         match model with

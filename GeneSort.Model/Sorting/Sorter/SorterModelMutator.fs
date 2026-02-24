@@ -59,15 +59,14 @@ module SorterModelMutator =
 
 
     let makeSorterModel 
-                (rngFactory: rngType -> Guid -> IRando) 
                 (index: int)  
                 (model: sorterModelMutator) : sorterModel =
         match model with
-        | SmmMsceRandMutate msce -> msce.MakeSorterModel rngFactory index |> sorterModel.Msce
-        | SmmMssiRandMutate mssi -> mssi.MakeSorterModel rngFactory index |> sorterModel.Mssi
-        | SmmMsrsRandMutate msrs -> msrs.MakeSorterModel rngFactory index |> sorterModel.Msrs
-        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModel rngFactory index |> sorterModel.Msuf4
-        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModel rngFactory index |> sorterModel.Msuf6
+        | SmmMsceRandMutate msce -> msce.MakeSorterModel index |> sorterModel.Msce
+        | SmmMssiRandMutate mssi -> mssi.MakeSorterModel index |> sorterModel.Mssi
+        | SmmMsrsRandMutate msrs -> msrs.MakeSorterModel index |> sorterModel.Msrs
+        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModel index |> sorterModel.Msuf4
+        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModel index |> sorterModel.Msuf6
 
 
 

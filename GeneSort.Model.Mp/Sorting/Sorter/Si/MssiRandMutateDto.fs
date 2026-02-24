@@ -1,17 +1,17 @@
 ﻿namespace GeneSort.Model.Mp.Sorting.Sorter.Si
 
 open FSharp.UMX
-open GeneSort.Core
 open GeneSort.Model.Sorting.Sorter.Si
 open GeneSort.Core.Mp.RatesAndOps
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
+open GeneSort.Core.Mp
 
 [<MessagePackObject>]
 type mssiRandMutateDto = 
     { [<Key(0)>] mssiDto: mssiDto
-      [<Key(1)>] rngType: rngType
+      [<Key(1)>] rngFactoryDto: rngFactoryDto
       [<Key(2)>] opActionRatesArrayDto: opActionRatesArrayDto }
 
 module MssiRandMutateDto =
@@ -21,7 +21,7 @@ module MssiRandMutateDto =
 
     let fromDomain (mssiRandMutate: mssiRandMutate) : mssiRandMutateDto =
         { mssiDto = MssiDto.fromDomain mssiRandMutate.Mssi
-          rngType = mssiRandMutate.RngType
+          rngFactoryDto = mssiRandMutate.RngFactory |> RngFactoryDto.fromDomain
           opActionRatesArrayDto = OpActionRatesArrayDto.fromDomain mssiRandMutate.OpActionRates }
 
     let toDomain (dto: mssiRandMutateDto) : Result<mssiRandMutate, string> =
@@ -34,7 +34,7 @@ module MssiRandMutateDto =
                 else
                     let mssiRandMutate = 
                         mssiRandMutate.create
-                            (dto.rngType)
+                            (dto.rngFactoryDto |> RngFactoryDto.toDomain)
                             (OpActionRatesArrayDto.toDomain dto.opActionRatesArrayDto)
                             mssi
                     Ok mssiRandMutate

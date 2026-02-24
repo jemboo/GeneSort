@@ -12,12 +12,12 @@ type msceRandMutate =
         { 
           id : Guid<sorterModelMutatorID>
           msce : msce
-          rngType: rngType
+          rngFactory: rngFactory
           indelRatesArray: indelRatesArray
           excludeSelfCe: bool }
     with
     static member create 
-            (rngType: rngType)
+            (rngFactory: rngFactory)
             (indelRatesArray: indelRatesArray)
             (excludeSelfCe: bool) 
             (msce : msce) : msceRandMutate = 
@@ -25,7 +25,7 @@ type msceRandMutate =
         let id =
             [
                 msce :> obj
-                rngType :> obj
+                rngFactory :> obj
                 indelRatesArray :> obj
                 excludeSelfCe :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorID>
@@ -33,14 +33,14 @@ type msceRandMutate =
         {
             id = id
             msce = msce
-            rngType = rngType
+            rngFactory = rngFactory
             indelRatesArray = indelRatesArray
             excludeSelfCe = excludeSelfCe
         }
         
     member this.Id with get () = this.id
     member this.Msce with get () = this.msce
-    member this.RngType with get () = this.rngType
+    member this.RngFactory with get () = this.rngFactory
     member this.CeLength with get () = this.msce.CeLength
     member this.IndelRatesArray with get () = this.indelRatesArray
     member this.ExcludeSelfCe with get () = this.excludeSelfCe
@@ -54,21 +54,22 @@ type msceRandMutate =
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.rngType, this.indelRatesArray, this.excludeSelfCe, this.msce)
+        hash (this.rngFactory, this.indelRatesArray, this.excludeSelfCe, this.msce)
 
     interface IEquatable<msceRandMutate> with
         member this.Equals(other) = 
             this.Id = other.Id
 
 
+
     /// Mutates an Msce by applying IndelRatesArray to its ceCodes array.
     /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
     /// The ceCodes array is modified using the provided indelRatesArray, with insertions and mutations
     /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
-    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) (index: int) 
+    member this.MakeSorterModel (index: int) 
                 : msce =
         let id = CommonMutator.makeSorterModelId this.Id index
-        let rng = rngFactory this.RngType %id
+        let rng = this.RngFactory.Create %id
         let excludeSelfCe = this.ExcludeSelfCe
         let sortingWidth = %this.msce.SortingWidth
         let ceCodeInserter = fun () -> Ce.generateCeCode excludeSelfCe sortingWidth (rng.NextIndex)
@@ -87,7 +88,7 @@ module MsceRandMutate =
     /// Returns a string representation of the MsceRandMutate instance.
     let toString (msceMutate: msceRandMutate) : string = 
         sprintf "MsceRandMutate(%s, %d, %s, %b)"
-            (msceMutate.RngType.ToString())
+            (msceMutate.RngFactory.ToString())
             (%msceMutate.CeLength)
             (msceMutate.IndelRatesArray.toString())
             msceMutate.ExcludeSelfCe

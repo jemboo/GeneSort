@@ -5,13 +5,13 @@ open MessagePack
 open FSharp.UMX
 open GeneSort.Model.Sortable
 open GeneSort.Sorting
-open GeneSort.Core
+open GeneSort.Core.Mp
 
 
 [<MessagePackObject>]
 type msasORandGenDto = {
     [<Key(0)>] id: Guid
-    [<Key(1)>] rngType: rngType
+    [<Key(1)>] rngFactoryDto: rngFactoryDto
     [<Key(2)>] sortingWidth: int
     [<Key(3)>] maxOrbit: int
 }
@@ -19,7 +19,7 @@ type msasORandGenDto = {
 module MsasORandGenDto =
 
     let fromDomain (msas: MsasORandGen) : msasORandGenDto =
-        { id = %msas.Id; rngType = msas.RngType; sortingWidth = int msas.SortingWidth; maxOrbit = msas.MaxOrbit }
+        { id = %msas.Id; rngFactoryDto = msas.RngFactory |> RngFactoryDto.fromDomain; sortingWidth = int msas.SortingWidth; maxOrbit = msas.MaxOrbit }
 
     let toDomain (dto: msasORandGenDto) : MsasORandGen =
         if dto.sortingWidth < 0 then
@@ -27,6 +27,7 @@ module MsasORandGenDto =
         if dto.maxOrbit < 0 then
             invalidArg "MaxOrbit" "Max orbit must be non-negative."
         try
-            MsasORandGen.create dto.rngType (UMX.tag<sortingWidth> dto.sortingWidth) dto.maxOrbit
+            let rngFactory = RngFactoryDto.toDomain dto.rngFactoryDto
+            MsasORandGen.create rngFactory (UMX.tag<sortingWidth> dto.sortingWidth) dto.maxOrbit
         with
-        | :? ArgumentException -> invalidArg "RngType" $"Invalid RngType: {dto.rngType}."
+        | :? ArgumentException -> invalidArg "RngType" $"Invalid RngType: {dto.rngFactoryDto}."

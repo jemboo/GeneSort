@@ -1,7 +1,6 @@
 ﻿namespace GeneSort.Model.Mp.Sorting.Sorter.Rs
 
 open FSharp.UMX
-open GeneSort.Core
 open GeneSort.Model.Mp.Sorting.Sorter.Rs
 open GeneSort.Core.Mp.RatesAndOps
 open MessagePack
@@ -13,7 +12,7 @@ open GeneSort.Core.Mp
 [<MessagePackObject>]
 type msrsRandMutateDto = 
     { [<Key(0)>] msrsDto: msrsDto
-      [<Key(1)>] rngType: rngType
+      [<Key(1)>] rngFactoryDto: rngFactoryDto
       [<Key(2)>] opsActionRatesArray: opsActionRatesArrayDto }
 
 module MsrsRandMutateDto =
@@ -23,7 +22,7 @@ module MsrsRandMutateDto =
 
     let fromDomain (msrsRandMutate: msrsRandMutate) : msrsRandMutateDto =
         { msrsDto = MsrsDto.fromDomain msrsRandMutate.Msrs
-          rngType = msrsRandMutate.RngType
+          rngFactoryDto = msrsRandMutate.RngFactory |> RngFactoryDto.fromDomain
           opsActionRatesArray = OpsActionRatesArrayDto.fromDomain msrsRandMutate.OpsActionRates }
 
     let toDomain (dto: msrsRandMutateDto) : msrsRandMutate =
@@ -34,7 +33,7 @@ module MsrsRandMutateDto =
                 if %msrs.StageLength <> dto.opsActionRatesArray.Rates.Length then
                     failwith $"StageLength ({%msrs.StageLength}) must match OpsActionRatesArray length ({dto.opsActionRatesArray.Rates.Length})"
                 msrsRandMutate.create
-                    (dto.rngType)
+                    (dto.rngFactoryDto |> RngFactoryDto.toDomain)
                     (OpsActionRatesArrayDto.toDomain dto.opsActionRatesArray)
                     msrs
             | Error err ->

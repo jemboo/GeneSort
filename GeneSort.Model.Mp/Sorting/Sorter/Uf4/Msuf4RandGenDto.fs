@@ -9,11 +9,12 @@ open MessagePack.Resolvers
 open MessagePack.FSharp
 open GeneSort.Core.Mp.RatesAndOps
 open GeneSort.Sorting
+open GeneSort.Core.Mp
 
 [<MessagePackObject>]
 type msuf4RandGenDto =
     { [<Key(0)>] id: Guid
-      [<Key(1)>] rngType: rngType
+      [<Key(1)>] rngFactoryDto: rngFactoryDto
       [<Key(2)>] sortingWidth: int
       [<Key(3)>] stageLength: int
       [<Key(4)>] uf4GenRatesArrayDto: Uf4GenRatesArrayDto }
@@ -25,7 +26,7 @@ module Msuf4RandGenDto =
 
     let fromDomain (msuf4RandGen: msuf4RandGen) : msuf4RandGenDto =
         { id = %msuf4RandGen.Id
-          rngType = msuf4RandGen.RngType
+          rngFactoryDto = msuf4RandGen.RngFactory |> RngFactoryDto.fromDomain
           sortingWidth = %msuf4RandGen.SortingWidth
           stageLength = %msuf4RandGen.StageLength
           uf4GenRatesArrayDto = Uf4GenRatesArrayDto.fromDomain msuf4RandGen.GenRates }
@@ -46,6 +47,10 @@ module Msuf4RandGenDto =
             if genRates.RatesArray |> Array.exists (fun gr -> gr.OpsGenRatesArray.Length <> MathUtils.exactLog2(gr.Order / 4)) then
                 failwith "opsGenRatesArray length must equal log2(order/4)"
 
-            msuf4RandGen.create dto.rngType (UMX.tag<sortingWidth> dto.sortingWidth) (UMX.tag<stageLength> dto.stageLength) genRates
+            msuf4RandGen.create 
+                    (dto.rngFactoryDto |> RngFactoryDto.toDomain)
+                    (UMX.tag<sortingWidth> dto.sortingWidth) 
+                    (UMX.tag<stageLength> dto.stageLength) 
+                    genRates
         with
         | ex -> failwith $"Failed to convert Msuf4RandGenDto: {ex.Message}"

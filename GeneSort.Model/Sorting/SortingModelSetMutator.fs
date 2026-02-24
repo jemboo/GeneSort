@@ -33,7 +33,7 @@ type sortingModelSetMutator =
     member this.FirstIndex with get() = this.firstIndex
     member this.Count with get() = this.count
 
-    member this.MutateSortingModels (rngFactory: rngType -> Guid -> IRando)
+    member this.MutateSortingModels (rngFactory: rngFactory)
                 : (Guid<sortingModelMutatorID> * sortingModel) [] =
         let mutantSortingModels = 
             [| for i in 0 .. %this.count - 1 do

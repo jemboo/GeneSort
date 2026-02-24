@@ -12,14 +12,14 @@ type mssiRandGen =
     private 
         { 
           id : Guid<sorterModelMakerID>
-          rngType: rngType
+          rngFactory: rngFactory
           sortingWidth: int<sortingWidth>
           stageLength: int<stageLength> 
         } 
     with
 
     static member create 
-            (rngType: rngType) 
+            (rngFactory: rngFactory) 
             (sortingWidth: int<sortingWidth>)
             (stageLength: int<stageLength>) 
                 : mssiRandGen =
@@ -30,46 +30,46 @@ type mssiRandGen =
         else
             let id =
                 [
-                    rngType :> obj
+                    rngFactory :> obj
                     sortingWidth :> obj
                     %stageLength :> obj
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
 
             { 
                 id = id; 
-                rngType = rngType; 
+                rngFactory = rngFactory; 
                 sortingWidth = sortingWidth; 
                 stageLength = stageLength 
             }
 
     member this.Id with get () = this.id
     member this.CeLength with get () = (this.SortingWidth * %this.StageLength / 2) |> UMX.tag<ceLength>
-    member this.RngType with get () = this.rngType
+    member this.RngFactory with get () = this.rngFactory
     member this.SortingWidth with get () = this.sortingWidth
     member this.StageLength with get () = this.stageLength
 
     override this.Equals(obj) = 
         match obj with
         | :? mssiRandGen as other -> 
-            this.rngType = other.rngType && 
+            this.RngFactory = other.RngFactory && 
             this.sortingWidth = other.sortingWidth &&
             this.stageLength = other.stageLength
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.GetType(), this.rngType, this.sortingWidth, this.stageLength)
+        hash (this.GetType(), this.RngFactory, this.sortingWidth, this.stageLength)
 
     interface IEquatable<mssiRandGen> with
         member this.Equals(other) = 
-            this.rngType = other.rngType && 
+            this.RngFactory = other.RngFactory && 
             this.sortingWidth = other.sortingWidth &&
             this.stageLength = other.stageLength
 
 
-    member this.MakeSorterModel (rngFactory: rngType -> Guid -> IRando) 
+    member this.MakeSorterModel
             (index: int) : mssi =
         let id = CommonMaker.makeSorterModelId this.Id index
-        let rando = rngFactory this.RngType %id
+        let rando = this.RngFactory.Create %id
         let perm_Sis = Perm_Si.makeRandoms (rando.NextIndex) (%this.SortingWidth) 
                         |> Seq.take (%this.StageLength)
                         |> Seq.toArray
@@ -82,4 +82,4 @@ module MssiRandGen =
     /// Returns a string representation of the MssiRandGen.
     let toString (mssiRandGen: mssiRandGen) : string =
         sprintf "MssiRandGen(RngType=%A, Width=%d, StageLength=%d)" 
-                mssiRandGen.RngType (%mssiRandGen.SortingWidth) (%mssiRandGen.StageLength)
+                mssiRandGen.RngFactory (%mssiRandGen.SortingWidth) (%mssiRandGen.StageLength)

@@ -64,14 +64,14 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 /// **********     MergeIntEvals   ****************
-//let executor = MergeIntEvals.executor
-//let project = MergeIntEvals.project
-//let projectName = MergeIntEvals.project.ProjectName
-//let projectFolder = MergeIntEvals.projectFolder
-//let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
-//let paramRefiner = MergeIntEvals.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+let executor = MergeIntEvals.executor
+let project = MergeIntEvals.project
+let projectName = MergeIntEvals.project.ProjectName
+let projectFolder = MergeIntEvals.projectFolder
+let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
+let paramRefiner = MergeIntEvals.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
 
@@ -97,14 +97,14 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 //let maxReplica = 1<replNumber>
 
 ///// **********    FullBoolMutate   ****************
-let executor = FullBoolMutate.executor
-let project = FullBoolMutate.project
-let projectName = FullBoolMutate.project.ProjectName
-let projectFolder = FullBoolMutate.projectFolder
-let buildQueryParams = FullBoolMutate.makeQueryParamsFromRunParams
-let paramRefiner = FullBoolMutate.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+//let executor = FullBoolMutate.executor
+//let project = FullBoolMutate.project
+//let projectName = FullBoolMutate.project.ProjectName
+//let projectFolder = FullBoolMutate.projectFolder
+//let buildQueryParams = FullBoolMutate.makeQueryParamsFromRunParams
+//let paramRefiner = FullBoolMutate.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 printfn "Initializing Project..."
 let initResult = 

@@ -95,7 +95,7 @@ module MsSplitPairsGen =
         getPrefixCeLength gen + getSuffixCeLength gen
     
     /// Generates an msSplitPairs instance by making sorter models from each maker
-    let makeMsSplitPairs (rngFactory: rngType -> Guid -> IRando) (index: int) (gen: msSplitPairsGen) : msSplitPairs =
+    let makeMsSplitPairs (rngFactory: rngFactory) (index: int) (gen: msSplitPairsGen) : msSplitPairs =
         let firstPrefix = SorterModelMaker.makeSorterModel rngFactory index gen.FirstPrefixMaker 
         let firstSuffix = SorterModelMaker.makeSorterModel rngFactory index gen.FirstSuffixMaker
         let secondPrefix = SorterModelMaker.makeSorterModel rngFactory index gen.SecondPrefixMaker

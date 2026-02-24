@@ -4,6 +4,8 @@ open FSharp.UMX
 
 
 [<Measure>] type randomSeed
+[<Measure>] type rngFactoryId
+
 
 module RandomSeed =
 
@@ -241,3 +243,66 @@ module Rando =
             member _.NextULong() = failwith "Not implemented"
             member _.NextGuid() = failwith "Not implemented"
             member _.ByteCount = 0
+
+
+
+
+[<CustomEquality; CustomComparison>]
+type rngFactory = 
+    private 
+        { id: Guid<rngFactoryId>
+          rngType: rngType
+          create: Guid -> IRando }
+    with
+    member this.Id with get() = this.id
+    member this.RngType with get() = this.rngType
+    member this.Create(seed: Guid) : IRando = this.create seed
+    
+    override this.ToString() =
+        sprintf "rngFactory(Id: %A, Type: %A)" this.id this.rngType
+
+    // Equality based on id and rngType only (ignoring the function)
+    override this.Equals(obj) =
+        match obj with
+        | :? rngFactory as other -> 
+            this.id = other.id && this.rngType = other.rngType
+        | _ -> false
+    
+    override this.GetHashCode() =
+        hash (this.id, this.rngType)
+    
+    // Comparison based on id
+    interface System.IComparable with
+        member this.CompareTo(obj) =
+            match obj with
+            | :? rngFactory as other -> compare this.id other.id
+            | _ -> invalidArg "obj" "Cannot compare values of different types"
+    
+    static member private createFactory (id: Guid<rngFactoryId>) (rngType: rngType) : rngFactory =
+        { id = id
+          rngType = rngType
+          create = fun guid -> Rando.create rngType guid }
+    
+    // Fixed IDs for static instances
+    static member private LcgFactoryId = Guid.Parse("00000000-0000-0000-0000-000000000001") |> UMX.tag<rngFactoryId>
+    static member private NetFactoryId = Guid.Parse("00000000-0000-0000-0000-000000000002") |> UMX.tag<rngFactoryId>
+    
+    // Static instances for each rngType with fixed IDs
+    static member LcgFactory : rngFactory =
+        rngFactory.createFactory rngFactory.LcgFactoryId Lcg
+    
+    static member NetFactory : rngFactory =
+        rngFactory.createFactory rngFactory.NetFactoryId Net
+    
+    // Helper to get factory by rngType
+    static member getFactory (rngType: rngType) : rngFactory =
+        match rngType with
+        | Lcg -> rngFactory.LcgFactory
+        | Net -> rngFactory.NetFactory
+
+module RngFactory =
+    let create (rngType: rngType) : rngFactory =
+        rngFactory.getFactory rngType
+    
+    let createRng (factory: rngFactory) (seed: Guid) : IRando =
+        factory.Create(seed)
