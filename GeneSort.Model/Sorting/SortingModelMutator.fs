@@ -38,13 +38,12 @@ module SortingModelMutator =
         | Pair spmm -> spmm |> SorterPairModelMutator.getCeLength
 
 
-    let makeSortingModel 
-                (rngFactory: rngFactory) 
+    let makeSortingModel
                 (index: int)  
                 (model: sortingModelMutator) : sortingModel =
         match model with
         | Single smm -> smm |> SorterModelMutator.makeSorterModel index |> sortingModel.Single
-        | Pair spmm -> spmm |> SorterPairModelMutator.makeSorterPairModel rngFactory index |> sortingModel.Pair
+        | Pair spmm -> spmm |> SorterPairModelMutator.makeSorterPairModel index |> sortingModel.Pair
 
 
 

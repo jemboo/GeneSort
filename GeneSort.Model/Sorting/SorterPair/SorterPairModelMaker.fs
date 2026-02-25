@@ -16,15 +16,22 @@ type sorterPairModelMaker =
 
 module SorterPairModelMaker =
 
-    let makeSorterPairModel 
-                (rngFactory: rngFactory) 
+    let makeSorterPairModel
                 (index: int)  
                 (model: sorterPairModelMaker) : sorterPairModel =
         match model with
-        | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs rngFactory index 
+        | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs index 
                                   |> sorterPairModel.SplitPairs
-        | SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs rngFactory index 
+        | SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs index 
                                    |> sorterPairModel.SplitPairs2
+
+
+    let makeSorterModelIds (model:sorterPairModelMaker) (index:int) 
+                                    : Guid<sorterModelID> [] =
+        match model with
+        | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeSorterModelIds index 
+
+        | SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeSorterModelIds index 
 
 
     let getCeLength (model: sorterPairModelMaker) : int<ceLength> =

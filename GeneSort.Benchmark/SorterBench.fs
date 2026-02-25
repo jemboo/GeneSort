@@ -157,7 +157,7 @@ type MergeEvalBench() =
             |> sortingModelMaker.Single
 
         let sorterModelSetMaker = sortingModelSetMaker.create smm firstIndex (this.sorterCount |> UMX.tag<sorterCount>)
-        let sorterModelSet = sorterModelSetMaker.MakeSortingModelSet rngFactory.LcgFactory
+        let sorterModelSet = sorterModelSetMaker.MakeSortingModelSet
         let (sorterSet, _) = SortingModelSet.makeSorterSet sorterModelSet
         this.ceBlocks <- sorterSet.Sorters |> Array.map (CeBlock.fromSorter)
 
@@ -442,7 +442,7 @@ type FullBoolEvalBench() =
             |> sortingModelMaker.Single
 
         let sortingModelSetMaker = sortingModelSetMaker.create smm firstIndex (this.sorterCount |> UMX.tag<sorterCount>)
-        let sortingModelSet = sortingModelSetMaker.MakeSortingModelSet rngFactory.LcgFactory
+        let sortingModelSet = sortingModelSetMaker.MakeSortingModelSet
         let (sorterSet, _) = SortingModelSet.makeSorterSet sortingModelSet
         this.ceBlocks <- sorterSet.Sorters |> Array.map (CeBlock.fromSorter)
 

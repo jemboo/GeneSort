@@ -31,6 +31,15 @@ module SorterModelMaker =
         | SmmMsuf6RandGen msuf6 -> msuf6.Id
 
 
+    let makeSorterModelId (model:sorterModelMaker) (index:int) : Guid<sorterModelID> =
+        match model with
+        | SmmMsceRandGen msce -> msce.MakeSorterModelId index
+        | SmmMssiRandGen mssi -> mssi.MakeSorterModelId index
+        | SmmMsrsRandGen msrs -> msrs.MakeSorterModelId index
+        | SmmMsuf4RandGen msuf4 -> msuf4.MakeSorterModelId index
+        | SmmMsuf6RandGen msuf6 -> msuf6.MakeSorterModelId index
+
+
     let getSortingWidth (model: sorterModelMaker) : int<sortingWidth> =
         match model with
         | SmmMsceRandGen msce -> msce.SortingWidth
@@ -58,7 +67,7 @@ module SorterModelMaker =
         | SmmMsuf6RandGen msuf6 -> msuf6.Id
 
 
-    let makeSorterModel (rngFactory: rngFactory) (index: int)  (model: sorterModelMaker) : sorterModel =
+    let makeSorterModel (index: int)  (model: sorterModelMaker) : sorterModel =
         match model with
         | SmmMsceRandGen msce -> msce.MakeSorterModel index |> sorterModel.Msce
         | SmmMssiRandGen mssi -> mssi.MakeSorterModel index |> sorterModel.Mssi

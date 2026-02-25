@@ -69,6 +69,8 @@ type msuf6RandMutate =
         member this.Equals(other) = 
             this.Id = other.Id
 
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelID> =
+        CommonMutator.makeSorterModelId this.Id index
 
     /// Mutates an Msuf6 by applying Uf6MutationRatesArray to its ceCodes array.
     /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
@@ -77,7 +79,7 @@ type msuf6RandMutate =
     member this.MakeSorterModel (index: int) : msuf6 =
         if %this.StageLength <> this.Uf6MutationRatesArray.Length then
             failwith $"Stage count of Msuf6 {%this.StageLength} must match Msuf6RandMutate length {this.Uf6MutationRatesArray.Length}"
-        let id = CommonMutator.makeSorterModelId this.Id index
+        let id = this.MakeSorterModelId index
         let rng = this.RngFactory.Create %id
         let mutatedUnfolders = 
             Array.zip this.msuf6.TwoOrbitUnfolder6s this.Uf6MutationRatesArray.RatesArray

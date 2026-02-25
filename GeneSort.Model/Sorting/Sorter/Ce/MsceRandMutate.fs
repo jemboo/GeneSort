@@ -60,15 +60,15 @@ type msceRandMutate =
         member this.Equals(other) = 
             this.Id = other.Id
 
-
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelID> =
+        CommonMutator.makeSorterModelId this.Id index
 
     /// Mutates an Msce by applying IndelRatesArray to its ceCodes array.
     /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
     /// The ceCodes array is modified using the provided indelRatesArray, with insertions and mutations
     /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
-    member this.MakeSorterModel (index: int) 
-                : msce =
-        let id = CommonMutator.makeSorterModelId this.Id index
+    member this.MakeSorterModel (index: int) : msce =
+        let id = this.MakeSorterModelId index
         let rng = this.RngFactory.Create %id
         let excludeSelfCe = this.ExcludeSelfCe
         let sortingWidth = %this.msce.SortingWidth

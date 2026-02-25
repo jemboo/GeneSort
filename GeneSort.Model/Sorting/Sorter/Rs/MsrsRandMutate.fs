@@ -62,12 +62,15 @@ type msrsRandMutate =
             this.Id = other.Id
 
 
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelID> =
+        CommonMutator.makeSorterModelId this.Id index
+
     /// Mutates an Msrs by applying OpsActionRatesArray to its ceCodes array.
     /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
     /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
     /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
     member this.MakeSorterModel (index: int) : msrs =
-        let id = CommonMutator.makeSorterModelId this.Id index
+        let id = this.MakeSorterModelId index
         let rng = this.RngFactory.Create %id
         let orthoMutator = fun psi ->   Perm_RsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Ortho psi 
         let paraMutator = fun psi ->    Perm_RsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Para psi 

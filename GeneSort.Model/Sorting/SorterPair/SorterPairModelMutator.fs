@@ -37,16 +37,15 @@ module SorterPairModelMutator =
         | sorterPairModelMutator.SplitPairs mspg -> MsSplitPairsMutator.getSortingWidth mspg
         | sorterPairModelMutator.SplitPairs2 mspg -> MsSplitPairsMutator.getSortingWidth mspg
 
-    let makeSorterPairModel 
-                (rngFactory: rngFactory) 
+    let makeSorterPairModel
                 (index: int)  
                 (model: sorterPairModelMutator) : sorterPairModel =
         match model with
         | sorterPairModelMutator.SplitPairs mspg -> 
-                mspg |> MsSplitPairsMutator.makeMsSplitPairs rngFactory index 
+                mspg |> MsSplitPairsMutator.makeMsSplitPairs index 
                      |> sorterPairModel.SplitPairs
         | sorterPairModelMutator.SplitPairs2 mspg -> 
-                mspg |> MsSplitPairsMutator.makeMsSplitPairs rngFactory index 
+                mspg |> MsSplitPairsMutator.makeMsSplitPairs index 
                      |> sorterPairModel.SplitPairs2
 
 

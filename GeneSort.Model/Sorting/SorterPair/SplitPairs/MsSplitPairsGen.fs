@@ -94,12 +94,22 @@ module MsSplitPairsGen =
     let getCeLength (gen: msSplitPairsGen) : int<ceLength> =
         getPrefixCeLength gen + getSuffixCeLength gen
     
+
     /// Generates an msSplitPairs instance by making sorter models from each maker
-    let makeMsSplitPairs (rngFactory: rngFactory) (index: int) (gen: msSplitPairsGen) : msSplitPairs =
-        let firstPrefix = SorterModelMaker.makeSorterModel rngFactory index gen.FirstPrefixMaker 
-        let firstSuffix = SorterModelMaker.makeSorterModel rngFactory index gen.FirstSuffixMaker
-        let secondPrefix = SorterModelMaker.makeSorterModel rngFactory index gen.SecondPrefixMaker
-        let secondSuffix = SorterModelMaker.makeSorterModel rngFactory index gen.SecondSuffixMaker
+    let makeSorterModelIds (index: int) (gen: msSplitPairsGen) : Guid<sorterModelID> [] =
+        [|
+            SorterModelMaker.makeSorterModelId gen.FirstPrefixMaker index
+            SorterModelMaker.makeSorterModelId gen.FirstSuffixMaker index
+            SorterModelMaker.makeSorterModelId gen.SecondPrefixMaker index
+            SorterModelMaker.makeSorterModelId gen.SecondSuffixMaker index
+        |]
+
+    /// Generates an msSplitPairs instance by making sorter models from each maker
+    let makeMsSplitPairs (index: int) (gen: msSplitPairsGen) : msSplitPairs =
+        let firstPrefix = SorterModelMaker.makeSorterModel index gen.FirstPrefixMaker 
+        let firstSuffix = SorterModelMaker.makeSorterModel index gen.FirstSuffixMaker
+        let secondPrefix = SorterModelMaker.makeSorterModel index gen.SecondPrefixMaker
+        let secondSuffix = SorterModelMaker.makeSorterModel index gen.SecondSuffixMaker
         
         // Calculate ID for the msSplitPairs from the generator ID and seed
         let splitPairsId =

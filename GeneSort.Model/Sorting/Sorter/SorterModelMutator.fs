@@ -31,6 +31,15 @@ module SorterModelMutator =
         | SmmMsuf6RandMutate msuf6 -> msuf6.Id
 
 
+    let makeSorterModelId (model:sorterModelMutator) (index:int) : Guid<sorterModelID> =
+        match model with
+        | SmmMsceRandMutate msce -> msce.MakeSorterModelId index
+        | SmmMssiRandMutate mssi -> mssi.MakeSorterModelId index
+        | SmmMsrsRandMutate msrs -> msrs.MakeSorterModelId index
+        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModelId index
+        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModelId index
+
+
     let getSortingModelSeedId (model: sorterModelMutator) : Guid<sortingModelID> =
         match model with
         | SmmMsceRandMutate msce -> %msce.Msce.Id |> UMX.tag<sortingModelID>

@@ -97,13 +97,12 @@ module MsSplitPairsMutator =
     
     /// Generates an msSplitPairs instance by making sorter models from each maker
     let makeMsSplitPairs 
-                (rngFactory: rngFactory) 
                 (index: int) 
                 (gen: msSplitPairsMutator) : msSplitPairs =
-        let firstPrefix = SorterModelMaker.makeSorterModel rngFactory index gen.FirstPrefixMaker 
-        let firstSuffix = SorterModelMaker.makeSorterModel rngFactory index gen.FirstSuffixMaker
-        let secondPrefix = SorterModelMaker.makeSorterModel rngFactory index gen.SecondPrefixMaker
-        let secondSuffix = SorterModelMaker.makeSorterModel rngFactory index gen.SecondSuffixMaker
+        let firstPrefix = SorterModelMaker.makeSorterModel index gen.FirstPrefixMaker 
+        let firstSuffix = SorterModelMaker.makeSorterModel index gen.FirstSuffixMaker
+        let secondPrefix = SorterModelMaker.makeSorterModel index gen.SecondPrefixMaker
+        let secondSuffix = SorterModelMaker.makeSorterModel index gen.SecondSuffixMaker
         
         // Calculate ID for the msSplitPairs from the generator ID and seed
         let splitPairsId =
