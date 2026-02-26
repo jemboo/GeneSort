@@ -76,7 +76,8 @@ module Sorter =
     /// Throws an exception if the sorters have different sorting widths.
     let concatSorters (prefix: sorter) (suffix: sorter) (newId: Guid<sorterId>) : sorter =
         if prefix.SortingWidth <> suffix.SortingWidth then
-            failwith $"Cannot concatenate sorters with different sorting widths. Prefix: {%prefix.SortingWidth}, Suffix: {%suffix.SortingWidth}"
+            failwith $"Cannot concatenate sorters with different sorting widths. Prefix: 
+                    {%prefix.SortingWidth}, Suffix: {%suffix.SortingWidth}"
         
         let concatenatedCes = Array.append prefix.Ces suffix.Ces
         

@@ -26,10 +26,10 @@ module SorterPairModel =
         | SplitPairs sp -> MsSplitPairs.getStageLength sp
         | SplitPairs2 sp -> MsSplitPairs.getStageLength sp
 
-    let makeSorters (model: sorterPairModel) : (sorter * sortingModelTag) []  =
+    let makeSorters (model: sorterPairModel) : sorter [] =
         match model with
         | SplitPairs sp -> MsSplitPairs.makeAllSorters sp
-        | SplitPairs2 sp -> failwith "Not implemented"
+        | SplitPairs2 sp -> MsSplitPairs.makeAllSorters sp
 
     let getSortingWidth (model: sorterPairModel) : int<sortingWidth> =
         match model with

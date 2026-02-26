@@ -192,7 +192,7 @@ module FullBoolMutate =
                 let! _ = checkCancellation cts.Token
                 let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataFormat
-                let (sorterSetParent, _) = sortingModelSetParent |> SortingModelSet.makeSorterSet
+                let sorterSetParent = sortingModelSetParent |> SortingModelSet.makeSorterSet
                 let collectNewSortableTests = false
                 let sorterSetEvalParent = SorterSetEval.makeSorterSetEval sorterSetParent sortableTests collectNewSortableTests
 
@@ -231,36 +231,9 @@ module FullBoolMutate =
                     |> Array.collect (fun (mmId, sm) -> 
                         SortingModel.makeSorters sm)
 
-                let mapMutantSorterIdToModelTag = 
-                    mutantSorters
-                    |> Array.map (fun (s, t) -> (s.SorterId, t))
-                    |> Map.ofArray
-
-                let mutatedSorterSet = sorterSet.createWithNewId 
-                                            (mutantSorters |> Array.map(fst))
+                let mutatedSorterSet = sorterSet.createWithNewId mutantSorters
 
                 let sorterSetEvalMutated = SorterSetEval.makeSorterSetEval mutatedSorterSet sortableTests collectNewSortableTests
-
-                let findParentEval (seval:sorterEval) : sorterEval option =
-                    let modelTag = mapMutantSorterIdToModelTag.[seval.SorterId]
-                    let parentModelId = modelTag |> SortingModelTag.getSortingModelParentId
-                    let modelSetMutatorId = mapSorterModelToModelSetMutators.[parentModelId]
-                    let modelSetMutator = mapOfSortingModelSetMutators.[modelSetMutatorId]
-                    let parentSorterId = modelSetMutator.SortingModelMutator |> SortingModelMutator.getSortingModelSeedId
-                    //sorterSetEvalParent.SorterEvals |> Array.tryFind (fun se -> se.SorterId = parentSorterId)
-                    None
-                //let yab = mapOfMutatedSortingModelSets |> Map.toArray
-                //          |> Array.map (fun (id, sm) -> (id, sm |> SortingModel.makeSorters))
-
-                //let tups = 
-                //    sortingModelSetMutators
-                //    |> Array.map (fun smm -> 
-                //        let newModelSet = smm.MakeSortingModelSet (Rando.create)
-                //        let (newSorterSet, _) = newModelSet |> SortingModelSet.makeSorterSet
-                //        let newEval = SorterSetEval.makeSorterSetEval newSorterSet sortableTests collectNewSortableTests
-                //        let yab = newModelSet |> SortingModelSet.makeSorterSet
-                //        (newModelSet, newEval))
-
 
                 // 5. Save Results
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")

@@ -228,7 +228,7 @@ module MergeIntEvals =
                 let! sortingModelSet = smsOutput |> OutputData.asSortingModelSet
 
                 // 5. Computation
-                let (sorterSet, _) = SortingModelSet.makeSorterSet sortingModelSet
+                let sorterSet = SortingModelSet.makeSorterSet sortingModelSet
                 let! _ = checkCancellation cts.Token
                 let collectNewSortableTests = false
                 let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTest collectNewSortableTests

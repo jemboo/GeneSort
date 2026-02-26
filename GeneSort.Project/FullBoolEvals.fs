@@ -182,7 +182,7 @@ module FullBoolEvals =
                 let! _ = checkCancellation cts.Token
                 let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataFormat
-                let (sorterSet, _) = sortingModelSet |> SortingModelSet.makeSorterSet
+                let sorterSet = sortingModelSet |> SortingModelSet.makeSorterSet
                 let collectNewSortableTests = false
                 let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests collectNewSortableTests
 

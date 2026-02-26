@@ -8,27 +8,27 @@ open GeneSort.Model.Mp.Sorting.Sorter
 [<MessagePackObject>]
 type msSplitPairsMutateDto =
     { [<Key(0)>] sortingWidth: int
-      [<Key(1)>] firstPrefixMaker: sorterModelMakerDto
-      [<Key(2)>] firstSuffixMaker: sorterModelMakerDto
-      [<Key(3)>] secondPrefixMaker: sorterModelMakerDto
-      [<Key(4)>] secondSuffixMaker: sorterModelMakerDto }
+      [<Key(1)>] firstPrefixMaker: sorterModelMutatorDto
+      [<Key(2)>] firstSuffixMaker: sorterModelMutatorDto
+      [<Key(3)>] secondPrefixMaker: sorterModelMutatorDto
+      [<Key(4)>] secondSuffixMaker: sorterModelMutatorDto }
 
 module MsSplitPairsMutateDto =
 
     let fromDomain (gen: msSplitPairsMutator) : msSplitPairsMutateDto =
         { sortingWidth = %(MsSplitPairsMutator.getSortingWidth gen)
-          firstPrefixMaker = SorterModelMakerDto.fromDomain gen.FirstPrefixMaker
-          firstSuffixMaker = SorterModelMakerDto.fromDomain gen.FirstSuffixMaker
-          secondPrefixMaker = SorterModelMakerDto.fromDomain gen.SecondPrefixMaker
-          secondSuffixMaker = SorterModelMakerDto.fromDomain gen.SecondSuffixMaker }
+          firstPrefixMaker = SorterModelMutatorDto.fromDomain gen.FirstPrefixMutator
+          firstSuffixMaker = SorterModelMutatorDto.fromDomain gen.FirstSuffixMutator
+          secondPrefixMaker = SorterModelMutatorDto.fromDomain gen.SecondPrefixMutator
+          secondSuffixMaker = SorterModelMutatorDto.fromDomain gen.SecondSuffixMutator }
 
     let toDomain (dto: msSplitPairsMutateDto) : msSplitPairsMutator =
         try
             msSplitPairsMutator.create
                 (UMX.tag<sortingWidth> dto.sortingWidth)
-                (SorterModelMakerDto.toDomain dto.firstPrefixMaker)
-                (SorterModelMakerDto.toDomain dto.firstSuffixMaker)
-                (SorterModelMakerDto.toDomain dto.secondPrefixMaker)
-                (SorterModelMakerDto.toDomain dto.secondSuffixMaker)
+                (SorterModelMutatorDto.toDomain dto.firstPrefixMaker)
+                (SorterModelMutatorDto.toDomain dto.firstSuffixMaker)
+                (SorterModelMutatorDto.toDomain dto.secondPrefixMaker)
+                (SorterModelMutatorDto.toDomain dto.secondSuffixMaker)
         with
         | ex -> failwith $"Failed to convert msSplitPairsGenDto: {ex.Message}"

@@ -55,28 +55,13 @@ type sortingModelSet =
 
 module SortingModelSet =
 
-    let makeSorterSet (modelSet: sortingModelSet) : sorterSet * Map<Guid<sorterId>, sortingModelTag> =
+    let makeSorterSet (modelSet: sortingModelSet) : sorterSet =
         // Collect all sorters with their tags
-        let sortersWithTags = 
+        let sorters = 
             modelSet.SortingModels 
             |> Array.collect (fun sm -> sm |> SortingModel.makeSorters)
         
-        // Extract just the sorters for the sorterSet
-        let sorters = sortersWithTags |> Array.map fst
-        
-        // Create the map of sorterId -> sorterModelTag
-        let sorterTagMap = 
-            sortersWithTags 
-            |> Array.map (fun (sorter, tag) -> (sorter.SorterId, tag))
-            |> Map.ofArray
-        
-        // Validate that all sorterIds are unique
-        if sorterTagMap.Count <> sortersWithTags.Length then
-            failwith "All sorters must have unique IDs"
-        
-        let sorterSet = sorterSet.create (%modelSet.Id |> UMX.tag<sorterSetId>) sorters
-        
-        (sorterSet, sorterTagMap)
+        sorterSet.create (%modelSet.Id |> UMX.tag<sorterSetId>) sorters
 
 
 
