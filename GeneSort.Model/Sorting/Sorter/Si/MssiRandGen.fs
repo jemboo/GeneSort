@@ -21,8 +21,7 @@ type mssiRandGen =
     static member create 
             (rngFactory: rngFactory) 
             (sortingWidth: int<sortingWidth>)
-            (stageLength: int<stageLength>) 
-                : mssiRandGen =
+            (stageLength: int<stageLength>) : mssiRandGen =
         if %sortingWidth < 2 then
             failwith $"SortingWidth must be at least 2, got {%sortingWidth}"
         else if %stageLength < 1 then
@@ -30,6 +29,7 @@ type mssiRandGen =
         else
             let id =
                 [
+                    "mssiRandGen" :> obj
                     rngFactory :> obj
                     sortingWidth :> obj
                     %stageLength :> obj

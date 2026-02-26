@@ -130,3 +130,13 @@ module MsSplitPairs =
                 msConcatenation.createId model.SecondPrefix model.FirstSuffix
         | modelTag.SplitPair splitJoin.Second_Second ->
                 msConcatenation.createId model.SecondPrefix model.SecondSuffix
+        | _ -> failwith $"Invalid modelTag for msSplitPairs"
+
+
+    let getSorterModelIdsWithTags (model: msSplitPairs) : (Guid<sorterModelID> * modelTag) [] =
+        [|
+            (msConcatenation.createId model.FirstPrefix model.FirstSuffix, modelTag.SplitPair splitJoin.First_First);
+            (msConcatenation.createId model.FirstPrefix model.SecondSuffix, modelTag.SplitPair splitJoin.First_Second);
+            (msConcatenation.createId model.SecondPrefix model.FirstSuffix, modelTag.SplitPair splitJoin.Second_First);
+            (msConcatenation.createId model.SecondPrefix model.SecondSuffix, modelTag.SplitPair splitJoin.Second_Second);
+        |]

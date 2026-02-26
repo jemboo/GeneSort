@@ -31,15 +31,6 @@ module SorterModelMutator =
         | SmmMsuf6RandMutate msuf6 -> msuf6.Id
 
 
-    let makeSorterModelId (model:sorterModelMutator) (index:int) : Guid<sorterModelID> =
-        match model with
-        | SmmMsceRandMutate msce -> msce.MakeSorterModelId index
-        | SmmMssiRandMutate mssi -> mssi.MakeSorterModelId index
-        | SmmMsrsRandMutate msrs -> msrs.MakeSorterModelId index
-        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModelId index
-        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModelId index
-
-
     let getSortingModelSeedId (model: sorterModelMutator) : Guid<sortingModelID> =
         match model with
         | SmmMsceRandMutate msce -> %msce.Msce.Id |> UMX.tag<sortingModelID>
@@ -76,6 +67,17 @@ module SorterModelMutator =
         | SmmMsrsRandMutate msrs -> msrs.MakeSorterModel index |> sorterModel.Msrs
         | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModel index |> sorterModel.Msuf4
         | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModel index |> sorterModel.Msuf6
+
+
+    let makeSorterModelIdWithTag (index:int) (model:sorterModelMutator) : Guid<sorterModelID> * modelTag =
+        match model with
+        | SmmMsceRandMutate msce -> (msce.MakeSorterModelId index, modelTag.Single)
+        | SmmMssiRandMutate mssi -> (mssi.MakeSorterModelId index, modelTag.Single)
+        | SmmMsrsRandMutate msrs -> (msrs.MakeSorterModelId index, modelTag.Single)
+        | SmmMsuf4RandMutate msuf4 -> (msuf4.MakeSorterModelId index, modelTag.Single)
+        | SmmMsuf6RandMutate msuf6 -> (msuf6.MakeSorterModelId index, modelTag.Single)
+
+
 
 
 

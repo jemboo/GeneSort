@@ -41,4 +41,8 @@ module SortingModelMaker =
         | Pair spmm -> spmm |> SorterPairModelMaker.makeSorterPairModel index |> sortingModel.Pair
 
 
-
+    let makeSorterModelIdsWithTags (index: int) (model: sortingModelMaker)  
+                                        : (Guid<sorterModelID> * modelTag) [] = 
+        match model with
+        | Single smm -> smm |> SorterModelMaker.makeSorterModelIdWithTag index |> Array.singleton
+        | Pair spmm -> spmm |> SorterPairModelMaker.makeSorterModelIdsWithTags index

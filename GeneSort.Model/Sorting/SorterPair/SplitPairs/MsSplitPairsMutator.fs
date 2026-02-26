@@ -94,7 +94,7 @@ module MsSplitPairsMutator =
 
     let getCeLength (gen: msSplitPairsMutator) : int<ceLength> =
         getPrefixCeLength gen + getSuffixCeLength gen
-    
+
     /// Generates an msSplitPairs instance by making sorter models from each maker
     let makeMsSplitPairs 
                 (index: int) 
@@ -118,3 +118,9 @@ module MsSplitPairsMutator =
                         firstSuffix
                         secondPrefix
                         secondSuffix
+
+
+    let makeSorterModelIdsWithTags (index: int) (mutator: msSplitPairsMutator) 
+                                    : (Guid<sorterModelID> * modelTag) [] =
+        let splitPairs = makeMsSplitPairs index mutator
+        splitPairs |> MsSplitPairs.getSorterModelIdsWithTags

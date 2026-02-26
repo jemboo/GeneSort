@@ -27,6 +27,7 @@ type msrsRandGen =
             failwith $"SortingWidth must be at least 2, got {%sortingWidth}"
         let id =
             [
+                "msrsRandGen" :> obj
                 rngFactory :> obj
                 sortingWidth :> obj
                 opsGenRatesArray :> obj
@@ -92,3 +93,8 @@ module MsrsRandGen =
                 (%msrsGen.SortingWidth) 
                 (%msrsGen.StageLength) 
                 (msrsGen.OpsGenRatesArray.toString())
+
+
+    let getSorterModelIdWithTag (index: int) (msrsRandGen:msrsRandGen) 
+                    : (Guid<sorterModelID> * modelTag) =
+        (msrsRandGen.MakeSorterModelId index, modelTag.Single)

@@ -16,24 +16,6 @@ type sorterPairModelMaker =
 
 module SorterPairModelMaker =
 
-    let makeSorterPairModel
-                (index: int)  
-                (model: sorterPairModelMaker) : sorterPairModel =
-        match model with
-        | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs index 
-                                  |> sorterPairModel.SplitPairs
-        | SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs index 
-                                   |> sorterPairModel.SplitPairs2
-
-
-    let makeSorterModelIds (model:sorterPairModelMaker) (index:int) 
-                                    : Guid<sorterModelID> [] =
-        match model with
-        | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeSorterModelIds index 
-
-        | SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeSorterModelIds index 
-
-
     let getCeLength (model: sorterPairModelMaker) : int<ceLength> =
         match model with
         | sorterPairModelMaker.SplitPairs mspg -> MsSplitPairsGen.getCeLength mspg
@@ -49,6 +31,26 @@ module SorterPairModelMaker =
         match model with
         | SplitPairs mspg -> MsSplitPairsGen.getSortingWidth mspg
         | SplitPairs2 mspg -> MsSplitPairsGen.getSortingWidth mspg
+
+
+    let makeSorterPairModel
+                (index: int)  
+                (model: sorterPairModelMaker) : sorterPairModel =
+        match model with
+        | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs index 
+                                  |> sorterPairModel.SplitPairs
+        | SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs index 
+                                   |> sorterPairModel.SplitPairs2
+
+
+    let makeSorterModelIdsWithTags (index:int) (model:sorterPairModelMaker)
+                                    : (Guid<sorterModelID> * modelTag) [] =
+        match model with
+        | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeSorterModelIdsWithTags index 
+
+        | SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeSorterModelIdsWithTags index 
+
+
 
 
 

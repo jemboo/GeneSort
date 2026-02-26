@@ -29,6 +29,7 @@ type msceRandGen =
         else
             let id =
                 [
+                    "msceRandGen" :> obj
                     rngFactory :> obj
                     sortingWidth :> obj
                     excludeSelfCe :> obj
@@ -99,4 +100,8 @@ module MsceRandGen =
         sprintf "Model_CeGen(rngType=%A, Width=%d, Length=[%d])" 
                     (msceRandGen.RngFactory) (%msceRandGen.SortingWidth) (%msceRandGen.ceLength)
 
-         
+
+
+    let getSorterModelIdWithTag (index: int) (msceRandGen:msceRandGen) 
+                    : (Guid<sorterModelID> * modelTag) =
+        (msceRandGen.MakeSorterModelId index, modelTag.Single)

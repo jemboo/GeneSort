@@ -29,16 +29,19 @@ type msuf6RandGen =
             failwith $"All Uf6GenRates in genRates must have order {%sortingWidth}"
         let id =
             [
+                "msuf6RandGen" :> obj
                 rngFactory :> obj
                 sortingWidth :> obj
                 stageLength :> obj
                 genRates :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
-        { id = id
+        { 
+          id = id
           rngFactory = rngFactory
           sortingWidth = sortingWidth
           stageLength = stageLength
-          genRates = genRates }
+          genRates = genRates 
+        }
 
     member this.Id with get() = this.id
     member this.CeLength with get () = (this.SortingWidth * %this.StageLength / 2) |> UMX.tag<ceLength>
@@ -93,3 +96,8 @@ module Msuf6RandGen =
                 (%msuf6RandGen.SortingWidth)
                 (%msuf6RandGen.StageLength)
                 (msuf6RandGen.GenRates.toString())
+
+
+    let getSorterModelIdWithTag (index: int) (msuf6RandGen:msuf6RandGen) 
+                    : (Guid<sorterModelID> * modelTag) =
+        (msuf6RandGen.MakeSorterModelId index, modelTag.Single)

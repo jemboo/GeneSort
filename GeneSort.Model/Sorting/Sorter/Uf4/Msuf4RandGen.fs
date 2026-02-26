@@ -44,6 +44,7 @@ type msuf4RandGen =
         else
             let id =
                 [
+                    "msuf4RandGen" :> obj
                     rngFactory :> obj
                     sortingWidth :> obj
                     stageLength :> obj
@@ -111,3 +112,7 @@ module Msuf4RandGen =
                 (%msuf4Gen.SortingWidth) 
                 (%msuf4Gen.StageLength)
                 genRatesStr
+
+    let getSorterModelIdWithTag (index: int) (msuf4RandGen:msuf4RandGen) 
+                    : (Guid<sorterModelID> * modelTag) =
+        (msuf4RandGen.MakeSorterModelId index, modelTag.Single)
