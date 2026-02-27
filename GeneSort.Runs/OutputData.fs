@@ -19,8 +19,8 @@ type outputData =
     | SorterSet of sorterSet
     | SortableTest of sortableTest
     | SortableTestSet of sortableTestSet
-    | SortingModelSet of sortingModelSet
-    | SortingModelSetMaker of sortingModelSetMaker
+    | SortingSet of sortingSet
+    | SortingSetMaker of sortingSetMaker
     | SortableTestModelSet of sortableTestModelSet
     | SortableTestModelSetMaker of sortableTestModelSetMaker
     | SorterSetEval of sorterSetEval
@@ -32,9 +32,9 @@ type outputData =
 
 module OutputData =
 
-    let asSortingModelSet = function
-        | SortingModelSet sms -> Ok sms
-        | _ -> Error "Database returned data, but it was not a SortingModelSet."
+    let asSortingSet = function
+        | SortingSet sms -> Ok sms
+        | _ -> Error "Database returned data, but it was not a SortingSet."
 
     let asSorterSet = function
         | SorterSet ss -> Ok ss

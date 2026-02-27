@@ -13,9 +13,9 @@ open GeneSort.Model.Sorting
 
 module SorterMutateParamsOps = 
     
-    let makeSortingModelMutatorFromSorterModel
+    let makeSortingMutatorFromSorterModel
                 (sorterModel: sorterModel)
-                (sorterModelMutateParams: sorterModelMutateParams) : sortingModelMutator = 
+                (sorterModelMutateParams: sorterModelMutateParams) : sortingMutator = 
         match sorterModel, sorterModelMutateParams with
         | Msce msce, McseRandMutateParams prams -> 
             // Validate that ceLength matches indelRatesArray length
@@ -23,7 +23,7 @@ module SorterMutateParamsOps =
                 failwith (sprintf "Msce ceLength (%d) must match IndelRatesArray length (%d)" 
                             %msce.CeLength prams.IndelRatesArray.Length)
             msceRandMutate.create prams.RngFactory prams.IndelRatesArray prams.ExcludeSelfCe msce 
-            |> sorterModelMutator.SmmMsceRandMutate |> sortingModelMutator.Single
+            |> sorterModelMutator.SmmMsceRandMutate |> sortingMutator.Single
 
         
         | Mssi mssi, MssiRandMutateParams prams -> 
@@ -32,7 +32,7 @@ module SorterMutateParamsOps =
                 failwith (sprintf "Mssi stageLength (%d) must match OpActionRatesArray length (%d)" 
                             %mssi.StageLength prams.OpActionRatesArray.Length)
             mssiRandMutate.create prams.RngFactory prams.OpActionRatesArray mssi
-            |> sorterModelMutator.SmmMssiRandMutate |> sortingModelMutator.Single
+            |> sorterModelMutator.SmmMssiRandMutate |> sortingMutator.Single
     
         
         | Msrs msrs, MsrsRandMutateParams prams -> 
@@ -41,7 +41,7 @@ module SorterMutateParamsOps =
                 failwith (sprintf "Msrs stageLength (%d) must match OpsActionRatesArray length (%d)" 
                             %msrs.StageLength prams.OpsActionRatesArray.Length)
             msrsRandMutate.create prams.RngFactory prams.OpsActionRatesArray msrs
-            |> sorterModelMutator.SmmMsrsRandMutate |> sortingModelMutator.Single
+            |> sorterModelMutator.SmmMsrsRandMutate |> sortingMutator.Single
 
         
         | Msuf4 msuf4, Msuf4RandMutateParams prams -> 
@@ -50,7 +50,7 @@ module SorterMutateParamsOps =
                 failwith (sprintf "Msuf4 stageLength (%d) must match Uf4MutationRatesArray length (%d)" 
                             %msuf4.StageLength prams.Uf4MutationRatesArray.Length)
             msuf4RandMutate.create prams.RngFactory prams.Uf4MutationRatesArray msuf4
-            |> sorterModelMutator.SmmMsuf4RandMutate |> sortingModelMutator.Single
+            |> sorterModelMutator.SmmMsuf4RandMutate |> sortingMutator.Single
     
         
         | Msuf6 msuf6, Msuf6RandMutateParams prams -> 
@@ -59,18 +59,18 @@ module SorterMutateParamsOps =
                 failwith (sprintf "Msuf6 stageLength (%d) must match Uf6MutationRatesArray length (%d)" 
                             %msuf6.StageLength prams.Uf6MutationRatesArray.Length)
             msuf6RandMutate.create prams.RngFactory prams.Uf6MutationRatesArray msuf6
-            |> sorterModelMutator.SmmMsuf6RandMutate |> sortingModelMutator.Single
+            |> sorterModelMutator.SmmMsuf6RandMutate |> sortingMutator.Single
 
         
         | _ -> failwith "Mismatched sorterModel and sorterMutateParams types"
 
 
 
-    let makeSortingModelSetMutatorFromSortingModel
+    let makeSortingSetMutatorFromSorting
                 (sorting: sorting)
                 (sorterModelMutateParams: sorterModelMutateParams) 
                 (firstIndex: int<sorterCount>) 
-                (count: int<sorterCount>) : sortingModelSetMutator = 
+                (count: int<sorterCount>) : sortingSetMutator = 
 
         if %count <= 0 then
             failwith "Count must be greater than 0"
@@ -79,11 +79,11 @@ module SorterMutateParamsOps =
 
         match sorting with
         | sorting.Single sorterModel ->
-            let sortingModelMutator = 
-                makeSortingModelMutatorFromSorterModel sorterModel sorterModelMutateParams
-            sortingModelSetMutator.create sortingModelMutator firstIndex count
+            let sortingMutator = 
+                makeSortingMutatorFromSorterModel sorterModel sorterModelMutateParams
+            sortingSetMutator.create sortingMutator firstIndex count
 
         | sorting.Pair _ ->
-                failwith "Mutation of Pair sortingModels not yet supported"
+                failwith "Mutation of Pair sortings not yet supported"
 
 

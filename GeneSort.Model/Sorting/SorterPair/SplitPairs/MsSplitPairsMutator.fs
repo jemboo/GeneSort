@@ -79,7 +79,7 @@ type msSplitPairsMutator =
     member this.FirstSuffixMutator with get () = this.firstSuffixMutator
     member this.SecondPrefixMutator with get () = this.secondPrefixMutator
     member this.SecondSuffixMutator with get () = this.secondSuffixMutator
-    member this.SortingModelSeedId with get() : Guid<sortingModelId> = failwith "not implemented."
+    member this.SortingSeedId with get() : Guid<sortingId> = failwith "not implemented."
 
 module MsSplitPairsMutator =
 

@@ -222,13 +222,13 @@ module MergeIntEvals =
                 //let! rawSorterData = db.loadAsync RandomSorters.projectFolder qpSorters
                 //let! sorterSet = rawSorterData |> OutputData.asSorterSet
 
-                // 4. Load SortingModelSet (Cross-project query)
-                let qpSorterModelSet = RandomSorters.makeQueryParams (Some repl) (Some width) (Some sModel) (outputDataType.SortingModelSet "")
+                // 4. Load SortingSet (Cross-project query)
+                let qpSorterModelSet = RandomSorters.makeQueryParams (Some repl) (Some width) (Some sModel) (outputDataType.SortingSet "")
                 let! smsOutput = db.loadAsync RandomSorters.projectFolder qpSorterModelSet
-                let! sortingModelSet = smsOutput |> OutputData.asSortingModelSet
+                let! sortingSet = smsOutput |> OutputData.asSortingSet
 
                 // 5. Computation
-                let sorterSet = SortingModelSet.makeSorterSet sortingModelSet
+                let sorterSet = SortingSet.makeSorterSet sortingSet
                 let! _ = checkCancellation cts.Token
                 let collectNewSortableTests = false
                 let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTest collectNewSortableTests
@@ -238,10 +238,10 @@ module MergeIntEvals =
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
                 let! _ = db.saveAsync projectFolder qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
-                let passingSortingModelSet = 
-                        SorterSetEval.makePassingSortingModelSet sortingModelSet sorterSetEval
-                let qpSorterModelSetPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingModelSet "Pass")
-                let! _ = db.saveAsync projectFolder qpSorterModelSetPass (passingSortingModelSet |> outputData.SortingModelSet) allowOverwrite
+                let passingSortingSet = 
+                        SorterSetEval.makePassingSortingSet sortingSet sorterSetEval
+                let qpSorterModelSetPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Pass")
+                let! _ = db.saveAsync projectFolder qpSorterModelSetPass (passingSortingSet |> outputData.SortingSet) allowOverwrite
 
                 // 7. Success
                 let duration = DateTime.Now - startTime

@@ -4,24 +4,24 @@ open FSharp.UMX
 open System
 
 
-type sortingModelGrandParentId = Guid<sortingModelId>
+type sortingGrandParentId = Guid<sortingId>
 
 
 // used to track a sorter back to it's parent sorting, and it gives it's position 
 // within it's family, and then back to the grandparent sorting.
-type parentSortingModelTag = sortingModelGrandParentId * sortingModelTag
+type parentSortingTag = sortingGrandParentId * sortingTag
 
-module ParentSortingModelTag =
+module ParentSortingTag =
 
-   let create (grandParentId: Guid) (parentTag: sortingModelTag) : parentSortingModelTag =
-        (grandParentId |> UMX.tag<sortingModelId>, parentTag)
+   let create (grandParentId: Guid) (parentTag: sortingTag) : parentSortingTag =
+        (grandParentId |> UMX.tag<sortingId>, parentTag)
 
    
-   let getGrandParentId (tag: parentSortingModelTag) : sortingModelGrandParentId =
+   let getGrandParentId (tag: parentSortingTag) : sortingGrandParentId =
         let (grandParentId, _) = tag
         grandParentId
 
 
-   let getParentTag (tag: parentSortingModelTag) : sortingModelTag =
+   let getParentTag (tag: parentSortingTag) : sortingTag =
         let (_, parentTag) = tag
         parentTag

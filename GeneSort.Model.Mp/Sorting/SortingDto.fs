@@ -9,26 +9,26 @@ open GeneSort.Model.Mp.Sorting.Sorter
 
 [<MessagePackObject>]
 [<Union(0, typeof<sorterModelDto>); Union(1, typeof<sorterPairModelDto>)>]
-type sortingModelDto =
+type sortingDto =
     | Single of sorterModelDto
     | Pair of sorterPairModelDto
 
 
-module SortingModelDto =
+module SortingDto =
 
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let fromDomain (sorting: sorting) : sortingModelDto =
+    let fromDomain (sorting: sorting) : sortingDto =
         match sorting with
         | sorting.Single single -> Single (SorterModelDto.fromDomain single)
         | sorting.Pair pair -> Pair (SorterPairModelDto.fromDomain pair)
 
 
-    let toDomain (dto: sortingModelDto) : sorting =
+    let toDomain (dto: sortingDto) : sorting =
         try
             match dto with
             | Single smDto -> sorting.Single (SorterModelDto.toDomain smDto)
             | Pair pairDto -> sorting.Pair (SorterPairModelDto.toDomain pairDto)
         with
-        | ex -> failwith $"Failed to convert SortingModelDto: {ex.Message}"
+        | ex -> failwith $"Failed to convert SortingDto: {ex.Message}"

@@ -9,39 +9,39 @@ open GeneSort.Model.Sorting
 open GeneSort.Model.Sorting.SorterPair
 
 
-type sortingModelMaker =
+type sortingMaker =
      | Single of sorterModelMaker
      | Pair of sorterPairModelMaker
 
 
-module SortingModelMaker =
+module SortingMaker =
 
-    let getId (model:sortingModelMaker) : Guid<sortingModelMakerId> =
+    let getId (model:sortingMaker) : Guid<sortingMakerId> =
         match model with
-        | Single smm -> %(smm |> SorterModelMaker.getId) |> UMX.tag<sortingModelMakerId>
-        | Pair spmm -> %(spmm |> SorterPairModelMaker.getId) |> UMX.tag<sortingModelMakerId>
+        | Single smm -> %(smm |> SorterModelMaker.getId) |> UMX.tag<sortingMakerId>
+        | Pair spmm -> %(spmm |> SorterPairModelMaker.getId) |> UMX.tag<sortingMakerId>
 
 
-    let getSortingWidth (model: sortingModelMaker) : int<sortingWidth> =
+    let getSortingWidth (model: sortingMaker) : int<sortingWidth> =
         match model with
         | Single smm -> smm |> SorterModelMaker.getSortingWidth
         | Pair spmm -> spmm |> SorterPairModelMaker.getSortingWidth
 
 
-    let getCeLength (model: sortingModelMaker) : int<ceLength> =
+    let getCeLength (model: sortingMaker) : int<ceLength> =
         match model with
         | Single smm -> smm |> SorterModelMaker.getCeLength
         | Pair spmm -> spmm |> SorterPairModelMaker.getCeLength
 
-    let makeSortingModel
+    let makeSorting
                 (index: int)  
-                (model: sortingModelMaker) : sorting =
+                (model: sortingMaker) : sorting =
         match model with
         | Single smm -> smm |> SorterModelMaker.makeSorterModel index |> sorting.Single
         | Pair spmm -> spmm |> SorterPairModelMaker.makeSorterPairModel index |> sorting.Pair
 
 
-    let makeSorterIdsWithTags (index: int) (model: sortingModelMaker)  
+    let makeSorterIdsWithTags (index: int) (model: sortingMaker)  
                                         : (Guid<sorterId> * modelTag) [] = 
         match model with
         | Single smm -> smm |> SorterModelMaker.makeSorterIdWithTag index |> Array.singleton

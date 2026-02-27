@@ -6,16 +6,16 @@ open GeneSort.Core
 
 
 [<Measure>] type sorterModelId
-[<Measure>] type sortingModelId
-[<Measure>] type sortingModelSetId
+[<Measure>] type sortingId
+[<Measure>] type sortingSetId
 [<Measure>] type sorterModelMakerId
 [<Measure>] type sorterModelMutatorId
 [<Measure>] type sorterPairModelMakerId
 [<Measure>] type sorterPairModelMutatorId
-[<Measure>] type sortingModelMakerId
-[<Measure>] type sortingModelMutatorId
-[<Measure>] type sortingModelSetMakerId
-[<Measure>] type sortingModelSetMutatorId
+[<Measure>] type sortingMakerId
+[<Measure>] type sortingMutatorId
+[<Measure>] type sortingSetMakerId
+[<Measure>] type sortingSetMutatorId
 [<Measure>] type parentSorterSetEvalId
 [<Measure>] type sortingParamsId
 
@@ -35,14 +35,14 @@ module CommonMaker =
         ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
 
 
-    let makeSortingModelId 
+    let makeSortingId 
                 (id:  Guid<sorterModelMakerId>) 
-                (index:int) : Guid<sortingModelId> = 
+                (index:int) : Guid<sortingId> = 
         [
             id  :> obj
             "Sorting" :> obj
             index :> obj
-        ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingModelId>
+        ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingId>
 
 
 
@@ -58,11 +58,11 @@ module CommonMutator =
         ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
 
 
-    let makeSortingModelId 
+    let makeSortingId 
                 (id:  Guid<sorterModelMutatorId>) 
-                (index:int) : Guid<sortingModelId> = 
+                (index:int) : Guid<sortingId> = 
         [
             id  :> obj
             "Sorting" :> obj
             index :> obj
-        ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingModelId>
+        ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingId>

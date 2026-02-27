@@ -183,43 +183,43 @@ module FullBoolMutate =
                         return (smt, sw, sdt, mr)
                     } |> Result.ofOption (sprintf "Run %s, Repl %d: Missing required parameters" %runId %repl)
 
-                // 3. Load SortingModelSet
-                let qpSorters = RandomSorters.makeQueryParams (Some repl) (Some sortingWidth) (Some sorterModelType) (outputDataType.SortingModelSet "")
+                // 3. Load SortingSet
+                let qpSorters = RandomSorters.makeQueryParams (Some repl) (Some sortingWidth) (Some sorterModelType) (outputDataType.SortingSet "")
                 let! loadRes = db.loadAsync RandomSorters.projectFolder qpSorters
-                let! sortingModelSetParent = loadRes |> OutputData.asSortingModelSet |> asAsync
+                let! sortingSetParent = loadRes |> OutputData.asSortingSet |> asAsync
 
                 // 4. Perform Computation
                 let! _ = checkCancellation cts.Token
                 let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataFormat
-                let sorterSetParent = sortingModelSetParent |> SortingModelSet.makeSorterSet
+                let sorterSetParent = sortingSetParent |> SortingSet.makeSorterSet
                 let collectNewSortableTests = false
                 let sorterSetEvalParent = SorterSetEval.makeSorterSetEval sorterSetParent sortableTests collectNewSortableTests
 
                 let sorterModelMutateParams = 
                     SorterModelMutateParams.makeUniformMutatorForSorterModel 
                                 sorterModelType 
-                                sortingModelSetParent.StageLength 
-                                sortingModelSetParent.SortingWidth 
+                                sortingSetParent.StageLength 
+                                sortingSetParent.SortingWidth 
                                 mutationRate 
                                 rngFactory
 
-                let mapOfSortingModelSetMutators = 
-                    sortingModelSetParent.SortingModels
+                let mapOfSortingSetMutators = 
+                    sortingSetParent.Sortings
                     |> Array.map (fun sm -> 
-                        let sortingModelSetMutator =
-                                SorterMutateParamsOps.makeSortingModelSetMutatorFromSortingModel
+                        let sortingSetMutator =
+                                SorterMutateParamsOps.makeSortingSetMutatorFromSorting
                                                 sm
                                                 sorterModelMutateParams
                                                 firstSortingIndex
                                                 sortingCount
-                        (sortingModelSetMutator.SortingModelMutator |> SortingModelMutator.getId, sortingModelSetMutator))
+                        (sortingSetMutator.SortingMutator |> SortingMutator.getId, sortingSetMutator))
                     |> Map.ofArray
 
                 let mmId_sm = 
-                    mapOfSortingModelSetMutators
+                    mapOfSortingSetMutators
                     |> Map.toArray
-                    |> Array.collect (fun (smmId, smm) -> smm.MutateSortingModels)
+                    |> Array.collect (fun (smmId, smm) -> smm.MutateSortings)
 
                 let mapSorterModelToModelSetMutators = 
                     mmId_sm
@@ -238,10 +238,10 @@ module FullBoolMutate =
                 // 5. Save Results
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
                 let! _ = db.saveAsync projectFolder qpEval (sorterSetEvalParent |> outputData.SorterSetEval) allowOverwrite
-                let passingSortingModelSet = 
-                        SorterSetEval.makePassingSortingModelSet sortingModelSetParent sorterSetEvalParent
-                let qpSorterModelSetPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingModelSet "Pass")
-                let! _ = db.saveAsync projectFolder qpSorterModelSetPass (passingSortingModelSet |> outputData.SortingModelSet) allowOverwrite
+                let passingSortingSet = 
+                        SorterSetEval.makePassingSortingSet sortingSetParent sorterSetEvalParent
+                let qpSorterModelSetPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Pass")
+                let! _ = db.saveAsync projectFolder qpSorterModelSetPass (passingSortingSet |> outputData.SortingSet) allowOverwrite
 
 
                 // 6. Final Success

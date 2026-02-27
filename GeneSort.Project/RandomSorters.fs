@@ -295,18 +295,18 @@ module RandomSorters =
                         |> sorterModelMaker.SmmMsuf6RandGen
 
                 let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-                let sorterModelSetMaker = sortingModelSetMaker.create 
-                                                (sorterModelMaker |> sortingModelMaker.Single)
+                let sorterModelSetMaker = sortingSetMaker.create 
+                                                (sorterModelMaker |> sortingMaker.Single)
                                                 firstIndex 
                                                 sorterCount
-                let sortingModelSet = sorterModelSetMaker.MakeSortingModelSet
+                let sortingSet = sorterModelSetMaker.MakeSortingSet
 
                 // 4. Saves
-                let qpSortingModelSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingModelSet "") 
-                let! _ = db.saveAsync projectFolder qpSortingModelSet (sortingModelSet |> outputData.SortingModelSet) allowOverwrite
+                let qpSortingSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "") 
+                let! _ = db.saveAsync projectFolder qpSortingSet (sortingSet |> outputData.SortingSet) allowOverwrite
             
                 progress |> Option.iter (fun p -> 
-                    p.Report(sprintf "Saved SortingModelSet %s for run: %s" (%qpSortingModelSet.Id.ToString()) %runId))
+                    p.Report(sprintf "Saved SortingSet %s for run: %s" (%qpSortingSet.Id.ToString()) %runId))
 
                 // 5. Final Return
                 return runParameters.WithRunFinished (Some true)

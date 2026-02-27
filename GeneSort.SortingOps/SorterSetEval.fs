@@ -114,9 +114,9 @@ module SorterSetEval =
 
     /// For the sorterSet and its corresponding sorterSetEval, this creates a subset 
     /// that consists of all the sorters with an UnsortedCount = 0
-    let makePassingSortingModelSet
-            (sms: sortingModelSet)
-            (sorterSetEval: sorterSetEval) : sortingModelSet =
+    let makePassingSortingSet
+            (sms: sortingSet)
+            (sorterSetEval: sorterSetEval) : sortingSet =
         
         // 1. Identify the IDs of the sorters that passed (UnsortedCount = 0)
         let passingIds = 
@@ -126,10 +126,10 @@ module SorterSetEval =
 
         // 2. Filter the original sorter collection based on the passing IDs
         let passingSorterModels = 
-            sms.SortingModels 
+            sms.Sortings 
             |> Array.filter (fun stm -> Sorting.containsAnySorter passingIds stm)
 
-        sortingModelSet.create 
-            (Guid.NewGuid() |> UMX.tag<sortingModelSetId>) 
+        sortingSet.create 
+            (Guid.NewGuid() |> UMX.tag<sortingSetId>) 
             passingSorterModels
 

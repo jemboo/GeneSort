@@ -5,43 +5,43 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 
-type sortingModelSetMaker =
+type sortingSetMaker =
     private
         { 
-          id : Guid<sortingModelSetMakerId>
-          sortingModelMaker : sortingModelMaker
+          id : Guid<sortingSetMakerId>
+          sortingMaker : sortingMaker
           firstIndex : int<sorterCount>
           count : int<sorterCount>
         }
     with
     static member create 
-                (sortingModelMaker: sortingModelMaker) 
+                (sortingMaker: sortingMaker) 
                 (firstIndex: int<sorterCount>) 
-                (count: int<sorterCount>) : sortingModelSetMaker =
+                (count: int<sorterCount>) : sortingSetMaker =
         let id = 
             // Generate a unique ID based on the SorterModelMaker and indices
             GuidUtils.guidFromObjs [
-                    sortingModelMaker :> obj
+                    sortingMaker :> obj
                     firstIndex :> obj
                     count :> obj
-                ] |> UMX.tag<sortingModelSetMakerId>
+                ] |> UMX.tag<sortingSetMakerId>
 
-        { id = id; sortingModelMaker = sortingModelMaker; firstIndex = firstIndex; count = count }
+        { id = id; sortingMaker = sortingMaker; firstIndex = firstIndex; count = count }
 
     member this.Id with get() = this.id
-    member this.SortingModelMaker with get() = this.sortingModelMaker
+    member this.SortingMaker with get() = this.sortingMaker
     member this.FirstIndex with get() = this.firstIndex
     member this.Count with get() = this.count
 
-    member this.MakeSortingModelSet : sortingModelSet =
+    member this.MakeSortingSet : sortingSet =
         if %this.count <= 0 then
             failwith "Count must be greater than 0"
         if %this.firstIndex < 0 then
             failwith "FirstIndex must be non-negative"
-        let sortingModels = 
+        let sortings = 
             [| for i in 0 .. %this.count - 1 do
                 let index = %this.firstIndex + i
-                SortingModelMaker.makeSortingModel index this.sortingModelMaker |]
+                SortingMaker.makeSorting index this.sortingMaker |]
 
-        let id = (%this.id) |> UMX.tag<sortingModelSetId>
-        sortingModelSet.create id sortingModels
+        let id = (%this.id) |> UMX.tag<sortingSetId>
+        sortingSet.create id sortings

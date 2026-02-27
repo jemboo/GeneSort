@@ -31,13 +31,13 @@ module SorterModelMutator =
         | SmmMsuf6RandMutate msuf6 -> msuf6.Id
 
 
-    let getSortingModelSeedId (model: sorterModelMutator) : Guid<sortingModelId> =
+    let getSortingSeedId (model: sorterModelMutator) : Guid<sortingId> =
         match model with
-        | SmmMsceRandMutate msce -> %msce.Msce.Id |> UMX.tag<sortingModelId>
-        | SmmMssiRandMutate mssi -> %mssi.Mssi.Id |> UMX.tag<sortingModelId>
-        | SmmMsrsRandMutate msrs -> %msrs.Msrs.Id |> UMX.tag<sortingModelId>
-        | SmmMsuf4RandMutate msuf4 -> %msuf4.Msuf4.Id |> UMX.tag<sortingModelId>
-        | SmmMsuf6RandMutate msuf6 -> %msuf6.Msuf6.Id |> UMX.tag<sortingModelId>
+        | SmmMsceRandMutate msce -> %msce.Msce.Id |> UMX.tag<sortingId>
+        | SmmMssiRandMutate mssi -> %mssi.Mssi.Id |> UMX.tag<sortingId>
+        | SmmMsrsRandMutate msrs -> %msrs.Msrs.Id |> UMX.tag<sortingId>
+        | SmmMsuf4RandMutate msuf4 -> %msuf4.Msuf4.Id |> UMX.tag<sortingId>
+        | SmmMsuf6RandMutate msuf6 -> %msuf6.Msuf6.Id |> UMX.tag<sortingId>
 
 
     let getSortingWidth (model: sorterModelMutator) : int<sortingWidth> =

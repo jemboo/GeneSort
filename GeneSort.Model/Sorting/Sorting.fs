@@ -26,10 +26,10 @@ module Sorting =
         | Pair smp -> smp |> SorterPairModel.getStageLength
 
     
-    let getId (model: sorting) : Guid<sortingModelId> =
+    let getId (model: sorting) : Guid<sortingId> =
         match model with
-        | Single sms -> %(sms |> SorterModel.getId) |> UMX.tag<sortingModelId>
-        | Pair smp -> %(smp |> SorterPairModel.getId) |> UMX.tag<sortingModelId>
+        | Single sms -> %(sms |> SorterModel.getId) |> UMX.tag<sortingId>
+        | Pair smp -> %(smp |> SorterPairModel.getId) |> UMX.tag<sortingId>
 
 
     let makeSorters (model: sorting) : sorter []  =

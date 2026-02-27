@@ -4,61 +4,61 @@ open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 
-type sortingModelSet =
+type sortingSet =
       private
         { 
-          id : Guid<sortingModelSetId>
-          sortingModels : Map<Guid<sortingModelId>, sorting>
+          id : Guid<sortingSetId>
+          sortings : Map<Guid<sortingId>, sorting>
         }
     with
     static member create 
-            (id : Guid<sortingModelSetId>) 
-            (sortingModels : sorting[]) : sortingModelSet =
+            (id : Guid<sortingSetId>) 
+            (sortings : sorting[]) : sortingSet =
 
         // Create map from sorterModels, keyed by their ID
         let modelMap = 
-            sortingModels 
+            sortings 
             |> Array.map (fun sm -> (Sorting.getId sm, sm))
             |> Map.ofArray
         
         // Check that no duplicates were lost when creating the map
-        if modelMap.Count <> sortingModels.Length then
+        if modelMap.Count <> sortings.Length then
             failwith "All SorterModels must have unique IDs"
         
-        { id = id; sortingModels = modelMap }
+        { id = id; sortings = modelMap }
     
-    member this.Count with get() = this.sortingModels.Count
+    member this.Count with get() = this.sortings.Count
     member this.Id with get() = this.id
-    member this.SortingModels with get() = this.sortingModels |> Map.toArray |> Array.map snd
+    member this.Sortings with get() = this.sortings |> Map.toArray |> Array.map snd
     member this.SortingWidth with get() = 
         if this.Count = 0 then
             failwith "Cannot determine sorting width of an empty sorting model set"
         else
             // Assuming all models in the set have the same sorting width, 
             // return the sorting width of the first model
-            this.SortingModels.[0] |> Sorting.getSortingWidth
+            this.Sortings.[0] |> Sorting.getSortingWidth
     member this.StageLength with get() = 
         if this.Count = 0 then
             failwith "Cannot determine stage length of an empty sorting model set"
         else
             // Assuming all models in the set have the same stage length, 
             // return the stage length of the first model
-            this.SortingModels.[0] |> Sorting.getStageLength
-    member this.tryFind (id: Guid<sortingModelId>) (modelSet: sortingModelSet) : sorting option =
-        modelSet.sortingModels |> Map.tryFind id
+            this.Sortings.[0] |> Sorting.getStageLength
+    member this.tryFind (id: Guid<sortingId>) (modelSet: sortingSet) : sorting option =
+        modelSet.sortings |> Map.tryFind id
     
-    member this.find (id: Guid<sortingModelId>) (modelSet: sortingModelSet) : sorting =
-        match modelSet.sortingModels |> Map.tryFind id with
+    member this.find (id: Guid<sortingId>) (modelSet: sortingSet) : sorting =
+        match modelSet.sortings |> Map.tryFind id with
         | Some model -> model
         | None -> failwithf "SorterModel with ID %A not found" id
 
 
-module SortingModelSet =
+module SortingSet =
 
-    let makeSorterSet (modelSet: sortingModelSet) : sorterSet =
+    let makeSorterSet (modelSet: sortingSet) : sorterSet =
         // Collect all sorters with their tags
         let sorters = 
-            modelSet.SortingModels 
+            modelSet.Sortings 
             |> Array.collect (fun sm -> sm |> Sorting.makeSorters)
         
         sorterSet.create (%modelSet.Id |> UMX.tag<sorterSetId>) sorters

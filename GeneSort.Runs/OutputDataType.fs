@@ -8,7 +8,7 @@ type outputDataType =
     | SorterSet of string  // Made string mandatory; use "" for none.
     | SortableTest of string
     | SortableTestSet of string
-    | SortingModelSet of string
+    | SortingSet of string
     | SorterModelSetMaker of string
     | SortableTestModelSet of string
     | SortableTestModelSetMaker of string
@@ -26,7 +26,7 @@ module OutputDataType =
         | SorterSet s -> appendParam "SorterSet" s
         | SortableTest s -> appendParam "SortableTest" s
         | SortableTestSet s -> appendParam "SortableTestSet" s
-        | SortingModelSet s -> appendParam "SortingModelSet" s
+        | SortingSet s -> appendParam "SortingSet" s
         | SorterModelSetMaker s -> appendParam "SorterModelSetMaker" s
         | SortableTestModelSet s -> appendParam "SortableTestModelSet" s
         | SortableTestModelSetMaker s -> appendParam "SortableTestModelSetMaker" s
@@ -44,7 +44,7 @@ module OutputDataType =
         | "SorterSet" -> Some (SorterSet param)
         | "SortableTest" -> Some (SortableTest param)
         | "SortableTestSet" -> Some (SortableTestSet param)
-        | "SortingModelSet" -> Some (SortingModelSet param)
+        | "SortingSet" -> Some (SortingSet param)
         | "SorterModelSetMaker" -> Some (SorterModelSetMaker param)
         | "SortableTestModelSet" -> Some (SortableTestModelSet param)
         | "SortableTestModelSetMaker" -> Some (SortableTestModelSetMaker param)

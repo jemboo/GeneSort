@@ -6,31 +6,31 @@ open FSharp.UMX
 open GeneSort.Model.Sorting
 
 [<MessagePackObject>]
-type sortingModelSetDto = 
+type sortingSetDto = 
     { 
         [<Key(0)>] Id: Guid
-        [<Key(1)>] sortingModelDtos: sortingModelDto[]
+        [<Key(1)>] sortingDtos: sortingDto[]
     }
 
-module SortingModelSetDto =
+module SortingSetDto =
 
-    let toDomain (dto: sortingModelSetDto) : sortingModelSet =
-        if dto.sortingModelDtos = null then
+    let toDomain (dto: sortingSetDto) : sortingSet =
+        if dto.sortingDtos = null then
             failwith "SorterModels array cannot be null or empty"
-        if Array.isEmpty dto.sortingModelDtos then
+        if Array.isEmpty dto.sortingDtos then
             failwith "SorterModels array cannot be null or empty"
         let sorterModels = 
-            dto.sortingModelDtos 
-            |> Array.map SortingModelDto.toDomain
-        sortingModelSet.create
-                (UMX.tag<sortingModelSetId> dto.Id)
+            dto.sortingDtos 
+            |> Array.map SortingDto.toDomain
+        sortingSet.create
+                (UMX.tag<sortingSetId> dto.Id)
                 (sorterModels)
 
 
-    let fromDomain (domain: sortingModelSet) : sortingModelSetDto =
+    let fromDomain (domain: sortingSet) : sortingSetDto =
         { 
             Id = %domain.Id
-            sortingModelDtos = domain.SortingModels |> Array.map SortingModelDto.fromDomain 
+            sortingDtos = domain.Sortings |> Array.map SortingDto.fromDomain 
         }
 
 

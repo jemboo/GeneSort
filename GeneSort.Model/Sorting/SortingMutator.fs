@@ -9,46 +9,46 @@ open GeneSort.Model.Sorting
 open GeneSort.Model.Sorting.SorterPair
 
 
-type sortingModelMutator =
+type sortingMutator =
      | Single of sorterModelMutator
      | Pair of sorterPairModelMutator
 
 
-module SortingModelMutator =
+module SortingMutator =
 
-    let getId (model:sortingModelMutator) : Guid<sortingModelMutatorId> =
+    let getId (model:sortingMutator) : Guid<sortingMutatorId> =
         match model with
-        | Single smm -> %(smm |> SorterModelMutator.getId) |> UMX.tag<sortingModelMutatorId>
-        | Pair spmm -> %(spmm |> SorterPairModelMutator.getId) |> UMX.tag<sortingModelMutatorId>
+        | Single smm -> %(smm |> SorterModelMutator.getId) |> UMX.tag<sortingMutatorId>
+        | Pair spmm -> %(spmm |> SorterPairModelMutator.getId) |> UMX.tag<sortingMutatorId>
 
 
-    let getSortingModelSeedId (model: sortingModelMutator) : Guid<sortingModelId> =
+    let getSortingSeedId (model: sortingMutator) : Guid<sortingId> =
         match model with
-        | Single smm -> smm |> SorterModelMutator.getSortingModelSeedId
+        | Single smm -> smm |> SorterModelMutator.getSortingSeedId
         | Pair spmm -> failwith "SorterPairModelMutator does not have a single sorting model seed ID"
 
 
-    let getSortingWidth (model: sortingModelMutator) : int<sortingWidth> =
+    let getSortingWidth (model: sortingMutator) : int<sortingWidth> =
         match model with
         | Single smm -> smm |> SorterModelMutator.getSortingWidth
         | Pair spmm -> spmm |> SorterPairModelMutator.getSortingWidth
 
 
-    let getCeLength (model: sortingModelMutator) : int<ceLength> =
+    let getCeLength (model: sortingMutator) : int<ceLength> =
         match model with
         | Single smm -> smm |> SorterModelMutator.getCeLength
         | Pair spmm -> spmm |> SorterPairModelMutator.getCeLength
 
 
-    let makeSortingModel
+    let makeSorting
                 (index: int)  
-                (model: sortingModelMutator) : sorting =
+                (model: sortingMutator) : sorting =
         match model with
         | Single smm -> smm |> SorterModelMutator.makeSorterModel index |> sorting.Single
         | Pair spmm -> spmm |> SorterPairModelMutator.makeSorterPairModel index |> sorting.Pair
 
 
-    let makeSorterIdsWithTags (index: int) (model: sortingModelMutator)  
+    let makeSorterIdsWithTags (index: int) (model: sortingMutator)  
                                         : (Guid<sorterId> * modelTag) [] = 
         match model with
         | Single smm -> smm |> SorterModelMutator.makeSorterIdWithTag index |> Array.singleton

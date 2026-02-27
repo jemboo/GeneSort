@@ -12,7 +12,7 @@ type parentSorterSetEval =
 
     private { 
         id: Guid<parentSorterSetEvalId>
-        grandParentMap: Map<Guid<sorterId>, parentSortingModelTag>
+        grandParentMap: Map<Guid<sorterId>, parentSortingTag>
         sorterEvals: sorterEval[]
     }
 
@@ -34,7 +34,7 @@ type parentSorterSetEval =
         }
 
     member this.Id with get() : Guid<parentSorterSetEvalId> = this.id
-    member this.GrandParentMap with get() : Map<Guid<sorterId>, parentSortingModelTag> = this.grandParentMap
+    member this.GrandParentMap with get() : Map<Guid<sorterId>, parentSortingTag> = this.grandParentMap
     member this.SorterEvals with get() : sorterEval[] = this.sorterEvals
 
  

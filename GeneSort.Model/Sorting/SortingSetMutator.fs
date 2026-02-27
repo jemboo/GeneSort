@@ -5,41 +5,41 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 
-type sortingModelSetMutator =
+type sortingSetMutator =
     private
         { 
-          id : Guid<sortingModelSetMutatorId>
-          sortingModelMutator : sortingModelMutator
+          id : Guid<sortingSetMutatorId>
+          sortingMutator : sortingMutator
           firstIndex : int<sorterCount>
           count : int<sorterCount>
         }
     with
     static member create 
-                (sortingModelMutator: sortingModelMutator) 
+                (sortingMutator: sortingMutator) 
                 (firstIndex: int<sorterCount>) 
-                (count: int<sorterCount>) : sortingModelSetMutator =
+                (count: int<sorterCount>) : sortingSetMutator =
         let id = 
             // Generate a unique ID based on the SorterModelMaker and indices
             GuidUtils.guidFromObjs [
-                    sortingModelMutator :> obj
+                    sortingMutator :> obj
                     firstIndex :> obj
                     count :> obj
-                ] |> UMX.tag<sortingModelSetMutatorId>
+                ] |> UMX.tag<sortingSetMutatorId>
 
-        { id = id; sortingModelMutator = sortingModelMutator; firstIndex = firstIndex; count = count }
+        { id = id; sortingMutator = sortingMutator; firstIndex = firstIndex; count = count }
 
     member this.Id with get() = this.id
-    member this.SortingModelMutator with get() = this.sortingModelMutator
+    member this.SortingMutator with get() = this.sortingMutator
     member this.FirstIndex with get() = this.firstIndex
     member this.Count with get() = this.count
 
-    member this.MutateSortingModels
-                : (Guid<sortingModelMutatorId> * sorting) [] =
-        let mutantSortingModels = 
+    member this.MutateSortings
+                : (Guid<sortingMutatorId> * sorting) [] =
+        let mutantSortings = 
             [| for i in 0 .. %this.count - 1 do
                 let index = %this.firstIndex + i
-                ( this.SortingModelMutator |> SortingModelMutator.getId,
-                  SortingModelMutator.makeSortingModel index this.SortingModelMutator )
+                ( this.SortingMutator |> SortingMutator.getId,
+                  SortingMutator.makeSorting index this.SortingMutator )
             |]
-        mutantSortingModels
+        mutantSortings
 
