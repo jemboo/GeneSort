@@ -19,16 +19,16 @@ module SortingModelDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let fromDomain (sortingModel: sortingModel) : sortingModelDto =
-        match sortingModel with
-        | sortingModel.Single single -> Single (SorterModelDto.fromDomain single)
-        | sortingModel.Pair pair -> Pair (SorterPairModelDto.fromDomain pair)
+    let fromDomain (sorting: sorting) : sortingModelDto =
+        match sorting with
+        | sorting.Single single -> Single (SorterModelDto.fromDomain single)
+        | sorting.Pair pair -> Pair (SorterPairModelDto.fromDomain pair)
 
 
-    let toDomain (dto: sortingModelDto) : sortingModel =
+    let toDomain (dto: sortingModelDto) : sorting =
         try
             match dto with
-            | Single smDto -> sortingModel.Single (SorterModelDto.toDomain smDto)
-            | Pair pairDto -> sortingModel.Pair (SorterPairModelDto.toDomain pairDto)
+            | Single smDto -> sorting.Single (SorterModelDto.toDomain smDto)
+            | Pair pairDto -> sorting.Pair (SorterPairModelDto.toDomain pairDto)
         with
         | ex -> failwith $"Failed to convert SortingModelDto: {ex.Message}"

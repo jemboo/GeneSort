@@ -26,7 +26,7 @@ module SplitJoin =
         | "Second_Second" -> Second_Second
         | _ -> failwithf "Invalid prefixOrSuffix value: %s" str
 
-// used to track how a sorter was made from a sortingModel
+// used to track how a sorter was made from a sorting
 type modelTag =
      | Single
      | SplitPair of splitJoin
@@ -51,7 +51,7 @@ module ModelTag =
             
 type sortingModelParentId = Guid<sortingModelId>
 
-// used to track a sorter back to it's parent sortingModel, and it gives it's position 
+// used to track a sorter back to it's parent sorting, and it gives it's position 
 // within it's family
 type sortingModelTag = sortingModelParentId * modelTag
 

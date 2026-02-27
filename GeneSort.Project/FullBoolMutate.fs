@@ -223,13 +223,13 @@ module FullBoolMutate =
 
                 let mapSorterModelToModelSetMutators = 
                     mmId_sm
-                    |> Array.map (fun (mmId, sm) -> (sm |> SortingModel.getId, mmId))
+                    |> Array.map (fun (mmId, sm) -> (sm |> Sorting.getId, mmId))
                     |> Map.ofArray
 
                 let mutantSorters = 
                     mmId_sm
                     |> Array.collect (fun (mmId, sm) -> 
-                        SortingModel.makeSorters sm)
+                        Sorting.makeSorters sm)
 
                 let mutatedSorterSet = sorterSet.createWithNewId mutantSorters
 

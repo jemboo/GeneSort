@@ -35,10 +35,10 @@ module SortingModelMaker =
 
     let makeSortingModel
                 (index: int)  
-                (model: sortingModelMaker) : sortingModel =
+                (model: sortingModelMaker) : sorting =
         match model with
-        | Single smm -> smm |> SorterModelMaker.makeSorterModel index |> sortingModel.Single
-        | Pair spmm -> spmm |> SorterPairModelMaker.makeSorterPairModel index |> sortingModel.Pair
+        | Single smm -> smm |> SorterModelMaker.makeSorterModel index |> sorting.Single
+        | Pair spmm -> spmm |> SorterPairModelMaker.makeSorterPairModel index |> sorting.Pair
 
 
     let makeSorterIdsWithTags (index: int) (model: sortingModelMaker)  

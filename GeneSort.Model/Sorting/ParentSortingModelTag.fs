@@ -7,8 +7,8 @@ open System
 type sortingModelGrandParentId = Guid<sortingModelId>
 
 
-// used to track a sorter back to it's parent sortingModel, and it gives it's position 
-// within it's family, and then back to the grandparent sortingModel.
+// used to track a sorter back to it's parent sorting, and it gives it's position 
+// within it's family, and then back to the grandparent sorting.
 type parentSortingModelTag = sortingModelGrandParentId * sortingModelTag
 
 module ParentSortingModelTag =

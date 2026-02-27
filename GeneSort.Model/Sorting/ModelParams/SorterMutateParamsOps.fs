@@ -67,7 +67,7 @@ module SorterMutateParamsOps =
 
 
     let makeSortingModelSetMutatorFromSortingModel
-                (sortingModel: sortingModel)
+                (sorting: sorting)
                 (sorterModelMutateParams: sorterModelMutateParams) 
                 (firstIndex: int<sorterCount>) 
                 (count: int<sorterCount>) : sortingModelSetMutator = 
@@ -77,13 +77,13 @@ module SorterMutateParamsOps =
         if %firstIndex < 0 then
             failwith "FirstIndex must be non-negative"
 
-        match sortingModel with
-        | sortingModel.Single sorterModel ->
+        match sorting with
+        | sorting.Single sorterModel ->
             let sortingModelMutator = 
                 makeSortingModelMutatorFromSorterModel sorterModel sorterModelMutateParams
             sortingModelSetMutator.create sortingModelMutator firstIndex count
 
-        | sortingModel.Pair _ ->
+        | sorting.Pair _ ->
                 failwith "Mutation of Pair sortingModels not yet supported"
 
 

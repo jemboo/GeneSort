@@ -42,10 +42,10 @@ module SortingModelMutator =
 
     let makeSortingModel
                 (index: int)  
-                (model: sortingModelMutator) : sortingModel =
+                (model: sortingModelMutator) : sorting =
         match model with
-        | Single smm -> smm |> SorterModelMutator.makeSorterModel index |> sortingModel.Single
-        | Pair spmm -> spmm |> SorterPairModelMutator.makeSorterPairModel index |> sortingModel.Pair
+        | Single smm -> smm |> SorterModelMutator.makeSorterModel index |> sorting.Single
+        | Pair spmm -> spmm |> SorterPairModelMutator.makeSorterPairModel index |> sorting.Pair
 
 
     let makeSorterIdsWithTags (index: int) (model: sortingModelMutator)  

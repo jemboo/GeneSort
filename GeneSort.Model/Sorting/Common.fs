@@ -40,7 +40,7 @@ module CommonMaker =
                 (index:int) : Guid<sortingModelId> = 
         [
             id  :> obj
-            "SortingModel" :> obj
+            "Sorting" :> obj
             index :> obj
         ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingModelId>
 
@@ -63,6 +63,6 @@ module CommonMutator =
                 (index:int) : Guid<sortingModelId> = 
         [
             id  :> obj
-            "SortingModel" :> obj
+            "Sorting" :> obj
             index :> obj
         ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingModelId>

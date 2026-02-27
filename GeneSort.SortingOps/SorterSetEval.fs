@@ -127,7 +127,7 @@ module SorterSetEval =
         // 2. Filter the original sorter collection based on the passing IDs
         let passingSorterModels = 
             sms.SortingModels 
-            |> Array.filter (fun stm -> SortingModel.containsAnySorter passingIds stm)
+            |> Array.filter (fun stm -> Sorting.containsAnySorter passingIds stm)
 
         sortingModelSet.create 
             (Guid.NewGuid() |> UMX.tag<sortingModelSetId>) 
