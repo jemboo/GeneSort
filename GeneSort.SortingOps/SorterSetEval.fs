@@ -130,6 +130,6 @@ module SorterSetEval =
             |> Array.filter (fun stm -> SortingModel.containsAnySorter passingIds stm)
 
         sortingModelSet.create 
-            (Guid.NewGuid() |> UMX.tag<sortingModelSetID>) 
+            (Guid.NewGuid() |> UMX.tag<sortingModelSetId>) 
             passingSorterModels
 

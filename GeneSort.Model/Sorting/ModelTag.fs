@@ -49,7 +49,7 @@ module ModelTag =
             failwithf "Invalid modelTag format: %s" str
 
             
-type sortingModelParentId = Guid<sortingModelID>
+type sortingModelParentId = Guid<sortingModelId>
 
 // used to track a sorter back to it's parent sortingModel, and it gives it's position 
 // within it's family
@@ -58,7 +58,7 @@ type sortingModelTag = sortingModelParentId * modelTag
 module SortingModelTag =
 
     let create (id: Guid) (tag: modelTag) : sortingModelTag =
-        (id |> UMX.tag<sortingModelID>, tag)
+        (id |> UMX.tag<sortingModelId>, tag)
 
     let getSortingModelParentId (sorterModelTag: sortingModelTag) : sortingModelParentId =
         let (modelId, _) = sorterModelTag
@@ -76,6 +76,6 @@ module SortingModelTag =
         let parts = str.Split('\t')
         if parts.Length <> 2 then
             failwithf "Invalid sortingModelTag format: %s" str
-        let modelId = Guid.Parse(parts.[0]) |> UMX.tag<sortingModelID>
+        let modelId = Guid.Parse(parts.[0]) |> UMX.tag<sortingModelId>
         let tag = ModelTag.fromString parts.[1]
         (modelId, tag)

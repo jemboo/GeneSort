@@ -9,7 +9,7 @@ open GeneSort.Sorting.Sorter
 
 type msConcatenation = 
     private 
-        { id: Guid<sorterModelID>
+        { id: Guid<sorterModelId>
           sortingWidth: int<sortingWidth>
           prefix: sorterModel
           suffix: sorterModel } 
@@ -17,12 +17,17 @@ type msConcatenation =
 
     static member createId 
             (prefix: sorterModel)
-            (suffix: sorterModel) : Guid<sorterModelID> =
+            (suffix: sorterModel) : Guid<sorterModelId> =
            [
                 "Concatenation" :> obj
                 %SorterModel.getId prefix :> obj
                 %SorterModel.getId suffix :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
+
+    static member createSorterId 
+        (prefix: sorterModel)
+        (suffix: sorterModel) : Guid<sorterId> =
+        %(msConcatenation.createId prefix suffix) |> UMX.tag<sorterId>
 
     /// Creates an msConcatenation instance with the specified prefix and suffix sorter models.
     /// The ID is deterministically calculated from the prefix and suffix IDs.
@@ -51,7 +56,7 @@ type msConcatenation =
 
 module MsConcatenation =
     
-    let getChildIds (model: msConcatenation) : Guid<sorterModelID> array =
+    let getChildIds (model: msConcatenation) : Guid<sorterModelId> array =
         [| 
             SorterModel.getId model.Prefix
             SorterModel.getId model.Suffix
@@ -62,7 +67,7 @@ module MsConcatenation =
         let suffixLength = SorterModel.getCeLength model.Suffix
         UMX.tag<ceLength> (%prefixLength + %suffixLength)
     
-    let hasChild (id: Guid<sorterModelID>) (model: msConcatenation) : bool =
+    let hasChild (id: Guid<sorterModelId>) (model: msConcatenation) : bool =
         model |> getChildIds |> Array.exists (fun childId -> %childId = %id)
 
     let makeSorterId (concat: msConcatenation) : Guid<sorterId> =

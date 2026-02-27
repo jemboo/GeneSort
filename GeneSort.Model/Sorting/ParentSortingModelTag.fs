@@ -4,7 +4,7 @@ open FSharp.UMX
 open System
 
 
-type sortingModelGrandParentId = Guid<sortingModelID>
+type sortingModelGrandParentId = Guid<sortingModelId>
 
 
 // used to track a sorter back to it's parent sortingModel, and it gives it's position 
@@ -14,7 +14,7 @@ type parentSortingModelTag = sortingModelGrandParentId * sortingModelTag
 module ParentSortingModelTag =
 
    let create (grandParentId: Guid) (parentTag: sortingModelTag) : parentSortingModelTag =
-        (grandParentId |> UMX.tag<sortingModelID>, parentTag)
+        (grandParentId |> UMX.tag<sortingModelId>, parentTag)
 
    
    let getGrandParentId (tag: parentSortingModelTag) : sortingModelGrandParentId =

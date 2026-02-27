@@ -10,7 +10,7 @@ open MathUtils
 type msuf4RandGen = 
     private 
         { 
-          id: Guid<sorterModelMakerID>
+          id: Guid<sorterModelMakerId>
           rngFactory: rngFactory
           sortingWidth: int<sortingWidth>
           stageLength: int<stageLength> 
@@ -49,7 +49,7 @@ type msuf4RandGen =
                     sortingWidth :> obj
                     stageLength :> obj
                     genRates :> obj
-                ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
+                ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerId>
 
             { id = id
               rngFactory = rngFactory
@@ -83,7 +83,7 @@ type msuf4RandGen =
             this.stageLength = other.stageLength &&
             this.genRates.Equals(other.genRates)
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelID> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMaker.makeSorterModelId this.Id index
 
     member this.MakeSorterModel (index: int) : msuf4 =
@@ -114,5 +114,5 @@ module Msuf4RandGen =
                 genRatesStr
 
     let getSorterModelIdWithTag (index: int) (msuf4RandGen:msuf4RandGen) 
-                    : (Guid<sorterModelID> * modelTag) =
+                    : (Guid<sorterModelId> * modelTag) =
         (msuf4RandGen.MakeSorterModelId index, modelTag.Single)

@@ -8,7 +8,7 @@ open GeneSort.Model.Sorting
 type msuf4RandMutate = 
     private 
         {
-          id : Guid<sorterModelMutatorID>
+          id : Guid<sorterModelMutatorId>
           msuf4 : msuf4
           rngFactory: rngFactory
           uf4MutationRatesArray: uf4MutationRatesArray } 
@@ -25,7 +25,7 @@ type msuf4RandMutate =
                 rngFactory :> obj
                 msuf4 :> obj
                 uf4MutationRatesArray :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorID>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorId>
 
         {
             id = id
@@ -65,7 +65,7 @@ type msuf4RandMutate =
         member this.Equals(other) = 
             this.Id = other.Id
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelID> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
     /// Mutates an Msuf4 by applying Uf4MutationRatesArray to its ceCodes array.

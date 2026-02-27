@@ -44,7 +44,7 @@ module MsSplitPairsDto =
     let toDomain (dto: msSplitPairsDto) : msSplitPairs =
         try
             msSplitPairs.create
-                (UMX.tag<sorterModelID> dto.Id)
+                (UMX.tag<sorterModelId> dto.Id)
                 (UMX.tag<sortingWidth> dto.SortingWidth)
                 (SorterModelDto.toDomain dto.FirstPrefix)
                 (SorterModelDto.toDomain dto.FirstSuffix)

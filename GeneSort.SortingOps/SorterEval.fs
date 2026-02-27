@@ -1,10 +1,7 @@
 ﻿namespace GeneSort.SortingOps
 
-open System
 open FSharp.UMX
 open GeneSort.Sorting
-open GeneSort.Sorting.Sorter
-open GeneSort.Sorting.Sortable
 
 
 type sorterEval =

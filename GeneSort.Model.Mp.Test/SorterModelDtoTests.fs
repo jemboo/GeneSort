@@ -84,7 +84,7 @@ type SorterModelDtoTests() =
 
     [<Fact>]
     let ``Msce round-trip serialization and deserialization should succeed`` () =
-        let msce = msce.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|1;2;3|]
+        let msce = msce.create (Guid.NewGuid() |> UMX.tag<sorterModelId>) (UMX.tag<sortingWidth> 16) [|1;2;3|]
         let sorterModel = sorterModel.Msce msce
         let result = roundTrip sorterModel
         match result with
@@ -97,7 +97,7 @@ type SorterModelDtoTests() =
     [<Fact>]
     let ``Mssi round-trip serialization and deserialization should succeed`` () =
         let permSi = Perm_Si.create [|1; 0; 2; 3|] // (0 1)
-        let mssi = mssi.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 16) [|permSi|]
+        let mssi = mssi.create (Guid.NewGuid() |> UMX.tag<sorterModelId>) (UMX.tag<sortingWidth> 16) [|permSi|]
         let sorterModel = sorterModel.Mssi mssi
         let result = roundTrip sorterModel
         match result with
@@ -111,7 +111,7 @@ type SorterModelDtoTests() =
     [<Fact>]
     let ``Msrs round-trip serialization and deserialization should succeed`` () =
         let permRss = [| Perm_Rs.create([| 3; 2; 1; 0 |]); Perm_Rs.create([| 1; 0; 3; 2 |]) |]
-        let msrs = msrs.create (Guid.NewGuid() |> UMX.tag<sorterModelID>) (UMX.tag<sortingWidth> 4) permRss
+        let msrs = msrs.create (Guid.NewGuid() |> UMX.tag<sorterModelId>) (UMX.tag<sortingWidth> 4) permRss
         let sorterModel = sorterModel.Msrs msrs
         let result = roundTrip sorterModel
         match result with
@@ -124,7 +124,7 @@ type SorterModelDtoTests() =
 
     [<Fact>]
     let ``Msuf4 round-trip serialization and deserialization should succeed`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
+        let id = Guid.NewGuid() |> UMX.tag<sorterModelId>
         let width = 16<sortingWidth>
         let tou = createTestTwoOrbitUnfolder4 16 TwoOrbitPairType.Ortho (Some TwoOrbitPairType.Para)
         let msuf4 = msuf4.create id width [|tou|] 
@@ -140,7 +140,7 @@ type SorterModelDtoTests() =
 
     [<Fact>]
     let ``Msuf6 round-trip serialization and deserialization should succeed`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelID>
+        let id = Guid.NewGuid() |> UMX.tag<sorterModelId>
         let order = 12
         let width = 12<sortingWidth>
         let tou = createTestTwoOrbitUnfolder6 order TwoOrbitPairType.Ortho (Some TwoOrbitPairType.Para)

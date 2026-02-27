@@ -63,7 +63,7 @@ module Msuf4Dto =
             try
                 let msuf4 = 
                     msuf4.create
-                        (UMX.tag<sorterModelID> dto.id)
+                        (UMX.tag<sorterModelId> dto.id)
                         (UMX.tag<sortingWidth> dto.sortingWidth)
                         twoOrbitUnfolder4s
                 Ok msuf4

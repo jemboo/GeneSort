@@ -7,12 +7,12 @@ open GeneSort.Sorting.Sorter
 type sortingModelSet =
       private
         { 
-          id : Guid<sortingModelSetID>
-          sortingModels : Map<Guid<sortingModelID>, sortingModel>
+          id : Guid<sortingModelSetId>
+          sortingModels : Map<Guid<sortingModelId>, sortingModel>
         }
     with
     static member create 
-            (id : Guid<sortingModelSetID>) 
+            (id : Guid<sortingModelSetId>) 
             (sortingModels : sortingModel[]) : sortingModelSet =
 
         // Create map from sorterModels, keyed by their ID
@@ -44,10 +44,10 @@ type sortingModelSet =
             // Assuming all models in the set have the same stage length, 
             // return the stage length of the first model
             this.SortingModels.[0] |> SortingModel.getStageLength
-    member this.tryFind (id: Guid<sortingModelID>) (modelSet: sortingModelSet) : sortingModel option =
+    member this.tryFind (id: Guid<sortingModelId>) (modelSet: sortingModelSet) : sortingModel option =
         modelSet.sortingModels |> Map.tryFind id
     
-    member this.find (id: Guid<sortingModelID>) (modelSet: sortingModelSet) : sortingModel =
+    member this.find (id: Guid<sortingModelId>) (modelSet: sortingModelSet) : sortingModel =
         match modelSet.sortingModels |> Map.tryFind id with
         | Some model -> model
         | None -> failwithf "SorterModel with ID %A not found" id
@@ -62,6 +62,3 @@ module SortingModelSet =
             |> Array.collect (fun sm -> sm |> SortingModel.makeSorters)
         
         sorterSet.create (%modelSet.Id |> UMX.tag<sorterSetId>) sorters
-
-
-

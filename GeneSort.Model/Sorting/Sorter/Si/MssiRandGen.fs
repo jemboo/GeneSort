@@ -11,7 +11,7 @@ open GeneSort.Model.Sorting
 type mssiRandGen = 
     private 
         { 
-          id : Guid<sorterModelMakerID>
+          id : Guid<sorterModelMakerId>
           rngFactory: rngFactory
           sortingWidth: int<sortingWidth>
           stageLength: int<stageLength> 
@@ -33,7 +33,7 @@ type mssiRandGen =
                     rngFactory :> obj
                     sortingWidth :> obj
                     %stageLength :> obj
-                ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
+                ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerId>
 
             { 
                 id = id; 
@@ -66,7 +66,7 @@ type mssiRandGen =
             this.stageLength = other.stageLength
 
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelID> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMaker.makeSorterModelId this.Id index
 
 

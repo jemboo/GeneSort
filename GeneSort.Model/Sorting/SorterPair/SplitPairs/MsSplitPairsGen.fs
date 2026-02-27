@@ -8,7 +8,7 @@ open GeneSort.Model.Sorting
 
 type msSplitPairsGen = 
     private 
-        { id: Guid<sorterPairModelMakerID>
+        { id: Guid<sorterPairModelMakerId>
           sortingWidth: int<sortingWidth>
           firstPrefixMaker: sorterModelMaker
           firstSuffixMaker: sorterModelMaker
@@ -64,7 +64,7 @@ type msSplitPairsGen =
                 %SorterModelMaker.getId firstSuffixMaker :> obj
                 %SorterModelMaker.getId secondPrefixMaker :> obj
                 %SorterModelMaker.getId secondSuffixMaker :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterPairModelMakerID>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterPairModelMakerId>
         
         { id = id
           sortingWidth = sortingWidth
@@ -109,7 +109,7 @@ module MsSplitPairsGen =
             [
                 %gen.Id :> obj
                 index :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
         
         msSplitPairs.create
             splitPairsId
@@ -120,7 +120,7 @@ module MsSplitPairsGen =
             secondSuffix
 
 
-    let makeSorterModelIdsWithTags (index: int) (gen: msSplitPairsGen) 
-                                    : (Guid<sorterModelID> * modelTag) [] =
+    let makeSorterIdsWithTags (index: int) (gen: msSplitPairsGen) 
+                                    : (Guid<sorterId> * modelTag) [] =
         let splitPairs = makeMsSplitPairs index gen
-        splitPairs |> MsSplitPairs.getSorterModelIdsWithTags
+        splitPairs |> MsSplitPairs.getSorterIdsWithTags

@@ -64,7 +64,7 @@ module SortingModelTagDto =
           ModelTag = ModelTagDto.toDto modelTag }
     
     let fromDto (dto: sortingModelTagDto) : sortingModelTag =
-        let parentId = Guid.Parse(dto.ParentId) |> UMX.tag<sortingModelID>
+        let parentId = Guid.Parse(dto.ParentId) |> UMX.tag<sortingModelId>
         let modelTag = ModelTagDto.fromDto dto.ModelTag
         (parentId, modelTag)
 
@@ -80,6 +80,6 @@ module ParentSortingModelTagDto =
           ParentTag = SortingModelTagDto.toDto parentTag }
     
     let fromDto (dto: parentSortingModelTagDto) : parentSortingModelTag =
-        let grandParentId = Guid.Parse(dto.GrandParentId) |> UMX.tag<sortingModelID>
+        let grandParentId = Guid.Parse(dto.GrandParentId) |> UMX.tag<sortingModelId>
         let parentTag = SortingModelTagDto.fromDto dto.ParentTag
         (grandParentId, parentTag)

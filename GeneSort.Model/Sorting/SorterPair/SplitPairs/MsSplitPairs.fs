@@ -8,7 +8,7 @@ open GeneSort.Sorting.Sorter
 
 type msSplitPairs = 
     private 
-        { id: Guid<sorterModelID>
+        { id: Guid<sorterModelId>
           sortingWidth: int<sortingWidth>
           firstPrefix: sorterModel
           firstSuffix: sorterModel
@@ -22,7 +22,7 @@ type msSplitPairs =
     /// - the two prefixes don't have the same ceLength
     /// - the two suffixes don't have the same ceLength
     static member create 
-            (id: Guid<sorterModelID>) 
+            (id: Guid<sorterModelId>) 
             (sortingWidth: int<sortingWidth>)
             (firstPrefix: sorterModel)
             (firstSuffix: sorterModel)
@@ -121,7 +121,7 @@ module MsSplitPairs =
         |> Array.exists (fun concat -> %concat.Id = %childId)
 
 
-    let getSorterModelIdForModelTag (model: msSplitPairs) (tag: modelTag) : Guid<sorterModelID> =
+    let getSorterModelIdForModelTag (model: msSplitPairs) (tag: modelTag) : Guid<sorterModelId> =
         match tag with
         | modelTag.SplitPair splitJoin.First_First -> 
                 msConcatenation.createId model.FirstPrefix model.FirstSuffix
@@ -134,10 +134,10 @@ module MsSplitPairs =
         | _ -> failwith $"Invalid modelTag for msSplitPairs"
 
 
-    let getSorterModelIdsWithTags (model: msSplitPairs) : (Guid<sorterModelID> * modelTag) [] =
+    let getSorterIdsWithTags (model: msSplitPairs) : (Guid<sorterId> * modelTag) [] =
         [|
-            (msConcatenation.createId model.FirstPrefix model.FirstSuffix, modelTag.SplitPair splitJoin.First_First);
-            (msConcatenation.createId model.FirstPrefix model.SecondSuffix, modelTag.SplitPair splitJoin.First_Second);
-            (msConcatenation.createId model.SecondPrefix model.FirstSuffix, modelTag.SplitPair splitJoin.Second_First);
-            (msConcatenation.createId model.SecondPrefix model.SecondSuffix, modelTag.SplitPair splitJoin.Second_Second);
+            (msConcatenation.createSorterId model.FirstPrefix model.FirstSuffix, modelTag.SplitPair splitJoin.First_First);
+            (msConcatenation.createSorterId model.FirstPrefix model.SecondSuffix, modelTag.SplitPair splitJoin.First_Second);
+            (msConcatenation.createSorterId model.SecondPrefix model.FirstSuffix, modelTag.SplitPair splitJoin.Second_First);
+            (msConcatenation.createSorterId model.SecondPrefix model.SecondSuffix, modelTag.SplitPair splitJoin.Second_Second);
         |]

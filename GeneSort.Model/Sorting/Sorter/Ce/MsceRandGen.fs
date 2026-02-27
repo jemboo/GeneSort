@@ -11,7 +11,7 @@ open GeneSort.Model.Sorting
 type msceRandGen = 
     private 
         { 
-          id : Guid<sorterModelMakerID>
+          id : Guid<sorterModelMakerId>
           rngFactory: rngFactory
           sortingWidth: int<sortingWidth>
           excludeSelfCe: bool
@@ -34,7 +34,7 @@ type msceRandGen =
                     sortingWidth :> obj
                     excludeSelfCe :> obj
                     %ceLength :> obj
-                ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
+                ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerId>
 
             { id = id;
               rngFactory = rngFactory; 
@@ -69,7 +69,7 @@ type msceRandGen =
             this.ceLength = other.ceLength
 
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelID> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMaker.makeSorterModelId this.Id index
 
 
@@ -103,5 +103,5 @@ module MsceRandGen =
 
 
     let getSorterModelIdWithTag (index: int) (msceRandGen:msceRandGen) 
-                    : (Guid<sorterModelID> * modelTag) =
+                    : (Guid<sorterModelId> * modelTag) =
         (msceRandGen.MakeSorterModelId index, modelTag.Single)

@@ -10,7 +10,7 @@ open GeneSort.Model.Sorting.Sorter.Uf6
 type msuf6RandMutate = 
     private 
         {
-          id : Guid<sorterModelMutatorID>
+          id : Guid<sorterModelMutatorId>
           msuf6 : msuf6
           rngFactory: rngFactory
           uf6MutationRatesArray: uf6MutationRatesArray 
@@ -29,7 +29,7 @@ type msuf6RandMutate =
                 rngFactory :> obj
                 msuf6 :> obj
                 uf6MutationRatesArray :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorID>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorId>
 
         {
             id = id
@@ -69,7 +69,7 @@ type msuf6RandMutate =
         member this.Equals(other) = 
             this.Id = other.Id
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelID> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
     /// Mutates an Msuf6 by applying Uf6MutationRatesArray to its ceCodes array.

@@ -8,7 +8,7 @@ open GeneSort.Sorting
 type sortingModelSetMutator =
     private
         { 
-          id : Guid<sortingModelSetMutatorID>
+          id : Guid<sortingModelSetMutatorId>
           sortingModelMutator : sortingModelMutator
           firstIndex : int<sorterCount>
           count : int<sorterCount>
@@ -24,7 +24,7 @@ type sortingModelSetMutator =
                     sortingModelMutator :> obj
                     firstIndex :> obj
                     count :> obj
-                ] |> UMX.tag<sortingModelSetMutatorID>
+                ] |> UMX.tag<sortingModelSetMutatorId>
 
         { id = id; sortingModelMutator = sortingModelMutator; firstIndex = firstIndex; count = count }
 
@@ -34,7 +34,7 @@ type sortingModelSetMutator =
     member this.Count with get() = this.count
 
     member this.MutateSortingModels
-                : (Guid<sortingModelMutatorID> * sortingModel) [] =
+                : (Guid<sortingModelMutatorId> * sortingModel) [] =
         let mutantSortingModels = 
             [| for i in 0 .. %this.count - 1 do
                 let index = %this.firstIndex + i

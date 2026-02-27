@@ -16,13 +16,13 @@ type sortingModelMutator =
 
 module SortingModelMutator =
 
-    let getId (model:sortingModelMutator) : Guid<sortingModelMutatorID> =
+    let getId (model:sortingModelMutator) : Guid<sortingModelMutatorId> =
         match model with
-        | Single smm -> %(smm |> SorterModelMutator.getId) |> UMX.tag<sortingModelMutatorID>
-        | Pair spmm -> %(spmm |> SorterPairModelMutator.getId) |> UMX.tag<sortingModelMutatorID>
+        | Single smm -> %(smm |> SorterModelMutator.getId) |> UMX.tag<sortingModelMutatorId>
+        | Pair spmm -> %(spmm |> SorterPairModelMutator.getId) |> UMX.tag<sortingModelMutatorId>
 
 
-    let getSortingModelSeedId (model: sortingModelMutator) : Guid<sortingModelID> =
+    let getSortingModelSeedId (model: sortingModelMutator) : Guid<sortingModelId> =
         match model with
         | Single smm -> smm |> SorterModelMutator.getSortingModelSeedId
         | Pair spmm -> failwith "SorterPairModelMutator does not have a single sorting model seed ID"
@@ -48,11 +48,11 @@ module SortingModelMutator =
         | Pair spmm -> spmm |> SorterPairModelMutator.makeSorterPairModel index |> sortingModel.Pair
 
 
-    let makeSorterModelIdsWithTags (index: int) (model: sortingModelMutator)  
-                                        : (Guid<sorterModelID> * modelTag) [] = 
+    let makeSorterIdsWithTags (index: int) (model: sortingModelMutator)  
+                                        : (Guid<sorterId> * modelTag) [] = 
         match model with
-        | Single smm -> smm |> SorterModelMutator.makeSorterModelIdWithTag index |> Array.singleton
-        | Pair spmm -> spmm |> SorterPairModelMutator.makeSorterModelIdsWithTags index
+        | Single smm -> smm |> SorterModelMutator.makeSorterIdWithTag index |> Array.singleton
+        | Pair spmm -> spmm |> SorterPairModelMutator.makeSorterIdsWithTags index
 
 
 

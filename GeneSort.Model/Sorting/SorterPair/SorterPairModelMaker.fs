@@ -22,7 +22,7 @@ module SorterPairModelMaker =
         | sorterPairModelMaker.SplitPairs2 mspg -> MsSplitPairsGen.getCeLength mspg
 
 
-    let getId (model: sorterPairModelMaker) : Guid<sorterPairModelMakerID> =
+    let getId (model: sorterPairModelMaker) : Guid<sorterPairModelMakerId> =
         match model with
         | SplitPairs mspg -> mspg.Id
         | SplitPairs2 mspg -> mspg.Id
@@ -43,12 +43,12 @@ module SorterPairModelMaker =
                                    |> sorterPairModel.SplitPairs2
 
 
-    let makeSorterModelIdsWithTags (index:int) (model:sorterPairModelMaker)
-                                    : (Guid<sorterModelID> * modelTag) [] =
+    let makeSorterIdsWithTags (index:int) (model:sorterPairModelMaker)
+                                    : (Guid<sorterId> * modelTag) [] =
         match model with
-        | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeSorterModelIdsWithTags index 
+        | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeSorterIdsWithTags index 
 
-        | SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeSorterModelIdsWithTags index 
+        | SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeSorterIdsWithTags index 
 
 
 

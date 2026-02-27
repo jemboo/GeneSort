@@ -16,10 +16,10 @@ type sortingModelMaker =
 
 module SortingModelMaker =
 
-    let getId (model:sortingModelMaker) : Guid<sortingModelMakerID> =
+    let getId (model:sortingModelMaker) : Guid<sortingModelMakerId> =
         match model with
-        | Single smm -> %(smm |> SorterModelMaker.getId) |> UMX.tag<sortingModelMakerID>
-        | Pair spmm -> %(spmm |> SorterPairModelMaker.getId) |> UMX.tag<sortingModelMakerID>
+        | Single smm -> %(smm |> SorterModelMaker.getId) |> UMX.tag<sortingModelMakerId>
+        | Pair spmm -> %(spmm |> SorterPairModelMaker.getId) |> UMX.tag<sortingModelMakerId>
 
 
     let getSortingWidth (model: sortingModelMaker) : int<sortingWidth> =
@@ -41,8 +41,8 @@ module SortingModelMaker =
         | Pair spmm -> spmm |> SorterPairModelMaker.makeSorterPairModel index |> sortingModel.Pair
 
 
-    let makeSorterModelIdsWithTags (index: int) (model: sortingModelMaker)  
-                                        : (Guid<sorterModelID> * modelTag) [] = 
+    let makeSorterIdsWithTags (index: int) (model: sortingModelMaker)  
+                                        : (Guid<sorterId> * modelTag) [] = 
         match model with
-        | Single smm -> smm |> SorterModelMaker.makeSorterModelIdWithTag index |> Array.singleton
-        | Pair spmm -> spmm |> SorterPairModelMaker.makeSorterModelIdsWithTags index
+        | Single smm -> smm |> SorterModelMaker.makeSorterIdWithTag index |> Array.singleton
+        | Pair spmm -> spmm |> SorterPairModelMaker.makeSorterIdsWithTags index

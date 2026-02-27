@@ -23,7 +23,7 @@ module SortingModelSetDto =
             dto.sortingModelDtos 
             |> Array.map SortingModelDto.toDomain
         sortingModelSet.create
-                (UMX.tag<sortingModelSetID> dto.Id)
+                (UMX.tag<sortingModelSetId> dto.Id)
                 (sorterModels)
 
 

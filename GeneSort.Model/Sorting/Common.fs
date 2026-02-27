@@ -5,17 +5,17 @@ open GeneSort.Core
 
 
 
-[<Measure>] type sorterModelID
-[<Measure>] type sortingModelID
-[<Measure>] type sortingModelSetID
-[<Measure>] type sorterModelMakerID
-[<Measure>] type sorterModelMutatorID
-[<Measure>] type sorterPairModelMakerID
-[<Measure>] type sorterPairModelMutatorID
-[<Measure>] type sortingModelMakerID
-[<Measure>] type sortingModelMutatorID
-[<Measure>] type sortingModelSetMakerID
-[<Measure>] type sortingModelSetMutatorID
+[<Measure>] type sorterModelId
+[<Measure>] type sortingModelId
+[<Measure>] type sortingModelSetId
+[<Measure>] type sorterModelMakerId
+[<Measure>] type sorterModelMutatorId
+[<Measure>] type sorterPairModelMakerId
+[<Measure>] type sorterPairModelMutatorId
+[<Measure>] type sortingModelMakerId
+[<Measure>] type sortingModelMutatorId
+[<Measure>] type sortingModelSetMakerId
+[<Measure>] type sortingModelSetMutatorId
 [<Measure>] type parentSorterSetEvalId
 [<Measure>] type sortingParamsId
 
@@ -26,43 +26,43 @@ open GeneSort.Core
 module CommonMaker =
 
     let makeSorterModelId 
-                (id:  Guid<sorterModelMakerID>) 
-                (index:int) : Guid<sorterModelID> = 
+                (id:  Guid<sorterModelMakerId>) 
+                (index:int) : Guid<sorterModelId> = 
         [
             id  :> obj
             "SorterModel" :> obj
             index :> obj
-        ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+        ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
 
 
     let makeSortingModelId 
-                (id:  Guid<sorterModelMakerID>) 
-                (index:int) : Guid<sortingModelID> = 
+                (id:  Guid<sorterModelMakerId>) 
+                (index:int) : Guid<sortingModelId> = 
         [
             id  :> obj
             "SortingModel" :> obj
             index :> obj
-        ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingModelID>
+        ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingModelId>
 
 
 
 module CommonMutator =
 
     let makeSorterModelId 
-                (id:  Guid<sorterModelMutatorID>) 
-                (index:int) : Guid<sorterModelID> = 
+                (id:  Guid<sorterModelMutatorId>) 
+                (index:int) : Guid<sorterModelId> = 
         [
             id  :> obj
             "SorterModel" :> obj
             index :> obj
-        ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelID>
+        ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
 
 
     let makeSortingModelId 
-                (id:  Guid<sorterModelMutatorID>) 
-                (index:int) : Guid<sortingModelID> = 
+                (id:  Guid<sorterModelMutatorId>) 
+                (index:int) : Guid<sortingModelId> = 
         [
             id  :> obj
             "SortingModel" :> obj
             index :> obj
-        ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingModelID>
+        ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingModelId>

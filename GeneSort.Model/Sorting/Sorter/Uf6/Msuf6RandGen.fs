@@ -8,7 +8,7 @@ open GeneSort.Model.Sorting
 [<Struct; CustomEquality; NoComparison>]
 type msuf6RandGen = 
     private 
-        { id: Guid<sorterModelMakerID>
+        { id: Guid<sorterModelMakerId>
           rngFactory: rngFactory
           sortingWidth: int<sortingWidth>
           stageLength: int<stageLength> 
@@ -34,7 +34,7 @@ type msuf6RandGen =
                 sortingWidth :> obj
                 stageLength :> obj
                 genRates :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerID>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerId>
         { 
           id = id
           rngFactory = rngFactory
@@ -71,7 +71,7 @@ type msuf6RandGen =
         member this.Equals(other) =
             this.id = other.id
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelID> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMaker.makeSorterModelId this.Id index
 
     member this.MakeSorterModel (index: int) : msuf6 =
@@ -99,5 +99,5 @@ module Msuf6RandGen =
 
 
     let getSorterModelIdWithTag (index: int) (msuf6RandGen:msuf6RandGen) 
-                    : (Guid<sorterModelID> * modelTag) =
+                    : (Guid<sorterModelId> * modelTag) =
         (msuf6RandGen.MakeSorterModelId index, modelTag.Single)

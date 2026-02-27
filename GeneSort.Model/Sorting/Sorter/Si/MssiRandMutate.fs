@@ -12,7 +12,7 @@ open GeneSort.Model.Sorting
 type mssiRandMutate = 
     private 
         { 
-              id : Guid<sorterModelMutatorID>
+              id : Guid<sorterModelMutatorId>
               mssi : mssi
               rngFactory: rngFactory
               opActionRates: opActionRatesArray
@@ -31,7 +31,7 @@ type mssiRandMutate =
                 rngFactory :> obj
                 mssi :> obj
                 opActionRatesArray :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorID>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorId>
 
         {
             id = id
@@ -61,7 +61,7 @@ type mssiRandMutate =
         member this.Equals(other) = 
             this.Id = other.Id
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelID> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
     /// Mutates an Mssi by applying OpActionRatesArray to its ceCodes array.

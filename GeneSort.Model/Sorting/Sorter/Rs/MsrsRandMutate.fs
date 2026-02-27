@@ -12,7 +12,7 @@ open GeneSort.Model.Sorting.Sorter.Rs
 type msrsRandMutate = 
     private 
         { 
-          id : Guid<sorterModelMutatorID>
+          id : Guid<sorterModelMutatorId>
           msrs : msrs
           rngFactory: rngFactory
           opsActionRatesArray: opsActionRatesArray
@@ -31,7 +31,7 @@ type msrsRandMutate =
                 rngFactory :> obj
                 msrs :> obj
                 opsActionRatesArray :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorID>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorId>
 
         {
             id = id
@@ -62,7 +62,7 @@ type msrsRandMutate =
             this.Id = other.Id
 
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelID> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
     /// Mutates an Msrs by applying OpsActionRatesArray to its ceCodes array.

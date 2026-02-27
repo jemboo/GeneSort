@@ -22,7 +22,7 @@ type sorterModelMutator =
 
 module SorterModelMutator =
 
-    let getId (model:sorterModelMutator) : Guid<sorterModelMutatorID> =
+    let getId (model:sorterModelMutator) : Guid<sorterModelMutatorId> =
         match model with
         | SmmMsceRandMutate msce -> msce.Id
         | SmmMssiRandMutate mssi -> mssi.Id
@@ -31,13 +31,13 @@ module SorterModelMutator =
         | SmmMsuf6RandMutate msuf6 -> msuf6.Id
 
 
-    let getSortingModelSeedId (model: sorterModelMutator) : Guid<sortingModelID> =
+    let getSortingModelSeedId (model: sorterModelMutator) : Guid<sortingModelId> =
         match model with
-        | SmmMsceRandMutate msce -> %msce.Msce.Id |> UMX.tag<sortingModelID>
-        | SmmMssiRandMutate mssi -> %mssi.Mssi.Id |> UMX.tag<sortingModelID>
-        | SmmMsrsRandMutate msrs -> %msrs.Msrs.Id |> UMX.tag<sortingModelID>
-        | SmmMsuf4RandMutate msuf4 -> %msuf4.Msuf4.Id |> UMX.tag<sortingModelID>
-        | SmmMsuf6RandMutate msuf6 -> %msuf6.Msuf6.Id |> UMX.tag<sortingModelID>
+        | SmmMsceRandMutate msce -> %msce.Msce.Id |> UMX.tag<sortingModelId>
+        | SmmMssiRandMutate mssi -> %mssi.Mssi.Id |> UMX.tag<sortingModelId>
+        | SmmMsrsRandMutate msrs -> %msrs.Msrs.Id |> UMX.tag<sortingModelId>
+        | SmmMsuf4RandMutate msuf4 -> %msuf4.Msuf4.Id |> UMX.tag<sortingModelId>
+        | SmmMsuf6RandMutate msuf6 -> %msuf6.Msuf6.Id |> UMX.tag<sortingModelId>
 
 
     let getSortingWidth (model: sorterModelMutator) : int<sortingWidth> =
@@ -69,13 +69,13 @@ module SorterModelMutator =
         | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModel index |> sorterModel.Msuf6
 
 
-    let makeSorterModelIdWithTag (index:int) (model:sorterModelMutator) : Guid<sorterModelID> * modelTag =
+    let makeSorterIdWithTag (index:int) (model:sorterModelMutator) : Guid<sorterId> * modelTag =
         match model with
-        | SmmMsceRandMutate msce -> (msce.MakeSorterModelId index, modelTag.Single)
-        | SmmMssiRandMutate mssi -> (mssi.MakeSorterModelId index, modelTag.Single)
-        | SmmMsrsRandMutate msrs -> (msrs.MakeSorterModelId index, modelTag.Single)
-        | SmmMsuf4RandMutate msuf4 -> (msuf4.MakeSorterModelId index, modelTag.Single)
-        | SmmMsuf6RandMutate msuf6 -> (msuf6.MakeSorterModelId index, modelTag.Single)
+        | SmmMsceRandMutate msce -> (%(msce.MakeSorterModelId index) |> UMX.tag<sorterId>, modelTag.Single)
+        | SmmMssiRandMutate mssi -> (%(mssi.MakeSorterModelId index) |> UMX.tag<sorterId>, modelTag.Single)
+        | SmmMsrsRandMutate msrs -> (%(msrs.MakeSorterModelId index) |> UMX.tag<sorterId>, modelTag.Single)
+        | SmmMsuf4RandMutate msuf4 -> (%(msuf4.MakeSorterModelId index) |> UMX.tag<sorterId>, modelTag.Single)
+        | SmmMsuf6RandMutate msuf6 -> (%(msuf6.MakeSorterModelId index) |> UMX.tag<sorterId>, modelTag.Single)
 
 
 

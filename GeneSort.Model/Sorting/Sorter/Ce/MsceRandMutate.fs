@@ -5,12 +5,13 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting.Sorter
 open GeneSort.Model.Sorting
+open GeneSort.Sorting
 
 [<Struct; CustomEquality; NoComparison>]
 type msceRandMutate = 
     private 
         { 
-          id : Guid<sorterModelMutatorID>
+          id : Guid<sorterModelMutatorId>
           msce : msce
           rngFactory: rngFactory
           indelRatesArray: indelRatesArray
@@ -28,7 +29,7 @@ type msceRandMutate =
                 rngFactory :> obj
                 indelRatesArray :> obj
                 excludeSelfCe :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorID>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorId>
 
         {
             id = id
@@ -60,8 +61,11 @@ type msceRandMutate =
         member this.Equals(other) = 
             this.Id = other.Id
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelID> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
+
+    member this.MakeSorterId (index: int) : Guid<sorterId> =
+        %(CommonMutator.makeSorterModelId this.Id index) |> UMX.tag<sorterId>
 
     /// Mutates an Msce by applying IndelRatesArray to its ceCodes array.
     /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.

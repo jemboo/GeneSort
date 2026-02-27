@@ -34,7 +34,7 @@ module MssiDto =
                     | Ok ps -> ps
                     | Error e -> raise (ArgumentException(sprintf "Error converting Perm_SiDto: %A" e)))
             let mssi = GeneSort.Model.Sorting.Sorter.Si.mssi.create
-                            (UMX.tag<sorterModelID> mssiDto.id)
+                            (UMX.tag<sorterModelId> mssiDto.id)
                             (UMX.tag<sortingWidth> mssiDto.sortingWidth)
                             perm_Sis
             Ok mssi
