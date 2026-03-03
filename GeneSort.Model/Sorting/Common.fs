@@ -14,8 +14,8 @@ open GeneSort.Core
 [<Measure>] type sorterPairModelMutatorId
 [<Measure>] type sortingMakerId
 [<Measure>] type sortingMutatorId
-[<Measure>] type sortingSetMakerId
-[<Measure>] type sortingSetMutatorId
+[<Measure>] type sortingGenSegmentId
+[<Measure>] type sortingMutationSegmentId
 [<Measure>] type parentSorterSetEvalId
 [<Measure>] type sortingParamsId
 

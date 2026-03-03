@@ -57,8 +57,8 @@ type sortingTag = sortingParentId * modelTag
 
 module SortingTag =
 
-    let create (id: Guid) (tag: modelTag) : sortingTag =
-        (id |> UMX.tag<sortingId>, tag)
+    let create (id: Guid<sortingId>) (tag: modelTag) : sortingTag =
+        (id, tag)
 
     let getSortingParentId (sorterModelTag: sortingTag) : sortingParentId =
         let (modelId, _) = sorterModelTag

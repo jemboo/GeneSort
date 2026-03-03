@@ -38,7 +38,7 @@ module SortingMaker =
                 (model: sortingMaker) : sorting =
         match model with
         | Single smm -> smm |> SorterModelMaker.makeSorterModel index |> sorting.Single
-        | Pair spmm -> spmm |> SorterPairModelMaker.makeSorterPairModel index |> sorting.Pair
+        | Pair spmm -> spmm |> SorterPairModelMaker.makeSorterPairModel index |> sorting.Pairs
 
 
     let makeSorterIdsWithTags (index: int) (model: sortingMaker)  

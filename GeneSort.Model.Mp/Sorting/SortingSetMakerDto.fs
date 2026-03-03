@@ -12,14 +12,14 @@ type sortingSetMakerDto =
 
 module SortingSetMakerDto =
 
-    let fromDomain (maker: sortingSetMaker) : sortingSetMakerDto =
+    let fromDomain (maker: sortingGenSegment) : sortingSetMakerDto =
         { sortingMaker = SortingMakerDto.fromDomain maker.SortingMaker
           firstIndex = %maker.FirstIndex
           count = %maker.Count }
 
-    let toDomain (dto: sortingSetMakerDto) : sortingSetMaker =
+    let toDomain (dto: sortingSetMakerDto) : sortingGenSegment =
         try
-            sortingSetMaker.create
+            sortingGenSegment.create
                 (SortingMakerDto.toDomain dto.sortingMaker)
                 (UMX.tag<sorterCount> dto.firstIndex)
                 (UMX.tag<sorterCount> dto.count)

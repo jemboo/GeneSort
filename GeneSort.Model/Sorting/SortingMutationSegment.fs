@@ -1,14 +1,13 @@
 ﻿namespace GeneSort.Model.Sorting
 
-open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 
-type sortingSetMutator =
+type sortingMutationSegment =
     private
         { 
-          id : Guid<sortingSetMutatorId>
+          id : Guid<sortingMutationSegmentId>
           sortingMutator : sortingMutator
           firstIndex : int<sorterCount>
           count : int<sorterCount>
@@ -17,14 +16,14 @@ type sortingSetMutator =
     static member create 
                 (sortingMutator: sortingMutator) 
                 (firstIndex: int<sorterCount>) 
-                (count: int<sorterCount>) : sortingSetMutator =
+                (count: int<sorterCount>) : sortingMutationSegment =
         let id = 
             // Generate a unique ID based on the SorterModelMaker and indices
             GuidUtils.guidFromObjs [
                     sortingMutator :> obj
                     firstIndex :> obj
                     count :> obj
-                ] |> UMX.tag<sortingSetMutatorId>
+                ] |> UMX.tag<sortingMutationSegmentId>
 
         { id = id; sortingMutator = sortingMutator; firstIndex = firstIndex; count = count }
 
@@ -33,13 +32,20 @@ type sortingSetMutator =
     member this.FirstIndex with get() = this.firstIndex
     member this.Count with get() = this.count
 
-    member this.MutateSortings
-                : (Guid<sortingMutatorId> * sorting) [] =
+    member this.MakeSortings : sorting [] =
         let mutantSortings = 
             [| for i in 0 .. %this.count - 1 do
                 let index = %this.firstIndex + i
-                ( this.SortingMutator |> SortingMutator.getId,
-                  SortingMutator.makeSorting index this.SortingMutator )
+                SortingMutator.makeSorting index this.SortingMutator
             |]
         mutantSortings
 
+    member this.MakeSorterIdsWithSortingTags : (Guid<sorterId> * sortingTag) [] =
+        [| for i in 0 .. %this.count - 1 do
+            let index = %this.firstIndex + i
+            let tupes = SortingMutator.makeSorterIdsWithTags index this.SortingMutator
+            let mutantSortingId = SortingMutator.getMutantSortingId index this.SortingMutator
+            tupes |> Array.map (
+                    fun (sorterId, modelTag) -> 
+                            (sorterId, SortingTag.create mutantSortingId modelTag))
+        |] |> Array.collect id

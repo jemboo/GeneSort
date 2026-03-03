@@ -16,20 +16,26 @@ type sorterPairModelMutator =
 
 module SorterPairModelMutator =
 
-    let getId (model: sorterPairModelMutator) : Guid<sorterPairModelMutatorId> =
-        match model with
+    let getId (mutator: sorterPairModelMutator) : Guid<sorterPairModelMutatorId> =
+        match mutator with
         | sorterPairModelMutator.SplitPairs mspg -> mspg.Id
         | sorterPairModelMutator.SplitPairs2 mspg -> mspg.Id
 
-    let getSortingSeedId (model: sorterPairModelMutator) : Guid<sortingId> =
-        match model with
+    let getSortingSeedId (mutator: sorterPairModelMutator) : Guid<sortingId> =
+        match mutator with
         | sorterPairModelMutator.SplitPairs mspg -> mspg.SortingSeedId
         | sorterPairModelMutator.SplitPairs2 mspg -> mspg.SortingSeedId
 
-    let getCeLength (model: sorterPairModelMutator) : int<ceLength> =
-        match model with
+    let getCeLength (mutator: sorterPairModelMutator) : int<ceLength> =
+        match mutator with
         | sorterPairModelMutator.SplitPairs mspg -> MsSplitPairsMutator.getCeLength mspg
         | sorterPairModelMutator.SplitPairs2 mspg -> MsSplitPairsMutator.getCeLength mspg
+
+
+    let getMutantSortingId (index: int) (mutator: sorterPairModelMutator) : Guid<sortingId> =
+        match mutator with
+        | sorterPairModelMutator.SplitPairs mspg -> MsSplitPairsMutator.getMutantSortingId index mspg
+        | sorterPairModelMutator.SplitPairs2 mspg -> MsSplitPairsMutator.getMutantSortingId index mspg
 
 
     let getSortingWidth (model: sorterPairModelMutator) : int<sortingWidth> =

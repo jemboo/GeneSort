@@ -22,13 +22,13 @@ module SortingDto =
     let fromDomain (sorting: sorting) : sortingDto =
         match sorting with
         | sorting.Single single -> Single (SorterModelDto.fromDomain single)
-        | sorting.Pair pair -> Pair (SorterPairModelDto.fromDomain pair)
+        | sorting.Pairs pair -> Pair (SorterPairModelDto.fromDomain pair)
 
 
     let toDomain (dto: sortingDto) : sorting =
         try
             match dto with
             | Single smDto -> sorting.Single (SorterModelDto.toDomain smDto)
-            | Pair pairDto -> sorting.Pair (SorterPairModelDto.toDomain pairDto)
+            | Pair pairDto -> sorting.Pairs (SorterPairModelDto.toDomain pairDto)
         with
         | ex -> failwith $"Failed to convert SortingDto: {ex.Message}"

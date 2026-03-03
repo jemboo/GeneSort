@@ -45,3 +45,7 @@ module SorterPairModel =
         | SplitPairs sp -> %(MsSplitPairs.getSorterModelIdForModelTag sp tag) |> UMX.tag<sorterId>
         | SplitPairs2 sp -> failwith "Not implemented"
 
+    let getSorterIdsWithModelTags (model: sorterPairModel) : (Guid<sorterId> * modelTag) [] =
+        match model with
+        | SplitPairs sp -> MsSplitPairs.getSorterIdsWithTags sp
+        | SplitPairs2 sp -> MsSplitPairs.getSorterIdsWithTags sp

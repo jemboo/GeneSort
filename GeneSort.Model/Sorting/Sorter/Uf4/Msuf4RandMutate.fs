@@ -68,6 +68,9 @@ type msuf4RandMutate =
     member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
+    member this.getMutantSortingId (index: int) : Guid<sortingId> =
+        %(this.MakeSorterModelId index) |> UMX.tag<sortingId>
+
     /// Mutates an Msuf4 by applying Uf4MutationRatesArray to its ceCodes array.
     /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
     /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations

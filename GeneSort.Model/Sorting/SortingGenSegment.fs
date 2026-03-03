@@ -5,10 +5,10 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 
-type sortingSetMaker =
+type sortingGenSegment =
     private
         { 
-          id : Guid<sortingSetMakerId>
+          id : Guid<sortingGenSegmentId>
           sortingMaker : sortingMaker
           firstIndex : int<sorterCount>
           count : int<sorterCount>
@@ -17,14 +17,14 @@ type sortingSetMaker =
     static member create 
                 (sortingMaker: sortingMaker) 
                 (firstIndex: int<sorterCount>) 
-                (count: int<sorterCount>) : sortingSetMaker =
+                (count: int<sorterCount>) : sortingGenSegment =
         let id = 
             // Generate a unique ID based on the SorterModelMaker and indices
             GuidUtils.guidFromObjs [
                     sortingMaker :> obj
                     firstIndex :> obj
                     count :> obj
-                ] |> UMX.tag<sortingSetMakerId>
+                ] |> UMX.tag<sortingGenSegmentId>
 
         { id = id; sortingMaker = sortingMaker; firstIndex = firstIndex; count = count }
 

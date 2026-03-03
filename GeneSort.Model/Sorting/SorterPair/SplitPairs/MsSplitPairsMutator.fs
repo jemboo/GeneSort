@@ -95,25 +95,27 @@ module MsSplitPairsMutator =
     let getCeLength (gen: msSplitPairsMutator) : int<ceLength> =
         getPrefixCeLength gen + getSuffixCeLength gen
 
+    let getMutantSortingId (index: int) (mutator: msSplitPairsMutator) : Guid<sortingId> =
+            [
+                %mutator.Id :> obj
+                index :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingId>
+
     /// Generates an msSplitPairs instance by making sorter models from each maker
     let makeMsSplitPairs 
                 (index: int) 
-                (gen: msSplitPairsMutator) : msSplitPairs =
-        let firstPrefix = SorterModelMutator.makeSorterModel index gen.FirstPrefixMutator 
-        let firstSuffix = SorterModelMutator.makeSorterModel index gen.FirstSuffixMutator
-        let secondPrefix = SorterModelMutator.makeSorterModel index gen.SecondPrefixMutator
-        let secondSuffix = SorterModelMutator.makeSorterModel index gen.SecondSuffixMutator
+                (mutator: msSplitPairsMutator) : msSplitPairs =
+        let firstPrefix = SorterModelMutator.makeSorterModel index mutator.FirstPrefixMutator 
+        let firstSuffix = SorterModelMutator.makeSorterModel index mutator.FirstSuffixMutator
+        let secondPrefix = SorterModelMutator.makeSorterModel index mutator.SecondPrefixMutator
+        let secondSuffix = SorterModelMutator.makeSorterModel index mutator.SecondSuffixMutator
         
         // Calculate ID for the msSplitPairs from the generator ID and seed
-        let splitPairsId =
-            [
-                %gen.Id :> obj
-                index :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
+        let splitPairsId = %(getMutantSortingId index mutator) |> UMX.tag<sorterModelId>
         
         msSplitPairs.create
                         splitPairsId
-                        gen.SortingWidth
+                        mutator.SortingWidth
                         firstPrefix
                         firstSuffix
                         secondPrefix

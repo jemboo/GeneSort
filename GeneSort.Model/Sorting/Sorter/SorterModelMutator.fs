@@ -1,13 +1,11 @@
 ﻿namespace GeneSort.Model.Sorting
 
-open System
 open FSharp.UMX
 open GeneSort.Model.Sorting.Sorter.Ce
 open GeneSort.Model.Sorting.Sorter.Si
 open GeneSort.Model.Sorting.Sorter.Rs
 open GeneSort.Model.Sorting.Sorter.Uf4
 open GeneSort.Model.Sorting.Sorter.Uf6
-open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting
 
@@ -38,6 +36,15 @@ module SorterModelMutator =
         | SmmMsrsRandMutate msrs -> %msrs.Msrs.Id |> UMX.tag<sortingId>
         | SmmMsuf4RandMutate msuf4 -> %msuf4.Msuf4.Id |> UMX.tag<sortingId>
         | SmmMsuf6RandMutate msuf6 -> %msuf6.Msuf6.Id |> UMX.tag<sortingId>
+
+
+    let getMutantSortingId (index: int) (model: sorterModelMutator) : Guid<sortingId> =
+        match model with
+        | SmmMsceRandMutate msce -> msce.getMutantSortingId index
+        | SmmMssiRandMutate mssi -> mssi.getMutantSortingId index
+        | SmmMsrsRandMutate msrs -> msrs.getMutantSortingId index
+        | SmmMsuf4RandMutate msuf4 -> msuf4.getMutantSortingId index
+        | SmmMsuf6RandMutate msuf6 -> msuf6.getMutantSortingId index
 
 
     let getSortingWidth (model: sorterModelMutator) : int<sortingWidth> =

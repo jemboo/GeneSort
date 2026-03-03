@@ -295,11 +295,11 @@ module RandomSorters =
                         |> sorterModelMaker.SmmMsuf6RandGen
 
                 let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-                let sorterModelSetMaker = sortingSetMaker.create 
+                let sortingSetMaker = sortingGenSegment.create 
                                                 (sorterModelMaker |> sortingMaker.Single)
                                                 firstIndex 
                                                 sorterCount
-                let sortingSet = sorterModelSetMaker.MakeSortingSet
+                let sortingSet = sortingSetMaker.MakeSortingSet
 
                 // 4. Saves
                 let qpSortingSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "") 

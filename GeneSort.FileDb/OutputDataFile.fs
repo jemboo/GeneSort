@@ -106,7 +106,7 @@ module OutputDataFile =
                         }
                     | outputDataType.SorterModelSetMaker _ ->
                         async {
-                            let! domain = deserializeDto<sortingSetMakerDto, sortingSetMaker> stream token SortingSetMakerDto.toDomain
+                            let! domain = deserializeDto<sortingSetMakerDto, sortingGenSegment> stream token SortingSetMakerDto.toDomain
                             return outputData.SortingSetMaker domain
                         }
                     | outputDataType.SortableTestModelSet _ ->

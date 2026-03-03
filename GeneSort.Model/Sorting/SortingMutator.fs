@@ -25,7 +25,13 @@ module SortingMutator =
     let getSortingSeedId (model: sortingMutator) : Guid<sortingId> =
         match model with
         | Single smm -> smm |> SorterModelMutator.getSortingSeedId
-        | Pair spmm -> failwith "SorterPairModelMutator does not have a single sorting model seed ID"
+        | Pair spmm -> spmm |> SorterPairModelMutator.getSortingSeedId
+
+
+    let getMutantSortingId (index: int) (model: sortingMutator) : Guid<sortingId> =
+        match model with
+        | Single smm -> smm |> SorterModelMutator.getMutantSortingId index
+        | Pair spmm -> spmm |> SorterPairModelMutator.getMutantSortingId index
 
 
     let getSortingWidth (model: sortingMutator) : int<sortingWidth> =
@@ -45,11 +51,12 @@ module SortingMutator =
                 (model: sortingMutator) : sorting =
         match model with
         | Single smm -> smm |> SorterModelMutator.makeSorterModel index |> sorting.Single
-        | Pair spmm -> spmm |> SorterPairModelMutator.makeSorterPairModel index |> sorting.Pair
+        | Pair spmm -> spmm |> SorterPairModelMutator.makeSorterPairModel index |> sorting.Pairs
 
 
-    let makeSorterIdsWithTags (index: int) (model: sortingMutator)  
-                                        : (Guid<sorterId> * modelTag) [] = 
+    let makeSorterIdsWithTags (index: int) 
+                              (model: sortingMutator)  
+                                : (Guid<sorterId> * modelTag) [] = 
         match model with
         | Single smm -> smm |> SorterModelMutator.makeSorterIdWithTag index |> Array.singleton
         | Pair spmm -> spmm |> SorterPairModelMutator.makeSorterIdsWithTags index

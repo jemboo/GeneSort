@@ -18,6 +18,11 @@
     <Compile Include="CeBlockOps.fs" />
     <Compile Include="SorterEval.fs" />
     <Compile Include="SorterSetEval.fs" />
+    <Compile Include="SortingResult\Common.fs" />
+    <Compile Include="SortingResult\SingleSortingResult.fs" />
+    <Compile Include="SortingResult\SplitPairsSortingResult.fs" />
+    <Compile Include="SortingResult\SortingResult.fs" />
+    <Compile Include="SortingResult\MutationSegmentResults.fs" />
     <Compile Include="ParentSorterSetEval.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

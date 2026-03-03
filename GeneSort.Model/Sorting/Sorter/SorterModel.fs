@@ -70,3 +70,6 @@ module SorterModel =
         | modelTag.Single -> 
             %(model |> getId) |> UMX.tag<sorterId>
         | _ -> failwith "Invalid modelTag for sorterModel. Only modelTag.Single is valid."
+
+    let getSorterIdsWithModelTags (model: sorterModel) : (Guid<sorterId> * modelTag) [] =
+        [| ( %(getId model) |> UMX.tag<sorterId>, modelTag.Single) |]

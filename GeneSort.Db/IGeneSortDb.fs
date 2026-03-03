@@ -68,7 +68,7 @@ module GeneSortDb =
             return unwrapOutput (function | outputData.SortingSet smsm -> Some smsm | _ -> None) result
         }
 
-    let getSorterModelSetMakerAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sortingSetMaker, OutputError>> =
+    let getSorterModelSetMakerAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sortingGenSegment, OutputError>> =
         async {
             let! result = geneSortDb.loadAsync projectFolder queryParams
             return unwrapOutput (function | outputData.SortingSetMaker smsm -> Some smsm | _ -> None) result
