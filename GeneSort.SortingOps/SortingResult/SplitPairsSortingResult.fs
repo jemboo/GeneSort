@@ -7,23 +7,23 @@ open GeneSort.SortingOps
 
 type splitPairsSortingResult=
     private { 
-        sorterModelId: Guid<sorterModelId>
+        sortingId: Guid<sortingId>
         mutable sorterEvalFirstFirst: sorterEval option
         mutable sorterEvalFirstSecond: sorterEval option
         mutable sorterEvalSecondFirst: sorterEval option
         mutable sorterEvalSecondSecond: sorterEval option
     }
 
-    static member create (sorterModelId: Guid<sorterModelId>) =
+    static member create (sorterModelId: Guid<sortingId>) =
         { 
-            sorterModelId = sorterModelId
+            sortingId = sorterModelId
             sorterEvalFirstFirst = None
             sorterEvalFirstSecond = None
             sorterEvalSecondFirst = None
             sorterEvalSecondSecond = None
         }
 
-    member this.SorterModelId with get() : Guid<sorterModelId> = this.sorterModelId
+    member this.SortingId with get() : Guid<sortingId> = this.sortingId
     member this.SorterEvalFirstFirst
         with get() = this.sorterEvalFirstFirst
         and set(value) = this.sorterEvalFirstFirst <- value
@@ -36,6 +36,16 @@ type splitPairsSortingResult=
     member this.SorterEvalSecondSecond
         with get() = this.sorterEvalSecondSecond
         and set(value) = this.sorterEvalSecondSecond <- value
+
+    member this.UpdateSorterEval (modelTag: modelTag) (newEval: sorterEval) : unit =
+        match modelTag with 
+        | modelTag.Single -> failwith "Invalid model tag for split pairs sorting result."
+        | modelTag.SplitPair splitJoin ->
+            match splitJoin with
+            | splitJoin.First_First -> this.SorterEvalFirstFirst <- Some newEval
+            | splitJoin.First_Second -> this.SorterEvalFirstSecond <- Some newEval
+            | splitJoin.Second_First -> this.SorterEvalSecondFirst <- Some newEval
+            | splitJoin.Second_Second -> this.SorterEvalSecondSecond <- Some newEval
 
 
 module SplitPairsSortingResult = ()

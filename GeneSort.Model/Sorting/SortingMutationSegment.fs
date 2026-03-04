@@ -40,6 +40,12 @@ type sortingMutationSegment =
             |]
         mutantSortings
 
+    member this.GetSortingIds : Guid<sortingId> [] =
+        [| for i in 0 .. %this.count - 1 do
+            let index = %this.firstIndex + i
+            SortingMutator.getMutantSortingId index this.SortingMutator
+        |]
+
     member this.MakeSorterIdsWithSortingTags : (Guid<sorterId> * sortingTag) [] =
         [| for i in 0 .. %this.count - 1 do
             let index = %this.firstIndex + i

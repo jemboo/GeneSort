@@ -7,21 +7,28 @@ open GeneSort.SortingOps
 
 type singleSortingResult=
     private { 
-        sorterModelId: Guid<sorterModelId>
+        sortingId: Guid<sortingId>
         mutable sorterEval: sorterEval option
     }
 
     static member create 
-                (sorterModelId: Guid<sorterModelId>) =
+                (sorterModelId: Guid<sortingId>) =
         { 
-            sorterModelId = sorterModelId
+            sortingId = sorterModelId
             sorterEval = None
         }
 
     member this.SorterEval 
         with get() = this.sorterEval
         and set(value) = this.sorterEval <- value
-    member this.SorterModelId with get() : Guid<sorterModelId> = this.sorterModelId
+
+    member this.SortingId with get() : Guid<sortingId> = this.sortingId
+
+    member this.UpdateSorterEval (modelTag: modelTag) (newEval: sorterEval) : unit =
+        match modelTag with 
+        | modelTag.Single -> this.SorterEval <- Some newEval
+        | modelTag.SplitPair splitJoin -> failwith "invalid modeltag"
+            
 
 
 module SingleSortingResult = ()

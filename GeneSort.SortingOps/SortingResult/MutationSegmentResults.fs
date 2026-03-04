@@ -11,21 +11,41 @@ type mutationSegmentResults =
         { 
           sortingMutationSegment : sortingMutationSegment
           sortingResults: Map<Guid<sortingId>, sortingResult>
-          evalMap: Map<Guid<sorterId>, sortingResult>
+          evalMap: Map<Guid<sorterId>, sortingTag>
         }
     with
     static member create (sortingMutationSegment: sortingMutationSegment) =
 
-        match sortingMutationSegment.SortingMutator with
-        | sortingMutator.Single _ -> 
-            failwith "MutationResultSet can only be created with a sortingSetMutator that contains a SplitPairs sortingMutator."
-        | sortingMutator.Pair _ ->
-            failwith "MutationResultSet can only be created with a sortingSetMutator that contains a SplitPairs sortingMutator."
+        let evalMap = 
+            sortingMutationSegment.MakeSorterIdsWithSortingTags
+            |> Map.ofArray
+
+        let sortingResults = 
+            match sortingMutationSegment.SortingMutator with
+            | sortingMutator.Single _ ->
+                sortingMutationSegment.GetSortingIds
+                |> Array.map (fun id -> (id, singleSortingResult.create id |> sortingResult.Single))
+                |> Map.ofArray
+
+            | sortingMutator.Pair _ ->
+                sortingMutationSegment.GetSortingIds
+                |> Array.map (fun id -> (id, splitPairsSortingResult.create id |> sortingResult.SplitPairs))
+                |> Map.ofArray
+
         { 
             sortingMutationSegment = sortingMutationSegment; 
-            sortingResults = Map.empty ;
-            evalMap = Map.empty
+            sortingResults = sortingResults;
+            evalMap = evalMap
         }
+
+
+    member this.SortingMutationSegment with get() = this.sortingMutationSegment
+    member this.SortingResults with get() = this.sortingResults
+    member this.EvalMap with get() = this.evalMap
+
+    member this.UpdateSortingResults (newEval: sorterEval)  =
+            let (sortingId, modelTag) = this.EvalMap.[newEval.SorterId]
+            this.sortingResults.[sortingId] |> SortingResult.UpdateSorterEval modelTag newEval
 
 
 module MutationSegmentResults = ()
