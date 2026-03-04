@@ -64,7 +64,7 @@ module SortingTag =
         let (modelId, _) = sorterModelTag
         modelId
 
-    let getSortingTag (sorterModelTag: sortingTag) : modelTag =
+    let getModelTag (sorterModelTag: sortingTag) : modelTag =
         let (_, tag) = sorterModelTag
         tag
 
@@ -79,3 +79,30 @@ module SortingTag =
         let modelId = Guid.Parse(parts.[0]) |> UMX.tag<sortingId>
         let tag = ModelTag.fromString parts.[1]
         (modelId, tag)
+
+
+type sortingMutationSetTag = Guid<sortingMutationSegmentId> * sortingTag
+
+module SortingMutationSetTag =
+    let create (id: Guid<sortingMutationSegmentId>) (tag: sortingTag) : sortingMutationSetTag =
+        (id, tag)
+    let getMutationSegmentId (tag: sortingMutationSetTag) : Guid<sortingMutationSegmentId> =
+        let (id, _) = tag
+        id
+    let getSortingTag (tag: sortingMutationSetTag) : sortingTag =
+        let (_, sortingTag) = tag
+        sortingTag
+    let getSortingParentId (tag: sortingMutationSetTag) : sortingParentId =
+        tag |> getSortingTag |> SortingTag.getSortingParentId
+    let getModelTag (tag: sortingMutationSetTag) : modelTag =
+        tag |> getSortingTag |> SortingTag.getModelTag
+    let toString (tag: sortingMutationSetTag) : string =
+        let (id, sortingTag) = tag
+        sprintf "%s\t%s" ((%id).ToString()) (SortingTag.toString sortingTag)
+    let fromString (str: string) : sortingMutationSetTag =
+        let parts = str.Split('\t', 3)
+        if parts.Length <> 3 then
+            failwithf "Invalid sortingMutationSetTag format: %s" str
+        let id = Guid.Parse(parts.[0]) |> UMX.tag<sortingMutationSegmentId>
+        let sortingTag = SortingTag.fromString (sprintf "%s\t%s" parts.[1] parts.[2])
+        (id, sortingTag)

@@ -23,6 +23,7 @@
     <Compile Include="SortingResult\SplitPairsSortingResult.fs" />
     <Compile Include="SortingResult\SortingResult.fs" />
     <Compile Include="SortingResult\MutationSegmentResults.fs" />
+    <Compile Include="SortingResult\MutationSegmentSetResults.fs" />
     <Compile Include="ParentSorterSetEval.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
