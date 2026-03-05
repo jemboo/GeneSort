@@ -14,7 +14,7 @@ open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.Model.Sorting
 open GeneSort.Model.Sorting.ModelParams
-open GeneSort.SortingOps.SortingResult
+open GeneSort.SortingResult
 
 module FullBoolMutate =
     // fixed values for this project

@@ -6,6 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Common.fs" />
+    <Compile Include="SingleSortingResult.fs" />
+    <Compile Include="SplitPairsSortingResult.fs" />
+    <Compile Include="SortingResult.fs" />
+    <Compile Include="MutationSegmentResults.fs" />
+    <Compile Include="MutationSegmentSetResults.fs" />
     <Compile Include="SorterSetEvalBins.fs" />
     <Compile Include="SorterSetCeUseProfile.fs" />
     <Compile Include="Program.fs" />
