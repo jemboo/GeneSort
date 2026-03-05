@@ -66,7 +66,7 @@ module SorterMutateParamsOps =
 
 
 
-    let makeSortingSetMutatorFromSorting
+    let makeSortingMutationSegmentFromSorting
                 (sorting: sorting)
                 (sorterModelMutateParams: sorterModelMutateParams) 
                 (firstIndex: int<sorterCount>) 

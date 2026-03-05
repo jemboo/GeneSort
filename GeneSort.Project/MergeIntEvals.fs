@@ -10,7 +10,6 @@ open GeneSort.Sorting
 open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.SortingOps
-open ProjectOps
 open GeneSort.Model.Sorting
 
 
@@ -191,7 +190,7 @@ module MergeIntEvals =
                 let! _ = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
-                report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) runId %repl)
+                ProjectOps.report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) runId %repl)
 
                 // 2. Safe Param Extraction
                 let! (repl, width, mDim, mFill, dType, sModel) = 

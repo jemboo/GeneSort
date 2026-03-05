@@ -12,10 +12,9 @@ open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.Runs
 open GeneSort.Db
-open ProjectOps
 open GeneSort.Model.Sorting
 open GeneSort.Model.Sorting.ModelParams
-
+open GeneSort.SortingOps.SortingResult
 
 module FullBoolMutate =
     // fixed values for this project
@@ -171,7 +170,7 @@ module FullBoolMutate =
                 let! _ = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
-                report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
+                ProjectOps.report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
 
                 // 2. Safe Domain Parameter Extraction
                 let! (sorterModelType, sortingWidth, sortableDataFormat, mutationRate) = 
@@ -204,31 +203,27 @@ module FullBoolMutate =
                                 mutationRate 
                                 rngFactory
 
-                let mapOfSortingSetMutators = 
-                    sortingSetParent.Sortings
-                    |> Array.map (fun sm -> 
-                        let sortingSetMutator =
-                                SorterMutateParamsOps.makeSortingSetMutatorFromSorting
+                let sortingMutationSegments = 
+                    sortingSetParent.Sortings |> Array.map(
+                        fun sm ->
+                                SorterMutateParamsOps.makeSortingMutationSegmentFromSorting
                                                 sm
                                                 sorterModelMutateParams
                                                 firstSortingIndex
                                                 sortingCount
-                        (sortingSetMutator.SortingMutator |> SortingMutator.getId, sortingSetMutator))
-                    |> Map.ofArray
-
-                let mmId_sm = 
-                    mapOfSortingSetMutators
-                    |> Map.toArray
-                    |> Array.collect (fun (smmId, smm) -> smm.MakeSortings)
-
+                    )
 
                 let mutantSorters = 
-                    mmId_sm
-                    |> Array.collect (fun sm -> Sorting.makeSorters sm)
+                    sortingMutationSegments |> Array.collect(
+                        fun sms -> sms.MakeSortings |> Array.collect(Sorting.makeSorters)
+                    )
+
 
                 let mutatedSorterSet = sorterSet.createWithNewId mutantSorters
 
                 let sorterSetEvalMutated = SorterSetEval.makeSorterSetEval mutatedSorterSet sortableTests collectNewSortableTests
+
+                let mutationSegmentSetResults = mutationSegmentSetResults.create sortingMutationSegments
 
                 // 5. Save Results
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
