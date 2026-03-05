@@ -41,6 +41,7 @@ type sorterSetEvalBins = {
 
 module SorterSetEvalBins =
 
+
     let addSorterEval (sorterEval: sorterEval) 
                       (sorterSetEvalBins: sorterSetEvalBins) : unit =
         let key = {
@@ -73,9 +74,6 @@ module SorterSetEvalBins =
             maxSorterEvalCount = maxBinCount
             evalBins = Dictionary<sorterEvalKey, sorterEvalBin>()
         }
-
-        //let gps = sorterSetEval.SorterEvals |> Array.groupBy (fun se -> (se.getUsedCeCount(), se.getStageLength()))
-
         sorterSetEval.SorterEvals
         |> Array.iter (fun se -> addSorterEval se sorterSetEvalBins)
         sorterSetEvalBins

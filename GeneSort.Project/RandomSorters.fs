@@ -14,9 +14,7 @@ open GeneSort.Model.Sorting.Sorter.Uf6
 open System.Threading
 open GeneSort.Runs
 open GeneSort.Db
-open ProjectOps
 open GeneSort.Model.Sorting
-open GeneSort.Model.Sorting.ModelParams
 
 
 module RandomSorters =
@@ -204,7 +202,7 @@ module RandomSorters =
         let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
         let stageLength = getStageLengthForSortingWidth (rp.GetSorterModelType().Value) sortingWidth
         let ceLength = stageLength |> StageLength.toCeLength sortingWidth
-        let sorterCount = 2 |> UMX.tag<sorterCount>
+        let sorterCount = 100 |> UMX.tag<sorterCount>
 
         rp.WithProjectName(Some projectName)
             .WithRunFinished(Some false)
@@ -259,7 +257,7 @@ module RandomSorters =
                 let! _ = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
-                report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
+                ProjectOps.report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
 
                 // 2. Safe Parameter Extraction
                 let! (sorterModelType, sortingWidth, stageLength, ceLength, sorterCount) = 

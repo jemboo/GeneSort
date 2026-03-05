@@ -60,6 +60,11 @@ type mutationSegmentSetResults =
                 | true, sortingResult ->
                     SortingResult.UpdateSorterEval modelTag newEval sortingResult
 
+
+    member this.UpdateAllSortingResults (newEvals: sorterEval []) =
+        newEvals |> Array.iter(this.UpdateSortingResults)
+
+
     member this.GetSegmentResults (segmentId: Guid<sortingMutationSegmentId>) =
         match this.sortingSegmentResults.TryGetValue(segmentId) with
         | false, _ -> failwithf "SegmentId %A not found in sortingSegmentResults." segmentId
