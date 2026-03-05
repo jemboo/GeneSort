@@ -70,12 +70,7 @@ type msrsRandMutate =
         %(this.MakeSorterModelId index) |> UMX.tag<sortingId>
 
 
-    /// Mutates an Msrs by applying OpsActionRatesArray to its ceCodes array.
-    /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
-    /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
-    /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
-    member this.MakeSorterModel (index: int) : msrs =
-        let id = this.MakeSorterModelId index
+    member this.MakeSorterModel (id: Guid<sorterModelId>) : msrs =
         let rng = this.RngFactory.Create %id
         let orthoMutator = fun psi ->   Perm_RsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Ortho psi 
         let paraMutator = fun psi ->    Perm_RsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Para psi 
@@ -89,6 +84,16 @@ type msrsRandMutate =
                         this.Msrs.Perm_Rss
 
         msrs.create id this.Msrs.SortingWidth mutated
+
+
+    /// Mutates an Msrs by applying OpsActionRatesArray to its ceCodes array.
+    /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
+    /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
+    /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
+    member this.MakeSorterModelFromIndex (index: int) : msrs =
+        let id = this.MakeSorterModelId index
+        this.MakeSorterModel id
+
 
             
 module MsrsRandMutate =

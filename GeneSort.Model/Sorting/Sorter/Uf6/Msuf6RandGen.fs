@@ -74,8 +74,7 @@ type msuf6RandGen =
     member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMaker.makeSorterModelId this.Id index
 
-    member this.MakeSorterModel (index: int) : msuf6 =
-        let id = this.MakeSorterModelId index
+    member this.MakeSorterModel (id: Guid<sorterModelId>) : msuf6 =
         let rng = this.RngFactory.Create %id
         let genRatesArray = this.GenRates
         let stageLength = %this.StageLength
@@ -85,6 +84,11 @@ type msuf6RandGen =
                     rng.NextFloat
                     (genRatesArray.Item(dex)) |]
         msuf6.create id this.SortingWidth twoOrbitUnfolder6s
+
+
+    member this.MakeSorterModelFromIndex (index: int) : msuf6 =
+        let id = this.MakeSorterModelId index
+        this.MakeSorterModel id
 
 
 module Msuf6RandGen =

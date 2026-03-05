@@ -71,20 +71,22 @@ type msuf4RandMutate =
     member this.getMutantSortingId (index: int) : Guid<sortingId> =
         %(this.MakeSorterModelId index) |> UMX.tag<sortingId>
 
-    /// Mutates an Msuf4 by applying Uf4MutationRatesArray to its ceCodes array.
-    /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
-    /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
-    /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
-    member this.MakeSorterModel (index: int) : msuf4 =
-        if %this.StageLength <> this.Uf4MutationRatesArray.Length then
-            failwith $"Stage count of Msuf4 {%this.StageLength} must match Msuf4RandMutate length {this.Uf4MutationRatesArray.Length}"
-        let id = this.MakeSorterModelId index
+    member this.MakeSorterModel (id: Guid<sorterModelId>) : msuf4 =
         let rng = this.RngFactory.Create %id
         let mutatedUnfolders = 
             Array.zip this.msuf4.TwoOrbitUnfolder4s this.Uf4MutationRatesArray.RatesArray
             |> Array.map (fun (unfolder, mutationRates) ->
                 RandomUnfolderOps4.mutateTwoOrbitUf4 rng.NextFloat mutationRates unfolder)
         msuf4.create id this.msuf4.SortingWidth mutatedUnfolders
+
+    /// Mutates an Msuf4 by applying Uf4MutationRatesArray to its ceCodes array.
+    /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
+    /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
+    /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
+    member this.MakeSorterModelFromIndex (index: int) : msuf4 =
+        let id = this.MakeSorterModelId index
+        this.MakeSorterModel id
+
 
 
 module Msuf4RandMutate =

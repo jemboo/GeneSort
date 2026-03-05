@@ -69,11 +69,11 @@ module SorterModelMutator =
                 (index: int)  
                 (model: sorterModelMutator) : sorterModel =
         match model with
-        | SmmMsceRandMutate msce -> msce.MakeSorterModel index |> sorterModel.Msce
-        | SmmMssiRandMutate mssi -> mssi.MakeSorterModel index |> sorterModel.Mssi
-        | SmmMsrsRandMutate msrs -> msrs.MakeSorterModel index |> sorterModel.Msrs
-        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModel index |> sorterModel.Msuf4
-        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModel index |> sorterModel.Msuf6
+        | SmmMsceRandMutate msce -> msce.MakeSorterModelFromIndex index |> sorterModel.Msce
+        | SmmMssiRandMutate mssi -> mssi.MakeSorterModelFromIndex index |> sorterModel.Mssi
+        | SmmMsrsRandMutate msrs -> msrs.MakeSorterModelFromIndex index |> sorterModel.Msrs
+        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModelFromIndex index |> sorterModel.Msuf4
+        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModelFromIndex index |> sorterModel.Msuf6
 
 
     let makeSorterIdWithTag (index:int) (model:sorterModelMutator) : Guid<sorterId> * modelTag =

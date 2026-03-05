@@ -33,7 +33,7 @@ type MssiRandMutateTests() =
         let modelSiMutate = mssiRandMutate.create rngFactory.LcgFactory arrayToMutate modelSi
 
         let mock = randoGen [0; 1] [0.5] // Ensures NoAction (within NoActionRate)
-        let result = modelSiMutate.MakeSorterModel 0
+        let result = modelSiMutate.MakeSorterModelFromIndex 0
         Assert.Equal<int array>(modelSi.Perm_Sis.[0].Array, result.Perm_Sis.[0].Array)
         Assert.Equal(modelSi.SortingWidth, result.SortingWidth)
 
@@ -47,7 +47,7 @@ type MssiRandMutateTests() =
         let modelSiMutate = mssiRandMutate.create rngFactory.LcgFactory arrayToMutate modelSi
 
         let mock = randoGen [0; 2] [0.0] // Picks indices 0, 2 and Ortho mode
-        let result = modelSiMutate.MakeSorterModel 0
+        let result = modelSiMutate.MakeSorterModelFromIndex 0
         let expectedArray = [|2; 3; 0; 1|] // Expected: (0 2)(1 3)
         Assert.Equal<int array>(expectedArray, result.Perm_Sis.[0].Array)
         Assert.True(Permutation.isSelfInverse result.Perm_Sis.[0].Permutation)
@@ -63,7 +63,7 @@ type MssiRandMutateTests() =
         let modelSiMutate = mssiRandMutate.create rngFactory.LcgFactory arrayToMutate modelSi
 
         let mock = randoGen [0; 2] [0.5] // Picks indices 0, 2 and Para mode
-        let result = modelSiMutate.MakeSorterModel 0
+        let result = modelSiMutate.MakeSorterModelFromIndex 0
         let expectedArray = [|3; 2; 1; 0|] // Expected: (0 3)(1 2)
         Assert.Equal<int array>(expectedArray, result.Perm_Sis.[0].Array)
         Assert.True(Permutation.isSelfInverse result.Perm_Sis.[0].Permutation)
@@ -80,7 +80,7 @@ type MssiRandMutateTests() =
         let modelSiMutate = mssiRandMutate.create rngFactory.LcgFactory arrayToMutate modelSi
 
         let mock = randoGen [0; 2; 0; 2] [0.0; 0.0] // Ortho mode
-        let result = modelSiMutate.MakeSorterModel 0
+        let result = modelSiMutate.MakeSorterModelFromIndex 0
         Assert.Equal(UMX.tag<sortingWidth> 4, result.SortingWidth)
         Assert.Equal(2, result.Perm_Sis.Length)
 
@@ -94,7 +94,7 @@ type MssiRandMutateTests() =
         let modelSiMutate = mssiRandMutate.create rngFactory.LcgFactory arrayToMutate modelSi
 
         let mock = randoGen [0; 1] [0.5]
-        let result = modelSiMutate.MakeSorterModel 0
+        let result = modelSiMutate.MakeSorterModelFromIndex 0
         Assert.NotEqual(%id, %result.Id)
         Assert.NotEqual(Guid.Empty, %result.Id)
 
@@ -109,7 +109,7 @@ type MssiRandMutateTests() =
         let modelSiMutate = mssiRandMutate.create rngFactory.LcgFactory arrayToMutate modelSi
 
         let mock = randoGen [0; 2; 0; 2] [0.0; 0.0] // Ortho mode, indices 0, 2
-        let result = modelSiMutate.MakeSorterModel 0
+        let result = modelSiMutate.MakeSorterModelFromIndex 0
         let expectedArray1 = [|2; 3; 0; 1|] // (0 2)(1 3)
         let expectedArray2 = [|1; 0; 3; 2|] // (0 1)(2 3)
         Assert.Equal<int array>(expectedArray1, result.Perm_Sis.[0].Array)

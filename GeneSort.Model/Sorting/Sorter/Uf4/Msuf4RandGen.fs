@@ -86,8 +86,7 @@ type msuf4RandGen =
     member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMaker.makeSorterModelId this.Id index
 
-    member this.MakeSorterModel (index: int) : msuf4 =
-        let id = this.MakeSorterModelId index
+    member this.MakeSorterModel (id: Guid<sorterModelId>) : msuf4 =
         let rando = this.RngFactory.Create %id
         let sc = %this.StageLength
         let genRts = this.GenRates
@@ -95,6 +94,12 @@ type msuf4RandGen =
                 [| for dex in 0 .. (sc - 1) ->
                     RandomUnfolderOps4.makeRandomTwoOrbitUf4 rando.NextFloat (genRts.Item(dex)) |]
         msuf4.create id this.SortingWidth twoOrbitUnfolder4s
+
+
+    member this.MakeSorterModelFromIndex (index: int) : msuf4 =
+        let id = this.MakeSorterModelId index
+        this.MakeSorterModel id
+
 
 
 module Msuf4RandGen =

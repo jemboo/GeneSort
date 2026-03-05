@@ -31,7 +31,7 @@ type MsceRandMutateTests() =
         let msceMutate = msceRandMutate.create rngFactory.LcgFactory arrayRates false msce
         
         let mockRando = createMockRando [newCeCode] [0.9]
-        let result = msceMutate.MakeSorterModel 0
+        let result = msceMutate.MakeSorterModelFromIndex 0
         result.CeCodes |> should equal [| newCeCode |]
         result.SortingWidth |> should equal sortingWidth
         result.CeLength |> should equal (1 |> UMX.tag<ceLength>)
@@ -43,7 +43,7 @@ type MsceRandMutateTests() =
         let msceMutate = msceRandMutate.create rngFactory.LcgFactory arrayRates false msce
         
         let mockRando = createMockRando [newCeCode; newCeCode] [0.9; 0.9]
-        let result = msceMutate.MakeSorterModel 0
+        let result = msceMutate.MakeSorterModelFromIndex 0
         result.CeCodes |> should equal [| newCeCode; mockCeCode; |] // Two insertions, trimmed to ceCount
         result.CeLength |> should equal (2 |> UMX.tag<ceLength>)
         result.SortingWidth |> should equal sortingWidth
@@ -55,7 +55,7 @@ type MsceRandMutateTests() =
         let msceMutate = msceRandMutate.create rngFactory.LcgFactory arrayRates false msce
         
         let mockRando = createMockRando [newCeCode] [0.9; 0.9]
-        let result = msceMutate.MakeSorterModel 0
+        let result = msceMutate.MakeSorterModelFromIndex 0
         result.CeCodes |> should equal [| newCeCode; mockCeCode |] // Deletion + Insertion
         result.CeLength |> should equal (2 |> UMX.tag<ceLength>)
         result.SortingWidth |> should equal sortingWidth
@@ -67,7 +67,7 @@ type MsceRandMutateTests() =
         let msceMutate = msceRandMutate.create rngFactory.LcgFactory arrayRates false msce
         
         let mockRando = createMockRando [0] [0.9]
-        let result = msceMutate.MakeSorterModel 0
+        let result = msceMutate.MakeSorterModelFromIndex 0
         result.CeCodes |> should equal [| mockCeCode |] // Unchanged
         result.CeLength |> should equal (1 |> UMX.tag<ceLength>)
         result.SortingWidth |> should equal sortingWidth
