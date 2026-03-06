@@ -6,94 +6,160 @@ open GeneSort.SortingOps
 open System.Collections.Generic
 
 [<Struct; StructuralEquality; NoComparison>]
-type sorterEvalKey = {
-    ceCount: int<ceLength>
-    stageLength: int<stageLength>
-}
+type sorterEvalKey =
+    private {
+        ceCount: int<ceLength>
+        stageLength: int<stageLength>
+        isSorted: bool
+    }
 
-type sorterEvalBin = {
-    mutable binCount: int
-    mutable sorterEvals: ResizeArray<sorterEval>
-}
+    static member create 
+                    (ceCount:int<ceLength>) 
+                    (stageLength: int<stageLength>) 
+                    (isSorted: bool) = 
+          {
+            ceCount = ceCount;
+            stageLength = stageLength;
+            isSorted = isSorted
+          }
+
+    member this.CeCount with get() : int<ceLength> =
+        this.ceCount
+
+    member this.StageLength with get() : int<stageLength> =
+        this.stageLength
+
+    member this.IsSorted with get() : bool = 
+        this.isSorted
+        
 
 
-module SorterEvalBin =
-    //returns [(uuct1, ct1); (uuct2, ct2) ... ], a histogram report of
-    // unsortedCount properties of sorterEvalBin.sorterEvals, where ct1 is the
-    // number of sorterEvals that have unsortedCount = uuct1
-    let getUnsortedHistogram (seb: sorterEvalBin) :string =
-            seb.sorterEvals
-            |> Seq.groupBy (fun se -> se.CeBlockEval.UnsortedCount)
-            |> Seq.sortBy fst
-            |> Seq.map (fun (key, group) -> sprintf "(%d, %d)" key (Seq.length group))
-            |> String.concat "; "
-            |> sprintf "[%s]"
+type sorterEvalSubBin =
+    private {
+        sorterIds: ResizeArray<Guid<sorterId>>
+    }
+    static member create() =
+        { sorterIds = ResizeArray<Guid<sorterId>>() }
+    member this.EvalCount with get() = this.sorterIds.Count
+    member this.Add(sorterId: Guid<sorterId>) = this.sorterIds.Add(sorterId)
+    member this.SorterIds with get() = this.sorterIds :> IReadOnlyList<Guid<sorterId>>
+
+type sorterEvalBin =
+    private {
+        subBins: Dictionary<ceUseCounts, sorterEvalSubBin>
+    }
+    static member create() =
+        { subBins = Dictionary<ceUseCounts, sorterEvalSubBin>() }
+    member this.EvalCount with get() =
+        this.subBins.Values |> Seq.sumBy (fun b -> b.EvalCount)
+    member this.SubBins with get() = this.subBins :> IReadOnlyDictionary<ceUseCounts, sorterEvalSubBin>
+    member this.SubBinCount with get() = this.subBins.Count
+    member this.TryGetSubBin (ceUseCounts: ceUseCounts) =
+        match this.subBins.TryGetValue(ceUseCounts) with
+        | true, bin -> Some bin
+        | false, _ -> None
+    member internal this.Add(sorterId: Guid<sorterId>, ceUseCounts: ceUseCounts) =
+        let subBin =
+            match this.subBins.TryGetValue(ceUseCounts) with
+            | true, existing -> existing
+            | false, _ ->
+                let newSubBin = sorterEvalSubBin.create()
+                this.subBins.[ceUseCounts] <- newSubBin
+                newSubBin
+        subBin.Add(sorterId)
+
+    member this.MergeSubBin (ceUseCounts: ceUseCounts) (subBin: sorterEvalSubBin) =
+        let existing =
+            match this.subBins.TryGetValue(ceUseCounts) with
+            | true, existing -> existing
+            | false, _ ->
+                let newSubBin = sorterEvalSubBin.create()
+                this.subBins.[ceUseCounts] <- newSubBin
+                newSubBin
+        for sorterId in subBin.SorterIds do
+            existing.Add(sorterId)
 
 
 
-type sorterSetEvalBins = {
-    sorterSetEvalId: Guid<sorterSetEvalId>
-    mutable totalSampleCount: int
-    maxSorterEvalCount: int
-    evalBins: Dictionary<sorterEvalKey, sorterEvalBin>
-}
+type sorterSetEvalBins = 
+    private {
+        sorterSetEvalId: Guid<sorterSetEvalId>
+        evalBins: Dictionary<sorterEvalKey, sorterEvalBin>
+    }
+    static member create (sorterSetEvalId: Guid<sorterSetEvalId>) =
+        {
+            sorterSetEvalId = sorterSetEvalId
+            evalBins = Dictionary<sorterEvalKey, sorterEvalBin>()
+        }
+    member this.SorterSetEvalId with get() = this.sorterSetEvalId
+    member this.EvalBins with get() = this.evalBins :> IReadOnlyDictionary<sorterEvalKey, sorterEvalBin>
+    member this.BinCount with get() = this.evalBins.Count
+    member this.TotalEvalCount with get() = 
+        this.evalBins.Values |> Seq.sumBy (fun b -> b.EvalCount)
+
+    member this.TryGetBin (key: sorterEvalKey) =
+        match this.evalBins.TryGetValue(key) with
+        | true, bin -> Some bin
+        | false, _ -> None
+
+    member internal this.AddSorterEval (sorterEval: sorterEval) =
+        let key = sorterEvalKey.create
+                      sorterEval.CeBlockEval.CeUseCounts.UsedCeCount
+                      sorterEval.CeBlockEval.getStageSequence.StageLength
+                      (sorterEval.CeBlockEval.UnsortedCount = 0<sortableCount>)
+        let bin =
+            match this.evalBins.TryGetValue(key) with
+            | true, existing -> existing
+            | false, _ ->
+                let newBin = sorterEvalBin.create()
+                this.evalBins.[key] <- newBin
+                newBin
+        bin.Add(sorterEval.SorterId, sorterEval.CeBlockEval.CeUseCounts)
+
+    member this.MergeBin (key: sorterEvalKey) (bin: sorterEvalBin) =
+        let existing =
+            match this.evalBins.TryGetValue(key) with
+            | true, existing -> existing
+            | false, _ ->
+                let newBin = sorterEvalBin.create()
+                this.evalBins.[key] <- newBin
+                newBin
+        for kvp in bin.SubBins do
+            existing.MergeSubBin kvp.Key kvp.Value
+
 
 
 module SorterSetEvalBins =
 
-
-    let addSorterEval (sorterEval: sorterEval) 
-                      (sorterSetEvalBins: sorterSetEvalBins) : unit =
-        let key = {
-            ceCount = sorterEval.CeBlockEval.CeUseCounts.UsedCeCount
-            stageLength = sorterEval.CeBlockEval.getStageSequence.StageLength
-        }
-
-        let sorterEvalBin =
-            if sorterSetEvalBins.evalBins.ContainsKey(key) then
-                sorterSetEvalBins.evalBins.[key]
-            else
-                let newBin = {
-                    binCount = 0
-                    sorterEvals = ResizeArray<sorterEval>()
-                }
-                sorterSetEvalBins.evalBins.[key] <- newBin
-                newBin
-        
-        if sorterEvalBin.sorterEvals.Count < sorterSetEvalBins.maxSorterEvalCount then
-            sorterEvalBin.sorterEvals.Add(sorterEval)
-            sorterEvalBin.binCount <- sorterEvalBin.binCount + 1
-        
-        sorterSetEvalBins.totalSampleCount <- sorterSetEvalBins.totalSampleCount + 1
-
-
-    let create (maxBinCount: int) (sorterSetEval:sorterSetEval) : sorterSetEvalBins =
-        let sorterSetEvalBins = {
-            sorterSetEvalId = sorterSetEval.SorterSetEvalId
-            totalSampleCount = 0
-            maxSorterEvalCount = maxBinCount
-            evalBins = Dictionary<sorterEvalKey, sorterEvalBin>()
-        }
+    let create (sorterSetEval: sorterSetEval) : sorterSetEvalBins =
+        let bins = sorterSetEvalBins.create sorterSetEval.SorterSetEvalId
         sorterSetEval.SorterEvals
-        |> Array.iter (fun se -> addSorterEval se sorterSetEvalBins)
-        sorterSetEvalBins
+        |> Array.iter (fun se -> bins.AddSorterEval se)
+        bins
 
-
-    /// Returns an array of int arrays, each inner array containing [| ceCount; stageLength; binCount |]
     let getBinCountReport 
-                (sortingWidth:int<sortingWidth> option) 
-                (sorterModelKey:string) 
-                (sorterSetEvalBins: sorterSetEvalBins) : string array array =
-        let lines = 
-            (sorterSetEvalBins.evalBins : Dictionary<sorterEvalKey, sorterEvalBin>)
-            |> Seq.map (fun kvp -> 
-                        [| 
-                            (%sortingWidth.Value).ToString();
-                            sorterModelKey;
-                            (%kvp.Key.ceCount).ToString(); 
-                            (%kvp.Key.stageLength).ToString(); 
-                            (kvp.Value.binCount).ToString();
-                            (kvp.Value |> SorterEvalBin.getUnsortedHistogram)
-                        |])
-            |> Seq.toArray
-        lines
+            (sortingWidth: int<sortingWidth> option) 
+            (sorterModelKey: string) 
+            (sorterSetEvalBins: sorterSetEvalBins) : string array array =
+        let widthStr = 
+            sortingWidth 
+            |> Option.map (fun w -> (%w).ToString()) 
+            |> Option.defaultValue "N/A"
+        sorterSetEvalBins.EvalBins
+        |> Seq.collect (fun kvp ->
+            kvp.Value.SubBins
+            |> Seq.map (fun subKvp ->
+                [|
+                    widthStr
+                    sorterModelKey
+                    (%kvp.Key.CeCount).ToString()
+                    (%kvp.Key.StageLength).ToString()
+                    kvp.Key.IsSorted.ToString()
+                    subKvp.Value.EvalCount.ToString()
+                |]))
+        |> Seq.toArray
+
+    let merge (target: sorterSetEvalBins) (source: sorterSetEvalBins) : sorterSetEvalBins =
+        for kvp in source.EvalBins do
+            target.MergeBin kvp.Key kvp.Value
+        target

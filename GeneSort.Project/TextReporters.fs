@@ -34,7 +34,7 @@ module TextReporters =
                 db.getProjectRunParametersForReplRangeAsync  projectFolder (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
 
             // 2. Setup Initial DataTable
-            let headers =  [| "Sorting Width"; "SorterModel"; "ceLength"; "stageLength"; "binCount"; "unsortedReport" |]
+            let headers =  [| "Sorting Width"; "SorterModel"; "ceLength"; "stageLength"; "binCount";|]
             let dtReport = DataTableReport.create reportName headers
             let mutable newFailures = []
 
@@ -49,7 +49,7 @@ module TextReporters =
 
                 match result with
                 | Ok sse ->
-                    let bins = SorterSetEvalBins.create 1 sse
+                    let bins = SorterSetEvalBins.create sse
                     let lines = SorterSetEvalBins.getBinCountReport
                                     (runParams.GetSortingWidth()) 
                                     (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringToString )
