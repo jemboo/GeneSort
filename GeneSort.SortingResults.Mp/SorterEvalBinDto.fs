@@ -5,7 +5,6 @@ open MessagePack
 open GeneSort.Sorting
 open GeneSort.SortingResults
 open GeneSort.SortingOps
-open GeneSort.SortingOps.Mp
 
 [<MessagePackObject>]
 type sorterEvalKeyDto = {
@@ -38,23 +37,22 @@ module SorterEvalKeyDto =
 [<MessagePackObject>]
 type sorterEvalSubBinDto = {
     [<Key(0)>]
-    ceUseCounts: int array
+    hashKey: int
     [<Key(1)>]
     sorterIds: System.Guid array
 }
 
 module SorterEvalSubBinDto =
-    let toDto (ceUseCounts: ceUseCounts) (subBin: sorterEvalSubBin) : sorterEvalSubBinDto =
+    let toDto (hashKey: int) (subBin: sorterEvalSubBin) : sorterEvalSubBinDto =
         {
-            ceUseCounts = ceUseCounts.ToArray()
+            hashKey = hashKey
             sorterIds = subBin.SorterIds |> Seq.map UMX.untag |> Seq.toArray
         }
-    let fromDto (dto: sorterEvalSubBinDto) : ceUseCounts * sorterEvalSubBin =
-        let ceUseCounts = ceUseCounts.CreateFromArray dto.ceUseCounts
+    let fromDto (dto: sorterEvalSubBinDto) : int * sorterEvalSubBin =
         let subBin = sorterEvalSubBin.create()
         for id in dto.sorterIds do
             subBin.Add(UMX.tag<sorterId> id)
-        (ceUseCounts, subBin)
+        (dto.hashKey, subBin)
 
 
 [<MessagePackObject>]
@@ -74,9 +72,10 @@ module SorterEvalBinDto =
     let fromDto (dto: sorterEvalBinDto) : sorterEvalBin =
         let bin = sorterEvalBin.create()
         for subBinDto in dto.subBins do
-            let (ceUseCounts, subBin) = SorterEvalSubBinDto.fromDto subBinDto
-            bin.MergeSubBin ceUseCounts subBin
+            let (hashKey, subBin) = SorterEvalSubBinDto.fromDto subBinDto
+            bin.MergeSubBin hashKey subBin
         bin
+
 
 
 [<MessagePackObject>]

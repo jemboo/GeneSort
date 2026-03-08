@@ -3,6 +3,7 @@
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
+open GeneSort.Sorting.Sorter
 
 type sortingMutationSegment =
     private
@@ -39,6 +40,15 @@ type sortingMutationSegment =
                 SortingMutator.makeSorting index this.SortingMutator
             |]
         mutantSortings
+
+    member this.MakeSorters : sorter [] =
+        this.MakeSortings |> Array.collect(Sorting.makeSorters)
+
+
+    member this.MakeSorterSet : sorterSet =
+        sorterSet.create  (%(this.id) |> UMX.tag<sorterSetId>)
+                          this.MakeSorters
+
 
     member this.GetSortingIds : Guid<sortingId> [] =
         [| for i in 0 .. %this.count - 1 do

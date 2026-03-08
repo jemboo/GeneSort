@@ -202,7 +202,7 @@ module RandomSorters =
         let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
         let stageLength = getStageLengthForSortingWidth (rp.GetSorterModelType().Value) sortingWidth
         let ceLength = stageLength |> StageLength.toCeLength sortingWidth
-        let sorterCount = 100 |> UMX.tag<sorterCount>
+        let sorterCount = 3 |> UMX.tag<sorterCount>
 
         rp.WithProjectName(Some projectName)
             .WithRunFinished(Some false)

@@ -44,41 +44,41 @@ type sorterEvalSubBin =
     member this.Add(sorterId: Guid<sorterId>) = this.sorterIds.Add(sorterId)
     member this.SorterIds with get() = this.sorterIds :> IReadOnlyList<Guid<sorterId>>
 
+
 type sorterEvalBin =
     private {
-        subBins: Dictionary<ceUseCounts, sorterEvalSubBin>
+        subBins: Dictionary<int, sorterEvalSubBin>
     }
     static member create() =
-        { subBins = Dictionary<ceUseCounts, sorterEvalSubBin>() }
+        { subBins = Dictionary<int, sorterEvalSubBin>() }
     member this.EvalCount with get() =
         this.subBins.Values |> Seq.sumBy (fun b -> b.EvalCount)
-    member this.SubBins with get() = this.subBins :> IReadOnlyDictionary<ceUseCounts, sorterEvalSubBin>
+    member this.SubBins with get() = this.subBins :> IReadOnlyDictionary<int, sorterEvalSubBin>
     member this.SubBinCount with get() = this.subBins.Count
-    member this.TryGetSubBin (ceUseCounts: ceUseCounts) =
-        match this.subBins.TryGetValue(ceUseCounts) with
+    member this.TryGetSubBin (hashKey: int) =
+        match this.subBins.TryGetValue(hashKey) with
         | true, bin -> Some bin
         | false, _ -> None
     member internal this.Add(sorterId: Guid<sorterId>, ceUseCounts: ceUseCounts) =
+        let key = ceUseCounts.GetHashCode()
         let subBin =
-            match this.subBins.TryGetValue(ceUseCounts) with
+            match this.subBins.TryGetValue(key) with
             | true, existing -> existing
             | false, _ ->
                 let newSubBin = sorterEvalSubBin.create()
-                this.subBins.[ceUseCounts] <- newSubBin
+                this.subBins.[key] <- newSubBin
                 newSubBin
         subBin.Add(sorterId)
-
-    member this.MergeSubBin (ceUseCounts: ceUseCounts) (subBin: sorterEvalSubBin) =
+    member this.MergeSubBin (hashKey: int) (subBin: sorterEvalSubBin) =
         let existing =
-            match this.subBins.TryGetValue(ceUseCounts) with
+            match this.subBins.TryGetValue(hashKey) with
             | true, existing -> existing
             | false, _ ->
                 let newSubBin = sorterEvalSubBin.create()
-                this.subBins.[ceUseCounts] <- newSubBin
+                this.subBins.[hashKey] <- newSubBin
                 newSubBin
         for sorterId in subBin.SorterIds do
             existing.Add(sorterId)
-
 
 
 type sorterSetEvalBins = 

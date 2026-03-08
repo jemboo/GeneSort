@@ -3,6 +3,7 @@
 open System
 open FSharp.UMX
 open GeneSort.Sorting
+open GeneSort.Core
 
  type sorterSet =
     private { 
@@ -21,3 +22,13 @@ open GeneSort.Sorting
 
     member this.Id with get() = this.sorterSetId
     member this.Sorters with get() : sorter[] = this.sorters
+
+
+
+  module SorterSet = 
+    
+    let mergeSorterSets (sorterSets: sorterSet []) : sorterSet =
+        let idSet = sorterSets |> Array.map(fun ss -> ss.Id :> obj)
+        let mergedId = GuidUtils.guidFromObjs idSet |> UMX.tag<sorterSetId>
+        let mergedSorters = sorterSets |> Array.collect(fun ss -> ss.Sorters)
+        sorterSet.create mergedId mergedSorters

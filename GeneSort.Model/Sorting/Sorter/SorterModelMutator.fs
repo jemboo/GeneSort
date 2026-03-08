@@ -29,13 +29,13 @@ module SorterModelMutator =
         | SmmMsuf6RandMutate msuf6 -> msuf6.Id
 
 
-    let getSortingSeedId (model: sorterModelMutator) : Guid<sortingId> =
+    let getMutatorSeedSortingIdWithTags (model: sorterModelMutator) : Guid<sortingId>  * (modelTag []) =
         match model with
-        | SmmMsceRandMutate msce -> %msce.Msce.Id |> UMX.tag<sortingId>
-        | SmmMssiRandMutate mssi -> %mssi.Mssi.Id |> UMX.tag<sortingId>
-        | SmmMsrsRandMutate msrs -> %msrs.Msrs.Id |> UMX.tag<sortingId>
-        | SmmMsuf4RandMutate msuf4 -> %msuf4.Msuf4.Id |> UMX.tag<sortingId>
-        | SmmMsuf6RandMutate msuf6 -> %msuf6.Msuf6.Id |> UMX.tag<sortingId>
+        | SmmMsceRandMutate msce -> (%msce.Msce.Id |> UMX.tag<sortingId>, [| modelTag.Single |])
+        | SmmMssiRandMutate mssi -> (%mssi.Mssi.Id |> UMX.tag<sortingId>, [| modelTag.Single |])
+        | SmmMsrsRandMutate msrs -> (%msrs.Msrs.Id |> UMX.tag<sortingId>, [| modelTag.Single |])
+        | SmmMsuf4RandMutate msuf4 -> (%msuf4.Msuf4.Id |> UMX.tag<sortingId>, [| modelTag.Single |])
+        | SmmMsuf6RandMutate msuf6 -> (%msuf6.Msuf6.Id |> UMX.tag<sortingId>, [| modelTag.Single |])
 
 
     let getMutantSortingId (index: int) (model: sorterModelMutator) : Guid<sortingId> =

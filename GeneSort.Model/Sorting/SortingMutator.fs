@@ -22,10 +22,10 @@ module SortingMutator =
         | Pair spmm -> %(spmm |> SorterPairModelMutator.getId) |> UMX.tag<sortingMutatorId>
 
 
-    let getSortingSeedId (model: sortingMutator) : Guid<sortingId> =
+    let getMutatorSeedSortingIdWithTags (model: sortingMutator) : Guid<sortingId> * (modelTag []) =
         match model with
-        | Single smm -> smm |> SorterModelMutator.getSortingSeedId
-        | Pair spmm -> spmm |> SorterPairModelMutator.getSortingSeedId
+        | Single smm -> smm |> SorterModelMutator.getMutatorSeedSortingIdWithTags
+        | Pair spmm -> spmm |> SorterPairModelMutator.getMutatorSeedSortingIdWithTags
 
 
     let getMutantSortingId (index: int) (model: sortingMutator) : Guid<sortingId> =

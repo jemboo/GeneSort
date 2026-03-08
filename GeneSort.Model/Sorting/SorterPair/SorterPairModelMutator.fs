@@ -21,10 +21,28 @@ module SorterPairModelMutator =
         | sorterPairModelMutator.SplitPairs mspg -> mspg.Id
         | sorterPairModelMutator.SplitPairs2 mspg -> mspg.Id
 
-    let getSortingSeedId (mutator: sorterPairModelMutator) : Guid<sortingId> =
+    let getMutatorSeedSortingIdWithTags (mutator: sorterPairModelMutator) : Guid<sortingId>  * (modelTag [])  =
         match mutator with
-        | sorterPairModelMutator.SplitPairs mspg -> mspg.SortingSeedId
-        | sorterPairModelMutator.SplitPairs2 mspg -> mspg.SortingSeedId
+        | sorterPairModelMutator.SplitPairs mspg -> 
+            (
+                mspg.SortingSeedId, 
+                [|
+                    modelTag.SplitPair splitJoin.First_First;
+                    modelTag.SplitPair splitJoin.First_Second;
+                    modelTag.SplitPair splitJoin.Second_First;
+                    modelTag.SplitPair splitJoin.Second_Second;
+                |]
+            )
+        | sorterPairModelMutator.SplitPairs2 mspg -> 
+            (
+                mspg.SortingSeedId, 
+                [|
+                    modelTag.SplitPair splitJoin.First_First;
+                    modelTag.SplitPair splitJoin.First_Second;
+                    modelTag.SplitPair splitJoin.Second_First;
+                    modelTag.SplitPair splitJoin.Second_Second;
+                |]
+            )
 
     let getCeLength (mutator: sorterPairModelMutator) : int<ceLength> =
         match mutator with
