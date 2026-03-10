@@ -1,23 +1,18 @@
 ﻿namespace GeneSort.SortingResult
 
-open System.Collections.Generic
-open FSharp.UMX
 open GeneSort.Model.Sorting
 open GeneSort.SortingOps
-open GeneSort.Sorting
+
 
 type mutationSegmentResults =
     private
         { 
           sortingMutationSegment : sortingMutationSegment
-          sortingResultSet : sortingResultSet
-          evalMap: Dictionary<Guid<sorterId>, sortingTag>
+          sortingResultSetMutants : sortingResultSet
+          sortingResultSetParent : sortingResultSet
         }
     with
     static member create (sortingMutationSegment: sortingMutationSegment) =
-        let evalMap = Dictionary<Guid<sorterId>, sortingTag>()
-        for (sorterId, sortingTag) in sortingMutationSegment.MakeSorterIdsWithSortingTags do
-            evalMap.[sorterId] <- sortingTag
         let sortingResults =
             match sortingMutationSegment.SortingMutator with
             | sortingMutator.Single _ ->
@@ -28,20 +23,24 @@ type mutationSegmentResults =
                 |> Array.map (fun id -> splitPairsSortingResult.create id |> sortingResult.SplitPairs)
         { 
             sortingMutationSegment = sortingMutationSegment
-            sortingResultSet = sortingResultSet.create sortingResults
-            evalMap = evalMap
+            sortingResultSetMutants = sortingResultSet.create 
+                                        sortingResults 
+                                        sortingMutationSegment.MakeSorterIdsWithSortingTags
+
+            sortingResultSetParent = 
+            
+                            sortingResultSet.create 
+                                        [||] 
+                                        [||]  //(SortingMutator.getMutatorSeedSorterIdsWithTags sortingMutationSegment.SortingMutator)
         }
 
     member this.SortingMutationSegment with get() = this.sortingMutationSegment
-    member this.SortingResultSet with get() = this.sortingResultSet
-    member this.EvalMap with get() = this.evalMap
+    member this.SortingResultSetParent with get() = this.sortingResultSetParent
+    member this.SortingResultSetMutants with get() = this.sortingResultSetMutants
 
-    member this.UpdateSortingResults (newEval: sorterEval) =
-        match this.evalMap.TryGetValue(newEval.SorterId) with
-        | false, _ -> failwithf "SorterId %A not found in evalMap." newEval.SorterId
-        | true, sortingTag ->
-            let sortingId = SortingTag.getSortingParentId sortingTag
-            let modelTag  = SortingTag.getModelTag sortingTag
-            this.sortingResultSet.UpdateSorterEval sortingId modelTag newEval
+    member this.UpdateSortingResultsMutant (newEval: sorterEval) =
+        this.sortingResultSetMutants.UpdateSorterEval newEval
+
+
 
 module MutationSegmentResults = ()

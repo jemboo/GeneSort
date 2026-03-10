@@ -21,26 +21,24 @@ module SorterPairModelMutator =
         | sorterPairModelMutator.SplitPairs mspg -> mspg.Id
         | sorterPairModelMutator.SplitPairs2 mspg -> mspg.Id
 
-    let getMutatorSeedSortingIdWithTags (mutator: sorterPairModelMutator) : Guid<sortingId>  * (modelTag [])  =
+    let getMutatorSeedSorterIdsWithTags (mutator: sorterPairModelMutator) : (Guid<sorterId> * modelTag) []  =
         match mutator with
         | sorterPairModelMutator.SplitPairs mspg -> 
             (
-                mspg.SortingSeedId, 
                 [|
-                    modelTag.SplitPair splitJoin.First_First;
-                    modelTag.SplitPair splitJoin.First_Second;
-                    modelTag.SplitPair splitJoin.Second_First;
-                    modelTag.SplitPair splitJoin.Second_Second;
+                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.First_First);
+                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.First_Second);
+                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.Second_First);
+                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.Second_Second);
                 |]
             )
         | sorterPairModelMutator.SplitPairs2 mspg -> 
             (
-                mspg.SortingSeedId, 
                 [|
-                    modelTag.SplitPair splitJoin.First_First;
-                    modelTag.SplitPair splitJoin.First_Second;
-                    modelTag.SplitPair splitJoin.Second_First;
-                    modelTag.SplitPair splitJoin.Second_Second;
+                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.First_First);
+                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.First_Second);
+                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.Second_First);
+                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.Second_Second);
                 |]
             )
 

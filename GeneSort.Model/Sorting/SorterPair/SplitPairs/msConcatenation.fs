@@ -73,11 +73,6 @@ module MsConcatenation =
     let makeSorterId (concat: msConcatenation) : Guid<sorterId> =
         %concat.Id |> UMX.tag<sorterId>
 
-    let makeSorter2 (concat: msConcatenation) : sorter =
-        let prefixSorter = SorterModel.makeSorter concat.Prefix
-        let suffixSorter = SorterModel.makeSorter concat.Suffix
-        Sorter.concatSorters prefixSorter suffixSorter (makeSorterId concat)
-
     let makeSorter (concat: msConcatenation) : sorter =
         let prefixSorter = SorterModel.makeSorter concat.Prefix
         let suffixSorter = SorterModel.makeSorter concat.Suffix

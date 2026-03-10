@@ -4,19 +4,28 @@ open FSharp.UMX
 open GeneSort.Model.Sorting
 open GeneSort.SortingOps
 open System.Collections.Generic
+open GeneSort.Sorting
 
 type sortingResultSet =
+    private { 
+        sortingResults: Dictionary<Guid<sortingId>, sortingResult>
+        evalMap: Dictionary<Guid<sorterId>, sortingTag>
+    }
 
-    private { sortingResults: Dictionary<Guid<sortingId>, sortingResult> }
-
-    static member create (sortingResults: sortingResult seq) =
+    static member create (sortingResults: sortingResult seq) (evalEntries: (Guid<sorterId> * sortingTag) seq) =
         let dict = Dictionary<Guid<sortingId>, sortingResult>()
         for result in sortingResults do
             dict.[SortingResult.getSortingId result] <- result
-        { sortingResults = dict }
+        let evalMap = Dictionary<Guid<sorterId>, sortingTag>()
+        for (sorterId, sortingTag) in evalEntries do
+            evalMap.[sorterId] <- sortingTag
+        { sortingResults = dict; evalMap = evalMap }
 
     static member empty () =
-        { sortingResults = Dictionary<Guid<sortingId>, sortingResult>() }
+        { 
+            sortingResults = Dictionary<Guid<sortingId>, sortingResult>()
+            evalMap = Dictionary<Guid<sorterId>, sortingTag>()
+        }
 
     member this.Count with get() = this.sortingResults.Count
 
@@ -36,14 +45,20 @@ type sortingResultSet =
     member this.SortingResults with get() =
         this.sortingResults :> IReadOnlyDictionary<Guid<sortingId>, sortingResult>
 
-    member internal this.UpdateSorterEval (sortingId: Guid<sortingId>) 
-                                          (modelTag: modelTag) 
-                                          (newEval: sorterEval) =
-        match this.sortingResults.TryGetValue(sortingId) with
-        | false, _ -> failwithf "SortingId %A not found in sortingResultSet." sortingId
-        | true, result -> SortingResult.UpdateSorterEval modelTag newEval result
-        
+    member this.EvalMap with get() =
+        this.evalMap :> IReadOnlyDictionary<Guid<sorterId>, sortingTag>
+
+    member this.UpdateSorterEval (newEval: sorterEval) =
+        match this.evalMap.TryGetValue(newEval.SorterId) with
+        | false, _ -> failwithf "SorterId %A not found in evalMap." newEval.SorterId
+        | true, sortingTag ->
+            let sortingParentId = SortingTag.getSortingParentId sortingTag
+            let modelTag  = SortingTag.getModelTag sortingTag
+            match this.sortingResults.TryGetValue(sortingParentId) with
+            | false, _ -> failwithf "SortingId %A not found in sortingResultSet." sortingParentId
+            | true, result -> SortingResult.UpdateSorterEval modelTag newEval result
+
+
 
 module SortingResultSet = ()
 
-            

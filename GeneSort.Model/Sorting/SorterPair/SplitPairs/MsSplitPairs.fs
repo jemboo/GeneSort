@@ -112,7 +112,7 @@ module MsSplitPairs =
 
     let makeAllSorters (model: msSplitPairs) : sorter [] =
         makeAllConcatenations model
-        |> Array.map (fun s ->  s |> MsConcatenation.makeSorter2 )
+        |> Array.map (fun s ->  s |> MsConcatenation.makeSorter )
 
 
     // checks if childId identifies one of the outputs of makeAllSorters

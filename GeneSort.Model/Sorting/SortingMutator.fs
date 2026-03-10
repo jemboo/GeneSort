@@ -1,9 +1,7 @@
 ﻿namespace GeneSort.Model.Sorting
 
-open System
 open FSharp.UMX
 
-open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting
 open GeneSort.Model.Sorting.SorterPair
@@ -22,10 +20,10 @@ module SortingMutator =
         | Pair spmm -> %(spmm |> SorterPairModelMutator.getId) |> UMX.tag<sortingMutatorId>
 
 
-    let getMutatorSeedSortingIdWithTags (model: sortingMutator) : Guid<sortingId> * (modelTag []) =
+    let getMutatorSeedSorterIdsWithTags (model: sortingMutator) : (Guid<sorterId> * modelTag) [] =
         match model with
-        | Single smm -> smm |> SorterModelMutator.getMutatorSeedSortingIdWithTags
-        | Pair spmm -> spmm |> SorterPairModelMutator.getMutatorSeedSortingIdWithTags
+        | Single smm -> smm |> SorterModelMutator.getMutatorSeedSorterIdsWithTags
+        | Pair spmm -> spmm |> SorterPairModelMutator.getMutatorSeedSorterIdsWithTags
 
 
     let getMutantSortingId (index: int) (model: sortingMutator) : Guid<sortingId> =
