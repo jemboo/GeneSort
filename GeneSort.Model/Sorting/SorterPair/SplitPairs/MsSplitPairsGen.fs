@@ -104,21 +104,12 @@ module MsSplitPairsGen =
         let secondPrefix = SorterModelMaker.makeSorterModel index gen.SecondPrefixMaker
         let secondSuffix = SorterModelMaker.makeSorterModel index gen.SecondSuffixMaker
         
-        // Calculate ID for the msSplitPairs from the generator ID and seed
-        let splitPairsId =
-            [
-                %gen.Id :> obj
-                index :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
-        
         msSplitPairs.create
-            splitPairsId
             gen.SortingWidth
             firstPrefix
             firstSuffix
             secondPrefix
             secondSuffix
-
 
     let makeSorterIdsWithTags (index: int) (gen: msSplitPairsGen) 
                                     : (Guid<sorterId> * modelTag) [] =

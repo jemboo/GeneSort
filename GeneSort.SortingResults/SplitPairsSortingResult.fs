@@ -1,5 +1,6 @@
 ﻿namespace GeneSort.SortingResult
 
+open System
 open FSharp.UMX
 open GeneSort.Model.Sorting
 open GeneSort.SortingOps
@@ -22,6 +23,16 @@ type splitPairsSortingResult=
             sorterEvalSecondFirst = None
             sorterEvalSecondSecond = None
         }
+
+    static member empty () : splitPairsSortingResult =
+        { 
+            sortingId = Guid.Empty |> UMX.tag<sortingId>
+            sorterEvalFirstFirst = None
+            sorterEvalFirstSecond = None
+            sorterEvalSecondFirst = None
+            sorterEvalSecondSecond = None
+        }
+
 
     member this.SortingId with get() : Guid<sortingId> = this.sortingId
     member this.SorterEvalFirstFirst

@@ -8,6 +8,7 @@ open GeneSort.Model.Sorting.Sorter.Uf4
 open GeneSort.Model.Sorting.Sorter.Uf6
 open GeneSort.Sorting
 open GeneSort.Model.Sorting
+open GeneSort.Sorting.Sorter
 
 
 type sorterModelMutator =
@@ -27,6 +28,24 @@ module SorterModelMutator =
         | SmmMsrsRandMutate msrs -> msrs.Id
         | SmmMsuf4RandMutate msuf4 -> msuf4.Id
         | SmmMsuf6RandMutate msuf6 -> msuf6.Id
+
+
+    let getParentSorterModel (model:sorterModelMutator) : sorterModel =
+        match model with
+        | SmmMsceRandMutate msce -> msce.Msce |> sorterModel.Msce
+        | SmmMssiRandMutate mssi -> mssi.Mssi |> sorterModel.Mssi
+        | SmmMsrsRandMutate msrs -> msrs.Msrs |> sorterModel.Msrs
+        | SmmMsuf4RandMutate msuf4 -> msuf4.Msuf4 |> sorterModel.Msuf4
+        | SmmMsuf6RandMutate msuf6 -> msuf6.Msuf6 |> sorterModel.Msuf6
+
+
+    let getParentSorterModelId (model: sorterModelMutator) : Guid<sorterModelId> =
+        match model with
+        | SmmMsceRandMutate msce -> msce.Msce.Id
+        | SmmMssiRandMutate mssi -> mssi.Mssi.Id
+        | SmmMsrsRandMutate msrs -> msrs.Msrs.Id
+        | SmmMsuf4RandMutate msuf4 -> msuf4.Msuf4.Id
+        | SmmMsuf6RandMutate msuf6 -> msuf6.Msuf6.Id
 
 
     let getMutatorSeedSorterIdsWithTags (model: sorterModelMutator) : (Guid<sorterId>  * modelTag) [] =

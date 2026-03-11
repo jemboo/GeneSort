@@ -25,6 +25,10 @@ module SortingMutator =
         | Single smm -> smm |> SorterModelMutator.getMutatorSeedSorterIdsWithTags
         | Pair spmm -> spmm |> SorterPairModelMutator.getMutatorSeedSorterIdsWithTags
 
+    let getParentSorting (model: sortingMutator) : sorting =
+        match model with
+        | Single smm -> smm |> SorterModelMutator.getParentSorterModel |> sorting.Single
+        | Pair psm -> psm |> SorterPairModelMutator.getParentSorterPair |> sorting.Pairs
 
     let getMutantSortingId (index: int) (model: sortingMutator) : Guid<sortingId> =
         match model with

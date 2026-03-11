@@ -1,6 +1,5 @@
 ﻿namespace GeneSort.Model.Sorting.SorterPair.SplitPairs
 
-open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
@@ -10,6 +9,7 @@ type msSplitPairsMutator =
     private 
         { id: Guid<sorterPairModelMutatorId>
           sortingWidth: int<sortingWidth>
+          parentModel: msSplitPairs
           firstPrefixMutator: sorterModelMutator
           firstSuffixMutator: sorterModelMutator
           secondPrefixMutator: sorterModelMutator
@@ -65,9 +65,18 @@ type msSplitPairsMutator =
                 %SorterModelMutator.getId secondPrefixMutator :> obj
                 %SorterModelMutator.getId secondSuffixMutator :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterPairModelMutatorId>
+
+
+        let parentModel = msSplitPairs.create
+                            sortingWidth
+                            (firstPrefixMutator |> SorterModelMutator.getParentSorterModel)
+                            (firstSuffixMutator |> SorterModelMutator.getParentSorterModel)
+                            (secondPrefixMutator |> SorterModelMutator.getParentSorterModel)
+                            (secondSuffixMutator |> SorterModelMutator.getParentSorterModel)
         
         { id = id
           sortingWidth = sortingWidth
+          parentModel = parentModel
           firstPrefixMutator = firstPrefixMutator
           firstSuffixMutator = firstSuffixMutator
           secondPrefixMutator = secondPrefixMutator
@@ -75,6 +84,7 @@ type msSplitPairsMutator =
     
     member this.Id with get () = this.id
     member this.SortingWidth with get () = this.sortingWidth
+    member this.ParentModel with get () = this.parentModel  
     member this.FirstPrefixMutator with get () = this.firstPrefixMutator
     member this.FirstSuffixMutator with get () = this.firstSuffixMutator
     member this.SecondPrefixMutator with get () = this.secondPrefixMutator
@@ -110,11 +120,7 @@ module MsSplitPairsMutator =
         let secondPrefix = SorterModelMutator.makeSorterModel index mutator.SecondPrefixMutator
         let secondSuffix = SorterModelMutator.makeSorterModel index mutator.SecondSuffixMutator
         
-        // Calculate ID for the msSplitPairs from the generator ID and seed
-        let splitPairsId = %(getMutantSortingId index mutator) |> UMX.tag<sorterModelId>
-        
         msSplitPairs.create
-                        splitPairsId
                         mutator.SortingWidth
                         firstPrefix
                         firstSuffix

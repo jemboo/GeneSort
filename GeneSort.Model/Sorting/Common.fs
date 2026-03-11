@@ -6,6 +6,7 @@ open GeneSort.Core
 
 
 [<Measure>] type sorterModelId
+[<Measure>] type sorterPairModelId
 [<Measure>] type sortingId
 [<Measure>] type sortingSetId
 [<Measure>] type sorterModelMakerId

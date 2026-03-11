@@ -1,5 +1,6 @@
 ﻿namespace GeneSort.SortingResult
 
+open System
 open FSharp.UMX
 open GeneSort.Model.Sorting
 open GeneSort.SortingOps
@@ -15,6 +16,12 @@ type singleSortingResult=
                 (sorterModelId: Guid<sortingId>) =
         { 
             sortingId = sorterModelId
+            sorterEval = None
+        }
+
+    static member empty () : singleSortingResult =
+        { 
+            sortingId = Guid.Empty |> UMX.tag<sortingId>
             sorterEval = None
         }
 

@@ -21,6 +21,19 @@ module SorterPairModelMutator =
         | sorterPairModelMutator.SplitPairs mspg -> mspg.Id
         | sorterPairModelMutator.SplitPairs2 mspg -> mspg.Id
 
+
+    let getParentSorterPair (mutator: sorterPairModelMutator) : sorterPairModel =
+        match mutator with
+        | sorterPairModelMutator.SplitPairs mspg -> mspg.ParentModel |> sorterPairModel.SplitPairs
+        | sorterPairModelMutator.SplitPairs2 mspg -> mspg.ParentModel |> sorterPairModel.SplitPairs2
+
+
+    let getParentSorterPairId (mutator: sorterPairModelMutator) : Guid<sorterPairModelId> =
+        match mutator with
+        | sorterPairModelMutator.SplitPairs mspg -> mspg.ParentModel.Id
+        | sorterPairModelMutator.SplitPairs2 mspg -> mspg.ParentModel.Id
+
+
     let getMutatorSeedSorterIdsWithTags (mutator: sorterPairModelMutator) : (Guid<sorterId> * modelTag) []  =
         match mutator with
         | sorterPairModelMutator.SplitPairs mspg -> 

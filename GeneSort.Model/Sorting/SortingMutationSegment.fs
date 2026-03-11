@@ -41,6 +41,7 @@ type sortingMutationSegment =
             |]
         mutantSortings
 
+
     member this.MakeSorters : sorter [] =
         this.MakeSortings |> Array.collect(Sorting.makeSorters)
 

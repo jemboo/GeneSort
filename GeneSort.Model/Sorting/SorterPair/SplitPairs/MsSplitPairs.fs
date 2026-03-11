@@ -5,10 +5,11 @@ open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Model.Sorting
 open GeneSort.Sorting.Sorter
+open GeneSort.Core
 
 type msSplitPairs = 
     private 
-        { id: Guid<sorterModelId>
+        { id: Guid<sorterPairModelId>
           sortingWidth: int<sortingWidth>
           firstPrefix: sorterModel
           firstSuffix: sorterModel
@@ -21,8 +22,7 @@ type msSplitPairs =
     /// - any sorter model has a mismatched sorting width
     /// - the two prefixes don't have the same ceLength
     /// - the two suffixes don't have the same ceLength
-    static member create 
-            (id: Guid<sorterModelId>) 
+    static member create
             (sortingWidth: int<sortingWidth>)
             (firstPrefix: sorterModel)
             (firstSuffix: sorterModel)
@@ -55,6 +55,14 @@ type msSplitPairs =
         if firstSuffixCeLength <> secondSuffixCeLength then
             failwith $"Both suffixes must have the same ceLength. FirstSuffix: {%firstSuffixCeLength}, SecondSuffix: {%secondSuffixCeLength}"
         
+        let id =
+            [
+                firstPrefix |> SorterModel.getId :> obj
+                firstSuffix |> SorterModel.getId :> obj
+                secondPrefix |> SorterModel.getId :> obj
+                secondSuffix |> SorterModel.getId :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterPairModelId>
+
         { id = id
           sortingWidth = sortingWidth
           firstPrefix = firstPrefix

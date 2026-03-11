@@ -16,7 +16,7 @@ type sorterPairModel =
 
 module SorterPairModel =
     
-    let getId (model: sorterPairModel) : Guid<sorterModelId> =
+    let getId (model: sorterPairModel) : Guid<sorterPairModelId> =
         match model with
         | SplitPairs sp -> sp.Id
         | SplitPairs2 sp -> sp.Id

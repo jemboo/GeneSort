@@ -1,12 +1,12 @@
 ﻿namespace GeneSort.SortingResult
 
+open System.Collections.Generic
 open FSharp.UMX
 open GeneSort.Model.Sorting
 open GeneSort.SortingOps
-open System.Collections.Generic
 open GeneSort.Sorting
 
-type sortingResultSet =
+type sortingResultSetMap =
     private { 
         sortingResults: Dictionary<Guid<sortingId>, sortingResult>
         evalMap: Dictionary<Guid<sorterId>, sortingTag>
@@ -60,5 +60,5 @@ type sortingResultSet =
 
 
 
-module SortingResultSet = ()
+module SortingResultSetMap = ()
 

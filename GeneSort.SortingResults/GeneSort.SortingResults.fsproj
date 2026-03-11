@@ -10,7 +10,8 @@
     <Compile Include="SingleSortingResult.fs" />
     <Compile Include="SplitPairsSortingResult.fs" />
     <Compile Include="SortingResult.fs" />
-    <Compile Include="SortingResultSet.fs" />
+    <Compile Include="SortingResultMap.fs" />
+    <Compile Include="SortingResultSetMap.fs" />
     <Compile Include="MutationSegmentResults.fs" />
     <Compile Include="MutationSegmentSetResults.fs" />
     <Compile Include="SorterSetEvalBins.fs" />
