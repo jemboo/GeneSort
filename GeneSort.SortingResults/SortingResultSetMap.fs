@@ -48,7 +48,7 @@ type sortingResultSetMap =
     member this.EvalMap with get() =
         this.evalMap :> IReadOnlyDictionary<Guid<sorterId>, sortingTag>
 
-    member this.UpdateSorterEval (newEval: sorterEval) =
+    member this.UpdateSortingResults (newEval: sorterEval) =
         match this.evalMap.TryGetValue(newEval.SorterId) with
         | false, _ -> failwithf "SorterId %A not found in evalMap." newEval.SorterId
         | true, sortingTag ->

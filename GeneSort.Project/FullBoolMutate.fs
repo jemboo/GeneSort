@@ -226,9 +226,8 @@ module FullBoolMutate =
                 let sorterSetEvalMutated = SorterSetEval.makeSorterSetEval mutatedSorterSet sortableTests collectNewSortableTests
 
                 let mutationSegmentSetResults = mutationSegmentSetResults.create sortingMutationSegments
-
-                mutationSegmentSetResults.UpdateAllSortingResults sorterSetEvalMutated.SorterEvals
-
+                mutationSegmentSetResults.UpdateAllSortingResultsParent sorterSetEvalParent.SorterEvals
+                mutationSegmentSetResults.UpdateAllSortingResultsMutant sorterSetEvalMutated.SorterEvals
 
                 // 5. Save Results
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")

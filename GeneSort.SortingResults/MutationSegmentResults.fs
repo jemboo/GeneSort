@@ -52,7 +52,10 @@ type mutationSegmentResults =
     member this.SortingResultSetMapMutants with get() = this.sortingResultSetMapMutants
 
     member this.UpdateSortingResultsMutant (newEval: sorterEval) =
-        this.sortingResultSetMapMutants.UpdateSorterEval newEval
+        this.sortingResultSetMapMutants.UpdateSortingResults newEval
+
+    member this.UpdateSortingResultParent (newEval: sorterEval) =
+        this.sortingResultMapParent.UpdateSortingResult newEval
 
 
 
