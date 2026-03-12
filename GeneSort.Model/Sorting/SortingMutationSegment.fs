@@ -33,35 +33,39 @@ type sortingMutationSegment =
     member this.FirstIndex with get() = this.firstIndex
     member this.Count with get() = this.count
 
-    member this.MakeSortings : sorting [] =
+    member this.MakeMutantSortings : sorting [] =
         let mutantSortings = 
             [| for i in 0 .. %this.count - 1 do
                 let index = %this.firstIndex + i
-                SortingMutator.makeSorting index this.SortingMutator
+                SortingMutator.makeMutantSorting index this.SortingMutator
             |]
         mutantSortings
 
 
-    member this.MakeSorters : sorter [] =
-        this.MakeSortings |> Array.collect(Sorting.makeSorters)
+    member this.MakeMutantSorters : sorter [] =
+        this.MakeMutantSortings |> Array.collect(Sorting.makeSorters)
 
 
-    member this.MakeSorterSet : sorterSet =
+    member this.MakeMutantSorterSet : sorterSet =
         sorterSet.create  (%(this.id) |> UMX.tag<sorterSetId>)
-                          this.MakeSorters
+                          this.MakeMutantSorters
 
 
-    member this.GetSortingIds : Guid<sortingId> [] =
+    member this.GetMutantSortingIds : Guid<sortingId> [] =
         [| for i in 0 .. %this.count - 1 do
             let index = %this.firstIndex + i
             SortingMutator.getMutantSortingId index this.SortingMutator
         |]
 
 
-    member this.MakeSorterIdsWithSortingTags : (Guid<sorterId> * sortingTag) [] =
+    member this.MakeParentSorterIdsWithModelTags : (Guid<sorterId> * modelTag) [] =
+        SortingMutator.getParentSorterIdsWithTags this.SortingMutator 
+
+
+    member this.MakeMutantSorterIdsWithSortingTags : (Guid<sorterId> * sortingTag) [] =
         [| for i in 0 .. %this.count - 1 do
             let index = %this.firstIndex + i
-            let tupes = SortingMutator.makeSorterIdsWithTags index this.SortingMutator
+            let tupes = SortingMutator.makeMutantSorterIdsWithTags index this.SortingMutator
             let mutantSortingId = SortingMutator.getMutantSortingId index this.SortingMutator
             tupes |> Array.map (
                     fun (sorterId, modelTag) -> 

@@ -23,16 +23,16 @@ type mutationSegmentSetResults =
             let segmentResults = Dictionary<Guid<sortingId>, sortingResult>()
             sortingSegmentResults.[segment.Id] <- segmentResults
 
-            for (sorterId, sortingTag) in segment.MakeSorterIdsWithSortingTags do
+            for (sorterId, sortingTag) in segment.MakeMutantSorterIdsWithSortingTags do
                 let mutationSetTag = SortingMutationSetTag.create segment.Id sortingTag
                 evalMap.[sorterId] <- mutationSetTag
 
             match segment.SortingMutator with
             | sortingMutator.Single _ ->
-                for id in segment.GetSortingIds do
+                for id in segment.GetMutantSortingIds do
                     segmentResults.[id] <- (singleSortingResult.create id |> sortingResult.Single)
             | sortingMutator.Pair _ ->
-                for id in segment.GetSortingIds do
+                for id in segment.GetMutantSortingIds do
                     segmentResults.[id] <- (splitPairsSortingResult.create id |> sortingResult.SplitPairs)
 
         {

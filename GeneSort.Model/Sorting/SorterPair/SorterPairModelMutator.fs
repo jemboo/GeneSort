@@ -34,26 +34,14 @@ module SorterPairModelMutator =
         | sorterPairModelMutator.SplitPairs2 mspg -> mspg.ParentModel.Id
 
 
-    let getMutatorSeedSorterIdsWithTags (mutator: sorterPairModelMutator) : (Guid<sorterId> * modelTag) []  =
+    let getParentSorterIdsWithTags (mutator: sorterPairModelMutator) : (Guid<sorterId> * modelTag) []  =
         match mutator with
         | sorterPairModelMutator.SplitPairs mspg -> 
-            (
-                [|
-                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.First_First);
-                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.First_Second);
-                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.Second_First);
-                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.Second_Second);
-                |]
-            )
+                mspg.ParentModel |> MsSplitPairs.getSorterIdsWithTags
+
         | sorterPairModelMutator.SplitPairs2 mspg -> 
-            (
-                [|
-                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.First_First);
-                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.First_Second);
-                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.Second_First);
-                    //(mspg.SortingSeedId, modelTag.SplitPair splitJoin.Second_Second);
-                |]
-            )
+                mspg.ParentModel |> MsSplitPairs.getSorterIdsWithTags
+
 
     let getCeLength (mutator: sorterPairModelMutator) : int<ceLength> =
         match mutator with
@@ -73,7 +61,7 @@ module SorterPairModelMutator =
         | sorterPairModelMutator.SplitPairs2 mspg -> MsSplitPairsMutator.getSortingWidth mspg
 
 
-    let makeSorterPairModel
+    let makeMutantSorterPairModel
                 (index: int)  
                 (model: sorterPairModelMutator) : sorterPairModel =
         match model with
@@ -85,7 +73,7 @@ module SorterPairModelMutator =
                      |> sorterPairModel.SplitPairs2
 
 
-    let makeSorterIdsWithTags (index: int) (model: sorterPairModelMutator) : (Guid<sorterId> * modelTag) [] =
+    let makeMutantSorterIdsWithTags (index: int) (model: sorterPairModelMutator) : (Guid<sorterId> * modelTag) [] =
         match model with
         | sorterPairModelMutator.SplitPairs mspg -> mspg |> MsSplitPairsMutator.makeSorterIdsWithTags index
         | sorterPairModelMutator.SplitPairs2 mspg -> mspg |> MsSplitPairsMutator.makeSorterIdsWithTags index

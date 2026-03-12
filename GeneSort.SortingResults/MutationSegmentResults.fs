@@ -11,18 +11,20 @@ type mutationSegmentResults =
         { 
           sortingMutationSegment : sortingMutationSegment
           sortingResultSetMapMutants : sortingResultSetMap
-          sortingResultMapParent : sortingResult
+          sortingResultMapParent : sortingResultMap
         }
     with
     static member create (sortingMutationSegment: sortingMutationSegment) =
         let mutantSortingResults =
             match sortingMutationSegment.SortingMutator with
             | sortingMutator.Single _ ->
-                sortingMutationSegment.GetSortingIds
+                sortingMutationSegment.GetMutantSortingIds
                 |> Array.map (fun id -> singleSortingResult.create id |> sortingResult.Single)
             | sortingMutator.Pair _ ->
-                sortingMutationSegment.GetSortingIds
+                sortingMutationSegment.GetMutantSortingIds
                 |> Array.map (fun id -> splitPairsSortingResult.create id |> sortingResult.SplitPairs)
+
+
 
         let parentSortingResult = 
             match sortingMutationSegment.SortingMutator with
@@ -37,9 +39,11 @@ type mutationSegmentResults =
             sortingMutationSegment = sortingMutationSegment
             sortingResultSetMapMutants = sortingResultSetMap.create 
                                         mutantSortingResults 
-                                        sortingMutationSegment.MakeSorterIdsWithSortingTags
+                                        sortingMutationSegment.MakeMutantSorterIdsWithSortingTags
 
-            sortingResultMapParent = parentSortingResult
+            sortingResultMapParent = sortingResultMap.create 
+                                        parentSortingResult 
+                                        sortingMutationSegment.MakeParentSorterIdsWithModelTags
            
         }
 

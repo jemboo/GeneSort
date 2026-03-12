@@ -115,10 +115,10 @@ module MsSplitPairsMutator =
     let makeMsSplitPairs 
                 (index: int) 
                 (mutator: msSplitPairsMutator) : msSplitPairs =
-        let firstPrefix = SorterModelMutator.makeSorterModel index mutator.FirstPrefixMutator 
-        let firstSuffix = SorterModelMutator.makeSorterModel index mutator.FirstSuffixMutator
-        let secondPrefix = SorterModelMutator.makeSorterModel index mutator.SecondPrefixMutator
-        let secondSuffix = SorterModelMutator.makeSorterModel index mutator.SecondSuffixMutator
+        let firstPrefix = SorterModelMutator.makeMutantSorterModel index mutator.FirstPrefixMutator 
+        let firstSuffix = SorterModelMutator.makeMutantSorterModel index mutator.FirstSuffixMutator
+        let secondPrefix = SorterModelMutator.makeMutantSorterModel index mutator.SecondPrefixMutator
+        let secondSuffix = SorterModelMutator.makeMutantSorterModel index mutator.SecondSuffixMutator
         
         msSplitPairs.create
                         mutator.SortingWidth

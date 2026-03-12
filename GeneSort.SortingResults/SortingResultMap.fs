@@ -9,11 +9,11 @@ open GeneSort.Sorting
 type sortingResultMap =
     private { 
         sortingResult: sortingResult
-        evalMap: Dictionary<Guid<sorterId>, sortingTag>
+        evalMap: Dictionary<Guid<sorterId>, modelTag>
     }
 
-    static member create (sortingResult: sortingResult) (evalEntries: (Guid<sorterId> * sortingTag) seq) =
-        let evalMap = Dictionary<Guid<sorterId>, sortingTag>()
+    static member create (sortingResult: sortingResult) (evalEntries: (Guid<sorterId> * modelTag) seq) =
+        let evalMap = Dictionary<Guid<sorterId>, modelTag>()
         for (sorterId, sortingTag) in evalEntries do
             evalMap.[sorterId] <- sortingTag
         { sortingResult = sortingResult; evalMap = evalMap }
@@ -21,7 +21,7 @@ type sortingResultMap =
     static member empty (sortingResult: sortingResult) =
         { 
             sortingResult = sortingResult
-            evalMap = Dictionary<Guid<sorterId>, sortingTag>()
+            evalMap = Dictionary<Guid<sorterId>, modelTag>()
         }
 
     member this.SortingResult with get() = this.sortingResult
@@ -30,7 +30,7 @@ type sortingResultMap =
         SortingResult.getSortingId this.sortingResult
 
     member this.EvalMap with get() =
-        this.evalMap :> IReadOnlyDictionary<Guid<sorterId>, sortingTag>
+        this.evalMap :> IReadOnlyDictionary<Guid<sorterId>, modelTag>
 
     member this.EvalCount with get() = this.evalMap.Count
 
@@ -45,6 +45,5 @@ type sortingResultMap =
     member this.UpdateSorterEval (newEval: sorterEval) =
         match this.evalMap.TryGetValue(newEval.SorterId) with
         | false, _ -> failwithf "SorterId %A not found in evalMap." newEval.SorterId
-        | true, sortingTag ->
-            let modelTag = SortingTag.getModelTag sortingTag
+        | true, modelTag ->
             SortingResult.UpdateSorterEval modelTag newEval this.sortingResult

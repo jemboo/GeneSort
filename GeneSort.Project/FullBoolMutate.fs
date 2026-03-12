@@ -213,12 +213,12 @@ module FullBoolMutate =
                                                 sortingCount
                     )
 
-                let mutantSorterSetArray = sortingMutationSegments |> Array.map(fun sms -> sms.MakeSorterSet)
+                let mutantSorterSetArray = sortingMutationSegments |> Array.map(fun sms -> sms.MakeMutantSorterSet)
                 let mergedMutantSorterSet = SorterSet.mergeSorterSets mutantSorterSetArray
 
 
                 let allMutantSorters = 
-                    sortingMutationSegments |> Array.collect(fun sms -> sms.MakeSorters)
+                    sortingMutationSegments |> Array.collect(fun sms -> sms.MakeMutantSorters)
 
 
                 let mutatedSorterSet = sorterSet.createWithNewId allMutantSorters
