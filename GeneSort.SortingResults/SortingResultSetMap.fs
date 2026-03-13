@@ -60,5 +60,11 @@ type sortingResultSetMap =
 
 
 
-module SortingResultSetMap = ()
+module SortingResultSetMap = 
+
+    let fromSortingSet (sortingSet:sortingSet) = //: sortingResultSetMap =
+         let tupes = sortingSet.Sortings |> Array.map(Sorting.getSorterIdsWithModelTags)
+
+         []
+
 

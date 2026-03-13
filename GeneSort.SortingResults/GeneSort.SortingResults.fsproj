@@ -9,6 +9,7 @@
     <Compile Include="Common.fs" />
     <Compile Include="SingleSortingResult.fs" />
     <Compile Include="SplitPairsSortingResult.fs" />
+    <Compile Include="PairsSortingResult.fs" />
     <Compile Include="SortingResult.fs" />
     <Compile Include="SortingResultMap.fs" />
     <Compile Include="SortingResultSetMap.fs" />

@@ -22,7 +22,9 @@ type mutationSegmentResults =
                 |> Array.map (fun id -> singleSortingResult.create id |> sortingResult.Single)
             | sortingMutator.Pair _ ->
                 sortingMutationSegment.GetMutantSortingIds
-                |> Array.map (fun id -> splitPairsSortingResult.create id |> sortingResult.SplitPairs)
+                |> Array.map (fun id -> splitPairsSortingResult.create id 
+                                        |> pairsSortingResult.SplitPairs
+                                        |> sortingResult.Pairs)
 
 
 
@@ -33,7 +35,7 @@ type mutationSegmentResults =
                 singleSortingResult.create parentSortingId |> sortingResult.Single
             | sortingMutator.Pair spmm ->
                 let parentSortingId = %(spmm |> SorterPairModelMutator.getParentSorterPairId) |> UMX.tag<sortingId>
-                splitPairsSortingResult.create parentSortingId |> sortingResult.SplitPairs
+                splitPairsSortingResult.create parentSortingId |> pairsSortingResult.SplitPairs |> sortingResult.Pairs
 
         { 
             sortingMutationSegment = sortingMutationSegment

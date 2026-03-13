@@ -5,9 +5,9 @@ open GeneSort.Model.Sorting
 open GeneSort.SortingOps
 
 
-type sortingResult=
+type sortingResult =
      | Single of singleSortingResult
-     | SplitPairs of splitPairsSortingResult
+     | Pairs of pairsSortingResult
 
 
 module SortingResult =
@@ -15,7 +15,7 @@ module SortingResult =
     let getSortingId (sortingResult: sortingResult) : Guid<sortingId> =
         match sortingResult with
         | Single singleResult -> singleResult.SortingId
-        | SplitPairs splitPairsResult -> splitPairsResult.SortingId
+        | Pairs pairsSortingResult -> pairsSortingResult |> PairsSortingResult.getSortingId
 
 
     let UpdateSorterEval (modelTag: modelTag) 
@@ -23,5 +23,13 @@ module SortingResult =
                          (sortingResult: sortingResult) : unit =
         match sortingResult with
         | Single ssr -> ssr.UpdateSorterEval modelTag newEval
-        | SplitPairs spsr -> spsr.UpdateSorterEval modelTag newEval
+        | Pairs psr ->
+            match psr with
+            | SplitPairs spsr -> spsr.UpdateSorterEval modelTag newEval
+            | SplitPairs2 spsr -> spsr.UpdateSorterEval modelTag newEval
+
+    //let makeFromSorting (ting: sorting) : sortingResult =
+    //    match ting with
+    //    | sorting.Single ss -> singleSortingResult.create (ting |> Sorting.getId) |> sortingResult.Single
+    //    | sorting.Pairs sp
             
