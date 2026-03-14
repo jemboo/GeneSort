@@ -49,8 +49,8 @@ module TextReporters =
 
                 match result with
                 | Ok sse ->
-                    let bins = SorterSetEvalBins.create 1 sse
-                    let lines = SorterSetEvalBins.getBinCountReport
+                    let bins = SorterEvalHierarchy.createFromSorterSetEval 1 sse
+                    let lines = SorterEvalHierarchy.getHierarchyReport
                                     (runParams.GetSortingWidth()) 
                                     (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringToString )
                                     bins

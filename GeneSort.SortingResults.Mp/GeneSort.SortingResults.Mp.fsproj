@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SorterEvalBinDto.fs" />
+    <Compile Include="SorterEvalHierarchyDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

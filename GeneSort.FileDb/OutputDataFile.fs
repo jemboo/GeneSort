@@ -126,7 +126,7 @@ module OutputDataFile =
                         }
                     | outputDataType.SorterSetEvalBins _ ->
                         async {
-                            let! domain = deserializeDto<sorterSetEvalBinsDto, sorterSetEvalBins> stream token SorterSetEvalBinsDto.toDomain
+                            let! domain = deserializeDto<sorterEvalHierarchyDto, sorterEvalHierarchy> stream token SorterEvalHierarchyDto.toDomain
                             return outputData.SorterSetEvalBins domain
                         }
                     | outputDataType.Project ->
@@ -197,7 +197,7 @@ module OutputDataFile =
                             | outputData.SorterSetEval sse ->
                                 serializeDto stream sse SorterSetEvalDto.fromDomain
                             | outputData.SorterSetEvalBins sse ->
-                                serializeDto stream sse SorterSetEvalBinsDto.fromDomain
+                                serializeDto stream sse SorterEvalHierarchyDto.fromDomain
                             | outputData.Project p ->
                                 serializeDto stream p ProjectDto.fromDomain
                             | outputData.TextReport dataTableReport ->

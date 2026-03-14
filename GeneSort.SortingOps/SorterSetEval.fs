@@ -8,8 +8,6 @@ open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
 open GeneSort.Model.Sorting
 
-[<Measure>] type sorterSetEvalId
-
 // This type represents the evaluation of a set of sorters (sorterSet) against a 
 // specific set of sortable tests (sortableTest).
 type sorterSetEval =

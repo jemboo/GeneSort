@@ -15,7 +15,7 @@
     <Compile Include="SortingResultSetMap.fs" />
     <Compile Include="MutationSegmentResults.fs" />
     <Compile Include="MutationSegmentSetResults.fs" />
-    <Compile Include="SorterSetEvalBins.fs" />
+    <Compile Include="SorterEvalHierarchy.fs" />
     <Compile Include="SorterSetCeUseProfile.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

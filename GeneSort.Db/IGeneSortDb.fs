@@ -92,7 +92,7 @@ module GeneSortDb =
             return unwrapOutput (function | outputData.SorterSetEval sse -> Some sse | _ -> None) result
         }
 
-    let getSorterSetEvalBinsAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sorterSetEvalBins, OutputError>> =
+    let getSorterSetEvalHierarchyAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sorterEvalHierarchy, OutputError>> =
         async {
             let! result = geneSortDb.loadAsync projectFolder queryParams
             return unwrapOutput (function | outputData.SorterSetEvalBins sseb -> Some sseb | _ -> None) result
