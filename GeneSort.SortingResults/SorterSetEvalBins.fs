@@ -23,84 +23,96 @@ type sorterEvalKey =
             isSorted = isSorted
           }
 
-    member this.CeCount with get() : int<ceLength> =
-        this.ceCount
+    member this.CeCount with get() : int<ceLength> = this.ceCount
+    member this.StageLength with get() : int<stageLength> = this.stageLength
+    member this.IsSorted with get() : bool = this.isSorted
 
-    member this.StageLength with get() : int<stageLength> =
-        this.stageLength
-
-    member this.IsSorted with get() : bool = 
-        this.isSorted
-        
-
-
+// ---------------------------------------------------------------------------
+// Sub-Bin: Stores IDs and a limited set of representative evaluations
+// ---------------------------------------------------------------------------
 type sorterEvalSubBin =
     private {
+        representativeEvals: ResizeArray<sorterEval>
         sorterIds: ResizeArray<Guid<sorterId>>
     }
-    static member create() =
-        { sorterIds = ResizeArray<Guid<sorterId>>() }
+    static member create(eval: sorterEval) =
+        let reps = ResizeArray<sorterEval>()
+        reps.Add(eval)
+        let ids = ResizeArray<Guid<sorterId>>()
+        ids.Add(eval.SorterId)
+        { 
+            representativeEvals = reps
+            sorterIds = ids 
+        }
+
     member this.EvalCount with get() = this.sorterIds.Count
-    member this.Add(sorterId: Guid<sorterId>) = this.sorterIds.Add(sorterId)
+    member this.RepresentativeEvals with get() = this.representativeEvals :> IReadOnlyList<sorterEval>
     member this.SorterIds with get() = this.sorterIds :> IReadOnlyList<Guid<sorterId>>
 
+    member this.Add(eval: sorterEval, maxReps: int) = 
+        if this.representativeEvals.Count < maxReps then
+            this.representativeEvals.Add(eval)
+        this.sorterIds.Add(eval.SorterId)
 
+    member this.AddIdOnly(sorterId: Guid<sorterId>) =
+        this.sorterIds.Add(sorterId)
+
+// ---------------------------------------------------------------------------
+// Bin: Collection of sub-bins keyed by the hash of ceUseCounts
+// ---------------------------------------------------------------------------
 type sorterEvalBin =
     private {
         subBins: Dictionary<int, sorterEvalSubBin>
     }
     static member create() =
         { subBins = Dictionary<int, sorterEvalSubBin>() }
+    
     member this.EvalCount with get() =
         this.subBins.Values |> Seq.sumBy (fun b -> b.EvalCount)
+    
     member this.SubBins with get() = this.subBins :> IReadOnlyDictionary<int, sorterEvalSubBin>
     member this.SubBinCount with get() = this.subBins.Count
-    member this.TryGetSubBin (hashKey: int) =
+    
+    member internal this.Add(eval: sorterEval, maxReps: int) =
+        let key = eval.CeBlockEval.CeUseCounts.GetHashCode()
+        match this.subBins.TryGetValue(key) with
+        | true, existing -> 
+            existing.Add(eval, maxReps)
+        | false, _ ->
+            this.subBins.[key] <- sorterEvalSubBin.create(eval)
+
+    member this.MergeSubBin (hashKey: int) (subBin: sorterEvalSubBin, maxReps: int) =
         match this.subBins.TryGetValue(hashKey) with
-        | true, bin -> Some bin
-        | false, _ -> None
-    member internal this.Add(sorterId: Guid<sorterId>, ceUseCounts: ceUseCounts) =
-        let key = ceUseCounts.GetHashCode()
-        let subBin =
-            match this.subBins.TryGetValue(key) with
-            | true, existing -> existing
-            | false, _ ->
-                let newSubBin = sorterEvalSubBin.create()
-                this.subBins.[key] <- newSubBin
-                newSubBin
-        subBin.Add(sorterId)
-    member this.MergeSubBin (hashKey: int) (subBin: sorterEvalSubBin) =
-        let existing =
-            match this.subBins.TryGetValue(hashKey) with
-            | true, existing -> existing
-            | false, _ ->
-                let newSubBin = sorterEvalSubBin.create()
-                this.subBins.[hashKey] <- newSubBin
-                newSubBin
-        for sorterId in subBin.SorterIds do
-            existing.Add(sorterId)
+        | true, existing -> 
+            for id in subBin.SorterIds do existing.AddIdOnly(id)
+            for rep in subBin.RepresentativeEvals do
+                if existing.RepresentativeEvals.Count < maxReps then
+                    existing.Add(rep, maxReps)
+        | false, _ ->
+            this.subBins.[hashKey] <- subBin
 
-
+// ---------------------------------------------------------------------------
+// SetBins: Top level container for the evaluation run
+// ---------------------------------------------------------------------------
 type sorterSetEvalBins = 
     private {
         sorterSetEvalId: Guid<sorterSetEvalId>
         evalBins: Dictionary<sorterEvalKey, sorterEvalBin>
+        maxRepresentativesPerSubBin: int
     }
-    static member create (sorterSetEvalId: Guid<sorterSetEvalId>) =
+    static member create (sorterSetEvalId: Guid<sorterSetEvalId>, maxReps: int) =
         {
             sorterSetEvalId = sorterSetEvalId
             evalBins = Dictionary<sorterEvalKey, sorterEvalBin>()
+            maxRepresentativesPerSubBin = maxReps
         }
+
     member this.SorterSetEvalId with get() = this.sorterSetEvalId
     member this.EvalBins with get() = this.evalBins :> IReadOnlyDictionary<sorterEvalKey, sorterEvalBin>
     member this.BinCount with get() = this.evalBins.Count
+    member this.MaxRepresentativesPerSubBin with get() = this.maxRepresentativesPerSubBin
     member this.TotalEvalCount with get() = 
         this.evalBins.Values |> Seq.sumBy (fun b -> b.EvalCount)
-
-    member this.TryGetBin (key: sorterEvalKey) =
-        match this.evalBins.TryGetValue(key) with
-        | true, bin -> Some bin
-        | false, _ -> None
 
     member internal this.AddSorterEval (sorterEval: sorterEval) =
         let key = sorterEvalKey.create
@@ -114,7 +126,7 @@ type sorterSetEvalBins =
                 let newBin = sorterEvalBin.create()
                 this.evalBins.[key] <- newBin
                 newBin
-        bin.Add(sorterEval.SorterId, sorterEval.CeBlockEval.CeUseCounts)
+        bin.Add(sorterEval, this.maxRepresentativesPerSubBin)
 
     member this.MergeBin (key: sorterEvalKey) (bin: sorterEvalBin) =
         let existing =
@@ -125,14 +137,25 @@ type sorterSetEvalBins =
                 this.evalBins.[key] <- newBin
                 newBin
         for kvp in bin.SubBins do
-            existing.MergeSubBin kvp.Key kvp.Value
+            existing.MergeSubBin kvp.Key (kvp.Value, this.maxRepresentativesPerSubBin)
 
 
+    member this.GetRepresentativeSorterEvals : sorterEval [] =
+            this.evalBins.Values                 // Get all sorterEvalBins
+            |> Seq.collect (fun bin -> 
+                bin.SubBins.Values               // Get all sorterEvalSubBins
+                |> Seq.collect (fun subBin -> 
+                    subBin.RepresentativeEvals)) // Collect the evaluations
+            |> Seq.toArray
 
+
+// ---------------------------------------------------------------------------
+// Module: Logic for operating on sorterSetEvalBins
+// ---------------------------------------------------------------------------
 module SorterSetEvalBins =
 
-    let create (sorterSetEval: sorterSetEval) : sorterSetEvalBins =
-        let bins = sorterSetEvalBins.create sorterSetEval.SorterSetEvalId
+    let create (maxReps: int) (sorterSetEval: sorterSetEval) : sorterSetEvalBins =
+        let bins = sorterSetEvalBins.create (sorterSetEval.SorterSetEvalId, maxReps)
         sorterSetEval.SorterEvals
         |> Array.iter (fun se -> bins.AddSorterEval se)
         bins

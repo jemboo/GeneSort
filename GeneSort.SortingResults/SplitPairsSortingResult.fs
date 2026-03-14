@@ -15,9 +15,9 @@ type splitPairsSortingResult=
         mutable sorterEvalSecondSecond: sorterEval option
     }
 
-    static member create (sorterModelId: Guid<sortingId>) =
+    static member create (sortingId: Guid<sortingId>) =
         { 
-            sortingId = sorterModelId
+            sortingId = sortingId
             sorterEvalFirstFirst = None
             sorterEvalFirstSecond = None
             sorterEvalSecondFirst = None

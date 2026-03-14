@@ -58,13 +58,17 @@ type sortingResultSetMap =
             | false, _ -> failwithf "SortingId %A not found in sortingResultSet." sortingParentId
             | true, result -> SortingResult.UpdateSorterEval modelTag newEval result
 
+    member this.UpdateManySortingResults (newEvals: sorterEval []) =
+        newEvals |> Array.iter(this.UpdateSortingResults)
+
 
 
 module SortingResultSetMap = 
 
-    let fromSortingSet (sortingSet:sortingSet) = //: sortingResultSetMap =
-         let tupes = sortingSet.Sortings |> Array.map(Sorting.getSorterIdsWithModelTags)
-
-         []
+    let fromSortingSet (sortingSet:sortingSet) : sortingResultSetMap =
+         let tupes = sortingSet.Sortings |> Array.collect(Sorting.getSorterIdsSortingTags)
+         let sortingResults = sortingSet.Sortings |> Array.map(SortingResult.makeFromSorting)
+         sortingResultSetMap.create sortingResults tupes
+         
 
 

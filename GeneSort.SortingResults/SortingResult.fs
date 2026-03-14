@@ -28,8 +28,12 @@ module SortingResult =
             | SplitPairs spsr -> spsr.UpdateSorterEval modelTag newEval
             | SplitPairs2 spsr -> spsr.UpdateSorterEval modelTag newEval
 
-    //let makeFromSorting (ting: sorting) : sortingResult =
-    //    match ting with
-    //    | sorting.Single ss -> singleSortingResult.create (ting |> Sorting.getId) |> sortingResult.Single
-    //    | sorting.Pairs sp
+
+    let makeFromSorting (ting: sorting) : sortingResult =
+        match ting with
+        | sorting.Single ssm -> singleSortingResult.create (ting |> Sorting.getId) |> sortingResult.Single
+        | sorting.Pairs spm -> splitPairsSortingResult.create 
+                                        (ting |> Sorting.getId) 
+                                        |> pairsSortingResult.SplitPairs  |> sortingResult.Pairs
+
             

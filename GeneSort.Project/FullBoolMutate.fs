@@ -186,6 +186,7 @@ module FullBoolMutate =
                 let qpSorters = RandomSorters.makeQueryParams (Some repl) (Some sortingWidth) (Some sorterModelType) (outputDataType.SortingSet "")
                 let! loadRes = db.loadAsync RandomSorters.projectFolder qpSorters
                 let! sortingSetParent = loadRes |> OutputData.asSortingSet |> asAsync
+                let sortingResultSetMap = SortingResultSetMap.fromSortingSet sortingSetParent
 
                 // 4. Perform Computation
                 let! _ = checkCancellation cts.Token
@@ -194,6 +195,9 @@ module FullBoolMutate =
                 let sorterSetParent = sortingSetParent |> SortingSet.makeSorterSet
                 let collectNewSortableTests = false
                 let sorterSetEvalParent = SorterSetEval.makeSorterSetEval sorterSetParent sortableTests collectNewSortableTests
+
+                sortingResultSetMap.UpdateManySortingResults sorterSetEvalParent.SorterEvals
+
 
                 let sorterModelMutateParams = 
                     SorterModelMutateParams.makeUniformMutatorForSorterModel 

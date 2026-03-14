@@ -49,7 +49,7 @@ module TextReporters =
 
                 match result with
                 | Ok sse ->
-                    let bins = SorterSetEvalBins.create sse
+                    let bins = SorterSetEvalBins.create 1 sse
                     let lines = SorterSetEvalBins.getBinCountReport
                                     (runParams.GetSortingWidth()) 
                                     (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringToString )
