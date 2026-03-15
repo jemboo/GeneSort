@@ -71,4 +71,13 @@ module SortingResultSetMap =
          sortingResultSetMap.create sortingResults tupes
          
 
+    let sortingSetExtractor
+                (sortingIds:ResizeArray<Guid<sortingId>>)
+                (sortingResultSetMap:sortingResultSetMap) 
+                (sorterId:Guid<sorterId>) : unit = 
+                
+                ()
+
+        
+
 

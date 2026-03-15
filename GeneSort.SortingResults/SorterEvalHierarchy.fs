@@ -61,7 +61,7 @@ type sorterEvalLayer =
     member private this.CurrentRepCount = 
         this.leaves.Values |> Seq.filter (fun l -> l.SorterEval.IsSome) |> Seq.length
 
-    member internal this.Add(eval: sorterEval, maxReps: int) =
+    member internal this.Add(eval: sorterEval, maxReps: int, onLeafCreated: sorterEval -> unit) =
         let key = eval.CeBlockEval.CeUseCounts.GetHashCode()
         match this.leaves.TryGetValue(key) with
         | true, existing -> 
@@ -70,6 +70,9 @@ type sorterEvalLayer =
             // Only include the full eval if we haven't hit the layer-wide limit
             let includeEval = this.CurrentRepCount < maxReps
             this.leaves.[key] <- sorterEvalLeaf.create(eval, includeEval)
+            // TRIGGER FOLLOW-UP ACTION
+            onLeafCreated eval
+
 
     member this.MergeLeaf (hashKey: int) (leaf: sorterEvalLeaf, maxReps: int) =
         match this.leaves.TryGetValue(hashKey) with
@@ -111,11 +114,12 @@ type sorterEvalHierarchy =
             |> Seq.choose (fun leaf -> leaf.SorterEval))
         |> Seq.toArray
 
-    member internal this.AddSorterEval (sorterEval: sorterEval) =
+    member internal this.AddSorterEval (sorterEval: sorterEval, ?onLeafCreated: sorterEval -> unit) =
+        let onLeafCreated = defaultArg onLeafCreated ignore
         let key = sorterEvalKey.create
-                      sorterEval.CeBlockEval.CeUseCounts.UsedCeCount
-                      sorterEval.CeBlockEval.getStageSequence.StageLength
-                      (sorterEval.CeBlockEval.UnsortedCount = 0<sortableCount>)
+                        sorterEval.CeBlockEval.CeUseCounts.UsedCeCount
+                        sorterEval.CeBlockEval.getStageSequence.StageLength
+                        (sorterEval.CeBlockEval.UnsortedCount = 0<sortableCount>)
         let layer =
             match this.layers.TryGetValue(key) with
             | true, existing -> existing
@@ -123,11 +127,14 @@ type sorterEvalHierarchy =
                 let newLayer = sorterEvalLayer.create()
                 this.layers.[key] <- newLayer
                 newLayer
-        layer.Add(sorterEval, this.maxRepresentativesPerLayer)
+        
+        // Pass the action down to the layer
+        layer.Add(sorterEval, this.maxRepresentativesPerLayer, onLeafCreated)
 
 
-    member this.AddSorterEvals  (sorterEvals: sorterEval seq) =
-           sorterEvals |> Seq.iter this.AddSorterEval
+    member this.AddSorterEvals (sorterEvals: sorterEval seq, ?onLeafCreated: sorterEval -> unit) =
+        let onAction = defaultArg onLeafCreated ignore
+        sorterEvals |> Seq.iter (fun eval -> this.AddSorterEval(eval, onAction))
 
 
     member this.MergeLayer (key: sorterEvalKey) (layer: sorterEvalLayer) =
