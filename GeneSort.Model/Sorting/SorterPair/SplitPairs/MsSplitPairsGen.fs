@@ -9,6 +9,7 @@ open GeneSort.Model.Sorting
 type msSplitPairsGen = 
     private 
         { id: Guid<sorterPairModelMakerId>
+          rngFactory: rngFactory
           sortingWidth: int<sortingWidth>
           firstPrefixMaker: sorterModelMaker
           firstSuffixMaker: sorterModelMaker
@@ -24,6 +25,7 @@ type msSplitPairsGen =
     /// - the two suffix makers don't have the same ceLength
     static member create 
             (sortingWidth: int<sortingWidth>)
+            (rngFactory: rngFactory)
             (firstPrefixMaker: sorterModelMaker)
             (firstSuffixMaker: sorterModelMaker)
             (secondPrefixMaker: sorterModelMaker)
@@ -68,12 +70,14 @@ type msSplitPairsGen =
         
         { id = id
           sortingWidth = sortingWidth
+          rngFactory = rngFactory
           firstPrefixMaker = firstPrefixMaker
           firstSuffixMaker = firstSuffixMaker
           secondPrefixMaker = secondPrefixMaker
           secondSuffixMaker = secondSuffixMaker }
     
     member this.Id with get () = this.id
+    member this.RngFactory with get() = this.rngFactory
     member this.SortingWidth with get () = this.sortingWidth
     member this.FirstPrefixMaker with get () = this.firstPrefixMaker
     member this.FirstSuffixMaker with get () = this.firstSuffixMaker
@@ -97,21 +101,38 @@ module MsSplitPairsGen =
 
 
     /// Generates an msSplitPairs instance by making sorter models from each maker
-    let makeMsSplitPairs (index: int) (gen: msSplitPairsGen) : msSplitPairs =
+    let makeMsSplitPairsFromId
+                (id : Guid<sorterPairModelId>)
+                (gen: msSplitPairsGen) : msSplitPairs =
 
-        let firstPrefix = SorterModelMaker.makeSorterModel index gen.FirstPrefixMaker 
-        let firstSuffix = SorterModelMaker.makeSorterModel index gen.FirstSuffixMaker
-        let secondPrefix = SorterModelMaker.makeSorterModel index gen.SecondPrefixMaker
-        let secondSuffix = SorterModelMaker.makeSorterModel index gen.SecondSuffixMaker
+        let firstPrefix = SorterModelMaker.makeSorterModelFromIndex 0 gen.FirstPrefixMaker 
+        let firstSuffix = SorterModelMaker.makeSorterModelFromIndex 0 gen.FirstSuffixMaker
+        let secondPrefix = SorterModelMaker.makeSorterModelFromIndex 0 gen.SecondPrefixMaker
+        let secondSuffix = SorterModelMaker.makeSorterModelFromIndex 0 gen.SecondSuffixMaker
         
         msSplitPairs.create
+            id
             gen.SortingWidth
             firstPrefix
             firstSuffix
             secondPrefix
             secondSuffix
 
+
+    /// Generates an msSplitPairs instance by making sorter models from each maker
+    let makeMsSplitPairsFromIndex 
+                (index: int) 
+                (gen: msSplitPairsGen) : msSplitPairs =
+        let id =
+            [
+                index :> obj
+                gen.Id :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterPairModelId>
+
+        makeMsSplitPairsFromId id gen
+
+
     let makeSorterIdsWithTags (index: int) (gen: msSplitPairsGen) 
                                     : (Guid<sorterId> * modelTag) [] =
-        let splitPairs = makeMsSplitPairs index gen
+        let splitPairs = makeMsSplitPairsFromIndex index gen
         splitPairs |> MsSplitPairs.getSorterIdsWithTags

@@ -56,6 +56,7 @@ module SortingMutator =
         | Single smm -> smm |> SorterModelMutator.getCeLength
         | Pair spmm -> spmm |> SorterPairModelMutator.getCeLength
 
+
     let makeMutantSorting
                 (index: int)  
                 (model: sortingMutator) : sorting =
@@ -64,9 +65,9 @@ module SortingMutator =
         | Pair spmm -> spmm |> SorterPairModelMutator.makeMutantSorterPairModel index |> sorting.Pairs
 
 
-    let makeMutantSorterIdsWithTags (index: int) 
-                              (model: sortingMutator)  
-                                : (Guid<sorterId> * modelTag) [] = 
+    let makeMutantSorterIdsWithTags 
+                        (index: int) 
+                        (model: sortingMutator) : (Guid<sorterId> * modelTag) [] = 
         match model with
         | Single smm -> smm |> SorterModelMutator.makeMutantSorterIdWithTag index |> Array.singleton
         | Pair spmm -> spmm |> SorterPairModelMutator.makeMutantSorterIdsWithTags index

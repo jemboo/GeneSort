@@ -4,10 +4,12 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting
+open System
 
 type msSplitPairsMutator = 
     private 
         { id: Guid<sorterPairModelMutatorId>
+          rngFactory: rngFactory
           sortingWidth: int<sortingWidth>
           parentModel: msSplitPairs
           firstPrefixMutator: sorterModelMutator
@@ -24,6 +26,7 @@ type msSplitPairsMutator =
     /// - the two suffix makers don't have the same ceLength
     static member create 
             (sortingWidth: int<sortingWidth>)
+            (rngFactory: rngFactory)
             (firstPrefixMutator: sorterModelMutator)
             (firstSuffixMutator: sorterModelMutator)
             (secondPrefixMutator: sorterModelMutator)
@@ -68,6 +71,7 @@ type msSplitPairsMutator =
 
 
         let parentModel = msSplitPairs.create
+                            (Guid.NewGuid() |> UMX.tag<sorterPairModelId>)
                             sortingWidth
                             (firstPrefixMutator |> SorterModelMutator.getParentSorterModel)
                             (firstSuffixMutator |> SorterModelMutator.getParentSorterModel)
@@ -76,6 +80,7 @@ type msSplitPairsMutator =
         
         { id = id
           sortingWidth = sortingWidth
+          rngFactory = rngFactory
           parentModel = parentModel
           firstPrefixMutator = firstPrefixMutator
           firstSuffixMutator = firstSuffixMutator
@@ -83,6 +88,7 @@ type msSplitPairsMutator =
           secondSuffixMutator = secondSuffixMutator }
     
     member this.Id with get () = this.id
+    member this.RngFactory with get() = this.rngFactory
     member this.SortingWidth with get () = this.sortingWidth
     member this.ParentModel with get () = this.parentModel  
     member this.FirstPrefixMutator with get () = this.firstPrefixMutator
@@ -115,12 +121,20 @@ module MsSplitPairsMutator =
     let makeMsSplitPairs 
                 (index: int) 
                 (mutator: msSplitPairsMutator) : msSplitPairs =
+
+        let id = getMutantSortingId index mutator
+
+        let rng = %id |> RngFactory.createRng mutator.RngFactory
+
+        let yab = (rng.NextGuid())
+
         let firstPrefix = SorterModelMutator.makeMutantSorterModel index mutator.FirstPrefixMutator 
         let firstSuffix = SorterModelMutator.makeMutantSorterModel index mutator.FirstSuffixMutator
         let secondPrefix = SorterModelMutator.makeMutantSorterModel index mutator.SecondPrefixMutator
         let secondSuffix = SorterModelMutator.makeMutantSorterModel index mutator.SecondSuffixMutator
         
         msSplitPairs.create
+                        (%id |> UMX.tag<sorterPairModelId>)
                         mutator.SortingWidth
                         firstPrefix
                         firstSuffix

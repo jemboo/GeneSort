@@ -33,13 +33,33 @@ module SorterPairModelMaker =
         | SplitPairs2 mspg -> MsSplitPairsGen.getSortingWidth mspg
 
 
-    let makeSorterPairModel
+
+    let makeSorterPairModelFromId
+                (sortingId: Guid<sortingId>) 
+                (model: sorterPairModelMaker) : sorterPairModel =
+
+
+        failwith "not implemented"
+        //match model with
+        //| SplitPairs mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs index 
+        //                          |> sorterPairModel.SplitPairs
+        //| SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs index 
+        //                           |> sorterPairModel.SplitPairs2
+
+
+    let makeSorterPairModelFromIndex
                 (index: int)  
                 (model: sorterPairModelMaker) : sorterPairModel =
+
+        let id = [
+                        model |> getId :> obj
+                        index :> obj
+                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingId>
+
         match model with
-        | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs index 
+        | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairsFromIndex index 
                                   |> sorterPairModel.SplitPairs
-        | SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs index 
+        | SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairsFromIndex index 
                                    |> sorterPairModel.SplitPairs2
 
 

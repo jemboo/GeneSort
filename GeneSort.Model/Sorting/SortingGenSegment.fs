@@ -41,7 +41,7 @@ type sortingGenSegment =
         let sortings = 
             [| for i in 0 .. %this.count - 1 do
                 let index = %this.firstIndex + i
-                SortingMaker.makeSorting index this.sortingMaker |]
+                SortingMaker.makeSortingFromIndex index this.sortingMaker |]
 
         let id = (%this.id) |> UMX.tag<sortingSetId>
         sortingSet.create id sortings

@@ -23,6 +23,7 @@ type msSplitPairs =
     /// - the two prefixes don't have the same ceLength
     /// - the two suffixes don't have the same ceLength
     static member create
+            (id : Guid<sorterPairModelId>)
             (sortingWidth: int<sortingWidth>)
             (firstPrefix: sorterModel)
             (firstSuffix: sorterModel)
@@ -54,14 +55,6 @@ type msSplitPairs =
         
         if firstSuffixCeLength <> secondSuffixCeLength then
             failwith $"Both suffixes must have the same ceLength. FirstSuffix: {%firstSuffixCeLength}, SecondSuffix: {%secondSuffixCeLength}"
-        
-        let id =
-            [
-                firstPrefix |> SorterModel.getId :> obj
-                firstSuffix |> SorterModel.getId :> obj
-                secondPrefix |> SorterModel.getId :> obj
-                secondSuffix |> SorterModel.getId :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterPairModelId>
 
         { id = id
           sortingWidth = sortingWidth

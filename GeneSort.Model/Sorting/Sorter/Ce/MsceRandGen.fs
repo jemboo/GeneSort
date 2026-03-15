@@ -72,7 +72,7 @@ type msceRandGen =
     member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMaker.makeSorterModelId this.Id index
 
-    member this.MakeSorterModel (id: Guid<sorterModelId>) : msce =
+    member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msce =
         let rando = this.RngFactory.Create %id
         let ceCodes = 
             if this.ExcludeSelfCe then
@@ -92,7 +92,7 @@ type msceRandGen =
 
     member this.MakeSorterModelFromIndex (index: int) : msce =
         let id = this.MakeSorterModelId index
-        this.MakeSorterModel id
+        this.MakeSorterModelFromId id
 
 
 

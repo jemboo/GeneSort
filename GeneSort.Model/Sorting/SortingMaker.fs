@@ -31,16 +31,26 @@ module SortingMaker =
         | Single smm -> smm |> SorterModelMaker.getCeLength
         | Pair spmm -> spmm |> SorterPairModelMaker.getCeLength
 
-    let makeSorting
+
+    let makeSortingFromIndex
                 (index: int)  
                 (model: sortingMaker) : sorting =
         match model with
-        | Single smm -> smm |> SorterModelMaker.makeSorterModel index |> sorting.Single
-        | Pair spmm -> spmm |> SorterPairModelMaker.makeSorterPairModel index |> sorting.Pairs
+        | Single smm -> smm |> SorterModelMaker.makeSorterModelFromIndex index |> sorting.Single
+        | Pair spmm -> spmm |> SorterPairModelMaker.makeSorterPairModelFromIndex index |> sorting.Pairs
 
 
-    let makeSorterIdsWithTags (index: int) (model: sortingMaker)  
-                                        : (Guid<sorterId> * modelTag) [] = 
+    let makeSortingFromId
+                (sortingId: Guid<sortingId>) 
+                (model: sortingMaker) : sorting =
+        match model with
+        | Single smm -> smm |> SorterModelMaker.makeSorterModelFromId sortingId |> sorting.Single
+        | Pair spmm -> spmm |> SorterPairModelMaker.makeSorterPairModelFromId sortingId |> sorting.Pairs
+
+
+    let makeSorterIdsWithTags 
+                 (index: int) 
+                 (model: sortingMaker) : (Guid<sorterId> * modelTag) [] = 
         match model with
         | Single smm -> smm |> SorterModelMaker.makeSorterIdWithTag index |> Array.singleton
         | Pair spmm -> spmm |> SorterPairModelMaker.makeSorterIdsWithTags index

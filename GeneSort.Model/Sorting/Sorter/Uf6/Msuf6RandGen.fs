@@ -74,7 +74,7 @@ type msuf6RandGen =
     member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMaker.makeSorterModelId this.Id index
 
-    member this.MakeSorterModel (id: Guid<sorterModelId>) : msuf6 =
+    member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msuf6 =
         let rng = this.RngFactory.Create %id
         let genRatesArray = this.GenRates
         let stageLength = %this.StageLength
@@ -88,7 +88,7 @@ type msuf6RandGen =
 
     member this.MakeSorterModelFromIndex (index: int) : msuf6 =
         let id = this.MakeSorterModelId index
-        this.MakeSorterModel id
+        this.MakeSorterModelFromId id
 
 
 module Msuf6RandGen =

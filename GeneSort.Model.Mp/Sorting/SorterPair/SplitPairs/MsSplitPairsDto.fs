@@ -8,18 +8,21 @@ open MessagePack.FSharp
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.SorterPair.SplitPairs
 open GeneSort.Model.Mp.Sorting.Sorter
+open GeneSort.Model.Sorting
 
 [<MessagePackObject>]
 type msSplitPairsDto = {
     [<Key(0)>]
     SortingWidth: int
     [<Key(1)>]
-    FirstPrefix: sorterModelDto
+    Id: Guid
     [<Key(2)>]
-    FirstSuffix: sorterModelDto
+    FirstPrefix: sorterModelDto
     [<Key(3)>]
-    SecondPrefix: sorterModelDto
+    FirstSuffix: sorterModelDto
     [<Key(4)>]
+    SecondPrefix: sorterModelDto
+    [<Key(5)>]
     SecondSuffix: sorterModelDto
 }
 
@@ -31,6 +34,7 @@ module MsSplitPairsDto =
     let fromDomain (model: msSplitPairs) : msSplitPairsDto =
         {
             SortingWidth = %model.SortingWidth
+            Id = %model.Id
             FirstPrefix = SorterModelDto.fromDomain model.FirstPrefix
             FirstSuffix = SorterModelDto.fromDomain model.FirstSuffix
             SecondPrefix = SorterModelDto.fromDomain model.SecondPrefix
@@ -40,6 +44,7 @@ module MsSplitPairsDto =
     let toDomain (dto: msSplitPairsDto) : msSplitPairs =
         try
             msSplitPairs.create
+                (UMX.tag<sorterPairModelId> dto.Id)
                 (UMX.tag<sortingWidth> dto.SortingWidth)
                 (SorterModelDto.toDomain dto.FirstPrefix)
                 (SorterModelDto.toDomain dto.FirstSuffix)

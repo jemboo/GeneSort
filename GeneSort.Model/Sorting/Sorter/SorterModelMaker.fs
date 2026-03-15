@@ -56,13 +56,26 @@ module SorterModelMaker =
         | SmmMsuf6RandGen msuf6 -> msuf6.Id
 
 
-    let makeSorterModel (index: int)  (model: sorterModelMaker) : sorterModel =
+    let makeSorterModelFromIndex (index: int)  (model: sorterModelMaker) : sorterModel =
         match model with
         | SmmMsceRandGen msce -> msce.MakeSorterModelFromIndex index |> sorterModel.Msce
         | SmmMssiRandGen mssi -> mssi.MakeSorterModelFromIndex index |> sorterModel.Mssi
         | SmmMsrsRandGen msrs -> msrs.MakeSorterModelFromIndex index |> sorterModel.Msrs
         | SmmMsuf4RandGen msuf4 -> msuf4.MakeSorterModelFromIndex index |> sorterModel.Msuf4
         | SmmMsuf6RandGen msuf6 -> msuf6.MakeSorterModelFromIndex index |> sorterModel.Msuf6
+
+
+    let makeSorterModelFromId 
+                    (sortingId: Guid<sortingId>)  
+                    (model: sorterModelMaker) : sorterModel =
+        let sorterModelId = %sortingId |> UMX.tag<sorterModelId>
+        match model with
+        | SmmMsceRandGen msce -> msce.MakeSorterModelFromId sorterModelId |> sorterModel.Msce
+        | SmmMssiRandGen mssi -> mssi.MakeSorterModelFromId sorterModelId |> sorterModel.Mssi
+        | SmmMsrsRandGen msrs -> msrs.MakeSorterModelFromId sorterModelId |> sorterModel.Msrs
+        | SmmMsuf4RandGen msuf4 -> msuf4.MakeSorterModelFromId sorterModelId |> sorterModel.Msuf4
+        | SmmMsuf6RandGen msuf6 -> msuf6.MakeSorterModelFromId sorterModelId |> sorterModel.Msuf6
+
 
 
     let makeSorterIdWithTag (index:int) (model:sorterModelMaker) : Guid<sorterId> * modelTag =
