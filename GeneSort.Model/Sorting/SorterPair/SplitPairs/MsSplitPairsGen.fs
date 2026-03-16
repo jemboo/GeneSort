@@ -102,16 +102,19 @@ module MsSplitPairsGen =
 
     /// Generates an msSplitPairs instance by making sorter models from each maker
     let makeMsSplitPairsFromId
-                (id : Guid<sorterPairModelId>)
+                (id: Guid<sortingId>)
                 (gen: msSplitPairsGen) : msSplitPairs =
 
-        let firstPrefix = SorterModelMaker.makeSorterModelFromIndex 0 gen.FirstPrefixMaker 
-        let firstSuffix = SorterModelMaker.makeSorterModelFromIndex 0 gen.FirstSuffixMaker
-        let secondPrefix = SorterModelMaker.makeSorterModelFromIndex 0 gen.SecondPrefixMaker
-        let secondSuffix = SorterModelMaker.makeSorterModelFromIndex 0 gen.SecondSuffixMaker
+        let rng = %id |> RngFactory.createRng gen.RngFactory
+        let makePrefixId () = (rng.NextGuid()) |> UMX.tag<sortingId>
+
+        let firstPrefix = SorterModelMaker.makeSorterModelFromId (makePrefixId()) gen.FirstPrefixMaker 
+        let firstSuffix = SorterModelMaker.makeSorterModelFromId (makePrefixId()) gen.FirstSuffixMaker
+        let secondPrefix = SorterModelMaker.makeSorterModelFromId (makePrefixId()) gen.SecondPrefixMaker
+        let secondSuffix = SorterModelMaker.makeSorterModelFromId (makePrefixId()) gen.SecondSuffixMaker
         
         msSplitPairs.create
-            id
+            (%id |> UMX.tag<sorterPairModelId>)
             gen.SortingWidth
             firstPrefix
             firstSuffix
@@ -127,7 +130,7 @@ module MsSplitPairsGen =
             [
                 index :> obj
                 gen.Id :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterPairModelId>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingId>
 
         makeMsSplitPairsFromId id gen
 

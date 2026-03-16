@@ -117,21 +117,18 @@ module MsSplitPairsMutator =
                 index :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingId>
 
-    /// Generates an msSplitPairs instance by making sorter models from each maker
-    let makeMsSplitPairs 
-                (index: int) 
+    /// Generates an msSplitPairs instance based on sortingId
+    let makeMsSplitPairsFromId
+                (id: Guid<sortingId>) 
                 (mutator: msSplitPairsMutator) : msSplitPairs =
 
-        let id = getMutantSortingId index mutator
-
         let rng = %id |> RngFactory.createRng mutator.RngFactory
+        let makePrefixId () = (rng.NextGuid()) |> UMX.tag<sortingId>
 
-        let yab = (rng.NextGuid())
-
-        let firstPrefix = SorterModelMutator.makeMutantSorterModel index mutator.FirstPrefixMutator 
-        let firstSuffix = SorterModelMutator.makeMutantSorterModel index mutator.FirstSuffixMutator
-        let secondPrefix = SorterModelMutator.makeMutantSorterModel index mutator.SecondPrefixMutator
-        let secondSuffix = SorterModelMutator.makeMutantSorterModel index mutator.SecondSuffixMutator
+        let firstPrefix = SorterModelMutator.makeMutantSorterModelFromId (makePrefixId()) mutator.FirstPrefixMutator 
+        let firstSuffix = SorterModelMutator.makeMutantSorterModelFromId (makePrefixId()) mutator.FirstSuffixMutator
+        let secondPrefix = SorterModelMutator.makeMutantSorterModelFromId (makePrefixId()) mutator.SecondPrefixMutator
+        let secondSuffix = SorterModelMutator.makeMutantSorterModelFromId (makePrefixId()) mutator.SecondSuffixMutator
         
         msSplitPairs.create
                         (%id |> UMX.tag<sorterPairModelId>)
@@ -142,7 +139,16 @@ module MsSplitPairsMutator =
                         secondSuffix
 
 
+    /// Generates an msSplitPairs instance based on index
+    let makeMsSplitPairsFromIndex 
+                (index: int) 
+                (mutator: msSplitPairsMutator) : msSplitPairs =
+
+        let id = getMutantSortingId index mutator
+        makeMsSplitPairsFromId id mutator
+
+
     let makeSorterIdsWithTags (index: int) (mutator: msSplitPairsMutator) 
                                     : (Guid<sorterId> * modelTag) [] =
-        let splitPairs = makeMsSplitPairs index mutator
+        let splitPairs = makeMsSplitPairsFromIndex index mutator
         splitPairs |> MsSplitPairs.getSorterIdsWithTags

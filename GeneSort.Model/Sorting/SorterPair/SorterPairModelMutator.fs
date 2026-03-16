@@ -61,16 +61,27 @@ module SorterPairModelMutator =
         | sorterPairModelMutator.SplitPairs2 mspg -> MsSplitPairsMutator.getSortingWidth mspg
 
 
-    let makeMutantSorterPairModel
-                (index: int)  
+    let makeSorterPairModelFromId
+                (sortingId: Guid<sortingId>) 
                 (model: sorterPairModelMutator) : sorterPairModel =
         match model with
         | sorterPairModelMutator.SplitPairs mspg -> 
-                mspg |> MsSplitPairsMutator.makeMsSplitPairs index 
+                mspg |> MsSplitPairsMutator.makeMsSplitPairsFromId sortingId 
                      |> sorterPairModel.SplitPairs
         | sorterPairModelMutator.SplitPairs2 mspg -> 
-                mspg |> MsSplitPairsMutator.makeMsSplitPairs index 
+                mspg |> MsSplitPairsMutator.makeMsSplitPairsFromId sortingId 
                      |> sorterPairModel.SplitPairs2
+
+
+    let makeSorterPairModelFromIndex
+                (index: int)  
+                (model: sorterPairModelMutator) : sorterPairModel =
+        let id = [
+                        model |> getId :> obj
+                        index :> obj
+                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingId>
+
+        model |> makeSorterPairModelFromId id
 
 
     let makeMutantSorterIdsWithTags (index: int) (model: sorterPairModelMutator) : (Guid<sorterId> * modelTag) [] =

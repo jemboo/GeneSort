@@ -61,8 +61,8 @@ module SortingMutator =
                 (index: int)  
                 (model: sortingMutator) : sorting =
         match model with
-        | Single smm -> smm |> SorterModelMutator.makeMutantSorterModel index |> sorting.Single
-        | Pair spmm -> spmm |> SorterPairModelMutator.makeMutantSorterPairModel index |> sorting.Pairs
+        | Single smm -> smm |> SorterModelMutator.makeMutantSorterModelFromIndex index |> sorting.Single
+        | Pair spmm -> spmm |> SorterPairModelMutator.makeSorterPairModelFromIndex index |> sorting.Pairs
 
 
     let makeMutantSorterIdsWithTags 

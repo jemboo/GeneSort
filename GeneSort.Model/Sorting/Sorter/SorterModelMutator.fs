@@ -84,7 +84,7 @@ module SorterModelMutator =
         | SmmMsuf6RandMutate msuf6 -> msuf6.CeLength
 
 
-    let makeMutantSorterModel 
+    let makeMutantSorterModelFromIndex 
                 (index: int)  
                 (model: sorterModelMutator) : sorterModel =
         match model with
@@ -93,6 +93,20 @@ module SorterModelMutator =
         | SmmMsrsRandMutate msrs -> msrs.MakeSorterModelFromIndex index |> sorterModel.Msrs
         | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModelFromIndex index |> sorterModel.Msuf4
         | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModelFromIndex index |> sorterModel.Msuf6
+
+
+
+    let makeMutantSorterModelFromId 
+                (sortingId: Guid<sortingId>)  
+                (model: sorterModelMutator) : sorterModel =
+
+        let sorterModelId = %sortingId |> UMX.tag<sorterModelId>
+        match model with
+        | SmmMsceRandMutate msce -> msce.MakeSorterModelFromId sorterModelId |> sorterModel.Msce
+        | SmmMssiRandMutate mssi -> mssi.MakeSorterModelFromId sorterModelId |> sorterModel.Mssi
+        | SmmMsrsRandMutate msrs -> msrs.MakeSorterModelFromId sorterModelId |> sorterModel.Msrs
+        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModelFromId sorterModelId |> sorterModel.Msuf4
+        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModelFromId sorterModelId |> sorterModel.Msuf6
 
 
     let makeMutantSorterIdWithTag (index:int) (model:sorterModelMutator) : Guid<sorterId> * modelTag =

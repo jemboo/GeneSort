@@ -38,14 +38,11 @@ module SorterPairModelMaker =
                 (sortingId: Guid<sortingId>) 
                 (model: sorterPairModelMaker) : sorterPairModel =
 
-
-        failwith "not implemented"
-        //match model with
-        //| SplitPairs mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs index 
-        //                          |> sorterPairModel.SplitPairs
-        //| SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairs index 
-        //                           |> sorterPairModel.SplitPairs2
-
+        match model with
+        | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairsFromId sortingId 
+                                  |> sorterPairModel.SplitPairs
+        | SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairsFromId sortingId 
+                                   |> sorterPairModel.SplitPairs2
 
     let makeSorterPairModelFromIndex
                 (index: int)  
@@ -56,11 +53,7 @@ module SorterPairModelMaker =
                         index :> obj
                  ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingId>
 
-        match model with
-        | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairsFromIndex index 
-                                  |> sorterPairModel.SplitPairs
-        | SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairsFromIndex index 
-                                   |> sorterPairModel.SplitPairs2
+        makeSorterPairModelFromId id model 
 
 
     let makeSorterIdsWithTags (index:int) (model:sorterPairModelMaker)
