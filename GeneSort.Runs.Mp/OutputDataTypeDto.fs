@@ -19,9 +19,9 @@ module OutputDataTypeDto =
         | SortableTest so -> { Tag = "SortableTest"; Value = so }
         | SortableTestSet so -> { Tag = "SortableTestSet"; Value = so }
         | SortingSet so -> { Tag = "SorterModelSet"; Value = so }
-        | SorterModelSetMaker so -> { Tag = "SorterModelSetMaker"; Value = so }
+        | SorterModelSetGen so -> { Tag = "SorterModelSetGen"; Value = so }
         | SortableTestModelSet so -> { Tag = "SortableTestModelSet"; Value = so }
-        | SortableTestModelSetMaker so -> { Tag = "SortableTestModelSetMaker"; Value = so }
+        | SortableTestModelSetGen so -> { Tag = "SortableTestModelSetGen"; Value = so }
         | SorterSetEval so -> { Tag = "SorterSetEval"; Value = so }
         | SorterSetEvalBins so -> { Tag = "SorterSetEvalBins"; Value = so }
         | Project -> { Tag = "Project"; Value = "" }
@@ -34,9 +34,9 @@ module OutputDataTypeDto =
         | "SortableTest" -> SortableTest dto.Value
         | "SortableTestSet" -> SortableTestSet dto.Value
         | "SorterModelSet" -> SortingSet dto.Value
-        | "SorterModelSetMaker" -> SorterModelSetMaker dto.Value
+        | "SorterModelSetGen" -> SorterModelSetGen dto.Value
         | "SortableTestModelSet" -> SortableTestModelSet dto.Value
-        | "SortableTestModelSetMaker" -> SortableTestModelSetMaker dto.Value
+        | "SortableTestModelSetGen" -> SortableTestModelSetGen dto.Value
         | "SorterSetEval" -> SorterSetEval dto.Value
         | "SorterSetEvalBins" -> SorterSetEvalBins dto.Value
         | "Project" -> Project

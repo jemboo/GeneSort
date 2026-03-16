@@ -6,7 +6,7 @@ open GeneSort.Model.Sorting
 open GeneSort.Model.Mp.Sorting.SorterPair
 open GeneSort.Model.Mp.Sorting.Sorter
 
-[<MessagePackObject; Union(0, typeof<sorterModelMakerDto>); Union(1, typeof<sorterPairModelMakerDto>)>]
+[<MessagePackObject; Union(0, typeof<sorterModelGenDto>); Union(1, typeof<sorterPairModelGenDto>)>]
 type sortingMutatorDto =
     | Single of sorterModelMutatorDto
     | Pair of sorterPairModelMutatorDto

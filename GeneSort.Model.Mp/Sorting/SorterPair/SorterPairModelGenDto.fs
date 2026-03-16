@@ -6,27 +6,27 @@ open GeneSort.Model.Sorting.SorterPair
 open GeneSort.Model.Mp.SorterPair.SplitPairs
 
 [<MessagePackObject; Union(0, typeof<msSplitPairsGenDto>); Union(1, typeof<msSplitPairsGenDto>)>]
-type sorterPairModelMakerDto =
+type sorterPairModelGenDto =
     | SplitPairs of msSplitPairsGenDto
     | SplitPairs2 of msSplitPairsGenDto
 
-module SorterPairModelMakerDto =
+module SorterPairModelGenDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let fromDomain (sorterPairModelMaker: sorterPairModelMaker) : sorterPairModelMakerDto =
+    let fromDomain (sorterPairModelMaker: sorterPairModelGen) : sorterPairModelGenDto =
         match sorterPairModelMaker with
-        | sorterPairModelMaker.SplitPairs msSplitPairsGen ->
+        | sorterPairModelGen.SplitPairs msSplitPairsGen ->
             SplitPairs (MsSplitPairsGenDto.fromDomain msSplitPairsGen)
-        | sorterPairModelMaker.SplitPairs2 msSplitPairsGen ->
+        | sorterPairModelGen.SplitPairs2 msSplitPairsGen ->
             SplitPairs2 (MsSplitPairsGenDto.fromDomain msSplitPairsGen)
 
-    let toDomain (dto: sorterPairModelMakerDto) : sorterPairModelMaker =
+    let toDomain (dto: sorterPairModelGenDto) : sorterPairModelGen =
         try
             match dto with
             | SplitPairs msSplitPairsGenDto ->
-                sorterPairModelMaker.SplitPairs (MsSplitPairsGenDto.toDomain msSplitPairsGenDto)
+                sorterPairModelGen.SplitPairs (MsSplitPairsGenDto.toDomain msSplitPairsGenDto)
             | SplitPairs2 msSplitPairsGenDto ->
-                sorterPairModelMaker.SplitPairs2 (MsSplitPairsGenDto.toDomain msSplitPairsGenDto)
+                sorterPairModelGen.SplitPairs2 (MsSplitPairsGenDto.toDomain msSplitPairsGenDto)
         with
         | ex -> failwith $"Failed to convert sorterPairModelMakerDto: {ex.Message}"

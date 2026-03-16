@@ -104,20 +104,20 @@ module OutputDataFile =
                             let! domain = deserializeDto<sortingSetDto, sortingSet> stream token SortingSetDto.toDomain
                             return outputData.SortingSet domain
                         }
-                    | outputDataType.SorterModelSetMaker _ ->
+                    | outputDataType.SorterModelSetGen _ ->
                         async {
                             let! domain = deserializeDto<sortingSetMakerDto, sortingGenSegment> stream token SortingSetMakerDto.toDomain
-                            return outputData.SortingSetMaker domain
+                            return outputData.SortingSetGen domain
                         }
                     | outputDataType.SortableTestModelSet _ ->
                         async {
                             let! domain = deserializeDto<sortableTestModelSetDto, sortableTestModelSet> stream token SortableTestModelSetDto.toDomain
                             return outputData.SortableTestModelSet domain
                         }
-                    | outputDataType.SortableTestModelSetMaker _ ->
+                    | outputDataType.SortableTestModelSetGen _ ->
                         async {
-                            let! domain = deserializeDto<sortableTestModelSetMakerDto, sortableTestModelSetMaker> stream token SortableTestModelSetMakerDto.toDomain
-                            return outputData.SortableTestModelSetMaker domain
+                            let! domain = deserializeDto<sortableTestModelSetGenDto, sortableTestModelSetGen> stream token SortableTestModelSetGenDto.toDomain
+                            return outputData.SortableTestModelSetGen domain
                         }
                     | outputDataType.SorterSetEval _ ->
                         async {
@@ -187,13 +187,13 @@ module OutputDataFile =
                                 serializeDto stream sts SortableTestDto.fromDomain
                             | outputData.SortingSet sms ->
                                 serializeDto stream sms SortingSetDto.fromDomain
-                            | outputData.SortingSetMaker sms ->
+                            | outputData.SortingSetGen sms ->
                               //  serializeDto stream sms SorterModelSetMakerDto.fromDomain
                                 failwith "Not implemented: SorterModelSetMaker serialization"
                             | outputData.SortableTestModelSet sts ->
                                 serializeDto stream sts SortableTestModelSetDto.fromDomain
-                            | outputData.SortableTestModelSetMaker stsm ->
-                                serializeDto stream stsm SortableTestModelSetMakerDto.fromDomain
+                            | outputData.SortableTestModelSetGen stsm ->
+                                serializeDto stream stsm SortableTestModelSetGenDto.fromDomain
                             | outputData.SorterSetEval sse ->
                                 serializeDto stream sse SorterSetEvalDto.fromDomain
                             | outputData.SorterSetEvalBins sse ->

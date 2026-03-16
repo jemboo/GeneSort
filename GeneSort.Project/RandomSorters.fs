@@ -224,7 +224,7 @@ module RandomSorters =
     let outputDataTypes = 
             [|
                 outputDataType.RunParameters;
-                outputDataType.SorterModelSetMaker "";
+                outputDataType.SorterModelSetGen "";
                 outputDataType.SorterSet "";
                 outputDataType.TextReport ("Bins" |> UMX.tag<textReportName>); 
                 outputDataType.TextReport ("Profiles" |> UMX.tag<textReportName>); 
@@ -271,33 +271,33 @@ module RandomSorters =
                     } |> Result.ofOption (sprintf "Run %s: Missing required parameters" %runId) |> asAsync
 
                 // 3. Sorter Model Logic (Pure Computation)
-                let sorterModelMaker =
+                let sorterModelGen =
                     match sorterModelType with
                     | sorterModelType.Msce -> 
                         msceRandGen.create rngFactory sortingWidth excludeSelfCe ceLength 
-                        |> sorterModelMaker.SmmMsceRandGen
+                        |> sorterModelGen.SmmMsceRandGen
                     | sorterModelType.Mssi -> 
                         mssiRandGen.create rngFactory sortingWidth stageLength 
-                        |> sorterModelMaker.SmmMssiRandGen
+                        |> sorterModelGen.SmmMssiRandGen
                     | sorterModelType.Msrs -> 
                         let opsGenRatesArray = OpsGenRatesArray.createUniform %stageLength
                         msrsRandGen.create rngFactory sortingWidth opsGenRatesArray 
-                        |> sorterModelMaker.SmmMsrsRandGen
+                        |> sorterModelGen.SmmMsrsRandGen
                     | sorterModelType.Msuf4 -> 
                         let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageLength %sortingWidth
                         msuf4RandGen.create rngFactory sortingWidth stageLength uf4GenRatesArray 
-                        |> sorterModelMaker.SmmMsuf4RandGen
+                        |> sorterModelGen.SmmMsuf4RandGen
                     | sorterModelType.Msuf6 -> 
                         let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
                         msuf6RandGen.create rngFactory sortingWidth stageLength uf6GenRatesArray 
-                        |> sorterModelMaker.SmmMsuf6RandGen
+                        |> sorterModelGen.SmmMsuf6RandGen
 
                 let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-                let sortingSetMaker = sortingGenSegment.create 
-                                                (sorterModelMaker |> sortingMaker.Single)
+                let sortingSetGen = sortingGenSegment.create 
+                                                (sorterModelGen |> sortingGen.Single)
                                                 firstIndex 
                                                 sorterCount
-                let sortingSet = sortingSetMaker.MakeSortingSet
+                let sortingSet = sortingSetGen.MakeSortingSet
 
                 // 4. Saves
                 let qpSortingSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "") 

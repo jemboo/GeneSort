@@ -8,26 +8,26 @@ open GeneSort.Model.Sorting
 open GeneSort.Model.Sorting.SorterPair.SplitPairs
 
 
-type sorterPairModelMaker =
+type sorterPairModelGen =
      | SplitPairs of msSplitPairsGen
      | SplitPairs2 of msSplitPairsGen
 
 
 
-module SorterPairModelMaker =
+module SorterPairModelGen =
 
-    let getCeLength (model: sorterPairModelMaker) : int<ceLength> =
+    let getCeLength (model: sorterPairModelGen) : int<ceLength> =
         match model with
-        | sorterPairModelMaker.SplitPairs mspg -> MsSplitPairsGen.getCeLength mspg
-        | sorterPairModelMaker.SplitPairs2 mspg -> MsSplitPairsGen.getCeLength mspg
+        | sorterPairModelGen.SplitPairs mspg -> MsSplitPairsGen.getCeLength mspg
+        | sorterPairModelGen.SplitPairs2 mspg -> MsSplitPairsGen.getCeLength mspg
 
 
-    let getId (model: sorterPairModelMaker) : Guid<sorterPairModelMakerId> =
+    let getId (model: sorterPairModelGen) : Guid<sorterPairModelMakerId> =
         match model with
         | SplitPairs mspg -> mspg.Id
         | SplitPairs2 mspg -> mspg.Id
 
-    let getSortingWidth (model: sorterPairModelMaker) : int<sortingWidth> =
+    let getSortingWidth (model: sorterPairModelGen) : int<sortingWidth> =
         match model with
         | SplitPairs mspg -> MsSplitPairsGen.getSortingWidth mspg
         | SplitPairs2 mspg -> MsSplitPairsGen.getSortingWidth mspg
@@ -36,7 +36,7 @@ module SorterPairModelMaker =
 
     let makeSorterPairModelFromId
                 (sortingId: Guid<sortingId>) 
-                (model: sorterPairModelMaker) : sorterPairModel =
+                (model: sorterPairModelGen) : sorterPairModel =
 
         match model with
         | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeMsSplitPairsFromId sortingId 
@@ -46,7 +46,7 @@ module SorterPairModelMaker =
 
     let makeSorterPairModelFromIndex
                 (index: int)  
-                (model: sorterPairModelMaker) : sorterPairModel =
+                (model: sorterPairModelGen) : sorterPairModel =
 
         let id = [
                         model |> getId :> obj
@@ -56,7 +56,7 @@ module SorterPairModelMaker =
         makeSorterPairModelFromId id model 
 
 
-    let makeSorterIdsWithTags (index:int) (model:sorterPairModelMaker)
+    let makeSorterIdsWithTags (index:int) (model:sorterPairModelGen)
                                     : (Guid<sorterId> * modelTag) [] =
         match model with
         | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeSorterIdsWithTags index 

@@ -56,7 +56,6 @@ type sortingSet =
 module SortingSet =
 
     let makeSorterSet (modelSet: sortingSet) : sorterSet =
-        // Collect all sorters with their tags
         let sorters = 
             modelSet.Sortings 
             |> Array.collect (fun sm -> sm |> Sorting.makeSorters)

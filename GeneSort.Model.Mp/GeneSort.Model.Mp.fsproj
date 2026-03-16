@@ -22,25 +22,25 @@
     <Compile Include="Sorting\Sorter\Uf6\Msuf6RandGenDto.fs" />
     <Compile Include="Sorting\Sorter\Uf6\Msuf6RandMutateDto.fs" />
     <Compile Include="Sorting\Sorter\SorterModelDto.fs" />
-    <Compile Include="Sorting\Sorter\SorterModelMakerDto.fs" />
+    <Compile Include="Sorting\Sorter\SorterModelGenDto.fs" />
     <Compile Include="Sorting\Sorter\SorterModelMutatorDto.fs" />
     <Compile Include="Sorting\SorterPair\SplitPairs\MsSplitPairsDto.fs" />
     <Compile Include="Sorting\SorterPair\SplitPairs\MsSplitPairsGenDto.fs" />
     <Compile Include="Sorting\SorterPair\SplitPairs\MsSplitPairsMutateDto.fs" />
     <Compile Include="Sorting\SorterPair\SorterPairModelDto.fs" />
-    <Compile Include="Sorting\SorterPair\SorterPairModelMakerDto.fs" />
+    <Compile Include="Sorting\SorterPair\SorterPairModelGenDto.fs" />
     <Compile Include="Sorting\SorterPair\SorterPairModelMutatorDto.fs" />
     <Compile Include="Sorting\SortingDto.fs" />
     <Compile Include="Sorting\SortingMakerDto.fs" />
     <Compile Include="Sorting\SortingMutatorDto.fs" />
     <Compile Include="Sorting\SortingSetDto.fs" />
-    <Compile Include="Sorting\SortingSetMakerDto.fs" />
+    <Compile Include="Sorting\SortingSetGenDto.fs" />
     <Compile Include="Sorting\SortingTagDto.fs" />
     <Compile Include="Sortable\MsasORandGenDto.fs" />
     <Compile Include="Sortable\SorterTestModelDto.fs" />
     <Compile Include="Sortable\SortableTestModelGenDto.fs" />
     <Compile Include="Sortable\SortableTestModelSetDto.fs" />
-    <Compile Include="Sortable\SortableTestModelSetMakerDto.fs" />
+    <Compile Include="Sortable\SortableTestModelSetGenDto.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />
   </ItemGroup>
 

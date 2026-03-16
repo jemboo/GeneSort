@@ -6,21 +6,21 @@ open GeneSort.Sorting
 
 [<MessagePackObject>]
 type sortingSetMakerDto =
-    { [<Key(0)>] sortingMaker: sortingMakerDto
+    { [<Key(0)>] sortingMaker: sortingGenDto
       [<Key(1)>] firstIndex: int
       [<Key(2)>] count: int }
 
 module SortingSetMakerDto =
 
     let fromDomain (maker: sortingGenSegment) : sortingSetMakerDto =
-        { sortingMaker = SortingMakerDto.fromDomain maker.SortingMaker
+        { sortingMaker = SortingGenDto.fromDomain maker.SortingMaker
           firstIndex = %maker.FirstIndex
           count = %maker.Count }
 
     let toDomain (dto: sortingSetMakerDto) : sortingGenSegment =
         try
             sortingGenSegment.create
-                (SortingMakerDto.toDomain dto.sortingMaker)
+                (SortingGenDto.toDomain dto.sortingMaker)
                 (UMX.tag<sorterCount> dto.firstIndex)
                 (UMX.tag<sorterCount> dto.count)
         with

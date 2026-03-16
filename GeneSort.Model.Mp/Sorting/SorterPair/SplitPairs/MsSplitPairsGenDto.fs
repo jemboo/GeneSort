@@ -11,20 +11,20 @@ open GeneSort.Core.Mp
 type msSplitPairsGenDto =
     { [<Key(0)>] sortingWidth: int
       [<Key(1)>] rngFactoryDto: rngFactoryDto
-      [<Key(2)>] firstPrefixMaker: sorterModelMakerDto
-      [<Key(3)>] firstSuffixMaker: sorterModelMakerDto
-      [<Key(4)>] secondPrefixMaker: sorterModelMakerDto
-      [<Key(5)>] secondSuffixMaker: sorterModelMakerDto }
+      [<Key(2)>] firstPrefixMaker: sorterModelGenDto
+      [<Key(3)>] firstSuffixMaker: sorterModelGenDto
+      [<Key(4)>] secondPrefixMaker: sorterModelGenDto
+      [<Key(5)>] secondSuffixMaker: sorterModelGenDto }
 
 module MsSplitPairsGenDto =
 
     let fromDomain (gen: msSplitPairsGen) : msSplitPairsGenDto =
         { sortingWidth = %(MsSplitPairsGen.getSortingWidth gen)
           rngFactoryDto = gen.RngFactory |> RngFactoryDto.fromDomain
-          firstPrefixMaker = SorterModelMakerDto.fromDomain gen.FirstPrefixMaker
-          firstSuffixMaker = SorterModelMakerDto.fromDomain gen.FirstSuffixMaker
-          secondPrefixMaker = SorterModelMakerDto.fromDomain gen.SecondPrefixMaker
-          secondSuffixMaker = SorterModelMakerDto.fromDomain gen.SecondSuffixMaker }
+          firstPrefixMaker = SorterModelGenDto.fromDomain gen.FirstPrefixMaker
+          firstSuffixMaker = SorterModelGenDto.fromDomain gen.FirstSuffixMaker
+          secondPrefixMaker = SorterModelGenDto.fromDomain gen.SecondPrefixMaker
+          secondSuffixMaker = SorterModelGenDto.fromDomain gen.SecondSuffixMaker }
 
 
     let toDomain (dto: msSplitPairsGenDto) : msSplitPairsGen =
@@ -32,9 +32,9 @@ module MsSplitPairsGenDto =
             msSplitPairsGen.create
                 (UMX.tag<sortingWidth> dto.sortingWidth)
                 (dto.rngFactoryDto |> RngFactoryDto.toDomain)
-                (SorterModelMakerDto.toDomain dto.firstPrefixMaker)
-                (SorterModelMakerDto.toDomain dto.firstSuffixMaker)
-                (SorterModelMakerDto.toDomain dto.secondPrefixMaker)
-                (SorterModelMakerDto.toDomain dto.secondSuffixMaker)
+                (SorterModelGenDto.toDomain dto.firstPrefixMaker)
+                (SorterModelGenDto.toDomain dto.firstSuffixMaker)
+                (SorterModelGenDto.toDomain dto.secondPrefixMaker)
+                (SorterModelGenDto.toDomain dto.secondSuffixMaker)
         with
         | ex -> failwith $"Failed to convert msSplitPairsGenDto: {ex.Message}"

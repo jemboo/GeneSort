@@ -20,9 +20,9 @@ type outputData =
     | SortableTest of sortableTest
     | SortableTestSet of sortableTestSet
     | SortingSet of sortingSet
-    | SortingSetMaker of sortingGenSegment
+    | SortingSetGen of sortingGenSegment
     | SortableTestModelSet of sortableTestModelSet
-    | SortableTestModelSetMaker of sortableTestModelSetMaker
+    | SortableTestModelSetGen of sortableTestModelSetGen
     | SorterSetEval of sorterSetEval
     | SorterSetEvalBins of sorterEvalHierarchy
     | Project of project

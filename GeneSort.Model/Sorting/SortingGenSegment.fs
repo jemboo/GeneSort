@@ -9,13 +9,13 @@ type sortingGenSegment =
     private
         { 
           id : Guid<sortingGenSegmentId>
-          sortingMaker : sortingMaker
+          sortingMaker : sortingGen
           firstIndex : int<sorterCount>
           count : int<sorterCount>
         }
     with
     static member create 
-                (sortingMaker: sortingMaker) 
+                (sortingMaker: sortingGen) 
                 (firstIndex: int<sorterCount>) 
                 (count: int<sorterCount>) : sortingGenSegment =
         let id = 

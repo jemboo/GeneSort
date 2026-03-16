@@ -9,9 +9,9 @@ type outputDataType =
     | SortableTest of string
     | SortableTestSet of string
     | SortingSet of string
-    | SorterModelSetMaker of string
+    | SorterModelSetGen of string
     | SortableTestModelSet of string
-    | SortableTestModelSetMaker of string
+    | SortableTestModelSetGen of string
     | SorterSetEval of string
     | SorterSetEvalBins of string
     | TextReport of string<textReportName>
@@ -27,9 +27,9 @@ module OutputDataType =
         | SortableTest s -> appendParam "SortableTest" s
         | SortableTestSet s -> appendParam "SortableTestSet" s
         | SortingSet s -> appendParam "SortingSet" s
-        | SorterModelSetMaker s -> appendParam "SorterModelSetMaker" s
+        | SorterModelSetGen s -> appendParam "SorterModelSetGen" s
         | SortableTestModelSet s -> appendParam "SortableTestModelSet" s
-        | SortableTestModelSetMaker s -> appendParam "SortableTestModelSetMaker" s
+        | SortableTestModelSetGen s -> appendParam "SortableTestModelSetGen" s
         | SorterSetEval s -> appendParam "SorterSetEval" s
         | SorterSetEvalBins s -> appendParam "SorterSetEvalBins" s
         | Project -> "Project"
@@ -45,9 +45,9 @@ module OutputDataType =
         | "SortableTest" -> Some (SortableTest param)
         | "SortableTestSet" -> Some (SortableTestSet param)
         | "SortingSet" -> Some (SortingSet param)
-        | "SorterModelSetMaker" -> Some (SorterModelSetMaker param)
+        | "SorterModelSetGen" -> Some (SorterModelSetGen param)
         | "SortableTestModelSet" -> Some (SortableTestModelSet param)
-        | "SortableTestModelSetMaker" -> Some (SortableTestModelSetMaker param)
+        | "SortableTestModelSetGen" -> Some (SortableTestModelSetGen param)
         | "SorterSetEval" -> Some (SorterSetEval param)
         | "SorterSetEvalBins" -> Some (SorterSetEvalBins param)
         | "Project" when param = "" -> Some Project

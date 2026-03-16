@@ -71,7 +71,7 @@ module GeneSortDb =
     let getSorterModelSetMakerAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sortingGenSegment, OutputError>> =
         async {
             let! result = geneSortDb.loadAsync projectFolder queryParams
-            return unwrapOutput (function | outputData.SortingSetMaker smsm -> Some smsm | _ -> None) result
+            return unwrapOutput (function | outputData.SortingSetGen smsm -> Some smsm | _ -> None) result
         }
 
     let getSortableTestModelSetAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sortableTestModelSet, OutputError>> =
@@ -80,10 +80,10 @@ module GeneSortDb =
             return unwrapOutput (function | outputData.SortableTestModelSet stms -> Some stms | _ -> None) result
         }
 
-    let getSortableTestModelSetMakerAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sortableTestModelSetMaker, OutputError>> =
+    let getSortableTestModelSetMakerAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sortableTestModelSetGen, OutputError>> =
         async {
             let! result = geneSortDb.loadAsync projectFolder queryParams
-            return unwrapOutput (function | outputData.SortableTestModelSetMaker stmsm -> Some stmsm | _ -> None) result
+            return unwrapOutput (function | outputData.SortableTestModelSetGen stmsm -> Some stmsm | _ -> None) result
         }
 
     let getSorterSetEvalAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sorterSetEval, OutputError>> =

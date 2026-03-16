@@ -8,29 +8,29 @@ open GeneSort.Model.Mp.SorterPair
 open GeneSort.Model.Mp.Sorting.Sorter
 open GeneSort.Model.Mp.Sorting.SorterPair
 
-[<MessagePackObject; Union(0, typeof<sorterModelMakerDto>); Union(1, typeof<sorterPairModelMakerDto>)>]
-type sortingMakerDto =
-    | Single of sorterModelMakerDto
-    | Pair of sorterPairModelMakerDto
+[<MessagePackObject; Union(0, typeof<sorterModelGenDto>); Union(1, typeof<sorterPairModelGenDto>)>]
+type sortingGenDto =
+    | Single of sorterModelGenDto
+    | Pair of sorterPairModelGenDto
 
-module SortingMakerDto =
+module SortingGenDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let fromDomain (sortingMaker: sortingMaker) : sortingMakerDto =
-        match sortingMaker with
-        | sortingMaker.Single sorterModelMaker ->
-            Single (SorterModelMakerDto.fromDomain sorterModelMaker)
-        | sortingMaker.Pair sorterPairModelMaker ->
-            Pair (SorterPairModelMakerDto.fromDomain sorterPairModelMaker)
+    let fromDomain (sortingGen: sortingGen) : sortingGenDto =
+        match sortingGen with
+        | sortingGen.Single sorterModelGen ->
+            Single (SorterModelGenDto.fromDomain sorterModelGen)
+        | sortingGen.Pair sorterPairModelMaker ->
+            Pair (SorterPairModelGenDto.fromDomain sorterPairModelMaker)
 
 
-    let toDomain (dto: sortingMakerDto) : sortingMaker =
+    let toDomain (dto: sortingGenDto) : sortingGen =
         try
             match dto with
             | Single sorterModelMakerDto ->
-                sortingMaker.Single (SorterModelMakerDto.toDomain sorterModelMakerDto)
+                sortingGen.Single (SorterModelGenDto.toDomain sorterModelMakerDto)
             | Pair sorterPairModelMakerDto ->
-                sortingMaker.Pair (SorterPairModelMakerDto.toDomain sorterPairModelMakerDto)
+                sortingGen.Pair (SorterPairModelGenDto.toDomain sorterPairModelMakerDto)
         with
         | ex -> failwith $"Failed to convert sortingMakerDto: {ex.Message}"
