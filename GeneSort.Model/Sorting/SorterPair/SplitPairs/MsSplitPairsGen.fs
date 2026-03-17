@@ -8,51 +8,51 @@ open GeneSort.Model.Sorting
 
 type msSplitPairsGen = 
     private 
-        { id: Guid<sorterPairModelMakerId>
+        { id: Guid<sorterPairModelGenId>
           rngFactory: rngFactory
           sortingWidth: int<sortingWidth>
-          firstPrefixMaker: sorterModelGen
-          firstSuffixMaker: sorterModelGen
-          secondPrefixMaker: sorterModelGen
-          secondSuffixMaker: sorterModelGen} 
+          firstPrefixGen: sorterModelGen
+          firstSuffixGen: sorterModelGen
+          secondPrefixGen: sorterModelGen
+          secondSuffixGen: sorterModelGen} 
     with
-    /// Creates an msSplitPairsGen instance with the specified sorting width and four sorter model makers.
-    /// The ID is deterministically calculated from the constituent maker IDs.
+    /// Creates an msSplitPairsGen instance with the specified sorting width and four sorter model gens.
+    /// The ID is deterministically calculated from the constituent gen IDs.
     /// Throws an exception if:
     /// - width is less than 1
-    /// - any sorter model maker has a mismatched sorting width
-    /// - the two prefix makers don't have the same ceLength
-    /// - the two suffix makers don't have the same ceLength
+    /// - any sorter model gen has a mismatched sorting width
+    /// - the two prefix gens don't have the same ceLength
+    /// - the two suffix gens don't have the same ceLength
     static member create 
             (sortingWidth: int<sortingWidth>)
             (rngFactory: rngFactory)
-            (firstPrefixMaker: sorterModelGen)
-            (firstSuffixMaker: sorterModelGen)
-            (secondPrefixMaker: sorterModelGen)
-            (secondSuffixMaker: sorterModelGen) : msSplitPairsGen =
+            (firstPrefixGen: sorterModelGen)
+            (firstSuffixGen: sorterModelGen)
+            (secondPrefixGen: sorterModelGen)
+            (secondSuffixGen: sorterModelGen) : msSplitPairsGen =
         
         if %sortingWidth < 1 then
             failwith $"SortingWidth must be at least 1, got {%sortingWidth}"
         
         // Validate that all sorter model makers have the same sorting width
-        let makers = [firstPrefixMaker; firstSuffixMaker; secondPrefixMaker; secondSuffixMaker]
+        let makers = [firstPrefixGen; firstSuffixGen; secondPrefixGen; secondSuffixGen]
         let mismatchedMakers = 
             makers 
-            |> List.filter (fun maker -> SorterModelGen.getSortingWidth maker <> sortingWidth)
+            |> List.filter (fun mutator -> SorterModelGen.getSortingWidth mutator <> sortingWidth)
         
         if not (List.isEmpty mismatchedMakers) then
             failwith $"All sorter model makers must have sortingWidth {%sortingWidth}"
         
         // Validate that the two prefix makers have the same ceLength
-        let firstPrefixCeLength = SorterModelGen.getCeLength firstPrefixMaker
-        let secondPrefixCeLength = SorterModelGen.getCeLength secondPrefixMaker
+        let firstPrefixCeLength = SorterModelGen.getCeLength firstPrefixGen
+        let secondPrefixCeLength = SorterModelGen.getCeLength secondPrefixGen
         
         if firstPrefixCeLength <> secondPrefixCeLength then
             failwith $"Both prefix makers must have the same ceLength. FirstPrefix: {%firstPrefixCeLength}, SecondPrefix: {%secondPrefixCeLength}"
         
         // Validate that the two suffix makers have the same ceLength
-        let firstSuffixCeLength = SorterModelGen.getCeLength firstSuffixMaker
-        let secondSuffixCeLength = SorterModelGen.getCeLength secondSuffixMaker
+        let firstSuffixCeLength = SorterModelGen.getCeLength firstSuffixGen
+        let secondSuffixCeLength = SorterModelGen.getCeLength secondSuffixGen
         
         if firstSuffixCeLength <> secondSuffixCeLength then
             failwith $"Both suffix makers must have the same ceLength. FirstSuffix: {%firstSuffixCeLength}, SecondSuffix: {%secondSuffixCeLength}"
@@ -62,27 +62,27 @@ type msSplitPairsGen =
             [
                 "msSplitPairsGen" :> obj
                 sortingWidth :> obj
-                %SorterModelGen.getId firstPrefixMaker :> obj
-                %SorterModelGen.getId firstSuffixMaker :> obj
-                %SorterModelGen.getId secondPrefixMaker :> obj
-                %SorterModelGen.getId secondSuffixMaker :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterPairModelMakerId>
+                %SorterModelGen.getId firstPrefixGen :> obj
+                %SorterModelGen.getId firstSuffixGen :> obj
+                %SorterModelGen.getId secondPrefixGen :> obj
+                %SorterModelGen.getId secondSuffixGen :> obj
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterPairModelGenId>
         
         { id = id
           sortingWidth = sortingWidth
           rngFactory = rngFactory
-          firstPrefixMaker = firstPrefixMaker
-          firstSuffixMaker = firstSuffixMaker
-          secondPrefixMaker = secondPrefixMaker
-          secondSuffixMaker = secondSuffixMaker }
+          firstPrefixGen = firstPrefixGen
+          firstSuffixGen = firstSuffixGen
+          secondPrefixGen = secondPrefixGen
+          secondSuffixGen = secondSuffixGen }
     
     member this.Id with get () = this.id
     member this.RngFactory with get() = this.rngFactory
     member this.SortingWidth with get () = this.sortingWidth
-    member this.FirstPrefixMaker with get () = this.firstPrefixMaker
-    member this.FirstSuffixMaker with get () = this.firstSuffixMaker
-    member this.SecondPrefixMaker with get () = this.secondPrefixMaker
-    member this.SecondSuffixMaker with get () = this.secondSuffixMaker
+    member this.FirstPrefixGen with get () = this.firstPrefixGen
+    member this.FirstSuffixGen with get () = this.firstSuffixGen
+    member this.SecondPrefixGen with get () = this.secondPrefixGen
+    member this.SecondSuffixGen with get () = this.secondSuffixGen
 
 
 module MsSplitPairsGen =
@@ -91,16 +91,16 @@ module MsSplitPairsGen =
         gen.SortingWidth
     
     let getPrefixCeLength (gen: msSplitPairsGen) : int<ceLength> =
-        SorterModelGen.getCeLength gen.FirstPrefixMaker
+        SorterModelGen.getCeLength gen.FirstPrefixGen
     
     let getSuffixCeLength (gen: msSplitPairsGen) : int<ceLength> =
-        SorterModelGen.getCeLength gen.FirstSuffixMaker
+        SorterModelGen.getCeLength gen.FirstSuffixGen
 
     let getCeLength (gen: msSplitPairsGen) : int<ceLength> =
         getPrefixCeLength gen + getSuffixCeLength gen
 
 
-    /// Generates an msSplitPairs instance by making sorter models from each maker
+    /// Generates an msSplitPairs instance by making sorter models from each mutator
     let makeMsSplitPairsFromId
                 (id: Guid<sortingId>)
                 (gen: msSplitPairsGen) : msSplitPairs =
@@ -108,10 +108,10 @@ module MsSplitPairsGen =
         let rng = %id |> RngFactory.createRng gen.RngFactory
         let makePrefixId () = (rng.NextGuid()) |> UMX.tag<sortingId>
 
-        let firstPrefix = SorterModelGen.makeSorterModelFromId (makePrefixId()) gen.FirstPrefixMaker 
-        let firstSuffix = SorterModelGen.makeSorterModelFromId (makePrefixId()) gen.FirstSuffixMaker
-        let secondPrefix = SorterModelGen.makeSorterModelFromId (makePrefixId()) gen.SecondPrefixMaker
-        let secondSuffix = SorterModelGen.makeSorterModelFromId (makePrefixId()) gen.SecondSuffixMaker
+        let firstPrefix = SorterModelGen.makeSorterModelFromId (makePrefixId()) gen.FirstPrefixGen 
+        let firstSuffix = SorterModelGen.makeSorterModelFromId (makePrefixId()) gen.FirstSuffixGen
+        let secondPrefix = SorterModelGen.makeSorterModelFromId (makePrefixId()) gen.SecondPrefixGen
+        let secondSuffix = SorterModelGen.makeSorterModelFromId (makePrefixId()) gen.SecondSuffixGen
         
         msSplitPairs.create
             (%id |> UMX.tag<sorterPairModelId>)
@@ -122,7 +122,7 @@ module MsSplitPairsGen =
             secondSuffix
 
 
-    /// Generates an msSplitPairs instance by making sorter models from each maker
+    /// Generates an msSplitPairs instance by making sorter models from each mutator
     let makeMsSplitPairsFromIndex 
                 (index: int) 
                 (gen: msSplitPairsGen) : msSplitPairs =

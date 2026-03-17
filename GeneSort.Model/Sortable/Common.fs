@@ -9,8 +9,8 @@ open GeneSort.Core
 [<Measure>] type sorterTestModelCount
 
 [<Measure>] type sorterTestModelSetID
-[<Measure>] type sorterTestModelMakerID
-[<Measure>] type sorterTestModelSetMakerID
+[<Measure>] type sorterTestModelGenID
+[<Measure>] type sorterTestModelSetGenID
 
 //module Common =
 //    let makeSorterModelId 

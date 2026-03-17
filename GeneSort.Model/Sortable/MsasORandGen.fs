@@ -10,7 +10,7 @@ open GeneSort.Sorting
 type MsasORandGen = 
     private 
         { 
-          id : Guid<sorterTestModelMakerID>
+          id : Guid<sorterTestModelGenID>
           rngFactory: rngFactory
           sortingWidth: int<sortingWidth>
           maxOrbit: int } 
@@ -26,7 +26,7 @@ type MsasORandGen =
                     sortingWidth :> obj
                     rngFactory :> obj
                     maxOrbit :> obj
-                ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelMakerID>
+                ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelGenID>
 
             { id = id; rngFactory = rngFactory; maxOrbit = maxOrbit; sortingWidth = sortingWidth}
 

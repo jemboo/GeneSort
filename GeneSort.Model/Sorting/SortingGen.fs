@@ -12,12 +12,12 @@ type sortingGen =
      | Pair of sorterPairModelGen
 
 
-module SortingMaker =
+module SortingGen =
 
-    let getId (model:sortingGen) : Guid<sortingMakerId> =
+    let getId (model:sortingGen) : Guid<sortingGenId> =
         match model with
-        | Single smm -> %(smm |> SorterModelGen.getId) |> UMX.tag<sortingMakerId>
-        | Pair spmm -> %(spmm |> SorterPairModelGen.getId) |> UMX.tag<sortingMakerId>
+        | Single smm -> %(smm |> SorterModelGen.getId) |> UMX.tag<sortingGenId>
+        | Pair spmm -> %(spmm |> SorterPairModelGen.getId) |> UMX.tag<sortingGenId>
 
 
     let getSortingWidth (model: sortingGen) : int<sortingWidth> =

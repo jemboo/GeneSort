@@ -6,7 +6,7 @@ open GeneSort.Core
 type sortableTestModelSetGen =
     private
         { 
-          id : Guid<sorterTestModelSetMakerID>
+          id : Guid<sorterTestModelSetGenID>
           sorterTestModelGen : sortableTestModelGen
           firstIndex : int<sorterTestModelCount>
           count : int<sorterTestModelCount>
@@ -17,12 +17,12 @@ type sortableTestModelSetGen =
                 (firstIndex: int<sorterTestModelCount>) 
                 (count: int<sorterTestModelCount>) : sortableTestModelSetGen =
         let id = 
-            // Generate a unique ID based on the SorterModelMaker and indices
+            // Generate a unique ID based on the SorterModelGen and indices
             GuidUtils.guidFromObjs [
                     sorterTestModelGen :> obj
                     firstIndex :> obj
                     count :> obj
-                ] |> UMX.tag<sorterTestModelSetMakerID>
+                ] |> UMX.tag<sorterTestModelSetGenID>
 
         { id = id; sorterTestModelGen = sorterTestModelGen; firstIndex = firstIndex; count = count }
 

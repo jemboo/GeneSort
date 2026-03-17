@@ -29,8 +29,8 @@ module SorterModelGenDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let fromDomain (sorterModelMaker: sorterModelGen) : sorterModelGenDto =
-        match sorterModelMaker with
+    let fromDomain (sorterModelGen: sorterModelGen) : sorterModelGenDto =
+        match sorterModelGen with
         | sorterModelGen.SmmMsceRandGen msceRandGen ->
             MsceRandGen (MsceRandGenDto.fromDomain msceRandGen)
         | sorterModelGen.SmmMssiRandGen mssiRandGen ->
@@ -57,4 +57,4 @@ module SorterModelGenDto =
             | Msuf6RandGen msuf6RandGenDto ->
                 sorterModelGen.SmmMsuf6RandGen (Msuf6RandGenDto.toDomain msuf6RandGenDto)
         with
-        | ex -> failwith $"Failed to convert SorterModelMakerDto: {ex.Message}"
+        | ex -> failwith $"Failed to convert sorterModelGenDto: {ex.Message}"

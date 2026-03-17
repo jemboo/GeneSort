@@ -9,27 +9,27 @@ type sortingGenSegment =
     private
         { 
           id : Guid<sortingGenSegmentId>
-          sortingMaker : sortingGen
+          sortingGen : sortingGen
           firstIndex : int<sorterCount>
           count : int<sorterCount>
         }
     with
     static member create 
-                (sortingMaker: sortingGen) 
+                (sortingGen: sortingGen) 
                 (firstIndex: int<sorterCount>) 
                 (count: int<sorterCount>) : sortingGenSegment =
         let id = 
-            // Generate a unique ID based on the SorterModelMaker and indices
+            // Generate a unique ID based on the SorterModelGen and indices
             GuidUtils.guidFromObjs [
-                    sortingMaker :> obj
+                    sortingGen :> obj
                     firstIndex :> obj
                     count :> obj
                 ] |> UMX.tag<sortingGenSegmentId>
 
-        { id = id; sortingMaker = sortingMaker; firstIndex = firstIndex; count = count }
+        { id = id; sortingGen = sortingGen; firstIndex = firstIndex; count = count }
 
     member this.Id with get() = this.id
-    member this.SortingMaker with get() = this.sortingMaker
+    member this.SortingGen with get() = this.sortingGen
     member this.FirstIndex with get() = this.firstIndex
     member this.Count with get() = this.count
 
@@ -41,7 +41,7 @@ type sortingGenSegment =
         let sortings = 
             [| for i in 0 .. %this.count - 1 do
                 let index = %this.firstIndex + i
-                SortingMaker.makeSortingFromIndex index this.sortingMaker |]
+                SortingGen.makeSortingFromIndex index this.sortingGen |]
 
         let id = (%this.id) |> UMX.tag<sortingSetId>
         sortingSet.create id sortings

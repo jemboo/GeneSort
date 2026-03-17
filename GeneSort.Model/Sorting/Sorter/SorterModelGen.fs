@@ -20,7 +20,7 @@ type sorterModelGen =
 
 module SorterModelGen =
 
-    let getId (model:sorterModelGen) : Guid<sorterModelMakerId> =
+    let getId (model:sorterModelGen) : Guid<sorterModelGenId> =
         match model with
         | SmmMsceRandGen msce -> msce.Id
         | SmmMssiRandGen mssi -> mssi.Id
@@ -47,7 +47,7 @@ module SorterModelGen =
         | SmmMsuf6RandGen msuf6 -> msuf6.CeLength
 
 
-    let getSorterModelMakerId (model: sorterModelGen) : Guid<sorterModelMakerId> =
+    let getSorterModelMakerId (model: sorterModelGen) : Guid<sorterModelGenId> =
         match model with
         | SmmMsceRandGen msce -> msce.Id
         | SmmMssiRandGen mssi -> mssi.Id

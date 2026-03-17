@@ -31,7 +31,7 @@
     <Compile Include="Sorting\SorterPair\SorterPairModelGenDto.fs" />
     <Compile Include="Sorting\SorterPair\SorterPairModelMutatorDto.fs" />
     <Compile Include="Sorting\SortingDto.fs" />
-    <Compile Include="Sorting\SortingMakerDto.fs" />
+    <Compile Include="Sorting\SortingGenDto.fs" />
     <Compile Include="Sorting\SortingMutatorDto.fs" />
     <Compile Include="Sorting\SortingSetDto.fs" />
     <Compile Include="Sorting\SortingSetGenDto.fs" />

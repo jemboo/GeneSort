@@ -9,11 +9,11 @@ open GeneSort.Core
 [<Measure>] type sorterPairModelId
 [<Measure>] type sortingId
 [<Measure>] type sortingSetId
-[<Measure>] type sorterModelMakerId
+[<Measure>] type sorterModelGenId
 [<Measure>] type sorterModelMutatorId
-[<Measure>] type sorterPairModelMakerId
+[<Measure>] type sorterPairModelGenId
 [<Measure>] type sorterPairModelMutatorId
-[<Measure>] type sortingMakerId
+[<Measure>] type sortingGenId
 [<Measure>] type sortingMutatorId
 [<Measure>] type sortingGenSegmentId
 [<Measure>] type sortingMutationSegmentId
@@ -24,10 +24,10 @@ open GeneSort.Core
 
 [<Measure>] type mutationRate
 
-module CommonMaker =
+module CommonGen =
 
     let makeSorterModelId 
-                (id:  Guid<sorterModelMakerId>) 
+                (id:  Guid<sorterModelGenId>) 
                 (index:int) : Guid<sorterModelId> = 
         [
             id  :> obj
@@ -37,7 +37,7 @@ module CommonMaker =
 
 
     let makeSortingId 
-                (id:  Guid<sorterModelMakerId>) 
+                (id:  Guid<sorterModelGenId>) 
                 (index:int) : Guid<sortingId> = 
         [
             id  :> obj

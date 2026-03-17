@@ -3,8 +3,6 @@ open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 open GeneSort.Model.Sorting
-open GeneSort.Model.Mp.Sorter
-open GeneSort.Model.Mp.SorterPair
 open GeneSort.Model.Mp.Sorting.Sorter
 open GeneSort.Model.Mp.Sorting.SorterPair
 
@@ -21,16 +19,16 @@ module SortingGenDto =
         match sortingGen with
         | sortingGen.Single sorterModelGen ->
             Single (SorterModelGenDto.fromDomain sorterModelGen)
-        | sortingGen.Pair sorterPairModelMaker ->
-            Pair (SorterPairModelGenDto.fromDomain sorterPairModelMaker)
+        | sortingGen.Pair sorterPairModelGen ->
+            Pair (SorterPairModelGenDto.fromDomain sorterPairModelGen)
 
 
     let toDomain (dto: sortingGenDto) : sortingGen =
         try
             match dto with
-            | Single sorterModelMakerDto ->
-                sortingGen.Single (SorterModelGenDto.toDomain sorterModelMakerDto)
-            | Pair sorterPairModelMakerDto ->
-                sortingGen.Pair (SorterPairModelGenDto.toDomain sorterPairModelMakerDto)
+            | Single sorterModelGenDto ->
+                sortingGen.Single (SorterModelGenDto.toDomain sorterModelGenDto)
+            | Pair sorterPairModelGenDto ->
+                sortingGen.Pair (SorterPairModelGenDto.toDomain sorterPairModelGenDto)
         with
-        | ex -> failwith $"Failed to convert sortingMakerDto: {ex.Message}"
+        | ex -> failwith $"Failed to convert sortingGenDto: {ex.Message}"

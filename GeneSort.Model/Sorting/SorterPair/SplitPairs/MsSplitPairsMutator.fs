@@ -17,13 +17,13 @@ type msSplitPairsMutator =
           secondPrefixMutator: sorterModelMutator
           secondSuffixMutator: sorterModelMutator} 
     with
-    /// Creates an msSplitPairsGen instance with the specified sorting width and four sorter model makers.
-    /// The ID is deterministically calculated from the constituent maker IDs.
+    /// Creates an msSplitPairsGen instance with the specified sorting width and four sorter model mutators.
+    /// The ID is deterministically calculated from the constituent mutator IDs.
     /// Throws an exception if:
     /// - width is less than 1
-    /// - any sorter model maker has a mismatched sorting width
-    /// - the two prefix makers don't have the same ceLength
-    /// - the two suffix makers don't have the same ceLength
+    /// - any sorter model mutator has a mismatched sorting width
+    /// - the two prefix mutators don't have the same ceLength
+    /// - the two suffix mutators don't have the same ceLength
     static member create 
             (sortingWidth: int<sortingWidth>)
             (rngFactory: rngFactory)
@@ -35,30 +35,30 @@ type msSplitPairsMutator =
         if %sortingWidth < 1 then
             failwith $"SortingWidth must be at least 1, got {%sortingWidth}"
         
-        // Validate that all sorter model makers have the same sorting width
+        // Validate that all sorter model mutators have the same sorting width
         let makers = [firstPrefixMutator; firstSuffixMutator; secondPrefixMutator; secondSuffixMutator]
-        let mismatchedMakers = 
+        let mismatchedMutators = 
             makers 
-            |> List.filter (fun maker -> SorterModelMutator.getSortingWidth maker <> sortingWidth)
+            |> List.filter (fun mutator -> SorterModelMutator.getSortingWidth mutator <> sortingWidth)
         
-        if not (List.isEmpty mismatchedMakers) then
-            failwith $"All sorter model makers must have sortingWidth {%sortingWidth}"
+        if not (List.isEmpty mismatchedMutators) then
+            failwith $"All sorter model mutators must have sortingWidth {%sortingWidth}"
         
-        // Validate that the two prefix makers have the same ceLength
+        // Validate that the two prefix mutators have the same ceLength
         let firstPrefixCeLength = SorterModelMutator.getCeLength firstPrefixMutator
         let secondPrefixCeLength = SorterModelMutator.getCeLength secondPrefixMutator
         
         if firstPrefixCeLength <> secondPrefixCeLength then
-            failwith $"Both prefix makers must have the same ceLength. FirstPrefix: {%firstPrefixCeLength}, SecondPrefix: {%secondPrefixCeLength}"
+            failwith $"Both prefix mutators must have the same ceLength. FirstPrefix: {%firstPrefixCeLength}, SecondPrefix: {%secondPrefixCeLength}"
         
-        // Validate that the two suffix makers have the same ceLength
+        // Validate that the two suffix mutator have the same ceLength
         let firstSuffixCeLength = SorterModelMutator.getCeLength firstSuffixMutator
         let secondSuffixCeLength = SorterModelMutator.getCeLength secondSuffixMutator
         
         if firstSuffixCeLength <> secondSuffixCeLength then
-            failwith $"Both suffix makers must have the same ceLength. FirstSuffix: {%firstSuffixCeLength}, SecondSuffix: {%secondSuffixCeLength}"
+            failwith $"Both suffix mutators must have the same ceLength. FirstSuffix: {%firstSuffixCeLength}, SecondSuffix: {%secondSuffixCeLength}"
         
-        // Calculate ID deterministically from the constituent maker IDs
+        // Calculate ID deterministically from the constituent mutator IDs
         let id =
             [
                 "msSplitPairsGen" :> obj

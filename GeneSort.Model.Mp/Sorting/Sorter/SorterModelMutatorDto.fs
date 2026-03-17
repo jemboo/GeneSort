@@ -58,4 +58,4 @@ module SorterModelMutatorDto =
                 sorterModelMutator.SmmMsuf6RandMutate (Msuf6RandMutateDto.toDomain msuf6RandGenDto)
 
         with
-        | ex -> failwith $"Failed to convert SorterModelMakerDto: {ex.Message}"
+        | ex -> failwith $"Failed to convert sorterModelMutatorDto: {ex.Message}"

@@ -14,8 +14,8 @@ module SorterPairModelGenDto =
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let fromDomain (sorterPairModelMaker: sorterPairModelGen) : sorterPairModelGenDto =
-        match sorterPairModelMaker with
+    let fromDomain (sorterPairModelGen: sorterPairModelGen) : sorterPairModelGenDto =
+        match sorterPairModelGen with
         | sorterPairModelGen.SplitPairs msSplitPairsGen ->
             SplitPairs (MsSplitPairsGenDto.fromDomain msSplitPairsGen)
         | sorterPairModelGen.SplitPairs2 msSplitPairsGen ->
@@ -29,4 +29,4 @@ module SorterPairModelGenDto =
             | SplitPairs2 msSplitPairsGenDto ->
                 sorterPairModelGen.SplitPairs2 (MsSplitPairsGenDto.toDomain msSplitPairsGenDto)
         with
-        | ex -> failwith $"Failed to convert sorterPairModelMakerDto: {ex.Message}"
+        | ex -> failwith $"Failed to convert sorterPairModelGenDto: {ex.Message}"

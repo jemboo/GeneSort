@@ -12,7 +12,7 @@ open GeneSort.Model.Sorting
 type msrsRandGen = 
     private 
         { 
-              id : Guid<sorterModelMakerId>
+              id : Guid<sorterModelGenId>
               rngFactory: rngFactory
               opsGenRatesArray: opsGenRatesArray
               sortingWidth: int<sortingWidth> 
@@ -31,7 +31,7 @@ type msrsRandGen =
                 rngFactory :> obj
                 sortingWidth :> obj
                 opsGenRatesArray :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMakerId>
+            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelGenId>
 
         {
             id = id
@@ -62,7 +62,7 @@ type msrsRandGen =
 
         
     member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
-        CommonMaker.makeSorterModelId this.Id index
+        CommonGen.makeSorterModelId this.Id index
 
 
     member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msrs =

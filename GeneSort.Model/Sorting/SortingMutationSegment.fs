@@ -19,7 +19,7 @@ type sortingMutationSegment =
                 (firstIndex: int<sorterCount>) 
                 (count: int<sorterCount>) : sortingMutationSegment =
         let id = 
-            // Generate a unique ID based on the SorterModelMaker and indices
+            // Generate a unique ID based on the SorterModelGen and indices
             GuidUtils.guidFromObjs [
                     sortingMutator :> obj
                     firstIndex :> obj

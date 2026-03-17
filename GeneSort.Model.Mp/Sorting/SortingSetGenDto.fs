@@ -5,23 +5,23 @@ open GeneSort.Model.Sorting
 open GeneSort.Sorting
 
 [<MessagePackObject>]
-type sortingSetMakerDto =
-    { [<Key(0)>] sortingMaker: sortingGenDto
+type sortingSetGenDto =
+    { [<Key(0)>] sortingGen: sortingGenDto
       [<Key(1)>] firstIndex: int
       [<Key(2)>] count: int }
 
-module SortingSetMakerDto =
+module SortingSetGenDto =
 
-    let fromDomain (maker: sortingGenSegment) : sortingSetMakerDto =
-        { sortingMaker = SortingGenDto.fromDomain maker.SortingMaker
-          firstIndex = %maker.FirstIndex
-          count = %maker.Count }
+    let fromDomain (gen: sortingGenSegment) : sortingSetGenDto =
+        { sortingGen = SortingGenDto.fromDomain gen.SortingGen
+          firstIndex = %gen.FirstIndex
+          count = %gen.Count }
 
-    let toDomain (dto: sortingSetMakerDto) : sortingGenSegment =
+    let toDomain (dto: sortingSetGenDto) : sortingGenSegment =
         try
             sortingGenSegment.create
-                (SortingGenDto.toDomain dto.sortingMaker)
+                (SortingGenDto.toDomain dto.sortingGen)
                 (UMX.tag<sorterCount> dto.firstIndex)
                 (UMX.tag<sorterCount> dto.count)
         with
-        | ex -> failwith $"Failed to convert sortingSetMakerDto: {ex.Message}"
+        | ex -> failwith $"Failed to convert sortingSetGenDto: {ex.Message}"

@@ -29,4 +29,4 @@ module SorterPairModelMutatorDto =
             | SplitPairs2 msSplitPairsMutateDto ->
                 sorterPairModelMutator.SplitPairs2 (MsSplitPairsMutateDto.toDomain msSplitPairsMutateDto)
         with
-        | ex -> failwith $"Failed to convert sorterPairModelMakerDto: {ex.Message}"
+        | ex -> failwith $"Failed to convert sorterPairModelMutatorDto: {ex.Message}"

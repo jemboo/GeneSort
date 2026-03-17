@@ -22,7 +22,7 @@ module SorterPairModelGen =
         | sorterPairModelGen.SplitPairs2 mspg -> MsSplitPairsGen.getCeLength mspg
 
 
-    let getId (model: sorterPairModelGen) : Guid<sorterPairModelMakerId> =
+    let getId (model: sorterPairModelGen) : Guid<sorterPairModelGenId> =
         match model with
         | SplitPairs mspg -> mspg.Id
         | SplitPairs2 mspg -> mspg.Id

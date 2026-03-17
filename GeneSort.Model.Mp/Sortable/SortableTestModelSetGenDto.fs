@@ -17,11 +17,11 @@ type sortableTestModelSetGenDto = {
 
 module SortableTestModelSetGenDto =
 
-    let fromDomain (maker: sortableTestModelSetGen) : sortableTestModelSetGenDto =
-        { Id = %maker.Id
-          SorterTestModelGenDto = SortableTestModelGenDto.fromDomain maker.SorterTestModelGen
-          FirstIndex = int maker.FirstIndex
-          Count = int maker.Count }
+    let fromDomain (gen: sortableTestModelSetGen) : sortableTestModelSetGenDto =
+        { Id = %gen.Id
+          SorterTestModelGenDto = SortableTestModelGenDto.fromDomain gen.SorterTestModelGen
+          FirstIndex = int gen.FirstIndex
+          Count = int gen.Count }
 
     let toDomain (dto: sortableTestModelSetGenDto) : sortableTestModelSetGen =
         if dto.FirstIndex < 0 then
