@@ -61,27 +61,27 @@ type sorterEvalLayer =
     member private this.CurrentRepCount = 
         this.leaves.Values |> Seq.filter (fun l -> l.SorterEval.IsSome) |> Seq.length
 
-    member internal this.Add(eval: sorterEval, maxReps: int, onLeafCreated: sorterEval -> unit) =
+    member internal this.Add(eval: sorterEval, maxReps: int<maxReps>, onLeafCreated: sorterEval -> unit) =
         let key = eval.CeBlockEval.CeUseCounts.GetHashCode()
         match this.leaves.TryGetValue(key) with
         | true, existing -> 
             existing.AddId(eval.SorterId)
         | false, _ ->
             // Only include the full eval if we haven't hit the layer-wide limit
-            let includeEval = this.CurrentRepCount < maxReps
+            let includeEval = this.CurrentRepCount < %maxReps
             this.leaves.[key] <- sorterEvalLeaf.create(eval, includeEval)
             // TRIGGER FOLLOW-UP ACTION
             onLeafCreated eval
 
 
-    member this.MergeLeaf (hashKey: int) (leaf: sorterEvalLeaf, maxReps: int) =
+    member this.MergeLeaf (hashKey: int) (leaf: sorterEvalLeaf, maxReps: int<maxReps>) =
         match this.leaves.TryGetValue(hashKey) with
         | true, existing -> 
             for id in leaf.SorterIds do existing.AddId(id)
         | false, _ ->
             // If the incoming leaf has an eval, but we are already at capacity, 
             // we must strip the eval to respect the maxReps constraint of this hierarchy.
-            if leaf.SorterEval.IsSome && this.CurrentRepCount >= maxReps then
+            if leaf.SorterEval.IsSome && this.CurrentRepCount >= %maxReps then
                 let strippedLeaf = { leaf with sorterEval = None }
                 this.leaves.[hashKey] <- strippedLeaf
             else
@@ -94,11 +94,11 @@ type sorterEvalHierarchy =
     private {
         sorterEvalHierarchyId: Guid<sorterEvalHierarchyId>
         layers: Dictionary<sorterEvalKey, sorterEvalLayer>
-        maxRepresentativesPerLayer: int
+        maxRepresentativesPerLayer: int<maxReps>
     }
-    static member create (sorterSetEvalId: Guid<sorterEvalHierarchyId>, maxReps: int) =
+    static member create (id: Guid<sorterEvalHierarchyId>, maxReps: int<maxReps>) =
         {
-            sorterEvalHierarchyId = sorterSetEvalId
+            sorterEvalHierarchyId = id
             layers = Dictionary<sorterEvalKey, sorterEvalLayer>()
             maxRepresentativesPerLayer = maxReps
         }
@@ -151,10 +151,10 @@ type sorterEvalHierarchy =
 
 module SorterEvalHierarchy =
 
-    let create (maxReps: int) : sorterEvalHierarchy =
+    let create (maxReps: int<maxReps>) : sorterEvalHierarchy =
         sorterEvalHierarchy.create (Guid.NewGuid() |> UMX.tag<sorterEvalHierarchyId>, maxReps)
 
-    let createFromSorterSetEval (maxReps: int) (sorterSetEval: sorterSetEval) : sorterEvalHierarchy =
+    let createFromSorterSetEval (maxReps: int<maxReps>) (sorterSetEval: sorterSetEval) : sorterEvalHierarchy =
         let hierarchy = create maxReps
         sorterSetEval.SorterEvals |> Array.iter hierarchy.AddSorterEval
         hierarchy

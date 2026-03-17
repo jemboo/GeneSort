@@ -14,7 +14,7 @@ open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.Model.Sorting
 open GeneSort.Model.Sorting.ModelParams
-open GeneSort.SortingResult
+open GeneSort.SortingResults
 
 module FullBoolMutate =
     // fixed values for this project
@@ -195,6 +195,8 @@ module FullBoolMutate =
                 let sorterSetParent = sortingSetParent |> SortingSet.makeSorterSet
                 let collectNewSortableTests = false
                 let sorterSetEvalParent = SorterSetEval.makeSorterSetEval sorterSetParent sortableTests collectNewSortableTests
+
+                let evalH = SorterEvalHierarchy.createFromSorterSetEval 1<maxReps> sorterSetEvalParent
 
                 sortingResultSetMap.UpdateManySortingResults sorterSetEvalParent.SorterEvals
 

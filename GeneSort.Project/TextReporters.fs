@@ -7,9 +7,9 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Runs
 open GeneSort.Db
-open GeneSort.SortingResults
 open ProjectOps
 open GeneSort.Model.Sorting
+open GeneSort.SortingResults
 
 module TextReporters =
 
@@ -49,7 +49,7 @@ module TextReporters =
 
                 match result with
                 | Ok sse ->
-                    let bins = SorterEvalHierarchy.createFromSorterSetEval 1 sse
+                    let bins = SorterEvalHierarchy.createFromSorterSetEval 1<maxReps> sse
                     let lines = SorterEvalHierarchy.getHierarchyReport
                                     (runParams.GetSortingWidth()) 
                                     (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringToString )

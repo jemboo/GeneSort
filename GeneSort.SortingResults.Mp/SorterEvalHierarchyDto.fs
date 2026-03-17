@@ -103,7 +103,7 @@ module SorterEvalLayerDto =
         let layer = sorterEvalLayer.create()
         for leafDto in dto.leaves do
             let (hashKey, leaf) = SorterEvalLeafDto.fromDto leafDto
-            layer.MergeLeaf hashKey (leaf, maxReps)
+            layer.MergeLeaf hashKey (leaf, UMX.tag<maxReps> maxReps)
         layer
 
 // ---------------------------------------------------------------------------
@@ -124,7 +124,7 @@ module SorterEvalHierarchyDto =
     let fromDomain (hierarchy: sorterEvalHierarchy) : sorterEvalHierarchyDto =
         {
             sorterEvalHierarchyId = %hierarchy.SorterEvalHierarchyId
-            maxRepresentativesPerLayer = hierarchy.MaxRepresentativesPerLayer
+            maxRepresentativesPerLayer = %hierarchy.MaxRepresentativesPerLayer
             layers =
                 hierarchy.Layers
                 |> Seq.map (fun kvp ->
@@ -135,7 +135,7 @@ module SorterEvalHierarchyDto =
     let toDomain (dto: sorterEvalHierarchyDto) : sorterEvalHierarchy =
         let hierarchy = sorterEvalHierarchy.create (
                             UMX.tag<sorterEvalHierarchyId> dto.sorterEvalHierarchyId, 
-                            dto.maxRepresentativesPerLayer)
+                            UMX.tag<maxReps> dto.maxRepresentativesPerLayer)
         for (keyDto, layerDto) in dto.layers do
             let key = SorterEvalKeyDto.fromDto keyDto
             let layer = SorterEvalLayerDto.fromDto (layerDto, dto.maxRepresentativesPerLayer)
