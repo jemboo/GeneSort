@@ -35,6 +35,7 @@ type splitPairsSortingResult=
 
 
     member this.SortingId with get() : Guid<sortingId> = this.sortingId
+
     member this.SorterEvalFirstFirst
         with get() = this.sorterEvalFirstFirst
         and set(value) = this.sorterEvalFirstFirst <- value
@@ -57,6 +58,17 @@ type splitPairsSortingResult=
             | splitJoin.First_Second -> this.SorterEvalFirstSecond <- Some newEval
             | splitJoin.Second_First -> this.SorterEvalSecondFirst <- Some newEval
             | splitJoin.Second_Second -> this.SorterEvalSecondSecond <- Some newEval
+
+
+    member this.GetSorterEval (modelTag: modelTag) :sorterEval =
+        match modelTag with
+        | modelTag.Single -> failwith "Invalid model tag for split pairs sorting result."
+        | modelTag.SplitPair splitJoin ->
+            match splitJoin with
+            | splitJoin.First_First -> this.SorterEvalFirstFirst.Value
+            | splitJoin.First_Second -> this.SorterEvalFirstSecond.Value
+            | splitJoin.Second_First -> this.SorterEvalSecondFirst.Value
+            | splitJoin.Second_Second -> this.SorterEvalSecondSecond.Value
 
 
 module SplitPairsSortingResult = ()

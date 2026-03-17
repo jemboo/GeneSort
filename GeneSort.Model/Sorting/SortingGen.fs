@@ -47,10 +47,16 @@ module SortingGen =
         | Single smm -> smm |> SorterModelGen.makeSorterModelFromId sortingId |> sorting.Single
         | Pair spmm -> spmm |> SorterPairModelGen.makeSorterPairModelFromId sortingId |> sorting.Pairs
 
-
-    let makeSorterIdsWithTags 
-                 (index: int) 
-                 (model: sortingGen) : (Guid<sorterId> * modelTag) [] = 
+    let makeSorterFromIdAndTag
+                (sortingId: Guid<sortingId>) 
+                (model: sortingGen) : sorting =
         match model with
-        | Single smm -> smm |> SorterModelGen.makeSorterIdWithTag index |> Array.singleton
-        | Pair spmm -> spmm |> SorterPairModelGen.makeSorterIdsWithTags index
+        | Single smm -> smm |> SorterModelGen.makeSorterModelFromId sortingId |> sorting.Single
+        | Pair spmm -> spmm |> SorterPairModelGen.makeSorterPairModelFromId sortingId |> sorting.Pairs
+
+    //let makeSorterIdsWithTags 
+    //             (index: int) 
+    //             (model: sortingGen) : (Guid<sorterId> * modelTag) [] = 
+    //    match model with
+    //    | Single smm -> smm |> SorterModelGen.makeSorterIdWithTag index |> Array.singleton
+    //    | Pair spmm -> spmm |> SorterPairModelGen.makeSorterIdsWithTags index

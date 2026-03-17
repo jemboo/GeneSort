@@ -1,8 +1,8 @@
 ﻿namespace GeneSort.SortingOps
 
-open FSharp.UMX
-open GeneSort.Model.Sorting
 
+[<Measure>] type ceIndex
+[<Measure>] type ceBlockId
 
 [<Measure>] type sortingResultId
 [<Measure>] type sorterSetEvalId

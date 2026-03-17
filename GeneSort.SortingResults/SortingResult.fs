@@ -36,4 +36,10 @@ module SortingResult =
                                         (ting |> Sorting.getId) 
                                         |> pairsSortingResult.SplitPairs  |> sortingResult.Pairs
 
+
+    let getSorterEval (psr: sortingResult) (modelTag:modelTag) :sorterEval =
+        match psr with
+        | Single ssr -> ssr.SorterEval.Value
+        | Pairs psr -> psr |> PairsSortingResult.getSorterEval modelTag
+
             

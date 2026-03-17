@@ -19,3 +19,10 @@ module PairsSortingResult =
         | SplitPairs2 spsr -> spsr.SortingId
 
 
+    let getSorterEval (modelTag:modelTag) (psr: pairsSortingResult)  :sorterEval =
+        match psr with
+        | SplitPairs spsr -> spsr.GetSorterEval modelTag
+        | SplitPairs2 spsr -> spsr.GetSorterEval modelTag
+
+
+

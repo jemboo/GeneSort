@@ -5,11 +5,6 @@ open FSharp.UMX
 open GeneSort.Sorting.Sorter
 open GeneSort.Sorting
 
-[<Measure>]
-type ceIndex
-
-[<Measure>] 
-type ceBlockId
 
 
 type ceBlock = 

@@ -6,34 +6,6 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 
-// Type definitions
-//[<Struct; CustomEquality; NoComparison>]
-//type ce = private { low: int; hi: int } with
-
-//    static member create (lv: int) (hv: int) : ce =
-//        if lv < 0 || hv < 0 then
-//            failwith "Indices must be non-negative"
-//        else if lv < hv then
-//            { low = lv; hi = hv }
-//        else
-//            { low = hv; hi = lv }
-
-//    /// Gets the first TwoOrbit.
-//    member this.Low with get () = this.low
-
-//    /// Gets the second TwoOrbit (if present).
-//    member this.Hi with get () = this.hi
-
-//    override this.Equals(obj) = 
-//        match obj with
-//        | :? ce as other -> this.low = other.low && this.hi = other.hi
-//        | _ -> false
-//    override this.GetHashCode() = 
-//        hash (this.low, this.hi)
-//    interface IEquatable<ce> with
-//        member this.Equals(other) = 
-//            this.low = other.low && this.hi = other.hi
-// Type definitions
 [<Struct>]
 type ce = private { low: int; hi: int } with
 
@@ -50,6 +22,33 @@ type ce = private { low: int; hi: int } with
 
     /// Gets the second TwoOrbit (if present).
     member this.Hi with get () = this.hi
+
+
+[<CustomEquality; NoComparison>]
+type ceSequenceKey =
+    private { 
+        ces: struct(int * int) array
+        hashCode: int 
+    }
+
+    static member create (ces: ce array) =
+        let arr = ces |> Array.map (fun c -> struct(c.Low, c.Hi))
+        let h = arr |> Array.fold (fun acc struct(l, h) -> HashCode.Combine(acc, l, h)) 0
+        { ces = arr; hashCode = h }
+
+
+    member this.Ces with get () = this.ces
+
+    override this.GetHashCode() = this.hashCode
+
+    override this.Equals(obj) =
+        match obj with
+        | :? ceSequenceKey as other ->
+            this.hashCode = other.hashCode &&
+            this.ces.Length = other.ces.Length &&
+            Array.forall2 (=) this.ces other.ces
+        | _ -> false
+
 
 
 module Ce =

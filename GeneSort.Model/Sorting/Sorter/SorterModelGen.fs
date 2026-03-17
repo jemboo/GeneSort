@@ -78,13 +78,13 @@ module SorterModelGen =
 
 
 
-    let makeSorterIdWithTag (index:int) (model:sorterModelGen) : Guid<sorterId> * modelTag =
-        match model with
-        | SmmMsceRandGen msce -> (%(msce.MakeSorterModelId index) |> UMX.tag<sorterId>, modelTag.Single)
-        | SmmMssiRandGen mssi -> (%(mssi.MakeSorterModelId index) |> UMX.tag<sorterId>, modelTag.Single)
-        | SmmMsrsRandGen msrs -> (%(msrs.MakeSorterModelId index) |> UMX.tag<sorterId>, modelTag.Single)
-        | SmmMsuf4RandGen msuf4 -> (%(msuf4.MakeSorterModelId index) |> UMX.tag<sorterId>, modelTag.Single)
-        | SmmMsuf6RandGen msuf6 -> (%(msuf6.MakeSorterModelId index) |> UMX.tag<sorterId>, modelTag.Single)
+    //let makeSorterIdWithTag (index:int) (model:sorterModelGen) : Guid<sorterId> * modelTag =
+    //    match model with
+    //    | SmmMsceRandGen msce -> (%(msce.MakeSorterModelId index) |> UMX.tag<sorterId>, modelTag.Single)
+    //    | SmmMssiRandGen mssi -> (%(mssi.MakeSorterModelId index) |> UMX.tag<sorterId>, modelTag.Single)
+    //    | SmmMsrsRandGen msrs -> (%(msrs.MakeSorterModelId index) |> UMX.tag<sorterId>, modelTag.Single)
+    //    | SmmMsuf4RandGen msuf4 -> (%(msuf4.MakeSorterModelId index) |> UMX.tag<sorterId>, modelTag.Single)
+    //    | SmmMsuf6RandGen msuf6 -> (%(msuf6.MakeSorterModelId index) |> UMX.tag<sorterId>, modelTag.Single)
 
 
 
