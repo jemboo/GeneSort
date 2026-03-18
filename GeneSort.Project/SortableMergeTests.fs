@@ -179,18 +179,17 @@ module SortableMergeTests =
                     msasM.create sortingWidth mergeDimension mergeFillType 
                     |> sortableTestModel.MsasMi
             
+                let qpForSortableTest = makeQueryParamsFromRunParams runParams (outputDataType.SortableTest "") 
                 let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataFormat
-                let newRunParams = runParams.WithSortableCount (sortableTests |> SortableTests.getSortableCount |> Some)
 
                 // 4. Save
                 let! _ = checkCancellation cts.Token
-                let qpForSortableTest = makeQueryParamsFromRunParams newRunParams (outputDataType.SortableTest "") 
             
                 // The builder automatically handles short-circuiting if saveAsync returns Error
                 let! _ = db.saveAsync projectFolder qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
 
                 // 5. Success
-                return newRunParams.WithRunFinished (Some true)
+                return runParams.WithRunFinished (Some true)
 
             with e ->
                 let runId = runParams |> RunParameters.getIdString

@@ -250,13 +250,13 @@ module MergeIntQa =
 
                 // 5. Computation
                 let collectNewSortableTests = false
+                let queryParamsForSorterSetEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
                 let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTest collectNewSortableTests
                 
                 report progress (sprintf "%s Saving sorterSet test results %s repl %d" (MathUtils.getTimestampString()) runId %repl)
                 let! _ = checkCancellation cts.Token
 
                 // 6. Save
-                let queryParamsForSorterSetEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
                 let! _ = db.saveAsync projectFolder queryParamsForSorterSetEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
                 // 7. Success

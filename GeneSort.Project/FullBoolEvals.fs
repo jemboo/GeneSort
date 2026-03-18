@@ -184,18 +184,20 @@ module FullBoolEvals =
                 let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataFormat
                 let sorterSet = sortingSet |> SortingSet.makeSorterSet
                 let collectNewSortableTests = false
+                let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
                 let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests collectNewSortableTests
 
                 // 5. Save Results
-                let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
                 let! _ = db.saveAsync projectFolder qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
+
+                // 6. make passing sorterSet
+                let qpSorterModelSetPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Pass")
                 let passingSortingSet = 
                         SorterSetEval.makePassingSortingSet sortingSet sorterSetEval
-                let qpSorterModelSetPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Pass")
                 let! _ = db.saveAsync projectFolder qpSorterModelSetPass (passingSortingSet |> outputData.SortingSet) allowOverwrite
 
 
-                // 6. Final Success
+                // 7. Final Success
                 return runParameters.WithRunFinished (Some true)
 
             with e ->

@@ -297,10 +297,10 @@ module RandomSorters =
                                                 (sorterModelGen |> sortingGen.Single)
                                                 firstIndex 
                                                 sorterCount
+                let qpSortingSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "") 
                 let sortingSet = sortingSetGen.MakeSortingSet
 
                 // 4. Saves
-                let qpSortingSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "") 
                 let! _ = db.saveAsync projectFolder qpSortingSet (sortingSet |> outputData.SortingSet) allowOverwrite
             
                 progress |> Option.iter (fun p -> 
