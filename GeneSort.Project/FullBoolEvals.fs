@@ -28,15 +28,15 @@ module FullBoolEvals =
             (sorterModelType:sorterModelType option)
             (sortableDataFormat:sortableDataFormat option)
             (outputDataType: outputDataType) =
-        queryParams.create(
-            Some projectName,
-            repl,
-            outputDataType,
+        queryParams.create
+            (Some projectName)
+            repl
+            outputDataType
             [|
                 (runParameters.sortingWidthKey, sortingWidth |> UmxExt.intToString ); 
                 (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString );
                 (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringToString );
-            |])
+            |]
 
 
     let makeQueryParamsFromRunParams

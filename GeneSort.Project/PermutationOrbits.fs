@@ -30,17 +30,16 @@ module PermutationOrbits =
             (sorterModelType:sorterModelType option)
             (outputDataType: outputDataType) =
              
-        queryParams.create(
-            Some projectName,
-            repl,
-            outputDataType,
+        queryParams.create
+            (Some projectName)
+            repl
+            outputDataType
             [|
                 (runParameters.sortingWidthKey, 
                  sortingWidth |> SortingWidth.toString); 
                 (runParameters.sorterModelTypeKey, 
                  sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString );
-            |])
-
+            |]
 
     let makeQueryParamsFromRunParams
             (runParams: runParameters) 

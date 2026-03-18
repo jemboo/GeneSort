@@ -23,18 +23,18 @@ module SortableMergeTests =
             (mergeDimension: int<mergeDimension> option)
             (mergeFillType: mergeSuffixType option)
             (sortableDataFormat: sortableDataFormat option)
-            (outputDataType: outputDataType) =
+            (outputDataType: outputDataType) : queryParams =
              
-        queryParams.create(
-            Some projectName,
-            repl,
-            outputDataType,
+        queryParams.create
+            (Some projectName)
+            repl
+            outputDataType
             [|
                 (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
                 (runParameters.mergeDimensionKey, mergeDimension |> MergeDimension.toString);
                 (runParameters.mergeSuffixTypeKey, mergeFillType |> Option.map MergeFillType.toString |> UmxExt.stringToString );
                 (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringToString );
-            |])
+            |]
 
     let makeQueryParamsFromRunParams
             (runParams: runParameters) 

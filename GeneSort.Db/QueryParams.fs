@@ -1,81 +1,71 @@
 ﻿namespace GeneSort.Db
 
-open System
 open FSharp.UMX
 open GeneSort.Runs
 open GeneSort.Core
 
 type queryParams =
     private {
-        projectName: string<projectName> option
-        repl: int<replNumber> option
+        projectName:    string<projectName> option
+        repl:           int<replNumber> option
         outputDataType: outputDataType
-        properties: Map<string, string>
-        idCache: Lazy<System.Guid> 
+        properties:     Map<string, string>
+        id:             Guid<queryParamsId>
     }
 
-    /// Gets the project name, defaulting to "NoName" if none.
-    static member ProjectNameString (projectName:string<projectName> option) = 
-           match projectName with
-              | Some pn -> %pn
-              | None -> "None"
+    static member ProjectNameString (projectName: string<projectName> option) =
+        match projectName with
+        | Some pn -> %pn
+        | None    -> "None"
 
-    static member ReplString (repl:int<replNumber> option) = 
-            match repl with
-               | Some r -> (%r).ToString()
-               | None -> ""
+    static member ReplString (repl: int<replNumber> option) =
+        match repl with
+        | Some r -> (%r).ToString()
+        | None   -> ""
 
-    member this.Id with get() : Guid<idValue> = this.idCache.Value |> UMX.tag<idValue>
-
+    member this.Id             with get() = this.id
+    member this.ProjectName    with get() = this.projectName
+    member this.Repl           with get() = this.repl
     member this.OutputDataType with get() = this.outputDataType
-
-    member this.Properties with get() = this.properties
-    
-    member this.Repl with get() = this.repl
+    member this.Properties     with get() = this.properties
 
     member this.ReplAsString with get() : string =
         queryParams.ReplString this.repl
 
-    member this.ToString : string =
-        let projStr = this.projectName |> queryParams.ProjectNameString
-        let replStr = this.repl |> queryParams.ReplString
+    override this.ToString() : string =
+        let projStr    = this.projectName    |> queryParams.ProjectNameString
+        let replStr    = this.repl           |> queryParams.ReplString
         let outTypeStr = this.outputDataType |> OutputDataType.toFolderName
-        let propsStr =
+        let propsStr   =
             this.properties
             |> Map.toSeq
-            |> Seq.map (fun (k,v) -> $"{k}={v}")
+            |> Seq.map (fun (k, v) -> $"{k}={v}")
             |> String.concat ";"
         $"Project: {projStr}, Repl: {replStr}, OutputType: {outTypeStr}, Properties: [{propsStr}]"
 
-
-    /// Creates a new queryParams instance.
-    static member create (
-        projectName: string<projectName> option,
-        repl: int<replNumber> option,
-        outputDataType: outputDataType,
-        properties: (string*string) []) : queryParams =
+    static member create
+            (projectName:    string<projectName> option)
+            (repl:           int<replNumber> option)
+            (outputDataType: outputDataType)
+            (properties:     (string * string) []) : queryParams =
         let props = properties |> Array.filter (fst >> isNull >> not) |> Map.ofArray
-        {   // Added validation: no null keys in properties.
-            projectName = projectName
-            repl = repl
+        {
+            projectName    = projectName
+            repl           = repl
             outputDataType = outputDataType
-            properties = props
-            idCache = lazy (
-                GuidUtils.guidFromObjs [
-                    box (projectName |> queryParams.ProjectNameString); 
-                    box (repl |> queryParams.ReplString); 
-                    box (outputDataType |> OutputDataType.toFolderName);
-                    box (props |> Map.toSeq |> Seq.sortBy fst |> Seq.toArray)
-                ])
+            properties     = props
+            id             = GuidUtils.guidFromObjs [
+                                box (projectName    |> queryParams.ProjectNameString)
+                                box (repl           |> queryParams.ReplString)
+                                box (outputDataType |> OutputDataType.toFolderName)
+                                box (props |> Map.toSeq |> Seq.sortBy fst |> Seq.toArray)
+                             ] |> UMX.tag<queryParamsId>
         }
 
-    /// Creates queryParams for a project.
-    static member createForProject(projectName: string<projectName>) : queryParams =
-        queryParams.create(Some projectName, None, outputDataType.Project, [||])
+    static member createForProject (projectName: string<projectName>) : queryParams =
+        queryParams.create (Some projectName) None outputDataType.Project [||]
 
-
-    /// Creates queryParams for a text report.
     static member createForTextReport
-        (projectName: string<projectName>)
-        (textReportName: string<textReportName>) : queryParams =
-        queryParams.create(Some projectName, None, outputDataType.TextReport textReportName, [||])
+            (projectName:    string<projectName>)
+            (textReportName: string<textReportName>) : queryParams =
+        queryParams.create (Some projectName) None (outputDataType.TextReport textReportName) [||]

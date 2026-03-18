@@ -6,10 +6,10 @@ open GeneSort.Runs
 
 
 type RunResult =
-    | Success of id: Guid<idValue> * repl: int<replNumber> * message: string
-    | Failure of id: Guid<idValue> * repl: int<replNumber> * message: string
-    | Skipped of id: Guid<idValue> * repl: int<replNumber> * message: string
-    | Cancelled of id: Guid<idValue> * repl: int<replNumber>
+    | Success of id: Guid<queryParamsId> * repl: int<replNumber> * message: string
+    | Failure of id: Guid<queryParamsId> * repl: int<replNumber> * message: string
+    | Skipped of id: Guid<queryParamsId> * repl: int<replNumber> * message: string
+    | Cancelled of id: Guid<queryParamsId> * repl: int<replNumber>
 
 
 

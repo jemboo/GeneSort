@@ -8,7 +8,7 @@ open GeneSort.Model.Sorting
 
 [<Measure>] type projectName
 [<Measure>] type textReportName
-[<Measure>] type idValue
+[<Measure>] type queryParamsId
 [<Measure>] type replNumber
 [<Measure>] type generationNumber
 
@@ -64,7 +64,7 @@ type runParameters =
     // --- Getters ---
     member this.GetCeLength() = runParameters.tryGetInt runParameters.ceLengthKey this.paramMap |> Option.map UMX.tag<ceLength>
     member this.GetGeneration() = runParameters.tryGetInt runParameters.generationKey this.paramMap |> Option.map UMX.tag<generationNumber>
-    member this.GetId() = runParameters.tryGetGuid runParameters.idKey this.paramMap |> Option.map UMX.tag<idValue>
+    member this.GetId() = runParameters.tryGetGuid runParameters.idKey this.paramMap |> Option.map UMX.tag<queryParamsId>
     member this.GetLatticeDistance() = runParameters.tryGetInt runParameters.latticeDistanceKey this.paramMap |> Option.map UMX.tag<latticeDistance>
     member this.GetMaxOrbit() = runParameters.tryGetInt runParameters.maxOrbitKey this.paramMap
     member this.GetMergeDimension() = runParameters.tryGetInt runParameters.mergeDimensionKey this.paramMap |> Option.map UMX.tag<mergeDimension>
@@ -101,7 +101,7 @@ type runParameters =
     member this.WithGeneration(gen: int<generationNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationKey (gen |> Option.map UmxExt.intToRaw) }
 
-    member this.WithId(id: Guid<idValue> option) = 
+    member this.WithId(id: Guid<queryParamsId> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.idKey (id |> Option.map UmxExt.guidToRaw) }
 
     member this.WithLatticeDistance(ld: int<latticeDistance> option) = 

@@ -32,17 +32,17 @@ module MergeIntQa =
             (mergeFillType: mergeSuffixType option)
             (outputDataType: outputDataType) =
              
-        queryParams.create(
-            Some projectName,
-            repl,
-            outputDataType,
+        queryParams.create
+            (Some projectName)
+            repl
+            outputDataType
             [|
                 (runParameters.sortingWidthKey, sortingWidth |> UmxExt.intToString ); 
                 (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString );
                 (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringToString );
                 (runParameters.mergeDimensionKey, mergeDimension |> UmxExt.intToString );
                 (runParameters.mergeSuffixTypeKey, mergeFillType |> Option.map MergeFillType.toString |> UmxExt.stringToString );
-            |])
+            |]
 
 
     let makeQueryParamsFromRunParams

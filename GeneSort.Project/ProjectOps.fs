@@ -74,7 +74,7 @@ module ProjectOps =
             (cts: CancellationTokenSource)
             (progress: IProgress<string> option) : Async<RunResult> =
         async {
-            let runId = runParameters.GetId() |> Option.defaultValue ( Guid.Empty |> UMX.tag<idValue>)
+            let runId = runParameters.GetId() |> Option.defaultValue ( Guid.Empty |> UMX.tag<queryParamsId>)
             let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
     
             // 1. Check if already done (Synchronous check remains the same)
@@ -123,7 +123,7 @@ module ProjectOps =
             use semaphore = new SemaphoreSlim(maxDegreeOfParallelism)
         
             let processInternal (rp: runParameters) = async {
-                let id = rp.GetId() |> Option.defaultValue ( Guid.Empty |> UMX.tag<idValue>)
+                let id = rp.GetId() |> Option.defaultValue ( Guid.Empty |> UMX.tag<queryParamsId>)
                 let repl = (rp.GetRepl() |> Option.defaultValue (-1 |> UMX.tag))
             
                 try 
