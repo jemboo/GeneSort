@@ -27,17 +27,15 @@ type ce = private { low: int; hi: int } with
 [<CustomEquality; NoComparison>]
 type ceSequenceKey =
     private { 
-        ces: struct(int * int) array
+        ces:      ce array
         hashCode: int 
     }
 
     static member create (ces: ce array) =
-        let arr = ces |> Array.map (fun c -> struct(c.Low, c.Hi))
-        let h = arr |> Array.fold (fun acc struct(l, h) -> HashCode.Combine(acc, l, h)) 0
-        { ces = arr; hashCode = h }
+        let h = ces |> Array.fold (fun acc c -> HashCode.Combine(acc, c.Low, c.Hi)) 0
+        { ces = ces; hashCode = h }
 
-
-    member this.Ces with get () = this.ces
+    member this.Ces with get() = this.ces
 
     override this.GetHashCode() = this.hashCode
 
@@ -46,9 +44,8 @@ type ceSequenceKey =
         | :? ceSequenceKey as other ->
             this.hashCode = other.hashCode &&
             this.ces.Length = other.ces.Length &&
-            Array.forall2 (=) this.ces other.ces
+            Array.forall2 (fun (a: ce) (b: ce) -> a.Low = b.Low && a.Hi = b.Hi) this.ces other.ces
         | _ -> false
-
 
 
 module Ce =

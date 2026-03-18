@@ -196,7 +196,7 @@ module FullBoolMutate =
                 let collectNewSortableTests = false
                 let sorterSetEvalParent = SorterSetEval.makeSorterSetEval sorterSetParent sortableTests collectNewSortableTests
 
-                let evalH = SorterEvalHierarchy.createFromSorterSetEval 1<maxReps> sorterSetEvalParent
+                let evalH = SorterEvalHierarchy.createFromSorterSetEval sorterSetEvalParent
 
                 sortingResultSetMap.UpdateManySortingResults sorterSetEvalParent.SorterEvals
 

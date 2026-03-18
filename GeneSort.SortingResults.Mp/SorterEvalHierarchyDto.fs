@@ -35,25 +35,22 @@ module SorterEvalKeyDto =
             dto.isSorted
 
 // ---------------------------------------------------------------------------
-// Leaf DTO
+// Leaf DTO: sorterEval removed; cesLowHi encodes the ceSequenceKey
 // ---------------------------------------------------------------------------
 [<MessagePackObject>]
 type sorterEvalLeafDto = {
     [<Key(0)>]
-    cesLowHi: int array          // interleaved low,hi pairs encoding the ceSequenceKey
+    cesLowHi:  int array     // interleaved low,hi pairs encoding the ceSequenceKey
     [<Key(1)>]
     sorterIds: Guid array
-    [<Key(2)>]
-    sorterEval: sorterEvalDto option
 }
 
 module SorterEvalLeafDto =
 
     let toDto (key: ceSequenceKey) (leaf: sorterEvalLeaf) : sorterEvalLeafDto =
         {
-            cesLowHi   = key.Ces |> Array.collect (fun struct(l, h) -> [| l; h |])
-            sorterIds  = leaf.SorterIds |> Seq.map UMX.untag |> Seq.toArray
-            sorterEval = leaf.SorterEval |> Option.map SorterEvalDto.toSorterEvalDto
+            cesLowHi  = key.Ces |> Array.collect (fun c -> [| c.Low; c.Hi |])
+            sorterIds = leaf.SorterIds |> Seq.map UMX.untag |> Seq.toArray
         }
 
     let fromDto (dto: sorterEvalLeafDto) : ceSequenceKey * sorterEvalLeaf =
@@ -61,20 +58,11 @@ module SorterEvalLeafDto =
             dto.cesLowHi
             |> Array.chunkBySize 2
             |> Array.map (fun pair -> ce.create pair.[0] pair.[1])
-        let key = ceSequenceKey.create ces
+        let key  = ceSequenceKey.create ces
         let leaf =
-            match dto.sorterEval with
-            | Some evalDto ->
-                let eval = SorterEvalDto.fromSorterEvalDto evalDto
-                let l = sorterEvalLeaf.create(eval, true)
-                for id in dto.sorterIds do
-                    let taggedId = UMX.tag<sorterId> id
-                    if taggedId <> eval.SorterId then l.AddId(taggedId)
-                l
-            | None ->
-                match dto.sorterIds with
-                | [||] -> failwith "Cannot reconstruct sorterEvalLeaf with no sorterIds."
-                | ids  -> sorterEvalLeaf.createWithIds(ids |> Array.map (UMX.tag<sorterId>))
+            match dto.sorterIds with
+            | [||] -> failwith "Cannot reconstruct sorterEvalLeaf with no sorterIds."
+            | ids  -> sorterEvalLeaf.createWithIds(ids |> Array.map (UMX.tag<sorterId>))
         key, leaf
 
 // ---------------------------------------------------------------------------
@@ -99,12 +87,12 @@ module SorterEvalLayerDto =
                 |> Seq.toArray
         }
 
-    let fromDto (dto: sorterEvalLayerDto, maxReps: int) : sorterEvalLayer =
+    let fromDto (dto: sorterEvalLayerDto) : sorterEvalLayer =
         let key   = SorterEvalKeyDto.fromDto dto.sorterEvalKey
         let layer = sorterEvalLayer.create(key)
         for leafDto in dto.leaves do
             let (ceSeqKey, leaf) = SorterEvalLeafDto.fromDto leafDto
-            layer.MergeLeaf ceSeqKey (leaf, UMX.tag<maxReps> maxReps)
+            layer.MergeLeaf ceSeqKey leaf
         layer
 
 // ---------------------------------------------------------------------------
@@ -116,16 +104,13 @@ type sorterEvalHierarchyDto = {
     sorterEvalHierarchyId: Guid
     [<Key(1)>]
     layers: sorterEvalLayerDto array
-    [<Key(2)>]
-    maxRepresentativesPerLayer: int
 }
 
 module SorterEvalHierarchyDto =
 
     let fromDomain (hierarchy: sorterEvalHierarchy) : sorterEvalHierarchyDto =
         {
-            sorterEvalHierarchyId      = %hierarchy.SorterEvalHierarchyId
-            maxRepresentativesPerLayer = %hierarchy.MaxRepresentativesPerLayer
+            sorterEvalHierarchyId = %hierarchy.SorterEvalHierarchyId
             layers =
                 hierarchy.Layers
                 |> Seq.map (fun kvp -> SorterEvalLayerDto.toDto kvp.Value)
@@ -134,12 +119,9 @@ module SorterEvalHierarchyDto =
 
     let toDomain (dto: sorterEvalHierarchyDto) : sorterEvalHierarchy =
         let hierarchy =
-            sorterEvalHierarchy.create (
-                UMX.tag<sorterEvalHierarchyId> dto.sorterEvalHierarchyId,
-                UMX.tag<maxReps>               dto.maxRepresentativesPerLayer)
+            sorterEvalHierarchy.create (UMX.tag<sorterEvalHierarchyId> dto.sorterEvalHierarchyId)
         for layerDto in dto.layers do
-            let layer = SorterEvalLayerDto.fromDto (layerDto, dto.maxRepresentativesPerLayer)
-            hierarchy.MergeLayer layer
+            hierarchy.MergeLayer (SorterEvalLayerDto.fromDto layerDto)
         hierarchy
 
     let serialize (options: MessagePackSerializerOptions)
