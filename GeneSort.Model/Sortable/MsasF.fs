@@ -43,42 +43,52 @@ type msasF =
     interface IEquatable<msasF> with
         member this.Equals(other) =  this.sortingWidth = other.sortingWidth
 
-    member this.MakeSortableBoolTest (sortingWidth: int<sortingWidth>) : sortableBinaryTest =
+    member this.MakeSortableBoolTest 
+                    (sorterTestId: Guid<sorterTestId>)
+                    (sortingWidth: int<sortingWidth>) : sortableBinaryTest =
         let sortableArrays =  SortableBoolArray.getAllSortableBoolArrays sortingWidth
         sortableBinaryTest.create 
-                ( %this.id |> UMX.tag<sorterTestId>) 
+                sorterTestId
                 sortingWidth
                 sortableArrays
 
 
-    member this.MakeSortableIntTest (sortingWidth: int<sortingWidth>) : sortableIntTest =
+    member this.MakeSortableIntTest 
+                    (sorterTestId: Guid<sorterTestId>)
+                    (sortingWidth: int<sortingWidth>) : sortableIntTest =
         let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
         sortableIntTest.create
-                ( %this.id |> UMX.tag<sorterTestId>) 
+                sorterTestId
                 sortingWidth
                 sortableArrays
 
 
-    member this.MakeSortableBitv512Test (sortingWidth: int<sortingWidth>) : sortableBitv512Test =
+    member this.MakeSortableBitv512Test 
+                    (sorterTestId: Guid<sorterTestId>)
+                    (sortingWidth: int<sortingWidth>) : sortableBitv512Test =
         let grayBlocks = Sortable.GrayVectorGenerator.getAllSortBlockBitv512ForSortingWidth sortingWidth |> Seq.toArray
         sortableBitv512Test.create
-                ( %this.id |> UMX.tag<sorterTestId>) 
+                sorterTestId
                 sortingWidth
                 grayBlocks
 
 
-    member this.MakeSortableUint8v256Test (sortingWidth: int<sortingWidth>) : sortableUint8v256Test =
+    member this.MakeSortableUint8v256Test 
+                    (sorterTestId: Guid<sorterTestId>)
+                    (sortingWidth: int<sortingWidth>) : sortableUint8v256Test =
         let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
         SortableUint8v256Test.fromIntArrays
-                ( %this.id |> UMX.tag<sorterTestId>) 
+                sorterTestId
                 sortingWidth
                 sortableArrays
 
 
-    member this.MakeSortableUint8v512Test (sortingWidth: int<sortingWidth>) : sortableUint8v512Test =
+    member this.MakeSortableUint8v512Test 
+                    (sorterTestId: Guid<sorterTestId>)
+                    (sortingWidth: int<sortingWidth>) : sortableUint8v512Test =
         let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
         SortableUint8v512Test.fromIntArrays
-                ( %this.id |> UMX.tag<sorterTestId>) 
+                sorterTestId
                 sortingWidth
                 sortableArrays
 

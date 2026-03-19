@@ -33,7 +33,8 @@ type sortingGenSegment =
     member this.FirstIndex with get() = this.firstIndex
     member this.Count with get() = this.count
 
-    member this.MakeSortingSet : sortingSet =
+    member this.MakeSortingSet
+                (sortingSetId: Guid<sortingSetId>) : sortingSet =
         if %this.count <= 0 then
             failwith "Count must be greater than 0"
         if %this.firstIndex < 0 then
@@ -43,5 +44,4 @@ type sortingGenSegment =
                 let index = %this.firstIndex + i
                 SortingGen.makeSortingFromIndex index this.sortingGen |]
 
-        let id = (%this.id) |> UMX.tag<sortingSetId>
-        sortingSet.create id sortings
+        sortingSet.create sortingSetId sortings

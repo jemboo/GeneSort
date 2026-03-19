@@ -174,26 +174,46 @@ module FullBoolEvals =
                     } |> Result.ofOption (sprintf "Run %s, Repl %d: Missing required parameters" %runId %repl)
 
                 // 3. Load SortingSet
-                let qpSorters = RandomSorters.makeQueryParams (Some repl) (Some sortingWidth) (Some sorterModelType) (outputDataType.SortingSet "")
+                let qpSorters = RandomSorters.makeQueryParams 
+                                                (Some repl) 
+                                                (Some sortingWidth) 
+                                                (Some sorterModelType) 
+                                                (outputDataType.SortingSet "")
                 let! loadRes = db.loadAsync RandomSorters.projectFolder qpSorters
                 let! sortingSet = loadRes |> OutputData.asSortingSet |> asAsync
 
                 // 4. Perform Computation
                 let! _ = checkCancellation cts.Token
                 let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-                let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataFormat
+                let qpSortableTests = makeQueryParamsFromRunParams 
+                                            runParameters 
+                                            (outputDataType.SortableTest "")
+                let sortableTests = SortableTestModel.makeSortableTest 
+                                        (%qpSortableTests.Id |> UMX.tag<sorterTestId>) 
+                                        sortableTestModel 
+                                        sortableDataFormat
+
                 let sorterSet = sortingSet |> SortingSet.makeSorterSet
                 let collectNewSortableTests = false
-                let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
-                let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTests collectNewSortableTests
+                let qpEval = makeQueryParamsFromRunParams 
+                                        runParameters 
+                                        (outputDataType.SorterSetEval "")
+                let sorterSetEval = SorterSetEval.makeSorterSetEval 
+                                            (%qpEval.Id |> UMX.tag<sorterSetEvalId>) 
+                                            sorterSet 
+                                            sortableTests 
+                                            collectNewSortableTests
 
                 // 5. Save Results
                 let! _ = db.saveAsync projectFolder qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
                 // 6. make passing sorterSet
                 let qpSorterModelSetPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Pass")
-                let passingSortingSet = 
-                        SorterSetEval.makePassingSortingSet sortingSet sorterSetEval
+                let passingSortingSet = SorterSetEval.makePassingSortingSet 
+                                            (%qpEval.Id |> UMX.tag<sortingSetId>) 
+                                            sortingSet 
+                                            sorterSetEval
+
                 let! _ = db.saveAsync projectFolder qpSorterModelSetPass (passingSortingSet |> outputData.SortingSet) allowOverwrite
 
 

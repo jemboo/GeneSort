@@ -20,17 +20,12 @@ type sorterSetEval =
     }
 
     static member create 
+                (sorterSetEvalId: Guid<sorterSetEvalId>) 
                 (sorterSetId: Guid<sorterSetId>) 
                 (sorterTestsId: Guid<sorterTestId>) 
                 (sorterEvals: sorterEval[]) =
-        let id =
-            [
-                sorterSetId :> obj
-                sorterTestsId :> obj
-            ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterSetEvalId>
-
         { 
-            sorterSetEvalId = id
+            sorterSetEvalId = sorterSetEvalId
             sorterSetId = sorterSetId
             sorterTestId = sorterTestsId
             sorterEvals = sorterEvals |> Array.map (fun se -> (se.SorterId, se)) |> Map.ofArray
@@ -51,6 +46,7 @@ module SorterSetEval =
         | None -> failwith "SorterSetEval contains no SorterEvals"
 
     let makeSorterSetEval
+            (sorterSetEvalId: Guid<sorterSetEvalId>)
             (sorterSet: sorterSet)
             (sortableTest: sortableTest) 
             (collectNewSortableTests: bool) : sorterSetEval =
@@ -71,7 +67,7 @@ module SorterSetEval =
                             sorter.SorterId
                             ceBlockEval
                 )
-        sorterSetEval.create sorterSet.Id (sortableTest |> SortableTests.getId ) sorterEvals
+        sorterSetEval.create sorterSetEvalId sorterSet.Id (sortableTest |> SortableTests.getId ) sorterEvals
 
 
     /// For the sorterSet and its corresponding sorterSetEval, this creates a sorterSet 
@@ -112,6 +108,7 @@ module SorterSetEval =
     /// For the sortingSet and its corresponding sorterSetEval, this creates a sortingSet 
     /// that consists of all the sortings that produced sorters with an UnsortedCount = 0
     let makePassingSortingSet
+            (id: Guid<sortingSetId>)
             (sms: sortingSet)
             (sorterSetEval: sorterSetEval) : sortingSet =
         
@@ -126,19 +123,7 @@ module SorterSetEval =
             sms.Sortings 
             |> Array.filter (fun stm -> Sorting.containsAnySorter passingIds stm)
 
-        // 3. Create a new sortingSet with a unique ID derived from the passing subset
-        // Note: Using the original set ID and evaluation ID to maintain lineage
-        let newSetId = 
-            [ 
-                sms.Id :> obj
-                sorterSetEval.SorterSetEvalId :> obj
-                "PassingSubset" :> obj 
-            ] 
-            |> GuidUtils.guidFromObjs 
-            |> UMX.tag<sortingSetId>
-
-
         sortingSet.create 
-            newSetId
+            id
             passingSorterModels
 

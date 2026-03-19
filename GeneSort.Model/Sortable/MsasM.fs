@@ -58,19 +58,21 @@ type msasM =
     interface IEquatable<msasM> with
         member this.Equals(other) =  this.sortingWidth = other.sortingWidth
 
-    member this.MakeSortableIntTest : sortableIntTest =
+    member this.MakeSortableIntTest 
+                    (sorterTestId: Guid<sorterTestId>) : sortableIntTest =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
                             this.mergeFillType
 
         sortableIntTest.create 
-                (%this.id |> UMX.tag<sorterTestId>) 
+                sorterTestId
                 this.SortingWidth
                 intArrays
 
 
-    member this.MakeSortableBoolTest : sortableBinaryTest =
+    member this.MakeSortableBoolTest
+                    (sorterTestId: Guid<sorterTestId>) : sortableBinaryTest =
 
         let sortableArrays = SortableBoolArray.getMergeTestCases
                                     this.sortingWidth
@@ -78,43 +80,45 @@ type msasM =
                                     this.mergeFillType  
 
         sortableBinaryTest.create 
-                ( %this.id |> UMX.tag<sorterTestId>) 
+                sorterTestId
                 this.sortingWidth
                 sortableArrays
 
 
-    member this.MakeSortableUint8v256Test : sortableUint8v256Test =
+    member this.MakeSortableUint8v256Test 
+                    (sorterTestId: Guid<sorterTestId>) : sortableUint8v256Test =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
                             this.mergeFillType
 
         SortableUint8v256Test.fromIntArrays 
-                (%this.id |> UMX.tag<sorterTestId>) 
+                sorterTestId
                 this.SortingWidth
                 intArrays
 
 
-    member this.MakeSortableUint8v512Test : sortableUint8v512Test =
+    member this.MakeSortableUint8v512Test 
+                    (sorterTestId: Guid<sorterTestId>) : sortableUint8v512Test =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
                             this.mergeFillType
 
         SortableUint8v512Test.fromIntArrays 
-                (%this.id |> UMX.tag<sorterTestId>) 
+                sorterTestId
                 this.SortingWidth
                 intArrays
 
 
-    member this.MakeSortableBitv512Test : sortableBitv512Test =
+    member this.MakeSortableBitv512Test 
+                    (sorterTestId: Guid<sorterTestId>) : sortableBitv512Test =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
                             this.mergeFillType
 
         let sw = this.SortingWidth
-        let id = %this.id |> UMX.tag<sorterTestId>
     
         // Instead of converting all to bool arrays first, we process intArrays in chunks
         let blocks = 
@@ -147,7 +151,7 @@ type msasM =
                 |]
             )
 
-        sortableBitv512Test.create id sw blocks
+        sortableBitv512Test.create sorterTestId sw blocks
 
 
 

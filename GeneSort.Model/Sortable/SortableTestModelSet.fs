@@ -1,5 +1,6 @@
 ﻿namespace GeneSort.Model.Sortable
 
+open System
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
@@ -20,12 +21,14 @@ type sortableTestModelSet =
     member this.Id with get() = this.id
     member this.SorterTestModels with get() = this.sorterTestModels
 
-    member this.makeSortableTestSet (sortableDataType:sortableDataFormat) : sortableTestSet =
+    member this.makeSortableTestSet 
+                    (sorterTestId: Guid<sorterTestId>)
+                    (sortableDataType:sortableDataFormat) : sortableTestSet =
         let id = (%this.id) |> UMX.tag<sortableTestSetId>
 
         let sortableTestArray = 
                 this.SorterTestModels
-                |> Array.map(fun model -> SortableTestModel.makeSortableTests model sortableDataType)
+                |> Array.map(fun model -> SortableTestModel.makeSortableTest sorterTestId model sortableDataType)
 
         //match sortableDataType with
         //| sortableDataType.Bools ->
@@ -37,7 +40,11 @@ type sortableTestModelSet =
         | sortableDataFormat.BoolArray -> 
             let boolTests = 
                 this.SorterTestModels 
-                |> Array.map (fun model -> SortableTestModel.makeSortableTests model sortableDataType)
+                |> Array.map (fun model ->
+                                    SortableTestModel.makeSortableTest 
+                                        (UMX.tag<sorterTestId> (Guid.NewGuid()))
+                                        model 
+                                        sortableDataType )
                 |> Array.map (fun st -> 
                     match st with
                     | sortableTest.Bools bt -> bt
@@ -47,7 +54,11 @@ type sortableTestModelSet =
         | sortableDataFormat.IntArray -> 
             let intTests = 
                 this.SorterTestModels 
-                |> Array.map (fun model -> SortableTestModel.makeSortableTests model sortableDataType)
+                |> Array.map (fun model -> 
+                            SortableTestModel.makeSortableTest 
+                                (UMX.tag<sorterTestId> (Guid.NewGuid()))
+                                model 
+                                sortableDataType)
                 |> Array.map (fun st -> 
                     match st with
                     | sortableTest.Ints it -> it

@@ -180,7 +180,10 @@ module SortableMergeTests =
                     |> sortableTestModel.MsasMi
             
                 let qpForSortableTest = makeQueryParamsFromRunParams runParams (outputDataType.SortableTest "") 
-                let sortableTests = SortableTestModel.makeSortableTests sortableTestModel sortableDataFormat
+                let sortableTests = SortableTestModel.makeSortableTest 
+                                            (%qpForSortableTest.Id |> UMX.tag<sorterTestId>) 
+                                            sortableTestModel 
+                                            sortableDataFormat
 
                 // 4. Save
                 let! _ = checkCancellation cts.Token

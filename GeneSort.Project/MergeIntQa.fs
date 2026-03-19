@@ -251,7 +251,11 @@ module MergeIntQa =
                 // 5. Computation
                 let collectNewSortableTests = false
                 let queryParamsForSorterSetEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
-                let sorterSetEval = SorterSetEval.makeSorterSetEval sorterSet sortableTest collectNewSortableTests
+                let sorterSetEval = SorterSetEval.makeSorterSetEval
+                                                    (%queryParamsForSorterSetEval.Id |> UMX.tag<sorterSetEvalId>) 
+                                                    sorterSet 
+                                                    sortableTest 
+                                                    collectNewSortableTests
                 
                 report progress (sprintf "%s Saving sorterSet test results %s repl %d" (MathUtils.getTimestampString()) runId %repl)
                 let! _ = checkCancellation cts.Token

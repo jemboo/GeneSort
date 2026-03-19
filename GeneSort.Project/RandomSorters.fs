@@ -298,7 +298,7 @@ module RandomSorters =
                                                 firstIndex 
                                                 sorterCount
                 let qpSortingSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "") 
-                let sortingSet = sortingSetGen.MakeSortingSet
+                let sortingSet = sortingSetGen.MakeSortingSet (%qpSortingSet.Id |> UMX.tag<sortingSetId>) 
 
                 // 4. Saves
                 let! _ = db.saveAsync projectFolder qpSortingSet (sortingSet |> outputData.SortingSet) allowOverwrite
