@@ -1,11 +1,7 @@
 ﻿namespace GeneSort.SortingResults
 
 open FSharp.UMX
-open GeneSort.Sorting
-open GeneSort.SortingOps
 open System.Collections.Generic
-open System
-open GeneSort.Sorting.Sorter
 
 
 

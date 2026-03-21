@@ -190,7 +190,9 @@ module FullBoolMutate =
                                         (outputDataType.SortingSet "")
                 let! loadRes = db.loadAsync RandomSorters.projectFolder qpSorters
                 let! sortingSetParent = loadRes |> OutputData.asSortingSet |> asAsync
-                let sortingResultSetMap = SortingResultSetMap.fromSortingSet sortingSetParent
+                let sorterSetParent = sortingSetParent |> SortingSet.makeSorterSet
+
+
 
                 // 4. Perform Computation
                 let! _ = checkCancellation cts.Token
@@ -203,24 +205,29 @@ module FullBoolMutate =
                                             sortableTestModel 
                                             sortableDataFormat
 
-                let sorterSetParent = sortingSetParent |> SortingSet.makeSorterSet
+
+
+                // 5. Evaluate parent sortings                
                 let collectNewSortableTests = false
-                let qpEval = makeQueryParamsFromRunParams 
-                                    runParameters 
-                                    (outputDataType.SorterSetEval "")
-                let sorterSetEvalParent = SorterSetEval.makeSorterSetEval
-                                                (%qpEval.Id |> UMX.tag<sorterSetEvalId>) 
+                let qpEvalParents = makeQueryParamsFromRunParams 
+                                        runParameters 
+                                        (outputDataType.SorterSetEval "Parents")
+                let sorterSetEvalParent = 
+                                SorterSetEval.makeSorterSetEval
+                                                (%qpEvalParents.Id |> UMX.tag<sorterSetEvalId>) 
                                                 sorterSetParent 
                                                 sortableTests 
                                                 collectNewSortableTests
 
-                let evalH = SorterEvalHierarchy.createFromSorterSetEval sorterSetEvalParent
 
+                // 6. Map parent sorterEvals to parent sortings
+                let evalH = SorterEvalHierarchy.createFromSorterSetEval sorterSetEvalParent
+                let sortingResultSetMap = SortingResultSetMap.fromSortingSet sortingSetParent
                 sortingResultSetMap.UpdateManySortingResults sorterSetEvalParent.SorterEvals
 
 
 
-
+                // 7. mutate parent sortings
                 let sorterModelMutateParams = 
                     SorterModelMutateParams.makeUniformMutatorForSorterModel 
                                 sorterModelType 
@@ -242,36 +249,42 @@ module FullBoolMutate =
                 let mutantSorterSetArray = sortingMutationSegments |> Array.map(fun sms -> sms.MakeMutantSorterSet)
                 let mergedMutantSorterSet = SorterSet.mergeSorterSets mutantSorterSetArray
 
-
                 let allMutantSorters = 
                     sortingMutationSegments |> Array.collect(fun sms -> sms.MakeMutantSorters)
 
 
                 let mutatedSorterSet = sorterSet.createWithNewId allMutantSorters
-                let qpEval = makeQueryParamsFromRunParams 
+
+                // 8. evaluate mutatnts
+                let qpEvalMutants = makeQueryParamsFromRunParams 
                                         runParameters 
-                                        (outputDataType.SorterSetEval "")
+                                        (outputDataType.SorterSetEval "Mutatnts")
 
                 let sorterSetEvalMutated = SorterSetEval.makeSorterSetEval 
-                                                (%qpEval.Id |> UMX.tag<sorterSetEvalId>) 
+                                                (%qpEvalMutants.Id |> UMX.tag<sorterSetEvalId>) 
                                                 mutatedSorterSet 
                                                 sortableTests 
                                                 collectNewSortableTests
 
+                // 9. map mutant sorter reuslts to mutant sortings
                 let mutationSegmentSetResults = mutationSegmentSetResults.create sortingMutationSegments
                 mutationSegmentSetResults.UpdateAllSortingResultsParent sorterSetEvalParent.SorterEvals
                 mutationSegmentSetResults.UpdateAllSortingResultsMutant sorterSetEvalMutated.SorterEvals
 
-                // 5. Save Results
-                let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
-                let! _ = db.saveAsync projectFolder qpEval (sorterSetEvalParent |> outputData.SorterSetEval) allowOverwrite
+                // 10. Extract the passing results
+                let qpSortingSetPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Pass")
                 let passingSortingSet = 
-                        SorterSetEval.makePassingSortingSet (%qpEval.Id |> UMX.tag<sortingSetId>) sortingSetParent sorterSetEvalParent
-                let qpSorterModelSetPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Pass")
-                let! _ = db.saveAsync projectFolder qpSorterModelSetPass (passingSortingSet |> outputData.SortingSet) allowOverwrite
+                        SorterSetEval.makePassingSortingSet (%qpSortingSetPass.Id |> UMX.tag<sortingSetId>) sortingSetParent sorterSetEvalParent
+
+                
+                // 11. Save Results
+                let! _ = db.saveAsync projectFolder qpSortableTests (sortableTests |> outputData.SortableTest) allowOverwrite
+                let! _ = db.saveAsync projectFolder qpEvalParents (sorterSetEvalParent |> outputData.SorterSetEval) allowOverwrite
+                let! _ = db.saveAsync projectFolder qpEvalMutants (sorterSetEvalMutated |> outputData.SorterSetEval) allowOverwrite
+                let! _ = db.saveAsync projectFolder qpSortingSetPass (passingSortingSet |> outputData.SortingSet) allowOverwrite
 
 
-                // 6. Final Success
+                // 11. Final Success
                 return runParameters.WithRunFinished (Some true)
 
             with e ->

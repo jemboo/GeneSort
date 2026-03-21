@@ -6,6 +6,7 @@
 
 [<Measure>] type sortingResultId
 [<Measure>] type sorterSetEvalId
+[<Measure>] type sorterEvalBinsId
 [<Measure>] type sorterEvalHierarchyId
 
 

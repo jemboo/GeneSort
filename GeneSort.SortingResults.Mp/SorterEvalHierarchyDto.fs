@@ -9,31 +9,6 @@ open GeneSort.SortingOps
 open GeneSort.SortingOps.Mp
 open GeneSort.Sorting.Sorter
 
-[<MessagePackObject>]
-type sorterEvalKeyDto = {
-    [<Key(0)>]
-    ceLength: int
-    [<Key(1)>]
-    stageLength: int
-    [<Key(2)>]
-    isSorted: bool
-}
-
-module SorterEvalKeyDto =
-    let toDto (key: sorterEvalKey) : sorterEvalKeyDto =
-        { 
-            ceLength    = %key.CeCount
-            stageLength = %key.StageLength
-            isSorted    = key.IsSorted
-        }
-    let fromDto (dto: sorterEvalKeyDto) : sorterEvalKey =
-        if dto.ceLength < 0    then failwith "CeLength must not be negative"
-        if dto.stageLength < 0 then failwith "StageLength must not be negative"
-        sorterEvalKey.create
-            (UMX.tag<ceLength>    dto.ceLength)
-            (UMX.tag<stageLength> dto.stageLength)
-            dto.isSorted
-
 // ---------------------------------------------------------------------------
 // Leaf DTO: sorterEval removed; cesLowHi encodes the ceSequenceKey
 // ---------------------------------------------------------------------------
