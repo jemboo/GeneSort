@@ -149,7 +149,6 @@ module SorterEvalBins =
 
     // Returns up to maxSorterIds sorterIds from each bin, where:
     // - bins are visited in ascending order of orderFunc applied to their sorterEvalKey
-    // - within each bin, ids are drawn in insertion order (no ce-sequence structure to round-robin)
     // - result is a flat sequence of (sorterEvalKey * Guid<sorterId>) pairs
     let getUpToNSorterIdsPerBin
             (orderFunc:    sorterEvalKey -> float)

@@ -70,40 +70,6 @@ module SorterSetEval =
         sorterSetEval.create sorterSetEvalId sorterSet.Id (sortableTest |> SortableTests.getId ) sorterEvals
 
 
-    /// For the sorterSet and its corresponding sorterSetEval, this creates a sorterSet 
-    /// that consists of all the sorters with an UnsortedCount = 0
-    let makePassingSorterSet
-            (sorterSet: sorterSet)
-            (sorterSetEval: sorterSetEval) : sorterSet =
-        
-        // 1. Identify the IDs of the sorters that passed (UnsortedCount = 0)
-        let passingIds = 
-            sorterSetEval.SorterEvals 
-            |> Array.filter (fun se -> se.CeBlockEval.UnsortedCount = 0<sortableCount>)
-            |> Array.map (fun se -> se.SorterId)
-            |> System.Collections.Generic.HashSet
-
-        // 2. Filter the original sorter collection based on the passing IDs
-        let passingSorters = 
-            sorterSet.Sorters 
-            |> Array.filter (fun s -> passingIds.Contains(s.SorterId))
-
-        // 3. Create a new sorterSet with a unique ID derived from the passing subset
-        // Note: Using the original set ID and evaluation ID to maintain lineage
-        let newSetId = 
-            [ 
-                sorterSet.Id :> obj
-                sorterSetEval.SorterSetEvalId :> obj
-                "PassingSubset" :> obj 
-            ] 
-            |> GuidUtils.guidFromObjs 
-            |> UMX.tag<sorterSetId>
-
-        GeneSort.Sorting.Sorter.sorterSet.create 
-            newSetId
-            passingSorters
-
-
 
     /// For the sortingSet and its corresponding sorterSetEval, this creates a sortingSet 
     /// that consists of all the sortings that produced sorters with an UnsortedCount = 0

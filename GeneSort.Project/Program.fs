@@ -98,25 +98,25 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 ///// **********     RandomSorterBins   ****************
-//let executor = RandomSorterBins.executor
-//let project = RandomSorterBins.project
-//let projectName = RandomSorterBins.project.ProjectName
-//let projectFolder = RandomSorterBins.projectFolder
-//let buildQueryParams = RandomSorterBins.makeQueryParamsFromRunParams
-//let paramRefiner = RandomSorterBins.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+let executor = RandomSorterBins.executor
+let project = RandomSorterBins.project
+let projectName = RandomSorterBins.project.ProjectName
+let projectFolder = RandomSorterBins.projectFolder
+let buildQueryParams = RandomSorterBins.makeQueryParamsFromRunParams
+let paramRefiner = RandomSorterBins.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
 ///// **********    FullBoolMutate   ****************
-let executor = FullBoolMutate.executor
-let project = FullBoolMutate.project
-let projectName = FullBoolMutate.project.ProjectName
-let projectFolder = FullBoolMutate.projectFolder
-let buildQueryParams = FullBoolMutate.makeQueryParamsFromRunParams
-let paramRefiner = FullBoolMutate.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+//let executor = FullBoolMutate.executor
+//let project = FullBoolMutate.project
+//let projectName = FullBoolMutate.project.ProjectName
+//let projectFolder = FullBoolMutate.projectFolder
+//let buildQueryParams = FullBoolMutate.makeQueryParamsFromRunParams
+//let paramRefiner = FullBoolMutate.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 printfn "Initializing Project..."
 let initResult = 
