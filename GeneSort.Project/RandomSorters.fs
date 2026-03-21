@@ -270,7 +270,7 @@ module RandomSorters =
                         return (smk, sw, sl, cl, sc)
                     } |> Result.ofOption (sprintf "Run %s: Missing required parameters" %runId) |> asAsync
 
-                // 3. Sorter Model Logic (Pure Computation)
+                // 3. Create sorting set from run parameters
                 let sorterModelGen =
                     match sorterModelType with
                     | sorterModelType.Msce -> 
@@ -300,7 +300,7 @@ module RandomSorters =
                 let qpSortingSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "") 
                 let sortingSet = sortingSetGen.MakeSortingSet (%qpSortingSet.Id |> UMX.tag<sortingSetId>) 
 
-                // 4. Saves
+                // 4. Save sorting set
                 let! _ = db.saveAsync projectFolder qpSortingSet (sortingSet |> outputData.SortingSet) allowOverwrite
             
                 progress |> Option.iter (fun p -> 

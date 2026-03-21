@@ -270,7 +270,7 @@ module RandomSorterBins =
                         return (smk, sw, sl, cl, sc)
                     } |> Result.ofOption (sprintf "Run %s: Missing required parameters" %runId) |> asAsync
 
-                // 3. Sorter Model Logic (Pure Computation)
+                // 3. Create sorting set from run parameters
                 let sorterModelGen =
                     match sorterModelType with
                     | sorterModelType.Msce -> 
@@ -293,12 +293,12 @@ module RandomSorterBins =
                         |> sorterModelGen.SmmMsuf6RandGen
 
                 let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-                let sortingSetGen = sortingGenSegment.create 
+                let sortingGenSegment = sortingGenSegment.create 
                                                 (sorterModelGen |> sortingGen.Single)
                                                 firstIndex 
                                                 sorterCount
                 let qpSortingSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "") 
-                let sortingSet = sortingSetGen.MakeSortingSet (%qpSortingSet.Id |> UMX.tag<sortingSetId>)
+                let sortingSet = sortingGenSegment.MakeSortingSet (%qpSortingSet.Id |> UMX.tag<sortingSetId>)
 
 
 
