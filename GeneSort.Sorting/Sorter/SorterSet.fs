@@ -25,7 +25,7 @@ open GeneSort.Core
 
 
 
-  module SorterSet = 
+ module SorterSet = 
     
     let mergeSorterSets (sorterSets: sorterSet []) : sorterSet =
         let idSet = sorterSets |> Array.map(fun ss -> ss.Id :> obj)
