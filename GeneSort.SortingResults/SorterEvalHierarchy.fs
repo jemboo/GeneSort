@@ -58,11 +58,11 @@ type sorterEvalLayer =
                 row <- row + 1
         }
 
-    member internal this.Add (eval: sorterEval) =
+    member internal this.Add (eval: sorterEval) (key : sorterEvalKey) =
         let ceSeqKey = ceSequenceKey.create eval.CeBlockEval.UsedCes
         match this.leaves.TryGetValue(ceSeqKey) with
         | true, existing -> existing.AddId(eval.SorterId)
-        | false, _       -> this.leaves.[ceSeqKey] <- sorterEvalLeaf.create(eval)
+        | false, _       -> this.leaves.[ceSeqKey] <- sorterEvalLeaf.create eval key
 
     member this.MergeLeaf (ceSeqKey: ceSequenceKey) (leaf: sorterEvalLeaf) =
         match this.leaves.TryGetValue(ceSeqKey) with
@@ -100,7 +100,7 @@ type sorterEvalHierarchy =
                 let newLayer = sorterEvalLayer.create(key)
                 this.layers.[key] <- newLayer
                 newLayer
-        layer.Add(sorterEval)
+        layer.Add sorterEval key
 
     member this.AddSorterEvals (sorterEvals: sorterEval seq) =
         sorterEvals |> Seq.iter this.AddSorterEval

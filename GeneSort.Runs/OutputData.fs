@@ -24,7 +24,7 @@ type outputData =
     | SortableTestModelSet of sortableTestModelSet
     | SortableTestModelSetGen of sortableTestModelSetGen
     | SorterSetEval of sorterSetEval
-    | SorterSetEvalBins of sorterEvalHierarchy
+    | SorterSetEvalBins of sorterEvalBins
     | Project of project
     | TextReport of dataTableReport
 

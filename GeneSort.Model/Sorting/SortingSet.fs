@@ -44,11 +44,9 @@ type sortingSet =
             // Assuming all models in the set have the same stage length, 
             // return the stage length of the first model
             this.Sortings.[0] |> Sorting.getStageLength
-    member this.tryFind (id: Guid<sortingId>) (modelSet: sortingSet) : sorting option =
-        modelSet.sortings |> Map.tryFind id
     
-    member this.find (id: Guid<sortingId>) (modelSet: sortingSet) : sorting =
-        match modelSet.sortings |> Map.tryFind id with
+    member this.find (id: Guid<sortingId>) : sorting =
+        match this.sortings |> Map.tryFind id with
         | Some model -> model
         | None -> failwithf "SorterModel with ID %A not found" id
 

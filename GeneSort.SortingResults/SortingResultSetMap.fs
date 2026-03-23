@@ -12,7 +12,9 @@ type sortingResultSetMap =
         evalMap: Dictionary<Guid<sorterId>, sortingTag>
     }
 
-    static member create (sortingResults: sortingResult seq) (evalEntries: (Guid<sorterId> * sortingTag) seq) =
+    static member create 
+                    (sortingResults: sortingResult seq) 
+                    (evalEntries: (Guid<sorterId> * sortingTag) seq) =
         let dict = Dictionary<Guid<sortingId>, sortingResult>()
         for result in sortingResults do
             dict.[SortingResult.getSortingId result] <- result

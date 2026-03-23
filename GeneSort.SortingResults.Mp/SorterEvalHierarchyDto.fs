@@ -18,6 +18,8 @@ type sorterEvalLeafDto = {
     cesLowHi:  int array     // interleaved low,hi pairs encoding the ceSequenceKey
     [<Key(1)>]
     sorterIds: Guid array
+    [<Key(2)>]
+    sorterEvalKeyDto: sorterEvalKeyDto
 }
 
 module SorterEvalLeafDto =
@@ -26,6 +28,7 @@ module SorterEvalLeafDto =
         {
             cesLowHi  = key.Ces |> Array.collect (fun c -> [| c.Low; c.Hi |])
             sorterIds = leaf.SorterIds |> Seq.map UMX.untag |> Seq.toArray
+            sorterEvalKeyDto = leaf.SorterEvalKey |> SorterEvalKeyDto.toDto
         }
 
     let fromDto (dto: sorterEvalLeafDto) : ceSequenceKey * sorterEvalLeaf =
@@ -33,12 +36,14 @@ module SorterEvalLeafDto =
             dto.cesLowHi
             |> Array.chunkBySize 2
             |> Array.map (fun pair -> ce.create pair.[0] pair.[1])
-        let key  = ceSequenceKey.create ces
+        let ceSeqKey     = ceSequenceKey.create ces
+        let sorterEvalKey = SorterEvalKeyDto.fromDto dto.sorterEvalKeyDto
         let leaf =
             match dto.sorterIds with
             | [||] -> failwith "Cannot reconstruct sorterEvalLeaf with no sorterIds."
-            | ids  -> sorterEvalLeaf.createWithIds(ids |> Array.map (UMX.tag<sorterId>))
-        key, leaf
+            | ids  -> sorterEvalLeaf.createWithIds (ids |> Array.map (UMX.tag<sorterId>)) sorterEvalKey
+        ceSeqKey, leaf
+
 
 // ---------------------------------------------------------------------------
 // Layer DTO

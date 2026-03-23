@@ -76,7 +76,7 @@ module SorterEvalBinsDto =
             match leafDto.sorterIds with
             | [||] -> failwith "Cannot reconstruct sorterEvalBins entry with no sorterIds."
             | ids  ->
-                let leaf = sorterEvalLeaf.createWithIds(ids |> Array.map (UMX.tag<sorterId>))
+                let leaf = sorterEvalLeaf.createWithIds (ids |> Array.map (UMX.tag<sorterId>)) key
                 bins.MergeLeaf key leaf
         bins
 
