@@ -70,7 +70,7 @@ module SorterEvalBinsDto =
         }
 
     let toDomain (dto: sorterEvalBinsDto) : sorterEvalBins =
-        let bins = sorterEvalBins.create (UMX.tag<sorterEvalBinsId> dto.sorterEvalBinsId)
+        let bins = sorterEvalBins.create (UMX.tag<sorterEvalBinsId> dto.sorterEvalBinsId) [||]
         for leafDto in dto.bins do
             let key  = SorterEvalKeyDto.fromDto leafDto.sorterEvalKey
             match leafDto.sorterIds with

@@ -362,9 +362,9 @@ module RandomSorterBins =
                                                 runParameters 
                                                 (outputDataType.SortingSet "HullSampled")
 
-                let sorterEvalBins = SorterEvalBins.createFromSorterSetEval 
+                let sorterEvalBins = sorterEvalBins.create
                                                 (%qpEvalBins.Id |> UMX.tag<sorterEvalBinsId>)
-                                                sorterSetEval
+                                                sorterSetEval.SorterEvals
                 let evenSampledSortingSet = 
                         sortingSet.create
                             (%qpEvenSampledSortingSet.Id |> UMX.tag<sortingSetId>)

@@ -119,8 +119,10 @@ type sorterEvalHierarchy =
 
 module SorterEvalHierarchy =
 
-    let toSorterEvalBins (id: Guid<sorterEvalBinsId>) (hierarchy: sorterEvalHierarchy) : sorterEvalBins =
-        let bins = sorterEvalBins.create id
+    let toSorterEvalBins 
+                    (id: Guid<sorterEvalBinsId>) 
+                    (hierarchy: sorterEvalHierarchy) : sorterEvalBins =
+        let bins = sorterEvalBins.create id [||]
         for kvp in hierarchy.Layers do
             for leafKvp in kvp.Value.Leaves do
                 bins.MergeLeaf kvp.Key leafKvp.Value

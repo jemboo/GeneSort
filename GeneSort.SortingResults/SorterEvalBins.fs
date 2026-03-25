@@ -116,11 +116,28 @@ type sorterEvalBins =
         layers:           Dictionary<sorterEvalKey, sorterEvalLeaf>
     }
 
-    static member create (id: Guid<sorterEvalBinsId>) =
-        {
-            sorterEvalBinsId = id
-            layers           = Dictionary<sorterEvalKey, sorterEvalLeaf>()
-        }
+    static member create 
+                        (id: Guid<sorterEvalBinsId>) 
+                        (sorterEvals: sorterEval seq) =
+        let bins =
+            {
+                sorterEvalBinsId = id
+                layers           = Dictionary<sorterEvalKey, sorterEvalLeaf>()
+            }
+        sorterEvals |> Seq.iter bins.AddSorterEval
+        bins
+
+
+    static member createWithNewId
+                        (sorterEvals: sorterEval seq) =
+        let bins =
+            {
+                sorterEvalBinsId = (Guid.NewGuid() |> UMX.tag<sorterEvalBinsId>)
+                layers           = Dictionary<sorterEvalKey, sorterEvalLeaf>()
+            }
+        sorterEvals |> Seq.iter bins.AddSorterEval
+        bins
+
 
     member this.SorterEvalBinsId with get() = this.sorterEvalBinsId
     member this.Layers           with get() = this.layers :> IReadOnlyDictionary<sorterEvalKey, sorterEvalLeaf>
@@ -147,14 +164,16 @@ type sorterEvalBins =
     member this.MergeLeaf (key: sorterEvalKey) (leaf: sorterEvalLeaf) =
         match this.layers.TryGetValue(key) with
         | true, existing -> for id in leaf.SorterIds do existing.AddId(id)
-        | false, _       -> this.layers.[key] <- 
-                                sorterEvalLeaf.createWithIds 
+        | false, _       -> 
+                    this.layers.[key] <- sorterEvalLeaf.createWithIds 
                                             (leaf.SorterIds |> Seq.toArray) 
                                             key
 
-    member this.MergeBins (source: sorterEvalBins) =
-        for kvp in source.Layers do
-            this.MergeLeaf kvp.Key kvp.Value
+
+    member this.AddLeafs (sourceLayers: IEnumerable<KeyValuePair<sorterEvalKey, sorterEvalLeaf>>) =
+            for kvp in sourceLayers do
+                this.MergeLeaf kvp.Key kvp.Value
+
 
     /// Returns an array of leaves, where each leaf represents a vertex 
     /// on the convex hull of the (CeCount, StageLength) lattice for isSorted = true.
@@ -214,15 +233,8 @@ type sorterEvalBins =
 
 module SorterEvalBins =
 
-    let createFromSorterSetEval 
-                    (id: Guid<sorterEvalBinsId>)
-                    (sorterSetEval: sorterSetEval) : sorterEvalBins =
-        let bins = sorterEvalBins.create id
-        sorterSetEval.SorterEvals |> Array.iter bins.AddSorterEval
-        bins
-
     let merge (target: sorterEvalBins) (source: sorterEvalBins) : sorterEvalBins =
-        target.MergeBins source
+        target.AddLeafs source.Layers
         target
 
     // Returns up to maxSorterIds sorterIds from each bin, where:

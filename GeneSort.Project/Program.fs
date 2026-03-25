@@ -104,8 +104,8 @@ let projectName = RandomSorterBins.project.ProjectName
 let projectFolder = RandomSorterBins.projectFolder
 let buildQueryParams = RandomSorterBins.makeQueryParamsFromRunParams
 let paramRefiner = RandomSorterBins.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+let minReplica = 1<replNumber>
+let maxReplica = 5<replNumber>
 
 
 ///// **********    FullBoolMutate   ****************
