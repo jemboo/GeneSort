@@ -11,6 +11,7 @@ open GeneSort.SortingOps
 open GeneSort.SortingResults
 open GeneSort.Runs
 open GeneSort.Core
+open GeneSort.SortingResults.Bins
 
 
 

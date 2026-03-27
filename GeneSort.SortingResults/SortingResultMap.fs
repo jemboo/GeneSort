@@ -47,3 +47,6 @@ type sortingResultMap =
         | false, _ -> failwithf "SorterId %A not found in evalMap." newEval.SorterId
         | true, modelTag ->
             SortingResult.UpdateSorterEval modelTag newEval this.sortingResult
+
+    member this.GetAllSorterEvals () : (sorterEval * sortingTag) seq =
+         this.sortingResult |> SortingResult.getAllSorterEvals

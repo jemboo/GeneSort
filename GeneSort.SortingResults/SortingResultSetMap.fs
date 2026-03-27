@@ -63,6 +63,10 @@ type sortingResultSetMap =
     member this.UpdateManySortingResults (newEvals: sorterEval []) =
         newEvals |> Array.iter(this.UpdateSortingResults)
 
+    member this.GetAllSorterEvals () : (sorterEval * sortingTag) seq =
+         this.sortingResults.Values |> Seq.collect(fun sr -> sr |> SortingResult.getAllSorterEvals)
+
+
 
 
 module SortingResultSetMap = 

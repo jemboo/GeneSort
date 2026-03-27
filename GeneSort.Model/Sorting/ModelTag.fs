@@ -26,13 +26,27 @@ module SplitJoin =
         | "Second_Second" -> Second_Second
         | _ -> failwithf "Invalid prefixOrSuffix value: %s" str
 
-// used to track how a sorter was made from a sorting
+
+
+// used to relate a sorting with the sorters it generates.
 type modelTag =
      | Single
      | SplitPair of splitJoin
 
 
 module ModelTag =
+
+    let allSingleTags : modelTag [] = [| 
+                modelTag.Single 
+            |]
+
+    let allSplitJoinTags : modelTag [] = [| 
+            modelTag.SplitPair splitJoin.First_First; 
+            modelTag.SplitPair  splitJoin.First_Second; 
+            modelTag.SplitPair  splitJoin.Second_First; 
+            modelTag.SplitPair  splitJoin.Second_Second
+            |]
+
     let toString (modelTag: modelTag) : string =
         match modelTag with
         | Single -> "Single"
@@ -48,19 +62,18 @@ module ModelTag =
         else
             failwithf "Invalid modelTag format: %s" str
 
-            
-type sortingParentId = Guid<sortingId>
+           
 
 // used to track a sorter back to it's parent sorting, and it gives it's position 
 // within it's family
-type sortingTag = sortingParentId * modelTag
+type sortingTag = Guid<sortingId> * modelTag
 
 module SortingTag =
 
     let create (id: Guid<sortingId>) (tag: modelTag) : sortingTag =
         (id, tag)
 
-    let getSortingParentId (sorterModelTag: sortingTag) : sortingParentId =
+    let getSortingParentId (sorterModelTag: sortingTag) : Guid<sortingId> =
         let (modelId, _) = sorterModelTag
         modelId
 
@@ -92,7 +105,7 @@ module SortingMutationSetTag =
     let getSortingTag (tag: sortingMutationSetTag) : sortingTag =
         let (_, sortingTag) = tag
         sortingTag
-    let getSortingParentId (tag: sortingMutationSetTag) : sortingParentId =
+    let getSortingParentId (tag: sortingMutationSetTag) : Guid<sortingId> =
         tag |> getSortingTag |> SortingTag.getSortingParentId
     let getModelTag (tag: sortingMutationSetTag) : modelTag =
         tag |> getSortingTag |> SortingTag.getModelTag

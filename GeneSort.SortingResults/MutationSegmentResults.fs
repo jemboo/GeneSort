@@ -10,8 +10,8 @@ type mutationSegmentResults =
     private
         { 
           sortingMutationSegment : sortingMutationSegment
-          sortingResultSetMapMutants : sortingResultSetMap
           sortingResultMapParent : sortingResultMap
+          sortingResultSetMapMutants : sortingResultSetMap
         }
     with
     static member create (sortingMutationSegment: sortingMutationSegment) =
@@ -25,8 +25,6 @@ type mutationSegmentResults =
                 |> Array.map (fun id -> splitPairsSortingResult.create id 
                                         |> pairsSortingResult.SplitPairs
                                         |> sortingResult.Pairs)
-
-
 
         let parentSortingResult = 
             match sortingMutationSegment.SortingMutator with
@@ -59,6 +57,15 @@ type mutationSegmentResults =
     member this.UpdateSortingResultParent (newEval: sorterEval) =
         this.sortingResultMapParent.UpdateSortingResult newEval
 
+    member this.GetAllParentSorterEvals () : (sorterEval * sortingTag) seq =
+        this.sortingResultMapParent.GetAllSorterEvals ()
+
+    member this.GetAllMutantSorterEvals () : (sorterEval * sortingTag) seq =
+        this.sortingResultSetMapMutants.GetAllSorterEvals ()
+
+    member this.UpdateParentSorterEvals (taggedEvals : (sorterEval * sortingTag) seq) = ()
+
+    member this.UpdateMutantSorterEvals (taggedEvals : (sorterEval * sortingTag) seq) = ()
 
 
 module MutationSegmentResults = ()

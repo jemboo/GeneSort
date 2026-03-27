@@ -37,9 +37,13 @@ module SortingResult =
                                         |> pairsSortingResult.SplitPairs  |> sortingResult.Pairs
 
 
-    let getSorterEval (psr: sortingResult) (modelTag:modelTag) :sorterEval =
+    let getSorterEval (psr: sortingResult) (modelTag:modelTag) : sorterEval =
         match psr with
         | Single ssr -> ssr.SorterEval.Value
         | Pairs psr -> psr |> PairsSortingResult.getSorterEval modelTag
 
             
+    let getAllSorterEvals (psr: sortingResult) : (sorterEval * sortingTag) seq =
+        match psr with
+        | Single ssr -> ssr.GetAllSorterEvals ()
+        | Pairs psr -> psr |> PairsSortingResult.getAllSorterEvals

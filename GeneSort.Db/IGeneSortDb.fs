@@ -7,8 +7,8 @@ open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
-open GeneSort.SortingResults
 open GeneSort.Model.Sorting
+open GeneSort.SortingResults.Bins
 
 [<Measure>] type projectFolder
 [<Measure>] type allowOverwrite

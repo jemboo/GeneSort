@@ -4,10 +4,9 @@ open System
 open FSharp.UMX
 open MessagePack
 open GeneSort.Sorting
-open GeneSort.SortingResults
 open GeneSort.SortingOps
-open GeneSort.SortingOps.Mp
 open GeneSort.Sorting.Sorter
+open GeneSort.SortingResults.Bins
 
 // ---------------------------------------------------------------------------
 // Leaf DTO: sorterEval removed; cesLowHi encodes the ceSequenceKey

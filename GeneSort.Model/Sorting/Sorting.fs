@@ -14,6 +14,11 @@ type sorting =
 
 module Sorting =
 
+    let getModelTags (sorting:sorting) : modelTag [] =
+        match sorting with
+        | Single _ -> ModelTag.allSingleTags
+        | Pairs _ -> ModelTag.allSplitJoinTags
+
     let getSortingWidth (model: sorting) : int<sortingWidth> =
         match model with
         | Single sms -> sms |> SorterModel.getSortingWidth

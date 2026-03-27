@@ -60,7 +60,7 @@ type splitPairsSortingResult=
             | splitJoin.Second_Second -> this.SorterEvalSecondSecond <- Some newEval
 
 
-    member this.GetSorterEval (modelTag: modelTag) :sorterEval =
+    member this.GetSorterEval (modelTag: modelTag) : sorterEval =
         match modelTag with
         | modelTag.Single -> failwith "Invalid model tag for split pairs sorting result."
         | modelTag.SplitPair splitJoin ->
@@ -69,6 +69,14 @@ type splitPairsSortingResult=
             | splitJoin.First_Second -> this.SorterEvalFirstSecond.Value
             | splitJoin.Second_First -> this.SorterEvalSecondFirst.Value
             | splitJoin.Second_Second -> this.SorterEvalSecondSecond.Value
+
+    member this.GetAllSorterEvals () : (sorterEval * sortingTag) seq =
+        seq { 
+            yield (this.SorterEvalFirstFirst.Value, SortingTag.create this.sortingId (splitJoin.First_First |> modelTag.SplitPair) )
+            yield (this.SorterEvalFirstSecond.Value, SortingTag.create this.sortingId (splitJoin.First_Second |> modelTag.SplitPair) )
+            yield (this.SorterEvalSecondFirst.Value, SortingTag.create this.sortingId (splitJoin.Second_First |> modelTag.SplitPair) )
+            yield (this.SorterEvalSecondSecond.Value, SortingTag.create this.sortingId (splitJoin.Second_Second |> modelTag.SplitPair) )
+        }
 
 
 module SplitPairsSortingResult = ()

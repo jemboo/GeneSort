@@ -13,16 +13,21 @@ type pairsSortingResult=
 
 module PairsSortingResult = 
 
-    let getSortingId (psr: pairsSortingResult): Guid<sortingId> =
+    let getSortingId (psr: pairsSortingResult) : Guid<sortingId> =
         match psr with
         | SplitPairs spsr -> spsr.SortingId
         | SplitPairs2 spsr -> spsr.SortingId
 
 
-    let getSorterEval (modelTag:modelTag) (psr: pairsSortingResult)  :sorterEval =
+    let getSorterEval (modelTag:modelTag) (psr: pairsSortingResult) : sorterEval =
         match psr with
         | SplitPairs spsr -> spsr.GetSorterEval modelTag
         | SplitPairs2 spsr -> spsr.GetSorterEval modelTag
+
+    let getAllSorterEvals (psr: pairsSortingResult) : (sorterEval * sortingTag) seq =
+        match psr with
+        | SplitPairs spsr -> spsr.GetAllSorterEvals ()
+        | SplitPairs2 spsr -> spsr.GetAllSorterEvals ()
 
 
 

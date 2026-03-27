@@ -18,6 +18,7 @@ open GeneSort.Model.Sorting
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.SortingResults
+open GeneSort.SortingResults.Bins
 
 
 module RandomSorterBins =

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingResults
+﻿namespace GeneSort.SortingResults.Bins
 
 open FSharp.UMX
 open GeneSort.Sorting

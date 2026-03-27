@@ -20,9 +20,9 @@ open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
-open GeneSort.SortingResults
 open GeneSort.Model.Sorting
 open GeneSort.Model.Mp.Sorting
+open GeneSort.SortingResults.Bins
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
