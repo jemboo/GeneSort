@@ -7,11 +7,6 @@ open System.Collections.Generic
 open System
 
 
-// ---------------------------------------------------------------------------
-// Bins: flat container — one leaf per sorterEvalKey (ceCount, stageLength, isSorted)
-// Collapses the ceSequenceKey dimension; sorterIds from all ce-sequences
-// that share a key are pooled into a single leaf.
-// ---------------------------------------------------------------------------
 type sorterEvalBins =
     private {
         sorterEvalBinsId: Guid<sorterEvalBinsId>
@@ -47,7 +42,7 @@ type sorterEvalBins =
     member this.EvalCount with get() =
         this.layers.Values |> Seq.sumBy (fun l -> l.EvalCount)
 
-    member internal this.AddSorterEval (sorterEval: sorterEval) =
+    member this.AddSorterEval (sorterEval: sorterEval) =
         let key =
             sorterEvalKey.create
                 sorterEval.CeBlockEval.CeUseCounts.UsedCeCount

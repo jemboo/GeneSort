@@ -19,8 +19,11 @@
     <Compile Include="Bins\SortingEvalKeys.fs" />
     <Compile Include="Bins\SorterEvalLeaf.fs" />
     <Compile Include="Bins\SorterEvalBins.fs" />
+    <Compile Include="Bins\SingleSortingEvalBins.fs" />
+    <Compile Include="Bins\SplitPairSortingEvalBins.fs" />
+    <Compile Include="Bins\PairSortingEvalBins.fs" />
     <Compile Include="Bins\SortingEvalBins.fs" />
-    <Compile Include="Bins\SortingEvalBinsSet.fs" />
+    <Compile Include="Bins\MutationSegmentEvalBins.fs" />
     <Compile Include="Bins\SorterEvalHierarchy.fs" />
     <Compile Include="Bins\SorterEvalLayerStats.fs" />
     <Compile Include="Bins\SorterEvalBinStats.fs" />

@@ -6,6 +6,7 @@ open GeneSort.SortingOps
 
 
 [<Measure>] type sortingResultId
+[<Measure>] type sortingEvalBinsId
 [<Measure>] type maxReps
 
 module Common = ()

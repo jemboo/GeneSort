@@ -63,9 +63,6 @@ type mutationSegmentResults =
     member this.GetAllMutantSorterEvals () : (sorterEval * sortingTag) seq =
         this.sortingResultSetMapMutants.GetAllSorterEvals ()
 
-    member this.UpdateParentSorterEvals (taggedEvals : (sorterEval * sortingTag) seq) = ()
-
-    member this.UpdateMutantSorterEvals (taggedEvals : (sorterEval * sortingTag) seq) = ()
 
 
 module MutationSegmentResults = ()

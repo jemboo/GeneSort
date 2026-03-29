@@ -8,7 +8,7 @@ type sortingSet =
       private
         { 
           id : Guid<sortingSetId>
-          sortings : Map<Guid<sortingId>, sorting>
+          sortingMap : Map<Guid<sortingId>, sorting>
         }
     with
     static member create 
@@ -25,11 +25,11 @@ type sortingSet =
         if modelMap.Count <> sortings.Length then
             failwith "All SorterModels must have unique IDs"
         
-        { id = id; sortings = modelMap }
+        { id = id; sortingMap = modelMap }
     
-    member this.Count with get() = this.sortings.Count
+    member this.Count with get() = this.sortingMap.Count
     member this.Id with get() = this.id
-    member this.Sortings with get() = this.sortings |> Map.toArray |> Array.map snd
+    member this.Sortings with get() = this.sortingMap |> Map.toArray |> Array.map snd
     member this.SortingWidth with get() = 
         if this.Count = 0 then
             failwith "Cannot determine sorting width of an empty sorting model set"
@@ -46,9 +46,14 @@ type sortingSet =
             this.Sortings.[0] |> Sorting.getStageLength
     
     member this.find (id: Guid<sortingId>) : sorting =
-        match this.sortings |> Map.tryFind id with
+        match this.sortingMap |> Map.tryFind id with
         | Some model -> model
         | None -> failwithf "SorterModel with ID %A not found" id
+
+    member this.SorterIdsWithSortingTags with get () : (Guid<sorterId> * sortingTag) [] =
+        this.Sortings |> Array.collect(Sorting.getSorterIdsWithSortingTags)
+
+
 
 
 module SortingSet =
