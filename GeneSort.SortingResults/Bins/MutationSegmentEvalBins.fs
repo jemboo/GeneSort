@@ -1,10 +1,8 @@
 ﻿namespace GeneSort.SortingResults.Bins
 
-open System.Collections.Generic
-open FSharp.UMX
 
-open GeneSort.SortingOps
 open GeneSort.Model.Sorting
+open GeneSort.SortingOps
 open GeneSort.SortingResults
 
 
@@ -13,6 +11,12 @@ type mutationSegmentEvalBins =
         parentSortingResult: sortingResult
         mutantSortingEvalBins: sortingEvalBins
     }
+
+    member this.AddMutantSorterEval (sorterEval: sorterEval) (modelTag:modelTag) =
+        SortingEvalBins.addSorterEval this.mutantSortingEvalBins sorterEval modelTag
+
+    member this.AddParentSorterEval (sorterEval: sorterEval) (modelTag:modelTag) =
+        SortingResult.addSorterEval modelTag sorterEval this.parentSortingResult
 
     member this.ParentSortingResult with get() = this.parentSortingResult
     member this.MutantSortingEvalBins with get() = this.mutantSortingEvalBins

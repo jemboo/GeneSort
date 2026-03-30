@@ -61,7 +61,7 @@ type sortingResultSetMap =
             let modelTag  = ModelSetTag.getModelTag sortingTag
             match this.sortingResultMap.TryGetValue(sortingParentId) with
             | false, _ -> failwithf "SortingId %A not found in sortingResultSet." sortingParentId
-            | true, result -> SortingResult.UpdateSorterEval modelTag newEval result
+            | true, result -> SortingResult.addSorterEval modelTag newEval result
 
     member this.UpdateManySortingResults (newEvals: sorterEval []) =
         newEvals |> Array.iter(this.UpdateSortingResults)

@@ -13,7 +13,10 @@ type sortingEvalBins =
 
 module SortingEvalBins = 
 
-    let addSorterEval (sortingEvalBins:sortingEvalBins) (sorterEval: sorterEval) (modelTag:modelTag) =
+    let addSorterEval 
+                (sortingEvalBins:sortingEvalBins) 
+                (sorterEval: sorterEval) 
+                (modelTag:modelTag) =
         match sortingEvalBins with
         | Single s -> s.AddSorterEval sorterEval modelTag
         | Pairs p -> PairSortingEvalBins.addSorterEval p sorterEval modelTag
@@ -25,5 +28,6 @@ module SortingEvalBins =
 
     let makeFromSorting (ting: sorting) : sortingEvalBins =
         match ting with
-        | sorting.Single _ -> Single (singleSortingEvalBins.create (Guid.NewGuid() |> UMX.tag<sortingEvalBinsId>))
-        | sorting.Pairs spm -> Pairs (PairSortingEvalBins.create spm)
+        | sorting.Single _ -> singleSortingEvalBins.create (Guid.NewGuid() |> UMX.tag<sortingEvalBinsId>)
+                              |> Single
+        | sorting.Pairs spm -> PairSortingEvalBins.create spm |> Pairs

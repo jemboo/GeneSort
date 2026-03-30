@@ -31,7 +31,7 @@ type singleSortingResult=
 
     member this.SortingId with get() : Guid<sortingId> = this.sortingId
 
-    member this.UpdateSorterEval (modelTag: modelTag) (newEval: sorterEval) : unit =
+    member this.AddSorterEval (modelTag: modelTag) (newEval: sorterEval) : unit =
         match modelTag with 
         | modelTag.Single -> this.SorterEval <- Some newEval
         | modelTag.SplitPair splitJoin -> failwith "invalid modeltag"

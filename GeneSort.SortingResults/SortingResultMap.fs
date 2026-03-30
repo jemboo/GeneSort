@@ -46,7 +46,7 @@ type sortingResultMap =
         match this.evalMap.TryGetValue(newEval.SorterId) with
         | false, _ -> failwithf "SorterId %A not found in evalMap." newEval.SorterId
         | true, modelTag ->
-            SortingResult.UpdateSorterEval modelTag newEval this.sortingResult
+            SortingResult.addSorterEval modelTag newEval this.sortingResult
 
     member this.GetAllSorterEvals () : (sorterEval * modelSetTag) seq =
          this.sortingResult |> SortingResult.getAllSorterEvals

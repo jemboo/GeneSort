@@ -18,15 +18,15 @@ module SortingResult =
         | Pairs pairsSortingResult -> pairsSortingResult |> PairsSortingResult.getSortingId
 
 
-    let UpdateSorterEval (modelTag: modelTag) 
+    let addSorterEval (modelTag: modelTag) 
                          (newEval: sorterEval) 
                          (sortingResult: sortingResult) : unit =
         match sortingResult with
-        | Single ssr -> ssr.UpdateSorterEval modelTag newEval
+        | Single ssr -> ssr.AddSorterEval modelTag newEval
         | Pairs psr ->
             match psr with
-            | SplitPairs spsr -> spsr.UpdateSorterEval modelTag newEval
-            | SplitPairs2 spsr -> spsr.UpdateSorterEval modelTag newEval
+            | SplitPairs spsr -> spsr.AddSorterEval modelTag newEval
+            | SplitPairs2 spsr -> spsr.AddSorterEval modelTag newEval
 
 
     let makeFromSorting (ting: sorting) : sortingResult =

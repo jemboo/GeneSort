@@ -24,6 +24,7 @@
     <Compile Include="Bins\PairSortingEvalBins.fs" />
     <Compile Include="Bins\SortingEvalBins.fs" />
     <Compile Include="Bins\MutationSegmentEvalBins.fs" />
+    <Compile Include="Bins\MutationSegmentEvalBinsSet.fs" />
     <Compile Include="Bins\SorterEvalHierarchy.fs" />
     <Compile Include="Bins\SorterEvalLayerStats.fs" />
     <Compile Include="Bins\SorterEvalBinStats.fs" />

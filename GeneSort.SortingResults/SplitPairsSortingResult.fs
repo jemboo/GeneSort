@@ -49,7 +49,7 @@ type splitPairsSortingResult=
         with get() = this.sorterEvalSecondSecond
         and set(value) = this.sorterEvalSecondSecond <- value
 
-    member this.UpdateSorterEval (modelTag: modelTag) (newEval: sorterEval) : unit =
+    member this.AddSorterEval (modelTag: modelTag) (newEval: sorterEval) : unit =
         match modelTag with 
         | modelTag.Single -> failwith "Invalid model tag for split pairs sorting result."
         | modelTag.SplitPair splitJoin ->
