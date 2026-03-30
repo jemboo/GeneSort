@@ -44,7 +44,7 @@ module SortingResult =
         | Pairs psr -> psr |> PairsSortingResult.getSorterEval modelTag
 
             
-    let getAllSorterEvals (psr: sortingResult) : (sorterEval * modelSetTag) seq =
+    let getAllTaggedSorterEvals (psr: sortingResult) : (sorterEval * modelSetTag) seq =
         match psr with
-        | Single ssr -> ssr.GetAllSorterEvals ()
-        | Pairs psr -> psr |> PairsSortingResult.getAllSorterEvals
+        | Single ssr -> ssr.GetAllTaggedSorterEvals ()
+        | Pairs psr -> psr |> PairsSortingResult.getAllTaggedSorterEvals

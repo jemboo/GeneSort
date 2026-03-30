@@ -57,13 +57,13 @@ type modelSetTagDto =
     { [<Key(0)>] ParentId: string
       [<Key(1)>] ModelTag: modelTagDto }
 
-module SortingTagDto =
+module ModelSetTagDto =
+
     let toDto (tag: modelSetTag) : modelSetTagDto =
-        let (parentId, modelTag) = tag
-        { ParentId = (%parentId).ToString()
-          ModelTag = ModelTagDto.toDto modelTag }
-    
+        { ParentId = (%tag.SortingId).ToString()
+          ModelTag  = ModelTagDto.toDto tag.ModelTag }
+
     let fromDto (dto: modelSetTagDto) : modelSetTag =
         let parentId = Guid.Parse(dto.ParentId) |> UMX.tag<sortingId>
         let modelTag = ModelTagDto.fromDto dto.ModelTag
-        (parentId, modelTag)
+        modelSetTag.create parentId modelTag

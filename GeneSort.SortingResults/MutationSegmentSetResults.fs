@@ -69,7 +69,14 @@ type mutationSegmentSetResults =
     member this.UpdateAllSortingResultsParent (newEvals: sorterEval []) =
         newEvals |> Array.iter(this.UpdateSortingResultParent)
 
-
+    member this.GetAllParentSorterEvals () : (sorterEval * modelSetTag) seq =
+        this.sortingSegmentResults.Values
+        |> Seq.collect (fun segmentResult -> segmentResult.GetAllTaggedParentSorterEvals())
+        
+    member this.GetAllMutantSorterEvals () : (sorterEval * modelSetTag) seq =
+        this.sortingSegmentResults.Values
+        |> Seq.collect (fun segmentResult -> segmentResult.GetAllTaggedMutantSorterEvals())
+  
 
 
 module MutationSegmentSetResults = 

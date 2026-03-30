@@ -39,9 +39,12 @@ module FullBoolMutate =
             repl
             outputDataType
             [|
-                (runParameters.sortingWidthKey, sortingWidth |> UmxExt.intToString ); 
-                (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString );
-                (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringToString );
+                (runParameters.sortingWidthKey, 
+                 sortingWidth |> UmxExt.intToString ); 
+                (runParameters.sorterModelTypeKey, 
+                 sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString );
+                (runParameters.sortableDataFormatKey, 
+                 sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringToString );
             |]
 
 
@@ -303,7 +306,18 @@ module FullBoolMutate =
                                             sorterSetEvalMutant
 
                 
-                // 11. Save Results
+                // 11. Make the evaluation bins
+
+                let mutationSegmentEvalBinsSet = 
+                        MutationSegmentEvalBinsSet.makeFromSortings sortingSetParent.Sortings
+
+                let parentTupes = mutationSegmentSetResults.GetAllParentSorterEvals() |> Seq.toArray
+                let mutantTupes = mutationSegmentSetResults.GetAllMutantSorterEvals() |> Seq.toArray
+                
+                mutationSegmentEvalBinsSet.AddAllParentSorterEvals parentTupes
+                mutationSegmentEvalBinsSet.AddAllMutantSorterEvals mutantTupes
+
+                // 12. Save Results
                 let! _ = db.saveAsync projectFolder qpSortableTests (sortableTests |> outputData.SortableTest) allowOverwrite
                 let! _ = db.saveAsync projectFolder qpEvalParents (sorterSetEvalParent |> outputData.SorterSetEval) allowOverwrite
                 let! _ = db.saveAsync projectFolder qpEvalMutants (sorterSetEvalMutant |> outputData.SorterSetEval) allowOverwrite
@@ -312,7 +326,7 @@ module FullBoolMutate =
                 let! _ = db.saveAsync projectFolder qpSortingSetMutantPass (sortingSetMutantPass |> outputData.SortingSet) allowOverwrite
 
 
-                // 12. Final Success
+                // 13. Final Success
                 return runParameters.WithRunFinished (Some true)
 
             with e ->

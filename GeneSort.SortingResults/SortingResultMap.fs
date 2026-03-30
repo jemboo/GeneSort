@@ -48,5 +48,5 @@ type sortingResultMap =
         | true, modelTag ->
             SortingResult.addSorterEval modelTag newEval this.sortingResult
 
-    member this.GetAllSorterEvals () : (sorterEval * modelSetTag) seq =
-         this.sortingResult |> SortingResult.getAllSorterEvals
+    member this.GetAllTaggedSorterEvals () : (sorterEval * modelSetTag) seq =
+         this.sortingResult |> SortingResult.getAllTaggedSorterEvals

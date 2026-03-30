@@ -40,7 +40,7 @@ module SortingSetFilter =
                             sorterEvalBins
                         |> Seq.map(snd)
 
-        let sortingIds = sorterIds |> Seq.map(fun id -> fst resultSetMap.EvalMap[id])
+        let sortingIds = sorterIds |> Seq.map(fun id -> resultSetMap.EvalMap[id].SortingId)
                                    |> Seq.distinct
 
         sortingIds |> Seq.map(parentSet.find) |> Seq.toArray
@@ -61,7 +61,7 @@ module SortingSetFilter =
                             sorterEvalBins
                         |> Seq.map(snd)
 
-        let sortingIds = sorterIds |> Seq.map(fun id -> fst resultSetMap.EvalMap[id])
+        let sortingIds = sorterIds |> Seq.map(fun id -> resultSetMap.EvalMap[id].SortingId)
                                    |> Seq.distinct
 
         sortingIds |> Seq.map(parentSet.find) |> Seq.toArray

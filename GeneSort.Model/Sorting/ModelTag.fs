@@ -28,7 +28,7 @@ module SplitJoin =
 
 
 
-// used to relate a sorting with the sorters it generates.
+// used to relate a sorter with the sorting that generates it.
 type modelTag =
      | Single
      | SplitPair of splitJoin
@@ -64,34 +64,43 @@ module ModelTag =
 
            
 
-// used to track a sorter back to it's parent sorting, and it gives it's position 
-// within it's family
-type modelSetTag = Guid<sortingId> * modelTag
+
+// used to relate a sorter with the item in a collection of sortings that generates it.
+[<Struct; StructuralEquality; NoComparison>]
+type modelSetTag =
+    private {
+        sortingId: Guid<sortingId>
+        modelTag:  modelTag
+    }
+
+    static member create (id: Guid<sortingId>) (tag: modelTag) =
+        { sortingId = id; modelTag = tag }
+
+    member this.SortingId with get() = this.sortingId
+    member this.ModelTag  with get() = this.modelTag
+
 
 module ModelSetTag =
 
     let create (id: Guid<sortingId>) (tag: modelTag) : modelSetTag =
-        (id, tag)
+        modelSetTag.create id tag
 
-    let getSortingParentId (sorterModelTag: modelSetTag) : Guid<sortingId> =
-        let (modelId, _) = sorterModelTag
-        modelId
+    let getSortingParentId (t: modelSetTag) : Guid<sortingId> =
+        t.SortingId
 
-    let getModelTag (sorterModelTag: modelSetTag) : modelTag =
-        let (_, tag) = sorterModelTag
-        tag
+    let getModelTag (t: modelSetTag) : modelTag =
+        t.ModelTag
 
-    let toString (sorterModelTag: modelSetTag) : string =
-        let (modelId, tag) = sorterModelTag
-        sprintf "%s\t%s" ((%modelId).ToString()) (ModelTag.toString tag)
+    let toString (t: modelSetTag) : string =
+        sprintf "%s\t%s" ((%t.SortingId).ToString()) (ModelTag.toString t.ModelTag)
 
     let fromString (str: string) : modelSetTag =
         let parts = str.Split('\t')
         if parts.Length <> 2 then
-            failwithf "Invalid sortingTag format: %s" str
-        let modelId = Guid.Parse(parts.[0]) |> UMX.tag<sortingId>
+            failwithf "Invalid modelSetTag format: %s" str
+        let id  = Guid.Parse(parts.[0]) |> UMX.tag<sortingId>
         let tag = ModelTag.fromString parts.[1]
-        (modelId, tag)
+        modelSetTag.create id tag
 
 
 type sortingMutationSetTag = Guid<sortingMutationSegmentId> * modelSetTag
