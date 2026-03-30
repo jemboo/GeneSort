@@ -53,33 +53,17 @@ module ModelTagDto =
 
 
 [<MessagePackObject>]
-type sortingTagDto =
+type modelSetTagDto =
     { [<Key(0)>] ParentId: string
       [<Key(1)>] ModelTag: modelTagDto }
 
 module SortingTagDto =
-    let toDto (tag: sortingTag) : sortingTagDto =
+    let toDto (tag: modelSetTag) : modelSetTagDto =
         let (parentId, modelTag) = tag
         { ParentId = (%parentId).ToString()
           ModelTag = ModelTagDto.toDto modelTag }
     
-    let fromDto (dto: sortingTagDto) : sortingTag =
+    let fromDto (dto: modelSetTagDto) : modelSetTag =
         let parentId = Guid.Parse(dto.ParentId) |> UMX.tag<sortingId>
         let modelTag = ModelTagDto.fromDto dto.ModelTag
         (parentId, modelTag)
-
-[<MessagePackObject>]
-type parentSortingTagDto =
-    { [<Key(0)>] GrandParentId: string
-      [<Key(1)>] ParentTag: sortingTagDto }
-
-module ParentSortingTagDto =
-    let toDto (tag: parentSortingTag) : parentSortingTagDto =
-        let (grandParentId, parentTag) = tag
-        { GrandParentId = (%grandParentId).ToString()
-          ParentTag = SortingTagDto.toDto parentTag }
-    
-    let fromDto (dto: parentSortingTagDto) : parentSortingTag =
-        let grandParentId = Guid.Parse(dto.GrandParentId) |> UMX.tag<sortingId>
-        let parentTag = SortingTagDto.fromDto dto.ParentTag
-        (grandParentId, parentTag)

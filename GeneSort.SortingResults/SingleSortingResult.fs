@@ -37,9 +37,9 @@ type singleSortingResult=
         | modelTag.SplitPair splitJoin -> failwith "invalid modeltag"
             
 
-    member this.GetAllSorterEvals () : (sorterEval * sortingTag) seq =
+    member this.GetAllSorterEvals () : (sorterEval * modelSetTag) seq =
         seq { 
-            yield (this.sorterEval.Value, SortingTag.create this.sortingId modelTag.Single )
+            yield (this.sorterEval.Value, ModelSetTag.create this.sortingId modelTag.Single )
         }
 
 

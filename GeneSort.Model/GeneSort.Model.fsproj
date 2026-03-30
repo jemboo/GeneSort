@@ -8,7 +8,6 @@
   <ItemGroup>
     <Compile Include="Sorting\Common.fs" />
     <Compile Include="Sorting\ModelTag.fs" />
-    <Compile Include="Sorting\ParentSortingModelTag.fs" />
     <Compile Include="Sorting\Sorter\SorterModelType.fs" />
     <Compile Include="Sorting\Sorter\Ce\Msce.fs" />
     <Compile Include="Sorting\Sorter\Ce\MsceRandGen.fs" />

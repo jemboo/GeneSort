@@ -31,10 +31,11 @@ module SortingResult =
 
     let makeFromSorting (ting: sorting) : sortingResult =
         match ting with
-        | sorting.Single ssm -> singleSortingResult.create (ting |> Sorting.getId) |> sortingResult.Single
+        | sorting.Single ssm -> singleSortingResult.create 
+                                        (ting |> Sorting.getId) |> sortingResult.Single
         | sorting.Pairs spm -> splitPairsSortingResult.create 
                                         (ting |> Sorting.getId) 
-                                        |> pairsSortingResult.SplitPairs  |> sortingResult.Pairs
+                                        |> pairsSortingResult.SplitPairs |> sortingResult.Pairs
 
 
     let getSorterEval (psr: sortingResult) (modelTag:modelTag) : sorterEval =
@@ -43,7 +44,7 @@ module SortingResult =
         | Pairs psr -> psr |> PairsSortingResult.getSorterEval modelTag
 
             
-    let getAllSorterEvals (psr: sortingResult) : (sorterEval * sortingTag) seq =
+    let getAllSorterEvals (psr: sortingResult) : (sorterEval * modelSetTag) seq =
         match psr with
         | Single ssr -> ssr.GetAllSorterEvals ()
         | Pairs psr -> psr |> PairsSortingResult.getAllSorterEvals

@@ -70,12 +70,12 @@ type splitPairsSortingResult=
             | splitJoin.Second_First -> this.SorterEvalSecondFirst.Value
             | splitJoin.Second_Second -> this.SorterEvalSecondSecond.Value
 
-    member this.GetAllSorterEvals () : (sorterEval * sortingTag) seq =
+    member this.GetAllSorterEvals () : (sorterEval * modelSetTag) seq =
         seq { 
-            yield (this.SorterEvalFirstFirst.Value, SortingTag.create this.sortingId (splitJoin.First_First |> modelTag.SplitPair) )
-            yield (this.SorterEvalFirstSecond.Value, SortingTag.create this.sortingId (splitJoin.First_Second |> modelTag.SplitPair) )
-            yield (this.SorterEvalSecondFirst.Value, SortingTag.create this.sortingId (splitJoin.Second_First |> modelTag.SplitPair) )
-            yield (this.SorterEvalSecondSecond.Value, SortingTag.create this.sortingId (splitJoin.Second_Second |> modelTag.SplitPair) )
+            yield (this.SorterEvalFirstFirst.Value, ModelSetTag.create this.sortingId (splitJoin.First_First |> modelTag.SplitPair) )
+            yield (this.SorterEvalFirstSecond.Value, ModelSetTag.create this.sortingId (splitJoin.First_Second |> modelTag.SplitPair) )
+            yield (this.SorterEvalSecondFirst.Value, ModelSetTag.create this.sortingId (splitJoin.Second_First |> modelTag.SplitPair) )
+            yield (this.SorterEvalSecondSecond.Value, ModelSetTag.create this.sortingId (splitJoin.Second_Second |> modelTag.SplitPair) )
         }
 
 

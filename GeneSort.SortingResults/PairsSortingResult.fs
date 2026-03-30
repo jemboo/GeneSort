@@ -24,7 +24,7 @@ module PairsSortingResult =
         | SplitPairs spsr -> spsr.GetSorterEval modelTag
         | SplitPairs2 spsr -> spsr.GetSorterEval modelTag
 
-    let getAllSorterEvals (psr: pairsSortingResult) : (sorterEval * sortingTag) seq =
+    let getAllSorterEvals (psr: pairsSortingResult) : (sorterEval * modelSetTag) seq =
         match psr with
         | SplitPairs spsr -> spsr.GetAllSorterEvals ()
         | SplitPairs2 spsr -> spsr.GetAllSorterEvals ()

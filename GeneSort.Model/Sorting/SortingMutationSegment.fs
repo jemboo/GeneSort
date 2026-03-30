@@ -62,12 +62,12 @@ type sortingMutationSegment =
         SortingMutator.getParentSorterIdsWithTags this.SortingMutator 
 
 
-    member this.MakeMutantSorterIdsWithSortingTags : (Guid<sorterId> * sortingTag) [] =
+    member this.MakeMutantSorterIdsWithSortingTags : (Guid<sorterId> * modelSetTag) [] =
         [| for i in 0 .. %this.count - 1 do
             let index = %this.firstIndex + i
             let tupes = SortingMutator.makeMutantSorterIdsWithTags index this.SortingMutator
             let mutantSortingId = SortingMutator.getMutantSortingId index this.SortingMutator
             tupes |> Array.map (
                     fun (sorterId, modelTag) -> 
-                            (sorterId, SortingTag.create mutantSortingId modelTag))
+                            (sorterId, ModelSetTag.create mutantSortingId modelTag))
         |] |> Array.collect id

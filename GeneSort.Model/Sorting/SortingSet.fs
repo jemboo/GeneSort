@@ -50,7 +50,7 @@ type sortingSet =
         | Some model -> model
         | None -> failwithf "SorterModel with ID %A not found" id
 
-    member this.SorterIdsWithSortingTags with get () : (Guid<sorterId> * sortingTag) [] =
+    member this.SorterIdsWithSortingTags with get () : (Guid<sorterId> * modelSetTag) [] =
         this.Sortings |> Array.collect(Sorting.getSorterIdsWithSortingTags)
 
 

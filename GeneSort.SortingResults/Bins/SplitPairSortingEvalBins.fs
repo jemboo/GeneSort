@@ -18,7 +18,7 @@ type splitPairSortingEvalBins =
         sorterEvalBinsSecondSecond: sorterEvalBins
     }
 
-    static member create (id: Guid<sortingEvalBinsId>) (tags: modelTag seq) =
+    static member create (id: Guid<sortingEvalBinsId>) =
         {
             sortingEvalBinsId = id
             sorterEvalBinsFirstFirst = sorterEvalBins.createWithNewId Seq.empty

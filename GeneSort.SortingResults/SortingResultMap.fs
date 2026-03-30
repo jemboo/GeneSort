@@ -48,5 +48,5 @@ type sortingResultMap =
         | true, modelTag ->
             SortingResult.UpdateSorterEval modelTag newEval this.sortingResult
 
-    member this.GetAllSorterEvals () : (sorterEval * sortingTag) seq =
+    member this.GetAllSorterEvals () : (sorterEval * modelSetTag) seq =
          this.sortingResult |> SortingResult.getAllSorterEvals

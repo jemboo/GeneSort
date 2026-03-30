@@ -66,26 +66,26 @@ module ModelTag =
 
 // used to track a sorter back to it's parent sorting, and it gives it's position 
 // within it's family
-type sortingTag = Guid<sortingId> * modelTag
+type modelSetTag = Guid<sortingId> * modelTag
 
-module SortingTag =
+module ModelSetTag =
 
-    let create (id: Guid<sortingId>) (tag: modelTag) : sortingTag =
+    let create (id: Guid<sortingId>) (tag: modelTag) : modelSetTag =
         (id, tag)
 
-    let getSortingParentId (sorterModelTag: sortingTag) : Guid<sortingId> =
+    let getSortingParentId (sorterModelTag: modelSetTag) : Guid<sortingId> =
         let (modelId, _) = sorterModelTag
         modelId
 
-    let getModelTag (sorterModelTag: sortingTag) : modelTag =
+    let getModelTag (sorterModelTag: modelSetTag) : modelTag =
         let (_, tag) = sorterModelTag
         tag
 
-    let toString (sorterModelTag: sortingTag) : string =
+    let toString (sorterModelTag: modelSetTag) : string =
         let (modelId, tag) = sorterModelTag
         sprintf "%s\t%s" ((%modelId).ToString()) (ModelTag.toString tag)
 
-    let fromString (str: string) : sortingTag =
+    let fromString (str: string) : modelSetTag =
         let parts = str.Split('\t')
         if parts.Length <> 2 then
             failwithf "Invalid sortingTag format: %s" str
@@ -94,28 +94,28 @@ module SortingTag =
         (modelId, tag)
 
 
-type sortingMutationSetTag = Guid<sortingMutationSegmentId> * sortingTag
+type sortingMutationSetTag = Guid<sortingMutationSegmentId> * modelSetTag
 
 module SortingMutationSetTag =
-    let create (id: Guid<sortingMutationSegmentId>) (tag: sortingTag) : sortingMutationSetTag =
+    let create (id: Guid<sortingMutationSegmentId>) (tag: modelSetTag) : sortingMutationSetTag =
         (id, tag)
     let getMutationSegmentId (tag: sortingMutationSetTag) : Guid<sortingMutationSegmentId> =
         let (id, _) = tag
         id
-    let getSortingTag (tag: sortingMutationSetTag) : sortingTag =
+    let getSortingTag (tag: sortingMutationSetTag) : modelSetTag =
         let (_, sortingTag) = tag
         sortingTag
     let getSortingParentId (tag: sortingMutationSetTag) : Guid<sortingId> =
-        tag |> getSortingTag |> SortingTag.getSortingParentId
+        tag |> getSortingTag |> ModelSetTag.getSortingParentId
     let getModelTag (tag: sortingMutationSetTag) : modelTag =
-        tag |> getSortingTag |> SortingTag.getModelTag
+        tag |> getSortingTag |> ModelSetTag.getModelTag
     let toString (tag: sortingMutationSetTag) : string =
         let (id, sortingTag) = tag
-        sprintf "%s\t%s" ((%id).ToString()) (SortingTag.toString sortingTag)
+        sprintf "%s\t%s" ((%id).ToString()) (ModelSetTag.toString sortingTag)
     let fromString (str: string) : sortingMutationSetTag =
         let parts = str.Split('\t', 3)
         if parts.Length <> 3 then
             failwithf "Invalid sortingMutationSetTag format: %s" str
         let id = Guid.Parse(parts.[0]) |> UMX.tag<sortingMutationSegmentId>
-        let sortingTag = SortingTag.fromString (sprintf "%s\t%s" parts.[1] parts.[2])
+        let sortingTag = ModelSetTag.fromString (sprintf "%s\t%s" parts.[1] parts.[2])
         (id, sortingTag)

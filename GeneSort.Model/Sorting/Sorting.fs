@@ -68,6 +68,6 @@ module Sorting =
         | Pairs smp -> SorterPairModel.getSorterIdsWithModelTags smp
 
 
-    let getSorterIdsWithSortingTags (model:sorting) : (Guid<sorterId> * sortingTag) [] =
+    let getSorterIdsWithSortingTags (model:sorting) : (Guid<sorterId> * modelSetTag) [] =
         model |> getSorterIdsWithModelTags 
-              |> Array.map(fun (sid, mt) -> (sid, SortingTag.create (model |> getId) mt))
+              |> Array.map(fun (sid, mt) -> (sid, ModelSetTag.create (model |> getId) mt))

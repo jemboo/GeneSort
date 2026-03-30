@@ -1,10 +1,7 @@
 ﻿namespace GeneSort.SortingResults.Bins
 
 open FSharp.UMX
-open GeneSort.Sorting
 open GeneSort.SortingOps
-open System.Collections.Generic
-open System
 open GeneSort.Model.Sorting
 open GeneSort.SortingResults
 
@@ -15,7 +12,7 @@ type singleSortingEvalBins =
         sorterEvalBins: sorterEvalBins
     }
 
-    static member create (id: Guid<sortingEvalBinsId>) (sortingId: Guid<sortingId>) (tags: modelTag seq) =
+    static member create (id: Guid<sortingEvalBinsId>) =
         {
             sortingEvalBinsId = id
             sorterEvalBins = sorterEvalBins.createWithNewId Seq.empty
