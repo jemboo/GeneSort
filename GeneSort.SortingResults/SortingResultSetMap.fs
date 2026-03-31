@@ -70,8 +70,6 @@ type sortingResultSetMap =
          this.sortingResultMap.Values |> Seq.collect(fun sr -> sr |> SortingResult.getAllTaggedSorterEvals)
 
 
-
-
 module SortingResultSetMap = 
 
     let fromSortingSet (sSet:sortingSet) : sortingResultSetMap =
@@ -79,12 +77,6 @@ module SortingResultSetMap =
          sortingResultSetMap.create sortingResults sSet.SorterIdsWithSortingTags
          
 
-    let sortingSetExtractor
-                (sortingIds:ResizeArray<Guid<sortingId>>)
-                (sortingResultSetMap:sortingResultSetMap) 
-                (sorterId:Guid<sorterId>) : unit = 
-                
-                ()
 
         
 

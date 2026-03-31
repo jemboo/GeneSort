@@ -24,6 +24,15 @@ type mutationSegmentEvalBins =
 
 module MutationSegmentEvalBins =
 
+    let makeFromStorage 
+                (parentSortingResult: sortingResult) 
+                (mutantSortingEvalBins: sortingEvalBins) =
+
+        {
+            parentSortingResult = parentSortingResult
+            mutantSortingEvalBins = mutantSortingEvalBins
+        }
+
     let makeFromSorting (ting: sorting) : mutationSegmentEvalBins =
         let mutantSortingEvalBins = SortingEvalBins.makeFromSorting ting
         let sortingResult = SortingResult.makeFromSorting ting

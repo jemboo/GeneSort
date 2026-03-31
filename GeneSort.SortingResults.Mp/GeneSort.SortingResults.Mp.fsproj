@@ -6,6 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="SingleSortingResultDto.fs" />
+    <Compile Include="SplitPairsSortingResultDto.fs" />
+    <Compile Include="PairsSortingResultDto.fs" />
+    <Compile Include="SortingResultDto.fs" />
+    <Compile Include="SortingResultMapDto.fs" />
+    <Compile Include="SortingResultSetMapDto.fs" />
+    <Compile Include="MutationSegmentResultsDto.fs" />
+    <Compile Include="MutationSegmentSetResultsDto.fs" />
     <Compile Include="SorterEvalBinsDto.fs" />
     <Compile Include="SorterEvalHierarchyDto.fs" />
     <Compile Include="Program.fs" />
@@ -21,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GeneSort.Core.Mp\GeneSort.Core.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+    <ProjectReference Include="..\GeneSort.Model.Mp\GeneSort.Model.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingOps.Mp\GeneSort.SortingOps.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingOps\GeneSort.SortingOps.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingResults\GeneSort.SortingResults.fsproj" />

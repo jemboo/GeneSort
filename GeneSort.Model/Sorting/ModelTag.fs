@@ -103,28 +103,55 @@ module ModelSetTag =
         modelSetTag.create id tag
 
 
-type sortingMutationSetTag = Guid<sortingMutationSegmentId> * modelSetTag
 
-module SortingMutationSetTag =
-    let create (id: Guid<sortingMutationSegmentId>) (tag: modelSetTag) : sortingMutationSetTag =
-        (id, tag)
-    let getMutationSegmentId (tag: sortingMutationSetTag) : Guid<sortingMutationSegmentId> =
-        let (id, _) = tag
-        id
-    let getSortingTag (tag: sortingMutationSetTag) : modelSetTag =
-        let (_, sortingTag) = tag
-        sortingTag
-    let getSortingParentId (tag: sortingMutationSetTag) : Guid<sortingId> =
-        tag |> getSortingTag |> ModelSetTag.getSortingParentId
-    let getModelTag (tag: sortingMutationSetTag) : modelTag =
-        tag |> getSortingTag |> ModelSetTag.getModelTag
-    let toString (tag: sortingMutationSetTag) : string =
-        let (id, sortingTag) = tag
-        sprintf "%s\t%s" ((%id).ToString()) (ModelSetTag.toString sortingTag)
-    let fromString (str: string) : sortingMutationSetTag =
+
+// used to relate a sorter with the item in a two level collection of sortings that generates it.
+[<Struct; StructuralEquality; NoComparison>]
+type modelSuperSetTag =
+    private {
+        sortingId:   Guid<sortingId>
+        modelSetTag: modelSetTag
+    }
+
+    static member create (id: Guid<sortingId>) (tag: modelSetTag) =
+        { sortingId = id; modelSetTag = tag }
+
+    member this.SortingId   with get() = this.sortingId
+    member this.ModelSetTag with get() = this.modelSetTag
+    // convenience pass-throughs to avoid double-dereferencing at call sites
+    member this.ChildSortingId with get() = this.modelSetTag.SortingId
+    member this.ModelTag       with get() = this.modelSetTag.ModelTag
+
+
+module ModelSuperSetTag =
+
+    let create (id: Guid<sortingId>) (tag: modelSetTag) : modelSuperSetTag =
+        modelSuperSetTag.create id tag
+
+    let getSortingParentId (t: modelSuperSetTag) : Guid<sortingId> =
+        t.SortingId
+
+    let getModelSetTag (t: modelSuperSetTag) : modelSetTag =
+        t.ModelSetTag
+
+    let getChildSortingId (t: modelSuperSetTag) : Guid<sortingId> =
+        t.ChildSortingId
+
+    let getModelTag (t: modelSuperSetTag) : modelTag =
+        t.ModelTag
+
+    let toString (t: modelSuperSetTag) : string =
+        sprintf "%s\t%s" ((%t.SortingId).ToString()) (ModelSetTag.toString t.ModelSetTag)
+
+    let fromString (str: string) : modelSuperSetTag =
         let parts = str.Split('\t', 3)
         if parts.Length <> 3 then
-            failwithf "Invalid sortingMutationSetTag format: %s" str
-        let id = Guid.Parse(parts.[0]) |> UMX.tag<sortingMutationSegmentId>
-        let sortingTag = ModelSetTag.fromString (sprintf "%s\t%s" parts.[1] parts.[2])
-        (id, sortingTag)
+            failwithf "Invalid modelSuperSetTag format: %s" str
+        let id         = Guid.Parse(parts.[0]) |> UMX.tag<sortingId>
+        let modelSetTag = ModelSetTag.fromString (sprintf "%s\t%s" parts.[1] parts.[2])
+        modelSuperSetTag.create id modelSetTag
+
+
+
+
+

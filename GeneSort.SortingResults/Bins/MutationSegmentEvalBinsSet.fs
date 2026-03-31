@@ -12,14 +12,14 @@ type mutationSegmentEvalBinsSet =
         binDict: Dictionary<Guid<sortingId>, mutationSegmentEvalBins>
     }
 
-    member this.AddMutantSorterEval (sorterEval: sorterEval) (modelSetTag:modelSetTag) =
-        match this.binDict.TryGetValue(modelSetTag.SortingId) with
-        | true, bins -> bins.AddMutantSorterEval sorterEval modelSetTag.ModelTag
-        | false, _ -> failwithf "SortingId %A not found in mutationSegmentEvalBinsSet." modelSetTag.SortingId
+    member this.AddMutantSorterEval (sorterEval: sorterEval) (modelSuperSetTag:modelSuperSetTag) =
+        match this.binDict.TryGetValue(modelSuperSetTag.SortingId) with
+        | true, bins -> bins.AddMutantSorterEval sorterEval modelSuperSetTag.ModelTag
+        | false, _ -> failwithf "SortingId %A not found in mutationSegmentEvalBinsSet." modelSuperSetTag.SortingId
 
-    member this.AddAllMutantSorterEvals (tupes: (sorterEval * modelSetTag) seq) =
-        for (sorterEval, modelSetTag) in tupes do
-            this.AddMutantSorterEval sorterEval modelSetTag
+    member this.AddAllMutantSorterEvals (tupes: (sorterEval * modelSuperSetTag) seq) =
+        for (sorterEval, modelSuperSetTag) in tupes do
+            this.AddMutantSorterEval sorterEval modelSuperSetTag
 
     member this.AddParentSorterEval (sorterEval: sorterEval) (modelSetTag:modelSetTag) =
         match this.binDict.TryGetValue(modelSetTag.SortingId) with

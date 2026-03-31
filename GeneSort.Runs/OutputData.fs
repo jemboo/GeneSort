@@ -16,6 +16,7 @@ open GeneSort.SortingResults.Bins
 
 
 type outputData =
+    
     | RunParameters of runParameters
     | SorterSet of sorterSet
     | SortableTest of sortableTest

@@ -29,6 +29,7 @@ type sortingMutationSegment =
         { id = id; sortingMutator = sortingMutator; firstIndex = firstIndex; count = count }
 
     member this.Id with get() = this.id
+    member this.ParentSortingId with get() = this.SortingMutator |> SortingMutator.getParentSortingId
     member this.SortingMutator with get() = this.sortingMutator
     member this.FirstIndex with get() = this.firstIndex
     member this.Count with get() = this.count

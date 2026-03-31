@@ -41,6 +41,8 @@ type mutationSegmentSetResults =
             parentSorterToSegmentMap = parentMap
         }
 
+    member this.MutantSorterToSegmentMap with get() = this.mutantSorterToSegmentMap
+    member this.ParentSorterToSegmentMap with get() = this.parentSorterToSegmentMap
     member this.SortingMutationSegments with get() = this.sortingMutationSegments
     member this.SortingSegmentResults with get() = this.sortingSegmentResults
 
@@ -73,11 +75,30 @@ type mutationSegmentSetResults =
         this.sortingSegmentResults.Values
         |> Seq.collect (fun segmentResult -> segmentResult.GetAllTaggedParentSorterEvals())
         
-    member this.GetAllMutantSorterEvals () : (sorterEval * modelSetTag) seq =
-        this.sortingSegmentResults.Values
-        |> Seq.collect (fun segmentResult -> segmentResult.GetAllTaggedMutantSorterEvals())
-  
+    // modelSuperSetTag.Id is the sortingId of the sorting that the mutants were made from.
+    member this.GetAllMutantSorterEvals () : (sorterEval * modelSuperSetTag) seq =
+        this.sortingSegmentResults
+        |> Seq.collect (
+            fun segmentResult -> 
+                let sortingMutationSegment = this.SortingMutationSegments |> Array.find(fun seg -> seg.Id = segmentResult.Key)
+                segmentResult.Value.GetAllTaggedMutantSorterEvals()
+                |> Seq.map (fun (eval, modelSetTag) ->
+                    eval, modelSuperSetTag.create sortingMutationSegment.ParentSortingId modelSetTag)
+            )
+
 
 
 module MutationSegmentSetResults = 
-    let create segments = mutationSegmentSetResults.create segments
+    
+    let load 
+           (sortingMutationSegments : sortingMutationSegment []) 
+           (sortingSegmentResults: Dictionary<Guid<sortingMutationSegmentId>, mutationSegmentResults>) 
+           (mutantSorterToSegmentMap: Dictionary<Guid<sorterId>, Guid<sortingMutationSegmentId>>) 
+           (parentSorterToSegmentMap: Dictionary<Guid<sorterId>, Guid<sortingMutationSegmentId>>) 
+                : mutationSegmentSetResults =
+           {
+                sortingMutationSegments = sortingMutationSegments
+                sortingSegmentResults = sortingSegmentResults
+                mutantSorterToSegmentMap = mutantSorterToSegmentMap
+                parentSorterToSegmentMap = parentSorterToSegmentMap
+           }

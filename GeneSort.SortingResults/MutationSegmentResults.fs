@@ -65,4 +65,13 @@ type mutationSegmentResults =
 
 
 
-module MutationSegmentResults = ()
+module MutationSegmentResults = 
+
+    let load (sortingMutationSegment: sortingMutationSegment) 
+             (sortingResultMapParent: sortingResultMap) 
+             (sortingResultSetMapMutants: sortingResultSetMap) : mutationSegmentResults =
+        {
+            sortingMutationSegment = sortingMutationSegment
+            sortingResultMapParent = sortingResultMapParent
+            sortingResultSetMapMutants = sortingResultSetMapMutants
+        }
