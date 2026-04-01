@@ -29,6 +29,14 @@ type singleSortingEvalBins =
 
 
 
-module SingleSortingEvalBins = ()
+module SingleSortingEvalBins = 
+
+    let fromStorage 
+            (sortingEvalBinsId: Guid<sortingEvalBinsId>) 
+            (sorterEvalBins: sorterEvalBins) : singleSortingEvalBins =
+        {
+            sortingEvalBinsId = sortingEvalBinsId
+            sorterEvalBins = sorterEvalBins
+        }
 
 

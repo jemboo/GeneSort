@@ -44,5 +44,19 @@ type splitPairSortingEvalBins =
              | Second_First -> this.SorterEvalBinsSecondFirst.AddSorterEval sorterEval
              | Second_Second -> this.SorterEvalBinsSecondSecond.AddSorterEval sorterEval
 
-module SplitPairSortingEvalBins = ()
+module SplitPairSortingEvalBins = 
+
+    let fromStorage 
+            (sortingEvalBinsId: Guid<sortingEvalBinsId>) 
+            (sorterEvalBinsFirstFirst: sorterEvalBins) 
+            (sorterEvalBinsFirstSecond: sorterEvalBins) 
+            (sorterEvalBinsSecondFirst: sorterEvalBins) 
+            (sorterEvalBinsSecondSecond: sorterEvalBins) : splitPairSortingEvalBins =
+        {
+            sortingEvalBinsId = sortingEvalBinsId
+            sorterEvalBinsFirstFirst = sorterEvalBinsFirstFirst
+            sorterEvalBinsFirstSecond = sorterEvalBinsFirstSecond
+            sorterEvalBinsSecondFirst = sorterEvalBinsSecondFirst
+            sorterEvalBinsSecondSecond = sorterEvalBinsSecondSecond
+        }
 

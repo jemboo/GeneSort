@@ -15,6 +15,12 @@
     <Compile Include="MutationSegmentResultsDto.fs" />
     <Compile Include="MutationSegmentSetResultsDto.fs" />
     <Compile Include="Bins\SorterEvalBinsDto.fs" />
+    <Compile Include="Bins\SingleSortingEvalBinsDto.fs" />
+    <Compile Include="Bins\SplitPairSortingEvalBinsDto.fs" />
+    <Compile Include="Bins\PairEvalBinsDto.fs" />
+    <Compile Include="Bins\SortingEvalBinsDto.fs" />
+    <Compile Include="Bins\MutationSegmentEvalBinsDto.fs" />
+    <Compile Include="Bins\MutationSegmentEvalBinsSetDto.fs" />
     <Compile Include="Bins\SorterEvalHierarchyDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

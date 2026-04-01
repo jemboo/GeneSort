@@ -12,6 +12,8 @@ type mutationSegmentEvalBinsSet =
         binDict: Dictionary<Guid<sortingId>, mutationSegmentEvalBins>
     }
 
+    member this.GetBinDict() = this.binDict :> seq<KeyValuePair<Guid<sortingId>, mutationSegmentEvalBins>>
+
     member this.AddMutantSorterEval (sorterEval: sorterEval) (modelSuperSetTag:modelSuperSetTag) =
         match this.binDict.TryGetValue(modelSuperSetTag.SortingId) with
         | true, bins -> bins.AddMutantSorterEval sorterEval modelSuperSetTag.ModelTag
@@ -37,6 +39,15 @@ type mutationSegmentEvalBinsSet =
 
 
 module MutationSegmentEvalBinsSet =
+
+    let makeFromStorage 
+                (parentSortingResult: (Guid<sortingId> * mutationSegmentEvalBins) seq) 
+                : mutationSegmentEvalBinsSet =
+        let binDict = Dictionary<Guid<sortingId>, mutationSegmentEvalBins>()
+        for (sortingId, bins) in parentSortingResult do
+            binDict.Add(sortingId, bins)
+        { binDict = binDict }
+
 
     let makeFromSortings (tings: sorting seq) : mutationSegmentEvalBinsSet =
         let binDict = Dictionary<Guid<sortingId>, mutationSegmentEvalBins>()
