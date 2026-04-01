@@ -21,5 +21,5 @@ module RunParametersDto =
     let fromDomain (runParameters: runParameters) : runParametersDto =
         { paramMap = runParameters.ParamMap }
 
-    let fromDto (dto: runParametersDto) : runParameters =
+    let toDomain (dto: runParametersDto) : runParameters =
         runParameters.create dto.paramMap

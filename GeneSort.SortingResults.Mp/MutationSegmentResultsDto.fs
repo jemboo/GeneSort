@@ -22,26 +22,26 @@ type mutationSegmentResultsDto = {
 module MutationSegmentResultsDto =
 
     /// Converts the domain object to a serializable DTO
-    let toDto (domain: mutationSegmentResults) : mutationSegmentResultsDto =
+    let fromDomain (domain: mutationSegmentResults) : mutationSegmentResultsDto =
         {
             SortingMutationSegment = SortingMutationSegmentDto.fromDomain domain.SortingMutationSegment
-            SortingResultMapParent = SortingResultMapDto.toDto domain.SortingResultMapParent
-            SortingResultSetMapMutants = SortingResultSetMapDto.toDto domain.SortingResultSetMapMutants
+            SortingResultMapParent = SortingResultMapDto.fromDomain domain.SortingResultMapParent
+            SortingResultSetMapMutants = SortingResultSetMapDto.fromDomain domain.SortingResultSetMapMutants
         }
 
     /// Reconstructs the domain object from the DTO
     /// Note: This relies on the internal 'create' logic of mutationSegmentResults
-    let fromDto (dto: mutationSegmentResultsDto) : mutationSegmentResults =
+    let toDomain (dto: mutationSegmentResultsDto) : mutationSegmentResults =
         let segment = SortingMutationSegmentDto.toDomain dto.SortingMutationSegment
-        let parentMap = SortingResultMapDto.fromDto dto.SortingResultMapParent
-        let mutantsMap = SortingResultSetMapDto.fromDto dto.SortingResultSetMapMutants
+        let parentMap = SortingResultMapDto.toDomain dto.SortingResultMapParent
+        let mutantsMap = SortingResultSetMapDto.toDomain dto.SortingResultSetMapMutants
 
         MutationSegmentResults.load segment parentMap mutantsMap
 
     /// Helper for direct serialization
     let serialize (options: MessagePackSerializerOptions) (results: mutationSegmentResults) =
-        results |> toDto |> fun d -> MessagePackSerializer.Serialize(d, options)
+        results |> fromDomain |> fun d -> MessagePackSerializer.Serialize(d, options)
 
     /// Helper for direct deserialization
     let deserialize (options: MessagePackSerializerOptions) (bytes: byte array) =
-        MessagePackSerializer.Deserialize<mutationSegmentResultsDto>(bytes, options) |> fromDto
+        MessagePackSerializer.Deserialize<mutationSegmentResultsDto>(bytes, options) |> toDomain

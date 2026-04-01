@@ -16,7 +16,8 @@ open GeneSort.SortingResults.Bins
 
 
 type outputData =
-    
+    | MutationSegmentSetResults of mutationSegmentSetResults
+    | Project of project
     | RunParameters of runParameters
     | SorterSet of sorterSet
     | SortableTest of sortableTest
@@ -27,7 +28,6 @@ type outputData =
     | SortableTestModelSetGen of sortableTestModelSetGen
     | SorterSetEval of sorterSetEval
     | SorterSetEvalBins of sorterEvalBins
-    | Project of project
     | TextReport of dataTableReport
 
 

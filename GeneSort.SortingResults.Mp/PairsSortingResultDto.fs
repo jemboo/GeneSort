@@ -17,13 +17,13 @@ type pairsSortingResultDto = {
 
 module PairsSortingResultDto =
 
-    let toDto (result: pairsSortingResult) : pairsSortingResultDto =
+    let fromDomain (result: pairsSortingResult) : pairsSortingResultDto =
         match result with
-        | SplitPairs  inner -> { Tag = 0; Value = SplitPairsSortingResultDto.toDto inner }
-        | SplitPairs2 inner -> { Tag = 1; Value = SplitPairsSortingResultDto.toDto inner }
+        | SplitPairs  inner -> { Tag = 0; Value = SplitPairsSortingResultDto.fromDomain inner }
+        | SplitPairs2 inner -> { Tag = 1; Value = SplitPairsSortingResultDto.fromDomain inner }
 
-    let fromDto (dto: pairsSortingResultDto) : pairsSortingResult =
-        let inner = SplitPairsSortingResultDto.fromDto dto.Value
+    let toDomain (dto: pairsSortingResultDto) : pairsSortingResult =
+        let inner = SplitPairsSortingResultDto.toDomain dto.Value
         match dto.Tag with
         | 0 -> SplitPairs  inner
         | 1 -> SplitPairs2 inner

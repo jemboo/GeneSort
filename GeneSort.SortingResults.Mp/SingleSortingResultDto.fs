@@ -17,13 +17,13 @@ type singleSortingResultDto = {
 
 module SingleSortingResultDto =
 
-    let toDto (result: singleSortingResult) : singleSortingResultDto =
+    let fromDomain (result: singleSortingResult) : singleSortingResultDto =
         {
             SortingId  = %result.SortingId
             SorterEval = result.SorterEval |> Option.map SorterEvalDto.toSorterEvalDto
         }
 
-    let fromDto (dto: singleSortingResultDto) : singleSortingResult =
+    let toDomain (dto: singleSortingResultDto) : singleSortingResult =
         let result = singleSortingResult.create (UMX.tag<sortingId> dto.SortingId)
         result.SorterEval <- dto.SorterEval |> Option.map SorterEvalDto.fromSorterEvalDto
         result

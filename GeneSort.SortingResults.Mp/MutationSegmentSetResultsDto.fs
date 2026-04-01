@@ -26,7 +26,7 @@ type mutationSegmentSetResultsDto = {
 
 module MutationSegmentSetResultsDto =
 
-    let toDto (domain: mutationSegmentSetResults) : mutationSegmentSetResultsDto =
+    let fromDomain (domain: mutationSegmentSetResults) : mutationSegmentSetResultsDto =
         // 1. Map Mutation Segments
         let segmentsDto = 
             domain.SortingMutationSegments 
@@ -35,7 +35,7 @@ module MutationSegmentSetResultsDto =
         // 2. Map Segment Results (Dictionary<Guid<Id>, mutationSegmentResults>)
         let segmentResultsDto = Dictionary<string, mutationSegmentResultsDto>()
         for kvp in domain.SortingSegmentResults do
-            segmentResultsDto.Add((%kvp.Key).ToString(), MutationSegmentResultsDto.toDto kvp.Value)
+            segmentResultsDto.Add((%kvp.Key).ToString(), MutationSegmentResultsDto.fromDomain kvp.Value)
 
         // 3. Map Mutant Routing (Dictionary<Guid<sorterId>, Guid<segmentId>>)
         let mutantMapDto = Dictionary<string, string>()
@@ -54,7 +54,7 @@ module MutationSegmentSetResultsDto =
             ParentSorterToSegmentMap = parentMapDto
         }
 
-    let fromDto (dto: mutationSegmentSetResultsDto) : mutationSegmentSetResults =
+    let toDomain (dto: mutationSegmentSetResultsDto) : mutationSegmentSetResults =
         // 1. Rebuild Segments
         let segments = 
             dto.SortingMutationSegments 
@@ -64,7 +64,7 @@ module MutationSegmentSetResultsDto =
         let segmentResults = Dictionary<Guid<sortingMutationSegmentId>, mutationSegmentResults>()
         for kvp in dto.SortingSegmentResults do
             let segmentId = Guid.Parse(kvp.Key) |> UMX.tag<sortingMutationSegmentId>
-            segmentResults.Add(segmentId, MutationSegmentResultsDto.fromDto kvp.Value)
+            segmentResults.Add(segmentId, MutationSegmentResultsDto.toDomain kvp.Value)
 
         // 3. Rebuild Mutant Routing Dictionary
         let mutantMap = Dictionary<Guid<sorterId>, Guid<sortingMutationSegmentId>>()

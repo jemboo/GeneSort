@@ -23,6 +23,7 @@ open GeneSort.SortingOps
 open GeneSort.Model.Sorting
 open GeneSort.Model.Mp.Sorting
 open GeneSort.SortingResults.Bins
+open GeneSort.SortingResults
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
@@ -58,10 +59,10 @@ module OutputDataFile =
         Path.Combine(%outputDataFolder, fileNameWithExtension) |> UMX.tag<fullPathToFile>
 
     /// Helper to deserialize DTO and convert to domain.
-    let private deserializeDto<'Dto, 'Domain> (stream: Stream) (token: CancellationToken) (fromDto: 'Dto -> 'Domain) =
+    let private deserializeDto<'Dto, 'Domain> (stream: Stream) (token: CancellationToken) (toDomain: 'Dto -> 'Domain) =
         async {
             let! dto = MessagePackSerializer.DeserializeAsync<'Dto>(stream, options, token).AsTask() |> Async.AwaitTask
-            return fromDto dto
+            return toDomain dto
         }
 
     let getOutputDataAsync
@@ -79,9 +80,14 @@ module OutputDataFile =
                 use stream = new FileStream(%filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync = true)
                 let! domainData =
                     match queryParams.OutputDataType with
+                    | outputDataType.MutationSegmentSetResults _ ->
+                        async {
+                            let! domain = deserializeDto<mutationSegmentSetResultsDto, mutationSegmentSetResults> stream token MutationSegmentSetResultsDto.toDomain
+                            return outputData.MutationSegmentSetResults domain
+                        }
                     | outputDataType.RunParameters ->
                         async {
-                            let! domain = deserializeDto<runParametersDto, runParameters> stream token RunParametersDto.fromDto
+                            let! domain = deserializeDto<runParametersDto, runParameters> stream token RunParametersDto.toDomain
                             return outputData.RunParameters domain
                         }
                     | outputDataType.SorterSet _ ->
@@ -147,8 +153,8 @@ module OutputDataFile =
         }
 
     /// Helper to serialize domain to DTO.
-    let private serializeDto<'Domain, 'Dto> (stream: Stream) (domain: 'Domain) (toDto: 'Domain -> 'Dto) =
-        let dto = toDto domain
+    let private serializeDto<'Domain, 'Dto> (stream: Stream) (domain: 'Domain) (fromDomain: 'Domain -> 'Dto) =
+        let dto = fromDomain domain
         MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
 
     let saveToFileAsync
@@ -177,6 +183,8 @@ module OutputDataFile =
                         use stream = new FileStream(%filePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync = true)
                         do!
                             match outputData with
+                            | outputData.MutationSegmentSetResults msr ->
+                                serializeDto stream msr MutationSegmentSetResultsDto.fromDomain
                             | outputData.RunParameters r ->
                                 serializeDto stream r RunParametersDto.fromDomain
                             | outputData.SorterSet ss ->
@@ -234,7 +242,7 @@ module OutputDataFile =
                 use stream = new FileStream(runFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync = true)
                 let token = defaultArg ct CancellationToken.None
                 let! dto = MessagePackSerializer.DeserializeAsync<runParametersDto>(stream, options, token).AsTask() |> Async.AwaitTask
-                return Ok (RunParametersDto.fromDto dto)
+                return Ok (RunParametersDto.toDomain dto)
             with e -> return Error (sprintf "Error loading file %s: %s" runFilePath e.Message)
         }
 

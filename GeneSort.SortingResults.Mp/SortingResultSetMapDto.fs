@@ -21,34 +21,34 @@ type sortingResultSetMapDto = {
 
 module SortingResultSetMapDto =
 
-    let toDto (resultSet: sortingResultSetMap) : sortingResultSetMapDto =
+    let fromDomain (resultSet: sortingResultSetMap) : sortingResultSetMapDto =
         // 1. Convert the SortingResultMap
         let resultMapDto = Dictionary<string, sortingResultDto>()
         for kvp in resultSet.SortingResultMap do
-            resultMapDto.Add((%kvp.Key).ToString(), SortingResultDto.toDto kvp.Value)
+            resultMapDto.Add((%kvp.Key).ToString(), SortingResultDto.fromDomain kvp.Value)
 
         // 2. Convert the EvalMap
         let evalMapDto = Dictionary<string, modelSetTagDto>()
         for kvp in resultSet.EvalMap do
-            evalMapDto.Add((%kvp.Key).ToString(), ModelSetTagDto.toDto kvp.Value)
+            evalMapDto.Add((%kvp.Key).ToString(), ModelSetTagDto.fromDomain kvp.Value)
 
         {
             SortingResultMap = resultMapDto
             EvalMap = evalMapDto
         }
 
-    let fromDto (dto: sortingResultSetMapDto) : sortingResultSetMap =
+    let toDomain (dto: sortingResultSetMapDto) : sortingResultSetMap =
         // Reconstruct SortingResults sequence
         let sortingResults = 
             dto.SortingResultMap.Values 
-            |> Seq.map SortingResultDto.fromDto
+            |> Seq.map SortingResultDto.toDomain
 
         // Reconstruct EvalEntries sequence (Guid<sorterId> * modelSetTag)
         let evalEntries = 
             dto.EvalMap 
             |> Seq.map (fun kvp -> 
                 let sorterId = Guid.Parse(kvp.Key) |> UMX.tag<sorterId>
-                let modelSetTag = ModelSetTagDto.fromDto kvp.Value
+                let modelSetTag = ModelSetTagDto.toDomain kvp.Value
                 (sorterId, modelSetTag)
             )
 

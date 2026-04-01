@@ -9,6 +9,7 @@ open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting
 open GeneSort.SortingResults.Bins
+open GeneSort.SortingResults
 
 [<Measure>] type projectFolder
 [<Measure>] type allowOverwrite
@@ -96,6 +97,12 @@ module GeneSortDb =
         async {
             let! result = geneSortDb.loadAsync projectFolder queryParams
             return unwrapOutput (function | outputData.SorterSetEvalBins sseb -> Some sseb | _ -> None) result
+        }
+
+    let getMutationSegmentSetResultsAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<mutationSegmentSetResults, OutputError>> =
+        async {
+            let! result = geneSortDb.loadAsync projectFolder queryParams
+            return unwrapOutput (function | outputData.MutationSegmentSetResults msr -> Some msr | _ -> None) result
         }
 
     let getProjectAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<project, OutputError>> =

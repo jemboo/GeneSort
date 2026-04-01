@@ -11,12 +11,12 @@ type rngTypeDto =
     | Net = 1
 
 module RngTypeDto =
-    let toDto (rngType: rngType) : rngTypeDto =
+    let fromDomain (rngType: rngType) : rngTypeDto =
         match rngType with
         | Lcg -> rngTypeDto.Lcg
         | Net -> rngTypeDto.Net
     
-    let fromDto (dto: rngTypeDto) : rngType =
+    let toDomain (dto: rngTypeDto) : rngType =
         match dto with
         | rngTypeDto.Lcg -> Lcg
         | rngTypeDto.Net -> Net
@@ -30,10 +30,10 @@ type rngFactoryDto =
 module RngFactoryDto =
     let fromDomain (factory: rngFactory) : rngFactoryDto =
         { Id = (%factory.Id).ToString()
-          RngType = RngTypeDto.toDto factory.RngType }
+          RngType = RngTypeDto.fromDomain factory.RngType }
     
     let toDomain (dto: rngFactoryDto) : rngFactory =
-        let rngType = RngTypeDto.fromDto dto.RngType
+        let rngType = RngTypeDto.toDomain dto.RngType
         let factory = rngFactory.getFactory rngType
         
         // Validate that the ID matches the expected factory ID

@@ -3,9 +3,10 @@ open FSharp.UMX
 open System
 
 type outputDataType =
+    | MutationSegmentSetResults of string
     | Project
     | RunParameters
-    | SorterSet of string  // Made string mandatory; use "" for none.
+    | SorterSet of string
     | SortableTest of string
     | SortableTestSet of string
     | SortingSet of string
@@ -22,6 +23,8 @@ module OutputDataType =
 
     let toFolderName (outputDataType: outputDataType) : string =
         match outputDataType with
+        | MutationSegmentSetResults s -> appendParam "MutationSegmentSetResults" s
+        | Project -> "Project"
         | RunParameters -> "RunParameters"
         | SorterSet s -> appendParam "SorterSet" s
         | SortableTest s -> appendParam "SortableTest" s
@@ -32,7 +35,6 @@ module OutputDataType =
         | SortableTestModelSetGen s -> appendParam "SortableTestModelSetGen" s
         | SorterSetEval s -> appendParam "SorterSetEval" s
         | SorterSetEvalBins s -> appendParam "SorterSetEvalBins" s
-        | Project -> "Project"
         | TextReport s -> appendParam "TextReport" %s
 
     let fromFolderName (description: string) : outputDataType option =
@@ -40,6 +42,8 @@ module OutputDataType =
         let prefix = parts.[0]
         let param = if parts.Length > 1 then String.Join("_", parts.[1..]) else ""
         match prefix with
+        | "MutationSegmentSetResults" -> Some (MutationSegmentSetResults param)
+        | "Project" when param = "" -> Some Project
         | "RunParameters" when param = "" -> Some RunParameters
         | "SorterSet" -> Some (SorterSet param)
         | "SortableTest" -> Some (SortableTest param)
@@ -50,7 +54,6 @@ module OutputDataType =
         | "SortableTestModelSetGen" -> Some (SortableTestModelSetGen param)
         | "SorterSetEval" -> Some (SorterSetEval param)
         | "SorterSetEvalBins" -> Some (SorterSetEvalBins param)
-        | "Project" when param = "" -> Some Project
         | "TextReport" -> Some (TextReport (param |> UMX.tag<textReportName>))
         | _ -> None
 

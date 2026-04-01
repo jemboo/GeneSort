@@ -20,27 +20,27 @@ type sortingResultMapDto = {
 
 module SortingResultMapDto =
 
-    let toDto (map: sortingResultMap) : sortingResultMapDto =
+    let fromDomain (map: sortingResultMap) : sortingResultMapDto =
         let evalDict = Dictionary<string, modelTagDto>()
         
         for kvp in map.EvalMap do
             let sorterIdStr = (%kvp.Key).ToString()
-            let tagDto = ModelTagDto.toDto kvp.Value
+            let tagDto = ModelTagDto.fromDomain kvp.Value
             evalDict.Add(sorterIdStr, tagDto)
 
         {
-            SortingResult = SortingResultDto.toDto map.SortingResult
+            SortingResult = SortingResultDto.fromDomain map.SortingResult
             EvalMap = evalDict
         }
 
-    let fromDto (dto: sortingResultMapDto) : sortingResultMap =
-        let sortingResult = SortingResultDto.fromDto dto.SortingResult
+    let toDomain (dto: sortingResultMapDto) : sortingResultMap =
+        let sortingResult = SortingResultDto.toDomain dto.SortingResult
         
         let evalEntries = 
             dto.EvalMap 
             |> Seq.map (fun kvp -> 
                 let sorterId = Guid.Parse(kvp.Key) |> UMX.tag<sorterId>
-                let modelTag = ModelTagDto.fromDto kvp.Value
+                let modelTag = ModelTagDto.toDomain kvp.Value
                 (sorterId, modelTag)
             )
 

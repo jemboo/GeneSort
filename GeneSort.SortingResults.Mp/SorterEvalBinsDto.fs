@@ -18,13 +18,13 @@ type sorterEvalKeyDto = {
 }
 
 module SorterEvalKeyDto =
-    let toDto (key: sorterEvalKey) : sorterEvalKeyDto =
+    let fromDomain (key: sorterEvalKey) : sorterEvalKeyDto =
         { 
             ceLength    = %key.CeCount
             stageLength = %key.StageLength
             isSorted    = key.IsSorted
         }
-    let fromDto (dto: sorterEvalKeyDto) : sorterEvalKey =
+    let toDomain (dto: sorterEvalKeyDto) : sorterEvalKey =
         if dto.ceLength < 0    then failwith "CeLength must not be negative"
         if dto.stageLength < 0 then failwith "StageLength must not be negative"
         sorterEvalKey.create
@@ -61,7 +61,7 @@ module SorterEvalBinsDto =
                 bins.Layers
                 |> Seq.map (fun kvp ->
                     {
-                        sorterEvalKey = SorterEvalKeyDto.toDto kvp.Key
+                        sorterEvalKey = SorterEvalKeyDto.fromDomain kvp.Key
                         sorterIds     = kvp.Value.SorterIds |> Seq.map UMX.untag |> Seq.toArray
                     })
                 |> Seq.toArray
@@ -70,7 +70,7 @@ module SorterEvalBinsDto =
     let toDomain (dto: sorterEvalBinsDto) : sorterEvalBins =
         let bins = sorterEvalBins.create (UMX.tag<sorterEvalBinsId> dto.sorterEvalBinsId) [||]
         for leafDto in dto.bins do
-            let key  = SorterEvalKeyDto.fromDto leafDto.sorterEvalKey
+            let key  = SorterEvalKeyDto.toDomain leafDto.sorterEvalKey
             match leafDto.sorterIds with
             | [||] -> failwith "Cannot reconstruct sorterEvalBins entry with no sorterIds."
             | ids  ->

@@ -23,7 +23,7 @@ type splitPairsSortingResultDto = {
 
 module SplitPairsSortingResultDto =
 
-    let toDto (result: splitPairsSortingResult) : splitPairsSortingResultDto =
+    let fromDomain (result: splitPairsSortingResult) : splitPairsSortingResultDto =
         {
             SortingId              = %result.SortingId
             SorterEvalFirstFirst   = result.SorterEvalFirstFirst   |> Option.map SorterEvalDto.toSorterEvalDto
@@ -32,7 +32,7 @@ module SplitPairsSortingResultDto =
             SorterEvalSecondSecond = result.SorterEvalSecondSecond |> Option.map SorterEvalDto.toSorterEvalDto
         }
 
-    let fromDto (dto: splitPairsSortingResultDto) : splitPairsSortingResult =
+    let toDomain (dto: splitPairsSortingResultDto) : splitPairsSortingResult =
         let result = splitPairsSortingResult.create (UMX.tag<sortingId> dto.SortingId)
         result.SorterEvalFirstFirst   <- dto.SorterEvalFirstFirst   |> Option.map SorterEvalDto.fromSorterEvalDto
         result.SorterEvalFirstSecond  <- dto.SorterEvalFirstSecond  |> Option.map SorterEvalDto.fromSorterEvalDto

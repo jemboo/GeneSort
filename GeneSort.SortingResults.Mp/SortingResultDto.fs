@@ -15,25 +15,25 @@ type sortingResultDto = {
 
 module SortingResultDto =
 
-    let toDto (result: sortingResult) : sortingResultDto =
+    let fromDomain (result: sortingResult) : sortingResultDto =
         match result with
         | sortingResult.Single inner ->
             { Tag    = 0
-              Single = Some (SingleSortingResultDto.toDto inner)
+              Single = Some (SingleSortingResultDto.fromDomain inner)
               Pairs  = None }
         | sortingResult.Pairs inner ->
             { Tag    = 1
               Single = None
-              Pairs  = Some (PairsSortingResultDto.toDto inner) }
+              Pairs  = Some (PairsSortingResultDto.fromDomain inner) }
 
-    let fromDto (dto: sortingResultDto) : sortingResult =
+    let toDomain (dto: sortingResultDto) : sortingResult =
         match dto.Tag with
         | 0 ->
             match dto.Single with
-            | Some inner -> sortingResult.Single (SingleSortingResultDto.fromDto inner)
+            | Some inner -> sortingResult.Single (SingleSortingResultDto.toDomain inner)
             | None       -> failwith "sortingResultDto tag=0 (Single) but Single field is None"
         | 1 ->
             match dto.Pairs with
-            | Some inner -> sortingResult.Pairs (PairsSortingResultDto.fromDto inner)
+            | Some inner -> sortingResult.Pairs (PairsSortingResultDto.toDomain inner)
             | None       -> failwith "sortingResultDto tag=1 (Pairs) but Pairs field is None"
         | n -> failwithf "Unknown sortingResult tag: %d" n

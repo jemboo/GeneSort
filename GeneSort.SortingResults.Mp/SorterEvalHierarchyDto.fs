@@ -23,20 +23,20 @@ type sorterEvalLeafDto = {
 
 module SorterEvalLeafDto =
 
-    let toDto (key: ceSequenceKey) (leaf: sorterEvalLeaf) : sorterEvalLeafDto =
+    let fromDomain (key: ceSequenceKey) (leaf: sorterEvalLeaf) : sorterEvalLeafDto =
         {
             cesLowHi  = key.Ces |> Array.collect (fun c -> [| c.Low; c.Hi |])
             sorterIds = leaf.SorterIds |> Seq.map UMX.untag |> Seq.toArray
-            sorterEvalKeyDto = leaf.SorterEvalKey |> SorterEvalKeyDto.toDto
+            sorterEvalKeyDto = leaf.SorterEvalKey |> SorterEvalKeyDto.fromDomain
         }
 
-    let fromDto (dto: sorterEvalLeafDto) : ceSequenceKey * sorterEvalLeaf =
+    let toDomain (dto: sorterEvalLeafDto) : ceSequenceKey * sorterEvalLeaf =
         let ces =
             dto.cesLowHi
             |> Array.chunkBySize 2
             |> Array.map (fun pair -> ce.create pair.[0] pair.[1])
         let ceSeqKey     = ceSequenceKey.create ces
-        let sorterEvalKey = SorterEvalKeyDto.fromDto dto.sorterEvalKeyDto
+        let sorterEvalKey = SorterEvalKeyDto.toDomain dto.sorterEvalKeyDto
         let leaf =
             match dto.sorterIds with
             | [||] -> failwith "Cannot reconstruct sorterEvalLeaf with no sorterIds."
@@ -57,20 +57,20 @@ type sorterEvalLayerDto = {
 
 module SorterEvalLayerDto =
 
-    let toDto (layer: sorterEvalLayer) : sorterEvalLayerDto =
+    let fromDomain (layer: sorterEvalLayer) : sorterEvalLayerDto =
         {
-            sorterEvalKey = SorterEvalKeyDto.toDto layer.Key
+            sorterEvalKey = SorterEvalKeyDto.fromDomain layer.Key
             leaves =
                 layer.Leaves
-                |> Seq.map (fun kvp -> SorterEvalLeafDto.toDto kvp.Key kvp.Value)
+                |> Seq.map (fun kvp -> SorterEvalLeafDto.fromDomain kvp.Key kvp.Value)
                 |> Seq.toArray
         }
 
-    let fromDto (dto: sorterEvalLayerDto) : sorterEvalLayer =
-        let key   = SorterEvalKeyDto.fromDto dto.sorterEvalKey
+    let toDomain (dto: sorterEvalLayerDto) : sorterEvalLayer =
+        let key   = SorterEvalKeyDto.toDomain dto.sorterEvalKey
         let layer = sorterEvalLayer.create(key)
         for leafDto in dto.leaves do
-            let (ceSeqKey, leaf) = SorterEvalLeafDto.fromDto leafDto
+            let (ceSeqKey, leaf) = SorterEvalLeafDto.toDomain leafDto
             layer.MergeLeaf ceSeqKey leaf
         layer
 
@@ -92,7 +92,7 @@ module SorterEvalHierarchyDto =
             sorterEvalHierarchyId = %hierarchy.SorterEvalHierarchyId
             layers =
                 hierarchy.Layers
-                |> Seq.map (fun kvp -> SorterEvalLayerDto.toDto kvp.Value)
+                |> Seq.map (fun kvp -> SorterEvalLayerDto.fromDomain kvp.Value)
                 |> Seq.toArray
         }
 
@@ -100,7 +100,7 @@ module SorterEvalHierarchyDto =
         let hierarchy =
             sorterEvalHierarchy.create (UMX.tag<sorterEvalHierarchyId> dto.sorterEvalHierarchyId)
         for layerDto in dto.layers do
-            hierarchy.MergeLayer (SorterEvalLayerDto.fromDto layerDto)
+            hierarchy.MergeLayer (SorterEvalLayerDto.toDomain layerDto)
         hierarchy
 
     let serialize (options: MessagePackSerializerOptions)
