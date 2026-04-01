@@ -14,8 +14,8 @@
     <Compile Include="SortingResultSetMapDto.fs" />
     <Compile Include="MutationSegmentResultsDto.fs" />
     <Compile Include="MutationSegmentSetResultsDto.fs" />
-    <Compile Include="SorterEvalBinsDto.fs" />
-    <Compile Include="SorterEvalHierarchyDto.fs" />
+    <Compile Include="Bins\SorterEvalBinsDto.fs" />
+    <Compile Include="Bins\SorterEvalHierarchyDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

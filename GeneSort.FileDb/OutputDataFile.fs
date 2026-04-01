@@ -24,6 +24,7 @@ open GeneSort.Model.Sorting
 open GeneSort.Model.Mp.Sorting
 open GeneSort.SortingResults.Bins
 open GeneSort.SortingResults
+open GeneSort.SortingResults.Mp.Bins
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
