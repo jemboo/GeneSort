@@ -5,12 +5,16 @@ open FSharp.UMX
 
 open GeneSort.Model.Sorting
 open GeneSort.SortingOps
+open GeneSort.SortingResults
 
 
 type mutationSegmentEvalBinsSet =
     private {
+        id: Guid<mutationSegmentEvalBinsSetId>
         binDict: Dictionary<Guid<sortingId>, mutationSegmentEvalBins>
     }
+
+    member this.Id = this.id
 
     member this.GetBinDict() = this.binDict :> seq<KeyValuePair<Guid<sortingId>, mutationSegmentEvalBins>>
 
@@ -41,17 +45,22 @@ type mutationSegmentEvalBinsSet =
 module MutationSegmentEvalBinsSet =
 
     let makeFromStorage 
+                (id: Guid<mutationSegmentEvalBinsSetId>)
                 (parentSortingResult: (Guid<sortingId> * mutationSegmentEvalBins) seq) 
                 : mutationSegmentEvalBinsSet =
         let binDict = Dictionary<Guid<sortingId>, mutationSegmentEvalBins>()
         for (sortingId, bins) in parentSortingResult do
             binDict.Add(sortingId, bins)
-        { binDict = binDict }
+        {   id = id
+            binDict = binDict }
 
 
-    let makeFromSortings (tings: sorting seq) : mutationSegmentEvalBinsSet =
+    let makeFromSortings 
+                (id: Guid<mutationSegmentEvalBinsSetId>)
+                (tings: sorting seq) : mutationSegmentEvalBinsSet =
         let binDict = Dictionary<Guid<sortingId>, mutationSegmentEvalBins>()
         for ting in tings do
             let bins = MutationSegmentEvalBins.makeFromSorting ting
             binDict.Add(Sorting.getId ting, bins)
-        { binDict = binDict }
+        {   id = id
+            binDict = binDict }

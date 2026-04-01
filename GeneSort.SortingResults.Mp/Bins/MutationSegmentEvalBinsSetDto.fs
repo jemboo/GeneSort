@@ -5,6 +5,7 @@ open MessagePack
 open FSharp.UMX
 open GeneSort.SortingResults.Bins
 open GeneSort.Model.Sorting
+open GeneSort.SortingResults
 
 [<MessagePackObject>]
 type mutationSegmentEvalBinEntryDto = {
@@ -17,6 +18,8 @@ type mutationSegmentEvalBinEntryDto = {
 [<MessagePackObject>]
 type mutationSegmentEvalBinsSetDto = {
     [<Key(0)>]
+    id: Guid
+    [<Key(1)>]
     entries: mutationSegmentEvalBinEntryDto array
 }
 
@@ -35,14 +38,17 @@ module MutationSegmentEvalBinsSetDto =
                     bins = MutationSegmentEvalBinsDto.fromDomain kvp.Value 
                 })
             |> Seq.toArray
-        { entries = entries }
+        { 
+                id = %domain.Id
+                entries = entries 
+        }
 
     /// Reconstructs the Domain Set from the DTO
     let toDomain (dto: mutationSegmentEvalBinsSetDto) : mutationSegmentEvalBinsSet =
         dto.entries
         |> Array.map (fun e -> 
             (UMX.tag<sortingId> e.sortingId, MutationSegmentEvalBinsDto.toDomain e.bins))
-        |> MutationSegmentEvalBinsSet.makeFromStorage
+        |> MutationSegmentEvalBinsSet.makeFromStorage (UMX.tag<mutationSegmentEvalBinsSetId> dto.id)
 
     let serialize (options: MessagePackSerializerOptions)
                   (domain: mutationSegmentEvalBinsSet) : byte array =

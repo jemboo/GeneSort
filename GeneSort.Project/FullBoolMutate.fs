@@ -313,7 +313,9 @@ module FullBoolMutate =
                                                     (outputDataType.MutationSegmentEvalBinsSet "")
 
                 let mutationSegmentEvalBinsSet = 
-                        MutationSegmentEvalBinsSet.makeFromSortings sortingSetParent.Sortings
+                        MutationSegmentEvalBinsSet.makeFromSortings
+                                    (%qpMutationSegmentEvalBinsSet.Id |> UMX.tag<mutationSegmentEvalBinsSetId>) 
+                                    sortingSetParent.Sortings
 
                 let parentTupes = mutationSegmentSetResults.GetAllParentSorterEvals() |> Seq.toArray
                 let mutantTupes = mutationSegmentSetResults.GetAllMutantSorterEvals() |> Seq.toArray
