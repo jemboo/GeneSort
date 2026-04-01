@@ -80,7 +80,7 @@ module OutputDataFile =
                 use stream = new FileStream(%filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync = true)
                 let! domainData =
                     match queryParams.OutputDataType with
-                    | outputDataType.MutationSegmentSetResults _ ->
+                    | outputDataType.MutationSegmentEvalBinsSet _ ->
                         async {
                             let! domain = deserializeDto<mutationSegmentSetResultsDto, mutationSegmentSetResults> stream token MutationSegmentSetResultsDto.toDomain
                             return outputData.MutationSegmentSetResults domain

@@ -3,7 +3,7 @@ open FSharp.UMX
 open System
 
 type outputDataType =
-    | MutationSegmentSetResults of string
+    | MutationSegmentEvalBinsSet of string
     | Project
     | RunParameters
     | SorterSet of string
@@ -23,7 +23,7 @@ module OutputDataType =
 
     let toFolderName (outputDataType: outputDataType) : string =
         match outputDataType with
-        | MutationSegmentSetResults s -> appendParam "MutationSegmentSetResults" s
+        | MutationSegmentEvalBinsSet s -> appendParam "MutationSegmentEvalBinsSet" s
         | Project -> "Project"
         | RunParameters -> "RunParameters"
         | SorterSet s -> appendParam "SorterSet" s
@@ -42,7 +42,7 @@ module OutputDataType =
         let prefix = parts.[0]
         let param = if parts.Length > 1 then String.Join("_", parts.[1..]) else ""
         match prefix with
-        | "MutationSegmentSetResults" -> Some (MutationSegmentSetResults param)
+        | "MutationSegmentEvalBinsSet" -> Some (MutationSegmentEvalBinsSet param)
         | "Project" when param = "" -> Some Project
         | "RunParameters" when param = "" -> Some RunParameters
         | "SorterSet" -> Some (SorterSet param)

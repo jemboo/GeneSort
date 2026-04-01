@@ -307,6 +307,11 @@ module FullBoolMutate =
 
                 
                 // 11. Make the evaluation bins
+
+                let qpMutationSegmentEvalBinsSet = makeQueryParamsFromRunParams 
+                                                    runParameters 
+                                                    (outputDataType.MutationSegmentEvalBinsSet "")
+
                 let mutationSegmentEvalBinsSet = 
                         MutationSegmentEvalBinsSet.makeFromSortings sortingSetParent.Sortings
 
