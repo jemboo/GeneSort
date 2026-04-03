@@ -55,5 +55,5 @@ type ProjectTests() =
         project.create
             ("TestProject"  |> UMX.tag<projectName>)
             "Test Description"
-            parameterSpans
             outputDataTypes
+            parameterSpans

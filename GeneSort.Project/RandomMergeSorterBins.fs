@@ -21,9 +21,12 @@ open GeneSort.SortingResults
 open GeneSort.SortingResults.Bins
 
 
-module RandomSorterBins_P1 =
+module RandomMergeSorterBins_P1 =
     
     let sortingWidths() : string*string list =
+       // let values = [4; 6; 8; 12; 16; 18; 20; 22; 24; 32; 36; 48; 64; 72; 96; 128; 144; 192; 256] |> List.map(fun d -> d.ToString())
+       // let values = [4; 6; 8; 12; 16; 18; 20; 22; 24; 32; 64; 128; 256] |> List.map(fun d -> d.ToString())
+       // let values = [4; 6; 8; 12; 16; 18; 20; 22; 24; 32; 64;] |> List.map(fun d -> d.ToString())
         let values = [4; 6; 8; 12; 16; 18; 20; 22; 24] |> List.map(fun d -> d.ToString())
         (runParameters.sortingWidthKey, values)
 
@@ -41,59 +44,26 @@ module RandomSorterBins_P1 =
 
 
     let sortableDataFormatKeys () : string * string list =
-        let values = [
+        let values = [ 
+                        //sortableDataFormat.IntArray; 
+                        //sortableDataFormat.BoolArray;
+                        //sortableDataFormat.Int8Vector256;
+                        //sortableDataFormat.Int8Vector512;
                         sortableDataFormat.BitVector512;
-                     ] |> List.map SortableDataFormat.toString
-        (runParameters.sortableDataFormatKey, values)
 
-    let sorterCounts () : string * string list =
-        let values = [ 10000;] |> List.map (fun d -> d.ToString())
-        (runParameters.sorterCountKey, values)
-
-    let parameterSpans = 
-        [ sortingWidths(); sorterModelTypes(); sortableDataFormatKeys(); sorterCounts() ]
-
-
-
-module RandomSorterBins_P2 =
-    
-    let sortingWidths() : string*string list =
-        let values = [4; 6; 8; 12; 16;] |> List.map(fun d -> d.ToString())
-        (runParameters.sortingWidthKey, values)
-
-
-    let sorterModelTypes () : string*string list =
-        let values =         
-            [ 
-              sorterModelType.Msce; 
-              sorterModelType.Mssi;
-              sorterModelType.Msrs; 
-              sorterModelType.Msuf4; 
-              sorterModelType.Msuf6; 
-              ]  |> List.map(SorterModelType.toString)
-        (runParameters.sorterModelTypeKey, values )
-
-
-    let sortableDataFormatKeys () : string * string list =
-        let values = [
-                        sortableDataFormat.BitVector512;
                      ] |> List.map SortableDataFormat.toString
         (runParameters.sortableDataFormatKey, values)
 
 
-    let sorterCounts () : string * string list =
-        let values = [ 100;] |> List.map (fun d -> d.ToString())
-        (runParameters.sorterCountKey, values)
-
     let parameterSpans = 
-        [ sortingWidths(); sorterModelTypes(); sortableDataFormatKeys(); sorterCounts() ]
+        [ sortingWidths(); sorterModelTypes(); sortableDataFormatKeys(); ]
+
+
+    let sorterCount = 10000
 
 
 
-
-
-
-module RandomSorterBins =
+module RandomMergeSorterBins =
     
     // Progress reporter that prints to console
     let progress = 
@@ -263,11 +233,13 @@ module RandomSorterBins =
         let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
         let stageLength = getStageLengthForSortingWidth (rp.GetSorterModelType().Value) sortingWidth
         let ceLength = stageLength |> StageLength.toCeLength sortingWidth
+        let sorterCount = 10000 |> UMX.tag<sorterCount>
 
         rp.WithProjectName(Some projectName)
             .WithRunFinished(Some false)
             .WithCeLength(Some ceLength)
             .WithStageLength(Some stageLength)
+            .WithSorterCount(Some sorterCount)
             .WithId (Some qp.Id)
 
 
@@ -294,7 +266,7 @@ module RandomSorterBins =
                 projectName 
                 projectDesc
                 outputDataTypes
-                RandomSorterBins_P2.parameterSpans
+                RandomMergeSorterBins_P1.parameterSpans
 
 
     let executor

@@ -9,7 +9,86 @@ open GeneSort.Sorting
 open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.Model.Sortable
-open GeneSort.Sorting.Sortable
+
+
+
+module SortableMergeTests_P1 =
+
+    // --- Filters ---
+
+    let mergeDimensionDividesSortingWidth (rp: runParameters) =
+        let sw = rp.GetSortingWidth().Value
+        let md = rp.GetMergeDimension().Value
+        if (%sw % %md = 0) then Some rp else None
+
+    let limitForBoolenDataType (rp: runParameters) =
+        let sw = rp.GetSortingWidth().Value
+        let dt = rp.GetSortableDataFormat().Value
+        if (dt.IsBoolArray && %sw > 32) then None else Some rp
+
+    let limitForMergeFillType (rp: runParameters) =
+        let sw = rp.GetSortingWidth().Value
+        let ft = rp.GetMergeSuffixType().Value
+        if (ft.IsNoSuffix && %sw > 64) then None else Some rp
+
+    let limitForMergeDimension (rp: runParameters) =
+        let sw = rp.GetSortingWidth().Value
+        let md = rp.GetMergeDimension().Value
+        if (%md > 6 && %sw > 144) then None else Some rp
+
+    let paramMapFilter (rp: runParameters) = 
+        Some rp
+        |> Option.bind mergeDimensionDividesSortingWidth
+       // |> Option.bind limitForBoolenDataType
+        |> Option.bind limitForMergeFillType
+       // |> Option.bind limitForMergeDimension
+
+
+
+    // --- Parameter Spans ---
+
+    let sortableDataFormatKeys () : string * string list =
+        let values = [ 
+                        //sortableDataFormat.IntArray; 
+                        //sortableDataFormat.BoolArray;
+                        sortableDataFormat.BitVector512;
+                        sortableDataFormat.Int8Vector512;
+                     ] |> List.map SortableDataFormat.toString
+        (runParameters.sortableDataFormatKey, values)
+
+
+    let sortingWidths () : string * string list =
+        //let values = [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] |> List.map string
+        //let values = [ 16; 32; 64; 128; 256] |> List.map string
+        let values = [ 16; 32; 64; ] |> List.map string
+        (runParameters.sortingWidthKey, values)
+
+
+    let mergeDimensions () : string * string list =
+       // let values = [2; 3; 4; 6; 8 ] |> List.map string
+        let values = [2; 3; 4;] |> List.map string
+        (runParameters.mergeDimensionKey, values)
+
+
+    let mergeFillTypes () : string * string list =
+        let values = [ 
+                        mergeSuffixType.NoSuffix; 
+                        mergeSuffixType.VV_1 
+                     ] |> List.map MergeFillType.toString
+        (runParameters.mergeSuffixTypeKey, values)
+
+    let parameterSpans = 
+        [
+            sortingWidths();
+            sortableDataFormatKeys(); 
+            mergeDimensions(); 
+            mergeFillTypes(); 
+        ]
+
+
+
+
+        
 
 module SortableMergeTests =
 
@@ -49,68 +128,6 @@ module SortableMergeTests =
             outputDataType
 
 
-    // --- Parameter Spans ---
-
-    let sortableDataFormatKeys () : string * string list =
-        let values = [ 
-                        //sortableDataFormat.IntArray; 
-                        //sortableDataFormat.BoolArray;
-                        sortableDataFormat.BitVector512;
-                        sortableDataFormat.Int8Vector512;
-                     ] |> List.map SortableDataFormat.toString
-        (runParameters.sortableDataFormatKey, values)
-
-
-    let sortingWidths () : string * string list =
-        //let values = [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] |> List.map string
-        //let values = [ 16; 32; 64; 128; 256] |> List.map string
-        let values = [ 16; 32; 64; ] |> List.map string
-        (runParameters.sortingWidthKey, values)
-
-
-    let mergeDimensions () : string * string list =
-       // let values = [2; 3; 4; 6; 8 ] |> List.map string
-        let values = [2; 3; 4;] |> List.map string
-        (runParameters.mergeDimensionKey, values)
-
-
-    let mergeFillTypes () : string * string list =
-        let values = [ 
-                        mergeSuffixType.NoSuffix; 
-                        mergeSuffixType.VV_1 
-                     ] |> List.map MergeFillType.toString
-        (runParameters.mergeSuffixTypeKey, values)
-
-
-    // --- Filters ---
-
-    let mergeDimensionDividesSortingWidth (rp: runParameters) =
-        let sw = rp.GetSortingWidth().Value
-        let md = rp.GetMergeDimension().Value
-        if (%sw % %md = 0) then Some rp else None
-
-    let limitForBoolenDataType (rp: runParameters) =
-        let sw = rp.GetSortingWidth().Value
-        let dt = rp.GetSortableDataFormat().Value
-        if (dt.IsBoolArray && %sw > 32) then None else Some rp
-
-    let limitForMergeFillType (rp: runParameters) =
-        let sw = rp.GetSortingWidth().Value
-        let ft = rp.GetMergeSuffixType().Value
-        if (ft.IsNoSuffix && %sw > 64) then None else Some rp
-
-    let limitForMergeDimension (rp: runParameters) =
-        let sw = rp.GetSortingWidth().Value
-        let md = rp.GetMergeDimension().Value
-        if (%md > 6 && %sw > 144) then None else Some rp
-
-    let paramMapFilter (rp: runParameters) = 
-        Some rp
-        |> Option.bind mergeDimensionDividesSortingWidth
-       // |> Option.bind limitForBoolenDataType
-        |> Option.bind limitForMergeFillType
-       // |> Option.bind limitForMergeDimension
-
 
 
     // --- Project Refinement ---
@@ -123,20 +140,12 @@ module SortableMergeTests =
 
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
         runParametersSeq 
-        |> Seq.choose (paramMapFilter >> Option.map enhancer)
+        |> Seq.choose (SortableMergeTests_P1.paramMapFilter >> Option.map enhancer)
 
 
-    let parameterSpans = 
-        [
-            sortingWidths();
-            sortableDataFormatKeys(); 
-            mergeDimensions(); 
-            mergeFillTypes(); 
-        ]
-        
     let outputDataTypes = 
             [|                
-                outputDataType.SortableTestSet ""; // Adjusted for string param
+                outputDataType.SortableTestSet "";
                 outputDataType.RunParameters;
             |]
 
@@ -144,8 +153,9 @@ module SortableMergeTests =
             project.create 
                 projectName 
                 projectDesc
-                parameterSpans
                 outputDataTypes
+                SortableMergeTests_P1.parameterSpans
+
 
         // --- Executor ---
     let executor
@@ -164,7 +174,6 @@ module SortableMergeTests =
                 progress |> Option.iter (fun p -> p.Report(sprintf "Starting Run %s (Generation)" %runId))
 
                 // 2. Safe extraction of domain parameters
-                // We use the Bind(Result) overload to flatten this
                 let! (sortingWidth, mergeDimension, mergeFillType, sortableDataFormat) = 
                     maybe {
                         let! width = runParams.GetSortingWidth()
@@ -174,7 +183,7 @@ module SortableMergeTests =
                         return (width, dim, fill, dataType)
                     } |> Result.ofOption "Missing domain parameters required for generation"
 
-                // 3. Logic Execution (Pure CPU work)
+                // 3. Create SortableTestModel
                 let sortableTestModel = 
                     msasM.create sortingWidth mergeDimension mergeFillType 
                     |> sortableTestModel.MsasMi

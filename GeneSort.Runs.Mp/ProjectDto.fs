@@ -37,5 +37,5 @@ module ProjectDto =
         project.create
           (dto.ProjectName |> UMX.tag<projectName> )
           dto.Description
-          (dto.ParameterSpans |> Array.toList |> List.map (fun ps -> ps.Key, ps.Values |> Array.toList))
           (dto.OutputDataTypes |> Array.map(OutputDataTypeDto.toDomain))
+          (dto.ParameterSpans |> Array.toList |> List.map (fun ps -> ps.Key, ps.Values |> Array.toList))

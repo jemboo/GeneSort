@@ -239,8 +239,8 @@ module RandomSorters =
             project.create 
                 projectName 
                 projectDesc
-                parameterSpans
                 outputDataTypes
+                parameterSpans
 
 
     let executor

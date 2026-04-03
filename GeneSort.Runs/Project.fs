@@ -19,8 +19,8 @@ type project =
     static member create
             (projectName: string<projectName>)
             (description: string)
-            (parameterSpans: (string * string list) list)
-            (outputDataTypes: outputDataType array) : project =
+            (outputDataTypes: outputDataType array) 
+            (parameterSpans: (string * string list) list) : project =
 
         if String.IsNullOrWhiteSpace %projectName then
             failwith "Project name cannot be empty"

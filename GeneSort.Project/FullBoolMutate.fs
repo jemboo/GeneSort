@@ -158,8 +158,8 @@ module FullBoolMutate =
             project.create 
                 projectName 
                 projectDesc
-                parameterSpans
                 outputDataTypes
+                parameterSpans
 
     let executor
             (db: IGeneSortDb)
@@ -330,7 +330,7 @@ module FullBoolMutate =
                 let! _ = db.saveAsync projectFolder qpSortingSetParentPass (sortingSetParentPass |> outputData.SortingSet) allowOverwrite
                 let! _ = db.saveAsync projectFolder qpSortingSetMutants (sortingSetMutant |> outputData.SortingSet) allowOverwrite
                 let! _ = db.saveAsync projectFolder qpSortingSetMutantPass (sortingSetMutantPass |> outputData.SortingSet) allowOverwrite
-
+                let! _ = db.saveAsync projectFolder qpMutationSegmentEvalBinsSet (mutationSegmentEvalBinsSet |> outputData.MutationSegmentEvalBinsSet) allowOverwrite
 
                 // 13. Final Success
                 return runParameters.WithRunFinished (Some true)

@@ -83,8 +83,8 @@ module OutputDataFile =
                     match queryParams.OutputDataType with
                     | outputDataType.MutationSegmentEvalBinsSet _ ->
                         async {
-                            let! domain = deserializeDto<mutationSegmentSetResultsDto, mutationSegmentSetResults> stream token MutationSegmentSetResultsDto.toDomain
-                            return outputData.MutationSegmentSetResults domain
+                            let! domain = deserializeDto<mutationSegmentEvalBinsSetDto, mutationSegmentEvalBinsSet> stream token MutationSegmentEvalBinsSetDto.toDomain
+                            return outputData.MutationSegmentEvalBinsSet domain
                         }
                     | outputDataType.RunParameters ->
                         async {
@@ -184,8 +184,8 @@ module OutputDataFile =
                         use stream = new FileStream(%filePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync = true)
                         do!
                             match outputData with
-                            | outputData.MutationSegmentSetResults msr ->
-                                serializeDto stream msr MutationSegmentSetResultsDto.fromDomain
+                            | outputData.MutationSegmentEvalBinsSet msr ->
+                                serializeDto stream msr MutationSegmentEvalBinsSetDto.fromDomain
                             | outputData.RunParameters r ->
                                 serializeDto stream r RunParametersDto.fromDomain
                             | outputData.SorterSet ss ->

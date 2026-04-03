@@ -16,7 +16,7 @@ open GeneSort.SortingResults.Bins
 
 
 type outputData =
-    | MutationSegmentSetResults of mutationSegmentSetResults
+    | MutationSegmentEvalBinsSet of mutationSegmentEvalBinsSet
     | Project of project
     | RunParameters of runParameters
     | SorterSet of sorterSet

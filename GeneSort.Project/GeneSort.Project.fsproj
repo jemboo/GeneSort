@@ -15,6 +15,7 @@
     <Compile Include="PermutationOrbits.fs" />
     <Compile Include="RandomSorters.fs" />
     <Compile Include="RandomSorterBins.fs" />
+    <Compile Include="RandomMergeSorterBins.fs" />
     <Compile Include="FullBoolEvals.fs" />
     <Compile Include="SortableMergeTests.fs" />
     <Compile Include="MergeIntEvals.fs" />
