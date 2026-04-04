@@ -108,7 +108,7 @@ module MergeIntEvals =
                         yield retVal
         }
 
-    let sortableDataTypes () : string*string list =
+    let sortableDataFormats () : string*string list =
         let values = [ 
                         //sortableDataFormat.IntArray; 
                         //sortableDataFormat.BoolArray;
@@ -153,7 +153,7 @@ module MergeIntEvals =
         [
             sortingWidths(); 
             sorterModelTypes(); 
-            sortableDataTypes(); 
+            sortableDataFormats(); 
             mergeDimensions(); 
             mergeFillTypes(); 
         ]
@@ -189,40 +189,39 @@ module MergeIntEvals =
                 let startTime = DateTime.Now
                 let! _ = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
-                let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
-                ProjectOps.report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) runId %repl)
+                ProjectOps.report progress (sprintf "%s Starting Run %s" (MathUtils.getTimestampString()) runId)
 
                 // 2. Safe Param Extraction
-                let! (repl, width, mDim, mFill, dType, sModel) = 
+                let! ( repl, 
+                       sortingWidth, 
+                       mergeDimension, 
+                       mergeSuffixType, 
+                       sortableDataFormat, 
+                       sModel) = 
                     maybe {
                         let! r = runParameters.GetRepl()
-                        let! w = runParameters.GetSortingWidth()
-                        let! dt = runParameters.GetSortableDataFormat()
+                        let! sw = runParameters.GetSortingWidth()
+                        let! sdf = runParameters.GetSortableDataFormat()
                         let! md = runParameters.GetMergeDimension()
-                        let! mf = runParameters.GetMergeSuffixType()
-                        let! sm = runParameters.GetSorterModelType()
-                        return (r, w, md, mf, dt, sm)
+                        let! mst = runParameters.GetMergeSuffixType()
+                        let! smt = runParameters.GetSorterModelType()
+                        return (r, sw, md, mst, sdf, smt)
                     } |> Result.ofOption "Missing domain parameters"
 
                 // 3. Load Sortable Tests (Cross-project query) (MergeTests are all repl 0)
-                let qpTests = SortableMergeTests.makeQueryParams 
+                let qpSortableTests = SortableMergeTests.makeQueryParams 
                                             (Some (0 |> UMX.tag<replNumber>)) 
-                                            (Some width) 
-                                            (Some mDim) 
-                                            (Some mFill) 
-                                            (Some dType) 
+                                            (Some sortingWidth) 
+                                            (Some mergeDimension) 
+                                            (Some mergeSuffixType) 
+                                            (Some sortableDataFormat) 
                                             (outputDataType.SortableTest "")
 
-                let! rawTestData = db.loadAsync SortableMergeTests.projectFolder qpTests 
+                let! rawTestData = db.loadAsync SortableMergeTests.projectFolder qpSortableTests 
                 let! sortableTest = rawTestData |> OutputData.asSortableTest
 
-                //// 4. Load Sorter Set (Cross-project query)
-                //let qpSorters = RandomSorters.makeQueryParams (Some repl) (Some width) (Some sModel) (outputDataType.SorterSet "")
-                //let! rawSorterData = db.loadAsync RandomSorters.projectFolder qpSorters
-                //let! sorterSet = rawSorterData |> OutputData.asSorterSet
-
                 // 4. Load SortingSet (Cross-project query)
-                let qpSorterModelSet = RandomSorters.makeQueryParams (Some repl) (Some width) (Some sModel) (outputDataType.SortingSet "")
+                let qpSorterModelSet = RandomSorters.makeQueryParams (Some repl) (Some sortingWidth) (Some sModel) (outputDataType.SortingSet "")
                 let! smsOutput = db.loadAsync RandomSorters.projectFolder qpSorterModelSet
                 let! sortingSet = smsOutput |> OutputData.asSortingSet
 

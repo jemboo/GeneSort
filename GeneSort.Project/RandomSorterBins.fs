@@ -41,9 +41,7 @@ module RandomSorterBins_P1 =
 
 
     let sortableDataFormatKeys () : string * string list =
-        let values = [
-                        sortableDataFormat.BitVector512;
-                     ] |> List.map SortableDataFormat.toString
+        let values = [ sortableDataFormat.BitVector512; ] |> List.map SortableDataFormat.toString
         (runParameters.sortableDataFormatKey, values)
 
     let sorterCounts () : string * string list =
@@ -141,47 +139,7 @@ module RandomSorterBins =
 
 
 
-    // Parameter spans:
-
-
-
-    let getStageLengthForSortingWidth0 (isMuf4:bool) (sortingWidth: int<sortingWidth>) : int<stageLength> =
-        if isMuf4 then
-            match %sortingWidth with
-            | 4 -> 10 |> UMX.tag<stageLength>
-            | 8 -> 50 |> UMX.tag<stageLength>
-            | 16 -> 200 |> UMX.tag<stageLength>
-            | 32 -> 600 |> UMX.tag<stageLength>
-            | 64 -> 2000 |> UMX.tag<stageLength>
-            | 128 -> 5000 |> UMX.tag<stageLength>
-            | 256 -> 18000 |> UMX.tag<stageLength>
-            | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
-        else
-            match %sortingWidth with
-            | 4 -> 5 |> UMX.tag<stageLength>
-            | 6 -> 20 |> UMX.tag<stageLength>
-            | 8 -> 40 |> UMX.tag<stageLength>
-            | 12 -> 80 |> UMX.tag<stageLength>
-            | 16 -> 100 |> UMX.tag<stageLength>
-            | 18 -> 120 |> UMX.tag<stageLength>
-            | 20 -> 130 |> UMX.tag<stageLength>
-            | 22 -> 140 |> UMX.tag<stageLength>
-            | 24 -> 200 |> UMX.tag<stageLength>
-            | 32 -> 300 |> UMX.tag<stageLength>
-            | 36 -> 340 |> UMX.tag<stageLength>
-            | 48 -> 700 |> UMX.tag<stageLength>
-            | 64 -> 1200 |> UMX.tag<stageLength>
-            | 72 -> 500 |> UMX.tag<stageLength>
-            | 96 -> 1800 |> UMX.tag<stageLength>
-            | 128 -> 3000 |> UMX.tag<stageLength>
-            | 144 -> 4000 |> UMX.tag<stageLength>
-            | 192 -> 6000 |> UMX.tag<stageLength>
-            | 256 -> 8000 |> UMX.tag<stageLength>
-            | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
-
-
-
-
+    // Implied Parameters:
 
     let getStageLengthForSortingWidth 
                         (smt:sorterModelType) 

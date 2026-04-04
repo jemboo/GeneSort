@@ -98,14 +98,25 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 ///// **********     RandomSorterBins   ****************
-let executor = RandomSorterBins.executor
-let project = RandomSorterBins.project
-let projectName = RandomSorterBins.project.ProjectName
-let projectFolder = RandomSorterBins.projectFolder
-let buildQueryParams = RandomSorterBins.makeQueryParamsFromRunParams
-let paramRefiner = RandomSorterBins.paramMapRefiner
+//let executor = RandomSorterBins.executor
+//let project = RandomSorterBins.project
+//let projectName = RandomSorterBins.project.ProjectName
+//let projectFolder = RandomSorterBins.projectFolder
+//let buildQueryParams = RandomSorterBins.makeQueryParamsFromRunParams
+//let paramRefiner = RandomSorterBins.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 30<replNumber>
+
+
+///// **********     RandomMergeSorterBins   ****************
+let executor = RandomMergeSorterBins.executor
+let project = RandomMergeSorterBins.project
+let projectName = RandomMergeSorterBins.project.ProjectName
+let projectFolder = RandomMergeSorterBins.projectFolder
+let buildQueryParams = RandomMergeSorterBins.makeQueryParamsFromRunParams
+let paramRefiner = RandomMergeSorterBins.paramMapRefiner
 let minReplica = 0<replNumber>
-let maxReplica = 30<replNumber>
+let maxReplica = 1<replNumber>
 
 
 ///// **********    FullBoolMutate   ****************
@@ -118,10 +129,12 @@ let maxReplica = 30<replNumber>
 //let minReplica = 0<replNumber>
 //let maxReplica = 1<replNumber>
 
+
 printfn "Initializing Project..."
 let initResult = 
     ProjectOps.initProjectFiles geneSortDb projectFolder buildQueryParams cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
     |> Async.RunSynchronously
+
 
 match initResult with
 | Ok () -> printfn "Project files initialized successfully."
@@ -132,6 +145,7 @@ printfn "Executing Runs..."
 let execResult = 
     ProjectOps.executeRuns geneSortDb projectFolder minReplica maxReplica buildQueryParams projectName allowOverwrite cts (Some progress) executor maxParallel
     |> Async.RunSynchronously
+
 
 match execResult with
 | Ok results -> printfn "Execution complete. %d results processed." results.Length
