@@ -52,8 +52,10 @@ module TextReporters =
                 | Ok sse ->
                     let bins = SorterEvalHierarchy.createFromSorterSetEval sse
                     let lines = SorterEvalHierarchy.getHierarchyReport
-                                    (runParams.GetSortingWidth()) 
-                                    (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringToString )
+                                    [| 
+                                        (runParams.GetSortingWidth() |> SortingWidth.toString) 
+                                        (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringToString ) 
+                                    |]
                                     bins
                     dtReport.AppendDataRows lines
                 | Error err ->

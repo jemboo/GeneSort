@@ -136,21 +136,25 @@ module SorterEvalHierarchy =
         sorterSetEval.SorterEvals |> Array.iter hierarchy.AddSorterEval
         hierarchy
 
-    let getHierarchyReport (sortingWidth: int<sortingWidth> option) (sorterModelKey: string) (hierarchy: sorterEvalHierarchy) =
-        let widthStr = sortingWidth |> Option.map (fun w -> (%w).ToString()) |> Option.defaultValue "N/A"
+
+    let getHierarchyReport 
+                    (prefixes:string [])
+                    (hierarchy: sorterEvalHierarchy) : string [][] =
         hierarchy.Layers
         |> Seq.collect (fun kvp ->
             kvp.Value.Leaves
             |> Seq.map (fun leafKvp ->
-                [|
-                    widthStr
-                    sorterModelKey
-                    (%kvp.Value.CeCount).ToString()
-                    (%kvp.Value.StageLength).ToString()
-                    kvp.Value.IsSorted.ToString()
-                    leafKvp.Value.EvalCount.ToString()
-                |]))
+                prefixes |> Array.append
+                    [|
+                        (%kvp.Value.CeCount).ToString()
+                        (%kvp.Value.StageLength).ToString()
+                        kvp.Value.IsSorted.ToString()
+                        leafKvp.Value.EvalCount.ToString()
+                    |] )
+            )
         |> Seq.toArray
+
+
 
     let merge (target: sorterEvalHierarchy) (source: sorterEvalHierarchy) =
         for kvp in source.Layers do target.MergeLayer kvp.Value

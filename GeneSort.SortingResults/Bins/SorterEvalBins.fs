@@ -172,6 +172,22 @@ module SorterEvalBins =
 
     // reporting
     let getBinsReport
+            (prefixes:string [])
+            (bins: sorterEvalBins)
+            : string[][] =
+        bins.Layers
+        |> Seq.map (fun kvp ->
+            prefixes |> Array.append
+                [|
+                    (%kvp.Key.CeCount).ToString()
+                    (%kvp.Key.StageLength).ToString()
+                    kvp.Key.IsSorted.ToString()
+                    kvp.Value.EvalCount.ToString()
+                |])
+        |> Seq.toArray
+
+    // reporting
+    let getBinsReport0
             (sortingWidth:   int<sortingWidth> option)
             (sorterModelKey: string)
             (bins:           sorterEvalBins)
