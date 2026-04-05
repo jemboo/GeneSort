@@ -115,8 +115,8 @@ let projectName = RandomMergeSorterBins.project.ProjectName
 let projectFolder = RandomMergeSorterBins.projectFolder
 let buildQueryParams = RandomMergeSorterBins.makeQueryParamsFromRunParams
 let paramRefiner = RandomMergeSorterBins.paramMapRefiner
-let minReplica = 1<replNumber>
-let maxReplica = 8<replNumber>
+let minReplica = 0<replNumber>
+let maxReplica = 10<replNumber>
 
 
 ///// **********    FullBoolMutate   ****************

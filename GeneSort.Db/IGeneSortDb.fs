@@ -96,7 +96,7 @@ module GeneSortDb =
     let getSorterEvalBinsAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<sorterEvalBins, OutputError>> =
         async {
             let! result = geneSortDb.loadAsync projectFolder queryParams
-            return unwrapOutput (function | outputData.SorterSetEvalBins sseb -> Some sseb | _ -> None) result
+            return unwrapOutput (function | outputData.SorterEvalBins sseb -> Some sseb | _ -> None) result
         }
 
     let getMutationSegmentEvalBinsSetAsync (geneSortDb: IGeneSortDb) (projectFolder: string<projectFolder>) (queryParams: queryParams) : Async<Result<mutationSegmentEvalBinsSet, OutputError>> =

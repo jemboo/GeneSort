@@ -131,10 +131,10 @@ module OutputDataFile =
                             let! domain = deserializeDto<sorterModelSetEvalDto, sorterSetEval> stream token SorterSetEvalDto.toDomain
                             return outputData.SorterSetEval domain
                         }
-                    | outputDataType.SorterSetEvalBins _ ->
+                    | outputDataType.SorterEvalBins _ ->
                         async {
                             let! domain = deserializeDto<sorterEvalBinsDto, sorterEvalBins> stream token SorterEvalBinsDto.toDomain
-                            return outputData.SorterSetEvalBins domain
+                            return outputData.SorterEvalBins domain
                         }
                     | outputDataType.Project ->
                         async {
@@ -205,7 +205,7 @@ module OutputDataFile =
                                 serializeDto stream stsm SortableTestModelSetGenDto.fromDomain
                             | outputData.SorterSetEval sse ->
                                 serializeDto stream sse SorterSetEvalDto.fromDomain
-                            | outputData.SorterSetEvalBins sse ->
+                            | outputData.SorterEvalBins sse ->
                                 serializeDto stream sse SorterEvalBinsDto.fromDomain
                             | outputData.Project p ->
                                 serializeDto stream p ProjectDto.fromDomain

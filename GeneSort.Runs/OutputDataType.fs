@@ -14,7 +14,7 @@ type outputDataType =
     | SortableTestModelSet of string
     | SortableTestModelSetGen of string
     | SorterSetEval of string
-    | SorterSetEvalBins of string
+    | SorterEvalBins of string
     | TextReport of string<textReportName>
 
 module OutputDataType =
@@ -34,7 +34,7 @@ module OutputDataType =
         | SortableTestModelSet s -> appendParam "SortableTestModelSet" s
         | SortableTestModelSetGen s -> appendParam "SortableTestModelSetGen" s
         | SorterSetEval s -> appendParam "SorterSetEval" s
-        | SorterSetEvalBins s -> appendParam "SorterSetEvalBins" s
+        | SorterEvalBins s -> appendParam "SorterEvalBins" s
         | TextReport s -> appendParam "TextReport" %s
 
     let fromFolderName (description: string) : outputDataType option =
@@ -53,7 +53,7 @@ module OutputDataType =
         | "SortableTestModelSet" -> Some (SortableTestModelSet param)
         | "SortableTestModelSetGen" -> Some (SortableTestModelSetGen param)
         | "SorterSetEval" -> Some (SorterSetEval param)
-        | "SorterSetEvalBins" -> Some (SorterSetEvalBins param)
+        | "SorterEvalBins" -> Some (SorterEvalBins param)
         | "TextReport" -> Some (TextReport (param |> UMX.tag<textReportName>))
         | _ -> None
 

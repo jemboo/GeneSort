@@ -393,7 +393,7 @@ module RandomMergeSorterBins =
     let outputDataTypes = 
             [|
                 outputDataType.RunParameters;
-                outputDataType.SorterSetEvalBins "";
+                outputDataType.SorterEvalBins "";
                 outputDataType.SortingSet "EvenSampled";
                 outputDataType.SortingSet "HullSampled";
             |]
@@ -511,15 +511,15 @@ module RandomMergeSorterBins =
                 // 7. Make the evalBins and the sampled sorterSets
                 let qpEvalBins = makeQueryParamsFromRunParams 
                                             runParameters 
-                                            (outputDataType.SorterSetEvalBins "")
+                                            (outputDataType.SorterEvalBins "")
 
                 let qpEvenSampledSortingSet = makeQueryParamsFromRunParams 
                                                 runParameters 
                                                 (outputDataType.SortingSet "EvenSampled")
 
-                let qpHullSampledSortingSet = makeQueryParamsFromRunParams 
-                                                runParameters 
-                                                (outputDataType.SortingSet "HullSampled")
+                //let qpHullSampledSortingSet = makeQueryParamsFromRunParams 
+                //                                runParameters 
+                //                                (outputDataType.SortingSet "HullSampled")
 
                 let sorterEvalBins = sorterEvalBins.create
                                                 (%qpEvalBins.Id |> UMX.tag<sorterEvalBinsId>)
@@ -529,15 +529,15 @@ module RandomMergeSorterBins =
                             (%qpEvenSampledSortingSet.Id |> UMX.tag<sortingSetId>)
                             (SortingSetFilter.sampleBinsEvenly samplesPerBin sorterEvalBins fullSortingSet)
 
-                let hullSampledSortingSet = 
-                        sortingSet.create
-                            (%qpEvenSampledSortingSet.Id |> UMX.tag<sortingSetId>)
-                            (SortingSetFilter.sampleBinsConvexHull samplesPerBin sorterEvalBins fullSortingSet)
+                //let hullSampledSortingSet = 
+                //        sortingSet.create
+                //            (%qpEvenSampledSortingSet.Id |> UMX.tag<sortingSetId>)
+                //            (SortingSetFilter.sampleBinsConvexHull samplesPerBin sorterEvalBins fullSortingSet)
 
                 // 4. Saves
-                let! _ = db.saveAsync projectFolder qpEvalBins (sorterEvalBins |> outputData.SorterSetEvalBins) allowOverwrite
+                let! _ = db.saveAsync projectFolder qpEvalBins (sorterEvalBins |> outputData.SorterEvalBins) allowOverwrite
                 let! _ = db.saveAsync projectFolder qpEvenSampledSortingSet (evenSampledSortingSet |> outputData.SortingSet) allowOverwrite
-                let! _ = db.saveAsync projectFolder qpHullSampledSortingSet (hullSampledSortingSet |> outputData.SortingSet) allowOverwrite
+                //let! _ = db.saveAsync projectFolder qpHullSampledSortingSet (hullSampledSortingSet |> outputData.SortingSet) allowOverwrite
 
             
                 progress |> Option.iter (fun p -> 

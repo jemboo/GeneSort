@@ -242,7 +242,7 @@ module RandomSorterBins =
     let outputDataTypes = 
             [|
                 outputDataType.RunParameters;
-                outputDataType.SorterSetEvalBins "";
+                outputDataType.SorterEvalBins "";
                 outputDataType.SortingSet "EvenSampled";
                 outputDataType.SortingSet "HullSampled";
             |]
@@ -346,7 +346,7 @@ module RandomSorterBins =
                 // 7. Make the evalBins and the sampled sorterSets
                 let qpEvalBins = makeQueryParamsFromRunParams 
                                             runParameters 
-                                            (outputDataType.SorterSetEvalBins "")
+                                            (outputDataType.SorterEvalBins "")
 
                 let qpEvenSampledSortingSet = makeQueryParamsFromRunParams 
                                                 runParameters 
@@ -370,7 +370,7 @@ module RandomSorterBins =
                             (SortingSetFilter.sampleBinsConvexHull samplesPerBin sorterEvalBins fullSortingSet)
 
                 // 4. Saves
-                let! _ = db.saveAsync projectFolder qpEvalBins (sorterEvalBins |> outputData.SorterSetEvalBins) allowOverwrite
+                let! _ = db.saveAsync projectFolder qpEvalBins (sorterEvalBins |> outputData.SorterEvalBins) allowOverwrite
                 let! _ = db.saveAsync projectFolder qpEvenSampledSortingSet (evenSampledSortingSet |> outputData.SortingSet) allowOverwrite
                 let! _ = db.saveAsync projectFolder qpHullSampledSortingSet (hullSampledSortingSet |> outputData.SortingSet) allowOverwrite
 

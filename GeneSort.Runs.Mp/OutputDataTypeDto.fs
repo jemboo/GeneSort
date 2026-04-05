@@ -23,7 +23,7 @@ module OutputDataTypeDto =
         | SortableTestModelSet so -> { Tag = "SortableTestModelSet"; Value = so }
         | SortableTestModelSetGen so -> { Tag = "SortableTestModelSetGen"; Value = so }
         | SorterSetEval so -> { Tag = "SorterSetEval"; Value = so }
-        | SorterSetEvalBins so -> { Tag = "SorterSetEvalBins"; Value = so }
+        | SorterEvalBins so -> { Tag = "SorterSetEvalBins"; Value = so }
         | Project -> { Tag = "Project"; Value = "" }
         | TextReport trn -> { Tag = "TextReport"; Value = %trn }
 
@@ -38,7 +38,7 @@ module OutputDataTypeDto =
         | "SortableTestModelSet" -> SortableTestModelSet dto.Value
         | "SortableTestModelSetGen" -> SortableTestModelSetGen dto.Value
         | "SorterSetEval" -> SorterSetEval dto.Value
-        | "SorterSetEvalBins" -> SorterSetEvalBins dto.Value
+        | "SorterSetEvalBins" -> SorterEvalBins dto.Value
         | "Project" -> Project
         | "TextReport" -> TextReport (dto.Value |> UMX.tag<textReportName>)
         | _ -> failwith (sprintf "%s not handled" dto.Tag)
