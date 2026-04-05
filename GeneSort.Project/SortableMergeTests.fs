@@ -114,12 +114,12 @@ module SortableMergeTests_P2 =
 
 
     let sortingWidths () : string * string list =
-        let values = [ 16; 32; 48; 64; ] |> List.map string
+        let values = [ 16; 32; 48; 64; 96; 128 ] |> List.map string
         (runParameters.sortingWidthKey, values)
 
 
     let mergeDimensions () : string * string list =
-        let values = [2; 3; 4; ] |> List.map string
+        let values = [2; 3; 4; 6; 8; ] |> List.map string
         (runParameters.mergeDimensionKey, values)
 
 

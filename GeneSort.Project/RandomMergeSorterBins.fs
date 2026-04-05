@@ -184,7 +184,7 @@ module RandomMergeSorterBins_P2 =
     // --- Parameter Spans ---
     
     let sortingWidths() : string*string list =
-        let values = [ 16; 32; 48; 64; ] |> List.map string
+        let values = [ 16; 32; 48; 64; 96; 128;] |> List.map string
         (runParameters.sortingWidthKey, values)
 
 
@@ -206,7 +206,7 @@ module RandomMergeSorterBins_P2 =
 
 
     let mergeDimensions () : string * string list =
-        let values = [2; 3; 4; ] |> List.map string
+        let values = [2; 3; 4; 6; 8;] |> List.map string
         (runParameters.mergeDimensionKey, values)
 
 
@@ -220,7 +220,7 @@ module RandomMergeSorterBins_P2 =
 
 
     let sorterCounts () : string * string list =
-        let values = [ 100;] |> List.map (fun d -> d.ToString())
+        let values = [ 1000;] |> List.map (fun d -> d.ToString())
         (runParameters.sorterCountKey, values)
 
 
@@ -372,7 +372,6 @@ module RandomMergeSorterBins =
         let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
         let stageLength = getStageLengthForSortingWidth (rp.GetSorterModelType().Value) sortingWidth
         let ceLength = stageLength |> StageLength.toCeLength sortingWidth
-        let sorterCount = 10000 |> UMX.tag<sorterCount>
 
         rp.WithProjectName(Some projectName)
             .WithRunFinished(Some false)

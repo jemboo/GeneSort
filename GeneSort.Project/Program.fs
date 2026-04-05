@@ -115,8 +115,8 @@ let projectName = RandomMergeSorterBins.project.ProjectName
 let projectFolder = RandomMergeSorterBins.projectFolder
 let buildQueryParams = RandomMergeSorterBins.makeQueryParamsFromRunParams
 let paramRefiner = RandomMergeSorterBins.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+let minReplica = 1<replNumber>
+let maxReplica = 8<replNumber>
 
 
 ///// **********    FullBoolMutate   ****************
@@ -150,6 +150,8 @@ let execResult =
 match execResult with
 | Ok results -> printfn "Execution complete. %d results processed." results.Length
 | Error e -> printfn "Execution Failed: %s" e
+
+
 
 
 //printfn "Printing RunParams..."
