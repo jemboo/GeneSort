@@ -91,15 +91,15 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 ///// **********    FullBoolEvals   ****************
-let executor = FullBoolEvals.executor
-let project = FullBoolEvals.project
-let projectName = FullBoolEvals.project.ProjectName
-let projectFolder = FullBoolEvals.projectFolder
-let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
-let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
-let paramRefiner = FullBoolEvals.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+//let executor = FullBoolEvals.executor
+//let project = FullBoolEvals.project
+//let projectName = FullBoolEvals.project.ProjectName
+//let projectFolder = FullBoolEvals.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+//let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
+//let paramRefiner = FullBoolEvals.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 ///// **********     RandomSorterBins   ****************
@@ -115,15 +115,15 @@ let maxReplica = 1<replNumber>
 
 
 ///// **********  MergeRandomSorterBins   ****************
-//let executor = MergeRandomSorterBins.executor
-//let project = MergeRandomSorterBins.project
-//let projectName = MergeRandomSorterBins.project.ProjectName
-//let projectFolder = MergeRandomSorterBins.projectFolder
-//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
-//let buildQueryParams = MergeRandomSorterBins.makeQueryParamsFromRunParams
-//let paramRefiner = MergeRandomSorterBins.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+let executor = MergeRandomSorterBins.executor
+let project = MergeRandomSorterBins.project
+let projectName = MergeRandomSorterBins.project.ProjectName
+let projectFolder = MergeRandomSorterBins.projectFolder
+let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+let buildQueryParams = MergeRandomSorterBins.makeQueryParamsFromRunParams
+let paramRefiner = MergeRandomSorterBins.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
 

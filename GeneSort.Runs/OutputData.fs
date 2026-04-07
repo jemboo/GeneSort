@@ -54,3 +54,36 @@ module OutputData =
         | RunParameters rp -> Ok rp
         | _ -> Error "Database returned data, but it was not RunParameters."
 
+    let asSorterEvalBins = function
+        | SorterEvalBins sseb -> Ok sseb
+        | _ -> Error "Database returned data, but it was not SorterEvalBins."
+
+    let asMutationSegmentEvalBinsSet = function
+        | MutationSegmentEvalBinsSet msebs -> Ok msebs
+        | _ -> Error "Database returned data, but it was not a MutationSegmentEvalBinsSet."
+
+    let asProject = function
+        | Project p -> Ok p
+        | _ -> Error "Database returned data, but it was not a Project."
+
+    let asSortableTestSet = function
+        | SortableTestSet sts -> Ok sts
+        | _ -> Error "Database returned data, but it was not a SortableTestSet."
+
+    let asSortingSetGen = function
+        | SortingSetGen ssg -> Ok ssg
+        | _ -> Error "Database returned data, but it was not a SortingSetGen."
+
+    let asSortableTestModelSet = function
+        | SortableTestModelSet stms -> Ok stms
+        | _ -> Error "Database returned data, but it was not a SortableTestModelSet."
+
+    let asSortableTestModelSetGen = function
+        | SortableTestModelSetGen stmsm -> Ok stmsm
+        | _ -> Error "Database returned data, but it was not a SortableTestModelSetGen."
+
+    let asTextReport = function
+        | TextReport tr -> Ok tr
+        | _ -> Error "Database returned data, but it was not a TextReport."
+
+

@@ -157,6 +157,25 @@ module Async =
 
 [<RequireQualifiedAccess>]
 module AsyncResult =
+    
+    let bind (f: 'T -> Async<Result<'U, 'E>>) (x: Async<Result<'T, 'E>>) : Async<Result<'U, 'E>> =
+        async {
+            let! res = x
+            match res with
+            | Error e -> return Error e
+            | Ok v -> return! f v
+        }
+
+    let ofResult (res: Result<'T, 'E>) : Async<Result<'T, 'E>> =
+        async { return res }
+
+
+    let map (f: 'T -> 'U) (x: Async<Result<'T, 'E>>) : Async<Result<'U, 'E>> =
+        async {
+            let! res = x
+            return Result.map f res
+        }
+
     let mapError (f: 'E -> 'F) (x: Async<Result<'T, 'E>>) : Async<Result<'T, 'F>> =
         async {
             let! res = x
