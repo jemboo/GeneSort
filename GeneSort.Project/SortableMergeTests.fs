@@ -119,7 +119,7 @@ module SortableMergeTests_P2 =
 
 
     let mergeDimensions () : string * string list =
-        let values = [2; 3; 4; 6; 8; ] |> List.map string
+        let values = [2; 3; 4; ] |> List.map string
         (runParameters.mergeDimensionKey, values)
 
 
@@ -145,7 +145,7 @@ module SortableMergeTests_P2 =
 module SortableMergeTests =
 
     let projectName = "SortableMergeTests" |> UMX.tag<projectName>
-    let projectFolder = "SortableMergeTests" |> UMX.tag<projectFolder>
+    let projectFolder = "c:\\Projects\\SortableMergeTests" |> UMX.tag<pathToProjectFolder>
     let projectDesc = "Calc and save large SortableMergeTests"
 
     let makeQueryParams 
@@ -212,7 +212,6 @@ module SortableMergeTests =
         // --- Executor ---
     let executor
             (db: IGeneSortDb)
-            (projectFolder: string<projectFolder>)
             (runParams: runParameters) 
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource) 
@@ -250,7 +249,7 @@ module SortableMergeTests =
                 let! _ = checkCancellation cts.Token
             
                 // The builder automatically handles short-circuiting if saveAsync returns Error
-                let! _ = db.saveAsync projectFolder qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
+                let! _ = db.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
 
                 // 5. Success
                 return runParams.WithRunFinished (Some true)
@@ -260,3 +259,57 @@ module SortableMergeTests =
                 let msg = sprintf "Fatal error in Generation Run %s: %s" runId e.Message
                 return! async { return Error msg }
         }
+
+
+//module Yab =
+//        // --- Executor ---
+//    let executor
+//            (db: IGeneSortDb)
+//            (runParams: runParameters) 
+//            (allowOverwrite: bool<allowOverwrite>)
+//            (cts: CancellationTokenSource) 
+//            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+
+//        asyncResult {
+//            try
+//                // 1. Setup
+//                let! _ = checkCancellation cts.Token
+//                let runId = runParams |> RunParameters.getIdString
+//                progress |> Option.iter (fun p -> p.Report(sprintf "Starting Run %s (Generation)" %runId))
+
+//                // 2. Safe extraction of domain parameters
+//                let! (sortingWidth, mergeDimension, mergeFillType, sortableDataFormat) = 
+//                    maybe {
+//                        let! width = runParams.GetSortingWidth()
+//                        let! dim = runParams.GetMergeDimension()
+//                        let! fill = runParams.GetMergeSuffixType()
+//                        let! dataType = runParams.GetSortableDataFormat()
+//                        return (width, dim, fill, dataType)
+//                    } |> Result.ofOption "Missing domain parameters required for generation"
+
+//                // 3. Create SortableTestModel
+//                let sortableTestModel = 
+//                    msasM.create sortingWidth mergeDimension mergeFillType 
+//                    |> sortableTestModel.MsasMi
+            
+//                let qpForSortableTest = makeQueryParamsFromRunParams runParams (outputDataType.SortableTest "") 
+//                let sortableTests = SortableTestModel.makeSortableTest 
+//                                            (%qpForSortableTest.Id |> UMX.tag<sorterTestId>) 
+//                                            sortableTestModel 
+//                                            sortableDataFormat
+
+//                // 4. Save
+//                let! _ = checkCancellation cts.Token
+            
+//                // The builder automatically handles short-circuiting if saveAsync returns Error
+//                let! _ = db.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
+
+//                // 5. Success
+//                return runParams.WithRunFinished (Some true)
+
+//            with e ->
+//                let runId = runParams |> RunParameters.getIdString
+//                let msg = sprintf "Fatal error in Generation Run %s: %s" runId e.Message
+//                return! async { return Error msg }
+//        }
+

@@ -31,6 +31,8 @@ type runParameters =
     static member mutationRateKey = "MutationRate"
     static member projectNameKey = "ProjectName"
     static member replKey = "Repl"
+    static member startingReplKey = "StartingRepl"
+    static member replSpanKey = "ReplSpan"
     static member runFinishedKey = "RunFinished"
     static member sorterCountKey = "SorterCount"
     static member sorterModelTypeKey = "SorterModelType"
@@ -75,6 +77,8 @@ type runParameters =
     member this.GetMutationRate() = runParameters.tryGetFloat runParameters.mutationRateKey this.paramMap |> Option.map UMX.tag<mutationRate>
     member this.GetProjectName() = this.paramMap.TryFind runParameters.projectNameKey |> Option.map UMX.tag<projectName>
     member this.GetRepl() = runParameters.tryGetInt runParameters.replKey this.paramMap |> Option.map UMX.tag<replNumber>
+    member this.GetStartingRepl() = runParameters.tryGetInt runParameters.startingReplKey this.paramMap |> Option.map UMX.tag<replNumber>
+    member this.GetReplSpan() = runParameters.tryGetInt runParameters.replSpanKey this.paramMap |> Option.map UMX.tag<replNumber>
     member this.GetRunFinished() = runParameters.tryGetBool runParameters.runFinishedKey this.paramMap
     member this.GetSortingWidth() = runParameters.tryGetInt runParameters.sortingWidthKey this.paramMap |> Option.map UMX.tag<sortingWidth>
     member this.GetStageLength() = runParameters.tryGetInt runParameters.stageLengthKey this.paramMap |> Option.map UMX.tag<stageLength>
@@ -124,6 +128,12 @@ type runParameters =
 
     member this.WithRepl(repl: int<replNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.replKey (repl |> Option.map UmxExt.intToRaw) }
+
+    member this.WithStartingRepl(sr: int<replNumber> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.startingReplKey (sr |> Option.map UmxExt.intToRaw) }
+
+    member this.WithReplSpan(rs: int<replNumber> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.replSpanKey (rs |> Option.map UmxExt.intToRaw) }  
 
     member this.WithRunFinished(fin: bool option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.runFinishedKey (fin |> Option.map string) }

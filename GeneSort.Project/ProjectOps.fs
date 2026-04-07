@@ -64,9 +64,8 @@ module ProjectOps =
 
     let executeRunParameters
             (db: IGeneSortDb)
-            (projectFolder: string<projectFolder>)
             (buildQueryParams: runParameters -> outputDataType -> queryParams) 
-            (executor: IGeneSortDb ->  string<projectFolder> -> runParameters -> bool<allowOverwrite> ->
+            (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> ->
                        CancellationTokenSource -> IProgress<string> option 
                         -> Async<Result<runParameters, string>>)
             (runParameters: runParameters)
@@ -87,12 +86,12 @@ module ProjectOps =
                 // 2. Use the builder to handle the execution + status save sequence
                 let! finalResult = asyncResult {
                     // Execute the main work
-                    let! updatedParams = executor db projectFolder runParameters allowOverwrite cts progress
+                    let! updatedParams = executor db runParameters allowOverwrite cts progress
                 
                     // If main work succeeded, save the "Finished" status
                     let qp = buildQueryParams updatedParams outputDataType.RunParameters
                     let! _ = 
-                        db.saveAsync projectFolder qp (updatedParams |> outputData.RunParameters) (true |> UMX.tag<allowOverwrite>)
+                        db.saveAsync qp (updatedParams |> outputData.RunParameters) (true |> UMX.tag<allowOverwrite>)
                         |> AsyncResult.mapError (fun err -> sprintf "Work succeeded but failed to save status: %s" err)
 
                     return updatedParams
@@ -182,9 +181,8 @@ module ProjectOps =
 
     let executeRunParametersSeq
                 (db: IGeneSortDb)
-                (projectFolder: string<projectFolder>)
                 (maxDegreeOfParallelism: int)
-                (executor: IGeneSortDb ->  string<projectFolder> -> runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option -> Async<Result<runParameters, string>>)
+                (executor: IGeneSortDb ->  runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option -> Async<Result<runParameters, string>>)
                 (runParameters: runParameters seq)
                 (buildQueryParams: runParameters -> outputDataType -> queryParams)
                 (allowOverwrite: bool<allowOverwrite>)
@@ -195,14 +193,13 @@ module ProjectOps =
                 maxDegreeOfParallelism 
                 runParameters cts progress 
                 (fun rp -> executeRunParameters 
-                                db projectFolder 
+                                db 
                                 buildQueryParams executor 
                                 rp allowOverwrite cts progress)
 
 
     let saveParametersFiles
             (db: IGeneSortDb)
-            (projectFolder: string<projectFolder>)
             (runParameterArray: runParameters[])
             (buildQueryParams: runParameters -> outputDataType -> queryParams)
             (allowOverwrite: bool<allowOverwrite>)
@@ -210,9 +207,9 @@ module ProjectOps =
             (progress: IProgress<string> option) : Async<Result<unit, string>> =
         async {
             try
-                report progress (sprintf "%s Saving RunParameter files in %s" (MathUtils.getTimestampString()) %projectFolder)
+                report progress (sprintf "%s Saving RunParameter files in %s" (MathUtils.getTimestampString()) %db.projectFolder)
                 cts.Token.ThrowIfCancellationRequested()
-                let! res = db.saveAllRunParametersAsync projectFolder runParameterArray buildQueryParams allowOverwrite (Some cts.Token) progress
+                let! res = db.saveAllRunParametersAsync runParameterArray buildQueryParams allowOverwrite (Some cts.Token) progress
                 match res with
                 | Ok () -> 
                     report progress (sprintf "%s Successfully saved %d RunParameter files" (MathUtils.getTimestampString()) runParameterArray.Length)
@@ -224,15 +221,14 @@ module ProjectOps =
                 report progress msg
                 return Error msg
             | e ->
-                let msg = sprintf "%s Failed to save RunParameter files in %s: %s" (MathUtils.getTimestampString()) %projectFolder e.Message
+                let msg = sprintf "%s Failed to save RunParameter files in %s: %s" (MathUtils.getTimestampString()) %db.projectFolder e.Message
                 report progress msg
                 return Error msg
         }
 
 
-    let initProjectFiles
+    let initProjectAndRunFiles
         (db: IGeneSortDb)
-        (projectFolder: string<projectFolder>)
         (buildQueryParams: runParameters -> outputDataType -> queryParams)
         (cts: CancellationTokenSource)
         (progress: IProgress<string> option)
@@ -245,14 +241,14 @@ module ProjectOps =
             try
                 report progress (sprintf "%s Saving project file: %s" (MathUtils.getTimestampString()) %project.ProjectName)
                 let queryParams = queryParams.createForProject project.ProjectName
-                let! saveProjRes = db.saveAsync projectFolder queryParams (project |> outputData.Project) (true |> UMX.tag<allowOverwrite>)
+                let! saveProjRes = db.saveAsync queryParams (project |> outputData.Project) (true |> UMX.tag<allowOverwrite>)
                 match saveProjRes with
                 | Error err -> return Error err
                 | Ok () ->
                     let runParametersArray = Project.makeRunParameters minReplica maxReplica project.ParameterSpans paramRefiner |> Seq.toArray
                     report progress (sprintf "%s Saving run parameters files: (%d)" (MathUtils.getTimestampString()) runParametersArray.Length)
                     return! saveParametersFiles 
-                                db projectFolder
+                                db
                                 runParametersArray buildQueryParams 
                                 allowOverwrite cts progress
             with e ->
@@ -264,7 +260,6 @@ module ProjectOps =
 
     let printRunParamsOld
             (db: IGeneSortDb)
-            (projectFolder: string<projectFolder>)
             (minReplNumber: int<replNumber>)
             (maxReplNumber: int<replNumber>)
             (cts: CancellationTokenSource)
@@ -272,11 +267,11 @@ module ProjectOps =
                                : Async<Result<RunResult[], string>> =
         asyncResult {
             try
-                report progress (sprintf "Reporting Runs from %s\n" %projectFolder)
+                report progress (sprintf "Reporting Runs from %s\n" %db.projectFolder)
 
                 // 1. Load Parameters (Auto-handles Error short-circuit)
                 let! runParametersArray = 
-                    db.getProjectRunParametersForReplRangeAsync projectFolder (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
+                    db.getProjectRunParametersForReplRangeAsync (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
 
                 report progress (sprintf "Found %d runs to report\n" runParametersArray.Length)
 
@@ -314,18 +309,17 @@ module ProjectOps =
 
     let printRunParams
             (db: IGeneSortDb)
-            (projectFolder: string<projectFolder>)
             (minReplNumber: int<replNumber>)
             (maxReplNumber: int<replNumber>)
             (cts: CancellationTokenSource)
             (progress: IProgress<string> option) =
         asyncResult {
             try
-                report progress (sprintf "Reporting Runs from %s\n" %projectFolder)
+                report progress (sprintf "Reporting Runs from %s\n" %db.projectFolder)
 
                 // 1. Load Parameters (Auto-handles Error short-circuit)
                 let! runParametersArray = 
-                    db.getProjectRunParametersForReplRangeAsync projectFolder (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
+                    db.getProjectRunParametersForReplRangeAsync (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
 
                 report progress (sprintf "Found %d runs to report\n" runParametersArray.Length)
 
@@ -368,7 +362,6 @@ module ProjectOps =
 
     let executeRuns
             (db: IGeneSortDb)
-            (projectFolder: string<projectFolder>)
             (minRepl: int<replNumber>)
             (maxRepl: int<replNumber>)
             (buildQueryParams: runParameters -> outputDataType -> queryParams)
@@ -376,7 +369,7 @@ module ProjectOps =
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource)
             (progress: IProgress<string> option)
-            (executor: IGeneSortDb -> string<projectFolder> -> runParameters ->
+            (executor: IGeneSortDb -> runParameters ->
                        bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option
                             -> Async<Result<runParameters, string>>)
             (maxDegreeOfParallelism: int)
@@ -388,7 +381,7 @@ module ProjectOps =
 
                 // 1. Load Parameters
                 let! runParametersArray = 
-                    db.getProjectRunParametersForReplRangeAsync projectFolder (Some minRepl) (Some maxRepl) (Some cts.Token) progress
+                    db.getProjectRunParametersForReplRangeAsync (Some minRepl) (Some maxRepl) (Some cts.Token) progress
 
                 report progress (sprintf "Found %d runs to execute\n" runParametersArray.Length)
 
@@ -399,7 +392,7 @@ module ProjectOps =
                     // 1. Run the sequence (returns Async<RunResult[]>)
                     let! results = 
                         executeRunParametersSeq 
-                            db projectFolder maxDegreeOfParallelism executor 
+                            db maxDegreeOfParallelism executor 
                             runParametersArray buildQueryParams allowOverwrite cts progress
                         |> Async.map Ok // Wrap the naked array in a Result.Ok
 

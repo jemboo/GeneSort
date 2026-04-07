@@ -58,9 +58,9 @@ type sortingSet =
 
 module SortingSet =
 
-    let makeSorterSet (modelSet: sortingSet) : sorterSet =
+    let makeSorterSet (sortingSet: sortingSet) : sorterSet =
         let sorters = 
-            modelSet.Sortings 
+            sortingSet.Sortings 
             |> Array.collect (fun sm -> sm |> Sorting.makeSorters)
         
-        sorterSet.create (%modelSet.Id |> UMX.tag<sorterSetId>) sorters
+        sorterSet.create (%sortingSet.Id |> UMX.tag<sorterSetId>) sorters

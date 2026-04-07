@@ -6,12 +6,13 @@ open FSharp.UMX
 open GeneSort.Db
 open GeneSort.FileDb
 open GeneSort.Project
+open GeneSort.Project.SorterBins
 open System.Threading
 open GeneSort.Runs
 
 
 
-let rootDir = "c:\Projects" |> UMX.tag<pathToRootFolder>
+let rootDir = "c:\Projects" |> UMX.tag<pathToProjectFolder>
 
 // Progress reporter that prints to console
 let createThreadSafeProgress() =
@@ -35,7 +36,6 @@ let startTime = System.DateTime.Now
 printfn $"**** Q22Q888 ******** {startTime.ToString()}"
 
 
-let geneSortDb = new GeneSortDbMp(rootDir) :> IGeneSortDb
 let cts = new CancellationTokenSource()
 let allowOverwrite = false |> UMX.tag<allowOverwrite>
 let maxParallel = 1 // Set a reasonable limit for your machine
@@ -46,6 +46,7 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 //let project = RandomSorters.project
 //let projectName = RandomSorters.project.ProjectName
 //let projectFolder = RandomSorters.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
 //let buildQueryParams = RandomSorters.makeQueryParamsFromRunParams
 //let paramRefiner = RandomSorters.paramMapRefiner
 //let minReplica = 0<replNumber>
@@ -57,6 +58,7 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 //let executor = SortableMergeTests.executor
 //let projectName = SortableMergeTests.projectName
 //let projectFolder = SortableMergeTests.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
 //let buildQueryParams = SortableMergeTests.makeQueryParamsFromRunParams
 //let paramRefiner = SortableMergeTests.paramMapRefiner
 //let minReplica = 0<replNumber>
@@ -68,6 +70,7 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 //let project = MergeIntEvals.project
 //let projectName = MergeIntEvals.project.ProjectName
 //let projectFolder = MergeIntEvals.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
 //let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
 //let paramRefiner = MergeIntEvals.paramMapRefiner
 //let minReplica = 0<replNumber>
@@ -80,6 +83,7 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 //let executor = MergeIntQa.executor
 //let projectName = MergeIntQa.projectName
 //let projectFolder = MergeIntQa.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
 //let buildQueryParams = MergeIntQa.makeQueryParamsFromRunParams
 //let paramRefiner = MergeIntQa.paramMapRefiner
 //let minReplica = 0<replNumber>
@@ -87,14 +91,15 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 ///// **********    FullBoolEvals   ****************
-//let executor = FullBoolEvals.executor
-//let project = FullBoolEvals.project
-//let projectName = FullBoolEvals.project.ProjectName
-//let projectFolder = FullBoolEvals.projectFolder
-//let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
-//let paramRefiner = FullBoolEvals.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+let executor = FullBoolEvals.executor
+let project = FullBoolEvals.project
+let projectName = FullBoolEvals.project.ProjectName
+let projectFolder = FullBoolEvals.projectFolder
+let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
+let paramRefiner = FullBoolEvals.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
 ///// **********     RandomSorterBins   ****************
@@ -102,21 +107,36 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 //let project = RandomSorterBins.project
 //let projectName = RandomSorterBins.project.ProjectName
 //let projectFolder = RandomSorterBins.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
 //let buildQueryParams = RandomSorterBins.makeQueryParamsFromRunParams
 //let paramRefiner = RandomSorterBins.paramMapRefiner
 //let minReplica = 0<replNumber>
 //let maxReplica = 30<replNumber>
 
 
+///// **********  MergeRandomSorterBins   ****************
+//let executor = MergeRandomSorterBins.executor
+//let project = MergeRandomSorterBins.project
+//let projectName = MergeRandomSorterBins.project.ProjectName
+//let projectFolder = MergeRandomSorterBins.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+//let buildQueryParams = MergeRandomSorterBins.makeQueryParamsFromRunParams
+//let paramRefiner = MergeRandomSorterBins.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
+
+
+
 ///// **********     RandomMergeSorterBins   ****************
-let executor = RandomMergeSorterBins.executor
-let project = RandomMergeSorterBins.project
-let projectName = RandomMergeSorterBins.project.ProjectName
-let projectFolder = RandomMergeSorterBins.projectFolder
-let buildQueryParams = RandomMergeSorterBins.makeQueryParamsFromRunParams
-let paramRefiner = RandomMergeSorterBins.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 10<replNumber>
+//let executor = RandomMergeSorterBins.executor
+//let project = RandomMergeSorterBins.project
+//let projectName = RandomMergeSorterBins.project.ProjectName
+//let projectFolder = RandomMergeSorterBins.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+//let buildQueryParams = RandomMergeSorterBins.makeQueryParamsFromRunParams
+//let paramRefiner = RandomMergeSorterBins.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 ///// **********    FullBoolMutate   ****************
@@ -124,6 +144,7 @@ let maxReplica = 10<replNumber>
 //let project = FullBoolMutate.project
 //let projectName = FullBoolMutate.project.ProjectName
 //let projectFolder = FullBoolMutate.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
 //let buildQueryParams = FullBoolMutate.makeQueryParamsFromRunParams
 //let paramRefiner = FullBoolMutate.paramMapRefiner
 //let minReplica = 0<replNumber>
@@ -132,7 +153,7 @@ let maxReplica = 10<replNumber>
 
 printfn "Initializing Project..."
 let initResult = 
-    ProjectOps.initProjectFiles geneSortDb projectFolder buildQueryParams cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
+    ProjectOps.initProjectAndRunFiles geneSortDb buildQueryParams cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
     |> Async.RunSynchronously
 
 
@@ -143,7 +164,7 @@ match initResult with
 
 printfn "Executing Runs..."
 let execResult = 
-    ProjectOps.executeRuns geneSortDb projectFolder minReplica maxReplica buildQueryParams projectName allowOverwrite cts (Some progress) executor maxParallel
+    ProjectOps.executeRuns geneSortDb minReplica maxReplica buildQueryParams projectName allowOverwrite cts (Some progress) executor maxParallel
     |> Async.RunSynchronously
 
 

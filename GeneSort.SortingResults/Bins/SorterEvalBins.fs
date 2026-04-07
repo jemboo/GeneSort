@@ -13,9 +13,8 @@ type sorterEvalBins =
         layers:           Dictionary<sorterEvalKey, sorterEvalLeaf>
     }
 
-    static member create 
-                        (id: Guid<sorterEvalBinsId>) 
-                        (sorterEvals: sorterEval seq) =
+    static member create (id: Guid<sorterEvalBinsId>) 
+                         (sorterEvals: sorterEval seq) =
         let bins =
             {
                 sorterEvalBinsId = id
@@ -25,8 +24,14 @@ type sorterEvalBins =
         bins
 
 
-    static member createWithNewId
-                        (sorterEvals: sorterEval seq) =
+    static member createEmpty (id: Guid<sorterEvalBinsId>) =
+         {
+            sorterEvalBinsId = id
+            layers           = Dictionary<sorterEvalKey, sorterEvalLeaf>()
+        }
+   
+
+    static member createWithNewId  (sorterEvals: sorterEval seq) =
         let bins =
             {
                 sorterEvalBinsId = (Guid.NewGuid() |> UMX.tag<sorterEvalBinsId>)
