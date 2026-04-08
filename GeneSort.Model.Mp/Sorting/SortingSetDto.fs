@@ -15,10 +15,10 @@ type sortingSetDto =
 module SortingSetDto =
 
     let toDomain (dto: sortingSetDto) : sortingSet =
-        if dto.sortingDtos = null then
-            failwith "SorterModels array cannot be null or empty"
-        if Array.isEmpty dto.sortingDtos then
-            failwith "SorterModels array cannot be null or empty"
+        //if dto.sortingDtos = null then
+        //    failwith "SorterModels array cannot be null or empty"
+        //if Array.isEmpty dto.sortingDtos then
+        //    failwith "SorterModels array cannot be null or empty"
         let sorterModels = 
             dto.sortingDtos 
             |> Array.map SortingDto.toDomain

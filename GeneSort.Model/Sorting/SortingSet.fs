@@ -64,3 +64,9 @@ module SortingSet =
             |> Array.collect (fun sm -> sm |> Sorting.makeSorters)
         
         sorterSet.create (%sortingSet.Id |> UMX.tag<sorterSetId>) sorters
+
+    // Merges two sorting sets by combining their sortings into a new set with the same ID as 
+    // the target set. The source set is not modified.
+    let merge (source: sortingSet) (target: sortingSet) : sortingSet =
+        let combinedSortings = Array.append target.Sortings source.Sortings
+        sortingSet.create target.Id combinedSortings
