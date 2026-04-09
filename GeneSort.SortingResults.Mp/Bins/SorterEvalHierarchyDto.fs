@@ -23,14 +23,14 @@ type sorterEvalLeafDto = {
 
 module SorterEvalLeafDto =
 
-    let fromDomain (key: ceSequenceKey) (leaf: sorterEvalLeaf) : sorterEvalLeafDto =
+    let fromDomain (key: ceSequenceKey) (leaf: sorterEvalLeafOld) : sorterEvalLeafDto =
         {
             cesLowHi  = key.Ces |> Array.collect (fun c -> [| c.Low; c.Hi |])
             sorterIds = leaf.SorterIds |> Seq.map UMX.untag |> Seq.toArray
             sorterEvalKeyDto = leaf.SorterEvalKey |> SorterEvalKeyDto.fromDomain
         }
 
-    let toDomain (dto: sorterEvalLeafDto) : ceSequenceKey * sorterEvalLeaf =
+    let toDomain (dto: sorterEvalLeafDto) : ceSequenceKey * sorterEvalLeafOld =
         let ces =
             dto.cesLowHi
             |> Array.chunkBySize 2
@@ -40,7 +40,7 @@ module SorterEvalLeafDto =
         let leaf =
             match dto.sorterIds with
             | [||] -> failwith "Cannot reconstruct sorterEvalLeaf with no sorterIds."
-            | ids  -> sorterEvalLeaf.createWithIds (ids |> Array.map (UMX.tag<sorterId>)) sorterEvalKey
+            | ids  -> sorterEvalLeafOld.createWithIds (ids |> Array.map (UMX.tag<sorterId>)) sorterEvalKey
         ceSeqKey, leaf
 
 

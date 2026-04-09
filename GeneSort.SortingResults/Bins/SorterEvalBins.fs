@@ -6,46 +6,28 @@ open GeneSort.SortingOps
 open System.Collections.Generic
 open System
 
-
 type sorterEvalBins =
     private {
         sorterEvalBinsId: Guid<sorterEvalBinsId>
-        layers:           Dictionary<sorterEvalKey, sorterEvalLeaf>
+        layers: Map<sorterEvalKey, sorterEvalLeaf>
     }
+    with
+    static member create (id: Guid<sorterEvalBinsId>) (sorterEvals: sorterEval seq) =
+        let initial = { sorterEvalBinsId = id; layers = Map.empty }
+        (initial, sorterEvals) ||> Seq.fold (fun acc eval -> acc.AddSorterEval eval)
 
-    static member create (id: Guid<sorterEvalBinsId>) 
-                         (sorterEvals: sorterEval seq) =
-        let bins =
-            {
-                sorterEvalBinsId = id
-                layers           = Dictionary<sorterEvalKey, sorterEvalLeaf>()
-            }
-        sorterEvals |> Seq.iter bins.AddSorterEval
-        bins
-
+    static member createWithNewId (sorterEvals: sorterEval seq) =
+        let id = Guid.NewGuid() |> UMX.tag<sorterEvalBinsId>
+        sorterEvalBins.create id sorterEvals    
 
     static member createEmpty (id: Guid<sorterEvalBinsId>) =
-         {
-            sorterEvalBinsId = id
-            layers           = Dictionary<sorterEvalKey, sorterEvalLeaf>()
-        }
-   
+         { sorterEvalBinsId = id; layers = Map.empty }
 
-    static member createWithNewId  (sorterEvals: sorterEval seq) =
-        let bins =
-            {
-                sorterEvalBinsId = (Guid.NewGuid() |> UMX.tag<sorterEvalBinsId>)
-                layers           = Dictionary<sorterEvalKey, sorterEvalLeaf>()
-            }
-        sorterEvals |> Seq.iter bins.AddSorterEval
-        bins
+    member this.SorterEvalBinsId = this.sorterEvalBinsId
+    member this.Layers = this.layers 
 
-
-    member this.SorterEvalBinsId with get() = this.sorterEvalBinsId
-    member this.Layers           with get() = this.layers :> IReadOnlyDictionary<sorterEvalKey, sorterEvalLeaf>
-
-    member this.EvalCount with get() =
-        this.layers.Values |> Seq.sumBy (fun l -> l.EvalCount)
+    member this.EvalCount =
+        this.layers |> Map.toSeq |> Seq.sumBy (fun (_, leaf) -> leaf.EvalCount)
 
     member this.AddSorterEval (sorterEval: sorterEval) =
         let key =
@@ -53,65 +35,52 @@ type sorterEvalBins =
                 sorterEval.CeBlockEval.CeUseCounts.UsedCeCount
                 sorterEval.CeBlockEval.getStageSequence.StageLength
                 (sorterEval.CeBlockEval.UnsortedCount = 0<sortableCount>)
-        match this.layers.TryGetValue(key) with
-        | true, existing -> existing.AddId(sorterEval.SorterId)
-        | false, _       -> this.layers.[key] <- 
-                                sorterEvalLeaf.create 
-                                            (sorterEval) 
-                                            key
+        
+        let newLeaf = 
+            match Map.tryFind key this.layers with
+            | Some existing -> existing.AddId(sorterEval.SorterId)
+            | None -> sorterEvalLeaf.create sorterEval key
+            
+        { this with layers = Map.add key newLeaf this.layers }
 
-    member this.AddSorterEvals (sorterEvals: sorterEval seq) =
-        sorterEvals |> Seq.iter this.AddSorterEval
+    /// Merges a leaf into the bins, preserving chronological order
+    member this.MergeLeaf (key: sorterEvalKey) (leaf: sorterEvalLeaf) : sorterEvalBins =
+        let mergedLeaf = 
+            match Map.tryFind key this.layers with
+            | Some existing -> sorterEvalLeaf.merge existing leaf
+            | None -> leaf
+            
+        { this with layers = Map.add key mergedLeaf this.layers }
 
-    member this.MergeLeaf (key: sorterEvalKey) (leaf: sorterEvalLeaf) =
-        match this.layers.TryGetValue(key) with
-        | true, existing -> for id in leaf.SorterIds do existing.AddId(id)
-        | false, _       -> 
-                    this.layers.[key] <- sorterEvalLeaf.createWithIds 
-                                            (leaf.SorterIds |> Seq.toArray) 
-                                            key
+    member this.AddLeafs (sourceLayers: seq<sorterEvalKey * sorterEvalLeaf>) : sorterEvalBins =
+        (this, sourceLayers) ||> Seq.fold (fun acc (key, leaf) -> acc.MergeLeaf key leaf)
 
-
-    member this.AddLeafs (sourceLayers: IEnumerable<KeyValuePair<sorterEvalKey, sorterEvalLeaf>>) =
-            for kvp in sourceLayers do
-                this.MergeLeaf kvp.Key kvp.Value
-
-
-    /// Returns an array of leaves, where each leaf represents a vertex 
-    /// on the convex hull of the (CeCount, StageLength) lattice for isSorted = true.
     member this.ConvexHull () : sorterEvalLeaf [] =
-        // 1. Filter for sorted bins and extract points (x=Ce, y=Stage)
         let sortedPoints = 
             this.layers 
-            |> Seq.filter (fun kvp -> kvp.Key.IsSorted)
-            |> Seq.map (fun kvp -> 
-                {| X = float (%kvp.Key.CeCount)
-                   Y = float (%kvp.Key.StageLength)
-                   Leaf = kvp.Value |})
+            |> Map.toSeq
+            |> Seq.filter (fun (key, _) -> key.IsSorted)
+            |> Seq.map (fun (key, leaf) -> 
+                {| X = float (%key.CeCount)
+                   Y = float (%key.StageLength)
+                   Leaf = leaf |})
             |> Seq.sortBy (fun p -> p.X, p.Y)
             |> Seq.toArray
 
-        if sortedPoints.Length = 0 then 
-            [||]
-        elif sortedPoints.Length <= 2 then
-            sortedPoints |> Array.map (fun p -> p.Leaf)
+        if sortedPoints.Length = 0 then [||]
+        elif sortedPoints.Length <= 2 then sortedPoints |> Array.map (fun p -> p.Leaf)
         else
-            // 2D cross product of OA and OB vectors
-            // Returns a positive value for a left turn, 
-            // negative for a right turn, and 0 if collinear.
             let crossProduct (o: {| X: float; Y: float; Leaf: sorterEvalLeaf |}) 
                              (a: {| X: float; Y: float; Leaf: sorterEvalLeaf |}) 
                              (b: {| X: float; Y: float; Leaf: sorterEvalLeaf |}) : float =
                 (a.X - o.X) * (b.Y - o.Y) - (a.Y - o.Y) * (b.X - o.X)
 
-            // Build Lower Hull
             let lower = ResizeArray()
             for p in sortedPoints do
                 while lower.Count >= 2 && crossProduct lower.[lower.Count-2] lower.[lower.Count-1] p < 0.0 do
                     lower.RemoveAt(lower.Count - 1)
                 lower.Add(p)
 
-            // Build Upper Hull
             let upper = ResizeArray()
             for i in (sortedPoints.Length - 1) .. -1 .. 0 do
                 let p = sortedPoints.[i]
@@ -119,30 +88,20 @@ type sorterEvalBins =
                     upper.RemoveAt(upper.Count - 1)
                 upper.Add(p)
 
-            // Combine hulls, removing the last point of each because it's repeated
-            let hullVertices = 
-                seq {
-                    yield! lower |> Seq.take (lower.Count - 1)
-                    yield! upper |> Seq.take (upper.Count - 1)
-                }
-
-            hullVertices 
+            seq {
+                yield! lower |> Seq.take (lower.Count - 1)
+                yield! upper |> Seq.take (upper.Count - 1)
+            }
             |> Seq.map (fun p -> p.Leaf)
             |> Seq.toArray
-
-
-
 
 module SorterEvalBins =
 
     let merge (target: sorterEvalBins) (source: sorterEvalBins) : sorterEvalBins =
-        target.AddLeafs source.Layers
-        target
+        source.Layers 
+        |> Map.toSeq
+        |> target.AddLeafs
 
-    // Returns up to maxSorterIds sorterIds from each bin, where:
-    // bins are filtered by their isSorted property.
-    // - bins are visited in ascending order of orderFunc applied to their sorterEvalKey
-    // - result is a flat sequence of (sorterEvalKey * Guid<sorterId>) pairs
     let getUpToNSorterIdsPerBin
             (orderFunc: sorterEvalKey -> float)
             (successfullySorted: bool)
@@ -150,14 +109,13 @@ module SorterEvalBins =
             (source: sorterEvalBins)
             : (sorterEvalKey * Guid<sorterId>) seq =
         source.Layers
-        |> Seq.filter (fun kvp -> kvp.Key.IsSorted = successfullySorted)
-        |> Seq.sortBy (fun kvp -> orderFunc kvp.Key)
-        |> Seq.collect (fun kvp ->
-                            kvp.Value.SorterIds
+        |> Map.toSeq
+        |> Seq.filter (fun (key, _) -> key.IsSorted = successfullySorted)
+        |> Seq.sortBy (fun (key, _) -> orderFunc key)
+        |> Seq.collect (fun (key, leaf) ->
+                            leaf.SorterIds
                             |> Seq.truncate maxPerBin
-                            |> Seq.map (fun id -> kvp.Key, id)
-                       )
-
+                            |> Seq.map (fun id -> key, id))
 
     let getUpToNSorterIdsPerConvexHullBin
             (orderFunc: sorterEvalKey -> float)
@@ -171,44 +129,20 @@ module SorterEvalBins =
         |> Seq.collect (fun leaf ->
                             leaf.SorterIds
                             |> Seq.truncate maxPerBin
-                            |> Seq.map (fun id -> leaf.SorterEvalKey, id)
-                       )
+                            |> Seq.map (fun id -> leaf.SorterEvalKey, id))
 
-
-    // reporting
     let getBinsReport
             (prefixes:string [])
             (bins: sorterEvalBins)
             : string[][] =
         bins.Layers
-        |> Seq.map (fun kvp ->
+        |> Map.toSeq
+        |> Seq.map (fun (key, leaf) ->
             prefixes |> Array.append
                 [|
-                    (%kvp.Key.CeCount).ToString()
-                    (%kvp.Key.StageLength).ToString()
-                    kvp.Key.IsSorted.ToString()
-                    kvp.Value.EvalCount.ToString()
+                    (%key.CeCount).ToString()
+                    (%key.StageLength).ToString()
+                    key.IsSorted.ToString()
+                    leaf.EvalCount.ToString()
                 |])
-        |> Seq.toArray
-
-    // reporting
-    let getBinsReport0
-            (sortingWidth:   int<sortingWidth> option)
-            (sorterModelKey: string)
-            (bins:           sorterEvalBins)
-            : string[][] =
-        let widthStr =
-            sortingWidth
-            |> Option.map (fun w -> (%w).ToString())
-            |> Option.defaultValue "N/A"
-        bins.Layers
-        |> Seq.map (fun kvp ->
-            [|
-                widthStr
-                sorterModelKey
-                (%kvp.Key.CeCount).ToString()
-                (%kvp.Key.StageLength).ToString()
-                kvp.Key.IsSorted.ToString()
-                kvp.Value.EvalCount.ToString()
-            |])
         |> Seq.toArray

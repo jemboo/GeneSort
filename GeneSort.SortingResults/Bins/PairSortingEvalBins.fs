@@ -18,7 +18,7 @@ module PairSortingEvalBins =
     let addSorterEval 
                 (pairSortingEvalBins:pairSortingEvalBins) 
                 (sorterEval: sorterEval) 
-                (modelTag:modelTag) : unit =
+                (modelTag:modelTag) : sorterEvalBins =
         match pairSortingEvalBins with
         | SplitPairs sp -> sp.AddSorterEval sorterEval modelTag
         | SplitPairs2 sp2 -> sp2.AddSorterEval sorterEval modelTag

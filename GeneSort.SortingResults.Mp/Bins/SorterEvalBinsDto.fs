@@ -68,15 +68,17 @@ module SorterEvalBinsDto =
         }
 
     let toDomain (dto: sorterEvalBinsDto) : sorterEvalBins =
-        let bins = sorterEvalBins.create (UMX.tag<sorterEvalBinsId> dto.sorterEvalBinsId) [||]
-        for leafDto in dto.bins do
-            let key  = SorterEvalKeyDto.toDomain leafDto.sorterEvalKey
+        let initialBins = sorterEvalBins.createEmpty (UMX.tag<sorterEvalBinsId> dto.sorterEvalBinsId)
+    
+        (initialBins, dto.bins)
+        ||> Array.fold (fun accBin leafDto ->
+            let key = SorterEvalKeyDto.toDomain leafDto.sorterEvalKey
             match leafDto.sorterIds with
             | [||] -> failwith "Cannot reconstruct sorterEvalBins entry with no sorterIds."
             | ids  ->
-                let leaf = sorterEvalLeaf.createWithIds (ids |> Array.map (UMX.tag<sorterId>)) key
-                bins.MergeLeaf key leaf
-        bins
+                let leaf = sorterEvalLeaf.createWithIds (ids |> Array.map UMX.tag<sorterId>) key
+                accBin.MergeLeaf key leaf // Returns the updated bin for the next iteration
+        )
 
     let serialize (options: MessagePackSerializerOptions)
                   (bins: sorterEvalBins) : byte array =

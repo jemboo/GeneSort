@@ -3,7 +3,7 @@
 open FSharp.UMX
 open GeneSort.Sorting
 
-[<Struct; StructuralEquality; NoComparison>]
+[<Struct; StructuralEquality; StructuralComparison>]
 type sorterEvalKey =
     private {
         ceCount:     int<ceLength>
