@@ -15,6 +15,8 @@ type sorterEvalKey =
     member this.CeCount     with get() : int<ceLength>    = this.ceCount
     member this.StageLength with get() : int<stageLength> = this.stageLength
     member this.IsSorted    with get() : bool             = this.isSorted
+    member this.AsString() : string =
+        sprintf "ceCount: %d, stageLength: %d, isSorted: %b" (UMX.untag this.ceCount) (UMX.untag this.stageLength) this.isSorted
 
 
 module SorterEvalKey =

@@ -146,3 +146,15 @@ module SorterEvalBins =
                     leaf.EvalCount.ToString()
                 |])
         |> Seq.toArray
+
+
+    let getPropertyMaps<'t> 
+                (bins: sorterEvalBins) 
+                (baseKey:'t) 
+                (baseProperties: Map<string, string>) 
+                    : (('t * sorterEvalKey) * Map<string, string>) seq =
+        bins.Layers
+        |> Map.toSeq
+        |> Seq.map (fun (key, leaf) ->
+            let combinedMap = leaf.combineMap baseProperties
+            ((baseKey, key), combinedMap))

@@ -6,22 +6,15 @@ open FSharp.UMX
 
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Model.Sorting.Sorter.Ce
-open GeneSort.Model.Sorting.Sorter.Si
-open GeneSort.Model.Sorting.Sorter.Uf4
-open GeneSort.Model.Sorting.Sorter.Rs
-open GeneSort.Model.Sorting.Sorter.Uf6
 open System.Threading
 open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.Model.Sorting
-open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.SortingResults
 open GeneSort.SortingResults.Bins
 open GeneSort.Project
 open GeneSort.FileDb
-open FsToolkit
 
 
 module MergeRandomSorterBins_P1 =
@@ -44,11 +37,11 @@ module MergeRandomSorterBins_P1 =
 
 
     let startingRepls () : string * string list =
-        let values = [ 0; 10; 20; ] |> List.map (fun d -> d.ToString())
+        let values = [ 0; ] |> List.map (fun d -> d.ToString())
         (runParameters.startingReplKey, values)
 
     let replSpans () : string * string list =
-        let values = [ 10 ] |> List.map (fun d -> d.ToString())
+        let values = [ 30 ] |> List.map (fun d -> d.ToString())
         (runParameters.replSpanKey, values)
 
     let parameterSpans = 
@@ -200,81 +193,106 @@ module MergeRandomSorterBins =
                         return (smt, sw, srp, rsp)
                     } |> Result.ofOption (sprintf "Run %s: Missing required parameters" %runId) |> asAsync
 
-                // 3. Make the evalBins that will be returned
+
+                // 3. Make query params for the output data, which is also used to generate the IDs
                 let qpEvalBins = makeQueryParamsFromRunParams 
                                             runParameters 
                                             (outputDataType.SorterEvalBins "")
+                let qpEvenSampledSortingSet = makeQueryParamsFromRunParams 
+                                                    runParameters 
+                                                    (outputDataType.SortingSet "EvenSampled")
 
-                let mergedSorterEvalBins = sorterEvalBins.createEmpty
-                                                (%qpEvalBins.Id |> UMX.tag<sorterEvalBinsId>)
+                let qpHullSampledSortingSet = makeQueryParamsFromRunParams 
+                                                runParameters 
+                                                (outputDataType.SortingSet "HullSampled")
 
-                 // 4. Load and merge the RandomSorterBins for the specified parameters
-                let sStartingRepl = (%startingRepl + 1) |> UMX.tag<replNumber>
-                let ssStartingRepl = (%startingRepl + 2) |> UMX.tag<replNumber>
+                // 4. create the repl collectors 
+                let mutable mergedSorterEvalBins = sorterEvalBins.createEmpty
+                                                        (%qpEvalBins.Id |> UMX.tag<sorterEvalBinsId>)
 
+                // This is repeatedly merged with the per-repl sorting sets, and then sampled down to create the even sampled set. 
+                // The hull sampled set is a subset of the even sampled set, so it doesn't need its own merged set - 
+                // the sampling can be done directly on the mergedSorterEvalBins and mergedSortingSet at the end.
+                let mutable mergedSortingSet = sortingSet.create
+                                                    (%qpEvenSampledSortingSet.Id |> UMX.tag<sortingSetId>)
+                                                    [||]
+
+                                            
+                // 5.  Get the database for the RandomSorterBins project - this is where the per-repl data will be loaded from
                 let dbRandomSorterBins = new GeneSortDbMp(RandomSorterBins.projectFolder) :> IGeneSortDb
 
-                let qpRandomSorterBins = RandomSorterBins.makeQueryParams 
-                                            (Some startingRepl) 
-                                            (Some sortingWidth) 
-                                            (Some sorterModelType) 
-                                            (outputDataType.SorterEvalBins "")
-
-                let! randomSorterEvalBins = dbRandomSorterBins.loadAsync qpRandomSorterBins
+                // 6. Loop through the repls, loading and merging the data as we go
+                for r in 0 .. (%replSpan - 1) do
+                        let currentRepl = %startingRepl + r
+                        let qpCurrentEvalBins = RandomSorterBins.makeQueryParams  
+                                                    (Some (currentRepl |> UMX.tag<replNumber>))
+                                                    (Some sortingWidth) 
+                                                    (Some sorterModelType) 
+                                                    (outputDataType.SorterEvalBins "")
+    
+                        let! currentEvalBins = dbRandomSorterBins.loadAsync qpCurrentEvalBins
                                                 |> AsyncResult.bind (OutputData.asSorterEvalBins >> AsyncResult.ofResult)
 
 
-                let qpEvenSampledSortingSet = RandomSorterBins.makeQueryParams 
-                                                    (Some startingRepl) 
+                        let qpCurrentSortingSet = RandomSorterBins.makeQueryParams  
+                                                    (Some (currentRepl |> UMX.tag<replNumber>))
                                                     (Some sortingWidth) 
                                                     (Some sorterModelType) 
                                                     (outputDataType.SortingSet "EvenSampled")
 
-                let qpHullSampledSortingSet = RandomSorterBins.makeQueryParams 
-                                                    (Some startingRepl) 
-                                                    (Some sortingWidth) 
-                                                    (Some sorterModelType) 
-                                                    (outputDataType.SortingSet "HullSampled")
 
-
-
-                let! evenSampledSortingSet = dbRandomSorterBins.loadAsync qpEvenSampledSortingSet
+                        let! currentSortingSet = dbRandomSorterBins.loadAsync qpCurrentSortingSet
                                                 |> AsyncResult.bind (OutputData.asSortingSet >> AsyncResult.ofResult)
 
+                        // merge with the latest repl's data
+                        mergedSortingSet <- SortingSet.merge mergedSortingSet currentSortingSet
+                        // merge the eval bins 
+                        mergedSorterEvalBins <- SorterEvalBins.merge mergedSorterEvalBins currentEvalBins
+                        // sample down to samplesPerBin per bin
+                        mergedSortingSet <-
+                            sortingSet.create
+                                (%qpEvenSampledSortingSet.Id |> UMX.tag<sortingSetId>)
+                                (SortingSetFilter.sampleBinsEvenly samplesPerBin mergedSorterEvalBins mergedSortingSet)
 
-                let sQpRandomSorterBins = RandomSorterBins.makeQueryParams 
-                                            (Some sStartingRepl) 
-                                            (Some sortingWidth) 
-                                            (Some sorterModelType) 
-                                            (outputDataType.SorterEvalBins "")
-                let! sRandomSorterEvalBins = dbRandomSorterBins.loadAsync sQpRandomSorterBins
-                                                |> AsyncResult.bind (OutputData.asSorterEvalBins >> AsyncResult.ofResult)
+                        None |> ignore // placeholder for potential per-repl processing
 
-                let sQpEvenSampledSortingSet = RandomSorterBins.makeQueryParams 
-                                                    (Some sStartingRepl) 
-                                                    (Some sortingWidth) 
-                                                    (Some sorterModelType) 
-                                                    (outputDataType.SortingSet "EvenSampled")
-                let! sEvenSampledSortingSet = dbRandomSorterBins.loadAsync sQpEvenSampledSortingSet
-                                                |> AsyncResult.bind (OutputData.asSortingSet >> AsyncResult.ofResult)
-
-
-                let mergedSorterEvalBins = SorterEvalBins.merge randomSorterEvalBins sRandomSorterEvalBins
-                let mergedSortingSet = evenSampledSortingSet |> SortingSet.merge  sEvenSampledSortingSet
-
-                let sEvenSampledSortingSet = 
-                        sortingSet.create
-                            (%qpEvenSampledSortingSet.Id |> UMX.tag<sortingSetId>)
-                            (SortingSetFilter.sampleBinsEvenly samplesPerBin mergedSorterEvalBins mergedSortingSet)
-
-
+                // 7. Get the convex hull of mergedSortingSet
                 let sHullSampledSortingSet = 
-                        sortingSet.create
-                            (%qpHullSampledSortingSet.Id |> UMX.tag<sortingSetId>)
-                            (SortingSetFilter.sampleBinsEvenly samplesPerBin mergedSorterEvalBins mergedSortingSet)
+                            sortingSet.create
+                                (%qpHullSampledSortingSet.Id |> UMX.tag<sortingSetId>)
+                                (SortingSetFilter.sampleBinsConvexHull samplesPerBin mergedSorterEvalBins mergedSortingSet)
 
 
-                // 5. Saves
+                // 8. Make Report
+                let reportName = $"MergeReport_{%sortingWidth}_{sorterModelType |> SorterModelType.toString}" 
+                                    |> UMX.tag<textReportName>
+
+                let qpMergeReport = makeQueryParamsFromRunParams 
+                                            runParameters 
+                                            (outputDataType.TextReport reportName)
+                let mergeProperties =
+                    [ 
+                        ("sortingWidth", (Some sortingWidth) |> SortingWidth.toString); 
+                        ("sorterModelType", sorterModelType |> SorterModelType.toString)
+                    ] |> Map.ofList
+
+                let keyFormatter (key: ((int * string) * sorterEvalKey)) =
+                        sprintf "%d_%s_%s" (fst (fst key)) (snd (fst key)) ((snd key).AsString())
+                        
+
+                let tableMap = SorterEvalBins.getPropertyMaps 
+                                    mergedSorterEvalBins 
+                                    (%sortingWidth, sorterModelType |> SorterModelType.toString)
+                                    mergeProperties
+                                |> Map.ofSeq
+
+                let headers, rows = DataTableReport.mapToTabDelimitedStrings keyFormatter tableMap
+                let dtReport = DataTableReport.create %reportName headers
+                dtReport.AppendDataRows (rows |> Array.toSeq)
+
+
+
+                //// 9. Saves
                 let qpMergedEvalBins = makeQueryParamsFromRunParams 
                                             runParameters 
                                             (outputDataType.SorterEvalBins "")
@@ -288,6 +306,8 @@ module MergeRandomSorterBins =
                                                         (outputDataType.SortingSet "HullSampled")
 
 
+
+
                 let! _ = db.saveAsync 
                                 qpMergedEvalBins 
                                 (mergedSorterEvalBins |> outputData.SorterEvalBins) 
@@ -295,7 +315,7 @@ module MergeRandomSorterBins =
 
                 let! _ = db.saveAsync 
                                 qpMergedEvenSampledSortingSet 
-                                (sEvenSampledSortingSet |> outputData.SortingSet) 
+                                (mergedSortingSet |> outputData.SortingSet) 
                                 allowOverwrite
 
                 let! _ = db.saveAsync 
@@ -304,10 +324,14 @@ module MergeRandomSorterBins =
                                 allowOverwrite
 
 
+                let! _ = db.saveAsync 
+                                qpMergeReport 
+                                (dtReport |> outputData.TextReport) 
+                                allowOverwrite
 
 
 
-                // 5. Final Return
+                // 10. Final Return
                 return runParameters.WithRunFinished (Some true)
 
             with e -> 

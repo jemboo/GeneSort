@@ -2,6 +2,7 @@
 open System
 open System.IO
 open System.Text
+open System.Collections.Generic
 
 type dataTableReport = 
     private 
@@ -143,3 +144,71 @@ module DataTableReport =
           errorRows = ResizeArray()
           dataHeaders = cleanHeaders
           dataRows = ResizeArray() }
+
+
+    let mapToTabDelimited<'t when 't : comparison> 
+            (keyFormatter: 't -> string) 
+            (data: Map<'t, Map<string, string>>) =
+
+        // Consolidate headers into a list so we can iterate over them 
+        // in the exact same order for every row.
+        let allHeaders = 
+            data.Values 
+            |> Seq.collect (fun m -> m.Keys) 
+            |> Set.ofSeq 
+            |> Set.toList
+
+        let sb = StringBuilder()
+
+        // Header Row
+        sb.Append("RowKey") |> ignore
+        for header in allHeaders do
+            sb.Append("\t").Append(header) |> ignore
+        sb.AppendLine() |> ignore
+
+        // Data Rows
+        for kvp in data do
+            sb.Append(keyFormatter kvp.Key) |> ignore
+            for header in allHeaders do
+                sb.Append("\t") |> ignore
+                match kvp.Value.TryFind header with
+                | Some v -> sb.Append(v) |> ignore
+                | None   -> () 
+            sb.AppendLine() |> ignore
+
+        sb.ToString()
+
+
+
+    let mapToTabDelimitedStrings<'t when 't : comparison> 
+            (keyFormatter: 't -> string) 
+            (data: Map<'t, Map<string, string>>) 
+                : (string []) * (string [] []) =
+
+        // Consolidate headers into a list so we can iterate over them 
+        // in the exact same order for every row.
+        let allHeaders = 
+            data.Values 
+            |> Seq.collect (fun m -> m.Keys) 
+            |> Set.ofSeq 
+            |> Set.toArray
+            |> Array.append [| "RowKey" |]
+            
+
+        let rows =
+            data
+            |> Map.toArray
+            |> Array.map 
+                (
+                    fun (key, values) ->
+                        let row = Array.zeroCreate<string> allHeaders.Length
+                        row.[0] <- keyFormatter key
+                        for i in 1 .. allHeaders.Length - 1 do
+                            let header = allHeaders.[i]
+                            match values.TryFind header with
+                            | Some v -> row.[i] <- v 
+                            | None   -> row.[i] <- ""
+                        row
+                )
+
+        allHeaders, rows

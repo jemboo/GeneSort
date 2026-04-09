@@ -11,7 +11,7 @@ open GeneSort.Sorting.Sorter
 // ---------------------------------------------------------------------------
 // Leaf: stores only the sorterIds that share a distinct ce-sequence
 // ---------------------------------------------------------------------------
-type sorterEvalLeafOld =
+type sorterEvalLeafH =
     private {
         sorterIds: ResizeArray<Guid<sorterId>>
         sorterEvalKey: sorterEvalKey
@@ -80,3 +80,15 @@ type sorterEvalLeaf =
         { target with 
             // source.sorterIds are the "newer" items, so they sit at the head
             sorterIds = source.sorterIds @ target.sorterIds }
+
+    member this.toMap() : Map<string, string> =
+            [
+                "CeCount", this.SorterEvalKey.CeCount |> UMX.untag |> string
+                "StageLength", this.SorterEvalKey.StageLength |> UMX.untag |> string
+                "IsSorted", this.SorterEvalKey.IsSorted |> string
+                "EvalCount", this.EvalCount |> string
+            ] |> Map.ofList
+
+    member this.combineMap (baseMap:Map<string, string>) : Map<string, string> =
+        let leafMap = this.toMap()
+        Map.fold (fun acc key value -> Map.add key value acc) baseMap leafMap

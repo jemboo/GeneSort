@@ -14,13 +14,13 @@ open GeneSort.Sorting.Sorter
 type sorterEvalLayer =
     private {
         key:    sorterEvalKey
-        leaves: Dictionary<ceSequenceKey, sorterEvalLeafOld>
+        leaves: Dictionary<ceSequenceKey, sorterEvalLeafH>
     }
 
     static member create (key: sorterEvalKey) =
         {
             key    = key
-            leaves = Dictionary<ceSequenceKey, sorterEvalLeafOld>()
+            leaves = Dictionary<ceSequenceKey, sorterEvalLeafH>()
         }
 
     member this.Key         with get() = this.key
@@ -32,7 +32,7 @@ type sorterEvalLayer =
         this.leaves.Values |> Seq.sumBy (fun l -> l.EvalCount)
 
     member this.Leaves with get() =
-        this.leaves :> IReadOnlyDictionary<ceSequenceKey, sorterEvalLeafOld>
+        this.leaves :> IReadOnlyDictionary<ceSequenceKey, sorterEvalLeafH>
 
     // Returns sorterIds from all leaves interleaved in round-robin order,
     // so that early items in the sequence sample broadly across distinct
@@ -62,9 +62,9 @@ type sorterEvalLayer =
         let ceSeqKey = ceSequenceKey.create eval.CeBlockEval.UsedCes
         match this.leaves.TryGetValue(ceSeqKey) with
         | true, existing -> existing.AddId(eval.SorterId)
-        | false, _       -> this.leaves.[ceSeqKey] <- sorterEvalLeafOld.create eval key
+        | false, _       -> this.leaves.[ceSeqKey] <- sorterEvalLeafH.create eval key
 
-    member this.MergeLeaf (ceSeqKey: ceSequenceKey) (leaf: sorterEvalLeafOld) =
+    member this.MergeLeaf (ceSeqKey: ceSequenceKey) (leaf: sorterEvalLeafH) =
         match this.leaves.TryGetValue(ceSeqKey) with
         | true, existing -> for id in leaf.SorterIds do existing.AddId(id)
         | false, _       -> this.leaves.[ceSeqKey] <- leaf

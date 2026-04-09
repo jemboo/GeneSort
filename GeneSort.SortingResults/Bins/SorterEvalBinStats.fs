@@ -29,7 +29,7 @@ module SorterEvalBinStats =
             let m = mean xs
             xs |> Array.averageBy (fun x -> (x - m) ** 2.0) |> sqrt
 
-    let compute (isSorted: bool) (bins: KeyValuePair<sorterEvalKey, sorterEvalLeafOld> seq) : sorterEvalBinStats =
+    let compute (isSorted: bool) (bins: KeyValuePair<sorterEvalKey, sorterEvalLeafH> seq) : sorterEvalBinStats =
         let matched =
             bins
             |> Seq.filter (fun kvp -> kvp.Key.IsSorted = isSorted)
