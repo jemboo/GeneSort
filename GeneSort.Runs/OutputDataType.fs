@@ -35,7 +35,7 @@ module OutputDataType =
         | SortableTestModelSetGen s -> appendParam "SortableTestModelSetGen" s
         | SorterSetEval s -> appendParam "SorterSetEval" s
         | SorterEvalBins s -> appendParam "SorterEvalBins" s
-        | TextReport s -> appendParam "TextReport" %s
+        | TextReport s -> appendParam "Report\\TextReport" %s
 
     let fromFolderName (description: string) : outputDataType option =
         let parts = description.Split([|'_'|], StringSplitOptions.RemoveEmptyEntries)

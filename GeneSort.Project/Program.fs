@@ -103,27 +103,27 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 ///// **********     RandomSorterBins   ****************
-//let executor = RandomSorterBins.executor
-//let project = RandomSorterBins.project
-//let projectName = RandomSorterBins.project.ProjectName
-//let projectFolder = RandomSorterBins.projectFolder
-//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
-//let buildQueryParams = RandomSorterBins.makeQueryParamsFromRunParams
-//let paramRefiner = RandomSorterBins.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 30<replNumber>
-
-
-///// **********  MergeRandomSorterBins   ****************
-let executor = MergeRandomSorterBins.executor
-let project = MergeRandomSorterBins.project
-let projectName = MergeRandomSorterBins.project.ProjectName
-let projectFolder = MergeRandomSorterBins.projectFolder
+let executor = RandomSorterBins.executor
+let project = RandomSorterBins.project
+let projectName = RandomSorterBins.project.ProjectName
+let projectFolder = RandomSorterBins.projectFolder
 let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
-let buildQueryParams = MergeRandomSorterBins.makeQueryParamsFromRunParams
-let paramRefiner = MergeRandomSorterBins.paramMapRefiner
+let buildQueryParams = RandomSorterBins.makeQueryParamsFromRunParams
+let paramRefiner = RandomSorterBins.paramMapRefiner
 let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+let maxReplica = 100<replNumber>
+
+
+/////// **********  MergeRandomSorterBins   ****************
+//let executor = MergeRandomSorterBins.executor
+//let project = MergeRandomSorterBins.project
+//let projectName = MergeRandomSorterBins.project.ProjectName
+//let projectFolder = MergeRandomSorterBins.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+//let buildQueryParams = MergeRandomSorterBins.makeQueryParamsFromRunParams
+//let paramRefiner = MergeRandomSorterBins.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 
