@@ -204,8 +204,13 @@ module MergeRandomSorterBins =
                                                     (outputDataType.SortingSet "EvenSampled")
 
                 let qpHullSampledSortingSet = makeQueryParamsFromRunParams 
-                                                runParameters 
-                                                (outputDataType.SortingSet "HullSampled")
+                                                    runParameters 
+                                                    (outputDataType.SortingSet "HullSampled")
+
+
+                let qpCenterSampledSortingSet = makeQueryParamsFromRunParams 
+                                                    runParameters 
+                                                    (outputDataType.SortingSet "CenterSampled")
 
                 // 4. create the repl collectors 
                 let mutable mergedSorterEvalBins = sorterEvalBins.createEmpty

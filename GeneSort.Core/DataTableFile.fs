@@ -212,3 +212,20 @@ module DataTableReport =
                 )
 
         allHeaders, rows
+
+
+
+    let concatenateAllFiles (rootPath: string) (outputPath: string) =
+        // 1. Get all .txt files in the root and all subdirectories
+        let files = Directory.GetFiles(rootPath, "*.txt", SearchOption.AllDirectories)
+    
+        // 2. Open a FileStream for writing the combined result
+        using (new StreamWriter(outputPath, false, Encoding.UTF8)) (fun writer ->
+            for file in files do
+                // Read the content of each file and write it to the output
+                let content = File.ReadAllText(file)
+                writer.WriteLine(content)
+            
+                // Optional: Add a separator or newline between files
+                writer.WriteLine("---") 
+        )

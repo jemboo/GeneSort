@@ -47,8 +47,10 @@ module Example =
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
-    LatticeLevelSetMap.getStats
-
+    //LatticeLevelSetMap.getStats
+    DataTableReport.concatenateAllFiles 
+                @"C:\Projects\Report" 
+                @"C:\Projects\Report\concatenated_report.txt"
 
     printfn "end: %s" (DateTime.Now.ToShortTimeString())
 

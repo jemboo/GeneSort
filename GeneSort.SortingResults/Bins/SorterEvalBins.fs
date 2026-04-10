@@ -131,6 +131,46 @@ module SorterEvalBins =
                             |> Seq.truncate maxPerBin
                             |> Seq.map (fun id -> leaf.SorterEvalKey, id))
 
+
+    // Returns up to maxReturned sorter IDs from the bins; filtering by whether they are 
+    // successfully sorted or not.
+    // The returned IDs are as close as possible to the center of the distribution of ceCount
+    // and stageLength, as determined by the orderFunc.
+    let getUpToNAverageSorterIds
+            (orderFunc: sorterEvalKey -> float)
+            (successfullySorted: bool)
+            (maxReturned: int)
+            (source: sorterEvalBins)
+            : (sorterEvalKey * Guid<sorterId>) seq =
+        
+        let relevantLayers = 
+            source.Layers
+            |> Map.toSeq
+            |> Seq.filter (fun (k, _) -> k.IsSorted = successfullySorted)
+            |> Seq.toArray
+
+        if relevantLayers.Length = 0 || maxReturned <= 0 then
+            Seq.empty
+        else
+            // 1. Calculate the weighted average score based on bin density (EvalCount)
+            let totalWeight = relevantLayers |> Array.sumBy (fun (_, leaf) -> float leaf.EvalCount)
+            let weightedSum = 
+                relevantLayers 
+                |> Array.sumBy (fun (k, leaf) -> orderFunc k * float leaf.EvalCount)
+            
+            let averageScore = weightedSum / totalWeight
+
+            // 2. Sort bins by proximity to the average score
+            // 3. Collect IDs from those bins until maxReturned is reached
+            relevantLayers
+            |> Seq.sortBy (fun (k, _) -> Math.Abs(orderFunc k - averageScore))
+            |> Seq.collect (fun (k, leaf) -> 
+                leaf.SorterIds 
+                |> Seq.map (fun id -> k, id))
+            |> Seq.truncate maxReturned
+
+
+
     let getBinsReport
             (prefixes:string [])
             (bins: sorterEvalBins)

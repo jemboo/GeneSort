@@ -68,11 +68,34 @@ module SortingSetFilter =
 
 
 
+    /// Returns up to maxReturned sortings from the center of the distribution.
+    /// Uses a balanced weight for CeCount and StageLength to define the center.
+    let sampleTheCenterBins
+               (maxReturned: int)
+               (sorterEvalBins: sorterEvalBins)
+               (parentSet: sortingSet) : sorting [] =
 
-    //let getSuccessfulSorts 
-    //           (ceCountWeight: float) 
-    //           (stageLengthWeight: float) 
-    //           (sorterEvalBins: sorterEvalBins)
-    //           (sortingSet: sortingSet) : sortingSet =
-    
+        let resultSetMap = SortingResultSetMap.fromSortingSet parentSet
+        let getSuccessfullySorted = true
+        
+        // Define how we calculate the "center". 
+        // Using equal weights for CeCount and StageLength.
+        let orderFunc = SorterEvalKey.byWeighted 1.0 1.0
+
+        let sorterIds = 
+            SorterEvalBins.getUpToNAverageSorterIds
+                orderFunc
+                getSuccessfullySorted
+                maxReturned
+                sorterEvalBins
+            |> Seq.map snd
+
+        let sortingIds = 
+            sorterIds 
+            |> Seq.map (fun id -> resultSetMap.EvalMap.[id].SortingId)
+            |> Seq.distinct
+
+        sortingIds 
+        |> Seq.map parentSet.find 
+        |> Seq.toArray
             
