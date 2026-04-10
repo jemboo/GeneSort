@@ -132,14 +132,13 @@ module SorterEvalBins =
                             |> Seq.map (fun id -> leaf.SorterEvalKey, id))
 
 
-    // Returns up to maxReturned sorter IDs from the bins; filtering by whether they are 
+    // Returns sorter IDs from the bins; filtering by whether they are 
     // successfully sorted or not.
-    // The returned IDs are as close as possible to the center of the distribution of ceCount
+    // The returned IDs are ordered by proximity to the center of the distribution of ceCount
     // and stageLength, as determined by the orderFunc.
-    let getUpToNAverageSorterIds
+    let getAverageSorterIds
             (orderFunc: sorterEvalKey -> float)
             (successfullySorted: bool)
-            (maxReturned: int)
             (source: sorterEvalBins)
             : (sorterEvalKey * Guid<sorterId>) seq =
         
@@ -149,7 +148,7 @@ module SorterEvalBins =
             |> Seq.filter (fun (k, _) -> k.IsSorted = successfullySorted)
             |> Seq.toArray
 
-        if relevantLayers.Length = 0 || maxReturned <= 0 then
+        if relevantLayers.Length = 0 then
             Seq.empty
         else
             // 1. Calculate the weighted average score based on bin density (EvalCount)
@@ -167,7 +166,6 @@ module SorterEvalBins =
             |> Seq.collect (fun (k, leaf) -> 
                 leaf.SorterIds 
                 |> Seq.map (fun id -> k, id))
-            |> Seq.truncate maxReturned
 
 
 

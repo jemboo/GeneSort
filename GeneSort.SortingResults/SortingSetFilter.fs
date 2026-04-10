@@ -78,24 +78,30 @@ module SortingSetFilter =
         let resultSetMap = SortingResultSetMap.fromSortingSet parentSet
         let getSuccessfullySorted = true
         
-        // Define how we calculate the "center". 
-        // Using equal weights for CeCount and StageLength.
+        // Define the center calculation metric
         let orderFunc = SorterEvalKey.byWeighted 1.0 1.0
 
+        // Get the list of sorter IDs sorted by proximity to the average
         let sorterIds = 
-            SorterEvalBins.getUpToNAverageSorterIds
+            SorterEvalBins.getAverageSorterIds
                 orderFunc
                 getSuccessfullySorted
-                maxReturned
                 sorterEvalBins
             |> Seq.map snd
 
         let sortingIds = 
             sorterIds 
-            |> Seq.map (fun id -> resultSetMap.EvalMap.[id].SortingId)
+            // 1. Safely handle potential missing IDs using choose + TryGetValue
+            |> Seq.choose (fun id -> 
+                match resultSetMap.EvalMap.TryGetValue(id) with
+                | true, tag -> Some (ModelSetTag.getSortingParentId tag)
+                | false, _  -> None)
+            // 2. Filter out duplicates (multiple evals pointing to one sorting)
             |> Seq.distinct
 
         sortingIds 
+        // 3. Retrieve the actual sorting object from the parent set
         |> Seq.map parentSet.find 
+        // 4. Enforce the limit on unique sortings
+        |> Seq.truncate maxReturned
         |> Seq.toArray
-            

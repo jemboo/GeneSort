@@ -19,6 +19,8 @@ open GeneSort.FileDb
 
 module MergeRandomSorterBins_P1 =
     
+    let maxCenterSampledSetSize = 200
+
     let sortingWidths() : string*string list =
     //    let values = [4; 6; 8; 12; 16; 18; 20; 22; 24] |> List.map(fun d -> d.ToString())
         let values = [4; 6; 8; 12; 16;] |> List.map(fun d -> d.ToString())
@@ -42,7 +44,7 @@ module MergeRandomSorterBins_P1 =
         (runParameters.startingReplKey, values)
 
     let replSpans () : string * string list =
-        let values = [ 100 ] |> List.map (fun d -> d.ToString())
+        let values = [ 30 ] |> List.map (fun d -> d.ToString())
         (runParameters.replSpanKey, values)
 
     let parameterSpans = 
@@ -159,6 +161,7 @@ module MergeRandomSorterBins =
                 outputDataType.SorterEvalBins "";
                 outputDataType.SortingSet "EvenSampled";
                 outputDataType.SortingSet "HullSampled";
+                outputDataType.SortingSet "CenterSampled";
             |]
 
     let project = 
@@ -199,16 +202,17 @@ module MergeRandomSorterBins =
                 let qpEvalBins = makeQueryParamsFromRunParams 
                                             runParameters 
                                             (outputDataType.SorterEvalBins "")
-                let qpEvenSampledSortingSet = makeQueryParamsFromRunParams 
+
+                let qpEvenSortingSet = makeQueryParamsFromRunParams 
                                                     runParameters 
                                                     (outputDataType.SortingSet "EvenSampled")
 
-                let qpHullSampledSortingSet = makeQueryParamsFromRunParams 
+                let qpHullSortingSet = makeQueryParamsFromRunParams 
                                                     runParameters 
                                                     (outputDataType.SortingSet "HullSampled")
 
 
-                let qpCenterSampledSortingSet = makeQueryParamsFromRunParams 
+                let qpCenterSortingSet = makeQueryParamsFromRunParams 
                                                     runParameters 
                                                     (outputDataType.SortingSet "CenterSampled")
 
@@ -219,8 +223,12 @@ module MergeRandomSorterBins =
                 // This is repeatedly merged with the per-repl sorting sets, and then sampled down to create the even sampled set. 
                 // The hull sampled set is a subset of the even sampled set, so it doesn't need its own merged set - 
                 // the sampling can be done directly on the mergedSorterEvalBins and mergedSortingSet at the end.
-                let mutable mergedSortingSet = sortingSet.create
-                                                    (%qpEvenSampledSortingSet.Id |> UMX.tag<sortingSetId>)
+                let mutable mergedEvenSet = sortingSet.create
+                                                    (%qpEvenSortingSet.Id |> UMX.tag<sortingSetId>)
+                                                    [||]
+
+                let mutable mergedCenterSet = sortingSet.create
+                                                    (%qpCenterSortingSet.Id |> UMX.tag<sortingSetId>)
                                                     [||]
 
                                             
@@ -251,22 +259,34 @@ module MergeRandomSorterBins =
                                                 |> AsyncResult.bind (OutputData.asSortingSet >> AsyncResult.ofResult)
 
                         // merge with the latest repl's data
-                        mergedSortingSet <- SortingSet.merge mergedSortingSet currentSortingSet
+                        mergedEvenSet <- SortingSet.merge mergedEvenSet currentSortingSet
+                        mergedCenterSet <- SortingSet.merge mergedCenterSet currentSortingSet
+
                         // merge the eval bins 
                         mergedSorterEvalBins <- SorterEvalBins.merge mergedSorterEvalBins currentEvalBins
+
                         // sample down to samplesPerBin per bin
-                        mergedSortingSet <-
+                        mergedEvenSet <-
                             sortingSet.create
-                                (%qpEvenSampledSortingSet.Id |> UMX.tag<sortingSetId>)
-                                (SortingSetFilter.sampleBinsEvenly samplesPerBin mergedSorterEvalBins mergedSortingSet)
+                                (%qpEvenSortingSet.Id |> UMX.tag<sortingSetId>)
+                                (SortingSetFilter.sampleBinsEvenly samplesPerBin mergedSorterEvalBins mergedEvenSet)
+
+                        mergedCenterSet <-
+                            sortingSet.create
+                                (%qpCenterSortingSet.Id |> UMX.tag<sortingSetId>)
+                                (SortingSetFilter.sampleTheCenterBins 
+                                        MergeRandomSorterBins_P1.maxCenterSampledSetSize 
+                                        mergedSorterEvalBins 
+                                        mergedCenterSet )
+
 
                         None |> ignore // placeholder for potential per-repl processing
 
                 // 7. Get the convex hull of mergedSortingSet
-                let sHullSampledSortingSet = 
+                let hullSampledSet = 
                             sortingSet.create
-                                (%qpHullSampledSortingSet.Id |> UMX.tag<sortingSetId>)
-                                (SortingSetFilter.sampleBinsConvexHull samplesPerBin mergedSorterEvalBins mergedSortingSet)
+                                (%qpHullSortingSet.Id |> UMX.tag<sortingSetId>)
+                                (SortingSetFilter.sampleBinsConvexHull samplesPerBin mergedSorterEvalBins mergedEvenSet)
 
 
                 // 8. Make Report
@@ -299,36 +319,29 @@ module MergeRandomSorterBins =
 
 
                 //// 9. Saves
-                let qpMergedEvalBins = makeQueryParamsFromRunParams 
-                                            runParameters 
-                                            (outputDataType.SorterEvalBins "")
-
-                let qpMergedEvenSampledSortingSet = makeQueryParamsFromRunParams 
-                                                        runParameters 
-                                                        (outputDataType.SortingSet "EvenSampled")
-                                            
-                let qpMergedHullSampledSortingSet = makeQueryParamsFromRunParams 
-                                                        runParameters 
-                                                        (outputDataType.SortingSet "HullSampled")
-
-
-
+                let qpSorterEvalBins = makeQueryParamsFromRunParams 
+                                                runParameters 
+                                                (outputDataType.SorterEvalBins "")
 
                 let! _ = db.saveAsync 
-                                qpMergedEvalBins 
+                                qpSorterEvalBins 
                                 (mergedSorterEvalBins |> outputData.SorterEvalBins) 
                                 allowOverwrite
 
                 let! _ = db.saveAsync 
-                                qpMergedEvenSampledSortingSet 
-                                (mergedSortingSet |> outputData.SortingSet) 
+                                qpEvenSortingSet 
+                                (mergedEvenSet |> outputData.SortingSet) 
                                 allowOverwrite
 
                 let! _ = db.saveAsync 
-                                qpMergedHullSampledSortingSet 
-                                (sHullSampledSortingSet |> outputData.SortingSet) 
+                                qpHullSortingSet 
+                                (hullSampledSet |> outputData.SortingSet) 
                                 allowOverwrite
 
+                let! _ = db.saveAsync 
+                                qpCenterSortingSet 
+                                (mergedCenterSet |> outputData.SortingSet) 
+                                allowOverwrite
 
                 let! _ = db.saveAsync 
                                 qpMergeReport 
