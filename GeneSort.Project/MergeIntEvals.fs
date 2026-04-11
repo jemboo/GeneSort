@@ -39,7 +39,7 @@ module MergeIntEvals =
                 (runParameters.sortingWidthKey, sortingWidth |> UmxExt.intToString ); 
                 (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString );
                 (runParameters.mergeDimensionKey, mergeDimension |> UmxExt.intToString );
-                (runParameters.mergeSuffixTypeKey, mergeFillType |> Option.map MergeFillType.toString |> UmxExt.stringToString );
+                (runParameters.mergeSuffixTypeKey, mergeFillType |> Option.map MergeSuffixType.toString |> UmxExt.stringToString );
             |]
 
 
@@ -131,11 +131,11 @@ module MergeIntEvals =
         (runParameters.mergeDimensionKey, values)
 
 
-    let mergeFillTypes () : string * string list =
+    let mergeSuffixTypes () : string * string list =
         let values = [ 
                         mergeSuffixType.NoSuffix; 
                         mergeSuffixType.VV_1 
-                     ] |> List.map MergeFillType.toString
+                     ] |> List.map MergeSuffixType.toString
         (runParameters.mergeSuffixTypeKey, values)
 
 
@@ -156,7 +156,7 @@ module MergeIntEvals =
             sorterModelTypes(); 
             sortableDataFormats(); 
             mergeDimensions(); 
-            mergeFillTypes(); 
+            mergeSuffixTypes(); 
         ]
         
     let outputDataTypes = 

@@ -92,7 +92,7 @@ module MergeDimension =
 
 
 
-module MergeFillType =
+module MergeSuffixType =
 
     let toString (t:mergeSuffixType) : string =
         match t with

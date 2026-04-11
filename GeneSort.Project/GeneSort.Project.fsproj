@@ -18,6 +18,7 @@
     <Compile Include="SorterBins\RandomSorterBins.fs" />
     <Compile Include="SorterBins\MergeRandomSorterBins.fs" />
     <Compile Include="SorterBins\RandomMergeSorterBins.fs" />
+    <Compile Include="SorterBins\MergeRandomMergeSorterBins.fs" />
     <Compile Include="FullBoolEvals.fs" />
     <Compile Include="MergeIntEvals.fs" />
     <Compile Include="FullBoolMutate.fs" />

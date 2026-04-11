@@ -127,7 +127,7 @@ module SortableMergeTests_P2 =
         let values = [ 
                         mergeSuffixType.NoSuffix; 
                         mergeSuffixType.VV_1 
-                     ] |> List.map MergeFillType.toString
+                     ] |> List.map MergeSuffixType.toString
         (runParameters.mergeSuffixTypeKey, values)
 
     let parameterSpans = 
@@ -163,7 +163,7 @@ module SortableMergeTests =
             [|
                 (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
                 (runParameters.mergeDimensionKey, mergeDimension |> MergeDimension.toString);
-                (runParameters.mergeSuffixTypeKey, mergeFillType |> Option.map MergeFillType.toString |> UmxExt.stringToString );
+                (runParameters.mergeSuffixTypeKey, mergeFillType |> Option.map MergeSuffixType.toString |> UmxExt.stringToString );
                 (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringToString );
             |]
 

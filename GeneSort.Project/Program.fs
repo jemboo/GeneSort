@@ -102,6 +102,7 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 //let maxReplica = 1<replNumber>
 
 
+
 ///// **********     RandomSorterBins   ****************
 //let executor = RandomSorterBins.executor
 //let project = RandomSorterBins.project
@@ -113,17 +114,16 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 //let minReplica = 0<replNumber>
 //let maxReplica = 100<replNumber>
 
-
 /////// **********  MergeRandomSorterBins   ****************
-let executor = MergeRandomSorterBins.executor
-let project = MergeRandomSorterBins.project
-let projectName = MergeRandomSorterBins.project.ProjectName
-let projectFolder = MergeRandomSorterBins.projectFolder
-let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
-let buildQueryParams = MergeRandomSorterBins.makeQueryParamsFromRunParams
-let paramRefiner = MergeRandomSorterBins.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+//let executor = MergeRandomSorterBins.executor
+//let project = MergeRandomSorterBins.project
+//let projectName = MergeRandomSorterBins.project.ProjectName
+//let projectFolder = MergeRandomSorterBins.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+//let buildQueryParams = MergeRandomSorterBins.makeQueryParamsFromRunParams
+//let paramRefiner = MergeRandomSorterBins.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 
@@ -135,8 +135,20 @@ let maxReplica = 1<replNumber>
 //let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
 //let buildQueryParams = RandomMergeSorterBins.makeQueryParamsFromRunParams
 //let paramRefiner = RandomMergeSorterBins.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+//let minReplica = 1<replNumber>
+//let maxReplica = 4<replNumber>
+
+/////// **********  MergeRandomMergeSorterBins   ****************
+let executor = MergeRandomMergeSorterBins.executor
+let project = MergeRandomMergeSorterBins.project
+let projectName = MergeRandomMergeSorterBins.project.ProjectName
+let projectFolder = MergeRandomMergeSorterBins.projectFolder
+let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+let buildQueryParams = MergeRandomMergeSorterBins.makeQueryParamsFromRunParams
+let paramRefiner = MergeRandomMergeSorterBins.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
+
 
 
 ///// **********    FullBoolMutate   ****************

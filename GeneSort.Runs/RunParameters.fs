@@ -72,7 +72,7 @@ type runParameters =
     member this.GetMergeDimension() = runParameters.tryGetInt runParameters.mergeDimensionKey this.paramMap |> Option.map UMX.tag<mergeDimension>
     
     member this.GetMergeSuffixType() = 
-        this.paramMap.TryFind runParameters.mergeSuffixTypeKey |> Option.bind (fun v -> try Some (MergeFillType.fromString v) with _ -> None)
+        this.paramMap.TryFind runParameters.mergeSuffixTypeKey |> Option.bind (fun v -> try Some (MergeSuffixType.fromString v) with _ -> None)
 
     member this.GetMutationRate() = runParameters.tryGetFloat runParameters.mutationRateKey this.paramMap |> Option.map UMX.tag<mutationRate>
     member this.GetProjectName() = this.paramMap.TryFind runParameters.projectNameKey |> Option.map UMX.tag<projectName>
@@ -115,7 +115,7 @@ type runParameters =
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeDimensionKey (md |> Option.map UmxExt.intToRaw) }
 
     member this.WithMergeSuffixType(mft: mergeSuffixType option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeSuffixTypeKey (mft |> Option.map MergeFillType.toString) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeSuffixTypeKey (mft |> Option.map MergeSuffixType.toString) }
 
     member this.WithMessage(message: string option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.messageKey message }

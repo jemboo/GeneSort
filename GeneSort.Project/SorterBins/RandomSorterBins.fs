@@ -148,35 +148,7 @@ module RandomSorterBins =
             | 20 -> 130 |> UMX.tag<stageLength>
             | 22 -> 140 |> UMX.tag<stageLength>
             | 24 -> 200 |> UMX.tag<stageLength>
-            | 32 ->  match smt with
-                        | sorterModelType.Msce -> 300 |> UMX.tag<stageLength>
-                        | sorterModelType.Mssi -> 300 |> UMX.tag<stageLength>
-                        | sorterModelType.Msrs -> 300 |> UMX.tag<stageLength>
-                        | sorterModelType.Msuf4 -> 600 |> UMX.tag<stageLength>
-                        | _ -> failwithf "Unsupported sorter model type: %A" smt
-
-            | 64 -> match smt with
-                        | sorterModelType.Msce -> 600 |> UMX.tag<stageLength>
-                        | sorterModelType.Mssi -> 600 |> UMX.tag<stageLength>
-                        | sorterModelType.Msrs -> 800 |> UMX.tag<stageLength>
-                        | sorterModelType.Msuf4 -> 2000 |> UMX.tag<stageLength>
-                        | _ -> failwithf "Unsupported sorter model type: %A" smt
-
-            | 128 -> match smt with
-                        | sorterModelType.Msce -> 1200 |> UMX.tag<stageLength>
-                        | sorterModelType.Mssi -> 1500 |> UMX.tag<stageLength>
-                        | sorterModelType.Msrs -> 1800 |> UMX.tag<stageLength>
-                        | sorterModelType.Msuf4 -> 4000 |> UMX.tag<stageLength>
-                        | _ -> failwithf "Unsupported sorter model type: %A" smt
-
-            | 256 -> match smt with
-                        | sorterModelType.Msce -> 3000 |> UMX.tag<stageLength>
-                        | sorterModelType.Mssi -> 3000 |> UMX.tag<stageLength>
-                        | sorterModelType.Msrs -> 4000 |> UMX.tag<stageLength>
-                        | sorterModelType.Msuf4 -> 6000 |> UMX.tag<stageLength>
-                        | _ -> failwithf "Unsupported sorter model type: %A" smt
             | _ -> failwithf "Unsupported sorting width: %d" (%sortingWidth)
-
 
 
 
