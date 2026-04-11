@@ -287,7 +287,7 @@ module MergeRandomMergeSorterBins =
     let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
         seq {
             for runParameters in runParametersSeq do
-                    let filtrate = MergeRandomMergeSorterBins_P1.paramMapFilter runParameters
+                    let filtrate = MergeRandomMergeSorterBins_P2.paramMapFilter runParameters
                     if filtrate.IsSome then
                         let retVal = filtrate.Value |> enhancer
                         yield retVal
@@ -308,7 +308,7 @@ module MergeRandomMergeSorterBins =
                 projectName 
                 projectDesc
                 outputDataTypes
-                MergeRandomMergeSorterBins_P1.parameterSpans
+                MergeRandomMergeSorterBins_P2.parameterSpans
 
 
 
@@ -361,6 +361,12 @@ module MergeRandomMergeSorterBins =
                                                     runParameters 
                                                     (outputDataType.SortingSet "CenterSampled")
 
+
+                let qpWinningSortingSet = makeQueryParamsFromRunParams 
+                                                    runParameters 
+                                                    (outputDataType.SortingSet "WinningSampled")
+
+
                 // 4. create the repl collectors 
                 let mutable mergedSorterEvalBins = sorterEvalBins.createEmpty
                                                         (%qpSorterEvalBins.Id |> UMX.tag<sorterEvalBinsId>)
@@ -374,6 +380,10 @@ module MergeRandomMergeSorterBins =
 
                 let mutable mergedCenterSet = sortingSet.create
                                                     (%qpCenterSortingSet.Id |> UMX.tag<sortingSetId>)
+                                                    [||]
+
+                let mutable mergedWinningSet = sortingSet.create
+                                                    (%qpWinningSortingSet.Id |> UMX.tag<sortingSetId>)
                                                     [||]
 
                                             
@@ -411,6 +421,7 @@ module MergeRandomMergeSorterBins =
                         // merge with the latest repl's data
                         mergedEvenSet <- SortingSet.merge mergedEvenSet currentSortingSet
                         mergedCenterSet <- SortingSet.merge mergedCenterSet currentSortingSet
+                        mergedWinningSet <- SortingSet.merge mergedWinningSet currentSortingSet
 
                         // merge the eval bins 
                         mergedSorterEvalBins <- SorterEvalBins.merge mergedSorterEvalBins currentEvalBins
@@ -428,6 +439,14 @@ module MergeRandomMergeSorterBins =
                                         MergeRandomSorterBins_P1.maxCenterSampledSetSize 
                                         mergedSorterEvalBins 
                                         mergedCenterSet )
+
+                        mergedWinningSet <-
+                            sortingSet.create
+                                (%qpWinningSortingSet.Id |> UMX.tag<sortingSetId>)
+                                (SortingSetFilter.sampleWinningBins 
+                                        MergeRandomSorterBins_P1.maxCenterSampledSetSize 
+                                        mergedSorterEvalBins 
+                                        mergedWinningSet )
 
 
                         None |> ignore // placeholder for potential per-repl processing
@@ -490,6 +509,11 @@ module MergeRandomMergeSorterBins =
                 let! _ = db.saveAsync 
                                 qpCenterSortingSet 
                                 (mergedCenterSet |> outputData.SortingSet) 
+                                allowOverwrite
+
+                let! _ = db.saveAsync 
+                                qpWinningSortingSet 
+                                (mergedWinningSet |> outputData.SortingSet) 
                                 allowOverwrite
 
                 let! _ = db.saveAsync 

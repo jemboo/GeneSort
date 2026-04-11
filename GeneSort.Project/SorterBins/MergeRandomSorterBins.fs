@@ -216,6 +216,10 @@ module MergeRandomSorterBins =
                                                     runParameters 
                                                     (outputDataType.SortingSet "CenterSampled")
 
+                let qpWinningSortingSet = makeQueryParamsFromRunParams 
+                                                    runParameters 
+                                                    (outputDataType.SortingSet "WinningSampled")
+
                 // 4. create the repl collectors 
                 let mutable mergedSorterEvalBins = sorterEvalBins.createEmpty
                                                         (%qpSorterEvalBins.Id |> UMX.tag<sorterEvalBinsId>)
@@ -231,7 +235,11 @@ module MergeRandomSorterBins =
                                                     (%qpCenterSortingSet.Id |> UMX.tag<sortingSetId>)
                                                     [||]
 
-                                            
+                let mutable mergedWinningSet = sortingSet.create
+                                                    (%qpWinningSortingSet.Id |> UMX.tag<sortingSetId>)
+                                                    [||]
+
+
                 // 5.  Get the database for the RandomSorterBins project - this is where the per-repl data will be loaded from
                 let dbRandomSorterBins = new GeneSortDbMp(RandomSorterBins.projectFolder) :> IGeneSortDb
 
@@ -261,6 +269,7 @@ module MergeRandomSorterBins =
                         // merge with the latest repl's data
                         mergedEvenSet <- SortingSet.merge mergedEvenSet currentSortingSet
                         mergedCenterSet <- SortingSet.merge mergedCenterSet currentSortingSet
+                        mergedWinningSet <- SortingSet.merge mergedWinningSet currentSortingSet
 
                         // merge the eval bins 
                         mergedSorterEvalBins <- SorterEvalBins.merge mergedSorterEvalBins currentEvalBins
@@ -278,6 +287,14 @@ module MergeRandomSorterBins =
                                         MergeRandomSorterBins_P1.maxCenterSampledSetSize 
                                         mergedSorterEvalBins 
                                         mergedCenterSet )
+
+                        mergedWinningSet <-
+                            sortingSet.create
+                                (%qpWinningSortingSet.Id |> UMX.tag<sortingSetId>)
+                                (SortingSetFilter.sampleWinningBins 
+                                        MergeRandomSorterBins_P1.maxCenterSampledSetSize 
+                                        mergedSorterEvalBins 
+                                        mergedWinningSet )
 
 
                         None |> ignore // placeholder for potential per-repl processing
@@ -338,6 +355,11 @@ module MergeRandomSorterBins =
                 let! _ = db.saveAsync 
                                 qpCenterSortingSet 
                                 (mergedCenterSet |> outputData.SortingSet) 
+                                allowOverwrite
+
+                let! _ = db.saveAsync 
+                                qpWinningSortingSet 
+                                (mergedWinningSet |> outputData.SortingSet) 
                                 allowOverwrite
 
                 let! _ = db.saveAsync 

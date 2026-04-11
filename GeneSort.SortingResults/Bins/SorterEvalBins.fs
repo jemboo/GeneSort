@@ -169,6 +169,30 @@ module SorterEvalBins =
 
 
 
+    // Returns sorter IDs from the bins; filtering by whether they are 
+    // successfully sorted or not.
+    // The returned have the lowest values of ceCount and stageLength,
+    // as determined by the orderFunc.
+    let getWinningSorterIds
+            (orderFunc: sorterEvalKey -> float)
+            (successfullySorted: bool)
+            (source: sorterEvalBins)
+            : (sorterEvalKey * Guid<sorterId>) seq =
+
+        source.Layers
+        |> Map.toSeq
+        // 1. Filter for success/failure status
+        |> Seq.filter (fun (key, _) -> key.IsSorted = successfullySorted)
+        // 2. Sort the bins by the orderFunc (lowest score wins)
+        |> Seq.sortBy (fun (key, _) -> orderFunc key)
+        // 3. Expand the IDs within those bins
+        |> Seq.collect (fun (key, leaf) ->
+            leaf.SorterIds 
+            |> Seq.map (fun id -> key, id))
+
+        
+
+
     let getBinsReport
             (prefixes:string [])
             (bins: sorterEvalBins)
