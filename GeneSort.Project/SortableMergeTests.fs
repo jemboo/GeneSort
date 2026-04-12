@@ -145,7 +145,7 @@ module SortableMergeTests_P2 =
 module SortableMergeTests =
 
     let projectName = "SortableMergeTests" |> UMX.tag<projectName>
-    let projectFolder = "c:\\Projects\\SortableMergeTests" |> UMX.tag<pathToProjectFolder>
+    let projectFolder = "c:\\Projects\\SortableMergeTests\\Data" |> UMX.tag<pathToProjectFolder>
     let projectDesc = "Calc and save large SortableMergeTests"
 
     let makeQueryParams 

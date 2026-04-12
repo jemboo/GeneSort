@@ -22,8 +22,8 @@ module MergeRandomSorterBins_P1 =
     let maxCenterSampledSetSize = 200
 
     let sortingWidths() : string*string list =
-    //    let values = [4; 6; 8; 12; 16; 18; 20; 22; 24] |> List.map(fun d -> d.ToString())
-        let values = [4; 6; 8; 12; 16;] |> List.map(fun d -> d.ToString())
+        let values = [4; 6; 8; 12; 16; 18; 20; 22; 24] |> List.map(fun d -> d.ToString())
+     //   let values = [4; 6; 8; 12; 16;] |> List.map(fun d -> d.ToString())
         (runParameters.sortingWidthKey, values)
 
 
@@ -44,7 +44,7 @@ module MergeRandomSorterBins_P1 =
         (runParameters.startingReplKey, values)
 
     let replSpans () : string * string list =
-        let values = [ 30 ] |> List.map (fun d -> d.ToString())
+        let values = [ 100 ] |> List.map (fun d -> d.ToString())
         (runParameters.replSpanKey, values)
 
     let parameterSpans = 

@@ -168,7 +168,7 @@ module MergeRandomMergeSorterBins_P2 =
 
     let sortingWidths() : string*string list =
     //    let values = [ 16; 32; 48; ] |> List.map(fun d -> d.ToString())
-        let values = [ 16; 32; 48; ] |> List.map string
+        let values = [ 16; 32; 48; 64; 96; 128 ] |> List.map string
         (runParameters.sortingWidthKey, values)
 
 
@@ -184,7 +184,7 @@ module MergeRandomMergeSorterBins_P2 =
 
 
     let mergeDimensions () : string * string list =
-        let values = [ 2; 3; 4; ] |> List.map string
+        let values = [ 8;] |> List.map string
         (runParameters.mergeDimensionKey, values)
 
     let mergeSuffixTypes () : string * string list =
@@ -201,7 +201,7 @@ module MergeRandomMergeSorterBins_P2 =
 
 
     let replSpans () : string * string list =
-        let values = [ 4 ] |> List.map (fun d -> d.ToString())
+        let values = [ 85 ] |> List.map (fun d -> d.ToString())
         (runParameters.replSpanKey, values)
 
 
