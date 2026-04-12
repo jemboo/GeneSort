@@ -307,7 +307,7 @@ module ProjectOps =
         }
 
 
-    let printRunParams
+    let printRunParamsTable
             (db: IGeneSortDb)
             (minReplNumber: int<replNumber>)
             (maxReplNumber: int<replNumber>)
@@ -315,49 +315,25 @@ module ProjectOps =
             (progress: IProgress<string> option) =
         asyncResult {
             try
-                report progress (sprintf "Reporting Runs from %s\n" %db.projectFolder)
+                report progress (sprintf "Displaying Source Table for %s\n" %db.projectFolder)
 
-                // 1. Load Parameters (Auto-handles Error short-circuit)
                 let! runParametersArray = 
                     db.getProjectRunParametersForReplRangeAsync (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
 
-                report progress (sprintf "Found %d runs to report\n" runParametersArray.Length)
-
                 if runParametersArray.Length = 0 then
-                    report progress "No runs found to report\n"
-                    return [||]
+                    report progress "No runs found to display.\n"
                 else
-
-                // Format and print the source table
-                let sourceTableRows = makeSourceTable runParametersArray
-                sourceTableRows |> Array.iter (report progress)
-
-                let maxDegreeOfParallelism = 1
-                let! results = 
-                    reportRunParametersSeq maxDegreeOfParallelism runParametersArray cts progress
-                    |> Async.map Ok
-
-                let summary = RunResult.analyze results
+                    let sourceTableRows = makeSourceTable runParametersArray
+                    sourceTableRows |> Array.iter (report progress)
+                    report progress (sprintf "\nFound %d run configurations.\n" runParametersArray.Length)
             
-                report progress (sprintf "--- Report Summary ---")
-                report progress (sprintf "Successfully verified: %d/%d" summary.Successes summary.Total)
-            
-                if summary.MissingLog.Length > 0 then
-                    report progress (sprintf "\nFound %d missing runs:" summary.MissingLog.Length)
-                    summary.MissingLog |> Array.iter (report progress)
-
-                if summary.IssueLog.Length > 0 then
-                    report progress (sprintf "\nFound %d issues/crashes:" summary.IssueLog.Length)
-                    summary.IssueLog |> Array.iter (report progress)
-
-                return results
-
+                // Return unit instead of an array
+                return () 
             with e ->
-                let msg = sprintf "Fatal error reporting runs: %s" e.Message
+                let msg = sprintf "Error displaying source table: %s" e.Message
                 report progress msg
                 return! async { return Error msg }
         }
-
 
 
     let executeRuns

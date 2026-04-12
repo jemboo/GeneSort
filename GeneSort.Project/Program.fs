@@ -135,8 +135,8 @@ let projectFolder = RandomMergeSorterBins.projectFolder
 let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
 let buildQueryParams = RandomMergeSorterBins.makeQueryParamsFromRunParams
 let paramRefiner = RandomMergeSorterBins.paramMapRefiner
-let minReplica = 85<replNumber>
-let maxReplica = 100<replNumber>
+let minReplica = 0<replNumber>
+let maxReplica = 4<replNumber>
 
 /////// **********  MergeRandomMergeSorterBins   ****************
 //let executor = MergeRandomMergeSorterBins.executor
@@ -163,34 +163,37 @@ let maxReplica = 100<replNumber>
 //let maxReplica = 1<replNumber>
 
 
-printfn "Initializing Project..."
-let initResult = 
-    ProjectOps.initProjectAndRunFiles geneSortDb buildQueryParams cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
-    |> Async.RunSynchronously
-
-
-match initResult with
-| Ok () -> printfn "Project files initialized successfully."
-| Error e -> printfn "Init Failed: %s" e
-
-
-printfn "Executing Runs..."
-let execResult = 
-    ProjectOps.executeRuns geneSortDb minReplica maxReplica buildQueryParams projectName allowOverwrite cts (Some progress) executor maxParallel
-    |> Async.RunSynchronously
-
-
-match execResult with
-| Ok results -> printfn "Execution complete. %d results processed." results.Length
-| Error e -> printfn "Execution Failed: %s" e
-
-
-
-
-//printfn "Printing RunParams..."
-//let reportResult = 
-//    ProjectOps.printRunParams geneSortDb projectFolder minReplica maxReplica cts (Some progress)
+//printfn "Initializing Project..."
+//let initResult = 
+//    ProjectOps.initProjectAndRunFiles geneSortDb buildQueryParams cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
 //    |> Async.RunSynchronously
+
+
+//match initResult with
+//| Ok () -> printfn "Project files initialized successfully."
+//| Error e -> printfn "Init Failed: %s" e
+
+
+//printfn "Executing Runs..."
+//let execResult = 
+//    ProjectOps.executeRuns geneSortDb minReplica maxReplica buildQueryParams projectName allowOverwrite cts (Some progress) executor maxParallel
+//    |> Async.RunSynchronously
+
+
+//match execResult with
+//| Ok results -> printfn "Execution complete. %d results processed." results.Length
+//| Error e -> printfn "Execution Failed: %s" e
+
+
+
+
+printfn "Printing RunParams..."
+
+ProjectOps.printRunParamsTable geneSortDb minReplica maxReplica cts (Some progress)
+    |> Async.RunSynchronously
+    |> function
+        | Ok ()      -> () // Success, table was printed
+        | Error msg  -> printfn "Failed: %s" msg
 
 //printfn "Making Use Profile report ..."
 
@@ -208,6 +211,7 @@ match execResult with
 
 let endTime = System.DateTime.Now
 let duration = endTime - startTime
+System.Threading.Thread.Sleep(100)
 printfn $"**************** All done ******************"
 printfn $"****************  {duration.ToString()} ******************"
 
