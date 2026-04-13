@@ -236,7 +236,8 @@ module ProjectOps =
         (minReplica: int<replNumber>)
         (maxReplica: int<replNumber>)
         (allowOverwrite: bool<allowOverwrite>)
-        (paramRefiner: runParameters seq -> runParameters seq) : Async<Result<unit, string>> =
+        (paramRefiner: runParameters seq -> runParameters seq) 
+        (parameterSpans: (string * string list) list) : Async<Result<unit, string>> =
         async {
             try
                 report progress (sprintf "%s Saving project file: %s" (MathUtils.getTimestampString()) %project.ProjectName)
@@ -245,7 +246,7 @@ module ProjectOps =
                 match saveProjRes with
                 | Error err -> return Error err
                 | Ok () ->
-                    let runParametersArray = Project.makeRunParameters minReplica maxReplica project.ParameterSpans paramRefiner |> Seq.toArray
+                    let runParametersArray = Project.makeRunParameters minReplica maxReplica parameterSpans paramRefiner |> Seq.toArray
                     report progress (sprintf "%s Saving run parameters files: (%d)" (MathUtils.getTimestampString()) runParametersArray.Length)
                     return! saveParametersFiles 
                                 db

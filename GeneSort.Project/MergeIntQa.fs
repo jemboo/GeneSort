@@ -191,8 +191,7 @@ module MergeIntQa =
                 projectName 
                 projectDesc
                 outputDataTypes
-                parameterSpans
-
+             
 
     let executor
             (db: IGeneSortDb)

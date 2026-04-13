@@ -308,7 +308,6 @@ module MergeRandomMergeSorterBins =
                 projectName 
                 projectDesc
                 outputDataTypes
-                MergeRandomMergeSorterBins_P2.parameterSpans
 
 
 

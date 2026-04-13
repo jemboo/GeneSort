@@ -42,7 +42,9 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 ///// **********     RandomSorters   ****************
-//let executor = RandomSorters.executor
+//let host = RandomSorters.randomSortersHost1
+//let parameterSpans = RandomSorters.parameterSpans
+//let executor = RandomSorters.executor host
 //let project = RandomSorters.project
 //let projectName = RandomSorters.project.ProjectName
 //let projectFolder = RandomSorters.projectFolder
@@ -54,27 +56,29 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 ///// **********     SortableMergeTests   ****************
+//let host = SortableMergeTests.P2.host
 //let project = SortableMergeTests.project
-//let executor = SortableMergeTests.executor
+//let executor = SortableMergeTests.executor host
 //let projectName = SortableMergeTests.projectName
 //let projectFolder = SortableMergeTests.projectFolder
 //let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
 //let buildQueryParams = SortableMergeTests.makeQueryParamsFromRunParams
-//let paramRefiner = SortableMergeTests.paramMapRefiner
+//let paramRefiner = SortableMergeTests.paramMapRefiner host
 //let minReplica = 0<replNumber>
 //let maxReplica = 1<replNumber>
 
 
 /// **********     MergeIntEvals   ****************
-//let executor = MergeIntEvals.executor
-//let project = MergeIntEvals.project
-//let projectName = MergeIntEvals.project.ProjectName
-//let projectFolder = MergeIntEvals.projectFolder
-//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
-//let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
-//let paramRefiner = MergeIntEvals.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+let host = MergeIntEvals.P1.host
+let executor = MergeIntEvals.executor host
+let project = MergeIntEvals.project
+let projectName = MergeIntEvals.project.ProjectName
+let projectFolder = MergeIntEvals.projectFolder
+let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+let buildQueryParams = MergeIntEvals.makeQueryParamsFromRunParams
+let paramRefiner = MergeIntEvals.paramMapRefiner host
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
 
@@ -127,16 +131,16 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 
-///// **********     RandomMergeSorterBins   ****************
-let executor = RandomMergeSorterBins.executor
-let project = RandomMergeSorterBins.project
-let projectName = RandomMergeSorterBins.project.ProjectName
-let projectFolder = RandomMergeSorterBins.projectFolder
-let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
-let buildQueryParams = RandomMergeSorterBins.makeQueryParamsFromRunParams
-let paramRefiner = RandomMergeSorterBins.paramMapRefiner
-let minReplica = 0<replNumber>
-let maxReplica = 4<replNumber>
+/////// **********     RandomMergeSorterBins   ****************
+//let executor = RandomMergeSorterBins.executor
+//let project = RandomMergeSorterBins.project
+//let projectName = RandomMergeSorterBins.project.ProjectName
+//let projectFolder = RandomMergeSorterBins.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+//let buildQueryParams = RandomMergeSorterBins.makeQueryParamsFromRunParams
+//let paramRefiner = RandomMergeSorterBins.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 4<replNumber>
 
 /////// **********  MergeRandomMergeSorterBins   ****************
 //let executor = MergeRandomMergeSorterBins.executor
@@ -163,37 +167,70 @@ let maxReplica = 4<replNumber>
 //let maxReplica = 1<replNumber>
 
 
-//printfn "Initializing Project..."
-//let initResult = 
-//    ProjectOps.initProjectAndRunFiles geneSortDb buildQueryParams cts (Some progress) project minReplica maxReplica allowOverwrite paramRefiner 
-//    |> Async.RunSynchronously
+/// **********    MutateSortingSet   ****************
+//let host = MutateSortingSet.mutateSortingSetHost1
+//let executor = MutateSortingSet.executor host
+//let project = MutateSortingSet.project
+//let projectName = MutateSortingSet.project.ProjectName
+//let projectFolder = MutateSortingSet.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+//let buildQueryParams = MutateSortingSet.makeQueryParamsFromRunParams
+//let paramRefiner = MutateSortingSet.paramMapRefiner
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
-//match initResult with
-//| Ok () -> printfn "Project files initialized successfully."
-//| Error e -> printfn "Init Failed: %s" e
-
-
-//printfn "Executing Runs..."
-//let execResult = 
-//    ProjectOps.executeRuns geneSortDb minReplica maxReplica buildQueryParams projectName allowOverwrite cts (Some progress) executor maxParallel
-//    |> Async.RunSynchronously
-
-
-//match execResult with
-//| Ok results -> printfn "Execution complete. %d results processed." results.Length
-//| Error e -> printfn "Execution Failed: %s" e
-
-
-
-
-printfn "Printing RunParams..."
-
-ProjectOps.printRunParamsTable geneSortDb minReplica maxReplica cts (Some progress)
+printfn "Initializing Project..."
+let initResult = 
+    ProjectOps.initProjectAndRunFiles
+                geneSortDb 
+                buildQueryParams 
+                cts 
+                (Some progress) 
+                project 
+                minReplica 
+                maxReplica 
+                allowOverwrite 
+                paramRefiner
+                host.ParameterSpans
     |> Async.RunSynchronously
-    |> function
-        | Ok ()      -> () // Success, table was printed
-        | Error msg  -> printfn "Failed: %s" msg
+
+
+match initResult with
+| Ok () -> printfn "Project files initialized successfully."
+| Error e -> printfn "Init Failed: %s" e
+
+
+printfn "Executing Runs..."
+let execResult = 
+    ProjectOps.executeRuns 
+                geneSortDb 
+                minReplica 
+                maxReplica 
+                buildQueryParams 
+                projectName 
+                allowOverwrite 
+                cts 
+                (Some progress) 
+                executor 
+                maxParallel
+    |> Async.RunSynchronously
+
+
+match execResult with
+| Ok results -> printfn "Execution complete. %d results processed." results.Length
+| Error e -> printfn "Execution Failed: %s" e
+
+
+
+
+//printfn "Printing RunParams..."
+
+//ProjectOps.printRunParamsTable geneSortDb minReplica maxReplica cts (Some progress)
+//    |> Async.RunSynchronously
+//    |> function
+//        | Ok ()      -> () // Success, table was printed
+//        | Error msg  -> printfn "Failed: %s" msg
 
 //printfn "Making Use Profile report ..."
 

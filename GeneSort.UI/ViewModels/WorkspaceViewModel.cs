@@ -24,7 +24,6 @@ namespace GeneSort.UI.ViewModels
 
             Name = project.ProjectName;
             Description = project.Description;
-            ParameterKeys = project.ParameterKeys.ToList();
 
             //foreach (var rp in project.RunParametersArray)
             //{

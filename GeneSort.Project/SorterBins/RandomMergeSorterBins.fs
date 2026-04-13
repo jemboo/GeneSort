@@ -383,7 +383,6 @@ module RandomMergeSorterBins =
                 projectName 
                 projectDesc
                 outputDataTypes
-                RandomMergeSorterBins_P1.parameterSpans
 
 
     let executor

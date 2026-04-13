@@ -322,7 +322,7 @@ namespace GeneSort.UI.ViewModels
             //dataGrid.Columns.Add(indexColumn);
 
             // Add columns for each parameter key
-            var parameterKeys = project.ParameterKeys;
+            var parameterKeys = Enumerable.Empty<string>();
             if (parameterKeys != null)
             {
                 foreach (var key in parameterKeys.OrderBy(k => k))

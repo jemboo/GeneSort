@@ -147,7 +147,6 @@ module FullBoolEvals =
                 projectName 
                 projectDesc
                 outputDataTypes
-                parameterSpans
 
     let executor
             (db: IGeneSortDb)

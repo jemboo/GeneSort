@@ -19,7 +19,6 @@ type projectDto =
         [<MessagePack.Key(0)>] ProjectName: string
         [<MessagePack.Key(1)>] Description: string
         [<MessagePack.Key(3)>] OutputDataTypes: outputDataTypeDto []
-        [<MessagePack.Key(5)>] ParameterSpans: parameterSpanDto []
     }
 
 module ProjectDto =
@@ -28,9 +27,6 @@ module ProjectDto =
             ProjectName = %project.ProjectName
             Description = project.Description
             OutputDataTypes = project.OutputDataTypes |> Array.map(OutputDataTypeDto.fromDomain)
-            ParameterSpans = project.ParameterSpans
-                            |> List.map (fun (k, vs) -> { Key = k; Values = vs |> List.toArray })
-                            |> List.toArray
         }
 
     let toDomain (dto: projectDto) : project =
@@ -38,4 +34,3 @@ module ProjectDto =
           (dto.ProjectName |> UMX.tag<projectName> )
           dto.Description
           (dto.OutputDataTypes |> Array.map(OutputDataTypeDto.toDomain))
-          (dto.ParameterSpans |> Array.toList |> List.map (fun ps -> ps.Key, ps.Values |> Array.toList))

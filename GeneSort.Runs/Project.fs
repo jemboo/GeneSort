@@ -10,8 +10,6 @@ type project =
         {
           projectName: string<projectName>
           description: string
-          parameterSpans: (string * string list) list
-          parameterKeys: string array
           outputDataTypes: outputDataType array
         }
     with
@@ -19,27 +17,18 @@ type project =
     static member create
             (projectName: string<projectName>)
             (description: string)
-            (outputDataTypes: outputDataType array) 
-            (parameterSpans: (string * string list) list) : project =
+            (outputDataTypes: outputDataType array) : project =
 
         if String.IsNullOrWhiteSpace %projectName then
             failwith "Project name cannot be empty"
         {
           projectName = projectName
           description = description
-          parameterSpans = parameterSpans
           outputDataTypes = outputDataTypes
-          parameterKeys =
-                if parameterSpans.Length = 0 then
-                    [||]
-                else
-                    parameterSpans |> List.map(fst) |> List.toArray
         }
 
     member this.ProjectName with get () = this.projectName
     member this.Description with get () = this.description
-    member this.ParameterSpans with get() = this.parameterSpans
-    member this.ParameterKeys with get() = this.parameterKeys
     member this.OutputDataTypes with get() = this.outputDataTypes
 
 

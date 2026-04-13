@@ -160,7 +160,6 @@ module FullBoolMutate =
                 projectName 
                 projectDesc
                 outputDataTypes
-                parameterSpans
 
     let executor
             (db: IGeneSortDb)

@@ -169,7 +169,6 @@ module MergeRandomSorterBins =
                 projectName 
                 projectDesc
                 outputDataTypes
-                MergeRandomSorterBins_P1.parameterSpans
 
 
     let executor

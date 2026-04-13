@@ -56,4 +56,3 @@ type ProjectTests() =
             ("TestProject"  |> UMX.tag<projectName>)
             "Test Description"
             outputDataTypes
-            parameterSpans
