@@ -402,7 +402,7 @@ module MergeRandomMergeSorterBins =
 
     
                         let! currentEvalBins = dbRandomMergeSorterBins.loadAsync qpCurrentEvalBins
-                                                |> AsyncResult.bind (OutputData.asSorterEvalBins >> AsyncResult.ofResult)
+                                                |> AsyncResult.bindResult OutputData.asSorterEvalBins
 
 
                         let qpCurrentSortingSet = RandomMergeSorterBins.makeQueryParams  
@@ -415,7 +415,7 @@ module MergeRandomMergeSorterBins =
 
 
                         let! currentSortingSet = dbRandomMergeSorterBins.loadAsync qpCurrentSortingSet
-                                                |> AsyncResult.bind (OutputData.asSortingSet >> AsyncResult.ofResult)
+                                                |> AsyncResult.bindResult OutputData.asSortingSet
 
                         // merge with the latest repl's data
                         mergedEvenSet <- SortingSet.merge mergedEvenSet currentSortingSet

@@ -7,6 +7,13 @@ open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.FileDb
 open GeneSort.Model.Sorting
+open GeneSort.Model.Sorting.Sorter.Ce
+open GeneSort.Model.Sorting.Sorter.Si
+open GeneSort.Model.Sorting.Sorter.Rs
+open GeneSort.Model.Sorting.Sorter.Uf4
+open GeneSort.Model.Sorting.Sorter.Uf6
+open System
+open System.Threading
 
 type randomSortersHost = 
     private { 
@@ -135,3 +142,73 @@ module RandomSorters =
           .WithCeLength(Some ceLength)
           .WithStageLength(Some stageLength)
           .WithSorterCount(Some sorterCount)
+
+
+    let paramMapRefiner (host: randomSortersHost) (runParametersSeq: runParameters seq) : runParameters seq = 
+            runParametersSeq 
+            |> Seq.choose host.Filter 
+            |> Seq.map (enhancer host)
+            |> Seq.toArray
+            |> Array.toSeq
+
+    // --- Helper for Model Generation ---
+    let private getModelGen (smt: sorterModelType) sw sl cl =
+        match smt with
+        | sorterModelType.Msce -> 
+            msceRandGen.create rngFactory sw excludeSelfCe cl |> sorterModelGen.SmmMsceRandGen
+        | sorterModelType.Mssi -> 
+            mssiRandGen.create rngFactory sw sl |> sorterModelGen.SmmMssiRandGen
+        | sorterModelType.Msrs -> 
+            let rates = OpsGenRatesArray.createUniform %sl
+            msrsRandGen.create rngFactory sw rates |> sorterModelGen.SmmMsrsRandGen
+        | sorterModelType.Msuf4 -> 
+            let rates = Uf4GenRatesArray.createUniform %sl %sw
+            msuf4RandGen.create rngFactory sw sl rates |> sorterModelGen.SmmMsuf4RandGen
+        | sorterModelType.Msuf6 -> 
+            let rates = Uf6GenRatesArray.createUniform %sl %sw
+            msuf6RandGen.create rngFactory sw sl rates |> sorterModelGen.SmmMsuf6RandGen
+
+    let outputDataTypes = 
+        [| outputDataType.RunParameters; outputDataType.SorterModelSetGen ""; outputDataType.SorterSet "";
+           outputDataType.TextReport ("Bins" |> UMX.tag); outputDataType.TextReport ("Profiles" |> UMX.tag) |]
+
+    let project = 
+        project.create projectName projectDesc outputDataTypes
+
+    // --- The Executor ---
+    let executor (host: randomSortersHost) (db: IGeneSortDb) (runParameters: runParameters) 
+                 (allowOverwrite: bool<allowOverwrite>) (cts: CancellationTokenSource) 
+                 (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+
+        asyncResult {
+            try
+                let! _ = checkCancellation cts.Token
+                let runId = runParameters |> RunParameters.getIdString
+                let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
+                ProjectOps.report progress (sprintf "%s Starting Random Generation %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
+
+                // 2. Safe Parameter Extraction (Via Host)
+                let! (smt, sw, sl, cl, sc) = 
+                    host.ExtractDomainParams runParameters 
+                    |> Result.ofOption (sprintf "Run %s: Missing required parameters" %runId)
+
+                // 3. Create sorting set
+                let sorterModelGen = getModelGen smt sw sl cl
+                let firstIndex = (%repl * %sc) |> UMX.tag<sorterCount>
+                
+                let sortingSetGen = sortingGenSegment.create (sorterModelGen |> sortingGen.Single) firstIndex sc
+                let qpSortingSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "") 
+                let sortingSet = sortingSetGen.MakeSortingSet (%qpSortingSet.Id |> UMX.tag) 
+
+                // 4. Save (Using the host's DB connection)
+                let! _ = host.ProjectDb.saveAsync qpSortingSet (sortingSet |> outputData.SortingSet) allowOverwrite
+            
+                ProjectOps.report progress (sprintf "Saved SortingSet %s for run: %s" (%qpSortingSet.Id.ToString()) %runId)
+
+                return runParameters.WithRunFinished (Some true)
+
+            with e -> 
+                return! Error (sprintf "Unexpected error in run %s: %s" 
+                        (runParameters |> RunParameters.getIdString) e.Message) 
+                        |> async.Return
+        }

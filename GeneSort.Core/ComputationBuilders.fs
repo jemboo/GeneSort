@@ -166,6 +166,14 @@ module AsyncResult =
             | Ok v -> return! f v
         }
 
+    let bindResult (f: 'T -> Result<'U, 'E>) (x: Async<Result<'T, 'E>>) : Async<Result<'U, 'E>> =
+        async {
+            let! res = x
+            match res with
+            | Error e -> return Error e
+            | Ok v -> return f v
+        }
+
     let ofResult (res: Result<'T, 'E>) : Async<Result<'T, 'E>> =
         async { return res }
 
