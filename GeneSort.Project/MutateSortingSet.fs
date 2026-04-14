@@ -19,11 +19,13 @@ open GeneSort.FileDb
 type mutateSortingSetHost = 
     private { 
         _projectDb: IGeneSortDb 
+        _parameterSpans: (string * string list) list
         _childSortersPerParent : int<sorterCount>
     }
-    static member Create (db: IGeneSortDb) (childSorters: int<sorterCount>) =
-        { _projectDb = db; _childSortersPerParent = childSorters }
+    static member Create (db: IGeneSortDb) (parameterSpans: (string * string list) list) (childSorters: int<sorterCount>) =
+        { _projectDb = db; _parameterSpans = parameterSpans; _childSortersPerParent = childSorters }
 
+    member this.ParameterSpans = this._parameterSpans
     member this.ProjectDb = this._projectDb
     member this.ChildSortersPerParent = this._childSortersPerParent
     member this.CollectNewSortableTests = false
@@ -146,7 +148,7 @@ module MutateSortingSet =
     /// It encapsulates the DB connection and global configuration.
     let mutateSortingSetHost1 = 
         let db = new GeneSortDbMp(projectFolder) :> IGeneSortDb
-        mutateSortingSetHost.Create db childSortersPerParentDefault
+        mutateSortingSetHost.Create db parameterSpans childSortersPerParentDefault
 
 
     // --- The Executor ---

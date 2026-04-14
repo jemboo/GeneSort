@@ -1,536 +1,227 @@
-﻿namespace GeneSort.Project.SorterBins
-
-open System
+﻿namespace GeneSort.Project
 
 open FSharp.UMX
-
 open GeneSort.Core
 open GeneSort.Sorting
-open System.Threading
 open GeneSort.Runs
 open GeneSort.Db
+open GeneSort.FileDb
 open GeneSort.Model.Sorting
-open GeneSort.SortingOps
 open GeneSort.SortingResults
 open GeneSort.SortingResults.Bins
 open GeneSort.Project
-open GeneSort.FileDb
-
-
-//module MergeRandomMergeSorterBins_P1 =
-    
-//    let maxCenterSampledSetSize = 200
-
-//    // --- Filters ---
-
-//    let sorterModelTypeForSortingWidth (rp: runParameters) =
-//        let sorterModelType = rp.GetSorterModelType().Value
-//        let sortingWidth = rp.GetSortingWidth().Value
-//        let has2factor = (%sortingWidth % 2 = 0)
-//        let isMuf4able = (MathUtils.isAPowerOfTwo %sortingWidth)
-//        let isMuf6able = (%sortingWidth % 3 = 0) && (MathUtils.isAPowerOfTwo (%sortingWidth / 3))
-
-//        match sorterModelType with
-//        | sorterModelType.Msce -> 
-//                Some rp
-//        | sorterModelType.Mssi
-//        | sorterModelType.Msrs -> 
-//                if has2factor then Some rp else None
-//        | sorterModelType.Msuf4 ->
-//                if isMuf4able then Some rp else None
-//        | sorterModelType.Msuf6 -> 
-//                if isMuf6able then Some rp else None
-                
-
-//    let mergeDimensionDividesSortingWidth (rp: runParameters) =
-//        let sw = rp.GetSortingWidth().Value
-//        let md = rp.GetMergeDimension().Value
-//        if (%sw % %md = 0) then Some rp else None
-
-//    let limitForMergeFillType (rp: runParameters) =
-//        let sw = rp.GetSortingWidth().Value
-//        let ft = rp.GetMergeSuffixType().Value
-//        if (ft.IsNoSuffix && %sw > 64) then None else Some rp
-
-//    let limitForMergeDimension (rp: runParameters) =
-//        let sw = rp.GetSortingWidth().Value
-//        let md = rp.GetMergeDimension().Value
-//        if (%md > 6 && %sw > 144) then None else Some rp
-
-//    let paramMapFilter (rp: runParameters) = 
-//        Some rp
-//        |> Option.bind sorterModelTypeForSortingWidth
-//        |> Option.bind mergeDimensionDividesSortingWidth
-//        |> Option.bind limitForMergeFillType
-//        |> Option.bind limitForMergeDimension
-
-
-//    let sortingWidths() : string*string list =
-//    //    let values = [ 16; 32; 48; 64; 96; 128;] |> List.map(fun d -> d.ToString())
-//        let values = [ 16; 32; 48; ] |> List.map string
-//        (runParameters.sortingWidthKey, values)
-
-
-//    let sorterModelTypes () : string*string list =
-//        let values =         
-//            [ 
-//              sorterModelType.Msce; 
-//              sorterModelType.Mssi;
-//              sorterModelType.Msrs; 
-//              sorterModelType.Msuf4;
-//              ]  |> List.map(SorterModelType.toString)
-//        (runParameters.sorterModelTypeKey, values )
-
-
-//    let mergeDimensions () : string * string list =
-//    //  let values = [2; 3; 4; 6; 8;] |> List.map string
-//        let values = [ 2; 3; 4; ] |> List.map string
-//        (runParameters.mergeDimensionKey, values)
-
-//    let mergeSuffixTypes () : string * string list =
-//        let values = [ 
-//                        mergeSuffixType.NoSuffix; 
-//                        mergeSuffixType.VV_1 
-//                     ] |> List.map MergeSuffixType.toString
-//        (runParameters.mergeSuffixTypeKey, values)
-
-
-//    let startingRepls () : string * string list =
-//        let values = [ 0; ] |> List.map (fun d -> d.ToString())
-//        (runParameters.startingReplKey, values)
-
-
-//    let replSpans () : string * string list =
-//        let values = [ 4 ] |> List.map (fun d -> d.ToString())
-//        (runParameters.replSpanKey, values)
-
-
-//    let parameterSpans = 
-//        [ 
-//            sortingWidths(); 
-//            sorterModelTypes();
-//            mergeDimensions();
-//            mergeSuffixTypes(); 
-//            startingRepls();
-//            replSpans();
-//        ]
-
-
-
-
-module MergeRandomMergeSorterBins_P2 =
-    
-    let maxCenterSampledSetSize = 200
-
-    // --- Filters ---
-
-    let sorterModelTypeForSortingWidth (rp: runParameters) =
-        let sorterModelType = rp.GetSorterModelType().Value
-        let sortingWidth = rp.GetSortingWidth().Value
-        let has2factor = (%sortingWidth % 2 = 0)
-        let isMuf4able = (MathUtils.isAPowerOfTwo %sortingWidth)
-        let isMuf6able = (%sortingWidth % 3 = 0) && (MathUtils.isAPowerOfTwo (%sortingWidth / 3))
-
-        match sorterModelType with
-        | sorterModelType.Msce -> 
-                Some rp
-        | sorterModelType.Mssi
-        | sorterModelType.Msrs -> 
-                if has2factor then Some rp else None
-        | sorterModelType.Msuf4 ->
-                if isMuf4able then Some rp else None
-        | sorterModelType.Msuf6 -> 
-                if isMuf6able then Some rp else None
-                
-
-    let mergeDimensionDividesSortingWidth (rp: runParameters) =
-        let sw = rp.GetSortingWidth().Value
-        let md = rp.GetMergeDimension().Value
-        if (%sw % %md = 0) then Some rp else None
-
-    let limitForMergeFillType (rp: runParameters) =
-        let sw = rp.GetSortingWidth().Value
-        let ft = rp.GetMergeSuffixType().Value
-        if (ft.IsNoSuffix && %sw > 64) then None else Some rp
-
-    let limitForMergeDimension (rp: runParameters) =
-        let sw = rp.GetSortingWidth().Value
-        let md = rp.GetMergeDimension().Value
-        if (%md > 6 && %sw > 144) then None else Some rp
-
-    let paramMapFilter (rp: runParameters) = 
-        Some rp
-        |> Option.bind sorterModelTypeForSortingWidth
-        |> Option.bind mergeDimensionDividesSortingWidth
-        |> Option.bind limitForMergeFillType
-        |> Option.bind limitForMergeDimension
-
-
-    let sortingWidths() : string*string list =
-    //    let values = [ 16; 32; 48; ] |> List.map(fun d -> d.ToString())
-        let values = [ 16; 32; 48; 64; 96; 128 ] |> List.map string
-        (runParameters.sortingWidthKey, values)
-
-
-    let sorterModelTypes () : string*string list =
-        let values =         
-            [ 
-              sorterModelType.Msce; 
-              sorterModelType.Mssi;
-              sorterModelType.Msrs; 
-              sorterModelType.Msuf4;
-              ]  |> List.map(SorterModelType.toString)
-        (runParameters.sorterModelTypeKey, values )
-
-
-    let mergeDimensions () : string * string list =
-        let values = [ 8;] |> List.map string
-        (runParameters.mergeDimensionKey, values)
-
-    let mergeSuffixTypes () : string * string list =
-        let values = [ 
-                        mergeSuffixType.NoSuffix; 
-                        mergeSuffixType.VV_1 
-                     ] |> List.map MergeSuffixType.toString
-        (runParameters.mergeSuffixTypeKey, values)
-
-
-    let startingRepls () : string * string list =
-        let values = [ 0; ] |> List.map (fun d -> d.ToString())
-        (runParameters.startingReplKey, values)
-
-
-    let replSpans () : string * string list =
-        let values = [ 85 ] |> List.map (fun d -> d.ToString())
-        (runParameters.replSpanKey, values)
-
-
-    let parameterSpans = 
-        [ 
-            sortingWidths(); 
-            sorterModelTypes();
-            mergeDimensions();
-            mergeSuffixTypes(); 
-            startingRepls();
-            replSpans();
-        ]
-
-
-
-
-module MergeRandomMergeSorterBins =
-
-    let projectName = "MergeRandomMergeSorterBins"  |> UMX.tag<projectName>
-    let projectFolder = "c:\\Projects\\RandomMergeSorterBins\\Merge\\Data" |> UMX.tag<pathToProjectFolder>
-    let projectDesc = "Merge RandomMergeSorterBins, generated by Msce, Mssi, Msrs, and Msuf"
-    let collectNewSortableTests = false
-    let samplesPerBin = 1
-
-
-    // Fixed parameters:
-    let rngFactory = rngFactory.LcgFactory
-    let excludeSelfCe = true
-    let allowOverwrite = false |> UMX.tag<allowOverwrite>
-
-
-    let makeQueryParams 
-            (repl: int<replNumber> option) 
-            (startingRepl: int<replNumber> option)
-            (replSpan: int<replNumber> option)
-            (sortingWidth:int<sortingWidth> option)            
-            (mergeDimension: int<mergeDimension> option)
-            (mergeSuffixType: mergeSuffixType option)
-            (sorterModelType:sorterModelType option)
-            (outputDataType: outputDataType) =
-             
-        queryParams.create
-            (Some projectName)
-            repl
-            outputDataType
-            [|
-                ( runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
-                ( runParameters.mergeDimensionKey, 
-                  mergeDimension |> MergeDimension.toString);
-                ( runParameters.mergeSuffixTypeKey, 
-                  mergeSuffixType |> Option.map MergeSuffixType.toString |> UmxExt.stringToString);
-                ( runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString)
-                ( runParameters.startingReplKey, startingRepl |> UmxExt.intToString);
-                ( runParameters.replSpanKey, replSpan |> UmxExt.intToString)
-            |]
-
-
-    let makeQueryParamsFromRunParams
-            (runParams: runParameters) 
-            (outputDataType: outputDataType) =
-        makeQueryParams
-            (runParams.GetRepl())
-            (runParams.GetStartingRepl())
-            (runParams.GetReplSpan())
-            (runParams.GetSortingWidth())
-            (runParams.GetMergeDimension())
-            (runParams.GetMergeSuffixType())
-            (runParams.GetSorterModelType())
-            outputDataType
-
-
-
-    // --- Project Refinement ---
-
-    let enhancer (rp : runParameters) : runParameters =
-        let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
-
-        rp.WithProjectName(Some projectName)
-            .WithRunFinished(Some false)
-            .WithId (Some qp.Id)
-
-
-    let paramMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
-        seq {
-            for runParameters in runParametersSeq do
-                    let filtrate = MergeRandomMergeSorterBins_P2.paramMapFilter runParameters
-                    if filtrate.IsSome then
-                        let retVal = filtrate.Value |> enhancer
-                        yield retVal
+open System
+open System.Threading
+open GeneSort.Project.SorterBins
+open GeneSort.SortingOps
+
+type mergeRandomMergeSorterBinsHost = 
+    private { 
+        _projectDb: IGeneSortDb 
+        _parameterSpans: (string * string list) list
+        _filter: runParameters -> runParameters option
+    }
+    static member Create db spans filter =
+        { _projectDb = db; _parameterSpans = spans; _filter = filter }
+
+    member this.ProjectDb = this._projectDb
+    member this.ParameterSpans = this._parameterSpans
+    member this.Filter = this._filter
+
+    member this.ExtractDomainParams (rp: runParameters) =
+        maybe {
+            let! md = rp.GetMergeDimension()
+            let! mst = rp.GetMergeSuffixType()
+            let! smt = rp.GetSorterModelType()
+            let! sw = rp.GetSortingWidth()
+            let! srp = rp.GetStartingRepl()
+            let! rsp = rp.GetReplSpan()
+            return (md, mst, smt, sw, srp, rsp)
         }
 
+module MergeRandomMergeSorterBins =
+    let projectName = "MergeRandomMergeSorterBins" |> UMX.tag<projectName>
+    let projectFolder = "c:\\Projects\\RandomMergeSorterBins\\Merge\\Data" |> UMX.tag<pathToProjectFolder>
+    let projectDesc = "Merge RandomMergeSorterBins, generated by Msce, Mssi, Msrs, and Msuf"
+    let samplesPerBin = 1
+
+    // --- Shared Filtering Logic ---
+    let private sorterModelTypeForSortingWidth (rp: runParameters) =
+        let smt = rp.GetSorterModelType().Value
+        let sw = rp.GetSortingWidth().Value
+        let has2factor = (%sw % 2 = 0)
+        let isMuf4able = (MathUtils.isAPowerOfTwo %sw)
+        let isMuf6able = (%sw % 3 = 0) && (MathUtils.isAPowerOfTwo (%sw / 3))
+
+        match smt with
+        | sorterModelType.Msce -> Some rp
+        | sorterModelType.Mssi | sorterModelType.Msrs -> if has2factor then Some rp else None
+        | sorterModelType.Msuf4 -> if isMuf4able then Some rp else None
+        | sorterModelType.Msuf6 -> if isMuf6able then Some rp else None
+        | _ -> None
+
+    let private mergeConstraints (rp: runParameters) =
+        let sw = rp.GetSortingWidth().Value
+        let md = rp.GetMergeDimension().Value
+        let ft = rp.GetMergeSuffixType().Value
+        let divides = (%sw % %md = 0)
+        let fillLimit = not (ft.IsNoSuffix && %sw > 64)
+        let dimLimit = not (%md > 6 && %sw > 144)
+        if divides && fillLimit && dimLimit then Some rp else None
+
+    let paramMapFilter (rp: runParameters) = 
+        Some rp 
+        |> Option.bind sorterModelTypeForSortingWidth
+        |> Option.bind mergeConstraints
+
+    // --- Configurations ---
+    module P2 =
+        let maxCenterSampledSetSize = 200
+        let spans = [ 
+            (runParameters.sortingWidthKey, ["16"; "32"; "48"; "64"; "96"; "128"] |> List.map string)
+            (runParameters.sorterModelTypeKey, [sorterModelType.Msce; sorterModelType.Mssi; sorterModelType.Msrs; sorterModelType.Msuf4] |> List.map SorterModelType.toString)
+            (runParameters.mergeDimensionKey, ["8"])
+            (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix; mergeSuffixType.VV_1] |> List.map MergeSuffixType.toString)
+            (runParameters.startingReplKey, ["0"])
+            (runParameters.replSpanKey, ["85"])
+        ]
+        let host = mergeRandomMergeSorterBinsHost.Create (new GeneSortDbMp(projectFolder) :> IGeneSortDb) spans paramMapFilter
+
+    // --- Query Parameter Helpers ---
+    let makeQueryParams (repl: int<replNumber> option) (startingRepl: int<replNumber> option) (replSpan: int<replNumber> option)
+                        (sw: int<sortingWidth> option) (md: int<mergeDimension> option) (mst: mergeSuffixType option)
+                        (smt: sorterModelType option) (odt: outputDataType) =
+        queryParams.create (Some projectName) repl odt
+            [| (runParameters.sortingWidthKey, sw |> SortingWidth.toString)
+               (runParameters.mergeDimensionKey, md |> MergeDimension.toString)
+               (runParameters.mergeSuffixTypeKey, mst |> Option.map MergeSuffixType.toString |> UmxExt.stringToString)
+               (runParameters.sorterModelTypeKey, smt |> Option.map SorterModelType.toString |> UmxExt.stringToString)
+               (runParameters.startingReplKey, startingRepl |> UmxExt.intToString)
+               (runParameters.replSpanKey, replSpan |> UmxExt.intToString) |]
+
+    let makeQueryParamsFromRunParams (rp: runParameters) (odt: outputDataType) =
+        makeQueryParams (rp.GetRepl()) (rp.GetStartingRepl()) (rp.GetReplSpan()) (rp.GetSortingWidth()) 
+                        (rp.GetMergeDimension()) (rp.GetMergeSuffixType()) (rp.GetSorterModelType()) odt
+
+    // --- Refinement ---
+    let enhancer (rp : runParameters) : runParameters =
+        let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
+        rp.WithProjectName(Some projectName).WithRunFinished(Some false).WithId(Some qp.Id)
+
+    let paramMapRefiner (host: mergeRandomMergeSorterBinsHost) (runParametersSeq: runParameters seq) : runParameters seq = 
+        runParametersSeq |> Seq.choose host.Filter |> Seq.map enhancer
 
     let outputDataTypes = 
-            [|
-                outputDataType.RunParameters;
-                outputDataType.SorterEvalBins "";
-                outputDataType.SortingSet "EvenSampled";
-                outputDataType.SortingSet "HullSampled";
-                outputDataType.SortingSet "CenterSampled";
+            [| 
+                outputDataType.RunParameters
+                outputDataType.SorterEvalBins ""
+                outputDataType.SortingSet "EvenSampled"
+                outputDataType.SortingSet "HullSampled"
+                outputDataType.SortingSet "CenterSampled"
+                outputDataType.SortingSet "WinningSampled"
+                // The report name is dynamic in the executor, 
+                // but we register the base type here.
+                outputDataType.TextReport ("" |> UMX.tag) 
             |]
 
-    let project = 
-            project.create 
-                projectName 
-                projectDesc
-                outputDataTypes
+    let project = project.create projectName projectDesc outputDataTypes
 
-
-
-
-    let executor
-            (db: IGeneSortDb)
-            (runParameters: runParameters) 
-            (allowOverwrite: bool<allowOverwrite>)
-            (cts: CancellationTokenSource) 
-            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+    // --- The Executor ---
+    let executor (host: mergeRandomMergeSorterBinsHost) (db: IGeneSortDb) (runParameters: runParameters) 
+                 (allowOverwrite: bool<allowOverwrite>) (cts: CancellationTokenSource) 
+                 (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
         asyncResult {
             try
-                // 1. Setup & ID Extraction
+                // 1. Setup & Initial Reporting
                 let! _ = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
-                ProjectOps.report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
+                ProjectOps.report progress (sprintf "%s Starting Merge Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
 
-                // 2. Safe Parameter Extraction
-                let! (mergeDimension, mergeSuffixType, sorterModelType, sortingWidth, startingRepl, replSpan) = 
-                    maybe {
-                        let! md = runParameters.GetMergeDimension()
-                        let! mst = runParameters.GetMergeSuffixType()
-                        let! smt = runParameters.GetSorterModelType()
-                        let! sw = runParameters.GetSortingWidth()
-                        let! srp = runParameters.GetStartingRepl()
-                        let! rsp = runParameters.GetReplSpan()
-                        return (md, mst, smt, sw, srp, rsp)
-                    } |> Result.ofOption (sprintf "Run %s: Missing required parameters" %runId) |> asAsync
+                // 2. Safe Parameter Extraction (Via Host)
+                let! (md, mst, smt, sw, srp, rsp) = 
+                    host.ExtractDomainParams runParameters 
+                    |> Result.ofOption (sprintf "Run %s: Missing required parameters" %runId) |> asAsync
 
+                // 3. Prepare Query Parameters for output IDs
+                let qpEvalBins = makeQueryParamsFromRunParams runParameters (outputDataType.SorterEvalBins "")
+                let qpEvenSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "EvenSampled")
+                let qpCenterSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "CenterSampled")
+                let qpWinningSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "WinningSampled")
+                let qpHullSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "HullSampled")
 
-                // 3. Make query params for the output data, which is also used to generate the IDs
-                let qpSorterEvalBins = makeQueryParamsFromRunParams 
-                                            runParameters 
-                                            (outputDataType.SorterEvalBins "")
+                // 4. Initialize Merged Containers
+                let mutable mergedEvalBins = sorterEvalBins.createEmpty (%qpEvalBins.Id |> UMX.tag<sorterEvalBinsId>)
+                let mutable mergedEvenSet = sortingSet.create (%qpEvenSet.Id |> UMX.tag<sortingSetId>) [||]
+                let mutable mergedCenterSet = sortingSet.create (%qpCenterSet.Id |> UMX.tag<sortingSetId>) [||]
+                let mutable mergedWinningSet = sortingSet.create (%qpWinningSet.Id |> UMX.tag<sortingSetId>) [||]
 
+                // 5. Connect to the Source Project DB
+                let dbSource = new GeneSortDbMp(RandomMergeSorterBins.projectFolder) :> IGeneSortDb
 
-                let qpEvenSortingSet = makeQueryParamsFromRunParams 
-                                                    runParameters 
-                                                    (outputDataType.SortingSet "EvenSampled")
+                // 6. Merge Loop (The "Memory Wall" sensitive part)
+                for r in 0 .. (%rsp - 1) do
+                    let currentRepl = %srp + r |> UMX.tag<replNumber>
+                    
+                    // Construct queries for the source data (RandomMergeSorterBins project)
+                    let qpSourceEval = RandomMergeSorterBins.makeQueryParams (Some currentRepl) (Some sw) (Some md) (Some mst) (Some smt) (outputDataType.SorterEvalBins "")
+                    let qpSourceSet = RandomMergeSorterBins.makeQueryParams (Some currentRepl) (Some sw) (Some md) (Some mst) (Some smt) (outputDataType.SortingSet "EvenSampled")
 
+                    // Load source data
+                    let! curEval = dbSource.loadAsync qpSourceEval |> AsyncResult.bindResult OutputData.asSorterEvalBins
+                    let! curSet = dbSource.loadAsync qpSourceSet |> AsyncResult.bindResult OutputData.asSortingSet
 
-                let qpHullSortingSet = makeQueryParamsFromRunParams 
-                                                    runParameters 
-                                                    (outputDataType.SortingSet "HullSampled")
+                    // Perform Merges
+                    mergedEvalBins <- SorterEvalBins.merge mergedEvalBins curEval
+                    
+                    // We merge and then immediately sample down to maintain density constraints
+                    let evenData = SortingSet.merge mergedEvenSet curSet 
+                    mergedEvenSet <- sortingSet.create (%qpEvenSet.Id |> UMX.tag) (SortingSetFilter.sampleBinsEvenly samplesPerBin mergedEvalBins evenData)
 
+                    mergedCenterSet <- SortingSet.merge mergedCenterSet curSet
+                    mergedCenterSet <- sortingSet.create (%qpCenterSet.Id |> UMX.tag) (SortingSetFilter.sampleTheCenterBins P2.maxCenterSampledSetSize mergedEvalBins mergedCenterSet)
 
-                let qpCenterSortingSet = makeQueryParamsFromRunParams 
-                                                    runParameters 
-                                                    (outputDataType.SortingSet "CenterSampled")
+                    mergedWinningSet <- SortingSet.merge mergedWinningSet curSet
+                    mergedWinningSet <- sortingSet.create (%qpWinningSet.Id |> UMX.tag) (SortingSetFilter.sampleWinningBins P2.maxCenterSampledSetSize mergedEvalBins mergedWinningSet)
 
+                    ProjectOps.report progress (sprintf "Merged repl %d for %s" %currentRepl %runId)
 
-                let qpWinningSortingSet = makeQueryParamsFromRunParams 
-                                                    runParameters 
-                                                    (outputDataType.SortingSet "WinningSampled")
+                // 7. Calculate Convex Hull from the merged results
+                let hullData = SortingSetFilter.sampleBinsConvexHull samplesPerBin mergedEvalBins mergedEvenSet
+                let hullSampledSet = sortingSet.create (%qpHullSet.Id |> UMX.tag) hullData
 
+                // 8. Generate DataTable Report
+                let reportName = $"MergeReport_{%sw}_{smt |> SorterModelType.toString}_{%md}_{mst}" |> UMX.tag<textReportName>
+                let qpReport = makeQueryParamsFromRunParams runParameters (outputDataType.TextReport reportName)
+                
+                let mergeProperties = 
+                        [ 
+                            ("sortingWidth", (Some sw) |> SortingWidth.toString)
+                            ("sorterModelType", smt |> SorterModelType.toString)
+                            ("mergeDimension", Some md |> MergeDimension.toString)
+                            ("mergeSuffixType", mst |> MergeSuffixType.toString)
+                        ] |> Map.ofList
 
-                // 4. create the repl collectors 
-                let mutable mergedSorterEvalBins = sorterEvalBins.createEmpty
-                                                        (%qpSorterEvalBins.Id |> UMX.tag<sorterEvalBinsId>)
+                let keyFormatter ((idx, tag), key: sorterEvalKey) = sprintf "%d_%s_%s" idx tag (key.AsString())
 
-                // This is repeatedly merged with the per-repl sorting sets, and then sampled down to create the even sampled set. 
-                // The hull sampled set is a subset of the even sampled set, so it doesn't need its own merged set - 
-                // the sampling can be done directly on the mergedSorterEvalBins and mergedSortingSet at the end.
-                let mutable mergedEvenSet = sortingSet.create
-                                                    (%qpEvenSortingSet.Id |> UMX.tag<sortingSetId>)
-                                                    [||]
-
-                let mutable mergedCenterSet = sortingSet.create
-                                                    (%qpCenterSortingSet.Id |> UMX.tag<sortingSetId>)
-                                                    [||]
-
-                let mutable mergedWinningSet = sortingSet.create
-                                                    (%qpWinningSortingSet.Id |> UMX.tag<sortingSetId>)
-                                                    [||]
-
-                                            
-                // 5.  Get the database for the RandomSorterBins project - this is where the per-repl data will be loaded from
-                let dbRandomMergeSorterBins = new GeneSortDbMp(RandomMergeSorterBins.projectFolder) :> IGeneSortDb
-
-                // 6. Loop through the repls, loading and merging the data as we go
-                for r in 0 .. (%replSpan - 1) do
-                        let currentRepl = %startingRepl + r
-                        let qpCurrentEvalBins = RandomMergeSorterBins.makeQueryParams  
-                                                    (Some (currentRepl |> UMX.tag<replNumber>))
-                                                    (Some sortingWidth) 
-                                                    (Some mergeDimension)
-                                                    (Some mergeSuffixType)
-                                                    (Some sorterModelType) 
-                                                    (outputDataType.SorterEvalBins "")
-
-    
-                        let! currentEvalBins = dbRandomMergeSorterBins.loadAsync qpCurrentEvalBins
-                                                |> AsyncResult.bindResult OutputData.asSorterEvalBins
-
-
-                        let qpCurrentSortingSet = RandomMergeSorterBins.makeQueryParams  
-                                                    (Some (currentRepl |> UMX.tag<replNumber>))
-                                                    (Some sortingWidth) 
-                                                    (Some mergeDimension)
-                                                    (Some mergeSuffixType)
-                                                    (Some sorterModelType) 
-                                                    (outputDataType.SortingSet "EvenSampled")
-
-
-                        let! currentSortingSet = dbRandomMergeSorterBins.loadAsync qpCurrentSortingSet
-                                                |> AsyncResult.bindResult OutputData.asSortingSet
-
-                        // merge with the latest repl's data
-                        mergedEvenSet <- SortingSet.merge mergedEvenSet currentSortingSet
-                        mergedCenterSet <- SortingSet.merge mergedCenterSet currentSortingSet
-                        mergedWinningSet <- SortingSet.merge mergedWinningSet currentSortingSet
-
-                        // merge the eval bins 
-                        mergedSorterEvalBins <- SorterEvalBins.merge mergedSorterEvalBins currentEvalBins
-
-                        // sample down to samplesPerBin per bin
-                        mergedEvenSet <-
-                            sortingSet.create
-                                (%qpEvenSortingSet.Id |> UMX.tag<sortingSetId>)
-                                (SortingSetFilter.sampleBinsEvenly samplesPerBin mergedSorterEvalBins mergedEvenSet)
-
-                        mergedCenterSet <-
-                            sortingSet.create
-                                (%qpCenterSortingSet.Id |> UMX.tag<sortingSetId>)
-                                (SortingSetFilter.sampleTheCenterBins 
-                                        MergeRandomSorterBins.P1.maxSampledSetSize 
-                                        mergedSorterEvalBins 
-                                        mergedCenterSet )
-
-                        mergedWinningSet <-
-                            sortingSet.create
-                                (%qpWinningSortingSet.Id |> UMX.tag<sortingSetId>)
-                                (SortingSetFilter.sampleWinningBins 
-                                        MergeRandomSorterBins.P1.maxSampledSetSize 
-                                        mergedSorterEvalBins 
-                                        mergedWinningSet )
-
-
-                        None |> ignore // placeholder for potential per-repl processing
-
-                // 7. Get the convex hull of mergedSortingSet
-                let hullSampledSet = 
-                            sortingSet.create
-                                (%qpHullSortingSet.Id |> UMX.tag<sortingSetId>)
-                                (SortingSetFilter.sampleBinsConvexHull samplesPerBin mergedSorterEvalBins mergedEvenSet)
-
-
-                // 8. Make Report
-                let reportName = $"MergeReport_{%sortingWidth}_{sorterModelType |> SorterModelType.toString}_{mergeDimension}_{mergeSuffixType}" 
-                                    |> UMX.tag<textReportName>
-
-                let qpMergeReport = makeQueryParamsFromRunParams 
-                                            runParameters 
-                                            (outputDataType.TextReport reportName)
-                let mergeProperties =
-                    [ 
-                        ("sortingWidth", (Some sortingWidth) |> SortingWidth.toString); 
-                        ("sorterModelType", sorterModelType |> SorterModelType.toString)
-                        ("mergeDimension", Some mergeDimension |> MergeDimension.toString)
-                        ("mergeSuffixType", mergeSuffixType |> MergeSuffixType.toString)
-                    ] |> Map.ofList
-
-                let keyFormatter (key: ((int * string) * sorterEvalKey)) =
-                        sprintf "%d_%s_%s" (fst (fst key)) (snd (fst key)) ((snd key).AsString())
-                        
-
-                let tableMap = SorterEvalBins.getPropertyMaps 
-                                    mergedSorterEvalBins 
-                                    (%sortingWidth, sorterModelType |> SorterModelType.toString)
-                                    mergeProperties
-                                |> Map.ofSeq
-
+                let tableMap = SorterEvalBins.getPropertyMaps mergedEvalBins (%sw, smt |> SorterModelType.toString) mergeProperties |> Map.ofSeq
                 let headers, rows = DataTableReport.mapToTabDelimitedStrings keyFormatter tableMap
                 let dtReport = DataTableReport.create %reportName headers
                 dtReport.AppendDataRows (rows |> Array.toSeq)
 
+                // 9. Persist to DB (Using the project-specific DB provided in the call)
+                let! _ = db.saveAsync qpEvalBins (mergedEvalBins |> outputData.SorterEvalBins) allowOverwrite
+                let! _ = db.saveAsync qpEvenSet (mergedEvenSet |> outputData.SortingSet) allowOverwrite
+                let! _ = db.saveAsync qpCenterSet (mergedCenterSet |> outputData.SortingSet) allowOverwrite
+                let! _ = db.saveAsync qpWinningSet (mergedWinningSet |> outputData.SortingSet) allowOverwrite
+                let! _ = db.saveAsync qpHullSet (hullSampledSet |> outputData.SortingSet) allowOverwrite
+                let! _ = db.saveAsync qpReport (dtReport |> outputData.TextReport) allowOverwrite
 
-
-                //// 9. Saves
-
-                let! _ = db.saveAsync 
-                                qpSorterEvalBins 
-                                (mergedSorterEvalBins |> outputData.SorterEvalBins) 
-                                allowOverwrite
-
-                let! _ = db.saveAsync 
-                                qpEvenSortingSet 
-                                (mergedEvenSet |> outputData.SortingSet) 
-                                allowOverwrite
-
-                let! _ = db.saveAsync 
-                                qpHullSortingSet 
-                                (hullSampledSet |> outputData.SortingSet) 
-                                allowOverwrite
-
-                let! _ = db.saveAsync 
-                                qpCenterSortingSet 
-                                (mergedCenterSet |> outputData.SortingSet) 
-                                allowOverwrite
-
-                let! _ = db.saveAsync 
-                                qpWinningSortingSet 
-                                (mergedWinningSet |> outputData.SortingSet) 
-                                allowOverwrite
-
-                let! _ = db.saveAsync 
-                                qpMergeReport 
-                                (dtReport |> outputData.TextReport) 
-                                allowOverwrite
-
-
-
-                // 10. Final Return
+                ProjectOps.report progress (sprintf "Merge Complete: %s" %runId)
                 return runParameters.WithRunFinished (Some true)
 
             with e -> 
                 let runId = runParameters |> RunParameters.getIdString
-                let msg = sprintf "Unexpected error in run %s: %s" runId e.Message
-                return! async { return Error msg }
+                return! Error (sprintf "Unexpected error in run %s: %s" runId e.Message) |> async.Return
         }
-
-
-
-

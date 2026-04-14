@@ -116,15 +116,15 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 ///// **********  MergeRandomSorterBins   ****************
-let host = MergeRandomSorterBins.P1.host    
-let executor = MergeRandomSorterBins.executor host
-let project = MergeRandomSorterBins.project
-let projectFolder = MergeRandomSorterBins.projectFolder
-let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
-let buildQueryParams = MergeRandomSorterBins.makeQueryParamsFromRunParams
-let paramRefiner = MergeRandomSorterBins.paramMapRefiner host
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+//let host = MergeRandomSorterBins.P1.host    
+//let executor = MergeRandomSorterBins.executor host
+//let project = MergeRandomSorterBins.project
+//let projectFolder = MergeRandomSorterBins.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+//let buildQueryParams = MergeRandomSorterBins.makeQueryParamsFromRunParams
+//let paramRefiner = MergeRandomSorterBins.paramMapRefiner host
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 
@@ -162,15 +162,15 @@ let maxReplica = 1<replNumber>
 
 
 /// **********    MutateSortingSet   ****************
-//let host = MutateSortingSet.mutateSortingSetHost1
-//let executor = MutateSortingSet.executor host
-//let project = MutateSortingSet.project
-//let projectFolder = MutateSortingSet.projectFolder
-//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
-//let buildQueryParams = MutateSortingSet.makeQueryParamsFromRunParams
-//let paramRefiner = MutateSortingSet.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+let host = MutateSortingSet.mutateSortingSetHost1
+let executor = MutateSortingSet.executor host
+let project = MutateSortingSet.project
+let projectFolder = MutateSortingSet.projectFolder
+let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+let buildQueryParams = MutateSortingSet.makeQueryParamsFromRunParams
+let paramRefiner = MutateSortingSet.paramMapRefiner
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
 printfn "Initializing Project..."
