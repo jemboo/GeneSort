@@ -496,9 +496,6 @@ module RandomMergeSorterBins =
                                                 runParameters 
                                                 (outputDataType.SortingSet "EvenSampled")
 
-                //let qpHullSampledSortingSet = makeQueryParamsFromRunParams 
-                //                                runParameters 
-                //                                (outputDataType.SortingSet "HullSampled")
 
                 let sorterEvalBins = sorterEvalBins.create
                                                 (%qpEvalBins.Id |> UMX.tag<sorterEvalBinsId>)
@@ -508,16 +505,10 @@ module RandomMergeSorterBins =
                             (%qpEvenSampledSortingSet.Id |> UMX.tag<sortingSetId>)
                             (SortingSetFilter.sampleBinsEvenly samplesPerBin sorterEvalBins fullSortingSet)
 
-                //let hullSampledSortingSet = 
-                //        sortingSet.create
-                //            (%qpEvenSampledSortingSet.Id |> UMX.tag<sortingSetId>)
-                //            (SortingSetFilter.sampleBinsConvexHull samplesPerBin sorterEvalBins fullSortingSet)
 
                 // 4. Saves
                 let! _ = db.saveAsync qpEvalBins (sorterEvalBins |> outputData.SorterEvalBins) allowOverwrite
                 let! _ = db.saveAsync qpEvenSampledSortingSet (evenSampledSortingSet |> outputData.SortingSet) allowOverwrite
-                //let! _ = db.saveAsync projectFolder qpHullSampledSortingSet (hullSampledSortingSet |> outputData.SortingSet) allowOverwrite
-
             
                 progress |> Option.iter (fun p -> 
                     p.Report(sprintf "Saved SortingSet %s for run: %s" (%qpSortingSet.Id.ToString()) %runId))
@@ -530,156 +521,3 @@ module RandomMergeSorterBins =
                 let msg = sprintf "Unexpected error in run %s: %s" runId e.Message
                 return! async { return Error msg }
         }
-
-
-
-
-//module Yab =
-
-
-
-//    let executor
-//            (db: IGeneSortDb)
-//            (runParameters: runParameters) 
-//            (allowOverwrite: bool<allowOverwrite>)
-//            (cts: CancellationTokenSource) 
-//            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
-
-//        asyncResult {
-//            try
-//                // 1. Setup & ID Extraction
-//                let! _ = checkCancellation cts.Token
-//                let runId = runParameters |> RunParameters.getIdString
-//                ProjectOps.report progress (sprintf "%s Starting Run %s" (MathUtils.getTimestampString()) %runId)
-
-//                // 2. Safe Parameter Extraction
-//                let! (  repl, 
-//                        mergeDimension, 
-//                        mergeSuffixType, 
-//                        sorterModelType, 
-//                        sortingWidth, 
-//                        stageLength, 
-//                        ceLength, 
-//                        sorterCount, 
-//                        sortableDataFormat) = 
-//                    maybe {
-//                        let! r = runParameters.GetRepl()
-//                        let! md = runParameters.GetMergeDimension()
-//                        let! mst = runParameters.GetMergeSuffixType()
-//                        let! smt = runParameters.GetSorterModelType()
-//                        let! sw = runParameters.GetSortingWidth()
-//                        let! sl = runParameters.GetStageLength()
-//                        let! cl = runParameters.GetCeLength()
-//                        let! sc = runParameters.GetSorterCount()
-//                        let! sdf = runParameters.GetSortableDataFormat()
-//                        return (r, md, mst, smt, sw, sl, cl, sc, sdf)
-//                    } |> Result.ofOption (sprintf "Run %s: Missing required parameters" %runId) |> asAsync
-
-
-
-//                // 3. Create sorting set from run parameters
-//                let sorterModelGen =
-//                    match sorterModelType with
-//                    | sorterModelType.Msce -> 
-//                        msceRandGen.create rngFactory sortingWidth excludeSelfCe ceLength 
-//                        |> sorterModelGen.SmmMsceRandGen
-//                    | sorterModelType.Mssi -> 
-//                        mssiRandGen.create rngFactory sortingWidth stageLength 
-//                        |> sorterModelGen.SmmMssiRandGen
-//                    | sorterModelType.Msrs -> 
-//                        let opsGenRatesArray = OpsGenRatesArray.createUniform %stageLength
-//                        msrsRandGen.create rngFactory sortingWidth opsGenRatesArray 
-//                        |> sorterModelGen.SmmMsrsRandGen
-//                    | sorterModelType.Msuf4 -> 
-//                        let uf4GenRatesArray = Uf4GenRatesArray.createUniform %stageLength %sortingWidth
-//                        msuf4RandGen.create rngFactory sortingWidth stageLength uf4GenRatesArray 
-//                        |> sorterModelGen.SmmMsuf4RandGen
-//                    | sorterModelType.Msuf6 -> 
-//                        let uf6GenRatesArray = Uf6GenRatesArray.createUniform %stageLength %sortingWidth
-//                        msuf6RandGen.create rngFactory sortingWidth stageLength uf6GenRatesArray 
-//                        |> sorterModelGen.SmmMsuf6RandGen
-
-//                let firstIndex = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-//                let sortingGenSegment = sortingGenSegment.create 
-//                                                (sorterModelGen |> sortingGen.Single)
-//                                                firstIndex 
-//                                                sorterCount
-//                let qpSortingSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "") 
-//                let fullSortingSet = sortingGenSegment.MakeSortingSet (%qpSortingSet.Id |> UMX.tag<sortingSetId>)
-//                let fullSorterSet = fullSortingSet |> SortingSet.makeSorterSet
-
-
-//                // 4. Create sortable tests
-//                let! _ = checkCancellation cts.Token
-//                let qpSortableTests = SortableMergeTests.makeQueryParams 
-//                                            (Some (0 |> UMX.tag<replNumber>)) 
-//                                            (Some sortingWidth) 
-//                                            (Some mergeDimension) 
-//                                            (Some mergeSuffixType) 
-//                                            (Some sortableDataFormat) 
-//                                            (outputDataType.SortableTest "")
-
-//                let! rawTestData = db.loadAsync qpSortableTests 
-//                let! sortableTests = rawTestData |> OutputData.asSortableTest
-
-
-//                // 5. Evaluate sortings          
-//                let qpEval = makeQueryParamsFromRunParams 
-//                                        runParameters 
-//                                        (outputDataType.SorterSetEval "")
-//                let sorterSetEval = 
-//                                SorterSetEval.makeSorterSetEval
-//                                                (%qpEval.Id |> UMX.tag<sorterSetEvalId>) 
-//                                                fullSorterSet 
-//                                                sortableTests 
-//                                                collectNewSortableTests
-
-//                // 6. Map sorterEvals to sortings
-//                let sortingResultSetMap = SortingResultSetMap.fromSortingSet fullSortingSet
-//                sortingResultSetMap.UpdateManySortingResults sorterSetEval.SorterEvals
-
-
-//                // 7. Make the evalBins and the sampled sorterSets
-//                let qpEvalBins = makeQueryParamsFromRunParams 
-//                                            runParameters 
-//                                            (outputDataType.SorterEvalBins "")
-
-//                let qpEvenSampledSortingSet = makeQueryParamsFromRunParams 
-//                                                runParameters 
-//                                                (outputDataType.SortingSet "EvenSampled")
-
-//                //let qpHullSampledSortingSet = makeQueryParamsFromRunParams 
-//                //                                runParameters 
-//                //                                (outputDataType.SortingSet "HullSampled")
-
-//                let sorterEvalBins = sorterEvalBins.create
-//                                                (%qpEvalBins.Id |> UMX.tag<sorterEvalBinsId>)
-//                                                sorterSetEval.SorterEvals
-//                let evenSampledSortingSet = 
-//                        sortingSet.create
-//                            (%qpEvenSampledSortingSet.Id |> UMX.tag<sortingSetId>)
-//                            (SortingSetFilter.sampleBinsEvenly samplesPerBin sorterEvalBins fullSortingSet)
-
-//                //let hullSampledSortingSet = 
-//                //        sortingSet.create
-//                //            (%qpEvenSampledSortingSet.Id |> UMX.tag<sortingSetId>)
-//                //            (SortingSetFilter.sampleBinsConvexHull samplesPerBin sorterEvalBins fullSortingSet)
-
-//                // 4. Saves
-//                let! _ = db.saveAsync qpEvalBins (sorterEvalBins |> outputData.SorterEvalBins) allowOverwrite
-//                let! _ = db.saveAsync qpEvenSampledSortingSet (evenSampledSortingSet |> outputData.SortingSet) allowOverwrite
-//                //let! _ = db.saveAsync projectFolder qpHullSampledSortingSet (hullSampledSortingSet |> outputData.SortingSet) allowOverwrite
-
-            
-//                progress |> Option.iter (fun p -> 
-//                    p.Report(sprintf "Saved SortingSet %s for run: %s" (%qpSortingSet.Id.ToString()) %runId))
-
-//                // 5. Final Return
-//                return runParameters.WithRunFinished (Some true)
-
-//            with e -> 
-//                let runId = runParameters |> RunParameters.getIdString
-//                let msg = sprintf "Unexpected error in run %s: %s" runId e.Message
-//                return! async { return Error msg }
-//        }
-

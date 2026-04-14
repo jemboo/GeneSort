@@ -50,11 +50,11 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 //let buildQueryParams = RandomSorters.makeQueryParamsFromRunParams
 //let paramRefiner = RandomSorters.paramMapRefiner host
 //let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+//let maxReplica = 10<replNumber>
 
 
 ///// **********     SortableMergeTests   ****************
-//let host = SortableMergeTests.P2.host
+//let host = SortableMergeTests.P1.host
 //let project = SortableMergeTests.project
 //let executor = SortableMergeTests.executor host
 //let projectFolder = SortableMergeTests.projectFolder
@@ -104,26 +104,27 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 ///// **********     RandomSorterBins   ****************
-let host = RandomSorterBins.P1.host
-let executor = RandomSorterBins.executor host
-let project = RandomSorterBins.project
-let projectFolder = RandomSorterBins.projectFolder
-let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
-let buildQueryParams = RandomSorterBins.makeQueryParamsFromRunParams
-let paramRefiner = RandomSorterBins.paramMapRefiner host
-let minReplica = 0<replNumber>
-let maxReplica = 2<replNumber>
+//let host = RandomSorterBins.P1.host
+//let executor = RandomSorterBins.executor host
+//let project = RandomSorterBins.project
+//let projectFolder = RandomSorterBins.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+//let buildQueryParams = RandomSorterBins.makeQueryParamsFromRunParams
+//let paramRefiner = RandomSorterBins.paramMapRefiner host
+//let minReplica = 0<replNumber>
+//let maxReplica = 10<replNumber>
 
 
 ///// **********  MergeRandomSorterBins   ****************
-//let executor = MergeRandomSorterBins.executor
-//let project = MergeRandomSorterBins.project
-//let projectFolder = MergeRandomSorterBins.projectFolder
-//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
-//let buildQueryParams = MergeRandomSorterBins.makeQueryParamsFromRunParams
-//let paramRefiner = MergeRandomSorterBins.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+let host = MergeRandomSorterBins.P1.host    
+let executor = MergeRandomSorterBins.executor host
+let project = MergeRandomSorterBins.project
+let projectFolder = MergeRandomSorterBins.projectFolder
+let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+let buildQueryParams = MergeRandomSorterBins.makeQueryParamsFromRunParams
+let paramRefiner = MergeRandomSorterBins.paramMapRefiner host
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
 

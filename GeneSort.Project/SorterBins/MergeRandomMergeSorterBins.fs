@@ -435,7 +435,7 @@ module MergeRandomMergeSorterBins =
                             sortingSet.create
                                 (%qpCenterSortingSet.Id |> UMX.tag<sortingSetId>)
                                 (SortingSetFilter.sampleTheCenterBins 
-                                        MergeRandomSorterBins_P1.maxCenterSampledSetSize 
+                                        MergeRandomSorterBins.P1.maxSampledSetSize 
                                         mergedSorterEvalBins 
                                         mergedCenterSet )
 
@@ -443,7 +443,7 @@ module MergeRandomMergeSorterBins =
                             sortingSet.create
                                 (%qpWinningSortingSet.Id |> UMX.tag<sortingSetId>)
                                 (SortingSetFilter.sampleWinningBins 
-                                        MergeRandomSorterBins_P1.maxCenterSampledSetSize 
+                                        MergeRandomSorterBins.P1.maxSampledSetSize 
                                         mergedSorterEvalBins 
                                         mergedWinningSet )
 

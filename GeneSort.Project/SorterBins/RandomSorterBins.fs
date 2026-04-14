@@ -87,10 +87,10 @@ module RandomSorterBins =
 
     module P1 =
         let spans = [
-            (runParameters.sortingWidthKey, ["8"])
+            (runParameters.sortingWidthKey, ["16"])
             (runParameters.sorterModelTypeKey, [sorterModelType.Msce] |> List.map SorterModelType.toString)
             (runParameters.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
-            (runParameters.sorterCountKey, ["10"])
+            (runParameters.sorterCountKey, ["100"])
         ]
         let host = randomSorterBinsHost.Create (new GeneSortDbMp(projectFolder) :> IGeneSortDb) spans paramMapFilter
 

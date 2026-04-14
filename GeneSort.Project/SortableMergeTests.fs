@@ -82,9 +82,9 @@ module SortableMergeTests =
 
     module P1 =
         let spans = [
-            (runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] |> List.map string)
+            (runParameters.sortingWidthKey, [16;] |> List.map string)
             (runParameters.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
-            (runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
+            (runParameters.mergeDimensionKey, [2;] |> List.map string)
             (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix; mergeSuffixType.VV_1] |> List.map MergeSuffixType.toString)
         ]
         let host = sortableMergeHost.Create (new GeneSortDbMp(projectFolder) :> IGeneSortDb) spans paramMapFilter
@@ -93,9 +93,9 @@ module SortableMergeTests =
 
     module P2 =
         let spans = [
-            (runParameters.sortingWidthKey, [16; 32; 48; 64; 96; 128] |> List.map string)
+            (runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] |> List.map string)
             (runParameters.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
-            (runParameters.mergeDimensionKey, [2; 3; 4] |> List.map string)
+            (runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
             (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix; mergeSuffixType.VV_1] |> List.map MergeSuffixType.toString)
         ]
         let host = sortableMergeHost.Create (new GeneSortDbMp(projectFolder) :> IGeneSortDb) spans paramMapFilter
