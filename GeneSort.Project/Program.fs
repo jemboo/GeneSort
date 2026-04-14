@@ -91,27 +91,29 @@ let maxParallel = 1 // Set a reasonable limit for your machine
 
 
 ///// **********    FullBoolEvals   ****************
-let host = FullBoolEvals.P1.host
-let project = FullBoolEvals.project
-let executor = FullBoolEvals.executor host
-let projectFolder = FullBoolEvals.projectFolder
-let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
-let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
-let paramRefiner = FullBoolEvals.paramMapRefiner host
-let minReplica = 0<replNumber>
-let maxReplica = 1<replNumber>
+//let host = FullBoolEvals.P1.host
+//let project = FullBoolEvals.project
+//let executor = FullBoolEvals.executor host
+//let projectFolder = FullBoolEvals.projectFolder
+//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+//let buildQueryParams = FullBoolEvals.makeQueryParamsFromRunParams
+//let paramRefiner = FullBoolEvals.paramMapRefiner host
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
 
 
 
 ///// **********     RandomSorterBins   ****************
-//let executor = RandomSorterBins.executor
-//let project = RandomSorterBins.project
-//let projectFolder = RandomSorterBins.projectFolder
-//let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
-//let buildQueryParams = RandomSorterBins.makeQueryParamsFromRunParams
-//let paramRefiner = RandomSorterBins.paramMapRefiner
-//let minReplica = 0<replNumber>
-//let maxReplica = 100<replNumber>
+let host = RandomSorterBins.P1.host
+let executor = RandomSorterBins.executor host
+let project = RandomSorterBins.project
+let projectFolder = RandomSorterBins.projectFolder
+let geneSortDb = new GeneSortDbMp(projectFolder) :> IGeneSortDb
+let buildQueryParams = RandomSorterBins.makeQueryParamsFromRunParams
+let paramRefiner = RandomSorterBins.paramMapRefiner host
+let minReplica = 0<replNumber>
+let maxReplica = 2<replNumber>
+
 
 ///// **********  MergeRandomSorterBins   ****************
 //let executor = MergeRandomSorterBins.executor
