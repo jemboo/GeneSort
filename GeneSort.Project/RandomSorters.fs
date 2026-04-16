@@ -176,7 +176,7 @@ module RandomSorters =
         project.create projectName projectDesc outputDataTypes
 
     // --- The Executor ---
-    let executor (host: randomSortersHost) (db: IGeneSortDb) (runParameters: runParameters) 
+    let executor (host: randomSortersHost) (runParameters: runParameters) 
                  (allowOverwrite: bool<allowOverwrite>) (cts: CancellationTokenSource) 
                  (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 

@@ -122,7 +122,7 @@ module MergeRandomSorterBins =
 
     // --- Executor ---
 
-    let executor (host: mergeRandomSorterBinsHost) (db: IGeneSortDb) (runParameters: runParameters) 
+    let executor (host: mergeRandomSorterBinsHost) (runParameters: runParameters) 
                  (allowOverwrite: bool<allowOverwrite>) (cts: CancellationTokenSource) 
                  (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
@@ -203,12 +203,12 @@ module MergeRandomSorterBins =
                 dtReport.AppendDataRows (rows |> Array.toSeq)
 
                 // 6. Save results
-                let! _ = db.saveAsync qpBins (mBins |> outputData.SorterEvalBins) allowOverwrite
-                let! _ = db.saveAsync qpEven (mEven |> outputData.SortingSet) allowOverwrite
-                let! _ = db.saveAsync qpHull (hullSet |> outputData.SortingSet) allowOverwrite
-                let! _ = db.saveAsync qpCenter (mCenter |> outputData.SortingSet) allowOverwrite
-                let! _ = db.saveAsync qpWinning (mWinning |> outputData.SortingSet) allowOverwrite
-                let! _ = db.saveAsync qpReport (dtReport |> outputData.TextReport) allowOverwrite
+                let! _ = host.ProjectDb.saveAsync qpBins (mBins |> outputData.SorterEvalBins) allowOverwrite
+                let! _ = host.ProjectDb.saveAsync qpEven (mEven |> outputData.SortingSet) allowOverwrite
+                let! _ = host.ProjectDb.saveAsync qpHull (hullSet |> outputData.SortingSet) allowOverwrite
+                let! _ = host.ProjectDb.saveAsync qpCenter (mCenter |> outputData.SortingSet) allowOverwrite
+                let! _ = host.ProjectDb.saveAsync qpWinning (mWinning |> outputData.SortingSet) allowOverwrite
+                let! _ = host.ProjectDb.saveAsync qpReport (dtReport |> outputData.TextReport) allowOverwrite
 
                 return runParameters.WithRunFinished (Some true)
 

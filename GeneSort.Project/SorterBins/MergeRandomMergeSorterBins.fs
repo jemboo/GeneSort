@@ -127,7 +127,7 @@ module MergeRandomMergeSorterBins =
     let project = project.create projectName projectDesc outputDataTypes
 
     // --- The Executor ---
-    let executor (host: mergeRandomMergeSorterBinsHost) (db: IGeneSortDb) (runParameters: runParameters) 
+    let executor (host: mergeRandomMergeSorterBinsHost) (runParameters: runParameters) 
                  (allowOverwrite: bool<allowOverwrite>) (cts: CancellationTokenSource) 
                  (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
@@ -231,12 +231,12 @@ module MergeRandomMergeSorterBins =
                 dtReport.AppendDataRows (rows |> Array.toSeq)
 
                 // 9. Persist to DB (Using the project-specific DB provided in the call)
-                let! _ = db.saveAsync qpEvalBins (mergedEvalBins |> outputData.SorterEvalBins) allowOverwrite
-                let! _ = db.saveAsync qpEvenSet (mergedEvenSet |> outputData.SortingSet) allowOverwrite
-                let! _ = db.saveAsync qpCenterSet (mergedCenterSet |> outputData.SortingSet) allowOverwrite
-                let! _ = db.saveAsync qpWinningSet (mergedWinningSet |> outputData.SortingSet) allowOverwrite
-                let! _ = db.saveAsync qpHullSet (hullSampledSet |> outputData.SortingSet) allowOverwrite
-                let! _ = db.saveAsync qpReport (dtReport |> outputData.TextReport) allowOverwrite
+                let! _ = host.ProjectDb.saveAsync qpEvalBins (mergedEvalBins |> outputData.SorterEvalBins) allowOverwrite
+                let! _ = host.ProjectDb.saveAsync qpEvenSet (mergedEvenSet |> outputData.SortingSet) allowOverwrite
+                let! _ = host.ProjectDb.saveAsync qpCenterSet (mergedCenterSet |> outputData.SortingSet) allowOverwrite
+                let! _ = host.ProjectDb.saveAsync qpWinningSet (mergedWinningSet |> outputData.SortingSet) allowOverwrite
+                let! _ = host.ProjectDb.saveAsync qpHullSet (hullSampledSet |> outputData.SortingSet) allowOverwrite
+                let! _ = host.ProjectDb.saveAsync qpReport (dtReport |> outputData.TextReport) allowOverwrite
 
                 ProjectOps.report progress (sprintf "Merge Complete: %s" %runId)
                 return runParameters.WithRunFinished (Some true)

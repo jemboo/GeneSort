@@ -152,7 +152,7 @@ module MutateSortingSet =
 
 
     // --- The Executor ---
-    let executor (host: mutateSortingSetHost) (db: IGeneSortDb) (runParameters: runParameters) 
+    let executor (host: mutateSortingSetHost) (runParameters: runParameters) 
                  (allowOverwrite: bool<allowOverwrite>) (cts: CancellationTokenSource) 
                  (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 

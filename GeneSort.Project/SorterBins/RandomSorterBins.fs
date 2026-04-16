@@ -133,7 +133,7 @@ module RandomSorterBins =
     let project = project.create  projectName projectDesc 
                                      [| outputDataType.RunParameters; outputDataType.SorterEvalBins ""; outputDataType.SortingSet "EvenSampled"; outputDataType.SortingSet "HullSampled" |]
 
-    let executor (host: randomSorterBinsHost) (db: IGeneSortDb) (runParameters: runParameters) 
+    let executor (host: randomSorterBinsHost) (runParameters: runParameters) 
                  (allowOverwrite: bool<allowOverwrite>) (cts: CancellationTokenSource) 
                  (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 

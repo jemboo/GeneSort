@@ -168,7 +168,7 @@ module RandomMergeSorterBins =
     let project = project.create projectName projectDesc 
                      [| outputDataType.RunParameters; outputDataType.SorterEvalBins ""; outputDataType.SortingSet "EvenSampled" |]
 
-    let executor (host: randomMergeSorterBinsHost) (db: IGeneSortDb) (runParameters: runParameters) 
+    let executor (host: randomMergeSorterBinsHost) (runParameters: runParameters) 
                  (allowOverwrite: bool<allowOverwrite>) (cts: CancellationTokenSource) 
                  (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 

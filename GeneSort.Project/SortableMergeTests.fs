@@ -119,7 +119,7 @@ module SortableMergeTests =
 
     // --- Executor ---
 
-    let executor (host: sortableMergeHost) (db: IGeneSortDb) (runParams: runParameters) 
+    let executor (host: sortableMergeHost) (runParams: runParameters) 
                  (allowOverwrite: bool<allowOverwrite>) (cts: CancellationTokenSource) 
                  (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 

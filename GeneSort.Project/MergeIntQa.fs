@@ -125,7 +125,7 @@ module MergeIntQa =
     let project = project.create  projectName projectDesc outputDataTypes
 
     // --- The Executor ---
-    let executor (host: mergeIntQaHost) (db: IGeneSortDb) (runParameters: runParameters) 
+    let executor (host: mergeIntQaHost) (runParameters: runParameters) 
                  (allowOverwrite: bool<allowOverwrite>) (cts: CancellationTokenSource) 
                  (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 

@@ -36,6 +36,7 @@ type mergeIntEvalsHost =
             return (r, sw, md, mst, sdf, smt)
         }
 
+
 module MergeIntEvals =
 
     let projectName = "MergeIntEvals" |> UMX.tag<projectName>
@@ -127,9 +128,11 @@ module MergeIntEvals =
            outputDataType.TextReport ("Bins" |> UMX.tag); outputDataType.TextReport ("Profiles" |> UMX.tag) |]
      
     let project = project.create  projectName projectDesc outputDataTypes
+
+
     // --- The Executor ---
 
-    let executor (host: mergeIntEvalsHost) (db: IGeneSortDb) (runParameters: runParameters) 
+    let executor (host: mergeIntEvalsHost) (runParameters: runParameters) 
                  (allowOverwrite: bool<allowOverwrite>) (cts: CancellationTokenSource) 
                  (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 

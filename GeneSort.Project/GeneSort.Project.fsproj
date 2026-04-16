@@ -12,7 +12,6 @@
   <ItemGroup>
     <Compile Include="ProjectOps.fs" />
     <Compile Include="TextReporters.fs" />
-    <Compile Include="PermutationOrbits.fs" />
     <Compile Include="RandomSorters.fs" />
     <Compile Include="SortableMergeTests.fs" />
     <Compile Include="SorterBins\RandomSorterBins.fs" />

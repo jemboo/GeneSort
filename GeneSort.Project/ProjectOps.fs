@@ -65,7 +65,7 @@ module ProjectOps =
     let executeRunParameters
             (db: IGeneSortDb)
             (buildQueryParams: runParameters -> outputDataType -> queryParams) 
-            (executor: IGeneSortDb -> runParameters -> bool<allowOverwrite> ->
+            (executor: runParameters -> bool<allowOverwrite> ->
                        CancellationTokenSource -> IProgress<string> option 
                         -> Async<Result<runParameters, string>>)
             (runParameters: runParameters)
@@ -86,7 +86,7 @@ module ProjectOps =
                 // 2. Use the builder to handle the execution + status save sequence
                 let! finalResult = asyncResult {
                     // Execute the main work
-                    let! updatedParams = executor db runParameters allowOverwrite cts progress
+                    let! updatedParams = executor runParameters allowOverwrite cts progress
                 
                     // If main work succeeded, save the "Finished" status
                     let qp = buildQueryParams updatedParams outputDataType.RunParameters
@@ -182,7 +182,7 @@ module ProjectOps =
     let executeRunParametersSeq
                 (db: IGeneSortDb)
                 (maxDegreeOfParallelism: int)
-                (executor: IGeneSortDb ->  runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option -> Async<Result<runParameters, string>>)
+                (executor: runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option -> Async<Result<runParameters, string>>)
                 (runParameters: runParameters seq)
                 (buildQueryParams: runParameters -> outputDataType -> queryParams)
                 (allowOverwrite: bool<allowOverwrite>)
@@ -346,7 +346,7 @@ module ProjectOps =
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource)
             (progress: IProgress<string> option)
-            (executor: IGeneSortDb -> runParameters ->
+            (executor: runParameters ->
                        bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option
                             -> Async<Result<runParameters, string>>)
             (maxDegreeOfParallelism: int)

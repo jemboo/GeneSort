@@ -107,7 +107,7 @@ module FullBoolEvals =
 
     // --- The Executor ---
 
-    let executor (host: fullBoolEvalsHost) (db: IGeneSortDb) (runParameters: runParameters) 
+    let executor (host: fullBoolEvalsHost) (runParameters: runParameters) 
                  (allowOverwrite: bool<allowOverwrite>) (cts: CancellationTokenSource) 
                  (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 

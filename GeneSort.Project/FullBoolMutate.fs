@@ -132,7 +132,7 @@ module FullBoolMutate =
         fullBoolMutateHost.Create db parameterSpans 100<sorterCount>
 
     // --- The Executor ---
-    let executor (host: fullBoolMutateHost) (db: IGeneSortDb) (runParameters: runParameters) 
+    let executor (host: fullBoolMutateHost) (runParameters: runParameters) 
                  (allowOverwrite: bool<allowOverwrite>) (cts: CancellationTokenSource) 
                  (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
