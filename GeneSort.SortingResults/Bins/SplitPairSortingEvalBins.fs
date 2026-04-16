@@ -60,3 +60,9 @@ module SplitPairSortingEvalBins =
             sorterEvalBinsSecondSecond = sorterEvalBinsSecondSecond
         }
 
+
+    let getAllTaggedSorterEvalBins (splitPairSortingEvalBins:splitPairSortingEvalBins) : (sorterEvalBins * modelTag) seq =
+        seq { yield (splitPairSortingEvalBins.SorterEvalBinsFirstFirst, modelTag.SplitPair First_First)
+              yield (splitPairSortingEvalBins.SorterEvalBinsFirstSecond, modelTag.SplitPair First_Second)
+              yield (splitPairSortingEvalBins.SorterEvalBinsSecondFirst, modelTag.SplitPair Second_First)
+              yield (splitPairSortingEvalBins.SorterEvalBinsSecondSecond, modelTag.SplitPair Second_Second) }

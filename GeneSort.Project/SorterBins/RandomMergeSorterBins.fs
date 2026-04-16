@@ -111,9 +111,12 @@ module RandomMergeSorterBins =
     module P1 =
         let spans = [
             (runParameters.sortingWidthKey, [32; 64] |> List.map string)
-            (runParameters.sorterModelTypeKey, [sorterModelType.Msce; sorterModelType.Mssi; sorterModelType.Msrs; sorterModelType.Msuf4] |> List.map SorterModelType.toString)
+            (runParameters.sorterModelTypeKey, [sorterModelType.Msce; sorterModelType.Mssi; 
+                                                sorterModelType.Msrs; sorterModelType.Msuf4] 
+                                                |> List.map SorterModelType.toString)
             (runParameters.mergeDimensionKey, [2; 4;] |> List.map string)
-            (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix; mergeSuffixType.VV_1] |> List.map MergeSuffixType.toString)
+            (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix; mergeSuffixType.VV_1]
+                                               |> List.map MergeSuffixType.toString)
             (runParameters.sorterCountKey, ["1000"])
         ]
         let host = randomMergeSorterBinsHost.Create (new GeneSortDbMp(projectFolder) :> IGeneSortDb) spans paramMapFilter
@@ -122,9 +125,12 @@ module RandomMergeSorterBins =
     module P2 =
         let spans = [
             (runParameters.sortingWidthKey, [16; 32; 48; 64; 96; 128] |> List.map string)
-            (runParameters.sorterModelTypeKey, [sorterModelType.Msce; sorterModelType.Mssi; sorterModelType.Msrs; sorterModelType.Msuf4] |> List.map SorterModelType.toString)
+            (runParameters.sorterModelTypeKey, [sorterModelType.Msce; sorterModelType.Mssi; 
+                                                sorterModelType.Msrs; sorterModelType.Msuf4] 
+                                                |> List.map SorterModelType.toString)
             (runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
-            (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix; mergeSuffixType.VV_1] |> List.map MergeSuffixType.toString)
+            (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix; 
+                                                mergeSuffixType.VV_1] |> List.map MergeSuffixType.toString)
             (runParameters.sorterCountKey, ["1000"])
         ]
         let host = randomMergeSorterBinsHost.Create (new GeneSortDbMp(projectFolder) :> IGeneSortDb) spans paramMapFilter
@@ -173,27 +179,39 @@ module RandomMergeSorterBins =
                 let repl = runParameters.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
                 ProjectOps.report progress (sprintf "%s Starting Run %s" (MathUtils.getTimestampString()) %runId)
 
-                let! (smt, sw, sl, cl, sc, sdt, md, mst) = 
+                let! (sorterModelType, sortingWidth, stageLength, ceLength, sorterCount, sortableDataFormat, mergeDimension, mergeSuffixType) = 
                     host.ExtractDomainParams runParameters |> Result.ofOption "Missing parameters"
 
                 // 3. Create sorting set
-                let smGen =
-                    match smt with
-                    | sorterModelType.Msce -> msceRandGen.create rngFactory sw excludeSelfCe cl |> sorterModelGen.SmmMsceRandGen
-                    | sorterModelType.Mssi -> mssiRandGen.create rngFactory sw sl |> sorterModelGen.SmmMssiRandGen
-                    | sorterModelType.Msrs -> msrsRandGen.create rngFactory sw (OpsGenRatesArray.createUniform %sl) |> sorterModelGen.SmmMsrsRandGen
-                    | sorterModelType.Msuf4 -> msuf4RandGen.create rngFactory sw sl (Uf4GenRatesArray.createUniform %sl %sw) |> sorterModelGen.SmmMsuf4RandGen
+                let sorterModelGen =
+                    match sorterModelType with
+                    | sorterModelType.Msce -> msceRandGen.create 
+                                                rngFactory sortingWidth excludeSelfCe ceLength |> sorterModelGen.SmmMsceRandGen
+                    | sorterModelType.Mssi -> mssiRandGen.create 
+                                                rngFactory sortingWidth stageLength |> sorterModelGen.SmmMssiRandGen
+                    | sorterModelType.Msrs -> msrsRandGen.create 
+                                                rngFactory sortingWidth (OpsGenRatesArray.createUniform %stageLength) |> sorterModelGen.SmmMsrsRandGen
+                    | sorterModelType.Msuf4 -> msuf4RandGen.create 
+                                                rngFactory sortingWidth stageLength 
+                                                (Uf4GenRatesArray.createUniform %stageLength %sortingWidth) |> sorterModelGen.SmmMsuf4RandGen
                     | _ -> failwith "Unsupported model type"
 
-                let firstIdx = (%repl * %sc) |> UMX.tag<sorterCount>
-                let genSeg = sortingGenSegment.create (smGen |> sortingGen.Single) firstIdx sc
+                let firstIdx = (%repl * %sorterCount) |> UMX.tag<sorterCount>
+                let genSeg = sortingGenSegment.create (sorterModelGen |> sortingGen.Single) firstIdx sorterCount
                 let qpFullSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "") 
                 let fullSortingSet = genSeg.MakeSortingSet (%qpFullSet.Id |> UMX.tag)
                 let fullSorterSet = fullSortingSet |> SortingSet.makeSorterSet
 
                 // 4. Load external tests (Merge Tests)
                 let! _ = checkCancellation cts.Token
-                let qpTests = SortableMergeTests.makeQueryParams (Some (0 |> UMX.tag)) (Some sw) (Some md) (Some mst) (Some sdt) (outputDataType.SortableTest "")
+                let qpTests = SortableMergeTests.makeQueryParams 
+                                        (Some (0 |> UMX.tag)) 
+                                        (Some sortingWidth) 
+                                        (Some mergeDimension) 
+                                        (Some mergeSuffixType) 
+                                        (Some sortableDataFormat) 
+                                        (outputDataType.SortableTest "")
+
                 let dbMergeTests = new GeneSortDbMp(SortableMergeTests.projectFolder) :> IGeneSortDb
                 let! rawTestData = dbMergeTests.loadAsync qpTests 
                 let! tests = rawTestData |> OutputData.asSortableTest

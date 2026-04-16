@@ -140,7 +140,7 @@ module MergeRandomMergeSorterBins =
                 ProjectOps.report progress (sprintf "%s Starting Merge Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
 
                 // 2. Safe Parameter Extraction (Via Host)
-                let! (md, mst, smt, sw, srp, rsp) = 
+                let! (md, mst, sorterModelType, sortingWidth, srp, rsp) = 
                     host.ExtractDomainParams runParameters 
                     |> Result.ofOption (sprintf "Run %s: Missing required parameters" %runId) |> asAsync
 
@@ -160,13 +160,13 @@ module MergeRandomMergeSorterBins =
                 // 5. Connect to the Source Project DB
                 let dbSource = new GeneSortDbMp(RandomMergeSorterBins.projectFolder) :> IGeneSortDb
 
-                // 6. Merge Loop (The "Memory Wall" sensitive part)
+                // 6. Merge Loop
                 for r in 0 .. (%rsp - 1) do
                     let currentRepl = %srp + r |> UMX.tag<replNumber>
                     
                     // Construct queries for the source data (RandomMergeSorterBins project)
-                    let qpSourceEval = RandomMergeSorterBins.makeQueryParams (Some currentRepl) (Some sw) (Some md) (Some mst) (Some smt) (outputDataType.SorterEvalBins "")
-                    let qpSourceSet = RandomMergeSorterBins.makeQueryParams (Some currentRepl) (Some sw) (Some md) (Some mst) (Some smt) (outputDataType.SortingSet "EvenSampled")
+                    let qpSourceEval = RandomMergeSorterBins.makeQueryParams (Some currentRepl) (Some sortingWidth) (Some md) (Some mst) (Some sorterModelType) (outputDataType.SorterEvalBins "")
+                    let qpSourceSet = RandomMergeSorterBins.makeQueryParams (Some currentRepl) (Some sortingWidth) (Some md) (Some mst) (Some sorterModelType) (outputDataType.SortingSet "EvenSampled")
 
                     // Load source data
                     let! curEval = dbSource.loadAsync qpSourceEval |> AsyncResult.bindResult OutputData.asSorterEvalBins
@@ -192,20 +192,40 @@ module MergeRandomMergeSorterBins =
                 let hullSampledSet = sortingSet.create (%qpHullSet.Id |> UMX.tag) hullData
 
                 // 8. Generate DataTable Report
-                let reportName = $"MergeReport_{%sw}_{smt |> SorterModelType.toString}_{%md}_{mst}" |> UMX.tag<textReportName>
+                let reportName = $"MergeReport_{%sortingWidth}_{sorterModelType |> SorterModelType.toString}_{%md}_{mst}" |> UMX.tag<textReportName>
                 let qpReport = makeQueryParamsFromRunParams runParameters (outputDataType.TextReport reportName)
                 
                 let mergeProperties = 
                         [ 
-                            ("sortingWidth", (Some sw) |> SortingWidth.toString)
-                            ("sorterModelType", smt |> SorterModelType.toString)
+                            ("sortingWidth", (Some sortingWidth) |> SortingWidth.toString)
+                            ("sorterModelType", sorterModelType |> SorterModelType.toString)
                             ("mergeDimension", Some md |> MergeDimension.toString)
                             ("mergeSuffixType", mst |> MergeSuffixType.toString)
                         ] |> Map.ofList
 
-                let keyFormatter ((idx, tag), key: sorterEvalKey) = sprintf "%d_%s_%s" idx tag (key.AsString())
+                let keyFormatter ((sw:int<sortingWidth>, smt:sorterModelType), key: sorterEvalKey) = 
+                            sprintf "%d_%s_%s" 
+                                    %sw 
+                                    (smt |> SorterModelType.toString) 
+                                    (key.AsString())
 
-                let tableMap = SorterEvalBins.getPropertyMaps mergedEvalBins (%sw, smt |> SorterModelType.toString) mergeProperties |> Map.ofSeq
+                let keyToMap (sw:int<sortingWidth>) 
+                             (smt:sorterModelType) : Map<string, string> =
+                             Map.ofList [("sortingWidth", (Some sortingWidth) |> SortingWidth.toString); 
+                                         ("sorterModelType", sorterModelType |> SorterModelType.toString)]
+
+                let tableMap = SorterEvalBins.getPropertyMaps 
+                                    mergedEvalBins 
+                                    (sortingWidth, sorterModelType) 
+                                    mergeProperties 
+                               |> Map.ofSeq
+
+                let tableMapNew = SorterEvalBins.getPropertyMapsNew
+                                    mergedEvalBins 
+                                    (keyToMap sortingWidth sorterModelType)
+                                    mergeProperties 
+                               |> Map.ofSeq
+
                 let headers, rows = DataTableReport.mapToTabDelimitedStrings keyFormatter tableMap
                 let dtReport = DataTableReport.create %reportName headers
                 dtReport.AppendDataRows (rows |> Array.toSeq)

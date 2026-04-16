@@ -33,10 +33,35 @@ module MutationSegmentEvalBins =
             mutantSortingEvalBins = mutantSortingEvalBins
         }
 
-    let makeFromSorting (ting: sorting) : mutationSegmentEvalBins =
-        let mutantSortingEvalBins = SortingEvalBins.makeFromSorting ting
-        let sortingResult = SortingResult.makeFromSorting ting
+    let makeFromSorting (sorting: sorting) : mutationSegmentEvalBins =
+        let mutantSortingEvalBins = SortingEvalBins.makeFromSorting sorting
+        let sortingResult = SortingResult.makeFromSorting sorting
         {
             parentSortingResult = sortingResult
             mutantSortingEvalBins = mutantSortingEvalBins
         }
+
+    //let getPropertyMaps<'t>
+    //                (mutationSegmentEvalBins:mutationSegmentEvalBins) 
+    //                (baseKey:'t) 
+    //                (baseProperties: Map<string, string>) = 
+    //    match mutationSegmentEvalBins.ParentSortingResult with
+    //    | Single ssr -> 
+    //        let parentMaps = SortingEvalBins.getPropertyMaps mutationSegmentEvalBins.MutantSortingEvalBins baseKey baseProperties
+    //        let parentEval = ssr.SorterEval.Value
+    //        let parentMap = baseProperties |> Map.add "modelTag" (modelTag.Single.ToString())
+    //        let parentCombinedMap = parentMap |> Map.add "evalType" "parent"
+    //        let parentResult = ((baseKey, modelTag.Single, sorterEvalKey.Parent), parentCombinedMap)
+    //        Seq.append (Seq.singleton parentResult) parentMaps
+
+    //    | Pairs psr ->
+    //        let parentMaps = SortingEvalBins.getPropertyMaps mutationSegmentEvalBins.MutantSortingEvalBins baseKey baseProperties
+    //        let parentEvals = psr |> PairsSortingResult.getAllTaggedSorterEvals
+    //        let parentResults = 
+    //            parentEvals 
+    //            |> Seq.map (fun (eval, modelSetTag) -> 
+    //                let parentMap = baseProperties |> Map.add "modelTag" (modelSetTag.ModelTag.ToString())
+    //                let parentCombinedMap = parentMap |> Map.add "evalType" "parent"
+    //                ((baseKey, modelSetTag.ModelTag, sorterEvalKey.Parent), parentCombinedMap))
+    //        Seq.append parentResults parentMaps
+            

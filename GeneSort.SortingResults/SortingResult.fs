@@ -19,8 +19,8 @@ module SortingResult =
 
 
     let addSorterEval (modelTag: modelTag) 
-                         (newEval: sorterEval) 
-                         (sortingResult: sortingResult) : unit =
+                      (newEval: sorterEval) 
+                      (sortingResult: sortingResult) : unit =
         match sortingResult with
         | Single ssr -> ssr.AddSorterEval modelTag newEval
         | Pairs psr ->

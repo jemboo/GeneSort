@@ -95,6 +95,7 @@ type sorterEvalBins =
             |> Seq.map (fun p -> p.Leaf)
             |> Seq.toArray
 
+
 module SorterEvalBins =
 
     let merge (target: sorterEvalBins) (source: sorterEvalBins) : sorterEvalBins =
@@ -220,3 +221,18 @@ module SorterEvalBins =
         |> Seq.map (fun (key, leaf) ->
             let combinedMap = leaf.combineMap baseProperties
             ((baseKey, key), combinedMap))
+
+
+    let getPropertyMapsNew
+            (bins: sorterEvalBins)
+            (baseKey: Map<string, string>) 
+            (baseProperties: Map<string, string>) 
+            : ((Map<string, string>) * Map<string, string>) seq =
+            bins.Layers
+            |> Map.toSeq
+            |> Seq.map (fun (key, leaf) ->
+                let combinedMap = leaf.combineMap baseProperties
+                let combinedKey = baseKey |> Map.add "ceCount" ((%key.CeCount).ToString())
+                                          |> Map.add "stageLength" ((%key.StageLength).ToString())
+                                          |> Map.add "isSorted" (key.IsSorted.ToString())
+                (combinedKey, combinedMap))

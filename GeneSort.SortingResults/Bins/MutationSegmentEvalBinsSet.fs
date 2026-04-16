@@ -18,9 +18,9 @@ type mutationSegmentEvalBinsSet =
 
     member this.GetBinDict() = this.binDict :> seq<KeyValuePair<Guid<sortingId>, mutationSegmentEvalBins>>
 
-    member this.AddMutantSorterEval (sorterEval: sorterEval) (modelSuperSetTag:modelSuperSetTag) =
+    member this.AddMutantSorterEval (sorterEval: sorterEval) (modelSuperSetTag:modelSuperSetTag) : unit =
         match this.binDict.TryGetValue(modelSuperSetTag.SortingId) with
-        | true, bins -> bins.AddMutantSorterEval sorterEval modelSuperSetTag.ModelTag
+        | true, bins -> bins.AddMutantSorterEval sorterEval modelSuperSetTag.ModelTag |> ignore
         | false, _ -> failwithf "SortingId %A not found in mutationSegmentEvalBinsSet." modelSuperSetTag.SortingId
 
     member this.AddAllMutantSorterEvals (tupes: (sorterEval * modelSuperSetTag) seq) =

@@ -38,3 +38,9 @@ module PairSortingEvalBins =
         | sorterPairModel.SplitPairs2 _ -> 
             SplitPairs2 (
                     splitPairSortingEvalBins.create (Guid.NewGuid () |> UMX.tag<sortingEvalBinsId>))
+
+
+    let getAllTaggedSorterEvalBins (pairSortingEvalBins:pairSortingEvalBins) : (sorterEvalBins * modelTag) seq =
+        match pairSortingEvalBins with
+        | SplitPairs sp -> SplitPairSortingEvalBins.getAllTaggedSorterEvalBins sp
+        | SplitPairs2 sp2 -> SplitPairSortingEvalBins.getAllTaggedSorterEvalBins sp2

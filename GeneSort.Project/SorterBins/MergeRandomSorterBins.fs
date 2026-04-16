@@ -130,7 +130,7 @@ module MergeRandomSorterBins =
             try
                 let! _ = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
-                let! (smt, sw, srp, rsp) = host.ExtractDomainParams runParameters |> Result.ofOption "Missing parameters"
+                let! (sorterModelType, sortingWidth, srp, rsp) = host.ExtractDomainParams runParameters |> Result.ofOption "Missing parameters"
                 
                 ProjectOps.report progress (sprintf "Merging %d repls starting at %d for %s" %rsp %srp %runId)
 
@@ -153,10 +153,18 @@ module MergeRandomSorterBins =
                 for r in 0 .. (%rsp - 1) do
                     let currentRepl = %srp + r |> UMX.tag<replNumber>
                     
-                    let qpSrcBins = RandomSorterBins.makeQueryParams (Some currentRepl) (Some sw) (Some smt) (outputDataType.SorterEvalBins "")
+                    let qpSrcBins = RandomSorterBins.makeQueryParams 
+                                            (Some currentRepl) 
+                                            (Some sortingWidth) 
+                                            (Some sorterModelType) 
+                                            (outputDataType.SorterEvalBins "")
                     let! srcBins = dbSource.loadAsync qpSrcBins |> AsyncResult.bindResult OutputData.asSorterEvalBins
 
-                    let qpSrcSet = RandomSorterBins.makeQueryParams (Some currentRepl) (Some sw) (Some smt) (outputDataType.SortingSet "EvenSampled")
+                    let qpSrcSet = RandomSorterBins.makeQueryParams 
+                                            (Some currentRepl) 
+                                            (Some sortingWidth) 
+                                            (Some sorterModelType) 
+                                            (outputDataType.SortingSet "EvenSampled")
                     let! srcSet = dbSource.loadAsync qpSrcSet |> AsyncResult.bindResult OutputData.asSortingSet
 
                     // Update Aggregates
@@ -174,11 +182,22 @@ module MergeRandomSorterBins =
                 let hullSet = sortingSet.create (%qpHull.Id |> UMX.tag) (SortingSetFilter.sampleBinsConvexHull samplesPerBin mBins mEven)
 
                 // 5. Reporting
-                let reportName = $"MergeReport_{%sw}_{smt |> SorterModelType.toString}" |> UMX.tag<textReportName>
+                let reportName = $"MergeReport_{%sortingWidth}_{sorterModelType |> SorterModelType.toString}" |> UMX.tag<textReportName>
                 let qpReport = makeQueryParamsFromRunParams runParameters (outputDataType.TextReport reportName)
                 
-                let tableMap = SorterEvalBins.getPropertyMaps mBins (%sw, smt |> SorterModelType.toString) Map.empty |> Map.ofSeq
-                let keyFormatter ((idx, name), key: sorterEvalKey) = sprintf "%d_%s_%s" idx name (key.AsString())
+
+                let keyFormatter ((sw:int<sortingWidth>, smt:sorterModelType), key: sorterEvalKey) = 
+                            sprintf "%d_%s_%s" 
+                                    %sw 
+                                    (smt |> SorterModelType.toString) 
+                                    (key.AsString())
+
+                let tableMap = SorterEvalBins.getPropertyMaps 
+                                    mBins 
+                                    (sortingWidth, sorterModelType) 
+                                    Map.empty 
+                               |> Map.ofSeq
+
                 let headers, rows = DataTableReport.mapToTabDelimitedStrings keyFormatter tableMap
                 let dtReport = DataTableReport.create %reportName headers
                 dtReport.AppendDataRows (rows |> Array.toSeq)
