@@ -1,55 +1,68 @@
 ﻿namespace GeneSort.Core
+
 open System
 open MathUtils
 
 [<Struct; CustomEquality; NoComparison>]
 type uf6MutationRatesArray =
     private 
-        { rates: uf6MutationRates array }
+        { 
+            Rates: uf6MutationRates array 
+            CachedHash: int
+        }
 
     static member create (rates: uf6MutationRates array) : uf6MutationRatesArray =
+        // Domain Validation
         if Array.exists (fun r -> r.order < 6 || r.order % 2 <> 0) rates then
             failwith "All Uf6MutationRates orders must be at least 6 and even"
-        { rates = rates }
+        
+        // Calculate hash once at construction
+        let mutable h = 17
+        for i = 0 to rates.Length - 1 do
+            let r = rates.[i]
+            // These child .GetHashCode() calls are O(1) if they follow the caching pattern
+            h <- h * 23 + r.order.GetHashCode()
+            h <- h * 23 + r.seed6TransitionRates.GetHashCode()
+            h <- h * 23 + r.opsTransitionRates.GetHashCode()
+            
+        { Rates = rates; CachedHash = h }
 
-    member this.Length = this.rates.Length
-    member this.Item(index: int) = this.rates.[index]
-    member this.RatesArray = this.rates
+    member this.Length = this.Rates.Length
+    member this.Item(index: int) = this.Rates.[index]
+    member this.RatesArray = this.Rates
 
     member this.toString() =
         String.Join(", ", Array.map (
             fun r -> sprintf "Uf6MutationRates(order=%d, seed=%s, opsTransitionRates=%s)" 
                         r.order 
                         (r.seed6TransitionRates.toString()) 
-                        (r.opsTransitionRates.toString())) this.rates)
+                        (r.opsTransitionRates.toString())) this.Rates)
+
+    override this.GetHashCode() = this.CachedHash
 
     override this.Equals(obj) =
         match obj with
         | :? uf6MutationRatesArray as other ->
-            if this.rates.Length <> other.rates.Length then false
+            // Immediate short-circuit: O(1) in most cases
+            if this.CachedHash <> other.CachedHash then false
+            elif this.Rates.Length <> other.Rates.Length then false
             else
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seed6TransitionRates.Equals(b.seed6TransitionRates) && 
-                    a.opsTransitionRates.Equals(b.opsTransitionRates)) this.rates other.rates
+                    a.opsTransitionRates.Equals(b.opsTransitionRates)) this.Rates other.Rates
         | _ -> false
-
-    override this.GetHashCode() =
-        let mutable hash = 17
-        for rate in this.rates do
-            hash <- hash * 23 + rate.order.GetHashCode()
-            hash <- hash * 23 + rate.seed6TransitionRates.GetHashCode()
-            hash <- hash * 23 + rate.opsTransitionRates.GetHashCode()
-        hash
 
     interface IEquatable<uf6MutationRatesArray> with
         member this.Equals(other) =
-            if this.rates.Length <> other.rates.Length then false
+            if this.CachedHash <> other.CachedHash then false
+            elif this.Rates.Length <> other.Rates.Length then false
             else
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seed6TransitionRates.Equals(b.seed6TransitionRates) && 
-                    a.opsTransitionRates.Equals(b.opsTransitionRates)) this.rates other.rates
+                    a.opsTransitionRates.Equals(b.opsTransitionRates)) this.Rates other.Rates
+
 
 module Uf6MutationRatesArray =
 

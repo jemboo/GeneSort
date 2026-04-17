@@ -5,36 +5,43 @@ open System
 
 [<Struct; CustomEquality; NoComparison>]
 type indelRatesArray =
+    private { 
+            rates: indelRates array
+            cachedHash: int // Store it directly
+        }
 
-    private { Rates: indelRates array }
     static member create (rates: indelRates array) : indelRatesArray =
-        if Array.isEmpty rates then failwith "Rates array cannot be empty"
-        { Rates = rates }
-    member this.Length = this.Rates.Length
-    member this.Item(index: int) = this.Rates.[index]
-    member this.RatesArray = this.Rates
+            if Array.isEmpty rates then failwith "Rates array cannot be empty"
+            let mutable h = 17
+            for rate in rates do
+                h <- h * 23 + rate.GetHashCode()
+            
+            { rates = rates; cachedHash = h }
+
+    member this.Length = this.rates.Length
+    member this.Item(index: int) = this.rates.[index]
+    member this.RatesArray = this.rates
     member this.toString() =
-        String.Join(", ", Array.map (fun r -> r.ToString()) this.Rates)
+        String.Join(", ", Array.map (fun r -> r.ToString()) this.rates)
+
+    override this.GetHashCode() = this.cachedHash
 
     override this.Equals(obj) =
         match obj with
         | :? indelRatesArray as other ->
-            if this.Rates.Length <> other.Rates.Length then false
+            // Performance win: short-circuit equality check using the cached hash
+            if this.cachedHash <> other.cachedHash then false
+            elif this.rates.Length <> other.rates.Length then false
             else
-                Array.forall2 (fun a b -> a.Equals(b)) this.Rates other.Rates
+                Array.forall2 (fun a b -> a.Equals(b)) this.rates other.rates   
         | _ -> false
-
-    override this.GetHashCode() =
-        let mutable hash = 17
-        for rate in this.Rates do
-            hash <- hash * 23 + rate.GetHashCode()
-        hash
 
     interface IEquatable<indelRatesArray> with
         member this.Equals(other) =
-            if this.Rates.Length <> other.Rates.Length then false
+            if this.cachedHash <> other.cachedHash then false
+            elif this.rates.Length <> other.rates.Length then false
             else
-                Array.forall2 (fun a b -> a.Equals(b)) this.Rates other.Rates
+                Array.forall2 (fun a b -> a.Equals(b)) this.rates other.rates
 
 
 module IndelRatesArray =

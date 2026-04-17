@@ -6,6 +6,7 @@ open GeneSort.SortingOps
 open System.Collections.Generic
 open System
 open GeneSort.Sorting.Sorter
+open GeneSort.Core
 
 
 // ---------------------------------------------------------------------------
@@ -92,3 +93,21 @@ type sorterEvalLeaf =
     member this.combineMap (baseMap:Map<string, string>) : Map<string, string> =
         let leafMap = this.toMap()
         Map.fold (fun acc key value -> Map.add key value acc) baseMap leafMap
+
+    
+    member this.toDataTableRecord() : dataTableRecord =
+        let keyData = 
+            [
+                "CeCount", this.SorterEvalKey.CeCount |> UMX.untag |> string
+                "StageLength", this.SorterEvalKey.StageLength |> UMX.untag |> string
+                "IsSorted", this.SorterEvalKey.IsSorted |> string
+            ] |> Map.ofList
+        let dataData = 
+            [
+                "CeCount", this.SorterEvalKey.CeCount |> UMX.untag |> string
+                "StageLength", this.SorterEvalKey.StageLength |> UMX.untag |> string
+                "IsSorted", this.SorterEvalKey.IsSorted |> string
+                "EvalCount", this.EvalCount |> string
+            ] |> Map.ofList
+
+        dataTableRecord.create keyData dataData

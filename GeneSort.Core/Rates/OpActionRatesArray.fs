@@ -4,35 +4,48 @@ open System
 
 [<Struct; CustomEquality; NoComparison>]
 type opActionRatesArray =
+    private 
+        { 
+            Rates: opActionRates array 
+            CachedHash: int
+        }
 
-    private { Rates: opActionRates array }
     static member create (rates: opActionRates array) : opActionRatesArray =
-        { Rates = rates }
+        if Array.isEmpty rates then failwith "opActionRatesArray cannot be empty"
+        
+        // O(N) calculation happens once at construction
+        let mutable h = 17
+        for i = 0 to rates.Length - 1 do
+            h <- h * 23 + rates.[i].GetHashCode()
+            
+        { Rates = rates; CachedHash = h }
+
     member this.Length = this.Rates.Length
     member this.Item(index: int) = this.Rates.[index]
     member this.RatesArray = this.Rates
+    
     member this.toString() =
         String.Join(", ", Array.map (fun r -> r.ToString()) this.Rates)
+
+    override this.GetHashCode() = this.CachedHash
 
     override this.Equals(obj) =
         match obj with
         | :? opActionRatesArray as other ->
-            if this.Rates.Length <> other.Rates.Length then false
+            // Immediate short-circuit: if hashes don't match, they aren't equal.
+            if this.CachedHash <> other.CachedHash then false
+            elif this.Rates.Length <> other.Rates.Length then false
             else
                 Array.forall2 (fun a b -> a.Equals(b)) this.Rates other.Rates
         | _ -> false
 
-    override this.GetHashCode() =
-        let mutable hash = 17
-        for rate in this.Rates do
-            hash <- hash * 23 + rate.GetHashCode()
-        hash
-
     interface IEquatable<opActionRatesArray> with
         member this.Equals(other) =
-            if this.Rates.Length <> other.Rates.Length then false
+            if this.CachedHash <> other.CachedHash then false
+            elif this.Rates.Length <> other.Rates.Length then false
             else
                 Array.forall2 (fun a b -> a.Equals(b)) this.Rates other.Rates
+
 
 module OpActionRatesArray =
 

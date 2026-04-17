@@ -1,29 +1,54 @@
 ﻿namespace GeneSort.Core
-open System
-open System.IO
-open System.Text
-open System.Collections.Generic
 
 type dataTableRecord = 
     private 
-        { name: string
-          timeStamp: string
-          mutable sourceRows: ResizeArray<string>
-          mutable errorRows: ResizeArray<string>
-          dataHeaders: string[]
-          dataRows: ResizeArray<string> }
+        { keys: Map<string, string>
+          data: Map<string, string> }
     
-    member this.Name with get() = this.name
-    member this.TimeStamp with get() = this.timeStamp
-    member this.SourceRows 
-        with get() = this.sourceRows
-    member this.ErrorRows 
-        with get() = this.errorRows
-    member this.DataHeaders with get() = this.dataHeaders
-    member this.DataRows with get() = this.dataRows
+    member this.Keys with get() = this.keys
+    member this.Data with get() = this.data
+
+    static member create ( keys: Map<string, string> ) 
+                         ( data: Map<string, string> ) : dataTableRecord =
+        { keys = keys; data = data }
 
     /// Helper to sanitize row data to prevent column shifting
-    static member private Sanitize (row: string[]) : string [] =
-        row |> Array.map (fun s -> if s = null then "" else s.Replace("\t", " "))
+    static member addKeyAndData (key: string) (value: string) (dataTableRecord: dataTableRecord) : dataTableRecord =
+        let cleanedKey = if key = null then "" else key.Replace("\t", " ")
+        let cleanedValue = if value = null then "" else value.Replace("\t", " ")
+        { keys = dataTableRecord.Keys.Add(cleanedKey, cleanedValue); data = dataTableRecord.Data.Add(cleanedKey, cleanedValue) }
 
+    static member addData (key: string) (value: string) (dataTableRecord: dataTableRecord) : dataTableRecord =
+        let cleanedKey = if key = null then "" else key.Replace("\t", " ")
+        let cleanedValue = if value = null then "" else value.Replace("\t", " ")
+        { keys = dataTableRecord.Keys; data = dataTableRecord.Data.Add(cleanedKey, cleanedValue) }
+
+    // Merges keys and data from both.
+    static member combine (record1: dataTableRecord) (record2: dataTableRecord) : dataTableRecord =
+        let mergedKeys = record1.Keys |> Map.fold (fun (acc: Map<string,string>) k v -> acc.Add(k, v)) record2.Keys
+        let mergedData = record1.Data |> Map.fold (fun (acc: Map<string,string>) k v -> acc.Add(k, v)) record2.Data
+        { keys = mergedKeys; data = mergedData }
+
+    //// Combines a root record with all records, merging keys and data from both.
+    static member joinWithMany (rootRecord: dataTableRecord) (records: dataTableRecord seq) : dataTableRecord seq =
+        records |> Seq.map (fun r -> dataTableRecord.combine rootRecord r)
+
+    static member createEmpty() : dataTableRecord =
+        { keys = Map.empty; data = Map.empty }
+
+    static member createWithKeyAndData (key: string) (value: string) : dataTableRecord =
+        let cleanedKey = if key = null then "" else key.Replace("\t", " ")
+        let cleanedValue = if value = null then "" else value.Replace("\t", " ")
+        { keys = Map.ofList [(cleanedKey, cleanedValue)]; data = Map.ofList [(cleanedKey, cleanedValue)] }
+
+    static member createTable (records: dataTableRecord seq) : string [] [] =
+        let allKeys = records |> Seq.collect (fun r -> r.Keys |> Map.toSeq) |> Seq.map fst |> Seq.distinct
+        let header = allKeys |> Seq.toArray
+        let rows = 
+            records 
+            |> Seq.map (fun r -> 
+                header 
+                |> Array.map (fun k -> if r.Data.ContainsKey(k) then r.Data.[k] else ""))
+            |> Seq.toArray
+        Array.concat [[|header|]; rows]
 

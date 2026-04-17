@@ -5,49 +5,60 @@ open System
 [<Struct; CustomEquality; NoComparison>]
 type uf4MutationRatesArray =
     private 
-        { rates: uf4MutationRates array }
+        { 
+            Rates: uf4MutationRates array 
+            CachedHash: int
+        }
 
     static member create (rates: uf4MutationRates array) : uf4MutationRatesArray =
         if Array.exists (fun r -> r.order < 4 || r.order % 4 <> 0) rates then
             failwith "All Uf4MutationRates orders must be at least 4 and divisible by 4"
-        { rates = rates }
+        
+        // Calculate hash once at construction
+        let mutable h = 17
+        for i = 0 to rates.Length - 1 do
+            let r = rates.[i]
+            h <- h * 23 + r.order.GetHashCode()
+            h <- h * 23 + r.seedOpsTransitionRates.GetHashCode()
+            h <- h * 23 + r.twoOrbitPairOpsTransitionRates.GetHashCode()
+            
+        { Rates = rates; CachedHash = h }
 
-    member this.Length = this.rates.Length
-    member this.Item(index: int) = this.rates.[index]
-    member this.RatesArray = this.rates
+    member this.Length = this.Rates.Length
+    member this.Item(index: int) = this.Rates.[index]
+    member this.RatesArray = this.Rates
 
     member this.toString() =
         String.Join(", ", Array.map (
             fun r -> sprintf "Uf4MutationRates(order=%d, seed=%s, arrayLength=%d)" 
-                        r.order (r.seedOpsTransitionRates.toString()) r.twoOrbitPairOpsTransitionRates.Length) this.rates)
+                        r.order (r.seedOpsTransitionRates.toString()) r.twoOrbitPairOpsTransitionRates.Length) this.Rates)
+
+    override this.GetHashCode() = this.CachedHash
 
     override this.Equals(obj) =
         match obj with
         | :? uf4MutationRatesArray as other ->
-            if this.rates.Length <> other.rates.Length then false
+            // O(1) short-circuit
+            if this.CachedHash <> other.CachedHash then false
+            elif this.Rates.Length <> other.Rates.Length then false
             else
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seedOpsTransitionRates.Equals(b.seedOpsTransitionRates) && 
-                    a.twoOrbitPairOpsTransitionRates.Equals(b.twoOrbitPairOpsTransitionRates)) this.rates other.rates
+                    a.twoOrbitPairOpsTransitionRates.Equals(b.twoOrbitPairOpsTransitionRates)) this.Rates other.Rates
         | _ -> false
-
-    override this.GetHashCode() =
-        let mutable hash = 17
-        for rate in this.rates do
-            hash <- hash * 23 + rate.order.GetHashCode()
-            hash <- hash * 23 + rate.seedOpsTransitionRates.GetHashCode()
-            hash <- hash * 23 + rate.twoOrbitPairOpsTransitionRates.GetHashCode()
-        hash
 
     interface IEquatable<uf4MutationRatesArray> with
         member this.Equals(other) =
-            if this.rates.Length <> other.rates.Length then false
+            if this.CachedHash <> other.CachedHash then false
+            elif this.Rates.Length <> other.Rates.Length then false
             else
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seedOpsTransitionRates.Equals(b.seedOpsTransitionRates) && 
-                    a.twoOrbitPairOpsTransitionRates.Equals(b.twoOrbitPairOpsTransitionRates)) this.rates other.rates
+                    a.twoOrbitPairOpsTransitionRates.Equals(b.twoOrbitPairOpsTransitionRates)) this.Rates other.Rates
+
+
 
 module Uf4MutationRatesArray =
 

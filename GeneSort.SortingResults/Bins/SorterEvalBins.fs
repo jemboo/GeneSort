@@ -5,6 +5,7 @@ open GeneSort.Sorting
 open GeneSort.SortingOps
 open System.Collections.Generic
 open System
+open GeneSort.Core
 
 type sorterEvalBins =
     private {
@@ -94,6 +95,13 @@ type sorterEvalBins =
             }
             |> Seq.map (fun p -> p.Leaf)
             |> Seq.toArray
+
+
+    member this.ToDataTableRecords : dataTableRecord seq =
+        this.layers
+        |> Map.toSeq
+        |> Seq.map (fun (key, leaf) -> leaf.toDataTableRecord())
+
 
 
 module SorterEvalBins =

@@ -68,3 +68,10 @@ module SorterEvalKey =
                     (key: sorterEvalKey) : float =
         let sortedScore = if key.IsSorted then 0.0 else 1.0e6
         sortedScore + byWeighted ceCountWeight stageLengthWeight key
+
+
+    let toDataTableRecord (key: sorterEvalKey) : GeneSort.Core.dataTableRecord =
+        GeneSort.Core.dataTableRecord.createEmpty()
+        |> GeneSort.Core.dataTableRecord.addData "CeCount" (key.CeCount |> UMX.untag |> string)
+        |> GeneSort.Core.dataTableRecord.addData "StageLength" (key.StageLength |> UMX.untag |> string)
+        |> GeneSort.Core.dataTableRecord.addData "IsSorted" (key.IsSorted.ToString())

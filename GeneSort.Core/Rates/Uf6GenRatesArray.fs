@@ -6,50 +6,59 @@ open MathUtils
 [<Struct; CustomEquality; NoComparison>]
 type uf6GenRatesArray =
     private 
-        { rates: uf6GenRates array }
+        { 
+            Rates: uf6GenRates array 
+            CachedHash: int
+        }
 
     static member create (rates: uf6GenRates array) : uf6GenRatesArray =
+        // Domain Validation
         if Array.exists (fun r -> r.order < 6 || r.order % 6 <> 0) rates then
             failwith "All Uf6GenRates orders must be at least 6 and divisible by 6"
-        { rates = rates }
+        
+        // Pre-calculate Hash once at construction
+        let mutable h = 17
+        for i = 0 to rates.Length - 1 do
+            let r = rates.[i]
+            h <- h * 23 + r.order.GetHashCode()
+            h <- h * 23 + r.seedGenRatesUf6.GetHashCode()
+            h <- h * 23 + r.opsGenRatesArray.GetHashCode()
+            
+        { Rates = rates; CachedHash = h }
 
-    member this.Length = this.rates.Length
-    member this.Item(index: int) = this.rates.[index]
-    member this.RatesArray = this.rates
+    member this.Length = this.Rates.Length
+    member this.Item(index: int) = this.Rates.[index]
+    member this.RatesArray = this.Rates
 
     member this.toString() =
         String.Join(", ", Array.map (
             fun r -> sprintf "Uf6GenRates(order=%d, seed=%s, arrayLength=%d)" 
-                        r.order (r.seedGenRatesUf6.toString()) r.opsGenRatesArray.Length) this.rates)
+                        r.order (r.seedGenRatesUf6.toString()) r.opsGenRatesArray.Length) this.Rates)
+
+    override this.GetHashCode() = this.CachedHash
 
     override this.Equals(obj) =
         match obj with
         | :? uf6GenRatesArray as other ->
-            if this.rates.Length <> other.rates.Length then false
+            // High-performance short-circuit
+            if this.CachedHash <> other.CachedHash then false
+            elif this.Rates.Length <> other.Rates.Length then false
             else
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seedGenRatesUf6.Equals(b.seedGenRatesUf6) && 
-                    a.opsGenRatesArray.Equals(b.opsGenRatesArray)) this.rates other.rates
+                    a.opsGenRatesArray.Equals(b.opsGenRatesArray)) this.Rates other.Rates
         | _ -> false
-
-    override this.GetHashCode() =
-        let mutable hash = 17
-        for rate in this.rates do
-            hash <- hash * 23 + rate.order.GetHashCode()
-            hash <- hash * 23 + rate.seedGenRatesUf6.GetHashCode()
-            hash <- hash * 23 + rate.opsGenRatesArray.GetHashCode()
-        hash
 
     interface IEquatable<uf6GenRatesArray> with
         member this.Equals(other) =
-            if this.rates.Length <> other.rates.Length then false
+            if this.CachedHash <> other.CachedHash then false
+            elif this.Rates.Length <> other.Rates.Length then false
             else
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seedGenRatesUf6.Equals(b.seedGenRatesUf6) && 
-                    a.opsGenRatesArray.Equals(b.opsGenRatesArray)) this.rates other.rates
-
+                    a.opsGenRatesArray.Equals(b.opsGenRatesArray)) this.Rates other.Rates
 
 
 module Uf6GenRatesArray =

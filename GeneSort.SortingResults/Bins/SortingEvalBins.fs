@@ -57,3 +57,6 @@ module SortingEvalBins =
                     SorterEvalBins.getPropertyMaps seb baseKey combinedMap
                     |> Seq.map (fun ((bk, sek), props) -> 
                         ((bk, mt, sek), props)))
+
+
+

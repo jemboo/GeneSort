@@ -6,52 +6,65 @@ open MathUtils
 [<Struct; CustomEquality; NoComparison>]
 type uf4GenRatesArray =
     private 
-        { rates: uf4GenRates array }
+        { 
+            Rates: uf4GenRates array 
+            CachedHash: int
+        }
 
     static member create (rates: uf4GenRates array) : uf4GenRatesArray =
+        // Domain Validation
         if Array.exists (fun r -> r.order < 4 || r.order % 4 <> 0) rates then
             failwith "All Uf4GenRates orders must be at least 4 and divisible by 4"
+        
         let arrayLengths = rates |> Array.map (fun r -> r.opsGenRatesArray.Length)
         if Array.distinct arrayLengths |> Array.length > 1 then
             failwith "All Uf4GenRates must have the same opsGenRatesArray length"
-        { rates = rates }
 
-    member this.Length = this.rates.Length
-    member this.Item(index: int) = this.rates.[index]
-    member this.RatesArray = this.rates
+        // Pre-calculate Hash
+        let mutable h = 17
+        for i = 0 to rates.Length - 1 do
+            let r = rates.[i]
+            // We hash the constituent parts of uf4GenRates
+            h <- h * 23 + r.order.GetHashCode()
+            h <- h * 23 + r.seedOpsGenRates.GetHashCode()
+            h <- h * 23 + r.opsGenRatesArray.GetHashCode()
+            
+        { Rates = rates; CachedHash = h }
+
+    member this.Length = this.Rates.Length
+    member this.Item(index: int) = this.Rates.[index]
+    member this.RatesArray = this.Rates
 
     member this.toString() =
         String.Join(", ", Array.map (
             fun r -> sprintf "Uf4GenRates(order=%d, seed=%s, arrayLength=%d)" 
-                        r.order (r.seedOpsGenRates.toString()) r.opsGenRatesArray.Length) this.rates)
+                        r.order (r.seedOpsGenRates.toString()) r.opsGenRatesArray.Length) this.Rates)
+
+    override this.GetHashCode() = this.CachedHash
 
     override this.Equals(obj) =
         match obj with
         | :? uf4GenRatesArray as other ->
-            if this.rates.Length <> other.rates.Length then false
+            // Early exit on hash mismatch or length mismatch
+            if this.CachedHash <> other.CachedHash then false
+            elif this.Rates.Length <> other.Rates.Length then false
             else
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seedOpsGenRates.Equals(b.seedOpsGenRates) && 
-                    a.opsGenRatesArray.Equals(b.opsGenRatesArray)) this.rates other.rates
+                    a.opsGenRatesArray.Equals(b.opsGenRatesArray)) this.Rates other.Rates
         | _ -> false
-
-    override this.GetHashCode() =
-        let mutable hash = 17
-        for rate in this.rates do
-            hash <- hash * 23 + rate.order.GetHashCode()
-            hash <- hash * 23 + rate.seedOpsGenRates.GetHashCode()
-            hash <- hash * 23 + rate.opsGenRatesArray.GetHashCode()
-        hash
 
     interface IEquatable<uf4GenRatesArray> with
         member this.Equals(other) =
-            if this.rates.Length <> other.rates.Length then false
+            if this.CachedHash <> other.CachedHash then false
+            elif this.Rates.Length <> other.Rates.Length then false
             else
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seedOpsGenRates.Equals(b.seedOpsGenRates) && 
-                    a.opsGenRatesArray.Equals(b.opsGenRatesArray)) this.rates other.rates
+                    a.opsGenRatesArray.Equals(b.opsGenRatesArray)) this.Rates other.Rates
+
 
 module Uf4GenRatesArray =
 

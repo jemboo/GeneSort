@@ -30,7 +30,7 @@ type msrsRandGen =
                 "msrsRandGen" :> obj
                 rngFactory :> obj
                 sortingWidth :> obj
-                opsGenRatesArray :> obj
+                opsGenRatesArray.GetHashCode() :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelGenId>
 
         {

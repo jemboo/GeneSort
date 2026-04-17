@@ -2,6 +2,7 @@
 
 open FSharp.UMX
 open System
+open GeneSort.Core
 
 
 type splitJoin =
@@ -62,6 +63,15 @@ module ModelTag =
         else
             failwithf "Invalid modelTag format: %s" str
 
+    let toDataTableRecord (modelTag: modelTag) : dataTableRecord =
+        match modelTag with
+        | Single ->  
+                let maps = Map.ofList [("ModelTag", "Single")]
+                dataTableRecord.create maps maps
+        | SplitPair sj -> 
+                let maps = Map.ofList [("ModelTag", SplitJoin.toString sj)]     
+                dataTableRecord.create maps maps
+
            
 
 
@@ -101,6 +111,12 @@ module ModelSetTag =
         let id  = Guid.Parse(parts.[0]) |> UMX.tag<sortingId>
         let tag = ModelTag.fromString parts.[1]
         modelSetTag.create id tag
+
+    let toDataTableRecord (modelSetTag: modelSetTag) : dataTableRecord =
+        let mstPart = ModelTag.toDataTableRecord modelSetTag.ModelTag
+        let sortingIdMap = Map.ofList [("SortingId", (%modelSetTag.SortingId).ToString())]
+        let sidPart = dataTableRecord.create sortingIdMap sortingIdMap
+        dataTableRecord.combine mstPart sidPart
 
 
 

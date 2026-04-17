@@ -1,40 +1,50 @@
 ﻿namespace GeneSort.Core
+
 open System
 
 [<Struct; CustomEquality; NoComparison>]
 type opsTransitionRatesArray =
-    private { rates: opsTransitionRates array }
+    private 
+        { 
+            Rates: opsTransitionRates array 
+            CachedHash: int
+        }
 
-    static member create (rates: opsTransitionRates array) 
-                    : opsTransitionRatesArray =
-        { rates = rates }
+    static member create (rates: opsTransitionRates array) : opsTransitionRatesArray =
+        if Array.isEmpty rates then failwith "opsTransitionRatesArray cannot be empty"
+        
+        // Calculate hash once at construction to handle O(N) cost upfront
+        let mutable h = 17
+        for i = 0 to rates.Length - 1 do
+            h <- h * 23 + rates.[i].GetHashCode()
+            
+        { Rates = rates; CachedHash = h }
 
-    member this.Length = this.rates.Length
-    member this.Item(index: int) = this.rates.[index]
-    member this.RatesArray = this.rates
+    member this.Length = this.Rates.Length
+    member this.Item(index: int) = this.Rates.[index]
+    member this.RatesArray = this.Rates
 
     member this.toString() =
-        String.Join(", ", Array.map (fun (r: opsTransitionRates) -> r.toString()) this.rates)
+        String.Join(", ", Array.map (fun (r: opsTransitionRates) -> r.toString()) this.Rates)
+
+    override this.GetHashCode() = this.CachedHash
 
     override this.Equals(obj) =
         match obj with
         | :? opsTransitionRatesArray as other ->
-            if this.rates.Length <> other.rates.Length then false
+            // Immediate O(1) exit if hashes differ
+            if this.CachedHash <> other.CachedHash then false
+            elif this.Rates.Length <> other.Rates.Length then false
             else
-                Array.forall2 (fun a b -> a.Equals(b)) this.rates other.rates
+                Array.forall2 (fun a b -> a.Equals(b)) this.Rates other.Rates
         | _ -> false
-
-    override this.GetHashCode() =
-        let mutable hash = 17
-        for rate in this.rates do
-            hash <- hash * 23 + rate.GetHashCode()
-        hash
 
     interface IEquatable<opsTransitionRatesArray> with
         member this.Equals(other) =
-            if this.rates.Length <> other.rates.Length then false
+            if this.CachedHash <> other.CachedHash then false
+            elif this.Rates.Length <> other.Rates.Length then false
             else
-                Array.forall2 (fun a b -> a.Equals(b)) this.rates other.rates
+                Array.forall2 (fun a b -> a.Equals(b)) this.Rates other.Rates
 
 
 module OpsTransitionRatesArray =

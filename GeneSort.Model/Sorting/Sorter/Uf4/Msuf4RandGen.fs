@@ -48,7 +48,7 @@ type msuf4RandGen =
                     rngFactory :> obj
                     sortingWidth :> obj
                     stageLength :> obj
-                    genRates :> obj
+                    genRates.GetHashCode() :> obj
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelGenId>
 
             { id = id
