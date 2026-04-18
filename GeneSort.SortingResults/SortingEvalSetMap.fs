@@ -6,75 +6,75 @@ open GeneSort.Model.Sorting
 open GeneSort.SortingOps
 open GeneSort.Sorting
 
-type sortingResultSetMap =
+type sortingEvalSetMap =
     private { 
-        sortingResultMap: Dictionary<Guid<sortingId>, sortingResult>
+        sortingEvalsMap: Dictionary<Guid<sortingId>, sortingEval>
         evalMap: Dictionary<Guid<sorterId>, modelSetTag>
     }
 
     static member create 
-                    (sortingResults: sortingResult seq) 
+                    (sortingResults: sortingEval seq) 
                     (evalEntries: (Guid<sorterId> * modelSetTag) seq) =
-        let dict = Dictionary<Guid<sortingId>, sortingResult>()
+        let dict = Dictionary<Guid<sortingId>, sortingEval>()
         for result in sortingResults do
             dict.[SortingResult.getSortingId result] <- result
         let evalMap = Dictionary<Guid<sorterId>, modelSetTag>()
         for (sorterId, sortingTag) in evalEntries do
             evalMap.[sorterId] <- sortingTag
-        { sortingResultMap = dict; evalMap = evalMap }
+        { sortingEvalsMap = dict; evalMap = evalMap }
 
     static member empty () =
         { 
-            sortingResultMap = Dictionary<Guid<sortingId>, sortingResult>()
+            sortingEvalsMap = Dictionary<Guid<sortingId>, sortingEval>()
             evalMap = Dictionary<Guid<sorterId>, modelSetTag>()
         }
 
-    member this.Count with get() = this.sortingResultMap.Count
+    member this.Count with get() = this.sortingEvalsMap.Count
 
     member this.TryGetResult (sortingId: Guid<sortingId>) =
-        match this.sortingResultMap.TryGetValue(sortingId) with
+        match this.sortingEvalsMap.TryGetValue(sortingId) with
         | true, result -> Some result
         | false, _ -> None
 
     member this.GetResult (sortingId: Guid<sortingId>) =
-        match this.sortingResultMap.TryGetValue(sortingId) with
+        match this.sortingEvalsMap.TryGetValue(sortingId) with
         | true, result -> result
-        | false, _ -> failwithf "SortingId %A not found in sortingResultSet." sortingId
+        | false, _ -> failwithf "SortingId %A not found in sortingEvalsMap." sortingId
 
     member this.ContainsId (sortingId: Guid<sortingId>) =
-        this.sortingResultMap.ContainsKey(sortingId)
+        this.sortingEvalsMap.ContainsKey(sortingId)
 
-    member this.SortingResults with get() : sortingResult [] =
-        this.sortingResultMap.Values |> Seq.map(id) |> Seq.toArray
+    member this.SortingEvals with get() : sortingEval [] =
+        this.sortingEvalsMap.Values |> Seq.map(id) |> Seq.toArray
 
-    member this.SortingResultMap with get() =
-        this.sortingResultMap :> IReadOnlyDictionary<Guid<sortingId>, sortingResult>
+    member this.SortingEvalsMap with get() =
+        this.sortingEvalsMap :> IReadOnlyDictionary<Guid<sortingId>, sortingEval>
 
     member this.EvalMap with get() =
         this.evalMap :> IReadOnlyDictionary<Guid<sorterId>, modelSetTag>
 
-    member this.UpdateSortingResults (newEval: sorterEval) =
+    member this.UpdateSortingEvals (newEval: sorterEval) : unit =
         match this.evalMap.TryGetValue(newEval.SorterId) with
         | false, _ -> failwithf "SorterId %A not found in evalMap." newEval.SorterId
         | true, sortingTag ->
             let sortingParentId = ModelSetTag.getSortingParentId sortingTag
             let modelTag  = ModelSetTag.getModelTag sortingTag
-            match this.sortingResultMap.TryGetValue(sortingParentId) with
-            | false, _ -> failwithf "SortingId %A not found in sortingResultSet." sortingParentId
+            match this.sortingEvalsMap.TryGetValue(sortingParentId) with
+            | false, _ -> failwithf "SortingId %A not found in sortingEvalsMap." sortingParentId
             | true, result -> SortingResult.addSorterEval modelTag newEval result
 
-    member this.UpdateManySortingResults (newEvals: sorterEval []) =
-        newEvals |> Array.iter(this.UpdateSortingResults)
+    member this.UpdateManySortingEvals (newEvals: sorterEval []) =
+        newEvals |> Array.iter(this.UpdateSortingEvals)
 
     member this.GetAllTaggedSorterEvals () : (sorterEval * modelSetTag) seq =
-         this.sortingResultMap.Values |> Seq.collect(fun sr -> sr |> SortingResult.getAllTaggedSorterEvals)
+         this.sortingEvalsMap.Values |> Seq.collect(fun sr -> sr |> SortingResult.getAllTaggedSorterEvals)
 
 
-module SortingResultSetMap = 
+module SortingEvalSetMap = 
 
-    let fromSortingSet (sSet:sortingSet) : sortingResultSetMap =
+    let fromSortingSet (sSet:sortingSet) : sortingEvalSetMap =
          let sortingResults = sSet.Sortings |> Array.map(SortingResult.makeFromSorting)
-         sortingResultSetMap.create sortingResults sSet.SorterIdsWithSortingTags
+         sortingEvalSetMap.create sortingResults sSet.SorterIdsWithSortingTags
          
 
 

@@ -3,7 +3,6 @@
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.SortingOps
-open System.Collections.Generic
 open System
 open GeneSort.Core
 
@@ -32,10 +31,7 @@ type sorterEvalBins =
 
     member this.AddSorterEval (sorterEval: sorterEval) =
         let key =
-            sorterEvalKey.create
-                sorterEval.CeBlockEval.CeUseCounts.UsedCeCount
-                sorterEval.CeBlockEval.getStageSequence.StageLength
-                (sorterEval.CeBlockEval.UnsortedCount = 0<sortableCount>)
+            SorterEvalKey.fromSorterEval sorterEval
         
         let newLeaf = 
             match Map.tryFind key this.layers with
@@ -95,12 +91,6 @@ type sorterEvalBins =
             }
             |> Seq.map (fun p -> p.Leaf)
             |> Seq.toArray
-
-
-    member this.ToDataTableRecords : dataTableRecord seq =
-        this.layers
-        |> Map.toSeq
-        |> Seq.map (fun (key, leaf) -> leaf.toDataTableRecord())
 
 
 
@@ -202,23 +192,6 @@ module SorterEvalBins =
         
 
 
-    let getBinsReport
-            (prefixes:string [])
-            (bins: sorterEvalBins)
-            : string[][] =
-        bins.Layers
-        |> Map.toSeq
-        |> Seq.map (fun (key, leaf) ->
-            prefixes |> Array.append
-                [|
-                    (%key.CeCount).ToString()
-                    (%key.StageLength).ToString()
-                    key.IsSorted.ToString()
-                    leaf.EvalCount.ToString()
-                |])
-        |> Seq.toArray
-
-
     let getPropertyMaps<'t> 
                 (bins: sorterEvalBins) 
                 (baseKey:'t) 
@@ -236,11 +209,17 @@ module SorterEvalBins =
             (baseKey: Map<string, string>) 
             (baseProperties: Map<string, string>) 
             : ((Map<string, string>) * Map<string, string>) seq =
-            bins.Layers
-            |> Map.toSeq
-            |> Seq.map (fun (key, leaf) ->
-                let combinedMap = leaf.combineMap baseProperties
-                let combinedKey = baseKey |> Map.add "ceCount" ((%key.CeCount).ToString())
-                                          |> Map.add "stageLength" ((%key.StageLength).ToString())
-                                          |> Map.add "isSorted" (key.IsSorted.ToString())
-                (combinedKey, combinedMap))
+        bins.Layers
+        |> Map.toSeq
+        |> Seq.map (fun (key, leaf) ->
+            let combinedMap = leaf.combineMap baseProperties
+            let combinedKey = baseKey |> Map.add "ceCount" ((%key.CeCount).ToString())
+                                        |> Map.add "stageLength" ((%key.StageLength).ToString())
+                                        |> Map.add "isSorted" (key.IsSorted.ToString())
+            (combinedKey, combinedMap))
+
+
+    let makeDataTableRecords (bins: sorterEvalBins) : dataTableRecord seq =
+        bins.Layers
+        |> Map.toSeq
+        |> Seq.map (fun (key, leaf) -> leaf.toDataTableRecord())

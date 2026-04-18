@@ -7,6 +7,9 @@ type dataTableRecord =
     
     member this.Keys with get() = this.keys
     member this.Data with get() = this.data
+    
+    static member createEmpty() : dataTableRecord =
+        { keys = Map.empty; data = Map.empty }
 
     static member create ( keys: Map<string, string> ) 
                          ( data: Map<string, string> ) : dataTableRecord =
@@ -30,11 +33,8 @@ type dataTableRecord =
         { keys = mergedKeys; data = mergedData }
 
     //// Combines a root record with all records, merging keys and data from both.
-    static member joinWithMany (rootRecord: dataTableRecord) (records: dataTableRecord seq) : dataTableRecord seq =
+    static member combineWithMany (records: dataTableRecord seq) (rootRecord: dataTableRecord)  : dataTableRecord seq =
         records |> Seq.map (fun r -> dataTableRecord.combine rootRecord r)
-
-    static member createEmpty() : dataTableRecord =
-        { keys = Map.empty; data = Map.empty }
 
     static member createWithKeyAndData (key: string) (value: string) : dataTableRecord =
         let cleanedKey = if key = null then "" else key.Replace("\t", " ")

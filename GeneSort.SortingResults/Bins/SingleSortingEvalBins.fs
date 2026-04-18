@@ -4,9 +4,11 @@ open FSharp.UMX
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting
 open GeneSort.SortingResults
+open GeneSort.Core
 
 
 type singleSortingEvalBins =
+
     private {
         sortingEvalBinsId: Guid<sortingEvalBinsId>
         sorterEvalBins: sorterEvalBins
@@ -39,4 +41,6 @@ module SingleSortingEvalBins =
             sorterEvalBins = sorterEvalBins
         }
 
-
+    let makeDataTableRecords (bins: singleSortingEvalBins) : dataTableRecord seq =
+        let binRecords = SorterEvalBins.makeDataTableRecords bins.SorterEvalBins
+        (ModelTag.toDataTableRecord modelTag.Single) |> dataTableRecord.combineWithMany binRecords

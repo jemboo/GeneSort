@@ -1,12 +1,10 @@
 ﻿namespace GeneSort.SortingResults.Bins
 
 open FSharp.UMX
-open GeneSort.Sorting
 open GeneSort.SortingOps
-open System.Collections.Generic
-open System
 open GeneSort.Model.Sorting
 open GeneSort.SortingResults
+open GeneSort.Core
 
 
 type splitPairSortingEvalBins =
@@ -66,3 +64,12 @@ module SplitPairSortingEvalBins =
               yield (splitPairSortingEvalBins.SorterEvalBinsFirstSecond, modelTag.SplitPair First_Second)
               yield (splitPairSortingEvalBins.SorterEvalBinsSecondFirst, modelTag.SplitPair Second_First)
               yield (splitPairSortingEvalBins.SorterEvalBinsSecondSecond, modelTag.SplitPair Second_Second) }
+
+
+    let makeDataTableRecords (bins: splitPairSortingEvalBins) : dataTableRecord seq =
+        let allTaggedBins = getAllTaggedSorterEvalBins bins
+        allTaggedBins
+        |> Seq.collect (fun (seb, mt) -> 
+            let mtRecord = ModelTag.toDataTableRecord mt
+            let binRecords = SorterEvalBins.makeDataTableRecords seb
+            mtRecord |> dataTableRecord.combineWithMany binRecords)

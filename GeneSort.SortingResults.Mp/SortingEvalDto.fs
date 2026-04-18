@@ -4,36 +4,36 @@ open MessagePack
 open GeneSort.SortingResults
 
 [<MessagePackObject>]
-type sortingResultDto = {
+type sortingEvalDto = {
     [<Key(0)>]
     Tag: int   // 0 = Single, 1 = Pairs
     [<Key(1)>]
-    Single: singleSortingResultDto option
+    Single: singleSortingEvalDto option
     [<Key(2)>]
-    Pairs: pairsSortingResultDto option
+    Pairs: pairsSortingEvalDto option
 }
 
-module SortingResultDto =
+module SortingEvalDto =
 
-    let fromDomain (result: sortingResult) : sortingResultDto =
+    let fromDomain (result: sortingEval) : sortingEvalDto =
         match result with
-        | sortingResult.Single inner ->
+        | sortingEval.Single inner ->
             { Tag    = 0
-              Single = Some (SingleSortingResultDto.fromDomain inner)
+              Single = Some (SingleSortingEvalDto.fromDomain inner)
               Pairs  = None }
-        | sortingResult.Pairs inner ->
+        | sortingEval.Pairs inner ->
             { Tag    = 1
               Single = None
-              Pairs  = Some (PairsSortingResultDto.fromDomain inner) }
+              Pairs  = Some (PairsSortingEvalDto.fromDomain inner) }
 
-    let toDomain (dto: sortingResultDto) : sortingResult =
+    let toDomain (dto: sortingEvalDto) : sortingEval =
         match dto.Tag with
         | 0 ->
             match dto.Single with
-            | Some inner -> sortingResult.Single (SingleSortingResultDto.toDomain inner)
+            | Some inner -> sortingEval.Single (SingleSortingEvalDto.toDomain inner)
             | None       -> failwith "sortingResultDto tag=0 (Single) but Single field is None"
         | 1 ->
             match dto.Pairs with
-            | Some inner -> sortingResult.Pairs (PairsSortingResultDto.toDomain inner)
+            | Some inner -> sortingEval.Pairs (PairsSortingEvalDto.toDomain inner)
             | None       -> failwith "sortingResultDto tag=1 (Pairs) but Pairs field is None"
         | n -> failwithf "Unknown sortingResult tag: %d" n

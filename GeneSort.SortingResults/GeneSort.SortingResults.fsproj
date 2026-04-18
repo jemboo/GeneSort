@@ -7,14 +7,14 @@
 
   <ItemGroup>
     <Compile Include="Common.fs" />
-    <Compile Include="SingleSortingResult.fs" />
-    <Compile Include="SplitPairsSortingResult.fs" />
-    <Compile Include="PairsSortingResult.fs" />
-    <Compile Include="SortingResult.fs" />
-    <Compile Include="SortingResultMap.fs" />
-    <Compile Include="SortingResultSetMap.fs" />
-    <Compile Include="MutationSegmentResults.fs" />
-    <Compile Include="MutationSegmentSetResults.fs" />
+    <Compile Include="SingleSortingEval.fs" />
+    <Compile Include="SplitPairsSortingEval.fs" />
+    <Compile Include="PairsSortingEval.fs" />
+    <Compile Include="SortingEval.fs" />
+    <Compile Include="SortingEvalMap.fs" />
+    <Compile Include="SortingEvalSetMap.fs" />
+    <Compile Include="MutationSegmentEvals.fs" />
+    <Compile Include="MutationSegmentSetEvals.fs" />
     <Compile Include="Bins\SorterEvalKey.fs" />
     <Compile Include="Bins\SortingEvalKeys.fs" />
     <Compile Include="Bins\SorterEvalLeaf.fs" />

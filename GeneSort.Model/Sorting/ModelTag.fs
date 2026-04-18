@@ -65,12 +65,15 @@ module ModelTag =
 
     let toDataTableRecord (modelTag: modelTag) : dataTableRecord =
         match modelTag with
-        | Single ->  
-                let maps = Map.ofList [("ModelTag", "Single")]
-                dataTableRecord.create maps maps
+        | Single ->
+                dataTableRecord.createWithKeyAndData 
+                            "ModelTag" 
+                            "Single"
         | SplitPair sj -> 
-                let maps = Map.ofList [("ModelTag", SplitJoin.toString sj)]     
-                dataTableRecord.create maps maps
+                dataTableRecord.createWithKeyAndData 
+                            "ModelTag" 
+                            (sprintf "SplitPair(%s)" (SplitJoin.toString sj))
+
 
            
 

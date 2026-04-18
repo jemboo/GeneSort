@@ -31,7 +31,7 @@ module SortingSetFilter =
                (sorterEvalBins: sorterEvalBins)
                (parentSet: sortingSet) : sorting [] =
 
-        let resultSetMap = SortingResultSetMap.fromSortingSet parentSet
+        let resultSetMap = SortingEvalSetMap.fromSortingSet parentSet
         let getSuccessfullySorted = true
         let sorterIds = SorterEvalBins.getUpToNSorterIdsPerBin
                             SorterEvalKey.noAction
@@ -52,7 +52,7 @@ module SortingSetFilter =
                (sorterEvalBins: sorterEvalBins)
                (parentSet: sortingSet) : sorting [] =
 
-        let resultSetMap = SortingResultSetMap.fromSortingSet parentSet
+        let resultSetMap = SortingEvalSetMap.fromSortingSet parentSet
         let getSuccessfullySorted = true
         let sorterIds = SorterEvalBins.getUpToNSorterIdsPerConvexHullBin
                             SorterEvalKey.noAction
@@ -76,7 +76,7 @@ module SortingSetFilter =
                (sorterEvalBins: sorterEvalBins)
                (parentSet: sortingSet) : sorting [] =
 
-        let resultSetMap = SortingResultSetMap.fromSortingSet parentSet
+        let resultSetMap = SortingEvalSetMap.fromSortingSet parentSet
         let getSuccessfullySorted = true
         
         // Define the center calculation metric
@@ -117,7 +117,7 @@ module SortingSetFilter =
                (sorterEvalBins: sorterEvalBins)
                (parentSet: sortingSet) : sorting [] =
 
-        let resultSetMap = SortingResultSetMap.fromSortingSet parentSet
+        let resultSetMap = SortingEvalSetMap.fromSortingSet parentSet
         let getSuccessfullySorted = true
         
         // Define the winning metric (low CeCount and low StageLength)

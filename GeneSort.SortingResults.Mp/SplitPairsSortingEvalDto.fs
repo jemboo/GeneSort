@@ -8,7 +8,7 @@ open GeneSort.SortingResults
 open GeneSort.Model.Sorting
 
 [<MessagePackObject>]
-type splitPairsSortingResultDto = {
+type splitPairsSortingEvalDto = {
     [<Key(0)>]
     SortingId: Guid
     [<Key(1)>]
@@ -21,9 +21,9 @@ type splitPairsSortingResultDto = {
     SorterEvalSecondSecond: sorterEvalDto option
 }
 
-module SplitPairsSortingResultDto =
+module SplitPairsSortingEvalDto =
 
-    let fromDomain (result: splitPairsSortingResult) : splitPairsSortingResultDto =
+    let fromDomain (result: splitPairsSortingEval) : splitPairsSortingEvalDto =
         {
             SortingId              = %result.SortingId
             SorterEvalFirstFirst   = result.SorterEvalFirstFirst   |> Option.map SorterEvalDto.toSorterEvalDto
@@ -32,8 +32,8 @@ module SplitPairsSortingResultDto =
             SorterEvalSecondSecond = result.SorterEvalSecondSecond |> Option.map SorterEvalDto.toSorterEvalDto
         }
 
-    let toDomain (dto: splitPairsSortingResultDto) : splitPairsSortingResult =
-        let result = splitPairsSortingResult.create (UMX.tag<sortingId> dto.SortingId)
+    let toDomain (dto: splitPairsSortingEvalDto) : splitPairsSortingEval =
+        let result = splitPairsSortingEval.create (UMX.tag<sortingId> dto.SortingId)
         result.SorterEvalFirstFirst   <- dto.SorterEvalFirstFirst   |> Option.map SorterEvalDto.fromSorterEvalDto
         result.SorterEvalFirstSecond  <- dto.SorterEvalFirstSecond  |> Option.map SorterEvalDto.fromSorterEvalDto
         result.SorterEvalSecondFirst  <- dto.SorterEvalSecondFirst  |> Option.map SorterEvalDto.fromSorterEvalDto

@@ -170,7 +170,7 @@ module FullBoolMutate =
                 let evalMutants = SorterSetEval.makeSorterSetEval (%qpEvalMutants.Id |> UMX.tag) sorterSetMutants sortableTests host.CollectNewSortableTests
 
                 // 5. Mapping & Binning
-                let segmentResults = mutationSegmentSetResults.create segments
+                let segmentResults = mutationSegmentSetEvals.create segments
                 segmentResults.UpdateAllSortingResultsParent evalParents.SorterEvals
                 segmentResults.UpdateAllSortingResultsMutant evalMutants.SorterEvals
 

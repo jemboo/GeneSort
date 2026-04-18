@@ -190,8 +190,8 @@ module MutateSortingSet =
                                                 sortableTest 
                                                 host.CollectNewSortableTests
 
-                let sortingResultSetMap = SortingResultSetMap.fromSortingSet sortingSetParent
-                sortingResultSetMap.UpdateManySortingResults sorterSetEvalParent.SorterEvals
+                let sortingResultSetMap = SortingEvalSetMap.fromSortingSet sortingSetParent
+                sortingResultSetMap.UpdateManySortingEvals sorterSetEvalParent.SorterEvals
 
                 // 7. Mutate parent sortings
                 let (segments, mutantSortings, mutantSorters) = 
@@ -208,7 +208,7 @@ module MutateSortingSet =
                                                 sorterSetMutants sortableTest 
                                                 host.CollectNewSortableTests
                 
-                let mutationSegmentSetResults = mutationSegmentSetResults.create segments
+                let mutationSegmentSetResults = mutationSegmentSetEvals.create segments
                 mutationSegmentSetResults.UpdateAllSortingResultsParent sorterSetEvalParent.SorterEvals
                 mutationSegmentSetResults.UpdateAllSortingResultsMutant sorterSetEvalMutant.SorterEvals
 

@@ -5,14 +5,14 @@ open GeneSort.Model.Sorting
 open GeneSort.SortingOps
 
 
-type sortingResult =
-     | Single of singleSortingResult
-     | Pairs of pairsSortingResult
+type sortingEval =
+     | Single of singleSortingEval
+     | Pairs of pairsSortingEval
 
 
 module SortingResult =
 
-    let getSortingId (sortingResult: sortingResult) : Guid<sortingId> =
+    let getSortingId (sortingResult: sortingEval) : Guid<sortingId> =
         match sortingResult with
         | Single singleResult -> singleResult.SortingId
         | Pairs pairsSortingResult -> pairsSortingResult |> PairsSortingResult.getSortingId
@@ -20,7 +20,7 @@ module SortingResult =
 
     let addSorterEval (modelTag: modelTag) 
                       (newEval: sorterEval) 
-                      (sortingResult: sortingResult) : unit =
+                      (sortingResult: sortingEval) : unit =
         match sortingResult with
         | Single ssr -> ssr.AddSorterEval modelTag newEval
         | Pairs psr ->
@@ -29,22 +29,22 @@ module SortingResult =
             | SplitPairs2 spsr -> spsr.AddSorterEval modelTag newEval
 
 
-    let makeFromSorting (ting: sorting) : sortingResult =
+    let makeFromSorting (ting: sorting) : sortingEval =
         match ting with
-        | sorting.Single ssm -> singleSortingResult.create 
-                                        (ting |> Sorting.getId) |> sortingResult.Single
-        | sorting.Pairs spm -> splitPairsSortingResult.create 
+        | sorting.Single ssm -> singleSortingEval.create 
+                                        (ting |> Sorting.getId) |> sortingEval.Single
+        | sorting.Pairs spm -> splitPairsSortingEval.create 
                                         (ting |> Sorting.getId) 
-                                        |> pairsSortingResult.SplitPairs |> sortingResult.Pairs
+                                        |> pairsSortingEval.SplitPairs |> sortingEval.Pairs
 
 
-    let getSorterEval (psr: sortingResult) (modelTag:modelTag) : sorterEval =
+    let getSorterEval (psr: sortingEval) (modelTag:modelTag) : sorterEval =
         match psr with
         | Single ssr -> ssr.SorterEval.Value
         | Pairs psr -> psr |> PairsSortingResult.getSorterEval modelTag
 
             
-    let getAllTaggedSorterEvals (psr: sortingResult) : (sorterEval * modelSetTag) seq =
+    let getAllTaggedSorterEvals (psr: sortingEval) : (sorterEval * modelSetTag) seq =
         match psr with
         | Single ssr -> ssr.GetAllTaggedSorterEvals ()
         | Pairs psr -> psr |> PairsSortingResult.getAllTaggedSorterEvals

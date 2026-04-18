@@ -2,6 +2,7 @@
 
 open FSharp.UMX
 open GeneSort.Sorting
+open GeneSort.SortingOps
 
 [<Struct; StructuralEquality; StructuralComparison>]
 type sorterEvalKey =
@@ -69,6 +70,11 @@ module SorterEvalKey =
         let sortedScore = if key.IsSorted then 0.0 else 1.0e6
         sortedScore + byWeighted ceCountWeight stageLengthWeight key
 
+    let fromSorterEval (eval: sorterEval) : sorterEvalKey =
+            sorterEvalKey.create
+                eval.CeBlockEval.CeUseCounts.UsedCeCount
+                eval.CeBlockEval.getStageSequence.StageLength
+                (eval.CeBlockEval.UnsortedCount = 0<sortableCount>)
 
     let toDataTableRecord (key: sorterEvalKey) : GeneSort.Core.dataTableRecord =
         GeneSort.Core.dataTableRecord.createEmpty()

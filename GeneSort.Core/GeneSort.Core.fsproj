@@ -7,8 +7,8 @@
 
   <ItemGroup>
     <Compile Include="ComputationBuilders.fs" />
-    <Compile Include="DataTableReport.fs" />
     <Compile Include="DataTableRecord.fs" />
+    <Compile Include="DataTableReport.fs" />
     <Compile Include="SysExt.fs" />
     <Compile Include="UMXext.fs" />
     <Compile Include="MonadUtils.fs" />

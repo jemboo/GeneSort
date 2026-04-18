@@ -12,7 +12,7 @@ open GeneSort.SortingResults
 type sortingResultSetMapDto = {
     /// Maps SortingId string to its respective result DTO
     [<Key(0)>]
-    SortingResultMap: IDictionary<string, sortingResultDto>
+    SortingEvalMap: IDictionary<string, sortingEvalDto>
     
     /// Maps SorterId string to the modelSetTag DTO
     [<Key(1)>]
@@ -21,11 +21,11 @@ type sortingResultSetMapDto = {
 
 module SortingResultSetMapDto =
 
-    let fromDomain (resultSet: sortingResultSetMap) : sortingResultSetMapDto =
+    let fromDomain (resultSet: sortingEvalSetMap) : sortingResultSetMapDto =
         // 1. Convert the SortingResultMap
-        let resultMapDto = Dictionary<string, sortingResultDto>()
-        for kvp in resultSet.SortingResultMap do
-            resultMapDto.Add((%kvp.Key).ToString(), SortingResultDto.fromDomain kvp.Value)
+        let resultMapDto = Dictionary<string, sortingEvalDto>()
+        for kvp in resultSet.SortingEvalsMap do
+            resultMapDto.Add((%kvp.Key).ToString(), SortingEvalDto.fromDomain kvp.Value)
 
         // 2. Convert the EvalMap
         let evalMapDto = Dictionary<string, modelSetTagDto>()
@@ -33,15 +33,15 @@ module SortingResultSetMapDto =
             evalMapDto.Add((%kvp.Key).ToString(), ModelSetTagDto.fromDomain kvp.Value)
 
         {
-            SortingResultMap = resultMapDto
+            SortingEvalMap = resultMapDto
             EvalMap = evalMapDto
         }
 
-    let toDomain (dto: sortingResultSetMapDto) : sortingResultSetMap =
+    let toDomain (dto: sortingResultSetMapDto) : sortingEvalSetMap =
         // Reconstruct SortingResults sequence
         let sortingResults = 
-            dto.SortingResultMap.Values 
-            |> Seq.map SortingResultDto.toDomain
+            dto.SortingEvalMap.Values 
+            |> Seq.map SortingEvalDto.toDomain
 
         // Reconstruct EvalEntries sequence (Guid<sorterId> * modelSetTag)
         let evalEntries = 
@@ -52,4 +52,4 @@ module SortingResultSetMapDto =
                 (sorterId, modelSetTag)
             )
 
-        sortingResultSetMap.create sortingResults evalEntries
+        sortingEvalSetMap.create sortingResults evalEntries

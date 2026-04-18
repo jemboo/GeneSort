@@ -6,28 +6,28 @@ open GeneSort.Model.Sorting
 open GeneSort.SortingOps
 open GeneSort.Sorting
 
-type sortingResultMap =
+type sortingEvalMap =
     private { 
-        sortingResult: sortingResult
+        sortingEval: sortingEval
         evalMap: Dictionary<Guid<sorterId>, modelTag>
     }
 
-    static member create (sortingResult: sortingResult) (evalEntries: (Guid<sorterId> * modelTag) seq) =
+    static member create (sortingResult: sortingEval) (evalEntries: (Guid<sorterId> * modelTag) seq) =
         let evalMap = Dictionary<Guid<sorterId>, modelTag>()
         for (sorterId, sortingTag) in evalEntries do
             evalMap.[sorterId] <- sortingTag
-        { sortingResult = sortingResult; evalMap = evalMap }
+        { sortingEval = sortingResult; evalMap = evalMap }
 
-    static member empty (sortingResult: sortingResult) =
+    static member empty (sortingResult: sortingEval) =
         { 
-            sortingResult = sortingResult
+            sortingEval = sortingResult
             evalMap = Dictionary<Guid<sorterId>, modelTag>()
         }
 
-    member this.SortingResult with get() = this.sortingResult
+    member this.SortingEval with get() = this.sortingEval
 
     member this.SortingId with get() =
-        SortingResult.getSortingId this.sortingResult
+        SortingResult.getSortingId this.sortingEval
 
     member this.EvalMap with get() =
         this.evalMap :> IReadOnlyDictionary<Guid<sorterId>, modelTag>
@@ -46,7 +46,7 @@ type sortingResultMap =
         match this.evalMap.TryGetValue(newEval.SorterId) with
         | false, _ -> failwithf "SorterId %A not found in evalMap." newEval.SorterId
         | true, modelTag ->
-            SortingResult.addSorterEval modelTag newEval this.sortingResult
+            SortingResult.addSorterEval modelTag newEval this.sortingEval
 
     member this.GetAllTaggedSorterEvals () : (sorterEval * modelSetTag) seq =
-         this.sortingResult |> SortingResult.getAllTaggedSorterEvals
+         this.sortingEval |> SortingResult.getAllTaggedSorterEvals

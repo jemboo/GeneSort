@@ -146,39 +146,6 @@ module DataTableReport =
           dataRows = ResizeArray() }
 
 
-    let mapToTabDelimited<'t when 't : comparison> 
-            (keyFormatter: 't -> string) 
-            (data: Map<'t, Map<string, string>>) =
-
-        // Consolidate headers into a list so we can iterate over them 
-        // in the exact same order for every row.
-        let allHeaders = 
-            data.Values 
-            |> Seq.collect (fun m -> m.Keys) 
-            |> Set.ofSeq 
-            |> Set.toList
-
-        let sb = StringBuilder()
-
-        // Header Row
-        sb.Append("RowKey") |> ignore
-        for header in allHeaders do
-            sb.Append("\t").Append(header) |> ignore
-        sb.AppendLine() |> ignore
-
-        // Data Rows
-        for kvp in data do
-            sb.Append(keyFormatter kvp.Key) |> ignore
-            for header in allHeaders do
-                sb.Append("\t") |> ignore
-                match kvp.Value.TryFind header with
-                | Some v -> sb.Append(v) |> ignore
-                | None   -> () 
-            sb.AppendLine() |> ignore
-
-        sb.ToString()
-
-
 
     let mapToTabDelimitedStrings<'t when 't : comparison> 
             (keyFormatter: 't -> string) 

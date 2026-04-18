@@ -5,6 +5,7 @@ open GeneSort.SortingOps
 open System
 open GeneSort.Model.Sorting
 open GeneSort.SortingResults
+open GeneSort.Core
 
 
 type sortingEvalBins =
@@ -37,26 +38,9 @@ module SortingEvalBins =
         | Single s -> seq { yield (s.SorterEvalBins, modelTag.Single) }
         | Pairs p -> PairSortingEvalBins.getAllTaggedSorterEvalBins p
 
-
-    let getPropertyMaps<'t>
-                    (sortingEvalBins:sortingEvalBins) 
-                    (baseKey:'t) 
-                    (baseProperties: Map<string, string>) 
-                    : (('t * modelTag * sorterEvalKey) * Map<string, string>) seq =
-            match sortingEvalBins with
-            | Single s -> 
-                SorterEvalBins.getPropertyMaps s.SorterEvalBins baseKey baseProperties
-                |> Seq.map (fun ((bk, sek), props) -> 
-                    let combinedMap = props |> Map.add "modelTag" (modelTag.Single.ToString())
-                    ((bk, modelTag.Single, sek), combinedMap))
-
-            | Pairs p -> 
-                PairSortingEvalBins.getAllTaggedSorterEvalBins p 
-                |> Seq.collect (fun (seb, mt) -> 
-                    let combinedMap = baseProperties |> Map.add "modelTag" (mt.ToString())
-                    SorterEvalBins.getPropertyMaps seb baseKey combinedMap
-                    |> Seq.map (fun ((bk, sek), props) -> 
-                        ((bk, mt, sek), props)))
-
+    let makeDataTableRecords (bins: sortingEvalBins) : dataTableRecord seq =
+        match bins with
+        | Single s -> SingleSortingEvalBins.makeDataTableRecords s
+        | Pairs p -> PairSortingEvalBins.makeDataTableRecords p
 
 

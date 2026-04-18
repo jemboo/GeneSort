@@ -6,12 +6,12 @@ open GeneSort.Model.Sorting.SorterPair
 open GeneSort.SortingOps
 
 
-type mutationSegmentResults =
+type mutationSegmentEvals =
     private
         { 
           sortingMutationSegment : sortingMutationSegment
-          sortingResultMapParent : sortingResultMap
-          sortingResultSetMapMutants : sortingResultSetMap
+          sortingEvalMapParent : sortingEvalMap
+          sortingEvalSetMapMutants : sortingEvalSetMap
         }
     with
     static member create (sortingMutationSegment: sortingMutationSegment) =
@@ -19,59 +19,59 @@ type mutationSegmentResults =
             match sortingMutationSegment.SortingMutator with
             | sortingMutator.Single _ ->
                 sortingMutationSegment.GetMutantSortingIds
-                |> Array.map (fun id -> singleSortingResult.create id |> sortingResult.Single)
+                |> Array.map (fun id -> singleSortingEval.create id |> sortingEval.Single)
             | sortingMutator.Pair _ ->
                 sortingMutationSegment.GetMutantSortingIds
-                |> Array.map (fun id -> splitPairsSortingResult.create id 
-                                        |> pairsSortingResult.SplitPairs
-                                        |> sortingResult.Pairs)
+                |> Array.map (fun id -> splitPairsSortingEval.create id 
+                                        |> pairsSortingEval.SplitPairs
+                                        |> sortingEval.Pairs)
 
         let parentSortingResult = 
             match sortingMutationSegment.SortingMutator with
             | sortingMutator.Single smm -> 
                 let parentSortingId = %(smm |> SorterModelMutator.getParentSorterModelId) |> UMX.tag<sortingId>
-                singleSortingResult.create parentSortingId |> sortingResult.Single
+                singleSortingEval.create parentSortingId |> sortingEval.Single
             | sortingMutator.Pair spmm ->
                 let parentSortingId = %(spmm |> SorterPairModelMutator.getParentSorterPairId) |> UMX.tag<sortingId>
-                splitPairsSortingResult.create parentSortingId |> pairsSortingResult.SplitPairs |> sortingResult.Pairs
+                splitPairsSortingEval.create parentSortingId |> pairsSortingEval.SplitPairs |> sortingEval.Pairs
 
         { 
             sortingMutationSegment = sortingMutationSegment
-            sortingResultSetMapMutants = sortingResultSetMap.create 
+            sortingEvalSetMapMutants = sortingEvalSetMap.create 
                                         mutantSortingResults 
                                         sortingMutationSegment.MakeMutantSorterIdsWithSortingTags
 
-            sortingResultMapParent = sortingResultMap.create 
+            sortingEvalMapParent = sortingEvalMap.create 
                                         parentSortingResult 
                                         sortingMutationSegment.MakeParentSorterIdsWithModelTags
            
         }
 
     member this.SortingMutationSegment with get() = this.sortingMutationSegment
-    member this.SortingResultMapParent with get() = this.sortingResultMapParent
-    member this.SortingResultSetMapMutants with get() = this.sortingResultSetMapMutants
+    member this.SortingEvalMapParent with get() = this.sortingEvalMapParent
+    member this.SortingEvalSetMapMutants with get() = this.sortingEvalSetMapMutants
 
-    member this.UpdateSortingResultsMutant (newEval: sorterEval) =
-        this.sortingResultSetMapMutants.UpdateSortingResults newEval
+    member this.UpdateSortingEvalSetMapMutants (newEval: sorterEval) =
+        this.sortingEvalSetMapMutants.UpdateSortingEvals newEval
 
-    member this.UpdateSortingResultParent (newEval: sorterEval) =
-        this.sortingResultMapParent.UpdateSortingResult newEval
+    member this.UpdateSortingEvalMapParent (newEval: sorterEval) =
+        this.sortingEvalMapParent.UpdateSortingResult newEval
 
     member this.GetAllTaggedParentSorterEvals () : (sorterEval * modelSetTag) seq =
-        this.sortingResultMapParent.GetAllTaggedSorterEvals ()
+        this.sortingEvalMapParent.GetAllTaggedSorterEvals ()
 
     member this.GetAllTaggedMutantSorterEvals () : (sorterEval * modelSetTag) seq =
-        this.sortingResultSetMapMutants.GetAllTaggedSorterEvals ()
+        this.sortingEvalSetMapMutants.GetAllTaggedSorterEvals ()
 
 
 
-module MutationSegmentResults = 
+module MutationSegmentEvals = 
 
     let load (sortingMutationSegment: sortingMutationSegment) 
-             (sortingResultMapParent: sortingResultMap) 
-             (sortingResultSetMapMutants: sortingResultSetMap) : mutationSegmentResults =
+             (sortingResultMapParent: sortingEvalMap) 
+             (sortingResultSetMapMutants: sortingEvalSetMap) : mutationSegmentEvals =
         {
             sortingMutationSegment = sortingMutationSegment
-            sortingResultMapParent = sortingResultMapParent
-            sortingResultSetMapMutants = sortingResultSetMapMutants
+            sortingEvalMapParent = sortingResultMapParent
+            sortingEvalSetMapMutants = sortingResultSetMapMutants
         }

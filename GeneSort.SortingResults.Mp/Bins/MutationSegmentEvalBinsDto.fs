@@ -8,7 +8,7 @@ open GeneSort.SortingResults.Mp
 [<MessagePackObject>]
 type mutationSegmentEvalBinsDto = {
     [<Key(0)>]
-    parentSortingResult: sortingResultDto
+    parentSortingResult: sortingEvalDto
     [<Key(1)>]
     mutantSortingEvalBins: sortingEvalBinsDto
 }
@@ -18,13 +18,13 @@ module MutationSegmentEvalBinsDto =
     /// Maps the Domain type to the DTO
     let fromDomain (domain: mutationSegmentEvalBins) : mutationSegmentEvalBinsDto =
         {
-            parentSortingResult = SortingResultDto.fromDomain domain.ParentSortingResult
+            parentSortingResult = SortingEvalDto.fromDomain domain.ParentSortingResult
             mutantSortingEvalBins = SortingEvalBinsDto.fromDomain domain.MutantSortingEvalBins
         }
 
     /// Maps the DTO back to the Domain type
     let toDomain (dto: mutationSegmentEvalBinsDto) : mutationSegmentEvalBins =
-        let parent = SortingResultDto.toDomain dto.parentSortingResult
+        let parent = SortingEvalDto.toDomain dto.parentSortingResult
         let mutantBins = SortingEvalBinsDto.toDomain dto.mutantSortingEvalBins
         
         MutationSegmentEvalBins.makeFromStorage parent mutantBins

@@ -6,24 +6,24 @@ open GeneSort.Model.Sorting
 open GeneSort.SortingOps
 open GeneSort.Sorting
 
-type mutationSegmentSetResults =
+type mutationSegmentSetEvals =
     private
         { 
           sortingMutationSegments : sortingMutationSegment []
-          sortingSegmentResults: Dictionary<Guid<sortingMutationSegmentId>, mutationSegmentResults>
+          sortingSegmentResults: Dictionary<Guid<sortingMutationSegmentId>, mutationSegmentEvals>
           // Routing lookups
           mutantSorterToSegmentMap: Dictionary<Guid<sorterId>, Guid<sortingMutationSegmentId>>
           parentSorterToSegmentMap: Dictionary<Guid<sorterId>, Guid<sortingMutationSegmentId>>
         }
     with
     static member create (sortingMutationSegments: sortingMutationSegment []) =
-        let sortingSegmentResults = Dictionary<Guid<sortingMutationSegmentId>, mutationSegmentResults>()
+        let sortingSegmentResults = Dictionary<Guid<sortingMutationSegmentId>, mutationSegmentEvals>()
         let mutantMap = Dictionary<Guid<sorterId>, Guid<sortingMutationSegmentId>>()
         let parentMap = Dictionary<Guid<sorterId>, Guid<sortingMutationSegmentId>>()
 
         for segment in sortingMutationSegments do
             // 1. Create the segment result object
-            let segmentResult = mutationSegmentResults.create segment
+            let segmentResult = mutationSegmentEvals.create segment
             sortingSegmentResults.[segment.Id] <- segmentResult
 
             // 2. Map Mutant IDs to this SegmentId
@@ -50,14 +50,14 @@ type mutationSegmentSetResults =
     member this.UpdateSortingResultsMutant (newEval: sorterEval) =
         match this.mutantSorterToSegmentMap.TryGetValue(newEval.SorterId) with
         | true, segmentId -> 
-            this.sortingSegmentResults.[segmentId].UpdateSortingResultsMutant newEval
+            this.sortingSegmentResults.[segmentId].UpdateSortingEvalSetMapMutants newEval
         | false, _ -> failwithf "Mutant SorterId %A not found in any segment." newEval.SorterId
 
     /// Automatically routes the evaluation to the correct Parent result
     member this.UpdateSortingResultParent (newEval: sorterEval) =
         match this.parentSorterToSegmentMap.TryGetValue(newEval.SorterId) with
         | true, segmentId -> 
-            this.sortingSegmentResults.[segmentId].UpdateSortingResultParent newEval
+            this.sortingSegmentResults.[segmentId].UpdateSortingEvalMapParent newEval
         | false, _ -> failwithf "Parent SorterId %A not found in any segment." newEval.SorterId
 
     member this.GetSegmentResults (segmentId: Guid<sortingMutationSegmentId>) =
@@ -88,14 +88,14 @@ type mutationSegmentSetResults =
 
 
 
-module MutationSegmentSetResults = 
+module MutationSegmentSetEvals = 
     
     let load 
            (sortingMutationSegments : sortingMutationSegment []) 
-           (sortingSegmentResults: Dictionary<Guid<sortingMutationSegmentId>, mutationSegmentResults>) 
+           (sortingSegmentResults: Dictionary<Guid<sortingMutationSegmentId>, mutationSegmentEvals>) 
            (mutantSorterToSegmentMap: Dictionary<Guid<sorterId>, Guid<sortingMutationSegmentId>>) 
            (parentSorterToSegmentMap: Dictionary<Guid<sorterId>, Guid<sortingMutationSegmentId>>) 
-                : mutationSegmentSetResults =
+                : mutationSegmentSetEvals =
            {
                 sortingMutationSegments = sortingMutationSegments
                 sortingSegmentResults = sortingSegmentResults

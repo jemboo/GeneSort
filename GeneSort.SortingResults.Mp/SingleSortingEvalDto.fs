@@ -8,22 +8,22 @@ open GeneSort.SortingResults
 open GeneSort.Model.Sorting
 
 [<MessagePackObject>]
-type singleSortingResultDto = {
+type singleSortingEvalDto = {
     [<Key(0)>]
     SortingId: Guid
     [<Key(1)>]
     SorterEval: sorterEvalDto option
 }
 
-module SingleSortingResultDto =
+module SingleSortingEvalDto =
 
-    let fromDomain (result: singleSortingResult) : singleSortingResultDto =
+    let fromDomain (result: singleSortingEval) : singleSortingEvalDto =
         {
             SortingId  = %result.SortingId
             SorterEval = result.SorterEval |> Option.map SorterEvalDto.toSorterEvalDto
         }
 
-    let toDomain (dto: singleSortingResultDto) : singleSortingResult =
-        let result = singleSortingResult.create (UMX.tag<sortingId> dto.SortingId)
+    let toDomain (dto: singleSortingEvalDto) : singleSortingEval =
+        let result = singleSortingEval.create (UMX.tag<sortingId> dto.SortingId)
         result.SorterEval <- dto.SorterEval |> Option.map SorterEvalDto.fromSorterEvalDto
         result

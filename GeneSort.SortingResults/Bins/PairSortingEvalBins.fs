@@ -6,6 +6,7 @@ open System
 open GeneSort.Model.Sorting
 open GeneSort.SortingResults
 open GeneSort.Model.Sorting.SorterPair
+open GeneSort.Core
 
 
 type pairSortingEvalBins =
@@ -44,3 +45,9 @@ module PairSortingEvalBins =
         match pairSortingEvalBins with
         | SplitPairs sp -> SplitPairSortingEvalBins.getAllTaggedSorterEvalBins sp
         | SplitPairs2 sp2 -> SplitPairSortingEvalBins.getAllTaggedSorterEvalBins sp2
+
+
+    let makeDataTableRecords (bins: pairSortingEvalBins) : dataTableRecord seq =
+        match bins with
+        | SplitPairs sp -> SplitPairSortingEvalBins.makeDataTableRecords sp
+        | SplitPairs2 sp2 -> SplitPairSortingEvalBins.makeDataTableRecords sp2

@@ -6,7 +6,7 @@ open GeneSort.Model.Sorting
 open GeneSort.SortingOps
 
 
-type singleSortingResult=
+type singleSortingEval=
     private { 
         sortingId: Guid<sortingId>
         mutable sorterEval: sorterEval option
@@ -19,7 +19,7 @@ type singleSortingResult=
             sorterEval = None
         }
 
-    static member empty () : singleSortingResult =
+    static member empty () : singleSortingEval =
         { 
             sortingId = Guid.Empty |> UMX.tag<sortingId>
             sorterEval = None

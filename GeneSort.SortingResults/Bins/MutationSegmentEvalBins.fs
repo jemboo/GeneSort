@@ -4,11 +4,12 @@
 open GeneSort.Model.Sorting
 open GeneSort.SortingOps
 open GeneSort.SortingResults
+open GeneSort.Core
 
 
 type mutationSegmentEvalBins =
     private {
-        parentSortingResult: sortingResult
+        parentSortingResult: sortingEval
         mutantSortingEvalBins: sortingEvalBins
     }
 
@@ -25,7 +26,7 @@ type mutationSegmentEvalBins =
 module MutationSegmentEvalBins =
 
     let makeFromStorage 
-                (parentSortingResult: sortingResult) 
+                (parentSortingResult: sortingEval) 
                 (mutantSortingEvalBins: sortingEvalBins) =
 
         {
@@ -40,6 +41,32 @@ module MutationSegmentEvalBins =
             parentSortingResult = sortingResult
             mutantSortingEvalBins = mutantSortingEvalBins
         }
+
+    let makeDataTableRecords (mutationSegmentEvalBins: mutationSegmentEvalBins) = //: dataTableRecord seq =
+
+        let taggedParents = SortingResult.getAllTaggedSorterEvals 
+                                mutationSegmentEvalBins.ParentSortingResult
+                            |> Seq.toArray
+
+    //    let taggedMutants = SortingEvalBins.getAllTaggedSorterEvalBins 
+    //                            mutationSegmentEvalBins.MutantSortingEvalBins
+    //                        |> Seq.toArray
+
+    //    let mergedRecords = 
+    //        seq {
+    //            for (parentEval, parentModelTag) in taggedParents do
+    //                let matchingMutant = 
+    //                    taggedMutants 
+    //                    |> Seq.filter (fun (mutantEval, mutantModelTag) -> mutantModelTag = parentModelTag.ModelTag)
+    //                    |> Seq.head |> fst
+
+    //                let modelSetTagRecord = ModelSetTag.toDataTableRecord parentModelTag
+    //                let parentRecord = parentEval |> SorterEval.toDataTableRecord
+    //                None
+    //        }
+        None
+
+
 
     //let getPropertyMaps<'t>
     //                (mutationSegmentEvalBins:mutationSegmentEvalBins) 

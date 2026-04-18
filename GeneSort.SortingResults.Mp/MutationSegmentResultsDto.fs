@@ -22,24 +22,24 @@ type mutationSegmentResultsDto = {
 module MutationSegmentResultsDto =
 
     /// Converts the domain object to a serializable DTO
-    let fromDomain (domain: mutationSegmentResults) : mutationSegmentResultsDto =
+    let fromDomain (domain: mutationSegmentEvals) : mutationSegmentResultsDto =
         {
             SortingMutationSegment = SortingMutationSegmentDto.fromDomain domain.SortingMutationSegment
-            SortingResultMapParent = SortingResultMapDto.fromDomain domain.SortingResultMapParent
-            SortingResultSetMapMutants = SortingResultSetMapDto.fromDomain domain.SortingResultSetMapMutants
+            SortingResultMapParent = SortingResultMapDto.fromDomain domain.SortingEvalMapParent
+            SortingResultSetMapMutants = SortingResultSetMapDto.fromDomain domain.SortingEvalSetMapMutants
         }
 
     /// Reconstructs the domain object from the DTO
     /// Note: This relies on the internal 'create' logic of mutationSegmentResults
-    let toDomain (dto: mutationSegmentResultsDto) : mutationSegmentResults =
+    let toDomain (dto: mutationSegmentResultsDto) : mutationSegmentEvals =
         let segment = SortingMutationSegmentDto.toDomain dto.SortingMutationSegment
         let parentMap = SortingResultMapDto.toDomain dto.SortingResultMapParent
         let mutantsMap = SortingResultSetMapDto.toDomain dto.SortingResultSetMapMutants
 
-        MutationSegmentResults.load segment parentMap mutantsMap
+        MutationSegmentEvals.load segment parentMap mutantsMap
 
     /// Helper for direct serialization
-    let serialize (options: MessagePackSerializerOptions) (results: mutationSegmentResults) =
+    let serialize (options: MessagePackSerializerOptions) (results: mutationSegmentEvals) =
         results |> fromDomain |> fun d -> MessagePackSerializer.Serialize(d, options)
 
     /// Helper for direct deserialization

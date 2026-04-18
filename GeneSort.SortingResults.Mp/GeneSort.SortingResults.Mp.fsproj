@@ -6,11 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SingleSortingResultDto.fs" />
-    <Compile Include="SplitPairsSortingResultDto.fs" />
-    <Compile Include="PairsSortingResultDto.fs" />
-    <Compile Include="SortingResultDto.fs" />
-    <Compile Include="SortingResultMapDto.fs" />
+    <Compile Include="SingleSortingEvalDto.fs" />
+    <Compile Include="SplitPairsSortingEvalDto.fs" />
+    <Compile Include="PairsSortingEvalDto.fs" />
+    <Compile Include="SortingEvalDto.fs" />
+    <Compile Include="SortingEvalMapDto.fs" />
     <Compile Include="SortingResultSetMapDto.fs" />
     <Compile Include="MutationSegmentResultsDto.fs" />
     <Compile Include="MutationSegmentSetResultsDto.fs" />

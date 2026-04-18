@@ -6,7 +6,7 @@ open GeneSort.Model.Sorting
 open GeneSort.SortingOps
 
 
-type splitPairsSortingResult=
+type splitPairsSortingEval=
     private { 
         sortingId: Guid<sortingId>
         mutable sorterEvalFirstFirst: sorterEval option
@@ -24,7 +24,7 @@ type splitPairsSortingResult=
             sorterEvalSecondSecond = None
         }
 
-    static member empty () : splitPairsSortingResult =
+    static member empty () : splitPairsSortingEval =
         { 
             sortingId = Guid.Empty |> UMX.tag<sortingId>
             sorterEvalFirstFirst = None

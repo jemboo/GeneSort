@@ -11,7 +11,7 @@ open GeneSort.Model.Mp.Sorting
 [<MessagePackObject>]
 type sortingResultMapDto = {
     [<Key(0)>]
-    SortingResult: sortingResultDto
+    SortingResult: sortingEvalDto
     
     /// Maps SorterId (as string/Guid) to the detailed ModelTagDto
     [<Key(1)>]
@@ -20,7 +20,7 @@ type sortingResultMapDto = {
 
 module SortingResultMapDto =
 
-    let fromDomain (map: sortingResultMap) : sortingResultMapDto =
+    let fromDomain (map: sortingEvalMap) : sortingResultMapDto =
         let evalDict = Dictionary<string, modelTagDto>()
         
         for kvp in map.EvalMap do
@@ -29,12 +29,12 @@ module SortingResultMapDto =
             evalDict.Add(sorterIdStr, tagDto)
 
         {
-            SortingResult = SortingResultDto.fromDomain map.SortingResult
+            SortingResult = SortingEvalDto.fromDomain map.SortingEval
             EvalMap = evalDict
         }
 
-    let toDomain (dto: sortingResultMapDto) : sortingResultMap =
-        let sortingResult = SortingResultDto.toDomain dto.SortingResult
+    let toDomain (dto: sortingResultMapDto) : sortingEvalMap =
+        let sortingResult = SortingEvalDto.toDomain dto.SortingResult
         
         let evalEntries = 
             dto.EvalMap 
@@ -44,4 +44,4 @@ module SortingResultMapDto =
                 (sorterId, modelTag)
             )
 
-        sortingResultMap.create sortingResult evalEntries
+        sortingEvalMap.create sortingResult evalEntries
