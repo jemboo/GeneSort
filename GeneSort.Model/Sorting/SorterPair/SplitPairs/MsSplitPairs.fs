@@ -47,14 +47,16 @@ type msSplitPairs =
         let secondPrefixCeLength = SorterModel.getCeLength secondPrefix
         
         if firstPrefixCeLength <> secondPrefixCeLength then
-            failwith $"Both prefixes must have the same ceLength. FirstPrefix: {%firstPrefixCeLength}, SecondPrefix: {%secondPrefixCeLength}"
+            failwith $"Both prefixes must have the same ceLength. 
+                     FirstPrefix: {%firstPrefixCeLength}, SecondPrefix: {%secondPrefixCeLength}"
         
         // Validate that the two suffixes have the same ceLength
         let firstSuffixCeLength = SorterModel.getCeLength firstSuffix
         let secondSuffixCeLength = SorterModel.getCeLength secondSuffix
         
         if firstSuffixCeLength <> secondSuffixCeLength then
-            failwith $"Both suffixes must have the same ceLength. FirstSuffix: {%firstSuffixCeLength}, SecondSuffix: {%secondSuffixCeLength}"
+            failwith $"Both suffixes must have the same ceLength. 
+                     FirstSuffix: {%firstSuffixCeLength}, SecondSuffix: {%secondSuffixCeLength}"
 
         { id = id
           sortingWidth = sortingWidth

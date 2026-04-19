@@ -19,7 +19,7 @@ type mutationSegmentEvalBins =
     member this.AddParentSorterEval (sorterEval: sorterEval) (modelTag:modelTag) =
         SortingEval.addSorterEval modelTag sorterEval this.parentSortingEval
 
-    member this.ParentSortingResult with get() = this.parentSortingEval
+    member this.ParentSortingEval with get() = this.parentSortingEval
     member this.MutantSortingEvalBins with get() = this.mutantSortingEvalBins
 
 
@@ -45,7 +45,7 @@ module MutationSegmentEvalBins =
     let makeDataTableRecords (mutationSegmentEvalBins: mutationSegmentEvalBins) = //: dataTableRecord seq =
 
         let taggedParents = SortingEval.getAllTaggedSorterEvals 
-                                mutationSegmentEvalBins.ParentSortingResult
+                                mutationSegmentEvalBins.ParentSortingEval
                             |> Seq.toArray
 
     //    let taggedMutants = SortingEvalBins.getAllTaggedSorterEvalBins 

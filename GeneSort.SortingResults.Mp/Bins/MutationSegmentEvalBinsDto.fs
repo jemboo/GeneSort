@@ -18,7 +18,7 @@ module MutationSegmentEvalBinsDto =
     /// Maps the Domain type to the DTO
     let fromDomain (domain: mutationSegmentEvalBins) : mutationSegmentEvalBinsDto =
         {
-            parentSortingResult = SortingEvalDto.fromDomain domain.ParentSortingResult
+            parentSortingResult = SortingEvalDto.fromDomain domain.ParentSortingEval
             mutantSortingEvalBins = SortingEvalBinsDto.fromDomain domain.MutantSortingEvalBins
         }
 
