@@ -79,5 +79,5 @@ type splitPairsSortingEval=
         }
 
 
-module SplitPairsSortingResult = ()
+module SplitPairsSortingEval = ()
 

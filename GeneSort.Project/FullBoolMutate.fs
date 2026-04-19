@@ -170,14 +170,14 @@ module FullBoolMutate =
                 let evalMutants = SorterSetEval.makeSorterSetEval (%qpEvalMutants.Id |> UMX.tag) sorterSetMutants sortableTests host.CollectNewSortableTests
 
                 // 5. Mapping & Binning
-                let segmentResults = mutationSegmentSetEvals.create segments
-                segmentResults.UpdateAllSortingResultsParent evalParents.SorterEvals
-                segmentResults.UpdateAllSortingResultsMutant evalMutants.SorterEvals
+                let segmentEvals = mutationSegmentSetEvals.create segments
+                segmentEvals.UpdateAllSortingEvalsParent evalParents.SorterEvals
+                segmentEvals.UpdateAllSortingEvalsMutant evalMutants.SorterEvals
 
                 let qpBinsSet = makeQueryParamsFromRunParams runParameters (outputDataType.MutationSegmentEvalBinsSet "")
                 let binsSet = MutationSegmentEvalBinsSet.makeFromSortings (%qpBinsSet.Id |> UMX.tag) sortingSetParent.Sortings
-                binsSet.AddAllParentSorterEvals (segmentResults.GetAllParentSorterEvals() |> Seq.toArray)
-                binsSet.AddAllMutantSorterEvals (segmentResults.GetAllMutantSorterEvals() |> Seq.toArray)
+                binsSet.AddAllParentSorterEvals (segmentEvals.GetAllParentSorterEvals() |> Seq.toArray)
+                binsSet.AddAllMutantSorterEvals (segmentEvals.GetAllMutantSorterEvals() |> Seq.toArray)
 
                 // 6. Persistence
                 let qpMutantSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Mutants")

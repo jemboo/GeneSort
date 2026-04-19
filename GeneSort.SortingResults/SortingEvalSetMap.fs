@@ -17,7 +17,7 @@ type sortingEvalSetMap =
                     (evalEntries: (Guid<sorterId> * modelSetTag) seq) =
         let dict = Dictionary<Guid<sortingId>, sortingEval>()
         for result in sortingResults do
-            dict.[SortingResult.getSortingId result] <- result
+            dict.[SortingEval.getSortingId result] <- result
         let evalMap = Dictionary<Guid<sorterId>, modelSetTag>()
         for (sorterId, sortingTag) in evalEntries do
             evalMap.[sorterId] <- sortingTag
@@ -61,20 +61,20 @@ type sortingEvalSetMap =
             let modelTag  = ModelSetTag.getModelTag sortingTag
             match this.sortingEvalsMap.TryGetValue(sortingParentId) with
             | false, _ -> failwithf "SortingId %A not found in sortingEvalsMap." sortingParentId
-            | true, result -> SortingResult.addSorterEval modelTag newEval result
+            | true, result -> SortingEval.addSorterEval modelTag newEval result
 
     member this.UpdateManySortingEvals (newEvals: sorterEval []) =
         newEvals |> Array.iter(this.UpdateSortingEvals)
 
     member this.GetAllTaggedSorterEvals () : (sorterEval * modelSetTag) seq =
-         this.sortingEvalsMap.Values |> Seq.collect(fun sr -> sr |> SortingResult.getAllTaggedSorterEvals)
+         this.sortingEvalsMap.Values |> Seq.collect(fun sr -> sr |> SortingEval.getAllTaggedSorterEvals)
 
 
 module SortingEvalSetMap = 
 
     let fromSortingSet (sSet:sortingSet) : sortingEvalSetMap =
-         let sortingResults = sSet.Sortings |> Array.map(SortingResult.makeFromSorting)
-         sortingEvalSetMap.create sortingResults sSet.SorterIdsWithSortingTags
+         let sortingEvals = sSet.Sortings |> Array.map(SortingEval.makeFromSorting)
+         sortingEvalSetMap.create sortingEvals sSet.SorterIdsWithSortingTags
          
 
 

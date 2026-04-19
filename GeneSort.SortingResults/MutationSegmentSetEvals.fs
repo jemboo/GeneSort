@@ -47,14 +47,14 @@ type mutationSegmentSetEvals =
     member this.SortingSegmentResults with get() = this.sortingSegmentResults
 
     /// Automatically routes the evaluation to the correct Mutant result
-    member this.UpdateSortingResultsMutant (newEval: sorterEval) =
+    member this.UpdateSorterEvalMutant (newEval: sorterEval) =
         match this.mutantSorterToSegmentMap.TryGetValue(newEval.SorterId) with
         | true, segmentId -> 
             this.sortingSegmentResults.[segmentId].UpdateSortingEvalSetMapMutants newEval
         | false, _ -> failwithf "Mutant SorterId %A not found in any segment." newEval.SorterId
 
     /// Automatically routes the evaluation to the correct Parent result
-    member this.UpdateSortingResultParent (newEval: sorterEval) =
+    member this.UpdateSorterEvalParent (newEval: sorterEval) =
         match this.parentSorterToSegmentMap.TryGetValue(newEval.SorterId) with
         | true, segmentId -> 
             this.sortingSegmentResults.[segmentId].UpdateSortingEvalMapParent newEval
@@ -65,11 +65,11 @@ type mutationSegmentSetEvals =
         | true, segmentResults -> segmentResults
         | false, _ -> failwithf "SegmentId %A not found." segmentId
 
-    member this.UpdateAllSortingResultsMutant (newEvals: sorterEval []) =
-        newEvals |> Array.iter(this.UpdateSortingResultsMutant)
+    member this.UpdateAllSortingEvalsMutant (newEvals: sorterEval []) =
+        newEvals |> Array.iter(this.UpdateSorterEvalMutant)
 
-    member this.UpdateAllSortingResultsParent (newEvals: sorterEval []) =
-        newEvals |> Array.iter(this.UpdateSortingResultParent)
+    member this.UpdateAllSortingEvalsParent (newEvals: sorterEval []) =
+        newEvals |> Array.iter(this.UpdateSorterEvalParent)
 
     member this.GetAllParentSorterEvals () : (sorterEval * modelSetTag) seq =
         this.sortingSegmentResults.Values

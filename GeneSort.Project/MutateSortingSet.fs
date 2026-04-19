@@ -190,8 +190,8 @@ module MutateSortingSet =
                                                 sortableTest 
                                                 host.CollectNewSortableTests
 
-                let sortingResultSetMap = SortingEvalSetMap.fromSortingSet sortingSetParent
-                sortingResultSetMap.UpdateManySortingEvals sorterSetEvalParent.SorterEvals
+                let sortingEvalSetMap = SortingEvalSetMap.fromSortingSet sortingSetParent
+                sortingEvalSetMap.UpdateManySortingEvals sorterSetEvalParent.SorterEvals
 
                 // 7. Mutate parent sortings
                 let (segments, mutantSortings, mutantSorters) = 
@@ -208,9 +208,9 @@ module MutateSortingSet =
                                                 sorterSetMutants sortableTest 
                                                 host.CollectNewSortableTests
                 
-                let mutationSegmentSetResults = mutationSegmentSetEvals.create segments
-                mutationSegmentSetResults.UpdateAllSortingResultsParent sorterSetEvalParent.SorterEvals
-                mutationSegmentSetResults.UpdateAllSortingResultsMutant sorterSetEvalMutant.SorterEvals
+                let mutationSegmentSetEvals = mutationSegmentSetEvals.create segments
+                mutationSegmentSetEvals.UpdateAllSortingEvalsParent sorterSetEvalParent.SorterEvals
+                mutationSegmentSetEvals.UpdateAllSortingEvalsMutant sorterSetEvalMutant.SorterEvals
 
                 // 10. Extract the passing results
                 let qpParentPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Parent_Pass")
@@ -225,8 +225,8 @@ module MutateSortingSet =
                 // 11. Make the evaluation bins
                 let qpBinsSet = makeQueryParamsFromRunParams runParameters (outputDataType.MutationSegmentEvalBinsSet "")
                 let mutationSegmentEvalBinsSet = MutationSegmentEvalBinsSet.makeFromSortings (%qpBinsSet.Id |> UMX.tag) sortingSetParent.Sortings
-                mutationSegmentEvalBinsSet.AddAllParentSorterEvals (mutationSegmentSetResults.GetAllParentSorterEvals() |> Seq.toArray)
-                mutationSegmentEvalBinsSet.AddAllMutantSorterEvals (mutationSegmentSetResults.GetAllMutantSorterEvals() |> Seq.toArray)
+                mutationSegmentEvalBinsSet.AddAllParentSorterEvals (mutationSegmentSetEvals.GetAllParentSorterEvals() |> Seq.toArray)
+                mutationSegmentEvalBinsSet.AddAllMutantSorterEvals (mutationSegmentSetEvals.GetAllMutantSorterEvals() |> Seq.toArray)
 
                 // 12. Save All Results (Using Batch Helper)
                 let resultsToSave = [

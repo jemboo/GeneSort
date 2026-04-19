@@ -4,7 +4,7 @@
 [<Measure>] type ceIndex
 [<Measure>] type ceBlockId
 
-[<Measure>] type sortingResultId
+[<Measure>] type sortingEvalId
 [<Measure>] type sorterSetEvalId
 [<Measure>] type sorterEvalBinsId
 [<Measure>] type sorterEvalHierarchyId

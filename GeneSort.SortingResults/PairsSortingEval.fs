@@ -11,7 +11,7 @@ type pairsSortingEval=
      | SplitPairs2 of splitPairsSortingEval
 
 
-module PairsSortingResult = 
+module PairsSortingEval = 
 
     let getSortingId (psr: pairsSortingEval) : Guid<sortingId> =
         match psr with

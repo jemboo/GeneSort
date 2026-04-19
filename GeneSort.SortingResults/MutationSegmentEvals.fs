@@ -55,7 +55,7 @@ type mutationSegmentEvals =
         this.sortingEvalSetMapMutants.UpdateSortingEvals newEval
 
     member this.UpdateSortingEvalMapParent (newEval: sorterEval) =
-        this.sortingEvalMapParent.UpdateSortingResult newEval
+        this.sortingEvalMapParent.UpdateSortingEval newEval
 
     member this.GetAllTaggedParentSorterEvals () : (sorterEval * modelSetTag) seq =
         this.sortingEvalMapParent.GetAllTaggedSorterEvals ()

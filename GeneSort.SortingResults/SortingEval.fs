@@ -10,18 +10,18 @@ type sortingEval =
      | Pairs of pairsSortingEval
 
 
-module SortingResult =
+module SortingEval =
 
     let getSortingId (sortingResult: sortingEval) : Guid<sortingId> =
         match sortingResult with
         | Single singleResult -> singleResult.SortingId
-        | Pairs pairsSortingResult -> pairsSortingResult |> PairsSortingResult.getSortingId
+        | Pairs pairsSortingEval -> pairsSortingEval |> PairsSortingEval.getSortingId
 
 
     let addSorterEval (modelTag: modelTag) 
                       (newEval: sorterEval) 
-                      (sortingResult: sortingEval) : unit =
-        match sortingResult with
+                      (sortingEval: sortingEval) : unit =
+        match sortingEval with
         | Single ssr -> ssr.AddSorterEval modelTag newEval
         | Pairs psr ->
             match psr with
@@ -41,10 +41,10 @@ module SortingResult =
     let getSorterEval (psr: sortingEval) (modelTag:modelTag) : sorterEval =
         match psr with
         | Single ssr -> ssr.SorterEval.Value
-        | Pairs psr -> psr |> PairsSortingResult.getSorterEval modelTag
+        | Pairs psr -> psr |> PairsSortingEval.getSorterEval modelTag
 
             
     let getAllTaggedSorterEvals (psr: sortingEval) : (sorterEval * modelSetTag) seq =
         match psr with
         | Single ssr -> ssr.GetAllTaggedSorterEvals ()
-        | Pairs psr -> psr |> PairsSortingResult.getAllTaggedSorterEvals
+        | Pairs psr -> psr |> PairsSortingEval.getAllTaggedSorterEvals

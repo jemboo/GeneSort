@@ -27,7 +27,7 @@ type sortingEvalMap =
     member this.SortingEval with get() = this.sortingEval
 
     member this.SortingId with get() =
-        SortingResult.getSortingId this.sortingEval
+        SortingEval.getSortingId this.sortingEval
 
     member this.EvalMap with get() =
         this.evalMap :> IReadOnlyDictionary<Guid<sorterId>, modelTag>
@@ -42,11 +42,11 @@ type sortingEvalMap =
     member this.ContainsSorter (sorterId: Guid<sorterId>) =
         this.evalMap.ContainsKey(sorterId)
 
-    member this.UpdateSortingResult (newEval: sorterEval) =
+    member this.UpdateSortingEval (newEval: sorterEval) =
         match this.evalMap.TryGetValue(newEval.SorterId) with
         | false, _ -> failwithf "SorterId %A not found in evalMap." newEval.SorterId
         | true, modelTag ->
-            SortingResult.addSorterEval modelTag newEval this.sortingEval
+            SortingEval.addSorterEval modelTag newEval this.sortingEval
 
     member this.GetAllTaggedSorterEvals () : (sorterEval * modelSetTag) seq =
-         this.sortingEval |> SortingResult.getAllTaggedSorterEvals
+         this.sortingEval |> SortingEval.getAllTaggedSorterEvals

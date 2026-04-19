@@ -13,10 +13,10 @@ type mutationSegmentResultsDto = {
     SortingMutationSegment: sortingMutationSegmentDto
     
     [<Key(1)>]
-    SortingResultMapParent: sortingResultMapDto
+    SortingEvalMapParent: sortingEvalMapDto
     
     [<Key(2)>]
-    SortingResultSetMapMutants: sortingResultSetMapDto
+    SortingEvalSetMapMutants: sortingEvalSetMapDto
 }
 
 module MutationSegmentResultsDto =
@@ -25,16 +25,16 @@ module MutationSegmentResultsDto =
     let fromDomain (domain: mutationSegmentEvals) : mutationSegmentResultsDto =
         {
             SortingMutationSegment = SortingMutationSegmentDto.fromDomain domain.SortingMutationSegment
-            SortingResultMapParent = SortingResultMapDto.fromDomain domain.SortingEvalMapParent
-            SortingResultSetMapMutants = SortingResultSetMapDto.fromDomain domain.SortingEvalSetMapMutants
+            SortingEvalMapParent = SortingEvalMapDto.fromDomain domain.SortingEvalMapParent
+            SortingEvalSetMapMutants = SortingEvalSetMapDto.fromDomain domain.SortingEvalSetMapMutants
         }
 
     /// Reconstructs the domain object from the DTO
     /// Note: This relies on the internal 'create' logic of mutationSegmentResults
     let toDomain (dto: mutationSegmentResultsDto) : mutationSegmentEvals =
         let segment = SortingMutationSegmentDto.toDomain dto.SortingMutationSegment
-        let parentMap = SortingResultMapDto.toDomain dto.SortingResultMapParent
-        let mutantsMap = SortingResultSetMapDto.toDomain dto.SortingResultSetMapMutants
+        let parentMap = SortingEvalMapDto.toDomain dto.SortingEvalMapParent
+        let mutantsMap = SortingEvalSetMapDto.toDomain dto.SortingEvalSetMapMutants
 
         MutationSegmentEvals.load segment parentMap mutantsMap
 
