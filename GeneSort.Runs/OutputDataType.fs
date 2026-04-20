@@ -1,6 +1,9 @@
 ﻿namespace GeneSort.Runs
+
 open FSharp.UMX
 open System
+
+[<Measure>] type textReportName
 
 type outputDataType =
     | MutationSegmentEvalBinsSet of string

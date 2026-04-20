@@ -7,7 +7,6 @@ open GeneSort.Sorting
 open GeneSort.Model.Sorting
 
 [<Measure>] type projectName
-[<Measure>] type textReportName
 [<Measure>] type queryParamsId
 [<Measure>] type replNumber
 [<Measure>] type generationNumber
