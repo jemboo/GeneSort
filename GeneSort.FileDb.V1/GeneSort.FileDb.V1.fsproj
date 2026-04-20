@@ -21,7 +21,6 @@
     <ProjectReference Include="..\GeneSort.Eval.Mp.V1\GeneSort.Eval.Mp.V1.fsproj" />
     <ProjectReference Include="..\GeneSort.Eval.V1\GeneSort.Eval.V1.fsproj" />
     <ProjectReference Include="..\GeneSort.Model.Sortable.Mp.V1\GeneSort.Model.Sortable.Mp.V1.fsproj" />
-    <ProjectReference Include="..\GeneSort.Model.Sortable.V1\GeneSort.Model.Sortable.V1.fsproj" />
     <ProjectReference Include="..\GeneSort.Model.Sorting.Mp.V1\GeneSort.Model.Sorting.Mp.V1.fsproj" />
     <ProjectReference Include="..\GeneSort.Model.Sorting.V1\GeneSort.Model.Sorting.V1.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingOps.Mp\GeneSort.SortingOps.Mp.fsproj" />
