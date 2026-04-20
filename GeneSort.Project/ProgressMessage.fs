@@ -1,8 +1,10 @@
-﻿namespace GeneSort.Runs
+﻿namespace GeneSort.Project
+
 
 open System
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Runs
 
 type progressMessage =
     | Info of string
