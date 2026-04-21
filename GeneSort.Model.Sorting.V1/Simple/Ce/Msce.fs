@@ -1,0 +1,70 @@
+﻿namespace GeneSort.Model.Sorting.V1.Simple.Ce
+
+open System
+open FSharp.UMX
+open GeneSort.Sorting
+open GeneSort.Sorting.Sorter
+open GeneSort.Model.Sorting.V1
+
+[<Struct; CustomEquality; NoComparison>]
+type msce = 
+    private 
+        { id: Guid<simpleSorterModelId>
+          sortingWidth: int<sortingWidth>
+          ceCodes: int array } 
+    with
+    static member create 
+            (id: Guid<simpleSorterModelId>) 
+            (sortingWidth: int<sortingWidth>)
+            (ceCodes: int array) : msce =
+        if ceCodes.Length < 1 then
+            failwith "Must be at least 1 Ce"
+        else if %sortingWidth < 1 then
+            failwith "SortingWidth must be at least 1"
+        else
+            { id = id; sortingWidth = sortingWidth; ceCodes = ceCodes }
+
+    member this.Id with get () = this.id
+    member this.SortingWidth with get () = this.sortingWidth
+    member this.CeCodes with get () = this.ceCodes
+    member this.CeLength with get () = (this.ceCodes.Length |> UMX.tag<ceLength>)
+    member this.StageLength with get () = 
+                ((2 * this.CeCodes.Length) / %this.SortingWidth) |> UMX.tag<stageLength>
+
+    member this.toString() =
+        sprintf "msce(Id=%A, SortingWidth=%d, SorterLength=%d)" 
+                (%this.Id) 
+                (%this.SortingWidth)
+                (this.CeCodes.Length)
+
+    override this.Equals(obj) = 
+        match obj with
+        | :? msce as other -> 
+            this.id = other.id && 
+            this.sortingWidth = other.sortingWidth &&
+            this.ceCodes = other.ceCodes
+        | _ -> false
+
+    override this.GetHashCode() = 
+        hash (this.GetType(), this.id, this.sortingWidth, this.ceCodes)
+
+    interface IEquatable<msce> with
+        member this.Equals(other) = 
+            this.id = other.id && 
+            this.sortingWidth = other.sortingWidth &&
+            this.ceCodes = other.ceCodes
+
+    member this.MakeSorter() = 
+        let sw = %this.sortingWidth
+        let ces = this.CeCodes |> Array.map (Ce.fromIndex)
+        sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
+
+
+
+module Msce =
+
+    let toString (msce: msce) : string =
+        sprintf "msce(Id=%A, SortingWidth=%d, SorterLength=%d)" 
+                (%msce.Id) 
+                (%msce.SortingWidth)
+                (msce.CeCodes.Length)

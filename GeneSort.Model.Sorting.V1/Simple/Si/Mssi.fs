@@ -1,0 +1,80 @@
+﻿namespace GeneSort.Model.Sorting.V1.Simple.Si
+
+open System
+open FSharp.UMX
+open GeneSort.Core
+open GeneSort.Sorting
+open GeneSort.Sorting.Sorter
+open GeneSort.Model.Sorting.V1
+ 
+[<Struct; CustomEquality; NoComparison>]
+type mssi = 
+    private 
+        { id: Guid<simpleSorterModelId>
+          sortingWidth: int<sortingWidth>
+          perm_Sis: Perm_Si array } 
+    with
+    static member create 
+            (id: Guid<simpleSorterModelId>) 
+            (sortingWidth: int<sortingWidth>) 
+            (perm_Sis: Perm_Si array) : mssi =
+        if perm_Sis.Length < 1 then
+            failwith "Must have at least 1 Perm_Si"
+        else if %sortingWidth < 1 then
+            failwith "Width must be at least 1"
+        else
+            { id = id; sortingWidth = sortingWidth; perm_Sis = perm_Sis }
+
+    member this.Id with get () = this.id
+    member this.SortingWidth with get () = this.sortingWidth
+    member this.CeLength with get () = (this.StageLength * %this.SortingWidth / 2) |> UMX.tag<ceLength>
+    member this.StageLength with get () = this.perm_Sis.Length |> UMX.tag<stageLength>
+    member this.Perm_Sis with get () = this.perm_Sis
+    member this.toString() =
+        sprintf "mssi(Id=%A, SortingWidth=%d, StageLength=%d)" 
+                (%this.Id) 
+                (%this.SortingWidth)
+                (this.StageLength)
+
+    override this.Equals(obj) = 
+        match obj with
+        | :? mssi as other -> 
+            this.id = other.id && 
+            this.sortingWidth = other.sortingWidth && 
+            this.perm_Sis = other.perm_Sis
+        | _ -> false
+
+    override this.GetHashCode() = 
+        hash (this.GetType(), this.id, this.sortingWidth, this.perm_Sis)
+
+    interface IEquatable<mssi> with
+        member this.Equals(other) = 
+            this.id = other.id &&  
+            this.sortingWidth = other.sortingWidth && 
+            this.perm_Sis = other.perm_Sis
+
+    member this.MakeSorter() = 
+        let ces = this.perm_Sis
+                    |> Array.map (fun psi -> psi |> Perm_Si.getTwoOrbits)
+                    |> Array.collect(id)
+                    |> Array.map(fun tbit -> ce.create tbit.First tbit.Second)
+        sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
+
+
+
+
+module Mssi =
+
+    let toString (mssi: mssi) : string =
+        sprintf "Mssi(Id=%A, Width=%d, StageLength=%d)" 
+                (%mssi.Id) 
+                (%mssi.SortingWidth) 
+                mssi.StageLength
+
+    let makeSorter (mssi: mssi) : sorter =
+        let ces = mssi.perm_Sis
+                    |> Array.map (fun psi -> psi |> Perm_Si.getTwoOrbits)
+                    |> Array.collect(id)
+                    |> Array.map(fun tbit -> ce.create tbit.First tbit.Second)
+        sorter.create (%mssi.Id |> UMX.tag<sorterId>) mssi.SortingWidth ces
+         

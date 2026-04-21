@@ -6,6 +6,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Common.fs" />
+    <Compile Include="Simple\Ce\Msce.fs" />
+    <Compile Include="Simple\Ce\MsceRandGen.fs" />
+    <Compile Include="Simple\Ce\MsceRandMutate.fs" />
+    <Compile Include="Simple\Rs\Msrs.fs" />
+    <Compile Include="Simple\Rs\MsrsRandGen.fs" />
+    <Compile Include="Simple\Rs\MsrsRandMutate.fs" />
+    <Compile Include="Simple\Si\Mssi.fs" />
+    <Compile Include="Simple\Si\MssiRandGen.fs" />
+    <Compile Include="Simple\Si\MssiRandMutate.fs" />
+    <Compile Include="Simple\Uf4\Msuf4.fs" />
+    <Compile Include="Simple\Uf4\Msuf4RandGen.fs" />
+    <Compile Include="Simple\Uf4\Msuf4RandMutate.fs" />
+    <Compile Include="Simple\Uf6\Msuf6.fs" />
+    <Compile Include="Simple\Uf6\Msuf6RandGen.fs" />
+    <Compile Include="Simple\Uf6\Msuf6RandMutate.fs" />
+    <Compile Include="Simple\SimpleSorterModel.fs" />
+    <Compile Include="Simple\SimpleSorterModelGen.fs" />
+    <Compile Include="Simple\SimpleSorterModelMutator.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
