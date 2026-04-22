@@ -6,95 +6,82 @@ open GeneSort.Core
 open GeneSort.Core.Perm_Si
 open GeneSort.Model.Sorting.V1
 
-
-/// Represents a configuration for mutating Mssi instances with specified mutation probabilities.
 [<Struct; CustomEquality; NoComparison>]
 type mssiRandMutate = 
     private 
         { 
-              id : Guid<sorterModelMutatorId>
-              mssi : mssi
-              rngFactory: rngFactory
-              opActionRates: opActionRatesArray
+          id : Guid<sorterModelMutatorId>
+          mssi : mssi
+          rngFactory: rngFactory
+          opActionRates: opActionRates // Changed from opActionRatesArray
         } 
+    with
     static member create 
             (rngFactory: rngFactory)
-            (opActionRatesArray: opActionRatesArray)
-            (mssi: mssi)
-            : mssiRandMutate =
+            (opActionRates: opActionRates)
+            (mssi: mssi) : mssiRandMutate =
         
-        if %mssi.Perm_Sis.Length <> opActionRatesArray.Length then 
-                failwith "Perm_Sis length must match opActionRatesArray.Length"
-
         let id =
             [
                 rngFactory :> obj
                 mssi.Id :> obj
-                opActionRatesArray.GetHashCode() :> obj
+                opActionRates.GetHashCode() :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorId>
 
         {
             id = id
             mssi = mssi
-            opActionRates = opActionRatesArray
             rngFactory = rngFactory
+            opActionRates = opActionRates
         }
         
     member this.Id with get () = this.id
-    member this.CeLength with get () = this.mssi.CeLength
     member this.Mssi with get () = this.mssi
     member this.RngFactory with get () = this.rngFactory
-    member this.StageLength with get () = this.opActionRates.Length
+    member this.CeLength with get () = this.mssi.CeLength
     member this.OpActionRates with get () = this.opActionRates
     member this.SortingWidth with get () = this.mssi.SortingWidth
+    member this.StageLength with get () = this.mssi.Perm_Sis.Length
 
     override this.Equals(obj) = 
         match obj with
-        | :? mssiRandMutate as other -> 
-            this.id = other.id
+        | :? mssiRandMutate as other -> this.id = other.id
         | _ -> false
 
     override this.GetHashCode() = 
         hash (this.rngFactory, this.mssi, this.opActionRates)
 
     interface IEquatable<mssiRandMutate> with
-        member this.Equals(other) = 
-            this.Id = other.Id
+        member this.Equals(other) = this.Id = other.Id
 
     member this.MakeSorterModelId (index: int) : Guid<simpleSorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
-    member this.getMutantSortingId (index: int) : Guid<sortingId> =
-        %(this.MakeSorterModelId index) |> UMX.tag<sortingId>
-
     member this.MakeSimpleSorterModelFromId (id: Guid<simpleSorterModelId>) : mssi =
         let rng = this.RngFactory.Create %id
-        let orthoMutator = fun psi ->  Perm_Si.mutate (rng.NextIndex) MutationMode.Ortho psi 
-        let paraMutator = fun psi ->   Perm_Si.mutate (rng.NextIndex) MutationMode.Para psi 
-        let mutated = OpActionRatesArray.mutate 
+        
+        // Define mutation behaviors for Perm_Si
+        let orthoMutator = fun psi -> Perm_Si.mutate (rng.NextIndex) MutationMode.Ortho psi 
+        let paraMutator = fun psi ->  Perm_Si.mutate (rng.NextIndex) MutationMode.Para psi 
+        
+        // Mutate the array using the uniform rates module
+        let mutated = OpActionRates.mutate 
                         this.OpActionRates 
                         orthoMutator 
                         paraMutator 
                         (rng.NextFloat) 
                         this.Mssi.Perm_Sis
+                        
         mssi.create id this.Mssi.SortingWidth mutated
 
-
-    /// Mutates an Mssi by applying OpActionRatesArray to its ceCodes array.
-    /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
-    /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
-    /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
     member this.MakeSimpleSorterModelFromIndex (index: int) : mssi =
         let id = this.MakeSorterModelId index
         this.MakeSimpleSorterModelFromId id
 
-
-
 module MssiRandMutate =
-
     let toString (mssiRandMutate: mssiRandMutate) : string = 
         sprintf "MssiRandMutate(RngType=%A, Width=%d, StageLength=%d, OpActionRates=%s)" 
                 mssiRandMutate.RngFactory 
                 (%mssiRandMutate.Mssi.SortingWidth) 
                 (mssiRandMutate.StageLength)
-                (mssiRandMutate.OpActionRates.ToString())
+                (mssiRandMutate.OpActionRates.toString())

@@ -1,10 +1,9 @@
 ﻿namespace GeneSort.Model.Sorting.V1.Simple.Uf6
+
 open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Model.Sorting.V1
-open GeneSort.Model.Sorting.V1.Simple.Uf6
-
 
 [<Struct; CustomEquality; NoComparison>]
 type msuf6RandMutate = 
@@ -13,103 +12,80 @@ type msuf6RandMutate =
           id : Guid<sorterModelMutatorId>
           msuf6 : msuf6
           rngFactory: rngFactory
-          uf6MutationRatesArray: uf6MutationRatesArray 
+          uf6MutationRates: uf6MutationRates 
         } 
+    with
     static member create 
             (rngFactory: rngFactory)
-            (uf6MutationRatesArray: uf6MutationRatesArray) 
+            (uf6MutationRates: uf6MutationRates) 
             (msuf6 : msuf6)
             : msuf6RandMutate =
-
-        if uf6MutationRatesArray.Length <> %msuf6.StageLength then
-            failwith $"mutationRates array length (%d{uf6MutationRatesArray.Length}) must equal stageLength ({%msuf6.StageLength})"
 
         let id =
             [
                 rngFactory :> obj
                 msuf6.Id :> obj
-                uf6MutationRatesArray.GetHashCode() :> obj
+                uf6MutationRates.GetHashCode() :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorId>
 
         {
             id = id
             rngFactory = rngFactory
             msuf6 = msuf6
-            uf6MutationRatesArray = uf6MutationRatesArray
+            uf6MutationRates = uf6MutationRates
         }
 
-    static member createFromSingleRate
-            (rngFactory: rngFactory)
-            (msuf6 : msuf6)
-            (rates: uf6MutationRates) 
-            : msuf6RandMutate =
-        let mutationRates = uf6MutationRatesArray.create (Array.create (%msuf6.StageLength) rates)
-        msuf6RandMutate.create rngFactory mutationRates msuf6
-
-    member this.Id with get () = this.id
     member this.CeLength with get () = this.msuf6.CeLength
+    member this.Id with get () = this.id
     member this.Msuf6 with get () = this.msuf6
     member this.RngFactory with get () = this.rngFactory
     member this.StageLength with get () = this.msuf6.StageLength
-    member this.Uf6MutationRatesArray with get () = this.uf6MutationRatesArray
+    member this.Uf6MutationRates with get () = this.uf6MutationRates
     member this.SortingWidth with get () = this.msuf6.SortingWidth
 
     override this.Equals(obj) = 
         match obj with
-        | :? msuf6RandMutate as other -> 
-            this.rngFactory = other.RngFactory && 
-            this.msuf6 = other.msuf6 &&
-            this.uf6MutationRatesArray.Equals(other.uf6MutationRatesArray)
+        | :? msuf6RandMutate as other -> this.Id = other.Id
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.RngFactory, this.msuf6, this.uf6MutationRatesArray)
+        hash (this.RngFactory, this.msuf6, this.uf6MutationRates)
 
     interface IEquatable<msuf6RandMutate> with
-        member this.Equals(other) = 
-            this.Id = other.Id
+        member this.Equals(other) = this.Id = other.Id
 
     member this.MakeSorterModelId (index: int) : Guid<simpleSorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
-    member this.getMutantSortingId (index: int) : Guid<sortingId> =
-        %(this.MakeSorterModelId index) |> UMX.tag<sortingId>
-
     member this.MakeSimpleSorterModelFromId (id: Guid<simpleSorterModelId>) : msuf6 =
         let rng = this.RngFactory.Create %id
-        let mutatedUnfolders = 
-            Array.zip this.msuf6.TwoOrbitUnfolder6s this.Uf6MutationRatesArray.RatesArray
-            |> Array.map (fun (unfolder, mutationRates) ->
-                RandomUnfolderOps6.mutateTwoOrbitUf6 rng.NextFloat mutationRates unfolder)
-        msuf6.create id this.msuf6.SortingWidth mutatedUnfolders
+        
+        let unfolderArray = this.msuf6.TwoOrbitUnfolder6s
+        let rates = this.uf6MutationRates
+        let width = this.msuf6.SortingWidth
 
-    /// Mutates an Msuf6 by applying Uf6MutationRatesArray to its ceCodes array.
-    /// Generates a new Msce with a new ID, the same sortingWidth, and a mutated ceCodes array.
-    /// The ceCodes array is modified using the provided chromosomeRates, with insertions and mutations
-    /// generated via Ce.generateCeCode, and deletions handled to maintain the ceCount length.
+        let mutatedUnfolders = 
+            unfolderArray
+            |> Array.map (fun unfolder ->
+                RandomUnfolderOps6.mutateTwoOrbitUf6 rng.NextFloat rates unfolder)
+                
+        msuf6.create id width mutatedUnfolders
+
     member this.MakeSimpleSorterModelFromIndex (index: int) : msuf6 =
         let id = this.MakeSorterModelId index
         this.MakeSimpleSorterModelFromId id
 
 
-
 module Msuf6RandMutate =
 
-    /// Returns a string representation of the Msuf6RandMutate configuration.
     let toString (msuf6RandMutate: msuf6RandMutate) : string =
-        let ratesStr = 
-            msuf6RandMutate.Uf6MutationRatesArray.RatesArray
-            |> Array.mapi (fun i rates -> 
-                sprintf "[%d: OrthoToPara=%f, OrthoToSelfRefl=%f, ParaToOrtho=%f, ParaToSelfRefl=%f, SelfReflToOrtho=%f, SelfReflToPara=%f]" 
-                    i 
-                    rates.Seed6TransitionRates.Ortho1Rates.Ortho2Rate
-                    rates.Seed6TransitionRates.Ortho2Rates.SelfReflRate
-                    rates.Seed6TransitionRates.Para1Rates.Ortho1Rate
-                    rates.Seed6TransitionRates.Para2Rates.SelfReflRate
-                    rates.Seed6TransitionRates.SelfReflRates.Ortho1Rate
-                    rates.Seed6TransitionRates.SelfReflRates.Para1Rate)
-            |> String.concat ", "
+        let rates = msuf6RandMutate.Uf6MutationRates
+        // Simplified reporting since we are using uniform rates
+        let seedStr = sprintf "Seed6(O1:%.2f, P1:%.2f)" 
+                        rates.Seed6TransitionRates.Ortho1Rates.Ortho2Rate
+                        rates.Seed6TransitionRates.Para1Rates.Ortho1Rate
+
         sprintf "Msuf6RandMutate(RngType=%A, StageLength=%d, MutationRates=%s)" 
                 msuf6RandMutate.RngFactory 
                 (%msuf6RandMutate.StageLength)
-                ratesStr
+                seedStr

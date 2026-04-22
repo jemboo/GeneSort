@@ -91,3 +91,21 @@ type opsActionRates =
             this.selfSymThresh = other.selfSymThresh
 
 
+module OpsActionRates =
+
+    /// Mutates an array of Perm_Rs using a single uniform opsActionRates.
+    let mutate 
+        (rates: opsActionRates) 
+        (orthoMutator: Perm_Rs -> Perm_Rs) 
+        (paraMutator: Perm_Rs -> Perm_Rs) 
+        (selfSymMutator: Perm_Rs -> Perm_Rs) 
+        (floatPicker: unit -> float) 
+        (arrayToMutate: Perm_Rs[]) : Perm_Rs[] = 
+        
+        arrayToMutate |> Array.map (fun prs ->
+            match rates.PickMode floatPicker with
+            | opsActionMode.Ortho    -> orthoMutator prs
+            | opsActionMode.Para     -> paraMutator prs
+            | opsActionMode.SelfRefl -> selfSymMutator prs
+            | opsActionMode.NoAction -> prs
+        )

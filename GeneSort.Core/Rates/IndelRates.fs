@@ -65,3 +65,44 @@ type indelRates =
             this.deletionThresh = other.deletionThresh
 
 
+
+module IndelRates =
+
+    /// Mutates an array based on a single uniform indelRate. 
+    /// Returns a new array with the same length as the input array.
+    let mutate<'a> 
+        (rates: indelRates) 
+        (inserter: unit -> 'a) 
+        (mutator: 'a -> 'a) 
+        (floatPicker: unit -> float) 
+        (arrayToMutate: 'a[]) : 'a[] = 
+        
+        let mutable deletionCount = 0
+        let mutable insertionCount = 0
+    
+        let results = 
+            seq {
+                for i in 0 .. arrayToMutate.Length - 1 do
+                    // Apply the uniform rate to every element
+                    match rates.PickMode floatPicker with
+                    | indelMode.Mutation -> 
+                        yield mutator arrayToMutate.[i]
+                    | indelMode.Insertion -> 
+                        insertionCount <- insertionCount + 1
+                        yield inserter ()
+                        yield arrayToMutate.[i]
+                    | indelMode.Deletion -> 
+                        deletionCount <- deletionCount + 1
+                    | indelMode.NoAction -> 
+                        yield arrayToMutate.[i]
+            } |> Seq.toArray
+    
+        let p = deletionCount - insertionCount
+        if p > 0 then
+            // Append p insertions to match input length
+            Array.append results (Array.init p (fun _ -> inserter ()))
+        elif p < 0 then
+            // Trim excess elements to match input length
+            Array.take arrayToMutate.Length results
+        else
+            results
