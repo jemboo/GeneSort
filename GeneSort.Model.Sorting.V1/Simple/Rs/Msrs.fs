@@ -11,14 +11,14 @@ open GeneSort.Model.Sorting.V1
 [<Struct; CustomEquality; NoComparison>]
 type msrs = 
     private 
-        { id: Guid<simpleSorterModelId>
+        { id: Guid<sorterModelId>
           sortingWidth: int<sortingWidth>
           perm_Rss: Perm_Rs array } 
     with
     /// Creates an Msrs instance with the specified ID, width, and Perm_Rs array.
     /// Throws an exception if the Perm_Rs array is empty, width is less than 1, or any Perm_Rs has a mismatched width.
     static member create 
-            (id: Guid<simpleSorterModelId>) 
+            (id: Guid<sorterModelId>) 
             (width: int<sortingWidth>) 
             (perm_Rss: Perm_Rs array) : msrs =
 

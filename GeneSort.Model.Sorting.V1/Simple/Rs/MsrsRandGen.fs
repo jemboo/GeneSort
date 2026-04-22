@@ -61,11 +61,11 @@ type msrsRandGen =
             this.Id = other.Id
 
         
-    member this.MakeSorterModelId (index: int) : Guid<simpleSorterModelId> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonGen.makeSorterModelId this.Id index
 
 
-    member this.MakeSorterModelFromId (id: Guid<simpleSorterModelId>) : msrs =
+    member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msrs =
         let rng = this.RngFactory.Create %id
         let genRatesArray = this.OpsGenRatesArray
         let stageLength = %this.StageLength

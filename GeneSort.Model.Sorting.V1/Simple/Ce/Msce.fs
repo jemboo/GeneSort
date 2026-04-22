@@ -9,12 +9,12 @@ open GeneSort.Model.Sorting.V1
 [<Struct; CustomEquality; NoComparison>]
 type msce = 
     private 
-        { id: Guid<simpleSorterModelId>
+        { id: Guid<sorterModelId>
           sortingWidth: int<sortingWidth>
           ceCodes: int array } 
     with
     static member create 
-            (id: Guid<simpleSorterModelId>) 
+            (id: Guid<sorterModelId>) 
             (sortingWidth: int<sortingWidth>)
             (ceCodes: int array) : msce =
         if ceCodes.Length < 1 then

@@ -52,10 +52,10 @@ type msrsRandMutate =
     interface IEquatable<msrsRandMutate> with
         member this.Equals(other) = this.Id = other.Id
 
-    member this.MakeSorterModelId (index: int) : Guid<simpleSorterModelId> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
-    member this.MakeSimpleSorterModelFromId (id: Guid<simpleSorterModelId>) : msrs =
+    member this.MakeSimpleSorterModelFromId (id: Guid<sorterModelId>) : msrs =
         let rng = this.RngFactory.Create %id
         
         // Define specific mutation behaviors using Perm_RsOps

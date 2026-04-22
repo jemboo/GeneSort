@@ -69,10 +69,10 @@ type msuf4RandGen =
     interface IEquatable<msuf4RandGen> with
         member this.Equals(other) = this.id = other.id
 
-    member this.MakeSorterModelId (index: int) : Guid<simpleSorterModelId> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonGen.makeSorterModelId this.Id index
 
-    member this.MakeSorterModelFromId (id: Guid<simpleSorterModelId>) : msuf4 =
+    member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msuf4 =
         let rando = this.RngFactory.Create %id
         let sc = %this.stageLength
         let rates = this.genRates

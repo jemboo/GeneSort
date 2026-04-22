@@ -57,11 +57,11 @@ type msceRandMutate =
     interface IEquatable<msceRandMutate> with
         member this.Equals(other) = this.Id = other.Id
 
-    member this.MakeSimpleSorterModelId (index: int) : Guid<simpleSorterModelId> =
+    member this.MakeSimpleSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
 
-    member this.MakeSimpleSorterModelFromId (id: Guid<simpleSorterModelId>) : msce =
+    member this.MakeSimpleSorterModelFromId (id: Guid<sorterModelId>) : msce =
         let rng = this.RngFactory.Create %id
         let excludeSelfCe = this.ExcludeSelfCe
         let sortingWidth = %this.msce.SortingWidth

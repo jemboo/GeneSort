@@ -54,10 +54,10 @@ type msuf4RandMutate =
     interface IEquatable<msuf4RandMutate> with
         member this.Equals(other) = this.Id = other.Id
 
-    member this.MakeSorterModelId (index: int) : Guid<simpleSorterModelId> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
-    member this.MakeSimpleSorterModelFromId (id: Guid<simpleSorterModelId>) : msuf4 =
+    member this.MakeSimpleSorterModelFromId (id: Guid<sorterModelId>) : msuf4 =
         let rng = this.RngFactory.Create %id
         
         // HOIST: Pull values out of 'this' into local variables to avoid capturing the struct byref

@@ -23,9 +23,9 @@ type simpleSorterModel =
 
 
 
-module SimpleSorterModel =
+module SorterModel =
     
-    let getId (model: simpleSorterModel) : Guid<simpleSorterModelId> =
+    let getId (model: simpleSorterModel) : Guid<sorterModelId> =
         match model with
         | Msce msce -> msce.Id
         | Mssi mssi -> mssi.Id

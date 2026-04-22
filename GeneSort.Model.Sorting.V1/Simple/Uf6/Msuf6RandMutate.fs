@@ -54,10 +54,10 @@ type msuf6RandMutate =
     interface IEquatable<msuf6RandMutate> with
         member this.Equals(other) = this.Id = other.Id
 
-    member this.MakeSorterModelId (index: int) : Guid<simpleSorterModelId> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
-    member this.MakeSimpleSorterModelFromId (id: Guid<simpleSorterModelId>) : msuf6 =
+    member this.MakeSimpleSorterModelFromId (id: Guid<sorterModelId>) : msuf6 =
         let rng = this.RngFactory.Create %id
         
         let unfolderArray = this.msuf6.TwoOrbitUnfolder6s

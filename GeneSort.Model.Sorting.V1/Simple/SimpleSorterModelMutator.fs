@@ -19,7 +19,7 @@ type simpleSorterModelMutator =
      | SmmMsuf6RandMutate of msuf6RandMutate
 
 
-module SimpleSorterModelMutator =
+module SorterModelMutator =
 
     let getId (model:simpleSorterModelMutator) : Guid<sorterModelMutatorId> =
         match model with
@@ -39,7 +39,7 @@ module SimpleSorterModelMutator =
         | SmmMsuf6RandMutate msuf6 -> msuf6.Msuf6 |> simpleSorterModel.Msuf6
 
 
-    let getParentSimpleSorterModelId (model: simpleSorterModelMutator) : Guid<simpleSorterModelId> =
+    let getParentSorterModelId (model: simpleSorterModelMutator) : Guid<sorterModelId> =
         match model with
         | SmmMsceRandMutate msce -> msce.Msce.Id
         | SmmMssiRandMutate mssi -> mssi.Mssi.Id
@@ -79,22 +79,22 @@ module SimpleSorterModelMutator =
                 (index: int)  
                 (model: simpleSorterModelMutator) : simpleSorterModel =
         match model with
-        | SmmMsceRandMutate msce -> msce.MakeSimpleSorterModelFromIndex index |> simpleSorterModel.Msce
-        | SmmMssiRandMutate mssi -> mssi.MakeSimpleSorterModelFromIndex index |> simpleSorterModel.Mssi
-        | SmmMsrsRandMutate msrs -> msrs.MakeSimpleSorterModelFromIndex index |> simpleSorterModel.Msrs
-        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSimpleSorterModelFromIndex index |> simpleSorterModel.Msuf4
-        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSimpleSorterModelFromIndex index |> simpleSorterModel.Msuf6
+        | SmmMsceRandMutate msce -> msce.MakeSorterModelFromIndex index |> simpleSorterModel.Msce
+        | SmmMssiRandMutate mssi -> mssi.MakeSorterModelFromIndex index |> simpleSorterModel.Mssi
+        | SmmMsrsRandMutate msrs -> msrs.MakeSorterModelFromIndex index |> simpleSorterModel.Msrs
+        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModelFromIndex index |> simpleSorterModel.Msuf4
+        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModelFromIndex index |> simpleSorterModel.Msuf6
 
 
     let makeMutantSorterModelFromId 
-                (simpleSorterModelId: Guid<simpleSorterModelId>)  
+                (simpleSorterModelId: Guid<sorterModelId>)  
                 (model: simpleSorterModelMutator) : simpleSorterModel =
         match model with
-        | SmmMsceRandMutate msce -> msce.MakeSimpleSorterModelFromId simpleSorterModelId |> simpleSorterModel.Msce
-        | SmmMssiRandMutate mssi -> mssi.MakeSimpleSorterModelFromId simpleSorterModelId |> simpleSorterModel.Mssi
-        | SmmMsrsRandMutate msrs -> msrs.MakeSimpleSorterModelFromId simpleSorterModelId |> simpleSorterModel.Msrs
-        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSimpleSorterModelFromId simpleSorterModelId |> simpleSorterModel.Msuf4
-        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSimpleSorterModelFromId simpleSorterModelId |> simpleSorterModel.Msuf6
+        | SmmMsceRandMutate msce -> msce.MakeSorterModelFromId simpleSorterModelId |> simpleSorterModel.Msce
+        | SmmMssiRandMutate mssi -> mssi.MakeSorterModelFromId simpleSorterModelId |> simpleSorterModel.Mssi
+        | SmmMsrsRandMutate msrs -> msrs.MakeSorterModelFromId simpleSorterModelId |> simpleSorterModel.Msrs
+        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModelFromId simpleSorterModelId |> simpleSorterModel.Msuf4
+        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModelFromId simpleSorterModelId |> simpleSorterModel.Msuf6
 
 
 

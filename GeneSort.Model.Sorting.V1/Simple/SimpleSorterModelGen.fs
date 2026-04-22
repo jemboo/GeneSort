@@ -20,7 +20,7 @@ type simpleSorterModelGen =
      | SmmMsuf6RandGen of msuf6RandGen
 
 
-module SimpleSorterModelGen =
+module SorterModelGen =
 
     let getId (model:simpleSorterModelGen) : Guid<sorterModelGenId> =
         match model with
@@ -58,7 +58,7 @@ module SimpleSorterModelGen =
         | SmmMsuf6RandGen msuf6 -> msuf6.Id
 
 
-    let makeSimpleSorterModelFromIndex (index: int)  (model: simpleSorterModelGen) : simpleSorterModel =
+    let makeSorterModelFromIndex (index: int)  (model: simpleSorterModelGen) : simpleSorterModel =
         match model with
         | SmmMsceRandGen msce -> msce.MakeSorterModelFromIndex index |> simpleSorterModel.Msce
         | SmmMssiRandGen mssi -> mssi.MakeSorterModelFromIndex index |> simpleSorterModel.Mssi
@@ -67,7 +67,7 @@ module SimpleSorterModelGen =
         | SmmMsuf6RandGen msuf6 -> msuf6.MakeSorterModelFromIndex index |> simpleSorterModel.Msuf6
 
 
-    //let makeSimpleSorterModelFromId 
+    //let makeSorterModelFromId 
     //                (sortingId: Guid<sortingId>)  
     //                (model: simpleSorterModelGen) : simpleSorterModel =
     //    let sorterModelId = %sortingId |> UMX.tag<simpleSorterModelId>

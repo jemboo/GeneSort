@@ -54,10 +54,10 @@ type mssiRandMutate =
     interface IEquatable<mssiRandMutate> with
         member this.Equals(other) = this.Id = other.Id
 
-    member this.MakeSorterModelId (index: int) : Guid<simpleSorterModelId> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
-    member this.MakeSimpleSorterModelFromId (id: Guid<simpleSorterModelId>) : mssi =
+    member this.MakeSimpleSorterModelFromId (id: Guid<sorterModelId>) : mssi =
         let rng = this.RngFactory.Create %id
         
         // Define mutation behaviors for Perm_Si

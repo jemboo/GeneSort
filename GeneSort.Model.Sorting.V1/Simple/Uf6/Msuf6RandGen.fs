@@ -62,10 +62,10 @@ type msuf6RandGen =
     interface IEquatable<msuf6RandGen> with
         member this.Equals(other) = this.id = other.id
 
-    member this.MakeSorterModelId (index: int) : Guid<simpleSorterModelId> =
+    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonGen.makeSorterModelId this.Id index
 
-    member this.MakeSorterModelFromId (id: Guid<simpleSorterModelId>) : msuf6 =
+    member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msuf6 =
         let rng = this.RngFactory.Create %id
         
         // HOIST: Local bindings for closure safety and performance

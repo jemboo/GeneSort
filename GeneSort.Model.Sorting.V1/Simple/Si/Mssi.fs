@@ -10,12 +10,12 @@ open GeneSort.Model.Sorting.V1
 [<Struct; CustomEquality; NoComparison>]
 type mssi = 
     private 
-        { id: Guid<simpleSorterModelId>
+        { id: Guid<sorterModelId>
           sortingWidth: int<sortingWidth>
           perm_Sis: Perm_Si array } 
     with
     static member create 
-            (id: Guid<simpleSorterModelId>) 
+            (id: Guid<sorterModelId>) 
             (sortingWidth: int<sortingWidth>) 
             (perm_Sis: Perm_Si array) : mssi =
         if perm_Sis.Length < 1 then
