@@ -57,7 +57,7 @@ type msuf6RandMutate =
     member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
-    member this.MakeSimpleSorterModelFromId (id: Guid<sorterModelId>) : msuf6 =
+    member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msuf6 =
         let rng = this.RngFactory.Create %id
         
         let unfolderArray = this.msuf6.TwoOrbitUnfolder6s
@@ -71,9 +71,9 @@ type msuf6RandMutate =
                 
         msuf6.create id width mutatedUnfolders
 
-    member this.MakeSimpleSorterModelFromIndex (index: int) : msuf6 =
+    member this.MakeSorterModelFromIndex (index: int) : msuf6 =
         let id = this.MakeSorterModelId index
-        this.MakeSimpleSorterModelFromId id
+        this.MakeSorterModelFromId id
 
 
 module Msuf6RandMutate =

@@ -23,7 +23,7 @@ type simpleSorterModel =
 
 
 
-module SorterModel =
+module SimpleSorterModel =
     
     let getId (model: simpleSorterModel) : Guid<sorterModelId> =
         match model with

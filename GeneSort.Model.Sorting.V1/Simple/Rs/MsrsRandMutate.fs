@@ -55,7 +55,7 @@ type msrsRandMutate =
     member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
-    member this.MakeSimpleSorterModelFromId (id: Guid<sorterModelId>) : msrs =
+    member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msrs =
         let rng = this.RngFactory.Create %id
         
         // Define specific mutation behaviors using Perm_RsOps
@@ -74,9 +74,9 @@ type msrsRandMutate =
 
         msrs.create id this.Msrs.SortingWidth mutated
 
-    member this.MakeSimpleSorterModelFromIndex (index: int) : msrs =
+    member this.MakeSorterModelFromIndex (index: int) : msrs =
         let id = this.MakeSorterModelId index
-        this.MakeSimpleSorterModelFromId id
+        this.MakeSorterModelFromId id
 
 module MsrsRandMutate =
     let toString (msrsRandMutate: msrsRandMutate) : string =

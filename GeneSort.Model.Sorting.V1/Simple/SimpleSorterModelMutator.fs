@@ -48,15 +48,6 @@ module SorterModelMutator =
         | SmmMsuf6RandMutate msuf6 -> msuf6.Msuf6.Id
 
 
-    //let getMutantSortingId (index: int) (model: simpleSorterModelMutator) : Guid<sortingId> =
-    //    match model with
-    //    | SmmMsceRandMutate msce -> msce.getMutantSortingId index
-    //    | SmmMssiRandMutate mssi -> mssi.getMutantSortingId index
-    //    | SmmMsrsRandMutate msrs -> msrs.getMutantSortingId index
-    //    | SmmMsuf4RandMutate msuf4 -> msuf4.getMutantSortingId index
-    //    | SmmMsuf6RandMutate msuf6 -> msuf6.getMutantSortingId index
-
-
     let getSortingWidth (model: simpleSorterModelMutator) : int<sortingWidth> =
         match model with
         | SmmMsceRandMutate msce -> msce.SortingWidth

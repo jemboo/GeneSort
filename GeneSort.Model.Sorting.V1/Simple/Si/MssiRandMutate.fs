@@ -57,7 +57,7 @@ type mssiRandMutate =
     member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
-    member this.MakeSimpleSorterModelFromId (id: Guid<sorterModelId>) : mssi =
+    member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : mssi =
         let rng = this.RngFactory.Create %id
         
         // Define mutation behaviors for Perm_Si
@@ -74,9 +74,9 @@ type mssiRandMutate =
                         
         mssi.create id this.Mssi.SortingWidth mutated
 
-    member this.MakeSimpleSorterModelFromIndex (index: int) : mssi =
+    member this.MakeSorterModelFromIndex (index: int) : mssi =
         let id = this.MakeSorterModelId index
-        this.MakeSimpleSorterModelFromId id
+        this.MakeSorterModelFromId id
 
 module MssiRandMutate =
     let toString (mssiRandMutate: mssiRandMutate) : string = 

@@ -57,7 +57,7 @@ type msuf4RandMutate =
     member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId this.Id index
 
-    member this.MakeSimpleSorterModelFromId (id: Guid<sorterModelId>) : msuf4 =
+    member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msuf4 =
         let rng = this.RngFactory.Create %id
         
         // HOIST: Pull values out of 'this' into local variables to avoid capturing the struct byref
@@ -73,9 +73,9 @@ type msuf4RandMutate =
                 
         msuf4.create id width mutatedUnfolders
 
-    member this.MakeSimpleSorterModelFromIndex (index: int) : msuf4 =
+    member this.MakeSorterModelFromIndex (index: int) : msuf4 =
         let id = this.MakeSorterModelId index
-        this.MakeSimpleSorterModelFromId id
+        this.MakeSorterModelFromId id
 
 
 

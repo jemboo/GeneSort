@@ -25,6 +25,7 @@
     <Compile Include="Simple\SimpleSorterModel.fs" />
     <Compile Include="Simple\SimpleSorterModelGen.fs" />
     <Compile Include="Simple\SimpleSorterModelMutator.fs" />
+    <Compile Include="SorterModel.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
