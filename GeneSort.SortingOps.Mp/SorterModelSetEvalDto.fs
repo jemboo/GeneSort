@@ -39,5 +39,5 @@ module SorterSetEvalDto =
         sorterSetEval.create
             (UMX.tag<sorterSetEvalId> dto.SorterSetEvalId)
             (UMX.tag<sorterSetId> dto.SorterSetId)
-            (UMX.tag<sorterTestId> dto.SorterTestsId)
+            (UMX.tag<sortableTestId> dto.SorterTestsId)
             (dto.SorterEvals |> Array.map SorterEvalDto.fromSorterEvalDto)

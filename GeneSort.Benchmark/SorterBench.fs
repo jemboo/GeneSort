@@ -119,7 +119,7 @@ type MergeEvalBench() =
                             this.mergeFillType
 
         this.sortableIntTests <- sortableIntTest.create
-                                        (Guid.NewGuid() |> UMX.tag<sorterTestId>)
+                                        (Guid.NewGuid() |> UMX.tag<sortableTestId>)
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         intArrays
                                   |> sortableTest.Ints
@@ -131,13 +131,13 @@ type MergeEvalBench() =
                                   |> sortableTest.PackedInts
 
         this.sortableUint8v256Test <- SortableUint8v256Test.fromIntArrays
-                                        (Guid.NewGuid() |> UMX.tag<sorterTestId>)
+                                        (Guid.NewGuid() |> UMX.tag<sortableTestId>)
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         intArrays
                                   |> sortableTest.Uint8v256
 
         this.sortableUint8v512Test <- SortableUint8v512Test.fromIntArrays
-                                        (Guid.NewGuid() |> UMX.tag<sorterTestId>)
+                                        (Guid.NewGuid() |> UMX.tag<sortableTestId>)
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         intArrays
                                   |> sortableTest.Uint8v512
@@ -215,7 +215,7 @@ type Eval2Rounds() =
                             this.mergeFillType
 
         this.sortableIntTests <- sortableIntTest.create
-                                        (Guid.NewGuid() |> UMX.tag<sorterTestId>)
+                                        (Guid.NewGuid() |> UMX.tag<sortableTestId>)
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         intArrays
                                   |> sortableTest.Ints
@@ -403,26 +403,26 @@ type FullBoolEvalBench() =
 
 
         this.sortableBinaryTest <- sortableBinaryTest.create
-                                        (Guid.NewGuid() |> UMX.tag<sorterTestId>)
+                                        (Guid.NewGuid() |> UMX.tag<sortableTestId>)
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         sortableBoolArrays
                                   |> sortableTest.Bools
 
         this.sortableUint8v256Test <- SortableUint8v256Test.fromIntArrays
-                                        (Guid.NewGuid() |> UMX.tag<sorterTestId>)
+                                        (Guid.NewGuid() |> UMX.tag<sortableTestId>)
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         sortableIntArrays
                                   |> sortableTest.Uint8v256
 
         this.sortableUint8v512Test <- SortableUint8v512Test.fromIntArrays
-                                        (Guid.NewGuid() |> UMX.tag<sorterTestId>)
+                                        (Guid.NewGuid() |> UMX.tag<sortableTestId>)
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         sortableIntArrays
                                   |> sortableTest.Uint8v512
 
 
         this.sortableBitv512Test <- sortableBitv512Test.create
-                                        (Guid.NewGuid() |> UMX.tag<sorterTestId>)
+                                        (Guid.NewGuid() |> UMX.tag<sortableTestId>)
                                         (this.sortingWidth |> UMX.tag<sortingWidth>)
                                         grayBlocks
                                     |> sortableTest.Bitv512
@@ -481,4 +481,3 @@ type FullBoolEvalBench() =
                             this.ceBlocks 
                             this.collectResults
        ceBlockEval
-

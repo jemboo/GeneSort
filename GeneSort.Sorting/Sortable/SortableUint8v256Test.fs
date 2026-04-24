@@ -9,13 +9,13 @@ open System.Threading.Tasks
 [<Struct>]
 type sortableUint8v256Test =
     private { 
-        id: Guid<sorterTestId>
+        id: Guid<sortableTestId>
         sortingWidth: int<sortingWidth>
         simdSortBlocks: SortBlockUint8v256[]
     }
 
     static member create 
-            (id: Guid<sorterTestId>) 
+            (id: Guid<sortableTestId>) 
             (sw: int<sortingWidth>) 
             (blocks: SortBlockUint8v256[]) =
         { id = id
@@ -23,13 +23,13 @@ type sortableUint8v256Test =
           simdSortBlocks = blocks }
 
     static member Empty =
-        let id = Guid.NewGuid() |> UMX.tag<sorterTestId>
+        let id = Guid.NewGuid() |> UMX.tag<sortableTestId>
         sortableUint8v256Test.create id 0<sortingWidth> [||]
 
     member this.Id with get() = this.id
     member this.SimdSortBlocks with get() = this.simdSortBlocks
     member this.SortableDataFormat with get() = sortableDataFormat.Int8Vector256
-    member this.SoratbleCount with get() = 
+    member this.SortableCount with get() = 
         this.simdSortBlocks 
         |> Array.sumBy (fun block -> block.SortableCount) 
         |> UMX.tag<sortableCount>
@@ -40,7 +40,7 @@ type sortableUint8v256Test =
 module SortableUint8v256Test =
 
     let fromIntArrays
-        (id: Guid<sorterTestId>)
+        (id: Guid<sortableTestId>)
         (sw: int<sortingWidth>)
         (allTests: sortableIntArray[]) 
                     : sortableUint8v256Test =

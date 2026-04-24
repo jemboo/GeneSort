@@ -22,6 +22,6 @@ module SortableBoolTestDto =
 
     let toDomain (dto: sortableBoolTestDto) : sortableBinaryTest =
         sortableBinaryTest.create
-            (UMX.tag<sorterTestId> dto.Id)
+            (UMX.tag<sortableTestId> dto.Id)
             (UMX.tag<sortingWidth> dto.SortingWidth)
             (dto.SortableArrays |> Array.map SortableBoolArrayDto.toDomain)

@@ -32,7 +32,7 @@ type sortableBitv512Test =
     
     member this.SortableDataFormat with get() = sortableDataFormat.BitVector512
     
-    member this.SoratbleCount with get() = 
+    member this.SortableCount with get() = 
         this.simdSortBlocks 
         |> Array.sumBy (fun block -> block.SortableCount) 
         |> UMX.tag<sortableCount>

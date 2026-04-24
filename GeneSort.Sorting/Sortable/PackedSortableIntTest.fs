@@ -7,7 +7,7 @@ open GeneSort.Sorting
 
 [<Struct>]
 type packedSortableIntTests =
-    private { id: Guid<sorterTestId>
+    private { id: Guid<sortableTestId>
               sortingWidth: int<sortingWidth>
               count: int<sortableCount>
               // All arrays flattened into one: [Test0_0..Test0_N, Test1_0..Test1_N...]
@@ -49,7 +49,7 @@ type packedSortableIntTests =
     member this.Id with get() = this.id
     member this.PackedValues with get() = this.packedValues
     member this.SortableDataFormat with get() = sortableDataFormat.PackedIntArray
-    member this.SoratbleCount with get() = this.count
+    member this.SortableCount with get() = this.count
     member this.SortingWidth with get() = this.sortingWidth
 
  

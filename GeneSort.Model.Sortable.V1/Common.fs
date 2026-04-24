@@ -1,9 +1,6 @@
 ﻿
-namespace GeneSort.Model.Sortable
-open System
-open FSharp.UMX
-open GeneSort.Sorting
-open GeneSort.Core
+namespace GeneSort.Model.Sortable.V1
+
 
 [<Measure>] type sorterTestModelID
 [<Measure>] type sorterTestModelCount

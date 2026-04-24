@@ -9,7 +9,7 @@ open GeneSort.SortingOps
 type sorterCeUseProfile = {
     sorterId: Guid<sorterId>
     sorterSetId: Guid<sorterSetId>
-    sorterTestsId: Guid<sorterTestId>
+    sorterTestsId: Guid<sortableTestId>
     lastUsedCeIndex: int<ceIndex>
     unsortedCount: int<sortableCount>
     unsorted: bool
@@ -23,7 +23,7 @@ module SorterCeUseProfile =
     let makeSorterCeUseProfile 
             (profileSegments: segment [])
             (sorterSetId: Guid<sorterSetId>)
-            (sorterTestsId: Guid<sorterTestId>)
+            (sorterTestsId: Guid<sortableTestId>)
             (sorterEval : sorterEval) : sorterCeUseProfile =
         {   
             sorterCeUseProfile.segmentTotals = 
@@ -71,7 +71,7 @@ module SorterCeUseProfile =
 type sorterSetCeUseProfile = {
     profileSegments: segment []
     sorterSetId: Guid<sorterSetId>
-    sorterTestsId: Guid<sorterTestId>
+    sorterTestsId: Guid<sortableTestId>
     sorterCeUseProfiles : sorterCeUseProfile []
 }
 

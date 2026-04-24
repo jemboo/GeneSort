@@ -9,13 +9,13 @@ open System.Runtime.Intrinsics
 [<Struct>]
 type sortableUint8v512Test =
     private { 
-        id: Guid<sorterTestId>
+        id: Guid<sortableTestId>
         sortingWidth: int<sortingWidth>
         simdSortBlocks: SortBlockUint8v512[]
     }
 
     static member create 
-            (id: Guid<sorterTestId>) 
+            (id: Guid<sortableTestId>) 
             (sw: int<sortingWidth>) 
             (blocks: SortBlockUint8v512[]) =
         { id = id
@@ -23,7 +23,7 @@ type sortableUint8v512Test =
           simdSortBlocks = blocks }
 
     static member Empty =
-        let id = Guid.NewGuid() |> UMX.tag<sorterTestId>
+        let id = Guid.NewGuid() |> UMX.tag<sortableTestId>
         sortableUint8v512Test.create id 0<sortingWidth> [||]
 
     member this.Id with get() = this.id
@@ -32,7 +32,7 @@ type sortableUint8v512Test =
     // Updated to reflect the 512-bit format
     member this.SortableDataFormat with get() = sortableDataFormat.Int8Vector512
     
-    member this.SoratbleCount with get() = 
+    member this.SortableCount with get() = 
         this.simdSortBlocks 
         |> Array.sumBy (fun block -> block.SortableCount) 
         |> UMX.tag<sortableCount>
@@ -43,7 +43,7 @@ type sortableUint8v512Test =
 module SortableUint8v512Test =
 
     let fromIntArrays
-        (id: Guid<sorterTestId>)
+        (id: Guid<sortableTestId>)
         (sw: int<sortingWidth>) 
         (allTests: sortableIntArray[]) 
                     : sortableUint8v512Test =

@@ -7,13 +7,13 @@ open GeneSort.Sorting
 
 [<Struct; CustomEquality; NoComparison>]
 type sortableBinaryTest =
-    private { id: Guid<sorterTestId>
+    private { id: Guid<sortableTestId>
               sortingWidth: int<sortingWidth>
               sortableBinaryArrays: sortableBoolArray[]
             }
 
     static member create 
-                    (id: Guid<sorterTestId>) 
+                    (id: Guid<sortableTestId>) 
                     (sortingWidth:int<sortingWidth>)
                     (arrays: sortableBoolArray[]) : sortableBinaryTest =
         { 
@@ -23,7 +23,7 @@ type sortableBinaryTest =
         }
 
     static member Empty =
-        let id = Guid.NewGuid() |> UMX.tag<sorterTestId>
+        let id = Guid.NewGuid() |> UMX.tag<sortableTestId>
         sortableBinaryTest.create id 0<sortingWidth> [||]
 
     override this.Equals(obj) =
@@ -36,7 +36,7 @@ type sortableBinaryTest =
         hash this.sortableBinaryArrays
 
 
-    member this.SoratbleCount with get() = this.sortableBinaryArrays.Length  |> UMX.tag<sortableCount>
+    member this.SortableCount with get() = this.sortableBinaryArrays.Length  |> UMX.tag<sortableCount>
 
     member this.Id with get() = this.id
     

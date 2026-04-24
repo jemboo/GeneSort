@@ -34,7 +34,7 @@ module SortableTests =
         | Uint8v256 uint8v256Test -> uint8v256Test.SortingWidth
         | Uint8v512 uint8v512Test -> uint8v512Test.SortingWidth
 
-    let getId (test: sortableTest) : Guid<sorterTestId> =
+    let getId (test: sortableTest) : Guid<sortableTestId> =
         match test with
         | Bitv512 bitv512Test -> bitv512Test.Id
         | Bools boolTest -> boolTest.Id
@@ -45,12 +45,12 @@ module SortableTests =
 
     let getSortableCount (test: sortableTest) : int<sortableCount> =
         match test with
-        | Bitv512 bitv512Test -> bitv512Test.SoratbleCount
-        | Bools boolTest -> boolTest.SoratbleCount
-        | Ints intTest -> intTest.SoratbleCount
-        | PackedInts packedIntTest -> packedIntTest.SoratbleCount
-        | Uint8v256 uint8v256Test -> uint8v256Test.SoratbleCount
-        | Uint8v512 uint8v512Test -> uint8v512Test.SoratbleCount
+        | Bitv512 bitv512Test -> bitv512Test.SortableCount
+        | Bools boolTest -> boolTest.SortableCount
+        | Ints intTest -> intTest.SortableCount
+        | PackedInts packedIntTest -> packedIntTest.SortableCount
+        | Uint8v256 uint8v256Test -> uint8v256Test.SortableCount
+        | Uint8v512 uint8v512Test -> uint8v512Test.SortableCount
 
 
     let getUnsortedCount (test: sortableTest) =
@@ -74,7 +74,7 @@ module SortableTests =
             let mutable unsortedCount = 0
         
             // Iterate through each test case (offset by width)
-            for i = 0 to (int %packed.SoratbleCount) - 1 do
+            for i = 0 to (int %packed.SortableCount) - 1 do
                 let offset = i * width
                 let mutable isSorted = true
                 let mutable j = 0

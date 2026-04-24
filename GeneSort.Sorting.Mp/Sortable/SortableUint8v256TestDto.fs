@@ -40,7 +40,7 @@ module SortableUint8v256TestDto =
           Blocks = test.SimdSortBlocks |> Array.map blockFromDomain }
 
     let toDomain (dto: sortableUint8v256TestDto) : sortableUint8v256Test =
-        let id = UMX.tag<sorterTestId> dto.Id
+        let id = UMX.tag<sortableTestId> dto.Id
         let sw = UMX.tag<sortingWidth> dto.SortingWidth
         let blocks = dto.Blocks |> Array.map blockToDomain
         sortableUint8v256Test.create id sw blocks

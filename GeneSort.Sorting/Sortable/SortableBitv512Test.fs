@@ -9,13 +9,13 @@ open System.Runtime.Intrinsics
 [<Struct>]
 type sortableBitv512Test =
     private { 
-        id: Guid<sorterTestId>
+        id: Guid<sortableTestId>
         sortingWidth: int<sortingWidth>
         simdSortBlocks: sortBlockBitv512[] 
     }
 
     static member create 
-            (id: Guid<sorterTestId>) 
+            (id: Guid<sortableTestId>) 
             (sw: int<sortingWidth>) 
             (blocks: sortBlockBitv512[]) =
         { id = id
@@ -23,7 +23,7 @@ type sortableBitv512Test =
           simdSortBlocks = blocks }
 
     static member Empty =
-        let id = Guid.NewGuid() |> UMX.tag<sorterTestId>
+        let id = Guid.NewGuid() |> UMX.tag<sortableTestId>
         sortableBitv512Test.create id 0<sortingWidth> [||]
 
     member this.Id with get() = this.id
@@ -32,7 +32,7 @@ type sortableBitv512Test =
     
     member this.SortableDataFormat with get() = sortableDataFormat.BitVector512
     
-    member this.SoratbleCount with get() = 
+    member this.SortableCount with get() = 
         this.simdSortBlocks 
         |> Array.sumBy (fun block -> block.SortableCount) 
         |> UMX.tag<sortableCount>
@@ -44,7 +44,7 @@ type sortableBitv512Test =
 module SortableBitv512Test =
 
     let fromBoolArrays
-        (id: Guid<sorterTestId>)
+        (id: Guid<sortableTestId>)
         (sw: int<sortingWidth>) 
         (allTests: sortableBoolArray[]) : sortableBitv512Test =
         

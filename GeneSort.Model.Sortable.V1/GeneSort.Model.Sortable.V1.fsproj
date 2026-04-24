@@ -6,6 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Common.fs" />
+    <Compile Include="MsasF.fs" />
+    <Compile Include="MsasM.fs" />
+    <Compile Include="MsasO.fs" />
+    <Compile Include="SortableTestModel.fs" />
+    <Compile Include="MsasORandGen.fs" />
+    <Compile Include="SortableTestModelGen.fs" />
+    <Compile Include="SortableTestModelSet.fs" />
+    <Compile Include="SortableTestModelSetGen.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

@@ -6,6 +6,8 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 
+[<Measure>] type sequenceHash
+
 [<Struct>]
 type ce = private { low: int; hi: int } with
 
@@ -49,6 +51,9 @@ type ceSequenceKey =
 
 
 module Ce =
+
+    let getSequenceHash (ces : ce array) : int<sequenceHash> =
+        ceSequenceKey.create(ces).GetHashCode() |> UMX.tag<sequenceHash>
 
     let toString (ce: ce) : string =
         sprintf "(%d, %d)" ce.Low ce.Hi

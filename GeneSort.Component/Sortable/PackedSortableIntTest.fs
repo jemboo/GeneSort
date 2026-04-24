@@ -49,7 +49,7 @@ type packedSortableIntTests =
     member this.Id with get() = this.id
     member this.PackedValues with get() = this.packedValues
     member this.SortableDataFormat with get() = sortableDataFormat.PackedIntArray
-    member this.SoratbleCount with get() = this.count
+    member this.SortableCount with get() = this.count
     member this.SortingWidth with get() = this.sortingWidth
 
  

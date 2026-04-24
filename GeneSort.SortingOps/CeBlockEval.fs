@@ -42,7 +42,6 @@ type ceBlockEval =
     member this.getStageSequence : stageSequence =
         this.stageSequence.Value
 
-
     static member getUsedCes (ceb: ceBlock) (useCounts: ceUseCounts) : ce[] =
         let usedCes = ResizeArray<ce>()
 

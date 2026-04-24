@@ -36,7 +36,7 @@ type sortableBinaryTest =
         hash this.sortableBinaryArrays
 
 
-    member this.SoratbleCount with get() = this.sortableBinaryArrays.Length  |> UMX.tag<sortableCount>
+    member this.SortableCount with get() = this.sortableBinaryArrays.Length  |> UMX.tag<sortableCount>
 
     member this.Id with get() = this.id
     

@@ -35,7 +35,7 @@ module CeBlockOpsPacked =
     // non-inline version, not used in hot path
     let deduplicatePacked (packedTs: packedSortableIntTests) (resultsBuffer: int[]) =
         let sw = %packedTs.SortingWidth
-        let totalTests = packedTs.SoratbleCount
+        let totalTests = packedTs.SortableCount
     
         // 1. HashSet stores ONLY the starting index (offset) of unique unsorted tests
         let comparer = PackedOffsetComparer(resultsBuffer, sw)
@@ -72,7 +72,7 @@ module CeBlockOpsPacked =
 
     let eval (tests: packedSortableIntTests) (ceBlock: ceBlock) : ceBlockEval =
         let sw = %tests.SortingWidth
-        let totalTests = tests.SoratbleCount
+        let totalTests = tests.SortableCount
         let ces = ceBlock.CeArray
     
         // Pre-deconstruct CEs for the hot loop
@@ -116,7 +116,7 @@ module CeBlockOpsPacked =
 
     let evalAndCollectNewSortableTests (tests: packedSortableIntTests) (ceBlock: ceBlock) : ceBlockEval =
         let sw = %tests.SortingWidth
-        let totalTests = tests.SoratbleCount
+        let totalTests = tests.SortableCount
         let ces = ceBlock.CeArray
     
         // Pre-deconstruct CEs for the hot loop

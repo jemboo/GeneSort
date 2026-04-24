@@ -15,14 +15,14 @@ type sorterSetEval =
     private { 
         sorterSetEvalId: Guid<sorterSetEvalId>
         sorterSetId: Guid<sorterSetId>
-        sorterTestId: Guid<sorterTestId>
+        sorterTestId: Guid<sortableTestId>
         sorterEvals: Map<Guid<sorterId>, sorterEval>
     }
 
     static member create 
                 (sorterSetEvalId: Guid<sorterSetEvalId>) 
                 (sorterSetId: Guid<sorterSetId>) 
-                (sorterTestsId: Guid<sorterTestId>) 
+                (sorterTestsId: Guid<sortableTestId>) 
                 (sorterEvals: sorterEval[]) =
         { 
             sorterSetEvalId = sorterSetEvalId
@@ -33,7 +33,7 @@ type sorterSetEval =
 
     member this.SorterSetEvalId with get() : Guid<sorterSetEvalId> = this.sorterSetEvalId
     member this.SorterSetId with get() : Guid<sorterSetId> = this.sorterSetId
-    member this.SorterTestId with get() : Guid<sorterTestId> = this.sorterTestId
+    member this.SorterTestId with get() : Guid<sortableTestId> = this.sorterTestId
     member this.SorterEvals with get() : sorterEval[] = this.sorterEvals.Values |> Seq.toArray
 
  

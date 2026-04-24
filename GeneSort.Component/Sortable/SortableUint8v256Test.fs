@@ -29,7 +29,7 @@ type sortableUint8v256Test =
     member this.Id with get() = this.id
     member this.SimdSortBlocks with get() = this.simdSortBlocks
     member this.SortableDataFormat with get() = sortableDataFormat.Int8Vector256
-    member this.SoratbleCount with get() = 
+    member this.SortableCount with get() = 
         this.simdSortBlocks 
         |> Array.sumBy (fun block -> block.SortableCount) 
         |> UMX.tag<sortableCount>

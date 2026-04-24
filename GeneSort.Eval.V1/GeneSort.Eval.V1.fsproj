@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Common.fs" />
+    <Compile Include="Bins\SorterScore.fs" />
+    <Compile Include="Bins\SorterEvalKey.fs" />
+    <Compile Include="Bins\SorterEvalBin.fs" />
+    <Compile Include="Bins\SorterEvalBins.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

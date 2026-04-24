@@ -32,7 +32,7 @@ type sortableUint8v512Test =
     // Updated to reflect the 512-bit format
     member this.SortableDataFormat with get() = sortableDataFormat.Int8Vector512
     
-    member this.SoratbleCount with get() = 
+    member this.SortableCount with get() = 
         this.simdSortBlocks 
         |> Array.sumBy (fun block -> block.SortableCount) 
         |> UMX.tag<sortableCount>

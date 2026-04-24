@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sortable
+﻿namespace GeneSort.Model.Sortable.V1
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -21,7 +21,7 @@ module SortableTestModel =
 
 
     let makeSortableTest 
-            (sortableTestId: Guid<sortableTestId>)
+            (sorterTestId: Guid<sortableTestId>)
             (sortableTestModel: sortableTestModel) 
             (sortableDataFormat: sortableDataFormat) : sortableTest =
 
@@ -30,26 +30,26 @@ module SortableTestModel =
         | MsasF msasF -> 
                 match sortableDataFormat with
                 | sortableDataFormat.BoolArray ->        
-                    (msasF.MakeSortableBoolTest sortableTestId (getSortingWidth sortableTestModel)) |> sortableTest.Bools
+                    (msasF.MakeSortableBoolTest sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Bools
                 | sortableDataFormat.IntArray ->
-                    (msasF.MakeSortableIntTest sortableTestId (getSortingWidth sortableTestModel)) |> sortableTest.Ints
+                    (msasF.MakeSortableIntTest sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Ints
                 | sortableDataFormat.BitVector256 ->
                     failwith "BitVector256 SortableArrayType not supported"
                 | sortableDataFormat.BitVector512 ->
-                    (msasF.MakeSortableBitv512Test sortableTestId (getSortingWidth sortableTestModel)) |> sortableTest.Bitv512
+                    (msasF.MakeSortableBitv512Test sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Bitv512
                 | sortableDataFormat.Int8Vector256 ->
-                    (msasF.MakeSortableUint8v256Test sortableTestId (getSortingWidth sortableTestModel)) |> sortableTest.Uint8v256
+                    (msasF.MakeSortableUint8v256Test sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Uint8v256
                 | sortableDataFormat.Int8Vector512  -> 
-                    (msasF.MakeSortableUint8v512Test sortableTestId (getSortingWidth sortableTestModel)) |> sortableTest.Uint8v512
+                    (msasF.MakeSortableUint8v512Test sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Uint8v512
                 | sortableDataFormat.PackedIntArray ->
                     failwith "PackedIntArray SortableArrayType not supported"
 
         | MsasO msasO ->
                 match sortableDataFormat with
                 | sortableDataFormat.BoolArray ->        
-                     (msasO.MakeSortableBoolTest sortableTestId (getSortingWidth sortableTestModel)) |> sortableTest.Bools
+                     (msasO.MakeSortableBoolTest sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Bools
                 | sortableDataFormat.IntArray ->
-                     (msasO.MakeSortableIntTest sortableTestId (getSortingWidth sortableTestModel)) |> sortableTest.Ints
+                     (msasO.MakeSortableIntTest sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Ints
                 | sortableDataFormat.Int8Vector256 ->
                      failwith "Int8Vector256 SortableArrayType not supported"
                 | _ ->  
@@ -58,15 +58,15 @@ module SortableTestModel =
         | MsasMi msasMi ->
                 match sortableDataFormat with
                 | sortableDataFormat.BoolArray ->        
-                    (msasMi.MakeSortableBoolTest sortableTestId) |> sortableTest.Bools
+                    (msasMi.MakeSortableBoolTest sorterTestId) |> sortableTest.Bools
                 | sortableDataFormat.IntArray ->
-                    (msasMi.MakeSortableIntTest sortableTestId) |> sortableTest.Ints
+                    (msasMi.MakeSortableIntTest sorterTestId) |> sortableTest.Ints
                 | sortableDataFormat.Int8Vector256 -> 
-                    (msasMi.MakeSortableUint8v256Test sortableTestId) |> sortableTest.Uint8v256
+                    (msasMi.MakeSortableUint8v256Test sorterTestId) |> sortableTest.Uint8v256
                 | sortableDataFormat.Int8Vector512 -> 
-                    (msasMi.MakeSortableUint8v512Test sortableTestId) |> sortableTest.Uint8v512
+                    (msasMi.MakeSortableUint8v512Test sorterTestId) |> sortableTest.Uint8v512
                 | sortableDataFormat.BitVector512 ->
-                    (msasMi.MakeSortableBitv512Test sortableTestId) |> sortableTest.Bitv512
+                    (msasMi.MakeSortableBitv512Test sorterTestId) |> sortableTest.Bitv512
                 | _ ->  
                     failwith "Unsupported SortableArrayType for MsasMi"
                     
