@@ -7,7 +7,7 @@ open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Core
 
-type sorterEvalBin =
+type sorterEvalBinV1 =
     private {
         /// Mutable for O(1) additions during the evaluation phase
         sorterScores: ResizeArray<sorterScore>
@@ -42,10 +42,10 @@ type sorterEvalBin =
 
 
 
-module SorterEvalBin =
+module SorterEvalBinV1 =
     
     /// Combines the bin key and each score into a sequence of records
-    let makeDataTableRecords (bin: sorterEvalBin) : GeneSort.Core.dataTableRecord seq =
+    let makeDataTableRecords (bin: sorterEvalBinV1) : GeneSort.Core.dataTableRecord seq =
         let keyRecord = SorterEvalKey.toDataTableRecord bin.SorterEvalKey
         
         bin.Scores 
@@ -55,3 +55,10 @@ module SorterEvalBin =
             (scoreRecord, keyRecord.Data) 
             ||> Map.fold (fun acc k v -> GeneSort.Core.dataTableRecord.addData k v acc)
         )
+
+
+
+
+type sorterEvalBin =
+    | V1 of sorterEvalBinV1
+    | Unknown

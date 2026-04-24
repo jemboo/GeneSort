@@ -78,14 +78,14 @@ module SorterModelMutator =
 
 
     let makeMutantSorterModelFromId 
-                (simpleSorterModelId: Guid<sorterModelId>)  
+                (sorterModelId: Guid<sorterModelId>)  
                 (model: simpleSorterModelMutator) : simpleSorterModel =
         match model with
-        | SmmMsceRandMutate msce -> msce.MakeSorterModelFromId simpleSorterModelId |> simpleSorterModel.Msce
-        | SmmMssiRandMutate mssi -> mssi.MakeSorterModelFromId simpleSorterModelId |> simpleSorterModel.Mssi
-        | SmmMsrsRandMutate msrs -> msrs.MakeSorterModelFromId simpleSorterModelId |> simpleSorterModel.Msrs
-        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModelFromId simpleSorterModelId |> simpleSorterModel.Msuf4
-        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModelFromId simpleSorterModelId |> simpleSorterModel.Msuf6
+        | SmmMsceRandMutate msce -> msce.MakeSorterModelFromId sorterModelId |> simpleSorterModel.Msce
+        | SmmMssiRandMutate mssi -> mssi.MakeSorterModelFromId sorterModelId |> simpleSorterModel.Mssi
+        | SmmMsrsRandMutate msrs -> msrs.MakeSorterModelFromId sorterModelId |> simpleSorterModel.Msrs
+        | SmmMsuf4RandMutate msuf4 -> msuf4.MakeSorterModelFromId sorterModelId |> simpleSorterModel.Msuf4
+        | SmmMsuf6RandMutate msuf6 -> msuf6.MakeSorterModelFromId sorterModelId |> simpleSorterModel.Msuf6
 
 
 

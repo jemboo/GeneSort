@@ -7,7 +7,6 @@ open GeneSort.Model.Sorting.V1.Simple.Rs
 open GeneSort.Model.Sorting.V1.Simple.Uf4
 open GeneSort.Model.Sorting.V1.Simple.Uf6
 open GeneSort.Sorting
-open GeneSort.Model.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.V1.Simple
 
@@ -20,7 +19,7 @@ type simpleSorterModelGen =
      | SmmMsuf6RandGen of msuf6RandGen
 
 
-module SorterModelGen =
+module SimpleSorterModelGen =
 
     let getId (model:simpleSorterModelGen) : Guid<sorterModelGenId> =
         match model with
