@@ -9,6 +9,7 @@ open GeneSort.Project
 open GeneSort.Project.SorterBins
 open System.Threading
 open GeneSort.Runs
+open GeneSort.Project.ParamOps
 
 
 
@@ -175,7 +176,7 @@ let maxReplica = 1<replNumber>
 
 printfn "Initializing Project..."
 let initResult = 
-    ProjectOps.initProjectAndRunFiles
+        initProjectAndRunFiles
                 geneSortDb 
                 buildQueryParams 
                 cts 
@@ -186,7 +187,7 @@ let initResult =
                 allowOverwrite 
                 paramRefiner
                 host.ParameterSpans
-    |> Async.RunSynchronously
+        |> Async.RunSynchronously
 
 
 match initResult with
