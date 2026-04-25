@@ -10,37 +10,6 @@ open OpsUtils
 module ProjectOps =
 
 
-    let makeErrorTable (failures: (runParameters * string) list) : string [] =
-        let mutable modRunParameters = []
-
-        for (rp, err) in failures do
-            modRunParameters <- (rp.WithMessage(Some err)) :: modRunParameters
-
-        let mutable tableRows =     
-                            (RunParameters.makeIndexAndReplTable modRunParameters
-                            |> Array.map (fun row -> String.Join("\t", row)))
-
-        tableRows <- [|"\n--- ********* ---"|]
-                     |> Array.append  tableRows
-                     |> Array.append [|"--- Error Runs ---"|] 
-
-        tableRows
-
-    
-    let makeSourceTable (runParams : runParameters []) : string [] =
-        let mutable tableRows =     
-                            (RunParameters.makeIndexAndReplTable runParams
-                            |> Array.map (fun row -> String.Join("\t", row)))
-
-
-        tableRows <- [|"\n--- ********* ---"|]
-                     |> Array.append  tableRows
-                     |> Array.append [|"--- Successful Runs ---"|] 
-
-        tableRows
-
-
-
     let executeRunParameters
             (db: IGeneSortDb)
             (buildQueryParams: runParameters -> outputDataType -> queryParams) 
@@ -223,36 +192,6 @@ module ProjectOps =
                 let errorMsg = sprintf "Failed to initialize project files: %s\n" e.Message
                 report progress errorMsg
                 return Error errorMsg
-        }
-
-
-
-    let printRunParamsTable
-            (db: IGeneSortDb)
-            (minReplNumber: int<replNumber>)
-            (maxReplNumber: int<replNumber>)
-            (cts: CancellationTokenSource)
-            (progress: IProgress<string> option) =
-        asyncResult {
-            try
-                report progress (sprintf "Displaying Source Table for %s\n" %db.projectFolder)
-
-                let! runParametersArray = 
-                    db.getProjectRunParametersForReplRangeAsync (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
-
-                if runParametersArray.Length = 0 then
-                    report progress "No runs found to display.\n"
-                else
-                    let sourceTableRows = makeSourceTable runParametersArray
-                    sourceTableRows |> Array.iter (report progress)
-                    report progress (sprintf "\nFound %d run configurations.\n" runParametersArray.Length)
-            
-                // Return unit instead of an array
-                return () 
-            with e ->
-                let msg = sprintf "Error displaying source table: %s" e.Message
-                report progress msg
-                return! async { return Error msg }
         }
 
 

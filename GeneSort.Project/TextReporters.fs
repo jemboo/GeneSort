@@ -63,8 +63,8 @@ module TextReporters =
 
 
             // 4. Finalize and Save
-            dtReport.AddSources (ProjectOps.makeSourceTable runParamsArray)
-            dtReport.AddErrors (ProjectOps.makeErrorTable newFailures)
+            dtReport.AddSources (makeSourceTable runParamsArray)
+            dtReport.AddErrors (makeErrorTable newFailures)
 
             let saveQp = buildQueryParams (runParamsArray.[0].WithRepl None) (outputDataType.TextReport (reportName |> UMX.tag))
             let! _ = db.saveAsync saveQp (outputData.TextReport dtReport) allowOverwrite |> Async.map Ok
