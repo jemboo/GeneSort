@@ -4,7 +4,7 @@ open System
 open FSharp.UMX
 open MessagePack
 open GeneSort.Sorting
-open GeneSort.SortingOps
+open GeneSort.SortingResults
 open GeneSort.SortingResults.Bins
 
 [<MessagePackObject>]

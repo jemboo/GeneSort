@@ -2,10 +2,12 @@
 namespace GeneSort.Project.V1
 
 open FSharp.UMX
+open GeneSort.Eval.V1.Bins
 
 type outputData =
     | Project of project
     | RunParameters of runParameters
+    | SorterEvalBins of sorterEvalBins
 
 
 //type outputData =

@@ -16,16 +16,26 @@ type sorterEvalBinsV1 =
         sortableTestId: Guid<sortableTestId>
     }
     with
-    static member create (id: Guid<sorterEvalBinsId>) (testId: Guid<sortableTestId>) =
+    static member createEmpty (id: Guid<sorterEvalBinsId>) (testId: Guid<sortableTestId>) =
         { 
             sorterEvalBinsId = id
             bins = Map.empty 
             sortableTestId = testId
         }
 
+    static member create 
+            (id: Guid<sorterEvalBinsId>) 
+            (testId: Guid<sortableTestId>)
+            (bins: Map<sorterEvalKey, sorterEvalBinV1>) =
+        { 
+            sorterEvalBinsId = id
+            bins = bins
+            sortableTestId = testId
+        }
+
     static member createWithNewId (testId: Guid<sortableTestId>) =
         let id = Guid.NewGuid() |> UMX.tag<sorterEvalBinsId>
-        sorterEvalBinsV1.create id testId
+        sorterEvalBinsV1.createEmpty id testId
 
     member this.Id = this.sorterEvalBinsId
     member this.Bins = this.bins

@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="SorterScoreDto.fs" />
+    <Compile Include="SorterEvalKeyDto.fs" />
+    <Compile Include="SorterEvalBinDto.fs" />
+    <Compile Include="SorterEvalBinsDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -18,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+    <ProjectReference Include="..\GeneSort.Eval.V1\GeneSort.Eval.V1.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorting\GeneSort.Sorting.fsproj" />
   </ItemGroup>
 

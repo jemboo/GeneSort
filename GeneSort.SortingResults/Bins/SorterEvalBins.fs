@@ -5,6 +5,7 @@ open GeneSort.Sorting
 open GeneSort.SortingOps
 open System
 open GeneSort.Core
+open GeneSort.SortingResults
 
 type sorterEvalBins =
     private {

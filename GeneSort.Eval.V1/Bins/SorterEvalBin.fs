@@ -1,10 +1,7 @@
-﻿
-
-namespace GeneSort.Eval.V1.Bins
+﻿namespace GeneSort.Eval.V1.Bins
 
 open System.Collections.Generic
 open FSharp.UMX
-open GeneSort.Sorting
 open GeneSort.Core
 
 type sorterEvalBinV1 =

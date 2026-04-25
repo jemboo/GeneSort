@@ -6,6 +6,7 @@ open GeneSort.SortingOps
 open System.Collections.Generic
 open System
 open GeneSort.Sorting.Sorter
+open GeneSort.SortingResults
 
 
 // ---------------------------------------------------------------------------

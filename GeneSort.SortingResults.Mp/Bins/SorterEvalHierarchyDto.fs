@@ -7,6 +7,7 @@ open GeneSort.Sorting
 open GeneSort.SortingOps
 open GeneSort.Sorting.Sorter
 open GeneSort.SortingResults.Bins
+open GeneSort.SortingResults
 
 // ---------------------------------------------------------------------------
 // Leaf DTO: sorterEval removed; cesLowHi encodes the ceSequenceKey

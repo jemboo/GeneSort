@@ -9,6 +9,8 @@ open GeneSort.SortingOps
 [<Measure>] type sortingEvalBinsId
 [<Measure>] type mutationSegmentEvalBinsSetId
 [<Measure>] type maxReps
+[<Measure>] type sorterEvalBinsId
+[<Measure>] type sorterEvalHierarchyId
 
 module Common = ()
 
