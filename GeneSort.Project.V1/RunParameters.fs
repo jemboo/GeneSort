@@ -5,11 +5,8 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sorting
 
-[<Measure>] type projectName
-[<Measure>] type queryParamsId
-[<Measure>] type replNumber
-[<Measure>] type generationNumber
 
 type runParameters =
     private { paramMap : Map<string, string> }

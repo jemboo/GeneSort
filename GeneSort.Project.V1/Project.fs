@@ -34,31 +34,31 @@ type project =
 
 
 
-//module Project =
+module Project =
 
-//    let makeRunParameters 
-//                (minReplica: int<replNumber>) 
-//                (maxReplica: int<replNumber>)
-//                (parameterSpans: (string * string list) list)
-//                (paramRefiner: runParameters seq -> runParameters seq) : runParameters [] =
+    let makeRunParameters 
+                (minReplica: int<replNumber>) 
+                (maxReplica: int<replNumber>)
+                (parameterSpans: (string * string list) list)
+                (paramRefiner: runParameters seq -> runParameters seq) : runParameters [] =
 
-//        let replicateSpan = [ runParameters.replKey, [%minReplica .. %maxReplica - 1] |> List.map string ]
+        let replicateSpan = [ runParameters.replKey, [%minReplica .. %maxReplica - 1] |> List.map string ]
 
-//        let fullSpans = replicateSpan @ parameterSpans
-//        let runParametersArray =
-//            if fullSpans.IsEmpty then
-//                [| runParameters.create Map.empty |]
-//            else
-//                fullSpans
-//                |> Combinatorics.cartesianProductMaps
-//                |> Seq.map runParameters.create
-//                |> Seq.toArray
+        let fullSpans = replicateSpan @ parameterSpans
+        let runParametersArray =
+            if fullSpans.IsEmpty then
+                [| runParameters.create Map.empty |]
+            else
+                fullSpans
+                |> Combinatorics.cartesianProductMaps
+                |> Seq.map runParameters.create
+                |> Seq.toArray
 
-//        let refinedParameters =
-//            runParametersArray
-//            |> Array.toSeq
-//            |> paramRefiner
-//            |> Seq.toArray
+        let refinedParameters =
+            runParametersArray
+            |> Array.toSeq
+            |> paramRefiner
+            |> Seq.toArray
 
-//        refinedParameters
+        refinedParameters
 

@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <Compile Include="Common.fs" />
-    <Compile Include="SorterModelType.fs" />
     <Compile Include="Simple\Ce\Msce.fs" />
     <Compile Include="Simple\Ce\MsceRandGen.fs" />
     <Compile Include="Simple\Ce\MsceRandMutate.fs" />
