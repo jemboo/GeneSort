@@ -38,7 +38,7 @@ type GeneSortDbMp(projectFolder: string<pathToProjectFolder>) =
 
     interface IGeneSortDb with
         member _.projectName
-            with get (): string<projectName> = (%projectFolder) |> UMX.tag
+            with get (): string<projectName> = DirectoryInfo(%projectFolder).Name |> UMX.tag
 
         member _.saveAsync
                     (queryParams: queryParams)

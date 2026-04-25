@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="Common.fs" />
     <Compile Include="OutputDataType.fs" />
+    <Compile Include="RunParameters.fs" />
     <Compile Include="Project.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
@@ -19,6 +20,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+    <ProjectReference Include="..\GeneSort.Eval.V1\GeneSort.Eval.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.Model.Sortable.V1\GeneSort.Model.Sortable.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.Model.Sorting.V1\GeneSort.Model.Sorting.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.SortingOps\GeneSort.SortingOps.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorting\GeneSort.Sorting.fsproj" />
   </ItemGroup>
 

@@ -16,7 +16,6 @@ open GeneSort.SortingResults.Bins
 type OutputError = string
 
 type IGeneSortDb =
-    //abstract member projectFolder : string<projectFolder>
     abstract member projectName : string<projectName>
     abstract member saveAsync : queryParams -> outputData -> bool<allowOverwrite> -> Async<Result<unit, string>>
     abstract member loadAsync : queryParams -> Async<Result<outputData, OutputError>>
