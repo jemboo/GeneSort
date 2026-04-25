@@ -18,12 +18,13 @@ module ParamOps =
             (progress: IProgress<string> option) : Async<Result<unit, string>> =
         async {
             try
-                report progress (sprintf "%s Saving RunParameter files in %s" (MathUtils.getTimestampString()) %db.projectFolder)
+                report progress (sprintf "%s Saving RunParameter files in %s" (MathUtils.getTimestampString()) %db.projectName)
                 cts.Token.ThrowIfCancellationRequested()
                 let! res = db.saveAllRunParametersAsync runParameterArray buildQueryParams allowOverwrite (Some cts.Token) progress
                 match res with
                 | Ok () -> 
-                    report progress (sprintf "%s Successfully saved %d RunParameter files" (MathUtils.getTimestampString()) runParameterArray.Length)
+                    report progress (sprintf "%s Successfully saved %d RunParameter files" 
+                                        (MathUtils.getTimestampString()) runParameterArray.Length)
                     return Ok ()
                 | Error msg -> return Error msg
             with
@@ -32,7 +33,10 @@ module ParamOps =
                 report progress msg
                 return Error msg
             | e ->
-                let msg = sprintf "%s Failed to save RunParameter files in %s: %s" (MathUtils.getTimestampString()) %db.projectFolder e.Message
+                let msg = sprintf "%s Failed to save RunParameter files in %s: %s" 
+                                        (MathUtils.getTimestampString()) 
+                                        %db.projectName
+                                        e.Message
                 report progress msg
                 return Error msg
         }

@@ -37,20 +37,8 @@ type GeneSortDbMp(projectFolder: string<pathToProjectFolder>) =
     member _.ProjectFolder = projectFolder
 
     interface IGeneSortDb with
-        member _.projectFolder
-            with get (): string<projectFolder> = (%projectFolder) |> UMX.tag<projectFolder>
-        member _.getAllProjectNamesAsync(): Async<Result<string<projectName> array,string>> =
-            async {
-                try
-                    //let root = %projectFolder
-                    if not (Directory.Exists(%projectFolder)) then
-                        return Error (sprintf "Project folder '%s' does not exist" %projectFolder)
-                    else
-                        let dirs = Directory.GetDirectories(%projectFolder)
-                        let names = dirs |> Array.map (Path.GetFileName >> UMX.tag<projectName>)
-                        return Ok names
-                with ex -> return Error ex.Message
-            }
+        member _.projectName
+            with get (): string<projectName> = (%projectFolder) |> UMX.tag
 
         member _.saveAsync
                     (queryParams: queryParams)

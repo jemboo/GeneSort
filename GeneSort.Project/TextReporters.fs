@@ -28,7 +28,7 @@ module TextReporters =
             let reportName = "SorterEval_Bin_Report"
             let timestamp () = MathUtils.getTimestampString()
         
-            report progress (sprintf "%s Starting %s for: %s" (timestamp()) reportName %db.projectFolder)
+            report progress (sprintf "%s Starting %s for: %s" (timestamp()) reportName %db.projectName)
 
             // 1. Get Parameters (Handles Error track automatically)
             let! runParamsArray = 
@@ -69,7 +69,7 @@ module TextReporters =
             let saveQp = buildQueryParams (runParamsArray.[0].WithRepl None) (outputDataType.TextReport (reportName |> UMX.tag))
             let! _ = db.saveAsync saveQp (outputData.TextReport dtReport) allowOverwrite |> Async.map Ok
 
-            report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %db.projectFolder)
+            report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %db.projectName)
             return ()
         }
 
@@ -88,7 +88,7 @@ module TextReporters =
             let binCount, blockGrowthRate = 20, 1.2
             let timestamp () = MathUtils.getTimestampString()
         
-            report progress (sprintf "%s Starting %s for: %s" (timestamp()) reportName %db.projectFolder)
+            report progress (sprintf "%s Starting %s for: %s" (timestamp()) reportName %db.projectName)
 
             // 1. Get Parameters (automatically handles Error exit)
             let! runParamsArray = 
@@ -138,6 +138,6 @@ module TextReporters =
             let saveQp = buildQueryParams (runParamsArray.[0].WithRepl None) (outputDataType.TextReport (reportName |> UMX.tag))
             let! _ = db.saveAsync saveQp (outputData.TextReport dtReport) allowOverwrite |> Async.map Ok
 
-            report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %db.projectFolder)
+            report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %db.projectName)
             return ()
         }

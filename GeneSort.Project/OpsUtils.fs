@@ -50,7 +50,7 @@ module OpsUtils =
             (progress: IProgress<string> option) =
         asyncResult {
             try
-                report progress (sprintf "Displaying Source Table for %s\n" %db.projectFolder)
+                report progress (sprintf "Displaying Source Table for %s\n" %db.projectName)
 
                 let! runParametersArray = 
                     db.getProjectRunParametersForReplRangeAsync (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
