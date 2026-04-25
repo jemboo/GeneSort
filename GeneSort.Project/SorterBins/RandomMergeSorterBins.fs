@@ -19,6 +19,7 @@ open GeneSort.SortingResults
 open GeneSort.SortingResults.Bins
 open GeneSort.Project
 open GeneSort.FileDb
+open GeneSort.Project.OpsUtils
 
 /// Host type for RandomMergeSorterBins to manage environment-specific spans and filtering
 type randomMergeSorterBinsHost = 
@@ -177,7 +178,7 @@ module RandomMergeSorterBins =
                 let! _ = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
-                ProjectOps.report progress (sprintf "%s Starting Run %s" (MathUtils.getTimestampString()) %runId)
+                report progress (sprintf "%s Starting Run %s" (MathUtils.getTimestampString()) %runId)
 
                 let! (sorterModelType, sortingWidth, stageLength, ceLength, sorterCount, sortableDataFormat, mergeDimension, mergeSuffixType) = 
                     host.ExtractDomainParams runParameters |> Result.ofOption "Missing parameters"

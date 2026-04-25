@@ -13,6 +13,7 @@ open GeneSort.SortingResults
 open GeneSort.SortingResults.Bins
 open GeneSort.Project
 open GeneSort.FileDb
+open GeneSort.Project.OpsUtils
 
 /// Host type for MergeRandomSorterBins to manage environment-specific spans and filtering
 type mergeRandomSorterBinsHost = 
@@ -132,7 +133,7 @@ module MergeRandomSorterBins =
                 let runId = runParameters |> RunParameters.getIdString
                 let! (sorterModelType, sortingWidth, srp, rsp) = host.ExtractDomainParams runParameters |> Result.ofOption "Missing parameters"
                 
-                ProjectOps.report progress (sprintf "Merging %d repls starting at %d for %s" %rsp %srp %runId)
+                report progress (sprintf "Merging %d repls starting at %d for %s" %rsp %srp %runId)
 
                 // 1. Output Query Params
                 let qpBins = makeQueryParamsFromRunParams runParameters (outputDataType.SorterEvalBins "")

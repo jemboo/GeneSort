@@ -11,6 +11,7 @@ open GeneSort.SortingOps
 open ProjectOps
 open GeneSort.Model.Sorting
 open GeneSort.FileDb
+open OpsUtils
 
 /// Host type for MergeIntQa supporting P1/P2 transitions
 type mergeIntQaHost = 

@@ -5,9 +5,11 @@ open FSharp.UMX
 open GeneSort.Db
 open GeneSort.Runs
 open GeneSort.Core
-open OpsUtils
 
-module ProjectOps =
+module OpsUtils =
+
+    let inline report (progress: IProgress<string> option) msg =
+        progress |> Option.iter (fun p -> p.Report msg)
 
 
     let makeErrorTable (failures: (runParameters * string) list) : string [] =
@@ -38,7 +40,6 @@ module ProjectOps =
                      |> Array.append [|"--- Successful Runs ---"|] 
 
         tableRows
-
 
 
     let executeRunParameters
@@ -146,86 +147,6 @@ module ProjectOps =
         }
 
 
-    let executeRunParametersSeq
-                (db: IGeneSortDb)
-                (maxDegreeOfParallelism: int)
-                (executor: runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option -> Async<Result<runParameters, string>>)
-                (runParameters: runParameters seq)
-                (buildQueryParams: runParameters -> outputDataType -> queryParams)
-                (allowOverwrite: bool<allowOverwrite>)
-                (cts: CancellationTokenSource)
-                (progress: IProgress<string> option)    : Async<RunResult[]> =
-        
-            processRunParametersSeq 
-                maxDegreeOfParallelism 
-                runParameters cts progress 
-                (fun rp -> executeRunParameters 
-                                db 
-                                buildQueryParams executor 
-                                rp allowOverwrite cts progress)
-
-
-    let saveParametersFiles
-            (db: IGeneSortDb)
-            (runParameterArray: runParameters[])
-            (buildQueryParams: runParameters -> outputDataType -> queryParams)
-            (allowOverwrite: bool<allowOverwrite>)
-            (cts: CancellationTokenSource)
-            (progress: IProgress<string> option) : Async<Result<unit, string>> =
-        async {
-            try
-                report progress (sprintf "%s Saving RunParameter files in %s" (MathUtils.getTimestampString()) %db.projectFolder)
-                cts.Token.ThrowIfCancellationRequested()
-                let! res = db.saveAllRunParametersAsync runParameterArray buildQueryParams allowOverwrite (Some cts.Token) progress
-                match res with
-                | Ok () -> 
-                    report progress (sprintf "%s Successfully saved %d RunParameter files" (MathUtils.getTimestampString()) runParameterArray.Length)
-                    return Ok ()
-                | Error msg -> return Error msg
-            with
-            | :? OperationCanceledException ->
-                let msg = "Saving RunParameter files was cancelled"
-                report progress msg
-                return Error msg
-            | e ->
-                let msg = sprintf "%s Failed to save RunParameter files in %s: %s" (MathUtils.getTimestampString()) %db.projectFolder e.Message
-                report progress msg
-                return Error msg
-        }
-
-
-    let initProjectAndRunFiles
-        (db: IGeneSortDb)
-        (buildQueryParams: runParameters -> outputDataType -> queryParams)
-        (cts: CancellationTokenSource)
-        (progress: IProgress<string> option)
-        (project: project)
-        (minReplica: int<replNumber>)
-        (maxReplica: int<replNumber>)
-        (allowOverwrite: bool<allowOverwrite>)
-        (paramRefiner: runParameters seq -> runParameters seq) 
-        (parameterSpans: (string * string list) list) : Async<Result<unit, string>> =
-        async {
-            try
-                report progress (sprintf "%s Saving project file: %s" (MathUtils.getTimestampString()) %project.ProjectName)
-                let queryParams = queryParams.createForProject project.ProjectName
-                let! saveProjRes = db.saveAsync queryParams (project |> outputData.Project) (true |> UMX.tag<allowOverwrite>)
-                match saveProjRes with
-                | Error err -> return Error err
-                | Ok () ->
-                    let runParametersArray = Project.makeRunParameters minReplica maxReplica parameterSpans paramRefiner |> Seq.toArray
-                    report progress (sprintf "%s Saving run parameters files: (%d)" (MathUtils.getTimestampString()) runParametersArray.Length)
-                    return! saveParametersFiles 
-                                db
-                                runParametersArray buildQueryParams 
-                                allowOverwrite cts progress
-            with e ->
-                let errorMsg = sprintf "Failed to initialize project files: %s\n" e.Message
-                report progress errorMsg
-                return Error errorMsg
-        }
-
-
 
     let printRunParamsTable
             (db: IGeneSortDb)
@@ -246,57 +167,9 @@ module ProjectOps =
                     let sourceTableRows = makeSourceTable runParametersArray
                     sourceTableRows |> Array.iter (report progress)
                     report progress (sprintf "\nFound %d run configurations.\n" runParametersArray.Length)
-            
-                // Return unit instead of an array
                 return () 
             with e ->
                 let msg = sprintf "Error displaying source table: %s" e.Message
-                report progress msg
-                return! async { return Error msg }
-        }
-
-
-    let executeRuns
-            (db: IGeneSortDb)
-            (minRepl: int<replNumber>)
-            (maxRepl: int<replNumber>)
-            (buildQueryParams: runParameters -> outputDataType -> queryParams)
-            (projectName: string<projectName>)
-            (allowOverwrite: bool<allowOverwrite>)
-            (cts: CancellationTokenSource)
-            (progress: IProgress<string> option)
-            (executor: runParameters ->
-                       bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option
-                            -> Async<Result<runParameters, string>>)
-            (maxDegreeOfParallelism: int)
-            : Async<Result<RunResult[], string>> =
-    
-        asyncResult {
-            try
-                report progress (sprintf "%s Executing Runs for %s\n" (MathUtils.getTimestampString()) %projectName)
-
-                // 1. Load Parameters
-                let! runParametersArray = 
-                    db.getProjectRunParametersForReplRangeAsync (Some minRepl) (Some maxRepl) (Some cts.Token) progress
-
-                report progress (sprintf "Found %d runs to execute\n" runParametersArray.Length)
-
-                if runParametersArray.Length = 0 then
-                    report progress "No runs found to execute"
-                    return [||]
-                else
-                    // 1. Run the sequence (returns Async<RunResult[]>)
-                    let! results = 
-                        executeRunParametersSeq 
-                            db maxDegreeOfParallelism executor 
-                            runParametersArray buildQueryParams allowOverwrite cts progress
-                        |> Async.map Ok // Wrap the naked array in a Result.Ok
-
-                    return results
-
-            with e ->
-                // Consistent with your executors, handle the unexpected
-                let msg = sprintf "%s Fatal error executing runs: %s\n" (MathUtils.getTimestampString()) e.Message
                 report progress msg
                 return! async { return Error msg }
         }

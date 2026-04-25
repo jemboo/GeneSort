@@ -13,6 +13,8 @@ open ProjectOps
 open GeneSort.Model.Sorting
 open GeneSort.Model.Sorting.ModelParams
 open GeneSort.FileDb
+open ParamOps
+open OpsUtils
 
 /// Host type for FullBoolEvals to manage environment configurations
 type fullBoolEvalsHost = 

@@ -14,6 +14,7 @@ open System
 open System.Threading
 open GeneSort.Project.SorterBins
 open GeneSort.SortingOps
+open OpsUtils
 
 type mergeRandomMergeSorterBinsHost = 
     private { 
@@ -137,7 +138,7 @@ module MergeRandomMergeSorterBins =
                 let! _ = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
-                ProjectOps.report progress (sprintf "%s Starting Merge Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
+                report progress (sprintf "%s Starting Merge Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
 
                 // 2. Safe Parameter Extraction (Via Host)
                 let! (md, mst, sorterModelType, sortingWidth, srp, rsp) = 
@@ -185,7 +186,7 @@ module MergeRandomMergeSorterBins =
                     mergedWinningSet <- SortingSet.merge mergedWinningSet curSet
                     mergedWinningSet <- sortingSet.create (%qpWinningSet.Id |> UMX.tag) (SortingSetFilter.sampleWinningBins P2.maxCenterSampledSetSize mergedEvalBins mergedWinningSet)
 
-                    ProjectOps.report progress (sprintf "Merged repl %d for %s" %currentRepl %runId)
+                    report progress (sprintf "Merged repl %d for %s" %currentRepl %runId)
 
                 // 7. Calculate Convex Hull from the merged results
                 let hullData = SortingSetFilter.sampleBinsConvexHull samplesPerBin mergedEvalBins mergedEvenSet
@@ -238,7 +239,7 @@ module MergeRandomMergeSorterBins =
                 let! _ = host.ProjectDb.saveAsync qpHullSet (hullSampledSet |> outputData.SortingSet) allowOverwrite
                 let! _ = host.ProjectDb.saveAsync qpReport (dtReport |> outputData.TextReport) allowOverwrite
 
-                ProjectOps.report progress (sprintf "Merge Complete: %s" %runId)
+                report progress (sprintf "Merge Complete: %s" %runId)
                 return runParameters.WithRunFinished (Some true)
 
             with e -> 

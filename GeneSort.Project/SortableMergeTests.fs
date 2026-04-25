@@ -9,6 +9,7 @@ open GeneSort.Runs
 open GeneSort.Db
 open GeneSort.FileDb
 open GeneSort.Model.Sortable
+open OpsUtils
 
 /// Host type to toggle between P1 (Testing) and P2 (Production) configurations
 type sortableMergeHost = 
@@ -127,7 +128,7 @@ module SortableMergeTests =
             try
                 let! _ = checkCancellation cts.Token
                 let runId = runParams |> RunParameters.getIdString
-                ProjectOps.report progress (sprintf "Starting Merge Generation Run %s" %runId)
+                report progress (sprintf "Starting Merge Generation Run %s" %runId)
 
                 // 2. Safe extraction (Via Host)
                 let! (sw, md, mft, sdf) = 

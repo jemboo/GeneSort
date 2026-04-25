@@ -14,6 +14,7 @@ open GeneSort.Model.Sorting.Sorter.Uf4
 open GeneSort.Model.Sorting.Sorter.Uf6
 open System
 open System.Threading
+open OpsUtils
 
 type randomSortersHost = 
     private { 
@@ -185,7 +186,7 @@ module RandomSorters =
                 let! _ = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
-                ProjectOps.report progress (sprintf "%s Starting Random Generation %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
+                report progress (sprintf "%s Starting Random Generation %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
 
                 // 2. Safe Parameter Extraction (Via Host)
                 let! (smt, sw, sl, cl, sc) = 
@@ -203,7 +204,7 @@ module RandomSorters =
                 // 4. Save (Using the host's DB connection)
                 let! _ = host.ProjectDb.saveAsync qpSortingSet (sortingSet |> outputData.SortingSet) allowOverwrite
             
-                ProjectOps.report progress (sprintf "Saved SortingSet %s for run: %s" (%qpSortingSet.Id.ToString()) %runId)
+                report progress (sprintf "Saved SortingSet %s for run: %s" (%qpSortingSet.Id.ToString()) %runId)
 
                 return runParameters.WithRunFinished (Some true)
 

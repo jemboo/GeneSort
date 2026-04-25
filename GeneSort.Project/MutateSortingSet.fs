@@ -15,6 +15,7 @@ open GeneSort.Model.Sorting.ModelParams
 open GeneSort.SortingResults
 open GeneSort.SortingResults.Bins
 open GeneSort.FileDb
+open OpsUtils
 
 type mutateSortingSetHost = 
     private { 
@@ -162,7 +163,7 @@ module MutateSortingSet =
                 let! _ = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
-                ProjectOps.report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
+                report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
 
                 // 2. Domain Parameter Extraction (Via Host)
                 let! (sorterModelType, sortingWidth, sortableDataFormat, mutationRate) = 

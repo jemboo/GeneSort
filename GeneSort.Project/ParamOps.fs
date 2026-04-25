@@ -7,7 +7,7 @@ open GeneSort.Runs
 open GeneSort.Core
 open OpsUtils
 
-module ProjectOps =
+module ParamOps =
 
 
     let makeErrorTable (failures: (runParameters * string) list) : string [] =
@@ -224,7 +224,6 @@ module ProjectOps =
                 report progress errorMsg
                 return Error errorMsg
         }
-
 
 
     let printRunParamsTable

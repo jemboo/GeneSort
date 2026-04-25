@@ -17,6 +17,7 @@ open GeneSort.Model.Sorting.ModelParams
 open GeneSort.SortingResults
 open GeneSort.SortingResults.Bins
 open GeneSort.FileDb
+open OpsUtils
 
 
 type fullBoolMutateHost = 
@@ -141,7 +142,7 @@ module FullBoolMutate =
                 let! _ = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
-                ProjectOps.report progress (sprintf "%s Starting FullBoolMutate Run %s" (MathUtils.getTimestampString()) %runId)
+                report progress (sprintf "%s Starting FullBoolMutate Run %s" (MathUtils.getTimestampString()) %runId)
 
                 // 1. Extract Parameters via Host
                 let! (smt, sw, sdt, mr) = host.ExtractDomainParams runParameters 

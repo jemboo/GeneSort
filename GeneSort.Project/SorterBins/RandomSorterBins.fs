@@ -19,6 +19,7 @@ open GeneSort.SortingResults
 open GeneSort.SortingResults.Bins
 open GeneSort.Project
 open GeneSort.FileDb
+open GeneSort.Project.OpsUtils
 
 /// Host type for RandomSorterBins to manage environment-specific spans and filtering
 type randomSorterBinsHost = 
@@ -142,32 +143,37 @@ module RandomSorterBins =
                 let! _ = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
-                ProjectOps.report progress (sprintf "%s Starting Run %s" (MathUtils.getTimestampString()) %runId)
+                report progress (sprintf "%s Starting Run %s" (MathUtils.getTimestampString()) %runId)
 
-                let! (smt, sw, sl, cl, sc, sdt) = 
-                    host.ExtractDomainParams runParameters |> Result.ofOption "Missing parameters"
+                let! (  sorterModelType, 
+                        sortingWidth, 
+                        stageLength, 
+                        ceLength, 
+                        sorterCount, 
+                        sortableDataFormat) = host.ExtractDomainParams runParameters 
+                                              |> Result.ofOption "Missing parameters"
 
                 // 3. Create sorting set
-                let smGen =
-                    match smt with
-                    | sorterModelType.Msce -> msceRandGen.create rngFactory sw excludeSelfCe cl |> sorterModelGen.SmmMsceRandGen
-                    | sorterModelType.Mssi -> mssiRandGen.create rngFactory sw sl |> sorterModelGen.SmmMssiRandGen
-                    | sorterModelType.Msrs -> msrsRandGen.create rngFactory sw (OpsGenRatesArray.createUniform %sl) |> sorterModelGen.SmmMsrsRandGen
-                    | sorterModelType.Msuf4 -> msuf4RandGen.create rngFactory sw sl (Uf4GenRatesArray.createUniform %sl %sw) |> sorterModelGen.SmmMsuf4RandGen
-                    | sorterModelType.Msuf6 -> msuf6RandGen.create rngFactory sw sl (Uf6GenRatesArray.createUniform %sl %sw) |> sorterModelGen.SmmMsuf6RandGen
+                let sorterModelGen =
+                    match sorterModelType with
+                    | sorterModelType.Msce -> msceRandGen.create rngFactory sortingWidth excludeSelfCe ceLength |> sorterModelGen.SmmMsceRandGen
+                    | sorterModelType.Mssi -> mssiRandGen.create rngFactory sortingWidth stageLength |> sorterModelGen.SmmMssiRandGen
+                    | sorterModelType.Msrs -> msrsRandGen.create rngFactory sortingWidth (OpsGenRatesArray.createUniform %stageLength) |> sorterModelGen.SmmMsrsRandGen
+                    | sorterModelType.Msuf4 -> msuf4RandGen.create rngFactory sortingWidth stageLength (Uf4GenRatesArray.createUniform %stageLength %sortingWidth) |> sorterModelGen.SmmMsuf4RandGen
+                    | sorterModelType.Msuf6 -> msuf6RandGen.create rngFactory sortingWidth stageLength (Uf6GenRatesArray.createUniform %stageLength %sortingWidth) |> sorterModelGen.SmmMsuf6RandGen
                     | _ -> failwith "Unsupported model type"
 
-                let firstIdx = (%repl * %sc) |> UMX.tag<sorterCount>
-                let genSeg = sortingGenSegment.create (smGen |> sortingGen.Single) firstIdx sc
+                let firstIdx = (%repl * %sorterCount) |> UMX.tag<sorterCount>
+                let genSeg = sortingGenSegment.create (sorterModelGen |> sortingGen.Single) firstIdx sorterCount
                 let qpFullSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "") 
                 let fullSortingSet = genSeg.MakeSortingSet (%qpFullSet.Id |> UMX.tag)
                 let fullSorterSet = fullSortingSet |> SortingSet.makeSorterSet
 
                 // 4. Create tests
                 let! _ = checkCancellation cts.Token
-                let testModel = msasF.create sw |> sortableTestModel.MsasF
+                let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 let qpTests = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTest "")
-                let tests = SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel sdt
+                let tests = SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel sortableDataFormat
 
                 // 5. Evaluate
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")

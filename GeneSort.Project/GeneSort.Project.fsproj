@@ -11,6 +11,8 @@
 
   <ItemGroup>
     <Compile Include="ProgressMessage.fs" />
+    <Compile Include="OpsUtils.fs" />
+    <Compile Include="ParamOps.fs" />
     <Compile Include="ProjectOps.fs" />
     <Compile Include="TextReporters.fs" />
     <Compile Include="RandomSorters.fs" />

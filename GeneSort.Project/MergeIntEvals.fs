@@ -10,6 +10,7 @@ open GeneSort.Db
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting
 open GeneSort.FileDb
+open OpsUtils
 
 /// Host type for MergeIntEvals to swap between Testing (P1) and Production (P2)
 type mergeIntEvalsHost = 
@@ -141,7 +142,7 @@ module MergeIntEvals =
                 let startTime = DateTime.Now
                 let! _ = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
-                ProjectOps.report progress (sprintf "%s Starting Run %s" (MathUtils.getTimestampString()) runId)
+                report progress (sprintf "%s Starting Run %s" (MathUtils.getTimestampString()) runId)
 
                 // 2. Safe Param Extraction (Via Host)
                 let! (repl, sw, md, mst, sdf, smt) = 

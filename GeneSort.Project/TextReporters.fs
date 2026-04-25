@@ -11,6 +11,7 @@ open ProjectOps
 open GeneSort.Model.Sorting
 open GeneSort.SortingResults
 open GeneSort.SortingResults.Bins
+open OpsUtils
 
 module TextReporters =
 
