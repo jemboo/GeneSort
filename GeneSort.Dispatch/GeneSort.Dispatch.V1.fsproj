@@ -7,6 +7,11 @@
 
   <ItemGroup>
     <Compile Include="BitonicSort.fs" />
+    <Compile Include="RunResult.fs" />
+    <Compile Include="ProgressMessage.fs" />
+    <Compile Include="OpsUtils.fs" />
+    <Compile Include="ParamOps.fs" />
+    <Compile Include="ProjectOps.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
