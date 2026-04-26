@@ -10,6 +10,7 @@ open MessagePack.Resolvers
 open GeneSort.Core
 open GeneSort.Db.V1
 open GeneSort.Project.V1
+open GeneSort.Eval.V1.Bins
 //open GeneSort.Model.Mp.Sortable
 open GeneSort.Sorting.Mp.Sorter
 open GeneSort.Sorting.Mp.Sortable
@@ -23,8 +24,10 @@ open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting
 //open GeneSort.Model.Mp.Sorting
-open GeneSort.SortingResults.Bins
+//open GeneSort.SortingResults.Bins
 open GeneSort.SortingResults
+open GeneSort.Project.Mp.V1
+open GeneSort.Eval.Mp.V1
 //open GeneSort.SortingResults.Mp.Bins
 
 [<Measure>] type fullPathToFolder
@@ -83,58 +86,68 @@ module OutputDataFile =
                 let! domainData =
                     match queryParams.OutputDataType with
                     | outputDataType.MutationSegmentEvalBinsSet _ ->
-                        async {
-                            let! domain = deserializeDto<mutationSegmentEvalBinsSetDto, mutationSegmentEvalBinsSet> stream token MutationSegmentEvalBinsSetDto.toDomain
-                            return outputData.MutationSegmentEvalBinsSet domain
-                        }
+                        failwith "Not implemented: SorterSet deserialization"
+                        //async {
+                        //    let! domain = deserializeDto<mutationSegmentEvalBinsSetDto, mutationSegmentEvalBinsSet> stream token MutationSegmentEvalBinsSetDto.toDomain
+                        //    return outputData.MutationSegmentEvalBinsSet domain
+                        //}
                     | outputDataType.RunParameters ->
-                        async {
-                            let! domain = deserializeDto<runParametersDto, runParameters> stream token RunParametersDto.toDomain
-                            return outputData.RunParameters domain
-                        }
+                        failwith "Not implemented: SorterSet deserialization"
+                        //async {
+                        //    let! domain = deserializeDto<runParametersDto, runParameters> stream token RunParametersDto.toDomain
+                        //    return outputData.RunParameters domain
+                        //}
                     | outputDataType.SorterSet _ ->
-                        async {
-                            let! domain = deserializeDto<sorterSetDto, sorterSet> stream token SorterSetDto.toDomain
-                            return outputData.SorterSet domain
-                        }
+                        failwith "Not implemented: SorterSet deserialization"
+                        //async {
+                        //    let! domain = deserializeDto<sorterSetDto, sorterSet> stream token SorterSetDto.toDomain
+                        //    return outputData.SorterSet domain
+                        //}
                     | outputDataType.SortableTestSet _ ->
-                        async {
-                            let! domain = deserializeDto<sortableTestSetDto, sortableTestSet> stream token SortableTestSetDto.toDomain
-                            return outputData.SortableTestSet domain
-                        }
+                        failwith "Not implemented: SorterSet deserialization"
+                        //async {
+                        //    let! domain = deserializeDto<sortableTestSetDto, sortableTestSet> stream token SortableTestSetDto.toDomain
+                        //    return outputData.SortableTestSet domain
+                        //}
                     | outputDataType.SortableTest _ ->
-                        async {
-                            let! domain = deserializeDto<sortableTestDto, sortableTest> stream token SortableTestDto.toDomain
-                            return outputData.SortableTest domain
-                        }
+                        failwith "Not implemented: SorterSet deserialization"
+                        //async {
+                        //    let! domain = deserializeDto<sortableTestDto, sortableTest> stream token SortableTestDto.toDomain
+                        //    return outputData.SortableTest domain
+                        //}
                     | outputDataType.SortingSet _ ->
-                        async {
-                            let! domain = deserializeDto<sortingSetDto, sortingSet> stream token SortingSetDto.toDomain
-                            return outputData.SortingSet domain
-                        }
+                        failwith "Not implemented: SorterSet deserialization"
+                        //async {
+                        //    let! domain = deserializeDto<sortingSetDto, sortingSet> stream token SortingSetDto.toDomain
+                        //    return outputData.SortingSet domain
+                        //}
                     | outputDataType.SorterModelSetGen _ ->
-                        async {
-                            let! domain = deserializeDto<sortingSetGenDto, sortingGenSegment> stream token SortingSetGenDto.toDomain
-                            return outputData.SortingSetGen domain
-                        }
+                        failwith "Not implemented: SorterSet deserialization"
+                        //async {
+                        //    let! domain = deserializeDto<sortingSetGenDto, sortingGenSegment> stream token SortingSetGenDto.toDomain
+                        //    return outputData.SortingSetGen domain
+                        //}
                     | outputDataType.SortableTestModelSet _ ->
-                        async {
-                            let! domain = deserializeDto<sortableTestModelSetDto, sortableTestModelSet> stream token SortableTestModelSetDto.toDomain
-                            return outputData.SortableTestModelSet domain
-                        }
+                        failwith "Not implemented: SorterSet deserialization"
+                        //async {
+                        //    let! domain = deserializeDto<sortableTestModelSetDto, sortableTestModelSet> stream token SortableTestModelSetDto.toDomain
+                        //    return outputData.SortableTestModelSet domain
+                        //}
                     | outputDataType.SortableTestModelSetGen _ ->
-                        async {
-                            let! domain = deserializeDto<sortableTestModelSetGenDto, sortableTestModelSetGen> stream token SortableTestModelSetGenDto.toDomain
-                            return outputData.SortableTestModelSetGen domain
-                        }
+                        failwith "Not implemented: SorterSet deserialization"
+                        //async {
+                        //    let! domain = deserializeDto<sortableTestModelSetGenDto, sortableTestModelSetGen> stream token SortableTestModelSetGenDto.toDomain
+                        //    return outputData.SortableTestModelSetGen domain
+                        //}
                     | outputDataType.SorterSetEval _ ->
-                        async {
-                            let! domain = deserializeDto<sorterModelSetEvalDto, sorterSetEval> stream token SorterSetEvalDto.toDomain
-                            return outputData.SorterSetEval domain
-                        }
+                        failwith "Not implemented: SorterSet deserialization"
+                        //async {
+                        //    let! domain = deserializeDto<sorterModelSetEvalDto, sorterSetEval> stream token SorterSetEvalDto.toDomain
+                        //    return outputData.SorterSetEval domain
+                        //}
                     | outputDataType.SorterEvalBins _ ->
                         async {
-                            let! domain = deserializeDto<sorterEvalBinsDto, sorterEvalBins> stream token SorterEvalBinsDto.toDomain
+                            let! domain = deserializeDto<sorterEvalBinsDto, sorterEvalBins> stream token SorterEvalBinsDto.fromDto
                             return outputData.SorterEvalBins domain
                         }
                     | outputDataType.Project ->
@@ -143,11 +156,12 @@ module OutputDataFile =
                             return outputData.Project domain
                         }
                     | outputDataType.TextReport _ ->
-                        async {
-                            use reader = new StreamReader(stream, Encoding.UTF8)
-                            let! text = reader.ReadToEndAsync() |> Async.AwaitTask
-                            return outputData.TextReport (DataTableReport.create "" [||]) // Assume FromText; adjust if needed.
-                        }
+                        failwith "Not implemented: SorterSet deserialization"
+                        //async {
+                        //    use reader = new StreamReader(stream, Encoding.UTF8)
+                        //    let! text = reader.ReadToEndAsync() |> Async.AwaitTask
+                        //    return outputData.TextReport (DataTableReport.create "" [||]) // Assume FromText; adjust if needed.
+                        //}
                 return Ok domainData
             with
             | :? OperationCanceledException -> return Error "Operation cancelled"
@@ -185,37 +199,46 @@ module OutputDataFile =
                         use stream = new FileStream(%filePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync = true)
                         do!
                             match outputData with
-                            | outputData.MutationSegmentEvalBinsSet msr ->
-                                serializeDto stream msr MutationSegmentEvalBinsSetDto.fromDomain
+                            //| outputData.MutationSegmentEvalBinsSet msr ->
+                            //    failwith "Not implemented: SorterSetEval serialization"
+                            //   // serializeDto stream msr MutationSegmentEvalBinsSetDto.fromDomain
                             | outputData.RunParameters r ->
                                 serializeDto stream r RunParametersDto.fromDomain
-                            | outputData.SorterSet ss ->
-                                serializeDto stream ss SorterSetDto.fromDomain
-                            | outputData.SortableTestSet sts ->
-                                serializeDto stream sts SortableTestSetDto.fromDomain
-                            | outputData.SortableTest sts ->
-                                serializeDto stream sts SortableTestDto.fromDomain
-                            | outputData.SortingSet sms ->
-                                serializeDto stream sms SortingSetDto.fromDomain
-                            | outputData.SortingSetGen sms ->
-                               //serializeDto stream sms SorterModelSetGenDto.fromDomain
-                                failwith "Not implemented: SorterModelSetGen serialization"
-                            | outputData.SortableTestModelSet sts ->
-                                serializeDto stream sts SortableTestModelSetDto.fromDomain
-                            | outputData.SortableTestModelSetGen stsm ->
-                                serializeDto stream stsm SortableTestModelSetGenDto.fromDomain
-                            | outputData.SorterSetEval sse ->
-                                serializeDto stream sse SorterSetEvalDto.fromDomain
+                            //| outputData.SorterSet ss ->
+                            //    failwith "Not implemented: SorterSetEval serialization"
+                            //    //serializeDto stream ss SorterSetDto.fromDomain
+                            //| outputData.SortableTestSet sts ->
+                            //    failwith "Not implemented: SorterSetEval serialization"
+                            //    //serializeDto stream sts SortableTestSetDto.fromDomain
+                            //| outputData.SortableTest sts ->
+                            //    failwith "Not implemented: SorterSetEval serialization"
+                            //    ///serializeDto stream sts SortableTestDto.fromDomain
+                            //| outputData.SortingSet sms ->
+                            //    failwith "Not implemented: SorterSetEval serialization"
+                            //    //serializeDto stream sms SortingSetDto.fromDomain
+                            //| outputData.SortingSetGen sms ->
+                            //   //serializeDto stream sms SorterModelSetGenDto.fromDomain
+                            //    failwith "Not implemented: SorterModelSetGen serialization"
+                            //| outputData.SortableTestModelSet sts ->
+                            //    failwith "Not implemented: SorterSetEval serialization"
+                            //    //serializeDto stream sts SortableTestModelSetDto.fromDomain
+                            //| outputData.SortableTestModelSetGen stsm ->
+                            //    failwith "Not implemented: SorterSetEval serialization"
+                            //   // serializeDto stream stsm SortableTestModelSetGenDto.fromDomain
+                            //| outputData.SorterSetEval sse ->
+                            //    failwith "Not implemented: SorterSetEval serialization"
+                            //   // serializeDto stream sse SorterSetEvalDto.fromDomain
                             | outputData.SorterEvalBins sse ->
-                                serializeDto stream sse SorterEvalBinsDto.fromDomain
+                                serializeDto stream sse SorterEvalBinsDto.toDto
                             | outputData.Project p ->
                                 serializeDto stream p ProjectDto.fromDomain
-                            | outputData.TextReport dataTableReport ->
-                                async {
-                                    dataTableReport.SaveToStream stream
-                                    //let textBytes = Encoding.UTF8.GetBytes("")
-                                    //do! stream.WriteAsync(textBytes, 0, textBytes.Length) |> Async.AwaitTask
-                                }
+                            //| outputData.TextReport dataTableReport ->
+                            //    failwith "Not implemented: SorterSetEval serialization"
+                            //    //async {
+                            //    //    dataTableReport.SaveToStream stream
+                            //    //    //let textBytes = Encoding.UTF8.GetBytes("")
+                            //    //    //do! stream.WriteAsync(textBytes, 0, textBytes.Length) |> Async.AwaitTask
+                            //    //}
                         return Ok ()
                     with e -> return Error (sprintf "Error saving file %s: %s" %filePath e.Message)
         }
