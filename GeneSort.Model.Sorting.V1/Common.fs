@@ -52,7 +52,7 @@ type simpleSorterModelType =
     | Msuf6
 
 
-module SorterModelType =
+module SimpleSorterModelType =
 
     let toString (model:simpleSorterModelType) : string =
         match model with

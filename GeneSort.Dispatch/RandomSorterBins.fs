@@ -19,6 +19,7 @@ open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.FileDb.V1
 open OpsUtils
+open GeneSort.Model.Sorting.V1
 
 
 /// Host type for RandomSorterBins to manage environment-specific spans and filtering
@@ -37,7 +38,7 @@ type randomSorterBinsHost =
 
     member this.ExtractDomainParams (rp: runParameters) =
         maybe {
-            let! smk = rp.GetSorterModelType()
+            let! smk = rp.GetSimpleSorterModelType()
             let! sw = rp.GetSortingWidth()
             let! sl = rp.GetStageLength()
             let! cl = rp.GetCeLength()
@@ -68,17 +69,17 @@ module RandomSorterBins =
         |> UMX.tag
 
     let private sorterModelTypeForSortingWidth (rp: runParameters) =
-        let smt = rp.GetSorterModelType().Value
+        let smt = rp.GetSimpleSorterModelType().Value
         let sw = rp.GetSortingWidth().Value
         let has2factor = (%sw % 2 = 0)
         let isMuf4able = (MathUtils.isAPowerOfTwo %sw)
         let isMuf6able = (%sw % 3 = 0) && (MathUtils.isAPowerOfTwo (%sw / 3))
 
         match smt with
-        | sorterModelType.Msce -> Some rp
-        | sorterModelType.Mssi | sorterModelType.Msrs -> if has2factor then Some rp else None
-        | sorterModelType.Msuf4 -> if isMuf4able then Some rp else None
-        | sorterModelType.Msuf6 -> if isMuf6able then Some rp else None
+        | simpleSorterModelType.Msce -> Some rp
+        | simpleSorterModelType.Mssi | simpleSorterModelType.Msrs -> if has2factor then Some rp else None
+        | simpleSorterModelType.Msuf4 -> if isMuf4able then Some rp else None
+        | simpleSorterModelType.Msuf6 -> if isMuf6able then Some rp else None
         | _ -> None
 
     let paramMapFilter (rp: runParameters) = 
@@ -89,7 +90,7 @@ module RandomSorterBins =
     module P1 =
         let spans = [
             (runParameters.sortingWidthKey, ["16"])
-            (runParameters.sorterModelTypeKey, [sorterModelType.Msce] |> List.map SorterModelType.toString)
+            (runParameters.simpleSorterModelTypeKey, [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
             (runParameters.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
             (runParameters.sorterCountKey, ["100"])
         ]
@@ -98,7 +99,7 @@ module RandomSorterBins =
     module P2 =
         let spans = [
             (runParameters.sortingWidthKey, [18; 20] |> List.map string)
-            (runParameters.sorterModelTypeKey, [sorterModelType.Msce; sorterModelType.Mssi; sorterModelType.Msrs; sorterModelType.Msuf4; sorterModelType.Msuf6] |> List.map SorterModelType.toString)
+            (runParameters.simpleSorterModelTypeKey, [sorterModelType.Msce; sorterModelType.Mssi; sorterModelType.Msrs; sorterModelType.Msuf4; sorterModelType.Msuf6] |> List.map SorterModelType.toString)
             (runParameters.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
             (runParameters.sorterCountKey, ["10000"])
         ]
@@ -109,14 +110,14 @@ module RandomSorterBins =
     let makeQueryParams repl sw smt outputDataType =
         queryParams.create (Some projectName) repl outputDataType
             [| (runParameters.sortingWidthKey, sw |> SortingWidth.toString); 
-               (runParameters.sorterModelTypeKey, smt |> Option.map SorterModelType.toString |> UmxExt.stringToString) |]
+               (runParameters.simpleSorterModelTypeKey, smt |> Option.map SimpleSorterModelType.toString |> UmxExt.stringToString) |]
 
     let makeQueryParamsFromRunParams (rp: runParameters) (odt: outputDataType) =
-        makeQueryParams (rp.GetRepl()) (rp.GetSortingWidth()) (rp.GetSorterModelType()) odt
+        makeQueryParams (rp.GetRepl()) (rp.GetSortingWidth()) (rp.GetSimpleSorterModelType()) odt
 
     let enhancer (rp : runParameters) : runParameters =
         let sw = rp.GetSortingWidth().Value
-        let smt = rp.GetSorterModelType().Value
+        let smt = rp.GetSimpleSorterModelType().Value
         let qp = makeQueryParamsFromRunParams rp (outputDataType.RunParameters)
         let sl = getStageLength sw
         let cl = sl |> StageLength.toCeLength sw
@@ -156,11 +157,11 @@ module RandomSorterBins =
                 // 3. Create sorting set
                 let sorterModelGen =
                     match sorterModelType with
-                    | sorterModelType.Msce -> msceRandGen.create rngFactory sortingWidth excludeSelfCe ceLength |> sorterModelGen.SmmMsceRandGen
-                    | sorterModelType.Mssi -> mssiRandGen.create rngFactory sortingWidth stageLength |> sorterModelGen.SmmMssiRandGen
-                    | sorterModelType.Msrs -> msrsRandGen.create rngFactory sortingWidth (OpsGenRatesArray.createUniform %stageLength) |> sorterModelGen.SmmMsrsRandGen
-                    | sorterModelType.Msuf4 -> msuf4RandGen.create rngFactory sortingWidth stageLength (Uf4GenRatesArray.createUniform %stageLength %sortingWidth) |> sorterModelGen.SmmMsuf4RandGen
-                    | sorterModelType.Msuf6 -> msuf6RandGen.create rngFactory sortingWidth stageLength (Uf6GenRatesArray.createUniform %stageLength %sortingWidth) |> sorterModelGen.SmmMsuf6RandGen
+                    | simpleSorterModelType.Msce -> msceRandGen.create rngFactory sortingWidth excludeSelfCe ceLength |> sorterModelGen.SmmMsceRandGen
+                    | simpleSorterModelType.Mssi -> mssiRandGen.create rngFactory sortingWidth stageLength |> sorterModelGen.SmmMssiRandGen
+                    | simpleSorterModelType.Msrs -> msrsRandGen.create rngFactory sortingWidth (OpsGenRatesArray.createUniform %stageLength) |> sorterModelGen.SmmMsrsRandGen
+                    | simpleSorterModelType.Msuf4 -> msuf4RandGen.create rngFactory sortingWidth stageLength (Uf4GenRatesArray.createUniform %stageLength %sortingWidth) |> sorterModelGen.SmmMsuf4RandGen
+                    | simpleSorterModelType.Msuf6 -> msuf6RandGen.create rngFactory sortingWidth stageLength (Uf6GenRatesArray.createUniform %stageLength %sortingWidth) |> sorterModelGen.SmmMsuf6RandGen
                     | _ -> failwith "Unsupported model type"
 
                 let firstIdx = (%repl * %sorterCount) |> UMX.tag<sorterCount>

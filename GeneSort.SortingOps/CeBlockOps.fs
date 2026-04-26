@@ -1,11 +1,6 @@
 ﻿namespace GeneSort.SortingOps
 
-open System
-open FSharp.UMX
 open GeneSort.Sorting.Sortable
-open System.Collections.Generic
-open System.Buffers    
-open GeneSort.Sorting
 
 
 

@@ -15,6 +15,7 @@ open GeneSort.Model.Sorting.ModelParams
 open GeneSort.FileDb
 open ParamOps
 open OpsUtils
+open GeneSort.SortingResults
 
 /// Host type for FullBoolEvals to manage environment configurations
 type fullBoolEvalsHost = 
@@ -148,7 +149,7 @@ module FullBoolEvals =
 
                 // 6. Make passing sorterSet
                 let qpPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Pass")
-                let passingSet = SorterSetEval.makePassingSortingSet (%qpPass.Id |> UMX.tag) sortingSet sorterSetEval
+                let passingSet = SortingEval.makePassingSortingSet (%qpPass.Id |> UMX.tag) sortingSet sorterSetEval
                 let! _ = host.ProjectDb.saveAsync qpPass (passingSet |> outputData.SortingSet) allowOverwrite
 
                 // 7. Success

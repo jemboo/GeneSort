@@ -215,13 +215,13 @@ module MutateSortingSet =
 
                 // 10. Extract the passing results
                 let qpParentPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Parent_Pass")
-                let sortingSetParentPass = SorterSetEval.makePassingSortingSet 
+                let sortingSetParentPass = SortingEval.makePassingSortingSet 
                                                             (%qpParentPass.Id |> UMX.tag) 
                                                             sortingSetParent 
                                                             sorterSetEvalParent
 
                 let qpMutantPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Mutant_Pass")
-                let sortingSetMutantPass = SorterSetEval.makePassingSortingSet (%qpMutantPass.Id |> UMX.tag) sortingSetMutant sorterSetEvalMutant
+                let sortingSetMutantPass = SortingEval.makePassingSortingSet (%qpMutantPass.Id |> UMX.tag) sortingSetMutant sorterSetEvalMutant
 
                 // 11. Make the evaluation bins
                 let qpBinsSet = makeQueryParamsFromRunParams runParameters (outputDataType.MutationSegmentEvalBinsSet "")

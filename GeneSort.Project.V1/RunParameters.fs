@@ -5,7 +5,6 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
-open GeneSort.Model.Sorting
 
 
 type runParameters =
@@ -31,7 +30,7 @@ type runParameters =
     static member replSpanKey = "ReplSpan"
     static member runFinishedKey = "RunFinished"
     static member sorterCountKey = "SorterCount"
-    static member sorterModelTypeKey = "SorterModelType"
+    static member simpleSorterModelTypeKey = "SimpleSorterModelType"
     static member sortingWidthKey = "SortingWidth"
     static member sortableCountKey = "SortableCount"
     static member sortableDataFormatKey = "SortableDataFormat"
@@ -83,8 +82,8 @@ type runParameters =
     
     member this.GetTextReportName() = this.paramMap.TryFind runParameters.textReportNameKey |> Option.map UMX.tag<textReportName>
 
-    member this.GetSorterModelType() = 
-        this.paramMap.TryFind runParameters.sorterModelTypeKey |> Option.bind (fun v -> try Some (SorterModelType.fromString v) with _ -> None)
+    member this.GetSimpleSorterModelType() = 
+        this.paramMap.TryFind runParameters.simpleSorterModelTypeKey |> Option.bind (fun v -> try Some (SimpleSorterModelType.fromString v) with _ -> None)
 
 
     member this.GetSortableDataFormat() = 
@@ -146,8 +145,8 @@ type runParameters =
     member this.WithSorterCount(sc: int<sorterCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountKey (sc |> Option.map UmxExt.intToRaw) }
 
-    member this.WithSorterModelType(smt: sorterModelType option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterModelTypeKey (smt |> Option.map SorterModelType.toString) }
+    member this.WithSorterModelType(smt: simpleSorterModelType option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.simpleSorterModelTypeKey (smt |> Option.map SimpleSorterModelType.toString) }
 
     member this.WithSortingWidth(w: int<sortingWidth> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortingWidthKey (w |> Option.map UmxExt.intToRaw) }

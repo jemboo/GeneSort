@@ -11,6 +11,7 @@ open GeneSort.SortingOps
 open GeneSort.Model.Sorting
 open GeneSort.FileDb
 open OpsUtils
+open GeneSort.SortingResults
 
 /// Host type for MergeIntEvals to swap between Testing (P1) and Production (P2)
 type mergeIntEvalsHost = 
@@ -171,7 +172,7 @@ module MergeIntEvals =
                 let! _ = host.ProjectDb.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
                 let qpPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Pass")
-                let passSet = SorterSetEval.makePassingSortingSet (%qpPass.Id |> UMX.tag) sortingSet sorterSetEval
+                let passSet = SortingEval.makePassingSortingSet (%qpPass.Id |> UMX.tag) sortingSet sorterSetEval
                 let! _ = host.ProjectDb.saveAsync qpPass (passSet |> outputData.SortingSet) allowOverwrite
 
                 // 7. Success

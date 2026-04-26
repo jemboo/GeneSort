@@ -1,12 +1,9 @@
 ﻿namespace GeneSort.SortingOps
 
-open System
 open FSharp.UMX
-open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
-open GeneSort.Model.Sorting
 
 // This type represents the evaluation of a set of sorters (sorterSet) against a 
 // specific set of sortable tests (sortableTest).
@@ -68,28 +65,3 @@ module SorterSetEval =
                             ceBlockEval
                 )
         sorterSetEval.create sorterSetEvalId sorterSet.Id (sortableTest |> SortableTests.getId ) sorterEvals
-
-
-
-    /// For the sortingSet and its corresponding sorterSetEval, this creates a sortingSet 
-    /// that consists of all the sortings that produced sorters with an UnsortedCount = 0
-    let makePassingSortingSet
-            (id: Guid<sortingSetId>)
-            (sms: sortingSet)
-            (sorterSetEval: sorterSetEval) : sortingSet =
-        
-        // 1. Identify the IDs of the sorters that passed (UnsortedCount = 0)
-        let passingIds = 
-            sorterSetEval.SorterEvals 
-            |> Array.filter (fun se -> se.CeBlockEval.UnsortedCount = 0<sortableCount>)
-            |> Array.map (fun se -> se.SorterId)
-
-        // 2. Filter the original sorter collection based on the passing IDs
-        let passingSorterModels = 
-            sms.Sortings 
-            |> Array.filter (fun stm -> Sorting.containsAnySorter passingIds stm)
-
-        sortingSet.create 
-            id
-            passingSorterModels
-
