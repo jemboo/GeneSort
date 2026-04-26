@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Eval.Project.Mp.V1
+﻿namespace GeneSort.Eval.Mp.V1
 
 open System
 open MessagePack
@@ -9,7 +9,7 @@ open GeneSort.Eval.V1.Bins
 open GeneSort.SortingOps
 
 [<MessagePackObject>]
-type SorterScoreV1Dto = {
+type sorterScoreV1Dto = {
     [<Key(0)>] SorterId: Guid
     [<Key(1)>] UnsortedCount: int
     [<Key(2)>] UnsortedGroupCount: Nullable<int> 
@@ -17,9 +17,9 @@ type SorterScoreV1Dto = {
     [<Key(4)>] LastCeIndex: int
 }
 
-module SorterScoreV1Mapping =
+module SorterScoreV1Dto =
     
-    let toDto (domain: sorterScoreV1) : SorterScoreV1Dto =
+    let toDto (domain: sorterScoreV1) : sorterScoreV1Dto =
         {
             SorterId = UMX.untag domain.SorterId
             UnsortedCount = UMX.untag domain.UnsortedCount
@@ -31,7 +31,7 @@ module SorterScoreV1Mapping =
             LastCeIndex = UMX.untag domain.LastCeIndex
         }
 
-    let fromDto (dto: SorterScoreV1Dto) : sorterScoreV1 =
+    let fromDto (dto: sorterScoreV1Dto) : sorterScoreV1 =
         let groupCount = 
             if dto.UnsortedGroupCount.HasValue 
             then Some (UMX.tag<sortableCount> dto.UnsortedGroupCount.Value) 
@@ -46,18 +46,18 @@ module SorterScoreV1Mapping =
 
 
 [<MessagePackObject>]
-type SorterScoreDto = 
-    | [<Key(0)>] V1 of SorterScoreV1Dto
+type sorterScoreDto = 
+    | [<Key(0)>] V1 of sorterScoreV1Dto
     | [<Key(1)>] Unknown
 
-module SorterScoreMapping =
+module SorterScoreDto =
     
-    let toDto (score: sorterScore) : SorterScoreDto =
+    let toDto (score: sorterScore) : sorterScoreDto =
         match score with
-        | sorterScore.V1 v1 -> SorterScoreDto.V1 (SorterScoreV1Mapping.toDto v1)
-        | sorterScore.Unknown -> SorterScoreDto.Unknown
+        | sorterScore.V1 v1 -> sorterScoreDto.V1 (SorterScoreV1Dto.toDto v1)
+        | sorterScore.Unknown -> sorterScoreDto.Unknown
 
-    let fromDto (dto: SorterScoreDto) : sorterScore =
+    let fromDto (dto: sorterScoreDto) : sorterScore =
         match dto with
-        | SorterScoreDto.V1 v1Dto -> sorterScore.V1 (SorterScoreV1Mapping.fromDto v1Dto)
-        | SorterScoreDto.Unknown -> sorterScore.Unknown
+        | sorterScoreDto.V1 v1Dto -> sorterScore.V1 (SorterScoreV1Dto.fromDto v1Dto)
+        | sorterScoreDto.Unknown -> sorterScore.Unknown

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.FileDb
+﻿namespace GeneSort.FileDb.V1
 open System
 open System.IO
 open System.Text
@@ -8,23 +8,24 @@ open MessagePack
 open MessagePack.FSharp
 open MessagePack.Resolvers
 open GeneSort.Core
-open GeneSort.Db
-open GeneSort.Model.Mp.Sortable
+open GeneSort.Db.V1
+open GeneSort.Project.V1
+//open GeneSort.Model.Mp.Sortable
 open GeneSort.Sorting.Mp.Sorter
 open GeneSort.Sorting.Mp.Sortable
-open GeneSort.SortingResults.Mp
+//open GeneSort.SortingResults.Mp
 open GeneSort.SortingOps.Mp
-open GeneSort.Runs
-open GeneSort.Runs.Mp
+//open GeneSort.Runs
+//open GeneSort.Runs.Mp
 open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
 open GeneSort.Model.Sortable
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting
-open GeneSort.Model.Mp.Sorting
+//open GeneSort.Model.Mp.Sorting
 open GeneSort.SortingResults.Bins
 open GeneSort.SortingResults
-open GeneSort.SortingResults.Mp.Bins
+//open GeneSort.SortingResults.Mp.Bins
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder

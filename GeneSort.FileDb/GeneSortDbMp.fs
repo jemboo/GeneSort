@@ -5,7 +5,6 @@ open System.Threading
 open FSharp.UMX
 open GeneSort.Db
 open GeneSort.Runs
-open GeneSort.Project
 
 type private DbMessage =
     | Save of string<pathToProjectFolder> * queryParams * outputData * bool<allowOverwrite> * AsyncReplyChannel<Result<unit, string>>
