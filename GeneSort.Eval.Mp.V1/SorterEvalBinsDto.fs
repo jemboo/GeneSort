@@ -48,7 +48,7 @@ module SorterEvalBinsDto =
             |> Map.ofArray
 
 
-        sorterEvalBinsV1.create 
+        sorterEvalBinsV1.createFromMap 
             (UMX.tag<sorterEvalBinsId> dto.SorterEvalBinsId) 
             (UMX.tag<sortableTestId> dto.SortableTestId) 
             binMap

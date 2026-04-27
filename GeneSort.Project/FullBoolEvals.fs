@@ -117,7 +117,7 @@ module FullBoolEvals =
         asyncResult {
             try
                 // 1. Setup
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
                 report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
@@ -135,7 +135,7 @@ module FullBoolEvals =
                 let! sortingSet = dbRandomSorters.loadAsync qpSortingSet |> AsyncResult.bindResult OutputData.asSortingSet
 
                 // 4. Perform Computation
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 let qpSortableTests = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTest "")
                 let sortableTests = SortableTestModel.makeSortableTest (%qpSortableTests.Id |> UMX.tag) sortableTestModel sortableDataFormat
@@ -145,17 +145,17 @@ module FullBoolEvals =
                 let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) sorterSet sortableTests false
 
                 // 5. Save Eval Results
-                let! _ = host.ProjectDb.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
                 // 6. Make passing sorterSet
                 let qpPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Pass")
                 let passingSet = SortingEval.makePassingSortingSet (%qpPass.Id |> UMX.tag) sortingSet sorterSetEval
-                let! _ = host.ProjectDb.saveAsync qpPass (passingSet |> outputData.SortingSet) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpPass (passingSet |> outputData.SortingSet) allowOverwrite
 
                 // 7. Success
                 return runParameters.WithRunFinished (Some true)
 
-            with e ->
+            with (e: exn) ->
                 let rawId = runParameters |> RunParameters.getIdString
                 return! Error (sprintf "Execution exception in Run %s: %s" rawId e.Message) |> async.Return
         }

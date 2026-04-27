@@ -3,7 +3,6 @@
 open System
 open System.Threading
 open FSharp.UMX
-open GeneSort.Db
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.Db.V1
@@ -54,7 +53,7 @@ module OpsUtils =
             try
                 report progress (sprintf "Displaying Source Table for %s\n" %db.projectName)
 
-                let! runParametersArray = 
+                let! (runParametersArray: runParameters array) = 
                     db.getProjectRunParametersForReplRangeAsync (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
 
                 if runParametersArray.Length = 0 then

@@ -129,7 +129,7 @@ module MergeRandomSorterBins =
 
         asyncResult {
             try
-                let! _ = checkCancellation cts.Token
+                let! (_:unit) = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let! (sorterModelType, sortingWidth, srp, rsp) = host.ExtractDomainParams runParameters |> Result.ofOption "Missing parameters"
                 
@@ -204,15 +204,15 @@ module MergeRandomSorterBins =
                 dtReport.AppendDataRows (rows |> Array.toSeq)
 
                 // 6. Save results
-                let! _ = host.ProjectDb.saveAsync qpBins (mBins |> outputData.SorterEvalBins) allowOverwrite
-                let! _ = host.ProjectDb.saveAsync qpEven (mEven |> outputData.SortingSet) allowOverwrite
-                let! _ = host.ProjectDb.saveAsync qpHull (hullSet |> outputData.SortingSet) allowOverwrite
-                let! _ = host.ProjectDb.saveAsync qpCenter (mCenter |> outputData.SortingSet) allowOverwrite
-                let! _ = host.ProjectDb.saveAsync qpWinning (mWinning |> outputData.SortingSet) allowOverwrite
-                let! _ = host.ProjectDb.saveAsync qpReport (dtReport |> outputData.TextReport) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpBins (mBins |> outputData.SorterEvalBins) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpEven (mEven |> outputData.SortingSet) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpHull (hullSet |> outputData.SortingSet) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpCenter (mCenter |> outputData.SortingSet) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpWinning (mWinning |> outputData.SortingSet) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpReport (dtReport |> outputData.TextReport) allowOverwrite
 
                 return runParameters.WithRunFinished (Some true)
 
-            with e -> 
+            with (e: exn) -> 
                 return! Error (sprintf "Merge failure for %s: %s" (runParameters |> RunParameters.getIdString) e.Message) |> async.Return
         }

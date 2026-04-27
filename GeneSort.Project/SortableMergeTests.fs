@@ -126,7 +126,7 @@ module SortableMergeTests =
 
         asyncResult {
             try
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let runId = runParams |> RunParameters.getIdString
                 report progress (sprintf "Starting Merge Generation Run %s" %runId)
 
@@ -142,12 +142,12 @@ module SortableMergeTests =
                 let sortableTests = SortableTestModel.makeSortableTest (%qpForSortableTest.Id |> UMX.tag) sortableTestModel sdf
 
                 // 4. Save (Using Host DB)
-                let! _ = checkCancellation cts.Token
-                let! _ = host.ProjectDb.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
+                let! (_: unit) = checkCancellation cts.Token
+                let! (_: unit) = host.ProjectDb.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
 
                 return runParams.WithRunFinished (Some true)
 
-            with e ->
+            with (e: exn) ->
                 let runId = runParams |> RunParameters.getIdString
                 return! Error (sprintf "Fatal error in Generation Run %s: %s" runId e.Message)
         }

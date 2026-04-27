@@ -135,7 +135,7 @@ module MergeRandomMergeSorterBins =
         asyncResult {
             try
                 // 1. Setup & Initial Reporting
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
                 report progress (sprintf "%s Starting Merge Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
@@ -232,17 +232,17 @@ module MergeRandomMergeSorterBins =
                 dtReport.AppendDataRows (rows |> Array.toSeq)
 
                 // 9. Persist to DB (Using the project-specific DB provided in the call)
-                let! _ = host.ProjectDb.saveAsync qpEvalBins (mergedEvalBins |> outputData.SorterEvalBins) allowOverwrite
-                let! _ = host.ProjectDb.saveAsync qpEvenSet (mergedEvenSet |> outputData.SortingSet) allowOverwrite
-                let! _ = host.ProjectDb.saveAsync qpCenterSet (mergedCenterSet |> outputData.SortingSet) allowOverwrite
-                let! _ = host.ProjectDb.saveAsync qpWinningSet (mergedWinningSet |> outputData.SortingSet) allowOverwrite
-                let! _ = host.ProjectDb.saveAsync qpHullSet (hullSampledSet |> outputData.SortingSet) allowOverwrite
-                let! _ = host.ProjectDb.saveAsync qpReport (dtReport |> outputData.TextReport) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpEvalBins (mergedEvalBins |> outputData.SorterEvalBins) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpEvenSet (mergedEvenSet |> outputData.SortingSet) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpCenterSet (mergedCenterSet |> outputData.SortingSet) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpWinningSet (mergedWinningSet |> outputData.SortingSet) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpHullSet (hullSampledSet |> outputData.SortingSet) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpReport (dtReport |> outputData.TextReport) allowOverwrite
 
                 report progress (sprintf "Merge Complete: %s" %runId)
                 return runParameters.WithRunFinished (Some true)
 
-            with e -> 
+            with (e: exn) -> 
                 let runId = runParameters |> RunParameters.getIdString
                 return! Error (sprintf "Unexpected error in run %s: %s" runId e.Message) |> async.Return
         }

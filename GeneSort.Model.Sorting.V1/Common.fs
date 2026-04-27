@@ -6,6 +6,7 @@ open GeneSort.Core
 
 
 [<Measure>] type sorterModelId
+[<Measure>] type sorterModelSetId
 [<Measure>] type sorterPairModelId
 [<Measure>] type sorterModelGenId
 [<Measure>] type sorterModelMutatorId
@@ -41,35 +42,3 @@ module CommonMutator =
             "SorterModel" :> obj
             index :> obj
         ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
-
-
-        
-type simpleSorterModelType = 
-    | Msce
-    | Mssi
-    | Msrs
-    | Msuf4
-    | Msuf6
-
-
-module SimpleSorterModelType =
-
-    let toString (model:simpleSorterModelType) : string =
-        match model with
-        | Msce -> "Msce"
-        | Mssi -> "Mssi"
-        | Msrs -> "Msrs"
-        | Msuf4 -> "Msuf4"
-        | Msuf6 -> "Msuf6"
-
-    let fromString (s:string) : simpleSorterModelType =
-        match s with
-        | "Msce" -> Msce
-        | "Mssi" -> Mssi
-        | "Msrs" -> Msrs
-        | "Msuf4" -> Msuf4
-        | "Msuf6" -> Msuf6
-        | _ -> failwithf "Unknown SorterModelType: %s" s
-
-    let all () : simpleSorterModelType list =
-        [ Msce; Mssi; Msrs; Msuf4; Msuf6 ]

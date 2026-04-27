@@ -5,21 +5,15 @@ open System.Threading
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Model.Sorting.Sorter.Ce
-open GeneSort.Model.Sorting.Sorter.Si
-open GeneSort.Model.Sorting.Sorter.Uf4
-open GeneSort.Model.Sorting.Sorter.Rs
-open GeneSort.Model.Sorting.Sorter.Uf6
-open GeneSort.Model.Sorting
-open GeneSort.Model.Sortable
 open GeneSort.SortingOps
-open GeneSort.SortingResults
-open GeneSort.SortingResults.Bins
 open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.FileDb.V1
 open OpsUtils
 open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sorting.Simple.V1
+open GeneSort.Model.Sortable.V1
+open GeneSort.Eval.V1.Bins
 
 
 /// Host type for RandomSorterBins to manage environment-specific spans and filtering
@@ -41,10 +35,9 @@ type randomSorterBinsHost =
             let! smk = rp.GetSimpleSorterModelType()
             let! sw = rp.GetSortingWidth()
             let! sl = rp.GetStageLength()
-            let! cl = rp.GetCeLength()
             let! sc = rp.GetSorterCount()
             let! sdt = rp.GetSortableDataFormat()
-            return (smk, sw, sl, cl, sc, sdt)
+            return (smk, sw, sl, sc, sdt)
         }
 
 module RandomSorterBins =
@@ -99,7 +92,13 @@ module RandomSorterBins =
     module P2 =
         let spans = [
             (runParameters.sortingWidthKey, [18; 20] |> List.map string)
-            (runParameters.simpleSorterModelTypeKey, [sorterModelType.Msce; sorterModelType.Mssi; sorterModelType.Msrs; sorterModelType.Msuf4; sorterModelType.Msuf6] |> List.map SorterModelType.toString)
+            (runParameters.simpleSorterModelTypeKey, 
+                        [simpleSorterModelType.Msce; 
+                        simpleSorterModelType.Mssi; 
+                        simpleSorterModelType.Msrs; 
+                        simpleSorterModelType.Msuf4; 
+                        simpleSorterModelType.Msuf6] 
+                        |> List.map SimpleSorterModelType.toString)
             (runParameters.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
             (runParameters.sorterCountKey, ["10000"])
         ]
@@ -141,7 +140,7 @@ module RandomSorterBins =
 
         asyncResult {
             try
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
                 report progress (sprintf "%s Starting Run %s" (MathUtils.getTimestampString()) %runId)
@@ -149,51 +148,48 @@ module RandomSorterBins =
                 let! (  sorterModelType, 
                         sortingWidth, 
                         stageLength, 
-                        ceLength, 
                         sorterCount, 
                         sortableDataFormat) = host.ExtractDomainParams runParameters 
                                               |> Result.ofOption "Missing parameters"
 
                 // 3. Create sorting set
-                let sorterModelGen =
-                    match sorterModelType with
-                    | simpleSorterModelType.Msce -> msceRandGen.create rngFactory sortingWidth excludeSelfCe ceLength |> sorterModelGen.SmmMsceRandGen
-                    | simpleSorterModelType.Mssi -> mssiRandGen.create rngFactory sortingWidth stageLength |> sorterModelGen.SmmMssiRandGen
-                    | simpleSorterModelType.Msrs -> msrsRandGen.create rngFactory sortingWidth (OpsGenRatesArray.createUniform %stageLength) |> sorterModelGen.SmmMsrsRandGen
-                    | simpleSorterModelType.Msuf4 -> msuf4RandGen.create rngFactory sortingWidth stageLength (Uf4GenRatesArray.createUniform %stageLength %sortingWidth) |> sorterModelGen.SmmMsuf4RandGen
-                    | simpleSorterModelType.Msuf6 -> msuf6RandGen.create rngFactory sortingWidth stageLength (Uf6GenRatesArray.createUniform %stageLength %sortingWidth) |> sorterModelGen.SmmMsuf6RandGen
-                    | _ -> failwith "Unsupported model type"
+                let sorterModelGen = SimpleSorterModelGen.makeUniform 
+                                        rngFactory 
+                                        sortingWidth 
+                                        stageLength 
+                                        sorterModelType
+                                     |> sorterModelGen.Simple
 
                 let firstIdx = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-                let genSeg = sortingGenSegment.create (sorterModelGen |> sortingGen.Single) firstIdx sorterCount
-                let qpFullSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "") 
-                let fullSortingSet = genSeg.MakeSortingSet (%qpFullSet.Id |> UMX.tag)
-                let fullSorterSet = fullSortingSet |> SortingSet.makeSorterSet
+
+
+
+
+                //let genSeg = sortingGenSegment.create (sorterModelGen |> sortingGen.Single) firstIdx sorterCount
+                let qpFullSet = makeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSet "") 
+                let sorterModelSet = sorterModelGen |> SorterModelGen.makeSorterModelSet (%qpFullSet.Id |> UMX.tag) firstIdx sorterCount
+                let fullSorterSet = SorterModelSet.makeSorterSet (%qpFullSet.Id |> UMX.tag) sorterModelSet
+                //let fullSorterSet = fullSortingSet |> SortingSet.makeSorterSet
 
                 // 4. Create tests
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 let qpTests = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTest "")
                 let tests = SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel sortableDataFormat
 
                 // 5. Evaluate
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
-                let eval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSet tests collectNewSortableTests
+                let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSet tests collectNewSortableTests
 
                 // 6. Binning and Sampling
                 let qpBins = makeQueryParamsFromRunParams runParameters (outputDataType.SorterEvalBins "")
-                let bins = sorterEvalBins.create (%qpBins.Id |> UMX.tag) eval.SorterEvals
-
-                let qpEven = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "EvenSampled")
-                let evenSet = sortingSet.create (%qpEven.Id |> UMX.tag) (SortingSetFilter.sampleBinsEvenly samplesPerBin bins fullSortingSet)
-
-                let qpHull = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "HullSampled")
-                let hullSet = sortingSet.create (%qpHull.Id |> UMX.tag) (SortingSetFilter.sampleBinsConvexHull samplesPerBin bins fullSortingSet)
+                let sorterEvalBins = sorterEvalBinsV1.createFromEvals (%qpBins.Id |> UMX.tag) (%qpTests.Id |> UMX.tag) sorterSetEval.SorterEvals
+                                     |> sorterEvalBins.V1
 
                 // 7. Save
-                //let! _ = host.ProjectDb.saveAsync qpBins (bins |> outputData.SorterEvalBins) allowOverwrite
-                //let! _ = host.ProjectDb.saveAsync qpEven (evenSet |> outputData.SortingSet) allowOverwrite
-                //let! _ = host.ProjectDb.saveAsync qpHull (hullSet |> outputData.SortingSet) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpBins (sorterEvalBins |> outputData.SorterEvalBins) allowOverwrite
+                //let! (_: unit) = host.ProjectDb.saveAsync qpEven (evenSet |> outputData.SortingSet) allowOverwrite
+                //let! (_: unit) = host.ProjectDb.saveAsync qpHull (hullSet |> outputData.SortingSet) allowOverwrite
 
                 return runParameters.WithRunFinished (Some true)
 

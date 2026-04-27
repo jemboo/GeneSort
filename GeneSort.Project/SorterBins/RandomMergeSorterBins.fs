@@ -175,7 +175,7 @@ module RandomMergeSorterBins =
 
         asyncResult {
             try
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
                 report progress (sprintf "%s Starting Run %s" (MathUtils.getTimestampString()) %runId)
@@ -204,7 +204,7 @@ module RandomMergeSorterBins =
                 let fullSorterSet = fullSortingSet |> SortingSet.makeSorterSet
 
                 // 4. Load external tests (Merge Tests)
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let qpTests = SortableMergeTests.makeQueryParams 
                                         (Some (0 |> UMX.tag)) 
                                         (Some sortingWidth) 
@@ -229,11 +229,11 @@ module RandomMergeSorterBins =
                 let evenSet = sortingSet.create (%qpEven.Id |> UMX.tag) (SortingSetFilter.sampleBinsEvenly samplesPerBin bins fullSortingSet)
 
                 // 7. Save
-                let! _ = host.ProjectDb.saveAsync qpBins (bins |> outputData.SorterEvalBins) allowOverwrite
-                let! _ = host.ProjectDb.saveAsync qpEven (evenSet |> outputData.SortingSet) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpBins (bins |> outputData.SorterEvalBins) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpEven (evenSet |> outputData.SortingSet) allowOverwrite
 
                 return runParameters.WithRunFinished (Some true)
 
-            with e -> 
+            with (e: exn) -> 
                 return! Error (sprintf "Error in %s: %s" (runParameters |> RunParameters.getIdString) e.Message) |> async.Return
         }

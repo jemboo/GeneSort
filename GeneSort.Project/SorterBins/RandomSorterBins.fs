@@ -140,7 +140,7 @@ module RandomSorterBins =
 
         asyncResult {
             try
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
                 report progress (sprintf "%s Starting Run %s" (MathUtils.getTimestampString()) %runId)
@@ -170,7 +170,7 @@ module RandomSorterBins =
                 let fullSorterSet = fullSortingSet |> SortingSet.makeSorterSet
 
                 // 4. Create tests
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 let qpTests = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTest "")
                 let tests = SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel sortableDataFormat
@@ -190,12 +190,12 @@ module RandomSorterBins =
                 let hullSet = sortingSet.create (%qpHull.Id |> UMX.tag) (SortingSetFilter.sampleBinsConvexHull samplesPerBin bins fullSortingSet)
 
                 // 7. Save
-                let! _ = host.ProjectDb.saveAsync qpBins (bins |> outputData.SorterEvalBins) allowOverwrite
-                let! _ = host.ProjectDb.saveAsync qpEven (evenSet |> outputData.SortingSet) allowOverwrite
-                let! _ = host.ProjectDb.saveAsync qpHull (hullSet |> outputData.SortingSet) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpBins (bins |> outputData.SorterEvalBins) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpEven (evenSet |> outputData.SortingSet) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpHull (hullSet |> outputData.SortingSet) allowOverwrite
 
                 return runParameters.WithRunFinished (Some true)
 
-            with e -> 
+            with (e: exn) -> 
                 return! Error (sprintf "Error in %s: %s" (runParameters |> RunParameters.getIdString) e.Message) |> async.Return
         }

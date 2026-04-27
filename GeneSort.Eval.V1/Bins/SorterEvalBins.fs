@@ -4,7 +4,6 @@ namespace GeneSort.Eval.V1.Bins
 open System
 open FSharp.UMX
 open GeneSort.Sorting
-open GeneSort.Eval.V1
 open GeneSort.SortingOps
 
 [<Measure>] type sorterEvalBinsId
@@ -23,7 +22,40 @@ type sorterEvalBinsV1 =
             sortableTestId = testId
         }
 
-    static member create 
+    static member createFromEvals 
+            (id: Guid<sorterEvalBinsId>) 
+            (testId: Guid<sortableTestId>)
+            (evals: sorterEval seq) =
+    
+        // Use a local mutable dictionary for O(1) lookups without thread contention
+        let dict = System.Collections.Generic.Dictionary<sorterEvalKey, ResizeArray<sorterScore>>()
+    
+        for eval in evals do
+            let key = SorterEvalKey.fromSorterEval eval
+            let score = SorterScore.fromSorterEval eval |> sorterScore.V1
+        
+            match dict.TryGetValue(key) with
+            | true, scores -> scores.Add(score)
+            | false, _ -> 
+                let scores = ResizeArray<sorterScore>()
+                scores.Add(score)
+                dict.[key] <- scores
+
+        // Convert to the immutable Map once at the end
+        let binMap = 
+            dict 
+            |> Seq.map (fun kvp -> 
+                kvp.Key, sorterEvalBinV1.createWithScores kvp.Value kvp.Key)
+            |> Map.ofSeq
+
+        { 
+            sorterEvalBinsId = id
+            bins = binMap
+            sortableTestId = testId
+        }
+
+
+    static member createFromMap 
             (id: Guid<sorterEvalBinsId>) 
             (testId: Guid<sortableTestId>)
             (bins: Map<sorterEvalKey, sorterEvalBinV1>) =

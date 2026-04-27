@@ -15,7 +15,7 @@ type msuf4RandGen =
           rngFactory: rngFactory
           sortingWidth: int<sortingWidth>
           stageLength: int<stageLength> 
-          genRates: uf4GenRates // Changed from uf4GenRatesArray
+          genRates: uf4GenRates
         } 
     with
     static member create 

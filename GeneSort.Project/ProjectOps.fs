@@ -38,7 +38,7 @@ module ProjectOps =
                 
                     // If main work succeeded, save the "Finished" status
                     let qp = buildQueryParams updatedParams outputDataType.RunParameters
-                    let! _ = 
+                    let! (_:unit) = 
                         db.saveAsync qp (updatedParams |> outputData.RunParameters) (true |> UMX.tag<allowOverwrite>)
                         |> AsyncResult.mapError (fun err -> sprintf "Work succeeded but failed to save status: %s" err)
 
@@ -154,7 +154,7 @@ module ProjectOps =
                 report progress (sprintf "%s Executing Runs for %s\n" (MathUtils.getTimestampString()) %projectName)
 
                 // 1. Load Parameters
-                let! runParametersArray = 
+                let! (runParametersArray: runParameters array) = 
                     db.getProjectRunParametersForReplRangeAsync (Some minRepl) (Some maxRepl) (Some cts.Token) progress
 
                 report progress (sprintf "Found %d runs to execute\n" runParametersArray.Length)
@@ -164,7 +164,7 @@ module ProjectOps =
                     return [||]
                 else
                     // 1. Run the sequence (returns Async<RunResult[]>)
-                    let! results = 
+                    let! (results: RunResult[]) = 
                         executeRunParametersSeq 
                             db maxDegreeOfParallelism executor 
                             runParametersArray buildQueryParams allowOverwrite cts progress

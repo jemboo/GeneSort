@@ -183,7 +183,7 @@ module RandomSorters =
 
         asyncResult {
             try
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
                 report progress (sprintf "%s Starting Random Generation %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
@@ -202,13 +202,13 @@ module RandomSorters =
                 let sortingSet = sortingSetGen.MakeSortingSet (%qpSortingSet.Id |> UMX.tag) 
 
                 // 4. Save (Using the host's DB connection)
-                let! _ = host.ProjectDb.saveAsync qpSortingSet (sortingSet |> outputData.SortingSet) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpSortingSet (sortingSet |> outputData.SortingSet) allowOverwrite
             
                 report progress (sprintf "Saved SortingSet %s for run: %s" (%qpSortingSet.Id.ToString()) %runId)
 
                 return runParameters.WithRunFinished (Some true)
 
-            with e -> 
+            with (e: exn) -> 
                 return! Error (sprintf "Unexpected error in run %s: %s" 
                         (runParameters |> RunParameters.getIdString) e.Message) 
                         |> async.Return

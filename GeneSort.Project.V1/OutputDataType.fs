@@ -9,6 +9,7 @@ type outputDataType =
     | MutationSegmentEvalBinsSet of string
     | Project
     | RunParameters
+    | SorterModelSet of string
     | SorterSet of string
     | SortableTest of string
     | SortableTestSet of string
@@ -38,6 +39,7 @@ module OutputDataType =
         | SortableTestModelSetGen s -> appendParam "SortableTestModelSetGen" s
         | SorterSetEval s -> appendParam "SorterSetEval" s
         | SorterEvalBins s -> appendParam "SorterEvalBins" s
+        | SorterModelSet s -> appendParam "SorterModelSet" s
         | TextReport s -> appendParam "Report\\TextReport" %s
 
     let fromFolderName (description: string) : outputDataType option =
@@ -55,6 +57,7 @@ module OutputDataType =
         | "SorterModelSetGen" -> Some (SorterModelSetGen param)
         | "SortableTestModelSet" -> Some (SortableTestModelSet param)
         | "SortableTestModelSetGen" -> Some (SortableTestModelSetGen param)
+        | "SorterModelSet" -> Some (SorterModelSet param)
         | "SorterSetEval" -> Some (SorterSetEval param)
         | "SorterEvalBins" -> Some (SorterEvalBins param)
         | "TextReport" -> Some (TextReport (param |> UMX.tag<textReportName>))

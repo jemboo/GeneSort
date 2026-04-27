@@ -99,7 +99,7 @@ module MutateSortingSet =
     let private saveResults (db: IGeneSortDb) allowOverwrite (results: (queryParams * outputData) list) =
         asyncResult {
             for (qp, data) in results do
-                let! _ = db.saveAsync qp data allowOverwrite
+                let! (_: unit) = db.saveAsync qp data allowOverwrite
                 ()
             return ()
         }
@@ -160,7 +160,7 @@ module MutateSortingSet =
         asyncResult {
             try
                 // 1. Setup & ID Extraction
-                let! _ = checkCancellation cts.Token
+                let! (_: unit)   = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
                 report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
@@ -178,7 +178,7 @@ module MutateSortingSet =
                 let sorterSetParent = sortingSetParent |> SortingSet.makeSorterSet
 
                 // 4. Create sortable tests
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 let qpSortableTests = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTest "")
                 let sortableTest = SortableTestModel.makeSortableTest (%qpSortableTests.Id |> UMX.tag) sortableTestModel sortableDataFormat
@@ -239,11 +239,11 @@ module MutateSortingSet =
                     qpMutantPass, (sortingSetMutantPass |> outputData.SortingSet)
                     qpBinsSet, (mutationSegmentEvalBinsSet |> outputData.MutationSegmentEvalBinsSet)
                 ]
-                let! _ = saveResults host.ProjectDb allowOverwrite resultsToSave
+                let! (_: unit) = saveResults host.ProjectDb allowOverwrite resultsToSave
 
                 return runParameters.WithRunFinished (Some true)
 
-            with e ->
+            with (e: exn) ->
                 let msg = sprintf "Execution exception in Run %s: %s" (runParameters |> RunParameters.getIdString) e.Message
                 return! async { return Error msg }
         }

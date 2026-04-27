@@ -67,7 +67,7 @@ module TextReporters =
             dtReport.AddErrors (makeErrorTable newFailures)
 
             let saveQp = buildQueryParams (runParamsArray.[0].WithRepl None) (outputDataType.TextReport (reportName |> UMX.tag))
-            let! _ = db.saveAsync saveQp (outputData.TextReport dtReport) allowOverwrite |> Async.map Ok
+            let! (_: unit) = db.saveAsync saveQp (outputData.TextReport dtReport) allowOverwrite
 
             report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %db.projectName)
             return ()
@@ -136,7 +136,7 @@ module TextReporters =
             dtReport.AddErrors (makeErrorTable newFailures)
 
             let saveQp = buildQueryParams (runParamsArray.[0].WithRepl None) (outputDataType.TextReport (reportName |> UMX.tag))
-            let! _ = db.saveAsync saveQp (outputData.TextReport dtReport) allowOverwrite |> Async.map Ok
+            let! (_:unit) = db.saveAsync saveQp (outputData.TextReport dtReport) allowOverwrite
 
             report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %db.projectName)
             return ()

@@ -14,13 +14,15 @@ type msrsRandGen =
         { 
               id : Guid<sorterModelGenId>
               rngFactory: rngFactory
-              opsGenRatesArray: opsGenRatesArray
+              opsGenRates: opsGenRates
               sortingWidth: int<sortingWidth> 
+              stageLength: int<stageLength>
         } 
     static member create 
             (rngFactory: rngFactory)
             (sortingWidth: int<sortingWidth>)
-            (opsGenRatesArray: opsGenRatesArray)
+            (opsGenRates: opsGenRates)
+            (stageLength: int<stageLength>)
             : msrsRandGen =
 
         if %sortingWidth < 2 then
@@ -30,22 +32,24 @@ type msrsRandGen =
                 "msrsRandGen" :> obj
                 rngFactory :> obj
                 sortingWidth :> obj
-                opsGenRatesArray.GetHashCode() :> obj
+                stageLength :> obj
+                opsGenRates.GetHashCode() :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelGenId>
 
         {
             id = id
             sortingWidth = sortingWidth
-            opsGenRatesArray = opsGenRatesArray
+            opsGenRates = opsGenRates
             rngFactory = rngFactory
+            stageLength = stageLength
         }
         
     member this.Id with get () = this.id
     member this.CeLength with get () = (this.SortingWidth * %this.StageLength / 2) |> UMX.tag<ceLength>
     member this.RngFactory with get () = this.rngFactory
-    member this.OpsGenRatesArray with get () = this.opsGenRatesArray
+    member this.OpsGenRates with get () = this.opsGenRates
     member this.SortingWidth with get () = this.sortingWidth
-    member this.StageLength with get () = this.opsGenRatesArray.Length
+    member this.StageLength with get () = this.StageLength
 
     override this.Equals(obj) = 
         match obj with
@@ -54,7 +58,7 @@ type msrsRandGen =
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.rngFactory, this.opsGenRatesArray, this.sortingWidth)
+        hash (this.rngFactory, this.opsGenRates, this.sortingWidth, this.stageLength)
 
     interface IEquatable<msrsRandGen> with
         member this.Equals(other) = 
@@ -67,15 +71,15 @@ type msrsRandGen =
 
     member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msrs =
         let rng = this.RngFactory.Create %id
-        let genRatesArray = this.OpsGenRatesArray
         let stageLength = %this.StageLength
         let sortingWidth = %this.SortingWidth
+        let opsGenRates = this.OpsGenRates
         let perm_Rss =
             [| for dex in 0 .. (stageLength - 1) ->
                 Perm_RsOps.makeRandomPerm_Rs
                     (rng.NextIndex)
                     (rng.NextFloat)
-                    (genRatesArray.[dex])
+                    (opsGenRates)
                     (sortingWidth) |]
 
         msrs.create id this.SortingWidth perm_Rss
@@ -94,5 +98,5 @@ module MsrsRandGen =
                 msrsGen.RngFactory 
                 (%msrsGen.SortingWidth) 
                 (%msrsGen.StageLength) 
-                (msrsGen.OpsGenRatesArray.toString())
+                (msrsGen.OpsGenRates.toString())
 

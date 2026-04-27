@@ -109,7 +109,7 @@ module FullBoolMutate =
     let private saveResults (db: IGeneSortDb) allowOverwrite (results: (queryParams * outputData) list) =
         asyncResult {
             for (qp, data) in results do
-                let! _ = db.saveAsync qp data allowOverwrite
+                let! (_: unit) = db.saveAsync qp data allowOverwrite
                 ()
             return ()
         }
@@ -139,7 +139,7 @@ module FullBoolMutate =
 
         asyncResult {
             try
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let repl = runParameters.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
                 report progress (sprintf "%s Starting FullBoolMutate Run %s" (MathUtils.getTimestampString()) %runId)
@@ -189,10 +189,10 @@ module FullBoolMutate =
                     qpMutantSet, (sortingSetMutant |> outputData.SortingSet)
                     qpBinsSet, (binsSet |> outputData.MutationSegmentEvalBinsSet)
                 ]
-                let! _ = saveResults host.ProjectDb allowOverwrite results
+                let! (_: unit) = saveResults host.ProjectDb allowOverwrite results
 
                 return runParameters.WithRunFinished (Some true)
 
-            with e -> 
+            with (e: exn)  -> 
                 return! Error (sprintf "Error in %s: %s" (runParameters |> RunParameters.getIdString) e.Message) |> async.Return
         }

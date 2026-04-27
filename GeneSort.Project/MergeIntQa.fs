@@ -132,7 +132,7 @@ module MergeIntQa =
 
         asyncResult {
             try
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 let! (repl, sw, md, mft, sdf, sm, sl, ce, sc) = 
                     host.ExtractDomainParams runParameters |> Result.ofOption "Missing domain parameters"
@@ -156,13 +156,13 @@ module MergeIntQa =
                 let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) sorterSet sortableTest false
                 
                 report progress (sprintf "%s Saving test results %s" (MathUtils.getTimestampString()) runId)
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
 
                 // 6. Save
-                let! _ = host.ProjectDb.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
                 return runParameters.WithRunFinished (Some true)
 
-            with e ->
+            with (e: exn) ->
                 return! Error (sprintf "Fatal error in Run %s: %s" (runParameters |> RunParameters.getIdString) e.Message) |> async.Return
         }

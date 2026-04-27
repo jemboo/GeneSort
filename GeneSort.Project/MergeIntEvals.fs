@@ -141,7 +141,7 @@ module MergeIntEvals =
         asyncResult {
             try
                 let startTime = DateTime.Now
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
                 report progress (sprintf "%s Starting Run %s" (MathUtils.getTimestampString()) runId)
 
@@ -164,22 +164,21 @@ module MergeIntEvals =
 
                 // 5. Computation
                 let sorterSet = SortingSet.makeSorterSet sortingSet
-                let! _ = checkCancellation cts.Token
+                let! (_: unit) = checkCancellation cts.Token
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
                 let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) sorterSet sortableTest false
 
                 // 6. Save
-                let! _ = host.ProjectDb.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
                 let qpPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Pass")
                 let passSet = SortingEval.makePassingSortingSet (%qpPass.Id |> UMX.tag) sortingSet sorterSetEval
-                let! _ = host.ProjectDb.saveAsync qpPass (passSet |> outputData.SortingSet) allowOverwrite
-
+                let! (_: unit) = host.ProjectDb.saveAsync qpPass (passSet |> outputData.SortingSet) allowOverwrite
                 // 7. Success
                 let duration = DateTime.Now - startTime
                 return (runParameters.WithRunFinished (Some true)).WithElapsedTime (Some (duration.TotalSeconds.ToString()))
 
-            with e ->
+            with (e: exn) ->
                 let runId = runParameters |> RunParameters.getIdString
                 return! Error (sprintf "Fatal error in Run %s: %s" runId e.Message) |> async.Return
         }

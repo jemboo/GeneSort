@@ -49,6 +49,13 @@ module ComputationBuilders =
             | Error e -> async { return Error e }
             | Ok v -> f v
 
+        // Allows: let! x = standardAsync (returns Ok x)
+        member this.Bind(x: Async<'T>, f: 'T -> Async<Result<'U, 'E>>) =
+            async {
+                let! res = x
+                return! f res
+            }
+
         member this.Delay(f: unit -> 'T) = f
 
         member this.Run(f: unit -> Async<Result<'T, 'E>>) = f()
@@ -105,16 +112,6 @@ module ComputationBuilders =
                 finally 
                     compensation()
             }
-
-
-
-
-
-
-
-
-
-
 
 
     let asyncResult = AsyncResultBuilder()
