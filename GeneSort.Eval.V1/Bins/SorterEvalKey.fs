@@ -50,5 +50,5 @@ module SorterEvalKey =
 
     let toDataTableRecord (key: sorterEvalKey) : GeneSort.Core.dataTableRecord =
         GeneSort.Core.dataTableRecord.createEmpty()
-        |> GeneSort.Core.dataTableRecord.addData "CeCount" (key.CeCount |> UMX.untag |> string)
-        |> GeneSort.Core.dataTableRecord.addData "StageLength" (key.StageLength |> UMX.untag |> string)
+        |> GeneSort.Core.dataTableRecord.addKeyAndData "CeCount" (key.CeCount |> UMX.untag |> string)
+        |> GeneSort.Core.dataTableRecord.addKeyAndData "StageLength" (key.StageLength |> UMX.untag |> string)

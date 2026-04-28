@@ -230,7 +230,7 @@ module SorterEvalBinsV1 =
             bin.Scores |> Seq.map (fun score ->
                 let scoreRecord = SorterScore.toDataTableRecord score
                 (scoreRecord, keyRecord.Data) 
-                ||> Map.fold (fun acc k v -> GeneSort.Core.dataTableRecord.addData k v acc)
+                ||> Map.fold (fun acc k v -> GeneSort.Core.dataTableRecord.addKeyAndData k v acc)
             )
         )
 
@@ -239,3 +239,17 @@ module SorterEvalBinsV1 =
 type sorterEvalBins =
     | V1 of sorterEvalBinsV1
     | Unknown
+
+
+module SorterEvalBins =
+    let createEmpty = sorterEvalBinsV1.createEmpty
+    let createFromEvals = sorterEvalBinsV1.createFromEvals
+    let createFromMap = sorterEvalBinsV1.createFromMap
+    let createWithNewId = sorterEvalBinsV1.createWithNewId
+    let addSorterEval = (fun bins eval -> match bins with | V1 b -> V1 (b.AddSorterEval eval) | _ -> bins)
+    let merge = (fun target source -> match target, source with | V1 t, V1 s -> V1 (SorterEvalBinsV1.merge t s) | _ -> target)
+    let getAllScores = (fun bins -> match bins with | V1 b -> SorterEvalBinsV1.getAllScores b | _ -> Seq.empty)
+    let extractBins = (fun filter bins -> match bins with | V1 b -> V1 (SorterEvalBinsV1.extractBins filter b) | _ -> bins)
+    let getTopN = (fun scoreValuer newId bins n -> match bins with | V1 b -> V1 (SorterEvalBinsV1.getTopN scoreValuer newId b n) | _ -> bins)
+    let convexHull = (fun newId bins -> match bins with | V1 b -> V1 (SorterEvalBinsV1.convexHull newId b) | _ -> bins)
+    let makeDataTableRecords = (fun bins -> match bins with | V1 b -> SorterEvalBinsV1.makeDataTableRecords b | _ -> Seq.empty)

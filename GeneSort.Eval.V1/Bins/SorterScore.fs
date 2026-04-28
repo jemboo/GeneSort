@@ -72,6 +72,12 @@ module SorterScore =
                     (sorterEval.CeBlockEval.CeUseCounts.LastUsedCeIndex)
 
 
+    let isUnsorted (score: sorterScore) : bool option =
+        match score with
+        | V1 v1 -> Some (v1.UnsortedCount > 0<sortableCount>)
+        | Unknown -> None
+
+
     /// Flattens a sorterScore into a dataTableRecord
     let toDataTableRecord (score: sorterScore) : GeneSort.Core.dataTableRecord =
         match score with

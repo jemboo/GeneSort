@@ -42,7 +42,7 @@ type dataTableRecord =
         { keys = Map.ofList [(cleanedKey, cleanedValue)]; data = Map.ofList [(cleanedKey, cleanedValue)] }
 
     static member createTable (records: dataTableRecord seq) : string [] [] =
-        let allKeys = records |> Seq.collect (fun r -> r.Keys |> Map.toSeq) |> Seq.map fst |> Seq.distinct
+        let allKeys = records |> Seq.collect (fun r -> r.Data |> Map.toSeq) |> Seq.map fst |> Seq.distinct
         let header = allKeys |> Seq.toArray
         let rows = 
             records 

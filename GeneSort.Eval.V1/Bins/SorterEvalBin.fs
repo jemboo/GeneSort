@@ -3,6 +3,7 @@
 open System.Collections.Generic
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Sorting
 
 type sorterEvalBinV1 =
     private {
@@ -28,15 +29,35 @@ type sorterEvalBinV1 =
     member this.EvalCount with get() = this.sorterScores.Count
     member this.SorterEvalKey with get() = this.sorterEvalKey
     member this.Scores with get() = this.sorterScores :> IReadOnlyList<sorterScore>
+    member this.UnsortedCount with get() = 
+        this.sorterScores 
+        |> Seq.map (function sorterScore.V1 s -> s.UnsortedCount | _ -> 0<sortableCount>) 
+        |> Seq.countBy id
 
     /// Appends a score to the existing bin (Mutable Addition)
     member this.AddScore (score: sorterScore) =
         this.sorterScores.Add(score)
 
-    member this.ToDataTableRecord() : dataTableRecord =
+    member this.ToEvalCountRecord() : dataTableRecord =
         SorterEvalKey.toDataTableRecord this.sorterEvalKey
         |> dataTableRecord.addData "EvalCount" (this.EvalCount.ToString())
 
+    // Returns two records, providing the EvalCount for both the sorted and unsorted cases.
+    member this.ToSortedAndUnsortedRecords() : dataTableRecord [] =
+        [| 
+            let unsortedCount = this.sorterScores 
+                                |> Seq.filter (SorterScore.isUnsorted >> Option.defaultValue false) 
+                                |> Seq.length
+            let dtrS = SorterEvalKey.toDataTableRecord this.sorterEvalKey
+                       |> dataTableRecord.addKeyAndData "Sorted" "True"
+                       |> dataTableRecord.addData "EvalCount" ((this.EvalCount - unsortedCount).ToString())
+            dtrS;
+
+            let dtrU = SorterEvalKey.toDataTableRecord this.sorterEvalKey
+                       |> dataTableRecord.addKeyAndData "Sorted" "False"
+                       |> dataTableRecord.addData "EvalCount" (unsortedCount.ToString())
+            dtrU;
+        |]
 
 
 module SorterEvalBinV1 =
