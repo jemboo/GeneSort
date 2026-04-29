@@ -26,7 +26,7 @@ type GeneSortDbMp(projectFolder: string<pathToProjectFolder>) =
                     let! res = OutputDataFile.getOutputDataAsync projectFolder queryParams None
                     replyChannel.Reply res
                 | GetProjectRunParametersForReplRange (replMin, replMax, ct, progress, replyChannel) ->
-                    let! res = OutputDataFile.getProjectRunParametersForReplRangeAsync projectFolder replMin replMax ct progress
+                    let! res = OutputDataFile.getRunParameters projectFolder replMin replMax ct progress
                     replyChannel.Reply res
                 return! loop ()
             }
@@ -49,14 +49,14 @@ type GeneSortDbMp(projectFolder: string<pathToProjectFolder>) =
                     (queryParams: queryParams) : Async<Result<outputData, OutputError>> =
             mailbox.PostAndAsyncReply(fun channel -> Load(projectFolder, queryParams, channel))
 
-        member _.getProjectRunParametersForReplRangeAsync
+        member _.getRunParameters
                         (minReplNumber: int<replNumber> option)
                         (maxReplNumber: int<replNumber> option)
                         (ct: CancellationToken option)
                         (progress: IProgress<string> option) : Async<Result<runParameters[], string>> =
             mailbox.PostAndAsyncReply(fun channel -> GetProjectRunParametersForReplRange(minReplNumber, maxReplNumber, ct, progress, channel))
 
-        member this.saveAllRunParametersAsync
+        member this.saveRunParameters
                         (runParamsArray: runParameters[])
                         (buildQueryParams: runParameters -> outputDataType -> queryParams)
                         (allowOverwrite: bool<allowOverwrite>)

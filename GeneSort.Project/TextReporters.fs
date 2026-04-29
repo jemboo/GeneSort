@@ -32,7 +32,7 @@ module TextReporters =
 
             // 1. Get Parameters (Handles Error track automatically)
             let! runParamsArray = 
-                db.getProjectRunParametersForReplRangeAsync  (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
+                db.getRunParameters  (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
 
             // 2. Setup Initial DataTable
             let headers =  [| "Sorting Width"; "SorterModel"; "ceLength"; "stageLength"; "binCount";|]
@@ -92,7 +92,7 @@ module TextReporters =
 
             // 1. Get Parameters (automatically handles Error exit)
             let! runParamsArray = 
-                db.getProjectRunParametersForReplRangeAsync (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
+                db.getRunParameters (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
 
             // 2. Setup Initial DataTable
             let headers = Array.append

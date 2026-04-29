@@ -296,7 +296,7 @@ module OutputDataFile =
         }
 
 
-    let getProjectRunParametersForReplRangeAsync
+    let getRunParameters
             (projectFolder: string<pathToProjectFolder>)
             (minRepl: int<replNumber> option)
             (maxRepl: int<replNumber> option) // Note: ensured unit matching

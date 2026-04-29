@@ -58,7 +58,7 @@ module ProjectOps =
                 report progress (sprintf "%s Starting project: %s" (MathUtils.getTimestampString()) %projectName)
 
                 let! (paramsArray: runParameters array) = 
-                        db.getProjectRunParametersForReplRangeAsync 
+                        db.getRunParameters 
                                 (Some minRepl) (Some maxRepl) (Some cts.Token) progress
                 
                 if paramsArray.Length = 0 then 

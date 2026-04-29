@@ -155,7 +155,7 @@ module ProjectOps =
 
                 // 1. Load Parameters
                 let! (runParametersArray: runParameters array) = 
-                    db.getProjectRunParametersForReplRangeAsync (Some minRepl) (Some maxRepl) (Some cts.Token) progress
+                    db.getRunParameters (Some minRepl) (Some maxRepl) (Some cts.Token) progress
 
                 report progress (sprintf "Found %d runs to execute\n" runParametersArray.Length)
 

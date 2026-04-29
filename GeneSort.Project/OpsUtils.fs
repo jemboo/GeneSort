@@ -53,7 +53,7 @@ module OpsUtils =
                 report progress (sprintf "Displaying Source Table for %s\n" %db.projectName)
 
                 let! (runParametersArray: runParameters array) = 
-                    db.getProjectRunParametersForReplRangeAsync (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
+                    db.getRunParameters (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
 
                 if runParametersArray.Length = 0 then
                     report progress "No runs found to display.\n"

@@ -20,7 +20,7 @@ module ParamOps =
             try
                 report progress (sprintf "%s Saving RunParameter files in %s" (MathUtils.getTimestampString()) %db.projectName)
                 cts.Token.ThrowIfCancellationRequested()
-                let! res = db.saveAllRunParametersAsync runParameterArray buildQueryParams allowOverwrite (Some cts.Token) progress
+                let! res = db.saveRunParameters runParameterArray buildQueryParams allowOverwrite (Some cts.Token) progress
                 match res with
                 | Ok () -> 
                     report progress (sprintf "%s Successfully saved %d RunParameter files" 
