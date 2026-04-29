@@ -16,6 +16,15 @@ type sortableTest =
 
 module SortableTests = 
 
+    let getId (test: sortableTest) : Guid<sortableTestId> =
+        match test with
+        | Bitv512 bitv512Test -> bitv512Test.Id
+        | Bools boolTest -> boolTest.Id
+        | Ints intTest -> intTest.Id
+        | PackedInts packedIntTest -> packedIntTest.Id
+        | Uint8v256 uint8v256Test -> uint8v256Test.Id
+        | Uint8v512 uint8v512Test -> uint8v512Test.Id
+
     let getSortableDataFormat (test: sortableTest) : sortableDataFormat =
         match test with
         | Bitv512 bitv512Test -> bitv512Test.SortableDataFormat
@@ -33,15 +42,6 @@ module SortableTests =
         | PackedInts packedIntTest -> packedIntTest.SortingWidth
         | Uint8v256 uint8v256Test -> uint8v256Test.SortingWidth
         | Uint8v512 uint8v512Test -> uint8v512Test.SortingWidth
-
-    let getId (test: sortableTest) : Guid<sortableTestId> =
-        match test with
-        | Bitv512 bitv512Test -> bitv512Test.Id
-        | Bools boolTest -> boolTest.Id
-        | Ints intTest -> intTest.Id
-        | PackedInts packedIntTest -> packedIntTest.Id
-        | Uint8v256 uint8v256Test -> uint8v256Test.Id
-        | Uint8v512 uint8v512Test -> uint8v512Test.Id
 
     let getSortableCount (test: sortableTest) : int<sortableCount> =
         match test with

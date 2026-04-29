@@ -4,7 +4,9 @@ open System
 open FSharp.UMX
 open System.Threading
 open GeneSort.Dispatch.V1
+open GeneSort.Db.V1
 open GeneSort.Project.V1
+open GeneSort.FileDb.V1
 
 // --- Infrastructure ---
 
@@ -24,7 +26,7 @@ let cts = new CancellationTokenSource()
 let maxParallel = Environment.ProcessorCount
 
 let startTime = DateTime.Now
-printfn $"**** GeneSort Execution Started: {startTime.ToString()} ****"
+printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 // --- Configuration Selection ---
 
@@ -33,7 +35,7 @@ let configKey = "P1"
 let spec = 
     match RandomSorterBins.Configs |> Map.tryFind configKey with
     | Some s -> s
-    | None -> failwithf "Configuration key '%s' not found." configKey
+    | None -> failwithf "Config key '%s' not found." configKey
 
 let host = RandomSorterBins.CreateHost spec
 
@@ -43,11 +45,8 @@ let maxReplica = 10<replNumber>
 // --- Execution ---
 
 async {
-    printfn "Config:      %s" configKey
-    printfn "Project:     %s" host.Spec.ProjectName
-    printfn "Folder:      %s" (host.ProjectDb.ToString())
+    printfn "Running Project: %s" host.Spec.ProjectName
     
-    // 1. Initialize
     let! initResult = 
         ParamOps.initProjectAndRunFiles
             host.ProjectDb           
@@ -62,11 +61,8 @@ async {
             host.ParameterSpans
 
     match initResult with
-    | Error e -> printfn "Initialization Failed: %s" e
+    | Error e -> printfn "Init Failure: %s" e
     | Ok () ->
-        printfn "Initialization Success. Running tests..."
-        
-        // 2. Execute
         let! execResult = 
             ProjectOps.executeRuns 
                 host.ProjectDb      
@@ -81,20 +77,13 @@ async {
                 maxParallel
 
         match execResult with
-        | Ok results -> printfn "Execution complete. %d results processed." results.Length
-        | Error e -> printfn "Execution Failed: %s" e
+        | Ok results -> printfn "Success: %d records processed." results.Length
+        | Error e -> printfn "Runtime Error: %s" e
 
 } |> Async.RunSynchronously
 
-// --- Finalize ---
-
-let endTime = DateTime.Now
-let duration = endTime - startTime
-Thread.Sleep(100) 
-
+let duration = DateTime.Now - startTime
 printfn "********************************************"
-printfn $"Total Duration: {duration.ToString()}"
+printfn $"Total Time: {duration.ToString()}"
 printfn "********************************************"
-
-Console.WriteLine("Press Enter to exit...")
 Console.ReadLine() |> ignore

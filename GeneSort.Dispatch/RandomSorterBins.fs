@@ -14,6 +14,7 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Model.Sortable.V1
 open GeneSort.Eval.V1.Bins
+open GeneSort.Sorting.Sortable
 
 // --- Core Types ---
 
@@ -32,6 +33,9 @@ type ProjectSpec = {
     RngFactory: rngFactory
     CollectNewSortableTests: bool
     AllowOverwrite: bool<allowOverwrite>
+    // Factories driven by runParameters
+    TestModelFactory: runParameters -> sortableTestModel
+    SorterModelGenFactory: runParameters -> sorterModelGen
 }
 
 /// Host type managing live environment dependencies and domain logic
@@ -50,7 +54,7 @@ and randomSorterBinsHost =
     member this.Spec = this._spec
     member this.Project = this._project
 
-    // --- Encapsulated Query & Refinement Logic ---
+    // --- Query & Refinement Logic ---
 
     member this.MakeQueryParams (repl: int<replNumber>) (sw: int<sortingWidth>) (smt: simpleSorterModelType option) (odt: outputDataType) =
         let pName = this.Spec.ProjectName |> UMX.tag<projectName>
@@ -66,19 +70,39 @@ and randomSorterBinsHost =
 
     member this.ExtractDomainParams (rp: runParameters) =
         maybe {
-            let! smk = rp.GetSimpleSorterModelType()
+            let! smt = rp.GetSimpleSorterModelType()
             let! sw = rp.GetSortingWidth()
             let! sl = rp.GetStageLength()
             let! sc = rp.GetSorterCount()
             let! sdt = rp.GetSortableDataFormat()
-            return (smk, sw, sl, sc, sdt)
+            let repl = rp.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
+            return (smt, sw, sl, sc, sdt, repl)
+        }
+
+    member this.MakeSortableTest (rp: runParameters) : Sortable.sortableTest option =
+        maybe {
+            let! sdt = rp.GetSortableDataFormat()
+            let qpTests = this.MakeQueryParamsFromRunParams rp (outputDataType.SortableTest "")
+            let testModel = this.Spec.TestModelFactory rp
+            return SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel sdt
+        }
+
+    /// streamlined: All necessary data is extracted from the single rp argument
+    member this.MakeSorterModelSet (rp: runParameters) =
+        maybe {
+            let! sc = rp.GetSorterCount()
+            let repl = rp.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
+            let qpFullSet = this.MakeQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
+            let gen = this.Spec.SorterModelGenFactory rp
+            let firstIdx = (%repl * %sc) |> UMX.tag<sorterCount>
+            return SorterModelGen.makeSorterModelSet (%qpFullSet.Id |> UMX.tag) firstIdx sc gen
         }
 
 // --- Logic Module ---
 
 module RandomSorterBins =
 
-    // --- Core Logic Implementations ---
+    // --- Logic Implementations ---
 
     let private standardEnhancer (host: randomSorterBinsHost) (rp : runParameters) : runParameters =
         let sw = rp.GetSortingWidth().Value
@@ -114,10 +138,10 @@ module RandomSorterBins =
         match %sw with
         | 4 -> 5 | 6 -> 20 | 8 -> 40 | 12 -> 40 | 16 -> 50
         | 18 -> 120 | 20 -> 130 | 22 -> 140 | 24 -> 200 
-        | _ -> failwithf "Unsupported sorting width: %d" %sw
+        | _ -> failwithf "Unsupported width: %d" %sw
         |> UMX.tag
 
-    // --- Specification Registry ---
+    // --- Specs ---
 
     module Specs =
         let P1 = {
@@ -137,40 +161,23 @@ module RandomSorterBins =
             RngFactory = rngFactory.LcgFactory
             CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
+            TestModelFactory = fun rp -> 
+                let sw = rp.GetSortingWidth().Value
+                msasF.create sw |> sortableTestModel.MsasF
+            SorterModelGenFactory = fun rp ->
+                let smt = rp.GetSimpleSorterModelType().Value
+                let sw = rp.GetSortingWidth().Value
+                let sl = rp.GetStageLength().Value
+                SimpleSorterModelGen.makeUniform rngFactory.LcgFactory sw sl smt |> sorterModelGen.Simple
         }
 
-        let P2 = {
-            ProjectName = "RandomSorterBins_Heavy"
-            ProjectDesc = "High-width stress tests for 9950X3D"
-            DefaultFolder = "c:\\ProjectsV1\\RandomSorterBins_Heavy\\Data"
-            Spans = [
-                (runParameters.sortingWidthKey, [18; 20] |> List.map string)
-                (runParameters.simpleSorterModelTypeKey, 
-                    [simpleSorterModelType.Msce; simpleSorterModelType.Mssi; simpleSorterModelType.Msrs; simpleSorterModelType.Msuf4; simpleSorterModelType.Msuf6] 
-                    |> List.map SimpleSorterModelType.toString)
-                (runParameters.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
-                (runParameters.sorterCountKey, ["10000"])
-            ]
-            CustomFolder = None
-            GetStageLength = standardStageLength
-            Filter = standardSorterModelTypeFilter
-            Enhancer = standardEnhancer
-            RngFactory = rngFactory.LcgFactory
-            CollectNewSortableTests = true
-            AllowOverwrite = false |> UMX.tag
-        }
+    let Configs = Map.ofList [ ("P1", Specs.P1) ]
 
-    let Configs = Map.ofList [ ("P1", Specs.P1); ("P2", Specs.P2) ]
-
-    /// Factory to create a live Host from a Spec
     let CreateHost (spec: ProjectSpec) =
         let folder = spec.CustomFolder |> Option.defaultValue spec.DefaultFolder |> UMX.tag
         let db = new GeneSortDbMp(folder) :> IGeneSortDb
         let pName = spec.ProjectName |> UMX.tag<projectName>
-        
-        let proj = project.create pName spec.ProjectDesc 
-                                  [| outputDataType.RunParameters; outputDataType.SorterEvalBins ""; |]
-        
+        let proj = project.create pName spec.ProjectDesc [| outputDataType.RunParameters; outputDataType.SorterEvalBins ""; |]
         randomSorterBinsHost.Create db spec proj
 
     // --- Execution Logic ---
@@ -184,28 +191,31 @@ module RandomSorterBins =
             try
                 let! (_: unit) = checkCancellation cts.Token
                 let runId = runParameters |> RunParameters.getIdString
-                let repl = runParameters.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
                 report progress (sprintf "%s Starting Run %s" (MathUtils.getTimestampString()) %runId)
 
-                let! (smt, sw, sl, sc, sdt) = host.ExtractDomainParams runParameters |> Result.ofOption "Missing parameters"
+                // 1. Sorter Models
+                let! sorterModelSet = host.MakeSorterModelSet runParameters |> Result.ofOption "Failed to create SorterModelSet"
+                let fullSorterSet = SorterModelSet.makeSorterSet (%sorterModelSet.Id |> UMX.tag) sorterModelSet
 
-                let sorterModelGen = SimpleSorterModelGen.makeUniform host.Spec.RngFactory sw sl smt |> sorterModelGen.Simple
-                let firstIdx = (%repl * %sc) |> UMX.tag<sorterCount>
-
-                let qpFullSet = host.MakeQueryParamsFromRunParams runParameters (outputDataType.SorterModelSet "") 
-                let sorterModelSet = SorterModelGen.makeSorterModelSet (%qpFullSet.Id |> UMX.tag) firstIdx sc sorterModelGen
-                let fullSorterSet = SorterModelSet.makeSorterSet (%qpFullSet.Id |> UMX.tag) sorterModelSet
-
+                // 2. Sortable Tests
                 let! (_: unit) = checkCancellation cts.Token
-                let testModel = msasF.create sw |> sortableTestModel.MsasF
-                let qpTests = host.MakeQueryParamsFromRunParams runParameters (outputDataType.SortableTest "")
-                let tests = SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel sdt
+                let! tests = host.MakeSortableTest runParameters |> Result.ofOption "Failed to create SortableTests"
 
+                // 3. Evaluation
                 let qpEval = host.MakeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
-                let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSet tests host.Spec.CollectNewSortableTests
+                let sorterSetEval = SorterSetEval.makeSorterSetEval 
+                                                    (%qpEval.Id |> UMX.tag) 
+                                                    fullSorterSet 
+                                                    tests 
+                                                    host.Spec.CollectNewSortableTests
 
+                // 4. Bin and Save
                 let qpBins = host.MakeQueryParamsFromRunParams runParameters (outputDataType.SorterEvalBins "")
-                let sorterEvalBins = sorterEvalBinsV1.createFromEvals (%qpBins.Id |> UMX.tag) (%qpTests.Id |> UMX.tag) sorterSetEval.SorterEvals |> sorterEvalBins.V1
+                let sorterEvalBins = sorterEvalBinsV1.createFromEvals 
+                                            (%qpBins.Id |> UMX.tag) 
+                                            (tests |> SortableTests.getId) 
+                                            sorterSetEval.SorterEvals 
+                                     |> sorterEvalBins.V1
 
                 let! (_: unit) = host.ProjectDb.saveAsync qpBins (sorterEvalBins |> outputData.SorterEvalBins) host.Spec.AllowOverwrite
 
