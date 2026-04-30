@@ -45,7 +45,7 @@ let maxReplica = 10<replNumber>
 // --- Execution ---
 
 async {
-    printfn "Running Project: %s" host.Spec.ProjectName
+    printfn "Running Project: %s" %host.Spec.ProjectName
     
     let! initResult = 
         ParamOps.initProjectAndRunFiles
@@ -69,7 +69,7 @@ async {
                 minReplica 
                 maxReplica 
                 host.MakeQueryParamsFromRunParams 
-                host.Project.ProjectName 
+                host.Project.RunName 
                 host.Spec.AllowOverwrite 
                 cts 
                 (Some progress) 

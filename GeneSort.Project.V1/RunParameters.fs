@@ -25,6 +25,7 @@ type runParameters =
     static member messageKey = "Message"
     static member mutationRateKey = "MutationRate"
     static member projectNameKey = "ProjectName"
+    static member runNameKey = "RunName"
     static member replKey = "Repl"
     static member startingReplKey = "StartingRepl"
     static member replSpanKey = "ReplSpan"
@@ -71,6 +72,7 @@ type runParameters =
 
     member this.GetMutationRate() = runParameters.tryGetFloat runParameters.mutationRateKey this.paramMap |> Option.map UMX.tag<mutationRate>
     member this.GetProjectName() = this.paramMap.TryFind runParameters.projectNameKey |> Option.map UMX.tag<projectName>
+    member this.GetRunName() = this.paramMap.TryFind runParameters.runNameKey |> Option.map UMX.tag<runName>
     member this.GetRepl() = runParameters.tryGetInt runParameters.replKey this.paramMap |> Option.map UMX.tag<replNumber>
     member this.GetStartingRepl() = runParameters.tryGetInt runParameters.startingReplKey this.paramMap |> Option.map UMX.tag<replNumber>
     member this.GetReplSpan() = runParameters.tryGetInt runParameters.replSpanKey this.paramMap |> Option.map UMX.tag<replNumber>
@@ -120,6 +122,9 @@ type runParameters =
 
     member this.WithProjectName(pn: string<projectName> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.projectNameKey (pn |> Option.map UmxExt.stringToRaw) }
+
+    member this.WithRunName(rn: string<runName> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.runNameKey (rn |> Option.map UmxExt.stringToRaw) }
 
     member this.WithRepl(repl: int<replNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.replKey (repl |> Option.map UmxExt.intToRaw) }

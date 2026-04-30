@@ -17,7 +17,7 @@ open GeneSort.Eval.Mp.V1
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
-[<Measure>] type pathToProjectFolder
+[<Measure>] type runParamsType
 [<Measure>] type fileNameWithoutExtension
 [<Measure>] type fullPathToFile // e.g., "C:\GeneSortData\Project1\RunParameters_0_0.msgpack"
 
@@ -26,7 +26,7 @@ module OutputDataFile =
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let getPathToOutputDataFolder
-                (pathToProjectFolder:string<pathToProjectFolder>)
+                (pathToProjectFolder:string<pathToRootFolder>)
                 (replString: string)
                 (outputDataType: outputDataType)
                  :string<fullPathToFolder> =
@@ -39,7 +39,7 @@ module OutputDataFile =
         | _ -> idPart
 
     let getFullOutputDataFilePath
-            (pathToProjectFolder: string<pathToProjectFolder>)
+            (pathToProjectFolder: string<pathToRootFolder>)
             (queryParams: queryParams) : string<fullPathToFile> =
         let fileNameWithExtension =
             match queryParams.OutputDataType with
@@ -56,7 +56,7 @@ module OutputDataFile =
         }
 
     let getOutputDataAsync
-            (pathToProjectFolder :string<pathToProjectFolder>)
+            (pathToProjectFolder :string<pathToRootFolder>)
             (queryParams :queryParams)
             (ct :CancellationToken option)
                 :Async<Result<outputData, string>> =
@@ -76,7 +76,7 @@ module OutputDataFile =
                         //    let! domain = deserializeDto<mutationSegmentEvalBinsSetDto, mutationSegmentEvalBinsSet> stream token MutationSegmentEvalBinsSetDto.toDomain
                         //    return outputData.MutationSegmentEvalBinsSet domain
                         //}
-                    | outputDataType.RunParameters ->
+                    | outputDataType.RunParameters _ ->
                         failwith "Not implemented: SorterSet deserialization"
                         //async {
                         //    let! domain = deserializeDto<runParametersDto, runParameters> stream token RunParametersDto.toDomain
@@ -159,7 +159,7 @@ module OutputDataFile =
         MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
 
     let saveToFileAsync
-        (pathToProjectFolder:string<pathToProjectFolder>)
+        (pathToProjectFolder:string<pathToRootFolder>)
         (queryParams: queryParams)
         (outputData: outputData)
         (allowOverwrite: bool<allowOverwrite>) : Async<Result<unit, string>> =
@@ -257,12 +257,13 @@ module OutputDataFile =
         }
 
     let getProjectRunParametersForReplAsync
-                (projectFolder: string<pathToProjectFolder>)
+                (rootFolder: string<pathToRootFolder>)
+                (runName:string<runName>)
                 (repl: int<replNumber> option)
                 (ct: CancellationToken option)
                 (progress: IProgress<string> option) : Async<Result<runParameters[], string>> =
         async {
-            let folder = getPathToOutputDataFolder projectFolder (repl |> queryParams.ReplString) outputDataType.RunParameters
+            let folder = getPathToOutputDataFolder rootFolder (repl |> queryParams.ReplString) (outputDataType.RunParameters %runName)
             progress |> Option.iter (fun p -> p.Report(sprintf "Scanning directory: %s" %folder))
             let! filePathsRes = getFilesSortedByCreationTimeAsync %folder ct
             match filePathsRes with
@@ -297,7 +298,8 @@ module OutputDataFile =
 
 
     let getRunParameters
-            (projectFolder: string<pathToProjectFolder>)
+            (rootFolder: string<pathToRootFolder>)
+            (runName:string<runName>)
             (minRepl: int<replNumber> option)
             (maxRepl: int<replNumber> option) // Note: ensured unit matching
             (ct: CancellationToken option)
@@ -316,7 +318,7 @@ module OutputDataFile =
             let! allResults = 
                 repls 
                 |> Array.map (fun r -> 
-                    getProjectRunParametersForReplAsync projectFolder (Some r) ct progress)
+                    getProjectRunParametersForReplAsync rootFolder runName (Some r) ct progress)
                 |> Async.Parallel
 
             // 3. Aggregate Results

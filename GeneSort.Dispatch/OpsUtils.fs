@@ -45,6 +45,7 @@ module OpsUtils =
 
     let printRunParamsTable
             (db: IGeneSortDb)
+            (runName: string<runName>)
             (minReplNumber: int<replNumber>)
             (maxReplNumber: int<replNumber>)
             (cts: CancellationTokenSource)
@@ -54,7 +55,7 @@ module OpsUtils =
                 report progress (sprintf "Displaying Source Table for %s\n" %db.projectName)
 
                 let! (runParametersArray: runParameters array) = 
-                    db.getRunParameters (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
+                    db.getRunParameters runName (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
 
                 if runParametersArray.Length = 0 then
                     report progress "No runs found to display.\n"

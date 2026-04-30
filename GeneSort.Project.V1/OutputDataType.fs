@@ -8,7 +8,7 @@ open System
 type outputDataType =
     | MutationSegmentEvalBinsSet of string
     | Project
-    | RunParameters
+    | RunParameters of string
     | SorterModelSet of string
     | SorterSet of string
     | SortableTest of string
@@ -21,6 +21,7 @@ type outputDataType =
     | SorterEvalBins of string
     | TextReport of string<textReportName>
 
+
 module OutputDataType =
     let private appendParam (prefix: string) (param: string) =
         if String.IsNullOrEmpty param then prefix else prefix + "_" + param
@@ -29,7 +30,7 @@ module OutputDataType =
         match outputDataType with
         | MutationSegmentEvalBinsSet s -> appendParam "MutationSegmentEvalBinsSet" s
         | Project -> "Project"
-        | RunParameters -> "RunParameters"
+        | RunParameters s -> appendParam "RunParameters" s
         | SorterSet s -> appendParam "SorterSet" s
         | SortableTest s -> appendParam "SortableTest" s
         | SortableTestSet s -> appendParam "SortableTestSet" s
@@ -42,6 +43,7 @@ module OutputDataType =
         | SorterModelSet s -> appendParam "SorterModelSet" s
         | TextReport s -> appendParam "Report\\TextReport" %s
 
+
     let fromFolderName (description: string) : outputDataType option =
         let parts = description.Split([|'_'|], StringSplitOptions.RemoveEmptyEntries)
         let prefix = parts.[0]
@@ -49,7 +51,7 @@ module OutputDataType =
         match prefix with
         | "MutationSegmentEvalBinsSet" -> Some (MutationSegmentEvalBinsSet param)
         | "Project" when param = "" -> Some Project
-        | "RunParameters" when param = "" -> Some RunParameters
+        | "RunParameters" -> Some (RunParameters param)
         | "SorterSet" -> Some (SorterSet param)
         | "SortableTest" -> Some (SortableTest param)
         | "SortableTestSet" -> Some (SortableTestSet param)
@@ -62,6 +64,7 @@ module OutputDataType =
         | "SorterEvalBins" -> Some (SorterEvalBins param)
         | "TextReport" -> Some (TextReport (param |> UMX.tag<textReportName>))
         | _ -> None
+
 
     let extractTextReportNames (outputDataTypes: outputDataType array) : string<textReportName> list =
         outputDataTypes

@@ -6,6 +6,7 @@ open GeneSort.Core
 
 
 [<Measure>] type projectName
+[<Measure>] type runName
 [<Measure>] type queryParamsId
 [<Measure>] type replNumber
 [<Measure>] type generationNumber

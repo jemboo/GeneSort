@@ -20,11 +20,11 @@ open GeneSort.Sorting.Sortable
 
 /// Data-only specification for a project configuration
 type ProjectSpec = {
-    ProjectName: string
+    ProjectName: string<projectName>
+    RunName: string<runName>
     ProjectDesc: string
-    DefaultFolder: string
+    DataFolder: string
     Spans: (string * string list) list
-    CustomFolder: string option
     // Logic Callbacks
     GetStageLength: int<sortingWidth> -> int<stageLength>
     Filter: runParameters -> runParameters option
@@ -57,7 +57,7 @@ and randomSorterBinsHost =
     // --- Query & Refinement Logic ---
 
     member this.MakeQueryParams (repl: int<replNumber>) (sw: int<sortingWidth>) (smt: simpleSorterModelType option) (odt: outputDataType) =
-        let pName = this.Spec.ProjectName |> UMX.tag<projectName>
+        let pName = this.Spec.ProjectName
         queryParams.create (Some pName) (Some repl) odt
             [| (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                (runParameters.simpleSorterModelTypeKey, smt |> Option.map SimpleSorterModelType.toString |> UmxExt.stringToString) |]
@@ -104,14 +104,16 @@ module RandomSorterBins =
 
     // --- Logic Implementations ---
 
-    let private standardEnhancer (host: randomSorterBinsHost) (rp : runParameters) : runParameters =
+    let private standardEnhancer (host :randomSorterBinsHost) (rp :runParameters) : runParameters =
         let sw = rp.GetSortingWidth().Value
-        let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters)
+        let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Project.ProjectName)
         let sl = host.Spec.GetStageLength sw
         let cl = sl |> StageLength.toCeLength sw
-        let pName = host.Spec.ProjectName |> UMX.tag<projectName>
+        let pName = host.Spec.ProjectName
+        let rName = host.Spec.RunName
 
         rp.WithProjectName(Some pName)
+          .WithRunName(Some rName)
           .WithRunFinished(Some false)
           .WithCeLength(Some cl)
           .WithStageLength(Some sl)
@@ -144,17 +146,18 @@ module RandomSorterBins =
     // --- Specs ---
 
     module Specs =
+
         let P1 = {
-            ProjectName = "RandomSorterBins_Standard"
+            ProjectName = "Standard" |>UMX.tag<projectName>
+            RunName = "Standard" |> UMX.tag<runName>
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs"
-            DefaultFolder = "c:\\ProjectsV1\\RandomSorterBins\\Data"
+            DataFolder = "c:\\ProjectsV1\\RandomSorterBins\\Data"
             Spans = [
                 (runParameters.sortingWidthKey, ["12"])
                 (runParameters.simpleSorterModelTypeKey, [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
                 (runParameters.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
                 (runParameters.sorterCountKey, ["1000"])
             ]
-            CustomFolder = None
             GetStageLength = standardStageLength
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
@@ -174,10 +177,13 @@ module RandomSorterBins =
     let Configs = Map.ofList [ ("P1", Specs.P1) ]
 
     let CreateHost (spec: ProjectSpec) =
-        let folder = spec.CustomFolder |> Option.defaultValue spec.DefaultFolder |> UMX.tag
+        let folder = spec.DataFolder |> UMX.tag
         let db = new GeneSortDbMp(folder) :> IGeneSortDb
-        let pName = spec.ProjectName |> UMX.tag<projectName>
-        let proj = project.create pName spec.ProjectDesc [| outputDataType.RunParameters; outputDataType.SorterEvalBins ""; |]
+        let proj = project.create 
+                        spec.ProjectName
+                        spec.RunName
+                        spec.ProjectDesc 
+                        [| outputDataType.RunParameters %spec.ProjectName; outputDataType.SorterEvalBins ""; |]
         randomSorterBinsHost.Create db spec proj
 
     // --- Execution Logic ---

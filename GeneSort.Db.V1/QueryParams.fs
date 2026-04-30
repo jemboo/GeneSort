@@ -44,7 +44,7 @@ type queryParams =
         $"Project: {projStr}, Repl: {replStr}, OutputType: {outTypeStr}, Properties: [{propsStr}]"
 
     static member create
-            (projectName:    string<projectName> option)
+            (projectName:        string<projectName> option)
             (repl:           int<replNumber> option)
             (outputDataType: outputDataType)
             (properties:     (string * string) []) : queryParams =

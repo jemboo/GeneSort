@@ -9,6 +9,7 @@ type project =
     private
         {
           projectName: string<projectName>
+          runName: string<runName>
           description: string
           outputDataTypes: outputDataType array
         }
@@ -16,6 +17,7 @@ type project =
 
     static member create
             (projectName: string<projectName>)
+            (runName: string<runName>)
             (description: string)
             (outputDataTypes: outputDataType array) : project =
 
@@ -23,11 +25,13 @@ type project =
             failwith "Project name cannot be empty"
         {
           projectName = projectName
+          runName = runName
           description = description
           outputDataTypes = outputDataTypes
         }
 
     member this.ProjectName with get () = this.projectName
+    member this.RunName with get () = this.runName
     member this.Description with get () = this.description
     member this.OutputDataTypes with get() = this.outputDataTypes
 

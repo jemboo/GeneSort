@@ -4,7 +4,6 @@ open System.Threading
 open FSharp.UMX
 open GeneSort.Project.V1
 
-[<Measure>] type projectFolder
 [<Measure>] type allowOverwrite
 
 type OutputError = string
@@ -14,6 +13,7 @@ type IGeneSortDb =
     abstract member saveAsync : queryParams -> outputData -> bool<allowOverwrite> -> Async<Result<unit, string>>
     abstract member loadAsync : queryParams -> Async<Result<outputData, OutputError>>
     abstract member getRunParameters :
+            string<runName> ->
             int<replNumber> option ->
             int<replNumber> option ->
             CancellationToken option ->
