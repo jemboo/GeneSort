@@ -44,7 +44,7 @@ type queryParams =
         $"Project: {projStr}, Repl: {replStr}, OutputType: {outTypeStr}, Properties: [{propsStr}]"
 
     static member create
-            (projectName:        string<projectName> option)
+            (projectName:    string<projectName> option)
             (repl:           int<replNumber> option)
             (outputDataType: outputDataType)
             (properties:     (string * string) []) : queryParams =
@@ -62,8 +62,12 @@ type queryParams =
                              ] |> UMX.tag<queryParamsId>
         }
 
-    static member createForProject (projectName: string<projectName>) : queryParams =
-        queryParams.create (Some projectName) None outputDataType.Project [||]
+    static member createForRun 
+                    (projectName: string<projectName>) 
+                    (runName: string<runName>) 
+                    : queryParams =
+        queryParams.create (Some projectName) None (outputDataType.Run runName) [||]
+
 
     static member createForTextReport
             (projectName:    string<projectName>)

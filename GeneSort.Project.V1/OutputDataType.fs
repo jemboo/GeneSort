@@ -7,8 +7,8 @@ open System
 
 type outputDataType =
     | MutationSegmentEvalBinsSet of string
-    | Project
-    | RunParameters of string
+    | Run of string<runName>
+    | RunParameters of string<runName>
     | SorterModelSet of string
     | SorterSet of string
     | SortableTest of string
@@ -29,8 +29,8 @@ module OutputDataType =
     let toFolderName (outputDataType: outputDataType) : string =
         match outputDataType with
         | MutationSegmentEvalBinsSet s -> appendParam "MutationSegmentEvalBinsSet" s
-        | Project -> "Project"
-        | RunParameters s -> appendParam "RunParameters" s
+        | Run s -> "Run"
+        | RunParameters s -> appendParam "RunParameters" %s
         | SorterSet s -> appendParam "SorterSet" s
         | SortableTest s -> appendParam "SortableTest" s
         | SortableTestSet s -> appendParam "SortableTestSet" s
@@ -50,8 +50,8 @@ module OutputDataType =
         let param = if parts.Length > 1 then String.Join("_", parts.[1..]) else ""
         match prefix with
         | "MutationSegmentEvalBinsSet" -> Some (MutationSegmentEvalBinsSet param)
-        | "Project" when param = "" -> Some Project
-        | "RunParameters" -> Some (RunParameters param)
+        | "Run" -> Some (Run (param |> UMX.tag<runName>))
+        | "RunParameters" -> Some (RunParameters (param |> UMX.tag<runName>))
         | "SorterSet" -> Some (SorterSet param)
         | "SortableTest" -> Some (SortableTest param)
         | "SortableTestSet" -> Some (SortableTestSet param)

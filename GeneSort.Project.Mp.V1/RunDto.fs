@@ -13,7 +13,7 @@ type parameterSpanDto =
     }
 
 [<MessagePackObject>]
-type projectDto =
+type runDto =
     {
         [<MessagePack.Key(0)>] ProjectName: string
         [<MessagePack.Key(1)>] RunName: string
@@ -21,8 +21,8 @@ type projectDto =
         [<MessagePack.Key(3)>] OutputDataTypes: outputDataTypeDto []
     }
 
-module ProjectDto =
-    let fromDomain (project: project) : projectDto =
+module RunDto =
+    let fromDomain (project: run) : runDto =
         {
             ProjectName = %project.ProjectName
             RunName = %project.RunName
@@ -30,8 +30,8 @@ module ProjectDto =
             OutputDataTypes = project.OutputDataTypes |> Array.map(OutputDataTypeDto.fromDomain)
         }
 
-    let toDomain (dto: projectDto) : project =
-        project.create
+    let toDomain (dto: runDto) : run =
+        run.create
           (dto.ProjectName |> UMX.tag<projectName> )
           (dto.RunName |> UMX.tag<runName> )
           dto.Description

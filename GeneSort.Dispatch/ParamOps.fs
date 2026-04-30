@@ -48,7 +48,7 @@ module ParamOps =
         (buildQueryParams: runParameters -> outputDataType -> queryParams)
         (cts: CancellationTokenSource)
         (progress: IProgress<string> option)
-        (project: project)
+        (run: run)
         (minReplica: int<replNumber>)
         (maxReplica: int<replNumber>)
         (allowOverwrite: bool<allowOverwrite>)
@@ -56,9 +56,9 @@ module ParamOps =
         (parameterSpans: (string * string list) list) : Async<Result<unit, string>> =
         async {
             try
-                report progress (sprintf "%s Saving project file: %s" (MathUtils.getTimestampString()) %project.ProjectName)
-                let queryParams = queryParams.createForProject project.ProjectName
-                let! saveProjRes = db.saveAsync queryParams (project |> outputData.Project) (true |> UMX.tag<allowOverwrite>)
+                report progress (sprintf "%s Saving project file: %s" (MathUtils.getTimestampString()) %run.ProjectName)
+                let queryParams = queryParams.createForRun run.ProjectName run.RunName
+                let! saveProjRes = db.saveAsync queryParams (run |> outputData.Run) (true |> UMX.tag<allowOverwrite>)
                 match saveProjRes with
                 | Error err -> return Error err
                 | Ok () ->

@@ -1,19 +1,16 @@
 ﻿namespace GeneSort.FileDb.V1
 open System
 open System.IO
-open System.Text
 open System.Threading
 open FSharp.UMX
 open MessagePack
 open MessagePack.FSharp
 open MessagePack.Resolvers
-open GeneSort.Core
 open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Eval.V1.Bins
 open GeneSort.Project.Mp.V1
 open GeneSort.Eval.Mp.V1
-//open GeneSort.SortingResults.Mp.Bins
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
@@ -26,26 +23,32 @@ module OutputDataFile =
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let getPathToOutputDataFolder
-                (pathToProjectFolder:string<pathToRootFolder>)
+                (pathToRootFolder:string<pathToRootFolder>)
                 (replString: string)
                 (outputDataType: outputDataType)
                  :string<fullPathToFolder> =
-        Path.Combine(%pathToProjectFolder, outputDataType |> OutputDataType.toFolderName, replString) |> UMX.tag<fullPathToFolder>
+        match outputDataType with
+        | outputDataType.RunParameters _   ->
+            Path.Combine(%pathToRootFolder, "Run", outputDataType |> OutputDataType.toFolderName, replString) 
+            |> UMX.tag<fullPathToFolder>
+        | _ -> 
+            Path.Combine(%pathToRootFolder, outputDataType |> OutputDataType.toFolderName, replString) 
+            |> UMX.tag<fullPathToFolder>
 
     let makeOutputDataName (queryParams: queryParams) : string =
         let idPart = queryParams.Id.ToString()
         match queryParams.OutputDataType with
-        | outputDataType.Project -> "Project"
+        | outputDataType.Run runName -> sprintf "Run_%s" %runName
         | _ -> idPart
 
     let getFullOutputDataFilePath
-            (pathToProjectFolder: string<pathToRootFolder>)
+            (pathToRootFolder: string<pathToRootFolder>)
             (queryParams: queryParams) : string<fullPathToFile> =
         let fileNameWithExtension =
             match queryParams.OutputDataType with
             | outputDataType.TextReport reportName -> sprintf "%s_%s.txt" %reportName (DateTime.Now.ToString("yyyyMMdd_HHmm"))
             | _ -> makeOutputDataName queryParams + ".msgpack"
-        let outputDataFolder = getPathToOutputDataFolder pathToProjectFolder queryParams.ReplAsString queryParams.OutputDataType
+        let outputDataFolder = getPathToOutputDataFolder pathToRootFolder queryParams.ReplAsString queryParams.OutputDataType
         Path.Combine(%outputDataFolder, fileNameWithExtension) |> UMX.tag<fullPathToFile>
 
     /// Helper to deserialize DTO and convert to domain.
@@ -135,10 +138,10 @@ module OutputDataFile =
                             let! domain = deserializeDto<sorterEvalBinsDto, sorterEvalBins> stream token SorterEvalBinsDto.fromDto
                             return outputData.SorterEvalBins domain
                         }
-                    | outputDataType.Project ->
+                    | outputDataType.Run _ ->
                         async {
-                            let! domain = deserializeDto<projectDto, project> stream token ProjectDto.toDomain
-                            return outputData.Project domain
+                            let! domain = deserializeDto<runDto, run> stream token RunDto.toDomain
+                            return outputData.Run domain
                         }
                     | outputDataType.TextReport _ ->
                         failwith "Not implemented: SorterSet deserialization"
@@ -215,8 +218,8 @@ module OutputDataFile =
                             //   // serializeDto stream sse SorterSetEvalDto.fromDomain
                             | outputData.SorterEvalBins sse ->
                                 serializeDto stream sse SorterEvalBinsDto.toDto
-                            | outputData.Project p ->
-                                serializeDto stream p ProjectDto.fromDomain
+                            | outputData.Run p ->
+                                serializeDto stream p RunDto.fromDomain
                             //| outputData.TextReport dataTableReport ->
                             //    failwith "Not implemented: SorterSetEval serialization"
                             //    //async {

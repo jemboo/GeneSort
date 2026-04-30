@@ -5,7 +5,7 @@ open FSharp.UMX
 open GeneSort.Eval.V1.Bins
 
 type outputData =
-    | Project of project
+    | Run of run
     | RunParameters of runParameters
     | SorterEvalBins of sorterEvalBins
 

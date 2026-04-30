@@ -5,7 +5,7 @@ open FSharp.UMX
 open GeneSort.Core
 
 
-type project =
+type run =
     private
         {
           projectName: string<projectName>
@@ -19,7 +19,7 @@ type project =
             (projectName: string<projectName>)
             (runName: string<runName>)
             (description: string)
-            (outputDataTypes: outputDataType array) : project =
+            (outputDataTypes: outputDataType array) : run =
 
         if String.IsNullOrWhiteSpace %projectName then
             failwith "Project name cannot be empty"

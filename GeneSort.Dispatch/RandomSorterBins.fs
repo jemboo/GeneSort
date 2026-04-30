@@ -19,7 +19,7 @@ open GeneSort.Sorting.Sortable
 // --- Core Types ---
 
 /// Data-only specification for a project configuration
-type ProjectSpec = {
+type runSpec = {
     ProjectName: string<projectName>
     RunName: string<runName>
     ProjectDesc: string
@@ -43,8 +43,8 @@ and randomSorterBinsHost =
     private { 
         _projectDb: IGeneSortDb 
         _parameterSpans: (string * string list) list
-        _spec: ProjectSpec
-        _project: project
+        _spec: runSpec
+        _project: run
     }
     static member Create db spec project =
         { _projectDb = db; _parameterSpans = spec.Spans; _spec = spec; _project = project }
@@ -176,10 +176,10 @@ module RandomSorterBins =
 
     let Configs = Map.ofList [ ("P1", Specs.P1) ]
 
-    let CreateHost (spec: ProjectSpec) =
+    let CreateHost (spec: runSpec) =
         let folder = spec.DataFolder |> UMX.tag
         let db = new GeneSortDbMp(folder) :> IGeneSortDb
-        let proj = project.create 
+        let proj = run.create 
                         spec.ProjectName
                         spec.RunName
                         spec.ProjectDesc 

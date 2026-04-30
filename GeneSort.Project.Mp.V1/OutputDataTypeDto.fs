@@ -15,7 +15,7 @@ module OutputDataTypeDto =
 
     let fromDomain (outputDataType: outputDataType) : outputDataTypeDto =
         match outputDataType with
-        | RunParameters so -> { Tag = "RunParameters"; Value = so }
+        | RunParameters so -> { Tag = "RunParameters"; Value = %so }
         | SorterSet so -> { Tag = "SorterSet"; Value = so }
         | SortableTest so -> { Tag = "SortableTest"; Value = so }
         | SortableTestSet so -> { Tag = "SortableTestSet"; Value = so }
@@ -25,12 +25,14 @@ module OutputDataTypeDto =
         | SortableTestModelSetGen so -> { Tag = "SortableTestModelSetGen"; Value = so }
         | SorterSetEval so -> { Tag = "SorterSetEval"; Value = so }
         | SorterEvalBins so -> { Tag = "SorterSetEvalBins"; Value = so }
-        | Project -> { Tag = "Project"; Value = "" }
+        | Run so -> { Tag = "Run"; Value = %so }
         | TextReport trn -> { Tag = "TextReport"; Value = %trn }
+        | _ -> failwith (sprintf "%A not handled" outputDataType)
+
 
     let toDomain (dto: outputDataTypeDto) : outputDataType =
         match dto.Tag with
-        | "RunParameters" -> RunParameters dto.Value
+        | "RunParameters" -> RunParameters (dto.Value |> UMX.tag<runName>)
         | "SorterSet" -> SorterSet dto.Value
         | "SortableTest" -> SortableTest dto.Value
         | "SortableTestSet" -> SortableTestSet dto.Value
@@ -40,6 +42,6 @@ module OutputDataTypeDto =
         | "SortableTestModelSetGen" -> SortableTestModelSetGen dto.Value
         | "SorterSetEval" -> SorterSetEval dto.Value
         | "SorterSetEvalBins" -> SorterEvalBins dto.Value
-        | "Project" -> Project
+        | "Run" -> Run (dto.Value |> UMX.tag<runName>)
         | "TextReport" -> TextReport (dto.Value |> UMX.tag<textReportName>)
         | _ -> failwith (sprintf "%s not handled" dto.Tag)
