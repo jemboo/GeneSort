@@ -62,7 +62,7 @@ module ParamOps =
                 match saveProjRes with
                 | Error err -> return Error err
                 | Ok () ->
-                    let runParametersArray = Project.makeRunParameters minReplica maxReplica parameterSpans paramRefiner |> Seq.toArray
+                    let runParametersArray = Run.makeRunParameters minReplica maxReplica parameterSpans paramRefiner |> Seq.toArray
                     report progress (sprintf "%s Saving run parameters files: (%d)" (MathUtils.getTimestampString()) runParametersArray.Length)
                     return! saveParametersFiles 
                                 db

@@ -38,7 +38,7 @@ type run =
 
 
 
-module Project =
+module Run =
 
     let makeRunParameters 
                 (minReplica: int<replNumber>) 
