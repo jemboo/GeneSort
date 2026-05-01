@@ -12,7 +12,7 @@ open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1
 
 
-module RandomStandardSorters =
+module RandomStandard =
 
     let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let sw = rp.GetSortingWidth().Value
@@ -40,15 +40,19 @@ module RandomStandardSorters =
 
     module Specs =
         let P1 = {
-            ProjectName = "Standard" |> UMX.tag
-            RunName = "Standard" |> UMX.tag
+            ProjectName = "SorterEvalBins" |> UMX.tag
+            RunName = "Dev" |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs"
-            DataFolder = "c:\\ProjectsV1\\RandomSorterBins\\Data"
+            DataFolder = "c:\\ProjectsV1\\SorterEvalBins\\RandomStandard\\Data"
             Spans = [
-                (runParameters.sortingWidthKey, ["12"])
-                (runParameters.simpleSorterModelTypeKey, [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
-                (runParameters.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
-                (runParameters.sorterCountKey, ["1000"])
+                (runParameters.sortingWidthKey, 
+                ["12"])
+                (runParameters.simpleSorterModelTypeKey, 
+                [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
+                (runParameters.sortableDataFormatKey, 
+                [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
+                (runParameters.sorterCountKey, 
+                ["1000"])
             ]
             GetStageLength = fun sw -> (match %sw with | 12 -> 40 | _ -> 40) |> UMX.tag
             Filter = standardSorterModelTypeFilter
@@ -63,7 +67,36 @@ module RandomStandardSorters =
                 |> sorterModelGen.Simple
         }
 
-    let Configs = Map.ofList [ ("P1", Specs.P1) ]
+        let P2 = {
+            ProjectName = "SorterEvalBins" |> UMX.tag
+            RunName = "Prod" |> UMX.tag
+            ProjectDesc = "Standard binning for Msce/Mssi/Msrs"
+            DataFolder = "c:\\ProjectsV1\\SorterEvalBins\\RandomStandard\\Data"
+            Spans = [
+                (runParameters.sortingWidthKey, 
+                ["12"])
+                (runParameters.simpleSorterModelTypeKey, 
+                [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
+                (runParameters.sortableDataFormatKey, 
+                [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
+                (runParameters.sorterCountKey, 
+                ["1000"])
+            ]
+            GetStageLength = fun sw -> (match %sw with | 12 -> 40 | _ -> 40) |> UMX.tag
+            Filter = standardSorterModelTypeFilter
+            Enhancer = standardEnhancer
+            RngFactory = rngFactory.LcgFactory
+            CollectNewSortableTests = true
+            AllowOverwrite = false |> UMX.tag
+            TestModelFactory = fun rp -> msasF.create (rp.GetSortingWidth().Value) |> sortableTestModel.MsasF
+            SorterModelGenFactory = fun rp -> 
+                SimpleSorterModelGen.makeUniform rngFactory.LcgFactory 
+                    (rp.GetSortingWidth().Value) (rp.GetStageLength().Value) (rp.GetSimpleSorterModelType().Value) 
+                |> sorterModelGen.Simple
+        }
+
+
+    let Configs = Map.ofList [ ("P1", Specs.P1); ("P2", Specs.P2) ]
 
     let CreateHost (spec: runHostSpec) =
         let folder = spec.DataFolder |> UMX.tag

@@ -29,10 +29,10 @@ type sortableMergeHost =
     member this.ExtractDomainParams (rp: runParameters) =
         maybe {
             let! width = rp.GetSortingWidth()
-            let! dim = rp.GetMergeDimension()
-            let! fill = rp.GetMergeSuffixType()
-            let! dataType = rp.GetSortableDataFormat()
-            return (width, dim, fill, dataType)
+            let! mergeDim = rp.GetMergeDimension()
+            let! suffixFill = rp.GetMergeSuffixType()
+            let! dataFormat = rp.GetSortableDataFormat()
+            return (width, mergeDim, suffixFill, dataFormat)
         }
 
 module SortableMergeTests =
@@ -66,18 +66,31 @@ module SortableMergeTests =
 
     // --- Shared Query Logic ---
 
-    let makeQueryParams (repl: int<replNumber> option) (sortingWidth: int<sortingWidth> option)
-                        (mergeDimension: int<mergeDimension> option) (mergeFillType: mergeSuffixType option)
-                        (sortableDataFormat: sortableDataFormat option) (outputDataType: outputDataType) : queryParams =
+    let makeQueryParams 
+                (repl: int<replNumber> option) 
+                (sortingWidth: int<sortingWidth> option)
+                (mergeDimension: int<mergeDimension> option) 
+                (mergeFillType: mergeSuffixType option)
+                (sortableDataFormat: sortableDataFormat option) 
+                (outputDataType: outputDataType) : queryParams =
         queryParams.create (Some projectName) repl outputDataType
             [| (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
                (runParameters.mergeDimensionKey, mergeDimension |> MergeDimension.toString);
-               (runParameters.mergeSuffixTypeKey, mergeFillType |> Option.map MergeSuffixType.toString |> UmxExt.stringToString );
-               (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringToString ); |]
+               (runParameters.mergeSuffixTypeKey, mergeFillType 
+                    |> Option.map MergeSuffixType.toString |> UmxExt.stringToString );
+               (runParameters.sortableDataFormatKey, sortableDataFormat 
+                    |> Option.map SortableDataFormat.toString |> UmxExt.stringToString ); |]
 
-    let makeQueryParamsFromRunParams (runParams: runParameters) (outputDataType: outputDataType) =
-        makeQueryParams (runParams.GetRepl()) (runParams.GetSortingWidth()) (runParams.GetMergeDimension())
-                        (runParams.GetMergeSuffixType()) (runParams.GetSortableDataFormat()) outputDataType
+    let makeQueryParamsFromRunParams 
+                (runParams: runParameters) 
+                (outputDataType: outputDataType) : queryParams =
+        makeQueryParams 
+                (runParams.GetRepl()) 
+                (runParams.GetSortingWidth()) 
+                (runParams.GetMergeDimension())
+                (runParams.GetMergeSuffixType()) 
+                (runParams.GetSortableDataFormat()) 
+                outputDataType
 
     // --- Configuration P1 (Testing) ---
 

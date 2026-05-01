@@ -3,10 +3,12 @@ namespace GeneSort.Project.V1
 
 open FSharp.UMX
 open GeneSort.Eval.V1.Bins
+open GeneSort.Sorting.Sortable
 
 type outputData =
     | Run of run
     | RunParameters of runParameters
+    | SortableTest of sortableTest
     | SorterEvalBins of sorterEvalBins
 
 

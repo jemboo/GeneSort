@@ -26,11 +26,16 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 let configKey = "P1" 
 
-// The Program now works purely against the IRunHost interface
 let host: IRunHost = 
-    match SorterEvalBins.RandomStandardSorters.Configs |> Map.tryFind configKey with
-    | Some s -> SorterEvalBins.RandomStandardSorters.CreateHost s
+    match SortableTest.Merge.Configs |> Map.tryFind configKey with
+    | Some s -> SortableTest.Merge.CreateHost s
     | None -> failwithf "Config key '%s' not found." configKey
+
+
+//let host: IRunHost = 
+//    match SorterEvalBins.RandomStandard.Configs |> Map.tryFind configKey with
+//    | Some s -> SorterEvalBins.RandomStandard.CreateHost s
+//    | None -> failwithf "Config key '%s' not found." configKey
 
 let minReplica = 0<replNumber>
 let maxReplica = 10<replNumber>

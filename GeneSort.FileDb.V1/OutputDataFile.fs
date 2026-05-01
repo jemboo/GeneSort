@@ -11,6 +11,8 @@ open GeneSort.Project.V1
 open GeneSort.Eval.V1.Bins
 open GeneSort.Project.Mp.V1
 open GeneSort.Eval.Mp.V1
+open GeneSort.Sorting.Mp.Sortable
+open GeneSort.Sorting.Sortable
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
@@ -98,11 +100,10 @@ module OutputDataFile =
                         //    return outputData.SortableTestSet domain
                         //}
                     | outputDataType.SortableTest _ ->
-                        failwith "Not implemented: SorterSet deserialization"
-                        //async {
-                        //    let! domain = deserializeDto<sortableTestDto, sortableTest> stream token SortableTestDto.toDomain
-                        //    return outputData.SortableTest domain
-                        //}
+                        async {
+                            let! domain = deserializeDto<sortableTestDto, sortableTest> stream token SortableTestDto.toDomain
+                            return outputData.SortableTest domain
+                        }
                     | outputDataType.SortingSet _ ->
                         failwith "Not implemented: SorterSet deserialization"
                         //async {
@@ -198,9 +199,8 @@ module OutputDataFile =
                             //| outputData.SortableTestSet sts ->
                             //    failwith "Not implemented: SorterSetEval serialization"
                             //    //serializeDto stream sts SortableTestSetDto.fromDomain
-                            //| outputData.SortableTest sts ->
-                            //    failwith "Not implemented: SorterSetEval serialization"
-                            //    ///serializeDto stream sts SortableTestDto.fromDomain
+                            | outputData.SortableTest sts ->
+                                 serializeDto stream sts SortableTestDto.fromDomain
                             //| outputData.SortingSet sms ->
                             //    failwith "Not implemented: SorterSetEval serialization"
                             //    //serializeDto stream sms SortingSetDto.fromDomain
