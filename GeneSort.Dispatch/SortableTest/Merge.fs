@@ -48,10 +48,10 @@ module Merge =
             ProjectDesc = "Int8 merge sorter test sets"
             DataFolder = "c:\\ProjectsV1\\SortableTest\\Merge\\Data"
             Spans = [
-                (runParameters.sortingWidthKey, [16;] |> List.map string)
+                (runParameters.sortingWidthKey, [32;] |> List.map string)
                 (runParameters.sortableDataFormatKey, 
                 [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
-                (runParameters.mergeDimensionKey, [2;] |> List.map string)
+                (runParameters.mergeDimensionKey, [4;] |> List.map string)
                 (runParameters.mergeSuffixTypeKey, 
                 [mergeSuffixType.NoSuffix; mergeSuffixType.VV_1] |> List.map MergeSuffixType.toString)
             ]

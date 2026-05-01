@@ -16,10 +16,12 @@ open GeneSort.Dispatch.V1
 
 module Executor =
 
+
+
     let makeSorterEvalBins 
-        (host: IRunHost)
         (makeSorterModel: runParameters -> sorterModelSet option)
         (makeTests: runParameters -> Sortable.sortableTest option)
+        (host: IRunHost)
         (collectTests: bool)
         (rp: runParameters) 
         (allowOverwrite: bool<allowOverwrite>) 
