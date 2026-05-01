@@ -16,12 +16,20 @@ module ComputationBuilders =
                 return Ok ()
         }
 
-    // --- Maybe Builder (Option) ---
     type MaybeBuilder() =
         member _.Bind(x, f) = Option.bind f x
         member _.Return(x) = Some x
         member _.ReturnFrom(x) = x
-        member _.Zero() = None
+        member _.Zero() = Some ()
+    
+        // The "unit -> 'a" function is the delay the compiler creates
+        member _.Delay(f) = f() 
+    
+        // Now Combine takes the result of Delay (the value) directly
+        member _.Combine(step1, step2) = 
+            match step1 with
+            | None -> None
+            | Some () -> step2
 
     let maybe = MaybeBuilder()
 

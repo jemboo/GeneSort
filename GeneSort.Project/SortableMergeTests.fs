@@ -131,15 +131,18 @@ module SortableMergeTests =
                 report progress (sprintf "Starting Merge Generation Run %s" %runId)
 
                 // 2. Safe extraction (Via Host)
-                let! (sw, md, mft, sdf) = 
+                let! (sw, md, mergeSufixType, sortableDataFormat) = 
                     host.ExtractDomainParams runParams 
                     |> Result.ofOption "Missing domain parameters required for generation"
 
                 // 3. Create SortableTestModel
-                let sortableTestModel = msasM.create sw md mft |> sortableTestModel.MsasMi
+                let sortableTestModel = msasM.create sw md mergeSufixType |> sortableTestModel.MsasMi
             
                 let qpForSortableTest = makeQueryParamsFromRunParams runParams (outputDataType.SortableTest "") 
-                let sortableTests = SortableTestModel.makeSortableTest (%qpForSortableTest.Id |> UMX.tag) sortableTestModel sdf
+                let sortableTests = SortableTestModel.makeSortableTest 
+                                            (%qpForSortableTest.Id |> UMX.tag) 
+                                            sortableTestModel 
+                                            sortableDataFormat
 
                 // 4. Save (Using Host DB)
                 let! (_: unit) = checkCancellation cts.Token

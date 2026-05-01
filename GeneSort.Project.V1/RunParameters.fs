@@ -150,7 +150,7 @@ type runParameters =
     member this.WithSorterCount(sc: int<sorterCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountKey (sc |> Option.map UmxExt.intToRaw) }
 
-    member this.WithSorterModelType(smt: simpleSorterModelType option) = 
+    member this.WithSimpleSorterModelType(smt: simpleSorterModelType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.simpleSorterModelTypeKey (smt |> Option.map SimpleSorterModelType.toString) }
 
     member this.WithSortingWidth(w: int<sortingWidth> option) = 

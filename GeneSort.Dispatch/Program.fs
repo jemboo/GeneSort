@@ -8,8 +8,6 @@ open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.FileDb.V1
 
-// --- Infrastructure ---
-
 let createThreadSafeProgress() =
     let agent = MailboxProcessor.Start(fun inbox ->
         async {
@@ -19,8 +17,6 @@ let createThreadSafeProgress() =
         })
     { new IProgress<string> with member _.Report(msg) = agent.Post(msg) }
 
-// --- Global Setup ---
-
 let progress = createThreadSafeProgress()
 let cts = new CancellationTokenSource()
 let maxParallel = Environment.ProcessorCount
@@ -28,24 +24,19 @@ let maxParallel = Environment.ProcessorCount
 let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
-// --- Configuration Selection ---
-
 let configKey = "P1" 
 
-let spec = 
-    match RandomSorterBins.Configs |> Map.tryFind configKey with
-    | Some s -> s
+// The Program now works purely against the IRunHost interface
+let host: IRunHost = 
+    match SorterEvalBins.RandomStandardSorters.Configs |> Map.tryFind configKey with
+    | Some s -> SorterEvalBins.RandomStandardSorters.CreateHost s
     | None -> failwithf "Config key '%s' not found." configKey
-
-let host = RandomSorterBins.CreateHost spec
 
 let minReplica = 0<replNumber>
 let maxReplica = 10<replNumber>
 
-// --- Execution ---
-
 async {
-    printfn "Running Project: %s" %host.Spec.ProjectName
+    printfn "Running Project: %s" %host.Project.ProjectName
     
     let! initResult = 
         ParamOps.initProjectAndRunFiles
@@ -56,7 +47,7 @@ async {
             host.Project              
             minReplica 
             maxReplica 
-            host.Spec.AllowOverwrite 
+            host.AllowOverwrite 
             host.ParamMapRefiner      
             host.ParameterSpans
 
@@ -70,10 +61,10 @@ async {
                 maxReplica 
                 host.MakeQueryParamsFromRunParams 
                 host.Project.RunName 
-                host.Spec.AllowOverwrite 
+                host.AllowOverwrite 
                 cts 
                 (Some progress) 
-                (RandomSorterBins.executor host)
+                host.Executor
                 maxParallel
 
         match execResult with

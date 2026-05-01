@@ -12,7 +12,11 @@
     <Compile Include="OpsUtils.fs" />
     <Compile Include="ParamOps.fs" />
     <Compile Include="ProjectOps.fs" />
-    <Compile Include="RandomSorterBins.fs" />
+    <Compile Include="IRunHost.fs" />
+    <Compile Include="SorterEvalBins\Executor.fs" />
+    <Compile Include="SorterEvalBins\RunHost.fs" />
+    <Compile Include="SorterEvalBins\RandomStandardSorters.fs" />
+    <Compile Include="SorterEvalBins\Merge.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -41,6 +45,10 @@
 
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="11.0.100-preview3.26207.106" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="SortableTest\" />
   </ItemGroup>
 
 </Project>
