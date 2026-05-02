@@ -181,6 +181,12 @@ module DataTableReport =
         allHeaders, rows
 
 
+    let saveToPath (filePath: string) (rows: string [] []) =
+        let append = false // overwrite existing file
+        use writer = new StreamWriter(filePath, append, Encoding.UTF8)
+        for row in rows do
+            writer.WriteLine(String.Join("\t", row))
+
 
     let concatenateAllFiles (rootPath: string) (outputPath: string) =
         // 1. Get all .txt files in the root and all subdirectories

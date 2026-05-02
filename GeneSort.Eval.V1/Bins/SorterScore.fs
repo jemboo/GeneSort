@@ -13,7 +13,7 @@ type sorterScoreV1 =
         sorterId: Guid<sorterId>
         unsortedCount: int<sortableCount>
         unsortedGroupCount: int<sortableCount> option
-        sequenceHash: int<sequenceHash>
+        stageSequenceHash: int<sequenceHash>
         lastCeIndex: int<ceIndex>
     }
 
@@ -27,14 +27,14 @@ type sorterScoreV1 =
                 sorterId = sorterId; 
                 unsortedCount = unsortedCount; 
                 unsortedGroupCount = unsortedGroupCount;
-                sequenceHash = sequenceKey; 
+                stageSequenceHash = sequenceKey; 
                 lastCeIndex = lastCeIndex;
         }
 
     member this.SorterId with get() : Guid<sorterId>  = this.sorterId
     member this.UnsortedCount with get() : int<sortableCount>  = this.unsortedCount
     member this.UnsortedGroupCount with get() : int<sortableCount> option  = this.unsortedGroupCount;
-    member this.SequenceKey with get() : int<sequenceHash>  = this.sequenceHash
+    member this.StageSequenceHash with get() : int<sequenceHash>  = this.stageSequenceHash
     member this.LastCeIndex with get() : int<ceIndex>  = this.lastCeIndex
     member this.ToDataTableRecord() : GeneSort.Core.dataTableRecord =
             let groupCountStr = 
@@ -46,7 +46,7 @@ type sorterScoreV1 =
             |> GeneSort.Core.dataTableRecord.addData "SorterId" (string %this.sorterId)
             |> GeneSort.Core.dataTableRecord.addData "UnsortedCount" (string %this.unsortedCount)
             |> GeneSort.Core.dataTableRecord.addData "UnsortedGroupCount" groupCountStr
-            |> GeneSort.Core.dataTableRecord.addData "SequenceHash" (string %this.sequenceHash)
+            |> GeneSort.Core.dataTableRecord.addData "SequenceHash" (string %this.stageSequenceHash)
             |> GeneSort.Core.dataTableRecord.addData "LastCeIndex" (string %this.lastCeIndex)
 
 
@@ -64,11 +64,14 @@ module SorterScore =
             | Some st -> Some (SortableTests.getSortableCount st)
             | None -> None
 
+        let stageSequence = 
+            StageSequence.fromCes sorterEval.CeBlockEval.CeBlock.SortingWidth sorterEval.CeBlockEval.UsedCes
+
         sorterScoreV1.create 
                     sorterEval.SorterId
                     sorterEval.CeBlockEval.UnsortedCount
                     unsortedGroupCount
-                    (Ce.getSequenceHash sorterEval.CeBlockEval.UsedCes)
+                    (stageSequence.GetHashCode() |> UMX.tag<sequenceHash>)
                     (sorterEval.CeBlockEval.CeUseCounts.LastUsedCeIndex)
 
 

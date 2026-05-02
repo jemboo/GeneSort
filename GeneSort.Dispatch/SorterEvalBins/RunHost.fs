@@ -5,10 +5,7 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Db.V1
 open GeneSort.Project.V1
-open GeneSort.FileDb.V1
 open GeneSort.Model.Sorting.V1
-open GeneSort.Model.Sorting.Simple.V1
-open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1
 
 
@@ -27,11 +24,7 @@ type runHostSpec = {
     RngFactory: rngFactory
     CollectNewSortableTests: bool
     AllowOverwrite: bool<allowOverwrite>
-    // Factories
-    TestModelFactory: runParameters -> sortableTestModel
-    SorterModelGenFactory: runParameters -> sorterModelGen
 }
-
 
 
 // --- 4. Host Implementation ---
@@ -49,26 +42,11 @@ type runHost =
 
     member this.Spec = this._spec
 
-    // Internal Factories
-    member this.MakeSortableTest (rp: runParameters) : Sortable.sortableTest option =
-        maybe {
-            let! sdt = rp.GetSortableDataFormat()
-            let qpTests = this.MakeQueryParamsFromRunParams rp (outputDataType.SortableTest "")
-            let testModel = this._spec.TestModelFactory rp
-            return SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel sdt
-        }
-
-    member this.MakeSorterModelSet (rp: runParameters) : sorterModelSet option =
-        maybe {
-            let! sc = rp.GetSorterCount()
-            let repl = rp.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
-            let qpFullSet = this.MakeQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
-            let gen = this._spec.SorterModelGenFactory rp
-            let firstIdx = (%repl * %sc) |> UMX.tag<sorterCount>
-            return SorterModelGen.makeSorterModelSet (%qpFullSet.Id |> UMX.tag) firstIdx sc gen
-        }
-
-    member this.MakeQueryParams (repl: int<replNumber>) (sw: int<sortingWidth>) (smt: simpleSorterModelType option) (odt: outputDataType) : queryParams =
+    member this.MakeQueryParams 
+                    (repl: int<replNumber>) 
+                    (sw: int<sortingWidth>) 
+                    (smt: simpleSorterModelType option) 
+                    (odt: outputDataType) : queryParams =
         let pName = this._spec.ProjectName
         queryParams.create (Some pName) (Some repl) odt
             [| (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
@@ -89,9 +67,7 @@ type runHost =
         member this.MakeQueryParamsFromRunParams rp odt = this.MakeQueryParamsFromRunParams rp odt
         member this.ParamMapRefiner rps = this.ParamMapRefiner rps
         member this.Executor runParameters allowOverwrite cts progress = 
-            Executor.makeSorterEvalBins 
-                this.MakeSorterModelSet 
-                this.MakeSortableTest 
+            Executor.makeSorterEvalBinsStandard
                 this 
                 this._spec.CollectNewSortableTests 
                 runParameters 
