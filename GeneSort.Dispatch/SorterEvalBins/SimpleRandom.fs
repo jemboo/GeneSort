@@ -59,7 +59,7 @@ module SimpleRandom =
 
     module Specs =
 
-        let Small_dev = {
+        let Small_dev :runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
             RunName = "Dev" |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs"
@@ -79,6 +79,7 @@ module SimpleRandom =
             RngFactory = rngFactory.LcgFactory
             CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
+            ExecutorType = Executor.Standard
         }
 
         let Small = {
@@ -101,6 +102,7 @@ module SimpleRandom =
             RngFactory = rngFactory.LcgFactory
             CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
+            ExecutorType = Executor.Standard
         }
 
         let Standard_dev = {
@@ -124,6 +126,7 @@ module SimpleRandom =
             RngFactory = rngFactory.LcgFactory
             CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
+            ExecutorType = Executor.Standard
         }
 
         let Standard = {
@@ -147,6 +150,7 @@ module SimpleRandom =
             RngFactory = rngFactory.LcgFactory
             CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
+            ExecutorType = Executor.Standard
         }
 
     let Configs = Map.ofList 

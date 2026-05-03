@@ -80,7 +80,7 @@ type runHost =
         member this.AllowOverwrite = this._spec.AllowOverwrite
         member this.MakeQueryParamsFromRunParams rp odt = this.MakeQueryParamsFromRunParams rp odt
         member this.ParamMapRefiner rps = this.ParamMapRefiner rps
-        member this.Executor runParameters allowOverwrite cts progress = 
+        member this.Execute runParameters allowOverwrite cts progress = 
             Executor.makeSortableTest 
                 this
                 this._spec.CollectNewSortableTests 

@@ -24,7 +24,7 @@ let maxParallel = Environment.ProcessorCount
 let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
-let configKey = "P1" 
+let configKey = "Small_dev" 
 
 //let host: IRunHost = 
 //    match SortableTest.Merge.Configs |> Map.tryFind configKey with
@@ -69,7 +69,7 @@ async {
                 host.AllowOverwrite 
                 cts 
                 (Some progress) 
-                host.Executor
+                host.Execute
                 maxParallel
 
         match execResult with

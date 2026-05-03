@@ -18,6 +18,11 @@ open GeneSort.Model.Sorting.Simple.V1
 
 module Executor =
 
+    type executorType = 
+        | Standard
+        | Merge
+        | BinsReport
+
 
     let makeMsasFTests (host:IRunHost) (rp:runParameters) : Sortable.sortableTest option =
         maybe {
@@ -48,7 +53,7 @@ module Executor =
         }
 
 
-    let makeSorterEvalBins 
+    let _makeSorterEvalBins 
         (makeSorterModel: IRunHost -> runParameters -> sorterModelSet option)
         (makeTests: IRunHost ->runParameters -> Sortable.sortableTest option)
         (host: IRunHost)
@@ -74,7 +79,11 @@ module Executor =
                 let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSet tests collectTests
 
                 let qpBins = host.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
-                let sorterEvalBins = sorterEvalBinsV1.createFromEvals (%qpBins.Id |> UMX.tag) (tests |> SortableTests.getId) sorterSetEval.SorterEvals |> sorterEvalBins.V1
+                let sorterEvalBins = sorterEvalBinsV1.createFromEvals 
+                                            (%qpBins.Id |> UMX.tag) 
+                                            (tests |> SortableTests.getId) 
+                                            sorterSetEval.SorterEvals 
+                                     |> sorterEvalBins.V1
 
                 let! (_: unit) = host.ProjectDb.saveAsync qpBins (sorterEvalBins |> outputData.SorterEvalBins) allowOverwrite
                 return rp.WithRunFinished (Some true)
@@ -82,16 +91,29 @@ module Executor =
                 return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message) |> async.Return
         }
 
-    let makeSorterEvalBinsStandard 
-        (host: IRunHost)
-        (collectTests: bool)
-        (rp: runParameters) 
-        (allowOverwrite: bool<allowOverwrite>) 
-        (cts: CancellationTokenSource) 
-        (progress: IProgress<string> option) : Async<Result<runParameters, string>> = 
-        
-            makeSorterEvalBins 
+
+    let standardExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host collectTests rp allowOverwrite cts progress =
+                _makeSorterEvalBins 
                     makeSorterModelSet
                     makeMsasFTests
-                    host collectTests rp allowOverwrite cts progress
+                    host collectTests rp allowOverwrite cts progress }
+
+    let mergeExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host collectTests rp allowOverwrite cts progress =
+                _makeSorterEvalBins 
+                    makeSorterModelSet
+                    makeMsasFTests
+                    host collectTests rp allowOverwrite cts progress }
+
+    // --- The Dispatcher ---
+
+    let getExecutor (executorType: executorType) : IRunParamsExecutor =
+        match executorType with
+        | Standard -> standardExecutor
+        | Merge -> mergeExecutor
+        | BinsReport -> failwith "BinsReport executor not implemented yet"
+
 

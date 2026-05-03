@@ -65,65 +65,65 @@ type randomSorterBinsMergeHost =
                (runParameters.mergeSuffixTypeKey, mst |> Option.map MergeSuffixType.toString |> UmxExt.stringToString);
                (runParameters.simpleSorterModelTypeKey, smt |>  Option.map SimpleSorterModelType.toString |> UmxExt.stringToString) |]
 
-    interface IRunHost with
-        member this.ProjectDb = this._projectDb
-        member this.Project = this._project
-        member this.ParameterSpans = this._parameterSpans
-        member this.AllowOverwrite = this._spec.AllowOverwrite
+    //interface IRunHost with
+    //    member this.ProjectDb = this._projectDb
+    //    member this.Project = this._project
+    //    member this.ParameterSpans = this._parameterSpans
+    //    member this.AllowOverwrite = this._spec.AllowOverwrite
         
-        member this.MakeQueryParamsFromRunParams rp odt = 
-            this.MakeQueryParams (rp.GetRepl()) (rp.GetSortingWidth()) (rp.GetMergeDimension()) (rp.GetMergeSuffixType()) (rp.GetSimpleSorterModelType()) odt
+    //    member this.MakeQueryParamsFromRunParams rp odt = 
+    //        this.MakeQueryParams (rp.GetRepl()) (rp.GetSortingWidth()) (rp.GetMergeDimension()) (rp.GetMergeSuffixType()) (rp.GetSimpleSorterModelType()) odt
         
-        member this.ParamMapRefiner rps = 
-            rps |> Seq.choose (this._spec.Filter >> Option.map (this._spec.Enhancer (this :> IRunHost)))
+    //    member this.ParamMapRefiner rps = 
+    //        rps |> Seq.choose (this._spec.Filter >> Option.map (this._spec.Enhancer (this :> IRunHost)))
             
-        member this.Executor rp ow cts prog = 
-            asyncResult {
-                try
-                    let! (_: unit) = checkCancellation cts.Token
-                    let! (smt, sw, sl, cl, sc, sdt, md, mst) = this.ExtractDomainParams rp |> Result.ofOption "Missing parameters"
-                    let repl = rp.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
+    //    member this.Executor rp ow cts prog = 
+    //        asyncResult {
+    //            try
+    //                let! (_: unit) = checkCancellation cts.Token
+    //                let! (smt, sw, sl, cl, sc, sdt, md, mst) = this.ExtractDomainParams rp |> Result.ofOption "Missing parameters"
+    //                let repl = rp.GetRepl() |> Option.defaultValue (0 |> UMX.tag)
                     
-                    // 1. Sorter Generation
-                    let rng = rngFactory.LcgFactory
-                    //let gen = 
-                    //    match smt with
-                    //    | simpleSorterModelType.Msce -> msceRandGen.create rng sw this._spec.ExcludeSelfCe cl |> sorterModelGen.SmmMsceRandGen
-                    //    | simpleSorterModelType.Mssi -> mssiRandGen.create rng sw sl |> sorterModelGen.SmmMssiRandGen
-                    //    | simpleSorterModelType.Msrs -> msrsRandGen.create rng sw (OpsGenRatesArray.createUniform %sl) |> sorterModelGen.SmmMsrsRandGen
-                    //    | simpleSorterModelType.Msuf4 -> msuf4RandGen.create rng sw sl (Uf4GenRatesArray.createUniform %sl %sw) |> sorterModelGen.SmmMsuf4RandGen
-                    //    | _ -> failwith "Unsupported model type"
+    //                // 1. Sorter Generation
+    //                let rng = rngFactory.LcgFactory
+    //                //let gen = 
+    //                //    match smt with
+    //                //    | simpleSorterModelType.Msce -> msceRandGen.create rng sw this._spec.ExcludeSelfCe cl |> sorterModelGen.SmmMsceRandGen
+    //                //    | simpleSorterModelType.Mssi -> mssiRandGen.create rng sw sl |> sorterModelGen.SmmMssiRandGen
+    //                //    | simpleSorterModelType.Msrs -> msrsRandGen.create rng sw (OpsGenRatesArray.createUniform %sl) |> sorterModelGen.SmmMsrsRandGen
+    //                //    | simpleSorterModelType.Msuf4 -> msuf4RandGen.create rng sw sl (Uf4GenRatesArray.createUniform %sl %sw) |> sorterModelGen.SmmMsuf4RandGen
+    //                //    | _ -> failwith "Unsupported model type"
 
-                    //let firstIdx = (%repl * %sc) |> UMX.tag<sorterCount>
-                    //let genSeg = sortingGenSegment.create (gen |> sortingGen.Single) firstIdx sc
-                    //let qpFullSet = (this :> IRunHost).MakeQueryParamsFromRunParams rp (outputDataType.SortingSet "") 
-                    //let fullSortingSet = genSeg.MakeSortingSet (%qpFullSet.Id |> UMX.tag)
-                    //let fullSorterSet = fullSortingSet |> SortingSet.makeSorterSet
+    //                //let firstIdx = (%repl * %sc) |> UMX.tag<sorterCount>
+    //                //let genSeg = sortingGenSegment.create (gen |> sortingGen.Single) firstIdx sc
+    //                //let qpFullSet = (this :> IRunHost).MakeQueryParamsFromRunParams rp (outputDataType.SortingSet "") 
+    //                //let fullSortingSet = genSeg.MakeSortingSet (%qpFullSet.Id |> UMX.tag)
+    //                //let fullSorterSet = fullSortingSet |> SortingSet.makeSorterSet
 
-                    //// 2. Load Merge Tests
-                    //let qpTests = this.MakeQueryParams (Some (0 |> UMX.tag)) (Some sw) (Some md) (Some mst) None (outputDataType.SortableTest "")
-                    //let dbMergeTests = new GeneSortDbMp(this._spec.MergeTestsProjectFolder |> UMX.tag) :> IGeneSortDb
-                    //let! rawTestData = dbMergeTests.loadAsync qpTests 
-                    //let! tests = rawTestData |> OutputData.asSortableTest
+    //                //// 2. Load Merge Tests
+    //                //let qpTests = this.MakeQueryParams (Some (0 |> UMX.tag)) (Some sw) (Some md) (Some mst) None (outputDataType.SortableTest "")
+    //                //let dbMergeTests = new GeneSortDbMp(this._spec.MergeTestsProjectFolder |> UMX.tag) :> IGeneSortDb
+    //                //let! rawTestData = dbMergeTests.loadAsync qpTests 
+    //                //let! tests = rawTestData |> OutputData.asSortableTest
 
-                    //// 3. Evaluate & Bin
-                    //let qpEval = (this :> IRunHost).MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
-                    //let eval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSet tests this._spec.CollectNewSortableTests
+    //                //// 3. Evaluate & Bin
+    //                //let qpEval = (this :> IRunHost).MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+    //                //let eval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSet tests this._spec.CollectNewSortableTests
 
-                    //let qpBins = (this :> IRunHost).MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
-                    //let bins = sorterEvalBins.create (%qpBins.Id |> UMX.tag) eval.SorterEvals
+    //                //let qpBins = (this :> IRunHost).MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
+    //                //let bins = sorterEvalBins.create (%qpBins.Id |> UMX.tag) eval.SorterEvals
 
-                    //// 4. Sample & Save
-                    //let qpEven = (this :> IRunHost).MakeQueryParamsFromRunParams rp (outputDataType.SortingSet "EvenSampled")
-                    //let evenSet = sortingSet.create (%qpEven.Id |> UMX.tag) (SortingSetFilter.sampleBinsEvenly this._spec.SamplesPerBin bins fullSortingSet)
+    //                //// 4. Sample & Save
+    //                //let qpEven = (this :> IRunHost).MakeQueryParamsFromRunParams rp (outputDataType.SortingSet "EvenSampled")
+    //                //let evenSet = sortingSet.create (%qpEven.Id |> UMX.tag) (SortingSetFilter.sampleBinsEvenly this._spec.SamplesPerBin bins fullSortingSet)
 
-                    //let! (_: unit) = this._projectDb.saveAsync qpBins (bins |> outputData.SorterEvalBins) ow
-                    //let! (_: unit) = this._projectDb.saveAsync qpEven (evenSet |> outputData.SortingSet) ow
+    //                //let! (_: unit) = this._projectDb.saveAsync qpBins (bins |> outputData.SorterEvalBins) ow
+    //                //let! (_: unit) = this._projectDb.saveAsync qpEven (evenSet |> outputData.SortingSet) ow
 
-                    return rp.WithRunFinished (Some true)
-                with e -> 
-                    return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message) |> async.Return
-            }
+    //                return rp.WithRunFinished (Some true)
+    //            with e -> 
+    //                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message) |> async.Return
+    //        }
 
 // --- 3. Logic Module: Merge ---
 
@@ -213,8 +213,8 @@ module RandomSorterBinsMerge =
 
     let Configs = Map.ofList [ ("P1", Specs.P1) ]
 
-    let CreateHost (spec: runSpecMerge) =
-        let db = new GeneSortDbMp(spec.DataFolder |> UMX.tag) :> IGeneSortDb
-        let proj = run.create spec.ProjectName spec.RunName spec.ProjectDesc 
-                                [| outputDataType.RunParameters spec.RunName; outputDataType.SorterEvalBins ""; outputDataType.SortingSet "EvenSampled" |]
-        randomSorterBinsMergeHost.Create db spec proj :> IRunHost
+    //let CreateHost (spec: runSpecMerge) =
+    //    let db = new GeneSortDbMp(spec.DataFolder |> UMX.tag) :> IGeneSortDb
+    //    let proj = run.create spec.ProjectName spec.RunName spec.ProjectDesc 
+    //                            [| outputDataType.RunParameters spec.RunName; outputDataType.SorterEvalBins ""; outputDataType.SortingSet "EvenSampled" |]
+    //    randomSorterBinsMergeHost.Create db spec proj :> IRunHost

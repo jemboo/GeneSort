@@ -12,14 +12,14 @@
     <Compile Include="OpsUtils.fs" />
     <Compile Include="ParamOps.fs" />
     <Compile Include="ProjectOps.fs" />
-    <Compile Include="IRunHost.fs" />
+    <Compile Include="Interfaces.fs" />
     <Compile Include="SortableTest\Executor.fs" />
     <Compile Include="SortableTest\RunHost.fs" />
     <Compile Include="SortableTest\Merge.fs" />
     <Compile Include="SorterEvalBins\Executor.fs" />
     <Compile Include="SorterEvalBins\RunHost.fs" />
     <Compile Include="SorterEvalBins\SimpleRandom.fs" />
-    <Compile Include="SorterEvalBins\Merge.fs" />
+    <Compile Include="SorterEvalBins\SimpleMerge.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
