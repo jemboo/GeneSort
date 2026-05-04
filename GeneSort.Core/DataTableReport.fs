@@ -161,7 +161,6 @@ module DataTableReport =
             |> Set.toArray
             |> Array.append [| "RowKey" |]
             
-
         let rows =
             data
             |> Map.toArray
@@ -177,11 +176,17 @@ module DataTableReport =
                             | None   -> row.[i] <- ""
                         row
                 )
-
         allHeaders, rows
 
 
-    let saveToPath (filePath: string) (rows: string [] []) =
+    let fromDataTableRecords (records: dataTableRecord seq) : dataTableReport =
+        let (headers, rows) = dataTableRecord.createTable records
+        let report = create "DataTableReport" headers
+        report.AppendDataRows rows
+        report
+
+
+    let saveToPath (filePath: string) (rows: string [][]) =
         let append = false // overwrite existing file
         use writer = new StreamWriter(filePath, append, Encoding.UTF8)
         for row in rows do

@@ -41,7 +41,7 @@ type dataTableRecord =
         let cleanedValue = if value = null then "" else value.Replace("\t", " ")
         { keys = Map.ofList [(cleanedKey, cleanedValue)]; data = Map.ofList [(cleanedKey, cleanedValue)] }
 
-    static member createTable (records: dataTableRecord seq) : string [] [] =
+    static member createTable (records: dataTableRecord seq) : (string []) * (string [][]) =
         let allKeys = records |> Seq.collect (fun r -> r.Data |> Map.toSeq) |> Seq.map fst |> Seq.distinct
         let header = allKeys |> Seq.toArray
         let rows = 
@@ -50,5 +50,5 @@ type dataTableRecord =
                 header 
                 |> Array.map (fun k -> if r.Data.ContainsKey(k) then r.Data.[k] else ""))
             |> Seq.toArray
-        Array.concat [[|header|]; rows]
+        (header, rows)
 

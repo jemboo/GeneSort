@@ -46,6 +46,7 @@ module SimpleRandom =
           .WithRunName(Some host.Project.RunName)
           .WithRunFinished(Some false)
           .WithStageLength(Some sl)
+          .WithCollectSortableTests(Some true)
           .WithId (Some qp.Id)
 
     let private standardSorterModelTypeFilter (rp: runParameters) =
@@ -59,9 +60,9 @@ module SimpleRandom =
 
     module Specs =
 
-        let Small_dev :runHostSpec = {
+        let Small_dev (executorType: Executor.executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = "Dev" |> UMX.tag
+            RunName = sprintf @"Small_Dev_%s" (Executor.ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Small\\Data"
             Spans = [
@@ -79,12 +80,12 @@ module SimpleRandom =
             RngFactory = rngFactory.LcgFactory
             CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
-            ExecutorType = Executor.Standard
+            ExecutorType = executorType
         }
 
-        let Small = {
+        let Small (executorType: Executor.executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = "Prod" |> UMX.tag
+            RunName = sprintf @"Small_%s" (Executor.ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Small\\Data"
             Spans = [
@@ -102,12 +103,12 @@ module SimpleRandom =
             RngFactory = rngFactory.LcgFactory
             CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
-            ExecutorType = Executor.Standard
+            ExecutorType = executorType
         }
 
-        let Standard_dev = {
+        let Standard_dev (executorType: Executor.executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = "Dev" |> UMX.tag
+            RunName = sprintf @"Standard_Dev_%s" (Executor.ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Standard\\Data"
             Spans = [
@@ -126,12 +127,12 @@ module SimpleRandom =
             RngFactory = rngFactory.LcgFactory
             CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
-            ExecutorType = Executor.Standard
+            ExecutorType = executorType
         }
 
-        let Standard = {
+        let Standard (executorType: Executor.executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = "Prod" |> UMX.tag
+            RunName = sprintf @"Standard_%s" (Executor.ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Standard\\Data"
             Spans = [
@@ -150,7 +151,7 @@ module SimpleRandom =
             RngFactory = rngFactory.LcgFactory
             CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
-            ExecutorType = Executor.Standard
+            ExecutorType = executorType
         }
 
     let Configs = Map.ofList 

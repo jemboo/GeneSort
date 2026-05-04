@@ -73,3 +73,14 @@ type queryParams =
             (projectName:    string<projectName>)
             (textReportName: string<textReportName>) : queryParams =
         queryParams.create (Some projectName) None (outputDataType.TextReport textReportName) [||]
+
+
+
+module QueryParams = 
+
+    // Creates a dataTableRecord from the Properties only, treating each of them as keys.
+    let makeDataTableRecord (qp: queryParams) : GeneSort.Core.dataTableRecord =
+        let baseRecord = GeneSort.Core.dataTableRecord.createEmpty()
+        qp.Properties
+        |> Map.toSeq
+        |> Seq.fold (fun acc (k, v) -> GeneSort.Core.dataTableRecord.addData k v acc) baseRecord

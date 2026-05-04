@@ -13,6 +13,7 @@ open GeneSort.Project.Mp.V1
 open GeneSort.Eval.Mp.V1
 open GeneSort.Sorting.Mp.Sortable
 open GeneSort.Sorting.Sortable
+open System.Text
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
@@ -48,7 +49,9 @@ module OutputDataFile =
             (queryParams: queryParams) : string<fullPathToFile> =
         let fileNameWithExtension =
             match queryParams.OutputDataType with
-            | outputDataType.TextReport reportName -> sprintf "%s_%s.txt" %reportName (DateTime.Now.ToString("yyyyMMdd_HHmm"))
+            | outputDataType.TextReport reportName -> 
+                sprintf "%s.txt" (string %queryParams.Id)
+                //sprintf "%s_%s.txt" %reportName (DateTime.Now.ToString("yyyyMMdd_HHmm"))
             | _ -> makeOutputDataName queryParams + ".msgpack"
         let outputDataFolder = getPathToOutputDataFolder pathToRootFolder queryParams.ReplAsString queryParams.OutputDataType
         Path.Combine(%outputDataFolder, fileNameWithExtension) |> UMX.tag<fullPathToFile>
@@ -220,13 +223,12 @@ module OutputDataFile =
                                 serializeDto stream sse SorterEvalBinsDto.toDto
                             | outputData.Run p ->
                                 serializeDto stream p RunDto.fromDomain
-                            //| outputData.TextReport dataTableReport ->
-                            //    failwith "Not implemented: SorterSetEval serialization"
-                            //    //async {
-                            //    //    dataTableReport.SaveToStream stream
-                            //    //    //let textBytes = Encoding.UTF8.GetBytes("")
-                            //    //    //do! stream.WriteAsync(textBytes, 0, textBytes.Length) |> Async.AwaitTask
-                            //    //}
+                            | outputData.TextReport dataTableReport ->
+                                async {
+                                    dataTableReport.SaveToStream stream
+                                    let textBytes = Encoding.UTF8.GetBytes("")
+                                    do! stream.WriteAsync(textBytes, 0, textBytes.Length) |> Async.AwaitTask
+                                }
                         return Ok ()
                     with e -> return Error (sprintf "Error saving file %s: %s" %filePath e.Message)
         }

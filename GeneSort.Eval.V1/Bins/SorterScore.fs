@@ -42,9 +42,11 @@ type sorterScoreV1 =
                 | Some c -> string %c 
                 | None -> "" // Or "N/A" depending on your reporting preference
 
+            let isSorted = this.unsortedCount = 0<sortableCount>
             GeneSort.Core.dataTableRecord.createEmpty()
             |> GeneSort.Core.dataTableRecord.addData "SorterId" (string %this.sorterId)
             |> GeneSort.Core.dataTableRecord.addData "UnsortedCount" (string %this.unsortedCount)
+            |> GeneSort.Core.dataTableRecord.addData "IsSorted" (string isSorted)
             |> GeneSort.Core.dataTableRecord.addData "UnsortedGroupCount" groupCountStr
             |> GeneSort.Core.dataTableRecord.addData "SequenceHash" (string %this.stageSequenceHash)
             |> GeneSort.Core.dataTableRecord.addData "LastCeIndex" (string %this.lastCeIndex)

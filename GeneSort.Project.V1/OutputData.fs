@@ -4,13 +4,14 @@ namespace GeneSort.Project.V1
 open FSharp.UMX
 open GeneSort.Eval.V1.Bins
 open GeneSort.Sorting.Sortable
+open GeneSort.Core
 
 type outputData =
     | Run of run
     | RunParameters of runParameters
     | SortableTest of sortableTest
     | SorterEvalBins of sorterEvalBins
-
+    | TextReport of dataTableReport
 
 //type outputData =
 //    | MutationSegmentEvalBinsSet of mutationSegmentEvalBinsSet
@@ -25,11 +26,10 @@ type outputData =
 //    | SortableTestModelSetGen of sortableTestModelSetGen
 //    | SorterSetEval of sorterSetEval
 //    | SorterEvalBins of sorterEvalBins
-//    | TextReport of dataTableReport
 
 
 
-//module OutputData =
+module OutputData =
 
 //    let asSortingSet = function
 //        | SortingSet sms -> Ok sms
@@ -39,9 +39,9 @@ type outputData =
 //        | SorterSet ss -> Ok ss
 //        | _ -> Error "Database returned data, but it was not a SorterSet."
 
-//    let asSortableTest = function
-//        | SortableTest st -> Ok st
-//        | _ -> Error "Database returned data, but it was not a SortableTest."
+    let asSortableTest = function
+        | SortableTest st -> Ok st
+        | _ -> Error "Database returned data, but it was not a SortableTest."
 
 //    let asSorterSetEval = function
 //        | SorterSetEval sse -> Ok sse
@@ -51,9 +51,9 @@ type outputData =
 //        | RunParameters rp -> Ok rp
 //        | _ -> Error "Database returned data, but it was not RunParameters."
 
-//    let asSorterEvalBins = function
-//        | SorterEvalBins sseb -> Ok sseb
-//        | _ -> Error "Database returned data, but it was not SorterEvalBins."
+    let asSorterEvalBins = function
+        | SorterEvalBins sseb -> Ok sseb
+        | _ -> Error "Database returned data, but it was not SorterEvalBins."
 
 //    let asMutationSegmentEvalBinsSet = function
 //        | MutationSegmentEvalBinsSet msebs -> Ok msebs

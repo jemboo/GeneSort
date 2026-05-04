@@ -15,6 +15,7 @@ type runParameters =
 
     // Constants for consistency
     static member ceLengthKey = "CeLength"
+    static member collectSortableTestsKey = "CollectSortableTests"
     static member elapsedTimeKey = "ElapsedTime"
     static member generationKey = "Generation"
     static member idKey = "Id"
@@ -61,6 +62,8 @@ type runParameters =
 
     // --- Getters ---
     member this.GetCeLength() = runParameters.tryGetInt runParameters.ceLengthKey this.paramMap |> Option.map UMX.tag<ceLength>
+    member this.GetCollectSortableTests() = runParameters.tryGetBool runParameters.collectSortableTestsKey this.paramMap
+    member this.GetElapsedTime() = this.paramMap.TryFind runParameters.elapsedTimeKey
     member this.GetGeneration() = runParameters.tryGetInt runParameters.generationKey this.paramMap |> Option.map UMX.tag<generationNumber>
     member this.GetId() = runParameters.tryGetGuid runParameters.idKey this.paramMap |> Option.map UMX.tag<queryParamsId>
     member this.GetLatticeDistance() = runParameters.tryGetInt runParameters.latticeDistanceKey this.paramMap |> Option.map UMX.tag<latticeDistance>
@@ -81,7 +84,7 @@ type runParameters =
     member this.GetStageLength() = runParameters.tryGetInt runParameters.stageLengthKey this.paramMap |> Option.map UMX.tag<stageLength>
     member this.GetSortableCount() = runParameters.tryGetInt runParameters.sortableCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     member this.GetSorterCount() = runParameters.tryGetInt runParameters.sorterCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
-    
+
     member this.GetTextReportName() = this.paramMap.TryFind runParameters.textReportNameKey |> Option.map UMX.tag<textReportName>
 
     member this.GetSimpleSorterModelType() = 
@@ -95,6 +98,9 @@ type runParameters =
 
     member this.WithCeLength(cl: int<ceLength> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.ceLengthKey (cl |> Option.map UmxExt.intToRaw) }
+
+    member this.WithCollectSortableTests(cst: bool option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.collectSortableTestsKey (cst |> Option.map string) }
 
     member this.WithElapsedTime(time: string option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.elapsedTimeKey time }

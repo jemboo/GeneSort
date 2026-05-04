@@ -7,11 +7,6 @@ open GeneSort.Db.V1
 open GeneSort.Project.V1
 
 
-
-
-
-
-
 /// The central interface allowing the Program to run any host implementation
 type IRunHost =
     abstract member ProjectDb: IGeneSortDb
@@ -31,7 +26,6 @@ type IRunHost =
 type IRunParamsExecutor =
     abstract member Execute : 
         host: IRunHost -> 
-        collectTests: bool -> 
         rp: runParameters -> 
         allowOverwrite: bool<allowOverwrite> -> 
         cts: CancellationTokenSource -> 
@@ -42,9 +36,8 @@ type IRunParamsExecutor =
 module RunParamsExecutor =
     let execute (executor: IRunParamsExecutor) 
                 (host: IRunHost) 
-                (collectTests: bool) 
                 (rp: runParameters) 
                 (allowOverwrite: bool<allowOverwrite>) 
                 (cts: CancellationTokenSource) 
                 (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
-        executor.Execute host collectTests rp allowOverwrite cts progress
+        executor.Execute host rp allowOverwrite cts progress

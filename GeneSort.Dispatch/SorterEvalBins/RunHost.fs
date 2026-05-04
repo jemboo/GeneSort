@@ -69,13 +69,6 @@ type runHost =
         member this.ParamMapRefiner rps = this.ParamMapRefiner rps
         member this.Execute runParameters allowOverwrite cts progress = 
             let executor = Executor.getExecutor this._spec.ExecutorType
-            RunParamsExecutor.execute executor this this._spec.CollectNewSortableTests  runParameters allowOverwrite cts progress
-        //member this.Executor runParameters allowOverwrite cts progress = 
-        //    Executor.makeSorterEvalBinsStandard
-        //        this 
-        //        this._spec.CollectNewSortableTests 
-        //        runParameters 
-        //        allowOverwrite 
-        //        cts 
-        //        progress
+            RunParamsExecutor.execute executor this runParameters allowOverwrite cts progress
+
 

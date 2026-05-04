@@ -7,6 +7,7 @@ open GeneSort.Dispatch.V1
 open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.FileDb.V1
+open GeneSort.Dispatch.V1.SorterEvalBins
 
 let createThreadSafeProgress() =
     let agent = MailboxProcessor.Start(fun inbox ->
@@ -25,6 +26,7 @@ let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 let configKey = "Small_dev" 
+let executorType = Executor.executorType.BinsReport
 
 //let host: IRunHost = 
 //    match SortableTest.Merge.Configs |> Map.tryFind configKey with
@@ -34,7 +36,7 @@ let configKey = "Small_dev"
 
 let host: IRunHost = 
     match SorterEvalBins.SimpleRandom.Configs |> Map.tryFind configKey with
-    | Some s -> SorterEvalBins.SimpleRandom.CreateHost s
+    | Some s -> SorterEvalBins.SimpleRandom.CreateHost (s executorType)
     | None -> failwithf "Config key '%s' not found." configKey
 
 let minReplica = 0<replNumber>
