@@ -21,7 +21,6 @@ type runHostSpec = {
     Filter: runParameters -> runParameters option
     Enhancer: IRunHost -> runParameters -> runParameters
     // Domain Settings
-    RngFactory: rngFactory
     CollectNewSortableTests: bool
     AllowOverwrite: bool<allowOverwrite>
     ExecutorType: Executor.executorType
@@ -47,14 +46,16 @@ type runHost =
                     (repl: int<replNumber>) 
                     (sw: int<sortingWidth>) 
                     (smt: simpleSorterModelType option) 
+                    (rng: rngType option)
                     (odt: outputDataType) : queryParams =
         let pName = this._spec.ProjectName
         queryParams.create (Some pName) (Some repl) odt
             [| (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
-               (runParameters.simpleSorterModelTypeKey, smt |> Option.map SimpleSorterModelType.toString |> UmxExt.stringToString) |]
+               (runParameters.simpleSorterModelTypeKey, smt |> Option.map SimpleSorterModelType.toString |> UmxExt.stringOptionToString) 
+               (runParameters.rngTypeKey, rng |> Option.map RngType.toString |> UmxExt.stringOptionToString) |]
 
     member this.MakeQueryParamsFromRunParams (rp: runParameters) (odt: outputDataType) : queryParams =
-        this.MakeQueryParams (rp.GetRepl().Value) (rp.GetSortingWidth().Value) (rp.GetSimpleSorterModelType()) odt
+        this.MakeQueryParams (rp.GetRepl().Value) (rp.GetSortingWidth().Value) (rp.GetSimpleSorterModelType()) (rp.GetRngType()) odt
 
     member this.ParamMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
         runParametersSeq 

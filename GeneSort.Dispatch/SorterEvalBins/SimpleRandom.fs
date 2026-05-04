@@ -15,6 +15,9 @@ module SimpleRandom =
     let smallSortingWidths = 
             (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
 
+    let testSortingWidths = 
+            (runParameters.sortingWidthKey, [8;] |> List.map string)
+
     let getStageLength (sw: int<sortingWidth>) : int<stageLength> =
         match %sw with
         | 4 -> 15
@@ -66,18 +69,17 @@ module SimpleRandom =
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Small\\Data"
             Spans = [
-                smallSortingWidths
+                testSortingWidths
                 (runParameters.simpleSorterModelTypeKey, 
-                [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
+                    [simpleSorterModelType.Msce; simpleSorterModelType.Msrs] |> List.map SimpleSorterModelType.toString)
                 (runParameters.sortableDataFormatKey, 
-                [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
-                (runParameters.sorterCountKey, 
-                ["1000"])
+                    [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
+                (runParameters.sorterCountKey, ["10000"])
+                (runParameters.rngTypeKey, [rngType.Lcg; rngType.Net; rngType.Smx] |> List.map RngType.toString)
             ]
             GetStageLength = getStageLength 
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
-            RngFactory = rngFactory.LcgFactory
             CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
             ExecutorType = executorType
@@ -94,13 +96,12 @@ module SimpleRandom =
                 [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
                 (runParameters.sortableDataFormatKey, 
                 [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
-                (runParameters.sorterCountKey, 
-                ["1000"])
+                (runParameters.sorterCountKey, ["10000"])
+                (runParameters.rngTypeKey, [rngType.Lcg; rngType.Net; rngType.Smx] |> List.map RngType.toString)
             ]
             GetStageLength = getStageLength
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
-            RngFactory = rngFactory.LcgFactory
             CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
             ExecutorType = executorType
@@ -118,13 +119,12 @@ module SimpleRandom =
                 [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
                 (runParameters.sortableDataFormatKey, 
                 [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
-                (runParameters.sorterCountKey, 
-                ["1000"])
+                (runParameters.sorterCountKey, ["10000"])
+                (runParameters.rngTypeKey, [rngType.Lcg; rngType.Net; rngType.Smx] |> List.map RngType.toString)
             ]
             GetStageLength = getStageLength
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
-            RngFactory = rngFactory.LcgFactory
             CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
             ExecutorType = executorType
@@ -142,13 +142,12 @@ module SimpleRandom =
                 [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
                 (runParameters.sortableDataFormatKey, 
                 [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
-                (runParameters.sorterCountKey, 
-                ["1000"])
+                (runParameters.sorterCountKey, ["10000"])
+                (runParameters.rngTypeKey, [rngType.Lcg; rngType.Net; rngType.Smx] |> List.map RngType.toString)
             ]
             GetStageLength = getStageLength
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
-            RngFactory = rngFactory.LcgFactory
             CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
             ExecutorType = executorType

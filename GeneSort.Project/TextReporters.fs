@@ -54,7 +54,7 @@ module TextReporters =
                     let lines = SorterEvalHierarchy.getHierarchyReport
                                     [| 
                                         (runParams.GetSortingWidth() |> SortingWidth.toString) 
-                                        (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringToString ) 
+                                        (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringOptionToString ) 
                                     |]
                                     bins
                     dtReport.AppendDataRows lines
@@ -119,12 +119,12 @@ module TextReporters =
                     let lines = 
                         SorterSetCeUseProfile.makeReportLines 
                             runId 
-                            (runParams.GetRepl() |> UmxExt.intToString) 
-                            (runParams.GetSortingWidth() |> UmxExt.intToString)
-                            (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringToString)
-                            (runParams.GetSortableDataFormat() |> Option.map SortableDataFormat.toString |> UmxExt.stringToString)
-                            (runParams.GetMergeSuffixType() |> Option.map MergeSuffixType.toString |> UmxExt.stringToString)
-                            (runParams.GetMergeDimension() |> UmxExt.intToString)
+                            (runParams.GetRepl() |> UmxExt.intOptionToString) 
+                            (runParams.GetSortingWidth() |> UmxExt.intOptionToString)
+                            (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringOptionToString)
+                            (runParams.GetSortableDataFormat() |> Option.map SortableDataFormat.toString |> UmxExt.stringOptionToString)
+                            (runParams.GetMergeSuffixType() |> Option.map MergeSuffixType.toString |> UmxExt.stringOptionToString)
+                            (runParams.GetMergeDimension() |> UmxExt.intOptionToString)
                             profile
                     dtReport.AppendDataRows lines
                 | Error err ->

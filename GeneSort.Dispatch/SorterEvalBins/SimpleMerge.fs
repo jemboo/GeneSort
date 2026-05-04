@@ -62,8 +62,8 @@ type randomSorterBinsMergeHost =
         queryParams.create (Some this._spec.ProjectName) repl odt
             [| (runParameters.sortingWidthKey, sw |> SortingWidth.toString); 
                (runParameters.mergeDimensionKey, md |> MergeDimension.toString);
-               (runParameters.mergeSuffixTypeKey, mst |> Option.map MergeSuffixType.toString |> UmxExt.stringToString);
-               (runParameters.simpleSorterModelTypeKey, smt |>  Option.map SimpleSorterModelType.toString |> UmxExt.stringToString) |]
+               (runParameters.mergeSuffixTypeKey, mst |> Option.map MergeSuffixType.toString |> UmxExt.stringOptionToString);
+               (runParameters.simpleSorterModelTypeKey, smt |>  Option.map SimpleSorterModelType.toString |> UmxExt.stringOptionToString) |]
 
     //interface IRunHost with
     //    member this.ProjectDb = this._projectDb

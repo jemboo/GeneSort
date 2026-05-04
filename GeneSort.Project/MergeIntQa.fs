@@ -90,11 +90,11 @@ module MergeIntQa =
     // --- Helpers ---
     let makeQueryParams repl sw smt sdf md mft outputDataType =
         queryParams.create (Some projectName) repl outputDataType
-            [| (runParameters.sortingWidthKey, sw |> UmxExt.intToString); 
-               (runParameters.sorterModelTypeKey, smt |> Option.map SorterModelType.toString |> UmxExt.stringToString);
-               (runParameters.sortableDataFormatKey, sdf |> Option.map SortableDataFormat.toString |> UmxExt.stringToString);
-               (runParameters.mergeDimensionKey, md |> UmxExt.intToString);
-               (runParameters.mergeSuffixTypeKey, mft |> Option.map MergeSuffixType.toString |> UmxExt.stringToString) |]
+            [| (runParameters.sortingWidthKey, sw |> UmxExt.intOptionToString); 
+               (runParameters.sorterModelTypeKey, smt |> Option.map SorterModelType.toString |> UmxExt.stringOptionToString);
+               (runParameters.sortableDataFormatKey, sdf |> Option.map SortableDataFormat.toString |> UmxExt.stringOptionToString);
+               (runParameters.mergeDimensionKey, md |> UmxExt.intOptionToString);
+               (runParameters.mergeSuffixTypeKey, mft |> Option.map MergeSuffixType.toString |> UmxExt.stringOptionToString) |]
 
     let makeQueryParamsFromRunParams (rp: runParameters) (odt: outputDataType) =
         makeQueryParams (rp.GetRepl()) (rp.GetSortingWidth()) (rp.GetSorterModelType()) 

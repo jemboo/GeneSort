@@ -9,6 +9,7 @@ open GeneSort.Sorting
 open GeneSort.Core
 open GeneSort.Model.Sorting
 open GeneSort.Model.Sorting.Sorter.Si
+open GeneSort.Core.Rando
 
 type MssiRandMutateTests() =
 

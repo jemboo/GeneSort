@@ -95,9 +95,9 @@ module MergeRandomSorterBins =
     let makeQueryParams repl startingRepl replSpan sw smt outputDataType =
         queryParams.create (Some projectName) repl outputDataType
             [| (runParameters.sortingWidthKey, sw |> SortingWidth.toString) 
-               (runParameters.sorterModelTypeKey, smt |> Option.map SorterModelType.toString |> UmxExt.stringToString)
-               (runParameters.startingReplKey, startingRepl |> UmxExt.intToString)
-               (runParameters.replSpanKey, replSpan |> UmxExt.intToString) |]
+               (runParameters.sorterModelTypeKey, smt |> Option.map SorterModelType.toString |> UmxExt.stringOptionToString)
+               (runParameters.startingReplKey, startingRepl |> UmxExt.intOptionToString)
+               (runParameters.replSpanKey, replSpan |> UmxExt.intOptionToString) |]
 
     let makeQueryParamsFromRunParams (rp: runParameters) (odt: outputDataType) =
         makeQueryParams (rp.GetRepl()) (rp.GetStartingRepl()) (rp.GetReplSpan()) (rp.GetSortingWidth()) (rp.GetSorterModelType()) odt

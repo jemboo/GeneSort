@@ -63,9 +63,9 @@ module FullBoolMutate =
                         (sorterModelType:sorterModelType option) (sortableDataFormat:sortableDataFormat option)
                         (outputDataType: outputDataType) : queryParams =
         queryParams.create (Some projectName) repl outputDataType
-            [| (runParameters.sortingWidthKey, sortingWidth |> UmxExt.intToString ); 
-               (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString );
-               (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringToString ); |]
+            [| (runParameters.sortingWidthKey, sortingWidth |> UmxExt.intOptionToString ); 
+               (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringOptionToString );
+               (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringOptionToString ); |]
 
     let makeQueryParamsFromRunParams (runParams: runParameters) (outputDataType: outputDataType) =
         makeQueryParams (runParams.GetRepl()) (runParams.GetSortingWidth())

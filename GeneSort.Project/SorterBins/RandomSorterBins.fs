@@ -109,7 +109,7 @@ module RandomSorterBins =
     let makeQueryParams repl sw smt outputDataType =
         queryParams.create (Some projectName) repl outputDataType
             [| (runParameters.sortingWidthKey, sw |> SortingWidth.toString); 
-               (runParameters.sorterModelTypeKey, smt |> Option.map SorterModelType.toString |> UmxExt.stringToString) |]
+               (runParameters.sorterModelTypeKey, smt |> Option.map SorterModelType.toString |> UmxExt.stringOptionToString) |]
 
     let makeQueryParamsFromRunParams (rp: runParameters) (odt: outputDataType) =
         makeQueryParams (rp.GetRepl()) (rp.GetSortingWidth()) (rp.GetSorterModelType()) odt

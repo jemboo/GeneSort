@@ -105,10 +105,10 @@ module MergeIntEvals =
 
     let makeQueryParams repl outputDataType sortingWidth sorterModelType sortableDataFormat mergeDimension mergeFillType =
         queryParams.create (Some projectName) repl outputDataType
-            [| (runParameters.sortingWidthKey, sortingWidth |> UmxExt.intToString); 
-               (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString);
-               (runParameters.mergeDimensionKey, mergeDimension |> UmxExt.intToString);
-               (runParameters.mergeSuffixTypeKey, mergeFillType |> Option.map MergeSuffixType.toString |> UmxExt.stringToString); |]
+            [| (runParameters.sortingWidthKey, sortingWidth |> UmxExt.intOptionToString); 
+               (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringOptionToString);
+               (runParameters.mergeDimensionKey, mergeDimension |> UmxExt.intOptionToString);
+               (runParameters.mergeSuffixTypeKey, mergeFillType |> Option.map MergeSuffixType.toString |> UmxExt.stringOptionToString); |]
 
     let makeQueryParamsFromRunParams (runParams: runParameters) (outputDataType: outputDataType) =
         makeQueryParams (runParams.GetRepl()) outputDataType (runParams.GetSortingWidth()) 

@@ -1,6 +1,7 @@
 ﻿namespace GeneSort.Core
 open System
 open FSharp.UMX
+open System.Threading
 
 
 [<Measure>] type randomSeed
@@ -8,7 +9,6 @@ open FSharp.UMX
 
 
 module RandomSeed =
-
     let fromGuid(guid: Guid) : uint64<randomSeed> =
         let bytes = guid.ToByteArray()
         let mutable seed = 0UL
@@ -21,6 +21,20 @@ module RandomSeed =
 type rngType =
     | Lcg
     | Net
+    | Smx 
+
+
+module RngType =
+    let toString = function
+        | Lcg -> "LCG"
+        | Net -> "Net"
+        | Smx -> "SplitMix64"
+
+    let fromString = function
+        | "LCG" -> Lcg
+        | "Net" -> Net
+        | "SplitMix64" -> Smx
+        | s -> failwithf "Unknown rngType: %s" s
 
 
 type IRando =
@@ -34,6 +48,71 @@ type IRando =
     abstract member rngType: rngType
 
 
+// ──────────────────────────────────────────────
+// SplitMix64 Implementation (Recommended)
+// ──────────────────────────────────────────────
+type randomSplitMix64(seed: uint64<randomSeed>) =
+    let mutable _state = seed |> UMX.untag |> uint64
+    let mutable _byteCount = 0
+
+    let nextULong() =
+        _state <- _state + 0x9E3779B97F4A7C15UL
+        let mutable z = _state
+        z <- (z ^^^ (z >>> 30)) * 0xBF58476D1CE4E5B9UL
+        z <- (z ^^^ (z >>> 27)) * 0x94D049BB133111EBUL
+        z ^^^ (z >>> 31)
+
+    member this.Seed = seed
+    member this.ByteCount = _byteCount
+
+    member this.NextUInt =
+        _byteCount <- _byteCount + 4
+        uint32 (nextULong() >>> 32)
+
+    member this.NextULong =
+        _byteCount <- _byteCount + 8
+        nextULong()
+
+    member this.NextFloat =
+        // Full 53-bit precision
+        let mantissa = (this.NextULong >>> 11) ||| 0x3FF0000000000000UL
+        (float mantissa) - 1.0
+
+    member this.AsNextUInt() = fun () -> this.NextUInt
+
+    interface IRando with
+        member this.NextUInt () = this.NextUInt
+        member this.NextPositiveInt () =
+            int (this.NextUInt % uint32 Int32.MaxValue)
+        member this.NextIndex (modulus: int) =
+            if modulus <= 0 then
+                int this.NextUInt
+            else
+                let threshold = UInt32.MaxValue - (UInt32.MaxValue % uint32 modulus)
+                let mutable result = None
+                while result.IsNone do
+                    let r = this.NextUInt
+                    if r < threshold then
+                        result <- Some (int (r % uint32 modulus))
+                result.Value
+        member this.NextULong () = this.NextULong
+        member this.NextGuid () =
+            let b1 = this.NextUInt
+            let b2 = this.NextUInt
+            let b3 = this.NextUInt
+            let b4 = this.NextUInt
+            Guid(int b1, int16 b2, int16 (b2 >>> 16), [|
+                byte b3; byte (b3 >>> 8); byte (b3 >>> 16); byte (b3 >>> 24);
+                byte b4; byte (b4 >>> 8); byte (b4 >>> 16); byte (b4 >>> 24)
+            |])
+        member this.NextFloat () = this.NextFloat
+        member this.ByteCount = this.ByteCount
+        member this.rngType = Smx
+
+
+// ──────────────────────────────────────────────
+// Linear Congruential Generator (LCG) 
+// ──────────────────────────────────────────────
 /// <summary>
 /// A Linear Congruential Generator (LCG) for random number generation.
 /// Uses parameters a = 6364136223846793005, c = 1442695040888963407, m = 2^64.
@@ -110,6 +189,10 @@ type randomLcg(seed: uint64<randomSeed>) =
         member this.ByteCount = this.ByteCount
         member this.rngType = Lcg
 
+
+// ──────────────────────────────────────────────
+// .NET Random Generator (LCG) 
+// ──────────────────────────────────────────────
 /// <summary>
 /// A random number generator using System.Random.
 /// </summary>
@@ -193,29 +276,38 @@ type randomNet(seed: int32<randomSeed>) =
 
 module Rando =
         
-        let create (rngType:rngType) (guid:Guid) : IRando =
-            let seed = RandomSeed.fromGuid guid
-            match rngType with
-            | Lcg -> randomLcg(seed) :> IRando
-            | Net -> randomNet(UMX.tag<randomSeed> (int32 seed)) :> IRando
+
+    // Seed mixing function - very important for independent streams
+    let mix (seed: uint64) (streamId: uint64) : uint64 =
+        let mutable z = seed + streamId * 0x9E3779B97F4A7C15UL
+        z <- (z ^^^ (z >>> 30)) * 0xBF58476D1CE4E5B9UL
+        z <- (z ^^^ (z >>> 27)) * 0x94D049BB133111EBUL
+        z ^^^ (z >>> 31)
+
+    let create (rngType: rngType) (guid: Guid) : IRando =
+        let seed = RandomSeed.fromGuid guid
+        match rngType with
+        | Lcg -> randomLcg(seed) :> IRando
+        | Net -> randomNet(UMX.tag<randomSeed> (int32 seed)) :> IRando
+        | Smx -> randomSplitMix64(seed) :> IRando
 
 
-        let nextTwoIndexes (maxDex:int) (randy:IRando) =
-            if (maxDex < 2) then failwith "array must have at least two elements"
-            else if (maxDex = 2) then (0, 1)
-            else
-                let firstVal = randy.NextIndex(maxDex)
-                let mutable sndVal = randy.NextIndex(maxDex)
-                while (firstVal = sndVal) do
-                    sndVal <- randy.NextIndex(maxDex)
-                (firstVal, sndVal)
+    let nextTwoIndexes (maxDex:int) (randy:IRando) =
+        if (maxDex < 2) then failwith "array must have at least two elements"
+        else if (maxDex = 2) then (0, 1)
+        else
+            let firstVal = randy.NextIndex(maxDex)
+            let mutable sndVal = randy.NextIndex(maxDex)
+            while (firstVal = sndVal) do
+                sndVal <- randy.NextIndex(maxDex)
+            (firstVal, sndVal)
 
-        //returns true if probability is less than the random value generated
-        let getTrueOrFalse (probability:float) (randy:IRando) =
-            if (probability < 0.0 || probability > 1.0) then failwith "Probability must be between 0 and 1"
-            else
-                let randVal = randy.NextFloat()
-                if (randVal < probability) then true else false
+    //returns true if probability is less than the random value generated
+    let getTrueOrFalse (probability:float) (randy:IRando) =
+        if (probability < 0.0 || probability > 1.0) then failwith "Probability must be between 0 and 1"
+        else
+            let randVal = randy.NextFloat()
+            if (randVal < probability) then true else false
 
 
 
@@ -245,11 +337,12 @@ module Rando =
             member _.ByteCount = 0
 
 
-
-
+// ──────────────────────────────────────────────
+// RngFactory
+// ──────────────────────────────────────────────
 [<CustomEquality; CustomComparison>]
-type rngFactory = 
-    private 
+type rngFactory =
+    private
         { id: Guid<rngFactoryId>
           rngType: rngType
           create: Guid -> IRando }
@@ -257,52 +350,46 @@ type rngFactory =
     member this.Id with get() = this.id
     member this.RngType with get() = this.rngType
     member this.Create(seed: Guid) : IRando = this.create seed
-    
+
     override this.ToString() =
         sprintf "rngFactory(Id: %A, Type: %A)" this.id this.rngType
 
-    // Equality based on id and rngType only (ignoring the function)
     override this.Equals(obj) =
         match obj with
-        | :? rngFactory as other -> 
-            this.id = other.id && this.rngType = other.rngType
+        | :? rngFactory as other -> this.id = other.id && this.rngType = other.rngType
         | _ -> false
-    
-    override this.GetHashCode() =
-        hash (this.id, this.rngType)
-    
-    // Comparison based on id
+
+    override this.GetHashCode() = hash (this.id, this.rngType)
+
     interface System.IComparable with
         member this.CompareTo(obj) =
             match obj with
             | :? rngFactory as other -> compare this.id other.id
             | _ -> invalidArg "obj" "Cannot compare values of different types"
-    
+
     static member private createFactory (id: Guid<rngFactoryId>) (rngType: rngType) : rngFactory =
         { id = id
           rngType = rngType
           create = fun guid -> Rando.create rngType guid }
-    
-    // Fixed IDs for static instances
+
     static member private LcgFactoryId = Guid.Parse("00000000-0000-0000-0000-000000000001") |> UMX.tag<rngFactoryId>
     static member private NetFactoryId = Guid.Parse("00000000-0000-0000-0000-000000000002") |> UMX.tag<rngFactoryId>
-    
-    // Static instances for each rngType with fixed IDs
-    static member LcgFactory : rngFactory =
-        rngFactory.createFactory rngFactory.LcgFactoryId Lcg
-    
-    static member NetFactory : rngFactory =
-        rngFactory.createFactory rngFactory.NetFactoryId Net
-    
-    // Helper to get factory by rngType
+    static member private SmxFactoryId = Guid.Parse("00000000-0000-0000-0000-000000000003") |> UMX.tag<rngFactoryId>
+
+    static member LcgFactory : rngFactory = rngFactory.createFactory rngFactory.LcgFactoryId Lcg
+    static member NetFactory : rngFactory = rngFactory.createFactory rngFactory.NetFactoryId Net
+    static member SmxFactory : rngFactory = rngFactory.createFactory rngFactory.SmxFactoryId Smx
+
     static member getFactory (rngType: rngType) : rngFactory =
         match rngType with
         | Lcg -> rngFactory.LcgFactory
         | Net -> rngFactory.NetFactory
+        | Smx -> rngFactory.SmxFactory
 
 module RngFactory =
     let create (rngType: rngType) : rngFactory =
         rngFactory.getFactory rngType
-    
+
     let createRng (factory: rngFactory) (seed: Guid) : IRando =
         factory.Create(seed)
+

@@ -1,5 +1,6 @@
 ﻿namespace GeneSort.Model.Sorting.V1
 
+open System
 open FSharp.UMX
 open GeneSort.Core
 
@@ -30,6 +31,14 @@ module CommonGen =
             index :> obj
         ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
 
+    let makeSorterModelIdWithMix
+                (genId: Guid<sorterModelGenId>)
+                (index: int) : Guid<sorterModelId> =
+            let baseSeed = RandomSeed.fromGuid %genId
+            let mixed = Rando.mix (baseSeed |> UMX.untag) (uint64 index)
+            // Convert back to Guid if needed, or keep as seed directly
+            // For now, stick close to your original style
+            makeSorterModelId genId index
 
 
 module CommonMutator =

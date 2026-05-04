@@ -28,6 +28,7 @@ type runParameters =
     static member projectNameKey = "ProjectName"
     static member runNameKey = "RunName"
     static member replKey = "Repl"
+    static member rngTypeKey = "RngType"
     static member startingReplKey = "StartingRepl"
     static member replSpanKey = "ReplSpan"
     static member runFinishedKey = "RunFinished"
@@ -75,6 +76,7 @@ type runParameters =
 
     member this.GetMutationRate() = runParameters.tryGetFloat runParameters.mutationRateKey this.paramMap |> Option.map UMX.tag<mutationRate>
     member this.GetProjectName() = this.paramMap.TryFind runParameters.projectNameKey |> Option.map UMX.tag<projectName>
+    member this.GetRngType() = this.paramMap.TryFind runParameters.rngTypeKey |> Option.map RngType.fromString
     member this.GetRunName() = this.paramMap.TryFind runParameters.runNameKey |> Option.map UMX.tag<runName>
     member this.GetRepl() = runParameters.tryGetInt runParameters.replKey this.paramMap |> Option.map UMX.tag<replNumber>
     member this.GetStartingRepl() = runParameters.tryGetInt runParameters.startingReplKey this.paramMap |> Option.map UMX.tag<replNumber>
@@ -128,6 +130,9 @@ type runParameters =
 
     member this.WithProjectName(pn: string<projectName> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.projectNameKey (pn |> Option.map UmxExt.stringToRaw) }
+
+    member this.WithRngType(rng: rngType option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.rngTypeKey (rng |> Option.map RngType.toString) }
 
     member this.WithRunName(rn: string<runName> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.runNameKey (rn |> Option.map UmxExt.stringToRaw) }
@@ -204,4 +209,4 @@ module RunParameters =
         |> String.concat Environment.NewLine
 
     let getIdString (runParameters:runParameters) =
-        runParameters.GetId() |> UmxExt.guidToString
+        runParameters.GetId() |> UmxExt.guidOptionToString

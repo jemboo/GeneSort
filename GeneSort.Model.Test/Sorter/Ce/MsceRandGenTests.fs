@@ -7,6 +7,7 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.Sorter.Ce
 open GeneSort.Model.Sorting
+open GeneSort.Core.Rando
 
 type MsceRandGenTests() =
 

@@ -47,9 +47,10 @@ module Executor =
             let! simpleSorterModelType = rp.GetSimpleSorterModelType()
             let! repl = rp.GetRepl()
             let! sorterCount = rp.GetSorterCount()
+            let! rngFactory = rp.GetRngType() |> Option.map RngFactory.create
             let firstIdx = (%repl * %sorterCount) |> UMX.tag<sorterCount>
             let sorterModelGen = SimpleSorterModelGen.makeUniform 
-                                        rngFactory.LcgFactory 
+                                        rngFactory 
                                         sortingWidth stageLength simpleSorterModelType
                                  |> sorterModelGen.Simple
 

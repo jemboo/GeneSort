@@ -197,4 +197,4 @@ module RunParameters =
         |> String.concat Environment.NewLine
 
     let getIdString (runParameters:runParameters) =
-        runParameters.GetId() |> UmxExt.guidToString
+        runParameters.GetId() |> UmxExt.guidOptionToString

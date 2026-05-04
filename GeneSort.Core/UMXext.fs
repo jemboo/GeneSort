@@ -32,23 +32,23 @@ module UmxExt =
 
 
     /// Converts any UMX-tagged int option to a string
-    let intToString (v: int<'u> option) : string =
+    let intOptionToString (v: int<'u> option) : string =
         match v with
         | Some value -> (UMX.untag value).ToString()
         | None -> "None"
 
     /// Converts any UMX-tagged int option to a string
-    let stringToString (v: string<'u> option) : string =
+    let stringOptionToString (v: string<'u> option) : string =
         match v with
         | Some value -> (UMX.untag value)
         | None -> "None"
 
-    let floatToString (v: float<'u> option) : string =
+    let floatOptionToString (v: float<'u> option) : string =
         match v with
         | Some value -> (UMX.untag value).ToString()
         | None -> "None"
 
-    let guidToString (v: Guid<'u> option) : string =
+    let guidOptionToString (v: Guid<'u> option) : string =
         match v with
         | Some value -> (UMX.untag value).ToString()
         | None -> "None"

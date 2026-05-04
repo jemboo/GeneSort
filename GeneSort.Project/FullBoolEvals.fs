@@ -88,9 +88,9 @@ module FullBoolEvals =
 
     let makeQueryParams repl sortingWidth sorterModelType sortableDataFormat outputDataType =
         queryParams.create (Some projectName) repl outputDataType
-            [| (runParameters.sortingWidthKey, sortingWidth |> UmxExt.intToString); 
-               (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString);
-               (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringToString) |]
+            [| (runParameters.sortingWidthKey, sortingWidth |> UmxExt.intOptionToString); 
+               (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringOptionToString);
+               (runParameters.sortableDataFormatKey, sortableDataFormat |> Option.map SortableDataFormat.toString |> UmxExt.stringOptionToString) |]
 
     let makeQueryParamsFromRunParams (rp: runParameters) (odt: outputDataType) =
         makeQueryParams (rp.GetRepl()) (rp.GetSortingWidth()) (rp.GetSorterModelType()) (rp.GetSortableDataFormat()) odt

@@ -77,9 +77,9 @@ module SortableMergeTests =
             [| (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
                (runParameters.mergeDimensionKey, mergeDimension |> MergeDimension.toString);
                (runParameters.mergeSuffixTypeKey, mergeFillType 
-                    |> Option.map MergeSuffixType.toString |> UmxExt.stringToString );
+                    |> Option.map MergeSuffixType.toString |> UmxExt.stringOptionToString );
                (runParameters.sortableDataFormatKey, sortableDataFormat 
-                    |> Option.map SortableDataFormat.toString |> UmxExt.stringToString ); |]
+                    |> Option.map SortableDataFormat.toString |> UmxExt.stringOptionToString ); |]
 
     let makeQueryParamsFromRunParams 
                 (runParams: runParameters) 

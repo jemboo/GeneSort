@@ -123,7 +123,7 @@ module RandomSorters =
                         (sorterModelType:sorterModelType option) (outputDataType: outputDataType) =
         queryParams.create (Some projectName) repl outputDataType
             [| (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
-               (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringToString) |]
+               (runParameters.sorterModelTypeKey, sorterModelType |> Option.map SorterModelType.toString |> UmxExt.stringOptionToString) |]
 
     let makeQueryParamsFromRunParams (runParams: runParameters) (outputDataType: outputDataType) =
         makeQueryParams (runParams.GetRepl()) (runParams.GetSortingWidth())
