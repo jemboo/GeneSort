@@ -52,12 +52,19 @@ module SimpleRandom =
           .WithCollectSortableTests(Some true)
           .WithId (Some qp.Id)
 
+    
     let private standardSorterModelTypeFilter (rp: runParameters) =
         maybe {
             let! smt = rp.GetSimpleSorterModelType()
             let! sw = rp.GetSortingWidth()
             let has2factor = (%sw % 2 = 0)
-            return! if (smt = simpleSorterModelType.Msce) || has2factor then Some rp else None
+            let isPowerOf2 = (%sw &&& (%sw - 1) = 0)
+            let isGt4 = (%sw > 4)
+            let validMsce = (smt = simpleSorterModelType.Msce)
+            let validMssi = (smt = simpleSorterModelType.Mssi) && has2factor
+            let validMsrs = (smt = simpleSorterModelType.Msrs) && has2factor
+            let validMsuf4 = (smt = simpleSorterModelType.Msuf4) && isPowerOf2 && isGt4
+            return! if validMsce || validMssi || validMsrs || validMsuf4 then Some rp else None
         }
 
 
@@ -66,15 +73,15 @@ module SimpleRandom =
         let Small_dev (executorType: Executor.executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
             RunName = sprintf @"Small_Dev_%s" (Executor.ExecutorType.toString executorType) |> UMX.tag
-            ProjectDesc = "Standard binning for Msce/Mssi/Msrs"
+            ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Small\\Data"
             Spans = [
-                testSortingWidths
+                smallSortingWidths
                 (runParameters.simpleSorterModelTypeKey, 
-                    [simpleSorterModelType.Msce;] |> List.map SimpleSorterModelType.toString)
+                    SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
                 (runParameters.sortableDataFormatKey, 
                     [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
-                (runParameters.sorterCountKey, ["10000"])
+                (runParameters.sorterCountKey, ["1000"])
                 (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
             ]
             GetStageLength = getStageLength 
@@ -93,11 +100,11 @@ module SimpleRandom =
             Spans = [
                 smallSortingWidths
                 (runParameters.simpleSorterModelTypeKey, 
-                [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
+                    SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
                 (runParameters.sortableDataFormatKey, 
                 [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
                 (runParameters.sorterCountKey, ["10000"])
-                (runParameters.rngTypeKey, [rngType.Lcg; rngType.Net; rngType.Smx] |> List.map RngType.toString)
+                (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
             ]
             GetStageLength = getStageLength
             Filter = standardSorterModelTypeFilter
@@ -120,7 +127,7 @@ module SimpleRandom =
                 (runParameters.sortableDataFormatKey, 
                 [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
                 (runParameters.sorterCountKey, ["10000"])
-                (runParameters.rngTypeKey, [rngType.Lcg; rngType.Net; rngType.Smx] |> List.map RngType.toString)
+                (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
             ]
             GetStageLength = getStageLength
             Filter = standardSorterModelTypeFilter
@@ -143,7 +150,7 @@ module SimpleRandom =
                 (runParameters.sortableDataFormatKey, 
                 [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
                 (runParameters.sorterCountKey, ["10000"])
-                (runParameters.rngTypeKey, [rngType.Lcg; rngType.Net; rngType.Smx] |> List.map RngType.toString)
+                (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
             ]
             GetStageLength = getStageLength
             Filter = standardSorterModelTypeFilter
