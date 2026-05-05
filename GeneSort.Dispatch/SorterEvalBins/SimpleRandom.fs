@@ -71,11 +71,11 @@ module SimpleRandom =
             Spans = [
                 testSortingWidths
                 (runParameters.simpleSorterModelTypeKey, 
-                    [simpleSorterModelType.Msce; simpleSorterModelType.Msrs] |> List.map SimpleSorterModelType.toString)
+                    [simpleSorterModelType.Msce;] |> List.map SimpleSorterModelType.toString)
                 (runParameters.sortableDataFormatKey, 
                     [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
                 (runParameters.sorterCountKey, ["10000"])
-                (runParameters.rngTypeKey, [rngType.Lcg; rngType.Net; rngType.Smx] |> List.map RngType.toString)
+                (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
             ]
             GetStageLength = getStageLength 
             Filter = standardSorterModelTypeFilter

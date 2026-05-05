@@ -5,7 +5,6 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Db.V1
 open GeneSort.Project.V1
-open GeneSort.FileDb.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 
@@ -24,7 +23,6 @@ type runSpecMerge = {
     // Merge Specifics
     ExcludeSelfCe: bool
     CollectNewSortableTests: bool
-    SamplesPerBin: int
     AllowOverwrite: bool<allowOverwrite>
     MergeTestsProjectFolder: string
 }
@@ -207,14 +205,7 @@ module RandomSorterBinsMerge =
             Enhancer = mergeEnhancer
             ExcludeSelfCe = true
             CollectNewSortableTests = false
-            SamplesPerBin = 1
             AllowOverwrite = false |> UMX.tag
         }
 
     let Configs = Map.ofList [ ("P1", Specs.P1) ]
-
-    //let CreateHost (spec: runSpecMerge) =
-    //    let db = new GeneSortDbMp(spec.DataFolder |> UMX.tag) :> IGeneSortDb
-    //    let proj = run.create spec.ProjectName spec.RunName spec.ProjectDesc 
-    //                            [| outputDataType.RunParameters spec.RunName; outputDataType.SorterEvalBins ""; outputDataType.SortingSet "EvenSampled" |]
-    //    randomSorterBinsMergeHost.Create db spec proj :> IRunHost

@@ -49,7 +49,7 @@ type msrsRandGen =
     member this.RngFactory with get () = this.rngFactory
     member this.OpsGenRates with get () = this.opsGenRates
     member this.SortingWidth with get () = this.sortingWidth
-    member this.StageLength with get () = this.StageLength
+    member this.StageLength with get () = this.stageLength
 
     override this.Equals(obj) = 
         match obj with
