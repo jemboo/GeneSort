@@ -25,7 +25,7 @@ let maxParallel = Environment.ProcessorCount
 let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
-let configKey = "Standard_dev" 
+let configKey = "Standard" 
 let executorType = Executor.executorType.Standard
 
 //let host: IRunHost = 
@@ -40,7 +40,7 @@ let host: IRunHost =
     | None -> failwithf "Config key '%s' not found." configKey
 
 let minReplica = 0<replNumber>
-let maxReplica = 10<replNumber>
+let maxReplica = 100<replNumber>
 
 async {
     printfn "Running Project: %s" %host.Project.ProjectName

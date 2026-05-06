@@ -108,7 +108,7 @@ module SimpleRandom =
                     SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
                 (runParameters.sortableDataFormatKey, 
                 [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
-                (runParameters.sorterCountKey, ["10000"])
+                (runParameters.sorterCountKey, ["100000"])
                 (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
             ]
             GetStageLength = getStageLength
@@ -152,7 +152,7 @@ module SimpleRandom =
                     SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
                 (runParameters.sortableDataFormatKey, 
                 [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
-                (runParameters.sorterCountKey, ["1000"])
+                (runParameters.sorterCountKey, ["10000"])
                 (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
             ]
             GetStageLength = getStageLength
