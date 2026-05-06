@@ -16,9 +16,10 @@ module SimpleRandom =
             (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
 
 
-    let largeSortingWidths = 
-            (runParameters.sortingWidthKey, [14;16;18;20;22;24] |> List.map string)
-
+    //let mediumSortingWidths = 
+    //        (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
+    let mediumSortingWidths = 
+            (runParameters.sortingWidthKey, [22] |> List.map string)
 
     let testSortingWidths = 
             (runParameters.sortingWidthKey, [8;] |> List.map string)
@@ -119,13 +120,13 @@ module SimpleRandom =
             ExecutorType = executorType
         }
 
-        let Standard_dev (executorType: Executor.executorType) : runHostSpec = {
+        let Medium_dev (executorType: Executor.executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
             RunName = sprintf @"Standard_Dev_%s" (Executor.ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Standard\\Data"
             Spans = [
-                largeSortingWidths
+                mediumSortingWidths
                 (runParameters.simpleSorterModelTypeKey, 
                     SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
                 (runParameters.sortableDataFormatKey, 
@@ -141,13 +142,13 @@ module SimpleRandom =
             ExecutorType = executorType
         }
 
-        let Standard (executorType: Executor.executorType) : runHostSpec = {
+        let Medium (executorType: Executor.executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
             RunName = sprintf @"Standard_%s" (Executor.ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Standard\\Data"
             Spans = [
-                largeSortingWidths
+                mediumSortingWidths
                 (runParameters.simpleSorterModelTypeKey, 
                     SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
                 (runParameters.sortableDataFormatKey, 
@@ -167,8 +168,8 @@ module SimpleRandom =
                     [ 
                         ("Small_dev", Specs.Small_dev); 
                         ("Small", Specs.Small) 
-                        ("Standard_dev", Specs.Standard_dev); 
-                        ("Standard", Specs.Standard) 
+                        ("Medium_dev", Specs.Medium_dev); 
+                        ("Medium", Specs.Medium) 
                     ]
 
     let CreateHost (spec: runHostSpec) =

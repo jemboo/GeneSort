@@ -25,7 +25,7 @@ let maxParallel = Environment.ProcessorCount
 let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
-let configKey = "Standard" 
+let configKey = "Medium" 
 let executorType = Executor.executorType.Standard
 
 //let host: IRunHost = 
@@ -42,45 +42,75 @@ let host: IRunHost =
 let minReplica = 0<replNumber>
 let maxReplica = 100<replNumber>
 
+//async {
+//    printfn "Running Project: %s" %host.Project.ProjectName
+    
+//    let! initResult = 
+//        ParamOps.initProjectAndRunFiles
+//            host.ProjectDb           
+//            host.MakeQueryParamsFromRunParams 
+//            cts 
+//            (Some progress) 
+//            host.Project              
+//            minReplica 
+//            maxReplica 
+//            host.AllowOverwrite 
+//            host.ParamMapRefiner      
+//            host.ParameterSpans
+
+//    match initResult with
+//    | Error e -> printfn "Init Failure: %s" e
+//    | Ok () ->
+//        let! execResult = 
+//            ProjectOps.executeRuns 
+//                host.ProjectDb      
+//                minReplica 
+//                maxReplica 
+//                host.MakeQueryParamsFromRunParams 
+//                host.Project.RunName 
+//                host.AllowOverwrite 
+//                cts 
+//                (Some progress) 
+//                host.Execute
+//                maxParallel
+
+//        match execResult with
+//        | Ok results -> printfn "Success: %d records processed." results.Length
+//        | Error e -> printfn "Runtime Error: %s" e
+
+//} |> Async.RunSynchronously
+
+
+
 async {
     printfn "Running Project: %s" %host.Project.ProjectName
     
-    let! initResult = 
-        ParamOps.initProjectAndRunFiles
-            host.ProjectDb           
-            host.MakeQueryParamsFromRunParams 
-            cts 
-            (Some progress) 
-            host.Project              
+
+    let! execResult = 
+        ProjectOps.executeRuns 
+            host.ProjectDb      
             minReplica 
             maxReplica 
+            host.MakeQueryParamsFromRunParams 
+            host.Project.RunName 
             host.AllowOverwrite 
-            host.ParamMapRefiner      
-            host.ParameterSpans
+            cts 
+            (Some progress) 
+            host.Execute
+            maxParallel
 
-    match initResult with
-    | Error e -> printfn "Init Failure: %s" e
-    | Ok () ->
-        let! execResult = 
-            ProjectOps.executeRuns 
-                host.ProjectDb      
-                minReplica 
-                maxReplica 
-                host.MakeQueryParamsFromRunParams 
-                host.Project.RunName 
-                host.AllowOverwrite 
-                cts 
-                (Some progress) 
-                host.Execute
-                maxParallel
-
-        match execResult with
-        | Ok results -> printfn "Success: %d records processed." results.Length
-        | Error e -> printfn "Runtime Error: %s" e
+    match execResult with
+    | Ok results -> printfn "Success: %d records processed." results.Length
+    | Error e -> printfn "Runtime Error: %s" e
 
 } |> Async.RunSynchronously
 
+
+
+
+
 let duration = DateTime.Now - startTime
+Thread.Sleep(100)
 printfn "********************************************"
 printfn $"Total Time: {duration.ToString()}"
 printfn "********************************************"
