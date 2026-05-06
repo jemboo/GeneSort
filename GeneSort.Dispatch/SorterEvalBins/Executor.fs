@@ -21,12 +21,14 @@ module Executor =
     type executorType = 
         | Standard
         | Merge
+        | FullReport
         | BinsReport
 
     module ExecutorType =
         let toString = function
             | Standard -> "Standard"
             | Merge -> "Merge"
+            | FullReport -> "FullReport"
             | BinsReport -> "BinsReport"
 
 
@@ -99,6 +101,41 @@ module Executor =
         }
 
 
+    let makeFullReport 
+            (host: IRunHost)
+            (rp: runParameters) 
+            (allowOverwrite: bool<allowOverwrite>) 
+            (cts: CancellationTokenSource) 
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+        asyncResult {
+            try
+                let! (_: unit) = checkCancellation cts.Token
+                let runId = rp |> RunParameters.getIdString
+                OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
+    
+                // 1. Load SorterEvalBins
+                let qpBins = host.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
+                let! (outB:outputData) = host.ProjectDb.loadAsync qpBins
+                let! bins = outB  |> OutputData.asSorterEvalBins
+
+                // 2. Make report
+                //let reportName = sprintf "BinsReport_%s" (rp |> RunParameters.getIdString)
+                //                 |> UMX.tag<textReportName>
+                let reportName = sprintf "FullReport" |> UMX.tag<textReportName>
+                let qpReport = host.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                let leadCols = qpReport |> QueryParams.makeDataTableRecord
+                let details = bins |> SorterEvalBins.makeFullDataTableRecords
+                let dtrs = dataTableRecord.combineWithMany details leadCols
+                let report = DataTableReport.fromDataTableRecords dtrs
+
+                //// 3. Save report (Using Host DB)
+                let! (_: unit) = host.ProjectDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
+                return rp.WithRunFinished (Some true)
+            with e -> 
+               return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message) |> async.Return
+        }
+
+
     let makeBinsReport 
             (host: IRunHost)
             (rp: runParameters) 
@@ -122,7 +159,7 @@ module Executor =
                 let reportName = sprintf "BinsReport" |> UMX.tag<textReportName>
                 let qpReport = host.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
-                let details = bins |> SorterEvalBins.makeDataTableRecords
+                let details = bins |> SorterEvalBins.makeSummaryDataTableRecords
                 let dtrs = dataTableRecord.combineWithMany details leadCols
                 let report = DataTableReport.fromDataTableRecords dtrs
 
@@ -134,6 +171,8 @@ module Executor =
         }
 
 
+
+
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
@@ -141,6 +180,7 @@ module Executor =
                     makeSorterModelSet
                     makeMsasFTests
                     host rp allowOverwrite cts progress }
+
 
     let mergeExecutor =
         { new IRunParamsExecutor with
@@ -150,12 +190,19 @@ module Executor =
                     makeMsasFTests
                     host rp allowOverwrite cts progress }
 
+
     let binsReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 makeBinsReport
                     host rp allowOverwrite cts progress }
 
+
+    let fullReportExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                makeFullReport
+                    host rp allowOverwrite cts progress }
 
 
     // --- The Dispatcher ---
@@ -164,6 +211,7 @@ module Executor =
         match executorType with
         | Standard -> standardExecutor
         | Merge -> mergeExecutor
+        | FullReport -> fullReportExecutor
         | BinsReport -> binsReportExecutor
 
 

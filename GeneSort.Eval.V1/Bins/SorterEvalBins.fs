@@ -4,7 +4,9 @@ namespace GeneSort.Eval.V1.Bins
 open System
 open FSharp.UMX
 open GeneSort.Sorting
+open GeneSort.Sorting.Sorter
 open GeneSort.SortingOps
+open SorterScore
 
 [<Measure>] type sorterEvalBinsId
 
@@ -222,7 +224,7 @@ module SorterEvalBinsV1 =
 
 
     /// Generates table-ready records for all scores across all bins.
-    let makeDataTableRecords (source: sorterEvalBinsV1) : GeneSort.Core.dataTableRecord seq =
+    let makeFullDataTableRecords (source: sorterEvalBinsV1) : GeneSort.Core.dataTableRecord seq =
         source.Bins
         |> Map.toSeq
         |> Seq.collect (fun (key, bin) ->
@@ -233,6 +235,45 @@ module SorterEvalBinsV1 =
                 ||> Map.fold (fun acc k v -> GeneSort.Core.dataTableRecord.addKeyAndData k v acc)
             )
         )
+
+    /// Generates two dataTableRecords per bin, one that summarizes the sorted members of the bin, 
+    /// and one for the unsorted.
+    let makeSummaryDataTableRecords (source: sorterEvalBinsV1) : GeneSort.Core.dataTableRecord seq =
+        source.Bins
+        |> Map.toSeq
+        |> Seq.collect (fun (key, bin) ->
+            let keyRecord = SorterEvalKey.toDataTableRecord key
+            
+            // Partition scores based on whether they are fully sorted
+            let unsortedScores, sortedScores = 
+                bin.Scores 
+                |> Seq.toArray
+                |> Array.partition (SorterScore.isUnsorted >> Option.defaultValue true)
+
+            let createSummary (scores: sorterScore array) (status: string) =
+                if scores.Length = 0 then 
+                    None
+                else
+                    // Find the number of unique stage sequences in this bin, which serves as a proxy for solution diversity
+                    let uniqueHashes = scores |> Seq.map (SorterScore.sequenceHash >> Option.defaultValue 0<sequenceHash>) 
+                                              |> Seq.distinct |> Seq.length
+                    
+                    let summary = 
+                        GeneSort.Core.dataTableRecord.createEmpty()
+                        |> GeneSort.Core.dataTableRecord.addData "Sorted" status
+                        |> GeneSort.Core.dataTableRecord.addData "BinCount" (string scores.Length)
+                        |> GeneSort.Core.dataTableRecord.addData "UniqueHashes" (string %uniqueHashes)
+                    
+                    // Merge with the bin's key data (Gates, Depth, etc.)
+                    Some ((summary, keyRecord.Data) 
+                        ||> Map.fold (fun acc k v -> GeneSort.Core.dataTableRecord.addKeyAndData k v acc))
+
+            seq {
+                match createSummary sortedScores "True" with | Some r -> yield r | None -> ()
+                match createSummary unsortedScores "False" with | Some r -> yield r | None -> ()
+            }
+        )
+
 
 
 
@@ -252,4 +293,5 @@ module SorterEvalBins =
     let extractBins = (fun filter bins -> match bins with | V1 b -> V1 (SorterEvalBinsV1.extractBins filter b) | _ -> bins)
     let getTopN = (fun scoreValuer newId bins n -> match bins with | V1 b -> V1 (SorterEvalBinsV1.getTopN scoreValuer newId b n) | _ -> bins)
     let convexHull = (fun newId bins -> match bins with | V1 b -> V1 (SorterEvalBinsV1.convexHull newId b) | _ -> bins)
-    let makeDataTableRecords = (fun bins -> match bins with | V1 b -> SorterEvalBinsV1.makeDataTableRecords b | _ -> Seq.empty)
+    let makeFullDataTableRecords = (fun bins -> match bins with | V1 b -> SorterEvalBinsV1.makeFullDataTableRecords b | _ -> Seq.empty)
+    let makeSummaryDataTableRecords = (fun bins -> match bins with | V1 b -> SorterEvalBinsV1.makeSummaryDataTableRecords b | _ -> Seq.empty)

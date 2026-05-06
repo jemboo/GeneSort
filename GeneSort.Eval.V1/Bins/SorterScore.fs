@@ -92,3 +92,7 @@ module SorterScore =
             |> GeneSort.Core.dataTableRecord.addData "Status" "UnknownVersion"
 
 
+    let sequenceHash (score: sorterScore) : int<sequenceHash> option =
+        match score with
+        | V1 v1 -> Some v1.StageSequenceHash
+        | Unknown -> None

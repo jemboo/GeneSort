@@ -25,8 +25,8 @@ let maxParallel = Environment.ProcessorCount
 let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
-let configKey = "Small_dev" 
-let executorType = Executor.executorType.BinsReport
+let configKey = "Standard_dev" 
+let executorType = Executor.executorType.Standard
 
 //let host: IRunHost = 
 //    match SortableTest.Merge.Configs |> Map.tryFind configKey with
