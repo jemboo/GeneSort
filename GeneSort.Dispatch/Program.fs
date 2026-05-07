@@ -34,22 +34,24 @@ let maxParallel = Environment.ProcessorCount
 let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
-let configKey = "Medium" 
-let executorType = Executor.executorType.Standard
-
-//let host: IRunHost = 
-//    match SortableTest.Merge.Configs |> Map.tryFind configKey with
-//    | Some s -> SortableTest.Merge.CreateHost s
-//    | None -> failwithf "Config key '%s' not found." configKey
-
+let configKey = "Merge_dev" 
+let executorType = SortableTest.executorType.Merge
 
 let host: IRunHost = 
-    match SorterEvalBins.SimpleRandom.Configs |> Map.tryFind configKey with
-    | Some s -> SorterEvalBins.SimpleRandom.CreateHost (s executorType)
+    match SortableTest.Merge.Configs |> Map.tryFind configKey with
+    | Some s -> SortableTest.Merge.CreateHost ( s executorType )
     | None -> failwithf "Config key '%s' not found." configKey
 
+
+//let configKey = "Merge_dev" 
+//let executorType = EvalBinsExecutor.executorType.Merge
+//let host: IRunHost = 
+//    match SorterEvalBins.SimpleRandom.Configs |> Map.tryFind configKey with
+//    | Some s -> SorterEvalBins.SimpleRandom.CreateHost (s executorType)
+//    | None -> failwithf "Config key '%s' not found." configKey
+
 let minReplica = 0<replNumber>
-let maxReplica = 100<replNumber>
+let maxReplica = 2<replNumber>
 
 
 

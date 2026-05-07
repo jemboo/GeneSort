@@ -11,6 +11,23 @@ open GeneSort.Dispatch.V1
 
 module Merge =
 
+
+    let smallSortingWidths = 
+            (runParameters.sortingWidthKey, [16; 18; 24; 32;] |> List.map string)
+
+    let allSortingWidths = 
+            (runParameters.sortingWidthKey,  [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256]  |> List.map string)
+
+    let allMergeDimensions = 
+            (runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
+
+    let allDataFormats = 
+            (runParameters.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
+
+    let allMergeFillTypes = 
+            (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix; mergeSuffixType.VV_1;] |> List.map MergeSuffixType.toString)
+
+
     let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Project.ProjectName)
         rp.WithProjectName(Some host.Project.ProjectName)
@@ -42,18 +59,16 @@ module Merge =
 
     module Specs =
 
-        let P1 (executorType: executorType) : runHostSpec = {
+        let Merge_dev (executorType: executorType) : runHostSpec = {
             ProjectName = "SortableTest" |> UMX.tag
-            RunName = "Dev" |> UMX.tag
+            RunName = "Merge_Dev" |> UMX.tag
             ProjectDesc = "Int8 merge sorter test sets"
             DataFolder = "c:\\Projects\\SortableTest\\Merge\\Data"
             Spans = [
-                (runParameters.sortingWidthKey, [32;] |> List.map string)
-                (runParameters.sortableDataFormatKey, 
-                [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
-                (runParameters.mergeDimensionKey, [4;] |> List.map string)
-                (runParameters.mergeSuffixTypeKey, 
-                [mergeSuffixType.NoSuffix; mergeSuffixType.VV_1] |> List.map MergeSuffixType.toString)
+                smallSortingWidths
+                allDataFormats
+                allMergeDimensions
+                allMergeFillTypes
             ]
             Filter = standardParamMapFilter
             Enhancer = standardEnhancer
@@ -63,20 +78,16 @@ module Merge =
         }
 
 
-        let P2 (executorType: executorType) : runHostSpec = {
+        let Merge_prod (executorType: executorType) : runHostSpec = {
             ProjectName = "SortableTest" |> UMX.tag
-            RunName = "Prod" |> UMX.tag
+            RunName = "Merge_Prod" |> UMX.tag
             ProjectDesc = "Int8 merge sorter test sets"
             DataFolder = "c:\\Projects\\SortableTest\\Merge\\Data"
             Spans = [
-                ( runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] 
-                    |> List.map string)
-                ( runParameters.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] 
-                    |> List.map SortableDataFormat.toString)
-                ( runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] 
-                    |> List.map string)
-                ( runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix; mergeSuffixType.VV_1] 
-                    |> List.map MergeSuffixType.toString)
+                allSortingWidths
+                allDataFormats
+                allMergeDimensions
+                allMergeFillTypes
             ]
             Filter = standardParamMapFilter
             Enhancer = standardEnhancer
@@ -85,7 +96,7 @@ module Merge =
             ExecutorType = executorType
         }
 
-    let Configs = Map.ofList [ ("P1", Specs.P1); ("P2", Specs.P2) ]
+    let Configs = Map.ofList [ ("Merge_dev", Specs.Merge_dev); ("Merge_prod", Specs.Merge_prod) ]
 
     let CreateHost (spec: runHostSpec) : IRunHost =
         let folder = spec.DataFolder |> UMX.tag

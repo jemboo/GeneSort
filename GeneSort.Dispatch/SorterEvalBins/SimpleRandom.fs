@@ -75,9 +75,9 @@ module SimpleRandom =
 
     module Specs =
 
-        let Small_dev (executorType: Executor.executorType) : runHostSpec = {
+        let Small_dev (executorType: EvalBinsExecutor.executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = sprintf @"Small_Dev_%s" (Executor.ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Small_Dev_%s" (EvalBinsExecutor.ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Small\\Data"
             Spans = [
@@ -97,9 +97,9 @@ module SimpleRandom =
             ExecutorType = executorType
         }
 
-        let Small (executorType: Executor.executorType) : runHostSpec = {
+        let Small (executorType: EvalBinsExecutor.executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = sprintf @"Small_%s" (Executor.ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Small_%s" (EvalBinsExecutor.ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Small\\Data"
             Spans = [
@@ -119,9 +119,9 @@ module SimpleRandom =
             ExecutorType = executorType
         }
 
-        let Medium_dev (executorType: Executor.executorType) : runHostSpec = {
+        let Medium_dev (executorType: EvalBinsExecutor.executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = sprintf @"Medium_Dev_%s" (Executor.ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Medium_Dev_%s" (EvalBinsExecutor.ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Medium_dev\\Data"
             Spans = [
@@ -141,9 +141,9 @@ module SimpleRandom =
             ExecutorType = executorType
         }
 
-        let Medium (executorType: Executor.executorType) : runHostSpec = {
+        let Medium (executorType: EvalBinsExecutor.executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = sprintf @"Medium_%s" (Executor.ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Medium_%s" (EvalBinsExecutor.ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Medium\\Data"
             Spans = [

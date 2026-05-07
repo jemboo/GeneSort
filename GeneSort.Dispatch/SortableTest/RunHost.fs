@@ -79,7 +79,14 @@ type runHostForMergeTest =
                     : Async<Result<sortableTest, string>> =
             asyncResult {
                 try
-                    let queryParams = this.MakeQueryParams repl sortingWidth mergeDimension mergeFillType sortableDataFormat (outputDataType.SortableTest "")
+                    let queryParams = this.MakeQueryParams 
+                                                repl 
+                                                sortingWidth 
+                                                mergeDimension 
+                                                mergeFillType 
+                                                sortableDataFormat 
+                                                (outputDataType.SortableTest "")
+
                     let! (dataOut : outputData) = this._projectDb.loadAsync queryParams
                     let! sortableTest = dataOut |> OutputData.asSortableTest
                     return sortableTest

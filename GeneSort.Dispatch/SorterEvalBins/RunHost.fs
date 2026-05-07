@@ -23,7 +23,7 @@ type runHostSpec = {
     // Domain Settings
     CollectNewSortableTests: bool
     AllowOverwrite: bool<allowOverwrite>
-    ExecutorType: Executor.executorType
+    ExecutorType: EvalBinsExecutor.executorType
 }
 
 
@@ -69,7 +69,7 @@ type runHost =
         member this.MakeQueryParamsFromRunParams rp odt = this.MakeQueryParamsFromRunParams rp odt
         member this.ParamMapRefiner rps = this.ParamMapRefiner rps
         member this.Execute runParameters allowOverwrite cts progress = 
-            let executor = Executor.getExecutor this._spec.ExecutorType
+            let executor = EvalBinsExecutor.getExecutor this._spec.ExecutorType
             RunParamsExecutor.execute executor this runParameters allowOverwrite cts progress
 
 

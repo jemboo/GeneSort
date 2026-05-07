@@ -16,7 +16,7 @@ open GeneSort.Model.Sortable.V1
 open GeneSort.Model.Sorting.Simple.V1
 
 
-module Executor =
+module EvalBinsExecutor =
 
     type executorType = 
         | Standard
