@@ -6,7 +6,7 @@ open GeneSort.Sorting
 open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Dispatch.V1
-
+open GeneSort.Sorting.Sortable
 
 
 type runHostSpec = {
@@ -21,10 +21,11 @@ type runHostSpec = {
     // Domain Settings
     RngFactory: rngFactory
     AllowOverwrite: bool<allowOverwrite>
-    ExecutorType: Executor.executorType
+    ExecutorType: executorType
 }
 
-type runHost = 
+
+type runHostForMergeTest = 
     private { 
         _projectDb: IGeneSortDb 
         _parameterSpans: (string * string list) list
@@ -67,6 +68,25 @@ type runHost =
                     (runParams.GetMergeSuffixType()) 
                     (runParams.GetSortableDataFormat()) 
                     outputDataType
+
+
+    member this.getSortableMergeTest 
+                (repl: int<replNumber> option) 
+                (sortingWidth: int<sortingWidth> option)
+                (mergeDimension: int<mergeDimension> option) 
+                (mergeFillType: mergeSuffixType option)
+                (sortableDataFormat: sortableDataFormat option) 
+                    : Async<Result<sortableTest, string>> =
+            asyncResult {
+                try
+                    let queryParams = this.MakeQueryParams repl sortingWidth mergeDimension mergeFillType sortableDataFormat (outputDataType.SortableTest "")
+                    let! (dataOut : outputData) = this._projectDb.loadAsync queryParams
+                    let! sortableTest = dataOut |> OutputData.asSortableTest
+                    return sortableTest
+                with e -> 
+                    return! Error (sprintf "Error in getSortableMergeTest: %s" e.Message) |> async.Return
+            }
+
 
     member this.ParamMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
         runParametersSeq 

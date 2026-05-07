@@ -12,16 +12,6 @@ open GeneSort.Model.Sortable.V1
 
 module Executor =
 
-    type executorType = 
-        | Merge
-        | Unknown
-
-    module ExecutorType =
-        let toString = function
-           | Merge -> "Merge"
-           | Unknown -> "Unknown"
-
-
     let _makeSortableMergeTest
         (host: IRunHost)
         (rp: runParameters) 

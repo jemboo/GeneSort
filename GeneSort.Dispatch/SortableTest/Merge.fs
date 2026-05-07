@@ -42,7 +42,7 @@ module Merge =
 
     module Specs =
 
-        let P1 (executorType: Executor.executorType) : runHostSpec = {
+        let P1 (executorType: executorType) : runHostSpec = {
             ProjectName = "SortableTest" |> UMX.tag
             RunName = "Dev" |> UMX.tag
             ProjectDesc = "Int8 merge sorter test sets"
@@ -63,7 +63,7 @@ module Merge =
         }
 
 
-        let P2 (executorType: Executor.executorType) : runHostSpec = {
+        let P2 (executorType: executorType) : runHostSpec = {
             ProjectName = "SortableTest" |> UMX.tag
             RunName = "Prod" |> UMX.tag
             ProjectDesc = "Int8 merge sorter test sets"
@@ -87,10 +87,10 @@ module Merge =
 
     let Configs = Map.ofList [ ("P1", Specs.P1); ("P2", Specs.P2) ]
 
-    let CreateHost (spec: runHostSpec) =
+    let CreateHost (spec: runHostSpec) : IRunHost =
         let folder = spec.DataFolder |> UMX.tag
         let db = new GeneSortDbMp(folder) :> IGeneSortDb
         let proj = run.create spec.ProjectName spec.RunName spec.ProjectDesc 
                                 [| outputDataType.RunParameters %spec.ProjectName; 
                                    outputDataType.SortableTestSet ""; |]
-        runHost.Create db spec proj :> IRunHost
+        runHostForMergeTest.Create db spec proj :> IRunHost

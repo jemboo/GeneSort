@@ -21,6 +21,7 @@
     <Compile Include="ParamOps.fs" />
     <Compile Include="ProjectOps.fs" />
     <Compile Include="Interfaces.fs" />
+    <Compile Include="SortableTest\Common.fs" />
     <Compile Include="SortableTest\Executor.fs" />
     <Compile Include="SortableTest\RunHost.fs" />
     <Compile Include="SortableTest\Merge.fs" />
