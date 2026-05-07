@@ -20,9 +20,8 @@ type runHostSpec = {
     Enhancer: IRunHost -> runParameters -> runParameters
     // Domain Settings
     RngFactory: rngFactory
-    CollectNewSortableTests: bool
     AllowOverwrite: bool<allowOverwrite>
-
+    ExecutorType: Executor.executorType
 }
 
 type runHost = 
@@ -81,11 +80,6 @@ type runHost =
         member this.MakeQueryParamsFromRunParams rp odt = this.MakeQueryParamsFromRunParams rp odt
         member this.ParamMapRefiner rps = this.ParamMapRefiner rps
         member this.Execute runParameters allowOverwrite cts progress = 
-            Executor.makeSortableTest 
-                this
-                this._spec.CollectNewSortableTests 
-                runParameters 
-                allowOverwrite 
-                cts 
-                progress
+            let executor = Executor.getExecutor this._spec.ExecutorType
+            RunParamsExecutor.execute executor this runParameters allowOverwrite cts progress
 

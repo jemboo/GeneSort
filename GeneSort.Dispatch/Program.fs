@@ -8,6 +8,7 @@ open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.FileDb.V1
 open GeneSort.Dispatch.V1.SorterEvalBins
+open System.Runtime
 
 let createThreadSafeProgress() =
     let agent = MailboxProcessor.Start(fun inbox ->
@@ -17,6 +18,14 @@ let createThreadSafeProgress() =
                 printfn "%s" msg
         })
     { new IProgress<string> with member _.Report(msg) = agent.Post(msg) }
+
+
+let isServer = GCSettings.IsServerGC
+let mode = GCSettings.LatencyMode
+
+
+
+
 
 let progress = createThreadSafeProgress()
 let cts = new CancellationTokenSource()
@@ -42,8 +51,51 @@ let host: IRunHost =
 let minReplica = 0<replNumber>
 let maxReplica = 100<replNumber>
 
+
+
+
+
+
+async {
+    printfn "Init Project: %s" %host.Project.ProjectName
+    
+    let! initResult = 
+        ParamOps.initProjectAndRunFiles
+            host.ProjectDb           
+            host.MakeQueryParamsFromRunParams 
+            cts 
+            (Some progress) 
+            host.Project              
+            minReplica 
+            maxReplica 
+            host.AllowOverwrite 
+            host.ParamMapRefiner      
+            host.ParameterSpans
+
+    match initResult with
+    | Error e -> printfn "Init Failure: %s" e
+    | Ok () ->
+        let! execResult = 
+            ProjectOps.executeRuns 
+                host.ProjectDb      
+                minReplica 
+                maxReplica 
+                host.MakeQueryParamsFromRunParams 
+                host.Project.RunName 
+                host.AllowOverwrite 
+                cts 
+                (Some progress) 
+                host.Execute
+                maxParallel
+
+        match execResult with
+        | Ok results -> printfn "Success: %d records processed." results.Length
+        | Error e -> printfn "Runtime Error: %s" e
+
+} |> Async.RunSynchronously
+
 //async {
-//    printfn "Running Project: %s" %host.Project.ProjectName
+//    printfn "Init Project: %s" %host.Project.ProjectName
     
 //    let! initResult = 
 //        ParamOps.initProjectAndRunFiles
@@ -60,50 +112,34 @@ let maxReplica = 100<replNumber>
 
 //    match initResult with
 //    | Error e -> printfn "Init Failure: %s" e
-//    | Ok () ->
-//        let! execResult = 
-//            ProjectOps.executeRuns 
-//                host.ProjectDb      
-//                minReplica 
-//                maxReplica 
-//                host.MakeQueryParamsFromRunParams 
-//                host.Project.RunName 
-//                host.AllowOverwrite 
-//                cts 
-//                (Some progress) 
-//                host.Execute
-//                maxParallel
+//    | Ok () -> printfn "Init Success: %s" %host.Project.ProjectName
 
-//        match execResult with
-//        | Ok results -> printfn "Success: %d records processed." results.Length
-//        | Error e -> printfn "Runtime Error: %s" e
 
 //} |> Async.RunSynchronously
 
 
-
-async {
-    printfn "Running Project: %s" %host.Project.ProjectName
+//async {
+//    printfn "Running Project: %s" %host.Project.ProjectName
     
 
-    let! execResult = 
-        ProjectOps.executeRuns 
-            host.ProjectDb      
-            minReplica 
-            maxReplica 
-            host.MakeQueryParamsFromRunParams 
-            host.Project.RunName 
-            host.AllowOverwrite 
-            cts 
-            (Some progress) 
-            host.Execute
-            maxParallel
+//    let! execResult = 
+//        ProjectOps.executeRuns 
+//            host.ProjectDb      
+//            minReplica 
+//            maxReplica 
+//            host.MakeQueryParamsFromRunParams 
+//            host.Project.RunName 
+//            host.AllowOverwrite 
+//            cts 
+//            (Some progress) 
+//            host.Execute
+//            maxParallel
 
-    match execResult with
-    | Ok results -> printfn "Success: %d records processed." results.Length
-    | Error e -> printfn "Runtime Error: %s" e
+//    match execResult with
+//    | Ok results -> printfn "Success: %d records processed." results.Length
+//    | Error e -> printfn "Runtime Error: %s" e
 
-} |> Async.RunSynchronously
+//} |> Async.RunSynchronously
 
 
 

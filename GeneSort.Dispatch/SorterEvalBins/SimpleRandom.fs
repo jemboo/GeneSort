@@ -48,7 +48,6 @@ module SimpleRandom =
     let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let sw = rp.GetSortingWidth().Value
         let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Project.ProjectName)
-       
         let sl = getStageLength %sw
         
         rp.WithProjectName(Some host.Project.ProjectName)
@@ -122,9 +121,9 @@ module SimpleRandom =
 
         let Medium_dev (executorType: Executor.executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = sprintf @"Standard_Dev_%s" (Executor.ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Medium_Dev_%s" (Executor.ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
-            DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Standard\\Data"
+            DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Medium_dev\\Data"
             Spans = [
                 mediumSortingWidths
                 (runParameters.simpleSorterModelTypeKey, 
@@ -144,9 +143,9 @@ module SimpleRandom =
 
         let Medium (executorType: Executor.executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = sprintf @"Standard_%s" (Executor.ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Medium_%s" (Executor.ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
-            DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Standard\\Data"
+            DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Medium\\Data"
             Spans = [
                 mediumSortingWidths
                 (runParameters.simpleSorterModelTypeKey, 

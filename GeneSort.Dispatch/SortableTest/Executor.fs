@@ -4,21 +4,26 @@ open System
 open System.Threading
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorting
-open GeneSort.SortingOps
 open GeneSort.Db.V1
 open GeneSort.Project.V1
-open GeneSort.Model.Sorting.V1
-open GeneSort.Eval.V1.Bins
-open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
 
 
 module Executor =
-    let makeSortableTest
+
+    type executorType = 
+        | Merge
+        | Unknown
+
+    module ExecutorType =
+        let toString = function
+           | Merge -> "Merge"
+           | Unknown -> "Unknown"
+
+
+    let _makeSortableMergeTest
         (host: IRunHost)
-        (collectTests: bool)
         (rp: runParameters) 
         (allowOverwrite: bool<allowOverwrite>) 
         (cts: CancellationTokenSource) 
@@ -59,3 +64,16 @@ module Executor =
         }
 
 
+
+    let mergeExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                _makeSortableMergeTest 
+                    host rp allowOverwrite cts progress }
+
+
+
+    let getExecutor (executorType: executorType) : IRunParamsExecutor =
+        match executorType with
+        | Merge -> mergeExecutor
+        | Unknown -> failwith "Unknown executor type"

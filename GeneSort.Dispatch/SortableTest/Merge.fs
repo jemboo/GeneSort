@@ -42,11 +42,11 @@ module Merge =
 
     module Specs =
 
-        let P1 = {
+        let P1 (executorType: Executor.executorType) : runHostSpec = {
             ProjectName = "SortableTest" |> UMX.tag
             RunName = "Dev" |> UMX.tag
             ProjectDesc = "Int8 merge sorter test sets"
-            DataFolder = "c:\\ProjectsV1\\SortableTest\\Merge\\Data"
+            DataFolder = "c:\\Projects\\SortableTest\\Merge\\Data"
             Spans = [
                 (runParameters.sortingWidthKey, [32;] |> List.map string)
                 (runParameters.sortableDataFormatKey, 
@@ -58,16 +58,16 @@ module Merge =
             Filter = standardParamMapFilter
             Enhancer = standardEnhancer
             RngFactory = rngFactory.LcgFactory
-            CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
+            ExecutorType = executorType
         }
 
 
-        let P2 = {
+        let P2 (executorType: Executor.executorType) : runHostSpec = {
             ProjectName = "SortableTest" |> UMX.tag
             RunName = "Prod" |> UMX.tag
             ProjectDesc = "Int8 merge sorter test sets"
-            DataFolder = "c:\\ProjectsV1\\SortableTest\\Merge\\Data"
+            DataFolder = "c:\\Projects\\SortableTest\\Merge\\Data"
             Spans = [
                 ( runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256] 
                     |> List.map string)
@@ -81,8 +81,8 @@ module Merge =
             Filter = standardParamMapFilter
             Enhancer = standardEnhancer
             RngFactory = rngFactory.LcgFactory
-            CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
+            ExecutorType = executorType
         }
 
     let Configs = Map.ofList [ ("P1", Specs.P1); ("P2", Specs.P2) ]

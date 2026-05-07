@@ -34,11 +34,11 @@ type runHost =
         _projectDb: IGeneSortDb 
         _parameterSpans: (string * string list) list
         _spec: runHostSpec
-        _project: run
+        _run: run
     }
     
-    static member Create db spec project =
-        { _projectDb = db; _parameterSpans = spec.Spans; _spec = spec; _project = project }
+    static member Create db spec run =
+        { _projectDb = db; _parameterSpans = spec.Spans; _spec = spec; _run = run }
 
     member this.Spec = this._spec
 
@@ -63,7 +63,7 @@ type runHost =
 
     interface IRunHost with
         member this.ProjectDb = this._projectDb
-        member this.Project = this._project
+        member this.Project = this._run
         member this.ParameterSpans = this._parameterSpans
         member this.AllowOverwrite = this._spec.AllowOverwrite
         member this.MakeQueryParamsFromRunParams rp odt = this.MakeQueryParamsFromRunParams rp odt

@@ -5,6 +5,14 @@
     <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
+        <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+        <RetainVMGarbageCollection>true</RetainVMGarbageCollection>
+        <!-- Limit heaps if running multiple processes -->
+        <!-- <GCHeapCount>4</GCHeapCount> -->
+  </PropertyGroup>
+    
   <ItemGroup>
     <Compile Include="BitonicSort.fs" />
     <Compile Include="RunResult.fs" />
