@@ -21,6 +21,7 @@ type runParameters =
     static member ceLengthKey = "CeLength"
     static member collectNewSortableTestsKey = "CollectNewSortableTests"
     static member elapsedTimeKey = "ElapsedTime"
+    static member excludeSelfCeKey = "ExcludeSelfCe"
     static member generationKey = "Generation"
     static member idKey = "Id"
     static member latticeDistanceKey = "LatticeDistance"
@@ -66,6 +67,7 @@ type runParameters =
     // --- Getters ---
     member this.GetCeLength() = runParameters.tryGetInt runParameters.ceLengthKey this.paramMap |> Option.map UMX.tag<ceLength>
     member this.GetCollectNewSortableTests() = runParameters.tryGetBool runParameters.collectNewSortableTestsKey this.paramMap
+    member this.GetExcludeSelfCe() = runParameters.tryGetBool runParameters.excludeSelfCeKey this.paramMap |> Option.map UMX.tag<excludeSelfCe>
     member this.GetGeneration() = runParameters.tryGetInt runParameters.generationKey this.paramMap |> Option.map UMX.tag<generationNumber>
     member this.GetId() = runParameters.tryGetGuid runParameters.idKey this.paramMap |> Option.map UMX.tag<queryParamsId>
     member this.GetLatticeDistance() = runParameters.tryGetInt runParameters.latticeDistanceKey this.paramMap |> Option.map UMX.tag<latticeDistance>
@@ -105,6 +107,9 @@ type runParameters =
 
     member this.WithElapsedTime(time: string option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.elapsedTimeKey time }
+
+    member this.WithExcludeSelfCe(esc: bool<excludeSelfCe> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.excludeSelfCeKey (esc |> Option.map UmxExt.boolToRaw) }
 
     member this.WithGeneration(gen: int<generationNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationKey (gen |> Option.map UmxExt.intToRaw) }

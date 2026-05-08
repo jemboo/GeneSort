@@ -47,10 +47,14 @@ module EvalBinsExecutor =
             let! repl = rp.GetRepl()
             let! sorterCount = rp.GetSorterCount()
             let! rngFactory = rp.GetRngType() |> Option.map RngFactory.create
+            let! excludeSelfCe = rp.GetExcludeSelfCe()
             let firstIdx = (%repl * %sorterCount) |> UMX.tag<sorterCount>
             let sorterModelGen = SimpleSorterModelGen.makeUniform 
                                         rngFactory 
-                                        sortingWidth stageLength simpleSorterModelType
+                                        sortingWidth 
+                                        stageLength 
+                                        simpleSorterModelType
+                                        excludeSelfCe
                                  |> sorterModelGen.Simple
 
             let qpModelSet = host.MakeQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
@@ -98,7 +102,7 @@ module EvalBinsExecutor =
         }
 
     let _makeMergeSorterEvalBins 
-        (makeSorterModel: IRunHost -> runParameters -> sorterModelSet option)
+        (makeSorterModelSet: IRunHost -> runParameters -> sorterModelSet option)
         (makeTests: IRunHost ->runParameters -> Sortable.sortableTest option)
         (host: IRunHost)
         (rp: runParameters) 
@@ -112,7 +116,7 @@ module EvalBinsExecutor =
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Sorter Run %s" (MathUtils.getTimestampString()) %runId)
 
-                let! modelSet = makeSorterModel host rp |> Result.ofOption "Failed to create SorterModelSet"
+                let! modelSet = makeSorterModelSet host rp |> Result.ofOption "Failed to create SorterModelSet"
                 let fullSorterSet = SorterModelSet.makeSorterSet (%modelSet.Id |> UMX.tag) modelSet
 
                 let! (_: unit) = checkCancellation cts.Token

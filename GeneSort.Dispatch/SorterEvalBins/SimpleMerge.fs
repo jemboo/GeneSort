@@ -148,6 +148,7 @@ module RandomSorterBinsMerge =
         rp.WithProjectName(Some host.Run.ProjectName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
+          .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
           .WithCeLength(Some cl)
           .WithStageLength(Some sl)
           .WithCollectSortableTests(Some true)

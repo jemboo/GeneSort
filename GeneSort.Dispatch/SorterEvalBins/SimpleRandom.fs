@@ -66,6 +66,7 @@ module SimpleRandom =
           .WithRunFinished(Some false)
           .WithStageLength(Some sl)
           .WithCollectSortableTests(Some true)
+          .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
           .WithId (Some qp.Id)
 
     

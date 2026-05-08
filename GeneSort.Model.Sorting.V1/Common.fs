@@ -18,6 +18,7 @@ open GeneSort.Core
 [<Measure>] type parentSorterSetEvalId
 [<Measure>] type sortingParamsId
 
+[<Measure>] type excludeSelfCe
 [<Measure>] type mutationRate
 
 module CommonGen =

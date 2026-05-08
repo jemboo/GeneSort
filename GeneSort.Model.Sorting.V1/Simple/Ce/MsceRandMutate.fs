@@ -14,12 +14,12 @@ type msceRandMutate =
           msce : msce
           rngFactory: rngFactory
           indelRates: indelRates // Changed from indelRatesArray
-          excludeSelfCe: bool }
+          excludeSelfCe: bool<excludeSelfCe> }
     with
     static member create 
             (rngFactory: rngFactory)
             (indelRates: indelRates) // Single value
-            (excludeSelfCe: bool) 
+            (excludeSelfCe: bool<excludeSelfCe>     ) 
             (msce : msce) : msceRandMutate = 
         
         let id =
@@ -67,8 +67,8 @@ type msceRandMutate =
         let sortingWidth = %this.msce.SortingWidth
         
         // Define generation logic
-        let ceCodeInserter = fun () -> Ce.generateCeCode excludeSelfCe sortingWidth (rng.NextIndex)
-        let ceCodeMutator = fun _ -> Ce.generateCeCode excludeSelfCe sortingWidth (rng.NextIndex)
+        let ceCodeInserter = fun () -> Ce.generateCeCode %excludeSelfCe sortingWidth (rng.NextIndex)
+        let ceCodeMutator = fun _ -> Ce.generateCeCode %excludeSelfCe sortingWidth (rng.NextIndex)
         
         // Directly use the uniform rates without an intermediate array allocation
         let ceCodes = IndelRates.mutate 
@@ -94,4 +94,4 @@ module MsceRandMutate =
             (msceMutate.RngFactory.ToString())
             (%msceMutate.CeLength)
             (msceMutate.IndelRates.toString())
-            msceMutate.ExcludeSelfCe
+            %msceMutate.ExcludeSelfCe

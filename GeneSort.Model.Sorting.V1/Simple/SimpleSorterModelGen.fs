@@ -26,11 +26,10 @@ module SimpleSorterModelGen =
             (rngFactory: rngFactory) 
             (sortingWidth: int<sortingWidth>) 
             (stageLength: int<stageLength>) 
-            (simpleorterModelType: simpleSorterModelType) =
-
+            (simpleorterModelType: simpleSorterModelType)
+            (excludeSelfCe: bool<excludeSelfCe>) =
         match simpleorterModelType with
         | simpleSorterModelType.Msce -> 
-            let excludeSelfCe = true
             let ceLength = stageLength |> StageLength.toCeLength sortingWidth
             SmmMsceRandGen (msceRandGen.create rngFactory sortingWidth excludeSelfCe ceLength)
         | simpleSorterModelType.Mssi -> SmmMssiRandGen (mssiRandGen.create rngFactory sortingWidth stageLength)

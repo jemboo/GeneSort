@@ -24,7 +24,7 @@ module UmxExt =
         let fv = x |> UMX.untag<'u>
         (fv * y) |> UMX.tag<'u>
 
-
+    let boolToRaw (v: bool<'u>) : string = (UMX.untag v).ToString()
     let floatToRaw (v: float<'u>) : string = (UMX.untag v).ToString()
     let intToRaw (v: int<'u>) : string = (UMX.untag v).ToString()
     let stringToRaw (v: string<'u>) : string = %v

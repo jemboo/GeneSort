@@ -27,6 +27,7 @@ open FSharp.UMX
 [<Measure>] type switchFrequency
 
 
+[<Measure>] type excludeSelfCe
 [<Measure>] type mergeDimension
 
 

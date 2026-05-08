@@ -14,13 +14,13 @@ type msceRandGen =
           id : Guid<sorterModelGenId>
           rngFactory: rngFactory
           sortingWidth: int<sortingWidth>
-          excludeSelfCe: bool
+          excludeSelfCe: bool<excludeSelfCe>
           ceLength: int<ceLength> } 
     with
     static member create 
             (rngFactory: rngFactory) 
             (sortingWidth: int<sortingWidth>) 
-            (excludeSelfCe: bool) 
+            (excludeSelfCe: bool<excludeSelfCe>) 
             (ceLength: int<ceLength>) : msceRandGen =
         if %ceLength < 1 then
             failwith "ceLength length must be at least 1"
@@ -75,7 +75,7 @@ type msceRandGen =
     member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msce =
         let rando = this.RngFactory.Create %id
         let ceCodes = 
-            if this.ExcludeSelfCe then
+            if %this.ExcludeSelfCe then
                 Ce.generateCeCodesExcludeSelf (rando.NextIndex) %this.SortingWidth
                 |> Seq.take %this.ceLength
                 |> Seq.toArray
