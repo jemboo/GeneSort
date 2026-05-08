@@ -20,8 +20,7 @@ type runSpecMerge = {
     GetStageLength: simpleSorterModelType -> int<sortingWidth> -> int<stageLength>
     Filter: runParameters -> runParameters option
     Enhancer: IRunHost -> runParameters -> runParameters
-    // Merge Specifics
-    ExcludeSelfCe: bool
+
     AllowOverwrite: bool<allowOverwrite>
     MergeTestsProjectFolder: string
 }
@@ -203,7 +202,6 @@ module RandomSorterBinsMerge =
             GetStageLength = getStageLength
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
-            ExcludeSelfCe = true
             AllowOverwrite = false |> UMX.tag
         }
 
