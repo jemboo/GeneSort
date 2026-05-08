@@ -23,7 +23,7 @@ type runHostSpec = {
     // Domain Settings
     CollectNewSortableTests: bool
     AllowOverwrite: bool<allowOverwrite>
-    ExecutorType: EvalBinsExecutor.executorType
+    ExecutorType: executorType
 }
 
 

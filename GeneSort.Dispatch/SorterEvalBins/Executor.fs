@@ -18,19 +18,6 @@ open GeneSort.Model.Sorting.Simple.V1
 
 module EvalBinsExecutor =
 
-    type executorType = 
-        | Standard
-        | Merge
-        | FullReport
-        | BinsReport
-
-    module ExecutorType =
-        let toString = function
-            | Standard -> "Standard"
-            | Merge -> "Merge"
-            | FullReport -> "FullReport"
-            | BinsReport -> "BinsReport"
-
 
     let makeStandardTests (host:IRunHost) (rp:runParameters) : Sortable.sortableTest option =
         maybe {

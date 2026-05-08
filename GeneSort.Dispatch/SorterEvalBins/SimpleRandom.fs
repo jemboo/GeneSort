@@ -15,14 +15,25 @@ module SimpleRandom =
     let smallSortingWidths = 
             (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
 
-
     //let mediumSortingWidths = 
     //        (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
     let mediumSortingWidths = 
-            (runParameters.sortingWidthKey, [22] |> List.map string)
+            (runParameters.sortingWidthKey, [24] |> List.map string)
 
-    let testSortingWidths = 
-            (runParameters.sortingWidthKey, [8;] |> List.map string)
+    let testSorterCount = (runParameters.sorterCountKey, ["100";] )
+    let smallSorterCount = (runParameters.sorterCountKey, ["1000";] )
+    let mediumSorterCount = (runParameters.sorterCountKey, ["10000";] )
+    let largeSorterCount = (runParameters.sorterCountKey, ["100000";] )
+
+    let standardSortableDataFormat = 
+            (runParameters.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
+
+    let rngTypeLcg = (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
+
+    let allSimpleSorterModelTypes = 
+            (runParameters.simpleSorterModelTypeKey, SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
+
+
 
     let getStageLength (sw: int<sortingWidth>) : int<stageLength> =
         match %sw with
@@ -75,19 +86,18 @@ module SimpleRandom =
 
     module Specs =
 
-        let Small_dev (executorType: EvalBinsExecutor.executorType) : runHostSpec = {
+        let Small_dev (executorType: executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = sprintf @"Small_Dev_%s" (EvalBinsExecutor.ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Small_Dev_%s" (ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Small\\Data"
             Spans = [
                 smallSortingWidths
                 (runParameters.simpleSorterModelTypeKey, 
                     SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
-                (runParameters.sortableDataFormatKey, 
-                    [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
-                (runParameters.sorterCountKey, ["1000"])
-                (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
+                standardSortableDataFormat
+                testSorterCount
+                rngTypeLcg
             ]
             GetStageLength = getStageLength 
             Filter = standardSorterModelTypeFilter
@@ -97,19 +107,17 @@ module SimpleRandom =
             ExecutorType = executorType
         }
 
-        let Small (executorType: EvalBinsExecutor.executorType) : runHostSpec = {
+        let Small (executorType: executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = sprintf @"Small_%s" (EvalBinsExecutor.ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Small_%s" (ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Small\\Data"
             Spans = [
                 smallSortingWidths
-                (runParameters.simpleSorterModelTypeKey, 
-                    SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
-                (runParameters.sortableDataFormatKey, 
-                [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
-                (runParameters.sorterCountKey, ["100000"])
-                (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
+                allSimpleSorterModelTypes
+                standardSortableDataFormat
+                largeSorterCount
+                rngTypeLcg
             ]
             GetStageLength = getStageLength
             Filter = standardSorterModelTypeFilter
@@ -119,19 +127,17 @@ module SimpleRandom =
             ExecutorType = executorType
         }
 
-        let Medium_dev (executorType: EvalBinsExecutor.executorType) : runHostSpec = {
+        let Medium_dev (executorType: executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = sprintf @"Medium_Dev_%s" (EvalBinsExecutor.ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Medium_Dev_%s" (ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Medium_dev\\Data"
             Spans = [
                 mediumSortingWidths
-                (runParameters.simpleSorterModelTypeKey, 
-                    SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
-                (runParameters.sortableDataFormatKey, 
-                [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
-                (runParameters.sorterCountKey, ["100"])
-                (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
+                allSimpleSorterModelTypes
+                standardSortableDataFormat
+                testSorterCount
+                rngTypeLcg
             ]
             GetStageLength = getStageLength
             Filter = standardSorterModelTypeFilter
@@ -141,19 +147,17 @@ module SimpleRandom =
             ExecutorType = executorType
         }
 
-        let Medium (executorType: EvalBinsExecutor.executorType) : runHostSpec = {
+        let Medium (executorType: executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = sprintf @"Medium_%s" (EvalBinsExecutor.ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Medium_%s" (ExecutorType.toString executorType) |> UMX.tag
             ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Medium\\Data"
             Spans = [
                 mediumSortingWidths
-                (runParameters.simpleSorterModelTypeKey, 
-                    SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
-                (runParameters.sortableDataFormatKey, 
-                [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
-                (runParameters.sorterCountKey, ["10000"])
-                (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
+                allSimpleSorterModelTypes
+                standardSortableDataFormat
+                mediumSorterCount
+                rngTypeLcg
             ]
             GetStageLength = getStageLength
             Filter = standardSorterModelTypeFilter
