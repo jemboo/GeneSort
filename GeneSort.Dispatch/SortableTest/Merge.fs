@@ -78,7 +78,7 @@ module Merge =
         }
 
 
-        let Merge_prod (executorType: executorType) : runHostSpec = {
+        let Merge_small (executorType: executorType) : runHostSpec = {
             ProjectName = "SortableTest" |> UMX.tag
             RunName = "Merge_Prod" |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
@@ -96,7 +96,7 @@ module Merge =
             ExecutorType = executorType
         }
 
-    let Configs = Map.ofList [ ("Merge_dev", Specs.Merge_dev); ("Merge_prod", Specs.Merge_prod) ]
+    let Configs = Map.ofList [ ("Merge_dev", Specs.Merge_dev); ("Merge_small", Specs.Merge_small) ]
 
     let CreateHost (spec: runHostSpec) : IRunHost =
         let folder = spec.DataFolder |> UMX.tag

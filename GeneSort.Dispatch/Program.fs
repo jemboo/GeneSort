@@ -29,12 +29,12 @@ let mode = GCSettings.LatencyMode
 
 let progress = createThreadSafeProgress()
 let cts = new CancellationTokenSource()
-let maxParallel = Environment.ProcessorCount
+let maxParallel = 2 // Environment.ProcessorCount
 
 let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
-let configKey = "Merge_dev" 
+let configKey = "Merge_small" 
 let executorType = SortableTest.executorType.Merge
 
 let host: IRunHost = 
