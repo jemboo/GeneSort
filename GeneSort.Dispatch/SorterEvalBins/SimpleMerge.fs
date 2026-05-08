@@ -22,7 +22,6 @@ type runSpecMerge = {
     Enhancer: IRunHost -> runParameters -> runParameters
     // Merge Specifics
     ExcludeSelfCe: bool
-    CollectNewSortableTests: bool
     AllowOverwrite: bool<allowOverwrite>
     MergeTestsProjectFolder: string
 }
@@ -143,15 +142,16 @@ module RandomSorterBinsMerge =
     let private mergeEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let sw = rp.GetSortingWidth().Value
         let smt = rp.GetSimpleSorterModelType().Value
-        let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Project.RunName)
+        let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
         let sl = getStageLength smt sw
         let cl = sl |> StageLength.toCeLength sw
 
-        rp.WithProjectName(Some host.Project.ProjectName)
-          .WithRunName(Some host.Project.RunName)
+        rp.WithProjectName(Some host.Run.ProjectName)
+          .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
           .WithCeLength(Some cl)
           .WithStageLength(Some sl)
+          .WithCollectSortableTests(Some true)
           .WithId (Some qp.Id)
 
     let private paramMapFilter (rp: runParameters) = 
@@ -204,7 +204,6 @@ module RandomSorterBinsMerge =
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
             ExcludeSelfCe = true
-            CollectNewSortableTests = false
             AllowOverwrite = false |> UMX.tag
         }
 

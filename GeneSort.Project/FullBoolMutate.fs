@@ -45,7 +45,8 @@ type fullBoolMutateHost =
             let! sw = rp.GetSortingWidth()
             let! sdt = rp.GetSortableDataFormat()
             let! mr = rp.GetMutationRate()
-            return (smt, sw, sdt, mr)
+            let! collectNewTests = rp.GetCollectNewSortableTests()
+            return (smt, sw, sdt, mr, collectNewTests)
         }
 
 
@@ -145,8 +146,9 @@ module FullBoolMutate =
                 report progress (sprintf "%s Starting FullBoolMutate Run %s" (MathUtils.getTimestampString()) %runId)
 
                 // 1. Extract Parameters via Host
-                let! (smt, sw, sdt, mr) = host.ExtractDomainParams runParameters 
-                                            |> Result.ofOption (sprintf "Run %s: Missing params" %runId)
+                let! (smt, sw, sdt, mr, collectNewSortableTests) =
+                        host.ExtractDomainParams runParameters 
+                     |> Result.ofOption (sprintf "Run %s: Missing params" %runId)
 
                 // 2. Load Parent Data
                 let qpParent = RandomSorters.makeQueryParams (Some repl) (Some sw) (Some smt) (outputDataType.SortingSet "")
@@ -160,7 +162,7 @@ module FullBoolMutate =
                 let sortableTests = SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) sortableTestModel sdt
 
                 let qpEvalParents = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "Parents")
-                let evalParents = SorterSetEval.makeSorterSetEval (%qpEvalParents.Id |> UMX.tag) sorterSetParent sortableTests host.CollectNewSortableTests
+                let evalParents = SorterSetEval.makeSorterSetEval (%qpEvalParents.Id |> UMX.tag) sorterSetParent sortableTests collectNewSortableTests
 
                 // 4. Mutation & Mutant Eval
                 let (segments, mutantSortings, mutantSorters) = performMutation sortingSetParent smt mr host.ChildSortersPerParent
@@ -168,7 +170,7 @@ module FullBoolMutate =
                 let sortingSetMutant = sortingSet.create (Guid.NewGuid() |> UMX.tag) mutantSortings // Internal ID
                 
                 let qpEvalMutants = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "Mutants")
-                let evalMutants = SorterSetEval.makeSorterSetEval (%qpEvalMutants.Id |> UMX.tag) sorterSetMutants sortableTests host.CollectNewSortableTests
+                let evalMutants = SorterSetEval.makeSorterSetEval (%qpEvalMutants.Id |> UMX.tag) sorterSetMutants sortableTests collectNewSortableTests
 
                 // 5. Mapping & Binning
                 let segmentEvals = mutationSegmentSetEvals.create segments

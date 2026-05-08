@@ -29,7 +29,6 @@ type mutateSortingSetHost =
     member this.ParameterSpans = this._parameterSpans
     member this.ProjectDb = this._projectDb
     member this.ChildSortersPerParent = this._childSortersPerParent
-    member this.CollectNewSortableTests = false
 
     /// Encapsulates the specific DB logic for loading parent sorters
     member this.GetRandomSortersDb() = 
@@ -42,7 +41,8 @@ type mutateSortingSetHost =
             let! sw = rp.GetSortingWidth()
             let! sdt = rp.GetSortableDataFormat()
             let! mr = rp.GetMutationRate()
-            return (smt, sw, sdt, mr)
+            let! col = rp.GetCollectNewSortableTests()
+            return (smt, sw, sdt, mr, col)
         }
 
 module MutateSortingSet =
@@ -166,7 +166,7 @@ module MutateSortingSet =
                 report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) %runId %repl)
 
                 // 2. Domain Parameter Extraction (Via Host)
-                let! (sorterModelType, sortingWidth, sortableDataFormat, mutationRate) = 
+                let! (sorterModelType, sortingWidth, sortableDataFormat, mutationRate, collectNewSortableTests) = 
                     host.ExtractDomainParams runParameters 
                     |> Result.ofOption (sprintf "Run %s, Repl %d: Missing required parameters" %runId %repl)
 
@@ -188,8 +188,8 @@ module MutateSortingSet =
                 let sorterSetEvalParent = SorterSetEval.makeSorterSetEval 
                                                 (%qpEvalParents.Id |> UMX.tag) 
                                                 sorterSetParent 
-                                                sortableTest 
-                                                host.CollectNewSortableTests
+                                                sortableTest
+                                                collectNewSortableTests
 
                 let sortingEvalSetMap = SortingEvalSetMap.fromSortingSet sortingSetParent
                 sortingEvalSetMap.UpdateManySortingEvals sorterSetEvalParent.SorterEvals
@@ -207,7 +207,7 @@ module MutateSortingSet =
                 let sorterSetEvalMutant = SorterSetEval.makeSorterSetEval 
                                                 (%qpEvalMutants.Id |> UMX.tag)
                                                 sorterSetMutants sortableTest 
-                                                host.CollectNewSortableTests
+                                                collectNewSortableTests
                 
                 let mutationSegmentSetEvals = mutationSegmentSetEvals.create segments
                 mutationSegmentSetEvals.UpdateAllSortingEvalsParent sorterSetEvalParent.SorterEvals

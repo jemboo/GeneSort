@@ -51,7 +51,7 @@ let host: IRunHost =
 //    | None -> failwithf "Config key '%s' not found." configKey
 
 let minReplica = 0<replNumber>
-let maxReplica = 2<replNumber>
+let maxReplica = 1<replNumber>
 
 
 
@@ -59,7 +59,7 @@ let maxReplica = 2<replNumber>
 
 
 async {
-    printfn "Init Project: %s" %host.Project.ProjectName
+    printfn "Init Project: %s" %host.Run.ProjectName
     
     let! initResult = 
         ParamOps.initProjectAndRunFiles
@@ -67,7 +67,7 @@ async {
             host.MakeQueryParamsFromRunParams 
             cts 
             (Some progress) 
-            host.Project              
+            host.Run              
             minReplica 
             maxReplica 
             host.AllowOverwrite 
@@ -83,7 +83,7 @@ async {
                 minReplica 
                 maxReplica 
                 host.MakeQueryParamsFromRunParams 
-                host.Project.RunName 
+                host.Run.RunName 
                 host.AllowOverwrite 
                 cts 
                 (Some progress) 

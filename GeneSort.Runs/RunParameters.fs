@@ -19,6 +19,7 @@ type runParameters =
 
     // Constants for consistency
     static member ceLengthKey = "CeLength"
+    static member collectNewSortableTestsKey = "CollectNewSortableTests"
     static member elapsedTimeKey = "ElapsedTime"
     static member generationKey = "Generation"
     static member idKey = "Id"
@@ -64,6 +65,7 @@ type runParameters =
 
     // --- Getters ---
     member this.GetCeLength() = runParameters.tryGetInt runParameters.ceLengthKey this.paramMap |> Option.map UMX.tag<ceLength>
+    member this.GetCollectNewSortableTests() = runParameters.tryGetBool runParameters.collectNewSortableTestsKey this.paramMap
     member this.GetGeneration() = runParameters.tryGetInt runParameters.generationKey this.paramMap |> Option.map UMX.tag<generationNumber>
     member this.GetId() = runParameters.tryGetGuid runParameters.idKey this.paramMap |> Option.map UMX.tag<queryParamsId>
     member this.GetLatticeDistance() = runParameters.tryGetInt runParameters.latticeDistanceKey this.paramMap |> Option.map UMX.tag<latticeDistance>
@@ -97,6 +99,9 @@ type runParameters =
 
     member this.WithCeLength(cl: int<ceLength> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.ceLengthKey (cl |> Option.map UmxExt.intToRaw) }
+
+    member this.WithCollectNewSortableTests(cnst: bool option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.collectNewSortableTestsKey (cnst |> Option.map string) }
 
     member this.WithElapsedTime(time: string option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.elapsedTimeKey time }

@@ -29,9 +29,9 @@ module Merge =
 
 
     let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Project.ProjectName)
-        rp.WithProjectName(Some host.Project.ProjectName)
-          .WithRunName(Some host.Project.RunName)
+        let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Run.ProjectName)
+        rp.WithProjectName(Some host.Run.ProjectName)
+          .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false).WithId (Some qp.Id)
 
     let private mergeDimensionDividesSortingWidth (rp: runParameters) =
@@ -62,7 +62,7 @@ module Merge =
         let Merge_dev (executorType: executorType) : runHostSpec = {
             ProjectName = "SortableTest" |> UMX.tag
             RunName = "Merge_Dev" |> UMX.tag
-            ProjectDesc = "Int8 merge sorter test sets"
+            RunDescription = "Int8 merge sorter test sets"
             DataFolder = "c:\\Projects\\SortableTest\\Merge\\Data"
             Spans = [
                 smallSortingWidths
@@ -81,7 +81,7 @@ module Merge =
         let Merge_prod (executorType: executorType) : runHostSpec = {
             ProjectName = "SortableTest" |> UMX.tag
             RunName = "Merge_Prod" |> UMX.tag
-            ProjectDesc = "Int8 merge sorter test sets"
+            RunDescription = "Int8 merge sorter test sets"
             DataFolder = "c:\\Projects\\SortableTest\\Merge\\Data"
             Spans = [
                 allSortingWidths
@@ -101,7 +101,7 @@ module Merge =
     let CreateHost (spec: runHostSpec) : IRunHost =
         let folder = spec.DataFolder |> UMX.tag
         let db = new GeneSortDbMp(folder) :> IGeneSortDb
-        let proj = run.create spec.ProjectName spec.RunName spec.ProjectDesc 
+        let proj = run.create spec.ProjectName spec.RunName spec.RunDescription 
                                 [| outputDataType.RunParameters %spec.ProjectName; 
                                    outputDataType.SortableTestSet ""; |]
         runHostForMergeTest.Create db spec proj :> IRunHost

@@ -58,11 +58,11 @@ module SimpleRandom =
 
     let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let sw = rp.GetSortingWidth().Value
-        let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Project.ProjectName)
+        let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Run.ProjectName)
         let sl = getStageLength %sw
         
-        rp.WithProjectName(Some host.Project.ProjectName)
-          .WithRunName(Some host.Project.RunName)
+        rp.WithProjectName(Some host.Run.ProjectName)
+          .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
           .WithStageLength(Some sl)
           .WithCollectSortableTests(Some true)
@@ -89,7 +89,7 @@ module SimpleRandom =
         let Small_dev (executorType: executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
             RunName = sprintf @"Small_Dev_%s" (ExecutorType.toString executorType) |> UMX.tag
-            ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Small\\Data"
             Spans = [
                 smallSortingWidths
@@ -102,7 +102,6 @@ module SimpleRandom =
             GetStageLength = getStageLength 
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
-            CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
             ExecutorType = executorType
         }
@@ -110,7 +109,7 @@ module SimpleRandom =
         let Small (executorType: executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
             RunName = sprintf @"Small_%s" (ExecutorType.toString executorType) |> UMX.tag
-            ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Small\\Data"
             Spans = [
                 smallSortingWidths
@@ -122,7 +121,6 @@ module SimpleRandom =
             GetStageLength = getStageLength
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
-            CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
             ExecutorType = executorType
         }
@@ -130,7 +128,7 @@ module SimpleRandom =
         let Medium_dev (executorType: executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
             RunName = sprintf @"Medium_Dev_%s" (ExecutorType.toString executorType) |> UMX.tag
-            ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Medium_dev\\Data"
             Spans = [
                 mediumSortingWidths
@@ -142,7 +140,6 @@ module SimpleRandom =
             GetStageLength = getStageLength
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
-            CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
             ExecutorType = executorType
         }
@@ -150,7 +147,7 @@ module SimpleRandom =
         let Medium (executorType: executorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
             RunName = sprintf @"Medium_%s" (ExecutorType.toString executorType) |> UMX.tag
-            ProjectDesc = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Medium\\Data"
             Spans = [
                 mediumSortingWidths
@@ -162,7 +159,6 @@ module SimpleRandom =
             GetStageLength = getStageLength
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
-            CollectNewSortableTests = true
             AllowOverwrite = false |> UMX.tag
             ExecutorType = executorType
         }
@@ -178,6 +174,6 @@ module SimpleRandom =
     let CreateHost (spec: runHostSpec) =
         let folder = spec.DataFolder |> UMX.tag
         let db = new GeneSortDbMp(folder) :> IGeneSortDb
-        let proj = run.create spec.ProjectName spec.RunName spec.ProjectDesc 
+        let proj = run.create spec.ProjectName spec.RunName spec.RunDescription 
                                 [| outputDataType.RunParameters %spec.ProjectName; outputDataType.SorterEvalBins ""; |]
         runHost.Create db spec proj :> IRunHost

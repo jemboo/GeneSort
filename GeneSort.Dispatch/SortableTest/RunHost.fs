@@ -12,7 +12,7 @@ open GeneSort.Sorting.Sortable
 type runHostSpec = {
     ProjectName: string<projectName>
     RunName: string<runName>
-    ProjectDesc: string
+    RunDescription: string
     DataFolder: string
     Spans: (string * string list) list
     // Logic Callbacks
@@ -30,11 +30,11 @@ type runHostForMergeTest =
         _projectDb: IGeneSortDb 
         _parameterSpans: (string * string list) list
         _spec: runHostSpec
-        _project: run
+        _run: run
     }
     
-    static member Create db spec project =
-        { _projectDb = db; _parameterSpans = spec.Spans; _spec = spec; _project = project }
+    static member Create db spec run =
+        { _projectDb = db; _parameterSpans = spec.Spans; _spec = spec; _run = run }
 
     member this.Spec = this._spec
 
@@ -101,7 +101,7 @@ type runHostForMergeTest =
 
     interface IRunHost with
         member this.ProjectDb = this._projectDb
-        member this.Project = this._project
+        member this.Run = this._run
         member this.ParameterSpans = this._parameterSpans
         member this.AllowOverwrite = this._spec.AllowOverwrite
         member this.MakeQueryParamsFromRunParams rp odt = this.MakeQueryParamsFromRunParams rp odt

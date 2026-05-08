@@ -28,12 +28,9 @@ module EvalBinsExecutor =
             return SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel sdt
         }
 
+
     let makeMergeTests (host:IRunHost) (rp:runParameters) : Sortable.sortableTest option =
         maybe {
-                //let qpTests = this.MakeQueryParams (Some (0 |> UMX.tag)) (Some sw) (Some md) (Some mst) None (outputDataType.SortableTest "")
-                //let dbMergeTests = new GeneSortDbMp(this._spec.MergeTestsProjectFolder |> UMX.tag) :> IGeneSortDb
-                //let! rawTestData = dbMergeTests.loadAsync qpTests 
-                //let! tests = rawTestData |> OutputData.asSortableTest
             let! sdt = rp.GetSortableDataFormat()
             let! sortingWidth = rp.GetSortingWidth()
             let qpTests = host.MakeQueryParamsFromRunParams rp (outputDataType.SortableTest "")

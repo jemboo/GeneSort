@@ -13,7 +13,7 @@ open GeneSort.Dispatch.V1
 type runHostSpec = {
     ProjectName: string<projectName>
     RunName: string<runName>
-    ProjectDesc: string
+    RunDescription: string
     DataFolder: string
     Spans: (string * string list) list
     // Logic Callbacks
@@ -21,7 +21,6 @@ type runHostSpec = {
     Filter: runParameters -> runParameters option
     Enhancer: IRunHost -> runParameters -> runParameters
     // Domain Settings
-    CollectNewSortableTests: bool
     AllowOverwrite: bool<allowOverwrite>
     ExecutorType: executorType
 }
@@ -63,7 +62,7 @@ type runHost =
 
     interface IRunHost with
         member this.ProjectDb = this._projectDb
-        member this.Project = this._run
+        member this.Run = this._run
         member this.ParameterSpans = this._parameterSpans
         member this.AllowOverwrite = this._spec.AllowOverwrite
         member this.MakeQueryParamsFromRunParams rp odt = this.MakeQueryParamsFromRunParams rp odt
