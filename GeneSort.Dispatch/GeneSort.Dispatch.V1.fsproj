@@ -28,8 +28,8 @@
     <Compile Include="SorterEvalBins\Common.fs" />
     <Compile Include="SorterEvalBins\Executor.fs" />
     <Compile Include="SorterEvalBins\RunHost.fs" />
-    <Compile Include="SorterEvalBins\SimpleRandom.fs" />
-    <Compile Include="SorterEvalBins\SimpleMerge.fs" />
+    <Compile Include="SorterEvalBins\StandardSpecs.fs" />
+    <Compile Include="SorterEvalBins\MergeSpecs.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

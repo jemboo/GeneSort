@@ -8,7 +8,7 @@ module ComputationBuilders =
 
 
     /// Helper to bridge CancellationTokens into the AsyncResult flow
-    let checkCancellation (token: CancellationToken) =
+    let checkCancellation (token: CancellationToken) : Async<Result<unit, string>> =
         async {
             if token.IsCancellationRequested then 
                 return Error "Operation cancelled"

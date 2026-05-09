@@ -8,15 +8,18 @@ open GeneSort.Project.V1
 open GeneSort.FileDb.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
+open yab
 
 
 module SimpleRandom =
 
+    //let smallSortingWidths = 
+    //        (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
     let smallSortingWidths = 
-            (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
-
+            (runParameters.sortingWidthKey, [12] |> List.map string)
     //let mediumSortingWidths = 
     //        (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
+
     let mediumSortingWidths = 
             (runParameters.sortingWidthKey, [24] |> List.map string)
 
@@ -25,48 +28,20 @@ module SimpleRandom =
     let mediumSorterCount = (runParameters.sorterCountKey, ["10000";] )
     let largeSorterCount = (runParameters.sorterCountKey, ["100000";] )
 
-    let standardSortableDataFormat = 
-            (runParameters.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
-
-    let rngTypeLcg = (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
-
     let allSimpleSorterModelTypes = 
             (runParameters.simpleSorterModelTypeKey, SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
 
 
 
-    let getStageLength (sw: int<sortingWidth>) : int<stageLength> =
-        match %sw with
-        | 4 -> 15
-        | 5 -> 25
-        | 6 -> 40 
-        | 7 -> 50 
-        | 8 -> 60
-        | 9 -> 70
-        | 10 -> 80
-        | 11 -> 90
-        | 12 -> 100
-        | 14 -> 120
-        | 16 -> 150
-        | 18 -> 180
-        | 20 -> 200
-        | 22 -> 250
-        | 24 -> 300
-        | _ -> failwithf "Unsupported sorting width: %d" %sw
-        |> UMX.tag
-
-
-    let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
+    let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let sw = rp.GetSortingWidth().Value
         let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Run.ProjectName)
-        let sl = getStageLength %sw
+        let sl = getStandardStageLength %sw
         
         rp.WithProjectName(Some host.Run.ProjectName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
-          .WithStageLength(Some sl)
-          .WithCollectSortableTests(Some true)
-          .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
+          .WithRngType(Some yab.projectRngType)
           .WithId (Some qp.Id)
 
     
@@ -94,13 +69,10 @@ module SimpleRandom =
             DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Small\\Data"
             Spans = [
                 smallSortingWidths
-                (runParameters.simpleSorterModelTypeKey, 
-                    SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
-                standardSortableDataFormat
+                allSimpleSorterModelTypes
                 testSorterCount
-                rngTypeLcg
             ]
-            GetStageLength = getStageLength 
+            GetStageLength = getStandardStageLength 
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
@@ -115,11 +87,9 @@ module SimpleRandom =
             Spans = [
                 smallSortingWidths
                 allSimpleSorterModelTypes
-                standardSortableDataFormat
                 largeSorterCount
-                rngTypeLcg
             ]
-            GetStageLength = getStageLength
+            GetStageLength = getStandardStageLength
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
@@ -134,11 +104,9 @@ module SimpleRandom =
             Spans = [
                 mediumSortingWidths
                 allSimpleSorterModelTypes
-                standardSortableDataFormat
                 testSorterCount
-                rngTypeLcg
             ]
-            GetStageLength = getStageLength
+            GetStageLength = getStandardStageLength
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
@@ -153,11 +121,9 @@ module SimpleRandom =
             Spans = [
                 mediumSortingWidths
                 allSimpleSorterModelTypes
-                standardSortableDataFormat
                 mediumSorterCount
-                rngTypeLcg
             ]
-            GetStageLength = getStageLength
+            GetStageLength = getStandardStageLength
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag

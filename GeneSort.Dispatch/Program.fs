@@ -29,26 +29,32 @@ let mode = GCSettings.LatencyMode
 
 let progress = createThreadSafeProgress()
 let cts = new CancellationTokenSource()
-let maxParallel = 2 // Environment.ProcessorCount
+let maxParallel = 1 // Environment.ProcessorCount
 
 let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
-let configKey = "Merge_small" 
-let executorType = SortableTest.executorType.Merge
 
+
+//let configKey = "Merge_small" 
+//let executorType = SortableTest.executorType.Merge
+//let host: IRunHost = 
+//    match SortableTest.Merge.Configs |> Map.tryFind configKey with
+//    | Some s -> SortableTest.Merge.CreateHost ( s executorType )
+//    | None -> failwithf "Config key '%s' not found." configKey
+
+
+
+let configKey = "Small_dev" 
+let executorType = executorType.Standard
 let host: IRunHost = 
-    match SortableTest.Merge.Configs |> Map.tryFind configKey with
-    | Some s -> SortableTest.Merge.CreateHost ( s executorType )
+    match SorterEvalBins.SimpleRandom.Configs |> Map.tryFind configKey with
+    | Some s -> SorterEvalBins.SimpleRandom.CreateHost (s executorType)
     | None -> failwithf "Config key '%s' not found." configKey
 
 
-//let configKey = "Merge_dev" 
-//let executorType = EvalBinsExecutor.executorType.Merge
-//let host: IRunHost = 
-//    match SorterEvalBins.SimpleRandom.Configs |> Map.tryFind configKey with
-//    | Some s -> SorterEvalBins.SimpleRandom.CreateHost (s executorType)
-//    | None -> failwithf "Config key '%s' not found." configKey
+
+
 
 let minReplica = 0<replNumber>
 let maxReplica = 1<replNumber>

@@ -7,6 +7,7 @@ open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
+open yab
 
 
 
@@ -125,24 +126,12 @@ type randomSorterBinsMergeHost =
 
 module RandomSorterBinsMerge =
 
-    let getStageLength (smt: simpleSorterModelType) (sw: int<sortingWidth>) : int<stageLength> =
-        match %sw with
-        | 16 -> 100
-        | 32 -> match smt with | Msuf4 -> 600 | _ -> 300
-        | 48 -> match smt with | Msuf4 -> 1200 | _ -> 400
-        | 64 -> match smt with | Msuf4 -> 2000 | _ -> 600
-        | 96 -> match smt with | Msuf4 -> 2800 | _ -> 800
-        | 128 -> match smt with | Msuf4 -> 4000 | _ -> 1200
-        | 196 -> match smt with | Msuf4 -> 4800 | _ -> 2000
-        | 256 -> match smt with | Msuf4 -> 6000 | _ -> 3000
-        | _ -> failwithf "Unsupported sorting width: %d" %sw
-        |> UMX.tag
 
     let private mergeEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let sw = rp.GetSortingWidth().Value
         let smt = rp.GetSimpleSorterModelType().Value
         let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
-        let sl = getStageLength smt sw
+        let sl = getMergeStageLength smt sw
         let cl = sl |> StageLength.toCeLength sw
 
         rp.WithProjectName(Some host.Run.ProjectName)
@@ -200,7 +189,7 @@ module RandomSorterBinsMerge =
                 (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix; mergeSuffixType.VV_1] |> List.map MergeSuffixType.toString)
                 (runParameters.sorterCountKey, ["1000"])
             ]
-            GetStageLength = getStageLength
+            GetStageLength = getMergeStageLength
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
             AllowOverwrite = false |> UMX.tag
