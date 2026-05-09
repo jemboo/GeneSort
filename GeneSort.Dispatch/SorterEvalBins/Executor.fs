@@ -96,36 +96,32 @@ module EvalBinsExecutor =
         (cts: CancellationTokenSource) 
         (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
     
-        // Local helper to clean up the reporting syntax
+        // Local reporting helper 
         let log msg = OpsUtils.report progress (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
                 // 1. Initial Check & Sorter Model Creation
                 let! (_: unit) = checkCancellation cts.Token
-                log "Step 1/4: Creating Sorter Model Set..."
+                log "Creating Sorter Model Set..."
             
                 let! modelSet = 
                     makeSorterModelSet host rp 
                     |> Result.ofOption "Failed: SorterModelSet could not be initialized."
             
                 let fullSorterSet = SorterModelSet.makeSorterSet (%modelSet.Id |> UMX.tag) modelSet
-                log (sprintf "Success: Created SorterSet with ID %A" modelSet.Id)
+                log (sprintf "Success: Created SorterSet %A" modelSet.Id)
 
                 // 2. Test Generation
                 let! (_: unit) = checkCancellation cts.Token
-                log "Step 2/4: Generating Sortable Tests..."
+                log "Generating Sortable Tests..."
             
                 let! tests = 
                     makeTests host rp 
                     |> Result.ofOption "Failed: SortableTests could not be generated."
             
-                log (sprintf "Success: Tests generated (Count: %d)" (SortableTests.getSortableCount tests))
-
                 // 3. Evaluation & Binning
-                // Note: If SorterSetEval.makeSorterSetEval is computationally heavy, 
-                // report BEFORE it starts so the user knows why the app seems 'frozen'.
-                log "Step 3/4: Running Sorter Evaluations (High CPU Task)..."
+                log "Running Sorter Evaluations ..."
             
                 let qpEval = host.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                 let collectTests = rp.GetCollectSortableTests() |> Option.defaultValue false
@@ -138,10 +134,9 @@ module EvalBinsExecutor =
                                 sorterSetEval.SorterEvals 
             
                 let sorterEvalBins = sorterEvalBins.V1 binsV1
-                log (sprintf "Success: Evaluated %d sorters into %d bins." sorterSetEval.SorterEvals.Length binsV1.Bins.Count)
 
                 // 4. Persistence
-                log "Step 4/4: Saving Bins to Project Database..."
+                log (sprintf "Saving SorterEvalBins %s" (string %qpBins.Id))
                 let! (_:unit) = host.ProjectDb.saveAsync qpBins (sorterEvalBins |> outputData.SorterEvalBins) allowOverwrite
             
                 log "Run Complete."

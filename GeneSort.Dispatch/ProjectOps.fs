@@ -13,7 +13,12 @@ module ProjectOps =
     /// Internal logic for a single unit of work
     let private runTask (db: IGeneSortDb)
                         (runName: string<runName>)
-                        buildQueryParams executor allowOverwrite cts progress (rp: runParameters) = 
+                        buildQueryParams 
+                        executor 
+                        allowOverwrite 
+                        cts 
+                        progress 
+                        (rp: runParameters) = 
         async {
             let id = rp.GetId() |> Option.defaultValue (Guid.Empty |> UMX.tag)
             let repl = rp.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
@@ -22,7 +27,12 @@ module ProjectOps =
                 if rp.GetRunFinished() |> Option.defaultValue false then
                     return Skipped (id, repl, sprintf "\n%s" (rp |> RunParameters.reportKvps))
                 else
-                    report progress (sprintf "%s Run %s Repl %d started" (MathUtils.getTimestampString()) (%id.ToString()) %repl)
+                    report progress 
+                        (
+                            sprintf "%s Started:\n%s" 
+                                        (MathUtils.getTimestampString()) 
+                                        (rp |> RunParameters.reportKvps)
+                        )
                 
                     // 1. Unwrapping the Result manually inside the async block
                     let! execResult = executor rp allowOverwrite cts progress
@@ -34,7 +44,7 @@ module ProjectOps =
                         let qp = buildQueryParams updated (outputDataType.RunParameters %runName)
                     
                         // 2. Standard async bind (no Result wrapper here)
-                        let! _ = db.saveAsync qp (updated |> outputData.RunParameters) (true |> UMX.tag)
+                        let! _ = db.saveAsync qp (updated |> outputData.RunParameters) (true |> UMX.tag<allowOverwrite>)
                     
                         return Success (id, repl, (updated |> RunParameters.reportKvps))
             with 

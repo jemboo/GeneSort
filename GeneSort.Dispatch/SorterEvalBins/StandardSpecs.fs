@@ -2,7 +2,6 @@
 
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorting
 open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.FileDb.V1
