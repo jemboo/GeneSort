@@ -72,7 +72,6 @@ module Merge =
             ]
             Filter = standardParamMapFilter
             Enhancer = standardEnhancer
-            RngFactory = rngFactory.LcgFactory
             AllowOverwrite = false |> UMX.tag
             ExecutorType = executorType
         }
@@ -91,7 +90,6 @@ module Merge =
             ]
             Filter = standardParamMapFilter
             Enhancer = standardEnhancer
-            RngFactory = rngFactory.LcgFactory
             AllowOverwrite = false |> UMX.tag
             ExecutorType = executorType
         }

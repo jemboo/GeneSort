@@ -1,5 +1,8 @@
 ﻿namespace GeneSort.Dispatch.V1.SortableTest
 
+open FSharp.UMX
+open GeneSort.Core
+
 
 type executorType = 
     | Merge
@@ -10,3 +13,7 @@ module ExecutorType =
         | Merge -> "Merge"
         | Unknown -> "Unknown"
 
+
+module yab =
+
+    let projectRngType = rngType.Lcg

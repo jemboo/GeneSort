@@ -19,7 +19,6 @@ type runHostSpec = {
     Filter: runParameters -> runParameters option
     Enhancer: IRunHost -> runParameters -> runParameters
     // Domain Settings
-    RngFactory: rngFactory
     AllowOverwrite: bool<allowOverwrite>
     ExecutorType: executorType
 }
