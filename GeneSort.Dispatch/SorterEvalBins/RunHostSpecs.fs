@@ -2,6 +2,7 @@
 
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Sorting
 open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.FileDb.V1
@@ -10,7 +11,26 @@ open GeneSort.Dispatch.V1
 open Yab
 
 
-module SimpleRandom =
+
+
+type runHostSpec = {
+    ProjectName: string<projectName>
+    RunName: string<runName>
+    RunDescription: string
+    DataFolder: string
+    Spans: (string * string list) list
+    // Logic Callbacks
+    GetStageLength: simpleSorterModelType -> int<sortingWidth> -> int<stageLength>
+    Filter: runParameters -> runParameters option
+    Enhancer: IRunHost -> runParameters -> runParameters
+    // Domain Settings
+    AllowOverwrite: bool<allowOverwrite>
+    ExecutorType: executorType
+}
+
+
+
+module SimpleRandomSpecs =
 
     //let smallSortingWidths = 
     //        (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
@@ -35,7 +55,6 @@ module SimpleRandom =
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let sw = rp.GetSortingWidth().Value
         let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Run.ProjectName)
-        let sl = getStandardStageLength %sw
         
         rp.WithProjectName(Some host.Run.ProjectName)
           .WithRunName(Some host.Run.RunName)
@@ -136,10 +155,3 @@ module SimpleRandom =
                         ("Medium_dev", Specs.Medium_dev); 
                         ("Medium", Specs.Medium) 
                     ]
-
-    let CreateHost (spec: runHostSpec) =
-        let folder = spec.DataFolder |> UMX.tag
-        let db = new GeneSortDbMp(folder) :> IGeneSortDb
-        let proj = run.create spec.ProjectName spec.RunName spec.RunDescription 
-                                [| outputDataType.RunParameters %spec.ProjectName; outputDataType.SorterEvalBins ""; |]
-        runHost.Create db spec proj :> IRunHost

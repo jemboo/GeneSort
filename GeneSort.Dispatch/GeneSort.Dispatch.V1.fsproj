@@ -28,9 +28,9 @@
     <Compile Include="SorterEvalBins\Common.fs" />
     <Compile Include="SorterEvalBins\ProjectDb.fs" />
     <Compile Include="SorterEvalBins\Executor.fs" />
-    <Compile Include="SorterEvalBins\RunHost.fs" />
-    <Compile Include="SorterEvalBins\StandardSpecs.fs" />
+    <Compile Include="SorterEvalBins\RunHostSpecs.fs" />
     <Compile Include="SorterEvalBins\MergeSpecs.fs" />
+    <Compile Include="SorterEvalBins\RunHost.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

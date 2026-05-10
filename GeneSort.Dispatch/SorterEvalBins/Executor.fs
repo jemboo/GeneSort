@@ -43,7 +43,7 @@ module EvalBinsExecutor =
         maybe {
             let! sortingWidth = rp.GetSortingWidth()
             let! simpleSorterModelType = rp.GetSimpleSorterModelType()
-            let stageLength = Yab.getStandardStageLength sortingWidth
+            let stageLength = Yab.getStandardStageLength simpleSorterModelType sortingWidth
 
             let! repl = rp.GetRepl()
             let! sorterCount = rp.GetSorterCount()
@@ -57,7 +57,7 @@ module EvalBinsExecutor =
                                         ExcludeSelfCe
                                  |> sorterModelGen.Simple
 
-            let qpModelSet = host.MakeQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
+            let! qpModelSet = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
             return SorterModelGen.makeSorterModelSet 
                             (%qpModelSet.Id |> UMX.tag) firstIdx sorterCount sorterModelGen
         }
@@ -80,14 +80,14 @@ module EvalBinsExecutor =
                                         ExcludeSelfCe
                                  |> sorterModelGen.Simple
 
-            let qpModelSet = host.MakeQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
+            let! qpModelSet = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
             return SorterModelGen.makeSorterModelSet 
                             (%qpModelSet.Id |> UMX.tag) firstIdx sorterCount sorterModelGen
         }
 
 
 
-    let _makeFullSorterEvalBins 
+    let _makeSorterEvalBins 
         (makeSorterModelSet: IRunHost -> runParameters -> sorterModelSet option)
         (makeTests: IRunHost -> runParameters -> Sortable.sortableTest option)
         (host: IRunHost)
@@ -123,11 +123,14 @@ module EvalBinsExecutor =
                 // 3. Evaluation & Binning
                 log "Running Sorter Evaluations ..."
             
-                let qpEval = host.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                let! qpEval = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                             |> Result.ofOption "Failed: SorterSetEval query parameters could not be generated."
                 let collectTests = rp.GetCollectSortableTests() |> Option.defaultValue false
                 let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSet tests collectTests
 
-                let qpBins = host.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
+                let! qpBins = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
+                             |> Result.ofOption "Failed: SorterEvalBins query parameters could not be generated."
+
                 let binsV1 = sorterEvalBinsV1.createFromEvals 
                                 (%qpBins.Id |> UMX.tag) 
                                 (tests |> SortableTests.getId) 
@@ -148,84 +151,6 @@ module EvalBinsExecutor =
                 return! Error errorMsg |> async.Return
         }
 
-    //let _makeFullSorterEvalBins 
-    //    (makeSorterModelSet: IRunHost -> runParameters -> sorterModelSet option)
-    //    (makeTests: IRunHost ->runParameters -> Sortable.sortableTest option)
-    //    (host: IRunHost)
-    //    (rp: runParameters) 
-    //    (allowOverwrite: bool<allowOverwrite>) 
-    //    (cts: CancellationTokenSource) 
-    //    (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
-        
-    //    asyncResult {
-    //        try
-    //            let! (_: unit) = checkCancellation cts.Token
-    //            let runId = rp |> RunParameters.getIdString
-    //            OpsUtils.report progress (sprintf "%s Starting Sorter Run %s" (MathUtils.getTimestampString()) %runId)
-
-    //            let! modelSet = makeSorterModelSet host rp |> Result.ofOption "Failed to create SorterModelSet"
-    //            let fullSorterSet = SorterModelSet.makeSorterSet (%modelSet.Id |> UMX.tag) modelSet
-
-    //            let! (_: unit) = checkCancellation cts.Token
-    //            progress.Value.Report "making tests..."
-    //            let! tests = makeTests host rp |> Result.ofOption "Failed to create SortableTests"
-
-    //            let qpEval = host.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
-    //            let collectTests = rp.GetCollectSortableTests() |> Option.defaultValue false
-    //            let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSet tests collectTests
-
-    //            let qpBins = host.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
-    //            let sorterEvalBins = sorterEvalBinsV1.createFromEvals 
-    //                                        (%qpBins.Id |> UMX.tag) 
-    //                                        (tests |> SortableTests.getId) 
-    //                                        sorterSetEval.SorterEvals 
-    //                                 |> sorterEvalBins.V1
-
-    //            let! (_: unit) = host.ProjectDb.saveAsync qpBins (sorterEvalBins |> outputData.SorterEvalBins) allowOverwrite
-    //            return rp.WithRunFinished (Some true)
-    //        with e -> 
-    //            return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message) |> async.Return
-    //    }
-
-
-
-    let _makeMergeSorterEvalBins 
-        (makeSorterModelSet: IRunHost -> runParameters -> sorterModelSet option)
-        (makeTests: IRunHost ->runParameters -> Sortable.sortableTest option)
-        (host: IRunHost)
-        (rp: runParameters) 
-        (allowOverwrite: bool<allowOverwrite>) 
-        (cts: CancellationTokenSource) 
-        (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
-        
-        asyncResult {
-            try
-                let! (_: unit) = checkCancellation cts.Token
-                let runId = rp |> RunParameters.getIdString
-                OpsUtils.report progress (sprintf "%s Starting Sorter Run %s" (MathUtils.getTimestampString()) %runId)
-
-                let! modelSet = makeSorterModelSet host rp |> Result.ofOption "Failed to create SorterModelSet"
-                let fullSorterSet = SorterModelSet.makeSorterSet (%modelSet.Id |> UMX.tag) modelSet
-
-                let! (_: unit) = checkCancellation cts.Token
-                let! tests = makeTests host rp |> Result.ofOption "Failed to create SortableTests"
-
-                let qpEval = host.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
-                let collectTests = rp.GetCollectSortableTests() |> Option.defaultValue false
-                let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSet tests collectTests
-
-                let qpBins = host.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
-                let sorterEvalBins = sorterEvalBinsV1.createFromEvals 
-                                            (%qpBins.Id |> UMX.tag) 
-                                            (tests |> SortableTests.getId) 
-                                            sorterSetEval.SorterEvals 
-                                     |> sorterEvalBins.V1
-
-                let! (_: unit) = host.ProjectDb.saveAsync qpBins (sorterEvalBins |> outputData.SorterEvalBins) allowOverwrite
-                return rp.WithRunFinished (Some true)
-            with e -> 
-                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message) |> async.Return
-        }
 
     let makeFullReport 
             (host: IRunHost)
@@ -298,7 +223,7 @@ module EvalBinsExecutor =
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _makeFullSorterEvalBins 
+                _makeSorterEvalBins 
                     makeStandardSorterModelSet
                     makeStandardTests
                     host rp allowOverwrite cts progress }
@@ -307,7 +232,7 @@ module EvalBinsExecutor =
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _makeMergeSorterEvalBins 
+                _makeSorterEvalBins 
                     makeStandardSorterModelSet
                     makeMergeTests
                     host rp allowOverwrite cts progress }

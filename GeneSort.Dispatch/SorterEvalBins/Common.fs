@@ -36,7 +36,7 @@ module Yab =
 
     let mergeSortableDataFormat = sortableDataFormat.Int8Vector512
 
-    let getStandardStageLength (sw: int<sortingWidth>) : int<stageLength> =
+    let getStandardStageLength (smt: simpleSorterModelType) (sw: int<sortingWidth>) : int<stageLength> =
         match %sw with
         | 4 -> 15
         | 5 -> 25

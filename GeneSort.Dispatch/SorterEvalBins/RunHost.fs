@@ -7,23 +7,7 @@ open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
-
-
-
-type runHostSpec = {
-    ProjectName: string<projectName>
-    RunName: string<runName>
-    RunDescription: string
-    DataFolder: string
-    Spans: (string * string list) list
-    // Logic Callbacks
-    GetStageLength: int<sortingWidth> -> int<stageLength>
-    Filter: runParameters -> runParameters option
-    Enhancer: IRunHost -> runParameters -> runParameters
-    // Domain Settings
-    AllowOverwrite: bool<allowOverwrite>
-    ExecutorType: executorType
-}
+open GeneSort.FileDb.V1
 
 
 // --- 4. Host Implementation ---
@@ -71,4 +55,12 @@ type runHost =
             let executor = EvalBinsExecutor.getExecutor this._spec.ExecutorType
             RunParamsExecutor.execute executor this runParameters allowOverwrite cts progress
 
+
+module RunHost =
+    let createRunHost (spec: runHostSpec) : IRunHost =
+        let folder = spec.DataFolder |> UMX.tag
+        let db = new GeneSortDbMp(folder) :> IGeneSortDb
+        let proj = run.create spec.ProjectName spec.RunName spec.RunDescription 
+                                [| outputDataType.RunParameters %spec.ProjectName; outputDataType.SorterEvalBins ""; |]
+        runHost.Create db spec proj :> IRunHost
 
