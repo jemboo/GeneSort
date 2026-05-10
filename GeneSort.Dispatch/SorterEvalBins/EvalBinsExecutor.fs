@@ -20,26 +20,28 @@ open Yab
 module EvalBinsExecutor =
 
 
-    let makeStandardTests (host:IRunHost) (rp:runParameters) : Sortable.sortableTest option =
+    let makeStandardTests (rp:runParameters) : Sortable.sortableTest option =
         maybe {
             let! sortingWidth = rp.GetSortingWidth()
-            let qpTests = host.MakeQueryParamsFromRunParams rp (outputDataType.SortableTest "")
+            let! qpTests = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SortableTest "")
             let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
             return SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel standardSortableDataFormat
         }
 
 
-    let makeMergeTests (host:IRunHost) (rp:runParameters) : Sortable.sortableTest option =
+    let makeMergeTests (rp:runParameters) : Sortable.sortableTest option =
         maybe {
-            let! sdt = rp.GetSortableDataFormat()
             let! sortingWidth = rp.GetSortingWidth()
-            let qpTests = host.MakeQueryParamsFromRunParams rp (outputDataType.SortableTest "")
+            let! sdt = rp.GetSortableDataFormat()
+            let! md = rp.GetMergeDimension()
+            let! mst = rp.GetMergeSuffixType()
+            let! qpTests = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SortableTest "")
             let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
             return SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel mergeSortableDataFormat
         }
 
 
-    let makeStandardSorterModelSet (host:IRunHost) (rp:runParameters) : sorterModelSet option =
+    let makeStandardSorterModelSet (rp:runParameters) : sorterModelSet option =
         maybe {
             let! sortingWidth = rp.GetSortingWidth()
             let! simpleSorterModelType = rp.GetSimpleSorterModelType()
@@ -63,7 +65,7 @@ module EvalBinsExecutor =
         }
 
 
-    let makeMergeSorterModelSet (host:IRunHost) (rp:runParameters) : sorterModelSet option =
+    let makeMergeSorterModelSet (rp:runParameters) : sorterModelSet option =
         maybe {
             let! sortingWidth = rp.GetSortingWidth()
             let! simpleSorterModelType = rp.GetSimpleSorterModelType()
@@ -73,7 +75,7 @@ module EvalBinsExecutor =
             let  rngFactory = projectRngType |> RngFactory.create
             let firstIdx = (%repl * %sorterCount) |> UMX.tag<sorterCount>
             let sorterModelGen = SimpleSorterModelGen.makeUniform 
-                                        rngFactory 
+                                        rngFactory
                                         sortingWidth 
                                         stageLength 
                                         simpleSorterModelType
@@ -88,13 +90,13 @@ module EvalBinsExecutor =
 
 
     let _makeSorterEvalBins 
-        (makeSorterModelSet: IRunHost -> runParameters -> sorterModelSet option)
-        (makeTests: IRunHost -> runParameters -> Sortable.sortableTest option)
-        (host: IRunHost)
-        (rp: runParameters) 
-        (allowOverwrite: bool<allowOverwrite>) 
-        (cts: CancellationTokenSource) 
-        (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+            (makeSorterModelSet: runParameters -> sorterModelSet option)
+            (makeTests: runParameters -> Sortable.sortableTest option)
+            (host: IRunHost)
+            (rp: runParameters) 
+            (allowOverwrite: bool<allowOverwrite>) 
+            (cts: CancellationTokenSource) 
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
     
         // Local reporting helper 
         let log msg = OpsUtils.report progress (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
@@ -106,7 +108,7 @@ module EvalBinsExecutor =
                 log "Creating Sorter Model Set..."
             
                 let! modelSet = 
-                    makeSorterModelSet host rp 
+                    makeSorterModelSet rp 
                     |> Result.ofOption "Failed: SorterModelSet could not be initialized."
             
                 let fullSorterSet = SorterModelSet.makeSorterSet (%modelSet.Id |> UMX.tag) modelSet
@@ -117,7 +119,7 @@ module EvalBinsExecutor =
                 log "Generating Sortable Tests..."
             
                 let! tests = 
-                    makeTests host rp 
+                    makeTests rp 
                     |> Result.ofOption "Failed: SortableTests could not be generated."
             
                 // 3. Evaluation & Binning
@@ -233,7 +235,7 @@ module EvalBinsExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvalBins 
-                    makeStandardSorterModelSet
+                    makeMergeSorterModelSet
                     makeMergeTests
                     host rp allowOverwrite cts progress }
 
@@ -252,7 +254,6 @@ module EvalBinsExecutor =
                     host rp allowOverwrite cts progress }
 
 
-    // --- The Dispatcher ---
 
     let getExecutor (executorType: executorType) : IRunParamsExecutor =
         match executorType with

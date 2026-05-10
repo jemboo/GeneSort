@@ -9,21 +9,6 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open Yab
 
-
-
-        //maybe {
-        //    let! smk = rp.GetSimpleSorterModelType()
-        //    let! sw = rp.GetSortingWidth()
-        //    let! sl = rp.GetStageLength()
-        //    let! cl = rp.GetCeLength()
-        //    let! sc = rp.GetSorterCount()
-        //    let! sdt = rp.GetSortableDataFormat()
-        //    let! md = rp.GetMergeDimension()
-        //    let! mst = rp.GetMergeSuffixType()
-        //    return (smk, sw, sl, cl, sc, sdt, md, mst)
-        //}
-
-
 module MergeSpecs =
 
 
@@ -75,25 +60,12 @@ module MergeSpecs =
             return rp
         }
 
-    let getStageLength (smt: simpleSorterModelType) (sw: int<sortingWidth>) : int<stageLength> =
-        match %sw with
-        | 16 -> 100
-        | 32 -> match smt with | Msuf4 -> 600 | _ -> 300
-        | 48 -> match smt with | Msuf4 -> 1200 | _ -> 400
-        | 64 -> match smt with | Msuf4 -> 2000 | _ -> 600
-        | 96 -> match smt with | Msuf4 -> 2800 | _ -> 800
-        | 128 -> match smt with | Msuf4 -> 4000 | _ -> 1200
-        | 196 -> match smt with | Msuf4 -> 4800 | _ -> 2000
-        | 256 -> match smt with | Msuf4 -> 6000 | _ -> 3000
-        | _ -> failwithf "Unsupported sorting width: %d" %sw
-        |> UMX.tag
-
 
     module Specs =
 
         let P1 (executorType: executorType) : runHostSpec = {
             ProjectName = "RandomMergeSorterBins" |> UMX.tag
-            RunName = "Merge_P1" |> UMX.tag
+            RunName = sprintf @"Merge_P1_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             DataFolder = "c:\\Projects\\RandomMergeSorterBins\\Data"
             Spans = [
@@ -103,11 +75,9 @@ module MergeSpecs =
                 (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix; mergeSuffixType.VV_1] |> List.map MergeSuffixType.toString)
                 (runParameters.sorterCountKey, ["1000"])
             ]
-            GetStageLength = getStageLength
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
             AllowOverwrite = false |> UMX.tag
-            ExecutorType = executorType
         }
 
     let Configs = Map.ofList [ ("P1", Specs.P1) ]

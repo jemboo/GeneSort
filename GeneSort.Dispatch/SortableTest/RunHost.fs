@@ -7,21 +7,7 @@ open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Sorting.Sortable
-
-
-type runHostSpec = {
-    ProjectName: string<projectName>
-    RunName: string<runName>
-    RunDescription: string
-    DataFolder: string
-    Spans: (string * string list) list
-    // Logic Callbacks
-    Filter: runParameters -> runParameters option
-    Enhancer: IRunHost -> runParameters -> runParameters
-    // Domain Settings
-    AllowOverwrite: bool<allowOverwrite>
-    ExecutorType: executorType
-}
+open GeneSort.FileDb.V1
 
 
 type runHostForMergeTest = 
@@ -105,7 +91,14 @@ type runHostForMergeTest =
         member this.AllowOverwrite = this._spec.AllowOverwrite
         member this.MakeQueryParamsFromRunParams rp odt = this.MakeQueryParamsFromRunParams rp odt
         member this.ParamMapRefiner rps = this.ParamMapRefiner rps
-        member this.Execute runParameters allowOverwrite cts progress = 
-            let executor = Executor.getExecutor this._spec.ExecutorType
-            RunParamsExecutor.execute executor this runParameters allowOverwrite cts progress
 
+
+
+module RunHostForMergeTest =
+
+    let createRunHost (spec: runHostSpec) : IRunHost =
+        let folder = spec.DataFolder |> UMX.tag
+        let db = new GeneSortDbMp(folder) :> IGeneSortDb
+        let proj = run.create spec.ProjectName spec.RunName spec.RunDescription 
+                                [| outputDataType.RunParameters %spec.ProjectName; outputDataType.SorterEvalBins ""; |]
+        runHost.Create db spec proj :> IRunHost

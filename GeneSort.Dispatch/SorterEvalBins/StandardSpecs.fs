@@ -11,26 +11,7 @@ open GeneSort.Dispatch.V1
 open Yab
 
 
-
-
-type runHostSpec = {
-    ProjectName: string<projectName>
-    RunName: string<runName>
-    RunDescription: string
-    DataFolder: string
-    Spans: (string * string list) list
-    // Logic Callbacks
-    GetStageLength: simpleSorterModelType -> int<sortingWidth> -> int<stageLength>
-    Filter: runParameters -> runParameters option
-    Enhancer: IRunHost -> runParameters -> runParameters
-    // Domain Settings
-    AllowOverwrite: bool<allowOverwrite>
-    ExecutorType: executorType
-}
-
-
-
-module SimpleRandomSpecs =
+module StandardSpecs =
 
     //let smallSortingWidths = 
     //        (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
@@ -80,7 +61,7 @@ module SimpleRandomSpecs =
 
     module Specs =
 
-        let Small_dev (executorType: executorType) : runHostSpec = {
+        let Small_dev (executorType: executorType)  : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
             RunName = sprintf @"Small_Dev_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
@@ -90,11 +71,9 @@ module SimpleRandomSpecs =
                 allSimpleSorterModelTypes
                 testSorterCount
             ]
-            GetStageLength = getStandardStageLength 
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            ExecutorType = executorType
         }
 
         let Small (executorType: executorType) : runHostSpec = {
@@ -107,11 +86,9 @@ module SimpleRandomSpecs =
                 allSimpleSorterModelTypes
                 largeSorterCount
             ]
-            GetStageLength = getStandardStageLength
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            ExecutorType = executorType
         }
 
         let Medium_dev (executorType: executorType) : runHostSpec = {
@@ -124,11 +101,9 @@ module SimpleRandomSpecs =
                 allSimpleSorterModelTypes
                 testSorterCount
             ]
-            GetStageLength = getStandardStageLength
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            ExecutorType = executorType
         }
 
         let Medium (executorType: executorType) : runHostSpec = {
@@ -141,11 +116,9 @@ module SimpleRandomSpecs =
                 allSimpleSorterModelTypes
                 mediumSorterCount
             ]
-            GetStageLength = getStandardStageLength
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            ExecutorType = executorType
         }
 
     let Configs = Map.ofList 

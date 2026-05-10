@@ -62,7 +62,8 @@ module ProjectOps =
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource)
             (progress: IProgress<string> option)
-            (executor: runParameters -> bool<allowOverwrite> -> CancellationTokenSource -> IProgress<string> option -> Async<Result<runParameters, string>>)
+            (host: IRunHost)
+            (executor: IRunParamsExecutor)
             (maxParallel: int) =
         asyncResult {
             try
@@ -79,7 +80,7 @@ module ProjectOps =
                     // Map parameters to tasks and execute with internal throttling
                     let! results = 
                         paramsArray 
-                        |> Seq.map (runTask db runName buildQueryParams executor allowOverwrite cts progress)
+                        |> Seq.map (runTask db runName buildQueryParams (RunParamsExecutor.execute executor host) allowOverwrite cts progress)
                         |> fun tasks -> Async.Parallel(tasks, maxParallel)
 
                     // Unified reporting logic

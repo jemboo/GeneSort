@@ -15,10 +15,6 @@ type IRunHost =
     abstract member AllowOverwrite: bool<allowOverwrite>
     abstract member MakeQueryParamsFromRunParams: runParameters -> outputDataType -> queryParams
     abstract member ParamMapRefiner: runParameters seq -> runParameters seq
-    abstract member Execute: 
-                    runParameters -> bool<allowOverwrite> -> 
-                    CancellationTokenSource -> IProgress<string> option 
-                    -> Async<Result<runParameters, string>>
 
 
 

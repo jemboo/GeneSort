@@ -18,6 +18,10 @@ module Merge =
     let allSortingWidths = 
             (runParameters.sortingWidthKey,  [16; 18; 24; 32; 36; 48; 64; 96; 128; 192; 256]  |> List.map string)
 
+    let smallMergeDimensions = 
+            (runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
+
+
     let allMergeDimensions = 
             (runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
 
@@ -59,27 +63,26 @@ module Merge =
 
     module Specs =
 
-        let Merge_dev (executorType: executorType) : runHostSpec = {
+        let Merge_dev  (executorType: executorType) : runHostSpec = {
             ProjectName = "SortableTest" |> UMX.tag
-            RunName = "Merge_Dev" |> UMX.tag
+            RunName = sprintf @"Merge_Dev%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             DataFolder = "c:\\Projects\\SortableTest\\Merge\\Data"
             Spans = [
                 smallSortingWidths
                 allDataFormats
-                allMergeDimensions
+                smallMergeDimensions
                 allMergeFillTypes
             ]
             Filter = standardParamMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            ExecutorType = executorType
         }
 
 
         let Merge_small (executorType: executorType) : runHostSpec = {
             ProjectName = "SortableTest" |> UMX.tag
-            RunName = "Merge_Prod" |> UMX.tag
+            RunName = sprintf @"Merge_Prod%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             DataFolder = "c:\\Projects\\SortableTest\\Merge\\Data"
             Spans = [
@@ -91,15 +94,6 @@ module Merge =
             Filter = standardParamMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            ExecutorType = executorType
         }
 
     let Configs = Map.ofList [ ("Merge_dev", Specs.Merge_dev); ("Merge_small", Specs.Merge_small) ]
-
-    let CreateHost (spec: runHostSpec) : IRunHost =
-        let folder = spec.DataFolder |> UMX.tag
-        let db = new GeneSortDbMp(folder) :> IGeneSortDb
-        let proj = run.create spec.ProjectName spec.RunName spec.RunDescription 
-                                [| outputDataType.RunParameters %spec.ProjectName; 
-                                   outputDataType.SortableTestSet ""; |]
-        runHostForMergeTest.Create db spec proj :> IRunHost

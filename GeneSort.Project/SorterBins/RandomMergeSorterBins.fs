@@ -206,7 +206,7 @@ module RandomMergeSorterBins =
                 // 4. Load external tests (Merge Tests)
                 let! (_: unit) = checkCancellation cts.Token
                 let qpTests = SortableMergeTests.makeQueryParams 
-                                        (Some (0 |> UMX.tag)) 
+                                        (Some (0 |> UMX.tag<replNumber>)) 
                                         (Some sortingWidth) 
                                         (Some mergeDimension) 
                                         (Some mergeSuffixType) 

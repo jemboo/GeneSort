@@ -10,7 +10,7 @@ open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
 
 
-module Executor =
+module SortableTestExecutor =
 
     let _makeSortableMergeTest
         (host: IRunHost)

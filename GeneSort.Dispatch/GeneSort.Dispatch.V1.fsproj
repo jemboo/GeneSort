@@ -19,18 +19,19 @@
     <Compile Include="ProgressMessage.fs" />
     <Compile Include="OpsUtils.fs" />
     <Compile Include="ParamOps.fs" />
-    <Compile Include="ProjectOps.fs" />
     <Compile Include="Interfaces.fs" />
+    <Compile Include="ProjectOps.fs" />
+    <Compile Include="RunHostSpec.fs" />
+    <Compile Include="RunHost.fs" />
     <Compile Include="SortableTest\Common.fs" />
-    <Compile Include="SortableTest\Executor.fs" />
+    <Compile Include="SortableTest\SortableTestExecutor.fs" />
+    <Compile Include="SortableTest\MergeSpecs.fs" />
     <Compile Include="SortableTest\RunHost.fs" />
-    <Compile Include="SortableTest\Merge.fs" />
     <Compile Include="SorterEvalBins\Common.fs" />
     <Compile Include="SorterEvalBins\ProjectDb.fs" />
-    <Compile Include="SorterEvalBins\Executor.fs" />
-    <Compile Include="SorterEvalBins\RunHostSpecs.fs" />
+    <Compile Include="SorterEvalBins\EvalBinsExecutor.fs" />
+    <Compile Include="SorterEvalBins\StandardSpecs.fs" />
     <Compile Include="SorterEvalBins\MergeSpecs.fs" />
-    <Compile Include="SorterEvalBins\RunHost.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

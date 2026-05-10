@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterEvalBins
+﻿namespace GeneSort.Dispatch.V1
 
 open FSharp.UMX
 open GeneSort.Core
@@ -51,9 +51,6 @@ type runHost =
         member this.AllowOverwrite = this._spec.AllowOverwrite
         member this.MakeQueryParamsFromRunParams rp odt = this.MakeQueryParamsFromRunParams rp odt
         member this.ParamMapRefiner rps = this.ParamMapRefiner rps
-        member this.Execute runParameters allowOverwrite cts progress = 
-            let executor = EvalBinsExecutor.getExecutor this._spec.ExecutorType
-            RunParamsExecutor.execute executor this runParameters allowOverwrite cts progress
 
 
 module RunHost =

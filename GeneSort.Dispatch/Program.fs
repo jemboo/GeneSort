@@ -7,8 +7,8 @@ open GeneSort.Dispatch.V1
 open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.FileDb.V1
-open GeneSort.Dispatch.V1.SorterEvalBins
 open System.Runtime
+open GeneSort.Dispatch.V1.SorterEvalBins
 
 let createThreadSafeProgress() =
     let agent = MailboxProcessor.Start(fun inbox ->
@@ -36,22 +36,23 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 
-//let configKey = "Merge_small" 
-//let executorType = SortableTest.executorType.Merge
-//let host: IRunHost = 
-//    match SortableTest.Merge.Configs |> Map.tryFind configKey with
-//    | Some s -> RunHost.createRunHost ( s executorType )
-//    | None -> failwithf "Config key '%s' not found." configKey
-
-
-let configKey = "Small_dev" 
-let executorType = executorType.Standard
+let configKey = "Merge_dev" 
+let executorType = SortableTest.executorType.Merge
 let host: IRunHost = 
-    match SorterEvalBins.SimpleRandomSpecs.Configs |> Map.tryFind configKey with
-    | Some s -> RunHost.createRunHost (s executorType)
+    match SortableTest.Merge.Configs |> Map.tryFind configKey with
+    | Some s -> SortableTest.RunHostForMergeTest.createRunHost (s executorType)
     | None -> failwithf "Config key '%s' not found." configKey
 
+let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 
+//let configKey = "Small_dev" 
+//let executorType = executorType.Standard
+//let host: IRunHost = 
+//    match SorterEvalBins.StandardSpecs.Configs |> Map.tryFind configKey with
+//    | Some s -> RunHost.createRunHost (s executorType)
+//    | None -> failwithf "Config key '%s' not found." configKey
+
+//let executor = EvalBinsExecutor.getExecutor executorType
 
 
 
@@ -63,43 +64,46 @@ let maxReplica = 1<replNumber>
 
 
 
-async {
-    printfn "Init Project: %s" %host.Run.ProjectName
+//async {
+//    printfn "Init Project: %s" %host.Run.ProjectName
     
-    let! initResult = 
-        ParamOps.initProjectAndRunFiles
-            host.ProjectDb           
-            host.MakeQueryParamsFromRunParams 
-            cts 
-            (Some progress) 
-            host.Run              
-            minReplica 
-            maxReplica 
-            host.AllowOverwrite 
-            host.ParamMapRefiner      
-            host.ParameterSpans
+//    let! initResult = 
+//        ParamOps.initProjectAndRunFiles
+//            host.ProjectDb           
+//            host.MakeQueryParamsFromRunParams 
+//            cts 
+//            (Some progress) 
+//            host.Run              
+//            minReplica 
+//            maxReplica 
+//            host.AllowOverwrite 
+//            host.ParamMapRefiner      
+//            host.ParameterSpans
 
-    match initResult with
-    | Error e -> printfn "Init Failure: %s" e
-    | Ok () ->
-        let! execResult = 
-            ProjectOps.executeRuns 
-                host.ProjectDb      
-                minReplica 
-                maxReplica 
-                host.MakeQueryParamsFromRunParams 
-                host.Run.RunName 
-                host.AllowOverwrite 
-                cts 
-                (Some progress) 
-                host.Execute
-                maxParallel
+//    match initResult with
+//    | Error e -> printfn "Init Failure: %s" e
+//    | Ok () ->
+//        let! execResult = 
+//            ProjectOps.executeRuns 
+//                host.ProjectDb      
+//                minReplica 
+//                maxReplica 
+//                host.MakeQueryParamsFromRunParams 
+//                host.Run.RunName 
+//                host.AllowOverwrite 
+//                cts 
+//                (Some progress)
+//                host
+//                executor
+//                maxParallel
 
-        match execResult with
-        | Ok results -> printfn "Success: %d records processed." results.Length
-        | Error e -> printfn "Runtime Error: %s" e
+//        match execResult with
+//        | Ok results -> printfn "Success: %d records processed." results.Length
+//        | Error e -> printfn "Runtime Error: %s" e
 
-} |> Async.RunSynchronously
+//} |> Async.RunSynchronously
+
+
 
 //async {
 //    printfn "Init Project: %s" %host.Project.ProjectName
@@ -125,28 +129,27 @@ async {
 //} |> Async.RunSynchronously
 
 
-//async {
-//    printfn "Running Project: %s" %host.Project.ProjectName
-    
+async {
 
-//    let! execResult = 
-//        ProjectOps.executeRuns 
-//            host.ProjectDb      
-//            minReplica 
-//            maxReplica 
-//            host.MakeQueryParamsFromRunParams 
-//            host.Project.RunName 
-//            host.AllowOverwrite 
-//            cts 
-//            (Some progress) 
-//            host.Execute
-//            maxParallel
+    let! execResult = 
+        ProjectOps.executeRuns 
+            host.ProjectDb      
+            minReplica 
+            maxReplica 
+            host.MakeQueryParamsFromRunParams 
+            host.Run.RunName 
+            host.AllowOverwrite 
+            cts 
+            (Some progress) 
+            host
+            executor
+            maxParallel
 
-//    match execResult with
-//    | Ok results -> printfn "Success: %d records processed." results.Length
-//    | Error e -> printfn "Runtime Error: %s" e
+    match execResult with
+    | Ok results -> printfn "Success: %d records processed." results.Length
+    | Error e -> printfn "Runtime Error: %s" e
 
-//} |> Async.RunSynchronously
+} |> Async.RunSynchronously
 
 
 
