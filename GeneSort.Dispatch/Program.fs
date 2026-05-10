@@ -36,21 +36,20 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 
-let configKey = "Merge_small" 
-let executorType = SortableTest.executorType.Merge
-let host: IRunHost = 
-    match SortableTest.Merge.Configs |> Map.tryFind configKey with
-    | Some s -> SortableTest.Merge.CreateHost ( s executorType )
-    | None -> failwithf "Config key '%s' not found." configKey
-
-
-
-//let configKey = "Small_dev" 
-//let executorType = executorType.Standard
+//let configKey = "Merge_small" 
+//let executorType = SortableTest.executorType.Merge
 //let host: IRunHost = 
-//    match SorterEvalBins.SimpleRandom.Configs |> Map.tryFind configKey with
-//    | Some s -> SorterEvalBins.SimpleRandom.CreateHost (s executorType)
+//    match SortableTest.Merge.Configs |> Map.tryFind configKey with
+//    | Some s -> SortableTest.Merge.CreateHost ( s executorType )
 //    | None -> failwithf "Config key '%s' not found." configKey
+
+
+let configKey = "Small_dev" 
+let executorType = executorType.Standard
+let host: IRunHost = 
+    match SorterEvalBins.SimpleRandom.Configs |> Map.tryFind configKey with
+    | Some s -> SorterEvalBins.SimpleRandom.CreateHost (s executorType)
+    | None -> failwithf "Config key '%s' not found." configKey
 
 
 

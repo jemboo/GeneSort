@@ -7,7 +7,7 @@ open GeneSort.Project.V1
 open GeneSort.FileDb.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
-open yab
+open Yab
 
 
 module SimpleRandom =
@@ -40,7 +40,7 @@ module SimpleRandom =
         rp.WithProjectName(Some host.Run.ProjectName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
-          .WithRngType(Some yab.projectRngType)
+          .WithRngType(Some Yab.projectRngType)
           .WithId (Some qp.Id)
 
     

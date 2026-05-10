@@ -14,7 +14,7 @@ open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
 open GeneSort.Model.Sorting.Simple.V1
-open yab
+open Yab
 
 
 module EvalBinsExecutor =
@@ -43,7 +43,7 @@ module EvalBinsExecutor =
         maybe {
             let! sortingWidth = rp.GetSortingWidth()
             let! simpleSorterModelType = rp.GetSimpleSorterModelType()
-            let stageLength = yab.getStandardStageLength sortingWidth
+            let stageLength = Yab.getStandardStageLength sortingWidth
 
             let! repl = rp.GetRepl()
             let! sorterCount = rp.GetSorterCount()
@@ -67,7 +67,7 @@ module EvalBinsExecutor =
         maybe {
             let! sortingWidth = rp.GetSortingWidth()
             let! simpleSorterModelType = rp.GetSimpleSorterModelType()
-            let stageLength = yab.getMergeStageLength simpleSorterModelType sortingWidth
+            let stageLength = Yab.getMergeStageLength simpleSorterModelType sortingWidth
             let! repl = rp.GetRepl()
             let! sorterCount = rp.GetSorterCount()
             let  rngFactory = projectRngType |> RngFactory.create

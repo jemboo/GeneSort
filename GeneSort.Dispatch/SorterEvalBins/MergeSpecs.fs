@@ -7,7 +7,7 @@ open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
-open yab
+open Yab
 
 
 
@@ -53,9 +53,12 @@ type randomSorterBinsMergeHost =
             return (smk, sw, sl, cl, sc, sdt, md, mst)
         }
 
-    member this.MakeQueryParams (repl: int<replNumber> option) (sw: int<sortingWidth> option) 
-                                (md: int<mergeDimension> option) (mst: mergeSuffixType option) 
-                                (smt: simpleSorterModelType option) (odt: outputDataType) : queryParams =
+    member this.MakeQueryParams (repl: int<replNumber> option) 
+                                (sw: int<sortingWidth> option) 
+                                (md: int<mergeDimension> option) 
+                                (mst: mergeSuffixType option) 
+                                (smt: simpleSorterModelType option) 
+                                (odt: outputDataType) : queryParams =
         queryParams.create (Some this._spec.ProjectName) repl odt
             [| (runParameters.sortingWidthKey, sw |> SortingWidth.toString); 
                (runParameters.mergeDimensionKey, md |> MergeDimension.toString);

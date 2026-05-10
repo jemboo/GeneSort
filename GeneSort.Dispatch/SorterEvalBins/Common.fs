@@ -4,6 +4,7 @@ open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Core
+open GeneSort.Project.V1
 
 
 type executorType = 
@@ -21,7 +22,9 @@ module ExecutorType =
 
 
 
-module yab =
+module Yab =
+
+    let projectName = "SorterEvalBins" |> UMX.tag<projectName>
 
     let projectRngType = rngType.Lcg
 

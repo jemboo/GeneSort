@@ -51,7 +51,6 @@ module OutputDataFile =
             match queryParams.OutputDataType with
             | outputDataType.TextReport reportName -> 
                 sprintf "%s.txt" (string %queryParams.Id)
-                //sprintf "%s_%s.txt" %reportName (DateTime.Now.ToString("yyyyMMdd_HHmm"))
             | _ -> makeOutputDataName queryParams + ".msgpack"
         let outputDataFolder = getPathToOutputDataFolder pathToRootFolder queryParams.ReplAsString queryParams.OutputDataType
         Path.Combine(%outputDataFolder, fileNameWithExtension) |> UMX.tag<fullPathToFile>
