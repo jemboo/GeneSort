@@ -6,7 +6,7 @@ open GeneSort.Project.V1
 
 type queryParams =
     private {
-        projectName:    string<projectName> option
+        projectName:    string<projectName>
         repl:           int<replNumber> option
         outputDataType: outputDataType
         properties:     Map<string, string>
@@ -33,7 +33,7 @@ type queryParams =
         queryParams.ReplString this.repl
 
     override this.ToString() : string =
-        let projStr    = this.projectName    |> queryParams.ProjectNameString
+        let projStr    = %this.projectName    |> string
         let replStr    = this.repl           |> queryParams.ReplString
         let outTypeStr = this.outputDataType |> OutputDataType.toFolderName
         let propsStr   =
@@ -44,7 +44,7 @@ type queryParams =
         $"Project: {projStr}, Repl: {replStr}, OutputType: {outTypeStr}, Properties: [{propsStr}]"
 
     static member create
-            (projectName:    string<projectName> option)
+            (projectName:    string<projectName>)
             (repl:           int<replNumber> option)
             (outputDataType: outputDataType)
             (properties:     (string * string) []) : queryParams =
@@ -55,7 +55,7 @@ type queryParams =
             outputDataType = outputDataType
             properties     = props
             id             = GuidUtils.guidFromObjs [
-                                box (projectName    |> queryParams.ProjectNameString)
+                                box (%projectName    |> string)
                                 box (repl           |> queryParams.ReplString)
                                 box (outputDataType |> OutputDataType.toFolderName)
                                 box (props |> Map.toSeq |> Seq.sortBy fst |> Seq.toArray)
@@ -66,13 +66,13 @@ type queryParams =
                     (projectName: string<projectName>) 
                     (runName: string<runName>) 
                     : queryParams =
-        queryParams.create (Some projectName) None (outputDataType.Run runName) [||]
+        queryParams.create projectName None (outputDataType.Run runName) [||]
 
 
     static member createForTextReport
             (projectName:    string<projectName>)
             (textReportName: string<textReportName>) : queryParams =
-        queryParams.create (Some projectName) None (outputDataType.TextReport textReportName) [||]
+        queryParams.create projectName None (outputDataType.TextReport textReportName) [||]
 
 
 

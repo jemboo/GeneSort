@@ -16,7 +16,7 @@ module ProjectDb =
                     (smt: simpleSorterModelType) 
                     (rng: rngType)
                     (odt: outputDataType) : queryParams =
-        queryParams.create (Some Yab.projectName) (Some repl) odt
+        queryParams.create Yab.projectName (Some repl) odt
             [| (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
                (runParameters.rngTypeKey, rng |> RngType.toString) |]
@@ -30,7 +30,7 @@ module ProjectDb =
                     (mst: mergeSuffixType) 
                     (smt: simpleSorterModelType) 
                     (odt: outputDataType) : queryParams =
-        queryParams.create (Some Yab.projectName) (Some repl) odt
+        queryParams.create Yab.projectName (Some repl) odt
             [| (runParameters.sortingWidthKey, string %sw ); 
                (runParameters.mergeDimensionKey, string %md);
                (runParameters.mergeSuffixTypeKey, mst |> MergeSuffixType.toString);

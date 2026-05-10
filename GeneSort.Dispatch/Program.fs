@@ -106,7 +106,7 @@ let maxReplica = 1<replNumber>
 
 
 //async {
-//    printfn "Init Project: %s" %host.Project.ProjectName
+//    printfn "Init Run: %s" %host.Run.RunName
     
 //    let! initResult = 
 //        ParamOps.initProjectAndRunFiles
@@ -114,7 +114,7 @@ let maxReplica = 1<replNumber>
 //            host.MakeQueryParamsFromRunParams 
 //            cts 
 //            (Some progress) 
-//            host.Project              
+//            host.Run              
 //            minReplica 
 //            maxReplica 
 //            host.AllowOverwrite 
@@ -123,7 +123,7 @@ let maxReplica = 1<replNumber>
 
 //    match initResult with
 //    | Error e -> printfn "Init Failure: %s" e
-//    | Ok () -> printfn "Init Success: %s" %host.Project.ProjectName
+//    | Ok () -> printfn "Init Success: %s" %host.Run.RunName
 
 
 //} |> Async.RunSynchronously

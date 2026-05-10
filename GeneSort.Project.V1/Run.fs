@@ -11,15 +11,13 @@ type run =
           projectName: string<projectName>
           runName: string<runName>
           description: string
-          outputDataTypes: outputDataType array
         }
     with
 
     static member create
             (projectName: string<projectName>)
             (runName: string<runName>)
-            (description: string)
-            (outputDataTypes: outputDataType array) : run =
+            (description: string) : run =
 
         if String.IsNullOrWhiteSpace %projectName then
             failwith "Project name cannot be empty"
@@ -27,13 +25,11 @@ type run =
           projectName = projectName
           runName = runName
           description = description
-          outputDataTypes = outputDataTypes
         }
 
     member this.ProjectName with get () = this.projectName
     member this.RunName with get () = this.runName
     member this.Description with get () = this.description
-    member this.OutputDataTypes with get() = this.outputDataTypes
 
 
 

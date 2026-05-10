@@ -32,7 +32,10 @@ type runHost =
                     (rng: rngType option)
                     (odt: outputDataType) : queryParams =
         let pName = this._spec.ProjectName
-        queryParams.create (Some pName) (Some repl) odt
+        queryParams.create 
+                    pName
+                    (Some repl) 
+                    odt
             [| (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                (runParameters.simpleSorterModelTypeKey, smt |> Option.map SimpleSorterModelType.toString |> UmxExt.stringOptionToString) 
                (runParameters.rngTypeKey, rng |> Option.map RngType.toString |> UmxExt.stringOptionToString) |]
@@ -57,7 +60,6 @@ module RunHost =
     let createRunHost (spec: runHostSpec) : IRunHost =
         let folder = spec.DataFolder |> UMX.tag
         let db = new GeneSortDbMp(folder) :> IGeneSortDb
-        let proj = run.create spec.ProjectName spec.RunName spec.RunDescription 
-                                [| outputDataType.RunParameters %spec.ProjectName; outputDataType.SorterEvalBins ""; |]
-        runHost.Create db spec proj :> IRunHost
+        let run = run.create spec.ProjectName spec.RunName spec.RunDescription
+        runHost.Create db spec run :> IRunHost
 

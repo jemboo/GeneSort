@@ -36,7 +36,8 @@ module Merge =
         let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Run.ProjectName)
         rp.WithProjectName(Some host.Run.ProjectName)
           .WithRunName(Some host.Run.RunName)
-          .WithRunFinished(Some false).WithId (Some qp.Id)
+          .WithRunFinished(Some false)
+          .WithId (Some qp.Id)
 
     let private mergeDimensionDividesSortingWidth (rp: runParameters) =
         let sw = rp.GetSortingWidth().Value
