@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1
+﻿namespace GeneSort.Dispatch.V1.SorterEvalBins
 
 open FSharp.UMX
 open GeneSort.Core
@@ -12,7 +12,7 @@ open GeneSort.FileDb.V1
 
 // --- 4. Host Implementation ---
 
-type runHost = 
+type runHostEvalBins = 
     private { 
         _projectDb: IGeneSortDb 
         _parameterSpans: (string * string list) list
@@ -55,10 +55,10 @@ type runHost =
         member this.ParamMapRefiner rps = this.ParamMapRefiner rps
 
 
-module RunHost =
+module RunHostEvalBins =
     let createRunHost (spec: runHostSpec) : IRunHost =
         let folder = spec.DataFolder |> UMX.tag
         let db = new GeneSortDbMp(folder) :> IGeneSortDb
         let run = run.create spec.ProjectName spec.RunName spec.RunDescription
-        runHost.Create db spec run :> IRunHost
+        runHostEvalBins.Create db spec run :> IRunHost
 

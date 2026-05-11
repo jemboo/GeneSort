@@ -10,7 +10,7 @@ open GeneSort.Sorting.Sortable
 open GeneSort.FileDb.V1
 
 
-type runHostForMergeTest = 
+type runHostSortableTest = 
     private { 
         _projectDb: IGeneSortDb 
         _parameterSpans: (string * string list) list
@@ -94,10 +94,10 @@ type runHostForMergeTest =
 
 
 
-module RunHostForMergeTest =
+module RunHostSortableTest =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let folder = spec.DataFolder |> UMX.tag
         let db = new GeneSortDbMp(folder) :> IGeneSortDb
         let run = run.create spec.ProjectName spec.RunName spec.RunDescription
-        runHost.Create db spec run :> IRunHost
+        runHostSortableTest.Create db spec run :> IRunHost

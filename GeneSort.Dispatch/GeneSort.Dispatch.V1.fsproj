@@ -22,11 +22,11 @@
     <Compile Include="Interfaces.fs" />
     <Compile Include="ProjectOps.fs" />
     <Compile Include="RunHostSpec.fs" />
-    <Compile Include="RunHost.fs" />
+    <Compile Include="SortableTest\RunHostSortableTest.fs" />
     <Compile Include="SortableTest\Common.fs" />
     <Compile Include="SortableTest\SortableTestExecutor.fs" />
     <Compile Include="SortableTest\MergeSpecs.fs" />
-    <Compile Include="SortableTest\RunHost.fs" />
+    <Compile Include="SorterEvalBins\RunHostEvalBins.fs" />
     <Compile Include="SorterEvalBins\Common.fs" />
     <Compile Include="SorterEvalBins\ProjectDb.fs" />
     <Compile Include="SorterEvalBins\EvalBinsExecutor.fs" />
