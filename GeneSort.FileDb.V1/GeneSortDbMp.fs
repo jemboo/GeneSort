@@ -36,8 +36,8 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
     member _.RootFolder = rootFolder
 
     interface IGeneSortDb with
-        member _.projectName
-            with get (): string<projectName> = DirectoryInfo(%rootFolder).Name |> UMX.tag
+        member _.databaseName
+            with get (): string<databaseName> = DirectoryInfo(%rootFolder).Name |> UMX.tag
 
         member _.saveAsync
                     (queryParams: queryParams)

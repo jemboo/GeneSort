@@ -31,9 +31,8 @@ type runHost =
                     (smt: simpleSorterModelType option) 
                     (rng: rngType option)
                     (odt: outputDataType) : queryParams =
-        let pName = this._spec.ProjectName
         queryParams.create 
-                    pName
+                    this._spec.ProjectName
                     (Some repl) 
                     odt
             [| (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
