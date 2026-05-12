@@ -17,3 +17,5 @@ module ExecutorType =
 module yab =
 
     let projectRngType = rngType.Lcg
+
+    let databaseFolder = "c:\\Projects\\SortableTest\\Merge\\Data"

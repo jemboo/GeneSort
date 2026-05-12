@@ -12,6 +12,8 @@ open Yab
 
 
 module StandardSpecs =
+    
+    let standardDataFolder = "c:\\Projects\\SorterEvalBins\\RandomSimple\\Data"
 
     //let smallSortingWidths = 
     //        (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
@@ -61,11 +63,11 @@ module StandardSpecs =
 
     module Specs =
 
-        let Small_dev (executorType: executorType)  : runHostSpec = {
+        let Small_dev (executorType: evalExecutorType)  : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = sprintf @"Small_Dev_%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Small_Dev_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
-            DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Small\\Data"
+            DataFolder = standardDataFolder
             Spans = [
                 smallSortingWidths
                 allSimpleSorterModelTypes
@@ -76,11 +78,11 @@ module StandardSpecs =
             AllowOverwrite = false |> UMX.tag
         }
 
-        let Small (executorType: executorType) : runHostSpec = {
+        let Small (executorType: evalExecutorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = sprintf @"Small_%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Small_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
-            DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Small\\Data"
+            DataFolder = standardDataFolder
             Spans = [
                 smallSortingWidths
                 allSimpleSorterModelTypes
@@ -91,11 +93,11 @@ module StandardSpecs =
             AllowOverwrite = false |> UMX.tag
         }
 
-        let Medium_dev (executorType: executorType) : runHostSpec = {
+        let Medium_dev (executorType: evalExecutorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = sprintf @"Medium_Dev_%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Medium_Dev_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
-            DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Medium_dev\\Data"
+            DataFolder = standardDataFolder
             Spans = [
                 mediumSortingWidths
                 allSimpleSorterModelTypes
@@ -106,11 +108,11 @@ module StandardSpecs =
             AllowOverwrite = false |> UMX.tag
         }
 
-        let Medium (executorType: executorType) : runHostSpec = {
+        let Medium (executorType: evalExecutorType) : runHostSpec = {
             ProjectName = "SorterEvalBins" |> UMX.tag
-            RunName = sprintf @"Medium_%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Medium_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
-            DataFolder = "c:\\Projects\\SorterEvalBins\\SimpleRandom\\Medium\\Data"
+            DataFolder = standardDataFolder
             Spans = [
                 mediumSortingWidths
                 allSimpleSorterModelTypes

@@ -29,15 +29,37 @@ module EvalBinsExecutor =
         }
 
 
+    //let makeMergeTests (rp:runParameters) : Sortable.sortableTest option =
+    //    maybe {
+    //        let! sortingWidth = rp.GetSortingWidth()
+    //        let! sdt = rp.GetSortableDataFormat()
+    //        let! md = rp.GetMergeDimension()
+    //        let! mst = rp.GetMergeSuffixType()
+    //        let! qpTests = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SortableTest "")
+    //        let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
+    //        return SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel mergeSortableDataFormat
+    //    }
+
     let makeMergeTests (rp:runParameters) : Sortable.sortableTest option =
         maybe {
-            let! sortingWidth = rp.GetSortingWidth()
-            let! sdt = rp.GetSortableDataFormat()
-            let! md = rp.GetMergeDimension()
-            let! mst = rp.GetMergeSuffixType()
-            let! qpTests = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SortableTest "")
-            let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-            return SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel mergeSortableDataFormat
+                // 1. Safe extraction
+                let! (sortingWidth, mergeDim, mergeSufixType, sortableDataFormat) = 
+                    maybe {
+                        let! width = rp.GetSortingWidth()
+                        let! mergeDim = rp.GetMergeDimension()
+                        let! suffixFill = rp.GetMergeSuffixType()
+                        let! dataFormat = rp.GetSortableDataFormat()
+                        return (width, mergeDim, suffixFill, dataFormat)
+                    }
+
+                // 3. Create SortableTestModel
+                let sortableTestModel = msasM.create sortingWidth mergeDim mergeSufixType |> sortableTestModel.MsasMi
+            
+                let! qpForSortableTest = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SortableTest "") 
+                return SortableTestModel.makeSortableTest 
+                                            (%qpForSortableTest.Id |> UMX.tag) 
+                                            sortableTestModel 
+                                            sortableDataFormat
         }
 
 
@@ -255,7 +277,7 @@ module EvalBinsExecutor =
 
 
 
-    let getExecutor (executorType: executorType) : IRunParamsExecutor =
+    let getExecutor (executorType: evalExecutorType) : IRunParamsExecutor =
         match executorType with
         | Standard -> standardExecutor
         | Merge -> mergeExecutor

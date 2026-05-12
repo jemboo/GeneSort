@@ -9,7 +9,7 @@ open GeneSort.FileDb.V1
 open GeneSort.Dispatch.V1
 
 
-module Merge =
+module SortableMergeSpecs =
 
 
     let smallSortingWidths = 
@@ -68,7 +68,7 @@ module Merge =
             ProjectName = "SortableTest" |> UMX.tag
             RunName = sprintf @"Merge_Dev%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
-            DataFolder = "c:\\Projects\\SortableTest\\Merge\\Data"
+            DataFolder = yab.databaseFolder
             Spans = [
                 smallSortingWidths
                 allDataFormats
@@ -85,7 +85,7 @@ module Merge =
             ProjectName = "SortableTest" |> UMX.tag
             RunName = sprintf @"Merge_Prod%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
-            DataFolder = "c:\\Projects\\SortableTest\\Merge\\Data"
+            DataFolder = yab.databaseFolder
             Spans = [
                 allSortingWidths
                 allDataFormats

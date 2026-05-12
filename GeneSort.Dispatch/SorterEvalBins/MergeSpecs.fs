@@ -2,33 +2,47 @@
 
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorting
-open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
-open Yab
+open GeneSort.Dispatch.V1.SortableTest
 
-module MergeSpecs =
+module SorterMergeSpecs =
+
+    let mergeDataFolder = "c:\\Projects\\SorterEvalBins\\RandomMerge\\Data"
+
+    let smallSortingWidths = SortableMergeSpecs.smallSortingWidths
+
+    let allSortingWidths = SortableMergeSpecs.allSortingWidths
+
+    let smallMergeDimensions = SortableMergeSpecs.smallMergeDimensions
+
+    let allMergeDimensions = SortableMergeSpecs.allMergeDimensions
+
+    let allDataFormats = SortableMergeSpecs.allDataFormats
+
+    let allMergeFillTypes = SortableMergeSpecs.allMergeFillTypes
+
+    let allSimpleSorterModelTypes = 
+            (runParameters.simpleSorterModelTypeKey, SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
+
+    let testSorterCount = (runParameters.sorterCountKey, ["100";] )
+    let smallSorterCount = (runParameters.sorterCountKey, ["1000";] )
+    let mediumSorterCount = (runParameters.sorterCountKey, ["10000";] )
+    let largeSorterCount = (runParameters.sorterCountKey, ["100000";] )
 
 
     let private mergeEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let sw = rp.GetSortingWidth().Value
         let smt = rp.GetSimpleSorterModelType().Value
         let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
-        let sl = getMergeStageLength smt sw
-        let cl = sl |> StageLength.toCeLength sw
 
         rp.WithProjectName(Some host.Run.ProjectName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
-          .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
-          .WithCeLength(Some cl)
-          .WithStageLength(Some sl)
-          .WithCollectSortableTests(Some true)
           .WithId (Some qp.Id)
 
-    let private paramMapFilter (rp: runParameters) = 
+    let private paramMapFilter (rp: runParameters) : runParameters option = 
         maybe {
             let! smt = rp.GetSimpleSorterModelType()
             let! sw = rp.GetSortingWidth()
@@ -63,21 +77,21 @@ module MergeSpecs =
 
     module Specs =
 
-        let P1 (executorType: executorType) : runHostSpec = {
+        let Small_Dev (executorType: evalExecutorType) : runHostSpec = {
             ProjectName = "RandomMergeSorterBins" |> UMX.tag
-            RunName = sprintf @"Merge_P1_%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Merge_P1_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
-            DataFolder = "c:\\Projects\\RandomMergeSorterBins\\Data"
+            DataFolder = mergeDataFolder
             Spans = [
-                (runParameters.sortingWidthKey, [32; 64] |> List.map string)
-                (runParameters.simpleSorterModelTypeKey, [simpleSorterModelType.Msce; simpleSorterModelType.Mssi; simpleSorterModelType.Msrs; simpleSorterModelType.Msuf4] |> List.map SimpleSorterModelType.toString)
-                (runParameters.mergeDimensionKey, [2; 4] |> List.map string)
-                (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix; mergeSuffixType.VV_1] |> List.map MergeSuffixType.toString)
-                (runParameters.sorterCountKey, ["1000"])
+                smallSortingWidths
+                allSimpleSorterModelTypes
+                smallMergeDimensions
+                allMergeFillTypes
+                testSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
             AllowOverwrite = false |> UMX.tag
         }
 
-    let Configs = Map.ofList [ ("P1", Specs.P1) ]
+    let Configs = Map.ofList [ ("Small_dev", Specs.Small_Dev) ]

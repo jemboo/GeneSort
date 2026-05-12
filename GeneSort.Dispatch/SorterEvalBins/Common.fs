@@ -7,13 +7,13 @@ open GeneSort.Core
 open GeneSort.Project.V1
 
 
-type executorType = 
+type evalExecutorType = 
     | Standard
     | Merge
     | FullReport
     | BinsReport
 
-module ExecutorType =
+module EvalExecutorType =
     let toString = function
         | Standard -> "Standard"
         | Merge -> "Merge"
