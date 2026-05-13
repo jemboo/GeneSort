@@ -24,61 +24,61 @@ type runHostSortableMergeTest =
 
     member this.Spec = this._spec
 
-    member this.MakeQueryParams 
-                (repl: int<replNumber> option) 
-                (sortingWidth: int<sortingWidth> option)
-                (mergeDimension: int<mergeDimension> option) 
-                (mergeFillType: mergeSuffixType option)
-                (sortableDataFormat: sortableDataFormat option) 
-                (outputDataType: outputDataType) : queryParams =
+    //member this.MakeQueryParams 
+    //            (repl: int<replNumber> option) 
+    //            (sortingWidth: int<sortingWidth> option)
+    //            (mergeDimension: int<mergeDimension> option) 
+    //            (mergeFillType: mergeSuffixType option)
+    //            (sortableDataFormat: sortableDataFormat option) 
+    //            (outputDataType: outputDataType) : queryParams =
 
-        queryParams.create 
-            this._spec.ProjectName
-            repl 
-            outputDataType
-            [| (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
-               (runParameters.mergeDimensionKey, mergeDimension |> MergeDimension.toString);
-               (runParameters.mergeSuffixTypeKey, mergeFillType 
-                    |> Option.map MergeSuffixType.toString |> UmxExt.stringOptionToString );
-               (runParameters.sortableDataFormatKey, sortableDataFormat 
-                    |> Option.map SortableDataFormat.toString |> UmxExt.stringOptionToString ); |]
-
-
-    member this.MakeQueryParamsFromRunParams 
-                (runParams: runParameters) 
-                (outputDataType: outputDataType) : queryParams =
-            this.MakeQueryParams 
-                    (runParams.GetRepl()) 
-                    (runParams.GetSortingWidth()) 
-                    (runParams.GetMergeDimension())
-                    (runParams.GetMergeSuffixType()) 
-                    (runParams.GetSortableDataFormat()) 
-                    outputDataType
+    //    queryParams.create 
+    //        this._spec.ProjectName
+    //        repl 
+    //        outputDataType
+    //        [| (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
+    //           (runParameters.mergeDimensionKey, mergeDimension |> MergeDimension.toString);
+    //           (runParameters.mergeSuffixTypeKey, mergeFillType 
+    //                |> Option.map MergeSuffixType.toString |> UmxExt.stringOptionToString );
+    //           (runParameters.sortableDataFormatKey, sortableDataFormat 
+    //                |> Option.map SortableDataFormat.toString |> UmxExt.stringOptionToString ); |]
 
 
-    member this.getSortableMergeTest 
-                (repl: int<replNumber> option) 
-                (sortingWidth: int<sortingWidth> option)
-                (mergeDimension: int<mergeDimension> option) 
-                (mergeFillType: mergeSuffixType option)
-                (sortableDataFormat: sortableDataFormat option) 
-                    : Async<Result<sortableTest, string>> =
-            asyncResult {
-                try
-                    let queryParams = this.MakeQueryParams 
-                                                repl 
-                                                sortingWidth 
-                                                mergeDimension 
-                                                mergeFillType 
-                                                sortableDataFormat 
-                                                (outputDataType.SortableTest "")
+    //member this.MakeQueryParamsFromRunParams 
+    //            (runParams: runParameters) 
+    //            (outputDataType: outputDataType) : queryParams =
+    //        this.MakeQueryParams 
+    //                (runParams.GetRepl()) 
+    //                (runParams.GetSortingWidth()) 
+    //                (runParams.GetMergeDimension())
+    //                (runParams.GetMergeSuffixType()) 
+    //                (runParams.GetSortableDataFormat()) 
+    //                outputDataType
 
-                    let! (dataOut : outputData) = this._projectDb.loadAsync queryParams
-                    let! sortableTest = dataOut |> OutputData.asSortableTest
-                    return sortableTest
-                with e -> 
-                    return! Error (sprintf "Error in getSortableMergeTest: %s" e.Message) |> async.Return
-            }
+
+    //member this.getSortableMergeTest 
+    //            (repl: int<replNumber> option) 
+    //            (sortingWidth: int<sortingWidth> option)
+    //            (mergeDimension: int<mergeDimension> option) 
+    //            (mergeFillType: mergeSuffixType option)
+    //            (sortableDataFormat: sortableDataFormat option) 
+    //                : Async<Result<sortableTest, string>> =
+    //        asyncResult {
+    //            try
+    //                let queryParams = this.MakeQueryParams 
+    //                                            repl 
+    //                                            sortingWidth 
+    //                                            mergeDimension 
+    //                                            mergeFillType 
+    //                                            sortableDataFormat 
+    //                                            (outputDataType.SortableTest "")
+
+    //                let! (dataOut : outputData) = this._projectDb.loadAsync queryParams
+    //                let! sortableTest = dataOut |> OutputData.asSortableTest
+    //                return sortableTest
+    //            with e -> 
+    //                return! Error (sprintf "Error in getSortableMergeTest: %s" e.Message) |> async.Return
+    //        }
 
 
     member this.ParamMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
@@ -90,7 +90,6 @@ type runHostSortableMergeTest =
         member this.Run = this._run
         member this.ParameterSpans = this._parameterSpans
         member this.AllowOverwrite = this._spec.AllowOverwrite
-        member this.MakeQueryParamsFromRunParams rp odt = this.MakeQueryParamsFromRunParams rp odt
         member this.ParamMapRefiner rps = this.ParamMapRefiner rps
 
 
@@ -103,13 +102,13 @@ module RunHostSortableMergeTest =
         runHostSortableMergeTest.Create db spec run :> IRunHost
 
 
-    let loadSortableTest 
-                    (host: IRunHost) 
-                    (repl: int<replNumber> option) 
-                    (sortingWidth: int<sortingWidth> option)
-                    (mergeDimension: int<mergeDimension> option) 
-                    (mergeFillType: mergeSuffixType option)
-                    (sortableDataFormat: sortableDataFormat option) 
-                        : Async<Result<sortableTest, string>> =
-        let concreteHost = host :?> runHostSortableMergeTest
-        concreteHost.getSortableMergeTest repl sortingWidth mergeDimension mergeFillType sortableDataFormat
+    //let loadSortableTest 
+    //                (host: IRunHost) 
+    //                (repl: int<replNumber> option) 
+    //                (sortingWidth: int<sortingWidth> option)
+    //                (mergeDimension: int<mergeDimension> option) 
+    //                (mergeFillType: mergeSuffixType option)
+    //                (sortableDataFormat: sortableDataFormat option) 
+    //                    : Async<Result<sortableTest, string>> =
+    //    let concreteHost = host :?> runHostSortableMergeTest
+    //    concreteHost.getSortableMergeTest repl sortingWidth mergeDimension mergeFillType sortableDataFormat

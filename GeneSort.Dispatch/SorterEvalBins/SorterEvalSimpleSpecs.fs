@@ -11,7 +11,7 @@ open GeneSort.Dispatch.V1
 open Yab
 
 
-module SorterEvalStandardSpecs =
+module SorterEvalSimpleSpecs =
     
     let standardDataFolder = "c:\\Projects\\SorterEvalBins\\RandomSimple\\Data"
 
@@ -37,7 +37,7 @@ module SorterEvalStandardSpecs =
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let sw = rp.GetSortingWidth().Value
-        let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Run.ProjectName)
+        let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Run.ProjectName)
         
         rp.WithProjectName(Some host.Run.ProjectName)
           .WithRunName(Some host.Run.RunName)

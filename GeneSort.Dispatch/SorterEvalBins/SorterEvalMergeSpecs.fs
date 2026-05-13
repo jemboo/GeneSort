@@ -35,7 +35,7 @@ module SorterEvalMergeSpecs =
     let private mergeEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let sw = rp.GetSortingWidth().Value
         let smt = rp.GetSimpleSorterModelType().Value
-        let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
+        let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
 
         rp.WithProjectName(Some host.Run.ProjectName)
           .WithRunName(Some host.Run.RunName)
@@ -87,6 +87,7 @@ module SorterEvalMergeSpecs =
                 allSimpleSorterModelTypes
                 smallMergeDimensions
                 allMergeFillTypes
+                allDataFormats
                 testSorterCount
             ]
             Filter = paramMapFilter

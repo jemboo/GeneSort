@@ -149,7 +149,7 @@ module EvalBinsExecutor =
             
                 let! qpEval = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                              |> Result.ofOption "Failed: SorterSetEval query parameters could not be generated."
-                let collectTests = rp.GetCollectSortableTests() |> Option.defaultValue false
+                let collectTests = Yab.CollectSortableTests
                 let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSet tests collectTests
 
                 let! qpBins = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
@@ -189,13 +189,13 @@ module EvalBinsExecutor =
                 OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
     
                 // 1. Load SorterEvalBins
-                let qpBins = host.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
+                let qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
                 let! (outB:outputData) = host.ProjectDb.loadAsync qpBins
                 let! bins = outB  |> OutputData.asSorterEvalBins
 
                 // 2. Make report
                 let reportName = sprintf "FullReport" |> UMX.tag<textReportName>
-                let qpReport = host.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                let qpReport = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
                 let details = bins |> SorterEvalBins.makeFullDataTableRecords
                 let dtrs = dataTableRecord.combineWithMany details leadCols
@@ -222,13 +222,13 @@ module EvalBinsExecutor =
                 OpsUtils.report progress (sprintf "%s Starting Bins Report for Run %s" (MathUtils.getTimestampString()) %runId)
     
                 // 1. Load SorterEvalBins
-                let qpBins = host.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
+                let qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
                 let! (outB:outputData) = host.ProjectDb.loadAsync qpBins
                 let! bins = outB  |> OutputData.asSorterEvalBins
 
                 // 2. Make report
                 let reportName = sprintf "BinsReport" |> UMX.tag<textReportName>
-                let qpReport = host.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                let qpReport = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
                 let details = bins |> SorterEvalBins.makeSummaryDataTableRecords
                 let dtrs = dataTableRecord.combineWithMany details leadCols

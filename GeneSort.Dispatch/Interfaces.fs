@@ -13,7 +13,6 @@ type IRunHost =
     abstract member Run: run
     abstract member ParameterSpans: (string * string list) list
     abstract member AllowOverwrite: bool<allowOverwrite>
-    abstract member MakeQueryParamsFromRunParams: runParameters -> outputDataType -> queryParams
     abstract member ParamMapRefiner: runParameters seq -> runParameters seq
 
 

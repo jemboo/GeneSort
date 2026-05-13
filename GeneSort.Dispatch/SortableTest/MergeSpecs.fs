@@ -33,7 +33,7 @@ module SortableMergeSpecs =
 
 
     let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let qp = host.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Run.ProjectName)
+        let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Run.ProjectName)
         rp.WithProjectName(Some host.Run.ProjectName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)

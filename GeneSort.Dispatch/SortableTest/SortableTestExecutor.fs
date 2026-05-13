@@ -42,7 +42,7 @@ module SortableTestExecutor =
                 // 3. Create SortableTestModel
                 let sortableTestModel = msasM.create sortingWidth mergeDim mergeSufixType |> sortableTestModel.MsasMi
             
-                let qpForSortableTest = host.MakeQueryParamsFromRunParams rp (outputDataType.SortableTest "") 
+                let qpForSortableTest = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SortableTest "") 
                 let sortableTests = SortableTestModel.makeSortableTest 
                                             (%qpForSortableTest.Id |> UMX.tag) 
                                             sortableTestModel 

@@ -30,8 +30,8 @@
     <Compile Include="SorterEvalBins\ProjectDb.fs" />
     <Compile Include="SorterEvalBins\RunHostEvalBins.fs" />
     <Compile Include="SorterEvalBins\EvalBinsExecutor.fs" />
-    <Compile Include="SorterEvalBins\StandardSpecs.fs" />
-    <Compile Include="SorterEvalBins\MergeSpecs.fs" />
+    <Compile Include="SorterEvalBins\SorterEvalSimpleSpecs.fs" />
+    <Compile Include="SorterEvalBins\SorterEvalMergeSpecs.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

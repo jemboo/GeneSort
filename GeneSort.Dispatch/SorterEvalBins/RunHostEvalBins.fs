@@ -26,22 +26,22 @@ type runHostEvalBins =
 
     member this.Spec = this._spec
 
-    member this.MakeQueryParams 
-                    (repl: int<replNumber>) 
-                    (sw: int<sortingWidth>) 
-                    (smt: simpleSorterModelType option) 
-                    (rng: rngType option)
-                    (odt: outputDataType) : queryParams =
-        queryParams.create 
-                    this._spec.ProjectName
-                    (Some repl) 
-                    odt
-            [| (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
-               (runParameters.simpleSorterModelTypeKey, smt |> Option.map SimpleSorterModelType.toString |> UmxExt.stringOptionToString) 
-               (runParameters.rngTypeKey, rng |> Option.map RngType.toString |> UmxExt.stringOptionToString) |]
+    //member this.MakeQueryParams 
+    //                (repl: int<replNumber>) 
+    //                (sw: int<sortingWidth>) 
+    //                (smt: simpleSorterModelType option) 
+    //                (rng: rngType option)
+    //                (odt: outputDataType) : queryParams =
+    //    queryParams.create 
+    //                this._spec.ProjectName
+    //                (Some repl) 
+    //                odt
+    //        [| (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
+    //           (runParameters.simpleSorterModelTypeKey, smt |> Option.map SimpleSorterModelType.toString |> UmxExt.stringOptionToString) 
+    //           (runParameters.rngTypeKey, rng |> Option.map RngType.toString |> UmxExt.stringOptionToString) |]
 
-    member this.MakeQueryParamsFromRunParams (rp: runParameters) (odt: outputDataType) : queryParams =
-        this.MakeQueryParams (rp.GetRepl().Value) (rp.GetSortingWidth().Value) (rp.GetSimpleSorterModelType()) (rp.GetRngType()) odt
+    //member this.MakeQueryParamsFromRunParams (rp: runParameters) (odt: outputDataType) : queryParams =
+    //    this.MakeQueryParams (rp.GetRepl().Value) (rp.GetSortingWidth().Value) (rp.GetSimpleSorterModelType()) (rp.GetRngType()) odt
 
     member this.ParamMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
         runParametersSeq 
@@ -52,7 +52,6 @@ type runHostEvalBins =
         member this.Run = this._run
         member this.ParameterSpans = this._parameterSpans
         member this.AllowOverwrite = this._spec.AllowOverwrite
-        member this.MakeQueryParamsFromRunParams rp odt = this.MakeQueryParamsFromRunParams rp odt
         member this.ParamMapRefiner rps = this.ParamMapRefiner rps
 
 

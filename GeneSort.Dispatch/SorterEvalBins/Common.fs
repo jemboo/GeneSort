@@ -34,11 +34,11 @@ module Yab =
 
 
     let randomSimpleDatabaseFolder = 
-                    "c:\\Projects\\SortableTest\\RandomSimple\\Data"
+                    "c:\\Projects\\SorterEvalBins\\RandomSimple\\Data"
                      |> UMX.tag<pathToRootFolder>
 
     let randomMergeDatabaseFolder = 
-                    "c:\\Projects\\SortableTest\\RandomMerge\\Data"
+                    "c:\\Projects\\SorterEvalBins\\RandomMerge\\Data"
                      |> UMX.tag<pathToRootFolder>
 
     let projectRngType = rngType.Lcg
@@ -77,12 +77,15 @@ module Yab =
                     (sw: int<sortingWidth>) : int<stageLength> =
         match %sw with
         | 16 -> 100
+        | 18 -> match smt with | Msuf4 -> 600 | _ -> 150
+        | 24 -> match smt with | Msuf4 -> 600 | _ -> 200
         | 32 -> match smt with | Msuf4 -> 600 | _ -> 300
+        | 36 -> match smt with | Msuf4 -> 600 | _ -> 300
         | 48 -> match smt with | Msuf4 -> 1200 | _ -> 400
         | 64 -> match smt with | Msuf4 -> 2000 | _ -> 600
         | 96 -> match smt with | Msuf4 -> 2800 | _ -> 800
         | 128 -> match smt with | Msuf4 -> 4000 | _ -> 1200
-        | 196 -> match smt with | Msuf4 -> 4800 | _ -> 2000
+        | 192 -> match smt with | Msuf4 -> 4800 | _ -> 2000
         | 256 -> match smt with | Msuf4 -> 6000 | _ -> 3000
         | _ -> failwithf "Unsupported sorting width: %d" %sw
         |> UMX.tag
@@ -92,21 +95,17 @@ module Yab =
     let makeQueryParamsForSimple 
                 (repl: int<replNumber> option) 
                 (sortingWidth: int<sortingWidth> option)
-                (mergeDimension: int<mergeDimension> option) 
-                (mergeFillType: mergeSuffixType option)
-                (sortableDataFormat: sortableDataFormat option) 
+                (simpleSorterModelType: simpleSorterModelType option) 
                 (outputDataType: outputDataType) : queryParams =
 
         queryParams.create 
             projectName
             repl 
             outputDataType
-            [| (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
-               (runParameters.mergeDimensionKey, mergeDimension |> MergeDimension.toString);
-               (runParameters.mergeSuffixTypeKey, mergeFillType 
-                    |> Option.map MergeSuffixType.toString |> UmxExt.stringOptionToString );
-               (runParameters.sortableDataFormatKey, sortableDataFormat 
-                    |> Option.map SortableDataFormat.toString |> UmxExt.stringOptionToString ); |]
+            [| 
+               (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
+               (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> Option.map SimpleSorterModelType.toString |> UmxExt.stringOptionToString);
+            |]
 
 
     let makeQueryParamsFromRunParamsForSimple 
@@ -115,16 +114,14 @@ module Yab =
             makeQueryParamsForSimple 
                     (runParams.GetRepl()) 
                     (runParams.GetSortingWidth()) 
-                    (runParams.GetMergeDimension())
-                    (runParams.GetMergeSuffixType()) 
-                    (runParams.GetSortableDataFormat()) 
+                    (runParams.GetSimpleSorterModelType())
                     outputDataType
 
 
     let makeQueryParamsForMerge
                 (repl: int<replNumber> option) 
                 (sortingWidth: int<sortingWidth> option)
-                (smt: simpleSorterModelType option)
+                (simpleSorterModelType: simpleSorterModelType option)
                 (mergeDimension: int<mergeDimension> option) 
                 (mergeSuffixType: mergeSuffixType option)
                 (sortableDataFormat: sortableDataFormat option) 
@@ -135,7 +132,7 @@ module Yab =
             repl 
             outputDataType
             [| (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
-               (runParameters.simpleSorterModelTypeKey, smt |> Option.map SimpleSorterModelType.toString |> UmxExt.stringOptionToString);
+               (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> Option.map SimpleSorterModelType.toString |> UmxExt.stringOptionToString);
                (runParameters.mergeDimensionKey, mergeDimension |> MergeDimension.toString);
                (runParameters.mergeSuffixTypeKey, mergeSuffixType 
                     |> Option.map MergeSuffixType.toString |> UmxExt.stringOptionToString );

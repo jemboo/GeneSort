@@ -46,13 +46,25 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 let configKey = "Small_dev" 
-let executorType = evalExecutorType.Standard
+let executorType = evalExecutorType.Merge
 let host: IRunHost = 
     match SorterEvalBins.SorterEvalMergeSpecs.Configs |> Map.tryFind configKey with
     | Some s -> RunHostEvalBins.createRunHost (s executorType)
     | None -> failwithf "Config key '%s' not found." configKey
 
 let executor = EvalBinsExecutor.getExecutor executorType
+
+
+
+//let configKey = "Small_dev" 
+//let executorType = evalExecutorType.Standard
+//let host: IRunHost = 
+//    match SorterEvalBins.SorterEvalSimpleSpecs.Configs |> Map.tryFind configKey with
+//    | Some s -> RunHostEvalBins.createRunHost (s executorType)
+//    | None -> failwithf "Config key '%s' not found." configKey
+
+//let executor = EvalBinsExecutor.getExecutor executorType
+
 
 
 
@@ -67,7 +79,7 @@ async {
     let! initResult = 
         ParamOps.initProjectAndRunFiles
             host.ProjectDb           
-            host.MakeQueryParamsFromRunParams 
+            host.ProjectDb.MakeQueryParamsFromRunParams 
             cts 
             (Some progress) 
             host.Run              
@@ -85,7 +97,7 @@ async {
                 host.ProjectDb      
                 minReplica 
                 maxReplica 
-                host.MakeQueryParamsFromRunParams 
+                host.ProjectDb.MakeQueryParamsFromRunParams 
                 host.Run.RunName 
                 host.AllowOverwrite 
                 cts 
@@ -108,7 +120,7 @@ async {
 //    let! initResult = 
 //        ParamOps.initProjectAndRunFiles
 //            host.ProjectDb           
-//            host.MakeQueryParamsFromRunParams 
+//            host.ProjectDb.MakeQueryParamsFromRunParams 
 //            cts 
 //            (Some progress) 
 //            host.Run              
@@ -133,7 +145,7 @@ async {
 //            host.ProjectDb      
 //            minReplica 
 //            maxReplica 
-//            host.MakeQueryParamsFromRunParams 
+//            host.ProjectDb.MakeQueryParamsFromRunParams 
 //            host.Run.RunName 
 //            host.AllowOverwrite 
 //            cts 
