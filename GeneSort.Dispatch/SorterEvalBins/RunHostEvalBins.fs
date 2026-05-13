@@ -8,6 +8,7 @@ open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.FileDb.V1
+open Yab
 
 
 // --- 4. Host Implementation ---
@@ -56,9 +57,9 @@ type runHostEvalBins =
 
 
 module RunHostEvalBins =
+
     let createRunHost (spec: runHostSpec) : IRunHost =
-        let folder = spec.DataFolder |> UMX.tag
-        let db = new GeneSortDbMp(folder) :> IGeneSortDb
+        let db = getDatabaseByName spec.DatabaseName
         let run = run.create spec.ProjectName spec.RunName spec.RunDescription
         runHostEvalBins.Create db spec run :> IRunHost
 

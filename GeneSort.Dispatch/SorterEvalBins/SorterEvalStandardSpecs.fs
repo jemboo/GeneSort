@@ -11,7 +11,7 @@ open GeneSort.Dispatch.V1
 open Yab
 
 
-module StandardSpecs =
+module SorterEvalStandardSpecs =
     
     let standardDataFolder = "c:\\Projects\\SorterEvalBins\\RandomSimple\\Data"
 
@@ -64,10 +64,10 @@ module StandardSpecs =
     module Specs =
 
         let Small_dev (executorType: evalExecutorType)  : runHostSpec = {
-            ProjectName = "SorterEvalBins" |> UMX.tag
+            ProjectName = Yab.projectName
+            DatabaseName = Yab.randomSimpleDatabaseName
             RunName = sprintf @"Small_Dev_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
-            DataFolder = standardDataFolder
             Spans = [
                 smallSortingWidths
                 allSimpleSorterModelTypes
@@ -79,10 +79,10 @@ module StandardSpecs =
         }
 
         let Small (executorType: evalExecutorType) : runHostSpec = {
-            ProjectName = "SorterEvalBins" |> UMX.tag
+            ProjectName = Yab.projectName
+            DatabaseName = Yab.randomSimpleDatabaseName
             RunName = sprintf @"Small_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
-            DataFolder = standardDataFolder
             Spans = [
                 smallSortingWidths
                 allSimpleSorterModelTypes
@@ -94,10 +94,10 @@ module StandardSpecs =
         }
 
         let Medium_dev (executorType: evalExecutorType) : runHostSpec = {
-            ProjectName = "SorterEvalBins" |> UMX.tag
+            ProjectName = Yab.projectName
+            DatabaseName = Yab.randomSimpleDatabaseName
             RunName = sprintf @"Medium_Dev_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
-            DataFolder = standardDataFolder
             Spans = [
                 mediumSortingWidths
                 allSimpleSorterModelTypes
@@ -109,10 +109,10 @@ module StandardSpecs =
         }
 
         let Medium (executorType: evalExecutorType) : runHostSpec = {
-            ProjectName = "SorterEvalBins" |> UMX.tag
+            ProjectName = Yab.projectName
+            DatabaseName = Yab.randomSimpleDatabaseName
             RunName = sprintf @"Medium_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
-            DataFolder = standardDataFolder
             Spans = [
                 mediumSortingWidths
                 allSimpleSorterModelTypes

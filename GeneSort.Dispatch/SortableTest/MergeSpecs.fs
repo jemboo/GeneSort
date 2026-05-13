@@ -65,10 +65,10 @@ module SortableMergeSpecs =
     module Specs =
 
         let Merge_dev  (executorType: executorType) : runHostSpec = {
-            ProjectName = "SortableTest" |> UMX.tag
+            ProjectName = yab.projectName
+            DatabaseName = yab.mergeDatabaseName
             RunName = sprintf @"Merge_Dev%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
-            DataFolder = yab.databaseFolder
             Spans = [
                 smallSortingWidths
                 allDataFormats
@@ -82,10 +82,10 @@ module SortableMergeSpecs =
 
 
         let Merge_small (executorType: executorType) : runHostSpec = {
-            ProjectName = "SortableTest" |> UMX.tag
+            ProjectName = yab.projectName
+            DatabaseName = yab.mergeDatabaseName
             RunName = sprintf @"Merge_Prod%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
-            DataFolder = yab.databaseFolder
             Spans = [
                 allSortingWidths
                 allDataFormats

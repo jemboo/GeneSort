@@ -39,7 +39,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executorType = SortableTest.executorType.Merge
 //let host: IRunHost = 
 //    match SortableTest.SortableMergeSpecs.Configs |> Map.tryFind configKey with
-//    | Some s -> SortableTest.RunHostSortableTest.createRunHost (s executorType)
+//    | Some s -> SortableTest.RunHostSortableMergeTest.createRunHost (s executorType)
 //    | None -> failwithf "Config key '%s' not found." configKey
 
 //let executor = SortableTest.SortableTestExecutor.getExecutor executorType
@@ -48,7 +48,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 let configKey = "Small_dev" 
 let executorType = evalExecutorType.Standard
 let host: IRunHost = 
-    match SorterEvalBins.SorterMergeSpecs.Configs |> Map.tryFind configKey with
+    match SorterEvalBins.SorterEvalMergeSpecs.Configs |> Map.tryFind configKey with
     | Some s -> RunHostEvalBins.createRunHost (s executorType)
     | None -> failwithf "Config key '%s' not found." configKey
 
@@ -61,49 +61,8 @@ let maxReplica = 1<replNumber>
 
 
 
-//async {
-//    printfn "Init Project: %s" %host.Run.ProjectName
-    
-//    let! initResult = 
-//        ParamOps.initProjectAndRunFiles
-//            host.ProjectDb           
-//            host.MakeQueryParamsFromRunParams 
-//            cts 
-//            (Some progress) 
-//            host.Run              
-//            minReplica 
-//            maxReplica 
-//            host.AllowOverwrite 
-//            host.ParamMapRefiner      
-//            host.ParameterSpans
-
-//    match initResult with
-//    | Error e -> printfn "Init Failure: %s" e
-//    | Ok () ->
-//        let! execResult = 
-//            ProjectOps.executeRuns 
-//                host.ProjectDb      
-//                minReplica 
-//                maxReplica 
-//                host.MakeQueryParamsFromRunParams 
-//                host.Run.RunName 
-//                host.AllowOverwrite 
-//                cts 
-//                (Some progress)
-//                host
-//                executor
-//                maxParallel
-
-//        match execResult with
-//        | Ok results -> printfn "Success: %d records processed." results.Length
-//        | Error e -> printfn "Runtime Error: %s" e
-
-//} |> Async.RunSynchronously
-
-
-
 async {
-    printfn "Init Run: %s" %host.Run.RunName
+    printfn "Init Project: %s" %host.Run.ProjectName
     
     let! initResult = 
         ParamOps.initProjectAndRunFiles
@@ -120,10 +79,51 @@ async {
 
     match initResult with
     | Error e -> printfn "Init Failure: %s" e
-    | Ok () -> printfn "Init Success: %s" %host.Run.RunName
+    | Ok () ->
+        let! execResult = 
+            ProjectOps.executeRuns 
+                host.ProjectDb      
+                minReplica 
+                maxReplica 
+                host.MakeQueryParamsFromRunParams 
+                host.Run.RunName 
+                host.AllowOverwrite 
+                cts 
+                (Some progress)
+                host
+                executor
+                maxParallel
 
+        match execResult with
+        | Ok results -> printfn "Success: %d records processed." results.Length
+        | Error e -> printfn "Runtime Error: %s" e
 
 } |> Async.RunSynchronously
+
+
+
+//async {
+//    printfn "Init Run: %s" %host.Run.RunName
+    
+//    let! initResult = 
+//        ParamOps.initProjectAndRunFiles
+//            host.ProjectDb           
+//            host.MakeQueryParamsFromRunParams 
+//            cts 
+//            (Some progress) 
+//            host.Run              
+//            minReplica 
+//            maxReplica 
+//            host.AllowOverwrite 
+//            host.ParamMapRefiner      
+//            host.ParameterSpans
+
+//    match initResult with
+//    | Error e -> printfn "Init Failure: %s" e
+//    | Ok () -> printfn "Init Success: %s" %host.Run.RunName
+
+
+//} |> Async.RunSynchronously
 
 
 //async {

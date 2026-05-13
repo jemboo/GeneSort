@@ -37,3 +37,8 @@ type IGeneSortDb =
                         IProgress<string> option -> 
                                 Async<Result<unit, string>>
 
+    abstract member MakeQueryParamsFromRunParams :
+                        runParameters ->
+                        outputDataType ->
+                        queryParams
+

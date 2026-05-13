@@ -11,7 +11,9 @@ type private DbMessage =
     | Load of string<pathToRootFolder> * queryParams * AsyncReplyChannel<Result<outputData, string>>
     | GetRunParameters of string<runName> * (int<replNumber> option) * (int<replNumber> option) * CancellationToken option * IProgress<string> option * AsyncReplyChannel<Result<runParameters[], string>>
 
-type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
+type GeneSortDbMp(
+                rootFolder: string<pathToRootFolder>,
+                queryParamsMaker: runParameters -> outputDataType -> queryParams) =
 
 
     let mailbox = MailboxProcessor.Start(fun inbox ->
@@ -34,10 +36,14 @@ type GeneSortDbMp(rootFolder: string<pathToRootFolder>) =
     )
 
     member _.RootFolder = rootFolder
+    member _.QueryParamsMaker = queryParamsMaker
 
     interface IGeneSortDb with
         member _.databaseName
             with get (): string<databaseName> = DirectoryInfo(%rootFolder).Name |> UMX.tag
+
+        member _.MakeQueryParamsFromRunParams rp odt =
+            queryParamsMaker rp odt
 
         member _.saveAsync
                     (queryParams: queryParams)

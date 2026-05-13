@@ -8,9 +8,10 @@ open GeneSort.Project.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Sorting.Sortable
 open GeneSort.FileDb.V1
+open yab
 
 
-type runHostSortableTest = 
+type runHostSortableMergeTest = 
     private { 
         _projectDb: IGeneSortDb 
         _parameterSpans: (string * string list) list
@@ -94,14 +95,12 @@ type runHostSortableTest =
 
 
 
-module RunHostSortableTest =
+module RunHostSortableMergeTest =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
-        let folder = spec.DataFolder |> UMX.tag
-        let db = new GeneSortDbMp(folder) :> IGeneSortDb
+        let db = getDatabaseByName spec.DatabaseName
         let run = run.create spec.ProjectName spec.RunName spec.RunDescription
-        runHostSortableTest.Create db spec run :> IRunHost
-
+        runHostSortableMergeTest.Create db spec run :> IRunHost
 
 
     let loadSortableTest 
@@ -112,5 +111,5 @@ module RunHostSortableTest =
                     (mergeFillType: mergeSuffixType option)
                     (sortableDataFormat: sortableDataFormat option) 
                         : Async<Result<sortableTest, string>> =
-        let concreteHost = host :?> runHostSortableTest
+        let concreteHost = host :?> runHostSortableMergeTest
         concreteHost.getSortableMergeTest repl sortingWidth mergeDimension mergeFillType sortableDataFormat

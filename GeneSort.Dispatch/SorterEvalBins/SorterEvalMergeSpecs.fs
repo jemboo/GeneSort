@@ -7,7 +7,7 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SortableTest
 
-module SorterMergeSpecs =
+module SorterEvalMergeSpecs =
 
     let mergeDataFolder = "c:\\Projects\\SorterEvalBins\\RandomMerge\\Data"
 
@@ -78,10 +78,10 @@ module SorterMergeSpecs =
     module Specs =
 
         let Small_Dev (executorType: evalExecutorType) : runHostSpec = {
-            ProjectName = "RandomMergeSorterBins" |> UMX.tag
+            ProjectName = Yab.projectName
+            DatabaseName = Yab.randomMergeDatabaseName
             RunName = sprintf @"Merge_P1_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
-            DataFolder = mergeDataFolder
             Spans = [
                 smallSortingWidths
                 allSimpleSorterModelTypes

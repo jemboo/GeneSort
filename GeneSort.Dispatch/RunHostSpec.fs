@@ -11,9 +11,9 @@ open GeneSort.Sorting.Sortable
 
 type runHostSpec = {
     ProjectName: string<projectName>
+    DatabaseName: string<databaseName>
     RunName: string<runName>
     RunDescription: string
-    DataFolder: string
     Spans: (string * string list) list
     // Logic Callbacks
     Filter: runParameters -> runParameters option
