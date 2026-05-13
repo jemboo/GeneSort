@@ -23,7 +23,8 @@
     <Compile Include="ProjectOps.fs" />
     <Compile Include="RunHostSpec.fs" />
     <Compile Include="SortableTest\Common.fs" />
-    <Compile Include="SortableTest\RunHostSortableMergeTest.fs" />
+    <Compile Include="SortableTest\ProjectDb.fs" />
+    <Compile Include="SortableTest\RunHostSortableTest.fs" />
     <Compile Include="SortableTest\SortableTestExecutor.fs" />
     <Compile Include="SortableTest\MergeSpecs.fs" />
     <Compile Include="SorterEvalBins\Common.fs" />

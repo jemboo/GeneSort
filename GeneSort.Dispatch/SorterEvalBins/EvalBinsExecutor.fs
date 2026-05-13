@@ -2,6 +2,7 @@
 
 open System
 open System.Threading
+open FsToolkit.ErrorHandling
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
@@ -16,50 +17,41 @@ open GeneSort.Model.Sortable.V1
 open GeneSort.Model.Sorting.Simple.V1
 open Yab
 
-
 module EvalBinsExecutor =
 
-
-    let makeStandardTests (rp:runParameters) : Sortable.sortableTest option =
-        maybe {
-            let! sortingWidth = rp.GetSortingWidth()
-            let! qpTests = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SortableTest "")
-            let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-            return SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel standardSortableDataFormat
+    let makeStandardTests (rp:runParameters) : Async<Result<Sortable.sortableTest, string>> =
+        async {
+            let paramsOpt = option {
+                let! sortingWidth = rp.GetSortingWidth()
+                let! qpTests = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SortableTest "")
+                return (sortingWidth, qpTests)
+            }
+            match paramsOpt with
+            | Some (sortingWidth, qpTests) ->
+                let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
+                return Ok (SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel standardSortableDataFormat)
+            | None ->
+                return Error "Failed: One or more RunParameters for StandardTests were missing."
         }
 
 
-    //let makeMergeTests (rp:runParameters) : Sortable.sortableTest option =
-    //    maybe {
-    //        let! sortingWidth = rp.GetSortingWidth()
-    //        let! sdt = rp.GetSortableDataFormat()
-    //        let! md = rp.GetMergeDimension()
-    //        let! mst = rp.GetMergeSuffixType()
-    //        let! qpTests = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SortableTest "")
-    //        let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-    //        return SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel mergeSortableDataFormat
-    //    }
+    let makeMergeTests (rp: runParameters) : Async<Result<Sortable.sortableTest, string>> =
+        async {
+            let paramsOpt = option {
+                let! repl = rp.GetRepl()
+                let! sw = rp.GetSortingWidth()
+                let! md = rp.GetMergeDimension()
+                let! mst = rp.GetMergeSuffixType()
+                let! sdf = rp.GetSortableDataFormat()
+                return (repl, sw, md, mst, sdf)
+            }
 
-    let makeMergeTests (rp:runParameters) : Sortable.sortableTest option =
-        maybe {
-                // 1. Safe extraction
-                let! (sortingWidth, mergeDim, mergeSufixType, sortableDataFormat) = 
-                    maybe {
-                        let! width = rp.GetSortingWidth()
-                        let! mergeDim = rp.GetMergeDimension()
-                        let! suffixFill = rp.GetMergeSuffixType()
-                        let! dataFormat = rp.GetSortableDataFormat()
-                        return (width, mergeDim, suffixFill, dataFormat)
-                    }
-
-                // 3. Create SortableTestModel
-                let sortableTestModel = msasM.create sortingWidth mergeDim mergeSufixType |> sortableTestModel.MsasMi
-            
-                let! qpForSortableTest = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SortableTest "") 
-                return SortableTestModel.makeSortableTest 
-                                            (%qpForSortableTest.Id |> UMX.tag) 
-                                            sortableTestModel 
-                                            sortableDataFormat
+            match paramsOpt with
+            | Some (repl, sw, md, mst, sdf) ->
+                return! GeneSort.Dispatch.V1.SortableTest.ProjectDb.getMergeSorterTestSet 
+                            (Some repl) (Some sw) (Some md) (Some mst) (Some sdf)   
+            | None ->
+                return Error "Failed: One or more RunParameters for MergeTests were missing."
         }
 
 
@@ -74,18 +66,17 @@ module EvalBinsExecutor =
             let  rngFactory = projectRngType |> RngFactory.create
             let firstIdx = (%repl * %sorterCount) |> UMX.tag<sorterCount>
             let sorterModelGen = SimpleSorterModelGen.makeUniform 
-                                        rngFactory 
-                                        sortingWidth 
-                                        stageLength 
-                                        simpleSorterModelType
-                                        ExcludeSelfCe
+                                    rngFactory 
+                                    sortingWidth 
+                                    stageLength 
+                                    simpleSorterModelType
+                                    ExcludeSelfCe
                                  |> sorterModelGen.Simple
 
             let! qpModelSet = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
             return SorterModelGen.makeSorterModelSet 
                             (%qpModelSet.Id |> UMX.tag) firstIdx sorterCount sorterModelGen
         }
-
 
     let makeMergeSorterModelSet (rp:runParameters) : sorterModelSet option =
         maybe {
@@ -97,11 +88,11 @@ module EvalBinsExecutor =
             let  rngFactory = projectRngType |> RngFactory.create
             let firstIdx = (%repl * %sorterCount) |> UMX.tag<sorterCount>
             let sorterModelGen = SimpleSorterModelGen.makeUniform 
-                                        rngFactory
-                                        sortingWidth 
-                                        stageLength 
-                                        simpleSorterModelType
-                                        ExcludeSelfCe
+                                    rngFactory
+                                    sortingWidth 
+                                    stageLength 
+                                    simpleSorterModelType
+                                    ExcludeSelfCe
                                  |> sorterModelGen.Simple
 
             let! qpModelSet = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
@@ -110,50 +101,49 @@ module EvalBinsExecutor =
         }
 
 
-
     let _makeSorterEvalBins 
             (makeSorterModelSet: runParameters -> sorterModelSet option)
-            (makeTests: runParameters -> Sortable.sortableTest option)
+            (makeTests: runParameters -> Async<Result<Sortable.sortableTest, string>>)
             (host: IRunHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
             (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
     
-        // Local reporting helper 
         let log msg = OpsUtils.report progress (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
                 // 1. Initial Check & Sorter Model Creation
-                let! (_: unit) = checkCancellation cts.Token
+                do! checkCancellation cts.Token
                 log "Creating Sorter Model Set..."
             
                 let! modelSet = 
-                    makeSorterModelSet rp 
-                    |> Result.ofOption "Failed: SorterModelSet could not be initialized."
+                        makeSorterModelSet rp 
+                        |> Result.ofOption "Failed: SorterModelSet could not be initialized."
             
                 let fullSorterSet = SorterModelSet.makeSorterSet (%modelSet.Id |> UMX.tag) modelSet
                 log (sprintf "Success: Created SorterSet %A" modelSet.Id)
 
-                // 2. Test Generation
-                let! (_: unit) = checkCancellation cts.Token
+                // 2. Test Generation (Now non-blocking Async)
+                do! checkCancellation cts.Token
                 log "Generating Sortable Tests..."
             
-                let! tests = 
-                    makeTests rp 
-                    |> Result.ofOption "Failed: SortableTests could not be generated."
+                let! tests = makeTests rp 
             
                 // 3. Evaluation & Binning
                 log "Running Sorter Evaluations ..."
             
-                let! qpEval = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
-                             |> Result.ofOption "Failed: SorterSetEval query parameters could not be generated."
+                let! qpEval = 
+                    ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                    |> Result.ofOption "Failed: SorterSetEval query parameters could not be generated."
+
                 let collectTests = Yab.CollectSortableTests
                 let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSet tests collectTests
 
-                let! qpBins = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
-                             |> Result.ofOption "Failed: SorterEvalBins query parameters could not be generated."
+                let! qpBins = 
+                    ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
+                    |> Result.ofOption "Failed: SorterEvalBins query parameters could not be generated."
 
                 let binsV1 = sorterEvalBinsV1.createFromEvals 
                                 (%qpBins.Id |> UMX.tag) 
@@ -171,10 +161,9 @@ module EvalBinsExecutor =
 
             with e -> 
                 let errorMsg = sprintf "Fatal Error in %s: %s" (rp |> RunParameters.getIdString) e.Message
-                log errorMsg // Ensure the error is also sent to the progress stream
-                return! Error errorMsg |> async.Return
+                log errorMsg 
+                return! Error errorMsg
         }
-
 
     let makeFullReport 
             (host: IRunHost)
@@ -184,16 +173,14 @@ module EvalBinsExecutor =
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
         asyncResult {
             try
-                let! (_: unit) = checkCancellation cts.Token
+                do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
     
-                // 1. Load SorterEvalBins
                 let qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
-                let! (outB:outputData) = host.ProjectDb.loadAsync qpBins
-                let! bins = outB  |> OutputData.asSorterEvalBins
+                let! outB = host.ProjectDb.loadAsync qpBins
+                let! bins = outB |> OutputData.asSorterEvalBins |> Async.singleton
 
-                // 2. Make report
                 let reportName = sprintf "FullReport" |> UMX.tag<textReportName>
                 let qpReport = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
@@ -201,13 +188,11 @@ module EvalBinsExecutor =
                 let dtrs = dataTableRecord.combineWithMany details leadCols
                 let report = DataTableReport.fromDataTableRecords dtrs
 
-                //// 3. Save report (Using Host DB)
-                let! (_: unit) = host.ProjectDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
+                let! (_:unit) = host.ProjectDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
                 return rp.WithRunFinished (Some true)
             with e -> 
-               return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message) |> async.Return
+               return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
         }
-
 
     let makeBinsReport 
             (host: IRunHost)
@@ -217,16 +202,14 @@ module EvalBinsExecutor =
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
         asyncResult {
             try
-                let! (_: unit) = checkCancellation cts.Token
+                do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Bins Report for Run %s" (MathUtils.getTimestampString()) %runId)
     
-                // 1. Load SorterEvalBins
                 let qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
-                let! (outB:outputData) = host.ProjectDb.loadAsync qpBins
-                let! bins = outB  |> OutputData.asSorterEvalBins
+                let! outB = host.ProjectDb.loadAsync qpBins
+                let! bins = outB |> OutputData.asSorterEvalBins |> Async.singleton
 
-                // 2. Make report
                 let reportName = sprintf "BinsReport" |> UMX.tag<textReportName>
                 let qpReport = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
@@ -234,15 +217,11 @@ module EvalBinsExecutor =
                 let dtrs = dataTableRecord.combineWithMany details leadCols
                 let report = DataTableReport.fromDataTableRecords dtrs
 
-                //// 3. Save report (Using Host DB)
-                let! (_: unit) = host.ProjectDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
+                let! (_:unit) = host.ProjectDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
                 return rp.WithRunFinished (Some true)
             with e -> 
-               return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message) |> async.Return
+               return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
         }
-
-
-
 
     let standardExecutor =
         { new IRunParamsExecutor with
@@ -252,7 +231,6 @@ module EvalBinsExecutor =
                     makeStandardTests
                     host rp allowOverwrite cts progress }
 
-
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
@@ -261,13 +239,11 @@ module EvalBinsExecutor =
                     makeMergeTests
                     host rp allowOverwrite cts progress }
 
-
     let binsReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 makeBinsReport
                     host rp allowOverwrite cts progress }
-
 
     let fullReportExecutor =
         { new IRunParamsExecutor with
@@ -275,13 +251,9 @@ module EvalBinsExecutor =
                 makeFullReport
                     host rp allowOverwrite cts progress }
 
-
-
     let getExecutor (executorType: evalExecutorType) : IRunParamsExecutor =
         match executorType with
         | Standard -> standardExecutor
         | Merge -> mergeExecutor
         | FullReport -> fullReportExecutor
         | BinsReport -> binsReportExecutor
-
-
