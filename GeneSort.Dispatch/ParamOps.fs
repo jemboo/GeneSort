@@ -2,7 +2,6 @@
 open System
 open System.Threading
 open FSharp.UMX
-open GeneSort.Db
 open GeneSort.Core
 open OpsUtils
 open GeneSort.Db.V1

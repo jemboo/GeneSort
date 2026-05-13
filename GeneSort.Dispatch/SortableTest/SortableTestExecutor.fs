@@ -8,6 +8,7 @@ open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
+open GeneSort.Dispatch.V1.OpsUtils
 
 
 module SortableTestExecutor =
@@ -20,12 +21,16 @@ module SortableTestExecutor =
         (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
         // Local reporting helper 
-        let log msg = OpsUtils.report progress (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+        let log msg = OpsUtils.report 
+                            progress 
+                            (sprintf "%s [%s] %s" 
+                            (MathUtils.getTimestampString()) 
+                            (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
                 // 1. Initial Check & Sorter Model Creation
-                let! (_: unit) = checkCancellation cts.Token
+                do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
                 log "Creating SortableTest..."
 
@@ -49,16 +54,15 @@ module SortableTestExecutor =
                                             sortableDataFormat
 
                 // 4. Save
-
                 log (sprintf "Saving SortableTest %s" (string %qpForSortableTest.Id))
 
-                let! (_: unit) = host.ProjectDb.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
+                do! host.ProjectDb.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
                 
                 log "Run Complete."
                 return rp.WithRunFinished (Some true)
             with e -> 
                 return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message) |> async.Return
-        }
+        } |> Async.map (logResult progress log)
 
 
 

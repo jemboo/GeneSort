@@ -22,6 +22,15 @@ module ProjectDb =
                (runParameters.rngTypeKey, rng |> RngType.toString) |]
 
 
+    let makeStandardQueryParamsFromRunParams (rp: runParameters) (odt: outputDataType) : queryParams option =
+        maybe {
+            let! repl = rp.GetRepl()
+            let! sw = rp.GetSortingWidth()
+            let! smt = rp.GetSimpleSorterModelType()
+            let! rng = rp.GetRngType()
+            return makeStandardQueryParams repl sw smt rng odt
+        }
+
 
     let makeMergeQueryParams
                     (repl: int<replNumber>) 
@@ -36,28 +45,14 @@ module ProjectDb =
                (runParameters.mergeSuffixTypeKey, mst |> MergeSuffixType.toString);
                (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) |]  
 
-
-
-    let makeQueryParamsFromRunParams (rp: runParameters) (odt: outputDataType) : queryParams option =
+    let makeMergeQueryParamsFromRunParams (rp: runParameters) (odt: outputDataType) : queryParams option =
         maybe {
-            // Common parameters: if these are missing, we definitely want None
             let! repl = rp.GetRepl()
             let! sw = rp.GetSortingWidth()
+            let! md = rp.GetMergeDimension()
+            let! mst = rp.GetMergeSuffixType()
             let! smt = rp.GetSimpleSorterModelType()
-
-            // Use standard pattern matching for the branching logic
-            // We don't use let! on RngType because its absence isn't necessarily a failure
-            return! 
-                match rp.GetRngType() with
-                | Some rng -> 
-                    // Standard Path
-                    Some (makeStandardQueryParams repl sw smt rng odt)
-            
-                | None -> 
-                    // Merge Path - we nested another maybe block here or just use Option.map
-                    maybe {
-                        let! md = rp.GetMergeDimension()
-                        let! mst = rp.GetMergeSuffixType()
-                        return makeMergeQueryParams repl sw md mst smt odt
-                    }
+            return makeMergeQueryParams repl sw md mst smt odt
         }
+
+

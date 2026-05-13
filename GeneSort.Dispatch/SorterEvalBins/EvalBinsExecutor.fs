@@ -16,6 +16,7 @@ open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
 open GeneSort.Model.Sorting.Simple.V1
 open Yab
+open GeneSort.Dispatch.V1.OpsUtils
 
 module EvalBinsExecutor =
 
@@ -23,7 +24,7 @@ module EvalBinsExecutor =
         async {
             let paramsOpt = option {
                 let! sortingWidth = rp.GetSortingWidth()
-                let! qpTests = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SortableTest "")
+                let! qpTests = ProjectDb.makeStandardQueryParamsFromRunParams rp (outputDataType.SortableTest "")
                 return (sortingWidth, qpTests)
             }
             match paramsOpt with
@@ -73,7 +74,7 @@ module EvalBinsExecutor =
                                     ExcludeSelfCe
                                  |> sorterModelGen.Simple
 
-            let! qpModelSet = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
+            let! qpModelSet = ProjectDb.makeStandardQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
             return SorterModelGen.makeSorterModelSet 
                             (%qpModelSet.Id |> UMX.tag) firstIdx sorterCount sorterModelGen
         }
@@ -95,7 +96,7 @@ module EvalBinsExecutor =
                                     ExcludeSelfCe
                                  |> sorterModelGen.Simple
 
-            let! qpModelSet = ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
+            let! qpModelSet = ProjectDb.makeMergeQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
             return SorterModelGen.makeSorterModelSet 
                             (%qpModelSet.Id |> UMX.tag) firstIdx sorterCount sorterModelGen
         }
@@ -134,16 +135,12 @@ module EvalBinsExecutor =
                 // 3. Evaluation & Binning
                 log "Running Sorter Evaluations ..."
             
-                let! qpEval = 
-                    ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
-                    |> Result.ofOption "Failed: SorterSetEval query parameters could not be generated."
+                let qpEval = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
 
                 let collectTests = Yab.CollectSortableTests
                 let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSet tests collectTests
 
-                let! qpBins = 
-                    ProjectDb.makeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
-                    |> Result.ofOption "Failed: SorterEvalBins query parameters could not be generated."
+                let qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
 
                 let binsV1 = sorterEvalBinsV1.createFromEvals 
                                 (%qpBins.Id |> UMX.tag) 
@@ -154,7 +151,7 @@ module EvalBinsExecutor =
 
                 // 4. Persistence
                 log (sprintf "Saving SorterEvalBins %s" (string %qpBins.Id))
-                let! (_:unit) = host.ProjectDb.saveAsync qpBins (sorterEvalBins |> outputData.SorterEvalBins) allowOverwrite
+                do! host.ProjectDb.saveAsync qpBins (sorterEvalBins |> outputData.SorterEvalBins) allowOverwrite
             
                 log "Run Complete."
                 return rp.WithRunFinished (Some true)
@@ -163,7 +160,9 @@ module EvalBinsExecutor =
                 let errorMsg = sprintf "Fatal Error in %s: %s" (rp |> RunParameters.getIdString) e.Message
                 log errorMsg 
                 return! Error errorMsg
-        }
+        } |> Async.map (logResult progress log)
+
+
 
     let makeFullReport 
             (host: IRunHost)
@@ -193,6 +192,7 @@ module EvalBinsExecutor =
             with e -> 
                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
         }
+
 
     let makeBinsReport 
             (host: IRunHost)

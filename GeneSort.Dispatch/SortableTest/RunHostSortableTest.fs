@@ -44,15 +44,3 @@ module RunHostSortableTest =
         let db = getDatabaseByName spec.DatabaseName
         let run = run.create spec.ProjectName spec.RunName spec.RunDescription
         runHostSortableTest.Create db spec run :> IRunHost
-
-
-    //let loadSortableTest 
-    //                (host: IRunHost) 
-    //                (repl: int<replNumber> option) 
-    //                (sortingWidth: int<sortingWidth> option)
-    //                (mergeDimension: int<mergeDimension> option) 
-    //                (mergeFillType: mergeSuffixType option)
-    //                (sortableDataFormat: sortableDataFormat option) 
-    //                    : Async<Result<sortableTest, string>> =
-    //    let concreteHost = host :?> runHostSortableMergeTest
-    //    concreteHost.getSortableMergeTest repl sortingWidth mergeDimension mergeFillType sortableDataFormat

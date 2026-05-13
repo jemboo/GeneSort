@@ -13,6 +13,12 @@ module OpsUtils =
         progress |> Option.iter (fun p -> p.Report msg)
 
 
+    let logResult progress logFn result =
+        match result with
+        | Error msg -> logFn msg; Error msg
+        | Ok w -> Ok w
+
+
     let makeErrorTable (failures: (runParameters * string) list) : string [] =
         let mutable modRunParameters = []
 
