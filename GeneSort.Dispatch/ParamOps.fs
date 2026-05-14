@@ -12,26 +12,31 @@ module ParamOps =
     let saveParametersFiles
             (db: IGeneSortDb)
             (runParameterArray: runParameters[])
-            (buildQueryParams: runParameters -> outputDataType -> queryParams option)
-            (allowOverwrite: bool<allowOverwrite>)
-            (cts: CancellationTokenSource)
-            (progress: IProgress<string> option) : Async<Result<unit, string>> =
+            (allowOverwrite: bool<allowOverwrite>) 
+            (progress: IProgress<string> option): Async<Result<unit, string>> =
         async {
             try
                 report progress (sprintf "%s Saving RunParameter files in %s" (MathUtils.getTimestampString()) %db.databaseName)
-                cts.Token.ThrowIfCancellationRequested()
-                let! res = db.saveRunParameters runParameterArray buildQueryParams allowOverwrite (Some cts.Token) progress
-                match res with
-                | Ok () -> 
-                    report progress (sprintf "%s Successfully saved %d RunParameter files" 
-                                        (MathUtils.getTimestampString()) runParameterArray.Length)
-                    return Ok ()
-                | Error msg -> return Error msg
+
+                let saveResults = 
+                    runParameterArray
+                    |> Array.map (fun rp -> 
+                        let runName = rp.GetRunName() |> Option.defaultValue ("UnknownRun" |> UMX.tag<runName>)
+                        let queryParamsOpt = db.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters runName)
+                        match queryParamsOpt with
+                        | Some qp -> db.saveAsync qp (outputData.RunParameters rp) allowOverwrite
+                        | None -> async { return Error (sprintf "Failed to create query parameters for run parameters: %A" rp) })
+                    |> Async.Parallel
+
+                return! saveResults
+                    |> Async.map (fun results ->
+                        results
+                        |> Array.tryFind (function Error _ -> true | Ok _ -> false)
+                        |> function
+                            | Some (Error err) -> Error err
+                            | _ -> Ok ())
+
             with
-            | :? OperationCanceledException ->
-                let msg = "Saving RunParameter files was cancelled"
-                report progress msg
-                return Error msg
             | e ->
                 let msg = sprintf "%s Failed to save RunParameter files in %s: %s" 
                                         (MathUtils.getTimestampString()) 
@@ -44,8 +49,6 @@ module ParamOps =
 
     let initProjectAndRunFiles
         (db: IGeneSortDb)
-        (buildQueryParams: runParameters -> outputDataType -> queryParams option)
-        (cts: CancellationTokenSource)
         (progress: IProgress<string> option)
         (run: run)
         (minReplica: int<replNumber>)
@@ -65,8 +68,8 @@ module ParamOps =
                     report progress (sprintf "%s Saving run parameters files: (%d)" (MathUtils.getTimestampString()) runParametersArray.Length)
                     return! saveParametersFiles 
                                 db
-                                runParametersArray buildQueryParams 
-                                allowOverwrite cts progress
+                                runParametersArray 
+                                allowOverwrite progress
             with e ->
                 let errorMsg = sprintf "Failed to initialize project files: %s\n" e.Message
                 report progress errorMsg
