@@ -15,7 +15,7 @@ open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
 open GeneSort.Model.Sorting.Simple.V1
-open Yab
+open Common
 open GeneSort.Dispatch.V1.OpsUtils
 
 module EvalBinsExecutor =
@@ -50,7 +50,7 @@ module EvalBinsExecutor =
             match paramsOpt with
             | Some (repl, sw, md, mst, sdf) ->
                 return! GeneSort.Dispatch.V1.SortableTest.ProjectDb.getMergeSorterTestSet 
-                            (Some repl) (Some sw) (Some md) (Some mst) (Some sdf)   
+                                        repl sw md mst sdf  
             | None ->
                 return Error "Failed: One or more RunParameters for MergeTests were missing."
         }
@@ -60,11 +60,12 @@ module EvalBinsExecutor =
         maybe {
             let! sortingWidth = rp.GetSortingWidth()
             let! simpleSorterModelType = rp.GetSimpleSorterModelType()
-            let stageLength = Yab.getStandardStageLength simpleSorterModelType sortingWidth
+            let stageLength = Common.getStandardStageLength simpleSorterModelType sortingWidth
 
             let! repl = rp.GetRepl()
             let! sorterCount = rp.GetSorterCount()
-            let  rngFactory = projectRngType |> RngFactory.create
+            let! rngType = rp.GetRngType()
+            let  rngFactory = rngType |> RngFactory.create
             let firstIdx = (%repl * %sorterCount) |> UMX.tag<sorterCount>
             let sorterModelGen = SimpleSorterModelGen.makeUniform 
                                     rngFactory 
@@ -79,14 +80,16 @@ module EvalBinsExecutor =
                             (%qpModelSet.Id |> UMX.tag) firstIdx sorterCount sorterModelGen
         }
 
+
     let makeMergeSorterModelSet (rp:runParameters) : sorterModelSet option =
         maybe {
             let! sortingWidth = rp.GetSortingWidth()
             let! simpleSorterModelType = rp.GetSimpleSorterModelType()
-            let stageLength = Yab.getMergeStageLength simpleSorterModelType sortingWidth
+            let stageLength = Common.getMergeStageLength simpleSorterModelType sortingWidth
             let! repl = rp.GetRepl()
             let! sorterCount = rp.GetSorterCount()
-            let  rngFactory = projectRngType |> RngFactory.create
+            let! rngType = rp.GetRngType()
+            let  rngFactory = rngType |> RngFactory.create
             let firstIdx = (%repl * %sorterCount) |> UMX.tag<sorterCount>
             let sorterModelGen = SimpleSorterModelGen.makeUniform 
                                     rngFactory
@@ -135,13 +138,14 @@ module EvalBinsExecutor =
                 // 3. Evaluation & Binning
                 log "Running Sorter Evaluations ..."
             
-                let qpEval = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                let! qpEval = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                             |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
 
-                let collectTests = Yab.CollectSortableTests
+                let collectTests = Common.CollectSortableTests
                 let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSet tests collectTests
 
-                let qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
-
+                let! qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
+                             |> Result.ofOption "Failed to create QueryParams for Bins."
                 let binsV1 = sorterEvalBinsV1.createFromEvals 
                                 (%qpBins.Id |> UMX.tag) 
                                 (tests |> SortableTests.getId) 
@@ -176,12 +180,14 @@ module EvalBinsExecutor =
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
     
-                let qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
+                let! qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
+                              |> Result.ofOption "Failed to create QueryParams for Bins."
                 let! outB = host.ProjectDb.loadAsync qpBins
                 let! bins = outB |> OutputData.asSorterEvalBins |> Async.singleton
 
                 let reportName = sprintf "FullReport" |> UMX.tag<textReportName>
-                let qpReport = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                let! qpReport = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                                |> Result.ofOption "Failed to create QueryParams for Report."
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
                 let details = bins |> SorterEvalBins.makeFullDataTableRecords
                 let dtrs = dataTableRecord.combineWithMany details leadCols
@@ -206,12 +212,14 @@ module EvalBinsExecutor =
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Bins Report for Run %s" (MathUtils.getTimestampString()) %runId)
     
-                let qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
-                let! outB = host.ProjectDb.loadAsync qpBins
+                let! qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
+                                    |> Result.ofOption "Failed to create QueryParams for Bins."
+                let! outB = host.ProjectDb.loadAsync qpBins 
                 let! bins = outB |> OutputData.asSorterEvalBins |> Async.singleton
 
                 let reportName = sprintf "BinsReport" |> UMX.tag<textReportName>
-                let qpReport = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                let! qpReport = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                                    |> Result.ofOption "Failed to create QueryParams for Report."
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
                 let details = bins |> SorterEvalBins.makeSummaryDataTableRecords
                 let dtrs = dataTableRecord.combineWithMany details leadCols

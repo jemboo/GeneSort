@@ -33,11 +33,11 @@ module SortableMergeSpecs =
 
 
     let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Run.ProjectName)
+        let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
         rp.WithProjectName(Some host.Run.ProjectName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
-          .WithId (Some qp.Id)
+          .WithId (Some qp.Value.Id)
 
     let private mergeDimensionDividesSortingWidth (rp: runParameters) =
         let sw = rp.GetSortingWidth().Value

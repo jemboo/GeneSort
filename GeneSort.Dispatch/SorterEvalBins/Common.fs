@@ -5,7 +5,6 @@ open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Core
 open GeneSort.Project.V1
-open GeneSort.Db.V1
 open GeneSort.FileDb.V1
 
 
@@ -24,7 +23,7 @@ module EvalExecutorType =
 
 
 
-module Yab =
+module Common =
 
     let projectName = "SorterEvalBins" |> UMX.tag<projectName>
 
@@ -40,8 +39,6 @@ module Yab =
     let randomMergeDatabaseFolder = 
                     "c:\\Projects\\SorterEvalBins\\RandomMerge\\Data"
                      |> UMX.tag<pathToRootFolder>
-
-    let projectRngType = rngType.Lcg
 
     let CollectSortableTests = true
 
@@ -90,86 +87,6 @@ module Yab =
         | _ -> failwithf "Unsupported sorting width: %d" %sw
         |> UMX.tag
 
-
-
-    let makeQueryParamsForSimple 
-                (repl: int<replNumber> option) 
-                (sortingWidth: int<sortingWidth> option)
-                (simpleSorterModelType: simpleSorterModelType option) 
-                (outputDataType: outputDataType) : queryParams =
-
-        queryParams.create 
-            projectName
-            repl 
-            outputDataType
-            [| 
-               (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
-               (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> Option.map SimpleSorterModelType.toString |> UmxExt.stringOptionToString);
-            |]
-
-
-    let makeQueryParamsFromRunParamsForSimple 
-                (runParams: runParameters) 
-                (outputDataType: outputDataType) : queryParams =
-            makeQueryParamsForSimple 
-                    (runParams.GetRepl()) 
-                    (runParams.GetSortingWidth()) 
-                    (runParams.GetSimpleSorterModelType())
-                    outputDataType
-
-
-    let makeQueryParamsForMerge
-                (repl: int<replNumber> option) 
-                (sortingWidth: int<sortingWidth> option)
-                (simpleSorterModelType: simpleSorterModelType option)
-                (mergeDimension: int<mergeDimension> option) 
-                (mergeSuffixType: mergeSuffixType option)
-                (sortableDataFormat: sortableDataFormat option) 
-                (outputDataType: outputDataType) : queryParams =
-
-        queryParams.create 
-            projectName
-            repl 
-            outputDataType
-            [| (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
-               (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> Option.map SimpleSorterModelType.toString |> UmxExt.stringOptionToString);
-               (runParameters.mergeDimensionKey, mergeDimension |> MergeDimension.toString);
-               (runParameters.mergeSuffixTypeKey, mergeSuffixType 
-                    |> Option.map MergeSuffixType.toString |> UmxExt.stringOptionToString );
-               (runParameters.sortableDataFormatKey, sortableDataFormat 
-                    |> Option.map SortableDataFormat.toString |> UmxExt.stringOptionToString ); |]
-
-
-    let makeQueryParamsFromRunParamsForMerge
-                (runParams: runParameters) 
-                (outputDataType: outputDataType) : queryParams =
-            makeQueryParamsForMerge 
-                    (runParams.GetRepl()) 
-                    (runParams.GetSortingWidth()) 
-                    (runParams.GetSimpleSorterModelType()) 
-                    (runParams.GetMergeDimension())
-                    (runParams.GetMergeSuffixType()) 
-                    (runParams.GetSortableDataFormat()) 
-                    outputDataType
-
-
-
-    let randomSimpleDb = new GeneSortDbMp(randomSimpleDatabaseFolder, 
-                                makeQueryParamsFromRunParamsForSimple)
-
-    let randomMergeDb = new GeneSortDbMp(randomMergeDatabaseFolder, 
-                                makeQueryParamsFromRunParamsForMerge)
-
-    let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
-        [ (randomSimpleDatabaseName, randomSimpleDb :> IGeneSortDb);
-          (randomMergeDatabaseName, randomMergeDb :> IGeneSortDb) ]
-        |> Map.ofList
-
-
-    let getDatabaseByName (name: string<databaseName>) : IGeneSortDb =
-        match databaseConfigs.TryFind name with
-        | Some db -> db
-        | None -> failwithf "Database with name %s not found" (UMX.untag name)
 
 
 

@@ -8,13 +8,15 @@ open GeneSort.Project.V1
 open GeneSort.FileDb.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
-open Yab
+open Common
 
 
 module SorterEvalSimpleSpecs =
     
     let standardDataFolder = "c:\\Projects\\SorterEvalBins\\RandomSimple\\Data"
-
+    let rngTypes = 
+            (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
+    
     //let smallSortingWidths = 
     //        (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
     let smallSortingWidths = 
@@ -36,14 +38,11 @@ module SorterEvalSimpleSpecs =
 
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let sw = rp.GetSortingWidth().Value
-        let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters %host.Run.ProjectName)
-        
+        let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
         rp.WithProjectName(Some host.Run.ProjectName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
-          .WithRngType(Some Yab.projectRngType)
-          .WithId (Some qp.Id)
+          .WithId (Some qp.Value.Id)
 
     
     let private standardSorterModelTypeFilter (rp: runParameters) =
@@ -64,11 +63,12 @@ module SorterEvalSimpleSpecs =
     module Specs =
 
         let Small_dev (executorType: evalExecutorType)  : runHostSpec = {
-            ProjectName = Yab.projectName
-            DatabaseName = Yab.randomSimpleDatabaseName
+            ProjectName = Common.projectName
+            DatabaseName = Common.randomSimpleDatabaseName
             RunName = sprintf @"Small_Dev_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
+                rngTypes
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 testSorterCount
@@ -79,11 +79,12 @@ module SorterEvalSimpleSpecs =
         }
 
         let Small (executorType: evalExecutorType) : runHostSpec = {
-            ProjectName = Yab.projectName
-            DatabaseName = Yab.randomSimpleDatabaseName
+            ProjectName = Common.projectName
+            DatabaseName = Common.randomSimpleDatabaseName
             RunName = sprintf @"Small_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
+                rngTypes
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 largeSorterCount
@@ -94,11 +95,12 @@ module SorterEvalSimpleSpecs =
         }
 
         let Medium_dev (executorType: evalExecutorType) : runHostSpec = {
-            ProjectName = Yab.projectName
-            DatabaseName = Yab.randomSimpleDatabaseName
+            ProjectName = Common.projectName
+            DatabaseName = Common.randomSimpleDatabaseName
             RunName = sprintf @"Medium_Dev_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
+                rngTypes
                 mediumSortingWidths
                 allSimpleSorterModelTypes
                 testSorterCount
@@ -109,11 +111,12 @@ module SorterEvalSimpleSpecs =
         }
 
         let Medium (executorType: evalExecutorType) : runHostSpec = {
-            ProjectName = Yab.projectName
-            DatabaseName = Yab.randomSimpleDatabaseName
+            ProjectName = Common.projectName
+            DatabaseName = Common.randomSimpleDatabaseName
             RunName = sprintf @"Medium_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
+                rngTypes
                 mediumSortingWidths
                 allSimpleSorterModelTypes
                 mediumSorterCount

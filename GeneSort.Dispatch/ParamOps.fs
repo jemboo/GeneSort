@@ -12,7 +12,7 @@ module ParamOps =
     let saveParametersFiles
             (db: IGeneSortDb)
             (runParameterArray: runParameters[])
-            (buildQueryParams: runParameters -> outputDataType -> queryParams)
+            (buildQueryParams: runParameters -> outputDataType -> queryParams option)
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource)
             (progress: IProgress<string> option) : Async<Result<unit, string>> =
@@ -44,7 +44,7 @@ module ParamOps =
 
     let initProjectAndRunFiles
         (db: IGeneSortDb)
-        (buildQueryParams: runParameters -> outputDataType -> queryParams)
+        (buildQueryParams: runParameters -> outputDataType -> queryParams option)
         (cts: CancellationTokenSource)
         (progress: IProgress<string> option)
         (run: run)

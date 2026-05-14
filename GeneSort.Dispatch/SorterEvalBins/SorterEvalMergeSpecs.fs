@@ -10,7 +10,9 @@ open GeneSort.Dispatch.V1.SortableTest
 module SorterEvalMergeSpecs =
 
     let mergeDataFolder = "c:\\Projects\\SorterEvalBins\\RandomMerge\\Data"
-
+    let rngTypes = 
+            (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
+    
     let smallSortingWidths = SortableMergeSpecs.smallSortingWidths
 
     let allSortingWidths = SortableMergeSpecs.allSortingWidths
@@ -33,10 +35,8 @@ module SorterEvalMergeSpecs =
 
 
     let private mergeEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let sw = rp.GetSortingWidth().Value
-        let smt = rp.GetSimpleSorterModelType().Value
         let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
-
+                 |> Option.get
         rp.WithProjectName(Some host.Run.ProjectName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
@@ -78,11 +78,12 @@ module SorterEvalMergeSpecs =
     module Specs =
 
         let Small_Dev (executorType: evalExecutorType) : runHostSpec = {
-            ProjectName = Yab.projectName
-            DatabaseName = Yab.randomMergeDatabaseName
+            ProjectName = Common.projectName
+            DatabaseName = Common.randomMergeDatabaseName
             RunName = sprintf @"Merge_P1_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
+                rngTypes
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 smallMergeDimensions

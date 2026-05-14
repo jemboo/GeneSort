@@ -35,24 +35,24 @@ let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
-//let configKey = "Merge_dev" 
-//let executorType = SortableTest.executorType.Merge
-//let host: IRunHost = 
-//    match SortableTest.SortableMergeSpecs.Configs |> Map.tryFind configKey with
-//    | Some s -> SortableTest.RunHostSortableMergeTest.createRunHost (s executorType)
-//    | None -> failwithf "Config key '%s' not found." configKey
-
-//let executor = SortableTest.SortableTestExecutor.getExecutor executorType
-
-
-let configKey = "Small_dev" 
-let executorType = evalExecutorType.Merge
+let configKey = "Merge_dev" 
+let executorType = SortableTest.executorType.Merge
 let host: IRunHost = 
-    match SorterEvalBins.SorterEvalMergeSpecs.Configs |> Map.tryFind configKey with
-    | Some s -> RunHostEvalBins.createRunHost (s executorType)
+    match SortableTest.SortableMergeSpecs.Configs |> Map.tryFind configKey with
+    | Some s -> SortableTest.RunHostSortableTest.createRunHost (s executorType)
     | None -> failwithf "Config key '%s' not found." configKey
 
-let executor = EvalBinsExecutor.getExecutor executorType
+let executor = SortableTest.SortableTestExecutor.getExecutor executorType
+
+
+//let configKey = "Small_dev" 
+//let executorType = evalExecutorType.Merge
+//let host: IRunHost = 
+//    match SorterEvalBins.SorterEvalMergeSpecs.Configs |> Map.tryFind configKey with
+//    | Some s -> RunHostEvalBins.createRunHost (s executorType)
+//    | None -> failwithf "Config key '%s' not found." configKey
+
+//let executor = EvalBinsExecutor.getExecutor executorType
 
 
 

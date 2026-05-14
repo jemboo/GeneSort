@@ -12,46 +12,44 @@ open GeneSort.Sorting.Sortable
 module ProjectDb =
 
     let makeMergeQueryParams 
-                (repl: int<replNumber> option) 
-                (sortingWidth: int<sortingWidth> option)
-                (mergeDimension: int<mergeDimension> option) 
-                (mergeFillType: mergeSuffixType option)
-                (sortableDataFormat: sortableDataFormat option) 
+                (repl: int<replNumber>) 
+                (sortingWidth: int<sortingWidth>)
+                (mergeDimension: int<mergeDimension>) 
+                (mergeFillType: mergeSuffixType)
+                (sortableDataFormat: sortableDataFormat) 
                 (outputDataType: outputDataType) : queryParams =
 
         queryParams.create 
             Common.projectName
-            repl 
+            (Some repl)
             outputDataType
-            [| (runParameters.sortingWidthKey, sortingWidth |> SortingWidth.toString); 
-               (runParameters.mergeDimensionKey, mergeDimension |> MergeDimension.toString);
-               (runParameters.mergeSuffixTypeKey, mergeFillType 
-                    |> Option.map MergeSuffixType.toString |> UmxExt.stringOptionToString );
-               (runParameters.sortableDataFormatKey, sortableDataFormat 
-                    |> Option.map SortableDataFormat.toString |> UmxExt.stringOptionToString ); |]
+            [| (runParameters.sortingWidthKey, string %sortingWidth); 
+               (runParameters.mergeDimensionKey, string %mergeDimension);
+               (runParameters.mergeSuffixTypeKey, MergeSuffixType.toString mergeFillType);
+               (runParameters.sortableDataFormatKey, SortableDataFormat.toString sortableDataFormat); |]
 
 
-    let makeMergeQueryParamsFromRunParams 
-                (runParams: runParameters) 
-                (outputDataType: outputDataType) : queryParams =
-            makeMergeQueryParams 
-                    (runParams.GetRepl()) 
-                    (runParams.GetSortingWidth()) 
-                    (runParams.GetMergeDimension())
-                    (runParams.GetMergeSuffixType()) 
-                    (runParams.GetSortableDataFormat()) 
-                    outputDataType
-
+    let makeMergeQueryParamsFromRunParams (rp: runParameters) (odt: outputDataType) : queryParams option =
+        maybe {
+            let! repl = rp.GetRepl()
+            let! sw = rp.GetSortingWidth()
+            let! md = rp.GetMergeDimension()
+            let! mst = rp.GetMergeSuffixType()
+            let! sdf = rp.GetSortableDataFormat()
+            return makeMergeQueryParams repl sw md mst sdf odt
+        }
 
     let sortableMergeTestDb = new GeneSortDbMp(Common.mergeDatabaseFolder, makeMergeQueryParamsFromRunParams)
 
+
     let getMergeSorterTestSet
-                        (repl: int<replNumber> option) 
-                        (sortingWidth: int<sortingWidth> option)
-                        (mergeDimension: int<mergeDimension> option) 
-                        (mergeSuffixType: mergeSuffixType option)
-                        (sortableDataFormat: sortableDataFormat option) 
-                             : Async<Result<sortableTest, string>> =
+                    (repl: int<replNumber>) 
+                    (sortingWidth: int<sortingWidth>)
+                    (mergeDimension: int<mergeDimension>) 
+                    (mergeSuffixType: mergeSuffixType)
+                    (sortableDataFormat: sortableDataFormat) 
+                            : Async<Result<sortableTest, string>> =
+
         let qp = makeMergeQueryParams 
                         repl 
                         sortingWidth 

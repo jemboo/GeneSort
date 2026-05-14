@@ -31,7 +31,7 @@ type IGeneSortDb =
 
     abstract member saveRunParameters :
                         runParameters[] ->
-                        (runParameters -> outputDataType -> queryParams) ->
+                        (runParameters -> outputDataType -> queryParams option) ->
                         bool<allowOverwrite> ->
                         CancellationToken option ->
                         IProgress<string> option -> 
@@ -40,5 +40,5 @@ type IGeneSortDb =
     abstract member MakeQueryParamsFromRunParams :
                         runParameters ->
                         outputDataType ->
-                        queryParams
+                        queryParams option
 

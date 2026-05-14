@@ -1,4 +1,5 @@
 ﻿namespace GeneSort.FileDb.V1
+
 open System
 open System.IO
 open System.Threading
@@ -13,8 +14,7 @@ type private DbMessage =
 
 type GeneSortDbMp(
                 rootFolder: string<pathToRootFolder>,
-                queryParamsMaker: runParameters -> outputDataType -> queryParams) =
-
+                queryParamsMaker: runParameters -> outputDataType -> queryParams option) =
 
     let mailbox = MailboxProcessor.Start(fun inbox ->
         let rec loop () =
@@ -65,31 +65,45 @@ type GeneSortDbMp(
 
         member this.saveRunParameters
                         (runParamsArray: runParameters[])
-                        (buildQueryParams: runParameters -> outputDataType -> queryParams)
+                        (buildQueryParams: runParameters -> outputDataType -> queryParams option)
                         (allowOverwrite: bool<allowOverwrite>)
                         (ct: CancellationToken option)
                         (progress: IProgress<string> option) : Async<Result<unit, string>> =
             async {
                 let token = defaultArg ct CancellationToken.None
-                let maxDegree = Environment.ProcessorCount / 2  // Configurable based on system.
+                let maxDegree = Environment.ProcessorCount / 2 
                 use semaphore = new SemaphoreSlim(maxDegree)
+                
                 let! results = 
                     runParamsArray 
                     |> Array.map (fun rp -> async {
-                        token.ThrowIfCancellationRequested()
-                        do! semaphore.WaitAsync(token) |> Async.AwaitTask
                         try
-                            let runName = rp.GetRunName().Value
-                            let qp = buildQueryParams rp (outputDataType.RunParameters %runName)
-                            let! res = (this :> IGeneSortDb).saveAsync qp (rp |> outputData.RunParameters) allowOverwrite
-                            progress |> Option.iter (fun p -> p.Report(sprintf "Saved RunParameters for Run %s Repl %s" 
-                                                                    (rp |> RunParameters.getIdString) 
-                                                                    (rp.GetRepl() |> queryParams.ReplString)))
-                            return res
-                        finally semaphore.Release() |> ignore
+                            token.ThrowIfCancellationRequested()
+            
+                            // Wait for the semaphore
+                            do! semaphore.WaitAsync(token) |> Async.AwaitTask
+            
+                            // Use a 'use' binding with a custom disposable to ensure release
+                            use _release = { new IDisposable with member _.Dispose() = semaphore.Release() |> ignore }
+
+                            let runNameOpt = rp.GetRunName()
+                            match runNameOpt with
+                            | None -> return Error (sprintf "Missing RunName for %s" (rp |> RunParameters.getIdString))
+                            | Some name ->
+                                let qpOpt = buildQueryParams rp (outputDataType.RunParameters %name)
+                                match qpOpt with
+                                | None -> return Error (sprintf "Could not build QueryParams for %s" (rp |> RunParameters.getIdString))
+                                | Some qp ->
+                                    return! (this :> IGeneSortDb).saveAsync qp (rp |> outputData.RunParameters) allowOverwrite
+                        with
+                        | :? OperationCanceledException -> return Error "Operation cancelled"
+                        | e -> return Error e.Message
                     })
                     |> Async.Parallel
+
                 let errors = results |> Array.choose (function Error e -> Some e | _ -> None)
-                if errors.Length > 0 then return Error (String.Join("; ", errors))
-                else return Ok ()
+                if errors.Length > 0 then 
+                    return Error (String.Join("; ", errors |> Array.distinct))
+                else 
+                    return Ok ()
             }
