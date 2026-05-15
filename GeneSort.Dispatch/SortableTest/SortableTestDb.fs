@@ -9,7 +9,7 @@ open GeneSort.FileDb.V1
 open GeneSort.Sorting.Sortable
 
 
-module ProjectDb =
+module SortableTestDb =
 
     let makeMergeQueryParams 
                 (repl: int<replNumber>) 

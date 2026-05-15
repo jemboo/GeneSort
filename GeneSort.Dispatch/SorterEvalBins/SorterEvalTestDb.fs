@@ -10,7 +10,7 @@ open GeneSort.FileDb.V1
 open Common
 
 
-module ProjectDb =
+module SorterEvalTestDb =
 
     let makeStandardQueryParams
                     (rng: rngType)

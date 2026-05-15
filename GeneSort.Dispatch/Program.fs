@@ -9,6 +9,7 @@ open GeneSort.Project.V1
 open GeneSort.FileDb.V1
 open System.Runtime
 open GeneSort.Dispatch.V1.SorterEvalBins
+open GeneSort.Dispatch.V1.SortableTest
 
 let createThreadSafeProgress() =
     let agent = MailboxProcessor.Start(fun inbox ->
@@ -35,37 +36,33 @@ let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
-//let configKey = "Merge_dev" 
-//let executorType = SortableTest.executorType.Merge
+//let configType = SortableTetsMergeSpecs.configType.MergeTest_Test
+//let executorType = SortableTest.executorType.Merge_Gen
 //let host: IRunHost = 
-//    match SortableTest.SortableMergeSpecs.Configs |> Map.tryFind configKey with
-//    | Some s -> SortableTest.RunHostSortableTest.createRunHost (s executorType)
-//    | None -> failwithf "Config key '%s' not found." configKey
+//    let spec = SortableTetsMergeSpecs.getConfig configType executorType
+//    SortableTest.RunHostSortableTest.createRunHost spec
 
 //let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 
 
-//let configKey = "Small_dev" 
-//let executorType = evalExecutorType.Merge
-//let host: IRunHost = 
-//    match SorterEvalBins.SorterEvalMergeSpecs.Configs |> Map.tryFind configKey with
-//    | Some s -> RunHostEvalBins.createRunHost (s executorType)
-//    | None -> failwithf "Config key '%s' not found." configKey
-
-//let executor = EvalBinsExecutor.getExecutor executorType
-
-
-
-let configKey = "Small_dev" 
-let executorType = evalExecutorType.Standard
+let configType = EvalBinsRandomMergeSpecs.configType.EvalBins_Merge_Test
+let executorType = evalExecutorType.FullReport
 let host: IRunHost = 
-    match SorterEvalBins.SorterEvalSimpleSpecs.Configs |> Map.tryFind configKey with
-    | Some s -> RunHostEvalBins.createRunHost (s executorType)
-    | None -> failwithf "Config key '%s' not found." configKey
+    let spec = EvalBinsRandomMergeSpecs.getConfig configType executorType
+    SorterEvalBins.RunHostEvalBins.createRunHost spec
 
 let executor = EvalBinsExecutor.getExecutor executorType
 
 
+
+
+//let configType = EvalBinsRandomStandardSpecs.configType.EvalBins_Standard_Test
+//let executorType = evalExecutorType.StandardBins
+//let host: IRunHost = 
+//    let spec = EvalBinsRandomStandardSpecs.getConfig configType executorType
+//    SorterEvalBins.RunHostEvalBins.createRunHost spec
+
+//let executor = EvalBinsExecutor.getExecutor executorType
 
 
 let minReplica = 0<replNumber>

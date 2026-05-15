@@ -8,7 +8,7 @@ open GeneSort.Project.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Sorting.Sortable
 open GeneSort.FileDb.V1
-open ProjectDb
+open SortableTestDb
 
 
 type runHostSortableTest = 

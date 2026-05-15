@@ -9,15 +9,15 @@ open GeneSort.FileDb.V1
 
 
 type evalExecutorType = 
-    | Standard
-    | Merge
+    | StandardBins
+    | MergeBins
     | FullReport
     | BinsReport
 
 module EvalExecutorType =
     let toString = function
-        | Standard -> "Standard"
-        | Merge -> "Merge"
+        | StandardBins -> "StandardBins"
+        | MergeBins -> "MergeBins"
         | FullReport -> "FullReport"
         | BinsReport -> "BinsReport"
 

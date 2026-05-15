@@ -2,36 +2,31 @@
 
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorting
-open GeneSort.Db.V1
 open GeneSort.Project.V1
-open GeneSort.FileDb.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
-open Common
 
 
-module SorterEvalSimpleSpecs =
+module EvalBinsRandomStandardSpecs =
     
-    let standardDataFolder = "c:\\Projects\\SorterEvalBins\\RandomSimple\\Data"
-    let rngTypes = 
+    let standardDataFolder = "c:\\Projects\\EvalBins\\RandomStandard\\Data"
+
+    let rngType = 
             (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
     
-    //let smallSortingWidths = 
-    //        (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
+    // SortingWidths
     let smallSortingWidths = 
-            (runParameters.sortingWidthKey, [12] |> List.map string)
-    //let mediumSortingWidths = 
-    //        (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
-
+            (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
     let mediumSortingWidths = 
-            (runParameters.sortingWidthKey, [24] |> List.map string)
+            (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
 
+    // SorterCounts
     let testSorterCount = (runParameters.sorterCountKey, ["100";] )
     let smallSorterCount = (runParameters.sorterCountKey, ["1000";] )
     let mediumSorterCount = (runParameters.sorterCountKey, ["10000";] )
     let largeSorterCount = (runParameters.sorterCountKey, ["100000";] )
-
+    
+    // SimpleSorterModelTypes
     let allSimpleSorterModelTypes = 
             (runParameters.simpleSorterModelTypeKey, SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
 
@@ -62,13 +57,13 @@ module SorterEvalSimpleSpecs =
 
     module Specs =
 
-        let Small_dev (executorType: evalExecutorType)  : runHostSpec = {
+        let EvalBins_Standard_test (executorType: evalExecutorType)  : runHostSpec = {
             ProjectName = Common.projectName
             DatabaseName = Common.randomSimpleDatabaseName
-            RunName = sprintf @"Small_Dev_%s" (EvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"EvalBins_Standard_test_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                rngTypes
+                rngType
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 testSorterCount
@@ -78,13 +73,13 @@ module SorterEvalSimpleSpecs =
             AllowOverwrite = false |> UMX.tag
         }
 
-        let Small (executorType: evalExecutorType) : runHostSpec = {
+        let EvalBins_Standard_small (executorType: evalExecutorType) : runHostSpec = {
             ProjectName = Common.projectName
             DatabaseName = Common.randomSimpleDatabaseName
-            RunName = sprintf @"Small_%s" (EvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"EvalBins_Standard_small_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                rngTypes
+                rngType
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 largeSorterCount
@@ -94,29 +89,13 @@ module SorterEvalSimpleSpecs =
             AllowOverwrite = false |> UMX.tag
         }
 
-        let Medium_dev (executorType: evalExecutorType) : runHostSpec = {
+        let EvalBins_Standard_medium (executorType: evalExecutorType) : runHostSpec = {
             ProjectName = Common.projectName
             DatabaseName = Common.randomSimpleDatabaseName
-            RunName = sprintf @"Medium_Dev_%s" (EvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"EvalBins_Standard_medium_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                rngTypes
-                mediumSortingWidths
-                allSimpleSorterModelTypes
-                testSorterCount
-            ]
-            Filter = standardSorterModelTypeFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-        }
-
-        let Medium (executorType: evalExecutorType) : runHostSpec = {
-            ProjectName = Common.projectName
-            DatabaseName = Common.randomSimpleDatabaseName
-            RunName = sprintf @"Medium_%s" (EvalExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
-            Spans = [
-                rngTypes
+                rngType
                 mediumSortingWidths
                 allSimpleSorterModelTypes
                 mediumSorterCount
@@ -126,10 +105,18 @@ module SorterEvalSimpleSpecs =
             AllowOverwrite = false |> UMX.tag
         }
 
+    type configType =
+        | EvalBins_Standard_Test
+        | EvalBins_Standard_Small
+        | EvalBins_Standard_Medium
+
     let Configs = Map.ofList 
                     [ 
-                        ("Small_dev", Specs.Small_dev); 
-                        ("Small", Specs.Small) 
-                        ("Medium_dev", Specs.Medium_dev); 
-                        ("Medium", Specs.Medium) 
+                        (configType.EvalBins_Standard_Test, Specs.EvalBins_Standard_test); 
+                        (configType.EvalBins_Standard_Small, Specs.EvalBins_Standard_small);
+                        (configType.EvalBins_Standard_Medium, Specs.EvalBins_Standard_medium);
                     ]
+
+    let getConfig (config: configType) (executorType: evalExecutorType) : runHostSpec =
+        let specFunc = Configs.[config]
+        specFunc executorType

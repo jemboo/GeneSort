@@ -3,18 +3,16 @@
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Project.V1
-open GeneSort.Db.V1
-open GeneSort.Sorting
 open GeneSort.FileDb.V1
 
 
 type executorType = 
-    | Merge
+    | Merge_Gen
     | Unknown
 
 module ExecutorType =
     let toString = function
-        | Merge -> "Merge"
+        | Merge_Gen -> "Merge_Gen"
         | Unknown -> "Unknown"
 
 

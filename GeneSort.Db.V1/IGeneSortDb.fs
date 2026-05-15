@@ -29,14 +29,6 @@ type IGeneSortDb =
                         IProgress<string> option ->
                                 Async<Result<runParameters[], string>>
 
-    //abstract member saveRunParameters :
-    //                    runParameters[] ->
-    //                    (runParameters -> outputDataType -> queryParams option) ->
-    //                    bool<allowOverwrite> ->
-    //                    CancellationToken option ->
-    //                    IProgress<string> option -> 
-    //                            Async<Result<unit, string>>
-
     abstract member MakeQueryParamsFromRunParams :
                         runParameters ->
                         outputDataType ->

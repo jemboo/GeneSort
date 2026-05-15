@@ -24,7 +24,7 @@ module EvalBinsExecutor =
         async {
             let paramsOpt = option {
                 let! sortingWidth = rp.GetSortingWidth()
-                let! qpTests = ProjectDb.makeStandardQueryParamsFromRunParams rp (outputDataType.SortableTest "")
+                let! qpTests = SorterEvalTestDb.makeStandardQueryParamsFromRunParams rp (outputDataType.SortableTest "")
                 return (sortingWidth, qpTests)
             }
             match paramsOpt with
@@ -49,7 +49,7 @@ module EvalBinsExecutor =
 
             match paramsOpt with
             | Some (repl, sw, md, mst, sdf) ->
-                return! GeneSort.Dispatch.V1.SortableTest.ProjectDb.getMergeSorterTestSet 
+                return! GeneSort.Dispatch.V1.SortableTest.SortableTestDb.getMergeSorterTestSet 
                                         repl sw md mst sdf  
             | None ->
                 return Error "Failed: One or more RunParameters for MergeTests were missing."
@@ -75,7 +75,7 @@ module EvalBinsExecutor =
                                     ExcludeSelfCe
                                  |> sorterModelGen.Simple
 
-            let! qpModelSet = ProjectDb.makeStandardQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
+            let! qpModelSet = SorterEvalTestDb.makeStandardQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
             return SorterModelGen.makeSorterModelSet 
                             (%qpModelSet.Id |> UMX.tag) firstIdx sorterCount sorterModelGen
         }
@@ -99,7 +99,7 @@ module EvalBinsExecutor =
                                     ExcludeSelfCe
                                  |> sorterModelGen.Simple
 
-            let! qpModelSet = ProjectDb.makeMergeQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
+            let! qpModelSet = SorterEvalTestDb.makeMergeQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
             return SorterModelGen.makeSorterModelSet 
                             (%qpModelSet.Id |> UMX.tag) firstIdx sorterCount sorterModelGen
         }
@@ -261,7 +261,7 @@ module EvalBinsExecutor =
 
     let getExecutor (executorType: evalExecutorType) : IRunParamsExecutor =
         match executorType with
-        | Standard -> standardExecutor
-        | Merge -> mergeExecutor
+        | StandardBins -> standardExecutor
+        | MergeBins -> mergeExecutor
         | FullReport -> fullReportExecutor
         | BinsReport -> binsReportExecutor
