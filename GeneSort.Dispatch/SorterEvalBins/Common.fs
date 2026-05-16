@@ -6,6 +6,7 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.FileDb.V1
+open GeneSort.Model.Sorting.Simple.V1
 
 
 type evalExecutorType = 
@@ -27,12 +28,12 @@ module Common =
 
     let projectName = "SorterEvalBins" |> UMX.tag<projectName>
 
-    let randomSimpleDatabaseName = "RandomSimple" |> UMX.tag<databaseName>
+    let randomStandardDatabaseName = "RandomSimple" |> UMX.tag<databaseName>
 
     let randomMergeDatabaseName = "RandomMerge" |> UMX.tag<databaseName>
 
 
-    let randomSimpleDatabaseFolder = 
+    let randomStandardDatabaseFolder = 
                     "c:\\Projects\\SorterEvalBins\\RandomSimple\\Data"
                      |> UMX.tag<pathToRootFolder>
 
@@ -88,6 +89,32 @@ module Common =
         |> UMX.tag
 
 
+    let getSimpleUniformSorterModelGen
+                    (rngType: rngType) 
+                    (sortingWidth: int<sortingWidth>)
+                    (simpleSorterModelType: simpleSorterModelType) 
+                            : sorterModelGen =
+            let stageLength = getStandardStageLength simpleSorterModelType sortingWidth
+            let rngFactory = rngType |> RngFactory.create
+            SimpleSorterModelGen.makeUniform 
+                                    rngFactory 
+                                    sortingWidth 
+                                    stageLength 
+                                    simpleSorterModelType
+                                    ExcludeSelfCe
+                                    |> sorterModelGen.Simple
+
+
+    let getSimpleSorterModelSetFromIds
+                    (ids: Guid<sorterModelId> [])
+                    (rngType: rngType) 
+                    (sortingWidth: int<sortingWidth>)
+                    (simpleSorterModelType: simpleSorterModelType) 
+                    (setId: Guid<sorterModelSetId>)
+                            : sorterModelSet =
+            let sorterModelGen = getSimpleUniformSorterModelGen 
+                                        rngType sortingWidth simpleSorterModelType
+            sorterModelGen |> SorterModelGen.makeSorterModelSetFromIds setId ids
 
 
 

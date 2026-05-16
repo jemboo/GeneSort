@@ -59,7 +59,7 @@ module EvalBinsRandomStandardSpecs =
 
         let EvalBins_Standard_test (executorType: evalExecutorType)  : runHostSpec = {
             ProjectName = Common.projectName
-            DatabaseName = Common.randomSimpleDatabaseName
+            DatabaseName = Common.randomStandardDatabaseName
             RunName = sprintf @"EvalBins_Standard_test_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
@@ -75,7 +75,7 @@ module EvalBinsRandomStandardSpecs =
 
         let EvalBins_Standard_small (executorType: evalExecutorType) : runHostSpec = {
             ProjectName = Common.projectName
-            DatabaseName = Common.randomSimpleDatabaseName
+            DatabaseName = Common.randomStandardDatabaseName
             RunName = sprintf @"EvalBins_Standard_small_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
@@ -91,7 +91,7 @@ module EvalBinsRandomStandardSpecs =
 
         let EvalBins_Standard_medium (executorType: evalExecutorType) : runHostSpec = {
             ProjectName = Common.projectName
-            DatabaseName = Common.randomSimpleDatabaseName
+            DatabaseName = Common.randomStandardDatabaseName
             RunName = sprintf @"EvalBins_Standard_medium_%s" (EvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [

@@ -3,14 +3,16 @@
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.Db.V1
 open GeneSort.FileDb.V1
 open Common
+open GeneSort.Eval.V1.Bins
 
 
-module SorterEvalTestDb =
+module SimpleSorterModelDbs =
 
     let makeStandardQueryParams
                     (rng: rngType)
@@ -75,13 +77,47 @@ module SorterEvalTestDb =
         }
 
 
-
-    let randomSimpleDb = new GeneSortDbMp(randomSimpleDatabaseFolder, makeStandardQueryParamsFromRunParams)
+    let randomStandardDb = new GeneSortDbMp(randomStandardDatabaseFolder, makeStandardQueryParamsFromRunParams)
 
     let randomMergeDb = new GeneSortDbMp(randomMergeDatabaseFolder, makeMergeQueryParamsFromRunParams)
 
+
+    let getStandardSorterEvalBins
+                    (rng: rngType)
+                    (repl: int<replNumber>) 
+                    (sortingWidth: int<sortingWidth>) 
+                    (simpleSorterModelType: simpleSorterModelType) 
+                            : Async<Result<sorterEvalBins, string>> =
+        let qp = makeStandardQueryParams 
+                        rng repl sortingWidth simpleSorterModelType 
+                        (outputDataType.SorterEvalBins "")
+        async {
+             let! result = (randomStandardDb :> IGeneSortDb).loadAsync qp
+             return  result |> Result.bind OutputData.asSorterEvalBins
+        }
+
+
+    let getMergeSorterEvalBins
+                    (rng: rngType)
+                    (repl: int<replNumber>) 
+                    (sortingWidth: int<sortingWidth>)
+                    (simpleSorterModelType: simpleSorterModelType)
+                    (mergeDimension: int<mergeDimension>) 
+                    (mergeSuffixType: mergeSuffixType) 
+                    (sortableDataFormat: sortableDataFormat) 
+                            : Async<Result<sorterEvalBins, string>> =
+        let qp = makeQueryParamsForMerge 
+                        rng repl sortingWidth simpleSorterModelType
+                        mergeDimension mergeSuffixType sortableDataFormat 
+                        (outputDataType.SorterEvalBins "")
+        async {
+             let! result = (randomMergeDb :> IGeneSortDb).loadAsync qp
+             return  result |> Result.bind OutputData.asSorterEvalBins
+        }
+
+
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
-        [ (randomSimpleDatabaseName, randomSimpleDb :> IGeneSortDb);
+        [ (randomStandardDatabaseName, randomStandardDb :> IGeneSortDb);
           (randomMergeDatabaseName, randomMergeDb :> IGeneSortDb) ]
         |> Map.ofList
 

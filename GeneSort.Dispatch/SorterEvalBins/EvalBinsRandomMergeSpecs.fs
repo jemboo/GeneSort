@@ -117,7 +117,7 @@ module EvalBinsRandomMergeSpecs =
                 allMergeDimensions
                 bothMergeSuffixTypes
                 onlyDataFormat
-                largeSorterCount
+                smallSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
@@ -137,7 +137,7 @@ module EvalBinsRandomMergeSpecs =
                 lowMergeDimensions
                 bothMergeSuffixTypes
                 onlyDataFormat
-                mediumSorterCount
+                smallSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
@@ -157,7 +157,7 @@ module EvalBinsRandomMergeSpecs =
                 highMergeDimensions
                 vv1SuffixType
                 onlyDataFormat
-                mediumSorterCount
+                smallSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer

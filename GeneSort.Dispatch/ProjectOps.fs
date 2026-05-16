@@ -43,7 +43,8 @@ module ProjectOps =
                     | Ok updated ->
                         let qp = buildQueryParams updated (outputDataType.RunParameters %runName)
                                  |> Option.defaultWith (fun () -> 
-                                        let msg = sprintf "Failed to build query parameters for saving results of run %s, repl %d" (string %runName) (int %repl)
+                                        let msg = sprintf "Failed to build query parameters for saving results of run %s, repl %d" 
+                                                            (string %runName) (int %repl)
                                         report progress msg
                                         raise (Exception msg)
                                     )
@@ -84,7 +85,8 @@ module ProjectOps =
                     // Map parameters to tasks and execute with internal throttling
                     let! results = 
                         paramsArray 
-                        |> Seq.map (runTask db runName buildQueryParams (RunParamsExecutor.execute executor host) allowOverwrite cts progress)
+                        |> Seq.map (runTask db runName buildQueryParams 
+                                            (RunParamsExecutor.execute executor host) allowOverwrite cts progress)
                         |> fun tasks -> Async.Parallel(tasks, maxParallel)
 
                     // Unified reporting logic

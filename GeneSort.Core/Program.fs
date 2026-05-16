@@ -49,8 +49,8 @@ module Example =
 
     //LatticeLevelSetMap.getStats
     DataTableReport.concatenateAllFiles 
-                @"C:\Projects\SorterEvalBins\RandomMerge\Data\Report\TextReport_FullReport"
-                @"C:\Projects\SorterEvalBins\RandomMerge\Data\Report\TextReport_FullReport\MergeBins_report.txt"
+                @"C:\Projects\SorterEvalBins\RandomMerge\Data\Report\TextReport_BinsReport"
+                @"C:\Projects\SorterEvalBins\RandomMerge\Data\Report\TextReport_BinsReport\MergeBins_report.txt"
 
 
     printfn "end: %s" (DateTime.Now.ToLongTimeString())

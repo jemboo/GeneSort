@@ -46,7 +46,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 let configType = EvalBinsRandomMergeSpecs.configType.EvalBins_Merge_Test
-let executorType = evalExecutorType.FullReport
+let executorType = evalExecutorType.BinsReport
 let host: IRunHost = 
     let spec = EvalBinsRandomMergeSpecs.getConfig configType executorType
     SorterEvalBins.RunHostEvalBins.createRunHost spec

@@ -9,7 +9,7 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.FileDb.V1
 open Common
-open SorterEvalTestDb
+open SimpleSorterModelDbs
 
 
 // --- 4. Host Implementation ---
@@ -26,23 +26,6 @@ type runHostEvalBins =
         { _projectDb = db; _parameterSpans = spec.Spans; _spec = spec; _run = run }
 
     member this.Spec = this._spec
-
-    //member this.MakeQueryParams 
-    //                (repl: int<replNumber>) 
-    //                (sw: int<sortingWidth>) 
-    //                (smt: simpleSorterModelType option) 
-    //                (rng: rngType option)
-    //                (odt: outputDataType) : queryParams =
-    //    queryParams.create 
-    //                this._spec.ProjectName
-    //                (Some repl) 
-    //                odt
-    //        [| (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
-    //           (runParameters.simpleSorterModelTypeKey, smt |> Option.map SimpleSorterModelType.toString |> UmxExt.stringOptionToString) 
-    //           (runParameters.rngTypeKey, rng |> Option.map RngType.toString |> UmxExt.stringOptionToString) |]
-
-    //member this.MakeQueryParamsFromRunParams (rp: runParameters) (odt: outputDataType) : queryParams =
-    //    this.MakeQueryParams (rp.GetRepl().Value) (rp.GetSortingWidth().Value) (rp.GetSimpleSorterModelType()) (rp.GetRngType()) odt
 
     member this.ParamMapRefiner (runParametersSeq: runParameters seq) : runParameters seq = 
         runParametersSeq 

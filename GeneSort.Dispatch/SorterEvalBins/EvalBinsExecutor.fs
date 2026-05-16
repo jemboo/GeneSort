@@ -24,7 +24,7 @@ module EvalBinsExecutor =
         async {
             let paramsOpt = option {
                 let! sortingWidth = rp.GetSortingWidth()
-                let! qpTests = SorterEvalTestDb.makeStandardQueryParamsFromRunParams rp (outputDataType.SortableTest "")
+                let! qpTests = SimpleSorterModelDbs.makeStandardQueryParamsFromRunParams rp (outputDataType.SortableTest "")
                 return (sortingWidth, qpTests)
             }
             match paramsOpt with
@@ -56,51 +56,24 @@ module EvalBinsExecutor =
         }
 
 
-    let makeStandardSorterModelSet (rp:runParameters) : sorterModelSet option =
+    let makeUniformSorterModelSet (rp:runParameters) : sorterModelSet option =
         maybe {
             let! sortingWidth = rp.GetSortingWidth()
             let! simpleSorterModelType = rp.GetSimpleSorterModelType()
             let stageLength = Common.getStandardStageLength simpleSorterModelType sortingWidth
 
+            let! rngType = rp.GetRngType()
+
+            let sorterModelGen = Common.getSimpleUniformSorterModelGen 
+                                    rngType sortingWidth simpleSorterModelType
+
+            let! qpModelSet = SimpleSorterModelDbs.makeStandardQueryParamsFromRunParams 
+                                     rp (outputDataType.SorterModelSet "")
+
             let! repl = rp.GetRepl()
             let! sorterCount = rp.GetSorterCount()
-            let! rngType = rp.GetRngType()
-            let  rngFactory = rngType |> RngFactory.create
             let firstIdx = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-            let sorterModelGen = SimpleSorterModelGen.makeUniform 
-                                    rngFactory 
-                                    sortingWidth 
-                                    stageLength 
-                                    simpleSorterModelType
-                                    ExcludeSelfCe
-                                 |> sorterModelGen.Simple
-
-            let! qpModelSet = SorterEvalTestDb.makeStandardQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
-            return SorterModelGen.makeSorterModelSet 
-                            (%qpModelSet.Id |> UMX.tag) firstIdx sorterCount sorterModelGen
-        }
-
-
-    let makeMergeSorterModelSet (rp:runParameters) : sorterModelSet option =
-        maybe {
-            let! sortingWidth = rp.GetSortingWidth()
-            let! simpleSorterModelType = rp.GetSimpleSorterModelType()
-            let stageLength = Common.getMergeStageLength simpleSorterModelType sortingWidth
-            let! repl = rp.GetRepl()
-            let! sorterCount = rp.GetSorterCount()
-            let! rngType = rp.GetRngType()
-            let  rngFactory = rngType |> RngFactory.create
-            let firstIdx = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-            let sorterModelGen = SimpleSorterModelGen.makeUniform 
-                                    rngFactory
-                                    sortingWidth 
-                                    stageLength 
-                                    simpleSorterModelType
-                                    ExcludeSelfCe
-                                 |> sorterModelGen.Simple
-
-            let! qpModelSet = SorterEvalTestDb.makeMergeQueryParamsFromRunParams rp (outputDataType.SorterModelSet "")
-            return SorterModelGen.makeSorterModelSet 
+            return SorterModelGen.makeSorterModelSetFromIndexSpan 
                             (%qpModelSet.Id |> UMX.tag) firstIdx sorterCount sorterModelGen
         }
 
@@ -114,7 +87,8 @@ module EvalBinsExecutor =
             (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
     
-        let log msg = OpsUtils.report progress (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+        let log msg = OpsUtils.report progress 
+                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
@@ -235,7 +209,7 @@ module EvalBinsExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvalBins 
-                    makeStandardSorterModelSet
+                    makeUniformSorterModelSet
                     makeStandardTests
                     host rp allowOverwrite cts progress }
 
@@ -243,7 +217,7 @@ module EvalBinsExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvalBins 
-                    makeMergeSorterModelSet
+                    makeUniformSorterModelSet
                     makeMergeTests
                     host rp allowOverwrite cts progress }
 

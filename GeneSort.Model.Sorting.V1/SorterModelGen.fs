@@ -37,20 +37,41 @@ module SorterModelGen =
         | Unknown -> failwith "Unknown sorterModelGen"
 
 
-    let makeManyModels (firstIndex:int<sorterCount>) 
-                       (count: int<sorterCount>) 
-                       (model: sorterModelGen) : sorterModel[] =
+    let makeSorterModelFromId (id: Guid<sorterModelId>) (model: sorterModelGen) : sorterModel =
         match model with
-        | Simple ssmg -> SimpleSorterModelGen.makeManyModels firstIndex count ssmg |> Array.map sorterModel.Simple
+        | Simple ssmg -> SimpleSorterModelGen.makeSorterModelFromId id ssmg |> sorterModel.Simple
         | Unknown -> failwith "Unknown sorterModelGen"
 
 
-    let makeSorterModelSet (id: Guid<sorterModelSetId>) 
+    let makeSorterModelsFromIndexSpan (firstIndex:int<sorterCount>) 
+                       (count: int<sorterCount>) 
+                       (model: sorterModelGen) : sorterModel[] =
+        match model with
+        | Simple ssmg -> SimpleSorterModelGen.makeSorterModelsFromIndexSpan firstIndex count ssmg |> Array.map sorterModel.Simple
+        | Unknown -> failwith "Unknown sorterModelGen"
+
+
+    let makeSorterModelsFromIds (ids: Guid<sorterModelId> []) (model: sorterModelGen) : sorterModel[] =
+        match model with
+        | Simple ssmg -> SimpleSorterModelGen.makeSorterModelsFromIds ids ssmg |> Array.map sorterModel.Simple
+        | Unknown -> failwith "Unknown sorterModelGen"
+
+    let makeSorterModelSetFromIndexSpan 
+                           (id: Guid<sorterModelSetId>) 
                            (firstIndex:int<sorterCount>) 
                            (count: int<sorterCount>)     
                            (modelGen: sorterModelGen)    
                            : sorterModelSet =
-        let sorterModels = makeManyModels firstIndex count modelGen
+        let sorterModels = makeSorterModelsFromIndexSpan firstIndex count modelGen
+        sorterModelSet.create id sorterModels
+
+
+    let makeSorterModelSetFromIds 
+                           (id: Guid<sorterModelSetId>) 
+                           (modelIds: Guid<sorterModelId> []) 
+                           (modelGen: sorterModelGen)    
+                           : sorterModelSet =
+        let sorterModels = makeSorterModelsFromIds modelIds modelGen
         sorterModelSet.create id sorterModels
 
 

@@ -32,7 +32,8 @@ module SimpleSorterModelGen =
         | simpleSorterModelType.Msce -> 
             let ceLength = stageLength |> StageLength.toCeLength sortingWidth
             SmmMsceRandGen (msceRandGen.create rngFactory sortingWidth excludeSelfCe ceLength)
-        | simpleSorterModelType.Mssi -> SmmMssiRandGen (mssiRandGen.create rngFactory sortingWidth stageLength)
+        | simpleSorterModelType.Mssi -> 
+            SmmMssiRandGen (mssiRandGen.create rngFactory sortingWidth stageLength)
         | simpleSorterModelType.Msrs -> 
             let opsGenRates = opsGenRates.createUniform()
             SmmMsrsRandGen (msrsRandGen.create rngFactory sortingWidth opsGenRates stageLength)
@@ -89,11 +90,15 @@ module SimpleSorterModelGen =
         | SmmMsuf6RandGen msuf6 -> msuf6.MakeSorterModelFromId id |> simpleSorterModel.Msuf6
 
 
-    let makeManyModels (firstIndex:int<sorterCount>) 
+    let makeSorterModelsFromIndexSpan (firstIndex:int<sorterCount>) 
                        (count: int<sorterCount>) 
                        (model: simpleSorterModelGen) : simpleSorterModel[] =
         [| for i in 0 .. %count - 1 -> makeSorterModelFromIndex (%firstIndex + i) model |]
 
+
+    let makeSorterModelsFromIds (ids:Guid<sorterModelId> seq) 
+                       (model: simpleSorterModelGen) : simpleSorterModel[] =
+        [| for id in ids -> makeSorterModelFromId id model |]
 
 
 

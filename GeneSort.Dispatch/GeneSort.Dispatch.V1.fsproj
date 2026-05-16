@@ -28,7 +28,7 @@
     <Compile Include="SortableTest\SortableTestExecutor.fs" />
     <Compile Include="SortableTest\SortableTestMergeSpecs.fs" />
     <Compile Include="SorterEvalBins\Common.fs" />
-    <Compile Include="SorterEvalBins\SorterEvalTestDb.fs" />
+    <Compile Include="SorterEvalBins\SimpleSorterModelDbs.fs" />
     <Compile Include="SorterEvalBins\RunHostEvalBins.fs" />
     <Compile Include="SorterEvalBins\EvalBinsExecutor.fs" />
     <Compile Include="SorterEvalBins\EvalBinsRandomStandardSpecs.fs" />
