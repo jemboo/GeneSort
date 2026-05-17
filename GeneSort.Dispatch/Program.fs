@@ -10,15 +10,33 @@ open GeneSort.FileDb.V1
 open System.Runtime
 open GeneSort.Dispatch.V1.SorterEvalBins
 open GeneSort.Dispatch.V1.SortableTest
+open System.IO
 
-let createThreadSafeProgress() =
+
+
+let createThreadSafeProgress () =
+    // 1. Create a unique file name for this application session
+    let sessionTimestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss")
+    let logFileName = sprintf "session_%s.log" sessionTimestamp
+    
     let agent = MailboxProcessor.Start(fun inbox ->
         async {
+            // 2. Open the file stream inside the agent loop
+            use writer = new StreamWriter(logFileName, append = true)
+            // Ensure edits flush immediately so logs are saved even if a crash happens
+            writer.AutoFlush <- true 
+
             while true do
                 let! msg = inbox.Receive()
+                
+                // Print to console
                 printfn "%s" msg
+                
+                // Append to text file
+                do! writer.WriteLineAsync(msg) |> Async.AwaitTask
         })
     { new IProgress<string> with member _.Report(msg) = agent.Post(msg) }
+
 
 
 let isServer = GCSettings.IsServerGC

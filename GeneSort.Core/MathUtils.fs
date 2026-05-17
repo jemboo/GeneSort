@@ -39,4 +39,4 @@ module MathUtils =
         let now = DateTime.Now
         // MM-dd for month-day
         // HH:mm:ss.f for hours (24h):minutes:seconds.tenths
-        now.ToString("MM-dd HH:mm:ss.f")
+        now.ToString("MM-dd HH:mm:ss.fff")
