@@ -10,18 +10,18 @@ open GeneSort.Model.Sorting.Simple.V1
 
 
 type evalExecutorType = 
-    | StandardBins
-    | MergeBins
+    | StandardSortables
+    | MergeSortables
     | FullReport
     | BinsReport
 
+
 module EvalExecutorType =
     let toString = function
-        | StandardBins -> "StandardBins"
-        | MergeBins -> "MergeBins"
+        | StandardSortables -> "StandardSortables"
+        | MergeSortables -> "MergeSortables"
         | FullReport -> "FullReport"
         | BinsReport -> "BinsReport"
-
 
 
 module Common =
@@ -49,7 +49,9 @@ module Common =
 
     let mergeSortableDataFormat = sortableDataFormat.Int8Vector512
 
-    let getStandardStageLength (smt: simpleSorterModelType) (sw: int<sortingWidth>) : int<stageLength> =
+    let getStageLength 
+                (smt: simpleSorterModelType) 
+                (sw: int<sortingWidth>) : int<stageLength> =
         match %sw with
         | 4 -> 15
         | 5 -> 25
@@ -61,29 +63,18 @@ module Common =
         | 11 -> 90
         | 12 -> 100
         | 14 -> 120
-        | 16 -> 150
+        | 16 -> match smt with | Msuf4 -> 300 | _ -> 150
         | 18 -> 180
         | 20 -> 200
         | 22 -> 250
         | 24 -> 300
-        | _ -> failwithf "Unsupported sorting width: %d" %sw
-        |> UMX.tag
-
-
-    let getMergeStageLength 
-                    (smt: simpleSorterModelType) 
-                    (sw: int<sortingWidth>) : int<stageLength> =
-        match %sw with
-        | 16 -> 100
-        | 18 -> match smt with | Msuf4 -> 600 | _ -> 150
-        | 24 -> match smt with | Msuf4 -> 600 | _ -> 200
         | 32 -> match smt with | Msuf4 -> 600 | _ -> 300
-        | 36 -> match smt with | Msuf4 -> 600 | _ -> 300
-        | 48 -> match smt with | Msuf4 -> 1200 | _ -> 400
+        | 36 -> 350
+        | 48 -> 400
         | 64 -> match smt with | Msuf4 -> 2000 | _ -> 600
-        | 96 -> match smt with | Msuf4 -> 2800 | _ -> 800
+        | 96 -> 800
         | 128 -> match smt with | Msuf4 -> 4000 | _ -> 1200
-        | 192 -> match smt with | Msuf4 -> 4800 | _ -> 2000
+        | 192 -> 2000
         | 256 -> match smt with | Msuf4 -> 6000 | _ -> 3000
         | _ -> failwithf "Unsupported sorting width: %d" %sw
         |> UMX.tag
@@ -94,7 +85,7 @@ module Common =
                     (sortingWidth: int<sortingWidth>)
                     (simpleSorterModelType: simpleSorterModelType) 
                             : sorterModelGen =
-            let stageLength = getStandardStageLength simpleSorterModelType sortingWidth
+            let stageLength = getStageLength simpleSorterModelType sortingWidth
             let rngFactory = rngType |> RngFactory.create
             SimpleSorterModelGen.makeUniform 
                                     rngFactory 

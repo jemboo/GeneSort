@@ -2,6 +2,7 @@
 
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Sorting
 open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
@@ -84,6 +85,24 @@ module EvalBinsRandomMergeSpecs =
 
     module Specs =
 
+        let EvalBins_Merge_single (executorType: evalExecutorType) : runHostSpec = {
+            ProjectName = Common.projectName
+            DatabaseName = Common.randomMergeDatabaseName
+            RunName = sprintf @"EvalBins_Merge_single_%s" (EvalExecutorType.toString executorType) |> UMX.tag
+            RunDescription = "Merge binning for Msuf4"
+            Spans = [   
+                rngType
+                (runParameters.sortingWidthKey, [64] |> List.map string)
+                allSimpleSorterModelTypes
+                (runParameters.mergeDimensionKey, [2;] |> List.map string)
+                (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix;] |> List.map MergeSuffixType.toString)
+                onlyDataFormat
+                (runParameters.sorterCountKey, ["1000";] )
+            ]
+            Filter = paramMapFilter
+            Enhancer = mergeEnhancer
+            AllowOverwrite = false |> UMX.tag
+        }
 
         let EvalBins_Merge_test (executorType: evalExecutorType) : runHostSpec = {
             ProjectName = Common.projectName
@@ -166,6 +185,7 @@ module EvalBinsRandomMergeSpecs =
 
 
     type configType =
+        | EvalBins_Merge_single
         | EvalBins_Merge_Test
         | EvalBins_Merge_Small
         | EvalBins_Merge_Medium_Ld
@@ -174,6 +194,7 @@ module EvalBinsRandomMergeSpecs =
 
     let Configs = Map.ofList 
                     [ 
+                        (configType.EvalBins_Merge_single, Specs.EvalBins_Merge_single);
                         (configType.EvalBins_Merge_Test, Specs.EvalBins_Merge_test); 
                         (configType.EvalBins_Merge_Small, Specs.EvalBins_Merge_small);
                         (configType.EvalBins_Merge_Medium_Ld, Specs.EvalBins_Merge_medium_Ld);

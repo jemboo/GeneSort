@@ -30,7 +30,7 @@ let mode = GCSettings.LatencyMode
 
 let progress = createThreadSafeProgress()
 let cts = new CancellationTokenSource()
-let maxParallel = 1 // Environment.ProcessorCount
+let maxParallel = 4 // Environment.ProcessorCount
 
 let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
@@ -45,8 +45,8 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 
 
-let configType = EvalBinsRandomMergeSpecs.configType.EvalBins_Merge_Test
-let executorType = evalExecutorType.BinsReport
+let configType = EvalBinsRandomMergeSpecs.configType.EvalBins_Merge_single
+let executorType = evalExecutorType.MergeSortables
 let host: IRunHost = 
     let spec = EvalBinsRandomMergeSpecs.getConfig configType executorType
     SorterEvalBins.RunHostEvalBins.createRunHost spec
