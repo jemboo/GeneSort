@@ -17,7 +17,7 @@ open System.IO
 let createThreadSafeProgress () =
     // 1. Create a unique file name for this application session
     let sessionTimestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss")
-    let logFileName = sprintf "session_%s.log" sessionTimestamp
+    let logFileName = sprintf @"c:\Projects\session_%s.log" sessionTimestamp
     
     let agent = MailboxProcessor.Start(fun inbox ->
         async {
