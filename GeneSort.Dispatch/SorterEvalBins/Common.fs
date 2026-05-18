@@ -9,14 +9,14 @@ open GeneSort.FileDb.V1
 open GeneSort.Model.Sorting.Simple.V1
 
 
-type evalExecutorType = 
+type evalBinsExecutorType = 
     | StandardSortables
     | MergeSortables
     | FullReport
     | BinsReport
 
 
-module EvalExecutorType =
+module EvalBinsExecutorType =
     let toString = function
         | StandardSortables -> "StandardSortables"
         | MergeSortables -> "MergeSortables"

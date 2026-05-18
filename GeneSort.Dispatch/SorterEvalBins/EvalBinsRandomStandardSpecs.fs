@@ -57,10 +57,10 @@ module EvalBinsRandomStandardSpecs =
 
     module Specs =
 
-        let EvalBins_Standard_test (executorType: evalExecutorType)  : runHostSpec = {
+        let EvalBins_Standard_test (executorType: evalBinsExecutorType)  : runHostSpec = {
             ProjectName = Common.projectName
             DatabaseName = Common.randomStandardDatabaseName
-            RunName = sprintf @"EvalBins_Standard_test_%s" (EvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"EvalBins_Standard_test_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -73,10 +73,10 @@ module EvalBinsRandomStandardSpecs =
             AllowOverwrite = false |> UMX.tag
         }
 
-        let EvalBins_Standard_small (executorType: evalExecutorType) : runHostSpec = {
+        let EvalBins_Standard_small (executorType: evalBinsExecutorType) : runHostSpec = {
             ProjectName = Common.projectName
             DatabaseName = Common.randomStandardDatabaseName
-            RunName = sprintf @"EvalBins_Standard_small_%s" (EvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"EvalBins_Standard_small_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -89,10 +89,10 @@ module EvalBinsRandomStandardSpecs =
             AllowOverwrite = false |> UMX.tag
         }
 
-        let EvalBins_Standard_medium (executorType: evalExecutorType) : runHostSpec = {
+        let EvalBins_Standard_medium (executorType: evalBinsExecutorType) : runHostSpec = {
             ProjectName = Common.projectName
             DatabaseName = Common.randomStandardDatabaseName
-            RunName = sprintf @"EvalBins_Standard_medium_%s" (EvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"EvalBins_Standard_medium_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -117,6 +117,6 @@ module EvalBinsRandomStandardSpecs =
                         (configType.EvalBins_Standard_Medium, Specs.EvalBins_Standard_medium);
                     ]
 
-    let getConfig (config: configType) (executorType: evalExecutorType) : runHostSpec =
+    let getConfig (config: configType) (executorType: evalBinsExecutorType) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType

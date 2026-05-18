@@ -184,69 +184,6 @@ module EvalBinsExecutor =
         } |> Async.map (logResult progress log)
 
 
-    //let _makeSorterEvalBins 
-    //        (makeSorterModelSet: runParameters -> sorterModelSet option)
-    //        (makeTests: runParameters -> Async<Result<Sortable.sortableTest, string>>)
-    //        (host: IRunHost)
-    //        (rp: runParameters) 
-    //        (allowOverwrite: bool<allowOverwrite>) 
-    //        (cts: CancellationTokenSource) 
-    //        (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
-    
-    //    let log msg = OpsUtils.report progress 
-    //                    (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
-
-    //    asyncResult {
-    //        try
-    //            // 1. Initial Check & Sorter Model Creation
-    //            do! checkCancellation cts.Token
-    //            log "Creating Sorter Model Set..."
-            
-    //            let! modelSet = 
-    //                    makeSorterModelSet rp 
-    //                    |> Result.ofOption "Failed: SorterModelSet could not be initialized."
-            
-    //            let fullSorterSet = SorterModelSet.makeSorterSet (%modelSet.Id |> UMX.tag) modelSet
-    //            log (sprintf "Success: Created SorterSet %A" modelSet.Id)
-
-    //            // 2. Test Generation (Now non-blocking Async)
-    //            do! checkCancellation cts.Token
-    //            log "Generating Sortable Tests..."
-            
-    //            let! tests = makeTests rp 
-            
-    //            // 3. Evaluation & Binning
-    //            log "Running Sorter Evaluations ..."
-            
-    //            let! qpEval = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
-    //                         |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
-
-    //            let collectTests = Common.CollectSortableTests
-    //            let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSet tests collectTests
-
-    //            let! qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
-    //                         |> Result.ofOption "Failed to create QueryParams for Bins."
-    //            let binsV1 = sorterEvalBinsV1.createFromEvals 
-    //                            (%qpBins.Id |> UMX.tag) 
-    //                            (tests |> SortableTests.getId) 
-    //                            sorterSetEval.SorterEvals 
-            
-    //            let sorterEvalBins = sorterEvalBins.V1 binsV1
-
-    //            // 4. Persistence
-    //            log (sprintf "Saving SorterEvalBins %s" (string %qpBins.Id))
-    //            do! host.ProjectDb.saveAsync qpBins (sorterEvalBins |> outputData.SorterEvalBins) allowOverwrite
-            
-    //            log "Run Complete."
-    //            return rp.WithRunFinished (Some true)
-
-    //        with e -> 
-    //            let errorMsg = sprintf "Fatal Error in %s: %s" (rp |> RunParameters.getIdString) e.Message
-    //            log errorMsg 
-    //            return! Error errorMsg
-    //    } |> Async.map (logResult progress log)
-
-
 
     let makeFullReport 
             (host: IRunHost)
@@ -339,7 +276,7 @@ module EvalBinsExecutor =
                 makeFullReport
                     host rp allowOverwrite cts progress }
 
-    let getExecutor (executorType: evalExecutorType) : IRunParamsExecutor =
+    let getExecutor (executorType: evalBinsExecutorType) : IRunParamsExecutor =
         match executorType with
         | StandardSortables -> standardExecutor
         | MergeSortables -> mergeExecutor

@@ -85,10 +85,10 @@ module EvalBinsRandomMergeSpecs =
 
     module Specs =
 
-        let EvalBins_Merge_single (executorType: evalExecutorType) : runHostSpec = {
+        let EvalBins_Merge_single (executorType: evalBinsExecutorType) : runHostSpec = {
             ProjectName = Common.projectName
             DatabaseName = Common.randomMergeDatabaseName
-            RunName = sprintf @"EvalBins_Merge_single_%s" (EvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"EvalBins_Merge_single_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msuf4"
             Spans = [   
                 rngType
@@ -104,10 +104,10 @@ module EvalBinsRandomMergeSpecs =
             AllowOverwrite = false |> UMX.tag
         }
 
-        let EvalBins_Merge_test (executorType: evalExecutorType) : runHostSpec = {
+        let EvalBins_Merge_test (executorType: evalBinsExecutorType) : runHostSpec = {
             ProjectName = Common.projectName
             DatabaseName = Common.randomMergeDatabaseName
-            RunName = sprintf @"EvalBins_Merge_test_%s" (EvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"EvalBins_Merge_test_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [   
                 rngType
@@ -124,10 +124,10 @@ module EvalBinsRandomMergeSpecs =
         }
 
 
-        let EvalBins_Merge_small (executorType: evalExecutorType) : runHostSpec = {
+        let EvalBins_Merge_small (executorType: evalBinsExecutorType) : runHostSpec = {
             ProjectName = Common.projectName
             DatabaseName = Common.randomMergeDatabaseName
-            RunName = sprintf @"EvalBins_Merge_small_%s" (EvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"EvalBins_Merge_small_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -144,10 +144,10 @@ module EvalBinsRandomMergeSpecs =
         }
 
 
-        let EvalBins_Merge_medium_Ld (executorType: evalExecutorType) : runHostSpec = {
+        let EvalBins_Merge_medium_Ld (executorType: evalBinsExecutorType) : runHostSpec = {
             ProjectName = Common.projectName
             DatabaseName = Common.randomMergeDatabaseName
-            RunName = sprintf @"EvalBins_Merge_medium_Ld_%s" (EvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"EvalBins_Merge_medium_Ld_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -164,10 +164,10 @@ module EvalBinsRandomMergeSpecs =
         }
 
 
-        let EvalBins_Merge_medium_Hd (executorType: evalExecutorType) : runHostSpec = {
+        let EvalBins_Merge_medium_Hd (executorType: evalBinsExecutorType) : runHostSpec = {
             ProjectName = Common.projectName
             DatabaseName = Common.randomMergeDatabaseName
-            RunName = sprintf @"EvalBins_Merge_medium_Hd_%s" (EvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"EvalBins_Merge_medium_Hd_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -201,6 +201,6 @@ module EvalBinsRandomMergeSpecs =
                         (configType.EvalBins_Merge_Medium_Hd, Specs.EvalBins_Merge_medium_Hd);
                     ]
 
-    let getConfig (config: configType) (executorType: evalExecutorType) : runHostSpec =
+    let getConfig (config: configType) (executorType: evalBinsExecutorType) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType
