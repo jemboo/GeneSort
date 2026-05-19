@@ -367,6 +367,16 @@ type rngFactory =
             | :? rngFactory as other -> compare this.id other.id
             | _ -> invalidArg "obj" "Cannot compare values of different types"
 
+    // Satisfy the stable identity contract
+    interface IStableSerializable with
+        member this.WriteStableBytes writer =
+            // 1. Write the factory Guid components
+            let rawGuid = UMX.untag this.id
+            writer.Write(rawGuid.ToByteArray())
+            // 2. Write the structural name of the Rng type case (e.g. "Lcg", "Net", "Smx")
+            writer.Write(sprintf "%A" this.rngType)
+
+
     static member private createFactory (id: Guid<rngFactoryId>) (rngType: rngType) : rngFactory =
         { id = id
           rngType = rngType

@@ -12,9 +12,9 @@
     <Compile Include="SysExt.fs" />
     <Compile Include="UMXext.fs" />
     <Compile Include="MonadUtils.fs" />
+    <Compile Include="GuidUtils.fs" />
     <Compile Include="Rando.fs" />
     <Compile Include="ByteUtils.fs" />
-    <Compile Include="GuidUtils.fs" />
     <Compile Include="MathUtils.fs" />
     <Compile Include="ArrayUtils.fs" />
     <Compile Include="SimdUtils.fs" />

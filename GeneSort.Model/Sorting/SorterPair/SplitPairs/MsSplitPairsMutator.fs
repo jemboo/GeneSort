@@ -61,12 +61,12 @@ type msSplitPairsMutator =
         // Calculate ID deterministically from the constituent mutator IDs
         let id =
             [
-                "msSplitPairsGen" :> obj
-                sortingWidth :> obj
-                %SorterModelMutator.getId firstPrefixMutator :> obj
-                %SorterModelMutator.getId firstSuffixMutator :> obj
-                %SorterModelMutator.getId secondPrefixMutator :> obj
-                %SorterModelMutator.getId secondSuffixMutator :> obj
+                box "msSplitPairsMutator"
+                box (sortingWidth |> UMX.untag)
+                box (firstPrefixMutator |> SorterModelMutator.getId |> UMX.untag)
+                box (firstSuffixMutator |> SorterModelMutator.getId |> UMX.untag)
+                box (secondPrefixMutator |> SorterModelMutator.getId |> UMX.untag)
+                box (secondSuffixMutator |> SorterModelMutator.getId |> UMX.untag)
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterPairModelMutatorId>
 
 
@@ -113,8 +113,8 @@ module MsSplitPairsMutator =
 
     let getMutantSortingId (index: int) (mutator: msSplitPairsMutator) : Guid<sortingId> =
             [
-                %mutator.Id :> obj
-                index :> obj
+                box (mutator.Id |> UMX.untag)   
+                box (index |> UMX.untag)
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingId>
 
     /// Generates an msSplitPairs instance based on sortingId

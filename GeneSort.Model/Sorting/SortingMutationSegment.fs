@@ -21,9 +21,10 @@ type sortingMutationSegment =
         let id = 
             // Generate a unique ID based on the SorterModelGen and indices
             GuidUtils.guidFromObjs [
-                    sortingMutator :> obj
-                    firstIndex :> obj
-                    count :> obj
+                    box "sortingMutationSegment"
+                    box (sortingMutator |> SortingMutator.getId |> UMX.untag)
+                    box (firstIndex |> UMX.untag)   
+                    box (count |> UMX.untag)
                 ] |> UMX.tag<sortingMutationSegmentId>
 
         { id = id; sortingMutator = sortingMutator; firstIndex = firstIndex; count = count }

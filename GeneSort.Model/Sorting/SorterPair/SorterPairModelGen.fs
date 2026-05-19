@@ -49,20 +49,12 @@ module SorterPairModelGen =
                 (model: sorterPairModelGen) : sorterPairModel =
 
         let id = [
-                        model |> getId :> obj
-                        index :> obj
-                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingId>
+                    box (model |> getId |> UMX.untag)
+                    box index
+                 ] 
+                    |> GuidUtils.guidFromObjs |> UMX.tag<sortingId>
 
         makeSorterPairModelFromId id model 
-
-
-    //let makeSorterIdsWithTags (index:int) (model:sorterPairModelGen)
-    //                                : (Guid<sorterId> * modelTag) [] =
-    //    match model with
-    //    | SplitPairs mspg -> mspg |> MsSplitPairsGen.makeSorterIdsWithTags index 
-
-    //    | SplitPairs2 mspg -> mspg |> MsSplitPairsGen.makeSorterIdsWithTags index 
-
 
 
 

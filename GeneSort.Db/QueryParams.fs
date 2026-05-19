@@ -43,26 +43,70 @@ type queryParams =
             |> String.concat ";"
         $"Project: {projStr}, Repl: {replStr}, OutputType: {outTypeStr}, Properties: [{propsStr}]"
 
+    interface IStableSerializable with
+        member this.WriteStableBytes writer =
+            // 1. Serialize projectName option safely
+            match this.projectName with
+            | Some pn -> 
+                writer.Write(true)
+                writer.Write(%pn)
+            | None -> 
+                writer.Write(false)
+
+            // 2. Serialize repl option safely
+            match this.repl with
+            | Some r -> 
+                writer.Write(true)
+                writer.Write(%r)
+            | None -> 
+                writer.Write(false)
+
+            // 3. Serialize outputDataType
+            writer.Write(this.outputDataType |> OutputDataType.toFolderName)
+
+            // 4. Serialize properties sorted by key to maintain hash parity
+            writer.Write(this.properties.Count)
+            this.properties 
+            |> Map.toSeq 
+            |> Seq.sortBy fst 
+            |> Seq.iter (fun (k, v) -> 
+                writer.Write(k)
+                writer.Write(v))
+
     static member create
             (projectName:    string<projectName> option)
             (repl:           int<replNumber> option)
             (outputDataType: outputDataType)
             (properties:     (string * string) []) : queryParams =
         let props = properties |> Array.filter (fst >> isNull >> not) |> Map.ofArray
+        
+        // Build a clean, typed sequential list for Guid generation.
+        // We unpack primitives here so they route smoothly into your GuidUtils primitives matcher.
+        let structuralIdentityComponents = seq {
+            match projectName with
+            | Some pn -> yield box true; yield box %pn
+            | None -> yield box false
+
+            match repl with
+            | Some r -> yield box true; yield box %r
+            | None -> yield box false
+
+            yield box (outputDataType |> OutputDataType.toFolderName)
+            yield box props.Count
+            
+            yield! props 
+                   |> Map.toSeq 
+                   |> Seq.sortBy fst 
+                   |> Seq.collect (fun (k, v) -> [box k; box v])
+        }
+
         {
             projectName    = projectName
             repl           = repl
             outputDataType = outputDataType
             properties     = props
-            id             = GuidUtils.guidFromObjs [
-                                box (projectName    |> queryParams.ProjectNameString)
-                                box (repl           |> queryParams.ReplString)
-                                box (outputDataType |> OutputDataType.toFolderName)
-                                box (props |> Map.toSeq |> Seq.sortBy fst |> Seq.toArray)
-                             ] |> UMX.tag<queryParamsId>
+            id             = GuidUtils.guidFromObjs structuralIdentityComponents |> UMX.tag<queryParamsId>
         }
 
     static member createForProject (projectName: string<projectName>) : queryParams =
         queryParams.create (Some projectName) None outputDataType.Project [||]
-
-

@@ -29,11 +29,11 @@ type msuf6RandGen =
             failwith $"All Uf6GenRates in genRates must have order {%sortingWidth}"
         let id =
             [
-                "msuf6RandGen" :> obj
-                rngFactory :> obj
-                sortingWidth :> obj
-                stageLength :> obj
-                genRates.GetHashCode() :> obj
+                box "msuf6RandGen"
+                box rngFactory
+                box (sortingWidth |> UMX.untag)
+                box (stageLength |> UMX.untag)
+                box (genRates.GetHashCode())
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelGenId>
         { 
           id = id

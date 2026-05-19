@@ -8,9 +8,11 @@ open FSharp.UMX
 
 [<Measure>] type Order
 
-// --- Struct DU for Zero-Allocation Wrapping ---
-[<Struct>]
-type permutation = private Perm of arr: int array * id: Guid with
+// 1. Swap NoComparison for CustomComparison
+[<Struct; CustomEquality; CustomComparison>]
+type permutation = 
+    private Perm of arr: int array * id: Guid 
+    with
     
     static member private ComputeGuid (arr: int array) : Guid =
         use sha256 = SHA256.Create()
@@ -36,8 +38,52 @@ type permutation = private Perm of arr: int array * id: Guid with
     member this.Order = UMX.tag<Order> this.Array.Length
 
     member this.equals (other: permutation) : bool =
-            this.Array.Length = other.Array.Length &&
-            arrayEquals this.Array other.Array
+        this.Array.Length = other.Array.Length &&
+        arrayEquals this.Array other.Array
+
+    override this.Equals(obj) =
+        match obj with
+        | :? permutation as other -> this.equals other
+        | _ -> false
+
+    override this.GetHashCode() = hash this.Id
+
+    // 2. High-Performance Type-Safe F# Comparison Implementation
+    interface IComparable<permutation> with
+        member this.CompareTo(other) =
+            // Strategy: First compare lengths
+            let lenCmp = this.Array.Length.CompareTo(other.Array.Length)
+            if lenCmp <> 0 then lenCmp
+            else
+                // Short-circuit if they point to the exact same array instance or have the same ID
+                if obj.ReferenceEquals(this.Array, other.Array) || this.Id = other.Id then 0
+                else
+                    // Lexicographical array element comparison
+                    let mutable i = 0
+                    let mutable result = 0
+                    let len = this.Array.Length
+                    while i < len && result = 0 do
+                        result <- this.Array.[i].CompareTo(other.Array.[i])
+                        i <- i + 1
+                    result
+
+    // 3. Native .NET IComparable Interface
+    interface IComparable with
+        member this.CompareTo(obj) =
+            match obj with
+            | :? permutation as other -> 
+                (this :> IComparable<permutation>).CompareTo(other)
+            | _ -> 
+                invalidArg "obj" "Argument must be of type permutation"
+
+    interface IStableSerializable with
+        member this.WriteStableBytes (writer: System.IO.BinaryWriter) =
+            writer.Write(this.Id.ToByteArray())
+
+
+
+
+
 
 
 module Permutation =

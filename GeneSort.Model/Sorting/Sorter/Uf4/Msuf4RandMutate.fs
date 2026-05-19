@@ -22,9 +22,10 @@ type msuf4RandMutate =
 
         let id =
             [
-                rngFactory :> obj
-                msuf4.Id :> obj
-                uf4MutationRatesArray.GetHashCode() :> obj
+                box "msuf4RandMutate"
+                box rngFactory
+                box (msuf4.Id |> UMX.untag)
+                box (uf4MutationRatesArray.GetHashCode())
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorId>
 
         {

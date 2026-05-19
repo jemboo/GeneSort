@@ -19,9 +19,9 @@ type sortableTestModelSetGen =
         let id = 
             // Generate a unique ID based on the SorterModelGen and indices
             GuidUtils.guidFromObjs [
-                    sorterTestModelGen :> obj
-                    firstIndex :> obj
-                    count :> obj
+                    (sorterTestModelGen |> SortableTestModelGen.getId |> UMX.untag) :> obj
+                    %firstIndex :> obj
+                    %count :> obj
                 ] |> UMX.tag<sorterTestModelSetGenID>
 
         { id = id; sorterTestModelGen = sorterTestModelGen; firstIndex = firstIndex; count = count }

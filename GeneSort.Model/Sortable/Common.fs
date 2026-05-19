@@ -9,7 +9,7 @@ open GeneSort.Core
 [<Measure>] type sorterTestModelCount
 
 [<Measure>] type sorterTestModelSetID
-[<Measure>] type sorterTestModelGenID
+[<Measure>] type sorterTestModelGenId
 [<Measure>] type sorterTestModelSetGenID
 
 module Common = ()

@@ -60,12 +60,12 @@ type msSplitPairsGen =
         // Calculate ID deterministically from the constituent maker IDs
         let id =
             [
-                "msSplitPairsGen" :> obj
-                sortingWidth :> obj
-                %SorterModelGen.getId firstPrefixGen :> obj
-                %SorterModelGen.getId firstSuffixGen :> obj
-                %SorterModelGen.getId secondPrefixGen :> obj
-                %SorterModelGen.getId secondSuffixGen :> obj
+                box "msSplitPairsGen"
+                box (sortingWidth |> UMX.untag)
+                box (firstPrefixGen |> SorterModelGen.getId |> UMX.untag)
+                box (firstSuffixGen |> SorterModelGen.getId |> UMX.untag)
+                box (secondPrefixGen |> SorterModelGen.getId |> UMX.untag)
+                box (secondSuffixGen |> SorterModelGen.getId |> UMX.untag)
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterPairModelGenId>
         
         { id = id
@@ -128,8 +128,8 @@ module MsSplitPairsGen =
                 (gen: msSplitPairsGen) : msSplitPairs =
         let id =
             [
-                index :> obj
-                gen.Id :> obj
+                box index
+                box (gen.Id |> UMX.untag)
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingId>
 
         makeMsSplitPairsFromId id gen

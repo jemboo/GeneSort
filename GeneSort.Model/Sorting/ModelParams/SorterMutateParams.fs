@@ -18,9 +18,10 @@ type mcseRandMutateParams =
             (excludeSelfCe: bool): mcseRandMutateParams = 
         let id =
             [
-                rngFactory :> obj
-                indelRatesArray :> obj
-                excludeSelfCe :> obj
+                box "mcseRandMutateParams"
+                box rngFactory
+                box (indelRatesArray.GetHashCode())
+                box excludeSelfCe
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingParamsId>
         {
             id = id
@@ -47,8 +48,9 @@ type mssiRandMutateParams =
             (opActionRatesArray: opActionRatesArray): mssiRandMutateParams = 
         let id =
             [
-                rngFactory :> obj
-                opActionRatesArray :> obj
+                box "mssiRandMutateParams"
+                box rngFactory
+                box (opActionRatesArray.GetHashCode())
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingParamsId>
         {
             id = id
@@ -74,8 +76,9 @@ type msrsRandMutateParams =
             (opsActionRatesArray: opsActionRatesArray): msrsRandMutateParams = 
         let id =
             [
-                rngFactory :> obj
-                opsActionRatesArray :> obj
+                box "msrsRandMutateParams"
+                box rngFactory
+                box (opsActionRatesArray.GetHashCode())
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingParamsId>
         {
             id = id
@@ -100,8 +103,9 @@ type msuf4RandMutateParams =
             (uf4MutationRatesArray: uf4MutationRatesArray): msuf4RandMutateParams = 
         let id =
             [
-                rngFactory :> obj
-                uf4MutationRatesArray :> obj
+                box "msuf4RandMutateParams"
+                box rngFactory
+                box (uf4MutationRatesArray.GetHashCode())
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingParamsId>
         {
             id = id
@@ -126,8 +130,9 @@ type msuf6RandMutateParams =
             (uf6MutationRatesArray: uf6MutationRatesArray): msuf6RandMutateParams = 
         let id =
             [
-                rngFactory :> obj
-                uf6MutationRatesArray :> obj
+                box "msuf6RandMutateParams"
+                box rngFactory
+                box (uf6MutationRatesArray.GetHashCode())
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingParamsId>
         {
             id = id

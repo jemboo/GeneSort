@@ -28,9 +28,10 @@ type msrsRandMutate =
 
         let id =
             [
-                rngFactory :> obj
-                msrs.Id :> obj
-                opsActionRatesArray.GetHashCode() :> obj
+                box "msrsRandMutate"
+                box rngFactory
+                box (msrs.Id |> UMX.untag)
+                box (opsActionRatesArray.GetHashCode())
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorId>
 
         {

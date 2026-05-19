@@ -4,6 +4,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Project.V1
 
+
 type queryParams =
     private {
         projectName:    string<projectName>
@@ -49,18 +50,38 @@ type queryParams =
             (outputDataType: outputDataType)
             (properties:     (string * string) []) : queryParams =
         let props = properties |> Array.filter (fst >> isNull >> not) |> Map.ofArray
+        
+        // Build a clean, typed sequential list for Guid generation.
+        // We unpack primitives here so they route smoothly into your GuidUtils primitives matcher.
+        let structuralIdentityComponents = seq {
+            yield box projectName
+
+            match repl with
+            | Some r -> yield box true; yield box %r
+            | None -> yield box false
+
+            yield box (outputDataType |> OutputDataType.toFolderName)
+            yield box props.Count
+            
+            yield! props 
+                   |> Map.toSeq 
+                   |> Seq.sortBy fst 
+                   |> Seq.collect (fun (k, v) -> [box k; box v])
+        }
+
         {
             projectName    = projectName
             repl           = repl
             outputDataType = outputDataType
             properties     = props
-            id             = GuidUtils.guidFromObjs [
-                                box (%projectName    |> string)
-                                box (repl           |> queryParams.ReplString)
-                                box (outputDataType |> OutputDataType.toFolderName)
-                                box (props |> Map.toSeq |> Seq.sortBy fst |> Seq.toArray)
-                             ] |> UMX.tag<queryParamsId>
+            id             = GuidUtils.guidFromObjs structuralIdentityComponents |> UMX.tag<queryParamsId>
         }
+
+    interface IStableSerializable with
+            member this.WriteStableBytes (writer: System.IO.BinaryWriter) =
+                let rawGuid = UMX.untag this.id
+                writer.Write(rawGuid.ToByteArray())
+
 
     static member createForRun 
                     (projectName: string<projectName>) 

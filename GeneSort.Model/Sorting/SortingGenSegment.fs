@@ -19,11 +19,11 @@ type sortingGenSegment =
                 (firstIndex: int<sorterCount>) 
                 (count: int<sorterCount>) : sortingGenSegment =
         let id = 
-            // Generate a unique ID based on the SorterModelGen and indices
             GuidUtils.guidFromObjs [
-                    sortingGen :> obj
-                    firstIndex :> obj
-                    count :> obj
+                    box "sortingGenSegment"
+                    box (sortingGen |> SortingGen.getId |> UMX.untag)
+                    box (firstIndex |> UMX.untag)
+                    box (count |> UMX.untag)
                 ] |> UMX.tag<sortingGenSegmentId>
 
         { id = id; sortingGen = sortingGen; firstIndex = firstIndex; count = count }

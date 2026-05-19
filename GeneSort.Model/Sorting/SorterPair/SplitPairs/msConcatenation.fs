@@ -19,9 +19,9 @@ type msConcatenation =
             (prefix: sorterModel)
             (suffix: sorterModel) : Guid<sorterModelId> =
            [
-                "Concatenation" :> obj
-                %SorterModel.getId prefix :> obj
-                %SorterModel.getId suffix :> obj
+                box "msConcatenation"
+                box (prefix |> SorterModel.getId |> UMX.untag)
+                box (suffix |> SorterModel.getId |> UMX.untag)
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
 
     static member createSorterId 

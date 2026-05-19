@@ -6,7 +6,6 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 
-
 [<Struct; CustomEquality; NoComparison>]
 type msasO = 
     private 
@@ -20,12 +19,15 @@ type msasO =
             (maxOrbit : int )
             : msasO =
             let sias = seedPermutation |> SortableIntArray.getOrbit maxOrbit |> Seq.toArray
-            let id =
-                [
-                    "MsasO" :> obj
-                    seedPermutation :> obj
-                    maxOrbit :> obj
-                ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
+            
+            // Build the components safely using sequence matching
+            let identityComponents = seq {
+                box "msasO"
+                box seedPermutation
+                box maxOrbit
+            }
+            
+            let id = identityComponents |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
 
             { id = id; seedPermutation = seedPermutation; maxOrbit = maxOrbit; sortableIntArrays = sias}
 
@@ -36,16 +38,14 @@ type msasO =
 
     override this.Equals(obj) =
         match obj with
-        | :? msasO as other -> 
-            this.id = other.id
+        | :? msasO as other -> this.id = other.id
         | _ -> false
 
-    override this.GetHashCode() = 
-        hash (this.id, this.seedPermutation, this.maxOrbit)
+
+    override this.GetHashCode() = hash this.id
 
     interface IEquatable<msasO> with
-        member this.Equals(other) = 
-            this.id = other.id
+        member this.Equals(other) = this.id = other.id
 
     member this.MakeSortableBoolTest 
             (sorterTestId: Guid<sortableTestId>)
@@ -68,7 +68,4 @@ type msasO =
                 sortingWidth
                 this.sortableIntArrays
 
-
 module MsasO = ()
- 
- 

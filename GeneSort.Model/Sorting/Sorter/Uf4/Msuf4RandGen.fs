@@ -44,11 +44,11 @@ type msuf4RandGen =
         else
             let id =
                 [
-                    "msuf4RandGen" :> obj
-                    rngFactory :> obj
-                    sortingWidth :> obj
-                    stageLength :> obj
-                    genRates.GetHashCode() :> obj
+                    box "msuf4RandGen"
+                    box rngFactory
+                    box (sortingWidth |> UMX.untag)
+                    box (stageLength  |> UMX.untag)
+                    box (genRates.GetHashCode())
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelGenId>
 
             { id = id

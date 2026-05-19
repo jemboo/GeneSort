@@ -24,10 +24,11 @@ type msceRandMutate =
         if %msce.CeLength <> indelRatesArray.Length then failwith "CeCount must match indelRatesArray.Length"
         let id =
             [
-                msce.Id :> obj
-                rngFactory :> obj
-                indelRatesArray.GetHashCode() :> obj
-                excludeSelfCe :> obj
+                box "msceRandMutate"
+                box (msce.Id |> UMX.untag)
+                box rngFactory
+                box (indelRatesArray.GetHashCode())
+                box excludeSelfCe
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorId>
 
         {

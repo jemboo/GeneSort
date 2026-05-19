@@ -16,13 +16,15 @@ type sortableTestModelSetGen =
                 (sorterTestModelGen: sortableTestModelGen) 
                 (firstIndex: int<sorterTestModelCount>) 
                 (count: int<sorterTestModelCount>) : sortableTestModelSetGen =
-        let id = 
-            // Generate a unique ID based on the SorterModelGen and indices
-            GuidUtils.guidFromObjs [
-                    sorterTestModelGen :> obj
-                    firstIndex :> obj
-                    count :> obj
-                ] |> UMX.tag<sorterTestModelSetGenID>
+        
+        let identityComponents = seq {
+            box "sortableTestModelSetGen"
+            box (sorterTestModelGen |> SortableTestModelGen.getId |> UMX.untag)
+            box (firstIndex |> UMX.untag) 
+            box (count |> UMX.untag)
+        }
+
+        let id = identityComponents |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelSetGenID>
 
         { id = id; sorterTestModelGen = sorterTestModelGen; firstIndex = firstIndex; count = count }
 

@@ -1,5 +1,7 @@
 ﻿namespace GeneSort.Model.Sortable.V1
 
+open FSharp.UMX
+
 type sortableTestModelGen =
      | MsasORandGen of MsasORandGen
 
@@ -14,3 +16,7 @@ module SortableTestModelGen =
         match gen with
         | MsasORandGen msasORandGen ->
                 msasORandGen.getMsasOs(firstIndex) |> Seq.take(count)
+
+    let getId (gen: sortableTestModelGen) : Guid<sorterTestModelGenID> =
+        match gen with
+        | MsasORandGen msasORandGen -> msasORandGen.Id 

@@ -25,24 +25,27 @@ open GeneSort.Core
 module CommonGen =
 
     let makeSorterModelId 
-                (id:  Guid<sorterModelGenId>) 
-                (index:int) : Guid<sorterModelId> = 
-        [
-            id  :> obj
-            "SorterModel" :> obj
-            index :> obj
-        ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
+                (id: Guid<sorterModelGenId>) 
+                (index: int) : Guid<sorterModelId> = 
+        seq {
+            box "CommonGen.makeSorterModelId"
+            box (id |> UMX.untag)
+            box index
+        } 
+        |> GuidUtils.guidFromObjs 
+        |> UMX.tag<sorterModelId>
 
 
     let makeSortingId 
-                (id:  Guid<sorterModelGenId>) 
-                (index:int) : Guid<sortingId> = 
-        [
-            id  :> obj
-            "Sorting" :> obj
-            index :> obj
-        ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingId>
-
+                (id: Guid<sorterModelGenId>) 
+                (index: int) : Guid<sortingId> = 
+        seq {
+            box "CommonGen.makeSortingId"
+            box (id |> UMX.untag)
+            box index
+        } 
+        |> GuidUtils.guidFromObjs 
+        |> UMX.tag<sortingId>
 
 module CommonMutator =
 
@@ -50,9 +53,9 @@ module CommonMutator =
                 (id:  Guid<sorterModelMutatorId>) 
                 (index:int) : Guid<sorterModelId> = 
         [
-            id  :> obj
-            "SorterModel" :> obj
-            index :> obj
+            box "CommonMutator.makeSorterModelId"
+            box (id |> UMX.untag)
+            box index
         ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
 
 
@@ -60,9 +63,9 @@ module CommonMutator =
                 (id:  Guid<sorterModelMutatorId>) 
                 (index:int) : Guid<sortingId> = 
         [
-            id  :> obj
-            "Sorting" :> obj
-            index :> obj
+            box "CommonMutator.makeSortingId"
+            box (id |> UMX.untag)
+            box index 
         ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingId>
 
 

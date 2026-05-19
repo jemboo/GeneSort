@@ -29,11 +29,11 @@ type msceRandGen =
         else
             let id =
                 [
-                    "msceRandGen" :> obj
-                    rngFactory :> obj
-                    sortingWidth :> obj
-                    excludeSelfCe :> obj
-                    %ceLength :> obj
+                    box "msceRandGen"
+                    box rngFactory
+                    box (sortingWidth |> UMX.untag)
+                    box excludeSelfCe
+                    box (ceLength |> UMX.untag)
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelGenId>
 
             { id = id;

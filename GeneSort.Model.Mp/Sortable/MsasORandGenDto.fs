@@ -18,16 +18,16 @@ type msasORandGenDto = {
 
 module MsasORandGenDto =
 
-    let fromDomain (msas: MsasORandGen) : msasORandGenDto =
+    let fromDomain (msas: msasORandGen) : msasORandGenDto =
         { id = %msas.Id; rngFactoryDto = msas.RngFactory |> RngFactoryDto.fromDomain; sortingWidth = int msas.SortingWidth; maxOrbit = msas.MaxOrbit }
 
-    let toDomain (dto: msasORandGenDto) : MsasORandGen =
+    let toDomain (dto: msasORandGenDto) : msasORandGen =
         if dto.sortingWidth < 0 then
             invalidArg "SortingWidth" "Sorting width must be non-negative."
         if dto.maxOrbit < 0 then
             invalidArg "MaxOrbit" "Max orbit must be non-negative."
         try
             let rngFactory = RngFactoryDto.toDomain dto.rngFactoryDto
-            MsasORandGen.create rngFactory (UMX.tag<sortingWidth> dto.sortingWidth) dto.maxOrbit
+            msasORandGen.create rngFactory (UMX.tag<sortingWidth> dto.sortingWidth) dto.maxOrbit
         with
         | :? ArgumentException -> invalidArg "RngType" $"Invalid RngType: {dto.rngFactoryDto}."

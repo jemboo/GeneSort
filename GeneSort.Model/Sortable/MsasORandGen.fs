@@ -5,28 +5,31 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 
-
 [<Struct; CustomEquality; NoComparison>]
-type MsasORandGen = 
+type msasORandGen = 
     private 
         { 
-          id : Guid<sorterTestModelGenID>
+          id : Guid<sorterTestModelGenId>
           rngFactory: rngFactory
           sortingWidth: int<sortingWidth>
-          maxOrbit: int } 
+          maxOrbit: int 
+        } 
 
     static member create
             (rngFactory : rngFactory)
             (sortingWidth : int<sortingWidth>)
             (maxOrbit : int )
-            : MsasORandGen =
-            let id =
-                [
-                    "MsasORandGen" :> obj
-                    sortingWidth :> obj
-                    rngFactory :> obj
-                    maxOrbit :> obj
-                ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelGenID>
+            : msasORandGen =
+            
+            // Clean, deterministic sequential layout using primitive-matching and interfaces
+            let identityComponents = seq {
+                box "msasORandGen"
+                box (sortingWidth |> UMX.untag)
+                box rngFactory
+                box maxOrbit
+            }
+
+            let id = identityComponents |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelGenId>
 
             { id = id; rngFactory = rngFactory; maxOrbit = maxOrbit; sortingWidth = sortingWidth}
 
@@ -37,16 +40,20 @@ type MsasORandGen =
 
     override this.Equals(obj) = 
         match obj with
-        | :? MsasORandGen as other -> 
-            this.id = other.id
+        | :? msasORandGen as other -> this.id = other.id
         | _ -> false
 
-    override this.GetHashCode() = 
-        hash (this.id, this.RngFactory, this.sortingWidth, this.maxOrbit)
+    // Aligned to match the explicit ID equality definition
+    override this.GetHashCode() = hash this.id
 
-    interface IEquatable<MsasORandGen> with
-        member this.Equals(other) = 
-            this.id = other.id
+    interface IEquatable<msasORandGen> with
+        member this.Equals(other) = this.id = other.id
+
+    // Interface fulfillment allowing this generator to be serialized safely inside collections
+    interface IStableSerializable with
+        member this.WriteStableBytes (writer: System.IO.BinaryWriter) =
+            let rawGuid = UMX.untag this.id
+            writer.Write(rawGuid.ToByteArray())
 
     member this.getMsasOs (offset: int) : sortableTestModel seq =
             let randy = this.RngFactory.Create (%this.id)
@@ -58,7 +65,4 @@ type MsasORandGen =
                     }
             permSeq |> Seq.skip offset |> Seq.map(fun perm -> msasO.create perm maxO |> sortableTestModel.MsasO)
 
-
 module MsasORandGen = ()
- 
- 

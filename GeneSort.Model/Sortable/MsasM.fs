@@ -12,13 +12,13 @@ type msasM =
     private 
         { id: Guid<sorterTestModelID>
           mergeDimension: int<mergeDimension>
-          mergeFillType: mergeSuffixType
+          mergeSuffixType: mergeSuffixType
           sortingWidth: int<sortingWidth> }
 
     static member create 
             (sortingWidth: int<sortingWidth>)
             (mergeDimension: int<mergeDimension>)
-            (mergeFillType: mergeSuffixType)
+            (mergeSuffixType: mergeSuffixType)
             : msasM =
         if %sortingWidth < 2 then
             failwith "SortingWidth must be at least 2"
@@ -27,22 +27,22 @@ type msasM =
         else
             let id = 
                 [
-                    "MsasMi" :> obj
-                    mergeDimension :> obj
-                    mergeFillType :> obj
-                    sortingWidth :> obj
+                    box "msasM"
+                    box (mergeDimension |> UMX.untag)
+                    box (sprintf "%A" mergeSuffixType)
+                    box (sortingWidth |> UMX.untag)
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
             { 
                 id = id; 
                 mergeDimension = mergeDimension
-                mergeFillType = mergeFillType
+                mergeSuffixType = mergeSuffixType
                 sortingWidth = sortingWidth
             }
 
     member this.Id with get() = this.id
 
     member this.MergeDimension with get() = this.mergeDimension
-    member this.MergeFillType with get() = this.mergeFillType
+    member this.MergeSuffixType with get() = this.mergeSuffixType
 
     member this.SortingWidth with get() = this.sortingWidth
 
@@ -63,7 +63,7 @@ type msasM =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
-                            this.mergeFillType
+                            this.mergeSuffixType
 
         sortableIntTest.create 
                 sorterTestId
@@ -77,7 +77,7 @@ type msasM =
         let sortableArrays = SortableBoolArray.getMergeTestCases
                                     this.sortingWidth
                                     this.mergeDimension
-                                    this.mergeFillType  
+                                    this.mergeSuffixType  
 
         sortableBinaryTest.create 
                 sorterTestId
@@ -90,7 +90,7 @@ type msasM =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
-                            this.mergeFillType
+                            this.mergeSuffixType
 
         SortableUint8v256Test.fromIntArrays 
                 sorterTestId
@@ -103,7 +103,7 @@ type msasM =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
-                            this.mergeFillType
+                            this.mergeSuffixType
 
         SortableUint8v512Test.fromIntArrays 
                 sorterTestId
@@ -116,7 +116,7 @@ type msasM =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
-                            this.mergeFillType
+                            this.mergeSuffixType
 
         let sw = this.SortingWidth
     

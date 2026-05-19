@@ -74,11 +74,11 @@ module SorterPairModelMutator =
 
 
     let makeSorterPairModelFromIndex
-                (index: int)  
+                (index: int)
                 (model: sorterPairModelMutator) : sorterPairModel =
         let id = [
-                        model |> getId :> obj
-                        index :> obj
+                        box (model |> getId |> UMX.untag)
+                        box index
                  ] |> GuidUtils.guidFromObjs |> UMX.tag<sortingId>
 
         model |> makeSorterPairModelFromId id

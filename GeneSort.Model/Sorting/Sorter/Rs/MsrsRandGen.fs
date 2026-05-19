@@ -27,10 +27,10 @@ type msrsRandGen =
             failwith $"SortingWidth must be at least 2, got {%sortingWidth}"
         let id =
             [
-                "msrsRandGen" :> obj
-                rngFactory :> obj
-                sortingWidth :> obj
-                opsGenRatesArray.GetHashCode() :> obj
+                box "msrsRandGen"
+                box rngFactory
+                box (sortingWidth |> UMX.untag)
+                box (opsGenRatesArray.GetHashCode())
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelGenId>
 
         {
