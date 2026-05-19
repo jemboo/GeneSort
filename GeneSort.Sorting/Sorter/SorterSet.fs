@@ -28,7 +28,7 @@ open GeneSort.Core
  module SorterSet = 
     
     let mergeSorterSets (sorterSets: sorterSet []) : sorterSet =
-        let idSet = sorterSets |> Array.map(fun ss -> ss.Id :> obj)
+        let idSet = sorterSets |> Array.map(fun ss -> ss.Id |> UMX.untag :> obj)
         let mergedId = GuidUtils.guidFromObjs idSet |> UMX.tag<sorterSetId>
         let mergedSorters = sorterSets |> Array.collect(fun ss -> ss.Sorters)
         sorterSet.create mergedId mergedSorters

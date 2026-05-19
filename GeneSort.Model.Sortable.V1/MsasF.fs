@@ -22,8 +22,8 @@ type msasF =
         else
             let id = 
                 [
-                    "MsasF" :> obj
-                    sortingWidth :> obj
+                    box "msasF"
+                    box (sortingWidth |> UMX.untag)
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
             { id = id; sortingWidth = sortingWidth; }
 

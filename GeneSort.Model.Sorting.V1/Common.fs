@@ -27,19 +27,11 @@ module CommonGen =
                 (id:  Guid<sorterModelGenId>) 
                 (index:int) : Guid<sorterModelId> = 
         [
-            id  :> obj
-            "SorterModel" :> obj
-            index :> obj
+            box "CommonGen.makeSorterModelId"
+            box (id |> UMX.untag)
+            box index
         ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
 
-    let makeSorterModelIdWithMix
-                (genId: Guid<sorterModelGenId>)
-                (index: int) : Guid<sorterModelId> =
-            let baseSeed = RandomSeed.fromGuid %genId
-            let mixed = Rando.mix (baseSeed |> UMX.untag) (uint64 index)
-            // Convert back to Guid if needed, or keep as seed directly
-            // For now, stick close to your original style
-            makeSorterModelId genId index
 
 
 module CommonMutator =
@@ -48,7 +40,7 @@ module CommonMutator =
                 (id:  Guid<sorterModelMutatorId>) 
                 (index:int) : Guid<sorterModelId> = 
         [
-            id  :> obj
-            "SorterModel" :> obj
-            index :> obj
+            box "CommonMutator.makeSorterModelId"
+            box (id |> UMX.untag)
+            box index
         ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>

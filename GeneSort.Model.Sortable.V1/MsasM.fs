@@ -18,7 +18,7 @@ type msasM =
     static member create 
             (sortingWidth: int<sortingWidth>)
             (mergeDimension: int<mergeDimension>)
-            (mergeFillType: mergeSuffixType)
+            (mergeSuffixType: mergeSuffixType)
             : msasM =
         if %sortingWidth < 2 then
             failwith "SortingWidth must be at least 2"
@@ -27,15 +27,15 @@ type msasM =
         else
             let id = 
                 [
-                    "MsasMi" :> obj
-                    mergeDimension :> obj
-                    mergeFillType :> obj
-                    sortingWidth :> obj
+                    box "msasM"
+                    box (mergeDimension |> UMX.untag)
+                    box (sprintf "%A" mergeSuffixType)
+                    box (sortingWidth |> UMX.untag)
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
             { 
                 id = id; 
                 mergeDimension = mergeDimension
-                mergeFillType = mergeFillType
+                mergeFillType = mergeSuffixType
                 sortingWidth = sortingWidth
             }
 

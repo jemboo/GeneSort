@@ -24,10 +24,11 @@ type msceRandMutate =
         
         let id =
             [
-                msce.Id :> obj
-                rngFactory :> obj
-                indelRates.GetHashCode() :> obj
-                excludeSelfCe :> obj
+                box "msceRandMutate"
+                box (msce.Id |> UMX.untag)
+                box rngFactory
+                box (indelRates.GetHashCode())
+                box (excludeSelfCe |> UMX.untag)
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorId>
 
         {

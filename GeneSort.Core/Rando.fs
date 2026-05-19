@@ -1,7 +1,6 @@
 ﻿namespace GeneSort.Core
 open System
 open FSharp.UMX
-open System.Threading
 
 
 [<Measure>] type randomSeed
@@ -10,13 +9,17 @@ open System.Threading
 
 module RandomSeed =
     let fromGuid(guid: Guid) : uint64<randomSeed> =
-        let bytes = guid.ToByteArray()
-        let mutable seed = 0UL
-        for i in 0 .. 7 do
-            seed <- seed ^^^ (uint64 bytes.[i] <<< (i * 8))
-        for i in 8 .. 15 do
-            seed <- seed ^^^ (uint64 bytes.[i] <<< ((i - 8) * 8))
-        UMX.tag<randomSeed> seed
+            let bytes = guid.ToByteArray()
+        
+            // Directly pull the lower and upper 64-bit halves of the GUID payload
+            let lowerHalf = BitConverter.ToUInt64(bytes, 0)
+            let upperHalf = BitConverter.ToUInt64(bytes, 8)
+        
+            // XOR compress them together instantly via CPU registers
+            let finalSeed = lowerHalf ^^^ upperHalf
+        
+            UMX.tag<randomSeed> finalSeed
+
 
 type rngType =
     | Lcg

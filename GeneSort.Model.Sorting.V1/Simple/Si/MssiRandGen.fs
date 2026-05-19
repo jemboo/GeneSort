@@ -29,10 +29,10 @@ type mssiRandGen =
         else
             let id =
                 [
-                    "mssiRandGen" :> obj
-                    rngFactory :> obj
-                    sortingWidth :> obj
-                    %stageLength :> obj
+                    box "mssiRandGen"
+                    box rngFactory
+                    box (sortingWidth |> UMX.untag)
+                    box (stageLength |> UMX.untag)
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelGenId>
 
             { 
