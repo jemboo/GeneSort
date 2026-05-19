@@ -102,6 +102,7 @@ module EvalBinsRandomMergeSpecs =
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
             AllowOverwrite = false |> UMX.tag
+            MaxParallel = 4
         }
 
         let EvalBins_Merge_test (executorType: evalBinsExecutorType) : runHostSpec = {
@@ -121,6 +122,7 @@ module EvalBinsRandomMergeSpecs =
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
             AllowOverwrite = false |> UMX.tag
+            MaxParallel = 2
         }
 
 
@@ -141,6 +143,7 @@ module EvalBinsRandomMergeSpecs =
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
             AllowOverwrite = false |> UMX.tag
+            MaxParallel = 4
         }
 
 
@@ -161,6 +164,7 @@ module EvalBinsRandomMergeSpecs =
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
             AllowOverwrite = false |> UMX.tag
+            MaxParallel = 4
         }
 
 
@@ -181,6 +185,7 @@ module EvalBinsRandomMergeSpecs =
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
             AllowOverwrite = false |> UMX.tag
+            MaxParallel = 2
         }
 
 

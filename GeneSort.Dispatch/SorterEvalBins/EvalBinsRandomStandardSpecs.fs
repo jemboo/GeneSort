@@ -71,6 +71,7 @@ module EvalBinsRandomStandardSpecs =
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
+            MaxParallel = 2
         }
 
         let EvalBins_Standard_small (executorType: evalBinsExecutorType) : runHostSpec = {
@@ -87,6 +88,7 @@ module EvalBinsRandomStandardSpecs =
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
+            MaxParallel = 8
         }
 
         let EvalBins_Standard_medium (executorType: evalBinsExecutorType) : runHostSpec = {
@@ -103,6 +105,7 @@ module EvalBinsRandomStandardSpecs =
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
+            MaxParallel = 4
         }
 
     type configType =

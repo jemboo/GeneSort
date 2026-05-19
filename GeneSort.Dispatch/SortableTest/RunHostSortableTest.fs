@@ -17,10 +17,17 @@ type runHostSortableTest =
         _parameterSpans: (string * string list) list
         _spec: runHostSpec
         _run: run
+        _maxParallel: int
     }
     
     static member Create db spec run =
-        { _projectDb = db; _parameterSpans = spec.Spans; _spec = spec; _run = run }
+        { 
+            _projectDb = db; 
+            _parameterSpans = spec.Spans; 
+            _spec = spec; 
+            _run = run;
+            _maxParallel = spec.MaxParallel
+        }
 
     member this.Spec = this._spec
 
@@ -35,7 +42,7 @@ type runHostSortableTest =
         member this.ParameterSpans = this._parameterSpans
         member this.AllowOverwrite = this._spec.AllowOverwrite
         member this.ParamMapRefiner rps = this.ParamMapRefiner rps
-
+        member this.MaxParallel with get (): int = this._maxParallel
 
 
 module RunHostSortableTest =

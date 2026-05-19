@@ -1,14 +1,8 @@
 ﻿namespace GeneSort.Dispatch.V1.SorterEvalBins
 
-open FSharp.UMX
-open GeneSort.Core
-open GeneSort.Sorting
 open GeneSort.Db.V1
 open GeneSort.Project.V1
-open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
-open GeneSort.FileDb.V1
-open Common
 open SimpleSorterModelDbs
 
 
@@ -20,10 +14,16 @@ type runHostEvalBins =
         _parameterSpans: (string * string list) list
         _spec: runHostSpec
         _run: run
+        _maxParallel: int
     }
     
     static member Create db spec run =
-        { _projectDb = db; _parameterSpans = spec.Spans; _spec = spec; _run = run }
+        { 
+          _projectDb = db; 
+          _parameterSpans = spec.Spans; 
+          _spec = spec;
+          _run = run;
+          _maxParallel = spec.MaxParallel }
 
     member this.Spec = this._spec
 
@@ -37,6 +37,7 @@ type runHostEvalBins =
         member this.ParameterSpans = this._parameterSpans
         member this.AllowOverwrite = this._spec.AllowOverwrite
         member this.ParamMapRefiner rps = this.ParamMapRefiner rps
+        member this.MaxParallel with get (): int = this._maxParallel
 
 
 module RunHostEvalBins =

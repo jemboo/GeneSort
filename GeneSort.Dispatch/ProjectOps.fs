@@ -59,11 +59,8 @@ module ProjectOps =
 
     /// The single entry point for executing a batch of runs
     let executeRuns
-            (db: IGeneSortDb)
             (minRepl: int<replNumber>)
             (maxRepl: int<replNumber>)
-            (buildQueryParams: runParameters -> outputDataType -> queryParams option)
-            (runName: string<runName>)
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource)
             (progress: IProgress<string> option)
@@ -71,6 +68,9 @@ module ProjectOps =
             (executor: IRunParamsExecutor)
             (maxParallel: int) =
         asyncResult {
+            let db = host.ProjectDb
+            let runName = host.Run.RunName
+
             try
                 report progress (sprintf "%s Starting project: %s" (MathUtils.getTimestampString()) %runName)
 
@@ -85,7 +85,7 @@ module ProjectOps =
                     // Map parameters to tasks and execute with internal throttling
                     let! results = 
                         paramsArray 
-                        |> Seq.map (runTask db runName buildQueryParams 
+                        |> Seq.map (runTask db runName db.MakeQueryParamsFromRunParams 
                                             (RunParamsExecutor.execute executor host) allowOverwrite cts progress)
                         |> fun tasks -> Async.Parallel(tasks, maxParallel)
 

@@ -63,7 +63,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 
 
-let configType = EvalBinsRandomMergeSpecs.configType.EvalBins_Merge_single
+let configType = EvalBinsRandomMergeSpecs.configType.EvalBins_Merge_Test
 let executorType = evalBinsExecutorType.MergeSortables
 let host: IRunHost = 
     let spec = EvalBinsRandomMergeSpecs.getConfig configType executorType
@@ -75,7 +75,7 @@ let executor = EvalBinsExecutor.getExecutor executorType
 
 
 //let configType = EvalBinsRandomStandardSpecs.configType.EvalBins_Standard_Test
-//let executorType = evalExecutorType.StandardBins
+//let executorType = evalBinsExecutorType.StandardSortables
 //let host: IRunHost = 
 //    let spec = EvalBinsRandomStandardSpecs.getConfig configType executorType
 //    SorterEvalBins.RunHostEvalBins.createRunHost spec
@@ -106,12 +106,9 @@ async {
     | Error e -> printfn "Init Failure: %s" e
     | Ok () ->
         let! execResult = 
-            ProjectOps.executeRuns 
-                host.ProjectDb      
+            ProjectOps.executeRuns  
                 minReplica 
-                maxReplica 
-                host.ProjectDb.MakeQueryParamsFromRunParams 
-                host.Run.RunName 
+                maxReplica
                 host.AllowOverwrite 
                 cts 
                 (Some progress)

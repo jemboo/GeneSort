@@ -14,7 +14,7 @@ type IRunHost =
     abstract member ParameterSpans: (string * string list) list
     abstract member AllowOverwrite: bool<allowOverwrite>
     abstract member ParamMapRefiner: runParameters seq -> runParameters seq
-
+    abstract member MaxParallel: int
 
 
 /// Define the contract for an Executor

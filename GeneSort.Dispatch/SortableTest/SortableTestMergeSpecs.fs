@@ -85,6 +85,7 @@ module SortableTetsMergeSpecs =
             Filter = standardParamMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
+            MaxParallel = 2
         }
 
 
@@ -102,6 +103,7 @@ module SortableTetsMergeSpecs =
             Filter = standardParamMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
+            MaxParallel = 4
         }
 
         
@@ -119,6 +121,7 @@ module SortableTetsMergeSpecs =
             Filter = standardParamMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
+            MaxParallel = 4
         }
 
         
@@ -136,6 +139,7 @@ module SortableTetsMergeSpecs =
             Filter = standardParamMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
+            MaxParallel = 2
         }
 
 

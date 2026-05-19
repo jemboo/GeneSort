@@ -56,25 +56,6 @@ module EvalBinsExecutor =
         }
 
 
-    let makeUniformSorterModelSet (rp:runParameters) : sorterModelSet option =
-        maybe {
-            let! sortingWidth = rp.GetSortingWidth()
-            let! simpleSorterModelType = rp.GetSimpleSorterModelType()
-            let! rngType = rp.GetRngType()
-
-            let sorterModelGen = Common.getSimpleUniformSorterModelGen 
-                                    rngType sortingWidth simpleSorterModelType
-
-            let! qpModelSet = SimpleSorterModelDbs.makeStandardQueryParamsFromRunParams 
-                                     rp (outputDataType.SorterModelSet "")
-
-            let! repl = rp.GetRepl()
-            let! sorterCount = rp.GetSorterCount()
-            let firstIdx = (%repl * %sorterCount) |> UMX.tag<sorterCount>
-            return SorterModelGen.makeSorterModelSetFromIndexSpan 
-                            (%qpModelSet.Id |> UMX.tag) firstIdx sorterCount sorterModelGen
-        }
-
 
     let makeUniformSorterModelSets (rp:runParameters) (splitFactor:int) : seq<sorterModelSet> option =
         maybe {
@@ -121,7 +102,9 @@ module EvalBinsExecutor =
             try
                 // 1. Initial Check & Splitting Sorter Model Creation
                 do! checkCancellation cts.Token
-                let splitFactor = 20
+                
+                let totalSorterCount = rp.GetSorterCount() |> Option.defaultValue (1000 |> UMX.tag)
+                let splitFactor = %totalSorterCount / 100
                 log (sprintf "Creating Sorter Model Sets split into %d pieces..." splitFactor)
         
                 let! modelSets = 

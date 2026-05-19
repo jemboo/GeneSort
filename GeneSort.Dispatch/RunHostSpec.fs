@@ -1,12 +1,9 @@
 ﻿namespace GeneSort.Dispatch.V1
 
 open FSharp.UMX
-open GeneSort.Core
-open GeneSort.Sorting
 open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Dispatch.V1
-open GeneSort.Sorting.Sortable
 
 
 type runHostSpec = {
@@ -20,4 +17,5 @@ type runHostSpec = {
     Enhancer: IRunHost -> runParameters -> runParameters
     // Domain Settings
     AllowOverwrite: bool<allowOverwrite>
+    MaxParallel: int
 }
