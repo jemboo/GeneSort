@@ -10,10 +10,10 @@ module SortableTetsMergeSpecs =
     
     // SortingWidths
     let smallSortingWidths = 
-            (runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48; 64] |> List.map string)
+            (runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48;] |> List.map string)
 
     let mediumSortingWidths = 
-            (runParameters.sortingWidthKey,  [96; 128; 192; 256]  |> List.map string)
+            (runParameters.sortingWidthKey,  [64; 96; 128; 192; 256]  |> List.map string)
 
 
     // MergeDimensions

@@ -159,7 +159,7 @@ module EvalBinsRandomMergeSpecs =
                 lowMergeDimensions
                 bothMergeSuffixTypes
                 onlyDataFormat
-                smallSorterCount
+                mediumSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer

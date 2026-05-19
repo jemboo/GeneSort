@@ -48,7 +48,6 @@ let mode = GCSettings.LatencyMode
 
 let progress = createThreadSafeProgress()
 let cts = new CancellationTokenSource()
-let maxParallel = 4 // Environment.ProcessorCount
 
 let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
@@ -114,7 +113,7 @@ async {
                 (Some progress)
                 host
                 executor
-                maxParallel
+                host.MaxParallel
 
         match execResult with
         | Ok results -> printfn "Success: %d records processed." results.Length

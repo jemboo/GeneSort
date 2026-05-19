@@ -21,10 +21,10 @@ module EvalBinsRandomStandardSpecs =
             (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
 
     // SorterCounts
-    let testSorterCount = (runParameters.sorterCountKey, ["100";] )
-    let smallSorterCount = (runParameters.sorterCountKey, ["1000";] )
-    let mediumSorterCount = (runParameters.sorterCountKey, ["10000";] )
-    let largeSorterCount = (runParameters.sorterCountKey, ["100000";] )
+    let testSorterCount = (runParameters.sorterCountKey, ["1000";] )
+    let smallSorterCount = (runParameters.sorterCountKey, ["10000";] )
+    let mediumSorterCount = (runParameters.sorterCountKey, ["100000";] )
+    let largeSorterCount = (runParameters.sorterCountKey, ["1000000";] )
     
     // SimpleSorterModelTypes
     let allSimpleSorterModelTypes = 
@@ -100,7 +100,7 @@ module EvalBinsRandomStandardSpecs =
                 rngType
                 mediumSortingWidths
                 allSimpleSorterModelTypes
-                mediumSorterCount
+                largeSorterCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
