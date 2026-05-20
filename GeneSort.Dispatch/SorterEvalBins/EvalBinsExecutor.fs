@@ -14,9 +14,9 @@ open GeneSort.Eval.V1.Bins
 open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
-open GeneSort.Model.Sorting.Simple.V1
 open Common
 open GeneSort.Dispatch.V1.OpsUtils
+open GeneSort.Dispatch.V1.SortableTest
 
 module EvalBinsExecutor =
 
@@ -30,7 +30,10 @@ module EvalBinsExecutor =
             match paramsOpt with
             | Some (sortingWidth, qpTests) ->
                 let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-                return Ok (SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel standardSortableDataFormat)
+                return Ok ( SortableTestModel.makeSortableTest 
+                                    (%qpTests.Id |> UMX.tag) 
+                                    testModel 
+                                    CommonSorterEvalBins.standardSortableDataFormat)
             | None ->
                 return Error "Failed: One or more RunParameters for StandardTests were missing."
         }
@@ -49,12 +52,11 @@ module EvalBinsExecutor =
 
             match paramsOpt with
             | Some (repl, sw, md, mst, sdf) ->
-                return! GeneSort.Dispatch.V1.SortableTest.SortableTestDb.getMergeSorterTestSet 
+                return! SortableTestDb.getMergeSorterTestSet 
                                         repl sw md mst sdf  
             | None ->
                 return Error "Failed: One or more RunParameters for MergeTests were missing."
         }
-
 
 
     let makeUniformSorterModelSets (rp:runParameters) (splitFactor:int) : seq<sorterModelSet> option =
@@ -63,7 +65,7 @@ module EvalBinsExecutor =
             let! simpleSorterModelType = rp.GetSimpleSorterModelType()
             let! rngType = rp.GetRngType()
 
-            let sorterModelGen = Common.getSimpleUniformSorterModelGen 
+            let sorterModelGen = CommonSorterEvalBins.getSimpleUniformSorterModelGen 
                                     rngType sortingWidth simpleSorterModelType
 
             let! qpModelSet = SimpleSorterModelDbs.makeStandardQueryParamsFromRunParams 
@@ -75,7 +77,6 @@ module EvalBinsExecutor =
             let chunkCount = (%totalSorterCount / splitFactor) |> UMX.tag<sorterCount>
             let baseFirstIdx = (%repl * %totalSorterCount)
 
-            // Using 'seq' instead of '[|' means this block yields elements lazily
             return seq {
                 for i in 0 .. (splitFactor - 1) do
                     let pieceFirstIdx = (baseFirstIdx + (i * %chunkCount)) |> UMX.tag<sorterCount>
@@ -104,7 +105,7 @@ module EvalBinsExecutor =
                 do! checkCancellation cts.Token
                 
                 let totalSorterCount = rp.GetSorterCount() |> Option.defaultValue (1000 |> UMX.tag)
-                let splitFactor = %totalSorterCount / 100
+                let splitFactor = %totalSorterCount / 1000
                 log (sprintf "Creating Sorter Model Sets split into %d pieces..." splitFactor)
         
                 let! modelSets = 
@@ -122,7 +123,7 @@ module EvalBinsExecutor =
                 let! qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
                               |> Result.ofOption "Failed to create QueryParams for Bins."
 
-                let collectTests = Common.CollectSortableTests
+                let collectTests = CommonSorterEvalBins.CollectSortableTests
                 let testId = tests |> SortableTests.getId
 
                 // 3. Sequential Chunk Evaluation & Merging

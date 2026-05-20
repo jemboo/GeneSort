@@ -20,7 +20,7 @@ module SortableTestDb =
                 (outputDataType: outputDataType) : queryParams =
 
         queryParams.create 
-            Common.projectName
+            CommonSortableTest.projectName
             (Some repl)
             outputDataType
             [| (runParameters.sortingWidthKey, string %sortingWidth); 
@@ -39,7 +39,7 @@ module SortableTestDb =
             return makeMergeQueryParams repl sw md mst sdf odt
         }
 
-    let sortableMergeTestDb = new GeneSortDbMp(Common.mergeDatabaseFolder, makeMergeQueryParamsFromRunParams)
+    let sortableMergeTestDb = new GeneSortDbMp(CommonSortableTest.mergeDatabaseFolder, makeMergeQueryParamsFromRunParams)
 
 
     let getMergeSorterTestSet
@@ -62,7 +62,7 @@ module SortableTestDb =
 
 
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
-        [ (Common.mergeDatabaseName, sortableMergeTestDb :> IGeneSortDb) ]
+        [ (CommonSortableTest.mergeDatabaseName, sortableMergeTestDb :> IGeneSortDb) ]
         |> Map.ofList   
 
     let getDatabaseByName (name: string<databaseName>) : IGeneSortDb =

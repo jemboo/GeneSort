@@ -7,6 +7,7 @@ open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.FileDb.V1
 open GeneSort.Model.Sorting.Simple.V1
+open GeneSort.Dispatch.V1.SortableTest
 
 
 type evalBinsExecutorType = 
@@ -24,7 +25,7 @@ module EvalBinsExecutorType =
         | BinsReport -> "BinsReport"
 
 
-module Common =
+module CommonSorterEvalBins =
 
     let projectName = "SorterEvalBins" |> UMX.tag<projectName>
 
@@ -46,8 +47,8 @@ module Common =
     let ExcludeSelfCe = true |> UMX.tag<excludeSelfCe>
 
     let standardSortableDataFormat = sortableDataFormat.BitVector512
-
-    let mergeSortableDataFormat = sortableDataFormat.Int8Vector512
+    let mergeSortableDataFormat = CommonSortableTest.projectSortableDataFormat
+    let projectRngType = rngType.Lcg
 
     let getStageLength 
                 (smt: simpleSorterModelType) 
@@ -81,9 +82,9 @@ module Common =
 
 
     let getSimpleUniformSorterModelGen
-                    (rngType: rngType) 
-                    (sortingWidth: int<sortingWidth>)
-                    (simpleSorterModelType: simpleSorterModelType) 
+            (rngType: rngType) 
+            (sortingWidth: int<sortingWidth>)
+            (simpleSorterModelType: simpleSorterModelType) 
                             : sorterModelGen =
             let stageLength = getStageLength simpleSorterModelType sortingWidth
             let rngFactory = rngType |> RngFactory.create
@@ -97,14 +98,15 @@ module Common =
 
 
     let getSimpleSorterModelSetFromIds
-                    (ids: Guid<sorterModelId> [])
-                    (rngType: rngType) 
-                    (sortingWidth: int<sortingWidth>)
-                    (simpleSorterModelType: simpleSorterModelType) 
-                    (setId: Guid<sorterModelSetId>)
+            (ids: Guid<sorterModelId> [])
+            (sortingWidth: int<sortingWidth>)
+            (simpleSorterModelType: simpleSorterModelType) 
+            (setId: Guid<sorterModelSetId>)
                             : sorterModelSet =
             let sorterModelGen = getSimpleUniformSorterModelGen 
-                                        rngType sortingWidth simpleSorterModelType
+                                        projectRngType 
+                                        sortingWidth 
+                                        simpleSorterModelType
             sorterModelGen |> SorterModelGen.makeSorterModelSetFromIds setId ids
 
 

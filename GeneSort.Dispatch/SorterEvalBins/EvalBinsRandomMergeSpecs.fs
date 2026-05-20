@@ -13,7 +13,8 @@ module EvalBinsRandomMergeSpecs =
     let mergeDataFolder = "c:\\Projects\\EvalBins\\RandomMerge\\Data"
 
     let rngType = 
-            (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
+            (runParameters.rngTypeKey, 
+            [CommonSorterEvalBins.projectRngType;] |> List.map RngType.toString)
     
     // SortingWidths
     let smallSortingWidths = SortableTetsMergeSpecs.smallSortingWidths
@@ -25,7 +26,9 @@ module EvalBinsRandomMergeSpecs =
     let highMergeDimensions = SortableTetsMergeSpecs.highMergeDimensions
 
     // DataFormats
-    let onlyDataFormat = SortableTetsMergeSpecs.onlyDataFormat
+    let onlyDataFormat = 
+            (runParameters.sortableDataFormatKey, 
+            [CommonSorterEvalBins.mergeSortableDataFormat] |> List.map SortableDataFormat.toString)
     
     // MergeSuffixTypes
     let bothMergeSuffixTypes = SortableTetsMergeSpecs.bothMergeSuffixTypes
@@ -86,8 +89,8 @@ module EvalBinsRandomMergeSpecs =
     module Specs =
 
         let EvalBins_Merge_single (executorType: evalBinsExecutorType) : runHostSpec = {
-            ProjectName = Common.projectName
-            DatabaseName = Common.randomMergeDatabaseName
+            ProjectName = CommonSortableTest.projectName
+            DatabaseName = CommonSorterEvalBins.randomMergeDatabaseName
             RunName = sprintf @"EvalBins_Merge_single_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msuf4"
             Spans = [   
@@ -106,8 +109,8 @@ module EvalBinsRandomMergeSpecs =
         }
 
         let EvalBins_Merge_test (executorType: evalBinsExecutorType) : runHostSpec = {
-            ProjectName = Common.projectName
-            DatabaseName = Common.randomMergeDatabaseName
+            ProjectName = CommonSortableTest.projectName
+            DatabaseName = CommonSorterEvalBins.randomMergeDatabaseName
             RunName = sprintf @"EvalBins_Merge_test_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [   
@@ -127,8 +130,8 @@ module EvalBinsRandomMergeSpecs =
 
 
         let EvalBins_Merge_small (executorType: evalBinsExecutorType) : runHostSpec = {
-            ProjectName = Common.projectName
-            DatabaseName = Common.randomMergeDatabaseName
+            ProjectName = CommonSortableTest.projectName
+            DatabaseName = CommonSorterEvalBins.randomMergeDatabaseName
             RunName = sprintf @"EvalBins_Merge_small_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
@@ -138,7 +141,7 @@ module EvalBinsRandomMergeSpecs =
                 allMergeDimensions
                 bothMergeSuffixTypes
                 onlyDataFormat
-                smallSorterCount
+                mediumSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
@@ -148,8 +151,8 @@ module EvalBinsRandomMergeSpecs =
 
 
         let EvalBins_Merge_medium_Ld (executorType: evalBinsExecutorType) : runHostSpec = {
-            ProjectName = Common.projectName
-            DatabaseName = Common.randomMergeDatabaseName
+            ProjectName = CommonSortableTest.projectName
+            DatabaseName = CommonSorterEvalBins.randomMergeDatabaseName
             RunName = sprintf @"EvalBins_Merge_medium_Ld_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
@@ -169,8 +172,8 @@ module EvalBinsRandomMergeSpecs =
 
 
         let EvalBins_Merge_medium_Hd (executorType: evalBinsExecutorType) : runHostSpec = {
-            ProjectName = Common.projectName
-            DatabaseName = Common.randomMergeDatabaseName
+            ProjectName = CommonSortableTest.projectName
+            DatabaseName = CommonSorterEvalBins.randomMergeDatabaseName
             RunName = sprintf @"EvalBins_Merge_medium_Hd_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [

@@ -12,7 +12,8 @@ module EvalBinsRandomStandardSpecs =
     let standardDataFolder = "c:\\Projects\\EvalBins\\RandomStandard\\Data"
 
     let rngType = 
-            (runParameters.rngTypeKey, [rngType.Lcg;] |> List.map RngType.toString)
+            (runParameters.rngTypeKey, 
+            [CommonSorterEvalBins.projectRngType;] |> List.map RngType.toString)
     
     // SortingWidths
     let smallSortingWidths = 
@@ -58,8 +59,8 @@ module EvalBinsRandomStandardSpecs =
     module Specs =
 
         let EvalBins_Standard_test (executorType: evalBinsExecutorType)  : runHostSpec = {
-            ProjectName = Common.projectName
-            DatabaseName = Common.randomStandardDatabaseName
+            ProjectName = CommonSorterEvalBins.projectName
+            DatabaseName = CommonSorterEvalBins.randomStandardDatabaseName
             RunName = sprintf @"EvalBins_Standard_test_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
@@ -75,8 +76,8 @@ module EvalBinsRandomStandardSpecs =
         }
 
         let EvalBins_Standard_small (executorType: evalBinsExecutorType) : runHostSpec = {
-            ProjectName = Common.projectName
-            DatabaseName = Common.randomStandardDatabaseName
+            ProjectName = CommonSorterEvalBins.projectName
+            DatabaseName = CommonSorterEvalBins.randomStandardDatabaseName
             RunName = sprintf @"EvalBins_Standard_small_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
@@ -92,8 +93,8 @@ module EvalBinsRandomStandardSpecs =
         }
 
         let EvalBins_Standard_medium (executorType: evalBinsExecutorType) : runHostSpec = {
-            ProjectName = Common.projectName
-            DatabaseName = Common.randomStandardDatabaseName
+            ProjectName = CommonSorterEvalBins.projectName
+            DatabaseName = CommonSorterEvalBins.randomStandardDatabaseName
             RunName = sprintf @"EvalBins_Standard_medium_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [

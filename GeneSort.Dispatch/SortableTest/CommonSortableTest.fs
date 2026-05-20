@@ -4,6 +4,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.FileDb.V1
+open GeneSort.Sorting
 
 
 type executorType = 
@@ -16,12 +17,13 @@ module ExecutorType =
         | Unknown -> "Unknown"
 
 
-module Common =
+module CommonSortableTest =
 
     let projectName = "SortableTest" |> UMX.tag<projectName>
     let mergeDatabaseName = "Merge" |> UMX.tag<databaseName>
 
     let projectRngType = rngType.Lcg
+    let projectSortableDataFormat = sortableDataFormat.Int8Vector512
 
     let mergeDatabaseFolder = 
                             "c:\\Projects\\SortableTest\\Merge\\Data"

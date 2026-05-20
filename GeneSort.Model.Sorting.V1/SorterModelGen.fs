@@ -1,6 +1,8 @@
 ﻿namespace GeneSort.Model.Sorting.V1
 
 open FSharp.UMX
+
+open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.Simple.V1
 
@@ -76,6 +78,4 @@ module SorterModelGen =
 
 
 
-
-
-
+ 

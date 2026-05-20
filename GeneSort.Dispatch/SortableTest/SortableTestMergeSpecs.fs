@@ -4,6 +4,7 @@ open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Project.V1
 open GeneSort.Dispatch.V1
+open CommonSortableTest
 
 
 module SortableTetsMergeSpecs =
@@ -27,7 +28,7 @@ module SortableTetsMergeSpecs =
 
     // DataFormats
     let onlyDataFormat = 
-            (runParameters.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
+            (runParameters.sortableDataFormatKey, [projectSortableDataFormat] |> List.map SortableDataFormat.toString)
 
 
     // MergeSuffixTypes
@@ -72,8 +73,8 @@ module SortableTetsMergeSpecs =
     module Specs =
 
         let Merge_Test_test  (executorType: executorType) : runHostSpec = {
-            ProjectName = Common.projectName
-            DatabaseName = Common.mergeDatabaseName
+            ProjectName = CommonSortableTest.projectName
+            DatabaseName = CommonSortableTest.mergeDatabaseName
             RunName = sprintf @"Merge_Test_test%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
@@ -90,8 +91,8 @@ module SortableTetsMergeSpecs =
 
 
         let Merge_Test_small (executorType: executorType) : runHostSpec = {
-            ProjectName = Common.projectName
-            DatabaseName = Common.mergeDatabaseName
+            ProjectName = CommonSortableTest.projectName
+            DatabaseName = CommonSortableTest.mergeDatabaseName
             RunName = sprintf @"Merge_Test_small%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
@@ -108,8 +109,8 @@ module SortableTetsMergeSpecs =
 
         
         let Merge_Test_medium_Ld (executorType: executorType) : runHostSpec = {
-            ProjectName = Common.projectName
-            DatabaseName = Common.mergeDatabaseName
+            ProjectName = CommonSortableTest.projectName
+            DatabaseName = CommonSortableTest.mergeDatabaseName
             RunName = sprintf @"Merge_Test_medium_Ld%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
@@ -126,8 +127,8 @@ module SortableTetsMergeSpecs =
 
         
         let Merge_Test_medium_Hd (executorType: executorType) : runHostSpec = {
-            ProjectName = Common.projectName
-            DatabaseName = Common.mergeDatabaseName
+            ProjectName = CommonSortableTest.projectName
+            DatabaseName = CommonSortableTest.mergeDatabaseName
             RunName = sprintf @"Merge_Test_medium_Hd%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [

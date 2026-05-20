@@ -3,13 +3,13 @@
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
-open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.Db.V1
 open GeneSort.FileDb.V1
-open Common
+open CommonSorterEvalBins
 open GeneSort.Eval.V1.Bins
+open GeneSort.Dispatch.V1.SortableTest
 
 
 module SimpleSorterModelDbs =
@@ -83,13 +83,13 @@ module SimpleSorterModelDbs =
 
 
     let getStandardSorterEvalBins
-                    (rng: rngType)
-                    (repl: int<replNumber>) 
                     (sortingWidth: int<sortingWidth>) 
                     (simpleSorterModelType: simpleSorterModelType) 
                             : Async<Result<sorterEvalBins, string>> =
         let qp = makeStandardQueryParams 
-                        rng repl sortingWidth simpleSorterModelType 
+                        CommonSorterEvalBins.projectRngType
+                        (0 |> UMX.tag<replNumber>) 
+                        sortingWidth simpleSorterModelType 
                         (outputDataType.SorterEvalBins "")
         async {
              let! result = (randomStandardDb :> IGeneSortDb).loadAsync qp
@@ -98,17 +98,17 @@ module SimpleSorterModelDbs =
 
 
     let getMergeSorterEvalBins
-                    (rng: rngType)
-                    (repl: int<replNumber>) 
                     (sortingWidth: int<sortingWidth>)
                     (simpleSorterModelType: simpleSorterModelType)
                     (mergeDimension: int<mergeDimension>) 
-                    (mergeSuffixType: mergeSuffixType) 
-                    (sortableDataFormat: sortableDataFormat) 
+                    (mergeSuffixType: mergeSuffixType)
                             : Async<Result<sorterEvalBins, string>> =
         let qp = makeQueryParamsForMerge 
-                        rng repl sortingWidth simpleSorterModelType
-                        mergeDimension mergeSuffixType sortableDataFormat 
+                        CommonSorterEvalBins.projectRngType
+                        (0 |> UMX.tag<replNumber>) 
+                        sortingWidth simpleSorterModelType
+                        mergeDimension mergeSuffixType 
+                        CommonSortableTest.projectSortableDataFormat
                         (outputDataType.SorterEvalBins "")
         async {
              let! result = (randomMergeDb :> IGeneSortDb).loadAsync qp
