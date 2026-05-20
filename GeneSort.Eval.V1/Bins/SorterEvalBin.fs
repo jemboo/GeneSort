@@ -38,6 +38,12 @@ type sorterEvalBinV1 =
     member this.AddScore (score: sorterScore) =
         this.sorterScores.Add(score)
 
+    member this.toSorterScoresWithKeys() : sorterScore seq =
+        this.sorterScores 
+        |> Seq.map (function 
+            | sorterScore.V1 s -> sorterScore.V1Key (s, this.sorterEvalKey)
+            | other -> other)
+
     member this.ToEvalCountRecord() : dataTableRecord =
         SorterEvalKey.toDataTableRecord this.sorterEvalKey
         |> dataTableRecord.addData "EvalCount" (this.EvalCount.ToString())

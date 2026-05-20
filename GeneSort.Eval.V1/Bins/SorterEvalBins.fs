@@ -100,6 +100,10 @@ type sorterEvalBinsV1 =
         | None -> 
             { this with bins = Map.add key sourceBin this.bins }
 
+    member this.toSorterScoresWithKeys() : sorterScore seq =
+        this.bins 
+        |> Map.toSeq 
+        |> Seq.collect (fun (_, bin) -> bin.toSorterScoresWithKeys())
 
 
 module SorterEvalBinsV1 =
