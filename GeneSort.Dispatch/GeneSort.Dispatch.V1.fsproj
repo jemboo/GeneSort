@@ -28,11 +28,17 @@
     <Compile Include="SortableTest\SortableTestExecutor.fs" />
     <Compile Include="SortableTest\SortableTestMergeSpecs.fs" />
     <Compile Include="SorterEvalBins\CommonSorterEvalBins.fs" />
-    <Compile Include="SorterEvalBins\SimpleSorterModelDbs.fs" />
+    <Compile Include="SorterEvalBins\SorterEvalBinDbs.fs" />
     <Compile Include="SorterEvalBins\RunHostEvalBins.fs" />
     <Compile Include="SorterEvalBins\EvalBinsExecutor.fs" />
     <Compile Include="SorterEvalBins\EvalBinsRandomStandardSpecs.fs" />
     <Compile Include="SorterEvalBins\EvalBinsRandomMergeSpecs.fs" />
+    <Compile Include="SorterMutate\CommonSorterMutate.fs" />
+    <Compile Include="SorterMutate\SorterMutateDbs.fs" />
+    <Compile Include="SorterMutate\RunHostSorterMutate.fs" />
+    <Compile Include="SorterMutate\SorterMutateExecutor.fs" />
+    <Compile Include="SorterMutate\SorterMutateRandomStandardSpecs.fs" />
+    <Compile Include="SorterMutate\SorterMutateRandomMergeSpecs.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

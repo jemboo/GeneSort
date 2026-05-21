@@ -1,12 +1,13 @@
-﻿namespace GeneSort.Dispatch.V1.SorterEvalBins
+﻿namespace GeneSort.Dispatch.V1.SorterMutate
+
 
 open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Dispatch.V1
-open SorterEvalBinDbs
+open SorterMutateDbs
 
 
-type runHostEvalBins = 
+type runHostSorterMutate = 
     private { 
         _projectDb: IGeneSortDb 
         _parameterSpans: (string * string list) list
@@ -39,10 +40,11 @@ type runHostEvalBins =
 
 
 
-module RunHostEvalBins =
+module RunHostSorterMutate =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.DatabaseName
         let run = run.create spec.ProjectName spec.RunName spec.RunDescription
-        runHostEvalBins.Create db spec run :> IRunHost
+        runHostSorterMutate.Create db spec run :> IRunHost
+
 

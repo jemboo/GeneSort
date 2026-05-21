@@ -10,8 +10,6 @@ open GeneSort.Dispatch.V1.SortableTest
 
 module EvalBinsRandomMergeSpecs =
 
-    let mergeDataFolder = "c:\\Projects\\EvalBins\\RandomMerge\\Data"
-
     let rngType = 
             (runParameters.rngTypeKey, 
             [CommonSorterEvalBins.projectRngType;] |> List.map RngType.toString)

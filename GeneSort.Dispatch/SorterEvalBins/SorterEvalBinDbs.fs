@@ -7,12 +7,12 @@ open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.Db.V1
 open GeneSort.FileDb.V1
-open CommonSorterEvalBins
 open GeneSort.Eval.V1.Bins
 open GeneSort.Dispatch.V1.SortableTest
+open CommonSorterEvalBins
 
 
-module SimpleSorterModelDbs =
+module SorterEvalBinDbs =
 
     let makeStandardQueryParams
                     (rng: rngType)
@@ -82,6 +82,26 @@ module SimpleSorterModelDbs =
     let randomMergeDb = new GeneSortDbMp(randomMergeDatabaseFolder, makeMergeQueryParamsFromRunParams)
 
 
+    let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
+        [ (randomStandardDatabaseName, randomStandardDb :> IGeneSortDb);
+          (randomMergeDatabaseName, randomMergeDb :> IGeneSortDb) ]
+        |> Map.ofList
+
+
+    let getDatabaseByName (name: string<databaseName>) : IGeneSortDb =
+        match databaseConfigs.TryFind name with
+        | Some db -> db
+        | None -> failwithf "Database with name %s not found" (UMX.untag name)
+
+
+
+
+
+
+
+
+
+
     let getStandardSorterEvalBins
                     (sortingWidth: int<sortingWidth>) 
                     (simpleSorterModelType: simpleSorterModelType) 
@@ -114,16 +134,3 @@ module SimpleSorterModelDbs =
              let! result = (randomMergeDb :> IGeneSortDb).loadAsync qp
              return  result |> Result.bind OutputData.asSorterEvalBins
         }
-
-
-    let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
-        [ (randomStandardDatabaseName, randomStandardDb :> IGeneSortDb);
-          (randomMergeDatabaseName, randomMergeDb :> IGeneSortDb) ]
-        |> Map.ofList
-
-
-    let getDatabaseByName (name: string<databaseName>) : IGeneSortDb =
-        match databaseConfigs.TryFind name with
-        | Some db -> db
-        | None -> failwithf "Database with name %s not found" (UMX.untag name)
-
