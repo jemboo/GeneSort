@@ -86,31 +86,20 @@ module CommonSorterMutate =
 
 
 
-    let getSimpleUniformSorterModelGen
-            (rngType: rngType) 
-            (sortingWidth: int<sortingWidth>)
-            (simpleSorterModelType: simpleSorterModelType) 
-                            : sorterModelGen =
-            let stageLength = getStageLength simpleSorterModelType sortingWidth
-            let rngFactory = rngType |> RngFactory.create
-            SimpleSorterModelGen.makeUniform 
-                                    rngFactory 
-                                    sortingWidth 
-                                    stageLength 
-                                    simpleSorterModelType
-                                    ExcludeSelfCe
-                                    |> sorterModelGen.Simple
+    //let getSimpleUniformSorterModelGen
+    //        (rngType: rngType) 
+    //        (sortingWidth: int<sortingWidth>)
+    //        (simpleSorterModelType: simpleSorterModelType) 
+    //                        : sorterModelGen =
+    //        let stageLength = getStageLength simpleSorterModelType sortingWidth
+    //        let rngFactory = rngType |> RngFactory.create
+    //        SimpleSorterModelGen.makeUniform 
+    //                                rngFactory 
+    //                                sortingWidth 
+    //                                stageLength 
+    //                                simpleSorterModelType
+    //                                ExcludeSelfCe
+    //                                |> sorterModelGen.Simple
 
 
-    let getSimpleSorterModelSetFromIds
-            (ids: Guid<sorterModelId> [])
-            (sortingWidth: int<sortingWidth>)
-            (simpleSorterModelType: simpleSorterModelType) 
-            (setId: Guid<sorterModelSetId>)
-                            : sorterModelSet =
-            let sorterModelGen = getSimpleUniformSorterModelGen 
-                                        projectRngType 
-                                        sortingWidth 
-                                        simpleSorterModelType
-            sorterModelGen |> SorterModelGen.makeSorterModelSetFromIds setId ids
 

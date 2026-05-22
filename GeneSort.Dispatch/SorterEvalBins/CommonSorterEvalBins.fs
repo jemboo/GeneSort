@@ -97,17 +97,6 @@ module CommonSorterEvalBins =
                                     |> sorterModelGen.Simple
 
 
-    let getSimpleSorterModelSetFromIds
-            (ids: Guid<sorterModelId> [])
-            (sortingWidth: int<sortingWidth>)
-            (simpleSorterModelType: simpleSorterModelType) 
-            (setId: Guid<sorterModelSetId>)
-                            : sorterModelSet =
-            let sorterModelGen = getSimpleUniformSorterModelGen 
-                                        projectRngType 
-                                        sortingWidth 
-                                        simpleSorterModelType
-            sorterModelGen |> SorterModelGen.makeSorterModelSetFromIds setId ids
 
 
 

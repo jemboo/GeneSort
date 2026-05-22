@@ -50,7 +50,7 @@ type msuf4RandMutate =
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.RngFactory, this.msuf4, this.uf4MutationRates)
+        hash (this.Id)
 
     interface IEquatable<msuf4RandMutate> with
         member this.Equals(other) = this.Id = other.Id

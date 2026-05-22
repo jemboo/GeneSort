@@ -53,7 +53,7 @@ type msceRandMutate =
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.rngFactory, this.indelRates, this.excludeSelfCe, this.msce)
+        hash (this.Id)
 
     interface IEquatable<msceRandMutate> with
         member this.Equals(other) = this.Id = other.Id

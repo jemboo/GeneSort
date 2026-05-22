@@ -142,7 +142,7 @@ module SorterMutateExecutor =
                         |> Result.ofOption "Missing RNG type in run parameters"
 
             let (sorterModelGen: sorterModelGen) = 
-                CommonSorterMutate.getSimpleUniformSorterModelGen rngType sortingWidth simpleSorterModelType
+                CommonSorterEvalBins.getSimpleUniformSorterModelGen rngType sortingWidth simpleSorterModelType
             return sorterModelGen
         }
 

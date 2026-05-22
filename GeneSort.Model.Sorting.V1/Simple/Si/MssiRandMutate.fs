@@ -50,7 +50,7 @@ type mssiRandMutate =
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.rngFactory, this.mssi, this.opActionRates)
+        hash (this.Id)
 
     interface IEquatable<mssiRandMutate> with
         member this.Equals(other) = this.Id = other.Id
