@@ -27,7 +27,7 @@ module SorterScoreV1Dto =
                 match domain.UnsortedGroupCount with 
                 | Some c -> Nullable(UMX.untag c) 
                 | None -> Nullable()
-            SequenceHash = UMX.untag domain.StageSequenceHash
+            SequenceHash = UMX.untag domain.SequenceHash
             LastCeIndex = UMX.untag domain.LastCeIndex
         }
 

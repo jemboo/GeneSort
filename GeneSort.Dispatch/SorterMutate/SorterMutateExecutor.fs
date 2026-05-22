@@ -15,6 +15,7 @@ open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1.OpsUtils
+open GeneSort.Dispatch.V1.SorterEvalBins
 open GeneSort.Dispatch.V1.SortableTest
 
 
@@ -61,37 +62,96 @@ module SorterMutateExecutor =
         }
 
 
-    let makeUniformSorterModelSets (rp:runParameters) (splitFactor:int) : seq<sorterModelSet> option =
-        maybe {
-            let! sortingWidth = rp.GetSortingWidth()
-            let! simpleSorterModelType = rp.GetSimpleSorterModelType()
-            let! rngType = rp.GetRngType()
 
-            let sorterModelGen = CommonSorterMutate.getSimpleUniformSorterModelGen 
-                                    rngType sortingWidth simpleSorterModelType
+    let selectStandardSorterParentScores (rp:runParameters) : Async<Result<sorterScore [], string>> =
+        asyncResult {
+            // Explicitly annotating the left side forces the compiler to lock down the type immediately
+            let! (sortingWidth: int<sortingWidth>) = 
+                        rp.GetSortingWidth() 
+                        |> Result.ofOption "Missing sorting width in run parameters"
+    
+            let! (simpleSorterModelType: simpleSorterModelType) = 
+                        rp.GetSimpleSorterModelType() 
+                        |> Result.ofOption "Missing simple sorter model type in run parameters"
 
-            let! qpModelSet = SorterMutateDbs.makeStandardQueryParamsFromRunParams 
-                                         rp (outputDataType.SorterModelSet "")
+            let! (parentEvalBins: sorterEvalBins) =
+                        SorterEvalBinDbs.getStandardSorterEvalBins sortingWidth simpleSorterModelType
 
-            let! repl = rp.GetRepl()
-            let! totalSorterCount = rp.GetSorterCount()
-        
-            let chunkCount = (%totalSorterCount / splitFactor) |> UMX.tag<sorterCount>
-            let baseFirstIdx = (%repl * %totalSorterCount)
+            let! (parentSorterCount: int<sorterCount>) = 
+                        rp.GetSorterParentCount()
+                        |> Result.ofOption "Missing parent sorter count in run parameters"
 
-            return seq {
-                for i in 0 .. (splitFactor - 1) do
-                    let pieceFirstIdx = (baseFirstIdx + (i * %chunkCount)) |> UMX.tag<sorterCount>
-                
-                    yield SorterModelGen.makeSorterModelSetFromIndexSpan 
-                            (%qpModelSet.Id |> UMX.tag) pieceFirstIdx chunkCount sorterModelGen
-            }
+            let scoreSamples = parentEvalBins |> SorterEvalBins.getAllScores
+                                              |> SorterScore.evenSampleByRankedValue
+                                                        SorterScore.byEqualWeighted
+                                                        parentSorterCount
+            return scoreSamples
         }
 
 
-    let _makeSorterEvalBins 
-            (makeSorterModelSets: runParameters -> int -> sorterModelSet seq option) // Updated signature
-            (makeTests: runParameters -> Async<Result<Sortable.sortableTest, string>>)
+
+    let selectMergeSorterParentScores (rp:runParameters) : Async<Result<sorterScore [], string>> =
+        asyncResult {
+            // Explicitly annotating the left side forces the compiler to lock down the type immediately
+            let! (sortingWidth: int<sortingWidth>) = 
+                        rp.GetSortingWidth() 
+                        |> Result.ofOption "Missing sorting width in run parameters"
+    
+            let! (simpleSorterModelType: simpleSorterModelType) = 
+                        rp.GetSimpleSorterModelType() 
+                        |> Result.ofOption "Missing simple sorter model type in run parameters"
+
+            let! (mergeDimension: int<mergeDimension>) = 
+                        rp.GetMergeDimension() 
+                        |> Result.ofOption "Missing mergeDimension in run parameters"
+
+            let! (mergeSuffixType: mergeSuffixType) = 
+                        rp.GetMergeSuffixType() 
+                        |> Result.ofOption "Missing mergeSuffixType in run parameters"
+
+            let! (parentEvalBins: sorterEvalBins) =
+                        SorterEvalBinDbs.getMergeSorterEvalBins 
+                                        sortingWidth simpleSorterModelType 
+                                        mergeDimension mergeSuffixType
+
+            let! (parentSorterCount: int<sorterCount>) = 
+                        rp.GetSorterParentCount()
+                        |> Result.ofOption "Missing parent sorter count in run parameters"
+
+            let scoreSamples = parentEvalBins |> SorterEvalBins.getAllScores
+                                              |> SorterScore.evenSampleByRankedValue
+                                                        SorterScore.byEqualWeighted
+                                                        parentSorterCount
+            return scoreSamples
+        }
+
+
+
+    let getParentSorterModelGen (rp:runParameters) : Async<Result<sorterModelGen, string>> =
+        asyncResult {
+            let! (sortingWidth: int<sortingWidth>) = 
+                        rp.GetSortingWidth() 
+                        |> Result.ofOption "Missing sorting width in run parameters"
+    
+            let! (simpleSorterModelType: simpleSorterModelType) =  
+                        rp.GetSimpleSorterModelType() 
+                        |> Result.ofOption "Missing simple sorter model type in run parameters"
+
+            let! (rngType: rngType) =  
+                        rp.GetRngType()
+                        |> Result.ofOption "Missing RNG type in run parameters"
+
+            let (sorterModelGen: sorterModelGen) = 
+                CommonSorterMutate.getSimpleUniformSorterModelGen rngType sortingWidth simpleSorterModelType
+            return sorterModelGen
+        }
+
+
+
+
+    let _mutateParentsAndEvaluate 
+            (selectParentSorterScores: runParameters -> Async<Result<sorterScore [], string>> )
+            (makeSortableTests: runParameters -> Async<Result<sortableTest, string>>)
             (host: IRunHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
@@ -105,61 +165,27 @@ module SorterMutateExecutor =
             try
                 // 1. Initial Check & Splitting Sorter Model Creation
                 do! checkCancellation cts.Token
-                
-                let totalSorterCount = rp.GetSorterCount() |> Option.defaultValue (1000 |> UMX.tag)
-                let splitFactor = %totalSorterCount / 1000
-                log (sprintf "Creating Sorter Model Sets split into %d pieces..." splitFactor)
-        
-                let! modelSets = 
-                    makeSorterModelSets rp splitFactor 
-                    |> Result.ofOption "Failed: SorterModelSets could not be split or initialized."
 
-                // 2. Test Generation (Shared across all chunk evaluations)
-                do! checkCancellation cts.Token
-                log "Generating Sortable Tests..."
-                let! tests = makeTests rp 
+                let! (parentSorterModelGen: sorterModelGen) = getParentSorterModelGen rp
+                let! (parentSorterScores: sorterScore []) = selectParentSorterScores rp
 
-                let! qpEval = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
-                              |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
+                let! (parentSorterCount: int<sorterCount>) = 
+                            rp.GetSorterParentCount()
+                            |> Result.ofOption "Missing parent sorter count in run parameters"
 
-                let! qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
-                              |> Result.ofOption "Failed to create QueryParams for Bins."
+                let splitFactor = %parentSorterCount / 1000
+                let parentScoreChunks = parentSorterScores |> Array.chunkBySize (1000 * splitFactor)
 
-                let collectTests = CommonSorterMutate.CollectSortableTests
-                let testId = tests |> SortableTests.getId
-
-                // 3. Sequential Chunk Evaluation & Merging
-                log "Running Split Sorter Evaluations & Bin Accumulation..."
-            
-                // We initialize an empty bin set to accumulate results into
-                let initialBins = sorterEvalBinsV1.createEmpty (%qpBins.Id |> UMX.tag) testId
-
-                let mutable accumulatedBins = initialBins
-
+                log (sprintf "Mutate/Evaluating parents plit into %d pieces..." splitFactor)
+                let! (sortableTest: sortableTest) = makeSortableTests rp
                 let mutable chunkIdx = 1
-                for modelSetChunk in modelSets do
+                for chunk in parentScoreChunks do
                     do! checkCancellation cts.Token
                     log (sprintf "Evaluating chunk %d of %d..." chunkIdx splitFactor)
-    
-                    let fullSorterSetChunk = SorterModelSet.makeSorterSet (%modelSetChunk.Id |> UMX.tag) modelSetChunk
-    
-                    let sorterSetEvalChunk = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSetChunk tests collectTests
-    
-                    let chunkBins = sorterEvalBinsV1.createFromEvals 
-                                        (%qpBins.Id |> UMX.tag) 
-                                        testId 
-                                        sorterSetEvalChunk.SorterEvals 
-    
-                    accumulatedBins <- SorterEvalBinsV1.merge accumulatedBins chunkBins
+
+
                     chunkIdx <- chunkIdx + 1
 
-
-                let sorterEvalBins = sorterEvalBins.V1 accumulatedBins
-
-                // 4. Persistence
-                log (sprintf "Saving Merged SorterEvalBins %s" (string %qpBins.Id))
-                do! host.ProjectDb.saveAsync qpBins (sorterEvalBins |> outputData.SorterEvalBins) allowOverwrite
-        
                 log "Run Complete."
                 return rp.WithRunFinished (Some true)
 
@@ -237,16 +263,16 @@ module SorterMutateExecutor =
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _makeSorterEvalBins 
-                    makeUniformSorterModelSets
+                _mutateParentsAndEvaluate 
+                    selectStandardSorterParentScores
                     makeStandardTests
                     host rp allowOverwrite cts progress }
 
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _makeSorterEvalBins 
-                    makeUniformSorterModelSets
+                _mutateParentsAndEvaluate 
+                    selectMergeSorterParentScores
                     makeMergeTests
                     host rp allowOverwrite cts progress }
 
@@ -264,10 +290,10 @@ module SorterMutateExecutor =
 
     let getExecutor (executorType: sorterMutateExecutorType) : IRunParamsExecutor =
         match executorType with
-        | StandardSortables -> standardExecutor
-        | MergeSortables -> mergeExecutor
-        | FullReport -> fullReportExecutor
-        | BinsReport -> binsReportExecutor
+        | sorterMutateExecutorType.StandardSortables -> standardExecutor
+        | sorterMutateExecutorType.MergeSortables -> mergeExecutor
+        | sorterMutateExecutorType.FullReport -> fullReportExecutor
+        | sorterMutateExecutorType.BinsReport -> binsReportExecutor
 
 
 

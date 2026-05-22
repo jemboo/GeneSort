@@ -26,6 +26,8 @@ type runParameters =
     static member mergeSuffixTypeKey = "MergeSuffixType"
     static member messageKey = "Message"
     static member mutationRateKey = "MutationRate"
+    static member insertionRateKey = "InsertionRate"
+    static member deletionRateKey = "DeletionRate"
     static member projectNameKey = "ProjectName"
     static member runNameKey = "RunName"
     static member replKey = "Repl"
@@ -34,6 +36,8 @@ type runParameters =
     static member replSpanKey = "ReplSpan"
     static member runFinishedKey = "RunFinished"
     static member sorterCountKey = "SorterCount"
+    static member sorterParentCountKey = "SorterParentCount"
+    static member sorterChildCountKey = "SorterChildCount"
     static member simpleSorterModelTypeKey = "SimpleSorterModelType"
     static member sortingWidthKey = "SortingWidth"
     static member sortableCountKey = "SortableCount"
@@ -77,6 +81,8 @@ type runParameters =
         this.paramMap.TryFind runParameters.mergeSuffixTypeKey |> Option.bind (fun v -> try Some (MergeSuffixType.fromString v) with _ -> None)
 
     member this.GetMutationRate() = runParameters.tryGetFloat runParameters.mutationRateKey this.paramMap |> Option.map UMX.tag<mutationRate>
+    member this.GetInsertionRate() = runParameters.tryGetFloat runParameters.insertionRateKey this.paramMap |> Option.map UMX.tag<insertionRate>
+    member this.GetDeletionRate() = runParameters.tryGetFloat runParameters.deletionRateKey this.paramMap |> Option.map UMX.tag<deletionRate>
     member this.GetProjectName() = this.paramMap.TryFind runParameters.projectNameKey |> Option.map UMX.tag<projectName>
     member this.GetRngType() = this.paramMap.TryFind runParameters.rngTypeKey |> Option.map RngType.fromString
     member this.GetRunName() = this.paramMap.TryFind runParameters.runNameKey |> Option.map UMX.tag<runName>
@@ -88,6 +94,9 @@ type runParameters =
     member this.GetStageLength() = runParameters.tryGetInt runParameters.stageLengthKey this.paramMap |> Option.map UMX.tag<stageLength>
     member this.GetSortableCount() = runParameters.tryGetInt runParameters.sortableCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     member this.GetSorterCount() = runParameters.tryGetInt runParameters.sorterCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
+    member this.GetSorterParentCount() = runParameters.tryGetInt runParameters.sorterParentCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
+    member this.GetSorterChildCount() = runParameters.tryGetInt runParameters.sorterChildCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
+
 
     member this.GetTextReportName() = this.paramMap.TryFind runParameters.textReportNameKey |> Option.map UMX.tag<textReportName>
 
@@ -136,6 +145,12 @@ type runParameters =
     member this.WithProjectName(pn: string<projectName> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.projectNameKey (pn |> Option.map UmxExt.stringToRaw) }
 
+    member this.WithInsertionRate(ir: float<insertionRate> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.insertionRateKey (ir |> Option.map UmxExt.floatToRaw) }
+
+    member this.WithDeletionRate(dr: float<deletionRate> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.deletionRateKey (dr |> Option.map UmxExt.floatToRaw) }    
+
     member this.WithRngType(rng: rngType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.rngTypeKey (rng |> Option.map RngType.toString) }
 
@@ -165,6 +180,12 @@ type runParameters =
 
     member this.WithSorterCount(sc: int<sorterCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountKey (sc |> Option.map UmxExt.intToRaw) }
+
+    member this.WithSorterParentCount(spc: int<sorterCount> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterParentCountKey (spc |> Option.map UmxExt.intToRaw) }
+
+    member this.WithSorterChildCount(scc: int<sorterCount> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterChildCountKey (scc |> Option.map UmxExt.intToRaw) } 
 
     member this.WithSimpleSorterModelType(smt: simpleSorterModelType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.simpleSorterModelTypeKey (smt |> Option.map SimpleSorterModelType.toString) }

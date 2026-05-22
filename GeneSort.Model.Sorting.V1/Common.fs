@@ -20,6 +20,9 @@ open GeneSort.Core
 
 [<Measure>] type excludeSelfCe
 [<Measure>] type mutationRate
+[<Measure>] type insertionRate
+[<Measure>] type deletionRate
+
 
 module CommonGen =
 

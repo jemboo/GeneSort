@@ -96,12 +96,6 @@ module SorterEvalBinDbs =
 
 
 
-
-
-
-
-
-
     let getStandardSorterEvalBins
                     (sortingWidth: int<sortingWidth>) 
                     (simpleSorterModelType: simpleSorterModelType) 

@@ -21,11 +21,18 @@ module SorterMutateRandomStandardSpecs =
             (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
 
     // SorterCounts
-    let testSorterCount = (runParameters.sorterCountKey, ["1000";] )
-    let smallSorterCount = (runParameters.sorterCountKey, ["10000";] )
-    let mediumSorterCount = (runParameters.sorterCountKey, ["100000";] )
-    let largeSorterCount = (runParameters.sorterCountKey, ["1000000";] )
-    
+    let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
+    let smallChildCount = (runParameters.sorterChildCountKey, ["1";] )
+    let mediumChildCount = (runParameters.sorterChildCountKey, ["10";] )
+    let largeChildCount = (runParameters.sorterChildCountKey, ["100";] )
+
+    let testParentCount = (runParameters.sorterParentCountKey, ["10";] )
+    let smallParentCount = (runParameters.sorterParentCountKey, ["10";] )
+    let mediumParentCount = (runParameters.sorterParentCountKey, ["100";] )
+    let largeParentCount = (runParameters.sorterParentCountKey, ["1000";] )
+
+
+
     // SimpleSorterModelTypes
     let allSimpleSorterModelTypes = 
             (runParameters.simpleSorterModelTypeKey, SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
@@ -34,9 +41,22 @@ module SorterMutateRandomStandardSpecs =
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
+        let mutationRate = rp.GetMutationRate()
+        let insertionRate =
+            maybe {
+                let! mr = mutationRate
+                return (%mr / 2.0) |> UMX.tag<insertionRate>
+            }
+        let deletionRate =
+            maybe {
+                let! mr = mutationRate
+                return (%mr / 2.0) |> UMX.tag<deletionRate>
+            }   
         rp.WithProjectName(Some host.Run.ProjectName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
+          .WithInsertionRate(insertionRate)
+          .WithDeletionRate(deletionRate)
           .WithId (Some qp.Value.Id)
 
     
@@ -66,7 +86,8 @@ module SorterMutateRandomStandardSpecs =
                 rngType
                 smallSortingWidths
                 allSimpleSorterModelTypes
-                testSorterCount
+                testParentCount
+                testChildCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
@@ -83,7 +104,8 @@ module SorterMutateRandomStandardSpecs =
                 rngType
                 smallSortingWidths
                 allSimpleSorterModelTypes
-                largeSorterCount
+                testParentCount
+                largeChildCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
@@ -100,7 +122,8 @@ module SorterMutateRandomStandardSpecs =
                 rngType
                 mediumSortingWidths
                 allSimpleSorterModelTypes
-                largeSorterCount
+                largeParentCount
+                largeChildCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
