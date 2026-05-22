@@ -40,10 +40,12 @@ module CommonGen =
 module CommonMutator =
 
     let makeSorterModelId 
+                (parentId: Guid<sorterModelId>)
                 (id:  Guid<sorterModelMutatorId>) 
                 (index:int) : Guid<sorterModelId> = 
         [
             box "CommonMutator.makeSorterModelId"
+            box (parentId |> UMX.untag)
             box (id |> UMX.untag)
             box index
         ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>

@@ -11,7 +11,6 @@ type msceRandMutate =
     private 
         { 
           id : Guid<sorterModelMutatorId>
-          msce : msce
           rngFactory: rngFactory
           indelRates: indelRates // Changed from indelRatesArray
           excludeSelfCe: bool<excludeSelfCe> }
@@ -19,13 +18,11 @@ type msceRandMutate =
     static member create 
             (rngFactory: rngFactory)
             (indelRates: indelRates) // Single value
-            (excludeSelfCe: bool<excludeSelfCe>     ) 
-            (msce : msce) : msceRandMutate = 
+            (excludeSelfCe: bool<excludeSelfCe>) : msceRandMutate = 
         
         let id =
             [
                 box "msceRandMutate"
-                box (msce.Id |> UMX.untag)
                 box rngFactory
                 box (indelRates.GetHashCode())
                 box (excludeSelfCe |> UMX.untag)
@@ -33,19 +30,15 @@ type msceRandMutate =
 
         {
             id = id
-            msce = msce
             rngFactory = rngFactory
             indelRates = indelRates
             excludeSelfCe = excludeSelfCe
         }
         
     member this.Id with get () = this.id
-    member this.Msce with get () = this.msce
     member this.RngFactory with get () = this.rngFactory
-    member this.CeLength with get () = this.msce.CeLength
     member this.IndelRates with get () = this.indelRates
     member this.ExcludeSelfCe with get () = this.excludeSelfCe
-    member this.SortingWidth with get () = this.msce.SortingWidth
 
     override this.Equals(obj) = 
         match obj with
@@ -58,14 +51,16 @@ type msceRandMutate =
     interface IEquatable<msceRandMutate> with
         member this.Equals(other) = this.Id = other.Id
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
-        CommonMutator.makeSorterModelId this.Id index
+    member this.MakeSorterModelId (parent: msce) (index: int) : Guid<sorterModelId> =
+        CommonMutator.makeSorterModelId parent.Id this.Id index
 
 
-    member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msce =
+    member this.MakeSorterModelFromId 
+                            (parent: msce) 
+                            (id: Guid<sorterModelId>) : msce =
         let rng = this.RngFactory.Create %id
         let excludeSelfCe = this.ExcludeSelfCe
-        let sortingWidth = %this.msce.SortingWidth
+        let sortingWidth = %parent.SortingWidth
         
         // Define generation logic
         let ceCodeInserter = fun () -> Ce.generateCeCode %excludeSelfCe sortingWidth (rng.NextIndex)
@@ -77,22 +72,20 @@ type msceRandMutate =
                         ceCodeInserter 
                         ceCodeMutator 
                         (rng.NextFloat) 
-                        this.msce.CeCodes
+                        parent.CeCodes
 
-        msce.create id this.msce.SortingWidth ceCodes
+        msce.create id parent.SortingWidth ceCodes
 
 
-
-    member this.MakeSorterModelFromIndex (index: int) : msce =
-        let id = this.MakeSorterModelId index
-        this.MakeSorterModelFromId id
+    member this.MakeSorterModelFromIndex (parent: msce) (index: int) : msce =
+        let id = this.MakeSorterModelId parent index
+        this.MakeSorterModelFromId parent id
 
 
 
 module MsceRandMutate =
     let toString (msceMutate: msceRandMutate) : string = 
-        sprintf "MsceRandMutate(%s, %d, %s, %b)"
+        sprintf "MsceRandMutate(%s, %s, %b)"
             (msceMutate.RngFactory.ToString())
-            (%msceMutate.CeLength)
             (msceMutate.IndelRates.toString())
             %msceMutate.ExcludeSelfCe

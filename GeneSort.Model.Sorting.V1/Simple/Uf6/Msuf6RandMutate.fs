@@ -48,13 +48,13 @@ type msuf6RandMutate =
         member this.Equals(other) = this.Id = other.Id
 
     member this.MakeSorterModelId 
-                (msuf6: msuf6) 
+                (parent: msuf6) 
                 (index: int) : Guid<sorterModelId> =
-        CommonMutator.makeSorterModelId this.Id index
+        CommonMutator.makeSorterModelId parent.Id this.Id index
 
     member this.MakeSorterModelFromId 
-                (id: Guid<sorterModelId>) 
-                (parent: msuf6) : msuf6 =
+                (parent: msuf6) 
+                (id: Guid<sorterModelId>) : msuf6 =
         let rng = this.RngFactory.Create %id
         
         let unfolderArray = parent.TwoOrbitUnfolder6s
@@ -68,10 +68,10 @@ type msuf6RandMutate =
         msuf6.create id parent.SortingWidth mutatedUnfolders
 
     member this.MakeSorterModelFromIndex 
-                        (index: int) 
-                        (parent: msuf6) : msuf6 =
+                        (parent: msuf6)
+                        (index: int)  : msuf6 =
         let id = this.MakeSorterModelId parent index
-        parent |> this.MakeSorterModelFromId id
+        id |> this.MakeSorterModelFromId parent
 
 
 module Msuf6RandMutate =

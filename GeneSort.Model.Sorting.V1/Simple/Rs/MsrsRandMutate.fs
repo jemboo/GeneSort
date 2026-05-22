@@ -10,37 +10,30 @@ type msrsRandMutate =
     private 
         { 
           id : Guid<sorterModelMutatorId>
-          msrs : msrs
           rngFactory: rngFactory
           opsActionRates: opsActionRates 
         } 
     with
     static member create 
             (rngFactory: rngFactory)
-            (opsActionRates: opsActionRates)
-            (msrs: msrs) : msrsRandMutate =
+            (opsActionRates: opsActionRates) :msrsRandMutate =
         
         let id =
             [
                 box "msuf6RandMutate"
                 box rngFactory
-                box (msrs.Id |> UMX.untag)
                 box (opsActionRates.GetHashCode())
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorId>
 
         {
             id = id
-            msrs = msrs
             rngFactory = rngFactory
             opsActionRates = opsActionRates
         }
 
     member this.Id with get () = this.id
-    member this.Msrs with get () = this.msrs
-    member this.CeLength with get () = this.msrs.CeLength
     member this.RngFactory with get () = this.rngFactory
     member this.OpsActionRates with get () = this.opsActionRates
-    member this.SortingWidth with get () = this.msrs.SortingWidth
 
     override this.Equals(obj) = 
         match obj with
@@ -53,10 +46,10 @@ type msrsRandMutate =
     interface IEquatable<msrsRandMutate> with
         member this.Equals(other) = this.Id = other.Id
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
-        CommonMutator.makeSorterModelId this.Id index
+    member this.MakeSorterModelId (parent: msrs) (index: int) : Guid<sorterModelId> =
+        CommonMutator.makeSorterModelId parent.Id this.Id index
 
-    member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msrs =
+    member this.MakeSorterModelFromId (parent: msrs)  (id: Guid<sorterModelId>) : msrs =
         let rng = this.RngFactory.Create %id
         
         // Define specific mutation behaviors using Perm_RsOps
@@ -71,17 +64,19 @@ type msrsRandMutate =
                         paraMutator 
                         selfSymMutator
                         (rng.NextFloat) 
-                        this.Msrs.Perm_Rss
+                        parent.Perm_Rss
 
-        msrs.create id this.Msrs.SortingWidth mutated
+        msrs.create id parent.SortingWidth mutated
 
-    member this.MakeSorterModelFromIndex (index: int) : msrs =
-        let id = this.MakeSorterModelId index
-        this.MakeSorterModelFromId id
+    member this.MakeSorterModelFromIndex 
+                            (parent: msrs) 
+                            (index: int) : msrs =
+        let id = this.MakeSorterModelId parent index
+        this.MakeSorterModelFromId parent id
+
 
 module MsrsRandMutate =
     let toString (msrsRandMutate: msrsRandMutate) : string =
-        sprintf "MsrsRandMutate(RngType=%A, Msrs=%s, OpsActionRates=%s)" 
-                msrsRandMutate.RngFactory 
-                (msrsRandMutate.Msrs.toString())
+        sprintf "MsrsRandMutate(RngType=%A, OpsActionRates=%s)" 
+                msrsRandMutate.RngFactory
                 (msrsRandMutate.OpsActionRates.toString())

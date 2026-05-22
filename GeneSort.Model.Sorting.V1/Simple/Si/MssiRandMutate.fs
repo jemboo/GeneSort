@@ -11,38 +11,30 @@ type mssiRandMutate =
     private 
         { 
           id : Guid<sorterModelMutatorId>
-          mssi : mssi
           rngFactory: rngFactory
           opActionRates: opActionRates // Changed from opActionRatesArray
         } 
     with
     static member create 
             (rngFactory: rngFactory)
-            (opActionRates: opActionRates)
-            (mssi: mssi) : mssiRandMutate =
+            (opActionRates: opActionRates) :mssiRandMutate =
         
         let id =
             [
                 box "mssiRandMutate"
                 box rngFactory
-                box (mssi.Id |> UMX.untag)
                 box (opActionRates.GetHashCode())
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorId>
 
         {
             id = id
-            mssi = mssi
             rngFactory = rngFactory
             opActionRates = opActionRates
         }
         
-    member this.Id with get () = this.id
-    member this.Mssi with get () = this.mssi
-    member this.RngFactory with get () = this.rngFactory
-    member this.CeLength with get () = this.mssi.CeLength
-    member this.OpActionRates with get () = this.opActionRates
-    member this.SortingWidth with get () = this.mssi.SortingWidth
-    member this.StageLength with get () = this.mssi.Perm_Sis.Length
+    member this.Id with get() = this.id
+    member this.RngFactory with get() = this.rngFactory
+    member this.OpActionRates with get() = this.opActionRates
 
     override this.Equals(obj) = 
         match obj with
@@ -55,10 +47,14 @@ type mssiRandMutate =
     interface IEquatable<mssiRandMutate> with
         member this.Equals(other) = this.Id = other.Id
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
-        CommonMutator.makeSorterModelId this.Id index
+    member this.MakeSorterModelId 
+                        (parent: mssi) 
+                        (index: int) : Guid<sorterModelId> =
+        CommonMutator.makeSorterModelId parent.Id this.Id index
 
-    member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : mssi =
+    member this.MakeSorterModelFromId 
+                        (parent:mssi) 
+                        (id: Guid<sorterModelId>) :mssi =
         let rng = this.RngFactory.Create %id
         
         // Define mutation behaviors for Perm_Si
@@ -71,18 +67,19 @@ type mssiRandMutate =
                         orthoMutator 
                         paraMutator 
                         (rng.NextFloat) 
-                        this.Mssi.Perm_Sis
+                        parent.Perm_Sis
                         
-        mssi.create id this.Mssi.SortingWidth mutated
+        mssi.create id parent.SortingWidth mutated
 
-    member this.MakeSorterModelFromIndex (index: int) : mssi =
-        let id = this.MakeSorterModelId index
-        this.MakeSorterModelFromId id
+    member this.MakeSorterModelFromIndex 
+                                (parent:mssi) 
+                                (index: int) : mssi =
+        let id = this.MakeSorterModelId parent index
+        this.MakeSorterModelFromId parent id
+
 
 module MssiRandMutate =
     let toString (mssiRandMutate: mssiRandMutate) : string = 
-        sprintf "MssiRandMutate(RngType=%A, Width=%d, StageLength=%d, OpActionRates=%s)" 
-                mssiRandMutate.RngFactory 
-                (%mssiRandMutate.Mssi.SortingWidth) 
-                (mssiRandMutate.StageLength)
+        sprintf "MssiRandMutate(RngType=%A, OpActionRates=%s)" 
+                mssiRandMutate.RngFactory
                 (mssiRandMutate.OpActionRates.toString())

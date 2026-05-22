@@ -10,7 +10,6 @@ type msuf4RandMutate =
     private 
         {
           id : Guid<sorterModelMutatorId>
-          msuf4 : msuf4
           rngFactory: rngFactory
           uf4MutationRates: uf4MutationRates 
         } 
@@ -18,31 +17,24 @@ type msuf4RandMutate =
     static member create 
             (rngFactory: rngFactory)
             (uf4MutationRates: uf4MutationRates) 
-            (msuf4 : msuf4)
             : msuf4RandMutate =
 
         let id =
             [
                 box "msuf4RandMutate"
                 box rngFactory
-                box (msuf4.Id |> UMX.untag)
                 box (uf4MutationRates.GetHashCode())
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelMutatorId>
 
         {
             id = id
             rngFactory = rngFactory
-            msuf4 = msuf4
             uf4MutationRates = uf4MutationRates
         }
 
     member this.Id with get () = this.id
-    member this.Msuf4 with get () = this.msuf4
-    member this.CeLength with get () = this.msuf4.CeLength
     member this.RngFactory with get () = this.rngFactory
-    member this.StageLength with get () = this.msuf4.StageLength
     member this.Uf4MutationRates with get () = this.uf4MutationRates
-    member this.SortingWidth with get () = this.msuf4.SortingWidth
 
     override this.Equals(obj) = 
         match obj with
@@ -55,18 +47,21 @@ type msuf4RandMutate =
     interface IEquatable<msuf4RandMutate> with
         member this.Equals(other) = this.Id = other.Id
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
-        CommonMutator.makeSorterModelId this.Id index
+    member this.MakeSorterModelId 
+                (parent: msuf4) 
+                (index: int) : Guid<sorterModelId> =
+        CommonMutator.makeSorterModelId parent.Id this.Id index
 
-    member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msuf4 =
+    member this.MakeSorterModelFromId 
+                        (parent: msuf4) 
+                        (id: Guid<sorterModelId>) : msuf4 =
         let rng = this.RngFactory.Create %id
         
-        // HOIST: Pull values out of 'this' into local variables to avoid capturing the struct byref
-        let unfolderArray = this.msuf4.TwoOrbitUnfolder4s 
+        // Pull values out of 'this' into local variables to avoid capturing the struct byref
+        let unfolderArray = parent.TwoOrbitUnfolder4s 
         let rates = this.Uf4MutationRates
-        let width = this.msuf4.SortingWidth
+        let width = parent.SortingWidth
 
-        // Now the closure captures 'unfolderArray' and 'rates' (heap or stack values), not 'this' (the byref)
         let mutatedUnfolders = 
             unfolderArray
             |> Array.map (fun unfolder ->
@@ -74,9 +69,11 @@ type msuf4RandMutate =
                 
         msuf4.create id width mutatedUnfolders
 
-    member this.MakeSorterModelFromIndex (index: int) : msuf4 =
-        let id = this.MakeSorterModelId index
-        this.MakeSorterModelFromId id
+    member this.MakeSorterModelFromIndex 
+                        (parent: msuf4) 
+                        (index: int) : msuf4 =
+        let id = this.MakeSorterModelId parent index
+        this.MakeSorterModelFromId parent id
 
 
 
@@ -90,7 +87,6 @@ module Msuf4RandMutate =
                 rates.seedOpsTransitionRates.ParaRates.OrthoRate
                 rates.seedOpsTransitionRates.SelfReflRates.ParaRate
 
-        sprintf "Msuf4RandMutate(RngType=%A, StageLength=%d, MutationRates=%s)" 
-                msuf4RandMutate.RngFactory 
-                (%msuf4RandMutate.StageLength)
+        sprintf "Msuf4RandMutate(RngType=%A, MutationRates=%s)" 
+                msuf4RandMutate.RngFactory
                 ratesStr
