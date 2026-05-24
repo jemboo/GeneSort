@@ -52,6 +52,7 @@ module CommonSorterMutate =
     let standardSortableDataFormat = sortableDataFormat.BitVector512
     let mergeSortableDataFormat = CommonSortableTest.projectSortableDataFormat
     let projectRngType = rngType.Lcg
+    let projectRngFactory = projectRngType |> RngFactory.create
 
 
     let getStageLength 

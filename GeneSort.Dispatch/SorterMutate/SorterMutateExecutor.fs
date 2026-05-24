@@ -17,6 +17,7 @@ open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Dispatch.V1.SorterEvalBins
 open GeneSort.Dispatch.V1.SortableTest
+open GeneSort.Model.Sorting.Simple.V1
 
 
 
@@ -147,6 +148,36 @@ module SorterMutateExecutor =
         }
 
 
+    let getParentSorterModelMutator (rp:runParameters) : Async<Result<simpleSorterModelMutator, string>> =
+        asyncResult {
+
+            let! (simpleSorterModelType: simpleSorterModelType) =  
+                        rp.GetSimpleSorterModelType() 
+                        |> Result.ofOption "Missing simple sorter model type in run parameters"
+
+            let! (rngType: rngType) =  
+                        rp.GetRngType()
+                        |> Result.ofOption "Missing RNG type in run parameters"
+            let rngFactory = rngType |> RngFactory.create
+
+            let! (modificationRate: float<modificationRate>) = 
+                        rp.GetModificationRate()
+                        |> Result.ofOption "Missing modificationRate in run parameters"
+
+            let excludeSelfCe = Some CommonSorterMutate.ExcludeSelfCe
+            let mutationRate = rp.GetMutationRate()
+            let insertionRate = rp.GetInsertionRate()
+            let deletionRate = rp.GetDeletionRate()
+
+            return SimpleSorterModelMutator.getSimpleSorterModelMutator 
+                        simpleSorterModelType
+                        rngFactory
+                        excludeSelfCe
+                        modificationRate
+                        mutationRate
+                        insertionRate
+                        deletionRate
+        }
 
 
     let _mutateParentsAndEvaluate 

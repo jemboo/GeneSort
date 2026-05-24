@@ -25,6 +25,7 @@ type runParameters =
     static member mergeDimensionKey = "MergeDimension"
     static member mergeSuffixTypeKey = "MergeSuffixType"
     static member messageKey = "Message"
+    static member modificationRateKey = "ModificationRate"
     static member mutationRateKey = "MutationRate"
     static member insertionRateKey = "InsertionRate"
     static member deletionRateKey = "DeletionRate"
@@ -80,6 +81,7 @@ type runParameters =
     member this.GetMergeSuffixType() = 
         this.paramMap.TryFind runParameters.mergeSuffixTypeKey |> Option.bind (fun v -> try Some (MergeSuffixType.fromString v) with _ -> None)
 
+    member this.GetModificationRate() = runParameters.tryGetFloat runParameters.modificationRateKey this.paramMap |> Option.map UMX.tag<modificationRate>
     member this.GetMutationRate() = runParameters.tryGetFloat runParameters.mutationRateKey this.paramMap |> Option.map UMX.tag<mutationRate>
     member this.GetInsertionRate() = runParameters.tryGetFloat runParameters.insertionRateKey this.paramMap |> Option.map UMX.tag<insertionRate>
     member this.GetDeletionRate() = runParameters.tryGetFloat runParameters.deletionRateKey this.paramMap |> Option.map UMX.tag<deletionRate>
@@ -138,6 +140,9 @@ type runParameters =
 
     member this.WithMessage(message: string option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.messageKey message }
+
+    member this.WithModificationRate(mr: float<modificationRate> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.modificationRateKey (mr |> Option.map UmxExt.floatToRaw) }
 
     member this.WithMutationRate(mr: float<mutationRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mutationRateKey (mr |> Option.map UmxExt.floatToRaw) }

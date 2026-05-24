@@ -19,6 +19,7 @@ open GeneSort.Core
 [<Measure>] type sortingParamsId
 
 [<Measure>] type excludeSelfCe
+[<Measure>] type modificationRate
 [<Measure>] type mutationRate
 [<Measure>] type insertionRate
 [<Measure>] type deletionRate

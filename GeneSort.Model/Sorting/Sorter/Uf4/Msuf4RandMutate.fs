@@ -99,12 +99,12 @@ module Msuf4RandMutate =
             |> Array.mapi (fun i rates -> 
                 sprintf "[%d: OrthoToPara=%f, OrthoToSelfRefl=%f, ParaToOrtho=%f, ParaToSelfRefl=%f, SelfReflToOrtho=%f, SelfReflToPara=%f]" 
                     i 
-                    rates.seedOpsTransitionRates.OrthoRates.ParaRate
-                    rates.seedOpsTransitionRates.OrthoRates.SelfReflRate
-                    rates.seedOpsTransitionRates.ParaRates.OrthoRate
-                    rates.seedOpsTransitionRates.ParaRates.SelfReflRate
-                    rates.seedOpsTransitionRates.SelfReflRates.OrthoRate
-                    rates.seedOpsTransitionRates.SelfReflRates.ParaRate)
+                    rates.SeedOpsTransitionRates.OrthoRates.ParaRate
+                    rates.SeedOpsTransitionRates.OrthoRates.SelfReflRate
+                    rates.SeedOpsTransitionRates.ParaRates.OrthoRate
+                    rates.SeedOpsTransitionRates.ParaRates.SelfReflRate
+                    rates.SeedOpsTransitionRates.SelfReflRates.OrthoRate
+                    rates.SeedOpsTransitionRates.SelfReflRates.ParaRate)
             |> String.concat ", "
         sprintf "Msuf4RandMutate(RngType=%A, StageLength=%d, MutationRates=%s)" 
                 msuf4RandMutate.RngFactory 

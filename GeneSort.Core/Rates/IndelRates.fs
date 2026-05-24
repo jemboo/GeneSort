@@ -27,6 +27,11 @@ type indelRates =
             deletionThresh = mutationRate + insertionRate + deletionRate
         }
 
+    static member createMod (modificationRate: float, mutationRate: float, 
+                             insertionRate: float, deletionRate: float) : indelRates = 
+        let adj = modificationRate / (mutationRate + insertionRate + deletionRate)
+        indelRates.create (adj*mutationRate, adj*insertionRate, adj*deletionRate)
+
     member this.MutationRate with get() = this.mutationThresh
     member this.InsertionRate with get() = this.insertionThresh - this.mutationThresh
     member this.DeletionRate with get() = this.deletionThresh - this.insertionThresh
@@ -55,8 +60,21 @@ type indelRates =
             this.deletionThresh = other.deletionThresh
         | _ -> false
 
+
     override this.GetHashCode() = 
-        hash (this.mutationThresh, this.insertionThresh, this.deletionThresh)
+            // 1. Convert the floating-point values into their exact 64-bit integer bit representations
+            let h1 = BitConverter.DoubleToInt64Bits(this.mutationThresh)
+            let h2 = BitConverter.DoubleToInt64Bits(this.insertionThresh)
+            let h3 = BitConverter.DoubleToInt64Bits(this.deletionThresh)
+
+            // 2. Combine the hashes using a fixed, deterministic algorithm (e.g., a basic Jenkins/Murmur or standard Knuth multiplier)
+            // This math is pure logic and will never change regardless of the .NET version.
+            let mutable hash = 17
+            hash <- hash * 23 + (int (h1 ^^^ (h1 >>> 32)))
+            hash <- hash * 23 + (int (h2 ^^^ (h2 >>> 32)))
+            hash <- hash * 23 + (int (h3 ^^^ (h3 >>> 32)))
+            hash
+
 
     interface IEquatable<indelRates> with
         member this.Equals(other) = 

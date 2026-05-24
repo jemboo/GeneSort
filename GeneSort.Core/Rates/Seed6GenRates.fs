@@ -86,6 +86,7 @@ type seed6GenRates =
         elif r < this.para4Thresh then Para4
         else SelfRefl
 
+
     override this.Equals(obj) = 
         match obj with
         | :? seed6GenRates as other -> 
@@ -98,9 +99,42 @@ type seed6GenRates =
             this.selfReflThresh = other.selfReflThresh
         | _ -> false
 
+
     override this.GetHashCode() = 
-        hash (this.ortho1Thresh, this.ortho2Thresh, this.para1Thresh, this.para2Thresh, 
-              this.para3Thresh, this.para4Thresh, this.selfReflThresh)
+            // 1. Convert the floating-point values into their exact 64-bit integer bit representations
+            let h1 = BitConverter.DoubleToInt64Bits(this.ortho1Thresh)
+            let h2 = BitConverter.DoubleToInt64Bits(this.ortho2Thresh)
+            let h3 = BitConverter.DoubleToInt64Bits(this.para1Thresh)
+            let h4 = BitConverter.DoubleToInt64Bits(this.para2Thresh)
+            let h5 = BitConverter.DoubleToInt64Bits(this.para3Thresh)
+            let h6 = BitConverter.DoubleToInt64Bits(this.para4Thresh)
+            let h7 = BitConverter.DoubleToInt64Bits(this.selfReflThresh)
+
+
+            // 2. Combine the hashes using a fixed, deterministic algorithm (e.g., a basic Jenkins/Murmur or standard Knuth multiplier)
+            // This math is pure logic and will never change regardless of the .NET version.
+            let mutable hash = 17
+            hash <- hash * 23 + (int (h1 ^^^ (h1 >>> 32)))
+            hash <- hash * 23 + (int (h2 ^^^ (h2 >>> 32)))
+            hash <- hash * 23 + (int (h3 ^^^ (h3 >>> 32)))
+            hash <- hash * 23 + (int (h4 ^^^ (h4 >>> 32)))
+            hash <- hash * 23 + (int (h5 ^^^ (h5 >>> 32)))
+            hash <- hash * 23 + (int (h6 ^^^ (h6 >>> 32)))
+            hash <- hash * 23 + (int (h7 ^^^ (h7 >>> 32)))
+            hash
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     interface IEquatable<seed6GenRates> with
         member this.Equals(other) = 

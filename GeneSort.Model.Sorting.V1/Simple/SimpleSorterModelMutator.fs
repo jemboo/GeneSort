@@ -1,12 +1,12 @@
 ﻿namespace GeneSort.Model.Sorting.Simple.V1
 
 open FSharp.UMX
+open GeneSort.Core
 open GeneSort.Model.Sorting.V1.Simple.Ce
 open GeneSort.Model.Sorting.V1.Simple.Si
 open GeneSort.Model.Sorting.V1.Simple.Rs
 open GeneSort.Model.Sorting.V1.Simple.Uf4
 open GeneSort.Model.Sorting.V1.Simple.Uf6
-open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.V1.Simple
 
@@ -28,6 +28,27 @@ module SimpleSorterModelMutator =
         | SmmMsrsRandMutate msrs -> msrs.Id
         | SmmMsuf4RandMutate msuf4 -> msuf4.Id
         | SmmMsuf6RandMutate msuf6 -> msuf6.Id
+
+
+    let getSimpleSorterModelMutator 
+                (simpleSorterModelType: simpleSorterModelType)
+                (rngFactory: rngFactory)
+                (excludeSelfCe: bool<excludeSelfCe> option)
+                (modificationRate: float<modificationRate>)
+                (mutationRate: float<mutationRate> option)
+                (insertionRate: float<insertionRate> option)
+                (deletionRate: float<deletionRate> option) :simpleSorterModelMutator =
+        match simpleSorterModelType with
+        | simpleSorterModelType.Msce -> 
+            (msceRandMutate.create rngFactory 
+                    (indelRates.createMod 
+                            (%modificationRate, %mutationRate.Value, 
+                                %insertionRate.Value, %deletionRate.Value))
+                    (%excludeSelfCe.Value))
+            |> simpleSorterModelMutator.SmmMsceRandMutate
+        | _ -> failwith "Unsupported simple sorter model type for mutator creation."
+
+            
 
 
     let makeMutantSorterModelFromIndex 

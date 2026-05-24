@@ -49,7 +49,8 @@ module SorterModelGen =
                        (count: int<sorterCount>) 
                        (model: sorterModelGen) : sorterModel[] =
         match model with
-        | Simple ssmg -> SimpleSorterModelGen.makeSorterModelsFromIndexSpan firstIndex count ssmg |> Array.map sorterModel.Simple
+        | Simple ssmg -> SimpleSorterModelGen.makeSorterModelsFromIndexSpan firstIndex count ssmg 
+                         |> Array.map sorterModel.Simple
         | Unknown -> failwith "Unknown sorterModelGen"
 
 
@@ -57,6 +58,7 @@ module SorterModelGen =
         match model with
         | Simple ssmg -> SimpleSorterModelGen.makeSorterModelsFromIds ids ssmg |> Array.map sorterModel.Simple
         | Unknown -> failwith "Unknown sorterModelGen"
+
 
     let makeSorterModelSetFromIndexSpan 
                            (id: Guid<sorterModelSetId>) 

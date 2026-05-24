@@ -3,6 +3,7 @@
 open System
 open FSharp.UMX
 
+[<Struct; CustomEquality; NoComparison>]
 type uf6GenRates = 
     private { 
         order: int
@@ -18,6 +19,24 @@ type uf6GenRates =
     member this.Order with get() = this.order
     member this.SeedGenRatesUf6 with get() = this.seedGenRatesUf6
     member this.OpsGenRatesArray with get() = this.opsGenRatesArray
+    override this.GetHashCode() = 
+        // 1. Extract the already-stable hashes from your individual component fields
+        let h1 = this.seedGenRatesUf6.GetHashCode()
+        let h2 = this.opsGenRatesArray.GetHashCode()
+        // 2. Combine them using the exact same deterministic Knuth-style multiplier algorithm
+        let mutable hash = 17
+        hash <- hash * 23 + h1
+        hash <- hash * 23 + h2
+        hash
+
+    override this.Equals(obj) = 
+        match obj with
+        | :? uf6GenRates as other -> 
+            this.order = other.order &&
+            this.seedGenRatesUf6.Equals(other.seedGenRatesUf6) &&
+            this.opsGenRatesArray.Equals(other.opsGenRatesArray)
+        | _ -> false
+
 
 module Uf6GenRates =
 

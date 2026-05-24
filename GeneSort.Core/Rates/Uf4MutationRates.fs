@@ -1,12 +1,49 @@
 ﻿namespace GeneSort.Core
 
 
+[<Struct; CustomEquality; NoComparison>]
 type uf4MutationRates =
-    {
-        order: int
-        seedOpsTransitionRates: opsTransitionRates
-        twoOrbitPairOpsTransitionRates: opsTransitionRatesArray
-    }
+    private
+        {
+            order: int
+            seedOpsTransitionRates: opsTransitionRates
+            twoOrbitPairOpsTransitionRates: opsTransitionRatesArray
+        }
+
+        static member create 
+                (order: int) 
+                (seedOpsTransitionRates: opsTransitionRates) 
+                (twoOrbitPairOpsTransitionRates: opsTransitionRatesArray) : uf4MutationRates =
+            if order < 4 || order % 4 <> 0 then
+                failwith $"Order must be at least 4 and divisible by 4, got {order}"
+            { 
+                order = order; 
+                seedOpsTransitionRates = seedOpsTransitionRates; 
+                twoOrbitPairOpsTransitionRates = twoOrbitPairOpsTransitionRates }
+
+        member this.Order with get() = this.order
+        member this.SeedOpsTransitionRates with get() = this.seedOpsTransitionRates
+        member this.TwoOrbitPairOpsTransitionRates with get() = this.twoOrbitPairOpsTransitionRates
+
+        override this.GetHashCode() = 
+            // 1. Extract the already-stable hashes from your individual component fields
+            let h1 = this.seedOpsTransitionRates.GetHashCode()
+            let h2 = this.twoOrbitPairOpsTransitionRates.GetHashCode()
+
+            // 2. Combine them using the exact same deterministic Knuth-style multiplier algorithm
+            let mutable hash = 17
+            hash <- hash * 23 + h1
+            hash <- hash * 23 + h2
+            hash
+
+        override this.Equals(obj) = 
+            match obj with
+            | :? uf4MutationRates as other -> 
+                this.order = other.order &&
+                this.seedOpsTransitionRates.Equals(other.seedOpsTransitionRates) &&
+                this.twoOrbitPairOpsTransitionRates.Equals(other.twoOrbitPairOpsTransitionRates)
+            | _ -> false
+
 
 module Uf4MutationRates =
 

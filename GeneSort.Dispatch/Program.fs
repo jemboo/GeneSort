@@ -14,30 +14,52 @@ open System.IO
 
 
 
+//let createThreadSafeProgress () =
+//    // 1. Create a unique file name for this application session
+//    let sessionTimestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss")
+//    let logFileName = sprintf @"c:\Projects\session_%s.log" sessionTimestamp
+    
+//    let agent = MailboxProcessor.Start(fun inbox ->
+//        async {
+//            // 2. Open the file stream inside the agent loop
+//            use writer = new StreamWriter(logFileName, append = true)
+//            // Ensure edits flush immediately so logs are saved even if a crash happens
+//            writer.AutoFlush <- true 
+
+//            while true do
+//                let! msg = inbox.Receive()
+                
+//                // Print to console
+//                printfn "%s" msg
+                
+//                // Append to text file
+//                do! writer.WriteLineAsync(msg) |> Async.AwaitTask
+//        })
+//    { new IProgress<string> with member _.Report(msg) = agent.Post(msg) }
+
 let createThreadSafeProgress () =
-    // 1. Create a unique file name for this application session
     let sessionTimestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss")
     let logFileName = sprintf @"c:\Projects\session_%s.log" sessionTimestamp
     
-    let agent = MailboxProcessor.Start(fun inbox ->
-        async {
-            // 2. Open the file stream inside the agent loop
-            use writer = new StreamWriter(logFileName, append = true)
-            // Ensure edits flush immediately so logs are saved even if a crash happens
-            writer.AutoFlush <- true 
+    // Explicit synchronization object to protect file access across threads
+    let lockObj = obj()
 
-            while true do
-                let! msg = inbox.Receive()
-                
-                // Print to console
+    { new IProgress<string> with 
+        member _.Report(msg) = 
+            // Thread-safe lock ensures concurrent evaluations don't step on each other
+            lock lockObj (fun () ->
+                // 1. Output to console immediately
                 printfn "%s" msg
                 
-                // Append to text file
-                do! writer.WriteLineAsync(msg) |> Async.AwaitTask
-        })
-    { new IProgress<string> with member _.Report(msg) = agent.Post(msg) }
-
-
+                // 2. Open, append, and force-flush to disk blocks instantly
+                // The 'use' keyword guarantees disposal and stream closure immediately after writing
+                use writer = new StreamWriter(logFileName, append = true)
+                writer.WriteLine(msg)
+                
+                // 3. Force the OS kernel to flush its internal file cache to physical storage
+                writer.Flush() 
+            )
+    }
 
 let isServer = GCSettings.IsServerGC
 let mode = GCSettings.LatencyMode

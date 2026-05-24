@@ -1,5 +1,6 @@
 ﻿namespace GeneSort.Core
 
+[<Struct; CustomEquality; NoComparison>]
 type uf6MutationRates = 
     private { 
         order: int
@@ -18,6 +19,25 @@ type uf6MutationRates =
     member this.Order with get() = this.order
     member this.Seed6TransitionRates with get() = this.seed6TransitionRates
     member this.OpsTransitionRates with get() = this.opsTransitionRates
+
+    override this.Equals(other: obj) =
+        match other with
+        | :? uf6MutationRates as otherRates ->
+            this.order = otherRates.order &&
+            this.seed6TransitionRates = otherRates.seed6TransitionRates &&
+            this.opsTransitionRates = otherRates.opsTransitionRates
+        | _ -> false
+
+    override this.GetHashCode() =
+        // 1. Extract the already-stable hashes from your individual component fields
+        let h1 = this.seed6TransitionRates.GetHashCode()
+        let h2 = this.opsTransitionRates.GetHashCode()
+        // 2. Combine them using the exact same deterministic Knuth-style multiplier algorithm
+        let mutable hash = 17
+        hash <- hash * 23 + h1
+        hash <- hash * 23 + h2
+        hash
+
 
 module Uf6MutationRates =
 

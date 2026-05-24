@@ -83,9 +83,9 @@ module Msuf4RandMutate =
         let rates = msuf4RandMutate.Uf4MutationRates
         let ratesStr = 
             sprintf "Seed(O:%.2f, P:%.2f, S:%.2f)" 
-                rates.seedOpsTransitionRates.OrthoRates.ParaRate
-                rates.seedOpsTransitionRates.ParaRates.OrthoRate
-                rates.seedOpsTransitionRates.SelfReflRates.ParaRate
+                rates.SeedOpsTransitionRates.OrthoRates.ParaRate
+                rates.SeedOpsTransitionRates.ParaRates.OrthoRate
+                rates.SeedOpsTransitionRates.SelfReflRates.ParaRate
 
         sprintf "Msuf4RandMutate(RngType=%A, MutationRates=%s)" 
                 msuf4RandMutate.RngFactory

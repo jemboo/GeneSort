@@ -8,12 +8,16 @@ type opsTransitionRates =
           paraRates: opsActionRates
           selfReflRates: opsActionRates }
 
-    static member create (orthoRates: opsActionRates, paraRates: opsActionRates, selfReflRates: opsActionRates) : opsTransitionRates =
+    static member create (
+                orthoRates: opsActionRates, 
+                paraRates: opsActionRates, 
+                selfReflRates: opsActionRates) : opsTransitionRates =
         { 
             orthoRates = orthoRates
             paraRates = paraRates
             selfReflRates = selfReflRates
         }
+
 
     static member createUniform (amt: float) : opsTransitionRates =
         let rates = opsActionRates.createUniform amt
@@ -72,7 +76,17 @@ type opsTransitionRates =
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.orthoRates, this.paraRates, this.selfReflRates)
+            // 1. Extract the already-stable hashes from your individual component fields
+            let h1 = this.orthoRates.GetHashCode()
+            let h2 = this.paraRates.GetHashCode()
+            let h3 = this.selfReflRates.GetHashCode()
+
+            // 2. Combine them using the exact same deterministic Knuth-style multiplier algorithm
+            let mutable hash = 17
+            hash <- hash * 23 + h1
+            hash <- hash * 23 + h2
+            hash <- hash * 23 + h3
+            hash
 
     interface IEquatable<opsTransitionRates> with
         member this.Equals(other) = 

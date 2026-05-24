@@ -154,8 +154,26 @@ type seed6TransitionRates =
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.ortho1Rates, this.ortho2Rates, this.para1Rates, this.para2Rates, 
-              this.para3Rates, this.para4Rates, this.selfReflRates)
+            // 1. Extract the already-stable hashes from your individual component fields
+            let h1 = this.ortho1Rates.GetHashCode()
+            let h2 = this.ortho2Rates.GetHashCode()
+            let h3 = this.para1Rates.GetHashCode()
+            let h4 = this.para2Rates.GetHashCode()
+            let h5 = this.para3Rates.GetHashCode()
+            let h6 = this.para4Rates.GetHashCode()
+            let h7 = this.selfReflRates.GetHashCode()
+
+            // 2. Combine them using the exact same deterministic Knuth-style multiplier algorithm
+            let mutable hash = 17
+            hash <- hash * 23 + h1
+            hash <- hash * 23 + h2
+            hash <- hash * 23 + h3
+            hash <- hash * 23 + h4
+            hash <- hash * 23 + h5
+            hash <- hash * 23 + h6
+            hash <- hash * 23 + h7
+            hash
+
 
     interface IEquatable<seed6TransitionRates> with
         member this.Equals(other) = 
