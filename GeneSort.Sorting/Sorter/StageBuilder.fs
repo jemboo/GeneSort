@@ -1,9 +1,7 @@
 ﻿
 namespace GeneSort.Sorting.Sorter
 
-open System
 open FSharp.UMX
-open GeneSort.Core
 open GeneSort.Sorting
 
 
@@ -45,19 +43,19 @@ module StageBuilder = ()
 type stageBuilderSequence = 
         private { 
                     sortingWidth: int<sortingWidth>; 
-                    stages: ResizeArray<stageBuilder>;  
+                    stageBuilders: ResizeArray<stageBuilder>;  
                 } with
 
         static member create (sortingWidth: int<sortingWidth>) : stageBuilderSequence =
             if sortingWidth <= 1<sortingWidth> then
                 invalidArg "sortingWidth" "Sorting width must be greater than 1."
-            { sortingWidth = sortingWidth; stages = ResizeArray<stageBuilder>() }
+            { sortingWidth = sortingWidth; stageBuilders = ResizeArray<stageBuilder>() }
 
         member this.SortingWidth with get() = this.sortingWidth
 
-        member this.Stages with get() = this.stages.ToArray()
+        member this.StageBuilders with get() = this.stageBuilders.ToArray()
 
-        member this.StageLength with get() = this.stages.Count |> UMX.tag<stageLength>
+        member this.StageLength with get() = this.stageBuilders.Count |> UMX.tag<stageLength>
 
         member this.AddCe (ce: ce) =
             if ce.Low >= (this.sortingWidth |> int) || ce.Hi >= (this.sortingWidth |> int) then
@@ -65,8 +63,8 @@ type stageBuilderSequence =
 
             let mutable targetStageIndex = -1
             // Start from the last stage and work backwards
-            for i = this.stages.Count - 1 downto 0 do
-                if this.stages.[i].CanAddCe(ce) then
+            for i = this.stageBuilders.Count - 1 downto 0 do
+                if this.stageBuilders.[i].CanAddCe(ce) then
                     targetStageIndex <- i
 
             // If no stage can accept the CE, create a new stage
@@ -78,16 +76,22 @@ type stageBuilderSequence =
                         occupied = Array.create (this.sortingWidth |> int) false
                     }
                 newStage.AddCe(ce)
-                this.stages.Add(newStage)
+                this.stageBuilders.Add(newStage)
             else
                 // Add to the earliest stage that can accept the CE
-                this.stages.[targetStageIndex].AddCe(ce)
+                this.stageBuilders.[targetStageIndex].AddCe(ce)
 
 
 module StageBuilderSequence =
 
     let fromCes (sortingWidth : int<sortingWidth>) (ces: ce array) : stageBuilderSequence =
-        let stageSeq = stageBuilderSequence.create(sortingWidth)
-        ces |> Array.iter stageSeq.AddCe
-        stageSeq
+        let stageBuilderSeq = stageBuilderSequence.create(sortingWidth)
+        ces |> Array.iter stageBuilderSeq.AddCe
+        stageBuilderSeq
+
+
+    let toStageSequence  (sortingWidth : int<sortingWidth>) (ces: ce array)  : stageSequence =
+        let stageBuilderSeq = fromCes sortingWidth ces
+        let stages = stageBuilderSeq.StageBuilders |> Array.map(fun st -> stage.create st.Ces)
+        stageSequence.create stages sortingWidth
 

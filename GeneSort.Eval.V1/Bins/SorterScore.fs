@@ -69,7 +69,7 @@ module SorterScore =
             | None -> None
 
         let stageSequence = 
-            StageSequence.fromCes sorterEval.CeBlockEval.CeBlock.SortingWidth 
+            StageBuilderSequence.toStageSequence sorterEval.CeBlockEval.CeBlock.SortingWidth 
                                   sorterEval.CeBlockEval.UsedCes
         sorterScoreV1.create 
                     sorterEval.SorterId

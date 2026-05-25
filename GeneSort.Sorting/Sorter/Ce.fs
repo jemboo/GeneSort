@@ -25,6 +25,8 @@ type ce = private { low: int; hi: int } with
     /// Gets the second TwoOrbit (if present).
     member this.Hi with get () = this.hi
 
+    member this.Length with get() = this.Hi - this.Low
+
 
 [<CustomEquality; NoComparison>]
 type ceSequenceKey =

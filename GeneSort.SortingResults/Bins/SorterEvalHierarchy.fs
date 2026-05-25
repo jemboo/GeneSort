@@ -92,7 +92,7 @@ type sorterEvalHierarchy =
     member internal this.AddSorterEval (sorterEval: sorterEval) =
         let key = sorterEvalKey.create
                         sorterEval.CeBlockEval.CeUseCounts.UsedCeCount
-                        sorterEval.CeBlockEval.getStageSequence.StageLength
+                        sorterEval.CeBlockEval.getStageBuilderSequence.StageLength
                         (sorterEval.CeBlockEval.UnsortedCount = 0<sortableCount>)
         let layer =
             match this.layers.TryGetValue(key) with

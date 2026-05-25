@@ -2,9 +2,7 @@
 namespace GeneSort.Sorting.Sorter
 
 open System
-open System.Collections.Generic
 open FSharp.UMX
-open GeneSort.Core
 open GeneSort.Sorting
 
 // --- 1. Stage Type ---
@@ -18,11 +16,9 @@ type stage =
         hashCode: int
     } with
 
-    static member create (builder: stageBuilder) =
+    static member create (ces: ce array) =
         // Sort CEs to ensure order-independent equality
-        let sortedCes = 
-            builder.Ces 
-            |> Array.sortBy (fun c -> c.Low, c.Hi)
+        let sortedCes = ces |> Array.sortBy (fun c -> c.Low, c.Hi)
         
         // Pre-calculate hash code using the sorted content
         let h = sortedCes |> Array.fold (fun acc c -> HashCode.Combine(acc, c.Low, c.Hi)) 0
@@ -50,12 +46,11 @@ type stageSequence =
         hashCode: int 
     } with
 
-    static member create (builderSeq: stageBuilderSequence) =
-        let stages = builderSeq.Stages |> Array.map stage.create
+    static member create (stages: stage array) (sortingWidth:int<sortingWidth>) =
         // Compute sequence hash based on the ordered hashes of the stages
         let h = stages |> Array.fold (fun acc s -> HashCode.Combine(acc, s.GetHashCode())) 0
         { 
-            sortingWidth = builderSeq.SortingWidth
+            sortingWidth = sortingWidth
             stages = stages 
             hashCode = h
         }
@@ -75,12 +70,3 @@ type stageSequence =
             this.stages.Length = other.stages.Length &&
             Array.forall2 (fun (s1: stage) (s2: stage) -> s1.Equals(s2)) this.stages other.stages
         | _ -> false
-
-
-
-module StageSequence =
-
-    let fromCes (sortingWidth : int<sortingWidth>) (ces: ce array) : stageSequence =
-        let builderSeq = stageBuilderSequence.create sortingWidth
-        ces |> Array.iter builderSeq.AddCe
-        stageSequence.create builderSeq

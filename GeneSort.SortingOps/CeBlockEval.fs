@@ -14,7 +14,7 @@ type ceBlockEval =
         usedCes: Lazy<ce array>
         unsortedCount: int<sortableCount>
         sortableTest: sortableTest option
-        stageSequence: Lazy<stageBuilderSequence>
+        stageBuilderSequence: Lazy<stageBuilderSequence>
     }
 
     static member create 
@@ -28,7 +28,7 @@ type ceBlockEval =
             usedCes = Lazy<ce[]>(ceBlockEval.getUsedCes ceBlock ceUseCounts)
             unsortedCount = unsortedCount
             sortableTest = sortableTest; 
-            stageSequence = Lazy<stageBuilderSequence>(
+            stageBuilderSequence = Lazy<stageBuilderSequence>(
                                     StageBuilderSequence.fromCes 
                                             ceBlock.SortingWidth
                                             (ceBlockEval.getUsedCes ceBlock ceUseCounts) 
@@ -39,8 +39,8 @@ type ceBlockEval =
 
     member this.CeUseCounts with get() = this.ceUseCounts
     
-    member this.getStageSequence : stageBuilderSequence =
-        this.stageSequence.Value
+    member this.getStageBuilderSequence : stageBuilderSequence =
+        this.stageBuilderSequence.Value
 
     static member getUsedCes (ceb: ceBlock) (useCounts: ceUseCounts) : ce[] =
         let usedCes = ResizeArray<ce>()

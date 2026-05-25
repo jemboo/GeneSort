@@ -46,7 +46,7 @@ module SorterEvalKey =
     let fromSorterEval (eval: sorterEval) : sorterEvalKey =
             sorterEvalKey.create
                 eval.CeBlockEval.CeUseCounts.UsedCeCount
-                eval.CeBlockEval.getStageSequence.StageLength
+                eval.CeBlockEval.getStageBuilderSequence.StageLength
 
     let toDataTableRecord (key: sorterEvalKey) : GeneSort.Core.dataTableRecord =
         GeneSort.Core.dataTableRecord.createEmpty()

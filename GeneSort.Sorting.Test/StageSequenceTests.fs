@@ -16,10 +16,10 @@ type StageSequenceTests() =
         stageSeq.AddCe(ce)
         
         stageSeq.StageLength |> should equal 1
-        stageSeq.Stages.[0].CeCount |> should equal 1
-        stageSeq.Stages.[0].Ces.[0] |> should equal ce
-        stageSeq.Stages.[0].IsOccupied(0) |> should equal true
-        stageSeq.Stages.[0].IsOccupied(1) |> should equal true
+        stageSeq.StageBuilders.[0].CeCount |> should equal 1
+        stageSeq.StageBuilders.[0].Ces.[0] |> should equal ce
+        stageSeq.StageBuilders.[0].IsOccupied(0) |> should equal true
+        stageSeq.StageBuilders.[0].IsOccupied(1) |> should equal true
 
     [<Fact>]
     let ``AddCe to existing stage when possible`` () =
@@ -32,13 +32,13 @@ type StageSequenceTests() =
         stageSeq.AddCe(secondCe)
         
         stageSeq.StageLength |> should equal 1
-        stageSeq.Stages.[0].CeCount |> should equal 2
-        stageSeq.Stages.[0].Ces |> should contain firstCe
-        stageSeq.Stages.[0].Ces |> should contain secondCe
-        stageSeq.Stages.[0].IsOccupied(0) |> should equal true
-        stageSeq.Stages.[0].IsOccupied(1) |> should equal true
-        stageSeq.Stages.[0].IsOccupied(2) |> should equal true
-        stageSeq.Stages.[0].IsOccupied(3) |> should equal true
+        stageSeq.StageBuilders.[0].CeCount |> should equal 2
+        stageSeq.StageBuilders.[0].Ces |> should contain firstCe
+        stageSeq.StageBuilders.[0].Ces |> should contain secondCe
+        stageSeq.StageBuilders.[0].IsOccupied(0) |> should equal true
+        stageSeq.StageBuilders.[0].IsOccupied(1) |> should equal true
+        stageSeq.StageBuilders.[0].IsOccupied(2) |> should equal true
+        stageSeq.StageBuilders.[0].IsOccupied(3) |> should equal true
 
     [<Fact>]
     let ``AddCe creates new stage when existing stage is occupied`` () =
@@ -51,10 +51,10 @@ type StageSequenceTests() =
         stageSeq.AddCe(secondCe)
         
         stageSeq.StageLength |> should equal 2
-        stageSeq.Stages.[0].CeCount |> should equal 1
-        stageSeq.Stages.[0].Ces.[0] |> should equal firstCe
-        stageSeq.Stages.[1].CeCount |> should equal 1
-        stageSeq.Stages.[1].Ces.[0] |> should equal secondCe
+        stageSeq.StageBuilders.[0].CeCount |> should equal 1
+        stageSeq.StageBuilders.[0].Ces.[0] |> should equal firstCe
+        stageSeq.StageBuilders.[1].CeCount |> should equal 1
+        stageSeq.StageBuilders.[1].Ces.[0] |> should equal secondCe
 
     [<Fact>]
     let ``AddCe adds to earliest possible stage`` () =
@@ -71,12 +71,12 @@ type StageSequenceTests() =
         stageSeq.AddCe(ce4)
         
         stageSeq.StageLength |> should equal 2
-        stageSeq.Stages.[0].CeCount |> should equal 2
-        stageSeq.Stages.[0].Ces |> should contain ce1
-        stageSeq.Stages.[0].Ces |> should contain ce2
-        stageSeq.Stages.[1].CeCount |> should equal 2
-        stageSeq.Stages.[1].Ces |> should contain ce3
-        stageSeq.Stages.[1].Ces |> should contain ce4
+        stageSeq.StageBuilders.[0].CeCount |> should equal 2
+        stageSeq.StageBuilders.[0].Ces |> should contain ce1
+        stageSeq.StageBuilders.[0].Ces |> should contain ce2
+        stageSeq.StageBuilders.[1].CeCount |> should equal 2
+        stageSeq.StageBuilders.[1].Ces |> should contain ce3
+        stageSeq.StageBuilders.[1].Ces |> should contain ce4
 
     [<Fact>]
     let ``AddCe adds to earliest possible stage v2`` () =
@@ -93,12 +93,12 @@ type StageSequenceTests() =
         stageSeq.AddCe(ce4)
         
         stageSeq.StageLength |> should equal 2
-        stageSeq.Stages.[0].CeCount |> should equal 3
-        stageSeq.Stages.[0].Ces |> should contain ce1
-        stageSeq.Stages.[0].Ces |> should contain ce2
-        stageSeq.Stages.[0].Ces |> should contain ce4
-        stageSeq.Stages.[1].CeCount |> should equal 1
-        stageSeq.Stages.[1].Ces |> should contain ce3
+        stageSeq.StageBuilders.[0].CeCount |> should equal 3
+        stageSeq.StageBuilders.[0].Ces |> should contain ce1
+        stageSeq.StageBuilders.[0].Ces |> should contain ce2
+        stageSeq.StageBuilders.[0].Ces |> should contain ce4
+        stageSeq.StageBuilders.[1].CeCount |> should equal 1
+        stageSeq.StageBuilders.[1].Ces |> should contain ce3
 
     [<Fact>]
     let ``AddCe with out-of-bounds indices throws exception`` () =

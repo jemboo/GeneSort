@@ -34,11 +34,11 @@ module SorterCeUseProfile =
             unsortedCount = sorterEval.CeBlockEval.UnsortedCount
             unsorted = %sorterEval.CeBlockEval.UnsortedCount > 0
             ceCount = sorterEval.CeBlockEval.CeUseCounts.UsedCeCount
-            stageLength = sorterEval.CeBlockEval.getStageSequence.StageLength
+            stageLength = sorterEval.CeBlockEval.getStageBuilderSequence.StageLength
             sorterTestsId = sorterTestsId
         }
 
-    let makeReportLine 
+    let makeReportLine
             (id:string)
             (repl:string)
             (sortingWidth:string) 
