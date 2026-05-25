@@ -23,14 +23,14 @@ module EvalBinsExecutor =
         async {
             let paramsOpt = option {
                 let! sortingWidth = rp.GetSortingWidth()
-                let! qpTests = SorterEvalBinDbs.makeStandardQueryParamsFromRunParams rp (outputDataType.SortableTest "")
-                return (sortingWidth, qpTests)
+                let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
+                return (sortingWidth, sortableTestId)
             }
             match paramsOpt with
-            | Some (sortingWidth, qpTests) ->
+            | Some (sortingWidth, sortableTestId) ->
                 let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 return Ok ( SortableTestModel.makeSortableTest 
-                                    (%qpTests.Id |> UMX.tag) 
+                                    sortableTestId
                                     testModel 
                                     CommonSorterEvalBins.standardSortableDataFormat)
             | None ->
@@ -67,7 +67,7 @@ module EvalBinsExecutor =
             let sorterModelGen = CommonSorterEvalBins.getSimpleUniformSorterModelGen 
                                     rngType sortingWidth simpleSorterModelType
 
-            let! qpModelSet = SorterEvalBinDbs.makeStandardQueryParamsFromRunParams 
+            let! qpModelSet = SorterEvalBinDbs.RandomStandard.Uniform.queryParamsFromRunParams 
                                          rp (outputDataType.SorterModelSet "")
 
             let! repl = rp.GetRepl()
@@ -231,7 +231,7 @@ module EvalBinsExecutor =
                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
         }
 
-    let standardExecutor =
+    let uniformStandardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvalBins 
@@ -239,7 +239,7 @@ module EvalBinsExecutor =
                     makeStandardTests
                     host rp allowOverwrite cts progress }
 
-    let mergeExecutor =
+    let uniformMergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvalBins 
@@ -261,7 +261,7 @@ module EvalBinsExecutor =
 
     let getExecutor (executorType: evalBinsExecutorType) : IRunParamsExecutor =
         match executorType with
-        | StandardSortables -> standardExecutor
-        | MergeSortables -> mergeExecutor
+        | GenStandard -> uniformStandardExecutor
+        | GenMerge -> uniformMergeExecutor
         | FullReport -> fullReportExecutor
         | BinsReport -> binsReportExecutor

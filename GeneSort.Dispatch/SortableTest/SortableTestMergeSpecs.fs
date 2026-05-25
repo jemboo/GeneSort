@@ -42,7 +42,7 @@ module SortableTetsMergeSpecs =
 
     let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
-        rp.WithProjectName(Some host.Run.ProjectName)
+        rp.WithQueryName(Some host.Run.QueryName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
           .WithId (Some qp.Value.Id)
@@ -72,10 +72,10 @@ module SortableTetsMergeSpecs =
 
     module Specs =
 
-        let Merge_Test_test  (executorType: executorType) : runHostSpec = {
-            ProjectName = CommonSortableTest.projectName
+        let Merge_test  (executorType: executorType) : runHostSpec = {
+            QueryName = CommonSortableTest.queryName
             DatabaseName = CommonSortableTest.mergeDatabaseName
-            RunName = sprintf @"Merge_Test_test%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Merge_test_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
                 smallSortingWidths
@@ -90,10 +90,10 @@ module SortableTetsMergeSpecs =
         }
 
 
-        let Merge_Test_small (executorType: executorType) : runHostSpec = {
-            ProjectName = CommonSortableTest.projectName
+        let Merge_small (executorType: executorType) : runHostSpec = {
+            QueryName = CommonSortableTest.queryName
             DatabaseName = CommonSortableTest.mergeDatabaseName
-            RunName = sprintf @"Merge_Test_small%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Merge_small_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
                 smallSortingWidths
@@ -108,10 +108,10 @@ module SortableTetsMergeSpecs =
         }
 
         
-        let Merge_Test_medium_Ld (executorType: executorType) : runHostSpec = {
-            ProjectName = CommonSortableTest.projectName
+        let Merge_medium_Ld (executorType: executorType) : runHostSpec = {
+            QueryName = CommonSortableTest.queryName
             DatabaseName = CommonSortableTest.mergeDatabaseName
-            RunName = sprintf @"Merge_Test_medium_Ld%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Merge_medium_Ld_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
                 mediumSortingWidths
@@ -126,10 +126,10 @@ module SortableTetsMergeSpecs =
         }
 
         
-        let Merge_Test_medium_Hd (executorType: executorType) : runHostSpec = {
-            ProjectName = CommonSortableTest.projectName
+        let Merge_medium_Hd (executorType: executorType) : runHostSpec = {
+            QueryName = CommonSortableTest.queryName
             DatabaseName = CommonSortableTest.mergeDatabaseName
-            RunName = sprintf @"Merge_Test_medium_Hd%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Merge_medium_Hd_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
                 mediumSortingWidths
@@ -145,17 +145,17 @@ module SortableTetsMergeSpecs =
 
 
     type configType =
-        | MergeTest_Test
-        | MergeTest_Small
-        | MergeTest_Medium_Ld
-        | MergeTest_Medium_Hd
+        | Merge_Test
+        | Merge_Small
+        | Merge_Medium_Ld
+        | Merge_Medium_Hd
 
     let Configs = Map.ofList 
                     [ 
-                        (configType.MergeTest_Test, Specs.Merge_Test_test); 
-                        (configType.MergeTest_Small, Specs.Merge_Test_small);
-                        (configType.MergeTest_Medium_Ld, Specs.Merge_Test_medium_Ld);
-                        (configType.MergeTest_Medium_Hd, Specs.Merge_Test_medium_Hd);
+                        (configType.Merge_Test, Specs.Merge_test); 
+                        (configType.Merge_Small, Specs.Merge_small);
+                        (configType.Merge_Medium_Ld, Specs.Merge_medium_Ld);
+                        (configType.Merge_Medium_Hd, Specs.Merge_medium_Hd);
                     ]
 
     let getConfig (config: configType) (executorType: executorType) : runHostSpec =

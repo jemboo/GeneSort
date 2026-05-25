@@ -11,16 +11,16 @@ open GeneSort.Dispatch.V1.SortableTest
 
 
 type evalBinsExecutorType = 
-    | StandardSortables
-    | MergeSortables
+    | GenStandard
+    | GenMerge
     | FullReport
     | BinsReport
 
 
 module EvalBinsExecutorType =
     let toString = function
-        | StandardSortables -> "StandardSortables"
-        | MergeSortables -> "MergeSortables"
+        | GenStandard -> "GenStandard"
+        | GenMerge -> "GenMerge"
         | FullReport -> "FullReport"
         | BinsReport -> "BinsReport"
 
@@ -28,19 +28,6 @@ module EvalBinsExecutorType =
 module CommonSorterEvalBins =
 
     let projectName = "SorterEvalBins" |> UMX.tag<projectName>
-
-    let randomStandardDatabaseName = "RandomSimple" |> UMX.tag<databaseName>
-
-    let randomMergeDatabaseName = "RandomMerge" |> UMX.tag<databaseName>
-
-
-    let randomStandardDatabaseFolder = 
-                    "c:\\Projects\\SorterEvalBins\\RandomSimple\\Data"
-                     |> UMX.tag<pathToRootFolder>
-
-    let randomMergeDatabaseFolder = 
-                    "c:\\Projects\\SorterEvalBins\\RandomMerge\\Data"
-                     |> UMX.tag<pathToRootFolder>
 
     let CollectSortableTests = true
 

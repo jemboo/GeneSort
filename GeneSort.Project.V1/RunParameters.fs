@@ -30,6 +30,7 @@ type runParameters =
     static member insertionRateKey = "InsertionRate"
     static member deletionRateKey = "DeletionRate"
     static member projectNameKey = "ProjectName"
+    static member queryNameKey = "QueryName"
     static member runNameKey = "RunName"
     static member replKey = "Repl"
     static member rngTypeKey = "RngType"
@@ -86,6 +87,7 @@ type runParameters =
     member this.GetInsertionRate() = runParameters.tryGetFloat runParameters.insertionRateKey this.paramMap |> Option.map UMX.tag<insertionRate>
     member this.GetDeletionRate() = runParameters.tryGetFloat runParameters.deletionRateKey this.paramMap |> Option.map UMX.tag<deletionRate>
     member this.GetProjectName() = this.paramMap.TryFind runParameters.projectNameKey |> Option.map UMX.tag<projectName>
+    member this.GetQueryName() = this.paramMap.TryFind runParameters.queryNameKey |> Option.map UMX.tag<queryName>
     member this.GetRngType() = this.paramMap.TryFind runParameters.rngTypeKey |> Option.map RngType.fromString
     member this.GetRunName() = this.paramMap.TryFind runParameters.runNameKey |> Option.map UMX.tag<runName>
     member this.GetRepl() = runParameters.tryGetInt runParameters.replKey this.paramMap |> Option.map UMX.tag<replNumber>
@@ -158,6 +160,9 @@ type runParameters =
 
     member this.WithRngType(rng: rngType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.rngTypeKey (rng |> Option.map RngType.toString) }
+
+    member this.WithQueryName(qn: string<queryName> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.queryNameKey (qn |> Option.map UmxExt.stringToRaw) }  
 
     member this.WithRunName(rn: string<runName> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.runNameKey (rn |> Option.map UmxExt.stringToRaw) }

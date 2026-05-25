@@ -8,18 +8,19 @@ open GeneSort.Sorting
 
 
 type executorType = 
-    | Merge_Gen
+    | Generator
     | Unknown
 
 module ExecutorType =
     let toString = function
-        | Merge_Gen -> "Merge_Gen"
+        | Generator -> "Generator"
         | Unknown -> "Unknown"
 
 
 module CommonSortableTest =
 
     let projectName = "SortableTest" |> UMX.tag<projectName>
+    let queryName = "SortableTest" |> UMX.tag<queryName>
     let mergeDatabaseName = "Merge" |> UMX.tag<databaseName>
 
     let projectRngType = rngType.Lcg

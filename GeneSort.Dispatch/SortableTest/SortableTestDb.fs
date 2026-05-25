@@ -20,7 +20,7 @@ module SortableTestDb =
                 (outputDataType: outputDataType) : queryParams =
 
         queryParams.create 
-            CommonSortableTest.projectName
+            CommonSortableTest.queryName
             (Some repl)
             outputDataType
             [| (runParameters.sortingWidthKey, string %sortingWidth); 

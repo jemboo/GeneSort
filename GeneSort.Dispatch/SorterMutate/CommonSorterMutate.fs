@@ -13,16 +13,16 @@ open GeneSort.Dispatch.V1.SortableTest
 
 
 type sorterMutateExecutorType = 
-    | StandardSortables
-    | MergeSortables
+    | GenStandard
+    | GenMerge
     | FullReport
     | BinsReport
 
 
 module SorterMutateExecutorType =
     let toString = function
-        | StandardSortables -> "StandardSortables"
-        | MergeSortables -> "MergeSortables"
+        | GenStandard -> "GenStandard"
+        | GenMerge -> "GenMerge"
         | FullReport -> "FullReport"
         | BinsReport -> "BinsReport"
 
@@ -31,6 +31,7 @@ module SorterMutateExecutorType =
 module CommonSorterMutate = 
 
     let projectName = "SorterMutate" |> UMX.tag<projectName>
+    let queryName = "SorterMutate" |> UMX.tag<queryName>
 
     let randomStandardDatabaseName = "RandomSimple" |> UMX.tag<databaseName>
 

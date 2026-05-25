@@ -19,7 +19,7 @@ module SorterMutateDbs =
                     (sw: int<sortingWidth>) 
                     (smt: simpleSorterModelType) 
                     (odt: outputDataType) : queryParams =
-        queryParams.create projectName (Some repl) odt
+        queryParams.create queryName (Some repl) odt
             [| 
                (runParameters.rngTypeKey, rng |> RngType.toString)
                (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
@@ -50,7 +50,7 @@ module SorterMutateDbs =
                 (outputDataType: outputDataType) : queryParams =
 
         queryParams.create 
-            projectName
+            queryName
             (Some repl)
             outputDataType
             [| 

@@ -44,5 +44,5 @@ module RunHostSortableTest =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.DatabaseName
-        let run = run.create spec.ProjectName spec.RunName spec.RunDescription
+        let run = run.create spec.QueryName spec.RunName spec.RunDescription
         runHostSortableTest.Create db spec run :> IRunHost

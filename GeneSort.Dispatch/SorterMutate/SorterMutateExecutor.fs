@@ -321,8 +321,8 @@ module SorterMutateExecutor =
 
     let getExecutor (executorType: sorterMutateExecutorType) : IRunParamsExecutor =
         match executorType with
-        | sorterMutateExecutorType.StandardSortables -> standardExecutor
-        | sorterMutateExecutorType.MergeSortables -> mergeExecutor
+        | sorterMutateExecutorType.GenStandard -> standardExecutor
+        | sorterMutateExecutorType.GenMerge -> mergeExecutor
         | sorterMutateExecutorType.FullReport -> fullReportExecutor
         | sorterMutateExecutorType.BinsReport -> binsReportExecutor
 

@@ -9,5 +9,6 @@ open GeneSort.Core
 [<Measure>] type databaseName
 [<Measure>] type runName
 [<Measure>] type queryParamsId
+[<Measure>] type queryName
 [<Measure>] type replNumber
 [<Measure>] type generationNumber

@@ -52,7 +52,7 @@ module SorterMutateRandomStandardSpecs =
                 let! mr = mutationRate
                 return (%mr / 2.0) |> UMX.tag<deletionRate>
             }   
-        rp.WithProjectName(Some host.Run.ProjectName)
+        rp.WithQueryName(Some host.Run.QueryName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
           .WithInsertionRate(insertionRate)
@@ -78,7 +78,7 @@ module SorterMutateRandomStandardSpecs =
     module Specs =
 
         let SorterMutate_Standard_test (executorType: sorterMutateExecutorType)  : runHostSpec = {
-            ProjectName = CommonSorterMutate.projectName
+            QueryName = CommonSorterMutate.queryName
             DatabaseName = CommonSorterMutate.randomStandardDatabaseName
             RunName = sprintf @"SorterMutate_Standard_test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
@@ -96,7 +96,7 @@ module SorterMutateRandomStandardSpecs =
         }
 
         let SorterMutate_Standard_small (executorType: sorterMutateExecutorType) : runHostSpec = {
-            ProjectName = CommonSorterMutate.projectName
+            QueryName = CommonSorterMutate.queryName
             DatabaseName = CommonSorterMutate.randomStandardDatabaseName
             RunName = sprintf @"SorterMutate_Standard_small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
@@ -114,7 +114,7 @@ module SorterMutateRandomStandardSpecs =
         }
 
         let SorterMutate_Standard_medium (executorType: sorterMutateExecutorType) : runHostSpec = {
-            ProjectName = CommonSorterMutate.projectName
+            QueryName = CommonSorterMutate.queryName
             DatabaseName = CommonSorterMutate.randomStandardDatabaseName
             RunName = sprintf @"SorterMutate_Standard_medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"

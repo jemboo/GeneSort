@@ -7,7 +7,7 @@ open GeneSort.Project.V1
 
 type queryParams =
     private {
-        projectName:    string<projectName>
+        queryName:    string<queryName>
         repl:           int<replNumber> option
         outputDataType: outputDataType
         properties:     Map<string, string>
@@ -25,7 +25,7 @@ type queryParams =
         | None   -> ""
 
     member this.Id             with get() = this.id
-    member this.ProjectName    with get() = this.projectName
+    member this.QueryName    with get() = this.queryName
     member this.Repl           with get() = this.repl
     member this.OutputDataType with get() = this.outputDataType
     member this.Properties     with get() = this.properties
@@ -34,7 +34,7 @@ type queryParams =
         queryParams.ReplString this.repl
 
     override this.ToString() : string =
-        let projStr    = %this.projectName    |> string
+        let queryStr    = %this.queryName    |> string
         let replStr    = this.repl           |> queryParams.ReplString
         let outTypeStr = this.outputDataType |> OutputDataType.toFolderName
         let propsStr   =
@@ -42,10 +42,10 @@ type queryParams =
             |> Map.toSeq
             |> Seq.map (fun (k, v) -> $"{k}={v}")
             |> String.concat ";"
-        $"Project: {projStr}, Repl: {replStr}, OutputType: {outTypeStr}, Properties: [{propsStr}]"
+        $"Query: {queryStr}, Repl: {replStr}, OutputType: {outTypeStr}, Properties: [{propsStr}]"
 
     static member create
-            (projectName:    string<projectName>)
+            (queryName:    string<queryName>)
             (repl:           int<replNumber> option)
             (outputDataType: outputDataType)
             (properties:     (string * string) []) : queryParams =
@@ -54,7 +54,7 @@ type queryParams =
         // Build a clean, typed sequential list for Guid generation.
         // We unpack primitives here so they route smoothly into your GuidUtils primitives matcher.
         let structuralIdentityComponents = seq {
-            yield box projectName
+            yield box queryName
 
             match repl with
             | Some r -> yield box true; yield box %r
@@ -70,7 +70,7 @@ type queryParams =
         }
 
         {
-            projectName    = projectName
+            queryName    = queryName
             repl           = repl
             outputDataType = outputDataType
             properties     = props
@@ -84,16 +84,16 @@ type queryParams =
 
 
     static member createForRun 
-                    (projectName: string<projectName>) 
+                    (queryName: string<queryName>) 
                     (runName: string<runName>) 
                     : queryParams =
-        queryParams.create projectName None (outputDataType.Run runName) [||]
+        queryParams.create queryName None (outputDataType.Run runName) [||]
 
 
     static member createForTextReport
-            (projectName:    string<projectName>)
+            (queryName:    string<queryName>)
             (textReportName: string<textReportName>) : queryParams =
-        queryParams.create projectName None (outputDataType.TextReport textReportName) [||]
+        queryParams.create queryName None (outputDataType.TextReport textReportName) [||]
 
 
 

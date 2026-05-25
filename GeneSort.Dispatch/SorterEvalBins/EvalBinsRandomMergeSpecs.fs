@@ -43,13 +43,16 @@ module EvalBinsRandomMergeSpecs =
 
 
 
-    let private mergeEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
+    let private mergeEnhancer 
+                    (host: IRunHost) 
+                    (rp: runParameters) : runParameters =
         let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
                  |> Option.get
-        rp.WithProjectName(Some host.Run.ProjectName)
+        rp.WithQueryName(Some host.Run.QueryName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
           .WithId (Some qp.Id)
+
 
     let private paramMapFilter (rp: runParameters) : runParameters option = 
         maybe {
@@ -86,10 +89,10 @@ module EvalBinsRandomMergeSpecs =
 
     module Specs =
 
-        let EvalBins_Merge_single (executorType: evalBinsExecutorType) : runHostSpec = {
-            ProjectName = CommonSortableTest.projectName
-            DatabaseName = CommonSorterEvalBins.randomMergeDatabaseName
-            RunName = sprintf @"EvalBins_Merge_single_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
+        let RandMerge_Single (executorType: evalBinsExecutorType) : runHostSpec = {
+            QueryName = CommonSortableTest.queryName
+            DatabaseName = SorterEvalBinDbs.RandomMerge.Uniform.dbName
+            RunName = sprintf @"RandMerge_Single_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msuf4"
             Spans = [   
                 rngType
@@ -106,10 +109,10 @@ module EvalBinsRandomMergeSpecs =
             MaxParallel = 4
         }
 
-        let EvalBins_Merge_test (executorType: evalBinsExecutorType) : runHostSpec = {
-            ProjectName = CommonSortableTest.projectName
-            DatabaseName = CommonSorterEvalBins.randomMergeDatabaseName
-            RunName = sprintf @"EvalBins_Merge_test_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
+        let RandMerge_Test (executorType: evalBinsExecutorType) : runHostSpec = {
+            QueryName = CommonSortableTest.queryName
+            DatabaseName = SorterEvalBinDbs.RandomMerge.Uniform.dbName
+            RunName = sprintf @"RandMerge_Test_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [   
                 rngType
@@ -127,10 +130,10 @@ module EvalBinsRandomMergeSpecs =
         }
 
 
-        let EvalBins_Merge_small (executorType: evalBinsExecutorType) : runHostSpec = {
-            ProjectName = CommonSortableTest.projectName
-            DatabaseName = CommonSorterEvalBins.randomMergeDatabaseName
-            RunName = sprintf @"EvalBins_Merge_small_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
+        let RandMerge_Small (executorType: evalBinsExecutorType) : runHostSpec = {
+            QueryName = CommonSortableTest.queryName
+            DatabaseName = SorterEvalBinDbs.RandomMerge.Uniform.dbName
+            RunName = sprintf @"RandMerge_Small_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -148,10 +151,10 @@ module EvalBinsRandomMergeSpecs =
         }
 
 
-        let EvalBins_Merge_medium_Ld (executorType: evalBinsExecutorType) : runHostSpec = {
-            ProjectName = CommonSortableTest.projectName
-            DatabaseName = CommonSorterEvalBins.randomMergeDatabaseName
-            RunName = sprintf @"EvalBins_Merge_medium_Ld_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
+        let RandMerge_MediumLd (executorType: evalBinsExecutorType) : runHostSpec = {
+            QueryName = CommonSortableTest.queryName
+            DatabaseName = SorterEvalBinDbs.RandomMerge.Uniform.dbName
+            RunName = sprintf @"RandMerge_MediumLd_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -169,10 +172,10 @@ module EvalBinsRandomMergeSpecs =
         }
 
 
-        let EvalBins_Merge_medium_Hd (executorType: evalBinsExecutorType) : runHostSpec = {
-            ProjectName = CommonSortableTest.projectName
-            DatabaseName = CommonSorterEvalBins.randomMergeDatabaseName
-            RunName = sprintf @"EvalBins_Merge_medium_Hd_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
+        let RandMerge_MediumHd (executorType: evalBinsExecutorType) : runHostSpec = {
+            QueryName = CommonSortableTest.queryName
+            DatabaseName = SorterEvalBinDbs.RandomMerge.Uniform.dbName
+            RunName = sprintf @"RandMerge_Medium_Hd_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -191,20 +194,20 @@ module EvalBinsRandomMergeSpecs =
 
 
     type configType =
-        | EvalBins_Merge_single
-        | EvalBins_Merge_Test
-        | EvalBins_Merge_Small
-        | EvalBins_Merge_Medium_Ld
-        | EvalBins_Merge_Medium_Hd
+        | RandMerge_Single
+        | RandMerge_Test
+        | RandMerge_Small
+        | RandMerge_MediumLd
+        | RandMerge_MediumHd
 
 
     let Configs = Map.ofList 
                     [ 
-                        (configType.EvalBins_Merge_single, Specs.EvalBins_Merge_single);
-                        (configType.EvalBins_Merge_Test, Specs.EvalBins_Merge_test); 
-                        (configType.EvalBins_Merge_Small, Specs.EvalBins_Merge_small);
-                        (configType.EvalBins_Merge_Medium_Ld, Specs.EvalBins_Merge_medium_Ld);
-                        (configType.EvalBins_Merge_Medium_Hd, Specs.EvalBins_Merge_medium_Hd);
+                        (configType.RandMerge_Single, Specs.RandMerge_Single);
+                        (configType.RandMerge_Test, Specs.RandMerge_Test); 
+                        (configType.RandMerge_Small, Specs.RandMerge_Small);
+                        (configType.RandMerge_MediumLd, Specs.RandMerge_MediumLd);
+                        (configType.RandMerge_MediumHd, Specs.RandMerge_MediumHd);
                     ]
 
     let getConfig (config: configType) (executorType: evalBinsExecutorType) : runHostSpec =

@@ -75,8 +75,8 @@ let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
-//let configType = SortableTetsMergeSpecs.configType.MergeTest_Test
-//let executorType = SortableTest.executorType.Merge_Gen
+//let configType = SortableTetsMergeSpecs.configType.Merge_Test
+//let executorType = SortableTest.executorType.Generator
 //let host: IRunHost = 
 //    let spec = SortableTetsMergeSpecs.getConfig configType executorType
 //    SortableTest.RunHostSortableTest.createRunHost spec
@@ -84,24 +84,24 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 
 
-let configType = EvalBinsRandomMergeSpecs.configType.EvalBins_Merge_Test
-let executorType = evalBinsExecutorType.MergeSortables
-let host: IRunHost = 
-    let spec = EvalBinsRandomMergeSpecs.getConfig configType executorType
-    SorterEvalBins.RunHostEvalBins.createRunHost spec
-
-let executor = EvalBinsExecutor.getExecutor executorType
-
-
-
-
-//let configType = EvalBinsRandomStandardSpecs.configType.EvalBins_Standard_Test
-//let executorType = evalBinsExecutorType.StandardSortables
+//let configType = EvalBinsRandomMergeSpecs.configType.Random_Merge_Test
+//let executorType = evalBinsExecutorType.MergeSortables
 //let host: IRunHost = 
-//    let spec = EvalBinsRandomStandardSpecs.getConfig configType executorType
+//    let spec = EvalBinsRandomMergeSpecs.getConfig configType executorType
 //    SorterEvalBins.RunHostEvalBins.createRunHost spec
 
 //let executor = EvalBinsExecutor.getExecutor executorType
+
+
+
+
+let configType = EvalBinsRandomStandardSpecs.configType.Random_Standard_Test
+let executorType = evalBinsExecutorType.GenStandard
+let host: IRunHost = 
+    let spec = EvalBinsRandomStandardSpecs.getConfig configType executorType
+    SorterEvalBins.RunHostEvalBins.createRunHost spec
+
+let executor = EvalBinsExecutor.getExecutor executorType
 
 
 let minReplica = 0<replNumber>
@@ -110,7 +110,7 @@ let maxReplica = 1<replNumber>
 
 
 async {
-    printfn "Init Project: %s" %host.Run.ProjectName
+    printfn "Init Project: %s" %host.Run.QueryName
     
     let! initResult = 
         ParamOps.initProjectAndRunFiles

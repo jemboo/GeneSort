@@ -15,7 +15,7 @@ type parameterSpanDto =
 [<MessagePackObject>]
 type runDto =
     {
-        [<MessagePack.Key(0)>] ProjectName: string
+        [<MessagePack.Key(0)>] QueryName: string
         [<MessagePack.Key(1)>] RunName: string
         [<MessagePack.Key(2)>] Description: string
     }
@@ -23,13 +23,13 @@ type runDto =
 module RunDto =
     let fromDomain (project: run) : runDto =
         {
-            ProjectName = %project.ProjectName
+            QueryName = %project.QueryName
             RunName = %project.RunName
             Description = project.Description
         }
 
     let toDomain (dto: runDto) : run =
         run.create
-          (dto.ProjectName |> UMX.tag<projectName> )
+          (dto.QueryName |> UMX.tag<queryName> )
           (dto.RunName |> UMX.tag<runName> )
           dto.Description
