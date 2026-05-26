@@ -60,7 +60,7 @@ module SorterEvalSpecsRandom =
 
         let Rand_Test (executorType: sorterEvalExecutorType)  : runHostSpec = {
             DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand_Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -76,7 +76,7 @@ module SorterEvalSpecsRandom =
 
         let Rand_Small (executorType: sorterEvalExecutorType) : runHostSpec = {
             DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand_Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -90,9 +90,9 @@ module SorterEvalSpecsRandom =
             MaxParallel = 8
         }
 
-        let Rand_medium (executorType: sorterEvalExecutorType) : runHostSpec = {
+        let Rand_Medium (executorType: sorterEvalExecutorType) : runHostSpec = {
             DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand_Medium_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Medium_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -115,7 +115,7 @@ module SorterEvalSpecsRandom =
                     [ 
                         (configType.Rand_Test, Specs.Rand_Test); 
                         (configType.Rand_Small, Specs.Rand_Small);
-                        (configType.Rand_Medium, Specs.Rand_medium);
+                        (configType.Rand_Medium, Specs.Rand_Medium);
                     ]
 
     let getConfig (config: configType) (executorType: sorterEvalExecutorType) : runHostSpec =

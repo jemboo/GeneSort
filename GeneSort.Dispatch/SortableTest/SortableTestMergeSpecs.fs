@@ -74,7 +74,7 @@ module SortableTetsMergeSpecs =
 
         let Merge_test  (executorType: executorType) : runHostSpec = {
             DatabaseName = CommonSortableTest.mergeDatabaseName
-            RunName = sprintf @"Merge_test_%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Merge-test_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
                 smallSortingWidths
@@ -91,7 +91,7 @@ module SortableTetsMergeSpecs =
 
         let Merge_small (executorType: executorType) : runHostSpec = {
             DatabaseName = CommonSortableTest.mergeDatabaseName
-            RunName = sprintf @"Merge_small_%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Merge-small_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
                 smallSortingWidths
@@ -108,7 +108,7 @@ module SortableTetsMergeSpecs =
         
         let Merge_medium_Ld (executorType: executorType) : runHostSpec = {
             DatabaseName = CommonSortableTest.mergeDatabaseName
-            RunName = sprintf @"Merge_medium_Ld_%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Merge-medium_Ld_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
                 mediumSortingWidths
@@ -125,7 +125,7 @@ module SortableTetsMergeSpecs =
         
         let Merge_medium_Hd (executorType: executorType) : runHostSpec = {
             DatabaseName = CommonSortableTest.mergeDatabaseName
-            RunName = sprintf @"Merge_medium_Hd_%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Merge-medium_Hd_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
                 mediumSortingWidths

@@ -72,7 +72,7 @@ module SorterEvalSpecsRandomMerge =
                 | simpleSorterModelType.Mssi | simpleSorterModelType.Msrs -> 
                     if has2factor then Some () else None
                 | simpleSorterModelType.Msuf4 -> 
-                    if isMuf4able then Some () else None
+                    if (isMuf4able && %sw < 256) then Some () else None
                 | simpleSorterModelType.Msuf6 -> 
                     if isMuf6able then Some () else None
                 | _ -> None
@@ -80,8 +80,8 @@ module SorterEvalSpecsRandomMerge =
             // Merge dimension check: If it doesn't divide, return None to stop
             if (%sw % %md <> 0) then return! None
         
-            // Suffix check: If it's NoSuffix and width > 64, return None to stop
-            if (mst.IsNoSuffix && %sw > 64) then return! None
+            // Suffix check: If it's NoSuffix and width > 128, return None to stop
+            if (mst.IsNoSuffix && %sw > 128) then return! None
         
             return rp
         }
@@ -91,7 +91,7 @@ module SorterEvalSpecsRandomMerge =
 
         let RandMerge_Single (executorType: sorterEvalExecutorType) : runHostSpec = {
             DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge_Single_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"RandMerge-Single_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msuf4"
             Spans = [   
                 rngType
@@ -110,7 +110,7 @@ module SorterEvalSpecsRandomMerge =
 
         let RandMerge_Test (executorType: sorterEvalExecutorType) : runHostSpec = {
             DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge_Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"RandMerge-Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [   
                 rngType
@@ -130,7 +130,7 @@ module SorterEvalSpecsRandomMerge =
 
         let RandMerge_Small (executorType: sorterEvalExecutorType) : runHostSpec = {
             DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge_Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"RandMerge-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -150,7 +150,7 @@ module SorterEvalSpecsRandomMerge =
 
         let RandMerge_MediumLd (executorType: sorterEvalExecutorType) : runHostSpec = {
             DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge_MediumLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"RandMerge-MediumLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -170,7 +170,7 @@ module SorterEvalSpecsRandomMerge =
 
         let RandMerge_MediumHd (executorType: sorterEvalExecutorType) : runHostSpec = {
             DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge_Medium_Hd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"RandMerge-MediumHd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
