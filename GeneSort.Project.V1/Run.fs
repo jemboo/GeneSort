@@ -8,26 +8,26 @@ open GeneSort.Core
 type run =
     private
         {
-          queryName: string<queryName>
+          dataBaseName: string<databaseName>
           runName: string<runName>
           description: string
         }
     with
 
     static member create
-            (queryName: string<queryName>)
+            (databaseName: string<databaseName>)
             (runName: string<runName>)
             (description: string) : run =
 
-        if String.IsNullOrWhiteSpace %queryName then
+        if String.IsNullOrWhiteSpace %databaseName then
             failwith "Query name cannot be empty"
         {
-          queryName = queryName
+          dataBaseName = databaseName
           runName = runName
           description = description
         }
 
-    member this.QueryName with get () = this.queryName
+    member this.DatabaseName with get () = this.dataBaseName
     member this.RunName with get () = this.runName
     member this.Description with get () = this.description
 

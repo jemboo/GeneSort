@@ -43,6 +43,6 @@ module SorterEvalRunHost =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.DatabaseName
-        let run = run.create spec.QueryName spec.RunName spec.RunDescription
+        let run = run.create spec.DatabaseName spec.RunName spec.RunDescription
         sorterEvalRunHost.Create db spec run :> IRunHost
 

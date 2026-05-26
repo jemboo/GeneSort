@@ -35,7 +35,7 @@ module SorterEvalSpecsRandom =
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
-        rp.WithQueryName(Some host.Run.QueryName)
+        rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
           .WithId (Some qp.Value.Id)
@@ -59,7 +59,6 @@ module SorterEvalSpecsRandom =
     module Specs =
 
         let Rand_Test (executorType: sorterEvalExecutorType)  : runHostSpec = {
-            QueryName = SorterEvalDbs.RandomStandard.Uniform.queryName
             DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand_Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
@@ -76,7 +75,6 @@ module SorterEvalSpecsRandom =
         }
 
         let Rand_Small (executorType: sorterEvalExecutorType) : runHostSpec = {
-            QueryName = SorterEvalDbs.RandomStandard.Uniform.queryName
             DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand_Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
@@ -93,7 +91,6 @@ module SorterEvalSpecsRandom =
         }
 
         let Rand_medium (executorType: sorterEvalExecutorType) : runHostSpec = {
-            QueryName = SorterEvalDbs.RandomStandard.Uniform.queryName
             DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand_Medium_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"

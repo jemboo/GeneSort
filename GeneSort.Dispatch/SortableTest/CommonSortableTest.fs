@@ -20,7 +20,7 @@ module ExecutorType =
 module CommonSortableTest =
 
     let projectName = "SortableTest" |> UMX.tag<projectName>
-    let queryName = "SortableTest" |> UMX.tag<queryName>
+    //let queryName = "SortableTest" |> UMX.tag<queryName>
     let mergeDatabaseName = "Merge" |> UMX.tag<databaseName>
 
     let projectRngType = rngType.Lcg

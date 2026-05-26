@@ -16,6 +16,7 @@ type runParameters =
     // Constants for consistency
     static member ceLengthKey = "CeLength"
     static member collectSortableTestsKey = "CollectSortableTests"
+    static member databaseNameKey = "DatabaseName"
     static member elapsedTimeKey = "ElapsedTime"
     static member excludeSelfCeKey = "ExcludeSelfCe"
     static member generationKey = "Generation"
@@ -71,6 +72,7 @@ type runParameters =
     // --- Getters ---
     member this.GetCeLength() = runParameters.tryGetInt runParameters.ceLengthKey this.paramMap |> Option.map UMX.tag<ceLength>
     member this.GetCollectSortableTests() = runParameters.tryGetBool runParameters.collectSortableTestsKey this.paramMap
+    member this.GetDatabaseName() = this.paramMap.TryFind runParameters.databaseNameKey |> Option.map UMX.tag<databaseName>
     member this.GetElapsedTime() = this.paramMap.TryFind runParameters.elapsedTimeKey
     member this.GetExcludeSelfCe() = runParameters.tryGetBool runParameters.excludeSelfCeKey this.paramMap |> Option.map UMX.tag<excludeSelfCe>
     member this.GetGeneration() = runParameters.tryGetInt runParameters.generationKey this.paramMap |> Option.map UMX.tag<generationNumber>
@@ -118,6 +120,9 @@ type runParameters =
 
     member this.WithCollectSortableTests(cst: bool option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.collectSortableTestsKey (cst |> Option.map string) }
+
+    member this.WithDatabaseName(dbn: string<databaseName> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.databaseNameKey (dbn |> Option.map UmxExt.stringToRaw) }
 
     member this.WithElapsedTime(time: string option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.elapsedTimeKey time }

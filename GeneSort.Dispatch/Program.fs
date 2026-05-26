@@ -79,7 +79,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executorType = SortableTest.executorType.Generator
 //let host: IRunHost = 
 //    let spec = SortableTetsMergeSpecs.getConfig configType executorType
-//    SortableTest.RunHostSortableTest.createRunHost spec
+//    SortableTest.SortableTestRunHost.createRunHost spec
 
 //let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 
@@ -110,7 +110,7 @@ let maxReplica = 1<replNumber>
 
 
 async {
-    printfn "Init Project: %s" %host.Run.QueryName
+    printfn "Init Project: %s" %host.Run.DatabaseName
     
     let! initResult = 
         ParamOps.initProjectAndRunFiles

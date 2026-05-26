@@ -7,7 +7,6 @@ open GeneSort.Dispatch.V1
 
 
 type runHostSpec = {
-    QueryName: string<queryName>
     DatabaseName: string<databaseName>
     RunName: string<runName>
     RunDescription: string

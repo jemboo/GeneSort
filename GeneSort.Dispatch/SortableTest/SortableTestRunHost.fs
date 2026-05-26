@@ -6,7 +6,7 @@ open GeneSort.Dispatch.V1
 open SortableTestDb
 
 
-type runHostSortableTest = 
+type sortableTestRunHost = 
     private { 
         _projectDb: IGeneSortDb 
         _parameterSpans: (string * string list) list
@@ -40,9 +40,9 @@ type runHostSortableTest =
         member this.MaxParallel with get (): int = this._maxParallel
 
 
-module RunHostSortableTest =
+module SortableTestRunHost =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.DatabaseName
-        let run = run.create spec.QueryName spec.RunName spec.RunDescription
-        runHostSortableTest.Create db spec run :> IRunHost
+        let run = run.create spec.DatabaseName spec.RunName spec.RunDescription
+        sortableTestRunHost.Create db spec run :> IRunHost

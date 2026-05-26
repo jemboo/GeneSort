@@ -7,7 +7,7 @@ open GeneSort.Dispatch.V1
 open SorterMutateDbs
 
 
-type runHostSorterMutate = 
+type sorterMutateRunHost = 
     private { 
         _projectDb: IGeneSortDb 
         _parameterSpans: (string * string list) list
@@ -40,11 +40,11 @@ type runHostSorterMutate =
 
 
 
-module RunHostSorterMutate =
+module SorterMutateRunHost =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.DatabaseName
-        let run = run.create spec.QueryName spec.RunName spec.RunDescription
-        runHostSorterMutate.Create db spec run :> IRunHost
+        let run = run.create spec.DatabaseName spec.RunName spec.RunDescription
+        sorterMutateRunHost.Create db spec run :> IRunHost
 
 

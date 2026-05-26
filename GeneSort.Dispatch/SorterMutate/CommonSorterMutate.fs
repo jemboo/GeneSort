@@ -31,7 +31,7 @@ module SorterMutateExecutorType =
 module CommonSorterMutate = 
 
     let projectName = "SorterMutate" |> UMX.tag<projectName>
-    let queryName = "SorterMutate" |> UMX.tag<queryName>
+    let queryName = "SorterMutate" |> UMX.tag<databaseName>
 
     let randomStandardDatabaseName = "RandomSimple" |> UMX.tag<databaseName>
 

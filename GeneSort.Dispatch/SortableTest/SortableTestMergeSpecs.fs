@@ -42,7 +42,7 @@ module SortableTetsMergeSpecs =
 
     let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
-        rp.WithQueryName(Some host.Run.QueryName)
+        rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
           .WithId (Some qp.Value.Id)
@@ -73,7 +73,6 @@ module SortableTetsMergeSpecs =
     module Specs =
 
         let Merge_test  (executorType: executorType) : runHostSpec = {
-            QueryName = CommonSortableTest.queryName
             DatabaseName = CommonSortableTest.mergeDatabaseName
             RunName = sprintf @"Merge_test_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
@@ -91,7 +90,6 @@ module SortableTetsMergeSpecs =
 
 
         let Merge_small (executorType: executorType) : runHostSpec = {
-            QueryName = CommonSortableTest.queryName
             DatabaseName = CommonSortableTest.mergeDatabaseName
             RunName = sprintf @"Merge_small_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
@@ -109,7 +107,6 @@ module SortableTetsMergeSpecs =
 
         
         let Merge_medium_Ld (executorType: executorType) : runHostSpec = {
-            QueryName = CommonSortableTest.queryName
             DatabaseName = CommonSortableTest.mergeDatabaseName
             RunName = sprintf @"Merge_medium_Ld_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
@@ -127,7 +124,6 @@ module SortableTetsMergeSpecs =
 
         
         let Merge_medium_Hd (executorType: executorType) : runHostSpec = {
-            QueryName = CommonSortableTest.queryName
             DatabaseName = CommonSortableTest.mergeDatabaseName
             RunName = sprintf @"Merge_medium_Hd_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"

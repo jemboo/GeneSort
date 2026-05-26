@@ -7,7 +7,7 @@ open GeneSort.Project.V1
 
 type queryParams =
     private {
-        queryName:    string<queryName>
+        queryName:    string<databaseName>
         repl:           int<replNumber> option
         outputDataType: outputDataType
         properties:     Map<string, string>
@@ -45,7 +45,7 @@ type queryParams =
         $"Query: {queryStr}, Repl: {replStr}, OutputType: {outTypeStr}, Properties: [{propsStr}]"
 
     static member create
-            (queryName:    string<queryName>)
+            (queryName:    string<databaseName>)
             (repl:           int<replNumber> option)
             (outputDataType: outputDataType)
             (properties:     (string * string) []) : queryParams =
@@ -84,14 +84,14 @@ type queryParams =
 
 
     static member createForRun 
-                    (queryName: string<queryName>) 
+                    (queryName: string<databaseName>) 
                     (runName: string<runName>) 
                     : queryParams =
         queryParams.create queryName None (outputDataType.Run runName) [||]
 
 
     static member createForTextReport
-            (queryName:    string<queryName>)
+            (queryName:    string<databaseName>)
             (textReportName: string<textReportName>) : queryParams =
         queryParams.create queryName None (outputDataType.TextReport textReportName) [||]
 

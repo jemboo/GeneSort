@@ -19,9 +19,8 @@ module SorterEvalDbs =
         module Uniform =
 
             let dbName = "RandomStandardUniform" |> UMX.tag<databaseName>
-            let queryName = $"{projectName}\\{%dbName}" |> UMX.tag<queryName>
             let dbFolder = 
-                    $"c:\\Projects\\{%queryName}\\Data" |> UMX.tag<pathToRootFolder>
+                    $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
 
             let makeQueryParams
@@ -30,7 +29,7 @@ module SorterEvalDbs =
                             (sw: int<sortingWidth>) 
                             (smt: simpleSorterModelType) 
                             (odt: outputDataType) : queryParams =
-                queryParams.create queryName (Some repl) odt
+                queryParams.create dbName (Some repl) odt
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
                        (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
@@ -61,8 +60,8 @@ module SorterEvalDbs =
     
         module Uniform =
             
-            let dbName = "UniformRandomMerge" |> UMX.tag<databaseName>
-            let queryName = $"{projectName}\\{%dbName}" |> UMX.tag<queryName>
+            let dbName = "RandomMergeUniform" |> UMX.tag<databaseName>
+            //let queryName = $"{projectName}\\{%dbName}" |> UMX.tag<queryName>
             let dbFolder = 
                     $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
@@ -77,7 +76,7 @@ module SorterEvalDbs =
                         (outputDataType: outputDataType) : queryParams =
 
                 queryParams.create 
-                    queryName
+                    dbName
                     (Some repl)
                     outputDataType
                     [| 

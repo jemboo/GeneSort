@@ -24,7 +24,7 @@
     <Compile Include="RunHostSpec.fs" />
     <Compile Include="SortableTest\CommonSortableTest.fs" />
     <Compile Include="SortableTest\SortableTestDb.fs" />
-    <Compile Include="SortableTest\RunHostSortableTest.fs" />
+    <Compile Include="SortableTest\SortableTestRunHost.fs" />
     <Compile Include="SortableTest\SortableTestExecutor.fs" />
     <Compile Include="SortableTest\SortableTestMergeSpecs.fs" />
     <Compile Include="SorterEval\CommonSorterEval.fs" />
@@ -35,7 +35,7 @@
     <Compile Include="SorterEval\SorterEvalSpecsRandomMerge.fs" />
     <Compile Include="SorterMutate\CommonSorterMutate.fs" />
     <Compile Include="SorterMutate\SorterMutateDbs.fs" />
-    <Compile Include="SorterMutate\RunHostSorterMutate.fs" />
+    <Compile Include="SorterMutate\SorterMutateRunHost.fs" />
     <Compile Include="SorterMutate\SorterMutateExecutor.fs" />
     <Compile Include="SorterMutate\SorterMutateRandomStandardSpecs.fs" />
     <Compile Include="SorterMutate\SorterMutateRandomMergeSpecs.fs" />

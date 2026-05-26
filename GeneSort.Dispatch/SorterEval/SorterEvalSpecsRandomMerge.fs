@@ -48,7 +48,7 @@ module SorterEvalSpecsRandomMerge =
                     (rp: runParameters) : runParameters =
         let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
                  |> Option.get
-        rp.WithQueryName(Some host.Run.QueryName)
+        rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
           .WithId (Some qp.Id)
@@ -90,7 +90,6 @@ module SorterEvalSpecsRandomMerge =
     module Specs =
 
         let RandMerge_Single (executorType: sorterEvalExecutorType) : runHostSpec = {
-            QueryName = CommonSortableTest.queryName
             DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"RandMerge_Single_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msuf4"
@@ -110,7 +109,6 @@ module SorterEvalSpecsRandomMerge =
         }
 
         let RandMerge_Test (executorType: sorterEvalExecutorType) : runHostSpec = {
-            QueryName = CommonSortableTest.queryName
             DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"RandMerge_Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
@@ -131,7 +129,6 @@ module SorterEvalSpecsRandomMerge =
 
 
         let RandMerge_Small (executorType: sorterEvalExecutorType) : runHostSpec = {
-            QueryName = CommonSortableTest.queryName
             DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"RandMerge_Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
@@ -152,7 +149,6 @@ module SorterEvalSpecsRandomMerge =
 
 
         let RandMerge_MediumLd (executorType: sorterEvalExecutorType) : runHostSpec = {
-            QueryName = CommonSortableTest.queryName
             DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"RandMerge_MediumLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
@@ -173,7 +169,6 @@ module SorterEvalSpecsRandomMerge =
 
 
         let RandMerge_MediumHd (executorType: sorterEvalExecutorType) : runHostSpec = {
-            QueryName = CommonSortableTest.queryName
             DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"RandMerge_Medium_Hd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
