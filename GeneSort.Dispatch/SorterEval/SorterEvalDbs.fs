@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterEvalBins
+﻿namespace GeneSort.Dispatch.V1.SorterEval
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -9,16 +9,16 @@ open GeneSort.Db.V1
 open GeneSort.FileDb.V1
 open GeneSort.Eval.V1.Bins
 open GeneSort.Dispatch.V1.SortableTest
-open CommonSorterEvalBins
+open CommonSorterEval
 
 
-module SorterEvalBinDbs =
+module SorterEvalDbs =
     
     module RandomStandard =
 
         module Uniform =
 
-            let dbName = "UniformRandomStandard" |> UMX.tag<databaseName>
+            let dbName = "RandomStandardUniform" |> UMX.tag<databaseName>
             let queryName = $"{projectName}\\{%dbName}" |> UMX.tag<queryName>
             let dbFolder = 
                     $"c:\\Projects\\{%queryName}\\Data" |> UMX.tag<pathToRootFolder>
@@ -127,7 +127,7 @@ module SorterEvalBinDbs =
                     (simpleSorterModelType: simpleSorterModelType) 
                             : Async<Result<sorterEvalBins, string>> =
         let qp = RandomStandard.Uniform.makeQueryParams 
-                        CommonSorterEvalBins.projectRngType
+                        CommonSorterEval.projectRngType
                         (0 |> UMX.tag<replNumber>) 
                         sortingWidth simpleSorterModelType 
                         (outputDataType.SorterEvalBins "")
@@ -144,7 +144,7 @@ module SorterEvalBinDbs =
                     (mergeSuffixType: mergeSuffixType)
                             : Async<Result<sorterEvalBins, string>> =
         let qp = RandomMerge.Uniform.makeQueryParams 
-                        CommonSorterEvalBins.projectRngType
+                        CommonSorterEval.projectRngType
                         (0 |> UMX.tag<replNumber>) 
                         sortingWidth simpleSorterModelType
                         mergeDimension mergeSuffixType 

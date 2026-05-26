@@ -15,7 +15,7 @@ open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1.OpsUtils
-open GeneSort.Dispatch.V1.SorterEvalBins
+open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Dispatch.V1.SortableTest
 open GeneSort.Model.Sorting.Simple.V1
 
@@ -76,7 +76,7 @@ module SorterMutateExecutor =
                         |> Result.ofOption "Missing simple sorter model type in run parameters"
 
             let! (parentEvalBins: sorterEvalBins) =
-                        SorterEvalBinDbs.getStandardSorterEvalBins sortingWidth simpleSorterModelType
+                        SorterEvalDbs.getStandardSorterEvalBins sortingWidth simpleSorterModelType
 
             let! (parentSorterCount: int<sorterCount>) = 
                         rp.GetSorterParentCount()
@@ -111,7 +111,7 @@ module SorterMutateExecutor =
                         |> Result.ofOption "Missing mergeSuffixType in run parameters"
 
             let! (parentEvalBins: sorterEvalBins) =
-                        SorterEvalBinDbs.getMergeSorterEvalBins 
+                        SorterEvalDbs.getMergeSorterEvalBins 
                                         sortingWidth simpleSorterModelType 
                                         mergeDimension mergeSuffixType
 
@@ -143,7 +143,7 @@ module SorterMutateExecutor =
                         |> Result.ofOption "Missing RNG type in run parameters"
 
             let (sorterModelGen: sorterModelGen) = 
-                CommonSorterEvalBins.getSimpleUniformSorterModelGen rngType sortingWidth simpleSorterModelType
+                CommonSorterEval.getSimpleUniformSorterModelGen rngType sortingWidth simpleSorterModelType
             return sorterModelGen
         }
 

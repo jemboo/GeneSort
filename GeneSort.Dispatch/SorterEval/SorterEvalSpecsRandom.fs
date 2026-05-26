@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterEvalBins
+﻿namespace GeneSort.Dispatch.V1.SorterEval
 
 open FSharp.UMX
 open GeneSort.Core
@@ -7,12 +7,12 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 
 
-module EvalBinsRandomStandardSpecs =
+module SorterEvalSpecsRandom =
     
 
     let rngType = 
             (runParameters.rngTypeKey, 
-            [CommonSorterEvalBins.projectRngType;] |> List.map RngType.toString)
+            [CommonSorterEval.projectRngType;] |> List.map RngType.toString)
     
     // SortingWidths
     let smallSortingWidths = 
@@ -58,10 +58,10 @@ module EvalBinsRandomStandardSpecs =
 
     module Specs =
 
-        let Random_Standard_test (executorType: evalBinsExecutorType)  : runHostSpec = {
-            QueryName = SorterEvalBinDbs.RandomStandard.Uniform.queryName
-            DatabaseName = SorterEvalBinDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Random_Standard_test_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
+        let Rand_Test (executorType: sorterEvalExecutorType)  : runHostSpec = {
+            QueryName = SorterEvalDbs.RandomStandard.Uniform.queryName
+            DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
+            RunName = sprintf @"Rand_Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -75,10 +75,10 @@ module EvalBinsRandomStandardSpecs =
             MaxParallel = 2
         }
 
-        let Random_Standard_small (executorType: evalBinsExecutorType) : runHostSpec = {
-            QueryName = SorterEvalBinDbs.RandomStandard.Uniform.queryName
-            DatabaseName = SorterEvalBinDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Random_Standard_small_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
+        let Rand_Small (executorType: sorterEvalExecutorType) : runHostSpec = {
+            QueryName = SorterEvalDbs.RandomStandard.Uniform.queryName
+            DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
+            RunName = sprintf @"Rand_Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -92,10 +92,10 @@ module EvalBinsRandomStandardSpecs =
             MaxParallel = 8
         }
 
-        let Random_Standard_medium (executorType: evalBinsExecutorType) : runHostSpec = {
-            QueryName = SorterEvalBinDbs.RandomStandard.Uniform.queryName
-            DatabaseName = SorterEvalBinDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Random_Standard_medium_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
+        let Rand_medium (executorType: sorterEvalExecutorType) : runHostSpec = {
+            QueryName = SorterEvalDbs.RandomStandard.Uniform.queryName
+            DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
+            RunName = sprintf @"Rand_Medium_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -110,17 +110,17 @@ module EvalBinsRandomStandardSpecs =
         }
 
     type configType =
-        | Random_Standard_Test
-        | Random_Standard_Small
-        | Random_Standard_Medium
+        | Rand_Test
+        | Rand_Small
+        | Rand_Medium
 
     let Configs = Map.ofList 
                     [ 
-                        (configType.Random_Standard_Test, Specs.Random_Standard_test); 
-                        (configType.Random_Standard_Small, Specs.Random_Standard_small);
-                        (configType.Random_Standard_Medium, Specs.Random_Standard_medium);
+                        (configType.Rand_Test, Specs.Rand_Test); 
+                        (configType.Rand_Small, Specs.Rand_Small);
+                        (configType.Rand_Medium, Specs.Rand_medium);
                     ]
 
-    let getConfig (config: configType) (executorType: evalBinsExecutorType) : runHostSpec =
+    let getConfig (config: configType) (executorType: sorterEvalExecutorType) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType

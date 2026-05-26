@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterEvalBins
+﻿namespace GeneSort.Dispatch.V1.SorterEval
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -10,14 +10,14 @@ open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Dispatch.V1.SortableTest
 
 
-type evalBinsExecutorType = 
+type sorterEvalExecutorType = 
     | GenStandard
     | GenMerge
     | FullReport
     | BinsReport
 
 
-module EvalBinsExecutorType =
+module SorterEvalExecutorType =
     let toString = function
         | GenStandard -> "GenStandard"
         | GenMerge -> "GenMerge"
@@ -25,9 +25,9 @@ module EvalBinsExecutorType =
         | BinsReport -> "BinsReport"
 
 
-module CommonSorterEvalBins =
+module CommonSorterEval =
 
-    let projectName = "SorterEvalBins" |> UMX.tag<projectName>
+    let projectName = "SorterEval" |> UMX.tag<projectName>
 
     let CollectSortableTests = true
 

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterEvalBins
+﻿namespace GeneSort.Dispatch.V1.SorterEval
 
 open System
 open System.Threading
@@ -17,7 +17,7 @@ open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Dispatch.V1.SortableTest
 
-module EvalBinsExecutor =
+module SorterEvalExecutor =
 
     let makeStandardTests (rp:runParameters) : Async<Result<Sortable.sortableTest, string>> =
         async {
@@ -32,7 +32,7 @@ module EvalBinsExecutor =
                 return Ok ( SortableTestModel.makeSortableTest 
                                     sortableTestId
                                     testModel 
-                                    CommonSorterEvalBins.standardSortableDataFormat)
+                                    CommonSorterEval.standardSortableDataFormat)
             | None ->
                 return Error "Failed: One or more RunParameters for StandardTests were missing."
         }
@@ -64,10 +64,10 @@ module EvalBinsExecutor =
             let! simpleSorterModelType = rp.GetSimpleSorterModelType()
             let! rngType = rp.GetRngType()
 
-            let sorterModelGen = CommonSorterEvalBins.getSimpleUniformSorterModelGen 
+            let sorterModelGen = CommonSorterEval.getSimpleUniformSorterModelGen 
                                     rngType sortingWidth simpleSorterModelType
 
-            let! qpModelSet = SorterEvalBinDbs.RandomStandard.Uniform.queryParamsFromRunParams 
+            let! qpModelSet = SorterEvalDbs.RandomStandard.Uniform.queryParamsFromRunParams 
                                          rp (outputDataType.SorterModelSet "")
 
             let! repl = rp.GetRepl()
@@ -122,7 +122,7 @@ module EvalBinsExecutor =
                 let! qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
                               |> Result.ofOption "Failed to create QueryParams for Bins."
 
-                let collectTests = CommonSorterEvalBins.CollectSortableTests
+                let collectTests = CommonSorterEval.CollectSortableTests
                 let testId = tests |> SortableTests.getId
 
                 // 3. Sequential Chunk Evaluation & Merging
@@ -259,7 +259,7 @@ module EvalBinsExecutor =
                 makeFullReport
                     host rp allowOverwrite cts progress }
 
-    let getExecutor (executorType: evalBinsExecutorType) : IRunParamsExecutor =
+    let getExecutor (executorType: sorterEvalExecutorType) : IRunParamsExecutor =
         match executorType with
         | GenStandard -> uniformStandardExecutor
         | GenMerge -> uniformMergeExecutor

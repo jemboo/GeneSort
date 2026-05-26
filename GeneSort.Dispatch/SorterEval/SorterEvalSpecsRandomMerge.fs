@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterEvalBins
+﻿namespace GeneSort.Dispatch.V1.SorterEval
 
 open FSharp.UMX
 open GeneSort.Core
@@ -8,11 +8,11 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SortableTest
 
-module EvalBinsRandomMergeSpecs =
+module SorterEvalSpecsRandomMerge =
 
     let rngType = 
             (runParameters.rngTypeKey, 
-            [CommonSorterEvalBins.projectRngType;] |> List.map RngType.toString)
+            [CommonSorterEval.projectRngType;] |> List.map RngType.toString)
     
     // SortingWidths
     let smallSortingWidths = SortableTetsMergeSpecs.smallSortingWidths
@@ -26,20 +26,20 @@ module EvalBinsRandomMergeSpecs =
     // DataFormats
     let onlyDataFormat = 
             (runParameters.sortableDataFormatKey, 
-            [CommonSorterEvalBins.mergeSortableDataFormat] |> List.map SortableDataFormat.toString)
+            [CommonSorterEval.mergeSortableDataFormat] |> List.map SortableDataFormat.toString)
     
     // MergeSuffixTypes
     let bothMergeSuffixTypes = SortableTetsMergeSpecs.bothMergeSuffixTypes
     let vv1SuffixType = SortableTetsMergeSpecs.vv1SuffixType
 
     // SimpleSorterModelTypes
-    let allSimpleSorterModelTypes = EvalBinsRandomStandardSpecs.allSimpleSorterModelTypes
+    let allSimpleSorterModelTypes = SorterEvalSpecsRandom.allSimpleSorterModelTypes
 
     // SorterCounts
-    let testSorterCount = EvalBinsRandomStandardSpecs.testSorterCount
-    let smallSorterCount = EvalBinsRandomStandardSpecs.smallSorterCount
-    let mediumSorterCount = EvalBinsRandomStandardSpecs.mediumSorterCount
-    let largeSorterCount = EvalBinsRandomStandardSpecs.largeSorterCount
+    let testSorterCount = SorterEvalSpecsRandom.testSorterCount
+    let smallSorterCount = SorterEvalSpecsRandom.smallSorterCount
+    let mediumSorterCount = SorterEvalSpecsRandom.mediumSorterCount
+    let largeSorterCount = SorterEvalSpecsRandom.largeSorterCount
 
 
 
@@ -89,10 +89,10 @@ module EvalBinsRandomMergeSpecs =
 
     module Specs =
 
-        let RandMerge_Single (executorType: evalBinsExecutorType) : runHostSpec = {
+        let RandMerge_Single (executorType: sorterEvalExecutorType) : runHostSpec = {
             QueryName = CommonSortableTest.queryName
-            DatabaseName = SorterEvalBinDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge_Single_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
+            DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
+            RunName = sprintf @"RandMerge_Single_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msuf4"
             Spans = [   
                 rngType
@@ -109,10 +109,10 @@ module EvalBinsRandomMergeSpecs =
             MaxParallel = 4
         }
 
-        let RandMerge_Test (executorType: evalBinsExecutorType) : runHostSpec = {
+        let RandMerge_Test (executorType: sorterEvalExecutorType) : runHostSpec = {
             QueryName = CommonSortableTest.queryName
-            DatabaseName = SorterEvalBinDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge_Test_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
+            DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
+            RunName = sprintf @"RandMerge_Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [   
                 rngType
@@ -130,10 +130,10 @@ module EvalBinsRandomMergeSpecs =
         }
 
 
-        let RandMerge_Small (executorType: evalBinsExecutorType) : runHostSpec = {
+        let RandMerge_Small (executorType: sorterEvalExecutorType) : runHostSpec = {
             QueryName = CommonSortableTest.queryName
-            DatabaseName = SorterEvalBinDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge_Small_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
+            DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
+            RunName = sprintf @"RandMerge_Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -151,10 +151,10 @@ module EvalBinsRandomMergeSpecs =
         }
 
 
-        let RandMerge_MediumLd (executorType: evalBinsExecutorType) : runHostSpec = {
+        let RandMerge_MediumLd (executorType: sorterEvalExecutorType) : runHostSpec = {
             QueryName = CommonSortableTest.queryName
-            DatabaseName = SorterEvalBinDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge_MediumLd_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
+            DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
+            RunName = sprintf @"RandMerge_MediumLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -172,10 +172,10 @@ module EvalBinsRandomMergeSpecs =
         }
 
 
-        let RandMerge_MediumHd (executorType: evalBinsExecutorType) : runHostSpec = {
+        let RandMerge_MediumHd (executorType: sorterEvalExecutorType) : runHostSpec = {
             QueryName = CommonSortableTest.queryName
-            DatabaseName = SorterEvalBinDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge_Medium_Hd_%s" (EvalBinsExecutorType.toString executorType) |> UMX.tag
+            DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
+            RunName = sprintf @"RandMerge_Medium_Hd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
@@ -210,6 +210,6 @@ module EvalBinsRandomMergeSpecs =
                         (configType.RandMerge_MediumHd, Specs.RandMerge_MediumHd);
                     ]
 
-    let getConfig (config: configType) (executorType: evalBinsExecutorType) : runHostSpec =
+    let getConfig (config: configType) (executorType: sorterEvalExecutorType) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType

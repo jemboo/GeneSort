@@ -41,25 +41,25 @@ module TextReporters =
 
 
             // 3. Process each run parameter
-            for runParams in runParamsArray do
-                let runId = runParams |> RunParameters.getIdString
-                let qp = buildQueryParams runParams (outputDataType.SorterSetEval "") 
+            //for runParams in runParamsArray do
+            //    let runId = runParams |> RunParameters.getIdString
+            //    let qp = buildQueryParams runParams (outputDataType.SorterSetEval "") 
             
                 // Map the naked Async result to the builder's track
-                let! result = GeneSortDb.getSorterSetEvalAsync db qp |> Async.map Ok
+               // let! result = GeneSortDb.getSorterSetEvalAsync db qp |> Async.map Ok
 
-                match result with
-                | Ok sse ->
-                    let bins = SorterEvalHierarchy.createFromSorterSetEval sse
-                    let lines = SorterEvalHierarchy.getHierarchyReport
-                                    [| 
-                                        (runParams.GetSortingWidth() |> SortingWidth.toString) 
-                                        (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringOptionToString ) 
-                                    |]
-                                    bins
-                    dtReport.AppendDataRows lines
-                | Error err ->
-                    newFailures <- (runParams, err) :: newFailures
+                //match result with
+                //| Ok sse ->
+                //    let bins = SorterEvalHierarchy.createFromSorterSetEval sse
+                //    let lines = SorterEvalHierarchy.getHierarchyReport
+                //                    [| 
+                //                        (runParams.GetSortingWidth() |> SortingWidth.toString) 
+                //                        (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringOptionToString ) 
+                //                    |]
+                //                    bins
+                //    dtReport.AppendDataRows lines
+                //| Error err ->
+                //    newFailures <- (runParams, err) :: newFailures
 
 
             // 4. Finalize and Save

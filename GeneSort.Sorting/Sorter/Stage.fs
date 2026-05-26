@@ -26,6 +26,10 @@ type stage =
 
     member this.Ces = this.ces
 
+    member this.AverageCeLength with get() =
+        if this.ces.Length = 0 then 0.0
+        else this.ces |> Array.averageBy (fun c -> float c.Length)
+
     override this.GetHashCode() = this.hashCode
 
     override this.Equals(obj) =

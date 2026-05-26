@@ -8,7 +8,7 @@ open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.FileDb.V1
 open System.Runtime
-open GeneSort.Dispatch.V1.SorterEvalBins
+open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Dispatch.V1.SortableTest
 open System.IO
 
@@ -84,24 +84,24 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 
 
-//let configType = EvalBinsRandomMergeSpecs.configType.Random_Merge_Test
-//let executorType = evalBinsExecutorType.MergeSortables
-//let host: IRunHost = 
-//    let spec = EvalBinsRandomMergeSpecs.getConfig configType executorType
-//    SorterEvalBins.RunHostEvalBins.createRunHost spec
-
-//let executor = EvalBinsExecutor.getExecutor executorType
-
-
-
-
-let configType = EvalBinsRandomStandardSpecs.configType.Random_Standard_Test
-let executorType = evalBinsExecutorType.GenStandard
+let configType = SorterEvalSpecsRandomMerge.configType.RandMerge_Test
+let executorType = sorterEvalExecutorType.GenMerge
 let host: IRunHost = 
-    let spec = EvalBinsRandomStandardSpecs.getConfig configType executorType
-    SorterEvalBins.RunHostEvalBins.createRunHost spec
+    let spec = SorterEvalSpecsRandomMerge.getConfig configType executorType
+    SorterEval.SorterEvalRunHost.createRunHost spec
 
-let executor = EvalBinsExecutor.getExecutor executorType
+let executor = SorterEvalExecutor.getExecutor executorType
+
+
+
+
+//let configType = SorterEvalSpecsRandom.configType.Rand_Test
+//let executorType = sorterEvalExecutorType.GenStandard
+//let host: IRunHost = 
+//    let spec = SorterEvalSpecsRandom.getConfig configType executorType
+//    SorterEval.SorterEvalRunHost.createRunHost spec
+
+//let executor = SorterEvalExecutor.getExecutor executorType
 
 
 let minReplica = 0<replNumber>
