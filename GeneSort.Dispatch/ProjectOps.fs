@@ -68,7 +68,7 @@ module ProjectOps =
             (executor: IRunParamsExecutor)
             (maxParallel: int) =
         asyncResult {
-            let db = host.ProjectDb
+            let db = host.RunDb
             let runName = host.Run.RunName
 
             try

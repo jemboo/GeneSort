@@ -240,20 +240,20 @@ module SorterMutateExecutor =
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
     
-                let! qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
+                let! qpBins = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
                               |> Result.ofOption "Failed to create QueryParams for Bins."
-                let! outB = host.ProjectDb.loadAsync qpBins
+                let! outB = host.RunDb.loadAsync qpBins
                 let! bins = outB |> OutputData.asSorterEvalBins |> Async.singleton
 
                 let reportName = sprintf "FullReport" |> UMX.tag<textReportName>
-                let! qpReport = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
                                 |> Result.ofOption "Failed to create QueryParams for Report."
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
                 let details = bins |> SorterEvalBins.makeFullDataTableRecords
                 let dtrs = dataTableRecord.combineWithMany details leadCols
                 let report = DataTableReport.fromDataTableRecords dtrs
 
-                let! (_:unit) = host.ProjectDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
+                let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
                 return rp.WithRunFinished (Some true)
             with e -> 
                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
@@ -272,20 +272,20 @@ module SorterMutateExecutor =
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Bins Report for Run %s" (MathUtils.getTimestampString()) %runId)
     
-                let! qpBins = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
+                let! qpBins = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
                                     |> Result.ofOption "Failed to create QueryParams for Bins."
-                let! outB = host.ProjectDb.loadAsync qpBins 
+                let! outB = host.RunDb.loadAsync qpBins 
                 let! bins = outB |> OutputData.asSorterEvalBins |> Async.singleton
 
                 let reportName = sprintf "BinsReport" |> UMX.tag<textReportName>
-                let! qpReport = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
                                     |> Result.ofOption "Failed to create QueryParams for Report."
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
                 let details = bins |> SorterEvalBins.makeSummaryDataTableRecords
                 let dtrs = dataTableRecord.combineWithMany details leadCols
                 let report = DataTableReport.fromDataTableRecords dtrs
 
-                let! (_:unit) = host.ProjectDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
+                let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
                 return rp.WithRunFinished (Some true)
             with e -> 
                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)

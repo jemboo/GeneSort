@@ -9,7 +9,7 @@ open GeneSort.Project.V1
 
 /// The central interface allowing the Program to run any host implementation
 type IRunHost =
-    abstract member ProjectDb: IGeneSortDb
+    abstract member RunDb: IGeneSortDb
     abstract member Run: run
     abstract member ParameterSpans: (string * string list) list
     abstract member AllowOverwrite: bool<allowOverwrite>

@@ -14,6 +14,7 @@ open GeneSort.Eval.Mp.V1
 open GeneSort.Sorting.Mp.Sortable
 open GeneSort.Sorting.Sortable
 open System.Text
+open GeneSort.SortingOps.Mp
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
@@ -215,9 +216,8 @@ module OutputDataFile =
                             //| outputData.SortableTestModelSetGen stsm ->
                             //    failwith "Not implemented: SorterSetEval serialization"
                             //   // serializeDto stream stsm SortableTestModelSetGenDto.fromDomain
-                            //| outputData.SorterSetEval sse ->
-                            //    failwith "Not implemented: SorterSetEval serialization"
-                            //   // serializeDto stream sse SorterSetEvalDto.fromDomain
+                            | outputData.SorterSetEval sse ->
+                                serializeDto stream sse SorterSetEvalDto.fromDomain
                             | outputData.SorterEvalBins sse ->
                                 serializeDto stream sse SorterEvalBinsDto.toDto
                             | outputData.Run p ->

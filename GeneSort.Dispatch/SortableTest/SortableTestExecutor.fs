@@ -47,7 +47,7 @@ module SortableTestExecutor =
                 // 3. Create SortableTestModel
                 let sortableTestModel = msasM.create sortingWidth mergeDim mergeSufixType |> sortableTestModel.MsasMi
             
-                let! qpForSortableTest = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.SortableTest "") 
+                let! qpForSortableTest = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SortableTest "") 
                                          |> Result.ofOption "Failed to create query parameters for SortableTest"
                 let sortableTests = SortableTestModel.makeSortableTest 
                                             (%qpForSortableTest.Id |> UMX.tag) 
@@ -57,7 +57,7 @@ module SortableTestExecutor =
                 // 4. Save
                 log (sprintf "Saving SortableTest %s" (string %qpForSortableTest.Id))
 
-                do! host.ProjectDb.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
+                do! host.RunDb.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
                 
                 log "Run Complete."
                 return rp.WithRunFinished (Some true)

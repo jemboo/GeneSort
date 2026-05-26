@@ -22,9 +22,9 @@ module SorterEvalSpecsRandom =
 
     // SorterCounts
     let testSorterCount = (runParameters.sorterCountKey, ["1000";] )
-    let smallSorterCount = (runParameters.sorterCountKey, ["10000";] )
-    let mediumSorterCount = (runParameters.sorterCountKey, ["100000";] )
-    let largeSorterCount = (runParameters.sorterCountKey, ["1000000";] )
+    let smallSorterCount = (runParameters.sorterCountKey, ["1000";] )
+    let mediumSorterCount = (runParameters.sorterCountKey, ["10000";] )
+    let largeSorterCount = (runParameters.sorterCountKey, ["100000";] )
     
     // SimpleSorterModelTypes
     let allSimpleSorterModelTypes = 
@@ -34,7 +34,7 @@ module SorterEvalSpecsRandom =
 
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
+        let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
         rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)

@@ -61,7 +61,6 @@ module SorterEvalDbs =
         module Uniform =
             
             let dbName = "RandomMergeUniform" |> UMX.tag<databaseName>
-            //let queryName = $"{projectName}\\{%dbName}" |> UMX.tag<queryName>
             let dbFolder = 
                     $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 

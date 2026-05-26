@@ -114,7 +114,7 @@ async {
     
     let! initResult = 
         ParamOps.initProjectAndRunFiles
-            host.ProjectDb           
+            host.RunDb           
             (Some progress) 
             host.Run              
             minReplica 

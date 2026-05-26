@@ -5,11 +5,13 @@ open FSharp.UMX
 open GeneSort.Eval.V1.Bins
 open GeneSort.Sorting.Sortable
 open GeneSort.Core
+open GeneSort.SortingOps
 
 type outputData =
     | Run of run
     | RunParameters of runParameters
     | SortableTest of sortableTest
+    | SorterSetEval of sorterSetEval
     | SorterEvalBins of sorterEvalBins
     | TextReport of dataTableReport
 
@@ -43,9 +45,9 @@ module OutputData =
         | SortableTest st -> Ok st
         | _ -> Error "Database returned data, but it was not a SortableTest."
 
-//    let asSorterSetEval = function
-//        | SorterSetEval sse -> Ok sse
-//        | _ -> Error "Database returned data, but it was not a SorterSetEval."
+    let asSorterSetEval = function
+        | SorterSetEval sse -> Ok sse
+        | _ -> Error "Database returned data, but it was not a SorterSetEval."
         
 //    let asRunParameters = function
 //        | RunParameters rp -> Ok rp

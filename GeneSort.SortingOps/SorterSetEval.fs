@@ -42,26 +42,37 @@ module SorterSetEval =
         | Some firstEval -> firstEval.CeBlockEval.CeBlock.CeLength
         | None -> failwith "SorterSetEval contains no SorterEvals"
 
+
+    let makeSorterEvals 
+                (sorters: sorter array) 
+                (sortableTest: sortableTest) 
+                (collectNewSortableTests: bool) :sorterEval array =
+        let ceBlocks = 
+                sorters 
+                |> Array.map (fun sorter ->
+                        ceBlock.create 
+                            (%sorter.SorterId |> UMX.tag<ceBlockId>) 
+                            sorter.SortingWidth sorter.Ces )
+
+        let ceBlockEvals : ceBlockEval array = CeBlockOps.evalWithSorterTests sortableTest ceBlocks collectNewSortableTests  
+        Array.zip sorters ceBlockEvals
+        |> Array.map (
+                fun (sorter, ceBlockEval ) -> 
+                        sorterEval.create 
+                            sorter.SorterId
+                            ceBlockEval
+                )
+
+
     let makeSorterSetEval
             (sorterSetEvalId: Guid<sorterSetEvalId>)
             (sorterSet: sorterSet)
             (sortableTest: sortableTest) 
             (collectNewSortableTests: bool) : sorterSetEval =
 
-        let ceBlockAs = 
-                sorterSet.Sorters 
-                |> Array.map (fun sorter ->
-                        ceBlock.create (%sorter.SorterId |> UMX.tag<ceBlockId>) sorter.SortingWidth sorter.Ces )
-
-        let ceBlockEvals : ceBlockEval array = CeBlockOps.evalWithSorterTests sortableTest ceBlockAs collectNewSortableTests  
-
-        let zipped = Array.zip sorterSet.Sorters ceBlockEvals
-
-        let sorterEvals = 
-            zipped |> Array.map (
-                fun (sorter, ceBlockEval ) -> 
-                        sorterEval.create 
-                            sorter.SorterId
-                            ceBlockEval
-                )
-        sorterSetEval.create sorterSetEvalId sorterSet.Id (sortableTest |> SortableTests.getId ) sorterEvals
+        let sorterEvals = makeSorterEvals sorterSet.Sorters sortableTest collectNewSortableTests
+        sorterSetEval.create 
+                    sorterSetEvalId 
+                    sorterSet.Id 
+                    (sortableTest |> SortableTests.getId ) 
+                    sorterEvals

@@ -40,7 +40,7 @@ module SorterMutateRandomStandardSpecs =
 
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
+        let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
         let mutationRate = rp.GetMutationRate()
         let insertionRate =
             maybe {

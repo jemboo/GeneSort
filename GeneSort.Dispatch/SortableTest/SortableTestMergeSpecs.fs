@@ -41,7 +41,7 @@ module SortableTetsMergeSpecs =
 
 
     let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let qp = host.ProjectDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
+        let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
         rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)

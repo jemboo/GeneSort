@@ -31,7 +31,7 @@ type sorterMutateRunHost =
         |> Seq.choose (this._spec.Filter >> Option.map (this._spec.Enhancer (this :> IRunHost)))
 
     interface IRunHost with
-        member this.ProjectDb = this._projectDb
+        member this.RunDb = this._projectDb
         member this.Run = this._run
         member this.ParameterSpans = this._parameterSpans
         member this.AllowOverwrite = this._spec.AllowOverwrite
