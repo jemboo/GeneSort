@@ -164,6 +164,11 @@ module SorterEvalExecutor =
                             sorterEvalsChunk
 
                     accumulatedBins <- SorterEvalBinsV1.merge accumulatedBins chunkBins
+                    System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
+                    GC.Collect(2, GCCollectionMode.Forced, true, true)
+
+
+
 
                 // 4. Build Master SorterSetEval directly using the specified ID rule
                 log "Compiling final Master SorterSetEval structure..."
