@@ -178,10 +178,11 @@ module CeBlockOpsUint8v256 =
                     h <- h * 31 + hash (obj.[i])
                 h
 
+
     let evalAndCollectUniqueFailures
-        (simdSortBlocks: SortBlockUint8v256 seq) 
-        (ceBlocks: ceBlock array) 
-        : ceBlockEval [] =
+            (simdSortBlocks: SortBlockUint8v256 seq) 
+            (ceBlocks: ceBlock array) 
+            : ceBlockEval [] =
     
         let numNetworks = ceBlocks.Length
         if numNetworks = 0 then [||] else
@@ -196,7 +197,6 @@ module CeBlockOpsUint8v256 =
 
         // Final global storage
         let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].CeLength))
-        let globalUnsorted = Array.zeroCreate<int> numNetworks
     
         // ConcurrentDictionary with explicit type annotation and custom content comparer
         let failureSets: ConcurrentDictionary<int[], byte> [] = 
@@ -205,18 +205,15 @@ module CeBlockOpsUint8v256 =
 
         Parallel.ForEach(
             simdSortBlocks, 
-            // 1. Initialize Thread-Local State (TLS)
+            // 1. Initialize Thread-Local State (TLS) - Removed unsorted tracking array
             (fun () -> 
                 let usage = Array.init numNetworks (fun i -> Array.zeroCreate<int> networkData.[i].CeLen)
-                let unsorted = Array.zeroCreate<int> numNetworks
                 let buffer = Array.zeroCreate<Vector256<uint8>> maxWidth
-                (usage, unsorted, buffer)),
+                (usage, buffer)),
     
             // 2. The Hot Loop (Processing one block at a time)
-            (fun currentBlock loopState ((localUsage: int [][]), (localUnsorted: int []), workBuffer) ->
+            (fun currentBlock loopState ((localUsage: int [][]), workBuffer) ->
                 let currentLen = currentBlock.Length
-            
-
 
                 for nIdx = 0 to numNetworks - 1 do
                     // Blit current vectors into the reusable thread-local buffer
@@ -241,8 +238,6 @@ module CeBlockOpsUint8v256 =
                     // --- Verification and Failure Extraction ---
                     // Vertical check (SIMD)
                     if not (IsBlockSortedMask currentLen workBuffer) then
-                        localUnsorted.[nIdx] <- localUnsorted.[nIdx] + 1
-                    
                         // Horizontal check (32-bit Hash)
                         let currentHashes = computeLaneHashes32 currentLen workBuffer
                     
@@ -255,12 +250,11 @@ module CeBlockOpsUint8v256 =
                             
                                 failureSets.[nIdx].TryAdd(laneArray, 0uy) |> ignore
             
-                (localUsage, localUnsorted, workBuffer)),
+                (localUsage, workBuffer)),
 
             // 3. Final Merge (Consolidating TLS into Global state)
-            (fun ((localUsage: int [][]), (localUnsorted: int []), _) ->
+            (fun ((localUsage: int [][]), _) ->
                 for nIdx = 0 to numNetworks - 1 do
-                    Interlocked.Add(&globalUnsorted.[nIdx], localUnsorted.[nIdx]) |> ignore
                     let globalArr = globalUsage.[nIdx]
                     for i = 0 to localUsage.[nIdx].Length - 1 do
                         globalArr.IncrementAtomicBy (i |> UMX.tag<ceIndex>) localUsage.[nIdx].[i]
@@ -270,6 +264,8 @@ module CeBlockOpsUint8v256 =
         // 4. Assemble final ceBlockEval results
         Array.init numNetworks (fun i ->
             let uniqueFailures = failureSets.[i].Keys |> Seq.toArray
+            let uniqueUnsortedCount = uniqueFailures.Length
+
             let failTest = 
                 if uniqueFailures.Length > 0 then
                     let sw = ceBlocks.[i].SortingWidth
@@ -284,10 +280,9 @@ module CeBlockOpsUint8v256 =
             ceBlockEval.create 
                 ceBlocks.[i] 
                 globalUsage.[i] 
-                (globalUnsorted.[i] |> UMX.tag<sortableCount>) 
+                (uniqueUnsortedCount |> UMX.tag<sortableCount>) 
                 failTest
         )
-
 
     let evalAndCollectNewSortableTests 
                     (test: sortableUint8v256Test) 

@@ -152,9 +152,6 @@ module SorterEvalExecutor =
                     // Compute sorter evaluations directly from the chunk array
                     let sorterEvalsChunk = 
                         SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters tests collectTests
-                    
-                    // Accumulate the evaluations
-                    allChunksEvals.[i] <- sorterEvalsChunk
 
                     // Bin chunks step-by-step
                     let chunkBins = 
@@ -162,6 +159,12 @@ module SorterEvalExecutor =
                             (%qpBins.Id |> UMX.tag) 
                             testId 
                             sorterEvalsChunk
+
+                    
+                    // Accumulate the evaluations
+                    allChunksEvals.[i] <- sorterEvalsChunk
+
+
 
                     accumulatedBins <- SorterEvalBinsV1.merge accumulatedBins chunkBins
                     System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce

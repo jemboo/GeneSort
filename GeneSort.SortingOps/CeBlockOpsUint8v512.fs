@@ -139,10 +139,11 @@ module CeBlockOpsUint8v512 =
             ceBlockEval.create ceBlocks.[i] globalUsage.[i] (globalUnsorted.[i] |> UMX.tag) None
         )
 
+
     let evalAndCollectUniqueFailures
-        (simdSortBlocks: SortBlockUint8v512 seq) 
-        (ceBlocks: ceBlock array) 
-        : ceBlockEval [] =
+            (simdSortBlocks: SortBlockUint8v512 seq) 
+            (ceBlocks: ceBlock array) 
+            : ceBlockEval [] =
     
         let numNetworks = ceBlocks.Length
         if numNetworks = 0 then [||] else
@@ -155,18 +156,17 @@ module CeBlockOpsUint8v512 =
                CeLen = ceb.CeArray.Length |})
 
         let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].CeLength))
-        let globalUnsorted = Array.zeroCreate<int> numNetworks
         let failureSets = Array.init numNetworks (fun _ -> ConcurrentDictionary<int[], byte>(ArrayContentComparer<int>()))
 
         Parallel.ForEach(
             simdSortBlocks, 
             (fun () -> 
                 let usage = Array.init numNetworks (fun i -> Array.zeroCreate<int> networkData.[i].CeLen)
-                let unsorted = Array.zeroCreate<int> numNetworks
                 let buffer = Array.zeroCreate<Vector512<uint8>> maxWidth
-                (usage, unsorted, buffer)),
+                // Removed unsorted array from thread-local state
+                (usage, buffer)),
     
-            (fun currentBlock loopState ((localUsage: int[][]), (localUnsorted: int[]), workBuffer) ->
+            (fun currentBlock loopState ((localUsage: int[][]), workBuffer) ->
                 let currentLen = currentBlock.Length
 
                 for nIdx = 0 to numNetworks - 1 do
@@ -187,8 +187,8 @@ module CeBlockOpsUint8v512 =
                             workBuffer.[lIdx] <- vMin
                             workBuffer.[hIdx] <- Vector512.Max(vLow, vHi)
 
+                    // We still check if the block is unsorted, but we don't increment a counter
                     if not (IsBlockSortedMask currentLen workBuffer) then
-                        localUnsorted.[nIdx] <- localUnsorted.[nIdx] + 1
                         let currentHashes = computeLaneHashes64 currentLen workBuffer
                     
                         for lane = 0 to currentBlock.SortableCount - 1 do
@@ -196,11 +196,11 @@ module CeBlockOpsUint8v512 =
                                 let laneArray = Array.init currentLen (fun i -> int (workBuffer.[i].GetElement(lane)))
                                 failureSets.[nIdx].TryAdd(laneArray, 0uy) |> ignore
             
-                (localUsage, localUnsorted, workBuffer)),
+                (localUsage, workBuffer)),
 
-            (fun ((localUsage: int[][]), (localUnsorted: int[]), _) ->
+            (fun ((localUsage: int[][]), _) ->
                 for nIdx = 0 to numNetworks - 1 do
-                    Interlocked.Add(&globalUnsorted.[nIdx], localUnsorted.[nIdx]) |> ignore
+                    // Removed Interlocked.Add block tracking entirely
                     let globalArr = globalUsage.[nIdx]
                     for i = 0 to localUsage.[nIdx].Length - 1 do
                         globalArr.IncrementAtomicBy (i |> UMX.tag) localUsage.[nIdx].[i]
@@ -209,6 +209,10 @@ module CeBlockOpsUint8v512 =
 
         Array.init numNetworks (fun i ->
             let uniqueFailures = failureSets.[i].Keys |> Seq.toArray
+            
+            // Derive your sortableCount directly from the distinct elements count
+            let uniqueUnsortedCount = uniqueFailures.Length
+
             let failTest = 
                 if uniqueFailures.Length > 0 then
                     let sw = ceBlocks.[i].SortingWidth
@@ -223,7 +227,7 @@ module CeBlockOpsUint8v512 =
             ceBlockEval.create 
                 ceBlocks.[i] 
                 globalUsage.[i] 
-                (globalUnsorted.[i] |> UMX.tag<sortableCount>) 
+                (uniqueUnsortedCount |> UMX.tag<sortableCount>) 
                 failTest
         )
 

@@ -54,7 +54,12 @@ module SorterSetEval =
                             (%sorter.SorterId |> UMX.tag<ceBlockId>) 
                             sorter.SortingWidth sorter.Ces )
 
-        let ceBlockEvals : ceBlockEval array = CeBlockOps.evalWithSorterTests sortableTest ceBlocks collectNewSortableTests  
+        let ceBlockEvals : ceBlockEval array =
+                CeBlockOps.evalWithSorterTests 
+                        sortableTest 
+                        ceBlocks 
+                        collectNewSortableTests  
+
         Array.zip sorters ceBlockEvals
         |> Array.map (
                 fun (sorter, ceBlockEval ) -> 
