@@ -106,9 +106,9 @@ module SortableTetsMergeSpecs =
         }
 
         
-        let Merge_medium_Ld (executorType: executorType) : runHostSpec = {
+        let Merge_MediumLd (executorType: executorType) : runHostSpec = {
             DatabaseName = CommonSortableTest.mergeDatabaseName
-            RunName = sprintf @"Merge-medium_Ld_%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Merge-MediumLd_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
                 mediumSortingWidths
@@ -123,9 +123,9 @@ module SortableTetsMergeSpecs =
         }
 
         
-        let Merge_medium_Hd (executorType: executorType) : runHostSpec = {
+        let Merge_MediumHd (executorType: executorType) : runHostSpec = {
             DatabaseName = CommonSortableTest.mergeDatabaseName
-            RunName = sprintf @"Merge-medium_Hd_%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Merge-MediumHd_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
                 mediumSortingWidths
@@ -143,15 +143,15 @@ module SortableTetsMergeSpecs =
     type configType =
         | Merge_Test
         | Merge_Small
-        | Merge_Medium_Ld
-        | Merge_Medium_Hd
+        | Merge_MediumLd
+        | Merge_MediumHd
 
     let Configs = Map.ofList 
                     [ 
                         (configType.Merge_Test, Specs.Merge_test); 
                         (configType.Merge_Small, Specs.Merge_small);
-                        (configType.Merge_Medium_Ld, Specs.Merge_medium_Ld);
-                        (configType.Merge_Medium_Hd, Specs.Merge_medium_Hd);
+                        (configType.Merge_MediumLd, Specs.Merge_MediumLd);
+                        (configType.Merge_MediumHd, Specs.Merge_MediumHd);
                     ]
 
     let getConfig (config: configType) (executorType: executorType) : runHostSpec =

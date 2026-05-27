@@ -88,7 +88,7 @@ module SorterEvalExecutor =
                 
                 // 1. Unpack run configuration
                 let totalSorterCount = rp.GetSorterCount().Value
-                let sortersPerSplit = 1000 |> UMX.tag<sorterCount>
+                let sortersPerSplit = 10 |> UMX.tag<sorterCount>
                 let splitFactor = %totalSorterCount / %sortersPerSplit
                 
                 log (sprintf "Initializing Sorter Generation over %d chunks..." splitFactor)

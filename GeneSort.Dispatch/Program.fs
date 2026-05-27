@@ -75,7 +75,7 @@ let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
-//let configType = SortableTetsMergeSpecs.configType.Merge_Test
+//let configType = SortableTetsMergeSpecs.configType.Merge_MediumHd
 //let executorType = SortableTest.executorType.Generator
 //let host: IRunHost = 
 //    let spec = SortableTetsMergeSpecs.getConfig configType executorType
@@ -84,7 +84,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 
 
-let configType = SorterEvalSpecsRandomMerge.configType.RandMerge_Test
+let configType = SorterEvalSpecsRandomMerge.configType.RandMerge_Small
 let executorType = sorterEvalExecutorType.GenMerge
 let host: IRunHost = 
     let spec = SorterEvalSpecsRandomMerge.getConfig configType executorType
@@ -95,7 +95,7 @@ let executor = SorterEvalExecutor.getExecutor executorType
 
 
 
-//let configType = SorterEvalSpecsRandom.configType.Rand_Test
+//let configType = SorterEvalSpecsRandom.configType.Rand_Medium
 //let executorType = sorterEvalExecutorType.GenStandard
 //let host: IRunHost = 
 //    let spec = SorterEvalSpecsRandom.getConfig configType executorType
@@ -109,39 +109,39 @@ let maxReplica = 1<replNumber>
 
 
 
-async {
-    printfn "Init Project: %s" %host.Run.DatabaseName
+//async {
+//    printfn "Init Project: %s" %host.Run.DatabaseName
     
-    let! initResult = 
-        ParamOps.initProjectAndRunFiles
-            host.RunDb           
-            (Some progress) 
-            host.Run              
-            minReplica 
-            maxReplica 
-            host.AllowOverwrite 
-            host.ParamMapRefiner      
-            host.ParameterSpans
+//    let! initResult = 
+//        ParamOps.initProjectAndRunFiles
+//            host.RunDb           
+//            (Some progress) 
+//            host.Run              
+//            minReplica 
+//            maxReplica 
+//            host.AllowOverwrite 
+//            host.ParamMapRefiner      
+//            host.ParameterSpans
 
-    match initResult with
-    | Error e -> printfn "Init Failure: %s" e
-    | Ok () ->
-        let! execResult = 
-            ProjectOps.executeRuns  
-                minReplica 
-                maxReplica
-                host.AllowOverwrite 
-                cts 
-                (Some progress)
-                host
-                executor
-                host.MaxParallel
+//    match initResult with
+//    | Error e -> printfn "Init Failure: %s" e
+//    | Ok () ->
+//        let! execResult = 
+//            ProjectOps.executeRuns  
+//                minReplica 
+//                maxReplica
+//                host.AllowOverwrite 
+//                cts 
+//                (Some progress)
+//                host
+//                executor
+//                host.MaxParallel
 
-        match execResult with
-        | Ok results -> printfn "Success: %d records processed." results.Length
-        | Error e -> printfn "Runtime Error: %s" e
+//        match execResult with
+//        | Ok results -> printfn "Success: %d records processed." results.Length
+//        | Error e -> printfn "Runtime Error: %s" e
 
-} |> Async.RunSynchronously
+//} |> Async.RunSynchronously
 
 
 
@@ -169,27 +169,24 @@ async {
 //} |> Async.RunSynchronously
 
 
-//async {
+async {
 
-//    let! execResult = 
-//        ProjectOps.executeRuns 
-//            host.ProjectDb      
-//            minReplica 
-//            maxReplica 
-//            host.ProjectDb.MakeQueryParamsFromRunParams 
-//            host.Run.RunName 
-//            host.AllowOverwrite 
-//            cts 
-//            (Some progress) 
-//            host
-//            executor
-//            maxParallel
+    let! execResult = 
+        ProjectOps.executeRuns 
+                minReplica 
+                maxReplica
+                host.AllowOverwrite 
+                cts 
+                (Some progress)
+                host
+                executor
+                host.MaxParallel
 
-//    match execResult with
-//    | Ok results -> printfn "Success: %d records processed." results.Length
-//    | Error e -> printfn "Runtime Error: %s" e
+    match execResult with
+    | Ok results -> printfn "Success: %d records processed." results.Length
+    | Error e -> printfn "Runtime Error: %s" e
 
-//} |> Async.RunSynchronously
+} |> Async.RunSynchronously
 
 
 

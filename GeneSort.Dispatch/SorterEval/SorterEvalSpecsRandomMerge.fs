@@ -144,7 +144,7 @@ module SorterEvalSpecsRandomMerge =
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            MaxParallel = 1
         }
 
 
