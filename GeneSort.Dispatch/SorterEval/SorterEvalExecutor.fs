@@ -132,8 +132,7 @@ module SorterEvalExecutor =
                 let initialBins = sorterEvalBinsV1.createEmpty (%qpBins.Id |> UMX.tag) testId
                 let mutable accumulatedBins = initialBins
                 
-                // Use ResizeArray to dynamically collect evaluations across chunks efficiently
-                let allSorterEvals = System.Collections.Generic.List<sorterEval>()
+                let allChunksEvals : sorterEval array[] = Array.zeroCreate splitFactor
 
                 for i in 0 .. (splitFactor - 1) do
                     do! checkCancellation cts.Token
@@ -155,7 +154,7 @@ module SorterEvalExecutor =
                         SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters tests collectTests
                     
                     // Accumulate the evaluations
-                    allSorterEvals.AddRange(sorterEvalsChunk)
+                    allChunksEvals.[i] <- sorterEvalsChunk
 
                     // Bin chunks step-by-step
                     let chunkBins = 
@@ -171,12 +170,13 @@ module SorterEvalExecutor =
                 
                 let correctSorterSetId = (%qpSorterSet.Id) |> UMX.tag<sorterSetId>
 
+                let finalEvalsArray = allChunksEvals |> Array.concat
                 let finalSorterSetEval = 
                     sorterSetEval.create 
                         (%qpEval.Id |> UMX.tag) 
                         correctSorterSetId 
                         testId 
-                        (allSorterEvals.ToArray())
+                        finalEvalsArray
 
                 let sorterEvalBins = sorterEvalBins.V1 accumulatedBins
 
