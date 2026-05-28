@@ -68,6 +68,37 @@ module CommonSorterEval =
         |> UMX.tag
 
 
+    let getStageLengthShort
+                (smt: simpleSorterModelType) 
+                (sw: int<sortingWidth>) : int<stageLength> =
+        match %sw with
+        | 4 -> 5
+        | 5 -> 5
+        | 6 -> 10 
+        | 7 -> 10 
+        | 8 -> 20
+        | 9 -> 20
+        | 10 -> 30
+        | 11 -> 40
+        | 12 -> 50
+        | 14 -> 60
+        | 16 -> match smt with | Msuf4 -> 100 | _ -> 60
+        | 18 -> 80
+        | 20 -> 100
+        | 22 -> 125
+        | 24 -> 150
+        | 32 -> match smt with | Msuf4 -> 200 | _ -> 150
+        | 36 -> 150
+        | 48 -> 200
+        | 64 -> match smt with | Msuf4 -> 1000 | _ -> 300
+        | 96 -> 800
+        | 128 -> match smt with | Msuf4 -> 1500 | _ -> 600
+        | 192 -> 2000
+        | 256 -> match smt with | Msuf4 -> 2000 | _ -> 1000
+        | _ -> failwithf "Unsupported sorting width: %d" %sw
+        |> UMX.tag
+
+
     let getSimpleUniformSorterModelGen
             (rngType: rngType) 
             (sortingWidth: int<sortingWidth>)

@@ -70,7 +70,7 @@ module SorterEvalKey =
         let sortedScore = if key.IsSorted then 0.0 else 1.0e6
         sortedScore + byWeighted ceCountWeight stageLengthWeight key
 
-    let fromSorterEval (eval: sorterEval) : sorterEvalKey =
+    let fromSorterEval (eval: sorterEvalOld) : sorterEvalKey =
             sorterEvalKey.create
                 eval.CeBlockEval.CeUseCounts.UsedCeCount
                 eval.CeBlockEval.getStageBuilderSequence.StageLength

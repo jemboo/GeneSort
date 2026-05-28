@@ -18,7 +18,7 @@ type sorterEvalLeafH =
         sorterEvalKey: sorterEvalKey
     }
 
-    static member create (eval: sorterEval) (key : sorterEvalKey) =
+    static member create (eval: sorterEvalOld) (key : sorterEvalKey) =
         let ids = ResizeArray<Guid<sorterId>>()
         ids.Add(eval.SorterId)
         { 
@@ -50,7 +50,7 @@ type sorterEvalLeaf =
         sorterEvalKey: sorterEvalKey
     }
 
-    static member create (eval: sorterEval) (key : sorterEvalKey) =
+    static member create (eval: sorterEvalOld) (key : sorterEvalKey) =
         { 
             sorterIds = [eval.SorterId]
             sorterEvalKey = key

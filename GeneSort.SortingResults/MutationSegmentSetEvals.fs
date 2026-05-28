@@ -47,14 +47,14 @@ type mutationSegmentSetEvals =
     member this.SortingSegmentResults with get() = this.sortingSegmentResults
 
     /// Automatically routes the evaluation to the correct Mutant result
-    member this.UpdateSorterEvalMutant (newEval: sorterEval) =
+    member this.UpdateSorterEvalMutant (newEval: sorterEvalOld) =
         match this.mutantSorterToSegmentMap.TryGetValue(newEval.SorterId) with
         | true, segmentId -> 
             this.sortingSegmentResults.[segmentId].UpdateSortingEvalSetMapMutants newEval
         | false, _ -> failwithf "Mutant SorterId %A not found in any segment." newEval.SorterId
 
     /// Automatically routes the evaluation to the correct Parent result
-    member this.UpdateSorterEvalParent (newEval: sorterEval) =
+    member this.UpdateSorterEvalParent (newEval: sorterEvalOld) =
         match this.parentSorterToSegmentMap.TryGetValue(newEval.SorterId) with
         | true, segmentId -> 
             this.sortingSegmentResults.[segmentId].UpdateSortingEvalMapParent newEval
@@ -65,18 +65,18 @@ type mutationSegmentSetEvals =
         | true, segmentResults -> segmentResults
         | false, _ -> failwithf "SegmentId %A not found." segmentId
 
-    member this.UpdateAllSortingEvalsMutant (newEvals: sorterEval []) =
+    member this.UpdateAllSortingEvalsMutant (newEvals: sorterEvalOld []) =
         newEvals |> Array.iter(this.UpdateSorterEvalMutant)
 
-    member this.UpdateAllSortingEvalsParent (newEvals: sorterEval []) =
+    member this.UpdateAllSortingEvalsParent (newEvals: sorterEvalOld []) =
         newEvals |> Array.iter(this.UpdateSorterEvalParent)
 
-    member this.GetAllParentSorterEvals () : (sorterEval * modelSetTag) seq =
+    member this.GetAllParentSorterEvals () : (sorterEvalOld * modelSetTag) seq =
         this.sortingSegmentResults.Values
         |> Seq.collect (fun segmentResult -> segmentResult.GetAllTaggedParentSorterEvals())
         
     // modelSuperSetTag.Id is the sortingId of the sorting that the mutants were made from.
-    member this.GetAllMutantSorterEvals () : (sorterEval * modelSuperSetTag) seq =
+    member this.GetAllMutantSorterEvals () : (sorterEvalOld * modelSuperSetTag) seq =
         this.sortingSegmentResults
         |> Seq.collect (
             fun segmentResult -> 

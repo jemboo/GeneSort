@@ -20,7 +20,7 @@ module SortingEval =
 
 
     let addSorterEval (modelTag: modelTag) 
-                      (newEval: sorterEval) 
+                      (newEval: sorterEvalOld) 
                       (sortingEval: sortingEval) : unit =
         match sortingEval with
         | Single ssr -> ssr.AddSorterEval modelTag newEval
@@ -39,13 +39,13 @@ module SortingEval =
                                         |> pairsSortingEval.SplitPairs |> sortingEval.Pairs
 
 
-    let getSorterEval (psr: sortingEval) (modelTag:modelTag) : sorterEval =
+    let getSorterEval (psr: sortingEval) (modelTag:modelTag) : sorterEvalOld =
         match psr with
         | Single ssr -> ssr.SorterEval.Value
         | Pairs psr -> psr |> PairsSortingEval.getSorterEval modelTag
 
             
-    let getAllTaggedSorterEvals (psr: sortingEval) : (sorterEval * modelSetTag) seq =
+    let getAllTaggedSorterEvals (psr: sortingEval) : (sorterEvalOld * modelSetTag) seq =
         match psr with
         | Single ssr -> ssr.GetAllTaggedSorterEvals ()
         | Pairs psr -> psr |> PairsSortingEval.getAllTaggedSorterEvals

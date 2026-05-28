@@ -24,7 +24,7 @@ type singleSortingEvalBins =
 
     member this.SorterEvalBins with get() = this.sorterEvalBins
 
-    member this.AddSorterEval (sorterEval: sorterEval) (modelTag:modelTag) =
+    member this.AddSorterEval (sorterEval: sorterEvalOld) (modelTag:modelTag) =
         match modelTag with
         | modelTag.Single -> this.sorterEvalBins.AddSorterEval sorterEval
         | _ -> failwith "wrong modelTag"

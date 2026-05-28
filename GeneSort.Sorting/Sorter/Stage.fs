@@ -1,7 +1,6 @@
 ﻿
 namespace GeneSort.Sorting.Sorter
 
-open System
 open FSharp.UMX
 open GeneSort.Sorting
 
@@ -19,9 +18,10 @@ type stage =
     static member create (ces: ce array) =
         // Sort CEs to ensure order-independent equality
         let sortedCes = ces |> Array.sortBy (fun c -> c.Low, c.Hi)
-        
-        // Pre-calculate hash code using the sorted content
-        let h = sortedCes |> Array.fold (fun acc c -> HashCode.Combine(acc, c.Low, c.Hi)) 0
+        let mutable h = 17
+        for ce in sortedCes do
+            h <- h * 23 + (ce |> Ce.toIndex)
+
         { ces = sortedCes; hashCode = h }
 
     member this.Ces = this.ces
@@ -51,8 +51,10 @@ type stageSequence =
     } with
 
     static member create (stages: stage array) (sortingWidth:int<sortingWidth>) =
-        // Compute sequence hash based on the ordered hashes of the stages
-        let h = stages |> Array.fold (fun acc s -> HashCode.Combine(acc, s.GetHashCode())) 0
+        let mutable h = 17
+        for stage in stages do
+            h <- h * 23 + stage.GetHashCode()
+
         { 
             sortingWidth = sortingWidth
             stages = stages 

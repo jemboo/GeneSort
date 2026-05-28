@@ -9,10 +9,10 @@ open GeneSort.SortingOps
 type splitPairsSortingEval=
     private { 
         sortingId: Guid<sortingId>
-        mutable sorterEvalFirstFirst: sorterEval option
-        mutable sorterEvalFirstSecond: sorterEval option
-        mutable sorterEvalSecondFirst: sorterEval option
-        mutable sorterEvalSecondSecond: sorterEval option
+        mutable sorterEvalFirstFirst: sorterEvalOld option
+        mutable sorterEvalFirstSecond: sorterEvalOld option
+        mutable sorterEvalSecondFirst: sorterEvalOld option
+        mutable sorterEvalSecondSecond: sorterEvalOld option
     }
 
     static member create (sortingId: Guid<sortingId>) =
@@ -49,7 +49,7 @@ type splitPairsSortingEval=
         with get() = this.sorterEvalSecondSecond
         and set(value) = this.sorterEvalSecondSecond <- value
 
-    member this.AddSorterEval (modelTag: modelTag) (newEval: sorterEval) : unit =
+    member this.AddSorterEval (modelTag: modelTag) (newEval: sorterEvalOld) : unit =
         match modelTag with 
         | modelTag.Single -> failwith "Invalid model tag for split pairs sorting result."
         | modelTag.SplitPair splitJoin ->
@@ -60,7 +60,7 @@ type splitPairsSortingEval=
             | splitJoin.Second_Second -> this.SorterEvalSecondSecond <- Some newEval
 
 
-    member this.GetSorterEval (modelTag: modelTag) : sorterEval =
+    member this.GetSorterEval (modelTag: modelTag) : sorterEvalOld =
         match modelTag with
         | modelTag.Single -> failwith "Invalid model tag for split pairs sorting result."
         | modelTag.SplitPair splitJoin ->
@@ -70,7 +70,7 @@ type splitPairsSortingEval=
             | splitJoin.Second_First -> this.SorterEvalSecondFirst.Value
             | splitJoin.Second_Second -> this.SorterEvalSecondSecond.Value
 
-    member this.GetAllSorterEvals () : (sorterEval * modelSetTag) seq =
+    member this.GetAllSorterEvals () : (sorterEvalOld * modelSetTag) seq =
         seq { 
             yield (this.SorterEvalFirstFirst.Value, ModelSetTag.create this.sortingId (splitJoin.First_First |> modelTag.SplitPair) )
             yield (this.SorterEvalFirstSecond.Value, ModelSetTag.create this.sortingId (splitJoin.First_Second |> modelTag.SplitPair) )

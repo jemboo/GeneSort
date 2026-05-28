@@ -51,16 +51,16 @@ type mutationSegmentEvals =
     member this.SortingEvalMapParent with get() = this.sortingEvalMapParent
     member this.SortingEvalSetMapMutants with get() = this.sortingEvalSetMapMutants
 
-    member this.UpdateSortingEvalSetMapMutants (newEval: sorterEval) =
+    member this.UpdateSortingEvalSetMapMutants (newEval: sorterEvalOld) =
         this.sortingEvalSetMapMutants.UpdateSortingEvals newEval
 
-    member this.UpdateSortingEvalMapParent (newEval: sorterEval) =
+    member this.UpdateSortingEvalMapParent (newEval: sorterEvalOld) =
         this.sortingEvalMapParent.UpdateSortingEval newEval
 
-    member this.GetAllTaggedParentSorterEvals () : (sorterEval * modelSetTag) seq =
+    member this.GetAllTaggedParentSorterEvals () : (sorterEvalOld * modelSetTag) seq =
         this.sortingEvalMapParent.GetAllTaggedSorterEvals ()
 
-    member this.GetAllTaggedMutantSorterEvals () : (sorterEval * modelSetTag) seq =
+    member this.GetAllTaggedMutantSorterEvals () : (sorterEvalOld * modelSetTag) seq =
         this.sortingEvalSetMapMutants.GetAllTaggedSorterEvals ()
 
 

@@ -43,7 +43,7 @@ module SorterEvalKey =
         ceCountWeight     * (key.CeCount     |> UMX.untag |> float) +
         stageLengthWeight * (key.StageLength |> UMX.untag |> float)
 
-    let fromSorterEval (eval: sorterEval) : sorterEvalKey =
+    let fromSorterEval (eval: sorterEvalOld) : sorterEvalKey =
             sorterEvalKey.create
                 eval.CeBlockEval.CeUseCounts.UsedCeCount
                 eval.CeBlockEval.getStageBuilderSequence.StageLength

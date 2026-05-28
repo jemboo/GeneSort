@@ -8,7 +8,7 @@
   <ItemGroup>
     <Compile Include="CeBlockDto.fs" />
     <Compile Include="CeBlockEvalDto.fs" />
-    <Compile Include="SorterEvalDto.fs" />
+    <Compile Include="SorterEvalDtoOld.fs" />
     <Compile Include="SorterModelEvalDto.fs" />
     <Compile Include="SorterModelSetEvalDto.fs" />
     <Compile Include="Program.fs" />

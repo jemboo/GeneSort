@@ -13,11 +13,11 @@ type sorterEvalBins =
         layers: Map<sorterEvalKey, sorterEvalLeaf>
     }
     with
-    static member create (id: Guid<sorterEvalBinsId>) (sorterEvals: sorterEval seq) =
+    static member create (id: Guid<sorterEvalBinsId>) (sorterEvals: sorterEvalOld seq) =
         let initial = { sorterEvalBinsId = id; layers = Map.empty }
         (initial, sorterEvals) ||> Seq.fold (fun acc eval -> acc.AddSorterEval eval)
 
-    static member createWithNewId (sorterEvals: sorterEval seq) =
+    static member createWithNewId (sorterEvals: sorterEvalOld seq) =
         let id = Guid.NewGuid() |> UMX.tag<sorterEvalBinsId>
         sorterEvalBins.create id sorterEvals    
 
@@ -30,7 +30,7 @@ type sorterEvalBins =
     member this.EvalCount =
         this.layers |> Map.toSeq |> Seq.sumBy (fun (_, leaf) -> leaf.EvalCount)
 
-    member this.AddSorterEval (sorterEval: sorterEval) =
+    member this.AddSorterEval (sorterEval: sorterEvalOld) =
         let key =
             SorterEvalKey.fromSorterEval sorterEval
         

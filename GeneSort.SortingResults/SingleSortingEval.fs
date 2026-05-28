@@ -9,7 +9,7 @@ open GeneSort.SortingOps
 type singleSortingEval=
     private { 
         sortingId: Guid<sortingId>
-        mutable sorterEval: sorterEval option
+        mutable sorterEval: sorterEvalOld option
     }
 
     static member create 
@@ -31,13 +31,13 @@ type singleSortingEval=
 
     member this.SortingId with get() : Guid<sortingId> = this.sortingId
 
-    member this.AddSorterEval (modelTag: modelTag) (newEval: sorterEval) : unit =
+    member this.AddSorterEval (modelTag: modelTag) (newEval: sorterEvalOld) : unit =
         match modelTag with 
         | modelTag.Single -> this.SorterEval <- Some newEval
         | modelTag.SplitPair splitJoin -> failwith "invalid modeltag"
             
 
-    member this.GetAllTaggedSorterEvals () : (sorterEval * modelSetTag) seq =
+    member this.GetAllTaggedSorterEvals () : (sorterEvalOld * modelSetTag) seq =
         seq { 
             yield (this.sorterEval.Value, ModelSetTag.create this.sortingId modelTag.Single )
         }

@@ -13,10 +13,10 @@ type mutationSegmentEvalBins =
         mutantSortingEvalBins: sortingEvalBins
     }
 
-    member this.AddMutantSorterEval (sorterEval: sorterEval) (modelTag:modelTag) =
+    member this.AddMutantSorterEval (sorterEval: sorterEvalOld) (modelTag:modelTag) =
         SortingEvalBins.addSorterEval this.mutantSortingEvalBins sorterEval modelTag
 
-    member this.AddParentSorterEval (sorterEval: sorterEval) (modelTag:modelTag) =
+    member this.AddParentSorterEval (sorterEval: sorterEvalOld) (modelTag:modelTag) =
         SortingEval.addSorterEval modelTag sorterEval this.parentSortingEval
 
     member this.ParentSortingEval with get() = this.parentSortingEval

@@ -42,11 +42,11 @@ type sortingEvalMap =
     member this.ContainsSorter (sorterId: Guid<sorterId>) =
         this.evalMap.ContainsKey(sorterId)
 
-    member this.UpdateSortingEval (newEval: sorterEval) =
+    member this.UpdateSortingEval (newEval: sorterEvalOld) =
         match this.evalMap.TryGetValue(newEval.SorterId) with
         | false, _ -> failwithf "SorterId %A not found in evalMap." newEval.SorterId
         | true, modelTag ->
             SortingEval.addSorterEval modelTag newEval this.sortingEval
 
-    member this.GetAllTaggedSorterEvals () : (sorterEval * modelSetTag) seq =
+    member this.GetAllTaggedSorterEvals () : (sorterEvalOld * modelSetTag) seq =
          this.sortingEval |> SortingEval.getAllTaggedSorterEvals

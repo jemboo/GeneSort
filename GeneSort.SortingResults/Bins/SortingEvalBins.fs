@@ -16,7 +16,7 @@ module SortingEvalBins =
 
     let addSorterEval 
                 (sortingEvalBins:sortingEvalBins) 
-                (sorterEval: sorterEval) 
+                (sorterEval: sorterEvalOld) 
                 (modelTag:modelTag) =
         match sortingEvalBins with
         | Single s -> s.AddSorterEval sorterEval modelTag

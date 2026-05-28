@@ -12,7 +12,7 @@ type singleSortingEvalDto = {
     [<Key(0)>]
     SortingId: Guid
     [<Key(1)>]
-    SorterEval: sorterEvalDto option
+    SorterEval: sorterEvalDtoOld option
 }
 
 module SingleSortingEvalDto =
@@ -20,10 +20,10 @@ module SingleSortingEvalDto =
     let fromDomain (result: singleSortingEval) : singleSortingEvalDto =
         {
             SortingId  = %result.SortingId
-            SorterEval = result.SorterEval |> Option.map SorterEvalDto.toSorterEvalDto
+            SorterEval = result.SorterEval |> Option.map SorterEvalDtoOld.toSorterEvalDto
         }
 
     let toDomain (dto: singleSortingEvalDto) : singleSortingEval =
         let result = singleSortingEval.create (UMX.tag<sortingId> dto.SortingId)
-        result.SorterEval <- dto.SorterEval |> Option.map SorterEvalDto.fromSorterEvalDto
+        result.SorterEval <- dto.SorterEval |> Option.map SorterEvalDtoOld.fromSorterEvalDto
         result

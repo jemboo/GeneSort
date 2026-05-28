@@ -32,7 +32,7 @@ type splitPairSortingEvalBins =
 
     member this.SortingEvalBinsId with get() = this.sortingEvalBinsId
 
-    member this.AddSorterEval (sorterEval: sorterEval) (modelTag:modelTag) =
+    member this.AddSorterEval (sorterEval: sorterEvalOld) (modelTag:modelTag) =
         match modelTag with
         | modelTag.Single -> failwith "wrong modelTag"
         | SplitPair sj -> 

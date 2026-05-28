@@ -132,7 +132,7 @@ module SorterEvalExecutor =
                 let initialBins = sorterEvalBinsV1.createEmpty (%qpBins.Id |> UMX.tag) testId
                 let mutable accumulatedBins = initialBins
                 
-                let allChunksEvals : sorterEval array[] = Array.zeroCreate splitFactor
+                let allChunksEvals : sorterEvalOld array[] = Array.zeroCreate splitFactor
 
                 for i in 0 .. (splitFactor - 1) do
                     do! checkCancellation cts.Token

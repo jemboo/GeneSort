@@ -17,13 +17,13 @@ type sorterModelEvalDto = {
 
 module SorterModelEvalDto =
 
-    let toSorterEvalDto (sorterEval: sorterEval) : sorterModelEvalDto =
+    let toSorterEvalDto (sorterEval: sorterEvalOld) : sorterModelEvalDto =
         { 
             SorterId = %sorterEval.SorterId
             CeBlockEvalDto = sorterEval.CeBlockEval |> CeBlockEvalDto.fromDomain
         }
 
-    let fromSorterEvalDto (dto: sorterModelEvalDto) : sorterEval =
-        sorterEval.create
+    let fromSorterEvalDto (dto: sorterModelEvalDto) : sorterEvalOld =
+        sorterEvalOld.create
             (UMX.tag<sorterId> dto.SorterId)  
             (CeBlockEvalDto.toDomain dto.CeBlockEvalDto)

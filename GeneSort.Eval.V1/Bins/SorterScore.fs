@@ -62,7 +62,7 @@ type sorterScore =
 
 module SorterScore =
 
-    let fromSorterEval (sorterEval:sorterEval) : sorterScoreV1 =
+    let fromSorterEval (sorterEval:sorterEvalOld) : sorterScoreV1 =
         let unsortedGroupCount = 
             match sorterEval.CeBlockEval.SortableTest with
             | Some st -> Some (SortableTests.getSortableCount st)

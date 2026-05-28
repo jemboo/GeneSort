@@ -16,7 +16,7 @@ type sorterModelSetEvalDto = {
     [<Key(2)>]
     SorterTestsId: Guid
     [<Key(3)>]
-    SorterEvals: sorterEvalDto array
+    SorterEvals: sorterEvalDtoOld array
 }
 
 module SorterSetEvalDto =
@@ -26,7 +26,7 @@ module SorterSetEvalDto =
             SorterSetEvalId = %sorterSetEval.SorterSetEvalId
             SorterSetId = %sorterSetEval.SorterSetId
             SorterTestsId = %sorterSetEval.SorterTestId
-            SorterEvals = sorterSetEval.SorterEvals |> Array.map SorterEvalDto.toSorterEvalDto
+            SorterEvals = sorterSetEval.SorterEvals |> Array.map SorterEvalDtoOld.toSorterEvalDto
         }
 
     let toDomain (dto: sorterModelSetEvalDto) : sorterSetEval =
@@ -40,4 +40,4 @@ module SorterSetEvalDto =
             (UMX.tag<sorterSetEvalId> dto.SorterSetEvalId)
             (UMX.tag<sorterSetId> dto.SorterSetId)
             (UMX.tag<sortableTestId> dto.SorterTestsId)
-            (dto.SorterEvals |> Array.map SorterEvalDto.fromSorterEvalDto)
+            (dto.SorterEvals |> Array.map SorterEvalDtoOld.fromSorterEvalDto)

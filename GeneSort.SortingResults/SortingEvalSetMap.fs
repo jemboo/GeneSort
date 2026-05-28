@@ -53,7 +53,7 @@ type sortingEvalSetMap =
     member this.EvalMap with get() =
         this.evalMap :> IReadOnlyDictionary<Guid<sorterId>, modelSetTag>
 
-    member this.UpdateSortingEvals (newEval: sorterEval) : unit =
+    member this.UpdateSortingEvals (newEval: sorterEvalOld) : unit =
         match this.evalMap.TryGetValue(newEval.SorterId) with
         | false, _ -> failwithf "SorterId %A not found in evalMap." newEval.SorterId
         | true, sortingTag ->
@@ -63,10 +63,10 @@ type sortingEvalSetMap =
             | false, _ -> failwithf "SortingId %A not found in sortingEvalsMap." sortingParentId
             | true, result -> SortingEval.addSorterEval modelTag newEval result
 
-    member this.UpdateManySortingEvals (newEvals: sorterEval []) =
+    member this.UpdateManySortingEvals (newEvals: sorterEvalOld []) =
         newEvals |> Array.iter(this.UpdateSortingEvals)
 
-    member this.GetAllTaggedSorterEvals () : (sorterEval * modelSetTag) seq =
+    member this.GetAllTaggedSorterEvals () : (sorterEvalOld * modelSetTag) seq =
          this.sortingEvalsMap.Values |> Seq.collect(fun sr -> sr |> SortingEval.getAllTaggedSorterEvals)
 
 

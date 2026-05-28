@@ -8,22 +8,22 @@ open GeneSort.Sorting
 
 
 [<MessagePackObject>]
-type sorterEvalDto = {
+type sorterEvalDtoOld = {
     [<Key(0)>]
     SorterId: Guid
     [<Key(1)>]
     CeBlockEvalDto: ceBlockEvalDto
 }
 
-module SorterEvalDto =
+module SorterEvalDtoOld =
 
-    let toSorterEvalDto (sorterEval: sorterEval) : sorterEvalDto =
+    let toSorterEvalDto (sorterEval: sorterEvalOld) : sorterEvalDtoOld =
         { 
             SorterId = %sorterEval.SorterId
             CeBlockEvalDto = sorterEval.CeBlockEval |> CeBlockEvalDto.fromDomain
         }
 
-    let fromSorterEvalDto (dto: sorterEvalDto) : sorterEval =
-        sorterEval.create
+    let fromSorterEvalDto (dto: sorterEvalDtoOld) : sorterEvalOld =
+        sorterEvalOld.create
             (UMX.tag<sorterId> dto.SorterId)  
             (CeBlockEvalDto.toDomain dto.CeBlockEvalDto)

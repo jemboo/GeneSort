@@ -27,7 +27,7 @@ type sorterEvalBinsV1 =
     static member createFromEvals 
             (id: Guid<sorterEvalBinsId>) 
             (testId: Guid<sortableTestId>)
-            (evals: sorterEval seq) =
+            (evals: sorterEvalOld seq) =
     
         // Use a local mutable dictionary for O(1) lookups without thread contention
         let dict = System.Collections.Generic.Dictionary<sorterEvalKey, ResizeArray<sorterScore>>()
@@ -79,7 +79,7 @@ type sorterEvalBinsV1 =
         this.bins |> Map.toSeq |> Seq.sumBy (fun (_, bin) -> bin.EvalCount)
 
     /// Adds a single sorter evaluation to the appropriate bin
-    member this.AddSorterEval (eval: sorterEval) =
+    member this.AddSorterEval (eval: sorterEvalOld) =
         let key = SorterEvalKey.fromSorterEval eval
         let score = SorterScore.fromSorterEval eval |> sorterScore.V1
         

@@ -18,21 +18,21 @@ type mutationSegmentEvalBinsSet =
 
     member this.GetBinDict() = this.binDict :> seq<KeyValuePair<Guid<sortingId>, mutationSegmentEvalBins>>
 
-    member this.AddMutantSorterEval (sorterEval: sorterEval) (modelSuperSetTag:modelSuperSetTag) : unit =
+    member this.AddMutantSorterEval (sorterEval: sorterEvalOld) (modelSuperSetTag:modelSuperSetTag) : unit =
         match this.binDict.TryGetValue(modelSuperSetTag.SortingId) with
         | true, bins -> bins.AddMutantSorterEval sorterEval modelSuperSetTag.ModelTag |> ignore
         | false, _ -> failwithf "SortingId %A not found in mutationSegmentEvalBinsSet." modelSuperSetTag.SortingId
 
-    member this.AddAllMutantSorterEvals (tupes: (sorterEval * modelSuperSetTag) seq) =
+    member this.AddAllMutantSorterEvals (tupes: (sorterEvalOld * modelSuperSetTag) seq) =
         for (sorterEval, modelSuperSetTag) in tupes do
             this.AddMutantSorterEval sorterEval modelSuperSetTag
 
-    member this.AddParentSorterEval (sorterEval: sorterEval) (modelSetTag:modelSetTag) =
+    member this.AddParentSorterEval (sorterEval: sorterEvalOld) (modelSetTag:modelSetTag) =
         match this.binDict.TryGetValue(modelSetTag.SortingId) with
         | true, bins -> bins.AddParentSorterEval sorterEval modelSetTag.ModelTag
         | false, _ -> failwithf "SortingId %A not found in mutationSegmentEvalBinsSet." modelSetTag.SortingId
 
-    member this.AddAllParentSorterEvals (tupes: (sorterEval * modelSetTag) seq) =
+    member this.AddAllParentSorterEvals (tupes: (sorterEvalOld * modelSetTag) seq) =
         for (sorterEval, modelSetTag) in tupes do
             this.AddParentSorterEval sorterEval modelSetTag
 

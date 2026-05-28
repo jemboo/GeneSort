@@ -13,14 +13,14 @@ type sorterSetEval =
         sorterSetEvalId: Guid<sorterSetEvalId>
         sorterSetId: Guid<sorterSetId>
         sorterTestId: Guid<sortableTestId>
-        sorterEvals: Map<Guid<sorterId>, sorterEval>
+        sorterEvals: Map<Guid<sorterId>, sorterEvalOld>
     }
 
     static member create 
                 (sorterSetEvalId: Guid<sorterSetEvalId>) 
                 (sorterSetId: Guid<sorterSetId>) 
                 (sorterTestsId: Guid<sortableTestId>) 
-                (sorterEvals: sorterEval[]) =
+                (sorterEvals: sorterEvalOld[]) =
         { 
             sorterSetEvalId = sorterSetEvalId
             sorterSetId = sorterSetId
@@ -31,7 +31,7 @@ type sorterSetEval =
     member this.SorterSetEvalId with get() : Guid<sorterSetEvalId> = this.sorterSetEvalId
     member this.SorterSetId with get() : Guid<sorterSetId> = this.sorterSetId
     member this.SorterTestId with get() : Guid<sortableTestId> = this.sorterTestId
-    member this.SorterEvals with get() : sorterEval[] = this.sorterEvals.Values |> Seq.toArray
+    member this.SorterEvals with get() : sorterEvalOld[] = this.sorterEvals.Values |> Seq.toArray
 
  
 
@@ -46,7 +46,7 @@ module SorterSetEval =
     let makeSorterEvals 
                 (sorters: sorter array) 
                 (sortableTest: sortableTest) 
-                (collectNewSortableTests: bool) :sorterEval array =
+                (collectNewSortableTests: bool) :sorterEvalOld array =
         let ceBlocks = 
                 sorters 
                 |> Array.map (fun sorter ->
@@ -63,7 +63,7 @@ module SorterSetEval =
         Array.zip sorters ceBlockEvals
         |> Array.map (
                 fun (sorter, ceBlockEval ) -> 
-                        sorterEval.create 
+                        sorterEvalOld.create 
                             sorter.SorterId
                             ceBlockEval
                 )
