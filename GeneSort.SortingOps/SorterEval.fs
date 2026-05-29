@@ -1,6 +1,7 @@
 ﻿namespace GeneSort.SortingOps
 
 open FSharp.UMX
+open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
@@ -9,6 +10,7 @@ open GeneSort.Sorting.Sortable
 type sorterEvalV1 =
     private { 
         sorterId: Guid<sorterId>
+        sortingWidth: int<sortingWidth>
         unsortedCount: int<sortableCount>
         sequenceHash: int<sequenceHash>
         lastCeIndex: int<ceIndex>
@@ -17,7 +19,8 @@ type sorterEvalV1 =
     }
 
     static member create 
-                    (sorterId: Guid<sorterId>) 
+                    (sorterId: Guid<sorterId>)
+                    (sortingWidth: int<sortingWidth>) 
                     (unsortedCount: int<sortableCount>)
                     (sequenceKey: int<sequenceHash>) 
                     (lastCeIndex: int<ceIndex>) 
@@ -25,6 +28,7 @@ type sorterEvalV1 =
                     (ceLength: int<ceLength>) : sorterEvalV1 =
         { 
                 sorterId = sorterId; 
+                sortingWidth = sortingWidth;
                 unsortedCount = unsortedCount;
                 sequenceHash = sequenceKey; 
                 lastCeIndex = lastCeIndex;
@@ -33,21 +37,23 @@ type sorterEvalV1 =
         }
 
     member this.SorterId with get() : Guid<sorterId>  = this.sorterId
+    member this.SortingWidth with get() : int<sortingWidth> = this.sortingWidth
     member this.StageLength with get() : int<stageLength> = this.stageLength
     member this.CeLength with get() : int<ceLength> = this.ceLength
     member this.UnsortedCount with get() : int<sortableCount>  = this.unsortedCount
     member this.SequenceHash with get() : int<sequenceHash>  = this.sequenceHash
     member this.LastCeIndex with get() : int<ceIndex>  = this.lastCeIndex
-    member this.ToDataTableRecord() : GeneSort.Core.dataTableRecord =
+    member this.ToDataTableRecord() : dataTableRecord =
             let isSorted = this.unsortedCount = 0<sortableCount>
-            GeneSort.Core.dataTableRecord.createEmpty()
-            |> GeneSort.Core.dataTableRecord.addData "SorterId" (string %this.sorterId)
-            |> GeneSort.Core.dataTableRecord.addData "UnsortedCount" (string %this.unsortedCount)
-            |> GeneSort.Core.dataTableRecord.addData "StageLength" (string %this.stageLength)
-            |> GeneSort.Core.dataTableRecord.addData "CeLength" (string %this.ceLength)
-            |> GeneSort.Core.dataTableRecord.addData "IsSorted" (string isSorted)
-            |> GeneSort.Core.dataTableRecord.addData "SequenceHash" (string %this.sequenceHash)
-            |> GeneSort.Core.dataTableRecord.addData "LastCeIndex" (string %this.lastCeIndex)
+            dataTableRecord.createEmpty()
+            |> dataTableRecord.addData "SorterId" (string %this.sorterId)
+            |> dataTableRecord.addData "SortingWidth" (string %this.sortingWidth)
+            |> dataTableRecord.addData "UnsortedCount" (string %this.unsortedCount)
+            |> dataTableRecord.addData "StageLength" (string %this.stageLength)
+            |> dataTableRecord.addData "CeLength" (string %this.ceLength)
+            |> dataTableRecord.addData "IsSorted" (string isSorted)
+            |> dataTableRecord.addData "SequenceHash" (string %this.sequenceHash)
+            |> dataTableRecord.addData "LastCeIndex" (string %this.lastCeIndex)
 
 
 
@@ -66,9 +72,11 @@ type ceData =
     member this.UseCount with get() : int = this.useCount
     member this.Ce with get() : ce = this.ce
 
+
 type sorterEvalV2 =
     private { 
         sorterId: Guid<sorterId>
+        sortingWidth: int<sortingWidth>
         unsortedCount: int<sortableCount>
         sequenceHash: int<sequenceHash>
         stageLength: int<stageLength>
@@ -77,12 +85,14 @@ type sorterEvalV2 =
 
     static member create 
                     (sorterId: Guid<sorterId>) 
+                    (sortingWidth: int<sortingWidth>) 
                     (unsortedCount: int<sortableCount>)
                     (sequenceKey: int<sequenceHash>)
                     (stageLength: int<stageLength>)
                     (ceDataSequence: ceData array): sorterEvalV2 =
         { 
                 sorterId = sorterId; 
+                sortingWidth = sortingWidth;
                 unsortedCount = unsortedCount;
                 sequenceHash = sequenceKey; 
                 stageLength = stageLength;
@@ -90,6 +100,7 @@ type sorterEvalV2 =
         }
 
     member this.SorterId with get() : Guid<sorterId>  = this.sorterId
+    member this.SortingWidth with get() : int<sortingWidth> = this.sortingWidth
     member this.StageLength with get() : int<stageLength> = this.stageLength
     member this.CeLength with get() : int<ceLength> = this.ceDataSequence.Length |> UMX.tag<ceLength>
     member this.CeDataSequence with get() : ceData array = this.ceDataSequence
@@ -98,16 +109,17 @@ type sorterEvalV2 =
     member this.LastCeIndex with get() : int<ceIndex>  = 
         if this.ceDataSequence.Length = 0 then 0<ceIndex>
         else this.ceDataSequence.[this.ceDataSequence.Length - 1].CeIndex
-    member this.ToDataTableRecord() : GeneSort.Core.dataTableRecord =
+    member this.ToDataTableRecord() : dataTableRecord =
             let isSorted = this.unsortedCount = 0<sortableCount>
-            GeneSort.Core.dataTableRecord.createEmpty()
-            |> GeneSort.Core.dataTableRecord.addData "SorterId" (string %this.sorterId)
-            |> GeneSort.Core.dataTableRecord.addData "UnsortedCount" (string %this.unsortedCount)
-            |> GeneSort.Core.dataTableRecord.addData "StageLength" (string %this.stageLength)
-            |> GeneSort.Core.dataTableRecord.addData "CeLength" (string %this.CeLength)
-            |> GeneSort.Core.dataTableRecord.addData "IsSorted" (string isSorted)
-            |> GeneSort.Core.dataTableRecord.addData "SequenceHash" (string %this.sequenceHash)
-            |> GeneSort.Core.dataTableRecord.addData "LastCeIndex" (string %this.LastCeIndex)
+            dataTableRecord.createEmpty()
+            |> dataTableRecord.addData "SorterId" (string %this.sorterId)
+            |> dataTableRecord.addData "SortingWidth" (string %this.sortingWidth)
+            |> dataTableRecord.addData "UnsortedCount" (string %this.unsortedCount)
+            |> dataTableRecord.addData "StageLength" (string %this.stageLength)
+            |> dataTableRecord.addData "CeLength" (string %this.CeLength)
+            |> dataTableRecord.addData "IsSorted" (string isSorted)
+            |> dataTableRecord.addData "SequenceHash" (string %this.sequenceHash)
+            |> dataTableRecord.addData "LastCeIndex" (string %this.LastCeIndex)
 
 
 
@@ -115,6 +127,7 @@ type sorterEvalV2 =
 type sorterEvalV3 =
     private { 
         sorterId: Guid<sorterId>
+        sortingWidth: int<sortingWidth>
         sequenceHash: int<sequenceHash>
         stageLength: int<stageLength>
         ceDataSequence: ceData array
@@ -123,12 +136,14 @@ type sorterEvalV3 =
 
     static member create 
                     (sorterId: Guid<sorterId>)
+                    (sortingWidth: int<sortingWidth>) 
                     (sequenceKey: int<sequenceHash>)
                     (stageLength: int<stageLength>)
                     (ceDataSequence: ceData array) 
                     (sortableTest:sortableTest) :sorterEvalV3 =
         { 
                 sorterId = sorterId;
+                sortingWidth = sortingWidth;
                 sequenceHash = sequenceKey; 
                 stageLength = stageLength;
                 ceDataSequence = ceDataSequence;
@@ -136,6 +151,7 @@ type sorterEvalV3 =
         }
 
     member this.SorterId with get() : Guid<sorterId>  = this.sorterId
+    member this.SortingWidth with get() : int<sortingWidth> = this.sortingWidth
     member this.StageLength with get() : int<stageLength> = this.stageLength
     member this.CeLength with get() : int<ceLength> = this.ceDataSequence.Length |> UMX.tag<ceLength>
     member this.CeDataSequence with get() : ceData array = this.ceDataSequence
@@ -146,16 +162,18 @@ type sorterEvalV3 =
     member this.LastCeIndex with get() : int<ceIndex>  = 
         if this.ceDataSequence.Length = 0 then 0<ceIndex>
         else this.ceDataSequence.[this.ceDataSequence.Length - 1].CeIndex
-    member this.ToDataTableRecord() : GeneSort.Core.dataTableRecord =
+    member this.ToDataTableRecord() : dataTableRecord =
             let isSorted = this.UnsortedCount = 0<sortableCount>
-            GeneSort.Core.dataTableRecord.createEmpty()
-            |> GeneSort.Core.dataTableRecord.addData "SorterId" (string %this.sorterId)
-            |> GeneSort.Core.dataTableRecord.addData "UnsortedCount" (string %this.UnsortedCount)
-            |> GeneSort.Core.dataTableRecord.addData "StageLength" (string %this.stageLength)
-            |> GeneSort.Core.dataTableRecord.addData "CeLength" (string %this.CeLength)
-            |> GeneSort.Core.dataTableRecord.addData "IsSorted" (string isSorted)
-            |> GeneSort.Core.dataTableRecord.addData "SequenceHash" (string %this.sequenceHash)
-            |> GeneSort.Core.dataTableRecord.addData "LastCeIndex" (string %this.LastCeIndex)
+            dataTableRecord.createEmpty()
+            |> dataTableRecord.addData "SorterId" (string %this.sorterId)
+            |> dataTableRecord.addData "SortingWidth" (string %this.sortingWidth)
+            |> dataTableRecord.addData "UnsortedCount" (string %this.UnsortedCount)
+            |> dataTableRecord.addData "StageLength" (string %this.stageLength)
+            |> dataTableRecord.addData "CeLength" (string %this.CeLength)
+            |> dataTableRecord.addData "IsSorted" (string isSorted)
+            |> dataTableRecord.addData "SequenceHash" (string %this.sequenceHash)
+            |> dataTableRecord.addData "LastCeIndex" (string %this.LastCeIndex)
+
 
 
 type sorterEvalType = 
@@ -190,6 +208,12 @@ module SorterEval =
         | V2 v2 -> v2.SorterId
         | V3 v3 -> v3.SorterId
 
+    let getSortingWidth (eval: sorterEval) : int<sortingWidth> =
+        match eval with
+        | V1 v1 -> v1.SortingWidth
+        | V2 v2 -> v2.SortingWidth
+        | V3 v3 -> v3.SortingWidth
+
     let getStageLength (eval: sorterEval) : int<stageLength> =
         match eval with
         | V1 v1 -> v1.StageLength
@@ -208,7 +232,6 @@ module SorterEval =
         | V2 v2 -> v2.UnsortedCount
         | V3 v3 -> v3.UnsortedCount
 
-
     let getSequenceHash (eval: sorterEval) : int<sequenceHash> =
         match eval with
         | V1 v1 -> v1.SequenceHash
@@ -221,14 +244,20 @@ module SorterEval =
         | V2 v2 -> v2.LastCeIndex
         | V3 v3 -> v3.LastCeIndex
 
-    let toDataTableRecord (eval: sorterEval) : GeneSort.Core.dataTableRecord =
+    let getCeDataSequence (eval: sorterEval) : ceData array =
+        match eval with
+        | V1 v1 -> failwith "V1 does not have CeDataSequence"
+        | V2 v2 -> v2.CeDataSequence
+        | V3 v3 -> v3.CeDataSequence
+
+    let toDataTableRecord (eval: sorterEval) : dataTableRecord =
         match eval with
         | V1 v1 -> v1.ToDataTableRecord()
         | V2 v2 -> v2.ToDataTableRecord()
         | V3 v3 -> v3.ToDataTableRecord()
 
 
-/// Internal helper to extract ceData array for V2 and V3 records
+    /// Internal helper to extract ceData array for V2 and V3 records
     let private extractCeDataSequence (ceb: ceBlock) (useCounts: ceUseCounts) : ceData array =
         let results = ResizeArray<ceData>()
         for i in 0 .. (%ceb.CeLength - 1) do
@@ -247,6 +276,7 @@ module SorterEval =
                                   ceBlockEval.UsedCes
         sorterEvalV1.create 
             sorterId 
+            ceBlockEval.CeBlock.SortingWidth
             ceBlockEval.UnsortedCount 
             (stageSequence.GetHashCode() |> UMX.tag<sequenceHash>) 
             ceBlockEval.CeUseCounts.LastUsedCeIndex 
@@ -265,6 +295,7 @@ module SorterEval =
         let ceDataSeq = extractCeDataSequence ceBlockEval.CeBlock ceBlockEval.CeUseCounts
         sorterEvalV2.create 
             sorterId 
+            ceBlockEval.CeBlock.SortingWidth
             ceBlockEval.UnsortedCount 
             (stageSequence.GetHashCode() |> UMX.tag<sequenceHash>) 
             stageSequence.StageLength  
@@ -291,6 +322,7 @@ module SorterEval =
             let ceDataSeq = extractCeDataSequence ceBlockEval.CeBlock ceBlockEval.CeUseCounts
             sorterEvalV3.create 
                 sorterId 
+                ceBlockEval.CeBlock.SortingWidth
                 (stageSequence.GetHashCode() |> UMX.tag<sequenceHash>) 
                 stageSequence.StageLength 
                 ceDataSeq 

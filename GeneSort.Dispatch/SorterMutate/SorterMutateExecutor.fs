@@ -75,12 +75,20 @@ module SorterMutateExecutor =
                         rp.GetSimpleSorterModelType() 
                         |> Result.ofOption "Missing simple sorter model type in run parameters"
 
+            let! (sorterEvalType: sorterEvalType) =
+                        rp.GetSorterEvalType()
+                        |> Result.ofOption "Missing sorter eval type in run parameters"
+
             let! (parentEvalBins: sorterEvalBins) =
-                        SorterEvalDbs.getStandardSorterEvalBins sortingWidth simpleSorterModelType
+                        SorterEvalDbs.getStandardSorterEvalBins 
+                                            sortingWidth 
+                                            simpleSorterModelType
+                                            sorterEvalType
 
             let! (parentSorterCount: int<sorterCount>) = 
                         rp.GetSorterParentCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
+
 
             let scoreSamples = parentEvalBins |> SorterEvalBins.getAllScores
                                               |> SorterScore.evenSampleByRankedValue
@@ -110,10 +118,17 @@ module SorterMutateExecutor =
                         rp.GetMergeSuffixType() 
                         |> Result.ofOption "Missing mergeSuffixType in run parameters"
 
+            let! (sorterEvalType: sorterEvalType) =
+                        rp.GetSorterEvalType()
+                        |> Result.ofOption "Missing sorter eval type in run parameters"
+
             let! (parentEvalBins: sorterEvalBins) =
                         SorterEvalDbs.getMergeSorterEvalBins 
-                                        sortingWidth simpleSorterModelType 
-                                        mergeDimension mergeSuffixType
+                                        sortingWidth 
+                                        simpleSorterModelType 
+                                        mergeDimension 
+                                        mergeSuffixType
+                                        sorterEvalType
 
             let! (parentSorterCount: int<sorterCount>) = 
                         rp.GetSorterParentCount()

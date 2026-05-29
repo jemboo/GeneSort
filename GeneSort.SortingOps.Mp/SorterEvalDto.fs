@@ -16,6 +16,7 @@ type sorterEvalV1Dto = {
     [<Key(3)>] LastCeIndex : int
     [<Key(4)>] StageLength : int
     [<Key(5)>] CeLength : int
+    [<Key(5)>] SortingWidth : int
 }
 
 [<MessagePackObject>]
@@ -25,6 +26,7 @@ type sorterEvalV2Dto = {
     [<Key(2)>] SequenceHash : int
     [<Key(3)>] StageLength : int
     [<Key(4)>] CeDataSequence : ceDataDto array
+    [<Key(5)>] SortingWidth : int
 }
 
 [<MessagePackObject>]
@@ -34,6 +36,7 @@ type sorterEvalV3Dto = {
     [<Key(2)>] StageLength : int
     [<Key(3)>] CeDataSequence : ceDataDto array
     [<Key(4)>] SortableTest : sortableTestDto
+    [<Key(5)>] SortingWidth : int
 }
 
 
@@ -64,6 +67,7 @@ module SorterEvalDto =
                 LastCeIndex = %v1.LastCeIndex
                 StageLength = %v1.StageLength
                 CeLength = %v1.CeLength
+                SortingWidth = %v1.SortingWidth
             }
         | sorterEval.V2 v2 ->
             V2 {
@@ -72,6 +76,7 @@ module SorterEvalDto =
                 SequenceHash = %v2.SequenceHash
                 StageLength = %v2.StageLength
                 CeDataSequence = v2.CeDataSequence |> Array.map CeDataDto.fromDomain
+                SortingWidth = %v2.SortingWidth
             }
         | sorterEval.V3 v3 ->
             V3 {
@@ -80,6 +85,7 @@ module SorterEvalDto =
                 StageLength = %v3.StageLength
                 CeDataSequence = v3.CeDataSequence |> Array.map CeDataDto.fromDomain
                 SortableTest = SortableTestDto.fromDomain v3.SortableTest
+                SortingWidth = %v3.SortingWidth
             }
 
     let toDomain (dto: sorterEvalDto) : sorterEval =
@@ -92,6 +98,7 @@ module SorterEvalDto =
                 (v1Dto.LastCeIndex |> UMX.tag)
                 (v1Dto.StageLength |> UMX.tag)
                 (v1Dto.CeLength |> UMX.tag)
+                (v1Dto.SortingWidth |> UMX.tag)
             |> sorterEval.V1
         | V2 v2Dto ->
             sorterEvalV2.create
@@ -99,6 +106,7 @@ module SorterEvalDto =
                 (v2Dto.UnsortedCount |> UMX.tag)
                 (v2Dto.SequenceHash |> UMX.tag)
                 (v2Dto.StageLength |> UMX.tag)
+                (v2Dto.SortingWidth |> UMX.tag)
                 (v2Dto.CeDataSequence |> Array.map CeDataDto.toDomain)
             |> sorterEval.V2
         | V3 v3Dto ->
@@ -106,6 +114,7 @@ module SorterEvalDto =
                 (v3Dto.SorterId |> UMX.tag)
                 (v3Dto.SequenceHash |> UMX.tag)
                 (v3Dto.StageLength |> UMX.tag)
+                (v3Dto.SortingWidth |> UMX.tag)
                 (v3Dto.CeDataSequence |> Array.map CeDataDto.toDomain)
                 (SortableTestDto.toDomain v3Dto.SortableTest)
             |> sorterEval.V3

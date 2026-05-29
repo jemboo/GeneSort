@@ -16,6 +16,7 @@ open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Dispatch.V1.SortableTest
+open GeneSort.Eval.V1
 
 module SorterEvalExecutor =
 
@@ -58,7 +59,7 @@ module SorterEvalExecutor =
         }
 
 
-/// Creates and returns the generator using CommonSorterEval.
+    /// Creates and returns the generator using CommonSorterEval.
     let makeUniformSorterModelGen (rp: runParameters) : sorterModelGen option =
         maybe {
             let! sortingWidth = rp.GetSortingWidth()
@@ -68,8 +69,7 @@ module SorterEvalExecutor =
             return CommonSorterEval.getSimpleUniformSorterModelGen rngType sortingWidth simpleSorterModelType
         }
 
-/// Processes sorters sequentially in chunk blocks, combines them, 
-    /// builds the final master SorterSetEval, and saves both bins and eval results.
+
     let _makeSorterEvalBins 
             (makeModelGen: runParameters -> sorterModelGen option)
             (makeTests: runParameters -> Async<Result<Sortable.sortableTest, string>>)
@@ -88,7 +88,7 @@ module SorterEvalExecutor =
                 
                 // 1. Unpack run configuration
                 let totalSorterCount = rp.GetSorterCount().Value
-                let sortersPerSplit = 10 |> UMX.tag<sorterCount>
+                let sortersPerSplit = 1000 |> UMX.tag<sorterCount>
                 let splitFactor = %totalSorterCount / %sortersPerSplit
                 
                 log (sprintf "Initializing Sorter Generation over %d chunks..." splitFactor)
@@ -133,9 +133,6 @@ module SorterEvalExecutor =
                 // 3. Setup Accumulators for Bins and Evals
                 log "Running Split Sorter Generation, Array Map Evaluations, & Aggregation..."
                 
-                //let initialBins = sorterEvalBinsV1.createEmpty (%qpBins.Id |> UMX.tag) testId
-                //let mutable accumulatedBins = initialBins
-                
                 let allChunksEvals : sorterEval array[] = Array.zeroCreate splitFactor
 
                 for i in 0 .. (splitFactor - 1) do
@@ -157,21 +154,11 @@ module SorterEvalExecutor =
                     let sorterEvalsChunk = 
                         SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters tests sorterEvalType collectTests
 
-                    //// Bin chunks step-by-step
-                    //let chunkBins = 
-                    //    sorterEvalBinsV1.createFromEvals 
-                    //        (%qpBins.Id |> UMX.tag) 
-                    //        testId 
-                    //        sorterEvalsChunk
-
                     
                     // Accumulate the evaluations
                     allChunksEvals.[i] <- sorterEvalsChunk
-                   // accumulatedBins <- SorterEvalBinsV1.merge accumulatedBins chunkBins
                     System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
                     GC.Collect(2, GCCollectionMode.Forced, true, true)
-
-
 
 
                 // 4. Build Master SorterSetEval directly using the specified ID rule
@@ -187,14 +174,9 @@ module SorterEvalExecutor =
                         testId 
                         finalEvalsArray
 
-                //let sorterEvalBins = sorterEvalBins.V1 accumulatedBins
-
                 // 5. Persistence
                 log (sprintf "Saving Combined SorterSetEval %s" (string %qpEval.Id))
                 do! host.RunDb.saveAsync qpEval (finalSorterSetEval |> outputData.SorterSetEval) allowOverwrite
-
-                //log (sprintf "Saving Merged SorterEvalBins %s" (string %qpBins.Id))
-                //do! host.RunDb.saveAsync qpBins (sorterEvalBins |> outputData.SorterEvalBins) allowOverwrite
                 
                 log "Run Complete."
                 return rp.WithRunFinished (Some true)
@@ -245,68 +227,49 @@ module SorterEvalExecutor =
                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
         } |> Async.map (logResult progress log)
 
-    //let makeFullReport 
-    //        (host: IRunHost)
-    //        (rp: runParameters) 
-    //        (allowOverwrite: bool<allowOverwrite>) 
-    //        (cts: CancellationTokenSource) 
-    //        (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
-    //    asyncResult {
-    //        try
-    //            do! checkCancellation cts.Token
-    //            let runId = rp |> RunParameters.getIdString
-    //            OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
-    
-    //            let! qpBins = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
-    //                          |> Result.ofOption "Failed to create QueryParams for Bins."
-    //            let! outB = host.RunDb.loadAsync qpBins
-    //            let! bins = outB |> OutputData.asSorterEvalBins |> Async.singleton
-
-    //            let reportName = sprintf "FullReport" |> UMX.tag<textReportName>
-    //            let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
-    //                            |> Result.ofOption "Failed to create QueryParams for Report."
-    //            let leadCols = qpReport |> QueryParams.makeDataTableRecord
-    //            let details = bins |> SorterEvalBins.makeFullDataTableRecords
-    //            let dtrs = dataTableRecord.combineWithMany details leadCols
-    //            let report = DataTableReport.fromDataTableRecords dtrs
-
-    //            let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
-    //            return rp.WithRunFinished (Some true)
-    //        with e -> 
-    //           return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
-    //    }
 
 
-    let makeBinsReport 
+    let makeStageStatsReport 
             (host: IRunHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
             (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+
+        let log msg = OpsUtils.report progress 
+                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+
         asyncResult {
             try
                 do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
-                OpsUtils.report progress (sprintf "%s Starting Bins Report for Run %s" (MathUtils.getTimestampString()) %runId)
+                OpsUtils.report progress (sprintf "%s Starting Stage stats Report for Run %s" (MathUtils.getTimestampString()) %runId)
     
-                let! qpBins = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
-                                    |> Result.ofOption "Failed to create QueryParams for Bins."
-                let! outB = host.RunDb.loadAsync qpBins 
-                let! bins = outB |> OutputData.asSorterEvalBins |> Async.singleton
+                let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                                        |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
+                let! outB = host.RunDb.loadAsync qpSorterSetEval
+                let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
 
-                let reportName = sprintf "BinsReport" |> UMX.tag<textReportName>
+                let reportName = (sprintf "StageStatsReport" |> UMX.tag<textReportName>)
+
                 let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
-                                    |> Result.ofOption "Failed to create QueryParams for Report."
+                                |> Result.ofOption "Failed to create QueryParams for Report."
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
-                let details = bins |> SorterEvalBins.makeSummaryDataTableRecords
+                let details = sorterSetEvals.SorterEvals 
+                                |> Array.collect(SorterStageStats.fromSorterEval)
+                                |> Array.map (fun sss -> sss.toDataTableRecord())
                 let dtrs = dataTableRecord.combineWithMany details leadCols
                 let report = DataTableReport.fromDataTableRecords dtrs
 
                 let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
-                return rp.WithRunFinished (Some true)
+                let yab = (rp : runParameters).WithRunFinished(Some true)
+                return yab
             with e -> 
                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
-        }
+        } |> Async.map (logResult progress log)
+
+
+
 
     let uniformStandardExecutor =
         { new IRunParamsExecutor with
@@ -324,10 +287,10 @@ module SorterEvalExecutor =
                     makeMergeTests
                     host rp allowOverwrite cts progress }
 
-    let binsReportExecutor =
+    let stageStatsReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                makeBinsReport
+                makeStageStatsReport
                     host rp allowOverwrite cts progress }
 
     let fullReportExecutor =
@@ -341,4 +304,4 @@ module SorterEvalExecutor =
         | GenStandard -> uniformStandardExecutor
         | GenMerge -> uniformMergeExecutor
         | FullReport -> fullReportExecutor
-        | BinsReport -> binsReportExecutor
+        | StageStatsReport -> stageStatsReportExecutor
