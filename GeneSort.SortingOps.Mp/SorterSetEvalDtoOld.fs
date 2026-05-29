@@ -8,7 +8,7 @@ open GeneSort.SortingOps
 open GeneSort.SortingOps.Mp
 
 [<MessagePackObject>]
-type sorterModelSetEvalDto = {
+type sorterSetEvalDtoOld = {
     [<Key(0)>]
     SorterSetEvalId: Guid
     [<Key(1)>]
@@ -19,9 +19,9 @@ type sorterModelSetEvalDto = {
     SorterEvals: sorterEvalDtoOld array
 }
 
-module SorterSetEvalDto =
+module SorterSetEvalDtoOld =
 
-    let fromDomain (sorterSetEval: sorterSetEval) : sorterModelSetEvalDto =
+    let fromDomain (sorterSetEval: sorterSetEvalOld) : sorterSetEvalDtoOld =
         { 
             SorterSetEvalId = %sorterSetEval.SorterSetEvalId
             SorterSetId = %sorterSetEval.SorterSetId
@@ -29,14 +29,14 @@ module SorterSetEvalDto =
             SorterEvals = sorterSetEval.SorterEvals |> Array.map SorterEvalDtoOld.toSorterEvalDto
         }
 
-    let toDomain (dto: sorterModelSetEvalDto) : sorterSetEval =
+    let toDomain (dto: sorterSetEvalDtoOld) : sorterSetEvalOld =
         if dto.SorterSetEvalId = Guid.Empty then
             failwith "SorterSetEvalId must not be empty"
         if dto.SorterSetId = Guid.Empty then
             failwith "SorterSetId must not be empty"
         if dto.SorterTestsId = Guid.Empty then
             failwith "SorterTestsId must not be empty"
-        sorterSetEval.create
+        sorterSetEvalOld.create
             (UMX.tag<sorterSetEvalId> dto.SorterSetEvalId)
             (UMX.tag<sorterSetId> dto.SorterSetId)
             (UMX.tag<sortableTestId> dto.SorterTestsId)

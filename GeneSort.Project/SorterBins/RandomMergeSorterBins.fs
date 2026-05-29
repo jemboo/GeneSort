@@ -219,18 +219,22 @@ module RandomMergeSorterBins =
 
                 // 5. Evaluate
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
-                let eval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) fullSorterSet tests collectNewSortableTests
+                let eval = SorterSetEval.makeSorterSetEval 
+                                    (%qpEval.Id |> UMX.tag) 
+                                    fullSorterSet tests 
+                                    sorterEvalType.V1
+                                    collectNewSortableTests
 
                 // 6. Binning and Sampling
-                let qpBins = makeQueryParamsFromRunParams runParameters (outputDataType.SorterEvalBins "")
-                let bins = sorterEvalBins.create (%qpBins.Id |> UMX.tag) eval.SorterEvals
+                //let qpBins = makeQueryParamsFromRunParams runParameters (outputDataType.SorterEvalBins "")
+                //let bins = sorterEvalBins.create (%qpBins.Id |> UMX.tag) eval.SorterEvals
 
-                let qpEven = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "EvenSampled")
-                let evenSet = sortingSet.create (%qpEven.Id |> UMX.tag) (SortingSetFilter.sampleBinsEvenly samplesPerBin bins fullSortingSet)
+                //let qpEven = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "EvenSampled")
+                //let evenSet = sortingSet.create (%qpEven.Id |> UMX.tag) (SortingSetFilter.sampleBinsEvenly samplesPerBin bins fullSortingSet)
 
                 // 7. Save
-                let! (_: unit) = host.ProjectDb.saveAsync qpBins (bins |> outputData.SorterEvalBins) allowOverwrite
-                let! (_: unit) = host.ProjectDb.saveAsync qpEven (evenSet |> outputData.SortingSet) allowOverwrite
+               // let! (_: unit) = host.ProjectDb.saveAsync qpBins (bins |> outputData.SorterEvalBins) allowOverwrite
+               // let! (_: unit) = host.ProjectDb.saveAsync qpEven (evenSet |> outputData.SortingSet) allowOverwrite
 
                 return runParameters.WithRunFinished (Some true)
 

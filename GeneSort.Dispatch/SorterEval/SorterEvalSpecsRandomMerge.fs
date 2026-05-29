@@ -7,21 +7,26 @@ open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SortableTest
+open GeneSort.SortingOps
 
 module SorterEvalSpecsRandomMerge =
 
     let rngType = 
             (runParameters.rngTypeKey, 
             [CommonSorterEval.projectRngType;] |> List.map RngType.toString)
+
+    let sorterEvalType = 
+            (runParameters.sorterEvalTypeKey, 
+            [ sorterEvalType.V2 ;] |> List.map SorterEvalType.toString)
     
     // SortingWidths
-    let smallSortingWidths = SortableTetsMergeSpecs.smallSortingWidths
-    let mediumSortingWidths = SortableTetsMergeSpecs.mediumSortingWidths
+    let smallSortingWidths = SortableTestMergeSpecs.smallSortingWidths
+    let mediumSortingWidths = SortableTestMergeSpecs.mediumSortingWidths
     
     // MergeDimensions
-    let allMergeDimensions = SortableTetsMergeSpecs.allMergeDimensions
-    let lowMergeDimensions = SortableTetsMergeSpecs.lowMergeDimensions
-    let highMergeDimensions = SortableTetsMergeSpecs.highMergeDimensions
+    let allMergeDimensions = SortableTestMergeSpecs.allMergeDimensions
+    let lowMergeDimensions = SortableTestMergeSpecs.lowMergeDimensions
+    let highMergeDimensions = SortableTestMergeSpecs.highMergeDimensions
 
     // DataFormats
     let onlyDataFormat = 
@@ -29,8 +34,8 @@ module SorterEvalSpecsRandomMerge =
             [CommonSorterEval.mergeSortableDataFormat] |> List.map SortableDataFormat.toString)
     
     // MergeSuffixTypes
-    let bothMergeSuffixTypes = SortableTetsMergeSpecs.bothMergeSuffixTypes
-    let vv1SuffixType = SortableTetsMergeSpecs.vv1SuffixType
+    let bothMergeSuffixTypes = SortableTestMergeSpecs.bothMergeSuffixTypes
+    let vv1SuffixType = SortableTestMergeSpecs.vv1SuffixType
 
     // SimpleSorterModelTypes
     let allSimpleSorterModelTypes = SorterEvalSpecsRandom.allSimpleSorterModelTypes
@@ -95,6 +100,7 @@ module SorterEvalSpecsRandomMerge =
             RunDescription = "Merge binning for Msuf4"
             Spans = [   
                 rngType
+                sorterEvalType
                 (runParameters.sortingWidthKey, [64] |> List.map string)
                 allSimpleSorterModelTypes
                 (runParameters.mergeDimensionKey, [2;] |> List.map string)
@@ -114,6 +120,7 @@ module SorterEvalSpecsRandomMerge =
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [   
                 rngType
+                sorterEvalType
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 lowMergeDimensions
@@ -134,6 +141,7 @@ module SorterEvalSpecsRandomMerge =
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
+                sorterEvalType
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 allMergeDimensions
@@ -154,6 +162,7 @@ module SorterEvalSpecsRandomMerge =
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
+                sorterEvalType
                 mediumSortingWidths
                 allSimpleSorterModelTypes
                 lowMergeDimensions
@@ -174,6 +183,7 @@ module SorterEvalSpecsRandomMerge =
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
+                sorterEvalType
                 mediumSortingWidths
                 allSimpleSorterModelTypes
                 highMergeDimensions

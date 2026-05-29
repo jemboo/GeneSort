@@ -166,14 +166,20 @@ module MergeIntEvals =
                 let sorterSet = SortingSet.makeSorterSet sortingSet
                 let! (_: unit) = checkCancellation cts.Token
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
-                let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) sorterSet sortableTest false
+                let collectNewSortableTests = false
+                let sorterSetEval = SorterSetEval.makeSorterSetEval 
+                                                (%qpEval.Id |> UMX.tag) 
+                                                sorterSet 
+                                                sortableTest 
+                                                sorterEvalType.V1
+                                                collectNewSortableTests
 
                 // 6. Save
-                let! (_: unit) = host.ProjectDb.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
+                //let! (_: unit) = host.ProjectDb.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
-                let qpPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Pass")
-                let passSet = SortingEval.makePassingSortingSet (%qpPass.Id |> UMX.tag) sortingSet sorterSetEval
-                let! (_: unit) = host.ProjectDb.saveAsync qpPass (passSet |> outputData.SortingSet) allowOverwrite
+                //let qpPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Pass")
+                //let passSet = SortingEval.makePassingSortingSet (%qpPass.Id |> UMX.tag) sortingSet sorterSetEval
+                //let! (_: unit) = host.ProjectDb.saveAsync qpPass (passSet |> outputData.SortingSet) allowOverwrite
                 // 7. Success
                 let duration = DateTime.Now - startTime
                 return (runParameters.WithRunFinished (Some true)).WithElapsedTime (Some (duration.TotalSeconds.ToString()))

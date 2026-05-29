@@ -13,7 +13,7 @@ type SorterDto = {
     [<Key(1)>]
     Width: int
     [<Key(2)>]
-    Ces: CeDto array
+    Ces: ceDto array
 }
 
 module SorterDto =

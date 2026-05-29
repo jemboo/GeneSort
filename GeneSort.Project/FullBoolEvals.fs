@@ -142,15 +142,20 @@ module FullBoolEvals =
 
                 let sorterSet = sortingSet |> SortingSet.makeSorterSet
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
-                let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) sorterSet sortableTests false
+                let collectNewSortableTests = false
+                let sorterSetEval = SorterSetEval.makeSorterSetEval 
+                                                (%qpEval.Id |> UMX.tag) 
+                                                sorterSet sortableTests 
+                                                sorterEvalType.V1 
+                                                collectNewSortableTests
 
-                // 5. Save Eval Results
-                let! (_: unit) = host.ProjectDb.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
+                //// 5. Save Eval Results
+                //let! (_: unit) = host.ProjectDb.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
-                // 6. Make passing sorterSet
-                let qpPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Pass")
-                let passingSet = SortingEval.makePassingSortingSet (%qpPass.Id |> UMX.tag) sortingSet sorterSetEval
-                let! (_: unit) = host.ProjectDb.saveAsync qpPass (passingSet |> outputData.SortingSet) allowOverwrite
+                //// 6. Make passing sorterSet
+                //let qpPass = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Pass")
+                //let passingSet = SortingEval.makePassingSortingSet (%qpPass.Id |> UMX.tag) sortingSet sorterSetEval
+                //let! (_: unit) = host.ProjectDb.saveAsync qpPass (passingSet |> outputData.SortingSet) allowOverwrite
 
                 // 7. Success
                 return runParameters.WithRunFinished (Some true)

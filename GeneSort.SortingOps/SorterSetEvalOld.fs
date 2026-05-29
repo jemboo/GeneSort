@@ -5,42 +5,48 @@ open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
 
-
-type sorterSetEval =
+// This type represents the evaluation of a set of sorters (sorterSet) against a 
+// specific set of sortable tests (sortableTest).
+type sorterSetEvalOld =
 
     private { 
         sorterSetEvalId: Guid<sorterSetEvalId>
         sorterSetId: Guid<sorterSetId>
         sorterTestId: Guid<sortableTestId>
-        sorterEvals: Map<Guid<sorterId>, sorterEval>
+        sorterEvals: Map<Guid<sorterId>, sorterEvalOld>
     }
 
     static member create 
                 (sorterSetEvalId: Guid<sorterSetEvalId>) 
                 (sorterSetId: Guid<sorterSetId>) 
                 (sorterTestsId: Guid<sortableTestId>) 
-                (sorterEvals: sorterEval[]) =
+                (sorterEvals: sorterEvalOld[]) =
         { 
             sorterSetEvalId = sorterSetEvalId
             sorterSetId = sorterSetId
             sorterTestId = sorterTestsId
-            sorterEvals = sorterEvals |> Array.map (fun se -> (se |> SorterEval.getSorterId, se)) |> Map.ofArray
+            sorterEvals = sorterEvals |> Array.map (fun se -> (se.SorterId, se)) |> Map.ofArray
         }
 
     member this.SorterSetEvalId with get() : Guid<sorterSetEvalId> = this.sorterSetEvalId
     member this.SorterSetId with get() : Guid<sorterSetId> = this.sorterSetId
     member this.SorterTestId with get() : Guid<sortableTestId> = this.sorterTestId
-    member this.SorterEvals with get() : sorterEval[] = this.sorterEvals.Values |> Seq.toArray
+    member this.SorterEvals with get() : sorterEvalOld[] = this.sorterEvals.Values |> Seq.toArray
 
  
 
-module SorterSetEval =
+module SorterSetEvalOld =
 
-    let makeSorterEvals
+    let getCeLength (sorterSetEval: sorterSetEvalOld) : int<ceLength> =
+        match sorterSetEval.SorterEvals |> Array.tryHead with
+        | Some firstEval -> firstEval.CeBlockEval.CeBlock.CeLength
+        | None -> failwith "SorterSetEval contains no SorterEvals"
+
+
+    let makeSorterEvals 
                 (sorters: sorter array) 
                 (sortableTest: sortableTest) 
-                (sorterEvalType:sorterEvalType) 
-                (collectNewSortableTests: bool) :sorterEval array =
+                (collectNewSortableTests: bool) :sorterEvalOld array =
         let ceBlocks = 
                 sorters 
                 |> Array.map (fun sorter ->
@@ -57,8 +63,7 @@ module SorterSetEval =
         Array.zip sorters ceBlockEvals
         |> Array.map (
                 fun (sorter, ceBlockEval ) -> 
-                        SorterEval.create 
-                            sorterEvalType
+                        sorterEvalOld.create 
                             sorter.SorterId
                             ceBlockEval
                 )
@@ -68,26 +73,11 @@ module SorterSetEval =
             (sorterSetEvalId: Guid<sorterSetEvalId>)
             (sorterSet: sorterSet)
             (sortableTest: sortableTest) 
-            (sorterEvalType:sorterEvalType) 
-            (collectNewSortableTests: bool) : sorterSetEval =
+            (collectNewSortableTests: bool) : sorterSetEvalOld =
 
-        let sorterEvals = makeSorterEvals 
-                            sorterSet.Sorters 
-                            sortableTest 
-                            sorterEvalType 
-                            collectNewSortableTests
-
-        sorterSetEval.create 
+        let sorterEvals = makeSorterEvals sorterSet.Sorters sortableTest collectNewSortableTests
+        sorterSetEvalOld.create 
                     sorterSetEvalId 
                     sorterSet.Id 
                     (sortableTest |> SortableTests.getId ) 
                     sorterEvals
-
-
-
-
-    let makeFullDataTableRecords (source: sorterSetEval) : GeneSort.Core.dataTableRecord seq =
-        let sorterSetId = source.SorterSetId
-        let sortableTestId = source.SorterTestId
-        source.SorterEvals
-        |> Seq.map (fun se -> SorterEval.toDataTableRecord se)

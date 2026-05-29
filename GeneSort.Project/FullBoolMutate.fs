@@ -162,7 +162,11 @@ module FullBoolMutate =
                 let sortableTests = SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) sortableTestModel sdt
 
                 let qpEvalParents = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "Parents")
-                let evalParents = SorterSetEval.makeSorterSetEval (%qpEvalParents.Id |> UMX.tag) sorterSetParent sortableTests collectNewSortableTests
+                let evalParents = SorterSetEval.makeSorterSetEval
+                                                (%qpEvalParents.Id |> UMX.tag) 
+                                                sorterSetParent sortableTests 
+                                                sorterEvalType.V1
+                                                collectNewSortableTests
 
                 // 4. Mutation & Mutant Eval
                 let (segments, mutantSortings, mutantSorters) = performMutation sortingSetParent smt mr host.ChildSortersPerParent
@@ -170,28 +174,33 @@ module FullBoolMutate =
                 let sortingSetMutant = sortingSet.create (Guid.NewGuid() |> UMX.tag) mutantSortings // Internal ID
                 
                 let qpEvalMutants = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "Mutants")
-                let evalMutants = SorterSetEval.makeSorterSetEval (%qpEvalMutants.Id |> UMX.tag) sorterSetMutants sortableTests collectNewSortableTests
+                let evalMutants = 
+                            SorterSetEval.makeSorterSetEval 
+                                (%qpEvalMutants.Id |> UMX.tag) 
+                                sorterSetMutants sortableTests 
+                                sorterEvalType.V1
+                                collectNewSortableTests
 
                 // 5. Mapping & Binning
                 let segmentEvals = mutationSegmentSetEvals.create segments
-                segmentEvals.UpdateAllSortingEvalsParent evalParents.SorterEvals
-                segmentEvals.UpdateAllSortingEvalsMutant evalMutants.SorterEvals
+                //segmentEvals.UpdateAllSortingEvalsParent evalParents.SorterEvals
+                //segmentEvals.UpdateAllSortingEvalsMutant evalMutants.SorterEvals
 
-                let qpBinsSet = makeQueryParamsFromRunParams runParameters (outputDataType.MutationSegmentEvalBinsSet "")
-                let binsSet = MutationSegmentEvalBinsSet.makeFromSortings (%qpBinsSet.Id |> UMX.tag) sortingSetParent.Sortings
-                binsSet.AddAllParentSorterEvals (segmentEvals.GetAllParentSorterEvals() |> Seq.toArray)
-                binsSet.AddAllMutantSorterEvals (segmentEvals.GetAllMutantSorterEvals() |> Seq.toArray)
+                //let qpBinsSet = makeQueryParamsFromRunParams runParameters (outputDataType.MutationSegmentEvalBinsSet "")
+                //let binsSet = MutationSegmentEvalBinsSet.makeFromSortings (%qpBinsSet.Id |> UMX.tag) sortingSetParent.Sortings
+                //binsSet.AddAllParentSorterEvals (segmentEvals.GetAllParentSorterEvals() |> Seq.toArray)
+                //binsSet.AddAllMutantSorterEvals (segmentEvals.GetAllMutantSorterEvals() |> Seq.toArray)
 
-                // 6. Persistence
-                let qpMutantSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Mutants")
-                let results = [
-                    qpTests, (sortableTests |> outputData.SortableTest)
-                    qpEvalParents, (evalParents |> outputData.SorterSetEval)
-                    qpEvalMutants, (evalMutants |> outputData.SorterSetEval)
-                    qpMutantSet, (sortingSetMutant |> outputData.SortingSet)
-                    qpBinsSet, (binsSet |> outputData.MutationSegmentEvalBinsSet)
-                ]
-                let! (_: unit) = saveResults host.ProjectDb allowOverwrite results
+                //// 6. Persistence
+                //let qpMutantSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Mutants")
+                //let results = [
+                //    qpTests, (sortableTests |> outputData.SortableTest)
+                //    qpEvalParents, (evalParents |> outputData.SorterSetEval)
+                //    qpEvalMutants, (evalMutants |> outputData.SorterSetEval)
+                //    qpMutantSet, (sortingSetMutant |> outputData.SortingSet)
+                //    qpBinsSet, (binsSet |> outputData.MutationSegmentEvalBinsSet)
+                //]
+                //let! (_: unit) = saveResults host.ProjectDb allowOverwrite results
 
                 return runParameters.WithRunFinished (Some true)
 

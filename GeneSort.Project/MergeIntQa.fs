@@ -153,13 +153,13 @@ module MergeIntQa =
 
                 // 5. Computation
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
-                let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) sorterSet sortableTest false
+                let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) sorterSet sortableTest sorterEvalType.V1 false
                 
                 report progress (sprintf "%s Saving test results %s" (MathUtils.getTimestampString()) runId)
                 let! (_: unit) = checkCancellation cts.Token
 
                 // 6. Save
-                let! (_: unit) = host.ProjectDb.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
+               // let! (_: unit) = host.ProjectDb.saveAsync qpEval (sorterSetEval |> outputData.SorterSetEval) allowOverwrite
 
                 return runParameters.WithRunFinished (Some true)
 

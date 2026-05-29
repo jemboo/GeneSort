@@ -92,6 +92,7 @@ type sorterEvalV2 =
     member this.SorterId with get() : Guid<sorterId>  = this.sorterId
     member this.StageLength with get() : int<stageLength> = this.stageLength
     member this.CeLength with get() : int<ceLength> = this.ceDataSequence.Length |> UMX.tag<ceLength>
+    member this.CeDataSequence with get() : ceData array = this.ceDataSequence
     member this.UnsortedCount with get() : int<sortableCount>  = this.unsortedCount
     member this.SequenceHash with get() : int<sequenceHash>  = this.sequenceHash
     member this.LastCeIndex with get() : int<ceIndex>  = 
@@ -137,6 +138,7 @@ type sorterEvalV3 =
     member this.SorterId with get() : Guid<sorterId>  = this.sorterId
     member this.StageLength with get() : int<stageLength> = this.stageLength
     member this.CeLength with get() : int<ceLength> = this.ceDataSequence.Length |> UMX.tag<ceLength>
+    member this.CeDataSequence with get() : ceData array = this.ceDataSequence
     member this.SequenceHash with get() : int<sequenceHash>  = this.sequenceHash
     member this.SortableTest with get() : sortableTest = this.sortableTest
     member this.UnsortedCount with get() : int<sortableCount>  = 
@@ -156,6 +158,24 @@ type sorterEvalV3 =
             |> GeneSort.Core.dataTableRecord.addData "LastCeIndex" (string %this.LastCeIndex)
 
 
+type sorterEvalType = 
+    | V1
+    | V2
+    | V3
+
+module SorterEvalType =
+    let toString (sorterEvalType: sorterEvalType) : string =
+        match sorterEvalType with
+        | V1 -> "V1"
+        | V2 -> "V2"
+        | V3 -> "V3"
+
+    let fromString (str: string) : sorterEvalType =
+        match str with
+        | "V1" -> V1
+        | "V2" -> V2
+        | "V3" -> V3
+        | s -> failwithf "Invalid sorterEvalType string: %s" s
 
 type sorterEval = 
     | V1 of sorterEvalV1
@@ -276,3 +296,15 @@ module SorterEval =
                 ceDataSeq 
                 test
             |> V3
+
+
+    let create 
+            (sorterEvalType:sorterEvalType) 
+            (sorterId: Guid<sorterId>) 
+            (ceBlockEval: ceBlockEval) : sorterEval =
+
+        match sorterEvalType with
+        | sorterEvalType.V1 -> createV1 sorterId ceBlockEval
+        | sorterEvalType.V2 -> createV2 sorterId ceBlockEval
+        | sorterEvalType.V3 -> createV3 sorterId ceBlockEval
+      

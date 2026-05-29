@@ -5,6 +5,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingOps
 
 
 type runParameters =
@@ -38,6 +39,7 @@ type runParameters =
     static member startingReplKey = "StartingRepl"
     static member replSpanKey = "ReplSpan"
     static member runFinishedKey = "RunFinished"
+    static member sorterEvalTypeKey = "SorterEvalType"
     static member sorterCountKey = "SorterCount"
     static member sorterParentCountKey = "SorterParentCount"
     static member sorterChildCountKey = "SorterChildCount"
@@ -100,6 +102,7 @@ type runParameters =
     member this.GetStageLength() = runParameters.tryGetInt runParameters.stageLengthKey this.paramMap |> Option.map UMX.tag<stageLength>
     member this.GetSortableCount() = runParameters.tryGetInt runParameters.sortableCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     member this.GetSorterCount() = runParameters.tryGetInt runParameters.sorterCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
+    member this.GetSorterEvalType() = this.paramMap.TryFind runParameters.sorterEvalTypeKey |> Option.map SorterEvalType.fromString
     member this.GetSorterParentCount() = runParameters.tryGetInt runParameters.sorterParentCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     member this.GetSorterChildCount() = runParameters.tryGetInt runParameters.sorterChildCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
 
@@ -195,6 +198,9 @@ type runParameters =
 
     member this.WithSorterCount(sc: int<sorterCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountKey (sc |> Option.map UmxExt.intToRaw) }
+
+    member this.WithSorterEvalType(set: sorterEvalType option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalTypeKey (set |> Option.map SorterEvalType.toString) }
 
     member this.WithSorterParentCount(spc: int<sorterCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterParentCountKey (spc |> Option.map UmxExt.intToRaw) }

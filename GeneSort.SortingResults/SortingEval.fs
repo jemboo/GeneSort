@@ -58,7 +58,7 @@ module SortingEval =
     let makePassingSortingSet
             (id: Guid<sortingSetId>)
             (sms: sortingSet)
-            (sorterSetEval: sorterSetEval) : sortingSet =
+            (sorterSetEval: sorterSetEvalOld) : sortingSet =
         
         // 1. Identify the IDs of the sorters that passed (UnsortedCount = 0)
         let passingIds = 

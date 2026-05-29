@@ -75,10 +75,10 @@ let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
-//let configType = SortableTetsMergeSpecs.configType.Merge_Test
+//let configType = SortableTestMergeSpecs.configType.Merge_Test
 //let executorType = SortableTest.executorType.Generator
 //let host: IRunHost = 
-//    let spec = SortableTetsMergeSpecs.getConfig configType executorType
+//    let spec = SortableTestMergeSpecs.getConfig configType executorType
 //    SortableTest.SortableTestRunHost.createRunHost spec
 
 //let executor = SortableTest.SortableTestExecutor.getExecutor executorType

@@ -7,7 +7,7 @@ open GeneSort.Dispatch.V1
 open CommonSortableTest
 
 
-module SortableTetsMergeSpecs =
+module SortableTestMergeSpecs =
     
     // SortingWidths
     let smallSortingWidths = 

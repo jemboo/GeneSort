@@ -15,7 +15,7 @@ type ceBlockDto = {
     [<Key(1)>]
     SortingWidth: int
     [<Key(2)>]
-    Ces: CeDto array
+    Ces: ceDto array
 
 }
 

@@ -5,6 +5,7 @@ open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
+open GeneSort.SortingOps
 
 
 module SorterEvalSpecsRandom =
@@ -13,6 +14,10 @@ module SorterEvalSpecsRandom =
     let rngType = 
             (runParameters.rngTypeKey, 
             [CommonSorterEval.projectRngType;] |> List.map RngType.toString)
+
+    let sorterEvalType = 
+            (runParameters.sorterEvalTypeKey, 
+            [ sorterEvalType.V2 ;] |> List.map SorterEvalType.toString)
     
     // SortingWidths
     let smallSortingWidths = 
@@ -64,6 +69,7 @@ module SorterEvalSpecsRandom =
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
+                sorterEvalType
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 testSorterCount
@@ -80,6 +86,7 @@ module SorterEvalSpecsRandom =
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
+                sorterEvalType
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 largeSorterCount
@@ -96,6 +103,7 @@ module SorterEvalSpecsRandom =
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
+                sorterEvalType
                 mediumSortingWidths
                 allSimpleSorterModelTypes
                 largeSorterCount

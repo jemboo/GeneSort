@@ -15,6 +15,7 @@ open GeneSort.Sorting.Mp.Sortable
 open GeneSort.Sorting.Sortable
 open System.Text
 open GeneSort.SortingOps.Mp
+open GeneSort.SortingOps
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
@@ -132,11 +133,10 @@ module OutputDataFile =
                         //    return outputData.SortableTestModelSetGen domain
                         //}
                     | outputDataType.SorterSetEval _ ->
-                        failwith "Not implemented: SorterSet deserialization"
-                        //async {
-                        //    let! domain = deserializeDto<sorterModelSetEvalDto, sorterSetEval> stream token SorterSetEvalDto.toDomain
-                        //    return outputData.SorterSetEval domain
-                        //}
+                        async {
+                            let! domain = deserializeDto<sorterSetEvalDto, sorterSetEval> stream token SorterSetEvalDto.toDomain
+                            return outputData.SorterSetEval domain
+                        }
                     | outputDataType.SorterEvalBins _ ->
                         async {
                             let! domain = deserializeDto<sorterEvalBinsDto, sorterEvalBins> stream token SorterEvalBinsDto.fromDto
