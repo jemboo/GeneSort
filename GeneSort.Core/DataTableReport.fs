@@ -22,6 +22,14 @@ type dataTableReport =
     member this.DataHeaders with get() = this.dataHeaders
     member this.DataRows with get() = this.dataRows
 
+    static member Empty(name:string) : dataTableReport =
+        { name = name
+          timeStamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")
+          sourceRows = ResizeArray<string>()
+          errorRows = ResizeArray<string>()
+          dataHeaders = [||]
+          dataRows = ResizeArray<string>() }
+
     /// Helper to sanitize row data to prevent column shifting
     static member private Sanitize (row: string[]) : string [] =
         row |> Array.map (fun s -> if s = null then "" else s.Replace("\t", " "))
@@ -180,10 +188,13 @@ module DataTableReport =
 
 
     let fromDataTableRecords (records: dataTableRecord seq) : dataTableReport =
-        let (headers, rows) = dataTableRecord.createTable records
-        let report = create "DataTableReport" headers
-        report.AppendDataRows rows
-        report
+        if (records |> Seq.isEmpty) then 
+            dataTableReport.Empty("no records")
+        else
+            let (headers, rows) = dataTableRecord.createTable records
+            let report = create "DataTableReport" headers
+            report.AppendDataRows rows
+            report
 
 
     let saveToPath (filePath: string) (rows: string [][]) =

@@ -200,6 +200,8 @@ type sorterEval =
     | V2 of sorterEvalV2
     | V3 of sorterEvalV3
 
+
+
 module SorterEval =
 
     let getSorterId (eval: sorterEval) : Guid<sorterId> =
@@ -231,6 +233,12 @@ module SorterEval =
         | V1 v1 -> v1.UnsortedCount
         | V2 v2 -> v2.UnsortedCount
         | V3 v3 -> v3.UnsortedCount
+
+    let getIsSorted (eval: sorterEval) : bool =
+        match eval with
+        | V1 v1 -> v1.UnsortedCount = 0<sortableCount>
+        | V2 v2 -> v2.UnsortedCount = 0<sortableCount>
+        | V3 v3 -> v3.UnsortedCount = 0<sortableCount>
 
     let getSequenceHash (eval: sorterEval) : int<sequenceHash> =
         match eval with
@@ -339,4 +347,20 @@ module SorterEval =
         | sorterEvalType.V1 -> createV1 sorterId ceBlockEval
         | sorterEvalType.V2 -> createV2 sorterId ceBlockEval
         | sorterEvalType.V3 -> createV3 sorterId ceBlockEval
+
+
+
+    // SorterEval quantification functions
+
+    // lower ceCounts and stageLengths have a lower value, and thus sort first ascending.
+    let byTwoWeighted (ceCountWeight: float) (stageLengthWeight: float) (eval: sorterEval) = 
+        let ceCount = float (getCeLength eval)
+        let stageLength = float (getStageLength eval)
+        (ceCount * ceCountWeight) + (stageLength * stageLengthWeight)
+
+    let byEqualTwoWeighted (eval: sorterEval) = 
+        byTwoWeighted 1.0 1.0 eval
+
+
+
       

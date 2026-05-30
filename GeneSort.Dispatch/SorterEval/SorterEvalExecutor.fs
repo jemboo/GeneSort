@@ -255,10 +255,21 @@ module SorterEvalExecutor =
                 let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
                                 |> Result.ofOption "Failed to create QueryParams for Report."
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
-                let details = sorterSetEvals.SorterEvals 
-                                |> Array.collect(SorterStageStats.fromSorterEval)
-                                |> Array.map (fun sss -> sss.toDataTableRecord())
-                let dtrs = dataTableRecord.combineWithMany details leadCols
+
+                let dtrs = sorterSetEvals.SorterEvals
+                            |> Array.filter(fun se -> se |> SorterEval.getIsSorted)
+                            |> RankedGroup.splitIntoRankedGroups SorterEval.byEqualTwoWeighted 300
+                            |> Array.map (
+                                fun group -> 
+                                    let dtr = (fst group) |> dataTableRecord.combine leadCols
+                                    let stageStats = (group |> snd)
+                                                     |> Array.collect (SorterStageStats.fromSorterEval) 
+                                                     |> Array.map (fun sss -> sss.toDataTableRecord()) 
+                                    (dataTableRecord.combineWithMany stageStats dtr)
+                                            |> Seq.toArray
+                                )
+                            |> Array.concat
+
                 let report = DataTableReport.fromDataTableRecords dtrs
 
                 let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite

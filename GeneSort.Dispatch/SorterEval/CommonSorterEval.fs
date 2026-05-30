@@ -22,7 +22,7 @@ module SorterEvalExecutorType =
         | GenStandard -> "GenStandard"
         | GenMerge -> "GenMerge"
         | FullReport -> "FullReport"
-        | StageStatsReport -> "BinsReport"
+        | StageStatsReport -> "StageStatsReport"
 
 
 module CommonSorterEval =

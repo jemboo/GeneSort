@@ -210,3 +210,5 @@ module CollectionUtils =
             let minIndex = xs |> List.indexed |> List.minBy snd |> fst
             let beforeMin, afterMin = xs |> List.splitAt minIndex
             afterMin @ beforeMin
+
+
