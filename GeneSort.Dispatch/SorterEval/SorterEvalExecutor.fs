@@ -282,6 +282,57 @@ module SorterEvalExecutor =
 
 
 
+    let makeCeBinSummaryStats
+            (host: IRunHost)
+            (rp: runParameters) 
+            (allowOverwrite: bool<allowOverwrite>) 
+            (cts: CancellationTokenSource) 
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+
+        let log msg = OpsUtils.report progress 
+                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+
+        asyncResult {
+            try
+                do! checkCancellation cts.Token
+                let runId = rp |> RunParameters.getIdString
+                OpsUtils.report progress (sprintf "%s Starting Ce bins Report for Run %s" (MathUtils.getTimestampString()) %runId)
+    
+                let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                                        |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
+                let! outB = host.RunDb.loadAsync qpSorterSetEval
+                let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
+
+                let reportName = (sprintf "CeBinsReport" |> UMX.tag<textReportName>)
+
+                let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                                |> Result.ofOption "Failed to create QueryParams for Report."
+                let leadCols = qpReport |> QueryParams.makeDataTableRecord
+
+                let evalBins = 
+                        sorterSetEvals.SorterEvals
+                        |> Array.filter(fun se -> se |> SorterEval.getIsSorted)
+                        |> SorterEvalBinning.makeBins
+
+                let dtrs = evalBins
+                            |> Array.map (
+                                fun bin -> 
+                                    bin |> BinSummaryStats.toDataTableRecord |> dataTableRecord.combine leadCols)
+                                
+                let report = DataTableReport.fromDataTableRecords dtrs
+
+                let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
+                let yab = (rp : runParameters).WithRunFinished(Some true)
+                return yab
+            with e -> 
+               return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
+        } |> Async.map (logResult progress log)
+
+
+
+
+
+
     let uniformStandardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
@@ -304,11 +355,18 @@ module SorterEvalExecutor =
                 makeStageStatsReport
                     host rp allowOverwrite cts progress }
 
+    let ceBinsReportExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                makeCeBinSummaryStats
+                    host rp allowOverwrite cts progress }
+
     let fullReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 makeFullReport
                     host rp allowOverwrite cts progress }
+
 
     let getExecutor (executorType: sorterEvalExecutorType) : IRunParamsExecutor =
         match executorType with
@@ -316,3 +374,4 @@ module SorterEvalExecutor =
         | GenMerge -> uniformMergeExecutor
         | FullReport -> fullReportExecutor
         | StageStatsReport -> stageStatsReportExecutor
+        | CeBinsReport -> ceBinsReportExecutor

@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="SorterEvalBinning.fs" />
     <Compile Include="SorterStageStats.fs" />
     <Compile Include="Common.fs" />
     <Compile Include="Bins\SorterEvalKey.fs" />

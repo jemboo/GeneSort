@@ -15,6 +15,7 @@ type sorterEvalExecutorType =
     | GenMerge
     | FullReport
     | StageStatsReport
+    | CeBinReport
 
 
 module SorterEvalExecutorType =
@@ -23,6 +24,7 @@ module SorterEvalExecutorType =
         | GenMerge -> "GenMerge"
         | FullReport -> "FullReport"
         | StageStatsReport -> "StageStatsReport"
+        | CeBinReport -> "CeBinReport"
 
 
 module CommonSorterEval =
