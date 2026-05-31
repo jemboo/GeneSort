@@ -9,81 +9,115 @@ open GeneSort.Project.V1
 open GeneSort.Db.V1
 open GeneSort.FileDb.V1
 open CommonSorterMutate
+open GeneSort.SortingOps
+open GeneSort.Eval.V1.Bins
+open GeneSort.Dispatch.V1.SorterEval
+open GeneSort.Dispatch.V1.SortableTest
 
 module SorterMutateDbs =
+    
+    module RandomStandard =
+
+        module Uniform =
+
+            let dbName = "RandomStandardUniform" |> UMX.tag<databaseName>
+            let dbFolder = 
+                    $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
 
-    let makeStandardQueryParams
-                    (rng: rngType)
-                    (repl: int<replNumber>) 
-                    (sw: int<sortingWidth>) 
-                    (smt: simpleSorterModelType) 
-                    (odt: outputDataType) : queryParams =
-        queryParams.create queryName (Some repl) odt
-            [| 
-               (runParameters.rngTypeKey, rng |> RngType.toString)
-               (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
-               (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
-            |]
+            let makeQueryParams
+                            (rng: rngType)
+                            (repl: int<replNumber>) 
+                            (sw: int<sortingWidth>) 
+                            (smt: simpleSorterModelType) 
+                            (set: sorterEvalType)
+                            (odt: outputDataType) : queryParams =
+                queryParams.create dbName (Some repl) odt
+                    [| 
+                       (runParameters.rngTypeKey, rng |> RngType.toString)
+                       (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
+                       (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
+                       (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString)
+                    |]
 
 
-    let makeStandardQueryParamsFromRunParams 
-                            (rp: runParameters) 
-                            (odt: outputDataType) : queryParams option =
-        maybe {
-            let! repl = rp.GetRepl()
-            let! sw = rp.GetSortingWidth()
-            let! smt = rp.GetSimpleSorterModelType()
-            let! rng = rp.GetRngType()
-            return makeStandardQueryParams rng repl sw smt odt
-        }
+            let queryParamsFromRunParams 
+                                    (rp: runParameters) 
+                                    (odt: outputDataType) : queryParams option =
+                maybe {
+                    let! repl = rp.GetRepl()
+                    let! sw = rp.GetSortingWidth()
+                    let! smt = rp.GetSimpleSorterModelType()
+                    let! rng = rp.GetRngType()
+                    let! set = rp.GetSorterEvalType()
+                    return makeQueryParams rng repl sw smt set odt 
+                }
+        
 
 
-    let makeQueryParamsForMerge
-                (rng: rngType)
-                (repl: int<replNumber>) 
-                (sortingWidth: int<sortingWidth>)
-                (simpleSorterModelType: simpleSorterModelType)
-                (mergeDimension: int<mergeDimension>) 
-                (mergeSuffixType: mergeSuffixType)
-                (sortableDataFormat: sortableDataFormat) 
-                (outputDataType: outputDataType) : queryParams =
-
-        queryParams.create 
-            queryName
-            (Some repl)
-            outputDataType
-            [| 
-               (runParameters.rngTypeKey, rng |> RngType.toString)
-               (runParameters.sortingWidthKey, string %sortingWidth); 
-               (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
-               (runParameters.mergeDimensionKey, string %mergeDimension);
-               (runParameters.mergeSuffixTypeKey, mergeSuffixType |> MergeSuffixType.toString);
-               (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
-            |]
+            let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
 
 
-    let makeMergeQueryParamsFromRunParams (rp: runParameters) (odt: outputDataType) : queryParams option =
-        maybe {
-            let! rng = rp.GetRngType()
-            let! repl = rp.GetRepl()
-            let! sw = rp.GetSortingWidth()
-            let! md = rp.GetMergeDimension()
-            let! mst = rp.GetMergeSuffixType()
-            let! smt = rp.GetSimpleSorterModelType()
-            let! sdf = rp.GetSortableDataFormat()
-            return makeQueryParamsForMerge rng repl sw smt md mst sdf odt
-        }
 
 
-    let randomStandardDb = new GeneSortDbMp(randomStandardDatabaseFolder, makeStandardQueryParamsFromRunParams)
 
-    let randomMergeDb = new GeneSortDbMp(randomMergeDatabaseFolder, makeMergeQueryParamsFromRunParams)
+    module RandomMerge =
+    
+        module Uniform =
+            
+            let dbName = "RandomMergeUniform" |> UMX.tag<databaseName>
+            let dbFolder = 
+                    $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
+
+            let makeQueryParams
+                        (rng: rngType)
+                        (repl: int<replNumber>) 
+                        (sortingWidth: int<sortingWidth>)
+                        (simpleSorterModelType: simpleSorterModelType)
+                        (mergeDimension: int<mergeDimension>) 
+                        (mergeSuffixType: mergeSuffixType)
+                        (sortableDataFormat: sortableDataFormat) 
+                        (set: sorterEvalType)
+                        (outputDataType: outputDataType) : queryParams =
+
+                queryParams.create 
+                    dbName
+                    (Some repl)
+                    outputDataType
+                    [| 
+                       (runParameters.rngTypeKey, rng |> RngType.toString)
+                       (runParameters.sortingWidthKey, string %sortingWidth); 
+                       (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
+                       (runParameters.mergeDimensionKey, string %mergeDimension);
+                       (runParameters.mergeSuffixTypeKey, mergeSuffixType |> MergeSuffixType.toString);
+                       (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString) 
+                       (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
+                    |]
+
+
+            let queryParamsFromRunParams 
+                                    (rp: runParameters) 
+                                    (odt: outputDataType) : queryParams option =
+                maybe {
+                    let! rng = rp.GetRngType()
+                    let! repl = rp.GetRepl()
+                    let! sw = rp.GetSortingWidth()
+                    let! md = rp.GetMergeDimension()
+                    let! mst = rp.GetMergeSuffixType()
+                    let! smt = rp.GetSimpleSorterModelType()
+                    let! sdf = rp.GetSortableDataFormat()
+                    let! set = rp.GetSorterEvalType() 
+                    return makeQueryParams rng repl sw smt md mst sdf set odt
+                }
+
+            let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+
+
 
 
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
-        [ (randomStandardDatabaseName, randomStandardDb :> IGeneSortDb);
-          (randomMergeDatabaseName, randomMergeDb :> IGeneSortDb) ]
+        [ (RandomStandard.Uniform.dbName, RandomStandard.Uniform.db :> IGeneSortDb);
+          (RandomMerge.Uniform.dbName, RandomMerge.Uniform.db :> IGeneSortDb) ]
         |> Map.ofList
 
 
@@ -94,5 +128,41 @@ module SorterMutateDbs =
 
 
 
+    let getStandardSorterEvalBins
+                    (sortingWidth: int<sortingWidth>) 
+                    (simpleSorterModelType: simpleSorterModelType) 
+                    (set: sorterEvalType)
+                            : Async<Result<sorterEvalBins, string>> =
+        let qp = RandomStandard.Uniform.makeQueryParams 
+                        CommonSorterEval.projectRngType
+                        (0 |> UMX.tag<replNumber>) 
+                        sortingWidth simpleSorterModelType set
+                        (outputDataType.SorterEvalBins "")
+        async {
+             let! result = (RandomStandard.Uniform.db :> IGeneSortDb).loadAsync qp
+             return  result |> Result.bind OutputData.asSorterEvalBins
+        }
 
 
+    let getMergeSorterEvalBins
+                    (sortingWidth: int<sortingWidth>)
+                    (simpleSorterModelType: simpleSorterModelType)
+                    (mergeDimension: int<mergeDimension>) 
+                    (mergeSuffixType: mergeSuffixType)
+                    (set: sorterEvalType)
+                            : Async<Result<sorterEvalBins, string>> =
+
+        let qp = RandomMerge.Uniform.makeQueryParams 
+                        CommonSorterEval.projectRngType
+                        (0 |> UMX.tag<replNumber>) 
+                        sortingWidth 
+                        simpleSorterModelType
+                        mergeDimension 
+                        mergeSuffixType 
+                        CommonSortableTest.projectSortableDataFormat
+                        set
+                        (outputDataType.SorterEvalBins "")
+        async {
+             let! result = (RandomMerge.Uniform.db :> IGeneSortDb).loadAsync qp
+             return  result |> Result.bind OutputData.asSorterEvalBins
+        }

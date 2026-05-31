@@ -77,8 +77,8 @@ module SorterMutateRandomStandardSpecs =
 
     module Specs =
 
-        let SorterMutate_Standard_test (executorType: sorterMutateExecutorType)  : runHostSpec = {
-            DatabaseName = CommonSorterMutate.randomStandardDatabaseName
+        let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
+            DatabaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"SorterMutate_Standard_test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
@@ -94,8 +94,8 @@ module SorterMutateRandomStandardSpecs =
             MaxParallel = 2
         }
 
-        let SorterMutate_Standard_small (executorType: sorterMutateExecutorType) : runHostSpec = {
-            DatabaseName = CommonSorterMutate.randomStandardDatabaseName
+        let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
+            DatabaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"SorterMutate_Standard_small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
@@ -111,8 +111,8 @@ module SorterMutateRandomStandardSpecs =
             MaxParallel = 8
         }
 
-        let SorterMutate_Standard_medium (executorType: sorterMutateExecutorType) : runHostSpec = {
-            DatabaseName = CommonSorterMutate.randomStandardDatabaseName
+        let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
+            DatabaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"SorterMutate_Standard_medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
@@ -129,15 +129,15 @@ module SorterMutateRandomStandardSpecs =
         }
 
     type configType =
-        | SorterMutate_Standard_Test
-        | SorterMutate_Standard_Small
-        | SorterMutate_Standard_Medium
+        | Rand_Test
+        | Rand_Small
+        | Rand_Medium
 
     let Configs = Map.ofList 
                     [ 
-                        (configType.SorterMutate_Standard_Test, Specs.SorterMutate_Standard_test); 
-                        (configType.SorterMutate_Standard_Small, Specs.SorterMutate_Standard_small);
-                        (configType.SorterMutate_Standard_Medium, Specs.SorterMutate_Standard_medium);
+                        (configType.Rand_Test, Specs.Rand_Test); 
+                        (configType.Rand_Small, Specs.Rand_Small);
+                        (configType.Rand_Medium, Specs.Rand_Medium);
                     ]
 
     let getConfig (config: configType) (executorType: sorterMutateExecutorType) : runHostSpec =

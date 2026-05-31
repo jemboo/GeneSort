@@ -28,16 +28,16 @@ module SorterMutateExecutor =
         async {
             let paramsOpt = option {
                 let! sortingWidth = rp.GetSortingWidth()
-                let! qpTests = SorterMutateDbs.makeStandardQueryParamsFromRunParams rp (outputDataType.SortableTest "")
-                return (sortingWidth, qpTests)
+                let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
+                return (sortingWidth, sortableTestId)
             }
             match paramsOpt with
-            | Some (sortingWidth, qpTests) ->
+            | Some (sortingWidth, sortableTestId) ->
                 let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
                 return Ok ( SortableTestModel.makeSortableTest 
-                                    (%qpTests.Id |> UMX.tag) 
+                                    sortableTestId
                                     testModel 
-                                    CommonSorterMutate.standardSortableDataFormat)
+                                    CommonSorterEval.standardSortableDataFormat)
             | None ->
                 return Error "Failed: One or more RunParameters for StandardTests were missing."
         }

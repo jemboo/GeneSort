@@ -374,4 +374,4 @@ module SorterEvalExecutor =
         | GenMerge -> uniformMergeExecutor
         | FullReport -> fullReportExecutor
         | StageStatsReport -> stageStatsReportExecutor
-        | CeBinsReport -> ceBinsReportExecutor
+        | CeBinReport -> ceBinsReportExecutor

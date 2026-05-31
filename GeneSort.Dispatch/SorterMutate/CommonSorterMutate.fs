@@ -33,18 +33,7 @@ module CommonSorterMutate =
     let projectName = "SorterMutate" |> UMX.tag<projectName>
     let queryName = "SorterMutate" |> UMX.tag<databaseName>
 
-    let randomStandardDatabaseName = "RandomSimple" |> UMX.tag<databaseName>
 
-    let randomMergeDatabaseName = "RandomMerge" |> UMX.tag<databaseName>
-
-
-    let randomStandardDatabaseFolder = 
-                    "c:\\Projects\\SorterMutate\\RandomSimple\\Data"
-                     |> UMX.tag<pathToRootFolder>
-
-    let randomMergeDatabaseFolder = 
-                    "c:\\Projects\\SorterMutate\\RandomMerge\\Data"
-                     |> UMX.tag<pathToRootFolder>
 
     let CollectSortableTests = true
 
@@ -53,7 +42,6 @@ module CommonSorterMutate =
     let standardSortableDataFormat = sortableDataFormat.BitVector512
     let mergeSortableDataFormat = CommonSortableTest.projectSortableDataFormat
     let projectRngType = rngType.Lcg
-    let projectRngFactory = projectRngType |> RngFactory.create
 
 
     let getStageLength 
@@ -88,20 +76,19 @@ module CommonSorterMutate =
 
 
 
-    //let getSimpleUniformSorterModelGen
-    //        (rngType: rngType) 
-    //        (sortingWidth: int<sortingWidth>)
-    //        (simpleSorterModelType: simpleSorterModelType) 
-    //                        : sorterModelGen =
-    //        let stageLength = getStageLength simpleSorterModelType sortingWidth
-    //        let rngFactory = rngType |> RngFactory.create
-    //        SimpleSorterModelGen.makeUniform 
-    //                                rngFactory 
-    //                                sortingWidth 
-    //                                stageLength 
-    //                                simpleSorterModelType
-    //                                ExcludeSelfCe
-    //                                |> sorterModelGen.Simple
-
+    let getSimpleUniformSorterModelGen
+            (rngType: rngType) 
+            (sortingWidth: int<sortingWidth>)
+            (simpleSorterModelType: simpleSorterModelType) 
+                            : sorterModelGen =
+            let stageLength = getStageLength simpleSorterModelType sortingWidth
+            let rngFactory = rngType |> RngFactory.create
+            SimpleSorterModelGen.makeUniform 
+                                    rngFactory 
+                                    sortingWidth 
+                                    stageLength 
+                                    simpleSorterModelType
+                                    ExcludeSelfCe
+                                    |> sorterModelGen.Simple
 
 
