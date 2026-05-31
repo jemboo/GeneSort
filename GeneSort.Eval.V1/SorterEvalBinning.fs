@@ -2,10 +2,7 @@
 
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorting
 open GeneSort.SortingOps
-open GeneSort.Sorting.Sorter
-open GeneSort.Sorting.Sortable
 open System
 
 
@@ -73,7 +70,7 @@ module SorterEvalBinning =
             |> Seq.collect (fun eval ->
                 let sortingWidth = % (SorterEval.getSortingWidth eval)
                 let binSize = Math.Max(1, sortingWidth / 2) // Guard against division by 0
-                let ceSequence = SorterEval.getCeDataSequence eval
+                let ceSequence = SorterEval.getCeUseArray eval
                 
                 ceSequence 
                 |> Array.mapi (fun posIndex ceData ->

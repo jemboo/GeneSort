@@ -5,7 +5,6 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.SortingOps
 open GeneSort.Sorting.Sorter
-open GeneSort.Sorting.Sortable
 
 
 type sorterStageStats =
@@ -41,7 +40,7 @@ type sorterStageStats =
 module SorterStageStats = 
 
     let fromSorterEval (sorterEval: sorterEval) : sorterStageStats array =
-        let ces = sorterEval |> SorterEval.getCeDataSequence |> Array.map (fun cd -> cd.Ce)
+        let ces = sorterEval |> SorterEval.getCeUseArray |> Array.map (fun cd -> cd.Ce)
         let sortingWidth = sorterEval |> SorterEval.getSortingWidth
         // 2. Process elements through your StageBuilderSequence layout pipeline
         let stageSeq = StageBuilderSequence.toStageSequence sortingWidth ces

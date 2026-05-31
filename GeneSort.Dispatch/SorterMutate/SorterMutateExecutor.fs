@@ -79,8 +79,8 @@ module SorterMutateExecutor =
                         rp.GetSorterEvalType()
                         |> Result.ofOption "Missing sorter eval type in run parameters"
 
-            let! (parentEvalBins: sorterEvalBins) =
-                        SorterEvalDbs.getStandardSorterEvalBins 
+            let! (parentSorterSetEval: sorterSetEval) =
+                        SorterEvalDbs.getStandardSorterEvals 
                                             sortingWidth 
                                             simpleSorterModelType
                                             sorterEvalType
@@ -90,10 +90,13 @@ module SorterMutateExecutor =
                         |> Result.ofOption "Missing parent sorter count in run parameters"
 
 
-            let scoreSamples = parentEvalBins |> SorterEvalBins.getAllScores
-                                              |> SorterScore.evenSampleByRankedValue
-                                                        SorterScore.byEqualWeighted
-                                                        parentSorterCount
+            //let scoreSamples = parentSorterSetEval |> SorterEvalBins.getAllScores
+            //                                  |> SorterScore.evenSampleByRankedValue
+            //                                            SorterScore.byEqualWeighted
+            //                                            parentSorterCount
+
+            let (scoreSamples: sorterScore []) = Array.empty
+            
             return scoreSamples
         }
 
@@ -122,8 +125,8 @@ module SorterMutateExecutor =
                         rp.GetSorterEvalType()
                         |> Result.ofOption "Missing sorter eval type in run parameters"
 
-            let! (parentEvalBins: sorterEvalBins) =
-                        SorterEvalDbs.getMergeSorterEvalBins 
+            let! (parentSorterSetEval: sorterSetEval) =
+                        SorterEvalDbs.getMergeSorterEvals 
                                         sortingWidth 
                                         simpleSorterModelType 
                                         mergeDimension 
@@ -134,10 +137,12 @@ module SorterMutateExecutor =
                         rp.GetSorterParentCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
 
-            let scoreSamples = parentEvalBins |> SorterEvalBins.getAllScores
-                                              |> SorterScore.evenSampleByRankedValue
-                                                        SorterScore.byEqualWeighted
-                                                        parentSorterCount
+            //let scoreSamples = parentSorterSetEval |> SorterEvalBins.getAllScores
+            //                                  |> SorterScore.evenSampleByRankedValue
+            //                                            SorterScore.byEqualWeighted
+            //                                            parentSorterCount
+            let (scoreSamples: sorterScore []) = Array.empty
+            
             return scoreSamples
         }
 
@@ -222,7 +227,7 @@ module SorterMutateExecutor =
                 let splitFactor = %parentSorterCount / 1000
                 let parentScoreChunks = parentSorterScores |> Array.chunkBySize (1000 * splitFactor)
 
-                log (sprintf "Mutate/Evaluating parents plit into %d pieces..." splitFactor)
+                log (sprintf "Mutate/Evaluating parents split into %d pieces..." splitFactor)
                 let! (sortableTest: sortableTest) = makeSortableTests rp
                 let mutable chunkIdx = 1
                 for chunk in parentScoreChunks do
@@ -340,6 +345,7 @@ module SorterMutateExecutor =
         | sorterMutateExecutorType.GenMerge -> mergeExecutor
         | sorterMutateExecutorType.FullReport -> fullReportExecutor
         | sorterMutateExecutorType.BinsReport -> binsReportExecutor
+
 
 
 

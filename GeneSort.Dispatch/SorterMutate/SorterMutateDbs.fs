@@ -31,6 +31,7 @@ module SorterMutateDbs =
                             (sw: int<sortingWidth>) 
                             (smt: simpleSorterModelType) 
                             (set: sorterEvalType)
+                            (mut: float<mutationRate>)
                             (odt: outputDataType) : queryParams =
                 queryParams.create dbName (Some repl) odt
                     [| 
@@ -38,6 +39,7 @@ module SorterMutateDbs =
                        (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                        (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString)
+                       (runParameters.mutationRateKey, (Some mut) |> MutationRate.toString)
                     |]
 
 
@@ -50,7 +52,8 @@ module SorterMutateDbs =
                     let! smt = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! set = rp.GetSorterEvalType()
-                    return makeQueryParams rng repl sw smt set odt 
+                    let! mut = rp.GetMutationRate()
+                    return makeQueryParams rng repl sw smt set mut odt 
                 }
         
 
@@ -78,6 +81,7 @@ module SorterMutateDbs =
                         (mergeSuffixType: mergeSuffixType)
                         (sortableDataFormat: sortableDataFormat) 
                         (set: sorterEvalType)
+                        (mut: float<mutationRate>)
                         (outputDataType: outputDataType) : queryParams =
 
                 queryParams.create 
@@ -91,6 +95,7 @@ module SorterMutateDbs =
                        (runParameters.mergeDimensionKey, string %mergeDimension);
                        (runParameters.mergeSuffixTypeKey, mergeSuffixType |> MergeSuffixType.toString);
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString) 
+                       (runParameters.mutationRateKey, (Some mut) |> MutationRate.toString)
                        (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
                     |]
 
@@ -106,8 +111,9 @@ module SorterMutateDbs =
                     let! mst = rp.GetMergeSuffixType()
                     let! smt = rp.GetSimpleSorterModelType()
                     let! sdf = rp.GetSortableDataFormat()
-                    let! set = rp.GetSorterEvalType() 
-                    return makeQueryParams rng repl sw smt md mst sdf set odt
+                    let! set = rp.GetSorterEvalType()
+                    let! mut = rp.GetMutationRate() 
+                    return makeQueryParams rng repl sw smt md mst sdf set mut odt
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -130,13 +136,17 @@ module SorterMutateDbs =
 
     let getStandardSorterEvalBins
                     (sortingWidth: int<sortingWidth>) 
+                    (mutationRate: float<mutationRate>)
                     (simpleSorterModelType: simpleSorterModelType) 
                     (set: sorterEvalType)
                             : Async<Result<sorterEvalBins, string>> =
         let qp = RandomStandard.Uniform.makeQueryParams 
                         CommonSorterEval.projectRngType
                         (0 |> UMX.tag<replNumber>) 
-                        sortingWidth simpleSorterModelType set
+                        sortingWidth 
+                        simpleSorterModelType 
+                        set
+                        mutationRate
                         (outputDataType.SorterEvalBins "")
         async {
              let! result = (RandomStandard.Uniform.db :> IGeneSortDb).loadAsync qp
@@ -146,6 +156,7 @@ module SorterMutateDbs =
 
     let getMergeSorterEvalBins
                     (sortingWidth: int<sortingWidth>)
+                    (mutationRate: float<mutationRate>)
                     (simpleSorterModelType: simpleSorterModelType)
                     (mergeDimension: int<mergeDimension>) 
                     (mergeSuffixType: mergeSuffixType)
@@ -161,6 +172,7 @@ module SorterMutateDbs =
                         mergeSuffixType 
                         CommonSortableTest.projectSortableDataFormat
                         set
+                        mutationRate
                         (outputDataType.SorterEvalBins "")
         async {
              let! result = (RandomMerge.Uniform.db :> IGeneSortDb).loadAsync qp

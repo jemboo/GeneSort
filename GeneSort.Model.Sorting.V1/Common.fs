@@ -25,6 +25,14 @@ open GeneSort.Core
 [<Measure>] type deletionRate
 
 
+module MutationRate =
+
+    let toString (w: float<mutationRate> option) : string =
+       match w with
+        | Some v -> sprintf "%f" %v
+        | None -> "None"
+
+
 module CommonGen =
 
     let makeSorterModelId 

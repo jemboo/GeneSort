@@ -33,7 +33,7 @@ module CeDataDto =
         Convert.ChangeType(f, typeof<System.Half>) :?> System.Half
         #endif
 
-    let fromDomain (domain: ceData) : ceDataDto = 
+    let fromDomain (domain: ceUse) : ceDataDto = 
         // Cast the int count to float32, then safely downcast to 16-bit Half float
         let floatValue = float32 domain.UseCount
         let halfValue = inline16Float floatValue
@@ -44,12 +44,12 @@ module CeDataDto =
             CeInt = Ce.toIndex domain.Ce
         }
 
-    let toDomain (dto: ceDataDto) : ceData =
+    let toDomain (dto: ceDataDto) : ceUse =
         // Cast the 16-bit float back to a native 32-bit float, then to int
         let decodedCount = int (float32 dto.UseCount)
         let reconstructedCe = Ce.fromIndex dto.CeInt
         
-        ceData.create 
+        ceUse.create 
             (int dto.CeIndex |> UMX.tag<ceIndex>) 
             decodedCount 
             reconstructedCe

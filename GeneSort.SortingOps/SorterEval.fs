@@ -57,7 +57,7 @@ type sorterEvalV1 =
 
 
 
-type ceData = 
+type ceUse = 
     private {
         ceIndex :int<ceIndex>
         useCount :int
@@ -66,7 +66,7 @@ type ceData =
     static member create 
                 (ceIndex: int<ceIndex>) 
                 (useCount: int)
-                (ce: ce): ceData =
+                (ce: ce): ceUse =
         { ceIndex = ceIndex; useCount = useCount; ce = ce }
     member this.CeIndex with get() : int<ceIndex> = this.ceIndex
     member this.UseCount with get() : int = this.useCount
@@ -80,7 +80,7 @@ type sorterEvalV2 =
         unsortedCount: int<sortableCount>
         sequenceHash: int<sequenceHash>
         stageLength: int<stageLength>
-        ceDataSequence: ceData array
+        ceUseArray: ceUse array
     }
 
     static member create 
@@ -89,26 +89,26 @@ type sorterEvalV2 =
                     (unsortedCount: int<sortableCount>)
                     (sequenceKey: int<sequenceHash>)
                     (stageLength: int<stageLength>)
-                    (ceDataSequence: ceData array): sorterEvalV2 =
+                    (ceUseArray: ceUse array): sorterEvalV2 =
         { 
                 sorterId = sorterId; 
                 sortingWidth = sortingWidth;
                 unsortedCount = unsortedCount;
                 sequenceHash = sequenceKey; 
                 stageLength = stageLength;
-                ceDataSequence = ceDataSequence;
+                ceUseArray = ceUseArray;
         }
 
     member this.SorterId with get() : Guid<sorterId>  = this.sorterId
     member this.SortingWidth with get() : int<sortingWidth> = this.sortingWidth
     member this.StageLength with get() : int<stageLength> = this.stageLength
-    member this.CeLength with get() : int<ceLength> = this.ceDataSequence.Length |> UMX.tag<ceLength>
-    member this.CeDataSequence with get() : ceData array = this.ceDataSequence
+    member this.CeLength with get() : int<ceLength> = this.ceUseArray.Length |> UMX.tag<ceLength>
+    member this.CeUseArray with get() : ceUse array = this.ceUseArray
     member this.UnsortedCount with get() : int<sortableCount>  = this.unsortedCount
     member this.SequenceHash with get() : int<sequenceHash>  = this.sequenceHash
     member this.LastCeIndex with get() : int<ceIndex>  = 
-        if this.ceDataSequence.Length = 0 then 0<ceIndex>
-        else this.ceDataSequence.[this.ceDataSequence.Length - 1].CeIndex
+        if this.ceUseArray.Length = 0 then 0<ceIndex>
+        else this.ceUseArray.[this.ceUseArray.Length - 1].CeIndex
     member this.ToDataTableRecord() : dataTableRecord =
             let isSorted = this.unsortedCount = 0<sortableCount>
             dataTableRecord.createEmpty()
@@ -130,7 +130,7 @@ type sorterEvalV3 =
         sortingWidth: int<sortingWidth>
         sequenceHash: int<sequenceHash>
         stageLength: int<stageLength>
-        ceDataSequence: ceData array
+        ceUseArray: ceUse array
         sortableTest: sortableTest 
     }
 
@@ -139,29 +139,29 @@ type sorterEvalV3 =
                     (sortingWidth: int<sortingWidth>) 
                     (sequenceKey: int<sequenceHash>)
                     (stageLength: int<stageLength>)
-                    (ceDataSequence: ceData array) 
+                    (ceUseArray: ceUse array) 
                     (sortableTest:sortableTest) :sorterEvalV3 =
         { 
                 sorterId = sorterId;
                 sortingWidth = sortingWidth;
                 sequenceHash = sequenceKey; 
                 stageLength = stageLength;
-                ceDataSequence = ceDataSequence;
+                ceUseArray = ceUseArray;
                 sortableTest =sortableTest;
         }
 
     member this.SorterId with get() : Guid<sorterId>  = this.sorterId
     member this.SortingWidth with get() : int<sortingWidth> = this.sortingWidth
     member this.StageLength with get() : int<stageLength> = this.stageLength
-    member this.CeLength with get() : int<ceLength> = this.ceDataSequence.Length |> UMX.tag<ceLength>
-    member this.CeDataSequence with get() : ceData array = this.ceDataSequence
+    member this.CeLength with get() : int<ceLength> = this.ceUseArray.Length |> UMX.tag<ceLength>
+    member this.CeUseArray with get() : ceUse array = this.ceUseArray
     member this.SequenceHash with get() : int<sequenceHash>  = this.sequenceHash
     member this.SortableTest with get() : sortableTest = this.sortableTest
     member this.UnsortedCount with get() : int<sortableCount>  = 
             this.sortableTest |> SortableTests.getUnsortedCount
     member this.LastCeIndex with get() : int<ceIndex>  = 
-        if this.ceDataSequence.Length = 0 then 0<ceIndex>
-        else this.ceDataSequence.[this.ceDataSequence.Length - 1].CeIndex
+        if this.ceUseArray.Length = 0 then 0<ceIndex>
+        else this.ceUseArray.[this.ceUseArray.Length - 1].CeIndex
     member this.ToDataTableRecord() : dataTableRecord =
             let isSorted = this.UnsortedCount = 0<sortableCount>
             dataTableRecord.createEmpty()
@@ -252,11 +252,11 @@ module SorterEval =
         | V2 v2 -> v2.LastCeIndex
         | V3 v3 -> v3.LastCeIndex
 
-    let getCeDataSequence (eval: sorterEval) : ceData array =
+    let getCeUseArray (eval: sorterEval) : ceUse array =
         match eval with
         | V1 v1 -> failwith "V1 does not have CeDataSequence"
-        | V2 v2 -> v2.CeDataSequence
-        | V3 v3 -> v3.CeDataSequence
+        | V2 v2 -> v2.CeUseArray
+        | V3 v3 -> v3.CeUseArray
 
     let toDataTableRecord (eval: sorterEval) : dataTableRecord =
         match eval with
@@ -266,13 +266,13 @@ module SorterEval =
 
 
     /// Internal helper to extract ceData array for V2 and V3 records
-    let private extractCeDataSequence (ceb: ceBlock) (useCounts: ceUseCounts) : ceData array =
-        let results = ResizeArray<ceData>()
+    let private extractCeUseArray (ceb: ceBlock) (useCounts: ceUseCounts) : ceUse array =
+        let results = ResizeArray<ceUse>()
         for i in 0 .. (%ceb.CeLength - 1) do
             let idx = i |> UMX.tag<ceIndex>
             let count = useCounts.[idx]
             if count > 0 then
-                results.Add(ceData.create idx count (ceb.getCe i))
+                results.Add(ceUse.create idx count (ceb.getCe i))
         results.ToArray()
 
     let createV1 
@@ -300,7 +300,7 @@ module SorterEval =
             StageBuilderSequence.toStageSequence 
                                   ceBlockEval.CeBlock.SortingWidth 
                                   ceBlockEval.UsedCes
-        let ceDataSeq = extractCeDataSequence ceBlockEval.CeBlock ceBlockEval.CeUseCounts
+        let ceDataSeq = extractCeUseArray ceBlockEval.CeBlock ceBlockEval.CeUseCounts
         sorterEvalV2.create 
             sorterId 
             ceBlockEval.CeBlock.SortingWidth
@@ -327,7 +327,7 @@ module SorterEval =
             createV2 sorterId ceBlockEval
         | Some test ->
 
-            let ceDataSeq = extractCeDataSequence ceBlockEval.CeBlock ceBlockEval.CeUseCounts
+            let ceDataSeq = extractCeUseArray ceBlockEval.CeBlock ceBlockEval.CeUseCounts
             sorterEvalV3.create 
                 sorterId 
                 ceBlockEval.CeBlock.SortingWidth

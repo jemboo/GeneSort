@@ -127,29 +127,32 @@ module SorterEvalDbs =
 
 
 
-    let getStandardSorterEvalBins
+
+
+
+    let getStandardSorterEvals
                     (sortingWidth: int<sortingWidth>) 
                     (simpleSorterModelType: simpleSorterModelType) 
                     (set: sorterEvalType)
-                            : Async<Result<sorterEvalBins, string>> =
+                            : Async<Result<sorterSetEval, string>> =
         let qp = RandomStandard.Uniform.makeQueryParams 
                         CommonSorterEval.projectRngType
                         (0 |> UMX.tag<replNumber>) 
                         sortingWidth simpleSorterModelType set
-                        (outputDataType.SorterEvalBins "")
+                        (outputDataType.SorterSetEval "")
         async {
              let! result = (RandomStandard.Uniform.db :> IGeneSortDb).loadAsync qp
-             return  result |> Result.bind OutputData.asSorterEvalBins
+             return  result |> Result.bind OutputData.asSorterSetEval
         }
 
 
-    let getMergeSorterEvalBins
+    let getMergeSorterEvals
                     (sortingWidth: int<sortingWidth>)
                     (simpleSorterModelType: simpleSorterModelType)
                     (mergeDimension: int<mergeDimension>) 
                     (mergeSuffixType: mergeSuffixType)
                     (set: sorterEvalType)
-                            : Async<Result<sorterEvalBins, string>> =
+                            : Async<Result<sorterSetEval, string>> =
 
         let qp = RandomMerge.Uniform.makeQueryParams 
                         CommonSorterEval.projectRngType
@@ -160,8 +163,8 @@ module SorterEvalDbs =
                         mergeSuffixType 
                         CommonSortableTest.projectSortableDataFormat
                         set
-                        (outputDataType.SorterEvalBins "")
+                        (outputDataType.SorterSetEval "")
         async {
              let! result = (RandomMerge.Uniform.db :> IGeneSortDb).loadAsync qp
-             return  result |> Result.bind OutputData.asSorterEvalBins
+             return  result |> Result.bind OutputData.asSorterSetEval
         }

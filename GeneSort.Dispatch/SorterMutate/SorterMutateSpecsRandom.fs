@@ -5,6 +5,7 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
+open GeneSort.SortingOps
 
 
 module SorterMutateSpecsRandom = 
@@ -13,12 +14,22 @@ module SorterMutateSpecsRandom =
     let rngType = 
             (runParameters.rngTypeKey, 
             [CommonSorterMutate.projectRngType;] |> List.map RngType.toString)
+
+
+    let sorterEvalType = 
+            (runParameters.sorterEvalTypeKey, 
+            [ sorterEvalType.V2 ;] |> List.map SorterEvalType.toString)
     
     // SortingWidths
     let smallSortingWidths = 
             (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
     let mediumSortingWidths = 
             (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
+
+
+    // MutationRates
+    let mutationRates =
+            (runParameters.mutationRateKey, [0.01; 0.05; 0.1] |> List.map string)
 
     // SorterCounts
     let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
@@ -83,6 +94,8 @@ module SorterMutateSpecsRandom =
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
+                sorterEvalType
+                mutationRates
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 testParentCount
@@ -100,6 +113,8 @@ module SorterMutateSpecsRandom =
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
+                sorterEvalType
+                mutationRates
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 testParentCount
@@ -117,6 +132,8 @@ module SorterMutateSpecsRandom =
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
+                sorterEvalType
+                mutationRates
                 mediumSortingWidths
                 allSimpleSorterModelTypes
                 largeParentCount

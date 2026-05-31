@@ -6,9 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Common.fs" />
+    <Compile Include="TmbSorterEvalGroups.fs" />
     <Compile Include="SorterEvalBinning.fs" />
     <Compile Include="SorterStageStats.fs" />
-    <Compile Include="Common.fs" />
     <Compile Include="Bins\SorterEvalKey.fs" />
     <Compile Include="Bins\SorterScore.fs" />
     <Compile Include="Bins\SorterEvalBin.fs" />
