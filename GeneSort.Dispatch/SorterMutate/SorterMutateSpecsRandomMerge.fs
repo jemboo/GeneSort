@@ -11,5 +11,5 @@ open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Dispatch.V1.SortableTest
 
 
-module SorterMutateRandomMergeSpecs = ()
+module SorterMutateSpecsRandomMerge = ()
 

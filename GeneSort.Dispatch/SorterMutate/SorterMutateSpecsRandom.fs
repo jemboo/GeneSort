@@ -7,7 +7,7 @@ open GeneSort.Core
 open GeneSort.Project.V1
 
 
-module SorterMutateRandomStandardSpecs = 
+module SorterMutateSpecsRandom = 
 
 
     let rngType = 

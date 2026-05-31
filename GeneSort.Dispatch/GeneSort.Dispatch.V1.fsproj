@@ -37,8 +37,8 @@
     <Compile Include="SorterMutate\SorterMutateDbs.fs" />
     <Compile Include="SorterMutate\SorterMutateRunHost.fs" />
     <Compile Include="SorterMutate\SorterMutateExecutor.fs" />
-    <Compile Include="SorterMutate\SorterMutateRandomStandardSpecs.fs" />
-    <Compile Include="SorterMutate\SorterMutateRandomMergeSpecs.fs" />
+    <Compile Include="SorterMutate\SorterMutateSpecsRandom.fs" />
+    <Compile Include="SorterMutate\SorterMutateSpecsRandomMerge.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
