@@ -315,17 +315,17 @@ module SorterEvalExecutor =
                     |> Array.map (fun sss -> sss.toDataTableRecord())
 
                 // Run the fully encapsulated pipeline
-                let dtrs = 
-                    sorterSetEvals.SorterEvals
-                    |> Array.filter (fun se -> se |> SorterEval.getIsSorted)
-                    |> TmbSorterEvalGroups.fromEvaluations SorterEval.byEqualTwoWeighted 300
-                    |> TmbSorterEvalGroups.toDataTableRecords leadCols stageStatsRecordMaker
+                //let dtrs = 
+                //    sorterSetEvals.SorterEvals
+                //    |> Array.filter (fun se -> se |> SorterEval.getIsSorted)
+                //    |> TmbSorterEvalGroups.fromEvaluations SorterEval.byEqualTwoWeighted 300
+                //    |> TmbSorterEvalGroups.toDataTableRecords leadCols stageStatsRecordMaker
 
-                let report = DataTableReport.fromDataTableRecords dtrs
+                //let report = DataTableReport.fromDataTableRecords dtrs
 
-                let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
-                let yab = (rp : runParameters).WithRunFinished(Some true)
-                return yab
+                //let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
+                return (rp : runParameters).WithRunFinished(Some true)
+
             with e -> 
                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
         } |> Async.map (logResult progress log)

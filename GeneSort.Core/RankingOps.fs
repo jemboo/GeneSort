@@ -10,14 +10,15 @@ type rankedGroup =
 
 module RankedGroup =
 
+    let toString (group: rankedGroup) : string =
+        match group with
+        | Top -> "Top"
+        | Middle -> "Middle"
+        | Bottom -> "Bottom"
+
     let toDataTableRecord (group: rankedGroup) : dataTableRecord =
-        let groupStr = 
-            match group with
-            | Top -> "Top"
-            | Middle -> "Middle"
-            | Bottom -> "Bottom"
         dataTableRecord.createEmpty()
-        |> dataTableRecord.addData "RankedGroup" groupStr
+        |> dataTableRecord.addData "RankedGroup" (toString group)
 
     /// Extracts three groups of items, each of size min(groupSize, items.Length/3)
     /// from the input sequence based on their rank as determined by the ranker function.
