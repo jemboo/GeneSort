@@ -18,6 +18,7 @@ open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Dispatch.V1.SortableTest
 open GeneSort.Model.Sorting.Simple.V1
+open GeneSort.Eval.V1
 
 
 
@@ -63,10 +64,9 @@ module SorterMutateExecutor =
         }
 
 
-
-    let selectStandardSorterParentScores (rp:runParameters) : Async<Result<sorterScore [], string>> =
+    let makeStandardEvalGroupSelection (rp:runParameters) : Async<Result<evalGroupSelection, string>> =
         asyncResult {
-            // Explicitly annotating the left side forces the compiler to lock down the type immediately
+
             let! (sortingWidth: int<sortingWidth>) = 
                         rp.GetSortingWidth() 
                         |> Result.ofOption "Missing sorting width in run parameters"
@@ -89,22 +89,24 @@ module SorterMutateExecutor =
                         rp.GetSorterParentCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
 
+            let! (childSorterCount: int<sorterCount>) = 
+                        rp.GetSorterChildCount()
+                        |> Result.ofOption "Missing parent sorter count in run parameters"
 
-            //let scoreSamples = parentSorterSetEval |> SorterEvalBins.getAllScores
-            //                                  |> SorterScore.evenSampleByRankedValue
-            //                                            SorterScore.byEqualWeighted
-            //                                            parentSorterCount
+            let ranker = SorterEval.byEqualTwoWeighted
 
-            let (scoreSamples: sorterScore []) = Array.empty
-            
-            return scoreSamples
+            let egs = TmbSorterEvalGroups.fromEvaluations
+                                        ranker
+                                        (%parentSorterCount / 3)
+                                        parentSorterSetEval.SorterEvals
+            return evalGroupSelection.Tmb egs
         }
 
 
 
-    let selectMergeSorterParentScores (rp:runParameters) : Async<Result<sorterScore [], string>> =
+    let makeMergeEvalGroupSelection (rp:runParameters) : Async<Result<evalGroupSelection, string>> =
         asyncResult {
-            // Explicitly annotating the left side forces the compiler to lock down the type immediately
+
             let! (sortingWidth: int<sortingWidth>) = 
                         rp.GetSortingWidth() 
                         |> Result.ofOption "Missing sorting width in run parameters"
@@ -133,18 +135,21 @@ module SorterMutateExecutor =
                                         mergeSuffixType
                                         sorterEvalType
 
+
             let! (parentSorterCount: int<sorterCount>) = 
                         rp.GetSorterParentCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
 
-            //let scoreSamples = parentSorterSetEval |> SorterEvalBins.getAllScores
-            //                                  |> SorterScore.evenSampleByRankedValue
-            //                                            SorterScore.byEqualWeighted
-            //                                            parentSorterCount
-            let (scoreSamples: sorterScore []) = Array.empty
-            
-            return scoreSamples
+
+            let ranker = SorterEval.byEqualTwoWeighted
+
+            let egs = TmbSorterEvalGroups.fromEvaluations
+                                        ranker
+                                        (%parentSorterCount / 3)
+                                        parentSorterSetEval.SorterEvals
+            return evalGroupSelection.Tmb egs
         }
+
 
 
 
@@ -200,8 +205,8 @@ module SorterMutateExecutor =
         }
 
 
-    let _mutateParentsAndEvaluate 
-            (selectParentSorterScores: runParameters -> Async<Result<sorterScore [], string>> )
+    let _evaluateMutants 
+            (makeEvalGroupSelection: runParameters -> Async<Result<evalGroupSelection, string>> )
             (makeSortableTests: runParameters -> Async<Result<sortableTest, string>>)
             (host: IRunHost)
             (rp: runParameters) 
@@ -218,26 +223,13 @@ module SorterMutateExecutor =
                 do! checkCancellation cts.Token
 
                 let! (parentSorterModelGen: sorterModelGen) = getParentSorterModelGen rp
-                let! (parentSorterScores: sorterScore []) = selectParentSorterScores rp
+                let! (parentSorterModelMutator: simpleSorterModelMutator) = getParentSorterModelMutator rp
 
-                let! (parentSorterCount: int<sorterCount>) = 
-                            rp.GetSorterParentCount()
-                            |> Result.ofOption "Missing parent sorter count in run parameters"
-
-                let splitFactor = %parentSorterCount / 1000
-                let parentScoreChunks = parentSorterScores |> Array.chunkBySize (1000 * splitFactor)
-
-                log (sprintf "Mutate/Evaluating parents split into %d pieces..." splitFactor)
-                let! (sortableTest: sortableTest) = makeSortableTests rp
-                let mutable chunkIdx = 1
-                for chunk in parentScoreChunks do
-                    do! checkCancellation cts.Token
-                    log (sprintf "Evaluating chunk %d of %d..." chunkIdx splitFactor)
+                let! (childSorterCount: int<sorterCount>) = 
+                            rp.GetSorterChildCount()
+                            |> Result.ofOption "Missing child sorter count in run parameters"
 
 
-                    chunkIdx <- chunkIdx + 1
-
-                log "Run Complete."
                 return rp.WithRunFinished (Some true)
 
             with e -> 
@@ -314,16 +306,16 @@ module SorterMutateExecutor =
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _mutateParentsAndEvaluate 
-                    selectStandardSorterParentScores
+                _evaluateMutants 
+                    makeStandardEvalGroupSelection
                     makeStandardTests
                     host rp allowOverwrite cts progress }
 
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _mutateParentsAndEvaluate 
-                    selectMergeSorterParentScores
+                _evaluateMutants 
+                    makeMergeEvalGroupSelection
                     makeMergeTests
                     host rp allowOverwrite cts progress }
 

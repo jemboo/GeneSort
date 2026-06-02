@@ -74,6 +74,29 @@ module TmbSorterEvalGroups =
             tmbSorterEvalGroups.create topGroup midGroup botGroup
 
 
+    let toDataTableRecords 
+                (leadCols: dataTableRecord) 
+                (recordMaker: sorterEval -> dataTableRecord [])
+                (groups: tmbSorterEvalGroups) : dataTableRecord array =
+
+            groups.ToGroupedArrays()
+            |> Array.collect (fun (groupTag, evals) -> 
+                // 1. Build the shared contextual header for this group tier
+                let groupHeaderDtr = 
+                    groupTag 
+                    |> RankedGroup.toDataTableRecord 
+                    |> dataTableRecord.combine leadCols
+            
+                // 2. Map items via the injected handler function and append the headers
+                evals
+                |> Array.collect recordMaker
+                |> Array.map (fun customDtr -> 
+                    customDtr |> dataTableRecord.combine groupHeaderDtr
+                )
+            )
+
+
+
 type indexedSorterEvals =
     private {
         sorterEvals: sorterEval array
@@ -104,6 +127,13 @@ module IndexedSorterEvals =
         |> Seq.filter SorterEval.getIsSorted
         |> Seq.distinctBy SorterEval.getSequenceHash
         |> Seq.toArray
+
+
+    let getTopN (ranker: sorterEval -> float) (n: int) (items: sorterEval array) : indexedSorterEvals =
+        let distinctSorted = prepareDistinctSorted items
+        let topN = distinctSorted |> Array.sortByDescending ranker |> Array.truncate n
+        indexedSorterEvals.create topN
+
 
     /// Samples an array of unique evaluations spaced evenly across the ranked ARRAY INDEX layout.
     let evenSampleByRankedIndex 

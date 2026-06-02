@@ -62,11 +62,9 @@ type msceRandMutate =
         let excludeSelfCe = this.ExcludeSelfCe
         let sortingWidth = %parent.SortingWidth
         
-        // Define generation logic
         let ceCodeInserter = fun () -> Ce.generateCeCode %excludeSelfCe sortingWidth (rng.NextIndex)
         let ceCodeMutator = fun _ -> Ce.generateCeCode %excludeSelfCe sortingWidth (rng.NextIndex)
         
-        // Directly use the uniform rates without an intermediate array allocation
         let ceCodes = IndelRates.mutate 
                         this.IndelRates 
                         ceCodeInserter 

@@ -88,7 +88,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 let configType = SorterEvalSpecsRandom.configType.Rand_Test
-let executorType = sorterEvalExecutorType.CeBinReport
+let executorType = sorterEvalExecutorType.StageStatsReport
 let host: IRunHost = 
     let spec = SorterEvalSpecsRandom.getConfig configType executorType
     SorterEval.SorterEvalRunHost.createRunHost spec

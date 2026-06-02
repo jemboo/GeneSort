@@ -10,7 +10,6 @@ open GeneSort.SortingOps
 open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
-open GeneSort.Eval.V1.Bins
 open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
@@ -122,10 +121,6 @@ module SorterEvalExecutor =
                     host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                     |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
 
-                let! qpBins = 
-                    host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterEvalBins "")
-                    |> Result.ofOption "Failed to create QueryParams for Bins."
-
                 let collectTests = CommonSorterEval.CollectSortableTests
                 let testId = tests |> SortableTests.getId
                 let baseFirstIdx = (%repl * %totalSorterCount)
@@ -229,58 +224,6 @@ module SorterEvalExecutor =
 
 
 
-    //let makeStageStatsReport 
-    //        (host: IRunHost)
-    //        (rp: runParameters) 
-    //        (allowOverwrite: bool<allowOverwrite>) 
-    //        (cts: CancellationTokenSource) 
-    //        (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
-
-    //    let log msg = OpsUtils.report progress 
-    //                    (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
-
-    //    asyncResult {
-    //        try
-    //            do! checkCancellation cts.Token
-    //            let runId = rp |> RunParameters.getIdString
-    //            OpsUtils.report progress (sprintf "%s Starting Stage stats Report for Run %s" (MathUtils.getTimestampString()) %runId)
-    
-    //            let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
-    //                                    |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
-    //            let! outB = host.RunDb.loadAsync qpSorterSetEval
-    //            let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
-
-    //            let reportName = (sprintf "StageStatsReport" |> UMX.tag<textReportName>)
-
-    //            let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
-    //                            |> Result.ofOption "Failed to create QueryParams for Report."
-    //            let leadCols = qpReport |> QueryParams.makeDataTableRecord
-
-    //            let dtrs = sorterSetEvals.SorterEvals
-    //                        |> Array.filter(fun se -> se |> SorterEval.getIsSorted)
-    //                        |> RankedGroup.splitIntoRankedGroups SorterEval.byEqualTwoWeighted 300
-    //                        |> Array.map (
-    //                            fun group -> 
-    //                                let dtr = (fst group) |> dataTableRecord.combine leadCols
-    //                                let stageStats = (group |> snd)
-    //                                                 |> Array.collect (SorterStageStats.fromSorterEval) 
-    //                                                 |> Array.map (fun sss -> sss.toDataTableRecord()) 
-    //                                (dataTableRecord.combineWithMany stageStats dtr)
-    //                                        |> Seq.toArray
-    //                            )
-    //                        |> Array.concat
-
-    //            let report = DataTableReport.fromDataTableRecords dtrs
-
-    //            let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
-    //            let yab = (rp : runParameters).WithRunFinished(Some true)
-    //            return yab
-    //        with e -> 
-    //           return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
-    //    } |> Async.map (logResult progress log)
-
-
-
     let makeStageStatsReport 
                 (host: IRunHost)
                 (rp: runParameters) 
@@ -309,21 +252,21 @@ module SorterEvalExecutor =
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
 
                 // Define how an individual evaluation expands into custom data table rows
-                let stageStatsRecordMaker (eval: sorterEval) =
+                let stageStatsRecordMaker (eval: sorterEval) : dataTableRecord [] =
                     eval
                     |> SorterStageStats.fromSorterEval
                     |> Array.map (fun sss -> sss.toDataTableRecord())
 
                 // Run the fully encapsulated pipeline
-                //let dtrs = 
-                //    sorterSetEvals.SorterEvals
-                //    |> Array.filter (fun se -> se |> SorterEval.getIsSorted)
-                //    |> TmbSorterEvalGroups.fromEvaluations SorterEval.byEqualTwoWeighted 300
-                //    |> TmbSorterEvalGroups.toDataTableRecords leadCols stageStatsRecordMaker
+                let dtrs = 
+                    sorterSetEvals.SorterEvals
+                    |> Array.filter (fun se -> se |> SorterEval.getIsSorted)
+                    |> TmbSorterEvalGroups.fromEvaluations SorterEval.byEqualTwoWeighted 300
+                    |> TmbSorterEvalGroups.toDataTableRecords leadCols stageStatsRecordMaker
 
-                //let report = DataTableReport.fromDataTableRecords dtrs
+                let report = DataTableReport.fromDataTableRecords dtrs
 
-                //let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
+                let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
                 return (rp : runParameters).WithRunFinished(Some true)
 
             with e -> 
