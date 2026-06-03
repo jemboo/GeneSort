@@ -71,7 +71,7 @@ module SorterEvalExecutor =
 
     let _makeSorterEvals 
             (makeModelGen: runParameters -> sorterModelGen option)
-            (makeTests: runParameters -> Async<Result<Sortable.sortableTest, string>>)
+            (makeSortableTests: runParameters -> Async<Result<Sortable.sortableTest, string>>)
             (host: IRunHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
@@ -107,7 +107,7 @@ module SorterEvalExecutor =
                 // 2. Generate common evaluation dependencies
                 do! checkCancellation cts.Token
                 log "Generating Sortable Tests..."
-                let! tests = makeTests rp 
+                let! tests = makeSortableTests rp 
 
                 let! qpSorterSet = 
                     host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSet "")

@@ -5,6 +5,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.SortingOps
+open GeneSort.Model.Sorting.V1
 
 
 type tmbSorterEvalGroups = 
@@ -40,6 +41,20 @@ type tmbSorterEvalGroups =
       this.ToRankedSorterEvals() |> Array.map(fun (group, se) -> 
                 (se |> SorterEval.getSorterId, (se, group |> RankedGroup.toDataTableRecord))) 
                 |> Map.ofArray
+
+
+    member this.makeSorterModelSet 
+                    (sorterModelSetId: Guid<sorterModelSetId>) 
+                    (sorterModelGen: sorterModelGen) : sorterModelSet =
+            let sorterModelIds = 
+                this.ToRankedSorterEvals() 
+                |> Array.map(fun (group, se) -> 
+                    se |> SorterEval.getSorterId |> UMX.untag |> UMX.tag<sorterModelId>)
+
+            let sorterModels = SorterModelGen.makeSorterModelsFromIds sorterModelIds sorterModelGen
+            sorterModelSet.create sorterModelSetId sorterModels
+
+
 
 
 module TmbSorterEvalGroups =
@@ -116,6 +131,22 @@ type indexedSorterEvals =
             (se |> SorterEval.getSorterId, (se, labelDtr))
         )
         |> Map.ofArray
+
+
+    member this.makeSorterModelSet 
+                    (sorterModelSetId: Guid<sorterModelSetId>) 
+                    (sorterModelGen: sorterModelGen) : sorterModelSet =
+            let sorterModelIds = 
+                this.SorterEvals
+                |> Array.map(fun se -> 
+                    se |> SorterEval.getSorterId |> UMX.untag |> UMX.tag<sorterModelId>)
+
+            let sorterModels = SorterModelGen.makeSorterModelsFromIds sorterModelIds sorterModelGen
+            sorterModelSet.create sorterModelSetId sorterModels
+
+
+
+
 
 
 

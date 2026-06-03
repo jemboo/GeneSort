@@ -6,7 +6,6 @@ open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Core
 open GeneSort.Project.V1
-open GeneSort.FileDb.V1
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Dispatch.V1.SortableTest
 
@@ -16,7 +15,6 @@ type sorterMutateExecutorType =
     | GenStandard
     | GenMerge
     | FullReport
-    | BinsReport
 
 
 module SorterMutateExecutorType =
@@ -24,7 +22,6 @@ module SorterMutateExecutorType =
         | GenStandard -> "GenStandard"
         | GenMerge -> "GenMerge"
         | FullReport -> "FullReport"
-        | BinsReport -> "BinsReport"
 
 
 

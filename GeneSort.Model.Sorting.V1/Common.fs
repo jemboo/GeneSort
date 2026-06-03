@@ -33,6 +33,29 @@ module MutationRate =
         | None -> "None"
 
 
+module InsertionRate =
+
+    let toString (w: float<insertionRate> option) : string =
+       match w with
+        | Some v -> sprintf "%f" %v
+        | None -> "None"
+
+
+module DeletionRate =
+
+    let toString (w: float<deletionRate> option) : string =
+       match w with
+        | Some v -> sprintf "%f" %v
+        | None -> "None"
+
+module ModificationRate =
+
+    let toString (w: float<modificationRate> option) : string =
+       match w with
+        | Some v -> sprintf "%f" %v
+        | None -> "None"
+
+
 module CommonGen =
 
     let makeSorterModelId 

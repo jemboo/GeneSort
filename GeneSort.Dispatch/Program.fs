@@ -87,13 +87,13 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 
-let configType = SorterEvalSpecsRandom.configType.Rand_Test
-let executorType = sorterEvalExecutorType.StageStatsReport
-let host: IRunHost = 
-    let spec = SorterEvalSpecsRandom.getConfig configType executorType
-    SorterEval.SorterEvalRunHost.createRunHost spec
+//let configType = SorterEvalSpecsRandom.configType.Rand_Test
+//let executorType = sorterEvalExecutorType.StageStatsReport
+//let host: IRunHost = 
+//    let spec = SorterEvalSpecsRandom.getConfig configType executorType
+//    SorterEval.SorterEvalRunHost.createRunHost spec
 
-let executor = SorterEvalExecutor.getExecutor executorType
+//let executor = SorterEvalExecutor.getExecutor executorType
 
 
 
@@ -108,13 +108,13 @@ let executor = SorterEvalExecutor.getExecutor executorType
 
 
 
-//let configType = SorterMutateSpecsRandom.configType.Rand_Test
-//let executorType = sorterMutateExecutorType.GenStandard
-//let host: IRunHost = 
-//    let spec = SorterMutateSpecsRandom.getConfig configType executorType
-//    SorterMutate.SorterMutateRunHost.createRunHost spec
+let configType = SorterMutateSpecsRandom.configType.Rand_Test
+let executorType = sorterMutateExecutorType.GenStandard
+let host: IRunHost = 
+    let spec = SorterMutateSpecsRandom.getConfig configType executorType
+    SorterMutate.SorterMutateRunHost.createRunHost spec
 
-//let executor = SorterMutateExecutor.getExecutor executorType
+let executor = SorterMutateExecutor.getExecutor executorType
 
 
 
@@ -166,9 +166,7 @@ async {
     
 //    let! initResult = 
 //        ParamOps.initProjectAndRunFiles
-//            host.ProjectDb           
-//            host.ProjectDb.MakeQueryParamsFromRunParams 
-//            cts 
+//            host.RunDb           
 //            (Some progress) 
 //            host.Run              
 //            minReplica 

@@ -29,7 +29,14 @@ module SorterMutateSpecsRandom =
 
     // MutationRates
     let mutationRates =
-            (runParameters.mutationRateKey, [0.01; 0.05; 0.1] |> List.map string)
+            (runParameters.mutationRateKey, [1.0] |> List.map string)
+    let insertionRates =
+            (runParameters.insertionRateKey, [0.1;] |> List.map string)
+    let deletionRates =
+            (runParameters.deletionRateKey, [0.1;] |> List.map string)
+    let modificationRates =
+            (runParameters.modificationRateKey, [0.01; 0.05; 0.1] |> List.map string)
+
 
     // SorterCounts
     let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
@@ -37,7 +44,7 @@ module SorterMutateSpecsRandom =
     let mediumChildCount = (runParameters.sorterChildCountKey, ["10";] )
     let largeChildCount = (runParameters.sorterChildCountKey, ["100";] )
 
-    let testParentCount = (runParameters.sorterParentCountKey, ["10";] )
+    let testParentCount = (runParameters.sorterParentCountKey, ["100";] )
     let smallParentCount = (runParameters.sorterParentCountKey, ["10";] )
     let mediumParentCount = (runParameters.sorterParentCountKey, ["100";] )
     let largeParentCount = (runParameters.sorterParentCountKey, ["1000";] )
@@ -46,28 +53,16 @@ module SorterMutateSpecsRandom =
 
     // SimpleSorterModelTypes
     let allSimpleSorterModelTypes = 
-            (runParameters.simpleSorterModelTypeKey, SimpleSorterModelType.all() |> List.map SimpleSorterModelType.toString)
+            (runParameters.simpleSorterModelTypeKey, 
+             [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
 
 
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
-        let mutationRate = rp.GetMutationRate()
-        let insertionRate =
-            maybe {
-                let! mr = mutationRate
-                return (%mr / 2.0) |> UMX.tag<insertionRate>
-            }
-        let deletionRate =
-            maybe {
-                let! mr = mutationRate
-                return (%mr / 2.0) |> UMX.tag<deletionRate>
-            }   
+        let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
         rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
-          .WithInsertionRate(insertionRate)
-          .WithDeletionRate(deletionRate)
           .WithId (Some qp.Value.Id)
 
     
@@ -96,6 +91,9 @@ module SorterMutateSpecsRandom =
                 rngType
                 sorterEvalType
                 mutationRates
+                insertionRates
+                deletionRates
+                modificationRates
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 testParentCount
@@ -115,6 +113,9 @@ module SorterMutateSpecsRandom =
                 rngType
                 sorterEvalType
                 mutationRates
+                insertionRates
+                deletionRates
+                modificationRates
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 testParentCount
@@ -134,6 +135,9 @@ module SorterMutateSpecsRandom =
                 rngType
                 sorterEvalType
                 mutationRates
+                insertionRates
+                deletionRates
+                modificationRates
                 mediumSortingWidths
                 allSimpleSorterModelTypes
                 largeParentCount
