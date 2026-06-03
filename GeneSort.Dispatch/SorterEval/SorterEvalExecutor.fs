@@ -69,7 +69,7 @@ module SorterEvalExecutor =
         }
 
 
-    let _makeSorterEvalBins 
+    let _makeSorterEvals 
             (makeModelGen: runParameters -> sorterModelGen option)
             (makeTests: runParameters -> Async<Result<Sortable.sortableTest, string>>)
             (host: IRunHost)
@@ -95,10 +95,6 @@ module SorterEvalExecutor =
                 let! sorterModelGen = 
                     makeModelGen rp 
                     |> Result.ofOption "Failed: SorterModelGen could not be initialized from parameters."
-
-                let! qpModelSet = 
-                    SorterEvalDbs.RandomStandard.Uniform.queryParamsFromRunParams rp (outputDataType.SorterModelSet "")
-                    |> Result.ofOption "Failed to create QueryParams for SorterModelSet."
 
                 let! repl = 
                     rp.GetRepl() 
@@ -139,11 +135,11 @@ module SorterEvalExecutor =
                     // Create individual sorter models for this chunk segment
                     let modelSetChunk = 
                         SorterModelGen.makeSorterModelSetFromIndexSpan 
-                            (%qpModelSet.Id |> UMX.tag) pieceFirstIdx sortersPerSplit sorterModelGen
+                            (Guid.Empty |> UMX.tag) pieceFirstIdx sortersPerSplit sorterModelGen
 
                     // Materialize models into a functional SorterSet chunk
                     let fullSorterSetChunk = 
-                        SorterModelSet.makeSorterSet (%modelSetChunk.Id |> UMX.tag) modelSetChunk
+                        SorterModelSet.makeSorterSet (Guid.Empty |> UMX.tag) modelSetChunk
 
                     // Compute sorter evaluations directly from the chunk array
                     let sorterEvalsChunk = 
@@ -329,7 +325,7 @@ module SorterEvalExecutor =
     let uniformStandardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _makeSorterEvalBins 
+                _makeSorterEvals 
                     makeUniformSorterModelGen
                     makeStandardTests
                     host rp allowOverwrite cts progress }
@@ -337,7 +333,7 @@ module SorterEvalExecutor =
     let uniformMergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _makeSorterEvalBins 
+                _makeSorterEvals 
                     makeUniformSorterModelGen
                     makeMergeTests
                     host rp allowOverwrite cts progress }

@@ -1,4 +1,6 @@
 ﻿namespace GeneSort.Model.Sorting.V1
+
+open System
 open FSharp.UMX
 
 open GeneSort.Sorting
@@ -27,7 +29,8 @@ type sorterModelSet =
         member this.Count with get() = this.sortingMap.Count
         member this.Id with get() = this.id
         member this.SorterModels with get() = this.sortingMap |> Map.toArray |> Array.map snd
-
+        static member empty: sorterModelSet =
+            { id = Guid.Empty |> UMX.tag; sortingMap = Map.empty }
 
 module SorterModelSet =
 

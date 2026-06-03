@@ -13,8 +13,6 @@ open GeneSort.Core
 
     static member create (sorterSetId: Guid<sorterSetId>)
                          (sorters: sorter array) : sorterSet =
-        if %sorterSetId = Guid.Empty then
-            invalidArg "sorterSetId" "SorterSet ID must not be empty"
         { sorterSetId = sorterSetId; sorters = Array.copy sorters; }
 
     static member createWithNewId (sorters: sorter array) : sorterSet =

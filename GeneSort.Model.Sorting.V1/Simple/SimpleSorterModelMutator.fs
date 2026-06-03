@@ -33,18 +33,19 @@ module SimpleSorterModelMutator =
     let getSimpleSorterModelMutator 
                 (simpleSorterModelType: simpleSorterModelType)
                 (rngFactory: rngFactory)
-                (excludeSelfCe: bool<excludeSelfCe> option)
+                (excludeSelfCe: bool<excludeSelfCe>)
                 (modificationRate: float<modificationRate>)
-                (mutationRate: float<mutationRate> option)
-                (insertionRate: float<insertionRate> option)
-                (deletionRate: float<deletionRate> option) :simpleSorterModelMutator =
+                (mutationRate: float<mutationRate>)
+                (insertionRate: float<insertionRate>)
+                (deletionRate: float<deletionRate>) :simpleSorterModelMutator =
         match simpleSorterModelType with
         | simpleSorterModelType.Msce -> 
             (msceRandMutate.create rngFactory 
                     (indelRates.createMod 
-                            (%modificationRate, %mutationRate.Value, 
-                                %insertionRate.Value, %deletionRate.Value))
-                    (%excludeSelfCe.Value))
+                            (%modificationRate, %mutationRate, %insertionRate, %deletionRate)
+                    )
+                    (%excludeSelfCe)
+            )
             |> simpleSorterModelMutator.SmmMsceRandMutate
         | _ -> failwith "Unsupported simple sorter model type for mutator creation."
 
