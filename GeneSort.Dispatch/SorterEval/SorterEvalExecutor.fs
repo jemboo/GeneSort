@@ -219,13 +219,12 @@ module SorterEvalExecutor =
         } |> Async.map (logResult progress log)
 
 
-
     let makeStageStatsReport 
-                (host: IRunHost)
-                (rp: runParameters) 
-                (allowOverwrite: bool<allowOverwrite>) 
-                (cts: CancellationTokenSource) 
-                (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+                    (host: IRunHost)
+                    (rp: runParameters) 
+                    (allowOverwrite: bool<allowOverwrite>) 
+                    (cts: CancellationTokenSource) 
+                    (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
         let log msg = OpsUtils.report progress 
                         (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
@@ -253,12 +252,16 @@ module SorterEvalExecutor =
                     |> SorterStageStats.fromSorterEval
                     |> Array.map (fun sss -> sss.toDataTableRecord())
 
-                // Run the fully encapsulated pipeline
-                let dtrs = 
+                // UPDATED PIPELINE:
+                // 1. Generate the labeled selections (TMB strategy in this case)
+                let selection = 
                     sorterSetEvals.SorterEvals
-                    |> Array.filter (fun se -> se |> SorterEval.getIsSorted)
-                    |> TmbSorterEvalGroups.fromEvaluations SorterEval.byEqualTwoWeighted 300
-                    |> TmbSorterEvalGroups.toDataTableRecords leadCols stageStatsRecordMaker
+                    |> LabeledSorterEvals.makeTmbSelections SorterEval.byEqualTwoWeighted 300
+                
+                // 2. Use the separated Reporting module to generate rows (now includes Strategy info)
+                let dtrs = 
+                    selection 
+                    |> EvalReporting.toDataTableRecords leadCols stageStatsRecordMaker
 
                 let report = DataTableReport.fromDataTableRecords dtrs
 
@@ -268,7 +271,6 @@ module SorterEvalExecutor =
             with e -> 
                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
         } |> Async.map (logResult progress log)
-
 
 
     let makeCeBinSummaryStats
@@ -316,9 +318,6 @@ module SorterEvalExecutor =
             with e -> 
                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
         } |> Async.map (logResult progress log)
-
-
-
 
 
 

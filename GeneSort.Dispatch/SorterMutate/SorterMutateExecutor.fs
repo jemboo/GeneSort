@@ -10,7 +10,6 @@ open GeneSort.SortingOps
 open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
-open GeneSort.Eval.V1.Bins
 open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
@@ -123,7 +122,8 @@ module SorterMutateExecutor =
                                             sorterEvalType
 
 
-            let egs = TmbSorterEvalGroups.fromEvaluations
+            let labeledSorterEvals
+                    = LabeledSorterEvals.makeTmbSelections
                                         ranker
                                         (%sorterParentCount / 3)
                                         parentSorterSetEval.SorterEvals
@@ -134,7 +134,7 @@ module SorterMutateExecutor =
                                         sortingWidth 
                                         simpleSorterModelType
 
-            let parentSorterModelSet = egs.makeSorterModelSet
+            let parentSorterModelSet = labeledSorterEvals.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
@@ -231,7 +231,6 @@ module SorterMutateExecutor =
             let ranker = SorterEval.byEqualTwoWeighted
 
 
-
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getMergeSorterEvals 
                                         sortingWidth 
@@ -240,11 +239,10 @@ module SorterMutateExecutor =
                                         mergeSuffixType
                                         sorterEvalType
 
-
-
-            let egs = TmbSorterEvalGroups.fromEvaluations
+            let labeledSorterEvals
+                    = LabeledSorterEvals.makeTmbSelections
                                         ranker
-                                        (%parentSorterCount / 3)
+                                        (%sorterParentCount / 3)
                                         parentSorterSetEval.SorterEvals
 
             let (parentSorterModelGen: sorterModelGen) = 
@@ -253,7 +251,7 @@ module SorterMutateExecutor =
                                         sortingWidth 
                                         simpleSorterModelType
 
-            let parentSorterModelSet = egs.makeSorterModelSet
+            let parentSorterModelSet = labeledSorterEvals.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
