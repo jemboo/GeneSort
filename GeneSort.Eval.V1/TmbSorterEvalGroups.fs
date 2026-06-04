@@ -7,6 +7,31 @@ open GeneSort.Sorting
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 
+type groupSelectionType = 
+    | Tmb
+    | Profile
+    | TopN
+
+
+type evalLabel = 
+    | Tmb of tmbGroup
+    | Index of int
+
+
+module GroupSelectionType =
+
+    let toString = function
+        | groupSelectionType.Tmb -> "Tmb"
+        | Profile -> "Profile"
+        | TopN -> "TopN"
+
+    let fromString = function
+        | "Tmb" -> groupSelectionType.Tmb
+        | "Profile" -> Profile
+        | "TopN" -> TopN
+        | _ -> failwith "Invalid sorterEvalSelectionType string"
+
+
 
 type tmbSorterEvalGroups = 
     private {
@@ -23,14 +48,14 @@ type tmbSorterEvalGroups =
     member this.Bottom = this.bottom
 
     /// Converts the three explicit ranked groups into an itemized loop context for reports
-    member this.ToGroupedArrays() : array<rankedGroup * sorterEval array> =
+    member this.ToGroupedArrays() : array<tmbGroup * sorterEval array> =
         [|
-            (Top, this.top)
-            (Middle, this.middle)
-            (Bottom, this.bottom)
+            (tmbGroup.Top, this.top)
+            (tmbGroup.Middle, this.middle)
+            (tmbGroup.Bottom, this.bottom)
         |]
 
-    member this.ToRankedSorterEvals() : array<rankedGroup * sorterEval> =
+    member this.ToRankedSorterEvals() : array<tmbGroup * sorterEval> =
         let topRecords = this.top |> Array.map (fun se -> (Top, se))
         let midRecords = this.middle |> Array.map (fun se -> (Middle, se))
         let botRecords = this.bottom |> Array.map (fun se -> (Bottom, se))
@@ -143,8 +168,6 @@ type indexedSorterEvals =
 
             let sorterModels = SorterModelGen.makeSorterModelsFromIds sorterModelIds sorterModelGen
             sorterModelSet.create sorterModelSetId sorterModels
-
-
 
 
 

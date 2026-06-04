@@ -6,6 +6,7 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.SortingOps
+open GeneSort.Eval.V1
 
 
 type runParameters =
@@ -40,6 +41,7 @@ type runParameters =
     static member replSpanKey = "ReplSpan"
     static member runFinishedKey = "RunFinished"
     static member sorterEvalTypeKey = "SorterEvalType"
+    static member groupSelectionType = "GroupSelectionType"
     static member sorterCountKey = "SorterCount"
     static member sorterParentCountKey = "SorterParentCount"
     static member sorterChildCountKey = "SorterChildCount"
@@ -82,10 +84,8 @@ type runParameters =
     member this.GetLatticeDistance() = runParameters.tryGetInt runParameters.latticeDistanceKey this.paramMap |> Option.map UMX.tag<latticeDistance>
     member this.GetMaxOrbit() = runParameters.tryGetInt runParameters.maxOrbitKey this.paramMap
     member this.GetMergeDimension() = runParameters.tryGetInt runParameters.mergeDimensionKey this.paramMap |> Option.map UMX.tag<mergeDimension>
-    
     member this.GetMergeSuffixType() = 
         this.paramMap.TryFind runParameters.mergeSuffixTypeKey |> Option.bind (fun v -> try Some (MergeSuffixType.fromString v) with _ -> None)
-
     member this.GetModificationRate() = runParameters.tryGetFloat runParameters.modificationRateKey this.paramMap |> Option.map UMX.tag<modificationRate>
     member this.GetMutationRate() = runParameters.tryGetFloat runParameters.mutationRateKey this.paramMap |> Option.map UMX.tag<mutationRate>
     member this.GetInsertionRate() = runParameters.tryGetFloat runParameters.insertionRateKey this.paramMap |> Option.map UMX.tag<insertionRate>
@@ -103,6 +103,7 @@ type runParameters =
     member this.GetSortableCount() = runParameters.tryGetInt runParameters.sortableCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     member this.GetSorterCount() = runParameters.tryGetInt runParameters.sorterCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     member this.GetSorterEvalType() = this.paramMap.TryFind runParameters.sorterEvalTypeKey |> Option.map SorterEvalType.fromString
+    member this.GetGroupSelectionType() = this.paramMap.TryFind runParameters.groupSelectionType |> Option.map GroupSelectionType.fromString
     member this.GetSorterParentCount() = runParameters.tryGetInt runParameters.sorterParentCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     member this.GetSorterChildCount() = runParameters.tryGetInt runParameters.sorterChildCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
 
@@ -201,6 +202,9 @@ type runParameters =
 
     member this.WithSorterEvalType(set: sorterEvalType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalTypeKey (set |> Option.map SorterEvalType.toString) }
+
+    member this.WithGroupSelectionType(ses: groupSelectionType option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.groupSelectionType (ses |> Option.map GroupSelectionType.toString) }
 
     member this.WithSorterParentCount(spc: int<sorterCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterParentCountKey (spc |> Option.map UmxExt.intToRaw) }

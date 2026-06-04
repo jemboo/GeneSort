@@ -76,7 +76,7 @@ module SorterEvalDbs =
                         (mergeDimension: int<mergeDimension>) 
                         (mergeSuffixType: mergeSuffixType)
                         (sortableDataFormat: sortableDataFormat) 
-                        (set: sorterEvalType)
+                        (sorterEvalType: sorterEvalType)
                         (outputDataType: outputDataType) : queryParams =
 
                 queryParams.create 
@@ -89,7 +89,7 @@ module SorterEvalDbs =
                        (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
                        (runParameters.mergeDimensionKey, string %mergeDimension);
                        (runParameters.mergeSuffixTypeKey, mergeSuffixType |> MergeSuffixType.toString);
-                       (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString) 
+                       (runParameters.sorterEvalTypeKey, sorterEvalType |> SorterEvalType.toString) 
                        (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
                     |]
 
@@ -133,12 +133,14 @@ module SorterEvalDbs =
     let getStandardSorterEvals
                     (sortingWidth: int<sortingWidth>) 
                     (simpleSorterModelType: simpleSorterModelType) 
-                    (set: sorterEvalType)
+                    (sorterEvalType: sorterEvalType)
                             : Async<Result<sorterSetEval, string>> =
         let qp = RandomStandard.Uniform.makeQueryParams 
                         CommonSorterEval.projectRngType
                         (0 |> UMX.tag<replNumber>) 
-                        sortingWidth simpleSorterModelType set
+                        sortingWidth 
+                        simpleSorterModelType 
+                        sorterEvalType
                         (outputDataType.SorterSetEval "")
         async {
              let! result = (RandomStandard.Uniform.db :> IGeneSortDb).loadAsync qp
@@ -151,7 +153,7 @@ module SorterEvalDbs =
                     (simpleSorterModelType: simpleSorterModelType)
                     (mergeDimension: int<mergeDimension>) 
                     (mergeSuffixType: mergeSuffixType)
-                    (set: sorterEvalType)
+                    (sorterEvalType: sorterEvalType)
                             : Async<Result<sorterSetEval, string>> =
 
         let qp = RandomMerge.Uniform.makeQueryParams 
@@ -162,7 +164,7 @@ module SorterEvalDbs =
                         mergeDimension 
                         mergeSuffixType 
                         CommonSortableTest.projectSortableDataFormat
-                        set
+                        sorterEvalType
                         (outputDataType.SorterSetEval "")
         async {
              let! result = (RandomMerge.Uniform.db :> IGeneSortDb).loadAsync qp

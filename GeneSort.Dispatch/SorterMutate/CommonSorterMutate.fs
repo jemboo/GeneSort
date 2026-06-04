@@ -15,6 +15,7 @@ type sorterMutateExecutorType =
     | GenStandard
     | GenMerge
     | FullReport
+    | MutantReport
 
 
 module SorterMutateExecutorType =
@@ -22,6 +23,7 @@ module SorterMutateExecutorType =
         | GenStandard -> "GenStandard"
         | GenMerge -> "GenMerge"
         | FullReport -> "FullReport"
+        | MutantReport -> "MutantReport"
 
 
 

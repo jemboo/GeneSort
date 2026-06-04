@@ -64,7 +64,7 @@ module SorterMutateExecutor =
         }
 
 
-    let makeStandardSorterModels (rp:runParameters) : Async<Result<sorterModel [], string>> =
+    let makeMutantSorterModels (rp:runParameters) : Async<Result<sorterModel [], string>> =
         asyncResult {
 
             let! (rngType: rngType) =  
@@ -106,6 +106,10 @@ module SorterMutateExecutor =
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
                         |> Result.ofOption "Missing modificationRate in run parameters"
+
+            let! (sorterEvalSelectionType: groupSelectionType) =  
+                        rp.GetGroupSelectionType()
+                        |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
 
 
             let rngFactory = rngType |> RngFactory.create
@@ -427,11 +431,53 @@ module SorterMutateExecutor =
         } |> Async.map (logResult progress log)
 
 
+
+    let makeMutantReport 
+            (host: IRunHost)
+            (rp: runParameters) 
+            (allowOverwrite: bool<allowOverwrite>) 
+            (cts: CancellationTokenSource) 
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+
+
+        let log msg = OpsUtils.report progress 
+                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+
+        asyncResult {
+            try
+                do! checkCancellation cts.Token
+                let runId = rp |> RunParameters.getIdString
+                OpsUtils.report progress (sprintf "%s Starting Mutant Report for Run %s" (MathUtils.getTimestampString()) %runId)
+    
+                let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                                        |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
+                let! outB = host.RunDb.loadAsync qpSorterSetEval
+                let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
+
+                let reportName = (sprintf "MutantReport" |> UMX.tag<textReportName>)
+
+                let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                                |> Result.ofOption "Failed to create QueryParams for Report."
+                let leadCols = qpReport |> QueryParams.makeDataTableRecord
+                let details = sorterSetEvals |> SorterSetEval.makeFullDataTableRecords
+                let dtrs = dataTableRecord.combineWithMany details leadCols
+                let report = DataTableReport.fromDataTableRecords dtrs
+
+                let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
+                let yab = (rp : runParameters).WithRunFinished(Some true)
+                return yab
+            with e -> 
+               return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
+        } |> Async.map (logResult progress log)
+
+
+
+
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _evaluateMutants 
-                    makeStandardSorterModels
+                    makeMutantSorterModels
                     makeStandardTests
                     host rp allowOverwrite cts progress }
 
@@ -449,11 +495,19 @@ module SorterMutateExecutor =
                 makeFullReport
                     host rp allowOverwrite cts progress }
 
+    let mutantReportExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                makeMutantReport
+                    host rp allowOverwrite cts progress }
+
+
     let getExecutor (executorType: sorterMutateExecutorType) : IRunParamsExecutor =
         match executorType with
         | sorterMutateExecutorType.GenStandard -> standardExecutor
         | sorterMutateExecutorType.GenMerge -> mergeExecutor
         | sorterMutateExecutorType.FullReport -> fullReportExecutor
+        | sorterMutateExecutorType.MutantReport -> mutantReportExecutor
 
 
 

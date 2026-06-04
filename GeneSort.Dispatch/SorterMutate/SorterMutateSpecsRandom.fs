@@ -6,6 +6,7 @@ open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.SortingOps
+open GeneSort.Eval.V1
 
 
 module SorterMutateSpecsRandom = 
@@ -19,6 +20,12 @@ module SorterMutateSpecsRandom =
     let sorterEvalType = 
             (runParameters.sorterEvalTypeKey, 
             [ sorterEvalType.V2 ;] |> List.map SorterEvalType.toString)
+
+
+    let sorterEvalSelection = 
+            (runParameters.groupSelectionType, 
+            [ groupSelectionType.Tmb; ] |> List.map GroupSelectionType.toString)
+
     
     // SortingWidths
     let smallSortingWidths = 
@@ -85,10 +92,11 @@ module SorterMutateSpecsRandom =
 
         let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
             DatabaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"SorterMutate_Standard_test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
+                sorterEvalSelection
                 sorterEvalType
                 mutationRates
                 insertionRates
@@ -107,10 +115,11 @@ module SorterMutateSpecsRandom =
 
         let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
             DatabaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"SorterMutate_Standard_small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
+                sorterEvalSelection
                 sorterEvalType
                 mutationRates
                 insertionRates
@@ -129,10 +138,11 @@ module SorterMutateSpecsRandom =
 
         let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
             DatabaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"SorterMutate_Standard_medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
+                sorterEvalSelection
                 sorterEvalType
                 mutationRates
                 insertionRates

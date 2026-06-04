@@ -10,9 +10,7 @@ open GeneSort.Db.V1
 open GeneSort.FileDb.V1
 open CommonSorterMutate
 open GeneSort.SortingOps
-open GeneSort.Eval.V1.Bins
-open GeneSort.Dispatch.V1.SorterEval
-open GeneSort.Dispatch.V1.SortableTest
+open GeneSort.Eval.V1
 
 module SorterMutateDbs =
     
@@ -27,6 +25,7 @@ module SorterMutateDbs =
 
             let makeQueryParams
                             (rng: rngType)
+                            (ses:groupSelectionType)
                             (repl: int<replNumber>) 
                             (sw: int<sortingWidth>) 
                             (smt: simpleSorterModelType) 
@@ -39,6 +38,7 @@ module SorterMutateDbs =
                 queryParams.create dbName (Some repl) odt
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
+                       (runParameters.groupSelectionType, ses |> GroupSelectionType.toString)
                        (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                        (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString)
@@ -54,6 +54,7 @@ module SorterMutateDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! repl = rp.GetRepl()
+                    let! ses = rp.GetGroupSelectionType()
                     let! sw = rp.GetSortingWidth()
                     let! smt = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
@@ -62,7 +63,7 @@ module SorterMutateDbs =
                     let! ins = rp.GetInsertionRate()
                     let! del = rp.GetDeletionRate()
                     let! mdr = rp.GetModificationRate()
-                    return makeQueryParams rng repl sw smt set mut ins del mdr odt 
+                    return makeQueryParams rng ses repl sw smt set mut ins del mdr odt 
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -79,6 +80,7 @@ module SorterMutateDbs =
 
             let makeQueryParams
                         (rng: rngType)
+                        (ses:groupSelectionType)
                         (repl: int<replNumber>) 
                         (sortingWidth: int<sortingWidth>)
                         (simpleSorterModelType: simpleSorterModelType)
@@ -98,6 +100,7 @@ module SorterMutateDbs =
                     outputDataType
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
+                       (runParameters.groupSelectionType, ses |> GroupSelectionType.toString)
                        (runParameters.sortingWidthKey, string %sortingWidth); 
                        (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
                        (runParameters.mergeDimensionKey, string %mergeDimension);
@@ -116,6 +119,7 @@ module SorterMutateDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! rng = rp.GetRngType()
+                    let! ses = rp.GetGroupSelectionType()
                     let! repl = rp.GetRepl()
                     let! sw = rp.GetSortingWidth()
                     let! md = rp.GetMergeDimension()
@@ -127,7 +131,7 @@ module SorterMutateDbs =
                     let! ins = rp.GetInsertionRate()
                     let! del = rp.GetDeletionRate()
                     let! mdr = rp.GetModificationRate()
-                    return makeQueryParams rng repl sw smt md mst sdf set mut ins del mdr odt
+                    return makeQueryParams rng ses repl sw smt md mst sdf set mut ins del mdr odt
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
