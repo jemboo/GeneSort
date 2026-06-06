@@ -52,6 +52,9 @@ type labeledSorterEvals =
         strategy: selectionStrategy
         items: (evalLabel * sorterEval) array
     }
+
+    static member Empty = { strategy = Tmb; items = [||] }
+
     static member create (strategy: selectionStrategy) (items: (evalLabel * sorterEval) array) = 
         { strategy = strategy; items = items }
 
@@ -223,7 +226,8 @@ module EvalReporting =
             dataTableRecord.createEmpty() 
             |> dataTableRecord.addData "SorterEvalIndex" (string idx)
 
-    let toDataTableRecords 
+    // for reports having multiple dataTableRecords per eval
+    let toManyDataTableRecords
                 (leadCols: dataTableRecord) 
                 (recordMaker: sorterEval -> dataTableRecord [])
                 (selection: labeledSorterEvals) : dataTableRecord array =
@@ -242,3 +246,26 @@ module EvalReporting =
             |> recordMaker
             |> Array.map (fun customDtr -> customDtr |> dataTableRecord.combine labelDtr)
         )
+
+
+    let toDataTableRecords 
+        (leadCols: dataTableRecord) 
+        (labelPfx:string)
+        (selection: labeledSorterEvals) : Map<Guid<sorterId>,dataTableRecord> =
+
+        // Append the generation context to data table records
+        let strategyDtr = 
+            dataTableRecord.createEmpty()
+            |> dataTableRecord.addData "SelectionStrategy" (SelectionStrategy.toString selection.Strategy)
+            |> dataTableRecord.combine leadCols
+
+        selection.Items
+        |> Array.map (
+            fun (label, se) -> 
+                let labelDtr = evalLabelToDtr label |> dataTableRecord.combine strategyDtr
+                (
+                    se |> SorterEval.getSorterId,
+                    se |> SorterEval.toDataTableRecordWithPrefix labelPfx
+                        |> dataTableRecord.combine labelDtr
+                )
+            ) |> Map.ofArray

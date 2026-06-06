@@ -55,6 +55,18 @@ type sorterEvalV1 =
             |> dataTableRecord.addData "SequenceHash" (string %this.sequenceHash)
             |> dataTableRecord.addData "LastCeIndex" (string %this.lastCeIndex)
 
+    member this.ToDataTableRecordWithPrefix(prefix: string) : dataTableRecord =
+            let isSorted = this.unsortedCount = 0<sortableCount>
+            dataTableRecord.createEmpty()
+            |> dataTableRecord.addData (prefix + "SorterId") (string %this.sorterId)
+            |> dataTableRecord.addData (prefix + "SortingWidth") (string %this.sortingWidth)
+            |> dataTableRecord.addData (prefix + "UnsortedCount") (string %this.unsortedCount)
+            |> dataTableRecord.addData (prefix + "StageLength") (string %this.stageLength)
+            |> dataTableRecord.addData (prefix + "CeLength") (string %this.ceLength)
+            |> dataTableRecord.addData (prefix + "IsSorted") (string isSorted)
+            |> dataTableRecord.addData (prefix + "SequenceHash") (string %this.sequenceHash)
+            |> dataTableRecord.addData (prefix + "LastCeIndex") (string %this.lastCeIndex)
+
 
 
 type ceUse = 
@@ -121,7 +133,19 @@ type sorterEvalV2 =
             |> dataTableRecord.addData "SequenceHash" (string %this.sequenceHash)
             |> dataTableRecord.addData "LastCeIndex" (string %this.LastCeIndex)
 
-
+    
+    member this.ToDataTableRecordWithPrefix(prefix: string) : dataTableRecord =
+        let isSorted = this.unsortedCount = 0<sortableCount>
+        dataTableRecord.createEmpty()
+        |> dataTableRecord.addData (prefix + "SorterId") (string %this.sorterId)
+        |> dataTableRecord.addData (prefix + "SortingWidth") (string %this.sortingWidth)
+        |> dataTableRecord.addData (prefix + "UnsortedCount") (string %this.unsortedCount)
+        |> dataTableRecord.addData (prefix + "StageLength") (string %this.stageLength)
+        |> dataTableRecord.addData (prefix + "CeLength") (string %this.CeLength)
+        |> dataTableRecord.addData (prefix + "IsSorted") (string isSorted)
+        |> dataTableRecord.addData (prefix + "SequenceHash") (string %this.sequenceHash)
+        |> dataTableRecord.addData (prefix + "LastCeIndex") (string %this.LastCeIndex)
+        
 
 
 type sorterEvalV3 =
@@ -173,6 +197,18 @@ type sorterEvalV3 =
             |> dataTableRecord.addData "IsSorted" (string isSorted)
             |> dataTableRecord.addData "SequenceHash" (string %this.sequenceHash)
             |> dataTableRecord.addData "LastCeIndex" (string %this.LastCeIndex)
+
+    member this.ToDataTableRecordWithPrefix(prefix: string) : dataTableRecord =
+            let isSorted = this.UnsortedCount = 0<sortableCount>
+            dataTableRecord.createEmpty()
+            |> dataTableRecord.addData (prefix + "SorterId") (string %this.sorterId)
+            |> dataTableRecord.addData (prefix + "SortingWidth") (string %this.sortingWidth)
+            |> dataTableRecord.addData (prefix + "UnsortedCount") (string %this.UnsortedCount)
+            |> dataTableRecord.addData (prefix + "StageLength") (string %this.stageLength) 
+            |> dataTableRecord.addData (prefix + "CeLength") (string %this.CeLength)
+            |> dataTableRecord.addData (prefix + "IsSorted") (string isSorted)
+            |> dataTableRecord.addData (prefix + "SequenceHash") (string %this.sequenceHash)
+            |> dataTableRecord.addData (prefix + "LastCeIndex") (string %this.LastCeIndex)
 
 
 
@@ -263,6 +299,12 @@ module SorterEval =
         | V1 v1 -> v1.ToDataTableRecord()
         | V2 v2 -> v2.ToDataTableRecord()
         | V3 v3 -> v3.ToDataTableRecord()
+
+    let toDataTableRecordWithPrefix (prefix: string) (eval: sorterEval) : dataTableRecord =
+        match eval with
+        | V1 v1 -> v1.ToDataTableRecordWithPrefix(prefix)
+        | V2 v2 -> v2.ToDataTableRecordWithPrefix(prefix)
+        | V3 v3 -> v3.ToDataTableRecordWithPrefix(prefix)
 
 
     /// Internal helper to extract ceData array for V2 and V3 records

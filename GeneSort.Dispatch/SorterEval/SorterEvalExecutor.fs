@@ -261,7 +261,7 @@ module SorterEvalExecutor =
                 // 2. Use the separated Reporting module to generate rows (now includes Strategy info)
                 let dtrs = 
                     selection 
-                    |> EvalReporting.toDataTableRecords leadCols stageStatsRecordMaker
+                    |> EvalReporting.toManyDataTableRecords leadCols stageStatsRecordMaker
 
                 let report = DataTableReport.fromDataTableRecords dtrs
 

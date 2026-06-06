@@ -167,7 +167,7 @@ module SorterMutateExecutor =
 
 
 
-    let makeMergeMutantSorterModels (rp:runParameters) : Async<Result<sorterModel [], string>> =
+    let makeMutantMergeSorterModels (rp:runParameters) : Async<Result<sorterModel [], string>> =
         asyncResult {
 
             let! (rngType: rngType) =  
@@ -282,6 +282,220 @@ module SorterMutateExecutor =
 
             return allMutantSorterModels
         }
+
+
+
+    let makeMutantDetails (rp:runParameters) : 
+                    Async<Result<labeledSorterEvals * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>> =
+        asyncResult {
+
+            let! (rngType: rngType) =  
+                        rp.GetRngType()
+                        |> Result.ofOption "Missing RNG type in run parameters"
+
+            let! (sortingWidth: int<sortingWidth>) = 
+                        rp.GetSortingWidth() 
+                        |> Result.ofOption "Missing sorting width in run parameters"
+    
+            let! (simpleSorterModelType: simpleSorterModelType) = 
+                        rp.GetSimpleSorterModelType() 
+                        |> Result.ofOption "Missing simple sorter model type in run parameters"
+
+            let! (sorterEvalType: sorterEvalType) =
+                        rp.GetSorterEvalType()
+                        |> Result.ofOption "Missing sorter eval type in run parameters"
+
+            let! (sorterParentCount: int<sorterCount>) = 
+                        rp.GetSorterParentCount()
+                        |> Result.ofOption "Missing parent sorter count in run parameters"
+
+            let! (sorterChildCount: int<sorterCount>) = 
+                        rp.GetSorterChildCount()
+                        |> Result.ofOption "Missing parent sorter count in run parameters"
+
+            let! (mutationRate: float<mutationRate>) =  
+                        rp.GetMutationRate()
+                        |> Result.ofOption "Missing mutationRate in run parameters"
+
+            let! (insertionRate: float<insertionRate>) =  
+                        rp.GetInsertionRate()
+                        |> Result.ofOption "Missing insertionRate in run parameters"
+
+            let! (deletionRate: float<deletionRate>) =  
+                        rp.GetDeletionRate()
+                        |> Result.ofOption "Missing deletionRate in run parameters"
+
+            let! (modificationRate: float<modificationRate>) =  
+                        rp.GetModificationRate()
+                        |> Result.ofOption "Missing modificationRate in run parameters"
+
+            let! (sorterEvalSelectionType: groupSelectionType) =  
+                        rp.GetGroupSelectionType()
+                        |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
+
+
+            let rngFactory = rngType |> RngFactory.create
+            let ranker = SorterEval.byEqualTwoWeighted
+
+
+            let! (parentSorterSetEval: sorterSetEval) =
+                        SorterEvalDbs.getStandardSorterEvals 
+                                            sortingWidth 
+                                            simpleSorterModelType
+                                            sorterEvalType
+
+
+            let _labeledSorterEvals
+                    = LabeledSorterEvals.makeTmbSelections
+                                        ranker
+                                        (%sorterParentCount / 30)
+                                        parentSorterSetEval.SorterEvals
+
+            let (parentSorterModelGen: sorterModelGen) = 
+                CommonSorterEval.getSimpleUniformSorterModelGen 
+                                        rngType 
+                                        sortingWidth 
+                                        simpleSorterModelType
+
+            let parentSorterModelSet = _labeledSorterEvals.MakeSorterModelSet
+                                            (Guid.Empty |> UMX.tag)
+                                            parentSorterModelGen
+
+            let simpleSorterModels = parentSorterModelSet.SorterModels |> Array.map (SorterModel.asSimpleSorterModel)
+
+            let sorterModelMutator = SimpleSorterModelMutator.getSimpleSorterModelMutator 
+                                            simpleSorterModelType
+                                            rngFactory
+                                            CommonSorterMutate.ExcludeSelfCe
+                                            modificationRate
+                                            mutationRate
+                                            insertionRate
+                                            deletionRate
+
+            let parentMutantMap = 
+                    SimpleSorterModelMutator.makeMutantIdToParentIdMap
+                                        sorterModelMutator
+                                        simpleSorterModels
+                                        %sorterChildCount
+
+            return (_labeledSorterEvals, parentMutantMap)
+        }
+
+
+
+
+    let makeMutantMergeDetails (rp:runParameters) : 
+                    Async<Result<labeledSorterEvals * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>> =
+        asyncResult {
+
+            let! (rngType: rngType) =  
+                        rp.GetRngType()
+                        |> Result.ofOption "Missing RNG type in run parameters"
+
+            let! (sortingWidth: int<sortingWidth>) = 
+                        rp.GetSortingWidth() 
+                        |> Result.ofOption "Missing sorting width in run parameters"
+    
+            let! (simpleSorterModelType: simpleSorterModelType) = 
+                        rp.GetSimpleSorterModelType() 
+                        |> Result.ofOption "Missing simple sorter model type in run parameters"
+
+            let! (mergeDimension: int<mergeDimension>) = 
+                        rp.GetMergeDimension() 
+                        |> Result.ofOption "Missing mergeDimension in run parameters"
+
+            let! (mergeSuffixType: mergeSuffixType) = 
+                        rp.GetMergeSuffixType() 
+                        |> Result.ofOption "Missing mergeSuffixType in run parameters"
+
+            let! (sorterEvalType: sorterEvalType) =
+                        rp.GetSorterEvalType()
+                        |> Result.ofOption "Missing sorter eval type in run parameters"
+
+            let! (sorterEvalType: sorterEvalType) =
+                        rp.GetSorterEvalType()
+                        |> Result.ofOption "Missing sorter eval type in run parameters"
+
+            let! (sorterParentCount: int<sorterCount>) = 
+                        rp.GetSorterParentCount()
+                        |> Result.ofOption "Missing parent sorter count in run parameters"
+
+            let! (sorterChildCount: int<sorterCount>) = 
+                        rp.GetSorterChildCount()
+                        |> Result.ofOption "Missing parent sorter count in run parameters"
+
+            let! (mutationRate: float<mutationRate>) =  
+                        rp.GetMutationRate()
+                        |> Result.ofOption "Missing mutationRate in run parameters"
+
+            let! (insertionRate: float<insertionRate>) =  
+                        rp.GetInsertionRate()
+                        |> Result.ofOption "Missing insertionRate in run parameters"
+
+            let! (deletionRate: float<deletionRate>) =  
+                        rp.GetDeletionRate()
+                        |> Result.ofOption "Missing deletionRate in run parameters"
+
+            let! (modificationRate: float<modificationRate>) =  
+                        rp.GetModificationRate()
+                        |> Result.ofOption "Missing modificationRate in run parameters"
+
+            let! (parentSorterCount: int<sorterCount>) = 
+                        rp.GetSorterParentCount()
+                        |> Result.ofOption "Missing parent sorter count in run parameters"
+
+                                        
+            let rngFactory = rngType |> RngFactory.create
+            let ranker = SorterEval.byEqualTwoWeighted
+
+
+            let! (parentSorterSetEval: sorterSetEval) =
+                        SorterEvalDbs.getMergeSorterEvals 
+                                        sortingWidth 
+                                        simpleSorterModelType 
+                                        mergeDimension 
+                                        mergeSuffixType
+                                        sorterEvalType
+
+            let _labeledSorterEvals
+                    = LabeledSorterEvals.makeTmbSelections
+                                        ranker
+                                        (%sorterParentCount / 30)
+                                        parentSorterSetEval.SorterEvals
+
+            let (parentSorterModelGen: sorterModelGen) = 
+                CommonSorterEval.getSimpleUniformSorterModelGen 
+                                        rngType 
+                                        sortingWidth 
+                                        simpleSorterModelType
+
+            let parentSorterModelSet = _labeledSorterEvals.MakeSorterModelSet
+                                            (Guid.Empty |> UMX.tag)
+                                            parentSorterModelGen
+
+
+            let sorterModelMutator = SimpleSorterModelMutator.getSimpleSorterModelMutator 
+                                            simpleSorterModelType
+                                            rngFactory
+                                            CommonSorterMutate.ExcludeSelfCe
+                                            modificationRate
+                                            mutationRate
+                                            insertionRate
+                                            deletionRate
+
+            let simpleSorterModels = parentSorterModelSet.SorterModels 
+                                        |> Array.map (SorterModel.asSimpleSorterModel)
+
+            let parentMutantMap = 
+                    SimpleSorterModelMutator.makeMutantIdToParentIdMap
+                                        sorterModelMutator
+                                        simpleSorterModels
+                                        %sorterChildCount
+
+            return (_labeledSorterEvals, parentMutantMap)
+        }
+
+
 
 
 
@@ -430,7 +644,8 @@ module SorterMutateExecutor =
 
 
 
-    let makeMutantReport 
+    let makeMutantReport
+            (mutantDetailsMaker: runParameters -> Async<Result<labeledSorterEvals * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>> )
             (host: IRunHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
@@ -446,24 +661,49 @@ module SorterMutateExecutor =
                 do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Mutant Report for Run %s" (MathUtils.getTimestampString()) %runId)
+                let reportName = (sprintf "MutantReport" |> UMX.tag<textReportName>)
+
+
+                let! (lse, (mutantIdToParentIdMap: Map<Guid<sorterModelId>,Guid<sorterModelId>>)) = mutantDetailsMaker rp
+
+
     
                 let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                                         |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
                 let! outB = host.RunDb.loadAsync qpSorterSetEval
                 let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
 
-                let reportName = (sprintf "MutantReport" |> UMX.tag<textReportName>)
+
 
                 let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
                                 |> Result.ofOption "Failed to create QueryParams for Report."
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
-                let details = sorterSetEvals |> SorterSetEval.makeFullDataTableRecords
+                let parentRecordMap = lse |> EvalReporting.toDataTableRecords leadCols "Parent_"
+
+                let details =  
+                    sorterSetEvals.SorterEvals
+                    |> Array.choose (fun se -> 
+                        let (sorterModelId : Guid<sorterModelId>) = se |> SorterEval.getSorterId |> UMX.untag |> UMX.tag<sorterModelId>
+        
+                        // Use an option workflow (or simple pattern match) to safely look up both maps
+                        match mutantIdToParentIdMap |> Map.tryFind sorterModelId with
+                        | None -> None // Safely ignore if the parent mapping is missing
+                        | Some parentSorterModelId ->
+                            let parentKey = %parentSorterModelId |> UMX.tag<sorterId>
+                            match parentRecordMap |> Map.tryFind parentKey with
+                            | None -> None // Safely ignore if the parent record detail is missing
+                            | Some parentRecord ->
+                                let childRecord = se |> SorterEval.toDataTableRecord
+                                Some (dataTableRecord.combine parentRecord childRecord)
+                    )
+
                 let dtrs = dataTableRecord.combineWithMany details leadCols
                 let report = DataTableReport.fromDataTableRecords dtrs
 
+
+
                 let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
-                let yab = (rp : runParameters).WithRunFinished(Some true)
-                return yab
+                return (rp : runParameters).WithRunFinished(Some true)
             with e -> 
                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
         } |> Async.map (logResult progress log)
@@ -483,7 +723,7 @@ module SorterMutateExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _evaluateMutants 
-                    makeMergeMutantSorterModels
+                    makeMutantMergeSorterModels
                     makeMergeTests
                     host rp allowOverwrite cts progress }
 
@@ -497,7 +737,16 @@ module SorterMutateExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 makeMutantReport
+                    makeMutantDetails
                     host rp allowOverwrite cts progress }
+
+    let mutantMergeReportExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                makeMutantReport
+                    makeMutantMergeDetails
+                    host rp allowOverwrite cts progress }
+
 
 
     let getExecutor (executorType: sorterMutateExecutorType) : IRunParamsExecutor =
@@ -506,6 +755,7 @@ module SorterMutateExecutor =
         | sorterMutateExecutorType.GenMerge -> mergeExecutor
         | sorterMutateExecutorType.FullReport -> fullReportExecutor
         | sorterMutateExecutorType.MutantReport -> mutantReportExecutor
+        | sorterMutateExecutorType.MutantMergeReport -> mutantMergeReportExecutor
 
 
 

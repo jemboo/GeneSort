@@ -13,6 +13,10 @@ module SortableTestMergeSpecs =
     let smallSortingWidths = 
             (runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48;] |> List.map string)
 
+    // SortingWidths
+    let singleSortingWidth = 
+            (runParameters.sortingWidthKey, [32;] |> List.map string)
+
     let mediumSortingWidths = 
             (runParameters.sortingWidthKey,  [64; 96; 128; 192; 256]  |> List.map string)
 
@@ -20,6 +24,8 @@ module SortableTestMergeSpecs =
     // MergeDimensions
     let allMergeDimensions = 
             (runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
+    let singleMergeDimension = 
+            (runParameters.mergeDimensionKey, [4;] |> List.map string)
     let lowMergeDimensions = 
             (runParameters.mergeDimensionKey, [2; 3; 4;] |> List.map string)
     let highMergeDimensions = 

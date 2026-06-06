@@ -134,26 +134,7 @@ type dataTableReport =
         for row in this.dataRows do
             writer.WriteLine(row)
 
-
-
-module DataTableReport =
-
-    let create name (headers: string []) : dataTableReport = 
-        if String.IsNullOrWhiteSpace(name) then
-            invalidArg "name" "Name cannot be null or whitespace"
-        if headers.Length = 0 then
-            invalidArg "headers" "Headers array cannot be empty"
-        
-        // Sanitize headers to ensure no tabs break the format
-        let cleanHeaders = headers |> Array.map (fun h -> if h = null then "" else h.Replace("\t", " "))
-        { name = name
-          timeStamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")
-          sourceRows = ResizeArray()
-          errorRows = ResizeArray()
-          dataHeaders = cleanHeaders
-          dataRows = ResizeArray() }
-
-
+module DataTableReport_old =
 
     let mapToTabDelimitedStrings<'t when 't : comparison> 
             (keyFormatter: 't -> string) 
@@ -185,6 +166,26 @@ module DataTableReport =
                         row
                 )
         allHeaders, rows
+
+
+module DataTableReport =
+
+    let create name (headers: string []) : dataTableReport = 
+        if String.IsNullOrWhiteSpace(name) then
+            invalidArg "name" "Name cannot be null or whitespace"
+        if headers.Length = 0 then
+            invalidArg "headers" "Headers array cannot be empty"
+        
+        // Sanitize headers to ensure no tabs break the format
+        let cleanHeaders = headers |> Array.map (fun h -> if h = null then "" else h.Replace("\t", " "))
+        { name = name
+          timeStamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")
+          sourceRows = ResizeArray()
+          errorRows = ResizeArray()
+          dataHeaders = cleanHeaders
+          dataRows = ResizeArray() }
+
+
 
 
     let fromDataTableRecords (records: dataTableRecord seq) : dataTableReport =

@@ -57,16 +57,18 @@ module SorterMutateSpecsRandomMerge =
     let deletionRates =
             (runParameters.deletionRateKey, [0.1;] |> List.map string)
     let modificationRates =
-            (runParameters.modificationRateKey, [0.01; 0.05; 0.1] |> List.map string)
+            (runParameters.modificationRateKey, [0.01; 0.02; 0.03; ] |> List.map string)
+    //let modificationRates =
+    //        (runParameters.modificationRateKey, [0.05; 0.07; 0.10] |> List.map string)
 
 
     // SorterCounts
     let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let smallChildCount = (runParameters.sorterChildCountKey, ["1";] )
-    let mediumChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let largeChildCount = (runParameters.sorterChildCountKey, ["100";] )
+    let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
+    let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )
+    let largeChildCount = (runParameters.sorterChildCountKey, ["50000";] )
 
-    let testParentCount = (runParameters.sorterParentCountKey, ["100";] )
+    let testParentCount = (runParameters.sorterParentCountKey, ["60";] )
     let smallParentCount = (runParameters.sorterParentCountKey, ["10";] )
     let mediumParentCount = (runParameters.sorterParentCountKey, ["100";] )
     let largeParentCount = (runParameters.sorterParentCountKey, ["1000";] )
@@ -74,7 +76,7 @@ module SorterMutateSpecsRandomMerge =
 
 
     // SimpleSorterModelTypes
-    let allSimpleSorterModelTypes = 
+    let singleSorterModelType = 
             (runParameters.simpleSorterModelTypeKey, 
              [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
 
@@ -136,13 +138,13 @@ module SorterMutateSpecsRandomMerge =
                 insertionRates
                 deletionRates
                 modificationRates
-                smallSortingWidths
-                allSimpleSorterModelTypes
-                lowMergeDimensions
-                bothMergeSuffixTypes
+                SortableTestMergeSpecs.singleSortingWidth
+                singleSorterModelType
+                SortableTestMergeSpecs.singleMergeDimension
+                SortableTestMergeSpecs.noSuffixSuffixType
                 onlyDataFormat
                 testParentCount
-                testChildCount
+                largeChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
@@ -163,7 +165,7 @@ module SorterMutateSpecsRandomMerge =
                 deletionRates
                 modificationRates
                 smallSortingWidths
-                allSimpleSorterModelTypes
+                singleSorterModelType
                 lowMergeDimensions
                 bothMergeSuffixTypes
                 onlyDataFormat
@@ -189,7 +191,7 @@ module SorterMutateSpecsRandomMerge =
                 deletionRates
                 modificationRates
                 mediumSortingWidths
-                allSimpleSorterModelTypes
+                singleSorterModelType
                 lowMergeDimensions
                 bothMergeSuffixTypes
                 onlyDataFormat

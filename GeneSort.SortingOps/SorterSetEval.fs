@@ -87,7 +87,5 @@ module SorterSetEval =
 
 
     let makeFullDataTableRecords (source: sorterSetEval) : GeneSort.Core.dataTableRecord seq =
-        let sorterSetId = source.SorterSetId
-        let sortableTestId = source.SorterTestId
         source.SorterEvals
-        |> Seq.map (fun se -> SorterEval.toDataTableRecord se)
+        |> Seq.map (SorterEval.toDataTableRecord)

@@ -51,6 +51,18 @@ module SimpleSorterModelMutator =
 
             
 
+    let makeMutantSorterModelIdFromIndex 
+                (mutatorModel: simpleSorterModelMutator) 
+                (parentModel: simpleSorterModel)
+                (index: int)  : Guid<sorterModelId> =
+        match (mutatorModel, parentModel) with
+        | (SmmMsceRandMutate msce, Msce parent) -> msce.MakeSorterModelId parent index
+        | (SmmMssiRandMutate mssi, Mssi parent) -> mssi.MakeSorterModelId parent index
+        | (SmmMsrsRandMutate msrs, Msrs parent) -> msrs.MakeSorterModelId parent index
+        | (SmmMsuf4RandMutate msuf4, Msuf4 parent) -> msuf4.MakeSorterModelId parent index
+        | (SmmMsuf6RandMutate msuf6, Msuf6 parent) -> msuf6.MakeSorterModelId parent index
+        | _ -> failwith "Mutator and parent model types do not match."
+
 
     let makeMutantSorterModelFromIndex 
                 (mutatorModel: simpleSorterModelMutator) 
@@ -79,9 +91,31 @@ module SimpleSorterModelMutator =
         | _ -> failwith "Mutator and parent model types do not match."
 
 
+    // Helper to extract the ID from a parent model
+    let private getParentId (parentModel: simpleSorterModel) : Guid<sorterModelId> =
+        match parentModel with
+        | Msce parent  -> parent.Id
+        | Mssi parent  -> parent.Id
+        | Msrs parent  -> parent.Id
+        | Msuf4 parent -> parent.Id
+        | Msuf6 parent -> parent.Id
 
 
-
-
-
+    // creates a map from mutant sorterModeIds to their parent sorterModelIds for a given list of mutant sorterModelIds,
+    // and a count of how many mutants were generated from each parent. [| 0 .. (count -1)|] are the indices used to 
+    // generate mutant sorterModelIds from each of the parent sorterModelIds.
+    let makeMutantIdToParentIdMap 
+                (mutatorModel: simpleSorterModelMutator) 
+                (parentModels: simpleSorterModel [])
+                (count: int) : Map<Guid<sorterModelId>, Guid<sorterModelId>> =
+        
+        parentModels
+        |> Array.collect (fun parentModel ->
+            let parentId = getParentId parentModel
+            Array.init count (fun index ->
+                let mutantId = makeMutantSorterModelIdFromIndex mutatorModel parentModel index
+                (mutantId, parentId)
+            )
+        )
+        |> Map.ofArray
 

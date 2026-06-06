@@ -109,7 +109,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //let configType = SorterMutateSpecsRandom.configType.Rand_Test
-//let executorType = sorterMutateExecutorType.FullReport
+//let executorType = sorterMutateExecutorType.MutantReport
 //let host: IRunHost = 
 //    let spec = SorterMutateSpecsRandom.getConfig configType executorType
 //    SorterMutate.SorterMutateRunHost.createRunHost spec
@@ -118,7 +118,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 let configType = SorterMutateSpecsRandomMerge.configType.Rand_Test
-let executorType = sorterMutateExecutorType.FullReport
+let executorType = sorterMutateExecutorType.MutantMergeReport
 let host: IRunHost = 
     let spec = SorterMutateSpecsRandomMerge.getConfig configType executorType
     SorterMutate.SorterMutateRunHost.createRunHost spec

@@ -199,7 +199,7 @@ module MergeRandomSorterBins =
                                     Map.empty 
                                |> Map.ofSeq
 
-                let headers, rows = DataTableReport.mapToTabDelimitedStrings keyFormatter tableMap
+                let headers, rows = DataTableReport_old.mapToTabDelimitedStrings keyFormatter tableMap
                 let dtReport = DataTableReport.create %reportName headers
                 dtReport.AppendDataRows (rows |> Array.toSeq)
 

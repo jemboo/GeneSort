@@ -36,6 +36,11 @@ module SorterModel =
         | Simple sms -> sms |> SimpleSorterModel.makeSorter
         | Unknown -> failwith "Unknown sorterModel"
 
+    let asSimpleSorterModel (model: sorterModel) : simpleSorterModel =
+        match model with
+        | Simple sms -> sms
+        | Unknown -> failwith "Unknown sorterModel"
+
 
 
 
