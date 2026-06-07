@@ -16,7 +16,7 @@ type sorterEvalV1Dto = {
     [<Key(3)>] LastCeIndex : int
     [<Key(4)>] StageLength : int
     [<Key(5)>] CeLength : int
-    [<Key(5)>] SortingWidth : int
+    [<Key(6)>] SortingWidth : int
 }
 
 [<MessagePackObject>]

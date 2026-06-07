@@ -303,12 +303,12 @@ module SorterEvalExecutor =
                 let evalBins = 
                         sorterSetEvals.SorterEvals
                         |> Array.filter(fun se -> se |> SorterEval.getIsSorted)
-                        |> SorterEvalBinning.makeBins
+                        |> SorterEvalBinStats.makeBins
 
                 let dtrs = evalBins
                             |> Array.map (
                                 fun bin -> 
-                                    bin |> BinSummaryStats.toDataTableRecord |> dataTableRecord.combine leadCols)
+                                    bin |> CeBinSummaryStats.toDataTableRecord |> dataTableRecord.combine leadCols)
                                 
                 let report = DataTableReport.fromDataTableRecords dtrs
 

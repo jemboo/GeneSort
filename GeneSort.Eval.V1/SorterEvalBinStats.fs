@@ -22,7 +22,7 @@ type ceBinSummaryStats = {
     P90UseCount: float
 }
 
-module BinSummaryStats =
+module CeBinSummaryStats =
     let toDataTableRecord (stats: ceBinSummaryStats) : dataTableRecord =
         dataTableRecord.createEmpty()
         |> dataTableRecord.addData "BinIndex" (stats.BinIndex |> string)
@@ -35,14 +35,15 @@ module BinSummaryStats =
         |> dataTableRecord.addData "P90UseCount" (stats.P90UseCount |> string)
 
 
+
+
 /// Simple payload to hold extracted raw values during reduction
-type private CeMetricSample = {
+type private ceMetricSample = {
     SequencePosIndex: float
     UseCount: float
 }
 
-
-module SorterEvalBinning =
+module SorterEvalBinStats =
 
     /// Helper to compute percentile value from a sorted array of floats using linear interpolation
     let private percentile (p: float) (sortedItems: float array) =
@@ -56,6 +57,7 @@ module SorterEvalBinning =
             else
                 let remainder = idx - float lowerIdx
                 sortedItems.[lowerIdx] + remainder * (sortedItems.[upperIdx] - sortedItems.[lowerIdx])
+
 
     /// Divides the ceData.CeIndex range into bins of size (sortingWidth/2)
     /// and calculates metrics to support graph generation.

@@ -22,7 +22,7 @@ module SorterMutateSpecsRandomMerge =
 
     let sorterEvalType = 
             (runParameters.sorterEvalTypeKey, 
-            [ sorterEvalType.V2; ] |> List.map SorterEvalType.toString)
+            [ sorterEvalType.V1; ] |> List.map SorterEvalType.toString)
 
     let sorterEvalSelection = 
             (runParameters.groupSelectionType, 
@@ -144,7 +144,7 @@ module SorterMutateSpecsRandomMerge =
                 SortableTestMergeSpecs.noSuffixSuffixType
                 onlyDataFormat
                 testParentCount
-                largeChildCount
+                mediumChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer

@@ -13,9 +13,6 @@ type groupSelectionType =
     | Profile
     | TopN
 
-type evalLabel = 
-    | Tmb of tmbGroup
-    | Index of int
 
 module GroupSelectionType =
     let toString = function
@@ -29,6 +26,10 @@ module GroupSelectionType =
         | "TopN" -> TopN
         | _ -> failwith "Invalid sorterEvalSelectionType string"
 
+
+type evalLabel = 
+    | Tmb of tmbGroup
+    | Index of int
 
 /// Captures the explicit strategy/provenance used to generate a selection subset
 type selectionStrategy =
@@ -200,20 +201,6 @@ module LabeledSorterEvals =
         labeledSorterEvals.create selectionStrategy.EvenSampleByRankedValue labeledItems
 
 
-/// Streamlined context boundary representation. No duplicate variants needed 
-/// since strategy logic is cleanly managed inside the labeledSorterEvals structure.
-type evalGroupSelection =
-    | Selected of labeledSorterEvals
-    | Unknown
-
-
-module EvalGroupSelection = 
-
-    let toMap (egs: evalGroupSelection) : Map<Guid<sorterId>, (evalLabel * sorterEval)> =
-        match egs with
-        | Selected lse -> lse.ToMap()
-        | Unknown -> Map.empty
-
 
 /// Separated reporting logic. Translates pure domain objects into output string layouts.
 module EvalReporting =
@@ -241,16 +228,14 @@ module EvalReporting =
         selection.Items
         |> Array.collect (fun (label, se) -> 
             let labelDtr = evalLabelToDtr label |> dataTableRecord.combine strategyDtr
-            
-            se 
-            |> recordMaker
-            |> Array.map (fun customDtr -> customDtr |> dataTableRecord.combine labelDtr)
+            se |> recordMaker
+               |> Array.map (fun customDtr -> customDtr |> dataTableRecord.combine labelDtr)
         )
 
 
     let toDataTableRecords 
         (leadCols: dataTableRecord) 
-        (labelPfx:string)
+        (labelPfx: string)
         (selection: labeledSorterEvals) : Map<Guid<sorterId>,dataTableRecord> =
 
         // Append the generation context to data table records
@@ -266,6 +251,6 @@ module EvalReporting =
                 (
                     se |> SorterEval.getSorterId,
                     se |> SorterEval.toDataTableRecordWithPrefix labelPfx
-                        |> dataTableRecord.combine labelDtr
+                       |> dataTableRecord.combine labelDtr
                 )
             ) |> Map.ofArray

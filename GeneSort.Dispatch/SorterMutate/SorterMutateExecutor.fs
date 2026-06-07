@@ -78,7 +78,7 @@ module SorterMutateExecutor =
                         rp.GetSimpleSorterModelType() 
                         |> Result.ofOption "Missing simple sorter model type in run parameters"
 
-            let! (sorterEvalType: sorterEvalType) =
+            let! (_sorterEvalType: sorterEvalType) =
                         rp.GetSorterEvalType()
                         |> Result.ofOption "Missing sorter eval type in run parameters"
 
@@ -106,9 +106,9 @@ module SorterMutateExecutor =
                         rp.GetModificationRate()
                         |> Result.ofOption "Missing modificationRate in run parameters"
 
-            let! (sorterEvalSelectionType: groupSelectionType) =  
-                        rp.GetGroupSelectionType()
-                        |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
+            //let! (sorterEvalSelectionType: groupSelectionType) =  
+            //            rp.GetGroupSelectionType()
+            //            |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
 
 
             let rngFactory = rngType |> RngFactory.create
@@ -119,7 +119,7 @@ module SorterMutateExecutor =
                         SorterEvalDbs.getStandardSorterEvals 
                                             sortingWidth 
                                             simpleSorterModelType
-                                            sorterEvalType
+                                            sorterEvalType.V2
 
 
             let labeledSorterEvals
@@ -190,11 +190,7 @@ module SorterMutateExecutor =
                         rp.GetMergeSuffixType() 
                         |> Result.ofOption "Missing mergeSuffixType in run parameters"
 
-            let! (sorterEvalType: sorterEvalType) =
-                        rp.GetSorterEvalType()
-                        |> Result.ofOption "Missing sorter eval type in run parameters"
-
-            let! (sorterEvalType: sorterEvalType) =
+            let! (_sorterEvalType: sorterEvalType) =
                         rp.GetSorterEvalType()
                         |> Result.ofOption "Missing sorter eval type in run parameters"
 
@@ -235,9 +231,9 @@ module SorterMutateExecutor =
                         SorterEvalDbs.getMergeSorterEvals 
                                         sortingWidth 
                                         simpleSorterModelType 
-                                        mergeDimension 
+                                        mergeDimension
                                         mergeSuffixType
-                                        sorterEvalType
+                                        sorterEvalType.V2
 
             let labeledSorterEvals
                     = LabeledSorterEvals.makeTmbSelections
@@ -301,7 +297,7 @@ module SorterMutateExecutor =
                         rp.GetSimpleSorterModelType() 
                         |> Result.ofOption "Missing simple sorter model type in run parameters"
 
-            let! (sorterEvalType: sorterEvalType) =
+            let! (_sorterEvalType: sorterEvalType) =
                         rp.GetSorterEvalType()
                         |> Result.ofOption "Missing sorter eval type in run parameters"
 
@@ -329,9 +325,9 @@ module SorterMutateExecutor =
                         rp.GetModificationRate()
                         |> Result.ofOption "Missing modificationRate in run parameters"
 
-            let! (sorterEvalSelectionType: groupSelectionType) =  
-                        rp.GetGroupSelectionType()
-                        |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
+            //let! (sorterEvalSelectionType: groupSelectionType) =  
+            //            rp.GetGroupSelectionType()
+            //            |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
 
 
             let rngFactory = rngType |> RngFactory.create
@@ -342,7 +338,7 @@ module SorterMutateExecutor =
                         SorterEvalDbs.getStandardSorterEvals 
                                             sortingWidth 
                                             simpleSorterModelType
-                                            sorterEvalType
+                                            sorterEvalType.V2
 
 
             let _labeledSorterEvals
@@ -408,11 +404,11 @@ module SorterMutateExecutor =
                         rp.GetMergeSuffixType() 
                         |> Result.ofOption "Missing mergeSuffixType in run parameters"
 
-            let! (sorterEvalType: sorterEvalType) =
+            let! (_sorterEvalType: sorterEvalType) =
                         rp.GetSorterEvalType()
                         |> Result.ofOption "Missing sorter eval type in run parameters"
 
-            let! (sorterEvalType: sorterEvalType) =
+            let! (_sorterEvalType: sorterEvalType) =
                         rp.GetSorterEvalType()
                         |> Result.ofOption "Missing sorter eval type in run parameters"
 
@@ -455,7 +451,7 @@ module SorterMutateExecutor =
                                         simpleSorterModelType 
                                         mergeDimension 
                                         mergeSuffixType
-                                        sorterEvalType
+                                        sorterEvalType.V2
 
             let _labeledSorterEvals
                     = LabeledSorterEvals.makeTmbSelections
