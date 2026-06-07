@@ -7,6 +7,7 @@ open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
+open GeneSort.Sorting
 
 
 module SorterMutateSpecsRandom = 
@@ -23,8 +24,8 @@ module SorterMutateSpecsRandom =
 
 
     let sorterEvalSelection = 
-            (runParameters.groupSelectionType, 
-            [ groupSelectionType.Tmb; ] |> List.map GroupSelectionType.toString)
+            (runParameters.sorterEvalSelectionType, 
+            [ sorterEvalSelectionType.Tmb 6<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
 
     
     // SortingWidths

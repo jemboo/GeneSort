@@ -41,7 +41,7 @@ type runParameters =
     static member replSpanKey = "ReplSpan"
     static member runFinishedKey = "RunFinished"
     static member sorterEvalTypeKey = "SorterEvalType"
-    static member groupSelectionType = "GroupSelectionType"
+    static member sorterEvalSelectionType = "SorterEvalSelectionType"
     static member sorterCountKey = "SorterCount"
     static member sorterParentCountKey = "SorterParentCount"
     static member sorterChildCountKey = "SorterChildCount"
@@ -103,7 +103,7 @@ type runParameters =
     member this.GetSortableCount() = runParameters.tryGetInt runParameters.sortableCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     member this.GetSorterCount() = runParameters.tryGetInt runParameters.sorterCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     member this.GetSorterEvalType() = this.paramMap.TryFind runParameters.sorterEvalTypeKey |> Option.map SorterEvalType.fromString
-    member this.GetGroupSelectionType() = this.paramMap.TryFind runParameters.groupSelectionType |> Option.map GroupSelectionType.fromString
+    member this.GetSorterEvalSelectionType() = this.paramMap.TryFind runParameters.sorterEvalSelectionType |> Option.map SorterEvalSelectionType.fromString
     member this.GetSorterParentCount() = runParameters.tryGetInt runParameters.sorterParentCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     member this.GetSorterChildCount() = runParameters.tryGetInt runParameters.sorterChildCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
 
@@ -203,8 +203,8 @@ type runParameters =
     member this.WithSorterEvalType(set: sorterEvalType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalTypeKey (set |> Option.map SorterEvalType.toString) }
 
-    member this.WithGroupSelectionType(ses: groupSelectionType option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.groupSelectionType (ses |> Option.map GroupSelectionType.toString) }
+    member this.WithSorterEvalSelectionType(ses: sorterEvalSelectionType option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalSelectionType (ses |> Option.map SorterEvalSelectionType.toString) }
 
     member this.WithSorterParentCount(spc: int<sorterCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterParentCountKey (spc |> Option.map UmxExt.intToRaw) }

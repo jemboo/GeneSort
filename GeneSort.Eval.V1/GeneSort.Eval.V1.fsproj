@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <Compile Include="Common.fs" />
-    <Compile Include="TmbSorterEvalGroups.fs" />
+    <Compile Include="SorterEvalSelection.fs" />
     <Compile Include="SorterEvalBinStats.fs" />
     <Compile Include="SorterStageStats.fs" />
     <Compile Include="Bins\SorterEvalKey.fs" />

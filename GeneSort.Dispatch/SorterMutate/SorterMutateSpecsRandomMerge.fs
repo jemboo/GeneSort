@@ -24,9 +24,9 @@ module SorterMutateSpecsRandomMerge =
             (runParameters.sorterEvalTypeKey, 
             [ sorterEvalType.V1; ] |> List.map SorterEvalType.toString)
 
-    let sorterEvalSelection = 
-            (runParameters.groupSelectionType, 
-            [ groupSelectionType.Tmb; ] |> List.map GroupSelectionType.toString)
+    let sorterEvalSelectionType = 
+            (runParameters.sorterEvalSelectionType, 
+            [ sorterEvalSelectionType.Tmb 6<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
 
     
     // SortingWidths
@@ -132,7 +132,7 @@ module SorterMutateSpecsRandomMerge =
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
-                sorterEvalSelection
+                sorterEvalSelectionType
                 sorterEvalType
                 mutationRates
                 insertionRates
@@ -158,7 +158,7 @@ module SorterMutateSpecsRandomMerge =
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
-                sorterEvalSelection
+                sorterEvalSelectionType
                 sorterEvalType
                 mutationRates
                 insertionRates
@@ -184,7 +184,7 @@ module SorterMutateSpecsRandomMerge =
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngType
-                sorterEvalSelection
+                sorterEvalSelectionType
                 sorterEvalType
                 mutationRates
                 insertionRates

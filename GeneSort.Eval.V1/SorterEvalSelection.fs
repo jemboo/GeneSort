@@ -8,23 +8,39 @@ open GeneSort.Sorting
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 
-type groupSelectionType = 
-    | Tmb
-    | Profile
-    | TopN
 
+type sorterEvalSelectionType = 
+    | Tmb of int<sorterCount>
+    | ValueSpan of int<sorterCount>
+    | IndexSpan of int<sorterCount>
+    | TopN of int<sorterCount>
 
-module GroupSelectionType =
+module SorterEvalSelectionType =
+    
+    // Serializes to "CaseName:Value" (e.g., "Tmb:5" or "TopN:10")
+    // Note: %d ignores the unit of measure (int<sorterCount>) during formatting
     let toString = function
-        | groupSelectionType.Tmb -> "Tmb"
-        | Profile -> "Profile"
-        | TopN -> "TopN"
+        | Tmb count       -> sprintf "Tmb:%d" count
+        | ValueSpan count -> sprintf "ValueSpan:%d" count
+        | IndexSpan count -> sprintf "IndexSpan:%d" count
+        | TopN count      -> sprintf "TopN:%d" count
 
-    let fromString = function
-        | "Tmb" -> groupSelectionType.Tmb
-        | "Profile" -> Profile
-        | "TopN" -> TopN
-        | _ -> failwith "Invalid sorterEvalSelectionType string"
+    // Parses "CaseName:Value" back into the strongly-typed union case
+    let fromString (str: string) = 
+        match str.Split(':') with
+        | [| caseName; countStr |] ->
+            // Re-apply the <sorterCount> unit of measure to the parsed integer
+            let count = Int32.Parse(countStr) * 1<sorterCount>
+            
+            match caseName with
+            | "Tmb"       -> Tmb count
+            | "ValueSpan" -> ValueSpan count
+            | "IndexSpan" -> IndexSpan count
+            | "TopN"      -> TopN count
+            | _           -> failwithf "Invalid case name '%s' in string '%s'" caseName str
+        | _ -> 
+            failwithf "String '%s' is not in the expected format 'Name:Value'" str
+
 
 
 type evalLabel = 

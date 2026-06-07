@@ -25,7 +25,7 @@ module SorterMutateDbs =
 
             let makeQueryParams
                             (rng: rngType)
-                            (ses:groupSelectionType)
+                            (ses:sorterEvalSelectionType)
                             (repl: int<replNumber>) 
                             (sw: int<sortingWidth>) 
                             (smt: simpleSorterModelType) 
@@ -38,7 +38,7 @@ module SorterMutateDbs =
                 queryParams.create dbName (Some repl) odt
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                       (runParameters.groupSelectionType, ses |> GroupSelectionType.toString)
+                       (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                        (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                        (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString)
@@ -54,7 +54,7 @@ module SorterMutateDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! ses = rp.GetGroupSelectionType()
+                    let! ses = rp.GetSorterEvalSelectionType()
                     let! sw = rp.GetSortingWidth()
                     let! smt = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
@@ -80,7 +80,7 @@ module SorterMutateDbs =
 
             let makeQueryParams
                         (rng: rngType)
-                        (ses:groupSelectionType)
+                        (ses:sorterEvalSelectionType)
                         (repl: int<replNumber>) 
                         (sortingWidth: int<sortingWidth>)
                         (simpleSorterModelType: simpleSorterModelType)
@@ -100,7 +100,7 @@ module SorterMutateDbs =
                     outputDataType
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                       (runParameters.groupSelectionType, ses |> GroupSelectionType.toString)
+                       (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                        (runParameters.sortingWidthKey, string %sortingWidth); 
                        (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
                        (runParameters.mergeDimensionKey, string %mergeDimension);
@@ -119,7 +119,7 @@ module SorterMutateDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! rng = rp.GetRngType()
-                    let! ses = rp.GetGroupSelectionType()
+                    let! ses = rp.GetSorterEvalSelectionType()
                     let! repl = rp.GetRepl()
                     let! sw = rp.GetSortingWidth()
                     let! md = rp.GetMergeDimension()
