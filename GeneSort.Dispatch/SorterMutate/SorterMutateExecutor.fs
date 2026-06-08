@@ -112,7 +112,7 @@ module SorterMutateExecutor =
 
 
             let rngFactory = rngType |> RngFactory.create
-            let ranker = SorterEval.byEqualTwoWeighted
+            let ranker = SorterEvalFunctions.byEqualTwoWeighted
 
 
             let! (parentSorterSetEval: sorterSetEval) =
@@ -123,7 +123,7 @@ module SorterMutateExecutor =
 
 
             let labeledSorterEvals
-                    = LabeledSorterEvals.makeTmbSelections
+                    = SorterEvalSelection.makeTmbSelections
                                         ranker
                                         (%sorterParentCount / 3)
                                         parentSorterSetEval.SorterEvals
@@ -224,7 +224,7 @@ module SorterMutateExecutor =
 
                                         
             let rngFactory = rngType |> RngFactory.create
-            let ranker = SorterEval.byEqualTwoWeighted
+            let ranker = SorterEvalFunctions.byEqualTwoWeighted
 
 
             let! (parentSorterSetEval: sorterSetEval) =
@@ -236,7 +236,7 @@ module SorterMutateExecutor =
                                         sorterEvalType.V2
 
             let labeledSorterEvals
-                    = LabeledSorterEvals.makeTmbSelections
+                    = SorterEvalSelection.makeTmbSelections
                                         ranker
                                         (%sorterParentCount / 3)
                                         parentSorterSetEval.SorterEvals
@@ -282,7 +282,7 @@ module SorterMutateExecutor =
 
 
     let makeMutantDetails (rp:runParameters) : 
-                    Async<Result<labeledSorterEvals * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>> =
+                    Async<Result<sorterEvalSelection * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>> =
         asyncResult {
 
             let! (rngType: rngType) =  
@@ -331,7 +331,7 @@ module SorterMutateExecutor =
 
 
             let rngFactory = rngType |> RngFactory.create
-            let ranker = SorterEval.byEqualTwoWeighted
+            let ranker = SorterEvalFunctions.byEqualTwoWeighted
 
 
             let! (parentSorterSetEval: sorterSetEval) =
@@ -342,7 +342,7 @@ module SorterMutateExecutor =
 
 
             let _labeledSorterEvals
-                    = LabeledSorterEvals.makeTmbSelections
+                    = SorterEvalSelection.makeTmbSelections
                                         ranker
                                         (%sorterParentCount / 30)
                                         parentSorterSetEval.SorterEvals
@@ -381,7 +381,7 @@ module SorterMutateExecutor =
 
 
     let makeMutantMergeDetails (rp:runParameters) : 
-                    Async<Result<labeledSorterEvals * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>> =
+                    Async<Result<sorterEvalSelection * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>> =
         asyncResult {
 
             let! (rngType: rngType) =  
@@ -442,7 +442,7 @@ module SorterMutateExecutor =
 
                                         
             let rngFactory = rngType |> RngFactory.create
-            let ranker = SorterEval.byEqualTwoWeighted
+            let ranker = SorterEvalFunctions.byEqualTwoWeighted
 
 
             let! (parentSorterSetEval: sorterSetEval) =
@@ -454,7 +454,7 @@ module SorterMutateExecutor =
                                         sorterEvalType.V2
 
             let _labeledSorterEvals
-                    = LabeledSorterEvals.makeTmbSelections
+                    = SorterEvalSelection.makeTmbSelections
                                         ranker
                                         (%sorterParentCount / 30)
                                         parentSorterSetEval.SorterEvals
@@ -641,7 +641,7 @@ module SorterMutateExecutor =
 
 
     let makeMutantReport
-            (mutantDetailsMaker: runParameters -> Async<Result<labeledSorterEvals * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>> )
+            (mutantDetailsMaker: runParameters -> Async<Result<sorterEvalSelection * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>> )
             (host: IRunHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 

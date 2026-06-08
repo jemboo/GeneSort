@@ -42,11 +42,6 @@ module SorterEvalSelectionType =
             failwithf "String '%s' is not in the expected format 'Name:Value'" str
 
 
-
-type evalLabel = 
-    | Tmb of tmbGroup
-    | Index of int
-
 /// Captures the explicit strategy/provenance used to generate a selection subset
 type selectionStrategy =
     | Tmb
@@ -62,9 +57,14 @@ module SelectionStrategy =
         | EvenSampleByRankedIndex -> "EvenSampleByRankedIndex"
 
 
+
+type evalLabel = 
+    | Tmb of tmbGroup
+    | Index of int
+
 /// Single unified domain structure holding your labeled selections.
 /// This cleanly encapsulates TopN, Profile, and TMB while maintaining strategy data.
-type labeledSorterEvals = 
+type sorterEvalSelection = 
     private {
         strategy: selectionStrategy
         items: (evalLabel * sorterEval) array
@@ -98,7 +98,7 @@ type labeledSorterEvals =
 
 
 
-module LabeledSorterEvals =
+module SorterEvalSelection =
 
     /// Helper to filter input collections for sorted candidates and remove phenotype duplicates
     let private prepareDistinctSorted (items: sorterEval seq) =
@@ -108,12 +108,12 @@ module LabeledSorterEvals =
         |> Seq.toArray
 
     /// Generates Tmb groups mapped directly to evalLabel variants
-    let makeTmbSelections (ranker: sorterEval -> float) (groupSize: int) (items: sorterEval array) : labeledSorterEvals =
+    let makeTmbSelections (ranker: sorterEval -> float) (groupSize: int) (items: sorterEval array) : sorterEvalSelection =
         let distinctItems = items |> Array.distinctBy SorterEval.getSequenceHash
         let targetSize = Math.Min(groupSize, distinctItems.Length / 3)
         
         if targetSize <= 0 then 
-            labeledSorterEvals.create selectionStrategy.Tmb Array.empty
+            sorterEvalSelection.create selectionStrategy.Tmb Array.empty
         else
             let sortedItems = distinctItems |> Array.sortByDescending ranker
             
@@ -125,21 +125,21 @@ module LabeledSorterEvals =
             let botGroup = sortedItems.[distinctItems.Length - targetSize .. distinctItems.Length - 1] |> Array.map (fun se -> evalLabel.Tmb tmbGroup.Bottom, se)
             
             let combined = Array.concat [topGroup; midGroup; botGroup]
-            labeledSorterEvals.create selectionStrategy.Tmb combined
+            sorterEvalSelection.create selectionStrategy.Tmb combined
 
     /// Generates TopN groups mapped directly to evalLabel Index variants
-    let getTopN (ranker: sorterEval -> float) (n: int) (items: sorterEval array) : labeledSorterEvals =
+    let getTopN (ranker: sorterEval -> float) (n: int) (items: sorterEval array) : sorterEvalSelection =
         let distinctSorted = prepareDistinctSorted items
         let topN = distinctSorted |> Array.sortByDescending ranker |> Array.truncate n
         
         let labeledItems = topN |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
-        labeledSorterEvals.create selectionStrategy.TopN labeledItems
+        sorterEvalSelection.create selectionStrategy.TopN labeledItems
 
     /// Samples an array of unique evaluations spaced evenly across the ranked ARRAY INDEX layout.
     let evenSampleByRankedIndex 
                 (ranker: sorterEval -> float)
                 (count: int<sorterCount>) 
-                (items: seq<sorterEval>) : labeledSorterEvals =
+                (items: seq<sorterEval>) : sorterEvalSelection =
         
         let sampleCount = %count
         if sampleCount <= 0 then 
@@ -166,13 +166,13 @@ module LabeledSorterEvals =
                 res
 
         let labeledItems = result |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
-        labeledSorterEvals.create selectionStrategy.EvenSampleByRankedIndex labeledItems
+        sorterEvalSelection.create selectionStrategy.EvenSampleByRankedIndex labeledItems
 
     /// Samples an array of unique evaluations spaced evenly along the actual RANKED VALUE score axis.
     let evenSampleByRankedValue 
                 (ranker: sorterEval -> float)
                 (count: int<sorterCount>) 
-                (items: seq<sorterEval>) : labeledSorterEvals =
+                (items: seq<sorterEval>) : sorterEvalSelection =
         
         let sampleCount = %count
         if sampleCount <= 0 then 
@@ -214,7 +214,7 @@ module LabeledSorterEvals =
                 res
 
         let labeledItems = result |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
-        labeledSorterEvals.create selectionStrategy.EvenSampleByRankedValue labeledItems
+        sorterEvalSelection.create selectionStrategy.EvenSampleByRankedValue labeledItems
 
 
 
@@ -233,7 +233,7 @@ module EvalReporting =
     let toManyDataTableRecords
                 (leadCols: dataTableRecord) 
                 (recordMaker: sorterEval -> dataTableRecord [])
-                (selection: labeledSorterEvals) : dataTableRecord array =
+                (selection: sorterEvalSelection) : dataTableRecord array =
 
         // Append the generation context to data table records
         let strategyDtr = 
@@ -252,7 +252,7 @@ module EvalReporting =
     let toDataTableRecords 
         (leadCols: dataTableRecord) 
         (labelPfx: string)
-        (selection: labeledSorterEvals) : Map<Guid<sorterId>,dataTableRecord> =
+        (selection: sorterEvalSelection) : Map<Guid<sorterId>,dataTableRecord> =
 
         // Append the generation context to data table records
         let strategyDtr = 

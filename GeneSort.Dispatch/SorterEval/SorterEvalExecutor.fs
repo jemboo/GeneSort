@@ -256,7 +256,7 @@ module SorterEvalExecutor =
                 // 1. Generate the labeled selections (TMB strategy in this case)
                 let selection = 
                     sorterSetEvals.SorterEvals
-                    |> LabeledSorterEvals.makeTmbSelections SorterEval.byEqualTwoWeighted 300
+                    |> SorterEvalSelection.makeTmbSelections SorterEvalFunctions.byEqualTwoWeighted 300
                 
                 // 2. Use the separated Reporting module to generate rows (now includes Strategy info)
                 let dtrs = 

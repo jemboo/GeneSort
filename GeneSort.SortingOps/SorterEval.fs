@@ -5,6 +5,7 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
+open System
 
 
 type sorterEvalV1 =
@@ -389,20 +390,5 @@ module SorterEval =
         | sorterEvalType.V1 -> createV1 sorterId ceBlockEval
         | sorterEvalType.V2 -> createV2 sorterId ceBlockEval
         | sorterEvalType.V3 -> createV3 sorterId ceBlockEval
-
-
-
-    // SorterEval quantification functions
-
-    // lower ceCounts and stageLengths have a lower value, and thus sort first ascending.
-    let byTwoWeighted (ceCountWeight: float) (stageLengthWeight: float) (eval: sorterEval) = 
-        let ceCount = float (getCeLength eval)
-        let stageLength = float (getStageLength eval)
-        (ceCount * ceCountWeight) + (stageLength * stageLengthWeight)
-
-    let byEqualTwoWeighted (eval: sorterEval) = 
-        byTwoWeighted 1.0 1.0 eval
-
-
 
       
