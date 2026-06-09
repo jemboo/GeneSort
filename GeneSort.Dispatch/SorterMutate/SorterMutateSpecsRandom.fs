@@ -27,6 +27,9 @@ module SorterMutateSpecsRandom =
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.Tmb 6<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
 
+    let sorterEvalMeasure = 
+            (runParameters.sorterEvalMeasureKey, 
+            [ sorterEvalMeasure.CeSt (1.0, true); ] |> List.map SorterEvalMeasure.toString)
     
     // SortingWidths
     let smallSortingWidths = 
@@ -98,6 +101,7 @@ module SorterMutateSpecsRandom =
             Spans = [
                 rngType
                 sorterEvalSelection
+                sorterEvalMeasure
                 sorterEvalType
                 mutationRates
                 insertionRates
@@ -122,6 +126,7 @@ module SorterMutateSpecsRandom =
             Spans = [
                 rngType
                 sorterEvalSelection
+                sorterEvalMeasure
                 sorterEvalType
                 mutationRates
                 insertionRates
@@ -145,6 +150,7 @@ module SorterMutateSpecsRandom =
             Spans = [
                 rngType
                 sorterEvalSelection
+                sorterEvalMeasure
                 sorterEvalType
                 mutationRates
                 insertionRates

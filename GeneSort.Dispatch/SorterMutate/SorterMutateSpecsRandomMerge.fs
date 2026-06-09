@@ -28,6 +28,9 @@ module SorterMutateSpecsRandomMerge =
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.Tmb 6<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
 
+    let sorterEvalMeasure = 
+            (runParameters.sorterEvalMeasureKey, 
+            [ sorterEvalMeasure.CeSt (1.0, true); ] |> List.map SorterEvalMeasure.toString)
     
     // SortingWidths
     let smallSortingWidths = SortableTestMergeSpecs.smallSortingWidths
@@ -133,6 +136,7 @@ module SorterMutateSpecsRandomMerge =
             Spans = [
                 rngType
                 sorterEvalSelectionType
+                sorterEvalMeasure
                 sorterEvalType
                 mutationRates
                 insertionRates
@@ -159,6 +163,7 @@ module SorterMutateSpecsRandomMerge =
             Spans = [
                 rngType
                 sorterEvalSelectionType
+                sorterEvalMeasure
                 sorterEvalType
                 mutationRates
                 insertionRates
@@ -185,6 +190,7 @@ module SorterMutateSpecsRandomMerge =
             Spans = [
                 rngType
                 sorterEvalSelectionType
+                sorterEvalMeasure
                 sorterEvalType
                 mutationRates
                 insertionRates

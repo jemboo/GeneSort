@@ -5,7 +5,7 @@ open System.Collections
 open System.Runtime.CompilerServices
 open System.Collections.Generic
 
-module Map =
+module MapUtils =
     /// Merges a sequence of maps into a single map.
     /// Throws an exception if any key appears in more than one map.
     let mergeUnique (maps: Map<'Key, 'Value> seq) : Map<'Key, 'Value> =
@@ -23,6 +23,14 @@ module Map =
             failwith (sprintf "Duplicate keys found during map merge: %A" (List.distinct duplicateKeys))
         
         result
+
+
+    let invert (m: Map<'Key, 'Value>) : Map<'Value, 'Key []> =
+        m
+        |> Seq.groupBy (fun kvp -> kvp.Value)
+        |> Seq.map (fun (value, kvps) -> value, kvps |> Seq.map (fun kvp -> kvp.Key) |> Seq.toArray)
+        |> Map.ofSeq
+
 
 module CollectionUtils =
 

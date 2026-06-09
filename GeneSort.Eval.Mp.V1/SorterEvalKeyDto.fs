@@ -13,13 +13,13 @@ type sorterEvalKeyDto = {
 
 module SorterEvalKeyDto =
 
-    let toDto (domain: sorterEvalKey) : sorterEvalKeyDto =
+    let toDto (domain: sorterEvalKeyOld) : sorterEvalKeyDto =
         {
             CeCount = UMX.untag domain.CeCount
             StageLength = UMX.untag domain.StageLength
         }
 
-    let fromDto (dto: sorterEvalKeyDto) : sorterEvalKey =
-        sorterEvalKey.create 
+    let fromDto (dto: sorterEvalKeyDto) : sorterEvalKeyOld =
+        sorterEvalKeyOld.create 
             (UMX.tag<ceLength> dto.CeCount) 
             (UMX.tag<stageLength> dto.StageLength)

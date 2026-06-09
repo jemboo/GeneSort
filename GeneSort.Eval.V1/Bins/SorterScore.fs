@@ -8,7 +8,7 @@ open GeneSort.Sorting.Sortable
 
 
 [<Struct; StructuralEquality; StructuralComparison>]
-type sorterScoreV1 =
+type sorterScoreV1Old =
     private {
         sorterId: Guid<sorterId>
         unsortedCount: int<sortableCount>
@@ -22,7 +22,7 @@ type sorterScoreV1 =
                     (unsortedCount: int<sortableCount>) 
                     (unsortedGroupCount: int<sortableCount> option) 
                     (sequenceKey: int<sequenceHash>) 
-                    (lastCeIndex: int<ceIndex>) : sorterScoreV1 =
+                    (lastCeIndex: int<ceIndex>) : sorterScoreV1Old =
         { 
                 sorterId = sorterId; 
                 unsortedCount = unsortedCount; 
@@ -54,15 +54,15 @@ type sorterScoreV1 =
 
 
 
-type sorterScore =
-    | V1 of sorterScoreV1
-    | V1Key of sorterScoreV1 * sorterEvalKey
+type sorterScoreOld =
+    | V1 of sorterScoreV1Old
+    | V1Key of sorterScoreV1Old * sorterEvalKeyOld
     | Unknown
 
 
-module SorterScore =
+module SorterScoreOld =
 
-    let fromSorterEval (sorterEval:sorterEvalOld) : sorterScoreV1 =
+    let fromSorterEval (sorterEval:sorterEvalOld) : sorterScoreV1Old =
         let unsortedGroupCount = 
             match sorterEval.CeBlockEval.SortableTest with
             | Some st -> Some (SortableTests.getSortableCount st)
@@ -71,7 +71,7 @@ module SorterScore =
         let stageSequence = 
             StageBuilderSequence.toStageSequence sorterEval.CeBlockEval.CeBlock.SortingWidth 
                                   sorterEval.CeBlockEval.UsedCes
-        sorterScoreV1.create 
+        sorterScoreV1Old.create 
                     sorterEval.SorterId
                     sorterEval.CeBlockEval.UnsortedCount
                     unsortedGroupCount
@@ -79,54 +79,54 @@ module SorterScore =
                     (sorterEval.CeBlockEval.CeUseCounts.LastUsedCeIndex)
 
 
-    let getSorterId (score: sorterScore) : Guid<sorterId> option =
+    let getSorterId (score: sorterScoreOld) : Guid<sorterId> option =
         match score with
         | V1 v1 -> Some v1.SorterId
         | V1Key (v1, _) -> Some v1.SorterId
         | Unknown -> None
 
 
-    let isUnsorted (score: sorterScore) : bool option =
+    let isUnsorted (score: sorterScoreOld) : bool option =
         match score with
         | V1 v1 -> Some (v1.UnsortedCount > 0<sortableCount>)
         | V1Key (v1, _) -> Some (v1.UnsortedCount > 0<sortableCount>)
         | Unknown -> None
 
 
-    let isSorted (score: sorterScore) : bool option =
+    let isSorted (score: sorterScoreOld) : bool option =
         match score with
         | V1 v1 -> Some (v1.UnsortedCount = 0<sortableCount>)
         | V1Key (v1, _) -> Some (v1.UnsortedCount = 0<sortableCount>)
         | Unknown -> None
 
 
-    let byCeCount (score: sorterScore) : float =
+    let byCeCount (score: sorterScoreOld) : float =
         match score with
         | V1 v1 -> failwith "CeCount is not available in V1 scores without a key."
-        | V1Key (v1, k) -> SorterEvalKey.byCeCount k
+        | V1Key (v1, k) -> SorterEvalKeyOld.byCeCount k
         | Unknown -> failwith "CeCount is not available in V1 scores without a key."
 
 
-    let byStageLength (score: sorterScore) : float =
+    let byStageLength (score: sorterScoreOld) : float =
         match score with
         | V1 v1 -> failwith "StageLength is not available in V1 scores without a key."
-        | V1Key (v1, k) -> SorterEvalKey.byStageLength k
+        | V1Key (v1, k) -> SorterEvalKeyOld.byStageLength k
         | Unknown -> failwith "StageLength is not available in V1 scores without a key."
 
 
     // lower ceCounts and stageLengths sort first
-    let byWeighted (ceCountWeight: float) (stageLengthWeight: float) (score: sorterScore) : float =
+    let byWeighted (ceCountWeight: float) (stageLengthWeight: float) (score: sorterScoreOld) : float =
         match score with
         | V1 v1 -> failwith "Weighted score is not available in V1 scores without a key."
-        | V1Key (v1, k) -> SorterEvalKey.byWeighted ceCountWeight stageLengthWeight k
+        | V1Key (v1, k) -> SorterEvalKeyOld.byWeighted ceCountWeight stageLengthWeight k
         | Unknown -> failwith "Weighted score is not available in V1 scores without a key."
 
 
-    let byEqualWeighted (score: sorterScore) : float =
+    let byEqualWeighted (score: sorterScoreOld) : float =
         byWeighted 0.5 0.5 score
 
     /// Flattens a sorterScore into a dataTableRecord
-    let toDataTableRecord (score: sorterScore) : GeneSort.Core.dataTableRecord =
+    let toDataTableRecord (score: sorterScoreOld) : GeneSort.Core.dataTableRecord =
         match score with
         | V1 v1 -> v1.ToDataTableRecord()
         | V1Key (v1, key) -> 
@@ -138,14 +138,14 @@ module SorterScore =
             |> GeneSort.Core.dataTableRecord.addData "Status" "UnknownVersion"
 
 
-    let sequenceHash (score: sorterScore) : int<sequenceHash> option =
+    let sequenceHash (score: sorterScoreOld) : int<sequenceHash> option =
         match score with
         | V1 v1 -> Some v1.SequenceHash
         | V1Key (v1, _) -> Some v1.SequenceHash
         | Unknown -> None
 
 
-    let unsortedCount (score: sorterScore) : int<sortableCount> option =
+    let unsortedCount (score: sorterScoreOld) : int<sortableCount> option =
         match score with
         | V1 v1 -> Some v1.UnsortedCount
         | V1Key (v1, _) -> Some v1.UnsortedCount
@@ -153,8 +153,8 @@ module SorterScore =
 
 
     let filterAndRemoveDuplicates
-                    (filter: sorterScore -> sorterScore option) 
-                    (scores: sorterScore seq) : sorterScore [] =
+                    (filter: sorterScoreOld -> sorterScoreOld option) 
+                    (scores: sorterScoreOld seq) : sorterScoreOld [] =
             scores
             |> Seq.choose filter
             |> Seq.distinctBy (sequenceHash)
@@ -162,16 +162,16 @@ module SorterScore =
 
 
     let evenSampleByRankedIndex 
-                (ranker: sorterScore -> float)
+                (ranker: sorterScoreOld -> float)
                 (count: int<sorterCount>) 
-                (scores: sorterScore seq) : sorterScore [] =
+                (scores: sorterScoreOld seq) : sorterScoreOld [] =
         
         // 1. Guard check for invalid input count
         if %count <= 0 then 
             failwithf "Requested sample count must be greater than zero, but was %d" count
 
         // 2. Filter for successful scores (unsortedCount = 0) and strip duplicates
-        let filterSuccess (score: sorterScore) =
+        let filterSuccess (score: sorterScoreOld) =
             (isSorted score) |> Option.bind (fun isS -> if isS then Some score else None)
 
         let uniqueSuccessfulScores = filterAndRemoveDuplicates filterSuccess scores
@@ -209,17 +209,17 @@ module SorterScore =
 
 
     let evenSampleByRankedValue 
-                (ranker: sorterScore -> float)
+                (ranker: sorterScoreOld -> float)
                 (count: int<sorterCount>) 
-                (scores: sorterScore seq) 
-                : sorterScore [] =
+                (scores: sorterScoreOld seq) 
+                : sorterScoreOld [] =
         
         // 1. Guard check for invalid input count
         if %count <= 0 then 
             failwithf "Requested sample count must be greater than zero, but was %d" count
 
         // 2. Filter for successful scores (unsortedCount = 0) and strip duplicates
-        let filterSuccess (score: sorterScore) =
+        let filterSuccess (score: sorterScoreOld) =
             (isSorted score) |> Option.bind (fun isS -> if isS then Some score else None)
 
         let uniqueSuccessfulScores = filterAndRemoveDuplicates filterSuccess scores

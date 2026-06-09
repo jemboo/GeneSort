@@ -126,8 +126,6 @@ let host: IRunHost =
 let executor = SorterMutateExecutor.getExecutor executorType
 
 
-
-
 let minReplica = 0<replNumber>
 let maxReplica = 1<replNumber>
 

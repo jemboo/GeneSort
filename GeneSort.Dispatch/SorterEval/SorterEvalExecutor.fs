@@ -252,16 +252,17 @@ module SorterEvalExecutor =
                     |> SorterStageStats.fromSorterEval
                     |> Array.map (fun sss -> sss.toDataTableRecord())
 
-                // UPDATED PIPELINE:
-                // 1. Generate the labeled selections (TMB strategy in this case)
-                let selection = 
-                    sorterSetEvals.SorterEvals
-                    |> SorterEvalSelection.makeTmbSelections SorterEvalFunctions.byEqualTwoWeighted 300
-                
-                // 2. Use the separated Reporting module to generate rows (now includes Strategy info)
-                let dtrs = 
-                    selection 
-                    |> EvalReporting.toManyDataTableRecords leadCols stageStatsRecordMaker
+                let _sorterEvalMeasure = sorterEvalMeasure.CeSt (1.0, true);
+                let _sorterEvalSelectionType = sorterEvalSelectionType.Tmb 300<sorterCount>
+                let _sorterEvalSelection = SorterEvalSelection.makeSelection 
+                                                _sorterEvalMeasure
+                                                _sorterEvalSelectionType 
+                                                sorterSetEvals.SorterEvals
+
+                let dtrs = _sorterEvalSelection
+                            |> EvalReporting.toManyDataTableRecords 
+                                                        leadCols 
+                                                        stageStatsRecordMaker
 
                 let report = DataTableReport.fromDataTableRecords dtrs
 

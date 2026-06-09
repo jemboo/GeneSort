@@ -5,7 +5,7 @@ open GeneSort.Sorting
 open GeneSort.SortingOps
 
 [<Struct; StructuralEquality; StructuralComparison>]
-type sorterEvalKey =
+type sorterEvalKeyOld =
     private {
         ceCount:     int<ceLength>
         stageLength: int<stageLength>
@@ -21,34 +21,34 @@ type sorterEvalKey =
 
 
 
-module SorterEvalKey =
+module SorterEvalKeyOld =
 
     // No action
-    let noAction (key: sorterEvalKey) : float =
+    let noAction (key: sorterEvalKeyOld) : float =
         0.0
         
     /// Raw ce count as a float
-    let byCeCount (key: sorterEvalKey) : float =
+    let byCeCount (key: sorterEvalKeyOld) : float =
         key.CeCount |> UMX.untag |> float
 
     /// Raw stage length as a float
-    let byStageLength (key: sorterEvalKey) : float =
+    let byStageLength (key: sorterEvalKeyOld) : float =
         key.StageLength |> UMX.untag |> float
 
     /// Weighted combination of ceCount and stageLength — lower values sort first
     let byWeighted 
                 (ceCountWeight: float) 
                 (stageLengthWeight: float) 
-                (key: sorterEvalKey) : float =
+                (key: sorterEvalKeyOld) : float =
         ceCountWeight     * (key.CeCount     |> UMX.untag |> float) +
         stageLengthWeight * (key.StageLength |> UMX.untag |> float)
 
-    let fromSorterEval (eval: sorterEvalOld) : sorterEvalKey =
-            sorterEvalKey.create
+    let fromSorterEval (eval: sorterEvalOld) : sorterEvalKeyOld =
+            sorterEvalKeyOld.create
                 eval.CeBlockEval.CeUseCounts.UsedCeCount
                 eval.CeBlockEval.getStageBuilderSequence.StageLength
 
-    let toDataTableRecord (key: sorterEvalKey) : GeneSort.Core.dataTableRecord =
+    let toDataTableRecord (key: sorterEvalKeyOld) : GeneSort.Core.dataTableRecord =
         GeneSort.Core.dataTableRecord.createEmpty()
         |> GeneSort.Core.dataTableRecord.addKeyAndData "CeCount" (key.CeCount |> UMX.untag |> string)
         |> GeneSort.Core.dataTableRecord.addKeyAndData "StageLength" (key.StageLength |> UMX.untag |> string)

@@ -26,7 +26,7 @@ type sorterEvalBinsDto =
 
 module SorterEvalBinsDto =
 
-    let toV1Dto (domain: sorterEvalBinsV1) : sorterEvalBinsV1Dto =
+    let toV1Dto (domain: sorterEvalBinsV1Old) : sorterEvalBinsV1Dto =
         {
             SorterEvalBinsId = UMX.untag domain.Id
             SortableTestId = UMX.untag domain.SortableTestId
@@ -39,7 +39,7 @@ module SorterEvalBinsDto =
                 |> Seq.toArray
         }
 
-    let fromV1Dto (dto: sorterEvalBinsV1Dto) : sorterEvalBinsV1 =
+    let fromV1Dto (dto: sorterEvalBinsV1Dto) : sorterEvalBinsV1Old =
         let binMap = 
             dto.Bins 
             |> Array.map (fun entry -> 
@@ -48,7 +48,7 @@ module SorterEvalBinsDto =
             |> Map.ofArray
 
 
-        sorterEvalBinsV1.createFromMap 
+        sorterEvalBinsV1Old.createFromMap 
             (UMX.tag<sorterEvalBinsId> dto.SorterEvalBinsId) 
             (UMX.tag<sortableTestId> dto.SortableTestId) 
             binMap

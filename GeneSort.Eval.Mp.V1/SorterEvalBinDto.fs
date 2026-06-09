@@ -18,16 +18,16 @@ type sorterEvalBinDto =
 
 module SorterEvalBinDto =
 
-    let toV1Dto (domain: sorterEvalBinV1) : sorterEvalBinV1Dto =
+    let toV1Dto (domain: sorterEvalBinV1Old) : sorterEvalBinV1Dto =
         {
             Key = SorterEvalKeyDto.toDto domain.SorterEvalKey
             // Projects ResizeArray to a standard array for serialization
             Scores = domain.Scores |> Seq.map SorterScoreDto.toDto |> Seq.toArray
         }
 
-    let fromV1Dto (dto: sorterEvalBinV1Dto) : sorterEvalBinV1 =
+    let fromV1Dto (dto: sorterEvalBinV1Dto) : sorterEvalBinV1Old =
         let scores = dto.Scores |> Seq.map SorterScoreDto.fromDto
-        sorterEvalBinV1.createWithScores scores (SorterEvalKeyDto.fromDto dto.Key)
+        sorterEvalBinV1Old.createWithScores scores (SorterEvalKeyDto.fromDto dto.Key)
 
 
     let toDto (domain: sorterEvalBin) : sorterEvalBinDto =

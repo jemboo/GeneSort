@@ -19,7 +19,7 @@ type sorterScoreV1Dto = {
 
 module SorterScoreV1Dto =
     
-    let toDto (domain: sorterScoreV1) : sorterScoreV1Dto =
+    let toDto (domain: sorterScoreV1Old) : sorterScoreV1Dto =
         {
             SorterId = UMX.untag domain.SorterId
             UnsortedCount = UMX.untag domain.UnsortedCount
@@ -31,13 +31,13 @@ module SorterScoreV1Dto =
             LastCeIndex = UMX.untag domain.LastCeIndex
         }
 
-    let fromDto (dto: sorterScoreV1Dto) : sorterScoreV1 =
+    let fromDto (dto: sorterScoreV1Dto) : sorterScoreV1Old =
         let groupCount = 
             if dto.UnsortedGroupCount.HasValue 
             then Some (UMX.tag<sortableCount> dto.UnsortedGroupCount.Value) 
             else None
             
-        sorterScoreV1.create
+        sorterScoreV1Old.create
             (UMX.tag<sorterId> dto.SorterId)
             (UMX.tag<sortableCount> dto.UnsortedCount)
             groupCount
@@ -52,12 +52,12 @@ type sorterScoreDto =
 
 module SorterScoreDto =
     
-    let toDto (score: sorterScore) : sorterScoreDto =
+    let toDto (score: sorterScoreOld) : sorterScoreDto =
         match score with
-        | sorterScore.V1 v1 -> sorterScoreDto.V1 (SorterScoreV1Dto.toDto v1)
-        | sorterScore.Unknown -> sorterScoreDto.Unknown
+        | sorterScoreOld.V1 v1 -> sorterScoreDto.V1 (SorterScoreV1Dto.toDto v1)
+        | sorterScoreOld.Unknown -> sorterScoreDto.Unknown
 
-    let fromDto (dto: sorterScoreDto) : sorterScore =
+    let fromDto (dto: sorterScoreDto) : sorterScoreOld =
         match dto with
-        | sorterScoreDto.V1 v1Dto -> sorterScore.V1 (SorterScoreV1Dto.fromDto v1Dto)
-        | sorterScoreDto.Unknown -> sorterScore.Unknown
+        | sorterScoreDto.V1 v1Dto -> sorterScoreOld.V1 (SorterScoreV1Dto.fromDto v1Dto)
+        | sorterScoreDto.Unknown -> sorterScoreOld.Unknown

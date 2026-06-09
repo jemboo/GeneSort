@@ -42,6 +42,7 @@ type runParameters =
     static member runFinishedKey = "RunFinished"
     static member sorterEvalTypeKey = "SorterEvalType"
     static member sorterEvalSelectionType = "SorterEvalSelectionType"
+    static member sorterEvalMeasureKey = "SorterEvalMeasure"
     static member sorterCountKey = "SorterCount"
     static member sorterParentCountKey = "SorterParentCount"
     static member sorterChildCountKey = "SorterChildCount"
@@ -104,6 +105,7 @@ type runParameters =
     member this.GetSorterCount() = runParameters.tryGetInt runParameters.sorterCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     member this.GetSorterEvalType() = this.paramMap.TryFind runParameters.sorterEvalTypeKey |> Option.map SorterEvalType.fromString
     member this.GetSorterEvalSelectionType() = this.paramMap.TryFind runParameters.sorterEvalSelectionType |> Option.map SorterEvalSelectionType.fromString
+    member this.GetSorterEvalMeasure() = this.paramMap.TryFind runParameters.sorterEvalMeasureKey |> Option.map SorterEvalMeasure.fromString
     member this.GetSorterParentCount() = runParameters.tryGetInt runParameters.sorterParentCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
     member this.GetSorterChildCount() = runParameters.tryGetInt runParameters.sorterChildCountKey this.paramMap |> Option.map UMX.tag<sorterCount>
 
@@ -205,6 +207,9 @@ type runParameters =
 
     member this.WithSorterEvalSelectionType(ses: sorterEvalSelectionType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalSelectionType (ses |> Option.map SorterEvalSelectionType.toString) }
+
+    member this.WithSorterEvalMeasure(sem: sorterEvalMeasure option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalMeasureKey (sem |> Option.map SorterEvalMeasure.toString) }
 
     member this.WithSorterParentCount(spc: int<sorterCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterParentCountKey (spc |> Option.map UmxExt.intToRaw) }

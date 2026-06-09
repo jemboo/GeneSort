@@ -1,5 +1,4 @@
-﻿
-namespace GeneSort.Eval.V1
+﻿namespace GeneSort.Eval.V1
 
 open System
 open FSharp.UMX
@@ -8,6 +7,9 @@ open GeneSort.Sorting
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 
+type evalLabel = 
+    | Tmb of tmbGroup
+    | Index of int
 
 type sorterEvalSelectionType = 
     | Tmb of int<sorterCount>
@@ -17,21 +19,16 @@ type sorterEvalSelectionType =
 
 module SorterEvalSelectionType =
     
-    // Serializes to "CaseName:Value" (e.g., "Tmb:5" or "TopN:10")
-    // Note: %d ignores the unit of measure (int<sorterCount>) during formatting
     let toString = function
         | Tmb count       -> sprintf "Tmb:%d" count
         | ValueSpan count -> sprintf "ValueSpan:%d" count
         | IndexSpan count -> sprintf "IndexSpan:%d" count
         | TopN count      -> sprintf "TopN:%d" count
 
-    // Parses "CaseName:Value" back into the strongly-typed union case
     let fromString (str: string) = 
         match str.Split(':') with
         | [| caseName; countStr |] ->
-            // Re-apply the <sorterCount> unit of measure to the parsed integer
             let count = Int32.Parse(countStr) * 1<sorterCount>
-            
             match caseName with
             | "Tmb"       -> Tmb count
             | "ValueSpan" -> ValueSpan count
@@ -41,50 +38,35 @@ module SorterEvalSelectionType =
         | _ -> 
             failwithf "String '%s' is not in the expected format 'Name:Value'" str
 
-
-/// Captures the explicit strategy/provenance used to generate a selection subset
-type selectionStrategy =
-    | Tmb
-    | TopN
-    | EvenSampleByRankedValue
-    | EvenSampleByRankedIndex
-
-module SelectionStrategy =
-    let toString = function
-        | Tmb -> "Tmb"
-        | TopN -> "TopN"
-        | EvenSampleByRankedValue -> "EvenSampleByRankedValue"
-        | EvenSampleByRankedIndex -> "EvenSampleByRankedIndex"
+    let toStrategyLabel = function
+        | Tmb _       -> "Tmb"
+        | ValueSpan _ -> "EvenSampleByRankedValue"
+        | IndexSpan _ -> "EvenSampleByRankedIndex"
+        | TopN _      -> "TopN"
 
 
-
-type evalLabel = 
-    | Tmb of tmbGroup
-    | Index of int
-
-/// Single unified domain structure holding your labeled selections.
-/// This cleanly encapsulates TopN, Profile, and TMB while maintaining strategy data.
 type sorterEvalSelection = 
     private {
-        strategy: selectionStrategy
-        items: (evalLabel * sorterEval) array
+        selectionType : sorterEvalSelectionType
+        measure       : sorterEvalMeasure
+        items         : (evalLabel * sorterEval) array
     }
 
-    static member Empty = { strategy = Tmb; items = [||] }
+    static member Empty = 
+        { selectionType = Tmb 0<sorterCount>; measure = CeLength false; items = [||] }
 
-    static member create (strategy: selectionStrategy) (items: (evalLabel * sorterEval) array) = 
-        { strategy = strategy; items = items }
+    static member create (selType: sorterEvalSelectionType) (measure: sorterEvalMeasure) (items: (evalLabel * sorterEval) array) = 
+        { selectionType = selType; measure = measure; items = items }
 
-    member this.Strategy = this.strategy
-    member this.Items = this.items
+    member this.SelectionType = this.selectionType
+    member this.Measure       = this.measure
+    member this.Items         = this.items
 
-    /// Standardized mapping function dealing strictly with Domain items and Labels
     member this.ToMap() : Map<Guid<sorterId>, (evalLabel * sorterEval)> =
         this.items 
         |> Array.map (fun (label, se) -> (se |> SorterEval.getSorterId, (label, se)))
         |> Map.ofArray
 
-    /// Universal model set generator pulled up into the shared container to prevent duplication
     member this.MakeSorterModelSet 
                     (sorterModelSetId: Guid<sorterModelSetId>) 
                     (sorterModelGen: sorterModelGen) : sorterModelSet =
@@ -97,128 +79,105 @@ type sorterEvalSelection =
             sorterModelSet.create sorterModelSetId sorterModels
 
 
-
 module SorterEvalSelection =
 
-    /// Helper to filter input collections for sorted candidates and remove phenotype duplicates
-    let private prepareDistinctSorted (items: sorterEval seq) =
+    let private prepareDistinctSorted (measure: sorterEvalMeasure) (items: sorterEval seq) =
         items
+        |> SorterEvalFunctions.filterEvaluations measure
         |> Seq.filter SorterEval.getIsSorted
         |> Seq.distinctBy SorterEval.getSequenceHash
         |> Seq.toArray
 
-    /// Generates Tmb groups mapped directly to evalLabel variants
-    let makeTmbSelections (ranker: sorterEval -> float) (groupSize: int) (items: sorterEval array) : sorterEvalSelection =
-        let distinctItems = items |> Array.distinctBy SorterEval.getSequenceHash
-        let targetSize = Math.Min(groupSize, distinctItems.Length / 3)
+
+    let makeSelection 
+                (measure: sorterEvalMeasure) 
+                (selType: sorterEvalSelectionType) 
+                (items: sorterEval seq) : sorterEvalSelection =
+        let ranker = SorterEvalFunctions.getFunctionForMeasure measure
+        let cleanItems = prepareDistinctSorted measure items
         
-        if targetSize <= 0 then 
-            sorterEvalSelection.create selectionStrategy.Tmb Array.empty
-        else
-            let sortedItems = distinctItems |> Array.sortByDescending ranker
+        match selType with
+        | TopN count ->
+            let n = %count
+            if n <= 0 then failwithf "Requested TopN count must be greater than zero, but was %d" n
             
-            let topGroup = sortedItems.[0 .. targetSize - 1] |> Array.map (fun se -> evalLabel.Tmb tmbGroup.Top, se)
+            let topN = cleanItems |> Array.sortByDescending ranker |> Array.truncate n
+            let labeledItems = topN |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
+            sorterEvalSelection.create selType measure labeledItems
+
+        | Tmb count ->
+            let groupSize = %count
+            let targetSize = Math.Min(groupSize, cleanItems.Length / 3)
             
-            let midStart = distinctItems.Length / 2 - (targetSize / 2)
-            let midGroup = sortedItems.[midStart .. midStart + targetSize - 1] |> Array.map (fun se -> evalLabel.Tmb tmbGroup.Middle, se)
-            
-            let botGroup = sortedItems.[distinctItems.Length - targetSize .. distinctItems.Length - 1] |> Array.map (fun se -> evalLabel.Tmb tmbGroup.Bottom, se)
-            
-            let combined = Array.concat [topGroup; midGroup; botGroup]
-            sorterEvalSelection.create selectionStrategy.Tmb combined
-
-    /// Generates TopN groups mapped directly to evalLabel Index variants
-    let getTopN (ranker: sorterEval -> float) (n: int) (items: sorterEval array) : sorterEvalSelection =
-        let distinctSorted = prepareDistinctSorted items
-        let topN = distinctSorted |> Array.sortByDescending ranker |> Array.truncate n
-        
-        let labeledItems = topN |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
-        sorterEvalSelection.create selectionStrategy.TopN labeledItems
-
-    /// Samples an array of unique evaluations spaced evenly across the ranked ARRAY INDEX layout.
-    let evenSampleByRankedIndex 
-                (ranker: sorterEval -> float)
-                (count: int<sorterCount>) 
-                (items: seq<sorterEval>) : sorterEvalSelection =
-        
-        let sampleCount = %count
-        if sampleCount <= 0 then 
-            failwithf "Requested sample count must be greater than zero, but was %d" sampleCount
-
-        let cleanItems = prepareDistinctSorted items
-        let availableCount = cleanItems.Length
-
-        if availableCount < sampleCount then
-            failwithf "Cannot sample %d items; only %d unique sorted options are available." sampleCount availableCount
-
-        let sortedItems = cleanItems |> Array.sortByDescending ranker
-
-        let result = 
-            if sampleCount = 1 then
-                [| sortedItems.[0] |]
+            if targetSize <= 0 then 
+                sorterEvalSelection.create selType measure Array.empty
             else
-                let res = Array.zeroCreate sampleCount
-                res.[0] <- sortedItems.[0]
-                let step = float (availableCount - 1) / float (sampleCount - 1)
-                for i in 1 .. (sampleCount - 1) do
-                    let targetIndex = int (round (float i * step))
-                    res.[i] <- sortedItems.[targetIndex]
-                res
+                let sortedItems = cleanItems |> Array.sortByDescending ranker
+                
+                let topGroup = sortedItems.[0 .. targetSize - 1] |> Array.map (fun se -> evalLabel.Tmb tmbGroup.Top, se)
+                
+                let midStart = cleanItems.Length / 2 - (targetSize / 2)
+                let midGroup = sortedItems.[midStart .. midStart + targetSize - 1] |> Array.map (fun se -> evalLabel.Tmb tmbGroup.Middle, se)
+                
+                let botGroup = sortedItems.[cleanItems.Length - targetSize .. cleanItems.Length - 1] |> Array.map (fun se -> evalLabel.Tmb tmbGroup.Bottom, se)
+                
+                let combined = Array.concat [topGroup; midGroup; botGroup]
+                sorterEvalSelection.create selType measure combined
 
-        let labeledItems = result |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
-        sorterEvalSelection.create selectionStrategy.EvenSampleByRankedIndex labeledItems
+        | IndexSpan count ->
+            let sampleCount = %count
+            if sampleCount <= 0 then failwithf "Requested sample count must be greater than zero, but was %d" sampleCount
+            if cleanItems.Length < sampleCount then failwithf "Cannot sample %d items; only %d options available." sampleCount cleanItems.Length
 
-    /// Samples an array of unique evaluations spaced evenly along the actual RANKED VALUE score axis.
-    let evenSampleByRankedValue 
-                (ranker: sorterEval -> float)
-                (count: int<sorterCount>) 
-                (items: seq<sorterEval>) : sorterEvalSelection =
-        
-        let sampleCount = %count
-        if sampleCount <= 0 then 
-            failwithf "Requested sample count must be greater than zero, but was %d" sampleCount
-
-        let cleanItems = prepareDistinctSorted items
-        let availableCount = cleanItems.Length
-
-        if availableCount < sampleCount then
-            failwithf "Cannot sample %d items; only %d unique sorted options are available." sampleCount availableCount
-
-        let sortedItems = cleanItems |> Array.sortByDescending ranker
-
-        let result = 
-            if sampleCount = 1 then
-                [| sortedItems.[0] |]
-            else
-                let res = Array.zeroCreate sampleCount
-                res.[0] <- sortedItems.[0]
-                res.[sampleCount - 1] <- sortedItems.[availableCount - 1]
-
-                let maxVal = ranker sortedItems.[0]
-                let minVal = ranker sortedItems.[availableCount - 1]
-                let valRange = maxVal - minVal
-
-                if valRange = 0.0 then
-                    let step = float (availableCount - 1) / float (sampleCount - 1)
+            let sortedItems = cleanItems |> Array.sortByDescending ranker
+            let result = 
+                if sampleCount = 1 then [| sortedItems.[0] |]
+                else
+                    let res = Array.zeroCreate sampleCount
+                    res.[0] <- sortedItems.[0]
+                    let step = float (cleanItems.Length - 1) / float (sampleCount - 1)
                     for i in 1 .. (sampleCount - 1) do
                         let targetIndex = int (round (float i * step))
                         res.[i] <- sortedItems.[targetIndex]
+                    res
+
+            let labeledItems = result |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
+            sorterEvalSelection.create selType measure labeledItems
+
+        | ValueSpan count ->
+            let sampleCount = %count
+            if sampleCount <= 0 then failwithf "Requested sample count must be greater than zero, but was %d" sampleCount
+            if cleanItems.Length < sampleCount then failwithf "Cannot sample %d items; only %d options available." sampleCount cleanItems.Length
+
+            let sortedItems = cleanItems |> Array.sortByDescending ranker
+            let result = 
+                if sampleCount = 1 then [| sortedItems.[0] |]
                 else
-                    let targetStep = valRange / float (sampleCount - 1)
-                    for i in 1 .. (sampleCount - 2) do
-                        let targetValue = maxVal - (float i * targetStep)
-                        let closestMatch = 
-                            sortedItems 
-                            |> Array.minBy (fun se -> Math.Abs(ranker se - targetValue))
-                        res.[i] <- closestMatch
-                res
+                    let res = Array.zeroCreate sampleCount
+                    res.[0] <- sortedItems.[0]
+                    res.[sampleCount - 1] <- sortedItems.[cleanItems.Length - 1]
 
-        let labeledItems = result |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
-        sorterEvalSelection.create selectionStrategy.EvenSampleByRankedValue labeledItems
+                    let maxVal = ranker sortedItems.[0]
+                    let minVal = ranker sortedItems.[cleanItems.Length - 1]
+                    let valRange = maxVal - minVal
+
+                    if valRange = 0.0 then
+                        let step = float (cleanItems.Length - 1) / float (sampleCount - 1)
+                        for i in 1 .. (sampleCount - 1) do
+                            let targetIndex = int (round (float i * step))
+                            res.[i] <- sortedItems.[targetIndex]
+                    else
+                        let targetStep = valRange / float (sampleCount - 1)
+                        for i in 1 .. (sampleCount - 2) do
+                            let targetValue = maxVal - (float i * targetStep)
+                            let closestMatch = sortedItems |> Array.minBy (fun se -> Math.Abs(ranker se - targetValue))
+                            res.[i] <- closestMatch
+                    res
+
+            let labeledItems = result |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
+            sorterEvalSelection.create selType measure labeledItems
 
 
-
-/// Separated reporting logic. Translates pure domain objects into output string layouts.
 module EvalReporting =
 
     let evalLabelToDtr (label: evalLabel) : dataTableRecord =
@@ -229,44 +188,43 @@ module EvalReporting =
             dataTableRecord.createEmpty() 
             |> dataTableRecord.addData "SorterEvalIndex" (string idx)
 
-    // for reports having multiple dataTableRecords per eval
+    let private createContextDtr (leadCols: dataTableRecord) (selection: sorterEvalSelection) =
+        dataTableRecord.createEmpty()
+        |> dataTableRecord.addData "SelectionType" (SorterEvalSelectionType.toString selection.SelectionType)
+        |> dataTableRecord.addData "SelectionStrategy" (SorterEvalSelectionType.toStrategyLabel selection.SelectionType)
+        |> dataTableRecord.addData "Measure" (SorterEvalMeasure.toString selection.Measure)
+        |> dataTableRecord.combine leadCols
+        |> dataTableRecord.combine (SorterEvalMeasure.toDataTableRecord selection.Measure)
+
     let toManyDataTableRecords
                 (leadCols: dataTableRecord) 
                 (recordMaker: sorterEval -> dataTableRecord [])
                 (selection: sorterEvalSelection) : dataTableRecord array =
 
-        // Append the generation context to data table records
-        let strategyDtr = 
-            dataTableRecord.createEmpty()
-            |> dataTableRecord.addData "SelectionStrategy" (SelectionStrategy.toString selection.Strategy)
-            |> dataTableRecord.combine leadCols
+        let contextDtr = createContextDtr leadCols selection
 
         selection.Items
         |> Array.collect (fun (label, se) -> 
-            let labelDtr = evalLabelToDtr label |> dataTableRecord.combine strategyDtr
-            se |> recordMaker
-               |> Array.map (fun customDtr -> customDtr |> dataTableRecord.combine labelDtr)
+            let labelDtr = evalLabelToDtr label |> dataTableRecord.combine contextDtr
+            se 
+            |> recordMaker
+            |> Array.map (fun customDtr -> customDtr |> dataTableRecord.combine labelDtr)
         )
-
 
     let toDataTableRecords 
         (leadCols: dataTableRecord) 
         (labelPfx: string)
-        (selection: sorterEvalSelection) : Map<Guid<sorterId>,dataTableRecord> =
+        (selection: sorterEvalSelection) : Map<Guid<sorterId>, dataTableRecord> =
 
-        // Append the generation context to data table records
-        let strategyDtr = 
-            dataTableRecord.createEmpty()
-            |> dataTableRecord.addData "SelectionStrategy" (SelectionStrategy.toString selection.Strategy)
-            |> dataTableRecord.combine leadCols
+        let contextDtr = createContextDtr leadCols selection
 
         selection.Items
-        |> Array.map (
-            fun (label, se) -> 
-                let labelDtr = evalLabelToDtr label |> dataTableRecord.combine strategyDtr
-                (
-                    se |> SorterEval.getSorterId,
-                    se |> SorterEval.toDataTableRecordWithPrefix labelPfx
-                       |> dataTableRecord.combine labelDtr
-                )
-            ) |> Map.ofArray
+        |> Array.map (fun (label, se) -> 
+            let labelDtr = evalLabelToDtr label |> dataTableRecord.combine contextDtr
+            (
+                se |> SorterEval.getSorterId,
+                se |> SorterEval.toDataTableRecordWithPrefix labelPfx
+                   |> dataTableRecord.combine labelDtr
+            )
+        ) 
+        |> Map.ofArray
