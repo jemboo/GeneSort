@@ -2,7 +2,7 @@
 namespace GeneSort.Project.V1
 
 open FSharp.UMX
-open GeneSort.Eval.V1.Bins
+open GeneSort.Eval.V1.Bins.Old
 open GeneSort.Sorting.Sortable
 open GeneSort.Core
 open GeneSort.SortingOps
@@ -12,7 +12,7 @@ type outputData =
     | RunParameters of runParameters
     | SortableTest of sortableTest
     | SorterSetEval of sorterSetEval
-    | SorterEvalBins of sorterEvalBins
+    | SorterEvalBins of sorterEvalBinsOld
     | TextReport of dataTableReport
 
 //type outputData =

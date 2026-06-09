@@ -3,7 +3,7 @@
 open MessagePack
 open FSharp.UMX
 open GeneSort.Sorting
-open GeneSort.Eval.V1.Bins
+open GeneSort.Eval.V1.Bins.Old
 
 [<MessagePackObject>]
 type sorterEvalKeyDto = {

@@ -3,7 +3,7 @@
 open MessagePack
 open FSharp.UMX
 open GeneSort.Sorting
-open GeneSort.Eval.V1.Bins
+open GeneSort.Eval.V1.Bins.Old
 
 [<MessagePackObject>]
 type sorterEvalBinV1Dto = {
@@ -30,13 +30,13 @@ module SorterEvalBinDto =
         sorterEvalBinV1Old.createWithScores scores (SorterEvalKeyDto.fromDto dto.Key)
 
 
-    let toDto (domain: sorterEvalBin) : sorterEvalBinDto =
+    let toDto (domain: sorterEvalBinOld) : sorterEvalBinDto =
         match domain with
-        | sorterEvalBin.V1 v1 -> sorterEvalBinDto.V1 (toV1Dto v1)
-        | sorterEvalBin.Unknown -> sorterEvalBinDto.Unknown
+        | sorterEvalBinOld.V1 v1 -> sorterEvalBinDto.V1 (toV1Dto v1)
+        | sorterEvalBinOld.Unknown -> sorterEvalBinDto.Unknown
 
 
-    let fromDto (dto: sorterEvalBinDto) : sorterEvalBin =
+    let fromDto (dto: sorterEvalBinDto) : sorterEvalBinOld =
         match dto with
-        | sorterEvalBinDto.V1 v1Dto -> sorterEvalBin.V1 (fromV1Dto v1Dto)
-        | sorterEvalBinDto.Unknown -> sorterEvalBin.Unknown
+        | sorterEvalBinDto.V1 v1Dto -> sorterEvalBinOld.V1 (fromV1Dto v1Dto)
+        | sorterEvalBinDto.Unknown -> sorterEvalBinOld.Unknown

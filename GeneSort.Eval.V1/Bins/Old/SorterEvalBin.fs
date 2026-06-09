@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Eval.V1.Bins
+﻿namespace GeneSort.Eval.V1.Bins.Old
 
 open System.Collections.Generic
 open FSharp.UMX
@@ -66,7 +66,7 @@ type sorterEvalBinV1Old =
         |]
 
 
-module SorterEvalBinV1 =
+module SorterEvalBinV1Old =
     
     /// Combines the bin key and each score into a sequence of records
     let makeDataTableRecords (bin: sorterEvalBinV1Old) : GeneSort.Core.dataTableRecord seq =
@@ -83,6 +83,6 @@ module SorterEvalBinV1 =
 
 
 
-type sorterEvalBin =
+type sorterEvalBinOld =
     | V1 of sorterEvalBinV1Old
     | Unknown

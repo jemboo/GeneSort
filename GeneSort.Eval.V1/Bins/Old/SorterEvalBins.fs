@@ -1,5 +1,4 @@
-﻿
-namespace GeneSort.Eval.V1.Bins
+﻿namespace GeneSort.Eval.V1.Bins.Old
 
 open System
 open FSharp.UMX
@@ -106,7 +105,7 @@ type sorterEvalBinsV1Old =
         |> Seq.collect (fun (_, bin) -> bin.toSorterScoresWithKeys())
 
 
-module SorterEvalBinsV1 =
+module SorterEvalBinsV1Old =
     
     let merge (target: sorterEvalBinsV1Old) (source: sorterEvalBinsV1Old) : sorterEvalBinsV1Old =
         (target, source.Bins |> Map.toSeq) 
@@ -281,21 +280,21 @@ module SorterEvalBinsV1 =
 
 
 
-type sorterEvalBins =
+type sorterEvalBinsOld =
     | V1 of sorterEvalBinsV1Old
     | Unknown
 
 
-module SorterEvalBins =
+module SorterEvalBinsOld =
     let createEmpty = sorterEvalBinsV1Old.createEmpty
     let createFromEvals = sorterEvalBinsV1Old.createFromEvals
     let createFromMap = sorterEvalBinsV1Old.createFromMap
     let createWithNewId = sorterEvalBinsV1Old.createWithNewId
     let addSorterEval = (fun bins eval -> match bins with | V1 b -> V1 (b.AddSorterEval eval) | _ -> bins)
-    let merge = (fun target source -> match target, source with | V1 t, V1 s -> V1 (SorterEvalBinsV1.merge t s) | _ -> target)
-    let getAllScores = (fun bins -> match bins with | V1 b -> SorterEvalBinsV1.getAllScores b | _ -> Seq.empty)
-    let extractBins = (fun filter bins -> match bins with | V1 b -> V1 (SorterEvalBinsV1.extractBins filter b) | _ -> bins)
-    let getTopN = (fun scoreValuer newId bins n -> match bins with | V1 b -> V1 (SorterEvalBinsV1.getTopN scoreValuer newId b n) | _ -> bins)
-    let convexHull = (fun newId bins -> match bins with | V1 b -> V1 (SorterEvalBinsV1.convexHull newId b) | _ -> bins)
-    let makeFullDataTableRecords = (fun bins -> match bins with | V1 b -> SorterEvalBinsV1.makeFullDataTableRecords b | _ -> Seq.empty)
-    let makeSummaryDataTableRecords = (fun bins -> match bins with | V1 b -> SorterEvalBinsV1.makeSummaryDataTableRecords b | _ -> Seq.empty)
+    let merge = (fun target source -> match target, source with | V1 t, V1 s -> V1 (SorterEvalBinsV1Old.merge t s) | _ -> target)
+    let getAllScores = (fun bins -> match bins with | V1 b -> SorterEvalBinsV1Old.getAllScores b | _ -> Seq.empty)
+    let extractBins = (fun filter bins -> match bins with | V1 b -> V1 (SorterEvalBinsV1Old.extractBins filter b) | _ -> bins)
+    let getTopN = (fun scoreValuer newId bins n -> match bins with | V1 b -> V1 (SorterEvalBinsV1Old.getTopN scoreValuer newId b n) | _ -> bins)
+    let convexHull = (fun newId bins -> match bins with | V1 b -> V1 (SorterEvalBinsV1Old.convexHull newId b) | _ -> bins)
+    let makeFullDataTableRecords = (fun bins -> match bins with | V1 b -> SorterEvalBinsV1Old.makeFullDataTableRecords b | _ -> Seq.empty)
+    let makeSummaryDataTableRecords = (fun bins -> match bins with | V1 b -> SorterEvalBinsV1Old.makeSummaryDataTableRecords b | _ -> Seq.empty)

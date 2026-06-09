@@ -8,7 +8,7 @@ open MessagePack.FSharp
 open MessagePack.Resolvers
 open GeneSort.Db.V1
 open GeneSort.Project.V1
-open GeneSort.Eval.V1.Bins
+open GeneSort.Eval.V1.Bins.Old
 open GeneSort.Project.Mp.V1
 open GeneSort.Eval.Mp.V1
 open GeneSort.Sorting.Mp.Sortable
@@ -139,7 +139,7 @@ module OutputDataFile =
                         }
                     | outputDataType.SorterEvalBins _ ->
                         async {
-                            let! domain = deserializeDto<sorterEvalBinsDto, sorterEvalBins> stream token SorterEvalBinsDto.fromDto
+                            let! domain = deserializeDto<sorterEvalBinsDto, sorterEvalBinsOld> stream token SorterEvalBinsDto.fromDto
                             return outputData.SorterEvalBins domain
                         }
                     | outputDataType.Run _ ->

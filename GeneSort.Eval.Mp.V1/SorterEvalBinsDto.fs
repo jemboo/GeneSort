@@ -3,7 +3,7 @@
 open System
 open MessagePack
 open FSharp.UMX
-open GeneSort.Eval.V1.Bins
+open GeneSort.Eval.V1.Bins.Old
 open GeneSort.Sorting
 
 [<MessagePackObject>]
@@ -54,12 +54,12 @@ module SorterEvalBinsDto =
             binMap
             
 
-    let toDto (domain: sorterEvalBins) : sorterEvalBinsDto =
+    let toDto (domain: sorterEvalBinsOld) : sorterEvalBinsDto =
         match domain with
-        | sorterEvalBins.V1 v1 -> sorterEvalBinsDto.V1 (toV1Dto v1)
-        | sorterEvalBins.Unknown -> sorterEvalBinsDto.Unknown
+        | sorterEvalBinsOld.V1 v1 -> sorterEvalBinsDto.V1 (toV1Dto v1)
+        | sorterEvalBinsOld.Unknown -> sorterEvalBinsDto.Unknown
 
-    let fromDto (dto: sorterEvalBinsDto) : sorterEvalBins =
+    let fromDto (dto: sorterEvalBinsDto) : sorterEvalBinsOld =
         match dto with
-        | sorterEvalBinsDto.V1 v1Dto -> sorterEvalBins.V1 (fromV1Dto v1Dto)
-        | sorterEvalBinsDto.Unknown -> sorterEvalBins.Unknown
+        | sorterEvalBinsDto.V1 v1Dto -> sorterEvalBinsOld.V1 (fromV1Dto v1Dto)
+        | sorterEvalBinsDto.Unknown -> sorterEvalBinsOld.Unknown
