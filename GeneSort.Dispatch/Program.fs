@@ -118,7 +118,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 let configType = SorterMutateSpecsRandomMerge.configType.Rand_Test
-let executorType = sorterMutateExecutorType.MutantMergeReport
+let executorType = sorterMutateExecutorType.GenMerge
 let host: IRunHost = 
     let spec = SorterMutateSpecsRandomMerge.getConfig configType executorType
     SorterMutate.SorterMutateRunHost.createRunHost spec

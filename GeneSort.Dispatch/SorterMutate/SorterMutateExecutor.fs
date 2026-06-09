@@ -83,10 +83,6 @@ module SorterMutateExecutor =
                         rp.GetSorterEvalType()
                         |> Result.ofOption "Missing sorter eval type in run parameters"
 
-            let! (sorterParentCount: int<sorterCount>) = 
-                        rp.GetSorterParentCount()
-                        |> Result.ofOption "Missing parent sorter count in run parameters"
-
             let! (sorterChildCount: int<sorterCount>) = 
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
@@ -117,8 +113,6 @@ module SorterMutateExecutor =
 
 
             let rngFactory = rngType |> RngFactory.create
-            let ranker = SorterEvalFunctions.byEqualTwoWeighted
-
 
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getStandardSorterEvals 
@@ -127,8 +121,11 @@ module SorterMutateExecutor =
                                             sorterEvalType.V2
 
             let _sorterEvalSelection = 
-                            SorterEvalSelection.makeSelection sem sest
+                            SorterEvalSelection.makeSelection 
+                                        sem 
+                                        sest
                                         parentSorterSetEval.SorterEvals
+                                        parentSorterSetEval.SorterTestId
 
             let (parentSorterModelGen: sorterModelGen) = 
                 CommonSorterEval.getSimpleUniformSorterModelGen 
@@ -195,10 +192,6 @@ module SorterMutateExecutor =
                         rp.GetSorterEvalType()
                         |> Result.ofOption "Missing sorter eval type in run parameters"
 
-            let! (sorterParentCount: int<sorterCount>) = 
-                        rp.GetSorterParentCount()
-                        |> Result.ofOption "Missing parent sorter count in run parameters"
-
             let! (sorterChildCount: int<sorterCount>) = 
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
@@ -241,8 +234,11 @@ module SorterMutateExecutor =
                                         sorterEvalType.V2
 
             let _sorterEvalSelection = 
-                            SorterEvalSelection.makeSelection sem sest
-                                        parentSorterSetEval.SorterEvals
+                            SorterEvalSelection.makeSelection 
+                                        sem 
+                                        sest
+                                        parentSorterSetEval.SorterEvals   
+                                        parentSorterSetEval.SorterTestId
 
             let (parentSorterModelGen: sorterModelGen) = 
                 CommonSorterEval.getSimpleUniformSorterModelGen 
@@ -306,10 +302,6 @@ module SorterMutateExecutor =
                         rp.GetSorterEvalType()
                         |> Result.ofOption "Missing sorter eval type in run parameters"
 
-            let! (sorterParentCount: int<sorterCount>) = 
-                        rp.GetSorterParentCount()
-                        |> Result.ofOption "Missing parent sorter count in run parameters"
-
             let! (sorterChildCount: int<sorterCount>) = 
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
@@ -348,6 +340,7 @@ module SorterMutateExecutor =
             let _sorterEvalSelection = 
                             SorterEvalSelection.makeSelection sem sest
                                         parentSorterSetEval.SorterEvals
+                                        parentSorterSetEval.SorterTestId
 
             let (parentSorterModelGen: sorterModelGen) = 
                 CommonSorterEval.getSimpleUniformSorterModelGen 
@@ -417,10 +410,6 @@ module SorterMutateExecutor =
                         rp.GetSorterEvalType()
                         |> Result.ofOption "Missing sorter eval type in run parameters"
 
-            let! (sorterParentCount: int<sorterCount>) = 
-                        rp.GetSorterParentCount()
-                        |> Result.ofOption "Missing parent sorter count in run parameters"
-
             let! (sorterChildCount: int<sorterCount>) = 
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
@@ -461,6 +450,7 @@ module SorterMutateExecutor =
             let _sorterEvalSelection = 
                             SorterEvalSelection.makeSelection sem sest
                                         parentSorterSetEval.SorterEvals
+                                        parentSorterSetEval.SorterTestId
 
             let (parentSorterModelGen: sorterModelGen) = 
                 CommonSorterEval.getSimpleUniformSorterModelGen 
@@ -748,27 +738,24 @@ module SorterMutateExecutor =
                     (parentSorterModelId, group |> Array.map(snd)))
 
                 let wab = yab |> Array.map(fun (parentSorterModelId, ses) ->
-                            let newId = (Guid.NewGuid()) |> UMX.tag<sorterEvalBinSetId>
+                            let evBinSet = sorterEvalBinSet.createFromSorterEvals
+                                                (Guid.Empty |> UMX.tag<sorterEvalBinSetId>)
+                                                (sorterSetEvals.SorterTestId)
+                                                ses
+                            (parentSorterModelId, evBinSet))
 
-                            None)
 
-                let details =  
-                    sorterSetEvals.SorterEvals
-                    |> Array.choose (fun se -> 
-                        let (sorterModelId : Guid<sorterModelId>) = se |> SorterEval.getSorterId |> UMX.untag |> UMX.tag<sorterModelId>
-        
-                        match mutantIdToParentIdMap |> Map.tryFind sorterModelId with
-                        | None -> None // Safely ignore if the parent mapping is missing
-                        | Some parentSorterModelId ->
+                let chubby = wab |> Array.choose(fun (parentSorterModelId, evBinSet) ->
                             let parentKey = %parentSorterModelId |> UMX.tag<sorterId>
                             match parentRecordMap |> Map.tryFind parentKey with
                             | None -> None // Safely ignore if the parent record detail is missing
                             | Some parentRecord ->
-                                let childRecord = se |> SorterEval.toDataTableRecord
-                                Some (dataTableRecord.combine parentRecord childRecord)
-                    )
+                                let childRecords = evBinSet |> SorterEvalBinSet.makeDataTableRecords
+                                Some (dataTableRecord.combineWithMany childRecords parentRecord |> Array.ofSeq))
+                            |> Array.concat
 
-                let dtrs = dataTableRecord.combineWithMany details leadCols
+
+                let dtrs = dataTableRecord.combineWithMany chubby leadCols
                 let report = DataTableReport.fromDataTableRecords dtrs
 
                 let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite

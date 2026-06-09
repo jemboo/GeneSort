@@ -258,6 +258,7 @@ module SorterEvalExecutor =
                                                 _sorterEvalMeasure
                                                 _sorterEvalSelectionType 
                                                 sorterSetEvals.SorterEvals
+                                                sorterSetEvals.SorterTestId
 
                 let dtrs = _sorterEvalSelection
                             |> EvalReporting.toManyDataTableRecords 

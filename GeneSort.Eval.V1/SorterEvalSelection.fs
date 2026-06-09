@@ -50,16 +50,26 @@ type sorterEvalSelection =
         selectionType : sorterEvalSelectionType
         measure       : sorterEvalMeasure
         items         : (evalLabel * sorterEval) array
+        sortableTestId: Guid<sortableTestId>
     }
 
     static member Empty = 
-        { selectionType = Tmb 0<sorterCount>; measure = CeLength false; items = [||] }
+        { selectionType = Tmb 0<sorterCount>; 
+          measure = CeLength false; 
+          items = [||] 
+          sortableTestId = Guid.Empty |> UMX.tag<sortableTestId>}
 
     static member create 
                     (selType: sorterEvalSelectionType) 
                     (measure: sorterEvalMeasure) 
-                    (items: (evalLabel * sorterEval) array) = 
-        { selectionType = selType; measure = measure; items = items }
+                    (items: (evalLabel * sorterEval) array)
+                    (sortableTestId: Guid<sortableTestId>) =
+            { 
+                selectionType = selType; 
+                measure = measure; 
+                items = items 
+                sortableTestId = sortableTestId
+            }
 
     member this.SelectionType = this.selectionType
     member this.Measure       = this.measure
@@ -98,7 +108,8 @@ module SorterEvalSelection =
     let makeSelection 
                 (measure: sorterEvalMeasure) 
                 (selType: sorterEvalSelectionType) 
-                (items: sorterEval seq) : sorterEvalSelection =
+                (items: sorterEval seq) 
+                (sortableTestId: Guid<sortableTestId>) : sorterEvalSelection =
         let ranker = SorterEvalFunctions.getFunctionForMeasure measure
         let cleanItems = prepareDistinctSorted measure items
         
@@ -109,14 +120,14 @@ module SorterEvalSelection =
             
             let topN = cleanItems |> Array.sortByDescending ranker |> Array.truncate n
             let labeledItems = topN |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
-            sorterEvalSelection.create selType measure labeledItems
+            sorterEvalSelection.create selType measure labeledItems sortableTestId
 
         | Tmb count ->
             let groupSize = %count
             let targetSize = Math.Min(groupSize, cleanItems.Length / 3)
             
             if targetSize <= 0 then 
-                sorterEvalSelection.create selType measure Array.empty
+                sorterEvalSelection.create selType measure Array.empty sortableTestId
             else
                 let sortedItems = cleanItems |> Array.sortByDescending ranker
                 
@@ -128,7 +139,7 @@ module SorterEvalSelection =
                 let botGroup = sortedItems.[cleanItems.Length - targetSize .. cleanItems.Length - 1] |> Array.map (fun se -> evalLabel.Tmb tmbGroup.Bottom, se)
                 
                 let combined = Array.concat [topGroup; midGroup; botGroup]
-                sorterEvalSelection.create selType measure combined
+                sorterEvalSelection.create selType measure combined sortableTestId
 
         | IndexSpan count ->
             let sampleCount = %count
@@ -148,7 +159,7 @@ module SorterEvalSelection =
                     res
 
             let labeledItems = result |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
-            sorterEvalSelection.create selType measure labeledItems
+            sorterEvalSelection.create selType measure labeledItems sortableTestId
 
         | ValueSpan count ->
             let sampleCount = %count
@@ -181,7 +192,7 @@ module SorterEvalSelection =
                     res
 
             let labeledItems = result |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
-            sorterEvalSelection.create selType measure labeledItems
+            sorterEvalSelection.create selType measure labeledItems sortableTestId
 
 
 module EvalReporting =

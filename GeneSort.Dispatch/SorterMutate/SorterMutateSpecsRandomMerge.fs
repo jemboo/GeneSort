@@ -26,7 +26,7 @@ module SorterMutateSpecsRandomMerge =
 
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.Tmb 6<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.TopN 10<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
 
     let sorterEvalMeasure = 
             (runParameters.sorterEvalMeasureKey, 
@@ -60,7 +60,7 @@ module SorterMutateSpecsRandomMerge =
     let deletionRates =
             (runParameters.deletionRateKey, [0.1;] |> List.map string)
     let modificationRates =
-            (runParameters.modificationRateKey, [0.01; 0.02; 0.03; ] |> List.map string)
+            (runParameters.modificationRateKey, [0.0025; 0.005; 0.01; 0.015; 0.02 ] |> List.map string)
     //let modificationRates =
     //        (runParameters.modificationRateKey, [0.05; 0.07; 0.10] |> List.map string)
 
@@ -68,13 +68,8 @@ module SorterMutateSpecsRandomMerge =
     // SorterCounts
     let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
     let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )
+    let mediumChildCount = (runParameters.sorterChildCountKey, ["1000";] )
     let largeChildCount = (runParameters.sorterChildCountKey, ["50000";] )
-
-    let testParentCount = (runParameters.sorterParentCountKey, ["60";] )
-    let smallParentCount = (runParameters.sorterParentCountKey, ["10";] )
-    let mediumParentCount = (runParameters.sorterParentCountKey, ["100";] )
-    let largeParentCount = (runParameters.sorterParentCountKey, ["1000";] )
 
 
 
@@ -147,8 +142,7 @@ module SorterMutateSpecsRandomMerge =
                 SortableTestMergeSpecs.singleMergeDimension
                 SortableTestMergeSpecs.noSuffixSuffixType
                 onlyDataFormat
-                testParentCount
-                mediumChildCount
+                largeChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
@@ -174,7 +168,6 @@ module SorterMutateSpecsRandomMerge =
                 lowMergeDimensions
                 bothMergeSuffixTypes
                 onlyDataFormat
-                testParentCount
                 largeChildCount
             ]
             Filter = paramMapFilter
@@ -201,7 +194,6 @@ module SorterMutateSpecsRandomMerge =
                 lowMergeDimensions
                 bothMergeSuffixTypes
                 onlyDataFormat
-                largeParentCount
                 largeChildCount
             ]
             Filter = paramMapFilter
