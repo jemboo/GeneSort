@@ -10,10 +10,13 @@
     <Compile Include="SorterEvalSelection.fs" />
     <Compile Include="SorterEvalBinStats.fs" />
     <Compile Include="SorterStageStats.fs" />
-    <Compile Include="Bins\Old\SorterEvalKey.fs" />
-    <Compile Include="Bins\Old\SorterScore.fs" />
-    <Compile Include="Bins\Old\SorterEvalBin.fs" />
-    <Compile Include="Bins\Old\SorterEvalBins.fs" />
+    <Compile Include="Bins\SorterEvalKey.fs" />
+    <Compile Include="Bins\SorterEvalBin.fs" />
+    <Compile Include="Bins\SorterEvalBinSet.fs" />
+    <Compile Include="Bins\Old\SorterEvalKeyOld.fs" />
+    <Compile Include="Bins\Old\SorterScoreOld.fs" />
+    <Compile Include="Bins\Old\SorterEvalBinOld.fs" />
+    <Compile Include="Bins\Old\SorterEvalBinsOld.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

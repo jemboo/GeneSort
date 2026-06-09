@@ -18,6 +18,7 @@ open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Dispatch.V1.SortableTest
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1
+open GeneSort.Eval.V1.Bins
 
 
 
@@ -746,7 +747,10 @@ module SorterMutateExecutor =
                 let yab = tupes |> Array.map(fun (parentSorterModelId, group) ->
                     (parentSorterModelId, group |> Array.map(snd)))
 
+                let wab = yab |> Array.map(fun (parentSorterModelId, ses) ->
+                            let newId = (Guid.NewGuid()) |> UMX.tag<sorterEvalBinSetId>
 
+                            None)
 
                 let details =  
                     sorterSetEvals.SorterEvals

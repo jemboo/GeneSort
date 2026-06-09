@@ -55,7 +55,10 @@ type sorterEvalSelection =
     static member Empty = 
         { selectionType = Tmb 0<sorterCount>; measure = CeLength false; items = [||] }
 
-    static member create (selType: sorterEvalSelectionType) (measure: sorterEvalMeasure) (items: (evalLabel * sorterEval) array) = 
+    static member create 
+                    (selType: sorterEvalSelectionType) 
+                    (measure: sorterEvalMeasure) 
+                    (items: (evalLabel * sorterEval) array) = 
         { selectionType = selType; measure = measure; items = items }
 
     member this.SelectionType = this.selectionType
@@ -81,7 +84,10 @@ type sorterEvalSelection =
 
 module SorterEvalSelection =
 
-    let private prepareDistinctSorted (measure: sorterEvalMeasure) (items: sorterEval seq) =
+    let private prepareDistinctSorted 
+                        (measure: sorterEvalMeasure) 
+                        (items: sorterEval seq) 
+                             :sorterEval array =
         items
         |> SorterEvalFunctions.filterEvaluations measure
         |> Seq.filter SorterEval.getIsSorted

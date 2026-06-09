@@ -277,6 +277,12 @@ module SorterEval =
         | V2 v2 -> v2.UnsortedCount = 0<sortableCount>
         | V3 v3 -> v3.UnsortedCount = 0<sortableCount>
 
+    let getIsUnSorted (eval: sorterEval) : bool =
+        match eval with
+        | V1 v1 -> v1.UnsortedCount > 0<sortableCount>
+        | V2 v2 -> v2.UnsortedCount > 0<sortableCount>
+        | V3 v3 -> v3.UnsortedCount > 0<sortableCount>
+
     let getSequenceHash (eval: sorterEval) : int<sequenceHash> =
         match eval with
         | V1 v1 -> v1.SequenceHash
