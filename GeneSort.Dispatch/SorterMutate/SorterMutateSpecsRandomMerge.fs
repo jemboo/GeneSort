@@ -24,13 +24,20 @@ module SorterMutateSpecsRandomMerge =
             (runParameters.sorterEvalTypeKey, 
             [ sorterEvalType.V1; ] |> List.map SorterEvalType.toString)
 
+    //let sorterEvalSelectionType = 
+    //        (runParameters.sorterEvalSelectionType, 
+    //        [ sorterEvalSelectionType.TopN 10<sorterCount>;  
+    //          sorterEvalSelectionType.Tmb 6<sorterCount>;  
+    //          sorterEvalSelectionType.ValueSpan 10<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
+
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.TopN 10<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.Tmb 6<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
+
 
     let sorterEvalMeasure = 
             (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (1.0, true); ] |> List.map SorterEvalMeasure.toString)
+            [ sorterEvalMeasure.CeSt (1.0, true);] |> List.map SorterEvalMeasure.toString)
     
     // SortingWidths
     let smallSortingWidths = SortableTestMergeSpecs.smallSortingWidths
@@ -69,7 +76,7 @@ module SorterMutateSpecsRandomMerge =
     let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
     let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
     let mediumChildCount = (runParameters.sorterChildCountKey, ["1000";] )
-    let largeChildCount = (runParameters.sorterChildCountKey, ["50000";] )
+    let largeChildCount = (runParameters.sorterChildCountKey, ["100000";] )
 
 
 

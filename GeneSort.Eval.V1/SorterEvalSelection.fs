@@ -40,8 +40,8 @@ module SorterEvalSelectionType =
 
     let toStrategyLabel = function
         | Tmb _       -> "Tmb"
-        | ValueSpan _ -> "EvenSampleByRankedValue"
-        | IndexSpan _ -> "EvenSampleByRankedIndex"
+        | ValueSpan _ -> "ValueSpan"
+        | IndexSpan _ -> "IndexSpan"
         | TopN _      -> "TopN"
 
 
@@ -118,7 +118,7 @@ module SorterEvalSelection =
             let n = %count
             if n <= 0 then failwithf "Requested TopN count must be greater than zero, but was %d" n
             
-            let topN = cleanItems |> Array.sortByDescending ranker |> Array.truncate n
+            let topN = cleanItems |> Array.sortBy ranker |> Array.truncate n
             let labeledItems = topN |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
             sorterEvalSelection.create selType measure labeledItems sortableTestId
 
@@ -129,7 +129,7 @@ module SorterEvalSelection =
             if targetSize <= 0 then 
                 sorterEvalSelection.create selType measure Array.empty sortableTestId
             else
-                let sortedItems = cleanItems |> Array.sortByDescending ranker
+                let sortedItems = cleanItems |> Array.sortBy ranker
                 
                 let topGroup = sortedItems.[0 .. targetSize - 1] |> Array.map (fun se -> evalLabel.Tmb tmbGroup.Top, se)
                 
@@ -146,7 +146,7 @@ module SorterEvalSelection =
             if sampleCount <= 0 then failwithf "Requested sample count must be greater than zero, but was %d" sampleCount
             if cleanItems.Length < sampleCount then failwithf "Cannot sample %d items; only %d options available." sampleCount cleanItems.Length
 
-            let sortedItems = cleanItems |> Array.sortByDescending ranker
+            let sortedItems = cleanItems |> Array.sortBy ranker
             let result = 
                 if sampleCount = 1 then [| sortedItems.[0] |]
                 else
@@ -166,7 +166,7 @@ module SorterEvalSelection =
             if sampleCount <= 0 then failwithf "Requested sample count must be greater than zero, but was %d" sampleCount
             if cleanItems.Length < sampleCount then failwithf "Cannot sample %d items; only %d options available." sampleCount cleanItems.Length
 
-            let sortedItems = cleanItems |> Array.sortByDescending ranker
+            let sortedItems = cleanItems |> Array.sortBy ranker
             let result = 
                 if sampleCount = 1 then [| sortedItems.[0] |]
                 else
