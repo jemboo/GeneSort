@@ -2,6 +2,7 @@
 
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1.Simple.Ce
 open GeneSort.Model.Sorting.V1.Simple.Si
 open GeneSort.Model.Sorting.V1.Simple.Rs
@@ -31,6 +32,7 @@ module SimpleSorterModelMutator =
 
 
     let getSimpleSorterModelMutator 
+                (sortingWidth: int<sortingWidth>)
                 (simpleSorterModelType: simpleSorterModelType)
                 (rngFactory: rngFactory)
                 (excludeSelfCe: bool<excludeSelfCe>)
@@ -47,6 +49,23 @@ module SimpleSorterModelMutator =
                     (%excludeSelfCe)
             )
             |> simpleSorterModelMutator.SmmMsceRandMutate
+
+        | simpleSorterModelType.Mssi -> 
+            mssiRandMutate.create rngFactory 
+                    (opActionRates.createUniform (%modificationRate / 2.0))
+            |> simpleSorterModelMutator.SmmMssiRandMutate
+
+        | simpleSorterModelType.Msrs -> 
+            msrsRandMutate.create rngFactory 
+                    (opsActionRates.createUniform (%modificationRate / 3.0))
+            |> simpleSorterModelMutator.SmmMsrsRandMutate
+
+
+        | simpleSorterModelType.Msuf4 -> 
+            msuf4RandMutate.create rngFactory 
+                    (Uf4MutationRates.makeUniform (%sortingWidth) (%modificationRate / 2.0) (%modificationRate / 2.0))
+            |> simpleSorterModelMutator.SmmMsuf4RandMutate
+
         | _ -> failwith "Unsupported simple sorter model type for mutator creation."
 
             

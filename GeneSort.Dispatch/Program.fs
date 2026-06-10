@@ -65,10 +65,6 @@ let createThreadSafeProgress () =
 let isServer = GCSettings.IsServerGC
 let mode = GCSettings.LatencyMode
 
-
-
-
-
 let progress = createThreadSafeProgress()
 let cts = new CancellationTokenSource()
 
@@ -118,7 +114,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 let configType = SorterMutateSpecsRandomMerge.configType.Rand_Test
-let executorType = sorterMutateExecutorType.GenMerge
+let executorType = sorterMutateExecutorType.MutantMergeReport
 let host: IRunHost = 
     let spec = SorterMutateSpecsRandomMerge.getConfig configType executorType
     SorterMutate.SorterMutateRunHost.createRunHost spec

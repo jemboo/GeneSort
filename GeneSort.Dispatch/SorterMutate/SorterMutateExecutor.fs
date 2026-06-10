@@ -79,10 +79,6 @@ module SorterMutateExecutor =
                         rp.GetSimpleSorterModelType() 
                         |> Result.ofOption "Missing simple sorter model type in run parameters"
 
-            let! (_sorterEvalType: sorterEvalType) =
-                        rp.GetSorterEvalType()
-                        |> Result.ofOption "Missing sorter eval type in run parameters"
-
             let! (sorterChildCount: int<sorterCount>) = 
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
@@ -137,7 +133,8 @@ module SorterMutateExecutor =
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = SimpleSorterModelMutator.getSimpleSorterModelMutator 
+            let sorterModelMutator = SimpleSorterModelMutator.getSimpleSorterModelMutator
+                                            sortingWidth
                                             simpleSorterModelType
                                             rngFactory
                                             CommonSorterMutate.ExcludeSelfCe
@@ -187,10 +184,6 @@ module SorterMutateExecutor =
             let! (mergeSuffixType: mergeSuffixType) = 
                         rp.GetMergeSuffixType() 
                         |> Result.ofOption "Missing mergeSuffixType in run parameters"
-
-            let! (_sorterEvalType: sorterEvalType) =
-                        rp.GetSorterEvalType()
-                        |> Result.ofOption "Missing sorter eval type in run parameters"
 
             let! (sorterChildCount: int<sorterCount>) = 
                         rp.GetSorterChildCount()
@@ -250,7 +243,8 @@ module SorterMutateExecutor =
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = SimpleSorterModelMutator.getSimpleSorterModelMutator 
+            let sorterModelMutator = SimpleSorterModelMutator.getSimpleSorterModelMutator
+                                            sortingWidth
                                             simpleSorterModelType
                                             rngFactory
                                             CommonSorterMutate.ExcludeSelfCe
@@ -297,10 +291,6 @@ module SorterMutateExecutor =
             let! (simpleSorterModelType: simpleSorterModelType) = 
                         rp.GetSimpleSorterModelType() 
                         |> Result.ofOption "Missing simple sorter model type in run parameters"
-
-            let! (_sorterEvalType: sorterEvalType) =
-                        rp.GetSorterEvalType()
-                        |> Result.ofOption "Missing sorter eval type in run parameters"
 
             let! (sorterChildCount: int<sorterCount>) = 
                         rp.GetSorterChildCount()
@@ -354,7 +344,8 @@ module SorterMutateExecutor =
 
             let simpleSorterModels = parentSorterModelSet.SorterModels |> Array.map (SorterModel.asSimpleSorterModel)
 
-            let sorterModelMutator = SimpleSorterModelMutator.getSimpleSorterModelMutator 
+            let sorterModelMutator = SimpleSorterModelMutator.getSimpleSorterModelMutator
+                                            sortingWidth
                                             simpleSorterModelType
                                             (rngType |> RngFactory.create)
                                             CommonSorterMutate.ExcludeSelfCe
@@ -401,14 +392,6 @@ module SorterMutateExecutor =
             let! (mergeSuffixType: mergeSuffixType) = 
                         rp.GetMergeSuffixType() 
                         |> Result.ofOption "Missing mergeSuffixType in run parameters"
-
-            let! (_sorterEvalType: sorterEvalType) =
-                        rp.GetSorterEvalType()
-                        |> Result.ofOption "Missing sorter eval type in run parameters"
-
-            let! (_sorterEvalType: sorterEvalType) =
-                        rp.GetSorterEvalType()
-                        |> Result.ofOption "Missing sorter eval type in run parameters"
 
             let! (sorterChildCount: int<sorterCount>) = 
                         rp.GetSorterChildCount()
@@ -464,6 +447,7 @@ module SorterMutateExecutor =
 
 
             let sorterModelMutator = SimpleSorterModelMutator.getSimpleSorterModelMutator 
+                                            sortingWidth
                                             simpleSorterModelType
                                             (rngType |> RngFactory.create)
                                             CommonSorterMutate.ExcludeSelfCe

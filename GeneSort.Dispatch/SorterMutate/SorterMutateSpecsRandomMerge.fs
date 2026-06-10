@@ -32,7 +32,7 @@ module SorterMutateSpecsRandomMerge =
 
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.Tmb 6<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.Tmb 2<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
 
 
     let sorterEvalMeasure = 
@@ -67,7 +67,7 @@ module SorterMutateSpecsRandomMerge =
     let deletionRates =
             (runParameters.deletionRateKey, [0.1;] |> List.map string)
     let modificationRates =
-            (runParameters.modificationRateKey, [0.0025; 0.005; 0.01; 0.015; 0.02 ] |> List.map string)
+            (runParameters.modificationRateKey, [0.0025; 0.005; 0.01; 0.015; 0.02; 0.03; 0.04; 0.05 ] |> List.map string)
     //let modificationRates =
     //        (runParameters.modificationRateKey, [0.05; 0.07; 0.10] |> List.map string)
 
@@ -83,7 +83,8 @@ module SorterMutateSpecsRandomMerge =
     // SimpleSorterModelTypes
     let singleSorterModelType = 
             (runParameters.simpleSorterModelTypeKey, 
-             [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
+             [simpleSorterModelType.Msuf4] |> List.map SimpleSorterModelType.toString)
+    let allSimpleSorterModelTypes = SorterEvalSpecsRandom.allSimpleSorterModelTypes
 
 
 
@@ -145,7 +146,7 @@ module SorterMutateSpecsRandomMerge =
                 deletionRates
                 modificationRates
                 SortableTestMergeSpecs.singleSortingWidth
-                singleSorterModelType
+                allSimpleSorterModelTypes
                 SortableTestMergeSpecs.singleMergeDimension
                 SortableTestMergeSpecs.noSuffixSuffixType
                 onlyDataFormat
@@ -154,7 +155,7 @@ module SorterMutateSpecsRandomMerge =
             Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 2
+            MaxParallel = 4
         }
 
         let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
