@@ -64,7 +64,7 @@ module SorterMutateExecutor =
         }
 
 
-    let makeMutantSorterModels (rp:runParameters) : Async<Result<sorterModel [], string>> =
+    let makeMutantSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
         asyncResult {
 
             let! (rngType: rngType) =  
@@ -149,23 +149,23 @@ module SorterMutateExecutor =
 
             let childIndexes = [| 0 .. (%sorterChildCount - 1) |]
 
-            let makeChildren (parentSorterModel: sorterModel) : sorterModel[] =
-                childIndexes
-                |> Array.map (fun dex -> SorterModelMutator.makeMutantSorterModelFromIndex
-                                            sorterModelMutator
-                                            parentSorterModel
-                                            dex)
+            // Streaming engine via sequence expression
+            let generateMutantStream (parents: sorterModel[]) =
+                seq {
+                    for parentModel in parents do
+                        for dex in childIndexes do
+                            yield SorterModelMutator.makeMutantSorterModelFromIndex
+                                        sorterModelMutator
+                                        parentModel
+                                        dex
+                }
 
-            let allMutantSorterModels = 
-                parentSorterModelSet.SorterModels
-                |> Array.collect makeChildren
-
-            return allMutantSorterModels
+            return generateMutantStream parentSorterModelSet.SorterModels
         }
 
 
 
-    let makeMutantMergeSorterModels (rp:runParameters) : Async<Result<sorterModel [], string>> =
+    let makeMutantMergeSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
         asyncResult {
 
             let! (rngType: rngType) =  
@@ -263,18 +263,18 @@ module SorterMutateExecutor =
 
             let childIndexes = [| 0 .. (%sorterChildCount - 1) |]
 
-            let makeChildren (parentSorterModel: sorterModel) : sorterModel[] =
-                childIndexes
-                |> Array.map (fun dex -> SorterModelMutator.makeMutantSorterModelFromIndex
-                                            sorterModelMutator
-                                            parentSorterModel
-                                            dex)
+            // Streaming engine via sequence expression
+            let generateMutantStream (parents: sorterModel[]) =
+                seq {
+                    for parentModel in parents do
+                        for dex in childIndexes do
+                            yield SorterModelMutator.makeMutantSorterModelFromIndex
+                                        sorterModelMutator
+                                        parentModel
+                                        dex
+                }
 
-            let allMutantSorterModels = 
-                    parentSorterModelSet.SorterModels
-                    |> Array.collect makeChildren
-
-            return allMutantSorterModels
+            return generateMutantStream parentSorterModelSet.SorterModels
         }
 
 
@@ -485,16 +485,13 @@ module SorterMutateExecutor =
         }
 
 
-
-
-
     let _evaluateMutants 
-                (makeMutantSorterModels: runParameters -> Async<Result<sorterModel [], string>> )
-                (makeSortableTests: runParameters -> Async<Result<sortableTest, string>>)
-                (host: IRunHost)
-                (rp: runParameters) 
-                (allowOverwrite: bool<allowOverwrite>) 
-                (cts: CancellationTokenSource) 
+            (makeMutantSorterModels: runParameters -> Async<Result<sorterModel seq, string>> )
+            (makeSortableTests: runParameters -> Async<Result<sortableTest, string>>)
+            (host: IRunHost)
+            (rp: runParameters) 
+            (allowOverwrite: bool<allowOverwrite>) 
+            (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
         let log msg = OpsUtils.report progress 
@@ -504,18 +501,12 @@ module SorterMutateExecutor =
             try
                 do! checkCancellation cts.Token
                 
-                // 1. Load the mutant sorter models and common dependencies
-                log "Generating Mutant Sorter Models..."
-                let! (allMutantModels: sorterModel []) = makeMutantSorterModels rp
+                // 1. Fetch mutant sorter models as a lazy stream sequence
+                log "Generating Mutant Sorter Models Stream..."
+                let! (allMutantStream: sorterModel seq) = makeMutantSorterModels rp
                 
-                let totalSorterCount = allMutantModels.Length
                 let sortersPerSplit = 1000
                 
-                // Calculate total chunks dynamically based on the number of generated mutants
-                let splitFactor = Math.Max(1, int (Math.Ceiling(float totalSorterCount / float sortersPerSplit)))
-                
-                log (sprintf "Initializing Mutant Evaluation over %d chunks for %d total mutants..." splitFactor totalSorterCount)
-
                 let! sorterEvalType =
                     rp.GetSorterEvalType() 
                     |> Result.ofOption "Missing sorterEvalType."
@@ -535,20 +526,17 @@ module SorterMutateExecutor =
                 let collectTests = CommonSorterEval.CollectSortableTests
                 let testId = tests |> SortableTests.getId
                 
-                // 2. Setup Accumulators and Chunk Loop
-                log "Running Split Sorter Generation, Array Map Evaluations, & Aggregation..."
-                let allChunksEvals : sorterEval array[] = Array.zeroCreate splitFactor
+                // 2. Setup Accumulators and Lazy Chunk Loop via Seq.chunkBySize
+                log "Running Split Sorter Generation, Stream Chunk Evaluations, & Aggregation..."
+                let allChunksEvals = ResizeArray<sorterEval[]>()
+                let mutable chunkCounter = 0
 
-                for i in 0 .. (splitFactor - 1) do
+                let chunkedMutants = allMutantStream |> Seq.chunkBySize sortersPerSplit
+
+                for modelChunk in chunkedMutants do
                     do! checkCancellation cts.Token
-                    log (sprintf "Processing mutant chunk %d of %d..." (i + 1) splitFactor)
-                    
-                    // Determine the lower and upper bounds for the current slice safely
-                    let startIdx = i * sortersPerSplit
-                    let endIdx = Math.Min(startIdx + sortersPerSplit - 1, totalSorterCount - 1)
-                    
-                    // Extract the chunk models
-                    let modelChunk = allMutantModels.[startIdx .. endIdx]
+                    chunkCounter <- chunkCounter + 1
+                    log (sprintf "Processing mutant chunk %d..." chunkCounter)
                     
                     // Wrap the subset models into an explicit SorterModelSet container
                     let modelSetChunk = sorterModelSet.create (Guid.Empty |> UMX.tag) modelChunk
@@ -561,8 +549,10 @@ module SorterMutateExecutor =
                     let sorterEvalsChunk = 
                         SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters tests sorterEvalType collectTests
 
-                    // Accumulate results and trigger an explicit GC collection cycle
-                    allChunksEvals.[i] <- sorterEvalsChunk
+                    // Accumulate transient array chunk results
+                    allChunksEvals.Add(sorterEvalsChunk)
+                    
+                    // Explicit GC collection cycle over the finished slice to drop garbage immediately
                     System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
                     GC.Collect(2, GCCollectionMode.Forced, true, true)
 
@@ -590,6 +580,9 @@ module SorterMutateExecutor =
                 log errorMsg 
                 return! Error errorMsg
         } |> Async.map (logResult progress log)
+
+
+
 
 
 
@@ -630,65 +623,6 @@ module SorterMutateExecutor =
             with e -> 
                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
         } |> Async.map (logResult progress log)
-
-
-
-    let makeMutantReport0
-            (mutantDetailsMaker: runParameters -> Async<Result<sorterEvalSelection * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>> )
-            (host: IRunHost)
-            (rp: runParameters) 
-            (allowOverwrite: bool<allowOverwrite>) 
-            (cts: CancellationTokenSource) 
-            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
-
-
-        let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
-
-        asyncResult {
-            try
-                do! checkCancellation cts.Token
-                let runId = rp |> RunParameters.getIdString
-                OpsUtils.report progress (sprintf "%s Starting Mutant Report for Run %s" (MathUtils.getTimestampString()) %runId)
-                let reportName = (sprintf "MutantReport" |> UMX.tag<textReportName>)
-
-                let! (_sorterEvalSelection, (mutantIdToParentIdMap: Map<Guid<sorterModelId>,Guid<sorterModelId>>)) = mutantDetailsMaker rp
-
-                let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
-                                        |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
-                let! outB = host.RunDb.loadAsync qpSorterSetEval
-                let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
-
-                let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
-                                |> Result.ofOption "Failed to create QueryParams for Report."
-                let leadCols = qpReport |> QueryParams.makeDataTableRecord
-                let parentRecordMap = _sorterEvalSelection |> EvalReporting.toDataTableRecords leadCols "Parent_"
-
-                let details =  
-                    sorterSetEvals.SorterEvals
-                    |> Array.choose (fun se -> 
-                        let (sorterModelId : Guid<sorterModelId>) = se |> SorterEval.getSorterId |> UMX.untag |> UMX.tag<sorterModelId>
-        
-                        match mutantIdToParentIdMap |> Map.tryFind sorterModelId with
-                        | None -> None // Safely ignore if the parent mapping is missing
-                        | Some parentSorterModelId ->
-                            let parentKey = %parentSorterModelId |> UMX.tag<sorterId>
-                            match parentRecordMap |> Map.tryFind parentKey with
-                            | None -> None // Safely ignore if the parent record detail is missing
-                            | Some parentRecord ->
-                                let childRecord = se |> SorterEval.toDataTableRecord
-                                Some (dataTableRecord.combine parentRecord childRecord)
-                    )
-
-                let dtrs = dataTableRecord.combineWithMany details leadCols
-                let report = DataTableReport.fromDataTableRecords dtrs
-
-                let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
-                return (rp : runParameters).WithRunFinished(Some true)
-            with e -> 
-               return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
-        } |> Async.map (logResult progress log)
-
 
 
 
@@ -763,6 +697,8 @@ module SorterMutateExecutor =
             with e -> 
                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
         } |> Async.map (logResult progress log)
+
+
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
