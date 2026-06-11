@@ -1,0 +1,17 @@
+﻿namespace GeneSort.Dispatch.V1
+
+open System
+open System.Threading
+open FSharp.UMX
+open GeneSort.Db.V1
+open GeneSort.Project.V1
+
+
+/// The central interface allowing the Program to run any host implementation
+type IRunHost =
+    abstract member RunDb: IGeneSortDb
+    abstract member Run: run
+    abstract member ParameterSpans: (string * string list) list
+    abstract member AllowOverwrite: bool<allowOverwrite>
+    abstract member ParamMapRefiner: runParameters seq -> runParameters seq
+    abstract member MaxParallel: int

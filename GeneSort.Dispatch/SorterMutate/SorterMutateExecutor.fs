@@ -215,8 +215,6 @@ module SorterMutateExecutor =
 
                                         
             let rngFactory = rngType |> RngFactory.create
-            let ranker = SorterEvalFunctions.byEqualTwoWeighted
-
 
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getMergeSorterEvals 

@@ -66,16 +66,16 @@ module SorterMutateSpecsRandomMerge =
             (runParameters.insertionRateKey, [0.1;] |> List.map string)
     let deletionRates =
             (runParameters.deletionRateKey, [0.1;] |> List.map string)
-    let modificationRates =
-            (runParameters.modificationRateKey, [0.0025; 0.005; 0.01; 0.015; 0.02; 0.03; 0.04; 0.05 ] |> List.map string)
     //let modificationRates =
-    //        (runParameters.modificationRateKey, [0.05; 0.07; 0.10] |> List.map string)
+    //        (runParameters.modificationRateKey, [0.0025; 0.005; 0.01; 0.015; 0.02; 0.03; 0.04; 0.05 ] |> List.map string)
+    let modificationRates =
+            (runParameters.modificationRateKey, [0.05;] |> List.map string)
 
 
     // SorterCounts
     let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
     let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let mediumChildCount = (runParameters.sorterChildCountKey, ["1000";] )
+    let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )
     let largeChildCount = (runParameters.sorterChildCountKey, ["100000";] )
 
 
@@ -150,7 +150,7 @@ module SorterMutateSpecsRandomMerge =
                 SortableTestMergeSpecs.singleMergeDimension
                 SortableTestMergeSpecs.noSuffixSuffixType
                 onlyDataFormat
-                largeChildCount
+                mediumChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
