@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterMutate
+﻿namespace GeneSort.Dispatch.V1.SorterMutate.Msce
 
 
 open FSharp.UMX
@@ -8,20 +8,21 @@ open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.Db.V1
 open GeneSort.FileDb.V1
-open CommonSorterMutate
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
 
-module SorterMutateDbs =
+module MsceMutateDbs =
     
+    let projectName = "SorterMutate.Msce" |> UMX.tag<projectName>
+
     module RandomStandard =
 
         module Uniform =
 
-            let dbName = "RandomStandardUniform" |> UMX.tag<databaseName>
+            let dbName = "Rsu" |> UMX.tag<databaseName>
             let dbFolder = 
-                    $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
+                    @$"c:\Projects\{projectName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
 
 
             let makeQueryParams
@@ -78,7 +79,7 @@ module SorterMutateDbs =
     
         module Uniform =
             
-            let dbName = "RandomMergeUniform" |> UMX.tag<databaseName>
+            let dbName = "Rmu" |> UMX.tag<databaseName>
             let dbFolder = 
                     $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 

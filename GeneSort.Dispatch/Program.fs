@@ -12,6 +12,7 @@ open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Dispatch.V1.SortableTest
 open System.IO
 open GeneSort.Dispatch.V1.SorterMutate
+open GeneSort.Dispatch.V1.SorterMutate.Msce
 
 
 
@@ -76,7 +77,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executorType = SortableTest.executorType.Generator
 //let host: IRunHost = 
 //    let spec = SortableTestMergeSpecs.getConfig configType executorType
-//    SortableTest.SortableTestRunHost.createRunHost spec
+//    SortableTestDb.createRunHost spec
 
 //let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 
@@ -94,11 +95,11 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 
-//let configType = SorterEvalSpecsRandomMerge.configType.RandMerge_Test
-//let executorType = sorterEvalExecutorType.FullReport
+//let configType = SorterEvalSpecsRandomMerge.configType.RandMerge_Single
+//let executorType = sorterEvalExecutorType.GenMerge
 //let host: IRunHost = 
 //    let spec = SorterEvalSpecsRandomMerge.getConfig configType executorType
-//    SorterEval.SorterEvalRunHost.createRunHost spec
+//    SorterEvalDbs.createRunHost spec
 
 //let executor = SorterEvalExecutor.getExecutor executorType
 
@@ -113,13 +114,13 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executor = SorterMutateExecutor.getExecutor executorType
 
 
-let configType = SorterMutateSpecsRandomMerge.configType.Rand_Test
+let configType = MsceMutateSpecsRm.configType.Rand_Test
 let executorType = sorterMutateExecutorType.GenMerge
 let host: IRunHost = 
-    let spec = SorterMutateSpecsRandomMerge.getConfig configType executorType
-    SorterMutateDbs.createRunHost spec
+    let spec = MsceMutateSpecsRm.getConfig configType executorType
+    MsceMutateDbs.createRunHost spec
 
-let executor = SorterMutateExecutor.getExecutor executorType
+let executor = MsceMutateExecutor.getExecutor executorType
 
 
 let minReplica = 0<replNumber>

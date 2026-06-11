@@ -30,7 +30,6 @@ module SorterMutateExecutorType =
 
 module CommonSorterMutate = 
 
-    let projectName = "SorterMutate" |> UMX.tag<projectName>
     let CollectSortableTests = true
 
     let ExcludeSelfCe = true |> UMX.tag<excludeSelfCe>

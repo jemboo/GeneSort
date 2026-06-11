@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterMutate
+﻿namespace GeneSort.Dispatch.V1.SorterMutate.Msce
 
 open System
 open System.Threading
@@ -19,11 +19,10 @@ open GeneSort.Dispatch.V1.SortableTest
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Bins
+open GeneSort.Dispatch.V1.SorterMutate
 
 
-
-
-module SorterMutateExecutor =
+module MsceMutateExecutor =
 
     let makeStandardTests (rp:runParameters) : Async<Result<Sortable.sortableTest, string>> =
         async {

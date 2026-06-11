@@ -72,7 +72,6 @@ module SortableTestDb =
         | None -> failwithf "Database with name %s not found" (UMX.untag name)
 
 
-
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.DatabaseName
         let run = run.create spec.DatabaseName spec.RunName spec.RunDescription

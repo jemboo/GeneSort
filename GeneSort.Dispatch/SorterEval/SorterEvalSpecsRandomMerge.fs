@@ -24,6 +24,7 @@ module SorterEvalSpecsRandomMerge =
     let mediumSortingWidths = SortableTestMergeSpecs.mediumSortingWidths
     
     // MergeDimensions
+    let singleMergeDimension = SortableTestMergeSpecs.singleMergeDimension
     let allMergeDimensions = SortableTestMergeSpecs.allMergeDimensions
     let lowMergeDimensions = SortableTestMergeSpecs.lowMergeDimensions
     let highMergeDimensions = SortableTestMergeSpecs.highMergeDimensions
@@ -101,9 +102,9 @@ module SorterEvalSpecsRandomMerge =
             Spans = [   
                 rngType
                 sorterEvalType
-                (runParameters.sortingWidthKey, [64] |> List.map string)
+                (runParameters.sortingWidthKey, [32] |> List.map string)
                 allSimpleSorterModelTypes
-                (runParameters.mergeDimensionKey, [2;] |> List.map string)
+                (runParameters.mergeDimensionKey, [8;] |> List.map string)
                 (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix;] |> List.map MergeSuffixType.toString)
                 onlyDataFormat
                 (runParameters.sorterCountKey, ["1000";] )

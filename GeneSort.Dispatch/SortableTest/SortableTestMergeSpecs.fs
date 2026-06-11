@@ -10,10 +10,12 @@ open CommonSortableTest
 module SortableTestMergeSpecs =
     
     // SortingWidths
+    let testSortingWidths = 
+            (runParameters.sortingWidthKey, [32; 64;] |> List.map string)
+
     let smallSortingWidths = 
             (runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48;] |> List.map string)
 
-    // SortingWidths
     let singleSortingWidth = 
             (runParameters.sortingWidthKey, [32;] |> List.map string)
 
@@ -25,12 +27,13 @@ module SortableTestMergeSpecs =
     let allMergeDimensions = 
             (runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
     let singleMergeDimension = 
-            (runParameters.mergeDimensionKey, [4;] |> List.map string)
+            (runParameters.mergeDimensionKey, [8;] |> List.map string)
     let lowMergeDimensions = 
             (runParameters.mergeDimensionKey, [2; 3; 4;] |> List.map string)
     let highMergeDimensions = 
             (runParameters.mergeDimensionKey, [6; 8] |> List.map string)
-
+    let testMergeDimensions = 
+            (runParameters.mergeDimensionKey, [4; 8] |> List.map string)
 
     // DataFormats
     let onlyDataFormat = 
@@ -83,9 +86,9 @@ module SortableTestMergeSpecs =
             RunName = sprintf @"Merge-test_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
-                smallSortingWidths
+                singleSortingWidth
                 onlyDataFormat
-                lowMergeDimensions
+                testMergeDimensions
                 bothMergeSuffixTypes
             ]
             Filter = standardParamMapFilter

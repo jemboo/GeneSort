@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterMutate
+﻿namespace GeneSort.Dispatch.V1.SorterMutate.Msce
 
 open FSharp.UMX
 open GeneSort.Model.Sorting.V1
@@ -8,9 +8,10 @@ open GeneSort.Project.V1
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Sorting
+open GeneSort.Dispatch.V1.SorterMutate
 
 
-module SorterMutateSpecsRandom = 
+module MsceMutateSpecsRs = 
 
 
     let rngType = 
@@ -95,7 +96,7 @@ module SorterMutateSpecsRandom =
     module Specs =
 
         let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
-            DatabaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
+            DatabaseName = MsceMutateDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
@@ -120,7 +121,7 @@ module SorterMutateSpecsRandom =
 
 
         let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
-            DatabaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
+            DatabaseName = MsceMutateDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
@@ -144,7 +145,7 @@ module SorterMutateSpecsRandom =
         }
 
         let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
-            DatabaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
+            DatabaseName = MsceMutateDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
