@@ -11,6 +11,7 @@ open GeneSort.FileDb.V1
 open CommonSorterMutate
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
+open GeneSort.Dispatch.V1
 
 module SorterMutateDbs =
     
@@ -143,11 +144,9 @@ module SorterMutateDbs =
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
 
 
-
-
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
         [ (RandomStandard.Uniform.dbName, RandomStandard.Uniform.db :> IGeneSortDb);
-          (RandomMerge.Uniform.dbName, RandomMerge.Uniform.db :> IGeneSortDb) ]
+            (RandomMerge.Uniform.dbName, RandomMerge.Uniform.db :> IGeneSortDb) ]
         |> Map.ofList
 
 
@@ -157,44 +156,8 @@ module SorterMutateDbs =
         | None -> failwithf "Database with name %s not found" (UMX.untag name)
 
 
+    let createRunHost (spec: runHostSpec) : IRunHost =
+        let db = getDatabaseByName spec.DatabaseName
+        let run = run.create spec.DatabaseName spec.RunName spec.RunDescription
+        runHost.Create db spec run :> IRunHost
 
-    //let getStandardSorterEvalBins
-    //                (sortingWidth: int<sortingWidth>)
-    //                (simpleSorterModelType: simpleSorterModelType) 
-    //                (set: sorterEvalType)
-    //                        : Async<Result<sorterEvalBins, string>> =
-    //    let qp = SorterEvalDbs.RandomStandard.Uniform.makeQueryParams 
-    //                    CommonSorterEval.projectRngType
-    //                    (0 |> UMX.tag<replNumber>) 
-    //                    sortingWidth 
-    //                    simpleSorterModelType 
-    //                    set
-    //                    (outputDataType.SorterEvalBins "")
-    //    async {
-    //         let! result = (SorterEvalDbs.RandomStandard.Uniform.db :> IGeneSortDb).loadAsync qp
-    //         return  result |> Result.bind OutputData.asSorterEvalBins
-    //    }
-
-
-    //let getMergeSorterEvalBins
-    //                (sortingWidth: int<sortingWidth>)
-    //                (simpleSorterModelType: simpleSorterModelType)
-    //                (mergeDimension: int<mergeDimension>) 
-    //                (mergeSuffixType: mergeSuffixType)
-    //                (set: sorterEvalType)
-    //                        : Async<Result<sorterEvalBins, string>> =
-
-    //    let qp = SorterEvalDbs.RandomMerge.Uniform.makeQueryParams 
-    //                    CommonSorterEval.projectRngType
-    //                    (0 |> UMX.tag<replNumber>) 
-    //                    sortingWidth 
-    //                    simpleSorterModelType
-    //                    mergeDimension 
-    //                    mergeSuffixType 
-    //                    CommonSortableTest.projectSortableDataFormat
-    //                    set
-    //                    (outputDataType.SorterEvalBins "")
-    //    async {
-    //         let! result = (SorterEvalDbs.RandomMerge.Uniform.db :> IGeneSortDb).loadAsync qp
-    //         return  result |> Result.bind OutputData.asSorterEvalBins
-    //    }

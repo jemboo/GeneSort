@@ -19,10 +19,10 @@
     <Compile Include="ProgressMessage.fs" />
     <Compile Include="OpsUtils.fs" />
     <Compile Include="ParamOps.fs" />
+    <Compile Include="RunHostSpec.fs" />
     <Compile Include="RunHost.fs" />
     <Compile Include="RunParamsExecutor.fs" />
     <Compile Include="ProjectOps.fs" />
-    <Compile Include="RunHostSpec.fs" />
     <Compile Include="SortableTest\CommonSortableTest.fs" />
     <Compile Include="SortableTest\SortableTestDb.fs" />
     <Compile Include="SortableTest\SortableTestRunHost.fs" />

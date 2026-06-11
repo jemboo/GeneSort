@@ -7,6 +7,7 @@ open GeneSort.Db.V1
 open GeneSort.Sorting
 open GeneSort.FileDb.V1
 open GeneSort.Sorting.Sortable
+open GeneSort.Dispatch.V1
 
 
 module SortableTestDb =
@@ -69,4 +70,11 @@ module SortableTestDb =
         match databaseConfigs.TryFind name with
         | Some db -> db
         | None -> failwithf "Database with name %s not found" (UMX.untag name)
+
+
+
+    let createRunHost (spec: runHostSpec) : IRunHost =
+        let db = getDatabaseByName spec.DatabaseName
+        let run = run.create spec.DatabaseName spec.RunName spec.RunDescription
+        runHost.Create db spec run :> IRunHost
 

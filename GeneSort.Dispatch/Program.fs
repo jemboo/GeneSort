@@ -117,7 +117,7 @@ let configType = SorterMutateSpecsRandomMerge.configType.Rand_Test
 let executorType = sorterMutateExecutorType.GenMerge
 let host: IRunHost = 
     let spec = SorterMutateSpecsRandomMerge.getConfig configType executorType
-    SorterMutate.SorterMutateRunHost.createRunHost spec
+    SorterMutateDbs.createRunHost spec
 
 let executor = SorterMutateExecutor.getExecutor executorType
 

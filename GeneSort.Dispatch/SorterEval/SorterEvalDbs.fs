@@ -11,6 +11,7 @@ open GeneSort.Eval.V1.Bins
 open GeneSort.Dispatch.V1.SortableTest
 open CommonSorterEval
 open GeneSort.SortingOps
+open GeneSort.Dispatch.V1
 
 
 module SorterEvalDbs =
@@ -127,9 +128,6 @@ module SorterEvalDbs =
 
 
 
-
-
-
     let getStandardSorterEvals
                     (sortingWidth: int<sortingWidth>) 
                     (simpleSorterModelType: simpleSorterModelType) 
@@ -170,3 +168,9 @@ module SorterEvalDbs =
              let! result = (RandomMerge.Uniform.db :> IGeneSortDb).loadAsync qp
              return  result |> Result.bind OutputData.asSorterSetEval
         }
+
+
+    let createRunHost (spec: runHostSpec) : IRunHost =
+        let db = getDatabaseByName spec.DatabaseName
+        let run = run.create spec.DatabaseName spec.RunName spec.RunDescription
+        runHost.Create db spec run :> IRunHost
