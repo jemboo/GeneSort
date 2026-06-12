@@ -37,6 +37,18 @@
     <Compile Include="SorterMutate\Msce\MsceMutateExecutor.fs" />
     <Compile Include="SorterMutate\Msce\MsceMutateSpecsRs.fs" />
     <Compile Include="SorterMutate\Msce\MsceMutateSpecsRm.fs" />
+    <Compile Include="SorterMutate\Mssi\MssiMutateDbs.fs" />
+    <Compile Include="SorterMutate\Mssi\MssiMutateExecutor.fs" />
+    <Compile Include="SorterMutate\Mssi\MssiMutateSpecsRs.fs" />
+    <Compile Include="SorterMutate\Mssi\MssiMutateSpecsRm.fs" />
+    <Compile Include="SorterMutate\Msrs\MsrsMutateDbs.fs" />
+    <Compile Include="SorterMutate\Msrs\MsrsMutateExecutor.fs" />
+    <Compile Include="SorterMutate\Msrs\MsrsMutateSpecsRm.fs" />
+    <Compile Include="SorterMutate\Msrs\MsrsMutateSpecsRs.fs" />
+    <Compile Include="SorterMutate\Msuf4\Msuf4MutateDbs.fs" />
+    <Compile Include="SorterMutate\Msuf4\Msuf4MutateExecutor.fs" />
+    <Compile Include="SorterMutate\Msuf4\Msuf4MutateSpecsRm.fs" />
+    <Compile Include="SorterMutate\Msuf4\Msuf4MutateSpecsRs.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
