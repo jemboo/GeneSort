@@ -25,12 +25,6 @@ module MsrsMutateSpecsRm =
             (runParameters.sorterEvalTypeKey, 
             [ sorterEvalType.V1; ] |> List.map SorterEvalType.toString)
 
-    //let sorterEvalSelectionType = 
-    //        (runParameters.sorterEvalSelectionType, 
-    //        [ sorterEvalSelectionType.TopN 10<sorterCount>;  
-    //          sorterEvalSelectionType.Tmb 6<sorterCount>;  
-    //          sorterEvalSelectionType.ValueSpan 10<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
-
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
@@ -59,28 +53,28 @@ module MsrsMutateSpecsRm =
     let vv1SuffixType = SortableTestMergeSpecs.vv1SuffixType
 
 
-
     // MutationRates
-    let mutationRates =
-            (runParameters.mutationRateKey, [1.0] |> List.map string)
-    let insertionRates =
-            (runParameters.insertionRateKey, [0.1;] |> List.map string)
-    let deletionRates =
-            (runParameters.deletionRateKey, [0.1;] |> List.map string)
+    let orthoRates =
+            (runParameters.orthoRateKey, [1.0;] |> List.map string)
+    let paraRates =
+            (runParameters.paraRateKey, [1.0;] |> List.map string)
+    let selfSymRates =
+            (runParameters.selfSymRateKey, [1.0;] |> List.map string)
     let modificationRates =
             (runParameters.modificationRateKey, [0.0025; 0.005; 0.01; 0.015; 0.02; 0.03; 0.04; 0.05 ] |> List.map string)
+
 
 
     // SorterCounts
     let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
     let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
     let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )
-    let largeChildCount = (runParameters.sorterChildCountKey, ["100000";] )
+    let largeChildCount = (runParameters.sorterChildCountKey, ["10000";] )
 
     // SimpleSorterModelTypes
-    let msceModelType = 
+    let msrsModelType = 
             (runParameters.simpleSorterModelTypeKey, 
-             [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
+             [simpleSorterModelType.Msrs] |> List.map SimpleSorterModelType.toString)
     let allSimpleSorterModelTypes = SorterEvalSpecsRandom.allSimpleSorterModelTypes
 
 
@@ -132,15 +126,15 @@ module MsrsMutateSpecsRm =
         let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
             DatabaseName = MsrsMutateDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"Rand-test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Mutation analysis for merge Msrs"
             Spans = [
                 rngType
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalType
-                mutationRates
-                insertionRates
-                deletionRates
+                orthoRates
+                paraRates
+                selfSymRates
                 modificationRates
                 SortableTestMergeSpecs.testSortingWidths
                 allSimpleSorterModelTypes
@@ -158,18 +152,18 @@ module MsrsMutateSpecsRm =
         let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
             DatabaseName = MsrsMutateDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Mutation analysis for merge Msrs"
             Spans = [
                 rngType
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalType
-                mutationRates
-                insertionRates
-                deletionRates
+                orthoRates
+                paraRates
+                selfSymRates
                 modificationRates
                 smallSortingWidths
-                msceModelType
+                msrsModelType
                 lowMergeDimensions
                 bothMergeSuffixTypes
                 onlyDataFormat
@@ -184,18 +178,18 @@ module MsrsMutateSpecsRm =
         let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
             DatabaseName = MsrsMutateDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Mutation analysis for merge Msrs"
             Spans = [
                 rngType
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalType
-                mutationRates
-                insertionRates
-                deletionRates
+                orthoRates
+                paraRates
+                selfSymRates
                 modificationRates
                 mediumSortingWidths
-                msceModelType
+                msrsModelType
                 lowMergeDimensions
                 bothMergeSuffixTypes
                 onlyDataFormat

@@ -23,6 +23,8 @@ type opsTransitionRates =
         let rates = opsActionRates.createUniform amt
         opsTransitionRates.create(rates, rates, rates)
 
+    static member createUniform2 (rates: opsActionRates) : opsTransitionRates =
+        opsTransitionRates.create(rates, rates, rates)
 
     static member createBiased (twoOrbitType: TwoOrbitType) (baseAmt:float) (biasAmt:float) : opsTransitionRates =
         match twoOrbitType with

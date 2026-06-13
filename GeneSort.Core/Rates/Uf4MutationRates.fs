@@ -21,6 +21,17 @@ type uf4MutationRates =
                 seedOpsTransitionRates = seedOpsTransitionRates; 
                 twoOrbitPairOpsTransitionRates = twoOrbitPairOpsTransitionRates }
 
+        static member createUniform 
+                            (order: int) 
+                            (seedRates:opsTransitionRates) 
+                            (rates:opsTransitionRates) : uf4MutationRates =
+            let genRatesArrayLength = MathUtils.exactLog2 (order / 4)
+            let genRatesArray = Array.init genRatesArrayLength (fun _ -> rates)
+            uf4MutationRates.create 
+                order
+                seedRates
+                (opsTransitionRatesArray.create genRatesArray)
+
         member this.Order with get() = this.order
         member this.SeedOpsTransitionRates with get() = this.seedOpsTransitionRates
         member this.TwoOrbitPairOpsTransitionRates with get() = this.twoOrbitPairOpsTransitionRates
@@ -56,7 +67,18 @@ module Uf4MutationRates =
           seedOpsTransitionRates = opsTransitionRates.createUniform seed4MutationRates
           twoOrbitPairOpsTransitionRates = opsTransitionRatesArray.create mutRatesArray }
 
-    let biasTowards (order: int) (perm_RsMutationRate: float) (twoOrbitType: TwoOrbitType) (baseAmt: float) (biasAmt: float) =
+    let makeUniform2 
+                    (order: int) 
+                    (seedRates: opsTransitionRates) 
+                    (twoOrbitRates: opsTransitionRates) :uf4MutationRates =
+        uf4MutationRates.createUniform order seedRates twoOrbitRates
+
+
+    let biasTowards (order: int) 
+                    (perm_RsMutationRate: float) 
+                    (twoOrbitType: TwoOrbitType) 
+                    (baseAmt: float) 
+                    (biasAmt: float) =
         if order < 4 || order % 4 <> 0 then
             failwith $"Order must be at least 4 and divisible by 4, got {order}"
         let mutRatesBaseArrayLength = MathUtils.exactLog2 (order / 4) - 1

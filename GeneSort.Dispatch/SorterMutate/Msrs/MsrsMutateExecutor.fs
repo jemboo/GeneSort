@@ -132,7 +132,7 @@ module MsrsMutateExecutor =
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = SimpleSorterModelMutator.getSimpleSorterModelMutator
+            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
                                             sortingWidth
                                             simpleSorterModelType
                                             rngFactory
@@ -240,7 +240,7 @@ module MsrsMutateExecutor =
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = SimpleSorterModelMutator.getSimpleSorterModelMutator
+            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
                                             sortingWidth
                                             simpleSorterModelType
                                             rngFactory
@@ -341,7 +341,7 @@ module MsrsMutateExecutor =
 
             let simpleSorterModels = parentSorterModelSet.SorterModels |> Array.map (SorterModel.asSimpleSorterModel)
 
-            let sorterModelMutator = SimpleSorterModelMutator.getSimpleSorterModelMutator
+            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
                                             sortingWidth
                                             simpleSorterModelType
                                             (rngType |> RngFactory.create)
@@ -443,7 +443,7 @@ module MsrsMutateExecutor =
                                             parentSorterModelGen
 
 
-            let sorterModelMutator = SimpleSorterModelMutator.getSimpleSorterModelMutator 
+            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator 
                                             sortingWidth
                                             simpleSorterModelType
                                             (rngType |> RngFactory.create)

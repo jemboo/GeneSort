@@ -31,7 +31,7 @@ module SimpleSorterModelMutator =
         | SmmMsuf6RandMutate msuf6 -> msuf6.Id
 
 
-    let getSimpleSorterModelMutator 
+    let getMsceModelMutator 
                 (sortingWidth: int<sortingWidth>)
                 (simpleSorterModelType: simpleSorterModelType)
                 (rngFactory: rngFactory)
@@ -50,25 +50,61 @@ module SimpleSorterModelMutator =
             )
             |> simpleSorterModelMutator.SmmMsceRandMutate
 
-        | simpleSorterModelType.Mssi -> 
+        | _ -> failwith "Unsupported simple sorter model type for Msce mutator creation."
+
+
+    let getMssiModelMutator
+                (rngFactory: rngFactory)
+                (excludeSelfCe: bool<excludeSelfCe>)
+                (modificationRate: float<modificationRate>)
+                (orthoRate: float<orthoRate>)
+                (paraRate: float<paraRate>) :simpleSorterModelMutator =
+
             mssiRandMutate.create rngFactory 
-                    (opActionRates.createUniform (%modificationRate / 2.0))
+                    (opActionRates.createMod (%modificationRate, %orthoRate, %paraRate))
             |> simpleSorterModelMutator.SmmMssiRandMutate
 
-        | simpleSorterModelType.Msrs -> 
+
+    let getMsrsModelMutator 
+                (rngFactory: rngFactory)
+                (excludeSelfCe: bool<excludeSelfCe>)
+                (modificationRate: float<modificationRate>)
+                (orthoRate: float<orthoRate>)
+                (paraRate: float<paraRate>) 
+                (symRate: float<selfSymRate>) :simpleSorterModelMutator =
             msrsRandMutate.create rngFactory 
-                    (opsActionRates.createUniform (%modificationRate / 3.0))
+                    (opsActionRates.createMod (%modificationRate, %orthoRate, %paraRate, %symRate))
             |> simpleSorterModelMutator.SmmMsrsRandMutate
 
 
-        | simpleSorterModelType.Msuf4 -> 
+    let getMsuf4ModelMutator 
+                (sortingWidth: int<sortingWidth>)
+                (rngFactory: rngFactory)
+                (excludeSelfCe: bool<excludeSelfCe>)
+                (seedModificationRate: float<seedModificationRate>)
+                (modificationRate: float<modificationRate>)
+                (orthoRate: float<orthoRate>)
+                (paraRate: float<paraRate>) 
+                (symRate: float<selfSymRate>) :simpleSorterModelMutator =
+
+            let opsSeedActionRates = 
+                opsActionRates.createMod (%seedModificationRate, %orthoRate, %paraRate, %symRate)
+            let opsActionRates = 
+                opsActionRates.createMod (%modificationRate, %orthoRate, %paraRate, %symRate)
+            let opsSeedTransitionRates = 
+                opsTransitionRates.createUniform2 opsSeedActionRates
+            let opsTransitionRates = 
+                opsTransitionRates.createUniform2 opsActionRates
+
             msuf4RandMutate.create rngFactory 
-                    (Uf4MutationRates.makeUniform (%sortingWidth) (%modificationRate / 2.0) (%modificationRate / 2.0))
+                    (Uf4MutationRates.makeUniform2 
+                                    (%sortingWidth) 
+                                    opsSeedTransitionRates 
+                                    opsTransitionRates )
             |> simpleSorterModelMutator.SmmMsuf4RandMutate
 
-        | _ -> failwith "Unsupported simple sorter model type for mutator creation."
 
-            
+
 
     let makeMutantSorterModelIdFromIndex 
                 (mutatorModel: simpleSorterModelMutator) 

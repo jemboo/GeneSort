@@ -47,24 +47,19 @@ module MsceMutateSpecsRs =
     let deletionRates =
             (runParameters.deletionRateKey, [0.1;] |> List.map string)
     let modificationRates =
-            (runParameters.modificationRateKey, [0.01; 0.05; 0.1] |> List.map string)
+            (runParameters.modificationRateKey, [0.0025; 0.005; 0.01; 0.015; 0.02; 0.03; 0.04; 0.05 ] |> List.map string)
 
 
     // SorterCounts
     let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let smallChildCount = (runParameters.sorterChildCountKey, ["1";] )
-    let mediumChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let largeChildCount = (runParameters.sorterChildCountKey, ["100";] )
-
-    let testParentCount = (runParameters.sorterParentCountKey, ["100";] )
-    let smallParentCount = (runParameters.sorterParentCountKey, ["10";] )
-    let mediumParentCount = (runParameters.sorterParentCountKey, ["100";] )
-    let largeParentCount = (runParameters.sorterParentCountKey, ["1000";] )
+    let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
+    let mediumChildCount = (runParameters.sorterChildCountKey, ["1000";] )
+    let largeChildCount = (runParameters.sorterChildCountKey, ["10000";] )
 
 
 
-    // SimpleSorterModelTypes
-    let allSimpleSorterModelTypes = 
+    // SorterModelTypes
+    let msceModelType = 
             (runParameters.simpleSorterModelTypeKey, 
              [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
 
@@ -98,7 +93,7 @@ module MsceMutateSpecsRs =
         let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
             DatabaseName = MsceMutateDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Mutation analysis for Msce"
             Spans = [
                 rngType
                 sorterEvalSelection
@@ -109,9 +104,8 @@ module MsceMutateSpecsRs =
                 deletionRates
                 modificationRates
                 smallSortingWidths
-                allSimpleSorterModelTypes
-                testParentCount
-                testChildCount
+                msceModelType
+                smallChildCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
@@ -123,7 +117,7 @@ module MsceMutateSpecsRs =
         let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
             DatabaseName = MsceMutateDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Mutation analysis for Msce"
             Spans = [
                 rngType
                 sorterEvalSelection
@@ -133,9 +127,8 @@ module MsceMutateSpecsRs =
                 insertionRates
                 deletionRates
                 modificationRates
-                smallSortingWidths
-                allSimpleSorterModelTypes
-                testParentCount
+                mediumSortingWidths
+                msceModelType
                 largeChildCount
             ]
             Filter = standardSorterModelTypeFilter
@@ -147,7 +140,7 @@ module MsceMutateSpecsRs =
         let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
             DatabaseName = MsceMutateDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Mutation analysis for Msce"
             Spans = [
                 rngType
                 sorterEvalSelection
@@ -158,8 +151,7 @@ module MsceMutateSpecsRs =
                 deletionRates
                 modificationRates
                 mediumSortingWidths
-                allSimpleSorterModelTypes
-                largeParentCount
+                msceModelType
                 largeChildCount
             ]
             Filter = standardSorterModelTypeFilter

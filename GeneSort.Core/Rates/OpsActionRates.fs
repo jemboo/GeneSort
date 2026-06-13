@@ -25,6 +25,10 @@ type opsActionRates =
             selfSymThresh = orthoRate + paraRate + selfSymRate
         }
 
+    static member createMod (modificationRate: float, orthoRate: float, paraRate: float, selfSymRate: float) : opsActionRates = 
+        let adj = modificationRate / (orthoRate + paraRate + selfSymRate)
+        opsActionRates.create (adj*orthoRate, adj*paraRate, adj*selfSymRate)
+
     static member createUniform (amt:float) : opsActionRates =
             opsActionRates.create(amt, amt, amt)
 

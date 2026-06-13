@@ -25,11 +25,6 @@ module MsceMutateSpecsRm =
             (runParameters.sorterEvalTypeKey, 
             [ sorterEvalType.V1; ] |> List.map SorterEvalType.toString)
 
-    //let sorterEvalSelectionType = 
-    //        (runParameters.sorterEvalSelectionType, 
-    //        [ sorterEvalSelectionType.TopN 10<sorterCount>;  
-    //          sorterEvalSelectionType.Tmb 6<sorterCount>;  
-    //          sorterEvalSelectionType.ValueSpan 10<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
 
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
@@ -59,7 +54,6 @@ module MsceMutateSpecsRm =
     let vv1SuffixType = SortableTestMergeSpecs.vv1SuffixType
 
 
-
     // MutationRates
     let mutationRates =
             (runParameters.mutationRateKey, [1.0] |> List.map string)
@@ -75,14 +69,12 @@ module MsceMutateSpecsRm =
     let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
     let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
     let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )
-    let largeChildCount = (runParameters.sorterChildCountKey, ["100000";] )
+    let largeChildCount = (runParameters.sorterChildCountKey, ["10000";] )
 
-    // SimpleSorterModelTypes
+    // SorterModelTypes
     let msceModelType = 
             (runParameters.simpleSorterModelTypeKey, 
              [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
-    let allSimpleSorterModelTypes = SorterEvalSpecsRandom.allSimpleSorterModelTypes
-
 
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
@@ -132,7 +124,7 @@ module MsceMutateSpecsRm =
         let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
             DatabaseName = MsceMutateDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"Rand-test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Mutation analysis for merge Msce"
             Spans = [
                 rngType
                 sorterEvalSelectionType
@@ -143,7 +135,7 @@ module MsceMutateSpecsRm =
                 deletionRates
                 modificationRates
                 SortableTestMergeSpecs.testSortingWidths
-                allSimpleSorterModelTypes
+                msceModelType
                 SortableTestMergeSpecs.testMergeDimensions
                 SortableTestMergeSpecs.noSuffixSuffixType
                 onlyDataFormat
@@ -158,7 +150,7 @@ module MsceMutateSpecsRm =
         let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
             DatabaseName = MsceMutateDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Mutation analysis for merge Msce"
             Spans = [
                 rngType
                 sorterEvalSelectionType
@@ -184,7 +176,7 @@ module MsceMutateSpecsRm =
         let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
             DatabaseName = MsceMutateDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Mutation analysis for merge Msce"
             Spans = [
                 rngType
                 sorterEvalSelectionType

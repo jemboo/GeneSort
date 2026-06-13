@@ -20,9 +20,13 @@ open GeneSort.Core
 
 [<Measure>] type excludeSelfCe
 [<Measure>] type modificationRate
+[<Measure>] type seedModificationRate
 [<Measure>] type mutationRate
 [<Measure>] type insertionRate
 [<Measure>] type deletionRate
+[<Measure>] type orthoRate
+[<Measure>] type paraRate
+[<Measure>] type selfSymRate
 
 
 module MutationRate =

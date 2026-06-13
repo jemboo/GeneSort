@@ -25,11 +25,6 @@ module MssiMutateSpecsRm =
             (runParameters.sorterEvalTypeKey, 
             [ sorterEvalType.V1; ] |> List.map SorterEvalType.toString)
 
-    //let sorterEvalSelectionType = 
-    //        (runParameters.sorterEvalSelectionType, 
-    //        [ sorterEvalSelectionType.TopN 10<sorterCount>;  
-    //          sorterEvalSelectionType.Tmb 6<sorterCount>;  
-    //          sorterEvalSelectionType.ValueSpan 10<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
 
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
@@ -59,14 +54,11 @@ module MssiMutateSpecsRm =
     let vv1SuffixType = SortableTestMergeSpecs.vv1SuffixType
 
 
-
     // MutationRates
-    let mutationRates =
-            (runParameters.mutationRateKey, [1.0] |> List.map string)
-    let insertionRates =
-            (runParameters.insertionRateKey, [0.1;] |> List.map string)
-    let deletionRates =
-            (runParameters.deletionRateKey, [0.1;] |> List.map string)
+    let orthoRates =
+            (runParameters.orthoRateKey, [1.0;] |> List.map string)
+    let paraRates =
+            (runParameters.paraRateKey, [1.0;] |> List.map string)
     let modificationRates =
             (runParameters.modificationRateKey, [0.0025; 0.005; 0.01; 0.015; 0.02; 0.03; 0.04; 0.05 ] |> List.map string)
 
@@ -75,14 +67,12 @@ module MssiMutateSpecsRm =
     let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
     let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
     let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )
-    let largeChildCount = (runParameters.sorterChildCountKey, ["100000";] )
+    let largeChildCount = (runParameters.sorterChildCountKey, ["10000";] )
 
-    // SimpleSorterModelTypes
-    let msceModelType = 
+    // SorterModelTypes
+    let mssiModelType = 
             (runParameters.simpleSorterModelTypeKey, 
-             [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
-    let allSimpleSorterModelTypes = SorterEvalSpecsRandom.allSimpleSorterModelTypes
-
+             [simpleSorterModelType.Mssi] |> List.map SimpleSorterModelType.toString)
 
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
@@ -91,7 +81,6 @@ module MssiMutateSpecsRm =
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
           .WithId (Some qp.Value.Id)
-
 
 
     let private paramMapFilter (rp: runParameters) : runParameters option = 
@@ -132,18 +121,17 @@ module MssiMutateSpecsRm =
         let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
             DatabaseName = MssiMutateDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"Rand-test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Mutation analysis for merge Mssi"
             Spans = [
                 rngType
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalType
-                mutationRates
-                insertionRates
-                deletionRates
+                orthoRates
+                paraRates
                 modificationRates
                 SortableTestMergeSpecs.testSortingWidths
-                allSimpleSorterModelTypes
+                mssiModelType
                 SortableTestMergeSpecs.testMergeDimensions
                 SortableTestMergeSpecs.noSuffixSuffixType
                 onlyDataFormat
@@ -158,18 +146,17 @@ module MssiMutateSpecsRm =
         let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
             DatabaseName = MssiMutateDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Mutation analysis for merge Mssi"
             Spans = [
                 rngType
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalType
-                mutationRates
-                insertionRates
-                deletionRates
+                orthoRates
+                paraRates
                 modificationRates
                 smallSortingWidths
-                msceModelType
+                mssiModelType
                 lowMergeDimensions
                 bothMergeSuffixTypes
                 onlyDataFormat
@@ -184,18 +171,17 @@ module MssiMutateSpecsRm =
         let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
             DatabaseName = MssiMutateDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Mutation analysis for merge Mssi"
             Spans = [
                 rngType
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalType
-                mutationRates
-                insertionRates
-                deletionRates
+                orthoRates
+                paraRates
                 modificationRates
                 mediumSortingWidths
-                msceModelType
+                mssiModelType
                 lowMergeDimensions
                 bothMergeSuffixTypes
                 onlyDataFormat

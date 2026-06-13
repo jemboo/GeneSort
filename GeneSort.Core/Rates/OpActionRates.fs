@@ -26,6 +26,10 @@ type opActionRates =
     static member createUniform (amt:float) : opActionRates =
         opActionRates.create(amt, amt)
 
+    static member createMod (modificationRate: float, orthoRate: float, paraRate: float) : opActionRates = 
+        let adj = modificationRate / (orthoRate + paraRate)
+        opActionRates.create (adj*orthoRate, adj*paraRate)
+
     static member createBiased(opActionMode: opActionMode, baseAmt:float, biasAmt: float) : opActionRates =
         match opActionMode with
         | opActionMode.Ortho -> opActionRates.create(baseAmt + biasAmt, baseAmt - biasAmt)

@@ -28,10 +28,14 @@ type runParameters =
     static member mergeDimensionKey = "MergeDimension"
     static member mergeSuffixTypeKey = "MergeSuffixType"
     static member messageKey = "Message"
+    static member seedModificationRateKey = "SeedModificationRate"
     static member modificationRateKey = "ModificationRate"
     static member mutationRateKey = "MutationRate"
     static member insertionRateKey = "InsertionRate"
     static member deletionRateKey = "DeletionRate"
+    static member orthoRateKey = "OrthoRate"
+    static member paraRateKey = "ParaRate"
+    static member selfSymRateKey = "SelfSym"
     static member projectNameKey = "ProjectName"
     static member queryNameKey = "QueryName"
     static member runNameKey = "RunName"
@@ -85,12 +89,15 @@ type runParameters =
     member this.GetLatticeDistance() = runParameters.tryGetInt runParameters.latticeDistanceKey this.paramMap |> Option.map UMX.tag<latticeDistance>
     member this.GetMaxOrbit() = runParameters.tryGetInt runParameters.maxOrbitKey this.paramMap
     member this.GetMergeDimension() = runParameters.tryGetInt runParameters.mergeDimensionKey this.paramMap |> Option.map UMX.tag<mergeDimension>
-    member this.GetMergeSuffixType() = 
-        this.paramMap.TryFind runParameters.mergeSuffixTypeKey |> Option.bind (fun v -> try Some (MergeSuffixType.fromString v) with _ -> None)
+    member this.GetMergeSuffixType() = this.paramMap.TryFind runParameters.mergeSuffixTypeKey |> Option.bind (fun v -> try Some (MergeSuffixType.fromString v) with _ -> None)
+    member this.GetSeedModificationRate() = runParameters.tryGetFloat runParameters.seedModificationRateKey this.paramMap |> Option.map UMX.tag<seedModificationRate>
     member this.GetModificationRate() = runParameters.tryGetFloat runParameters.modificationRateKey this.paramMap |> Option.map UMX.tag<modificationRate>
     member this.GetMutationRate() = runParameters.tryGetFloat runParameters.mutationRateKey this.paramMap |> Option.map UMX.tag<mutationRate>
     member this.GetInsertionRate() = runParameters.tryGetFloat runParameters.insertionRateKey this.paramMap |> Option.map UMX.tag<insertionRate>
     member this.GetDeletionRate() = runParameters.tryGetFloat runParameters.deletionRateKey this.paramMap |> Option.map UMX.tag<deletionRate>
+    member this.GetOrthoRate() = runParameters.tryGetFloat runParameters.orthoRateKey this.paramMap |> Option.map UMX.tag<orthoRate>
+    member this.GetParaRate() = runParameters.tryGetFloat runParameters.paraRateKey this.paramMap |> Option.map UMX.tag<paraRate>
+    member this.GetSelfSymRate() = runParameters.tryGetFloat runParameters.selfSymRateKey this.paramMap |> Option.map UMX.tag<selfSymRate>
     member this.GetProjectName() = this.paramMap.TryFind runParameters.projectNameKey |> Option.map UMX.tag<projectName>
     member this.GetQueryName() = this.paramMap.TryFind runParameters.queryNameKey |> Option.map UMX.tag<queryName>
     member this.GetRngType() = this.paramMap.TryFind runParameters.rngTypeKey |> Option.map RngType.fromString
@@ -154,6 +161,9 @@ type runParameters =
     member this.WithMessage(message: string option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.messageKey message }
 
+    member this.WithSeedModificationRate(mr: float<modificationRate> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedModificationRateKey (mr |> Option.map UmxExt.floatToRaw) }
+
     member this.WithModificationRate(mr: float<modificationRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.modificationRateKey (mr |> Option.map UmxExt.floatToRaw) }
 
@@ -168,6 +178,15 @@ type runParameters =
 
     member this.WithDeletionRate(dr: float<deletionRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.deletionRateKey (dr |> Option.map UmxExt.floatToRaw) }    
+
+    member this.WithOrthoRate(ortho: float<orthoRate> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.orthoRateKey (ortho |> Option.map UmxExt.floatToRaw) }
+
+    member this.WithParaRate(para: float<paraRate> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.paraRateKey (para |> Option.map UmxExt.floatToRaw) }
+
+    member this.WithSelfSymRate(ssr: float<selfSymRate> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.selfSymRateKey (ssr |> Option.map UmxExt.floatToRaw) }
 
     member this.WithRngType(rng: rngType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.rngTypeKey (rng |> Option.map RngType.toString) }

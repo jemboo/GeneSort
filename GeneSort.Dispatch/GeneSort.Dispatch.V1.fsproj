@@ -43,12 +43,12 @@
     <Compile Include="SorterMutate\Mssi\MssiMutateSpecsRm.fs" />
     <Compile Include="SorterMutate\Msrs\MsrsMutateDbs.fs" />
     <Compile Include="SorterMutate\Msrs\MsrsMutateExecutor.fs" />
-    <Compile Include="SorterMutate\Msrs\MsrsMutateSpecsRm.fs" />
     <Compile Include="SorterMutate\Msrs\MsrsMutateSpecsRs.fs" />
+    <Compile Include="SorterMutate\Msrs\MsrsMutateSpecsRm.fs" />
     <Compile Include="SorterMutate\Msuf4\Msuf4MutateDbs.fs" />
     <Compile Include="SorterMutate\Msuf4\Msuf4MutateExecutor.fs" />
-    <Compile Include="SorterMutate\Msuf4\Msuf4MutateSpecsRm.fs" />
     <Compile Include="SorterMutate\Msuf4\Msuf4MutateSpecsRs.fs" />
+    <Compile Include="SorterMutate\Msuf4\Msuf4MutateSpecsRm.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
