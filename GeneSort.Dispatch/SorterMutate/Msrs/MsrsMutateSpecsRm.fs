@@ -136,9 +136,9 @@ module MsrsMutateSpecsRm =
                 paraRates
                 selfSymRates
                 modificationRates
-                SortableTestMergeSpecs.testSortingWidths
+                SortableTestMergeSpecs.testSortingWidth
                 allSimpleSorterModelTypes
-                SortableTestMergeSpecs.testMergeDimensions
+                SortableTestMergeSpecs.mergeDimension2
                 SortableTestMergeSpecs.noSuffixSuffixType
                 onlyDataFormat
                 largeChildCount

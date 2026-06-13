@@ -24,7 +24,7 @@ module SorterEvalSpecsRandomMerge =
     let mediumSortingWidths = SortableTestMergeSpecs.mediumSortingWidths
     
     // MergeDimensions
-    let singleMergeDimension = SortableTestMergeSpecs.singleMergeDimension
+    let singleMergeDimension = SortableTestMergeSpecs.mergeDimension2
     let allMergeDimensions = SortableTestMergeSpecs.allMergeDimensions
     let lowMergeDimensions = SortableTestMergeSpecs.lowMergeDimensions
     let highMergeDimensions = SortableTestMergeSpecs.highMergeDimensions

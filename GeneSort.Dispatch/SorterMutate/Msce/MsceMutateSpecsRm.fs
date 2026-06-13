@@ -62,7 +62,7 @@ module MsceMutateSpecsRm =
     let deletionRates =
             (runParameters.deletionRateKey, [0.1;] |> List.map string)
     let modificationRates =
-            (runParameters.modificationRateKey, [0.0025; 0.005; 0.01; 0.015; 0.02; 0.03; 0.04; 0.05 ] |> List.map string)
+            (runParameters.modificationRateKey, [0.005; 0.01; 0.02; 0.04; 0.08 ] |> List.map string)
 
 
     // SorterCounts
@@ -113,7 +113,7 @@ module MsceMutateSpecsRm =
             if (%sw % %md <> 0) then return! None
         
             // Suffix check: If it's NoSuffix and width > 128, return None to stop
-            if (mst.IsNoSuffix && %sw > 128) then return! None
+            if (mst.IsNoSuffix && %sw > 128 && %md > 2) then return! None
         
             return rp
         }
@@ -134,9 +134,9 @@ module MsceMutateSpecsRm =
                 insertionRates
                 deletionRates
                 modificationRates
-                SortableTestMergeSpecs.testSortingWidths
+                SortableTestMergeSpecs.testSortingWidth
                 msceModelType
-                SortableTestMergeSpecs.testMergeDimensions
+                SortableTestMergeSpecs.mergeDimension2
                 SortableTestMergeSpecs.noSuffixSuffixType
                 onlyDataFormat
                 largeChildCount

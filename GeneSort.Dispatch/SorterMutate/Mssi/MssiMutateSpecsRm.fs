@@ -130,9 +130,9 @@ module MssiMutateSpecsRm =
                 orthoRates
                 paraRates
                 modificationRates
-                SortableTestMergeSpecs.testSortingWidths
+                SortableTestMergeSpecs.testSortingWidth
                 mssiModelType
-                SortableTestMergeSpecs.testMergeDimensions
+                SortableTestMergeSpecs.mergeDimension2
                 SortableTestMergeSpecs.noSuffixSuffixType
                 onlyDataFormat
                 largeChildCount

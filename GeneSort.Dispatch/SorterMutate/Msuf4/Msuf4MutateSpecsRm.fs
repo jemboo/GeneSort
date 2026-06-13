@@ -138,9 +138,9 @@ module Msuf4MutateSpecsRm =
                 selfSymRates
                 seedModificationRates
                 modificationRates
-                SortableTestMergeSpecs.testSortingWidths
+                SortableTestMergeSpecs.testSortingWidth
                 msuf4ModelType
-                SortableTestMergeSpecs.testMergeDimensions
+                SortableTestMergeSpecs.mergeDimension2
                 SortableTestMergeSpecs.noSuffixSuffixType
                 onlyDataFormat
                 largeChildCount

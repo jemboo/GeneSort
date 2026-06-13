@@ -10,30 +10,41 @@ open CommonSortableTest
 module SortableTestMergeSpecs =
     
     // SortingWidths
-    let testSortingWidths = 
-            (runParameters.sortingWidthKey, [32; 64;] |> List.map string)
+    let testSortingWidth = 
+            (runParameters.sortingWidthKey, [16;] |> List.map string)
 
     let smallSortingWidths = 
-            (runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48;] |> List.map string)
-
-    let singleSortingWidth = 
-            (runParameters.sortingWidthKey, [32;] |> List.map string)
-
+            (runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48;] |> List.map string)  
+            
     let mediumSortingWidths = 
             (runParameters.sortingWidthKey,  [64; 96; 128; 192; 256]  |> List.map string)
+
+    let smallP2SortingWidths = 
+            (runParameters.sortingWidthKey, [16; 32;] |> List.map string)
+
+    let mediumP2SortingWidths = 
+            (runParameters.sortingWidthKey, [64; 128;] |> List.map string)
+
+    let largeP2SortingWidths = 
+            (runParameters.sortingWidthKey, [256; 512;] |> List.map string)
+
 
 
     // MergeDimensions
     let allMergeDimensions = 
             (runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
-    let singleMergeDimension = 
+    let mergeDimension2 = 
+            (runParameters.mergeDimensionKey, [2;] |> List.map string)
+    let mergeDimension4 = 
+            (runParameters.mergeDimensionKey, [4;] |> List.map string)
+    let mergeDimension8 = 
             (runParameters.mergeDimensionKey, [8;] |> List.map string)
+
     let lowMergeDimensions = 
             (runParameters.mergeDimensionKey, [2; 3; 4;] |> List.map string)
     let highMergeDimensions = 
             (runParameters.mergeDimensionKey, [6; 8] |> List.map string)
-    let testMergeDimensions = 
-            (runParameters.mergeDimensionKey, [4; 8] |> List.map string)
+
 
     // DataFormats
     let onlyDataFormat = 
@@ -86,12 +97,12 @@ module SortableTestMergeSpecs =
             RunName = sprintf @"Merge-test_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
-                singleSortingWidth
+                smallP2SortingWidths
                 onlyDataFormat
-                testMergeDimensions
+                mergeDimension2
                 bothMergeSuffixTypes
             ]
-            Filter = standardParamMapFilter
+            Filter = mergeDimensionDividesSortingWidth
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
             MaxParallel = 2
@@ -108,7 +119,7 @@ module SortableTestMergeSpecs =
                 allMergeDimensions
                 bothMergeSuffixTypes
             ]
-            Filter = standardParamMapFilter
+            Filter = mergeDimensionDividesSortingWidth
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
             MaxParallel = 4
@@ -125,7 +136,7 @@ module SortableTestMergeSpecs =
                 lowMergeDimensions
                 bothMergeSuffixTypes
             ]
-            Filter = standardParamMapFilter
+            Filter = mergeDimensionDividesSortingWidth
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
             MaxParallel = 4
