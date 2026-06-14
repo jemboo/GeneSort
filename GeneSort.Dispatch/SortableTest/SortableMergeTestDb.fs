@@ -10,7 +10,12 @@ open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 
 
-module SortableTestDb =
+module SortableMergeTestDb =
+
+    let dbName = "Merge" |> UMX.tag<databaseName>
+    let dbFolder = "c:\\Projects\\SortableTest\\Merge\\Data"
+                   |> UMX.tag<pathToRootFolder>
+
 
     let makeMergeQueryParams 
                 (repl: int<replNumber>) 
@@ -21,7 +26,7 @@ module SortableTestDb =
                 (outputDataType: outputDataType) : queryParams =
 
         queryParams.create 
-            CommonSortableTest.mergeDatabaseName
+            dbName
             (Some repl)
             outputDataType
             [| (runParameters.sortingWidthKey, string %sortingWidth); 
@@ -40,7 +45,9 @@ module SortableTestDb =
             return makeMergeQueryParams repl sw md mst sdf odt
         }
 
-    let sortableMergeTestDb = new GeneSortDbMp(CommonSortableTest.mergeDatabaseFolder, makeMergeQueryParamsFromRunParams)
+
+    let sortableMergeTestDb = new GeneSortDbMp(dbFolder, makeMergeQueryParamsFromRunParams)
+
 
 
     let getMergeSorterTestSet
@@ -63,7 +70,7 @@ module SortableTestDb =
 
 
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
-        [ (CommonSortableTest.mergeDatabaseName, sortableMergeTestDb :> IGeneSortDb) ]
+        [ (dbName, sortableMergeTestDb :> IGeneSortDb) ]
         |> Map.ofList   
 
     let getDatabaseByName (name: string<databaseName>) : IGeneSortDb =

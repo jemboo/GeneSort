@@ -78,7 +78,7 @@ let configType = SortableTestMergeSpecs.configType.Merge_Small
 let executorType = SortableTest.executorType.Generator
 let host: IRunHost = 
     let spec = SortableTestMergeSpecs.getConfig configType executorType
-    SortableTestDb.createRunHost spec
+    SortableMergeTestDb.createRunHost spec
 
 let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 

@@ -20,15 +20,10 @@ module ExecutorType =
 module CommonSortableTest =
 
     let projectName = "SortableTest" |> UMX.tag<projectName>
-    let mergeDatabaseName = "Merge" |> UMX.tag<databaseName>
 
     let _rngTypeLcg = rngType.Lcg
     let _dataFormatInt8v512 = sortableDataFormat.Int8Vector512
     let _dataFormatBitVector512 = sortableDataFormat.BitVector512
-
-    let mergeDatabaseFolder = 
-                            "c:\\Projects\\SortableTest\\Merge\\Data"
-                            |> UMX.tag<pathToRootFolder>
 
     // MergeDimensions
     let allMergeDimensions = 

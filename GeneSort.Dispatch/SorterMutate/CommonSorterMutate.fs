@@ -2,12 +2,8 @@
 
 
 open FSharp.UMX
-open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
-open GeneSort.Core
 open GeneSort.Project.V1
-open GeneSort.Dispatch.V1.SortableTest
-open GeneSort.SortingOps
 
 
 
