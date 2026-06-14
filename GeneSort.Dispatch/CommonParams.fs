@@ -67,8 +67,12 @@ module CommonParams =
             (runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
     let mergeDimension2 = 
             (runParameters.mergeDimensionKey, [2;] |> List.map string)
+    let mergeDimension3 = 
+            (runParameters.mergeDimensionKey, [3;] |> List.map string)
     let mergeDimension4 = 
             (runParameters.mergeDimensionKey, [4;] |> List.map string)
+    let mergeDimension6 = 
+            (runParameters.mergeDimensionKey, [6;] |> List.map string)
     let mergeDimension8 = 
             (runParameters.mergeDimensionKey, [8;] |> List.map string)
     let lowMergeDimensions = 
@@ -92,6 +96,9 @@ module CommonParams =
             
     let mediumMergeSortingWidths = 
             (runParameters.sortingWidthKey,  [96; 128;]  |> List.map string)
+
+    let sortingWidth96 = 
+            (runParameters.sortingWidthKey,  [96;]  |> List.map string)
 
     let largeMergeSortingWidths = 
             (runParameters.sortingWidthKey,  [192; 256; 512]  |> List.map string)

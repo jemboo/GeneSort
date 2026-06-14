@@ -96,15 +96,15 @@ module SortableTestMergeSpecs =
             RunName = sprintf @"Merge-MediumHd_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge_MediumHd sorter test sets"
             Spans = [
-                mediumMergeSortingWidths
+                sortingWidth96
                 dataFormatInt8v512
-                highMergeDimensions
+                mergeDimension6
                 noSuffixSuffixType
             ]
             Filter = mergeDimensionDividesSortingWidth
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 2
+            MaxParallel = 1
         }
 
 

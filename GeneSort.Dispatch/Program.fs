@@ -129,40 +129,40 @@ let maxReplica = 1<replNumber>
 
 
 
-async {
-    printfn "Init Project: %s" %host.Run.DatabaseName
+//async {
+//    printfn "Init Project: %s" %host.Run.DatabaseName
     
-    let! initResult = 
-        ParamOps.initProjectAndRunFiles
-            host.RunDb           
-            (Some progress) 
-            host.Run              
-            minReplica 
-            maxReplica 
-            host.AllowOverwrite 
-            host.ParamMapRefiner      
-            host.ParameterSpans
+//    let! initResult = 
+//        ParamOps.initProjectAndRunFiles
+//            host.RunDb           
+//            (Some progress) 
+//            host.Run              
+//            minReplica 
+//            maxReplica 
+//            host.AllowOverwrite 
+//            host.ParamMapRefiner      
+//            host.ParameterSpans
 
 
-    match initResult with
-    | Error e -> printfn "Init Failure: %s" e
-    | Ok () ->
-        let! execResult = 
-            ProjectOps.executeRuns  
-                minReplica 
-                maxReplica
-                host.AllowOverwrite 
-                cts 
-                (Some progress)
-                host
-                executor
-                host.MaxParallel
+//    match initResult with
+//    | Error e -> printfn "Init Failure: %s" e
+//    | Ok () ->
+//        let! execResult = 
+//            ProjectOps.executeRuns  
+//                minReplica 
+//                maxReplica
+//                host.AllowOverwrite 
+//                cts 
+//                (Some progress)
+//                host
+//                executor
+//                host.MaxParallel
 
-        match execResult with
-        | Ok results -> printfn "Success: %d records processed." results.Length
-        | Error e -> printfn "Runtime Error: %s" e
+//        match execResult with
+//        | Ok results -> printfn "Success: %d records processed." results.Length
+//        | Error e -> printfn "Runtime Error: %s" e
 
-} |> Async.RunSynchronously
+//} |> Async.RunSynchronously
 
 
 
@@ -188,24 +188,24 @@ async {
 //} |> Async.RunSynchronously
 
 
-//async {
+async {
 
-//    let! execResult = 
-//        ProjectOps.executeRuns 
-//                minReplica 
-//                maxReplica
-//                host.AllowOverwrite 
-//                cts 
-//                (Some progress)
-//                host
-//                executor
-//                host.MaxParallel
+    let! execResult = 
+        ProjectOps.executeRuns 
+                minReplica 
+                maxReplica
+                host.AllowOverwrite 
+                cts 
+                (Some progress)
+                host
+                executor
+                host.MaxParallel
 
-//    match execResult with
-//    | Ok results -> printfn "Success: %d records processed." results.Length
-//    | Error e -> printfn "Runtime Error: %s" e
+    match execResult with
+    | Ok results -> printfn "Success: %d records processed." results.Length
+    | Error e -> printfn "Runtime Error: %s" e
 
-//} |> Async.RunSynchronously
+} |> Async.RunSynchronously
 
 
 
