@@ -47,7 +47,7 @@ module SortableTestMergeSpecs =
             Spans = [
                 testMergeSortingWidth
                 dataFormatInt8v512
-                mergeDimension2
+                lowMergeDimensions
                 noSuffixSuffixType
             ]
             Filter = mergeDimensionDividesSortingWidth
@@ -140,6 +140,6 @@ module SortableTestMergeSpecs =
                         (configType.Merge_LargeLd, Specs.Merge_LargeLd);
                     ]
 
-    let getConfig (config: configType) (executorType: executorType) : runHostSpec =
+    let getRunHostSpec (config: configType) (executorType: executorType) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType

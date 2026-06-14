@@ -98,6 +98,6 @@ module SorterEvalSpecsRandom =
                         (configType.Rand_Medium, Specs.Rand_Medium);
                     ]
 
-    let getConfig (config: configType) (executorType: sorterEvalExecutorType) : runHostSpec =
+    let getRunHostSpec (config: configType) (executorType: sorterEvalExecutorType) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType

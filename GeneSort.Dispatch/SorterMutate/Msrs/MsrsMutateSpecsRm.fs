@@ -160,7 +160,7 @@ module MsrsMutateSpecsRm =
                         (configType.Rand_Medium, Specs.Rand_Medium);
                     ]
 
-    let getConfig (config: configType) (executorType: sorterMutateExecutorType) : runHostSpec =
+    let getRunHostSpec (config: configType) (executorType: sorterMutateExecutorType) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType
 

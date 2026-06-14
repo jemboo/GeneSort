@@ -31,8 +31,8 @@
     <Compile Include="SorterEval\CommonSorterEval.fs" />
     <Compile Include="SorterEval\SorterEvalDbs.fs" />
     <Compile Include="SorterEval\SorterEvalExecutor.fs" />
-    <Compile Include="SorterEval\SorterEvalSpecsRandom.fs" />
-    <Compile Include="SorterEval\SorterEvalSpecsRandomMerge.fs" />
+    <Compile Include="SorterEval\SorterEvalSpecsRs.fs" />
+    <Compile Include="SorterEval\SorterEvalSpecsRm.fs" />
     <Compile Include="SorterMutate\CommonSorterMutate.fs" />
     <Compile Include="SorterMutate\Msce\MsceMutateDbs.fs" />
     <Compile Include="SorterMutate\Msce\MsceMutateExecutor.fs" />

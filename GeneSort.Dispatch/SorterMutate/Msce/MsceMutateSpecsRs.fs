@@ -53,16 +53,16 @@ module MsceMutateSpecsRs =
             RunName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msce"
             Spans = [
+                msceModelType
                 rngTypeLcg
+                sorterEvalTypeV1
                 sorterEvalSelection
                 sorterEvalMeasure
-                sorterEvalTypeV1
                 mutationRates
                 insertionRates
                 deletionRates
                 modificationRates
                 smallSortingWidths
-                msceModelType
                 smallChildCount
             ]
             Filter = standardSorterModelTypeFilter
@@ -77,16 +77,16 @@ module MsceMutateSpecsRs =
             RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msce"
             Spans = [
+                msceModelType
                 rngTypeLcg
+                sorterEvalTypeV1
                 sorterEvalSelection
                 sorterEvalMeasure
-                sorterEvalTypeV1
                 mutationRates
                 insertionRates
                 deletionRates
                 modificationRates
                 mediumSortingWidths
-                msceModelType
                 largeChildCount
             ]
             Filter = standardSorterModelTypeFilter
@@ -100,16 +100,16 @@ module MsceMutateSpecsRs =
             RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msce"
             Spans = [
+                msceModelType
                 rngTypeLcg
+                sorterEvalTypeV1
                 sorterEvalSelection
                 sorterEvalMeasure
-                sorterEvalTypeV1
                 mutationRates
                 insertionRates
                 deletionRates
                 modificationRates
                 mediumSortingWidths
-                msceModelType
                 largeChildCount
             ]
             Filter = standardSorterModelTypeFilter
@@ -130,7 +130,7 @@ module MsceMutateSpecsRs =
                         (configType.Rand_Medium, Specs.Rand_Medium);
                     ]
 
-    let getConfig (config: configType) (executorType: sorterMutateExecutorType) : runHostSpec =
+    let getRunHostSpec (config: configType) (executorType: sorterMutateExecutorType) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType
 
