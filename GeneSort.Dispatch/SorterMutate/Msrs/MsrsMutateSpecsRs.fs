@@ -10,8 +10,6 @@ open GeneSort.Eval.V1
 open GeneSort.Sorting
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
-open GeneSort.Dispatch.V1.SorterEval.CommonSorterEval
-open GeneSort.Dispatch.V1.SorterMutate.CommonSorterMutate
 
 module MsrsMutateSpecsRs = 
 
@@ -22,19 +20,6 @@ module MsrsMutateSpecsRs =
     let sorterEvalMeasure = 
             (runParameters.sorterEvalMeasureKey, 
             [ sorterEvalMeasure.CeSt (1.0, true); ] |> List.map SorterEvalMeasure.toString)
-    
-    // SortingWidths
-    let smallSortingWidths = 
-            (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
-    let mediumSortingWidths = 
-            (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
-
-
-    // SorterCounts
-    let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )
-    let largeChildCount = (runParameters.sorterChildCountKey, ["10000";] )
 
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =

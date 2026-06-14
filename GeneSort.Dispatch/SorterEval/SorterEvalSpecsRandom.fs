@@ -5,29 +5,10 @@ open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
-open GeneSort.SortingOps
 open GeneSort.Dispatch.V1.CommonParams
 
 
 module SorterEvalSpecsRandom =
-
-    let sorterEvalType = 
-            (runParameters.sorterEvalTypeKey, 
-            [ sorterEvalType.V2 ;] |> List.map SorterEvalType.toString)
-    
-    // SortingWidths
-    let smallSortingWidths = 
-            (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
-    let mediumSortingWidths = 
-            (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
-
-    
-    // SimpleSorterModelTypes
-    let allSimpleSorterModelTypes = 
-            (runParameters.simpleSorterModelTypeKey, SimpleSorterModelType.all() 
-            |> List.map SimpleSorterModelType.toString)
-
-
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
@@ -60,7 +41,7 @@ module SorterEvalSpecsRandom =
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngTypeLcg
-                sorterEvalType
+                sorterEvalTypeV2
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 smallSorterCount
@@ -77,7 +58,7 @@ module SorterEvalSpecsRandom =
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngTypeLcg
-                sorterEvalType
+                sorterEvalTypeV2
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 largeSorterCount
@@ -94,7 +75,7 @@ module SorterEvalSpecsRandom =
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngTypeLcg
-                sorterEvalType
+                sorterEvalTypeV2
                 mediumSortingWidths
                 allSimpleSorterModelTypes
                 largeSorterCount

@@ -10,7 +10,6 @@ open GeneSort.Eval.V1
 open GeneSort.Sorting
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
-open GeneSort.Dispatch.V1.SorterEval.CommonSorterEval
 
 
 module MsceMutateSpecsRs = 
@@ -23,38 +22,6 @@ module MsceMutateSpecsRs =
             (runParameters.sorterEvalMeasureKey, 
             [ sorterEvalMeasure.CeSt (1.0, true); ] |> List.map SorterEvalMeasure.toString)
     
-    // SortingWidths
-    let smallSortingWidths = 
-            (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
-    let mediumSortingWidths = 
-            (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
-
-
-    // MutationRates
-    let mutationRates =
-            (runParameters.mutationRateKey, [1.0] |> List.map string)
-    let insertionRates =
-            (runParameters.insertionRateKey, [0.1;] |> List.map string)
-    let deletionRates =
-            (runParameters.deletionRateKey, [0.1;] |> List.map string)
-    let modificationRates =
-            (runParameters.modificationRateKey, [0.0025; 0.005; 0.01; 0.015; 0.02; 0.03; 0.04; 0.05 ] |> List.map string)
-
-
-    // SorterCounts
-    let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let mediumChildCount = (runParameters.sorterChildCountKey, ["1000";] )
-    let largeChildCount = (runParameters.sorterChildCountKey, ["10000";] )
-
-
-
-    // SorterModelTypes
-    let msceModelType = 
-            (runParameters.simpleSorterModelTypeKey, 
-             [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
-
-
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  

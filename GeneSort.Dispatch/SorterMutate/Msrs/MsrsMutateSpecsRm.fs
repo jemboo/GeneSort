@@ -8,12 +8,9 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Project.V1
 open GeneSort.SortingOps
-open GeneSort.Dispatch.V1.SorterEval
-open GeneSort.Sorting
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
-open GeneSort.Dispatch.V1.SorterEval.CommonSorterEval
 
 
 module MsrsMutateSpecsRm =
@@ -27,33 +24,6 @@ module MsrsMutateSpecsRm =
     let sorterEvalMeasure = 
             (runParameters.sorterEvalMeasureKey, 
             [ sorterEvalMeasure.CeSt (1.0, true);] |> List.map SorterEvalMeasure.toString)
-
-
-
-    // MutationRates
-    let orthoRates =
-            (runParameters.orthoRateKey, [1.0;] |> List.map string)
-    let paraRates =
-            (runParameters.paraRateKey, [1.0;] |> List.map string)
-    let selfSymRates =
-            (runParameters.selfSymRateKey, [1.0;] |> List.map string)
-    let modificationRates =
-            (runParameters.modificationRateKey, [0.0025; 0.005; 0.01; 0.015; 0.02; 0.03; 0.04; 0.05 ] |> List.map string)
-
-
-
-    // SorterCounts
-    let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )
-    let largeChildCount = (runParameters.sorterChildCountKey, ["10000";] )
-
-    // SimpleSorterModelTypes
-    let msrsModelType = 
-            (runParameters.simpleSorterModelTypeKey, 
-             [simpleSorterModelType.Msrs] |> List.map SimpleSorterModelType.toString)
-    let allSimpleSorterModelTypes = SorterEvalSpecsRandom.allSimpleSorterModelTypes
-
 
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
@@ -113,7 +83,7 @@ module MsrsMutateSpecsRm =
                 paraRates
                 selfSymRates
                 modificationRates
-                testSortingWidth
+                testMergeSortingWidth
                 allSimpleSorterModelTypes
                 mergeDimension2
                 noSuffixSuffixType
@@ -139,7 +109,7 @@ module MsrsMutateSpecsRm =
                 paraRates
                 selfSymRates
                 modificationRates
-                smallSortingWidths
+                smallMergeSortingWidths
                 msrsModelType
                 lowMergeDimensions
                 noSuffixSuffixType
@@ -165,7 +135,7 @@ module MsrsMutateSpecsRm =
                 paraRates
                 selfSymRates
                 modificationRates
-                mediumSortingWidths
+                mediumMergeSortingWidths
                 msrsModelType
                 lowMergeDimensions
                 noSuffixSuffixType

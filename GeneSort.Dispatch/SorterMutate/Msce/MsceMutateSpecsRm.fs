@@ -7,13 +7,10 @@ open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.SortingOps
-open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Sorting
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
-open GeneSort.Dispatch.V1.SorterEval.CommonSorterEval
-open GeneSort.Dispatch.V1.SorterMutate.CommonSorterMutate
 
 module MsceMutateSpecsRm =
 
@@ -84,7 +81,7 @@ module MsceMutateSpecsRm =
                 insertionRates
                 deletionRates
                 modificationRates
-                testSortingWidth
+                testMergeSortingWidth
                 msceModelType
                 mergeDimension2
                 noSuffixSuffixType
@@ -110,7 +107,7 @@ module MsceMutateSpecsRm =
                 insertionRates
                 deletionRates
                 modificationRates
-                smallSortingWidths
+                smallMergeSortingWidths
                 msceModelType
                 lowMergeDimensions
                 noSuffixSuffixType
@@ -136,7 +133,7 @@ module MsceMutateSpecsRm =
                 insertionRates
                 deletionRates
                 modificationRates
-                mediumSortingWidths
+                mediumMergeSortingWidths
                 msceModelType
                 lowMergeDimensions
                 noSuffixSuffixType

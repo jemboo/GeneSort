@@ -45,7 +45,7 @@ module SortableTestMergeSpecs =
             RunName = sprintf @"Merge-test_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
-                testSortingWidth
+                testMergeSortingWidth
                 dataFormatInt8v512
                 mergeDimension2
                 noSuffixSuffixType
@@ -62,7 +62,7 @@ module SortableTestMergeSpecs =
             RunName = sprintf @"Merge-small_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge_small sorter test sets"
             Spans = [
-                smallSortingWidths
+                smallMergeSortingWidths
                 dataFormatInt8v512
                 allMergeDimensions
                 noSuffixSuffixType
@@ -79,7 +79,7 @@ module SortableTestMergeSpecs =
             RunName = sprintf @"Merge-MediumLd_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge_MediumLd sorter test sets"
             Spans = [
-                mediumSortingWidths
+                mediumMergeSortingWidths
                 dataFormatInt8v512
                 lowMergeDimensions
                 noSuffixSuffixType
@@ -96,7 +96,7 @@ module SortableTestMergeSpecs =
             RunName = sprintf @"Merge-MediumHd_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge_MediumHd sorter test sets"
             Spans = [
-                largeSortingWidths
+                largeMergeSortingWidths
                 dataFormatInt8v512
                 highMergeDimensions
                 noSuffixSuffixType

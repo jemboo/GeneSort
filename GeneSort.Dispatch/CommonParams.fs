@@ -12,6 +12,10 @@ module CommonParams =
     let ExcludeSelfCe = true |> UMX.tag<excludeSelfCe>
 
     // SimpleSorterModelTypes
+    let allSimpleSorterModelTypes = 
+            (runParameters.simpleSorterModelTypeKey, SimpleSorterModelType.all() 
+            |> List.map SimpleSorterModelType.toString)
+
     let msceModelType = 
             (runParameters.simpleSorterModelTypeKey, 
              [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
@@ -72,26 +76,33 @@ module CommonParams =
     let highMergeDimensions = 
             (runParameters.mergeDimensionKey, [6; 8] |> List.map string)
     
+
     // SortingWidths
-    let testSortingWidth = 
+    let smallSortingWidths = 
+            (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
+    let mediumSortingWidths = 
+            (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
+
+    // MergeSortingWidths
+    let testMergeSortingWidth = 
             (runParameters.sortingWidthKey, [16;] |> List.map string)
 
-    let smallSortingWidths = 
+    let smallMergeSortingWidths = 
             (runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48; 64] |> List.map string)  
             
-    let mediumSortingWidths = 
+    let mediumMergeSortingWidths = 
             (runParameters.sortingWidthKey,  [96; 128;]  |> List.map string)
 
-    let largeSortingWidths = 
+    let largeMergeSortingWidths = 
             (runParameters.sortingWidthKey,  [192; 256; 512]  |> List.map string)
 
-    let smallP2SortingWidths = 
+    let smallP2MergeSortingWidths = 
             (runParameters.sortingWidthKey, [16; 32; 64;] |> List.map string)
 
-    let mediumP2SortingWidths = 
+    let mediumP2MergeSortingWidths = 
             (runParameters.sortingWidthKey, [128;] |> List.map string)
 
-    let largeP2SortingWidths = 
+    let largeP2MergeSortingWidths = 
             (runParameters.sortingWidthKey, [256; 512;] |> List.map string)
 
 

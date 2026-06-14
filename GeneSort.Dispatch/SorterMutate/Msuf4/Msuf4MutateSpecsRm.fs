@@ -111,7 +111,7 @@ module Msuf4MutateSpecsRm =
                 selfSymRates
                 seedModificationRates
                 modificationRates
-                testSortingWidth
+                testMergeSortingWidth
                 msuf4ModelType
                 mergeDimension2
                 noSuffixSuffixType
@@ -138,7 +138,7 @@ module Msuf4MutateSpecsRm =
                 selfSymRates
                 seedModificationRates
                 modificationRates
-                smallSortingWidths
+                smallMergeSortingWidths
                 msuf4ModelType
                 lowMergeDimensions
                 noSuffixSuffixType
@@ -165,7 +165,7 @@ module Msuf4MutateSpecsRm =
                 selfSymRates
                 seedModificationRates
                 modificationRates
-                mediumSortingWidths
+                mediumMergeSortingWidths
                 msuf4ModelType
                 lowMergeDimensions
                 noSuffixSuffixType

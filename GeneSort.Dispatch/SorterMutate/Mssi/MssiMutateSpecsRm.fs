@@ -10,7 +10,6 @@ open GeneSort.Sorting
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
-open GeneSort.Dispatch.V1.SorterEval.CommonSorterEval
 
 
 module MssiMutateSpecsRm =
@@ -24,28 +23,6 @@ module MssiMutateSpecsRm =
             (runParameters.sorterEvalMeasureKey, 
             [ sorterEvalMeasure.CeSt (1.0, true);] |> List.map SorterEvalMeasure.toString)
     
-
-
-    // MutationRates
-    let orthoRates =
-            (runParameters.orthoRateKey, [1.0;] |> List.map string)
-    let paraRates =
-            (runParameters.paraRateKey, [1.0;] |> List.map string)
-    let modificationRates =
-            (runParameters.modificationRateKey, [0.0025; 0.005; 0.01; 0.015; 0.02; 0.03; 0.04; 0.05 ] |> List.map string)
-
-
-    // SorterCounts
-    let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )
-    let largeChildCount = (runParameters.sorterChildCountKey, ["10000";] )
-
-    // SorterModelTypes
-    let mssiModelType = 
-            (runParameters.simpleSorterModelTypeKey, 
-             [simpleSorterModelType.Mssi] |> List.map SimpleSorterModelType.toString)
-
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
@@ -102,7 +79,7 @@ module MssiMutateSpecsRm =
                 orthoRates
                 paraRates
                 modificationRates
-                testSortingWidth
+                testMergeSortingWidth
                 mssiModelType
                 mergeDimension2
                 noSuffixSuffixType
@@ -127,7 +104,7 @@ module MssiMutateSpecsRm =
                 orthoRates
                 paraRates
                 modificationRates
-                smallSortingWidths
+                smallMergeSortingWidths
                 mssiModelType
                 lowMergeDimensions
                 noSuffixSuffixType
@@ -152,7 +129,7 @@ module MssiMutateSpecsRm =
                 orthoRates
                 paraRates
                 modificationRates
-                mediumSortingWidths
+                mediumMergeSortingWidths
                 mssiModelType
                 lowMergeDimensions
                 noSuffixSuffixType

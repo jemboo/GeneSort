@@ -7,13 +7,8 @@ open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.CommonParams
-open GeneSort.Dispatch.V1.SorterEval.CommonSorterEval
 
 module SorterEvalSpecsRandomMerge =
-
-    // SimpleSorterModelTypes
-    let allSimpleSorterModelTypes = SorterEvalSpecsRandom.allSimpleSorterModelTypes
-
 
     let private mergeEnhancer 
                     (host: IRunHost) 
@@ -84,7 +79,7 @@ module SorterEvalSpecsRandomMerge =
             Spans = [   
                 rngTypeLcg
                 sorterEvalTypeV2
-                smallSortingWidths
+                smallMergeSortingWidths
                 allSimpleSorterModelTypes
                 lowMergeDimensions
                 noSuffixSuffixType
@@ -105,7 +100,7 @@ module SorterEvalSpecsRandomMerge =
             Spans = [
                 rngTypeLcg
                 sorterEvalTypeV2
-                smallSortingWidths
+                smallMergeSortingWidths
                 allSimpleSorterModelTypes
                 allMergeDimensions
                 noSuffixSuffixType
@@ -126,7 +121,7 @@ module SorterEvalSpecsRandomMerge =
             Spans = [
                 rngTypeLcg
                 sorterEvalTypeV2
-                mediumSortingWidths
+                mediumMergeSortingWidths
                 allSimpleSorterModelTypes
                 lowMergeDimensions
                 noSuffixSuffixType
@@ -147,7 +142,7 @@ module SorterEvalSpecsRandomMerge =
             Spans = [
                 rngTypeLcg
                 sorterEvalTypeV2
-                mediumSortingWidths
+                mediumMergeSortingWidths
                 allSimpleSorterModelTypes
                 highMergeDimensions
                 noSuffixSuffixType
@@ -168,7 +163,7 @@ module SorterEvalSpecsRandomMerge =
             Spans = [
                 rngTypeLcg
                 sorterEvalTypeV2
-                mediumSortingWidths
+                mediumMergeSortingWidths
                 allSimpleSorterModelTypes
                 highMergeDimensions
                 noSuffixSuffixType
