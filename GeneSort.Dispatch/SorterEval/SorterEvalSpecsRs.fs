@@ -8,7 +8,7 @@ open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.CommonParams
 
 
-module SorterEvalSpecsRandom =
+module SorterEvalSpecsRs =
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
@@ -78,7 +78,7 @@ module SorterEvalSpecsRandom =
                 sorterEvalTypeV2
                 mediumSortingWidths
                 allSimpleSorterModelTypes
-                largeSorterCount
+                extraLargeSorterCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer

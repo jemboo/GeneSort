@@ -85,24 +85,24 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** SorterEval Standard **********
-let configType = SorterEvalSpecsRandom.configType.Rand_Small
-let executorType = sorterEvalExecutorType.GenStandard
-let host: IRunHost = 
-    let spec = SorterEvalSpecsRandom.getRunHostSpec configType executorType
-    SorterEvalDbs.createRunHost spec
+//let configType = SorterEvalSpecsRs.configType.Rand_Medium
+//let executorType = sorterEvalExecutorType.GenStandard
+//let host: IRunHost = 
+//    let spec = SorterEvalSpecsRs.getRunHostSpec configType executorType
+//    SorterEvalDbs.createRunHost spec
 
-let executor = SorterEvalExecutor.getExecutor executorType
+//let executor = SorterEvalExecutor.getExecutor executorType
 
 
 
 //********** SorterEval Merge **********
-//let configType = SorterEvalSpecsRandomMerge.configType.RandMerge_Single
-//let executorType = sorterEvalExecutorType.GenMerge
-//let host: IRunHost = 
-//    let spec = SorterEvalSpecsRandomMerge.getRunHostSpec configType executorType
-//    SorterEvalDbs.createRunHost spec
+let configType = SorterEvalSpecsRm.configType.RandMerge_Small
+let executorType = sorterEvalExecutorType.GenMerge
+let host: IRunHost = 
+    let spec = SorterEvalSpecsRm.getRunHostSpec configType executorType
+    SorterEvalDbs.createRunHost spec
 
-//let executor = SorterEvalExecutor.getExecutor executorType
+let executor = SorterEvalExecutor.getExecutor executorType
 
 
 

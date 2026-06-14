@@ -105,7 +105,7 @@ module SorterEvalSpecsRm =
                 sorterEvalTypeV2
                 smallMergeSortingWidths
                 allMergeDimensions
-                largeSorterCount
+                extraLargeSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
@@ -183,6 +183,7 @@ module SorterEvalSpecsRm =
         | RandMerge_Small
         | RandMerge_MediumLd
         | RandMerge_MediumHd
+        | RandMerge_LargeLd
 
 
     let Configs = Map.ofList 
@@ -192,6 +193,7 @@ module SorterEvalSpecsRm =
                         (configType.RandMerge_Small, Specs.RandMerge_Small);
                         (configType.RandMerge_MediumLd, Specs.RandMerge_MediumLd);
                         (configType.RandMerge_MediumHd, Specs.RandMerge_MediumHd);
+                        (configType.RandMerge_LargeLd, Specs.RandMerge_LargeLd);
                     ]
 
     let getRunHostSpec (config: configType) (executorType: sorterEvalExecutorType) : runHostSpec =
