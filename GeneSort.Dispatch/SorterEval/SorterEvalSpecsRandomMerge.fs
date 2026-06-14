@@ -38,7 +38,7 @@ module SorterEvalSpecsRandomMerge =
                 | simpleSorterModelType.Mssi | simpleSorterModelType.Msrs -> 
                     if has2factor then Some () else None
                 | simpleSorterModelType.Msuf4 -> 
-                    if (isMuf4able && %sw < 256) then Some () else None
+                    if isMuf4able then Some () else None
                 | simpleSorterModelType.Msuf6 -> 
                     if isMuf6able then Some () else None
                 | _ -> None
@@ -64,7 +64,7 @@ module SorterEvalSpecsRandomMerge =
                 (runParameters.mergeDimensionKey, [8;] |> List.map string)
                 (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix;] |> List.map MergeSuffixType.toString)
                 dataFormatInt8v512
-                (runParameters.sorterCountKey, ["1000";] )
+                smallSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
@@ -78,18 +78,18 @@ module SorterEvalSpecsRandomMerge =
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [   
                 rngTypeLcg
+                dataFormatInt8v512
+                allSimpleSorterModelTypes
+                noSuffixSuffixType
                 sorterEvalTypeV2
                 smallMergeSortingWidths
-                allSimpleSorterModelTypes
                 lowMergeDimensions
-                noSuffixSuffixType
-                dataFormatInt8v512
                 smallSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 2
+            MaxParallel = 8
         }
 
 
@@ -99,18 +99,18 @@ module SorterEvalSpecsRandomMerge =
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngTypeLcg
+                dataFormatInt8v512
+                allSimpleSorterModelTypes
+                noSuffixSuffixType
                 sorterEvalTypeV2
                 smallMergeSortingWidths
-                allSimpleSorterModelTypes
                 allMergeDimensions
-                noSuffixSuffixType
-                dataFormatInt8v512
                 mediumSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 1
+            MaxParallel = 8
         }
 
 
@@ -120,12 +120,12 @@ module SorterEvalSpecsRandomMerge =
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngTypeLcg
+                dataFormatInt8v512
+                allSimpleSorterModelTypes
+                noSuffixSuffixType
                 sorterEvalTypeV2
                 mediumMergeSortingWidths
-                allSimpleSorterModelTypes
                 lowMergeDimensions
-                noSuffixSuffixType
-                dataFormatInt8v512
                 mediumSorterCount
             ]
             Filter = paramMapFilter
@@ -141,12 +141,12 @@ module SorterEvalSpecsRandomMerge =
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngTypeLcg
+                dataFormatInt8v512
+                noSuffixSuffixType
+                allSimpleSorterModelTypes
                 sorterEvalTypeV2
                 mediumMergeSortingWidths
-                allSimpleSorterModelTypes
                 highMergeDimensions
-                noSuffixSuffixType
-                dataFormatInt8v512
                 smallSorterCount
             ]
             Filter = paramMapFilter
@@ -162,12 +162,12 @@ module SorterEvalSpecsRandomMerge =
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngTypeLcg
+                dataFormatInt8v512
+                noSuffixSuffixType
+                allSimpleSorterModelTypes
                 sorterEvalTypeV2
                 mediumMergeSortingWidths
-                allSimpleSorterModelTypes
                 highMergeDimensions
-                noSuffixSuffixType
-                dataFormatInt8v512
                 smallSorterCount
             ]
             Filter = paramMapFilter

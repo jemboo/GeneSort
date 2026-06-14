@@ -40,9 +40,9 @@ module SortableTestMergeSpecs =
 
     module Specs =
 
-        let Merge_test  (executorType: executorType) : runHostSpec = {
+        let Merge_Test  (executorType: executorType) : runHostSpec = {
             DatabaseName = SortableMergeTestDb.dbName
-            RunName = sprintf @"Merge-test_%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Merge-Test_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
                 testMergeSortingWidth
@@ -57,10 +57,10 @@ module SortableTestMergeSpecs =
         }
 
 
-        let Merge_small (executorType: executorType) : runHostSpec = {
+        let Merge_Small (executorType: executorType) : runHostSpec = {
             DatabaseName = SortableMergeTestDb.dbName
-            RunName = sprintf @"Merge-small_%s" (ExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Merge_small sorter test sets"
+            RunName = sprintf @"Merge-Small_%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunDescription = "Merge_Small sorter test sets"
             Spans = [
                 smallMergeSortingWidths
                 dataFormatInt8v512
@@ -96,7 +96,7 @@ module SortableTestMergeSpecs =
             RunName = sprintf @"Merge-MediumHd_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge_MediumHd sorter test sets"
             Spans = [
-                largeMergeSortingWidths
+                mediumMergeSortingWidths
                 dataFormatInt8v512
                 highMergeDimensions
                 noSuffixSuffixType
@@ -112,7 +112,7 @@ module SortableTestMergeSpecs =
             RunName = sprintf @"Merge-LargeLd_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge_LargeLd sorter test sets"
             Spans = [
-                highMergeDimensions
+                largeMergeSortingWidths
                 dataFormatInt8v512
                 mergeDimension2
                 noSuffixSuffixType
@@ -133,8 +133,8 @@ module SortableTestMergeSpecs =
 
     let Configs = Map.ofList 
                     [ 
-                        (configType.Merge_Test, Specs.Merge_test); 
-                        (configType.Merge_Small, Specs.Merge_small);
+                        (configType.Merge_Test, Specs.Merge_Test); 
+                        (configType.Merge_Small, Specs.Merge_Small);
                         (configType.Merge_MediumLd, Specs.Merge_MediumLd);
                         (configType.Merge_MediumHd, Specs.Merge_MediumHd);
                         (configType.Merge_LargeLd, Specs.Merge_LargeLd);
