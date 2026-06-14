@@ -74,7 +74,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** SortableTest **********
-let configType = SortableTestMergeSpecs.configType.Merge_Small
+let configType = SortableTestMergeSpecs.configType.Merge_MediumHd
 let executorType = SortableTest.executorType.Generator
 let host: IRunHost = 
     let spec = SortableTestMergeSpecs.getRunHostSpec configType executorType

@@ -101,11 +101,12 @@ module SortableTestMergeSpecs =
                 highMergeDimensions
                 noSuffixSuffixType
             ]
-            Filter = standardParamMapFilter
+            Filter = mergeDimensionDividesSortingWidth
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
             MaxParallel = 2
         }
+
 
         let Merge_LargeLd (executorType: executorType) : runHostSpec = {
             DatabaseName = SortableMergeTestDb.dbName
@@ -117,7 +118,7 @@ module SortableTestMergeSpecs =
                 mergeDimension2
                 noSuffixSuffixType
             ]
-            Filter = standardParamMapFilter
+            Filter = mergeDimensionDividesSortingWidth
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
             MaxParallel = 2
