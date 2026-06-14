@@ -8,6 +8,7 @@ open GeneSort.Project.V1
 open GeneSort.FileDb.V1
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Dispatch.V1.SortableTest
+open GeneSort.SortingOps
 
 
 type sorterEvalExecutorType = 
@@ -36,8 +37,21 @@ module CommonSorterEval =
     let ExcludeSelfCe = true |> UMX.tag<excludeSelfCe>
 
     let standardSortableDataFormat = sortableDataFormat.BitVector512
-    let mergeSortableDataFormat = CommonSortableTest.projectSortableDataFormat
-    let projectRngType = rngType.Lcg
+    let dataFormatInt8v512 = CommonSortableTest.dataFormatInt8v512
+
+    // SorterCounts
+    let smallSorterCount = (runParameters.sorterCountKey, ["100";] )
+    let mediumSorterCount = (runParameters.sorterCountKey, ["1000";] )
+    let largeSorterCount = (runParameters.sorterCountKey, ["10000";] )
+    let extraLargeSorterCount = (runParameters.sorterCountKey, ["100000";] )
+    let sorterEvalTypeV1 = 
+            (runParameters.sorterEvalTypeKey, 
+            [ sorterEvalType.V2 ;] |> List.map SorterEvalType.toString)
+
+    let sorterEvalTypeV2 = 
+            (runParameters.sorterEvalTypeKey, 
+            [ sorterEvalType.V2 ;] |> List.map SorterEvalType.toString)
+
 
     let getStageLength 
                 (smt: simpleSorterModelType) 

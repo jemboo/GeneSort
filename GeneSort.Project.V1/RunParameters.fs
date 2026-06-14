@@ -263,7 +263,13 @@ module RunParameters =
         runParams |> Seq.collect (fun rp -> rp.ParamMap.Keys) |> Seq.distinct |> Seq.toArray
 
     let reportKvps (runParameters: runParameters) : string =
-        runParameters.ParamMap.Keys |> Seq.map(fun k -> sprintf "%s: %s" k (runParameters.ParamMap.[k])) |> String.concat "\n"
+        let concats =
+            runParameters.ParamMap.Keys 
+            |> Seq.map(fun k -> sprintf "\t%s: %s" k (runParameters.ParamMap.[k])) 
+            |> String.concat "\n"
+
+        concats + "\n"
+        
 
     /// Generates a structured table where rows represent individual runs and columns represent parameter keys.
     let makeIndexAndReplTable (runParams: runParameters seq) : string[][] =
@@ -281,7 +287,7 @@ module RunParameters =
     let toStringTable (runParams: runParameters seq) : string =
         makeIndexAndReplTable runParams
         |> Array.map (String.concat "\t")
-        |> String.concat Environment.NewLine
+        |> String.concat "\n\n"
 
     let getIdString (runParameters:runParameters) =
         runParameters.GetId() |> UmxExt.guidOptionToString

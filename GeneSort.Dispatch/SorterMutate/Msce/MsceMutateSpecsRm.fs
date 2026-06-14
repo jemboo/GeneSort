@@ -7,24 +7,14 @@ open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.SortingOps
-open GeneSort.Dispatch.V1.SortableTest
 open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Sorting
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
-
+open GeneSort.Dispatch.V1.SorterMutate.CommonSorterMutate
+open GeneSort.Dispatch.V1.SortableTest.CommonSortableTest
 
 module MsceMutateSpecsRm =
-
-    let rngType = 
-            (runParameters.rngTypeKey, 
-            [CommonSorterMutate.projectRngType;] |> List.map RngType.toString)
-
-
-    let sorterEvalType = 
-            (runParameters.sorterEvalTypeKey, 
-            [ sorterEvalType.V1; ] |> List.map SorterEvalType.toString)
-
 
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
@@ -35,47 +25,6 @@ module MsceMutateSpecsRm =
             (runParameters.sorterEvalMeasureKey, 
             [ sorterEvalMeasure.CeSt (1.0, true);] |> List.map SorterEvalMeasure.toString)
     
-    // SortingWidths
-    let smallSortingWidths = SortableTestMergeSpecs.smallSortingWidths
-    let mediumSortingWidths = SortableTestMergeSpecs.mediumSortingWidths
-
-    // MergeDimensions
-    let allMergeDimensions = SortableTestMergeSpecs.allMergeDimensions
-    let lowMergeDimensions = SortableTestMergeSpecs.lowMergeDimensions
-    let highMergeDimensions = SortableTestMergeSpecs.highMergeDimensions
-
-    // DataFormats
-    let onlyDataFormat = 
-            (runParameters.sortableDataFormatKey, 
-            [CommonSorterEval.mergeSortableDataFormat] |> List.map SortableDataFormat.toString)
-    
-    // MergeSuffixTypes
-    let bothMergeSuffixTypes = SortableTestMergeSpecs.bothMergeSuffixTypes
-    let vv1SuffixType = SortableTestMergeSpecs.vv1SuffixType
-
-
-    // MutationRates
-    let mutationRates =
-            (runParameters.mutationRateKey, [1.0] |> List.map string)
-    let insertionRates =
-            (runParameters.insertionRateKey, [0.1;] |> List.map string)
-    let deletionRates =
-            (runParameters.deletionRateKey, [0.1;] |> List.map string)
-    let modificationRates =
-            (runParameters.modificationRateKey, [0.005; 0.01; 0.02; 0.04; 0.08 ] |> List.map string)
-
-
-    // SorterCounts
-    let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )
-    let largeChildCount = (runParameters.sorterChildCountKey, ["10000";] )
-
-    // SorterModelTypes
-    let msceModelType = 
-            (runParameters.simpleSorterModelTypeKey, 
-             [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
-
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
@@ -113,7 +62,7 @@ module MsceMutateSpecsRm =
             if (%sw % %md <> 0) then return! None
         
             // Suffix check: If it's NoSuffix and width > 128, return None to stop
-            if (mst.IsNoSuffix && %sw > 128 && %md > 2) then return! None
+            //if (mst.IsNoSuffix && %sw > 128 && %md > 2) then return! None
         
             return rp
         }
@@ -126,7 +75,7 @@ module MsceMutateSpecsRm =
             RunName = sprintf @"Rand-test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Msce"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalType
@@ -134,11 +83,11 @@ module MsceMutateSpecsRm =
                 insertionRates
                 deletionRates
                 modificationRates
-                SortableTestMergeSpecs.testSortingWidth
+                testSortingWidth
                 msceModelType
-                SortableTestMergeSpecs.mergeDimension2
-                SortableTestMergeSpecs.noSuffixSuffixType
-                onlyDataFormat
+                mergeDimension2
+                noSuffixSuffixType
+                dataFormatInt8v512
                 largeChildCount
             ]
             Filter = paramMapFilter
@@ -152,7 +101,7 @@ module MsceMutateSpecsRm =
             RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Msce"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalType
@@ -163,8 +112,8 @@ module MsceMutateSpecsRm =
                 smallSortingWidths
                 msceModelType
                 lowMergeDimensions
-                bothMergeSuffixTypes
-                onlyDataFormat
+                noSuffixSuffixType
+                dataFormatInt8v512
                 largeChildCount
             ]
             Filter = paramMapFilter
@@ -178,7 +127,7 @@ module MsceMutateSpecsRm =
             RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Msce"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalType
@@ -189,8 +138,8 @@ module MsceMutateSpecsRm =
                 mediumSortingWidths
                 msceModelType
                 lowMergeDimensions
-                bothMergeSuffixTypes
-                onlyDataFormat
+                noSuffixSuffixType
+                dataFormatInt8v512
                 largeChildCount
             ]
             Filter = paramMapFilter

@@ -1,30 +1,19 @@
 ﻿namespace GeneSort.Dispatch.V1.SorterMutate.Mssi
 
-
 open FSharp.UMX
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.SortingOps
-open GeneSort.Dispatch.V1.SortableTest
-open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Sorting
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
+open GeneSort.Dispatch.V1.SortableTest.CommonSortableTest
+open GeneSort.Dispatch.V1.SorterMutate.CommonSorterMutate
 
 
 module MssiMutateSpecsRm =
-
-    let rngType = 
-            (runParameters.rngTypeKey, 
-            [CommonSorterMutate.projectRngType;] |> List.map RngType.toString)
-
-
-    let sorterEvalType = 
-            (runParameters.sorterEvalTypeKey, 
-            [ sorterEvalType.V1; ] |> List.map SorterEvalType.toString)
-
 
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
@@ -35,23 +24,6 @@ module MssiMutateSpecsRm =
             (runParameters.sorterEvalMeasureKey, 
             [ sorterEvalMeasure.CeSt (1.0, true);] |> List.map SorterEvalMeasure.toString)
     
-    // SortingWidths
-    let smallSortingWidths = SortableTestMergeSpecs.smallSortingWidths
-    let mediumSortingWidths = SortableTestMergeSpecs.mediumSortingWidths
-
-    // MergeDimensions
-    let allMergeDimensions = SortableTestMergeSpecs.allMergeDimensions
-    let lowMergeDimensions = SortableTestMergeSpecs.lowMergeDimensions
-    let highMergeDimensions = SortableTestMergeSpecs.highMergeDimensions
-
-    // DataFormats
-    let onlyDataFormat = 
-            (runParameters.sortableDataFormatKey, 
-            [CommonSorterEval.mergeSortableDataFormat] |> List.map SortableDataFormat.toString)
-    
-    // MergeSuffixTypes
-    let bothMergeSuffixTypes = SortableTestMergeSpecs.bothMergeSuffixTypes
-    let vv1SuffixType = SortableTestMergeSpecs.vv1SuffixType
 
 
     // MutationRates
@@ -123,18 +95,18 @@ module MssiMutateSpecsRm =
             RunName = sprintf @"Rand-test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Mssi"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalType
                 orthoRates
                 paraRates
                 modificationRates
-                SortableTestMergeSpecs.testSortingWidth
+                testSortingWidth
                 mssiModelType
-                SortableTestMergeSpecs.mergeDimension2
-                SortableTestMergeSpecs.noSuffixSuffixType
-                onlyDataFormat
+                mergeDimension2
+                noSuffixSuffixType
+                dataFormatInt8v512
                 largeChildCount
             ]
             Filter = paramMapFilter
@@ -148,7 +120,7 @@ module MssiMutateSpecsRm =
             RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Mssi"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalType
@@ -158,8 +130,8 @@ module MssiMutateSpecsRm =
                 smallSortingWidths
                 mssiModelType
                 lowMergeDimensions
-                bothMergeSuffixTypes
-                onlyDataFormat
+                noSuffixSuffixType
+                dataFormatInt8v512
                 largeChildCount
             ]
             Filter = paramMapFilter
@@ -173,7 +145,7 @@ module MssiMutateSpecsRm =
             RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Mssi"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalType
@@ -183,8 +155,8 @@ module MssiMutateSpecsRm =
                 mediumSortingWidths
                 mssiModelType
                 lowMergeDimensions
-                bothMergeSuffixTypes
-                onlyDataFormat
+                noSuffixSuffixType
+                dataFormatInt8v512
                 largeChildCount
             ]
             Filter = paramMapFilter

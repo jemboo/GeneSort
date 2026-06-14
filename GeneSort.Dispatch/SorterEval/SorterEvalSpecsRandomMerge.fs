@@ -6,47 +6,13 @@ open GeneSort.Sorting
 open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.SortableTest
-open GeneSort.SortingOps
+open GeneSort.Dispatch.V1.SortableTest.CommonSortableTest
+open GeneSort.Dispatch.V1.SorterEval.CommonSorterEval
 
 module SorterEvalSpecsRandomMerge =
 
-    let rngType = 
-            (runParameters.rngTypeKey, 
-            [CommonSorterEval.projectRngType;] |> List.map RngType.toString)
-
-    let sorterEvalType = 
-            (runParameters.sorterEvalTypeKey, 
-            [ sorterEvalType.V2 ;] |> List.map SorterEvalType.toString)
-    
-    // SortingWidths
-    let smallSortingWidths = SortableTestMergeSpecs.smallSortingWidths
-    let mediumSortingWidths = SortableTestMergeSpecs.mediumSortingWidths
-    
-    // MergeDimensions
-    let singleMergeDimension = SortableTestMergeSpecs.mergeDimension2
-    let allMergeDimensions = SortableTestMergeSpecs.allMergeDimensions
-    let lowMergeDimensions = SortableTestMergeSpecs.lowMergeDimensions
-    let highMergeDimensions = SortableTestMergeSpecs.highMergeDimensions
-
-    // DataFormats
-    let onlyDataFormat = 
-            (runParameters.sortableDataFormatKey, 
-            [CommonSorterEval.mergeSortableDataFormat] |> List.map SortableDataFormat.toString)
-    
-    // MergeSuffixTypes
-    let bothMergeSuffixTypes = SortableTestMergeSpecs.bothMergeSuffixTypes
-    let vv1SuffixType = SortableTestMergeSpecs.vv1SuffixType
-
     // SimpleSorterModelTypes
     let allSimpleSorterModelTypes = SorterEvalSpecsRandom.allSimpleSorterModelTypes
-
-    // SorterCounts
-    let testSorterCount = SorterEvalSpecsRandom.testSorterCount
-    let smallSorterCount = SorterEvalSpecsRandom.smallSorterCount
-    let mediumSorterCount = SorterEvalSpecsRandom.mediumSorterCount
-    let largeSorterCount = SorterEvalSpecsRandom.largeSorterCount
-
 
 
     let private mergeEnhancer 
@@ -65,7 +31,6 @@ module SorterEvalSpecsRandomMerge =
             let! smt = rp.GetSimpleSorterModelType()
             let! sw = rp.GetSortingWidth()
             let! md = rp.GetMergeDimension()
-            let! mst = rp.GetMergeSuffixType()
         
             let has2factor = (%sw % 2 = 0)
             let isMuf4able = (MathUtils.isAPowerOfTwo %sw)
@@ -86,9 +51,6 @@ module SorterEvalSpecsRandomMerge =
             // Merge dimension check: If it doesn't divide, return None to stop
             if (%sw % %md <> 0) then return! None
         
-            // Suffix check: If it's NoSuffix and width > 128, return None to stop
-            if (mst.IsNoSuffix && %sw > 128) then return! None
-        
             return rp
         }
 
@@ -100,13 +62,13 @@ module SorterEvalSpecsRandomMerge =
             RunName = sprintf @"RandMerge-Single_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msuf4"
             Spans = [   
-                rngType
-                sorterEvalType
+                projectRngType
+                sorterEvalTypeV2
                 (runParameters.sortingWidthKey, [32] |> List.map string)
                 allSimpleSorterModelTypes
                 (runParameters.mergeDimensionKey, [8;] |> List.map string)
                 (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix;] |> List.map MergeSuffixType.toString)
-                onlyDataFormat
+                dataFormatInt8v512
                 (runParameters.sorterCountKey, ["1000";] )
             ]
             Filter = paramMapFilter
@@ -120,14 +82,14 @@ module SorterEvalSpecsRandomMerge =
             RunName = sprintf @"RandMerge-Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [   
-                rngType
-                sorterEvalType
+                projectRngType
+                sorterEvalTypeV2
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 lowMergeDimensions
-                bothMergeSuffixTypes
-                onlyDataFormat
-                testSorterCount
+                noSuffixSuffixType
+                dataFormatInt8v512
+                CommonSorterEval.smallSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
@@ -141,14 +103,14 @@ module SorterEvalSpecsRandomMerge =
             RunName = sprintf @"RandMerge-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                rngType
-                sorterEvalType
+                projectRngType
+                sorterEvalTypeV2
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 allMergeDimensions
-                bothMergeSuffixTypes
-                onlyDataFormat
-                mediumSorterCount
+                noSuffixSuffixType
+                dataFormatInt8v512
+                CommonSorterEval.mediumSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
@@ -162,14 +124,14 @@ module SorterEvalSpecsRandomMerge =
             RunName = sprintf @"RandMerge-MediumLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                rngType
-                sorterEvalType
+                projectRngType
+                sorterEvalTypeV2
                 mediumSortingWidths
                 allSimpleSorterModelTypes
                 lowMergeDimensions
-                bothMergeSuffixTypes
-                onlyDataFormat
-                mediumSorterCount
+                noSuffixSuffixType
+                dataFormatInt8v512
+                CommonSorterEval.mediumSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
@@ -183,14 +145,35 @@ module SorterEvalSpecsRandomMerge =
             RunName = sprintf @"RandMerge-MediumHd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                rngType
-                sorterEvalType
+                projectRngType
+                sorterEvalTypeV2
                 mediumSortingWidths
                 allSimpleSorterModelTypes
                 highMergeDimensions
-                vv1SuffixType
-                onlyDataFormat
-                smallSorterCount
+                noSuffixSuffixType
+                dataFormatInt8v512
+                CommonSorterEval.smallSorterCount
+            ]
+            Filter = paramMapFilter
+            Enhancer = mergeEnhancer
+            AllowOverwrite = false |> UMX.tag
+            MaxParallel = 2
+        }
+
+
+        let RandMerge_LargeLd (executorType: sorterEvalExecutorType) : runHostSpec = {
+            DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
+            RunName = sprintf @"RandMerge-LargeLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
+            Spans = [
+                projectRngType
+                sorterEvalTypeV2
+                mediumSortingWidths
+                allSimpleSorterModelTypes
+                highMergeDimensions
+                noSuffixSuffixType
+                dataFormatInt8v512
+                CommonSorterEval.smallSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer

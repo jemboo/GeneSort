@@ -6,14 +6,10 @@ open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.SortingOps
+open GeneSort.Dispatch.V1.SortableTest.CommonSortableTest
 
 
 module SorterEvalSpecsRandom =
-    
-
-    let rngType = 
-            (runParameters.rngTypeKey, 
-            [CommonSorterEval.projectRngType;] |> List.map RngType.toString)
 
     let sorterEvalType = 
             (runParameters.sorterEvalTypeKey, 
@@ -25,11 +21,6 @@ module SorterEvalSpecsRandom =
     let mediumSortingWidths = 
             (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
 
-    // SorterCounts
-    let testSorterCount = (runParameters.sorterCountKey, ["1000";] )
-    let smallSorterCount = (runParameters.sorterCountKey, ["1000";] )
-    let mediumSorterCount = (runParameters.sorterCountKey, ["10000";] )
-    let largeSorterCount = (runParameters.sorterCountKey, ["100000";] )
     
     // SimpleSorterModelTypes
     let allSimpleSorterModelTypes = 
@@ -68,11 +59,11 @@ module SorterEvalSpecsRandom =
             RunName = sprintf @"Rand-Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalType
                 smallSortingWidths
                 allSimpleSorterModelTypes
-                testSorterCount
+                CommonSorterEval.smallSorterCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
@@ -85,11 +76,11 @@ module SorterEvalSpecsRandom =
             RunName = sprintf @"Rand-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalType
                 smallSortingWidths
                 allSimpleSorterModelTypes
-                largeSorterCount
+                CommonSorterEval.largeSorterCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
@@ -102,11 +93,11 @@ module SorterEvalSpecsRandom =
             RunName = sprintf @"Rand-Medium_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalType
                 mediumSortingWidths
                 allSimpleSorterModelTypes
-                largeSorterCount
+                CommonSorterEval.largeSorterCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer

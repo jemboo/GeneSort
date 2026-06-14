@@ -9,19 +9,11 @@ open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Sorting
 open GeneSort.Dispatch.V1.SorterMutate
+open GeneSort.Dispatch.V1.SortableTest.CommonSortableTest
+open GeneSort.Dispatch.V1.SorterMutate.CommonSorterMutate
 
 
 module Msuf4MutateSpecsRs = 
-
-
-    let rngType = 
-            (runParameters.rngTypeKey, 
-            [CommonSorterMutate.projectRngType;] |> List.map RngType.toString)
-
-
-    let sorterEvalType = 
-            (runParameters.sorterEvalTypeKey, 
-            [ sorterEvalType.V2 ;] |> List.map SorterEvalType.toString)
 
 
     let sorterEvalSelection = 
@@ -32,39 +24,6 @@ module Msuf4MutateSpecsRs =
             (runParameters.sorterEvalMeasureKey, 
             [ sorterEvalMeasure.CeSt (1.0, true); ] |> List.map SorterEvalMeasure.toString)
     
-    // SortingWidths
-    let smallSortingWidths = 
-            (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
-    let mediumSortingWidths = 
-            (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
-
-
-    // MutationRates
-    let orthoRates =
-            (runParameters.orthoRateKey, [1.0;] |> List.map string)
-    let paraRates =
-            (runParameters.paraRateKey, [1.0;] |> List.map string)
-    let selfSymRates =
-            (runParameters.selfSymRateKey, [1.0;] |> List.map string)
-    let seedModificationRates =
-            (runParameters.modificationRateKey, [0.00; 0.0025;] |> List.map string)
-    let modificationRates =
-            (runParameters.modificationRateKey, [0.0025; 0.005; 0.01; 0.015; 0.02; 0.03; 0.04; 0.05 ] |> List.map string)
-
-
-    // SorterCounts
-    let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )
-    let largeChildCount = (runParameters.sorterChildCountKey, ["10000";] )
-
-
-
-    // SorterModelTypes
-    let msuf4ModelType = 
-            (runParameters.simpleSorterModelTypeKey, 
-             [simpleSorterModelType.Msuf4] |> List.map SimpleSorterModelType.toString)
-
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
@@ -96,14 +55,14 @@ module Msuf4MutateSpecsRs =
             RunName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msuf4"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalSelection
                 sorterEvalMeasure
                 sorterEvalType
                 orthoRates
                 paraRates
                 selfSymRates
-                seedModificationRates
+                noSeedModificationRates
                 modificationRates
                 smallSortingWidths
                 msuf4ModelType
@@ -121,14 +80,14 @@ module Msuf4MutateSpecsRs =
             RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msuf4"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalSelection
                 sorterEvalMeasure
                 sorterEvalType
                 orthoRates
                 paraRates
                 selfSymRates
-                seedModificationRates
+                noSeedModificationRates
                 modificationRates
                 smallSortingWidths
                 msuf4ModelType
@@ -145,14 +104,14 @@ module Msuf4MutateSpecsRs =
             RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msuf4"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalSelection
                 sorterEvalMeasure
                 sorterEvalType
                 orthoRates
                 paraRates
                 selfSymRates
-                seedModificationRates
+                noSeedModificationRates
                 modificationRates
                 mediumSortingWidths
                 msuf4ModelType

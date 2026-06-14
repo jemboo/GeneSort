@@ -8,57 +8,6 @@ open CommonSortableTest
 
 
 module SortableTestMergeSpecs =
-    
-    // SortingWidths
-    let testSortingWidth = 
-            (runParameters.sortingWidthKey, [16;] |> List.map string)
-
-    let smallSortingWidths = 
-            (runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48;] |> List.map string)  
-            
-    let mediumSortingWidths = 
-            (runParameters.sortingWidthKey,  [64; 96; 128; 192; 256]  |> List.map string)
-
-    let smallP2SortingWidths = 
-            (runParameters.sortingWidthKey, [16; 32;] |> List.map string)
-
-    let mediumP2SortingWidths = 
-            (runParameters.sortingWidthKey, [64; 128;] |> List.map string)
-
-    let largeP2SortingWidths = 
-            (runParameters.sortingWidthKey, [256; 512;] |> List.map string)
-
-
-
-    // MergeDimensions
-    let allMergeDimensions = 
-            (runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
-    let mergeDimension2 = 
-            (runParameters.mergeDimensionKey, [2;] |> List.map string)
-    let mergeDimension4 = 
-            (runParameters.mergeDimensionKey, [4;] |> List.map string)
-    let mergeDimension8 = 
-            (runParameters.mergeDimensionKey, [8;] |> List.map string)
-
-    let lowMergeDimensions = 
-            (runParameters.mergeDimensionKey, [2; 3; 4;] |> List.map string)
-    let highMergeDimensions = 
-            (runParameters.mergeDimensionKey, [6; 8] |> List.map string)
-
-
-    // DataFormats
-    let onlyDataFormat = 
-            (runParameters.sortableDataFormatKey, [projectSortableDataFormat] |> List.map SortableDataFormat.toString)
-
-
-    // MergeSuffixTypes
-    let bothMergeSuffixTypes = 
-            (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix; mergeSuffixType.VV_1;] |> List.map MergeSuffixType.toString)
-    let noSuffixSuffixType = 
-            (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix] |> List.map MergeSuffixType.toString)
-    let vv1SuffixType = 
-            (runParameters.mergeSuffixTypeKey, [mergeSuffixType.VV_1] |> List.map MergeSuffixType.toString)
-
 
     let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
@@ -97,10 +46,10 @@ module SortableTestMergeSpecs =
             RunName = sprintf @"Merge-test_%s" (ExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Int8 merge sorter test sets"
             Spans = [
-                smallP2SortingWidths
-                onlyDataFormat
+                testSortingWidth
+                dataFormatInt8v512
                 mergeDimension2
-                bothMergeSuffixTypes
+                noSuffixSuffixType
             ]
             Filter = mergeDimensionDividesSortingWidth
             Enhancer = standardEnhancer
@@ -112,12 +61,12 @@ module SortableTestMergeSpecs =
         let Merge_small (executorType: executorType) : runHostSpec = {
             DatabaseName = CommonSortableTest.mergeDatabaseName
             RunName = sprintf @"Merge-small_%s" (ExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Int8 merge sorter test sets"
+            RunDescription = "Merge_small sorter test sets"
             Spans = [
                 smallSortingWidths
-                onlyDataFormat
+                dataFormatInt8v512
                 allMergeDimensions
-                bothMergeSuffixTypes
+                noSuffixSuffixType
             ]
             Filter = mergeDimensionDividesSortingWidth
             Enhancer = standardEnhancer
@@ -129,12 +78,12 @@ module SortableTestMergeSpecs =
         let Merge_MediumLd (executorType: executorType) : runHostSpec = {
             DatabaseName = CommonSortableTest.mergeDatabaseName
             RunName = sprintf @"Merge-MediumLd_%s" (ExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Int8 merge sorter test sets"
+            RunDescription = "Merge_MediumLd sorter test sets"
             Spans = [
                 mediumSortingWidths
-                onlyDataFormat
+                dataFormatInt8v512
                 lowMergeDimensions
-                bothMergeSuffixTypes
+                noSuffixSuffixType
             ]
             Filter = mergeDimensionDividesSortingWidth
             Enhancer = standardEnhancer
@@ -146,12 +95,28 @@ module SortableTestMergeSpecs =
         let Merge_MediumHd (executorType: executorType) : runHostSpec = {
             DatabaseName = CommonSortableTest.mergeDatabaseName
             RunName = sprintf @"Merge-MediumHd_%s" (ExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Int8 merge sorter test sets"
+            RunDescription = "Merge_MediumHd sorter test sets"
             Spans = [
-                mediumSortingWidths
-                onlyDataFormat
+                largeSortingWidths
+                dataFormatInt8v512
                 highMergeDimensions
-                vv1SuffixType
+                noSuffixSuffixType
+            ]
+            Filter = standardParamMapFilter
+            Enhancer = standardEnhancer
+            AllowOverwrite = false |> UMX.tag
+            MaxParallel = 2
+        }
+
+        let Merge_LargeLd (executorType: executorType) : runHostSpec = {
+            DatabaseName = CommonSortableTest.mergeDatabaseName
+            RunName = sprintf @"Merge-LargeLd_%s" (ExecutorType.toString executorType) |> UMX.tag
+            RunDescription = "Merge_LargeLd sorter test sets"
+            Spans = [
+                highMergeDimensions
+                dataFormatInt8v512
+                mergeDimension2
+                noSuffixSuffixType
             ]
             Filter = standardParamMapFilter
             Enhancer = standardEnhancer
@@ -165,6 +130,7 @@ module SortableTestMergeSpecs =
         | Merge_Small
         | Merge_MediumLd
         | Merge_MediumHd
+        | Merge_LargeLd
 
     let Configs = Map.ofList 
                     [ 
@@ -172,6 +138,7 @@ module SortableTestMergeSpecs =
                         (configType.Merge_Small, Specs.Merge_small);
                         (configType.Merge_MediumLd, Specs.Merge_MediumLd);
                         (configType.Merge_MediumHd, Specs.Merge_MediumHd);
+                        (configType.Merge_LargeLd, Specs.Merge_LargeLd);
                     ]
 
     let getConfig (config: configType) (executorType: executorType) : runHostSpec =

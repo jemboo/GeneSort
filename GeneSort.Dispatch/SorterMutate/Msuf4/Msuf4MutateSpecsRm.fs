@@ -7,24 +7,15 @@ open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.SortingOps
-open GeneSort.Dispatch.V1.SortableTest
 open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Sorting
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
+open GeneSort.Dispatch.V1.SortableTest.CommonSortableTest
+open GeneSort.Dispatch.V1.SorterMutate.CommonSorterMutate
 
 
 module Msuf4MutateSpecsRm =
-
-    let rngType = 
-            (runParameters.rngTypeKey, 
-            [CommonSorterMutate.projectRngType;] |> List.map RngType.toString)
-
-
-    let sorterEvalType = 
-            (runParameters.sorterEvalTypeKey, 
-            [ sorterEvalType.V1; ] |> List.map SorterEvalType.toString)
-
 
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
@@ -34,24 +25,7 @@ module Msuf4MutateSpecsRm =
     let sorterEvalMeasure = 
             (runParameters.sorterEvalMeasureKey, 
             [ sorterEvalMeasure.CeSt (1.0, true);] |> List.map SorterEvalMeasure.toString)
-    
-    // SortingWidths
-    let smallSortingWidths = SortableTestMergeSpecs.smallSortingWidths
-    let mediumSortingWidths = SortableTestMergeSpecs.mediumSortingWidths
-
-    // MergeDimensions
-    let allMergeDimensions = SortableTestMergeSpecs.allMergeDimensions
-    let lowMergeDimensions = SortableTestMergeSpecs.lowMergeDimensions
-    let highMergeDimensions = SortableTestMergeSpecs.highMergeDimensions
-
-    // DataFormats
-    let onlyDataFormat = 
-            (runParameters.sortableDataFormatKey, 
-            [CommonSorterEval.mergeSortableDataFormat] |> List.map SortableDataFormat.toString)
-    
-    // MergeSuffixTypes
-    let bothMergeSuffixTypes = SortableTestMergeSpecs.bothMergeSuffixTypes
-    let vv1SuffixType = SortableTestMergeSpecs.vv1SuffixType
+   
 
 
     // MutationRates
@@ -129,7 +103,7 @@ module Msuf4MutateSpecsRm =
             RunName = sprintf @"Rand-test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Msuf4"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalType
@@ -138,11 +112,11 @@ module Msuf4MutateSpecsRm =
                 selfSymRates
                 seedModificationRates
                 modificationRates
-                SortableTestMergeSpecs.testSortingWidth
+                testSortingWidth
                 msuf4ModelType
-                SortableTestMergeSpecs.mergeDimension2
-                SortableTestMergeSpecs.noSuffixSuffixType
-                onlyDataFormat
+                mergeDimension2
+                noSuffixSuffixType
+                dataFormatInt8v512
                 largeChildCount
             ]
             Filter = paramMapFilter
@@ -156,7 +130,7 @@ module Msuf4MutateSpecsRm =
             RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Msuf4"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalType
@@ -168,8 +142,8 @@ module Msuf4MutateSpecsRm =
                 smallSortingWidths
                 msuf4ModelType
                 lowMergeDimensions
-                bothMergeSuffixTypes
-                onlyDataFormat
+                noSuffixSuffixType
+                dataFormatInt8v512
                 largeChildCount
             ]
             Filter = paramMapFilter
@@ -183,7 +157,7 @@ module Msuf4MutateSpecsRm =
             RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Msuf4"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalType
@@ -195,8 +169,8 @@ module Msuf4MutateSpecsRm =
                 mediumSortingWidths
                 msuf4ModelType
                 lowMergeDimensions
-                bothMergeSuffixTypes
-                onlyDataFormat
+                noSuffixSuffixType
+                dataFormatInt8v512
                 largeChildCount
             ]
             Filter = paramMapFilter

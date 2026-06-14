@@ -73,17 +73,18 @@ let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
-//let configType = SortableTestMergeSpecs.configType.Merge_Test
-//let executorType = SortableTest.executorType.Generator
-//let host: IRunHost = 
-//    let spec = SortableTestMergeSpecs.getConfig configType executorType
-//    SortableTestDb.createRunHost spec
+//********** SortableTest **********
+let configType = SortableTestMergeSpecs.configType.Merge_Small
+let executorType = SortableTest.executorType.Generator
+let host: IRunHost = 
+    let spec = SortableTestMergeSpecs.getConfig configType executorType
+    SortableTestDb.createRunHost spec
 
-//let executor = SortableTest.SortableTestExecutor.getExecutor executorType
+let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 
 
 
-
+//********** SorterEval Standard **********
 //let configType = SorterEvalSpecsRandom.configType.Rand_Test
 //let executorType = sorterEvalExecutorType.StageStatsReport
 //let host: IRunHost = 
@@ -94,7 +95,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 
-
+//********** SorterEval Merge **********
 //let configType = SorterEvalSpecsRandomMerge.configType.RandMerge_Single
 //let executorType = sorterEvalExecutorType.GenMerge
 //let host: IRunHost = 
@@ -114,13 +115,13 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executor = SorterMutateExecutor.getExecutor executorType
 
 
-let configType = MsceMutateSpecsRm.configType.Rand_Test
-let executorType = sorterMutateExecutorType.GenMerge
-let host: IRunHost = 
-    let spec = MsceMutateSpecsRm.getConfig configType executorType
-    MsceMutateDbs.createRunHost spec
+//let configType = MsceMutateSpecsRm.configType.Rand_Test
+//let executorType = sorterMutateExecutorType.GenMerge
+//let host: IRunHost = 
+//    let spec = MsceMutateSpecsRm.getConfig configType executorType
+//    MsceMutateDbs.createRunHost spec
 
-let executor = MsceMutateExecutor.getExecutor executorType
+//let executor = MsceMutateExecutor.getExecutor executorType
 
 
 let minReplica = 0<replNumber>

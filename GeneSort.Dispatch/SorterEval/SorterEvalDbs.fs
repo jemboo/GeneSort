@@ -2,6 +2,7 @@
 
 open FSharp.UMX
 open GeneSort.Sorting
+open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.Core
 open GeneSort.Project.V1
@@ -10,7 +11,6 @@ open GeneSort.FileDb.V1
 open GeneSort.Eval.V1.Bins
 open GeneSort.Dispatch.V1.SortableTest
 open CommonSorterEval
-open GeneSort.SortingOps
 open GeneSort.Dispatch.V1
 
 
@@ -134,7 +134,7 @@ module SorterEvalDbs =
                     (sorterEvalType: sorterEvalType)
                             : Async<Result<sorterSetEval, string>> =
         let qp = RandomStandard.Uniform.makeQueryParams 
-                        CommonSorterEval.projectRngType
+                        CommonSortableTest._projectRngType
                         (0 |> UMX.tag<replNumber>) 
                         sortingWidth 
                         simpleSorterModelType 
@@ -155,13 +155,13 @@ module SorterEvalDbs =
                             : Async<Result<sorterSetEval, string>> =
 
         let qp = RandomMerge.Uniform.makeQueryParams 
-                        CommonSorterEval.projectRngType
+                        CommonSortableTest._projectRngType
                         (0 |> UMX.tag<replNumber>) 
                         sortingWidth 
                         simpleSorterModelType
                         mergeDimension 
                         mergeSuffixType 
-                        CommonSortableTest.projectSortableDataFormat
+                        CommonSortableTest._dataFormatInt8v512
                         sorterEvalType
                         (outputDataType.SorterSetEval "")
         async {

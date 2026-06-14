@@ -9,20 +9,11 @@ open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Sorting
 open GeneSort.Dispatch.V1.SorterMutate
+open GeneSort.Dispatch.V1.SortableTest.CommonSortableTest
+open GeneSort.Dispatch.V1.SorterMutate.CommonSorterMutate
 
 
 module MsceMutateSpecsRs = 
-
-
-    let rngType = 
-            (runParameters.rngTypeKey, 
-            [CommonSorterMutate.projectRngType;] |> List.map RngType.toString)
-
-
-    let sorterEvalType = 
-            (runParameters.sorterEvalTypeKey, 
-            [ sorterEvalType.V2 ;] |> List.map SorterEvalType.toString)
-
 
     let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
@@ -95,7 +86,7 @@ module MsceMutateSpecsRs =
             RunName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msce"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalSelection
                 sorterEvalMeasure
                 sorterEvalType
@@ -119,7 +110,7 @@ module MsceMutateSpecsRs =
             RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msce"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalSelection
                 sorterEvalMeasure
                 sorterEvalType
@@ -142,7 +133,7 @@ module MsceMutateSpecsRs =
             RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msce"
             Spans = [
-                rngType
+                projectRngType
                 sorterEvalSelection
                 sorterEvalMeasure
                 sorterEvalType
