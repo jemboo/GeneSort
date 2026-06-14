@@ -16,6 +16,7 @@ open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Dispatch.V1.SortableTest
 open GeneSort.Eval.V1
+open GeneSort.Dispatch.V1.CommonParams
 
 module SorterEvalExecutor =
 
@@ -32,7 +33,7 @@ module SorterEvalExecutor =
                 return Ok ( SortableTestModel.makeSortableTest 
                                     sortableTestId
                                     testModel 
-                                    CommonSortableTest._dataFormatBitVector512)
+                                    _dataFormatBitVector512)
             | None ->
                 return Error "Failed: One or more RunParameters for StandardTests were missing."
         }
@@ -117,7 +118,7 @@ module SorterEvalExecutor =
                     host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                     |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
 
-                let collectTests = CommonSorterEval.CollectSortableTests
+                let collectTests = CollectSortableTests
                 let testId = tests |> SortableTests.getId
                 let baseFirstIdx = (%repl * %totalSorterCount)
 

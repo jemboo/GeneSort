@@ -6,7 +6,7 @@ open GeneSort.Sorting
 open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.SortableTest.CommonSortableTest
+open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterEval.CommonSorterEval
 
 module SorterEvalSpecsRandomMerge =
@@ -89,7 +89,7 @@ module SorterEvalSpecsRandomMerge =
                 lowMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                CommonSorterEval.smallSorterCount
+                smallSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
@@ -110,7 +110,7 @@ module SorterEvalSpecsRandomMerge =
                 allMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                CommonSorterEval.mediumSorterCount
+                mediumSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
@@ -131,7 +131,7 @@ module SorterEvalSpecsRandomMerge =
                 lowMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                CommonSorterEval.mediumSorterCount
+                mediumSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
@@ -152,7 +152,7 @@ module SorterEvalSpecsRandomMerge =
                 highMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                CommonSorterEval.smallSorterCount
+                smallSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
@@ -173,7 +173,7 @@ module SorterEvalSpecsRandomMerge =
                 highMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                CommonSorterEval.smallSorterCount
+                smallSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer

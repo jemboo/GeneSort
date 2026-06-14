@@ -20,7 +20,7 @@ open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Bins
 open GeneSort.Dispatch.V1.SorterMutate
-open GeneSort.Dispatch.V1.SortableTest.CommonSortableTest
+open GeneSort.Dispatch.V1.CommonParams
 
 
 module MssiMutateExecutor =
@@ -137,7 +137,7 @@ module MssiMutateExecutor =
                                             sortingWidth
                                             simpleSorterModelType
                                             rngFactory
-                                            CommonSorterMutate.ExcludeSelfCe
+                                            ExcludeSelfCe
                                             modificationRate
                                             mutationRate
                                             insertionRate
@@ -245,7 +245,7 @@ module MssiMutateExecutor =
                                             sortingWidth
                                             simpleSorterModelType
                                             rngFactory
-                                            CommonSorterMutate.ExcludeSelfCe
+                                            ExcludeSelfCe
                                             modificationRate
                                             mutationRate
                                             insertionRate
@@ -346,7 +346,7 @@ module MssiMutateExecutor =
                                             sortingWidth
                                             simpleSorterModelType
                                             (rngType |> RngFactory.create)
-                                            CommonSorterMutate.ExcludeSelfCe
+                                            ExcludeSelfCe
                                             modificationRate
                                             mutationRate
                                             insertionRate
@@ -448,7 +448,7 @@ module MssiMutateExecutor =
                                             sortingWidth
                                             simpleSorterModelType
                                             (rngType |> RngFactory.create)
-                                            CommonSorterMutate.ExcludeSelfCe
+                                            ExcludeSelfCe
                                             modificationRate
                                             mutationRate
                                             insertionRate
@@ -505,7 +505,7 @@ module MssiMutateExecutor =
                     host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                     |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
 
-                let collectTests = CommonSorterEval.CollectSortableTests
+                let collectTests = CollectSortableTests
                 let testId = tests |> SortableTests.getId
                 
                 // 2. Setup Accumulators and Lazy Chunk Loop via Seq.chunkBySize

@@ -1,0 +1,193 @@
+﻿namespace GeneSort.Dispatch.V1
+open GeneSort.Core
+open GeneSort.Project.V1
+open GeneSort.Sorting
+open GeneSort.SortingOps
+open FSharp.UMX
+open GeneSort.Model.Sorting.V1
+
+module CommonParams =
+
+    let CollectSortableTests = true
+    let ExcludeSelfCe = true |> UMX.tag<excludeSelfCe>
+
+    // SimpleSorterModelTypes
+    let msceModelType = 
+            (runParameters.simpleSorterModelTypeKey, 
+             [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
+
+    let msrsModelType = 
+            (runParameters.simpleSorterModelTypeKey, 
+             [simpleSorterModelType.Msrs] |> List.map SimpleSorterModelType.toString)
+
+    let mssiModelType = 
+            (runParameters.simpleSorterModelTypeKey, 
+             [simpleSorterModelType.Mssi] |> List.map SimpleSorterModelType.toString)
+
+    let msuf4ModelType = 
+            (runParameters.simpleSorterModelTypeKey, 
+             [simpleSorterModelType.Msuf4] |> List.map SimpleSorterModelType.toString)
+
+
+    // SorterCounts
+    let smallSorterCount = (runParameters.sorterCountKey, ["100";] )
+    let mediumSorterCount = (runParameters.sorterCountKey, ["1000";] )
+    let largeSorterCount = (runParameters.sorterCountKey, ["10000";] )
+    let extraLargeSorterCount = (runParameters.sorterCountKey, ["100000";] )
+    
+    // Child SorterCounts
+    let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
+    let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
+    let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )
+    let largeChildCount = (runParameters.sorterChildCountKey, ["1000";] )
+    let extraLargeChildCount = (runParameters.sorterChildCountKey, ["10000";] )
+
+    let _sorterEvalTypeV1 = sorterEvalType.V1
+    let _sorterEvalTypeV2 = sorterEvalType.V2
+
+    let sorterEvalTypeV1 = 
+            (runParameters.sorterEvalTypeKey, 
+            [ sorterEvalType.V1 ;] |> List.map SorterEvalType.toString)
+
+    let sorterEvalTypeV2 = 
+            (runParameters.sorterEvalTypeKey, 
+            [ sorterEvalType.V2 ;] |> List.map SorterEvalType.toString)
+
+
+    let _rngTypeLcg = rngType.Lcg
+    let _dataFormatInt8v512 = sortableDataFormat.Int8Vector512
+    let _dataFormatBitVector512 = sortableDataFormat.BitVector512
+
+    // MergeDimensions
+    let allMergeDimensions = 
+            (runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
+    let mergeDimension2 = 
+            (runParameters.mergeDimensionKey, [2;] |> List.map string)
+    let mergeDimension4 = 
+            (runParameters.mergeDimensionKey, [4;] |> List.map string)
+    let mergeDimension8 = 
+            (runParameters.mergeDimensionKey, [8;] |> List.map string)
+    let lowMergeDimensions = 
+            (runParameters.mergeDimensionKey, [2; 3; 4;] |> List.map string)
+    let highMergeDimensions = 
+            (runParameters.mergeDimensionKey, [6; 8] |> List.map string)
+    
+    // SortingWidths
+    let testSortingWidth = 
+            (runParameters.sortingWidthKey, [16;] |> List.map string)
+
+    let smallSortingWidths = 
+            (runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48; 64] |> List.map string)  
+            
+    let mediumSortingWidths = 
+            (runParameters.sortingWidthKey,  [96; 128;]  |> List.map string)
+
+    let largeSortingWidths = 
+            (runParameters.sortingWidthKey,  [192; 256; 512]  |> List.map string)
+
+    let smallP2SortingWidths = 
+            (runParameters.sortingWidthKey, [16; 32; 64;] |> List.map string)
+
+    let mediumP2SortingWidths = 
+            (runParameters.sortingWidthKey, [128;] |> List.map string)
+
+    let largeP2SortingWidths = 
+            (runParameters.sortingWidthKey, [256; 512;] |> List.map string)
+
+
+    // RngType
+    let rngTypeLcg = 
+            (runParameters.rngTypeKey, [_rngTypeLcg] |> List.map RngType.toString)
+
+
+    // DataFormats
+    let dataFormatInt8v512 = 
+            (runParameters.sortableDataFormatKey, [_dataFormatInt8v512] |> List.map SortableDataFormat.toString)
+
+    let noSuffixSuffixType = 
+            (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix] |> List.map MergeSuffixType.toString)
+
+
+    // MutationRates
+    let mutationRates =
+            (runParameters.mutationRateKey, [1.0] |> List.map string)
+    let insertionRates =
+            (runParameters.insertionRateKey, [0.1;] |> List.map string)
+    let deletionRates =
+            (runParameters.deletionRateKey, [0.1;] |> List.map string)
+    let orthoRates =
+            (runParameters.orthoRateKey, [1.0;] |> List.map string)
+    let paraRates =
+            (runParameters.paraRateKey, [1.0;] |> List.map string)
+    let selfSymRates =
+            (runParameters.selfSymRateKey, [1.0;] |> List.map string)
+
+    let noSeedModificationRates =
+            (runParameters.modificationRateKey, [0.00] |> List.map string)
+
+    let modificationRates =
+            (runParameters.modificationRateKey, [0.005; 0.01; 0.02; 0.04; 0.08 ] |> List.map string)
+
+
+
+    let getStageLength 
+                (smt: simpleSorterModelType) 
+                (sw: int<sortingWidth>) : int<stageLength> =
+        match %sw with
+        | 4 -> 15
+        | 5 -> 25
+        | 6 -> 40 
+        | 7 -> 50 
+        | 8 -> 60
+        | 9 -> 70
+        | 10 -> 80
+        | 11 -> 90
+        | 12 -> 100
+        | 14 -> 120
+        | 16 -> match smt with | Msuf4 -> 300 | _ -> 150
+        | 18 -> 180
+        | 20 -> 200
+        | 22 -> 250
+        | 24 -> 300
+        | 32 -> match smt with | Msuf4 -> 600 | _ -> 300
+        | 36 -> 350
+        | 48 -> 400
+        | 64 -> match smt with | Msuf4 -> 2000 | _ -> 600
+        | 96 -> 800
+        | 128 -> match smt with | Msuf4 -> 4000 | _ -> 1200
+        | 192 -> 2000
+        | 256 -> match smt with | Msuf4 -> 6000 | _ -> 3000
+        | _ -> failwithf "Unsupported sorting width: %d" %sw
+        |> UMX.tag
+
+
+    let getStageLengthShort
+                (smt: simpleSorterModelType) 
+                (sw: int<sortingWidth>) : int<stageLength> =
+        match %sw with
+        | 4 -> 5
+        | 5 -> 5
+        | 6 -> 10 
+        | 7 -> 10 
+        | 8 -> 20
+        | 9 -> 20
+        | 10 -> 30
+        | 11 -> 40
+        | 12 -> 50
+        | 14 -> 60
+        | 16 -> match smt with | Msuf4 -> 100 | _ -> 60
+        | 18 -> 80
+        | 20 -> 100
+        | 22 -> 125
+        | 24 -> 150
+        | 32 -> match smt with | Msuf4 -> 200 | _ -> 150
+        | 36 -> 150
+        | 48 -> 200
+        | 64 -> match smt with | Msuf4 -> 1000 | _ -> 300
+        | 96 -> 800
+        | 128 -> match smt with | Msuf4 -> 1500 | _ -> 600
+        | 192 -> 2000
+        | 256 -> match smt with | Msuf4 -> 2000 | _ -> 1000
+        | _ -> failwithf "Unsupported sorting width: %d" %sw
+        |> UMX.tag
+

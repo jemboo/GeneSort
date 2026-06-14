@@ -18,7 +18,6 @@ open GeneSort.Core
 [<Measure>] type parentSorterSetEvalId
 [<Measure>] type sortingParamsId
 
-[<Measure>] type excludeSelfCe
 [<Measure>] type modificationRate
 [<Measure>] type seedModificationRate
 [<Measure>] type mutationRate

@@ -8,10 +8,9 @@ open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.Db.V1
 open GeneSort.FileDb.V1
-open GeneSort.Eval.V1.Bins
-open GeneSort.Dispatch.V1.SortableTest
-open CommonSorterEval
 open GeneSort.Dispatch.V1
+open CommonSorterEval
+open GeneSort.Dispatch.V1.CommonParams
 
 
 module SorterEvalDbs =
@@ -134,7 +133,7 @@ module SorterEvalDbs =
                     (sorterEvalType: sorterEvalType)
                             : Async<Result<sorterSetEval, string>> =
         let qp = RandomStandard.Uniform.makeQueryParams 
-                        CommonSortableTest._rngTypeLcg
+                        _rngTypeLcg
                         (0 |> UMX.tag<replNumber>) 
                         sortingWidth 
                         simpleSorterModelType 
@@ -155,13 +154,13 @@ module SorterEvalDbs =
                             : Async<Result<sorterSetEval, string>> =
 
         let qp = RandomMerge.Uniform.makeQueryParams 
-                        CommonSortableTest._rngTypeLcg
+                        _rngTypeLcg
                         (0 |> UMX.tag<replNumber>) 
                         sortingWidth 
                         simpleSorterModelType
                         mergeDimension 
                         mergeSuffixType 
-                        CommonSortableTest._dataFormatInt8v512
+                        _dataFormatInt8v512
                         sorterEvalType
                         (outputDataType.SorterSetEval "")
         async {

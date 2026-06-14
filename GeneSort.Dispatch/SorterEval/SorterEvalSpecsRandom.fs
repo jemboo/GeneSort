@@ -6,7 +6,7 @@ open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.SortingOps
-open GeneSort.Dispatch.V1.SortableTest.CommonSortableTest
+open GeneSort.Dispatch.V1.CommonParams
 
 
 module SorterEvalSpecsRandom =
@@ -63,7 +63,7 @@ module SorterEvalSpecsRandom =
                 sorterEvalType
                 smallSortingWidths
                 allSimpleSorterModelTypes
-                CommonSorterEval.smallSorterCount
+                smallSorterCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
@@ -80,7 +80,7 @@ module SorterEvalSpecsRandom =
                 sorterEvalType
                 smallSortingWidths
                 allSimpleSorterModelTypes
-                CommonSorterEval.largeSorterCount
+                largeSorterCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
@@ -97,7 +97,7 @@ module SorterEvalSpecsRandom =
                 sorterEvalType
                 mediumSortingWidths
                 allSimpleSorterModelTypes
-                CommonSorterEval.largeSorterCount
+                largeSorterCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer

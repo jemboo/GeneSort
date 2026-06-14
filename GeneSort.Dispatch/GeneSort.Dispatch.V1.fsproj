@@ -19,6 +19,7 @@
     <Compile Include="ProgressMessage.fs" />
     <Compile Include="OpsUtils.fs" />
     <Compile Include="ParamOps.fs" />
+    <Compile Include="CommonParams.fs" />
     <Compile Include="RunHostSpec.fs" />
     <Compile Include="RunHost.fs" />
     <Compile Include="RunParamsExecutor.fs" />

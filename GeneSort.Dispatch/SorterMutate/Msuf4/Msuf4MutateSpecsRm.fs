@@ -7,13 +7,11 @@ open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.SortingOps
-open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Sorting
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
-open GeneSort.Dispatch.V1.SortableTest.CommonSortableTest
+open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterEval.CommonSorterEval
-open GeneSort.Dispatch.V1.SorterMutate.CommonSorterMutate
 
 
 module Msuf4MutateSpecsRm =

@@ -5,6 +5,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting.Sorter
 open GeneSort.Model.Sorting.V1
+open GeneSort.Sorting
 
 [<Struct; CustomEquality; NoComparison>]
 type msceRandMutate = 

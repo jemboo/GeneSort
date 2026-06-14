@@ -8,12 +8,12 @@ open GeneSort.Sorting
 open GeneSort.FileDb.V1
 open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
-
+open CommonSortableTest
 
 module SortableMergeTestDb =
 
     let dbName = "Merge" |> UMX.tag<databaseName>
-    let dbFolder = "c:\\Projects\\SortableTest\\Merge\\Data"
+    let dbFolder = $"c:\\Projects\\{projectName}\\{%dbName}\\Data"
                    |> UMX.tag<pathToRootFolder>
 
 
