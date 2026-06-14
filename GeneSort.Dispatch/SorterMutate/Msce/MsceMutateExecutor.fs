@@ -20,7 +20,7 @@ open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Bins
 open GeneSort.Dispatch.V1.SorterMutate
-
+open GeneSort.Dispatch.V1.SortableTest.CommonSortableTest
 
 module MsceMutateExecutor =
 
@@ -37,7 +37,7 @@ module MsceMutateExecutor =
                 return Ok ( SortableTestModel.makeSortableTest 
                                     sortableTestId
                                     testModel 
-                                    CommonSorterEval.standardSortableDataFormat)
+                                    _dataFormatBitVector512)
             | None ->
                 return Error "Failed: One or more RunParameters for StandardTests were missing."
         }

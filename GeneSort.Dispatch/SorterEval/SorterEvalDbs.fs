@@ -134,7 +134,7 @@ module SorterEvalDbs =
                     (sorterEvalType: sorterEvalType)
                             : Async<Result<sorterSetEval, string>> =
         let qp = RandomStandard.Uniform.makeQueryParams 
-                        CommonSortableTest._projectRngType
+                        CommonSortableTest._rngTypeLcg
                         (0 |> UMX.tag<replNumber>) 
                         sortingWidth 
                         simpleSorterModelType 
@@ -155,7 +155,7 @@ module SorterEvalDbs =
                             : Async<Result<sorterSetEval, string>> =
 
         let qp = RandomMerge.Uniform.makeQueryParams 
-                        CommonSortableTest._projectRngType
+                        CommonSortableTest._rngTypeLcg
                         (0 |> UMX.tag<replNumber>) 
                         sortingWidth 
                         simpleSorterModelType

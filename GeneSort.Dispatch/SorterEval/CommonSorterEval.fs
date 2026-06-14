@@ -36,17 +36,18 @@ module CommonSorterEval =
 
     let ExcludeSelfCe = true |> UMX.tag<excludeSelfCe>
 
-    let standardSortableDataFormat = sortableDataFormat.BitVector512
-    let dataFormatInt8v512 = CommonSortableTest.dataFormatInt8v512
-
     // SorterCounts
     let smallSorterCount = (runParameters.sorterCountKey, ["100";] )
     let mediumSorterCount = (runParameters.sorterCountKey, ["1000";] )
     let largeSorterCount = (runParameters.sorterCountKey, ["10000";] )
     let extraLargeSorterCount = (runParameters.sorterCountKey, ["100000";] )
+
+    let _sorterEvalTypeV1 = sorterEvalType.V1
+    let _sorterEvalTypeV2 = sorterEvalType.V2
+
     let sorterEvalTypeV1 = 
             (runParameters.sorterEvalTypeKey, 
-            [ sorterEvalType.V2 ;] |> List.map SorterEvalType.toString)
+            [ sorterEvalType.V1 ;] |> List.map SorterEvalType.toString)
 
     let sorterEvalTypeV2 = 
             (runParameters.sorterEvalTypeKey, 

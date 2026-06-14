@@ -10,6 +10,7 @@ open GeneSort.Eval.V1
 open GeneSort.Sorting
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.SortableTest.CommonSortableTest
+open GeneSort.Dispatch.V1.SorterEval.CommonSorterEval
 open GeneSort.Dispatch.V1.SorterMutate.CommonSorterMutate
 
 
@@ -55,10 +56,10 @@ module Msuf4MutateSpecsRs =
             RunName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msuf4"
             Spans = [
-                projectRngType
+                rngTypeLcg
                 sorterEvalSelection
                 sorterEvalMeasure
-                sorterEvalType
+                sorterEvalTypeV1
                 orthoRates
                 paraRates
                 selfSymRates
@@ -80,10 +81,10 @@ module Msuf4MutateSpecsRs =
             RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msuf4"
             Spans = [
-                projectRngType
+                rngTypeLcg
                 sorterEvalSelection
                 sorterEvalMeasure
-                sorterEvalType
+                sorterEvalTypeV1
                 orthoRates
                 paraRates
                 selfSymRates
@@ -104,10 +105,10 @@ module Msuf4MutateSpecsRs =
             RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msuf4"
             Spans = [
-                projectRngType
+                rngTypeLcg
                 sorterEvalSelection
                 sorterEvalMeasure
-                sorterEvalType
+                sorterEvalTypeV1
                 orthoRates
                 paraRates
                 selfSymRates

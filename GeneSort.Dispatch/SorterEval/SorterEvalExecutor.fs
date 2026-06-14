@@ -32,7 +32,7 @@ module SorterEvalExecutor =
                 return Ok ( SortableTestModel.makeSortableTest 
                                     sortableTestId
                                     testModel 
-                                    CommonSorterEval.standardSortableDataFormat)
+                                    CommonSortableTest._dataFormatBitVector512)
             | None ->
                 return Error "Failed: One or more RunParameters for StandardTests were missing."
         }

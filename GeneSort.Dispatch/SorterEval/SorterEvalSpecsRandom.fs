@@ -59,7 +59,7 @@ module SorterEvalSpecsRandom =
             RunName = sprintf @"Rand-Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                projectRngType
+                rngTypeLcg
                 sorterEvalType
                 smallSortingWidths
                 allSimpleSorterModelTypes
@@ -76,7 +76,7 @@ module SorterEvalSpecsRandom =
             RunName = sprintf @"Rand-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                projectRngType
+                rngTypeLcg
                 sorterEvalType
                 smallSortingWidths
                 allSimpleSorterModelTypes
@@ -93,7 +93,7 @@ module SorterEvalSpecsRandom =
             RunName = sprintf @"Rand-Medium_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                projectRngType
+                rngTypeLcg
                 sorterEvalType
                 mediumSortingWidths
                 allSimpleSorterModelTypes

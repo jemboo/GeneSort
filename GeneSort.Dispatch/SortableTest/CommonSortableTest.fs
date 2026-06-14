@@ -20,11 +20,11 @@ module ExecutorType =
 module CommonSortableTest =
 
     let projectName = "SortableTest" |> UMX.tag<projectName>
-    //let queryName = "SortableTest" |> UMX.tag<queryName>
     let mergeDatabaseName = "Merge" |> UMX.tag<databaseName>
 
-    let _projectRngType = rngType.Lcg
+    let _rngTypeLcg = rngType.Lcg
     let _dataFormatInt8v512 = sortableDataFormat.Int8Vector512
+    let _dataFormatBitVector512 = sortableDataFormat.BitVector512
 
     let mergeDatabaseFolder = 
                             "c:\\Projects\\SortableTest\\Merge\\Data"
@@ -68,8 +68,8 @@ module CommonSortableTest =
 
 
     // RngType
-    let projectRngType = 
-            (runParameters.rngTypeKey, [_projectRngType] |> List.map RngType.toString)
+    let rngTypeLcg = 
+            (runParameters.rngTypeKey, [_rngTypeLcg] |> List.map RngType.toString)
 
 
     // DataFormats

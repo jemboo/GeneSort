@@ -13,6 +13,7 @@ open GeneSort.Sorting
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.SortableTest.CommonSortableTest
+open GeneSort.Dispatch.V1.SorterEval.CommonSorterEval
 open GeneSort.Dispatch.V1.SorterMutate.CommonSorterMutate
 
 
@@ -105,10 +106,10 @@ module MsrsMutateSpecsRm =
             RunName = sprintf @"Rand-test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Msrs"
             Spans = [
-                projectRngType
+                rngTypeLcg
                 sorterEvalSelectionType
                 sorterEvalMeasure
-                sorterEvalType
+                sorterEvalTypeV1
                 orthoRates
                 paraRates
                 selfSymRates
@@ -131,10 +132,10 @@ module MsrsMutateSpecsRm =
             RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Msrs"
             Spans = [
-                projectRngType
+                rngTypeLcg
                 sorterEvalSelectionType
                 sorterEvalMeasure
-                sorterEvalType
+                sorterEvalTypeV1
                 orthoRates
                 paraRates
                 selfSymRates
@@ -157,10 +158,10 @@ module MsrsMutateSpecsRm =
             RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Msrs"
             Spans = [
-                projectRngType
+                rngTypeLcg
                 sorterEvalSelectionType
                 sorterEvalMeasure
-                sorterEvalType
+                sorterEvalTypeV1
                 orthoRates
                 paraRates
                 selfSymRates

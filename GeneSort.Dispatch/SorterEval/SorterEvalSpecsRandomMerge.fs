@@ -62,7 +62,7 @@ module SorterEvalSpecsRandomMerge =
             RunName = sprintf @"RandMerge-Single_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msuf4"
             Spans = [   
-                projectRngType
+                rngTypeLcg
                 sorterEvalTypeV2
                 (runParameters.sortingWidthKey, [32] |> List.map string)
                 allSimpleSorterModelTypes
@@ -82,7 +82,7 @@ module SorterEvalSpecsRandomMerge =
             RunName = sprintf @"RandMerge-Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [   
-                projectRngType
+                rngTypeLcg
                 sorterEvalTypeV2
                 smallSortingWidths
                 allSimpleSorterModelTypes
@@ -103,7 +103,7 @@ module SorterEvalSpecsRandomMerge =
             RunName = sprintf @"RandMerge-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                projectRngType
+                rngTypeLcg
                 sorterEvalTypeV2
                 smallSortingWidths
                 allSimpleSorterModelTypes
@@ -124,7 +124,7 @@ module SorterEvalSpecsRandomMerge =
             RunName = sprintf @"RandMerge-MediumLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                projectRngType
+                rngTypeLcg
                 sorterEvalTypeV2
                 mediumSortingWidths
                 allSimpleSorterModelTypes
@@ -145,7 +145,7 @@ module SorterEvalSpecsRandomMerge =
             RunName = sprintf @"RandMerge-MediumHd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                projectRngType
+                rngTypeLcg
                 sorterEvalTypeV2
                 mediumSortingWidths
                 allSimpleSorterModelTypes
@@ -166,7 +166,7 @@ module SorterEvalSpecsRandomMerge =
             RunName = sprintf @"RandMerge-LargeLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Merge binning for Msce/Mssi/Msrs/Msuf4"
             Spans = [
-                projectRngType
+                rngTypeLcg
                 sorterEvalTypeV2
                 mediumSortingWidths
                 allSimpleSorterModelTypes
