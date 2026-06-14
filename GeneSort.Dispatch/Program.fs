@@ -74,24 +74,24 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** SortableTest **********
-let configType = SortableTestMergeSpecs.configType.Merge_MediumHd
-let executorType = SortableTest.executorType.Generator
-let host: IRunHost = 
-    let spec = SortableTestMergeSpecs.getRunHostSpec configType executorType
-    SortableMergeTestDb.createRunHost spec
+//let configType = SortableTestMergeSpecs.configType.Merge_MediumHd
+//let executorType = SortableTest.executorType.Generator
+//let host: IRunHost = 
+//    let spec = SortableTestMergeSpecs.getRunHostSpec configType executorType
+//    SortableMergeTestDb.createRunHost spec
 
-let executor = SortableTest.SortableTestExecutor.getExecutor executorType
+//let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 
 
 
 //********** SorterEval Standard **********
-//let configType = SorterEvalSpecsRandom.configType.Rand_Test
-//let executorType = sorterEvalExecutorType.StageStatsReport
-//let host: IRunHost = 
-//    let spec = SorterEvalSpecsRandom.getConfig configType executorType
-//    SorterEval.SorterEvalRunHost.createRunHost spec
+let configType = SorterEvalSpecsRandom.configType.Rand_Small
+let executorType = sorterEvalExecutorType.GenStandard
+let host: IRunHost = 
+    let spec = SorterEvalSpecsRandom.getRunHostSpec configType executorType
+    SorterEvalDbs.createRunHost spec
 
-//let executor = SorterEvalExecutor.getExecutor executorType
+let executor = SorterEvalExecutor.getExecutor executorType
 
 
 
@@ -99,7 +99,7 @@ let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 //let configType = SorterEvalSpecsRandomMerge.configType.RandMerge_Single
 //let executorType = sorterEvalExecutorType.GenMerge
 //let host: IRunHost = 
-//    let spec = SorterEvalSpecsRandomMerge.getConfig configType executorType
+//    let spec = SorterEvalSpecsRandomMerge.getRunHostSpec configType executorType
 //    SorterEvalDbs.createRunHost spec
 
 //let executor = SorterEvalExecutor.getExecutor executorType
@@ -109,7 +109,7 @@ let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 //let configType = SorterMutateSpecsRandom.configType.Rand_Test
 //let executorType = sorterMutateExecutorType.MutantReport
 //let host: IRunHost = 
-//    let spec = SorterMutateSpecsRandom.getConfig configType executorType
+//    let spec = SorterMutateSpecsRandom.getRunHostSpec configType executorType
 //    SorterMutate.SorterMutateRunHost.createRunHost spec
 
 //let executor = SorterMutateExecutor.getExecutor executorType
@@ -118,7 +118,7 @@ let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 //let configType = MsceMutateSpecsRm.configType.Rand_Test
 //let executorType = sorterMutateExecutorType.GenMerge
 //let host: IRunHost = 
-//    let spec = MsceMutateSpecsRm.getConfig configType executorType
+//    let spec = MsceMutateSpecsRm.getRunHostSpec configType executorType
 //    MsceMutateDbs.createRunHost spec
 
 //let executor = MsceMutateExecutor.getExecutor executorType
@@ -129,40 +129,40 @@ let maxReplica = 1<replNumber>
 
 
 
-//async {
-//    printfn "Init Project: %s" %host.Run.DatabaseName
+async {
+    printfn "Init Project: %s" %host.Run.DatabaseName
     
-//    let! initResult = 
-//        ParamOps.initProjectAndRunFiles
-//            host.RunDb           
-//            (Some progress) 
-//            host.Run              
-//            minReplica 
-//            maxReplica 
-//            host.AllowOverwrite 
-//            host.ParamMapRefiner      
-//            host.ParameterSpans
+    let! initResult = 
+        ParamOps.initProjectAndRunFiles
+            host.RunDb           
+            (Some progress) 
+            host.Run              
+            minReplica 
+            maxReplica 
+            host.AllowOverwrite 
+            host.ParamMapRefiner      
+            host.ParameterSpans
 
 
-//    match initResult with
-//    | Error e -> printfn "Init Failure: %s" e
-//    | Ok () ->
-//        let! execResult = 
-//            ProjectOps.executeRuns  
-//                minReplica 
-//                maxReplica
-//                host.AllowOverwrite 
-//                cts 
-//                (Some progress)
-//                host
-//                executor
-//                host.MaxParallel
+    match initResult with
+    | Error e -> printfn "Init Failure: %s" e
+    | Ok () ->
+        let! execResult = 
+            ProjectOps.executeRuns  
+                minReplica 
+                maxReplica
+                host.AllowOverwrite 
+                cts 
+                (Some progress)
+                host
+                executor
+                host.MaxParallel
 
-//        match execResult with
-//        | Ok results -> printfn "Success: %d records processed." results.Length
-//        | Error e -> printfn "Runtime Error: %s" e
+        match execResult with
+        | Ok results -> printfn "Success: %d records processed." results.Length
+        | Error e -> printfn "Runtime Error: %s" e
 
-//} |> Async.RunSynchronously
+} |> Async.RunSynchronously
 
 
 
@@ -188,24 +188,24 @@ let maxReplica = 1<replNumber>
 //} |> Async.RunSynchronously
 
 
-async {
+//async {
 
-    let! execResult = 
-        ProjectOps.executeRuns 
-                minReplica 
-                maxReplica
-                host.AllowOverwrite 
-                cts 
-                (Some progress)
-                host
-                executor
-                host.MaxParallel
+//    let! execResult = 
+//        ProjectOps.executeRuns 
+//                minReplica 
+//                maxReplica
+//                host.AllowOverwrite 
+//                cts 
+//                (Some progress)
+//                host
+//                executor
+//                host.MaxParallel
 
-    match execResult with
-    | Ok results -> printfn "Success: %d records processed." results.Length
-    | Error e -> printfn "Runtime Error: %s" e
+//    match execResult with
+//    | Ok results -> printfn "Success: %d records processed." results.Length
+//    | Error e -> printfn "Runtime Error: %s" e
 
-} |> Async.RunSynchronously
+//} |> Async.RunSynchronously
 
 
 

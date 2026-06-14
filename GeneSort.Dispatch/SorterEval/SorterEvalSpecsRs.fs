@@ -38,7 +38,7 @@ module SorterEvalSpecsRandom =
         let Rand_Test (executorType: sorterEvalExecutorType)  : runHostSpec = {
             DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngTypeLcg
                 sorterEvalTypeV2
@@ -55,13 +55,13 @@ module SorterEvalSpecsRandom =
         let Rand_Small (executorType: sorterEvalExecutorType) : runHostSpec = {
             DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngTypeLcg
                 sorterEvalTypeV2
                 smallSortingWidths
                 allSimpleSorterModelTypes
-                largeSorterCount
+                extraLargeSorterCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
@@ -72,7 +72,7 @@ module SorterEvalSpecsRandom =
         let Rand_Medium (executorType: sorterEvalExecutorType) : runHostSpec = {
             DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Medium_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard binning for Msce/Mssi/Msrs/Msuf4"
+            RunDescription = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngTypeLcg
                 sorterEvalTypeV2
