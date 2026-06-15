@@ -31,26 +31,19 @@ module SimpleSorterModelMutator =
         | SmmMsuf6RandMutate msuf6 -> msuf6.Id
 
 
-    let getMsceModelMutator 
-                (sortingWidth: int<sortingWidth>)
-                (simpleSorterModelType: simpleSorterModelType)
+    let getMsceModelMutator
                 (rngFactory: rngFactory)
                 (excludeSelfCe: bool<excludeSelfCe>)
                 (modificationRate: float<modificationRate>)
                 (mutationRate: float<mutationRate>)
                 (insertionRate: float<insertionRate>)
-                (deletionRate: float<deletionRate>) :simpleSorterModelMutator =
-        match simpleSorterModelType with
-        | simpleSorterModelType.Msce -> 
-            (msceRandMutate.create rngFactory 
+                (deletionRate: float<deletionRate>) : simpleSorterModelMutator =
+            msceRandMutate.create rngFactory 
                     (indelRates.createMod 
                             (%modificationRate, %mutationRate, %insertionRate, %deletionRate)
                     )
                     (%excludeSelfCe)
-            )
             |> simpleSorterModelMutator.SmmMsceRandMutate
-
-        | _ -> failwith "Unsupported simple sorter model type for Msce mutator creation."
 
 
     let getMssiModelMutator

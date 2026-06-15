@@ -83,17 +83,13 @@ module MssiMutateExecutor =
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
 
-            let! (mutationRate: float<mutationRate>) =  
-                        rp.GetMutationRate()
-                        |> Result.ofOption "Missing mutationRate in run parameters"
+            let! (orthoRate: float<orthoRate>) =  
+                        rp.GetOrthoRate()
+                        |> Result.ofOption "Missing orthoRate in run parameters"
 
-            let! (insertionRate: float<insertionRate>) =  
-                        rp.GetInsertionRate()
-                        |> Result.ofOption "Missing insertionRate in run parameters"
-
-            let! (deletionRate: float<deletionRate>) =  
-                        rp.GetDeletionRate()
-                        |> Result.ofOption "Missing deletionRate in run parameters"
+            let! (paraRate: float<paraRate>) =  
+                        rp.GetParaRate()
+                        |> Result.ofOption "Missing paraRate in run parameters"
 
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
@@ -133,15 +129,12 @@ module MssiMutateExecutor =
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            sortingWidth
-                                            simpleSorterModelType
+            let sorterModelMutator = SimpleSorterModelMutator.getMssiModelMutator
                                             rngFactory
                                             ExcludeSelfCe
                                             modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
+                                            orthoRate
+                                            paraRate
                                      |> sorterModelMutator.Simple
 
             let childIndexes = [| 0 .. (%sorterChildCount - 1) |]
@@ -189,17 +182,13 @@ module MssiMutateExecutor =
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
 
-            let! (mutationRate: float<mutationRate>) =  
-                        rp.GetMutationRate()
-                        |> Result.ofOption "Missing mutationRate in run parameters"
+            let! (orthoRate: float<orthoRate>) =  
+                        rp.GetOrthoRate()
+                        |> Result.ofOption "Missing orthoRate in run parameters"
 
-            let! (insertionRate: float<insertionRate>) =  
-                        rp.GetInsertionRate()
-                        |> Result.ofOption "Missing insertionRate in run parameters"
-
-            let! (deletionRate: float<deletionRate>) =  
-                        rp.GetDeletionRate()
-                        |> Result.ofOption "Missing deletionRate in run parameters"
+            let! (paraRate: float<paraRate>) =  
+                        rp.GetParaRate()
+                        |> Result.ofOption "Missing paraRate in run parameters"
 
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
@@ -241,15 +230,12 @@ module MssiMutateExecutor =
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            sortingWidth
-                                            simpleSorterModelType
+            let sorterModelMutator = SimpleSorterModelMutator.getMssiModelMutator
                                             rngFactory
                                             ExcludeSelfCe
                                             modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
+                                            orthoRate
+                                            paraRate
                                      |> sorterModelMutator.Simple
 
 
@@ -294,17 +280,13 @@ module MssiMutateExecutor =
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
 
-            let! (mutationRate: float<mutationRate>) =  
-                        rp.GetMutationRate()
-                        |> Result.ofOption "Missing mutationRate in run parameters"
+            let! (orthoRate: float<orthoRate>) =  
+                        rp.GetOrthoRate()
+                        |> Result.ofOption "Missing orthoRate in run parameters"
 
-            let! (insertionRate: float<insertionRate>) =  
-                        rp.GetInsertionRate()
-                        |> Result.ofOption "Missing insertionRate in run parameters"
-
-            let! (deletionRate: float<deletionRate>) =  
-                        rp.GetDeletionRate()
-                        |> Result.ofOption "Missing deletionRate in run parameters"
+            let! (paraRate: float<paraRate>) =  
+                        rp.GetParaRate()
+                        |> Result.ofOption "Missing paraRate in run parameters"
 
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
@@ -325,6 +307,8 @@ module MssiMutateExecutor =
                                             simpleSorterModelType
                                             sorterEvalType.V2
 
+            let rngFactory = rngType |> RngFactory.create
+
             let _sorterEvalSelection = 
                             SorterEvalSelection.makeSelection sem sest
                                         parentSorterSetEval.SorterEvals
@@ -342,15 +326,12 @@ module MssiMutateExecutor =
 
             let simpleSorterModels = parentSorterModelSet.SorterModels |> Array.map (SorterModel.asSimpleSorterModel)
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            sortingWidth
-                                            simpleSorterModelType
-                                            (rngType |> RngFactory.create)
+            let sorterModelMutator = SimpleSorterModelMutator.getMssiModelMutator
+                                            rngFactory
                                             ExcludeSelfCe
                                             modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
+                                            orthoRate
+                                            paraRate
 
             let parentMutantMap = 
                     SimpleSorterModelMutator.makeMutantIdToParentIdMap
@@ -360,8 +341,6 @@ module MssiMutateExecutor =
 
             return (_sorterEvalSelection, parentMutantMap)
         }
-
-
 
 
     let makeMutantMergeDetails (rp:runParameters) : 
@@ -395,17 +374,13 @@ module MssiMutateExecutor =
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
 
-            let! (mutationRate: float<mutationRate>) =  
-                        rp.GetMutationRate()
-                        |> Result.ofOption "Missing mutationRate in run parameters"
+            let! (orthoRate: float<orthoRate>) =  
+                        rp.GetOrthoRate()
+                        |> Result.ofOption "Missing orthoRate in run parameters"
 
-            let! (insertionRate: float<insertionRate>) =  
-                        rp.GetInsertionRate()
-                        |> Result.ofOption "Missing insertionRate in run parameters"
-
-            let! (deletionRate: float<deletionRate>) =  
-                        rp.GetDeletionRate()
-                        |> Result.ofOption "Missing deletionRate in run parameters"
+            let! (paraRate: float<paraRate>) =  
+                        rp.GetParaRate()
+                        |> Result.ofOption "Missing paraRate in run parameters"
 
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
@@ -419,6 +394,7 @@ module MssiMutateExecutor =
                         rp.GetSorterEvalMeasure()
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
+            let rngFactory = rngType |> RngFactory.create
 
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getMergeSorterEvals 
@@ -444,15 +420,12 @@ module MssiMutateExecutor =
                                             parentSorterModelGen
 
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator 
-                                            sortingWidth
-                                            simpleSorterModelType
-                                            (rngType |> RngFactory.create)
+            let sorterModelMutator = SimpleSorterModelMutator.getMssiModelMutator
+                                            rngFactory
                                             ExcludeSelfCe
                                             modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
+                                            orthoRate
+                                            paraRate
 
             let simpleSorterModels = parentSorterModelSet.SorterModels 
                                         |> Array.map (SorterModel.asSimpleSorterModel)

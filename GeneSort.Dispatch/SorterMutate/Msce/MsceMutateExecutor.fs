@@ -133,8 +133,6 @@ module MsceMutateExecutor =
                                             parentSorterModelGen
 
             let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            sortingWidth
-                                            simpleSorterModelType
                                             rngFactory
                                             ExcludeSelfCe
                                             modificationRate
@@ -241,8 +239,6 @@ module MsceMutateExecutor =
                                             parentSorterModelGen
 
             let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            sortingWidth
-                                            simpleSorterModelType
                                             rngFactory
                                             ExcludeSelfCe
                                             modificationRate
@@ -342,8 +338,6 @@ module MsceMutateExecutor =
             let simpleSorterModels = parentSorterModelSet.SorterModels |> Array.map (SorterModel.asSimpleSorterModel)
 
             let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            sortingWidth
-                                            simpleSorterModelType
                                             (rngType |> RngFactory.create)
                                             ExcludeSelfCe
                                             modificationRate
@@ -443,9 +437,7 @@ module MsceMutateExecutor =
                                             parentSorterModelGen
 
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator 
-                                            sortingWidth
-                                            simpleSorterModelType
+            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
                                             (rngType |> RngFactory.create)
                                             ExcludeSelfCe
                                             modificationRate

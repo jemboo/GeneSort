@@ -134,8 +134,6 @@ module MsrsMutateExecutor =
                                             parentSorterModelGen
 
             let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            sortingWidth
-                                            simpleSorterModelType
                                             rngFactory
                                             ExcludeSelfCe
                                             modificationRate
@@ -159,7 +157,6 @@ module MsrsMutateExecutor =
 
             return generateMutantStream parentSorterModelSet.SorterModels
         }
-
 
 
     let makeMutantMergeSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
@@ -242,8 +239,6 @@ module MsrsMutateExecutor =
                                             parentSorterModelGen
 
             let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            sortingWidth
-                                            simpleSorterModelType
                                             rngFactory
                                             ExcludeSelfCe
                                             modificationRate
@@ -343,8 +338,6 @@ module MsrsMutateExecutor =
             let simpleSorterModels = parentSorterModelSet.SorterModels |> Array.map (SorterModel.asSimpleSorterModel)
 
             let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            sortingWidth
-                                            simpleSorterModelType
                                             (rngType |> RngFactory.create)
                                             ExcludeSelfCe
                                             modificationRate
@@ -444,9 +437,7 @@ module MsrsMutateExecutor =
                                             parentSorterModelGen
 
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator 
-                                            sortingWidth
-                                            simpleSorterModelType
+            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
                                             (rngType |> RngFactory.create)
                                             ExcludeSelfCe
                                             modificationRate
