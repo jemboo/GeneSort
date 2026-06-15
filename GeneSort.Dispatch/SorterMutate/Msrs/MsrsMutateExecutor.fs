@@ -83,17 +83,17 @@ module MsrsMutateExecutor =
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
 
-            let! (mutationRate: float<mutationRate>) =  
-                        rp.GetMutationRate()
-                        |> Result.ofOption "Missing mutationRate in run parameters"
+            let! (orthoRate: float<orthoRate>) =  
+                        rp.GetOrthoRate()
+                        |> Result.ofOption "Missing orthoRate in run parameters"
 
-            let! (insertionRate: float<insertionRate>) =  
-                        rp.GetInsertionRate()
-                        |> Result.ofOption "Missing insertionRate in run parameters"
+            let! (paraRate: float<paraRate>) =  
+                        rp.GetParaRate()
+                        |> Result.ofOption "Missing paraRate in run parameters"
 
-            let! (deletionRate: float<deletionRate>) =  
-                        rp.GetDeletionRate()
-                        |> Result.ofOption "Missing deletionRate in run parameters"
+            let! (selfSymRate: float<selfSymRate>) =  
+                        rp.GetSelfSymRate()
+                        |> Result.ofOption "Missing selfSymRate in run parameters"
 
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
@@ -133,13 +133,13 @@ module MsrsMutateExecutor =
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
+            let sorterModelMutator = SimpleSorterModelMutator.getMsrsModelMutator
                                             rngFactory
                                             ExcludeSelfCe
                                             modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
+                                            orthoRate
+                                            paraRate
+                                            selfSymRate
                                      |> sorterModelMutator.Simple
 
             let childIndexes = [| 0 .. (%sorterChildCount - 1) |]
@@ -186,17 +186,17 @@ module MsrsMutateExecutor =
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
 
-            let! (mutationRate: float<mutationRate>) =  
-                        rp.GetMutationRate()
-                        |> Result.ofOption "Missing mutationRate in run parameters"
+            let! (orthoRate: float<orthoRate>) =  
+                        rp.GetOrthoRate()
+                        |> Result.ofOption "Missing orthoRate in run parameters"
 
-            let! (insertionRate: float<insertionRate>) =  
-                        rp.GetInsertionRate()
-                        |> Result.ofOption "Missing insertionRate in run parameters"
+            let! (paraRate: float<paraRate>) =  
+                        rp.GetParaRate()
+                        |> Result.ofOption "Missing paraRate in run parameters"
 
-            let! (deletionRate: float<deletionRate>) =  
-                        rp.GetDeletionRate()
-                        |> Result.ofOption "Missing deletionRate in run parameters"
+            let! (selfSymRate: float<selfSymRate>) =  
+                        rp.GetSelfSymRate()
+                        |> Result.ofOption "Missing selfSymRate in run parameters"
 
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
@@ -238,13 +238,13 @@ module MsrsMutateExecutor =
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
+            let sorterModelMutator = SimpleSorterModelMutator.getMsrsModelMutator
                                             rngFactory
                                             ExcludeSelfCe
                                             modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
+                                            orthoRate
+                                            paraRate
+                                            selfSymRate
                                      |> sorterModelMutator.Simple
 
 
@@ -289,17 +289,17 @@ module MsrsMutateExecutor =
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
 
-            let! (mutationRate: float<mutationRate>) =  
-                        rp.GetMutationRate()
-                        |> Result.ofOption "Missing mutationRate in run parameters"
+            let! (orthoRate: float<orthoRate>) =  
+                        rp.GetOrthoRate()
+                        |> Result.ofOption "Missing orthoRate in run parameters"
 
-            let! (insertionRate: float<insertionRate>) =  
-                        rp.GetInsertionRate()
-                        |> Result.ofOption "Missing insertionRate in run parameters"
+            let! (paraRate: float<paraRate>) =  
+                        rp.GetParaRate()
+                        |> Result.ofOption "Missing paraRate in run parameters"
 
-            let! (deletionRate: float<deletionRate>) =  
-                        rp.GetDeletionRate()
-                        |> Result.ofOption "Missing deletionRate in run parameters"
+            let! (selfSymRate: float<selfSymRate>) =  
+                        rp.GetSelfSymRate()
+                        |> Result.ofOption "Missing selfSymRate in run parameters"
 
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
@@ -313,6 +313,8 @@ module MsrsMutateExecutor =
                         rp.GetSorterEvalMeasure()
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
+
+            let rngFactory = rngType |> RngFactory.create
 
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getStandardSorterEvals 
@@ -335,15 +337,16 @@ module MsrsMutateExecutor =
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let simpleSorterModels = parentSorterModelSet.SorterModels |> Array.map (SorterModel.asSimpleSorterModel)
+            let simpleSorterModels = parentSorterModelSet.SorterModels 
+                                        |> Array.map (SorterModel.asSimpleSorterModel)
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            (rngType |> RngFactory.create)
+            let sorterModelMutator = SimpleSorterModelMutator.getMsrsModelMutator
+                                            rngFactory
                                             ExcludeSelfCe
                                             modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
+                                            orthoRate
+                                            paraRate
+                                            selfSymRate
 
             let parentMutantMap = 
                     SimpleSorterModelMutator.makeMutantIdToParentIdMap
@@ -388,17 +391,17 @@ module MsrsMutateExecutor =
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorter count in run parameters"
 
-            let! (mutationRate: float<mutationRate>) =  
-                        rp.GetMutationRate()
-                        |> Result.ofOption "Missing mutationRate in run parameters"
+            let! (orthoRate: float<orthoRate>) =  
+                        rp.GetOrthoRate()
+                        |> Result.ofOption "Missing orthoRate in run parameters"
 
-            let! (insertionRate: float<insertionRate>) =  
-                        rp.GetInsertionRate()
-                        |> Result.ofOption "Missing insertionRate in run parameters"
+            let! (paraRate: float<paraRate>) =  
+                        rp.GetParaRate()
+                        |> Result.ofOption "Missing paraRate in run parameters"
 
-            let! (deletionRate: float<deletionRate>) =  
-                        rp.GetDeletionRate()
-                        |> Result.ofOption "Missing deletionRate in run parameters"
+            let! (selfSymRate: float<selfSymRate>) =  
+                        rp.GetSelfSymRate()
+                        |> Result.ofOption "Missing selfSymRate in run parameters"
 
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
@@ -412,6 +415,7 @@ module MsrsMutateExecutor =
                         rp.GetSorterEvalMeasure()
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
+            let rngFactory = rngType |> RngFactory.create
 
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getMergeSorterEvals 
@@ -437,13 +441,13 @@ module MsrsMutateExecutor =
                                             parentSorterModelGen
 
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            (rngType |> RngFactory.create)
+            let sorterModelMutator = SimpleSorterModelMutator.getMsrsModelMutator
+                                            rngFactory
                                             ExcludeSelfCe
                                             modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
+                                            orthoRate
+                                            paraRate
+                                            selfSymRate
 
             let simpleSorterModels = parentSorterModelSet.SorterModels 
                                         |> Array.map (SorterModel.asSimpleSorterModel)

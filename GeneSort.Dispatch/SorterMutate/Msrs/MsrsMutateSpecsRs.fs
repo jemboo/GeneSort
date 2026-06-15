@@ -29,21 +29,16 @@ module MsrsMutateSpecsRs =
           .WithRunFinished(Some false)
           .WithId (Some qp.Value.Id)
 
-    
-    let private standardSorterModelTypeFilter (rp: runParameters) =
+    let private paramMapFilter (rp: runParameters) =
         maybe {
-            let! smt = rp.GetSimpleSorterModelType()
             let! sw = rp.GetSortingWidth()
+        
             let has2factor = (%sw % 2 = 0)
-            let isPowerOf2 = (%sw &&& (%sw - 1) = 0)
-            let isGt4 = (%sw > 4)
-            let validMsce = (smt = simpleSorterModelType.Msce)
-            let validMssi = (smt = simpleSorterModelType.Mssi) && has2factor
-            let validMsrs = (smt = simpleSorterModelType.Msrs) && has2factor
-            let validMsuf4 = (smt = simpleSorterModelType.Msuf4) && isPowerOf2 && isGt4
-            return! if validMsce || validMssi || validMsrs || validMsuf4 then Some rp else None
+            let isMuf4able = (MathUtils.isAPowerOfTwo %sw)
+            // We bind to unit just to enforce the filter
+            let! _ = if has2factor then Some () else None
+            return! Some rp
         }
-
 
     module Specs =
 
@@ -64,7 +59,7 @@ module MsrsMutateSpecsRs =
                 msrsModelType
                 testChildCount
             ]
-            Filter = standardSorterModelTypeFilter
+            Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
             MaxParallel = 2
@@ -88,7 +83,7 @@ module MsrsMutateSpecsRs =
                 msrsModelType
                 largeChildCount
             ]
-            Filter = standardSorterModelTypeFilter
+            Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
             MaxParallel = 8
@@ -111,7 +106,7 @@ module MsrsMutateSpecsRs =
                 msrsModelType
                 largeChildCount
             ]
-            Filter = standardSorterModelTypeFilter
+            Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
             MaxParallel = 4

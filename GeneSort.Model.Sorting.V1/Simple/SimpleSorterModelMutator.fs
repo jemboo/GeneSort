@@ -64,9 +64,9 @@ module SimpleSorterModelMutator =
                 (modificationRate: float<modificationRate>)
                 (orthoRate: float<orthoRate>)
                 (paraRate: float<paraRate>) 
-                (symRate: float<selfSymRate>) :simpleSorterModelMutator =
+                (selfSymRate: float<selfSymRate>) :simpleSorterModelMutator =
             msrsRandMutate.create rngFactory 
-                    (opsActionRates.createMod (%modificationRate, %orthoRate, %paraRate, %symRate))
+                    (opsActionRates.createMod (%modificationRate, %orthoRate, %paraRate, %selfSymRate))
             |> simpleSorterModelMutator.SmmMsrsRandMutate
 
 
@@ -78,12 +78,12 @@ module SimpleSorterModelMutator =
                 (modificationRate: float<modificationRate>)
                 (orthoRate: float<orthoRate>)
                 (paraRate: float<paraRate>) 
-                (symRate: float<selfSymRate>) :simpleSorterModelMutator =
+                (selfSymRate: float<selfSymRate>) :simpleSorterModelMutator =
 
             let opsSeedActionRates = 
-                opsActionRates.createMod (%seedModificationRate, %orthoRate, %paraRate, %symRate)
+                opsActionRates.createMod (%seedModificationRate, %orthoRate, %paraRate, %selfSymRate)
             let opsActionRates = 
-                opsActionRates.createMod (%modificationRate, %orthoRate, %paraRate, %symRate)
+                opsActionRates.createMod (%modificationRate, %orthoRate, %paraRate, %selfSymRate)
             let opsSeedTransitionRates = 
                 opsTransitionRates.createUniform2 opsSeedActionRates
             let opsTransitionRates = 
