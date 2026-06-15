@@ -81,17 +81,17 @@ module MsceMutateSpecsRm =
                 insertionRates
                 deletionRates
                 modificationRates
-                testMergeSortingWidth
+                testMergeSortingWidths
                 msceModelType
-                mergeDimension2
+                testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                extraLargeChildCount
+                testChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            MaxParallel = 1
         }
 
         let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {

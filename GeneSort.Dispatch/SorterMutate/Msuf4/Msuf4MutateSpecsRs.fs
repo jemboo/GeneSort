@@ -34,19 +34,16 @@ module Msuf4MutateSpecsRs =
     let private paramMapFilter (rp: runParameters) =
         maybe {
             let! sw = rp.GetSortingWidth()
-        
-            let has2factor = (%sw % 2 = 0)
+            let! isGt4 = if (%sw > 4) then Some () else None
             let isMuf4able = (MathUtils.isAPowerOfTwo %sw)
-            // We bind to unit just to enforce the filter
-            let! _ = if isMuf4able then Some () else None
-            return! Some rp
+            return! if isMuf4able then Some rp else None
         }
 
 
     module Specs =
 
         let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
-            DatabaseName = Muf4MutateDbs.RandomStandard.Uniform.dbName
+            DatabaseName = Msuf4MutateDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msuf4"
             Spans = [
@@ -59,7 +56,7 @@ module Msuf4MutateSpecsRs =
                 selfSymRates
                 noSeedModificationRates
                 modificationRates
-                smallMergeSortingWidths
+                testSortingWidths
                 msuf4ModelType
                 testChildCount
             ]
@@ -71,7 +68,7 @@ module Msuf4MutateSpecsRs =
 
 
         let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
-            DatabaseName = Muf4MutateDbs.RandomStandard.Uniform.dbName
+            DatabaseName = Msuf4MutateDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msuf4"
             Spans = [
@@ -84,7 +81,7 @@ module Msuf4MutateSpecsRs =
                 selfSymRates
                 noSeedModificationRates
                 modificationRates
-                smallMergeSortingWidths
+                smallSortingWidths
                 msuf4ModelType
                 largeChildCount
             ]
@@ -95,7 +92,7 @@ module Msuf4MutateSpecsRs =
         }
 
         let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
-            DatabaseName = Muf4MutateDbs.RandomStandard.Uniform.dbName
+            DatabaseName = Msuf4MutateDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msuf4"
             Spans = [
@@ -108,7 +105,7 @@ module Msuf4MutateSpecsRs =
                 selfSymRates
                 noSeedModificationRates
                 modificationRates
-                mediumMergeSortingWidths
+                mediumSortingWidths
                 msuf4ModelType
                 largeChildCount
             ]

@@ -37,12 +37,10 @@ module MsrsMutateSpecsRm =
     let private paramMapFilter (rp: runParameters) =
         maybe {
             let! sw = rp.GetSortingWidth()
-        
+            let! md = rp.GetMergeDimension()
             let has2factor = (%sw % 2 = 0)
-            let isMuf4able = (MathUtils.isAPowerOfTwo %sw)
-            // We bind to unit just to enforce the filter
-            let! _ = if has2factor then Some () else None
-            return! Some rp
+            let! _ = if (%sw % %md = 0) then Some rp else None
+            return! if has2factor then Some rp else None
         }
 
 
@@ -61,17 +59,17 @@ module MsrsMutateSpecsRm =
                 paraRates
                 selfSymRates
                 modificationRates
-                testMergeSortingWidth
-                allSimpleSorterModelTypes
-                mergeDimension2
+                testMergeSortingWidths
+                msrsModelType
+                testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                largeChildCount
+                testChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            MaxParallel = 1
         }
 
         let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {

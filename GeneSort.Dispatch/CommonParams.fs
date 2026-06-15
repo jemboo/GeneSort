@@ -34,13 +34,14 @@ module CommonParams =
 
 
     // SorterCounts
+    let testSorterCount = (runParameters.sorterCountKey, ["1000";] )
     let smallSorterCount = (runParameters.sorterCountKey, ["100";] )
     let mediumSorterCount = (runParameters.sorterCountKey, ["1000";] )
     let largeSorterCount = (runParameters.sorterCountKey, ["10000";] )
     let extraLargeSorterCount = (runParameters.sorterCountKey, ["100000";] )
     
     // Child SorterCounts
-    let testChildCount = (runParameters.sorterChildCountKey, ["10";] )
+    let testChildCount = (runParameters.sorterChildCountKey, ["100";] )
     let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
     let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )
     let largeChildCount = (runParameters.sorterChildCountKey, ["1000";] )
@@ -63,6 +64,8 @@ module CommonParams =
     let _dataFormatBitVector512 = sortableDataFormat.BitVector512
 
     // MergeDimensions
+    let testMergeDimensions = 
+        (runParameters.mergeDimensionKey, [2; 3; 4;] |> List.map string)
     let allMergeDimensions = 
             (runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
     let mergeDimension2 = 
@@ -82,14 +85,16 @@ module CommonParams =
     
 
     // SortingWidths
+    let testSortingWidths = 
+            (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
     let smallSortingWidths = 
             (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
     let mediumSortingWidths = 
             (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
 
     // MergeSortingWidths
-    let testMergeSortingWidth = 
-            (runParameters.sortingWidthKey, [16;] |> List.map string)
+    let testMergeSortingWidths = 
+            (runParameters.sortingWidthKey, [16; 24; 32;] |> List.map string)
 
     let smallMergeSortingWidths = 
             (runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48; 64] |> List.map string)  
@@ -141,7 +146,7 @@ module CommonParams =
             (runParameters.selfSymRateKey, [1.0;] |> List.map string)
 
     let noSeedModificationRates =
-            (runParameters.modificationRateKey, [0.00] |> List.map string)
+            (runParameters.seedModificationRateKey, [0.00] |> List.map string)
 
     let modificationRates =
             (runParameters.modificationRateKey, [0.005; 0.01; 0.02; 0.04; 0.08 ] |> List.map string)

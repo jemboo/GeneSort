@@ -31,16 +31,15 @@ module MssiMutateSpecsRm =
           .WithRunFinished(Some false)
           .WithId (Some qp.Value.Id)
 
+    
 
     let private paramMapFilter (rp: runParameters) =
         maybe {
             let! sw = rp.GetSortingWidth()
-        
+            let! md = rp.GetMergeDimension()
             let has2factor = (%sw % 2 = 0)
-            let isMuf4able = (MathUtils.isAPowerOfTwo %sw)
-            // We bind to unit just to enforce the filter
-            let! _ = if has2factor then Some () else None
-            return! Some rp
+            let! _ = if (%sw % %md = 0) then Some rp else None
+            return! if has2factor then Some rp else None
         }
 
     module Specs =
@@ -57,17 +56,17 @@ module MssiMutateSpecsRm =
                 orthoRates
                 paraRates
                 modificationRates
-                testMergeSortingWidth
+                testMergeSortingWidths
                 mssiModelType
-                mergeDimension2
+                testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                largeChildCount
+                testChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            MaxParallel = 1
         }
 
         let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {

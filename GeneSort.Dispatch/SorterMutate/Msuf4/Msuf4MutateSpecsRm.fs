@@ -36,19 +36,18 @@ module Msuf4MutateSpecsRm =
     let private paramMapFilter (rp: runParameters) =
         maybe {
             let! sw = rp.GetSortingWidth()
-        
-            let has2factor = (%sw % 2 = 0)
+            let! md = rp.GetMergeDimension()
             let isMuf4able = (MathUtils.isAPowerOfTwo %sw)
-            // We bind to unit just to enforce the filter
-            let! _ = if isMuf4able then Some () else None
-            return! Some rp
+
+            let! _ = if (%sw % %md = 0) then Some rp else None
+            return! if isMuf4able then Some rp else None
         }
 
 
     module Specs =
 
         let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
-            DatabaseName = Muf4MutateDbs.RandomMerge.Uniform.dbName
+            DatabaseName = Msuf4MutateDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"Rand-test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Msuf4"
             Spans = [
@@ -61,21 +60,21 @@ module Msuf4MutateSpecsRm =
                 selfSymRates
                 noSeedModificationRates
                 modificationRates
-                testMergeSortingWidth
+                testMergeSortingWidths
                 msuf4ModelType
-                mergeDimension2
+                testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                largeChildCount
+                testChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            MaxParallel = 1
         }
 
         let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
-            DatabaseName = Muf4MutateDbs.RandomMerge.Uniform.dbName
+            DatabaseName = Msuf4MutateDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Msuf4"
             Spans = [
@@ -102,7 +101,7 @@ module Msuf4MutateSpecsRm =
         }
 
         let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
-            DatabaseName = Muf4MutateDbs.RandomMerge.Uniform.dbName
+            DatabaseName = Msuf4MutateDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Msuf4"
             Spans = [

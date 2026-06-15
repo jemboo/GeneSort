@@ -51,12 +51,42 @@ module DeletionRate =
         | Some v -> sprintf "%f" %v
         | None -> "None"
 
+
+module SeedModificationRate =
+    let toString (w: float<seedModificationRate> option) : string =
+       match w with
+        | Some v -> sprintf "%f" %v
+        | None -> "None"
+
+
 module ModificationRate =
 
     let toString (w: float<modificationRate> option) : string =
        match w with
         | Some v -> sprintf "%f" %v
         | None -> "None"
+
+
+module OrthoRate =
+    let toString (w: float<orthoRate> option) : string =
+       match w with
+        | Some v -> sprintf "%f" %v
+        | None -> "None"
+
+
+module ParaRate =
+    let toString (w: float<paraRate> option) : string =
+       match w with
+        | Some v -> sprintf "%f" %v
+        | None -> "None"
+
+
+module SelfSymRate =
+    let toString (w: float<selfSymRate> option) : string =
+       match w with
+        | Some v -> sprintf "%f" %v
+        | None -> "None"
+
 
 
 module CommonGen =

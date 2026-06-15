@@ -13,6 +13,9 @@ open GeneSort.Dispatch.V1.SortableTest
 open System.IO
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.SorterMutate.Msce
+open GeneSort.Dispatch.V1.SorterMutate.Mssi
+open GeneSort.Dispatch.V1.SorterMutate.Msrs
+open GeneSort.Dispatch.V1.SorterMutate.Msuf4
 
 
 
@@ -74,7 +77,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** SortableTest **********
-//let configType = SortableTestMergeSpecs.configType.Merge_MediumHd
+//let configType = SortableTestMergeSpecs.configType.Merge_Test
 //let executorType = SortableTest.executorType.Generator
 //let host: IRunHost = 
 //    let spec = SortableTestMergeSpecs.getRunHostSpec configType executorType
@@ -85,36 +88,35 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** SorterEval Standard **********
-//let configType = SorterEvalSpecsRs.configType.Rand_Medium
+//let configType = SorterEvalSpecsRs.configType.Rand_Test
 //let executorType = sorterEvalExecutorType.GenStandard
 //let host: IRunHost = 
 //    let spec = SorterEvalSpecsRs.getRunHostSpec configType executorType
 //    SorterEvalDbs.createRunHost spec
-
 //let executor = SorterEvalExecutor.getExecutor executorType
 
 
 
 //********** SorterEval Merge **********
-let configType = SorterEvalSpecsRm.configType.RandMerge_MediumLd
-let executorType = sorterEvalExecutorType.GenMerge
-let host: IRunHost = 
-    let spec = SorterEvalSpecsRm.getRunHostSpec configType executorType
-    SorterEvalDbs.createRunHost spec
-
-let executor = SorterEvalExecutor.getExecutor executorType
-
-
-
-//let configType = SorterMutateSpecsRandom.configType.Rand_Test
-//let executorType = sorterMutateExecutorType.MutantReport
+//let configType = SorterEvalSpecsRm.configType.RandMerge_Test
+//let executorType = sorterEvalExecutorType.GenMerge
 //let host: IRunHost = 
-//    let spec = SorterMutateSpecsRandom.getRunHostSpec configType executorType
-//    SorterMutate.SorterMutateRunHost.createRunHost spec
+//    let spec = SorterEvalSpecsRm.getRunHostSpec configType executorType
+//    SorterEvalDbs.createRunHost spec
 
-//let executor = SorterMutateExecutor.getExecutor executorType
+//let executor = SorterEvalExecutor.getExecutor executorType
 
 
+//********** MsceMutateSpecsRs **********
+//let configType = MsceMutateSpecsRs.configType.Rand_Test
+//let executorType = sorterMutateExecutorType.GenStandard
+//let host: IRunHost = 
+//    let spec = MsceMutateSpecsRs.getRunHostSpec configType executorType
+//    MsceMutateDbs.createRunHost spec
+
+//let executor = MsceMutateExecutor.getExecutor executorType
+
+//********** MsceMutateSpecsRm **********
 //let configType = MsceMutateSpecsRm.configType.Rand_Test
 //let executorType = sorterMutateExecutorType.GenMerge
 //let host: IRunHost = 
@@ -124,12 +126,77 @@ let executor = SorterEvalExecutor.getExecutor executorType
 //let executor = MsceMutateExecutor.getExecutor executorType
 
 
+
+//********** MssiMutateSpecsRs **********
+//let configType = MssiMutateSpecsRs.configType.Rand_Test
+//let executorType = sorterMutateExecutorType.GenStandard
+//let host: IRunHost = 
+//    let spec = MssiMutateSpecsRs.getRunHostSpec configType executorType
+//    MssiMutateDbs.createRunHost spec
+
+//let executor = MssiMutateExecutor.getExecutor executorType
+
+
+//********** MssiMutateSpecsRm **********
+//let configType = MssiMutateSpecsRm.configType.Rand_Test
+//let executorType = sorterMutateExecutorType.GenMerge
+//let host: IRunHost = 
+//    let spec = MssiMutateSpecsRm.getRunHostSpec configType executorType
+//    MssiMutateDbs.createRunHost spec
+
+//let executor = MssiMutateExecutor.getExecutor executorType
+
+
+
+//********** MsrsMutateSpecsRs **********
+//let configType = MsrsMutateSpecsRs.configType.Rand_Test
+//let executorType = sorterMutateExecutorType.GenStandard
+//let host: IRunHost = 
+//    let spec = MsrsMutateSpecsRs.getRunHostSpec configType executorType
+//    MsrsMutateDbs.createRunHost spec
+
+//let executor = MsrsMutateExecutor.getExecutor executorType
+
+
+//********** MsrsMutateSpecsRm **********
+//let configType = MsrsMutateSpecsRm.configType.Rand_Test
+//let executorType = sorterMutateExecutorType.GenMerge
+//let host: IRunHost = 
+//    let spec = MsrsMutateSpecsRm.getRunHostSpec configType executorType
+//    MsrsMutateDbs.createRunHost spec
+
+//let executor = MsrsMutateExecutor.getExecutor executorType
+
+
+
+
+//********** Msuf4MutateSpecsRs **********
+//let configType = Msuf4MutateSpecsRs.configType.Rand_Test
+//let executorType = sorterMutateExecutorType.GenStandard
+//let host: IRunHost = 
+//    let spec = Msuf4MutateSpecsRs.getRunHostSpec configType executorType
+//    Msuf4MutateDbs.createRunHost spec
+
+//let executor = Msuf4MutateExecutor.getExecutor executorType
+
+
+//********** Msuf4MutateSpecsRm **********
+let configType = Msuf4MutateSpecsRm.configType.Rand_Test
+let executorType = sorterMutateExecutorType.GenMerge
+let host: IRunHost = 
+    let spec = Msuf4MutateSpecsRm.getRunHostSpec configType executorType
+    Msuf4MutateDbs.createRunHost spec
+
+let executor = Msuf4MutateExecutor.getExecutor executorType
+
+
 let minReplica = 0<replNumber>
 let maxReplica = 1<replNumber>
 
 
 
 async {
+
     printfn "Init Project: %s" %host.Run.DatabaseName
     
     let! initResult = 

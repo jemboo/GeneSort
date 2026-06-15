@@ -52,26 +52,6 @@ module SorterEvalSpecsRm =
 
     module Specs =
 
-        let RandMerge_Single (executorType: sorterEvalExecutorType) : runHostSpec = {
-            DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge-Single_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
-            Spans = [   
-                rngTypeLcg
-                sorterEvalTypeV2
-                (runParameters.sortingWidthKey, [32] |> List.map string)
-                allSimpleSorterModelTypes
-                (runParameters.mergeDimensionKey, [8;] |> List.map string)
-                (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix;] |> List.map MergeSuffixType.toString)
-                dataFormatInt8v512
-                smallSorterCount
-            ]
-            Filter = paramMapFilter
-            Enhancer = mergeEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
-        }
-
         let RandMerge_Test (executorType: sorterEvalExecutorType) : runHostSpec = {
             DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
             RunName = sprintf @"RandMerge-Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
@@ -82,14 +62,14 @@ module SorterEvalSpecsRm =
                 allSimpleSorterModelTypes
                 noSuffixSuffixType
                 sorterEvalTypeV2
-                smallMergeSortingWidths
-                lowMergeDimensions
-                smallSorterCount
+                testMergeSortingWidths
+                testMergeDimensions
+                testSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            MaxParallel = 1
         }
 
 
@@ -178,7 +158,6 @@ module SorterEvalSpecsRm =
 
 
     type configType =
-        | RandMerge_Single
         | RandMerge_Test
         | RandMerge_Small
         | RandMerge_MediumLd
@@ -188,7 +167,6 @@ module SorterEvalSpecsRm =
 
     let Configs = Map.ofList 
                     [ 
-                        (configType.RandMerge_Single, Specs.RandMerge_Single);
                         (configType.RandMerge_Test, Specs.RandMerge_Test); 
                         (configType.RandMerge_Small, Specs.RandMerge_Small);
                         (configType.RandMerge_MediumLd, Specs.RandMerge_MediumLd);

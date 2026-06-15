@@ -42,14 +42,14 @@ module SorterEvalSpecsRs =
             Spans = [
                 rngTypeLcg
                 sorterEvalTypeV2
-                smallSortingWidths
+                testSortingWidths
                 allSimpleSorterModelTypes
-                smallSorterCount
+                testSorterCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 2
+            MaxParallel = 1
         }
 
         let Rand_Small (executorType: sorterEvalExecutorType) : runHostSpec = {

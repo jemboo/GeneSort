@@ -62,13 +62,13 @@ module MsceMutateSpecsRs =
                 insertionRates
                 deletionRates
                 modificationRates
-                smallSortingWidths
-                smallChildCount
+                testSortingWidths
+                testChildCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 2
+            MaxParallel = 1
         }
 
 

@@ -32,12 +32,8 @@ module MsrsMutateSpecsRs =
     let private paramMapFilter (rp: runParameters) =
         maybe {
             let! sw = rp.GetSortingWidth()
-        
             let has2factor = (%sw % 2 = 0)
-            let isMuf4able = (MathUtils.isAPowerOfTwo %sw)
-            // We bind to unit just to enforce the filter
-            let! _ = if has2factor then Some () else None
-            return! Some rp
+            return! if has2factor then Some rp else None
         }
 
     module Specs =
@@ -55,16 +51,15 @@ module MsrsMutateSpecsRs =
                 paraRates
                 selfSymRates
                 modificationRates
-                smallSortingWidths
+                testSortingWidths
                 msrsModelType
                 testChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 2
+            MaxParallel = 1
         }
-
 
         let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
             DatabaseName = MsrsMutateDbs.RandomStandard.Uniform.dbName

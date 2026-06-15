@@ -33,14 +33,9 @@ module MssiMutateSpecsRs =
     let private paramMapFilter (rp: runParameters) =
         maybe {
             let! sw = rp.GetSortingWidth()
-        
             let has2factor = (%sw % 2 = 0)
-            let isMuf4able = (MathUtils.isAPowerOfTwo %sw)
-            // We bind to unit just to enforce the filter
-            let! _ = if has2factor then Some () else None
-            return! Some rp
+            return! if has2factor then Some rp else None
         }
-
 
     module Specs =
 
@@ -56,14 +51,14 @@ module MssiMutateSpecsRs =
                 orthoRates
                 paraRates
                 modificationRates
-                smallSortingWidths
+                testSortingWidths
                 mssiModelType
                 testChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 2
+            MaxParallel = 1
         }
 
 

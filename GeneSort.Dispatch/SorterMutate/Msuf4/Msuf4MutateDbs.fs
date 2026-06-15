@@ -12,7 +12,7 @@ open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
 
-module Muf4MutateDbs =
+module Msuf4MutateDbs =
     
     let projectName = "SorterMutate.Msuf4" |> UMX.tag<projectName>
 
@@ -33,9 +33,10 @@ module Muf4MutateDbs =
                             (sw: int<sortingWidth>) 
                             (smt: simpleSorterModelType) 
                             (set: sorterEvalType)
-                            (mut: float<mutationRate>)
-                            (ins: float<insertionRate>)
-                            (del: float<deletionRate>)
+                            (orthoRate: float<orthoRate>)
+                            (paraRate: float<paraRate>)
+                            (selfSymRate: float<selfSymRate>)
+                            (smdr: float<seedModificationRate>)
                             (mdr: float<modificationRate>)
                             (odt: outputDataType) : queryParams =
                 queryParams.create dbName (Some repl) odt
@@ -46,9 +47,10 @@ module Muf4MutateDbs =
                        (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                        (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString)
-                       (runParameters.mutationRateKey, (Some mut) |> MutationRate.toString)
-                       (runParameters.insertionRateKey, (Some ins) |> InsertionRate.toString)
-                       (runParameters.deletionRateKey, (Some del) |> DeletionRate.toString)
+                       (runParameters.orthoRateKey, (Some orthoRate) |> OrthoRate.toString)
+                       (runParameters.paraRateKey, (Some paraRate) |> ParaRate.toString)
+                       (runParameters.selfSymRateKey, (Some selfSymRate) |> SelfSymRate.toString)
+                       (runParameters.seedModificationRateKey, (Some smdr) |> SeedModificationRate.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
                     |]
 
@@ -64,11 +66,12 @@ module Muf4MutateDbs =
                     let! smt = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! set = rp.GetSorterEvalType()
-                    let! mut = rp.GetMutationRate()
-                    let! ins = rp.GetInsertionRate()
-                    let! del = rp.GetDeletionRate()
+                    let! ortho = rp.GetOrthoRate()
+                    let! para = rp.GetParaRate()
+                    let! sym = rp.GetSelfSymRate()
+                    let! smdr = rp.GetSeedModificationRate()
                     let! mdr = rp.GetModificationRate()
-                    return makeQueryParams rng ses sem repl sw smt set mut ins del mdr odt 
+                    return makeQueryParams rng ses sem repl sw smt set ortho para sym smdr mdr odt 
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -94,9 +97,10 @@ module Muf4MutateDbs =
                         (mergeSuffixType: mergeSuffixType)
                         (sortableDataFormat: sortableDataFormat) 
                         (set: sorterEvalType)
-                        (mut: float<mutationRate>)
-                        (ins: float<insertionRate>)
-                        (del: float<deletionRate>)
+                        (orthoRate: float<orthoRate>)
+                        (paraRate: float<paraRate>)
+                        (selfSymRate: float<selfSymRate>)
+                        (smdr: float<seedModificationRate>)
                         (mdr: float<modificationRate>)
                         (outputDataType: outputDataType) : queryParams =
 
@@ -113,9 +117,10 @@ module Muf4MutateDbs =
                        (runParameters.mergeDimensionKey, string %mergeDimension);
                        (runParameters.mergeSuffixTypeKey, mergeSuffixType |> MergeSuffixType.toString);
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString) 
-                       (runParameters.mutationRateKey, (Some mut) |> MutationRate.toString)
-                       (runParameters.insertionRateKey, (Some ins) |> InsertionRate.toString)
-                       (runParameters.deletionRateKey, (Some del) |> DeletionRate.toString)
+                       (runParameters.orthoRateKey, (Some orthoRate) |> OrthoRate.toString)
+                       (runParameters.paraRateKey, (Some paraRate) |> ParaRate.toString)
+                       (runParameters.selfSymRateKey, (Some selfSymRate) |> SelfSymRate.toString)
+                       (runParameters.seedModificationRateKey, (Some smdr) |> SeedModificationRate.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
                        (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
                     |]
@@ -135,11 +140,12 @@ module Muf4MutateDbs =
                     let! smt = rp.GetSimpleSorterModelType()
                     let! sdf = rp.GetSortableDataFormat()
                     let! set = rp.GetSorterEvalType()
-                    let! mut = rp.GetMutationRate()
-                    let! ins = rp.GetInsertionRate()
-                    let! del = rp.GetDeletionRate()
+                    let! ortho = rp.GetOrthoRate()
+                    let! para = rp.GetParaRate()
+                    let! sym = rp.GetSelfSymRate()
+                    let! smdr = rp.GetSeedModificationRate()
                     let! mdr = rp.GetModificationRate()
-                    return makeQueryParams rng ses sem repl sw smt md mst sdf set mut ins del mdr odt
+                    return makeQueryParams rng ses sem repl sw smt md mst sdf set ortho para sym smdr mdr odt
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
