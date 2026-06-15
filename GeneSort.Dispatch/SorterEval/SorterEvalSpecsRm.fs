@@ -166,8 +166,8 @@ module SorterEvalSpecsRm =
                 noSuffixSuffixType
                 allSimpleSorterModelTypes
                 sorterEvalTypeV2
-                mediumMergeSortingWidths
-                highMergeDimensions
+                largeMergeSortingWidths
+                mergeDimension2
                 mediumSorterCount
             ]
             Filter = paramMapFilter

@@ -96,7 +96,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** SorterEval Merge **********
-let configType = SorterEvalSpecsRm.configType.RandMerge_Small
+let configType = SorterEvalSpecsRm.configType.RandMerge_MediumLd
 let executorType = sorterEvalExecutorType.GenMerge
 let host: IRunHost = 
     let spec = SorterEvalSpecsRm.getRunHostSpec configType executorType
