@@ -357,107 +357,6 @@ module MsceMutateExecutor =
 
 
 
-    let makeMutantMergeDetails (rp:runParameters) : 
-                    Async<Result<
-                            sorterEvalSelection * 
-                            Map<Guid<sorterModelId>, Guid<sorterModelId>>, 
-                            string>> =
-        asyncResult {
-
-            let! (rngType: rngType) =  
-                        rp.GetRngType()
-                        |> Result.ofOption "Missing RNG type in run parameters"
-
-            let! (sortingWidth: int<sortingWidth>) = 
-                        rp.GetSortingWidth() 
-                        |> Result.ofOption "Missing sorting width in run parameters"
-    
-            let! (simpleSorterModelType: simpleSorterModelType) = 
-                        rp.GetSimpleSorterModelType() 
-                        |> Result.ofOption "Missing simple sorter model type in run parameters"
-
-            let! (mergeDimension: int<mergeDimension>) = 
-                        rp.GetMergeDimension() 
-                        |> Result.ofOption "Missing mergeDimension in run parameters"
-
-            let! (mergeSuffixType: mergeSuffixType) = 
-                        rp.GetMergeSuffixType() 
-                        |> Result.ofOption "Missing mergeSuffixType in run parameters"
-
-            let! (sorterChildCount: int<sorterCount>) = 
-                        rp.GetSorterChildCount()
-                        |> Result.ofOption "Missing parent sorter count in run parameters"
-
-            let! (mutationRate: float<mutationRate>) =  
-                        rp.GetMutationRate()
-                        |> Result.ofOption "Missing mutationRate in run parameters"
-
-            let! (insertionRate: float<insertionRate>) =  
-                        rp.GetInsertionRate()
-                        |> Result.ofOption "Missing insertionRate in run parameters"
-
-            let! (deletionRate: float<deletionRate>) =  
-                        rp.GetDeletionRate()
-                        |> Result.ofOption "Missing deletionRate in run parameters"
-
-            let! (modificationRate: float<modificationRate>) =  
-                        rp.GetModificationRate()
-                        |> Result.ofOption "Missing modificationRate in run parameters"
-
-            let! (sest: sorterEvalSelectionType) = 
-                        rp.GetSorterEvalSelectionType()
-                        |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
-
-            let! (sem:sorterEvalMeasure) = 
-                        rp.GetSorterEvalMeasure()
-                        |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
-
-
-            let! (parentSorterSetEval: sorterSetEval) =
-                        SorterEvalDbs.getMergeSorterEvals 
-                                        sortingWidth 
-                                        simpleSorterModelType 
-                                        mergeDimension 
-                                        mergeSuffixType
-                                        sorterEvalType.V2
-
-            let _sorterEvalSelection = 
-                            SorterEvalSelection.makeSelection sem sest
-                                        parentSorterSetEval.SorterEvals
-                                        parentSorterSetEval.SorterTestId
-
-            let (parentSorterModelGen: sorterModelGen) = 
-                CommonSorterEval.getSimpleUniformSorterModelGen 
-                                        rngType 
-                                        sortingWidth 
-                                        simpleSorterModelType
-
-            let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
-                                            (Guid.Empty |> UMX.tag)
-                                            parentSorterModelGen
-
-
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            (rngType |> RngFactory.create)
-                                            ExcludeSelfCe
-                                            modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
-
-            let simpleSorterModels = parentSorterModelSet.SorterModels 
-                                        |> Array.map (SorterModel.asSimpleSorterModel)
-
-            let parentMutantMap = 
-                    SimpleSorterModelMutator.makeMutantIdToParentIdMap
-                                        sorterModelMutator
-                                        simpleSorterModels
-                                        %sorterChildCount
-
-            return (_sorterEvalSelection, parentMutantMap)
-        }
-
-
     let _evaluateMutants 
             (makeMutantSorterModels: runParameters -> Async<Result<sorterModel seq, string>> )
             (makeSortableTests: runParameters -> Async<Result<sortableTest, string>>)
@@ -701,13 +600,6 @@ module MsceMutateExecutor =
                     makeMutantDetails
                     host rp allowOverwrite cts progress }
 
-    let mutantMergeReportExecutor =
-        { new IRunParamsExecutor with
-            member _.Execute host rp allowOverwrite cts progress =
-                makeMutantReport
-                    makeMutantMergeDetails
-                    host rp allowOverwrite cts progress }
-
 
 
     let getExecutor (executorType: sorterMutateExecutorType) : IRunParamsExecutor =
@@ -716,7 +608,6 @@ module MsceMutateExecutor =
         | sorterMutateExecutorType.GenMerge -> mergeExecutor
         | sorterMutateExecutorType.FullReport -> fullReportExecutor
         | sorterMutateExecutorType.MutantReport -> mutantReportExecutor
-        | sorterMutateExecutorType.MutantMergeReport -> mutantMergeReportExecutor
 
 
 

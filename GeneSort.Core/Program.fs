@@ -41,10 +41,10 @@ module Example =
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
-    //LatticeLevelSetMap.getStats
+    let rootDir = @"C:\Projects\SorterMutate.Msrs\Rmu\Data\Report\TextReport_MutantReport"
     DataTableReport.concatenateAllFiles 
-                @"C:\Projects\SorterMutate\RandomMergeUniform\Data\Report\TextReport_MutantReport\"
-                @"C:\Projects\SorterMutate\RandomMergeUniform\Data\Report\TextReport_MutantReport\MergeBins_report.txt"
+                rootDir
+                $"{rootDir}\\MergeBins_report.txt"
 
 
     printfn "end: %s" (DateTime.Now.ToLongTimeString())

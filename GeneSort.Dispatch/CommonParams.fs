@@ -41,7 +41,7 @@ module CommonParams =
     let extraLargeSorterCount = (runParameters.sorterCountKey, ["100000";] )
     
     // Child SorterCounts
-    let testChildCount = (runParameters.sorterChildCountKey, ["100";] )
+    let testChildCount = (runParameters.sorterChildCountKey, ["1000";] )
     let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
     let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )
     let largeChildCount = (runParameters.sorterChildCountKey, ["1000";] )
@@ -149,7 +149,7 @@ module CommonParams =
             (runParameters.seedModificationRateKey, [0.00] |> List.map string)
 
     let modificationRates =
-            (runParameters.modificationRateKey, [0.005; 0.01; 0.02; 0.04; 0.08 ] |> List.map string)
+            (runParameters.modificationRateKey, [ 0.0025; 0.01; 0.04; 0.16 ] |> List.map string)
 
 
 
