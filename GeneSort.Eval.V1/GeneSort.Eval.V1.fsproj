@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Common.fs" />
+    <Compile Include="CommonEval.fs" />
     <Compile Include="Sgd\Sgd.fs" />
     <Compile Include="SorterEvalSelection.fs" />
     <Compile Include="SorterEvalBinStats.fs" />
