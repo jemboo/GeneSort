@@ -62,7 +62,7 @@ type msuf6RandGen =
     interface IEquatable<msuf6RandGen> with
         member this.Equals(other) = this.id = other.id
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
+    member this.MakeSorterModelId (index: int<sortingGenIndex>) : Guid<sorterModelId> =
         CommonGen.makeSorterModelId this.Id index
 
     member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msuf6 =
@@ -79,7 +79,7 @@ type msuf6RandGen =
 
         msuf6.create id width twoOrbitUnfolder6s
 
-    member this.MakeSorterModelFromIndex (index: int) : msuf6 =
+    member this.MakeSorterModelFromIndex (index: int<sortingGenIndex>) : msuf6 =
         let id = this.MakeSorterModelId index
         this.MakeSorterModelFromId id
 

@@ -11,6 +11,7 @@ open GeneSort.Core
 [<Measure>] type sorterPairModelId
 [<Measure>] type sorterModelGenId
 [<Measure>] type sorterModelMutatorId
+[<Measure>] type sortingGenIndex
 [<Measure>] type sortingGenId
 [<Measure>] type sortingMutatorId
 [<Measure>] type sortingGenSegmentId
@@ -20,6 +21,7 @@ open GeneSort.Core
 
 [<Measure>] type modificationRate
 [<Measure>] type seedModificationRate
+[<Measure>] type sorterMutationIndex
 [<Measure>] type mutationRate
 [<Measure>] type insertionRate
 [<Measure>] type deletionRate
@@ -93,11 +95,11 @@ module CommonGen =
 
     let makeSorterModelId 
                 (id:  Guid<sorterModelGenId>) 
-                (index:int) : Guid<sorterModelId> = 
+                (index:int<sortingGenIndex>) : Guid<sorterModelId> = 
         [
             box "CommonGen.makeSorterModelId"
             box (id |> UMX.untag)
-            box index
+            box (index |> UMX.untag)
         ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
 
 
@@ -107,10 +109,10 @@ module CommonMutator =
     let makeSorterModelId 
                 (parentId: Guid<sorterModelId>)
                 (id:  Guid<sorterModelMutatorId>) 
-                (index:int) : Guid<sorterModelId> = 
+                (index: int<sorterMutationIndex>): Guid<sorterModelId> = 
         [
             box "CommonMutator.makeSorterModelId"
             box (parentId |> UMX.untag)
             box (id |> UMX.untag)
-            box index
+            box (index |> UMX.untag)
         ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>

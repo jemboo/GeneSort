@@ -65,7 +65,7 @@ type msrsRandGen =
             this.Id = other.Id
 
         
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
+    member this.MakeSorterModelId (index: int<sortingGenIndex>) : Guid<sorterModelId> =
         CommonGen.makeSorterModelId this.Id index
 
 
@@ -85,7 +85,7 @@ type msrsRandGen =
         msrs.create id this.SortingWidth perm_Rss
 
 
-    member this.MakeSorterModelFromIndex (index: int) : msrs =
+    member this.MakeSorterModelFromIndex (index: int<sortingGenIndex>) : msrs =
         let id = this.MakeSorterModelId index
         this.MakeSorterModelFromId id
 

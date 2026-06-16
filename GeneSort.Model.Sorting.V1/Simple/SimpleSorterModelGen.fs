@@ -72,7 +72,7 @@ module SimpleSorterModelGen =
         | SmmMsuf6RandGen msuf6 -> msuf6.CeLength
 
 
-    let makeSorterModelFromIndex (index: int)  (model: simpleSorterModelGen) : simpleSorterModel =
+    let makeSorterModelFromIndex (index: int<sortingGenIndex>)  (model: simpleSorterModelGen) : simpleSorterModel =
         match model with
         | SmmMsceRandGen msce -> msce.MakeSorterModelFromIndex index |> simpleSorterModel.Msce
         | SmmMssiRandGen mssi -> mssi.MakeSorterModelFromIndex index |> simpleSorterModel.Mssi
@@ -93,7 +93,11 @@ module SimpleSorterModelGen =
     let makeSorterModelsFromIndexSpan (firstIndex:int<sorterCount>) 
                        (count: int<sorterCount>) 
                        (model: simpleSorterModelGen) : simpleSorterModel[] =
-        [| for i in 0 .. %count - 1 -> makeSorterModelFromIndex (%firstIndex + i) model |]
+        [| for i in 0 .. %count - 1 -> 
+                makeSorterModelFromIndex 
+                        ((%firstIndex + i) |> UMX.tag<sortingGenIndex>) 
+                        model 
+        |]
 
 
     let makeSorterModelsFromIds (ids:Guid<sorterModelId> seq) 

@@ -102,7 +102,7 @@ module SimpleSorterModelMutator =
     let makeMutantSorterModelIdFromIndex 
                 (mutatorModel: simpleSorterModelMutator) 
                 (parentModel: simpleSorterModel)
-                (index: int)  : Guid<sorterModelId> =
+                (index: int<sorterMutationIndex>)  : Guid<sorterModelId> =
         match (mutatorModel, parentModel) with
         | (SmmMsceRandMutate msce, Msce parent) -> msce.MakeSorterModelId parent index
         | (SmmMssiRandMutate mssi, Mssi parent) -> mssi.MakeSorterModelId parent index
@@ -115,7 +115,7 @@ module SimpleSorterModelMutator =
     let makeMutantSorterModelFromIndex 
                 (mutatorModel: simpleSorterModelMutator) 
                 (parentModel: simpleSorterModel)
-                (index: int)  : simpleSorterModel =
+                (index: int<sorterMutationIndex>)  : simpleSorterModel =
         match (mutatorModel, parentModel) with
         | (SmmMsceRandMutate msce, Msce parent) -> msce.MakeSorterModelFromIndex parent index |> simpleSorterModel.Msce
         | (SmmMssiRandMutate mssi, Mssi parent) -> mssi.MakeSorterModelFromIndex parent index |> simpleSorterModel.Mssi
@@ -161,7 +161,10 @@ module SimpleSorterModelMutator =
         |> Array.collect (fun parentModel ->
             let parentId = getParentId parentModel
             Array.init count (fun index ->
-                let mutantId = makeMutantSorterModelIdFromIndex mutatorModel parentModel index
+                let mutantId = makeMutantSorterModelIdFromIndex 
+                                        mutatorModel 
+                                        parentModel 
+                                        (index |> UMX.tag<sorterMutationIndex>)
                 (mutantId, parentId)
             )
         )

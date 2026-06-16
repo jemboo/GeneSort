@@ -49,7 +49,7 @@ type msuf6RandMutate =
 
     member this.MakeSorterModelId 
                 (parent: msuf6) 
-                (index: int) : Guid<sorterModelId> =
+                (index: int<sorterMutationIndex>) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId parent.Id this.Id index
 
     member this.MakeSorterModelFromId 
@@ -69,7 +69,7 @@ type msuf6RandMutate =
 
     member this.MakeSorterModelFromIndex 
                         (parent: msuf6)
-                        (index: int)  : msuf6 =
+                        (index: int<sorterMutationIndex>)  : msuf6 =
         let id = this.MakeSorterModelId parent index
         id |> this.MakeSorterModelFromId parent
 

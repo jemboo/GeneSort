@@ -66,7 +66,7 @@ type mssiRandGen =
             this.stageLength = other.stageLength
 
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
+    member this.MakeSorterModelId (index: int<sortingGenIndex>) : Guid<sorterModelId> =
         CommonGen.makeSorterModelId this.Id index
 
 
@@ -78,7 +78,7 @@ type mssiRandGen =
         mssi.create id this.SortingWidth perm_Sis
 
 
-    member this.MakeSorterModelFromIndex (index: int) : mssi =
+    member this.MakeSorterModelFromIndex (index: int<sortingGenIndex>) : mssi =
         let id = this.MakeSorterModelId index
         this.MakeSorterModelFromId id
 

@@ -69,7 +69,7 @@ type msceRandGen =
             this.ceLength = other.ceLength
 
 
-    member this.MakeSorterModelId (index: int) : Guid<sorterModelId> =
+    member this.MakeSorterModelId (index: int<sortingGenIndex>) : Guid<sorterModelId> =
         CommonGen.makeSorterModelId this.Id index
 
     member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msce =
@@ -90,7 +90,7 @@ type msceRandGen =
             ceCodes
 
 
-    member this.MakeSorterModelFromIndex (index: int) : msce =
+    member this.MakeSorterModelFromIndex (index: int<sortingGenIndex>) : msce =
         let id = this.MakeSorterModelId index
         this.MakeSorterModelFromId id
 

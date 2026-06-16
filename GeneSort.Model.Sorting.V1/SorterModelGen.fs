@@ -33,7 +33,7 @@ module SorterModelGen =
         | Unknown -> failwith "Unknown sorterModelGen"
 
 
-    let makeSorterModelFromIndex (index: int)  (model: sorterModelGen) : sorterModel =
+    let makeSorterModelFromIndex (index: int<sortingGenIndex>)  (model: sorterModelGen) : sorterModel =
         match model with
         | Simple ssmg -> SimpleSorterModelGen.makeSorterModelFromIndex index ssmg |> sorterModel.Simple
         | Unknown -> failwith "Unknown sorterModelGen"
