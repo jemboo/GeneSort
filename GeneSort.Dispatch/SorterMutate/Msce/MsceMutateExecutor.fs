@@ -43,7 +43,7 @@ module MsceMutateExecutor =
         }
 
 
-    let makeMergeTests (rp: runParameters) : Async<Result<Sortable.sortableTest, string>> =
+    let makeMergeTests (rp: runParameters) : Async<Result<sortableTest, string>> =
         async {
             let paramsOpt = option {
                 let repl = 0 |> UMX.tag<replNumber>   

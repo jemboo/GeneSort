@@ -127,7 +127,7 @@ module SorterEvalSpecsRm =
                 sorterEvalTypeV2
                 sortingWidth96
                 mergeDimension6
-                mediumSorterCount
+                largeSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer
@@ -148,7 +148,7 @@ module SorterEvalSpecsRm =
                 sorterEvalTypeV2
                 largeMergeSortingWidths
                 mergeDimension2
-                mediumSorterCount
+                largeSorterCount
             ]
             Filter = paramMapFilter
             Enhancer = mergeEnhancer

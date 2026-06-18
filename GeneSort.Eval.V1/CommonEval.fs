@@ -6,6 +6,7 @@ open GeneSort.SortingOps
 
 
 [<Measure>] type generationNumber
+[<Measure>] type sorterPoolMemberId
 [<Measure>] type sorterPoolId
 
 module Common = ()

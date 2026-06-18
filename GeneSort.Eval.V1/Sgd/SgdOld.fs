@@ -12,18 +12,18 @@ open GeneSort.Model.Sorting.V1
 type sorterMutationSource =
     private {
         _sorterModelMutatorId: Guid<sorterModelMutatorId>
-        _parentSorterModelId: Guid<sorterModelId>
-        _parentMutationIndex: int<sorterMutationIndex>
+        _sorterModelId: Guid<sorterModelId>
+        _mutationIndex: int<sorterMutationIndex>
     }
     member this.SorterModelMutatorId = this._sorterModelMutatorId
-    member this.ParentSorterModelId = this._parentSorterModelId
-    member this.ParentMutationIndex = this._parentMutationIndex
+    member this.SorterModelId = this._sorterModelId
+    member this.MutationIndex = this._mutationIndex
 
     static member Create(sorterModelMutatorId, parentSorterModelId, parentMutationIndex) =
         { 
             _sorterModelMutatorId = sorterModelMutatorId
-            _parentSorterModelId = parentSorterModelId
-            _parentMutationIndex = parentMutationIndex 
+            _sorterModelId = parentSorterModelId
+            _mutationIndex = parentMutationIndex 
         }
 
 type sorterModelSgd = 
@@ -59,7 +59,7 @@ type sorterModelSgd2 =
         }
 
 [<CustomEquality; CustomComparison>]
-type SorterPool =
+type SorterPoolOld =
     private {
         _sorterPoolId: Guid<sorterPoolId>
         _sorterModelSgd2s: sorterModelSgd2 array
@@ -75,7 +75,7 @@ type SorterPool =
 
     override this.Equals(obj) =
         match obj with
-        | :? SorterPool as other -> this._sorterPoolId = other._sorterPoolId
+        | :? SorterPoolOld as other -> this._sorterPoolId = other._sorterPoolId
         | _ -> false
         
     override this.GetHashCode() = hash this._sorterPoolId
@@ -83,21 +83,21 @@ type SorterPool =
     interface IComparable with
         member this.CompareTo(obj) =
             match obj with
-            | :? SorterPool as other -> compare this._sorterPoolId other._sorterPoolId
+            | :? SorterPoolOld as other -> compare this._sorterPoolId other._sorterPoolId
             | _ -> invalidArg "obj" "Cannot compare SorterPool to a different type"
             
 
 
-type SorterPoolSet =
+type SorterPoolSetOld =
     private {
         // Optimized: Changed from Map<sorterPool, sorterPool> to Map keyed by Guid
-        _sorterPools: Map<Guid<sorterPoolId>, SorterPool>
+        _sorterPools: Map<Guid<sorterPoolId>, SorterPoolOld>
         _generationNumber: int<generationNumber>
     }
     member this.SorterPools = this._sorterPools
     member this.GenerationNumber = this._generationNumber
 
-    static member Create(sorterPools: seq<SorterPool>, generationNumber) =
+    static member Create(sorterPools: seq<SorterPoolOld>, generationNumber) =
         let poolMap = 
             sorterPools 
             |> Seq.map (fun p -> p.SorterPoolId, p) 
@@ -113,10 +113,10 @@ type SorterPoolSet =
 module Sgd = 
     
     /// Helper to easily extract and find a pool inside a SorterPoolSet
-    let tryFindPool (poolId: Guid<sorterPoolId>) (poolSet: SorterPoolSet) =
+    let tryFindPool (poolId: Guid<sorterPoolId>) (poolSet: SorterPoolSetOld) =
         Map.tryFind poolId poolSet.SorterPools
 
     /// Adds or updates a SorterPool inside the SorterPoolSet
-    let upsertPool (pool: SorterPool) (poolSet: SorterPoolSet) =
+    let upsertPool (pool: SorterPoolOld) (poolSet: SorterPoolSetOld) =
         let updatedMap = Map.add pool.SorterPoolId pool poolSet.SorterPools
-        SorterPoolSet.Create(Map.values updatedMap, poolSet.GenerationNumber)
+        SorterPoolSetOld.Create(Map.values updatedMap, poolSet.GenerationNumber)

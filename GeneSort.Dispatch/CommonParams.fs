@@ -180,6 +180,7 @@ module CommonParams =
         | 128 -> match smt with | Msuf4 -> 4000 | _ -> 1200
         | 192 -> 2000
         | 256 -> match smt with | Msuf4 -> 6000 | _ -> 3000
+        | 512 -> match smt with | Msuf4 -> 8000 | _ -> 8000
         | _ -> failwithf "Unsupported sorting width: %d" %sw
         |> UMX.tag
 
