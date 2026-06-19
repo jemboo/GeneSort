@@ -7,8 +7,10 @@
 
   <ItemGroup>
     <Compile Include="CommonEval.fs" />
+    <Compile Include="Sgd\SorterMutationSource.fs" />
+    <Compile Include="Sgd\SorterPoolMember.fs" />
     <Compile Include="Sgd\SorterPool.fs" />
-    <Compile Include="Sgd\SgdOld.fs" />
+    <Compile Include="Sgd\SorterPoolSet.fs" />
     <Compile Include="SorterEvalSelection.fs" />
     <Compile Include="SorterEvalBinStats.fs" />
     <Compile Include="SorterStageStats.fs" />

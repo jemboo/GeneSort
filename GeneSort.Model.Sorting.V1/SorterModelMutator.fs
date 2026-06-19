@@ -18,11 +18,11 @@ module SorterModelMutator =
 
 
     let makeMutantSorterModelFromIndex 
-                    (mutatorModel: sorterModelMutator) 
+                    (sorterModelMutator: sorterModelMutator) 
                     (parentModel: sorterModel)
                     (index: int<sorterMutationIndex>)  : sorterModel =
 
-        match (mutatorModel, parentModel) with
+        match (sorterModelMutator, parentModel) with
         | (Simple ssm, sorterModel.Simple parent) -> 
                     SimpleSorterModelMutator.makeMutantSorterModelFromIndex 
                         ssm parent index 
