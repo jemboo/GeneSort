@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <Compile Include="Sgd\SorterMutationSourceDto.fs" />
-    <Compile Include="Sgd\SorterPoolSetDescriptionDto.fs" />
+    <Compile Include="Sgd\EvolutionResultDto.fs" />
     <Compile Include="SorterScoreDto.fs" />
     <Compile Include="SorterEvalKeyDto.fs" />
     <Compile Include="SorterEvalBinDto.fs" />

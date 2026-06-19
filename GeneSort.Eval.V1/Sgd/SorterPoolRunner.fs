@@ -1,6 +1,5 @@
 ﻿namespace GeneSort.Eval.V1
 
-open System
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable

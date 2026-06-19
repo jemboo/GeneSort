@@ -46,7 +46,7 @@ type msrsRandMutate =
     interface IEquatable<msrsRandMutate> with
         member this.Equals(other) = this.Id = other.Id
 
-    member this.MakeSorterModelId (parent: msrs) (index: int<sorterMutationIndex>) : Guid<sorterModelId> =
+    member this.MakeSorterModelId (parent: msrs) (index: int<mutationIndex>) : Guid<sorterModelId> =
         CommonMutator.makeSorterModelId parent.Id this.Id index
 
     member this.MakeSorterModelFromId (parent: msrs)  (id: Guid<sorterModelId>) : msrs =
@@ -70,7 +70,7 @@ type msrsRandMutate =
 
     member this.MakeSorterModelFromIndex 
                             (parent: msrs) 
-                            (index: int<sorterMutationIndex>) : msrs =
+                            (index: int<mutationIndex>) : msrs =
         let id = this.MakeSorterModelId parent index
         this.MakeSorterModelFromId parent id
 

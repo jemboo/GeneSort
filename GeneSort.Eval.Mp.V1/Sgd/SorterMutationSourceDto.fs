@@ -33,7 +33,7 @@ module SorterMutationSourceV1Dto =
         sorterMutationSource.create
             (UMX.tag<sorterModelMutatorId> dto.SorterModelMutatorId)
             (UMX.tag<sorterModelId> dto.SorterModelId)
-            (UMX.tag<sorterMutationIndex> dto.MutationIndex)
+            (UMX.tag<mutationIndex> dto.MutationIndex)
 
 
 

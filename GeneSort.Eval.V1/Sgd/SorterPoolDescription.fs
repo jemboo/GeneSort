@@ -9,13 +9,13 @@ type spmDescription =
     private {
         _sorterPoolMemberId:   Guid<sorterPoolMemberId>
         _sorterModelId:        Guid<sorterModelId>
-        _sorterMutationIndex:  int<sorterMutationIndex>
+        _mutationIndex:        int<mutationIndex>
         _sorterMutationSource: sorterMutationSource option
         _sorterEval:           sorterEval option
     }
     member this.SorterPoolMemberId = this._sorterPoolMemberId
     member this.SorterModelId = this._sorterModelId
-    member this.SorterMutationIndex = this._sorterMutationIndex
+    member this.MutationIndex = this._mutationIndex
     member this.SorterMutationSource = this._sorterMutationSource
     member this.SorterEval = this._sorterEval
 
@@ -23,7 +23,7 @@ type spmDescription =
         {
             _sorterPoolMemberId = poolMemberId
             _sorterModelId = modelId
-            _sorterMutationIndex = mutationIndex
+            _mutationIndex = mutationIndex
             _sorterMutationSource = mutationSource
             _sorterEval = evaluation
         }
@@ -68,7 +68,7 @@ module SorterPoolSetDescription =
                         spmDescription.Create 
                             spm.SorterPoolMemberId 
                             modelId 
-                            spm.SorterMutationIndex 
+                            spm.MutationIndex 
                             spm.SorterMutationSource 
                             spm.SorterEval
                     )

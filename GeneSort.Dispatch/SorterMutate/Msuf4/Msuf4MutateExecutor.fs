@@ -158,7 +158,7 @@ module Msuf4MutateExecutor =
                             yield SorterModelMutator.makeMutantSorterModelFromIndex
                                         sorterModelMutator
                                         parentModel
-                                        (dex |> UMX.tag<sorterMutationIndex>)
+                                        (dex |> UMX.tag<mutationIndex>)
                 }
 
             return generateMutantStream parentSorterModelSet.SorterModels
@@ -271,7 +271,7 @@ module Msuf4MutateExecutor =
                             yield SorterModelMutator.makeMutantSorterModelFromIndex
                                         sorterModelMutator
                                         parentModel
-                                        (dex |> UMX.tag<sorterMutationIndex>)
+                                        (dex |> UMX.tag<mutationIndex>)
                 }
 
             return generateMutantStream parentSorterModelSet.SorterModels

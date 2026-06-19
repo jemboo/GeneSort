@@ -2,7 +2,6 @@
 
 open System
 open FSharp.UMX
-open GeneSort.Model.Sorting
 open GeneSort.SortingOps
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1

@@ -8,7 +8,7 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.SortingOps
 open GeneSort.SortingOps.Mp
 open GeneSort.Eval.V1
-open GeneSort.Eval.V1.SorterEvolutionEngine
+open GeneSort.Eval.V1.SorterRunResult
 
 // ---------------------------------------------------------------------
 // 1. Lightweight History Description DTOs
@@ -96,7 +96,7 @@ module SorterPoolSetDescriptionDto =
                         {
                             spmDescriptionDto.SorterPoolMemberId = UMX.untag m.SorterPoolMemberId
                             SorterModelId = UMX.untag m.SorterModelId
-                            SorterMutationIndex = UMX.untag m.SorterMutationIndex
+                            SorterMutationIndex = UMX.untag m.MutationIndex
                             SorterMutationSource = SorterMutationSourceDto.toDto m.SorterMutationSource
                             SorterEval = m.SorterEval |> Option.map SorterEvalDto.fromDomain
                         }
@@ -143,7 +143,7 @@ module SorterPoolSetDto =
                         {
                             SorterPoolMemberId = UMX.untag m.SorterPoolMemberId
                             SorterModel = m.SorterModel
-                            SorterMutationIndex = UMX.untag m.SorterMutationIndex
+                            SorterMutationIndex = UMX.untag m.MutationIndex
                             SorterMutationSource = SorterMutationSourceDto.toDto m.SorterMutationSource
                             SorterEval = m.SorterEval |> Option.map SorterEvalDto.fromDomain
                         }
@@ -180,14 +180,14 @@ module SorterPoolSetDto =
 
 module EvolutionRunResultDto =
 
-    let toDto (domain: EvolutionRunResult) : evolutionRunResultDto =
+    let toDto (domain: sorterRunResult) : evolutionRunResultDto =
         let v1 = {
             IntermediateHistory = domain.IntermediateHistory |> Array.map SorterPoolSetDescriptionDto.toDto
             FinalPoolSet = SorterPoolSetDto.toDto domain.FinalPoolSet
         }
         evolutionRunResultDto.V1 v1
 
-    let fromDto (dto: evolutionRunResultDto) : EvolutionRunResult =
+    let fromDto (dto: evolutionRunResultDto) : sorterRunResult =
         match dto with
         | evolutionRunResultDto.V1 v1Dto ->
             {

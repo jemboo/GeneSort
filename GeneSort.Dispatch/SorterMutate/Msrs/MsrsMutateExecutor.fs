@@ -152,7 +152,7 @@ module MsrsMutateExecutor =
                             yield SorterModelMutator.makeMutantSorterModelFromIndex
                                         sorterModelMutator
                                         parentModel
-                                        (dex |> UMX.tag<sorterMutationIndex>)
+                                        (dex |> UMX.tag<mutationIndex>)
                 }
 
             return generateMutantStream parentSorterModelSet.SorterModels
@@ -258,7 +258,7 @@ module MsrsMutateExecutor =
                             yield SorterModelMutator.makeMutantSorterModelFromIndex
                                         sorterModelMutator
                                         parentModel
-                                        (dex |> UMX.tag<sorterMutationIndex>)
+                                        (dex |> UMX.tag<mutationIndex>)
                 }
 
             return generateMutantStream parentSorterModelSet.SorterModels

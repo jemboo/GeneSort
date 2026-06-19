@@ -10,27 +10,27 @@ type sorterPoolMember =
     private {
         _sorterPoolMemberId:   Guid<sorterPoolMemberId>
         _sorterModel:          sorterModel
-        _sorterMutationIndex:  int<sorterMutationIndex>
+        _mutationIndex:        int<mutationIndex>
         _sorterMutationSource: sorterMutationSource option
         _sorterEval:           sorterEval option
     }
 
     member this.SorterPoolMemberId = this._sorterPoolMemberId
     member this.SorterModel = this._sorterModel
-    member this.SorterMutationIndex = this._sorterMutationIndex
+    member this.MutationIndex = this._mutationIndex
     member this.SorterMutationSource = this._sorterMutationSource
     member this.SorterEval = this._sorterEval
 
     static member Create 
                     sorterPoolMemberId 
                     sorterModel 
-                    sorterMutationIndex 
+                    mutationIndex 
                     sorterMutationSource 
                     sorterEval =
         { 
             _sorterPoolMemberId = sorterPoolMemberId
             _sorterModel = sorterModel
-            _sorterMutationIndex = sorterMutationIndex 
+            _mutationIndex = mutationIndex 
             _sorterMutationSource = sorterMutationSource
             _sorterEval = sorterEval
         }
@@ -40,7 +40,7 @@ module SorterPoolMember =
 
     /// Increments a member's mutation index by a given integer value
     let advanceIndex (offset: int) (spm: sorterPoolMember) : sorterPoolMember =
-        { spm with _sorterMutationIndex = (%spm.SorterMutationIndex + offset) |> UMX.tag }
+        { spm with _mutationIndex = (%spm.MutationIndex + offset) |> UMX.tag }
 
     /// Increments a member's mutation index by exactly 1
     let updateIndex (spm: sorterPoolMember) : sorterPoolMember =
@@ -56,7 +56,7 @@ module SorterPoolMember =
                (mutantCount: int<sorterCount>) : sorterPoolMember * sorterPoolMember [] =
         
         let countRaw = %mutantCount
-        let baseIndexRaw = %spm.SorterMutationIndex
+        let baseIndexRaw = %spm.MutationIndex
         
         let mutatorId = SorterModelMutator.getId sorterModelMutator
         let parentModelId = SorterModel.getId spm.SorterModel
@@ -65,7 +65,7 @@ module SorterPoolMember =
         let mutants = 
             Array.init countRaw (fun i ->
                 // Compute sequential mutation indices for each child
-                let individualMutationIndex = (baseIndexRaw + i) |> UMX.tag<sorterMutationIndex>
+                let individualMutationIndex = (baseIndexRaw + i) |> UMX.tag<mutationIndex>
                 
                 let childPoolMemberId = Guid.NewGuid() |> UMX.tag<sorterPoolMemberId>
                 

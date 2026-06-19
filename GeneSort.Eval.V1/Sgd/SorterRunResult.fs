@@ -5,13 +5,14 @@ open GeneSort.Sorting.Sortable
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 
-module SorterEvolutionEngine =
 
-    /// Holds the combined results of the historical optimization run
-    type EvolutionRunResult = {
-        IntermediateHistory: sorterPoolSetDescription array
-        FinalPoolSet: sorterPoolSet
-    }
+/// Holds the combined results of the historical optimization run
+type sorterRunResult = {
+    IntermediateHistory: sorterPoolSetDescription array
+    FinalPoolSet: sorterPoolSet
+}
+
+module SorterRunResult =
 
     /// Recursively runs the generation loop step N times. 
     /// Saves optimized lightweight history tokens for intermediate steps, 
@@ -25,7 +26,7 @@ module SorterEvolutionEngine =
             (collectNewSortableTests: bool)
             (selectionMeasure: sorterEvalMeasure)
             (prunedSize: int<sorterCount>)
-            (initialPoolSet: sorterPoolSet) : EvolutionRunResult =
+            (initialPoolSet: sorterPoolSet) : sorterRunResult =
 
         let rec loop (remainingSteps: int) (currentSet: sorterPoolSet) (historyAcc: sorterPoolSetDescription list) =
             if remainingSteps <= 0 then

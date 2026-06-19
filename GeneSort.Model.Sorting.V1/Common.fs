@@ -21,7 +21,7 @@ open GeneSort.Core
 
 [<Measure>] type modificationRate
 [<Measure>] type seedModificationRate
-[<Measure>] type sorterMutationIndex
+[<Measure>] type mutationIndex
 [<Measure>] type mutationRate
 [<Measure>] type insertionRate
 [<Measure>] type deletionRate
@@ -109,7 +109,7 @@ module CommonMutator =
     let makeSorterModelId 
                 (parentId: Guid<sorterModelId>)
                 (id:  Guid<sorterModelMutatorId>) 
-                (index: int<sorterMutationIndex>): Guid<sorterModelId> = 
+                (index: int<mutationIndex>): Guid<sorterModelId> = 
         [
             box "CommonMutator.makeSorterModelId"
             box (parentId |> UMX.untag)
