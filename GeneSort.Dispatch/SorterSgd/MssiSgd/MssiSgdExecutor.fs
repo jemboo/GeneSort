@@ -19,8 +19,8 @@ open GeneSort.Dispatch.V1.SortableTest
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Bins
-open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
+open GeneSort.Dispatch.V1.SorterSgd
 
 
 module MssiSgdExecutor =
@@ -590,12 +590,12 @@ module MssiSgdExecutor =
 
 
 
-    let getExecutor (executorType: sorterMutateExecutorType) : IRunParamsExecutor =
+    let getExecutor (executorType: sorterSgdExecutorType) : IRunParamsExecutor =
         match executorType with
-        | sorterMutateExecutorType.GenStandard -> standardExecutor
-        | sorterMutateExecutorType.GenMerge -> mergeExecutor
-        | sorterMutateExecutorType.FullReport -> fullReportExecutor
-        | sorterMutateExecutorType.MutantReport -> mutantReportExecutor
+        | sorterSgdExecutorType.GenStandard -> standardExecutor
+        | sorterSgdExecutorType.GenMerge -> mergeExecutor
+        | sorterSgdExecutorType.FullReport -> fullReportExecutor
+        | sorterSgdExecutorType.MutantReport -> mutantReportExecutor
 
 
 

@@ -14,7 +14,7 @@ open GeneSort.Dispatch.V1
 
 module MsrsSgdDbs =
     
-    let projectName = "SorterMutate.Msrs" |> UMX.tag<projectName>
+    let projectName = "SorterSgd.Msrs" |> UMX.tag<projectName>
 
     module RandomStandard =
 

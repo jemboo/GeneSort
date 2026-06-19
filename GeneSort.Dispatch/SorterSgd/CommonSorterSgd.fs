@@ -1,14 +1,14 @@
 ﻿namespace GeneSort.Dispatch.V1.SorterSgd
 
 
-type sorterMutateExecutorType = 
+type sorterSgdExecutorType = 
     | GenStandard
     | GenMerge
     | FullReport
     | MutantReport
 
 
-module SorterMutateExecutorType =
+module SorterSgdExecutorType =
     let toString = function
         | GenStandard -> "GenStandard"
         | GenMerge -> "GenMerge"
