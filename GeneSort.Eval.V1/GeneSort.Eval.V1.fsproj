@@ -11,6 +11,10 @@
     <Compile Include="Sgd\SorterPoolMember.fs" />
     <Compile Include="Sgd\SorterPool.fs" />
     <Compile Include="Sgd\SorterPoolSet.fs" />
+    <Compile Include="Sgd\SorterPoolRunner.fs" />
+    <Compile Include="Sgd\SorterPipeline.fs" />
+    <Compile Include="Sgd\SorterPoolDescription.fs" />
+    <Compile Include="Sgd\SorterEvolutionEngine.fs" />
     <Compile Include="SorterEvalSelection.fs" />
     <Compile Include="SorterEvalBinStats.fs" />
     <Compile Include="SorterStageStats.fs" />

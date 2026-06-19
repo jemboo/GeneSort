@@ -6,6 +6,7 @@ open GeneSort.SortingOps
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 
+
 type sorterPoolSet =
     private {
         _sorterPoolSetId: Guid<sorterPoolSetId>
@@ -89,11 +90,32 @@ module SorterPoolSet =
         { poolSet with _sorterPools = prunedPools }
 
 
+    /// Initializes a pristine sorterPoolSet from a sorterModelSet.
+    /// Each sorterModel is isolated into its own distinct sorterPool containing exactly one member.
+    let fromSorterModelSet 
+            (sorterPoolSetId: Guid<sorterPoolSetId>) 
+            (generationNumber: int<generationNumber>) 
+            (modelSet: sorterModelSet) : sorterPoolSet =
 
-//let nextGeneration = 
-//    currentPoolSet
-//    |> SorterPoolSet.mutate mutator 2<sorterCount>
-//    // ... evaluate members here ...
-//    |> SorterPoolSet.updateSorterPools computedEvals
-//    |> SorterPoolSet.pruneSorterPools selectionMeasure 10<sorterCount>
-//    |> SorterPoolSet.advanceGeneration 1
+        let pools = 
+            modelSet.SorterModels
+            |> Array.map (fun model ->
+                // 1. Create a tracking ID for this specific pool member instance
+                let poolMemberId = Guid.NewGuid() |> UMX.tag<sorterPoolMemberId>
+                
+                // 2. Build the member containing the model
+                let memberObj = 
+                    sorterPoolMember.Create
+                        poolMemberId
+                        model
+                        (0 |> UMX.tag)  // Initial mutation tracking starts at index 0
+                        None            // No mutation source (root seeding element)
+                        None            // Not yet evaluated
+                
+                // 3. Create a unique pool ID and wrap the single member inside it
+                let poolId = Guid.NewGuid() |> UMX.tag<sorterPoolId>
+                sorterPool.Create(poolId, [ memberObj ])
+            )
+
+        // 4. Assemble the array of pools into the final generational pool set container
+        sorterPoolSet.Create(sorterPoolSetId, generationNumber, pools)

@@ -34,6 +34,7 @@ type sorterModelSet =
             { id = Guid.Empty |> UMX.tag; sortingMap = Map.empty }
 
 
+
 module SorterModelSet =
 
     let getSortingWidth (model: sorterModel) : int<sortingWidth> =
