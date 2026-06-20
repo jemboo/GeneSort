@@ -86,7 +86,7 @@ module MsceMutateSpecsRs =
                 insertionRates
                 deletionRates
                 modificationRates
-                mediumSortingWidths
+                smallSortingWidths
                 extraLargeChildCount
             ]
             Filter = standardSorterModelTypeFilter

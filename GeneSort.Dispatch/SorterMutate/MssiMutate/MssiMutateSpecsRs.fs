@@ -45,7 +45,7 @@ module MssiMutateSpecsRs =
             RunDescription = "Mutation analysis for Mssi"
             Spans = [
                 rngTypeLcg
-                sorterEvalSelection
+                sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
                 orthoRates
@@ -68,7 +68,7 @@ module MssiMutateSpecsRs =
             RunDescription = "Mutation analysis for Mssi"
             Spans = [
                 rngTypeLcg
-                sorterEvalSelection
+                sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
                 orthoRates
@@ -90,7 +90,7 @@ module MssiMutateSpecsRs =
             RunDescription = "Mutation analysis for Mssi"
             Spans = [
                 rngTypeLcg
-                sorterEvalSelection
+                sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
                 orthoRates

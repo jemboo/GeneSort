@@ -108,13 +108,13 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** MsceMutateSpecsRs **********
-//let configType = MsceMutateSpecsRs.configType.Rand_Test
-//let executorType = sorterMutateExecutorType.GenStandard
-//let host: IRunHost = 
-//    let spec = MsceMutateSpecsRs.getRunHostSpec configType executorType
-//    MsceMutateDbs.createRunHost spec
+let configType = MsceMutateSpecsRs.configType.Rand_Medium
+let executorType = sorterMutateExecutorType.GenStandard
+let host: IRunHost = 
+    let spec = MsceMutateSpecsRs.getRunHostSpec configType executorType
+    MsceMutateDbs.createRunHost spec
 
-//let executor = MsceMutateExecutor.getExecutor executorType
+let executor = MsceMutateExecutor.getExecutor executorType
 
 //********** MsceMutateSpecsRm **********
 //let configType = MsceMutateSpecsRm.configType.Rand_Test
@@ -159,13 +159,13 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** MsrsMutateSpecsRm **********
-let configType = MsrsMutateSpecsRm.configType.Rand_Test
-let executorType = sorterMutateExecutorType.MutantReport
-let host: IRunHost = 
-    let spec = MsrsMutateSpecsRm.getRunHostSpec configType executorType
-    MsrsMutateDbs.createRunHost spec
+//let configType = MsrsMutateSpecsRm.configType.Rand_Test
+//let executorType = sorterMutateExecutorType.MutantReport
+//let host: IRunHost = 
+//    let spec = MsrsMutateSpecsRm.getRunHostSpec configType executorType
+//    MsrsMutateDbs.createRunHost spec
 
-let executor = MsrsMutateExecutor.getExecutor executorType
+//let executor = MsrsMutateExecutor.getExecutor executorType
 
 
 
