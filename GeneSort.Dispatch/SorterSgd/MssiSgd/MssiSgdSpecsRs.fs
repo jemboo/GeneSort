@@ -21,7 +21,10 @@ module MssiSgdSpecsRs =
     let sorterEvalMeasure = 
             (runParameters.sorterEvalMeasureKey, 
             [ sorterEvalMeasure.CeSt (1.0, true); ] |> List.map SorterEvalMeasure.toString)
-    
+        
+    let generationCount = 
+            (runParameters.generationCountKey, [10] |> List.map string)
+
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
         rp.WithDatabaseName(Some host.Run.DatabaseName)
@@ -54,6 +57,7 @@ module MssiSgdSpecsRs =
                 testSortingWidths
                 mssiModelType
                 testChildCount
+                generationCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
@@ -77,6 +81,7 @@ module MssiSgdSpecsRs =
                 smallSortingWidths
                 mssiModelType
                 largeChildCount
+                generationCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
@@ -99,6 +104,7 @@ module MssiSgdSpecsRs =
                 mediumSortingWidths
                 mssiModelType
                 largeChildCount
+                generationCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
