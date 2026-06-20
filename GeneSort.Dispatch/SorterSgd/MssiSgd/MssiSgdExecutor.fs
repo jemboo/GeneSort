@@ -103,6 +103,10 @@ module MssiSgdExecutor =
                         rp.GetSorterEvalMeasure()
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
+            let! (genCt: int<generationNumber>) =
+                        rp.GetGenerationCount()
+                        |> Result.ofOption "Missing generationCount in run parameters"
+
 
             let rngFactory = rngType |> RngFactory.create
 
@@ -202,7 +206,10 @@ module MssiSgdExecutor =
                         rp.GetSorterEvalMeasure()
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
-                                        
+            let! (genCt: int<generationNumber>) =
+                        rp.GetGenerationCount()
+                        |> Result.ofOption "Missing generationCount in run parameters"
+                        
             let rngFactory = rngType |> RngFactory.create
 
             let! (parentSorterSetEval: sorterSetEval) =
@@ -299,6 +306,10 @@ module MssiSgdExecutor =
             let! (sem:sorterEvalMeasure) = 
                         rp.GetSorterEvalMeasure()
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
+
+            let! (genCt: int<generationNumber>) =
+                        rp.GetGenerationCount()
+                        |> Result.ofOption "Missing generationCount in run parameters"
 
 
             let! (parentSorterSetEval: sorterSetEval) =

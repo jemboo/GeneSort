@@ -1,9 +1,13 @@
 ﻿namespace GeneSort.Eval.V1
 
+open FSharp.UMX
+open System.Threading
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
+open GeneSort.Core
+open System
 
 
 /// Holds the combined results of the historical optimization run
@@ -28,7 +32,7 @@ module SorterRunResult =
     /// Saves optimized lightweight history tokens for intermediate steps, 
     /// and preserves the fully realized heavy pool data structure on the final step.
     let runEvolution 
-            (n: int)
+            (genCount: int<generationNumber>)
             (mutator: sorterModelMutator)
             (mutantsPerSorter: int<sorterCount>)
             (sortableTest: sortableTest)
@@ -62,4 +66,64 @@ module SorterRunResult =
 
                 loop (remainingSteps - 1) nextSet updatedHistory
 
-        loop n initialPoolSet []
+        loop %genCount initialPoolSet []
+
+
+    /// Asynchronously runs the generation loops step N times using an asyncResult pipeline.
+    /// Accumulates lightweight snapshots for intermediate states and forced GC compacting 
+    /// over long execution steps.
+    let runEvolutionAsync
+            (genCount: int<generationNumber>)
+            (mutator: sorterModelMutator)
+            (mutantsPerSorter: int<sorterCount>)
+            (sortableTest: sortableTest)
+            (sorterEvalType: sorterEvalType)
+            (collectNewSortableTests: bool)
+            (selectionMeasure: sorterEvalMeasure)
+            (prunedSize: int<sorterCount>)
+            (initialPoolSet: sorterPoolSet)
+            (cts: CancellationToken)
+            (log: string -> unit) : Async<Result<sorterRunResult, string>> =
+
+        let rec loop (remainingSteps: int) (currentSet: sorterPoolSet) (historyAcc: sorterPoolSetDescription list) =
+            asyncResult {
+                // Safeguard against downstream timeouts or execution cancellations
+                if cts.IsCancellationRequested then 
+                    return! Error "Evolution run aborted via cancellation token request."
+
+                if remainingSteps <= 0 then
+                    let finalResult = 
+                        sorterRunResult.create 
+                            currentSet 
+                            (historyAcc |> List.rev |> List.toArray)
+                    return finalResult
+                else
+                    log (sprintf "Starting evolution step. Remaining generations: %d" remainingSteps)
+
+                    // 1. Snapshot the current generation state before applying structural changes
+                    let currentSnapshot = SorterPoolSetDescription.fromPoolSet currentSet
+                    let updatedHistory = currentSnapshot :: historyAcc
+
+                    // 2. Advance the heavy state across your pipeline step axis.
+                    // If your real SorterPipeline is still synchronous, wrap it inside asyncResult.retn
+                    log "Executing generation processing step..."
+                    let nextSet = 
+                        SorterPipeline.runGenerationStep 
+                            mutator 
+                            mutantsPerSorter 
+                            sortableTest 
+                            sorterEvalType 
+                            collectNewSortableTests 
+                            selectionMeasure 
+                            prunedSize
+                            currentSet
+
+                    // 3. Clear transient allocations before executing the next generational depth
+                    System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
+                    GC.Collect(2, GCCollectionMode.Forced, true, true)
+
+                    return! loop (remainingSteps - 1) nextSet updatedHistory
+            }
+
+        loop %genCount initialPoolSet []
+

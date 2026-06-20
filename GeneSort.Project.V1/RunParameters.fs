@@ -113,6 +113,10 @@ type runParameters =
         runParameters.tryGetInt runParameters.generationCountKey this.paramMap
         |> Option.map UMX.tag<generationNumber>
 
+    member this.GetGenerationFirst() =
+        runParameters.tryGetInt runParameters.generationFirstKey this.paramMap
+        |> Option.map UMX.tag<generationNumber>
+
     member this.GetId() =
         runParameters.tryGetGuid runParameters.idKey this.paramMap
         |> Option.map UMX.tag<queryParamsId>
