@@ -86,7 +86,7 @@ module MssiMutateSpecsRm =
                 lowMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                largeChildCount
+                extraLargeChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
@@ -94,9 +94,9 @@ module MssiMutateSpecsRm =
             MaxParallel = 8
         }
 
-        let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
+        let Rand_MediumLd (executorType: sorterMutateExecutorType) : runHostSpec = {
             DatabaseName = MssiMutateDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-MediumLd_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Mssi"
             Spans = [
                 rngTypeLcg
@@ -111,6 +111,31 @@ module MssiMutateSpecsRm =
                 lowMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
+                extraLargeChildCount
+            ]
+            Filter = paramMapFilter
+            Enhancer = standardEnhancer
+            AllowOverwrite = false |> UMX.tag
+            MaxParallel = 4
+        }
+
+        let Rand_MediumHd (executorType: sorterMutateExecutorType) : runHostSpec = {
+            DatabaseName = MssiMutateDbs.RandomMerge.Uniform.dbName
+            RunName = sprintf @"Rand-MediumHd_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunDescription = "Mutation analysis for merge Mssi"
+            Spans = [
+                rngTypeLcg
+                sorterEvalSelectionType
+                sorterEvalMeasure
+                sorterEvalTypeV1
+                orthoRates
+                paraRates
+                modificationRates
+                mediumMergeSortingWidths
+                mssiModelType
+                highMergeDimensions
+                noSuffixSuffixType
+                dataFormatInt8v512
                 largeChildCount
             ]
             Filter = paramMapFilter
@@ -119,16 +144,46 @@ module MssiMutateSpecsRm =
             MaxParallel = 4
         }
 
+        let Rand_Large2d (executorType: sorterMutateExecutorType) : runHostSpec = {
+            DatabaseName = MssiMutateDbs.RandomMerge.Uniform.dbName
+            RunName = sprintf @"Rand-Large2d_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunDescription = "Mutation analysis for merge Mssi"
+            Spans = [
+                rngTypeLcg
+                sorterEvalSelectionType
+                sorterEvalMeasure
+                sorterEvalTypeV1
+                orthoRates
+                paraRates
+                modificationRates
+                largeMergeSortingWidths
+                mssiModelType
+                mergeDimension2
+                noSuffixSuffixType
+                dataFormatInt8v512
+                largeChildCount
+            ]
+            Filter = paramMapFilter
+            Enhancer = standardEnhancer
+            AllowOverwrite = false |> UMX.tag
+            MaxParallel = 4
+        }
+
+
     type configType =
         | Rand_Test
         | Rand_Small
-        | Rand_Medium
+        | Rand_MediumLd
+        | Rand_MediumHd
+        | Rand_Large2d
 
     let Configs = Map.ofList 
                     [ 
                         (configType.Rand_Test, Specs.Rand_Test); 
                         (configType.Rand_Small, Specs.Rand_Small);
-                        (configType.Rand_Medium, Specs.Rand_Medium);
+                        (configType.Rand_MediumLd, Specs.Rand_MediumLd);
+                        (configType.Rand_MediumLd, Specs.Rand_MediumHd);
+                        (configType.Rand_Large2d, Specs.Rand_Large2d);
                     ]
 
     let getRunHostSpec (config: configType) (executorType: sorterMutateExecutorType) : runHostSpec =

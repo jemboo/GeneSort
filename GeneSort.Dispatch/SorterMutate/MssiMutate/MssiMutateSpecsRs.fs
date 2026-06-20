@@ -76,7 +76,7 @@ module MssiMutateSpecsRs =
                 modificationRates
                 smallSortingWidths
                 mssiModelType
-                largeChildCount
+                extraLargeChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
@@ -98,7 +98,7 @@ module MssiMutateSpecsRs =
                 modificationRates
                 mediumSortingWidths
                 mssiModelType
-                largeChildCount
+                extraLargeChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer

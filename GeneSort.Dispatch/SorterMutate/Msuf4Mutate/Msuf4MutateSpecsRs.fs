@@ -83,7 +83,7 @@ module Msuf4MutateSpecsRs =
                 modificationRates
                 smallSortingWidths
                 msuf4ModelType
-                largeChildCount
+                extraLargeChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
@@ -107,7 +107,7 @@ module Msuf4MutateSpecsRs =
                 modificationRates
                 mediumSortingWidths
                 msuf4ModelType
-                largeChildCount
+                extraLargeChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer

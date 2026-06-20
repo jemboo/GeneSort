@@ -122,7 +122,7 @@ module MsceMutateSpecsRm =
 
         let Rand_MediumLd (executorType: sorterMutateExecutorType) : runHostSpec = {
             DatabaseName = MsceMutateDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-MediumLd_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Msce"
             Spans = [
                 rngTypeLcg
@@ -146,9 +146,36 @@ module MsceMutateSpecsRm =
             MaxParallel = 4
         }
 
+        let Rand_MediumHd (executorType: sorterMutateExecutorType) : runHostSpec = {
+            DatabaseName = MsceMutateDbs.RandomMerge.Uniform.dbName
+            RunName = sprintf @"Rand-MediumHd_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunDescription = "Mutation analysis for merge Msce"
+            Spans = [
+                rngTypeLcg
+                sorterEvalSelectionType
+                sorterEvalMeasure
+                sorterEvalTypeV1
+                mutationRates
+                insertionRates
+                deletionRates
+                modificationRates
+                mediumMergeSortingWidths
+                msceModelType
+                highMergeDimensions
+                noSuffixSuffixType
+                dataFormatInt8v512
+                largeChildCount
+            ]
+            Filter = paramMapFilter
+            Enhancer = standardEnhancer
+            AllowOverwrite = false |> UMX.tag
+            MaxParallel = 2
+        }
+
+
         let Rand_Large2d (executorType: sorterMutateExecutorType) : runHostSpec = {
             DatabaseName = MsceMutateDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Large2d_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Msce"
             Spans = [
                 rngTypeLcg
@@ -164,24 +191,28 @@ module MsceMutateSpecsRm =
                 mergeDimension2
                 noSuffixSuffixType
                 dataFormatInt8v512
-                extraLargeChildCount
+                largeChildCount
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            MaxParallel = 2
         }
 
     type configType =
         | Rand_Test
         | Rand_Small
         | Rand_MediumLd
+        | Rand_MediumHd
+        | Rand_Large2d
 
     let Configs = Map.ofList 
                     [ 
                         (configType.Rand_Test, Specs.Rand_Test); 
                         (configType.Rand_Small, Specs.Rand_Small);
                         (configType.Rand_MediumLd, Specs.Rand_MediumLd);
+                        (configType.Rand_MediumLd, Specs.Rand_MediumHd);
+                        (configType.Rand_Large2d, Specs.Rand_Large2d);
                     ]
 
     let getRunHostSpec (config: configType) (executorType: sorterMutateExecutorType) : runHostSpec =
