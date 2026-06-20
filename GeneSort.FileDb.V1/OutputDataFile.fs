@@ -16,6 +16,9 @@ open GeneSort.Sorting.Sortable
 open System.Text
 open GeneSort.SortingOps.Mp
 open GeneSort.SortingOps
+open GeneSort.Sorting.Mp.Sorter
+open GeneSort.Sorting.Sorter
+open GeneSort.Eval.V1
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
@@ -91,12 +94,16 @@ module OutputDataFile =
                         //    let! domain = deserializeDto<runParametersDto, runParameters> stream token RunParametersDto.toDomain
                         //    return outputData.RunParameters domain
                         //}
+                    | outputDataType.SorterRunResult _ ->
+                        async {
+                            let! domain = deserializeDto<sorterRunResultDto, sorterRunResult> stream token SorterRunResultDto.toDomain
+                            return outputData.SorterRunResult domain
+                        }
                     | outputDataType.SorterSet _ ->
-                        failwith "Not implemented: SorterSet deserialization"
-                        //async {
-                        //    let! domain = deserializeDto<sorterSetDto, sorterSet> stream token SorterSetDto.toDomain
-                        //    return outputData.SorterSet domain
-                        //}
+                        async {
+                            let! domain = deserializeDto<sorterSetDto, sorterSet> stream token SorterSetDto.toDomain
+                            return outputData.SorterSet domain
+                        }
                     | outputDataType.SortableTestSet _ ->
                         failwith "Not implemented: SorterSet deserialization"
                         //async {
@@ -132,6 +139,10 @@ module OutputDataFile =
                         //    let! domain = deserializeDto<sortableTestModelSetGenDto, sortableTestModelSetGen> stream token SortableTestModelSetGenDto.toDomain
                         //    return outputData.SortableTestModelSetGen domain
                         //}
+
+                    | outputDataType.SorterModelSet _ ->
+                        failwith "Not implemented: SorterSet deserialization"
+
                     | outputDataType.SorterSetEval _ ->
                         async {
                             let! domain = deserializeDto<sorterSetEvalDto, sorterSetEval> stream token SorterSetEvalDto.toDomain
@@ -196,9 +207,10 @@ module OutputDataFile =
                             //   // serializeDto stream msr MutationSegmentEvalBinsSetDto.fromDomain
                             | outputData.RunParameters r ->
                                 serializeDto stream r RunParametersDto.fromDomain
-                            //| outputData.SorterSet ss ->
-                            //    failwith "Not implemented: SorterSetEval serialization"
-                            //    //serializeDto stream ss SorterSetDto.fromDomain
+                            | outputData.SorterRunResult ss ->
+                                serializeDto stream ss SorterRunResultDto.fromDomain
+                            | outputData.SorterSet ss ->
+                                serializeDto stream ss SorterSetDto.fromDomain
                             //| outputData.SortableTestSet sts ->
                             //    failwith "Not implemented: SorterSetEval serialization"
                             //    //serializeDto stream sts SortableTestSetDto.fromDomain
@@ -219,7 +231,7 @@ module OutputDataFile =
                             | outputData.SorterSetEval sse ->
                                 serializeDto stream sse SorterSetEvalDto.fromDomain
                             | outputData.SorterEvalBins sse ->
-                                serializeDto stream sse SorterEvalBinsDto.toDto
+                                serializeDto stream sse SorterEvalBinsDto.fromDomain
                             | outputData.Run p ->
                                 serializeDto stream p RunDto.fromDomain
                             | outputData.TextReport dataTableReport ->

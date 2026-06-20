@@ -7,10 +7,20 @@ open GeneSort.Model.Sorting.V1
 
 
 /// Holds the combined results of the historical optimization run
-type sorterRunResult = {
-    IntermediateHistory: sorterPoolSetDescription array
-    FinalPoolSet: sorterPoolSet
-}
+type sorterRunResult = 
+    private {
+        _intermediateHistory: sorterPoolSetDescription array
+        _finalPoolSet: sorterPoolSet
+    }
+    member this.FinalPoolSet with get() = this._finalPoolSet
+    member this.IntermediateHistory with get() = this._intermediateHistory
+    static member create 
+                    (finalPoolSet:sorterPoolSet) 
+                    (intermediateHistory:sorterPoolSetDescription []) =
+            {
+                _intermediateHistory = intermediateHistory
+                _finalPoolSet = finalPoolSet
+            }
 
 module SorterRunResult =
 
@@ -30,11 +40,9 @@ module SorterRunResult =
 
         let rec loop (remainingSteps: int) (currentSet: sorterPoolSet) (historyAcc: sorterPoolSetDescription list) =
             if remainingSteps <= 0 then
-                {
-                    // Convert accumulated list to array for structural permanence
-                    IntermediateHistory = historyAcc |> List.rev |> List.toArray
-                    FinalPoolSet = currentSet
-                }
+                sorterRunResult.create
+                        currentSet
+                        (historyAcc |> List.rev |> List.toArray)
             else
                 // 1. Take a lightweight snapshot of the current generation state before transitioning
                 let currentSnapshot = SorterPoolSetDescription.fromPoolSet currentSet

@@ -16,6 +16,7 @@ module OutputDataTypeDto =
     let fromDomain (outputDataType: outputDataType) : outputDataTypeDto =
         match outputDataType with
         | RunParameters so -> { Tag = "RunParameters"; Value = %so }
+        | SorterRunResult srr -> { Tag = "SorterRunResult"; Value = srr }
         | SorterSet so -> { Tag = "SorterSet"; Value = so }
         | SortableTest so -> { Tag = "SortableTest"; Value = so }
         | SortableTestSet so -> { Tag = "SortableTestSet"; Value = so }
@@ -33,6 +34,7 @@ module OutputDataTypeDto =
     let toDomain (dto: outputDataTypeDto) : outputDataType =
         match dto.Tag with
         | "RunParameters" -> RunParameters (dto.Value |> UMX.tag<runName>)
+        | "SorterRunResult" -> SorterRunResult dto.Value
         | "SorterSet" -> SorterSet dto.Value
         | "SortableTest" -> SortableTest dto.Value
         | "SortableTestSet" -> SortableTestSet dto.Value

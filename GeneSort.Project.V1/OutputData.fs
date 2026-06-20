@@ -6,11 +6,15 @@ open GeneSort.Eval.V1.Bins.Old
 open GeneSort.Sorting.Sortable
 open GeneSort.Core
 open GeneSort.SortingOps
+open GeneSort.Sorting.Sorter
+open GeneSort.Eval.V1
 
 type outputData =
     | Run of run
     | RunParameters of runParameters
     | SortableTest of sortableTest
+    | SorterRunResult of sorterRunResult
+    | SorterSet of sorterSet
     | SorterSetEval of sorterSetEval
     | SorterEvalBins of sorterEvalBinsOld
     | TextReport of dataTableReport
@@ -36,10 +40,13 @@ module OutputData =
 //    let asSortingSet = function
 //        | SortingSet sms -> Ok sms
 //        | _ -> Error "Database returned data, but it was not a SortingSet."
+    let asSorterRunResult = function
+        | SorterRunResult ss -> Ok ss
+        | _ -> Error "Database returned data, but it was not a SorterRunResult."
 
-//    let asSorterSet = function
-//        | SorterSet ss -> Ok ss
-//        | _ -> Error "Database returned data, but it was not a SorterSet."
+    let asSorterSet = function
+        | SorterSet ss -> Ok ss
+        | _ -> Error "Database returned data, but it was not a SorterSet."
 
     let asSortableTest = function
         | SortableTest st -> Ok st

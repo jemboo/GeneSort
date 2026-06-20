@@ -69,14 +69,14 @@ type sorterPoolSetDto = {
 // ---------------------------------------------------------------------
 
 [<MessagePackObject>]
-type evolutionRunResultV1Dto = {
+type sorterRunResultV1Dto = {
     [<Key(0)>] IntermediateHistory: sorterPoolSetDescriptionDto array
     [<Key(1)>] FinalPoolSet: sorterPoolSetDto
 }
 
 [<MessagePackObject>]
-type evolutionRunResultDto =
-    | [<Key(0)>] V1 of evolutionRunResultV1Dto
+type sorterRunResultDto =
+    | [<Key(0)>] V1 of sorterRunResultV1Dto
     | [<Key(1)>] Unknown
 
 
@@ -178,21 +178,21 @@ module SorterPoolSetDto =
         sorterPoolSet.Create(UMX.tag dto.SorterPoolSetId, UMX.tag dto.GenerationNumber, pools)
 
 
-module EvolutionRunResultDto =
+module SorterRunResultDto =
 
-    let toDto (domain: sorterRunResult) : evolutionRunResultDto =
+    let fromDomain (domain: sorterRunResult) : sorterRunResultDto =
         let v1 = {
             IntermediateHistory = domain.IntermediateHistory |> Array.map SorterPoolSetDescriptionDto.toDto
             FinalPoolSet = SorterPoolSetDto.toDto domain.FinalPoolSet
         }
-        evolutionRunResultDto.V1 v1
+        sorterRunResultDto.V1 v1
 
-    let fromDto (dto: evolutionRunResultDto) : sorterRunResult =
+    let toDomain (dto: sorterRunResultDto) : sorterRunResult =
         match dto with
-        | evolutionRunResultDto.V1 v1Dto ->
-            {
-                IntermediateHistory = v1Dto.IntermediateHistory |> Array.map SorterPoolSetDescriptionDto.fromDto
-                FinalPoolSet = SorterPoolSetDto.fromDto v1Dto.FinalPoolSet
-            }
-        | evolutionRunResultDto.Unknown ->
+        | sorterRunResultDto.V1 v1Dto ->
+            sorterRunResult.create
+                (SorterPoolSetDto.fromDto v1Dto.FinalPoolSet)
+                (v1Dto.IntermediateHistory |> Array.map SorterPoolSetDescriptionDto.fromDto)
+
+        | sorterRunResultDto.Unknown ->
             failwith "Cannot reconstruct evaluation run result from an Unknown DTO variant container state."

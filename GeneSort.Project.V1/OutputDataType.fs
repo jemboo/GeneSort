@@ -9,6 +9,7 @@ type outputDataType =
     | MutationSegmentEvalBinsSet of string
     | Run of string<runName>
     | RunParameters of string<runName>
+    | SorterRunResult of string
     | SorterModelSet of string
     | SorterSet of string
     | SortableTest of string
@@ -31,6 +32,7 @@ module OutputDataType =
         | MutationSegmentEvalBinsSet s -> appendParam "MutationSegmentEvalBinsSet" s
         | Run s -> "Run"
         | RunParameters s -> appendParam "RunParameters" %s
+        | SorterRunResult s -> appendParam "SorterRunResult" %s
         | SorterSet s -> appendParam "SorterSet" s
         | SortableTest s -> appendParam "SortableTest" s
         | SortableTestSet s -> appendParam "SortableTestSet" s
@@ -52,6 +54,7 @@ module OutputDataType =
         | "MutationSegmentEvalBinsSet" -> Some (MutationSegmentEvalBinsSet param)
         | "Run" -> Some (Run (param |> UMX.tag<runName>))
         | "RunParameters" -> Some (RunParameters (param |> UMX.tag<runName>))
+        | "SorterRunResult" -> Some (SorterRunResult param)
         | "SorterSet" -> Some (SorterSet param)
         | "SortableTest" -> Some (SortableTest param)
         | "SortableTestSet" -> Some (SortableTestSet param)

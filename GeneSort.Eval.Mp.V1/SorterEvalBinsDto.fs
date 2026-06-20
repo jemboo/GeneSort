@@ -54,7 +54,7 @@ module SorterEvalBinsDto =
             binMap
             
 
-    let toDto (domain: sorterEvalBinsOld) : sorterEvalBinsDto =
+    let fromDomain (domain: sorterEvalBinsOld) : sorterEvalBinsDto =
         match domain with
         | sorterEvalBinsOld.V1 v1 -> sorterEvalBinsDto.V1 (toV1Dto v1)
         | sorterEvalBinsOld.Unknown -> sorterEvalBinsDto.Unknown
