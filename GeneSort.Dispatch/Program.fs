@@ -108,22 +108,22 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** MsceMutateSpecsRs **********
-let configType = MsceMutateSpecsRs.configType.Rand_Medium
-let executorType = sorterMutateExecutorType.GenStandard
-let host: IRunHost = 
-    let spec = MsceMutateSpecsRs.getRunHostSpec configType executorType
-    MsceMutateDbs.createRunHost spec
-
-let executor = MsceMutateExecutor.getExecutor executorType
-
-//********** MsceMutateSpecsRm **********
-//let configType = MsceMutateSpecsRm.configType.Rand_Test
-//let executorType = sorterMutateExecutorType.GenMerge
+//let configType = MsceMutateSpecsRs.configType.Rand_Medium
+//let executorType = sorterMutateExecutorType.MutantReport
 //let host: IRunHost = 
-//    let spec = MsceMutateSpecsRm.getRunHostSpec configType executorType
+//    let spec = MsceMutateSpecsRs.getRunHostSpec configType executorType
 //    MsceMutateDbs.createRunHost spec
 
 //let executor = MsceMutateExecutor.getExecutor executorType
+
+//********** MsceMutateSpecsRm **********
+let configType = MsceMutateSpecsRm.configType.Rand_Small
+let executorType = sorterMutateExecutorType.GenMerge
+let host: IRunHost = 
+    let spec = MsceMutateSpecsRm.getRunHostSpec configType executorType
+    MsceMutateDbs.createRunHost spec
+
+let executor = MsceMutateExecutor.getExecutor executorType
 
 
 

@@ -41,7 +41,7 @@ module Example =
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
-    let rootDir = @"C:\Projects\SorterMutate.Msrs\Rmu\Data\Report\TextReport_MutantReport"
+    let rootDir = @"C:\Projects\SorterMutate.Msce\Rsu\Data\Report\TextReport_MutantReport"
     DataTableReport.concatenateAllFiles 
                 rootDir
                 $"{rootDir}\\MergeBins_report.txt"
