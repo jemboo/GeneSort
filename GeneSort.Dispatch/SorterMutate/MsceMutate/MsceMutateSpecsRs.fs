@@ -14,9 +14,9 @@ open GeneSort.Dispatch.V1.CommonParams
 
 module MsceMutateSpecsRs = 
 
-    let sorterEvalSelection = 
+    let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.Tmb 6<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
 
     let sorterEvalMeasure = 
             (runParameters.sorterEvalMeasureKey, 
@@ -56,7 +56,7 @@ module MsceMutateSpecsRs =
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
-                sorterEvalSelection
+                sorterEvalSelectionType
                 sorterEvalMeasure
                 mutationRates
                 insertionRates
@@ -80,14 +80,14 @@ module MsceMutateSpecsRs =
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
-                sorterEvalSelection
+                sorterEvalSelectionType
                 sorterEvalMeasure
                 mutationRates
                 insertionRates
                 deletionRates
                 modificationRates
                 mediumSortingWidths
-                largeChildCount
+                extraLargeChildCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
@@ -103,14 +103,14 @@ module MsceMutateSpecsRs =
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
-                sorterEvalSelection
+                sorterEvalSelectionType
                 sorterEvalMeasure
                 mutationRates
                 insertionRates
                 deletionRates
                 modificationRates
                 mediumSortingWidths
-                largeChildCount
+                extraLargeChildCount
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer

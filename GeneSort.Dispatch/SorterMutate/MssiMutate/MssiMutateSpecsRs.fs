@@ -14,9 +14,9 @@ open GeneSort.Dispatch.V1.CommonParams
 
 module MssiMutateSpecsRs = 
 
-    let sorterEvalSelection = 
+    let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.Tmb 6<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
 
     let sorterEvalMeasure = 
             (runParameters.sorterEvalMeasureKey, 

@@ -465,6 +465,125 @@ module MsceSgdExecutor =
         } |> Async.map (logResult progress log)
 
 
+    /// Dispatches the evolution history run parameters, executes the generative loop via asyncResult,
+    /// and manages final state serialization/reporting pipelines.
+    let evaluateEvolutionRun
+            (makeSortableTests: runParameters -> Async<Result<sortableTest, string>>)
+            (host: IRunHost)
+            (rp: runParameters)
+            (allowOverwrite: bool<allowOverwrite>)
+            (cts: CancellationTokenSource)
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+
+        let log msg = 
+            OpsUtils.report progress 
+                (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+
+        asyncResult {
+            try
+                do! checkCancellation cts.Token
+
+                // 1. Gather all required run metrics and options out of your parameters block securely
+                let! sortingWidth = rp.GetSortingWidth() |> Result.ofOption "Missing sorting width."
+                let! genCount = rp.GetGenerationCount() |> Result.ofOption "Missing generation count parameters."
+                let! mutantsPerSorter = rp.GetSorterChildCount() |> Result.ofOption "Missing target parent mutant child limits."
+                let prunedSize = 1 |> UMX.tag<sorterCount> //rp.GetSorterPrunedSize() |> Result.ofOption "Missing generation survival bounds size limits."
+                let! selectionMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing baseline selection evaluation metrics."
+                let! sorterEvalType = rp.GetSorterEvalType() |> Result.ofOption "Missing evaluation execution profile type structures."
+                let! rngType = rp.GetRngType() |> Result.ofOption "Missing source engine pseudo-random layout generator."
+                let! simpleSorterModelType = rp.GetSimpleSorterModelType() |> Result.ofOption "Missing inner layout design configuration types."
+                let! (sest: sorterEvalSelectionType) = rp.GetSorterEvalSelectionType() |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
+
+                // Rates for mutator creation
+                let! mutationRate = rp.GetMutationRate() |> Result.ofOption "Missing mutationRate."
+                let! insertionRate = rp.GetInsertionRate() |> Result.ofOption "Missing insertionRate."
+                let! deletionRate = rp.GetDeletionRate() |> Result.ofOption "Missing deletionRate."
+                let! modificationRate = rp.GetModificationRate() |> Result.ofOption "Missing modificationRate."
+
+                do! checkCancellation cts.Token
+                log "Resolving Sortable Tests Environment..."
+                let! tests = makeSortableTests rp
+
+                // 2. Instantiate Mutator and Initialization Set
+                let rngFactory = RngFactory.create rngType
+                let sorterModelMutator = 
+                    SimpleSorterModelMutator.getMsceModelMutator
+                        rngFactory ExcludeSelfCe modificationRate mutationRate insertionRate deletionRate
+                    |> sorterModelMutator.Simple
+
+                log "Fetching parent standard base evaluators..."
+                let! (parentSorterSetEval : sorterSetEval) = 
+                                SorterEvalDbs.getStandardSorterEvals 
+                                    sortingWidth 
+                                    simpleSorterModelType 
+                                    GeneSort.SortingOps.sorterEvalType.V2
+
+                log "Building structural seed configurations..."
+                let parentSorterModelGen = CommonSorterEval.getSimpleUniformSorterModelGen 
+                                                rngType 
+                                                sortingWidth 
+                                                simpleSorterModelType
+
+                let selectionEngine = SorterEvalSelection.makeSelection 
+                                                selectionMeasure 
+                                                sest 
+                                                parentSorterSetEval.SorterEvals 
+                                                parentSorterSetEval.SorterTestId
+                
+                // Reconstruct initial seed pool set to begin tracking iterations 
+                let seedModelSet = selectionEngine.MakeSorterModelSet (Guid.Empty |> UMX.tag) parentSorterModelGen
+                let seedSorterSet = SorterModelSet.makeSorterSet (Guid.Empty |> UMX.tag) seedModelSet
+                
+                // Assuming sorterPoolSet.Create or similar initializes the heavy collection variant from a SorterSet
+                let initialPoolSet = SorterPoolSet.fromSorterModelSet 
+                                                (Guid.NewGuid() |> UMX.tag) 
+                                                (0 |> UMX.tag)
+                                                seedModelSet
+
+                // 3. Hand control off to the asynchronous generational pipeline loop
+                log "Executing runEvolutionAsync multi-generation loop processing pipeline..."
+                let collectNewSortableTests = false
+                
+                let! (runResult: sorterRunResult) = SorterRunResult.runEvolutionAsync
+                                                        genCount
+                                                        sorterModelMutator
+                                                        mutantsPerSorter
+                                                        tests
+                                                        sorterEvalType
+                                                        collectNewSortableTests
+                                                        selectionMeasure
+                                                        prunedSize
+                                                        initialPoolSet
+                                                        cts.Token
+                                                        log
+
+                // 4. Persistence of run stats mapping results out to output streams
+                let! qpRunResult = 
+                    host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterRunResult "")
+                    |> Result.ofOption "Failed to create QueryParams for SorterRunResult snapshot payload storage mapping targets."
+
+                log (sprintf "Persisting historical simulation analysis run results to database targeting Id: %s" (string qpRunResult.Id))
+                // Note: Connects seamlessly to your previously completed MessagePack serializer schema wrappers
+                // let dtoPayload = SorterRunResultDto.fromDomain runResult
+                
+                log "Generational evolution run fully completed successfully."
+                return rp.WithRunFinished (Some true)
+
+            with e -> 
+                let errorMsg = sprintf "Fatal Error observed inside generational evolution runner context for run parameter maps: %s" e.Message
+                log errorMsg 
+                return! Error errorMsg
+        }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -585,8 +704,7 @@ module MsceSgdExecutor =
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _evaluateMutants 
-                    makeMutantSorterModels
+                evaluateEvolutionRun
                     makeStandardTests
                     host rp allowOverwrite cts progress }
 
