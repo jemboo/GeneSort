@@ -61,7 +61,9 @@ module Msuf4SgdSpecsRs =
                 modificationRates
                 testSortingWidths
                 msuf4ModelType
-                testChildCount
+                testPoolCount
+                oneSorterPerPool
+                singleChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -87,7 +89,9 @@ module Msuf4SgdSpecsRs =
                 modificationRates
                 smallSortingWidths
                 msuf4ModelType
-                largeChildCount
+                testPoolCount
+                oneSorterPerPool
+                singleChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -112,7 +116,9 @@ module Msuf4SgdSpecsRs =
                 modificationRates
                 mediumSortingWidths
                 msuf4ModelType
-                largeChildCount
+                testPoolCount
+                oneSorterPerPool
+                singleChildCount
                 generationCount
             ]
             Filter = paramMapFilter

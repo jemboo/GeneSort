@@ -88,7 +88,9 @@ module MsceSgdSpecsRm =
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                testChildCount
+                testPoolCount
+                oneSorterPerPool
+                singleChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -115,7 +117,9 @@ module MsceSgdSpecsRm =
                 lowMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                extraLargeChildCount
+                testPoolCount
+                oneSorterPerPool
+                singleChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -142,7 +146,9 @@ module MsceSgdSpecsRm =
                 lowMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                extraLargeChildCount
+                testPoolCount
+                oneSorterPerPool
+                singleChildCount
                 generationCount
             ]
             Filter = paramMapFilter

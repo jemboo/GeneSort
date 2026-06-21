@@ -39,7 +39,7 @@ module SorterRunResult =
             (sorterEvalType: sorterEvalType)
             (collectNewSortableTests: bool)
             (selectionMeasure: sorterEvalMeasure)
-            (prunedSize: int<sorterCount>)
+            (sorterCountPerPool: int<sorterCountPerPool>)
             (initialPoolSet: sorterPoolSet) : sorterRunResult =
 
         let rec loop (remainingSteps: int) (currentSet: sorterPoolSet) (historyAcc: sorterPoolSetDescription list) =
@@ -62,7 +62,7 @@ module SorterRunResult =
                         sorterEvalType 
                         collectNewSortableTests 
                         selectionMeasure 
-                        prunedSize
+                        sorterCountPerPool
 
                 loop (remainingSteps - 1) nextSet updatedHistory
 
@@ -75,12 +75,12 @@ module SorterRunResult =
     let runEvolutionAsync
             (genCount: int<generationNumber>)
             (mutator: sorterModelMutator)
-            (mutantsPerSorter: int<sorterCount>)
+            (sorterChildCount: int<sorterCount>)
             (sortableTest: sortableTest)
             (sorterEvalType: sorterEvalType)
             (collectNewSortableTests: bool)
             (selectionMeasure: sorterEvalMeasure)
-            (prunedSize: int<sorterCount>)
+            (sorterCountPerPool: int<sorterCountPerPool>)
             (initialPoolSet: sorterPoolSet)
             (cts: CancellationToken)
             (log: string -> unit) : Async<Result<sorterRunResult, string>> =
@@ -110,12 +110,12 @@ module SorterRunResult =
                     let nextSet = 
                         SorterPipeline.runGenerationStep 
                             mutator 
-                            mutantsPerSorter 
+                            sorterChildCount 
                             sortableTest 
                             sorterEvalType 
                             collectNewSortableTests 
                             selectionMeasure 
-                            prunedSize
+                            sorterCountPerPool
                             currentSet
 
                     // 3. Clear transient allocations before executing the next generational depth

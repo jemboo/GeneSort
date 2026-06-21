@@ -9,6 +9,8 @@ open GeneSort.SortingOps
 [<Measure>] type sorterPoolMemberId
 [<Measure>] type sorterPoolSetId
 [<Measure>] type sorterPoolId
+[<Measure>] type sorterCountPerPool
+[<Measure>] type sorterPoolCount
 
 module Common = ()
 

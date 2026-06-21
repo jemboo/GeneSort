@@ -133,7 +133,7 @@ module MssiMutateSpecsRm =
                 modificationRates
                 mediumMergeSortingWidths
                 mssiModelType
-                highMergeDimensions
+                mergeDimension6
                 noSuffixSuffixType
                 dataFormatInt8v512
                 largeChildCount
@@ -141,7 +141,7 @@ module MssiMutateSpecsRm =
             Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            MaxParallel = 2
         }
 
         let Rand_Large2d (executorType: sorterMutateExecutorType) : runHostSpec = {
@@ -166,7 +166,7 @@ module MssiMutateSpecsRm =
             Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            MaxParallel = 2
         }
 
 
@@ -182,7 +182,7 @@ module MssiMutateSpecsRm =
                         (configType.Rand_Test, Specs.Rand_Test); 
                         (configType.Rand_Small, Specs.Rand_Small);
                         (configType.Rand_MediumLd, Specs.Rand_MediumLd);
-                        (configType.Rand_MediumLd, Specs.Rand_MediumHd);
+                        (configType.Rand_MediumHd, Specs.Rand_MediumHd);
                         (configType.Rand_Large2d, Specs.Rand_Large2d);
                     ]
 

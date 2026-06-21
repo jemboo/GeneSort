@@ -486,13 +486,19 @@ module MsceSgdExecutor =
                 // 1. Gather all required run metrics and options out of your parameters block securely
                 let! sortingWidth = rp.GetSortingWidth() |> Result.ofOption "Missing sorting width."
                 let! genCount = rp.GetGenerationCount() |> Result.ofOption "Missing generation count parameters."
-                let! mutantsPerSorter = rp.GetSorterChildCount() |> Result.ofOption "Missing target parent mutant child limits."
-                let prunedSize = 1 |> UMX.tag<sorterCount> //rp.GetSorterPrunedSize() |> Result.ofOption "Missing generation survival bounds size limits."
+                let! poolCount = rp.GetSorterPoolCount() |> Result.ofOption "Missing poolCount parameter mapping settings."
+                let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool parameter settings."
+                let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count"
                 let! selectionMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing baseline selection evaluation metrics."
                 let! sorterEvalType = rp.GetSorterEvalType() |> Result.ofOption "Missing evaluation execution profile type structures."
                 let! rngType = rp.GetRngType() |> Result.ofOption "Missing source engine pseudo-random layout generator."
-                let! simpleSorterModelType = rp.GetSimpleSorterModelType() |> Result.ofOption "Missing inner layout design configuration types."
-                let! (sest: sorterEvalSelectionType) = rp.GetSorterEvalSelectionType() |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
+                let! simpleSorterModelType = 
+                                    rp.GetSimpleSorterModelType() 
+                                    |> Result.ofOption "Missing inner layout design configuration types."
+
+                let! (sorterEvalSelectionType: sorterEvalSelectionType) =
+                                    rp.GetSorterEvalSelectionType() 
+                                    |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
 
                 // Rates for mutator creation
                 let! mutationRate = rp.GetMutationRate() |> Result.ofOption "Missing mutationRate."
@@ -502,7 +508,7 @@ module MsceSgdExecutor =
 
                 do! checkCancellation cts.Token
                 log "Resolving Sortable Tests Environment..."
-                let! tests = makeSortableTests rp
+                let! sortableTest = makeSortableTests rp
 
                 // 2. Instantiate Mutator and Initialization Set
                 let rngFactory = RngFactory.create rngType
@@ -526,7 +532,7 @@ module MsceSgdExecutor =
 
                 let selectionEngine = SorterEvalSelection.makeSelection 
                                                 selectionMeasure 
-                                                sest 
+                                                sorterEvalSelectionType 
                                                 parentSorterSetEval.SorterEvals 
                                                 parentSorterSetEval.SorterTestId
                 
@@ -536,7 +542,9 @@ module MsceSgdExecutor =
                 
                 // Assuming sorterPoolSet.Create or similar initializes the heavy collection variant from a SorterSet
                 let initialPoolSet = SorterPoolSet.fromSorterModelSet 
-                                                (Guid.NewGuid() |> UMX.tag) 
+                                                (Guid.NewGuid() |> UMX.tag)
+                                                poolCount
+                                                sortersPerPool
                                                 (0 |> UMX.tag)
                                                 seedModelSet
 
@@ -547,12 +555,12 @@ module MsceSgdExecutor =
                 let! (runResult: sorterRunResult) = SorterRunResult.runEvolutionAsync
                                                         genCount
                                                         sorterModelMutator
-                                                        mutantsPerSorter
-                                                        tests
+                                                        sorterChildCount
+                                                        sortableTest
                                                         sorterEvalType
                                                         collectNewSortableTests
                                                         selectionMeasure
-                                                        prunedSize
+                                                        sortersPerPool
                                                         initialPoolSet
                                                         cts.Token
                                                         log
@@ -711,8 +719,7 @@ module MsceSgdExecutor =
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _evaluateMutants 
-                    makeMutantMergeSorterModels
+                evaluateEvolutionRun
                     makeMergeTests
                     host rp allowOverwrite cts progress }
 

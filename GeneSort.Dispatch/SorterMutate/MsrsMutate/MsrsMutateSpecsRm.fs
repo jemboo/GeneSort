@@ -138,7 +138,7 @@ module MsrsMutateSpecsRm =
                 modificationRates
                 mediumMergeSortingWidths
                 msrsModelType
-                highMergeDimensions
+                mergeDimension6
                 noSuffixSuffixType
                 dataFormatInt8v512
                 largeChildCount
@@ -188,7 +188,7 @@ module MsrsMutateSpecsRm =
                         (configType.Rand_Test, Specs.Rand_Test); 
                         (configType.Rand_Small, Specs.Rand_Small);
                         (configType.Rand_MediumLd, Specs.Rand_MediumLd);
-                        (configType.Rand_MediumLd, Specs.Rand_MediumHd);
+                        (configType.Rand_MediumHd, Specs.Rand_MediumHd);
                         (configType.Rand_Large2d, Specs.Rand_Large2d);
                     ]
 

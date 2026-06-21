@@ -56,7 +56,9 @@ module MssiSgdSpecsRs =
                 modificationRates
                 testSortingWidths
                 mssiModelType
-                testChildCount
+                testPoolCount
+                oneSorterPerPool
+                singleChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -80,7 +82,9 @@ module MssiSgdSpecsRs =
                 modificationRates
                 smallSortingWidths
                 mssiModelType
-                largeChildCount
+                testPoolCount
+                oneSorterPerPool
+                singleChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -103,7 +107,9 @@ module MssiSgdSpecsRs =
                 modificationRates
                 mediumSortingWidths
                 mssiModelType
-                largeChildCount
+                testPoolCount
+                oneSorterPerPool
+                singleChildCount
                 generationCount
             ]
             Filter = paramMapFilter

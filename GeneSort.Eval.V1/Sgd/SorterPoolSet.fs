@@ -68,54 +68,74 @@ module SorterPoolSet =
 
     /// Updates the evaluations of individual pool members across all relevant sub-pools.
     /// The resulting pool set will only preserve pool members actively found in the evaluation map.
-    let updateSorterPools 
+    let updateSorterEvals 
                 (evalMap: Map<Guid<sorterPoolMemberId>, sorterEval>) 
                 (poolSet: sorterPoolSet) : sorterPoolSet =
         let updatedPools = 
             poolSet._sorterPools
-            |> Map.map (fun _ pool -> SorterPool.updateSorterPool evalMap pool)
+            |> Map.map (fun _ pool -> SorterPool.updateSorterEval evalMap pool)
 
         { poolSet with _sorterPools = updatedPools }
 
     /// Trims every pool inside the set down to the designated pruned size using the given evaluation rule
     let pruneSorterPools 
                 (measure: sorterEvalMeasure) 
-                (prunedSize: int<sorterCount>) 
+                (sorterCountPerPool: int<sorterCountPerPool>) 
                 (poolSet: sorterPoolSet) : sorterPoolSet =
         
         let prunedPools = 
             poolSet._sorterPools
-            |> Map.map (fun _ pool -> SorterPool.pruneSorterPool pool measure prunedSize)
+            |> Map.map (fun _ pool -> SorterPool.pruneSorterPool pool measure sorterCountPerPool)
 
         { poolSet with _sorterPools = prunedPools }
 
 
-    /// Initializes a pristine sorterPoolSet from a sorterModelSet.
-    /// Each sorterModel is isolated into its own distinct sorterPool containing exactly one member.
+
+    /// Initializes a sorterPoolSet with poolCount pools from a sorterModelSet, each pool
+    /// having sortersPerPool members. Takes the first (poolCount * sortersPerPool) sorters
+    /// from sorterPool, and throws if there are not enough.
     let fromSorterModelSet 
             (sorterPoolSetId: Guid<sorterPoolSetId>) 
+            (poolCount: int<sorterPoolCount>)
+            (sortersPerPool: int<sorterCountPerPool>)
             (generationNumber: int<generationNumber>) 
             (modelSet: sorterModelSet) : sorterPoolSet =
 
+        let totalRequiredSorters = %poolCount * %sortersPerPool
+        let availableModels = modelSet.SorterModels
+
+        // Guard: Verify the source model set contains enough elements to completely satisfy the requested layout bounds
+        if availableModels.Length < totalRequiredSorters then
+            raise (ArgumentException(
+                sprintf "Insufficient models in sorterModelSet. Required: %d (Pools: %d, SortersPerPool: %d), Available: %d." 
+                    totalRequiredSorters %poolCount %sortersPerPool availableModels.Length))
+
+        // 1. Slice the exact number of required parent sorter models from the array head
+        let targetedModels = availableModels |> Array.take totalRequiredSorters
+
+        // 2. Fragment the contiguous models stream into distinct array slices per pool block boundary
         let pools = 
-            modelSet.SorterModels
-            |> Array.map (fun model ->
-                // 1. Create a tracking ID for this specific pool member instance
-                let poolMemberId = Guid.NewGuid() |> UMX.tag<sorterPoolMemberId>
-                
-                // 2. Build the member containing the model
-                let memberObj = 
-                    sorterPoolMember.Create
-                        poolMemberId
-                        model
-                        (0 |> UMX.tag)  // Initial mutation tracking starts at index 0
-                        None            // No mutation source (root seeding element)
-                        None            // Not yet evaluated
-                
-                // 3. Create a unique pool ID and wrap the single member inside it
+            targetedModels
+            |> Array.chunkBySize %sortersPerPool
+            |> Array.map (fun modelChunk ->
+            
+                // 3. Map each model within the chunk into a tracking pool member record
+                let memberObjs = 
+                    modelChunk
+                    |> Array.map (fun model ->
+                        let poolMemberId = Guid.NewGuid() |> UMX.tag<sorterPoolMemberId>
+                        sorterPoolMember.Create
+                            poolMemberId
+                            model
+                            (0 |> UMX.tag<mutationIndex>)   // Initial tracking index starts at 0
+                            None                            // Root node element has no parent mutation source
+                            None                            // Transient evaluation state begins unassigned
+                    )
+
+                // 4. Wrap the evaluated array segment block inside an explicit tracking pool object container
                 let poolId = Guid.NewGuid() |> UMX.tag<sorterPoolId>
-                sorterPool.Create(poolId, [ memberObj ])
+                sorterPool.Create(poolId, memberObjs)
             )
 
-        // 4. Assemble the array of pools into the final generational pool set container
+        // 5. Package the complete group layout structure back out to the main generational repository root
         sorterPoolSet.Create(sorterPoolSetId, generationNumber, pools)

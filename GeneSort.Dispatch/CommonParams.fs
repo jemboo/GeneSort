@@ -40,7 +40,19 @@ module CommonParams =
     let largeSorterCount = (runParameters.sorterCountKey, ["10000";] )
     let extraLargeSorterCount = (runParameters.sorterCountKey, ["100000";] )
     
-    // Child SorterCounts
+    // SorterCounts per pool
+    let oneSorterPerPool = (runParameters.sorterCountPerPoolKey, ["1";] )
+    let twoSortersPerPool = (runParameters.sorterCountPerPoolKey, ["2";] )
+
+    // SorterPoolCounts
+    let testPoolCount = (runParameters.sorterChildCountKey, ["10";] )
+    let smallPoolCount = (runParameters.sorterChildCountKey, ["10";] )
+    let mediumPoolCount = (runParameters.sorterChildCountKey, ["100";] )
+    let largePoolCount = (runParameters.sorterChildCountKey, ["1000";] )
+
+    // SorterChildCounts    
+    let singleChildCount = (runParameters.sorterChildCountKey, ["1";] )
+    let twoChildCount = (runParameters.sorterChildCountKey, ["2";] )
     let testChildCount = (runParameters.sorterChildCountKey, ["1000";] )
     let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
     let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )

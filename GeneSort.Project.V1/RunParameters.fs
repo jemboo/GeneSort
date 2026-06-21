@@ -51,10 +51,12 @@ type runParameters =
     static member sortableDataFormatKey = "SortableDataFormat"
     static member sorterChildCountKey = "SorterChildCount"
     static member sorterCountKey = "SorterCount"
+    static member sorterCountPerPoolKey = "SorterCountPerPool"
     static member sorterEvalMeasureKey = "SorterEvalMeasure"
     static member sorterEvalSelectionType = "SorterEvalSelectionType"
     static member sorterEvalTypeKey = "SorterEvalType"
     static member sorterParentCountKey = "SorterParentCount"
+    static member sorterPoolCountKey = "SorterPoolCount"
     static member sortingWidthKey = "SortingWidth"
     static member stageLengthKey = "StageLength"
     static member startingReplKey = "StartingRepl"
@@ -217,6 +219,10 @@ type runParameters =
         runParameters.tryGetInt runParameters.sorterCountKey this.paramMap
         |> Option.map UMX.tag<sorterCount>
 
+    member this.GetSorterCountPerPool() =
+        runParameters.tryGetInt runParameters.sorterCountPerPoolKey this.ParamMap
+        |> Option.map UMX.tag<sorterCountPerPool>
+
     member this.GetSorterEvalMeasure() =
         this.paramMap.TryFind runParameters.sorterEvalMeasureKey
         |> Option.map SorterEvalMeasure.fromString
@@ -232,6 +238,10 @@ type runParameters =
     member this.GetSorterParentCount() =
         runParameters.tryGetInt runParameters.sorterParentCountKey this.paramMap
         |> Option.map UMX.tag<sorterCount>
+
+    member this.GetSorterPoolCount() =
+        runParameters.tryGetInt runParameters.sorterPoolCountKey this.paramMap
+        |> Option.map UMX.tag<sorterPoolCount>
 
     member this.GetSortingWidth() =
         runParameters.tryGetInt runParameters.sortingWidthKey this.paramMap
@@ -352,6 +362,9 @@ type runParameters =
     member this.WithSorterCount(sc: int<sorterCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountKey (sc |> Option.map UmxExt.intToRaw) }
 
+    member this.WithSorterCountPerPool(sc: int<sorterCountPerPool> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountPerPoolKey (sc |> Option.map UmxExt.intToRaw) }
+
     member this.WithSorterEvalMeasure(sem: sorterEvalMeasure option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalMeasureKey (sem |> Option.map SorterEvalMeasure.toString) }
 
@@ -363,6 +376,9 @@ type runParameters =
 
     member this.WithSorterParentCount(spc: int<sorterCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterParentCountKey (spc |> Option.map UmxExt.intToRaw) }
+
+    member this.WithSorterPoolCount(sc: int<sorterPoolCount> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterPoolCountKey (sc |> Option.map UmxExt.intToRaw) }
 
     member this.WithSortingWidth(w: int<sortingWidth> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortingWidthKey (w |> Option.map UmxExt.intToRaw) }

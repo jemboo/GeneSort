@@ -15,7 +15,7 @@ module SorterPipeline =
             (sorterEvalType: sorterEvalType)
             (collectNewSortableTests: bool)
             (selectionMeasure: sorterEvalMeasure)
-            (prunedSize: int<sorterCount>)
+            (prunedSize: int<sorterCountPerPool>)
             (currentPoolSet: sorterPoolSet) : sorterPoolSet =
 
         currentPoolSet
@@ -28,7 +28,7 @@ module SorterPipeline =
                 expandedPoolSet 
                 |> SorterPoolRunner.evaluatePoolSet sortableTest sorterEvalType collectNewSortableTests
             
-            expandedPoolSet |> SorterPoolSet.updateSorterPools computedEvals
+            expandedPoolSet |> SorterPoolSet.updateSorterEvals computedEvals
         )
         
         // Step 3: Trim out defective or un-optimized sorters down to baseline target capacities

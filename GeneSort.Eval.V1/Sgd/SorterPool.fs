@@ -48,7 +48,7 @@ module SorterPool =
 
 
     /// The returned SorterPool only contains members with sorterPoolMemberIds that are found in map
-    let updateSorterPool (map: Map<Guid<sorterPoolMemberId>, sorterEval>) (pool: sorterPool) : sorterPool =
+    let updateSorterEval (map: Map<Guid<sorterPoolMemberId>, sorterEval>) (pool: sorterPool) : sorterPool =
         let updatedMembersMap =
             map 
             |> Map.fold (fun acc poolMemberId eval ->
@@ -113,9 +113,9 @@ module SorterPool =
     let pruneSorterPool 
                 (pool: sorterPool) 
                 (measure: sorterEvalMeasure) 
-                (prunedSize: int<sorterCount>) : sorterPool =
+                (sorterCountPerPool: int<sorterCountPerPool>) : sorterPool =
         
-        let targetSize = max 0 %prunedSize
+        let targetSize = max 0 %sorterCountPerPool
         let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
         let filterUnsorted = SorterEvalFunctions.getFilterUnsortedFlag measure
 
