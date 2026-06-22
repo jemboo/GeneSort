@@ -4,16 +4,16 @@
 type sorterMutateExecutorType = 
     | GenStandard
     | GenMerge
-    | FullReport
-    | MutantReport
+    | MergeReport
+    | StandardReport
 
 
 module SorterMutateExecutorType =
     let toString = function
         | GenStandard -> "GenStandard"
         | GenMerge -> "GenMerge"
-        | FullReport -> "FullReport"
-        | MutantReport -> "MutantReport"
+        | MergeReport -> "MergeReport"
+        | StandardReport -> "StandardReport"
 
 
 

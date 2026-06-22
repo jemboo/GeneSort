@@ -117,7 +117,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executor = MsceMutateExecutor.getExecutor executorType
 
 //********** MsceMutateSpecsRm **********
-let configType = MsceMutateSpecsRm.configType.Rand_Small
+let configType = MsceMutateSpecsRm.configType.Rand_Test
 let executorType = sorterMutateExecutorType.GenMerge
 let host: IRunHost = 
     let spec = MsceMutateSpecsRm.getRunHostSpec configType executorType

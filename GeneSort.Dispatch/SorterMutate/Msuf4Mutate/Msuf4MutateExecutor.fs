@@ -602,13 +602,13 @@ module Msuf4MutateExecutor =
                     makeMergeTests
                     host rp allowOverwrite cts progress }
 
-    let fullReportExecutor =
+    let mergeReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 makeFullReport
                     host rp allowOverwrite cts progress }
 
-    let mutantReportExecutor =
+    let standardReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 makeMutantReport
@@ -622,8 +622,8 @@ module Msuf4MutateExecutor =
         match executorType with
         | sorterMutateExecutorType.GenStandard -> standardExecutor
         | sorterMutateExecutorType.GenMerge -> mergeExecutor
-        | sorterMutateExecutorType.FullReport -> fullReportExecutor
-        | sorterMutateExecutorType.MutantReport -> mutantReportExecutor
+        | sorterMutateExecutorType.MergeReport -> mergeReportExecutor
+        | sorterMutateExecutorType.StandardReport -> standardReportExecutor
 
 
 
