@@ -34,7 +34,8 @@ module MssiMutateSpecsRs =
         maybe {
             let! sw = rp.GetSortingWidth()
             let has2factor = (%sw % 2 = 0)
-            return! if has2factor then Some rp else None
+            let gt4 = (%sw > 4)
+            return! if (has2factor && gt4)  then Some rp else None
         }
 
     module Specs =

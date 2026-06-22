@@ -117,19 +117,19 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executor = MsceMutateExecutor.getExecutor executorType
 
 //********** MsceMutateSpecsRm **********
-let configType = MsceMutateSpecsRm.configType.Rand_Test
-let executorType = sorterMutateExecutorType.MergeReport
-let host: IRunHost = 
-    let spec = MsceMutateSpecsRm.getRunHostSpec configType executorType
-    MsceMutateDbs.createRunHost spec
+//let configType = MsceMutateSpecsRm.configType.Rand_Test
+//let executorType = sorterMutateExecutorType.MergeReport
+//let host: IRunHost = 
+//    let spec = MsceMutateSpecsRm.getRunHostSpec configType executorType
+//    MsceMutateDbs.createRunHost spec
 
-let executor = MsceMutateExecutor.getExecutor executorType
+//let executor = MsceMutateExecutor.getExecutor executorType
 
 
 
 //********** MssiMutateSpecsRs **********
 //let configType = MssiMutateSpecsRs.configType.Rand_Test
-//let executorType = sorterMutateExecutorType.GenStandard
+//let executorType = sorterMutateExecutorType.StandardReport
 //let host: IRunHost = 
 //    let spec = MssiMutateSpecsRs.getRunHostSpec configType executorType
 //    MssiMutateDbs.createRunHost spec
@@ -139,7 +139,7 @@ let executor = MsceMutateExecutor.getExecutor executorType
 
 //********** MssiMutateSpecsRm **********
 //let configType = MssiMutateSpecsRm.configType.Rand_Test
-//let executorType = sorterMutateExecutorType.GenMerge
+//let executorType = sorterMutateExecutorType.MergeReport
 //let host: IRunHost = 
 //    let spec = MssiMutateSpecsRm.getRunHostSpec configType executorType
 //    MssiMutateDbs.createRunHost spec
@@ -172,7 +172,7 @@ let executor = MsceMutateExecutor.getExecutor executorType
 
 //********** Msuf4MutateSpecsRs **********
 //let configType = Msuf4MutateSpecsRs.configType.Rand_Test
-//let executorType = sorterMutateExecutorType.GenStandard
+//let executorType = sorterMutateExecutorType.StandardReport
 //let host: IRunHost = 
 //    let spec = Msuf4MutateSpecsRs.getRunHostSpec configType executorType
 //    Msuf4MutateDbs.createRunHost spec
@@ -181,13 +181,13 @@ let executor = MsceMutateExecutor.getExecutor executorType
 
 
 //********** Msuf4MutateSpecsRm **********
-//let configType = Msuf4MutateSpecsRm.configType.Rand_Test
-//let executorType = sorterMutateExecutorType.MutantMergeReport
-//let host: IRunHost = 
-//    let spec = Msuf4MutateSpecsRm.getRunHostSpec configType executorType
-//    Msuf4MutateDbs.createRunHost spec
+let configType = Msuf4MutateSpecsRm.configType.Rand_Test
+let executorType = sorterMutateExecutorType.MergeReport
+let host: IRunHost = 
+    let spec = Msuf4MutateSpecsRm.getRunHostSpec configType executorType
+    Msuf4MutateDbs.createRunHost spec
 
-//let executor = Msuf4MutateExecutor.getExecutor executorType
+let executor = Msuf4MutateExecutor.getExecutor executorType
 
 
 let minReplica = 0<replNumber>

@@ -257,7 +257,7 @@ module MssiMutateExecutor =
 
 
 
-    let makeMutantDetails (rp:runParameters) : 
+    let makeStandardMutantDetails (rp:runParameters) : 
             Async<Result<
                         sorterEvalSelection * 
                         Map<Guid<sorterModelId>, Guid<sorterModelId>>, 
@@ -342,6 +342,100 @@ module MssiMutateExecutor =
             return (_sorterEvalSelection, parentMutantMap)
         }
 
+
+    let makeMergeMutantDetails (rp:runParameters) : 
+            Async<Result<
+                        sorterEvalSelection * 
+                        Map<Guid<sorterModelId>, Guid<sorterModelId>>, 
+                        string>> =
+        asyncResult {
+
+            let! (rngType: rngType) =  
+                        rp.GetRngType()
+                        |> Result.ofOption "Missing RNG type in run parameters"
+
+            let! (sortingWidth: int<sortingWidth>) = 
+                        rp.GetSortingWidth() 
+                        |> Result.ofOption "Missing sorting width in run parameters"
+    
+            let! (simpleSorterModelType: simpleSorterModelType) = 
+                        rp.GetSimpleSorterModelType() 
+                        |> Result.ofOption "Missing simple sorter model type in run parameters"
+
+            let! (sorterChildCount: int<sorterCount>) = 
+                        rp.GetSorterChildCount()
+                        |> Result.ofOption "Missing parent sorter count in run parameters"
+
+            let! (orthoRate: float<orthoRate>) =  
+                        rp.GetOrthoRate()
+                        |> Result.ofOption "Missing orthoRate in run parameters"
+
+            let! (paraRate: float<paraRate>) =  
+                        rp.GetParaRate()
+                        |> Result.ofOption "Missing paraRate in run parameters"
+
+            let! (modificationRate: float<modificationRate>) =  
+                        rp.GetModificationRate()
+                        |> Result.ofOption "Missing modificationRate in run parameters"
+
+            let! (sest: sorterEvalSelectionType) = 
+                        rp.GetSorterEvalSelectionType()
+                        |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
+
+            let! (sem:sorterEvalMeasure) = 
+                        rp.GetSorterEvalMeasure()
+                        |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
+
+            let! (mergeDimension: int<mergeDimension>) = 
+                        rp.GetMergeDimension() 
+                        |> Result.ofOption "Missing mergeDimension in run parameters"
+
+            let! (mergeSuffixType: mergeSuffixType) = 
+                        rp.GetMergeSuffixType() 
+                        |> Result.ofOption "Missing mergeSuffixType in run parameters"
+
+
+            let! (parentSorterSetEval: sorterSetEval) =
+                        SorterEvalDbs.getMergeSorterEvals 
+                                            sortingWidth 
+                                            simpleSorterModelType
+                                            mergeDimension
+                                            mergeSuffixType
+                                            sorterEvalType.V2
+
+
+            let _sorterEvalSelection = 
+                            SorterEvalSelection.makeSelection sem sest
+                                        parentSorterSetEval.SorterEvals
+                                        parentSorterSetEval.SorterTestId
+
+            let (parentSorterModelGen: sorterModelGen) = 
+                CommonSorterEval.getSimpleUniformSorterModelGen 
+                                        rngType 
+                                        sortingWidth 
+                                        simpleSorterModelType
+
+            let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
+                                            (Guid.Empty |> UMX.tag)
+                                            parentSorterModelGen
+
+            let simpleSorterModels = parentSorterModelSet.SorterModels |> Array.map (SorterModel.asSimpleSorterModel)
+
+            let sorterModelMutator = SimpleSorterModelMutator.getMssiModelMutator
+                                            (rngType |> RngFactory.create)
+                                            ExcludeSelfCe
+                                            modificationRate
+                                            orthoRate
+                                            paraRate
+
+            let parentMutantMap = 
+                    SimpleSorterModelMutator.makeMutantIdToParentIdMap
+                                        sorterModelMutator
+                                        simpleSorterModels
+                                        %sorterChildCount
+
+            return (_sorterEvalSelection, parentMutantMap)
+        }
 
 
 
@@ -578,14 +672,15 @@ module MssiMutateExecutor =
     let mergeReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                makeFullReport
+                makeMutantReport
+                    makeMergeMutantDetails
                     host rp allowOverwrite cts progress }
 
     let standardReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 makeMutantReport
-                    makeMutantDetails
+                    makeStandardMutantDetails
                     host rp allowOverwrite cts progress }
 
 
