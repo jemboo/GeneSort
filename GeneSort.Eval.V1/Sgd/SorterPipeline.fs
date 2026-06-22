@@ -33,6 +33,4 @@ module SorterPipeline =
         
         // Step 3: Trim out defective or un-optimized sorters down to baseline target capacities
         |> SorterPoolSet.pruneSorterPools selectionMeasure prunedSize
-        
-        // Step 4: Advance your transfinite epoch generation tracking vector safely
         |> SorterPoolSet.advanceGeneration 1

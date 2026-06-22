@@ -182,7 +182,7 @@ module SorterRunResultDto =
 
     let fromDomain (domain: sorterRunResult) : sorterRunResultDto =
         let v1 = {
-            IntermediateHistory = domain.IntermediateHistory |> Array.map SorterPoolSetDescriptionDto.toDto
+            sorterRunResultV1Dto.IntermediateHistory = domain.IntermediateHistory |> Array.map SorterPoolSetDescriptionDto.toDto
             FinalPoolSet = SorterPoolSetDto.toDto domain.FinalPoolSet
         }
         sorterRunResultDto.V1 v1

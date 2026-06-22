@@ -571,8 +571,8 @@ module MsceSgdExecutor =
                     |> Result.ofOption "Failed to create QueryParams for SorterRunResult snapshot payload storage mapping targets."
 
                 log (sprintf "Persisting historical simulation analysis run results to database targeting Id: %s" (string qpRunResult.Id))
-                // Note: Connects seamlessly to your previously completed MessagePack serializer schema wrappers
-                // let dtoPayload = SorterRunResultDto.fromDomain runResult
+                do! host.RunDb.saveAsync qpRunResult (runResult |> outputData.SorterRunResult) allowOverwrite
+                
                 
                 log "Generational evolution run fully completed successfully."
                 return rp.WithRunFinished (Some true)
@@ -581,7 +581,7 @@ module MsceSgdExecutor =
                 let errorMsg = sprintf "Fatal Error observed inside generational evolution runner context for run parameter maps: %s" e.Message
                 log errorMsg 
                 return! Error errorMsg
-        }
+        } |> Async.map (logResult progress log)
 
 
 

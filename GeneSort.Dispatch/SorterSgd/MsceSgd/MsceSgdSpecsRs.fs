@@ -10,6 +10,7 @@ open GeneSort.Eval.V1
 open GeneSort.Sorting
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
+open GeneSort.Dispatch.V1.SorterSgd
 
 
 module MsceSgdSpecsRs = 
@@ -51,9 +52,9 @@ module MsceSgdSpecsRs =
 
     module Specs =
 
-        let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
+        let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
             DatabaseName = MsceSgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msce"
             Spans = [
                 msceModelType
@@ -78,9 +79,9 @@ module MsceSgdSpecsRs =
         }
 
 
-        let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
+        let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
             DatabaseName = MsceSgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msce"
             Spans = [
                 msceModelType
@@ -104,9 +105,9 @@ module MsceSgdSpecsRs =
             MaxParallel = 8
         }
 
-        let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
+        let Rand_Medium (executorType: sorterSgdExecutorType) : runHostSpec = {
             DatabaseName = MsceSgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msce"
             Spans = [
                 msceModelType
@@ -142,7 +143,7 @@ module MsceSgdSpecsRs =
                         (configType.Rand_Medium, Specs.Rand_Medium);
                     ]
 
-    let getRunHostSpec (config: configType) (executorType: sorterMutateExecutorType) : runHostSpec =
+    let getRunHostSpec (config: configType) (executorType: sorterSgdExecutorType) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType
 

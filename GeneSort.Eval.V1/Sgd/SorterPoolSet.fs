@@ -42,7 +42,8 @@ module SorterPoolSet =
 
     /// Advances the generation counter by a given step count
     let advanceGeneration (steps: int) (poolSet: sorterPoolSet) : sorterPoolSet =
-        { poolSet with _generationNumber = (%poolSet._generationNumber + steps) |> UMX.tag }
+        { poolSet with _sorterPoolSetId = Guid.NewGuid() |> UMX.tag;
+                       _generationNumber = (%poolSet._generationNumber + steps) |> UMX.tag }
 
     /// Mutates every single pool across the entire pool set uniformly
     let mutate 
