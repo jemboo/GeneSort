@@ -64,7 +64,7 @@ module MsceSgdSpecsRs =
                 mutationRates
                 insertionRates
                 deletionRates
-                modificationRates
+                modificationRatesMsce
                 testSortingWidths
                 testPoolCount
                 oneSorterPerPool
@@ -91,7 +91,7 @@ module MsceSgdSpecsRs =
                 mutationRates
                 insertionRates
                 deletionRates
-                modificationRates
+                modificationRatesMsce
                 mediumSortingWidths
                 testPoolCount
                 oneSorterPerPool
@@ -117,7 +117,7 @@ module MsceSgdSpecsRs =
                 mutationRates
                 insertionRates
                 deletionRates
-                modificationRates
+                modificationRatesMsce
                 mediumSortingWidths
                 testPoolCount
                 oneSorterPerPool

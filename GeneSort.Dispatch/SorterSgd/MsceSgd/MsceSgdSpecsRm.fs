@@ -82,7 +82,7 @@ module MsceSgdSpecsRm =
                 mutationRates
                 insertionRates
                 deletionRates
-                modificationRates
+                modificationRatesMsce
                 testMergeSortingWidths
                 msceModelType
                 testMergeDimensions
@@ -111,7 +111,7 @@ module MsceSgdSpecsRm =
                 mutationRates
                 insertionRates
                 deletionRates
-                modificationRates
+                modificationRatesMsce
                 smallMergeSortingWidths
                 msceModelType
                 lowMergeDimensions
@@ -140,7 +140,7 @@ module MsceSgdSpecsRm =
                 mutationRates
                 insertionRates
                 deletionRates
-                modificationRates
+                modificationRatesMsce
                 mediumMergeSortingWidths
                 msceModelType
                 lowMergeDimensions

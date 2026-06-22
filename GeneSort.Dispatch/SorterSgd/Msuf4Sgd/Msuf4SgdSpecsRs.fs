@@ -58,7 +58,7 @@ module Msuf4SgdSpecsRs =
                 paraRates
                 selfSymRates
                 noSeedModificationRates
-                modificationRates
+                modificationRatesStage
                 testSortingWidths
                 msuf4ModelType
                 testPoolCount
@@ -86,7 +86,7 @@ module Msuf4SgdSpecsRs =
                 paraRates
                 selfSymRates
                 noSeedModificationRates
-                modificationRates
+                modificationRatesStage
                 smallSortingWidths
                 msuf4ModelType
                 testPoolCount
@@ -113,7 +113,7 @@ module Msuf4SgdSpecsRs =
                 paraRates
                 selfSymRates
                 noSeedModificationRates
-                modificationRates
+                modificationRatesStage
                 mediumSortingWidths
                 msuf4ModelType
                 testPoolCount

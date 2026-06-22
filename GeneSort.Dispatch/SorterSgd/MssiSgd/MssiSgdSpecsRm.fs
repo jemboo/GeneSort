@@ -58,7 +58,7 @@ module MssiSgdSpecsRm =
                 sorterEvalTypeV1
                 orthoRates
                 paraRates
-                modificationRates
+                modificationRatesStage
                 testMergeSortingWidths
                 mssiModelType
                 testMergeDimensions
@@ -86,7 +86,7 @@ module MssiSgdSpecsRm =
                 sorterEvalTypeV1
                 orthoRates
                 paraRates
-                modificationRates
+                modificationRatesStage
                 smallMergeSortingWidths
                 mssiModelType
                 lowMergeDimensions
@@ -114,7 +114,7 @@ module MssiSgdSpecsRm =
                 sorterEvalTypeV1
                 orthoRates
                 paraRates
-                modificationRates
+                modificationRatesStage
                 mediumMergeSortingWidths
                 mssiModelType
                 lowMergeDimensions

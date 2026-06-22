@@ -61,7 +61,7 @@ module MsceMutateSpecsRs =
                 mutationRates
                 insertionRates
                 deletionRates
-                modificationRates
+                modificationRatesMsce
                 testSortingWidths
                 testChildCount
             ]
@@ -85,7 +85,7 @@ module MsceMutateSpecsRs =
                 mutationRates
                 insertionRates
                 deletionRates
-                modificationRates
+                modificationRatesMsce
                 smallSortingWidths
                 extraLargeChildCount
             ]
@@ -108,7 +108,7 @@ module MsceMutateSpecsRs =
                 mutationRates
                 insertionRates
                 deletionRates
-                modificationRates
+                modificationRatesMsce
                 mediumSortingWidths
                 extraLargeChildCount
             ]

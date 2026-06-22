@@ -160,10 +160,11 @@ module CommonParams =
     let noSeedModificationRates =
             (runParameters.seedModificationRateKey, [0.00] |> List.map string)
 
-    let modificationRates =
+    let modificationRatesMsce =
             (runParameters.modificationRateKey, [ 0.0025; 0.01; 0.04; 0.16 ] |> List.map string)
 
-
+    let modificationRatesStage =
+            (runParameters.modificationRateKey, [ 0.15; 0.2; 0.3; 0.35 ] |> List.map string)
 
     let getStageLength 
                 (smt: simpleSorterModelType) 

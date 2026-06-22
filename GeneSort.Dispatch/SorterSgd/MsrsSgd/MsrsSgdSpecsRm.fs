@@ -60,7 +60,7 @@ module MsrsSgdSpecsRm =
                 orthoRates
                 paraRates
                 selfSymRates
-                modificationRates
+                modificationRatesStage
                 testMergeSortingWidths
                 msrsModelType
                 testMergeDimensions
@@ -89,7 +89,7 @@ module MsrsSgdSpecsRm =
                 orthoRates
                 paraRates
                 selfSymRates
-                modificationRates
+                modificationRatesStage
                 smallMergeSortingWidths
                 msrsModelType
                 lowMergeDimensions
@@ -118,7 +118,7 @@ module MsrsSgdSpecsRm =
                 orthoRates
                 paraRates
                 selfSymRates
-                modificationRates
+                modificationRatesStage
                 mediumMergeSortingWidths
                 msrsModelType
                 lowMergeDimensions

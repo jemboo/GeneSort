@@ -52,7 +52,7 @@ module MsrsSgdSpecsRs =
                 orthoRates
                 paraRates
                 selfSymRates
-                modificationRates
+                modificationRatesStage
                 testSortingWidths
                 msrsModelType
                 testPoolCount
@@ -78,7 +78,7 @@ module MsrsSgdSpecsRs =
                 orthoRates
                 paraRates
                 selfSymRates
-                modificationRates
+                modificationRatesStage
                 smallSortingWidths
                 msrsModelType
                 testPoolCount
@@ -104,7 +104,7 @@ module MsrsSgdSpecsRs =
                 orthoRates
                 paraRates
                 selfSymRates
-                modificationRates
+                modificationRatesStage
                 mediumSortingWidths
                 msrsModelType
                 testPoolCount

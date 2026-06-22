@@ -50,7 +50,7 @@ module MsrsMutateSpecsRs =
                 orthoRates
                 paraRates
                 selfSymRates
-                modificationRates
+                modificationRatesStage
                 testSortingWidths
                 msrsModelType
                 testChildCount
@@ -73,7 +73,7 @@ module MsrsMutateSpecsRs =
                 orthoRates
                 paraRates
                 selfSymRates
-                modificationRates
+                modificationRatesStage
                 smallSortingWidths
                 msrsModelType
                 extraLargeChildCount
@@ -96,7 +96,7 @@ module MsrsMutateSpecsRs =
                 orthoRates
                 paraRates
                 selfSymRates
-                modificationRates
+                modificationRatesStage
                 mediumSortingWidths
                 msrsModelType
                 extraLargeChildCount

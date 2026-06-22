@@ -53,7 +53,7 @@ module MssiSgdSpecsRs =
                 sorterEvalTypeV1
                 orthoRates
                 paraRates
-                modificationRates
+                modificationRatesStage
                 testSortingWidths
                 mssiModelType
                 testPoolCount
@@ -79,7 +79,7 @@ module MssiSgdSpecsRs =
                 sorterEvalTypeV1
                 orthoRates
                 paraRates
-                modificationRates
+                modificationRatesStage
                 smallSortingWidths
                 mssiModelType
                 testPoolCount
@@ -104,7 +104,7 @@ module MssiSgdSpecsRs =
                 sorterEvalTypeV1
                 orthoRates
                 paraRates
-                modificationRates
+                modificationRatesStage
                 mediumSortingWidths
                 mssiModelType
                 testPoolCount

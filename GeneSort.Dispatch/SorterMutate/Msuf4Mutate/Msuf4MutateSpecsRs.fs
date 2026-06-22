@@ -55,7 +55,7 @@ module Msuf4MutateSpecsRs =
                 paraRates
                 selfSymRates
                 noSeedModificationRates
-                modificationRates
+                modificationRatesStage
                 testSortingWidths
                 msuf4ModelType
                 testChildCount
@@ -80,7 +80,7 @@ module Msuf4MutateSpecsRs =
                 paraRates
                 selfSymRates
                 noSeedModificationRates
-                modificationRates
+                modificationRatesStage
                 smallSortingWidths
                 msuf4ModelType
                 extraLargeChildCount
@@ -104,7 +104,7 @@ module Msuf4MutateSpecsRs =
                 paraRates
                 selfSymRates
                 noSeedModificationRates
-                modificationRates
+                modificationRatesStage
                 mediumSortingWidths
                 msuf4ModelType
                 extraLargeChildCount

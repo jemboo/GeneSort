@@ -62,7 +62,7 @@ module Msuf4SgdSpecsRm =
                 paraRates
                 selfSymRates
                 noSeedModificationRates
-                modificationRates
+                modificationRatesStage
                 testMergeSortingWidths
                 msuf4ModelType
                 testMergeDimensions
@@ -91,7 +91,7 @@ module Msuf4SgdSpecsRm =
                 paraRates
                 selfSymRates
                 noSeedModificationRates
-                modificationRates
+                modificationRatesStage
                 smallMergeSortingWidths
                 msuf4ModelType
                 lowMergeDimensions
@@ -120,7 +120,7 @@ module Msuf4SgdSpecsRm =
                 paraRates
                 selfSymRates
                 noSeedModificationRates
-                modificationRates
+                modificationRatesStage
                 mediumMergeSortingWidths
                 msuf4ModelType
                 lowMergeDimensions
