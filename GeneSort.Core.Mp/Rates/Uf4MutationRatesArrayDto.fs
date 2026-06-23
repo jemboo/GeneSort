@@ -8,7 +8,7 @@ open MessagePack.FSharp
 
 [<MessagePackObject>]
 type Uf4MutationRatesArrayDto =
-    { [<Key(0)>] Rates: Uf4MutationRatesDto array }
+    { [<Key(0)>] uf4MutationRatesDtos: uf4MutationRatesDto array }
 
 module Uf4MutationRatesArrayDto =
 
@@ -16,13 +16,13 @@ module Uf4MutationRatesArrayDto =
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let fromDomain (uf4MutationRatesArray: uf4MutationRatesArray) : Uf4MutationRatesArrayDto =
-        { Rates = uf4MutationRatesArray.RatesArray |> Array.map Uf4MutationRatesDto.fromDomain }
+        { uf4MutationRatesDtos = uf4MutationRatesArray.RatesArray |> Array.map Uf4MutationRatesDto.fromDomain }
 
     let toDomain (dto: Uf4MutationRatesArrayDto) : uf4MutationRatesArray =
         try
-            if Array.isEmpty dto.Rates then
+            if Array.isEmpty dto.uf4MutationRatesDtos then
                 failwith "Rates array cannot be empty"
-            let rates = dto.Rates |> Array.map Uf4MutationRatesDto.toDomain
+            let rates = dto.uf4MutationRatesDtos |> Array.map Uf4MutationRatesDto.toDomain
             uf4MutationRatesArray.create rates
         with
         | ex -> failwith $"Failed to convert Uf4MutationRatesArrayDto: {ex.Message}"

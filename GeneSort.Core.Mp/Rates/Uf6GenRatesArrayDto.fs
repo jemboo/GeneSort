@@ -1,7 +1,6 @@
 ﻿
 namespace GeneSort.Model.Mp.Sorter.Uf6
 
-open System
 open GeneSort.Core
 open MessagePack
 open MessagePack.Resolvers
@@ -10,7 +9,7 @@ open GeneSort.Core.Mp.RatesAndOps
 
 [<MessagePackObject>]
 type Uf6GenRatesArrayDto =
-    { [<Key(0)>] Rates: Uf6GenRatesDto array }
+    { [<Key(0)>] uf6GenRatesDtos: uf6GenRatesDto array }
 
 module Uf6GenRatesArrayDto =
 
@@ -18,13 +17,13 @@ module Uf6GenRatesArrayDto =
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let fromDomain (gen6RatesArray: uf6GenRatesArray) : Uf6GenRatesArrayDto =
-        { Rates = gen6RatesArray.RatesArray |> Array.map Uf6GenRatesDto.fromDomain }
+        { uf6GenRatesDtos = gen6RatesArray.RatesArray |> Array.map Uf6GenRatesDto.fromDomain }
 
     let toDomain (dto: Uf6GenRatesArrayDto) : uf6GenRatesArray =
         try
-            if Array.isEmpty dto.Rates then
+            if Array.isEmpty dto.uf6GenRatesDtos then
                 failwith "Rates array cannot be empty"
-            let rates = dto.Rates |> Array.map Uf6GenRatesDto.toDomain
+            let rates = dto.uf6GenRatesDtos |> Array.map Uf6GenRatesDto.toDomain
             uf6GenRatesArray.create rates
         with
         | ex -> failwith $"Failed to convert Uf6GenRatesArrayDto: {ex.Message}"

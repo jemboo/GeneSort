@@ -13,7 +13,7 @@ open GeneSort.Core.Mp
 type msuf6RandMutateDto =
     { [<Key(0)>] id: Guid
       [<Key(1)>] rngFactoryDto: rngFactoryDto
-      [<Key(3)>] uf6MutationRates: Uf6MutationRatesDto }
+      [<Key(3)>] uf6MutationRates: uf6MutationRatesDto }
 
 module Msuf6RandMutateDto =
 

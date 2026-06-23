@@ -30,8 +30,8 @@ module MsrsRandGenDto =
         try
             if dto.SortingWidth < 2 then
                 failwith $"SortingWidth must be at least 2, got {dto.SortingWidth}"
-            if (dto.OpsGenRatesArray.Rates.Length) < 1 then
-                failwith $"OpsGenRatesArray must have at least 1 rate, got {dto.OpsGenRatesArray.Rates.Length}"
+            if (dto.OpsGenRatesArray.opsGenRatesDtos.Length) < 1 then
+                failwith $"OpsGenRatesArray must have at least 1 rate, got {dto.OpsGenRatesArray.opsGenRatesDtos.Length}"
             msrsRandGen.create
                 (dto.rngFactoryDto |> RngFactoryDto.toDomain)
                 (UMX.tag<sortingWidth> dto.SortingWidth)

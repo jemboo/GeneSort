@@ -6,15 +6,15 @@ open GeneSort.Core
 [<MessagePackObject>]
 type opActionRatesArrayDto = {
     [<Key(0)>]
-    Rates: opActionRatesDto array
+    opActionRatesDtos: opActionRatesDto array
 }
 
 module OpActionRatesArrayDto =
 
     let toDomain (dto: opActionRatesArrayDto) : opActionRatesArray =
-        let rates = Array.map OpActionRatesDto.toDomain dto.Rates
+        let rates = Array.map OpActionRatesDto.toDomain dto.opActionRatesDtos
         opActionRatesArray.create rates
 
     let fromDomain (domain: opActionRatesArray) : opActionRatesArrayDto = {
-        Rates = Array.map OpActionRatesDto.fromDomain domain.RatesArray
+        opActionRatesDtos = Array.map OpActionRatesDto.fromDomain domain.RatesArray
     }

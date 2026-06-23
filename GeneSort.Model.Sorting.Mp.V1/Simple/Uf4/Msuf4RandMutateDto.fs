@@ -13,7 +13,7 @@ open GeneSort.Model.Mp.Sorter.Uf4
 type msuf4RandMutateDto =
     { [<Key(0)>] id: Guid
       [<Key(1)>] rngFactoryDto: rngFactoryDto
-      [<Key(2)>] uf4MutationRatesArrayDtos: Uf4MutationRatesDto }
+      [<Key(2)>] uf4MutationRatesArrayDtos: uf4MutationRatesDto }
 
 module Msuf4RandMutateDto =
 

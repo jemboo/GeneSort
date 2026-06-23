@@ -15,7 +15,7 @@ type msuf6RandMutateDto =
     { [<Key(0)>] id: Guid
       [<Key(1)>] rngFactoryDto: rngFactoryDto
       [<Key(2)>] msuf6Dto: msuf6Dto
-      [<Key(3)>] uf6MutationRatesArray: Uf6MutationRatesArrayDto }
+      [<Key(3)>] uf6MutationRatesArray: uf6MutationRatesArrayDto }
 
 module Msuf6RandMutateDto =
 

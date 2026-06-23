@@ -7,18 +7,18 @@ open MessagePack.Resolvers
 open MessagePack.FSharp
 
 [<MessagePackObject>]
-type Uf6MutationRatesArrayDto =
-    { [<Key(0)>] Rates: Uf6MutationRatesDto array }
+type uf6MutationRatesArrayDto =
+    { [<Key(0)>] Rates: uf6MutationRatesDto array }
 
 module Uf6MutationRatesArrayDto =
 
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let fromDomain (uf6MutationRatesArray: uf6MutationRatesArray) : Uf6MutationRatesArrayDto =
+    let fromDomain (uf6MutationRatesArray: uf6MutationRatesArray) : uf6MutationRatesArrayDto =
         { Rates = uf6MutationRatesArray.RatesArray |> Array.map Uf6MutationRatesDto.fromDomain }
 
-    let toDomain (dto: Uf6MutationRatesArrayDto) : uf6MutationRatesArray =
+    let toDomain (dto: uf6MutationRatesArrayDto) : uf6MutationRatesArray =
         try
             if Array.isEmpty dto.Rates then
                 failwith "Rates array cannot be empty"

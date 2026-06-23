@@ -3,42 +3,42 @@ open MessagePack
 open GeneSort.Core
 
 [<MessagePackObject>]
-type Seed6GenRatesDto = {
+type seed6GenRatesDto = {
     [<Key(0)>]
-    Ortho1Thresh: float
+    ortho1Thresh: float
     [<Key(1)>]
-    Ortho2Thresh: float
+    ortho2Thresh: float
     [<Key(2)>]
-    Para1Thresh: float
+    para1Thresh: float
     [<Key(3)>]
-    Para2Thresh: float
+    para2Thresh: float
     [<Key(4)>]
-    Para3Thresh: float
+    para3Thresh: float
     [<Key(5)>]
-    Para4Thresh: float
+    para4Thresh: float
     [<Key(6)>]
-    SelfReflThresh: float
+    selfReflThresh: float
 }
 
 module Seed6GenRatesDto =
 
-    let toDomain (dto: Seed6GenRatesDto) : seed6GenRates =
+    let toDomain (dto: seed6GenRatesDto) : seed6GenRates =
         seed6GenRates.create(
-            dto.Ortho1Thresh,
-            dto.Ortho2Thresh - dto.Ortho1Thresh,
-            dto.Para1Thresh - dto.Ortho2Thresh,
-            dto.Para2Thresh - dto.Para1Thresh,
-            dto.Para3Thresh - dto.Para2Thresh,
-            dto.Para4Thresh - dto.Para3Thresh,
-            dto.SelfReflThresh - dto.Para4Thresh
+            dto.ortho1Thresh,
+            dto.ortho2Thresh - dto.ortho1Thresh,
+            dto.para1Thresh - dto.ortho2Thresh,
+            dto.para2Thresh - dto.para1Thresh,
+            dto.para3Thresh - dto.para2Thresh,
+            dto.para4Thresh - dto.para3Thresh,
+            dto.selfReflThresh - dto.para4Thresh
         )
 
-    let fromDomain (domain: seed6GenRates) : Seed6GenRatesDto = {
-        Ortho1Thresh = domain.Ortho1Rate
-        Ortho2Thresh = domain.Ortho1Rate + domain.Ortho2Rate
-        Para1Thresh = domain.Ortho1Rate + domain.Ortho2Rate + domain.Para1Rate
-        Para2Thresh = domain.Ortho1Rate + domain.Ortho2Rate + domain.Para1Rate + domain.Para2Rate
-        Para3Thresh = domain.Ortho1Rate + domain.Ortho2Rate + domain.Para1Rate + domain.Para2Rate + domain.Para3Rate
-        Para4Thresh = domain.Ortho1Rate + domain.Ortho2Rate + domain.Para1Rate + domain.Para2Rate + domain.Para3Rate + domain.Para4Rate
-        SelfReflThresh = domain.Ortho1Rate + domain.Ortho2Rate + domain.Para1Rate + domain.Para2Rate + domain.Para3Rate + domain.Para4Rate + domain.SelfReflRate
+    let fromDomain (domain: seed6GenRates) : seed6GenRatesDto = {
+        ortho1Thresh = domain.Ortho1Rate
+        ortho2Thresh = domain.Ortho1Rate + domain.Ortho2Rate
+        para1Thresh = domain.Ortho1Rate + domain.Ortho2Rate + domain.Para1Rate
+        para2Thresh = domain.Ortho1Rate + domain.Ortho2Rate + domain.Para1Rate + domain.Para2Rate
+        para3Thresh = domain.Ortho1Rate + domain.Ortho2Rate + domain.Para1Rate + domain.Para2Rate + domain.Para3Rate
+        para4Thresh = domain.Ortho1Rate + domain.Ortho2Rate + domain.Para1Rate + domain.Para2Rate + domain.Para3Rate + domain.Para4Rate
+        selfReflThresh = domain.Ortho1Rate + domain.Ortho2Rate + domain.Para1Rate + domain.Para2Rate + domain.Para3Rate + domain.Para4Rate + domain.SelfReflRate
     }

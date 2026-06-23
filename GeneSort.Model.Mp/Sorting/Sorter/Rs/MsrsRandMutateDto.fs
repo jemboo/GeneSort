@@ -30,8 +30,8 @@ module MsrsRandMutateDto =
             let msrsResult = MsrsDto.toDomain dto.msrsDto
             match msrsResult with
             | Ok msrs ->
-                if %msrs.StageLength <> dto.opsActionRatesArray.Rates.Length then
-                    failwith $"StageLength ({%msrs.StageLength}) must match OpsActionRatesArray length ({dto.opsActionRatesArray.Rates.Length})"
+                if %msrs.StageLength <> dto.opsActionRatesArray.opsActionRatesDtos.Length then
+                    failwith $"StageLength ({%msrs.StageLength}) must match OpsActionRatesArray length ({dto.opsActionRatesArray.opsActionRatesDtos.Length})"
                 msrsRandMutate.create
                     (dto.rngFactoryDto |> RngFactoryDto.toDomain)
                     (OpsActionRatesArrayDto.toDomain dto.opsActionRatesArray)
