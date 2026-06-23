@@ -10,7 +10,7 @@ module Perm_RsOps =
         (indexPicker: int -> int) 
         (floatPicker: unit -> float)
         (opsGenRates: opsGenRates) 
-        (order: int) : Perm_Rs =
+        (order: int) : permRs =
         if order % 2 <> 0 then
             failwith "Perm_Rs order must be even"
         
@@ -54,7 +54,7 @@ module Perm_RsOps =
         
         let perm_Si = twoOrbits |> PermSi.fromTranspositions order
 
-        Perm_Rs.create perm_Si.Array
+        permRs.create perm_Si.Array
 
 
     /// Analyzes two distinct points in a Perm_Rs permutation to determine their symmetry properties.
@@ -62,7 +62,7 @@ module Perm_RsOps =
     /// <param name="permRs">The Perm_Rs permutation to analyze, which must be self-inverse.</param>
     /// <returns>A TwoOrbitPair </returns>
     /// <exception cref="ArgumentException">Thrown if permRs.Order is less than 4 or not even, or if PermPair constraints are violated.</exception>
-    let findRsPoints (indexPicker: int -> int) (permRs: Perm_Rs) : TwoOrbitPair =
+    let findRsPoints (indexPicker: int -> int) (permRs: permRs) : TwoOrbitPair =
         // Validate input
         let order = %permRs.Order
         let permArray = permRs.Array
@@ -112,15 +112,15 @@ module Perm_RsOps =
     let mutatePerm_Rs
             (indexPicker: int -> int) 
             (opam:opsActionMode) 
-            (permRs: Perm_Rs) : Perm_Rs =
+            (pRs: permRs) : permRs =
 
         if (opam = opsActionMode.NoAction) then
             // for NoAction mode, return the permutation as is
-            permRs
+            pRs
         else
-            let newArray = Array.copy permRs.Array
+            let newArray = Array.copy pRs.Array
             // Find two points in the permutation to mutate
-            let twoOrbitPair = findRsPoints indexPicker permRs
+            let twoOrbitPair = findRsPoints indexPicker pRs
 
             let twoOrbitTypeOpt = twoOrbitPair |> TwoOrbitPairOps.getTwoOrbitPairTypeOption
             let twoOrbitPairTypeFound = 
@@ -174,5 +174,5 @@ module Perm_RsOps =
                     newArray.[firstH] <- secondL 
             | opsActionMode.NoAction -> failwith "NoAction mode should not reach here"
 
-            newArray |> Perm_Rs.createUnsafe
+            newArray |> permRs.createUnsafe
 

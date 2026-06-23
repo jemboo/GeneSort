@@ -7,12 +7,12 @@ open GeneSort.Core.Combinatorics
 type Perm_RsTests() =
 
     // Helper function to create a Perm_Rs from an array
-    let createPermRs (arr: int array) : Perm_Rs =
-        Perm_Rs.create arr
+    let createPermRs (arr: int array) : permRs =
+        permRs.create arr
 
 
     // Helper to check if a permutation is self-inverse
-    let isSelfInverse (perm: Perm_Rs) : bool =
+    let isSelfInverse (perm: permRs) : bool =
         let arr = perm.Array
         arr |> Array.indexed |> Array.forall (fun (i, x) -> arr.[x] = i)
 
@@ -20,7 +20,7 @@ type Perm_RsTests() =
     [<Fact>]
     let ``NoAction mode returns original permutation`` () =
         let originalArray = [| 3; 2; 1; 0 |] // Self-inverse permutation
-        let permRs = Perm_Rs.create originalArray
+        let permRs = permRs.create originalArray
         let indexPicker = indexPicker [|0; 1|] // Should not be used in NoAction
         let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.NoAction permRs
         Assert.True(result.equals permRs)
@@ -30,7 +30,7 @@ type Perm_RsTests() =
     [<Fact>]
     let ``SS_Pair with SelfSymmetric mode`` () =
         let originalArray = [| 3; 2; 1; 0 |] // All self-symmetric pairs: (0,3), (1,2)
-        let permRs = Perm_Rs.create originalArray
+        let permRs = permRs.create originalArray
         let indexPicker = indexPicker  [|0; 1|] // Pick pairs (0,3) and (1,2)
         let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.SelfRefl permRs
         Assert.True(isSelfInverse result)
@@ -40,7 +40,7 @@ type Perm_RsTests() =
     let ``SS_Pair with Ortho mode`` () =
         let originalArray = [| 3; 2; 1; 0 |]
         let expectedArray = [| 1; 0; 3; 2 |]
-        let permRs = Perm_Rs.create originalArray
+        let permRs = permRs.create originalArray
         let indexPicker = indexPicker [|0; 1|]// Pick pairs (0,3) and (1,2)
         let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.Ortho permRs
         Assert.True(isSelfInverse result)
@@ -50,7 +50,7 @@ type Perm_RsTests() =
     let ``SS_Pair with Para mode`` () =
         let originalArray = [| 3; 2; 1; 0 |]
         let expectedArray = [| 2; 3; 0; 1 |]
-        let permRs = Perm_Rs.create originalArray
+        let permRs = permRs.create originalArray
         let indexPicker = indexPicker [|0; 1|] // Pick pairs (0,3) and (1,2)
         let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.Para permRs
         Assert.True(isSelfInverse result)
@@ -61,7 +61,7 @@ type Perm_RsTests() =
     let ``Mixed_Pair with SelfSymmetric mode`` () =
         let originalArray = [| 5; 2; 1; 4; 3; 0 |]
         let expectedArray = [| 5; 4; 3; 2; 1; 0 |]
-        let permRs = Perm_Rs.create originalArray
+        let permRs = permRs.create originalArray
         let indexPicker = indexPicker [|0; 1|] // Pick pairs (0,5) and (1,2)
         let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.SelfRefl permRs
         Assert.True(isSelfInverse result)
@@ -71,7 +71,7 @@ type Perm_RsTests() =
     let ``Mixed_Pair with Ortho mode`` () =
         let originalArray = [| 5; 2; 1; 4; 3; 0 |] // (0,5), (1,2), (3,4)
         let expectedArray = [| 5; 2; 1; 4; 3; 0 |]
-        let permRs = Perm_Rs.create originalArray
+        let permRs = permRs.create originalArray
         let indexPicker = indexPicker [|0; 1|] // Pick (0,3) and (4,5)
         let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.Ortho permRs
         Assert.True(isSelfInverse result)
@@ -81,7 +81,7 @@ type Perm_RsTests() =
     let ``Mixed_Pair with Para mode`` () =
         let originalArray = [| 5; 2; 1; 4; 3; 0 |] // (0,5), (1,2), (3,4)
         let expectedArray = [| 5; 3; 4; 1; 2; 0 |]
-        let permRs = Perm_Rs.create originalArray
+        let permRs = permRs.create originalArray
         let indexPicker = indexPicker [|0; 2|] // Pick (0,4) and (1,2)
         let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.Para permRs
         Assert.True(isSelfInverse result)
@@ -92,7 +92,7 @@ type Perm_RsTests() =
     let ``Mixed_Pair with Para mode another rsTwoOrbit`` () =
         let originalArray = [| 11; 2; 1; 8; 5; 4; 7; 6; 3; 10; 9; 0 |]
         let expectedArray = [| 8; 2; 1; 11; 5; 4; 7; 6; 0; 10; 9; 3 |]
-        let permRs = Perm_Rs.create originalArray
+        let permRs = permRs.create originalArray
         let indexPicker = indexPicker [|0; 2; 0|] // Pick (0,4) and (1,2)
         let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.Para permRs
         Assert.True(isSelfInverse result)
@@ -102,7 +102,7 @@ type Perm_RsTests() =
     [<Fact>]
     let ``RS_Pair with Ortho mode`` () =
         let originalArray = [| 1; 0; 3; 2 |] // (0,1), (2,3)
-        let permRs = Perm_Rs.create originalArray
+        let permRs = permRs.create originalArray
         let indexPicker = indexPicker [|0; 1|] // Pick (0,1) and (2,3)
         let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.Ortho permRs
         let expectedArray = [| 1; 0; 3; 2 |] // Ortho swap should preserve for valid pairs
@@ -112,7 +112,7 @@ type Perm_RsTests() =
     [<Fact>]
     let ``RS_Pair with Para mode`` () =
         let originalArray = [| 1; 0; 3; 2 |] // (0,1), (2,3)
-        let permRs = Perm_Rs.create originalArray
+        let permRs = permRs.create originalArray
         let indexPicker = indexPicker [|0; 1|] // Pick (0,1) and (2,3)
         let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.Para permRs
         let expectedArray = [| 2; 3; 0; 1 |] // Para swap should preserve for valid pairs
@@ -122,7 +122,7 @@ type Perm_RsTests() =
     [<Fact>]
     let ``RS_Pair with SelfSymmetric mode`` () =
         let originalArray = [| 1; 0; 3; 2 |] // (0,1), (2,3)
-        let permRs = Perm_Rs.create originalArray
+        let permRs = permRs.create originalArray
         let indexPicker = indexPicker [|0; 1|] // Pick (0,1) and (2,3)
         let result = Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.SelfRefl permRs
         let expectedArray = [| 3; 2; 1; 0 |] // Map 0->3, 1->2, 2->1, 3->0
@@ -134,7 +134,7 @@ type Perm_RsTests() =
     [<Fact>]
     let ``Throws on invalid order less than 4`` () =
         let invalidArray = [| 1; 0 |] // Order 2, too small
-        let permRs = Perm_Rs.createUnsafe invalidArray // Use unsafe to bypass create validation
+        let permRs = permRs.createUnsafe invalidArray // Use unsafe to bypass create validation
         let indexPicker = indexPicker [|0; 1|]
         Assert.ThrowsAny<System.ArgumentException>(fun () ->
             Perm_RsOps.mutatePerm_Rs indexPicker opsActionMode.SelfRefl permRs |> ignore

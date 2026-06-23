@@ -31,15 +31,15 @@ module Perm_RsDto =
         | NotReflectionSymmetric of string
         | PermSiConversionError of PermSiDto.Perm_SiDtoError
 
-    let toPerm_RsDto (permRs: Perm_Rs) : Perm_RsDto =
+    let toPerm_RsDto (permRs: permRs) : Perm_RsDto =
         { PermSi = PermSiDto.fromDomain permRs.PermSi }
 
-    let toPerm_Rs (dto: Perm_RsDto) : Result<Perm_Rs, Perm_RsDtoError> =
+    let toPerm_Rs (dto: Perm_RsDto) : Result<permRs, Perm_RsDtoError> =
         match PermSiDto.toDomain dto.PermSi with
         | Error e -> Error (PermSiConversionError e)
         | Ok permSi ->
             try
-                let permRs = Perm_Rs.create permSi.Array
+                let permRs = permRs.create permSi.Array
                 Ok permRs
             with
             | :? ArgumentException as ex when ex.Message.Contains("order must be at least 4") ->

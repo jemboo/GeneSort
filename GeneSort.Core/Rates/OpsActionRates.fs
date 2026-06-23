@@ -113,11 +113,11 @@ module OpsActionRates =
     /// Mutates an array of Perm_Rs using a single uniform opsActionRates.
     let mutate 
         (rates: opsActionRates) 
-        (orthoMutator: Perm_Rs -> Perm_Rs) 
-        (paraMutator: Perm_Rs -> Perm_Rs) 
-        (selfSymMutator: Perm_Rs -> Perm_Rs) 
+        (orthoMutator: permRs -> permRs) 
+        (paraMutator: permRs -> permRs) 
+        (selfSymMutator: permRs -> permRs) 
         (floatPicker: unit -> float) 
-        (arrayToMutate: Perm_Rs[]) : Perm_Rs[] = 
+        (arrayToMutate: permRs[]) : permRs[] = 
         
         arrayToMutate |> Array.map (fun prs ->
             match rates.PickMode floatPicker with

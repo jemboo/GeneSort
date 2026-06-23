@@ -1,12 +1,10 @@
 ﻿namespace GeneSort.Core
-open FSharp.UMX
-open Combinatorics
 
 // Perm_Rs type: a permutation that is its own inverse (p ∘ p = identity)
 // Is reflection symmetric, and has an order that is divisible by 4.
-type Perm_Rs = private Perm_Rs of permSi with
+type permRs = private PermRs of permSi with
     // Static method to create a Perm_Rs, validating self-inverse property
-    static member create (arr: int array) : Perm_Rs =
+    static member create (arr: int array) : permRs =
         if arr.Length < 4 then
             failwith "Perm_Rs order must be at least 4"
         if arr.Length % 2 <> 0 then
@@ -14,39 +12,39 @@ type Perm_Rs = private Perm_Rs of permSi with
         let perm_Si = permSi.create arr
         if not (PermSi.isReflectionSymmetric perm_Si) then
             failwith "Invalid Perm_Rs: permutation must be self-inverse"
-        Perm_Rs perm_Si
+        PermRs perm_Si
 
     // Static method to create a Perm_Rs, validating self-inverse property
-    static member createUnsafe (arr: int array) : Perm_Rs =
+    static member createUnsafe (arr: int array) : permRs =
         let perm = permSi.createUnsafe arr
-        Perm_Rs perm
+        PermRs perm
 
     // Property to access the underlying permutation
     member this.Permutation
         with get () =
             match this with
-            | Perm_Rs perm -> perm.Permutation
+            | PermRs perm -> perm.Permutation
 
     // Property to access the underlying PermSi
     member this.PermSi
         with get () =
         match this with
-        | Perm_Rs perm_rs -> perm_rs
+        | PermRs perm_rs -> perm_rs
 
     member this.Id
         with get () =
             match this with
-            | Perm_Rs perm -> perm.Id
+            | PermRs perm -> perm.Id
 
     member this.Order
         with get () =
             match this with
-            | Perm_Rs perm -> perm.Order
+            | PermRs perm -> perm.Order
              
     member this.Array
         with get () =
             match this with
-            | Perm_Rs perm -> perm.Array
+            | PermRs perm -> perm.Array
 
-    member this.equals (other: Perm_Rs) : bool =
+    member this.equals (other: permRs) : bool =
             this.Permutation.equals(other.Permutation)

@@ -110,7 +110,7 @@ type SorterModelDtoTests() =
 
     [<Fact>]
     let ``Msrs round-trip serialization and deserialization should succeed`` () =
-        let permRss = [| Perm_Rs.create([| 3; 2; 1; 0 |]); Perm_Rs.create([| 1; 0; 3; 2 |]) |]
+        let permRss = [| permRs.create([| 3; 2; 1; 0 |]); permRs.create([| 1; 0; 3; 2 |]) |]
         let msrs = msrs.create (Guid.NewGuid() |> UMX.tag<sorterModelId>) (UMX.tag<sortingWidth> 4) permRss
         let sorterModel = sorterModel.Msrs msrs
         let result = roundTrip sorterModel
@@ -118,7 +118,7 @@ type SorterModelDtoTests() =
         | sorterModel.Msrs resultMsrs ->
             Assert.Equal(msrs.Id, resultMsrs.Id)
             Assert.Equal(msrs.SortingWidth, resultMsrs.SortingWidth)
-            Assert.Equal<Perm_Rs>(msrs.Perm_Rss, resultMsrs.Perm_Rss)
+            Assert.Equal<permRs>(msrs.Perm_Rss, resultMsrs.Perm_Rss)
         | _ -> Assert.True(false, "Expected Msrs case")
 
 

@@ -13,15 +13,15 @@ open GeneSort.Core.Rando
 type MsrsRandMutateTests() =
 
     // Helper function to create a Perm_Rs from an array
-    let createPermRs (arr: int array) : Perm_Rs =
-        Perm_Rs.create arr
+    let createPermRs (arr: int array) : permRs =
+        permRs.create arr
 
     // Helper to create a Model_Rs
-    let createModelRs (id: Guid<sorterModelId>) (width: int<sortingWidth>) (permRss: Perm_Rs array) : msrs =
+    let createModelRs (id: Guid<sorterModelId>) (width: int<sortingWidth>) (permRss: permRs array) : msrs =
         msrs.create id width permRss
 
     // Helper to check if a permutation is self-inverse
-    let isSelfInverse (perm: Perm_Rs) : bool =
+    let isSelfInverse (perm: permRs) : bool =
         let arr = perm.Array
         arr |> Array.indexed |> Array.forall (fun (i, x) -> arr.[x] = i)
 
@@ -43,7 +43,7 @@ type MsrsRandMutateTests() =
         let result = modelRsMutate.MakeSorterModelFromIndex 0
         Assert.Equal(width, result.SortingWidth)
         Assert.Equal(2<stageLength>, result.StageLength)
-        Assert.Equal<Perm_Rs array>(permRss, result.Perm_Rss)
+        Assert.Equal<permRs array>(permRss, result.Perm_Rss)
 
     [<Fact>]
     let ``SelfSym mode mutates Perm_Rss correctly`` () =
@@ -60,7 +60,7 @@ type MsrsRandMutateTests() =
         let result = modelRsMutate.MakeSorterModelFromIndex 0
         Assert.Equal(width, result.SortingWidth)
         Assert.Equal(2<stageLength>, result.StageLength)
-        Assert.Equal<Perm_Rs array>(expectedPermRss, result.Perm_Rss)
+        Assert.Equal<permRs array>(expectedPermRss, result.Perm_Rss)
         Assert.True(result.Perm_Rss |> Array.forall isSelfInverse)
 
     [<Fact>]
@@ -78,7 +78,7 @@ type MsrsRandMutateTests() =
         let result = modelRsMutate.MakeSorterModelFromIndex 0
         Assert.Equal(width, result.SortingWidth)
         Assert.Equal(2<stageLength>, result.StageLength)
-        Assert.Equal<Perm_Rs array>(expectedPermRss, result.Perm_Rss)
+        Assert.Equal<permRs array>(expectedPermRss, result.Perm_Rss)
         Assert.True(result.Perm_Rss |> Array.forall isSelfInverse)
 
     [<Fact>]
@@ -96,7 +96,7 @@ type MsrsRandMutateTests() =
         let result = modelRsMutate.MakeSorterModelFromIndex 0
         Assert.Equal(width, result.SortingWidth)
         Assert.Equal(2<stageLength>, result.StageLength)
-        Assert.Equal<Perm_Rs array>(expectedPermRss, result.Perm_Rss)
+        Assert.Equal<permRs array>(expectedPermRss, result.Perm_Rss)
         Assert.True(result.Perm_Rss |> Array.forall isSelfInverse)
 
     [<Fact>]
@@ -115,7 +115,7 @@ type MsrsRandMutateTests() =
         let expectedPermRss = [| [| 3; 2; 1; 0 |]; [| 2; 3; 0; 1 |] |] |> Array.map createPermRs
         Assert.Equal(width, result.SortingWidth)
         Assert.Equal(2<stageLength>, result.StageLength)
-        Assert.Equal<Perm_Rs array>(expectedPermRss, result.Perm_Rss)
+        Assert.Equal<permRs array>(expectedPermRss, result.Perm_Rss)
         Assert.True(result.Perm_Rss |> Array.forall isSelfInverse)
 
     [<Fact>]
