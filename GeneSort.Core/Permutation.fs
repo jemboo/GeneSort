@@ -226,3 +226,17 @@ module Permutation =
         let k = k % order // Normalize k to avoid unnecessary cycles
         let k = if k < 0 then k + order else k // Handle negative k
         permutation.createUnsafe (Array.init order (fun i -> arr.[(i + k + order) % order]))
+
+
+    // Get the sequence of powers p, p^2, ..., e (identity)
+    let makeCyclicGroup (perm: permutation) : permutation seq =
+        let arr = perm.Array
+        let n = Array.length arr
+        let id = identity n
+        let rec generatePowers (current: permutation) acc =
+            if current.Array = id.Array then
+                seq { yield! acc; yield current }
+            else
+                let next = compose current perm
+                generatePowers next (seq { yield! acc; yield current })
+        generatePowers perm Seq.empty

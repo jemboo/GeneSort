@@ -25,7 +25,7 @@ module PrototypeUnfolder =
     // creates TwoOrbitPairs from TwoOrbits by reflection
     let unfoldTwoOrbitPairsIntoTwoOrbitPairs 
             (types: twoOrbitPairType list) 
-            (twoOrbitPairs: TwoOrbitPair list) : TwoOrbitPair list =
+            (twoOrbitPairs: twoOrbitPair list) : twoOrbitPair list =
 
         if types.Length <> (twoOrbitPairs.Length * 2) then
             invalidArg "types" "Length of types must be twice the length of pairs"
@@ -55,22 +55,22 @@ module PrototypeUnfolder =
 
 
     // twoOrbitPairsForOrder4
-    let twoOrbitPairsForOrder4 (twoOrbitPairType:twoOrbitPairType) : TwoOrbitPair =
+    let twoOrbitPairsForOrder4 (twoOrbitPairType:twoOrbitPairType) : twoOrbitPair =
         match twoOrbitPairType with
-        | twoOrbitPairType.Ortho -> TwoOrbitPair.create 4 (twoOrbit.create [0; 2]) (twoOrbit.create [1; 3] |> Some)
-        | twoOrbitPairType.Para -> TwoOrbitPair.create 4 (twoOrbit.create [0; 1]) (twoOrbit.create [2; 3] |> Some)
-        | twoOrbitPairType.SelfRefl ->  TwoOrbitPair.create 4 (twoOrbit.create [0; 3]) (twoOrbit.create [1; 2] |> Some)
+        | twoOrbitPairType.Ortho -> twoOrbitPair.create 4 (twoOrbit.create [0; 2]) (twoOrbit.create [1; 3] |> Some)
+        | twoOrbitPairType.Para -> twoOrbitPair.create 4 (twoOrbit.create [0; 1]) (twoOrbit.create [2; 3] |> Some)
+        | twoOrbitPairType.SelfRefl ->  twoOrbitPair.create 4 (twoOrbit.create [0; 3]) (twoOrbit.create [1; 2] |> Some)
 
 
     // makeTwoCycleFromTwoOrbitTypes
     let makePerm_SiFromTwoOrbitPairsAndTypes
-            (seedTwoOrbitPair : TwoOrbitPair list option)
+            (seedTwoOrbitPair : twoOrbitPair list option)
             (twoOrbitPairTypes: twoOrbitPairType list) : permSi =
         if twoOrbitPairTypes.Length < 1 then
             failwith "twoOrbitPairTypes list must have an element"
 
         let _makeTwoCycleFromTwoOrbitTypes
-                (seedTwoOrbitPairs : TwoOrbitPair list)
+                (seedTwoOrbitPairs : twoOrbitPair list)
                 (twoOrbitPairTypes: twoOrbitPairType list) : permSi =
             if seedTwoOrbitPairs.Length < 1 then
                 failwith "seedRsOrbitPair list must have an element"

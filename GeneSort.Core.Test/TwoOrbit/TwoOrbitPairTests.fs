@@ -13,7 +13,7 @@ type TwoOrbitPairTests() =
         let orbit1 = twoOrbit.create [0; 1]
         let orbit2 = twoOrbit.create [2; 3]
         let order = 4
-        let pair = TwoOrbitPair.create order orbit1 (orbit2 |> Some)
+        let pair = twoOrbitPair.create order orbit1 (orbit2 |> Some)
         Assert.Equal(orbit1, pair.FirstOrbit)
         Assert.Equal(orbit2, pair.SecondOrbit.Value)
         Assert.Equal(order, pair.Order)
@@ -25,7 +25,7 @@ type TwoOrbitPairTests() =
         let orbit1 = twoOrbit.create [2; 4]
         let orbit2 = twoOrbit.create [3; 5]
         let order = 8
-        let pair = TwoOrbitPair.create order orbit1 (orbit2 |> Some)
+        let pair = twoOrbitPair.create order orbit1 (orbit2 |> Some)
         Assert.Equal(orbit1, pair.FirstOrbit)
         Assert.Equal(orbit2, pair.SecondOrbit.Value)
         Assert.Equal(order, pair.Order)
@@ -37,7 +37,7 @@ type TwoOrbitPairTests() =
         let orbit1 = twoOrbit.create [1; 2]
         let orbit2 = twoOrbit.create [0; 3]
         let order = 4
-        let pair = TwoOrbitPair.create order orbit1 (orbit2 |> Some)
+        let pair = twoOrbitPair.create order orbit1 (orbit2 |> Some)
         Assert.Equal(orbit2, pair.FirstOrbit)
         Assert.Equal(orbit1, pair.SecondOrbit.Value)
         Assert.Equal(order, pair.Order)
@@ -49,29 +49,29 @@ type TwoOrbitPairTests() =
         let orbit1 = twoOrbit.create [0; 1]
         let orbit2 = twoOrbit.create [1; 2]
         let order = 4
-        Assert.Throws<Exception>(fun () -> TwoOrbitPair.create order orbit1 (orbit2 |> Some) |> ignore)
+        Assert.Throws<Exception>(fun () -> twoOrbitPair.create order orbit1 (orbit2 |> Some) |> ignore)
 
     [<Fact>]
     let ``Create TwoOrbitPair with order less than 4 fails`` () =
         let orbit1 = twoOrbit.create [0; 1]
         let orbit2 = twoOrbit.create [2; 3]
         let order = 3
-        Assert.Throws<Exception>(fun () -> TwoOrbitPair.create order orbit1 (orbit2 |> Some) |> ignore)
+        Assert.Throws<Exception>(fun () -> twoOrbitPair.create order orbit1 (orbit2 |> Some) |> ignore)
 
     [<Fact>]
     let ``Create TwoOrbitPair with invalid orbit pair fails`` () =
         let orbit1 = twoOrbit.create [0; 1]
         let orbit2 = twoOrbit.create [2; 4]
         let order = 4
-        Assert.Throws<Exception>(fun () -> TwoOrbitPair.create order orbit1 (orbit2 |> Some) |> ignore)
+        Assert.Throws<Exception>(fun () -> twoOrbitPair.create order orbit1 (orbit2 |> Some) |> ignore)
 
     [<Fact>]
     let ``TwoOrbitPair equality with same orbits and order`` () =
         let orbit1 = twoOrbit.create [0; 1]
         let orbit2 = twoOrbit.create [2; 3]
         let order = 4
-        let pair1 = TwoOrbitPair.create order orbit1 (orbit2 |> Some)
-        let pair2 = TwoOrbitPair.create order orbit2 (orbit1 |> Some)
+        let pair1 = twoOrbitPair.create order orbit1 (orbit2 |> Some)
+        let pair2 = twoOrbitPair.create order orbit2 (orbit1 |> Some)
         Assert.True(pair1.Equals(pair2))
         Assert.Equal(pair1.GetHashCode(), pair2.GetHashCode())
 
@@ -82,8 +82,8 @@ type TwoOrbitPairTests() =
         let orbit3 = twoOrbit.create [0; 3]
         let orbit4 = twoOrbit.create [1; 2]
         let order = 4
-        let pair1 = TwoOrbitPair.create order orbit1 (orbit2 |> Some)
-        let pair2 = TwoOrbitPair.create order orbit3 (orbit4 |> Some)
+        let pair1 = twoOrbitPair.create order orbit1 (orbit2 |> Some)
+        let pair2 = twoOrbitPair.create order orbit3 (orbit4 |> Some)
         Assert.False(pair1.Equals(pair2))
 
     [<Fact>]
@@ -91,8 +91,8 @@ type TwoOrbitPairTests() =
         let orbit1 = twoOrbit.create [0; 1]
         let orbit2 = twoOrbit.create [2; 3]
         let orbit2s = twoOrbit.create [4; 5]
-        let pair1 = TwoOrbitPair.create 4 orbit1 (orbit2 |> Some)
-        let pair2 = TwoOrbitPair.create 6 orbit1 (orbit2s |> Some)
+        let pair1 = twoOrbitPair.create 4 orbit1 (orbit2 |> Some)
+        let pair2 = twoOrbitPair.create 6 orbit1 (orbit2s |> Some)
         Assert.False(pair1.Equals(pair2))
 
     //unfoldTwoOrbitIntoTwoOrbitPair
@@ -159,7 +159,7 @@ type TwoOrbitPairTests() =
                      twoOrbitPairType.Para; twoOrbitPairType.SelfRefl;]
         let orbit1 = twoOrbit.create [0; 1]
         let orbit2 = twoOrbit.create [2; 3]
-        let pair = TwoOrbitPair.create 4 orbit1 (orbit2 |> Some)
+        let pair = twoOrbitPair.create 4 orbit1 (orbit2 |> Some)
         let perm_Rs = makePerm_SiFromTwoOrbitPairsAndTypes (Some [pair]) types
         Assert.Equal((perm_Rs.Order |> UMX.untag), 16)
 

@@ -62,7 +62,7 @@ module Perm_RsOps =
     /// <param name="permRs">The Perm_Rs permutation to analyze, which must be self-inverse.</param>
     /// <returns>A TwoOrbitPair </returns>
     /// <exception cref="ArgumentException">Thrown if permRs.Order is less than 4 or not even, or if PermPair constraints are violated.</exception>
-    let findRsPoints (indexPicker: int -> int) (permRs: permRs) : TwoOrbitPair =
+    let findRsPoints (indexPicker: int -> int) (permRs: permRs) : twoOrbitPair =
         // Validate input
         let order = %permRs.Order
         let permArray = permRs.Array
@@ -91,20 +91,20 @@ module Perm_RsOps =
         if firstReflect = firstMap then
             if secondReflect = secondMap then
                 // Both points are self-symmetric
-                TwoOrbitPair.create order (twoOrbit.create [ first; firstMap ]) (twoOrbit.create [ second; secondMap] |> Some) 
+                twoOrbitPair.create order (twoOrbit.create [ first; firstMap ]) (twoOrbit.create [ second; secondMap] |> Some) 
             else
                 // First point is self-symmetric, second is not
                 let otherRsTwoOrbit = _randomlyFindOtherReflectionSymmetricTwoOrbits first
                 match otherRsTwoOrbit with
                 | Some orb -> 
-                    TwoOrbitPair.create order (twoOrbit.create [ first; firstMap ]) (orb |> Some) 
+                    twoOrbitPair.create order (twoOrbit.create [ first; firstMap ]) (orb |> Some) 
                 | None ->
                     let secondReflectMap = permArray.[secondReflect]
-                    TwoOrbitPair.create order (twoOrbit.create [ second; secondMap ]) (twoOrbit.create [ secondReflect; secondReflectMap] |> Some) 
+                    twoOrbitPair.create order (twoOrbit.create [ second; secondMap ]) (twoOrbit.create [ secondReflect; secondReflectMap] |> Some) 
         else
             // Neither point is self-symmetric, use first point's reflection
             let firstReflectMap = permArray.[firstReflect]
-            TwoOrbitPair.create order (twoOrbit.create [ first; firstMap ]) (twoOrbit.create [ firstReflect; firstReflectMap] |> Some) 
+            twoOrbitPair.create order (twoOrbit.create [ first; firstMap ]) (twoOrbit.create [ firstReflect; firstReflectMap] |> Some) 
 
 
 

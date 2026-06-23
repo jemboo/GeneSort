@@ -67,7 +67,7 @@ type PrototypeUnfolderTests() =
     let ``unfoldTwoOrbitPairsIntoTwoOrbitPairs with mismatched lengths throws exception`` () =
         let orbit1 = twoOrbit.create [0; 1]
         let orbit2 = twoOrbit.create [2; 3]
-        let pair = TwoOrbitPair.create 4 orbit1 (orbit2 |> Some)
+        let pair = twoOrbitPair.create 4 orbit1 (orbit2 |> Some)
         let types = [twoOrbitPairType.Ortho; twoOrbitPairType.Para; twoOrbitPairType.SelfRefl] // Length 3
         let pairs = [pair] // Length 1, 2*1 != 3
         Assert.Throws<ArgumentException>(fun () -> unfoldTwoOrbitPairsIntoTwoOrbitPairs types pairs |> ignore)

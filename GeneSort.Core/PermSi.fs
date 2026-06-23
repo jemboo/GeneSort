@@ -238,7 +238,7 @@ module PermSi =
 
 
     /// Creates a Perm_Rs from a list of TwoOrbit pairs by mutating the identity Perm
-    let fromTwoOrbitPair (twoOrbitPairs : TwoOrbitPair array) : permSi =
+    let fromTwoOrbitPair (twoOrbitPairs : twoOrbitPair array) : permSi =
         if twoOrbitPairs.Length < 1 then
             failwith "RsOrbitPair list must have an element"
 

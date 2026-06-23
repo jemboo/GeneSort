@@ -5,7 +5,6 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Core.CollectionUtils
 open GeneSort.Core.Permutation
-open GeneSort.Core.PermutationSets
 open GeneSort.Core.CoreGen
 open System
 

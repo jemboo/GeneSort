@@ -2,7 +2,7 @@
 
 open Xunit
 open GeneSort.Core
-open GeneSort.Core.PermutationSets
+open GeneSort.Core.Permutation
 
 type PermutationSetsTests() =
 

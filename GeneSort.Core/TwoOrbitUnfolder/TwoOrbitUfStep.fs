@@ -53,7 +53,7 @@ module TwoOrbitUfStep =
     /// provided, and twice the order of the given Perm_RsUnfolderStep.
     let unfoldTwoOrbits
         (twoOrbitUfStep:TwoOrbitUfStep) 
-        (twoOrbits:twoOrbit array) : TwoOrbitPair list =
+        (twoOrbits:twoOrbit array) : twoOrbitPair list =
 
         let zippy = twoOrbitUfStep.twoOrbitPairTypes |> Array.zip twoOrbits
         [  
@@ -68,7 +68,7 @@ module TwoOrbitUfStep =
     /// twoOrbitUnfolder.TwoOrbitTypes, and twice the order of the given Perm_RsUnfolderStep.
     let unfoldTwoOrbitPairs
         (twoOrbitUfStep:TwoOrbitUfStep) 
-        (twoOrbitPairs:TwoOrbitPair array) : TwoOrbitPair array =
+        (twoOrbitPairs:twoOrbitPair array) : twoOrbitPair array =
 
         let twoOrbits = twoOrbitPairs |> TwoOrbitPairOps.makeTwoOrbits |> Seq.toArray
         let zippy = twoOrbitUfStep.twoOrbitPairTypes |> Array.zip twoOrbits
