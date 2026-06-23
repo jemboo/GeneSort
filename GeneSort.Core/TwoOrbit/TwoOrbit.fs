@@ -48,7 +48,7 @@ type twoOrbit = private TwoOrbit of (int * int) with
     /// Converts the TwoOrbit to an Orbit.
     member this.ToOrbit =
         match this with
-        | TwoOrbit (a, b) -> Orbit.create [a; b]
+        | TwoOrbit (a, b) -> orbit.create [a; b]
 
     /// Checks if this TwoOrbit is disjoint from another.
     member this.IsDisjoint (other: twoOrbit) =

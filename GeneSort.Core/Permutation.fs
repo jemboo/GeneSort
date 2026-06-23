@@ -162,7 +162,7 @@ module Permutation =
 
     // --- Visualization & Orbits ---
 
-    let toOrbitSet (perm: permutation) : OrbitSet =
+    let toOrbitSet (perm: permutation) : orbitSet =
         let arr = perm.Array
         let n = arr.Length
         let visited = Array.create n false
@@ -175,14 +175,14 @@ module Permutation =
         let orbits = [
             for i in 0 .. n-1 do
                 if not visited.[i] then
-                    yield Orbit.create (build i [] |> List.rev)
+                    yield orbit.create (build i [] |> List.rev)
         ]
-        OrbitSet.create orbits n
+        orbitSet.create orbits n
 
 
     /// Converts an OrbitSet to a Permutation.
     /// The orbits must cover indices from 0 to order-1.
-    let fromOrbitSet (orbitSet:OrbitSet) : permutation =
+    let fromOrbitSet (orbitSet:orbitSet) : permutation =
         let indices = 
             orbitSet.Orbits 
             |> List.collect (fun orbit -> orbit.Indices)

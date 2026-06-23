@@ -2,12 +2,11 @@
 
 open System
 open GeneSort.Core.Orbit
-open CollectionUtils
 
 [<CustomEquality; NoComparison>]
-type OrbitSet = private OrbitSet of orbits: Orbit list * order: int with
+type orbitSet = private OrbitSet of orbits: orbit list * order: int with
     // Static method to create an OrbitSet, validating input
-    static member create (orbits: Orbit list) (order: int) : OrbitSet =
+    static member create (orbits: orbit list) (order: int) : orbitSet =
         if orbits.Length < 1 then
             failwith "orbits cannot be empty"
         if order < 0 then
@@ -37,13 +36,13 @@ type OrbitSet = private OrbitSet of orbits: Orbit list * order: int with
             | OrbitSet (_, order) -> order
 
         // Check if two OrbitSets are equal
-        member this.Equals (other: OrbitSet) =
+        member this.Equals (other: orbitSet) =
             this.Orbits = other.Orbits && this.Order = other.Order
 
         // Override for object equality
         override this.Equals (obj: obj) =
             match obj with
-            | :? OrbitSet as other -> this.Equals other
+            | :? orbitSet as other -> this.Equals other
             | _ -> false
 
         // Override GetHashCode for consistency with Equals
@@ -55,15 +54,15 @@ type OrbitSet = private OrbitSet of orbits: Orbit list * order: int with
             (orbitHash * 397) ^^^ this.Order
 
         // Implement IEquatable<OrbitSet> for structural equality
-        interface IEquatable<OrbitSet> with
-            member this.Equals (other: OrbitSet) = this.Equals other
+        interface IEquatable<orbitSet> with
+            member this.Equals (other: orbitSet) = this.Equals other
 
 
 
 module OrbitSet =
 
     // Helper to print permutation in orbit notation, including fixed points
-    let toOrbitNotation (orbitSet: OrbitSet) : string =
+    let toOrbitNotation (orbitSet: orbitSet) : string =
         let orbits = orbitSet.Orbits
         let orbitString = 
             orbits 
@@ -74,7 +73,7 @@ module OrbitSet =
 
     /// Finds all orbits (for all lengths including fixed points) that are either 
     /// their own reflection or have a reflection partner orbit. 
-    let getReflectionPartnerOrbits (orbitSet: OrbitSet) =
+    let getReflectionPartnerOrbits (orbitSet: orbitSet) =
         let reflected = orbitSet.Orbits
                         |> List.map(getReflection orbitSet.Order)
         let combo = orbitSet.Orbits |> List.append reflected

@@ -4,7 +4,7 @@ open System
 open SysExt
 
 
-type BytePack = {
+type bytePack = {
     bitsPerSymbol: int
     symbolCount: int
     data: byte[]
@@ -13,11 +13,11 @@ type BytePack = {
 
 module BytePack =
 
-    let toBitSequence (bytePack: BytePack) : seq<bool> =
+    let toBitSequence (bytePack: bytePack) : seq<bool> =
         bytePack.data
         |> Seq.collect (fun b -> b.toBoolArrayMSB 8)
 
-    let toSequenceOfInt (bytePack: BytePack) : seq<int> =
+    let toSequenceOfInt (bytePack: bytePack) : seq<int> =
         let bits = toBitSequence bytePack |> Seq.toArray
         let chunkSize = bytePack.bitsPerSymbol
         let expectedBits = bytePack.symbolCount * chunkSize
@@ -36,7 +36,7 @@ module BytePack =
                 yield value
         }
 
-    let fromSequenceOfInt (ints: seq<int>) (bitsPerSymbol: int) : BytePack =
+    let fromSequenceOfInt (ints: seq<int>) (bitsPerSymbol: int) : bytePack =
         let symbols = Seq.toArray ints
         let symbolCount = symbols.Length
         let totalBits = symbolCount * bitsPerSymbol
@@ -66,7 +66,7 @@ module BytePack =
 
 
 
-    let toSequenceOfUInt64 (bp: BytePack) : seq<uint64> =
+    let toSequenceOfUInt64 (bp: bytePack) : seq<uint64> =
         let bits = toBitSequence bp |> Seq.toArray
         let chunkSize = bp.bitsPerSymbol
         let expectedBits = bp.symbolCount * chunkSize
@@ -89,7 +89,7 @@ module BytePack =
                 yield value
         }
 
-    let fromSequenceOfUInt64 (uint64s: seq<uint64>) (bitsPerSymbol: int) : BytePack =
+    let fromSequenceOfUInt64 (uint64s: seq<uint64>) (bitsPerSymbol: int) : bytePack =
         let symbols = Seq.toArray uint64s
         let symbolCount = symbols.Length
         let totalBits = symbolCount * bitsPerSymbol
@@ -110,32 +110,32 @@ module BytePack =
 
 
 
-    let toSequenceOfUInt8 (bp: BytePack) : seq<uint8> =
+    let toSequenceOfUInt8 (bp: bytePack) : seq<uint8> =
         if bp.bitsPerSymbol > 8 then
             failwithf "bitsPerSymbol (%d) exceeds uint8 capacity (8 bits)" bp.bitsPerSymbol
         toSequenceOfUInt64 bp |> Seq.map uint8
 
-    let fromSequenceOfUInt8 (uint8s: seq<uint8>) (bitsPerSymbol: int) : BytePack =
+    let fromSequenceOfUInt8 (uint8s: seq<uint8>) (bitsPerSymbol: int) : bytePack =
         if bitsPerSymbol > 8 then
             failwithf "bitsPerSymbol (%d) exceeds uint8 capacity (8 bits)" bitsPerSymbol
         fromSequenceOfUInt64 (uint8s |> Seq.map uint64) bitsPerSymbol
 
-    let toSequenceOfUInt16 (bp: BytePack) : seq<uint16> =
+    let toSequenceOfUInt16 (bp: bytePack) : seq<uint16> =
         if bp.bitsPerSymbol > 16 then
             failwithf "bitsPerSymbol (%d) exceeds uint16 capacity (16 bits)" bp.bitsPerSymbol
         toSequenceOfUInt64 bp |> Seq.map uint16
 
-    let fromSequenceOfUInt16 (uint16s: seq<uint16>) (bitsPerSymbol: int) : BytePack =
+    let fromSequenceOfUInt16 (uint16s: seq<uint16>) (bitsPerSymbol: int) : bytePack =
         if bitsPerSymbol > 16 then
             failwithf "bitsPerSymbol (%d) exceeds uint16 capacity (16 bits)" bitsPerSymbol
         fromSequenceOfUInt64 (uint16s |> Seq.map uint64) bitsPerSymbol
 
-    let toSequenceOfUInt32 (bp: BytePack) : seq<uint32> =
+    let toSequenceOfUInt32 (bp: bytePack) : seq<uint32> =
         if bp.bitsPerSymbol > 32 then
             failwithf "bitsPerSymbol (%d) exceeds uint32 capacity (32 bits)" bp.bitsPerSymbol
         toSequenceOfUInt64 bp |> Seq.map uint32
 
-    let fromSequenceOfUInt32 (uint32s: seq<uint32>) (bitsPerSymbol: int) : BytePack =
+    let fromSequenceOfUInt32 (uint32s: seq<uint32>) (bitsPerSymbol: int) : bytePack =
         if bitsPerSymbol > 32 then
             failwithf "bitsPerSymbol (%d) exceeds uint32 capacity (32 bits)" bitsPerSymbol
         fromSequenceOfUInt64 (uint32s |> Seq.map uint64) bitsPerSymbol

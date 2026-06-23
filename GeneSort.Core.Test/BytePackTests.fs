@@ -35,7 +35,7 @@ type BytePackTests() =
 
     [<Fact>]
     let ``toBitSequence converts byte array to correct boolean sequence`` () =
-        let bp:BytePack = { bitsPerSymbol = 4; symbolCount = 2; data = parseByteArray "10110010,00001111" }
+        let bp:bytePack = { bitsPerSymbol = 4; symbolCount = 2; data = parseByteArray "10110010,00001111" }
         let expected = [ true; false; true; true; false; false; true; false; 
                          false; false; false; false; true; true; true; true;  ]
         let actual = toBitSequence bp |> Seq.toList
@@ -44,7 +44,7 @@ type BytePackTests() =
 
     [<Fact>]
     let ``toBitSequence handles empty data array`` () =
-        let bp:BytePack = { bitsPerSymbol = 4; symbolCount = 0; data = [||] }
+        let bp:bytePack = { bitsPerSymbol = 4; symbolCount = 0; data = [||] }
         let actual = toBitSequence bp |> Seq.toList
         Assert.Empty(actual)
 
@@ -54,14 +54,14 @@ type BytePackTests() =
     [<InlineData(2, 4, "11001001", "3,0,2,1")>]
     [<InlineData(1, 8, "10110010", "1,0,1,1,0,0,1,0")>]
     let ``toSequenceOfInt converts bits to integers with MSB order`` (bitsPerSymbol: int, symbolCount: int, data: string, expected: string) =
-        let bp:BytePack = { bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = parseByteArray data }
+        let bp:bytePack = { bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = parseByteArray data }
         let expectedInts = parseIntArray expected
         let actual = toSequenceOfInt bp |> Seq.toList
         Assert.Equal<int list>(expectedInts |> Array.toList, actual)
 
     [<Fact>]
     let ``toSequenceOfInt throws when insufficient bits`` () =
-        let bp:BytePack = { bitsPerSymbol = 4; symbolCount = 3; data = parseByteArray "10110010" } // 8 bits, need 12
+        let bp:bytePack = { bitsPerSymbol = 4; symbolCount = 3; data = parseByteArray "10110010" } // 8 bits, need 12
         let ex = Assert.Throws<System.Exception>(fun () -> toSequenceOfInt bp |> Seq.toList |> ignore)
         Assert.Equal("Not enough bits in data: expected 12 bits for 3 symbols of 4 bits each, but got 8 bits", ex.Message)
 
@@ -71,7 +71,7 @@ type BytePackTests() =
     [<InlineData("1,0,1,1,0,0,1,0", 1, 8, "10110010")>]
     let ``fromSequenceOfInt converts integers to BytePack with MSB order`` (ints: string, bitsPerSymbol: int, symbolCount: int, expectedData: string) =
         let inputInts = parseIntArray ints
-        let bp:BytePack = fromSequenceOfInt inputInts bitsPerSymbol
+        let bp:bytePack = fromSequenceOfInt inputInts bitsPerSymbol
         let expectedBytes = parseByteArray expectedData
         Assert.Equal(bitsPerSymbol, bp.bitsPerSymbol)
         Assert.Equal(symbolCount, bp.symbolCount)
@@ -80,7 +80,7 @@ type BytePackTests() =
 
     [<Fact>]
     let ``fromSequenceOfInt handles empty sequence`` () =
-        let bp:BytePack = fromSequenceOfInt [] 4
+        let bp:bytePack = fromSequenceOfInt [] 4
         Assert.Equal(4, bp.bitsPerSymbol)
         Assert.Equal(0, bp.symbolCount)
         Assert.Empty(bp.data)
@@ -97,7 +97,7 @@ type BytePackTests() =
     [<InlineData("1,0,1,1,0,0,1,0", 1)>]
     let ``round-trip toSequenceOfInt and fromSequenceOfInt preserves data`` (ints: string, bitsPerSymbol: int) =
         let inputInts = parseIntArray ints
-        let bp:BytePack = fromSequenceOfInt inputInts bitsPerSymbol
+        let bp:bytePack = fromSequenceOfInt inputInts bitsPerSymbol
         let result = toSequenceOfInt bp |> Seq.toList
         Assert.Equal<int list>(inputInts |> Array.toList, result)
 
@@ -105,7 +105,7 @@ type BytePackTests() =
     // toBitSequence Tests
     [<Fact>]
     let ``toBitSequence converts byte array to correct boolean sequence`` () =
-        let bp:BytePack = { bitsPerSymbol = 4; symbolCount = 2; data = parseByteArray "10110010,00001111" }
+        let bp:bytePack = { bitsPerSymbol = 4; symbolCount = 2; data = parseByteArray "10110010,00001111" }
         let expected = [ true; false; true; true; false; false; true; false; 
                          false; false; false; false; true; true; true; true ]
         let actual = toBitSequence bp |> Seq.toList
@@ -113,7 +113,7 @@ type BytePackTests() =
 
     [<Fact>]
     let ``toBitSequence handles empty data array`` () =
-        let bp:BytePack = { bitsPerSymbol = 4; symbolCount = 0; data = [||] }
+        let bp:bytePack = { bitsPerSymbol = 4; symbolCount = 0; data = [||] }
         let actual = toBitSequence bp |> Seq.toList
         Assert.Empty(actual)
 
@@ -125,26 +125,26 @@ type BytePackTests() =
     [<InlineData(16, 1, "10110010,10110000", "45744")>] // 1011001011110000
     [<InlineData(32, 1, "10110010,11110000,00000000,00000000", "3002073088")>] // 10110010111100000000000000000000
     let ``toSequenceOfUInt64 converts bits to uint64 with MSB order`` (bitsPerSymbol: int, symbolCount: int, data: string, expected: string) =
-        let bp:BytePack = { bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = parseByteArray data }
+        let bp:bytePack = { bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = parseByteArray data }
         let expectedUInt64s = parseUInt64Array expected
         let actual = toSequenceOfUInt64 bp |> Seq.toList
         Assert.Equal<uint64 list>(expectedUInt64s |> Array.toList, actual)
 
     [<Fact>]
     let ``toSequenceOfUInt64 throws when bitsPerSymbol exceeds 64`` () =
-        let bp:BytePack = { bitsPerSymbol = 65; symbolCount = 1; data = parseByteArray "10110010,11110000" }
+        let bp:bytePack = { bitsPerSymbol = 65; symbolCount = 1; data = parseByteArray "10110010,11110000" }
         let ex = Assert.Throws<System.Exception>(fun () -> toSequenceOfUInt64 bp |> Seq.toList |> ignore)
         Assert.Equal("bitsPerSymbol (65) exceeds uint64 capacity (64 bits)", ex.Message)
 
     [<Fact>]
     let ``toSequenceOfUInt64 throws when bitsPerSymbol is non-positive`` () =
-        let bp:BytePack = { bitsPerSymbol = 0; symbolCount = 1; data = parseByteArray "10110010" }
+        let bp:bytePack = { bitsPerSymbol = 0; symbolCount = 1; data = parseByteArray "10110010" }
         let ex = Assert.Throws<System.Exception>(fun () -> toSequenceOfUInt64 bp |> Seq.toList |> ignore)
         Assert.Equal("bitsPerSymbol must be positive", ex.Message)
 
     [<Fact>]
     let ``toSequenceOfUInt64 throws when insufficient bits`` () =
-        let bp:BytePack = { bitsPerSymbol = 4; symbolCount = 3; data = parseByteArray "10110010" } // 8 bits, need 12
+        let bp:bytePack = { bitsPerSymbol = 4; symbolCount = 3; data = parseByteArray "10110010" } // 8 bits, need 12
         let ex = Assert.Throws<System.Exception>(fun () -> toSequenceOfUInt64 bp |> Seq.toList |> ignore)
         Assert.Equal("Not enough bits in data: expected 12 bits for 3 symbols of 4 bits each, but got 8 bits", ex.Message)
 
@@ -199,14 +199,14 @@ type BytePackTests() =
     [<InlineData(1, 8, "10110010", "1,0,1,1,0,0,1,0")>]
     [<InlineData(8, 2, "10110010,11110000", "178,240")>]
     let ``toSequenceOfUInt8 converts bits to uint8 with MSB order`` (bitsPerSymbol: int, symbolCount: int, data: string, expected: string) =
-        let bp:BytePack = { bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = parseByteArray data }
+        let bp:bytePack = { bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = parseByteArray data }
         let expectedUInt8s = parseUInt8Array expected
         let actual = toSequenceOfUInt8 bp |> Seq.toList
         Assert.Equal<uint8 list>(expectedUInt8s |> Array.toList, actual)
 
     [<Fact>]
     let ``toSequenceOfUInt8 throws when bitsPerSymbol exceeds 8`` () =
-        let bp:BytePack = { bitsPerSymbol = 9; symbolCount = 1; data = parseByteArray "10110010" }
+        let bp:bytePack = { bitsPerSymbol = 9; symbolCount = 1; data = parseByteArray "10110010" }
         let ex = Assert.Throws<System.Exception>(fun () -> toSequenceOfUInt8 bp |> Seq.toList |> ignore)
         Assert.Equal("bitsPerSymbol (9) exceeds uint8 capacity (8 bits)", ex.Message)
 
@@ -258,14 +258,14 @@ type BytePackTests() =
     [<InlineData(8, 2, "10110010,11110000", "178,240")>]
     [<InlineData(16, 1, "10110010,10110000", "45744")>]
     let ``toSequenceOfUInt16 converts bits to uint16 with MSB order`` (bitsPerSymbol: int, symbolCount: int, data: string, expected: string) =
-        let bp:BytePack = { bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = parseByteArray data }
+        let bp:bytePack = { bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = parseByteArray data }
         let expectedUInt16s = parseUInt16Array expected
         let actual = toSequenceOfUInt16 bp |> Seq.toList
         Assert.Equal<uint16 list>(expectedUInt16s |> Array.toList, actual)
 
     [<Fact>]
     let ``toSequenceOfUInt16 throws when bitsPerSymbol exceeds 16`` () =
-        let bp:BytePack = { bitsPerSymbol = 17; symbolCount = 1; data = parseByteArray "10110010,11110000" }
+        let bp:bytePack = { bitsPerSymbol = 17; symbolCount = 1; data = parseByteArray "10110010,11110000" }
         let ex = Assert.Throws<System.Exception>(fun () -> toSequenceOfUInt16 bp |> Seq.toList |> ignore)
         Assert.Equal("bitsPerSymbol (17) exceeds uint16 capacity (16 bits)", ex.Message)
 
@@ -276,7 +276,7 @@ type BytePackTests() =
     [<InlineData("15744,222", 15, 2, "01111011, 00000000, 00000011,01111000")>]
     let ``fromSequenceOfUInt16 converts uint16 to BytePack with MSB order`` (uint16s: string, bitsPerSymbol: int, symbolCount: int, expectedData: string) =
         let inputUInt16s = parseUInt16Array uint16s
-        let bytePack:BytePack = fromSequenceOfUInt16 inputUInt16s bitsPerSymbol
+        let bytePack:bytePack = fromSequenceOfUInt16 inputUInt16s bitsPerSymbol
         let expectedBytes = parseByteArray expectedData
         Assert.Equal(bitsPerSymbol, bytePack.bitsPerSymbol)
         Assert.Equal(symbolCount, bytePack.symbolCount)
@@ -317,14 +317,14 @@ type BytePackTests() =
     [<InlineData(32, 1, "10110010,11110000,00000000,00000000", "3002073088")>]
     [<InlineData(31, 2, "10110010,11110000,00000000,00000001,01100101,11100000,00000000,00000000", "1501036544,1501036544")>]
     let ``toSequenceOfUInt32 converts bits to uint32 with MSB order`` (bitsPerSymbol: int, symbolCount: int, data: string, expected: string) =
-        let bp:BytePack = { bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = parseByteArray data }
+        let bp:bytePack = { bitsPerSymbol = bitsPerSymbol; symbolCount = symbolCount; data = parseByteArray data }
         let expectedUInt32s = parseUInt32Array expected
         let actual = toSequenceOfUInt32 bp |> Seq.toList
         Assert.Equal<uint32 list>(expectedUInt32s |> Array.toList, actual)
 
     [<Fact>]
     let ``toSequenceOfUInt32 throws when bitsPerSymbol exceeds 32`` () =
-        let bp:BytePack = { bitsPerSymbol = 33; symbolCount = 1; data = parseByteArray "10110010,11110000" }
+        let bp:bytePack = { bitsPerSymbol = 33; symbolCount = 1; data = parseByteArray "10110010,11110000" }
         let ex = Assert.Throws<System.Exception>(fun () -> toSequenceOfUInt32 bp |> Seq.toList |> ignore)
         Assert.Equal("bitsPerSymbol (33) exceeds uint32 capacity (32 bits)", ex.Message)
 

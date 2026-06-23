@@ -169,36 +169,36 @@ type PermutationTests() =
 
     [<Fact>]
     let ``toPermutation converts multiple cycles with fixed points correctly`` () =
-        let orbit1 = Orbit.create [0; 1]
-        let orbit2 = Orbit.create [2]
-        let orbit3 = Orbit.create [3; 4]
-        let orbitSet = OrbitSet.create [orbit1; orbit2; orbit3] 5
+        let orbit1 = orbit.create [0; 1]
+        let orbit2 = orbit.create [2]
+        let orbit3 = orbit.create [3; 4]
+        let orbitSet = orbitSet.create [orbit1; orbit2; orbit3] 5
         let perm = fromOrbitSet orbitSet
         perm.Array |> should equal [|1; 0; 2; 4; 3|] // (0 1)(2)(3 4)
 
     [<Fact>]
     let ``toPermutation converts identity OrbitSet correctly`` () =
-        let orbits = [Orbit.create [0]; Orbit.create [1]; Orbit.create [2]]
-        let orbitSet = OrbitSet.create orbits 3
+        let orbits = [orbit.create [0]; orbit.create [1]; orbit.create [2]]
+        let orbitSet = orbitSet.create orbits 3
         let perm = fromOrbitSet orbitSet
         perm.Array |> should equal [|0; 1; 2|] // (0)(1)(2)
 
     [<Fact>]
     let ``toPermutation converts full cycle OrbitSet correctly`` () =
-        let orbit = Orbit.create [0; 1; 2; 3]
-        let orbitSet = OrbitSet.create [orbit] 4
+        let orbit = orbit.create [0; 1; 2; 3]
+        let orbitSet = orbitSet.create [orbit] 4
         let perm = fromOrbitSet orbitSet
         perm.Array |> should equal [|1; 2; 3; 0|] // (0 1 2 3)
 
     [<Fact>]
     let ``OrbitSet.create throws for incomplete coverage`` () =
-        let orbit = Orbit.create [0; 1]
-        let ex = Assert.Throws<Exception>(fun () -> OrbitSet.create [orbit] 3 |> ignore)
+        let orbit = orbit.create [0; 1]
+        let ex = Assert.Throws<Exception>(fun () -> orbitSet.create [orbit] 3 |> ignore)
         ex.Message |> should equal "Orbits must cover indices 0 to order-1"
 
     [<Fact>]
     let ``toPermutation handles empty OrbitSet for order 0`` () =
-        let ex = Assert.Throws<Exception>(fun () -> OrbitSet.create [] 3 |> ignore)
+        let ex = Assert.Throws<Exception>(fun () -> orbitSet.create [] 3 |> ignore)
         ex.Message |> should equal "orbits cannot be empty"
 
     [<Fact>]

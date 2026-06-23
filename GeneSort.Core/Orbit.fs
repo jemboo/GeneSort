@@ -4,9 +4,9 @@ open System
 open Combinatorics
 
 [<CustomEquality; NoComparison>]
-type Orbit = private Orbit of indices: int list with
+type orbit = private Orbit of indices: int list with
     // Static method to create an Orbit, validating input
-    static member create (indices: int list) : Orbit =
+    static member create (indices: int list) : orbit =
         // Validate non-negative indices
         if indices |> List.exists (fun i -> i < 0) then
             failwith "Orbit indices must be non-negative"
@@ -31,13 +31,13 @@ type Orbit = private Orbit of indices: int list with
         | Orbit indices -> indices
 
     // Check if two orbits are equal (based on normalized indices)
-    member this.Equals (other: Orbit) =
+    member this.Equals (other: orbit) =
         this.Indices = other.Indices
 
     // Override for object equality
     override this.Equals (obj: obj) =
         match obj with
-        | :? Orbit as other -> this.Equals other
+        | :? orbit as other -> this.Equals other
         | _ -> false
 
     // Override GetHashCode for consistency with Equals
@@ -47,17 +47,17 @@ type Orbit = private Orbit of indices: int list with
         |> List.fold (fun acc i -> (acc * 397) ^^^ i) 0
 
     // Implement IEquatable<Orbit> for structural equality
-    interface IEquatable<Orbit> with
-        member this.Equals (other: Orbit) = this.Equals other
+    interface IEquatable<orbit> with
+        member this.Equals (other: orbit) = this.Equals other
 
 module Orbit =
 
     // returns a reflection of the orbit about (order - 1) / 2
-    let getReflection (order: int) (orbit: Orbit) : Orbit =
+    let getReflection (order: int) (orb: orbit) : orbit =
         // Reflect each index in the orbit
-        let reflectedIndices = orbit.Indices |> List.map (fun i -> order - 1 - i)
+        let reflectedIndices = orb.Indices |> List.map (fun i -> order - 1 - i)
         // Create a new Orbit from the reflected indices
-        Orbit.create reflectedIndices
+        orbit.create reflectedIndices
 
-    let isReflectionSymmetric (order: int) (orbit: Orbit) =
+    let isReflectionSymmetric (order: int) (orbit: orbit) =
         (orbit.Indices.[0] |> reflect order) = (orbit.Indices.[1])
