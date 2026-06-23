@@ -26,19 +26,19 @@ type opsTransitionRates =
     static member createUniform2 (rates: opsActionRates) : opsTransitionRates =
         opsTransitionRates.create(rates, rates, rates)
 
-    static member createBiased (twoOrbitType: TwoOrbitType) (baseAmt:float) (biasAmt:float) : opsTransitionRates =
+    static member createBiased (twoOrbitType: twoOrbitType) (baseAmt:float) (biasAmt:float) : opsTransitionRates =
         match twoOrbitType with
-        | TwoOrbitType.Ortho -> 
+        | twoOrbitType.Ortho -> 
             let orthoRates = opsActionRates.createBiased(opsActionMode.Ortho, baseAmt, biasAmt)
             let paraRates = opsActionRates.createBiased(opsActionMode.Ortho, baseAmt, biasAmt)
             let selfReflRates = opsActionRates.createBiased(opsActionMode.Ortho, baseAmt, biasAmt)
             opsTransitionRates.create(orthoRates, paraRates, selfReflRates)
-        | TwoOrbitType.Para -> 
+        | twoOrbitType.Para -> 
             let orthoRates = opsActionRates.createBiased(opsActionMode.Para, baseAmt, biasAmt)
             let paraRates = opsActionRates.createBiased(opsActionMode.Para, baseAmt + biasAmt, biasAmt)
             let selfReflRates = opsActionRates.createBiased(opsActionMode.Para, baseAmt, biasAmt)
             opsTransitionRates.create(orthoRates, paraRates, selfReflRates)
-        | TwoOrbitType.SelfRefl -> 
+        | twoOrbitType.SelfRefl -> 
             let orthoRates = opsActionRates.createBiased(opsActionMode.SelfRefl, baseAmt, biasAmt)
             let paraRates = opsActionRates.createBiased(opsActionMode.SelfRefl, baseAmt, biasAmt)
             let selfReflRates = opsActionRates.createBiased(opsActionMode.SelfRefl, baseAmt, biasAmt)
@@ -49,11 +49,11 @@ type opsTransitionRates =
     member this.ParaRates with get() = this.paraRates
     member this.SelfReflRates with get() = this.selfReflRates
 
-    member this.PickMode (floatPicker: unit -> float) (twoOrbitType: TwoOrbitType) : opsActionMode =
+    member this.PickMode (floatPicker: unit -> float) (twoOrbitType: twoOrbitType) : opsActionMode =
         match twoOrbitType with
-        | TwoOrbitType.Ortho -> this.orthoRates.PickMode floatPicker
-        | TwoOrbitType.Para -> this.paraRates.PickMode floatPicker
-        | TwoOrbitType.SelfRefl -> this.selfReflRates.PickMode floatPicker
+        | twoOrbitType.Ortho -> this.orthoRates.PickMode floatPicker
+        | twoOrbitType.Para -> this.paraRates.PickMode floatPicker
+        | twoOrbitType.SelfRefl -> this.selfReflRates.PickMode floatPicker
 
 
     member this.TransitionMode (floatPicker: unit -> float) (opsGenMode : opsGenMode) : opsGenMode =

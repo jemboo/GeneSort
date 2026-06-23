@@ -12,22 +12,22 @@ module TwoOrbitPairOps =
         match twoOrbitPair.Second with
         | None -> 
                match (TwoOrbit.getTwoOrbitType twoOrbitPair.Order twoOrbitPair.FirstOrbit) with
-               | TwoOrbitType.Ortho -> Some twoOrbitPairType.Ortho
-               | TwoOrbitType.Para -> Some twoOrbitPairType.Para
-               | TwoOrbitType.SelfRefl -> Some twoOrbitPairType.SelfRefl
+               | twoOrbitType.Ortho -> Some twoOrbitPairType.Ortho
+               | twoOrbitType.Para -> Some twoOrbitPairType.Para
+               | twoOrbitType.SelfRefl -> Some twoOrbitPairType.SelfRefl
         | Some second ->
           match (TwoOrbit.getTwoOrbitType twoOrbitPair.Order twoOrbitPair.FirstOrbit) with
-            | TwoOrbitType.Ortho ->
+            | twoOrbitType.Ortho ->
                 match (TwoOrbit.getTwoOrbitType twoOrbitPair.Order second) with
-                | TwoOrbitType.Ortho -> Some twoOrbitPairType.Ortho 
+                | twoOrbitType.Ortho -> Some twoOrbitPairType.Ortho 
                 | _ -> None
-            | TwoOrbitType.Para ->
+            | twoOrbitType.Para ->
                 match (TwoOrbit.getTwoOrbitType twoOrbitPair.Order second) with
-                | TwoOrbitType.Para -> Some twoOrbitPairType.Para 
+                | twoOrbitType.Para -> Some twoOrbitPairType.Para 
                 | _ -> None
-            | TwoOrbitType.SelfRefl ->
+            | twoOrbitType.SelfRefl ->
                 match (TwoOrbit.getTwoOrbitType twoOrbitPair.Order second) with
-                | TwoOrbitType.SelfRefl -> Some twoOrbitPairType.SelfRefl 
+                | twoOrbitType.SelfRefl -> Some twoOrbitPairType.SelfRefl 
                 | _ -> None
 
 

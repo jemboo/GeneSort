@@ -230,9 +230,9 @@ module PermSi =
             twoOrbits 
             |> Array.fold (fun (ortho, para, self) orbit ->
                 match TwoOrbit.getTwoOrbitType order orbit with
-                | TwoOrbitType.Ortho -> (ortho + 1, para, self)
-                | TwoOrbitType.Para -> (ortho, para + 1, self)
-                | TwoOrbitType.SelfRefl -> (ortho, para, self + 1)
+                | twoOrbitType.Ortho -> (ortho + 1, para, self)
+                | twoOrbitType.Para -> (ortho, para + 1, self)
+                | twoOrbitType.SelfRefl -> (ortho, para, self + 1)
             ) (0, 0, 0)
         (fst3 counts, snd3 counts, trd3 counts)
 

@@ -139,7 +139,7 @@ module OpsTransitionRatesArray =
         (paraMutator: 'a -> 'a) 
         (selfSymMutator: 'a -> 'a) 
         (floatPicker: unit -> float) 
-        (twoOrbitType: TwoOrbitType) 
+        (twoOrbitType: twoOrbitType) 
         (arrayToMutate: 'a[]) : 'a[] = 
         if opsTransitionRatesArray.Length <> arrayToMutate.Length then
             failwith "Array length does not match rates length"

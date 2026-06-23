@@ -50,7 +50,7 @@ module Uf6MutationRates =
             (seed6TransitionRates.createUniform(seed6MutationRates))
             (opsTransitionRatesArray.create mutRatesArray)
 
-    let biasTowards (order: int) (seed6MutationRates: float) (twoOrbitType: TwoOrbitType) (baseAmt: float) (biasAmt: float) 
+    let biasTowards (order: int) (seed6MutationRates: float) (twoOrbitType: twoOrbitType) (baseAmt: float) (biasAmt: float) 
          : uf6MutationRates =
         let mutRatesBaseListLength = MathUtils.exactLog2 (order / 6) - 1
         let mutRatesBaseList = List.init mutRatesBaseListLength (fun _ -> opsTransitionRates.createUniform(baseAmt))

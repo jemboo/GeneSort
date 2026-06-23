@@ -1,6 +1,6 @@
 ﻿namespace GeneSort.Core
 
-type TwoOrbitType =
+type twoOrbitType =
     | Ortho
     | Para
     | SelfRefl
@@ -110,16 +110,16 @@ module TwoOrbit =
     /// Gets the TwoOrbitType.
     /// <param name="order">The order (must be non-negative and even).</param>
     /// <param name="orbit">The TwoOrbit to check.</param>
-    let getTwoOrbitType (order: int) (orbit: TwoOrbit) : TwoOrbitType =
+    let getTwoOrbitType (order: int) (orbit: TwoOrbit) : twoOrbitType =
         if (isReflectionSymmetric order orbit) then
-            TwoOrbitType.SelfRefl
+            twoOrbitType.SelfRefl
         else if snd orbit.IndicesTuple >= order / 2 then
             if (fst orbit.IndicesTuple >= order / 2) then
-                TwoOrbitType.Ortho
+                twoOrbitType.Ortho
             else
-                TwoOrbitType.Para
+                twoOrbitType.Para
         else
-            TwoOrbitType.Ortho
+            twoOrbitType.Ortho
 
 
 

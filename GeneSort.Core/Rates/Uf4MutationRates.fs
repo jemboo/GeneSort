@@ -76,7 +76,7 @@ module Uf4MutationRates =
 
     let biasTowards (order: int) 
                     (perm_RsMutationRate: float) 
-                    (twoOrbitType: TwoOrbitType) 
+                    (twoOrbitType: twoOrbitType) 
                     (baseAmt: float) 
                     (biasAmt: float) =
         if order < 4 || order % 4 <> 0 then

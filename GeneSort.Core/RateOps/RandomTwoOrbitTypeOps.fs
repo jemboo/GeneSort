@@ -21,19 +21,19 @@ module TwoOrbitTypeOps =
          twoOrbitTypes |> Seq.map( fun topt ->
                 match topt with
                 | twoOrbitPairType.Ortho -> 
-                    match (opsTransitionRates.PickMode floatPicker TwoOrbitType.Ortho) with
+                    match (opsTransitionRates.PickMode floatPicker twoOrbitType.Ortho) with
                     | opsActionMode.Para -> twoOrbitPairType.Para
                     | opsActionMode.SelfRefl -> twoOrbitPairType.SelfRefl
                     | _ -> twoOrbitPairType.Ortho
  
                 | twoOrbitPairType.Para -> 
-                    match (opsTransitionRates.PickMode floatPicker TwoOrbitType.Para) with
+                    match (opsTransitionRates.PickMode floatPicker twoOrbitType.Para) with
                     | opsActionMode.Ortho -> twoOrbitPairType.Ortho
                     | opsActionMode.SelfRefl -> twoOrbitPairType.SelfRefl
                     | _ -> twoOrbitPairType.Para
 
                 | twoOrbitPairType.SelfRefl -> 
-                    match (opsTransitionRates.PickMode floatPicker TwoOrbitType.SelfRefl) with
+                    match (opsTransitionRates.PickMode floatPicker twoOrbitType.SelfRefl) with
                     | opsActionMode.Para -> twoOrbitPairType.Para
                     | opsActionMode.Ortho -> twoOrbitPairType.Ortho
                     | _ -> twoOrbitPairType.SelfRefl

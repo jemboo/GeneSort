@@ -234,7 +234,7 @@ module Uf4MutationRatesArray =
         (paraMutator: 'a -> 'a) 
         (selfSymMutator: 'a -> 'a) 
         (floatPicker: unit -> float) 
-        (twoOrbitType: TwoOrbitType) 
+        (twoOrbitType: twoOrbitType) 
         (arrayToMutate: 'a[]) : 'a[] = 
         if uf4MutationRatesArray.Length <> arrayToMutate.Length then
             failwith "Array length does not match rates length"
