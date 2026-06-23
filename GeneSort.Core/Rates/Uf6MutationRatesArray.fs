@@ -7,8 +7,8 @@ open MathUtils
 type uf6MutationRatesArray =
     private 
         { 
-            Rates: uf6MutationRates array 
-            CachedHash: int
+            uf6MutationRates: uf6MutationRates array 
+            cachedHash: int
         }
 
     static member create (rates: uf6MutationRates array) : uf6MutationRatesArray =
@@ -25,43 +25,43 @@ type uf6MutationRatesArray =
             h <- h * 23 + r.seed6TransitionRates.GetHashCode()
             h <- h * 23 + r.opsTransitionRates.GetHashCode()
             
-        { Rates = rates; CachedHash = h }
+        { uf6MutationRates = rates; cachedHash = h }
 
-    member this.Length = this.Rates.Length
-    member this.Item(index: int) = this.Rates.[index]
-    member this.RatesArray = this.Rates
+    member this.Length = this.uf6MutationRates.Length
+    member this.Item(index: int) = this.uf6MutationRates.[index]
+    member this.RatesArray = this.uf6MutationRates
 
     member this.toString() =
         String.Join(", ", Array.map (
             fun r -> sprintf "Uf6MutationRates(order=%d, seed=%s, opsTransitionRates=%s)" 
                         r.order 
                         (r.seed6TransitionRates.toString()) 
-                        (r.opsTransitionRates.toString())) this.Rates)
+                        (r.opsTransitionRates.toString())) this.uf6MutationRates)
 
-    override this.GetHashCode() = this.CachedHash
+    override this.GetHashCode() = this.cachedHash
 
     override this.Equals(obj) =
         match obj with
         | :? uf6MutationRatesArray as other ->
             // Immediate short-circuit: O(1) in most cases
-            if this.CachedHash <> other.CachedHash then false
-            elif this.Rates.Length <> other.Rates.Length then false
+            if this.cachedHash <> other.cachedHash then false
+            elif this.uf6MutationRates.Length <> other.uf6MutationRates.Length then false
             else
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seed6TransitionRates.Equals(b.seed6TransitionRates) && 
-                    a.opsTransitionRates.Equals(b.opsTransitionRates)) this.Rates other.Rates
+                    a.opsTransitionRates.Equals(b.opsTransitionRates)) this.uf6MutationRates other.uf6MutationRates
         | _ -> false
 
     interface IEquatable<uf6MutationRatesArray> with
         member this.Equals(other) =
-            if this.CachedHash <> other.CachedHash then false
-            elif this.Rates.Length <> other.Rates.Length then false
+            if this.cachedHash <> other.cachedHash then false
+            elif this.uf6MutationRates.Length <> other.uf6MutationRates.Length then false
             else
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seed6TransitionRates.Equals(b.seed6TransitionRates) && 
-                    a.opsTransitionRates.Equals(b.opsTransitionRates)) this.Rates other.Rates
+                    a.opsTransitionRates.Equals(b.opsTransitionRates)) this.uf6MutationRates other.uf6MutationRates
 
 
 module Uf6MutationRatesArray =

@@ -6,8 +6,8 @@ open System
 type uf4MutationRatesArray =
     private 
         { 
-            Rates: uf4MutationRates array 
-            CachedHash: int
+            uf4MutationRates: uf4MutationRates array 
+            cachedHash: int
         }
 
     static member create (rates: uf4MutationRates array) : uf4MutationRatesArray =
@@ -22,41 +22,41 @@ type uf4MutationRatesArray =
             h <- h * 23 + r.seedOpsTransitionRates.GetHashCode()
             h <- h * 23 + r.twoOrbitPairOpsTransitionRates.GetHashCode()
             
-        { Rates = rates; CachedHash = h }
+        { uf4MutationRates = rates; cachedHash = h }
 
-    member this.Length = this.Rates.Length
-    member this.Item(index: int) = this.Rates.[index]
-    member this.RatesArray = this.Rates
+    member this.Length = this.uf4MutationRates.Length
+    member this.Item(index: int) = this.uf4MutationRates.[index]
+    member this.RatesArray = this.uf4MutationRates
 
     member this.toString() =
         String.Join(", ", Array.map (
             fun r -> sprintf "Uf4MutationRates(order=%d, seed=%s, arrayLength=%d)" 
-                        r.order (r.seedOpsTransitionRates.toString()) r.twoOrbitPairOpsTransitionRates.Length) this.Rates)
+                        r.order (r.seedOpsTransitionRates.toString()) r.twoOrbitPairOpsTransitionRates.Length) this.uf4MutationRates)
 
-    override this.GetHashCode() = this.CachedHash
+    override this.GetHashCode() = this.cachedHash
 
     override this.Equals(obj) =
         match obj with
         | :? uf4MutationRatesArray as other ->
             // O(1) short-circuit
-            if this.CachedHash <> other.CachedHash then false
-            elif this.Rates.Length <> other.Rates.Length then false
+            if this.cachedHash <> other.cachedHash then false
+            elif this.uf4MutationRates.Length <> other.uf4MutationRates.Length then false
             else
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seedOpsTransitionRates.Equals(b.seedOpsTransitionRates) && 
-                    a.twoOrbitPairOpsTransitionRates.Equals(b.twoOrbitPairOpsTransitionRates)) this.Rates other.Rates
+                    a.twoOrbitPairOpsTransitionRates.Equals(b.twoOrbitPairOpsTransitionRates)) this.uf4MutationRates other.uf4MutationRates
         | _ -> false
 
     interface IEquatable<uf4MutationRatesArray> with
         member this.Equals(other) =
-            if this.CachedHash <> other.CachedHash then false
-            elif this.Rates.Length <> other.Rates.Length then false
+            if this.cachedHash <> other.cachedHash then false
+            elif this.uf4MutationRates.Length <> other.uf4MutationRates.Length then false
             else
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seedOpsTransitionRates.Equals(b.seedOpsTransitionRates) && 
-                    a.twoOrbitPairOpsTransitionRates.Equals(b.twoOrbitPairOpsTransitionRates)) this.Rates other.Rates
+                    a.twoOrbitPairOpsTransitionRates.Equals(b.twoOrbitPairOpsTransitionRates)) this.uf4MutationRates other.uf4MutationRates
 
 
 

@@ -6,8 +6,8 @@ open System
 type opActionRatesArray =
     private 
         { 
-            Rates: opActionRates array 
-            CachedHash: int
+            opActionRates: opActionRates array 
+            cachedHash: int
         }
 
     static member create (rates: opActionRates array) : opActionRatesArray =
@@ -18,33 +18,33 @@ type opActionRatesArray =
         for i = 0 to rates.Length - 1 do
             h <- h * 23 + rates.[i].GetHashCode()
             
-        { Rates = rates; CachedHash = h }
+        { opActionRates = rates; cachedHash = h }
 
-    member this.Length = this.Rates.Length
-    member this.Item(index: int) = this.Rates.[index]
-    member this.RatesArray = this.Rates
+    member this.Length = this.opActionRates.Length
+    member this.Item(index: int) = this.opActionRates.[index]
+    member this.RatesArray = this.opActionRates
     
     member this.toString() =
-        String.Join(", ", Array.map (fun r -> r.ToString()) this.Rates)
+        String.Join(", ", Array.map (fun r -> r.ToString()) this.opActionRates)
 
-    override this.GetHashCode() = this.CachedHash
+    override this.GetHashCode() = this.cachedHash
 
     override this.Equals(obj) =
         match obj with
         | :? opActionRatesArray as other ->
             // Immediate short-circuit: if hashes don't match, they aren't equal.
-            if this.CachedHash <> other.CachedHash then false
-            elif this.Rates.Length <> other.Rates.Length then false
+            if this.cachedHash <> other.cachedHash then false
+            elif this.opActionRates.Length <> other.opActionRates.Length then false
             else
-                Array.forall2 (fun a b -> a.Equals(b)) this.Rates other.Rates
+                Array.forall2 (fun a b -> a.Equals(b)) this.opActionRates other.opActionRates
         | _ -> false
 
     interface IEquatable<opActionRatesArray> with
         member this.Equals(other) =
-            if this.CachedHash <> other.CachedHash then false
-            elif this.Rates.Length <> other.Rates.Length then false
+            if this.cachedHash <> other.cachedHash then false
+            elif this.opActionRates.Length <> other.opActionRates.Length then false
             else
-                Array.forall2 (fun a b -> a.Equals(b)) this.Rates other.Rates
+                Array.forall2 (fun a b -> a.Equals(b)) this.opActionRates other.opActionRates
 
 
 module OpActionRatesArray =

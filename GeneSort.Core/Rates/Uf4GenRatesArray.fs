@@ -7,8 +7,8 @@ open MathUtils
 type uf4GenRatesArray =
     private 
         { 
-            Rates: uf4GenRates array 
-            CachedHash: int
+            uf4GenRates: uf4GenRates array 
+            cachedHash: int
         }
 
     static member create (rates: uf4GenRates array) : uf4GenRatesArray =
@@ -29,41 +29,41 @@ type uf4GenRatesArray =
             h <- h * 23 + r.seedOpsGenRates.GetHashCode()
             h <- h * 23 + r.opsGenRatesArray.GetHashCode()
             
-        { Rates = rates; CachedHash = h }
+        { uf4GenRates = rates; cachedHash = h }
 
-    member this.Length = this.Rates.Length
-    member this.Item(index: int) = this.Rates.[index]
-    member this.RatesArray = this.Rates
+    member this.Length = this.uf4GenRates.Length
+    member this.Item(index: int) = this.uf4GenRates.[index]
+    member this.RatesArray = this.uf4GenRates
 
     member this.toString() =
         String.Join(", ", Array.map (
             fun r -> sprintf "Uf4GenRates(order=%d, seed=%s, arrayLength=%d)" 
-                        r.order (r.seedOpsGenRates.toString()) r.opsGenRatesArray.Length) this.Rates)
+                        r.order (r.seedOpsGenRates.toString()) r.opsGenRatesArray.Length) this.uf4GenRates)
 
-    override this.GetHashCode() = this.CachedHash
+    override this.GetHashCode() = this.cachedHash
 
     override this.Equals(obj) =
         match obj with
         | :? uf4GenRatesArray as other ->
             // Early exit on hash mismatch or length mismatch
-            if this.CachedHash <> other.CachedHash then false
-            elif this.Rates.Length <> other.Rates.Length then false
+            if this.cachedHash <> other.cachedHash then false
+            elif this.uf4GenRates.Length <> other.uf4GenRates.Length then false
             else
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seedOpsGenRates.Equals(b.seedOpsGenRates) && 
-                    a.opsGenRatesArray.Equals(b.opsGenRatesArray)) this.Rates other.Rates
+                    a.opsGenRatesArray.Equals(b.opsGenRatesArray)) this.uf4GenRates other.uf4GenRates
         | _ -> false
 
     interface IEquatable<uf4GenRatesArray> with
         member this.Equals(other) =
-            if this.CachedHash <> other.CachedHash then false
-            elif this.Rates.Length <> other.Rates.Length then false
+            if this.cachedHash <> other.cachedHash then false
+            elif this.uf4GenRates.Length <> other.uf4GenRates.Length then false
             else
                 Array.forall2 (fun a b -> 
                     a.order = b.order && 
                     a.seedOpsGenRates.Equals(b.seedOpsGenRates) && 
-                    a.opsGenRatesArray.Equals(b.opsGenRatesArray)) this.Rates other.Rates
+                    a.opsGenRatesArray.Equals(b.opsGenRatesArray)) this.uf4GenRates other.uf4GenRates
 
 
 module Uf4GenRatesArray =
