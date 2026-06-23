@@ -57,9 +57,9 @@ module PrototypeUnfolder =
     // twoOrbitPairsForOrder4
     let twoOrbitPairsForOrder4 (twoOrbitPairType:twoOrbitPairType) : TwoOrbitPair =
         match twoOrbitPairType with
-        | twoOrbitPairType.Ortho -> TwoOrbitPair.create 4 (TwoOrbit.create [0; 2]) (TwoOrbit.create [1; 3] |> Some)
-        | twoOrbitPairType.Para -> TwoOrbitPair.create 4 (TwoOrbit.create [0; 1]) (TwoOrbit.create [2; 3] |> Some)
-        | twoOrbitPairType.SelfRefl ->  TwoOrbitPair.create 4 (TwoOrbit.create [0; 3]) (TwoOrbit.create [1; 2] |> Some)
+        | twoOrbitPairType.Ortho -> TwoOrbitPair.create 4 (twoOrbit.create [0; 2]) (twoOrbit.create [1; 3] |> Some)
+        | twoOrbitPairType.Para -> TwoOrbitPair.create 4 (twoOrbit.create [0; 1]) (twoOrbit.create [2; 3] |> Some)
+        | twoOrbitPairType.SelfRefl ->  TwoOrbitPair.create 4 (twoOrbit.create [0; 3]) (twoOrbit.create [1; 2] |> Some)
 
 
     // makeTwoCycleFromTwoOrbitTypes

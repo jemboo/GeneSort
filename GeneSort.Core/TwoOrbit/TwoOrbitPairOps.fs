@@ -45,12 +45,12 @@ module TwoOrbitPairOps =
                     twoOrbitPairType.Para
 
 
-    let fromTwoOrbits (order:int) (twoOrbits:seq<TwoOrbit>) : seq<TwoOrbitPair> =
+    let fromTwoOrbits (order:int) (twoOrbits:seq<twoOrbit>) : seq<TwoOrbitPair> =
         twoOrbits |> CollectionUtils.pairWithNext 
                   |> Seq.map(fun (to1, to2) -> TwoOrbitPair.create order to1 to2)
 
     
-    let makeTwoOrbits (twoOrbitPairs:seq<TwoOrbitPair>) : seq<TwoOrbit> =
+    let makeTwoOrbits (twoOrbitPairs:seq<TwoOrbitPair>) : seq<twoOrbit> =
         seq {
             for top in twoOrbitPairs do
                 yield top.FirstOrbit
@@ -61,16 +61,16 @@ module TwoOrbitPairOps =
 
     // creates a TwoOrbitPair from a TwoOrbit by reflection
     let unfoldTwoOrbitIntoTwoOrbitPair
-            (twoOrbit:TwoOrbit) 
+            (toOb:twoOrbit) 
             (order:int) 
             (twoOrbitPairType:twoOrbitPairType) : TwoOrbitPair =
 
-        let (low, high) = twoOrbit.IndicesTuple
-        let (highR, lowR) = (TwoOrbit.getReflection (order*2) twoOrbit).IndicesTuple
+        let (low, high) = toOb.IndicesTuple
+        let (highR, lowR) = (TwoOrbit.getReflection (order*2) toOb).IndicesTuple
         let (twoOrbitA, twoOrbitB) = 
             match twoOrbitPairType with
-            | twoOrbitPairType.Ortho -> (TwoOrbit.create [low; high], TwoOrbit.create [lowR; highR])
-            | twoOrbitPairType.Para -> (TwoOrbit.create [low; highR], TwoOrbit.create [high; lowR])
-            | twoOrbitPairType.SelfRefl -> (TwoOrbit.create [low; lowR], TwoOrbit.create [high; highR])
+            | twoOrbitPairType.Ortho -> (twoOrbit.create [low; high], twoOrbit.create [lowR; highR])
+            | twoOrbitPairType.Para -> (twoOrbit.create [low; highR], twoOrbit.create [high; lowR])
+            | twoOrbitPairType.SelfRefl -> (twoOrbit.create [low; lowR], twoOrbit.create [high; highR])
 
         TwoOrbitPair.create (order*2) twoOrbitA (Some twoOrbitB)

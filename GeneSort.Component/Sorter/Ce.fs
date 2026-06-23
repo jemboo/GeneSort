@@ -230,5 +230,5 @@ module Ce =
         generateCeCodesExcludeSelf indexPicker width |> Seq.map(fromIndex)
 
 
-    let fromTwoOrbit (twoOrbit:TwoOrbit) :ce = 
-            ce.create (twoOrbit.First) (twoOrbit.Second)
+    let fromTwoOrbit (toOb:twoOrbit) :ce = 
+            ce.create (toOb.First) (toOb.Second)

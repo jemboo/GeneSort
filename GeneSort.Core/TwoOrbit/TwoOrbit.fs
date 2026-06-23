@@ -13,11 +13,11 @@ type twoOrbitPairType =
 
 /// Represents a pair of distinct, non-negative indices in canonical order (smaller index first).
 [<CustomEquality; NoComparison>]
-type TwoOrbit = private TwoOrbit of (int * int) with
+type twoOrbit = private TwoOrbit of (int * int) with
     /// Creates a TwoOrbit from a list of exactly two distinct, non-negative indices.
     /// <param name="indices">A list of exactly two distinct, non-negative integers.</param>
     /// <exception cref="System.ArgumentException">Thrown when the list doesn't contain exactly two indices, indices are negative, or indices are equal.</exception>
-    static member create (indices: int list) : TwoOrbit =
+    static member create (indices: int list) : twoOrbit =
         if indices.Length <> 2 then
             failwith "TwoOrbit must contain exactly 2 indices"
         if indices |> List.exists (fun i -> i < 0) then
@@ -51,13 +51,13 @@ type TwoOrbit = private TwoOrbit of (int * int) with
         | TwoOrbit (a, b) -> Orbit.create [a; b]
 
     /// Checks if this TwoOrbit is disjoint from another.
-    member this.IsDisjoint (other: TwoOrbit) =
+    member this.IsDisjoint (other: twoOrbit) =
         Set.ofList this.Indices |> Set.intersect (Set.ofList other.Indices) |> Set.isEmpty
 
     /// Determines whether this instance equals another TwoOrbit.
     override this.Equals (obj: obj) =
         match obj with
-        | :? TwoOrbit as other -> this.IndicesTuple = other.IndicesTuple
+        | :? twoOrbit as other -> this.IndicesTuple = other.IndicesTuple
         | _ -> false
 
     /// Computes the hash code for this instance.
@@ -77,18 +77,18 @@ module TwoOrbit =
     /// <param name="order">The order (must be non-negative and even).</param>
     /// <param name="orbit">The TwoOrbit to reflect.</param>
     /// <exception cref="System.ArgumentException">Thrown when order is negative or odd.</exception>
-    let getReflection (order: int) (orbit: TwoOrbit) : TwoOrbit =
+    let getReflection (order: int) (orbit: twoOrbit) : twoOrbit =
         if order < 0 then
             failwith "Order must be non-negative"
         if order % 2 <> 0 then
             failwith "Order must be even"
         let reflectedIndices = orbit.Indices |> List.map (fun i -> order - 1 - i)
-        TwoOrbit.create reflectedIndices
+        twoOrbit.create reflectedIndices
 
     /// Checks if the TwoOrbit is equal to its reflection.
     /// <param name="order">The order (must be non-negative and even).</param>
     /// <param name="orbit">The TwoOrbit to check.</param>
-    let isReflectionSymmetric (order: int) (orbit: TwoOrbit) : bool =
+    let isReflectionSymmetric (order: int) (orbit: twoOrbit) : bool =
         let reflected = getReflection order orbit
         orbit.Equals(reflected)
 
@@ -110,7 +110,7 @@ module TwoOrbit =
     /// Gets the TwoOrbitType.
     /// <param name="order">The order (must be non-negative and even).</param>
     /// <param name="orbit">The TwoOrbit to check.</param>
-    let getTwoOrbitType (order: int) (orbit: TwoOrbit) : twoOrbitType =
+    let getTwoOrbitType (order: int) (orbit: twoOrbit) : twoOrbitType =
         if (isReflectionSymmetric order orbit) then
             twoOrbitType.SelfRefl
         else if snd orbit.IndicesTuple >= order / 2 then
@@ -123,8 +123,8 @@ module TwoOrbit =
 
 
 
-    let getTwoOrbits (topType:twoOrbitPairType) : TwoOrbit list =
+    let getTwoOrbits (topType:twoOrbitPairType) : twoOrbit list =
         match topType with
-        | twoOrbitPairType.Ortho -> [TwoOrbit.create [0; 1]; TwoOrbit.create [2; 3]]
-        | twoOrbitPairType.Para -> [TwoOrbit.create [0; 2]; TwoOrbit.create [1; 3]]
-        | twoOrbitPairType.SelfRefl -> [TwoOrbit.create [0; 3]; TwoOrbit.create [1; 2]]
+        | twoOrbitPairType.Ortho -> [twoOrbit.create [0; 1]; twoOrbit.create [2; 3]]
+        | twoOrbitPairType.Para -> [twoOrbit.create [0; 2]; twoOrbit.create [1; 3]]
+        | twoOrbitPairType.SelfRefl -> [twoOrbit.create [0; 3]; twoOrbit.create [1; 2]]

@@ -12,20 +12,20 @@ type Perm_SiTests() =
         let perm_Rs = permSi.create [|1; 0; 3; 2|]
         let result = PermSi.getTwoOrbits perm_Rs
         let expected = [|
-            TwoOrbit.create [0; 1]
-            TwoOrbit.create [2; 3]
+            twoOrbit.create [0; 1]
+            twoOrbit.create [2; 3]
         |]
-        Assert.Equal<TwoOrbit array>(expected, result)
+        Assert.Equal<twoOrbit array>(expected, result)
 
     [<Fact>]
     let ``PermSi.getTwoOrbits with different valid order 4 permutation returns correct TwoOrbits`` () =
         let perm_Rs = permSi.create  [|2; 3; 0; 1|]
         let result = PermSi.getTwoOrbits perm_Rs
         let expected = [|
-            TwoOrbit.create [0; 2]
-            TwoOrbit.create [1; 3]
+            twoOrbit.create [0; 2]
+            twoOrbit.create [1; 3]
         |]
-        Assert.Equal<TwoOrbit array>(expected, result)
+        Assert.Equal<twoOrbit array>(expected, result)
 
     [<Fact>]
     let ``PermSi.getTwoOrbits with odd order throws exception`` () =

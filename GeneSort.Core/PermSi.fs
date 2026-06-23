@@ -55,7 +55,7 @@ module PermSi =
     /// The returned TwoOrbits are ordered ascending by their first index.
     /// <param name="perm_Si">The PermSi to convert.</param>
     /// <exception cref="System.ArgumentException">Thrown when the PermSi order is odd, or the array is invalid.</exception>
-    let getTwoOrbits (perm_Si: permSi) : TwoOrbit array =
+    let getTwoOrbits (perm_Si: permSi) : twoOrbit array =
         let order = perm_Si.Order |> UMX.untag
         if order < 0 || order % 2 <> 0 then
             failwith "PermSi order must be non-negative and even"
@@ -71,7 +71,7 @@ module PermSi =
                 if j < 0 || j >= order then
                     failwith "PermSi array contains invalid indices"
                 visited.[j] <- true
-                let twoOrbit = TwoOrbit.create [i; j]
+                let twoOrbit = twoOrbit.create [i; j]
                 findOrbits (i + 1) (twoOrbit :: acc)
         findOrbits 0 [] |> List.rev |> Array.ofList
 

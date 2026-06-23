@@ -5,13 +5,13 @@
 /// The order must be non-negative and even, and the TwoOrbits must be disjoint if both are present.
 /// The Second of the pair has a higher first index than the First if both are present.
 [<CustomEquality; NoComparison>]
-type TwoOrbitPair = private { First: TwoOrbit; Second: TwoOrbit option; order: int } with
+type TwoOrbitPair = private { First: twoOrbit; Second: twoOrbit option; order: int } with
     /// Creates a TwoOrbitPair with a required first TwoOrbit, an optional second TwoOrbit, and an order.
     /// <param name="first">The first TwoOrbit (required).</param>
     /// <param name="second">The second TwoOrbit (optional).</param>
     /// <param name="order">The order (must be non-negative and even).</param>
     /// <exception cref="System.ArgumentException">Thrown when order is negative, odd, or the TwoOrbits share indices.</exception>
-    static member create (order: int) (first: TwoOrbit) (second: TwoOrbit option) : TwoOrbitPair =
+    static member create (order: int) (first: twoOrbit) (second: twoOrbit option) : TwoOrbitPair =
         if order < 0 then
             failwith "TwoOrbitPair order must be non-negative"
         if order % 2 <> 0 then

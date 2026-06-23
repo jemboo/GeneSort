@@ -91,20 +91,20 @@ module Perm_RsOps =
         if firstReflect = firstMap then
             if secondReflect = secondMap then
                 // Both points are self-symmetric
-                TwoOrbitPair.create order (TwoOrbit.create [ first; firstMap ]) (TwoOrbit.create [ second; secondMap] |> Some) 
+                TwoOrbitPair.create order (twoOrbit.create [ first; firstMap ]) (twoOrbit.create [ second; secondMap] |> Some) 
             else
                 // First point is self-symmetric, second is not
                 let otherRsTwoOrbit = _randomlyFindOtherReflectionSymmetricTwoOrbits first
                 match otherRsTwoOrbit with
                 | Some orb -> 
-                    TwoOrbitPair.create order (TwoOrbit.create [ first; firstMap ]) (orb |> Some) 
+                    TwoOrbitPair.create order (twoOrbit.create [ first; firstMap ]) (orb |> Some) 
                 | None ->
                     let secondReflectMap = permArray.[secondReflect]
-                    TwoOrbitPair.create order (TwoOrbit.create [ second; secondMap ]) (TwoOrbit.create [ secondReflect; secondReflectMap] |> Some) 
+                    TwoOrbitPair.create order (twoOrbit.create [ second; secondMap ]) (twoOrbit.create [ secondReflect; secondReflectMap] |> Some) 
         else
             // Neither point is self-symmetric, use first point's reflection
             let firstReflectMap = permArray.[firstReflect]
-            TwoOrbitPair.create order (TwoOrbit.create [ first; firstMap ]) (TwoOrbit.create [ firstReflect; firstReflectMap] |> Some) 
+            TwoOrbitPair.create order (twoOrbit.create [ first; firstMap ]) (twoOrbit.create [ firstReflect; firstReflectMap] |> Some) 
 
 
 
