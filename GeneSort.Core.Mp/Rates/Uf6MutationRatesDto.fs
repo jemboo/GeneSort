@@ -11,7 +11,7 @@ open MessagePack.FSharp
 type Uf6MutationRatesDto =
     { [<Key(0)>] Order: int
       [<Key(1)>] Seed6TransitionRates: Seed6TransitionRatesDto
-      [<Key(2)>] OpsTransitionRates: OpsTransitionRatesArrayDto }
+      [<Key(2)>] OpsTransitionRates: opsTransitionRatesArrayDto }
 
 module Uf6MutationRatesDto =
 

@@ -7,7 +7,7 @@ open GeneSort.Core
 [<MessagePackObject>]
 type opsActionRatesArrayDto = {
     [<Key(0)>]
-    Rates: OpsActionRatesDto array
+    Rates: opsActionRatesDto array
 }
 
 module OpsActionRatesArrayDto =

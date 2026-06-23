@@ -16,7 +16,7 @@ type msuf4RandGenDto =
       [<Key(1)>] rngFactoryDto: rngFactoryDto
       [<Key(2)>] sortingWidth: int
       [<Key(3)>] stageLength: int
-      [<Key(4)>] uf4GenRatesDto: Uf4GenRatesDto }
+      [<Key(4)>] uf4GenRatesDto: uf4GenRatesDto }
 
 module Msuf4RandGenDto =
 

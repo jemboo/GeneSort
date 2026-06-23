@@ -12,7 +12,7 @@ open GeneSort.Model.Sorting.V1.Simple.Rs
 type msrsRandMutateDto = 
     { 
       [<Key(0)>] rngFactoryDto: rngFactoryDto
-      [<Key(1)>] opsActionRates: OpsActionRatesDto }
+      [<Key(1)>] opsActionRates: opsActionRatesDto }
 
 module MsrsRandMutateDto =
 

@@ -5,23 +5,23 @@ open GeneSort.Core
 
 
 [<MessagePackObject>]
-type IndelRatesDto = {
+type indelRatesDto = {
     [<Key(0)>]
-    MutationThresh: float
+    mutationThresh: float
     [<Key(1)>]
-    InsertionThresh: float
+    insertionThresh: float
     [<Key(2)>]
-    DeletionThresh: float
+    deletionThresh: float
 }
 
 module IndelRatesDto =
 
-    let toDomain (dto: IndelRatesDto) : indelRates =
-        indelRates.create (dto.MutationThresh, dto.InsertionThresh - dto.MutationThresh, dto.DeletionThresh - dto.InsertionThresh)
+    let toDomain (dto: indelRatesDto) : indelRates =
+        indelRates.create (dto.mutationThresh, dto.insertionThresh - dto.mutationThresh, dto.deletionThresh - dto.insertionThresh)
 
-    let fromDomain (domain: indelRates) : IndelRatesDto = {
-        MutationThresh = domain.MutationRate
-        InsertionThresh = domain.MutationRate + domain.InsertionRate
-        DeletionThresh = domain.MutationRate + domain.InsertionRate + domain.DeletionRate
+    let fromDomain (domain: indelRates) : indelRatesDto = {
+        mutationThresh = domain.MutationRate
+        insertionThresh = domain.MutationRate + domain.InsertionRate
+        deletionThresh = domain.MutationRate + domain.InsertionRate + domain.DeletionRate
     }
 

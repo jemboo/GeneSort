@@ -15,7 +15,7 @@ type msrsRandGenDto =
     { [<Key(0)>] sortingWidth: int
       [<Key(1)>] stageLength: int 
       [<Key(2)>] rngFactoryDto: rngFactoryDto
-      [<Key(3)>] opsGenRatesDto: OpsGenRatesDto }
+      [<Key(3)>] opsGenRatesDto: opsGenRatesDto }
 
 module MsrsRandGenDto =
 

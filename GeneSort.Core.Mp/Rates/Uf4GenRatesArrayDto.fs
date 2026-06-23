@@ -8,7 +8,7 @@ open MessagePack.FSharp
 
 [<MessagePackObject>]
 type Uf4GenRatesArrayDto =
-    { [<Key(0)>] Rates: Uf4GenRatesDto array }
+    { [<Key(0)>] Rates: uf4GenRatesDto array }
 
 module Uf4GenRatesArrayDto =
 

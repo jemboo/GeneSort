@@ -4,18 +4,18 @@ open MessagePack
 open GeneSort.Core
 
 [<MessagePackObject>]
-type OpsTransitionRatesArrayDto = {
+type opsTransitionRatesArrayDto = {
     [<Key(0)>]
-    Rates: OpsTransitionRatesDto array
+    Rates: opsTransitionRatesDto array
 }
 
 module OpsTransitionRatesArrayDto =
 
-    let toDomain (dto: OpsTransitionRatesArrayDto) : opsTransitionRatesArray =
+    let toDomain (dto: opsTransitionRatesArrayDto) : opsTransitionRatesArray =
         let rates = Array.map OpsTransitionRatesDto.toDomain dto.Rates
         opsTransitionRatesArray.create rates
 
-    let fromDomain (domain: opsTransitionRatesArray) : OpsTransitionRatesArrayDto = {
+    let fromDomain (domain: opsTransitionRatesArray) : opsTransitionRatesArrayDto = {
         Rates = Array.map OpsTransitionRatesDto.fromDomain domain.RatesArray
     }
 

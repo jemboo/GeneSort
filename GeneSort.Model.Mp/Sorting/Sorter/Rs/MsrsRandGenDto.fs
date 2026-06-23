@@ -14,7 +14,7 @@ open GeneSort.Core.Mp
 type msrsRandGenDto = 
     { [<Key(0)>] SortingWidth: int
       [<Key(1)>] rngFactoryDto: rngFactoryDto
-      [<Key(2)>] OpsGenRatesArray: OpsGenRatesArrayDto }
+      [<Key(2)>] OpsGenRatesArray: opsGenRatesArrayDto }
 
 module MsrsRandGenDto =
 

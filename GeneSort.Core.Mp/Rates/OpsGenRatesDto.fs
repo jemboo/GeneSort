@@ -4,23 +4,23 @@ open MessagePack
 open GeneSort.Core
 
 [<MessagePackObject>]
-type OpsGenRatesDto = {
+type opsGenRatesDto = {
     [<Key(0)>]
-    OrthoThresh: float
+    orthoThresh: float
     [<Key(1)>]
-    ParaThresh: float
+    paraThresh: float
     [<Key(2)>]
-    SelfReflThresh: float
+    selfReflThresh: float
 }
 
 module OpsGenRatesDto =
 
-    let toDomain (dto: OpsGenRatesDto) : opsGenRates =
-        opsGenRates.create (dto.OrthoThresh, dto.ParaThresh - dto.OrthoThresh, dto.SelfReflThresh - dto.ParaThresh)
+    let toDomain (dto: opsGenRatesDto) : opsGenRates =
+        opsGenRates.create (dto.orthoThresh, dto.paraThresh - dto.orthoThresh, dto.selfReflThresh - dto.paraThresh)
 
-    let fromDomain (domain: opsGenRates) : OpsGenRatesDto = {
-        OrthoThresh = domain.OrthoRate
-        ParaThresh = domain.OrthoRate + domain.ParaRate
-        SelfReflThresh = domain.OrthoRate + domain.ParaRate + domain.SelfReflRate
+    let fromDomain (domain: opsGenRates) : opsGenRatesDto = {
+        orthoThresh = domain.OrthoRate
+        paraThresh = domain.OrthoRate + domain.ParaRate
+        selfReflThresh = domain.OrthoRate + domain.ParaRate + domain.SelfReflRate
     }
 

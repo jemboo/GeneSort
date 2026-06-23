@@ -11,7 +11,7 @@ open GeneSort.Core.Mp
 [<MessagePackObject>]
 type msceRandMutateDto = 
     { [<Key(0)>] rngFactoryDto: rngFactoryDto
-      [<Key(1)>] indelRatesDto: IndelRatesDto
+      [<Key(1)>] indelRatesDto: indelRatesDto
       [<Key(2)>] excludeSelfCe: bool }
 
 module MsceRandMutateDto =

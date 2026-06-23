@@ -8,32 +8,32 @@ open MessagePack.Resolvers
 open MessagePack.FSharp
 
 [<MessagePackObject>]
-type Uf4GenRatesDto =
-    { [<Key(0)>] Order: int
-      [<Key(1)>] SeedOpsGenRates: OpsGenRatesDto
-      [<Key(2)>] OpsGenRatesArray: OpsGenRatesArrayDto }
+type uf4GenRatesDto =
+    { [<Key(0)>] order: int
+      [<Key(1)>] seedOpsGenRatesDto: opsGenRatesDto
+      [<Key(2)>] opsGenRatesArrayDto: opsGenRatesArrayDto }
 
 module Uf4GenRatesDto =
 
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let fromDomain (uf4GenRates: uf4GenRates) : Uf4GenRatesDto =
-        { Order = uf4GenRates.Order
-          SeedOpsGenRates = OpsGenRatesDto.fromDomain uf4GenRates.SeedOpsGenRates
-          OpsGenRatesArray = OpsGenRatesArrayDto.fromDomain uf4GenRates.OpsGenRatesArray }
+    let fromDomain (uf4GenRates: uf4GenRates) : uf4GenRatesDto =
+        { order = uf4GenRates.Order
+          seedOpsGenRatesDto = OpsGenRatesDto.fromDomain uf4GenRates.SeedOpsGenRates
+          opsGenRatesArrayDto = OpsGenRatesArrayDto.fromDomain uf4GenRates.OpsGenRatesArray }
 
-    let toDomain (dto: Uf4GenRatesDto) : uf4GenRates =
+    let toDomain (dto: uf4GenRatesDto) : uf4GenRates =
         try
-            if dto.Order < 4 || dto.Order % 4 <> 0 then
-                failwith $"Order must be at least 4 and divisible by 4, got {dto.Order}"
-            if dto.OpsGenRatesArray.Rates.Length <> MathUtils.exactLog2 (dto.Order / 4) then
-                failwith $"OpsGenRatesArray length ({dto.OpsGenRatesArray.Rates.Length}) must match log2(order/4) ({MathUtils.exactLog2 (dto.Order / 4)})"
+            if dto.order < 4 || dto.order % 4 <> 0 then
+                failwith $"Order must be at least 4 and divisible by 4, got {dto.order}"
+            if dto.opsGenRatesArrayDto.Rates.Length <> MathUtils.exactLog2 (dto.order / 4) then
+                failwith $"OpsGenRatesArray length ({dto.opsGenRatesArrayDto.Rates.Length}) must match log2(order/4) ({MathUtils.exactLog2 (dto.order / 4)})"
 
             uf4GenRates.create 
-                dto.Order 
-                (OpsGenRatesDto.toDomain dto.SeedOpsGenRates) 
-                (OpsGenRatesArrayDto.toDomain dto.OpsGenRatesArray)
+                dto.order 
+                (OpsGenRatesDto.toDomain dto.seedOpsGenRatesDto) 
+                (OpsGenRatesArrayDto.toDomain dto.opsGenRatesArrayDto)
 
         with
         | ex -> failwith $"Failed to convert Uf4GenRatesDto: {ex.Message}"

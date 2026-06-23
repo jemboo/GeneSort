@@ -10,8 +10,8 @@ open MessagePack.FSharp
 [<MessagePackObject>]
 type Uf4MutationRatesDto =
     { [<Key(0)>] Order: int
-      [<Key(1)>] SeedOpsTransitionRates: OpsTransitionRatesDto
-      [<Key(2)>] TwoOrbitPairOpsTransitionRates: OpsTransitionRatesArrayDto }
+      [<Key(1)>] SeedOpsTransitionRates: opsTransitionRatesDto
+      [<Key(2)>] TwoOrbitPairOpsTransitionRates: opsTransitionRatesArrayDto }
 
 module Uf4MutationRatesDto =
 

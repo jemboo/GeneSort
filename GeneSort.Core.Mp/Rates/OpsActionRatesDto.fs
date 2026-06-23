@@ -4,7 +4,7 @@ open MessagePack
 open GeneSort.Core
 
 [<MessagePackObject>]
-type OpsActionRatesDto = {
+type opsActionRatesDto = {
     [<Key(0)>]
     OrthoThresh: float
     [<Key(1)>]
@@ -15,10 +15,10 @@ type OpsActionRatesDto = {
 
 module OpsActionRatesDto =
 
-    let toDomain (dto: OpsActionRatesDto) : opsActionRates =
+    let toDomain (dto: opsActionRatesDto) : opsActionRates =
         opsActionRates.create (dto.OrthoThresh, dto.ParaThresh - dto.OrthoThresh, dto.SelfReflThresh - dto.ParaThresh)
 
-    let fromDomain (domain: opsActionRates) : OpsActionRatesDto = {
+    let fromDomain (domain: opsActionRates) : opsActionRatesDto = {
         OrthoThresh = domain.OrthoRate
         ParaThresh = domain.OrthoRate + domain.ParaRate
         SelfReflThresh = domain.OrthoRate + domain.ParaRate + domain.SelfReflRate

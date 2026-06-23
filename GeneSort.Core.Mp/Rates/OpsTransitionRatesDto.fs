@@ -3,25 +3,25 @@ open MessagePack
 open GeneSort.Core
 
 [<MessagePackObject>]
-type OpsTransitionRatesDto = {
+type opsTransitionRatesDto = {
     [<Key(0)>]
-    OrthoRates: OpsActionRatesDto
+    OrthoRates: opsActionRatesDto
     [<Key(1)>]
-    ParaRates: OpsActionRatesDto
+    ParaRates: opsActionRatesDto
     [<Key(2)>]
-    SelfReflRates: OpsActionRatesDto
+    SelfReflRates: opsActionRatesDto
 }
 
 module OpsTransitionRatesDto =
 
-    let toDomain (dto: OpsTransitionRatesDto) : opsTransitionRates =
+    let toDomain (dto: opsTransitionRatesDto) : opsTransitionRates =
         opsTransitionRates.create(
             OpsActionRatesDto.toDomain dto.OrthoRates,
             OpsActionRatesDto.toDomain dto.ParaRates,
             OpsActionRatesDto.toDomain dto.SelfReflRates
         )
 
-    let fromDomain (domain: opsTransitionRates) : OpsTransitionRatesDto = {
+    let fromDomain (domain: opsTransitionRates) : opsTransitionRatesDto = {
         OrthoRates = OpsActionRatesDto.fromDomain domain.OrthoRates
         ParaRates = OpsActionRatesDto.fromDomain domain.ParaRates
         SelfReflRates = OpsActionRatesDto.fromDomain domain.SelfReflRates
