@@ -25,19 +25,14 @@ module MsceRandMutateDto =
           ExcludeSelfCe = msceRandMutate.ExcludeSelfCe }
     
     let toDomain (dto: msceRandMutateDto) : msceRandMutate =
-        match MsceDto.toDomain dto.Msce with
-        | Ok msce ->
-            let indelRatesArray = IndelRatesArrayDto.toDomain dto.IndelRatesArray
+        let msce = MsceDto.toDomain dto.Msce
+        let indelRatesArray = IndelRatesArrayDto.toDomain dto.IndelRatesArray
         
-            if %msce.CeLength <> indelRatesArray.Length then
-                failwith "CeCount must match IndelRatesArray.Length"
+        if %msce.CeLength <> indelRatesArray.Length then
+            failwith "CeCount must match IndelRatesArray.Length"
         
-            msceRandMutate.create
-                (dto.rngFactoryDto |> RngFactoryDto.toDomain)
-                indelRatesArray
-                dto.ExcludeSelfCe
-                msce
-        | Error err ->
-            failwith (match err with
-                      | MsceDto.InvalidCeCodesLength msg -> msg
-                      | MsceDto.InvalidSortingWidth msg -> msg)
+        msceRandMutate.create
+            (dto.rngFactoryDto |> RngFactoryDto.toDomain)
+            indelRatesArray
+            dto.ExcludeSelfCe
+            msce

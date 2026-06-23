@@ -6,7 +6,7 @@ type TwoOrbitType =
     | SelfRefl
 
 
-type TwoOrbitPairType =
+type twoOrbitPairType =
     | Ortho
     | Para
     | SelfRefl
@@ -123,8 +123,8 @@ module TwoOrbit =
 
 
 
-    let getTwoOrbits (twoOrbitPairType:TwoOrbitPairType) : TwoOrbit list =
-        match twoOrbitPairType with
-        | TwoOrbitPairType.Ortho -> [TwoOrbit.create [0; 1]; TwoOrbit.create [2; 3]]
-        | TwoOrbitPairType.Para -> [TwoOrbit.create [0; 2]; TwoOrbit.create [1; 3]]
-        | TwoOrbitPairType.SelfRefl -> [TwoOrbit.create [0; 3]; TwoOrbit.create [1; 2]]
+    let getTwoOrbits (topType:twoOrbitPairType) : TwoOrbit list =
+        match topType with
+        | twoOrbitPairType.Ortho -> [TwoOrbit.create [0; 1]; TwoOrbit.create [2; 3]]
+        | twoOrbitPairType.Para -> [TwoOrbit.create [0; 2]; TwoOrbit.create [1; 3]]
+        | twoOrbitPairType.SelfRefl -> [TwoOrbit.create [0; 3]; TwoOrbit.create [1; 2]]

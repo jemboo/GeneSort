@@ -10,7 +10,7 @@ open GeneSort.Sorting
 
 [<MessagePackObject; Struct>]
 type msceDto =
-    { [<Key(0)>] Id: Guid
+    { [<Key(0)>] id: Guid
       [<Key(1)>] sortingWidth: int
       [<Key(2)>] ceCodes: int array }
     
@@ -20,32 +20,21 @@ type msceDto =
         if sortingWidth < 1 then
             invalidArg "sortingWidth" "SortingWidth must be at least 1"
         
-        { Id = id; sortingWidth = sortingWidth; ceCodes = ceCodes }
+        { id = id; sortingWidth = sortingWidth; ceCodes = ceCodes }
     
    // member this.ceLength = this.CeCodes.Length
 
 
 module MsceDto =
-    type MsceDtoError =
-        | InvalidCeCodesLength of string
-        | InvalidSortingWidth of string
 
     let fromDomain (msce: msce) : msceDto =
-        { Id = %msce.Id
+        { id = %msce.Id
           sortingWidth = %msce.SortingWidth
           ceCodes = msce.CeCodes }
 
-    let toDomain (msceDto: msceDto) : Result<msce, MsceDtoError> =
-        try
-            let msce = msce.create
-                            (UMX.tag<sorterModelId> msceDto.Id)
-                            (UMX.tag<sortingWidth> msceDto.sortingWidth)
-                            msceDto.ceCodes
-            Ok msce
-        with
-        | :? ArgumentException as ex when ex.Message.Contains("Ce") ->
-            Error (InvalidCeCodesLength ex.Message)
-        | :? ArgumentException as ex when ex.Message.Contains("SortingWidth") ->
-            Error (InvalidSortingWidth ex.Message)
-        | ex ->
-            Error (InvalidCeCodesLength ex.Message) // Fallback for unexpected errors
+    let toDomain (msceDto: msceDto) : msce =
+         msce.create
+            (UMX.tag<sorterModelId> msceDto.id)
+            (UMX.tag<sortingWidth> msceDto.sortingWidth)
+            msceDto.ceCodes
+

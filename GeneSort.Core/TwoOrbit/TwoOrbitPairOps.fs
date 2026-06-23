@@ -7,42 +7,42 @@ module TwoOrbitPairOps =
     /// or checks the TwoOrbitType of both if the second is present.
     /// returns None if the TwoOrbits are not of the same type.
     /// <param name="twoOrbitPair">The TwoOrbitPair to check.</param>
-    let getTwoOrbitPairTypeOption (twoOrbitPair: TwoOrbitPair) : TwoOrbitPairType option =
+    let getTwoOrbitPairTypeOption (twoOrbitPair: TwoOrbitPair) : twoOrbitPairType option =
 
         match twoOrbitPair.Second with
         | None -> 
                match (TwoOrbit.getTwoOrbitType twoOrbitPair.Order twoOrbitPair.FirstOrbit) with
-               | TwoOrbitType.Ortho -> Some TwoOrbitPairType.Ortho
-               | TwoOrbitType.Para -> Some TwoOrbitPairType.Para
-               | TwoOrbitType.SelfRefl -> Some TwoOrbitPairType.SelfRefl
+               | TwoOrbitType.Ortho -> Some twoOrbitPairType.Ortho
+               | TwoOrbitType.Para -> Some twoOrbitPairType.Para
+               | TwoOrbitType.SelfRefl -> Some twoOrbitPairType.SelfRefl
         | Some second ->
           match (TwoOrbit.getTwoOrbitType twoOrbitPair.Order twoOrbitPair.FirstOrbit) with
             | TwoOrbitType.Ortho ->
                 match (TwoOrbit.getTwoOrbitType twoOrbitPair.Order second) with
-                | TwoOrbitType.Ortho -> Some TwoOrbitPairType.Ortho 
+                | TwoOrbitType.Ortho -> Some twoOrbitPairType.Ortho 
                 | _ -> None
             | TwoOrbitType.Para ->
                 match (TwoOrbit.getTwoOrbitType twoOrbitPair.Order second) with
-                | TwoOrbitType.Para -> Some TwoOrbitPairType.Para 
+                | TwoOrbitType.Para -> Some twoOrbitPairType.Para 
                 | _ -> None
             | TwoOrbitType.SelfRefl ->
                 match (TwoOrbit.getTwoOrbitType twoOrbitPair.Order second) with
-                | TwoOrbitType.SelfRefl -> Some TwoOrbitPairType.SelfRefl 
+                | TwoOrbitType.SelfRefl -> Some twoOrbitPairType.SelfRefl 
                 | _ -> None
 
 
-    let getTwoOrbitPairType (twoOrbitPair:TwoOrbitPair) : TwoOrbitPairType =
+    let getTwoOrbitPairType (twoOrbitPair:TwoOrbitPair) : twoOrbitPairType =
         if twoOrbitPair.Second.IsNone then
-            TwoOrbitPairType.SelfRefl
+            twoOrbitPairType.SelfRefl
         else
             let orbit1 = twoOrbitPair.First
             if TwoOrbit.isReflectionSymmetric twoOrbitPair.Order orbit1  then
-                TwoOrbitPairType.SelfRefl
+                twoOrbitPairType.SelfRefl
             else
                 if ((snd orbit1.IndicesTuple) < twoOrbitPair.Order / 2) then
-                    TwoOrbitPairType.Ortho
+                    twoOrbitPairType.Ortho
                 else
-                    TwoOrbitPairType.Para
+                    twoOrbitPairType.Para
 
 
     let fromTwoOrbits (order:int) (twoOrbits:seq<TwoOrbit>) : seq<TwoOrbitPair> =
@@ -63,14 +63,14 @@ module TwoOrbitPairOps =
     let unfoldTwoOrbitIntoTwoOrbitPair
             (twoOrbit:TwoOrbit) 
             (order:int) 
-            (twoOrbitPairType:TwoOrbitPairType) : TwoOrbitPair =
+            (twoOrbitPairType:twoOrbitPairType) : TwoOrbitPair =
 
         let (low, high) = twoOrbit.IndicesTuple
         let (highR, lowR) = (TwoOrbit.getReflection (order*2) twoOrbit).IndicesTuple
         let (twoOrbitA, twoOrbitB) = 
             match twoOrbitPairType with
-            | TwoOrbitPairType.Ortho -> (TwoOrbit.create [low; high], TwoOrbit.create [lowR; highR])
-            | TwoOrbitPairType.Para -> (TwoOrbit.create [low; highR], TwoOrbit.create [high; lowR])
-            | TwoOrbitPairType.SelfRefl -> (TwoOrbit.create [low; lowR], TwoOrbit.create [high; highR])
+            | twoOrbitPairType.Ortho -> (TwoOrbit.create [low; high], TwoOrbit.create [lowR; highR])
+            | twoOrbitPairType.Para -> (TwoOrbit.create [low; highR], TwoOrbit.create [high; lowR])
+            | twoOrbitPairType.SelfRefl -> (TwoOrbit.create [low; lowR], TwoOrbit.create [high; highR])
 
         TwoOrbitPair.create (order*2) twoOrbitA (Some twoOrbitB)

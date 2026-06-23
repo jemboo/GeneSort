@@ -3,7 +3,7 @@
 open Combinatorics
 
 /// The seven reflection symmetric order 6 TwoCycles.
-type TwoOrbitTripleType =
+type twoOrbitTripleType =
     | Ortho1
     | Ortho2
     | Para1
@@ -16,7 +16,7 @@ type TwoOrbitTripleType =
 module TwoOrbitTripleType =
 
     /// 
-    let getTwoOrbits (seedType:TwoOrbitTripleType) : TwoOrbit list =
+    let getTwoOrbits (seedType:twoOrbitTripleType) : TwoOrbit list =
         match seedType with
         | Ortho1 -> [TwoOrbit.create [0; 1]; TwoOrbit.create [4; 5]; TwoOrbit.create [2; 3]]
         | Ortho2 -> [TwoOrbit.create [0; 2]; TwoOrbit.create [3; 5]; TwoOrbit.create [1; 4]]
@@ -24,4 +24,4 @@ module TwoOrbitTripleType =
         | Para2 -> [TwoOrbit.create [0; 4]; TwoOrbit.create [1; 5]; TwoOrbit.create [2; 3]]
         | Para3 -> [TwoOrbit.create [1; 3]; TwoOrbit.create [2; 4]; TwoOrbit.create [0; 5]]
         | Para4 -> [TwoOrbit.create [0; 3]; TwoOrbit.create [1; 4]; TwoOrbit.create [2; 5]]
-        | TwoOrbitTripleType.SelfRefl -> [TwoOrbit.create [0; 5]; TwoOrbit.create [1; 4]; TwoOrbit.create [2; 3]]
+        | twoOrbitTripleType.SelfRefl -> [TwoOrbit.create [0; 5]; TwoOrbit.create [1; 4]; TwoOrbit.create [2; 3]]

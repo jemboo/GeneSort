@@ -15,9 +15,6 @@ type mssiDto =
       [<Key(2)>] permSiDtos: permSiDto array }
 
 module MssiDto =
-    type MssiDtoError =
-        | InvalidPermSiCount of string
-        | InvalidWidth of string
 
     let fromDomain (mssi: mssi) : mssiDto =
         let mssiDtos = mssi.Perm_Sis |> Array.map PermSiDto.fromDomain
@@ -25,23 +22,12 @@ module MssiDto =
           sortingWidth = %mssi.SortingWidth
           permSiDtos = mssiDtos }
 
-    let toDomain (mssiDto: mssiDto) : Result<mssi, MssiDtoError> =
-        try
-            let perm_SisR = mssiDto.permSiDtos |> Array.map (PermSiDto.toDomain)
-            let perm_Sis =
-                perm_SisR 
-                |> Array.map (function
-                    | Ok ps -> ps
-                    | Error e -> raise (ArgumentException(sprintf "Error converting Perm_SiDto: %A" e)))
-            let mssi = GeneSort.Model.Sorting.Sorter.Si.mssi.create
-                            (UMX.tag<sorterModelId> mssiDto.id)
-                            (UMX.tag<sortingWidth> mssiDto.sortingWidth)
-                            perm_Sis
-            Ok mssi
-        with
-        | :? ArgumentException as ex when ex.Message.Contains("PermSi") ->
-            Error (InvalidPermSiCount ex.Message)
-        | :? ArgumentException as ex when ex.Message.Contains("Width") ->
-            Error (InvalidWidth ex.Message)
-        | ex ->
-            Error (InvalidPermSiCount ex.Message) // Fallback for unexpected errors
+    let toDomain (mssiDto: mssiDto) : mssi =
+        let perm_Sis = 
+            mssiDto.permSiDtos 
+            |> Array.map PermSiDto.toDomain
+        
+        GeneSort.Model.Sorting.Sorter.Si.mssi.create
+            (UMX.tag<sorterModelId> mssiDto.id)
+            (UMX.tag<sortingWidth> mssiDto.sortingWidth)
+            perm_Sis

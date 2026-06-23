@@ -30,7 +30,7 @@ module Msuf6RandMutateDto =
 
     let toDomain (dto: msuf6RandMutateDto) : msuf6RandMutate =
         try
-            let msuf6 = Msuf6Dto.toDomain dto.msuf6Dto |> Result.toOption |> Option.get
+            let msuf6 = Msuf6Dto.toDomain dto.msuf6Dto
             let uf6MutationRatesArray = Uf6MutationRatesArrayDto.toDomain dto.uf6MutationRatesArray
             let rngFactory = dto.rngFactoryDto |> RngFactoryDto.toDomain
             msuf6RandMutate.create rngFactory uf6MutationRatesArray msuf6

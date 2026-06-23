@@ -29,7 +29,7 @@ module Msuf4RandMutateDto =
 
     let toDomain (dto: msuf4RandMutateDto) : msuf4RandMutate =
         try
-            let msuf4 = Msuf4Dto.toDomain dto.msuf4 |> Result.toOption |> Option.get
+            let msuf4 = Msuf4Dto.toDomain dto.msuf4
             let uf4MutationRatesArray = Uf4MutationRatesArrayDto.toDomain dto.uf4MutationRatesArrayDtos
             if uf4MutationRatesArray.Length <> %msuf4.StageLength then
                 failwith $"Uf4MutationRatesArray length ({uf4MutationRatesArray.Length}) must equal StageLength ({%msuf4.StageLength})"

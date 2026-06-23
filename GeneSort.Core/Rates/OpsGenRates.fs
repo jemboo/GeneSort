@@ -83,15 +83,15 @@ type opsGenRates =
 
 module OpsGenMode =
 
-    let fromTwoOrbitType (twoOrbitType:TwoOrbitPairType) : opsGenMode =
+    let fromTwoOrbitType (twoOrbitType:twoOrbitPairType) : opsGenMode =
             match twoOrbitType with
-            | TwoOrbitPairType.Ortho -> opsGenMode.Ortho
-            | TwoOrbitPairType.Para -> opsGenMode.Para
-            | TwoOrbitPairType.SelfRefl ->  opsGenMode.SelfRefl
+            | twoOrbitPairType.Ortho -> opsGenMode.Ortho
+            | twoOrbitPairType.Para -> opsGenMode.Para
+            | twoOrbitPairType.SelfRefl ->  opsGenMode.SelfRefl
 
-    let toTwoOrbitPairType (opsGenMode:opsGenMode) : TwoOrbitPairType =
+    let toTwoOrbitPairType (opsGenMode:opsGenMode) : twoOrbitPairType =
             match opsGenMode with
-            | opsGenMode.Ortho -> TwoOrbitPairType.Ortho
-            | opsGenMode.Para -> TwoOrbitPairType.Para
-            | opsGenMode.SelfRefl ->  TwoOrbitPairType.SelfRefl
+            | opsGenMode.Ortho -> twoOrbitPairType.Ortho
+            | opsGenMode.Para -> twoOrbitPairType.Para
+            | opsGenMode.SelfRefl ->  twoOrbitPairType.SelfRefl
 

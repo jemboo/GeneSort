@@ -12,9 +12,9 @@ open GeneSort.Core.Mp
 
 [<MessagePackObject>]
 type msrsRandGenDto = 
-    { [<Key(0)>] SortingWidth: int
+    { [<Key(0)>] sortingWidth: int
       [<Key(1)>] rngFactoryDto: rngFactoryDto
-      [<Key(2)>] OpsGenRatesArray: opsGenRatesArrayDto }
+      [<Key(2)>] opsGenRatesArrayDto: opsGenRatesArrayDto }
 
 module MsrsRandGenDto =
 
@@ -22,19 +22,19 @@ module MsrsRandGenDto =
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let fromDomain (msrsRandGen: msrsRandGen) : msrsRandGenDto =
-        { SortingWidth = %msrsRandGen.SortingWidth
+        { sortingWidth = %msrsRandGen.SortingWidth
           rngFactoryDto = msrsRandGen.RngFactory |> RngFactoryDto.fromDomain
-          OpsGenRatesArray = OpsGenRatesArrayDto.fromDomain msrsRandGen.OpsGenRatesArray }
+          opsGenRatesArrayDto = OpsGenRatesArrayDto.fromDomain msrsRandGen.OpsGenRatesArray }
 
     let toDomain (dto: msrsRandGenDto) : msrsRandGen =
         try
-            if dto.SortingWidth < 2 then
-                failwith $"SortingWidth must be at least 2, got {dto.SortingWidth}"
-            if (dto.OpsGenRatesArray.opsGenRatesDtos.Length) < 1 then
-                failwith $"OpsGenRatesArray must have at least 1 rate, got {dto.OpsGenRatesArray.opsGenRatesDtos.Length}"
+            if dto.sortingWidth < 2 then
+                failwith $"SortingWidth must be at least 2, got {dto.sortingWidth}"
+            if (dto.opsGenRatesArrayDto.opsGenRatesDtos.Length) < 1 then
+                failwith $"OpsGenRatesArray must have at least 1 rate, got {dto.opsGenRatesArrayDto.opsGenRatesDtos.Length}"
             msrsRandGen.create
                 (dto.rngFactoryDto |> RngFactoryDto.toDomain)
-                (UMX.tag<sortingWidth> dto.SortingWidth)
-                (OpsGenRatesArrayDto.toDomain dto.OpsGenRatesArray)
+                (UMX.tag<sortingWidth> dto.sortingWidth)
+                (OpsGenRatesArrayDto.toDomain dto.opsGenRatesArrayDto)
         with
         | ex -> failwith $"Failed to convert MsrsRandGenDto: {ex.Message}"

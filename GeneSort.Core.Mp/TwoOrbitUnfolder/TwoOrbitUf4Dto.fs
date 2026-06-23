@@ -1,54 +1,35 @@
-﻿
-namespace GeneSort.Core.Mp.TwoOrbitUnfolder
+﻿namespace GeneSort.Core.Mp.TwoOrbitUnfolder
 
 open System
 open GeneSort.Core
 open MessagePack
 
 [<MessagePackObject; Struct>]
-type TwoOrbitUf4Dto =
-    { [<Key(0)>] SeedType: TwoOrbitPairType
-      [<Key(1)>] TwoOrbitUfSteps: TwoOrbitUfStepDto array }
+type twoOrbitUf4Dto =
+    { [<Key(0)>] seedType: twoOrbitPairType
+      [<Key(1)>] twoOrbitUfStepDtos: twoOrbitUfStepDto array }
     
-    static member Create(seedType: TwoOrbitPairType, twoOrbitUnfolderSteps: TwoOrbitUfStepDto array) : Result<TwoOrbitUf4Dto, string> =
+    static member Create 
+                    (seedType: twoOrbitPairType) 
+                    (twoOrbitUnfolderSteps: twoOrbitUfStepDto array) : twoOrbitUf4Dto =
         if Array.isEmpty twoOrbitUnfolderSteps then
-            Error "TwoOrbitUnfolderSteps array cannot be empty"
+            failwith "TwoOrbitUnfolderSteps array cannot be empty"
         else
-            Ok { SeedType = seedType
-                 TwoOrbitUfSteps = twoOrbitUnfolderSteps }
+            { seedType = seedType
+              twoOrbitUfStepDtos = twoOrbitUnfolderSteps }
 
 module TwoOrbitUf4Dto =
-    type TwoOrbitUf4DtoError =
-        | EmptyTwoOrbitUfSteps of string
-        | StepConversionError of TwoOrbitUnfolderStepDto.TwoOrbitUnfolderStepDtoError
 
-    let fromDomain (tou: TwoOrbitUf4) : TwoOrbitUf4Dto =
-        { SeedType = tou.TwoOrbitPairType
-          TwoOrbitUfSteps = tou.TwoOrbitUnfolderSteps |> Array.map TwoOrbitUnfolderStepDto.fromDomain }
+    let fromDomain (tou: TwoOrbitUf4) : twoOrbitUf4Dto =
+        { seedType = tou.TwoOrbitPairType
+          twoOrbitUfStepDtos = tou.TwoOrbitUnfolderSteps |> Array.map TwoOrbitUnfolderStepDto.fromDomain }
 
-    let toDomain (dto: TwoOrbitUf4Dto) : Result<TwoOrbitUf4, TwoOrbitUf4DtoError> =
-        let stepsResult = 
-            dto.TwoOrbitUfSteps 
+    let toDomain (dto: twoOrbitUf4Dto) : TwoOrbitUf4 =
+        let steps = 
+            dto.twoOrbitUfStepDtos 
             |> Array.map TwoOrbitUnfolderStepDto.toDomain
-            |> Array.fold (fun acc res ->
-                match acc, res with
-                | Ok arr, Ok step -> Ok (arr @ [step])
-                | Ok _, Error e -> Error (StepConversionError e)
-                | Error e, _ -> Error e
-            ) (Ok [])
         
-        match stepsResult with
-        | Error e -> Error e
-        | Ok steps ->
-            try
-                let tou = TwoOrbitUf4.create dto.SeedType (steps |> List.toArray)
-                Ok tou
-            with
-            | :? ArgumentException as ex when ex.Message.Contains("empty") ->
-                Error (EmptyTwoOrbitUfSteps ex.Message)
-            | ex ->
-                Error (EmptyTwoOrbitUfSteps ex.Message)
+        TwoOrbitUf4.create dto.seedType steps
 
-
-    let getOrder (twoOrbitUnfolder: TwoOrbitUf4Dto) : int =
-            4 * (MathUtils.integerPower 2 (Array.length twoOrbitUnfolder.TwoOrbitUfSteps))
+    let getOrder (twoOrbitUnfolder: twoOrbitUf4Dto) : int =
+        4 * (MathUtils.integerPower 2 (Array.length twoOrbitUnfolder.twoOrbitUfStepDtos))

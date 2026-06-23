@@ -24,23 +24,17 @@ module MssiRandMutateDto =
           rngFactoryDto = mssiRandMutate.RngFactory |> RngFactoryDto.fromDomain
           opActionRatesArrayDto = OpActionRatesArrayDto.fromDomain mssiRandMutate.OpActionRates }
 
-    let toDomain (dto: mssiRandMutateDto) : Result<mssiRandMutate, string> =
+    let toDomain (dto: mssiRandMutateDto) : mssiRandMutate =
         try
-            let mssiResult = MssiDto.toDomain dto.mssiDto
-            match mssiResult with
-            | Ok mssi ->
-                if %mssi.StageLength <> (OpActionRatesArrayDto.toDomain dto.opActionRatesArrayDto).Length then
-                    Error "StageLength must match OpActionRatesArray.Length"
-                else
-                    let mssiRandMutate = 
-                        mssiRandMutate.create
-                            (dto.rngFactoryDto |> RngFactoryDto.toDomain)
-                            (OpActionRatesArrayDto.toDomain dto.opActionRatesArrayDto)
-                            mssi
-                    Ok mssiRandMutate
-            | Error err ->
-                Error (match err with
-                       | MssiDto.InvalidPermSiCount msg -> msg
-                       | MssiDto.InvalidWidth msg -> msg)
+            let mssi = MssiDto.toDomain dto.mssiDto
+            let opActionRates = OpActionRatesArrayDto.toDomain dto.opActionRatesArrayDto
+            
+            if %mssi.StageLength <> opActionRates.Length then
+                failwith $"StageLength ({%mssi.StageLength}) must match OpActionRatesArray length ({opActionRates.Length})"
+            
+            mssiRandMutate.create
+                (dto.rngFactoryDto |> RngFactoryDto.toDomain)
+                opActionRates
+                mssi
         with
-        | ex -> Error ex.Message
+        | ex -> failwith $"Failed to convert MssiRandMutateDto: {ex.Message}"

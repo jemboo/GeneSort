@@ -17,7 +17,7 @@ type msasFDto = {
 [<MessagePackObject>]
 type msasODto = {
 [<Key(0)>] Id: Guid
-[<Key(1)>] SeedPermutation: PermutationDto
+[<Key(1)>] SeedPermutation: permutationDto
 [<Key(2)>] MaxOrbit: int
 }
 
@@ -51,7 +51,7 @@ module MsasODtoConv =
         }
 
     let toDomain (dto: msasODto) : msasO =
-        let perm = dto.SeedPermutation |> PermutationDto.toDomain |> Result.toOption |> Option.get
+        let perm = dto.SeedPermutation |> PermutationDto.toDomain
         msasO.create perm dto.MaxOrbit
 
 

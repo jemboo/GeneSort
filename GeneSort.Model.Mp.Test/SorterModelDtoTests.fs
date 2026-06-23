@@ -30,20 +30,20 @@ type SorterModelDtoTests() =
     // Helper function to create a valid TwoOrbitUnfolder4 for a given order, SeedType, and optional TwoOrbitType override
     let createTestTwoOrbitUnfolder4 
             (order: int) 
-            (twoOrbitPairType: TwoOrbitPairType) 
-            (twoOrbitPairTypeOverride: TwoOrbitPairType option) 
+            (topType: twoOrbitPairType) 
+            (twoOrbitPairTypeOverride: twoOrbitPairType option) 
      : TwoOrbitUf4  =
         let baseGenRates = createTestGenRates order
-        let orthoRate = if twoOrbitPairType = TwoOrbitPairType.Ortho then 1.0 else 0.0
-        let paraRate = if twoOrbitPairType = TwoOrbitPairType.Para then 1.0 else 0.0
-        let selfSyymRate = if twoOrbitPairType = TwoOrbitPairType.SelfRefl then 1.0 else 0.0
+        let orthoRate = if topType = twoOrbitPairType.Ortho then 1.0 else 0.0
+        let paraRate = if topType = twoOrbitPairType.Para then 1.0 else 0.0
+        let selfSyymRate = if topType = twoOrbitPairType.SelfRefl then 1.0 else 0.0
 
         let ratesArray = 
                 match twoOrbitPairTypeOverride with
                 | Some tot -> 
-                    let orthoRate = if twoOrbitPairType = TwoOrbitPairType.Ortho then 1.0 else 0.0
-                    let paraRate = if twoOrbitPairType = TwoOrbitPairType.Para then 1.0 else 0.0
-                    let selfSyymRate = if twoOrbitPairType = TwoOrbitPairType.SelfRefl then 1.0 else 0.0
+                    let orthoRate = if topType = twoOrbitPairType.Ortho then 1.0 else 0.0
+                    let paraRate = if topType = twoOrbitPairType.Para then 1.0 else 0.0
+                    let selfSyymRate = if topType = twoOrbitPairType.SelfRefl then 1.0 else 0.0
                     Array.init baseGenRates.OpsGenRatesArray.RatesArray.Length (
                         fun _ -> opsGenRates.create(orthoRate, paraRate, selfSyymRate))
                 | None -> baseGenRates.OpsGenRatesArray.RatesArray
@@ -61,8 +61,8 @@ type SorterModelDtoTests() =
     // Helper function to create a valid TwoOrbitUnfolder4 for a given order, SeedType, and optional TwoOrbitType override
     let createTestTwoOrbitUnfolder6
             (order: int) 
-            (twoOrbitPairType: TwoOrbitPairType) 
-            (twoOrbitPairTypeOverride: TwoOrbitPairType option) 
+            (twoOrbitPairType: twoOrbitPairType) 
+            (twoOrbitPairTypeOverride: twoOrbitPairType option) 
      : TwoOrbitUf6  =
         let genRates : uf6GenRates = 
             Uf6GenRates.makeUniform order
@@ -126,7 +126,7 @@ type SorterModelDtoTests() =
     let ``Msuf4 round-trip serialization and deserialization should succeed`` () =
         let id = Guid.NewGuid() |> UMX.tag<sorterModelId>
         let width = 16<sortingWidth>
-        let tou = createTestTwoOrbitUnfolder4 16 TwoOrbitPairType.Ortho (Some TwoOrbitPairType.Para)
+        let tou = createTestTwoOrbitUnfolder4 16 twoOrbitPairType.Ortho (Some twoOrbitPairType.Para)
         let msuf4 = msuf4.create id width [|tou|] 
         let sorterModel = sorterModel.Msuf4 msuf4
         let result = roundTrip sorterModel
@@ -143,7 +143,7 @@ type SorterModelDtoTests() =
         let id = Guid.NewGuid() |> UMX.tag<sorterModelId>
         let order = 12
         let width = 12<sortingWidth>
-        let tou = createTestTwoOrbitUnfolder6 order TwoOrbitPairType.Ortho (Some TwoOrbitPairType.Para)
+        let tou = createTestTwoOrbitUnfolder6 order twoOrbitPairType.Ortho (Some twoOrbitPairType.Para)
 
         let msuf6 = msuf6.create id width [|tou|]
         let sorterModel = sorterModel.Msuf6 msuf6

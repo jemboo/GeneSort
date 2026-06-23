@@ -140,7 +140,7 @@ module Perm_RsOps =
             match opam with
             | opsActionMode.Ortho -> 
                 match twoOrbitPairTypeFound with
-                | TwoOrbitPairType.Ortho -> ()
+                | twoOrbitPairType.Ortho -> ()
 
                 | _ -> 
                     newArray.[firstL] <- secondL
@@ -150,15 +150,15 @@ module Perm_RsOps =
 
             | opsActionMode.Para -> 
                 match twoOrbitPairTypeFound with
-                | TwoOrbitPairType.Ortho -> 
+                | twoOrbitPairType.Ortho -> 
                     newArray.[firstL] <- secondL
                     newArray.[secondL] <- firstL 
                     newArray.[firstH] <- secondH
                     newArray.[secondH] <- firstH
 
-                | TwoOrbitPairType.Para -> ()
+                | twoOrbitPairType.Para -> ()
 
-                | TwoOrbitPairType.SelfRefl -> 
+                | twoOrbitPairType.SelfRefl -> 
                     newArray.[firstL] <- secondH
                     newArray.[secondH] <- firstL 
                     newArray.[firstH] <- secondL
@@ -166,7 +166,7 @@ module Perm_RsOps =
 
             | opsActionMode.SelfRefl -> 
                 match twoOrbitPairTypeFound with
-                | TwoOrbitPairType.SelfRefl -> ()
+                | twoOrbitPairType.SelfRefl -> ()
                 | _ -> 
                     newArray.[firstL] <- secondH
                     newArray.[secondH] <- firstL 

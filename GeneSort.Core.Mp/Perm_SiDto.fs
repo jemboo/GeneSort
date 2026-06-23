@@ -1,47 +1,22 @@
 ﻿namespace GeneSort.Core.Mp
 
-open System
 open GeneSort.Core
 open MessagePack
 
 
 [<MessagePackObject; Struct>]
 type permSiDto =
-    { [<Key(0)>] Permutation: PermutationDto }
+    { [<Key(0)>] permutationDto: permutationDto }
     
-    static member Create(arr: int array) : Result<permSiDto, string> =
-        match PermutationDto.Create(arr) with
-        | Error e -> Error e
-        | Ok permDto ->
-            let perm = permutation.create arr
-            if not (Permutation.isSelfInverse perm) then
-                Error "Invalid: permutation must be self-inverse"
-            else
-                Ok { Permutation = permDto }
+    static member Create(arr: int array) : permSiDto =
+        let permDto = permutationDto.Create(arr)
+        { permutationDto = permDto }
 
 module PermSiDto =
 
-    type Perm_SiDtoError =
-        | NullArray of string
-        | EmptyArray of string
-        | InvalidPermutation of string
-        | NotSelfInverse of string
-        | PermutationConversionError of PermutationDto.PermutationDtoError
-
     let fromDomain (permSi: permSi) : permSiDto =
-        { Permutation = PermutationDto.fromDomain permSi.Permutation }
+        { permutationDto = PermutationDto.fromDomain permSi.Permutation }
 
-    let toDomain (dto: permSiDto) : Result<permSi, Perm_SiDtoError> =
-        match PermutationDto.toDomain dto.Permutation with
-        | Error e -> Error (PermutationConversionError e)
-        | Ok perm ->
-            try
-                let permSi = permSi.create perm.Array
-                Ok permSi
-            with
-            | :? ArgumentException as ex when ex.Message.Contains("array must contain items") ->
-                Error (EmptyArray ex.Message)
-            | :? ArgumentException as ex when ex.Message.Contains("self-inverse") ->
-                Error (NotSelfInverse ex.Message)
-            | ex ->
-                Error (InvalidPermutation ex.Message) // Fallback for unexpected errors
+    let toDomain (dto: permSiDto) : permSi =
+        let perm = PermutationDto.toDomain dto.permutationDto
+        permSi.create perm.Array

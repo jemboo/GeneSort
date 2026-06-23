@@ -196,7 +196,7 @@ module Uf6GenRatesArray =
         (para4Mutator: 'a -> 'a) 
         (selfReflMutator: 'a -> 'a) 
         (floatPicker: unit -> float) 
-        (seed6TwoOrbitType: TwoOrbitTripleType) 
+        (seed6TwoOrbitType: twoOrbitTripleType) 
         (arrayToMutate: 'a[]) : 'a[] = 
         if uf6GenRatesArray.Length <> arrayToMutate.Length then
             failwith "Array length does not match rates length"

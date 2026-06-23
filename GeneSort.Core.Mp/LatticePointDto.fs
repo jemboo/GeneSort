@@ -5,12 +5,12 @@ open GeneSort.Core
 open MessagePack
 
 [<MessagePackObject>]
-type LatticePointDto =
-    { [<Key(0)>] Coords: int[] }
+type latticePointDto =
+    { [<Key(0)>] coords: int[] }
 
 module LatticePointDto =
-    let fromDomain (lp: latticePoint) : LatticePointDto =
-        { Coords = lp.Coords }
+    let fromDomain (lp: latticePoint) : latticePointDto =
+        { coords = lp.Coords }
 
-    let toDomain (dto: LatticePointDto) : latticePoint =
-        latticePoint.create dto.Coords
+    let toDomain (dto: latticePointDto) : latticePoint =
+        latticePoint.create dto.coords

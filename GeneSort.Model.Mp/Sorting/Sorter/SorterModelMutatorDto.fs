@@ -49,7 +49,7 @@ module SorterModelMutatorDto =
             | MsceRandMutate msceRandMutateDto ->
                 sorterModelMutator.SmmMsceRandMutate (MsceRandMutateDto.toDomain msceRandMutateDto)
             | MssiRandMutate mssiRandGenDto ->
-                sorterModelMutator.SmmMssiRandMutate (MssiRandMutateDto.toDomain mssiRandGenDto |> Result.toOption |> Option.get )
+                sorterModelMutator.SmmMssiRandMutate (MssiRandMutateDto.toDomain mssiRandGenDto)
             | MsrsRandMutate msrsRandGenDto ->
                 sorterModelMutator.SmmMsrsRandMutate (MsrsRandMutateDto.toDomain msrsRandGenDto)
             | Msuf4RandMutate msuf4RandGenDto ->

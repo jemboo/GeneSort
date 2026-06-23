@@ -4,14 +4,14 @@ open TwoOrbitPairOps
 
 /// Specifies the transformation of sequences of TwoOrbitPairs to sequences of TwoOrbitPairs.
 [<CustomEquality; NoComparison>]
-type TwoOrbitUfStep = private { twoOrbitPairTypes: TwoOrbitPairType array; order: int } with
+type TwoOrbitUfStep = private { twoOrbitPairTypes: twoOrbitPairType array; order: int } with
     /// The TwoOrbitUfStep specifies the transformation of a group of TwoOrbits into another
     /// group of TwoOrbits (of twice the size and twice the order), via reflection and further
     /// modification according to the list of TwoOrbitTypes
     /// <param name="twoOrbitTypes">The list of TwoOrbitType values (must be non-empty).</param>
     /// <param name="order">The order TwoOrbits the Perm_RsUnfolderStep acts upon.</param>
     /// <exception cref="System.ArgumentException">Thrown when order is negative or the type types is empty.</exception>
-    static member create (twoOrbitPairTypes: TwoOrbitPairType array) (order: int) : TwoOrbitUfStep =
+    static member create (twoOrbitPairTypes: twoOrbitPairType array) (order: int) : TwoOrbitUfStep =
         if order < 4 then
             failwith "TwoOrbitUfStep order must be at least 4"
         if order % 2 <> 0 then
@@ -43,7 +43,7 @@ type TwoOrbitUfStep = private { twoOrbitPairTypes: TwoOrbitPairType array; order
 
 module TwoOrbitUfStep =
 
-    let makeUniformUfStep (order:int) (twoOrbitPairType:TwoOrbitPairType) : TwoOrbitUfStep =
+    let makeUniformUfStep (order:int) (twoOrbitPairType:twoOrbitPairType) : TwoOrbitUfStep =
         let twoOrbitTypes = 
             [| for _ in 1 .. order / 2 -> twoOrbitPairType |]
         TwoOrbitUfStep.create twoOrbitTypes order

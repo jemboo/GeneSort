@@ -1,52 +1,27 @@
 ﻿namespace GeneSort.Core.Mp
 
-open System
 open GeneSort.Core
 open MessagePack
 
 [<MessagePackObject; Struct>]
-type Perm_RsDto =
-    { [<Key(0)>] PermSi: permSiDto }
+type permRsDto =
+    { [<Key(0)>] permSiDto: permSiDto }
     
-    static member Create(arr: int array) : Result<Perm_RsDto, string> =
+    static member Create(arr: int array) : permRsDto =
         if arr.Length < 4 then
-            Error "Perm_Rs order must be at least 4"
+            failwith "Perm_Rs order must be at least 4"
         else if arr.Length % 2 <> 0 then
-            Error "Perm_Rs order must be divisible by 2"
+            failwith "Perm_Rs order must be divisible by 2"
         else
-            match permSiDto.Create(arr) with
-            | Error e -> Error e
-            | Ok permSiDto ->
-                let permSi = permSi.create arr
-                if not (PermSi.isReflectionSymmetric permSi) then
-                    Error "Invalid Perm_Rs: permutation must be reflection-symmetric"
-                else
-                    Ok { PermSi = permSiDto }
+            { permSiDto = permSiDto.Create(arr) }
 
 
-module Perm_RsDto =
-    type Perm_RsDtoError =
-        | OrderTooSmall of string
-        | OrderNotDivisibleByTwo of string
-        | NotReflectionSymmetric of string
-        | PermSiConversionError of PermSiDto.Perm_SiDtoError
+module PermRsDto =
 
-    let toPerm_RsDto (permRs: permRs) : Perm_RsDto =
-        { PermSi = PermSiDto.fromDomain permRs.PermSi }
+    let toPerm_RsDto (permRs: permRs) : permRsDto =
+        { permSiDto = PermSiDto.fromDomain permRs.PermSi }
 
-    let toPerm_Rs (dto: Perm_RsDto) : Result<permRs, Perm_RsDtoError> =
-        match PermSiDto.toDomain dto.PermSi with
-        | Error e -> Error (PermSiConversionError e)
-        | Ok permSi ->
-            try
-                let permRs = permRs.create permSi.Array
-                Ok permRs
-            with
-            | :? ArgumentException as ex when ex.Message.Contains("order must be at least 4") ->
-                Error (OrderTooSmall ex.Message)
-            | :? ArgumentException as ex when ex.Message.Contains("divisible by 2") ->
-                Error (OrderNotDivisibleByTwo ex.Message)
-            | :? ArgumentException as ex when ex.Message.Contains("reflection-symmetric") ->
-                Error (NotReflectionSymmetric ex.Message)
-            | ex ->
-                Error (NotReflectionSymmetric ex.Message) // Fallback for unexpected errors
+    let toPerm_Rs (dto: permRsDto) : permRs =
+        let permSi = PermSiDto.toDomain dto.permSiDto
+        permRs.create permSi.Array
+

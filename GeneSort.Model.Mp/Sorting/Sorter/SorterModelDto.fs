@@ -36,10 +36,10 @@ module SorterModelDto =
     let toDomain (dto: sorterModelDto) : sorterModel =
         try
             match dto with
-            | Msce msceDto -> sorterModel.Msce (MsceDto.toDomain msceDto |> Result.toOption |> Option.get)
-            | Mssi mssiDto -> sorterModel.Mssi (MssiDto.toDomain mssiDto |> Result.toOption |> Option.get)
-            | Msrs msrsDto -> sorterModel.Msrs (MsrsDto.toDomain msrsDto |> Result.toOption |> Option.get)
-            | Msuf4 msuf4Dto -> sorterModel.Msuf4 (Msuf4Dto.toDomain msuf4Dto |> Result.toOption |> Option.get)
-            | Msuf6 msuf6Dto -> sorterModel.Msuf6 (Msuf6Dto.toDomain msuf6Dto |> Result.toOption |> Option.get)
+            | Msce msceDto -> sorterModel.Msce (MsceDto.toDomain msceDto)
+            | Mssi mssiDto -> sorterModel.Mssi (MssiDto.toDomain mssiDto)
+            | Msrs msrsDto -> sorterModel.Msrs (MsrsDto.toDomain msrsDto)
+            | Msuf4 msuf4Dto -> sorterModel.Msuf4 (Msuf4Dto.toDomain msuf4Dto)
+            | Msuf6 msuf6Dto -> sorterModel.Msuf6 (Msuf6Dto.toDomain msuf6Dto)
         with
         | ex -> failwith $"Failed to convert SorterModelDto: {ex.Message}"

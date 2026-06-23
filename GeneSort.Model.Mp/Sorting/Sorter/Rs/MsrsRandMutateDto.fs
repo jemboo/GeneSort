@@ -27,37 +27,14 @@ module MsrsRandMutateDto =
 
     let toDomain (dto: msrsRandMutateDto) : msrsRandMutate =
         try
-            let msrsResult = MsrsDto.toDomain dto.msrsDto
-            match msrsResult with
-            | Ok msrs ->
-                if %msrs.StageLength <> dto.opsActionRatesArray.opsActionRatesDtos.Length then
-                    failwith $"StageLength ({%msrs.StageLength}) must match OpsActionRatesArray length ({dto.opsActionRatesArray.opsActionRatesDtos.Length})"
-                msrsRandMutate.create
-                    (dto.rngFactoryDto |> RngFactoryDto.toDomain)
-                    (OpsActionRatesArrayDto.toDomain dto.opsActionRatesArray)
-                    msrs
-            | Error err ->
-                let msg = match err with
-                          | MsrsDto.NullPermRssArray m -> m
-                          | MsrsDto.EmptyPermRssArray m -> m
-                          | MsrsDto.InvalidWidth m -> m
-                          | MsrsDto.MismatchedPermRsOrder m -> m
-                          | MsrsDto.PermRsConversionError e ->
-                              match e with
-                              | Perm_RsDto.Perm_RsDtoError.OrderTooSmall m -> m
-                              | Perm_RsDto.Perm_RsDtoError.OrderNotDivisibleByTwo m -> m
-                              | Perm_RsDto.Perm_RsDtoError.NotReflectionSymmetric m -> m
-                              | Perm_RsDto.Perm_RsDtoError.PermSiConversionError e' ->
-                                  match e' with
-                                  | PermSiDto.Perm_SiDtoError.EmptyArray m -> m
-                                  | PermSiDto.Perm_SiDtoError.InvalidPermutation m -> m
-                                  | PermSiDto.Perm_SiDtoError.NotSelfInverse m -> m
-                                  | PermSiDto.Perm_SiDtoError.NullArray m -> m
-                                  | PermSiDto.Perm_SiDtoError.PermutationConversionError e'' ->
-                                      match e'' with
-                                      | PermutationDto.PermutationDtoError.EmptyArray m -> m
-                                      | PermutationDto.PermutationDtoError.InvalidPermutation m -> m
-                                      | PermutationDto.PermutationDtoError.NullArray m -> m
-                failwith $"Failed to convert MsrsDto: {msg}"
+            let msrs = MsrsDto.toDomain dto.msrsDto
+            
+            if %msrs.StageLength <> dto.opsActionRatesArray.opsActionRatesDtos.Length then
+                failwith $"StageLength ({%msrs.StageLength}) must match OpsActionRatesArray length ({dto.opsActionRatesArray.opsActionRatesDtos.Length})"
+            
+            msrsRandMutate.create
+                (dto.rngFactoryDto |> RngFactoryDto.toDomain)
+                (OpsActionRatesArrayDto.toDomain dto.opsActionRatesArray)
+                msrs
         with
         | ex -> failwith $"Failed to convert MsrsRandMutateDto: {ex.Message}"

@@ -24,21 +24,21 @@ module RngTypeDto =
 
 [<MessagePackObject>]
 type rngFactoryDto =
-    { [<Key(0)>] Id: string
-      [<Key(1)>] RngType: rngTypeDto }
+    { [<Key(0)>] id: string
+      [<Key(1)>] rngTypeDto: rngTypeDto }
 
 module RngFactoryDto =
     let fromDomain (factory: rngFactory) : rngFactoryDto =
-        { Id = (%factory.Id).ToString()
-          RngType = RngTypeDto.fromDomain factory.RngType }
+        { id = (%factory.Id).ToString()
+          rngTypeDto = RngTypeDto.fromDomain factory.RngType }
     
     let toDomain (dto: rngFactoryDto) : rngFactory =
-        let rngType = RngTypeDto.toDomain dto.RngType
+        let rngType = RngTypeDto.toDomain dto.rngTypeDto
         let factory = rngFactory.getFactory rngType
         
         // Validate that the ID matches the expected factory ID
         let expectedId = %factory.Id
-        let providedId = Guid.Parse(dto.Id)
+        let providedId = Guid.Parse(dto.id)
         
         if expectedId <> providedId then
             failwithf "Factory ID mismatch: expected %A but got %A for rngType %A" 

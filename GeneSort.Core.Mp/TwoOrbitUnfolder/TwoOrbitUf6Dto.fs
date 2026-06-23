@@ -1,62 +1,39 @@
 ﻿namespace GeneSort.Core.Mp.TwoOrbitUnfolder
 
-
 open System
 open FSharp.UMX
 open GeneSort.Core
 open MessagePack
 
 [<MessagePackObject>]
-type TwoOrbitUf6Dto =
-    { [<Key(0)>] SeedType: TwoOrbitTripleType
-      [<Key(1)>] TwoOrbitUfSteps: TwoOrbitUfStepDto array }
+type twoOrbitUf6Dto =
+    { [<Key(0)>] seedType: twoOrbitTripleType
+      [<Key(1)>] twoOrbitUfSteps: twoOrbitUfStepDto array }
     
-    static member Create(seedType: TwoOrbitTripleType, twoOrbitUnfolderSteps: TwoOrbitUfStepDto array) : Result<TwoOrbitUf6Dto, string> =
+    static member Create (seedType: twoOrbitTripleType) 
+                         (twoOrbitUnfolderSteps: twoOrbitUfStepDto array) : twoOrbitUf6Dto =
         if Array.isEmpty twoOrbitUnfolderSteps then
-            Error "TwoOrbitUnfolderSteps list cannot be empty"
+            failwith "TwoOrbitUnfolderSteps list cannot be empty"
         else
-            let computedOrder = 6 * (MathUtils.integerPower 2 (Array.length twoOrbitUnfolderSteps))
-            if twoOrbitUnfolderSteps |> Array.exists (fun step -> step.Order < 4 || step.Order % 2 <> 0) then
-                Error $"All TwoOrbitUfStep orders must be at least 4 and even"
+            if twoOrbitUnfolderSteps |> Array.exists (fun step -> step.order < 4 || step.order % 2 <> 0) then
+                invalidArg (nameof twoOrbitUnfolderSteps) "All TwoOrbitUfStep orders must be at least 4 and even"
             else
-                Ok { SeedType = seedType
-                     TwoOrbitUfSteps = twoOrbitUnfolderSteps }
+                { seedType = seedType
+                  twoOrbitUfSteps = twoOrbitUnfolderSteps }
 
 
 module TwoOrbitUf6Dto =
 
-    type TwoOrbitUf6DtoError =
-        | EmptyTwoOrbitUnfolderSteps of string
-        | InvalidStepOrder of string
-        | StepConversionError of TwoOrbitUnfolderStepDto.TwoOrbitUnfolderStepDtoError
+    let fromDomain (tou: TwoOrbitUf6) : twoOrbitUf6Dto =
+        { seedType = tou.Seed6TwoOrbitType
+          twoOrbitUfSteps = tou.TwoOrbitUnfolderSteps |> Array.map TwoOrbitUnfolderStepDto.fromDomain }
 
-    let fromDomain (tou: TwoOrbitUf6) : TwoOrbitUf6Dto =
-        { SeedType = tou.Seed6TwoOrbitType
-          TwoOrbitUfSteps = tou.TwoOrbitUnfolderSteps |> Array.map TwoOrbitUnfolderStepDto.fromDomain }
-
-    let toDomain (dto: TwoOrbitUf6Dto) : Result<TwoOrbitUf6, TwoOrbitUf6DtoError> =
-        let stepsResult = 
-            dto.TwoOrbitUfSteps 
+    let toDomain (dto: twoOrbitUf6Dto) : TwoOrbitUf6 =
+        let steps = 
+            dto.twoOrbitUfSteps 
             |> Array.map TwoOrbitUnfolderStepDto.toDomain
-            |> Array.fold (fun acc res ->
-                match acc, res with
-                | Ok arr, Ok step -> Ok (arr @ [step])
-                | Ok _, Error e -> Error (StepConversionError e)
-                | Error e, _ -> Error e
-            ) (Ok [])
         
-        match stepsResult with
-        | Error e -> Error e
-        | Ok steps ->
-            try
-                let tou = TwoOrbitUf6.create dto.SeedType (steps |> List.toArray)
-                Ok tou
-            with
-            | :? ArgumentException as ex when ex.Message.Contains("empty") ->
-                Error (EmptyTwoOrbitUnfolderSteps ex.Message)
-            | ex ->
-                Error (EmptyTwoOrbitUnfolderSteps ex.Message)
+        TwoOrbitUf6.create dto.seedType steps
 
-
-    let getOrder (twoOrbitUnfolder: TwoOrbitUf6Dto) : int =
-            6 * (MathUtils.integerPower 2 (Array.length twoOrbitUnfolder.TwoOrbitUfSteps))
+    let getOrder (twoOrbitUnfolder: twoOrbitUf6Dto) : int =
+        6 * (MathUtils.integerPower 2 (Array.length twoOrbitUnfolder.twoOrbitUfSteps))
