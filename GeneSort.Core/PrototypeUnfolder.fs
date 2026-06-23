@@ -65,13 +65,13 @@ module PrototypeUnfolder =
     // makeTwoCycleFromTwoOrbitTypes
     let makePerm_SiFromTwoOrbitPairsAndTypes
             (seedTwoOrbitPair : TwoOrbitPair list option)
-            (twoOrbitPairTypes: TwoOrbitPairType list) : Perm_Si =
+            (twoOrbitPairTypes: TwoOrbitPairType list) : permSi =
         if twoOrbitPairTypes.Length < 1 then
             failwith "twoOrbitPairTypes list must have an element"
 
         let _makeTwoCycleFromTwoOrbitTypes
                 (seedTwoOrbitPairs : TwoOrbitPair list)
-                (twoOrbitPairTypes: TwoOrbitPairType list)  : Perm_Si =
+                (twoOrbitPairTypes: TwoOrbitPairType list) : permSi =
             if seedTwoOrbitPairs.Length < 1 then
                 failwith "seedRsOrbitPair list must have an element"
             if twoOrbitPairTypes.Length < 1 then
@@ -86,7 +86,7 @@ module PrototypeUnfolder =
             for chunk in rsOrbitPairTypeChunks do
                 workingList <- unfoldTwoOrbitPairsIntoTwoOrbitPairs chunk workingList 
 
-            Perm_Si.fromTwoOrbitPair (workingList |> List.toArray)
+            PermSi.fromTwoOrbitPair (workingList |> List.toArray)
         match seedTwoOrbitPair, twoOrbitPairTypes with
         | Some orbitPairs, _::_ ->
             _makeTwoCycleFromTwoOrbitTypes orbitPairs twoOrbitPairTypes
@@ -99,7 +99,7 @@ module PrototypeUnfolder =
 
     // makeAllPerm_SisOfOrder
     let makeAllPerm_SisOfOrder (order:int) 
-            : Perm_Si seq =
+            : permSi seq =
         if (not (isAPowerOfTwo order)) then
             failwith "order must be a power of two"
         if(order < 4) then
@@ -116,7 +116,7 @@ module PrototypeUnfolder =
 
     // makeRandomPerm_Sis
     let makeRandomPerm_Sis (randy:IRando) (order:int) 
-            : Perm_Si seq =
+            : permSi seq =
     
         // getTwoOrbitTypeLengthForOrder
         let getTwoOrbitTypeLengthForOrder (order:int) =

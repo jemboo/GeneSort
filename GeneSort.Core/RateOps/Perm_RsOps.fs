@@ -52,7 +52,7 @@ module Perm_RsOps =
             } |> Seq.toList
 
         
-        let perm_Si = twoOrbits |> Perm_Si.fromTranspositions order
+        let perm_Si = twoOrbits |> PermSi.fromTranspositions order
 
         Perm_Rs.create perm_Si.Array
 
@@ -68,8 +68,8 @@ module Perm_RsOps =
         let permArray = permRs.Array
 
         let _randomlyFindOtherReflectionSymmetricTwoOrbits (indexToExclude:int) =
-            let rsTwoOrbs = permRs.Perm_Si 
-                           |> Perm_Si.getTwoOrbits 
+            let rsTwoOrbs = permRs.PermSi 
+                           |> PermSi.getTwoOrbits 
                            |> Array.filter(fun tob -> 
                             (tob |> TwoOrbit.isReflectionSymmetric %permRs.Order) && (tob.First <> indexToExclude))
             if rsTwoOrbs.Length = 0 then

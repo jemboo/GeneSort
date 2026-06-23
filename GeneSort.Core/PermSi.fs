@@ -4,48 +4,48 @@ open CollectionUtils
 open FSharp.UMX
 open Combinatorics
 
-// Perm_Si: a permutation that is its own inverse (p ∘ p = identity)
-type Perm_Si = private Perm_Si of permutation with
+// permSi: a permutation that is its own inverse (p ∘ p = identity)
+type permSi = private PermSi of permutation with
 
     // Static method to create a Perm_Rs, validating self-inverse property
-    static member create (arr: int array) : Perm_Si =
+    static member create (arr: int array) : permSi =
         if arr.Length < 1 then
             failwith "array must contain items"
         let perm = permutation.create arr
         if not (Permutation.isSelfInverse perm) then
             failwith "Invalid: permutation must be self-inverse"
-        Perm_Si perm
+        PermSi perm
 
     // Static method to create a Perm_Rs, validating self-inverse property
-    static member createUnsafe (arr: int array) : Perm_Si =
+    static member createUnsafe (arr: int array) : permSi =
         let perm = permutation.createUnsafe arr
-        Perm_Si perm
+        PermSi perm
 
     // Property to access the underlying permutation
     member this.Permutation =
         match this with
-        | Perm_Si perm -> perm
+        | PermSi perm -> perm
 
     member this.Id
         with get () =
             match this with
-            | Perm_Si perm -> perm.Id
+            | PermSi perm -> perm.Id
 
     member this.Order
         with get () =
             match this with
-            | Perm_Si perm -> perm.Order
+            | PermSi perm -> perm.Order
 
     member this.Array
         with get () =
             match this with
-            | Perm_Si perm -> perm.Array
+            | PermSi perm -> perm.Array
 
-    member this.equals (other: Perm_Si) : bool =
+    member this.equals (other: permSi) : bool =
             this.Permutation.equals(other.Permutation)
 
 
-module Perm_Si =
+module PermSi =
 
     type MutationMode =
         | Ortho
@@ -53,14 +53,14 @@ module Perm_Si =
         | NoAction
 
     /// The returned TwoOrbits are ordered ascending by their first index.
-    /// <param name="perm_Si">The Perm_Si to convert.</param>
-    /// <exception cref="System.ArgumentException">Thrown when the Perm_Si order is odd, or the array is invalid.</exception>
-    let getTwoOrbits (perm_Si: Perm_Si) : TwoOrbit array =
+    /// <param name="perm_Si">The PermSi to convert.</param>
+    /// <exception cref="System.ArgumentException">Thrown when the PermSi order is odd, or the array is invalid.</exception>
+    let getTwoOrbits (perm_Si: permSi) : TwoOrbit array =
         let order = perm_Si.Order |> UMX.untag
         if order < 0 || order % 2 <> 0 then
-            failwith "Perm_Si order must be non-negative and even"
+            failwith "PermSi order must be non-negative and even"
         if perm_Si.Array.Length <> order then
-            failwith "Perm_Si array length must match order"
+            failwith "PermSi array length must match order"
         let visited = Array.create order false
         let rec findOrbits i acc =
             if i >= order then acc
@@ -69,19 +69,19 @@ module Perm_Si =
                 visited.[i] <- true
                 let j = perm_Si.Array.[i]
                 if j < 0 || j >= order then
-                    failwith "Perm_Si array contains invalid indices"
+                    failwith "PermSi array contains invalid indices"
                 visited.[j] <- true
                 let twoOrbit = TwoOrbit.create [i; j]
                 findOrbits (i + 1) (twoOrbit :: acc)
         findOrbits 0 [] |> List.rev |> Array.ofList
 
 
-    // Create a Perm_Si from a list of disjoint transpositions
+    // Create a PermSi from a list of disjoint transpositions
     let fromTranspositions 
                 (n: int) 
-                (transpositions: List<int * int>) : Perm_Si =
+                (transpositions: List<int * int>) : permSi =
         if n < 0 then
-            failwith "Perm_Si order must not be negative"
+            failwith "PermSi order must not be negative"
         let arr = Array.init n id
         let mutable seen = Set.empty
         for (i, j) in transpositions do
@@ -92,19 +92,19 @@ module Perm_Si =
             seen <- seen |> Set.add i |> Set.add j
             arr.[i] <- j
             arr.[j] <- i
-        Perm_Si.create arr
+        permSi.create arr
 
 
-    // Creates a Perm_Si of order n with a maximum number of orbits
-    let saturatedWithTwoCycles (order: int) : Perm_Si =
+    // Creates a PermSi of order n with a maximum number of orbits
+    let saturatedWithTwoCycles (order: int) : permSi =
         let cycleCount = order / 2
         let transpositions =
             [ for i in 0 .. (cycleCount - 1) -> (2 * i, 2 * i + 1) ]
         fromTranspositions order transpositions 
 
 
-    // Creates a Perm_Si of order n with a maximum number of orbits
-    let unSaturatedWithTwoCycles (order:int) (cycleCount:int) : Perm_Si =
+    // Creates a PermSi of order n with a maximum number of orbits
+    let unSaturatedWithTwoCycles (order:int) (cycleCount:int) : permSi =
         if(cycleCount > order / 2) then
             failwithf "cycleCount must be at most %d" (order/2)
         let cycleCount = order / 2
@@ -113,35 +113,35 @@ module Perm_Si =
         fromTranspositions order transpositions
 
 
-    // makeReflection returns a reflection of the given Perm_Si
-    let makeReflection (perm_Rs: Perm_Si) : Perm_Si =
+    // makeReflection returns a reflection of the given PermSi
+    let makeReflection (perm_Rs: permSi) : permSi =
         let origArray = perm_Rs.Permutation.Array
         let arrayLength = origArray.Length
         let _refl pos = 
             arrayLength - pos - 1
-        Perm_Si.createUnsafe
+        permSi.createUnsafe
             (Array.init arrayLength (fun dex -> origArray.[_refl dex] |> _refl))
 
 
-    // isReflectionSymmetric checks if a Perm_Si is reflection symmetric
-    let isReflectionSymmetric (perm_Rs: Perm_Si) :bool =
+    // isReflectionSymmetric checks if a PermSi is reflection symmetric
+    let isReflectionSymmetric (perm_Rs: permSi) :bool =
         let arr = perm_Rs.Permutation.Array
         let reflArray = (makeReflection perm_Rs).Permutation.Array
         arrayEquals arr reflArray
 
 
-    // Creates a Perm_Si of given order packed with non-overlapping transpositions (i, i+k)
+    // Creates a PermSi of given order packed with non-overlapping transpositions (i, i+k)
     let steppedOffsetTwoCycle 
             (order: int) (start:int) 
-            (offset: int) (count: int) : Perm_Si =
+            (offset: int) (count: int) : permSi =
         let transpositions =
             steppedOffsetPairs start order offset |> Seq.truncate count |> Seq.toList
         fromTranspositions order transpositions
 
 
-    // Creates a Perm_Si of given even with count sequential 
+    // Creates a PermSi of given even with count sequential 
     // transpositions (i, i+1) starting at i = startIndex
-    let adjacentTwoCycles (order: int) (startIndex:int) (count: int): Perm_Si =
+    let adjacentTwoCycles (order: int) (startIndex:int) (count: int): permSi =
         if (order - startIndex) < 2 * count then
             failwith (sprintf "%d cycles is too many for Permutation of order %d and sda %d" 
                         count order startIndex)
@@ -150,69 +150,69 @@ module Perm_Si =
         fromTranspositions order transpositions
 
 
-    // Conjugate a Perm_Si (t) with a permutation (p) : p^-1 ∘ t ∘ p
-    // This always makes a Perm_Si
-    let conjugate (t: Perm_Si) (p: permutation) : Perm_Si =
+    // Conjugate a PermSi (t) with a permutation (p) : p^-1 ∘ t ∘ p
+    // This always makes a PermSi
+    let conjugate (t: permSi) (p: permutation) : permSi =
         let arrT = t.Permutation.Array
         let arrP = p.Array
         if Array.length arrT <> Array.length arrP then
             failwith "Permutations must have the same order"
         let res = compose (compose (inverse p) t.Permutation) p
-        Perm_Si.createUnsafe res.Array
+        permSi.createUnsafe res.Array
 
 
-    // given a Perm_Si of Order n, this returns a Perm_Si of order 2n
+    // given a PermSi of Order n, this returns a PermSi of order 2n
     // that is reflection symmetric
-    let unfoldReflection (perm_Rs:Perm_Si) : Perm_Si =
-        let sa = perm_Rs.Array
-        let o = %perm_Rs.Order
+    let unfoldReflection (psi:permSi) : permSi =
+        let sa = psi.Array
+        let o = %psi.Order
         let newArray = Array.create (o * 2) 0
         for i in 0 .. (o - 1) do
             newArray.[i] <- sa.[i]
             newArray.[o + i] <- 2 * o - sa.[o - i - 1] - 1
-        Perm_Si.createUnsafe newArray
+        permSi.createUnsafe newArray
 
 
-    // Generates a random Perm_Rs by conjugating a saturated Perm_Si with a random permutation
-    let makeRandoms (indexShuffler: int -> int) (order: int) : Perm_Si seq =
+    // Generates a random Perm_Rs by conjugating a saturated PermSi with a random permutation
+    let makeRandoms (indexShuffler: int -> int) (order: int) : permSi seq =
         seq {
             while true do
                 let initialPerm = Permutation.randomPermutation indexShuffler order
                 yield conjugate (saturatedWithTwoCycles order) initialPerm
         }
 
-    // Mutates a Perm_Si in a minimal way based on siMutationMode
+    // Mutates a PermSi in a minimal way based on siMutationMode
     let mutate 
             (indexPicker: int -> int) 
             (siMutationMode:MutationMode) 
-            (permSi: Perm_Si) : Perm_Si =
+            (psi: permSi) : permSi =
 
         // for None mode, return the permutation as is
         if (siMutationMode = MutationMode.NoAction) then
-            permSi
+            psi
         else
-            let first, second = pickAndOrderTwoDistinct indexPicker %permSi.Order
+            let first, second = pickAndOrderTwoDistinct indexPicker %psi.Order
             // if the two items are in the same orbit, do nothing
-            if (permSi.Array.[first] = second) then
-                permSi
+            if (psi.Array.[first] = second) then
+                psi
             else
-                let fpLow, fpHi = orderItems first permSi.Array.[first]
-                let spLow, spHi = orderItems second permSi.Array.[second]
-                let newArray = Array.copy permSi.Array
+                let fpLow, fpHi = orderItems first psi.Array.[first]
+                let spLow, spHi = orderItems second psi.Array.[second]
+                let newArray = Array.copy psi.Array
                 match siMutationMode with
                 | MutationMode.Ortho -> 
                    newArray.[fpLow] <- spLow
                    newArray.[spLow] <- fpLow
                    newArray.[spHi] <- fpHi
                    newArray.[fpHi] <- spHi
-                   Perm_Si.createUnsafe newArray
+                   permSi.createUnsafe newArray
                 | MutationMode.Para ->
                    newArray.[fpLow] <- spHi
                    newArray.[spHi] <- fpLow
                    newArray.[fpHi] <- spLow
                    newArray.[spLow] <- fpHi
-                   Perm_Si.createUnsafe newArray
-                | MutationMode.NoAction -> permSi
+                   permSi.createUnsafe newArray
+                | MutationMode.NoAction -> psi
 
 
     /// Computes the TwoOrbitType breakdown for a given Perm_Rs
@@ -220,7 +220,7 @@ module Perm_Si =
     /// <param name="perm_Rs">The Perm_Rs to analyze.</param>
     /// <returns>A TwoOrbitBreakdown containing the count of each TwoOrbitType.</returns>
     /// <exception cref="System.ArgumentException">Thrown when the Perm_Rs order is negative, odd, or the array is invalid.</exception>
-    let getTwoOrbitTypeCounts (order: int) (perm_Si: Perm_Si) :(int*int*int) =
+    let getTwoOrbitTypeCounts (order: int) (perm_Si: permSi) :(int*int*int) =
         // Helper function to extract components from a triple
         let fst3 (a, _, _) = a
         let snd3 (_, b, _) = b
@@ -238,7 +238,7 @@ module Perm_Si =
 
 
     /// Creates a Perm_Rs from a list of TwoOrbit pairs by mutating the identity Perm
-    let fromTwoOrbitPair (twoOrbitPairs : TwoOrbitPair array) : Perm_Si =
+    let fromTwoOrbitPair (twoOrbitPairs : TwoOrbitPair array) : permSi =
         if twoOrbitPairs.Length < 1 then
             failwith "RsOrbitPair list must have an element"
 
@@ -252,6 +252,6 @@ module Perm_Si =
                 arr.[c] <- d
                 arr.[d] <- c
 
-        Perm_Si.create arr
+        permSi.create arr
 
 

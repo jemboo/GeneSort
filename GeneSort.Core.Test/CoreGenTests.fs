@@ -130,6 +130,6 @@ type CoreGenTests() =
                     |> Seq.toArray
 
         for i = 0 to testCount - 1 do
-            let conj = Perm_Si.conjugate perm_Rss.[i] conjies.[i]
+            let conj = PermSi.conjugate perm_Rss.[i] conjies.[i]
             Assert.True (conj.Permutation |> Permutation.isSelfInverse)
             

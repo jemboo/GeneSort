@@ -12,14 +12,14 @@ type mssi =
     private 
         { id: Guid<sorterModelId>
           sortingWidth: int<sortingWidth>
-          perm_Sis: Perm_Si array } 
+          perm_Sis: permSi array } 
     with
     static member create 
             (id: Guid<sorterModelId>) 
             (sortingWidth: int<sortingWidth>) 
-            (perm_Sis: Perm_Si array) : mssi =
+            (perm_Sis: permSi array) : mssi =
         if perm_Sis.Length < 1 then
-            failwith "Must have at least 1 Perm_Si"
+            failwith "Must have at least 1 PermSi"
         else if %sortingWidth < 1 then
             failwith "Width must be at least 1"
         else
@@ -55,7 +55,7 @@ type mssi =
 
     member this.MakeSorter() = 
         let ces = this.perm_Sis
-                    |> Array.map (fun psi -> psi |> Perm_Si.getTwoOrbits)
+                    |> Array.map (fun psi -> psi |> PermSi.getTwoOrbits)
                     |> Array.collect(id)
                     |> Array.map(fun tbit -> ce.create tbit.First tbit.Second)
         sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
@@ -73,7 +73,7 @@ module Mssi =
 
     let makeSorter (mssi: mssi) : sorter =
         let ces = mssi.perm_Sis
-                    |> Array.map (fun psi -> psi |> Perm_Si.getTwoOrbits)
+                    |> Array.map (fun psi -> psi |> PermSi.getTwoOrbits)
                     |> Array.collect(id)
                     |> Array.map(fun tbit -> ce.create tbit.First tbit.Second)
         sorter.create (%mssi.Id |> UMX.tag<sorterId>) mssi.SortingWidth ces

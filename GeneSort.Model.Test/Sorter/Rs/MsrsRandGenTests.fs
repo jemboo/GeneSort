@@ -48,7 +48,7 @@ type MsrsRandGenTests() =
         let modelRs = model.MakeSorterModelFromIndex 0
         modelRs.Perm_Rss
         |> Array.iter (fun perm ->
-            Perm_Si.isReflectionSymmetric perm.Perm_Si |> should equal true)
+            PermSi.isReflectionSymmetric perm.PermSi |> should equal true)
 
     [<Fact>]
     let ``MakeSorterModelFromIndex generates unique IDs`` () =

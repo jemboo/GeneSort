@@ -97,11 +97,11 @@ module PermRsGen_old =
         let aRet = Array.init order (id)
 
         OrbitRS_old.rndReflectivePairs order rnd |> Seq.iter (OrbitRS_old.writeToArray aRet)
-        Perm_Si.create aRet
+        permSi.create aRet
 
 
     // Creates a TwoCycleRS, often containing lots of fixed points
-    let decodePermutation (permutation: permutation) : Perm_Si =
+    let decodePermutation (permutation: permutation) : permSi =
         let permLength = permutation.Array.Length
         let availableFlags = Array.init permLength (fun i -> true)
         let arrayRS = Array.init<int> permLength (fun i -> i)
@@ -132,11 +132,11 @@ module PermRsGen_old =
                 arrayRS.[a] <- b
                 arrayRS.[b] <- a
 
-        let perm_Rs = Perm_Si.createUnsafe arrayRS
+        let perm_Rs = permSi.createUnsafe arrayRS
         if not (Permutation.isSelfInverse perm_Rs.Permutation) then
             failwith "Invalid TwoCycleRS: permutation must be self-inverse"
-        if not (Perm_Si.isReflectionSymmetric perm_Rs) then
+        if not (PermSi.isReflectionSymmetric perm_Rs) then
             failwith "Invalid TwoCycleRS: permutation must be reflection-symmetric"
-        Perm_Si.createUnsafe perm_Rs.Array
+        permSi.createUnsafe perm_Rs.Array
 
 

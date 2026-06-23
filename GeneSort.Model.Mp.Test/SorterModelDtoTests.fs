@@ -96,7 +96,7 @@ type SorterModelDtoTests() =
 
     [<Fact>]
     let ``Mssi round-trip serialization and deserialization should succeed`` () =
-        let permSi = Perm_Si.create [|1; 0; 2; 3|] // (0 1)
+        let permSi = permSi.create [|1; 0; 2; 3|] // (0 1)
         let mssi = mssi.create (Guid.NewGuid() |> UMX.tag<sorterModelId>) (UMX.tag<sortingWidth> 16) [|permSi|]
         let sorterModel = sorterModel.Mssi mssi
         let result = roundTrip sorterModel
@@ -104,7 +104,7 @@ type SorterModelDtoTests() =
         | sorterModel.Mssi resultMssi ->
             Assert.Equal(mssi.Id, resultMssi.Id)
             Assert.Equal(mssi.SortingWidth, resultMssi.SortingWidth)
-            Assert.Equal<Perm_Si>(mssi.Perm_Sis, resultMssi.Perm_Sis)
+            Assert.Equal<permSi>(mssi.Perm_Sis, resultMssi.Perm_Sis)
         | _ -> Assert.True(false, "Expected Mssi case")
 
 

@@ -3,7 +3,7 @@
 open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Core.Perm_Si
+open GeneSort.Core.PermSi
 open GeneSort.Model.Sorting.V1
 
 [<Struct; CustomEquality; NoComparison>]
@@ -57,9 +57,9 @@ type mssiRandMutate =
                         (id: Guid<sorterModelId>) :mssi =
         let rng = this.RngFactory.Create %id
         
-        // Define mutation behaviors for Perm_Si
-        let orthoMutator = fun psi -> Perm_Si.mutate (rng.NextIndex) MutationMode.Ortho psi 
-        let paraMutator = fun psi ->  Perm_Si.mutate (rng.NextIndex) MutationMode.Para psi 
+        // Define mutation behaviors for PermSi
+        let orthoMutator = fun psi -> PermSi.mutate (rng.NextIndex) MutationMode.Ortho psi 
+        let paraMutator = fun psi ->  PermSi.mutate (rng.NextIndex) MutationMode.Para psi 
         
         // Mutate the array using the uniform rates module
         let mutated = OpActionRates.mutate 

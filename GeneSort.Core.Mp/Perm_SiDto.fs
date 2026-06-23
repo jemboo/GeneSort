@@ -28,15 +28,15 @@ module PermSiDto =
         | NotSelfInverse of string
         | PermutationConversionError of PermutationDto.PermutationDtoError
 
-    let fromDomain (permSi: Perm_Si) : permSiDto =
+    let fromDomain (permSi: permSi) : permSiDto =
         { Permutation = PermutationDto.fromDomain permSi.Permutation }
 
-    let toDomain (dto: permSiDto) : Result<Perm_Si, Perm_SiDtoError> =
+    let toDomain (dto: permSiDto) : Result<permSi, Perm_SiDtoError> =
         match PermutationDto.toDomain dto.Permutation with
         | Error e -> Error (PermutationConversionError e)
         | Ok perm ->
             try
-                let permSi = Perm_Si.create perm.Array
+                let permSi = permSi.create perm.Array
                 Ok permSi
             with
             | :? ArgumentException as ex when ex.Message.Contains("array must contain items") ->

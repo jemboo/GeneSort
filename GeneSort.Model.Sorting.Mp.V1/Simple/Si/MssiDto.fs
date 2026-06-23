@@ -39,7 +39,7 @@ module MssiDto =
                             perm_Sis
             Ok mssi
         with
-        | :? ArgumentException as ex when ex.Message.Contains("Perm_Si") ->
+        | :? ArgumentException as ex when ex.Message.Contains("PermSi") ->
             Error (InvalidPermSiCount ex.Message)
         | :? ArgumentException as ex when ex.Message.Contains("Width") ->
             Error (InvalidWidth ex.Message)

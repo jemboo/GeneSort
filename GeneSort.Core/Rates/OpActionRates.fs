@@ -84,13 +84,13 @@ type opActionRates =
 
 module OpActionRates =
 
-    /// Mutates an array of Perm_Si using a single uniform opActionRates.
+    /// Mutates an array of PermSi using a single uniform opActionRates.
     let mutate 
         (rates: opActionRates) 
-        (orthoMutator: Perm_Si -> Perm_Si) 
-        (paraMutator: Perm_Si -> Perm_Si) 
+        (orthoMutator: permSi -> permSi) 
+        (paraMutator: permSi -> permSi) 
         (floatPicker: unit -> float) 
-        (arrayToMutate: Perm_Si[]) : Perm_Si[] = 
+        (arrayToMutate: permSi[]) : permSi[] = 
         
         arrayToMutate |> Array.map (fun psi ->
             match rates.PickMode floatPicker with

@@ -3,7 +3,7 @@
 open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Core.Perm_Si
+open GeneSort.Core.PermSi
 open GeneSort.Model.Sorting
 
 
@@ -70,8 +70,8 @@ type mssiRandMutate =
 
     member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : mssi =
         let rng = this.RngFactory.Create %id
-        let orthoMutator = fun psi ->  Perm_Si.mutate (rng.NextIndex) MutationMode.Ortho psi 
-        let paraMutator = fun psi ->   Perm_Si.mutate (rng.NextIndex) MutationMode.Para psi 
+        let orthoMutator = fun psi ->  PermSi.mutate (rng.NextIndex) MutationMode.Ortho psi 
+        let paraMutator = fun psi ->   PermSi.mutate (rng.NextIndex) MutationMode.Para psi 
         let mutated = OpActionRatesArray.mutate 
                         this.OpActionRates 
                         orthoMutator 

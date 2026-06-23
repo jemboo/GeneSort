@@ -21,7 +21,7 @@ type msrsDto =
             Error $"Must have at least 1 Perm_Rs, got {permRss.Length}"
         else if width < 1 then
             Error $"Width must be at least 1, got {width}"
-        else if permRss |> Array.exists (fun prs -> prs.Perm_Si.Permutation.Array.Length <> width) then
+        else if permRss |> Array.exists (fun prs -> prs.PermSi.Permutation.Array.Length <> width) then
             Error $"All Perm_Rs must have order equal to width {width}"
         else
             Ok { Id = id

@@ -6,7 +6,7 @@ open MessagePack
 
 [<MessagePackObject; Struct>]
 type Perm_RsDto =
-    { [<Key(0)>] Perm_Si: permSiDto }
+    { [<Key(0)>] PermSi: permSiDto }
     
     static member Create(arr: int array) : Result<Perm_RsDto, string> =
         if arr.Length < 4 then
@@ -17,11 +17,11 @@ type Perm_RsDto =
             match permSiDto.Create(arr) with
             | Error e -> Error e
             | Ok permSiDto ->
-                let permSi = Perm_Si.create arr
-                if not (Perm_Si.isReflectionSymmetric permSi) then
+                let permSi = permSi.create arr
+                if not (PermSi.isReflectionSymmetric permSi) then
                     Error "Invalid Perm_Rs: permutation must be reflection-symmetric"
                 else
-                    Ok { Perm_Si = permSiDto }
+                    Ok { PermSi = permSiDto }
 
 
 module Perm_RsDto =
@@ -32,10 +32,10 @@ module Perm_RsDto =
         | PermSiConversionError of PermSiDto.Perm_SiDtoError
 
     let toPerm_RsDto (permRs: Perm_Rs) : Perm_RsDto =
-        { Perm_Si = PermSiDto.fromDomain permRs.Perm_Si }
+        { PermSi = PermSiDto.fromDomain permRs.PermSi }
 
     let toPerm_Rs (dto: Perm_RsDto) : Result<Perm_Rs, Perm_RsDtoError> =
-        match PermSiDto.toDomain dto.Perm_Si with
+        match PermSiDto.toDomain dto.PermSi with
         | Error e -> Error (PermSiConversionError e)
         | Ok permSi ->
             try

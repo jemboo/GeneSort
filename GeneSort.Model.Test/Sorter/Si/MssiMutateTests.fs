@@ -4,7 +4,6 @@
 open System
 open Xunit
 open FSharp.UMX
-open FsUnit.Xunit
 open GeneSort.Sorting
 open GeneSort.Core
 open GeneSort.Model.Sorting
@@ -14,7 +13,7 @@ open GeneSort.Core.Rando
 type MssiRandMutateTests() =
 
     // Helper to create a Model_Si
-    let createModelSi (id: Guid<sorterModelId>) (width: int<sortingWidth>) (permSis: Perm_Si array) : mssi =
+    let createModelSi (id: Guid<sorterModelId>) (width: int<sortingWidth>) (permSis: permSi array) : mssi =
         mssi.create id width permSis
 
     let randoGen 
@@ -27,7 +26,7 @@ type MssiRandMutateTests() =
     [<Fact>]
     let ``mutate with NoAction mode does not change permutations`` () =
         let id = UMX.tag<sorterModelId> (Guid.NewGuid())
-        let permSi = Perm_Si.create [|1; 0; 2; 3|] // (0 1)
+        let permSi = permSi.create [|1; 0; 2; 3|] // (0 1)
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
         let siMutationRates = opActionRates.create (0.0, 0.0)
         let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
@@ -41,7 +40,7 @@ type MssiRandMutateTests() =
     [<Fact>]
     let ``mutate with Ortho mode applies Ortho mutation`` () = 
         let id = UMX.tag<sorterModelId> (Guid.NewGuid())
-        let permSi = Perm_Si.create [|1; 0; 3; 2|] // (0 1)(2 3)
+        let permSi = permSi.create [|1; 0; 3; 2|] // (0 1)(2 3)
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
         let siMutationRates = opActionRates.create (0.9, 0.0)
         let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
@@ -57,7 +56,7 @@ type MssiRandMutateTests() =
     [<Fact>]
     let ``mutate with Para mode applies Para mutation`` () =
         let id = UMX.tag<sorterModelId> (Guid.NewGuid())
-        let permSi = Perm_Si.create [|1; 0; 3; 2|] // (0 1)(2 3)
+        let permSi = permSi.create [|1; 0; 3; 2|] // (0 1)(2 3)
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
         let siMutationRates = opActionRates.create (0.0, 1.0)
         let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
@@ -73,8 +72,8 @@ type MssiRandMutateTests() =
     [<Fact>]
     let ``mutate preserves width and number of permutations`` () =
         let id = UMX.tag<sorterModelId> (Guid.NewGuid())
-        let permSi1 = Perm_Si.create [|1; 0; 3; 2|]
-        let permSi2 = Perm_Si.create [|3; 2; 1; 0|]
+        let permSi1 = permSi.create [|1; 0; 3; 2|]
+        let permSi2 = permSi.create [|3; 2; 1; 0|]
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi1; permSi2|]
         let siMutationRates = opActionRates.create (0.5, 0.5)
         let arrayToMutate = opActionRatesArray.create [|siMutationRates; siMutationRates|]
@@ -88,7 +87,7 @@ type MssiRandMutateTests() =
     [<Fact>]
     let ``mutate generates new unique ID`` () =
         let id = UMX.tag<sorterModelId> (Guid.NewGuid())
-        let permSi = Perm_Si.create [|1; 0; 2; 3|]
+        let permSi = permSi.create [|1; 0; 2; 3|]
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
         let siMutationRates = opActionRates.create (0.0, 0.0)
         let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
@@ -102,8 +101,8 @@ type MssiRandMutateTests() =
     [<Fact>]
     let ``mutate applies mutation to all permutations in array`` () =
         let id = UMX.tag<sorterModelId> (Guid.NewGuid())
-        let permSi1 = Perm_Si.create [|1; 0; 3; 2|] // (0 1)(2 3)
-        let permSi2 = Perm_Si.create [|3; 2; 1; 0|] // (0 3)(1 2)
+        let permSi1 = permSi.create [|1; 0; 3; 2|] // (0 1)(2 3)
+        let permSi2 = permSi.create [|3; 2; 1; 0|] // (0 3)(1 2)
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi1; permSi2|]
         let siMutationRates = opActionRates.create (1.0, 0.0)
         let arrayToMutate = opActionRatesArray.create [|siMutationRates; siMutationRates|]
@@ -121,7 +120,7 @@ type MssiRandMutateTests() =
     [<Fact>]
     let ``create fails when Perm_Sis length does not match arrayRates length`` () =
         let id = UMX.tag<sorterModelId> (Guid.NewGuid())
-        let permSi = Perm_Si.create [|1; 0; 2; 3|]
+        let permSi = permSi.create [|1; 0; 2; 3|]
         let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
         let siMutationRates = opActionRates.create (0.0, 0.0)
         let array = opActionRatesArray.create [|siMutationRates; siMutationRates|] // Length 2
