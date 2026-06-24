@@ -21,9 +21,10 @@
     <Compile Include="Simple\Uf6\Msuf6Dto.fs" />
     <Compile Include="Simple\Uf6\Msuf6RandGenDto.fs" />
     <Compile Include="Simple\Uf6\Msuf6RandMutateDto.fs" />
+    <Compile Include="Simple\SimpleSorterModelDto.fs" />
+    <Compile Include="Simple\SimpleSorterModelGenDto.fs" />
+    <Compile Include="Simple\SimpleSorterModelMutateDto.fs" />
     <Compile Include="SorterModelDto.fs" />
-    <Compile Include="SorterModelGenDto.fs" />
-    <Compile Include="SorterModelMutatorDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

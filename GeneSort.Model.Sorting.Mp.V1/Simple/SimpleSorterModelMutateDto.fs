@@ -18,19 +18,19 @@ open GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Uf6
   Union(3, typeof<msuf4RandMutateDto>);
   Union(4, typeof<msuf6RandMutateDto>)>]
 
-type sorterModelMutatorDto =
+type simpleSorterModelMutateDto =
     | MsceRandMutate of msceRandMutateDto
     | MssiRandMutate of mssiRandMutateDto
     | MsrsRandMutate of msrsRandMutateDto
     | Msuf4RandMutate of msuf4RandMutateDto
     | Msuf6RandMutate of msuf6RandMutateDto
 
-module SorterModelMutatorDto =
+module SimpleSorterModelMutateDto =
 
     let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
     let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
-    let fromDomain (sorterModelMutator: simpleSorterModelMutator) : sorterModelMutatorDto =
+    let fromDomain (sorterModelMutator: simpleSorterModelMutator) : simpleSorterModelMutateDto =
         match sorterModelMutator with
         | simpleSorterModelMutator.SmmMsceRandMutate msceRandMutate ->
             MsceRandMutate (MsceRandMutateDto.fromDomain msceRandMutate)
@@ -44,7 +44,7 @@ module SorterModelMutatorDto =
             Msuf6RandMutate (Msuf6RandMutateDto.fromDomain msuf6RandMutate)
 
 
-    let toDomain (dto: sorterModelMutatorDto) : simpleSorterModelMutator =
+    let toDomain (dto: simpleSorterModelMutateDto) : simpleSorterModelMutator =
         try
             match dto with
             | MsceRandMutate msceRandMutateDto ->
