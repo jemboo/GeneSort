@@ -17,7 +17,7 @@ type msuf6RandGenDto =
       [<Key(1)>] rngFactoryDto: rngFactoryDto
       [<Key(2)>] sortingWidth: int
       [<Key(3)>] stageLength: int
-      [<Key(4)>] uf6GenRatesArrayDto: Uf6GenRatesArrayDto }
+      [<Key(4)>] uf6GenRatesArrayDto: uf6GenRatesArrayDto }
 
 module Msuf6RandGenDto =
 

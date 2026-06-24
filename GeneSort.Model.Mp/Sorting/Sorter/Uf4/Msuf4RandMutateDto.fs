@@ -14,7 +14,7 @@ type msuf4RandMutateDto =
     { [<Key(0)>] id: Guid
       [<Key(1)>] rngFactoryDto: rngFactoryDto
       [<Key(2)>] msuf4: msuf4Dto
-      [<Key(3)>] uf4MutationRatesArrayDtos: Uf4MutationRatesArrayDto }
+      [<Key(3)>] uf4MutationRatesArrayDtos: uf4MutationRatesArrayDto }
 
 module Msuf4RandMutateDto =
 
