@@ -10,8 +10,8 @@
     <Compile Include="PermutationDto.fs" />
     <Compile Include="LatticePointDto.fs" />
     <Compile Include="LatticeLevelSetMapDto.fs" />
-    <Compile Include="Perm_SiDto.fs" />
-    <Compile Include="Perm_RsDto.fs" />
+    <Compile Include="PermSiDto.fs" />
+    <Compile Include="PermRsDto.fs" />
     <Compile Include="TwoOrbitUnfolder\TwoOrbitUfStepDto.fs" />
     <Compile Include="TwoOrbitUnfolder\TwoOrbitUf4Dto.fs" />
     <Compile Include="TwoOrbitUnfolder\TwoOrbitUf6Dto.fs" />
