@@ -45,8 +45,8 @@ module TwoOrbitTypeOps =
                 (floatPicker:unit -> float)
                 (order:int) 
                 (opsGenRates:opsGenRates) 
-                : TwoOrbitUfStep =
-        TwoOrbitUfStep.create 
+                : twoOrbitUfStep =
+        twoOrbitUfStep.create 
                 (makeRandomTwoOrbitPairTypes floatPicker opsGenRates 
                     |> Seq.take (order / 2)
                     |> Seq.toArray)
@@ -57,9 +57,9 @@ module TwoOrbitTypeOps =
     let mutateTwoOrbitUnfolderStep
                 (floatPicker:unit -> float)
                 (opsTransitionRates:opsTransitionRates) 
-                (twoOrbitUfStep:TwoOrbitUfStep) =
-        TwoOrbitUfStep.create 
-                (mutateTwoOrbitPairTypes floatPicker opsTransitionRates twoOrbitUfStep.TwoOrbitPairTypes
-                    |> Seq.take (twoOrbitUfStep.Order / 2)
+                (tOufs:twoOrbitUfStep) =
+        twoOrbitUfStep.create 
+                (mutateTwoOrbitPairTypes floatPicker opsTransitionRates tOufs.TwoOrbitPairTypes
+                    |> Seq.take (tOufs.Order / 2)
                     |> Seq.toArray)
-                twoOrbitUfStep.Order
+                tOufs.Order

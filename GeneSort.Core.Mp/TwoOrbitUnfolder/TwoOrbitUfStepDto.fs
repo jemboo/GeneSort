@@ -23,11 +23,11 @@ type twoOrbitUfStepDto =
 
 module TwoOrbitUnfolderStepDto =
 
-    let fromDomain (step: TwoOrbitUfStep) : twoOrbitUfStepDto =
+    let fromDomain (step: twoOrbitUfStep) : twoOrbitUfStepDto =
         { twoOrbitPairTypes = step.TwoOrbitPairTypes
           order = step.Order }
 
-    let toDomain (dto: twoOrbitUfStepDto) :TwoOrbitUfStep =
-        TwoOrbitUfStep.create dto.twoOrbitPairTypes dto.order
+    let toDomain (dto: twoOrbitUfStepDto) :twoOrbitUfStep =
+        twoOrbitUfStep.create dto.twoOrbitPairTypes dto.order
 
 

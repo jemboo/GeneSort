@@ -32,7 +32,7 @@ type Msuf4Tests() =
             (order: int) 
             (topType: twoOrbitPairType) 
             (twoOrbitPairTypeOverride: twoOrbitPairType option) 
-            : TwoOrbitUf4  =
+            : twoOrbitUf4  =
         let baseGenRates : uf4GenRates = createTestGenRates order
         let orthoRate = if topType = twoOrbitPairType.Ortho then 1.0 else 0.0
         let paraRate = if topType = twoOrbitPairType.Para then 1.0 else 0.0
@@ -65,7 +65,7 @@ type Msuf4Tests() =
         Assert.Equal(id, msuf4.Id)
         Assert.Equal(width, msuf4.SortingWidth)
         Assert.Equal(1, %msuf4.StageLength)
-        Assert.Equal<TwoOrbitUf4 array>([| tou |], msuf4.TwoOrbitUnfolder4s)
+        Assert.Equal<twoOrbitUf4 array>([| tou |], msuf4.TwoOrbitUnfolder4s)
 
     [<Fact>]
     let ``create fails with empty TwoOrbitUnfolder4 array`` () =

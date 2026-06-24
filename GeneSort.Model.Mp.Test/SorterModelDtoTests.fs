@@ -32,7 +32,7 @@ type SorterModelDtoTests() =
             (order: int) 
             (topType: twoOrbitPairType) 
             (twoOrbitPairTypeOverride: twoOrbitPairType option) 
-     : TwoOrbitUf4  =
+     : twoOrbitUf4  =
         let baseGenRates = createTestGenRates order
         let orthoRate = if topType = twoOrbitPairType.Ortho then 1.0 else 0.0
         let paraRate = if topType = twoOrbitPairType.Para then 1.0 else 0.0
@@ -63,7 +63,7 @@ type SorterModelDtoTests() =
             (order: int) 
             (twoOrbitPairType: twoOrbitPairType) 
             (twoOrbitPairTypeOverride: twoOrbitPairType option) 
-     : TwoOrbitUf6  =
+     : twoOrbitUf6  =
         let genRates : uf6GenRates = 
             Uf6GenRates.makeUniform order
 
@@ -134,7 +134,7 @@ type SorterModelDtoTests() =
         | sorterModel.Msuf4 resultMsuf4 ->
             Assert.Equal(msuf4.Id, resultMsuf4.Id)
             Assert.Equal(msuf4.SortingWidth, resultMsuf4.SortingWidth)
-            Assert.Equal<TwoOrbitUf4>(msuf4.TwoOrbitUnfolder4s, resultMsuf4.TwoOrbitUnfolder4s)
+            Assert.Equal<twoOrbitUf4>(msuf4.TwoOrbitUnfolder4s, resultMsuf4.TwoOrbitUnfolder4s)
         | _ -> Assert.True(false, "Expected Msuf4 case")
 
 
@@ -152,5 +152,5 @@ type SorterModelDtoTests() =
         | sorterModel.Msuf6 resultMsuf6 ->
             Assert.Equal(msuf6.Id, resultMsuf6.Id)
             Assert.Equal(msuf6.SortingWidth, resultMsuf6.SortingWidth)
-            Assert.Equal<TwoOrbitUf6 array>(msuf6.TwoOrbitUnfolder6s, resultMsuf6.TwoOrbitUnfolder6s)
+            Assert.Equal<twoOrbitUf6 array>(msuf6.TwoOrbitUnfolder6s, resultMsuf6.TwoOrbitUnfolder6s)
         | _ -> Assert.True(false, "Expected Msuf6 case")

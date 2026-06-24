@@ -13,14 +13,14 @@ type msuf6 =
     private 
         { id: Guid<sorterModelId>
           sortingWidth: int<sortingWidth>
-          twoOrbitUnfolder6s: TwoOrbitUf6 array } 
+          twoOrbitUnfolder6s: twoOrbitUf6 array } 
     with
     /// Creates an Msuf6 instance with the specified ID, sorting width, and array of TwoOrbitUnfolder4 instances.
     /// Throws an exception if the array is empty, width is less than 1, or any TwoOrbitUnfolder4 has a mismatched order.
     static member create 
             (id: Guid<sorterModelId>) 
             (sortingWidth: int<sortingWidth>) 
-            (twoOrbitUnfolder6s: TwoOrbitUf6 array) : msuf6 =
+            (twoOrbitUnfolder6s: twoOrbitUf6 array) : msuf6 =
         if twoOrbitUnfolder6s.Length < 1 then
             failwith $"Must have at least 1 TwoOrbitUnfolder6, got %d{twoOrbitUnfolder6s.Length}"
         else if %sortingWidth < 1 then

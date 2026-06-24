@@ -4,7 +4,7 @@ open FSharp.UMX
 open Combinatorics
 
 
-module Perm_RsOps = 
+module PermRsOps = 
 
     let makeRandomPerm_Rs
         (indexPicker: int -> int) 

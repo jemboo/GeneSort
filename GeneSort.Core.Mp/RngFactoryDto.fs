@@ -5,7 +5,7 @@ open FSharp.UMX
 open GeneSort.Core
 open MessagePack
 
-[<MessagePackObject>]
+//[<MessagePackObject>]
 type rngTypeDto =
     | Lcg = 0
     | Net = 1

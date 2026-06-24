@@ -72,7 +72,7 @@ type msrsRandGen =
         let sortingWidth = %this.SortingWidth
         let perm_Rss =
             [| for dex in 0 .. (stageLength - 1) ->
-                Perm_RsOps.makeRandomPerm_Rs
+                PermRsOps.makeRandomPerm_Rs
                     (rng.NextIndex)
                     (rng.NextFloat)
                     (genRatesArray.[dex])

@@ -53,9 +53,9 @@ type msrsRandMutate =
         let rng = this.RngFactory.Create %id
         
         // Define specific mutation behaviors using Perm_RsOps
-        let orthoMutator = fun psi -> Perm_RsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Ortho psi 
-        let paraMutator = fun psi -> Perm_RsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Para psi 
-        let selfSymMutator = fun psi -> Perm_RsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.SelfRefl psi 
+        let orthoMutator = fun psi -> PermRsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Ortho psi 
+        let paraMutator = fun psi -> PermRsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Para psi 
+        let selfSymMutator = fun psi -> PermRsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.SelfRefl psi 
         
         // Perform the mutation using the uniform rate module
         let mutated = OpsActionRates.mutate 

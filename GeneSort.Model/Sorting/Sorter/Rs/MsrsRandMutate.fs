@@ -73,9 +73,9 @@ type msrsRandMutate =
 
     member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msrs =
         let rng = this.RngFactory.Create %id
-        let orthoMutator = fun psi ->   Perm_RsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Ortho psi 
-        let paraMutator = fun psi ->    Perm_RsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Para psi 
-        let selfSymMutator = fun psi -> Perm_RsOps.mutatePerm_Rs  (rng.NextIndex) opsActionMode.SelfRefl psi 
+        let orthoMutator = fun psi ->   PermRsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Ortho psi 
+        let paraMutator = fun psi ->    PermRsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.Para psi 
+        let selfSymMutator = fun psi -> PermRsOps.mutatePerm_Rs  (rng.NextIndex) opsActionMode.SelfRefl psi 
         let mutated = OpsActionRatesArray.mutate 
                         this.OpsActionRates 
                         orthoMutator 

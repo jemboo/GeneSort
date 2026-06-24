@@ -24,16 +24,16 @@ type twoOrbitUf6Dto =
 
 module TwoOrbitUf6Dto =
 
-    let fromDomain (tou: TwoOrbitUf6) : twoOrbitUf6Dto =
+    let fromDomain (tou: twoOrbitUf6) : twoOrbitUf6Dto =
         { seedType = tou.Seed6TwoOrbitType
           twoOrbitUfSteps = tou.TwoOrbitUnfolderSteps |> Array.map TwoOrbitUnfolderStepDto.fromDomain }
 
-    let toDomain (dto: twoOrbitUf6Dto) : TwoOrbitUf6 =
+    let toDomain (dto: twoOrbitUf6Dto) : twoOrbitUf6 =
         let steps = 
             dto.twoOrbitUfSteps 
             |> Array.map TwoOrbitUnfolderStepDto.toDomain
         
-        TwoOrbitUf6.create dto.seedType steps
+        twoOrbitUf6.create dto.seedType steps
 
     let getOrder (twoOrbitUnfolder: twoOrbitUf6Dto) : int =
         6 * (MathUtils.integerPower 2 (Array.length twoOrbitUnfolder.twoOrbitUfSteps))
