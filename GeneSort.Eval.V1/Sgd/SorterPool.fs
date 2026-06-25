@@ -39,7 +39,10 @@ module SorterPool =
         { pool with _sorterPoolMembers = updatedMap }
 
     /// Finds a member and updates its evaluation within the pool context
-    let updateMemberEval (memberId: Guid<sorterPoolMemberId>) (eval: sorterEval option) (pool: sorterPool) : sorterPool =
+    let updateMemberEval 
+                    (memberId: Guid<sorterPoolMemberId>) 
+                    (eval: sorterEval option) 
+                    (pool: sorterPool) : sorterPool =
         match Map.tryFind memberId pool._sorterPoolMembers with
         | Some memberObj ->
             let updatedMember = memberObj |> SorterPoolMember.withEval eval

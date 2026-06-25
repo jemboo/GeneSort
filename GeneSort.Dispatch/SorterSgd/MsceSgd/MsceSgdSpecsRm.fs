@@ -90,7 +90,7 @@ module MsceSgdSpecsRm =
                 dataFormatInt8v512
                 testPoolCount
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -119,7 +119,7 @@ module MsceSgdSpecsRm =
                 dataFormatInt8v512
                 testPoolCount
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -148,7 +148,7 @@ module MsceSgdSpecsRm =
                 dataFormatInt8v512
                 testPoolCount
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = paramMapFilter

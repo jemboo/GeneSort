@@ -58,7 +58,7 @@ module MssiSgdSpecsRs =
                 mssiModelType
                 testPoolCount
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -84,7 +84,7 @@ module MssiSgdSpecsRs =
                 mssiModelType
                 testPoolCount
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -109,7 +109,7 @@ module MssiSgdSpecsRs =
                 mssiModelType
                 testPoolCount
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = paramMapFilter

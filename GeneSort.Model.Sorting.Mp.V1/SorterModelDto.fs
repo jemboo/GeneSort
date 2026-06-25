@@ -1,9 +1,10 @@
-﻿namespace GeneSort.Model.Mp.Sorting.Sorter
+﻿namespace GeneSort.Model.Mp.Sorting.Mp.V1
 
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Mp.Sorting.Mp.V1.Simple
 
 [<MessagePackObject>]
 type UnknownDto() = class end

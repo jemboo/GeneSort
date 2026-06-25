@@ -3,12 +3,9 @@
 open System
 open MessagePack
 open FSharp.UMX
-open GeneSort.Model.Sorting
-open GeneSort.Model.Sorting.V1
-open GeneSort.SortingOps
 open GeneSort.SortingOps.Mp
 open GeneSort.Eval.V1
-open GeneSort.Eval.V1.SorterRunResult
+open GeneSort.Model.Mp.Sorting.Mp.V1
 
 // ---------------------------------------------------------------------
 // 1. Lightweight History Description DTOs
@@ -16,24 +13,24 @@ open GeneSort.Eval.V1.SorterRunResult
 
 [<MessagePackObject>]
 type spmDescriptionDto = {
-    [<Key(0)>] SorterPoolMemberId: Guid
-    [<Key(1)>] SorterModelId: Guid
-    [<Key(2)>] SorterMutationIndex: int
-    [<Key(3)>] SorterMutationSource: sorterMutationSourceDto
-    [<Key(4)>] SorterEval: sorterEvalDto option 
+    [<Key(0)>] sorterPoolMemberId: Guid
+    [<Key(1)>] sorterModelId: Guid
+    [<Key(2)>] sorterMutationIndex: int
+    [<Key(3)>] sorterMutationSource: sorterMutationSourceDto option
+    [<Key(4)>] sorterEval: sorterEvalDto option 
 }
 
 [<MessagePackObject>]
 type sorterPoolDescriptionDto = {
-    [<Key(0)>] SorterPoolId: Guid
-    [<Key(1)>] SorterPoolMembers: spmDescriptionDto array
+    [<Key(0)>] sorterPoolId: Guid
+    [<Key(1)>] spmDescriptionDtos: spmDescriptionDto array
 }
 
 [<MessagePackObject>]
 type sorterPoolSetDescriptionDto = {
-    [<Key(0)>] SorterPoolSetId: Guid
-    [<Key(1)>] GenerationNumber: int
-    [<Key(2)>] Pools: sorterPoolDescriptionDto array
+    [<Key(0)>] sorterPoolSetId: Guid
+    [<Key(1)>] generationNumber: int
+    [<Key(2)>] sorterPoolDescriptionDtos: sorterPoolDescriptionDto array
 }
 
 
@@ -43,24 +40,24 @@ type sorterPoolSetDescriptionDto = {
 
 [<MessagePackObject>]
 type sorterPoolMemberDto = {
-    [<Key(0)>] SorterPoolMemberId: Guid
-    [<Key(1)>] SorterModel: sorterModel 
-    [<Key(2)>] SorterMutationIndex: int
-    [<Key(3)>] SorterMutationSource: sorterMutationSourceDto
-    [<Key(4)>] SorterEval: sorterEvalDto option
+    [<Key(0)>] sorterPoolMemberId: Guid
+    [<Key(1)>] sorterModelDto: sorterModelDto 
+    [<Key(2)>] sorterMutationIndex: int
+    [<Key(3)>] sorterMutationSource: sorterMutationSourceDto option
+    [<Key(4)>] sorterEvalDto: sorterEvalDto option
 }
 
 [<MessagePackObject>]
 type sorterPoolDto = {
-    [<Key(0)>] SorterPoolId: Guid
-    [<Key(1)>] SorterPoolMembers: sorterPoolMemberDto array
+    [<Key(0)>] sorterPoolId: Guid
+    [<Key(1)>] sorterPoolMemberDtos: sorterPoolMemberDto array
 }
 
 [<MessagePackObject>]
 type sorterPoolSetDto = {
-    [<Key(0)>] SorterPoolSetId: Guid
-    [<Key(1)>] GenerationNumber: int
-    [<Key(2)>] SorterPools: sorterPoolDto array
+    [<Key(0)>] sorterPoolSetId: Guid
+    [<Key(1)>] generationNumber: int
+    [<Key(2)>] sorterPools: sorterPoolDto array
 }
 
 
@@ -70,8 +67,8 @@ type sorterPoolSetDto = {
 
 [<MessagePackObject>]
 type sorterRunResultV1Dto = {
-    [<Key(0)>] IntermediateHistory: sorterPoolSetDescriptionDto array
-    [<Key(1)>] FinalPoolSet: sorterPoolSetDto
+    [<Key(0)>] spsDescriptionDtos: sorterPoolSetDescriptionDto array
+    [<Key(1)>] spsFinalDto: sorterPoolSetDto
 }
 
 [<MessagePackObject>]
@@ -94,40 +91,41 @@ module SorterPoolSetDescriptionDto =
                     p.SorterPoolMembers
                     |> Array.map (fun m ->
                         {
-                            spmDescriptionDto.SorterPoolMemberId = UMX.untag m.SorterPoolMemberId
-                            SorterModelId = UMX.untag m.SorterModelId
-                            SorterMutationIndex = UMX.untag m.MutationIndex
-                            SorterMutationSource = SorterMutationSourceDto.toDto m.SorterMutationSource
-                            SorterEval = m.SorterEval |> Option.map SorterEvalDto.fromDomain
+                            spmDescriptionDto.sorterPoolMemberId = UMX.untag m.SorterPoolMemberId
+                            sorterModelId = UMX.untag m.SorterModelId
+                            sorterMutationIndex = UMX.untag m.MutationIndex
+                            sorterMutationSource = m.SorterMutationSource |> Option.map SorterMutationSourceDto.toDto
+                            sorterEval = m.SorterEval |> Option.map SorterEvalDto.fromDomain
                         }
                     )
-                { sorterPoolDescriptionDto.SorterPoolId = UMX.untag p.SorterPoolId; SorterPoolMembers = memberDtos }
+                { sorterPoolDescriptionDto.sorterPoolId = UMX.untag p.SorterPoolId; spmDescriptionDtos = memberDtos }
             )
         {
-            SorterPoolSetId = UMX.untag domain.SorterPoolSetId
-            GenerationNumber = UMX.untag domain.GenerationNumber
-            Pools = poolDtos
+            sorterPoolSetId = UMX.untag domain.SorterPoolSetId
+            generationNumber = UMX.untag domain.GenerationNumber
+            sorterPoolDescriptionDtos = poolDtos
         }
 
     let fromDto (dto: sorterPoolSetDescriptionDto) : sorterPoolSetDescription =
         let poolDomains =
-            dto.Pools
+            dto.sorterPoolDescriptionDtos
             |> Array.map (fun p ->
                 let memberDomains =
-                    p.SorterPoolMembers
+                    p.spmDescriptionDtos
                     |> Array.map (fun m ->
-                        let evalOpt = m.SorterEval |> Option.map SorterEvalDto.toDomain
+                        let evalOpt = m.sorterEval |> Option.map SorterEvalDto.toDomain
+                        let sourceOpt = m.sorterMutationSource |> Option.map SorterMutationSourceDto.fromDto
                         spmDescription.Create
-                            (UMX.tag m.SorterPoolMemberId)
-                            (UMX.tag m.SorterModelId)
-                            (UMX.tag m.SorterMutationIndex)
-                            (SorterMutationSourceDto.fromDto m.SorterMutationSource)
+                            (UMX.tag m.sorterPoolMemberId)
+                            (UMX.tag m.sorterModelId)
+                            (UMX.tag m.sorterMutationIndex)
+                            sourceOpt
                             evalOpt
                     )
-                sorterPoolDescription.Create(UMX.tag p.SorterPoolId, memberDomains)
+                sorterPoolDescription.Create(UMX.tag p.sorterPoolId, memberDomains)
             )
         sorterPoolSetDescription.Create
-            (UMX.tag dto.SorterPoolSetId, UMX.tag dto.GenerationNumber, poolDomains)
+            (UMX.tag dto.sorterPoolSetId, UMX.tag dto.generationNumber, poolDomains)
 
 
 module SorterPoolSetDto =
@@ -141,49 +139,51 @@ module SorterPoolSetDto =
                     p.SorterPoolMembers
                     |> Seq.map (fun m ->
                         {
-                            SorterPoolMemberId = UMX.untag m.SorterPoolMemberId
-                            SorterModel = m.SorterModel
-                            SorterMutationIndex = UMX.untag m.MutationIndex
-                            SorterMutationSource = SorterMutationSourceDto.toDto m.SorterMutationSource
-                            SorterEval = m.SorterEval |> Option.map SorterEvalDto.fromDomain
+                            sorterPoolMemberId = UMX.untag m.SorterPoolMemberId
+                            sorterModelDto = SorterModelDto.fromDomain m.SorterModel
+                            sorterMutationIndex = UMX.untag m.MutationIndex
+                            sorterMutationSource = m.SorterMutationSource |> Option.map SorterMutationSourceDto.toDto
+                            sorterEvalDto = m.SorterEval |> Option.map SorterEvalDto.fromDomain
                         }
                     )
                     |> Seq.toArray
-                { SorterPoolId = UMX.untag p.SorterPoolId; SorterPoolMembers = memberDtos }
+                { sorterPoolId = UMX.untag p.SorterPoolId; sorterPoolMemberDtos = memberDtos }
             )
             |> Seq.toArray
         {
-            SorterPoolSetId = UMX.untag domain.SorterPoolSetId
-            GenerationNumber = UMX.untag domain.GenerationNumber
-            SorterPools = poolDtos
+            sorterPoolSetId = UMX.untag domain.SorterPoolSetId
+            generationNumber = UMX.untag domain.GenerationNumber
+            sorterPools = poolDtos
         }
 
     let fromDto (dto: sorterPoolSetDto) : sorterPoolSet =
         let pools =
-            dto.SorterPools
+            dto.sorterPools
             |> Array.map (fun p ->
                 let members =
-                    p.SorterPoolMembers
+                    p.sorterPoolMemberDtos
                     |> Array.map (fun m ->
-                        let evalOpt = m.SorterEval |> Option.map SorterEvalDto.toDomain
+                        let evalOpt = m.sorterEvalDto |> Option.map SorterEvalDto.toDomain
+                        let sourceOpt = m.sorterMutationSource |> Option.map SorterMutationSourceDto.fromDto
+                        
                         sorterPoolMember.Create
-                            (UMX.tag m.SorterPoolMemberId)
-                            m.SorterModel
-                            (UMX.tag m.SorterMutationIndex)
-                            (SorterMutationSourceDto.fromDto m.SorterMutationSource)
+                            (UMX.tag m.sorterPoolMemberId)
+                            (SorterModelDto.toDomain m.sorterModelDto)
+                            (UMX.tag m.sorterMutationIndex)
+                            sourceOpt
                             evalOpt
                     )
-                sorterPool.Create(UMX.tag p.SorterPoolId, members)
+                sorterPool.Create(UMX.tag p.sorterPoolId, members)
             )
-        sorterPoolSet.Create(UMX.tag dto.SorterPoolSetId, UMX.tag dto.GenerationNumber, pools)
+        sorterPoolSet.Create(UMX.tag dto.sorterPoolSetId, UMX.tag dto.generationNumber, pools)
 
 
 module SorterRunResultDto =
 
     let fromDomain (domain: sorterRunResult) : sorterRunResultDto =
         let v1 = {
-            sorterRunResultV1Dto.IntermediateHistory = domain.IntermediateHistory |> Array.map SorterPoolSetDescriptionDto.toDto
-            FinalPoolSet = SorterPoolSetDto.toDto domain.FinalPoolSet
+            sorterRunResultV1Dto.spsDescriptionDtos = domain.IntermediateHistory |> Array.map SorterPoolSetDescriptionDto.toDto
+            spsFinalDto = SorterPoolSetDto.toDto domain.FinalPoolSet
         }
         sorterRunResultDto.V1 v1
 
@@ -191,8 +191,8 @@ module SorterRunResultDto =
         match dto with
         | sorterRunResultDto.V1 v1Dto ->
             sorterRunResult.create
-                (SorterPoolSetDto.fromDto v1Dto.FinalPoolSet)
-                (v1Dto.IntermediateHistory |> Array.map SorterPoolSetDescriptionDto.fromDto)
+                (SorterPoolSetDto.fromDto v1Dto.spsFinalDto)
+                (v1Dto.spsDescriptionDtos |> Array.map SorterPoolSetDescriptionDto.fromDto)
 
         | sorterRunResultDto.Unknown ->
             failwith "Cannot reconstruct evaluation run result from an Unknown DTO variant container state."

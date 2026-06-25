@@ -69,7 +69,7 @@ module Msuf4SgdSpecsRm =
                 noSuffixSuffixType
                 dataFormatInt8v512
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -98,7 +98,7 @@ module Msuf4SgdSpecsRm =
                 noSuffixSuffixType
                 dataFormatInt8v512
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -127,7 +127,7 @@ module Msuf4SgdSpecsRm =
                 noSuffixSuffixType
                 dataFormatInt8v512
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = paramMapFilter

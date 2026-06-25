@@ -63,7 +63,7 @@ module Msuf4SgdSpecsRs =
                 msuf4ModelType
                 testPoolCount
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -91,7 +91,7 @@ module Msuf4SgdSpecsRs =
                 msuf4ModelType
                 testPoolCount
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -118,7 +118,7 @@ module Msuf4SgdSpecsRs =
                 msuf4ModelType
                 testPoolCount
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = paramMapFilter

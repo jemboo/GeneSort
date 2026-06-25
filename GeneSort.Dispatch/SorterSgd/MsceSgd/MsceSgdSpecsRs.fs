@@ -24,7 +24,7 @@ module MsceSgdSpecsRs =
             [ sorterEvalMeasure.CeSt (1.0, true); ] |> List.map SorterEvalMeasure.toString)
     
     let generationCount = 
-            (runParameters.generationCountKey, [2] |> List.map string)
+            (runParameters.generationCountKey, [20] |> List.map string)
 
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
@@ -69,7 +69,7 @@ module MsceSgdSpecsRs =
                 testSortingWidths
                 testPoolCount
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = standardSorterModelTypeFilter
@@ -96,7 +96,7 @@ module MsceSgdSpecsRs =
                 mediumSortingWidths
                 testPoolCount
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = standardSorterModelTypeFilter
@@ -122,7 +122,7 @@ module MsceSgdSpecsRs =
                 mediumSortingWidths
                 testPoolCount
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = standardSorterModelTypeFilter

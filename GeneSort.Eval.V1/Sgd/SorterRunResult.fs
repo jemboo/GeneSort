@@ -85,11 +85,15 @@ module SorterRunResult =
             (cts: CancellationToken)
             (log: string -> unit) : Async<Result<sorterRunResult, string>> =
 
-        let rec loop (remainingSteps: int) (currentSet: sorterPoolSet) (historyAcc: sorterPoolSetDescription list) =
+        let rec loop 
+                    (remainingSteps: int) 
+                    (currentSet: sorterPoolSet) 
+                    (historyAcc: sorterPoolSetDescription list) 
+                    : Async<Result<sorterRunResult, string>> =
             asyncResult {
                 // Safeguard against downstream timeouts or execution cancellations
                 if cts.IsCancellationRequested then 
-                    return! Error "Evolution run aborted via cancellation token request."
+                    return! Error "runEvolutionAsync was cancelled."
 
                 if remainingSteps <= 0 then
                     let finalResult = 
@@ -106,7 +110,7 @@ module SorterRunResult =
 
                     // 2. Advance the heavy state across your pipeline step axis.
                     // If your real SorterPipeline is still synchronous, wrap it inside asyncResult.retn
-                    log "Executing generation processing step..."
+                    // log "Executing generation processing step..."
                     let nextSet = 
                         SorterPipeline.runGenerationStep 
                             mutator 

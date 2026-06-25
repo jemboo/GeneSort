@@ -57,7 +57,7 @@ module MsrsSgdSpecsRs =
                 msrsModelType
                 testPoolCount
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -83,7 +83,7 @@ module MsrsSgdSpecsRs =
                 msrsModelType
                 testPoolCount
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = paramMapFilter
@@ -109,7 +109,7 @@ module MsrsSgdSpecsRs =
                 msrsModelType
                 testPoolCount
                 oneSorterPerPool
-                singleChildCount
+                oneChildCount
                 generationCount
             ]
             Filter = paramMapFilter
