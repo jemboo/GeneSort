@@ -24,8 +24,9 @@ type runParameters =
     static member deletionRateKey = "DeletionRate"
     static member elapsedTimeKey = "ElapsedTime"
     static member excludeSelfCeKey = "ExcludeSelfCe"
-    static member generationCountKey = "GenerationCount"
     static member generationFirstKey = "GenerationFirst"
+    static member generationLastKey = "GenerationLast"
+    static member generationQueryFirst = "GenerationQueryFirst"
     static member idKey = "Id"
     static member insertionRateKey = "InsertionRate"
     static member latticeDistanceKey = "LatticeDistance"
@@ -52,6 +53,7 @@ type runParameters =
     static member sorterChildCountKey = "SorterChildCount"
     static member sorterCountKey = "SorterCount"
     static member sorterCountPerPoolKey = "SorterCountPerPool"
+    static member sorterEvalMeasureInitialKey = "SorterEvalMeasureInitial"
     static member sorterEvalMeasureKey = "SorterEvalMeasure"
     static member sorterEvalSelectionType = "SorterEvalSelectionType"
     static member sorterEvalTypeKey = "SorterEvalType"
@@ -111,13 +113,16 @@ type runParameters =
         runParameters.tryGetBool runParameters.excludeSelfCeKey this.paramMap
         |> Option.map UMX.tag<excludeSelfCe>
 
-    member this.GetGenerationCount() =
-        runParameters.tryGetInt runParameters.generationCountKey this.paramMap
-        |> Option.map UMX.tag<generationNumber>
-
     member this.GetGenerationFirst() =
         runParameters.tryGetInt runParameters.generationFirstKey this.paramMap
         |> Option.map UMX.tag<generationNumber>
+
+    member this.GetGenerationLast() =
+        runParameters.tryGetInt runParameters.generationLastKey this.paramMap
+        |> Option.map UMX.tag<generationNumber>
+
+    member this.GetGenerationQueryFirst() =
+        runParameters.tryGetBool runParameters.generationQueryFirst this.paramMap
 
     member this.GetId() =
         runParameters.tryGetGuid runParameters.idKey this.paramMap
@@ -213,7 +218,7 @@ type runParameters =
 
     member this.GetSorterChildCount() =
         runParameters.tryGetInt runParameters.sorterChildCountKey this.paramMap
-        |> Option.map UMX.tag<sorterCount>
+        |> Option.map UMX.tag<sorterChildCount>
 
     member this.GetSorterCount() =
         runParameters.tryGetInt runParameters.sorterCountKey this.paramMap
@@ -225,6 +230,10 @@ type runParameters =
 
     member this.GetSorterEvalMeasure() =
         this.paramMap.TryFind runParameters.sorterEvalMeasureKey
+        |> Option.map SorterEvalMeasure.fromString
+
+    member this.GetSorterEvalMeasureInitial() =
+        this.paramMap.TryFind runParameters.sorterEvalMeasureInitialKey
         |> Option.map SorterEvalMeasure.fromString
 
     member this.GetSorterEvalSelectionType() =
@@ -281,11 +290,14 @@ type runParameters =
     member this.WithExcludeSelfCe(esc: bool<excludeSelfCe> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.excludeSelfCeKey (esc |> Option.map UmxExt.boolToRaw) }
 
-    member this.WithGenerationCount(gen: int<generationNumber> option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationCountKey (gen |> Option.map UmxExt.intToRaw) }
-
     member this.WithGenerationFirst(gen: int<generationNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationFirstKey (gen |> Option.map UmxExt.intToRaw) }
+
+    member this.WithGenerationLast(gen: int<generationNumber> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationLastKey (gen |> Option.map UmxExt.intToRaw) }
+
+    member this.WithGenerationQueryFirst(qf: bool option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationQueryFirst (qf |> Option.map UmxExt.boolToRaw) }
 
     member this.WithId(id: Guid<queryParamsId> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.idKey (id |> Option.map UmxExt.guidToRaw) }
@@ -367,6 +379,9 @@ type runParameters =
 
     member this.WithSorterEvalMeasure(sem: sorterEvalMeasure option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalMeasureKey (sem |> Option.map SorterEvalMeasure.toString) }
+
+    member this.WithSorterEvalMeasureInitial(sem: sorterEvalMeasure option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalMeasureInitialKey (sem |> Option.map SorterEvalMeasure.toString) }
 
     member this.WithSorterEvalSelectionType(ses: sorterEvalSelectionType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalSelectionType (ses |> Option.map SorterEvalSelectionType.toString) }

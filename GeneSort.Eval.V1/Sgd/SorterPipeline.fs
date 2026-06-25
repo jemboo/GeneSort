@@ -11,7 +11,7 @@ module SorterPipeline =
     let runGenerationStep
             (mutator: sorterModelMutator)
             (sorterCountPerPool: int<sorterCountPerPool>)
-            (sorterChildCount: int<sorterCount>)
+            (sorterChildCount: int<sorterChildCount>)
             (sortableTest: sortableTest)
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)

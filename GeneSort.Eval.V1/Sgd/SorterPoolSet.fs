@@ -47,7 +47,7 @@ module SorterPoolSet =
     /// Mutates every single pool across the entire pool set uniformly
     let mutate 
             (sorterModelMutator: sorterModelMutator) 
-            (mutantsPerSorter: int<sorterCount>)  
+            (mutantsPerSorter: int<sorterChildCount>)  
             (poolSet: sorterPoolSet) : sorterPoolSet =
         
         let mutatedPools = 

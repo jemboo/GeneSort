@@ -53,7 +53,7 @@ module SorterPoolMember =
     /// Generates 'mutantCount' new mutants, updating the parent's index by 'mutantCount'
     let mutate (sorterModelMutator: sorterModelMutator) 
                (spm: sorterPoolMember) 
-               (mutantCount: int<sorterCount>) : sorterPoolMember * sorterPoolMember [] =
+               (mutantCount: int<sorterChildCount>) : sorterPoolMember * sorterPoolMember [] =
         
         let countRaw = %mutantCount
         let baseIndexRaw = %spm.MutationIndex

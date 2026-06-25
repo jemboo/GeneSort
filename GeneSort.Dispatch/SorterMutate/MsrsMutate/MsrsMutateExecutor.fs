@@ -79,9 +79,9 @@ module MsrsMutateExecutor =
                         rp.GetSimpleSorterModelType() 
                         |> Result.ofOption "Missing simple sorter model type in run parameters"
 
-            let! (sorterChildCount: int<sorterCount>) = 
+            let! (sorterChildCount: int<sorterChildCount>) = 
                         rp.GetSorterChildCount()
-                        |> Result.ofOption "Missing parent sorter count in run parameters"
+                        |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
             let! (orthoRate: float<orthoRate>) =  
                         rp.GetOrthoRate()
@@ -182,9 +182,9 @@ module MsrsMutateExecutor =
                         rp.GetMergeSuffixType() 
                         |> Result.ofOption "Missing mergeSuffixType in run parameters"
 
-            let! (sorterChildCount: int<sorterCount>) = 
+            let! (sorterChildCount: int<sorterChildCount>) = 
                         rp.GetSorterChildCount()
-                        |> Result.ofOption "Missing parent sorter count in run parameters"
+                        |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
             let! (orthoRate: float<orthoRate>) =  
                         rp.GetOrthoRate()
@@ -285,9 +285,9 @@ module MsrsMutateExecutor =
                         rp.GetSimpleSorterModelType() 
                         |> Result.ofOption "Missing simple sorter model type in run parameters"
 
-            let! (sorterChildCount: int<sorterCount>) = 
+            let! (sorterChildCount: int<sorterChildCount>) = 
                         rp.GetSorterChildCount()
-                        |> Result.ofOption "Missing parent sorter count in run parameters"
+                        |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
             let! (orthoRate: float<orthoRate>) =  
                         rp.GetOrthoRate()
@@ -378,9 +378,9 @@ module MsrsMutateExecutor =
                         rp.GetSimpleSorterModelType() 
                         |> Result.ofOption "Missing simple sorter model type in run parameters"
 
-            let! (sorterChildCount: int<sorterCount>) = 
+            let! (sorterChildCount: int<sorterChildCount>) = 
                         rp.GetSorterChildCount()
-                        |> Result.ofOption "Missing parent sorter count in run parameters"
+                        |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
             let! (orthoRate: float<orthoRate>) =  
                         rp.GetOrthoRate()

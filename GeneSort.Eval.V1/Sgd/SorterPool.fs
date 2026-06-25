@@ -86,7 +86,7 @@ module SorterPool =
     /// the advanced parents and all newly spawned mutants into a single updated pool.
     let mutate 
             (sorterModelMutator: sorterModelMutator) 
-            (mutantsPerSorter: int<sorterCount>)  
+            (mutantsPerSorter: int<sorterChildCount>)  
             (pool: sorterPool) : sorterPool =
 
         let updatedMembersMap =

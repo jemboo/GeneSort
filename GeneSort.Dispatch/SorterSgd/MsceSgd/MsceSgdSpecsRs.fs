@@ -8,24 +8,34 @@ open GeneSort.Project.V1
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Sorting
-open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterSgd
 
 
 module MsceSgdSpecsRs = 
 
-    let sorterEvalSelection = 
+    let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.Tmb 6<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
 
-    let sorterEvalMeasure = 
+    let sorterEvalMeasureInitial = 
+            (runParameters.sorterEvalMeasureInitialKey , 
+            [ sorterEvalMeasure.CeSt (1.0, true); ] |> List.map SorterEvalMeasure.toString)
+
+    let sorterEvalMeasureEvo = 
             (runParameters.sorterEvalMeasureKey, 
             [ sorterEvalMeasure.CeSt (1.0, true); ] |> List.map SorterEvalMeasure.toString)
     
-    let generationCount = 
-            (runParameters.generationCountKey, [20] |> List.map string)
+   
+    let generationLast = 
+            (runParameters.generationLastKey, [20] |> List.map string)
 
+    let generationFirst = 
+            (runParameters.generationFirstKey, [0] |> List.map string)
+
+
+    let generationQueryFirst = 
+            (runParameters.generationQueryFirst, [true] |> List.map string)
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
@@ -60,8 +70,9 @@ module MsceSgdSpecsRs =
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
-                sorterEvalSelection
-                sorterEvalMeasure
+                sorterEvalSelectionType
+                sorterEvalMeasureInitial
+                sorterEvalMeasureEvo
                 mutationRates
                 insertionRates
                 deletionRates
@@ -70,7 +81,9 @@ module MsceSgdSpecsRs =
                 testPoolCount
                 oneSorterPerPool
                 oneChildCount
-                generationCount
+                generationFirst
+                generationLast
+                generationQueryFirst
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
@@ -87,8 +100,9 @@ module MsceSgdSpecsRs =
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
-                sorterEvalSelection
-                sorterEvalMeasure
+                sorterEvalSelectionType
+                sorterEvalMeasureInitial
+                sorterEvalMeasureEvo
                 mutationRates
                 insertionRates
                 deletionRates
@@ -97,7 +111,9 @@ module MsceSgdSpecsRs =
                 testPoolCount
                 oneSorterPerPool
                 oneChildCount
-                generationCount
+                generationFirst
+                generationLast
+                generationQueryFirst
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer
@@ -113,8 +129,9 @@ module MsceSgdSpecsRs =
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
-                sorterEvalSelection
-                sorterEvalMeasure
+                sorterEvalSelectionType
+                sorterEvalMeasureInitial
+                sorterEvalMeasureEvo
                 mutationRates
                 insertionRates
                 deletionRates
@@ -123,7 +140,9 @@ module MsceSgdSpecsRs =
                 testPoolCount
                 oneSorterPerPool
                 oneChildCount
-                generationCount
+                generationFirst
+                generationLast
+                generationQueryFirst
             ]
             Filter = standardSorterModelTypeFilter
             Enhancer = standardEnhancer

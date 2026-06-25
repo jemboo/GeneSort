@@ -79,9 +79,9 @@ module MsceSgdExecutor =
                         rp.GetSimpleSorterModelType() 
                         |> Result.ofOption "Missing simple sorter model type in run parameters"
 
-            let! (sorterChildCount: int<sorterCount>) = 
+            let! (sorterChildCount: int<sorterChildCount>) = 
                         rp.GetSorterChildCount()
-                        |> Result.ofOption "Missing parent sorter count in run parameters"
+                        |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
             let! (mutationRate: float<mutationRate>) =  
                         rp.GetMutationRate()
@@ -108,7 +108,7 @@ module MsceSgdExecutor =
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
             let! (genCt: int<generationNumber>) =
-                        rp.GetGenerationCount()
+                        rp.GetGenerationLast()
                         |> Result.ofOption "Missing generationCount in run parameters"
 
 
@@ -187,9 +187,9 @@ module MsceSgdExecutor =
                         rp.GetMergeSuffixType() 
                         |> Result.ofOption "Missing mergeSuffixType in run parameters"
 
-            let! (sorterChildCount: int<sorterCount>) = 
+            let! (sorterChildCount: int<sorterChildCount>) = 
                         rp.GetSorterChildCount()
-                        |> Result.ofOption "Missing parent sorter count in run parameters"
+                        |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
             let! (mutationRate: float<mutationRate>) =  
                         rp.GetMutationRate()
@@ -216,7 +216,7 @@ module MsceSgdExecutor =
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
             let! (genCt: int<generationNumber>) =
-                        rp.GetGenerationCount()
+                        rp.GetGenerationLast()
                         |> Result.ofOption "Missing generationCount in run parameters"
                         
             let rngFactory = rngType |> RngFactory.create
@@ -293,9 +293,9 @@ module MsceSgdExecutor =
                         rp.GetSimpleSorterModelType() 
                         |> Result.ofOption "Missing simple sorter model type in run parameters"
 
-            let! (sorterChildCount: int<sorterCount>) = 
+            let! (sorterChildCount: int<sorterChildCount>) = 
                         rp.GetSorterChildCount()
-                        |> Result.ofOption "Missing parent sorter count in run parameters"
+                        |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
             let! (mutationRate: float<mutationRate>) =  
                         rp.GetMutationRate()
@@ -322,7 +322,7 @@ module MsceSgdExecutor =
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
             let! (genCt: int<generationNumber>) =
-                        rp.GetGenerationCount()
+                        rp.GetGenerationLast()
                         |> Result.ofOption "Missing generationCount in run parameters"
 
             let! (parentSorterSetEval: sorterSetEval) =
@@ -366,105 +366,6 @@ module MsceSgdExecutor =
         }
 
 
-
-
-    let _evaluateMutants 
-            (makeMutantSorterModels: runParameters -> Async<Result<sorterModel seq, string>> )
-            (makeSortableTests: runParameters -> Async<Result<sortableTest, string>>)
-            (host: IRunHost)
-            (rp: runParameters) 
-            (allowOverwrite: bool<allowOverwrite>) 
-            (cts: CancellationTokenSource) 
-            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
-
-        let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
-
-        asyncResult {
-            try
-                do! checkCancellation cts.Token
-                
-                // 1. Fetch mutant sorter models as a lazy stream sequence
-                log "Generating Mutant Sorter Models Stream..."
-                let! (allMutantStream: sorterModel seq) = makeMutantSorterModels rp
-                
-                let sortersPerSplit = 1000
-                
-                let! sorterEvalType =
-                    rp.GetSorterEvalType() 
-                    |> Result.ofOption "Missing sorterEvalType."
-
-                do! checkCancellation cts.Token
-                log "Generating Sortable Tests..."
-                let! tests = makeSortableTests rp 
-
-                let! qpSorterSet = 
-                    host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSet "")
-                    |> Result.ofOption "Failed to create QueryParams for SorterSet."
-
-                let! qpEval = 
-                    host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
-                    |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
-
-                let collectTests = CollectSortableTests
-                let testId = tests |> SortableTests.getId
-                
-                // 2. Setup Accumulators and Lazy Chunk Loop via Seq.chunkBySize
-                log "Running Split Sorter Generation, Stream Chunk Evaluations, & Aggregation..."
-                let allChunksEvals = ResizeArray<sorterEval[]>()
-                let mutable chunkCounter = 0
-
-                let chunkedMutants = allMutantStream |> Seq.chunkBySize sortersPerSplit
-
-                for modelChunk in chunkedMutants do
-                    do! checkCancellation cts.Token
-                    chunkCounter <- chunkCounter + 1
-                    log (sprintf "Processing mutant chunk %d..." chunkCounter)
-                    
-                    // Wrap the subset models into an explicit SorterModelSet container
-                    let modelSetChunk = sorterModelSet.create (Guid.Empty |> UMX.tag) modelChunk
-
-                    // Materialize into a functional SorterSet chunk
-                    let fullSorterSetChunk = 
-                        SorterModelSet.makeSorterSet (Guid.Empty |> UMX.tag) modelSetChunk
-
-                    // Compute sorter evaluations directly from the targeted network chunk
-                    let sorterEvalsChunk = 
-                        SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters tests sorterEvalType collectTests
-
-                    // Accumulate transient array chunk results
-                    allChunksEvals.Add(sorterEvalsChunk)
-                    
-                    // Explicit GC collection cycle over the finished slice to drop garbage immediately
-                    System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
-                    GC.Collect(2, GCCollectionMode.Forced, true, true)
-
-                // 3. Compile Master SorterSetEval structure
-                log "Compiling final Master Mutant SorterSetEval structure..."
-                let correctSorterSetId = (%qpSorterSet.Id) |> UMX.tag<sorterSetId>
-                
-                let finalEvalsArray = allChunksEvals |> Array.concat
-                let finalSorterSetEval = 
-                    sorterSetEval.create 
-                        (%qpEval.Id |> UMX.tag) 
-                        correctSorterSetId 
-                        testId 
-                        finalEvalsArray
-
-                // 4. Persistence
-                log (sprintf "Saving Combined Mutant SorterSetEval %s" (string %qpEval.Id))
-                do! host.RunDb.saveAsync qpEval (finalSorterSetEval |> outputData.SorterSetEval) allowOverwrite
-                
-                log "Mutant Evaluation Run Complete."
-                return rp.WithRunFinished (Some true)
-
-            with e -> 
-                let errorMsg = sprintf "Fatal Error in %s: %s" (rp |> RunParameters.getIdString) e.Message
-                log errorMsg 
-                return! Error errorMsg
-        } |> Async.map (logResult progress log)
-
-
     /// Dispatches the evolution history run parameters, executes the generative loop via asyncResult,
     /// and manages final state serialization/reporting pipelines.
     let evaluateEvolutionRun
@@ -485,7 +386,7 @@ module MsceSgdExecutor =
 
                 // 1. Gather all required run metrics and options out of your parameters block securely
                 let! sortingWidth = rp.GetSortingWidth() |> Result.ofOption "Missing sorting width."
-                let! genCount = rp.GetGenerationCount() |> Result.ofOption "Missing generation count."
+                let! genCount = rp.GetGenerationLast() |> Result.ofOption "Missing generation count."
                 let! poolCount = rp.GetSorterPoolCount() |> Result.ofOption "Missing poolCount."
                 let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
                 let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count"
@@ -572,8 +473,10 @@ module MsceSgdExecutor =
                                                         log
 
                 // 4. Persistence of run stats mapping results out to output streams
+
+                let newRp = rp.WithGenerationQueryFirst (Some false)
                 let! qpRunResult = 
-                    host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterRunResult "")
+                    host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.SorterRunResult "")
                     |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
 
                 log (sprintf "Saving SorterRunResult - Id: %s" (string qpRunResult.Id))
@@ -581,24 +484,13 @@ module MsceSgdExecutor =
                 
                 
                 log "evaluateEvolutionRun completed."
-                return rp.WithRunFinished (Some true)
+                return newRp.WithRunFinished (Some true)
 
             with e -> 
                 let errorMsg = sprintf "Error in evaluateEvolutionRun: %s" e.Message
                 log errorMsg 
                 return! Error errorMsg
         } |> Async.map (logResult progress log)
-
-
-
-
-
-
-
-
-
-
-
 
 
 

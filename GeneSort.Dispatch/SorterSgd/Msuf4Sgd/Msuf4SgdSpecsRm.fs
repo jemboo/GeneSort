@@ -26,7 +26,7 @@ module Msuf4SgdSpecsRm =
    
        
     let generationCount = 
-            (runParameters.generationCountKey, [10] |> List.map string)
+            (runParameters.generationLastKey, [10] |> List.map string)
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  

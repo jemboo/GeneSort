@@ -79,9 +79,9 @@ module Msuf4SgdExecutor =
                         rp.GetSimpleSorterModelType() 
                         |> Result.ofOption "Missing simple sorter model type in run parameters"
 
-            let! (sorterChildCount: int<sorterCount>) = 
+            let! (sorterChildCount: int<sorterChildCount>) = 
                         rp.GetSorterChildCount()
-                        |> Result.ofOption "Missing parent sorter count in run parameters"
+                        |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
             let! (orthoRate: float<orthoRate>) =  
                         rp.GetOrthoRate()
@@ -112,7 +112,7 @@ module Msuf4SgdExecutor =
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
             let! (genCt: int<generationNumber>) =
-                        rp.GetGenerationCount()
+                        rp.GetGenerationLast()
                         |> Result.ofOption "Missing generationCount in run parameters"
 
             let rngFactory = rngType |> RngFactory.create
@@ -192,9 +192,9 @@ module Msuf4SgdExecutor =
                         rp.GetMergeSuffixType() 
                         |> Result.ofOption "Missing mergeSuffixType in run parameters"
 
-            let! (sorterChildCount: int<sorterCount>) = 
+            let! (sorterChildCount: int<sorterChildCount>) = 
                         rp.GetSorterChildCount()
-                        |> Result.ofOption "Missing parent sorter count in run parameters"
+                        |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
             let! (orthoRate: float<orthoRate>) =  
                         rp.GetOrthoRate()
@@ -225,7 +225,7 @@ module Msuf4SgdExecutor =
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
             let! (genCt: int<generationNumber>) =
-                        rp.GetGenerationCount()
+                        rp.GetGenerationLast()
                         |> Result.ofOption "Missing generationCount in run parameters"            
 
 
@@ -305,9 +305,9 @@ module Msuf4SgdExecutor =
                         rp.GetSimpleSorterModelType() 
                         |> Result.ofOption "Missing simple sorter model type in run parameters"
 
-            let! (sorterChildCount: int<sorterCount>) = 
+            let! (sorterChildCount: int<sorterChildCount>) = 
                         rp.GetSorterChildCount()
-                        |> Result.ofOption "Missing parent sorter count in run parameters"
+                        |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
             let! (orthoRate: float<orthoRate>) =  
                         rp.GetOrthoRate()
@@ -338,7 +338,7 @@ module Msuf4SgdExecutor =
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
             let! (genCt: int<generationNumber>) =
-                        rp.GetGenerationCount()
+                        rp.GetGenerationLast()
                         |> Result.ofOption "Missing generationCount in run parameters"
 
 
