@@ -485,45 +485,30 @@ module MsceSgdExecutor =
 
                 // 1. Gather all required run metrics and options out of your parameters block securely
                 let! sortingWidth = rp.GetSortingWidth() |> Result.ofOption "Missing sorting width."
-                let! genCount = rp.GetGenerationCount() |> Result.ofOption "Missing generation count parameters."
-                let! poolCount = rp.GetSorterPoolCount() |> Result.ofOption "Missing poolCount parameter mapping settings."
-                let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool parameter settings."
+                let! genCount = rp.GetGenerationCount() |> Result.ofOption "Missing generation count."
+                let! poolCount = rp.GetSorterPoolCount() |> Result.ofOption "Missing poolCount."
+                let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
                 let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count"
-                let! selectionMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing baseline selection evaluation metrics."
-                let! sorterEvalType = rp.GetSorterEvalType() |> Result.ofOption "Missing evaluation execution profile type structures."
-                let! rngType = rp.GetRngType() |> Result.ofOption "Missing source engine pseudo-random layout generator."
+                let! selectionMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing selectionMeasure."
+                let! sorterEvalType = rp.GetSorterEvalType() |> Result.ofOption "Missing sorterEvalType."
+                let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
                 let! simpleSorterModelType = 
                                     rp.GetSimpleSorterModelType() 
-                                    |> Result.ofOption "Missing inner layout design configuration types."
+                                    |> Result.ofOption "Missing simpleSorterModelType."
 
                 let! (sorterEvalSelectionType: sorterEvalSelectionType) =
                                     rp.GetSorterEvalSelectionType() 
-                                    |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
+                                    |> Result.ofOption "Missing sorterEvalSelectionType"
 
-                // Rates for mutator creation
-                let! mutationRate = rp.GetMutationRate() |> Result.ofOption "Missing mutationRate."
-                let! insertionRate = rp.GetInsertionRate() |> Result.ofOption "Missing insertionRate."
-                let! deletionRate = rp.GetDeletionRate() |> Result.ofOption "Missing deletionRate."
-                let! modificationRate = rp.GetModificationRate() |> Result.ofOption "Missing modificationRate."
+
 
                 do! checkCancellation cts.Token
                 log "Executing makeSortableTests..."
                 let! sortableTest = makeSortableTests rp
 
-                // 2. Instantiate Mutator and Initialization Set
-                let rngFactory = RngFactory.create rngType
-                let sorterModelMutator = 
-                    SimpleSorterModelMutator.getMsceModelMutator
-                                rngFactory 
-                                ExcludeSelfCe 
-                                modificationRate 
-                                mutationRate
-                                insertionRate
-                                deletionRate
-                    |> sorterModelMutator.Simple
 
                 log "Fetching sorterSetEval..."
-                let! (parentSorterSetEval : sorterSetEval) = 
+                let! (parentSorterSetEval :sorterSetEval) = 
                                 SorterEvalDbs.getStandardSorterEvals 
                                     sortingWidth 
                                     simpleSorterModelType 
@@ -535,14 +520,14 @@ module MsceSgdExecutor =
                                                 sortingWidth 
                                                 simpleSorterModelType
 
-                let selectionEngine = SorterEvalSelection.makeSelection 
+                let sorterEvalSelection = SorterEvalSelection.makeSelection 
                                                 selectionMeasure 
                                                 sorterEvalSelectionType 
                                                 parentSorterSetEval.SorterEvals 
                                                 parentSorterSetEval.SorterTestId
                 
                 // Reconstruct initial seed pool set to begin tracking iterations 
-                let seedSorterModelSet = selectionEngine.MakeSorterModelSet 
+                let seedSorterModelSet = sorterEvalSelection.MakeSorterModelSet 
                                                 (Guid.Empty |> UMX.tag) 
                                                 seedSorterModelGen
 
@@ -553,6 +538,25 @@ module MsceSgdExecutor =
                                                 sortersPerPool
                                                 (0 |> UMX.tag<generationNumber>)
                                                 seedSorterModelSet
+
+
+                
+                log "Making sorterModelMutator..."
+                // Rates for mutator creation
+                let! mutationRate = rp.GetMutationRate() |> Result.ofOption "Missing mutationRate."
+                let! insertionRate = rp.GetInsertionRate() |> Result.ofOption "Missing insertionRate."
+                let! deletionRate = rp.GetDeletionRate() |> Result.ofOption "Missing deletionRate."
+                let! modificationRate = rp.GetModificationRate() |> Result.ofOption "Missing modificationRate."
+
+                let sorterModelMutator = 
+                    SimpleSorterModelMutator.getMsceModelMutator
+                                (RngFactory.create rngType) 
+                                ExcludeSelfCe 
+                                modificationRate 
+                                mutationRate
+                                insertionRate
+                                deletionRate
+                    |> sorterModelMutator.Simple
 
                 log "Executing SorterRunResult.runEvolutionAsync..."
                 let! (runResult: sorterRunResult) = SorterRunResult.runEvolutionAsync

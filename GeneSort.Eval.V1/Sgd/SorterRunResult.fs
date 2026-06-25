@@ -109,7 +109,7 @@ module SorterRunResult =
 
                     // log "Executing generation processing step..."
                     let reEvaluateParents = false
-                    let nextSet = 
+                    let nextSorterPoolSet = 
                         SorterPipeline.runGenerationStep 
                             mutator 
                             sorterCountPerPool
@@ -126,7 +126,7 @@ module SorterRunResult =
                         System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
                         GC.Collect(2, GCCollectionMode.Forced, true, true)
 
-                    return! loop (remainingSteps - 1) nextSet updatedHistory
+                    return! loop (remainingSteps - 1) nextSorterPoolSet updatedHistory
             }
 
         loop %genCount seedSorterPoolSet []

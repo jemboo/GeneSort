@@ -49,14 +49,14 @@ type sorterEvalSelection =
     private {
         selectionType : sorterEvalSelectionType
         measure       : sorterEvalMeasure
-        items         : (evalLabel * sorterEval) array
+        labeledSorterEvals : (evalLabel * sorterEval) array
         sortableTestId: Guid<sortableTestId>
     }
 
     static member Empty = 
         { selectionType = Tmb 0<sorterCount>; 
           measure = CeLength false; 
-          items = [||] 
+          labeledSorterEvals = [||] 
           sortableTestId = Guid.Empty |> UMX.tag<sortableTestId>}
 
     static member create 
@@ -67,16 +67,16 @@ type sorterEvalSelection =
             { 
                 selectionType = selType; 
                 measure = measure; 
-                items = items 
+                labeledSorterEvals = items 
                 sortableTestId = sortableTestId
             }
 
     member this.SelectionType = this.selectionType
     member this.Measure       = this.measure
-    member this.Items         = this.items
+    member this.LabeledSorterEvals with get() = this.labeledSorterEvals
 
     member this.ToMap() : Map<Guid<sorterId>, (evalLabel * sorterEval)> =
-        this.items 
+        this.labeledSorterEvals 
         |> Array.map (fun (label, se) -> (se |> SorterEval.getSorterId, (label, se)))
         |> Map.ofArray
 
@@ -84,7 +84,7 @@ type sorterEvalSelection =
                     (sorterModelSetId: Guid<sorterModelSetId>) 
                     (sorterModelGen: sorterModelGen) : sorterModelSet =
             let sorterModelIds = 
-                this.items 
+                this.labeledSorterEvals 
                 |> Array.map(fun (_, se) -> 
                     se |> SorterEval.getSorterId |> UMX.untag |> UMX.tag<sorterModelId>)
 
@@ -116,7 +116,7 @@ module SorterEvalSelection =
         match selType with
         | TopN count ->
             let n = %count
-            if n <= 0 then failwithf "Requested TopN count must be greater than zero, but was %d" n
+            if n <= 0 then failwithf "TopN count must be greater than zero, but was %d" n
             
             let topN = cleanItems |> Array.sortBy ranker |> Array.truncate n
             let labeledItems = topN |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
@@ -131,20 +131,24 @@ module SorterEvalSelection =
             else
                 let sortedItems = cleanItems |> Array.sortBy ranker
                 
-                let topGroup = sortedItems.[0 .. targetSize - 1] |> Array.map (fun se -> evalLabel.Tmb tmbGroup.Top, se)
+                let topGroup = sortedItems.[0 .. targetSize - 1] 
+                               |> Array.map (fun se -> evalLabel.Tmb tmbGroup.Top, se)
                 
                 let midStart = cleanItems.Length / 2 - (targetSize / 2)
-                let midGroup = sortedItems.[midStart .. midStart + targetSize - 1] |> Array.map (fun se -> evalLabel.Tmb tmbGroup.Middle, se)
+                let midGroup = sortedItems.[midStart .. midStart + targetSize - 1] 
+                               |> Array.map (fun se -> evalLabel.Tmb tmbGroup.Middle, se)
                 
-                let botGroup = sortedItems.[cleanItems.Length - targetSize .. cleanItems.Length - 1] |> Array.map (fun se -> evalLabel.Tmb tmbGroup.Bottom, se)
+                let botGroup = sortedItems.[cleanItems.Length - targetSize .. cleanItems.Length - 1] 
+                               |> Array.map (fun se -> evalLabel.Tmb tmbGroup.Bottom, se)
                 
-                let combined = Array.concat [topGroup; midGroup; botGroup]
-                sorterEvalSelection.create selType measure combined sortableTestId
+                let labeledItems = Array.concat [topGroup; midGroup; botGroup]
+                sorterEvalSelection.create selType measure labeledItems sortableTestId
 
         | IndexSpan count ->
             let sampleCount = %count
-            if sampleCount <= 0 then failwithf "Requested sample count must be greater than zero, but was %d" sampleCount
-            if cleanItems.Length < sampleCount then failwithf "Cannot sample %d items; only %d options available." sampleCount cleanItems.Length
+            if sampleCount <= 0 then failwithf "Sample count must be greater than zero, but was %d" sampleCount
+            if cleanItems.Length < sampleCount then failwithf "Cannot sample %d items; only %d options available." 
+                                                        sampleCount cleanItems.Length
 
             let sortedItems = cleanItems |> Array.sortBy ranker
             let result = 
@@ -163,8 +167,9 @@ module SorterEvalSelection =
 
         | ValueSpan count ->
             let sampleCount = %count
-            if sampleCount <= 0 then failwithf "Requested sample count must be greater than zero, but was %d" sampleCount
-            if cleanItems.Length < sampleCount then failwithf "Cannot sample %d items; only %d options available." sampleCount cleanItems.Length
+            if sampleCount <= 0 then failwithf "Sample count must be greater than zero, but was %d" sampleCount
+            if cleanItems.Length < sampleCount then failwithf "Cannot sample %d items; only %d options available." 
+                                                        sampleCount cleanItems.Length
 
             let sortedItems = cleanItems |> Array.sortBy ranker
             let result = 
@@ -220,7 +225,7 @@ module EvalReporting =
 
         let contextDtr = createContextDtr leadCols selection
 
-        selection.Items
+        selection.LabeledSorterEvals
         |> Array.collect (fun (label, se) -> 
             let labelDtr = evalLabelToDtr label |> dataTableRecord.combine contextDtr
             se 
@@ -235,7 +240,7 @@ module EvalReporting =
 
         let contextDtr = createContextDtr leadCols selection
 
-        selection.Items
+        selection.LabeledSorterEvals
         |> Array.map (fun (label, se) -> 
             let labelDtr = evalLabelToDtr label |> dataTableRecord.combine contextDtr
             (
