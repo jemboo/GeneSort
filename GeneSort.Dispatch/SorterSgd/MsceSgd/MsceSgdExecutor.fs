@@ -555,16 +555,14 @@ module MsceSgdExecutor =
                                                 seedSorterModelSet
 
                 log "Executing SorterRunResult.runEvolutionAsync..."
-                let collectNewSortableTests = false
                 let! (runResult: sorterRunResult) = SorterRunResult.runEvolutionAsync
                                                         genCount
                                                         sorterModelMutator
+                                                        sortersPerPool
                                                         sorterChildCount
                                                         sortableTest
                                                         sorterEvalType
-                                                        collectNewSortableTests
                                                         selectionMeasure
-                                                        sortersPerPool
                                                         seedSorterPoolSet
                                                         cts.Token
                                                         log

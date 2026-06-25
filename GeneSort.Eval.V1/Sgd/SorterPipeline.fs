@@ -10,27 +10,31 @@ module SorterPipeline =
     /// Executes one full generational iteration of the algorithm suite
     let runGenerationStep
             (mutator: sorterModelMutator)
-            (mutantsPerSorter: int<sorterCount>)
+            (sorterCountPerPool: int<sorterCountPerPool>)
+            (sorterChildCount: int<sorterCount>)
             (sortableTest: sortableTest)
             (sorterEvalType: sorterEvalType)
-            (collectNewSortableTests: bool)
             (selectionMeasure: sorterEvalMeasure)
-            (prunedSize: int<sorterCountPerPool>)
+            (reEvaluateParents: bool)
             (currentPoolSet: sorterPoolSet) : sorterPoolSet =
 
         currentPoolSet
         // Step 1: Expand the population across all sub-pools
-        |> SorterPoolSet.mutate mutator mutantsPerSorter
+        |> SorterPoolSet.mutate mutator sorterChildCount
         
         // Step 2: Extract, evaluate, and transform the operational scores back into context
         |> (fun expandedPoolSet ->
-            let computedEvals = 
-                expandedPoolSet 
-                |> SorterPoolRunner.evaluatePoolSet sortableTest sorterEvalType collectNewSortableTests
+                let computedEvals = 
+                    expandedPoolSet 
+                    |> SorterPoolRunner.evaluatePoolSet 
+                                        sortableTest 
+                                        sorterEvalType 
+                                        reEvaluateParents
             
-            expandedPoolSet |> SorterPoolSet.updateSorterEvals computedEvals
+                expandedPoolSet 
+                |> SorterPoolSet.updateSorterEvals computedEvals
         )
         
         // Step 3: Trim out defective or un-optimized sorters down to baseline target capacities
-        |> SorterPoolSet.pruneSorterPools selectionMeasure prunedSize
+        |> SorterPoolSet.pruneSorterPools selectionMeasure sorterCountPerPool
         |> SorterPoolSet.advanceGeneration 1

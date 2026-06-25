@@ -34,10 +34,9 @@ module SorterRunResult =
     let runEvolution 
             (genCount: int<generationNumber>)
             (mutator: sorterModelMutator)
-            (mutantsPerSorter: int<sorterCount>)
+            (sorterChildCount: int<sorterCount>)
             (sortableTest: sortableTest)
             (sorterEvalType: sorterEvalType)
-            (collectNewSortableTests: bool)
             (selectionMeasure: sorterEvalMeasure)
             (sorterCountPerPool: int<sorterCountPerPool>)
             (initialPoolSet: sorterPoolSet) : sorterRunResult =
@@ -53,16 +52,17 @@ module SorterRunResult =
                 let updatedHistory = currentSnapshot :: historyAcc
 
                 // 2. Advance the heavy state across the pipeline axis
+                let reEvaluateParents = false
                 let nextSet = 
-                    currentSet 
-                    |> SorterPipeline.runGenerationStep 
-                        mutator 
-                        mutantsPerSorter 
+                    SorterPipeline.runGenerationStep 
+                        mutator  
+                        sorterCountPerPool
+                        sorterChildCount 
                         sortableTest 
                         sorterEvalType 
-                        collectNewSortableTests 
                         selectionMeasure 
-                        sorterCountPerPool
+                        reEvaluateParents
+                        currentSet
 
                 loop (remainingSteps - 1) nextSet updatedHistory
 
@@ -75,19 +75,18 @@ module SorterRunResult =
     let runEvolutionAsync
             (genCount: int<generationNumber>)
             (mutator: sorterModelMutator)
+            (sorterCountPerPool: int<sorterCountPerPool>)
             (sorterChildCount: int<sorterCount>)
             (sortableTest: sortableTest)
             (sorterEvalType: sorterEvalType)
-            (collectNewSortableTests: bool)
             (selectionMeasure: sorterEvalMeasure)
-            (sorterCountPerPool: int<sorterCountPerPool>)
-            (initialPoolSet: sorterPoolSet)
+            (seedSorterPoolSet: sorterPoolSet)
             (cts: CancellationToken)
             (log: string -> unit) : Async<Result<sorterRunResult, string>> =
 
         let rec loop 
                     (remainingSteps: int) 
-                    (currentSet: sorterPoolSet) 
+                    (currentSorterPoolSet: sorterPoolSet) 
                     (historyAcc: sorterPoolSetDescription list) 
                     : Async<Result<sorterRunResult, string>> =
             asyncResult {
@@ -98,36 +97,37 @@ module SorterRunResult =
                 if remainingSteps <= 0 then
                     let finalResult = 
                         sorterRunResult.create 
-                            currentSet 
+                            currentSorterPoolSet 
                             (historyAcc |> List.rev |> List.toArray)
                     return finalResult
                 else
                     log (sprintf "Starting evolution step. Remaining generations: %d" remainingSteps)
 
                     // 1. Snapshot the current generation state before applying structural changes
-                    let currentSnapshot = SorterPoolSetDescription.fromPoolSet currentSet
+                    let currentSnapshot = SorterPoolSetDescription.fromPoolSet currentSorterPoolSet
                     let updatedHistory = currentSnapshot :: historyAcc
 
-                    // 2. Advance the heavy state across your pipeline step axis.
-                    // If your real SorterPipeline is still synchronous, wrap it inside asyncResult.retn
                     // log "Executing generation processing step..."
+                    let reEvaluateParents = false
                     let nextSet = 
                         SorterPipeline.runGenerationStep 
                             mutator 
+                            sorterCountPerPool
                             sorterChildCount 
                             sortableTest 
-                            sorterEvalType 
-                            collectNewSortableTests 
+                            sorterEvalType
                             selectionMeasure 
-                            sorterCountPerPool
-                            currentSet
+                            reEvaluateParents
+                            currentSorterPoolSet
+                            
 
-                    // 3. Clear transient allocations before executing the next generational depth
-                    System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
-                    GC.Collect(2, GCCollectionMode.Forced, true, true)
+                    // Only force a GC sweep every 50 generations to minimize overhead
+                    if remainingSteps % 50 = 0 then
+                        System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
+                        GC.Collect(2, GCCollectionMode.Forced, true, true)
 
                     return! loop (remainingSteps - 1) nextSet updatedHistory
             }
 
-        loop %genCount initialPoolSet []
+        loop %genCount seedSorterPoolSet []
 
