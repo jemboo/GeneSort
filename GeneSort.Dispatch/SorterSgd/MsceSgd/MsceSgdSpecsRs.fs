@@ -28,10 +28,10 @@ module MsceSgdSpecsRs =
     
    
     let generationLast = 
-            (runParameters.generationLastKey, [40] |> List.map string)
+            (runParameters.generationLastKey, [60] |> List.map string)
 
     let generationFirst = 
-            (runParameters.generationFirstKey, [20] |> List.map string)
+            (runParameters.generationFirstKey, [40] |> List.map string)
 
 
     let generationQueryFirst = 
@@ -64,7 +64,7 @@ module MsceSgdSpecsRs =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
             DatabaseName = MsceSgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Test1_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Test2_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msce"
             Spans = [
                 msceModelType

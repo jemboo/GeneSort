@@ -132,3 +132,11 @@ module SorterRunResult =
 
         loop %genCount seedSorterPoolSet []
 
+
+    // extracts dataTableRecords out of sorterRunResult.IntermediateHistory only
+    let toDataTableRecords (prefix: string) (srRes: sorterRunResult) : dataTableRecord array =
+        srRes.IntermediateHistory
+        |> Array.collect (fun poolSetDesc -> 
+            poolSetDesc 
+            |> SorterPoolSetDescription.toDataTableRecords prefix
+        )

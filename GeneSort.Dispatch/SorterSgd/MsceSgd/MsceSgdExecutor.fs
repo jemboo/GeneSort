@@ -449,23 +449,23 @@ module MsceSgdExecutor =
                 do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
-    
-                let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
-                                        |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
-                let! outB = host.RunDb.loadAsync qpSorterSetEval
-                let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
+                let newRp = rp.WithQueryWithGenFirst (Some true)
+                let! qpSorterRunResult = host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.SorterRunResult "")
+                                        |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
+                let! outB = host.RunDb.loadAsync qpSorterRunResult
+                let! (srResult : sorterRunResult) = outB |> OutputData.asSorterRunResult |> Async.singleton
 
-                let reportName = (sprintf "FullEvalReport" |> UMX.tag<textReportName>)
+                let reportName = (sprintf "SorterRunResult_report" |> UMX.tag<textReportName>)
 
-                let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                let! qpReport = host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.TextReport reportName)
                                 |> Result.ofOption "Failed to create QueryParams for Report."
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
-                let details = sorterSetEvals |> SorterSetEval.makeFullDataTableRecords
+                let details = srResult |> SorterRunResult.toDataTableRecords ""
                 let dtrs = dataTableRecord.combineWithMany details leadCols
                 let report = DataTableReport.fromDataTableRecords dtrs
 
                 let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
-                let yab = (rp : runParameters).WithRunFinished(Some true)
+                let yab = (newRp : runParameters).WithRunFinished(Some true)
                 return yab
             with e -> 
                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)

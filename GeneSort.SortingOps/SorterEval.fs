@@ -307,7 +307,8 @@ module SorterEval =
         | V2 v2 -> v2.ToDataTableRecord()
         | V3 v3 -> v3.ToDataTableRecord()
 
-    let toDataTableRecordWithPrefix (prefix: string) (eval: sorterEval) : dataTableRecord =
+    let toDataTableRecordWithPrefix (prefix: string) 
+                                    (eval: sorterEval) : dataTableRecord =
         match eval with
         | V1 v1 -> v1.ToDataTableRecordWithPrefix(prefix)
         | V2 v2 -> v2.ToDataTableRecordWithPrefix(prefix)

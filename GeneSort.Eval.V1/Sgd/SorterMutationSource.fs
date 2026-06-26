@@ -2,6 +2,7 @@
 
 open FSharp.UMX
 open GeneSort.Model.Sorting.V1
+open GeneSort.Core
 
 type sorterMutationSource =
     private {
@@ -22,3 +23,12 @@ type sorterMutationSource =
             _sorterModelId = parentSorterModelId
             _mutationIndex = parentMutationIndex 
         }
+
+
+module SorterMutationSource = 
+    
+    let toDataTableRecordWithPrefix (prefix: string) (source: sorterMutationSource) : dataTableRecord =
+        dataTableRecord.createEmpty()
+        |> dataTableRecord.addData (sprintf "%sSorterModelMutatorId" prefix) (string (%source.SorterModelMutatorId))
+        |> dataTableRecord.addData (sprintf "%sParentSorterModelId" prefix) (string (%source.SorterModelId))
+        |> dataTableRecord.addData (sprintf "%sParentMutationIndex" prefix) (string (%source.SorterMutationIndex))
