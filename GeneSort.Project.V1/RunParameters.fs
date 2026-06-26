@@ -26,7 +26,7 @@ type runParameters =
     static member excludeSelfCeKey = "ExcludeSelfCe"
     static member generationFirstKey = "GenerationFirst"
     static member generationLastKey = "GenerationLast"
-    static member generationQueryFirst = "GenerationQueryFirst"
+    static member queryWithGenFirst = "QueryWithGenFirst"
     static member idKey = "Id"
     static member insertionRateKey = "InsertionRate"
     static member latticeDistanceKey = "LatticeDistance"
@@ -121,8 +121,8 @@ type runParameters =
         runParameters.tryGetInt runParameters.generationLastKey this.paramMap
         |> Option.map UMX.tag<generationNumber>
 
-    member this.GetGenerationQueryFirst() =
-        runParameters.tryGetBool runParameters.generationQueryFirst this.paramMap
+    member this.GetQueryWithGenFirst() =
+        runParameters.tryGetBool runParameters.queryWithGenFirst this.paramMap
 
     member this.GetId() =
         runParameters.tryGetGuid runParameters.idKey this.paramMap
@@ -296,8 +296,8 @@ type runParameters =
     member this.WithGenerationLast(gen: int<generationNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationLastKey (gen |> Option.map UmxExt.intToRaw) }
 
-    member this.WithGenerationQueryFirst(qf: bool option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationQueryFirst (qf |> Option.map UmxExt.boolToRaw) }
+    member this.WithQueryWithGenFirst(qf: bool option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.queryWithGenFirst (qf |> Option.map UmxExt.boolToRaw) }
 
     member this.WithId(id: Guid<queryParamsId> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.idKey (id |> Option.map UmxExt.guidToRaw) }

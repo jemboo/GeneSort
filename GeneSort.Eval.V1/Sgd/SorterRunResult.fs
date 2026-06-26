@@ -67,12 +67,11 @@ module SorterRunResult =
                 loop (remainingSteps - 1) nextSet updatedHistory
 
         loop %genCount initialPoolSet []
-
-
-    /// Asynchronously runs the generation loops step N times using an asyncResult pipeline.
+/// Asynchronously runs the generation loops step N times using an asyncResult pipeline.
     /// Accumulates lightweight snapshots for intermediate states and forced GC compacting 
     /// over long execution steps.
     let runEvolutionAsync
+            (genStart: int<generationNumber>)
             (genCount: int<generationNumber>)
             (mutator: sorterModelMutator)
             (sorterCountPerPool: int<sorterCountPerPool>)
@@ -101,7 +100,9 @@ module SorterRunResult =
                             (historyAcc |> List.rev |> List.toArray)
                     return finalResult
                 else
-                    log (sprintf "Starting evolution step. Remaining generations: %d" remainingSteps)
+                    let currentGen = genStart + (genCount - %remainingSteps)
+                    let totalGen = genStart + genCount
+                    log (sprintf "Starting evolution step. Generation %d of %d" currentGen totalGen)
 
                     // 1. Snapshot the current generation state before applying structural changes
                     let currentSnapshot = SorterPoolSetDescription.fromPoolSet currentSorterPoolSet
