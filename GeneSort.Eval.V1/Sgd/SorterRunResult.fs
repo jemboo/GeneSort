@@ -89,7 +89,7 @@ module SorterRunResult =
                     (historyAcc: sorterPoolSetDescription list) 
                     : Async<Result<sorterRunResult, string>> =
             asyncResult {
-                // Safeguard against downstream timeouts or execution cancellations
+                let reportFreq = 100
                 if cts.IsCancellationRequested then 
                     return! Error "runEvolutionAsync was cancelled."
 
@@ -102,11 +102,15 @@ module SorterRunResult =
                 else
                     let currentGen = genStart + (genCount - %remainingSteps)
                     let totalGen = genStart + genCount
-                    log (sprintf "Starting evolution step. Generation %d of %d" currentGen totalGen)
+                    if (%currentGen % reportFreq = 1) then
+                        log (sprintf "Starting evolution step. Generation %d of %d" currentGen totalGen)
 
                     // 1. Snapshot the current generation state before applying structural changes
                     let currentSnapshot = SorterPoolSetDescription.fromPoolSet currentSorterPoolSet
-                    let updatedHistory = currentSnapshot :: historyAcc
+                    let updatedHistory = 
+                        if (%currentGen % reportFreq = 1) then
+                            currentSnapshot :: historyAcc
+                            else historyAcc
 
                     // log "Executing generation processing step..."
                     let reEvaluateParents = false

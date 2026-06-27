@@ -38,14 +38,14 @@ type dataTableReport =
     member this.SaveToStream (stream: Stream) =
         use writer = new StreamWriter(stream, Encoding.UTF8, 1024, true)
     
-        // First line: Name and timestamp
-        writer.WriteLine($"{this.name}\t{this.timeStamp}")
+        //// First line: Name and timestamp
+        //writer.WriteLine($"{this.name}\t{this.timeStamp}")
     
-        // Second line: Blank line
-        writer.WriteLine()
+        //// Second line: Blank line
+        //writer.WriteLine()
     
-        // Next line: Blank line
-        writer.WriteLine()
+        //// Next line: Blank line
+        //writer.WriteLine()
     
         // Next line: Headers
         writer.WriteLine(String.Join("\t", this.dataHeaders))
