@@ -45,7 +45,7 @@ module CommonParams =
     let twoSortersPerPool = (runParameters.sorterCountPerPoolKey, ["2";] )
 
     // SorterPoolCounts
-    let testPoolCount = (runParameters.sorterPoolCountKey, ["9";] )
+    let testPoolCount = (runParameters.sorterPoolCountKey, ["30";] )
     let smallPoolCount = (runParameters.sorterPoolCountKey, ["10";] )
     let mediumPoolCount = (runParameters.sorterPoolCountKey, ["100";] )
     let largePoolCount = (runParameters.sorterPoolCountKey, ["1000";] )
@@ -99,6 +99,8 @@ module CommonParams =
     // SortingWidths
     let testSortingWidths = 
             (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
+    let sortingWidth16 = 
+            (runParameters.sortingWidthKey, [16] |> List.map string)
     let smallSortingWidths = 
             (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
     let mediumSortingWidths = 

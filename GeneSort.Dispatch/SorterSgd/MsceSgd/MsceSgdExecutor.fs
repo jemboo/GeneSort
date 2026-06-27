@@ -449,7 +449,7 @@ module MsceSgdExecutor =
                 do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
-                let newRp = rp.WithQueryWithGenFirst (Some true)
+                let newRp = rp.WithQueryWithGenFirst (Some false)
                 let! qpSorterRunResult = host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.SorterRunResult "")
                                         |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
                 let! outB = host.RunDb.loadAsync qpSorterRunResult
@@ -467,80 +467,6 @@ module MsceSgdExecutor =
                 let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
                 let yab = (newRp : runParameters).WithRunFinished(Some true)
                 return yab
-            with e -> 
-               return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
-        } |> Async.map (logResult progress log)
-
-
-
-    let makeMutantReport
-            (mutantDetailsMaker: runParameters -> Async<Result<sorterEvalSelection * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>> )
-            (host: IRunHost)
-            (rp: runParameters) 
-            (allowOverwrite: bool<allowOverwrite>) 
-            (cts: CancellationTokenSource) 
-            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
-
-
-        let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
-
-        asyncResult {
-            try
-                do! checkCancellation cts.Token
-                let runId = rp |> RunParameters.getIdString
-                OpsUtils.report progress (sprintf "%s Starting Mutant Report for Run %s" (MathUtils.getTimestampString()) %runId)
-                let reportName = (sprintf "MutantReport" |> UMX.tag<textReportName>)
-
-                let! (_sorterEvalSelection, (mutantIdToParentIdMap: Map<Guid<sorterModelId>,Guid<sorterModelId>>)) = mutantDetailsMaker rp
-
-                let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
-                                        |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
-                let! outB = host.RunDb.loadAsync qpSorterSetEval
-                let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
-
-                let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
-                                |> Result.ofOption "Failed to create QueryParams for Report."
-                let leadCols = qpReport |> QueryParams.makeDataTableRecord
-                let parentRecordMap = _sorterEvalSelection |> EvalReporting.toDataTableRecords leadCols "Parent_"
-
-                let tupes =
-                    sorterSetEvals.SorterEvals
-                    |> Array.choose (fun se -> 
-                        let (sorterModelId : Guid<sorterModelId>) = se |> SorterEval.getSorterId |> UMX.untag |> UMX.tag<sorterModelId>
-        
-                        match mutantIdToParentIdMap |> Map.tryFind sorterModelId with
-                        | None -> None // Safely ignore if the parent mapping is missing
-                        | Some parentSorterModelId ->
-                            Some (parentSorterModelId, se)
-                    ) |> Array.groupBy fst
-
-                let yab = tupes |> Array.map(fun (parentSorterModelId, group) ->
-                    (parentSorterModelId, group |> Array.map(snd)))
-
-                let wab = yab |> Array.map(fun (parentSorterModelId, ses) ->
-                            let evBinSet = sorterEvalBinSet.createFromSorterEvals
-                                                (Guid.Empty |> UMX.tag<sorterEvalBinSetId>)
-                                                (sorterSetEvals.SorterTestId)
-                                                ses
-                            (parentSorterModelId, evBinSet))
-
-
-                let chubby = wab |> Array.choose(fun (parentSorterModelId, evBinSet) ->
-                            let parentKey = %parentSorterModelId |> UMX.tag<sorterId>
-                            match parentRecordMap |> Map.tryFind parentKey with
-                            | None -> None // Safely ignore if the parent record detail is missing
-                            | Some parentRecord ->
-                                let childRecords = evBinSet |> SorterEvalBinSet.makeDataTableRecords
-                                Some (dataTableRecord.combineWithMany childRecords parentRecord |> Array.ofSeq))
-                            |> Array.concat
-
-
-                let dtrs = dataTableRecord.combineWithMany chubby leadCols
-                let report = DataTableReport.fromDataTableRecords dtrs
-
-                let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
-                return (rp : runParameters).WithRunFinished(Some true)
             with e -> 
                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
         } |> Async.map (logResult progress log)
@@ -566,13 +492,6 @@ module MsceSgdExecutor =
                 makeFullReport
                     host rp allowOverwrite cts progress }
 
-    let mutantReportExecutor =
-        { new IRunParamsExecutor with
-            member _.Execute host rp allowOverwrite cts progress =
-                makeMutantReport
-                    makeMutantDetails
-                    host rp allowOverwrite cts progress }
-
 
 
     let getExecutor (executorType: sorterSgdExecutorType) : IRunParamsExecutor =
@@ -580,23 +499,6 @@ module MsceSgdExecutor =
         | sorterSgdExecutorType.GenStandard -> standardExecutor
         | sorterSgdExecutorType.GenMerge -> mergeExecutor
         | sorterSgdExecutorType.FullReport -> fullReportExecutor
-        | sorterSgdExecutorType.MutantReport -> mutantReportExecutor
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

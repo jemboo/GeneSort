@@ -2,31 +2,22 @@
 open System
 open System.IO
 open System.Text
-open System.Collections.Generic
 
 type dataTableReport = 
     private 
         { name: string
           timeStamp: string
-          mutable sourceRows: ResizeArray<string>
-          mutable errorRows: ResizeArray<string>
           dataHeaders: string[]
           dataRows: ResizeArray<string> }
     
     member this.Name with get() = this.name
     member this.TimeStamp with get() = this.timeStamp
-    member this.SourceRows 
-        with get() = this.sourceRows
-    member this.ErrorRows 
-        with get() = this.errorRows
     member this.DataHeaders with get() = this.dataHeaders
     member this.DataRows with get() = this.dataRows
 
     static member Empty(name:string) : dataTableReport =
         { name = name
           timeStamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")
-          sourceRows = ResizeArray<string>()
-          errorRows = ResizeArray<string>()
           dataHeaders = [||]
           dataRows = ResizeArray<string>() }
 
@@ -43,64 +34,6 @@ type dataTableReport =
         for r in rows do
             this.AppendDataRow(r)
 
-    member this.AddSources (data: string []) =
-        //let cleanedData = dataTableReport.Sanitize data
-        this.sourceRows.AddRange(data)
-
-    member this.AddErrors (data: string []) =
-        //let cleanedData = dataTableReport.Sanitize data
-        this.errorRows.AddRange(data)
-
-    member this.AddSource (source: string) =
-        let cleaned = if source = null then "" else source.Replace("\t", " ")
-        this.sourceRows.Add(cleaned)
-
-    member this.AddError (error: string) =
-        let cleaned = if error = null then "" else error.Replace("\t", " ")
-        this.errorRows.Add(cleaned)
-
-
-
-    // First line: Name and timestamp
-    // Second line: Blank line
-    // Next lines: Source rows (if any)
-    // Next line: Blank line
-    // Next lines: Error rows (if any)
-    // Next line: Blank line
-    // Next line: Headers
-    // Next lines: Data rows
-    member this.SaveToPath (filePath: string) =
-        use writer = new StreamWriter(filePath, false, Encoding.UTF8)
-    
-        // First line: Name and timestamp
-        writer.WriteLine($"{this.name}\t{this.timeStamp}")
-    
-        // Second line: Blank line
-        writer.WriteLine()
-    
-        // Next lines: Source rows (if any)
-        if this.sourceRows.Count > 0 then
-            for row in this.sourceRows do
-                writer.WriteLine(row)
-    
-        // Next line: Blank line
-        writer.WriteLine()
-    
-        // Next lines: Error rows (if any)
-        if this.errorRows.Count > 0 then
-            for row in this.errorRows do
-                writer.WriteLine(row)
-    
-        // Next line: Blank line
-        writer.WriteLine()
-    
-        // Next line: Headers
-        writer.WriteLine(String.Join("\t", this.dataHeaders))
-    
-        // Next lines: Data rows
-        for row in this.dataRows do
-            writer.WriteLine(row)
-
 
     member this.SaveToStream (stream: Stream) =
         use writer = new StreamWriter(stream, Encoding.UTF8, 1024, true)
@@ -111,19 +44,6 @@ type dataTableReport =
         // Second line: Blank line
         writer.WriteLine()
     
-        // Next lines: Source rows (if any)
-        if this.sourceRows.Count > 0 then
-            for row in this.sourceRows do
-                writer.WriteLine(row)
-    
-        // Next line: Blank line
-        writer.WriteLine()
-    
-        // Next lines: Error rows (if any)
-        if this.errorRows.Count > 0 then
-            for row in this.errorRows do
-                writer.WriteLine(row)
-    
         // Next line: Blank line
         writer.WriteLine()
     
@@ -133,39 +53,6 @@ type dataTableReport =
         // Next lines: Data rows
         for row in this.dataRows do
             writer.WriteLine(row)
-
-module DataTableReport_old =
-
-    let mapToTabDelimitedStrings<'t when 't : comparison> 
-            (keyFormatter: 't -> string) 
-            (data: Map<'t, Map<string, string>>) 
-                : (string []) * (string [] []) =
-
-        // Consolidate headers into a list so we can iterate over them 
-        // in the exact same order for every row.
-        let allHeaders = 
-            data.Values 
-            |> Seq.collect (fun m -> m.Keys) 
-            |> Set.ofSeq 
-            |> Set.toArray
-            |> Array.append [| "RowKey" |]
-            
-        let rows =
-            data
-            |> Map.toArray
-            |> Array.map 
-                (
-                    fun (key, values) ->
-                        let row = Array.zeroCreate<string> allHeaders.Length
-                        row.[0] <- keyFormatter key
-                        for i in 1 .. allHeaders.Length - 1 do
-                            let header = allHeaders.[i]
-                            match values.TryFind header with
-                            | Some v -> row.[i] <- v 
-                            | None   -> row.[i] <- ""
-                        row
-                )
-        allHeaders, rows
 
 
 module DataTableReport =
@@ -180,12 +67,8 @@ module DataTableReport =
         let cleanHeaders = headers |> Array.map (fun h -> if h = null then "" else h.Replace("\t", " "))
         { name = name
           timeStamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")
-          sourceRows = ResizeArray()
-          errorRows = ResizeArray()
           dataHeaders = cleanHeaders
           dataRows = ResizeArray() }
-
-
 
 
     let fromDataTableRecords (records: dataTableRecord seq) : dataTableReport =

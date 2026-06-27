@@ -37,12 +37,12 @@ module SorterEvalSpecsRs =
 
         let Rand_Test (executorType: sorterEvalExecutorType)  : runHostSpec = {
             DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Test16_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
             Spans = [
                 rngTypeLcg
                 sorterEvalTypeV2
-                testSortingWidths
+                sortingWidth16
                 allSimpleSorterModelTypes
                 testSorterCount
             ]

@@ -227,9 +227,9 @@ module MergeRandomMergeSorterBins =
                                     mergeProperties 
                                |> Map.ofSeq
 
-                let headers, rows = DataTableReport_old.mapToTabDelimitedStrings keyFormatter tableMap
-                let dtReport = DataTableReport.create %reportName headers
-                dtReport.AppendDataRows (rows |> Array.toSeq)
+                //let headers, rows = DataTableReport_old.mapToTabDelimitedStrings keyFormatter tableMap
+                //let dtReport = DataTableReport.create %reportName headers
+                //dtReport.AppendDataRows (rows |> Array.toSeq)
 
                 // 9. Persist to DB (Using the project-specific DB provided in the call)
                 let! (_: unit) = host.ProjectDb.saveAsync qpEvalBins (mergedEvalBins |> outputData.SorterEvalBins) allowOverwrite
@@ -237,7 +237,7 @@ module MergeRandomMergeSorterBins =
                 let! (_: unit) = host.ProjectDb.saveAsync qpCenterSet (mergedCenterSet |> outputData.SortingSet) allowOverwrite
                 let! (_: unit) = host.ProjectDb.saveAsync qpWinningSet (mergedWinningSet |> outputData.SortingSet) allowOverwrite
                 let! (_: unit) = host.ProjectDb.saveAsync qpHullSet (hullSampledSet |> outputData.SortingSet) allowOverwrite
-                let! (_: unit) = host.ProjectDb.saveAsync qpReport (dtReport |> outputData.TextReport) allowOverwrite
+                //let! (_: unit) = host.ProjectDb.saveAsync qpReport (dtReport |> outputData.TextReport) allowOverwrite
 
                 report progress (sprintf "Merge Complete: %s" %runId)
                 return runParameters.WithRunFinished (Some true)

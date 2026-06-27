@@ -52,3 +52,75 @@ type dataTableRecord =
             |> Seq.toArray
         (header, rows)
 
+
+
+
+open System.IO
+
+module DataTableIO =
+
+    /// Writes a sequence of dataTableRecords to a tab-delimited file.
+    /// It dynamically extracts all unique headers across all records to guarantee alignment.
+    let writeToFile (filePath: string) (records: dataTableRecord seq) : unit =
+        if Seq.isEmpty records then
+            // If there's nothing to write, we can create an empty file or just return.
+            File.WriteAllText(filePath, "")
+        else
+            let headers, rows = dataTableRecord.createTable records
+            
+            // Open a stream writer to write lines efficiently
+            use writer = new StreamWriter(filePath)
+            
+            // 1. Write Header Row
+            let headerLine = String.concat "\t" headers
+            writer.WriteLine(headerLine)
+            
+            // 2. Write Data Rows
+            for row in rows do
+                let rowLine = String.concat "\t" row
+                writer.WriteLine(rowLine)
+
+
+    /// Reads a tab-delimited file and reconstructs a sequence of dataTableRecords.
+    /// It treats all column values as 'data' and leaves 'keys' empty, or you can adjust 
+    /// if specific column headers represent keys.
+    let readFromFile (filePath: string) : dataTableRecord seq =
+        seq {
+            if File.Exists(filePath) then
+                use reader = new StreamReader(filePath)
+                
+                // Read the header row first
+                let headerLine = reader.ReadLine()
+                if not (System.String.IsNullOrWhiteSpace(headerLine)) then
+                    let headers = headerLine.Split('\t')
+                    
+                    // Process subsequent data rows
+                    while not reader.EndOfStream do
+                        let line = reader.ReadLine()
+                        if not (System.String.IsNullOrWhiteSpace(line)) then
+                            let values = line.Split('\t')
+                            
+                            // Map headers to row values zip style, handling potential length mismatches Safely
+                            let rowData = 
+                                headers 
+                                |> Array.mapi (fun i header -> 
+                                    let value = if i < values.Length then values.[i] else ""
+                                    (header, value))
+                                |> Map.ofArray
+                                
+                            // Reconstitute the record (assuming everything read back goes into data)
+                            yield dataTableRecord.create Map.empty rowData
+        }
+
+    // reads all the dataTableRecords from all the files, combines them, and writes them to outputPath
+    let concatenateAllFiles (rootPath: string) (outputPath: string) =
+        // 1. Get all .txt files in the root and all subdirectories
+        let files = Directory.GetFiles(rootPath, "*.txt", SearchOption.AllDirectories)
+        // 2. Read and flat-map records from all found files lazily
+        let allRecords = 
+            files 
+            |> Seq.ofArray 
+            |> Seq.collect readFromFile
+
+        // 3. Re-serialize all records into a single consolidated layout
+        writeToFile outputPath allRecords

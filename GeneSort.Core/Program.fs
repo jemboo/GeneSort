@@ -41,10 +41,12 @@ module Example =
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
-    let rootDir = @"C:\Projects\SorterMutate.Msce\Rsu\Data\Report\TextReport_MutantReport"
-    DataTableReport.concatenateAllFiles 
+    let rootDir = @"C:\Projects\SorterSgd.Msce\Rsu\Data\Report\TextReport_SorterRunResult_report"
+
+    //let rootDir = @"C:\Projects\SorterMutate.Msce\Rsu\Data\Report\TextReport_MutantReport"
+    DataTableIO.concatenateAllFiles 
                 rootDir
-                $"{rootDir}\\MergeBins_report.txt"
+                $"{rootDir}\\MergeReport_report.txt"
 
 
     printfn "end: %s" (DateTime.Now.ToLongTimeString())

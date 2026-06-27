@@ -16,7 +16,7 @@ module MsceSgdSpecsRs =
 
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.Tmb 6<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.Tmb 10<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
 
     let sorterEvalMeasureInitial = 
             (runParameters.sorterEvalMeasureInitialKey , 
@@ -28,10 +28,10 @@ module MsceSgdSpecsRs =
     
    
     let generationLast = 
-            (runParameters.generationLastKey, [60] |> List.map string)
+            (runParameters.generationLastKey, [2000] |> List.map string)
 
     let generationFirst = 
-            (runParameters.generationFirstKey, [40] |> List.map string)
+            (runParameters.generationFirstKey, [0] |> List.map string)
 
 
     let generationQueryFirst = 
@@ -77,7 +77,7 @@ module MsceSgdSpecsRs =
                 insertionRates
                 deletionRates
                 modificationRatesMsce
-                testSortingWidths
+                sortingWidth16
                 testPoolCount
                 oneSorterPerPool
                 oneChildCount

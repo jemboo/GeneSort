@@ -621,7 +621,6 @@ module MsrsSgdExecutor =
         | sorterSgdExecutorType.GenStandard -> standardExecutor
         | sorterSgdExecutorType.GenMerge -> mergeExecutor
         | sorterSgdExecutorType.FullReport -> fullReportExecutor
-        | sorterSgdExecutorType.MutantReport -> mutantReportExecutor
 
 
 

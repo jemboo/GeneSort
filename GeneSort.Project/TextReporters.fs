@@ -31,45 +31,45 @@ module TextReporters =
             report progress (sprintf "%s Starting %s for: %s" (timestamp()) reportName %db.projectName)
 
             // 1. Get Parameters (Handles Error track automatically)
-            let! runParamsArray = 
+            let! (runParamsArray : runParameters []) = 
                 db.getRunParameters  (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
 
-            // 2. Setup Initial DataTable
-            let headers =  [| "Sorting Width"; "SorterModel"; "ceLength"; "stageLength"; "binCount";|]
-            let dtReport = DataTableReport.create reportName headers
-            let mutable newFailures = []
+            //// 2. Setup Initial DataTable
+            //let (headers : string []) =  [| "Sorting Width"; "SorterModel"; "ceLength"; "stageLength"; "binCount";|]
+            //let dtReport = DataTableReport.create reportName headers
+            //let mutable newFailures = []
 
 
-            // 3. Process each run parameter
-            //for runParams in runParamsArray do
-            //    let runId = runParams |> RunParameters.getIdString
-            //    let qp = buildQueryParams runParams (outputDataType.SorterSetEval "") 
+            //// 3. Process each run parameter
+            ////for runParams in runParamsArray do
+            ////    let runId = runParams |> RunParameters.getIdString
+            ////    let qp = buildQueryParams runParams (outputDataType.SorterSetEval "") 
             
-                // Map the naked Async result to the builder's track
-               // let! result = GeneSortDb.getSorterSetEvalAsync db qp |> Async.map Ok
+            //    // Map the naked Async result to the builder's track
+            //   // let! result = GeneSortDb.getSorterSetEvalAsync db qp |> Async.map Ok
 
-                //match result with
-                //| Ok sse ->
-                //    let bins = SorterEvalHierarchy.createFromSorterSetEval sse
-                //    let lines = SorterEvalHierarchy.getHierarchyReport
-                //                    [| 
-                //                        (runParams.GetSortingWidth() |> SortingWidth.toString) 
-                //                        (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringOptionToString ) 
-                //                    |]
-                //                    bins
-                //    dtReport.AppendDataRows lines
-                //| Error err ->
-                //    newFailures <- (runParams, err) :: newFailures
+            //    //match result with
+            //    //| Ok sse ->
+            //    //    let bins = SorterEvalHierarchy.createFromSorterSetEval sse
+            //    //    let lines = SorterEvalHierarchy.getHierarchyReport
+            //    //                    [| 
+            //    //                        (runParams.GetSortingWidth() |> SortingWidth.toString) 
+            //    //                        (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringOptionToString ) 
+            //    //                    |]
+            //    //                    bins
+            //    //    dtReport.AppendDataRows lines
+            //    //| Error err ->
+            //    //    newFailures <- (runParams, err) :: newFailures
 
 
-            // 4. Finalize and Save
-            dtReport.AddSources (makeSourceTable runParamsArray)
-            dtReport.AddErrors (makeErrorTable newFailures)
+            //// 4. Finalize and Save
+            ////dtReport.AddSources (makeSourceTable runParamsArray)
+            ////dtReport.AddErrors (makeErrorTable newFailures)
 
-            let saveQp = buildQueryParams (runParamsArray.[0].WithRepl None) (outputDataType.TextReport (reportName |> UMX.tag))
-            let! (_: unit) = db.saveAsync saveQp (outputData.TextReport dtReport) allowOverwrite
+            //let saveQp = buildQueryParams (runParamsArray.[0].WithRepl None) (outputDataType.TextReport (reportName |> UMX.tag))
+            //let! (_: unit) = db.saveAsync saveQp (outputData.TextReport dtReport) allowOverwrite
 
-            report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %db.projectName)
+            //report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %db.projectName)
             return ()
         }
 
@@ -84,60 +84,60 @@ module TextReporters =
         (progress: IProgress<string> option) : Async<Result<unit, string>> =
 
         asyncResult {
-            let reportName = "SorterCeUseProfile_Report"
-            let binCount, blockGrowthRate = 20, 1.2
-            let timestamp () = MathUtils.getTimestampString()
+            let (reportName : string) = "SorterCeUseProfile_Report"
+            //let binCount, blockGrowthRate = 20, 1.2
+            //let timestamp () = MathUtils.getTimestampString()
         
-            report progress (sprintf "%s Starting %s for: %s" (timestamp()) reportName %db.projectName)
+            //report progress (sprintf "%s Starting %s for: %s" (timestamp()) reportName %db.projectName)
 
-            // 1. Get Parameters (automatically handles Error exit)
-            let! runParamsArray = 
-                db.getRunParameters (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
+            //// 1. Get Parameters (automatically handles Error exit)
+            //let! runParamsArray = 
+            //    db.getRunParameters (Some minReplNumber) (Some maxReplNumber) (Some cts.Token) progress
 
             // 2. Setup Initial DataTable
-            let headers = Array.append
-                              [| 
-                                "Id"; "Repl"; "SortingWidth"; "SorterModel"; "DataType"; "MergeFillType"; 
-                                "MergeDimension"; "sorterId"; "sorterSetId"; "sorterTestsId"; "UnsortedCount"; 
-                                "Unsorted"; "CeCount"; "StageCount"; "lastCe" 
-                              |]
-                              (Array.init 20 (fun i -> i.ToString()))
 
-            let dtReport = DataTableReport.create reportName headers
-            let mutable newFailures = []
+            //let dtReport = DataTableReport.create reportName headers
+            //let mutable newFailures = []
 
-            for runParams in runParamsArray do
-                let runId = runParams |> RunParameters.getIdString
-                let qp = buildQueryParams runParams (outputDataType.SorterSetEval "") 
+            //for runParams in runParamsArray do
+            //    let runId = runParams |> RunParameters.getIdString
+            //    let qp = buildQueryParams runParams (outputDataType.SorterSetEval "") 
             
-                // Try to get the eval data
-                let! evalResult = GeneSortDb.getSorterSetEvalAsync db qp |> Async.map Ok
+            //    // Try to get the eval data
+            //    let! evalResult = GeneSortDb.getSorterSetEvalAsync db qp |> Async.map Ok
             
-                match evalResult with
-                | Ok sse ->
-                    let profile = SorterSetCeUseProfile.makeSorterSetCeUseProfile binCount blockGrowthRate sse
-                    let lines = 
-                        SorterSetCeUseProfile.makeReportLines 
-                            runId 
-                            (runParams.GetRepl() |> UmxExt.intOptionToString) 
-                            (runParams.GetSortingWidth() |> UmxExt.intOptionToString)
-                            (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringOptionToString)
-                            (runParams.GetSortableDataFormat() |> Option.map SortableDataFormat.toString |> UmxExt.stringOptionToString)
-                            (runParams.GetMergeSuffixType() |> Option.map MergeSuffixType.toString |> UmxExt.stringOptionToString)
-                            (runParams.GetMergeDimension() |> UmxExt.intOptionToString)
-                            profile
-                    dtReport.AppendDataRows lines
-                | Error err ->
-                    newFailures <- (runParams, err) :: newFailures
+            //    match evalResult with
+            //    | Ok sse ->
+            //        let profile = SorterSetCeUseProfile.makeSorterSetCeUseProfile binCount blockGrowthRate sse
+            //        let lines = 
+            //            SorterSetCeUseProfile.makeReportLines 
+            //                runId 
+            //                (runParams.GetRepl() |> UmxExt.intOptionToString) 
+            //                (runParams.GetSortingWidth() |> UmxExt.intOptionToString)
+            //                (runParams.GetSorterModelType() |> Option.map SorterModelType.toString |> UmxExt.stringOptionToString)
+            //                (runParams.GetSortableDataFormat() |> Option.map SortableDataFormat.toString |> UmxExt.stringOptionToString)
+            //                (runParams.GetMergeSuffixType() |> Option.map MergeSuffixType.toString |> UmxExt.stringOptionToString)
+            //                (runParams.GetMergeDimension() |> UmxExt.intOptionToString)
+            //                profile
+            //        dtReport.AppendDataRows lines
+            //    | Error err ->
+            //        newFailures <- (runParams, err) :: newFailures
    
 
-            // 4. Finalize and Save
-            dtReport.AddSources (makeSourceTable runParamsArray)
-            dtReport.AddErrors (makeErrorTable newFailures)
+            //// 4. Finalize and Save
+            ////dtReport.AddSources (makeSourceTable runParamsArray)
+            ////dtReport.AddErrors (makeErrorTable newFailures)
 
-            let saveQp = buildQueryParams (runParamsArray.[0].WithRepl None) (outputDataType.TextReport (reportName |> UMX.tag))
-            let! (_:unit) = db.saveAsync saveQp (outputData.TextReport dtReport) allowOverwrite
+            //let saveQp = buildQueryParams (runParamsArray.[0].WithRepl None) (outputDataType.TextReport (reportName |> UMX.tag))
+            //let! (_:unit) = db.saveAsync saveQp (outputData.TextReport dtReport) allowOverwrite
 
-            report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %db.projectName)
+            //report progress (sprintf "%s Finished %s for: %s" (timestamp()) reportName %db.projectName)            let headers = Array.append
+                              //[| 
+                              //  "Id"; "Repl"; "SortingWidth"; "SorterModel"; "DataType"; "MergeFillType"; 
+                              //  "MergeDimension"; "sorterId"; "sorterSetId"; "sorterTestsId"; "UnsortedCount"; 
+                              //  "Unsorted"; "CeCount"; "StageCount"; "lastCe" 
+                              //|]
+                              //(Array.init 20 (fun i -> i.ToString()))
+
             return ()
         }
