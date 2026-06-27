@@ -67,7 +67,8 @@ module SorterRunResult =
                 loop (remainingSteps - 1) nextSet updatedHistory
 
         loop %genCount initialPoolSet []
-/// Asynchronously runs the generation loops step N times using an asyncResult pipeline.
+
+    /// Asynchronously runs the generation loops step N times using an asyncResult pipeline.
     /// Accumulates lightweight snapshots for intermediate states and forced GC compacting 
     /// over long execution steps.
     let runEvolutionAsync
@@ -83,13 +84,17 @@ module SorterRunResult =
             (cts: CancellationToken)
             (log: string -> unit) : Async<Result<sorterRunResult, string>> =
 
+        // --- Exponential Frequency Configuration ---
+        let totalGenInt = int (genStart + genCount)
+        // Pre-calculate target snapshot generations exponentially.
+        let targetGenerations = MathUtils.expSampler totalGenInt MathUtils.ksample100K
+
         let rec loop 
                     (remainingSteps: int) 
                     (currentSorterPoolSet: sorterPoolSet) 
                     (historyAcc: sorterPoolSetDescription list) 
                     : Async<Result<sorterRunResult, string>> =
             asyncResult {
-                let reportFreq = 100
                 if cts.IsCancellationRequested then 
                     return! Error "runEvolutionAsync was cancelled."
 
@@ -102,15 +107,20 @@ module SorterRunResult =
                 else
                     let currentGen = genStart + (genCount - %remainingSteps)
                     let totalGen = genStart + genCount
-                    if (%currentGen % reportFreq = 1) then
+                    
+                    // Look up if the current generation is an exponential milestone
+                    let shouldReport = Set.contains (int currentGen) targetGenerations
+
+                    if shouldReport then
                         log (sprintf "Starting evolution step. Generation %d of %d" currentGen totalGen)
 
                     // 1. Snapshot the current generation state before applying structural changes
                     let currentSnapshot = SorterPoolSetDescription.fromPoolSet currentSorterPoolSet
                     let updatedHistory = 
-                        if (%currentGen % reportFreq = 1) then
+                        if shouldReport then 
                             currentSnapshot :: historyAcc
-                            else historyAcc
+                        else 
+                            historyAcc
 
                     // log "Executing generation processing step..."
                     let reEvaluateParents = false
@@ -135,6 +145,10 @@ module SorterRunResult =
             }
 
         loop %genCount seedSorterPoolSet []
+
+
+
+
 
 
     // extracts dataTableRecords out of sorterRunResult.IntermediateHistory only

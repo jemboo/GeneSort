@@ -33,6 +33,30 @@ module MathUtils =
         if order <= 0 then invalidArg "order" "Order must be positive"
         order > 0 && (order &&& (order - 1)) = 0
 
+    // Samples [1 .. maxInt] with exponentailly decreasing frequency.
+    // 1.0049 -> 1002 samples per 10^4
+    // 1.0068 -> 1008 samples per 50K
+    // 1.0077 -> 997 samples per 10^5
+    // 10095 -> 1001 samples per 500K
+    // 1.0103 -> 1000 samples per 10^6
+
+    let ksample10K = 1.0049
+    let ksample50K = 1.0068
+    let ksample100K = 1.0077
+    let ksample500K = 1.0095
+    let ksample1000K = 1.0103
+
+    let expSampler (maxInt:int) (stepIncrease:float)=
+        let rec computeTargets currentVal acc =
+            let nextVal = currentVal * stepIncrease
+            let nextInt = int (ceil nextVal)
+            if nextInt >= maxInt then 
+                (maxInt :: acc) |> Set.ofList
+            else 
+                computeTargets nextVal (nextInt :: acc)
+
+        computeTargets 1.0 [1;] 
+
 
 
     let getTimestampString () =
