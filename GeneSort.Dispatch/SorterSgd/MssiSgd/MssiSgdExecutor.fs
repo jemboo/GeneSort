@@ -592,14 +592,6 @@ module MssiSgdExecutor =
                 makeFullReport
                     host rp allowOverwrite cts progress }
 
-    let mutantReportExecutor =
-        { new IRunParamsExecutor with
-            member _.Execute host rp allowOverwrite cts progress =
-                makeMutantReport
-                    makeMutantDetails
-                    host rp allowOverwrite cts progress }
-
-
 
     let getExecutor (executorType: sorterSgdExecutorType) : IRunParamsExecutor =
         match executorType with

@@ -26,13 +26,11 @@ module MsceSgdSpecsRs =
             (runParameters.sorterEvalMeasureKey, 
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
     
-   
     let generationLast = 
             (runParameters.generationLastKey, [50000] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
-
 
     let generationQueryFirst = 
             (runParameters.queryWithGenFirst, [false] |> List.map string)
@@ -65,7 +63,7 @@ module MsceSgdSpecsRs =
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
             DatabaseName = MsceSgdDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Msce"
+            RunDescription = "Sgd analysis for Msce"
             Spans = [
                 msceModelType
                 rngTypeLcg
@@ -95,7 +93,7 @@ module MsceSgdSpecsRs =
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
             DatabaseName = MsceSgdDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Msce"
+            RunDescription = "Sgd analysis for Msce"
             Spans = [
                 msceModelType
                 rngTypeLcg
@@ -124,7 +122,7 @@ module MsceSgdSpecsRs =
         let Rand_Medium (executorType: sorterSgdExecutorType) : runHostSpec = {
             DatabaseName = MsceSgdDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Msce"
+            RunDescription = "Sgd analysis for Msce"
             Spans = [
                 msceModelType
                 rngTypeLcg

@@ -39,7 +39,6 @@ module MathUtils =
     // 1.0077 -> 997 samples per 10^5
     // 10095 -> 1001 samples per 500K
     // 1.0103 -> 1000 samples per 10^6
-
     let ksample10K = 1.0049
     let ksample50K = 1.0068
     let ksample100K = 1.0077

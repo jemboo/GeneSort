@@ -183,11 +183,21 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //    Msuf4MutateDbs.createRunHost spec
 //let executor = Msuf4MutateExecutor.getExecutor executorType
 
+
 //********** MsceSgdSpecsRs **********
-let configType = MsceSgdSpecsRs.configType.Rand_Test
-let executorType = sorterSgdExecutorType.FullReport
+//let configType = MsceSgdSpecsRs.configType.Rand_Test
+//let executorType = sorterSgdExecutorType.FullReport
+//let host: IRunHost = 
+//    let spec = MsceSgdSpecsRs.getRunHostSpec configType executorType
+//    MsceSgdDbs.createRunHost spec
+//let executor = MsceSgdExecutor.getExecutor executorType
+
+
+//********** MsceSgdSpecsRs **********
+let configType = MsceSgdSpecsRm.configType.Rand_Test
+let executorType = sorterSgdExecutorType.GenMerge
 let host: IRunHost = 
-    let spec = MsceSgdSpecsRs.getRunHostSpec configType executorType
+    let spec = MsceSgdSpecsRm.getRunHostSpec configType executorType
     MsceSgdDbs.createRunHost spec
 let executor = MsceSgdExecutor.getExecutor executorType
 
