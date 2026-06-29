@@ -1,6 +1,5 @@
 ﻿namespace GeneSort.Dispatch.V1.SorterSgd.Msrs
 
-
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
@@ -25,12 +24,18 @@ module MsrsSgdDbs =
                     @$"c:\Projects\{projectName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
 
 
+
             let makeQueryParams
                             (rng: rngType)
+                            (genLast: int<generationNumber>)
+                            (sorterCtPerPool: int<sorterCountPerPool>)
+                            (sorterPoolCt: int<sorterPoolCount>)
+                            (childCt: int<sorterChildCount>)
                             (ses:sorterEvalSelectionType)
                             (sem:sorterEvalMeasure)
+                            (semInitial:sorterEvalMeasure)
                             (repl: int<replNumber>) 
-                            (sw: int<sortingWidth>) 
+                            (sw: int<sortingWidth>)
                             (smt: simpleSorterModelType) 
                             (set: sorterEvalType)
                             (orthoRate: float<orthoRate>)
@@ -41,8 +46,13 @@ module MsrsSgdDbs =
                 queryParams.create dbName (Some repl) odt
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
+                       (runParameters.generationLastKey, (Some genLast) |> GenerationNumber.toString)
+                       (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                       (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                       (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
                        (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toString)
+                       (runParameters.sorterEvalMeasureInitialKey, semInitial |> SorterEvalMeasure.toString)
                        (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                        (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString)
@@ -58,8 +68,15 @@ module MsrsSgdDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! repl = rp.GetRepl()
+                    let! genFirst = rp.GetGenerationFirst()
+                    let! genLast = rp.GetGenerationLast()
+                    let! genQf = rp.GetQueryWithGenFirst()
+                    let! scPP = rp.GetSorterCountPerPool()
+                    let! spc = rp.GetSorterPoolCount()
+                    let! scc = rp.GetSorterChildCount()
                     let! ses = rp.GetSorterEvalSelectionType()
                     let! sem = rp.GetSorterEvalMeasure()
+                    let! semi = rp.GetSorterEvalMeasureInitial()
                     let! sw = rp.GetSortingWidth()
                     let! smt = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
@@ -68,11 +85,13 @@ module MsrsSgdDbs =
                     let! para = rp.GetParaRate()
                     let! sym = rp.GetSelfSymRate()
                     let! mdr = rp.GetModificationRate()
-                    return makeQueryParams rng ses sem repl sw smt set ortho para sym mdr odt 
+                    return if genQf then
+                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt set ortho para sym mdr odt 
+                            else
+                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt set ortho para sym mdr odt 
                 }
-
+                
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
-
 
 
     module RandomMerge =
@@ -85,8 +104,13 @@ module MsrsSgdDbs =
 
             let makeQueryParams
                         (rng: rngType)
+                        (genLast: int<generationNumber>)
+                        (sorterCtPerPool: int<sorterCountPerPool>)
+                        (sorterPoolCt: int<sorterPoolCount>)
+                        (childCt: int<sorterChildCount>)
                         (ses:sorterEvalSelectionType)
                         (sem:sorterEvalMeasure)
+                        (semInitial:sorterEvalMeasure)
                         (repl: int<replNumber>) 
                         (sortingWidth: int<sortingWidth>)
                         (simpleSorterModelType: simpleSorterModelType)
@@ -106,8 +130,13 @@ module MsrsSgdDbs =
                     outputDataType
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
+                       (runParameters.generationLastKey, (Some genLast) |> GenerationNumber.toString)
+                       (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                       (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                       (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
                        (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toString)
+                       (runParameters.sorterEvalMeasureInitialKey, semInitial |> SorterEvalMeasure.toString)
                        (runParameters.sortingWidthKey, string %sortingWidth); 
                        (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
                        (runParameters.mergeDimensionKey, string %mergeDimension);
@@ -126,8 +155,15 @@ module MsrsSgdDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! rng = rp.GetRngType()
+                    let! genFirst = rp.GetGenerationFirst()
+                    let! genLast = rp.GetGenerationLast()
+                    let! genQf = rp.GetQueryWithGenFirst()
+                    let! scPP = rp.GetSorterCountPerPool()
+                    let! spc = rp.GetSorterPoolCount()
+                    let! scc = rp.GetSorterChildCount()
                     let! ses = rp.GetSorterEvalSelectionType()
                     let! sem = rp.GetSorterEvalMeasure()
+                    let! semi = rp.GetSorterEvalMeasureInitial()
                     let! repl = rp.GetRepl()
                     let! sw = rp.GetSortingWidth()
                     let! md = rp.GetMergeDimension()
@@ -139,10 +175,14 @@ module MsrsSgdDbs =
                     let! para = rp.GetParaRate()
                     let! sym = rp.GetSelfSymRate()
                     let! mdr = rp.GetModificationRate()
-                    return makeQueryParams rng ses sem repl sw smt md mst sdf set ortho para sym mdr odt
+                    return if genQf then
+                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt md mst sdf set ortho para sym mdr odt
+                            else
+                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt md mst sdf set ortho para sym mdr odt
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+
 
 
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
