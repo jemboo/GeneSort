@@ -26,7 +26,7 @@ module Msuf4SgdSpecsRs =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
 
     let generationLast = 
-            (runParameters.generationLastKey, [50000] |> List.map string)
+            (runParameters.generationLastKey, [200000] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
@@ -53,8 +53,8 @@ module Msuf4SgdSpecsRs =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
             DatabaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Test3_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Msuf4"
+            RunName = sprintf @"Rand-Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            RunDescription = "Sgd analysis for Msuf4"
             Spans = [
                 msuf4ModelType
                 rngTypeLcg
@@ -65,7 +65,7 @@ module Msuf4SgdSpecsRs =
                 orthoRates
                 paraRates
                 selfSymRates
-                seedModificationRateZero
+                seedModificationRateC
                 modificationRatesStage3
                 sortingWidth16
                 testPoolCount
@@ -84,7 +84,7 @@ module Msuf4SgdSpecsRs =
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
             DatabaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Msuf4"
+            RunDescription = "Sgd analysis for Msuf4"
             Spans = [
                 msuf4ModelType
                 rngTypeLcg
@@ -114,7 +114,7 @@ module Msuf4SgdSpecsRs =
         let Rand_Medium (executorType: sorterSgdExecutorType) : runHostSpec = {
             DatabaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
             RunName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Msuf4"
+            RunDescription = "Sgd analysis for Msuf4"
             Spans = [
                 msuf4ModelType
                 rngTypeLcg

@@ -37,6 +37,7 @@ module Msuf4SgdDbs =
                             (sw: int<sortingWidth>)
                             (smt: simpleSorterModelType) 
                             (set: sorterEvalType)
+                            (seedMdr:float<seedModificationRate>)
                             (orthoRate: float<orthoRate>)
                             (paraRate: float<paraRate>)
                             (selfSymRate: float<selfSymRate>)
@@ -55,6 +56,7 @@ module Msuf4SgdDbs =
                        (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                        (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString)
+                       (runParameters.seedModificationRateKey, (Some seedMdr) |> SeedModificationRate.toString)
                        (runParameters.orthoRateKey, (Some orthoRate) |> OrthoRate.toString)
                        (runParameters.paraRateKey, (Some paraRate) |> ParaRate.toString)
                        (runParameters.selfSymRateKey, (Some selfSymRate) |> SelfSymRate.toString)
@@ -80,14 +82,15 @@ module Msuf4SgdDbs =
                     let! smt = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! set = rp.GetSorterEvalType()
+                    let! sdMdr = rp.GetSeedModificationRate()
                     let! ortho = rp.GetOrthoRate()
                     let! para = rp.GetParaRate()
                     let! sym = rp.GetSelfSymRate()
                     let! mdr = rp.GetModificationRate()
                     return if genQf then
-                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt set ortho para sym mdr odt 
+                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt set sdMdr ortho para sym mdr odt 
                             else
-                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt set ortho para sym mdr odt 
+                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt set sdMdr ortho para sym mdr odt 
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -119,6 +122,7 @@ module Msuf4SgdDbs =
                         (mergeSuffixType: mergeSuffixType)
                         (sortableDataFormat: sortableDataFormat) 
                         (set: sorterEvalType)
+                        (seedMdr:float<seedModificationRate>)
                         (orthoRate: float<orthoRate>)
                         (paraRate: float<paraRate>)
                         (selfSymRate: float<selfSymRate>)
@@ -143,6 +147,7 @@ module Msuf4SgdDbs =
                        (runParameters.mergeDimensionKey, string %mergeDimension);
                        (runParameters.mergeSuffixTypeKey, mergeSuffixType |> MergeSuffixType.toString);
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString) 
+                       (runParameters.seedModificationRateKey, (Some seedMdr) |> SeedModificationRate.toString)
                        (runParameters.orthoRateKey, (Some orthoRate) |> OrthoRate.toString)
                        (runParameters.paraRateKey, (Some paraRate) |> ParaRate.toString)
                        (runParameters.selfSymRateKey, (Some selfSymRate) |> SelfSymRate.toString)
@@ -172,14 +177,15 @@ module Msuf4SgdDbs =
                     let! smt = rp.GetSimpleSorterModelType()
                     let! sdf = rp.GetSortableDataFormat()
                     let! set = rp.GetSorterEvalType()
+                    let! sdMdr = rp.GetSeedModificationRate()
                     let! ortho = rp.GetOrthoRate()
                     let! para = rp.GetParaRate()
                     let! sym = rp.GetSelfSymRate()
                     let! mdr = rp.GetModificationRate()
                     return if genQf then
-                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt md mst sdf set ortho para sym mdr odt
+                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt md mst sdf set sdMdr ortho para sym mdr odt
                             else
-                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt md mst sdf set ortho para sym mdr odt
+                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt md mst sdf set sdMdr ortho para sym mdr odt
                 }
 
 
