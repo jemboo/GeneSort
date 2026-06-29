@@ -18,6 +18,7 @@ open GeneSort.Dispatch.V1.SorterMutate.Msrs
 open GeneSort.Dispatch.V1.SorterMutate.Msuf4
 open GeneSort.Dispatch.V1.SorterSgd.Msce
 open GeneSort.Dispatch.V1.SorterSgd
+open GeneSort.Dispatch.V1.SorterSgd.Mssi
 
 
 
@@ -186,7 +187,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 //********** MsceSgdSpecsRs **********
 let configType = MsceSgdSpecsRs.configType.Rand_Test
-let executorType = sorterSgdExecutorType.GenStandard
+let executorType = sorterSgdExecutorType.FullReport
 let host: IRunHost = 
     let spec = MsceSgdSpecsRs.getRunHostSpec configType executorType
     MsceSgdDbs.createRunHost spec
@@ -202,6 +203,22 @@ let executor = MsceSgdExecutor.getExecutor executorType
 //let executor = MsceSgdExecutor.getExecutor executorType
 
 
+//********** MssiSgdSpecsRs **********
+//let configType = MssiSgdSpecsRs.configType.Rand_Test
+//let executorType = sorterSgdExecutorType.FullReport
+//let host: IRunHost = 
+//    let spec = MssiSgdSpecsRs.getRunHostSpec configType executorType
+//    MssiSgdDbs.createRunHost spec
+//let executor = MssiSgdExecutor.getExecutor executorType
+
+
+//********** MssiSgdSpecsRs **********
+//let configType = MssiSgdSpecsRm.configType.Rand_Test
+//let executorType = sorterSgdExecutorType.GenMerge
+//let host: IRunHost = 
+//    let spec = MssiSgdSpecsRm.getRunHostSpec configType executorType
+//    MssiSgdDbs.createRunHost spec
+//let executor = MssiSgdExecutor.getExecutor executorType
 
 
 

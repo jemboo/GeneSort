@@ -42,7 +42,7 @@ module Example =
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
-    let rootDir = @"C:\Projects\SorterSgd.Msce\Rmu\Data\Report\TextReport_SorterRunResult_report"
+    let rootDir = @"C:\Projects\SorterSgd.Mssi\Rsu\Data\Report\TextReport_SorterRunResult_report"
    // let rootDir = @"C:\Projects\SorterSgd.Msce\Rsu\Data\Report\TextReport_SorterRunResult_report"
     //let rootDir = @"C:\Projects\SorterMutate.Msce\Rsu\Data\Report\TextReport_MutantReport"
     DataTableIO.concatenateAllFiles 
