@@ -1,28 +1,37 @@
 ﻿namespace GeneSort.Dispatch.V1.SorterSgd.Msrs
 
 open FSharp.UMX
-open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Sorting
-open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
+open GeneSort.Dispatch.V1.SorterSgd
 
 module MsrsSgdSpecsRs = 
 
     let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.Tmb 6<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.Tmb 10<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
 
-    let sorterEvalMeasure = 
+    let sorterEvalMeasureInitial = 
+            (runParameters.sorterEvalMeasureInitialKey , 
+            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
+
+    let sorterEvalMeasureEvo = 
             (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (1.0, true); ] |> List.map SorterEvalMeasure.toString)
+            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
 
-    let generationCount = 
-            (runParameters.generationLastKey, [10] |> List.map string)
+    let generationLast = 
+            (runParameters.generationLastKey, [5000] |> List.map string)
+
+    let generationFirst = 
+            (runParameters.generationFirstKey, [0] |> List.map string)
+
+    let generationQueryFirst = 
+            (runParameters.queryWithGenFirst, [false] |> List.map string)
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
@@ -31,6 +40,7 @@ module MsrsSgdSpecsRs =
           .WithRunFinished(Some false)
           .WithId (Some qp.Value.Id)
 
+    
     let private paramMapFilter (rp: runParameters) =
         maybe {
             let! sw = rp.GetSortingWidth()
@@ -40,77 +50,86 @@ module MsrsSgdSpecsRs =
 
     module Specs =
 
-        let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
+        let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
             DatabaseName = MsrsSgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msrs"
             Spans = [
+                msrsModelType
                 rngTypeLcg
-                sorterEvalSelection
-                sorterEvalMeasure
                 sorterEvalTypeV1
+                sorterEvalSelection
+                sorterEvalMeasureInitial
+                sorterEvalMeasureEvo
                 orthoRates
                 paraRates
                 selfSymRates
                 modificationRatesStage
-                testSortingWidths
-                msrsModelType
+                sortingWidth16
                 testPoolCount
                 oneSorterPerPool
                 oneChildCount
-                generationCount
+                generationFirst
+                generationLast
+                generationQueryFirst
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 1
+            MaxParallel = 4
         }
 
-        let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
+        let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
             DatabaseName = MsrsSgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msrs"
             Spans = [
+                msrsModelType
                 rngTypeLcg
-                sorterEvalSelection
-                sorterEvalMeasure
                 sorterEvalTypeV1
+                sorterEvalSelection
+                sorterEvalMeasureInitial
+                sorterEvalMeasureEvo
                 orthoRates
                 paraRates
                 selfSymRates
                 modificationRatesStage
-                smallSortingWidths
-                msrsModelType
+                sortingWidth16
                 testPoolCount
                 oneSorterPerPool
                 oneChildCount
-                generationCount
+                generationFirst
+                generationLast
+                generationQueryFirst
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            MaxParallel = 4
         }
 
-        let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
+        let Rand_Medium (executorType: sorterSgdExecutorType) : runHostSpec = {
             DatabaseName = MsrsSgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msrs"
             Spans = [
+                msrsModelType
                 rngTypeLcg
-                sorterEvalSelection
-                sorterEvalMeasure
                 sorterEvalTypeV1
+                sorterEvalSelection
+                sorterEvalMeasureInitial
+                sorterEvalMeasureEvo
                 orthoRates
                 paraRates
                 selfSymRates
                 modificationRatesStage
-                mediumSortingWidths
-                msrsModelType
+                sortingWidth16
                 testPoolCount
                 oneSorterPerPool
                 oneChildCount
-                generationCount
+                generationFirst
+                generationLast
+                generationQueryFirst
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
@@ -130,8 +149,6 @@ module MsrsSgdSpecsRs =
                         (configType.Rand_Medium, Specs.Rand_Medium);
                     ]
 
-    let getRunHostSpec (config: configType) (executorType: sorterMutateExecutorType) : runHostSpec =
+    let getRunHostSpec (config: configType) (executorType: sorterSgdExecutorType) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType
-
-

@@ -54,7 +54,7 @@ module Msuf4MutateSpecsRs =
                 orthoRates
                 paraRates
                 selfSymRates
-                noSeedModificationRates
+                seedModificationRateZero
                 modificationRatesStage
                 testSortingWidths
                 msuf4ModelType
@@ -79,7 +79,7 @@ module Msuf4MutateSpecsRs =
                 orthoRates
                 paraRates
                 selfSymRates
-                noSeedModificationRates
+                seedModificationRateZero
                 modificationRatesStage
                 smallSortingWidths
                 msuf4ModelType
@@ -103,7 +103,7 @@ module Msuf4MutateSpecsRs =
                 orthoRates
                 paraRates
                 selfSymRates
-                noSeedModificationRates
+                seedModificationRateZero
                 modificationRatesStage
                 mediumSortingWidths
                 msuf4ModelType

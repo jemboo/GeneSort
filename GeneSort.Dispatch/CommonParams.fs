@@ -45,7 +45,7 @@ module CommonParams =
     let twoSortersPerPool = (runParameters.sorterCountPerPoolKey, ["2";] )
 
     // SorterPoolCounts
-    let testPoolCount = (runParameters.sorterPoolCountKey, ["30";] )
+    let testPoolCount = (runParameters.sorterPoolCountKey, ["300";] )
     let smallPoolCount = (runParameters.sorterPoolCountKey, ["10";] )
     let mediumPoolCount = (runParameters.sorterPoolCountKey, ["100";] )
     let largePoolCount = (runParameters.sorterPoolCountKey, ["1000";] )
@@ -159,8 +159,11 @@ module CommonParams =
     let selfSymRates =
             (runParameters.selfSymRateKey, [1.0;] |> List.map string)
 
-    let noSeedModificationRates =
+    let seedModificationRateZero =
             (runParameters.seedModificationRateKey, [0.00] |> List.map string)
+
+    let seedModificationRateC =
+            (runParameters.seedModificationRateKey, [0.00; 0.01] |> List.map string)
 
     //let modificationRatesMsce =
     //        (runParameters.modificationRateKey, [ 0.00125; 0.005; 0.02; 0.08 ] |> List.map string)
@@ -170,6 +173,16 @@ module CommonParams =
 
     let modificationRatesStage =
             (runParameters.modificationRateKey, [ 0.15; 0.2; 0.3; 0.35 ] |> List.map string)
+
+    let modificationRatesStage2 =
+            (runParameters.modificationRateKey, [ 0.050; 0.075; 0.1; 0.125 ] |> List.map string)
+
+    let modificationRatesStage3 =
+            (runParameters.modificationRateKey, [ 0.040; 0.060; 0.080; 0.100 ] |> List.map string)
+
+
+
+
 
     let getStageLength 
                 (smt: simpleSorterModelType) 

@@ -24,33 +24,40 @@ module Msuf4SgdDbs =
             let dbFolder = 
                     @$"c:\Projects\{projectName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
 
-
             let makeQueryParams
                             (rng: rngType)
+                            (genLast: int<generationNumber>)
+                            (sorterCtPerPool: int<sorterCountPerPool>)
+                            (sorterPoolCt: int<sorterPoolCount>)
+                            (childCt: int<sorterChildCount>)
                             (ses:sorterEvalSelectionType)
                             (sem:sorterEvalMeasure)
+                            (semInitial:sorterEvalMeasure)
                             (repl: int<replNumber>) 
-                            (sw: int<sortingWidth>) 
+                            (sw: int<sortingWidth>)
                             (smt: simpleSorterModelType) 
                             (set: sorterEvalType)
                             (orthoRate: float<orthoRate>)
                             (paraRate: float<paraRate>)
                             (selfSymRate: float<selfSymRate>)
-                            (smdr: float<seedModificationRate>)
                             (mdr: float<modificationRate>)
                             (odt: outputDataType) : queryParams =
                 queryParams.create dbName (Some repl) odt
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
+                       (runParameters.generationLastKey, (Some genLast) |> GenerationNumber.toString)
+                       (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                       (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                       (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
                        (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toString)
+                       (runParameters.sorterEvalMeasureInitialKey, semInitial |> SorterEvalMeasure.toString)
                        (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                        (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString)
                        (runParameters.orthoRateKey, (Some orthoRate) |> OrthoRate.toString)
                        (runParameters.paraRateKey, (Some paraRate) |> ParaRate.toString)
                        (runParameters.selfSymRateKey, (Some selfSymRate) |> SelfSymRate.toString)
-                       (runParameters.seedModificationRateKey, (Some smdr) |> SeedModificationRate.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
                     |]
 
@@ -60,8 +67,15 @@ module Msuf4SgdDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! repl = rp.GetRepl()
+                    let! genFirst = rp.GetGenerationFirst()
+                    let! genLast = rp.GetGenerationLast()
+                    let! genQf = rp.GetQueryWithGenFirst()
+                    let! scPP = rp.GetSorterCountPerPool()
+                    let! spc = rp.GetSorterPoolCount()
+                    let! scc = rp.GetSorterChildCount()
                     let! ses = rp.GetSorterEvalSelectionType()
                     let! sem = rp.GetSorterEvalMeasure()
+                    let! semi = rp.GetSorterEvalMeasureInitial()
                     let! sw = rp.GetSortingWidth()
                     let! smt = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
@@ -69,9 +83,11 @@ module Msuf4SgdDbs =
                     let! ortho = rp.GetOrthoRate()
                     let! para = rp.GetParaRate()
                     let! sym = rp.GetSelfSymRate()
-                    let! smdr = rp.GetSeedModificationRate()
                     let! mdr = rp.GetModificationRate()
-                    return makeQueryParams rng ses sem repl sw smt set ortho para sym smdr mdr odt 
+                    return if genQf then
+                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt set ortho para sym mdr odt 
+                            else
+                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt set ortho para sym mdr odt 
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -86,10 +102,16 @@ module Msuf4SgdDbs =
             let dbFolder = 
                     $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
+
             let makeQueryParams
                         (rng: rngType)
+                        (genLast: int<generationNumber>)
+                        (sorterCtPerPool: int<sorterCountPerPool>)
+                        (sorterPoolCt: int<sorterPoolCount>)
+                        (childCt: int<sorterChildCount>)
                         (ses:sorterEvalSelectionType)
                         (sem:sorterEvalMeasure)
+                        (semInitial:sorterEvalMeasure)
                         (repl: int<replNumber>) 
                         (sortingWidth: int<sortingWidth>)
                         (simpleSorterModelType: simpleSorterModelType)
@@ -100,7 +122,6 @@ module Msuf4SgdDbs =
                         (orthoRate: float<orthoRate>)
                         (paraRate: float<paraRate>)
                         (selfSymRate: float<selfSymRate>)
-                        (smdr: float<seedModificationRate>)
                         (mdr: float<modificationRate>)
                         (outputDataType: outputDataType) : queryParams =
 
@@ -110,8 +131,13 @@ module Msuf4SgdDbs =
                     outputDataType
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
+                       (runParameters.generationLastKey, (Some genLast) |> GenerationNumber.toString)
+                       (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                       (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                       (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
                        (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toString)
+                       (runParameters.sorterEvalMeasureInitialKey, semInitial |> SorterEvalMeasure.toString)
                        (runParameters.sortingWidthKey, string %sortingWidth); 
                        (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
                        (runParameters.mergeDimensionKey, string %mergeDimension);
@@ -120,7 +146,6 @@ module Msuf4SgdDbs =
                        (runParameters.orthoRateKey, (Some orthoRate) |> OrthoRate.toString)
                        (runParameters.paraRateKey, (Some paraRate) |> ParaRate.toString)
                        (runParameters.selfSymRateKey, (Some selfSymRate) |> SelfSymRate.toString)
-                       (runParameters.seedModificationRateKey, (Some smdr) |> SeedModificationRate.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
                        (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
                     |]
@@ -131,8 +156,15 @@ module Msuf4SgdDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! rng = rp.GetRngType()
+                    let! genFirst = rp.GetGenerationFirst()
+                    let! genLast = rp.GetGenerationLast()
+                    let! genQf = rp.GetQueryWithGenFirst()
+                    let! scPP = rp.GetSorterCountPerPool()
+                    let! spc = rp.GetSorterPoolCount()
+                    let! scc = rp.GetSorterChildCount()
                     let! ses = rp.GetSorterEvalSelectionType()
                     let! sem = rp.GetSorterEvalMeasure()
+                    let! semi = rp.GetSorterEvalMeasureInitial()
                     let! repl = rp.GetRepl()
                     let! sw = rp.GetSortingWidth()
                     let! md = rp.GetMergeDimension()
@@ -143,10 +175,13 @@ module Msuf4SgdDbs =
                     let! ortho = rp.GetOrthoRate()
                     let! para = rp.GetParaRate()
                     let! sym = rp.GetSelfSymRate()
-                    let! smdr = rp.GetSeedModificationRate()
                     let! mdr = rp.GetModificationRate()
-                    return makeQueryParams rng ses sem repl sw smt md mst sdf set ortho para sym smdr mdr odt
+                    return if genQf then
+                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt md mst sdf set ortho para sym mdr odt
+                            else
+                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt md mst sdf set ortho para sym mdr odt
                 }
+
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
 

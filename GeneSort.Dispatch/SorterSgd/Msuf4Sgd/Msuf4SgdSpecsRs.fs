@@ -7,24 +7,32 @@ open GeneSort.Project.V1
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Sorting
-open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
+open GeneSort.Dispatch.V1.SorterSgd
 
 
 module Msuf4SgdSpecsRs = 
 
-
     let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.Tmb 6<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.Tmb 100<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
 
-    let sorterEvalMeasure = 
+    let sorterEvalMeasureInitial = 
+            (runParameters.sorterEvalMeasureInitialKey , 
+            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
+
+    let sorterEvalMeasureEvo = 
             (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (1.0, true); ] |> List.map SorterEvalMeasure.toString)
-    
-        
-    let generationCount = 
-            (runParameters.generationLastKey, [10] |> List.map string)
+            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
+
+    let generationLast = 
+            (runParameters.generationLastKey, [50000] |> List.map string)
+
+    let generationFirst = 
+            (runParameters.generationFirstKey, [0] |> List.map string)
+
+    let generationQueryFirst = 
+            (runParameters.queryWithGenFirst, [false] |> List.map string)
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
@@ -37,62 +45,35 @@ module Msuf4SgdSpecsRs =
     let private paramMapFilter (rp: runParameters) =
         maybe {
             let! sw = rp.GetSortingWidth()
-            let! isGt4 = if (%sw > 4) then Some () else None
-            let isMuf4able = (MathUtils.isAPowerOfTwo %sw)
-            return! if isMuf4able then Some rp else None
+            let has2factor = (%sw % 2 = 0)
+            return! if has2factor then Some rp else None
         }
-
 
     module Specs =
 
-        let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
+        let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
             DatabaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Test3_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msuf4"
             Spans = [
+                msuf4ModelType
                 rngTypeLcg
-                sorterEvalSelection
-                sorterEvalMeasure
                 sorterEvalTypeV1
+                sorterEvalSelection
+                sorterEvalMeasureInitial
+                sorterEvalMeasureEvo
                 orthoRates
                 paraRates
                 selfSymRates
-                noSeedModificationRates
-                modificationRatesStage
-                testSortingWidths
-                msuf4ModelType
+                seedModificationRateZero
+                modificationRatesStage3
+                sortingWidth16
                 testPoolCount
                 oneSorterPerPool
                 oneChildCount
-                generationCount
-            ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 2
-        }
-
-
-        let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
-            DatabaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Msuf4"
-            Spans = [
-                rngTypeLcg
-                sorterEvalSelection
-                sorterEvalMeasure
-                sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                noSeedModificationRates
-                modificationRatesStage
-                smallSortingWidths
-                msuf4ModelType
-                testPoolCount
-                oneSorterPerPool
-                oneChildCount
-                generationCount
+                generationFirst
+                generationLast
+                generationQueryFirst
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
@@ -100,26 +81,59 @@ module Msuf4SgdSpecsRs =
             MaxParallel = 8
         }
 
-        let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
+        let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
             DatabaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for Msuf4"
             Spans = [
+                msuf4ModelType
                 rngTypeLcg
-                sorterEvalSelection
-                sorterEvalMeasure
                 sorterEvalTypeV1
+                sorterEvalSelection
+                sorterEvalMeasureInitial
+                sorterEvalMeasureEvo
                 orthoRates
                 paraRates
                 selfSymRates
-                noSeedModificationRates
+                seedModificationRateZero
                 modificationRatesStage
-                mediumSortingWidths
-                msuf4ModelType
+                sortingWidth16
                 testPoolCount
                 oneSorterPerPool
                 oneChildCount
-                generationCount
+                generationFirst
+                generationLast
+                generationQueryFirst
+            ]
+            Filter = paramMapFilter
+            Enhancer = standardEnhancer
+            AllowOverwrite = false |> UMX.tag
+            MaxParallel = 4
+        }
+
+        let Rand_Medium (executorType: sorterSgdExecutorType) : runHostSpec = {
+            DatabaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
+            RunName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            RunDescription = "Mutation analysis for Msuf4"
+            Spans = [
+                msuf4ModelType
+                rngTypeLcg
+                sorterEvalTypeV1
+                sorterEvalSelection
+                sorterEvalMeasureInitial
+                sorterEvalMeasureEvo
+                orthoRates
+                paraRates
+                selfSymRates
+                seedModificationRateZero
+                modificationRatesStage
+                sortingWidth16
+                testPoolCount
+                oneSorterPerPool
+                oneChildCount
+                generationFirst
+                generationLast
+                generationQueryFirst
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
@@ -139,8 +153,6 @@ module Msuf4SgdSpecsRs =
                         (configType.Rand_Medium, Specs.Rand_Medium);
                     ]
 
-    let getRunHostSpec (config: configType) (executorType: sorterMutateExecutorType) : runHostSpec =
+    let getRunHostSpec (config: configType) (executorType: sorterSgdExecutorType) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType
-
-
