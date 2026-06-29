@@ -63,217 +63,23 @@ module MsceSgdExecutor =
         }
 
 
-    let makeMutantMergeSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
+    let private createSeedSorterPoolSetStandard 
+            (rp:runParameters) : Async<Result<sorterPoolSet, string>> =
         asyncResult {
+            let! sortingWidth = rp.GetSortingWidth() |> Result.ofOption "Missing sorting width."
+            let! poolCount = rp.GetSorterPoolCount() |> Result.ofOption "Missing poolCount."
+            let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
+            let! sorterEvalMeasureInitial = rp.GetSorterEvalMeasureInitial() |> Result.ofOption "Missing sorterEvalMeasureInitial."
+            let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
+            let! simpleSorterModelType = 
+                                rp.GetSimpleSorterModelType() 
+                                |> Result.ofOption "Missing simpleSorterModelType."
 
-            let! (rngType: rngType) =  
-                        rp.GetRngType()
-                        |> Result.ofOption "Missing RNG type in run parameters"
+            let! (sorterEvalSelectionType: sorterEvalSelectionType) =
+                                rp.GetSorterEvalSelectionType() 
+                                |> Result.ofOption "Missing sorterEvalSelectionType"
 
-            let! (sortingWidth: int<sortingWidth>) = 
-                        rp.GetSortingWidth() 
-                        |> Result.ofOption "Missing sorting width in run parameters"
-    
-            let! (simpleSorterModelType: simpleSorterModelType) = 
-                        rp.GetSimpleSorterModelType() 
-                        |> Result.ofOption "Missing simple sorter model type in run parameters"
-
-            let! (mergeDimension: int<mergeDimension>) = 
-                        rp.GetMergeDimension() 
-                        |> Result.ofOption "Missing mergeDimension in run parameters"
-
-            let! (mergeSuffixType: mergeSuffixType) = 
-                        rp.GetMergeSuffixType() 
-                        |> Result.ofOption "Missing mergeSuffixType in run parameters"
-
-            let! (sorterChildCount: int<sorterChildCount>) = 
-                        rp.GetSorterChildCount()
-                        |> Result.ofOption "Missing parent sorterChildCount in run parameters"
-
-            let! (mutationRate: float<mutationRate>) =  
-                        rp.GetMutationRate()
-                        |> Result.ofOption "Missing mutationRate in run parameters"
-
-            let! (insertionRate: float<insertionRate>) =  
-                        rp.GetInsertionRate()
-                        |> Result.ofOption "Missing insertionRate in run parameters"
-
-            let! (deletionRate: float<deletionRate>) =  
-                        rp.GetDeletionRate()
-                        |> Result.ofOption "Missing deletionRate in run parameters"
-
-            let! (modificationRate: float<modificationRate>) =  
-                        rp.GetModificationRate()
-                        |> Result.ofOption "Missing modificationRate in run parameters"
-
-            let! (sest: sorterEvalSelectionType) = 
-                        rp.GetSorterEvalSelectionType()
-                        |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
-
-            let! (sem:sorterEvalMeasure) = 
-                        rp.GetSorterEvalMeasure()
-                        |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
-
-            let! (genCt: int<generationNumber>) =
-                        rp.GetGenerationLast()
-                        |> Result.ofOption "Missing generationCount in run parameters"
-                        
-            let rngFactory = rngType |> RngFactory.create
-
-            let! (parentSorterSetEval: sorterSetEval) =
-                        SorterEvalDbs.getMergeSorterEvals 
-                                        sortingWidth 
-                                        simpleSorterModelType 
-                                        mergeDimension
-                                        mergeSuffixType
-                                        sorterEvalType.V2
-
-            let _sorterEvalSelection = 
-                            SorterEvalSelection.makeSelection 
-                                        sem 
-                                        sest
-                                        parentSorterSetEval.SorterEvals   
-                                        parentSorterSetEval.SorterTestId
-
-            let (parentSorterModelGen: sorterModelGen) = 
-                CommonSorterEval.getSimpleUniformSorterModelGen 
-                                        rngType 
-                                        sortingWidth 
-                                        simpleSorterModelType
-
-            let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
-                                            (Guid.Empty |> UMX.tag)
-                                            parentSorterModelGen
-
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            rngFactory
-                                            ExcludeSelfCe
-                                            modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
-                                     |> sorterModelMutator.Simple
-
-
-            let childIndexes = [| 0 .. (%sorterChildCount - 1) |]
-
-            // Streaming engine via sequence expression
-            let generateMutantStream (parents: sorterModel[]) =
-                seq {
-                    for parentModel in parents do
-                        for dex in childIndexes do
-                            yield SorterModelMutator.makeMutantSorterModelFromIndex
-                                        sorterModelMutator
-                                        parentModel
-                                        (dex |> UMX.tag<mutationIndex>)
-                }
-
-            return generateMutantStream parentSorterModelSet.SorterModels
-        }
-
-
-
-    let makeMutantDetails (rp:runParameters) : 
-            Async<Result<
-                sorterEvalSelection * Map<Guid<sorterModelId>, Guid<sorterModelId>>, 
-                string>> =
-        asyncResult {
-
-            let! (rngType: rngType) =  
-                        rp.GetRngType()
-                        |> Result.ofOption "Missing RNG type in run parameters"
-
-            let! (sortingWidth: int<sortingWidth>) = 
-                        rp.GetSortingWidth() 
-                        |> Result.ofOption "Missing sorting width in run parameters"
-    
-            let! (simpleSorterModelType: simpleSorterModelType) = 
-                        rp.GetSimpleSorterModelType() 
-                        |> Result.ofOption "Missing simple sorter model type in run parameters"
-
-            let! (sorterChildCount: int<sorterChildCount>) = 
-                        rp.GetSorterChildCount()
-                        |> Result.ofOption "Missing parent sorterChildCount in run parameters"
-
-            let! (mutationRate: float<mutationRate>) =  
-                        rp.GetMutationRate()
-                        |> Result.ofOption "Missing mutationRate in run parameters"
-
-            let! (insertionRate: float<insertionRate>) =  
-                        rp.GetInsertionRate()
-                        |> Result.ofOption "Missing insertionRate in run parameters"
-
-            let! (deletionRate: float<deletionRate>) =  
-                        rp.GetDeletionRate()
-                        |> Result.ofOption "Missing deletionRate in run parameters"
-
-            let! (modificationRate: float<modificationRate>) =  
-                        rp.GetModificationRate()
-                        |> Result.ofOption "Missing modificationRate in run parameters"
-
-            let! (sest: sorterEvalSelectionType) = 
-                        rp.GetSorterEvalSelectionType()
-                        |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
-
-            let! (sem:sorterEvalMeasure) = 
-                        rp.GetSorterEvalMeasure()
-                        |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
-
-            let! (genCt: int<generationNumber>) =
-                        rp.GetGenerationLast()
-                        |> Result.ofOption "Missing generationCount in run parameters"
-
-            let! (parentSorterSetEval: sorterSetEval) =
-                        SorterEvalDbs.getStandardSorterEvals 
-                                            sortingWidth 
-                                            simpleSorterModelType
-                                            sorterEvalType.V2
-
-            let _sorterEvalSelection = 
-                            SorterEvalSelection.makeSelection sem sest
-                                        parentSorterSetEval.SorterEvals
-                                        parentSorterSetEval.SorterTestId
-
-            let (parentSorterModelGen: sorterModelGen) = 
-                CommonSorterEval.getSimpleUniformSorterModelGen 
-                                        rngType 
-                                        sortingWidth 
-                                        simpleSorterModelType
-
-            let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
-                                            (Guid.Empty |> UMX.tag)
-                                            parentSorterModelGen
-
-            let simpleSorterModels = parentSorterModelSet.SorterModels |> Array.map (SorterModel.asSimpleSorterModel)
-
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            (rngType |> RngFactory.create)
-                                            ExcludeSelfCe
-                                            modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
-
-            let parentMutantMap = 
-                    SimpleSorterModelMutator.makeMutantIdToParentIdMap
-                                        sorterModelMutator
-                                        simpleSorterModels
-                                        %sorterChildCount
-
-            return (_sorterEvalSelection, parentMutantMap)
-        }
-
-
-    /// Reusable function to create a clean seed sorterPoolSet from baseline uniform model allocations
-    let private createSeedSorterPoolSet 
-            (sortingWidth: int<sortingWidth>)
-            (simpleSorterModelType: simpleSorterModelType)
-            (sorterEvalMeasureInitial: sorterEvalMeasure)
-            (sorterEvalSelectionType: sorterEvalSelectionType)
-            (rngType: rngType)
-            (poolCount: int<sorterPoolCount>)
-            (sortersPerPool: int<sorterCountPerPool>) : Async<Result<sorterPoolSet, string>> =
-        asyncResult {
+            
             let! (parentSorterSetEval: sorterSetEval) = 
                 SorterEvalDbs.getStandardSorterEvals 
                     sortingWidth 
@@ -307,10 +113,64 @@ module MsceSgdExecutor =
         }
 
 
+    let private createSeedSorterPoolSetMerge
+            (rp:runParameters) : Async<Result<sorterPoolSet, string>> =
+        asyncResult {
+            let! sortingWidth = rp.GetSortingWidth() |> Result.ofOption "Missing sorting width."
+            let! poolCount = rp.GetSorterPoolCount() |> Result.ofOption "Missing poolCount."
+            let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
+            let! mergeDimension = rp.GetMergeDimension() |> Result.ofOption "Missing sortersPerPool."
+            let! mergeSuffixType = rp.GetMergeSuffixType() |> Result.ofOption "Missing sortersPerPool."
+            let! sorterEvalMeasureInitial = rp.GetSorterEvalMeasureInitial() |> Result.ofOption "Missing sorterEvalMeasureInitial."
+            let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
+            let! simpleSorterModelType = 
+                                rp.GetSimpleSorterModelType() 
+                                |> Result.ofOption "Missing simpleSorterModelType."
+
+            let! (sorterEvalSelectionType: sorterEvalSelectionType) =
+                                rp.GetSorterEvalSelectionType() 
+                                |> Result.ofOption "Missing sorterEvalSelectionType"
+
+            
+            let! (parentSorterSetEval: sorterSetEval) = 
+                SorterEvalDbs.getMergeSorterEvals 
+                    sortingWidth 
+                    simpleSorterModelType 
+                    mergeDimension
+                    mergeSuffixType
+                    GeneSort.SortingOps.sorterEvalType.V2
+
+            let seedSorterModelGen = 
+                CommonSorterEval.getSimpleUniformSorterModelGen 
+                    rngType 
+                    sortingWidth 
+                    simpleSorterModelType
+
+            let sorterEvalSelection = 
+                SorterEvalSelection.makeSelection 
+                    sorterEvalMeasureInitial 
+                    sorterEvalSelectionType 
+                    parentSorterSetEval.SorterEvals 
+                    parentSorterSetEval.SorterTestId
+                
+            let seedSorterModelSet = 
+                sorterEvalSelection.MakeSorterModelSet 
+                    (Guid.Empty |> UMX.tag) 
+                    seedSorterModelGen
+
+            return SorterPoolSet.fromSorterModelSet 
+                (Guid.NewGuid() |> UMX.tag)
+                poolCount
+                sortersPerPool
+                (0 |> UMX.tag<generationNumber>)
+                seedSorterModelSet
+        }
+
     /// Dispatches the evolution history run parameters, executes the generative loop via asyncResult,
     /// and manages final state serialization/reporting pipelines.
     let evaluateEvolutionRun
             (makeSortableTests: runParameters -> Async<Result<sortableTest, string>>)
+            (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
             (host: IRunHost)
             (rp: runParameters)
             (allowOverwrite: bool<allowOverwrite>)
@@ -326,23 +186,13 @@ module MsceSgdExecutor =
                 do! checkCancellation cts.Token
 
                 // 1. Gather all required run metrics and options out of your parameters block securely
-                let! sortingWidth = rp.GetSortingWidth() |> Result.ofOption "Missing sorting width."
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
                 let! genFirst = rp.GetGenerationFirst() |> Result.ofOption "Missing genFirst."
-                let! poolCount = rp.GetSorterPoolCount() |> Result.ofOption "Missing poolCount."
                 let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
                 let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count"
-                let! sorterEvalMeasureInitial = rp.GetSorterEvalMeasureInitial() |> Result.ofOption "Missing sorterEvalMeasureInitial."
                 let! sorterEvalMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
                 let! sorterEvalType = rp.GetSorterEvalType() |> Result.ofOption "Missing sorterEvalType."
                 let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
-                let! simpleSorterModelType = 
-                                    rp.GetSimpleSorterModelType() 
-                                    |> Result.ofOption "Missing simpleSorterModelType."
-
-                let! (sorterEvalSelectionType: sorterEvalSelectionType) =
-                                    rp.GetSorterEvalSelectionType() 
-                                    |> Result.ofOption "Missing sorterEvalSelectionType"
 
                 // 2. Resolve target seed sorterPoolSet collection state depending on genFirst criteria
                 let! seedSorterPoolSet = 
@@ -366,14 +216,7 @@ module MsceSgdExecutor =
                     else
                         // Otherwise create it ..
                         log "Make seedSorterPoolSet..."
-                        createSeedSorterPoolSet 
-                            sortingWidth 
-                            simpleSorterModelType 
-                            sorterEvalMeasureInitial 
-                            sorterEvalSelectionType 
-                            rngType 
-                            poolCount 
-                            sortersPerPool
+                        sorterPoolSetCreator rp
 
                 do! checkCancellation cts.Token
                 log "Executing makeSortableTests..."
@@ -476,6 +319,7 @@ module MsceSgdExecutor =
             member _.Execute host rp allowOverwrite cts progress =
                 evaluateEvolutionRun
                     makeStandardTests
+                    createSeedSorterPoolSetStandard
                     host rp allowOverwrite cts progress }
 
     let mergeExecutor =
@@ -483,6 +327,7 @@ module MsceSgdExecutor =
             member _.Execute host rp allowOverwrite cts progress =
                 evaluateEvolutionRun
                     makeMergeTests
+                    createSeedSorterPoolSetMerge
                     host rp allowOverwrite cts progress }
 
     let fullReportExecutor =

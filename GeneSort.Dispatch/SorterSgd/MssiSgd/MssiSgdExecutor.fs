@@ -64,7 +64,7 @@ module MssiSgdExecutor =
         }
 
 
-    let makeMutantSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
+    let makeSeedSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
         asyncResult {
 
             let! (rngType: rngType) =  
@@ -159,7 +159,7 @@ module MssiSgdExecutor =
 
 
 
-    let makeMutantMergeSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
+    let makeSeedMergeSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
         asyncResult {
 
             let! (rngType: rngType) =  
@@ -574,7 +574,7 @@ module MssiSgdExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _evaluateMutants 
-                    makeMutantSorterModels
+                    makeSeedSorterModels
                     makeStandardTests
                     host rp allowOverwrite cts progress }
 
@@ -582,7 +582,7 @@ module MssiSgdExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _evaluateMutants 
-                    makeMutantMergeSorterModels
+                    makeSeedMergeSorterModels
                     makeMergeTests
                     host rp allowOverwrite cts progress }
 

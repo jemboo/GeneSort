@@ -27,7 +27,7 @@ module MsceSgdSpecsRs =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
     
     let generationLast = 
-            (runParameters.generationLastKey, [50000] |> List.map string)
+            (runParameters.generationLastKey, [100] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
