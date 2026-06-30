@@ -39,15 +39,24 @@ module MathUtils =
     // 1.0077 -> 997 samples per 10^5
     // 10095 -> 1001 samples per 500K
     // 1.0103 -> 1000 samples per 10^6
-    let ksample10K = 1.0049
+    
+    let cSample5C = 1.041
+    let cSample1K = 1.05
+    let cSample10K = 1.08
+    let cSample50K = 1.1
+    let cSample100K = 1.1113
+    let cSample500K = 1.13
+
+    let kSample5K = 1.004
+    let kSample10K = 1.0049
     let ksample50K = 1.0068
     let ksample100K = 1.0077
     let ksample500K = 1.0095
-    let ksample1000K = 1.0103
+    let ksample1M = 1.0103
 
-    let expSampler (maxInt:int) (stepIncrease:float)=
+    let expSampler (maxInt:int) (increaseRatio:float) :Set<int> =
         let rec computeTargets currentVal acc =
-            let nextVal = currentVal * stepIncrease
+            let nextVal = currentVal * increaseRatio
             let nextInt = int (ceil nextVal)
             if nextInt >= maxInt then 
                 (maxInt :: acc) |> Set.ofList

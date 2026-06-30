@@ -87,7 +87,7 @@ module SorterRunResult =
         // --- Exponential Frequency Configuration ---
         let totalGenInt = int (genStart + genCount)
         // Pre-calculate target snapshot generations exponentially.
-        let targetGenerations = MathUtils.expSampler totalGenInt MathUtils.ksample100K
+        let targetGenerations = MathUtils.expSampler totalGenInt MathUtils.cSample1K
 
         let rec loop 
                     (remainingSteps: int) 

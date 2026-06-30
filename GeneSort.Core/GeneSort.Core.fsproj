@@ -20,6 +20,7 @@
     <Compile Include="SimdUtils.fs" />
     <Compile Include="SimdSandbox.fs" />
     <Compile Include="Segment.fs" />
+    <Compile Include="IntSteps.fs" />
     <Compile Include="CollectionUtils.fs" />
     <Compile Include="RankingOps.fs" />
     <Compile Include="BytePack.fs" />

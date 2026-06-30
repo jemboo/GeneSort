@@ -7,7 +7,6 @@ open GeneSort.Project.V1
 open GeneSort.SortingOps
 open GeneSort.Sorting
 open GeneSort.Eval.V1
-open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterSgd
 
@@ -29,7 +28,7 @@ module Msuf4SgdSpecsRm =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [100] |> List.map string)
+            (runParameters.generationLastKey, [1000] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
