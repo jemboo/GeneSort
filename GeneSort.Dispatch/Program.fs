@@ -196,7 +196,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executor = MsceSgdExecutor.getExecutor executorType
 
 
-//********** MsceSgdSpecsRs **********
+//********** MsceSgdSpecsRm **********
 //let configType = MsceSgdSpecsRm.configType.Rand_Test
 //let executorType = sorterSgdExecutorType.GenMerge
 //let host: IRunHost = 
@@ -214,7 +214,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executor = MssiSgdExecutor.getExecutor executorType
 
 
-//********** MssiSgdSpecsRs **********
+//********** MssiSgdSpecsRm **********
 //let configType = MssiSgdSpecsRm.configType.Rand_Test
 //let executorType = sorterSgdExecutorType.GenMerge
 //let host: IRunHost = 
@@ -232,7 +232,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executor = MsrsSgdExecutor.getExecutor executorType
 
 
-//********** MsrsSgdSpecsRs **********
+//********** MsrsSgdSpecsRm **********
 //let configType = MsrsSgdSpecsRm.configType.Rand_Test
 //let executorType = sorterSgdExecutorType.GenMerge
 //let host: IRunHost = 
@@ -240,22 +240,22 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //    MsrsSgdDbs.createRunHost spec
 //let executor = MsrsSgdExecutor.getExecutor executorType
 
-//********** Msuf4SgdSpecsRs **********
-let configType = Msuf4SgdSpecsRs.configType.Rand_Test
-let executorType = sorterSgdExecutorType.GenStandard
-let host: IRunHost = 
-    let spec = Msuf4SgdSpecsRs.getRunHostSpec configType executorType
-    Msuf4SgdDbs.createRunHost spec
-let executor = Msuf4SgdExecutor.getExecutor executorType
-
 
 //********** Msuf4SgdSpecsRs **********
-//let configType = Msuf4SgdSpecsRm.configType.Rand_Test
-//let executorType = sorterSgdExecutorType.GenMerge
+//let configType = Msuf4SgdSpecsRs.configType.Rand_Test
+//let executorType = sorterSgdExecutorType.FullReport
 //let host: IRunHost = 
-//    let spec = Msuf4SgdSpecsRm.getRunHostSpec configType executorType
+//    let spec = Msuf4SgdSpecsRs.getRunHostSpec configType executorType
 //    Msuf4SgdDbs.createRunHost spec
 //let executor = Msuf4SgdExecutor.getExecutor executorType
+
+//********** Msuf4SgdSpecsRm **********
+let configType = Msuf4SgdSpecsRm.configType.Rand_Test
+let executorType = sorterSgdExecutorType.GenMerge
+let host: IRunHost = 
+    let spec = Msuf4SgdSpecsRm.getRunHostSpec configType executorType
+    Msuf4SgdDbs.createRunHost spec
+let executor = Msuf4SgdExecutor.getExecutor executorType
 
 
 

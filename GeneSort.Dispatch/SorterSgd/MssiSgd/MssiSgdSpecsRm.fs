@@ -1,31 +1,38 @@
 ﻿namespace GeneSort.Dispatch.V1.SorterSgd.Mssi
 
 open FSharp.UMX
-open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.SortingOps
 open GeneSort.Sorting
 open GeneSort.Eval.V1
-open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
+open GeneSort.Dispatch.V1.SorterSgd
 
 
 module MssiSgdSpecsRm =
 
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.ValueSpan 30<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
 
+    let sorterEvalMeasureInitial = 
+            (runParameters.sorterEvalMeasureInitialKey , 
+            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
 
-    let sorterEvalMeasure = 
+    let sorterEvalMeasureEvo = 
             (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (1.0, true);] |> List.map SorterEvalMeasure.toString)
-    
+            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
         
-    let generationCount = 
-            (runParameters.generationLastKey, [10] |> List.map string)
+    let generationLast = 
+            (runParameters.generationLastKey, [100] |> List.map string)
+
+    let generationFirst = 
+            (runParameters.generationFirstKey, [0] |> List.map string)
+
+    let generationQueryFirst = 
+            (runParameters.queryWithGenFirst, [false] |> List.map string)
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
@@ -47,14 +54,15 @@ module MssiSgdSpecsRm =
 
     module Specs =
 
-        let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
+        let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
             DatabaseName = MssiSgdDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"Rand-test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Mssi"
             Spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure
+                sorterEvalMeasureInitial
+                sorterEvalMeasureEvo
                 sorterEvalTypeV1
                 orthoRates
                 paraRates
@@ -67,7 +75,9 @@ module MssiSgdSpecsRm =
                 testPoolCount
                 oneSorterPerPool
                 oneChildCount
-                generationCount
+                generationFirst
+                generationLast
+                generationQueryFirst
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
@@ -75,27 +85,30 @@ module MssiSgdSpecsRm =
             MaxParallel = 1
         }
 
-        let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
+        let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
             DatabaseName = MssiSgdDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Mssi"
             Spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure
+                sorterEvalMeasureInitial
+                sorterEvalMeasureEvo
                 sorterEvalTypeV1
                 orthoRates
                 paraRates
                 modificationRatesStage
-                smallMergeSortingWidths
+                testMergeSortingWidths
                 mssiModelType
-                lowMergeDimensions
+                testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
                 testPoolCount
                 oneSorterPerPool
                 oneChildCount
-                generationCount
+                generationFirst
+                generationLast
+                generationQueryFirst
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
@@ -103,27 +116,30 @@ module MssiSgdSpecsRm =
             MaxParallel = 8
         }
 
-        let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
+        let Rand_Medium (executorType: sorterSgdExecutorType) : runHostSpec = {
             DatabaseName = MssiSgdDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Mutation analysis for merge Mssi"
             Spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure
+                sorterEvalMeasureInitial
+                sorterEvalMeasureEvo
                 sorterEvalTypeV1
                 orthoRates
                 paraRates
                 modificationRatesStage
-                mediumMergeSortingWidths
+                testMergeSortingWidths
                 mssiModelType
-                lowMergeDimensions
+                testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
                 testPoolCount
                 oneSorterPerPool
                 oneChildCount
-                generationCount
+                generationFirst
+                generationLast
+                generationQueryFirst
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
@@ -143,7 +159,7 @@ module MssiSgdSpecsRm =
                         (configType.Rand_Medium, Specs.Rand_Medium);
                     ]
 
-    let getRunHostSpec (config: configType) (executorType: sorterMutateExecutorType) : runHostSpec =
+    let getRunHostSpec (config: configType) (executorType: sorterSgdExecutorType) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType
 

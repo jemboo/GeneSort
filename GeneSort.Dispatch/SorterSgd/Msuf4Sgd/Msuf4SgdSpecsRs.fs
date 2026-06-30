@@ -15,7 +15,7 @@ module Msuf4SgdSpecsRs =
 
     let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.Tmb 100<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.Tmb 10<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
 
     let sorterEvalMeasureInitial = 
             (runParameters.sorterEvalMeasureInitialKey , 
@@ -26,7 +26,7 @@ module Msuf4SgdSpecsRs =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
 
     let generationLast = 
-            (runParameters.generationLastKey, [200000] |> List.map string)
+            (runParameters.generationLastKey, [20000] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
@@ -65,7 +65,7 @@ module Msuf4SgdSpecsRs =
                 orthoRates
                 paraRates
                 selfSymRates
-                seedModificationRateC
+                seedModificationRatesC
                 modificationRatesStage3
                 sortingWidth16
                 testPoolCount

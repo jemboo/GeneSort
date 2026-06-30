@@ -17,7 +17,7 @@ module MsceSgdSpecsRm =
 
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.Tmb 50<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.Tmb 10<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
 
     let sorterEvalMeasureInitial = 
             (runParameters.sorterEvalMeasureInitialKey , 
