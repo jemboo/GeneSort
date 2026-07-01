@@ -2,6 +2,20 @@
 open LanguagePrimitives
 open System
 
+type blockSize =
+    | X1
+    | X5
+    | C1
+    | C5
+    | K1
+    | K5
+    | K10
+    | K50
+    | K100
+    | K500
+    | M1
+
+
 type uniformSteps = {
     firstStep: int
     stepSize: int
@@ -13,11 +27,18 @@ type stepBlock =
         firstStep: int
         offsets: int[]
     }
+
     static member create (firstStep:int) (offsets: int[]) : stepBlock =
         {
             stepBlock.firstStep = firstStep
             stepBlock.offsets = offsets
         }
+
+    member this.FirstStep with get() = this.firstStep
+    member this.Offsets with get() = this.offsets
+    member this.OffsetsInOrder with get() = this.offsets |> Array.sort
+
+
 
 
 //module StepBlock =

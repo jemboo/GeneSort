@@ -38,7 +38,7 @@ module Example =
 
 
 
-    let yab = MathUtils.expSampler 5000 MathUtils.cSample5K
+    let yab = MathUtils.expSampler 5000 1 MathUtils.cSample5K
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
