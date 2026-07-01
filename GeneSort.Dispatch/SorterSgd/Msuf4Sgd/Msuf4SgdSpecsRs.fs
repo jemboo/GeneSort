@@ -53,7 +53,7 @@ module Msuf4SgdSpecsRs =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
             DatabaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Test1_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Sgd analysis for Msuf4"
             Spans = [
                 msuf4ModelType
@@ -78,7 +78,7 @@ module Msuf4SgdSpecsRs =
             Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            MaxParallel = 1
         }
 
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {

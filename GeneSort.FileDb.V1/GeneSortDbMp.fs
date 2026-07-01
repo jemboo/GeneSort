@@ -6,6 +6,7 @@ open System.Threading
 open FSharp.UMX
 open GeneSort.Db.V1
 open GeneSort.Project.V1
+open GeneSort.Eval.V1
 
 type private DbMessage =
     | Save of string<pathToRootFolder> * queryParams * outputData * bool<allowOverwrite> * AsyncReplyChannel<Result<unit, string>>
@@ -45,20 +46,57 @@ type GeneSortDbMp(
         member _.MakeQueryParamsFromRunParams rp odt =
             queryParamsMaker rp odt
 
-        member _.saveAsync
-                    (queryParams: queryParams)
-                    (data: outputData)
-                    (allowOverwrite: bool<allowOverwrite>) : Async<Result<unit, string>> =
+        member _.saveAsync (queryParams: queryParams) (data: outputData) (allowOverwrite: bool<allowOverwrite>) =
             mailbox.PostAndAsyncReply(fun channel -> Save(rootFolder, queryParams, data, allowOverwrite, channel))
 
-        member _.loadAsync 
-                    (queryParams: queryParams) : Async<Result<outputData, OutputError>> =
+        member _.loadAsync (queryParams: queryParams) =
             mailbox.PostAndAsyncReply(fun channel -> Load(rootFolder, queryParams, channel))
 
-        member _.getRunParameters
-                        (runName :string<runName>)
-                        (minReplNumber: int<replNumber> option)
-                        (maxReplNumber: int<replNumber> option)
-                        (ct: CancellationToken option)
-                        (progress: IProgress<string> option) : Async<Result<runParameters[], string>> =
-            mailbox.PostAndAsyncReply(fun channel -> GetRunParameters(runName, minReplNumber, maxReplNumber, ct, progress, channel))
+        member this.loadIfFoundAsync(queryParams: queryParams) =
+            async {
+                let filePath = OutputDataFile.getFullOutputDataFilePath rootFolder queryParams
+                if not (File.Exists %filePath) then
+                    return None
+                else
+                    let! loadResult = (this :> IGeneSortDb).loadAsync queryParams
+                    match loadResult with
+                    | Ok data -> return Some data
+                    | Error _ -> return None
+            }
+
+        member this.getNextGenerationalItemAsync 
+                    (baseQueryParams: queryParams) 
+                    (generationMutator: queryParams -> int<generationNumber> -> queryParams) 
+                    (defaultValue: outputData option) : Async<outputData option> =
+            async {
+                // Collect standard intervals and reverse them to start at the highest generation number
+                let reversedIntervals = GenerationNumber.standardIntervals() |> Seq.toArray |> Array.rev
+                let db = this :> IGeneSortDb
+
+                let rec search index =
+                    async {
+                        if index >= reversedIntervals.Length then
+                            return defaultValue
+                        else
+                            let currentGen = reversedIntervals.[index]
+                            let targetQueryParams = generationMutator baseQueryParams currentGen
+                            
+                            // Highly performant: checks File.Exists outside the mailbox loop
+                            let! itemOpt = db.loadIfFoundAsync targetQueryParams
+                            
+                            match itemOpt with
+                            | Some data -> return Some data // Boundary found! Stop tracking backwards immediately.
+                            | None -> return! search (index + 1) // File missing, check next lowest interval.
+                    }
+
+                return! search 0
+            }
+
+        member _.getRunParameters 
+                            (runName: string<runName>) 
+                            (minReplNumber: int<replNumber> option) 
+                            (maxReplNumber: int<replNumber> option) 
+                            (ct: CancellationToken option) 
+                            (progress: IProgress<string> option) =
+                    mailbox.PostAndAsyncReply(fun channel -> 
+                        GetRunParameters(runName, minReplNumber, maxReplNumber, ct, progress, channel))

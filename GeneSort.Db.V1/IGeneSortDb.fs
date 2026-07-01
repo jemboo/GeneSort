@@ -2,6 +2,7 @@
 open System
 open System.Threading
 open FSharp.UMX
+open GeneSort.Eval.V1
 open GeneSort.Project.V1
 
 [<Measure>] type allowOverwrite
@@ -21,6 +22,16 @@ type IGeneSortDb =
                         queryParams -> 
                             Async<Result<outputData, OutputError>>
 
+    abstract member loadIfFoundAsync : 
+                        queryParams -> 
+                            Async<outputData option>
+
+    abstract member getNextGenerationalItemAsync :
+                        queryParams ->
+                        (queryParams -> int<generationNumber> -> queryParams) ->
+                        outputData option ->
+                            Async<outputData option>
+
     abstract member getRunParameters :
                         string<runName> ->
                         int<replNumber> option ->
@@ -33,4 +44,3 @@ type IGeneSortDb =
                         runParameters ->
                         outputDataType ->
                         queryParams option
-
