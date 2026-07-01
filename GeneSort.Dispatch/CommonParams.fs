@@ -45,7 +45,7 @@ module CommonParams =
     let twoSortersPerPool = (runParameters.sorterCountPerPoolKey, ["2";] )
 
     // SorterPoolCounts
-    let testPoolCount = (runParameters.sorterPoolCountKey, ["30";] )
+    let testPoolCount = (runParameters.sorterPoolCountKey, ["16";] )
     let smallPoolCount = (runParameters.sorterPoolCountKey, ["10";] )
     let mediumPoolCount = (runParameters.sorterPoolCountKey, ["100";] )
     let largePoolCount = (runParameters.sorterPoolCountKey, ["1000";] )
@@ -153,11 +153,11 @@ module CommonParams =
     let deletionRates =
             (runParameters.deletionRateKey, [0.1;] |> List.map string)
     let orthoRates =
-            (runParameters.orthoRateKey, [1.0; 2.0; 3.0] |> List.map string)
+            (runParameters.orthoRateKey, [2.001; 3.001; 4.001] |> List.map string)
     let paraRates =
-            (runParameters.paraRateKey, [1.0; 2.0; 3.0] |> List.map string)
+            (runParameters.paraRateKey, [0.5; 1.001; 1.5] |> List.map string)
     let selfSymRates =
-            (runParameters.selfSymRateKey, [2.0; ] |> List.map string)
+            (runParameters.selfSymRateKey, [2.001; ] |> List.map string)
 
     let seedModificationRateZero =
             (runParameters.seedModificationRateKey, [0.00] |> List.map string)
@@ -166,7 +166,7 @@ module CommonParams =
             (runParameters.seedModificationRateKey, [0.01; ] |> List.map string)
 
     let seedModificationRatesC =
-            (runParameters.seedModificationRateKey, [0.00; 0.01; 0.02; 0.04; 0.08] |> List.map string)
+            (runParameters.seedModificationRateKey, [0.001; 0.01; 0.02; 0.04; 0.08] |> List.map string)
 
     //let modificationRatesMsce =
     //        (runParameters.modificationRateKey, [ 0.00125; 0.005; 0.02; 0.08 ] |> List.map string)
