@@ -86,7 +86,6 @@ module SorterRunResult =
 
         // --- Exponential Frequency Configuration ---
         let totalGenInt = int (genStart + genCount)
-        // Pre-calculate target snapshot generations exponentially.
         let targetGenerations = MathUtils.expSampler 1 totalGenInt MathUtils.cSample5K
 
         let rec loop 
@@ -115,9 +114,9 @@ module SorterRunResult =
                         log (sprintf "Starting evolution step. Generation %d of %d" currentGen totalGen)
 
                     // 1. Snapshot the current generation state before applying structural changes
-                    let currentSnapshot = SorterPoolSetDescription.fromPoolSet currentSorterPoolSet
                     let updatedHistory = 
                         if shouldReport then 
+                            let currentSnapshot = SorterPoolSetDescription.fromPoolSet currentSorterPoolSet
                             currentSnapshot :: historyAcc
                         else 
                             historyAcc

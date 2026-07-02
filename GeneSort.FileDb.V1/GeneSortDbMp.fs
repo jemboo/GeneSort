@@ -81,7 +81,6 @@ type GeneSortDbMp(
                             let currentGen = reversedIntervals.[index]
                             let targetQueryParams = generationMutator baseQueryParams currentGen
                             
-                            // Highly performant: checks File.Exists outside the mailbox loop
                             let! itemOpt = db.loadIfFoundAsync targetQueryParams
                             
                             match itemOpt with
