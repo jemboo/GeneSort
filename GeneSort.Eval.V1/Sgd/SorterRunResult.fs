@@ -86,7 +86,7 @@ module SorterRunResult =
 
         // --- Exponential Frequency Configuration ---
         let totalGenInt = int (genStart + genCount)
-        let targetGenerations = MathUtils.expSampler 1 totalGenInt MathUtils.cSample5K
+        let targetGenerations = MathUtils.expSampler 1 totalGenInt MathUtils.cSample1K
 
         let rec loop 
                     (remainingSteps: int) 

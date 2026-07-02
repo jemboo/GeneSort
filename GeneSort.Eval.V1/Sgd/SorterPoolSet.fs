@@ -97,7 +97,8 @@ module SorterPoolSet =
             (sorterPoolSetId: Guid<sorterPoolSetId>) 
             (poolCount: int<sorterPoolCount>)
             (sortersPerPool: int<sorterCountPerPool>)
-            (generationNumber: int<generationNumber>) 
+            (generationNumber: int<generationNumber>)
+            (evalLabelMap: Map<Guid<sorterModelId>, evalLabel>)
             (modelSet: sorterModelSet) : sorterPoolSet =
 
         let totalRequiredSorters = %poolCount * %sortersPerPool
@@ -117,7 +118,13 @@ module SorterPoolSet =
             targetedModels
             |> Array.chunkBySize %sortersPerPool
             |> Array.map (fun modelChunk ->
-            
+                
+                let poolName =
+                    modelChunk |> Array.map (fun model -> 
+                        let id = model |> SorterModel.getId
+                        Map.find id evalLabelMap
+                    ) |> EvalLabel.toString |> UMX.tag<sorterPoolName>
+
                 // 3. Map each model within the chunk into a tracking pool member record
                 let memberObjs = 
                     modelChunk
@@ -133,7 +140,7 @@ module SorterPoolSet =
 
                 // 4. Wrap the evaluated array segment block inside an explicit tracking pool object container
                 let poolId = Guid.NewGuid() |> UMX.tag<sorterPoolId>
-                sorterPool.create poolId (""|> UMX.tag<sorterPoolName>) memberObjs
+                sorterPool.create poolId poolName memberObjs
             )
 
         // 5. Package the complete group layout structure back out to the main generational repository root

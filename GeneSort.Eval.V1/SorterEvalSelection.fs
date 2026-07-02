@@ -7,11 +7,6 @@ open GeneSort.Sorting
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 
-type evalLabel = 
-    | Tmb of tmbGroup
-    | Index of int
-    //| Index of int
-    //| Index of int
 
 type sorterEvalSelectionType = 
     | Tmb of int<sorterCount>
@@ -77,9 +72,10 @@ type sorterEvalSelection =
     member this.Measure       = this.measure
     member this.LabeledSorterEvals with get() = this.labeledSorterEvals
 
-    member this.ToMap() : Map<Guid<sorterId>, (evalLabel * sorterEval)> =
+    member this.ToEvalLabelMap() : Map<Guid<sorterModelId>, evalLabel> =
         this.labeledSorterEvals 
-        |> Array.map (fun (label, se) -> (se |> SorterEval.getSorterId, (label, se)))
+        |> Array.map (fun (evalLabel, se) -> 
+                (se |> SorterEval.getSorterId |> UMX.cast<sorterId,sorterModelId>, evalLabel))
         |> Map.ofArray
 
     member this.MakeSorterModelSet 
@@ -98,8 +94,7 @@ module SorterEvalSelection =
 
     let private prepareDistinctSorted 
                         (measure: sorterEvalMeasure) 
-                        (items: sorterEval seq) 
-                             :sorterEval array =
+                        (items: sorterEval seq): sorterEval array =
         items
         |> SorterEvalFunctions.filterEvaluations measure
         |> Seq.filter SorterEval.getIsSorted
@@ -121,7 +116,7 @@ module SorterEvalSelection =
             if n <= 0 then failwithf "TopN count must be greater than zero, but was %d" n
             
             let topN = cleanItems |> Array.sortBy ranker |> Array.truncate n
-            let labeledItems = topN |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
+            let labeledItems = topN |> Array.mapi (fun idx se -> evalLabel.Rank idx, se)
             sorterEvalSelection.create selType measure labeledItems sortableTestId
 
         | Tmb count ->
@@ -164,7 +159,7 @@ module SorterEvalSelection =
                         res.[i] <- sortedItems.[targetIndex]
                     res
 
-            let labeledItems = result |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
+            let labeledItems = result |> Array.mapi (fun idx se -> evalLabel.RankIndex idx, se)
             sorterEvalSelection.create selType measure labeledItems sortableTestId
 
         | ValueSpan count ->
@@ -198,19 +193,18 @@ module SorterEvalSelection =
                             res.[i] <- closestMatch
                     res
 
-            let labeledItems = result |> Array.mapi (fun idx se -> evalLabel.Index idx, se)
+            let labeledItems = result |> Array.mapi (fun idx se -> evalLabel.ValueIndex idx, se)
             sorterEvalSelection.create selType measure labeledItems sortableTestId
 
 
 module EvalReporting =
 
-    let evalLabelToDtr (label: evalLabel) : dataTableRecord =
-        match label with
-        | evalLabel.Tmb groupTag -> 
-            groupTag |> RankedGroup.toDataTableRecord
-        | evalLabel.Index idx -> 
+    let evalLabelsToDtr (labels: evalLabel seq) : dataTableRecord =
             dataTableRecord.createEmpty() 
-            |> dataTableRecord.addData "SorterEvalIndex" (string idx)
+            |> dataTableRecord.addData "EvalLabel" (EvalLabel.toString labels)
+
+    let evalLabelToDtr (label: evalLabel) : dataTableRecord =
+            seq { yield label } |> evalLabelsToDtr
 
     let private createContextDtr (leadCols: dataTableRecord) (selection: sorterEvalSelection) =
         dataTableRecord.createEmpty()

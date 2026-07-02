@@ -70,7 +70,7 @@ module Msuf4SgdSpecsRm =
                 orthoRates
                 paraRates
                 selfSymRates
-                seedModificationRateZero
+                seedModificationRateC
                 modificationRatesStage
                 testMergeSortingWidths
                 msuf4ModelType
@@ -103,7 +103,7 @@ module Msuf4SgdSpecsRm =
                 orthoRates
                 paraRates
                 selfSymRates
-                seedModificationRateZero
+                seedModificationRateC
                 modificationRatesStage
                 smallMergeSortingWidths
                 msuf4ModelType
@@ -136,7 +136,7 @@ module Msuf4SgdSpecsRm =
                 orthoRates
                 paraRates
                 selfSymRates
-                seedModificationRateZero
+                seedModificationRateC
                 modificationRatesStage
                 mediumMergeSortingWidths
                 msuf4ModelType

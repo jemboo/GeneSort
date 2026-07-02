@@ -134,6 +134,7 @@ module SorterPoolSetDescription =
             let poolContextDtr =
                 setContextDtr
                 |> dataTableRecord.addData (sprintf "%sSorterPoolId" prefix) (string (%poolDesc.SorterPoolId))
+                |> dataTableRecord.addData (sprintf "%sSorterPoolName" prefix) (string (%poolDesc.SorterPoolName))
 
             // 2b. Map every single pool member, flattening and combining structures upward
             poolDesc.SorterPoolMembers

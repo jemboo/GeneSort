@@ -18,7 +18,7 @@ module RankedGroup =
 
     let toDataTableRecord (group: tmbGroup) : dataTableRecord =
         dataTableRecord.createEmpty()
-        |> dataTableRecord.addData "RankedGroup" (toString group)
+        |> dataTableRecord.addData "EvalLabel" (toString group)
 
     /// Extracts three groups of items, each of size min(groupSize, items.Length/3)
     /// from the input sequence based on their rank as determined by the ranker function.

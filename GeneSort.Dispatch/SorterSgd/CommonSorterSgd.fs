@@ -122,6 +122,7 @@ module CommonSorterSgd =
                 poolCount
                 sortersPerPool
                 (0 |> UMX.tag<generationNumber>)
+                (sorterEvalSelection.ToEvalLabelMap())
                 seedSorterModelSet
         }
 
@@ -176,6 +177,7 @@ module CommonSorterSgd =
                 poolCount
                 sortersPerPool
                 (0 |> UMX.tag<generationNumber>)
+                (sorterEvalSelection.ToEvalLabelMap())
                 seedSorterModelSet
         }
 

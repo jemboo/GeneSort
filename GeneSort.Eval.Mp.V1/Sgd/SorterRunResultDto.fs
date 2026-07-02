@@ -182,7 +182,10 @@ module SorterPoolSetDto =
                             sourceOpt
                             evalOpt
                     )
-                sorterPool.create (UMX.tag p.sorterPoolId) (UMX.tag p.name) members
+                sorterPool.create 
+                            (p.sorterPoolId |> UMX.tag<sorterPoolId>) 
+                            (p.name |> UMX.tag<sorterPoolName>) 
+                            members
             )
         sorterPoolSet.Create(UMX.tag dto.sorterPoolSetId, UMX.tag dto.generationNumber, pools)
 
