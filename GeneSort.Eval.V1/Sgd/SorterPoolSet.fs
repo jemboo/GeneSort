@@ -3,7 +3,6 @@
 open System
 open FSharp.UMX
 open GeneSort.SortingOps
-open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 
 
@@ -134,7 +133,7 @@ module SorterPoolSet =
 
                 // 4. Wrap the evaluated array segment block inside an explicit tracking pool object container
                 let poolId = Guid.NewGuid() |> UMX.tag<sorterPoolId>
-                sorterPool.Create(poolId, memberObjs)
+                sorterPool.create poolId (""|> UMX.tag<sorterPoolName>) memberObjs
             )
 
         // 5. Package the complete group layout structure back out to the main generational repository root

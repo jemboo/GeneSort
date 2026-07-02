@@ -17,6 +17,7 @@ open GeneSort.Dispatch.V1.SortableTest
 open GeneSort.Dispatch.V1
 open System.Threading
 open GeneSort.Dispatch.V1.OpsUtils
+open GeneSort.Model.Sorting.V1
 
 
 type sorterSgdExecutorType = 
@@ -167,7 +168,7 @@ module CommonSorterSgd =
                 
             let seedSorterModelSet = 
                 sorterEvalSelection.MakeSorterModelSet 
-                    (Guid.Empty |> UMX.tag) 
+                    (Guid.Empty |> UMX.tag<sorterModelSetId>) 
                     seedSorterModelGen
 
             return SorterPoolSet.fromSorterModelSet 

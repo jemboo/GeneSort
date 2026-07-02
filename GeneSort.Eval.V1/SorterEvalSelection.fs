@@ -10,11 +10,13 @@ open GeneSort.Model.Sorting.V1
 type evalLabel = 
     | Tmb of tmbGroup
     | Index of int
+    //| Index of int
+    //| Index of int
 
 type sorterEvalSelectionType = 
     | Tmb of int<sorterCount>
     | ValueSpan of int<sorterCount>
-    | IndexSpan of int<sorterCount>
+    | RankSpan of int<sorterCount>
     | TopN of int<sorterCount>
 
 module SorterEvalSelectionType =
@@ -22,7 +24,7 @@ module SorterEvalSelectionType =
     let toString = function
         | Tmb count       -> sprintf "Tmb:%d" count
         | ValueSpan count -> sprintf "ValueSpan:%d" count
-        | IndexSpan count -> sprintf "IndexSpan:%d" count
+        | RankSpan count -> sprintf "RankSpan:%d" count
         | TopN count      -> sprintf "TopN:%d" count
 
     let fromString (str: string) = 
@@ -32,7 +34,7 @@ module SorterEvalSelectionType =
             match caseName with
             | "Tmb"       -> Tmb count
             | "ValueSpan" -> ValueSpan count
-            | "IndexSpan" -> IndexSpan count
+            | "RankSpan" -> RankSpan count
             | "TopN"      -> TopN count
             | _           -> failwithf "Invalid case name '%s' in string '%s'" caseName str
         | _ -> 
@@ -41,7 +43,7 @@ module SorterEvalSelectionType =
     let toStrategyLabel = function
         | Tmb _       -> "Tmb"
         | ValueSpan _ -> "ValueSpan"
-        | IndexSpan _ -> "IndexSpan"
+        | RankSpan _ -> "RankSpan"
         | TopN _      -> "TopN"
 
 
@@ -144,7 +146,7 @@ module SorterEvalSelection =
                 let labeledItems = Array.concat [topGroup; midGroup; botGroup]
                 sorterEvalSelection.create selType measure labeledItems sortableTestId
 
-        | IndexSpan count ->
+        | RankSpan count ->
             let sampleCount = %count
             if sampleCount <= 0 then failwithf "Sample count must be greater than zero, but was %d" sampleCount
             if cleanItems.Length < sampleCount then failwithf "Cannot sample %d items; only %d options available." 

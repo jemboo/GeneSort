@@ -5,6 +5,7 @@ open FSharp.UMX
 [<Measure>] type generationNumber
 [<Measure>] type sorterPoolMemberId
 [<Measure>] type sorterPoolSetId
+[<Measure>] type sorterPoolName
 [<Measure>] type sorterPoolId
 [<Measure>] type sorterCountPerPool
 [<Measure>] type sorterPoolCount

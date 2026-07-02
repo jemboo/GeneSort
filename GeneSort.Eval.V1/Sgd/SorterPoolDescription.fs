@@ -61,13 +61,19 @@ module SpmDescription =
 type sorterPoolDescription =
     private {
         _sorterPoolId: Guid<sorterPoolId>
+        _sorterPoolName: string<sorterPoolName>
         _sorterPoolMembers: spmDescription array
     }
-    member this.SorterPoolId = this._sorterPoolId
-    member this.SorterPoolMembers = this._sorterPoolMembers
+    member this.SorterPoolId with get() = this._sorterPoolId
+    member this.SorterPoolName with get() = this._sorterPoolName
+    member this.SorterPoolMembers with get() = this._sorterPoolMembers
 
-    static member Create(poolId, members) =
-        { _sorterPoolId = poolId; _sorterPoolMembers = members }
+    static member create 
+                    (poolId: Guid<sorterPoolId>) 
+                    (sorterPoolName: string<sorterPoolName>) 
+                    (spmDescriptions: spmDescription []) =
+        { _sorterPoolId = poolId; _sorterPoolName = sorterPoolName; _sorterPoolMembers = spmDescriptions }
+
 
 type sorterPoolSetDescription =
     private {
@@ -75,9 +81,9 @@ type sorterPoolSetDescription =
         _generationNumber: int<generationNumber>
         _pools: sorterPoolDescription array
     }
-    member this.SorterPoolSetId = this._sorterPoolSetId
-    member this.GenerationNumber = this._generationNumber
-    member this.Pools = this._pools
+    member this.SorterPoolSetId with get() = this._sorterPoolSetId
+    member this.GenerationNumber with get() = this._generationNumber
+    member this.Pools with get() = this._pools
 
     static member Create(setId, genNum, pools) =
         { _sorterPoolSetId = setId; _generationNumber = genNum; _pools = pools }
@@ -103,7 +109,7 @@ module SorterPoolSetDescription =
                             spm.SorterEval
                     )
                     |> Seq.toArray
-                sorterPoolDescription.Create(pool.SorterPoolId, memberDescriptions)
+                sorterPoolDescription.create pool.SorterPoolId pool.Name memberDescriptions
             )
             |> Seq.toArray
 

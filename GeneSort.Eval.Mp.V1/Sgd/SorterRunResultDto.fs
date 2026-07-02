@@ -23,7 +23,8 @@ type spmDescriptionDto = {
 [<MessagePackObject>]
 type sorterPoolDescriptionDto = {
     [<Key(0)>] sorterPoolId: Guid
-    [<Key(1)>] spmDescriptionDtos: spmDescriptionDto array
+    [<Key(1)>] sorterPoolName: string
+    [<Key(2)>] spmDescriptionDtos: spmDescriptionDto array
 }
 
 [<MessagePackObject>]
@@ -50,7 +51,8 @@ type sorterPoolMemberDto = {
 [<MessagePackObject>]
 type sorterPoolDto = {
     [<Key(0)>] sorterPoolId: Guid
-    [<Key(1)>] sorterPoolMemberDtos: sorterPoolMemberDto array
+    [<Key(1)>] name: string
+    [<Key(2)>] sorterPoolMemberDtos: sorterPoolMemberDto array
 }
 
 [<MessagePackObject>]
@@ -98,7 +100,11 @@ module SorterPoolSetDescriptionDto =
                             sorterEval = m.SorterEval |> Option.map SorterEvalDto.fromDomain
                         }
                     )
-                { sorterPoolDescriptionDto.sorterPoolId = UMX.untag p.SorterPoolId; spmDescriptionDtos = memberDtos }
+                { 
+                    sorterPoolDescriptionDto.sorterPoolId = UMX.untag p.SorterPoolId;
+                    sorterPoolName = UMX.untag p.SorterPoolName;
+                    spmDescriptionDtos = memberDtos 
+                }
             )
         {
             sorterPoolSetId = UMX.untag domain.SorterPoolSetId
@@ -122,7 +128,10 @@ module SorterPoolSetDescriptionDto =
                             sourceOpt
                             evalOpt
                     )
-                sorterPoolDescription.Create(UMX.tag p.sorterPoolId, memberDomains)
+                sorterPoolDescription.create
+                                (p.sorterPoolId |> UMX.tag<sorterPoolId>) 
+                                (p.sorterPoolName |> UMX.tag<sorterPoolName>)
+                                memberDomains
             )
         sorterPoolSetDescription.Create
             (UMX.tag dto.sorterPoolSetId, UMX.tag dto.generationNumber, poolDomains)
@@ -147,7 +156,7 @@ module SorterPoolSetDto =
                         }
                     )
                     |> Seq.toArray
-                { sorterPoolId = UMX.untag p.SorterPoolId; sorterPoolMemberDtos = memberDtos }
+                { sorterPoolId = %p.SorterPoolId; name = %p.Name; sorterPoolMemberDtos = memberDtos }
             )
             |> Seq.toArray
         {
@@ -173,7 +182,7 @@ module SorterPoolSetDto =
                             sourceOpt
                             evalOpt
                     )
-                sorterPool.Create(UMX.tag p.sorterPoolId, members)
+                sorterPool.create (UMX.tag p.sorterPoolId) (UMX.tag p.name) members
             )
         sorterPoolSet.Create(UMX.tag dto.sorterPoolSetId, UMX.tag dto.generationNumber, pools)
 

@@ -9,23 +9,27 @@ open GeneSort.Model.Sorting.V1
 
 type sorterPool =
     private {
+        _name: string<sorterPoolName>
         _sorterPoolId: Guid<sorterPoolId>
         _sorterPoolMembers: Map<Guid<sorterPoolMemberId>, sorterPoolMember>
     }
 
-    member this.SorterPoolId = this._sorterPoolId
-
-    // Exposed sequence directly from the map values for efficiency
-    member this.SorterPoolMembers : sorterPoolMember seq =
+    member this.SorterPoolId with get() = this._sorterPoolId
+    member this.Name with get() = this._name
+    member this.SorterPoolMembers with get() :sorterPoolMember seq =
         Map.values this._sorterPoolMembers
 
 
-    static member Create(sorterPoolId, ?members: seq<sorterPoolMember>) =
+    static member create 
+            (sorterPoolId: Guid<sorterPoolId>) 
+            (name: string<sorterPoolName>)
+            (members: sorterPoolMember []) =
         let membersMap = 
-            defaultArg members Seq.empty
+            members
             |> Seq.map (fun m -> m.SorterPoolMemberId, m)
             |> Map.ofSeq
         { 
+            _name = name
             _sorterPoolId = sorterPoolId
             _sorterPoolMembers = membersMap
         }
@@ -146,7 +150,7 @@ module SorterPool =
             // Step 4: Take the best up to the designated pruned size limit
             |> Seq.truncate targetSize
             |> Seq.map snd
+            |> Seq.toArray
 
-        // Rebuild into a clean SorterPool record format
-        sorterPool.Create(pool.SorterPoolId, sortedSurvivors)
+        sorterPool.create pool.SorterPoolId pool.Name sortedSurvivors
 
