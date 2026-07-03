@@ -85,6 +85,37 @@ type ceUse =
     member this.UseCount with get() : int = this.useCount
     member this.Ce with get() : ce = this.ce
 
+module CeUse =
+    let toString (ceUse: ceUse) : string =
+        sprintf "[%d, %d, %s]" (%ceUse.CeIndex) ceUse.UseCount (ceUse.Ce |> Ce.toString)
+
+    let arrayToString (ceUses: ceUse array) : string =
+        ceUses
+        |> Array.map toString
+        |> String.concat "; "
+
+    let ceUseStringToSorter 
+                    (sorterId: Guid<sorterId>)
+                    (sortingWidth: int<sortingWidth>)
+                    (ceUseString: string) : sorter =
+        let ceUseStrings = ceUseString.Split([|";"|], StringSplitOptions.RemoveEmptyEntries)
+        let ceUses = 
+            ceUseStrings
+            |> Array.map (fun s -> 
+                let trimmed = s.Trim([|'[';']'; ' '|])
+                let parts = trimmed.Split([|','; ')';'('|], StringSplitOptions.TrimEntries)
+                if parts.Length <> 6 then
+                    failwithf "Invalid ceUse string format: %s" s
+                let ceIndex = (parts.[0].Trim() |> int) |> UMX.tag<ceIndex>
+                let useCount = parts.[1].Trim() |> int
+                let lv = parts.[3].Trim() |> int
+                let hv = parts.[4].Trim() |> int
+                let ce = ce.create lv hv
+                ceUse.create ceIndex useCount ce
+            )
+        let ces = ceUses |> Array.map (fun cu -> cu.Ce)
+        sorter.create sorterId sortingWidth ces
+
 
 type sorterEvalV2 =
     private { 
@@ -122,6 +153,7 @@ type sorterEvalV2 =
     member this.LastCeIndex with get() : int<ceIndex>  = 
         if this.ceUseArray.Length = 0 then 0<ceIndex>
         else this.ceUseArray.[this.ceUseArray.Length - 1].CeIndex
+
     member this.ToDataTableRecord() : dataTableRecord =
             let isSorted = this.unsortedCount = 0<sortableCount>
             dataTableRecord.createEmpty()
@@ -133,6 +165,7 @@ type sorterEvalV2 =
             |> dataTableRecord.addData "IsSorted" (string isSorted)
             |> dataTableRecord.addData "SequenceHash" (string %this.sequenceHash)
             |> dataTableRecord.addData "LastCeIndex" (string %this.LastCeIndex)
+            |> dataTableRecord.addData "CeUseArray" (CeUse.arrayToString this.ceUseArray)
 
     
     member this.ToDataTableRecordWithPrefix(prefix: string) : dataTableRecord =
@@ -146,6 +179,7 @@ type sorterEvalV2 =
         |> dataTableRecord.addData (prefix + "IsSorted") (string isSorted)
         |> dataTableRecord.addData (prefix + "SequenceHash") (string %this.sequenceHash)
         |> dataTableRecord.addData (prefix + "LastCeIndex") (string %this.LastCeIndex)
+        |> dataTableRecord.addData "CeUseArray" (CeUse.arrayToString this.ceUseArray)
         
 
 
@@ -198,6 +232,7 @@ type sorterEvalV3 =
             |> dataTableRecord.addData "IsSorted" (string isSorted)
             |> dataTableRecord.addData "SequenceHash" (string %this.sequenceHash)
             |> dataTableRecord.addData "LastCeIndex" (string %this.LastCeIndex)
+            |> dataTableRecord.addData "CeUseArray" (CeUse.arrayToString this.ceUseArray)
 
     member this.ToDataTableRecordWithPrefix(prefix: string) : dataTableRecord =
             let isSorted = this.UnsortedCount = 0<sortableCount>
@@ -210,6 +245,7 @@ type sorterEvalV3 =
             |> dataTableRecord.addData (prefix + "IsSorted") (string isSorted)
             |> dataTableRecord.addData (prefix + "SequenceHash") (string %this.sequenceHash)
             |> dataTableRecord.addData (prefix + "LastCeIndex") (string %this.LastCeIndex)
+            |> dataTableRecord.addData "CeUseArray" (CeUse.arrayToString this.ceUseArray)
 
 
 

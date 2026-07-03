@@ -7,6 +7,7 @@ open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open System.Runtime.Intrinsics
 
+// msasM = a merge test
 [<Struct; CustomEquality; NoComparison>]
 type msasM = 
     private 

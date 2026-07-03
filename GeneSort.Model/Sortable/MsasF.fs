@@ -7,7 +7,7 @@ open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open GeneSort.Sorting.Sortable.SortableIntArray
 
-// MsasF = a full bool test set for a given sorting width
+// msasF = a full bool test set for a given sorting width
 [<Struct; CustomEquality; NoComparison>]
 type msasF = 
     private 

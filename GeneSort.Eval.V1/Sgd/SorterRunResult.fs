@@ -81,7 +81,7 @@ module SorterRunResult =
             (sorterCountPerPool: int<sorterCountPerPool>)
             (sorterChildCount: int<sorterChildCount>)
             (sortableTest: sortableTest)
-            (sorterEvalType: sorterEvalType)
+            (srtrEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
             (seedSorterPoolSet: sorterPoolSet)
             (cts: CancellationToken)
@@ -126,6 +126,7 @@ module SorterRunResult =
 
                     // log "Executing generation processing step..."
                     let reEvaluateParents = false
+                    let adjSorterEvalType = if (remainingSteps = 1) then sorterEvalType.V2 else srtrEvalType
                     let nextSorterPoolSet = 
                         SorterPipeline.runGenerationStep 
                             mutator 
@@ -133,7 +134,7 @@ module SorterRunResult =
                             sorterChildCount 
                             distinctSorterHashes
                             sortableTest 
-                            sorterEvalType
+                            adjSorterEvalType
                             selectionMeasure 
                             reEvaluateParents
                             currentSorterPoolSet
@@ -144,7 +145,14 @@ module SorterRunResult =
                         System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
                         GC.Collect(2, GCCollectionMode.Forced, true, true)
 
-                    return! loop (remainingSteps - 1) nextSorterPoolSet updatedHistory
+                    let moreUpdatedHistory = 
+                        if (remainingSteps = 1) then 
+                            let nextSnapshot = SorterPoolSetDescription.fromPoolSet nextSorterPoolSet
+                            nextSnapshot :: updatedHistory
+                        else 
+                            updatedHistory
+
+                    return! loop (remainingSteps - 1) nextSorterPoolSet moreUpdatedHistory
             }
 
         loop %genCount seedSorterPoolSet []

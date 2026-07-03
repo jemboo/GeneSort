@@ -32,10 +32,26 @@ module Ce =
     let toString (ce: ce) : string =
         sprintf "(%d, %d)" ce.Low ce.Hi
 
+    let fromString (s: string) : ce =
+        let parts = s.Trim('(', ')').Split(',')
+        if parts.Length <> 2 then
+            failwith "Invalid ce string format"
+        else
+            let low = Int32.Parse(parts.[0].Trim())
+            let hi = Int32.Parse(parts.[1].Trim())
+            ce.create low hi
 
     let arrayToString (ces: ce[]) : string =
         let ceStrings = ces |> Array.map toString
         sprintf "[%s]" (String.Join("; ", ceStrings))
+
+    let fromArrayString (s: string) : ce[] =
+        let trimmed = s.Trim('[', ']')
+        if String.IsNullOrWhiteSpace(trimmed) then
+            [||]
+        else
+            let ceStrings = trimmed.Split(';')
+            ceStrings |> Array.map (fun ceStr -> fromString (ceStr.Trim()))
 
 
     // combine the upper and lower arrays, but increase the low and hi indexes of the ce's in cesLower

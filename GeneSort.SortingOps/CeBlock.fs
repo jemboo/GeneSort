@@ -5,8 +5,6 @@ open FSharp.UMX
 open GeneSort.Sorting.Sorter
 open GeneSort.Sorting
 
-
-
 type ceBlock = 
     private { 
         ces: ce array 

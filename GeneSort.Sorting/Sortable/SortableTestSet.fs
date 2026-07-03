@@ -1,11 +1,6 @@
 ﻿
 namespace GeneSort.Sorting.Sortable
 
-open System
-open FSharp.UMX
-open GeneSort.Core
-open GeneSort.Sorting
-
 
 type sortableTestSet = 
     | Ints of sortableIntTestSet

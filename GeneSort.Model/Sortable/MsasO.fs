@@ -6,6 +6,7 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 
+// msasO = test cases created by the orbit of a permutation
 [<Struct; CustomEquality; NoComparison>]
 type msasO = 
     private 
