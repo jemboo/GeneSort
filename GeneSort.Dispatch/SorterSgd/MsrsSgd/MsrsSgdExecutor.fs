@@ -11,7 +11,7 @@ open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Model.Sorting.Simple.V1
-open GeneSort.Eval.V1
+open GeneSort.Eval.V1.Sgd
 open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterSgd
 
@@ -73,7 +73,7 @@ module MsrsSgdExecutor =
 
                 do! checkCancellation cts.Token
                 log "Executing makeSortableTests..."
-                let! sortableTest = makeSortableTests rp
+                let! (sortableTest: sortableTest) = makeSortableTests rp
                 
                 log "Making sorterModelMutator..."
                 // Rates for mutator creation

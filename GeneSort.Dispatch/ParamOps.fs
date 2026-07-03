@@ -47,7 +47,7 @@ module ParamOps =
         }
 
 
-    let initProjectAndRunFiles
+    let initRunAndParamFiles
         (db: IGeneSortDb)
         (progress: IProgress<string> option)
         (run: run)

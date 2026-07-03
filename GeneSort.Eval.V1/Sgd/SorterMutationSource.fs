@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Eval.V1
+﻿namespace GeneSort.Eval.V1.Sgd
 
 open FSharp.UMX
 open GeneSort.Model.Sorting.V1

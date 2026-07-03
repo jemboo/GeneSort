@@ -27,35 +27,7 @@ type ce = private { low: int; hi: int } with
 
     member this.Length with get() = this.Hi - this.Low
 
-
-//[<CustomEquality; NoComparison>]
-//type ceSequenceKey =
-//    private { 
-//        ces:      ce array
-//        hashCode: int 
-//    }
-
-//    static member create (ces: ce array) =
-//        let h = ces |> Array.fold (fun acc c -> HashCode.Combine(acc, c.Low, c.Hi)) 0
-//        { ces = ces; hashCode = h }
-
-//    member this.Ces with get() = this.ces
-
-//    override this.GetHashCode() = this.hashCode
-
-//    override this.Equals(obj) =
-//        match obj with
-//        | :? ceSequenceKey as other ->
-//            this.hashCode = other.hashCode &&
-//            this.ces.Length = other.ces.Length &&
-//            Array.forall2 (fun (a: ce) (b: ce) -> a.Low = b.Low && a.Hi = b.Hi) this.ces other.ces
-//        | _ -> false
-
-
 module Ce =
-
-    //let getSequenceHash (ces : ce array) : int<sequenceHash> =
-    //    ceSequenceKey.create(ces).GetHashCode() |> UMX.tag<sequenceHash>
 
     let toString (ce: ce) : string =
         sprintf "(%d, %d)" ce.Low ce.Hi

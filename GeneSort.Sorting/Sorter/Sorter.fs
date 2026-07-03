@@ -6,6 +6,7 @@ open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 open System.Collections.Generic
+open GeneSort.Core
 
 [<Struct; CustomEquality; NoComparison>]
 type sorter =
@@ -82,3 +83,13 @@ module Sorter =
         let concatenatedCes = Array.append prefix.Ces suffix.Ces
         
         sorter.create newId prefix.SortingWidth concatenatedCes
+
+
+    // returns a dataTableRecord with the sorterId, sortingWidth, and ces serialized as a string
+    let toDataTableRecord (sorter:sorter) : dataTableRecord =
+        let ceString = sorter.Ces |> Ce.arrayToString
+        
+        dataTableRecord.createEmpty()
+        |> dataTableRecord.addData "SorterId" ((%sorter.SorterId).ToString())
+        |> dataTableRecord.addData "SortingWidth" ((%sorter.SortingWidth).ToString())
+        |> dataTableRecord.addData "Ces" ceString

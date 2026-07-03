@@ -1,9 +1,11 @@
-﻿namespace GeneSort.Eval.V1
+﻿namespace GeneSort.Eval.V1.Sgd
 
 open System
 open FSharp.UMX
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
+open GeneSort.Core
+open GeneSort.Eval.V1
 
 
 type sorterPoolSet =
@@ -146,3 +148,8 @@ module SorterPoolSet =
 
         // 5. Package the complete group layout structure back out to the main generational repository root
         sorterPoolSet.Create(sorterPoolSetId, generationNumber, pools)
+
+
+
+    let toDataTableRecords (sorterPoolSet: sorterPoolSet) : dataTableRecord [] =
+        [||]

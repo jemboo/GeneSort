@@ -4,7 +4,7 @@ open System
 open MessagePack
 open FSharp.UMX
 open GeneSort.Model.Sorting.V1
-open GeneSort.Eval.V1
+open GeneSort.Eval.V1.Sgd
 
 [<MessagePackObject>]
 type sorterMutationSourceDto = {

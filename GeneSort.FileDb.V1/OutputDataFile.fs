@@ -19,6 +19,7 @@ open GeneSort.SortingOps
 open GeneSort.Sorting.Mp.Sorter
 open GeneSort.Sorting.Sorter
 open GeneSort.Eval.V1
+open GeneSort.Eval.V1.Sgd
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder

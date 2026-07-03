@@ -11,9 +11,9 @@ open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Model.Sorting.Simple.V1
-open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterSgd
+open GeneSort.Eval.V1.Sgd
 
 
 module MsceSgdExecutor =

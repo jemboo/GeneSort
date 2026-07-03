@@ -273,7 +273,7 @@ async {
     printfn "Init Project: %s" %host.Run.DatabaseName
     
     let! initResult = 
-        ParamOps.initProjectAndRunFiles
+        ParamOps.initRunAndParamFiles
             host.RunDb           
             (Some progress) 
             host.Run              

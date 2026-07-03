@@ -18,6 +18,7 @@ open GeneSort.Dispatch.V1
 open System.Threading
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Model.Sorting.V1
+open GeneSort.Eval.V1.Sgd
 
 
 type sorterSgdExecutorType = 

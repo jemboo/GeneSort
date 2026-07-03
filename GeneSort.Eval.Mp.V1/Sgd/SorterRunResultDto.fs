@@ -6,6 +6,7 @@ open FSharp.UMX
 open GeneSort.SortingOps.Mp
 open GeneSort.Eval.V1
 open GeneSort.Model.Mp.Sorting.Mp.V1
+open GeneSort.Eval.V1.Sgd
 
 // ---------------------------------------------------------------------
 // 1. Lightweight History Description DTOs
