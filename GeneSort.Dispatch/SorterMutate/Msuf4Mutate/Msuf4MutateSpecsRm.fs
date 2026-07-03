@@ -55,11 +55,11 @@ module Msuf4MutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                seedModificationRateC
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                seedModificationRate
+                modificationRateStage
                 testMergeSortingWidths
                 msuf4ModelType
                 testMergeDimensions
@@ -82,11 +82,11 @@ module Msuf4MutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                seedModificationRateC
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                seedModificationRate
+                modificationRateStage
                 smallMergeSortingWidths
                 msuf4ModelType
                 lowMergeDimensions
@@ -109,11 +109,11 @@ module Msuf4MutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                seedModificationRateC
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                seedModificationRate
+                modificationRateStage
                 mediumMergeSortingWidths
                 msuf4ModelType
                 lowMergeDimensions
@@ -136,11 +136,11 @@ module Msuf4MutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                seedModificationRateC
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                seedModificationRate
+                modificationRateStage
                 mediumMergeSortingWidths
                 msuf4ModelType
                 mergeDimension6
@@ -164,11 +164,11 @@ module Msuf4MutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                seedModificationRateC
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                seedModificationRate
+                modificationRateStage
                 largeMergeSortingWidths
                 msuf4ModelType
                 mergeDimension2

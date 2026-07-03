@@ -51,11 +51,11 @@ module Msuf4MutateSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                seedModificationRateC
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                seedModificationRate
+                modificationRateStage
                 testSortingWidths
                 msuf4ModelType
                 testChildCount
@@ -76,11 +76,11 @@ module Msuf4MutateSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                seedModificationRateC
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                seedModificationRate
+                modificationRateStage
                 smallSortingWidths
                 msuf4ModelType
                 extraLargeChildCount
@@ -100,11 +100,11 @@ module Msuf4MutateSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                seedModificationRateC
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                seedModificationRate
+                modificationRateStage
                 mediumSortingWidths
                 msuf4ModelType
                 extraLargeChildCount

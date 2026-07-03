@@ -34,6 +34,7 @@ module SorterRunResult =
     let runEvolution 
             (genCount: int<generationNumber>)
             (mutator: sorterModelMutator)
+            (distinctSorterHashes: bool<distinctSorterHashes>)
             (sorterChildCount: int<sorterChildCount>)
             (sortableTest: sortableTest)
             (sorterEvalType: sorterEvalType)
@@ -58,6 +59,7 @@ module SorterRunResult =
                         mutator  
                         sorterCountPerPool
                         sorterChildCount 
+                        distinctSorterHashes
                         sortableTest 
                         sorterEvalType 
                         selectionMeasure 
@@ -75,6 +77,7 @@ module SorterRunResult =
             (genStart: int<generationNumber>)
             (genCount: int<generationNumber>)
             (mutator: sorterModelMutator)
+            (distinctSorterHashes: bool<distinctSorterHashes>)
             (sorterCountPerPool: int<sorterCountPerPool>)
             (sorterChildCount: int<sorterChildCount>)
             (sortableTest: sortableTest)
@@ -128,6 +131,7 @@ module SorterRunResult =
                             mutator 
                             sorterCountPerPool
                             sorterChildCount 
+                            distinctSorterHashes
                             sortableTest 
                             sorterEvalType
                             selectionMeasure 

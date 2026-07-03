@@ -22,6 +22,7 @@ type runParameters =
     static member collectSortableTestsKey = "CollectSortableTests"
     static member databaseNameKey = "DatabaseName"
     static member deletionRateKey = "DeletionRate"
+    static member distinctSorterHashesKey = "DistinctSorterHashes"
     static member elapsedTimeKey = "ElapsedTime"
     static member excludeSelfCeKey = "ExcludeSelfCe"
     static member generationFirstKey = "GenerationFirst"
@@ -105,6 +106,10 @@ type runParameters =
     member this.GetDeletionRate() =
         runParameters.tryGetFloat runParameters.deletionRateKey this.paramMap
         |> Option.map UMX.tag<deletionRate>
+
+    member this.GetDistinctSorterHashes() =
+        runParameters.tryGetBool runParameters.distinctSorterHashesKey this.paramMap
+        |> Option.map UMX.tag<distinctSorterHashes>
 
     member this.GetElapsedTime() =
         this.paramMap.TryFind runParameters.elapsedTimeKey
@@ -283,6 +288,9 @@ type runParameters =
 
     member this.WithDeletionRate(dr: float<deletionRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.deletionRateKey (dr |> Option.map UmxExt.floatToRaw) }
+
+    member this.WithDistinctSorterHashes(dsh: bool option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.distinctSorterHashesKey (dsh |> Option.map string) }
 
     member this.WithElapsedTime(time: string option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.elapsedTimeKey time }

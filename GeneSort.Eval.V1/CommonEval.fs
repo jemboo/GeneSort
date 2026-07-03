@@ -2,6 +2,7 @@
 
 open FSharp.UMX
 
+[<Measure>] type distinctSorterHashes
 [<Measure>] type generationNumber
 [<Measure>] type sorterPoolMemberId
 [<Measure>] type sorterPoolSetId

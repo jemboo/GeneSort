@@ -79,12 +79,13 @@ module SorterPoolSet =
     /// Trims every pool inside the set down to the designated pruned size using the given evaluation rule
     let pruneSorterPools 
                 (measure: sorterEvalMeasure) 
+                (distinctSorterHashes: bool<distinctSorterHashes>)
                 (sorterCountPerPool: int<sorterCountPerPool>) 
                 (poolSet: sorterPoolSet) : sorterPoolSet =
         
         let prunedPools = 
             poolSet._sorterPools
-            |> Map.map (fun _ pool -> SorterPool.pruneSorterPool pool measure sorterCountPerPool)
+            |> Map.map (fun _ pool -> SorterPool.pruneSorterPool pool measure distinctSorterHashes sorterCountPerPool)
 
         { poolSet with _sorterPools = prunedPools }
 

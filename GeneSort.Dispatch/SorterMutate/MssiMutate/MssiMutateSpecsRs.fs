@@ -49,9 +49,9 @@ module MssiMutateSpecsRs =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                modificationRateStage
                 testSortingWidths
                 mssiModelType
                 testChildCount
@@ -72,9 +72,9 @@ module MssiMutateSpecsRs =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                modificationRateStage
                 smallSortingWidths
                 mssiModelType
                 extraLargeChildCount
@@ -94,9 +94,9 @@ module MssiMutateSpecsRs =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                modificationRateStage
                 mediumSortingWidths
                 mssiModelType
                 extraLargeChildCount

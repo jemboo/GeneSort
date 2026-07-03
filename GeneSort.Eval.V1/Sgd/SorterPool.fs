@@ -120,13 +120,14 @@ module SorterPool =
     let pruneSorterPool 
                 (pool: sorterPool) 
                 (measure: sorterEvalMeasure) 
+                (distinctSorterHashes: bool<distinctSorterHashes>)
                 (sorterCountPerPool: int<sorterCountPerPool>) : sorterPool =
         
         let targetSize = max 0 %sorterCountPerPool
         let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
         let filterUnsorted = SorterEvalFunctions.getFilterUnsortedFlag measure
 
-        let sortedSurvivors =
+        let filter1 =
             pool._sorterPoolMembers
             |> Map.values
             // Step 1: Handle filtering of unsorted elements if required by the measure rules
@@ -137,6 +138,15 @@ module SorterPool =
                     | None -> false // Unevaluated members cannot verify if they are fully sorted
                 else true
             )
+
+        let filter2 =
+            if %distinctSorterHashes then
+                filter1 |> Seq.distinctBy (fun spm -> %(SorterEval.getSequenceHash spm.SorterEval.Value))
+            else
+                filter1
+
+        let sortedSurvivors =
+            filter2
             // Step 2: Score members. Lower scores are better (fewer CEs, fewer stages, less unsorted).
             // We map into a sortable tuple: (Score, PoolMember)
             // Unevaluated members (None) are treated as Double.PositiveInfinity (worst possible score)

@@ -54,10 +54,10 @@ module MsrsMutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                modificationRateStage
                 testMergeSortingWidths
                 msrsModelType
                 testMergeDimensions
@@ -80,10 +80,10 @@ module MsrsMutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                modificationRateStage
                 smallMergeSortingWidths
                 msrsModelType
                 lowMergeDimensions
@@ -106,10 +106,10 @@ module MsrsMutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                modificationRateStage
                 mediumMergeSortingWidths
                 msrsModelType
                 lowMergeDimensions
@@ -132,10 +132,10 @@ module MsrsMutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                modificationRateStage
                 mediumMergeSortingWidths
                 msrsModelType
                 mergeDimension6
@@ -158,10 +158,10 @@ module MsrsMutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                modificationRateStage
                 largeMergeSortingWidths
                 msrsModelType
                 mergeDimension2

@@ -40,6 +40,7 @@ module MssiSgdDbs =
                             (orthoRate: float<orthoRate>)
                             (paraRate: float<paraRate>)
                             (mdr: float<modificationRate>)
+                            (dsh: bool<distinctSorterHashes>)
                             (odt: outputDataType) : queryParams =
                 queryParams.create dbName (Some repl) odt
                     [| 
@@ -57,6 +58,7 @@ module MssiSgdDbs =
                        (runParameters.orthoRateKey, (Some orthoRate) |> OrthoRate.toString)
                        (runParameters.paraRateKey, (Some paraRate) |> ParaRate.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
+                       (runParameters.distinctSorterHashesKey, (Some %dsh) |> string)
                     |]
 
 
@@ -81,10 +83,11 @@ module MssiSgdDbs =
                     let! ortho = rp.GetOrthoRate()
                     let! para = rp.GetParaRate()
                     let! mdr = rp.GetModificationRate()
+                    let! dsh = rp.GetDistinctSorterHashes()
                     return if genQf then
-                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt set ortho para mdr odt 
+                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt set ortho para mdr dsh odt 
                             else
-                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt set ortho para mdr odt 
+                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt set ortho para mdr dsh odt 
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -118,6 +121,7 @@ module MssiSgdDbs =
                         (orthoRate: float<orthoRate>)
                         (paraRate: float<paraRate>)
                         (mdr: float<modificationRate>)
+                        (dsh: bool<distinctSorterHashes>)
                         (outputDataType: outputDataType) : queryParams =
 
                 queryParams.create 
@@ -141,7 +145,8 @@ module MssiSgdDbs =
                        (runParameters.orthoRateKey, (Some orthoRate) |> OrthoRate.toString)
                        (runParameters.paraRateKey, (Some paraRate) |> ParaRate.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
-                       (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
+                       (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString);
+                       (runParameters.distinctSorterHashesKey, (Some %dsh) |> string)
                     |]
 
 
@@ -169,10 +174,11 @@ module MssiSgdDbs =
                     let! ortho = rp.GetOrthoRate()
                     let! para = rp.GetParaRate()
                     let! mdr = rp.GetModificationRate()
+                    let! dsh = rp.GetDistinctSorterHashes()
                     return if genQf then
-                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt md mst sdf set ortho para mdr odt
+                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt md mst sdf set ortho para mdr dsh odt
                             else
-                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt md mst sdf set ortho para mdr odt
+                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt md mst sdf set ortho para mdr dsh odt
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)

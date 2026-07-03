@@ -28,10 +28,13 @@ module Msuf4SgdSpecsRm =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [1000] |> List.map string)
+            (runParameters.generationLastKey, [100] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
+            
+    let distinctSorterHashes = 
+            (runParameters.distinctSorterHashesKey, [true, false] |> List.map string)
 
     let generationQueryFirst = 
             (runParameters.queryWithGenFirst, [false] |> List.map string)
@@ -67,17 +70,17 @@ module Msuf4SgdSpecsRm =
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                seedModificationRateC
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                seedModificationRate
+                modificationRateStage
                 testMergeSortingWidths
                 msuf4ModelType
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
@@ -100,17 +103,17 @@ module Msuf4SgdSpecsRm =
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                seedModificationRateC
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                seedModificationRate
+                modificationRateStage
                 smallMergeSortingWidths
                 msuf4ModelType
                 lowMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
@@ -133,17 +136,17 @@ module Msuf4SgdSpecsRm =
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                seedModificationRateC
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                seedModificationRate
+                modificationRateStage
                 mediumMergeSortingWidths
                 msuf4ModelType
                 lowMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst

@@ -1,5 +1,6 @@
 ﻿namespace GeneSort.Eval.V1
 
+open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open GeneSort.SortingOps
@@ -12,6 +13,7 @@ module SorterPipeline =
             (mutator: sorterModelMutator)
             (sorterCountPerPool: int<sorterCountPerPool>)
             (sorterChildCount: int<sorterChildCount>)
+            (distinctSorterHashes: bool<distinctSorterHashes>)
             (sortableTest: sortableTest)
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
@@ -36,5 +38,5 @@ module SorterPipeline =
         )
         
         // Step 3: Trim out defective or un-optimized sorters down to baseline target capacities
-        |> SorterPoolSet.pruneSorterPools selectionMeasure sorterCountPerPool
+        |> SorterPoolSet.pruneSorterPools selectionMeasure distinctSorterHashes sorterCountPerPool
         |> SorterPoolSet.advanceGeneration 1

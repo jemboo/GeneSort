@@ -67,16 +67,16 @@ module MsrsSgdSpecsRm =
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                modificationRateStage
                 testMergeSortingWidths
                 msrsModelType
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
@@ -99,16 +99,16 @@ module MsrsSgdSpecsRm =
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                modificationRateStage
                 testMergeSortingWidths
                 msrsModelType
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
@@ -131,16 +131,16 @@ module MsrsSgdSpecsRm =
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                modificationRateStage
                 testMergeSortingWidths
                 msrsModelType
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst

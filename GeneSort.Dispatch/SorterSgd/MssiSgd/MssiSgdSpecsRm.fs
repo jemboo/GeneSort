@@ -64,15 +64,15 @@ module MssiSgdSpecsRm =
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                modificationRateStage
                 testMergeSortingWidths
                 mssiModelType
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
@@ -95,15 +95,15 @@ module MssiSgdSpecsRm =
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                modificationRateStage
                 testMergeSortingWidths
                 mssiModelType
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
@@ -126,15 +126,15 @@ module MssiSgdSpecsRm =
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                modificationRateStage
                 testMergeSortingWidths
                 mssiModelType
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst

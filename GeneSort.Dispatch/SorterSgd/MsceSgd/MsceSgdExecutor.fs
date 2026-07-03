@@ -44,6 +44,7 @@ module MsceSgdExecutor =
                 let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count"
                 let! sorterEvalMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
                 let! sorterEvalType = rp.GetSorterEvalType() |> Result.ofOption "Missing sorterEvalType."
+                let! distinctSorterHashes = rp.GetDistinctSorterHashes() |> Result.ofOption "Missing distinctSorterHashes."
                 let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
 
                 // 2. Resolve target seed sorterPoolSet collection state depending on genFirst criteria
@@ -96,6 +97,7 @@ module MsceSgdExecutor =
                                                         genFirst
                                                         (genLast - genFirst)
                                                         sorterModelMutator
+                                                        distinctSorterHashes
                                                         sortersPerPool
                                                         sorterChildCount
                                                         sortableTest

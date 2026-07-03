@@ -47,10 +47,10 @@ module MsrsMutateSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                modificationRateStage
                 testSortingWidths
                 msrsModelType
                 testChildCount
@@ -70,10 +70,10 @@ module MsrsMutateSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                modificationRateStage
                 smallSortingWidths
                 msrsModelType
                 extraLargeChildCount
@@ -93,10 +93,10 @@ module MsrsMutateSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                selfSymRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                modificationRateStage
                 mediumSortingWidths
                 msrsModelType
                 extraLargeChildCount

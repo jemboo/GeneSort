@@ -15,7 +15,7 @@ module Msuf4SgdSpecsRs =
 
     let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.Tmb 12<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.Tmb 48<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
 
     let sorterEvalMeasureInitial = 
             (runParameters.sorterEvalMeasureInitialKey , 
@@ -26,13 +26,20 @@ module Msuf4SgdSpecsRs =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
 
     let generationLast = 
-            (runParameters.generationLastKey, [40000] |> List.map string)
+            (runParameters.generationLastKey, [10000] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
 
     let generationQueryFirst = 
             (runParameters.queryWithGenFirst, [false] |> List.map string)
+
+    let distinctSorterHashesBoth = 
+            (runParameters.distinctSorterHashesKey, [true; false] |> List.map string)
+
+    let distinctSorterHashesTrue = 
+            (runParameters.distinctSorterHashesKey, [true] |> List.map string)
+
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
@@ -62,11 +69,11 @@ module Msuf4SgdSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
-                orthoRates
-                paraRates
-                selfSymRates
-                seedModificationRateC
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                seedModificationRate
+                modificationRateStage
                 sortingWidth16
                 poolCount30
                 oneSorterPerPool
@@ -74,6 +81,7 @@ module Msuf4SgdSpecsRs =
                 generationFirst
                 generationLast
                 generationQueryFirst
+                distinctSorterHashesBoth
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
@@ -92,11 +100,11 @@ module Msuf4SgdSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
-                orthoRates
-                paraRates
-                selfSymRates
-                seedModificationRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                selfSymRate
+                seedModificationRate
+                modificationRateStage
                 sortingWidth16
                 poolCount30
                 oneSorterPerPool
@@ -104,6 +112,7 @@ module Msuf4SgdSpecsRs =
                 generationFirst
                 generationLast
                 generationQueryFirst
+                distinctSorterHashesBoth
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
@@ -111,9 +120,9 @@ module Msuf4SgdSpecsRs =
             MaxParallel = 8
         }
 
-        let Rand_Medium (executorType: sorterSgdExecutorType) : runHostSpec = {
+        let Rand_Pool2 (executorType: sorterSgdExecutorType) : runHostSpec = {
             DatabaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            RunName = sprintf @"Rand-Pool2_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             RunDescription = "Sgd analysis for Msuf4"
             Spans = [
                 msuf4ModelType
@@ -122,35 +131,36 @@ module Msuf4SgdSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
-                orthoRates
-                paraRates
-                selfSymRates
-                seedModificationRateC
+                orthoRate
+                paraRate
+                selfSymRate
+                seedModificationRate
                 modificationRatesStage
                 sortingWidth16
-                testPoolCount
-                oneSorterPerPool
-                oneChildCount
+                poolCount30
+                oneToFourSortersPerPool
+                oneToFourChildCount
                 generationFirst
                 generationLast
                 generationQueryFirst
+                distinctSorterHashesBoth
             ]
             Filter = paramMapFilter
             Enhancer = standardEnhancer
             AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            MaxParallel = 8
         }
 
     type configType =
         | Rand_Test
         | Rand_Small
-        | Rand_Medium
+        | Rand_Pool2
 
     let Configs = Map.ofList 
                     [ 
                         (configType.Rand_Test, Specs.Rand_Test); 
                         (configType.Rand_Small, Specs.Rand_Small);
-                        (configType.Rand_Medium, Specs.Rand_Medium);
+                        (configType.Rand_Pool2, Specs.Rand_Pool2);
                     ]
 
     let getRunHostSpec (config: configType) (executorType: sorterSgdExecutorType) : runHostSpec =

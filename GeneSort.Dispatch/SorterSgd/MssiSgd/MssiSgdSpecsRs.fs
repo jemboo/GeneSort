@@ -63,11 +63,11 @@ module MssiSgdSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
-                orthoRates
-                paraRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                modificationRateStage
                 sortingWidth16
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
@@ -92,11 +92,11 @@ module MssiSgdSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
-                orthoRates
-                paraRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                modificationRateStage
                 sortingWidth16
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
@@ -120,11 +120,11 @@ module MssiSgdSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
-                orthoRates
-                paraRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                modificationRateStage
                 sortingWidth16
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst

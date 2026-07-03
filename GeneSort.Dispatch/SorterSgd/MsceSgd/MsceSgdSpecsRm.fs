@@ -98,7 +98,7 @@ module MsceSgdSpecsRm =
                 deletionRates
                 modificationRatesMsce
                 sortingWidth16
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
@@ -130,7 +130,7 @@ module MsceSgdSpecsRm =
                 deletionRates
                 modificationRatesMsce
                 sortingWidth16
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
@@ -162,7 +162,7 @@ module MsceSgdSpecsRm =
                 deletionRates
                 modificationRatesMsce
                 sortingWidth16
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
@@ -194,7 +194,7 @@ module MsceSgdSpecsRm =
                 deletionRates
                 modificationRatesMsce
                 sortingWidth16
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
@@ -227,7 +227,7 @@ module MsceSgdSpecsRm =
                 deletionRates
                 modificationRatesMsce
                 sortingWidth16
-                testPoolCount
+                poolCount10
                 oneSorterPerPool
                 oneChildCount
                 generationFirst

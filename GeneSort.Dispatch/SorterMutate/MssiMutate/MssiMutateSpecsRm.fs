@@ -53,9 +53,9 @@ module MssiMutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                modificationRateStage
                 testMergeSortingWidths
                 mssiModelType
                 testMergeDimensions
@@ -78,9 +78,9 @@ module MssiMutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                modificationRateStage
                 smallMergeSortingWidths
                 mssiModelType
                 lowMergeDimensions
@@ -103,9 +103,9 @@ module MssiMutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                modificationRateStage
                 mediumMergeSortingWidths
                 mssiModelType
                 lowMergeDimensions
@@ -128,9 +128,9 @@ module MssiMutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                modificationRateStage
                 mediumMergeSortingWidths
                 mssiModelType
                 mergeDimension6
@@ -153,9 +153,9 @@ module MssiMutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure
                 sorterEvalTypeV1
-                orthoRates
-                paraRates
-                modificationRatesStage
+                orthoRate
+                paraRate
+                modificationRateStage
                 largeMergeSortingWidths
                 mssiModelType
                 mergeDimension2
