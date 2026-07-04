@@ -28,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GeneSort.Component\GeneSort.Component.fsproj" />
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
   </ItemGroup>
 
