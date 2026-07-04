@@ -2,7 +2,6 @@
 namespace GeneSort.Project.V1
 
 open FSharp.UMX
-open GeneSort.Eval.V1.Bins.Old
 open GeneSort.Sorting.Sortable
 open GeneSort.Core
 open GeneSort.SortingOps
@@ -17,22 +16,7 @@ type outputData =
     | SorterRunResult of sorterRunResult
     | SorterSet of sorterSet
     | SorterSetEval of sorterSetEval
-    | SorterEvalBins of sorterEvalBinsOld
     | TextReport of dataTableReport
-
-//type outputData =
-//    | MutationSegmentEvalBinsSet of mutationSegmentEvalBinsSet
-//    | Project of project
-//    | RunParameters of runParameters
-//    | SorterSet of sorterSet
-//    | SortableTest of sortableTest
-//    | SortableTestSet of sortableTestSet
-//    | SortingSet of sortingSet
-//    | SortingSetGen of sortingGenSegment
-//    | SortableTestModelSet of sortableTestModelSet
-//    | SortableTestModelSetGen of sortableTestModelSetGen
-//    | SorterSetEval of sorterSetEval
-//    | SorterEvalBins of sorterEvalBins
 
 
 

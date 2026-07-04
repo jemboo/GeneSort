@@ -8,7 +8,6 @@ open MessagePack.FSharp
 open MessagePack.Resolvers
 open GeneSort.Db.V1
 open GeneSort.Project.V1
-open GeneSort.Eval.V1.Bins.Old
 open GeneSort.Project.Mp.V1
 open GeneSort.Eval.Mp.V1
 open GeneSort.Sorting.Mp.Sortable
@@ -18,7 +17,6 @@ open GeneSort.SortingOps.Mp
 open GeneSort.SortingOps
 open GeneSort.Sorting.Mp.Sorter
 open GeneSort.Sorting.Sorter
-open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd
 
 [<Measure>] type fullPathToFolder
@@ -149,11 +147,6 @@ module OutputDataFile =
                             let! domain = deserializeDto<sorterSetEvalDto, sorterSetEval> stream token SorterSetEvalDto.toDomain
                             return outputData.SorterSetEval domain
                         }
-                    | outputDataType.SorterEvalBins _ ->
-                        async {
-                            let! domain = deserializeDto<sorterEvalBinsDto, sorterEvalBinsOld> stream token SorterEvalBinsDto.fromDto
-                            return outputData.SorterEvalBins domain
-                        }
                     | outputDataType.Run _ ->
                         async {
                             let! domain = deserializeDto<runDto, run> stream token RunDto.toDomain
@@ -231,8 +224,6 @@ module OutputDataFile =
                             //   // serializeDto stream stsm SortableTestModelSetGenDto.fromDomain
                             | outputData.SorterSetEval sse ->
                                 serializeDto stream sse SorterSetEvalDto.fromDomain
-                            | outputData.SorterEvalBins sse ->
-                                serializeDto stream sse SorterEvalBinsDto.fromDomain
                             | outputData.Run p ->
                                 serializeDto stream p RunDto.fromDomain
                             | outputData.TextReport dataTableReport ->
