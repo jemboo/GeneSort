@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.6.11828.311 oobstable
+VisualStudioVersion = 18.6.11828.311
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.Core", "GeneSort.Core\GeneSort.Core.fsproj", "{D4A96BBD-B9E4-B746-8106-888D4EA99A57}"
 EndProject
@@ -24,8 +24,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneSort.WPF", "GeneSort.WPF\GeneSort.WPF.csproj", "{F3E46AC0-4A70-4C23-8EC3-5309AEDF7416}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.Dispatch.V1", "GeneSort.Dispatch\GeneSort.Dispatch.V1.fsproj", "{FBEF0FE7-1989-4DB7-BDE7-30075E988CCC}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.Benchmark", "GeneSort.Benchmark\GeneSort.Benchmark.fsproj", "{74BCE6D4-60C7-4352-A16F-EC26C8208B17}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.Sorting", "GeneSort.Sorting\GeneSort.Sorting.fsproj", "{7CCF6CA3-5FD0-4190-93BC-19DCDB2548A2}"
 EndProject
@@ -127,10 +125,6 @@ Global
 		{FBEF0FE7-1989-4DB7-BDE7-30075E988CCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBEF0FE7-1989-4DB7-BDE7-30075E988CCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBEF0FE7-1989-4DB7-BDE7-30075E988CCC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{74BCE6D4-60C7-4352-A16F-EC26C8208B17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{74BCE6D4-60C7-4352-A16F-EC26C8208B17}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{74BCE6D4-60C7-4352-A16F-EC26C8208B17}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{74BCE6D4-60C7-4352-A16F-EC26C8208B17}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7CCF6CA3-5FD0-4190-93BC-19DCDB2548A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7CCF6CA3-5FD0-4190-93BC-19DCDB2548A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CCF6CA3-5FD0-4190-93BC-19DCDB2548A2}.Release|Any CPU.ActiveCfg = Release|Any CPU

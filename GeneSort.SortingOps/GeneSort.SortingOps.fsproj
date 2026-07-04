@@ -19,7 +19,6 @@
     <Compile Include="CeBlockOps.fs" />
     <Compile Include="SorterEval.fs" />
     <Compile Include="SorterEvalFunctions.fs" />
-    <Compile Include="SorterEvalOld.fs" />
     <Compile Include="SorterSetEval.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
