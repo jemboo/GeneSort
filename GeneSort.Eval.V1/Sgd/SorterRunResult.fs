@@ -111,7 +111,7 @@ module SorterRunResult =
                     let totalGen = genStart + genCount
                     
                     // Look up if the current generation is an exponential milestone
-                    let shouldReport = Set.contains (int currentGen) targetGenerations
+                    let shouldReport = (Set.contains (int currentGen) targetGenerations)
 
                     if shouldReport then
                         log (sprintf "Starting evolution step. Generation %d of %d" currentGen totalGen)
@@ -125,8 +125,10 @@ module SorterRunResult =
                             historyAcc
 
                     // log "Executing generation processing step..."
-                    let reEvaluateParents = false
+                    //let reEvaluateParents = false
                     let adjSorterEvalType = if (remainingSteps = 1) then sorterEvalType.V2 else srtrEvalType
+                    let reEvaluateParents = (remainingSteps = 1)
+
                     let nextSorterPoolSet = 
                         SorterPipeline.runGenerationStep 
                             mutator 
