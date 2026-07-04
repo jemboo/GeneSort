@@ -94,18 +94,30 @@ module CeUse =
         |> Array.map toString
         |> String.concat "; "
 
+
     let ceUseStringToSorter 
-                    (sorterId: Guid<sorterId>)
-                    (sortingWidth: int<sortingWidth>)
-                    (ceUseString: string) : sorter =
+            (sorterId: Guid<sorterId>)
+            (sortingWidth: int<sortingWidth>)
+            (ceUseString: string) : sorter =
+    
+        // Helper to strip out ALL control characters (like \r, \n, tabs, etc.)
+        let cleanString (str: string) =
+            str |> Seq.filter (fun c -> not (System.Char.IsControl(c))) 
+                |> System.String.Concat
+
         let ceUseStrings = ceUseString.Split([|";"|], StringSplitOptions.RemoveEmptyEntries)
         let ceUses = 
             ceUseStrings
             |> Array.map (fun s -> 
-                let trimmed = s.Trim([|'[';']'; ' '|])
+                // 1. Clean out the invisible control characters first
+                let cleaned = cleanString s
+                // 2. Then proceed with your brackets and spaces trim
+                let trimmed = cleaned.Trim([|'['; ']'; ' '|])
+            
                 let parts = trimmed.Split([|','; ')';'('|], StringSplitOptions.TrimEntries)
                 if parts.Length <> 6 then
                     failwithf "Invalid ceUse string format: %s" s
+                
                 let ceIndex = (parts.[0].Trim() |> int) |> UMX.tag<ceIndex>
                 let useCount = parts.[1].Trim() |> int
                 let lv = parts.[3].Trim() |> int
@@ -115,6 +127,28 @@ module CeUse =
             )
         let ces = ceUses |> Array.map (fun cu -> cu.Ce)
         sorter.create sorterId sortingWidth ces
+
+    //let ceUseStringToSorter 
+    //                (sorterId: Guid<sorterId>)
+    //                (sortingWidth: int<sortingWidth>)
+    //                (ceUseString: string) : sorter =
+    //    let ceUseStrings = ceUseString.Split([|";"|], StringSplitOptions.RemoveEmptyEntries)
+    //    let ceUses = 
+    //        ceUseStrings
+    //        |> Array.map (fun s -> 
+    //            let trimmed = s.Trim([|'[';']'; ' '|])
+    //            let parts = trimmed.Split([|','; ')';'('|], StringSplitOptions.TrimEntries)
+    //            if parts.Length <> 6 then
+    //                failwithf "Invalid ceUse string format: %s" s
+    //            let ceIndex = (parts.[0].Trim() |> int) |> UMX.tag<ceIndex>
+    //            let useCount = parts.[1].Trim() |> int
+    //            let lv = parts.[3].Trim() |> int
+    //            let hv = parts.[4].Trim() |> int
+    //            let ce = ce.create lv hv
+    //            ceUse.create ceIndex useCount ce
+    //        )
+    //    let ces = ceUses |> Array.map (fun cu -> cu.Ce)
+    //    sorter.create sorterId sortingWidth ces
 
 
 type sorterEvalV2 =

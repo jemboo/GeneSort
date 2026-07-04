@@ -61,14 +61,21 @@ type stageBuilderSequence =
             if ce.Low >= (this.sortingWidth |> int) || ce.Hi >= (this.sortingWidth |> int) then
                 invalidArg "ce" $"CE {ce} has indices out of bounds for sorting width {this.sortingWidth}."
 
-            let mutable targetStageIndex = -1
-            // Start from the last stage and work backwards
-            for i = this.stageBuilders.Count - 1 downto 0 do
-                if this.stageBuilders.[i].CanAddCe(ce) then
-                    targetStageIndex <- i
+            // Find the last stage that CANNOT accept the CE
+            let firstBlockedIndex = 
+                this.stageBuilders 
+                |> Seq.tryFindIndexBack (fun sb -> not (sb.CanAddCe(ce)))
 
-            // If no stage can accept the CE, create a new stage
-            if targetStageIndex = -1 then
+            // If a stage is blocked at index `i`, the target is the one right after it (`i + 1`)
+            // If no stages are blocked, it means every stage from the end back to 0 can accept it, 
+            // so the earliest available stage is index 0.
+            let targetStageIndex = 
+                match firstBlockedIndex with
+                | Some i -> i + 1
+                | None   -> 0
+
+            // If the calculated index is beyond our existing stages, it means we need a new stage
+            if targetStageIndex >= this.stageBuilders.Count then
                 let newStage = 
                     { 
                         sortingWidth = this.sortingWidth
@@ -80,6 +87,32 @@ type stageBuilderSequence =
             else
                 // Add to the earliest stage that can accept the CE
                 this.stageBuilders.[targetStageIndex].AddCe(ce)
+
+
+
+        //member this.AddCe (ce: ce) =
+        //    if ce.Low >= (this.sortingWidth |> int) || ce.Hi >= (this.sortingWidth |> int) then
+        //        invalidArg "ce" $"CE {ce} has indices out of bounds for sorting width {this.sortingWidth}."
+
+        //    let mutable targetStageIndex = -1
+        //    // Start from the last stage and work backwards
+        //    for i = this.stageBuilders.Count - 1 downto 0 do
+        //        if this.stageBuilders.[i].CanAddCe(ce) then
+        //            targetStageIndex <- i
+
+        //    // If no stage can accept the CE, create a new stage
+        //    if targetStageIndex = -1 then
+        //        let newStage = 
+        //            { 
+        //                sortingWidth = this.sortingWidth
+        //                ces = ResizeArray<ce>()
+        //                occupied = Array.create (this.sortingWidth |> int) false
+        //            }
+        //        newStage.AddCe(ce)
+        //        this.stageBuilders.Add(newStage)
+        //    else
+        //        // Add to the earliest stage that can accept the CE
+        //        this.stageBuilders.[targetStageIndex].AddCe(ce)
 
 
 module StageBuilderSequence =
