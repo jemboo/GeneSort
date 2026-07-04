@@ -15,7 +15,7 @@ module Msuf4SgdSpecsRs =
 
     let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.Tmb 48<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.Tmb 120<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
 
     let sorterEvalMeasureInitial = 
             (runParameters.sorterEvalMeasureInitialKey , 
@@ -26,10 +26,10 @@ module Msuf4SgdSpecsRs =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
 
     let generationLast = 
-            (runParameters.generationLastKey, [21001] |> List.map string)
+            (runParameters.generationLastKey, [10000] |> List.map string)
 
     let generationFirst = 
-            (runParameters.generationFirstKey, [21000] |> List.map string)
+            (runParameters.generationFirstKey, [0] |> List.map string)
 
     let generationQueryFirst = 
             (runParameters.queryWithGenFirst, [false] |> List.map string)
@@ -75,7 +75,7 @@ module Msuf4SgdSpecsRs =
                 orthoRate
                 paraRate
                 selfSymRate
-                seedModificationRate
+                seedModificationRate12
                 modificationRateStage
                 sortingWidth16
                 poolCount30
@@ -106,7 +106,7 @@ module Msuf4SgdSpecsRs =
                 orthoRate
                 paraRate
                 selfSymRate
-                seedModificationRate
+                seedModificationRate12
                 modificationRateStage
                 sortingWidth16
                 poolCount30
@@ -123,9 +123,9 @@ module Msuf4SgdSpecsRs =
             maxParallel = 8
         }
 
-        let Rand_Pool2 (executorType: sorterSgdExecutorType) : runHostSpec = {
+        let Rand_Pool (executorType: sorterSgdExecutorType) : runHostSpec = {
             databaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
-            runName = sprintf @"Rand-Pool2b_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-Pool_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Sgd analysis for Msuf4"
             spans = [
                 msuf4ModelType
@@ -137,12 +137,12 @@ module Msuf4SgdSpecsRs =
                 orthoRate
                 paraRate
                 selfSymRate
-                seedModificationRate
-                modificationRatesStage
+                seedModificationRates
+                modificationRateStage
                 sortingWidth16
-                poolCount30
-                fourSortersPerPool
-                oneToFourChildCount
+                poolCount10
+                fourTo32SortersPerPool
+                oneChildCount
                 generationFirst
                 generationLast
                 generationQueryFirst
@@ -151,7 +151,7 @@ module Msuf4SgdSpecsRs =
             filter = paramMapFilter
             enhancer = standardEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 1
+            maxParallel = 8
         }
 
 
@@ -169,7 +169,7 @@ module Msuf4SgdSpecsRs =
                 orthoRate
                 paraRate
                 selfSymRate
-                seedModificationRate
+                seedModificationRate12
                 modificationRates15
                 sortingWidth16
                 poolCount30
@@ -189,14 +189,14 @@ module Msuf4SgdSpecsRs =
     type configType =
         | Rand_Test
         | Rand_Small
-        | Rand_Pool2
+        | Rand_Pool
         | Rand_Pool3
 
     let Configs = Map.ofList 
                     [ 
                         (configType.Rand_Test, Specs.Rand_Test); 
                         (configType.Rand_Small, Specs.Rand_Small);
-                        (configType.Rand_Pool2, Specs.Rand_Pool2);
+                        (configType.Rand_Pool, Specs.Rand_Pool);
                         (configType.Rand_Pool3, Specs.Rand_Pool3);
                     ]
 

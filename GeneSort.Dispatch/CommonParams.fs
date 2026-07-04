@@ -45,8 +45,10 @@ module CommonParams =
     let fourSortersPerPool = (runParameters.sorterCountPerPoolKey, ["4"] )
     let oneAndTwoSortersPerPool = (runParameters.sorterCountPerPoolKey, ["1"; "2";] )
     let oneToFourSortersPerPool = (runParameters.sorterCountPerPoolKey, ["1"; "2"; "4"] )
+    let fourTo32SortersPerPool = (runParameters.sorterCountPerPoolKey, ["4"; "8"; "16"; "32"] )
 
     // SorterPoolCounts
+    let poolCount5 = (runParameters.sorterPoolCountKey, ["5";] )
     let poolCount10 = (runParameters.sorterPoolCountKey, ["10";] )
     let poolCount30 = (runParameters.sorterPoolCountKey, ["30";] )
     let poolCount100 = (runParameters.sorterPoolCountKey, ["100";] )
@@ -164,11 +166,14 @@ module CommonParams =
     let selfSymRates =  (runParameters.selfSymRateKey, [1.5; 2.001; ] |> List.map string)
 
 
-    let seedModificationRate =
+    let seedModificationRate12 =
             (runParameters.seedModificationRateKey, [0.12] |> List.map string)
 
+    let seedModificationRate15 =
+            (runParameters.seedModificationRateKey, [0.15] |> List.map string)
+
     let seedModificationRates =
-            (runParameters.seedModificationRateKey, [0.08; 0.12] |> List.map string)
+            (runParameters.seedModificationRateKey, [0.08; 0.12; 0.16] |> List.map string)
 
     let seedModificationRates2 =
             (runParameters.seedModificationRateKey, [0.10; 0.14] |> List.map string)

@@ -90,31 +90,6 @@ type stageBuilderSequence =
 
 
 
-        //member this.AddCe (ce: ce) =
-        //    if ce.Low >= (this.sortingWidth |> int) || ce.Hi >= (this.sortingWidth |> int) then
-        //        invalidArg "ce" $"CE {ce} has indices out of bounds for sorting width {this.sortingWidth}."
-
-        //    let mutable targetStageIndex = -1
-        //    // Start from the last stage and work backwards
-        //    for i = this.stageBuilders.Count - 1 downto 0 do
-        //        if this.stageBuilders.[i].CanAddCe(ce) then
-        //            targetStageIndex <- i
-
-        //    // If no stage can accept the CE, create a new stage
-        //    if targetStageIndex = -1 then
-        //        let newStage = 
-        //            { 
-        //                sortingWidth = this.sortingWidth
-        //                ces = ResizeArray<ce>()
-        //                occupied = Array.create (this.sortingWidth |> int) false
-        //            }
-        //        newStage.AddCe(ce)
-        //        this.stageBuilders.Add(newStage)
-        //    else
-        //        // Add to the earliest stage that can accept the CE
-        //        this.stageBuilders.[targetStageIndex].AddCe(ce)
-
-
 module StageBuilderSequence =
 
     let fromCes (sortingWidth : int<sortingWidth>) (ces: ce array) : stageBuilderSequence =
