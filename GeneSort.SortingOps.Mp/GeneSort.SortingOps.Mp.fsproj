@@ -10,9 +10,6 @@
     <Compile Include="CeDataDto.fs" />
     <Compile Include="CeBlockEvalDto.fs" />
     <Compile Include="SorterEvalDto.fs" />
-    <Compile Include="SorterEvalDtoOld.fs" />
-    <Compile Include="SorterModelEvalDto.fs" />
-    <Compile Include="SorterSetEvalDtoOld.fs" />
     <Compile Include="SorterSetEvalDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
