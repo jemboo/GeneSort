@@ -53,10 +53,10 @@ module MssiSgdSpecsRs =
     module Specs =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            DatabaseName = MssiSgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Mssi"
-            Spans = [
+            databaseName = MssiSgdDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for Mssi"
+            spans = [
                 mssiModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -74,18 +74,18 @@ module MssiSgdSpecsRs =
                 generationLast
                 generationQueryFirst
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 4
         }
 
 
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
-            DatabaseName = MssiSgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Mssi"
-            Spans = [
+            databaseName = MssiSgdDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for Mssi"
+            spans = [
                 mssiModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -103,17 +103,17 @@ module MssiSgdSpecsRs =
                 generationLast
                 generationQueryFirst
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
         }
 
         let Rand_Medium (executorType: sorterSgdExecutorType) : runHostSpec = {
-            DatabaseName = MssiSgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Mssi"
-            Spans = [
+            databaseName = MssiSgdDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for Mssi"
+            spans = [
                 mssiModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -131,10 +131,10 @@ module MssiSgdSpecsRs =
                 generationLast
                 generationQueryFirst
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 4
         }
 
     type configType =

@@ -61,10 +61,10 @@ module Msuf4SgdSpecsRm =
     module Specs =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            DatabaseName = Msuf4SgdDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for merge Msuf4"
-            Spans = [
+            databaseName = Msuf4SgdDbs.RandomMerge.Uniform.dbName
+            runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for merge Msuf4"
+            spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
                 sorterEvalMeasureInitial
@@ -87,17 +87,17 @@ module Msuf4SgdSpecsRm =
                 generationLast
                 generationQueryFirst
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 1
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 1
         }
 
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
-            DatabaseName = Msuf4SgdDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for merge Msuf4"
-            Spans = [
+            databaseName = Msuf4SgdDbs.RandomMerge.Uniform.dbName
+            runName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for merge Msuf4"
+            spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
                 sorterEvalMeasureInitial
@@ -120,17 +120,17 @@ module Msuf4SgdSpecsRm =
                 generationLast
                 generationQueryFirst
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
         }
 
         let Rand_Medium (executorType: sorterSgdExecutorType) : runHostSpec = {
-            DatabaseName = Msuf4SgdDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for merge Msuf4"
-            Spans = [
+            databaseName = Msuf4SgdDbs.RandomMerge.Uniform.dbName
+            runName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for merge Msuf4"
+            spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
                 sorterEvalMeasureInitial
@@ -153,10 +153,10 @@ module Msuf4SgdSpecsRm =
                 generationLast
                 generationQueryFirst
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 4
         }
 
     type configType =

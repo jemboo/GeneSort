@@ -36,54 +36,54 @@ module SorterEvalSpecsRs =
     module Specs =
 
         let Rand_Test (executorType: sorterEvalExecutorType)  : runHostSpec = {
-            DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Test16_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
-            Spans = [
+            databaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Test16_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
+            spans = [
                 rngTypeLcg
                 sorterEvalTypeV2
                 sortingWidth16
                 allSimpleSorterModelTypes
                 testSorterCount
             ]
-            Filter = standardSorterModelTypeFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 1
+            filter = standardSorterModelTypeFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 1
         }
 
         let Rand_Small (executorType: sorterEvalExecutorType) : runHostSpec = {
-            DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
-            Spans = [
+            databaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
+            spans = [
                 rngTypeLcg
                 sorterEvalTypeV2
                 smallSortingWidths
                 allSimpleSorterModelTypes
                 extraLargeSorterCount
             ]
-            Filter = standardSorterModelTypeFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            filter = standardSorterModelTypeFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
         }
 
         let Rand_Medium (executorType: sorterEvalExecutorType) : runHostSpec = {
-            DatabaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
-            Spans = [
+            databaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Medium_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
+            spans = [
                 rngTypeLcg
                 sorterEvalTypeV2
                 mediumSortingWidths
                 allSimpleSorterModelTypes
                 extraLargeSorterCount
             ]
-            Filter = standardSorterModelTypeFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            filter = standardSorterModelTypeFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 4
         }
 
     type configType =

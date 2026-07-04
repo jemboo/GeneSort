@@ -17,14 +17,14 @@ type IRunHost =
 
 
 type runHostSpec = {
-    DatabaseName: string<databaseName>
-    RunName: string<runName>
-    RunDescription: string
-    Spans: (string * string list) list
+    databaseName: string<databaseName>
+    runName: string<runName>
+    runDescription: string
+    spans: (string * string list) list
     // Logic Callbacks
-    Filter: runParameters -> runParameters option
-    Enhancer: IRunHost -> runParameters -> runParameters
+    filter: runParameters -> runParameters option
+    enhancer: IRunHost -> runParameters -> runParameters
     // Domain Settings
-    AllowOverwrite: bool<allowOverwrite>
-    MaxParallel: int
+    allowOverwrite: bool<allowOverwrite>
+    maxParallel: int
 }

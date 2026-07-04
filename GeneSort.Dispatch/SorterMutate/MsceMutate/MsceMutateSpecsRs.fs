@@ -49,10 +49,10 @@ module MsceMutateSpecsRs =
     module Specs =
 
         let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
-            DatabaseName = MsceMutateDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Msce"
-            Spans = [
+            databaseName = MsceMutateDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for Msce"
+            spans = [
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -65,18 +65,18 @@ module MsceMutateSpecsRs =
                 testSortingWidths
                 testChildCount
             ]
-            Filter = standardSorterModelTypeFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 1
+            filter = standardSorterModelTypeFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 1
         }
 
 
         let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
-            DatabaseName = MsceMutateDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Msce"
-            Spans = [
+            databaseName = MsceMutateDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for Msce"
+            spans = [
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -89,17 +89,17 @@ module MsceMutateSpecsRs =
                 smallSortingWidths
                 extraLargeChildCount
             ]
-            Filter = standardSorterModelTypeFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            filter = standardSorterModelTypeFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
         }
 
         let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
-            DatabaseName = MsceMutateDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Msce"
-            Spans = [
+            databaseName = MsceMutateDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for Msce"
+            spans = [
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -112,10 +112,10 @@ module MsceMutateSpecsRs =
                 mediumSortingWidths
                 extraLargeChildCount
             ]
-            Filter = standardSorterModelTypeFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            filter = standardSorterModelTypeFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 4
         }
 
     type configType =

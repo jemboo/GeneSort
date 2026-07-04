@@ -211,7 +211,7 @@ module Msuf4SgdDbs =
 
 
     let createRunHost (spec: runHostSpec) : IRunHost =
-        let db = getDatabaseByName spec.DatabaseName
-        let run = run.create spec.DatabaseName spec.RunName spec.RunDescription
+        let db = getDatabaseByName spec.databaseName
+        let run = run.create spec.databaseName spec.runName spec.runDescription
         runHost.Create db spec run :> IRunHost
 

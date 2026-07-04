@@ -61,10 +61,10 @@ module MsceSgdSpecsRs =
     module Specs =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            DatabaseName = MsceSgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Sgd analysis for Msce"
-            Spans = [
+            databaseName = MsceSgdDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Sgd analysis for Msce"
+            spans = [
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -83,18 +83,18 @@ module MsceSgdSpecsRs =
                 generationLast
                 generationQueryFirst
             ]
-            Filter = standardSorterModelTypeFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            filter = standardSorterModelTypeFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
         }
 
 
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
-            DatabaseName = MsceSgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Sgd analysis for Msce"
-            Spans = [
+            databaseName = MsceSgdDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Sgd analysis for Msce"
+            spans = [
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -113,17 +113,17 @@ module MsceSgdSpecsRs =
                 generationLast
                 generationQueryFirst
             ]
-            Filter = standardSorterModelTypeFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            filter = standardSorterModelTypeFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
         }
 
         let Rand_Medium (executorType: sorterSgdExecutorType) : runHostSpec = {
-            DatabaseName = MsceSgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Sgd analysis for Msce"
-            Spans = [
+            databaseName = MsceSgdDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Sgd analysis for Msce"
+            spans = [
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -142,10 +142,10 @@ module MsceSgdSpecsRs =
                 generationLast
                 generationQueryFirst
             ]
-            Filter = standardSorterModelTypeFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            filter = standardSorterModelTypeFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 4
         }
 
     type configType =

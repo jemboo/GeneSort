@@ -43,10 +43,10 @@ module Msuf4MutateSpecsRs =
     module Specs =
 
         let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
-            DatabaseName = Msuf4MutateDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Msuf4"
-            Spans = [
+            databaseName = Msuf4MutateDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for Msuf4"
+            spans = [
                 rngTypeLcg
                 sorterEvalSelection
                 sorterEvalMeasure
@@ -60,18 +60,18 @@ module Msuf4MutateSpecsRs =
                 msuf4ModelType
                 testChildCount
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 2
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 2
         }
 
 
         let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
-            DatabaseName = Msuf4MutateDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Msuf4"
-            Spans = [
+            databaseName = Msuf4MutateDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for Msuf4"
+            spans = [
                 rngTypeLcg
                 sorterEvalSelection
                 sorterEvalMeasure
@@ -85,17 +85,17 @@ module Msuf4MutateSpecsRs =
                 msuf4ModelType
                 extraLargeChildCount
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
         }
 
         let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
-            DatabaseName = Msuf4MutateDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Mutation analysis for Msuf4"
-            Spans = [
+            databaseName = Msuf4MutateDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for Msuf4"
+            spans = [
                 rngTypeLcg
                 sorterEvalSelection
                 sorterEvalMeasure
@@ -109,10 +109,10 @@ module Msuf4MutateSpecsRs =
                 msuf4ModelType
                 extraLargeChildCount
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 4
         }
 
     type configType =

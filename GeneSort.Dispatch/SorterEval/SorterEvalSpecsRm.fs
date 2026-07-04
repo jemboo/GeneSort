@@ -53,10 +53,10 @@ module SorterEvalSpecsRm =
     module Specs =
 
         let RandMerge_Test (executorType: sorterEvalExecutorType) : runHostSpec = {
-            DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge-Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
-            Spans = [   
+            databaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
+            runName = sprintf @"RandMerge-Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
+            spans = [   
                 rngTypeLcg
                 dataFormatInt8v512
                 allSimpleSorterModelTypes
@@ -66,18 +66,18 @@ module SorterEvalSpecsRm =
                 testMergeDimensions
                 testSorterCount
             ]
-            Filter = paramMapFilter
-            Enhancer = mergeEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 1
+            filter = paramMapFilter
+            enhancer = mergeEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 1
         }
 
 
         let RandMerge_Small (executorType: sorterEvalExecutorType) : runHostSpec = {
-            DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
-            Spans = [
+            databaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
+            runName = sprintf @"RandMerge-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
+            spans = [
                 rngTypeLcg
                 dataFormatInt8v512
                 allSimpleSorterModelTypes
@@ -87,18 +87,18 @@ module SorterEvalSpecsRm =
                 allMergeDimensions
                 extraLargeSorterCount
             ]
-            Filter = paramMapFilter
-            Enhancer = mergeEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            filter = paramMapFilter
+            enhancer = mergeEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
         }
 
 
         let RandMerge_MediumLd (executorType: sorterEvalExecutorType) : runHostSpec = {
-            DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge-MediumLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
-            Spans = [
+            databaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
+            runName = sprintf @"RandMerge-MediumLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
+            spans = [
                 rngTypeLcg
                 dataFormatInt8v512
                 allSimpleSorterModelTypes
@@ -108,18 +108,18 @@ module SorterEvalSpecsRm =
                 lowMergeDimensions
                 largeSorterCount
             ]
-            Filter = paramMapFilter
-            Enhancer = mergeEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            filter = paramMapFilter
+            enhancer = mergeEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 4
         }
 
 
         let RandMerge_MediumHd (executorType: sorterEvalExecutorType) : runHostSpec = {
-            DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge-MediumHd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
-            Spans = [
+            databaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
+            runName = sprintf @"RandMerge-MediumHd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
+            spans = [
                 rngTypeLcg
                 dataFormatInt8v512
                 noSuffixSuffixType
@@ -129,18 +129,18 @@ module SorterEvalSpecsRm =
                 mergeDimension6
                 largeSorterCount
             ]
-            Filter = paramMapFilter
-            Enhancer = mergeEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 2
+            filter = paramMapFilter
+            enhancer = mergeEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 2
         }
 
 
         let RandMerge_LargeLd (executorType: sorterEvalExecutorType) : runHostSpec = {
-            DatabaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"RandMerge-LargeLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
-            Spans = [
+            databaseName = SorterEvalDbs.RandomMerge.Uniform.dbName
+            runName = sprintf @"RandMerge-LargeLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
+            spans = [
                 rngTypeLcg
                 dataFormatInt8v512
                 noSuffixSuffixType
@@ -150,10 +150,10 @@ module SorterEvalSpecsRm =
                 mergeDimension2
                 largeSorterCount
             ]
-            Filter = paramMapFilter
-            Enhancer = mergeEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 2
+            filter = paramMapFilter
+            enhancer = mergeEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 2
         }
 
 

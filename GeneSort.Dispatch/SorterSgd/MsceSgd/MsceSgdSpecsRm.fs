@@ -83,10 +83,10 @@ module MsceSgdSpecsRm =
     module Specs =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            DatabaseName = MsceSgdDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Sgd analysis for merge Msce"
-            Spans = [
+            databaseName = MsceSgdDbs.RandomMerge.Uniform.dbName
+            runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Sgd analysis for merge Msce"
+            spans = [
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -108,17 +108,17 @@ module MsceSgdSpecsRm =
                 noSuffixSuffixType
                 dataFormatInt8v512
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
         }
 
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
-            DatabaseName = MsceSgdDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Sgd analysis for merge Msce"
-            Spans = [
+            databaseName = MsceSgdDbs.RandomMerge.Uniform.dbName
+            runName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Sgd analysis for merge Msce"
+            spans = [
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -140,17 +140,17 @@ module MsceSgdSpecsRm =
                 noSuffixSuffixType
                 dataFormatInt8v512
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
         }
 
         let Rand_MediumLd (executorType: sorterSgdExecutorType) : runHostSpec = {
-            DatabaseName = MsceSgdDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Sgd analysis for merge Msce"
-            Spans = [
+            databaseName = MsceSgdDbs.RandomMerge.Uniform.dbName
+            runName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Sgd analysis for merge Msce"
+            spans = [
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -172,17 +172,17 @@ module MsceSgdSpecsRm =
                 noSuffixSuffixType
                 dataFormatInt8v512
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 4
         }
 
         let Rand_MediumHd (executorType: sorterSgdExecutorType) : runHostSpec = {
-            DatabaseName = MsceSgdDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Sgd analysis for merge Msce"
-            Spans = [
+            databaseName = MsceSgdDbs.RandomMerge.Uniform.dbName
+            runName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Sgd analysis for merge Msce"
+            spans = [
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -204,18 +204,18 @@ module MsceSgdSpecsRm =
                 noSuffixSuffixType
                 dataFormatInt8v512
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 4
         }
 
 
         let Rand_Large2d (executorType: sorterSgdExecutorType) : runHostSpec = {
-            DatabaseName = MsceSgdDbs.RandomMerge.Uniform.dbName
-            RunName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Sgd analysis for merge Msce"
-            Spans = [
+            databaseName = MsceSgdDbs.RandomMerge.Uniform.dbName
+            runName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Sgd analysis for merge Msce"
+            spans = [
                 msceModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -237,10 +237,10 @@ module MsceSgdSpecsRm =
                 noSuffixSuffixType
                 dataFormatInt8v512
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 4
         }
 
     type configType =

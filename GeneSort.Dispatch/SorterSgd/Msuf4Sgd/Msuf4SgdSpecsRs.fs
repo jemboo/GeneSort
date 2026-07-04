@@ -59,10 +59,10 @@ module Msuf4SgdSpecsRs =
     module Specs =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            DatabaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Test1_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Sgd analysis for Msuf4"
-            Spans = [
+            databaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Test1_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Sgd analysis for Msuf4"
+            spans = [
                 msuf4ModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -83,17 +83,17 @@ module Msuf4SgdSpecsRs =
                 generationQueryFirst
                 distinctSorterHashesBoth
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
         }
 
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
-            DatabaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Sgd analysis for Msuf4"
-            Spans = [
+            databaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Sgd analysis for Msuf4"
+            spans = [
                 msuf4ModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -114,17 +114,17 @@ module Msuf4SgdSpecsRs =
                 generationQueryFirst
                 distinctSorterHashesBoth
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
         }
 
         let Rand_Pool2 (executorType: sorterSgdExecutorType) : runHostSpec = {
-            DatabaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
-            RunName = sprintf @"Rand-Pool2_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Sgd analysis for Msuf4"
-            Spans = [
+            databaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Pool2_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Sgd analysis for Msuf4"
+            spans = [
                 msuf4ModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -145,10 +145,10 @@ module Msuf4SgdSpecsRs =
                 generationQueryFirst
                 distinctSorterHashesBoth
             ]
-            Filter = paramMapFilter
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 8
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
         }
 
     type configType =

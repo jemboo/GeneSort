@@ -41,87 +41,87 @@ module SortableTestMergeSpecs =
     module Specs =
 
         let Merge_Test  (executorType: executorType) : runHostSpec = {
-            DatabaseName = SortableMergeTestDb.dbName
-            RunName = sprintf @"Merge-Test_%s" (ExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Int8 merge sorter test sets"
-            Spans = [
+            databaseName = SortableMergeTestDb.dbName
+            runName = sprintf @"Merge-Test_%s" (ExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Int8 merge sorter test sets"
+            spans = [
                 testMergeSortingWidths
                 dataFormatInt8v512
                 testMergeDimensions
                 noSuffixSuffixType
             ]
-            Filter = mergeDimensionDividesSortingWidth
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 1
+            filter = mergeDimensionDividesSortingWidth
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 1
         }
 
 
         let Merge_Small (executorType: executorType) : runHostSpec = {
-            DatabaseName = SortableMergeTestDb.dbName
-            RunName = sprintf @"Merge-Small_%s" (ExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Merge_Small sorter test sets"
-            Spans = [
+            databaseName = SortableMergeTestDb.dbName
+            runName = sprintf @"Merge-Small_%s" (ExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Merge_Small sorter test sets"
+            spans = [
                 smallMergeSortingWidths
                 dataFormatInt8v512
                 allMergeDimensions
                 noSuffixSuffixType
             ]
-            Filter = mergeDimensionDividesSortingWidth
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            filter = mergeDimensionDividesSortingWidth
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 4
         }
 
         
         let Merge_MediumLd (executorType: executorType) : runHostSpec = {
-            DatabaseName = SortableMergeTestDb.dbName
-            RunName = sprintf @"Merge-MediumLd_%s" (ExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Merge_MediumLd sorter test sets"
-            Spans = [
+            databaseName = SortableMergeTestDb.dbName
+            runName = sprintf @"Merge-MediumLd_%s" (ExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Merge_MediumLd sorter test sets"
+            spans = [
                 mediumMergeSortingWidths
                 dataFormatInt8v512
                 lowMergeDimensions
                 noSuffixSuffixType
             ]
-            Filter = mergeDimensionDividesSortingWidth
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 4
+            filter = mergeDimensionDividesSortingWidth
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 4
         }
 
         
         let Merge_MediumHd (executorType: executorType) : runHostSpec = {
-            DatabaseName = SortableMergeTestDb.dbName
-            RunName = sprintf @"Merge-MediumHd_%s" (ExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Merge_MediumHd sorter test sets"
-            Spans = [
+            databaseName = SortableMergeTestDb.dbName
+            runName = sprintf @"Merge-MediumHd_%s" (ExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Merge_MediumHd sorter test sets"
+            spans = [
                 sortingWidth96
                 dataFormatInt8v512
                 mergeDimension6
                 noSuffixSuffixType
             ]
-            Filter = mergeDimensionDividesSortingWidth
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 1
+            filter = mergeDimensionDividesSortingWidth
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 1
         }
 
 
         let Merge_LargeLd (executorType: executorType) : runHostSpec = {
-            DatabaseName = SortableMergeTestDb.dbName
-            RunName = sprintf @"Merge-LargeLd_%s" (ExecutorType.toString executorType) |> UMX.tag
-            RunDescription = "Merge_LargeLd sorter test sets"
-            Spans = [
+            databaseName = SortableMergeTestDb.dbName
+            runName = sprintf @"Merge-LargeLd_%s" (ExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Merge_LargeLd sorter test sets"
+            spans = [
                 largeMergeSortingWidths
                 dataFormatInt8v512
                 mergeDimension2
                 noSuffixSuffixType
             ]
-            Filter = mergeDimensionDividesSortingWidth
-            Enhancer = standardEnhancer
-            AllowOverwrite = false |> UMX.tag
-            MaxParallel = 2
+            filter = mergeDimensionDividesSortingWidth
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 2
         }
 
 
