@@ -8,6 +8,7 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Core
 open System
 open GeneSort.Eval.V1
+open GeneSort.Sorting
 
 
 /// Holds the combined results of the historical optimization run
@@ -40,6 +41,7 @@ module SorterRunResult =
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
             (sorterCountPerPool: int<sorterCountPerPool>)
+            (celengthSelector: int<generationNumber> -> int<ceLength> option)
             (initialPoolSet: sorterPoolSet) : sorterRunResult =
 
         let rec loop (remainingSteps: int) (currentSet: sorterPoolSet) (historyAcc: sorterPoolSetDescription list) =
@@ -48,6 +50,10 @@ module SorterRunResult =
                         currentSet
                         (historyAcc |> List.rev |> List.toArray)
             else
+                // Calculate the current active generation (assuming 0-indexed start since genStart isn't provided)
+                let currentGen = (int genCount - remainingSteps) |> UMX.tag<generationNumber>
+                let maxCeCount = celengthSelector currentGen
+
                 // 1. Take a lightweight snapshot of the current generation state before transitioning
                 let currentSnapshot = SorterPoolSetDescription.fromPoolSet currentSet
                 let updatedHistory = currentSnapshot :: historyAcc
@@ -63,12 +69,14 @@ module SorterRunResult =
                         sortableTest 
                         sorterEvalType 
                         selectionMeasure 
+                        maxCeCount
                         reEvaluateParents
                         currentSet
 
                 loop (remainingSteps - 1) nextSet updatedHistory
 
         loop %genCount initialPoolSet []
+
 
     /// Asynchronously runs the generation loops step N times using an asyncResult pipeline.
     /// Accumulates lightweight snapshots for intermediate states and forced GC compacting 
@@ -83,7 +91,8 @@ module SorterRunResult =
             (sortableTest: sortableTest)
             (srtrEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
-            (seedSorterPoolSet: sorterPoolSet)
+            (celengthSelector: int<generationNumber> -> int<ceLength> option)
+            (initialPoolSet: sorterPoolSet)
             (cts: CancellationToken)
             (log: string -> unit) : Async<Result<sorterRunResult, string>> =
 
@@ -109,6 +118,7 @@ module SorterRunResult =
                 else
                     let currentGen = genStart + (genCount - %remainingSteps)
                     let totalGen = genStart + genCount
+                    let maxCeCount = celengthSelector currentGen
                     
                     // Look up if the current generation is an exponential milestone
                     let shouldReport = (Set.contains (int currentGen) targetGenerations)
@@ -124,8 +134,6 @@ module SorterRunResult =
                         else 
                             historyAcc
 
-                    // log "Executing generation processing step..."
-                    //let reEvaluateParents = false
                     let adjSorterEvalType = if (remainingSteps = 1) then sorterEvalType.V2 else srtrEvalType
                     let reEvaluateParents = (remainingSteps = 1)
 
@@ -138,6 +146,7 @@ module SorterRunResult =
                             sortableTest 
                             adjSorterEvalType
                             selectionMeasure 
+                            maxCeCount
                             reEvaluateParents
                             currentSorterPoolSet
                             
@@ -157,10 +166,8 @@ module SorterRunResult =
                     return! loop (remainingSteps - 1) nextSorterPoolSet moreUpdatedHistory
             }
 
-        loop %genCount seedSorterPoolSet []
 
-
-
+        loop %genCount initialPoolSet []
 
 
 

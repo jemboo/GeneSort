@@ -14,6 +14,7 @@ module SorterPoolRunner =
     let evaluatePoolSet 
             (sortableTest: sortableTest)
             (sorterEvalType: sorterEvalType)
+            (maxCeCount: int<ceLength> option)
             (reEvaluateParents: bool)
             (poolSet: sorterPoolSet)
             : Map<Guid<sorterPoolMemberId>, sorterEval> =
@@ -57,7 +58,7 @@ module SorterPoolRunner =
                 // 4. Materialize the filtered models into actual sorter executable structures
                 let sorters = 
                     membersToEvaluate 
-                    |> Array.map (fun m -> SorterModel.makeSorter m.SorterModel)
+                    |> Array.map (fun m -> SorterModel.makeSorter m.SorterModel maxCeCount)
 
                 // 5. Run the evaluation engine on the filtered pool subset
                 let collectNewSortableTests = false

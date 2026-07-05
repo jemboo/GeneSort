@@ -56,9 +56,10 @@ module SorterModelSet =
 
 
     let makeSorterSet (id:Guid<sorterSetId>) 
+                      (maxCeCount: int<ceLength> option)
                       (modelSet: sorterModelSet) : sorterSet =
         let sorters = 
             modelSet.SorterModels 
-            |> Array.map (fun sm -> SorterModel.makeSorter sm)
+            |> Array.map (fun sm -> SorterModel.makeSorter sm maxCeCount)
         sorterSet.create id sorters
 

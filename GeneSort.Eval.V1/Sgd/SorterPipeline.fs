@@ -1,11 +1,11 @@
 ﻿namespace GeneSort.Eval.V1.Sgd
 
 open FSharp.UMX
-open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1
+open GeneSort.Sorting
 
 module SorterPipeline =
 
@@ -18,6 +18,7 @@ module SorterPipeline =
             (sortableTest: sortableTest)
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
+            (maxCeCount: int<ceLength> option)
             (reEvaluateParents: bool)
             (currentPoolSet: sorterPoolSet) : sorterPoolSet =
 
@@ -31,7 +32,8 @@ module SorterPipeline =
                     expandedPoolSet 
                     |> SorterPoolRunner.evaluatePoolSet 
                                         sortableTest 
-                                        sorterEvalType 
+                                        sorterEvalType
+                                        maxCeCount
                                         reEvaluateParents
             
                 expandedPoolSet 

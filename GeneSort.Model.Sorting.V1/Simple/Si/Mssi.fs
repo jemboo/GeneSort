@@ -53,11 +53,15 @@ type mssi =
             this.sortingWidth = other.sortingWidth && 
             this.perm_Sis = other.perm_Sis
 
-    member this.MakeSorter() = 
-        let ces = this.perm_Sis
-                    |> Array.map (fun psi -> psi |> PermSi.getTwoOrbits)
-                    |> Array.collect(id)
-                    |> Array.map(fun tbit -> ce.create tbit.First tbit.Second)
+    member this.MakeSorter (maxCount: int<ceLength> option) = 
+        let allCes = this.perm_Sis
+                        |> Array.map (fun psi -> psi |> PermSi.getTwoOrbits)
+                        |> Array.collect(id)
+                        |> Array.map(fun tbit -> ce.create tbit.First tbit.Second)
+        let ces = 
+            match maxCount with
+            | Some n -> allCes |> Array.truncate %n
+            | None   -> allCes
         sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
 
 

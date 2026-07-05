@@ -14,6 +14,7 @@ open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterSgd
+open GeneSort.Eval.V1
 
 
 module Msuf4SgdExecutor =
@@ -98,6 +99,7 @@ module Msuf4SgdExecutor =
                                          |> sorterModelMutator.Simple
 
                 log "Executing SorterRunResult.runEvolutionAsync..."
+                let ceCountSelector = fun (gem: int<generationNumber>) -> None
                 let! (runResult: sorterRunResult) = SorterRunResult.runEvolutionAsync
                                                         genFirst
                                                         (genLast - genFirst)
@@ -108,6 +110,7 @@ module Msuf4SgdExecutor =
                                                         sortableTest
                                                         sorterEvalType
                                                         sorterEvalMeasure
+                                                        ceCountSelector
                                                         seedSorterPoolSet
                                                         cts.Token
                                                         log

@@ -31,9 +31,9 @@ module SorterModel =
         | Unknown -> failwith "Unknown sorterModel"
 
 
-    let makeSorter (model: sorterModel) : sorter =
+    let makeSorter (model: sorterModel) (maxCeCount: int<ceLength> option)  : sorter =
         match model with
-        | Simple sms -> sms |> SimpleSorterModel.makeSorter
+        | Simple sms -> sms |> SimpleSorterModel.makeSorter maxCeCount
         | Unknown -> failwith "Unknown sorterModel"
 
     let asSimpleSorterModel (model: sorterModel) : simpleSorterModel =

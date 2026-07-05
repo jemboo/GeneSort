@@ -54,9 +54,13 @@ type msce =
             this.sortingWidth = other.sortingWidth &&
             this.ceCodes = other.ceCodes
 
-    member this.MakeSorter() = 
-        let sw = %this.sortingWidth
-        let ces = this.CeCodes |> Array.map (Ce.fromIndex)
+    // take up to n ces if n is Some, otherwise take all ces
+    member this.MakeSorter (maxCount: int<ceLength> option) = 
+        let allCes = this.CeCodes |> Array.map (Ce.fromIndex)
+        let ces = 
+            match maxCount with
+            | Some n -> allCes |> Array.truncate %n
+            | None   -> allCes
         sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
 
 

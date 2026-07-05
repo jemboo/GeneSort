@@ -512,8 +512,9 @@ module MsceMutateExecutor =
                     let modelSetChunk = sorterModelSet.create (Guid.Empty |> UMX.tag) modelChunk
 
                     // Materialize into a functional SorterSet chunk
+                    let maxCeCount = None
                     let fullSorterSetChunk = 
-                        SorterModelSet.makeSorterSet (Guid.Empty |> UMX.tag) modelSetChunk
+                        SorterModelSet.makeSorterSet (Guid.Empty |> UMX.tag) maxCeCount modelSetChunk
 
                     // Compute sorter evaluations directly from the targeted network chunk
                     let sorterEvalsChunk = 

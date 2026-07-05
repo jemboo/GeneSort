@@ -139,8 +139,9 @@ module SorterEvalExecutor =
                             (Guid.Empty |> UMX.tag) pieceFirstIdx sortersPerSplit sorterModelGen
 
                     // Materialize models into a functional SorterSet chunk
+                    let maxCeCount = None
                     let fullSorterSetChunk = 
-                        SorterModelSet.makeSorterSet (Guid.Empty |> UMX.tag) modelSetChunk
+                        SorterModelSet.makeSorterSet (Guid.Empty |> UMX.tag) maxCeCount modelSetChunk
 
                     // Compute sorter evaluations directly from the chunk array
                     let sorterEvalsChunk = 
