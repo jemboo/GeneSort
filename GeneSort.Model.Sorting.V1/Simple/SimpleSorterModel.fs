@@ -33,13 +33,13 @@ module SimpleSorterModel =
         | Msuf4 msuf4 -> msuf4.Id
         | Msuf6 msuf6 -> msuf6.Id
 
-    let makeSorter (maxCeCount: int<ceLength> option) (model: simpleSorterModel)  : sorter =
+    let makeSorter (maxCeLength: int<ceLength> option) (model: simpleSorterModel)  : sorter =
         match model with
-        | Msce msce -> msce.MakeSorter(maxCeCount)
-        | Mssi mssi -> mssi.MakeSorter(maxCeCount)
-        | Msrs msrs -> msrs.MakeSorter(maxCeCount)
-        | Msuf4 msuf4 -> msuf4.MakeSorter(maxCeCount)
-        | Msuf6 msuf6 -> msuf6.MakeSorter(maxCeCount)
+        | Msce msce -> msce.MakeSorter(maxCeLength)
+        | Mssi mssi -> mssi.MakeSorter(maxCeLength)
+        | Msrs msrs -> msrs.MakeSorter(maxCeLength)
+        | Msuf4 msuf4 -> msuf4.MakeSorter(maxCeLength)
+        | Msuf6 msuf6 -> msuf6.MakeSorter(maxCeLength)
 
     let getSortingWidth (model: simpleSorterModel) : int<sortingWidth> =
         match model with

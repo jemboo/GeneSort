@@ -5,47 +5,90 @@ open GeneSort.Model.Sortable
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open GeneSort.SortingOps
+open GeneSort.SortingLib.Sorter
 
-let yab = "[0, 64, (0, 15)]; [1, 64, (1, 14)]; [2, 64, (2, 13)]; [3, 64, (3, 11)]; [4, 64, (4, 12)]; [5, 64, (5, 10)]; [6, 128, (6, 7)]; [7, 64, (8, 9)]; [8, 64, (0, 6)]; [9, 64, (1, 7)]; [10, 32, (2, 10)]; [11, 32, (3, 12)]; [12, 32, (4, 11)]; [13, 32, (5, 13)]; [14, 32, (8, 14)]; [15, 64, (9, 15)]; [20, 64, (4, 8)]; [22, 96, (6, 9)]; [23, 64, (7, 11)]; [26, 64, (2, 3)]; [27, 32, (4, 5)]; [29, 128, (7, 8)]; [30, 64, (10, 11)]; [31, 64, (12, 13)]; [32, 32, (0, 6)]; [33, 64, (1, 7)]; [34, 32, (2, 4)]; [35, 96, (3, 5)]; [36, 64, (8, 14)]; [37, 32, (9, 15)]; [38, 96, (10, 12)]; [39, 32, (11, 13)]; [41, 48, (1, 6)]; [45, 64, (7, 8)]; [46, 64, (9, 14)]; [51, 12, (3, 12)]; [53, 108, (5, 10)]; [54, 80, (6, 9)]; [56, 64, (0, 7)]; [59, 60, (3, 4)]; [61, 32, (8, 15)]; [63, 72, (11, 12)]; [65, 48, (1, 2)]; [68, 116, (5, 6)]; [70, 120, (9, 10)]; [71, 48, (13, 14)]; [72, 56, (0, 2)]; [77, 72, (7, 8)]; [79, 32, (13, 15)]; [82, 80, (2, 3)]; [83, 76, (4, 5)]; [86, 88, (10, 11)]; [87, 64, (12, 13)]; [88, 24, (0, 2)]; [95, 16, (13, 15)]; [106, 2, (2, 12)]; [107, 2, (3, 13)]; [115, 16, (3, 12)]; [117, 114, (5, 7)]; [118, 108, (8, 10)]; [122, 27, (2, 5)]; [123, 89, (3, 4)]; [124, 127, (6, 9)]; [126, 20, (10, 13)]; [127, 84, (11, 12)]; [128, 7, (0, 1)]; [133, 128, (6, 7)]; [134, 126, (8, 9)]; [135, 6, (14, 15)]; [146, 2, (2, 6)]; [147, 86, (4, 8)]; [149, 70, (7, 11)]; [150, 4, (9, 13)]; [162, 25, (2, 3)]; [163, 104, (4, 5)]; [164, 116, (6, 8)]; [165, 97, (7, 9)]; [166, 93, (10, 11)]; [167, 22, (12, 13)]; [174, 128, (7, 8)]; [179, 22, (3, 4)]; [183, 18, (11, 12)]; [188, 97, (5, 6)]; [190, 104, (9, 10)]; [203, 41, (4, 5)]; [206, 41, (10, 11)]; [212, 14, (6, 7)]; [213, 24, (8, 9)]"
+let ceUseSoruceTester() =
 
-let yow1 ="[0, 64, (0, 15)]; 
-           [1, 64, (1, 14)]; 
-           [2, 64, (2, 13)]; 
-           [3, 64, (3, 12)]; 
-           [4, 64, (4, 11)]; 
-           [5, 64, (5, 10)]; [6, 64, (6, 9)]; [7, 128, (7, 8)]; [8, 64, (0, 3)]; [9, 64, (1, 2)]; [10, 64, (4, 7)]; [11, 64, (5, 6)]; [12, 64, (8, 11)]; [13, 64, (9, 10)]; [14, 64, (12, 15)]; [15, 64, (13, 14)]; [16, 32, (0, 1)]; [17, 72, (2, 12)]; [18, 72, (3, 13)]; [19, 64, (4, 5)]; [20, 96, (6, 7)]; [21, 96, (8, 9)]; [22, 64, (10, 11)]; [23, 32, (14, 15)]; [24, 8, (0, 4)]; [25, 56, (1, 6)]; [26, 96, (2, 5)]; [27, 96, (3, 8)]; [28, 96, (7, 12)]; [29, 56, (9, 14)]; [30, 96, (10, 13)]; [31, 8, (11, 15)]; [34, 60, (2, 3)]; [39, 60, (12, 13)]; [41, 42, (1, 4)]; [44, 104, (5, 10)]; [46, 128, (7, 8)]; [47, 42, (11, 14)]; [54, 92, (6, 9)]; [59, 111, (3, 4)]; [63, 111, (11, 12)]; [76, 116, (5, 6)]; [78, 116, (9, 10)]; [81, 12, (1, 2)]; [82, 114, (4, 7)]; [84, 114, (8, 11)]; [87, 12, (13, 14)]; [98, 49, (2, 3)]; [99, 114, (4, 5)]; [100, 125, (6, 7)]; [101, 125, (8, 9)]; [102, 114, (10, 11)]; [103, 49, (12, 13)]; [114, 70, (3, 4)]; [115, 122, (5, 6)]; [117, 122, (9, 10)]; [118, 70, (11, 12)]; [124, 122, (6, 8)]; [125, 122, (7, 9)]; [270, 128, (7, 8)]"
-
-
-
-let yow2 = "[0, 64, (0, 15)]; [1, 64, (1, 14)]; [2, 64, (2, 13)]; [3, 64, (3, 12)]; [4, 64, (4, 11)]; [5, 64, (5, 10)]; [6, 64, (6, 9)]; [7, 128, (7, 8)]; [8, 64, (0, 3)]; [9, 64, (1, 2)]; [10, 64, (4, 7)]; [11, 64, (5, 6)]; [12, 64, (8, 11)]; [13, 64, (9, 10)]; [14, 64, (12, 15)]; [15, 64, (13, 14)]; [16, 32, (0, 1)]; [17, 72, (2, 12)]; [18, 72, (3, 13)]; [19, 64, (4, 5)]; [20, 96, (6, 7)]; [21, 96, (8, 9)]; [22, 64, (10, 11)]; [23, 32, (14, 15)]; [24, 8, (0, 4)]; [25, 56, (1, 6)]; [26, 96, (2, 5)]; [27, 96, (3, 8)]; [28, 96, (7, 12)]; [29, 56, (9, 14)]; [30, 96, (10, 13)]; [31, 8, (11, 15)]; [33, 42, (1, 3)]; [36, 128, (7, 8)]; [39, 42, (12, 14)]; [42, 60, (2, 4)]; [45, 92, (6, 9)]; [47, 60, (11, 13)]; [52, 104, (5, 10)]; [59, 102, (3, 4)]; [63, 102, (11, 12)]; [76, 114, (4, 7)]; [79, 114, (8, 11)]; [81, 36, (1, 2)]; [83, 116, (5, 6)]; [85, 116, (9, 10)]; [87, 36, (13, 14)]; [98, 44, (2, 3)]; [99, 114, (4, 5)]; [100, 125, (6, 7)]; [101, 125, (8, 9)]; [102, 114, (10, 11)]; [103, 44, (12, 13)]; [126, 128, (7, 8)]; [148, 122, (5, 6)]; [150, 122, (9, 10)]; [155, 122, (6, 7)]; [156, 122, (8, 9)]; [171, 70, (3, 4)]; [175, 70, (11, 12)]"
+    let yow1 ="[0, 64, (0, 15)]; 
+               [1, 64, (1, 14)]; 
+               [2, 64, (2, 13)]; 
+               [3, 64, (3, 12)]; 
+               [4, 64, (4, 11)]; 
+               [5, 64, (5, 10)]; [6, 64, (6, 9)]; [7, 128, (7, 8)]; [8, 64, (0, 3)]; [9, 64, (1, 2)]; [10, 64, (4, 7)]; [11, 64, (5, 6)]; [12, 64, (8, 11)]; [13, 64, (9, 10)]; [14, 64, (12, 15)]; [15, 64, (13, 14)]; [16, 32, (0, 1)]; [17, 72, (2, 12)]; [18, 72, (3, 13)]; [19, 64, (4, 5)]; [20, 96, (6, 7)]; [21, 96, (8, 9)]; [22, 64, (10, 11)]; [23, 32, (14, 15)]; [24, 8, (0, 4)]; [25, 56, (1, 6)]; [26, 96, (2, 5)]; [27, 96, (3, 8)]; [28, 96, (7, 12)]; [29, 56, (9, 14)]; [30, 96, (10, 13)]; [31, 8, (11, 15)]; [34, 60, (2, 3)]; [39, 60, (12, 13)]; [41, 42, (1, 4)]; [44, 104, (5, 10)]; [46, 128, (7, 8)]; [47, 42, (11, 14)]; [54, 92, (6, 9)]; [59, 111, (3, 4)]; [63, 111, (11, 12)]; [76, 116, (5, 6)]; [78, 116, (9, 10)]; [81, 12, (1, 2)]; [82, 114, (4, 7)]; [84, 114, (8, 11)]; [87, 12, (13, 14)]; [98, 49, (2, 3)]; [99, 114, (4, 5)]; [100, 125, (6, 7)]; [101, 125, (8, 9)]; [102, 114, (10, 11)]; [103, 49, (12, 13)]; [114, 70, (3, 4)]; [115, 122, (5, 6)]; [117, 122, (9, 10)]; [118, 70, (11, 12)]; [124, 122, (6, 8)]; [125, 122, (7, 9)]; [270, 128, (7, 8)]"
 
 
+    let sorterId = Guid.NewGuid() |> UMX.tag<sorterId>
+    let sortingWidth = 16 |> UMX.tag<sortingWidth>
+    let sorter = CeUse.ceUseStringToSorter sorterId sortingWidth yow1
+    let ceBlock = CeBlock.fromSorter sorter
+
+
+    let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
+    let sortableModel = msasF.create sortingWidth
+    let sortableTest = sortableModel.MakeSortableBoolTest sortableTestId sortingWidth
+                       |> sortableTest.Bools
+    let collectNewSortableTests = true
+    let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
+    None
+
+
+let sorterLibTester16() =
+
+    let ceBlockId = Guid.NewGuid() |> UMX.tag<ceBlockId>
+    let sortingWidth = 16 |> UMX.tag<sortingWidth>
+    let ceArray = SorterDataParse.parseCeArray SorterData.Degree16_Green
+    let ceBlock = ceBlock.create ceBlockId sortingWidth ceArray
+    
+    let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
+    let sortableModel = msasF.create sortingWidth
+    let sortableTest = sortableModel.MakeSortableBoolTest sortableTestId sortingWidth
+                       |> sortableTest.Bools
+                       
+    let collectNewSortableTests = true
+    let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
+
+    None
 
 
 
+let sorterLibTester22() =
+
+    let ceBlockId = Guid.NewGuid() |> UMX.tag<ceBlockId>
+    let sortingWidth = 22 |> UMX.tag<sortingWidth>
+    let ceArray = SorterDataParse.parseCeArray SorterData.Degree22aStr
+    let ceBlock = ceBlock.create ceBlockId sortingWidth ceArray
+    
+    let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
+    let sortableModel = msasF.create sortingWidth
+    let sortableTest = sortableModel.MakeSortableBoolTest sortableTestId sortingWidth
+                       |> sortableTest.Bools
+                       
+    let collectNewSortableTests = true
+    let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
+
+    None
+
+
+let sorterLibTester24() =
+
+    let ceBlockId = Guid.NewGuid() |> UMX.tag<ceBlockId>
+    let sortingWidth = 24 |> UMX.tag<sortingWidth>
+    let ceArray = SorterDataParse.parseCeArray SorterData.Degree24StrStg1to4
+    let ceBlock = ceBlock.create ceBlockId sortingWidth ceArray
+    
+    let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
+    let sortableModel = msasF.create sortingWidth
+    let sortableTest = sortableModel.MakeSortableBoolTest sortableTestId sortingWidth
+                       |> sortableTest.Bools
+                       
+    let collectNewSortableTests = true
+    let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
+
+    None
 
 
 
-
-
-
-
-
-
-
-let sorterId = Guid.NewGuid() |> UMX.tag<sorterId>
-let sortingWidth = 16 |> UMX.tag<sortingWidth>
-let sorter = CeUse.ceUseStringToSorter sorterId sortingWidth yow1
-let ceBlock = CeBlock.fromSorter sorter
-
-
-let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
-let sortableModel = msasF.create sortingWidth
-let sortableTest = sortableModel.MakeSortableBoolTest sortableTestId sortingWidth
-                   |> sortableTest.Bools
-let collectNewSortableTests = true
-let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
-
-
+//ceUseSoruceTester() |> ignore
+sorterLibTester24() |> ignore
 
 printfn "Hello from F# yo"

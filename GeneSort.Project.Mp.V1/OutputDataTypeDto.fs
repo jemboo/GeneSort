@@ -19,13 +19,7 @@ module OutputDataTypeDto =
         | SorterRunResult srr -> { Tag = "SorterRunResult"; Value = srr }
         | SorterSet so -> { Tag = "SorterSet"; Value = so }
         | SortableTest so -> { Tag = "SortableTest"; Value = so }
-        | SortableTestSet so -> { Tag = "SortableTestSet"; Value = so }
-        | SortingSet so -> { Tag = "SorterModelSet"; Value = so }
-        | SorterModelSetGen so -> { Tag = "SorterModelSetGen"; Value = so }
-        | SortableTestModelSet so -> { Tag = "SortableTestModelSet"; Value = so }
-        | SortableTestModelSetGen so -> { Tag = "SortableTestModelSetGen"; Value = so }
         | SorterSetEval so -> { Tag = "SorterSetEval"; Value = so }
-        | SorterEvalBins so -> { Tag = "SorterSetEvalBins"; Value = so }
         | Run so -> { Tag = "Run"; Value = %so }
         | TextReport trn -> { Tag = "TextReport"; Value = %trn }
         | _ -> failwith (sprintf "%A not handled" outputDataType)
@@ -37,13 +31,7 @@ module OutputDataTypeDto =
         | "SorterRunResult" -> SorterRunResult dto.Value
         | "SorterSet" -> SorterSet dto.Value
         | "SortableTest" -> SortableTest dto.Value
-        | "SortableTestSet" -> SortableTestSet dto.Value
-        | "SorterModelSet" -> SortingSet dto.Value
-        | "SorterModelSetGen" -> SorterModelSetGen dto.Value
-        | "SortableTestModelSet" -> SortableTestModelSet dto.Value
-        | "SortableTestModelSetGen" -> SortableTestModelSetGen dto.Value
         | "SorterSetEval" -> SorterSetEval dto.Value
-        | "SorterSetEvalBins" -> SorterEvalBins dto.Value
         | "Run" -> Run (dto.Value |> UMX.tag<runName>)
         | "TextReport" -> TextReport (dto.Value |> UMX.tag<textReportName>)
         | _ -> failwith (sprintf "%s not handled" dto.Tag)

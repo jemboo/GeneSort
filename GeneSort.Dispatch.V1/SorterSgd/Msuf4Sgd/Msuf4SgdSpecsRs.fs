@@ -25,8 +25,12 @@ module Msuf4SgdSpecsRs =
             (runParameters.sorterEvalMeasureKey, 
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
 
+    let sorterEvalMeasureEvoUsc = 
+            (runParameters.sorterEvalMeasureKey, 
+            [ sorterEvalMeasure.CeStUc (1.1, 20.0); ] |> List.map SorterEvalMeasure.toString)
+
     let generationLast = 
-            (runParameters.generationLastKey, [10000] |> List.map string)
+            (runParameters.generationLastKey, [5000] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
@@ -165,7 +169,7 @@ module Msuf4SgdSpecsRs =
                 sorterEvalTypeV1
                 sorterEvalSelection
                 sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureEvoUsc
                 orthoRate
                 paraRate
                 selfSymRate
@@ -173,7 +177,7 @@ module Msuf4SgdSpecsRs =
                 modificationRates15
                 sortingWidth16
                 poolCount30
-                fourSortersPerPool
+                oneToFourSortersPerPool
                 twoChildCount
                 generationFirst
                 generationLast
@@ -183,7 +187,7 @@ module Msuf4SgdSpecsRs =
             filter = paramMapFilter
             enhancer = standardEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 1
+            maxParallel = 4
         }
 
     type configType =

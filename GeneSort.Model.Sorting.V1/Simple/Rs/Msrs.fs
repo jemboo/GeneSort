@@ -55,7 +55,7 @@ type msrs =
         member this.Equals(other) = 
             this.id = other.id
 
-    member this.MakeSorter (maxCount: int<ceLength> option) = 
+    member this.MakeSorter (maxCeLength: int<ceLength> option) = 
         let allCes = 
             this.Perm_Rss
             |> Array.collect (fun prs -> 
@@ -63,7 +63,7 @@ type msrs =
                 |> PermSi.getTwoOrbits
                 |> Array.map (fun tbit -> ce.create tbit.First tbit.Second))
         let ces = 
-            match maxCount with
+            match maxCeLength with
             | Some n -> allCes |> Array.truncate %n
             | None   -> allCes
         sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces

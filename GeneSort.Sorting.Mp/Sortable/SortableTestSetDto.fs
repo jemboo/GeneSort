@@ -14,6 +14,7 @@ type sortableTestSetDto =
     | Bools of sortableBoolTestSetDto
 
 module SortableTestSetDto =
+
     let fromDomain (sorterTestSet: sortableTestSet) : sortableTestSetDto =
         match sorterTestSet with
         | sortableTestSet.Ints intTestSet -> Ints (SortableIntTestSetDto.fromDomain intTestSet)

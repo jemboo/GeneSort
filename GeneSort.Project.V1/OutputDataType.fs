@@ -6,20 +6,12 @@ open System
 [<Measure>] type textReportName
 
 type outputDataType =
-    | MutationSegmentEvalBinsSet of string
     | Run of string<runName>
     | RunParameters of string<runName>
     | SorterRunResult of string
-    | SorterModelSet of string
     | SorterSet of string
     | SortableTest of string
-    | SortableTestSet of string
-    | SortingSet of string
-    | SorterModelSetGen of string
-    | SortableTestModelSet of string
-    | SortableTestModelSetGen of string
     | SorterSetEval of string
-    | SorterEvalBins of string
     | TextReport of string<textReportName>
 
 
@@ -29,20 +21,12 @@ module OutputDataType =
 
     let toFolderName (outputDataType: outputDataType) : string =
         match outputDataType with
-        | MutationSegmentEvalBinsSet s -> appendParam "MutationSegmentEvalBinsSet" s
         | Run s -> "Run"
         | RunParameters s -> appendParam "RunParameters" %s
         | SorterRunResult s -> appendParam "SorterRunResult" %s
         | SorterSet s -> appendParam "SorterSet" s
         | SortableTest s -> appendParam "SortableTest" s
-        | SortableTestSet s -> appendParam "SortableTestSet" s
-        | SortingSet s -> appendParam "SortingSet" s
-        | SorterModelSetGen s -> appendParam "SorterModelSetGen" s
-        | SortableTestModelSet s -> appendParam "SortableTestModelSet" s
-        | SortableTestModelSetGen s -> appendParam "SortableTestModelSetGen" s
         | SorterSetEval s -> appendParam "SorterSetEval" s
-        | SorterEvalBins s -> appendParam "SorterEvalBins" s
-        | SorterModelSet s -> appendParam "SorterModelSet" s
         | TextReport s -> appendParam "Report\\TextReport" %s
 
 
@@ -51,20 +35,12 @@ module OutputDataType =
         let prefix = parts.[0]
         let param = if parts.Length > 1 then String.Join("_", parts.[1..]) else ""
         match prefix with
-        | "MutationSegmentEvalBinsSet" -> Some (MutationSegmentEvalBinsSet param)
         | "Run" -> Some (Run (param |> UMX.tag<runName>))
         | "RunParameters" -> Some (RunParameters (param |> UMX.tag<runName>))
         | "SorterRunResult" -> Some (SorterRunResult param)
         | "SorterSet" -> Some (SorterSet param)
         | "SortableTest" -> Some (SortableTest param)
-        | "SortableTestSet" -> Some (SortableTestSet param)
-        | "SortingSet" -> Some (SortingSet param)
-        | "SorterModelSetGen" -> Some (SorterModelSetGen param)
-        | "SortableTestModelSet" -> Some (SortableTestModelSet param)
-        | "SortableTestModelSetGen" -> Some (SortableTestModelSetGen param)
-        | "SorterModelSet" -> Some (SorterModelSet param)
         | "SorterSetEval" -> Some (SorterSetEval param)
-        | "SorterEvalBins" -> Some (SorterEvalBins param)
         | "TextReport" -> Some (TextReport (param |> UMX.tag<textReportName>))
         | _ -> None
 

@@ -126,7 +126,10 @@ module SorterEvalFunctions =
         | UnsortedCount -> false
         | CeStUc _ -> false
 
-    let filterEvaluations (measure: sorterEvalMeasure) (items: seq<sorterEval>) : seq<sorterEval> =
+
+    let filterEvaluations 
+                    (measure: sorterEvalMeasure) 
+                    (items: seq<sorterEval>) : seq<sorterEval> =
         if getFilterUnsortedFlag measure then
             items |> Seq.filter (fun se -> SorterEval.getUnsortedCount se <= 0<sortableCount>)
         else

@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="SorterData.fs" />
+    <Compile Include="SorterDataParse.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.UMX" Version="1.1.0" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="6.0.0-beta001" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+    <ProjectReference Include="..\GeneSort.Sorting\GeneSort.Sorting.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="11.0.101-preview5.26302.115" />
+  </ItemGroup>
+
+</Project>

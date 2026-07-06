@@ -54,7 +54,7 @@ type msuf6 =
         member this.Equals(other) = 
             this.id = other.id
 
-    member this.MakeSorter (maxCount: int<ceLength> option) = 
+    member this.MakeSorter (maxCeLength: int<ceLength> option) = 
         let allCes = 
             this.TwoOrbitUnfolder6s
             |> Array.collect (fun tou ->
@@ -62,7 +62,7 @@ type msuf6 =
                 |> PermSi.getTwoOrbits
                 |> Array.map Ce.fromTwoOrbit)
         let ces = 
-            match maxCount with
+            match maxCeLength with
             | Some n -> allCes |> Array.truncate %n
             | None   -> allCes
         sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces

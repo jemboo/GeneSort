@@ -98,7 +98,7 @@ module SorterRunResult =
 
         // --- Exponential Frequency Configuration ---
         let totalGenInt = int (genStart + genCount)
-        let targetGenerations = MathUtils.expSampler 1 totalGenInt MathUtils.cSample1K
+        let targetGenerations = MathUtils.expSampler 1 totalGenInt MathUtils.kSample5K
 
         let rec loop 
                     (remainingSteps: int) 
@@ -135,7 +135,7 @@ module SorterRunResult =
                             historyAcc
 
                     let adjSorterEvalType = if (remainingSteps = 1) then sorterEvalType.V2 else srtrEvalType
-                    let reEvaluateParents = (remainingSteps = 1)
+                    let reEvaluateParents = true //(remainingSteps = 1)
 
                     let nextSorterPoolSet = 
                         SorterPipeline.runGenerationStep 

@@ -20,7 +20,7 @@ open GeneSort.Dispatch.V1.CommonParams
 
 module SorterEvalExecutor =
 
-    let makeStandardTests (rp:runParameters) : Async<Result<Sortable.sortableTest, string>> =
+    let makeStandardTests (rp:runParameters) : Async<Result<sortableTest, string>> =
         async {
             let paramsOpt = option {
                 let! sortingWidth = rp.GetSortingWidth()
@@ -39,7 +39,7 @@ module SorterEvalExecutor =
         }
 
 
-    let makeMergeTests (rp: runParameters) : Async<Result<Sortable.sortableTest, string>> =
+    let makeMergeTests (rp: runParameters) : Async<Result<sortableTest, string>> =
         async {
             let paramsOpt = option {
                 let repl = 0 |> UMX.tag<replNumber>   
@@ -72,7 +72,7 @@ module SorterEvalExecutor =
 
     let _makeSorterEvals 
             (makeModelGen: runParameters -> sorterModelGen option)
-            (makeSortableTests: runParameters -> Async<Result<Sortable.sortableTest, string>>)
+            (makeSortableTests: runParameters -> Async<Result<sortableTest, string>>)
             (host: IRunHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
