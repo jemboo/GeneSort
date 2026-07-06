@@ -1,9 +1,7 @@
 ﻿namespace GeneSort.Model.Sorting.V1
 
-open System
 open FSharp.UMX
 open GeneSort.Core
-
 
 
 [<Measure>] type sorterModelId
@@ -18,9 +16,9 @@ open GeneSort.Core
 [<Measure>] type sortingMutationSegmentId
 [<Measure>] type parentSorterSetEvalId
 [<Measure>] type sortingParamsId
-
 [<Measure>] type modificationRate
 [<Measure>] type seedModificationRate
+[<Measure>] type prioritizeNewMutants
 [<Measure>] type mutationIndex
 [<Measure>] type mutationRate
 [<Measure>] type insertionRate

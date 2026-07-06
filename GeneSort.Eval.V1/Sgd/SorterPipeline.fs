@@ -14,6 +14,7 @@ module SorterPipeline =
             (mutator: sorterModelMutator)
             (sorterCountPerPool: int<sorterCountPerPool>)
             (sorterChildCount: int<sorterChildCount>)
+            (prioritizeNewMutants: bool<prioritizeNewMutants>)
             (distinctSorterHashes: bool<distinctSorterHashes>)
             (sortableTest: sortableTest)
             (sorterEvalType: sorterEvalType)
@@ -41,5 +42,9 @@ module SorterPipeline =
         )
         
         // Step 3: Trim out defective or un-optimized sorters down to baseline target capacities
-        |> SorterPoolSet.pruneSorterPools selectionMeasure distinctSorterHashes sorterCountPerPool
+        |> SorterPoolSet.pruneSorterPools 
+                            selectionMeasure
+                            prioritizeNewMutants
+                            distinctSorterHashes 
+                            sorterCountPerPool
         |> SorterPoolSet.advanceGeneration 1

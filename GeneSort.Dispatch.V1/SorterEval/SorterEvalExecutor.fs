@@ -363,7 +363,7 @@ module SorterEvalExecutor =
     let getExecutor (executorType: sorterEvalExecutorType) : IRunParamsExecutor =
         match executorType with
         | GenStandard -> uniformStandardExecutor
-        | GenMerge -> uniformMergeExecutor
+        | sorterEvalExecutorType.GenMerge -> uniformMergeExecutor
         | FullReport -> fullReportExecutor
         | StageStatsReport -> stageStatsReportExecutor
         | CeBinReport -> ceBinsReportExecutor

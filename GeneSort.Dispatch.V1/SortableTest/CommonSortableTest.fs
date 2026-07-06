@@ -4,14 +4,14 @@ open FSharp.UMX
 open GeneSort.Project.V1
 
 
-type executorType = 
-    | Generator
-    | Unknown
+type sortableTestExecutorType = 
+    | GenMerge
+    | GenPrefix
 
-module ExecutorType =
+module SortableTestExecutorType =
     let toString = function
-        | Generator -> "Generator"
-        | Unknown -> "Unknown"
+        | GenMerge -> "GenMerge"
+        | GenPrefix -> "GenPrefix"
 
 
 module CommonSortableTest =

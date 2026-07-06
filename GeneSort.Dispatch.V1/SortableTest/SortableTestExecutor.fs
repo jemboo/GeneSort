@@ -75,7 +75,7 @@ module SortableTestExecutor =
 
 
 
-    let getExecutor (executorType: executorType) : IRunParamsExecutor =
+    let getExecutor (executorType: sortableTestExecutorType) : IRunParamsExecutor =
         match executorType with
-        | Generator -> mergeExecutor
-        | Unknown -> failwith "Unknown executor type"
+        | GenMerge -> mergeExecutor
+        | GenPrefix -> failwith "Unknown executor type"

@@ -6,7 +6,7 @@ open GeneSort.Dispatch.V1
 open CommonParams
 
 
-module SortableTestMergeSpecs =
+module SortableTestSpecsMerge =
 
     let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
@@ -40,9 +40,9 @@ module SortableTestMergeSpecs =
 
     module Specs =
 
-        let Merge_Test  (executorType: executorType) : runHostSpec = {
+        let Merge_Test  (executorType: sortableTestExecutorType) : runHostSpec = {
             databaseName = SortableMergeTestDb.dbName
-            runName = sprintf @"Merge-Test_%s" (ExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Merge-Test_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Int8 merge sorter test sets"
             spans = [
                 testMergeSortingWidths
@@ -57,9 +57,9 @@ module SortableTestMergeSpecs =
         }
 
 
-        let Merge_Small (executorType: executorType) : runHostSpec = {
+        let Merge_Small (executorType: sortableTestExecutorType) : runHostSpec = {
             databaseName = SortableMergeTestDb.dbName
-            runName = sprintf @"Merge-Small_%s" (ExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Merge-Small_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Merge_Small sorter test sets"
             spans = [
                 smallMergeSortingWidths
@@ -74,9 +74,9 @@ module SortableTestMergeSpecs =
         }
 
         
-        let Merge_MediumLd (executorType: executorType) : runHostSpec = {
+        let Merge_MediumLd (executorType: sortableTestExecutorType) : runHostSpec = {
             databaseName = SortableMergeTestDb.dbName
-            runName = sprintf @"Merge-MediumLd_%s" (ExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Merge-MediumLd_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Merge_MediumLd sorter test sets"
             spans = [
                 mediumMergeSortingWidths
@@ -91,9 +91,9 @@ module SortableTestMergeSpecs =
         }
 
         
-        let Merge_MediumHd (executorType: executorType) : runHostSpec = {
+        let Merge_MediumHd (executorType: sortableTestExecutorType) : runHostSpec = {
             databaseName = SortableMergeTestDb.dbName
-            runName = sprintf @"Merge-MediumHd_%s" (ExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Merge-MediumHd_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Merge_MediumHd sorter test sets"
             spans = [
                 sortingWidth96
@@ -108,9 +108,9 @@ module SortableTestMergeSpecs =
         }
 
 
-        let Merge_LargeLd (executorType: executorType) : runHostSpec = {
+        let Merge_LargeLd (executorType: sortableTestExecutorType) : runHostSpec = {
             databaseName = SortableMergeTestDb.dbName
-            runName = sprintf @"Merge-LargeLd_%s" (ExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Merge-LargeLd_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Merge_LargeLd sorter test sets"
             spans = [
                 largeMergeSortingWidths
@@ -141,6 +141,6 @@ module SortableTestMergeSpecs =
                         (configType.Merge_LargeLd, Specs.Merge_LargeLd);
                     ]
 
-    let getRunHostSpec (config: configType) (executorType: executorType) : runHostSpec =
+    let getRunHostSpec (config: configType) (executorType: sortableTestExecutorType) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType

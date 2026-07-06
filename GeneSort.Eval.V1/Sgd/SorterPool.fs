@@ -115,12 +115,11 @@ module SorterPool =
 
         { pool with _sorterPoolMembers = updatedMembersMap }
 
-
-
     /// Trims the SorterPool to size prunedSize, selecting the best (lowest score) according to measure
     let pruneSorterPool 
                 (pool: sorterPool) 
                 (measure: sorterEvalMeasure) 
+                (prioritizeNewMutants: bool<prioritizeNewMutants>)
                 (distinctSorterHashes: bool<distinctSorterHashes>)
                 (sorterCountPerPool: int<sorterCountPerPool>) : sorterPool =
         
@@ -148,16 +147,26 @@ module SorterPool =
 
         let sortedSurvivors =
             filter2
-            // Step 2: Score members. Lower scores are better (fewer CEs, fewer stages, less unsorted).
-            // We map into a sortable tuple: (Score, PoolMember)
-            // Unevaluated members (None) are treated as Double.PositiveInfinity (worst possible score)
+            // Step 2: Score members and construct the sorting key matrix
+            // Unevaluated members (None) get Double.PositiveInfinity (worst possible score)
             |> Seq.map (fun spm ->
-                match spm.SorterEval with
-                | Some eval -> (scoreFunc eval, spm)
-                | None -> (Double.PositiveInfinity, spm)
+                let score = 
+                    match spm.SorterEval with
+                    | Some eval -> scoreFunc eval
+                    | None -> Double.PositiveInfinity
+                (score, spm)
             )
-            // Step 3: Sort ascending (best scores first)
-            |> Seq.sortBy fst
+            // Step 3: Sort ascending (best scores first). 
+            // Tie-break on MutationIndex when scores match uniformly.
+            |> Seq.sortBy (fun (score, spm) ->
+                let mIndexRaw = %spm.MutationIndex
+                
+                // If prioritizing NEW mutants: lower mutation index comes first.
+                // If prioritizing OLD members: higher mutation index comes first (so we negate it).
+                let tieBreaker = if %prioritizeNewMutants then mIndexRaw else -mIndexRaw
+                
+                (score, tieBreaker)
+            )
             // Step 4: Take the best up to the designated pruned size limit
             |> Seq.truncate targetSize
             |> Seq.map snd

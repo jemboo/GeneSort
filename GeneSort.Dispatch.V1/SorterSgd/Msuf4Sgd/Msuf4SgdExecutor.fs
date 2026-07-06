@@ -43,6 +43,7 @@ module Msuf4SgdExecutor =
                 // 1. Gather all required run metrics and options out of your parameters block securely
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
                 let! genFirst = rp.GetGenerationFirst() |> Result.ofOption "Missing genFirst."
+                let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
                 let! sortingWidth = rp.GetSortingWidth() |> Result.ofOption "Missing sortingWidth."
                 let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
                 let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count"
@@ -114,6 +115,7 @@ module Msuf4SgdExecutor =
                                                         genFirst
                                                         (genLast - genFirst)
                                                         sorterModelMutator
+                                                        prioritizeNewMutants
                                                         distinctSorterHashes
                                                         sortersPerPool
                                                         sorterChildCount

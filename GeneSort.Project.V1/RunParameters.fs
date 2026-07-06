@@ -39,6 +39,7 @@ type runParameters =
     static member mutationRateKey = "MutationRate"
     static member orthoRateKey = "OrthoRate"
     static member paraRateKey = "ParaRate"
+    static member prioritizeNewMutantsKey = "PrioritizeNewMutants"
     static member projectNameKey = "ProjectName"
     static member queryNameKey = "QueryName"
     static member replKey = "Repl"
@@ -169,6 +170,10 @@ type runParameters =
     member this.GetParaRate() =
         runParameters.tryGetFloat runParameters.paraRateKey this.paramMap
         |> Option.map UMX.tag<paraRate>
+
+    member this.GetPrioritizeNewMutants() =
+        runParameters.tryGetBool runParameters.prioritizeNewMutantsKey this.paramMap
+        |> Option.map UMX.tag<prioritizeNewMutants>
 
     member this.GetProjectName() =
         this.paramMap.TryFind runParameters.projectNameKey
@@ -339,6 +344,9 @@ type runParameters =
 
     member this.WithParaRate(para: float<paraRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.paraRateKey (para |> Option.map UmxExt.floatToRaw) }
+
+    member this.WithPrioritizeNewMutants(pnm: bool option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.prioritizeNewMutantsKey (pnm |> Option.map string) }
 
     member this.WithProjectName(pn: string<projectName> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.projectNameKey (pn |> Option.map UmxExt.stringToRaw) }

@@ -41,6 +41,7 @@ module MsrsSgdExecutor =
                 // 1. Gather all required run metrics and options out of your parameters block securely
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
                 let! genFirst = rp.GetGenerationFirst() |> Result.ofOption "Missing genFirst."
+                let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
                 let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
                 let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count"
                 let! sorterEvalMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
@@ -99,6 +100,7 @@ module MsrsSgdExecutor =
                                                         genFirst
                                                         (genLast - genFirst)
                                                         sorterModelMutator
+                                                        prioritizeNewMutants
                                                         distinctSorterHashes
                                                         sortersPerPool
                                                         sorterChildCount

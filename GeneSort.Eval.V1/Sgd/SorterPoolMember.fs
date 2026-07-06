@@ -17,6 +17,8 @@ type sorterPoolMember =
 
     member this.SorterPoolMemberId = this._sorterPoolMemberId
     member this.SorterModel = this._sorterModel
+    // The mutationIndex is incremented each time a new mutation is applied to the sorterModel. 
+    // If it wasn't, the same mutant would be created each time.
     member this.MutationIndex = this._mutationIndex
     member this.SorterMutationSource = this._sorterMutationSource
     member this.SorterEval = this._sorterEval
