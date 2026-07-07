@@ -138,7 +138,8 @@ module SorterRunResult =
                             historyAcc
 
                     let adjSorterEvalType = if (remainingSteps = 1) then sorterEvalType.V2 else srtrEvalType
-                    let reEvaluateParents = true //(remainingSteps = 1)
+                    //let reEvaluateParents = true
+                    let reEvaluateParents = (remainingSteps = 1)
 
                     let nextSorterPoolSet = 
                         SorterPipeline.runGenerationStep 

@@ -13,6 +13,10 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 module Msuf4SgdSpecsRs = 
 
+    let prioritizeNewMutants = 
+            (runParameters.prioritizeNewMutantsKey, 
+            [ true; false ] |> List.map string)
+
     let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.Tmb 120<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
@@ -30,7 +34,7 @@ module Msuf4SgdSpecsRs =
             [ sorterEvalMeasure.CeStUc (1.1, 20.0); ] |> List.map SorterEvalMeasure.toString)
 
     let generationLast = 
-            (runParameters.generationLastKey, [5000] |> List.map string)
+            (runParameters.generationLastKey, [50] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
@@ -89,6 +93,7 @@ module Msuf4SgdSpecsRs =
                 generationLast
                 generationQueryFirst
                 distinctSorterHashesBoth
+                prioritizeNewMutants
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -120,6 +125,7 @@ module Msuf4SgdSpecsRs =
                 generationLast
                 generationQueryFirst
                 distinctSorterHashesBoth
+                prioritizeNewMutants
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -151,6 +157,7 @@ module Msuf4SgdSpecsRs =
                 generationLast
                 generationQueryFirst
                 distinctSorterHashesBoth
+                prioritizeNewMutants
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -176,13 +183,14 @@ module Msuf4SgdSpecsRs =
                 seedModificationRate12
                 modificationRates15
                 sortingWidth16
-                poolCount30
+                poolCount10
                 oneToFourSortersPerPool
                 twoChildCount
                 generationFirst
                 generationLast
                 generationQueryFirst
                 distinctSorterHashesTrue
+                prioritizeNewMutants
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer

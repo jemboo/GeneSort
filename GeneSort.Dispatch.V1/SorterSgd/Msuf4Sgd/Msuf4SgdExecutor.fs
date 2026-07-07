@@ -20,7 +20,6 @@ open GeneSort.Sorting
 
 module Msuf4SgdExecutor =
 
-
     /// Dispatches the evolution history run parameters, executes the generative loop via asyncResult,
     /// and manages final state serialization/reporting pipelines.
     let evaluateEvolutionRun
@@ -102,14 +101,12 @@ module Msuf4SgdExecutor =
 
                 log "Executing SorterRunResult.runEvolutionAsync..."
 
+                let ceLengthSelector = 
+                    fun (gem: int<generationNumber>) -> None
                 //let ceLengthSelector = 
                 //    fun (gem: int<generationNumber>) -> 
-                //        let maxLen = Math.Max(100, 800 - (%gem * 2))
-                //        Some (maxLen |> UMX.tag<ceLength>)
-                let ceLengthSelector = 
-                    fun (gem: int<generationNumber>) -> 
-                        let maxLen = 200.0 + Math.Cos((%gem |> float) / 20.0) * 100.0
-                        Some (maxLen |> int |> UMX.tag<ceLength>)
+                //        let maxLen = 200.0 + Math.Cos((%gem |> float) / 20.0) * 100.0
+                //        Some (maxLen |> int |> UMX.tag<ceLength>)
 
                 let! (runResult: sorterRunResult) = SorterRunResult.runEvolutionAsync
                                                         genFirst
