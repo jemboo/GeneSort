@@ -49,7 +49,8 @@ module MathUtils =
     let xSample100K = 1.1113
     let xSample500K = 1.13
 
-
+    
+    let cSampleS = 1.001
     let cSample5C = 1.041
     let cSample1K = 1.05
     let cSample5K = 1.07

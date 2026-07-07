@@ -39,6 +39,7 @@ module CommonParams =
     let mediumSorterCount = (runParameters.sorterCountKey, ["1000";] )
     let largeSorterCount = (runParameters.sorterCountKey, ["10000";] )
     let extraLargeSorterCount = (runParameters.sorterCountKey, ["100000";] )
+
     
     // SorterCounts per pool
     let oneSorterPerPool = (runParameters.sorterCountPerPoolKey, ["1";] )
@@ -46,8 +47,15 @@ module CommonParams =
     let oneAndTwoSortersPerPool = (runParameters.sorterCountPerPoolKey, ["1"; "2";] )
     let oneToFourSortersPerPool = (runParameters.sorterCountPerPoolKey, ["1"; "2"; "4"] )
     let fourTo32SortersPerPool = (runParameters.sorterCountPerPoolKey, ["4"; "8"; "16"; "32"] )
+    let oneTwenty8SortersPerPool = (runParameters.sorterCountPerPoolKey, ["128";] )
+    let fiveTwelveSortersPerPool = (runParameters.sorterCountPerPoolKey, ["512";] )
+    let fourKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["4096";] )
+    let eightKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["8192";] )
+
 
     // SorterPoolCounts
+    let poolCount1 = (runParameters.sorterPoolCountKey, ["1";] )
+    let poolCount2 = (runParameters.sorterPoolCountKey, ["2";] )
     let poolCount5 = (runParameters.sorterPoolCountKey, ["5";] )
     let poolCount10 = (runParameters.sorterPoolCountKey, ["10";] )
     let poolCount30 = (runParameters.sorterPoolCountKey, ["30";] )
@@ -166,11 +174,25 @@ module CommonParams =
     let selfSymRates =  (runParameters.selfSymRateKey, [1.5; 2.001; ] |> List.map string)
 
 
+    let seedModificationRate06 =
+            (runParameters.seedModificationRateKey, [0.06] |> List.map string)
+    
+    let seedModificationRateR2 =
+            (runParameters.seedModificationRateKey, [0.03; 0.06] |> List.map string)
     let seedModificationRate12 =
             (runParameters.seedModificationRateKey, [0.12] |> List.map string)
 
-    let seedModificationRate15 =
-            (runParameters.seedModificationRateKey, [0.15] |> List.map string)
+    let modificationRatesStageR =
+            (runParameters.modificationRateKey, [ 0.08; 0.09; 0.10; 0.11; 0.12; 0.13; 0.14; 0.15;] |> List.map string)
+
+    let modificationRatesStageRR =
+            (runParameters.modificationRateKey, [ 0.02; 0.03; 0.04; 0.05; 0.07; 0.08; 0.09; 0.10;] |> List.map string)
+            
+    let modificationRatesStageR3 =
+            (runParameters.modificationRateKey, [ 0.03; 0.04;] |> List.map string)
+
+    let seedModificationRate10 =
+            (runParameters.seedModificationRateKey, [0.10] |> List.map string)
 
     let seedModificationRates =
             (runParameters.seedModificationRateKey, [0.08; 0.12; 0.16] |> List.map string)

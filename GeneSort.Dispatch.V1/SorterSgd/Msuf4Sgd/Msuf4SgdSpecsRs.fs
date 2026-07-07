@@ -13,13 +13,13 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 module Msuf4SgdSpecsRs = 
 
-    let prioritizeNewMutants = 
+    let prioritizeNewMutantsBoth = 
             (runParameters.prioritizeNewMutantsKey, 
             [ true; false ] |> List.map string)
 
     let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.Tmb 120<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.Tmb 3000<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
 
     let sorterEvalMeasureInitial = 
             (runParameters.sorterEvalMeasureInitialKey , 
@@ -29,12 +29,17 @@ module Msuf4SgdSpecsRs =
             (runParameters.sorterEvalMeasureKey, 
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
 
+    let sorterEvalMeasureEvos = 
+            (runParameters.sorterEvalMeasureKey, 
+            [ sorterEvalMeasure.CeSt (0.8, true);
+              sorterEvalMeasure.CeSt (2.0, true); ] |> List.map SorterEvalMeasure.toString)
+
     let sorterEvalMeasureEvoUsc = 
             (runParameters.sorterEvalMeasureKey, 
             [ sorterEvalMeasure.CeStUc (1.1, 20.0); ] |> List.map SorterEvalMeasure.toString)
 
     let generationLast = 
-            (runParameters.generationLastKey, [50] |> List.map string)
+            (runParameters.generationLastKey, [500] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
@@ -93,7 +98,7 @@ module Msuf4SgdSpecsRs =
                 generationLast
                 generationQueryFirst
                 distinctSorterHashesBoth
-                prioritizeNewMutants
+                prioritizeNewMutantsBoth
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -125,7 +130,7 @@ module Msuf4SgdSpecsRs =
                 generationLast
                 generationQueryFirst
                 distinctSorterHashesBoth
-                prioritizeNewMutants
+                prioritizeNewMutantsBoth
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -147,17 +152,17 @@ module Msuf4SgdSpecsRs =
                 orthoRate
                 paraRate
                 selfSymRate
-                seedModificationRates
-                modificationRateStage
+                seedModificationRate10
+                modificationRatesStageR3
                 sortingWidth16
-                poolCount10
-                fourTo32SortersPerPool
+                poolCount1
+                fourKSortersPerPool
                 oneChildCount
                 generationFirst
                 generationLast
                 generationQueryFirst
                 distinctSorterHashesBoth
-                prioritizeNewMutants
+                prioritizeNewMutantsBoth
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -190,7 +195,7 @@ module Msuf4SgdSpecsRs =
                 generationLast
                 generationQueryFirst
                 distinctSorterHashesTrue
-                prioritizeNewMutants
+                prioritizeNewMutantsBoth
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
