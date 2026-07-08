@@ -43,6 +43,7 @@ module MsrsSgdDbs =
                             (selfSymRate: float<selfSymRate>)
                             (mdr: float<modificationRate>)
                             (dsh: bool<distinctSorterHashes>)
+                            (pNm: bool<prioritizeNewMutants>)
                             (odt: outputDataType) : queryParams =
                 queryParams.create dbName (Some repl) odt
                     [| 
@@ -62,6 +63,7 @@ module MsrsSgdDbs =
                        (runParameters.selfSymRateKey, (Some selfSymRate) |> SelfSymRate.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
                        (runParameters.distinctSorterHashesKey, (Some %dsh) |> string)
+                       (runParameters.prioritizeNewMutantsKey, (Some %pNm) |> string)
                     |]
 
 
@@ -88,10 +90,13 @@ module MsrsSgdDbs =
                     let! sym = rp.GetSelfSymRate()
                     let! mdr = rp.GetModificationRate()
                     let! dsh = rp.GetDistinctSorterHashes()
+                    let! pNm = rp.GetPrioritizeNewMutants()
                     return if genQf then
-                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt set ortho para sym mdr dsh odt 
+                            makeQueryParams rng genFirst scPP spc scc ses sem semi 
+                                            repl sw smt set ortho para sym mdr dsh pNm odt 
                             else
-                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt set ortho para sym mdr dsh odt 
+                            makeQueryParams rng genLast scPP spc scc ses sem semi 
+                                            repl sw smt set ortho para sym mdr dsh pNm odt 
                 }
                 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)

@@ -210,7 +210,7 @@ module CommonParams =
             (runParameters.modificationRateKey, [0.19;] |> List.map string)
 
     let modificationRatesStage =
-            (runParameters.modificationRateKey, [ 0.15; 0.19; 0.23; 0.27;] |> List.map string)
+            (runParameters.modificationRateKey, [ 0.04; 0.08; 0.16; 0.24;] |> List.map string)
 
     let modificationRates15 =
             (runParameters.modificationRateKey, [ 0.15;] |> List.map string)
