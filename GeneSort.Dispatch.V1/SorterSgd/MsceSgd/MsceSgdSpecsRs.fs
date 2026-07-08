@@ -14,9 +14,13 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 module MsceSgdSpecsRs = 
 
+    let prioritizeNewMutantsBoth = 
+            (runParameters.prioritizeNewMutantsKey, 
+            [ true; false ] |> List.map string)
+
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.Tmb 10<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.Tmb 1500<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
 
     let sorterEvalMeasureInitial = 
             (runParameters.sorterEvalMeasureInitialKey , 
@@ -27,13 +31,23 @@ module MsceSgdSpecsRs =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
     
     let generationLast = 
-            (runParameters.generationLastKey, [5000] |> List.map string)
+            (runParameters.generationLastKey, [2500] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
 
     let generationQueryFirst = 
             (runParameters.queryWithGenFirst, [false] |> List.map string)
+
+    let distinctSorterHashesBoth = 
+            (runParameters.distinctSorterHashesKey, [true; false] |> List.map string)
+
+    let distinctSorterHashesTrue = 
+            (runParameters.distinctSorterHashesKey, [true] |> List.map string)
+
+    let distinctSorterHashesFalse = 
+            (runParameters.distinctSorterHashesKey, [false] |> List.map string)
+
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
@@ -89,6 +103,36 @@ module MsceSgdSpecsRs =
             maxParallel = 8
         }
 
+        let Rand_Pool (executorType: sorterSgdExecutorType)  : runHostSpec = {
+            databaseName = MsceSgdDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Sgd analysis for Msce"
+            spans = [
+                msceModelType
+                rngTypeLcg
+                sorterEvalTypeV1
+                sorterEvalSelectionType
+                sorterEvalMeasureInitial
+                sorterEvalMeasureEvo
+                mutationRates
+                insertionRates
+                deletionRates
+                modificationRatesMsce
+                sortingWidth16
+                poolCount1
+                fourKSortersPerPool
+                oneChildCount
+                generationFirst
+                generationLast
+                generationQueryFirst
+                distinctSorterHashesTrue
+                prioritizeNewMutantsBoth
+            ]
+            filter = standardSorterModelTypeFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
+        }
 
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
             databaseName = MsceSgdDbs.RandomStandard.Uniform.dbName
@@ -150,12 +194,14 @@ module MsceSgdSpecsRs =
 
     type configType =
         | Rand_Test
+        | Rand_Pool
         | Rand_Small
         | Rand_Medium
 
     let Configs = Map.ofList 
                     [ 
                         (configType.Rand_Test, Specs.Rand_Test); 
+                        (configType.Rand_Pool, Specs.Rand_Pool); 
                         (configType.Rand_Small, Specs.Rand_Small);
                         (configType.Rand_Medium, Specs.Rand_Medium);
                     ]

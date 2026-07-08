@@ -114,6 +114,38 @@ module MsceSgdSpecsRm =
             maxParallel = 8
         }
 
+        let Rand_Pool (executorType: sorterSgdExecutorType)  : runHostSpec = {
+            databaseName = MsceSgdDbs.RandomMerge.Uniform.dbName
+            runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Sgd analysis for merge Msce"
+            spans = [
+                msceModelType
+                rngTypeLcg
+                sorterEvalTypeV1
+                sorterEvalSelectionType
+                sorterEvalMeasureInitial
+                sorterEvalMeasureEvo
+                mutationRates
+                insertionRates
+                deletionRates
+                modificationRatesMsce
+                sortingWidth16
+                poolCount10
+                oneSorterPerPool
+                oneChildCount
+                generationFirst
+                generationLast
+                generationQueryFirst
+                mergeDimension2
+                noSuffixSuffixType
+                dataFormatInt8v512
+            ]
+            filter = paramMapFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
+        }
+
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
             databaseName = MsceSgdDbs.RandomMerge.Uniform.dbName
             runName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
@@ -245,6 +277,7 @@ module MsceSgdSpecsRm =
 
     type configType =
         | Rand_Test
+        | Rand_Pool
         | Rand_Small
         | Rand_MediumLd
         | Rand_MediumHd
@@ -253,6 +286,7 @@ module MsceSgdSpecsRm =
     let Configs = Map.ofList 
                     [ 
                         (configType.Rand_Test, Specs.Rand_Test); 
+                        (configType.Rand_Pool, Specs.Rand_Pool); 
                         (configType.Rand_Small, Specs.Rand_Small);
                         (configType.Rand_MediumLd, Specs.Rand_MediumLd);
                         (configType.Rand_MediumHd, Specs.Rand_MediumHd);

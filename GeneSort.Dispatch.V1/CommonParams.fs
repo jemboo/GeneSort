@@ -49,6 +49,8 @@ module CommonParams =
     let fourTo32SortersPerPool = (runParameters.sorterCountPerPoolKey, ["4"; "8"; "16"; "32"] )
     let oneTwenty8SortersPerPool = (runParameters.sorterCountPerPoolKey, ["128";] )
     let fiveTwelveSortersPerPool = (runParameters.sorterCountPerPoolKey, ["512";] )
+    let oneKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["1024";] )
+    let twoKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["2048";] )
     let fourKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["4096";] )
     let eightKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["8192";] )
 

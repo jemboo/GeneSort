@@ -188,12 +188,12 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** MsceSgdSpecsRs **********
-//let configType = MsceSgdSpecsRs.configType.Rand_Test
-//let executorType = sorterSgdExecutorType.FullReport
-//let host: IRunHost = 
-//    let spec = MsceSgdSpecsRs.getRunHostSpec configType executorType
-//    MsceSgdDbs.createRunHost spec
-//let executor = MsceSgdExecutor.getExecutor executorType
+let configType = MsceSgdSpecsRs.configType.Rand_Pool
+let executorType = sorterSgdExecutorType.GenStandard
+let host: IRunHost = 
+    let spec = MsceSgdSpecsRs.getRunHostSpec configType executorType
+    MsceSgdDbs.createRunHost spec
+let executor = MsceSgdExecutor.getExecutor executorType
 
 
 //********** MsceSgdSpecsRm **********
@@ -206,12 +206,12 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** MssiSgdSpecsRs **********
-let configType = MssiSgdSpecsRs.configType.Rand_Pool
-let executorType = sorterSgdExecutorType.FullReport
-let host: IRunHost = 
-    let spec = MssiSgdSpecsRs.getRunHostSpec configType executorType
-    MssiSgdDbs.createRunHost spec
-let executor = MssiSgdExecutor.getExecutor executorType
+//let configType = MssiSgdSpecsRs.configType.Rand_Pool
+//let executorType = sorterSgdExecutorType.FullReport
+//let host: IRunHost = 
+//    let spec = MssiSgdSpecsRs.getRunHostSpec configType executorType
+//    MssiSgdDbs.createRunHost spec
+//let executor = MssiSgdExecutor.getExecutor executorType
 
 
 //********** MssiSgdSpecsRm **********

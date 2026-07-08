@@ -59,7 +59,8 @@ module MssiSgdDbs =
                        (runParameters.orthoRateKey, (Some orthoRate) |> OrthoRate.toString)
                        (runParameters.paraRateKey, (Some paraRate) |> ParaRate.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
-                       (runParameters.distinctSorterHashesKey, (Some %dsh) |> string)
+                       (runParameters.prioritizeNewMutantsKey, (Some pNm) |> string)
+                       (runParameters.distinctSorterHashesKey, (Some dsh) |> string)
                     |]
 
 
@@ -151,7 +152,8 @@ module MssiSgdDbs =
                        (runParameters.paraRateKey, (Some paraRate) |> ParaRate.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
                        (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString);
-                       (runParameters.distinctSorterHashesKey, (Some %dsh) |> string)
+                       (runParameters.prioritizeNewMutantsKey, (Some pNm) |> string)
+                       (runParameters.distinctSorterHashesKey, (Some dsh) |> string)
                     |]
 
 

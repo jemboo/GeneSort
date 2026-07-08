@@ -43,6 +43,7 @@ module MsceSgdDbs =
                             (del: float<deletionRate>)
                             (mdr: float<modificationRate>)
                             (dsh: bool<distinctSorterHashes>)
+                            (pNm: bool<prioritizeNewMutants>)
                             (odt: outputDataType) : queryParams =
                 queryParams.create dbName (Some repl) odt
                     [| 
@@ -61,7 +62,8 @@ module MsceSgdDbs =
                        (runParameters.insertionRateKey, (Some ins) |> InsertionRate.toString)
                        (runParameters.deletionRateKey, (Some del) |> DeletionRate.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
-                       (runParameters.distinctSorterHashesKey, (Some %dsh) |> string)
+                       (runParameters.prioritizeNewMutantsKey, (Some pNm) |> string)
+                       (runParameters.distinctSorterHashesKey, (Some dsh) |> string)
                     |]
 
 
@@ -88,10 +90,13 @@ module MsceSgdDbs =
                     let! del = rp.GetDeletionRate()
                     let! mdr = rp.GetModificationRate()
                     let! dsh = rp.GetDistinctSorterHashes()
+                    let! pNm = rp.GetPrioritizeNewMutants()
                     return if genQf then
-                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt set mut ins del mdr dsh odt
+                            makeQueryParams rng genFirst scPP spc scc ses sem semi
+                                            repl sw smt set mut ins del mdr dsh pNm odt
                             else
-                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt set mut ins del mdr dsh odt
+                            makeQueryParams rng genLast scPP spc scc ses sem semi
+                                            repl sw smt set mut ins del mdr dsh pNm odt
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -127,6 +132,7 @@ module MsceSgdDbs =
                         (del: float<deletionRate>)
                         (mdr: float<modificationRate>)
                         (dsh: bool<distinctSorterHashes>)
+                        (pNm: bool<prioritizeNewMutants>)
                         (outputDataType: outputDataType) : queryParams =
 
                 queryParams.create 
@@ -152,7 +158,8 @@ module MsceSgdDbs =
                        (runParameters.deletionRateKey, (Some del) |> DeletionRate.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
                        (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
-                       (runParameters.distinctSorterHashesKey, (Some %dsh) |> string)
+                       (runParameters.prioritizeNewMutantsKey, (Some pNm) |> string)
+                       (runParameters.distinctSorterHashesKey, (Some dsh) |> string)
                     |]
 
 
@@ -182,10 +189,15 @@ module MsceSgdDbs =
                     let! del = rp.GetDeletionRate()
                     let! mdr = rp.GetModificationRate()
                     let! dsh = rp.GetDistinctSorterHashes()
+                    let! pNm = rp.GetPrioritizeNewMutants()
                     return if genQf then
-                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt md mst sdf set mut ins del mdr dsh odt
+                            makeQueryParams rng genFirst scPP spc scc ses sem semi
+                                            repl sw smt md mst sdf set mut 
+                                            ins del mdr dsh pNm odt
                             else
-                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt md mst sdf set mut ins del mdr dsh odt
+                            makeQueryParams rng genLast scPP spc scc ses sem semi
+                                            repl sw smt md mst sdf set mut 
+                                            ins del mdr dsh pNm odt
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
