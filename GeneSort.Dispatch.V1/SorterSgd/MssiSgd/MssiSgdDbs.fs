@@ -41,6 +41,7 @@ module MssiSgdDbs =
                             (paraRate: float<paraRate>)
                             (mdr: float<modificationRate>)
                             (dsh: bool<distinctSorterHashes>)
+                            (pNm: bool<prioritizeNewMutants>)
                             (odt: outputDataType) : queryParams =
                 queryParams.create dbName (Some repl) odt
                     [| 
@@ -84,10 +85,13 @@ module MssiSgdDbs =
                     let! para = rp.GetParaRate()
                     let! mdr = rp.GetModificationRate()
                     let! dsh = rp.GetDistinctSorterHashes()
+                    let! pNm = rp.GetPrioritizeNewMutants()
                     return if genQf then
-                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt set ortho para mdr dsh odt 
+                            makeQueryParams rng genFirst scPP spc scc ses sem semi 
+                                            repl sw smt set ortho para mdr dsh pNm odt 
                             else
-                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt set ortho para mdr dsh odt 
+                            makeQueryParams rng genLast scPP spc scc ses sem semi 
+                                            repl sw smt set ortho para mdr dsh pNm odt 
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -122,6 +126,7 @@ module MssiSgdDbs =
                         (paraRate: float<paraRate>)
                         (mdr: float<modificationRate>)
                         (dsh: bool<distinctSorterHashes>)
+                        (pNm: bool<prioritizeNewMutants>)
                         (outputDataType: outputDataType) : queryParams =
 
                 queryParams.create 
@@ -175,10 +180,15 @@ module MssiSgdDbs =
                     let! para = rp.GetParaRate()
                     let! mdr = rp.GetModificationRate()
                     let! dsh = rp.GetDistinctSorterHashes()
+                    let! pNm = rp.GetPrioritizeNewMutants()
                     return if genQf then
-                            makeQueryParams rng genFirst scPP spc scc ses sem semi repl sw smt md mst sdf set ortho para mdr dsh odt
+                            makeQueryParams rng genFirst scPP spc scc ses sem semi 
+                                            repl sw smt md mst sdf set ortho para 
+                                            mdr dsh pNm odt
                             else
-                            makeQueryParams rng genLast scPP spc scc ses sem semi repl sw smt md mst sdf set ortho para mdr dsh odt
+                            makeQueryParams rng genLast scPP spc scc ses sem semi 
+                                            repl sw smt md mst sdf set ortho para 
+                                            mdr dsh pNm odt
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)

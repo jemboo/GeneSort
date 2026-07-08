@@ -23,8 +23,6 @@ module MsrsSgdDbs =
             let dbFolder = 
                     @$"c:\Projects\{projectName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
 
-
-
             let makeQueryParams
                             (rng: rngType)
                             (genLast: int<generationNumber>)
