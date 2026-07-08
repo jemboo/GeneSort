@@ -10,6 +10,7 @@
     <Compile Include="MsasF.fs" />
     <Compile Include="MsasM.fs" />
     <Compile Include="MsasO.fs" />
+    <Compile Include="MsasPfx.fs" />
     <Compile Include="SortableTestModel.fs" />
     <Compile Include="MsasORandGen.fs" />
     <Compile Include="SortableTestModelGen.fs" />

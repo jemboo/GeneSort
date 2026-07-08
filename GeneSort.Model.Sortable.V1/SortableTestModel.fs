@@ -6,9 +6,10 @@ open GeneSort.Sorting.Sortable
 
 
 type sortableTestModel =
-     | MsasF of msasF     // MsasF = a full bool test set for a given sorting width
-     | MsasO of msasO     // MsasO = generated from a seed permutation; for bool models, it's expanded from the integer permutations
-     | MsasMi of msasM    // All (sorting width)/2 merge test cases
+     | MsasF of msasF      // MsasF = a full bool test set for a given sorting width
+     | MsasO of msasO      // MsasO = generated from a seed permutation; for bool models, it's expanded from the integer permutations
+     | MsasMi of msasM     // All (sorting width)/2 merge test cases
+     | MsasPfx of msasPfx  // For testing sorters with a fixed prefix - an MsasF that's reduced by the prefix ce's.
 
 
 module SortableTestModel =
@@ -18,6 +19,7 @@ module SortableTestModel =
         | MsasF msasF -> msasF.sortingWidth
         | MsasO msasO -> %msasO.SeedPermutation.Order |> UMX.tag<sortingWidth>
         | MsasMi msasMi -> msasMi.sortingWidth
+        | MsasPfx msasPfx -> %msasPfx.SeedPermutation.Order |> UMX.tag<sortingWidth>
 
 
     let makeSortableTest 
@@ -69,4 +71,14 @@ module SortableTestModel =
                     (msasMi.MakeSortableBitv512Test sorterTestId) |> sortableTest.Bitv512
                 | _ ->  
                     failwith "Unsupported SortableArrayType for MsasMi"
-                    
+
+        | MsasPfx msasPfx ->
+                match sortableDataFormat with
+                | sortableDataFormat.BoolArray ->        
+                     (msasPfx.MakeSortableBoolTest sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Bools
+                | sortableDataFormat.IntArray ->
+                     (msasPfx.MakeSortableIntTest sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Ints
+                | sortableDataFormat.Int8Vector256 ->
+                     failwith "Int8Vector256 SortableArrayType not supported"
+                | _ ->  
+                    failwith "Unsupported SortableArrayType for MsasO"
