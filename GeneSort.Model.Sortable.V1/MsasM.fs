@@ -78,6 +78,7 @@ type msasM =
                                     this.sortingWidth
                                     this.mergeDimension
                                     this.mergeFillType  
+                             |> Seq.toArray
 
         sortableBinaryTest.create 
                 sorterTestId

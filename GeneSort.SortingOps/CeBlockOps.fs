@@ -36,7 +36,6 @@ module CeBlockOps =
     //    (values, localCounts)
 
 
-
     let evalWithSorterTest 
                 (sortableTs: sortableTest) 
                 (ceBlock: ceBlock) 

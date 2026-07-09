@@ -80,7 +80,23 @@ module Ce =
         ) cesUpper cesLower
 
 
-    let inline sortByBranchless 
+    let inline sortBy< ^a when ^a: comparison> 
+                (ces: ce[]) 
+                (values: ^a[]) : ^a[] =
+
+        for i = 0 to ces.Length - 1 do
+            let ce = ces.[i]
+            let lowIdx = ce.Low
+            let hiIdx = ce.Hi
+            
+            if values.[lowIdx] > values.[hiIdx] then
+                let temp = values.[lowIdx]
+                values.[lowIdx] <- values.[hiIdx]
+                values.[hiIdx] <- temp
+        values
+
+
+    let inline sortByBranchlessWithUses 
             (ces: ce[]) 
             (useCounter: int[]) 
             (values: int[]) : int[] =
@@ -103,7 +119,7 @@ module Ce =
 
    // mutates in placeby a sequence of ces, and returns the resulting sortable (values[]),
    // records the number of uses of each ce in useCounter, starting at useCounterOffset
-    let inline sortBy< ^a when ^a: comparison> 
+    let inline sortByWithUses< ^a when ^a: comparison> 
                 (ces: ce[]) 
                 (useCounter: int[])
                 (values: ^a[]) : ^a[] =
@@ -121,7 +137,7 @@ module Ce =
    // mutates in placeby a sequence of ces, returning an array of the final and
    // intermediate results (values[][]) 
    // records the number of uses of each ce in useCounter, starting at useCounterOffset
-    let inline sortByWithHistory< ^a when ^a: comparison> 
+    let inline sortByWithHistoryAndUses< ^a when ^a: comparison> 
                 (ces: ce[]) 
                 (useCounter: int[])
                 (values: ^a[]) : ^a[][] =

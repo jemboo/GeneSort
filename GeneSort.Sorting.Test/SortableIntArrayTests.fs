@@ -159,7 +159,7 @@ type SortableIntArrayTests() =
             ) |> Array.concat |> SortableBoolArray.removeDuplicates
 
         let mutable report = ""
-        boolConv |> Array.iter (fun sba ->
+        boolConv |> Seq.iter (fun sba ->
             report <- report + sprintf "%A\n" sba.Values
         )
 

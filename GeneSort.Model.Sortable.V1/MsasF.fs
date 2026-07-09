@@ -47,6 +47,7 @@ type msasF =
                     (sorterTestId: Guid<sortableTestId>)
                     (sortingWidth: int<sortingWidth>) : sortableBinaryTest =
         let sortableArrays =  SortableBoolArray.getAllSortableBoolArrays sortingWidth
+                              |> Seq.toArray
         sortableBinaryTest.create 
                 sorterTestId
                 sortingWidth
