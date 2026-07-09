@@ -32,63 +32,7 @@ let ceUseSoruceTester() =
     None
 
 
-let sorterLibTester16() =
-
-    let ceBlockId = Guid.NewGuid() |> UMX.tag<ceBlockId>
-    let sortingWidth = 16 |> UMX.tag<sortingWidth>
-    let ceArray = SorterDataParse.parseCeArray SorterData.Degree16_Green
-    let ceBlock = ceBlock.create ceBlockId sortingWidth ceArray
-    
-    let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
-    let sortableModel = msasF.create sortingWidth
-    let sortableTest = sortableModel.MakeSortableBoolTest sortableTestId sortingWidth
-                       |> sortableTest.Bools
-                       
-    let collectNewSortableTests = true
-    let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
-
-    None
 
 
-
-let sorterLibTester22() =
-
-    let ceBlockId = Guid.NewGuid() |> UMX.tag<ceBlockId>
-    let sortingWidth = 22 |> UMX.tag<sortingWidth>
-    let ceArray = SorterDataParse.parseCeArray SorterData.Degree22aStr
-    let ceBlock = ceBlock.create ceBlockId sortingWidth ceArray
-    
-    let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
-    let sortableModel = msasF.create sortingWidth
-    let sortableTest = sortableModel.MakeSortableBoolTest sortableTestId sortingWidth
-                       |> sortableTest.Bools
-                       
-    let collectNewSortableTests = true
-    let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
-
-    None
-
-
-let sorterLibTester24() =
-
-    let ceBlockId = Guid.NewGuid() |> UMX.tag<ceBlockId>
-    let sortingWidth = 24 |> UMX.tag<sortingWidth>
-    let ceArray = SorterDataParse.parseCeArray SorterData.Degree24StrStg1to4
-    let ceBlock = ceBlock.create ceBlockId sortingWidth ceArray
-    
-    let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
-    let sortableModel = msasF.create sortingWidth
-    let sortableTest = sortableModel.MakeSortableBoolTest sortableTestId sortingWidth
-                       |> sortableTest.Bools
-                       
-    let collectNewSortableTests = true
-    let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
-
-    None
-
-
-
-//ceUseSoruceTester() |> ignore
-sorterLibTester24() |> ignore
 
 printfn "Hello from F# yo"

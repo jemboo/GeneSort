@@ -5,29 +5,32 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
-
+open GeneSort.SortingLib.Sorter
 
 [<Struct; CustomEquality; NoComparison>]
 type msasPfx = 
     private 
         { id: Guid<sorterTestModelID>
+          sorterKey: sorterKey
           sortableIntArrays : sortableIntArray array
           seedPermutation : permutation
           maxOrbit: int; }
 
     static member create
+            (sorterKey: sorterKey)
             (seedPermutation : permutation)
             (maxOrbit : int )
             : msasPfx =
             let sias = seedPermutation |> SortableIntArray.getOrbit maxOrbit |> Seq.toArray
             let id =
                 [
-                    "MsasO" :> obj
-                    seedPermutation :> obj
-                    maxOrbit :> obj
+                    "MsasPfx" :> obj
+                    sorterKey :> obj
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
 
-            { id = id; seedPermutation = seedPermutation; maxOrbit = maxOrbit; sortableIntArrays = sias}
+            { id = id; 
+              sorterKey = sorterKey;
+              seedPermutation = seedPermutation; maxOrbit = maxOrbit; sortableIntArrays = sias}
 
     member this.Id with get() = this.id
     member this.MaxOrbit with get() = this.maxOrbit 
@@ -41,7 +44,7 @@ type msasPfx =
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.id, this.seedPermutation, this.maxOrbit)
+        hash (this.id, this.sorterKey, this.maxOrbit)
 
     interface IEquatable<msasPfx> with
         member this.Equals(other) = 

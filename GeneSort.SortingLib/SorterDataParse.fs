@@ -28,3 +28,8 @@ module SorterDataParse =
                 let lowVal = Int32.Parse(matches.[i].Value)
                 let hiVal  = Int32.Parse(matches.[i + 1].Value)
                 ce.create lowVal hiVal |]
+
+
+
+    let getCeArrayFromLib (sorterKey:sorterKey) =
+        (SorterData.tryGet sorterKey) |> Option.map (parseCeArray)

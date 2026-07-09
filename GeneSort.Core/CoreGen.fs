@@ -29,13 +29,13 @@ module CoreGen =
             }
 
 
-    let randomUnSaturatedPerm_Rs (order:int) (randy:IRando) : seq<permSi> =
-        randomPermutations order randy 
-                |> Seq.map (fun p -> p |> PermRsGen_old.decodePermutation)
+    //let randomUnSaturatedPerm_Rs (order:int) (randy:IRando) : seq<permSi> =
+    //    randomPermutations order randy 
+    //            |> Seq.map (fun p -> p |> PermRsGen_old.decodePermutation)
 
 
-    let randomSaturatedPerm_Rs (order:int) (randy:IRando) : seq<permSi> =
-        seq {
-                while true do
-                    yield PermRsGen_old.rndSymmetric order randy
-            }
+    //let randomSaturatedPerm_Rs (order:int) (randy:IRando) : seq<permSi> =
+    //    seq {
+    //            while true do
+    //                yield PermRsGen_old.rndSymmetric order randy
+    //        }
