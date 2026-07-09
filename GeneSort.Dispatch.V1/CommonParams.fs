@@ -93,7 +93,7 @@ module CommonParams =
 
     // MergeDimensions
     let testMergeDimensions = 
-        (runParameters.mergeDimensionKey, [2; 3; 4;] |> List.map string)
+        (runParameters.mergeDimensionKey, [8;] |> List.map string)
     let allMergeDimensions = 
             (runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
     let mergeDimension2 = 
@@ -117,6 +117,8 @@ module CommonParams =
             (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
     let sortingWidth16 = 
             (runParameters.sortingWidthKey, [16] |> List.map string)
+    let sortingWidth32 = 
+            (runParameters.sortingWidthKey, [32] |> List.map string)
     let smallSortingWidths = 
             (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
     let mediumSortingWidths = 
@@ -219,6 +221,32 @@ module CommonParams =
 
     let modificationRatesStage2 =
             (runParameters.modificationRateKey, [ 0.17; 0.21; 0.25; 0.29;] |> List.map string)
+
+
+    let prioritizeNewMutantsBoth = 
+            (runParameters.prioritizeNewMutantsKey, 
+            [ true; false ] |> List.map string)
+
+
+    let prioritizeNewMutantsTrue = 
+            (runParameters.prioritizeNewMutantsKey, 
+            [ true; ] |> List.map string)
+
+    let prioritizeNewMutantsFalse = 
+            (runParameters.prioritizeNewMutantsKey, 
+            [ false ] |> List.map string)
+
+
+
+
+    let distinctSorterHashesBoth = 
+            (runParameters.distinctSorterHashesKey, [true; false] |> List.map string)
+
+    let distinctSorterHashesTrue = 
+            (runParameters.distinctSorterHashesKey, [true] |> List.map string)
+
+    let distinctSorterHashesFalse = 
+            (runParameters.distinctSorterHashesKey, [false] |> List.map string)
 
 
 

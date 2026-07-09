@@ -12,10 +12,6 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 module MsrsSgdSpecsRs = 
 
-    let prioritizeNewMutantsBoth = 
-            (runParameters.prioritizeNewMutantsKey, 
-            [ true; false ] |> List.map string)
-
     let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.Tmb 1500<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
@@ -41,15 +37,6 @@ module MsrsSgdSpecsRs =
 
     let generationQueryFirst = 
             (runParameters.queryWithGenFirst, [false] |> List.map string)
-
-    let distinctSorterHashesBoth = 
-            (runParameters.distinctSorterHashesKey, [true; false] |> List.map string)
-
-    let distinctSorterHashesTrue = 
-            (runParameters.distinctSorterHashesKey, [true] |> List.map string)
-
-    let distinctSorterHashesFalse = 
-            (runParameters.distinctSorterHashesKey, [false] |> List.map string)
 
 
 

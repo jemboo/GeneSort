@@ -60,12 +60,12 @@ module Msuf4MutateSpecsRm =
                 selfSymRate
                 seedModificationRate12
                 modificationRateStage
-                testMergeSortingWidths
+                sortingWidth32
                 msuf4ModelType
-                testMergeDimensions
+                mergeDimension8
                 noSuffixSuffixType
                 dataFormatInt8v512
-                testChildCount
+                extraLargeChildCount
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer

@@ -13,9 +13,9 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 module Msuf4SgdSpecsRm =
 
-    let sorterEvalSelectionType = 
+    let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.ValueSpan 30<sorterCount>;] 
+            [ sorterEvalSelectionType.ValueSpan 600<sorterCount>;] 
             |> List.map SorterEvalSelectionType.toString)
 
 
@@ -28,13 +28,11 @@ module Msuf4SgdSpecsRm =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [100] |> List.map string)
+            (runParameters.generationLastKey, [1000] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
             
-    let distinctSorterHashes = 
-            (runParameters.distinctSorterHashesKey, [true, false] |> List.map string)
 
     let generationQueryFirst = 
             (runParameters.queryWithGenFirst, [false] |> List.map string)
@@ -65,27 +63,29 @@ module Msuf4SgdSpecsRm =
             runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for merge Msuf4"
             spans = [
+                msuf4ModelType
                 rngTypeLcg
-                sorterEvalSelectionType
+                sorterEvalTypeV1
+                sorterEvalSelection
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
-                sorterEvalTypeV1
                 orthoRate
                 paraRate
                 selfSymRate
                 seedModificationRate12
                 modificationRateStage
-                testMergeSortingWidths
-                msuf4ModelType
-                testMergeDimensions
+                sortingWidth32
+                mergeDimension8
                 noSuffixSuffixType
                 dataFormatInt8v512
-                poolCount10
-                oneSorterPerPool
+                poolCount1
+                fiveTwelveSortersPerPool
                 oneChildCount
                 generationFirst
                 generationLast
                 generationQueryFirst
+                distinctSorterHashesTrue
+                prioritizeNewMutantsTrue
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -99,7 +99,7 @@ module Msuf4SgdSpecsRm =
             runDescription = "Mutation analysis for merge Msuf4"
             spans = [
                 rngTypeLcg
-                sorterEvalSelectionType
+                sorterEvalSelection
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
                 sorterEvalTypeV1
@@ -132,7 +132,7 @@ module Msuf4SgdSpecsRm =
             runDescription = "Mutation analysis for merge Msuf4"
             spans = [
                 rngTypeLcg
-                sorterEvalSelectionType
+                sorterEvalSelection
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
                 sorterEvalTypeV1

@@ -71,17 +71,19 @@ module MsrsSgdSpecsRm =
                 paraRate
                 selfSymRate
                 modificationRateStage
-                testMergeSortingWidths
+                sortingWidth32
                 msrsModelType
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                poolCount10
-                oneSorterPerPool
+                poolCount1
+                fourSortersPerPool
                 oneChildCount
                 generationFirst
                 generationLast
                 generationQueryFirst
+                distinctSorterHashesTrue
+                prioritizeNewMutantsBoth
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer

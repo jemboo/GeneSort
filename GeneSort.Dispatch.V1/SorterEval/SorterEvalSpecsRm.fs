@@ -59,12 +59,12 @@ module SorterEvalSpecsRm =
             spans = [   
                 rngTypeLcg
                 dataFormatInt8v512
-                allSimpleSorterModelTypes
+                msuf4ModelType
                 noSuffixSuffixType
                 sorterEvalTypeV2
-                testMergeSortingWidths
-                testMergeDimensions
-                testSorterCount
+                sortingWidth32
+                mergeDimension8
+                extraLargeSorterCount
             ]
             filter = paramMapFilter
             enhancer = mergeEnhancer
