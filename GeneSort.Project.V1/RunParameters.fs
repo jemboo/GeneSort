@@ -7,6 +7,7 @@ open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
+open GeneSort.SortingLib.Sorter
 
 type runParameters =
     private { paramMap : Map<string, string> }
@@ -59,6 +60,7 @@ type runParameters =
     static member sorterEvalMeasureKey = "SorterEvalMeasure"
     static member sorterEvalSelectionType = "SorterEvalSelectionType"
     static member sorterEvalTypeKey = "SorterEvalType"
+    static member sorterLibIdKey = "SorterLibId"
     static member sorterParentCountKey = "SorterParentCount"
     static member sorterPoolCountKey = "SorterPoolCount"
     static member sortingWidthKey = "SortingWidth"
@@ -254,6 +256,10 @@ type runParameters =
         this.paramMap.TryFind runParameters.sorterEvalTypeKey
         |> Option.map SorterEvalType.fromString
 
+    member this.GetSorterLibId() =
+        this.paramMap.TryFind runParameters.sorterLibIdKey
+        |> Option.map SorterLibId.fromString
+
     member this.GetSorterParentCount() =
         runParameters.tryGetInt runParameters.sorterParentCountKey this.paramMap
         |> Option.map UMX.tag<sorterCount>
@@ -404,6 +410,9 @@ type runParameters =
 
     member this.WithSorterEvalType(set: sorterEvalType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalTypeKey (set |> Option.map SorterEvalType.toString) }
+
+    member this.WithSorterLibId(slId:sorterLibId option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterLibIdKey (slId |> Option.map SorterLibId.toString) }
 
     member this.WithSorterParentCount(spc: int<sorterCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterParentCountKey (spc |> Option.map UmxExt.intToRaw) }

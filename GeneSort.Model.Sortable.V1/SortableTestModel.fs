@@ -19,8 +19,7 @@ module SortableTestModel =
         | MsasF msasF -> msasF.sortingWidth
         | MsasO msasO -> %msasO.SeedPermutation.Order |> UMX.tag<sortingWidth>
         | MsasMi msasMi -> msasMi.sortingWidth
-        | MsasPfx msasPfx -> %msasPfx.SeedPermutation.Order |> UMX.tag<sortingWidth>
-
+        | MsasPfx msasPfx -> msasPfx.SortingWidth
 
     let makeSortableTest 
             (sorterTestId: Guid<sortableTestId>)
@@ -49,9 +48,9 @@ module SortableTestModel =
         | MsasO msasO ->
                 match sortableDataFormat with
                 | sortableDataFormat.BoolArray ->        
-                     (msasO.MakeSortableBoolTest sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Bools
+                     (msasO.MakeSortableBoolTest sorterTestId) |> sortableTest.Bools
                 | sortableDataFormat.IntArray ->
-                     (msasO.MakeSortableIntTest sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Ints
+                     (msasO.MakeSortableIntTest sorterTestId) |> sortableTest.Ints
                 | sortableDataFormat.Int8Vector256 ->
                      failwith "Int8Vector256 SortableArrayType not supported"
                 | _ ->  
@@ -75,10 +74,12 @@ module SortableTestModel =
         | MsasPfx msasPfx ->
                 match sortableDataFormat with
                 | sortableDataFormat.BoolArray ->        
-                     (msasPfx.MakeSortableBoolTest sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Bools
+                     (msasPfx.MakeSortableBoolTest sorterTestId) |> sortableTest.Bools
                 | sortableDataFormat.IntArray ->
-                     (msasPfx.MakeSortableIntTest sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Ints
+                     failwith "IntArray SortableArrayType not supported for MsasPfx"
                 | sortableDataFormat.Int8Vector256 ->
                      failwith "Int8Vector256 SortableArrayType not supported"
+                | sortableDataFormat.BitVector512 ->
+                     msasPfx.MakeSortableBitv512Test sorterTestId |> sortableTest.Bitv512
                 | _ ->  
-                    failwith "Unsupported SortableArrayType for MsasO"
+                    failwith "Unsupported SortableArrayType for MsasPfx"

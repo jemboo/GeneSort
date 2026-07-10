@@ -11,7 +11,7 @@ module Sandbox =
     let test32Pfx() =
         let sortingWidth = 28<sortingWidth>
         let sorterVariant = sorterVariant.Prefix4
-        let sorterKey = SorterKey.create sortingWidth sorterVariant
+        let sorterKey = SorterLibId.create sortingWidth sorterVariant
         let ceArray = (SorterDataParse.getCeArrayFromLib sorterKey).Value
         let res = SortableBoolArray.getAllPossibleResultsFromCeArray
                     ceArray

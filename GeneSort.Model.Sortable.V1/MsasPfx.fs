@@ -11,31 +11,21 @@ open GeneSort.SortingLib.Sorter
 type msasPfx = 
     private 
         { id: Guid<sorterTestModelID>
-          sorterKey: sorterKey
-          sortableIntArrays : sortableIntArray array
-          seedPermutation : permutation
-          maxOrbit: int; }
+          sorterKey: sorterLibId }
 
     static member create
-            (sorterKey: sorterKey)
-            (seedPermutation : permutation)
-            (maxOrbit : int )
-            : msasPfx =
-            let sias = seedPermutation |> SortableIntArray.getOrbit maxOrbit |> Seq.toArray
+            (sorterKey: sorterLibId) : msasPfx =
             let id =
                 [
                     "MsasPfx" :> obj
                     sorterKey :> obj
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
 
-            { id = id; 
-              sorterKey = sorterKey;
-              seedPermutation = seedPermutation; maxOrbit = maxOrbit; sortableIntArrays = sias}
+            { id = id; sorterKey = sorterKey;}
 
     member this.Id with get() = this.id
-    member this.MaxOrbit with get() = this.maxOrbit 
-    member this.SeedPermutation with get() = this.seedPermutation
-    member this.SortingWidth with get() = (%this.seedPermutation.Order |> UMX.tag<sortingWidth>)
+    member this.SorterKey with get() = this.sorterKey
+    member this.SortingWidth with get() = this.sorterKey.sortingWidth
 
     override this.Equals(obj) =
         match obj with
@@ -44,33 +34,32 @@ type msasPfx =
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.id, this.sorterKey, this.maxOrbit)
+        hash (this.id, this.sorterKey)
 
     interface IEquatable<msasPfx> with
         member this.Equals(other) = 
             this.id = other.id
 
     member this.MakeSortableBoolTest 
-            (sorterTestId: Guid<sortableTestId>)
-            (sortingWidth: int<sortingWidth>) : sortableBinaryTest =
-        let bArrays =
-            this.sortableIntArrays 
-            |> Array.map(fun sia -> sia.ToSortableBoolArrays())
-            |> Array.collect id
-            |> Array.distinct
+            (sorterTestId: Guid<sortableTestId>) : sortableBinaryTest =
+        let ceArray = (SorterDataParse.getCeArrayFromLib this.SorterKey).Value
+        let bArrays = SortableBoolArray.getAllPossibleResultsFromCeArray
+                        ceArray
+                        this.SortingWidth
+                      |> Seq.toArray
         sortableBinaryTest.create 
                 sorterTestId 
-                sortingWidth
+                this.SortingWidth
                 bArrays
 
-    member this.MakeSortableIntTest 
-            (sorterTestId: Guid<sortableTestId>)
-            (sortingWidth: int<sortingWidth>) : sortableIntTest =
-        sortableIntTest.create 
-                sorterTestId 
-                sortingWidth
-                this.sortableIntArrays
-
+    member this.MakeSortableBitv512Test 
+            (sorterTestId: Guid<sortableTestId>) : sortableBitv512Test =
+        let ceArray = (SorterDataParse.getCeArrayFromLib this.SorterKey).Value
+        let bArrays = SortableBoolArray.getAllPossibleResultsFromCeArray
+                        ceArray
+                        this.SortingWidth
+                      |> Seq.toArray
+        SortableBitv512Test.fromBoolArrays sorterTestId this.SortingWidth bArrays
 
 module MsasPfx = ()
  

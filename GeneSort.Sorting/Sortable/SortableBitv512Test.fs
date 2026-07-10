@@ -46,12 +46,12 @@ module SortableBitv512Test =
     let fromBoolArrays
         (id: Guid<sortableTestId>)
         (sw: int<sortingWidth>) 
-        (allTests: sortableBoolArray[]) : sortableBitv512Test =
+        (sortableBoolArrays: sortableBoolArray[]) : sortableBitv512Test =
         
         let width = %sw
         // Chunk the input arrays into groups of 512
         let blocks = 
-            allTests 
+            sortableBoolArrays 
             |> Array.chunkBySize 512 
             |> Array.map (fun chunk ->
                 let inputCount = chunk.Length

@@ -14,20 +14,20 @@ type sorterVariant =
     | Prefix3
     | Prefix4
 
-type sorterKey = { sortingWidth: int<sortingWidth>; sorterVariant: sorterVariant }
+type sorterLibId = { sortingWidth: int<sortingWidth>; sorterVariant: sorterVariant }
 
-module SorterKey =
-    let create (sortingWidth: int<sortingWidth>) (variant: sorterVariant) : sorterKey =
+module SorterLibId =
+    let create (sortingWidth: int<sortingWidth>) (variant: sorterVariant) : sorterLibId =
         { sortingWidth = sortingWidth; sorterVariant = variant }
-    let toString (key: sorterKey) : string =
-        sprintf "SorterKey(sortingWidth=%d, Variant=%A)" (UMX.untag key.sortingWidth) key.sorterVariant
-    let fromString (s: string) : sorterKey =
+    let toString (key: sorterLibId) : string =
+        sprintf "SorterLibId(sortingWidth=%d, Variant=%A)" (UMX.untag key.sortingWidth) key.sorterVariant
+    let fromString (s: string) : sorterLibId =
         // This is a simple parser; in a real implementation, you might want to use a more robust parsing method
         let parts = s.Trim().Split([|','|], StringSplitOptions.RemoveEmptyEntries)
         if parts.Length <> 2 then
-            failwith "Invalid sorterKey string format"
+            failwith "Invalid sorterLibId string format"
         else
-            let sortingWidthPart = parts.[0].Trim().Replace("SorterKey(sortingWidth=", "").Replace(")", "")
+            let sortingWidthPart = parts.[0].Trim().Replace("SorterLibId(sortingWidth=", "").Replace(")", "")
             let variantPart = parts.[1].Trim().Replace("Variant=", "").Replace(")", "")
             let sortingWidth = Int32.Parse(sortingWidthPart) |> UMX.tag<sortingWidth>
             let variant =
@@ -703,5 +703,5 @@ module SorterData =
 
 
     /// Safely attempts to find a network string by its key properties.
-    let tryGet (sorterKey: sorterKey) =
+    let tryGet (sorterKey: sorterLibId) =
         Map.tryFind sorterKey AllNetworksList
