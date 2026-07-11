@@ -12,7 +12,6 @@ type sorterModelGen =
      | Unknown
 
 
-
 module SorterModelGen =
 
     let getId (model:sorterModelGen) : Guid<sorterModelGenId> =
@@ -67,7 +66,7 @@ module SorterModelGen =
                            (modelGen: sorterModelGen)    
                            : sorterModelSet =
         let sorterModels = makeSorterModelsFromIndexSpan firstIndex count modelGen
-        sorterModelSet.create id sorterModels
+        sorterModelSet.create id sorterModels (modelGen |> getCeLength)
 
 
     let makeSorterModelSetFromIds 
@@ -76,7 +75,7 @@ module SorterModelGen =
                            (modelGen: sorterModelGen)    
                            : sorterModelSet =
         let sorterModels = makeSorterModelsFromIds modelIds modelGen
-        sorterModelSet.create id sorterModels
+        sorterModelSet.create id sorterModels (modelGen |> getCeLength)
 
 
 

@@ -62,7 +62,7 @@ module CeBlockOpsUint8v256 =
 
 
     let evalSimdSortBlocks
-            (simdSortBlocks: SortBlockUint8v256 seq) 
+            (simdSortableBlocks: SortBlockUint8v256 seq) 
             (ceBlocks: ceBlock array) 
             : ceBlockEval [] =
     
@@ -79,7 +79,7 @@ module CeBlockOpsUint8v256 =
             let globalUnsorted = Array.zeroCreate<int> numNetworks
 
             Parallel.ForEach(
-                simdSortBlocks, 
+                simdSortableBlocks, 
                 // 1. Initialize Thread-Local State (TLS)
                 (fun () -> 
                     let usage = Array.init numNetworks (fun i -> Array.zeroCreate<int> networkData.[i].CeLen)
@@ -89,7 +89,7 @@ module CeBlockOpsUint8v256 =
     
                 // 2. The Hot Loop
                 // Explicit type annotations for the state tuple to satisfy the F# compiler
-                (fun currentBlock loopState ((localUsage: int [][]), (localUnsorted: int []), (workBuffer: Vector256<uint8> [])) ->
+                (fun currentBlock loopState (localUsage: int [][], localUnsorted: int [], workBuffer: Vector256<uint8> []) ->
                     let currentLen = currentBlock.Length
 
                     for nIdx = 0 to numNetworks - 1 do
@@ -180,7 +180,7 @@ module CeBlockOpsUint8v256 =
 
 
     let evalAndCollectUniqueFailures
-            (simdSortBlocks: SortBlockUint8v256 seq) 
+            (simdSortableBlocks: SortBlockUint8v256 seq) 
             (ceBlocks: ceBlock array) 
             : ceBlockEval [] =
     
@@ -204,7 +204,7 @@ module CeBlockOpsUint8v256 =
                 ConcurrentDictionary<int[], byte>(ArrayContentComparer<int>()))
 
         Parallel.ForEach(
-            simdSortBlocks, 
+            simdSortableBlocks, 
             // 1. Initialize Thread-Local State (TLS) - Removed unsorted tracking array
             (fun () -> 
                 let usage = Array.init numNetworks (fun i -> Array.zeroCreate<int> networkData.[i].CeLen)

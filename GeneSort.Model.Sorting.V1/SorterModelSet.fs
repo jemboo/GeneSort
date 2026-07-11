@@ -11,28 +11,29 @@ open GeneSort.Model.Sorting.V1.Simple
 type sorterModelSet =
       private
         { 
-          id : Guid<sorterModelSetId>
-          sortingMap : Map<Guid<sorterModelId>, sorterModel>
+          id: Guid<sorterModelSetId>
+          sortingMap: Map<Guid<sorterModelId>, sorterModel>
+          maxCeLength: int<ceLength>
         }
         with
         static member create 
             (id : Guid<sorterModelSetId>) 
-            (models : sorterModel[]) : sorterModelSet =
-
+            (models : sorterModel[]) 
+            (maxCeLength: int<ceLength>): sorterModelSet =
             let modelMap = 
                 models 
                 |> Array.map (fun sm -> (SorterModel.getId sm, sm))
                 |> Map.ofArray
 
-            { id = id; sortingMap = modelMap  }
+            { id = id; sortingMap = modelMap; maxCeLength = maxCeLength }
 
         member this.Count with get() = this.sortingMap.Count
         member this.Id with get() = this.id
+        member this.MaxCeLength with get() = this.maxCeLength
         member this.SorterModels with get() : sorterModel array = 
                     this.sortingMap |> Map.toArray |> Array.map snd
         static member empty: sorterModelSet =
-            { id = Guid.Empty |> UMX.tag; sortingMap = Map.empty }
-
+            { id = Guid.Empty |> UMX.tag; sortingMap = Map.empty; maxCeLength = 0<ceLength> }
 
 
 module SorterModelSet =
@@ -57,9 +58,9 @@ module SorterModelSet =
 
     let makeSorterSet (id:Guid<sorterSetId>) 
                       (maxCeCount: int<ceLength> option)
-                      (modelSet: sorterModelSet) : sorterSet =
+                      (sorterModelSet: sorterModelSet) : sorterSet =
         let sorters = 
-            modelSet.SorterModels 
+            sorterModelSet.SorterModels 
             |> Array.map (fun sm -> SorterModel.makeSorter sm maxCeCount)
         sorterSet.create id sorters
 

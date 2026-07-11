@@ -13,18 +13,20 @@ type sorterPool =
         _name: string<sorterPoolName>
         _sorterPoolId: Guid<sorterPoolId>
         _sorterPoolMembers: Map<Guid<sorterPoolMemberId>, sorterPoolMember>
+        _ceLength: int<ceLength>
     }
-
-    member this.SorterPoolId with get() = this._sorterPoolId
+    member this.CeLength with get() = this._ceLength
     member this.Name with get() = this._name
     member this.SorterPoolMembers with get() :sorterPoolMember seq =
         Map.values this._sorterPoolMembers
+    member this.SorterPoolId with get() = this._sorterPoolId
 
 
     static member create 
             (sorterPoolId: Guid<sorterPoolId>) 
             (name: string<sorterPoolName>)
-            (members: sorterPoolMember []) =
+            (members: sorterPoolMember []) 
+            (ceLength: int<ceLength>) =
         let membersMap = 
             members
             |> Seq.map (fun m -> m.SorterPoolMemberId, m)
@@ -33,14 +35,20 @@ type sorterPool =
             _name = name
             _sorterPoolId = sorterPoolId
             _sorterPoolMembers = membersMap
+            _ceLength = ceLength
         }
 
 
 module SorterPool = 
 
     /// Adds or updates a member inside the pool
-    let upsertMember (memberToUpsert: sorterPoolMember) (pool: sorterPool) : sorterPool =
-        let updatedMap = Map.add memberToUpsert.SorterPoolMemberId memberToUpsert pool._sorterPoolMembers
+    let upsertMember 
+            (memberToUpsert: sorterPoolMember) 
+            (pool: sorterPool) : sorterPool =
+        let updatedMap = Map.add 
+                            memberToUpsert.SorterPoolMemberId 
+                            memberToUpsert 
+                            pool._sorterPoolMembers
         { pool with _sorterPoolMembers = updatedMap }
 
     /// Finds a member and updates its evaluation within the pool context
@@ -172,5 +180,5 @@ module SorterPool =
             |> Seq.map snd
             |> Seq.toArray
 
-        sorterPool.create pool.SorterPoolId pool.Name sortedSurvivors
+        sorterPool.create pool.SorterPoolId pool.Name sortedSurvivors pool.CeLength
 

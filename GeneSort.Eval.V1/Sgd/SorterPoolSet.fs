@@ -135,7 +135,7 @@ module SorterPoolSet =
                     ) |> EvalLabel.toString |> UMX.tag<sorterPoolName>
 
                 // 3. Map each model within the chunk into a tracking pool member record
-                let memberObjs = 
+                let sorterPoolMembers = 
                     modelChunk
                     |> Array.map (fun model ->
                         let poolMemberId = Guid.NewGuid() |> UMX.tag<sorterPoolMemberId>
@@ -149,7 +149,7 @@ module SorterPoolSet =
 
                 // 4. Wrap the evaluated array segment block inside an explicit tracking pool object container
                 let poolId = Guid.NewGuid() |> UMX.tag<sorterPoolId>
-                sorterPool.create poolId poolName memberObjs
+                sorterPool.create poolId poolName sorterPoolMembers modelSet.MaxCeLength
             )
 
         // 5. Package the complete group layout structure back out to the main generational repository root

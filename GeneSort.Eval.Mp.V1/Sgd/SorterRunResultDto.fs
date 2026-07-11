@@ -7,6 +7,7 @@ open GeneSort.SortingOps.Mp
 open GeneSort.Eval.V1
 open GeneSort.Model.Mp.Sorting.Mp.V1
 open GeneSort.Eval.V1.Sgd
+open GeneSort.Sorting
 
 // ---------------------------------------------------------------------
 // 1. Lightweight History Description DTOs
@@ -54,6 +55,7 @@ type sorterPoolDto = {
     [<Key(0)>] sorterPoolId: Guid
     [<Key(1)>] name: string
     [<Key(2)>] sorterPoolMemberDtos: sorterPoolMemberDto array
+    [<Key(3)>] ceLength: int
 }
 
 [<MessagePackObject>]
@@ -157,7 +159,7 @@ module SorterPoolSetDto =
                         }
                     )
                     |> Seq.toArray
-                { sorterPoolId = %p.SorterPoolId; name = %p.Name; sorterPoolMemberDtos = memberDtos }
+                { sorterPoolId = %p.SorterPoolId; name = %p.Name; sorterPoolMemberDtos = memberDtos; ceLength = %p.CeLength }
             )
             |> Seq.toArray
         {
@@ -187,6 +189,7 @@ module SorterPoolSetDto =
                             (p.sorterPoolId |> UMX.tag<sorterPoolId>) 
                             (p.name |> UMX.tag<sorterPoolName>) 
                             members
+                            (p.ceLength |> UMX.tag<ceLength> )
             )
         sorterPoolSet.Create(UMX.tag dto.sorterPoolSetId, UMX.tag dto.generationNumber, pools)
 

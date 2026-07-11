@@ -77,7 +77,7 @@ module CeBlockOpsUint8v512 =
                 h
 
     let evalSimdSortBlocks
-        (simdSortBlocks: SortBlockUint8v512 seq) 
+        (simdSortableBlocks: SortBlockUint8v512 seq) 
         (ceBlocks: ceBlock array) 
         : ceBlockEval [] =
     
@@ -94,7 +94,7 @@ module CeBlockOpsUint8v512 =
         let globalUnsorted = Array.zeroCreate<int> numNetworks
 
         Parallel.ForEach(
-            simdSortBlocks, 
+            simdSortableBlocks, 
             (fun () -> 
                 let usage = Array.init numNetworks (fun i -> Array.zeroCreate<int> networkData.[i].CeLen)
                 let unsorted = Array.zeroCreate<int> numNetworks
@@ -141,7 +141,7 @@ module CeBlockOpsUint8v512 =
 
 
     let evalAndCollectUniqueFailures
-            (simdSortBlocks: SortBlockUint8v512 seq) 
+            (simdSortableBlocks: SortBlockUint8v512 seq) 
             (ceBlocks: ceBlock array) 
             : ceBlockEval [] =
     
@@ -159,7 +159,7 @@ module CeBlockOpsUint8v512 =
         let failureSets = Array.init numNetworks (fun _ -> ConcurrentDictionary<int[], byte>(ArrayContentComparer<int>()))
 
         Parallel.ForEach(
-            simdSortBlocks, 
+            simdSortableBlocks, 
             (fun () -> 
                 let usage = Array.init numNetworks (fun i -> Array.zeroCreate<int> networkData.[i].CeLen)
                 let buffer = Array.zeroCreate<Vector512<uint8>> maxWidth

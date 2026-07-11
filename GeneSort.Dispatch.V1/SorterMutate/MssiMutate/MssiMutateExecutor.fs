@@ -493,7 +493,10 @@ module MssiMutateExecutor =
                     log (sprintf "Processing mutant chunk %d..." chunkCounter)
                     
                     // Wrap the subset models into an explicit SorterModelSet container
-                    let modelSetChunk = sorterModelSet.create (Guid.Empty |> UMX.tag) modelChunk
+                    let modelSetChunk = sorterModelSet.create 
+                                            (Guid.Empty |> UMX.tag) 
+                                            modelChunk
+                                            (modelChunk.[0] |> SorterModel.getCeLength)
 
                     // Materialize into a functional SorterSet chunk
                     let maxCeCount = None

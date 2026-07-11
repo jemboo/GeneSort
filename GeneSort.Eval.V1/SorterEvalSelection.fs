@@ -87,7 +87,7 @@ type sorterEvalSelection =
                     se |> SorterEval.getSorterId |> UMX.untag |> UMX.tag<sorterModelId>)
 
             let sorterModels = SorterModelGen.makeSorterModelsFromIds sorterModelIds sorterModelGen
-            sorterModelSet.create sorterModelSetId sorterModels
+            sorterModelSet.create sorterModelSetId sorterModels (sorterModelGen |> SorterModelGen.getCeLength)
 
 
 module SorterEvalSelection =

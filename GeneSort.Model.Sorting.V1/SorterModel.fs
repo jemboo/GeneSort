@@ -24,6 +24,10 @@ module SorterModel =
         | Simple sms -> sms |> SimpleSorterModel.getStageLength
         | Unknown -> failwith "Unknown sorterModel"
 
+    let getCeLength (model: sorterModel) : int<ceLength> =
+        match model with
+        | Simple sms -> sms |> SimpleSorterModel.getCeLength
+        | Unknown -> failwith "Unknown sorterModel"
     
     let getId (model: sorterModel) : Guid<sorterModelId> =
         match model with

@@ -42,7 +42,7 @@ module CeBlockOpsBitv512 =
             false
 
     let evalSimdSortBlocks
-        (simdSortBlocks: sortBlockBitv512 seq) 
+        (simdSortableBlocks: sortBlockBitv512 seq) 
         (ceBlocks: ceBlock array) 
         : ceBlockEval [] =
     
@@ -59,7 +59,7 @@ module CeBlockOpsBitv512 =
         let globalUnsortedCount = Array.zeroCreate<int> numNetworks
 
         Parallel.ForEach(
-            simdSortBlocks, 
+            simdSortableBlocks, 
             (fun () -> 
                 let usage = Array.init numNetworks (fun i -> Array.zeroCreate<int> networkData.[i].CeLen)
                 let unsortedCount = Array.zeroCreate<int> numNetworks
@@ -109,14 +109,10 @@ module CeBlockOpsBitv512 =
         )
 
 
-
     let eval 
             (test: sortableBitv512Test) 
             (ceBlocks: ceBlock []) =
             evalSimdSortBlocks test.SimdSortBlocks ceBlocks
-
-
-
 
 
 
@@ -135,7 +131,7 @@ module CeBlockOpsBitv512 =
                 h
 
     let evalAndCollectUniqueFailures
-            (simdSortBlocks: sortBlockBitv512 seq) 
+            (simdSortableBlocks: sortBlockBitv512 seq) 
             (ceBlocks: ceBlock array) 
             : ceBlockEval [] =
     
@@ -159,7 +155,7 @@ module CeBlockOpsBitv512 =
             )
 
         Parallel.ForEach(
-            simdSortBlocks, 
+            simdSortableBlocks, 
             // 1. Initialize Thread-Local State - removed unsortedCount tracker
             (fun () -> 
                 let usage = Array.init numNetworks (fun i -> Array.zeroCreate<int> networkData.[i].CeLen)

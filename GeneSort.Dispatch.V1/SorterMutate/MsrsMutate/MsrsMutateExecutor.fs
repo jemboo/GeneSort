@@ -515,12 +515,18 @@ module MsrsMutateExecutor =
                     log (sprintf "Processing mutant chunk %d..." chunkCounter)
                     
                     // Wrap the subset models into an explicit SorterModelSet container
-                    let modelSetChunk = sorterModelSet.create (Guid.Empty |> UMX.tag) modelChunk
+                    let modelSetChunk = sorterModelSet.create 
+                                                    (Guid.Empty |> UMX.tag) 
+                                                    modelChunk
+                                                    (modelChunk.[0] |> SorterModel.getCeLength)
 
                     // Materialize into a functional SorterSet chunk
                     let maxCeCount = None
                     let fullSorterSetChunk = 
-                        SorterModelSet.makeSorterSet (Guid.Empty |> UMX.tag) maxCeCount modelSetChunk
+                        SorterModelSet.makeSorterSet 
+                                    (Guid.Empty |> UMX.tag) 
+                                    maxCeCount 
+                                    modelSetChunk
 
                     // Compute sorter evaluations directly from the targeted network chunk
                     let sorterEvalsChunk = 
