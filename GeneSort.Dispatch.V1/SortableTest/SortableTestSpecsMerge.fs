@@ -41,7 +41,7 @@ module SortableTestSpecsMerge =
     module Specs =
 
         let Merge_Test  (executorType: sortableTestExecutorType) : runHostSpec = {
-            databaseName = SortableMergeTestDb.dbName
+            databaseName = SortableTestDbs.Merge.dbName
             runName = sprintf @"Merge-Test_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Int8 merge sorter test sets"
             spans = [
@@ -58,7 +58,7 @@ module SortableTestSpecsMerge =
 
 
         let Merge_Small (executorType: sortableTestExecutorType) : runHostSpec = {
-            databaseName = SortableMergeTestDb.dbName
+            databaseName = SortableTestDbs.Merge.dbName
             runName = sprintf @"Merge-Small_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Merge_Small sorter test sets"
             spans = [
@@ -75,7 +75,7 @@ module SortableTestSpecsMerge =
 
         
         let Merge_MediumLd (executorType: sortableTestExecutorType) : runHostSpec = {
-            databaseName = SortableMergeTestDb.dbName
+            databaseName = SortableTestDbs.Merge.dbName
             runName = sprintf @"Merge-MediumLd_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Merge_MediumLd sorter test sets"
             spans = [
@@ -92,7 +92,7 @@ module SortableTestSpecsMerge =
 
         
         let Merge_MediumHd (executorType: sortableTestExecutorType) : runHostSpec = {
-            databaseName = SortableMergeTestDb.dbName
+            databaseName = SortableTestDbs.Merge.dbName
             runName = sprintf @"Merge-MediumHd_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Merge_MediumHd sorter test sets"
             spans = [
@@ -109,7 +109,7 @@ module SortableTestSpecsMerge =
 
 
         let Merge_LargeLd (executorType: sortableTestExecutorType) : runHostSpec = {
-            databaseName = SortableMergeTestDb.dbName
+            databaseName = SortableTestDbs.Merge.dbName
             runName = sprintf @"Merge-LargeLd_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Merge_LargeLd sorter test sets"
             spans = [

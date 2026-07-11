@@ -58,9 +58,9 @@ module MsrsMutateSpecsRm =
                 paraRate
                 selfSymRate
                 modificationRateStage
-                testMergeSortingWidths
+                sortingWidth32
                 msrsModelType
-                testMergeDimensions
+                mergeDimension8
                 noSuffixSuffixType
                 dataFormatInt8v512
                 testChildCount

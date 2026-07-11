@@ -5,6 +5,7 @@ open GeneSort.Sorting
 open GeneSort.SortingOps
 open FSharp.UMX
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingLib.Sorter
 
 module CommonParams =
 
@@ -88,8 +89,6 @@ module CommonParams =
 
 
     let _rngTypeLcg = rngType.Lcg
-    let _dataFormatInt8v512 = sortableDataFormat.Int8Vector512
-    let _dataFormatBitVector512 = sortableDataFormat.BitVector512
 
     // MergeDimensions
     let testMergeDimensions = 
@@ -157,7 +156,10 @@ module CommonParams =
 
     // DataFormats
     let dataFormatInt8v512 = 
-            (runParameters.sortableDataFormatKey, [_dataFormatInt8v512] |> List.map SortableDataFormat.toString)
+            (runParameters.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
+            
+    let dataFomatBitv512 = 
+            (runParameters.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
 
     let noSuffixSuffixType = 
             (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix] |> List.map MergeSuffixType.toString)
@@ -248,6 +250,21 @@ module CommonParams =
     let distinctSorterHashesFalse = 
             (runParameters.distinctSorterHashesKey, [false] |> List.map string)
 
+
+    let _sorterLibId24_4 = 
+            SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix4
+    let sorterLibId24_4 = 
+            (runParameters.sorterLibIdKey, [_sorterLibId24_4] |> List.map SorterLibId.toString)
+
+    let _sorterLibId28_4 = 
+            SorterLibId.create (28<sortingWidth>) sorterVariant.Prefix4
+    let sorterLibId28_4 = 
+            (runParameters.sorterLibIdKey, [_sorterLibId28_4] |> List.map SorterLibId.toString)
+
+    let _sorterLibId32_4 = 
+            SorterLibId.create (32<sortingWidth>) sorterVariant.Prefix4
+    let sorterLibId32_4 = 
+            (runParameters.sorterLibIdKey, [_sorterLibId32_4] |> List.map SorterLibId.toString)
 
 
 

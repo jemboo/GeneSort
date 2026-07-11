@@ -81,7 +81,7 @@ let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
-//********** SortableTest **********
+//********** SortableTest Merge **********
 //let configType = SortableTestSpecsMerge.configType.Merge_Test
 //let executorType = SortableTest.sortableTestExecutorType.GenMerge
 //let host: IRunHost = 
@@ -89,6 +89,17 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //    SortableMergeTestDb.createRunHost spec
 
 //let executor = SortableTest.SortableTestExecutor.getExecutor executorType
+
+
+
+//********** SortableTest Prefix **********
+let configType = SortableTestSpecsPrefix.configType.Prefix_Test
+let executorType = SortableTest.sortableTestExecutorType.GenPrefix
+let host: IRunHost = 
+    let spec = SortableTestSpecsPrefix.getRunHostSpec configType executorType
+    SortableTestDbs.createRunHost spec
+
+let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 
 
 
@@ -251,12 +262,12 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** Msuf4SgdSpecsRm **********
-let configType = Msuf4SgdSpecsRm.configType.Rand_Test
-let executorType = sorterSgdExecutorType.GenMerge
-let host: IRunHost = 
-    let spec = Msuf4SgdSpecsRm.getRunHostSpec configType executorType
-    Msuf4SgdDbs.createRunHost spec
-let executor = Msuf4SgdExecutor.getExecutor executorType
+//let configType = Msuf4SgdSpecsRm.configType.Rand_Test
+//let executorType = sorterSgdExecutorType.GenMerge
+//let host: IRunHost = 
+//    let spec = Msuf4SgdSpecsRm.getRunHostSpec configType executorType
+//    Msuf4SgdDbs.createRunHost spec
+//let executor = Msuf4SgdExecutor.getExecutor executorType
 
 
 

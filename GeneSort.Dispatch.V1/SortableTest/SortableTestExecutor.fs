@@ -13,7 +13,7 @@ open GeneSort.Dispatch.V1.OpsUtils
 
 module SortableTestExecutor =
 
-    let _makeSortableMergeTest
+    let _makeSortableTestMerge
         (host: IRunHost)
         (rp: runParameters) 
         (allowOverwrite: bool<allowOverwrite>) 
@@ -67,15 +67,70 @@ module SortableTestExecutor =
 
 
 
+    let _makeSortableTestPrefix
+        (host: IRunHost)
+        (rp: runParameters) 
+        (allowOverwrite: bool<allowOverwrite>) 
+        (cts: CancellationTokenSource) 
+        (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+
+        // Local reporting helper 
+        let log msg = OpsUtils.report 
+                            progress 
+                            (sprintf "%s [%s] %s" 
+                            (MathUtils.getTimestampString()) 
+                            (rp |> RunParameters.getIdString) msg)
+
+        asyncResult {
+            try
+                // 1. Initial Check & Sorter Model Creation
+                do! checkCancellation cts.Token
+                let runId = rp |> RunParameters.getIdString
+                log "Creating SortableTest..."
+
+                // 2. Safe extraction
+                let! (sorterLibId, sortableDataFormat) = 
+                    maybe {
+                        let! _slLibId = rp.GetSorterLibId()
+                        let! _dataFmt = rp.GetSortableDataFormat()
+                        return (_slLibId, _dataFmt)
+                    } |> Result.ofOption "Missing domain parameters required for generation"
+
+                // 3. Create SortableTestModel
+                let sortableTestModel = msasPfx.create sorterLibId |> sortableTestModel.MsasPfx
+            
+                let! qpForSortableTest = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SortableTest "") 
+                                         |> Result.ofOption "Failed to create query parameters for SortableTest"
+                let sortableTests = SortableTestModel.makeSortableTest 
+                                            (%qpForSortableTest.Id |> UMX.tag) 
+                                            sortableTestModel 
+                                            sortableDataFormat
+
+                // 4. Save
+                log (sprintf "Saving SortableTest %s" (string %qpForSortableTest.Id))
+
+                do! host.RunDb.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
+                
+                log "Run Complete."
+                return rp.WithRunFinished (Some true)
+            with e -> 
+                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message) |> async.Return
+        } |> Async.map (logResult progress log)
+
+
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _makeSortableMergeTest 
+                _makeSortableTestMerge 
                     host rp allowOverwrite cts progress }
 
-
+    let prefixExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                _makeSortableTestPrefix 
+                    host rp allowOverwrite cts progress }
 
     let getExecutor (executorType: sortableTestExecutorType) : IRunParamsExecutor =
         match executorType with
         | GenMerge -> mergeExecutor
-        | GenPrefix -> failwith "Unknown executor type"
+        | GenPrefix -> prefixExecutor

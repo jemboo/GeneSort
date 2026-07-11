@@ -1,9 +1,9 @@
 
 namespace GeneSort.SortingLib.Sorter
 open FSharp.UMX
-open GeneSort.Core
 open GeneSort.Sorting
 open System
+open GeneSort.Core
 
 
 type sorterVariant =
@@ -14,7 +14,18 @@ type sorterVariant =
     | Prefix3
     | Prefix4
 
-type sorterLibId = { sortingWidth: int<sortingWidth>; sorterVariant: sorterVariant }
+type sorterLibId = 
+    { sortingWidth: int<sortingWidth>
+      sorterVariant: sorterVariant }
+    
+    interface IStableSerializable with
+        member this.WriteStableBytes (writer: System.IO.BinaryWriter) =
+            // 1. Write the underlying integer from the UMX tag
+            writer.Write(UMX.untag this.sortingWidth)
+            
+            // 2. Write the variant as a consistent string or integer tag
+            writer.Write(sprintf "%A" this.sorterVariant)
+
 
 module SorterLibId =
     let create (sortingWidth: int<sortingWidth>) (variant: sorterVariant) : sorterLibId =

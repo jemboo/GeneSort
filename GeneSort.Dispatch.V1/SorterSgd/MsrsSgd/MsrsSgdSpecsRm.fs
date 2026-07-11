@@ -16,9 +16,9 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 module MsrsSgdSpecsRm =
 
-    let sorterEvalSelectionType = 
+    let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.ValueSpan 30<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
+            [ sorterEvalSelectionType.RankSpan 600<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
 
     let sorterEvalMeasureInitial = 
             (runParameters.sorterEvalMeasureInitialKey , 
@@ -29,7 +29,7 @@ module MsrsSgdSpecsRm =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [100] |> List.map string)
+            (runParameters.generationLastKey, [10000] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
@@ -62,28 +62,28 @@ module MsrsSgdSpecsRm =
             runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for merge Msrs"
             spans = [
+                msrsModelType
                 rngTypeLcg
-                sorterEvalSelectionType
+                sorterEvalTypeV1
+                sorterEvalSelection
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
-                sorterEvalTypeV1
                 orthoRate
                 paraRate
                 selfSymRate
                 modificationRateStage
                 sortingWidth32
-                msrsModelType
-                testMergeDimensions
+                mergeDimension8
                 noSuffixSuffixType
                 dataFormatInt8v512
                 poolCount1
-                fourSortersPerPool
+                oneTwenty8SortersPerPool
                 oneChildCount
                 generationFirst
                 generationLast
                 generationQueryFirst
                 distinctSorterHashesTrue
-                prioritizeNewMutantsBoth
+                prioritizeNewMutantsTrue
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -97,7 +97,7 @@ module MsrsSgdSpecsRm =
             runDescription = "Mutation analysis for merge Msrs"
             spans = [
                 rngTypeLcg
-                sorterEvalSelectionType
+                sorterEvalSelection
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
                 sorterEvalTypeV1
@@ -129,7 +129,7 @@ module MsrsSgdSpecsRm =
             runDescription = "Mutation analysis for merge Msrs"
             spans = [
                 rngTypeLcg
-                sorterEvalSelectionType
+                sorterEvalSelection
                 sorterEvalMeasureInitial
                 sorterEvalMeasureEvo
                 sorterEvalTypeV1

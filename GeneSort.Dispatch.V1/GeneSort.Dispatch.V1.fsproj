@@ -25,9 +25,10 @@
     <Compile Include="RunParamsExecutor.fs" />
     <Compile Include="ProjectOps.fs" />
     <Compile Include="SortableTest\CommonSortableTest.fs" />
-    <Compile Include="SortableTest\SortableMergeTestDb.fs" />
+    <Compile Include="SortableTest\SortableTestDbs.fs" />
     <Compile Include="SortableTest\SortableTestExecutor.fs" />
     <Compile Include="SortableTest\SortableTestSpecsMerge.fs" />
+    <Compile Include="SortableTest\SortableTestSpecsPrefix.fs" />
     <Compile Include="SorterEval\CommonSorterEval.fs" />
     <Compile Include="SorterEval\SorterEvalDbs.fs" />
     <Compile Include="SorterEval\SorterEvalExecutor.fs" />

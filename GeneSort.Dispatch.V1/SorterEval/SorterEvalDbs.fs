@@ -160,7 +160,7 @@ module SorterEvalDbs =
                         simpleSorterModelType
                         mergeDimension 
                         mergeSuffixType 
-                        _dataFormatInt8v512
+                        sortableDataFormat.Int8Vector512
                         sorterEvalType
                         (outputDataType.SorterSetEval "")
         async {

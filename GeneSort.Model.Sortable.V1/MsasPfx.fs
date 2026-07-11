@@ -14,14 +14,14 @@ type msasPfx =
           sorterKey: sorterLibId }
 
     static member create
-            (sorterKey: sorterLibId) : msasPfx =
+            (sorterLibId: sorterLibId) : msasPfx =
             let id =
                 [
                     "MsasPfx" :> obj
-                    sorterKey :> obj
+                    sorterLibId :> obj
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
 
-            { id = id; sorterKey = sorterKey;}
+            { id = id; sorterKey = sorterLibId;}
 
     member this.Id with get() = this.id
     member this.SorterKey with get() = this.sorterKey

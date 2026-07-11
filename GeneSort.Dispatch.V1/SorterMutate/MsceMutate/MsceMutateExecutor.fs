@@ -37,7 +37,7 @@ module MsceMutateExecutor =
                 return Ok ( SortableTestModel.makeSortableTest 
                                     sortableTestId
                                     testModel 
-                                    _dataFormatBitVector512)
+                                    sortableDataFormat.BitVector512)
             | None ->
                 return Error "Failed: One or more RunParameters for StandardTests were missing."
         }
@@ -56,7 +56,7 @@ module MsceMutateExecutor =
 
             match paramsOpt with
             | Some (repl, sw, md, mst, sdf) ->
-                return! SortableMergeTestDb.getMergeSorterTestSet 
+                return! SortableTestDbs.Merge.getMergeSorterTestSet 
                                         repl sw md mst sdf  
             | None ->
                 return Error "Failed: One or more RunParameters for MergeTests were missing."
