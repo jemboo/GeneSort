@@ -19,7 +19,6 @@ module SorterPipeline =
             (sortableTest: sortableTest)
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
-            (maxCeCount: int<ceLength> option)
             (reEvaluateParents: bool)
             (currentPoolSet: sorterPoolSet) : sorterPoolSet =
 
@@ -34,7 +33,6 @@ module SorterPipeline =
                     |> SorterPoolRunner.evaluatePoolSet 
                                         sortableTest 
                                         sorterEvalType
-                                        maxCeCount
                                         reEvaluateParents
             
                 expandedPoolSet 

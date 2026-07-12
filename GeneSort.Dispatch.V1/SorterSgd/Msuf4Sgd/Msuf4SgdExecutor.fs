@@ -102,13 +102,6 @@ module Msuf4SgdExecutor =
 
                 log "Executing SorterRunResult.runEvolutionAsync..."
 
-                let ceLengthSelector = 
-                    fun (gem: int<generationNumber>) -> None
-                //let ceLengthSelector = 
-                //    fun (gem: int<generationNumber>) -> 
-                //        let maxLen = 200.0 + Math.Cos((%gem |> float) / 20.0) * 100.0
-                //        Some (maxLen |> int |> UMX.tag<ceLength>)
-
                 let! (runResult: sorterRunResult) = SorterRunResult.runEvolutionAsync
                                                         genFirst
                                                         (genLast - genFirst)
@@ -120,7 +113,6 @@ module Msuf4SgdExecutor =
                                                         sortableTest
                                                         sorterEvalType
                                                         sorterEvalMeasure
-                                                        ceLengthSelector
                                                         seedSorterPoolSet
                                                         cts.Token
                                                         log

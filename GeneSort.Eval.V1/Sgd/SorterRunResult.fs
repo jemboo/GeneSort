@@ -42,7 +42,6 @@ module SorterRunResult =
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
             (sorterCountPerPool: int<sorterCountPerPool>)
-            (celengthSelector: int<generationNumber> -> int<ceLength> option)
             (initialPoolSet: sorterPoolSet) : sorterRunResult =
 
         let rec loop (remainingSteps: int) (currentSet: sorterPoolSet) (historyAcc: sorterPoolSetDescription list) =
@@ -53,7 +52,6 @@ module SorterRunResult =
             else
                 // Calculate the current active generation (assuming 0-indexed start since genStart isn't provided)
                 let currentGen = (int genCount - remainingSteps) |> UMX.tag<generationNumber>
-                let maxCeCount = celengthSelector currentGen
 
                 // 1. Take a lightweight snapshot of the current generation state before transitioning
                 let currentSnapshot = SorterPoolSetDescription.fromPoolSet currentSet
@@ -70,8 +68,7 @@ module SorterRunResult =
                         distinctSorterHashes
                         sortableTest 
                         sorterEvalType 
-                        selectionMeasure 
-                        maxCeCount
+                        selectionMeasure
                         reEvaluateParents
                         currentSet
 
@@ -94,7 +91,6 @@ module SorterRunResult =
             (sortableTest: sortableTest)
             (srtrEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
-            (celengthSelector: int<generationNumber> -> int<ceLength> option)
             (initialPoolSet: sorterPoolSet)
             (cts: CancellationToken)
             (log: string -> unit) : Async<Result<sorterRunResult, string>> =
@@ -121,7 +117,6 @@ module SorterRunResult =
                 else
                     let currentGen = genStart + (genCount - %remainingSteps)
                     let totalGen = genStart + genCount
-                    let maxCeCount = celengthSelector currentGen
                     
                     // Look up if the current generation is an exponential milestone
                     let shouldReport = (Set.contains (int currentGen) targetGenerations)
@@ -150,8 +145,7 @@ module SorterRunResult =
                             distinctSorterHashes
                             sortableTest 
                             adjSorterEvalType
-                            selectionMeasure 
-                            maxCeCount
+                            selectionMeasure
                             reEvaluateParents
                             currentSorterPoolSet
                             

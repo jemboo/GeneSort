@@ -95,8 +95,7 @@ module MsrsSgdExecutor =
                                                 selfSymRate
                                          |> sorterModelMutator.Simple
 
-                log "Executing SorterRunResult.runEvolutionAsync..."                
-                let ceCountSelector = fun (gem: int<generationNumber>) -> None
+                log "Executing SorterRunResult.runEvolutionAsync..."               
                 let! (runResult: sorterRunResult) = SorterRunResult.runEvolutionAsync
                                                         genFirst
                                                         (genLast - genFirst)
@@ -108,7 +107,6 @@ module MsrsSgdExecutor =
                                                         sortableTest
                                                         sorterEvalType
                                                         sorterEvalMeasure
-                                                        ceCountSelector
                                                         seedSorterPoolSet
                                                         cts.Token
                                                         log

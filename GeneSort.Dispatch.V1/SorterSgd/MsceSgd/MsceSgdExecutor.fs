@@ -96,7 +96,6 @@ module MsceSgdExecutor =
                     |> sorterModelMutator.Simple
 
                 log "Executing SorterRunResult.runEvolutionAsync..."
-                let ceCountSelector = fun (gem: int<generationNumber>) -> None
                 let! (runResult: sorterRunResult) = SorterRunResult.runEvolutionAsync
                                                         genFirst
                                                         (genLast - genFirst)
@@ -108,7 +107,6 @@ module MsceSgdExecutor =
                                                         sortableTest
                                                         sorterEvalType
                                                         sorterEvalMeasure
-                                                        ceCountSelector
                                                         seedSorterPoolSet
                                                         cts.Token
                                                         log

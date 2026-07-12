@@ -14,16 +14,18 @@ module SorterPoolRunner =
     let evaluatePoolSet 
             (sortableTest: sortableTest)
             (sorterEvalType: sorterEvalType)
-            (maxCeCount: int<ceLength> option)
             (reEvaluateParents: bool)
             (poolSet: sorterPoolSet)
             : Map<Guid<sorterPoolMemberId>, sorterEval> =
 
-        // 1. Collect all members across all pools
+        // 1. Collect all members across all pools paired with their respective pool's ceLength
         let allMembers = 
             poolSet.SorterPools
             |> Map.values
-            |> Seq.collect (fun pool -> pool.SorterPoolMembers)
+            |> Seq.collect (fun pool -> 
+                pool.SorterPoolMembers 
+                |> Seq.map (fun m -> pool.CeLength, m)
+            )
             |> Seq.toArray
 
         if allMembers.Length = 0 then 
@@ -34,10 +36,10 @@ module SorterPoolRunner =
                 if reEvaluateParents then
                     allMembers, Map.empty
                 else
-                    let toEval = allMembers |> Array.filter (fun m -> m.SorterEval.IsNone)
+                    let toEval = allMembers |> Array.filter (fun (_, m) -> m.SorterEval.IsNone)
                     let cached = 
                         allMembers 
-                        |> Seq.choose (fun m -> m.SorterEval |> Option.map (fun eval -> m.SorterPoolMemberId, eval))
+                        |> Seq.choose (fun (_, m) -> m.SorterEval |> Option.map (fun eval -> m.SorterPoolMemberId, eval))
                         |> Map.ofSeq
                     toEval, cached
 
@@ -48,7 +50,7 @@ module SorterPoolRunner =
                 // 3. Compile an ID mapping between sorterId and poolMemberId for the targets being evaluated
                 let idMapping = 
                     membersToEvaluate 
-                    |> Array.map (fun m -> 
+                    |> Array.map (fun (_, m) -> 
                         let modelId = SorterModel.getId m.SorterModel
                         let sorterId = %modelId |> UMX.tag<sorterId>
                         sorterId, m.SorterPoolMemberId
@@ -56,9 +58,10 @@ module SorterPoolRunner =
                     |> Map.ofArray
 
                 // 4. Materialize the filtered models into actual sorter executable structures
+                //    We wrap the pool's ceLength into an option block to match the original signature requirement
                 let sorters = 
                     membersToEvaluate 
-                    |> Array.map (fun m -> SorterModel.makeSorter m.SorterModel maxCeCount)
+                    |> Array.map (fun (ceLength, m) -> SorterModel.makeSorter m.SorterModel (Some ceLength))
 
                 // 5. Run the evaluation engine on the filtered pool subset
                 let collectNewSortableTests = false
