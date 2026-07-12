@@ -42,7 +42,8 @@ module SorterRunResult =
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
             (sorterCountPerPool: int<sorterCountPerPool>)
-            (initialPoolSet: sorterPoolSet) : sorterRunResult =
+            (initialPoolSet: sorterPoolSet) 
+            (sortedFractionThreshold: float<sortedFraction>): sorterRunResult =
 
         let rec loop (remainingSteps: int) (currentSet: sorterPoolSet) (historyAcc: sorterPoolSetDescription list) =
             if remainingSteps <= 0 then
@@ -71,6 +72,7 @@ module SorterRunResult =
                         selectionMeasure
                         reEvaluateParents
                         currentSet
+                        sortedFractionThreshold
 
                 loop (remainingSteps - 1) nextSet updatedHistory
 
@@ -92,12 +94,13 @@ module SorterRunResult =
             (srtrEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
             (initialPoolSet: sorterPoolSet)
+            (sortedFractionThreshold: float<sortedFraction>)
             (cts: CancellationToken)
             (log: string -> unit) : Async<Result<sorterRunResult, string>> =
 
         // --- Exponential Frequency Configuration ---
         let totalGenInt = int (genStart + genCount)
-        let targetGenerations = MathUtils.expSampler 1 totalGenInt MathUtils.cSample100K
+        let targetGenerations = MathUtils.expSampler 1 totalGenInt MathUtils.kSample10K
 
         let rec loop 
                     (remainingSteps: int) 
@@ -148,6 +151,7 @@ module SorterRunResult =
                             selectionMeasure
                             reEvaluateParents
                             currentSorterPoolSet
+                            sortedFractionThreshold
                             
 
                     // Only force a GC sweep every 50 generations to minimize overhead

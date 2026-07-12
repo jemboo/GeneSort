@@ -108,6 +108,7 @@ module MsrsSgdExecutor =
                                                         sorterEvalType
                                                         sorterEvalMeasure
                                                         seedSorterPoolSet
+                                                        sortedFraction
                                                         cts.Token
                                                         log
 

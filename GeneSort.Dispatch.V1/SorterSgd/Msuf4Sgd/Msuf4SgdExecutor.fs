@@ -114,6 +114,7 @@ module Msuf4SgdExecutor =
                                                         sorterEvalType
                                                         sorterEvalMeasure
                                                         seedSorterPoolSet
+                                                        sortedFraction
                                                         cts.Token
                                                         log
 

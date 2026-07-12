@@ -28,7 +28,7 @@ module Msuf4SgdSpecsRm =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [10000] |> List.map string)
+            (runParameters.generationLastKey, [1000] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
@@ -72,7 +72,7 @@ module Msuf4SgdSpecsRm =
                 orthoRate
                 paraRate
                 selfSymRate
-                seedModificationRate12
+                seedModificationRate03
                 modificationRateStage
                 sortingWidth32
                 mergeDimension8
@@ -86,12 +86,12 @@ module Msuf4SgdSpecsRm =
                 generationQueryFirst
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
-                sortedFraction90
+                sortedFractions
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 1
+            maxParallel = 8
         }
 
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {

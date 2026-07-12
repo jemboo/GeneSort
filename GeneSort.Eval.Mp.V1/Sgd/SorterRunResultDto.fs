@@ -26,7 +26,8 @@ type spmDescriptionDto = {
 type sorterPoolDescriptionDto = {
     [<Key(0)>] sorterPoolId: Guid
     [<Key(1)>] sorterPoolName: string
-    [<Key(2)>] spmDescriptionDtos: spmDescriptionDto array
+    [<Key(2)>] sorterPoolCeLength: int
+    [<Key(3)>] spmDescriptionDtos: spmDescriptionDto array
 }
 
 [<MessagePackObject>]
@@ -105,6 +106,7 @@ module SorterPoolSetDescriptionDto =
                     )
                 { 
                     sorterPoolDescriptionDto.sorterPoolId = UMX.untag p.SorterPoolId;
+                    sorterPoolDescriptionDto.sorterPoolCeLength = UMX.untag p.CeLength;
                     sorterPoolName = UMX.untag p.SorterPoolName;
                     spmDescriptionDtos = memberDtos 
                 }
@@ -134,6 +136,7 @@ module SorterPoolSetDescriptionDto =
                 sorterPoolDescription.create
                                 (p.sorterPoolId |> UMX.tag<sorterPoolId>) 
                                 (p.sorterPoolName |> UMX.tag<sorterPoolName>)
+                                (p.sorterPoolCeLength |> UMX.tag<ceLength>)
                                 memberDomains
             )
         sorterPoolSetDescription.Create

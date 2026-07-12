@@ -5,7 +5,6 @@ open GeneSort.Sorting.Sortable
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1
-open GeneSort.Sorting
 
 module SorterPipeline =
 
@@ -20,7 +19,8 @@ module SorterPipeline =
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
             (reEvaluateParents: bool)
-            (currentPoolSet: sorterPoolSet) : sorterPoolSet =
+            (currentPoolSet: sorterPoolSet) 
+            (sortedFractionThreshold: float<sortedFraction>) : sorterPoolSet =
 
         currentPoolSet
         // Step 1: Expand the population across all sub-pools
@@ -39,10 +39,13 @@ module SorterPipeline =
                 |> SorterPoolSet.updateSorterEvals computedEvals
         )
         
+        // Step 2b: Adjust the constraint boundaries based on performance thresholds
+        |> SorterPoolSet.adjustCeLengths sortedFractionThreshold
+        
         // Step 3: Trim out defective or un-optimized sorters down to baseline target capacities
         |> SorterPoolSet.pruneSorterPools 
-                            selectionMeasure
-                            prioritizeNewMutants
-                            distinctSorterHashes 
-                            sorterCountPerPool
+                    selectionMeasure
+                    prioritizeNewMutants
+                    distinctSorterHashes 
+                    sorterCountPerPool
         |> SorterPoolSet.advanceGeneration 1

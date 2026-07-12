@@ -108,6 +108,7 @@ module MssiSgdExecutor =
                                                         sorterEvalType
                                                         sorterEvalMeasure
                                                         seedSorterPoolSet
+                                                        sortedFraction
                                                         cts.Token
                                                         log
 

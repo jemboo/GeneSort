@@ -6,6 +6,7 @@ open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.Core
 open GeneSort.Eval.V1
+open GeneSort.Sorting
 
 
 type sorterPoolSet =
@@ -98,6 +99,49 @@ module SorterPoolSet =
         { poolSet with _sorterPools = prunedPools }
 
 
+    /// Dynamically scales each pool's CeLength by -5% if the fraction of fully sorted members 
+    /// meets/exceeds the threshold, or +5% otherwise.
+    let adjustCeLengths 
+            (sortedFractionThreshold: float<sortedFraction>) 
+            (poolSet: sorterPoolSet) : sorterPoolSet =
+        
+        let adjustedPools = 
+            poolSet._sorterPools
+            |> Map.map (fun _ pool ->
+                let members = pool.SorterPoolMembers |> Seq.toArray
+                if members.Length = 0 then 
+                    pool
+                else
+                    // Count how many members are actively marked as completely sorted
+                    let sortedCount = 
+                        members 
+                        |> Array.filter (fun m -> 
+                            match m.SorterEval with
+                            | Some eval -> SorterEval.getIsSorted eval
+                            | None -> false)
+                        |> Array.length
+                    
+                    let fraction = float sortedCount / float members.Length
+                    let currentCe = %pool.CeLength
+                    
+                    // Apply dynamic scaling boundaries (preventing drop below 1)
+                    let newCeRaw = 
+                        if fraction >= %sortedFractionThreshold then
+                            max 1 (int (round (float currentCe * 0.95)))
+                        else
+                            int (round (float currentCe * 1.05))
+                            
+                    let newCeLength = newCeRaw |> UMX.tag<ceLength>
+                    
+                    // Re-create the structural container with the scaled metric
+                    sorterPool.create 
+                        pool.SorterPoolId 
+                        pool.Name 
+                        members 
+                        newCeLength
+            )
+
+        { poolSet with _sorterPools = adjustedPools }
 
     /// Initializes a sorterPoolSet with poolCount pools from a sorterModelSet, each pool
     /// having sortersPerPool members. Takes the first (poolCount * sortersPerPool) sorters
