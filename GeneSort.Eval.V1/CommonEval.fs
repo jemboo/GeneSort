@@ -9,6 +9,7 @@ open FSharp.UMX
 [<Measure>] type sorterPoolName
 [<Measure>] type sorterPoolId
 [<Measure>] type sorterCountPerPool
+[<Measure>] type sortedFraction
 [<Measure>] type sorterPoolCount
 [<Measure>] type sorterChildCount
 

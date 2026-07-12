@@ -53,6 +53,7 @@ type runParameters =
     static member simpleSorterModelTypeKey = "SimpleSorterModelType"
     static member sortableCountKey = "SortableCount"
     static member sortableDataFormatKey = "SortableDataFormat"
+    static member sortedFractionKey = "SortedFraction"
     static member sorterChildCountKey = "SorterChildCount"
     static member sorterCountKey = "SorterCount"
     static member sorterCountPerPoolKey = "SorterCountPerPool"
@@ -228,6 +229,10 @@ type runParameters =
             try Some (SortableDataFormat.fromString v)
             with _ -> None)
 
+    member this.GetSortedFraction() =
+        runParameters.tryGetFloat runParameters.sortedFractionKey this.paramMap
+        |> Option.map UMX.tag<sortedFraction>
+
     member this.GetSorterChildCount() =
         runParameters.tryGetInt runParameters.sorterChildCountKey this.paramMap
         |> Option.map UMX.tag<sorterChildCount>
@@ -389,6 +394,9 @@ type runParameters =
 
     member this.WithSortableDataFormat(sdt: sortableDataFormat option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortableDataFormatKey (sdt |> Option.map SortableDataFormat.toString) }
+
+    member this.WithSortedFraction(sf: float<sortedFraction> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortedFractionKey (sf |> Option.map UmxExt.floatToRaw) }
 
     member this.WithSorterChildCount(scc: int<sorterCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterChildCountKey (scc |> Option.map UmxExt.intToRaw) }

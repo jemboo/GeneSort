@@ -44,6 +44,7 @@ module Msuf4SgdDbs =
                             (mdr: float<modificationRate>)
                             (dsh: bool<distinctSorterHashes>)
                             (pNm: bool<prioritizeNewMutants>)
+                            (sfrac: float<sortedFraction>)
                             (odt: outputDataType) : queryParams =
                 queryParams.create dbName (Some repl) odt
                     [| 
@@ -65,6 +66,7 @@ module Msuf4SgdDbs =
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
                        (runParameters.distinctSorterHashesKey, (Some %dsh) |> string)
                        (runParameters.prioritizeNewMutantsKey, (Some %pNm) |> string)
+                       (runParameters.sortedFractionKey, (Some %sfrac) |> string)
                     |]
 
 
@@ -93,12 +95,15 @@ module Msuf4SgdDbs =
                     let! mdr = rp.GetModificationRate()
                     let! dsh = rp.GetDistinctSorterHashes()
                     let! pNm = rp.GetPrioritizeNewMutants()
+                    let! sfrac = rp.GetSortedFraction()
                     return if genQf then
                             makeQueryParams rng genFirst scPP spc scc ses sem semi 
-                                            repl sw smt set sdMdr ortho para sym mdr dsh pNm odt 
+                                            repl sw smt set sdMdr ortho para sym mdr
+                                            dsh pNm sfrac odt 
                             else
                             makeQueryParams rng genLast scPP spc scc ses sem semi 
-                                            repl sw smt set sdMdr ortho para sym mdr dsh pNm odt 
+                                            repl sw smt set sdMdr ortho para sym mdr
+                                            dsh pNm sfrac odt 
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -137,6 +142,7 @@ module Msuf4SgdDbs =
                         (mdr: float<modificationRate>)
                         (dsh: bool<distinctSorterHashes>)
                         (pNm: bool<prioritizeNewMutants>)
+                        (sfrac: float<sortedFraction>)
                         (outputDataType: outputDataType) : queryParams =
 
                 queryParams.create 
@@ -165,6 +171,7 @@ module Msuf4SgdDbs =
                        (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
                        (runParameters.distinctSorterHashesKey, (Some %dsh) |> string)
                        (runParameters.prioritizeNewMutantsKey, (Some %pNm) |> string)
+                       (runParameters.sortedFractionKey, (Some %sfrac) |> string)
                     |]
 
 
@@ -196,14 +203,15 @@ module Msuf4SgdDbs =
                     let! mdr = rp.GetModificationRate()
                     let! dsh = rp.GetDistinctSorterHashes()
                     let! pNm = rp.GetPrioritizeNewMutants()
+                    let! sfrac = rp.GetSortedFraction()
                     return if genQf then
                             makeQueryParams rng genFirst scPP spc scc ses sem semi 
                                             repl sw smt md mst sdf set sdMdr ortho 
-                                            para sym mdr dsh pNm odt
+                                            para sym mdr dsh pNm sfrac odt
                             else
                             makeQueryParams rng genLast scPP spc scc ses sem semi 
                                             repl sw smt md mst sdf set sdMdr ortho 
-                                            para sym mdr dsh pNm odt
+                                            para sym mdr dsh pNm sfrac odt
                 }
 
 

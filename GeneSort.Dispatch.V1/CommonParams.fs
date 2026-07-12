@@ -123,6 +123,7 @@ module CommonParams =
     let mediumSortingWidths = 
             (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
 
+
     // MergeSortingWidths
     let testMergeSortingWidths = 
             (runParameters.sortingWidthKey, [16; 24; 32;] |> List.map string)
@@ -225,6 +226,7 @@ module CommonParams =
             (runParameters.modificationRateKey, [ 0.17; 0.21; 0.25; 0.29;] |> List.map string)
 
 
+    // prioritizeNewMutants
     let prioritizeNewMutantsBoth = 
             (runParameters.prioritizeNewMutantsKey, 
             [ true; false ] |> List.map string)
@@ -240,7 +242,7 @@ module CommonParams =
 
 
 
-
+    // distinctSorterHashes
     let distinctSorterHashesBoth = 
             (runParameters.distinctSorterHashesKey, [true; false] |> List.map string)
 
@@ -251,6 +253,7 @@ module CommonParams =
             (runParameters.distinctSorterHashesKey, [false] |> List.map string)
 
 
+    // SorterLib Ids
     let _sorterLibId24_4 = 
             SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix4
     let sorterLibId24_4 = 
@@ -265,6 +268,21 @@ module CommonParams =
             SorterLibId.create (32<sortingWidth>) sorterVariant.Prefix4
     let sorterLibId32_4 = 
             (runParameters.sorterLibIdKey, [_sorterLibId32_4] |> List.map SorterLibId.toString)
+
+
+    // Sorted Fractions
+    let sortedFractions = 
+            (runParameters.sortedFractionKey, [0.5; 0.75; 0.90; 0.95; 0.99] |> List.map string)
+
+    let sortedFraction90 = 
+            (runParameters.sortedFractionKey, [0.90] |> List.map string)
+
+    let sortedFraction95 = 
+            (runParameters.sortedFractionKey, [0.95] |> List.map string)
+
+    let sortedFraction99 = 
+            (runParameters.sortedFractionKey, [0.99] |> List.map string)
+
 
 
 

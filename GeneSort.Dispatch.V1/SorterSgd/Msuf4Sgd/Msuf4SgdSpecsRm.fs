@@ -86,6 +86,7 @@ module Msuf4SgdSpecsRm =
                 generationQueryFirst
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
+                sortedFraction90
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -119,6 +120,7 @@ module Msuf4SgdSpecsRm =
                 generationFirst
                 generationLast
                 generationQueryFirst
+                sortedFraction90
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -152,6 +154,7 @@ module Msuf4SgdSpecsRm =
                 generationFirst
                 generationLast
                 generationQueryFirst
+                sortedFraction90
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer

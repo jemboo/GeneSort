@@ -47,6 +47,7 @@ module MsceSgdExecutor =
                 let! sorterEvalMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
                 let! sorterEvalType = rp.GetSorterEvalType() |> Result.ofOption "Missing sorterEvalType."
                 let! distinctSorterHashes = rp.GetDistinctSorterHashes() |> Result.ofOption "Missing distinctSorterHashes."
+                let! sortedFraction = rp.GetSortedFraction() |> Result.ofOption "Missing sortedFraction."
                 let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
 
                 // 2. Resolve target seed sorterPoolSet collection state depending on genFirst criteria
