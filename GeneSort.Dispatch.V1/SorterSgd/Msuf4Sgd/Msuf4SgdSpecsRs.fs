@@ -77,7 +77,7 @@ module Msuf4SgdSpecsRs =
                 paraRate
                 selfSymRate
                 seedModificationRate12
-                modificationRateStage
+                modificationRatesMsuf4
                 sortingWidth16
                 poolCount30
                 oneSorterPerPool
@@ -109,7 +109,7 @@ module Msuf4SgdSpecsRs =
                 paraRate
                 selfSymRate
                 seedModificationRate12
-                modificationRateStage
+                modificationRatesMsuf4
                 sortingWidth16
                 poolCount30
                 oneSorterPerPool

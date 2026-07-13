@@ -46,6 +46,8 @@ module CommonParams =
     let oneAndTwoSortersPerPool = (runParameters.sorterCountPerPoolKey, ["1"; "2";] )
     let oneToFourSortersPerPool = (runParameters.sorterCountPerPoolKey, ["1"; "2"; "4"] )
     let fourTo32SortersPerPool = (runParameters.sorterCountPerPoolKey, ["4"; "8"; "16"; "32"] )
+    let mid3SortersPerPool = (runParameters.sorterCountPerPoolKey, ["64"; "128"; "256"] )
+
     
     let oneSorterPerPool = (runParameters.sorterCountPerPoolKey, ["1";] )
     let twoSortersPerPool = (runParameters.sorterCountPerPoolKey, ["2";] )
@@ -55,12 +57,12 @@ module CommonParams =
     let thirtyTwoSortersPerPool = (runParameters.sorterCountPerPoolKey, ["32";] )
     let sixtyFourSortersPerPool = (runParameters.sorterCountPerPoolKey, ["64";] )
     let oneTwenty8SortersPerPool = (runParameters.sorterCountPerPoolKey, ["128";] )
+    let twoFifty6SortersPerPool = (runParameters.sorterCountPerPoolKey, ["256";] )
     let fiveTwelveSortersPerPool = (runParameters.sorterCountPerPoolKey, ["512";] )
     let oneKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["1024";] )
     let twoKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["2048";] )
     let fourKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["4096";] )
     let eightKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["8192";] )
-
 
     // SorterPoolCounts
     let poolCount1 = (runParameters.sorterPoolCountKey, ["1";] )
@@ -223,8 +225,8 @@ module CommonParams =
     let modificationRatesMsce =
         (runParameters.modificationRateKey, [ 0.02; 0.035; 0.045; 0.05; 0.055; 0.065; 0.08 ] |> List.map string)
 
-    let modificationRateStage =
-            (runParameters.modificationRateKey, [0.03;] |> List.map string)
+    let modificationRatesMsuf4 =
+            (runParameters.modificationRateKey, [0.02; 0.03; 0.04;] |> List.map string)
 
     let modificationRatesStage =
             (runParameters.modificationRateKey, [ 0.04; 0.08; 0.16; 0.24;] |> List.map string)
@@ -282,7 +284,7 @@ module CommonParams =
 
     // Sorted Fractions
     let sortedFractions = 
-            (runParameters.sortedFractionKey, [0.80; 0.85; 0.90; 0.93; 0.95; 0.98; 0.99; 0.995] |> List.map string)
+            (runParameters.sortedFractionKey, [0.65; 0.75; 0.85; 0.90; 0.95; 0.98; 0.99; 0.995] |> List.map string)
 
     let sortedFraction90 = 
             (runParameters.sortedFractionKey, [0.90] |> List.map string)

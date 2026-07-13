@@ -55,7 +55,7 @@ module MssiMutateSpecsRm =
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
-                modificationRateStage
+                modificationRatesMsuf4
                 testMergeSortingWidths
                 mssiModelType
                 testMergeDimensions
@@ -80,7 +80,7 @@ module MssiMutateSpecsRm =
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
-                modificationRateStage
+                modificationRatesMsuf4
                 smallMergeSortingWidths
                 mssiModelType
                 lowMergeDimensions
@@ -105,7 +105,7 @@ module MssiMutateSpecsRm =
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
-                modificationRateStage
+                modificationRatesMsuf4
                 mediumMergeSortingWidths
                 mssiModelType
                 lowMergeDimensions
@@ -130,7 +130,7 @@ module MssiMutateSpecsRm =
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
-                modificationRateStage
+                modificationRatesMsuf4
                 mediumMergeSortingWidths
                 mssiModelType
                 mergeDimension6
@@ -155,7 +155,7 @@ module MssiMutateSpecsRm =
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
-                modificationRateStage
+                modificationRatesMsuf4
                 largeMergeSortingWidths
                 mssiModelType
                 mergeDimension2

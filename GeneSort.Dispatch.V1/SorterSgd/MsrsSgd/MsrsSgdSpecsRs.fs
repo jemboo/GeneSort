@@ -71,7 +71,7 @@ module MsrsSgdSpecsRs =
                 orthoRate
                 paraRate
                 selfSymRate
-                modificationRateStage
+                modificationRatesMsuf4
                 sortingWidth16
                 poolCount10
                 oneSorterPerPool
@@ -132,7 +132,7 @@ module MsrsSgdSpecsRs =
                 orthoRate
                 paraRate
                 selfSymRate
-                modificationRateStage
+                modificationRatesMsuf4
                 sortingWidth16
                 poolCount10
                 oneSorterPerPool
@@ -161,7 +161,7 @@ module MsrsSgdSpecsRs =
                 orthoRate
                 paraRate
                 selfSymRate
-                modificationRateStage
+                modificationRatesMsuf4
                 sortingWidth16
                 poolCount10
                 oneSorterPerPool
