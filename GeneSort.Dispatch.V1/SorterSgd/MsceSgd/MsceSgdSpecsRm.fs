@@ -102,6 +102,7 @@ module MsceSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
                 mergeDimension2
@@ -134,6 +135,7 @@ module MsceSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
                 mergeDimension2
@@ -166,6 +168,7 @@ module MsceSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
                 testMergeDimensions
@@ -198,6 +201,7 @@ module MsceSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
                 testMergeDimensions
@@ -230,6 +234,7 @@ module MsceSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
                 testMergeDimensions
@@ -263,6 +268,7 @@ module MsceSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
                 testMergeDimensions

@@ -76,6 +76,7 @@ module MssiSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
             ]
@@ -107,6 +108,7 @@ module MssiSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
             ]
@@ -138,6 +140,7 @@ module MssiSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
             ]

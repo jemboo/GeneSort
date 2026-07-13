@@ -94,6 +94,7 @@ module MsceSgdSpecsRs =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
             ]
@@ -123,6 +124,7 @@ module MsceSgdSpecsRs =
                 fourKSortersPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
                 distinctSorterHashesTrue
@@ -154,6 +156,7 @@ module MsceSgdSpecsRs =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
             ]
@@ -183,6 +186,7 @@ module MsceSgdSpecsRs =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
             ]

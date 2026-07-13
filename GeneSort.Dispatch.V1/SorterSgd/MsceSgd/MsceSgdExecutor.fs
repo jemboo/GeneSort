@@ -14,7 +14,6 @@ open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterSgd
 open GeneSort.Eval.V1.Sgd
-open GeneSort.Eval.V1
 
 
 module MsceSgdExecutor =
@@ -41,6 +40,7 @@ module MsceSgdExecutor =
                 // 1. Gather all required run metrics and options out of your parameters block securely
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
                 let! genFirst = rp.GetGenerationFirst() |> Result.ofOption "Missing genFirst."
+                let! genReportInterval = rp.GetGenerationReportInterval() |> Result.ofOption "Missing generation report interval."
                 let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
                 let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
                 let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count"
@@ -79,7 +79,6 @@ module MsceSgdExecutor =
                 let! sortableTest = makeSortableTests rp
                 
                 log "Making sorterModelMutator..."
-                // Rates for mutator creation
                 let! mutationRate = rp.GetMutationRate() |> Result.ofOption "Missing mutationRate."
                 let! insertionRate = rp.GetInsertionRate() |> Result.ofOption "Missing insertionRate."
                 let! deletionRate = rp.GetDeletionRate() |> Result.ofOption "Missing deletionRate."
@@ -87,44 +86,30 @@ module MsceSgdExecutor =
 
                 let sorterModelMutator = 
                     SimpleSorterModelMutator.getMsceModelMutator
-                                (RngFactory.create rngType) 
-                                ExcludeSelfCe 
-                                modificationRate 
-                                mutationRate
-                                insertionRate
-                                deletionRate
+                        (RngFactory.create rngType) 
+                        ExcludeSelfCe 
+                        modificationRate 
+                        mutationRate
+                        insertionRate
+                        deletionRate
                     |> sorterModelMutator.Simple
 
-                log "Executing SorterRunResult.runEvolutionAsync..."
-                let! (runResult: sorterRunResult) = SorterRunResult.runEvolutionAsync
-                                                        genFirst
-                                                        (genLast - genFirst)
-                                                        sorterModelMutator
-                                                        prioritizeNewMutants
-                                                        distinctSorterHashes
-                                                        sortersPerPool
-                                                        sorterChildCount
-                                                        sortableTest
-                                                        sorterEvalType
-                                                        sorterEvalMeasure
-                                                        seedSorterPoolSet
-                                                        sortedFraction
-                                                        cts.Token
-                                                        log
+                // 3. Define the step strategy closure
+                let stepExecutionStrategy targetGenFirst stepSize workingPoolSet =
+                    SorterRunResult.runEvolutionAsync
+                        targetGenFirst stepSize sorterModelMutator prioritizeNewMutants 
+                        distinctSorterHashes sortersPerPool sorterChildCount sortableTest 
+                        sorterEvalType sorterEvalMeasure workingPoolSet sortedFraction cts.Token log
 
-                // 4. Persistence of run stats mapping results out to output streams
-
-                let newRp = rp.WithQueryWithGenFirst (Some false)
-                let! qpSorterRunResult = 
-                    host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.SorterRunResult "")
-                    |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
-
-                log (sprintf "Saving SorterRunResult - Id: %s" (string qpSorterRunResult.Id))
-                do! host.RunDb.saveAsync qpSorterRunResult (runResult |> outputData.SorterRunResult) allowOverwrite
-                
+                // 4. Hand execution over to the centralized orchestrator loop
+                log "Executing chunked SorterRunResult loop via loop manager..."
+                let! finalRp: runParameters = 
+                    EvolutionOrchestrator.runSlicesInLoop
+                        host rp genFirst genLast genReportInterval 
+                        seedSorterPoolSet allowOverwrite cts.Token log stepExecutionStrategy
                 
                 log "evaluateEvolutionRun completed."
-                return newRp.WithRunFinished (Some true)
+                return finalRp.WithRunFinished (Some true)
 
             with e -> 
                 let errorMsg = sprintf "Error in evaluateEvolutionRun: %s" e.Message
@@ -137,24 +122,23 @@ module MsceSgdExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 evaluateEvolutionRun
-                    CommonSorterSgd.makeStandardTests
-                    CommonSorterSgd.createSeedSorterPoolSetStandard
+                    SortableTestMakers.makeStandardTests
+                    PoolSetMakers.createSeedSorterPoolSetStandard
                     host rp allowOverwrite cts progress }
 
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 evaluateEvolutionRun
-                    CommonSorterSgd.makeMergeTests
-                    CommonSorterSgd.createSeedSorterPoolSetMerge
+                    SortableTestMakers.makeMergeTests
+                    PoolSetMakers.createSeedSorterPoolSetMerge
                     host rp allowOverwrite cts progress }
 
     let fullReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                CommonSorterSgd.makeFullReport
+                Reporting.makeFullReport
                     host rp allowOverwrite cts progress }
-
 
 
     let getExecutor (executorType: sorterSgdExecutorType) : IRunParamsExecutor =

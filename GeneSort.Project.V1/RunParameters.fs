@@ -26,7 +26,9 @@ type runParameters =
     static member distinctSorterHashesKey = "DistinctSorterHashes"
     static member elapsedTimeKey = "ElapsedTime"
     static member excludeSelfCeKey = "ExcludeSelfCe"
+    static member generationCurrentKey = "GenerationCurrent"
     static member generationFirstKey = "GenerationFirst"
+    static member generationReportIntervalKey = "GenerationReportInterval"
     static member generationLastKey = "GenerationLast"
     static member queryWithGenFirst = "QueryWithGenFirst"
     static member idKey = "Id"
@@ -122,8 +124,16 @@ type runParameters =
         runParameters.tryGetBool runParameters.excludeSelfCeKey this.paramMap
         |> Option.map UMX.tag<excludeSelfCe>
 
+    member this.GetGenerationCurrent() =
+        runParameters.tryGetInt runParameters.generationCurrentKey this.paramMap
+        |> Option.map UMX.tag<generationNumber>
+
     member this.GetGenerationFirst() =
         runParameters.tryGetInt runParameters.generationFirstKey this.paramMap
+        |> Option.map UMX.tag<generationNumber>
+
+    member this.GetGenerationReportInterval() =
+        runParameters.tryGetInt runParameters.generationReportIntervalKey this.paramMap
         |> Option.map UMX.tag<generationNumber>
 
     member this.GetGenerationLast() =
@@ -314,8 +324,14 @@ type runParameters =
     member this.WithExcludeSelfCe(esc: bool<excludeSelfCe> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.excludeSelfCeKey (esc |> Option.map UmxExt.boolToRaw) }
 
+    member this.WithGenerationCurrent(gen: int<generationNumber> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationCurrentKey (gen |> Option.map UmxExt.intToRaw) }
+
     member this.WithGenerationFirst(gen: int<generationNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationFirstKey (gen |> Option.map UmxExt.intToRaw) }
+
+    member this.WithGenerationReportInterval(gen: int<generationNumber> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationReportIntervalKey (gen |> Option.map UmxExt.intToRaw) }
 
     member this.WithGenerationLast(gen: int<generationNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationLastKey (gen |> Option.map UmxExt.intToRaw) }

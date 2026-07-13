@@ -73,7 +73,7 @@ module Msuf4SgdSpecsRm =
                 paraRate
                 selfSymRate
                 seedModificationRate03
-                modificationRatesMsuf4
+                modificationRate03
                 sortingWidth32
                 mergeDimension8
                 noSuffixSuffixType
@@ -82,11 +82,12 @@ module Msuf4SgdSpecsRm =
                 thirtyTwoSortersPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
-                sortedFractions
+                sortedFraction90
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -118,6 +119,7 @@ module Msuf4SgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
                 sortedFraction90
@@ -152,6 +154,7 @@ module Msuf4SgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
                 sortedFraction90

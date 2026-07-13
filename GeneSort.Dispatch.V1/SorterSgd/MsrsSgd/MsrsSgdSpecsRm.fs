@@ -80,6 +80,7 @@ module MsrsSgdSpecsRm =
                 oneTwenty8SortersPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
                 distinctSorterHashesTrue
@@ -114,6 +115,7 @@ module MsrsSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
             ]
@@ -146,6 +148,7 @@ module MsrsSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationFirst
+                genReportInterval10
                 generationLast
                 generationQueryFirst
             ]

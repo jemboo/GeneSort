@@ -141,7 +141,7 @@ module Msuf4SgdSpecsRs =
                 paraRate
                 selfSymRate
                 seedModificationRate10
-                modificationRatesStageR3
+                modificationRate03
                 sortingWidth16
                 poolCount1
                 fourKSortersPerPool
