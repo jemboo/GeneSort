@@ -26,7 +26,7 @@ module Msuf4SgdDbs =
 
             let makeQueryParams
                             (rng: rngType)
-                            (genLast: int<generationNumber>)
+                            (genCurrent: int<generationNumber>)
                             (sorterCtPerPool: int<sorterCountPerPool>)
                             (sorterPoolCt: int<sorterPoolCount>)
                             (childCt: int<sorterChildCount>)
@@ -49,7 +49,7 @@ module Msuf4SgdDbs =
                 queryParams.create dbName (Some repl) odt
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                       (runParameters.generationLastKey, (Some genLast) |> GenerationNumber.toString)
+                       (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
                        (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                        (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                        (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
@@ -75,9 +75,7 @@ module Msuf4SgdDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! genFirst = rp.GetGenerationFirst()
-                    let! genLast = rp.GetGenerationLast()
-                    let! genQf = rp.GetQueryWithGenFirst()
+                    let! curGen = rp.GetGenerationCurrent()
                     let! scPP = rp.GetSorterCountPerPool()
                     let! spc = rp.GetSorterPoolCount()
                     let! scc = rp.GetSorterChildCount()
@@ -96,14 +94,9 @@ module Msuf4SgdDbs =
                     let! dsh = rp.GetDistinctSorterHashes()
                     let! pNm = rp.GetPrioritizeNewMutants()
                     let! sfrac = rp.GetSortedFraction()
-                    return if genQf then
-                            makeQueryParams rng genFirst scPP spc scc ses sem semi 
-                                            repl sw smt set sdMdr ortho para sym mdr
-                                            dsh pNm sfrac odt 
-                            else
-                            makeQueryParams rng genLast scPP spc scc ses sem semi 
-                                            repl sw smt set sdMdr ortho para sym mdr
-                                            dsh pNm sfrac odt 
+                    return makeQueryParams rng curGen scPP spc scc ses sem semi 
+                                    repl sw smt set sdMdr ortho para sym mdr
+                                    dsh pNm sfrac odt
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -121,7 +114,7 @@ module Msuf4SgdDbs =
 
             let makeQueryParams
                         (rng: rngType)
-                        (genLast: int<generationNumber>)
+                        (genCurrent: int<generationNumber>)
                         (sorterCtPerPool: int<sorterCountPerPool>)
                         (sorterPoolCt: int<sorterPoolCount>)
                         (childCt: int<sorterChildCount>)
@@ -151,7 +144,7 @@ module Msuf4SgdDbs =
                     outputDataType
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                       (runParameters.generationLastKey, (Some genLast) |> GenerationNumber.toString)
+                       (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
                        (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                        (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                        (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
@@ -180,9 +173,7 @@ module Msuf4SgdDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! rng = rp.GetRngType()
-                    let! genFirst = rp.GetGenerationFirst()
-                    let! genLast = rp.GetGenerationLast()
-                    let! genQf = rp.GetQueryWithGenFirst()
+                    let! curGen = rp.GetGenerationCurrent()
                     let! scPP = rp.GetSorterCountPerPool()
                     let! spc = rp.GetSorterPoolCount()
                     let! scc = rp.GetSorterChildCount()
@@ -204,14 +195,10 @@ module Msuf4SgdDbs =
                     let! dsh = rp.GetDistinctSorterHashes()
                     let! pNm = rp.GetPrioritizeNewMutants()
                     let! sfrac = rp.GetSortedFraction()
-                    return if genQf then
-                            makeQueryParams rng genFirst scPP spc scc ses sem semi 
+                    return makeQueryParams rng curGen scPP spc scc ses sem semi 
                                             repl sw smt md mst sdf set sdMdr ortho 
                                             para sym mdr dsh pNm sfrac odt
-                            else
-                            makeQueryParams rng genLast scPP spc scc ses sem semi 
-                                            repl sw smt md mst sdf set sdMdr ortho 
-                                            para sym mdr dsh pNm sfrac odt
+
                 }
 
 

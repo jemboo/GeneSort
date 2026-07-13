@@ -14,6 +14,7 @@ open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterSgd
+open GeneSort.Eval.V1
 
 
 module Msuf4SgdExecutor =
@@ -37,7 +38,7 @@ module Msuf4SgdExecutor =
 
                 // 1. Core structural control parameters
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
-                let! genFirst = rp.GetGenerationFirst() |> Result.ofOption "Missing genFirst."
+                let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
                 let! genReportInterval = rp.GetGenerationReportInterval() |> Result.ofOption "Missing generation report interval."
                 
                 // 2. Engine Specific parameters 
@@ -52,11 +53,10 @@ module Msuf4SgdExecutor =
                 let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
 
                 let! initialSeedPoolSet = 
-                    if %genFirst > 0 then
+                    if %genCurrent > 0 then
                         log "Looking up historical sorterPoolSet from database..."
-                        let newRp = rp.WithQueryWithGenFirst (Some true)
                         let qpSRRResult = 
-                            host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.SorterRunResult "")
+                            host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterRunResult "")
                             |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
                         asyncResult {
                             let! qpSRR = qpSRRResult 
@@ -93,7 +93,7 @@ module Msuf4SgdExecutor =
                 // 4. Hand execution over to the centralized orchestrator loop
                 let! finalRp: runParameters = 
                     EvolutionOrchestrator.runSlicesInLoop
-                        host rp genFirst genLast genReportInterval 
+                        host rp genCurrent genLast genReportInterval 
                         initialSeedPoolSet allowOverwrite cts.Token log 
                         stepExecutionStrategy
 

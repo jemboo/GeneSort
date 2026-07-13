@@ -28,10 +28,10 @@ module Msuf4SgdSpecsRm =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [20] |> List.map string)
+            (runParameters.generationLastKey, [50] |> List.map string)
 
-    let generationFirst = 
-            (runParameters.generationFirstKey, [0] |> List.map string)
+    let generationCurrent = 
+            (runParameters.generationCurrentKey, [20] |> List.map string)
             
 
     let generationQueryFirst = 
@@ -81,7 +81,7 @@ module Msuf4SgdSpecsRm =
                 poolCount1
                 thirtyTwoSortersPerPool
                 oneChildCount
-                generationFirst
+                generationCurrent
                 genReportInterval10
                 generationLast
                 generationQueryFirst
@@ -118,7 +118,7 @@ module Msuf4SgdSpecsRm =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
+                generationCurrent
                 genReportInterval10
                 generationLast
                 generationQueryFirst
@@ -153,7 +153,7 @@ module Msuf4SgdSpecsRm =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
+                generationCurrent
                 genReportInterval10
                 generationLast
                 generationQueryFirst

@@ -50,9 +50,7 @@ module EvolutionOrchestrator =
 
                     let stepRp = 
                         currentRp
-                            .WithGenerationFirst(Some currentGenFirst)
-                            .WithGenerationLast(Some currentGenLast)
-                            .WithQueryWithGenFirst(Some false)
+                            .WithGenerationCurrent(Some currentGenLast)
 
                     let! qpSorterRunResult = 
                         host.RunDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterRunResult "")

@@ -91,7 +91,7 @@ module PoolSetMakers =
                     simpleSorterModelType 
                     mergeDimension
                     mergeSuffixType
-                    GeneSort.SortingOps.sorterEvalType.V2
+                    sorterEvalType.V2
 
             let seedSorterModelGen = 
                 CommonSorterEval.getSimpleUniformSorterModelGen 
