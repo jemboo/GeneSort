@@ -13,9 +13,9 @@ type sorterPool =
         _name: string<sorterPoolName>
         _sorterPoolId: Guid<sorterPoolId>
         _sorterPoolMembers: Map<Guid<sorterPoolMemberId>, sorterPoolMember>
-        _ceLength: int<ceLength>
+        _rawCeLength: int<ceLength>
     }
-    member this.CeLength with get() = this._ceLength
+    member this.RawCeLength with get() = this._rawCeLength
     member this.Name with get() = this._name
     member this.SorterPoolMembers with get() :sorterPoolMember seq =
         Map.values this._sorterPoolMembers
@@ -26,7 +26,7 @@ type sorterPool =
             (sorterPoolId: Guid<sorterPoolId>) 
             (name: string<sorterPoolName>)
             (members: sorterPoolMember []) 
-            (ceLength: int<ceLength>) =
+            (rawCeLength: int<ceLength>) =
         let membersMap = 
             members
             |> Seq.map (fun m -> m.SorterPoolMemberId, m)
@@ -35,7 +35,7 @@ type sorterPool =
             _name = name
             _sorterPoolId = sorterPoolId
             _sorterPoolMembers = membersMap
-            _ceLength = ceLength
+            _rawCeLength = rawCeLength
         }
 
 
@@ -180,5 +180,5 @@ module SorterPool =
             |> Seq.map snd
             |> Seq.toArray
 
-        sorterPool.create pool.SorterPoolId pool.Name sortedSurvivors pool.CeLength
+        sorterPool.create pool.SorterPoolId pool.Name sortedSurvivors pool.RawCeLength
 

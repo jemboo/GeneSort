@@ -15,9 +15,9 @@ type sorterPoolSet =
         _sorterPools: Map<Guid<sorterPoolId>, sorterPool>
         _generationNumber: int<generationNumber>
     }
-    member this.SorterPoolSetId = this._sorterPoolSetId
-    member this.SorterPools = this._sorterPools
-    member this.GenerationNumber = this._generationNumber
+    member this.SorterPoolSetId with get() = this._sorterPoolSetId
+    member this.SorterPools with get() = this._sorterPools
+    member this.GenerationNumber with get() = this._generationNumber
 
     static member Create(sorterPoolSetId, generationNumber, ?pools: seq<sorterPool>) =
         let poolsMap = 
@@ -122,7 +122,7 @@ module SorterPoolSet =
                         |> Array.length
                     
                     let fraction = float sortedCount / float members.Length
-                    let currentCe = %pool.CeLength
+                    let currentCe = %pool.RawCeLength
                     
                     // Apply dynamic scaling boundaries (preventing drop below 1)
                     let newCeRaw = 
@@ -193,7 +193,7 @@ module SorterPoolSet =
 
                 // 4. Wrap the evaluated array segment block inside an explicit tracking pool object container
                 let poolId = Guid.NewGuid() |> UMX.tag<sorterPoolId>
-                sorterPool.create poolId poolName sorterPoolMembers modelSet.MaxCeLength
+                sorterPool.create poolId poolName sorterPoolMembers modelSet.RawCeLength
             )
 
         // 5. Package the complete group layout structure back out to the main generational repository root

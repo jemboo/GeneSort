@@ -91,7 +91,7 @@ module Msuf4SgdSpecsRs =
             filter = paramMapFilter
             enhancer = standardEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 8
+            maxParallel = 1
         }
 
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {

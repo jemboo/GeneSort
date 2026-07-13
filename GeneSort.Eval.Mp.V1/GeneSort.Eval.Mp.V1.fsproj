@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <Compile Include="Sgd\SorterMutationSourceDto.fs" />
+    <Compile Include="Sgd\SorterPoolSetDto.fs" />
+    <Compile Include="Sgd\SorterPoolSetSummaryDto.fs" />
     <Compile Include="Sgd\SorterRunResultDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

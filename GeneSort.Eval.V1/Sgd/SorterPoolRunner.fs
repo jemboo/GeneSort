@@ -24,7 +24,7 @@ module SorterPoolRunner =
             |> Map.values
             |> Seq.collect (fun pool -> 
                 pool.SorterPoolMembers 
-                |> Seq.map (fun m -> pool.CeLength, m)
+                |> Seq.map (fun m -> pool.RawCeLength, m)
             )
             |> Seq.toArray
 

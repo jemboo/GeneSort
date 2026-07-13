@@ -282,7 +282,7 @@ module CommonParams =
 
     // Sorted Fractions
     let sortedFractions = 
-            (runParameters.sortedFractionKey, [0.95; 0.98; 0.99; 0.995] |> List.map string)
+            (runParameters.sortedFractionKey, [0.80; 0.85; 0.90; 0.93; 0.95; 0.98; 0.99; 0.995] |> List.map string)
 
     let sortedFraction90 = 
             (runParameters.sortedFractionKey, [0.90] |> List.map string)

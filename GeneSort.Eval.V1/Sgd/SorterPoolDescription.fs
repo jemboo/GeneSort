@@ -65,10 +65,10 @@ type sorterPoolDescription =
         _sorterPoolId: Guid<sorterPoolId>
         _sorterPoolName: string<sorterPoolName>
         _sorterPoolMembers: spmDescription array
-        _ceLength: int<ceLength>
+        _rawCeLength: int<ceLength>
     }
 
-    member this.CeLength with get() = this._ceLength
+    member this.RawCeLength with get() = this._rawCeLength
     member this.SorterPoolId with get() = this._sorterPoolId
     member this.SorterPoolName with get() = this._sorterPoolName
     member this.SorterPoolMembers with get() = this._sorterPoolMembers
@@ -76,9 +76,11 @@ type sorterPoolDescription =
     static member create 
                     (poolId: Guid<sorterPoolId>) 
                     (sorterPoolName: string<sorterPoolName>) 
-                    (ceLength: int<ceLength>) 
+                    (rawCeLength: int<ceLength>) 
                     (spmDescriptions: spmDescription []) =
-        { _sorterPoolId = poolId; _ceLength = ceLength; _sorterPoolName = sorterPoolName; 
+        { _sorterPoolId = poolId; 
+          _rawCeLength = rawCeLength; 
+          _sorterPoolName = sorterPoolName; 
           _sorterPoolMembers = spmDescriptions }
 
 
@@ -120,7 +122,7 @@ module SorterPoolSetDescription =
                 sorterPoolDescription.create 
                             pool.SorterPoolId 
                             pool.Name 
-                            pool.CeLength 
+                            pool.RawCeLength 
                             memberDescriptions
             )
             |> Seq.toArray
@@ -146,7 +148,7 @@ module SorterPoolSetDescription =
             let poolContextDtr =
                 setContextDtr
                 |> dataTableRecord.addData (sprintf "%sSorterPoolId" prefix) (string (%poolDesc.SorterPoolId))
-                |> dataTableRecord.addData (sprintf "%sSorterPoolCeLength" prefix) (string (%poolDesc.CeLength))
+                |> dataTableRecord.addData (sprintf "%sRawCeLength" prefix) (string (%poolDesc.RawCeLength))
                 |> dataTableRecord.addData (sprintf "%sSorterPoolName" prefix) (string (%poolDesc.SorterPoolName))
 
             // 2b. Map every single pool member, flattening and combining structures upward

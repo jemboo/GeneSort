@@ -15,7 +15,7 @@ module Msuf4SgdSpecsRm =
 
     let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.RankSpan 600<sorterCount>;] 
+            [ sorterEvalSelectionType.RankSpan 1200<sorterCount>;] 
             |> List.map SorterEvalSelectionType.toString)
 
 
@@ -28,7 +28,7 @@ module Msuf4SgdSpecsRm =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [1000] |> List.map string)
+            (runParameters.generationLastKey, [20] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
@@ -79,7 +79,7 @@ module Msuf4SgdSpecsRm =
                 noSuffixSuffixType
                 dataFormatInt8v512
                 poolCount1
-                oneTwenty8SortersPerPool
+                thirtyTwoSortersPerPool
                 oneChildCount
                 generationFirst
                 generationLast
@@ -91,7 +91,7 @@ module Msuf4SgdSpecsRm =
             filter = paramMapFilter
             enhancer = standardEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 8
+            maxParallel = 1
         }
 
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {

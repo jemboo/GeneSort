@@ -13,7 +13,7 @@ type sorterModelSet =
         { 
           id: Guid<sorterModelSetId>
           sortingMap: Map<Guid<sorterModelId>, sorterModel>
-          maxCeLength: int<ceLength>
+          rawCeLength: int<ceLength>
         }
         with
         static member create 
@@ -25,15 +25,15 @@ type sorterModelSet =
                 |> Array.map (fun sm -> (SorterModel.getId sm, sm))
                 |> Map.ofArray
 
-            { id = id; sortingMap = modelMap; maxCeLength = maxCeLength }
+            { id = id; sortingMap = modelMap; rawCeLength = maxCeLength }
 
         member this.Count with get() = this.sortingMap.Count
         member this.Id with get() = this.id
-        member this.MaxCeLength with get() = this.maxCeLength
+        member this.RawCeLength with get() = this.rawCeLength
         member this.SorterModels with get() : sorterModel array = 
                     this.sortingMap |> Map.toArray |> Array.map snd
         static member empty: sorterModelSet =
-            { id = Guid.Empty |> UMX.tag; sortingMap = Map.empty; maxCeLength = 0<ceLength> }
+            { id = Guid.Empty |> UMX.tag; sortingMap = Map.empty; rawCeLength = 0<ceLength> }
 
 
 module SorterModelSet =

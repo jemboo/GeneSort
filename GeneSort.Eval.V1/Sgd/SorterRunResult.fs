@@ -8,76 +8,25 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Core
 open System
 open GeneSort.Eval.V1
-open GeneSort.Sorting
 
-
-/// Holds the combined results of the historical optimization run
+/// Holds the combined results of the historical optimization run using light snapshot telemetry
 type sorterRunResult = 
     private {
-        _intermediateHistory: sorterPoolSetDescription array
+        _intermediateHistory: sorterPoolSetSummary array
         _finalPoolSet: sorterPoolSet
     }
     member this.FinalPoolSet with get() = this._finalPoolSet
     member this.IntermediateHistory with get() = this._intermediateHistory
     static member create 
                     (finalPoolSet:sorterPoolSet) 
-                    (intermediateHistory:sorterPoolSetDescription []) =
+                    (intermediateHistory:sorterPoolSetSummary []) =
             {
                 _intermediateHistory = intermediateHistory
                 _finalPoolSet = finalPoolSet
             }
 
+
 module SorterRunResult =
-
-    /// Recursively runs the generation loop step N times. 
-    /// Saves optimized lightweight history tokens for intermediate steps, 
-    /// and preserves the fully realized heavy pool data structure on the final step.
-    let runEvolution 
-            (genCount: int<generationNumber>)
-            (mutator: sorterModelMutator)
-            (prioritizeNewMutants: bool<prioritizeNewMutants>)
-            (distinctSorterHashes: bool<distinctSorterHashes>)
-            (sorterChildCount: int<sorterChildCount>)
-            (sortableTest: sortableTest)
-            (sorterEvalType: sorterEvalType)
-            (selectionMeasure: sorterEvalMeasure)
-            (sorterCountPerPool: int<sorterCountPerPool>)
-            (initialPoolSet: sorterPoolSet) 
-            (sortedFractionThreshold: float<sortedFraction>): sorterRunResult =
-
-        let rec loop (remainingSteps: int) (currentSet: sorterPoolSet) (historyAcc: sorterPoolSetDescription list) =
-            if remainingSteps <= 0 then
-                sorterRunResult.create
-                        currentSet
-                        (historyAcc |> List.rev |> List.toArray)
-            else
-                // Calculate the current active generation (assuming 0-indexed start since genStart isn't provided)
-                let currentGen = (int genCount - remainingSteps) |> UMX.tag<generationNumber>
-
-                // 1. Take a lightweight snapshot of the current generation state before transitioning
-                let currentSnapshot = SorterPoolSetDescription.fromPoolSet currentSet
-                let updatedHistory = currentSnapshot :: historyAcc
-
-                // 2. Advance the heavy state across the pipeline axis
-                let reEvaluateParents = false
-                let nextSet = 
-                    SorterPipeline.runGenerationStep 
-                        mutator  
-                        sorterCountPerPool
-                        sorterChildCount
-                        prioritizeNewMutants
-                        distinctSorterHashes
-                        sortableTest 
-                        sorterEvalType 
-                        selectionMeasure
-                        reEvaluateParents
-                        currentSet
-                        sortedFractionThreshold
-
-                loop (remainingSteps - 1) nextSet updatedHistory
-
-        loop %genCount initialPoolSet []
-
 
     /// Asynchronously runs the generation loops step N times using an asyncResult pipeline.
     /// Accumulates lightweight snapshots for intermediate states and forced GC compacting 
@@ -105,7 +54,7 @@ module SorterRunResult =
         let rec loop 
                     (remainingSteps: int) 
                     (currentSorterPoolSet: sorterPoolSet) 
-                    (historyAcc: sorterPoolSetDescription list) 
+                    (historyAcc: sorterPoolSetSummary list) 
                     : Async<Result<sorterRunResult, string>> =
             asyncResult {
                 if cts.IsCancellationRequested then 
@@ -130,13 +79,12 @@ module SorterRunResult =
                     // 1. Snapshot the current generation state before applying structural changes
                     let updatedHistory = 
                         if shouldReport then 
-                            let currentSnapshot = SorterPoolSetDescription.fromPoolSet currentSorterPoolSet
+                            let currentSnapshot = SorterPoolSetSummary.fromPoolSet currentSorterPoolSet
                             currentSnapshot :: historyAcc
                         else 
                             historyAcc
 
                     let adjSorterEvalType = if (remainingSteps = 1) then sorterEvalType.V2 else srtrEvalType
-                    //let reEvaluateParents = true
                     let reEvaluateParents = (remainingSteps = 1)
 
                     let nextSorterPoolSet = 
@@ -152,7 +100,6 @@ module SorterRunResult =
                             reEvaluateParents
                             currentSorterPoolSet
                             sortedFractionThreshold
-                            
 
                     // Only force a GC sweep every 50 generations to minimize overhead
                     if remainingSteps % 50 = 0 then
@@ -161,7 +108,7 @@ module SorterRunResult =
 
                     let moreUpdatedHistory = 
                         if (remainingSteps = 1) then 
-                            let nextSnapshot = SorterPoolSetDescription.fromPoolSet nextSorterPoolSet
+                            let nextSnapshot = SorterPoolSetSummary.fromPoolSet nextSorterPoolSet
                             nextSnapshot :: updatedHistory
                         else 
                             updatedHistory
@@ -169,15 +116,13 @@ module SorterRunResult =
                     return! loop (remainingSteps - 1) nextSorterPoolSet moreUpdatedHistory
             }
 
-
         loop %genCount initialPoolSet []
 
 
-
-    // extracts dataTableRecords out of sorterRunResult.IntermediateHistory only
+    /// Extracts dataTableRecords out of the run result's intermediate summary history
     let toDataTableRecords (prefix: string) (srRes: sorterRunResult) : dataTableRecord array =
         srRes.IntermediateHistory
-        |> Array.collect (fun poolSetDesc -> 
-            poolSetDesc 
-            |> SorterPoolSetDescription.toDataTableRecords prefix
+        |> Array.collect (fun poolSetSummary ->
+            poolSetSummary
+            |> SorterPoolSetSummary.toDataTableRecords prefix
         )

@@ -162,9 +162,16 @@ module Msuf4SgdExecutor =
                     host rp allowOverwrite cts progress }
 
 
+    let summaryReportExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                CommonSorterSgd.makeSummaryReport
+                    host rp allowOverwrite cts progress }
+
 
     let getExecutor (executorType: sorterSgdExecutorType) : IRunParamsExecutor =
         match executorType with
         | sorterSgdExecutorType.GenStandard -> standardExecutor
         | sorterSgdExecutorType.GenMerge -> mergeExecutor
         | sorterSgdExecutorType.FullReport -> fullReportExecutor
+        | sorterSgdExecutorType.SummaryReport -> summaryReportExecutor
