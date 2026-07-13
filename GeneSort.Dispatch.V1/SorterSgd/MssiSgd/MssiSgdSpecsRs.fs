@@ -83,7 +83,7 @@ module MssiSgdSpecsRs =
                 sorterEvalMeasureEvo
                 orthoRate
                 paraRate
-                modificationRateStage
+                modificationRatesMsuf4
                 sortingWidth16
                 poolCount10
                 oneSorterPerPool
@@ -112,7 +112,7 @@ module MssiSgdSpecsRs =
                 sorterEvalMeasureEvo
                 orthoRate
                 paraRate
-                modificationRateStage
+                modificationRatesMsuf4
                 sortingWidth16
                 poolCount1
                 fourKSortersPerPool
@@ -143,7 +143,7 @@ module MssiSgdSpecsRs =
                 sorterEvalMeasureEvo
                 orthoRate
                 paraRate
-                modificationRateStage
+                modificationRatesMsuf4
                 sortingWidth16
                 poolCount10
                 oneSorterPerPool
@@ -171,7 +171,7 @@ module MssiSgdSpecsRs =
                 sorterEvalMeasureEvo
                 orthoRate
                 paraRate
-                modificationRateStage
+                modificationRatesMsuf4
                 sortingWidth16
                 poolCount10
                 oneSorterPerPool

@@ -28,7 +28,7 @@ module Msuf4SgdSpecsRm =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [1000] |> List.map string)
+            (runParameters.generationLastKey, [20000] |> List.map string)
 
     let generationFirst = 
             (runParameters.generationFirstKey, [0] |> List.map string)
@@ -73,13 +73,13 @@ module Msuf4SgdSpecsRm =
                 paraRate
                 selfSymRate
                 seedModificationRate03
-                modificationRateStage
+                modificationRatesMsuf4
                 sortingWidth32
                 mergeDimension8
                 noSuffixSuffixType
                 dataFormatInt8v512
                 poolCount1
-                oneTwenty8SortersPerPool
+                mid3SortersPerPool
                 oneChildCount
                 generationFirst
                 generationLast
@@ -108,7 +108,7 @@ module Msuf4SgdSpecsRm =
                 paraRate
                 selfSymRate
                 seedModificationRate12
-                modificationRateStage
+                modificationRatesMsuf4
                 smallMergeSortingWidths
                 msuf4ModelType
                 lowMergeDimensions
@@ -142,7 +142,7 @@ module Msuf4SgdSpecsRm =
                 paraRate
                 selfSymRate
                 seedModificationRate12
-                modificationRateStage
+                modificationRatesMsuf4
                 mediumMergeSortingWidths
                 msuf4ModelType
                 lowMergeDimensions

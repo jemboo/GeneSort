@@ -71,7 +71,7 @@ module MsrsSgdSpecsRm =
                 orthoRate
                 paraRate
                 selfSymRate
-                modificationRateStage
+                modificationRatesMsuf4
                 sortingWidth32
                 mergeDimension8
                 noSuffixSuffixType
@@ -104,7 +104,7 @@ module MsrsSgdSpecsRm =
                 orthoRate
                 paraRate
                 selfSymRate
-                modificationRateStage
+                modificationRatesMsuf4
                 testMergeSortingWidths
                 msrsModelType
                 testMergeDimensions
@@ -136,7 +136,7 @@ module MsrsSgdSpecsRm =
                 orthoRate
                 paraRate
                 selfSymRate
-                modificationRateStage
+                modificationRatesMsuf4
                 testMergeSortingWidths
                 msrsModelType
                 testMergeDimensions

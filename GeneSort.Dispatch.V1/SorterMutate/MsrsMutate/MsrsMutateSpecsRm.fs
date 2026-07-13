@@ -57,7 +57,7 @@ module MsrsMutateSpecsRm =
                 orthoRate
                 paraRate
                 selfSymRate
-                modificationRateStage
+                modificationRatesMsuf4
                 sortingWidth32
                 msrsModelType
                 mergeDimension8
@@ -83,7 +83,7 @@ module MsrsMutateSpecsRm =
                 orthoRate
                 paraRate
                 selfSymRate
-                modificationRateStage
+                modificationRatesMsuf4
                 smallMergeSortingWidths
                 msrsModelType
                 lowMergeDimensions
@@ -109,7 +109,7 @@ module MsrsMutateSpecsRm =
                 orthoRate
                 paraRate
                 selfSymRate
-                modificationRateStage
+                modificationRatesMsuf4
                 mediumMergeSortingWidths
                 msrsModelType
                 lowMergeDimensions
@@ -135,7 +135,7 @@ module MsrsMutateSpecsRm =
                 orthoRate
                 paraRate
                 selfSymRate
-                modificationRateStage
+                modificationRatesMsuf4
                 mediumMergeSortingWidths
                 msrsModelType
                 mergeDimension6
@@ -161,7 +161,7 @@ module MsrsMutateSpecsRm =
                 orthoRate
                 paraRate
                 selfSymRate
-                modificationRateStage
+                modificationRatesMsuf4
                 largeMergeSortingWidths
                 msrsModelType
                 mergeDimension2

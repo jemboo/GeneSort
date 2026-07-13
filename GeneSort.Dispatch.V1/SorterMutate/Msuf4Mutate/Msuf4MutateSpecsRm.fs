@@ -59,7 +59,7 @@ module Msuf4MutateSpecsRm =
                 paraRate
                 selfSymRate
                 seedModificationRate12
-                modificationRateStage
+                modificationRatesMsuf4
                 sortingWidth32
                 msuf4ModelType
                 mergeDimension8
@@ -86,7 +86,7 @@ module Msuf4MutateSpecsRm =
                 paraRate
                 selfSymRate
                 seedModificationRate12
-                modificationRateStage
+                modificationRatesMsuf4
                 smallMergeSortingWidths
                 msuf4ModelType
                 lowMergeDimensions
@@ -113,7 +113,7 @@ module Msuf4MutateSpecsRm =
                 paraRate
                 selfSymRate
                 seedModificationRate12
-                modificationRateStage
+                modificationRatesMsuf4
                 mediumMergeSortingWidths
                 msuf4ModelType
                 lowMergeDimensions
@@ -140,7 +140,7 @@ module Msuf4MutateSpecsRm =
                 paraRate
                 selfSymRate
                 seedModificationRate12
-                modificationRateStage
+                modificationRatesMsuf4
                 mediumMergeSortingWidths
                 msuf4ModelType
                 mergeDimension6
@@ -168,7 +168,7 @@ module Msuf4MutateSpecsRm =
                 paraRate
                 selfSymRate
                 seedModificationRate12
-                modificationRateStage
+                modificationRatesMsuf4
                 largeMergeSortingWidths
                 msuf4ModelType
                 mergeDimension2
