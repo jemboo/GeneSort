@@ -122,23 +122,10 @@ module Msuf4SgdExecutor =
                     PoolSetMakers.createSeedSorterPoolSetMerge
                     host rp allowOverwrite cts progress }
 
-    let fullReportExecutor =
-        { new IRunParamsExecutor with
-            member _.Execute host rp allowOverwrite cts progress =
-                Reporting.makeFullReport
-                    host rp allowOverwrite cts progress }
-
-
-    let summaryReportExecutor =
-        { new IRunParamsExecutor with
-            member _.Execute host rp allowOverwrite cts progress =
-                Reporting.makeSummaryReport
-                    host rp allowOverwrite cts progress }
-
 
     let getExecutor (executorType: sorterSgdExecutorType) : IRunParamsExecutor =
         match executorType with
         | sorterSgdExecutorType.GenStandard -> standardExecutor
         | sorterSgdExecutorType.GenMerge -> mergeExecutor
-        | sorterSgdExecutorType.FullReport -> fullReportExecutor
-        | sorterSgdExecutorType.SummaryReport -> summaryReportExecutor
+        | sorterSgdExecutorType.FullReport -> Reporting.fullReportExecutor
+        | sorterSgdExecutorType.SnapshotReport -> Reporting.snapshotReportExecutor

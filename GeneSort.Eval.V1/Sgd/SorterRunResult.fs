@@ -120,7 +120,17 @@ module SorterRunResult =
 
 
     /// Extracts dataTableRecords out of the run result's intermediate summary history
-    let toDataTableRecords (prefix: string) (srRes: sorterRunResult) : dataTableRecord array =
+    let toDataTableRecordsIntermediateHistory (prefix: string) (srRes: sorterRunResult) : dataTableRecord array =
+        srRes.IntermediateHistory
+        |> Array.collect (fun poolSetSummary ->
+            poolSetSummary
+            |> SorterPoolSetSummary.toDataTableRecords prefix
+        )
+
+
+    /// Extracts dataTableRecords out of the run result's FinalPoolSet
+    let toDataTableRecordsSnapshot (prefix: string) (srRes: sorterRunResult) : dataTableRecord array =
+        let yab = srRes.FinalPoolSet
         srRes.IntermediateHistory
         |> Array.collect (fun poolSetSummary ->
             poolSetSummary

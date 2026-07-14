@@ -130,7 +130,7 @@ module MsrsSgdExecutor =
     let fullReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                Reporting.makeFullReport
+                Reporting.makeSummaryReport
                     host rp allowOverwrite cts progress }
 
 
@@ -139,4 +139,5 @@ module MsrsSgdExecutor =
         match executorType with
         | sorterSgdExecutorType.GenStandard -> standardExecutor
         | sorterSgdExecutorType.GenMerge -> mergeExecutor
-        | sorterSgdExecutorType.FullReport -> fullReportExecutor
+        | sorterSgdExecutorType.FullReport -> Reporting.fullReportExecutor
+        | sorterSgdExecutorType.SnapshotReport -> Reporting.snapshotReportExecutor

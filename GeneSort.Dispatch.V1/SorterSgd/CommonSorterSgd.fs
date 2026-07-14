@@ -25,7 +25,7 @@ type sorterSgdExecutorType =
     | GenStandard
     | GenMerge
     | FullReport
-    | SummaryReport
+    | SnapshotReport
 
 
 module SorterSgdExecutorType =
@@ -33,4 +33,4 @@ module SorterSgdExecutorType =
         | GenStandard -> "GenStandard"
         | GenMerge -> "GenMerge"
         | FullReport -> "FullReport"
-        | SummaryReport -> "SummaryReport"
+        | SnapshotReport -> "SummaryReport"
