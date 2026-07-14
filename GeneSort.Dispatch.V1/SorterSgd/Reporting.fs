@@ -65,7 +65,7 @@ module Reporting =
                     accumulatedDetails <- Seq.append accumulatedDetails sliceDetails
 
                 // 3. Prepare query params and metadata headers for the final compiled text report
-                let reportName = (sprintf "SorterRunResult_FullReport" |> UMX.tag<textReportName>)
+                let reportName = (sprintf "SorterRunResult_SummaryReport" |> UMX.tag<textReportName>)
                 let newRp = rp.WithGenerationCurrent (rp.GetGenerationLast())
 
                 let! qpReport = 
@@ -144,7 +144,7 @@ module Reporting =
                     accumulatedDetails <- Seq.append accumulatedDetails sliceDetails
 
                 // 3. Prepare query params and metadata headers for the final compiled text report
-                let reportName = (sprintf "SorterRunResult_FullReport" |> UMX.tag<textReportName>)
+                let reportName = (sprintf "SorterRunResult_SnapshotReport" |> UMX.tag<textReportName>)
                 let newRp = rp.WithGenerationCurrent (rp.GetGenerationLast())
 
                 let! qpReport = 

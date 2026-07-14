@@ -48,9 +48,7 @@ module EvolutionOrchestrator =
 
                     do! checkCancellation cts
 
-                    let stepRp = 
-                        currentRp
-                            .WithGenerationCurrent(Some currentGenLast)
+                    let stepRp = currentRp.WithGenerationCurrent(Some currentGenLast)
 
                     let! qpSorterRunResult = 
                         host.RunDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterRunResult "")
@@ -63,5 +61,10 @@ module EvolutionOrchestrator =
 
                     return! stepLoop currentGenLast runResult.FinalPoolSet stepRp
             }
+
+        if %genFirst = 0 then
+            let srr0: sorterRunResult = sorterRunResult.create initialSeedPoolSet [||]
+            let qpStep0 = (host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterRunResult "")).Value
+            host.RunDb.saveAsync qpStep0 (srr0 |> outputData.SorterRunResult) allowOverwrite |> ignore
 
         stepLoop genFirst initialSeedPoolSet rp

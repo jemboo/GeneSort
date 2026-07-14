@@ -140,5 +140,5 @@ module MssiSgdExecutor =
         match executorType with
         | sorterSgdExecutorType.GenStandard -> standardExecutor
         | sorterSgdExecutorType.GenMerge -> mergeExecutor
-        | sorterSgdExecutorType.FullReport -> Reporting.fullReportExecutor
+        | sorterSgdExecutorType.SummaryReport -> Reporting.fullReportExecutor
         | sorterSgdExecutorType.SnapshotReport -> Reporting.snapshotReportExecutor

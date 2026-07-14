@@ -24,7 +24,7 @@ open GeneSort.Eval.V1.Sgd
 type sorterSgdExecutorType = 
     | GenStandard
     | GenMerge
-    | FullReport
+    | SummaryReport
     | SnapshotReport
 
 
@@ -32,5 +32,5 @@ module SorterSgdExecutorType =
     let toString = function
         | GenStandard -> "GenStandard"
         | GenMerge -> "GenMerge"
-        | FullReport -> "FullReport"
-        | SnapshotReport -> "SummaryReport"
+        | SummaryReport -> "SummaryReport"
+        | SnapshotReport -> "SnapshotReport"

@@ -35,8 +35,14 @@ module CommonParams =
 
 
     // Generation Report Intervals
+    let genReportInterval1 = 
+        (runParameters.generationReportIntervalKey, [1] |> List.map string)
+
     let genReportInterval10 = 
         (runParameters.generationReportIntervalKey, [10] |> List.map string)
+
+    let genReportInterval20 = 
+        (runParameters.generationReportIntervalKey, [20] |> List.map string)
 
     let genReportInterval100 = 
         (runParameters.generationReportIntervalKey, [100] |> List.map string)
@@ -233,7 +239,7 @@ module CommonParams =
             (runParameters.modificationRateKey, [ 0.02; 0.03; 0.04; 0.05; 0.07; 0.08; 0.09; 0.10;] |> List.map string)
             
     let modificationRate03 =
-            (runParameters.modificationRateKey, [ 0.03; 0.04;] |> List.map string)
+            (runParameters.modificationRateKey, [ 0.03; ] |> List.map string)
 
 
     let modificationRatesMsce =
