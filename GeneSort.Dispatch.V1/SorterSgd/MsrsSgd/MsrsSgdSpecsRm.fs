@@ -31,11 +31,8 @@ module MsrsSgdSpecsRm =
     let generationLast = 
             (runParameters.generationLastKey, [10000] |> List.map string)
 
-    let generationFirst = 
-            (runParameters.generationFirstKey, [0] |> List.map string)
-
-    let generationQueryFirst = 
-            (runParameters.queryWithGenFirst, [false] |> List.map string)
+    let generationCurrent = 
+            (runParameters.generationCurrentKey, [20] |> List.map string)
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
@@ -79,10 +76,9 @@ module MsrsSgdSpecsRm =
                 poolCount1
                 oneTwenty8SortersPerPool
                 oneChildCount
-                generationFirst
+                generationCurrent
                 genReportInterval10
                 generationLast
-                generationQueryFirst
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
             ]
@@ -114,10 +110,9 @@ module MsrsSgdSpecsRm =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
+                generationCurrent
                 genReportInterval10
                 generationLast
-                generationQueryFirst
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -147,10 +142,9 @@ module MsrsSgdSpecsRm =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
+                generationCurrent
                 genReportInterval10
                 generationLast
-                generationQueryFirst
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer

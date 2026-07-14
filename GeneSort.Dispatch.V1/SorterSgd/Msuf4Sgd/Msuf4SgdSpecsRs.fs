@@ -37,12 +37,8 @@ module Msuf4SgdSpecsRs =
     let generationLast = 
             (runParameters.generationLastKey, [500] |> List.map string)
 
-    let generationFirst = 
-            (runParameters.generationFirstKey, [0] |> List.map string)
-
-    let generationQueryFirst = 
-            (runParameters.queryWithGenFirst, [false] |> List.map string)
-
+    let generationCurrent = 
+            (runParameters.generationCurrentKey, [20] |> List.map string)
 
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
@@ -82,9 +78,8 @@ module Msuf4SgdSpecsRs =
                 poolCount30
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
                 generationLast
-                generationQueryFirst
+                generationCurrent
                 distinctSorterHashesBoth
                 prioritizeNewMutantsBoth
             ]
@@ -114,9 +109,8 @@ module Msuf4SgdSpecsRs =
                 poolCount30
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
+                generationCurrent
                 generationLast
-                generationQueryFirst
                 distinctSorterHashesBoth
                 prioritizeNewMutantsBoth
             ]
@@ -146,9 +140,8 @@ module Msuf4SgdSpecsRs =
                 poolCount1
                 fourKSortersPerPool
                 oneChildCount
-                generationFirst
+                generationCurrent
                 generationLast
-                generationQueryFirst
                 distinctSorterHashesBoth
                 prioritizeNewMutantsBoth
             ]
@@ -179,9 +172,8 @@ module Msuf4SgdSpecsRs =
                 poolCount10
                 oneToFourSortersPerPool
                 twoChildCount
-                generationFirst
+                generationCurrent
                 generationLast
-                generationQueryFirst
                 distinctSorterHashesTrue
                 prioritizeNewMutantsBoth
             ]

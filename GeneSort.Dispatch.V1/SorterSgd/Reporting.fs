@@ -30,7 +30,7 @@ module Reporting =
                 do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
-                let newRp = rp.WithQueryWithGenFirst (Some false)
+                let newRp = rp.WithGenerationCurrent (rp.GetGenerationLast())
                 let! qpSorterRunResult = host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.SorterRunResult "")
                                         |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
                 let! outB = host.RunDb.loadAsync qpSorterRunResult
@@ -70,7 +70,7 @@ module Reporting =
                 do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
-                let newRp = rp.WithQueryWithGenFirst (Some false)
+                let newRp = rp.WithGenerationCurrent (rp.GetGenerationLast())
                 let! qpSorterRunResult = host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.SorterRunResult "")
                                         |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
                 let! outB = host.RunDb.loadAsync qpSorterRunResult

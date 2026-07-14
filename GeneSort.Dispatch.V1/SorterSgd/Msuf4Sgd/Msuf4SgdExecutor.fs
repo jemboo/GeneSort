@@ -40,8 +40,6 @@ module Msuf4SgdExecutor =
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
                 let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
                 let! genReportInterval = rp.GetGenerationReportInterval() |> Result.ofOption "Missing generation report interval."
-                
-                // 2. Engine Specific parameters 
                 let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
                 let! sortingWidth = rp.GetSortingWidth() |> Result.ofOption "Missing sortingWidth."
                 let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."

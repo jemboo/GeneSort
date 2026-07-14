@@ -32,12 +32,8 @@ module MsrsSgdSpecsRs =
     let generationLast = 
             (runParameters.generationLastKey, [2500] |> List.map string)
 
-    let generationFirst = 
-            (runParameters.generationFirstKey, [0] |> List.map string)
-
-    let generationQueryFirst = 
-            (runParameters.queryWithGenFirst, [false] |> List.map string)
-
+    let generationCurrent = 
+            (runParameters.generationCurrentKey, [20] |> List.map string)
 
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
@@ -76,10 +72,9 @@ module MsrsSgdSpecsRs =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
                 genReportInterval10
                 generationLast
-                generationQueryFirst
+                generationCurrent
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -106,10 +101,9 @@ module MsrsSgdSpecsRs =
                 poolCount1
                 fourKSortersPerPool
                 oneChildCount
-                generationFirst
+                generationCurrent
                 genReportInterval10
                 generationLast
-                generationQueryFirst
                 distinctSorterHashesTrue
                 prioritizeNewMutantsBoth
             ]
@@ -139,10 +133,9 @@ module MsrsSgdSpecsRs =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
+                generationCurrent
                 genReportInterval10
                 generationLast
-                generationQueryFirst
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -169,10 +162,9 @@ module MsrsSgdSpecsRs =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
+                generationCurrent
                 genReportInterval10
                 generationLast
-                generationQueryFirst
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer

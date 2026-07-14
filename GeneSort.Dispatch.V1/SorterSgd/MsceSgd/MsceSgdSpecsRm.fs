@@ -30,12 +30,8 @@ module MsceSgdSpecsRm =
     let generationLast = 
             (runParameters.generationLastKey, [100] |> List.map string)
 
-    let generationFirst = 
-            (runParameters.generationFirstKey, [0] |> List.map string)
-
-    let generationQueryFirst = 
-            (runParameters.queryWithGenFirst, [false] |> List.map string)
-
+    let generationCurrent = 
+            (runParameters.generationCurrentKey, [20] |> List.map string)
 
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
@@ -101,10 +97,9 @@ module MsceSgdSpecsRm =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
                 genReportInterval10
                 generationLast
-                generationQueryFirst
+                generationCurrent
                 mergeDimension2
                 noSuffixSuffixType
                 dataFormatInt8v512
@@ -134,10 +129,9 @@ module MsceSgdSpecsRm =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
                 genReportInterval10
                 generationLast
-                generationQueryFirst
+                generationCurrent
                 mergeDimension2
                 noSuffixSuffixType
                 dataFormatInt8v512
@@ -167,10 +161,9 @@ module MsceSgdSpecsRm =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
                 genReportInterval10
                 generationLast
-                generationQueryFirst
+                generationCurrent
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
@@ -200,10 +193,9 @@ module MsceSgdSpecsRm =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
                 genReportInterval10
                 generationLast
-                generationQueryFirst
+                generationCurrent
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
@@ -233,10 +225,9 @@ module MsceSgdSpecsRm =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
                 genReportInterval10
                 generationLast
-                generationQueryFirst
+                generationCurrent
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
@@ -267,10 +258,9 @@ module MsceSgdSpecsRm =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
                 genReportInterval10
                 generationLast
-                generationQueryFirst
+                generationCurrent
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512

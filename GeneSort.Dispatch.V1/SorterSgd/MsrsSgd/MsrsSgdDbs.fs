@@ -72,9 +72,7 @@ module MsrsSgdDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! genFirst = rp.GetGenerationFirst()
-                    let! genLast = rp.GetGenerationLast()
-                    let! genQf = rp.GetQueryWithGenFirst()
+                    let! curGen = rp.GetGenerationCurrent()
                     let! scPP = rp.GetSorterCountPerPool()
                     let! spc = rp.GetSorterPoolCount()
                     let! scc = rp.GetSorterChildCount()
@@ -92,12 +90,8 @@ module MsrsSgdDbs =
                     let! dsh = rp.GetDistinctSorterHashes()
                     let! pNm = rp.GetPrioritizeNewMutants()
                     let! sfrac = rp.GetSortedFraction()
-                    return if genQf then
-                            makeQueryParams rng genFirst scPP spc scc ses sem semi 
-                                            repl sw smt set ortho para sym mdr dsh pNm sfrac odt 
-                            else
-                            makeQueryParams rng genLast scPP spc scc ses sem semi 
-                                            repl sw smt set ortho para sym mdr dsh pNm sfrac odt 
+                    return makeQueryParams rng curGen scPP spc scc ses sem semi 
+                                            repl sw smt set ortho para sym mdr dsh pNm sfrac odt
                 }
                 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -168,9 +162,7 @@ module MsrsSgdDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! rng = rp.GetRngType()
-                    let! genFirst = rp.GetGenerationFirst()
-                    let! genLast = rp.GetGenerationLast()
-                    let! genQf = rp.GetQueryWithGenFirst()
+                    let! curGen = rp.GetGenerationCurrent()
                     let! scPP = rp.GetSorterCountPerPool()
                     let! spc = rp.GetSorterPoolCount()
                     let! scc = rp.GetSorterChildCount()
@@ -190,12 +182,7 @@ module MsrsSgdDbs =
                     let! mdr = rp.GetModificationRate()
                     let! dsh = rp.GetDistinctSorterHashes()
                     let! sfrac = rp.GetSortedFraction()
-                    return if genQf then
-                            makeQueryParams rng genFirst scPP spc scc ses sem
-                                            semi repl sw smt md mst sdf set 
-                                            ortho para sym mdr dsh sfrac odt
-                            else
-                            makeQueryParams rng genLast scPP spc scc ses sem
+                    return makeQueryParams rng curGen scPP spc scc ses sem
                                             semi repl sw smt md mst sdf set 
                                             ortho para sym mdr dsh sfrac odt
                 }

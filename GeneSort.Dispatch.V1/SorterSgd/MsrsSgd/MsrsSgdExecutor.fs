@@ -38,8 +38,8 @@ module MsrsSgdExecutor =
                 do! checkCancellation cts.Token
 
                 // 1. Gather all required run metrics and options out of your parameters block securely
-                let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
-                let! genFirst = rp.GetGenerationFirst() |> Result.ofOption "Missing genFirst."
+                let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."             
+                let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
                 let! genReportInterval = rp.GetGenerationReportInterval() |> Result.ofOption "Missing generation report interval."
                 let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
                 let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
@@ -51,26 +51,19 @@ module MsrsSgdExecutor =
                 let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
 
                 // 2. Resolve target seed sorterPoolSet collection state depending on genFirst criteria
-                let! seedSorterPoolSet = 
-                    if %genFirst > 0 then
+                let! initialSeedPoolSet: sorterPoolSet = 
+                    if %genCurrent > 0 then
                         log "Looking up historical sorterPoolSet from database..."
-                        let newRp = rp.WithQueryWithGenFirst (Some true)
-                        
                         let qpSRRResult = 
-                            host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.SorterRunResult "")
+                            host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterRunResult "")
                             |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
-
                         asyncResult {
                             let! qpSRR = qpSRRResult 
-                            let! (outData: outputData) = 
-                                host.RunDb.loadAsync qpSRR 
-                                |> AsyncResult.mapError (fun err -> sprintf "Database load error: %A" err)
-
+                            let! (outData: outputData) = host.RunDb.loadAsync qpSRR |> AsyncResult.mapError (fun err -> sprintf "Database load error: %A" err)
                             let! sorterRunRes = outData |> OutputData.asSorterRunResult
                             return sorterRunRes.FinalPoolSet
                         }
                     else
-                        // Otherwise create it ..
                         log "Make seedSorterPoolSet..."
                         sorterPoolSetCreator rp
 
@@ -105,8 +98,8 @@ module MsrsSgdExecutor =
                 log "Executing chunked SorterRunResult loop via loop manager..."
                 let! finalRp: runParameters = 
                     EvolutionOrchestrator.runSlicesInLoop
-                        host rp genFirst genLast genReportInterval 
-                        seedSorterPoolSet allowOverwrite cts.Token log stepExecutionStrategy
+                        host rp genCurrent genLast genReportInterval 
+                        initialSeedPoolSet allowOverwrite cts.Token log stepExecutionStrategy
                 
                 log "evaluateEvolutionRun completed."
                 return finalRp.WithRunFinished (Some true)

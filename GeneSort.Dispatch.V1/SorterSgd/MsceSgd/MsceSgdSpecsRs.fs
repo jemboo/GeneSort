@@ -33,11 +33,8 @@ module MsceSgdSpecsRs =
     let generationLast = 
             (runParameters.generationLastKey, [2500] |> List.map string)
 
-    let generationFirst = 
-            (runParameters.generationFirstKey, [0] |> List.map string)
-
-    let generationQueryFirst = 
-            (runParameters.queryWithGenFirst, [false] |> List.map string)
+    let generationCurrent = 
+            (runParameters.generationCurrentKey, [20] |> List.map string)
 
     let distinctSorterHashesBoth = 
             (runParameters.distinctSorterHashesKey, [true; false] |> List.map string)
@@ -93,10 +90,9 @@ module MsceSgdSpecsRs =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
+                generationCurrent
                 genReportInterval10
                 generationLast
-                generationQueryFirst
             ]
             filter = standardSorterModelTypeFilter
             enhancer = standardEnhancer
@@ -123,10 +119,9 @@ module MsceSgdSpecsRs =
                 poolCount1
                 fourKSortersPerPool
                 oneChildCount
-                generationFirst
+                generationCurrent
                 genReportInterval10
                 generationLast
-                generationQueryFirst
                 distinctSorterHashesTrue
                 prioritizeNewMutantsBoth
             ]
@@ -155,10 +150,9 @@ module MsceSgdSpecsRs =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
                 genReportInterval10
                 generationLast
-                generationQueryFirst
+                generationCurrent
             ]
             filter = standardSorterModelTypeFilter
             enhancer = standardEnhancer
@@ -185,10 +179,9 @@ module MsceSgdSpecsRs =
                 poolCount10
                 oneSorterPerPool
                 oneChildCount
-                generationFirst
+                generationCurrent
                 genReportInterval10
                 generationLast
-                generationQueryFirst
             ]
             filter = standardSorterModelTypeFilter
             enhancer = standardEnhancer

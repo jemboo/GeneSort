@@ -34,9 +34,6 @@ module Msuf4SgdSpecsRm =
             (runParameters.generationCurrentKey, [20] |> List.map string)
             
 
-    let generationQueryFirst = 
-            (runParameters.queryWithGenFirst, [false] |> List.map string)
-
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
         rp.WithDatabaseName(Some host.Run.DatabaseName)
@@ -84,7 +81,6 @@ module Msuf4SgdSpecsRm =
                 generationCurrent
                 genReportInterval10
                 generationLast
-                generationQueryFirst
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction90
@@ -121,7 +117,6 @@ module Msuf4SgdSpecsRm =
                 generationCurrent
                 genReportInterval10
                 generationLast
-                generationQueryFirst
                 sortedFraction90
             ]
             filter = paramMapFilter
@@ -156,7 +151,6 @@ module Msuf4SgdSpecsRm =
                 generationCurrent
                 genReportInterval10
                 generationLast
-                generationQueryFirst
                 sortedFraction90
             ]
             filter = paramMapFilter

@@ -30,7 +30,6 @@ type runParameters =
     static member generationFirstKey = "GenerationFirst"
     static member generationReportIntervalKey = "GenerationReportInterval"
     static member generationLastKey = "GenerationLast"
-    static member queryWithGenFirst = "QueryWithGenFirst"
     static member idKey = "Id"
     static member insertionRateKey = "InsertionRate"
     static member latticeDistanceKey = "LatticeDistance"
@@ -139,9 +138,6 @@ type runParameters =
     member this.GetGenerationLast() =
         runParameters.tryGetInt runParameters.generationLastKey this.paramMap
         |> Option.map UMX.tag<generationNumber>
-
-    member this.GetQueryWithGenFirst() =
-        runParameters.tryGetBool runParameters.queryWithGenFirst this.paramMap
 
     member this.GetId() =
         runParameters.tryGetGuid runParameters.idKey this.paramMap
@@ -335,9 +331,6 @@ type runParameters =
 
     member this.WithGenerationLast(gen: int<generationNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationLastKey (gen |> Option.map UmxExt.intToRaw) }
-
-    member this.WithQueryWithGenFirst(qf: bool option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.queryWithGenFirst (qf |> Option.map UmxExt.boolToRaw) }
 
     member this.WithId(id: Guid<queryParamsId> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.idKey (id |> Option.map UmxExt.guidToRaw) }
