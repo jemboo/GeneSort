@@ -262,7 +262,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 //********** Msuf4SgdSpecsRm **********
 let configType = Msuf4SgdSpecsRm.configType.Rand_Test
-let executorType = sorterSgdExecutorType.GenMerge
+let executorType = sorterSgdExecutorType.FullReport
 let host: IRunHost = 
     let spec = Msuf4SgdSpecsRm.getRunHostSpec configType executorType
     Msuf4SgdDbs.createRunHost spec
