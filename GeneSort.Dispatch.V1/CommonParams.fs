@@ -285,21 +285,21 @@ module CommonParams =
             (runParameters.distinctSorterHashesKey, [false] |> List.map string)
 
 
-    // SorterLib Ids
+    // SortableTestFilters
     let _sorterLibId24_4 = 
             SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix4
     let sorterLibId24_4 = 
-            (runParameters.sorterLibIdKey, [_sorterLibId24_4] |> List.map SorterLibId.toString)
+            (runParameters.sortableTestFilterKey, [_sorterLibId24_4] |> List.map SorterLibId.toString)
 
     let _sorterLibId28_4 = 
             SorterLibId.create (28<sortingWidth>) sorterVariant.Prefix4
     let sorterLibId28_4 = 
-            (runParameters.sorterLibIdKey, [_sorterLibId28_4] |> List.map SorterLibId.toString)
+            (runParameters.sortableTestFilterKey, [_sorterLibId28_4] |> List.map SorterLibId.toString)
 
     let _sorterLibId32_4 = 
             SorterLibId.create (32<sortingWidth>) sorterVariant.Prefix4
     let sorterLibId32_4 = 
-            (runParameters.sorterLibIdKey, [_sorterLibId32_4] |> List.map SorterLibId.toString)
+            (runParameters.sortableTestFilterKey, [_sorterLibId32_4] |> List.map SorterLibId.toString)
 
 
     // Sorted Fractions

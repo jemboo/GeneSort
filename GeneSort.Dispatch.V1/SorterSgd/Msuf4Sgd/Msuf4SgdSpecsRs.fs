@@ -59,7 +59,7 @@ module Msuf4SgdSpecsRs =
     module Specs =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
+            databaseName = Msuf4SgdDbs.Standard.dbName
             runName = sprintf @"Rand-Test1_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Sgd analysis for Msuf4"
             spans = [
@@ -90,7 +90,7 @@ module Msuf4SgdSpecsRs =
         }
 
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
-            databaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
+            databaseName = Msuf4SgdDbs.Standard.dbName
             runName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Sgd analysis for Msuf4"
             spans = [
@@ -121,7 +121,7 @@ module Msuf4SgdSpecsRs =
         }
 
         let Rand_Pool (executorType: sorterSgdExecutorType) : runHostSpec = {
-            databaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
+            databaseName = Msuf4SgdDbs.Standard.dbName
             runName = sprintf @"Rand-Pool_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Sgd analysis for Msuf4"
             spans = [
@@ -153,7 +153,7 @@ module Msuf4SgdSpecsRs =
 
 
         let Rand_Pool3 (executorType: sorterSgdExecutorType) : runHostSpec = {
-            databaseName = Msuf4SgdDbs.RandomStandard.Uniform.dbName
+            databaseName = Msuf4SgdDbs.Standard.dbName
             runName = sprintf @"Rand-Pool3_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Sgd analysis for Msuf4"
             spans = [

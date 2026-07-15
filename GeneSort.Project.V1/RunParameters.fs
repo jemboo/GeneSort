@@ -62,7 +62,7 @@ type runParameters =
     static member sorterEvalMeasureKey = "SorterEvalMeasure"
     static member sorterEvalSelectionType = "SorterEvalSelectionType"
     static member sorterEvalTypeKey = "SorterEvalType"
-    static member sorterLibIdKey = "SorterLibId"
+    static member sortableTestFilterKey = "SortableTestFilter"
     static member sorterParentCountKey = "SorterParentCount"
     static member sorterPoolCountKey = "SorterPoolCount"
     static member sortingWidthKey = "SortingWidth"
@@ -267,8 +267,8 @@ type runParameters =
         this.paramMap.TryFind runParameters.sorterEvalTypeKey
         |> Option.map SorterEvalType.fromString
 
-    member this.GetSorterLibId() =
-        this.paramMap.TryFind runParameters.sorterLibIdKey
+    member this.GetSortableTestFilter() =
+        this.paramMap.TryFind runParameters.sortableTestFilterKey
         |> Option.map SorterLibId.fromString
 
     member this.GetSorterParentCount() =
@@ -428,8 +428,8 @@ type runParameters =
     member this.WithSorterEvalType(set: sorterEvalType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalTypeKey (set |> Option.map SorterEvalType.toString) }
 
-    member this.WithSorterLibId(slId:sorterLibId option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterLibIdKey (slId |> Option.map SorterLibId.toString) }
+    member this.WithSortableTestFilter(slId:sorterLibId option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortableTestFilterKey (slId |> Option.map SorterLibId.toString) }
 
     member this.WithSorterParentCount(spc: int<sorterCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterParentCountKey (spc |> Option.map UmxExt.intToRaw) }

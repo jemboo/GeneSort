@@ -11,7 +11,7 @@ open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterSgd
 
 
-module Msuf4SgdSpecsRm =
+module Msuf4SgdSpecs32Pfx4 =
 
     let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
@@ -43,23 +43,17 @@ module Msuf4SgdSpecsRm =
 
 
     let private paramMapFilter (rp: runParameters) =
-        maybe {
-            let! sw = rp.GetSortingWidth()
-            let! md = rp.GetMergeDimension()
-            let isMuf4able = (MathUtils.isAPowerOfTwo %sw)
-
-            let! _ = if (%sw % %md = 0) then Some rp else None
-            return! if isMuf4able then Some rp else None
-        }
+        Some rp
 
 
     module Specs =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = Msuf4SgdDbs.Merge.dbName
-            runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for merge Msuf4"
+            databaseName = Msuf4SgdDbs.ThrityTwoPfx4.dbName
+            runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for 32pfx4 Msuf4"
             spans = [
+                sortingWidth32
                 msuf4ModelType
                 rngTypeLcg
                 sorterEvalTypeV1
@@ -71,9 +65,6 @@ module Msuf4SgdSpecsRm =
                 selfSymRate
                 seedModificationRate03
                 modificationRate03
-                sortingWidth32
-                mergeDimension8
-                noSuffixSuffixType
                 dataFormatInt8v512
                 poolCount1
                 oneTwenty8SortersPerPool

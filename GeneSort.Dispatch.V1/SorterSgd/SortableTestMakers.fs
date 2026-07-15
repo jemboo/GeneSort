@@ -60,3 +60,23 @@ module SortableTestMakers =
             | None ->
                 return Error "Failed: One or more RunParameters for MergeTests were missing."
         }
+
+
+    let make32pfx4Tests (rp: runParameters) : Async<Result<sortableTest, string>> =
+        async {
+            let paramsOpt = option {
+                let repl = 0 |> UMX.tag<replNumber>   
+                let! sw = rp.GetSortingWidth()
+                let! md = rp.GetMergeDimension()
+                let! mst = rp.GetMergeSuffixType()
+                let! sdf = rp.GetSortableDataFormat()
+                return (repl, sw, md, mst, sdf)
+            }
+
+            match paramsOpt with
+            | Some (repl, sw, md, mst, sdf) ->
+                return! SortableTestDbs.Merge.getMergeSorterTestSet 
+                                        repl sw md mst sdf  
+            | None ->
+                return Error "Failed: One or more RunParameters for MergeTests were missing."
+        }

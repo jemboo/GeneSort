@@ -261,17 +261,30 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** Msuf4SgdSpecsRm **********
-let configType = Msuf4SgdSpecsRm.configType.Rand_Test
-let executorType = sorterSgdExecutorType.SnapshotReport
+//let configType = Msuf4SgdSpecsRm.configType.Rand_Test
+//let executorType = sorterSgdExecutorType.SnapshotReport
+//let host: IRunHost = 
+//    let spec = Msuf4SgdSpecsRm.getRunHostSpec configType executorType
+//    Msuf4SgdDbs.createRunHost spec
+//let executor = Msuf4SgdExecutor.getExecutor executorType
+
+//let minReplica = 0<replNumber>
+//let maxReplica = 1<replNumber>
+
+
+//********** Msuf4SgdSpecsRm **********
+let configType = Msuf4SgdSpecs32Pfx4.configType.Rand_Test
+let executorType = sorterSgdExecutorType.Gen32pfx4
 let host: IRunHost = 
-    let spec = Msuf4SgdSpecsRm.getRunHostSpec configType executorType
+    let spec = Msuf4SgdSpecs32Pfx4.getRunHostSpec configType executorType
     Msuf4SgdDbs.createRunHost spec
 let executor = Msuf4SgdExecutor.getExecutor executorType
 
-
-
 let minReplica = 0<replNumber>
 let maxReplica = 1<replNumber>
+
+
+
 
 
 

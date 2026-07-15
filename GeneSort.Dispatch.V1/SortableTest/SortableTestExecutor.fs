@@ -91,7 +91,7 @@ module SortableTestExecutor =
                 // 2. Safe extraction
                 let! (sorterLibId, sortableDataFormat) = 
                     maybe {
-                        let! _slLibId = rp.GetSorterLibId()
+                        let! _slLibId = rp.GetSortableTestFilter()
                         let! _dataFmt = rp.GetSortableDataFormat()
                         return (_slLibId, _dataFmt)
                     } |> Result.ofOption "Missing domain parameters required for generation"

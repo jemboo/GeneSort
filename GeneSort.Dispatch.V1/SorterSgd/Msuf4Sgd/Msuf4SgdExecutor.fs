@@ -123,9 +123,20 @@ module Msuf4SgdExecutor =
                     host rp allowOverwrite cts progress }
 
 
+    let sorter32pfx4Executor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                evaluateEvolutionRun
+                    SortableTestMakers.make32pfx4Tests
+                    PoolSetMakers.createSeedSorterPoolSet32pfx4
+                    host rp allowOverwrite cts progress }
+
+
+
     let getExecutor (executorType: sorterSgdExecutorType) : IRunParamsExecutor =
         match executorType with
         | sorterSgdExecutorType.GenStandard -> standardExecutor
         | sorterSgdExecutorType.GenMerge -> mergeExecutor
+        | sorterSgdExecutorType.Gen32pfx4 -> sorter32pfx4Executor
         | sorterSgdExecutorType.SummaryReport -> Reporting.fullReportExecutor
         | sorterSgdExecutorType.SnapshotReport -> Reporting.snapshotReportExecutor

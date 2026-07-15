@@ -36,7 +36,7 @@ module SorterEvalSpecsRs =
     module Specs =
 
         let Rand_Test (executorType: sorterEvalExecutorType)  : runHostSpec = {
-            databaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
+            databaseName = SorterEvalDbs.Standard.dbName
             runName = sprintf @"Rand-Test16_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             runDescription = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
             spans = [
@@ -53,7 +53,7 @@ module SorterEvalSpecsRs =
         }
 
         let Rand_Small (executorType: sorterEvalExecutorType) : runHostSpec = {
-            databaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
+            databaseName = SorterEvalDbs.Standard.dbName
             runName = sprintf @"Rand-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             runDescription = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
             spans = [
@@ -70,7 +70,7 @@ module SorterEvalSpecsRs =
         }
 
         let Rand_Medium (executorType: sorterEvalExecutorType) : runHostSpec = {
-            databaseName = SorterEvalDbs.RandomStandard.Uniform.dbName
+            databaseName = SorterEvalDbs.Standard.dbName
             runName = sprintf @"Rand-Medium_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             runDescription = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
             spans = [

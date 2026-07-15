@@ -91,7 +91,7 @@ module SortableTestDbs =
                 dbName
                 (Some repl)
                 outputDataType
-                [| (runParameters.sorterLibIdKey, SorterLibId.toString sorterLibId);
+                [| (runParameters.sortableTestFilterKey, SorterLibId.toString sorterLibId);
                    (runParameters.sortableDataFormatKey, SortableDataFormat.toString sortableDataFormat); |]
 
 
@@ -100,7 +100,7 @@ module SortableTestDbs =
                         (odt: outputDataType) : queryParams option =
             maybe {
                 let! repl = rp.GetRepl()
-                let! slId = rp.GetSorterLibId()
+                let! slId = rp.GetSortableTestFilter()
                 let! sdf = rp.GetSortableDataFormat()
                 return makeMergeQueryParams repl slId sdf odt
             }

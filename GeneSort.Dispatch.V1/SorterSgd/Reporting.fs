@@ -116,7 +116,7 @@ module Reporting =
 
                 // 1. Calculate the target generation slices
                 let reportGenerations = 
-                    [ (%genCurrent + %genReportInterval) .. %genReportInterval .. %genLast ]
+                    [ %genCurrent .. %genReportInterval .. %genLast ]
                     |> List.map UMX.tag<generationNumber>
 
                 if List.isEmpty reportGenerations then
