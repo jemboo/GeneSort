@@ -34,8 +34,9 @@ module Msuf4SgdSpecsTestPrefix =
             (runParameters.generationCurrentKey, [0] |> List.map string)
             
 
-    let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
+    let prefixEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
+        let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
+
         rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
@@ -77,7 +78,7 @@ module Msuf4SgdSpecsTestPrefix =
                 sortedFraction90
             ]
             filter = paramMapFilter
-            enhancer = standardEnhancer
+            enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
             maxParallel = 1
         }

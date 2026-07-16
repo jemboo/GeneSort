@@ -9,10 +9,10 @@ open GeneSort.Dispatch.V1.CommonParams
 
 module SorterEvalSpecsTestPrefix =
 
-    let private mergeEnhancer 
+    let private prefixEnhancer 
                     (host: IRunHost) 
                     (rp: runParameters) : runParameters =
-        let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters host.Run.RunName)
+        let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
                  |> Option.get
 
         let stf = rp.GetSortableTestFilter().Value
@@ -64,7 +64,7 @@ module SorterEvalSpecsTestPrefix =
                 largeSorterCount
             ]
             filter = paramMapFilter
-            enhancer = mergeEnhancer
+            enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
             maxParallel = 1
         }
