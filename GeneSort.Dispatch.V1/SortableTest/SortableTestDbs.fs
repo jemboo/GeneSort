@@ -81,7 +81,7 @@ module SortableTestDbs =
                        |> UMX.tag<pathToRootFolder>
 
 
-        let makeMergeQueryParams 
+        let makeQueryParams 
                     (repl: int<replNumber>) 
                     (sorterLibId: sorterLibId)
                     (sortableDataFormat: sortableDataFormat) 
@@ -95,18 +95,18 @@ module SortableTestDbs =
                    (runParameters.sortableDataFormatKey, SortableDataFormat.toString sortableDataFormat); |]
 
 
-        let makeMergeQueryParamsFromRunParams 
+        let makeQueryParamsFromRunParams 
                         (rp: runParameters) 
                         (odt: outputDataType) : queryParams option =
             maybe {
                 let! repl = rp.GetRepl()
                 let! slId = rp.GetSortableTestFilter()
                 let! sdf = rp.GetSortableDataFormat()
-                return makeMergeQueryParams repl slId sdf odt
+                return makeQueryParams repl slId sdf odt
             }
 
 
-        let db = new GeneSortDbMp(dbFolder, makeMergeQueryParamsFromRunParams)
+        let db = new GeneSortDbMp(dbFolder, makeQueryParamsFromRunParams)
 
         let getPrefixSorterTestSet
                         (repl: int<replNumber>) 
@@ -114,7 +114,7 @@ module SortableTestDbs =
                         (sortableDataFormat: sortableDataFormat) 
                                 : Async<Result<sortableTest, string>> =
 
-            let qp = makeMergeQueryParams 
+            let qp = makeQueryParams 
                             repl 
                             sorterLibId
                             sortableDataFormat 

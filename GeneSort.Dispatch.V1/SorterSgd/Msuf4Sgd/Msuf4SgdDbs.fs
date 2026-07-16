@@ -201,9 +201,9 @@ module Msuf4SgdDbs =
         let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
 
 
-    module ThrityTwoPfx4 =
+    module Prefix =
             
-        let dbName = "ThrityTwoPfx4" |> UMX.tag<databaseName>
+        let dbName = "Prefix" |> UMX.tag<databaseName>
         let dbFolder = 
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
@@ -300,7 +300,7 @@ module Msuf4SgdDbs =
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
         [ (Standard.dbName, Standard.db :> IGeneSortDb);
           (Merge.dbName, Merge.db :> IGeneSortDb);
-          (ThrityTwoPfx4.dbName, ThrityTwoPfx4.db :> IGeneSortDb);  ]
+          (Prefix.dbName, Prefix.db :> IGeneSortDb);  ]
         |> Map.ofList
 
 

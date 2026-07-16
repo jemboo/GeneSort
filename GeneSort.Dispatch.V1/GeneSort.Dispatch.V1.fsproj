@@ -34,7 +34,7 @@
     <Compile Include="SorterEval\SorterEvalExecutor.fs" />
     <Compile Include="SorterEval\SorterEvalSpecsRs.fs" />
     <Compile Include="SorterEval\SorterEvalSpecsRm.fs" />
-    <Compile Include="SorterEval\SorterEvalSpecsPrefix.fs" />
+    <Compile Include="SorterEval\SorterEvalSpecsTestPrefix.fs" />
     <Compile Include="SorterMutate\CommonSorterMutate.fs" />
     <Compile Include="SorterMutate\MsceMutate\MsceMutateDbs.fs" />
     <Compile Include="SorterMutate\MsceMutate\MsceMutateExecutor.fs" />
@@ -73,7 +73,7 @@
     <Compile Include="SorterSgd\Msuf4Sgd\Msuf4SgdExecutor.fs" />
     <Compile Include="SorterSgd\Msuf4Sgd\Msuf4SgdSpecsRs.fs" />
     <Compile Include="SorterSgd\Msuf4Sgd\Msuf4SgdSpecsRm.fs" />
-    <Compile Include="SorterSgd\Msuf4Sgd\Msuf4SgdSpecs32Pfx4.fs" />
+    <Compile Include="SorterSgd\Msuf4Sgd\Msuf4SgdSpecsTestPrefix.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

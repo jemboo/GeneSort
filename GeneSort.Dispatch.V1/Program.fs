@@ -98,7 +98,6 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let host: IRunHost = 
 //    let spec = SortableTestSpecsPrefix.getRunHostSpec configType executorType
 //    SortableTestDbs.createRunHost spec
-
 //let executor = SortableTest.SortableTestExecutor.getExecutor executorType
 
 
@@ -119,8 +118,18 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let host: IRunHost = 
 //    let spec = SorterEvalSpecsRm.getRunHostSpec configType executorType
 //    SorterEvalDbs.createRunHost spec
-
 //let executor = SorterEvalExecutor.getExecutor executorType
+
+
+
+//********** SorterEval Prefix **********
+//let configType = SorterEvalSpecsTestPrefix.configType.TestPrefixFilter_Test
+//let executorType = sorterEvalExecutorType.GenPrefix
+//let host: IRunHost = 
+//    let spec = SorterEvalSpecsTestPrefix.getRunHostSpec configType executorType
+//    SorterEvalDbs.createRunHost spec
+//let executor = SorterEvalExecutor.getExecutor executorType
+
 
 
 //********** MsceMutateSpecsRs **********
@@ -130,6 +139,8 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //    let spec = MsceMutateSpecsRs.getRunHostSpec configType executorType
 //    MsceMutateDbs.createRunHost spec
 //let executor = MsceMutateExecutor.getExecutor executorType
+
+
 
 //********** MsceMutateSpecsRm **********
 //let configType = MsceMutateSpecsRm.configType.Rand_Test
@@ -273,19 +284,23 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** Msuf4SgdSpecsRm **********
-let configType = Msuf4SgdSpecs32Pfx4.configType.Rand_Test
-let executorType = sorterSgdExecutorType.Gen32pfx4
+let configType = Msuf4SgdSpecsTestPrefix.configType.Rand_Test
+let executorType = sorterSgdExecutorType.GenPrefix
 let host: IRunHost = 
-    let spec = Msuf4SgdSpecs32Pfx4.getRunHostSpec configType executorType
+    let spec = Msuf4SgdSpecsTestPrefix.getRunHostSpec configType executorType
     Msuf4SgdDbs.createRunHost spec
 let executor = Msuf4SgdExecutor.getExecutor executorType
 
+
+
+
+
+
+
+
+
 let minReplica = 0<replNumber>
 let maxReplica = 1<replNumber>
-
-
-
-
 
 
 async {

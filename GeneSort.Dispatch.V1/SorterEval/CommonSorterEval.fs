@@ -12,6 +12,7 @@ open GeneSort.Dispatch.V1.CommonParams
 type sorterEvalExecutorType = 
     | GenStandard
     | GenMerge
+    | GenPrefix
     | FullReport
     | StageStatsReport
     | CeBinReport
@@ -21,6 +22,7 @@ module SorterEvalExecutorType =
     let toString = function
         | GenStandard -> "GenStandard"
         | GenMerge -> "GenMerge"
+        | GenPrefix -> "GenPrefix"
         | FullReport -> "FullReport"
         | StageStatsReport -> "StageStatsReport"
         | CeBinReport -> "CeBinReport"

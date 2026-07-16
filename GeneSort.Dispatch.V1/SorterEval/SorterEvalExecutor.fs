@@ -59,8 +59,26 @@ module SorterEvalExecutor =
         }
 
 
+    let makePrefixTests (rp: runParameters) : Async<Result<sortableTest, string>> =
+        async {
+            let paramsOpt = option {
+                let repl = 0 |> UMX.tag<replNumber>   
+                let! stf = rp.GetSortableTestFilter()
+                let! sdf = rp.GetSortableDataFormat()
+                return (repl, stf, sdf)
+            }
+
+            match paramsOpt with
+            | Some (repl, stf, sdf) ->
+                return! SortableTestDbs.Prefix.getPrefixSorterTestSet repl stf sdf  
+            | None ->
+                return Error "Failed: One or more RunParameters for MergeTests were missing."
+        }
+
+
+
     /// Creates and returns the generator using CommonSorterEval.
-    let makeUniformSorterModelGen (rp: runParameters) : sorterModelGen option =
+    let makeSorterModelGen (rp: runParameters) : sorterModelGen option =
         maybe {
             let! sortingWidth = rp.GetSortingWidth()
             let! simpleSorterModelType = rp.GetSimpleSorterModelType()
@@ -91,7 +109,7 @@ module SorterEvalExecutor =
                 let sortersPerSplit = 1000 |> UMX.tag<sorterCount>
                 let splitFactor = %totalSorterCount / %sortersPerSplit
                 
-                log (sprintf "Initializing Sorter Generation over %d chunks..." splitFactor)
+                log (sprintf "Sorter evaluation over %d chunks..." splitFactor)
                 
                 let! sorterModelGen = 
                     makeModelGen rp 
@@ -325,21 +343,30 @@ module SorterEvalExecutor =
 
 
 
-    let uniformStandardExecutor =
+    let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvals 
-                    makeUniformSorterModelGen
+                    makeSorterModelGen
                     makeStandardTests
                     host rp allowOverwrite cts progress }
 
-    let uniformMergeExecutor =
+    let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvals 
-                    makeUniformSorterModelGen
+                    makeSorterModelGen
                     makeMergeTests
                     host rp allowOverwrite cts progress }
+
+    let prefixExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                _makeSorterEvals 
+                    makeSorterModelGen
+                    makePrefixTests
+                    host rp allowOverwrite cts progress }
+
 
     let stageStatsReportExecutor =
         { new IRunParamsExecutor with
@@ -362,8 +389,9 @@ module SorterEvalExecutor =
 
     let getExecutor (executorType: sorterEvalExecutorType) : IRunParamsExecutor =
         match executorType with
-        | GenStandard -> uniformStandardExecutor
-        | sorterEvalExecutorType.GenMerge -> uniformMergeExecutor
+        | GenStandard -> standardExecutor
+        | sorterEvalExecutorType.GenMerge -> mergeExecutor
+        | sorterEvalExecutorType.GenPrefix -> prefixExecutor
         | FullReport -> fullReportExecutor
         | StageStatsReport -> stageStatsReportExecutor
         | CeBinReport -> ceBinsReportExecutor

@@ -11,7 +11,7 @@ open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterSgd
 
 
-module Msuf4SgdSpecs32Pfx4 =
+module Msuf4SgdSpecsTestPrefix =
 
     let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
@@ -49,7 +49,7 @@ module Msuf4SgdSpecs32Pfx4 =
     module Specs =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = Msuf4SgdDbs.ThrityTwoPfx4.dbName
+            databaseName = Msuf4SgdDbs.Prefix.dbName
             runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for 32pfx4 Msuf4"
             spans = [
@@ -82,84 +82,13 @@ module Msuf4SgdSpecs32Pfx4 =
             maxParallel = 1
         }
 
-        let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
-            databaseName = Msuf4SgdDbs.Merge.dbName
-            runName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for merge Msuf4"
-            spans = [
-                rngTypeLcg
-                sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
-                sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
-                seedModificationRate12
-                modificationRatesMsuf4
-                smallMergeSortingWidths
-                msuf4ModelType
-                lowMergeDimensions
-                noSuffixSuffixType
-                dataFormatInt8v512
-                poolCount10
-                oneSorterPerPool
-                oneChildCount
-                generationCurrent
-                genReportInterval10
-                generationLast
-                sortedFraction90
-            ]
-            filter = paramMapFilter
-            enhancer = standardEnhancer
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 8
-        }
-
-        let Rand_Medium (executorType: sorterSgdExecutorType) : runHostSpec = {
-            databaseName = Msuf4SgdDbs.Merge.dbName
-            runName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for merge Msuf4"
-            spans = [
-                rngTypeLcg
-                sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
-                sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
-                seedModificationRate12
-                modificationRatesMsuf4
-                mediumMergeSortingWidths
-                msuf4ModelType
-                lowMergeDimensions
-                noSuffixSuffixType
-                dataFormatInt8v512
-                poolCount10
-                oneSorterPerPool
-                oneChildCount
-                generationCurrent
-                genReportInterval10
-                generationLast
-                sortedFraction90
-            ]
-            filter = paramMapFilter
-            enhancer = standardEnhancer
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 4
-        }
 
     type configType =
         | Rand_Test
-        | Rand_Small
-        | Rand_Medium
 
     let Configs = Map.ofList 
                     [ 
-                        (configType.Rand_Test, Specs.Rand_Test); 
-                        (configType.Rand_Small, Specs.Rand_Small);
-                        (configType.Rand_Medium, Specs.Rand_Medium);
+                        (configType.Rand_Test, Specs.Rand_Test);
                     ]
 
     let getRunHostSpec (config: configType) (executorType: sorterSgdExecutorType) : runHostSpec =

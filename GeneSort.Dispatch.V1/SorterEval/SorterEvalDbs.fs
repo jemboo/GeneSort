@@ -9,6 +9,7 @@ open GeneSort.Project.V1
 open GeneSort.Db.V1
 open GeneSort.FileDb.V1
 open GeneSort.Dispatch.V1
+open GeneSort.SortingLib.Sorter
 open CommonSorterEval
 open GeneSort.Dispatch.V1.CommonParams
 
@@ -118,11 +119,9 @@ module SorterEvalDbs =
 
         let makeQueryParams
                     (rng: rngType)
-                    (repl: int<replNumber>) 
-                    (sortingWidth: int<sortingWidth>)
+                    (repl: int<replNumber>)
+                    (sorterLibId: sorterLibId)
                     (simpleSorterModelType: simpleSorterModelType)
-                    (mergeDimension: int<mergeDimension>) 
-                    (mergeSuffixType: mergeSuffixType)
                     (sortableDataFormat: sortableDataFormat) 
                     (sorterEvalType: sorterEvalType)
                     (outputDataType: outputDataType) : queryParams =
@@ -133,10 +132,8 @@ module SorterEvalDbs =
                 outputDataType
                 [| 
                     (runParameters.rngTypeKey, rng |> RngType.toString)
-                    (runParameters.sortingWidthKey, string %sortingWidth); 
+                    (runParameters.sortableTestFilterKey, SorterLibId.toString sorterLibId);
                     (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
-                    (runParameters.mergeDimensionKey, string %mergeDimension);
-                    (runParameters.mergeSuffixTypeKey, mergeSuffixType |> MergeSuffixType.toString);
                     (runParameters.sorterEvalTypeKey, sorterEvalType |> SorterEvalType.toString) 
                     (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
                 |]
@@ -147,14 +144,12 @@ module SorterEvalDbs =
                                 (odt: outputDataType) : queryParams option =
             maybe {
                 let! rng = rp.GetRngType()
-                let! repl = rp.GetRepl()
-                let! sw = rp.GetSortingWidth()
-                let! md = rp.GetMergeDimension()
-                let! mst = rp.GetMergeSuffixType()
+                let! slId = rp.GetSortableTestFilter()
                 let! smt = rp.GetSimpleSorterModelType()
                 let! sdf = rp.GetSortableDataFormat()
                 let! set = rp.GetSorterEvalType() 
-                return makeQueryParams rng repl sw smt md mst sdf set odt
+                let! repl = rp.GetRepl()
+                return makeQueryParams rng repl slId smt sdf set odt
             }
 
         let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -169,7 +164,8 @@ module SorterEvalDbs =
 
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
         [ (Standard.dbName, Standard.db :> IGeneSortDb);
-          (Merge.dbName, Merge.db :> IGeneSortDb) ]
+          (Merge.dbName, Merge.db :> IGeneSortDb) 
+          (Prefix.dbName, Prefix.db :> IGeneSortDb) ]
         |> Map.ofList
 
 

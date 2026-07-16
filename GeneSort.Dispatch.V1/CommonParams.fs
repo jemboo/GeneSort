@@ -141,6 +141,10 @@ module CommonParams =
             (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
     let sortingWidth16 = 
             (runParameters.sortingWidthKey, [16] |> List.map string)
+    let sortingWidth24 = 
+            (runParameters.sortingWidthKey, [24] |> List.map string)
+    let sortingWidth28 = 
+            (runParameters.sortingWidthKey, [28] |> List.map string)
     let sortingWidth32 = 
             (runParameters.sortingWidthKey, [32] |> List.map string)
     let smallSortingWidths = 
@@ -286,20 +290,20 @@ module CommonParams =
 
 
     // SortableTestFilters
-    let _sorterLibId24_4 = 
+    let _sortableTestFilter_Prefix24_4 = 
             SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix4
-    let sorterLibId24_4 = 
-            (runParameters.sortableTestFilterKey, [_sorterLibId24_4] |> List.map SorterLibId.toString)
+    let sortableTestFilter_Prefix24_4 = 
+            (runParameters.sortableTestFilterKey, [_sortableTestFilter_Prefix24_4] |> List.map SorterLibId.toString)
 
-    let _sorterLibId28_4 = 
+    let _sortableTestFilter_Prefix28_4 = 
             SorterLibId.create (28<sortingWidth>) sorterVariant.Prefix4
-    let sorterLibId28_4 = 
-            (runParameters.sortableTestFilterKey, [_sorterLibId28_4] |> List.map SorterLibId.toString)
+    let sortableTestFilter_Prefix28_4 = 
+            (runParameters.sortableTestFilterKey, [_sortableTestFilter_Prefix28_4] |> List.map SorterLibId.toString)
 
-    let _sorterLibId32_4 = 
+    let _sortableTestFilter_Prefix32_4 = 
             SorterLibId.create (32<sortingWidth>) sorterVariant.Prefix4
-    let sorterLibId32_4 = 
-            (runParameters.sortableTestFilterKey, [_sorterLibId32_4] |> List.map SorterLibId.toString)
+    let sortableTestFilter_Prefix32_4 = 
+            (runParameters.sortableTestFilterKey, [_sortableTestFilter_Prefix32_4] |> List.map SorterLibId.toString)
 
 
     // Sorted Fractions
@@ -337,6 +341,7 @@ module CommonParams =
         | 20 -> 200
         | 22 -> 250
         | 24 -> 300
+        | 28 -> 300
         | 32 -> match smt with | Msuf4 -> 600 | _ -> 300
         | 36 -> 350
         | 48 -> 400

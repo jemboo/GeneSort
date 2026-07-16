@@ -137,6 +137,6 @@ module Msuf4SgdExecutor =
         match executorType with
         | sorterSgdExecutorType.GenStandard -> standardExecutor
         | sorterSgdExecutorType.GenMerge -> mergeExecutor
-        | sorterSgdExecutorType.Gen32pfx4 -> sorter32pfx4Executor
+        | sorterSgdExecutorType.GenPrefix -> sorter32pfx4Executor
         | sorterSgdExecutorType.SummaryReport -> Reporting.fullReportExecutor
         | sorterSgdExecutorType.SnapshotReport -> Reporting.snapshotReportExecutor
