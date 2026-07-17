@@ -122,15 +122,12 @@ module PoolSetMakers =
 
 
 
-
-    let createSeedSorterPoolSet32pfx4
+    let createSeedSorterPoolSetPrefix
             (rp:runParameters) : Async<Result<sorterPoolSet, string>> =
         asyncResult {
-            let! sortingWidth = rp.GetSortingWidth() |> Result.ofOption "Missing sorting width."
+            let! sorterLibId = rp.GetSortableTestFilter() |> Result.ofOption "Missing sorterLibId."
             let! poolCount = rp.GetSorterPoolCount() |> Result.ofOption "Missing poolCount."
             let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
-            let! mergeDimension = rp.GetMergeDimension() |> Result.ofOption "Missing mergeDimension."
-            let! mergeSuffixType = rp.GetMergeSuffixType() |> Result.ofOption "Missing mergeSuffixType."
             let! sorterEvalMeasureInitial = rp.GetSorterEvalMeasureInitial() |> Result.ofOption "Missing sorterEvalMeasureInitial."
             let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
             let! simpleSorterModelType = 
@@ -143,20 +140,18 @@ module PoolSetMakers =
 
             
             let! (parentSorterSetEval: sorterSetEval) = 
-                SorterEvalDbs.getMergeSorterEvals 
-                    sortingWidth 
-                    simpleSorterModelType 
-                    mergeDimension
-                    mergeSuffixType
+                SorterEvalDbs.getPrefixSorterEvals 
+                    sorterLibId 
+                    simpleSorterModelType
                     sorterEvalType.V2
 
             let seedSorterModelGen = 
                 CommonSorterEval.getSimpleUniformSorterModelGen 
                     rngType 
-                    sortingWidth 
+                    sorterLibId.sortingWidth 
                     simpleSorterModelType
 
-            let sorterEvalSelection = 
+            let sorterEvalSelection =
                 SorterEvalSelection.makeSelection 
                     sorterEvalMeasureInitial 
                     sorterEvalSelectionType 
@@ -176,4 +171,5 @@ module PoolSetMakers =
                 (sorterEvalSelection.ToEvalLabelMap())
                 seedSorterModelSet
         }
+
 

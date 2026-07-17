@@ -108,12 +108,12 @@ module SortableTestDbs =
 
         let db = new GeneSortDbMp(dbFolder, makeQueryParamsFromRunParams)
 
-        let getPrefixSorterTestSet
-                        (repl: int<replNumber>) 
-                        (sorterLibId: sorterLibId)
-                        (sortableDataFormat: sortableDataFormat) 
-                                : Async<Result<sortableTest, string>> =
 
+
+        let getPrefixSorterTestSet
+                (repl: int<replNumber>) 
+                (sorterLibId: sorterLibId)
+                (sortableDataFormat: sortableDataFormat): Async<Result<sortableTest, string>> =
             let qp = makeQueryParams 
                             repl 
                             sorterLibId

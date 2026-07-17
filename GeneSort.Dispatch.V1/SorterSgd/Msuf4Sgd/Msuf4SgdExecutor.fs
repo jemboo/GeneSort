@@ -123,12 +123,12 @@ module Msuf4SgdExecutor =
                     host rp allowOverwrite cts progress }
 
 
-    let sorter32pfx4Executor =
+    let prefixExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 evaluateEvolutionRun
-                    SortableTestMakers.make32pfx4Tests
-                    PoolSetMakers.createSeedSorterPoolSet32pfx4
+                    SortableTestMakers.makePrefixTests
+                    PoolSetMakers.createSeedSorterPoolSetPrefix
                     host rp allowOverwrite cts progress }
 
 
@@ -137,6 +137,6 @@ module Msuf4SgdExecutor =
         match executorType with
         | sorterSgdExecutorType.GenStandard -> standardExecutor
         | sorterSgdExecutorType.GenMerge -> mergeExecutor
-        | sorterSgdExecutorType.GenPrefix -> sorter32pfx4Executor
+        | sorterSgdExecutorType.GenPrefix -> prefixExecutor
         | sorterSgdExecutorType.SummaryReport -> Reporting.fullReportExecutor
         | sorterSgdExecutorType.SnapshotReport -> Reporting.snapshotReportExecutor

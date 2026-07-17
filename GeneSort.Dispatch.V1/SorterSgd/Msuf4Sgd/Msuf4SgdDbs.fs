@@ -11,6 +11,7 @@ open GeneSort.FileDb.V1
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
+open GeneSort.SortingLib.Sorter
 
 module Msuf4SgdDbs =
     
@@ -209,24 +210,24 @@ module Msuf4SgdDbs =
 
 
         let makeQueryParams
+                    (repl: int<replNumber>)
                     (rng: rngType)
                     (genCurrent: int<generationNumber>)
                     (sorterCtPerPool: int<sorterCountPerPool>)
                     (sorterPoolCt: int<sorterPoolCount>)
                     (childCt: int<sorterChildCount>)
                     (ses:sorterEvalSelectionType)
-                    (sem:sorterEvalMeasure)
+                    (semEvo:sorterEvalMeasure)
                     (semInitial:sorterEvalMeasure)
-                    (repl: int<replNumber>)
-                    (sortingWidth: int<sortingWidth>)
+                    (sorterLibId: sorterLibId)
                     (simpleSorterModelType: simpleSorterModelType)
                     (sortableDataFormat: sortableDataFormat) 
-                    (set: sorterEvalType)
-                    (seedMdr:float<seedModificationRate>)
+                    (sorterEvalType: sorterEvalType)
+                    (seedModRate:float<seedModificationRate>)
                     (orthoRate: float<orthoRate>)
                     (paraRate: float<paraRate>)
                     (selfSymRate: float<selfSymRate>)
-                    (mdr: float<modificationRate>)
+                    (modRate: float<modificationRate>)
                     (dsh: bool<distinctSorterHashes>)
                     (pNm: bool<prioritizeNewMutants>)
                     (sfrac: float<sortedFraction>)
@@ -243,16 +244,16 @@ module Msuf4SgdDbs =
                     (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                     (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
                     (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
-                    (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toString)
+                    (runParameters.sorterEvalMeasureKey, semEvo |> SorterEvalMeasure.toString)
                     (runParameters.sorterEvalMeasureInitialKey, semInitial |> SorterEvalMeasure.toString)
-                    (runParameters.sortingWidthKey, (Some sortingWidth) |> SortingWidth.toString); 
+                    (runParameters.sortableTestFilterKey, SorterLibId.toString sorterLibId);
                     (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
-                    (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString) 
-                    (runParameters.seedModificationRateKey, (Some seedMdr) |> SeedModificationRate.toString)
+                    (runParameters.sorterEvalTypeKey, sorterEvalType |> SorterEvalType.toString) 
+                    (runParameters.seedModificationRateKey, (Some seedModRate) |> SeedModificationRate.toString)
                     (runParameters.orthoRateKey, (Some orthoRate) |> OrthoRate.toString)
                     (runParameters.paraRateKey, (Some paraRate) |> ParaRate.toString)
                     (runParameters.selfSymRateKey, (Some selfSymRate) |> SelfSymRate.toString)
-                    (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
+                    (runParameters.modificationRateKey, (Some modRate) |> ModificationRate.toString)
                     (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
                     (runParameters.distinctSorterHashesKey, (Some %dsh) |> string)
                     (runParameters.prioritizeNewMutantsKey, (Some %pNm) |> string)
@@ -264,6 +265,7 @@ module Msuf4SgdDbs =
                                 (rp: runParameters) 
                                 (odt: outputDataType) : queryParams option =
             maybe {
+                let! repl = rp.GetRepl()
                 let! rng = rp.GetRngType()
                 let! curGen = rp.GetGenerationCurrent()
                 let! scPP = rp.GetSorterCountPerPool()
@@ -272,8 +274,7 @@ module Msuf4SgdDbs =
                 let! ses = rp.GetSorterEvalSelectionType()
                 let! sem = rp.GetSorterEvalMeasure()
                 let! semi = rp.GetSorterEvalMeasureInitial()
-                let! repl = rp.GetRepl()
-                let! sw = rp.GetSortingWidth()
+                let! slId = rp.GetSortableTestFilter()
                 let! smt = rp.GetSimpleSorterModelType()
                 let! sdf = rp.GetSortableDataFormat()
                 let! set = rp.GetSorterEvalType()
@@ -285,9 +286,9 @@ module Msuf4SgdDbs =
                 let! dsh = rp.GetDistinctSorterHashes()
                 let! pNm = rp.GetPrioritizeNewMutants()
                 let! sfrac = rp.GetSortedFraction()
-                return makeQueryParams rng curGen scPP spc scc ses sem semi 
-                                        repl sw smt sdf set sdMdr ortho 
-                                        para sym mdr dsh pNm sfrac odt
+                return makeQueryParams repl rng curGen scPP spc scc ses sem  
+                                       semi slId smt sdf set sdMdr ortho 
+                                       para sym mdr dsh pNm sfrac odt
 
             }
 

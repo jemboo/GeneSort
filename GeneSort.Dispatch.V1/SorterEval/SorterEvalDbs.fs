@@ -220,20 +220,16 @@ module SorterEvalDbs =
 
 
     let getPrefixSorterEvals
-                    (sortingWidth: int<sortingWidth>)
+                    (sorterLibId: sorterLibId)
                     (simpleSorterModelType: simpleSorterModelType)
-                    (mergeDimension: int<mergeDimension>) 
-                    (mergeSuffixType: mergeSuffixType)
                     (sorterEvalType: sorterEvalType)
                             : Async<Result<sorterSetEval, string>> =
 
-        let qp = Merge.makeQueryParams 
+        let qp = Prefix.makeQueryParams 
                         _rngTypeLcg
                         (0 |> UMX.tag<replNumber>) 
-                        sortingWidth 
+                        sorterLibId 
                         simpleSorterModelType
-                        mergeDimension 
-                        mergeSuffixType 
                         sortableDataFormat.Int8Vector512
                         sorterEvalType
                         (outputDataType.SorterSetEval "")

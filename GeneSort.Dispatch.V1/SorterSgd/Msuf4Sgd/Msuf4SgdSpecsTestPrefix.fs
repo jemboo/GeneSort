@@ -13,7 +13,7 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 module Msuf4SgdSpecsTestPrefix =
 
-    let sorterEvalSelection = 
+    let sorterEvalSelectionTypeRs5000 = 
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.RankSpan 5000<sorterCount>;] 
             |> List.map SorterEvalSelectionType.toString)
@@ -54,28 +54,28 @@ module Msuf4SgdSpecsTestPrefix =
             runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for 32pfx4 Msuf4"
             spans = [
-                sortingWidth32
-                msuf4ModelType
                 rngTypeLcg
-                sorterEvalTypeV1
-                sorterEvalSelection
-                sorterEvalMeasureInitial
+                generationCurrent
+                oneTwenty8SortersPerPool
+                poolCount1
+                oneChildCount
+                sorterEvalSelectionTypeRs5000
                 sorterEvalMeasureEvo
+                sorterEvalMeasureInitial
+                sortableTestFilter_Prefix24_4
+                msuf4ModelType
+                sorterEvalTypeV1
+                seedModificationRate03
                 orthoRate
                 paraRate
                 selfSymRate
-                seedModificationRate03
                 modificationRate03
                 dataFormatInt8v512
-                poolCount1
-                oneTwenty8SortersPerPool
-                oneChildCount
-                generationCurrent
-                genReportInterval1
-                generationLast
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction90
+                genReportInterval1
+                generationLast
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
