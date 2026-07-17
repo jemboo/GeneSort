@@ -250,7 +250,7 @@ module CommonParams =
         (runParameters.modificationRateKey, [ 0.02; 0.035; 0.045; 0.05; 0.055; 0.065; 0.08 ] |> List.map string)
 
     let modificationRatesMsuf4 =
-            (runParameters.modificationRateKey, [0.02; 0.03; 0.04;] |> List.map string)
+            (runParameters.modificationRateKey, [0.02; 0.03; 0.04; 0.05] |> List.map string)
 
     let modificationRatesStage =
             (runParameters.modificationRateKey, [ 0.04; 0.08; 0.16; 0.24;] |> List.map string)
@@ -309,6 +309,9 @@ module CommonParams =
     // Sorted Fractions
     let sortedFractions = 
             (runParameters.sortedFractionKey, [0.65; 0.75; 0.85; 0.90; 0.95; 0.98; 0.99; 0.995] |> List.map string)
+
+    let sortedFractionsHi = 
+            (runParameters.sortedFractionKey, [0.99; 0.995] |> List.map string)
 
     let sortedFraction90 = 
             (runParameters.sortedFractionKey, [0.90] |> List.map string)

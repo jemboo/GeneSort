@@ -230,11 +230,11 @@ module SorterEvalDbs =
                         (0 |> UMX.tag<replNumber>) 
                         sorterLibId 
                         simpleSorterModelType
-                        sortableDataFormat.Int8Vector512
+                        sortableDataFormat.BitVector512
                         sorterEvalType
                         (outputDataType.SorterSetEval "")
         async {
-             let! result = (Merge.db :> IGeneSortDb).loadAsync qp
+             let! result = (Prefix.db :> IGeneSortDb).loadAsync qp
              return  result |> Result.bind OutputData.asSorterSetEval
         }
 

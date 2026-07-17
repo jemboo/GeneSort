@@ -28,7 +28,7 @@ module Msuf4SgdSpecsTestPrefix =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [10] |> List.map string)
+            (runParameters.generationLastKey, [20000] |> List.map string)
 
     let generationCurrent = 
             (runParameters.generationCurrentKey, [0] |> List.map string)
@@ -36,8 +36,10 @@ module Msuf4SgdSpecsTestPrefix =
 
     let prefixEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
-
+        
+        let stf = rp.GetSortableTestFilter().Value
         rp.WithDatabaseName(Some host.Run.DatabaseName)
+          .WithSortingWidth(Some stf.sortingWidth)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
           .WithId (Some qp.Value.Id)
@@ -56,25 +58,25 @@ module Msuf4SgdSpecsTestPrefix =
             spans = [
                 rngTypeLcg
                 generationCurrent
-                oneTwenty8SortersPerPool
+                fiveTwelveSortersPerPool
                 poolCount1
                 oneChildCount
                 sorterEvalSelectionTypeRs5000
                 sorterEvalMeasureEvo
                 sorterEvalMeasureInitial
-                sortableTestFilter_Prefix24_4
+                sortableTestFilter_Prefix32_4
                 msuf4ModelType
                 sorterEvalTypeV1
                 seedModificationRate03
                 orthoRate
                 paraRate
                 selfSymRate
-                modificationRate03
-                dataFormatInt8v512
+                modificationRatesMsuf4
+                dataFomatBitv512
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
-                sortedFraction90
-                genReportInterval1
+                sortedFractionsHi
+                genReportInterval1000
                 generationLast
             ]
             filter = paramMapFilter
