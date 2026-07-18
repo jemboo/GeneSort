@@ -13,7 +13,7 @@ type msceRandMutate =
         { 
           id : Guid<sorterModelMutatorId>
           rngFactory: rngFactory
-          indelRates: indelRates // Changed from indelRatesArray
+          indelRates: indelRates
           excludeSelfCe: bool<excludeSelfCe> }
     with
     static member create 

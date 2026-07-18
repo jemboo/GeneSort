@@ -144,6 +144,37 @@ module ArrayUtils =
             | None   -> fullSeq)
 
 
+    // recombines the two input arrays, both of the same length.
+    // rndFlt returns random values in (0, 1). 
+    // getProb returns the probability that a crossover will occur at a given index.
+    let crossOver 
+            (lhs: 'a[]) 
+            (rhs: 'a[]) 
+            (getProb: int -> float) 
+            (rndFlt: unit -> float)
+            : 'a[] * 'a[] =
+        
+        let len = lhs.Length
+        let resLhs = Array.copy lhs
+        let resRhs = Array.copy rhs
+        
+        // Tracks whether we are currently swapping elements
+        let mutable swapActive = false
+        
+        for i = 0 to len - 1 do
+            // Every time the condition is met, toggle the swap state
+            if rndFlt() < getProb i then
+                swapActive <- not swapActive
+            
+            // If swapActive is true, exchange elements at this index
+            if swapActive then
+                let temp = resLhs.[i]
+                resLhs.[i] <- resRhs.[i]
+                resRhs.[i] <- temp
+                
+        (resLhs, resRhs)
+
+
     // You must use the 'unmanaged' constraint for NativePtr operations
     let fastGenericCopyToBuffer0 (source: 'T[]) (dest: 'T[]) : unit when 'T : unmanaged =
         let byteCount = uint32 (source.Length * Unsafe.SizeOf<'T>())
