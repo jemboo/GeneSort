@@ -50,11 +50,15 @@ module SorterPoolSet =
     let mutate 
             (sorterModelMutator: sorterModelMutator) 
             (mutantsPerSorter: int<sorterChildCount>)  
-            (poolSet: sorterPoolSet) : sorterPoolSet =
+            (poolSet: sorterPoolSet): sorterPoolSet =
         
         let mutatedPools = 
             poolSet._sorterPools 
-            |> Map.map (fun _ pool -> SorterPool.mutate sorterModelMutator mutantsPerSorter pool)
+            |> Map.map (fun _ pool -> SorterPool.mutate 
+                                            sorterModelMutator 
+                                            mutantsPerSorter
+                                            poolSet.GenerationNumber
+                                            pool)
 
         { poolSet with _sorterPools = mutatedPools }
 
@@ -189,6 +193,7 @@ module SorterPoolSet =
                             (0 |> UMX.tag<mutationIndex>)   // Initial tracking index starts at 0
                             None                            // Root node element has no parent mutation source
                             None                            // Transient evaluation state begins unassigned
+                            0<generationNumber>             // Happy born day
                     )
 
                 // 4. Wrap the evaluated array segment block inside an explicit tracking pool object container

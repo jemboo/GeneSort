@@ -20,6 +20,7 @@ type sorterPoolMemberDto = {
     [<Key(2)>] sorterMutationIndex: int
     [<Key(3)>] sorterMutationSource: sorterMutationSourceDto option
     [<Key(4)>] sorterEvalDto: sorterEvalDto option
+    [<Key(5)>] birthday: int
 }
 
 [<MessagePackObject>]
@@ -53,6 +54,7 @@ module SorterPoolSetDto =
                             sorterMutationIndex = UMX.untag m.MutationIndex
                             sorterMutationSource = m.SorterMutationSource |> Option.map SorterMutationSourceDto.toDto
                             sorterEvalDto = m.SorterEval |> Option.map SorterEvalDto.fromDomain
+                            birthday = m.Birthday |> UMX.untag
                         }
                     )
                     |> Seq.toArray
@@ -85,6 +87,7 @@ module SorterPoolSetDto =
                             (UMX.tag m.sorterMutationIndex)
                             sourceOpt
                             evalOpt
+                            (UMX.tag m.birthday)
                     )
                 sorterPool.create 
                             (p.sorterPoolId |> UMX.tag<sorterPoolId>) 

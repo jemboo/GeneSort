@@ -26,10 +26,9 @@ module SorterPipeline =
         // Step 1: Expand the population across all sub-pools
         |> SorterPoolSet.mutate mutator sorterChildCount
         
-        // Step 2: Extract, evaluate, and transform the operational scores back into context
-        |> (fun expandedPoolSet ->
-                let computedEvals = 
-                    expandedPoolSet 
+        |> (fun (expandedPoolSet: sorterPoolSet) ->
+                let (computedEvals: Map<Guid<sorterPoolMemberId>, sorterEval>) = 
+                    expandedPoolSet
                     |> SorterPoolRunner.evaluatePoolSet 
                                         sortableTest 
                                         sorterEvalType

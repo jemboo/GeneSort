@@ -13,10 +13,12 @@ type sorterPoolMember =
         _mutationIndex:        int<mutationIndex>
         _sorterMutationSource: sorterMutationSource option
         _sorterEval:           sorterEval option
+        _birthday:             int<generationNumber>
     }
 
-    member this.SorterPoolMemberId = this._sorterPoolMemberId
-    member this.SorterModel = this._sorterModel
+    member this.Birthday with get() = this._birthday
+    member this.SorterPoolMemberId with get() = this._sorterPoolMemberId
+    member this.SorterModel with get() = this._sorterModel
     // The mutationIndex is incremented each time a new mutation is applied to the sorterModel. 
     // If it wasn't, the same mutant would be created each time.
     member this.MutationIndex = this._mutationIndex
@@ -28,13 +30,15 @@ type sorterPoolMember =
                     sorterModel 
                     mutationIndex 
                     sorterMutationSource 
-                    sorterEval =
+                    sorterEval 
+                    birthday =
         { 
             _sorterPoolMemberId = sorterPoolMemberId
             _sorterModel = sorterModel
             _mutationIndex = mutationIndex 
             _sorterMutationSource = sorterMutationSource
             _sorterEval = sorterEval
+            _birthday = birthday
         }
 
 
@@ -55,7 +59,8 @@ module SorterPoolMember =
     /// Generates 'mutantCount' new mutants, updating the parent's index by 'mutantCount'
     let mutate (sorterModelMutator: sorterModelMutator) 
                (spm: sorterPoolMember) 
-               (mutantCount: int<sorterChildCount>) : sorterPoolMember * sorterPoolMember [] =
+               (mutantCount: int<sorterChildCount>) 
+               (currentGeneration: int<generationNumber>): sorterPoolMember * sorterPoolMember [] =
         
         let countRaw = %mutantCount
         let baseIndexRaw = %spm.MutationIndex
@@ -89,6 +94,7 @@ module SorterPoolMember =
                     (0 |> UMX.tag)          // New mutants start at mutation index 0
                     (Some mutationSource)
                     None                    // New mutants start unevaluated
+                    currentGeneration
             )
 
         // Increment the parent's SorterMutationIndex by the number of mutants produced

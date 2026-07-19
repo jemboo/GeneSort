@@ -34,23 +34,23 @@ type spmDescription =
 module SpmDescription = 
 
     let toDataTableRecordWithPrefix (prefix: string) 
-                                    (eval: spmDescription) : dataTableRecord =
+                                    (spmDesc: spmDescription) : dataTableRecord =
         // 1. Map root scalar fields belonging directly to spmDescription
         let baseRecord =
             dataTableRecord.createEmpty()
-            |> dataTableRecord.addData (sprintf "%sSorterPoolMemberId" prefix) (string (%eval.SorterPoolMemberId))
-            |> dataTableRecord.addData (sprintf "%sSorterModelId" prefix) (string (%eval.SorterModelId))
-            |> dataTableRecord.addData (sprintf "%sMutationIndex" prefix) (string (%eval.MutationIndex))
+            |> dataTableRecord.addData (sprintf "%sSorterPoolMemberId" prefix) (string (%spmDesc.SorterPoolMemberId))
+            |> dataTableRecord.addData (sprintf "%sSorterModelId" prefix) (string (%spmDesc.SorterModelId))
+            |> dataTableRecord.addData (sprintf "%sMutationIndex" prefix) (string (%spmDesc.MutationIndex))
 
         // 2. Flatten optional sorterMutationSource properties if present
         let sourceRecord =
-            match eval.SorterMutationSource with
+            match spmDesc.SorterMutationSource with
             | Some source -> source |> SorterMutationSource.toDataTableRecordWithPrefix prefix
             | None -> dataTableRecord.createEmpty()
 
         // 3. Flatten optional sorterEval metrics if present
         let evalRecord =
-            match eval.SorterEval with
+            match spmDesc.SorterEval with
             | Some sorterEval -> sorterEval |> SorterEval.toDataTableRecordWithPrefix prefix
             | None -> dataTableRecord.createEmpty()
 

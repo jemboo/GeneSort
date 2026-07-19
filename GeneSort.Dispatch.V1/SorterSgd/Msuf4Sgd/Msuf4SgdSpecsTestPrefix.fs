@@ -28,7 +28,7 @@ module Msuf4SgdSpecsTestPrefix =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [20000] |> List.map string)
+            (runParameters.generationLastKey, [20] |> List.map string)
 
     let generationCurrent = 
             (runParameters.generationCurrentKey, [0] |> List.map string)
@@ -58,7 +58,7 @@ module Msuf4SgdSpecsTestPrefix =
             spans = [
                 rngTypeLcg
                 generationCurrent
-                fiveTwelveSortersPerPool
+                oneSorterPerPool
                 poolCount1
                 oneChildCount
                 sorterEvalSelectionTypeRs5000
@@ -76,7 +76,7 @@ module Msuf4SgdSpecsTestPrefix =
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFractionsHi
-                genReportInterval1000
+                genReportInterval1
                 generationLast
             ]
             filter = paramMapFilter

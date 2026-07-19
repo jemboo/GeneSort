@@ -100,6 +100,7 @@ module SorterPool =
     let mutate 
             (sorterModelMutator: sorterModelMutator) 
             (mutantsPerSorter: int<sorterChildCount>)  
+            (currentGeneration: int<generationNumber>)
             (pool: sorterPool) : sorterPool =
 
         let updatedMembersMap =
@@ -108,8 +109,12 @@ module SorterPool =
             |> Seq.fold (fun accMap currentMember ->
                 // Invoke the member-level mutation strategy designed earlier
                 let updatedParent, childMutants = 
-                    SorterPoolMember.mutate sorterModelMutator currentMember mutantsPerSorter
-                
+                    SorterPoolMember.mutate 
+                            sorterModelMutator 
+                            currentMember 
+                            mutantsPerSorter
+                            currentGeneration
+
                 // Add the updated parent to our accumulator map
                 let mapWithParent = Map.add updatedParent.SorterPoolMemberId updatedParent accMap
                 
@@ -122,6 +127,7 @@ module SorterPool =
             ) Map.empty
 
         { pool with _sorterPoolMembers = updatedMembersMap }
+
 
     /// Trims the SorterPool to size prunedSize, selecting the best (lowest score) according to measure
     let pruneSorterPool 
@@ -149,7 +155,9 @@ module SorterPool =
 
         let filter2 =
             if %distinctSorterHashes then
-                filter1 |> Seq.distinctBy (fun spm -> %(SorterEval.getSequenceHash spm.SorterEval.Value))
+                filter1 
+                |> Seq.sortBy(fun spm -> %spm.Birthday)
+                |> Seq.distinctBy (fun spm -> %(SorterEval.getSequenceHash spm.SorterEval.Value))
             else
                 filter1
 
@@ -181,4 +189,83 @@ module SorterPool =
             |> Seq.toArray
 
         sorterPool.create pool.SorterPoolId pool.Name sortedSurvivors pool.RawCeLength
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ///// Trims the SorterPool to size prunedSize, selecting the best (lowest score) according to measure
+    //let pruneSorterPool 
+    //            (pool: sorterPool) 
+    //            (measure: sorterEvalMeasure) 
+    //            (prioritizeNewMutants: bool<prioritizeNewMutants>)
+    //            (distinctSorterHashes: bool<distinctSorterHashes>)
+    //            (sorterCountPerPool: int<sorterCountPerPool>) : sorterPool =
+        
+    //    let targetSize = max 0 %sorterCountPerPool
+    //    let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
+    //    let filterUnsorted = SorterEvalFunctions.getFilterUnsortedFlag measure
+
+    //    let filter1 =
+    //        pool._sorterPoolMembers
+    //        |> Map.values
+    //        // Step 1: Handle filtering of unsorted elements if required by the measure rules
+    //        |> Seq.filter (fun spm ->
+    //            if filterUnsorted then
+    //                match spm.SorterEval with
+    //                | Some eval -> SorterEval.getUnsortedCount eval <= 0<sortableCount>
+    //                | None -> false // Unevaluated members cannot verify if they are fully sorted
+    //            else true
+    //        )
+
+    //    let filter2 =
+    //        if %distinctSorterHashes then
+    //            filter1 |> Seq.distinctBy (fun spm -> %(SorterEval.getSequenceHash spm.SorterEval.Value))
+    //        else
+    //            filter1
+
+    //    let sortedSurvivors =
+    //        filter2
+    //        // Step 2: Score members and construct the sorting key matrix
+    //        // Unevaluated members (None) get Double.PositiveInfinity (worst possible score)
+    //        |> Seq.map (fun spm ->
+    //            let score = 
+    //                match spm.SorterEval with
+    //                | Some eval -> scoreFunc eval
+    //                | None -> Double.PositiveInfinity
+    //            (score, spm)
+    //        )
+    //        // Step 3: Sort ascending (best scores first). 
+    //        // Tie-break on MutationIndex when scores match uniformly.
+    //        |> Seq.sortBy (fun (score, spm) ->
+    //            let mIndexRaw = %spm.MutationIndex
+                
+    //            // If prioritizing NEW mutants: lower mutation index comes first.
+    //            // If prioritizing OLD members: higher mutation index comes first (so we negate it).
+    //            let tieBreaker = if %prioritizeNewMutants then mIndexRaw else -mIndexRaw
+                
+    //            (score, tieBreaker)
+    //        )
+    //        // Step 4: Take the best up to the designated pruned size limit
+    //        |> Seq.truncate targetSize
+    //        |> Seq.map snd
+    //        |> Seq.toArray
+
+    //    sorterPool.create pool.SorterPoolId pool.Name sortedSurvivors pool.RawCeLength
 

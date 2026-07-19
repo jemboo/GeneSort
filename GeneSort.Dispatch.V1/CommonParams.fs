@@ -38,6 +38,9 @@ module CommonParams =
     let genReportInterval1 = 
         (runParameters.generationReportIntervalKey, [1] |> List.map string)
 
+    let genReportInterval2 = 
+        (runParameters.generationReportIntervalKey, [1] |> List.map string)
+
     let genReportInterval10 = 
         (runParameters.generationReportIntervalKey, [10] |> List.map string)
 

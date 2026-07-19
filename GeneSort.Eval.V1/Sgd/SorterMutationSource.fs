@@ -28,7 +28,7 @@ type sorterMutationSource =
 module SorterMutationSource = 
     
     let toDataTableRecordWithPrefix (prefix: string) (source: sorterMutationSource) : dataTableRecord =
-        dataTableRecord.createEmpty()
+        (dataTableRecord.createEmpty())
         |> dataTableRecord.addData (sprintf "%sSorterModelMutatorId" prefix) (string (%source.SorterModelMutatorId))
         |> dataTableRecord.addData (sprintf "%sParentSorterModelId" prefix) (string (%source.SorterModelId))
         |> dataTableRecord.addData (sprintf "%sParentMutationIndex" prefix) (string (%source.SorterMutationIndex))
