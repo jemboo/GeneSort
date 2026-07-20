@@ -83,8 +83,7 @@ module SorterPool =
 
     /// Gets the sorterEvals from the sorterPool, and ignores SorterPoolMembers that don't have them
     let extractSorterEvals (pool: sorterPool) : Map<Guid<sorterPoolMemberId>, sorterEval> =
-        pool._sorterPoolMembers
-        |> Map.values
+        pool.SorterPoolMembers
         |> Seq.fold (fun accMap spm ->
             match spm.SorterEval with
             | Some eval -> 
@@ -104,8 +103,7 @@ module SorterPool =
             (pool: sorterPool) : sorterPool =
 
         let updatedMembersMap =
-            pool._sorterPoolMembers
-            |> Map.values
+            pool.SorterPoolMembers
             |> Seq.fold (fun accMap currentMember ->
                 // Invoke the member-level mutation strategy designed earlier
                 let updatedParent, childMutants = 
@@ -142,8 +140,7 @@ module SorterPool =
         let filterUnsorted = SorterEvalFunctions.getFilterUnsortedFlag measure
 
         let filter1 =
-            pool._sorterPoolMembers
-            |> Map.values
+            pool.SorterPoolMembers
             // Step 1: Handle filtering of unsorted elements if required by the measure rules
             |> Seq.filter (fun spm ->
                 if filterUnsorted then
@@ -153,13 +150,18 @@ module SorterPool =
                 else true
             )
 
+        let birthdaySort = 
+            if %prioritizeNewMutants then
+                filter1 |> Seq.sortBy(fun spm -> - %spm.Birthday)
+            else
+                filter1 |> Seq.sortBy(fun spm -> spm.Birthday )
+
         let filter2 =
             if %distinctSorterHashes then
-                filter1 
-                |> Seq.sortBy(fun spm -> %spm.Birthday)
+                birthdaySort 
                 |> Seq.distinctBy (fun spm -> %(SorterEval.getSequenceHash spm.SorterEval.Value))
             else
-                filter1
+                birthdaySort
 
         let sortedSurvivors =
             filter2
