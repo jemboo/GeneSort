@@ -14,20 +14,23 @@ type spmDescription =
         _mutationIndex:        int<mutationIndex>
         _sorterMutationSource: sorterMutationSource option
         _sorterEval:           sorterEval option
+        _birthday:             int<generationNumber>
     }
-    member this.SorterPoolMemberId = this._sorterPoolMemberId
-    member this.SorterModelId = this._sorterModelId
-    member this.MutationIndex = this._mutationIndex
-    member this.SorterMutationSource = this._sorterMutationSource
-    member this.SorterEval = this._sorterEval
+    member this.Birthday with get() = this._birthday
+    member this.SorterPoolMemberId with get() = this._sorterPoolMemberId
+    member this.SorterModelId with get() = this._sorterModelId
+    member this.MutationIndex with get() = this._mutationIndex
+    member this.SorterMutationSource with get() = this._sorterMutationSource
+    member this.SorterEval with get() = this._sorterEval
 
-    static member Create poolMemberId modelId mutationIndex mutationSource evaluation =
+    static member create poolMemberId modelId mutationIndex mutationSource evaluation birthday =
         {
             _sorterPoolMemberId = poolMemberId
             _sorterModelId = modelId
             _mutationIndex = mutationIndex
             _sorterMutationSource = mutationSource
             _sorterEval = evaluation
+            _birthday = birthday
         }
 
 
@@ -41,6 +44,7 @@ module SpmDescription =
             |> dataTableRecord.addData (sprintf "%sSorterPoolMemberId" prefix) (string (%spmDesc.SorterPoolMemberId))
             |> dataTableRecord.addData (sprintf "%sSorterModelId" prefix) (string (%spmDesc.SorterModelId))
             |> dataTableRecord.addData (sprintf "%sMutationIndex" prefix) (string (%spmDesc.MutationIndex))
+            |> dataTableRecord.addData (sprintf "%sBirthday" prefix) (string (%spmDesc.Birthday))
 
         // 2. Flatten optional sorterMutationSource properties if present
         let sourceRecord =
@@ -110,12 +114,13 @@ module SorterPoolSetDescription =
                     pool.SorterPoolMembers
                     |> Seq.map (fun spm ->
                         let modelId = SorterModel.getId spm.SorterModel
-                        spmDescription.Create 
+                        spmDescription.create 
                             spm.SorterPoolMemberId 
                             modelId 
                             spm.MutationIndex 
                             spm.SorterMutationSource 
                             spm.SorterEval
+                            spm.Birthday
                     )
                     |> Seq.toArray
 
