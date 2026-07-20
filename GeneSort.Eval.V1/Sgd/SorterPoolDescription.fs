@@ -37,6 +37,7 @@ type spmDescription =
 module SpmDescription = 
 
     let toDataTableRecordWithPrefix (prefix: string) 
+                                    (currentGen: int<generationNumber>)
                                     (spmDesc: spmDescription) : dataTableRecord =
         // 1. Map root scalar fields belonging directly to spmDescription
         let baseRecord =
@@ -45,6 +46,7 @@ module SpmDescription =
             |> dataTableRecord.addData (sprintf "%sSorterModelId" prefix) (string (%spmDesc.SorterModelId))
             |> dataTableRecord.addData (sprintf "%sMutationIndex" prefix) (string (%spmDesc.MutationIndex))
             |> dataTableRecord.addData (sprintf "%sBirthday" prefix) (string (%spmDesc.Birthday))
+            |> dataTableRecord.addData (sprintf "%sAge" prefix) (string (%currentGen - %spmDesc.Birthday))
 
         // 2. Flatten optional sorterMutationSource properties if present
         let sourceRecord =
@@ -160,7 +162,7 @@ module SorterPoolSetDescription =
             poolDesc.SorterPoolMembers
             |> Array.map (fun memberDesc ->
                 memberDesc 
-                |> SpmDescription.toDataTableRecordWithPrefix prefix
+                |> SpmDescription.toDataTableRecordWithPrefix prefix %setDesc.GenerationNumber
                 |> dataTableRecord.combine poolContextDtr
             )
         )
