@@ -229,7 +229,7 @@ module CommonParams =
             (runParameters.seedModificationRateKey, [0.10] |> List.map string)
 
     let seedModificationRates =
-            (runParameters.seedModificationRateKey, [0.08; 0.12; 0.16] |> List.map string)
+            (runParameters.seedModificationRateKey, [0.02; 0.03;] |> List.map string)
 
     let seedModificationRates2 =
             (runParameters.seedModificationRateKey, [0.10; 0.14] |> List.map string)
@@ -253,7 +253,7 @@ module CommonParams =
         (runParameters.modificationRateKey, [ 0.02; 0.035; 0.045; 0.05; 0.055; 0.065; 0.08 ] |> List.map string)
 
     let modificationRatesMsuf4 =
-            (runParameters.modificationRateKey, [0.02; 0.03; 0.04; 0.05] |> List.map string)
+            (runParameters.modificationRateKey, [0.015; 0.02; 0.025; 0.03] |> List.map string)
 
     let modificationRatesStage =
             (runParameters.modificationRateKey, [ 0.04; 0.08; 0.16; 0.24;] |> List.map string)

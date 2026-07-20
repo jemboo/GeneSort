@@ -13,9 +13,9 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 module Msuf4SgdSpecsTestPrefix =
 
-    let sorterEvalSelectionTypeRs5000 = 
+    let sorterEvalSelectionTypeRs6000 = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.RankSpan 5000<sorterCount>;] 
+            [ sorterEvalSelectionType.RankSpan 6000<sorterCount>;] 
             |> List.map SorterEvalSelectionType.toString)
 
 
@@ -28,7 +28,7 @@ module Msuf4SgdSpecsTestPrefix =
             [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [20] |> List.map string)
+            (runParameters.generationLastKey, [1000] |> List.map string)
 
     let generationCurrent = 
             (runParameters.generationCurrentKey, [0] |> List.map string)
@@ -58,31 +58,31 @@ module Msuf4SgdSpecsTestPrefix =
             spans = [
                 rngTypeLcg
                 generationCurrent
-                oneSorterPerPool
-                poolCount1
+                fiveTwelveSortersPerPool
+                poolCount5
                 oneChildCount
-                sorterEvalSelectionTypeRs5000
+                sorterEvalSelectionTypeRs6000
                 sorterEvalMeasureEvo
                 sorterEvalMeasureInitial
                 sortableTestFilter_Prefix32_4
                 msuf4ModelType
                 sorterEvalTypeV1
-                seedModificationRate03
+                seedModificationRates
                 orthoRate
                 paraRate
                 selfSymRate
                 modificationRatesMsuf4
                 dataFomatBitv512
-                distinctSorterHashesTrue
+                distinctSorterHashesBoth
                 prioritizeNewMutantsTrue
-                sortedFractionsHi
-                genReportInterval1
+                sortedFraction99
+                genReportInterval100
                 generationLast
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 1
+            maxParallel = 8
         }
 
 
