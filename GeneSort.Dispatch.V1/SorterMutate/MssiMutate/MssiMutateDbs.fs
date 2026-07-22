@@ -40,7 +40,7 @@ module MssiMutateDbs =
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
                        (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
-                       (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toString)
+                       (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toCompactString)
                        (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                        (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString)
@@ -102,7 +102,7 @@ module MssiMutateDbs =
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
                        (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
-                       (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toString)
+                       (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toCompactString)
                        (runParameters.sortingWidthKey, string %sortingWidth); 
                        (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
                        (runParameters.mergeDimensionKey, string %mergeDimension);

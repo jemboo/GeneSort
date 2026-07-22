@@ -42,7 +42,7 @@ module MsceMutateDbs =
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
                        (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
-                       (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toString)
+                       (runParameters.sorterEvalMeasureKey, sem |> SorterEvalFunctions.toCompactString)
                        (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                        (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString)
@@ -107,7 +107,7 @@ module MsceMutateDbs =
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
                        (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
-                       (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toString)
+                       (runParameters.sorterEvalMeasureKey, sem |> SorterEvalFunctions.toCompactString)
                        (runParameters.sortingWidthKey, string %sortingWidth); 
                        (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
                        (runParameters.mergeDimensionKey, string %mergeDimension);

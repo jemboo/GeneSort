@@ -4,7 +4,6 @@ open FSharp.UMX
 open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
-open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Sorting
 open GeneSort.Dispatch.V1.CommonParams
@@ -15,19 +14,6 @@ module MsrsSgdSpecsRs =
     let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.Tmb 1500<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
-
-    let sorterEvalMeasureInitial = 
-            (runParameters.sorterEvalMeasureInitialKey , 
-            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
-
-    let sorterEvalMeasureEvo = 
-            (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
-
-    let sorterEvalMeasureEvos = 
-            (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (0.8, true);
-              sorterEvalMeasure.CeSt (2.0, true); ] |> List.map SorterEvalMeasure.toString)
 
     let generationLast = 
             (runParameters.generationLastKey, [2500] |> List.map string)
@@ -62,8 +48,8 @@ module MsrsSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noRs
                 orthoRate
                 paraRate
                 selfSymRate
@@ -91,8 +77,8 @@ module MsrsSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noRs
                 orthoRate
                 paraRate
                 selfSymRate
@@ -123,8 +109,8 @@ module MsrsSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noRs
                 orthoRate
                 paraRate
                 selfSymRate
@@ -152,8 +138,8 @@ module MsrsSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noRs
                 orthoRate
                 paraRate
                 selfSymRate

@@ -253,11 +253,11 @@ type runParameters =
 
     member this.GetSorterEvalMeasure() =
         this.paramMap.TryFind runParameters.sorterEvalMeasureKey
-        |> Option.map SorterEvalMeasure.fromString
+        |> Option.map SorterEvalFunctions.fromCompactString
 
     member this.GetSorterEvalMeasureInitial() =
         this.paramMap.TryFind runParameters.sorterEvalMeasureInitialKey
-        |> Option.map SorterEvalMeasure.fromString
+        |> Option.map SorterEvalFunctions.fromCompactString
 
     member this.GetSorterEvalSelectionType() =
         this.paramMap.TryFind runParameters.sorterEvalSelectionType
@@ -417,10 +417,10 @@ type runParameters =
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountPerPoolKey (sc |> Option.map UmxExt.intToRaw) }
 
     member this.WithSorterEvalMeasure(sem: sorterEvalMeasure option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalMeasureKey (sem |> Option.map SorterEvalMeasure.toString) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalMeasureKey (sem |> Option.map SorterEvalFunctions.toCompactString) }
 
     member this.WithSorterEvalMeasureInitial(sem: sorterEvalMeasure option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalMeasureInitialKey (sem |> Option.map SorterEvalMeasure.toString) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalMeasureInitialKey (sem |> Option.map SorterEvalFunctions.toCompactString) }
 
     member this.WithSorterEvalSelectionType(ses: sorterEvalSelectionType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalSelectionType (ses |> Option.map SorterEvalSelectionType.toString) }

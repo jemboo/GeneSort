@@ -17,15 +17,6 @@ module Msuf4SgdSpecsRm =
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.RankSpan 5000<sorterCount>;] 
             |> List.map SorterEvalSelectionType.toString)
-
-
-    let sorterEvalMeasureInitial = 
-            (runParameters.sorterEvalMeasureInitialKey , 
-            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
-
-    let sorterEvalMeasureEvo = 
-            (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
         
     let generationLast = 
             (runParameters.generationLastKey, [10] |> List.map string)
@@ -64,8 +55,8 @@ module Msuf4SgdSpecsRm =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 orthoRate
                 paraRate
                 selfSymRate
@@ -98,8 +89,8 @@ module Msuf4SgdSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -132,8 +123,8 @@ module Msuf4SgdSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 sorterEvalTypeV1
                 orthoRate
                 paraRate

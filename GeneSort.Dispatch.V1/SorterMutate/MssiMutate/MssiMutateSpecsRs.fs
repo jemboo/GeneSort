@@ -17,10 +17,6 @@ module MssiMutateSpecsRs =
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
-
-    let sorterEvalMeasure = 
-            (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (1.0, true); ] |> List.map SorterEvalMeasure.toString)
     
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
@@ -47,7 +43,7 @@ module MssiMutateSpecsRs =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure
+                sorterEvalMeasure_CestM_noRs
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -70,7 +66,7 @@ module MssiMutateSpecsRs =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure
+                sorterEvalMeasure_CestM_noRs
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -92,7 +88,7 @@ module MssiMutateSpecsRs =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure
+                sorterEvalMeasure_CestM_noRs
                 sorterEvalTypeV1
                 orthoRate
                 paraRate

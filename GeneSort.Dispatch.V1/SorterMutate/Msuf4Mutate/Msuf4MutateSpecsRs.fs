@@ -17,10 +17,6 @@ module Msuf4MutateSpecsRs =
     let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.Tmb 6<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
-
-    let sorterEvalMeasure = 
-            (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (1.0, true); ] |> List.map SorterEvalMeasure.toString)
     
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
@@ -49,7 +45,7 @@ module Msuf4MutateSpecsRs =
             spans = [
                 rngTypeLcg
                 sorterEvalSelection
-                sorterEvalMeasure
+                sorterEvalMeasure_CestM_noRs
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -74,7 +70,7 @@ module Msuf4MutateSpecsRs =
             spans = [
                 rngTypeLcg
                 sorterEvalSelection
-                sorterEvalMeasure
+                sorterEvalMeasure_CestM_noRs
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -98,7 +94,7 @@ module Msuf4MutateSpecsRs =
             spans = [
                 rngTypeLcg
                 sorterEvalSelection
-                sorterEvalMeasure
+                sorterEvalMeasure_CestM_noRs
                 sorterEvalTypeV1
                 orthoRate
                 paraRate

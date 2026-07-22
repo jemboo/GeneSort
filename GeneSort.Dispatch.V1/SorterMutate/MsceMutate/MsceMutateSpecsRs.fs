@@ -17,10 +17,6 @@ module MsceMutateSpecsRs =
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
-
-    let sorterEvalMeasure = 
-            (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (1.0, true); ] |> List.map SorterEvalMeasure.toString)
     
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
@@ -57,7 +53,7 @@ module MsceMutateSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasure
+                sorterEvalMeasure_CestM_Rs
                 mutationRates
                 insertionRates
                 deletionRates
@@ -81,7 +77,7 @@ module MsceMutateSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasure
+                sorterEvalMeasure_CestM_Rs
                 mutationRates
                 insertionRates
                 deletionRates
@@ -104,7 +100,7 @@ module MsceMutateSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasure
+                sorterEvalMeasure_CestM_Rs
                 mutationRates
                 insertionRates
                 deletionRates

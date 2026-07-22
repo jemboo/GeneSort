@@ -143,7 +143,7 @@ module SorterPool =
             pool.SorterPoolMembers
             // Step 1: Handle filtering of unsorted elements if required by the measure rules
             |> Seq.filter (fun spm ->
-                if filterUnsorted then
+                if %filterUnsorted then
                     match spm.SorterEval with
                     | Some eval -> SorterEval.getUnsortedCount eval <= 0<sortableCount>
                     | None -> false // Unevaluated members cannot verify if they are fully sorted

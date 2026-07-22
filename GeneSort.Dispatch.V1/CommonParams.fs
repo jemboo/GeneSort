@@ -1,9 +1,10 @@
 ﻿namespace GeneSort.Dispatch.V1
+
+open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.Sorting
 open GeneSort.SortingOps
-open FSharp.UMX
 open GeneSort.Model.Sorting.V1
 open GeneSort.SortingLib.Sorter
 
@@ -330,6 +331,45 @@ module CommonParams =
 
     let sortedFraction99 = 
             (runParameters.sortedFractionKey, [0.99] |> List.map string)
+
+
+
+
+    // SorterEvalMeasures
+
+    let _cestM_noRs = ceStMeasure.create 
+                                (1.1<stageWeight>) 
+                                (true |> UMX.tag<filterUnsorted>)
+                                (false |> UMX.tag<filterReflectionSymmetric>)
+                      |> sorterEvalMeasure.CeSt
+
+    let _cestM_Rs = ceStMeasure.create 
+                                (1.1<stageWeight>) 
+                                (true |> UMX.tag<filterUnsorted>)
+                                (false |> UMX.tag<filterReflectionSymmetric>)
+                    |> sorterEvalMeasure.CeSt
+
+
+    let sorterEvalMeasureInitial_CestM_noRs =
+            (runParameters.sorterEvalMeasureInitialKey, 
+            [ _cestM_noRs;] |> List.map SorterEvalMeasure.toCompactString)
+    let sorterEvalMeasureInitial_CestM_Rs =
+            (runParameters.sorterEvalMeasureInitialKey, 
+            [ _cestM_Rs;] |> List.map SorterEvalMeasure.toCompactString)
+
+
+
+    let sorterEvalMeasure_CestM_noRs =
+            (runParameters.sorterEvalMeasureKey, 
+            [ _cestM_noRs;] |> List.map SorterEvalMeasure.toCompactString)
+    let sorterEvalMeasure_CestM_Rs =
+            (runParameters.sorterEvalMeasureKey, 
+            [ _cestM_Rs;] |> List.map SorterEvalMeasure.toCompactString)
+
+
+    let sorterEvalMeasure_CestM_Both =
+            (runParameters.sorterEvalMeasureKey, 
+            [ _cestM_noRs; _cestM_Rs;] |> List.map SorterEvalMeasure.toCompactString)
 
 
 

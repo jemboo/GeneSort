@@ -51,10 +51,17 @@ type sorterEvalSelection =
     }
 
     static member Empty = 
+        
+        let _cestM_noRs = ceStMeasure.create 
+                                    (1.1<stageWeight>) 
+                                    (true |> UMX.tag<filterUnsorted>)
+                                    (false |> UMX.tag<filterReflectionSymmetric>)
+                          |> sorterEvalMeasure.CeSt
         { selectionType = Tmb 0<sorterCount>; 
-          measure = CeLength false; 
+          measure = _cestM_noRs; 
           labeledSorterEvals = [||] 
-          sortableTestId = Guid.Empty |> UMX.tag<sortableTestId>}
+          sortableTestId = Guid.Empty |> UMX.tag<sortableTestId> }
+
 
     static member create 
                     (selType: sorterEvalSelectionType) 
@@ -210,7 +217,7 @@ module EvalReporting =
         dataTableRecord.createEmpty()
         |> dataTableRecord.addData "SelectionType" (SorterEvalSelectionType.toString selection.SelectionType)
         |> dataTableRecord.addData "SelectionStrategy" (SorterEvalSelectionType.toStrategyLabel selection.SelectionType)
-        |> dataTableRecord.addData "Measure" (SorterEvalMeasure.toString selection.Measure)
+        |> dataTableRecord.addData "Measure" (SorterEvalFunctions.toCompactString selection.Measure)
         |> dataTableRecord.combine leadCols
         |> dataTableRecord.combine (SorterEvalMeasure.toDataTableRecord selection.Measure)
 

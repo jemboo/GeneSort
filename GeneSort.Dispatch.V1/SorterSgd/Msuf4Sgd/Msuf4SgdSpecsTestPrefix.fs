@@ -17,15 +17,6 @@ module Msuf4SgdSpecsTestPrefix =
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.RankSpan 6000<sorterCount>;] 
             |> List.map SorterEvalSelectionType.toString)
-
-
-    let sorterEvalMeasureInitial = 
-            (runParameters.sorterEvalMeasureInitialKey , 
-            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
-
-    let sorterEvalMeasureEvo = 
-            (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
         
     let generationLast = 
             (runParameters.generationLastKey, [10000] |> List.map string)
@@ -62,8 +53,8 @@ module Msuf4SgdSpecsTestPrefix =
                 poolCount2
                 oneChildCount
                 sorterEvalSelectionTypeRs6000
-                sorterEvalMeasureEvo
-                sorterEvalMeasureInitial
+                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noRs
                 sortableTestFilter_Prefix32_4
                 msuf4ModelType
                 sorterEvalTypeV1

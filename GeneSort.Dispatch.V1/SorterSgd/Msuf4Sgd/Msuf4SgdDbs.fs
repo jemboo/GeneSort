@@ -53,8 +53,8 @@ module Msuf4SgdDbs =
                     (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                     (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
                     (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
-                    (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toString)
-                    (runParameters.sorterEvalMeasureInitialKey, semInitial |> SorterEvalMeasure.toString)
+                    (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toCompactString)
+                    (runParameters.sorterEvalMeasureInitialKey, semInitial |> SorterEvalMeasure.toCompactString)
                     (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                     (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
                     (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString)
@@ -146,8 +146,8 @@ module Msuf4SgdDbs =
                     (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                     (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
                     (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
-                    (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toString)
-                    (runParameters.sorterEvalMeasureInitialKey, semInitial |> SorterEvalMeasure.toString)
+                    (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toCompactString)
+                    (runParameters.sorterEvalMeasureInitialKey, semInitial |> SorterEvalMeasure.toCompactString)
                     (runParameters.sortingWidthKey, string %sortingWidth); 
                     (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
                     (runParameters.mergeDimensionKey, string %mergeDimension);
@@ -244,8 +244,8 @@ module Msuf4SgdDbs =
                     (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                     (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
                     (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
-                    (runParameters.sorterEvalMeasureKey, semEvo |> SorterEvalMeasure.toString)
-                    (runParameters.sorterEvalMeasureInitialKey, semInitial |> SorterEvalMeasure.toString)
+                    (runParameters.sorterEvalMeasureKey, semEvo |> SorterEvalMeasure.toCompactString)
+                    (runParameters.sorterEvalMeasureInitialKey, semInitial |> SorterEvalMeasure.toCompactString)
                     (runParameters.sortableTestFilterKey, SorterLibId.toString sorterLibId);
                     (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
                     (runParameters.sorterEvalTypeKey, sorterEvalType |> SorterEvalType.toString) 

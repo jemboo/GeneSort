@@ -20,11 +20,6 @@ module MsrsMutateSpecsRm =
             [ sorterEvalSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
 
 
-    let sorterEvalMeasure = 
-            (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (1.0, true);] |> List.map SorterEvalMeasure.toString)
-
-
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
         rp.WithDatabaseName(Some host.Run.DatabaseName)
@@ -52,7 +47,7 @@ module MsrsMutateSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure
+                sorterEvalMeasure_CestM_noRs
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -78,7 +73,7 @@ module MsrsMutateSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure
+                sorterEvalMeasure_CestM_noRs
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -104,7 +99,7 @@ module MsrsMutateSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure
+                sorterEvalMeasure_CestM_noRs
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -130,7 +125,7 @@ module MsrsMutateSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure
+                sorterEvalMeasure_CestM_noRs
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -156,7 +151,7 @@ module MsrsMutateSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure
+                sorterEvalMeasure_CestM_noRs
                 sorterEvalTypeV1
                 orthoRate
                 paraRate

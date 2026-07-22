@@ -1,15 +1,12 @@
 ﻿namespace GeneSort.Dispatch.V1.SorterSgd.Msce
 
-
 open FSharp.UMX
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
-open GeneSort.SortingOps
 open GeneSort.Sorting
 open GeneSort.Eval.V1
-open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterSgd
 
@@ -18,14 +15,6 @@ module MsceSgdSpecsRm =
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.Tmb 10<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
-
-    let sorterEvalMeasureInitial = 
-            (runParameters.sorterEvalMeasureInitialKey , 
-            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
-
-    let sorterEvalMeasureEvo = 
-            (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
     
     let generationLast = 
             (runParameters.generationLastKey, [100] |> List.map string)
@@ -87,8 +76,8 @@ module MsceSgdSpecsRm =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 mutationRates
                 insertionRates
                 deletionRates
@@ -119,8 +108,8 @@ module MsceSgdSpecsRm =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 mutationRates
                 insertionRates
                 deletionRates
@@ -151,8 +140,8 @@ module MsceSgdSpecsRm =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 mutationRates
                 insertionRates
                 deletionRates
@@ -183,8 +172,8 @@ module MsceSgdSpecsRm =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 mutationRates
                 insertionRates
                 deletionRates
@@ -215,8 +204,8 @@ module MsceSgdSpecsRm =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 mutationRates
                 insertionRates
                 deletionRates
@@ -248,8 +237,8 @@ module MsceSgdSpecsRm =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 mutationRates
                 insertionRates
                 deletionRates

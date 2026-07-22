@@ -20,19 +20,6 @@ module MssiSgdSpecsRs =
     let sorterEvalSelection = 
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.Tmb 1500<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
-
-    let sorterEvalMeasureInitial = 
-            (runParameters.sorterEvalMeasureInitialKey , 
-            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
-
-    let sorterEvalMeasureEvo = 
-            (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
-
-    let sorterEvalMeasureEvos = 
-            (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (0.8, true);
-              sorterEvalMeasure.CeSt (2.0, true); ] |> List.map SorterEvalMeasure.toString)
         
     let generationLast = 
             (runParameters.generationLastKey, [2500] |> List.map string)
@@ -76,8 +63,8 @@ module MssiSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 orthoRate
                 paraRate
                 modificationRatesMsuf4
@@ -105,8 +92,8 @@ module MssiSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 orthoRate
                 paraRate
                 modificationRatesMsuf4
@@ -136,8 +123,8 @@ module MssiSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 orthoRate
                 paraRate
                 modificationRatesMsuf4
@@ -164,8 +151,8 @@ module MssiSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 orthoRate
                 paraRate
                 modificationRatesMsuf4

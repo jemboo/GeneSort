@@ -21,14 +21,6 @@ module MsceSgdSpecsRs =
     let sorterEvalSelectionType = 
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.Tmb 1500<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
-
-    let sorterEvalMeasureInitial = 
-            (runParameters.sorterEvalMeasureInitialKey , 
-            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
-
-    let sorterEvalMeasureEvo = 
-            (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
     
     let generationLast = 
             (runParameters.generationLastKey, [2500] |> List.map string)
@@ -80,8 +72,8 @@ module MsceSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 mutationRates
                 insertionRates
                 deletionRates
@@ -109,8 +101,8 @@ module MsceSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 mutationRates
                 insertionRates
                 deletionRates
@@ -140,8 +132,8 @@ module MsceSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 mutationRates
                 insertionRates
                 deletionRates
@@ -169,8 +161,8 @@ module MsceSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 mutationRates
                 insertionRates
                 deletionRates

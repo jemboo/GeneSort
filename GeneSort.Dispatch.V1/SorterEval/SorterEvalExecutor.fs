@@ -272,7 +272,7 @@ module SorterEvalExecutor =
                     |> SorterStageStats.fromSorterEval
                     |> Array.map (fun sss -> sss.toDataTableRecord())
 
-                let _sorterEvalMeasure = sorterEvalMeasure.CeSt (1.0, true);
+                let _sorterEvalMeasure = CommonParams._cestM_noRs
                 let _sorterEvalSelectionType = sorterEvalSelectionType.Tmb 300<sorterCount>
                 let _sorterEvalSelection = SorterEvalSelection.makeSelection 
                                                 _sorterEvalMeasure

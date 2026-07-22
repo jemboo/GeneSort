@@ -17,22 +17,6 @@ module Msuf4SgdSpecsRs =
             (runParameters.sorterEvalSelectionType, 
             [ sorterEvalSelectionType.Tmb 3000<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
 
-    let sorterEvalMeasureInitial = 
-            (runParameters.sorterEvalMeasureInitialKey , 
-            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
-
-    let sorterEvalMeasureEvo = 
-            (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (1.1, true); ] |> List.map SorterEvalMeasure.toString)
-
-    let sorterEvalMeasureEvos = 
-            (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeSt (0.8, true);
-              sorterEvalMeasure.CeSt (2.0, true); ] |> List.map SorterEvalMeasure.toString)
-
-    let sorterEvalMeasureEvoUsc = 
-            (runParameters.sorterEvalMeasureKey, 
-            [ sorterEvalMeasure.CeStUc (1.1, 20.0); ] |> List.map SorterEvalMeasure.toString)
 
     let generationLast = 
             (runParameters.generationLastKey, [500] |> List.map string)
@@ -67,8 +51,8 @@ module Msuf4SgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 orthoRate
                 paraRate
                 selfSymRate
@@ -98,8 +82,8 @@ module Msuf4SgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 orthoRate
                 paraRate
                 selfSymRate
@@ -129,8 +113,8 @@ module Msuf4SgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvo
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 orthoRate
                 paraRate
                 selfSymRate
@@ -161,8 +145,8 @@ module Msuf4SgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial
-                sorterEvalMeasureEvoUsc
+                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasure_CestM_noRs
                 orthoRate
                 paraRate
                 selfSymRate
