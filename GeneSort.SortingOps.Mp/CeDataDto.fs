@@ -2,8 +2,8 @@
 
 open FSharp.UMX
 open MessagePack
-open GeneSort.SortingOps
 open GeneSort.Sorting.Sorter
+open GeneSort.Sorting
 
 
 // ---------------------------------------------------------------------

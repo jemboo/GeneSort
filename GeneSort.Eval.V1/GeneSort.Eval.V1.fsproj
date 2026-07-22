@@ -10,7 +10,7 @@
     </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="CommonEval.fs" />
+    <Compile Include="EvalTypes.fs" />
     <Compile Include="EvalLabel.fs" />
     <Compile Include="Sgd\SorterMutationSource.fs" />
     <Compile Include="Sgd\SorterPoolMember.fs" />

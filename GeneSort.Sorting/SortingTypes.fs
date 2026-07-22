@@ -7,6 +7,8 @@ open FSharp.UMX
 [<Measure>] type sorterId
 [<Measure>] type stageLength
 [<Measure>] type ceLength
+[<Measure>] type reflectionSymmetric
+[<Measure>] type ceIndex
 [<Measure>] type symbolSetSize
 [<Measure>] type sortableCount
 [<Measure>] type sortableTestId

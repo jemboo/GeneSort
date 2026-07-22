@@ -9,4 +9,4 @@ namespace GeneSort.Model.Sortable.V1
 [<Measure>] type sorterTestModelGenID
 [<Measure>] type sorterTestModelSetGenID
 
-module Common = ()
+module SortableTypes = ()

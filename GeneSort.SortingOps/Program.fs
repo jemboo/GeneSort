@@ -5,7 +5,7 @@ open GeneSort.Model.Sortable
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open GeneSort.SortingOps
-open GeneSort.SortingLib.Sorter
+open GeneSort.Sorting.Sorter
 
 let ceUseSoruceTester() =
 

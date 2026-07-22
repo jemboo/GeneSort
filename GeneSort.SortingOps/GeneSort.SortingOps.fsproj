@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Common.fs" />
+    <Compile Include="SortingOpsTypes.fs" />
     <Compile Include="CeBlock.fs" />
     <Compile Include="CeUseCounts.fs" />
     <Compile Include="CeBlockEval.fs" />

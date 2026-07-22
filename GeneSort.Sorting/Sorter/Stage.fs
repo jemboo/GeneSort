@@ -13,22 +13,28 @@ type stage =
     private { 
         ces: ce array 
         hashCode: int
+        sortingWidth: int<sortingWidth>
     } with
 
-    static member create (ces: ce array) =
+    static member create (ces: ce array) (sortingWidth: int<sortingWidth>) =
         // Sort CEs to ensure order-independent equality
         let sortedCes = ces |> Array.sortBy (fun c -> c.Low, c.Hi)
         let mutable h = 17
         for ce in sortedCes do
             h <- h * 23 + (ce |> Ce.toIndex)
 
-        { ces = sortedCes; hashCode = h }
+        { 
+            ces = sortedCes; 
+            hashCode = h 
+            sortingWidth = sortingWidth}
 
     member this.Ces = this.ces
 
     member this.AverageCeLength with get() =
         if this.ces.Length = 0 then 0.0
         else this.ces |> Array.averageBy (fun c -> float c.Length)
+
+    member this.SortingWidth with get() = this.sortingWidth
 
     override this.GetHashCode() = this.hashCode
 
@@ -39,6 +45,15 @@ type stage =
             this.ces.Length = other.ces.Length &&
             Array.forall2 (fun (a: ce) (b: ce) -> a.Low = b.Low && a.Hi = b.Hi) this.ces other.ces
         | _ -> false
+
+
+module Stage =
+
+   let reflect (stg: stage) : stage =
+       stage.create (stg.Ces |> Array.map(Ce.reflect stg.SortingWidth)) stg.SortingWidth
+
+   let isReflectionSymmetric (stg: stage) : bool =
+        stg = (reflect stg)
 
 
 

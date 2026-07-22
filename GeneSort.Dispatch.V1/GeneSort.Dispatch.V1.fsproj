@@ -52,7 +52,7 @@
     <Compile Include="SorterMutate\Msuf4Mutate\Msuf4MutateExecutor.fs" />
     <Compile Include="SorterMutate\Msuf4Mutate\Msuf4MutateSpecsRs.fs" />
     <Compile Include="SorterMutate\Msuf4Mutate\Msuf4MutateSpecsRm.fs" />
-    <Compile Include="SorterSgd\CommonSorterSgd.fs" />
+    <Compile Include="SorterSgd\SorterSgdTypes.fs" />
     <Compile Include="SorterSgd\PoolSetMakers.fs" />
     <Compile Include="SorterSgd\SortableTestMakers.fs" />
     <Compile Include="SorterSgd\EvolutionOrchestrator.fs" />

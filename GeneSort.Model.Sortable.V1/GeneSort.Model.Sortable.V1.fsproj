@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Common.fs" />
+    <Compile Include="SortableTypes.fs" />
     <Compile Include="MsasF.fs" />
     <Compile Include="MsasM.fs" />
     <Compile Include="MsasO.fs" />
