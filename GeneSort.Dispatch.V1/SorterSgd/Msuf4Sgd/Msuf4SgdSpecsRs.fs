@@ -59,7 +59,7 @@ module Msuf4SgdSpecsRs =
                 seedModificationRate12
                 modificationRatesMsuf4
                 sortingWidth16
-                poolCount30
+                poolCount40
                 oneSorterPerPool
                 oneChildCount
                 generationLast
@@ -90,7 +90,7 @@ module Msuf4SgdSpecsRs =
                 seedModificationRate12
                 modificationRatesMsuf4
                 sortingWidth16
-                poolCount30
+                poolCount40
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent

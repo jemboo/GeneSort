@@ -49,8 +49,8 @@ module Msuf4SgdSpecsTestPrefix =
             spans = [
                 rngTypeLcg
                 generationCurrent
-                thirtyTwoSortersPerPool
-                poolCount5
+                sixteenSortersPerPool
+                poolCount40
                 oneChildCount
                 sorterEvalSelectionTypeRs6000
                 sorterEvalMeasureInitial_CestM_noScw
@@ -67,13 +67,13 @@ module Msuf4SgdSpecsTestPrefix =
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction99
-                genReportInterval20
+                genReportInterval200
                 generationLast
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 8
+            maxParallel = 16
         }
 
 

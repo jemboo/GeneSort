@@ -51,6 +51,9 @@ module CommonParams =
     let genReportInterval100 = 
         (runParameters.generationReportIntervalKey, [100] |> List.map string)
 
+    let genReportInterval200 = 
+        (runParameters.generationReportIntervalKey, [200] |> List.map string)
+
     let genReportInterval500 = 
         (runParameters.generationReportIntervalKey, [500] |> List.map string)
 
@@ -93,7 +96,7 @@ module CommonParams =
     let poolCount2 = (runParameters.sorterPoolCountKey, ["2";] )
     let poolCount5 = (runParameters.sorterPoolCountKey, ["5";] )
     let poolCount10 = (runParameters.sorterPoolCountKey, ["10";] )
-    let poolCount30 = (runParameters.sorterPoolCountKey, ["30";] )
+    let poolCount40 = (runParameters.sorterPoolCountKey, ["40";] )
     let poolCount100 = (runParameters.sorterPoolCountKey, ["100";] )
     let poolCount1000 = (runParameters.sorterPoolCountKey, ["1000";] )
 
@@ -344,7 +347,15 @@ module CommonParams =
                                 (0.0 |> UMX.tag<stageCrossingWeight>)
                       |> sorterEvalMeasure.CeSt
 
-    let _cestM_ScwP = ceStMeasure.create 
+    let _cestM_ScwP1 = ceStMeasure.create 
+                                (1.1<stageWeight>) 
+                                (true |> UMX.tag<filterUnsorted>)
+                                (false |> UMX.tag<filterReflectionSymmetric>)
+                                (0.0025 |> UMX.tag<stageCrossingWeight>)
+                    |> sorterEvalMeasure.CeSt
+
+
+    let _cestM_ScwP2 = ceStMeasure.create 
                                 (1.1<stageWeight>) 
                                 (true |> UMX.tag<filterUnsorted>)
                                 (false |> UMX.tag<filterReflectionSymmetric>)
@@ -352,19 +363,44 @@ module CommonParams =
                     |> sorterEvalMeasure.CeSt
 
 
-    let _cestM_ScwPP = ceStMeasure.create 
+    let _cestM_ScwP3 = ceStMeasure.create 
+                                (1.1<stageWeight>) 
+                                (true |> UMX.tag<filterUnsorted>)
+                                (false |> UMX.tag<filterReflectionSymmetric>)
+                                (0.0075 |> UMX.tag<stageCrossingWeight>)
+                    |> sorterEvalMeasure.CeSt
+
+
+    let _cestM_ScwP4 = ceStMeasure.create 
                                 (1.1<stageWeight>) 
                                 (true |> UMX.tag<filterUnsorted>)
                                 (false |> UMX.tag<filterReflectionSymmetric>)
                                 (0.01 |> UMX.tag<stageCrossingWeight>)
                     |> sorterEvalMeasure.CeSt
 
-    let _cestM_ScwM = ceStMeasure.create 
+    let _cestM_ScwP5 = ceStMeasure.create 
+                                (1.1<stageWeight>) 
+                                (true |> UMX.tag<filterUnsorted>)
+                                (false |> UMX.tag<filterReflectionSymmetric>)
+                                (0.015 |> UMX.tag<stageCrossingWeight>)
+                    |> sorterEvalMeasure.CeSt
+
+
+
+    let _cestM_ScwM1 = ceStMeasure.create 
                                 (1.1<stageWeight>) 
                                 (true |> UMX.tag<filterUnsorted>)
                                 (false |> UMX.tag<filterReflectionSymmetric>)
                                 (-0.005 |> UMX.tag<stageCrossingWeight>)
                     |> sorterEvalMeasure.CeSt
+
+    let _cestM_ScwM2 = ceStMeasure.create 
+                                (1.1<stageWeight>) 
+                                (true |> UMX.tag<filterUnsorted>)
+                                (false |> UMX.tag<filterReflectionSymmetric>)
+                                (-0.01 |> UMX.tag<stageCrossingWeight>)
+                    |> sorterEvalMeasure.CeSt
+
 
 
     let sorterEvalMeasureInitial_CestM_noScw =
@@ -372,7 +408,7 @@ module CommonParams =
             [ _cestM_noScw;] |> List.map SorterEvalMeasure.toCompactString)
     let sorterEvalMeasureInitial_CestM_Scw =
             (runParameters.sorterEvalMeasureInitialKey, 
-            [ _cestM_ScwP;] |> List.map SorterEvalMeasure.toCompactString)
+            [ _cestM_ScwP2;] |> List.map SorterEvalMeasure.toCompactString)
 
 
 
@@ -381,12 +417,13 @@ module CommonParams =
             [ _cestM_noScw;] |> List.map SorterEvalMeasure.toCompactString)
     let sorterEvalMeasure_CestM_Scw =
             (runParameters.sorterEvalMeasureKey, 
-            [ _cestM_ScwP;] |> List.map SorterEvalMeasure.toCompactString)
+            [ _cestM_ScwP2;] |> List.map SorterEvalMeasure.toCompactString)
 
 
     let sorterEvalMeasure_CestM_Range =
             (runParameters.sorterEvalMeasureKey, 
-            [ _cestM_noScw; _cestM_ScwP; _cestM_ScwM; _cestM_ScwPP] 
+            [ _cestM_noScw; _cestM_ScwP1; _cestM_ScwP2; _cestM_ScwP3; 
+             _cestM_ScwP4; _cestM_ScwP5; _cestM_ScwM1; _cestM_ScwM2; ] 
             |> List.map SorterEvalMeasure.toCompactString)
 
 
