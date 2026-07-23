@@ -51,8 +51,8 @@ module MssiSgdSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -82,8 +82,8 @@ module MssiSgdSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -113,8 +113,8 @@ module MssiSgdSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate

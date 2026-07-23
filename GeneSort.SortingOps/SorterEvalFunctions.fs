@@ -97,30 +97,35 @@ type ceStMeasure = private {
     stageWeight: float<stageWeight>
     filterUnsorted: bool<filterUnsorted>
     filterReflectionSymmetric: bool<filterReflectionSymmetric>
+    stageCrossingWeight: float<stageCrossingWeight>
 } with
     static member create 
-                (stageWeight: float<stageWeight>) 
-                (filterUnsorted: bool<filterUnsorted>) 
-                (filterReflectionSymmetric: bool<filterReflectionSymmetric>) 
-                : ceStMeasure =
+        (stageWeight: float<stageWeight>) 
+        (filterUnsorted: bool<filterUnsorted>) 
+        (filterReflectionSymmetric: bool<filterReflectionSymmetric>) 
+        (stageCrossingWeight: float<stageCrossingWeight>) : ceStMeasure =
         {
             stageWeight = stageWeight
             filterUnsorted = filterUnsorted
             filterReflectionSymmetric = filterReflectionSymmetric
+            stageCrossingWeight = stageCrossingWeight
         }
 
     member this.StageWeight: float<stageWeight> = this.stageWeight
     member this.FilterUnsorted: bool<filterUnsorted> = this.filterUnsorted
     member this.FilterReflectionSymmetric: bool<filterReflectionSymmetric> = this.filterReflectionSymmetric
+    member this.StageCrossingWeight: float<stageCrossingWeight> = this.stageCrossingWeight
 
     member this.ToCompactString() = 
-        sprintf "CeSt(stW=%.2f, fUnsorted=%b, fRefl=%b)" (%this.stageWeight) (%this.filterUnsorted) (%this.filterReflectionSymmetric)
+        sprintf "CeSt(stW=%.2f, fUnsorted=%b, fRefl=%b, stcXW=%.4f)" 
+            (%this.stageWeight) (%this.filterUnsorted) (%this.filterReflectionSymmetric) (%this.stageCrossingWeight)
 
     static member FromCompactString(s: string) : ceStMeasure =
         let stW = CompactStringParser.parseFloat "stW" s
         let fUnsorted = CompactStringParser.parseBool "fUnsorted" s
         let fRefl = CompactStringParser.parseBool "fRefl" s
-        ceStMeasure.create stW fUnsorted fRefl
+        let stcXW = CompactStringParser.parseFloat "stcXW" s
+        ceStMeasure.create stW fUnsorted fRefl stcXW
 
 
 type ceStUcMeasure = private {
@@ -210,6 +215,7 @@ module SorterEvalMeasure =
             baseRecord
             |> dataTableRecord.addData "MeasureType" "CeSt"
             |> dataTableRecord.addData "M_StageLengthWeight" (string %m.StageWeight)
+            |> dataTableRecord.addData "M_StageCrossingWeight" (string %m.StageCrossingWeight)
             |> dataTableRecord.addData "M_FilterUnsorted" (string %m.FilterUnsorted)
             |> dataTableRecord.addData "M_FilterReflectionSymmetric" (string %m.FilterReflectionSymmetric)
         | CeStUc m ->
@@ -223,10 +229,11 @@ module SorterEvalMeasure =
 
 module SorterEvalFunctions =
 
-    let byTwoWeighted (ceCountWeight: float) (stageLengthWeight: float) (eval: sorterEval) = 
+    let byThreeWeighted (ceCountWeight: float) (stageLengthWeight: float) (stageCrossingWeight: float) (eval: sorterEval) = 
         let ceCount = float (SorterEval.getCeLength eval)
         let stageLength = float (SorterEval.getStageLength eval)
-        (ceCount * ceCountWeight) + (stageLength * stageLengthWeight)
+        let stageCrossing = float (SorterEval.getStageCrossingsCount eval)
+        (ceCount * ceCountWeight) + (stageLength * stageLengthWeight) + (stageCrossing * stageCrossingWeight)
 
     let byUnsortedCount (m: float) (eval: sorterEval) =
         let uc = float (SorterEval.getUnsortedCount eval)
@@ -241,7 +248,7 @@ module SorterEvalFunctions =
         | UnsortedCount _ -> 
             byUnsortedCount 1.0
         | CeSt m -> 
-            byTwoWeighted 1.0 (%m.StageWeight)
+            byThreeWeighted 1.0 (%m.StageWeight) (%m.StageCrossingWeight)
         | CeStUc m ->
             let ceFunc = SorterEval.getCeLength >> float
             let stageFunc = SorterEval.getStageLength >> float

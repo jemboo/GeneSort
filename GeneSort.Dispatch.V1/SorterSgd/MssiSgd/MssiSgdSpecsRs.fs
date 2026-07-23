@@ -63,8 +63,8 @@ module MssiSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 orthoRate
                 paraRate
                 modificationRatesMsuf4
@@ -92,8 +92,8 @@ module MssiSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 orthoRate
                 paraRate
                 modificationRatesMsuf4
@@ -123,8 +123,8 @@ module MssiSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 orthoRate
                 paraRate
                 modificationRatesMsuf4
@@ -151,8 +151,8 @@ module MssiSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 orthoRate
                 paraRate
                 modificationRatesMsuf4

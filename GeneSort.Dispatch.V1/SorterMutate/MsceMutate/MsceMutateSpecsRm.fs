@@ -69,7 +69,7 @@ module MsceMutateSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 mutationRates
                 insertionRates
@@ -95,7 +95,7 @@ module MsceMutateSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 mutationRates
                 insertionRates
@@ -121,7 +121,7 @@ module MsceMutateSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 mutationRates
                 insertionRates
@@ -147,7 +147,7 @@ module MsceMutateSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 mutationRates
                 insertionRates
@@ -174,7 +174,7 @@ module MsceMutateSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 mutationRates
                 insertionRates

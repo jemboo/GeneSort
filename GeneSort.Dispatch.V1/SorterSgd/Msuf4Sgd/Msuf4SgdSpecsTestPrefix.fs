@@ -49,12 +49,12 @@ module Msuf4SgdSpecsTestPrefix =
             spans = [
                 rngTypeLcg
                 generationCurrent
-                twoFifty6SortersPerPool
-                poolCount2
+                thirtyTwoSortersPerPool
+                poolCount5
                 oneChildCount
                 sorterEvalSelectionTypeRs6000
-                sorterEvalMeasure_CestM_noRs
-                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_Range
                 sortableTestFilter_Prefix32_4
                 msuf4ModelType
                 sorterEvalTypeV1
@@ -64,10 +64,10 @@ module Msuf4SgdSpecsTestPrefix =
                 selfSymRate
                 modificationRatesMsuf4center
                 dataFomatBitv512
-                distinctSorterHashesBoth
-                prioritizeNewMutantsBoth
+                distinctSorterHashesTrue
+                prioritizeNewMutantsTrue
                 sortedFraction99
-                genReportInterval500
+                genReportInterval20
                 generationLast
             ]
             filter = paramMapFilter

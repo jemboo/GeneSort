@@ -6,6 +6,7 @@
 [<Measure>] type filterUnsorted
 [<Measure>] type unsortedWeight
 [<Measure>] type stageWeight
+[<Measure>] type stageCrossingWeight
 [<Measure>] type sortingEvalId
 [<Measure>] type sorterSetEvalId
 

@@ -56,6 +56,7 @@ type sorterEvalSelection =
                                     (1.1<stageWeight>) 
                                     (true |> UMX.tag<filterUnsorted>)
                                     (false |> UMX.tag<filterReflectionSymmetric>)
+                                    (0.0 |> UMX.tag<stageCrossingWeight>)
                           |> sorterEvalMeasure.CeSt
         { selectionType = Tmb 0<sorterCount>; 
           measure = _cestM_noRs; 

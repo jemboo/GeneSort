@@ -18,6 +18,7 @@ type sorterEvalV1Dto = {
     [<Key(5)>] CeLength : int
     [<Key(6)>] SortingWidth : int
     [<Key(7)>] ReflectionSymmetric : bool
+    [<Key(8)>] StageCrossingsCount : int
 }
 
 [<MessagePackObject>]
@@ -29,6 +30,7 @@ type sorterEvalV2Dto = {
     [<Key(4)>] CeUseArray : ceDataDto array
     [<Key(5)>] SortingWidth : int
     [<Key(6)>] ReflectionSymmetric : bool
+    [<Key(7)>] StageCrossingsCount : int
 }
 
 [<MessagePackObject>]
@@ -40,6 +42,7 @@ type sorterEvalV3Dto = {
     [<Key(4)>] SortableTest : sortableTestDto
     [<Key(5)>] SortingWidth : int
     [<Key(6)>] ReflectionSymmetric : bool
+    [<Key(7)>] StageCrossingsCount : int
 }
 
 
@@ -72,6 +75,7 @@ module SorterEvalDto =
                 CeLength = %v1.CeLength
                 SortingWidth = %v1.SortingWidth
                 ReflectionSymmetric = %v1.ReflectionSymmetric
+                StageCrossingsCount = %v1.StageCrossingsCount
             }
         | sorterEval.V2 v2 ->
             V2 {
@@ -81,7 +85,8 @@ module SorterEvalDto =
                 StageLength = %v2.StageLength
                 CeUseArray = v2.CeUseArray |> Array.map CeDataDto.fromDomain
                 SortingWidth = %v2.SortingWidth
-                ReflectionSymmetric = %v2.ReflectionSymmetric
+                ReflectionSymmetric = %v2.IsReflectionSymmetric
+                StageCrossingsCount = %v2.StageCrossingsCount
             }
         | sorterEval.V3 v3 ->
             V3 {
@@ -92,6 +97,7 @@ module SorterEvalDto =
                 SortableTest = SortableTestDto.fromDomain v3.SortableTest
                 SortingWidth = %v3.SortingWidth
                 ReflectionSymmetric = %v3.ReflectionSymmetric
+                StageCrossingsCount = %v3.StageCrossingsCount
             }
 
     let toDomain (dto: sorterEvalDto) : sorterEval =
@@ -106,6 +112,7 @@ module SorterEvalDto =
                 (v1Dto.StageLength |> UMX.tag)
                 (v1Dto.CeLength |> UMX.tag)
                 (v1Dto.ReflectionSymmetric |> UMX.tag)
+                (v1Dto.StageCrossingsCount |> UMX.tag)
             |> sorterEval.V1
         | V2 v2Dto ->
             sorterEvalV2.create
@@ -116,6 +123,7 @@ module SorterEvalDto =
                 (v2Dto.StageLength |> UMX.tag)
                 (v2Dto.CeUseArray |> Array.map CeDataDto.toDomain)
                 (v2Dto.ReflectionSymmetric |> UMX.tag)
+                (v2Dto.StageCrossingsCount |> UMX.tag)
             |> sorterEval.V2
         | V3 v3Dto ->
             sorterEvalV3.create
@@ -126,4 +134,5 @@ module SorterEvalDto =
                 (v3Dto.CeUseArray |> Array.map CeDataDto.toDomain)
                 (SortableTestDto.toDomain v3Dto.SortableTest)
                 (v3Dto.ReflectionSymmetric |> UMX.tag)
+                (v3Dto.StageCrossingsCount |> UMX.tag)
             |> sorterEval.V3

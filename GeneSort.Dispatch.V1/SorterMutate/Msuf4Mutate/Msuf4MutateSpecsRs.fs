@@ -45,7 +45,7 @@ module Msuf4MutateSpecsRs =
             spans = [
                 rngTypeLcg
                 sorterEvalSelection
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -70,7 +70,7 @@ module Msuf4MutateSpecsRs =
             spans = [
                 rngTypeLcg
                 sorterEvalSelection
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -94,7 +94,7 @@ module Msuf4MutateSpecsRs =
             spans = [
                 rngTypeLcg
                 sorterEvalSelection
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate

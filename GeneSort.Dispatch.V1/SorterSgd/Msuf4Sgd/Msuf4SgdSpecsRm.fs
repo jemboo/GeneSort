@@ -55,8 +55,8 @@ module Msuf4SgdSpecsRm =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 orthoRate
                 paraRate
                 selfSymRate
@@ -89,8 +89,8 @@ module Msuf4SgdSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelection
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -123,8 +123,8 @@ module Msuf4SgdSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelection
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate

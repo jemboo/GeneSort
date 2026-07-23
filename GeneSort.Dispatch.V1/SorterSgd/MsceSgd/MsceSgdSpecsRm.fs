@@ -76,8 +76,8 @@ module MsceSgdSpecsRm =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 mutationRates
                 insertionRates
                 deletionRates
@@ -108,8 +108,8 @@ module MsceSgdSpecsRm =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 mutationRates
                 insertionRates
                 deletionRates
@@ -140,8 +140,8 @@ module MsceSgdSpecsRm =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 mutationRates
                 insertionRates
                 deletionRates
@@ -172,8 +172,8 @@ module MsceSgdSpecsRm =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 mutationRates
                 insertionRates
                 deletionRates
@@ -204,8 +204,8 @@ module MsceSgdSpecsRm =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 mutationRates
                 insertionRates
                 deletionRates
@@ -237,8 +237,8 @@ module MsceSgdSpecsRm =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 mutationRates
                 insertionRates
                 deletionRates

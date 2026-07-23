@@ -46,7 +46,7 @@ module MssiMutateSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -71,7 +71,7 @@ module MssiMutateSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -96,7 +96,7 @@ module MssiMutateSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -121,7 +121,7 @@ module MssiMutateSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -146,7 +146,7 @@ module MssiMutateSpecsRm =
             spans = [
                 rngTypeLcg
                 sorterEvalSelectionType
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate

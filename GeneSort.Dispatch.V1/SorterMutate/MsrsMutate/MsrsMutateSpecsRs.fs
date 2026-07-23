@@ -41,7 +41,7 @@ module MsrsMutateSpecsRs =
             spans = [
                 rngTypeLcg
                 sorterEvalSelection
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -64,7 +64,7 @@ module MsrsMutateSpecsRs =
             spans = [
                 rngTypeLcg
                 sorterEvalSelection
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate
@@ -87,7 +87,7 @@ module MsrsMutateSpecsRs =
             spans = [
                 rngTypeLcg
                 sorterEvalSelection
-                sorterEvalMeasure_CestM_noRs
+                sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 orthoRate
                 paraRate

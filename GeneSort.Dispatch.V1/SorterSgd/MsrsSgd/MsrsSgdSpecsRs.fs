@@ -48,8 +48,8 @@ module MsrsSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasureInitial_CestM_noScw
                 orthoRate
                 paraRate
                 selfSymRate
@@ -77,8 +77,8 @@ module MsrsSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasureInitial_CestM_noScw
                 orthoRate
                 paraRate
                 selfSymRate
@@ -109,8 +109,8 @@ module MsrsSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasureInitial_CestM_noScw
                 orthoRate
                 paraRate
                 selfSymRate
@@ -138,8 +138,8 @@ module MsrsSgdSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelection
-                sorterEvalMeasureInitial_CestM_noRs
-                sorterEvalMeasureInitial_CestM_noRs
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasureInitial_CestM_noScw
                 orthoRate
                 paraRate
                 selfSymRate

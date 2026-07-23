@@ -337,39 +337,57 @@ module CommonParams =
 
     // SorterEvalMeasures
 
-    let _cestM_noRs = ceStMeasure.create 
+    let _cestM_noScw = ceStMeasure.create 
                                 (1.1<stageWeight>) 
                                 (true |> UMX.tag<filterUnsorted>)
                                 (false |> UMX.tag<filterReflectionSymmetric>)
+                                (0.0 |> UMX.tag<stageCrossingWeight>)
                       |> sorterEvalMeasure.CeSt
 
-    let _cestM_Rs = ceStMeasure.create 
+    let _cestM_ScwP = ceStMeasure.create 
                                 (1.1<stageWeight>) 
                                 (true |> UMX.tag<filterUnsorted>)
                                 (false |> UMX.tag<filterReflectionSymmetric>)
+                                (0.005 |> UMX.tag<stageCrossingWeight>)
                     |> sorterEvalMeasure.CeSt
 
 
-    let sorterEvalMeasureInitial_CestM_noRs =
+    let _cestM_ScwPP = ceStMeasure.create 
+                                (1.1<stageWeight>) 
+                                (true |> UMX.tag<filterUnsorted>)
+                                (false |> UMX.tag<filterReflectionSymmetric>)
+                                (0.01 |> UMX.tag<stageCrossingWeight>)
+                    |> sorterEvalMeasure.CeSt
+
+    let _cestM_ScwM = ceStMeasure.create 
+                                (1.1<stageWeight>) 
+                                (true |> UMX.tag<filterUnsorted>)
+                                (false |> UMX.tag<filterReflectionSymmetric>)
+                                (-0.005 |> UMX.tag<stageCrossingWeight>)
+                    |> sorterEvalMeasure.CeSt
+
+
+    let sorterEvalMeasureInitial_CestM_noScw =
             (runParameters.sorterEvalMeasureInitialKey, 
-            [ _cestM_noRs;] |> List.map SorterEvalMeasure.toCompactString)
-    let sorterEvalMeasureInitial_CestM_Rs =
+            [ _cestM_noScw;] |> List.map SorterEvalMeasure.toCompactString)
+    let sorterEvalMeasureInitial_CestM_Scw =
             (runParameters.sorterEvalMeasureInitialKey, 
-            [ _cestM_Rs;] |> List.map SorterEvalMeasure.toCompactString)
+            [ _cestM_ScwP;] |> List.map SorterEvalMeasure.toCompactString)
 
 
 
-    let sorterEvalMeasure_CestM_noRs =
+    let sorterEvalMeasure_CestM_noScw =
             (runParameters.sorterEvalMeasureKey, 
-            [ _cestM_noRs;] |> List.map SorterEvalMeasure.toCompactString)
-    let sorterEvalMeasure_CestM_Rs =
+            [ _cestM_noScw;] |> List.map SorterEvalMeasure.toCompactString)
+    let sorterEvalMeasure_CestM_Scw =
             (runParameters.sorterEvalMeasureKey, 
-            [ _cestM_Rs;] |> List.map SorterEvalMeasure.toCompactString)
+            [ _cestM_ScwP;] |> List.map SorterEvalMeasure.toCompactString)
 
 
-    let sorterEvalMeasure_CestM_Both =
+    let sorterEvalMeasure_CestM_Range =
             (runParameters.sorterEvalMeasureKey, 
-            [ _cestM_noRs; _cestM_Rs;] |> List.map SorterEvalMeasure.toCompactString)
+            [ _cestM_noScw; _cestM_ScwP; _cestM_ScwM; _cestM_ScwPP] 
+            |> List.map SorterEvalMeasure.toCompactString)
 
 
 

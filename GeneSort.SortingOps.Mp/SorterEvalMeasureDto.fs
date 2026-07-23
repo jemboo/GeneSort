@@ -28,6 +28,7 @@ type ceStMeasureDto = {
     [<Key(0)>] StageWeight: float
     [<Key(1)>] FilterUnsorted: bool
     [<Key(2)>] FilterReflectionSymmetric: bool
+    [<Key(3)>] StageCrossingWeight: float
 }
 
 [<MessagePackObject>]
@@ -74,6 +75,7 @@ module SorterEvalMeasureDto =
                 StageWeight = %m.StageWeight
                 FilterUnsorted = %m.FilterUnsorted
                 FilterReflectionSymmetric = %m.FilterReflectionSymmetric 
+                StageCrossingWeight = %m.StageCrossingWeight
             }
         | sorterEvalMeasure.CeStUc m ->
             CeStUc { 
@@ -90,11 +92,12 @@ module SorterEvalMeasureDto =
             sorterEvalMeasure.StageLength (stageLengthMeasure.create d.FilterUnsorted d.FilterReflectionSymmetric)
         | UnsortedCount d ->
             sorterEvalMeasure.UnsortedCount (unsortedCountMeasure.create d.FilterReflectionSymmetric)
-        | CeSt d ->
-            sorterEvalMeasure.CeSt (ceStMeasure.create 
+        | CeSt d ->            
+                sorterEvalMeasure.CeSt (ceStMeasure.create 
                                             (d.StageWeight |> UMX.tag)
                                             (d.FilterUnsorted |> UMX.tag)
-                                            (d.FilterReflectionSymmetric |> UMX.tag))
+                                            (d.FilterReflectionSymmetric |> UMX.tag)
+                                            (d.StageCrossingWeight |> UMX.tag))
         | CeStUc d ->
             sorterEvalMeasure.CeStUc (ceStUcMeasure.create 
                                             (d.StageWeight |> UMX.tag)

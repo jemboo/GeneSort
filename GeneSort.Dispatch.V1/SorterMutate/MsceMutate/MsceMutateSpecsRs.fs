@@ -53,7 +53,7 @@ module MsceMutateSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasure_CestM_Rs
+                sorterEvalMeasure_CestM_Scw
                 mutationRates
                 insertionRates
                 deletionRates
@@ -77,7 +77,7 @@ module MsceMutateSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasure_CestM_Rs
+                sorterEvalMeasure_CestM_Scw
                 mutationRates
                 insertionRates
                 deletionRates
@@ -100,7 +100,7 @@ module MsceMutateSpecsRs =
                 rngTypeLcg
                 sorterEvalTypeV1
                 sorterEvalSelectionType
-                sorterEvalMeasure_CestM_Rs
+                sorterEvalMeasure_CestM_Scw
                 mutationRates
                 insertionRates
                 deletionRates
