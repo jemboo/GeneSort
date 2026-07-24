@@ -75,7 +75,7 @@ module SorterRunResult =
                     // --- Dynamic Periodic Variation for sorterCountPerPool ---
                     // Alternates every 20 generations:
                     // Generations 0-19: 1x, 20-39: 2x, 40-59: 1x, etc.
-                    let multiplier = if ((%currentGen / %sorterCountCycle) % %sorterCountCycleMultiplier = 0) then 1 else 2
+                    let multiplier = if ((%currentGen / %sorterCountCycle) % 2 = 0) then 1 else %sorterCountCycleMultiplier
                     let currentSorterCountPerPool : int<sorterCountPerPool> = UMX.tag (%sorterCountPerPool * multiplier)
 
                     // Look up if the current generation is an exponential milestone

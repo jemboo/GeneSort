@@ -17,7 +17,7 @@ module Msuf4SgdSpecsTestPrefix =
             |> List.map SorterEvalSelectionType.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [10000] |> List.map string)
+            (runParameters.generationLastKey, [5000] |> List.map string)
 
     let generationCurrent = 
             (runParameters.generationCurrentKey, [0] |> List.map string)
@@ -42,7 +42,7 @@ module Msuf4SgdSpecsTestPrefix =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
             databaseName = Msuf4SgdDbs.Prefix.dbName
-            runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for 32pfx4 Msuf4"
             spans = [
                 rngTypeLcg
@@ -68,7 +68,7 @@ module Msuf4SgdSpecsTestPrefix =
                 genReportInterval5
                 generationLast
                 sorterCountCycle100
-                sorterCountCycleMultiplier1n2
+                sorterCountCycleMultiplier1n16
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
