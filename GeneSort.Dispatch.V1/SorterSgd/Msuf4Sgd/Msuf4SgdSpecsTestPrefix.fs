@@ -52,7 +52,7 @@ module Msuf4SgdSpecsTestPrefix =
                 oneChildCount
                 sorterEvalSelectionTypeRs6000
                 sorterEvalMeasureInitial_CestM_noScw
-                sorterEvalMeasure_CestM_Range
+                sorterEvalMeasure_CestM_noScw
                 sortableTestFilter_Prefix32_4
                 msuf4ModelType
                 sorterEvalTypeV1
@@ -65,15 +65,15 @@ module Msuf4SgdSpecsTestPrefix =
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction99
-                genReportInterval200
+                genReportInterval5
                 generationLast
-                sorterCountCycle20
+                sorterCountCycle100
                 sorterCountCycleMultiplier1n2
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 4
+            maxParallel = 8
         }
 
 

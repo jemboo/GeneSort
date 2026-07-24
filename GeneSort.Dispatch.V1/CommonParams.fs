@@ -40,7 +40,10 @@ module CommonParams =
         (runParameters.generationReportIntervalKey, [1] |> List.map string)
 
     let genReportInterval2 = 
-        (runParameters.generationReportIntervalKey, [1] |> List.map string)
+        (runParameters.generationReportIntervalKey, [2] |> List.map string)
+
+    let genReportInterval5 = 
+        (runParameters.generationReportIntervalKey, [5] |> List.map string)
 
     let genReportInterval10 = 
         (runParameters.generationReportIntervalKey, [10] |> List.map string)
@@ -93,6 +96,7 @@ module CommonParams =
 
     // sorterCountCycle
     let sorterCountCycle20 = (runParameters.sorterCountCycleKey, ["20";] )
+    let sorterCountCycle100 = (runParameters.sorterCountCycleKey, ["100";] )
 
     // sorterCountCycleMultiplier
     let sorterCountCycleMultiplier1n2 = (runParameters.sorterCountCycleMultiplierKey, ["1"; "2";] )

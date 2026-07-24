@@ -62,7 +62,9 @@ module Msuf4SgdSpecsRm =
                 selfSymRate
                 seedModificationRate03
                 modificationRate03
-                sortingWidth32
+                sortingWidth32                
+                mergeDimension8
+                noSuffixSuffixType
                 dataFormatInt8v512
                 poolCount1
                 oneTwenty8SortersPerPool
