@@ -34,6 +34,8 @@ module SorterRunResult =
     let runEvolutionAsync
             (genStart: int<generationNumber>)
             (genCount: int<generationNumber>)
+            (sorterCountCycle: int<sorterCountCycle>)
+            (sorterCountCycleMultiplier: int<sorterCountCycleMultiplier>)
             (mutator: sorterModelMutator)
             (prioritizeNewMutants: bool<prioritizeNewMutants>)
             (distinctSorterHashes: bool<distinctSorterHashes>)
@@ -69,7 +71,13 @@ module SorterRunResult =
                 else
                     let currentGen = genStart + (genCount - %remainingSteps)
                     let totalGen = genStart + genCount
-                    
+
+                    // --- Dynamic Periodic Variation for sorterCountPerPool ---
+                    // Alternates every 20 generations:
+                    // Generations 0-19: 1x, 20-39: 2x, 40-59: 1x, etc.
+                    let multiplier = if ((%currentGen / %sorterCountCycle) % %sorterCountCycleMultiplier = 0) then 1 else 2
+                    let currentSorterCountPerPool : int<sorterCountPerPool> = UMX.tag (%sorterCountPerPool * multiplier)
+
                     // Look up if the current generation is an exponential milestone
                     let shouldReport = (Set.contains (int currentGen) targetGenerations)
 
@@ -90,7 +98,7 @@ module SorterRunResult =
                     let nextSorterPoolSet = 
                         SorterPipeline.runGenerationStep 
                             mutator 
-                            sorterCountPerPool
+                            currentSorterCountPerPool
                             sorterChildCount
                             prioritizeNewMutants
                             distinctSorterHashes

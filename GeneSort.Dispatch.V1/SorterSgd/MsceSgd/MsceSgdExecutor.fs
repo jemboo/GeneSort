@@ -47,7 +47,9 @@ module MsceSgdExecutor =
                 let! sorterEvalMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
                 let! sorterEvalType = rp.GetSorterEvalType() |> Result.ofOption "Missing sorterEvalType."
                 let! distinctSorterHashes = rp.GetDistinctSorterHashes() |> Result.ofOption "Missing distinctSorterHashes."
-                let! sortedFraction = rp.GetSortedFraction() |> Result.ofOption "Missing sortedFraction."
+                let! sortedFraction = rp.GetSortedFraction() |> Result.ofOption "Missing sortedFraction."                
+                let! sorterCountCycle = rp.GetSorterCountCycle() |> Result.ofOption "Missing sorterCountCycle."
+                let! sorterCountCycleMultiplier = rp.GetSorterCountCycleMultiplier() |> Result.ofOption "Missing sorterCountCycleMultiplier."
                 let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
 
                 // 2. Resolve target seed sorterPoolSet collection state depending on genFirst criteria
@@ -91,7 +93,8 @@ module MsceSgdExecutor =
                 // 3. Define the step strategy closure
                 let stepExecutionStrategy targetGenFirst stepSize workingPoolSet =
                     SorterRunResult.runEvolutionAsync
-                        targetGenFirst stepSize sorterModelMutator prioritizeNewMutants 
+                        targetGenFirst stepSize sorterCountCycle sorterCountCycleMultiplier
+                        sorterModelMutator prioritizeNewMutants 
                         distinctSorterHashes sortersPerPool sorterChildCount sortableTest 
                         sorterEvalType sorterEvalMeasure workingPoolSet sortedFraction cts.Token log
 

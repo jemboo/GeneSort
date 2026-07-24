@@ -2,9 +2,7 @@
 
 open FSharp.UMX
 open GeneSort.Dispatch.V1
-open GeneSort.Core
 open GeneSort.Project.V1
-open GeneSort.SortingOps
 open GeneSort.Sorting
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.CommonParams
@@ -50,7 +48,7 @@ module Msuf4SgdSpecsTestPrefix =
                 rngTypeLcg
                 generationCurrent
                 sixteenSortersPerPool
-                poolCount40
+                poolCount1
                 oneChildCount
                 sorterEvalSelectionTypeRs6000
                 sorterEvalMeasureInitial_CestM_noScw
@@ -69,11 +67,13 @@ module Msuf4SgdSpecsTestPrefix =
                 sortedFraction99
                 genReportInterval200
                 generationLast
+                sorterCountCycle20
+                sorterCountCycleMultiplier1n2
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 16
+            maxParallel = 4
         }
 
 

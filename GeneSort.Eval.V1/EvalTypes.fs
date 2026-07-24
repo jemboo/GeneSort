@@ -9,6 +9,8 @@ open FSharp.UMX
 [<Measure>] type sorterPoolName
 [<Measure>] type sorterPoolId
 [<Measure>] type sorterCountPerPool
+[<Measure>] type sorterCountCycle
+[<Measure>] type sorterCountCycleMultiplier
 [<Measure>] type sortedFraction
 [<Measure>] type sorterPoolCount
 [<Measure>] type sorterChildCount
@@ -102,6 +104,18 @@ module GenerationNumber =
 
 module SorterCountPerPool =
     let toString (w: int<sorterCountPerPool> option) : string =
+       match w with
+        | Some v -> sprintf "%d" %v
+        | None -> "None"
+
+module SorterCountCycle =
+    let toString (w: int<sorterCountCycle> option) : string =
+       match w with
+        | Some v -> sprintf "%d" %v
+        | None -> "None"
+
+module SorterCountCycleMultiplier =
+    let toString (w: int<sorterCountCycleMultiplier> option) : string =
        match w with
         | Some v -> sprintf "%d" %v
         | None -> "None"

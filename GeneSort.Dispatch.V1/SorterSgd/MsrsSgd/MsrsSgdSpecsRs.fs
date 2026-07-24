@@ -49,7 +49,7 @@ module MsrsSgdSpecsRs =
                 sorterEvalTypeV1
                 sorterEvalSelection
                 sorterEvalMeasureInitial_CestM_noScw
-                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 orthoRate
                 paraRate
                 selfSymRate
@@ -60,7 +60,9 @@ module MsrsSgdSpecsRs =
                 oneChildCount
                 genReportInterval10
                 generationLast
-                generationCurrent
+                generationCurrent                
+                sorterCountCycle20
+                sorterCountCycleMultiplier1n2
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer

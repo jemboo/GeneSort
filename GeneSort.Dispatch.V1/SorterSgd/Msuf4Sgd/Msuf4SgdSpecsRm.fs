@@ -19,7 +19,7 @@ module Msuf4SgdSpecsRm =
             |> List.map SorterEvalSelectionType.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [10] |> List.map string)
+            (runParameters.generationLastKey, [500] |> List.map string)
 
     let generationCurrent = 
             (runParameters.generationCurrentKey, [0] |> List.map string)
@@ -63,8 +63,6 @@ module Msuf4SgdSpecsRm =
                 seedModificationRate03
                 modificationRate03
                 sortingWidth32
-                mergeDimension8
-                noSuffixSuffixType
                 dataFormatInt8v512
                 poolCount1
                 oneTwenty8SortersPerPool
@@ -72,6 +70,8 @@ module Msuf4SgdSpecsRm =
                 generationCurrent
                 genReportInterval1
                 generationLast
+                sorterCountCycle20
+                sorterCountCycleMultiplier1n2
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction90

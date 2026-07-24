@@ -91,6 +91,13 @@ module CommonParams =
     let fourKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["4096";] )
     let eightKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["8192";] )
 
+    // sorterCountCycle
+    let sorterCountCycle20 = (runParameters.sorterCountCycleKey, ["20";] )
+
+    // sorterCountCycleMultiplier
+    let sorterCountCycleMultiplier1n2 = (runParameters.sorterCountCycleMultiplierKey, ["1"; "2";] )
+
+
     // SorterPoolCounts
     let poolCount1 = (runParameters.sorterPoolCountKey, ["1";] )
     let poolCount2 = (runParameters.sorterPoolCountKey, ["2";] )

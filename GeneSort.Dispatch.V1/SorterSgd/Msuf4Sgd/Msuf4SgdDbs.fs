@@ -27,6 +27,8 @@ module Msuf4SgdDbs =
                         (rng: rngType)
                         (genCurrent: int<generationNumber>)
                         (sorterCtPerPool: int<sorterCountPerPool>)
+                        (sorterCountCycle: int<sorterCountCycle>)
+                        (sorterCountCycleMultiplier: int<sorterCountCycleMultiplier>)
                         (sorterPoolCt: int<sorterPoolCount>)
                         (childCt: int<sorterChildCount>)
                         (ses:sorterEvalSelectionType)
@@ -50,6 +52,8 @@ module Msuf4SgdDbs =
                     (runParameters.rngTypeKey, rng |> RngType.toString)
                     (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
                     (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                    (runParameters.sorterCountCycleKey, (Some sorterCountCycle) |> SorterCountCycle.toString)
+                    (runParameters.sorterCountCycleMultiplierKey, (Some sorterCountCycleMultiplier) |> SorterCountCycleMultiplier.toString)
                     (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                     (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
                     (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
@@ -76,6 +80,8 @@ module Msuf4SgdDbs =
                 let! repl = rp.GetRepl()
                 let! curGen = rp.GetGenerationCurrent()
                 let! scPP = rp.GetSorterCountPerPool()
+                let! sctc = rp.GetSorterCountCycle()
+                let! sctm = rp.GetSorterCountCycleMultiplier()
                 let! spc = rp.GetSorterPoolCount()
                 let! scc = rp.GetSorterChildCount()
                 let! ses = rp.GetSorterEvalSelectionType()
@@ -93,7 +99,7 @@ module Msuf4SgdDbs =
                 let! dsh = rp.GetDistinctSorterHashes()
                 let! pNm = rp.GetPrioritizeNewMutants()
                 let! sfrac = rp.GetSortedFraction()
-                return makeQueryParams rng curGen scPP spc scc ses sem semi 
+                return makeQueryParams rng curGen scPP sctc sctm spc scc ses sem semi 
                                 repl sw smt set sdMdr ortho para sym mdr
                                 dsh pNm sfrac odt
             }
@@ -113,6 +119,8 @@ module Msuf4SgdDbs =
                     (rng: rngType)
                     (genCurrent: int<generationNumber>)
                     (sorterCtPerPool: int<sorterCountPerPool>)
+                    (sorterCountCycle: int<sorterCountCycle>)
+                    (sorterCountCycleMultiplier: int<sorterCountCycleMultiplier>)
                     (sorterPoolCt: int<sorterPoolCount>)
                     (childCt: int<sorterChildCount>)
                     (ses:sorterEvalSelectionType)
@@ -143,6 +151,8 @@ module Msuf4SgdDbs =
                     (runParameters.rngTypeKey, rng |> RngType.toString)
                     (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
                     (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                    (runParameters.sorterCountCycleKey, (Some sorterCountCycle) |> SorterCountCycle.toString)
+                    (runParameters.sorterCountCycleMultiplierKey, (Some sorterCountCycleMultiplier) |> SorterCountCycleMultiplier.toString)
                     (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                     (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
                     (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
@@ -172,6 +182,8 @@ module Msuf4SgdDbs =
                 let! rng = rp.GetRngType()
                 let! curGen = rp.GetGenerationCurrent()
                 let! scPP = rp.GetSorterCountPerPool()
+                let! sctc = rp.GetSorterCountCycle()
+                let! sctm = rp.GetSorterCountCycleMultiplier()
                 let! spc = rp.GetSorterPoolCount()
                 let! scc = rp.GetSorterChildCount()
                 let! ses = rp.GetSorterEvalSelectionType()
@@ -192,7 +204,7 @@ module Msuf4SgdDbs =
                 let! dsh = rp.GetDistinctSorterHashes()
                 let! pNm = rp.GetPrioritizeNewMutants()
                 let! sfrac = rp.GetSortedFraction()
-                return makeQueryParams rng curGen scPP spc scc ses sem semi 
+                return makeQueryParams rng curGen scPP sctc sctm spc scc ses sem semi 
                                         repl sw smt md mst sdf set sdMdr ortho 
                                         para sym mdr dsh pNm sfrac odt
 
@@ -214,6 +226,8 @@ module Msuf4SgdDbs =
                     (rng: rngType)
                     (genCurrent: int<generationNumber>)
                     (sorterCtPerPool: int<sorterCountPerPool>)
+                    (sorterCountCycle: int<sorterCountCycle>)
+                    (sorterCountCycleMultiplier: int<sorterCountCycleMultiplier>)
                     (sorterPoolCt: int<sorterPoolCount>)
                     (childCt: int<sorterChildCount>)
                     (ses:sorterEvalSelectionType)
@@ -241,6 +255,8 @@ module Msuf4SgdDbs =
                     (runParameters.rngTypeKey, rng |> RngType.toString)
                     (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
                     (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                    (runParameters.sorterCountCycleKey, (Some sorterCountCycle) |> SorterCountCycle.toString)
+                    (runParameters.sorterCountCycleMultiplierKey, (Some sorterCountCycleMultiplier) |> SorterCountCycleMultiplier.toString)
                     (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                     (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
                     (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
@@ -269,6 +285,8 @@ module Msuf4SgdDbs =
                 let! rng = rp.GetRngType()
                 let! curGen = rp.GetGenerationCurrent()
                 let! scPP = rp.GetSorterCountPerPool()
+                let! sctc = rp.GetSorterCountCycle()
+                let! sctm = rp.GetSorterCountCycleMultiplier()
                 let! spc = rp.GetSorterPoolCount()
                 let! scc = rp.GetSorterChildCount()
                 let! ses = rp.GetSorterEvalSelectionType()
@@ -286,7 +304,7 @@ module Msuf4SgdDbs =
                 let! dsh = rp.GetDistinctSorterHashes()
                 let! pNm = rp.GetPrioritizeNewMutants()
                 let! sfrac = rp.GetSortedFraction()
-                return makeQueryParams repl rng curGen scPP spc scc ses sem  
+                return makeQueryParams repl rng curGen scPP sctc sctm spc scc ses sem  
                                        semi slId smt sdf set sdMdr ortho 
                                        para sym mdr dsh pNm sfrac odt
 
