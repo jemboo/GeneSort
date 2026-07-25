@@ -281,7 +281,7 @@ module CommonParams =
             (runParameters.modificationRateKey, [0.015; 0.02; 0.025; 0.03] |> List.map string)
 
     let modificationRatesMsuf4center =
-            (runParameters.modificationRateKey, [0.02; 0.025; 0.03; 0.035;] |> List.map string)
+            (runParameters.modificationRateKey, [0.015; 0.0175; 0.02; 0.0225; 0.025; 0.0275; 0.03; 0.0325;] |> List.map string)
 
     let modificationRatesStage =
             (runParameters.modificationRateKey, [ 0.04; 0.08; 0.16; 0.24;] |> List.map string)
