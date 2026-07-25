@@ -254,7 +254,7 @@ type runParameters =
         |> Option.map UMX.tag<sorterCountCycle>
 
     member this.GetSorterCountCycleMultiplier() =
-        runParameters.tryGetInt runParameters.sorterCountCycleMultiplierKey this.paramMap
+        runParameters.tryGetFloat runParameters.sorterCountCycleMultiplierKey this.paramMap
         |> Option.map UMX.tag<sorterCountCycleMultiplier>
 
     member this.GetSorterCountPerPool() =
@@ -426,8 +426,8 @@ type runParameters =
     member this.WithSorterCountCycle(scc: int<sorterCountCycle> option) =
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountCycleKey (scc |> Option.map UmxExt.intToRaw) }
         
-    member this.WithSorterCountCycleMultiplier(scc: int<sorterCountCycleMultiplier> option) =
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountCycleMultiplierKey (scc |> Option.map UmxExt.intToRaw) }
+    member this.WithSorterCountCycleMultiplier(scc: float<sorterCountCycleMultiplier> option) =
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountCycleMultiplierKey (scc |> Option.map UmxExt.floatToRaw) }
 
     member this.WithSorterCountPerPool(sc: int<sorterCountPerPool> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountPerPoolKey (sc |> Option.map UmxExt.intToRaw) }

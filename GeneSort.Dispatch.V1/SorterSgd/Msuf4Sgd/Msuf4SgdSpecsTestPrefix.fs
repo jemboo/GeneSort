@@ -42,7 +42,7 @@ module Msuf4SgdSpecsTestPrefix =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
             databaseName = Msuf4SgdDbs.Prefix.dbName
-            runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for 32pfx4 Msuf4"
             spans = [
                 rngTypeLcg
@@ -73,7 +73,7 @@ module Msuf4SgdSpecsTestPrefix =
             filter = paramMapFilter
             enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 8
+            maxParallel = 16
         }
 
 

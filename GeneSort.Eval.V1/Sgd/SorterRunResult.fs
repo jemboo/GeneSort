@@ -35,7 +35,7 @@ module SorterRunResult =
             (genStart: int<generationNumber>)
             (genCount: int<generationNumber>)
             (sorterCountCycle: int<sorterCountCycle>)
-            (sorterCountCycleMultiplier: int<sorterCountCycleMultiplier>)
+            (sorterCountCycleMultiplier: float<sorterCountCycleMultiplier>)
             (mutator: sorterModelMutator)
             (prioritizeNewMutants: bool<prioritizeNewMutants>)
             (distinctSorterHashes: bool<distinctSorterHashes>)
