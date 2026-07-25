@@ -98,11 +98,14 @@ module CommonParams =
     let sorterCountCycle20 = (runParameters.sorterCountCycleKey, ["20";] )
     let sorterCountCycle50 = (runParameters.sorterCountCycleKey, ["50";] )
     let sorterCountCycle100 = (runParameters.sorterCountCycleKey, ["100";] )
+    let sorterCountCycle500 = (runParameters.sorterCountCycleKey, ["500";] )
 
     // sorterCountCycleMultiplier
     let sorterCountCycleMultiplier1n2 = (runParameters.sorterCountCycleMultiplierKey, ["1"; "2";] )
     let sorterCountCycleMultiplier1n4 = (runParameters.sorterCountCycleMultiplierKey, ["1"; "4";] )
     let sorterCountCycleMultiplier1n16 = (runParameters.sorterCountCycleMultiplierKey, ["1"; "16";] )
+    let sorterCountCycleMultiplier4 = (runParameters.sorterCountCycleMultiplierKey, ["4";] )
+    let sorterCountCycleMultiplier8 = (runParameters.sorterCountCycleMultiplierKey, ["8";] )
     let sorterCountCycleMultiplier16 = (runParameters.sorterCountCycleMultiplierKey, ["16";] )
 
 

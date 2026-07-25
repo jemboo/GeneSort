@@ -92,7 +92,7 @@ module SorterRunResult =
                         else 
                             historyAcc
 
-                    let adjSorterEvalType = if (remainingSteps = 1) then sorterEvalType.V2 else srtrEvalType
+                    let adjSorterEvalType = sorterEvalType.V1 // if (remainingSteps = 1) then sorterEvalType.V2 else srtrEvalType
                     let reEvaluateParents = (remainingSteps = 1)
 
                     let nextSorterPoolSet = 
