@@ -51,6 +51,9 @@ module CommonParams =
     let genReportInterval20 = 
         (runParameters.generationReportIntervalKey, [20] |> List.map string)
 
+    let genReportInterval50 = 
+        (runParameters.generationReportIntervalKey, [20] |> List.map string)
+
     let genReportInterval100 = 
         (runParameters.generationReportIntervalKey, [100] |> List.map string)
 
@@ -101,6 +104,7 @@ module CommonParams =
     let sorterCountCycle500 = (runParameters.sorterCountCycleKey, ["500";] )
 
     // sorterCountCycleMultiplier
+    let sorterCountCycleMultipliers1 = (runParameters.sorterCountCycleMultiplierKey, ["1";] )
     let sorterCountCycleMultipliers1n2 = (runParameters.sorterCountCycleMultiplierKey, ["1"; "2";] )
     let sorterCountCycleMultipliers1n4 = (runParameters.sorterCountCycleMultiplierKey, ["1"; "4";] )
     let sorterCountCycleMultipliersLow = (runParameters.sorterCountCycleMultiplierKey, ["1"; "1.1";] )
@@ -292,6 +296,8 @@ module CommonParams =
     let modificationRatesStage2 =
             (runParameters.modificationRateKey, [ 0.17; 0.21; 0.25; 0.29;] |> List.map string)
 
+    let modificationRatesMsceCenter =
+            (runParameters.modificationRateKey, [0.02; 0.025; 0.03; 0.035; 0.04; 0.045; 0.05; 0.055;] |> List.map string)
 
     // prioritizeNewMutants
     let prioritizeNewMutantsBoth = 

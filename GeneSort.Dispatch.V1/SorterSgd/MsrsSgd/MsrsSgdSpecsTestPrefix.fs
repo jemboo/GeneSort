@@ -17,7 +17,7 @@ module MsrsSgdSpecsTestPrefix =
             |> List.map SorterEvalSelectionType.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [10000] |> List.map string)
+            (runParameters.generationLastKey, [20000] |> List.map string)
 
     let generationCurrent = 
             (runParameters.generationCurrentKey, [0] |> List.map string)
@@ -48,7 +48,7 @@ module MsrsSgdSpecsTestPrefix =
                 rngTypeLcg
                 generationCurrent
                 thirtyTwoSortersPerPool
-                poolCount5
+                poolCount40
                 oneChildCount
                 sorterEvalSelectionTypeRs6000
                 sorterEvalMeasureInitial_CestM_noScw
@@ -60,15 +60,15 @@ module MsrsSgdSpecsTestPrefix =
                 orthoRate
                 paraRate
                 selfSymRate
-                modificationRatesMsuf4center
+                modificationRatesMsceCenter
                 dataFomatBitv512
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction99
-                genReportInterval20
+                genReportInterval50
                 generationLast
                 sorterCountCycle500
-                sorterCountCycleMultipliersLow
+                sorterCountCycleMultipliers1n2
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
