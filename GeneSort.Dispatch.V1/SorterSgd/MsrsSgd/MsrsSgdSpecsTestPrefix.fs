@@ -48,7 +48,7 @@ module MsrsSgdSpecsTestPrefix =
                 rngTypeLcg
                 generationCurrent
                 thirtyTwoSortersPerPool
-                poolCount40
+                poolCount10
                 oneChildCount
                 sorterEvalSelectionTypeRs6000
                 sorterEvalMeasureInitial_CestM_noScw
@@ -57,10 +57,10 @@ module MsrsSgdSpecsTestPrefix =
                 msrsModelType
                 sorterEvalTypeV1
                 seedModificationRate03
+                modificationRatesMsceCenter
                 orthoRate
                 paraRate
                 selfSymRate
-                modificationRatesMsceCenter
                 dataFomatBitv512
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
@@ -68,7 +68,7 @@ module MsrsSgdSpecsTestPrefix =
                 genReportInterval50
                 generationLast
                 sorterCountCycle500
-                sorterCountCycleMultipliers1n2
+                sorterCountCycleMultipliers1
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
