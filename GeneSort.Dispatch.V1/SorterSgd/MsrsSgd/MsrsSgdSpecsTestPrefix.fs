@@ -47,7 +47,7 @@ module MsrsSgdSpecsTestPrefix =
             spans = [
                 rngTypeLcg
                 generationCurrent
-                thirtyTwoSortersPerPool
+                twoFifty6SortersPerPool
                 poolCount10
                 oneChildCount
                 sorterEvalSelectionTypeRs6000
