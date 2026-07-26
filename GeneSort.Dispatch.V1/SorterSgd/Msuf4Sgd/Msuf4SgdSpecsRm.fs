@@ -73,7 +73,7 @@ module Msuf4SgdSpecsRm =
                 genReportInterval1
                 generationLast
                 sorterCountCycle20
-                sorterCountCycleMultiplier1n2
+                sorterCountCycleMultipliers1n2
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction90

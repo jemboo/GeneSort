@@ -117,7 +117,7 @@ module SorterCountCycle =
 module SorterCountCycleMultiplier =
     let toString (w: float<sorterCountCycleMultiplier> option) : string =
        match w with
-        | Some v -> sprintf "%f" %v
+        | Some v -> sprintf "%.2f" %v
         | None -> "None"
 
 module SorterPoolCount =

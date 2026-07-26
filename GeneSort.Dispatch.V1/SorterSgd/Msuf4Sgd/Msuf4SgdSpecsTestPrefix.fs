@@ -43,7 +43,7 @@ module Msuf4SgdSpecsTestPrefix =
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
             databaseName = Msuf4SgdDbs.Prefix.dbName
             runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for 32pfx4 Msuf4"
+            runDescription = "Mutation analysis for 24pfx4 Msuf4"
             spans = [
                 rngTypeLcg
                 generationCurrent
@@ -53,7 +53,7 @@ module Msuf4SgdSpecsTestPrefix =
                 sorterEvalSelectionTypeRs6000
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
-                sortableTestFilter_Prefix32_4
+                sortableTestFilter_Prefix24_4
                 msuf4ModelType
                 sorterEvalTypeV1
                 seedModificationRate03
@@ -68,7 +68,7 @@ module Msuf4SgdSpecsTestPrefix =
                 genReportInterval20
                 generationLast
                 sorterCountCycle500
-                sorterCountCycleMultiplier1n4
+                sorterCountCycleMultipliersLow
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer

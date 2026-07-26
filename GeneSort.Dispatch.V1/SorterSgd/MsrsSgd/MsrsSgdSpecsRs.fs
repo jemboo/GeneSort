@@ -62,7 +62,7 @@ module MsrsSgdSpecsRs =
                 generationLast
                 generationCurrent                
                 sorterCountCycle20
-                sorterCountCycleMultiplier1n2
+                sorterCountCycleMultipliers1n2
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
