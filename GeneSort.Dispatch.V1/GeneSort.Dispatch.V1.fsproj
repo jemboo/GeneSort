@@ -69,6 +69,7 @@
     <Compile Include="SorterSgd\MsrsSgd\MsrsSgdExecutor.fs" />
     <Compile Include="SorterSgd\MsrsSgd\MsrsSgdSpecsRs.fs" />
     <Compile Include="SorterSgd\MsrsSgd\MsrsSgdSpecsRm.fs" />
+    <Compile Include="SorterSgd\MsrsSgd\MsrsSgdSpecsTestPrefix.fs" />
     <Compile Include="SorterSgd\Msuf4Sgd\Msuf4SgdDbs.fs" />
     <Compile Include="SorterSgd\Msuf4Sgd\Msuf4SgdExecutor.fs" />
     <Compile Include="SorterSgd\Msuf4Sgd\Msuf4SgdSpecsRs.fs" />

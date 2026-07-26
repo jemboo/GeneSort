@@ -21,11 +21,11 @@ module SortableTestSpecsPrefix =
 
         let Prefix_Test  (executorType: sortableTestExecutorType) : runHostSpec = {
             databaseName = SortableTestDbs.Prefix.dbName
-            runName = sprintf @"Prefix-TestA_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Prefix-Test_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Bitv512 prefix sorter test sets"
             spans = [
                 dataFomatBitv512
-                sortableTestFilter_Prefix32_4
+                sortableTestFilter_Prefix24_4
             ]
             filter = (fun rp -> Some rp)
             enhancer = standardEnhancer

@@ -137,10 +137,21 @@ module MsrsSgdExecutor =
                     host rp allowOverwrite cts progress }
 
 
+    let prefixExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                evaluateEvolutionRun
+                    SortableTestMakers.makePrefixTests
+                    PoolSetMakers.createSeedSorterPoolSetPrefix
+                    host rp allowOverwrite cts progress }
+
+
+
 
     let getExecutor (executorType: sorterSgdExecutorType) : IRunParamsExecutor =
         match executorType with
         | sorterSgdExecutorType.GenStandard -> standardExecutor
         | sorterSgdExecutorType.GenMerge -> mergeExecutor
+        | sorterSgdExecutorType.GenPrefix -> prefixExecutor
         | sorterSgdExecutorType.SummaryReport -> Reporting.fullReportExecutor
         | sorterSgdExecutorType.SnapshotReport -> Reporting.snapshotReportExecutor

@@ -40,7 +40,7 @@ module MsrsSgdSpecsRs =
     module Specs =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = MsrsSgdDbs.RandomStandard.Uniform.dbName
+            databaseName = MsrsSgdDbs.Standard.Uniform.dbName
             runName = sprintf @"Rand-Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for Msrs"
             spans = [
@@ -71,7 +71,7 @@ module MsrsSgdSpecsRs =
         }
 
         let Rand_Pool (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = MsrsSgdDbs.RandomStandard.Uniform.dbName
+            databaseName = MsrsSgdDbs.Standard.Uniform.dbName
             runName = sprintf @"Rand-Pool_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for Msrs"
             spans = [
@@ -103,7 +103,7 @@ module MsrsSgdSpecsRs =
 
 
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
-            databaseName = MsrsSgdDbs.RandomStandard.Uniform.dbName
+            databaseName = MsrsSgdDbs.Standard.Uniform.dbName
             runName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for Msrs"
             spans = [
@@ -132,7 +132,7 @@ module MsrsSgdSpecsRs =
         }
 
         let Rand_Medium (executorType: sorterSgdExecutorType) : runHostSpec = {
-            databaseName = MsrsSgdDbs.RandomStandard.Uniform.dbName
+            databaseName = MsrsSgdDbs.Standard.Uniform.dbName
             runName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for Msrs"
             spans = [

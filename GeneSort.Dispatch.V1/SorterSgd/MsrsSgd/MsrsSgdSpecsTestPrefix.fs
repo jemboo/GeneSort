@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterSgd.Msuf4
+﻿namespace GeneSort.Dispatch.V1.SorterSgd.Msrs
 
 open FSharp.UMX
 open GeneSort.Dispatch.V1
@@ -9,7 +9,7 @@ open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterSgd
 
 
-module Msuf4SgdSpecsTestPrefix =
+module MsrsSgdSpecsTestPrefix =
 
     let sorterEvalSelectionTypeRs6000 = 
             (runParameters.sorterEvalSelectionType, 
@@ -41,7 +41,7 @@ module Msuf4SgdSpecsTestPrefix =
     module Specs =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = Msuf4SgdDbs.Prefix.dbName
+            databaseName = MsrsSgdDbs.Prefix.dbName
             runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for 24pfx4 Msuf4"
             spans = [
@@ -54,7 +54,7 @@ module Msuf4SgdSpecsTestPrefix =
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
                 sortableTestFilter_Prefix24_4
-                msuf4ModelType
+                msrsModelType
                 sorterEvalTypeV1
                 seedModificationRate03
                 orthoRate
@@ -73,7 +73,7 @@ module Msuf4SgdSpecsTestPrefix =
             filter = paramMapFilter
             enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 1
+            maxParallel = 16
         }
 
 

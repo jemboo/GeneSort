@@ -53,7 +53,7 @@ module SorterEvalSpecsTestPrefix =
 
         let TestPrefixFilter_Test (executorType: sorterEvalExecutorType) : runHostSpec = {
             databaseName = SorterEvalDbs.Prefix.dbName
-            runName = sprintf @"TestPrefixFilter-TestC_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"TestPrefixFilter-TestB_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             runDescription = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf4"
             spans = [   
                 rngTypeLcg

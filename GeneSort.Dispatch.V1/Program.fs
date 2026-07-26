@@ -261,6 +261,14 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //    MsrsSgdDbs.createRunHost spec
 //let executor = MsrsSgdExecutor.getExecutor executorType
 
+//********** MsrsSgdSpecsPrefix **********
+let configType = MsrsSgdSpecsTestPrefix.configType.Rand_Test
+let executorType = sorterSgdExecutorType.GenPrefix
+let host: IRunHost = 
+    let spec = MsrsSgdSpecsTestPrefix.getRunHostSpec configType executorType
+    MsrsSgdDbs.createRunHost spec
+let executor = MsrsSgdExecutor.getExecutor executorType
+
 
 ////********** Msuf4SgdSpecsRs **********
 //let configType = Msuf4SgdSpecsRs.configType.Rand_Pool
@@ -283,13 +291,13 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let maxReplica = 1<replNumber>
 
 
-//********** Msuf4SgdSpecsRm **********
-let configType = Msuf4SgdSpecsTestPrefix.configType.Rand_Test
-let executorType = sorterSgdExecutorType.GenPrefix
-let host: IRunHost = 
-    let spec = Msuf4SgdSpecsTestPrefix.getRunHostSpec configType executorType
-    Msuf4SgdDbs.createRunHost spec
-let executor = Msuf4SgdExecutor.getExecutor executorType
+//********** Msuf4SgdSpecsPrefix **********
+//let configType = Msuf4SgdSpecsTestPrefix.configType.Rand_Test
+//let executorType = sorterSgdExecutorType.GenPrefix
+//let host: IRunHost = 
+//    let spec = Msuf4SgdSpecsTestPrefix.getRunHostSpec configType executorType
+//    Msuf4SgdDbs.createRunHost spec
+//let executor = Msuf4SgdExecutor.getExecutor executorType
 
 
 
