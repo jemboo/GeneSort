@@ -297,7 +297,7 @@ module CommonParams =
             (runParameters.modificationRateKey, [ 0.17; 0.21; 0.25; 0.29;] |> List.map string)
 
     let modificationRatesMsceCenter =
-            (runParameters.modificationRateKey, [0.02; 0.025; 0.03; 0.035; 0.04; 0.045; 0.05; 0.055;] |> List.map string)
+            (runParameters.modificationRateKey, [0.01; 0.02; 0.03; 0.04; 0.05; 0.06; 0.07; 0.08;] |> List.map string)
 
     // prioritizeNewMutants
     let prioritizeNewMutantsBoth = 
