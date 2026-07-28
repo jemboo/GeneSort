@@ -131,6 +131,14 @@ module OutputDataFile =
         let dto = fromDomain domain
         MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
 
+
+    let rec buildDetailedMessage (ex: exn) =
+        let currentMsg = sprintf "[%s] %s" (ex.GetType().FullName) ex.Message
+        if isNull ex.InnerException then
+            currentMsg
+        else
+            sprintf "%s\n  ---> %s" currentMsg (buildDetailedMessage ex.InnerException)
+
     let saveToFileAsync
         (pathToProjectFolder:string<pathToRootFolder>)
         (queryParams: queryParams)
@@ -157,32 +165,14 @@ module OutputDataFile =
                         use stream = new FileStream(%filePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync = true)
                         do!
                             match outputData with
-                            //| outputData.MutationSegmentEvalBinsSet msr ->
-                            //    failwith "Not implemented: SorterSetEval serialization"
-                            //   // serializeDto stream msr MutationSegmentEvalBinsSetDto.fromDomain
                             | outputData.RunParameters r ->
                                 serializeDto stream r RunParametersDto.fromDomain
                             | outputData.SorterRunResult ss ->
                                 serializeDto stream ss SorterRunResultDto.fromDomain
                             | outputData.SorterSet ss ->
                                 serializeDto stream ss SorterSetDto.fromDomain
-                            //| outputData.SortableTestSet sts ->
-                            //    failwith "Not implemented: SorterSetEval serialization"
-                            //    //serializeDto stream sts SortableTestSetDto.fromDomain
                             | outputData.SortableTest sts ->
                                  serializeDto stream sts SortableTestDto.fromDomain
-                            //| outputData.SortingSet sms ->
-                            //    failwith "Not implemented: SorterSetEval serialization"
-                            //    //serializeDto stream sms SortingSetDto.fromDomain
-                            //| outputData.SortingSetGen sms ->
-                            //   //serializeDto stream sms SorterModelSetGenDto.fromDomain
-                            //    failwith "Not implemented: SorterModelSetGen serialization"
-                            //| outputData.SortableTestModelSet sts ->
-                            //    failwith "Not implemented: SorterSetEval serialization"
-                            //    //serializeDto stream sts SortableTestModelSetDto.fromDomain
-                            //| outputData.SortableTestModelSetGen stsm ->
-                            //    failwith "Not implemented: SorterSetEval serialization"
-                            //   // serializeDto stream stsm SortableTestModelSetGenDto.fromDomain
                             | outputData.SorterSetEval sse ->
                                 serializeDto stream sse SorterSetEvalDto.fromDomain
                             | outputData.Run p ->
@@ -194,7 +184,9 @@ module OutputDataFile =
                                     do! stream.WriteAsync(textBytes, 0, textBytes.Length) |> Async.AwaitTask
                                 }
                         return Ok ()
-                    with e -> return Error (sprintf "Error saving file %s: %s" %filePath e.Message)
+                    with e -> 
+                        let detailedError = buildDetailedMessage e
+                        return Error (sprintf "Error saving file %s:\n%s" %filePath detailedError)
         }
 
 

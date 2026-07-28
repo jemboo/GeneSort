@@ -12,8 +12,8 @@ type sorterMutationSourceDto = {
     [<Key(0)>] sorterModelMutatorId: Guid
     [<Key(1)>] sorterModelId: Guid
     [<Key(2)>] mutationIndex: int
-    [<Key(2)>] ceLength: int
-    [<Key(2)>] stageLength: int
+    [<Key(3)>] ceLength: int
+    [<Key(4)>] stageLength: int
 }
 
 module SorterMutationSourceDto =

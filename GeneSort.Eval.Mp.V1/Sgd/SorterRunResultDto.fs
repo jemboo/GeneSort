@@ -14,10 +14,12 @@ type sorterRunResultDto = {
 module SorterRunResultDto =
 
     let fromDomain (domain: sorterRunResult) : sorterRunResultDto =
-        {
-            spsDescriptionDtos = domain.IntermediateHistory |> Array.map SorterPoolSetSummaryDto.toDto
-            spsFinalDto = SorterPoolSetDto.toDto domain.FinalPoolSet
-        }
+        let retVal =
+            {
+                spsDescriptionDtos = domain.IntermediateHistory |> Array.map SorterPoolSetSummaryDto.toDto
+                spsFinalDto = SorterPoolSetDto.toDto domain.FinalPoolSet
+            }
+        retVal
 
     let toDomain (dto: sorterRunResultDto) : sorterRunResult =
         let finalPoolSet = SorterPoolSetDto.fromDto dto.spsFinalDto
