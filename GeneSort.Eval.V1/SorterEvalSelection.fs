@@ -13,33 +13,37 @@ type sorterEvalSelectionType =
     | ValueSpan of int<sorterCount>
     | RankSpan of int<sorterCount>
     | TopN of int<sorterCount>
+    | GuidOrder of int<sorterCount>
 
 module SorterEvalSelectionType =
     
     let toString = function
-        | Tmb count       -> sprintf "Tmb:%d" count
+        | Tmb count        -> sprintf "Tmb:%d" count
         | ValueSpan count -> sprintf "ValueSpan:%d" count
         | RankSpan count -> sprintf "RankSpan:%d" count
         | TopN count      -> sprintf "TopN:%d" count
+        | GuidOrder count -> sprintf "GuidOrder:%d" count
 
     let fromString (str: string) = 
         match str.Split(':') with
         | [| caseName; countStr |] ->
             let count = Int32.Parse(countStr) * 1<sorterCount>
             match caseName with
-            | "Tmb"       -> Tmb count
+            | "Tmb"        -> Tmb count
             | "ValueSpan" -> ValueSpan count
             | "RankSpan" -> RankSpan count
             | "TopN"      -> TopN count
+            | "GuidOrder" -> GuidOrder count
             | _           -> failwithf "Invalid case name '%s' in string '%s'" caseName str
         | _ -> 
             failwithf "String '%s' is not in the expected format 'Name:Value'" str
 
     let toStrategyLabel = function
-        | Tmb _       -> "Tmb"
+        | Tmb _        -> "Tmb"
         | ValueSpan _ -> "ValueSpan"
         | RankSpan _ -> "RankSpan"
         | TopN _      -> "TopN"
+        | GuidOrder _ -> "GuidOrder"
 
 
 type sorterEvalSelection = 
@@ -203,6 +207,21 @@ module SorterEvalSelection =
 
             let labeledItems = result |> Array.mapi (fun idx se -> evalLabel.ValueIndex idx, se)
             sorterEvalSelection.create selType measure labeledItems sortableTestId
+
+        | GuidOrder count ->
+                    let sampleCount = %count
+                    if sampleCount <= 0 then failwithf "Sample count must be greater than zero, but was %d" sampleCount
+                    if cleanItems.Length < sampleCount then 
+                        failwithf "Cannot sample %d items; only %d options available." sampleCount cleanItems.Length
+
+                    let result = 
+                        cleanItems
+                        |> Array.sortBy (fun se -> se |> SorterEval.getSorterId |> UMX.untag)
+                        |> Array.truncate sampleCount
+
+                    let labeledItems = result |> Array.mapi (fun idx se -> evalLabel.RankIndex idx, se)
+                    sorterEvalSelection.create selType measure labeledItems sortableTestId
+
 
 
 module EvalReporting =

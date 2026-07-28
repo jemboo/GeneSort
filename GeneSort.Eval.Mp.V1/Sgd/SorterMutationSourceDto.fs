@@ -35,5 +35,3 @@ module SorterMutationSourceDto =
             (UMX.tag<mutationIndex> dto.mutationIndex)
             (UMX.tag<ceLength> dto.ceLength)
             (UMX.tag<stageLength> dto.stageLength)
-
-

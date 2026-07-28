@@ -52,8 +52,11 @@ module MsrsSgdExecutor =
                 let! sorterCountCycleMultiplier = rp.GetSorterCountCycleMultiplier() |> Result.ofOption "Missing sorterCountCycleMultiplier."
                 let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
 
+                log "Executing makeSortableTests..."
+                let! (sortableTest: sortableTest) = makeSortableTests rp
+
                 // 2. Resolve target seed sorterPoolSet collection state depending on genFirst criteria
-                let! initialSeedPoolSet: sorterPoolSet = 
+                let! (initialSeedPoolSet: sorterPoolSet) = 
                     if %genCurrent > 0 then
                         log "Looking up historical sorterPoolSet from database..."
                         let qpSRRResult = 
@@ -67,11 +70,20 @@ module MsrsSgdExecutor =
                         }
                     else
                         log "Make seedSorterPoolSet..."
-                        sorterPoolSetCreator rp
+                        asyncResult {
+                            let! (seedPoolSet: sorterPoolSet) = sorterPoolSetCreator rp
+                            let reEvaluateParents = true
+                            let computedEvals = 
+                                    seedPoolSet 
+                                    |> SorterPoolRunner.evaluatePoolSet 
+                                                        sortableTest 
+                                                        sorterEvalType
+                                                        reEvaluateParents
+                            return seedPoolSet |> SorterPoolSet.updateSorterEvals computedEvals
+                        }
 
                 do! checkCancellation cts.Token
-                log "Executing makeSortableTests..."
-                let! (sortableTest: sortableTest) = makeSortableTests rp
+
                 
                 log "Making sorterModelMutator..."
                 let! (orthoRate: float<orthoRate>) = rp.GetOrthoRate() |> Result.ofOption "Missing orthoRate in run parameters"

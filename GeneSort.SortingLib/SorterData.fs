@@ -10,7 +10,8 @@ type sorterVariant =
     | VariantA
     | VariantB
     | VariantC
-    | Prefix2
+    | Prefix2a
+    | Prefix2b
     | Prefix3a
     | Prefix3b
     | Prefix4a
@@ -48,9 +49,12 @@ module SorterLibId =
                 | "VariantA" -> VariantA
                 | "VariantB" -> VariantB
                 | "VariantC" -> VariantC
-                | "Prefix2" -> Prefix2
-                | "Prefix3" -> Prefix3a
-                | "Prefix4" -> Prefix4a
+                | "Prefix2a" -> Prefix2a
+                | "Prefix2b" -> Prefix2b
+                | "Prefix3a" -> Prefix3a
+                | "Prefix3b" -> Prefix3b
+                | "Prefix4a" -> Prefix4a
+                | "Prefix4b" -> Prefix4b
                 | _ -> failwith "Unknown sorterVariant"
             create sortingWidth variant
 
@@ -69,7 +73,7 @@ module SorterData =
              [(0,1)]
              [(1,2)]"
 
-            { sortingWidth = 4<sortingWidth>; sorterVariant = Prefix2 }, 
+            { sortingWidth = 4<sortingWidth>; sorterVariant = Prefix2a }, 
             "[(0,2),(1,3)]
              [(0,1),(2,3)]"
 

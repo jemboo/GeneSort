@@ -93,7 +93,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** SortableTest Prefix **********
-//let configType = SortableTestSpecsPrefix.configType.Prefix_Test
+//let configType = SortableTestSpecsPrefix.configType.Prefix_24s
 //let executorType = SortableTest.sortableTestExecutorType.GenPrefix
 //let host: IRunHost = 
 //    let spec = SortableTestSpecsPrefix.getRunHostSpec configType executorType
@@ -123,7 +123,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** SorterEval Prefix **********
-//let configType = SorterEvalSpecsTestPrefix.configType.TestPrefixFilter_Test
+//let configType = SorterEvalSpecsTestPrefix.configType.Prefix_24s
 //let executorType = sorterEvalExecutorType.GenPrefix
 //let host: IRunHost = 
 //    let spec = SorterEvalSpecsTestPrefix.getRunHostSpec configType executorType

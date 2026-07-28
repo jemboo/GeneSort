@@ -29,7 +29,7 @@ module EvolutionOrchestrator =
 
         let rec stepLoop 
                     (currentGenFirst: int<generationNumber>) 
-                    (currentSeedPoolSet: sorterPoolSet) 
+                    (currentPoolSet: sorterPoolSet) 
                     (currentRp: runParameters) : Async<Result<runParameters, string>> =
             asyncResult {
                 if currentGenFirst >= genLast then
@@ -44,7 +44,7 @@ module EvolutionOrchestrator =
                             currentGenFirst currentGenLast stepSize)
 
                     // Execute the engine payload passed in by the executor module
-                    let! (runResult: sorterRunResult) = runSliceAsync currentGenFirst stepSize currentSeedPoolSet
+                    let! (runResult: sorterRunResult) = runSliceAsync currentGenFirst stepSize currentPoolSet
 
                     do! checkCancellation cts
 

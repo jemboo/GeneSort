@@ -72,6 +72,7 @@ module CommonParams =
     let smallSorterCount = (runParameters.sorterCountKey, ["100";] )
     let mediumSorterCount = (runParameters.sorterCountKey, ["1000";] )
     let largeSorterCount = (runParameters.sorterCountKey, ["10000";] )
+    let veryLargeSorterCount = (runParameters.sorterCountKey, ["25000";] )
     let extraLargeSorterCount = (runParameters.sorterCountKey, ["100000";] )
 
     

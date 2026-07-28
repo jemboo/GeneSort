@@ -61,7 +61,7 @@ module SorterEvalSpecsTestPrefix =
                 allSimpleSorterModelTypes
                 dataFomatBitv512
                 sorterEvalTypeV2
-                largeSorterCount
+                veryLargeSorterCount
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
@@ -80,7 +80,7 @@ module SorterEvalSpecsTestPrefix =
                 allSimpleSorterModelTypes
                 dataFomatBitv512
                 sorterEvalTypeV2
-                largeSorterCount
+                veryLargeSorterCount
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
