@@ -119,6 +119,7 @@ module CommonParams =
     let poolCount2 = (runParameters.sorterPoolCountKey, ["2";] )
     let poolCount5 = (runParameters.sorterPoolCountKey, ["5";] )
     let poolCount10 = (runParameters.sorterPoolCountKey, ["10";] )
+    let poolCount20 = (runParameters.sorterPoolCountKey, ["20";] )
     let poolCount40 = (runParameters.sorterPoolCountKey, ["40";] )
     let poolCount100 = (runParameters.sorterPoolCountKey, ["100";] )
     let poolCount1000 = (runParameters.sorterPoolCountKey, ["1000";] )

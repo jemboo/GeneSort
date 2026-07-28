@@ -11,13 +11,13 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 module MsrsSgdSpecsTestPrefix =
 
-    let sorterEvalSelectionTypeGuid6K = 
+    let sorterEvalSelectionTypeGuid12K = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.GuidOrder 6000<sorterCount>;] 
+            [ sorterEvalSelectionType.GuidOrder 12000<sorterCount>;] 
             |> List.map SorterEvalSelectionType.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [20000] |> List.map string)
+            (runParameters.generationLastKey, [2500] |> List.map string)
 
     let generationCurrent = 
             (runParameters.generationCurrentKey, [0] |> List.map string)
@@ -48,9 +48,9 @@ module MsrsSgdSpecsTestPrefix =
                 rngTypeLcg
                 generationCurrent
                 fiveTwelveSortersPerPool
-                poolCount10
+                poolCount20
                 oneChildCount
-                sorterEvalSelectionTypeGuid6K
+                sorterEvalSelectionTypeGuid12K
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
                 sortableTestFilter_Prefix24_4b
@@ -65,7 +65,7 @@ module MsrsSgdSpecsTestPrefix =
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction99
-                genReportInterval1000
+                genReportInterval500
                 generationLast
                 sorterCountCycle500
                 sorterCountCycleMultipliers1
@@ -73,7 +73,7 @@ module MsrsSgdSpecsTestPrefix =
             filter = paramMapFilter
             enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 4
+            maxParallel = 8
         }
 
 
