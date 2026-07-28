@@ -187,7 +187,7 @@ module SorterPoolSet =
                     modelChunk
                     |> Array.map (fun model ->
                         let poolMemberId = Guid.NewGuid() |> UMX.tag<sorterPoolMemberId>
-                        sorterPoolMember.Create
+                        sorterPoolMember.create
                             poolMemberId
                             model
                             (0 |> UMX.tag<mutationIndex>)   // Initial tracking index starts at 0

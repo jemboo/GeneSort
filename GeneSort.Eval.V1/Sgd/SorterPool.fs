@@ -150,11 +150,9 @@ module SorterPool =
                 else true
             )
 
-        let birthdaySort = 
-            if %prioritizeNewMutants then
-                filter1 |> Seq.sortBy(fun spm -> - %spm.Birthday)
-            else
-                filter1 |> Seq.sortBy(fun spm -> spm.Birthday )
+        // if the hashes are the same, then prioritize the older member
+        let birthdaySort =
+                filter1 |> Seq.sortBy(fun spm -> spm.Birthday)
 
         let filter2 =
             if %distinctSorterHashes then

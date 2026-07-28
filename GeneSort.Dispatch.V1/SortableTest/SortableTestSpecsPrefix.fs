@@ -19,13 +19,13 @@ module SortableTestSpecsPrefix =
 
     module Specs =
 
-        let Prefix_Test  (executorType: sortableTestExecutorType) : runHostSpec = {
+        let Prefix_24s  (executorType: sortableTestExecutorType) : runHostSpec = {
             databaseName = SortableTestDbs.Prefix.dbName
             runName = sprintf @"Prefix-Test_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Bitv512 prefix sorter test sets"
             spans = [
                 dataFomatBitv512
-                sortableTestFilter_Prefix24_4
+                sortableTestFilter_Prefix24s
             ]
             filter = (fun rp -> Some rp)
             enhancer = standardEnhancer
@@ -33,12 +33,29 @@ module SortableTestSpecsPrefix =
             maxParallel = 1
         }
 
+        let Prefix_32  (executorType: sortableTestExecutorType) : runHostSpec = {
+            databaseName = SortableTestDbs.Prefix.dbName
+            runName = sprintf @"Prefix-Test_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Bitv512 prefix sorter test sets"
+            spans = [
+                dataFomatBitv512
+                sortableTestFilter_Prefix32_4
+            ]
+            filter = (fun rp -> Some rp)
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 1
+        }
+
+
     type configType =
-        | Prefix_Test
+        | Prefix_24s
+        | Prefix_32
 
     let Configs = Map.ofList 
                     [ 
-                        (configType.Prefix_Test, Specs.Prefix_Test);
+                        (configType.Prefix_24s, Specs.Prefix_24s);
+                        (configType.Prefix_32, Specs.Prefix_32);
                     ]
 
     let getRunHostSpec (config: configType) (executorType: sortableTestExecutorType) : runHostSpec =

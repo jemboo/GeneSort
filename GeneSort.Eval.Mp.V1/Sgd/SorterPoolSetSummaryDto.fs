@@ -15,10 +15,10 @@ open GeneSort.Eval.V1
 type sorterPoolSummaryDto = {
     [<Key(0)>] sorterPoolId: Guid
     [<Key(1)>] sorterPoolName: string
-    [<Key(2)>] aveCeLength: int
+    [<Key(2)>] aveCeLength: float
     [<Key(3)>] minCeLength: int
     [<Key(4)>] minStageLength: int
-    [<Key(5)>] aveStageLength: int
+    [<Key(5)>] aveStageLength: float
     [<Key(6)>] rawCeLength: int
 }
 

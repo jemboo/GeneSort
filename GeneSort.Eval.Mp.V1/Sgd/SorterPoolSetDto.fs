@@ -81,7 +81,7 @@ module SorterPoolSetDto =
                         let evalOpt = m.sorterEvalDto |> Option.map SorterEvalDto.toDomain
                         let sourceOpt = m.sorterMutationSource |> Option.map SorterMutationSourceDto.fromDto
                         
-                        sorterPoolMember.Create
+                        sorterPoolMember.create
                             (UMX.tag m.sorterPoolMemberId)
                             (SorterModelDto.toDomain m.sorterModelDto)
                             (UMX.tag m.sorterMutationIndex)

@@ -159,9 +159,6 @@ module SorterEvalDbs =
 
 
 
-
-
-
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
         [ (Standard.dbName, Standard.db :> IGeneSortDb);
           (Merge.dbName, Merge.db :> IGeneSortDb) 

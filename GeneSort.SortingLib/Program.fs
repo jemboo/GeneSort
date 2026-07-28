@@ -10,7 +10,7 @@ open GeneSort.Sorting.Sortable
 module Sandbox =
     let test32Pfx() =
         let sortingWidth = 28<sortingWidth>
-        let sorterVariant = sorterVariant.Prefix4
+        let sorterVariant = sorterVariant.Prefix4a
         let sorterKey = SorterLibId.create sortingWidth sorterVariant
         let ceArray = (SorterDataParse.getCeArrayFromLib sorterKey).Value
         let res = SortableBoolArray.getAllPossibleResultsFromCeArray

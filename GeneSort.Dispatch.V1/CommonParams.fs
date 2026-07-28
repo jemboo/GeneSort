@@ -327,20 +327,51 @@ module CommonParams =
 
 
     // SortableTestFilters
-    let _sortableTestFilter_Prefix24_4 = 
-            SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix4
-    let sortableTestFilter_Prefix24_4 = 
-            (runParameters.sortableTestFilterKey, [_sortableTestFilter_Prefix24_4] |> List.map SorterLibId.toString)
+    let _sortableTestFilter_Prefix24_4a = 
+            SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix4a
+    let sortableTestFilter_Prefix24_4a = 
+            (runParameters.sortableTestFilterKey, [_sortableTestFilter_Prefix24_4a] |> List.map SorterLibId.toString)
+
+    let _sortableTestFilter_Prefix24_4b = 
+            SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix4b
+    let sortableTestFilter_Prefix24_4b = 
+            (runParameters.sortableTestFilterKey, [_sortableTestFilter_Prefix24_4b] |> List.map SorterLibId.toString)
+
+    let _sortableTestFilter_Prefix24_3a = 
+            SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix3a
+    let sortableTestFilter_Prefix24_3a = 
+            (runParameters.sortableTestFilterKey, [_sortableTestFilter_Prefix24_3a] |> List.map SorterLibId.toString)
+
+    let _sortableTestFilter_Prefix24_3b = 
+            SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix3b
+    let sortableTestFilter_Prefix24_3b = 
+            (runParameters.sortableTestFilterKey, [_sortableTestFilter_Prefix24_3b] |> List.map SorterLibId.toString)
+
+    let sortableTestFilter_Prefix24s = 
+            (runParameters.sortableTestFilterKey, 
+            [   _sortableTestFilter_Prefix24_4a
+                _sortableTestFilter_Prefix24_4b
+                _sortableTestFilter_Prefix24_3a
+                _sortableTestFilter_Prefix24_3b
+            ] |> List.map SorterLibId.toString)
+
+
+
 
     let _sortableTestFilter_Prefix28_4 = 
-            SorterLibId.create (28<sortingWidth>) sorterVariant.Prefix4
+            SorterLibId.create (28<sortingWidth>) sorterVariant.Prefix4a
     let sortableTestFilter_Prefix28_4 = 
             (runParameters.sortableTestFilterKey, [_sortableTestFilter_Prefix28_4] |> List.map SorterLibId.toString)
 
+
     let _sortableTestFilter_Prefix32_4 = 
-            SorterLibId.create (32<sortingWidth>) sorterVariant.Prefix4
+            SorterLibId.create (32<sortingWidth>) sorterVariant.Prefix4a
     let sortableTestFilter_Prefix32_4 = 
             (runParameters.sortableTestFilterKey, [_sortableTestFilter_Prefix32_4] |> List.map SorterLibId.toString)
+
+
+
+
 
 
     // Sorted Fractions

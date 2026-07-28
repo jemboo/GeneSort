@@ -51,13 +51,13 @@ module SorterEvalSpecsTestPrefix =
 
     module Specs =
 
-        let TestPrefixFilter_Test (executorType: sorterEvalExecutorType) : runHostSpec = {
+        let Prefix_24s (executorType: sorterEvalExecutorType) : runHostSpec = {
             databaseName = SorterEvalDbs.Prefix.dbName
-            runName = sprintf @"TestPrefixFilter-TestB_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            runDescription = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf4"
+            runName = sprintf @"Prefix_24s_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            runDescription = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf6"
             spans = [   
                 rngTypeLcg
-                sortableTestFilter_Prefix24_4
+                sortableTestFilter_Prefix24s
                 allSimpleSorterModelTypes
                 dataFomatBitv512
                 sorterEvalTypeV2
@@ -70,14 +70,33 @@ module SorterEvalSpecsTestPrefix =
         }
 
 
+        let Prefix_32 (executorType: sorterEvalExecutorType) : runHostSpec = {
+            databaseName = SorterEvalDbs.Prefix.dbName
+            runName = sprintf @"Prefix_32_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
+            runDescription = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf4"
+            spans = [   
+                rngTypeLcg
+                sortableTestFilter_Prefix32_4
+                allSimpleSorterModelTypes
+                dataFomatBitv512
+                sorterEvalTypeV2
+                largeSorterCount
+            ]
+            filter = paramMapFilter
+            enhancer = prefixEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 1
+        }
+
 
     type configType =
-        | TestPrefixFilter_Test
-
+        | Prefix_24s
+        | Prefix_32
 
     let Configs = Map.ofList 
                     [ 
-                        (configType.TestPrefixFilter_Test, Specs.TestPrefixFilter_Test);
+                        (configType.Prefix_24s, Specs.Prefix_24s);
+                        (configType.Prefix_32, Specs.Prefix_32);
                     ]
 
     let getRunHostSpec (config: configType) (executorType: sorterEvalExecutorType) : runHostSpec =

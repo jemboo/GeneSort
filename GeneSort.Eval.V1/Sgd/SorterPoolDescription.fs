@@ -46,7 +46,6 @@ module SpmDescription =
             |> dataTableRecord.addData (sprintf "%sSorterModelId" prefix) (string (%spmDesc.SorterModelId))
             |> dataTableRecord.addData (sprintf "%sMutationIndex" prefix) (string (%spmDesc.MutationIndex))
             |> dataTableRecord.addData (sprintf "%sBirthday" prefix) (string (%spmDesc.Birthday))
-            |> dataTableRecord.addData (sprintf "%sAge" prefix) (string (%currentGen - %spmDesc.Birthday))
 
         // 2. Flatten optional sorterMutationSource properties if present
         let sourceRecord =

@@ -53,7 +53,7 @@ module MsrsSgdSpecsTestPrefix =
                 sorterEvalSelectionTypeRs6000
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
-                sortableTestFilter_Prefix24_4
+                sortableTestFilter_Prefix24_4a
                 msrsModelType
                 sorterEvalTypeV1
                 seedModificationRate03

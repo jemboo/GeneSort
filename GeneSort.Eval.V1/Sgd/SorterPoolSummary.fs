@@ -11,10 +11,10 @@ type sorterPoolSummary =
     private {
         _sorterPoolId: Guid<sorterPoolId>
         _sorterPoolName: string<sorterPoolName>
-        _aveCeLength: int<ceLength>
+        _aveCeLength: float<ceLength>
         _minCeLength: int<ceLength>
         _minStageLength: int<stageLength>
-        _aveStageLength: int<stageLength>
+        _aveStageLength: float<stageLength>
         _rawCeLength: int<ceLength>
     }
 
@@ -31,9 +31,9 @@ type sorterPoolSummary =
                     (sorterPoolName: string<sorterPoolName>) 
                     (rawCeLength: int<ceLength>) 
                     (minCeLength: int<ceLength>) 
-                    (aveCeLength: int<ceLength>) 
+                    (aveCeLength: float<ceLength>) 
                     (minStageLength: int<stageLength>) 
-                    (aveStageLength: int<stageLength>) =
+                    (aveStageLength: float<stageLength>) =
         { _sorterPoolId = poolId; 
           _sorterPoolName = sorterPoolName;
           _rawCeLength = rawCeLength; 
@@ -81,9 +81,9 @@ module SorterPoolSetSummary =
                         pool.Name 
                         pool.RawCeLength 
                         (0 |> UMX.tag) 
+                        (0.0 |> UMX.tag) 
                         (0 |> UMX.tag) 
-                        (0 |> UMX.tag) 
-                        (0 |> UMX.tag)
+                        (0.0 |> UMX.tag)
                 else
                     // Map out the metrics across all evaluations
                     let ceLengths = evals |> Array.map (fun ev -> % (SorterEval.getCeLength ev))
@@ -94,15 +94,15 @@ module SorterPoolSetSummary =
                     let minStage = Array.min stageLengths |> UMX.tag<stageLength>
 
                     // Compute averages safely as integers
-                    let aveCe = (ceLengths |> Array.averageBy float |> int) |> UMX.tag<ceLength>
-                    let aveStage = (stageLengths |> Array.averageBy float |> int) |> UMX.tag<stageLength>
+                    let aveCe = (ceLengths |> Array.averageBy float) |> UMX.tag<ceLength>
+                    let aveStage = (stageLengths |> Array.averageBy float) |> UMX.tag<stageLength>
 
                     sorterPoolSummary.create 
                         pool.SorterPoolId 
                         pool.Name 
                         pool.RawCeLength 
                         minCe 
-                        aveCe 
+                        aveCe
                         minStage 
                         aveStage
             )
@@ -132,8 +132,8 @@ module SorterPoolSetSummary =
             |> dataTableRecord.addData (sprintf "%sSorterPoolId" prefix) (string (%poolSum.SorterPoolId))
             |> dataTableRecord.addData (sprintf "%sSorterPoolName" prefix) (string (%poolSum.SorterPoolName))
             |> dataTableRecord.addData (sprintf "%sRawCeLength" prefix) (string (%poolSum.RawCeLength))
-            |> dataTableRecord.addData (sprintf "%sAveCeLength" prefix) (string (%poolSum.AveCeLength))
+            |> dataTableRecord.addData (sprintf "%sAveCeLength" prefix) (sprintf "%.5f" (%poolSum.AveCeLength))
             |> dataTableRecord.addData (sprintf "%sMinCeLength" prefix) (string (%poolSum.MinCeLength))
             |> dataTableRecord.addData (sprintf "%sMinStageLength" prefix) (string (%poolSum.MinStageLength))
-            |> dataTableRecord.addData (sprintf "%sAveStageLength" prefix) (string (%poolSum.AveStageLength))
+            |> dataTableRecord.addData (sprintf "%sAveStageLength" prefix) (sprintf "%.5f" (%poolSum.AveStageLength))
         )

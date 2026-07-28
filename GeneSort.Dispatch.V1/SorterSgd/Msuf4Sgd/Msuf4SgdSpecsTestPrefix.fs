@@ -53,7 +53,7 @@ module Msuf4SgdSpecsTestPrefix =
                 sorterEvalSelectionTypeRs6000
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
-                sortableTestFilter_Prefix24_4
+                sortableTestFilter_Prefix24_4a
                 msuf4ModelType
                 sorterEvalTypeV1
                 seedModificationRate03
