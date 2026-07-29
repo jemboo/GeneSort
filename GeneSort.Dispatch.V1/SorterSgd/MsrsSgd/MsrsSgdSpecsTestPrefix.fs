@@ -17,7 +17,7 @@ module MsrsSgdSpecsTestPrefix =
             |> List.map SorterEvalSelectionType.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [2500] |> List.map string)
+            (runParameters.generationLastKey, [20000] |> List.map string)
 
     let generationCurrent = 
             (runParameters.generationCurrentKey, [0] |> List.map string)
@@ -48,7 +48,7 @@ module MsrsSgdSpecsTestPrefix =
                 rngTypeLcg
                 generationCurrent
                 fiveTwelveSortersPerPool
-                poolCount20
+                poolCount10
                 oneChildCount
                 sorterEvalSelectionTypeGuid12K
                 sorterEvalMeasureInitial_CestM_noScw
@@ -56,7 +56,7 @@ module MsrsSgdSpecsTestPrefix =
                 sortableTestFilter_Prefix24_4b
                 msrsModelType
                 sorterEvalTypeV1
-                seedModificationRate03
+                seedModificationRates
                 modificationRatesMsceCenter
                 orthoRate
                 paraRate

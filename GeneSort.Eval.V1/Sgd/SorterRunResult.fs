@@ -72,13 +72,13 @@ module SorterRunResult =
                     let currentGen = genStart + (genCount - %remainingSteps)
                     let totalGen = genStart + genCount
 
-                    // --- Dynamic Periodic Variation for sorterCountPerPool ---
-                    // Alternates every 20 generations:
-                    // Generations 0-19: 1x, 20-39: 2x, 40-59: 1x, etc.
-                    let scm = float %sorterCountCycleMultiplier
-                    let scPP = float %sorterCountPerPool
-                    let multiplier = if ((%currentGen / %sorterCountCycle) % 2 = 0) then (1.0 / scm) else (2.0 - 1.0 / scm)
-                    let currentSorterCountPerPool : int<sorterCountPerPool> = UMX.tag (int (scPP * multiplier))
+                    //// --- Dynamic Periodic Variation for sorterCountPerPool ---
+                    //// Alternates every 20 generations:
+                    //// Generations 0-19: 1x, 20-39: 2x, 40-59: 1x, etc.
+                    //let scm = float %sorterCountCycleMultiplier
+                    //let scPP = float %sorterCountPerPool
+                    //let multiplier = if ((%currentGen / %sorterCountCycle) % 2 = 0) then (1.0 / scm) else (2.0 - 1.0 / scm)
+                    //let currentSorterCountPerPool : int<sorterCountPerPool> = UMX.tag (int (scPP * multiplier))
 
                     // Look up if the current generation is an exponential milestone
                     let shouldReport = (Set.contains (int currentGen) targetGenerations)
@@ -94,13 +94,13 @@ module SorterRunResult =
                         else 
                             historyAcc
 
-                    let adjSorterEvalType = sorterEvalType.V1 // if (remainingSteps = 1) then sorterEvalType.V2 else srtrEvalType
+                    let adjSorterEvalType = if (remainingSteps = 1) then sorterEvalType.V2 else srtrEvalType
                     let reEvaluateParents = (remainingSteps = 1)
 
                     let nextSorterPoolSet = 
                         SorterPipeline.runGenerationStep 
                             mutator 
-                            currentSorterCountPerPool
+                            sorterCountPerPool
                             sorterChildCount
                             prioritizeNewMutants
                             distinctSorterHashes
@@ -116,14 +116,14 @@ module SorterRunResult =
                         System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
                         GC.Collect(2, GCCollectionMode.Forced, true, true)
 
-                    let moreUpdatedHistory = 
-                        if (remainingSteps = 1) then 
-                            let nextSnapshot = SorterPoolSetSummary.fromPoolSet nextSorterPoolSet
-                            nextSnapshot :: updatedHistory
-                        else 
-                            updatedHistory
+                    //let moreUpdatedHistory = 
+                    //    if (remainingSteps = 1) then 
+                    //        let nextSnapshot = SorterPoolSetSummary.fromPoolSet nextSorterPoolSet
+                    //        nextSnapshot :: updatedHistory
+                    //    else 
+                    //        updatedHistory
 
-                    return! loop (remainingSteps - 1) nextSorterPoolSet moreUpdatedHistory
+                    return! loop (remainingSteps - 1) nextSorterPoolSet updatedHistory
             }
 
         loop %genCount initialPoolSet []
