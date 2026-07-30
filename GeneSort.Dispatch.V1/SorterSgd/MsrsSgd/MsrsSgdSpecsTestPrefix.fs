@@ -13,11 +13,11 @@ module MsrsSgdSpecsTestPrefix =
 
     let sorterEvalSelectionTypeGuid12K = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.GuidOrder 12000<sorterCount>;] 
+            [ sorterEvalSelectionType.GuidOrder 10000<sorterCount>;] 
             |> List.map SorterEvalSelectionType.toString)
         
     let generationLast = 
-            (runParameters.generationLastKey, [20000] |> List.map string)
+            (runParameters.generationLastKey, [10000] |> List.map string)
 
     let generationCurrent = 
             (runParameters.generationCurrentKey, [0] |> List.map string)
@@ -47,8 +47,8 @@ module MsrsSgdSpecsTestPrefix =
             spans = [
                 rngTypeLcg
                 generationCurrent
-                fiveTwelveSortersPerPool
-                poolCount10
+                oneTwenty8SortersPerPool
+                poolCount1
                 oneChildCount
                 sorterEvalSelectionTypeGuid12K
                 sorterEvalMeasureInitial_CestM_noScw

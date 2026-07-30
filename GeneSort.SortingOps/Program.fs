@@ -1,7 +1,8 @@
 ﻿// For more information see https://aka.ms/fsharp-console-apps
 open System
 open FSharp.UMX
-open GeneSort.Model.Sortable
+open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sortable.V1
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open GeneSort.SortingOps

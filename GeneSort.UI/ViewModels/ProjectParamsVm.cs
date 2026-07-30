@@ -1,7 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using GeneSort.Runs;
-using GeneSort.Runs.Mp;
 using MessagePack;
 using System.Collections.ObjectModel;
 using System.IO;
