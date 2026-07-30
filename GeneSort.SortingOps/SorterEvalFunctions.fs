@@ -1,6 +1,7 @@
 ﻿namespace GeneSort.SortingOps
 
 open System
+open System.Globalization
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
@@ -25,10 +26,9 @@ module private CompactStringParser =
 
     let parseFloat<[<Measure>] 'm> (key: string) (input: string) : float<'m> =
         let raw = getValue key input
-        match Double.TryParse(raw) with
+        match Double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture) with
         | true, v -> UMX.tag<'m> v
         | _ -> failwithf "Failed to parse float for key '%s' in '%s'" key input
-
 
 
 type ceLengthMeasure = private {
@@ -117,8 +117,10 @@ type ceStMeasure = private {
     member this.StageCrossingWeight: float<stageCrossingWeight> = this.stageCrossingWeight
 
     member this.ToCompactString() = 
-        sprintf "CeSt(stW=%.2f, fUnsorted=%b, fRefl=%b, stcXW=%.4f)" 
-            (%this.stageWeight) (%this.filterUnsorted) (%this.filterReflectionSymmetric) (%this.stageCrossingWeight)
+        let stWStr = UmxExt.floatToRaw this.stageWeight
+        let stcXWStr = UmxExt.floatToRaw this.stageCrossingWeight
+        sprintf "CeSt(stW=%s, fUnsorted=%b, fRefl=%b, stcXW=%s)" 
+            stWStr (%this.filterUnsorted) (%this.filterReflectionSymmetric) stcXWStr
 
     static member FromCompactString(s: string) : ceStMeasure =
         let stW = CompactStringParser.parseFloat "stW" s
@@ -148,7 +150,9 @@ type ceStUcMeasure = private {
     member this.FilterReflectionSymmetric: bool<filterReflectionSymmetric> = this.filterReflectionSymmetric
 
     member this.ToCompactString() = 
-        sprintf "CeStUc(stW=%.2f, ucW=%.2f, fRefl=%b)" (%this.stageWeight) (%this.unsortedWeight) (%this.filterReflectionSymmetric)
+        let stWStr = UmxExt.floatToRaw this.stageWeight
+        let ucWStr = UmxExt.floatToRaw this.unsortedWeight
+        sprintf "CeStUc(stW=%s, ucW=%s, fRefl=%b)" stWStr ucWStr (%this.filterReflectionSymmetric)
 
     static member FromCompactString(s: string) : ceStUcMeasure =
         let stW = CompactStringParser.parseFloat "stW" s
@@ -214,15 +218,15 @@ module SorterEvalMeasure =
         | CeSt m ->
             baseRecord
             |> dataTableRecord.addData "MeasureType" "CeSt"
-            |> dataTableRecord.addData "M_StageLengthWeight" (string %m.StageWeight)
-            |> dataTableRecord.addData "M_StageCrossingWeight" (string %m.StageCrossingWeight)
+            |> dataTableRecord.addData "M_StageLengthWeight" (UmxExt.floatToRaw m.StageWeight)
+            |> dataTableRecord.addData "M_StageCrossingWeight" (UmxExt.floatToRaw m.StageCrossingWeight)
             |> dataTableRecord.addData "M_FilterUnsorted" (string %m.FilterUnsorted)
             |> dataTableRecord.addData "M_FilterReflectionSymmetric" (string %m.FilterReflectionSymmetric)
         | CeStUc m ->
             baseRecord
             |> dataTableRecord.addData "MeasureType" "CeStUc"
-            |> dataTableRecord.addData "M_StageLengthWeight" (string %m.StageWeight)
-            |> dataTableRecord.addData "M_UnsortedCountWeight" (string %m.UnsortedWeight)
+            |> dataTableRecord.addData "M_StageLengthWeight" (UmxExt.floatToRaw m.StageWeight)
+            |> dataTableRecord.addData "M_UnsortedCountWeight" (UmxExt.floatToRaw m.UnsortedWeight)
             |> dataTableRecord.addData "M_FilterUnsorted" "false"
             |> dataTableRecord.addData "M_FilterReflectionSymmetric" (string %m.FilterReflectionSymmetric)
 
@@ -287,6 +291,7 @@ module SorterEvalFunctions =
                 (SorterEval.getIsReflectionSymmetric se |> UMX.untag)
             passUnsorted && passRefl
         )
+
     let toCompactString (measure: sorterEvalMeasure) : string =
             match measure with
             | CeLength m -> m.ToCompactString()

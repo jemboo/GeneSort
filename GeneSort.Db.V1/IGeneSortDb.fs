@@ -26,11 +26,11 @@ type IGeneSortDb =
                         queryParams -> 
                             Async<outputData option>
 
-    abstract member getNextGenerationalItemAsync :
-                        queryParams ->
-                        (queryParams -> int<generationNumber> -> queryParams) ->
-                        outputData option ->
-                            Async<outputData option>
+    //abstract member getNextGenerationalItemAsync :
+    //                    queryParams ->
+    //                    (queryParams -> int<generationNumber> -> queryParams) ->
+    //                    outputData option ->
+    //                        Async<outputData option>
 
     abstract member getRunParameters :
                         string<runName> ->

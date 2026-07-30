@@ -1,8 +1,8 @@
 ﻿namespace GeneSort.Model.Sorting.V1
 
+open System
 open FSharp.UMX
 open GeneSort.Core
-
 
 [<Measure>] type sorterModelId
 [<Measure>] type sorterModelSetId
@@ -27,86 +27,52 @@ open GeneSort.Core
 [<Measure>] type paraRate
 [<Measure>] type selfSymRate
 
-
 module MutationRate =
-
     let toString (w: float<mutationRate> option) : string =
-       match w with
-        | Some v -> sprintf "%.4f" %v
-        | None -> "None"
-
+        UmxExt.floatOptionToString w
 
 module InsertionRate =
-
     let toString (w: float<insertionRate> option) : string =
-       match w with
-        | Some v -> sprintf "%.4f" %v
-        | None -> "None"
-
+        UmxExt.floatOptionToString w
 
 module DeletionRate =
-
     let toString (w: float<deletionRate> option) : string =
-       match w with
-        | Some v -> sprintf "%.4f" %v
-        | None -> "None"
-
+        UmxExt.floatOptionToString w
 
 module SeedModificationRate =
     let toString (w: float<seedModificationRate> option) : string =
-       match w with
-        | Some v -> sprintf "%.4f" %v
-        | None -> "None"
-
+        UmxExt.floatOptionToString w
 
 module ModificationRate =
-
     let toString (w: float<modificationRate> option) : string =
-       match w with
-        | Some v -> sprintf "%.4f" %v
-        | None -> "None"
-
+        UmxExt.floatOptionToString w
 
 module OrthoRate =
     let toString (w: float<orthoRate> option) : string =
-       match w with
-        | Some v -> sprintf "%.4f" %v
-        | None -> "None"
-
+        UmxExt.floatOptionToString w
 
 module ParaRate =
     let toString (w: float<paraRate> option) : string =
-       match w with
-        | Some v -> sprintf "%.4f" %v
-        | None -> "None"
-
+        UmxExt.floatOptionToString w
 
 module SelfSymRate =
     let toString (w: float<selfSymRate> option) : string =
-       match w with
-        | Some v -> sprintf "%.4f" %v
-        | None -> "None"
-
-
+        UmxExt.floatOptionToString w
 
 module CommonGen =
-
     let makeSorterModelId 
-                (id:  Guid<sorterModelGenId>) 
-                (index:int<sortingGenIndex>) : Guid<sorterModelId> = 
+                (id: Guid<sorterModelGenId>) 
+                (index: int<sortingGenIndex>) : Guid<sorterModelId> = 
         [
             box "CommonGen.makeSorterModelId"
             box (id |> UMX.untag)
             box (index |> UMX.untag)
         ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelId>
 
-
-
 module CommonMutator =
-
     let makeSorterModelId 
                 (parentId: Guid<sorterModelId>)
-                (id:  Guid<sorterModelMutatorId>) 
+                (id: Guid<sorterModelMutatorId>) 
                 (index: int<mutationIndex>): Guid<sorterModelId> = 
         [
             box "CommonMutator.makeSorterModelId"

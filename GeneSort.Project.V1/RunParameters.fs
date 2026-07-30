@@ -1,6 +1,7 @@
 ﻿namespace GeneSort.Project.V1
 
 open System
+open System.Globalization
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
@@ -80,7 +81,11 @@ type runParameters =
         map.TryFind key |> Option.bind (fun v -> match Boolean.TryParse v with true, b -> Some b | _ -> None)
 
     static member private tryGetFloat (key: string) (map: Map<string, string>) =
-        map.TryFind key |> Option.bind (fun v -> match Double.TryParse v with true, f -> Some f | _ -> None)
+        map.TryFind key 
+        |> Option.bind (fun v -> 
+            match Double.TryParse(v, NumberStyles.Float, CultureInfo.InvariantCulture) with 
+            | true, f -> Some f 
+            | _ -> None)
 
     static member private tryGetGuid (key: string) (map: Map<string, string>) =
         map.TryFind key |> Option.bind (fun v -> match Guid.TryParse v with true, g -> Some g | _ -> None)
@@ -399,7 +404,7 @@ type runParameters =
     member this.WithRunName(rn: string<runName> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.runNameKey (rn |> Option.map UmxExt.stringToRaw) }
 
-    member this.WithSeedModificationRate(mr: float<modificationRate> option) = 
+    member this.WithSeedModificationRate(mr: float<seedModificationRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedModificationRateKey (mr |> Option.map UmxExt.floatToRaw) }
 
     member this.WithSelfSymRate(ssr: float<selfSymRate> option) = 

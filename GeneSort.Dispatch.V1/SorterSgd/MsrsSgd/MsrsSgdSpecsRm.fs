@@ -4,12 +4,9 @@
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Project.V1
-open GeneSort.SortingOps
 open GeneSort.Eval.V1
-open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterSgd
 
@@ -47,7 +44,7 @@ module MsrsSgdSpecsRm =
     module Specs =
 
         let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = MsrsSgdDbs.RandomMerge.Uniform.dbName
+            databaseName = MsrsSgdDbs.Merge.dbName
             runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for merge Msrs"
             spans = [
@@ -81,7 +78,7 @@ module MsrsSgdSpecsRm =
         }
 
         let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
-            databaseName = MsrsSgdDbs.RandomMerge.Uniform.dbName
+            databaseName = MsrsSgdDbs.Merge.dbName
             runName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for merge Msrs"
             spans = [
@@ -113,7 +110,7 @@ module MsrsSgdSpecsRm =
         }
 
         let Rand_Medium (executorType: sorterSgdExecutorType) : runHostSpec = {
-            databaseName = MsrsSgdDbs.RandomMerge.Uniform.dbName
+            databaseName = MsrsSgdDbs.Merge.dbName
             runName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for merge Msrs"
             spans = [
