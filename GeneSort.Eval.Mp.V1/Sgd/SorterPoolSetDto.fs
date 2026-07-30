@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Eval.Mp.V1
+﻿namespace GeneSort.Eval.Mp.V1.Sgd
 
 open System
 open MessagePack
@@ -8,6 +8,7 @@ open GeneSort.Eval.V1
 open GeneSort.Model.Mp.Sorting.Mp.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Sorting
+open GeneSort.Eval.Mp.V1
 
 // ---------------------------------------------------------------------
 // 2. Fully Realized Final State DTOs

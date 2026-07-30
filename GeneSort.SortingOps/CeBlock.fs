@@ -4,6 +4,7 @@ open System
 open FSharp.UMX
 open GeneSort.Sorting.Sorter
 open GeneSort.Sorting
+open GeneSort.Core
 
 type ceBlock = 
     private { 
@@ -36,6 +37,12 @@ type ceBlock =
     member this.CeLength with get() = this.ces.Length |> UMX.tag<ceLength>
 
     member this.SortingWidth with get() = this.sortingWidth
+
+    member this.permute (perm:permutation) : ceBlock =
+        ceBlock.create 
+            (Guid.NewGuid() |> UMX.tag)
+            this.sortingWidth
+            (this.ces |> Array.map(Ce.permute perm))
 
 
 module CeBlock =

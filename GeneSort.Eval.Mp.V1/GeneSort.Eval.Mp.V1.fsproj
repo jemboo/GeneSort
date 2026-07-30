@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Bins\SorterEvalBinsDto.fs" />
     <Compile Include="Sgd\SorterMutationSourceDto.fs" />
     <Compile Include="Sgd\SorterPoolSetDto.fs" />
     <Compile Include="Sgd\SorterPoolSetSummaryDto.fs" />

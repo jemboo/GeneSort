@@ -6,6 +6,7 @@ open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open GeneSort.SortingOps
 open GeneSort.Sorting.Sorter
+open GeneSort.SortingLib.Sorter
 
 let ceUseSoruceTester() =
 
@@ -32,7 +33,26 @@ let ceUseSoruceTester() =
     None
 
 
+let testRelabel() =
+    let sortingWidth = 16 |> UMX.tag<sortingWidth>
+
+    let sm = msasF.create sortingWidth
+    let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
+    let sortableTest = sm.MakeSortableBoolTest sortableTestId sortingWidth
+                       |> sortableTest.Bools
 
 
+    let slId = { sorterLibId.sortingWidth = sortingWidth; sorterVariant = sorterVariant.VariantA }
+    let blockId = Guid.NewGuid() |> UMX.tag<ceBlockId>
+    let ces = (SorterDataParse.getCeArrayFromLib slId) |> Option.get
+    let ceBlk = ceBlock.create blockId sortingWidth ces
 
-printfn "Hello from F# yo"
+
+    let collectNewSortableTests = true
+    let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlk collectNewSortableTests
+
+    printfn "Hello from F# yo"
+    1
+
+
+ceUseSoruceTester() |> ignore

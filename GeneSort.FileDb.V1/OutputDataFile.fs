@@ -9,7 +9,6 @@ open MessagePack.Resolvers
 open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Project.Mp.V1
-open GeneSort.Eval.Mp.V1
 open GeneSort.Sorting.Mp.Sortable
 open GeneSort.Sorting.Sortable
 open System.Text
@@ -18,6 +17,7 @@ open GeneSort.SortingOps
 open GeneSort.Sorting.Mp.Sorter
 open GeneSort.Sorting.Sorter
 open GeneSort.Eval.V1.Sgd
+open GeneSort.Eval.Mp.V1.Sgd
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder

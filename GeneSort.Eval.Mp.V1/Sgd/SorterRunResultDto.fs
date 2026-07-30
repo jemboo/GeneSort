@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Eval.Mp.V1
+﻿namespace GeneSort.Eval.Mp.V1.Sgd
 
 open MessagePack
 open GeneSort.Eval.V1.Sgd

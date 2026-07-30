@@ -11,13 +11,13 @@ open GeneSort.Sorting
 [<Struct>]
 type ce = private { low: int; hi: int } with
 
-    static member create (lv: int) (hv: int) : ce =
-        if lv < 0 || hv < 0 then
+    static member create (lhs: int) (rhs: int) : ce =
+        if lhs < 0 || rhs < 0 then
             failwith "Indices must be non-negative"
-        else if lv < hv then
-            { low = lv; hi = hv }
+        else if lhs < rhs then
+            { low = lhs; hi = rhs }
         else
-            { low = hv; hi = lv }
+            { low = rhs; hi = lhs }
 
     /// Gets the first TwoOrbit.
     member this.Low with get () = this.low
@@ -174,6 +174,10 @@ module Ce =
             let lo = (float dex) - (float (pfloor * (pfloor + 1))) / 2.0 |> int
             let hi = (int pfloor)
             ce.create (lo) (hi)
+
+
+    let permute (perm: permutation) (cer:ce) =
+        ce.create (perm.permute cer.Low) (perm.permute cer.Hi)
 
     let reflect 
             (sortingWidth: int<sortingWidth>) 

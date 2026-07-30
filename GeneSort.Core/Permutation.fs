@@ -48,6 +48,9 @@ type permutation =
 
     override this.GetHashCode() = hash this.Id
 
+    member this.permute (dom: int) :int =
+        this.Array.[dom]
+
     // 2. High-Performance Type-Safe F# Comparison Implementation
     interface IComparable<permutation> with
         member this.CompareTo(other) =

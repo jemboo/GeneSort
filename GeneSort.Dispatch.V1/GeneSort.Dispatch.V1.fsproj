@@ -36,6 +36,7 @@
     <Compile Include="SorterEval\SorterEvalSpecsRm.fs" />
     <Compile Include="SorterEval\SorterEvalSpecsTestPrefix.fs" />
     <Compile Include="SorterMutate\CommonSorterMutate.fs" />
+    <Compile Include="SorterMutate\Reporting.fs" />
     <Compile Include="SorterMutate\MsceMutate\MsceMutateDbs.fs" />
     <Compile Include="SorterMutate\MsceMutate\MsceMutateExecutor.fs" />
     <Compile Include="SorterMutate\MsceMutate\MsceMutateSpecsRs.fs" />
