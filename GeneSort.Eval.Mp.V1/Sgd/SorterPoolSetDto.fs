@@ -96,5 +96,5 @@ module SorterPoolSetDto =
                             members
                             (p.ceLength |> UMX.tag<ceLength> )
             )
-        sorterPoolSet.Create(UMX.tag dto.sorterPoolSetId, UMX.tag dto.generationNumber, pools)
+        sorterPoolSet.create(UMX.tag dto.sorterPoolSetId, UMX.tag dto.generationNumber, pools)
 

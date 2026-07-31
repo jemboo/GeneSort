@@ -19,7 +19,7 @@ type sorterPoolSet =
     member this.SorterPools with get() = this._sorterPools
     member this.GenerationNumber with get() = this._generationNumber
 
-    static member Create(sorterPoolSetId, generationNumber, ?pools: seq<sorterPool>) =
+    static member create(sorterPoolSetId, generationNumber, ?pools: seq<sorterPool>) =
         let poolsMap = 
             defaultArg pools Seq.empty
             |> Seq.map (fun p -> p.SorterPoolId, p)
@@ -93,7 +93,7 @@ module SorterPoolSet =
         
         let prunedPools = 
             poolSet._sorterPools
-            |> Map.map (fun _ pool -> SorterPool.pruneSorterPool 
+            |> Map.map (fun _ pool -> SorterPool.pruneSorterPoolDebug 
                                             pool 
                                             measure
                                             prioritizeNewMutants
@@ -102,50 +102,22 @@ module SorterPoolSet =
 
         { poolSet with _sorterPools = prunedPools }
 
-
-    /// Dynamically scales each pool's CeLength by -5% if the fraction of fully sorted members 
-    /// meets/exceeds the threshold, or +5% otherwise.
-    let adjustCeLengths 
-            (sortedFractionThreshold: float<sortedFraction>) 
+    /// Iterates through all sorter pools in the set and adjusts their RawCeLengths
+    /// and member population based on sortedFractionThreshold.
+    let adjustCeLengths
+            (sortedFractionThreshold: float<sortedFraction>)
             (poolSet: sorterPoolSet) : sorterPoolSet =
-        
-        let adjustedPools = 
-            poolSet._sorterPools
-            |> Map.map (fun _ pool ->
-                let members = pool.SorterPoolMembers |> Seq.toArray
-                if members.Length = 0 then 
-                    pool
-                else
-                    // Count how many members are actively marked as completely sorted
-                    let sortedCount = 
-                        members 
-                        |> Array.filter (fun m -> 
-                            match m.SorterEval with
-                            | Some eval -> SorterEval.getIsSorted eval
-                            | None -> false)
-                        |> Array.length
-                    
-                    let fraction = float sortedCount / float members.Length
-                    let currentCe = %pool.RawCeLength
-                    
-                    // Apply dynamic scaling boundaries (preventing drop below 1)
-                    let newCeRaw = 
-                        if fraction >= %sortedFractionThreshold then
-                            max 1 (int (round (float currentCe * 0.95)))
-                        else
-                            int (round (float currentCe * 1.05))
-                            
-                    let newCeLength = newCeRaw |> UMX.tag<ceLength>
-                    
-                    // Re-create the structural container with the scaled metric
-                    sorterPool.create 
-                        pool.SorterPoolId 
-                        pool.Name 
-                        members 
-                        newCeLength
-            )
 
-        { poolSet with _sorterPools = adjustedPools }
+        let updatedPools =
+            poolSet.SorterPools
+            |> Map.toSeq
+            |> Seq.map (fun (_, pool) ->
+                SorterPool.adjustCeLengthByThreshold sortedFractionThreshold pool
+            )
+            |> Seq.toArray
+
+        sorterPoolSet.create(poolSet.SorterPoolSetId, poolSet.GenerationNumber, updatedPools)
+
 
     /// Initializes a sorterPoolSet with poolCount pools from a sorterModelSet, each pool
     /// having sortersPerPool members. Takes the first (poolCount * sortersPerPool) sorters
@@ -202,7 +174,7 @@ module SorterPoolSet =
             )
 
         // 5. Package the complete group layout structure back out to the main generational repository root
-        sorterPoolSet.Create(sorterPoolSetId, generationNumber, pools)
+        sorterPoolSet.create(sorterPoolSetId, generationNumber, pools)
 
 
 

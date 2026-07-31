@@ -6,6 +6,7 @@ open GeneSort.SortingOps
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1
+open System.Diagnostics
 
 
 type sorterPool =
@@ -127,6 +128,63 @@ module SorterPool =
         { pool with _sorterPoolMembers = updatedMembersMap }
 
 
+    /// Adjusts the RawCeLength to the minimal LastCeIndex required to keep at least 
+    /// sortedFractionThreshold fraction of members sorted, and prunes any members exceeding that cutoff.
+    let adjustCeLengthByThreshold
+            (sortedFractionThreshold: float<sortedFraction>)
+            (pool: sorterPool) : sorterPool =
+
+        // 1. Gather all sorted members that have valid evaluations
+        let sortedMembersWithLastIndex =
+            pool.SorterPoolMembers
+            |> Seq.choose (fun spm ->
+                match spm.SorterEval with
+                | Some eval when SorterEval.getIsSorted eval ->
+                    Some (spm, SorterEval.getLastCeIndex eval)
+                | _ -> None
+            )
+            |> Seq.toArray
+
+        if Array.isEmpty sortedMembersWithLastIndex then
+            // If no sorted members exist, keep pool unchanged
+            pool
+        else
+            // 2. Sort by LastCeIndex ascending to determine the threshold index cutoff
+            let sortedByLastCe = 
+                sortedMembersWithLastIndex 
+                |> Array.sortBy (fun (_, lastIdx) -> %lastIdx)
+
+            // Calculate target count based on the threshold
+            let targetCount = 
+                sortedByLastCe.Length 
+                |> float 
+                |> (*) %sortedFractionThreshold 
+                |> Math.Ceiling 
+                |> int 
+                |> max 1
+
+            let targetIndex = min (targetCount - 1) (sortedByLastCe.Length - 1)
+            let _, thresholdLastCeIndex = sortedByLastCe.[targetIndex]
+
+            // 3. Filter out all pool members whose LastCeIndex exceeds the cutoff
+            let updatedMembers =
+                pool.SorterPoolMembers
+                |> Seq.filter (fun spm ->
+                    match spm.SorterEval with
+                    | Some eval -> SorterEval.getLastCeIndex eval <= thresholdLastCeIndex
+                    | None -> true
+                )
+                |> Seq.toArray
+
+            // Re-create the pool with the newly calculated cutoff as RawCeLength
+            sorterPool.create 
+                pool.SorterPoolId 
+                pool.Name 
+                updatedMembers 
+                (UMX.tag<ceLength> %thresholdLastCeIndex)
+
+
+
     /// Trims the SorterPool to size prunedSize, selecting the best (lowest score) according to measure
     let pruneSorterPool 
                 (pool: sorterPool) 
@@ -145,7 +203,7 @@ module SorterPool =
             |> Seq.filter (fun spm ->
                 if %filterUnsorted then
                     match spm.SorterEval with
-                    | Some eval -> SorterEval.getUnsortedCount eval <= 0<sortableCount>
+                    | Some eval -> eval |> SorterEval.getIsShortEnough pool.RawCeLength 
                     | None -> false // Unevaluated members cannot verify if they are fully sorted
                 else true
             )
@@ -192,80 +250,90 @@ module SorterPool =
 
 
 
+    /// Debug version of pruneSorterPool that forces immediate evaluation at each step
+    /// to allow complete inspection of intermediate collections and count drop-offs.
+    let pruneSorterPoolDebug
+            (pool: sorterPool) 
+            (measure: sorterEvalMeasure) 
+            (prioritizeNewMutants: bool<prioritizeNewMutants>)
+            (distinctSorterHashes: bool<distinctSorterHashes>)
+            (sorterCountPerPool: int<sorterCountPerPool>) : sorterPool =
 
+        let targetSize = max 0 %sorterCountPerPool
+        let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
+        let filterUnsorted = SorterEvalFunctions.getFilterUnsortedFlag measure
 
+        let initialMembers = pool.SorterPoolMembers |> Seq.toArray
+        let initialCount = initialMembers.Length
 
+        // --- Step 1: Filter Unsorted ---
+        let filter1Members =
+            initialMembers
+            |> Array.filter (fun spm ->
+                if %filterUnsorted then
+                    match spm.SorterEval with
+                    | Some eval -> eval |> SorterEval.getIsShortEnough pool.RawCeLength 
+                    | None -> false // Unevaluated members cannot verify if they are fully sorted
+                else true
+            )
 
+        let countAfterFilter1 = filter1Members.Length
 
+        if countAfterFilter1 = 0 && initialCount > 0 && Debugger.IsAttached then
+            Debugger.Break() // Pause if filtering unsorted wiped out all members
 
+        // --- Step 2: Birthday Sort (Stable base order for deduplication) ---
+        let birthdaySortedMembers =
+            filter1Members 
+            |> Array.sortBy (fun spm -> spm.Birthday)
 
+        // --- Step 3: Distinct Hashes Deduplication ---
+        let filter2Members =
+            if %distinctSorterHashes then
+                birthdaySortedMembers 
+                |> Array.distinctBy (fun spm -> 
+                    match spm.SorterEval with
+                    | Some eval -> %(SorterEval.getSequenceHash eval)
+                    | None -> 
+                        if Debugger.IsAttached then Debugger.Break() // Unevaluated member reaching distinctBy step
+                        0
+                )
+            else
+                birthdaySortedMembers
+        let countAfterFilter2 = filter2Members.Length
 
+        if countAfterFilter2 = 0 && countAfterFilter1 > 0 && Debugger.IsAttached then
+            Debugger.Break() // Pause if distinct hashing wiped out all members
 
+        // --- Step 4: Scoring & Tuple Generation ---
+        let scoredMembers =
+            filter2Members
+            |> Array.map (fun spm ->
+                let score = 
+                    match spm.SorterEval with
+                    | Some eval -> scoreFunc eval
+                    | None -> Double.PositiveInfinity
+            
+                let mIndexRaw = %spm.MutationIndex
+                let tieBreaker = if %prioritizeNewMutants then mIndexRaw else -mIndexRaw
+            
+                (score, tieBreaker, spm)
+            )
 
+        // --- Step 5: Ranking & Sorting ---
+        let rankedMembers =
+            scoredMembers
+            |> Array.sortBy (fun (score, tieBreaker, _) -> (score, tieBreaker))
 
+        // --- Step 6: Truncation (Pruning to Target Capacity) ---
+        let truncatedSurvivors =
+            rankedMembers
+            |> Array.truncate targetSize
+            |> Array.map (fun (_, _, spm) -> spm)
 
+        let finalCount = truncatedSurvivors.Length
 
+        if finalCount = 0 && targetSize > 0 && countAfterFilter2 > 0 && Debugger.IsAttached then
+            Debugger.Break() // Pause if final truncation resulted in an empty pool
 
-
-
-
-
-    ///// Trims the SorterPool to size prunedSize, selecting the best (lowest score) according to measure
-    //let pruneSorterPool 
-    //            (pool: sorterPool) 
-    //            (measure: sorterEvalMeasure) 
-    //            (prioritizeNewMutants: bool<prioritizeNewMutants>)
-    //            (distinctSorterHashes: bool<distinctSorterHashes>)
-    //            (sorterCountPerPool: int<sorterCountPerPool>) : sorterPool =
-        
-    //    let targetSize = max 0 %sorterCountPerPool
-    //    let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
-    //    let filterUnsorted = SorterEvalFunctions.getFilterUnsortedFlag measure
-
-    //    let filter1 =
-    //        pool._sorterPoolMembers
-    //        |> Map.values
-    //        // Step 1: Handle filtering of unsorted elements if required by the measure rules
-    //        |> Seq.filter (fun spm ->
-    //            if filterUnsorted then
-    //                match spm.SorterEval with
-    //                | Some eval -> SorterEval.getUnsortedCount eval <= 0<sortableCount>
-    //                | None -> false // Unevaluated members cannot verify if they are fully sorted
-    //            else true
-    //        )
-
-    //    let filter2 =
-    //        if %distinctSorterHashes then
-    //            filter1 |> Seq.distinctBy (fun spm -> %(SorterEval.getSequenceHash spm.SorterEval.Value))
-    //        else
-    //            filter1
-
-    //    let sortedSurvivors =
-    //        filter2
-    //        // Step 2: Score members and construct the sorting key matrix
-    //        // Unevaluated members (None) get Double.PositiveInfinity (worst possible score)
-    //        |> Seq.map (fun spm ->
-    //            let score = 
-    //                match spm.SorterEval with
-    //                | Some eval -> scoreFunc eval
-    //                | None -> Double.PositiveInfinity
-    //            (score, spm)
-    //        )
-    //        // Step 3: Sort ascending (best scores first). 
-    //        // Tie-break on MutationIndex when scores match uniformly.
-    //        |> Seq.sortBy (fun (score, spm) ->
-    //            let mIndexRaw = %spm.MutationIndex
-                
-    //            // If prioritizing NEW mutants: lower mutation index comes first.
-    //            // If prioritizing OLD members: higher mutation index comes first (so we negate it).
-    //            let tieBreaker = if %prioritizeNewMutants then mIndexRaw else -mIndexRaw
-                
-    //            (score, tieBreaker)
-    //        )
-    //        // Step 4: Take the best up to the designated pruned size limit
-    //        |> Seq.truncate targetSize
-    //        |> Seq.map snd
-    //        |> Seq.toArray
-
-    //    sorterPool.create pool.SorterPoolId pool.Name sortedSurvivors pool.RawCeLength
-
+        sorterPool.create pool.SorterPoolId pool.Name truncatedSurvivors pool.RawCeLength

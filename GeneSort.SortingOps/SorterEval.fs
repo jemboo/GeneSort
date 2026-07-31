@@ -331,6 +331,13 @@ module SorterEval =
         | V2 v2 -> v2.LastCeIndex
         | V3 v3 -> v3.LastCeIndex
 
+    let getIsShortEnough
+            (lengthCutoff: int<ceLength>) 
+            (eval: sorterEval): bool =
+        (%(getLastCeIndex eval) <= %lengthCutoff)
+        &&
+        (getIsSorted eval)
+
     let getCeUseArray (eval: sorterEval) : ceUse array =
         match eval with
         | V1 v1 -> failwith "V1 does not have CeDataSequence"

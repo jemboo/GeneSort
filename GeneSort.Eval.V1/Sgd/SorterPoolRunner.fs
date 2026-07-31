@@ -19,12 +19,14 @@ module SorterPoolRunner =
             : Map<Guid<sorterPoolMemberId>, sorterEval> =
 
         // 1. Collect all members across all pools paired with their respective pool's ceLength
+        
         let allMembers = 
             poolSet.SorterPools
             |> Map.values
             |> Seq.collect (fun pool -> 
+                let paddedCeLength = ((float pool.RawCeLength) * 1.1) |> int |> UMX.tag<ceLength>
                 pool.SorterPoolMembers 
-                |> Seq.map (fun m -> pool.RawCeLength, m)
+                |> Seq.map (fun m -> paddedCeLength, m)
             )
             |> Seq.toArray
 

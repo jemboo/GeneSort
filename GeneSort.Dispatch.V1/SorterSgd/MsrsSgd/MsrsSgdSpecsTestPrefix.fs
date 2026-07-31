@@ -13,7 +13,7 @@ module MsrsSgdSpecsTestPrefix =
 
     let sorterEvalSelectionTypeGuid12K = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.GuidOrder 10000<sorterCount>;] 
+            [ sorterEvalSelectionType.GuidOrder 6000<sorterCount>;] 
             |> List.map SorterEvalSelectionType.toString)
         
     let generationLast = 
@@ -47,7 +47,7 @@ module MsrsSgdSpecsTestPrefix =
             spans = [
                 rngTypeLcg
                 generationCurrent
-                oneTwenty8SortersPerPool
+                fiveTwelveSortersPerPool
                 poolCount1
                 oneChildCount
                 sorterEvalSelectionTypeGuid12K
@@ -56,14 +56,14 @@ module MsrsSgdSpecsTestPrefix =
                 sortableTestFilter_Prefix24_4b
                 msrsModelType
                 sorterEvalTypeV1
-                seedModificationRates
+                seedModificationRate02
                 modificationRatesMsceCenter
                 orthoRate
                 paraRate
                 selfSymRate
                 dataFomatBitv512
-                distinctSorterHashesTrue
-                prioritizeNewMutantsTrue
+                distinctSorterHashesBoth
+                prioritizeNewMutantsBoth
                 sortedFraction99
                 genReportInterval500
                 generationLast
@@ -73,7 +73,7 @@ module MsrsSgdSpecsTestPrefix =
             filter = paramMapFilter
             enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 8
+            maxParallel = 1
         }
 
 

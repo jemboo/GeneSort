@@ -8,6 +8,7 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Core
 open System
 open GeneSort.Eval.V1
+open System.Diagnostics
 
 /// Holds the combined results of the historical optimization run using light snapshot telemetry
 type sorterRunResult = 
@@ -72,6 +73,11 @@ module SorterRunResult =
                     let currentGen = genStart + (genCount - %remainingSteps)
                     let totalGen = genStart + genCount
 
+                    let debugTargetGen = 1499<generationNumber>
+                    if currentSorterPoolSet.GenerationNumber = debugTargetGen && Debugger.IsAttached then
+                        Debugger.Break()
+
+
                     //// --- Dynamic Periodic Variation for sorterCountPerPool ---
                     //// Alternates every 20 generations:
                     //// Generations 0-19: 1x, 20-39: 2x, 40-59: 1x, etc.
@@ -95,10 +101,10 @@ module SorterRunResult =
                             historyAcc
 
                     let adjSorterEvalType = if (remainingSteps = 1) then sorterEvalType.V2 else srtrEvalType
-                    let reEvaluateParents = (remainingSteps = 1)
+                    let reEvaluateParents = (remainingSteps % 10 = 0)
 
                     let nextSorterPoolSet = 
-                        SorterPipeline.runGenerationStep 
+                        SorterPipeline.runGenerationStepDebug 
                             mutator 
                             sorterCountPerPool
                             sorterChildCount
@@ -110,6 +116,10 @@ module SorterRunResult =
                             reEvaluateParents
                             currentSorterPoolSet
                             sortedFractionThreshold
+
+                    let poolMemberLengths = nextSorterPoolSet.SorterPools |> Map.toArray |> Array.map(fun p -> (snd p).SorterPoolMembers |> Seq.length)
+                    if Array.contains 0 poolMemberLengths && Debugger.IsAttached then
+                        Debugger.Break()
 
                     // Only force a GC sweep every 50 generations to minimize overhead
                     if remainingSteps % 50 = 0 then
