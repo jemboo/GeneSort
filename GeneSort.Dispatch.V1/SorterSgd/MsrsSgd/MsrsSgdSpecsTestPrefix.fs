@@ -53,7 +53,7 @@ module MsrsSgdSpecsTestPrefix =
                 sorterEvalSelectionTypeGuid12K
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
-                sortableTestFilter_Prefix24_4b
+                sortableTestFilter_Prefix24_3s
                 msrsModelType
                 sorterEvalTypeV1
                 seedModificationRate02
@@ -62,18 +62,18 @@ module MsrsSgdSpecsTestPrefix =
                 paraRate
                 selfSymRate
                 dataFomatBitv512
-                distinctSorterHashesBoth
-                prioritizeNewMutantsBoth
+                distinctSorterHashesTrue
+                prioritizeNewMutantsTrue
                 sortedFraction99
-                genReportInterval500
+                genReportInterval1000
                 generationLast
-                sorterCountCycle500
-                sorterCountCycleMultipliers1
+                sorterCountCycle100
+                sorterCountCycleMultipliersLow
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 1
+            maxParallel = 16
         }
 
 

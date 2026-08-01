@@ -43,17 +43,23 @@ let testRelabel() =
                        |> sortableTest.Bools
 
 
-    let slId = { sorterLibId.sortingWidth = sortingWidth; sorterVariant = sorterVariant.VariantA }
-    let blockId = Guid.NewGuid() |> UMX.tag<ceBlockId>
-    let ces = (SorterDataParse.getCeArrayFromLib slId) |> Option.get
-    let ceBlk = ceBlock.create blockId sortingWidth ces
+    let slIdA = { sorterLibId.sortingWidth = sortingWidth; sorterVariant = sorterVariant.VariantA }
+    let blockIdA = Guid.NewGuid() |> UMX.tag<ceBlockId>
+    let cesA = (SorterDataParse.getCeArrayFromLib slIdA) |> Option.get
+    let ceBlkA = ceBlock.create blockIdA sortingWidth cesA
+
+    let slIdB = { sorterLibId.sortingWidth = sortingWidth; sorterVariant = sorterVariant.VariantB }
+    let blockIdB = Guid.NewGuid() |> UMX.tag<ceBlockId>
+    let cesB = (SorterDataParse.getCeArrayFromLib slIdB) |> Option.get
+    let ceBlkB = ceBlock.create blockIdB sortingWidth cesB
 
 
     let collectNewSortableTests = true
-    let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlk collectNewSortableTests
+    let ceBlockEvalA = CeBlockOps.evalWithSorterTest sortableTest ceBlkA collectNewSortableTests
+    let ceBlockEvalB = CeBlockOps.evalWithSorterTest sortableTest ceBlkB collectNewSortableTests
 
     printfn "Hello from F# yo"
     1
 
 
-ceUseSoruceTester() |> ignore
+testRelabel() |> ignore

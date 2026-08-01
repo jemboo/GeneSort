@@ -108,7 +108,7 @@ module CommonParams =
     let sorterCountCycleMultipliers1 = (runParameters.sorterCountCycleMultiplierKey, ["1";] )
     let sorterCountCycleMultipliers1n2 = (runParameters.sorterCountCycleMultiplierKey, ["1"; "2";] )
     let sorterCountCycleMultipliers1n4 = (runParameters.sorterCountCycleMultiplierKey, ["1"; "4";] )
-    let sorterCountCycleMultipliersLow = (runParameters.sorterCountCycleMultiplierKey, ["1"; "1.1";] )
+    let sorterCountCycleMultipliersLow = (runParameters.sorterCountCycleMultiplierKey, ["1.001"; "1.2"; "1.4"; "1.8"] )
     let sorterCountCycleMultiplier4 = (runParameters.sorterCountCycleMultiplierKey, ["4";] )
     let sorterCountCycleMultiplier8 = (runParameters.sorterCountCycleMultiplierKey, ["8";] )
     let sorterCountCycleMultiplier16 = (runParameters.sorterCountCycleMultiplierKey, ["16";] )
@@ -301,6 +301,9 @@ module CommonParams =
     let modificationRatep01 =
             (runParameters.modificationRateKey, [0.01;] |> List.map string)
 
+    let modificationRatep04 =
+            (runParameters.modificationRateKey, [0.04;] |> List.map string)
+
     let modificationRatesMsceCenter =
             (runParameters.modificationRateKey, [0.01; 0.02; 0.03; 0.04; 0.05; 0.06; 0.07; 0.08;] |> List.map string)
 
@@ -351,6 +354,14 @@ module CommonParams =
             SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix3b
     let sortableTestFilter_Prefix24_3b = 
             (runParameters.sortableTestFilterKey, [_sortableTestFilter_Prefix24_3b] |> List.map SorterLibId.toString)
+
+    let sortableTestFilter_Prefix24_3s = 
+            (runParameters.sortableTestFilterKey, 
+            [_sortableTestFilter_Prefix24_3a; _sortableTestFilter_Prefix24_3b] |> List.map SorterLibId.toString)
+
+
+
+
 
     let sortableTestFilter_Prefix24s = 
             (runParameters.sortableTestFilterKey, 
