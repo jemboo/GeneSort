@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Common.fs" />
+    <Compile Include="ProjectTypes.fs" />
     <Compile Include="OutputDataType.fs" />
     <Compile Include="RunParameters.fs" />
     <Compile Include="Run.fs" />

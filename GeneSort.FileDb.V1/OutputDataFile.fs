@@ -18,6 +18,7 @@ open GeneSort.Sorting.Mp.Sorter
 open GeneSort.Sorting.Sorter
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.Mp.V1.Sgd
+open GeneSort.Core
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
@@ -224,7 +225,7 @@ module OutputDataFile =
                 (ct: CancellationToken option)
                 (progress: IProgress<string> option) : Async<Result<runParameters[], string>> =
         async {
-            let folder = getPathToOutputDataFolder rootFolder (repl |> queryParams.ReplString) (outputDataType.RunParameters %runName)
+            let folder = getPathToOutputDataFolder rootFolder (repl |> UmxExt.intOptionToString) (outputDataType.RunParameters %runName)
             progress |> Option.iter (fun p -> p.Report(sprintf "Scanning directory: %s" %folder))
             let! filePathsRes = getFilesSortedByCreationTimeAsync %folder ct
             match filePathsRes with

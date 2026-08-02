@@ -47,7 +47,7 @@ module Msuf4SgdDbs =
                         (pNm: bool<prioritizeNewMutants>)
                         (sfrac: float<sortedFraction>)
                         (odt: outputDataType) : queryParams =
-            queryParams.create dbName (Some repl) odt
+            queryParams.create dbName projectName (Some repl) odt
                 [| 
                     (runParameters.rngTypeKey, rng |> RngType.toString)
                     (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
@@ -144,7 +144,7 @@ module Msuf4SgdDbs =
                     (outputDataType: outputDataType) : queryParams =
 
             queryParams.create 
-                dbName
+                dbName projectName
                 (Some repl)
                 outputDataType
                 [| 
@@ -248,7 +248,7 @@ module Msuf4SgdDbs =
                     (outputDataType: outputDataType) : queryParams =
 
             queryParams.create 
-                dbName
+                dbName projectName
                 (Some repl)
                 outputDataType
                 [| 
@@ -331,6 +331,6 @@ module Msuf4SgdDbs =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.databaseName
-        let run = run.create spec.databaseName spec.runName spec.runDescription
+        let run = run.create spec.databaseName projectName spec.runName spec.runDescription
         runHost.Create db spec run :> IRunHost
 

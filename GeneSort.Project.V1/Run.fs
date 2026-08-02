@@ -9,6 +9,7 @@ type run =
     private
         {
           dataBaseName: string<databaseName>
+          projName:     string<projectName>
           runName: string<runName>
           description: string
         }
@@ -16,6 +17,7 @@ type run =
 
     static member create
             (databaseName: string<databaseName>)
+            (projName:     string<projectName>)
             (runName: string<runName>)
             (description: string) : run =
 
@@ -23,11 +25,13 @@ type run =
             failwith "Query name cannot be empty"
         {
           dataBaseName = databaseName
+          projName     = projName
           runName = runName
           description = description
         }
 
     member this.DatabaseName with get () = this.dataBaseName
+    member this.ProjectName with get () = this.projName
     member this.RunName with get () = this.runName
     member this.Description with get () = this.description
 

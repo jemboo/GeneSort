@@ -7,45 +7,38 @@ open GeneSort.Project.V1
 
 type queryParams =
     private {
-        queryName:      string<databaseName>
+        dbName:         string<databaseName>
+        projectName:    string<projectName>
         repl:           int<replNumber> option
         outputDataType: outputDataType
         properties:     Map<string, string>
         id:             Guid<queryParamsId>
     }
 
-    static member ProjectNameString (projectName: string<projectName> option) =
-        match projectName with
-        | Some pn -> %pn
-        | None    -> "None"
-
-    static member ReplString (repl: int<replNumber> option) =
-        match repl with
-        | Some r -> (%r).ToString()
-        | None   -> ""
-
     member this.Id             with get() = this.id
-    member this.QueryName    with get() = this.queryName
+    member this.DbName         with get() = this.dbName
     member this.Repl           with get() = this.repl
     member this.OutputDataType with get() = this.outputDataType
+    member this.ProjectName    with get() = this.projectName
     member this.Properties     with get() = this.properties
 
     member this.ReplAsString with get() : string =
-        queryParams.ReplString this.repl
+        UmxExt.intOptionToString this.repl
 
     override this.ToString() : string =
-        let queryStr    = %this.queryName    |> string
-        let replStr    = this.repl           |> queryParams.ReplString
+        let replStr    = this.repl           |> UmxExt.intOptionToString
         let outTypeStr = this.outputDataType |> OutputDataType.toFolderName
         let propsStr   =
             this.properties
             |> Map.toSeq
             |> Seq.map (fun (k, v) -> $"{k}={v}")
             |> String.concat ";"
-        $"Query: {queryStr}, Repl: {replStr}, OutputType: {outTypeStr}, Properties: [{propsStr}]"
+        $"Db: {%this.dbName}, Project: {%this.projectName}, Repl: {replStr}, 
+           OutputType: {outTypeStr}, Properties: [{propsStr}]"
 
     static member create
-            (queryName:    string<databaseName>)
+            (dbName:         string<databaseName>)
+            (projName:       string<projectName>)
             (repl:           int<replNumber> option)
             (outputDataType: outputDataType)
             (properties:     (string * string) []) : queryParams =
@@ -54,8 +47,8 @@ type queryParams =
         // Build a clean, typed sequential list for Guid generation.
         // We unpack primitives here so they route smoothly into your GuidUtils primitives matcher.
         let structuralIdentityComponents = seq {
-            yield box queryName
-
+            yield box dbName
+            yield box projName
             match repl with
             | Some r -> yield box true; yield box %r
             | None -> yield box false
@@ -70,7 +63,8 @@ type queryParams =
         }
 
         {
-            queryName    = queryName
+            dbName    = dbName
+            projectName =  projName
             repl           = repl
             outputDataType = outputDataType
             properties     = props
@@ -85,15 +79,17 @@ type queryParams =
 
     static member createForRun 
                     (queryName: string<databaseName>) 
-                    (runName: string<runName>) 
+                    (projName:  string<projectName>)
+                    (runName:   string<runName>) 
                     : queryParams =
-        queryParams.create queryName None (outputDataType.Run runName) [||]
+        queryParams.create queryName projName None (outputDataType.Run runName) [||]
 
 
     static member createForTextReport
-            (queryName:    string<databaseName>)
+            (queryName:      string<databaseName>)
+            (projName:       string<projectName>)
             (textReportName: string<textReportName>) : queryParams =
-        queryParams.create queryName None (outputDataType.TextReport textReportName) [||]
+        queryParams.create queryName projName None (outputDataType.TextReport textReportName) [||]
 
 
 

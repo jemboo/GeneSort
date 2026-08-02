@@ -11,3 +11,6 @@ open GeneSort.Core
 [<Measure>] type queryParamsId
 [<Measure>] type queryName
 [<Measure>] type replNumber
+
+
+module ProjectTypes = ()

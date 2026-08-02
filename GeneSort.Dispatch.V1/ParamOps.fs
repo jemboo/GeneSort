@@ -59,7 +59,7 @@ module ParamOps =
         async {
             try
                 report progress (sprintf "%s Saving run file: %s" (MathUtils.getTimestampString()) %run.DatabaseName)
-                let queryParams = queryParams.createForRun run.DatabaseName run.RunName
+                let queryParams = queryParams.createForRun run.DatabaseName run.ProjectName run.RunName
                 let! saveProjRes = db.saveAsync queryParams (run |> outputData.Run) (false |> UMX.tag<allowOverwrite>)
                 match saveProjRes with
                 | Error err -> return Error err
