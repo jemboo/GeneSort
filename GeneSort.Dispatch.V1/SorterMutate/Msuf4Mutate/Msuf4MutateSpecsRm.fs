@@ -4,7 +4,6 @@ open FSharp.UMX
 open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
-open GeneSort.SortingOps
 open GeneSort.Sorting
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate

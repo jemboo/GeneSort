@@ -7,7 +7,7 @@ open GeneSort.Project.V1
 
 type queryParams =
     private {
-        queryName:    string<databaseName>
+        queryName:      string<databaseName>
         repl:           int<replNumber> option
         outputDataType: outputDataType
         properties:     Map<string, string>

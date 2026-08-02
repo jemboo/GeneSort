@@ -8,58 +8,110 @@ open GeneSort.Sorting.Sortable
 open GeneSort.SortingOps
 open GeneSort.Sorting.Sorter
 open GeneSort.SortingLib.Sorter
+open GeneSort.Core
 
-let ceUseSoruceTester() =
+module Sandbox =
 
-    let yow1 ="[0, 64, (0, 15)]; 
-               [1, 64, (1, 14)]; 
-               [2, 64, (2, 13)]; 
-               [3, 64, (3, 12)]; 
-               [4, 64, (4, 11)]; 
-               [5, 64, (5, 10)]; [6, 64, (6, 9)]; [7, 128, (7, 8)]; [8, 64, (0, 3)]; [9, 64, (1, 2)]; [10, 64, (4, 7)]; [11, 64, (5, 6)]; [12, 64, (8, 11)]; [13, 64, (9, 10)]; [14, 64, (12, 15)]; [15, 64, (13, 14)]; [16, 32, (0, 1)]; [17, 72, (2, 12)]; [18, 72, (3, 13)]; [19, 64, (4, 5)]; [20, 96, (6, 7)]; [21, 96, (8, 9)]; [22, 64, (10, 11)]; [23, 32, (14, 15)]; [24, 8, (0, 4)]; [25, 56, (1, 6)]; [26, 96, (2, 5)]; [27, 96, (3, 8)]; [28, 96, (7, 12)]; [29, 56, (9, 14)]; [30, 96, (10, 13)]; [31, 8, (11, 15)]; [34, 60, (2, 3)]; [39, 60, (12, 13)]; [41, 42, (1, 4)]; [44, 104, (5, 10)]; [46, 128, (7, 8)]; [47, 42, (11, 14)]; [54, 92, (6, 9)]; [59, 111, (3, 4)]; [63, 111, (11, 12)]; [76, 116, (5, 6)]; [78, 116, (9, 10)]; [81, 12, (1, 2)]; [82, 114, (4, 7)]; [84, 114, (8, 11)]; [87, 12, (13, 14)]; [98, 49, (2, 3)]; [99, 114, (4, 5)]; [100, 125, (6, 7)]; [101, 125, (8, 9)]; [102, 114, (10, 11)]; [103, 49, (12, 13)]; [114, 70, (3, 4)]; [115, 122, (5, 6)]; [117, 122, (9, 10)]; [118, 70, (11, 12)]; [124, 122, (6, 8)]; [125, 122, (7, 9)]; [270, 128, (7, 8)]"
+    let makeFullBoolTest (sw:int<sortingWidth>) : sortableTest =
 
-
-    let sorterId = Guid.NewGuid() |> UMX.tag<sorterId>
-    let sortingWidth = 16 |> UMX.tag<sortingWidth>
-    let sorter = CeUse.ceUseStringToSorter sorterId sortingWidth yow1
-    let ceBlock = CeBlock.fromSorter sorter
+        let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
+        let sortableModel = msasF.create sw
+        sortableModel.MakeSortableBoolTest sortableTestId sw
+                            |> sortableTest.Bools
 
 
-    let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
-    let sortableModel = msasF.create sortingWidth
-    let sortableTest = sortableModel.MakeSortableBoolTest sortableTestId sortingWidth
-                       |> sortableTest.Bools
-    let collectNewSortableTests = true
-    let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
-    None
+
+    let make16Perm () : permutation =
+        let permArray = [| 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 0 |]
+        permutation.create permArray
 
 
-let testRelabel() =
-    let sortingWidth = 16 |> UMX.tag<sortingWidth>
-
-    let sm = msasF.create sortingWidth
-    let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
-    let sortableTest = sm.MakeSortableBoolTest sortableTestId sortingWidth
-                       |> sortableTest.Bools
+    let make16TwoCycle () : permutation =
+        let permArray = [| 1; 0; 3; 2; 5; 4; 7; 6; 8; 9; 10; 11; 12; 13; 14; 15; |]
+        permutation.create permArray
 
 
-    let slIdA = { sorterLibId.sortingWidth = sortingWidth; sorterVariant = sorterVariant.VariantA }
-    let blockIdA = Guid.NewGuid() |> UMX.tag<ceBlockId>
-    let cesA = (SorterDataParse.getCeArrayFromLib slIdA) |> Option.get
-    let ceBlkA = ceBlock.create blockIdA sortingWidth cesA
 
-    let slIdB = { sorterLibId.sortingWidth = sortingWidth; sorterVariant = sorterVariant.VariantB }
-    let blockIdB = Guid.NewGuid() |> UMX.tag<ceBlockId>
-    let cesB = (SorterDataParse.getCeArrayFromLib slIdB) |> Option.get
-    let ceBlkB = ceBlock.create blockIdB sortingWidth cesB
+    let ceUseSoruceTester() =
+
+        let yow1 = "[0, 64, (0, 15)]; [1, 64, (1, 14)]; [2, 64, (2, 13)]; 
+                    [3, 64, (3, 12)]; [4, 64, (4, 11)]; [5, 64, (5, 10)]; 
+                    [6, 64, (6, 9)]; [7, 128, (7, 8)]; [8, 64, (0, 3)]; 
+                    [9, 64, (1, 2)]; [10, 64, (4, 7)]; [11, 64, (5, 6)]; 
+                    [12, 64, (8, 11)]; [13, 64, (9, 10)]; [14, 64, (12, 15)]; 
+                    [15, 64, (13, 14)]; [16, 32, (0, 1)]; [17, 72, (2, 12)]; 
+                    [18, 72, (3, 13)]; [19, 64, (4, 5)]; [20, 96, (6, 7)]; 
+                    [21, 96, (8, 9)]; [22, 64, (10, 11)]; [23, 32, (14, 15)]; 
+                    [24, 8, (0, 4)]; [25, 56, (1, 6)]; [26, 96, (2, 5)]; 
+                    [27, 96, (3, 8)]; [28, 96, (7, 12)]; [29, 56, (9, 14)]; 
+                    [30, 96, (10, 13)]; [31, 8, (11, 15)]; [34, 60, (2, 3)]; 
+                    [39, 60, (12, 13)]; [41, 42, (1, 4)]; [44, 104, (5, 10)]; 
+                    [46, 128, (7, 8)]; [47, 42, (11, 14)]; [54, 92, (6, 9)]; 
+                    [59, 111, (3, 4)]; [63, 111, (11, 12)]; [76, 116, (5, 6)]; 
+                    [78, 116, (9, 10)]; [81, 12, (1, 2)]; [82, 114, (4, 7)]; 
+                    [84, 114, (8, 11)]; [87, 12, (13, 14)]; [98, 49, (2, 3)]; 
+                    [99, 114, (4, 5)]; [100, 125, (6, 7)]; [101, 125, (8, 9)]; 
+                    [102, 114, (10, 11)]; [103, 49, (12, 13)]; [114, 70, (3, 4)]; 
+                    [115, 122, (5, 6)]; [117, 122, (9, 10)]; [118, 70, (11, 12)]; 
+                    [124, 122, (6, 8)]; [125, 122, (7, 9)]; [270, 128, (7, 8)]"
 
 
-    let collectNewSortableTests = true
-    let ceBlockEvalA = CeBlockOps.evalWithSorterTest sortableTest ceBlkA collectNewSortableTests
-    let ceBlockEvalB = CeBlockOps.evalWithSorterTest sortableTest ceBlkB collectNewSortableTests
+        let sorterId = Guid.NewGuid() |> UMX.tag<sorterId>
+        let sortingWidth = 16 |> UMX.tag<sortingWidth>
+        let sorter = CeUse.ceUseStringToSorter sorterId sortingWidth yow1
+        let ceBlock = CeBlock.fromSorter sorter
 
-    printfn "Hello from F# yo"
-    1
+        let sortableTest = makeFullBoolTest sortingWidth
+        let collectNewSortableTests = true
+        let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
+        None
 
 
-testRelabel() |> ignore
+    let testTwo() =
+        let sortingWidth = 16 |> UMX.tag<sortingWidth>
+        let sortableTest = makeFullBoolTest sortingWidth
+
+
+        let slIdA = { sorterLibId.sortingWidth = sortingWidth; sorterVariant = sorterVariant.VariantA }
+        let blockIdA = Guid.NewGuid() |> UMX.tag<ceBlockId>
+        let cesA = (SorterDataParse.getCeArrayFromLib slIdA) |> Option.get
+        let ceBlkA = ceBlock.create blockIdA sortingWidth cesA
+
+        let slIdB = { sorterLibId.sortingWidth = sortingWidth; sorterVariant = sorterVariant.VariantB }
+        let blockIdB = Guid.NewGuid() |> UMX.tag<ceBlockId>
+        let cesB = (SorterDataParse.getCeArrayFromLib slIdB) |> Option.get
+        let ceBlkB = ceBlock.create blockIdB sortingWidth cesB
+
+
+        let collectNewSortableTests = true
+        let ceBlockEvalA = CeBlockOps.evalWithSorterTest sortableTest ceBlkA collectNewSortableTests
+        let ceBlockEvalB = CeBlockOps.evalWithSorterTest sortableTest ceBlkB collectNewSortableTests
+
+        1
+
+
+    let testRelabel() =
+        let sortingWidth = 16 |> UMX.tag<sortingWidth>
+        let sortableTest = makeFullBoolTest sortingWidth
+
+
+        let slIdA = { sorterLibId.sortingWidth = sortingWidth; sorterVariant = sorterVariant.VariantA }
+        let blockIdA = Guid.NewGuid() |> UMX.tag<ceBlockId>
+        let cesA = (SorterDataParse.getCeArrayFromLib slIdA) |> Option.get
+        let ceBlkA = ceBlock.create blockIdA sortingWidth cesA
+
+        let perm = make16TwoCycle()
+        let ceBlkB = ceBlkA.permute perm
+
+
+        let collectNewSortableTests = true
+        let ceBlockEvalA = CeBlockOps.evalWithSorterTest sortableTest ceBlkA collectNewSortableTests
+        let ceBlockEvalB = CeBlockOps.evalWithSorterTest sortableTest ceBlkB collectNewSortableTests
+
+        printfn "Hello from F# yo"
+        1
+
+
+
+
+Sandbox.testRelabel() |> ignore

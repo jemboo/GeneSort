@@ -18,9 +18,9 @@ open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Dispatch.V1.SortableTest
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1
-open GeneSort.Eval.V1.Bins
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
+
 
 module MsceMutateExecutor =
 

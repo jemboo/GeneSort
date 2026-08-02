@@ -236,9 +236,6 @@ module SorterEvalDbs =
         }
 
 
-
-
-
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.databaseName
         let run = run.create spec.databaseName spec.runName spec.runDescription

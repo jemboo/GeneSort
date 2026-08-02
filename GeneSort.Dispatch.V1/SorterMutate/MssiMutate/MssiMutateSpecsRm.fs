@@ -1,11 +1,9 @@
 ﻿namespace GeneSort.Dispatch.V1.SorterMutate.Mssi
 
 open FSharp.UMX
-open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
-open GeneSort.SortingOps
 open GeneSort.Sorting
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate

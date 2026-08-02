@@ -1,13 +1,10 @@
 ﻿namespace GeneSort.Dispatch.V1.SorterMutate.Msrs
 
-
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Project.V1
-open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams

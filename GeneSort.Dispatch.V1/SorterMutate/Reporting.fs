@@ -7,7 +7,6 @@ open FSharp.UMX
 open GeneSort.Project.V1
 open GeneSort.Eval.V1
 open GeneSort.Model.Sorting.V1
-open System.Threading
 open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.SortingOps
