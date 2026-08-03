@@ -58,7 +58,7 @@ module SorterPoolMember =
         { spm with _sorterEval = eval }
 
     /// Generates 'mutantCount' new mutants, updating the parent's index by 'mutantCount'
-    let mutate (sorterModelMutator: sorterModelMutator) 
+    let mutate (sorterModelMut: sorterModelMutator) 
                (spm: sorterPoolMember) 
                (mutantCount: int<sorterChildCount>) 
                (currentGeneration: int<generationNumber>): sorterPoolMember * sorterPoolMember [] =
@@ -66,7 +66,7 @@ module SorterPoolMember =
         let countRaw = %mutantCount
         let baseIndexRaw = %spm.MutationIndex
         
-        let mutatorId = SorterModelMutator.getId sorterModelMutator
+        let mutatorId = SorterModelMutator.getId sorterModelMut
         let parentModelId = SorterModel.getId spm.SorterModel
 
         // Generate N unique mutant pool members
@@ -79,7 +79,7 @@ module SorterPoolMember =
                 
                 let mutantModel = 
                     SorterModelMutator.makeMutantSorterModelFromIndex 
-                        sorterModelMutator 
+                        sorterModelMut 
                         spm.SorterModel 
                         individualMutationIndex
 

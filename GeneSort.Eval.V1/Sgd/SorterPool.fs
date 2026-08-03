@@ -98,7 +98,7 @@ module SorterPool =
     /// Applies the same mutantsPerSorter count to every pool member, accumulating 
     /// the advanced parents and all newly spawned mutants into a single updated pool.
     let mutate 
-            (sorterModelMutator: sorterModelMutator) 
+            (sorterModelMut: sorterModelMutator) 
             (mutantsPerSorter: int<sorterChildCount>)  
             (currentGeneration: int<generationNumber>)
             (pool: sorterPool) : sorterPool =
@@ -109,7 +109,7 @@ module SorterPool =
                 // Invoke the member-level mutation strategy designed earlier
                 let updatedParent, childMutants = 
                     SorterPoolMember.mutate 
-                            sorterModelMutator 
+                            sorterModelMut 
                             currentMember 
                             mutantsPerSorter
                             currentGeneration

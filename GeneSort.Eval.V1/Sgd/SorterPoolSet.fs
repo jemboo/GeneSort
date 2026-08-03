@@ -48,14 +48,14 @@ module SorterPoolSet =
 
     /// Mutates every single pool across the entire pool set uniformly
     let mutate 
-            (sorterModelMutator: sorterModelMutator) 
+            (sorterModelMut: sorterModelMutator) 
             (mutantsPerSorter: int<sorterChildCount>)  
             (poolSet: sorterPoolSet): sorterPoolSet =
         
         let mutatedPools = 
             poolSet._sorterPools 
             |> Map.map (fun _ pool -> SorterPool.mutate 
-                                            sorterModelMutator 
+                                            sorterModelMut 
                                             mutantsPerSorter
                                             poolSet.GenerationNumber
                                             pool)
