@@ -18,18 +18,37 @@ module PoolSetMakers =
     let createSeedSorterPoolSetStandard 
             (rp:runParameters) : Async<Result<sorterPoolSet, string>> =
         asyncResult {
-            let! sortingWidth = rp.GetSortingWidth() |> Result.ofOption "Missing sorting width."
-            let! poolCount = rp.GetSorterPoolCount() |> Result.ofOption "Missing poolCount."
-            let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
-            let! sorterEvalMeasureInitial = rp.GetSorterEvalMeasureInitial() |> Result.ofOption "Missing sorterEvalMeasureInitial."
-            let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
+            let! sortingWidth = 
+                    rp.GetSortingWidth() 
+                    |> Result.ofOption "Missing sorting width."
+
+            let! poolCount = 
+                    rp.GetSorterPoolCount() 
+                    |> Result.ofOption "Missing poolCount."
+
+            let! sortersPerPool = 
+                    rp.GetSorterCountPerPool() 
+                    |> Result.ofOption "Missing sortersPerPool."
+
+            let! sorterEvalMeasureInitial = 
+                    rp.GetSorterEvalMeasureInitial() 
+                    |> Result.ofOption "Missing sorterEvalMeasureInitial."
+
+            let! rngType = 
+                    rp.GetRngType() 
+                    |> Result.ofOption "Missing rngType."
+
             let! simpleSorterModelType = 
-                                rp.GetSimpleSorterModelType() 
-                                |> Result.ofOption "Missing simpleSorterModelType."
+                    rp.GetSimpleSorterModelType() 
+                    |> Result.ofOption "Missing simpleSorterModelType."
 
             let! (sorterEvalSelectionType: sorterEvalSelectionType) =
-                                rp.GetSorterEvalSelectionType() 
-                                |> Result.ofOption "Missing sorterEvalSelectionType"
+                    rp.GetSorterEvalSelectionType() 
+                    |> Result.ofOption "Missing sorterEvalSelectionType"
+
+            let! (mutationMod: int<mutationMod>) = 
+                    rp.GetMutationMod() 
+                    |> Result.ofOption "Missing mutationMod in run parameters"
 
             
             let! (parentSorterSetEval: sorterSetEval) = 
@@ -63,27 +82,52 @@ module PoolSetMakers =
                 (0 |> UMX.tag<generationNumber>)
                 (sorterEvalSelection.ToEvalLabelMap())
                 seedSorterModelSet
+                mutationMod
         }
 
 
     let createSeedSorterPoolSetMerge
             (rp:runParameters) : Async<Result<sorterPoolSet, string>> =
         asyncResult {
-            let! sortingWidth = rp.GetSortingWidth() |> Result.ofOption "Missing sorting width."
-            let! poolCount = rp.GetSorterPoolCount() |> Result.ofOption "Missing poolCount."
-            let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
-            let! mergeDimension = rp.GetMergeDimension() |> Result.ofOption "Missing mergeDimension."
-            let! mergeSuffixType = rp.GetMergeSuffixType() |> Result.ofOption "Missing mergeSuffixType."
-            let! sorterEvalMeasureInitial = rp.GetSorterEvalMeasureInitial() |> Result.ofOption "Missing sorterEvalMeasureInitial."
-            let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
+            let! sortingWidth = 
+                    rp.GetSortingWidth() 
+                    |> Result.ofOption "Missing sorting width."
+
+            let! poolCount = 
+                    rp.GetSorterPoolCount() 
+                    |> Result.ofOption "Missing poolCount."
+
+            let! sortersPerPool = 
+                    rp.GetSorterCountPerPool() 
+                    |> Result.ofOption "Missing sortersPerPool."
+
+            let! mergeDimension = 
+                    rp.GetMergeDimension() 
+                    |> Result.ofOption "Missing mergeDimension."
+
+            let! mergeSuffixType = 
+                    rp.GetMergeSuffixType() 
+                    |> Result.ofOption "Missing mergeSuffixType."
+
+            let! sorterEvalMeasureInitial = 
+                    rp.GetSorterEvalMeasureInitial() 
+                    |> Result.ofOption "Missing sorterEvalMeasureInitial."
+
+            let! rngType = 
+                    rp.GetRngType() 
+                    |> Result.ofOption "Missing rngType."
+
             let! simpleSorterModelType = 
-                                rp.GetSimpleSorterModelType() 
-                                |> Result.ofOption "Missing simpleSorterModelType."
+                    rp.GetSimpleSorterModelType() 
+                    |> Result.ofOption "Missing simpleSorterModelType."
 
             let! (sorterEvalSelectionType: sorterEvalSelectionType) =
-                                rp.GetSorterEvalSelectionType() 
-                                |> Result.ofOption "Missing sorterEvalSelectionType"
+                    rp.GetSorterEvalSelectionType() 
+                    |> Result.ofOption "Missing sorterEvalSelectionType"
 
+            let! (mutationMod: int<mutationMod>) = 
+                        rp.GetMutationMod() 
+                        |> Result.ofOption "Missing mutationMod in run parameters"
             
             let! (parentSorterSetEval: sorterSetEval) = 
                 SorterEvalDbs.getMergeSorterEvals 
@@ -118,6 +162,7 @@ module PoolSetMakers =
                 (0 |> UMX.tag<generationNumber>)
                 (sorterEvalSelection.ToEvalLabelMap())
                 seedSorterModelSet
+                mutationMod
         }
 
 
@@ -125,20 +170,40 @@ module PoolSetMakers =
     let createSeedSorterPoolSetPrefix
             (rp:runParameters) : Async<Result<sorterPoolSet, string>> =
         asyncResult {
-            let! sorterLibId = rp.GetSortableTestFilter() |> Result.ofOption "Missing sorterLibId."
-            let! poolCount = rp.GetSorterPoolCount() |> Result.ofOption "Missing poolCount."
-            let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
-            let! sorterEvalMeasureInitial = rp.GetSorterEvalMeasureInitial() |> Result.ofOption "Missing sorterEvalMeasureInitial."
-            let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
+            let! sorterLibId = 
+                    rp.GetSortableTestFilter() 
+                    |> Result.ofOption "Missing sorterLibId."
+
+            let! poolCount = 
+                    rp.GetSorterPoolCount() 
+                    |> Result.ofOption "Missing poolCount."
+
+            let! sortersPerPool = 
+                    rp.GetSorterCountPerPool() 
+                    |> Result.ofOption "Missing sortersPerPool."
+
+            let! sorterEvalMeasureInitial = 
+                    rp.GetSorterEvalMeasureInitial() 
+                    |> Result.ofOption "Missing sorterEvalMeasureInitial."
+
+            let! rngType = 
+                    rp.GetRngType() 
+                    |> Result.ofOption "Missing rngType."
+
             let! simpleSorterModelType = 
-                                rp.GetSimpleSorterModelType() 
-                                |> Result.ofOption "Missing simpleSorterModelType."
+                    rp.GetSimpleSorterModelType() 
+                    |> Result.ofOption "Missing simpleSorterModelType."
 
             let! (sorterEvalSelectionType: sorterEvalSelectionType) =
-                                rp.GetSorterEvalSelectionType() 
-                                |> Result.ofOption "Missing sorterEvalSelectionType"
+                    rp.GetSorterEvalSelectionType() 
+                    |> Result.ofOption "Missing sorterEvalSelectionType"
 
+            let! (mutationMod: int<mutationMod>) = 
+                        rp.GetMutationMod() 
+                        |> Result.ofOption "Missing mutationMod in run parameters"
             
+
+
             let! (parentSorterSetEval: sorterSetEval) = 
                 SorterEvalDbs.getPrefixSorterEvals 
                     sorterLibId 
@@ -170,6 +235,7 @@ module PoolSetMakers =
                 (0 |> UMX.tag<generationNumber>)
                 (sorterEvalSelection.ToEvalLabelMap())
                 seedSorterModelSet
+                mutationMod
         }
 
 

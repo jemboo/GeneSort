@@ -107,6 +107,10 @@ module MsrsMutateExecutor =
                         rp.GetSorterEvalMeasure()
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
+            let! (mutationMod: int<mutationMod>) = 
+                        rp.GetMutationMod() 
+                        |> Result.ofOption "Missing mutationMod in run parameters"
+
 
             let rngFactory = rngType |> RngFactory.create
 
@@ -149,10 +153,11 @@ module MsrsMutateExecutor =
                 seq {
                     for parentModel in parents do
                         for dex in childIndexes do
-                            yield SorterModelMutator.makeMutantSorterModelFromIndex
+                            yield SorterModelMutator.makeMutantSorterModelFromIndexAndMod
                                         sorterModelMutator
                                         parentModel
                                         (dex |> UMX.tag<mutationIndex>)
+                                        mutationMod
                 }
 
             return generateMutantStream parentSorterModelSet.SorterModels
@@ -210,7 +215,11 @@ module MsrsMutateExecutor =
                         rp.GetSorterEvalMeasure()
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
-                                        
+                        
+            let! (mutationMod: int<mutationMod>) = 
+                        rp.GetMutationMod() 
+                        |> Result.ofOption "Missing mutationMod in run parameters"
+
             let rngFactory = rngType |> RngFactory.create
 
             let! (parentSorterSetEval: sorterSetEval) =
@@ -255,10 +264,11 @@ module MsrsMutateExecutor =
                 seq {
                     for parentModel in parents do
                         for dex in childIndexes do
-                            yield SorterModelMutator.makeMutantSorterModelFromIndex
+                            yield SorterModelMutator.makeMutantSorterModelFromIndexAndMod
                                         sorterModelMutator
                                         parentModel
                                         (dex |> UMX.tag<mutationIndex>)
+                                        mutationMod
                 }
 
             return generateMutantStream parentSorterModelSet.SorterModels

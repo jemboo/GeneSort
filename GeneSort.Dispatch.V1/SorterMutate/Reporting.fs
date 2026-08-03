@@ -190,6 +190,10 @@ module Reporting =
                         rp.GetMergeSuffixType() 
                         |> Result.ofOption "Missing mergeSuffixType in run parameters"
 
+            let! (mutationMod: int<mutationMod>) = 
+                        rp.GetMutationMod() 
+                        |> Result.ofOption "Missing mutationMod in run parameters"
+
 
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getMergeSorterEvals 
@@ -199,7 +203,7 @@ module Reporting =
                                             mergeSuffixType
                                             sorterEvalType.V2
 
-            let _sorterEvalSelection = 
+            let (_sorterEvalSelection: sorterEvalSelection) = 
                             SorterEvalSelection.makeSelection sem sest
                                         parentSorterSetEval.SorterEvals
                                         parentSorterSetEval.SorterTestId
@@ -229,6 +233,7 @@ module Reporting =
                                         sorterModelMutator
                                         simpleSorterModels
                                         %sorterChildCount
+                                        mutationMod
 
             return (_sorterEvalSelection, parentMutantMap)
         }
@@ -282,6 +287,10 @@ module Reporting =
                         rp.GetSorterEvalMeasure()
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
+            let! (mutationMod: int<mutationMod>) = 
+                        rp.GetMutationMod() 
+                        |> Result.ofOption "Missing mutationMod in run parameters"
+
 
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getStandardSorterEvals 
@@ -319,6 +328,7 @@ module Reporting =
                                         sorterModelMutator
                                         simpleSorterModels
                                         %sorterChildCount
+                                        mutationMod
 
             return (_sorterEvalSelection, parentMutantMap)
         }

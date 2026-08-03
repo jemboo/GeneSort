@@ -46,10 +46,13 @@ type msrsRandMutate =
     interface IEquatable<msrsRandMutate> with
         member this.Equals(other) = this.Id = other.Id
 
-    member this.MakeSorterModelId (parent: msrs) (index: int<mutationIndex>) : Guid<sorterModelId> =
-        CommonMutator.makeSorterModelId parent.Id this.Id index
+    member this.MakeSorterModelId 
+                    (parent: msrs) 
+                    (index: int<mutationIndex>) 
+                    (modd: int<mutationMod>) : Guid<sorterModelId> =
+        CommonMutator.makeSorterModelId parent.Id this.Id index modd
 
-    member this.MakeSorterModelFromId (parent: msrs)  (id: Guid<sorterModelId>) : msrs =
+    member this.MakeSorterModelFromId (parent: msrs) (id: Guid<sorterModelId>) : msrs =
         let rng = this.RngFactory.Create %id
         
         // Define specific mutation behaviors using Perm_RsOps
@@ -68,11 +71,12 @@ type msrsRandMutate =
 
         msrs.create id parent.SortingWidth mutated
 
-    member this.MakeSorterModelFromIndex 
+    member this.MakeSorterModelFromIndexAndMod 
                             (parent: msrs) 
-                            (index: int<mutationIndex>) : msrs =
-        let id = this.MakeSorterModelId parent index
-        this.MakeSorterModelFromId parent id
+                            (index: int<mutationIndex>) 
+                            (modd: int<mutationMod>) : msrs =
+        let id = this.MakeSorterModelId parent index modd
+        this.MakeSorterModelFromId parent id 
 
 
 module MsrsRandMutate =

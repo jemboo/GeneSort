@@ -49,8 +49,9 @@ type mssiRandMutate =
 
     member this.MakeSorterModelId 
                         (parent: mssi) 
-                        (index: int<mutationIndex>) : Guid<sorterModelId> =
-        CommonMutator.makeSorterModelId parent.Id this.Id index
+                        (index: int<mutationIndex>) 
+                        (modd: int<mutationMod>) : Guid<sorterModelId> =
+        CommonMutator.makeSorterModelId parent.Id this.Id index modd
 
     member this.MakeSorterModelFromId 
                         (parent:mssi) 
@@ -71,10 +72,11 @@ type mssiRandMutate =
                         
         mssi.create id parent.SortingWidth mutated
 
-    member this.MakeSorterModelFromIndex 
+    member this.MakeSorterModelFromIndexAndMod 
                                 (parent:mssi) 
-                                (index: int<mutationIndex>) : mssi =
-        let id = this.MakeSorterModelId parent index
+                                (index: int<mutationIndex>) 
+                                (modd: int<mutationMod>) : mssi =
+        let id = this.MakeSorterModelId parent index modd
         this.MakeSorterModelFromId parent id
 
 

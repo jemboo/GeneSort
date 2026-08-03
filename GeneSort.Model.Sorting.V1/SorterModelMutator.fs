@@ -17,15 +17,16 @@ module SorterModelMutator =
         | Unknown -> failwith "Unknown sorterModel"
 
 
-    let makeMutantSorterModelFromIndex 
+    let makeMutantSorterModelFromIndexAndMod 
                     (sorterModelMutator: sorterModelMutator) 
                     (parentModel: sorterModel)
-                    (index: int<mutationIndex>)  : sorterModel =
+                    (index: int<mutationIndex>)  
+                    (modd: int<mutationMod>) : sorterModel =
 
         match (sorterModelMutator, parentModel) with
         | (Simple ssm, sorterModel.Simple parent) -> 
-                    SimpleSorterModelMutator.makeMutantSorterModelFromIndex 
-                        ssm parent index 
+                    SimpleSorterModelMutator.makeMutantSorterModelFromIndexAndMod 
+                        ssm parent index modd
                     |> sorterModel.Simple
         | _ -> failwith "Mutator and parent model types do not match."
 

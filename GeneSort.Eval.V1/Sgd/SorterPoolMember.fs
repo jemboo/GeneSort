@@ -12,6 +12,7 @@ type sorterPoolMember =
         _sorterPoolMemberId:   Guid<sorterPoolMemberId>
         _sorterModel:          sorterModel
         _mutationIndex:        int<mutationIndex>
+        _mutationMod:          int<mutationMod>
         _sorterMutationSource: sorterMutationSource option
         _sorterEval:           sorterEval option
         _birthday:             int<generationNumber>
@@ -23,13 +24,15 @@ type sorterPoolMember =
     // The mutationIndex is incremented each time a new mutation is applied to the sorterModel. 
     // If it wasn't, the same mutant would be created each time.
     member this.MutationIndex = this._mutationIndex
+    member this.MutationMod = this._mutationMod
     member this.SorterMutationSource = this._sorterMutationSource
     member this.SorterEval = this._sorterEval
 
     static member create 
                     sorterPoolMemberId 
                     sorterModel 
-                    mutationIndex 
+                    mutationIndex
+                    mutationMod
                     sorterMutationSource 
                     sorterEval 
                     birthday =
@@ -37,6 +40,7 @@ type sorterPoolMember =
             _sorterPoolMemberId = sorterPoolMemberId
             _sorterModel = sorterModel
             _mutationIndex = mutationIndex 
+            _mutationMod = mutationMod
             _sorterMutationSource = sorterMutationSource
             _sorterEval = sorterEval
             _birthday = birthday
@@ -78,10 +82,11 @@ module SorterPoolMember =
                 let childPoolMemberId = Guid.NewGuid() |> UMX.tag<sorterPoolMemberId>
                 
                 let mutantModel = 
-                    SorterModelMutator.makeMutantSorterModelFromIndex 
+                    SorterModelMutator.makeMutantSorterModelFromIndexAndMod 
                         sorterModelMut 
                         spm.SorterModel 
                         individualMutationIndex
+                        spm.MutationMod
 
                 let parentCeLength, parentStageLength = 
                     match spm.SorterEval with
@@ -100,6 +105,7 @@ module SorterPoolMember =
                     childPoolMemberId
                     mutantModel
                     (0 |> UMX.tag)          // New mutants start at mutation index 0
+                    spm.MutationMod
                     (Some mutationSource)
                     None                    // New mutants start unevaluated
                     currentGeneration

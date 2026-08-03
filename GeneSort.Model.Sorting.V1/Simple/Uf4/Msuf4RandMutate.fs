@@ -49,8 +49,9 @@ type msuf4RandMutate =
 
     member this.MakeSorterModelId 
                 (parent: msuf4) 
-                (index: int<mutationIndex>) : Guid<sorterModelId> =
-        CommonMutator.makeSorterModelId parent.Id this.Id index
+                (index: int<mutationIndex>) 
+                (modd: int<mutationMod>) : Guid<sorterModelId> =
+        CommonMutator.makeSorterModelId parent.Id this.Id index modd
 
     member this.MakeSorterModelFromId 
                         (parent: msuf4) 
@@ -69,11 +70,12 @@ type msuf4RandMutate =
                 
         msuf4.create id width mutatedUnfolders
 
-    member this.MakeSorterModelFromIndex 
+    member this.MakeSorterModelFromIndexAndMod 
                         (parent: msuf4) 
-                        (index: int<mutationIndex>) : msuf4 =
-        let id = this.MakeSorterModelId parent index
-        this.MakeSorterModelFromId parent id
+                        (index: int<mutationIndex>) 
+                        (modd: int<mutationMod>) : msuf4 =
+        let id = this.MakeSorterModelId parent index modd
+        this.MakeSorterModelFromId parent id 
 
 
 

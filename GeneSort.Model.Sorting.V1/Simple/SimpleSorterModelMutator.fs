@@ -99,29 +99,31 @@ module SimpleSorterModelMutator =
 
 
 
-    let makeMutantSorterModelIdFromIndex 
+    let makeMutantSorterModelIdFromIndexAndMod 
                 (mutatorModel: simpleSorterModelMutator) 
                 (parentModel: simpleSorterModel)
-                (index: int<mutationIndex>)  : Guid<sorterModelId> =
+                (index: int<mutationIndex>)  
+                (modd: int<mutationMod>) : Guid<sorterModelId> =
         match (mutatorModel, parentModel) with
-        | (SmmMsceRandMutate msce, Msce parent) -> msce.MakeSorterModelId parent index
-        | (SmmMssiRandMutate mssi, Mssi parent) -> mssi.MakeSorterModelId parent index
-        | (SmmMsrsRandMutate msrs, Msrs parent) -> msrs.MakeSorterModelId parent index
-        | (SmmMsuf4RandMutate msuf4, Msuf4 parent) -> msuf4.MakeSorterModelId parent index
-        | (SmmMsuf6RandMutate msuf6, Msuf6 parent) -> msuf6.MakeSorterModelId parent index
+        | (SmmMsceRandMutate msce, Msce parent) -> msce.MakeSorterModelId parent index modd
+        | (SmmMssiRandMutate mssi, Mssi parent) -> mssi.MakeSorterModelId parent index modd
+        | (SmmMsrsRandMutate msrs, Msrs parent) -> msrs.MakeSorterModelId parent index modd
+        | (SmmMsuf4RandMutate msuf4, Msuf4 parent) -> msuf4.MakeSorterModelId parent index modd
+        | (SmmMsuf6RandMutate msuf6, Msuf6 parent) -> msuf6.MakeSorterModelId parent index modd
         | _ -> failwith "Mutator and parent model types do not match."
 
 
-    let makeMutantSorterModelFromIndex 
+    let makeMutantSorterModelFromIndexAndMod 
                 (mutatorModel: simpleSorterModelMutator) 
                 (parentModel: simpleSorterModel)
-                (index: int<mutationIndex>)  : simpleSorterModel =
+                (index: int<mutationIndex>) 
+                (modd: int<mutationMod>): simpleSorterModel =
         match (mutatorModel, parentModel) with
-        | (SmmMsceRandMutate msce, Msce parent) -> msce.MakeSorterModelFromIndex parent index |> simpleSorterModel.Msce
-        | (SmmMssiRandMutate mssi, Mssi parent) -> mssi.MakeSorterModelFromIndex parent index |> simpleSorterModel.Mssi
-        | (SmmMsrsRandMutate msrs, Msrs parent) -> msrs.MakeSorterModelFromIndex parent index |> simpleSorterModel.Msrs
-        | (SmmMsuf4RandMutate msuf4, Msuf4 parent) -> msuf4.MakeSorterModelFromIndex parent index |> simpleSorterModel.Msuf4
-        | (SmmMsuf6RandMutate msuf6, Msuf6 parent) -> msuf6.MakeSorterModelFromIndex parent index |> simpleSorterModel.Msuf6
+        | (SmmMsceRandMutate msce, Msce parent) -> msce.MakeSorterModelFromIndexAndMod parent index modd |> simpleSorterModel.Msce
+        | (SmmMssiRandMutate mssi, Mssi parent) -> mssi.MakeSorterModelFromIndexAndMod parent index modd |> simpleSorterModel.Mssi
+        | (SmmMsrsRandMutate msrs, Msrs parent) -> msrs.MakeSorterModelFromIndexAndMod parent index modd |> simpleSorterModel.Msrs
+        | (SmmMsuf4RandMutate msuf4, Msuf4 parent) -> msuf4.MakeSorterModelFromIndexAndMod parent index modd |> simpleSorterModel.Msuf4
+        | (SmmMsuf6RandMutate msuf6, Msuf6 parent) -> msuf6.MakeSorterModelFromIndexAndMod parent index modd |> simpleSorterModel.Msuf6
         | _ -> failwith "Mutator and parent model types do not match."
 
 
@@ -155,16 +157,18 @@ module SimpleSorterModelMutator =
     let makeMutantIdToParentIdMap 
                 (mutatorModel: simpleSorterModelMutator) 
                 (parentModels: simpleSorterModel [])
-                (count: int) : Map<Guid<sorterModelId>, Guid<sorterModelId>> =
+                (count: int) 
+                (modd: int<mutationMod>) : Map<Guid<sorterModelId>, Guid<sorterModelId>> =
         
         parentModels
         |> Array.collect (fun parentModel ->
             let parentId = getParentId parentModel
             Array.init count (fun index ->
-                let mutantId = makeMutantSorterModelIdFromIndex 
+                let mutantId = makeMutantSorterModelIdFromIndexAndMod 
                                         mutatorModel 
                                         parentModel 
                                         (index |> UMX.tag<mutationIndex>)
+                                        modd
                 (mutantId, parentId)
             )
         )

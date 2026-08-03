@@ -128,7 +128,8 @@ module SorterPoolSet =
             (sortersPerPool: int<sorterCountPerPool>)
             (generationNumber: int<generationNumber>)
             (evalLabelMap: Map<Guid<sorterModelId>, evalLabel>)
-            (modelSet: sorterModelSet) : sorterPoolSet =
+            (modelSet: sorterModelSet) 
+            (mutationMod: int<mutationMod>): sorterPoolSet =
 
         let totalRequiredSorters = %poolCount * %sortersPerPool
         let availableModels = modelSet.SorterModels
@@ -163,6 +164,7 @@ module SorterPoolSet =
                             poolMemberId
                             model
                             (0 |> UMX.tag<mutationIndex>)   // Initial tracking index starts at 0
+                            mutationMod
                             None                            // Root node element has no parent mutation source
                             None                            // Transient evaluation state begins unassigned
                             0<generationNumber>             // Happy born day

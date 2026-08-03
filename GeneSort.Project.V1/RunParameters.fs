@@ -39,6 +39,7 @@ type runParameters =
     static member mergeSuffixTypeKey = "MergeSuffixType"
     static member messageKey = "Message"
     static member modificationRateKey = "ModificationRate"
+    static member mutationModKey = "MutationMod"
     static member mutationRateKey = "MutationRate"
     static member orthoRateKey = "OrthoRate"
     static member paraRateKey = "ParaRate"
@@ -178,6 +179,10 @@ type runParameters =
     member this.GetMutationRate() =
         runParameters.tryGetFloat runParameters.mutationRateKey this.paramMap
         |> Option.map UMX.tag<mutationRate>
+
+    member this.GetMutationMod() =
+        runParameters.tryGetInt runParameters.mutationModKey this.paramMap
+        |> Option.map UMX.tag<mutationMod>
 
     member this.GetOrthoRate() =
         runParameters.tryGetFloat runParameters.orthoRateKey this.paramMap
@@ -370,6 +375,9 @@ type runParameters =
 
     member this.WithModificationRate(mr: float<modificationRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.modificationRateKey (mr |> Option.map UmxExt.floatToRaw) }
+
+    member this.WithMutationMod(mm: int<mutationMod> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mutationModKey (mm |> Option.map UmxExt.intToRaw) }
 
     member this.WithMutationRate(mr: float<mutationRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mutationRateKey (mr |> Option.map UmxExt.floatToRaw) }
