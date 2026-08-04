@@ -5,6 +5,8 @@ open GeneSort.Core
 
 [<Measure>] type distinctSorterHashes
 [<Measure>] type generationNumber
+[<Measure>] type sorterPoolCount
+[<Measure>] type sorterPoolExpansionRate
 [<Measure>] type sorterPoolMemberId
 [<Measure>] type sorterPoolSetId
 [<Measure>] type sorterPoolName
@@ -13,7 +15,6 @@ open GeneSort.Core
 [<Measure>] type sorterCountCycle
 [<Measure>] type sorterCountCycleMultiplier
 [<Measure>] type sortedFraction
-[<Measure>] type sorterPoolCount
 [<Measure>] type sorterChildCount
 
 module GenerationNumber =

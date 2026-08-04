@@ -69,6 +69,7 @@ type runParameters =
     static member sortableTestFilterKey = "SortableTestFilter"
     static member sorterParentCountKey = "SorterParentCount"
     static member sorterPoolCountKey = "SorterPoolCount"
+    static member sorterPoolExpansionRateKey = "SorterPoolExpansionRate"
     static member sortingWidthKey = "SortingWidth"
     static member stageLengthKey = "StageLength"
     static member startingReplKey = "StartingRepl"
@@ -246,6 +247,10 @@ type runParameters =
         |> Option.bind (fun v ->
             try Some (SortableDataFormat.fromString v)
             with _ -> None)
+
+    member this.GetSorterPoolExpansionRate() =
+        runParameters.tryGetInt runParameters.sorterPoolExpansionRateKey this.paramMap
+        |> Option.map UMX.tag<sorterPoolExpansionRate>
 
     member this.GetSortedFraction() =
         runParameters.tryGetFloat runParameters.sortedFractionKey this.paramMap
@@ -465,6 +470,9 @@ type runParameters =
 
     member this.WithSorterPoolCount(sc: int<sorterPoolCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterPoolCountKey (sc |> Option.map UmxExt.intToRaw) }
+
+    member this.WithSorterPoolExpansionRate(sper: int<sorterPoolExpansionRate> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterPoolExpansionRateKey (sper |> Option.map UmxExt.intToRaw) }
 
     member this.WithSortingWidth(w: int<sortingWidth> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortingWidthKey (w |> Option.map UmxExt.intToRaw) }

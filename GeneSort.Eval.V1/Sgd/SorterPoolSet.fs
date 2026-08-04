@@ -6,7 +6,6 @@ open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.Core
 open GeneSort.Eval.V1
-open GeneSort.Sorting
 
 
 type sorterPoolSet =
@@ -17,6 +16,7 @@ type sorterPoolSet =
     }
     member this.SorterPoolSetId with get() = this._sorterPoolSetId
     member this.SorterPools with get() = this._sorterPools
+    member this.SorterPoolCount with get() = this._sorterPools.Count |> UMX.tag<sorterPoolCount>
     member this.GenerationNumber with get() = this._generationNumber
 
     static member create(sorterPoolSetId, generationNumber, ?pools: seq<sorterPool>) =
@@ -45,6 +45,87 @@ module SorterPoolSet =
     /// Advances the generation counter by a given step count
     let advanceGeneration (steps: int) (poolSet: sorterPoolSet) : sorterPoolSet =
         { poolSet with _generationNumber = (%poolSet._generationNumber + steps) |> UMX.tag }
+
+
+    // reduces the sorterPoolCount by a factor of sorterPoolExpansionRate, effectively pruning the pool set,
+    // selecting only the top-performing pools based on SorterPool.getAverageScore
+    let trimPools (sorterPoolExpansionRate: int<sorterPoolExpansionRate>) 
+                  (measure: sorterEvalMeasure) 
+                  (poolSet: sorterPoolSet) : sorterPoolSet =
+
+        let currentPoolCount = poolSet._sorterPools.Count
+        if currentPoolCount = 0 then
+            poolSet
+        else
+            let expansionFactor = %sorterPoolExpansionRate
+
+            // Guard: Expansion factor must be positive and non-zero to avoid division errors
+            if expansionFactor <= 0 then
+                raise (ArgumentException(
+                    sprintf "sorterPoolExpansionRate must be greater than 0, but was %d." expansionFactor))
+
+            // Guard: Pool count must be evenly divisible by sorterPoolExpansionRate
+            if currentPoolCount % expansionFactor <> 0 then
+                raise (ArgumentException(
+                    sprintf "Current pool count (%d) is not divisible by sorterPoolExpansionRate (%d)." 
+                        currentPoolCount expansionFactor))
+
+            let targetCount = currentPoolCount / expansionFactor
+
+            let updatedPools =
+                poolSet._sorterPools
+                |> Map.values
+                |> Seq.map (fun pool -> 
+                    let avgScore = SorterPool.getAverageScore measure pool
+                    (avgScore, pool)
+                )
+                // Lower score represents better performance; sort ascending
+                |> Seq.sortBy (fun (avgScore, _) -> %avgScore)
+                |> Seq.truncate targetCount
+                |> Seq.map snd
+
+            sorterPoolSet.create(poolSet.SorterPoolSetId, poolSet.GenerationNumber, updatedPools)
+
+
+    // Increases the poolSet.PoolCount by a factor of sorterPoolExpansionRate.
+    // Assigns distinct mutationMod values [0 .. (sorterPoolExpansionRate - 1)] to each new pool
+    let expandPools (sorterPoolExpansionRate: int<sorterPoolExpansionRate>) 
+                    (poolSet: sorterPoolSet) : sorterPoolSet =
+
+        let expansionFactor = %sorterPoolExpansionRate
+
+        // Guard: Expansion factor must be positive and non-zero
+        if expansionFactor <= 0 then
+            raise (ArgumentException(
+                sprintf "sorterPoolExpansionRate must be greater than 0, but was %d." expansionFactor))
+
+        if Map.isEmpty poolSet._sorterPools then
+            poolSet
+        else
+            let expandedPools =
+                poolSet._sorterPools
+                |> Map.values
+                |> Seq.collect (fun parentPool ->
+                    [| 0 .. expansionFactor - 1 |]
+                    |> Array.map (fun modValue ->
+                        let newPoolId = Guid.NewGuid() |> UMX.tag<sorterPoolId>
+                        let newMutationMod = modValue |> UMX.tag<mutationMod>
+                        
+                        // Apply the mutationMod to the pool and all of its members
+                        let mutatedPool = SorterPool.changeMutationMod newMutationMod parentPool
+
+                        // Re-create the pool with a fresh pool ID while preserving name and members
+                        sorterPool.create
+                            newPoolId
+                            mutatedPool.Name
+                            (mutatedPool.SorterPoolMembers |> Seq.toArray)
+                            mutatedPool.RawCeLength
+                            newMutationMod
+                    )
+                )
+
+            sorterPoolSet.create(poolSet.SorterPoolSetId, poolSet.GenerationNumber, expandedPools)
+
 
     /// Mutates every single pool across the entire pool set uniformly
     let mutate 
@@ -172,7 +253,12 @@ module SorterPoolSet =
 
                 // 4. Wrap the evaluated array segment block inside an explicit tracking pool object container
                 let poolId = Guid.NewGuid() |> UMX.tag<sorterPoolId>
-                sorterPool.create poolId poolName sorterPoolMembers modelSet.RawCeLength
+                sorterPool.create 
+                        poolId 
+                        poolName 
+                        sorterPoolMembers 
+                        modelSet.RawCeLength 
+                        mutationMod
             )
 
         // 5. Package the complete group layout structure back out to the main generational repository root

@@ -55,7 +55,7 @@ module MsrsSgdSpecsRs =
                 selfSymRate
                 modificationRatesMsuf4
                 sortingWidth16
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 genReportInterval10
@@ -118,7 +118,7 @@ module MsrsSgdSpecsRs =
                 selfSymRate
                 modificationRatesMsuf4
                 sortingWidth16
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
@@ -147,7 +147,7 @@ module MsrsSgdSpecsRs =
                 selfSymRate
                 modificationRatesMsuf4
                 sortingWidth16
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent

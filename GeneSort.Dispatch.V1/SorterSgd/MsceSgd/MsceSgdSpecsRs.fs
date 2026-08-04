@@ -79,7 +79,7 @@ module MsceSgdSpecsRs =
                 deletionRates
                 modificationRatesMsce
                 sortingWidth16
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
@@ -139,7 +139,7 @@ module MsceSgdSpecsRs =
                 deletionRates
                 modificationRatesMsce
                 mediumSortingWidths
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 genReportInterval10
@@ -168,7 +168,7 @@ module MsceSgdSpecsRs =
                 deletionRates
                 modificationRatesMsce
                 mediumSortingWidths
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent

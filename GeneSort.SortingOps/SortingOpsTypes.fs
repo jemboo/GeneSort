@@ -9,6 +9,7 @@
 [<Measure>] type stageCrossingWeight
 [<Measure>] type sortingEvalId
 [<Measure>] type sorterSetEvalId
+[<Measure>] type sorterEvalScore
 
 
 

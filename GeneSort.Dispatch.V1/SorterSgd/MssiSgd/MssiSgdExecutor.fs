@@ -41,7 +41,7 @@ module MssiSgdExecutor =
                 // 1. Gather all required run metrics and options out of your parameters block securely
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
                 let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
-                let! genReportInterval = rp.GetGenerationReportInterval() |> Result.ofOption "Missing generation report interval."
+                let! genSliceSize = rp.GetGenerationReportInterval() |> Result.ofOption "Missing generation report interval."
                 let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
                 let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
                 let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count"
@@ -51,6 +51,7 @@ module MssiSgdExecutor =
                 let! sortedFraction = rp.GetSortedFraction() |> Result.ofOption "Missing sortedFraction."
                 let! sorterCountCycle = rp.GetSorterCountCycle() |> Result.ofOption "Missing sorterCountCycle."
                 let! sorterCountCycleMultiplier = rp.GetSorterCountCycleMultiplier() |> Result.ofOption "Missing sorterCountCycleMultiplier."
+                let! sorterPoolExpansionRate = rp.GetSorterPoolExpansionRate () |> Result.ofOption "Missing sorterPoolExpansionRate."
                 let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
 
                 // 2. Resolve target seed sorterPoolSet collection state depending on genFirst criteria
@@ -102,7 +103,7 @@ module MssiSgdExecutor =
                 log "Executing chunked SorterRunResult loop via loop manager..."
                 let! finalRp: runParameters = 
                     EvolutionOrchestrator.runSlicesInLoop
-                        host rp genCurrent genLast genReportInterval 
+                        host rp genCurrent genLast genSliceSize sorterEvalMeasure sorterPoolExpansionRate
                         initialSeedPoolSet allowOverwrite cts.Token log stepExecutionStrategy
                 
                 log "evaluateEvolutionRun completed."

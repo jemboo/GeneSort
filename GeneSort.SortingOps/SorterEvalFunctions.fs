@@ -233,22 +233,28 @@ module SorterEvalMeasure =
 
 module SorterEvalFunctions =
 
-    let byThreeWeighted (ceCountWeight: float) (stageLengthWeight: float) (stageCrossingWeight: float) (eval: sorterEval) = 
+    let byThreeWeighted 
+                (ceCountWeight: float) 
+                (stageLengthWeight: float) 
+                (stageCrossingWeight: float) 
+                (eval: sorterEval) : float<sorterEvalScore> = 
         let ceCount = float (SorterEval.getCeLength eval)
         let stageLength = float (SorterEval.getStageLength eval)
         let stageCrossing = float (SorterEval.getStageCrossingsCount eval)
-        (ceCount * ceCountWeight) + (stageLength * stageLengthWeight) + (stageCrossing * stageCrossingWeight)
+        let score = (ceCount * ceCountWeight) + (stageLength * stageLengthWeight) + (stageCrossing * stageCrossingWeight)
+        UMX.tag<sorterEvalScore> score
 
-    let byUnsortedCount (m: float) (eval: sorterEval) =
+    let byUnsortedCount (m: float) (eval: sorterEval) : float<sorterEvalScore> =
         let uc = float (SorterEval.getUnsortedCount eval)
-        if uc <= 0.0 then 0.0 else m * Math.Log uc
+        let score = if uc <= 0.0 then 0.0 else m * Math.Log uc
+        UMX.tag<sorterEvalScore> score
 
-    let getFunctionForMeasure (measure: sorterEvalMeasure) : (sorterEval -> float) =
+    let getFunctionForMeasure (measure: sorterEvalMeasure) : (sorterEval -> float<sorterEvalScore>) =
         match measure with
         | CeLength _ -> 
-            SorterEval.getCeLength >> float
+            SorterEval.getCeLength >> float >> UMX.tag<sorterEvalScore>
         | StageLength _ -> 
-            SorterEval.getStageLength >> float
+            SorterEval.getStageLength >> float >> UMX.tag<sorterEvalScore>
         | UnsortedCount _ -> 
             byUnsortedCount 1.0
         | CeSt m -> 
@@ -256,12 +262,12 @@ module SorterEvalFunctions =
         | CeStUc m ->
             let ceFunc = SorterEval.getCeLength >> float
             let stageFunc = SorterEval.getStageLength >> float
-            let unsortedFunc = byUnsortedCount (%m.UnsortedWeight)
+            let unsortedFunc = byUnsortedCount (%m.UnsortedWeight) >> UMX.untag
             fun eval ->
                 let cePart = ceFunc eval * 1.0
                 let stagePart = stageFunc eval * (%m.StageWeight)
                 let unsortedPart = unsortedFunc eval
-                cePart + stagePart + unsortedPart
+                UMX.tag<sorterEvalScore> (cePart + stagePart + unsortedPart)
 
     let getFilterUnsortedFlag (measure: sorterEvalMeasure) : bool<filterUnsorted> =
         match measure with

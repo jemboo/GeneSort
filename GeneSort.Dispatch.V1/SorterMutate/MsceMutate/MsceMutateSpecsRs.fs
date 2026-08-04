@@ -5,7 +5,6 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
-open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Sorting
 open GeneSort.Dispatch.V1.SorterMutate
@@ -58,8 +57,9 @@ module MsceMutateSpecsRs =
                 insertionRates
                 deletionRates
                 modificationRatesMsce
-                testSortingWidths
+                sortingWidth16
                 testChildCount
+                mutationMod1
             ]
             filter = standardSorterModelTypeFilter
             enhancer = standardEnhancer
@@ -84,6 +84,7 @@ module MsceMutateSpecsRs =
                 modificationRatesMsce
                 smallSortingWidths
                 extraLargeChildCount
+                mutationMod1
             ]
             filter = standardSorterModelTypeFilter
             enhancer = standardEnhancer
@@ -107,6 +108,7 @@ module MsceMutateSpecsRs =
                 modificationRatesMsce
                 mediumSortingWidths
                 extraLargeChildCount
+                mutationMod1
             ]
             filter = standardSorterModelTypeFilter
             enhancer = standardEnhancer

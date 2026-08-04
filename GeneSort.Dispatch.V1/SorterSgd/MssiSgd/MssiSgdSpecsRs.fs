@@ -69,7 +69,7 @@ module MssiSgdSpecsRs =
                 paraRate
                 modificationRatesMsuf4
                 sortingWidth16
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 genReportInterval10
@@ -129,7 +129,7 @@ module MssiSgdSpecsRs =
                 paraRate
                 modificationRatesMsuf4
                 sortingWidth16
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 genReportInterval10
@@ -157,7 +157,7 @@ module MssiSgdSpecsRs =
                 paraRate
                 modificationRatesMsuf4
                 sortingWidth16
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 genReportInterval10

@@ -57,6 +57,12 @@ module SorterPoolMember =
     let updateIndex (spm: sorterPoolMember) : sorterPoolMember =
         advanceIndex 1 spm
 
+/// Updates the mutationMod of a pool member and resets its mutationIndex to 0
+    let changeMutationMod (newMod: int<mutationMod>) (spm: sorterPoolMember) : sorterPoolMember =
+        { spm with 
+            _mutationMod = newMod
+            _mutationIndex = 0 |> UMX.tag<mutationIndex> }
+
     /// Updates the sorterEval of a pool member
     let withEval (eval: sorterEval option) (spm: sorterPoolMember) : sorterPoolMember =
         { spm with _sorterEval = eval }

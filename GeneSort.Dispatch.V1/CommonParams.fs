@@ -105,7 +105,7 @@ module CommonParams =
     let sorterCountCycle500 = (runParameters.sorterCountCycleKey, ["500";] )
 
     // sorterCountCycleMultiplier
-    let sorterCountCycleMultipliers1 = (runParameters.sorterCountCycleMultiplierKey, ["1";] )
+    let sorterCountCycleMultiplier1 = (runParameters.sorterCountCycleMultiplierKey, ["1";] )
     let sorterCountCycleMultipliers1n2 = (runParameters.sorterCountCycleMultiplierKey, ["1"; "2";] )
     let sorterCountCycleMultipliers1n4 = (runParameters.sorterCountCycleMultiplierKey, ["1"; "4";] )
     let sorterCountCycleMultipliersLow = (runParameters.sorterCountCycleMultiplierKey, ["1.001"; "1.2"; "1.4"; "1.8"] )
@@ -117,12 +117,14 @@ module CommonParams =
     // SorterPoolCounts
     let poolCount1 = (runParameters.sorterPoolCountKey, ["1";] )
     let poolCount2 = (runParameters.sorterPoolCountKey, ["2";] )
-    let poolCount5 = (runParameters.sorterPoolCountKey, ["5";] )
-    let poolCount10 = (runParameters.sorterPoolCountKey, ["10";] )
-    let poolCount20 = (runParameters.sorterPoolCountKey, ["20";] )
-    let poolCount40 = (runParameters.sorterPoolCountKey, ["40";] )
-    let poolCount100 = (runParameters.sorterPoolCountKey, ["100";] )
-    let poolCount1000 = (runParameters.sorterPoolCountKey, ["1000";] )
+    let poolCount4 = (runParameters.sorterPoolCountKey, ["4";] )
+    let poolCount8 = (runParameters.sorterPoolCountKey, ["8";] )
+    let poolCount16 = (runParameters.sorterPoolCountKey, ["16";] )
+    let poolCount32 = (runParameters.sorterPoolCountKey, ["32";] )
+    let poolCount64 = (runParameters.sorterPoolCountKey, ["64";] )
+    let poolCount128 = (runParameters.sorterPoolCountKey, ["128";] )
+    let poolCount256 = (runParameters.sorterPoolCountKey, ["256";] )
+    let poolCount512 = (runParameters.sorterPoolCountKey, ["512";] )
 
     // SorterChildCounts
     let oneChildCount = (runParameters.sorterChildCountKey, ["1";] )
@@ -496,6 +498,33 @@ module CommonParams =
             [ _cestM_noScw; _cestM_ScwP1; _cestM_ScwP2; _cestM_ScwP3; 
              _cestM_ScwP4; _cestM_ScwP5; _cestM_ScwM1; _cestM_ScwM2; ] 
             |> List.map SorterEvalMeasure.toCompactString)
+
+
+
+    // MutationMods
+
+    let mutationMod1 =
+            (runParameters.mutationModKey, [1;] |> List.map string)
+
+
+    // SorterPoolExpansionRates
+
+    let sorterPoolExpansionRate1 =
+            (runParameters.sorterPoolExpansionRateKey, [1.0;] |> List.map string)
+
+    let sorterPoolExpansionRate2 =
+            (runParameters.sorterPoolExpansionRateKey, [2.0;] |> List.map string)
+
+    let sorterPoolExpansionRate4 =
+            (runParameters.sorterPoolExpansionRateKey, [4.0;] |> List.map string)
+            
+    let sorterPoolExpansionRate8 =
+            (runParameters.sorterPoolExpansionRateKey, [8.0;] |> List.map string)
+
+    let sorterPoolExpansionRates =
+            (runParameters.sorterPoolExpansionRateKey, [1.0; 2.0; 4.0; 8.0;] |> List.map string)
+
+
 
 
 

@@ -8,7 +8,7 @@ open GeneSort.Eval.V1
 open GeneSort.Model.Mp.Sorting.Mp.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Sorting
-open GeneSort.Eval.Mp.V1
+open GeneSort.Model.Sorting.V1
 
 // ---------------------------------------------------------------------
 // 2. Fully Realized Final State DTOs
@@ -31,6 +31,7 @@ type sorterPoolDto = {
     [<Key(1)>] name: string
     [<Key(2)>] sorterPoolMemberDtos: sorterPoolMemberDto array
     [<Key(3)>] ceLength: int
+    [<Key(4)>] mutationMod: int
 }
 
 [<MessagePackObject>]
@@ -65,7 +66,8 @@ module SorterPoolSetDto =
                 { sorterPoolId = %p.SorterPoolId; 
                   name = %p.Name; 
                   sorterPoolMemberDtos = memberDtos; 
-                  ceLength = %p.RawCeLength }
+                  ceLength = %p.RawCeLength 
+                  mutationMod = %p.MutationMod }
             )
             |> Seq.toArray
         {
@@ -98,6 +100,7 @@ module SorterPoolSetDto =
                             (p.name |> UMX.tag<sorterPoolName>) 
                             members
                             (p.ceLength |> UMX.tag<ceLength> )
+                            (p.mutationMod |> UMX.tag<mutationMod>)
             )
         sorterPoolSet.create(UMX.tag dto.sorterPoolSetId, UMX.tag dto.generationNumber, pools)
 

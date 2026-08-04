@@ -62,7 +62,7 @@ module MssiSgdSpecsRm =
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 genReportInterval10
@@ -93,7 +93,7 @@ module MssiSgdSpecsRm =
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 genReportInterval10
@@ -124,7 +124,7 @@ module MssiSgdSpecsRm =
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent

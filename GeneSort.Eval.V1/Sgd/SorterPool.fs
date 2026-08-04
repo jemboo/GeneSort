@@ -15,19 +15,22 @@ type sorterPool =
         _sorterPoolId: Guid<sorterPoolId>
         _sorterPoolMembers: Map<Guid<sorterPoolMemberId>, sorterPoolMember>
         _rawCeLength: int<ceLength>
+        _mutationMod: int<mutationMod>
     }
-    member this.RawCeLength with get() = this._rawCeLength
+
+    member this.MutationMod with get() = this._mutationMod
     member this.Name with get() = this._name
+    member this.RawCeLength with get() = this._rawCeLength
     member this.SorterPoolMembers with get() :sorterPoolMember seq =
         Map.values this._sorterPoolMembers
     member this.SorterPoolId with get() = this._sorterPoolId
-
 
     static member create 
             (sorterPoolId: Guid<sorterPoolId>) 
             (name: string<sorterPoolName>)
             (members: sorterPoolMember []) 
-            (rawCeLength: int<ceLength>) =
+            (rawCeLength: int<ceLength>) 
+            (mutationMod: int<mutationMod>) =
         let membersMap = 
             members
             |> Seq.map (fun m -> m.SorterPoolMemberId, m)
@@ -37,10 +40,24 @@ type sorterPool =
             _sorterPoolId = sorterPoolId
             _sorterPoolMembers = membersMap
             _rawCeLength = rawCeLength
+            _mutationMod = mutationMod
         }
 
 
 module SorterPool = 
+
+    let getAverageScore (measure: sorterEvalMeasure) (pool: sorterPool) : float<sorterEvalScore> =
+            let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
+            let validScores =
+                pool.SorterPoolMembers
+                |> Seq.choose (fun spm -> spm.SorterEval |> Option.map scoreFunc)
+                |> Seq.map UMX.untag
+                |> Seq.toArray
+
+            if Array.isEmpty validScores then
+                Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
+            else
+                Array.average validScores |> UMX.tag<sorterEvalScore>
 
     /// Adds or updates a member inside the pool
     let upsertMember 
@@ -93,6 +110,20 @@ module SorterPool =
                 // Ignore members that don't have an evaluation yet
                 accMap
         ) Map.empty
+
+
+    /// Updates the mutationMod for the pool and applies the change to all members (resetting their mutationIndex)
+    let changeMutationMod (newMod: int<mutationMod>) (pool: sorterPool) : sorterPool =
+        let updatedMembers =
+            pool._sorterPoolMembers
+            |> Map.map (fun _ memberObj ->
+                memberObj |> SorterPoolMember.changeMutationMod newMod
+            )
+
+        { pool with 
+            _mutationMod = newMod
+            _sorterPoolMembers = updatedMembers }
+
 
 
     /// Applies the same mutantsPerSorter count to every pool member, accumulating 
@@ -182,6 +213,7 @@ module SorterPool =
                 pool.Name 
                 updatedMembers 
                 (UMX.tag<ceLength> %thresholdLastCeIndex)
+                pool.MutationMod
 
 
 
@@ -227,7 +259,7 @@ module SorterPool =
                 let score = 
                     match spm.SorterEval with
                     | Some eval -> scoreFunc eval
-                    | None -> Double.PositiveInfinity
+                    | None -> Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
                 (score, spm)
             )
             // Step 3: Sort ascending (best scores first). 
@@ -246,7 +278,12 @@ module SorterPool =
             |> Seq.map snd
             |> Seq.toArray
 
-        sorterPool.create pool.SorterPoolId pool.Name sortedSurvivors pool.RawCeLength
+        sorterPool.create 
+                    pool.SorterPoolId 
+                    pool.Name 
+                    sortedSurvivors
+                    pool.RawCeLength 
+                    pool.MutationMod
 
 
 
@@ -312,7 +349,7 @@ module SorterPool =
                 let score = 
                     match spm.SorterEval with
                     | Some eval -> scoreFunc eval
-                    | None -> Double.PositiveInfinity
+                    | None -> Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
             
                 let mIndexRaw = %spm.MutationIndex
                 let tieBreaker = if %prioritizeNewMutants then mIndexRaw else -mIndexRaw
@@ -336,4 +373,9 @@ module SorterPool =
         if finalCount = 0 && targetSize > 0 && countAfterFilter2 > 0 && Debugger.IsAttached then
             Debugger.Break() // Pause if final truncation resulted in an empty pool
 
-        sorterPool.create pool.SorterPoolId pool.Name truncatedSurvivors pool.RawCeLength
+        sorterPool.create 
+                    pool.SorterPoolId 
+                    pool.Name 
+                    truncatedSurvivors
+                    pool.RawCeLength 
+                    pool.MutationMod

@@ -96,7 +96,7 @@ module MsrsSgdSpecsRm =
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
@@ -128,7 +128,7 @@ module MsrsSgdSpecsRm =
                 testMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent

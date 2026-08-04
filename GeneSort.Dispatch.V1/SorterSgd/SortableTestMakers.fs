@@ -55,8 +55,7 @@ module SortableTestMakers =
 
             match paramsOpt with
             | Some (repl, sw, md, mst, sdf) ->
-                return! SortableTestDbs.Merge.getMergeSorterTestSet 
-                                        repl sw md mst sdf  
+                return! SortableTestDbs.Merge.getMergeSorterTestSet repl sw md mst sdf  
             | None ->
                 return Error "Failed: One or more RunParameters for MergeTests were missing."
         }
@@ -73,8 +72,7 @@ module SortableTestMakers =
 
             match paramsOpt with
             | Some (repl, sorterLibId, sdf) ->
-                return! SortableTestDbs.Prefix.getPrefixSorterTestSet 
-                                        repl sorterLibId sdf  
+                return! SortableTestDbs.Prefix.getPrefixSorterTestSet repl sorterLibId sdf  
             | None ->
                 return Error "Failed: One or more RunParameters for MergeTests were missing."
         }

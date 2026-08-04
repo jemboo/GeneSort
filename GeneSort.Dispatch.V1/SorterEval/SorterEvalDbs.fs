@@ -10,12 +10,13 @@ open GeneSort.Db.V1
 open GeneSort.FileDb.V1
 open GeneSort.Dispatch.V1
 open GeneSort.SortingLib.Sorter
-open CommonSorterEval
 open GeneSort.Dispatch.V1.CommonParams
 
 
 module SorterEvalDbs =
     
+    let projectName = "SorterEval" |> UMX.tag<projectName>
+
     module Standard =
 
         let dbName = "Standard" |> UMX.tag<databaseName>
@@ -52,10 +53,7 @@ module SorterEvalDbs =
             }
         
 
-
         let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
-
-
 
 
 

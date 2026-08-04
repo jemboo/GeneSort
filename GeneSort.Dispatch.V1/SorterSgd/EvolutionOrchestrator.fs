@@ -8,43 +8,58 @@ open FSharp.UMX
 open GeneSort.Dispatch.V1
 open System.Threading
 open GeneSort.Eval.V1.Sgd
-
+open GeneSort.SortingOps
 
 module EvolutionOrchestrator =
 
-    /// Reusable engine that runs an evolution algorithm in chunks defined by genReportInterval and saves progress checkpoints.
+    /// Reusable engine that runs an evolution algorithm in chunks defined by genSliceSize and saves progress checkpoints.
     let runSlicesInLoop
             (host: IRunHost)
             (rp: runParameters)
             (genFirst: int<generationNumber>)
             (genLast: int<generationNumber>)
-            (genReportInterval: int<generationNumber>)
+            (genSliceSize: int<generationNumber>)
+            (measure: sorterEvalMeasure)
+            (sorterPoolExpansionRate: int<sorterPoolExpansionRate>)
             (initialSeedPoolSet: sorterPoolSet)
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationToken)
             (log: string -> unit)
             (runSliceAsync: int<generationNumber> -> int<generationNumber> -> sorterPoolSet -> 
-                                          Async<Result<sorterRunResult, string>>) 
+                                        Async<Result<sorterRunResult, string>>) 
             : Async<Result<runParameters, string>> =
+
 
         let rec stepLoop 
                     (currentGenFirst: int<generationNumber>) 
                     (currentPoolSet: sorterPoolSet) 
                     (currentRp: runParameters) : Async<Result<runParameters, string>> =
+
             asyncResult {
                 if currentGenFirst >= genLast then
                     return currentRp
                 else
                     do! checkCancellation cts
 
-                    let stepSize = min genReportInterval (genLast - currentGenFirst)
+                    let stepSize = min genSliceSize (genLast - currentGenFirst)
                     let currentGenLast = currentGenFirst + stepSize
+
+                    log (sprintf "Selecting and expanding pools for slice: Generation %d -> %d (Expansion rate: %d)..." 
+                            currentGenFirst currentGenLast %sorterPoolExpansionRate)
+
+                    // Execute pool selection logic every genSliceSize boundary:
+                    // 1. Trim the pools down to the top-performing fraction
+                    // 2. Expand back out by multiplying pools and assigning distinct mutationMod values
+                    let expandedPoolSet =
+                        currentPoolSet
+                        |> SorterPoolSet.trimPools sorterPoolExpansionRate measure
+                        |> SorterPoolSet.expandPools sorterPoolExpansionRate
 
                     log (sprintf "Stepping evolution: Generation %d -> %d (Report interval: %d)..." 
                             currentGenFirst currentGenLast stepSize)
 
                     // Execute the engine payload passed in by the executor module
-                    let! (runResult: sorterRunResult) = runSliceAsync currentGenFirst stepSize currentPoolSet
+                    let! (runResult: sorterRunResult) = runSliceAsync currentGenFirst stepSize expandedPoolSet
 
                     do! checkCancellation cts
 

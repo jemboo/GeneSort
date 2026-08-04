@@ -133,8 +133,8 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** MsceMutateSpecsRs **********
-//let configType = MsceMutateSpecsRs.configType.Rand_Medium
-//let executorType = sorterMutateExecutorType.MutantReport
+//let configType = MsceMutateSpecsRs.configType.Rand_Test
+//let executorType = sorterMutateExecutorType.GenStandard
 //let host: IRunHost = 
 //    let spec = MsceMutateSpecsRs.getRunHostSpec configType executorType
 //    MsceMutateDbs.createRunHost spec
@@ -262,8 +262,8 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executor = MsrsSgdExecutor.getExecutor executorType
 
 //********** MsrsSgdSpecsPrefix **********
-let configType = MsrsSgdSpecsTestPrefix.configType.Rand_Test
-let executorType = sorterSgdExecutorType.SummaryReport
+let configType = MsrsSgdSpecsTestPrefix.configType.T4_P3
+let executorType = sorterSgdExecutorType.GenPrefix
 let host: IRunHost = 
     let spec = MsrsSgdSpecsTestPrefix.getRunHostSpec configType executorType
     MsrsSgdDbs.createRunHost spec

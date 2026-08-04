@@ -48,7 +48,7 @@ module Msuf4SgdSpecsTestPrefix =
                 rngTypeLcg
                 generationCurrent
                 thirtyTwoSortersPerPool
-                poolCount5
+                poolCount4
                 oneChildCount
                 sorterEvalSelectionTypeRs6000
                 sorterEvalMeasureInitial_CestM_noScw

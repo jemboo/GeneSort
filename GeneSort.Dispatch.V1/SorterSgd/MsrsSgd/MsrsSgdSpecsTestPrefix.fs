@@ -13,9 +13,17 @@ module MsrsSgdSpecsTestPrefix =
 
     let sorterEvalSelectionTypeGuid12K = 
             (runParameters.sorterEvalSelectionType, 
-            [ sorterEvalSelectionType.GuidOrder 6000<sorterCount>;] 
+            [ sorterEvalSelectionType.GuidOrder 12000<sorterCount>;] 
+            |> List.map SorterEvalSelectionType.toString)
+
+    let sorterEvalSelectionTypeGuid1K = 
+            (runParameters.sorterEvalSelectionType, 
+            [ sorterEvalSelectionType.GuidOrder 1000<sorterCount>;] 
             |> List.map SorterEvalSelectionType.toString)
         
+    let generationLastTest = 
+            (runParameters.generationLastKey, [250] |> List.map string)
+
     let generationLast = 
             (runParameters.generationLastKey, [10000] |> List.map string)
 
@@ -40,24 +48,24 @@ module MsrsSgdSpecsTestPrefix =
 
     module Specs =
 
-        let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
+        let Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
             databaseName = MsrsSgdDbs.Prefix.dbName
             runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for 24pfx4 Msuf4"
             spans = [
                 rngTypeLcg
                 generationCurrent
-                fiveTwelveSortersPerPool
-                poolCount1
+                thirtyTwoSortersPerPool
+                poolCount8
                 oneChildCount
-                sorterEvalSelectionTypeGuid12K
+                sorterEvalSelectionTypeGuid1K
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
-                sortableTestFilter_Prefix24_3s
+                sortableTestFilter_Prefix24_3a
                 msrsModelType
                 sorterEvalTypeV1
                 seedModificationRate02
-                modificationRatesMsceCenter
+                modificationRatep04
                 orthoRate
                 paraRate
                 selfSymRate
@@ -65,10 +73,12 @@ module MsrsSgdSpecsTestPrefix =
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction99
-                genReportInterval1000
-                generationLast
+                genReportInterval50
+                generationLastTest
                 sorterCountCycle100
-                sorterCountCycleMultipliersLow
+                sorterCountCycleMultiplier1
+                mutationMod1
+                sorterPoolExpansionRates
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
@@ -76,13 +86,53 @@ module MsrsSgdSpecsTestPrefix =
             maxParallel = 16
         }
 
+        let T4_P3 (executorType: sorterSgdExecutorType)  : runHostSpec = {
+            databaseName = MsrsSgdDbs.Prefix.dbName
+            runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for 24pfx4 Msuf4"
+            spans = [
+                rngTypeLcg
+                generationCurrent
+                fiveTwelveSortersPerPool
+                poolCount16
+                oneChildCount
+                sorterEvalSelectionTypeGuid12K
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
+                sortableTestFilter_Prefix24_3a
+                msrsModelType
+                sorterEvalTypeV1
+                seedModificationRate02
+                modificationRatep04
+                orthoRate
+                paraRate
+                selfSymRate
+                dataFomatBitv512
+                distinctSorterHashesTrue
+                prioritizeNewMutantsTrue
+                sortedFraction99
+                genReportInterval500
+                generationLast
+                sorterCountCycle100
+                sorterCountCycleMultipliersLow
+                mutationMod1
+                sorterPoolExpansionRates
+            ]
+            filter = paramMapFilter
+            enhancer = prefixEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
+        }
+
 
     type configType =
-        | Rand_Test
+        | T4_P3
+        | Test
 
     let Configs = Map.ofList 
                     [ 
-                        (configType.Rand_Test, Specs.Rand_Test);
+                        (configType.Test, Specs.Test);
+                        (configType.T4_P3, Specs.T4_P3);
                     ]
 
     let getRunHostSpec (config: configType) (executorType: sorterSgdExecutorType) : runHostSpec =

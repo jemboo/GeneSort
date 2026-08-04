@@ -192,7 +192,7 @@ module SorterEvalSelection =
                     let minVal = ranker sortedItems.[cleanItems.Length - 1]
                     let valRange = maxVal - minVal
 
-                    if valRange = 0.0 then
+                    if %valRange = 0.0 then
                         let step = float (cleanItems.Length - 1) / float (sampleCount - 1)
                         for i in 1 .. (sampleCount - 1) do
                             let targetIndex = int (round (float i * step))
@@ -201,7 +201,7 @@ module SorterEvalSelection =
                         let targetStep = valRange / float (sampleCount - 1)
                         for i in 1 .. (sampleCount - 2) do
                             let targetValue = maxVal - (float i * targetStep)
-                            let closestMatch = sortedItems |> Array.minBy (fun se -> Math.Abs(ranker se - targetValue))
+                            let closestMatch = sortedItems |> Array.minBy (fun se -> Math.Abs(%(ranker se - targetValue)))
                             res.[i] <- closestMatch
                     res
 

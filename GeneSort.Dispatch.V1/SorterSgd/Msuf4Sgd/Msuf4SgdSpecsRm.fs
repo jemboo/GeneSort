@@ -104,7 +104,7 @@ module Msuf4SgdSpecsRm =
                 lowMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
@@ -138,7 +138,7 @@ module Msuf4SgdSpecsRm =
                 lowMergeDimensions
                 noSuffixSuffixType
                 dataFormatInt8v512
-                poolCount10
+                poolCount8
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent

@@ -30,9 +30,6 @@ module SorterEvalExecutorType =
 
 module CommonSorterEval =
 
-    let projectName = "SorterEval" |> UMX.tag<projectName>
-
-
     let getSimpleUniformSorterModelGen
             (rngType: rngType) 
             (sortingWidth: int<sortingWidth>)
