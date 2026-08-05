@@ -30,7 +30,7 @@ module Reporting =
                 do! checkCancellation cts.Token                
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
                 let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
-                let! genSliceSize = rp.GetGenerationReportInterval() |> Result.ofOption "Missing generation report interval."
+                let! genSliceSize = rp.GetGenerationSliceInterval() |> Result.ofOption "Missing generation report interval."
 
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
@@ -109,7 +109,7 @@ module Reporting =
                 do! checkCancellation cts.Token                
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
                 let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
-                let! genSliceSize = rp.GetGenerationReportInterval() |> Result.ofOption "Missing generation report interval."
+                let! genSliceSize = rp.GetGenerationSliceInterval() |> Result.ofOption "Missing generation report interval."
 
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)

@@ -66,7 +66,7 @@ module MsrsSgdSpecsRm =
                 oneTwenty8SortersPerPool
                 oneChildCount
                 generationCurrent
-                genReportInterval10
+                genSliceInterval10
                 generationLast
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
@@ -100,7 +100,7 @@ module MsrsSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
-                genReportInterval10
+                genSliceInterval10
                 generationLast
             ]
             filter = paramMapFilter
@@ -132,7 +132,7 @@ module MsrsSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
-                genReportInterval10
+                genSliceInterval10
                 generationLast
             ]
             filter = paramMapFilter

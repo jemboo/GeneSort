@@ -83,7 +83,7 @@ module MsceSgdSpecsRs =
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
-                genReportInterval10
+                genSliceInterval10
                 generationLast
             ]
             filter = standardSorterModelTypeFilter
@@ -112,7 +112,7 @@ module MsceSgdSpecsRs =
                 fourKSortersPerPool
                 oneChildCount
                 generationCurrent
-                genReportInterval10
+                genSliceInterval10
                 generationLast
                 distinctSorterHashesTrue
                 prioritizeNewMutantsBoth
@@ -142,7 +142,7 @@ module MsceSgdSpecsRs =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                genReportInterval10
+                genSliceInterval10
                 generationLast
                 generationCurrent
             ]
@@ -172,7 +172,7 @@ module MsceSgdSpecsRs =
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
-                genReportInterval10
+                genSliceInterval10
                 generationLast
             ]
             filter = standardSorterModelTypeFilter

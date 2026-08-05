@@ -51,9 +51,12 @@ module EvolutionOrchestrator =
                     // 1. Trim the pools down to the top-performing fraction
                     // 2. Expand back out by multiplying pools and assigning distinct mutationMod values
                     let expandedPoolSet =
-                        currentPoolSet
-                        |> SorterPoolSet.trimPools sorterPoolExpansionRate measure
-                        |> SorterPoolSet.expandPools sorterPoolExpansionRate
+                        if sorterPoolExpansionRate = 1<sorterPoolExpansionRate> then
+                            currentPoolSet
+                        else
+                            currentPoolSet
+                            |> SorterPoolSet.trimPools sorterPoolExpansionRate measure
+                            |> SorterPoolSet.expandPools sorterPoolExpansionRate
 
                     log (sprintf "Stepping evolution: Generation %d -> %d (Report interval: %d)..." 
                             currentGenFirst currentGenLast stepSize)

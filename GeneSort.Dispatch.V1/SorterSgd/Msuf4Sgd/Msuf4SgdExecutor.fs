@@ -39,7 +39,7 @@ module Msuf4SgdExecutor =
                 // 1. Core structural control parameters
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
                 let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
-                let! genSliceSize = rp.GetGenerationReportInterval() |> Result.ofOption "Missing generation report interval."
+                let! genSliceSize = rp.GetGenerationSliceInterval() |> Result.ofOption "Missing generation report interval."
                 let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
                 let! sortingWidth = rp.GetSortingWidth() |> Result.ofOption "Missing sortingWidth."
                 let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."

@@ -65,7 +65,7 @@ module MssiSgdSpecsRm =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                genReportInterval10
+                genSliceInterval10
                 generationLast
                 generationCurrent
             ]
@@ -96,7 +96,7 @@ module MssiSgdSpecsRm =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                genReportInterval10
+                genSliceInterval10
                 generationLast
                 generationCurrent
             ]
@@ -128,7 +128,7 @@ module MssiSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
-                genReportInterval10
+                genSliceInterval10
                 generationLast
             ]
             filter = paramMapFilter

@@ -35,36 +35,39 @@ module CommonParams =
              [simpleSorterModelType.Msuf4] |> List.map SimpleSorterModelType.toString)
 
 
-    // Generation Report Intervals
-    let genReportInterval1 = 
-        (runParameters.generationReportIntervalKey, [1] |> List.map string)
+    // Generation Slice Intervals
+    let genSliceInterval1 = 
+        (runParameters.generationSliceIntervalKey, [1] |> List.map string)
 
-    let genReportInterval2 = 
-        (runParameters.generationReportIntervalKey, [2] |> List.map string)
+    let genSliceInterval2 = 
+        (runParameters.generationSliceIntervalKey, [2] |> List.map string)
 
-    let genReportInterval5 = 
-        (runParameters.generationReportIntervalKey, [5] |> List.map string)
+    let genSliceInterval5 = 
+        (runParameters.generationSliceIntervalKey, [5] |> List.map string)
 
-    let genReportInterval10 = 
-        (runParameters.generationReportIntervalKey, [10] |> List.map string)
+    let genSliceInterval10 = 
+        (runParameters.generationSliceIntervalKey, [10] |> List.map string)
 
-    let genReportInterval20 = 
-        (runParameters.generationReportIntervalKey, [20] |> List.map string)
+    let genSliceInterval20 = 
+        (runParameters.generationSliceIntervalKey, [20] |> List.map string)
 
-    let genReportInterval50 = 
-        (runParameters.generationReportIntervalKey, [20] |> List.map string)
+    let genSliceInterval50 = 
+        (runParameters.generationSliceIntervalKey, [50] |> List.map string)
 
-    let genReportInterval100 = 
-        (runParameters.generationReportIntervalKey, [100] |> List.map string)
+    let genSliceInterval100 = 
+        (runParameters.generationSliceIntervalKey, [100] |> List.map string)
 
-    let genReportInterval200 = 
-        (runParameters.generationReportIntervalKey, [200] |> List.map string)
+    let genSliceInterval200 = 
+        (runParameters.generationSliceIntervalKey, [200] |> List.map string)
 
-    let genReportInterval500 = 
-        (runParameters.generationReportIntervalKey, [500] |> List.map string)
+    let genSliceInterval500 = 
+        (runParameters.generationSliceIntervalKey, [500] |> List.map string)
 
-    let genReportInterval1000 = 
-        (runParameters.generationReportIntervalKey, [1000] |> List.map string)
+    let genSliceInterval1000 = 
+        (runParameters.generationSliceIntervalKey, [1000] |> List.map string)
+
+    let genSliceIntervals = 
+        (runParameters.generationSliceIntervalKey, [5; 25; 100; 250] |> List.map string)
 
 
     // SorterCounts
@@ -509,6 +512,12 @@ module CommonParams =
     let mutationMod1 =
             (runParameters.mutationModKey, [1;] |> List.map string)
 
+    let mutationMods4a =
+            (runParameters.mutationModKey, [1; 2; 3; 4] |> List.map string)
+
+    let mutationMods4b =
+            (runParameters.mutationModKey, [5; 6; 7; 8] |> List.map string)
+
 
     // SorterPoolExpansionRates
 
@@ -526,10 +535,6 @@ module CommonParams =
 
     let sorterPoolExpansionRates =
             (runParameters.sorterPoolExpansionRateKey, [1.0; 2.0; 4.0; 8.0;] |> List.map string)
-
-
-
-
 
 
     let getStageLength 

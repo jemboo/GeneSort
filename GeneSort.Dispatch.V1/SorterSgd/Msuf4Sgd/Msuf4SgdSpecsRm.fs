@@ -70,7 +70,7 @@ module Msuf4SgdSpecsRm =
                 oneTwenty8SortersPerPool
                 oneChildCount
                 generationCurrent
-                genReportInterval1
+                genSliceInterval1
                 generationLast
                 sorterCountCycle20
                 sorterCountCycleMultipliers1n2
@@ -108,7 +108,7 @@ module Msuf4SgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
-                genReportInterval10
+                genSliceInterval10
                 generationLast
                 sortedFraction90
             ]
@@ -142,7 +142,7 @@ module Msuf4SgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
-                genReportInterval10
+                genSliceInterval10
                 generationLast
                 sortedFraction90
             ]

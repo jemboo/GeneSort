@@ -22,7 +22,7 @@ module MsrsSgdSpecsTestPrefix =
             |> List.map SorterEvalSelectionType.toString)
         
     let generationLastTest = 
-            (runParameters.generationLastKey, [250] |> List.map string)
+            (runParameters.generationLastKey, [500] |> List.map string)
 
     let generationLast = 
             (runParameters.generationLastKey, [5000] |> List.map string)
@@ -50,13 +50,13 @@ module MsrsSgdSpecsTestPrefix =
 
         let Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
             databaseName = MsrsSgdDbs.Prefix.dbName
-            runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for 24pfx4 Msuf4"
+            runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for 24pfx Msrs"
             spans = [
                 rngTypeLcg
                 generationCurrent
-                thirtyTwoSortersPerPool
-                poolCount8
+                sixteenSortersPerPool
+                poolCount16
                 oneChildCount
                 sorterEvalSelectionTypeGuid1K
                 sorterEvalMeasureInitial_CestM_noScw
@@ -73,11 +73,11 @@ module MsrsSgdSpecsTestPrefix =
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction99
-                genReportInterval50
+                genSliceIntervals
                 generationLastTest
                 sorterCountCycle100
                 sorterCountCycleMultiplier1
-                mutationMod1
+                mutationMods4b
                 sorterPoolExpansionRates
             ]
             filter = paramMapFilter
@@ -88,8 +88,8 @@ module MsrsSgdSpecsTestPrefix =
 
         let T4_P3 (executorType: sorterSgdExecutorType)  : runHostSpec = {
             databaseName = MsrsSgdDbs.Prefix.dbName
-            runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for 24pfx4 Msuf4"
+            runName = sprintf @"T4_P3_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for 24pfx Msrs"
             spans = [
                 rngTypeLcg
                 generationCurrent
@@ -111,7 +111,7 @@ module MsrsSgdSpecsTestPrefix =
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction99
-                genReportInterval500
+                genSliceInterval500
                 generationLast
                 sorterCountCycle500
                 sorterCountCycleMultipliersLow
