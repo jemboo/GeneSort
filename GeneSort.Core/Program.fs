@@ -48,8 +48,8 @@ module Example =
    // let rootDir = @"C:\Projects\SorterSgd.Msuf4\Prefix\Data\Report\TextReport_SorterRunResult_SummaryReport"
   //  let rootDir = @"C:\Projects\SorterSgd.Msuf4\Prefix\Data\Report\TextReport_SorterRunResult_SnapshotReport"
 
-   // let rootDir = @"C:\Projects\SorterSgd.Msrs\Prefix\Data\Report\TextReport_SorterRunResult_SnapshotReport"
-    let rootDir = @"C:\Projects\SorterSgd.Msrs\Prefix\Data\Report\TextReport_SorterRunResult_SummaryReport"
+    let rootDir = @"C:\Projects\SorterSgd.Msrs\Prefix\Data\Report\TextReport_SorterRunResult_SnapshotReport"
+   // let rootDir = @"C:\Projects\SorterSgd.Msrs\Prefix\Data\Report\TextReport_SorterRunResult_SummaryReport"
 
 
    // let rootDir = @"C:\Projects\SorterSgd.Msce\Rsu\Data\Report\TextReport_SorterRunResult_report"

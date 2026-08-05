@@ -25,7 +25,7 @@ module MsrsSgdSpecsTestPrefix =
             (runParameters.generationLastKey, [250] |> List.map string)
 
     let generationLast = 
-            (runParameters.generationLastKey, [10000] |> List.map string)
+            (runParameters.generationLastKey, [5000] |> List.map string)
 
     let generationCurrent = 
             (runParameters.generationCurrentKey, [0] |> List.map string)
@@ -103,7 +103,7 @@ module MsrsSgdSpecsTestPrefix =
                 msrsModelType
                 sorterEvalTypeV1
                 seedModificationRate02
-                modificationRatep04
+                modificationRatep06
                 orthoRate
                 paraRate
                 selfSymRate
@@ -113,7 +113,7 @@ module MsrsSgdSpecsTestPrefix =
                 sortedFraction99
                 genReportInterval500
                 generationLast
-                sorterCountCycle100
+                sorterCountCycle500
                 sorterCountCycleMultipliersLow
                 mutationMod1
                 sorterPoolExpansionRates
@@ -121,7 +121,7 @@ module MsrsSgdSpecsTestPrefix =
             filter = paramMapFilter
             enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 8
+            maxParallel = 16
         }
 
 
