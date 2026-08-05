@@ -512,6 +512,16 @@ module CommonParams =
     let mutationMod1 =
             (runParameters.mutationModKey, [1;] |> List.map string)
 
+    let mutationMod2 =
+            (runParameters.mutationModKey, [2;] |> List.map string)
+
+    let mutationMod3 =
+            (runParameters.mutationModKey, [3;] |> List.map string)
+
+    let mutationMod4 =
+            (runParameters.mutationModKey, [4;] |> List.map string)
+
+
     let mutationMods4a =
             (runParameters.mutationModKey, [1; 2; 3; 4] |> List.map string)
 

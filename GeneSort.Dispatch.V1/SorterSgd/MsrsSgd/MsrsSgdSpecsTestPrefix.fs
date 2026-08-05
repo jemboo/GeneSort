@@ -115,13 +115,13 @@ module MsrsSgdSpecsTestPrefix =
                 generationLast
                 sorterCountCycle500
                 sorterCountCycleMultipliersLow
-                mutationMod1
+                mutationMod2
                 sorterPoolExpansionRates
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 16
+            maxParallel = 8
         }
 
 
