@@ -13,6 +13,7 @@ open GeneSort.SortingOps
 open FsToolkit
 open System
 open GeneSort.Model.Sorting.V1
+open GeneSort.Core.MathUtils
 
 module EvolutionOrchestrator =
 
@@ -113,15 +114,18 @@ module EvolutionOrchestrator =
             (selectionMeasure: sorterEvalMeasure)
             (initialPoolSet: sorterPoolSet)
             (sortedFractionThreshold: float<sortedFraction>)
+            (snapshotReportInterval: essData)
+            (summaryReportInterval: essData)
+            (sorterPoolSelectionIntervals: essData)
             (cts: CancellationToken)
             (log: string -> unit) : Async<Result<sorterRunResult, string>> =
 
         let totalGenInt = int (genStart + genCount)
-
+        
         // --- Exponential Frequency Triggers ---
-        let targetGenerationsForSummaryReport = MathUtils.expSampler 1 totalGenInt MathUtils.kSample5K
-        let targetGenerationsForSaveRunResult = MathUtils.expSampler 1 totalGenInt MathUtils.cSample100K
-        let targetGenerationsForPoolExpansion = MathUtils.expSampler 1 totalGenInt MathUtils.cSample5C
+        let targetGenerationsForSummaryReport = EssData.expSampler 1 totalGenInt EssData.kSample5K None
+        let targetGenerationsForSaveRunResult = EssData.expSampler 1 totalGenInt EssData.cSample100K None
+        let targetGenerationsForPoolExpansion = EssData.expSampler 1 totalGenInt EssData.cSample5C None
 
         let rec loop 
                     (remainingSteps: int) 

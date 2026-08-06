@@ -3,6 +3,7 @@
 open GeneSort.Core
 open FSharp.UMX
 open System
+open GeneSort.Core.MathUtils
 
 
 
@@ -38,7 +39,7 @@ module Example =
 
 
 
-    let yab = MathUtils.expSampler 1 2000  MathUtils.cSampleC
+    let yab = EssData.expSampler 1 2000 EssData.cSampleC
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 

@@ -136,16 +136,14 @@ type runParameters =
         |> Option.map UMX.tag<excludeSelfCe>
 
     member this.GetGenerationCurrent() =
-        this.paramMap.TryFind runParameters.generationCurrentKey
-        |> Option.bind (fun v ->
-            try Some (SortableDataFormat.fromString v)
-            with _ -> None)
+        runParameters.tryGetInt runParameters.generationCurrentKey this.paramMap
+        |> Option.map UMX.tag<generationNumber>
 
     member this.GetGenerationFirst() =
         runParameters.tryGetInt runParameters.generationFirstKey this.paramMap
         |> Option.map UMX.tag<generationNumber>
 
-    member this.SorterPoolSelectionIntervals() =
+    member this.GetSorterPoolSelectionIntervals() =
         this.paramMap.TryFind runParameters.sorterPoolSelectionIntervalsKey
         |> Option.map (fun v -> essData.fromString(v))
 

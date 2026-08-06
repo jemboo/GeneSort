@@ -40,8 +40,9 @@ module MsceSgdExecutor =
                 // 1. Gather all required run metrics and options out of your parameters block securely
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
                 let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
-                let! genSliceInterval = rp.GetSnapshotReportIntervals() |> Result.ofOption "Missing generation slice interval."
-                let! genReportInterval = rp.GetSummaryReportIntervals() |> Result.ofOption "Missing generation report interval."
+                let! snapshotReportInterval = rp.GetSnapshotReportIntervals() |> Result.ofOption "Missing snapshot report interval."
+                let! summaryReportInterval = rp.GetSummaryReportIntervals() |> Result.ofOption "Missing summary report interval."
+                let! sorterPoolSelectionIntervals = rp.GetSorterPoolSelectionIntervals() |> Result.ofOption "Missing sorterPoolSelectionInterval."
                 let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
                 let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
                 let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count"
@@ -99,7 +100,9 @@ module MsceSgdExecutor =
                         sorterCountCycle sorterCountCycleMultiplier sorterPoolExpansionRate
                         sorterModelMutator prioritizeNewMutants distinctSorterHashes
                         sortersPerPool sorterChildCount sortableTest sorterEvalType
-                        sorterEvalMeasure initialSeedPoolSet sortedFraction cts.Token log
+                        sorterEvalMeasure initialSeedPoolSet sortedFraction 
+                        snapshotReportInterval summaryReportInterval sorterPoolSelectionIntervals
+                        cts.Token log
 
                 log "evaluateEvolutionRun completed."
                 let finalRp = rp.WithGenerationCurrent(Some genLast).WithRunFinished(Some true)
@@ -131,7 +134,7 @@ module MsceSgdExecutor =
     let fullReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                Reporting.makeSummaryReport
+                GeneSort.Dispatch.V1.SorterSgd.Reporting.makeSummaryReport
                     host rp allowOverwrite cts progress }
 
 
