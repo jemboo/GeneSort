@@ -37,37 +37,60 @@ module CommonParams =
 
     // Generation Slice Intervals
     let genSliceInterval1 = 
-        (runParameters.generationSliceIntervalKey, [1] |> List.map string)
+        (runParameters.snapshotReportIntervalsKey, [1] |> List.map string)
 
     let genSliceInterval2 = 
-        (runParameters.generationSliceIntervalKey, [2] |> List.map string)
+        (runParameters.snapshotReportIntervalsKey, [2] |> List.map string)
 
     let genSliceInterval5 = 
-        (runParameters.generationSliceIntervalKey, [5] |> List.map string)
+        (runParameters.snapshotReportIntervalsKey, [5] |> List.map string)
 
     let genSliceInterval10 = 
-        (runParameters.generationSliceIntervalKey, [10] |> List.map string)
+        (runParameters.snapshotReportIntervalsKey, [10] |> List.map string)
 
     let genSliceInterval20 = 
-        (runParameters.generationSliceIntervalKey, [20] |> List.map string)
+        (runParameters.snapshotReportIntervalsKey, [20] |> List.map string)
 
     let genSliceInterval50 = 
-        (runParameters.generationSliceIntervalKey, [50] |> List.map string)
+        (runParameters.snapshotReportIntervalsKey, [50] |> List.map string)
 
     let genSliceInterval100 = 
-        (runParameters.generationSliceIntervalKey, [100] |> List.map string)
+        (runParameters.snapshotReportIntervalsKey, [100] |> List.map string)
 
     let genSliceInterval200 = 
-        (runParameters.generationSliceIntervalKey, [200] |> List.map string)
+        (runParameters.snapshotReportIntervalsKey, [200] |> List.map string)
 
     let genSliceInterval500 = 
-        (runParameters.generationSliceIntervalKey, [500] |> List.map string)
+        (runParameters.snapshotReportIntervalsKey, [500] |> List.map string)
 
     let genSliceInterval1000 = 
-        (runParameters.generationSliceIntervalKey, [1000] |> List.map string)
+        (runParameters.snapshotReportIntervalsKey, [1000] |> List.map string)
 
     let genSliceIntervals = 
-        (runParameters.generationSliceIntervalKey, [5; 25; 100; 250] |> List.map string)
+        (runParameters.snapshotReportIntervalsKey, [5; 25; 100; 250] |> List.map string)
+
+
+
+    // Generation Report Intervals
+
+    let genReportInterval20 = 
+        (runParameters.summaryReportIntervalsKey, [20] |> List.map string)
+
+    let genReportInterval50 = 
+        (runParameters.summaryReportIntervalsKey, [50] |> List.map string)
+
+    let genReportInterval100 = 
+        (runParameters.summaryReportIntervalsKey, [100] |> List.map string)
+
+    let genReportInterval200 = 
+        (runParameters.summaryReportIntervalsKey, [200] |> List.map string)
+
+    let genReportInterval500 = 
+        (runParameters.summaryReportIntervalsKey, [500] |> List.map string)
+
+    let genReportInterval1000 = 
+        (runParameters.summaryReportIntervalsKey, [1000] |> List.map string)
+
 
 
     // SorterCounts

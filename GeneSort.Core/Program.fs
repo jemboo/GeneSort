@@ -38,7 +38,7 @@ module Example =
 
 
 
-   // let yab = MathUtils.expSampler 5000 1 MathUtils.cSample5K
+    let yab = MathUtils.expSampler 1 2000  MathUtils.cSampleC
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
@@ -49,14 +49,14 @@ module Example =
   //  let rootDir = @"C:\Projects\SorterSgd.Msuf4\Prefix\Data\Report\TextReport_SorterRunResult_SnapshotReport"
 
    //let rootDir = @"C:\Projects\SorterSgd.Msrs\Prefix\Data\Report\TextReport_SorterRunResult_SnapshotReport"
-    let rootDir = @"C:\Projects\SorterSgd.Msrs\Prefix\Data\Report\TextReport_SorterRunResult_SummaryReport"
+   // let rootDir = @"C:\Projects\SorterSgd.Msrs\Prefix\Data\Report\TextReport_SorterRunResult_SummaryReport"
 
 
    // let rootDir = @"C:\Projects\SorterSgd.Msce\Rsu\Data\Report\TextReport_SorterRunResult_report"
     //let rootDir = @"C:\Projects\SorterMutate.Msce\Rsu\Data\Report\TextReport_MutantReport"
-    DataTableIO.concatenateAllFiles 
-                rootDir
-                $"{rootDir}\\MergeReport_report.txt"
+    //DataTableIO.concatenateAllFiles 
+    //            rootDir
+    //            $"{rootDir}\\MergeReport_report.txt"
 
 
     printfn "end: %s" (DateTime.Now.ToLongTimeString())

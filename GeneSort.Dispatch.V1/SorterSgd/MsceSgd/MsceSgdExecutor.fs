@@ -40,7 +40,8 @@ module MsceSgdExecutor =
                 // 1. Gather all required run metrics and options out of your parameters block securely
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
                 let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
-                let! genSliceSize = rp.GetGenerationSliceInterval() |> Result.ofOption "Missing generation report interval."
+                let! genSliceInterval = rp.GetSnapshotReportIntervals() |> Result.ofOption "Missing generation slice interval."
+                let! genReportInterval = rp.GetSummaryReportIntervals() |> Result.ofOption "Missing generation report interval."
                 let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
                 let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
                 let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count"
@@ -91,23 +92,18 @@ module MsceSgdExecutor =
                         deletionRate
                     |> sorterModelMutator.Simple
 
-                // 3. Define the step strategy closure
-                let stepExecutionStrategy targetGenFirst stepSize workingPoolSet =
-                    SorterRunResult.runEvolutionAsync
-                        targetGenFirst stepSize sorterCountCycle sorterCountCycleMultiplier
-                        sorterModelMutator prioritizeNewMutants 
-                        distinctSorterHashes sortersPerPool sorterChildCount sortableTest 
-                        sorterEvalType sorterEvalMeasure workingPoolSet sortedFraction cts.Token log
+                log "Executing unified evolution run..."
+                let! (finalRunResult :sorterRunResult) = 
+                    EvolutionOrchestrator.runEvolutionAsync
+                        host rp allowOverwrite genCurrent (genLast - genCurrent)
+                        sorterCountCycle sorterCountCycleMultiplier sorterPoolExpansionRate
+                        sorterModelMutator prioritizeNewMutants distinctSorterHashes
+                        sortersPerPool sorterChildCount sortableTest sorterEvalType
+                        sorterEvalMeasure initialSeedPoolSet sortedFraction cts.Token log
 
-                // 4. Hand execution over to the centralized orchestrator loop
-                log "Executing chunked SorterRunResult loop via loop manager..."
-                let! finalRp: runParameters = 
-                    EvolutionOrchestrator.runSlicesInLoop
-                        host rp genCurrent genLast genSliceSize sorterEvalMeasure sorterPoolExpansionRate
-                        initialSeedPoolSet allowOverwrite cts.Token log stepExecutionStrategy
-                
                 log "evaluateEvolutionRun completed."
-                return finalRp.WithRunFinished (Some true)
+                let finalRp = rp.WithGenerationCurrent(Some genLast).WithRunFinished(Some true)
+                return finalRp
 
             with e -> 
                 let errorMsg = sprintf "Error in evaluateEvolutionRun: %s" e.Message

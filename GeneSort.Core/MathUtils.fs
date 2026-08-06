@@ -41,16 +41,11 @@ module MathUtils =
     // 1.0103 -> 1000 samples per 10^6
     
 
-    let xSample5C = 1.041
-    let xSample1K = 1.05
-    let xSample5K = 1.07
-    let xSample10K = 1.08
-    let xSample50K = 1.1
-    let xSample100K = 1.1113
-    let xSample500K = 1.13
-
+    let xSampleC = 1.582
+    let xSample5C = 1.992
+    let xSample1K = 2.153
     
-    let cSampleS = 1.001
+    let cSampleC = 1.001
     let cSample5C = 1.041
     let cSample1K = 1.05
     let cSample5K = 1.07
@@ -66,7 +61,8 @@ module MathUtils =
     let ksample500K = 1.0095
     let ksample1M = 1.0103
 
-    let expSampler (minInt:int) (maxInt:int) (increaseRatio:float) :Set<int> =
+    let expSampler 
+                (minInt:int) (maxInt:int) (increaseRatio:float) :Set<int> =
         let rec computeTargets currentVal acc =
             let nextVal = currentVal * increaseRatio
             let nextInt = int (ceil nextVal)
@@ -77,6 +73,51 @@ module MathUtils =
 
         computeTargets minInt [minInt;] 
 
+
+    let expSampleAndScale
+                (minInt:int) (maxInt:int) 
+                (increaseRatio:float) (scale:float) : Set<int> =
+        expSampler minInt maxInt increaseRatio
+        |> Set.map (fun x -> int (ceil (float x * scale)))
+
+
+    type essData = 
+        private {
+            exp:float
+            scale:float
+        } with 
+
+        static member create (exp:float) (scale:float) : essData =
+            { exp = exp; scale = scale }
+
+        member this.Exp with get() = this.exp
+
+        member this.Scale with get() = this.scale
+
+        member this.getSampleSet (min:int) (max:int) : Set<int> =
+            expSampleAndScale min max this.exp this.scale
+
+        member this.toString() : string =
+            sprintf "exp: %f, scale: %f" this.exp this.scale
+
+        static member fromString (s:string) : essData =
+            let parts = s.Split([|','|], StringSplitOptions.RemoveEmptyEntries)
+            if parts.Length <> 2 then
+                invalidArg "s" "Input string must contain exactly two parts separated by a comma."
+            else
+                let expPart = parts.[0].Trim()
+                let scalePart = parts.[1].Trim()
+                let expValue = 
+                    if expPart.StartsWith("exp:") then
+                        expPart.Substring(4).Trim() |> float
+                    else
+                        invalidArg "s" "First part must start with 'exp:'."
+                let scaleValue = 
+                    if scalePart.StartsWith("scale:") then
+                        scalePart.Substring(6).Trim() |> float
+                    else
+                        invalidArg "s" "Second part must start with 'scale:'."
+                { exp = expValue; scale = scaleValue }
 
 
     let getTimestampString () =

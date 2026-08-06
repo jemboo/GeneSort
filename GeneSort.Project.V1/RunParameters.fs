@@ -9,6 +9,7 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.SortingLib.Sorter
+open GeneSort.Core.MathUtils
 
 type runParameters =
     private { paramMap : Map<string, string> }
@@ -29,7 +30,9 @@ type runParameters =
     static member excludeSelfCeKey = "ExcludeSelfCe"
     static member generationCurrentKey = "GenerationCurrent"
     static member generationFirstKey = "GenerationFirst"
-    static member generationSliceIntervalKey = "GenerationReportInterval"
+    static member snapshotReportIntervalsKey = "SnapshotReportIntervals"
+    static member summaryReportIntervalsKey = "SummaryReportIntervals"
+    static member sorterPoolSelectionIntervalsKey = "SorterPoolSelectionIntervals"
     static member generationLastKey = "GenerationLast"
     static member idKey = "Id"
     static member insertionRateKey = "InsertionRate"
@@ -133,16 +136,26 @@ type runParameters =
         |> Option.map UMX.tag<excludeSelfCe>
 
     member this.GetGenerationCurrent() =
-        runParameters.tryGetInt runParameters.generationCurrentKey this.paramMap
-        |> Option.map UMX.tag<generationNumber>
+        this.paramMap.TryFind runParameters.generationCurrentKey
+        |> Option.bind (fun v ->
+            try Some (SortableDataFormat.fromString v)
+            with _ -> None)
 
     member this.GetGenerationFirst() =
         runParameters.tryGetInt runParameters.generationFirstKey this.paramMap
         |> Option.map UMX.tag<generationNumber>
 
-    member this.GetGenerationSliceInterval() =
-        runParameters.tryGetInt runParameters.generationSliceIntervalKey this.paramMap
-        |> Option.map UMX.tag<generationNumber>
+    member this.SorterPoolSelectionIntervals() =
+        this.paramMap.TryFind runParameters.sorterPoolSelectionIntervalsKey
+        |> Option.map (fun v -> essData.fromString(v))
+
+    member this.GetSummaryReportIntervals() =
+        this.paramMap.TryFind runParameters.summaryReportIntervalsKey
+        |> Option.map (fun v -> essData.fromString(v))
+
+    member this.GetSnapshotReportIntervals() =
+        this.paramMap.TryFind runParameters.snapshotReportIntervalsKey
+        |> Option.map (fun v -> essData.fromString(v))
 
     member this.GetGenerationLast() =
         runParameters.tryGetInt runParameters.generationLastKey this.paramMap
@@ -351,8 +364,14 @@ type runParameters =
     member this.WithGenerationFirst(gen: int<generationNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationFirstKey (gen |> Option.map UmxExt.intToRaw) }
 
-    member this.WithGenerationSliceInterval(gen: int<generationNumber> option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationSliceIntervalKey (gen |> Option.map UmxExt.intToRaw) }
+    member this.WithSorterPoolSelectionIntervals(essd: essData option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterPoolSelectionIntervalsKey (essd |> Option.map (fun e -> e.toString())) }
+
+    member this.WithSummaryReportIntervals(essd: essData option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterPoolSelectionIntervalsKey (essd |> Option.map (fun e -> e.toString())) }
+
+    member this.WithSnapshotReportIntervals(essd: essData option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterPoolSelectionIntervalsKey (essd |> Option.map (fun e -> e.toString())) }
 
     member this.WithGenerationLast(gen: int<generationNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationLastKey (gen |> Option.map UmxExt.intToRaw) }

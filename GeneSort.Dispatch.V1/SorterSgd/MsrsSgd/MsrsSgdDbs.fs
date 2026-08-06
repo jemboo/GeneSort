@@ -69,7 +69,7 @@ module MsrsSgdDbs =
                        (runParameters.prioritizeNewMutantsKey, (Some %pNm) |> string)
                        (runParameters.sortedFractionKey, (Some %sfrac) |> string)
                        (runParameters.sorterPoolExpansionRateKey, (Some %sper) |> string)
-                       (runParameters.generationSliceIntervalKey, (Some %sli) |> string)
+                       (runParameters.snapshotReportIntervalsKey, (Some %sli) |> string)
                        (runParameters.mutationModKey, (Some %mmod) |> string)
                     |]
 
@@ -98,7 +98,7 @@ module MsrsSgdDbs =
                     let! pNm = rp.GetPrioritizeNewMutants()
                     let! sfrac = rp.GetSortedFraction()
                     let! sper = rp.GetSorterPoolExpansionRate()
-                    let! sli = rp.GetGenerationSliceInterval()
+                    let! sli = rp.GetSnapshotReportIntervals()
                     let! mmod = rp.GetMutationMod()
                     return makeQueryParams rng curGen scPP spc scc ses
                                            sem semi repl sw smt set ortho 
@@ -168,7 +168,7 @@ module MsrsSgdDbs =
                     (runParameters.distinctSorterHashesKey, (Some %dsh) |> string)
                     (runParameters.sortedFractionKey, (Some %sfrac) |> string)
                     (runParameters.sorterPoolExpansionRateKey, (Some %sper) |> string)
-                    (runParameters.generationSliceIntervalKey, (Some %sli) |> string)
+                    (runParameters.snapshotReportIntervalsKey, (Some %sli) |> string)
                     (runParameters.mutationModKey, (Some %mmod) |> string)
                 |]
 
@@ -199,7 +199,7 @@ module MsrsSgdDbs =
                 let! dsh = rp.GetDistinctSorterHashes()
                 let! sfrac = rp.GetSortedFraction()
                 let! sper = rp.GetSorterPoolExpansionRate()
-                let! sli = rp.GetGenerationSliceInterval()
+                let! sli = rp.GetSnapshotReportIntervals()
                 let! mmod = rp.GetMutationMod()
                 return makeQueryParams rng curGen scPP spc scc ses sem
                                         semi repl sw smt md mst sdf set 
@@ -275,7 +275,7 @@ module MsrsSgdDbs =
                     (runParameters.prioritizeNewMutantsKey, (Some %pNm) |> string)
                     (runParameters.sortedFractionKey, (Some %sfrac) |> string)
                     (runParameters.sorterPoolExpansionRateKey, (Some %sper) |> string)
-                    (runParameters.generationSliceIntervalKey, (Some %sli) |> string)
+                    (runParameters.snapshotReportIntervalsKey, (Some %sli) |> string)
                     (runParameters.mutationModKey, (Some %mmod) |> string)
                 |]
 
@@ -308,7 +308,7 @@ module MsrsSgdDbs =
                 let! pNm = rp.GetPrioritizeNewMutants()
                 let! sfrac = rp.GetSortedFraction()
                 let! sper = rp.GetSorterPoolExpansionRate()
-                let! sli = rp.GetGenerationSliceInterval()
+                let! sli = rp.GetSnapshotReportIntervals()
                 let! mmod = rp.GetMutationMod()
                 return makeQueryParams repl rng curGen scPP sctc sctm 
                                        spc scc ses sem semi slId smt 

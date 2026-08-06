@@ -112,6 +112,7 @@ module MsrsSgdSpecsTestPrefix =
                 prioritizeNewMutantsTrue
                 sortedFraction99
                 genSliceInterval500
+                genReportInterval200
                 generationLast
                 sorterCountCycle500
                 sorterCountCycleMultipliersLow
