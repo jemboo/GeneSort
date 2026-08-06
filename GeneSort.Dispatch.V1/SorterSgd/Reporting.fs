@@ -1,11 +1,11 @@
 ﻿namespace GeneSort.Dispatch.V1.SorterSgd
 
+open System
+open FSharp.UMX
 open GeneSort.Project.V1
 open GeneSort.Core
 open GeneSort.Db.V1
 open FsToolkit.ErrorHandling
-open FSharp.UMX
-open System
 open GeneSort.Dispatch.V1
 open System.Threading
 open GeneSort.Dispatch.V1.OpsUtils
@@ -30,15 +30,15 @@ module Reporting =
                 do! checkCancellation cts.Token                
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
                 let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
-                let! genSliceSize = rp.GetSnapshotReportIntervals() |> Result.ofOption "Missing generation report interval."
+                let! essSnapshotIntervals = rp.GetSnapshotReportIntervals() |> Result.ofOption "Missing generation report interval."
 
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
 
                 // 1. Calculate the target generation slices
-                let reportGenerations = 
-                    [ (%genCurrent + %genSliceSize) .. %genSliceSize .. %genLast ]
-                    |> List.map UMX.tag<generationNumber>
+                let reportGenerations = EssData.getSamplesInOrder essSnapshotIntervals %genLast %genCurrent
+                                        |> Seq.map(UMX.tag<generationNumber>) 
+                                        |> Seq.toList
 
                 if List.isEmpty reportGenerations then
                     return! Error "No generation steps calculated for the full report. Verify genCurrent, genLast, and genSliceSize bounds."
@@ -109,15 +109,15 @@ module Reporting =
                 do! checkCancellation cts.Token                
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
                 let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
-                let! genSliceSize = rp.GetSnapshotReportIntervals() |> Result.ofOption "Missing generation report interval."
+                let! essSnapshotIntervals = rp.GetSnapshotReportIntervals() |> Result.ofOption "Missing generation report interval."
 
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
 
                 // 1. Calculate the target generation slices
-                let reportGenerations = 
-                    [ %genCurrent .. %genSliceSize .. %genLast ]
-                    |> List.map UMX.tag<generationNumber>
+                let reportGenerations = EssData.getSamplesInOrder essSnapshotIntervals %genLast %genCurrent
+                                        |> Seq.map(UMX.tag<generationNumber>) 
+                                        |> Seq.toList
 
                 if List.isEmpty reportGenerations then
                     return! Error "No generation steps calculated for the full report. Verify genCurrent, genLast, and genSliceSize bounds."

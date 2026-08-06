@@ -100,8 +100,12 @@ module EssData =
 
     let create exp scale maxCount = essData.create exp scale maxCount
 
-    let getSampleSet (ess:essData) min max = 
+    let getSampleSet (ess:essData) min max : Set<int> = 
         expSampleAndScale min max ess.Exp ess.Scale ess.MaxCount
+
+    let getSamplesInOrder (ess:essData) min max = 
+        expSampler min max ess.Exp ess.MaxCount
+        |> Set.toSeq |> Seq.sort
 
     let toString (ess:essData option) = 
         match ess with
