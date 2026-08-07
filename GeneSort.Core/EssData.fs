@@ -2,36 +2,39 @@
 
 open System
 
-
 type essData = 
     private {
-        exp:float
-        scale:float
-        maxCount:int option
+        exp: float
+        scale: float
+        min: int
+        maxCount: int option
     } with 
 
-    static member create (exp:float) (scale:float) (maxCt:int option) : essData =
-        { exp = exp; scale = scale; maxCount = maxCt }
+    static member create (exp:float) (scale:float) (min:int) (maxCt:int option) : essData =
+        { exp = exp; scale = scale; min = min; maxCount = maxCt }
 
+    /// Returns an Empty instance with maxCount = Some 0 to naturally yield empty sets.
     static member Empty : essData = 
-            { exp = 1.0; scale = 1.0; maxCount = Some 0 }
+        { exp = 1.0; scale = 1.0; min = 0; maxCount = Some 0 }
 
     member this.Exp with get() = this.exp
-    member this.MaxCount with get() = this.maxCount
     member this.Scale with get() = this.scale
+    member this.Min with get() = this.min
+    member this.MaxCount with get() = this.maxCount
 
     member this.toString() : string =
         match this.maxCount with
-        | Some mc -> sprintf "exp: %f, scale: %f, maxCount: %d" this.exp this.scale mc
-        | None -> sprintf "exp: %f, scale: %f" this.exp this.scale
+        | Some mc -> sprintf "exp: %f, scale: %f, min: %d, maxCount: %d" this.exp this.scale this.min mc
+        | None -> sprintf "exp: %f, scale: %f, min: %d" this.exp this.scale this.min
 
     static member fromString (s:string) : essData =
         let parts = s.Split([|','|], StringSplitOptions.RemoveEmptyEntries)
-        if parts.Length < 2 || parts.Length > 3 then
-            invalidArg "s" "Input string must contain two or three parts separated by commas."
+        if parts.Length < 3 || parts.Length > 4 then
+            invalidArg "s" "Input string must contain three or four parts separated by commas."
         else
             let expPart = parts.[0].Trim()
             let scalePart = parts.[1].Trim()
+            let minPart = parts.[2].Trim()
 
             let expValue = 
                 if expPart.StartsWith("exp:") then
@@ -45,18 +48,23 @@ type essData =
                 else
                     invalidArg "s" "Second part must start with 'scale:'."
 
+            let minValue = 
+                if minPart.StartsWith("min:") then
+                    minPart.Substring(4).Trim() |> int
+                else
+                    invalidArg "s" "Third part must start with 'min:'."
+
             let maxCountValue =
-                if parts.Length = 3 then
-                    let maxCountPart = parts.[2].Trim()
+                if parts.Length = 4 then
+                    let maxCountPart = parts.[3].Trim()
                     if maxCountPart.StartsWith("maxCount:") then
                         Some (maxCountPart.Substring(9).Trim() |> int)
                     else
-                        invalidArg "s" "Third part must start with 'maxCount:'."
+                        invalidArg "s" "Fourth part must start with 'maxCount:'."
                 else
                     None
 
-            { exp = expValue; scale = scaleValue; maxCount = maxCountValue }
-
+            { exp = expValue; scale = scaleValue; min = minValue; maxCount = maxCountValue }
 
 
 module EssData = 
@@ -65,6 +73,8 @@ module EssData =
                 (minInt:int) (maxInt:int) (increaseRatio:float) (maxCount:int option) : Set<int> =
         match maxCount with
         | Some mc when mc <= 0 -> 
+            Set.empty
+        | _ when minInt > maxInt || minInt <= 0 ->
             Set.empty
         | _ ->
             let rec computeTargets currentVal acc =
@@ -75,37 +85,38 @@ module EssData =
                 else 
                     computeTargets nextVal (nextInt :: acc)
 
-            let rawList = computeTargets minInt [minInt]
-        
+            let rawList = computeTargets (float minInt) [minInt]
+            
             match maxCount with
-            | Some mc when mc = 1 ->
-                Set.singleton (List.last rawList)
-            | Some mc when mc > 1 && rawList.Length > mc ->
-                let step = float (rawList.Length - 1) / float (mc - 1)
-                [ 0 .. mc - 1 ]
-                |> List.map (fun i -> 
-                    let idx = int (round (float i * step))
-                    rawList.[idx])
-                |> Set.ofList
-            | _ -> 
-                rawList |> Set.ofList
+                    | Some mc -> 
+                        rawList 
+                        |> Set.ofList
+                        |> Set.toSeq
+                        |> Seq.sort
+                        |> Seq.truncate mc
+                        |> Set.ofSeq
+                    | None -> 
+                        rawList 
+                        |> Set.ofList
 
 
-    let expSampleAndScale
+    let expSampleAndScale 
                 (minInt:int) (maxInt:int) 
                 (increaseRatio:float) (scale:float) (maxCount:int option) : Set<int> =
-        expSampler minInt maxInt increaseRatio maxCount
-        |> Set.map (fun x -> int (ceil (float x * scale)))
+        let samples = expSampler minInt maxInt increaseRatio maxCount
+        samples |> Set.map (fun x -> int (ceil (float x * scale)))
 
+    let empty = essData.Empty
 
-    let create exp scale maxCount = essData.create exp scale maxCount
+    let create exp scale min maxCount = essData.create exp scale min maxCount
 
-    let getSampleSet (ess:essData) min max : Set<int> = 
-        expSampleAndScale min max ess.Exp ess.Scale ess.MaxCount
+    let getSampleSet (ess:essData) (max:int) : Set<int> = 
+        expSampleAndScale ess.Min max ess.Exp ess.Scale ess.MaxCount
 
-    let getSamplesInOrder (ess:essData) min max = 
-        expSampler min max ess.Exp ess.MaxCount
-        |> Set.toSeq |> Seq.sort
+    let getSamplesInOrder (ess:essData) (max:int) : int seq = 
+        expSampleAndScale ess.Min max ess.Exp ess.Scale ess.MaxCount
+        |> Set.toSeq 
+        |> Seq.sort
 
     let toString (ess:essData option) = 
         match ess with

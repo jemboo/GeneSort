@@ -65,7 +65,7 @@ module Msuf4SgdSpecsTestPrefix =
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction99
-                genSliceInterval20
+                runResultReportInterval100
                 generationLast
                 sorterCountCycle500
                 sorterCountCycleMultipliersLow

@@ -35,61 +35,70 @@ module CommonParams =
              [simpleSorterModelType.Msuf4] |> List.map SimpleSorterModelType.toString)
 
 
-    // Generation Slice Intervals
-    let genSliceInterval1 = 
-        (runParameters.snapshotReportIntervalsKey, [1] |> List.map string)
 
-    let genSliceInterval2 = 
-        (runParameters.snapshotReportIntervalsKey, [2] |> List.map string)
+    // RunResult report Intervals
+    let min1 = 1
+    let min2 = 2
+    let min25 = 25
+    let min50 = 50
+    let min100 = 100
+    let scale1 = 1
+    let scale10 = 10
+    let scale25 = 25
+    let scale50 = 50
+    let scale100 = 100
+    let scale500 = 500
+    let scale1K = 1000
+    let scale5K = 5000
 
-    let genSliceInterval5 = 
-        (runParameters.snapshotReportIntervalsKey, [5] |> List.map string)
+    let runResultReportInterval10 = 
+        (runParameters.snapshotReportIntervalsKey, [EssData.create EssData.cSampleC scale10 min1 None |> Some] |> List.map EssData.toString)
 
-    let genSliceInterval10 = 
-        (runParameters.snapshotReportIntervalsKey, [10] |> List.map string)
+    let runResultReportInterval100 = 
+        (runParameters.snapshotReportIntervalsKey, [EssData.create EssData.cSampleC scale100 min1 None |> Some] |> List.map EssData.toString)
 
-    let genSliceInterval20 = 
-        (runParameters.snapshotReportIntervalsKey, [20] |> List.map string)
+    let runResultReportInterval500 = 
+        (runParameters.snapshotReportIntervalsKey, [EssData.create EssData.cSampleC scale500 min1 None |> Some] |> List.map EssData.toString)
 
-    let genSliceInterval50 = 
-        (runParameters.snapshotReportIntervalsKey, [50] |> List.map string)
+    let runResultReportInterval1000 = 
+        (runParameters.snapshotReportIntervalsKey, [EssData.create EssData.cSampleC scale1K min1 None |> Some] |> List.map  EssData.toString)
 
-    let genSliceInterval100 = 
-        (runParameters.snapshotReportIntervalsKey, [100] |> List.map string)
+        
+    // SummaryReport Intervals
 
-    let genSliceInterval200 = 
-        (runParameters.snapshotReportIntervalsKey, [200] |> List.map string)
+    let summaryReport_cSample5C = 
+        (runParameters.summaryReportIntervalsKey, [EssData.create EssData.cSample5C scale1 min25 None |> Some] |> List.map EssData.toString)
 
-    let genSliceInterval500 = 
-        (runParameters.snapshotReportIntervalsKey, [500] |> List.map string)
+    let summaryReport_cSample1K = 
+        (runParameters.summaryReportIntervalsKey, [EssData.create EssData.cSample1K scale1 min25 None |> Some] |> List.map EssData.toString)
 
-    let genSliceInterval1000 = 
-        (runParameters.snapshotReportIntervalsKey, [1000] |> List.map string)
-
-    let genSliceIntervals = 
-        (runParameters.snapshotReportIntervalsKey, [5; 25; 100; 250] |> List.map string)
+    let summaryReport_cSample5K = 
+        (runParameters.summaryReportIntervalsKey, [EssData.create EssData.cSample5K scale1 min25 None |> Some] |> List.map EssData.toString)
 
 
 
-    // Generation Report Intervals
+    // SorterPool expansion Intervals
+    let sorterPoolExpEmpty = 
+        (runParameters.sorterPoolSelectionIntervalsKey, [essData.Empty |> Some] |> List.map EssData.toString)
 
-    let genReportInterval20 = 
-        (runParameters.summaryReportIntervalsKey, [20] |> List.map string)
+    let sorterPoolExp25_10 = 
+        (runParameters.sorterPoolSelectionIntervalsKey, [EssData.create EssData.cSampleC scale10 min2 (Some 10) |> Some] |> List.map EssData.toString)
 
-    let genReportInterval50 = 
-        (runParameters.summaryReportIntervalsKey, [50] |> List.map string)
+    let sorterPoolExp50_10 = 
+        (runParameters.sorterPoolSelectionIntervalsKey, [EssData.create EssData.cSampleC scale50 min2 (Some 10) |> Some] |> List.map EssData.toString)
 
-    let genReportInterval100 = 
-        (runParameters.summaryReportIntervalsKey, [100] |> List.map string)
+    let sorterPoolExp100_10 = 
+        (runParameters.sorterPoolSelectionIntervalsKey, [EssData.create EssData.cSampleC scale100 min2 (Some 10) |> Some] |> List.map EssData.toString)
 
-    let genReportInterval200 = 
-        (runParameters.summaryReportIntervalsKey, [200] |> List.map string)
+    let sorterPoolExp25_20i = 
+        (runParameters.sorterPoolSelectionIntervalsKey, [EssData.create EssData.xSample5C scale10 min1 (Some 20) |> Some] |> List.map EssData.toString)
 
-    let genReportInterval500 = 
-        (runParameters.summaryReportIntervalsKey, [500] |> List.map string)
+    let sorterPoolExp50_10i = 
+        (runParameters.sorterPoolSelectionIntervalsKey, [EssData.create EssData.xSample5C scale50 min1 (Some 10) |> Some] |> List.map EssData.toString)
 
-    let genReportInterval1000 = 
-        (runParameters.summaryReportIntervalsKey, [1000] |> List.map string)
+    let sorterPoolExp100_10i = 
+        (runParameters.sorterPoolSelectionIntervalsKey, [EssData.create EssData.xSample5C scale100 min1 (Some 10) |> Some] |> List.map EssData.toString)
+
 
 
 
@@ -258,6 +267,7 @@ module CommonParams =
 
 
     // MutationRates
+
     let mutationRates =
             (runParameters.mutationRateKey, [1.0] |> List.map string)
     let insertionRates =
@@ -271,7 +281,10 @@ module CommonParams =
     let selfSymRate =  (runParameters.selfSymRateKey, [2.001; ] |> List.map string)
     let selfSymRates =  (runParameters.selfSymRateKey, [1.5; 2.001; ] |> List.map string)
 
+
+
     // SeedModificationRates
+
     let seedModificationRate02 =
             (runParameters.seedModificationRateKey, [0.02] |> List.map string)
     let seedModificationRate03 =
@@ -294,9 +307,8 @@ module CommonParams =
             (runParameters.seedModificationRateKey, [0.10; 0.14] |> List.map string)
 
 
+
     // ModificationRates
-    //let modificationRatesMsce =
-    //        (runParameters.modificationRateKey, [ 0.00125; 0.005; 0.02; 0.08 ] |> List.map string)
 
     let modificationRatesStageR =
             (runParameters.modificationRateKey, [ 0.08; 0.09; 0.10; 0.11; 0.12; 0.13; 0.14; 0.15;] |> List.map string)
@@ -338,7 +350,10 @@ module CommonParams =
     let modificationRatesMsceCenter =
             (runParameters.modificationRateKey, [0.01; 0.02; 0.03; 0.04; 0.05; 0.06; 0.07; 0.08;] |> List.map string)
 
+
+
     // prioritizeNewMutants
+
     let prioritizeNewMutantsBoth = 
             (runParameters.prioritizeNewMutantsKey, 
             [ true; false ] |> List.map string)
@@ -363,6 +378,8 @@ module CommonParams =
 
     let distinctSorterHashesFalse = 
             (runParameters.distinctSorterHashesKey, [false] |> List.map string)
+
+
 
 
     // SortableTestFilters
@@ -390,10 +407,6 @@ module CommonParams =
             (runParameters.sortableTestFilterKey, 
             [_sortableTestFilter_Prefix24_3a; _sortableTestFilter_Prefix24_3b] |> List.map SorterLibId.toString)
 
-
-
-
-
     let sortableTestFilter_Prefix24s = 
             (runParameters.sortableTestFilterKey, 
             [   _sortableTestFilter_Prefix24_4a
@@ -401,9 +414,6 @@ module CommonParams =
                 _sortableTestFilter_Prefix24_3a
                 _sortableTestFilter_Prefix24_3b
             ] |> List.map SorterLibId.toString)
-
-
-
 
     let _sortableTestFilter_Prefix28_4 = 
             SorterLibId.create (28<sortingWidth>) sorterVariant.Prefix4a

@@ -4,7 +4,6 @@ open FSharp.UMX
 open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
-open GeneSort.SortingOps
 open GeneSort.Sorting
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.CommonParams
@@ -70,7 +69,7 @@ module Msuf4SgdSpecsRm =
                 oneTwenty8SortersPerPool
                 oneChildCount
                 generationCurrent
-                genSliceInterval1
+                runResultReportInterval500
                 generationLast
                 sorterCountCycle20
                 sorterCountCycleMultipliers1n2
@@ -108,7 +107,7 @@ module Msuf4SgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
-                genSliceInterval10
+                runResultReportInterval10
                 generationLast
                 sortedFraction90
             ]
@@ -142,7 +141,7 @@ module Msuf4SgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
-                genSliceInterval10
+                runResultReportInterval500
                 generationLast
                 sortedFraction90
             ]

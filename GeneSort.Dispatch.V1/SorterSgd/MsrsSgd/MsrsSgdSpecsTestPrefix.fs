@@ -73,7 +73,7 @@ module MsrsSgdSpecsTestPrefix =
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction99
-                genSliceIntervals
+                runResultReportInterval100
                 generationLastTest
                 sorterCountCycle100
                 sorterCountCycleMultiplier1
@@ -111,8 +111,8 @@ module MsrsSgdSpecsTestPrefix =
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction99
-                genSliceInterval500
-                genReportInterval200
+                runResultReportInterval1000
+                runResultReportInterval100
                 generationLast
                 sorterCountCycle500
                 sorterCountCycleMultipliersLow

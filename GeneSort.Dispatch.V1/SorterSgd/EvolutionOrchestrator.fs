@@ -10,88 +10,10 @@ open GeneSort.Db.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.SortingOps
-open FsToolkit
 open System
 open GeneSort.Model.Sorting.V1
-open GeneSort.Core.MathUtils
 
 module EvolutionOrchestrator =
-
-    let saveCheckpoint
-            (host: IRunHost)
-            (currentRp: runParameters)
-            (currentGen: int<generationNumber>)
-            (runResult: sorterRunResult)
-            (allowOverwrite: bool<allowOverwrite>)
-            (log: string -> unit) =
-        asyncResult {
-            let stepRp = currentRp.WithGenerationCurrent(Some currentGen)
-            let! qp = 
-                host.RunDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterRunResult "")
-                |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
-
-            log (sprintf "Saving SorterRunResult for generation %d - Id: %s" %currentGen (string qp.Id))
-            do! host.RunDb.saveAsync qp (runResult |> outputData.SorterRunResult) allowOverwrite
-            return stepRp
-        }
-
-    let runSlicesInLoop
-            (host: IRunHost)
-            (rp: runParameters)
-            (genFirst: int<generationNumber>)
-            (genLast: int<generationNumber>)
-            (genSliceInterval: int<generationNumber>)
-            (genReportInterval: int<generationNumber>)
-            (measure: sorterEvalMeasure)
-            (sorterPoolExpansionRate: int<sorterPoolExpansionRate>)
-            (initialSeedPoolSet: sorterPoolSet)
-            (allowOverwrite: bool<allowOverwrite>)
-            (cts: CancellationToken)
-            (log: string -> unit)
-            (runSliceAsync: int<generationNumber> -> int<generationNumber> -> sorterPoolSet -> Async<Result<sorterRunResult, string>>) 
-            : Async<Result<runParameters, string>> =
-
-        let rec stepLoop 
-                    (currentGen: int<generationNumber>) 
-                    (currentPoolSet: sorterPoolSet) 
-                    (currentRp: runParameters) =
-
-            asyncResult {
-                if currentGen >= genLast then
-                    return currentRp
-                else
-                    do! checkCancellation cts
-
-                    // 1. Calculate step size driven by the reporting interval (or remaining count)
-                    let stepSize = min genReportInterval (genLast - currentGen)
-                    let nextGen = currentGen + stepSize
-
-                    // 2. Pool Expansion: Run every `genSliceInterval` generations (or at start gen 0)
-                    let expandedPoolSet =
-                        if (%currentGen > 0) && (%currentGen % %genSliceInterval = 0) && (sorterPoolExpansionRate > 1<sorterPoolExpansionRate>) then
-                            log (sprintf "Expanding pools at Generation %d (Rate: %d)..." %currentGen %sorterPoolExpansionRate)
-                            currentPoolSet
-                            |> SorterPoolSet.trimPools sorterPoolExpansionRate measure
-                            |> SorterPoolSet.expandPools sorterPoolExpansionRate
-                        else
-                            currentPoolSet
-
-                    log (sprintf "Stepping evolution: Generation %d -> %d..." %currentGen %nextGen)
-                    let! runResult = runSliceAsync currentGen stepSize expandedPoolSet
-                    do! checkCancellation cts
-
-                    // 3. Database Persistence: Run every `genReportInterval` generations (or at run end)
-                    let! updatedRp =
-                        if (%nextGen % %genReportInterval = 0) || (nextGen >= genLast) then
-                            saveCheckpoint host currentRp nextGen runResult allowOverwrite log
-                        else
-                            asyncResult { return currentRp.WithGenerationCurrent(Some nextGen) }
-
-                    return! stepLoop nextGen runResult.FinalPoolSet updatedRp
-            }
-
-        stepLoop genFirst initialSeedPoolSet rp
-
 
     /// Asynchronously runs evolution step-by-step over genCount generations.
     /// Handles exponential sampling triggers for history accumulation, pool expansion, and DB persistence.
@@ -123,9 +45,15 @@ module EvolutionOrchestrator =
         let totalGenInt = int (genStart + genCount)
         
         // --- Exponential Frequency Triggers ---
-        let targetGenerationsForSummaryReport = EssData.expSampler 1 totalGenInt EssData.kSample5K None
-        let targetGenerationsForSaveRunResult = EssData.expSampler 1 totalGenInt EssData.cSample100K None
-        let targetGenerationsForPoolExpansion = EssData.expSampler 1 totalGenInt EssData.cSample5C None
+        let targetGenerationsForPoolExpansion = 
+                        EssData.getSampleSet sorterPoolSelectionIntervals totalGenInt
+
+        let targetGenerationsForSaveRunResult = 
+                        EssData.getSampleSet snapshotReportInterval totalGenInt
+
+        let targetGenerationsForSummaryReport = 
+                        EssData.getSampleSet summaryReportInterval totalGenInt
+
 
         let rec loop 
                     (remainingSteps: int) 
@@ -153,9 +81,9 @@ module EvolutionOrchestrator =
                     let currentSorterCountPerPool : int<sorterCountPerPool> = UMX.tag (int (scPP * multiplier))
 
                     // Evaluate Triggers
-                    let shouldSummaryReport = Set.contains (int currentGen) targetGenerationsForSummaryReport
-                    let shouldSaveRunResult = Set.contains (int currentGen) targetGenerationsForSaveRunResult
-                    let shouldExpandPools = Set.contains (int currentGen) targetGenerationsForPoolExpansion
+                    let shouldSummaryReport = Set.contains %currentGen targetGenerationsForSummaryReport
+                    let shouldSaveRunResult = Set.contains %currentGen targetGenerationsForSaveRunResult
+                    let shouldExpandPools = Set.contains %currentGen targetGenerationsForPoolExpansion
 
                     if shouldSummaryReport then
                         log (sprintf "Starting evolution step. Generation %d of %d" currentGen totalGen)
@@ -226,4 +154,83 @@ module EvolutionOrchestrator =
 
 
 
+
+
+
+
+
+    //let saveCheckpoint
+    //        (host: IRunHost)
+    //        (currentRp: runParameters)
+    //        (currentGen: int<generationNumber>)
+    //        (runResult: sorterRunResult)
+    //        (allowOverwrite: bool<allowOverwrite>)
+    //        (log: string -> unit) =
+    //    asyncResult {
+    //        let stepRp = currentRp.WithGenerationCurrent(Some currentGen)
+    //        let! qp = 
+    //            host.RunDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterRunResult "")
+    //            |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
+
+    //        log (sprintf "Saving SorterRunResult for generation %d - Id: %s" %currentGen (string qp.Id))
+    //        do! host.RunDb.saveAsync qp (runResult |> outputData.SorterRunResult) allowOverwrite
+    //        return stepRp
+    //    }
+
+    //let runSlicesInLoop
+    //        (host: IRunHost)
+    //        (rp: runParameters)
+    //        (genFirst: int<generationNumber>)
+    //        (genLast: int<generationNumber>)
+    //        (genSliceInterval: int<generationNumber>)
+    //        (genReportInterval: int<generationNumber>)
+    //        (measure: sorterEvalMeasure)
+    //        (sorterPoolExpansionRate: int<sorterPoolExpansionRate>)
+    //        (initialSeedPoolSet: sorterPoolSet)
+    //        (allowOverwrite: bool<allowOverwrite>)
+    //        (cts: CancellationToken)
+    //        (log: string -> unit)
+    //        (runSliceAsync: int<generationNumber> -> int<generationNumber> -> sorterPoolSet -> Async<Result<sorterRunResult, string>>) 
+    //        : Async<Result<runParameters, string>> =
+
+    //    let rec stepLoop 
+    //                (currentGen: int<generationNumber>) 
+    //                (currentPoolSet: sorterPoolSet) 
+    //                (currentRp: runParameters) =
+
+    //        asyncResult {
+    //            if currentGen >= genLast then
+    //                return currentRp
+    //            else
+    //                do! checkCancellation cts
+
+    //                // 1. Calculate step size driven by the reporting interval (or remaining count)
+    //                let stepSize = min genReportInterval (genLast - currentGen)
+    //                let nextGen = currentGen + stepSize
+
+    //                // 2. Pool Expansion: Run every `genSliceInterval` generations (or at start gen 0)
+    //                let expandedPoolSet =
+    //                    if (%currentGen > 0) && (%currentGen % %genSliceInterval = 0) && (sorterPoolExpansionRate > 1<sorterPoolExpansionRate>) then
+    //                        log (sprintf "Expanding pools at Generation %d (Rate: %d)..." %currentGen %sorterPoolExpansionRate)
+    //                        currentPoolSet
+    //                        |> SorterPoolSet.trimPools sorterPoolExpansionRate measure
+    //                        |> SorterPoolSet.expandPools sorterPoolExpansionRate
+    //                    else
+    //                        currentPoolSet
+
+    //                log (sprintf "Stepping evolution: Generation %d -> %d..." %currentGen %nextGen)
+    //                let! runResult = runSliceAsync currentGen stepSize expandedPoolSet
+    //                do! checkCancellation cts
+
+    //                // 3. Database Persistence: Run every `genReportInterval` generations (or at run end)
+    //                let! updatedRp =
+    //                    if (%nextGen % %genReportInterval = 0) || (nextGen >= genLast) then
+    //                        saveCheckpoint host currentRp nextGen runResult allowOverwrite log
+    //                    else
+    //                        asyncResult { return currentRp.WithGenerationCurrent(Some nextGen) }
+
+    //                return! stepLoop nextGen runResult.FinalPoolSet updatedRp
+    //        }
+
+    //    stepLoop genFirst initialSeedPoolSet rp
 

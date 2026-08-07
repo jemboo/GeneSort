@@ -4,7 +4,6 @@ open FSharp.UMX
 open GeneSort.Dispatch.V1
 open GeneSort.Core
 open GeneSort.Project.V1
-open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Sorting
 open GeneSort.Dispatch.V1.CommonParams
@@ -72,7 +71,7 @@ module MssiSgdSpecsRs =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                genSliceInterval10
+                runResultReportInterval100
                 generationLast
                 generationCurrent
             ]
@@ -101,7 +100,7 @@ module MssiSgdSpecsRs =
                 poolCount1
                 fourKSortersPerPool
                 oneChildCount
-                genSliceInterval10
+                runResultReportInterval100
                 generationLast
                 generationCurrent
                 distinctSorterHashesTrue
@@ -132,7 +131,7 @@ module MssiSgdSpecsRs =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                genSliceInterval10
+                runResultReportInterval100
                 generationLast
                 generationCurrent
             ]
@@ -160,7 +159,7 @@ module MssiSgdSpecsRs =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                genSliceInterval10
+                runResultReportInterval100
                 generationLast
                 generationCurrent
             ]

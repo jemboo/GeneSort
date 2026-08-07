@@ -86,7 +86,7 @@ module MsceSgdSpecsRm =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                genSliceInterval10
+                runResultReportInterval100
                 generationLast
                 generationCurrent
                 mergeDimension2
@@ -118,7 +118,7 @@ module MsceSgdSpecsRm =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                genSliceInterval10
+                runResultReportInterval100
                 generationLast
                 generationCurrent
                 mergeDimension2
@@ -150,7 +150,7 @@ module MsceSgdSpecsRm =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                genSliceInterval10
+                runResultReportInterval100
                 generationLast
                 generationCurrent
                 testMergeDimensions
@@ -182,7 +182,7 @@ module MsceSgdSpecsRm =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                genSliceInterval10
+                runResultReportInterval100
                 generationLast
                 generationCurrent
                 testMergeDimensions
@@ -214,7 +214,7 @@ module MsceSgdSpecsRm =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                genSliceInterval10
+                runResultReportInterval100
                 generationLast
                 generationCurrent
                 testMergeDimensions
@@ -247,7 +247,7 @@ module MsceSgdSpecsRm =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                genSliceInterval10
+                runResultReportInterval100
                 generationLast
                 generationCurrent
                 testMergeDimensions

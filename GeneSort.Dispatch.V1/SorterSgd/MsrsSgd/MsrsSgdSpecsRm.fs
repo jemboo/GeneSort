@@ -1,6 +1,5 @@
 ﻿namespace GeneSort.Dispatch.V1.SorterSgd.Msrs
 
-
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
@@ -66,7 +65,7 @@ module MsrsSgdSpecsRm =
                 oneTwenty8SortersPerPool
                 oneChildCount
                 generationCurrent
-                genSliceInterval10
+                runResultReportInterval100
                 generationLast
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
@@ -100,7 +99,7 @@ module MsrsSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
-                genSliceInterval10
+                runResultReportInterval100
                 generationLast
             ]
             filter = paramMapFilter
@@ -132,7 +131,7 @@ module MsrsSgdSpecsRm =
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
-                genSliceInterval10
+                runResultReportInterval100
                 generationLast
             ]
             filter = paramMapFilter
