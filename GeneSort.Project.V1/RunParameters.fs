@@ -452,7 +452,7 @@ type runParameters =
     member this.WithSortedFraction(sf: float<sortedFraction> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortedFractionKey (sf |> Option.map UmxExt.floatToRaw) }
 
-    member this.WithSorterChildCount(scc: int<sorterCount> option) = 
+    member this.WithSorterChildCount(scc: int<sorterChildCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterChildCountKey (scc |> Option.map UmxExt.intToRaw) }
 
     member this.WithSorterCount(sc: int<sorterCount> option) = 

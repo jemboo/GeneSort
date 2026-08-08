@@ -22,7 +22,10 @@ module MsrsSgdSpecsTestPrefix =
             |> List.map SorterEvalSelectionType.toString)
         
     let generationLastTest = 
-            (runParameters.generationLastKey, [500] |> List.map string)
+            (runParameters.generationLastKey, [11] |> List.map string)
+
+    let generationLastLight = 
+            (runParameters.generationLastKey, [501] |> List.map string)
 
     let generationLast = 
             (runParameters.generationLastKey, [5000] |> List.map string)
@@ -73,11 +76,54 @@ module MsrsSgdSpecsTestPrefix =
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction99
-                runResultReportInterval100
+                runResultReportInterval10
+                summaryReport_cSampleC
+                sorterPoolSelect5_2
                 generationLastTest
                 sorterCountCycle100
                 sorterCountCycleMultiplier1
-                mutationMods4b
+                mutationMod4
+                sorterPoolExpansionRate1
+            ]
+            filter = paramMapFilter
+            enhancer = prefixEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 1
+        }
+
+
+        let Light (executorType: sorterSgdExecutorType)  : runHostSpec = {
+            databaseName = MsrsSgdDbs.Prefix.dbName
+            runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for 24pfx Msrs"
+            spans = [
+                rngTypeLcg
+                generationCurrent
+                sixteenSortersPerPool
+                poolCount16
+                oneChildCount
+                sorterEvalSelectionTypeGuid1K
+                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
+                sortableTestFilter_Prefix24_3a
+                msrsModelType
+                sorterEvalTypeV1
+                seedModificationRate02
+                modificationRatep04
+                orthoRate
+                paraRate
+                selfSymRate
+                dataFomatBitv512
+                distinctSorterHashesTrue
+                prioritizeNewMutantsTrue
+                sortedFraction99
+                runResultReportInterval500
+                summaryReport_cSampleC
+                sorterPoolSelects25_5
+                generationLastLight
+                sorterCountCycle100
+                sorterCountCycleMultiplier1
+                mutationMods64
                 sorterPoolExpansionRates
             ]
             filter = paramMapFilter
@@ -127,12 +173,14 @@ module MsrsSgdSpecsTestPrefix =
 
 
     type configType =
+        | Light
         | T4_P3
         | Test
 
     let Configs = Map.ofList 
                     [ 
                         (configType.Test, Specs.Test);
+                        (configType.Light, Specs.Light);
                         (configType.T4_P3, Specs.T4_P3);
                     ]
 

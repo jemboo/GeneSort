@@ -114,7 +114,8 @@ module EssData =
         expSampleAndScale ess.Min max ess.Exp ess.Scale ess.MaxCount
 
     let getSamplesInOrder (ess:essData) (max:int) : int seq = 
-        expSampleAndScale ess.Min max ess.Exp ess.Scale ess.MaxCount
+        let preScaled = (float max /ess.Scale) |> floor |> int
+        expSampleAndScale ess.Min preScaled ess.Exp ess.Scale ess.MaxCount
         |> Set.toSeq 
         |> Seq.sort
 

@@ -36,6 +36,9 @@ module OutputDataFile =
                 (outputDataType: outputDataType)
                  :string<fullPathToFolder> =
         match outputDataType with
+        | outputDataType.Run runName ->
+            let folderPath = Path.Combine(%pathToRootFolder, "Run", %runName)
+            UMX.tag<fullPathToFolder> folderPath
         | outputDataType.RunParameters _   ->
             Path.Combine(%pathToRootFolder, "Run", outputDataType |> OutputDataType.toFolderName, replString) 
             |> UMX.tag<fullPathToFolder>

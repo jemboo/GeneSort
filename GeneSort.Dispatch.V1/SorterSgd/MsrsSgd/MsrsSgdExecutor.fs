@@ -115,8 +115,18 @@ module MsrsSgdExecutor =
                         snapshotReportInterval summaryReportInterval sorterPoolSelectionIntervals
                         cts.Token log
 
+                //let! qp = 
+                //    host.RunDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterRunResult "")
+                //    |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
+
+                //log (sprintf "Saving SorterRunResult checkpoint at Generation %d (Id: %s)..." %currentGen (string qp.Id))
+                //do! host.RunDb.saveAsync qp (finalRunResult |> outputData.SorterRunResult) allowOverwrite
+
+
+
+
                 log "evaluateEvolutionRun completed."
-                let finalRp = rp.WithGenerationCurrent(Some genLast).WithRunFinished(Some true)
+                let finalRp = rp.WithRunFinished(Some true)
                 return finalRp
 
             with e -> 

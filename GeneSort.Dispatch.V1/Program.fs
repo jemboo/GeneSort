@@ -262,13 +262,14 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //    MsrsSgdDbs.createRunHost spec
 //let executor = MsrsSgdExecutor.getExecutor executorType
 
+
 //********** MsrsSgdSpecsPrefix **********
-//let configType = MsrsSgdSpecsTestPrefix.configType.Test
-//let executorType = sorterSgdExecutorType.GenPrefix
-//let host: IRunHost = 
-//    let spec = MsrsSgdSpecsTestPrefix.getRunHostSpec configType executorType
-//    MsrsSgdDbs.createRunHost spec
-//let executor = MsrsSgdExecutor.getExecutor executorType
+let configType = MsrsSgdSpecsTestPrefix.configType.Light
+let executorType = sorterSgdExecutorType.SummaryReport
+let host: IRunHost = 
+    let spec = MsrsSgdSpecsTestPrefix.getRunHostSpec configType executorType
+    MsrsSgdDbs.createRunHost spec
+let executor = MsrsSgdExecutor.getExecutor executorType
 
 
 ////********** Msuf4SgdSpecsRs **********
@@ -309,41 +310,41 @@ let minReplica = 0<replNumber>
 let maxReplica = 1<replNumber>
 
 
-//async {
+async {
 
-//    printfn "Init Project: %s" %host.Run.DatabaseName
+    printfn "Init Project: %s" %host.Run.DatabaseName
     
-//    let! initResult = 
-//        ParamOps.initRunAndParamFiles
-//            host.RunDb           
-//            (Some progress) 
-//            host.Run              
-//            minReplica 
-//            maxReplica 
-//            host.AllowOverwrite 
-//            host.ParamMapRefiner      
-//            host.ParameterSpans
+    let! initResult = 
+        ParamOps.initRunAndParamFiles
+            host.RunDb           
+            (Some progress) 
+            host.Run              
+            minReplica 
+            maxReplica 
+            host.AllowOverwrite 
+            host.ParamMapRefiner      
+            host.ParameterSpans
 
 
-//    match initResult with
-//    | Error e -> printfn "Init Failure: %s" e
-//    | Ok () ->
-//        let! execResult = 
-//            ProjectOps.executeRuns  
-//                minReplica 
-//                maxReplica
-//                host.AllowOverwrite 
-//                cts 
-//                (Some progress)
-//                host
-//                executor
-//                host.MaxParallel
+    match initResult with
+    | Error e -> printfn "Init Failure: %s" e
+    | Ok () ->
+        let! execResult = 
+            ProjectOps.executeRuns  
+                minReplica 
+                maxReplica
+                host.AllowOverwrite 
+                cts 
+                (Some progress)
+                host
+                executor
+                host.MaxParallel
 
-//        match execResult with
-//        | Ok results -> printfn "Success: %d records processed." results.Length
-//        | Error e -> printfn "Runtime Error: %s" e
+        match execResult with
+        | Ok results -> printfn "Success: %d records processed." results.Length
+        | Error e -> printfn "Runtime Error: %s" e
 
-//} |> Async.RunSynchronously
+} |> Async.RunSynchronously
 
 
 
@@ -389,10 +390,10 @@ let maxReplica = 1<replNumber>
 //} |> Async.RunSynchronously
 
 
-let yab = CommonParams.runResultReportInterval10 |> snd |> List.head
-let essD = yab |> EssData.fromString
+//let yab = CommonParams.sorterPoolSelect25_5 |> snd |> List.head
+//let essD = yab |> EssData.fromString
 
-let qua = EssData.getSamplesInOrder essD 10000 |> Seq.toArray
+//let qua = EssData.getSamplesInOrder essD 10000 |> Seq.toArray
 
 
 let duration = DateTime.Now - startTime

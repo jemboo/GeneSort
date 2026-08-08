@@ -30,13 +30,13 @@ module Reporting =
                 do! checkCancellation cts.Token                
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
                 let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
-                let! essSummaryReportIntervals = rp.GetSummaryReportIntervals() |> Result.ofOption "Missing generation report interval."
+                let! essSnapshotReportIntervals = rp.GetSnapshotReportIntervals () |> Result.ofOption "Missing generation report interval."
 
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
 
                 // 1. Calculate the target generation slices
-                let reportGenerations = EssData.getSamplesInOrder essSummaryReportIntervals %genLast
+                let reportGenerations = EssData.getSamplesInOrder essSnapshotReportIntervals %genLast
                                         |> Seq.map(UMX.tag<generationNumber>) 
                                         |> Seq.toList
 
