@@ -99,8 +99,8 @@ module MsrsSgdSpecsTestPrefix =
             spans = [
                 rngTypeLcg
                 generationCurrent
-                sixteenSortersPerPool
-                poolCount16
+                thirtyTwoSortersPerPool
+                poolCount32
                 oneChildCount
                 sorterEvalSelectionTypeGuid1K
                 sorterEvalMeasureInitial_CestM_noScw
@@ -118,7 +118,7 @@ module MsrsSgdSpecsTestPrefix =
                 prioritizeNewMutantsTrue
                 sortedFraction99
                 runResultReportInterval500
-                summaryReport_cSampleC
+                summaryReport_cSample5C
                 sorterPoolSelects25_5
                 generationLastLight
                 sorterCountCycle100
