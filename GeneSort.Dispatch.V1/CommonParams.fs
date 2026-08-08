@@ -51,27 +51,34 @@ module CommonParams =
     let scale1K = 1000
     let scale5K = 5000
 
+    //
     let runResultReportInterval10 = 
         (runParameters.snapshotReportIntervalsKey, [EssData.create EssData.cSampleC scale10 min1 None |> Some] |> List.map EssData.toString)
 
+    //1000, 2000, 300 ..
     let runResultReportInterval100 = 
         (runParameters.snapshotReportIntervalsKey, [EssData.create EssData.cSampleC scale100 min1 None |> Some] |> List.map EssData.toString)
 
+    // 500, 1000, 1500 ...
     let runResultReportInterval500 = 
         (runParameters.snapshotReportIntervalsKey, [EssData.create EssData.cSampleC scale500 min1 None |> Some] |> List.map EssData.toString)
 
+    //1000, 2000, 3000 ...
     let runResultReportInterval1000 = 
         (runParameters.snapshotReportIntervalsKey, [EssData.create EssData.cSampleC scale1K min1 None |> Some] |> List.map  EssData.toString)
 
         
     // SummaryReport Intervals
 
+    // 25, 27, 28, 29, 30, 31, 32, 34, 35, 36, 38
     let summaryReport_cSample5C = 
         (runParameters.summaryReportIntervalsKey, [EssData.create EssData.cSample5C scale1 min25 None |> Some] |> List.map EssData.toString)
 
+    // 25, 27, 28, 29, 31, 32, 34, 36, 37, 39
     let summaryReport_cSample1K = 
         (runParameters.summaryReportIntervalsKey, [EssData.create EssData.cSample1K scale1 min25 None |> Some] |> List.map EssData.toString)
 
+    // 25, 27, 29, 31, 33, 36 ...
     let summaryReport_cSample5K = 
         (runParameters.summaryReportIntervalsKey, [EssData.create EssData.cSample5K scale1 min25 None |> Some] |> List.map EssData.toString)
 
@@ -81,21 +88,27 @@ module CommonParams =
     let sorterPoolExpEmpty = 
         (runParameters.sorterPoolSelectionIntervalsKey, [essData.Empty |> Some] |> List.map EssData.toString)
 
+    //20, 30, 40 ..
     let sorterPoolExp25_10 = 
         (runParameters.sorterPoolSelectionIntervalsKey, [EssData.create EssData.cSampleC scale10 min2 (Some 10) |> Some] |> List.map EssData.toString)
 
+    //100, 150, 200, 250, 300 ...
     let sorterPoolExp50_10 = 
         (runParameters.sorterPoolSelectionIntervalsKey, [EssData.create EssData.cSampleC scale50 min2 (Some 10) |> Some] |> List.map EssData.toString)
 
+    //200, 300, 400, ...
     let sorterPoolExp100_10 = 
         (runParameters.sorterPoolSelectionIntervalsKey, [EssData.create EssData.cSampleC scale100 min2 (Some 10) |> Some] |> List.map EssData.toString)
 
+    //10, 20, 40, 80, 160, 320, 630, 1250, 2480, 4940, 999840, 19600, 39040, 77770 .. 
     let sorterPoolExp25_20i = 
         (runParameters.sorterPoolSelectionIntervalsKey, [EssData.create EssData.xSample5C scale10 min1 (Some 20) |> Some] |> List.map EssData.toString)
 
+    // 50, 100, 200, 400, 800, 1600, 3150, 6250, 12400, 24700
     let sorterPoolExp50_10i = 
         (runParameters.sorterPoolSelectionIntervalsKey, [EssData.create EssData.xSample5C scale50 min1 (Some 10) |> Some] |> List.map EssData.toString)
 
+    // 100, 200, 400, 800, 1600, 3200, 6300, 12500, 24800, 49400
     let sorterPoolExp100_10i = 
         (runParameters.sorterPoolSelectionIntervalsKey, [EssData.create EssData.xSample5C scale100 min1 (Some 10) |> Some] |> List.map EssData.toString)
 

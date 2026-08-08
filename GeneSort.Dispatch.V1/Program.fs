@@ -263,7 +263,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //let executor = MsrsSgdExecutor.getExecutor executorType
 
 //********** MsrsSgdSpecsPrefix **********
-//let configType = MsrsSgdSpecsTestPrefix.configType.T4_P3
+//let configType = MsrsSgdSpecsTestPrefix.configType.Test
 //let executorType = sorterSgdExecutorType.GenPrefix
 //let host: IRunHost = 
 //    let spec = MsrsSgdSpecsTestPrefix.getRunHostSpec configType executorType
@@ -305,8 +305,8 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 
-//let minReplica = 0<replNumber>
-//let maxReplica = 1<replNumber>
+let minReplica = 0<replNumber>
+let maxReplica = 1<replNumber>
 
 
 //async {
@@ -389,7 +389,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //} |> Async.RunSynchronously
 
 
-let yab = CommonParams.sorterPoolExp25_20i |> snd |> List.head
+let yab = CommonParams.runResultReportInterval10 |> snd |> List.head
 let essD = yab |> EssData.fromString
 
 let qua = EssData.getSamplesInOrder essD 10000 |> Seq.toArray
