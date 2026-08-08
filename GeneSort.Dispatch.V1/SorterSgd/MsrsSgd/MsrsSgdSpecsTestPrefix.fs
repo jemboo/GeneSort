@@ -25,7 +25,7 @@ module MsrsSgdSpecsTestPrefix =
             (runParameters.generationLastKey, [11] |> List.map string)
 
     let generationLastLight = 
-            (runParameters.generationLastKey, [501] |> List.map string)
+            (runParameters.generationLastKey, [1001] |> List.map string)
 
     let generationLast = 
             (runParameters.generationLastKey, [5000] |> List.map string)

@@ -594,6 +594,9 @@ module CommonParams =
     let mutationMods4b =
             (runParameters.mutationModKey, [5; 6; 7; 8] |> List.map string)
 
+    let mutationMods64 =
+            (runParameters.mutationModKey, [0 .. 63] |> List.map string)
+
 
     // SorterPoolExpansionRates
 
