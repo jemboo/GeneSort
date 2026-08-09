@@ -102,14 +102,14 @@ module MsrsSgdSpecsTestPrefix =
                 thirtyTwoSortersPerPool
                 poolCount32
                 oneChildCount
-                sorterEvalSelectionTypeGuid1K
+                sorterEvalSelectionTypeGuid12K
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
                 sortableTestFilter_Prefix24_3a
                 msrsModelType
                 sorterEvalTypeV1
                 seedModificationRate02
-                modificationRatep04
+                modificationRatep06
                 orthoRate
                 paraRate
                 selfSymRate
