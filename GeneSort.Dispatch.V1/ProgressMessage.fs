@@ -17,7 +17,7 @@ module ProgressMessage =
     let reportRunResult (progress: IProgress<string> option) (result: RunResult) =
         match progress with
         | Some p ->
-            let timeStamp = MathUtils.getTimestampString()
+            let timeStamp = StringUtils.getTimestampString()
             let msg = 
                 match result with
                 | Success (idx, repl, congrats) -> 

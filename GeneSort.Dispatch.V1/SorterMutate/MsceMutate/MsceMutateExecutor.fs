@@ -285,7 +285,7 @@ module MsceMutateExecutor =
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
         let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+                        (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try

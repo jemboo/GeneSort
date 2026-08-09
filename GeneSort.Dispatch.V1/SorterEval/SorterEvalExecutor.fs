@@ -98,7 +98,7 @@ module SorterEvalExecutor =
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
         let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+                        (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
@@ -209,13 +209,13 @@ module SorterEvalExecutor =
 
 
         let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+                        (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
                 do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
-                OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
+                OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (StringUtils.getTimestampString()) %runId)
     
                 let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                                         |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
@@ -247,13 +247,13 @@ module SorterEvalExecutor =
                     (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
         let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+                        (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
                 do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
-                OpsUtils.report progress (sprintf "%s Starting Stage stats Report for Run %s" (MathUtils.getTimestampString()) %runId)
+                OpsUtils.report progress (sprintf "%s Starting Stage stats Report for Run %s" (StringUtils.getTimestampString()) %runId)
     
                 let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                                         |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
@@ -303,13 +303,13 @@ module SorterEvalExecutor =
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
         let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+                        (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
                 do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
-                OpsUtils.report progress (sprintf "%s Starting Ce bins Report for Run %s" (MathUtils.getTimestampString()) %runId)
+                OpsUtils.report progress (sprintf "%s Starting Ce bins Report for Run %s" (StringUtils.getTimestampString()) %runId)
     
                 let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                                         |> Result.ofOption "Failed to create QueryParams for SorterSetEval."

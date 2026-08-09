@@ -16,7 +16,7 @@ module ParamOps =
             (progress: IProgress<string> option): Async<Result<unit, string>> =
         async {
             try
-                report progress (sprintf "%s Saving RunParameter files in %s" (MathUtils.getTimestampString()) %db.databaseName)
+                report progress (sprintf "%s Saving RunParameter files in %s" (StringUtils.getTimestampString()) %db.databaseName)
 
                 let saveResults = 
                     runParameterArray
@@ -39,7 +39,7 @@ module ParamOps =
             with
             | e ->
                 let msg = sprintf "%s Failed to save RunParameter files in %s: %s" 
-                                        (MathUtils.getTimestampString()) 
+                                        (StringUtils.getTimestampString()) 
                                         %db.databaseName
                                         e.Message
                 report progress msg
@@ -58,14 +58,14 @@ module ParamOps =
         (parameterSpans: (string * string list) list) : Async<Result<unit, string>> =
         async {
             try
-                report progress (sprintf "%s Saving run file: %s" (MathUtils.getTimestampString()) %run.DatabaseName)
+                report progress (sprintf "%s Saving run file: %s" (StringUtils.getTimestampString()) %run.DatabaseName)
                 let queryParams = queryParams.createForRun run.DatabaseName run.ProjectName run.RunName
                 let! saveProjRes = db.saveAsync queryParams (run |> outputData.Run) (false |> UMX.tag<allowOverwrite>)
                 match saveProjRes with
                 | Error err -> return Error err
                 | Ok () ->
                     let runParametersArray = Run.makeRunParameters minReplica maxReplica parameterSpans paramRefiner |> Seq.toArray
-                    report progress (sprintf "%s Saving run parameters files: (%d)" (MathUtils.getTimestampString()) runParametersArray.Length)
+                    report progress (sprintf "%s Saving run parameters files: (%d)" (StringUtils.getTimestampString()) runParametersArray.Length)
                     return! saveParametersFiles 
                                 db
                                 runParametersArray 

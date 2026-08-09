@@ -32,13 +32,13 @@ module Reporting =
 
 
         let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+                        (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
                 do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
-                OpsUtils.report progress (sprintf "%s Starting Mutant Report for Run %s" (MathUtils.getTimestampString()) %runId)
+                OpsUtils.report progress (sprintf "%s Starting Mutant Report for Run %s" (StringUtils.getTimestampString()) %runId)
                 let reportName = (sprintf "MutantReport" |> UMX.tag<textReportName>)
 
                 let! (_sorterEvalSelection, (mutantIdToParentIdMap: Map<Guid<sorterModelId>,Guid<sorterModelId>>)) = mutantDetailsMaker rp
@@ -104,13 +104,13 @@ module Reporting =
 
 
         let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+                        (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
                 do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
-                OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
+                OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (StringUtils.getTimestampString()) %runId)
     
                 let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                                         |> Result.ofOption "Failed to create QueryParams for SorterSetEval."

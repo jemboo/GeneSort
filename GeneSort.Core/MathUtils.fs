@@ -32,10 +32,3 @@ module MathUtils =
     let isAPowerOfTwo (order: int) : bool =
         if order <= 0 then invalidArg "order" "Order must be positive"
         order > 0 && (order &&& (order - 1)) = 0
-
-
-    let getTimestampString () =
-        let now = DateTime.Now
-        // MM-dd for month-day
-        // HH:mm:ss.f for hours (24h):minutes:seconds.tenths
-        now.ToString("MM-dd HH:mm:ss.fff")

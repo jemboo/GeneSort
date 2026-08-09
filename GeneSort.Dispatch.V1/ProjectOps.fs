@@ -30,7 +30,7 @@ module ProjectOps =
                     report progress 
                         (
                             sprintf "%s Started:\n%s" 
-                                        (MathUtils.getTimestampString()) 
+                                        (StringUtils.getTimestampString()) 
                                         (rp |> RunParameters.reportKvps)
                         )
                 
@@ -72,7 +72,7 @@ module ProjectOps =
             let runName = host.Run.RunName
 
             try
-                report progress (sprintf "%s Starting project: %s" (MathUtils.getTimestampString()) %runName)
+                report progress (sprintf "%s Starting project: %s" (StringUtils.getTimestampString()) %runName)
 
                 let! (paramsArray: runParameters array) = 
                         db.getRunParameters 

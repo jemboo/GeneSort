@@ -24,7 +24,7 @@ module SortableTestExecutor =
         let log msg = OpsUtils.report 
                             progress 
                             (sprintf "%s [%s] %s" 
-                            (MathUtils.getTimestampString()) 
+                            (StringUtils.getTimestampString()) 
                             (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
@@ -78,7 +78,7 @@ module SortableTestExecutor =
         let log msg = OpsUtils.report 
                             progress 
                             (sprintf "%s [%s] %s" 
-                            (MathUtils.getTimestampString()) 
+                            (StringUtils.getTimestampString()) 
                             (rp |> RunParameters.getIdString) msg)
 
         asyncResult {

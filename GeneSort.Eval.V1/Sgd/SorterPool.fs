@@ -59,6 +59,26 @@ module SorterPool =
             else
                 Array.average validScores |> UMX.tag<sorterEvalScore>
 
+
+    /// Calculates the standard deviation of scores in the pool for the specified measure.
+    /// Returns 0.0 if empty or if fewer than 2 evaluated members exist.
+    let getStandardDeviationOfScores (measure: sorterEvalMeasure) (pool: sorterPool) : float<sorterEvalScore> =
+        let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
+        let validScores =
+            pool.SorterPoolMembers
+            |> Seq.choose (fun spm -> spm.SorterEval |> Option.map scoreFunc)
+            |> Seq.map UMX.untag
+            |> Seq.toArray
+
+        if validScores.Length < 2 then
+            0.0 |> UMX.tag<sorterEvalScore>
+        else
+            let avg = Array.average validScores
+            let sumOfSquares = validScores |> Array.sumBy (fun score -> (score - avg) ** 2.0)
+            let stdDev = Math.Sqrt(sumOfSquares / float validScores.Length)
+            stdDev |> UMX.tag<sorterEvalScore>
+
+
     /// Adds or updates a member inside the pool
     let upsertMember 
             (memberToUpsert: sorterPoolMember) 

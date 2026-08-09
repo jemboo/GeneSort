@@ -10,6 +10,7 @@ open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.SortingLib.Sorter
 open GeneSort.Core.MathUtils
+open GeneSort.Eval.V1.Sgd
 
 type runParameters =
     private { paramMap : Map<string, string> }
@@ -73,6 +74,7 @@ type runParameters =
     static member sorterParentCountKey = "SorterParentCount"
     static member sorterPoolCountKey = "SorterPoolCount"
     static member sorterPoolExpansionRateKey = "SorterPoolExpansionRate"
+    static member sorterPoolMeasureKey = "sorterPoolMeasure"
     static member sortingWidthKey = "SortingWidth"
     static member stageLengthKey = "StageLength"
     static member startingReplKey = "StartingRepl"
@@ -315,6 +317,10 @@ type runParameters =
         runParameters.tryGetInt runParameters.sorterPoolCountKey this.paramMap
         |> Option.map UMX.tag<sorterPoolCount>
 
+    member this.GetSorterPoolMeasure() =
+        this.paramMap.TryFind runParameters.sorterPoolMeasureKey
+        |> Option.map SorterPoolMeasure.fromCompactString
+
     member this.GetSortingWidth() =
         runParameters.tryGetInt runParameters.sortingWidthKey this.paramMap
         |> Option.map UMX.tag<sortingWidth>
@@ -490,6 +496,9 @@ type runParameters =
 
     member this.WithSorterPoolExpansionRate(sper: int<sorterPoolExpansionRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterPoolExpansionRateKey (sper |> Option.map UmxExt.intToRaw) }
+
+    member this.WithSorterPoolMeasure(spm: sorterPoolMeasure option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterPoolMeasureKey (spm |> Option.map SorterPoolMeasure.toCompactString) }
 
     member this.WithSortingWidth(w: int<sortingWidth> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortingWidthKey (w |> Option.map UmxExt.intToRaw) }

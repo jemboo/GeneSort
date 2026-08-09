@@ -18,7 +18,7 @@ module RunResult =
 
 /// Analyzes results to identify what needs attention
     let analyze (results: RunResult[]) =
-        let timeStamp = MathUtils.getTimestampString()
+        let timeStamp = StringUtils.getTimestampString()
         // 1. Extract specifically which ones failed or were cancelled
         let issues = 
             results |> Array.choose (function

@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <Compile Include="ComputationBuilders.fs" />
+    <Compile Include="StringUtils.fs" />
     <Compile Include="DataTableRecord.fs" />
     <Compile Include="DataTableReport.fs" />
     <Compile Include="SysExt.fs" />

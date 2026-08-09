@@ -23,7 +23,7 @@ module Reporting =
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
         let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+                        (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
@@ -33,7 +33,7 @@ module Reporting =
                 let! essSnapshotReportIntervals = rp.GetSnapshotReportIntervals () |> Result.ofOption "Missing generation report interval."
 
                 let runId = rp |> RunParameters.getIdString
-                OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
+                OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (StringUtils.getTimestampString()) %runId)
 
                 // 1. Calculate the target generation slices
                 let reportGenerations = EssData.getSamplesInOrder essSnapshotReportIntervals %genLast
@@ -101,7 +101,7 @@ module Reporting =
 
 
         let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+                        (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
 
         asyncResult {
@@ -112,7 +112,7 @@ module Reporting =
                 let! essSnapshotIntervals = rp.GetSnapshotReportIntervals() |> Result.ofOption "Missing generation report interval."
 
                 let runId = rp |> RunParameters.getIdString
-                OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (MathUtils.getTimestampString()) %runId)
+                OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (StringUtils.getTimestampString()) %runId)
 
                 // 1. Calculate the target generation slices
                 let reportGenerations = EssData.getSamplesInOrder essSnapshotIntervals %genLast

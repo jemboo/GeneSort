@@ -30,7 +30,7 @@ module Msuf4SgdExecutor =
 
         let log msg = 
             OpsUtils.report progress 
-                (sprintf "%s [%s] %s" (MathUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+                (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
