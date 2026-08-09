@@ -25,7 +25,7 @@ module MsrsSgdSpecsTestPrefix =
             (runParameters.generationLastKey, [11] |> List.map string)
 
     let generationLastLight = 
-            (runParameters.generationLastKey, [1001] |> List.map string)
+            (runParameters.generationLastKey, [2001] |> List.map string)
 
     let generationLast = 
             (runParameters.generationLastKey, [5000] |> List.map string)
@@ -119,12 +119,12 @@ module MsrsSgdSpecsTestPrefix =
                 sortedFraction99
                 runResultReportInterval500
                 summaryReport_cSample5C
-                sorterPoolSelects25_5
+                sorterPoolSelects25_5i
                 generationLastLight
                 sorterCountCycle100
                 sorterCountCycleMultiplier1
-                mutationMods64
-                sorterPoolExpansionRates
+                mutationMods128
+                sorterPoolExpansionRate2
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer

@@ -110,6 +110,14 @@ module CommonParams =
                 [EssData.create EssData.cSampleC scale25 min1 (Some 5) |> Some; 
                  essData.Empty |> Some] |> List.map EssData.toString)
 
+
+    //25, 50, 100, 200, 400
+    let sorterPoolSelects25_5i = 
+        (runParameters.sorterPoolSelectionIntervalsKey, 
+                [EssData.create EssData.xSample5C scale25 min1 (Some 5) |> Some; 
+                 essData.Empty |> Some] |> List.map EssData.toString)
+
+
     //100, 150, 200, 250, 300 ...
     let sorterPoolSelect100_50 = 
         (runParameters.sorterPoolSelectionIntervalsKey, [EssData.create EssData.cSampleC scale50 min2 (Some 10) |> Some] |> List.map EssData.toString)
@@ -597,6 +605,8 @@ module CommonParams =
     let mutationMods64 =
             (runParameters.mutationModKey, [0 .. 63] |> List.map string)
 
+    let mutationMods128 =
+            (runParameters.mutationModKey, [0 .. 127] |> List.map string)
 
     // SorterPoolExpansionRates
 

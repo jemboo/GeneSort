@@ -264,12 +264,12 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
 //********** MsrsSgdSpecsPrefix **********
-let configType = MsrsSgdSpecsTestPrefix.configType.Light
-let executorType = sorterSgdExecutorType.GenPrefix
-let host: IRunHost = 
-    let spec = MsrsSgdSpecsTestPrefix.getRunHostSpec configType executorType
-    MsrsSgdDbs.createRunHost spec
-let executor = MsrsSgdExecutor.getExecutor executorType
+//let configType = MsrsSgdSpecsTestPrefix.configType.Light
+//let executorType = sorterSgdExecutorType.GenPrefix
+//let host: IRunHost = 
+//    let spec = MsrsSgdSpecsTestPrefix.getRunHostSpec configType executorType
+//    MsrsSgdDbs.createRunHost spec
+//let executor = MsrsSgdExecutor.getExecutor executorType
 
 
 ////********** Msuf4SgdSpecsRs **********
@@ -300,9 +300,6 @@ let executor = MsrsSgdExecutor.getExecutor executorType
 //    let spec = Msuf4SgdSpecsTestPrefix.getRunHostSpec configType executorType
 //    Msuf4SgdDbs.createRunHost spec
 //let executor = Msuf4SgdExecutor.getExecutor executorType
-
-
-
 
 
 
@@ -390,7 +387,7 @@ async {
 //} |> Async.RunSynchronously
 
 
-//let yab = CommonParams.sorterPoolSelect25_5 |> snd |> List.head
+//let yab = CommonParams.sorterPoolSelects25_5i |> snd |> List.head
 //let essD = yab |> EssData.fromString
 
 //let qua = EssData.getSamplesInOrder essD 10000 |> Seq.toArray
