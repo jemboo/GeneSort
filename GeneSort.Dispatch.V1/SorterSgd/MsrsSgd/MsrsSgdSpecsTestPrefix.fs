@@ -76,14 +76,14 @@ module MsrsSgdSpecsTestPrefix =
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction99
-                runResultReportInterval2
+                runResultReportInterval500
                 summaryReport_cSampleC
                 sorterPoolSelects25_5i
                 generationLastTest
                 sorterCountCycle100
                 sorterCountCycleMultiplier1
                 mutationMod4
-                sorterPoolExpansionRate1
+                sorterPoolExpansionRate2
                 sorterPoolMeasures_noScw
             ]
             filter = paramMapFilter
