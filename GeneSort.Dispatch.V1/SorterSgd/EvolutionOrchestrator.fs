@@ -39,6 +39,7 @@ module EvolutionOrchestrator =
             (snapshotReportInterval: essData)
             (summaryReportInterval: essData)
             (sorterPoolSelectionIntervals: essData)
+            (poolMeasure: sorterPoolMeasure)
             (cts: CancellationToken)
             (log: string -> unit) : Async<Result<sorterRunResult, string>> =
 
@@ -101,7 +102,7 @@ module EvolutionOrchestrator =
                         if shouldExpandPools && (%currentGen > 0) && (sorterPoolExpansionRate > 1<sorterPoolExpansionRate>) then
                             log (sprintf "Expanding pools at Generation %d (Rate: %d)..." %currentGen %sorterPoolExpansionRate)
                             currentSorterPoolSet
-                            |> SorterPoolSet.trimPools sorterPoolExpansionRate selectionMeasure
+                            |> SorterPoolSet.trimPools sorterPoolExpansionRate poolMeasure
                             |> SorterPoolSet.expandPools sorterPoolExpansionRate
                         else
                             currentSorterPoolSet
@@ -125,26 +126,38 @@ module EvolutionOrchestrator =
                             sortedFractionThreshold
 
                     // 4. Save RunResult to Database on exponential milestone
-                    if shouldSaveRunResult && (%currentGen > 0) then
-                        let currentRunResult = 
-                            sorterRunResult.create 
-                                nextSorterPoolSet 
-                                (updatedSorterPoolSetSummary |> List.rev |> List.toArray)
+                    let! historyAccNext = 
+                        asyncResult {
+                            if shouldSaveRunResult && (%currentGen > 0) then
+                                let currentRunResult = 
+                                    sorterRunResult.create 
+                                        nextSorterPoolSet 
+                                        (updatedSorterPoolSetSummary |> List.rev |> List.toArray)
 
-                        let stepRp = rp.WithGenerationCurrent(Some currentGen)
-                        let! qp = 
-                            host.RunDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterRunResult "")
-                            |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
+                                let stepRp = rp.WithGenerationCurrent(Some currentGen)
+            
+                                let! qp = 
+                                    host.RunDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterRunResult "")
+                                    |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
 
-                        log (sprintf "Saving SorterRunResult checkpoint at Generation %d (Id: %s)..." %currentGen (string qp.Id))
-                        do! host.RunDb.saveAsync qp (currentRunResult |> outputData.SorterRunResult) allowOverwrite
+                                log (sprintf "Saving SorterRunResult checkpoint at Generation %d..." %currentGen)
+            
+                                // saveAsync matches Async<Result<unit, string>> so do! directly unrolls it
+                                do! host.RunDb.saveAsync qp (currentRunResult |> outputData.SorterRunResult) allowOverwrite
+
+                                // Reset accumulator on success
+                                return []
+                            else
+                                return updatedSorterPoolSetSummary
+                        }
+
 
                     // Forced GC Compacting
                     if remainingSteps % 50 = 0 then
                         System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
                         GC.Collect(2, GCCollectionMode.Forced, true, true)
 
-                    return! loop (remainingSteps - 1) nextSorterPoolSet updatedSorterPoolSetSummary
+                    return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext
             }
 
         loop %genCount initialPoolSet []

@@ -53,6 +53,7 @@ module MsrsSgdExecutor =
                 let! sorterCountCycle = rp.GetSorterCountCycle() |> Result.ofOption "Missing sorterCountCycle."
                 let! sorterCountCycleMultiplier = rp.GetSorterCountCycleMultiplier() |> Result.ofOption "Missing sorterCountCycleMultiplier."
                 let! sorterPoolExpansionRate = rp.GetSorterPoolExpansionRate () |> Result.ofOption "Missing sorterPoolExpansionRate."
+                let! sorterPoolMeasure = rp.GetSorterPoolMeasure() |> Result.ofOption "Missing sorterPoolMeasure."
                 let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
 
                 log "Executing makeSortableTests..."
@@ -105,7 +106,7 @@ module MsrsSgdExecutor =
                     |> sorterModelMutator.Simple
 
                 log "Executing unified evolution run..."
-                let! (finalRunResult :sorterRunResult) = 
+                let! (finalRunResult: sorterRunResult) = 
                     EvolutionOrchestrator.runEvolutionAsync
                         host rp allowOverwrite genCurrent (genLast - genCurrent)
                         sorterCountCycle sorterCountCycleMultiplier sorterPoolExpansionRate
@@ -113,7 +114,7 @@ module MsrsSgdExecutor =
                         sortersPerPool sorterChildCount sortableTest sorterEvalType
                         sorterEvalMeasure initialSeedPoolSet sortedFraction 
                         snapshotReportInterval summaryReportInterval sorterPoolSelectionIntervals
-                        cts.Token log
+                        sorterPoolMeasure cts.Token log
 
                 //let! qp = 
                 //    host.RunDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterRunResult "")

@@ -22,7 +22,7 @@ module MsrsSgdSpecsTestPrefix =
             |> List.map SorterEvalSelectionType.toString)
         
     let generationLastTest = 
-            (runParameters.generationLastKey, [11] |> List.map string)
+            (runParameters.generationLastKey, [2001] |> List.map string)
 
     let generationLastLight = 
             (runParameters.generationLastKey, [2001] |> List.map string)
@@ -76,19 +76,20 @@ module MsrsSgdSpecsTestPrefix =
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction99
-                runResultReportInterval10
+                runResultReportInterval2
                 summaryReport_cSampleC
-                sorterPoolSelect5_2
+                sorterPoolSelects25_5i
                 generationLastTest
                 sorterCountCycle100
                 sorterCountCycleMultiplier1
                 mutationMod4
                 sorterPoolExpansionRate1
+                sorterPoolMeasures_noScw
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 1
+            maxParallel = 4
         }
 
 
@@ -125,6 +126,7 @@ module MsrsSgdSpecsTestPrefix =
                 sorterCountCycleMultiplier1
                 mutationMods128
                 sorterPoolExpansionRate2
+                sorterPoolMeasures_noScw
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer

@@ -11,6 +11,7 @@ open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
 open GeneSort.SortingLib.Sorter
+open GeneSort.Eval.V1.Sgd
 
 module MsrsSgdDbs =
     
@@ -259,6 +260,7 @@ module MsrsSgdDbs =
                     (spsi: essData)
                     (ssri: essData)
                     (syri: essData)
+                    (spm: sorterPoolMeasure)
                     (outputDataType: outputDataType) : queryParams =
 
             queryParams.create 
@@ -293,6 +295,7 @@ module MsrsSgdDbs =
                     (runParameters.sorterPoolSelectionIntervalsKey, (Some spsi) |> EssData.toString)
                     (runParameters.snapshotReportIntervalsKey, (Some ssri) |> EssData.toString)
                     (runParameters.summaryReportIntervalsKey, (Some syri) |> EssData.toString)
+                    (runParameters.sorterPoolMeasureKey, spm |> SorterPoolMeasure.toCompactString)
                 |]
 
 
@@ -328,11 +331,12 @@ module MsrsSgdDbs =
                 let! spsi = rp.GetSorterPoolSelectionIntervals()
                 let! ssri = rp.GetSnapshotReportIntervals()
                 let! syri = rp.GetSummaryReportIntervals()
+                let! spm = rp.GetSorterPoolMeasure()
                 return makeQueryParams repl rng curGen scPP sctc sctm 
                                        spc scc ses sem semi slId smt 
                                        sdf set sdMdr ortho para sym mdr 
                                        dsh pNm sfrac sper mmod
-                                       spsi ssri syri odt
+                                       spsi ssri syri spm odt
 
             }
 

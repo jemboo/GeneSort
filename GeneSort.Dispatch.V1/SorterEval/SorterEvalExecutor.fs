@@ -136,7 +136,7 @@ module SorterEvalExecutor =
                     host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                     |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
 
-                let collectTests = CollectSortableTests
+                let collectTests = CollectSortableTestsTrue
                 let testId = tests |> SortableTests.getId
                 let baseFirstIdx = (%repl * %totalSorterCount)
 

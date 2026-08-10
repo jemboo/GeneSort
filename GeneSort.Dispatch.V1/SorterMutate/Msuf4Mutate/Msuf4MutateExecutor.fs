@@ -323,7 +323,7 @@ module Msuf4MutateExecutor =
                     host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                     |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
 
-                let collectTests = CollectSortableTests
+                let collectTests = CollectSortableTestsTrue
                 let testId = tests |> SortableTests.getId
                 
                 // 2. Setup Accumulators and Lazy Chunk Loop via Seq.chunkBySize

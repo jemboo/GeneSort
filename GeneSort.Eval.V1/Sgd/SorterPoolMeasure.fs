@@ -11,7 +11,9 @@ type stDevPoolMeasure = private {
     stDevWeight: float<stDevWeight>
     sorterEvalMeasure: sorterEvalMeasure
 } with
-    static member create (stDevWeight: float<stDevWeight>) (sorterEvalMeasure: sorterEvalMeasure) : stDevPoolMeasure =
+    static member create 
+                (stDevWeight: float<stDevWeight>) 
+                (sorterEvalMeasure: sorterEvalMeasure) : stDevPoolMeasure =
         {
             stDevWeight = stDevWeight
             sorterEvalMeasure = sorterEvalMeasure
@@ -65,7 +67,12 @@ module PoolEvalFunctions =
                 let avg = SorterPool.getAverageScore m.SorterEvalMeasure pool |> UMX.untag
                 let stdDev = SorterPool.getStandardDeviationOfScores m.SorterEvalMeasure pool |> UMX.untag
                 let weight = %m.StDevWeight
-                
                 // Subtract stdDev component since larger standard deviation is better (lowers score)
                 let compositeScore = avg - (weight * stdDev)
                 UMX.tag<sorterPoolEvalScore> compositeScore
+
+
+    /// Evaluates the pool score using the specified poolMeasure.
+    let getPoolScore (measure: sorterPoolMeasure) (pool: sorterPool) : float<sorterPoolEvalScore> =
+        let evalFunc = getFunctionForMeasure measure
+        evalFunc pool

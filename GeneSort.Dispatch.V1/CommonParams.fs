@@ -7,10 +7,11 @@ open GeneSort.Sorting
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.SortingLib.Sorter
+open GeneSort.Eval.V1.Sgd
 
 module CommonParams =
 
-    let CollectSortableTests = true
+    let CollectSortableTestsTrue = true
     let ExcludeSelfCe = true |> UMX.tag<excludeSelfCe>
 
     // SimpleSorterModelTypes
@@ -43,6 +44,7 @@ module CommonParams =
     let min50 = 50
     let min100 = 100
     let scale1 = 1
+    let scale2 = 2
     let scale5 = 5
     let scale10 = 10
     let scale25 = 25
@@ -51,6 +53,10 @@ module CommonParams =
     let scale500 = 500
     let scale1K = 1000
     let scale5K = 5000
+    
+    //2, 4, 6, ...
+    let runResultReportInterval2 = 
+        (runParameters.snapshotReportIntervalsKey, [EssData.create EssData.cSampleC scale2 min1 None |> Some] |> List.map EssData.toString)
 
     //10, 20, 30, ...
     let runResultReportInterval10 = 
@@ -578,6 +584,36 @@ module CommonParams =
             [ _cestM_noScw; _cestM_ScwP1; _cestM_ScwP2; _cestM_ScwP3; 
              _cestM_ScwP4; _cestM_ScwP5; _cestM_ScwM1; _cestM_ScwM2; ] 
             |> List.map SorterEvalMeasure.toCompactString)
+
+
+
+
+    // SorterPoolMeasures
+
+    let _spm_zp4_noScw = stDevPoolMeasure.create 
+                                (0.4<stDevWeight>) 
+                                _cestM_noScw
+                         |> sorterPoolMeasure.StDevPool
+
+
+    let _spm_z_noScw = stDevPoolMeasure.create 
+                                (0.0<stDevWeight>) 
+                                _cestM_noScw
+                       |> sorterPoolMeasure.StDevPool
+
+    let sorterPoolMeasure_zp4_noScw =
+            (runParameters.sorterPoolMeasureKey, 
+            [ _spm_zp4_noScw;] |> List.map SorterPoolMeasure.toCompactString)
+
+
+    let sorterPoolMeasure_z_noScw =
+            (runParameters.sorterPoolMeasureKey, 
+            [ _spm_z_noScw;] |> List.map SorterPoolMeasure.toCompactString)
+
+
+    let sorterPoolMeasures_noScw =
+            (runParameters.sorterPoolMeasureKey, 
+            [ _spm_zp4_noScw; _spm_z_noScw;] |> List.map SorterPoolMeasure.toCompactString)
 
 
 

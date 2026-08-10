@@ -15,15 +15,36 @@ module StringUtils =
 
 module CompactStringParser =
 
+    /// Extracts a key-value token handling nested balanced parentheses.
     let getValue (key: string) (input: string) : string =
         let prefix = key + "="
-        if input.Contains(prefix) then
-            let startIdx = input.IndexOf(prefix) + prefix.Length
-            let remainder = input.Substring(startIdx)
-            // Trim off trailing commas, parentheses, or extra text
-            remainder.Split([| ','; ')'; ' ' |], StringSplitOptions.RemoveEmptyEntries).[0].Trim()
-        else
+        let idx = input.IndexOf(prefix)
+        if idx < 0 then
             failwithf "Key '%s' not found in compact string '%s'" key input
+            
+        let startIdx = idx + prefix.Length
+        let mutable parenCount = 0
+        let mutable endIdx = startIdx
+        let mutable found = false
+
+        while endIdx < input.Length && not found do
+            let ch = input.[endIdx]
+            match ch with
+            | '(' -> 
+                parenCount <- parenCount + 1
+                endIdx <- endIdx + 1
+            | ')' -> 
+                if parenCount > 0 then
+                    parenCount <- parenCount - 1
+                    endIdx <- endIdx + 1
+                else
+                    found <- true
+            | ',' when parenCount = 0 -> 
+                found <- true
+            | _ -> 
+                endIdx <- endIdx + 1
+
+        input.Substring(startIdx, endIdx - startIdx).Trim()
 
     let parseBool<[<Measure>] 'm> (key: string) (input: string) : bool<'m> =
         let raw = getValue key input
@@ -36,4 +57,3 @@ module CompactStringParser =
         match Double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture) with
         | true, v -> UMX.tag<'m> v
         | _ -> failwithf "Failed to parse float for key '%s' in '%s'" key input
-

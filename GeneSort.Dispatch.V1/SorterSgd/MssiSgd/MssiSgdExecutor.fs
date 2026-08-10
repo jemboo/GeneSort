@@ -53,6 +53,7 @@ module MssiSgdExecutor =
                 let! sorterCountCycle = rp.GetSorterCountCycle() |> Result.ofOption "Missing sorterCountCycle."
                 let! sorterCountCycleMultiplier = rp.GetSorterCountCycleMultiplier() |> Result.ofOption "Missing sorterCountCycleMultiplier."
                 let! sorterPoolExpansionRate = rp.GetSorterPoolExpansionRate () |> Result.ofOption "Missing sorterPoolExpansionRate."
+                let! sorterPoolMeasure = rp.GetSorterPoolMeasure() |> Result.ofOption "Missing sorterPoolMeasure."
                 let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
 
                 // 2. Resolve target seed sorterPoolSet collection state depending on genFirst criteria
@@ -100,7 +101,7 @@ module MssiSgdExecutor =
                         sortersPerPool sorterChildCount sortableTest sorterEvalType
                         sorterEvalMeasure initialSeedPoolSet sortedFraction
                         snapshotReportInterval summaryReportInterval sorterPoolSelectionIntervals
-                        cts.Token log
+                        sorterPoolMeasure cts.Token log
 
                 log "evaluateEvolutionRun completed."
                 let finalRp = rp.WithGenerationCurrent(Some genLast).WithRunFinished(Some true)
