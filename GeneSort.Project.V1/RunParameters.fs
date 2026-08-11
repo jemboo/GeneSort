@@ -345,7 +345,7 @@ type runParameters =
     member this.WithCeLength(cl: int<ceLength> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.ceLengthKey (cl |> Option.map UmxExt.intToRaw) }
 
-    member this.WithCollectSortableTests(cst: bool option) = 
+    member this.WithCollectNewSortableTests(cst: bool<collectNewSortableTests> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.collectSortableTestsKey (cst |> Option.map string) }
 
     member this.WithDatabaseName(dbn: string<databaseName> option) = 

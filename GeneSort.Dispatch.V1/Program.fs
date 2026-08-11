@@ -265,7 +265,7 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 //********** MsrsSgdSpecsPrefix **********
 let configType = MsrsSgdSpecsTestPrefix.configType.Test
-let executorType = sorterSgdExecutorType.GenPrefix
+let executorType = sorterSgdExecutorType.SummaryReport
 let host: IRunHost = 
     let spec = MsrsSgdSpecsTestPrefix.getRunHostSpec configType executorType
     MsrsSgdDbs.createRunHost spec

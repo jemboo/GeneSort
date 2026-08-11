@@ -254,19 +254,19 @@ module SorterPoolSet =
         let totalRequiredSorters = %poolCount * %sortersPerPool
         let availableModels = modelSet.SorterModels
 
-        // Guard: Verify the source model set contains enough elements to completely satisfy the requested layout bounds
-        if availableModels.Length < totalRequiredSorters then
-            raise (ArgumentException(
-                sprintf "Insufficient models in sorterModelSet. Required: %d (Pools: %d, SortersPerPool: %d), Available: %d." 
-                    totalRequiredSorters %poolCount %sortersPerPool availableModels.Length))
+        //// Guard: Verify the source model set contains enough elements to completely satisfy the requested layout bounds
+        //if availableModels.Length < totalRequiredSorters then
+        //    raise (ArgumentException(
+        //        sprintf "Insufficient models in sorterModelSet. Required: %d (Pools: %d, SortersPerPool: %d), Available: %d." 
+        //            totalRequiredSorters %poolCount %sortersPerPool availableModels.Length))
 
         // 1. Slice the exact number of required parent sorter models from the array head
-        let targetedModels = availableModels |> Array.take totalRequiredSorters
-
+        let targetedModels = availableModels |> Array.truncate totalRequiredSorters
+        let adjSortersPerPool = ((float targetedModels.Length) /(float %poolCount)) |> floor |> int
         // 2. Fragment the contiguous models stream into distinct array slices per pool block boundary
         let pools = 
             targetedModels
-            |> Array.chunkBySize %sortersPerPool
+            |> Array.chunkBySize adjSortersPerPool
             |> Array.map (fun modelChunk ->
                 
                 let poolName =

@@ -66,9 +66,13 @@ module MsrsSgdSpecsTestPrefix =
                                 (0.0 |> UMX.tag<stageCrossingWeight>)
                              |> sorterEvalMeasure.CeSt
 
-        let sorterEvalSelectionType = sorterEvalSelectionType.GuidOrder 12000<sorterCount>
+        let spp = rp.GetSorterCountPerPool().Value |> UMX.untag
+        let pc = rp.GetSorterPoolCount().Value |> UMX.untag
+
+        let sorterEvalSelectionType = sorterEvalSelectionType.GuidOrder ((spp) |> UMX.tag<sorterCount>)
 
         let newRp = rp.WithRngType(Some rngType.Lcg)
+                      .WithCollectNewSortableTests(true |> UMX.tag<collectNewSortableTests> |> Some)
                       .WithExcludeSelfCe(true |> UMX.tag<excludeSelfCe> |> Some)
                       .WithSortableTestFilter(Some stf)
                       .WithSortingWidth(Some stf.sortingWidth)
