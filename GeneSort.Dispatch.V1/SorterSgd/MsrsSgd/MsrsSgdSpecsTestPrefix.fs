@@ -39,17 +39,6 @@ module MsrsSgdSpecsTestPrefix =
             (runParameters.generationCurrentKey, [0] |> List.map string)
             
 
-    //let prefixEnhancerO (host: IRunHost) (rp: runParameters) : runParameters =
-    //    let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
-        
-    //    let stf = rp.GetSortableTestFilter().Value
-    //    rp.WithDatabaseName(Some host.Run.DatabaseName)
-    //      .WithSortingWidth(Some stf.sortingWidth)
-    //      .WithRunName(Some host.Run.RunName)
-    //      .WithRunFinished(Some false)
-    //      .WithId (Some qp.Value.Id)
-
-
     let prefixEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let stf = SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix3a
         let evalMeasureInitial = ceStMeasure.create 
@@ -91,6 +80,7 @@ module MsrsSgdSpecsTestPrefix =
                       .WithSorterEvalMeasureInitial(Some evalMeasureInitial)
                       .WithSorterEvalMeasure(Some evalMeasureRun)
                       .WithSorterEvalSelectionType(Some sorterEvalSelectionType)
+                      .WithSorterPoolExpansionRate(Some 2<sorterPoolExpansionRate>)
 
 
         let qp = host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.Run host.Run.RunName)
@@ -126,7 +116,6 @@ module MsrsSgdSpecsTestPrefix =
                 sorterCountCycle100
                 sorterCountCycleMultiplier1
                 mutationMod4
-                sorterPoolExpansionRate2
                 sorterPoolMeasures_noScw
             ]
             filter = paramMapFilter
@@ -141,26 +130,9 @@ module MsrsSgdSpecsTestPrefix =
             runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for 24pfx Msrs"
             spans = [
-                rngTypeLcg
                 generationCurrent
                 thirtyTwoSortersPerPool
                 poolCount32
-                oneChildCount
-                sorterEvalSelectionTypeGuid12K
-                sorterEvalMeasureInitial_CestM_noScw
-                sorterEvalMeasure_CestM_noScw
-                sortableTestFilter_Prefix24_3a
-                msrsModelType
-                sorterEvalTypeV1
-                seedModificationRate02
-                modificationRatep06
-                mRateOrtho
-                mRatePara
-                mRateSelfSym
-                dataFomatBitv512
-                distinctSorterHashesTrue
-                prioritizeNewMutantsTrue
-                sortedFraction99
                 runResultReportInterval500
                 summaryReport_cSample5C
                 sorterPoolSelects25_5i
@@ -168,7 +140,6 @@ module MsrsSgdSpecsTestPrefix =
                 sorterCountCycle100
                 sorterCountCycleMultiplier1
                 mutationMods128
-                sorterPoolExpansionRate2
                 sorterPoolMeasures_noScw
             ]
             filter = paramMapFilter

@@ -58,6 +58,7 @@
     <Compile Include="SorterSgd\MutatorMakers.fs" />
     <Compile Include="SorterSgd\SortableTestMakers.fs" />
     <Compile Include="SorterSgd\EvolutionOrchestrator.fs" />
+    <Compile Include="SorterSgd\SgdExecutor.fs" />
     <Compile Include="SorterSgd\Reporting.fs" />
     <Compile Include="SorterSgd\MsceSgd\MsceSgdDbs.fs" />
     <Compile Include="SorterSgd\MsceSgd\MsceSgdExecutor.fs" />

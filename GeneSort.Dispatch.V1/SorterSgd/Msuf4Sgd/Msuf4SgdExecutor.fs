@@ -1,121 +1,15 @@
 ﻿namespace GeneSort.Dispatch.V1.SorterSgd.Msuf4
 
-open System
-open System.Threading
-open FSharp.UMX
-open GeneSort.Core
-open GeneSort.Db.V1
-open GeneSort.Project.V1
-open GeneSort.Model.Sorting.V1
-open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.OpsUtils
-open GeneSort.Model.Sorting.Simple.V1
-open GeneSort.Eval.V1.Sgd
 open GeneSort.Dispatch.V1.SorterSgd
-open GeneSort.Sorting
 
 
 module Msuf4SgdExecutor =
 
-    let evaluateEvolutionRun
-            (makeSortableTests: runParameters -> Async<Result<sortableTest, string>>)
-            (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
-            (host: IRunHost)
-            (rp: runParameters)
-            (allowOverwrite: bool<allowOverwrite>)
-            (cts: CancellationTokenSource)
-            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
-
-        let log msg = 
-            OpsUtils.report progress 
-                (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
-
-        asyncResult {
-            try
-                do! checkCancellation cts.Token
-
-                // 1. Core structural control parameters
-                let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
-                let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
-                let! snapshotReportInterval = rp.GetSnapshotReportIntervals() |> Result.ofOption "Missing snapshot report interval."
-                let! summaryReportInterval = rp.GetSummaryReportIntervals() |> Result.ofOption "Missing summary report interval."
-                let! sorterPoolSelectionIntervals = rp.GetSorterPoolSelectionIntervals() |> Result.ofOption "Missing sorterPoolSelectionInterval."
-                let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
-                let! sortingWidth = rp.GetSortingWidth() |> Result.ofOption "Missing sortingWidth."
-                let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
-                let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count"
-                let! sorterEvalMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
-                let! sorterEvalType = rp.GetSorterEvalType() |> Result.ofOption "Missing sorterEvalType."
-                let! distinctSorterHashes = rp.GetDistinctSorterHashes() |> Result.ofOption "Missing distinctSorterHashes."
-                let! collectNewSortableTests = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests."
-                let! sortedFraction = rp.GetSortedFraction() |> Result.ofOption "Missing sortedFraction."
-                let! sorterPoolExpansionRate = rp.GetSorterPoolExpansionRate () |> Result.ofOption "Missing sorterPoolExpansionRate."
-                let! sorterCountCycle = rp.GetSorterCountCycle() |> Result.ofOption "Missing sorterCountCycle."
-                let! sorterCountCycleMultiplier = rp.GetSorterCountCycleMultiplier() |> Result.ofOption "Missing sorterCountCycleMultiplier."
-                let! sorterPoolMeasure = rp.GetSorterPoolMeasure() |> Result.ofOption "Missing sorterPoolMeasure."
-                let! (excludeSelfCe: bool<excludeSelfCe>) = rp.GetExcludeSelfCe() |> Result.ofOption "Missing excludeSelfCe in run parameters"
-                let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
-
-                let! initialSeedPoolSet = 
-                    if %genCurrent > 0 then
-                        log "Looking up historical sorterPoolSet from database..."
-                        let qpSRRResult = 
-                            host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterRunResult "")
-                            |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
-                        asyncResult {
-                            let! qpSRR = qpSRRResult 
-                            let! (outData: outputData) = host.RunDb.loadAsync qpSRR |> AsyncResult.mapError (fun err -> sprintf "Database load error: %A" err)
-                            let! sorterRunRes = outData |> OutputData.asSorterRunResult
-                            return sorterRunRes.FinalPoolSet
-                        }
-                    else
-                        log "Make seedSorterPoolSet..."
-                        sorterPoolSetCreator rp
-
-                do! checkCancellation cts.Token
-                let! sortableTest = makeSortableTests rp
-                
-                let! (orthoRate: float<orthoRate>) = rp.GetOrthoRate() |> Result.ofOption "Missing orthoRate in run parameters"
-                let! (paraRate: float<paraRate>) = rp.GetParaRate() |> Result.ofOption "Missing paraRate in run parameters"
-                let! (selfSymRate: float<selfSymRate>) = rp.GetSelfSymRate() |> Result.ofOption "Missing selfSymRate in run parameters"
-                let! modificationRate = rp.GetModificationRate() |> Result.ofOption "Missing modificationRate."
-                let! seedModificationRate = rp.GetSeedModificationRate() |> Result.ofOption "Missing seedModificationRate."
-
-                let (sorterModelMutator: sorterModelMutator) = 
-                    SimpleSorterModelMutator.getMsuf4ModelMutator
-                        sortingWidth (RngFactory.create rngType) excludeSelfCe
-                        seedModificationRate modificationRate orthoRate paraRate selfSymRate
-                    |> sorterModelMutator.Simple
-
-                // 3. Define the step strategy closure
-                log "Executing unified evolution run..."
-                let! (finalRunResult :sorterRunResult) = 
-                    EvolutionOrchestrator.runEvolutionAsync
-                        host rp allowOverwrite genCurrent (genLast - genCurrent)
-                        sorterCountCycle sorterCountCycleMultiplier sorterPoolExpansionRate
-                        sorterModelMutator prioritizeNewMutants distinctSorterHashes
-                        sortersPerPool sorterChildCount sortableTest sorterEvalType
-                        sorterEvalMeasure initialSeedPoolSet collectNewSortableTests sortedFraction 
-                        snapshotReportInterval summaryReportInterval sorterPoolSelectionIntervals
-                        sorterPoolMeasure cts.Token log
-
-                log "evaluateEvolutionRun completed."
-                let finalRp = rp.WithGenerationCurrent(Some genLast).WithRunFinished(Some true)
-                return finalRp
-
-            with e -> 
-                let errorMsg = sprintf "Error in evaluateEvolutionRun: %s" e.Message
-                log errorMsg 
-                return! Error errorMsg
-        } |> Async.map (logResult progress log)
-
-
-
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                evaluateEvolutionRun
+                SgdExecutor.evaluateEvolutionRun
                     SortableTestMakers.makeStandardTests
                     PoolSetMakers.createSeedSorterPoolSetStandard
                     host rp allowOverwrite cts progress }
@@ -123,7 +17,7 @@ module Msuf4SgdExecutor =
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                evaluateEvolutionRun
+                SgdExecutor.evaluateEvolutionRun
                     SortableTestMakers.makeMergeTests
                     PoolSetMakers.createSeedSorterPoolSetMerge
                     host rp allowOverwrite cts progress }
@@ -132,7 +26,7 @@ module Msuf4SgdExecutor =
     let prefixExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                evaluateEvolutionRun
+                SgdExecutor.evaluateEvolutionRun
                     SortableTestMakers.makePrefixTests
                     PoolSetMakers.createSeedSorterPoolSetPrefix
                     host rp allowOverwrite cts progress }
