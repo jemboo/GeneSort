@@ -50,9 +50,9 @@ module MsrsSgdSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesMsuf4
                 sortingWidth16
                 poolCount8
@@ -81,9 +81,9 @@ module MsrsSgdSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasureInitial_CestM_noScw
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesStage
                 sortingWidth16
                 poolCount1
@@ -113,9 +113,9 @@ module MsrsSgdSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasureInitial_CestM_noScw
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesMsuf4
                 sortingWidth16
                 poolCount8
@@ -142,9 +142,9 @@ module MsrsSgdSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasureInitial_CestM_noScw
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesMsuf4
                 sortingWidth16
                 poolCount8

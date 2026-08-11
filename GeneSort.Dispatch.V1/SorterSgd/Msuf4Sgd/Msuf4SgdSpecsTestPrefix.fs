@@ -57,9 +57,9 @@ module Msuf4SgdSpecsTestPrefix =
                 msuf4ModelType
                 sorterEvalTypeV1
                 seedModificationRate03
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesMsuf4center
                 dataFomatBitv512
                 distinctSorterHashesTrue

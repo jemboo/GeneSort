@@ -41,9 +41,9 @@ module MsrsMutateSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesMsuf4
                 testSortingWidths
                 msrsModelType
@@ -64,9 +64,9 @@ module MsrsMutateSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesMsuf4
                 smallSortingWidths
                 msrsModelType
@@ -87,9 +87,9 @@ module MsrsMutateSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesMsuf4
                 mediumSortingWidths
                 msrsModelType

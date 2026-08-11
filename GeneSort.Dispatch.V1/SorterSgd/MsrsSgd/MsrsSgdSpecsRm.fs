@@ -53,9 +53,9 @@ module MsrsSgdSpecsRm =
                 sorterEvalSelection
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesMsuf4
                 sortingWidth32
                 mergeDimension8
@@ -86,9 +86,9 @@ module MsrsSgdSpecsRm =
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesMsuf4
                 testMergeSortingWidths
                 msrsModelType
@@ -118,9 +118,9 @@ module MsrsSgdSpecsRm =
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesMsuf4
                 testMergeSortingWidths
                 msrsModelType

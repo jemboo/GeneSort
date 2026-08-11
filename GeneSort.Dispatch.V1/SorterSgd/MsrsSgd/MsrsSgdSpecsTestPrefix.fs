@@ -7,6 +7,11 @@ open GeneSort.Sorting
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterSgd
+open GeneSort.Core
+open GeneSort.Model.Sorting.V1
+open GeneSort.SortingOps
+open GeneSort.SortingLib.Sorter
+//open GeneSort.Model.Sorting.V1
 
 
 module MsrsSgdSpecsTestPrefix =
@@ -22,7 +27,7 @@ module MsrsSgdSpecsTestPrefix =
             |> List.map SorterEvalSelectionType.toString)
         
     let generationLastTest = 
-            (runParameters.generationLastKey, [2001] |> List.map string)
+            (runParameters.generationLastKey, [11] |> List.map string)
 
     let generationLastLight = 
             (runParameters.generationLastKey, [2001] |> List.map string)
@@ -34,15 +39,66 @@ module MsrsSgdSpecsTestPrefix =
             (runParameters.generationCurrentKey, [0] |> List.map string)
             
 
-    let prefixEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
+    //let prefixEnhancerO (host: IRunHost) (rp: runParameters) : runParameters =
+    //    let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
         
-        let stf = rp.GetSortableTestFilter().Value
-        rp.WithDatabaseName(Some host.Run.DatabaseName)
-          .WithSortingWidth(Some stf.sortingWidth)
-          .WithRunName(Some host.Run.RunName)
-          .WithRunFinished(Some false)
-          .WithId (Some qp.Value.Id)
+    //    let stf = rp.GetSortableTestFilter().Value
+    //    rp.WithDatabaseName(Some host.Run.DatabaseName)
+    //      .WithSortingWidth(Some stf.sortingWidth)
+    //      .WithRunName(Some host.Run.RunName)
+    //      .WithRunFinished(Some false)
+    //      .WithId (Some qp.Value.Id)
+
+
+    let prefixEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
+        let stf = SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix3a
+        let evalMeasureInitial = ceStMeasure.create 
+                                    (1.1<stageWeight>) 
+                                    (true |> UMX.tag<filterUnsorted>)
+                                    (false |> UMX.tag<filterReflectionSymmetric>)
+                                    (0.0 |> UMX.tag<stageCrossingWeight>)
+                                 |> sorterEvalMeasure.CeSt
+
+        let evalMeasureRun = ceStMeasure.create 
+                                (1.1<stageWeight>) 
+                                (true |> UMX.tag<filterUnsorted>)
+                                (false |> UMX.tag<filterReflectionSymmetric>)
+                                (0.0 |> UMX.tag<stageCrossingWeight>)
+                             |> sorterEvalMeasure.CeSt
+
+        let sorterEvalSelectionType = sorterEvalSelectionType.GuidOrder 12000<sorterCount>
+
+        let newRp = rp.WithRngType(Some rngType.Lcg)
+                      .WithExcludeSelfCe(true |> UMX.tag<excludeSelfCe> |> Some)
+                      .WithSortableTestFilter(Some stf)
+                      .WithSortingWidth(Some stf.sortingWidth)
+                      .WithSorterChildCount(Some 1<sorterChildCount>)
+                      .WithSimpleSorterModelType(Some simpleSorterModelType.Msrs)
+                      .WithSorterEvalType(Some sorterEvalType.V1)
+                      .WithSeedModificationRate(Some 0.02<seedModificationRate>)
+                      .WithModificationRate(Some 0.06<modificationRate>)
+                      .WithOrthoRate(Some 4.001<orthoRate>)
+                      .WithParaRate(Some 0.4<paraRate>)
+                      .WithSelfSymRate(Some 2.001<selfSymRate>)
+                      .WithSortableDataFormat(Some sortableDataFormat.BitVector512)
+                      .WithDistinctSorterHashes(Some true)
+                      .WithPrioritizeNewMutants(Some true)
+                      .WithSortedFraction(Some 0.99<sortedFraction>)
+                      .WithSorterEvalMeasureInitial(Some evalMeasureInitial)
+                      .WithSorterEvalMeasure(Some evalMeasureRun)
+                      .WithSorterEvalSelectionType(Some sorterEvalSelectionType)
+
+
+        let qp = host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.Run host.Run.RunName)
+
+        newRp.WithDatabaseName(Some host.Run.DatabaseName)
+             .WithSortingWidth(Some stf.sortingWidth)
+             .WithRunName(Some host.Run.RunName)
+             .WithRunFinished(Some false)
+             .WithId (Some qp.Value.Id)
+
+
+
 
 
     let private paramMapFilter (rp: runParameters) =
@@ -56,27 +112,10 @@ module MsrsSgdSpecsTestPrefix =
             runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for 24pfx Msrs"
             spans = [
-                rngTypeLcg
                 generationCurrent
                 sixteenSortersPerPool
                 poolCount16
-                oneChildCount
-                sorterEvalSelectionTypeGuid1K
-                sorterEvalMeasureInitial_CestM_noScw
-                sorterEvalMeasure_CestM_noScw
-                sortableTestFilter_Prefix24_3a
-                msrsModelType
-                sorterEvalTypeV1
-                seedModificationRate02
-                modificationRatep04
-                orthoRate
-                paraRate
-                selfSymRate
-                dataFomatBitv512
-                distinctSorterHashesTrue
-                prioritizeNewMutantsTrue
-                sortedFraction99
-                runResultReportInterval500
+                runResultReportInterval2
                 summaryReport_cSampleC
                 sorterPoolSelects25_5i
                 generationLastTest
@@ -89,7 +128,7 @@ module MsrsSgdSpecsTestPrefix =
             filter = paramMapFilter
             enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 4
+            maxParallel = 1
         }
 
 
@@ -111,9 +150,9 @@ module MsrsSgdSpecsTestPrefix =
                 sorterEvalTypeV1
                 seedModificationRate02
                 modificationRatep06
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 dataFomatBitv512
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
@@ -152,9 +191,9 @@ module MsrsSgdSpecsTestPrefix =
                 sorterEvalTypeV1
                 seedModificationRate02
                 modificationRatep06
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 dataFomatBitv512
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue

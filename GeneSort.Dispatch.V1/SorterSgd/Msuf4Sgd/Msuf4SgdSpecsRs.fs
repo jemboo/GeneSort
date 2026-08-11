@@ -53,9 +53,9 @@ module Msuf4SgdSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 seedModificationRate12
                 modificationRatesMsuf4
                 sortingWidth16
@@ -84,9 +84,9 @@ module Msuf4SgdSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 seedModificationRate12
                 modificationRatesMsuf4
                 sortingWidth16
@@ -115,9 +115,9 @@ module Msuf4SgdSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 seedModificationRate10
                 modificationRate03
                 sortingWidth16
@@ -147,9 +147,9 @@ module Msuf4SgdSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 seedModificationRate12
                 modificationRates15
                 sortingWidth16

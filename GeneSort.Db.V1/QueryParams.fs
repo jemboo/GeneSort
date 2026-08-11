@@ -78,11 +78,11 @@ type queryParams =
 
 
     static member createForRun 
-                    (queryName: string<databaseName>) 
+                    (databaseName: string<databaseName>) 
                     (projName:  string<projectName>)
                     (runName:   string<runName>) 
                     : queryParams =
-        queryParams.create queryName projName None (outputDataType.Run runName) [||]
+        queryParams.create databaseName projName None (outputDataType.Run runName) [||]
 
 
     static member createForTextReport

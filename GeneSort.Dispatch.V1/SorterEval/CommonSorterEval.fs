@@ -34,6 +34,7 @@ module CommonSorterEval =
             (rngType: rngType) 
             (sortingWidth: int<sortingWidth>)
             (simpleSorterModelType: simpleSorterModelType) 
+            (excludeSelfCe: bool<excludeSelfCe>)
                             : sorterModelGen =
             let stageLength = getStageLength simpleSorterModelType sortingWidth
             let rngFactory = rngType |> RngFactory.create
@@ -42,7 +43,7 @@ module CommonSorterEval =
                                     sortingWidth 
                                     stageLength 
                                     simpleSorterModelType
-                                    ExcludeSelfCe
+                                    excludeSelfCe
                                     |> sorterModelGen.Simple
 
 

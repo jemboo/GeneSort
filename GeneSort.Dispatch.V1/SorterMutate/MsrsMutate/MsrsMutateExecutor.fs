@@ -111,6 +111,9 @@ module MsrsMutateExecutor =
                         rp.GetMutationMod() 
                         |> Result.ofOption "Missing mutationMod in run parameters"
 
+            let! (excludeSelfCe: bool<excludeSelfCe>) = 
+                        rp.GetExcludeSelfCe()
+                        |> Result.ofOption "Missing excludeSelfCe in run parameters"
 
             let rngFactory = rngType |> RngFactory.create
 
@@ -132,6 +135,7 @@ module MsrsMutateExecutor =
                                         rngType 
                                         sortingWidth 
                                         simpleSorterModelType
+                                        excludeSelfCe
 
             let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
@@ -139,7 +143,7 @@ module MsrsMutateExecutor =
 
             let sorterModelMutator = SimpleSorterModelMutator.getMsrsModelMutator
                                             rngFactory
-                                            ExcludeSelfCe
+                                            excludeSelfCe
                                             modificationRate
                                             orthoRate
                                             paraRate
@@ -214,11 +218,14 @@ module MsrsMutateExecutor =
             let! (sem:sorterEvalMeasure) = 
                         rp.GetSorterEvalMeasure()
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
-
                         
             let! (mutationMod: int<mutationMod>) = 
                         rp.GetMutationMod() 
-                        |> Result.ofOption "Missing mutationMod in run parameters"
+                        |> Result.ofOption "Missing mutationMod in run parameters"    
+                        
+            let! (excludeSelfCe: bool<excludeSelfCe>) = 
+                        rp.GetExcludeSelfCe()
+                        |> Result.ofOption "Missing excludeSelfCe in run parameters"
 
             let rngFactory = rngType |> RngFactory.create
 
@@ -242,6 +249,7 @@ module MsrsMutateExecutor =
                                         rngType 
                                         sortingWidth 
                                         simpleSorterModelType
+                                        excludeSelfCe
 
             let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
@@ -249,7 +257,7 @@ module MsrsMutateExecutor =
 
             let sorterModelMutator = SimpleSorterModelMutator.getMsrsModelMutator
                                             rngFactory
-                                            ExcludeSelfCe
+                                            excludeSelfCe
                                             modificationRate
                                             orthoRate
                                             paraRate
@@ -313,7 +321,11 @@ module MsrsMutateExecutor =
                     host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                     |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
 
-                let collectTests = CollectSortableTestsTrue
+                let! collectSortableTests = 
+                     rp.GetCollectNewSortableTests()
+                     |> Result.ofOption "Missing collectSortableTests in run parameters"
+
+
                 let testId = tests |> SortableTests.getId
                 
                 // 2. Setup Accumulators and Lazy Chunk Loop via Seq.chunkBySize
@@ -344,7 +356,7 @@ module MsrsMutateExecutor =
 
                     // Compute sorter evaluations directly from the targeted network chunk
                     let sorterEvalsChunk = 
-                        SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters tests sorterEvalType collectTests
+                        SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters tests sorterEvalType collectSortableTests
 
                     // Accumulate transient array chunk results
                     allChunksEvals.Add(sorterEvalsChunk)

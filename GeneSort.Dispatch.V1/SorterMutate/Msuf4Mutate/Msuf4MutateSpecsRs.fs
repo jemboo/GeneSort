@@ -45,9 +45,9 @@ module Msuf4MutateSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 seedModificationRate12
                 modificationRatesMsuf4
                 testSortingWidths
@@ -70,9 +70,9 @@ module Msuf4MutateSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 seedModificationRate12
                 modificationRatesMsuf4
                 smallSortingWidths
@@ -94,9 +94,9 @@ module Msuf4MutateSpecsRs =
                 sorterEvalSelection
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 seedModificationRate12
                 modificationRatesMsuf4
                 mediumSortingWidths

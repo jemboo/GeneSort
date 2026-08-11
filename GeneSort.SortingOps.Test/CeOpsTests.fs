@@ -64,7 +64,7 @@ type CeOpsTests() =
         let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) sortingWidth [| createCe 0 1 |]
         
         // Act
-        let collectNewSortableTests = false
+        let collectNewSortableTests = false |> UMX.tag<collectNewSortableTests>
         let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTests ceBlock collectNewSortableTests
         
         // Assert
@@ -93,7 +93,7 @@ type CeOpsTests() =
         let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) sortingWidth [| createCe 0 1 |]
         
         // Act
-        let collectNewSortableTests = false
+        let collectNewSortableTests = false |> UMX.tag<collectNewSortableTests>
         let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
         
         // Assert
@@ -117,7 +117,7 @@ type CeOpsTests() =
         let ceBlock = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) sortingWidth [| createCe 0 1 |] 
 
         // Act
-        let collectNewSortableTests = false
+        let collectNewSortableTests = false |> UMX.tag<collectNewSortableTests>
         let result = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
         
         // Assert

@@ -43,8 +43,8 @@ module MssiMutateSpecsRs =
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
+                mRateOrtho
+                mRatePara
                 modificationRatesMsuf4
                 testSortingWidths
                 mssiModelType
@@ -66,8 +66,8 @@ module MssiMutateSpecsRs =
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
+                mRateOrtho
+                mRatePara
                 modificationRatesMsuf4
                 smallSortingWidths
                 mssiModelType
@@ -88,8 +88,8 @@ module MssiMutateSpecsRs =
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
+                mRateOrtho
+                mRatePara
                 modificationRatesMsuf4
                 mediumSortingWidths
                 mssiModelType

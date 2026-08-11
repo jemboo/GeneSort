@@ -2,6 +2,7 @@
 
 
 [<Measure>] type ceBlockId
+[<Measure>] type collectNewSortableTests
 [<Measure>] type filterReflectionSymmetric
 [<Measure>] type filterUnsorted
 [<Measure>] type unsortedWeight

@@ -15,6 +15,7 @@ module SorterPoolRunner =
             (sortableTest: sortableTest)
             (sorterEvalType: sorterEvalType)
             (reEvaluateParents: bool)
+            (collectNewSortableTests: bool<collectNewSortableTests>)
             (poolSet: sorterPoolSet)
             : Map<Guid<sorterPoolMemberId>, sorterEval> =
 
@@ -66,7 +67,6 @@ module SorterPoolRunner =
                     |> Array.map (fun (ceLength, m) -> SorterModel.makeSorter m.SorterModel (Some ceLength))
 
                 // 5. Run the evaluation engine on the filtered pool subset
-                let collectNewSortableTests = false
                 let rawEvaluations =
                     SorterSetEval.makeSorterEvals 
                         sorters 

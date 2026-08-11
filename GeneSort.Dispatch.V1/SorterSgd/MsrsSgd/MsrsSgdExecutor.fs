@@ -12,9 +12,9 @@ open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1.Sgd
-open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterSgd
-
+open GeneSort.Sorting
+open GeneSort.SortingOps
 
 module MsrsSgdExecutor =
 
@@ -54,6 +54,8 @@ module MsrsSgdExecutor =
                 let! sorterCountCycleMultiplier = rp.GetSorterCountCycleMultiplier() |> Result.ofOption "Missing sorterCountCycleMultiplier."
                 let! sorterPoolExpansionRate = rp.GetSorterPoolExpansionRate () |> Result.ofOption "Missing sorterPoolExpansionRate."
                 let! sorterPoolMeasure = rp.GetSorterPoolMeasure() |> Result.ofOption "Missing sorterPoolMeasure."
+                let! (excludeSelfCe: bool<excludeSelfCe>) = rp.GetExcludeSelfCe() |> Result.ofOption "Missing excludeSelfCe in run parameters"
+                let! (collectNewSortableTests: bool<collectNewSortableTests>) = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests in run parameters"
                 let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
 
                 log "Executing makeSortableTests..."
@@ -83,6 +85,7 @@ module MsrsSgdExecutor =
                                                         sortableTest 
                                                         sorterEvalType
                                                         reEvaluateParents
+                                                        collectNewSortableTests
                             return seedPoolSet |> SorterPoolSet.updateSorterEvals computedEvals
                         }
 
@@ -98,7 +101,7 @@ module MsrsSgdExecutor =
                 let sorterModelMutator = 
                     SimpleSorterModelMutator.getMsrsModelMutator
                         (RngFactory.create rngType)
-                        ExcludeSelfCe
+                        excludeSelfCe
                         modificationRate
                         orthoRate
                         paraRate
@@ -112,7 +115,7 @@ module MsrsSgdExecutor =
                         sorterCountCycle sorterCountCycleMultiplier sorterPoolExpansionRate
                         sorterModelMutator prioritizeNewMutants distinctSorterHashes
                         sortersPerPool sorterChildCount sortableTest sorterEvalType
-                        sorterEvalMeasure initialSeedPoolSet sortedFraction 
+                        sorterEvalMeasure initialSeedPoolSet collectNewSortableTests sortedFraction 
                         snapshotReportInterval summaryReportInterval sorterPoolSelectionIntervals
                         sorterPoolMeasure cts.Token log
 

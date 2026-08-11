@@ -21,6 +21,7 @@ module SorterPipeline =
             (selectionMeasure: sorterEvalMeasure)
             (reEvaluateParents: bool)
             (currentPoolSet: sorterPoolSet) 
+            (collectNewSortableTests: bool<collectNewSortableTests>)
             (sortedFractionThreshold: float<sortedFraction>) : sorterPoolSet =
 
         currentPoolSet
@@ -34,6 +35,7 @@ module SorterPipeline =
                                         sortableTest 
                                         sorterEvalType
                                         reEvaluateParents
+                                        collectNewSortableTests
             
                 expandedPoolSet 
                 |> SorterPoolSet.updateSorterEvals computedEvals
@@ -64,6 +66,7 @@ module SorterPipeline =
             (selectionMeasure: sorterEvalMeasure)
             (reEvaluateParents: bool)
             (currentPoolSet: sorterPoolSet) 
+            (collectNewSortableTests: bool<collectNewSortableTests>)
             (sortedFractionThreshold: float<sortedFraction>) : sorterPoolSet =
 
         // Helper to check if any pool in a poolSet has dropped to 0 members
@@ -82,7 +85,8 @@ module SorterPipeline =
             SorterPoolRunner.evaluatePoolSet 
                 sortableTest 
                 sorterEvalType 
-                reEvaluateParents 
+                reEvaluateParents
+                collectNewSortableTests
                 mutatedPoolSet
 
         let evaluatedPoolSet = SorterPoolSet.updateSorterEvals computedEvals mutatedPoolSet

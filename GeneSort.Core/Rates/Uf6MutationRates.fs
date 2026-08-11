@@ -16,6 +16,17 @@ type uf6MutationRates =
             failwith $"Order must be at least 6 and divisible by 6, got {order}"
         { order = order; seed6TransitionRates = seed6TransitionRates; opsTransitionRates = opsTransitionRates }
 
+    static member createUniform 
+            (order: int) 
+            (seed6TransitionRates: seed6TransitionRates) 
+            (rates: opsTransitionRates) : uf6MutationRates =
+        let genRatesArrayLength = MathUtils.exactLog2 (order / 6)
+        let genRatesArray = Array.init genRatesArrayLength (fun _ -> rates)
+        uf6MutationRates.create 
+            order 
+            seed6TransitionRates 
+            (opsTransitionRatesArray.create genRatesArray)
+
     member this.Order with get() = this.order
     member this.Seed6TransitionRates with get() = this.seed6TransitionRates
     member this.OpsTransitionRates with get() = this.opsTransitionRates
@@ -39,6 +50,7 @@ type uf6MutationRates =
         hash
 
 
+
 module Uf6MutationRates =
 
     let makeUniform (order: int) (seed6MutationRates: float) (twoOrbitMutationRate: float) 
@@ -49,6 +61,12 @@ module Uf6MutationRates =
             order 
             (seed6TransitionRates.createUniform(seed6MutationRates))
             (opsTransitionRatesArray.create mutRatesArray)
+
+    let makeUniform2 
+            (order: int) 
+            (seed6TransitionRates: seed6TransitionRates) 
+            (rates: opsTransitionRates) : uf6MutationRates =
+        uf6MutationRates.createUniform order seed6TransitionRates rates
 
     let biasTowards (order: int) (seed6MutationRates: float) (twoOrbitType: twoOrbitType) (baseAmt: float) (biasAmt: float) 
          : uf6MutationRates =

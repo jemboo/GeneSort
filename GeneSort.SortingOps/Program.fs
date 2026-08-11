@@ -62,7 +62,7 @@ module Sandbox =
         let ceBlock = CeBlock.fromSorter sorter
 
         let sortableTest = makeFullBoolTest sortingWidth
-        let collectNewSortableTests = true
+        let collectNewSortableTests = true |> UMX.tag<collectNewSortableTests>
         let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
         None
 
@@ -83,7 +83,7 @@ module Sandbox =
         let ceBlkB = ceBlock.create blockIdB sortingWidth cesB
 
 
-        let collectNewSortableTests = true
+        let collectNewSortableTests = true |> UMX.tag<collectNewSortableTests>
         let ceBlockEvalA = CeBlockOps.evalWithSorterTest sortableTest ceBlkA collectNewSortableTests
         let ceBlockEvalB = CeBlockOps.evalWithSorterTest sortableTest ceBlkB collectNewSortableTests
 
@@ -104,7 +104,7 @@ module Sandbox =
         let ceBlkB = ceBlkA.permute perm
 
 
-        let collectNewSortableTests = true
+        let collectNewSortableTests = true |> UMX.tag<collectNewSortableTests>
         let ceBlockEvalA = CeBlockOps.evalWithSorterTest sortableTest ceBlkA collectNewSortableTests
         let ceBlockEvalB = CeBlockOps.evalWithSorterTest sortableTest ceBlkB collectNewSortableTests
 

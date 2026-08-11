@@ -97,6 +97,36 @@ module SimpleSorterModelMutator =
             |> simpleSorterModelMutator.SmmMsuf4RandMutate
 
 
+    let getMsuf6ModelMutator 
+                (sortingWidth: int<sortingWidth>)
+                (rngFactory: rngFactory)
+                (excludeSelfCe: bool<excludeSelfCe>)
+                (seedModificationRate: float<seedModificationRate>)
+                (modificationRate: float<modificationRate>)
+                (orthoRate: float<orthoRate>)
+                (paraRate: float<paraRate>) 
+                (selfSymRate: float<selfSymRate>) : simpleSorterModelMutator =
+
+            let seed6ActionRates = 
+                seed6ActionRates.createUniform (%seedModificationRate)
+
+            let seed6TransitionRates = seed6TransitionRates.create(
+                        seed6ActionRates, seed6ActionRates, seed6ActionRates, 
+                        seed6ActionRates, seed6ActionRates, seed6ActionRates,
+                        seed6ActionRates)
+
+            let opsActionRates = 
+                opsActionRates.createMod (%modificationRate, %orthoRate, %paraRate, %selfSymRate)
+            let opsTransitionRates = 
+                opsTransitionRates.createUniform2 opsActionRates
+
+            msuf6RandMutate.create rngFactory 
+                    (Uf6MutationRates.makeUniform2
+                                    (%sortingWidth) 
+                                    seed6TransitionRates 
+                                    opsTransitionRates)
+            |> simpleSorterModelMutator.SmmMsuf6RandMutate
+
 
 
     let makeMutantSorterModelIdFromIndexAndMod 

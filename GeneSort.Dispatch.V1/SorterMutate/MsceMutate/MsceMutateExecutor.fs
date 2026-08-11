@@ -110,6 +110,10 @@ module MsceMutateExecutor =
                         rp.GetMutationMod() 
                         |> Result.ofOption "Missing mutationMod in run parameters"
 
+            let! (excludeSelfCe: bool<excludeSelfCe>) = 
+                        rp.GetExcludeSelfCe()
+                        |> Result.ofOption "Missing excludeSelfCe in run parameters"
+            
 
             let rngFactory = rngType |> RngFactory.create
 
@@ -131,6 +135,7 @@ module MsceMutateExecutor =
                                         rngType 
                                         sortingWidth 
                                         simpleSorterModelType
+                                        excludeSelfCe
 
             let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
@@ -138,7 +143,7 @@ module MsceMutateExecutor =
 
             let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
                                             rngFactory
-                                            ExcludeSelfCe
+                                            excludeSelfCe
                                             modificationRate
                                             mutationRate
                                             insertionRate
@@ -218,7 +223,10 @@ module MsceMutateExecutor =
             let! (mutationMod: int<mutationMod>) = 
                         rp.GetMutationMod() 
                         |> Result.ofOption "Missing mutationMod in run parameters"
-                        
+
+            let! (excludeSelfCe: bool<excludeSelfCe>) = 
+                        rp.GetExcludeSelfCe()
+                        |> Result.ofOption "Missing excludeSelfCe in run parameters" 
 
             let rngFactory = rngType |> RngFactory.create
 
@@ -242,6 +250,7 @@ module MsceMutateExecutor =
                                         rngType 
                                         sortingWidth 
                                         simpleSorterModelType
+                                        excludeSelfCe
 
             let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
@@ -249,7 +258,7 @@ module MsceMutateExecutor =
 
             let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
                                             rngFactory
-                                            ExcludeSelfCe
+                                            excludeSelfCe
                                             modificationRate
                                             mutationRate
                                             insertionRate
@@ -294,7 +303,8 @@ module MsceMutateExecutor =
                 // 1. Fetch mutant sorter models as a lazy stream sequence
                 log "Generating Mutant Sorter Models Stream..."
                 let! (allMutantStream: sorterModel seq) = makeMutantSorterModels rp
-                
+                let! (collectTests :bool<collectNewSortableTests>) = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests in run parameters"
+
                 let sortersPerSplit = 1000
                 
                 let! sorterEvalType =
@@ -313,7 +323,6 @@ module MsceMutateExecutor =
                     host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                     |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
 
-                let collectTests = CollectSortableTestsTrue
                 let testId = tests |> SortableTests.getId
                 
                 // 2. Setup Accumulators and Lazy Chunk Loop via Seq.chunkBySize

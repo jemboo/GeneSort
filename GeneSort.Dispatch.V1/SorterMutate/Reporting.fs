@@ -194,6 +194,9 @@ module Reporting =
                         rp.GetMutationMod() 
                         |> Result.ofOption "Missing mutationMod in run parameters"
 
+            let! (excludeSelfCe: bool<excludeSelfCe>) = 
+                        rp.GetExcludeSelfCe() 
+                        |> Result.ofOption "Missing excludeSelfCe in run parameters"
 
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getMergeSorterEvals 
@@ -213,6 +216,7 @@ module Reporting =
                                         rngType 
                                         sortingWidth 
                                         simpleSorterModelType
+                                        excludeSelfCe
 
             let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
@@ -222,7 +226,7 @@ module Reporting =
 
             let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
                                             (rngType |> RngFactory.create)
-                                            ExcludeSelfCe
+                                            excludeSelfCe
                                             modificationRate
                                             mutationRate
                                             insertionRate
@@ -291,6 +295,9 @@ module Reporting =
                         rp.GetMutationMod() 
                         |> Result.ofOption "Missing mutationMod in run parameters"
 
+            let! (excludeSelfCe: bool<excludeSelfCe>) = 
+                        rp.GetExcludeSelfCe() 
+                        |> Result.ofOption "Missing excludeSelfCe in run parameters"
 
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getStandardSorterEvals 
@@ -308,6 +315,7 @@ module Reporting =
                                         rngType 
                                         sortingWidth 
                                         simpleSorterModelType
+                                        excludeSelfCe
 
             let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
@@ -317,7 +325,7 @@ module Reporting =
 
             let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
                                             (rngType |> RngFactory.create)
-                                            ExcludeSelfCe
+                                            excludeSelfCe
                                             modificationRate
                                             mutationRate
                                             insertionRate

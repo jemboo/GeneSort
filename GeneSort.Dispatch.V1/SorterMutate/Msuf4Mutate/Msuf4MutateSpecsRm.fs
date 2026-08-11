@@ -48,9 +48,9 @@ module Msuf4MutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 seedModificationRate12
                 modificationRatesMsuf4
                 sortingWidth32
@@ -75,9 +75,9 @@ module Msuf4MutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 seedModificationRate12
                 modificationRatesMsuf4
                 smallMergeSortingWidths
@@ -102,9 +102,9 @@ module Msuf4MutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 seedModificationRate12
                 modificationRatesMsuf4
                 mediumMergeSortingWidths
@@ -129,9 +129,9 @@ module Msuf4MutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 seedModificationRate12
                 modificationRatesMsuf4
                 mediumMergeSortingWidths
@@ -157,9 +157,9 @@ module Msuf4MutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 seedModificationRate12
                 modificationRatesMsuf4
                 largeMergeSortingWidths

@@ -11,9 +11,6 @@ open GeneSort.Eval.V1.Sgd
 
 module CommonParams =
 
-    let CollectSortableTestsTrue = true
-    let ExcludeSelfCe = true |> UMX.tag<excludeSelfCe>
-
     // SimpleSorterModelTypes
     let allSimpleSorterModelTypes = 
             (runParameters.simpleSorterModelTypeKey, SimpleSorterModelType.all() 
@@ -322,11 +319,11 @@ module CommonParams =
     let deletionRates =
             (runParameters.deletionRateKey, [0.1;] |> List.map string)
 
-    let orthoRate =    (runParameters.orthoRateKey, [4.001;] |> List.map string)
-    let paraRate =     (runParameters.paraRateKey, [0.4;] |> List.map string)
-    let paraRates =     (runParameters.paraRateKey, [0.4; 0.6] |> List.map string)
-    let selfSymRate =  (runParameters.selfSymRateKey, [2.001; ] |> List.map string)
-    let selfSymRates =  (runParameters.selfSymRateKey, [1.5; 2.001; ] |> List.map string)
+    let mRateOrtho =    (runParameters.orthoRateKey, [4.001;] |> List.map string)
+    let mRatePara =     (runParameters.paraRateKey, [0.4;] |> List.map string)
+    let mRatesPara =     (runParameters.paraRateKey, [0.4; 0.6] |> List.map string)
+    let mRateSelfSym =  (runParameters.selfSymRateKey, [2.001; ] |> List.map string)
+    let mRatesSelfSym =  (runParameters.selfSymRateKey, [1.5; 2.001; ] |> List.map string)
 
 
 

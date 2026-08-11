@@ -11,9 +11,9 @@ open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Model.Sorting.Simple.V1
-open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterSgd
 open GeneSort.Eval.V1.Sgd
+open GeneSort.Sorting
 
 
 module MsceSgdExecutor =
@@ -49,11 +49,13 @@ module MsceSgdExecutor =
                 let! sorterEvalMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
                 let! sorterEvalType = rp.GetSorterEvalType() |> Result.ofOption "Missing sorterEvalType."
                 let! distinctSorterHashes = rp.GetDistinctSorterHashes() |> Result.ofOption "Missing distinctSorterHashes."
+                let! collectNewSortableTests = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests."
                 let! sortedFraction = rp.GetSortedFraction() |> Result.ofOption "Missing sortedFraction."    
                 let! sorterPoolExpansionRate = rp.GetSorterPoolExpansionRate () |> Result.ofOption "Missing sorterPoolExpansionRate."
                 let! sorterCountCycle = rp.GetSorterCountCycle() |> Result.ofOption "Missing sorterCountCycle."
                 let! sorterCountCycleMultiplier = rp.GetSorterCountCycleMultiplier() |> Result.ofOption "Missing sorterCountCycleMultiplier."
-                let! sorterPoolMeasure = rp.GetSorterPoolMeasure() |> Result.ofOption "Missing sorterPoolMeasure."
+                let! sorterPoolMeasure = rp.GetSorterPoolMeasure() |> Result.ofOption "Missing sorterPoolMeasure."            
+                let! (excludeSelfCe: bool<excludeSelfCe>) = rp.GetExcludeSelfCe()  |> Result.ofOption "Missing excludeSelfCe in run parameters"
                 let! rngType = rp.GetRngType() |> Result.ofOption "Missing rngType."
 
                 // 2. Resolve target seed sorterPoolSet collection state depending on genFirst criteria
@@ -87,7 +89,7 @@ module MsceSgdExecutor =
                 let sorterModelMutator = 
                     SimpleSorterModelMutator.getMsceModelMutator
                         (RngFactory.create rngType) 
-                        ExcludeSelfCe 
+                        excludeSelfCe 
                         modificationRate 
                         mutationRate
                         insertionRate
@@ -101,7 +103,7 @@ module MsceSgdExecutor =
                         sorterCountCycle sorterCountCycleMultiplier sorterPoolExpansionRate
                         sorterModelMutator prioritizeNewMutants distinctSorterHashes
                         sortersPerPool sorterChildCount sortableTest sorterEvalType
-                        sorterEvalMeasure initialSeedPoolSet sortedFraction 
+                        sorterEvalMeasure initialSeedPoolSet collectNewSortableTests sortedFraction 
                         snapshotReportInterval summaryReportInterval sorterPoolSelectionIntervals
                         sorterPoolMeasure cts.Token log
 

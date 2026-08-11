@@ -46,9 +46,9 @@ module MsrsMutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesMsuf4
                 sortingWidth32
                 msrsModelType
@@ -72,9 +72,9 @@ module MsrsMutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesMsuf4
                 smallMergeSortingWidths
                 msrsModelType
@@ -98,9 +98,9 @@ module MsrsMutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesMsuf4
                 mediumMergeSortingWidths
                 msrsModelType
@@ -124,9 +124,9 @@ module MsrsMutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesMsuf4
                 mediumMergeSortingWidths
                 msrsModelType
@@ -150,9 +150,9 @@ module MsrsMutateSpecsRm =
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
-                selfSymRate
+                mRateOrtho
+                mRatePara
+                mRateSelfSym
                 modificationRatesMsuf4
                 largeMergeSortingWidths
                 msrsModelType

@@ -10,6 +10,7 @@ open FSharp.UMX
 open System
 open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1.Sgd
+open GeneSort.Sorting
 
 
 
@@ -46,6 +47,10 @@ module PoolSetMakers =
                     rp.GetSorterEvalSelectionType() 
                     |> Result.ofOption "Missing sorterEvalSelectionType"
 
+            let! (excludeSelfCe: bool<excludeSelfCe>) =
+                    rp.GetExcludeSelfCe()
+                    |> Result.ofOption "Missing excludeSelfCe"
+
             let! (mutationMod: int<mutationMod>) = 
                     rp.GetMutationMod() 
                     |> Result.ofOption "Missing mutationMod in run parameters"
@@ -62,6 +67,7 @@ module PoolSetMakers =
                     rngType 
                     sortingWidth 
                     simpleSorterModelType
+                    excludeSelfCe
 
             let sorterEvalSelection = 
                 SorterEvalSelection.makeSelection 
@@ -128,6 +134,10 @@ module PoolSetMakers =
             let! (mutationMod: int<mutationMod>) = 
                         rp.GetMutationMod() 
                         |> Result.ofOption "Missing mutationMod in run parameters"
+
+            let! (excludeSelfCe: bool<excludeSelfCe>) =
+                    rp.GetExcludeSelfCe()
+                    |> Result.ofOption "Missing excludeSelfCe"
             
             let! (parentSorterSetEval: sorterSetEval) = 
                 SorterEvalDbs.getMergeSorterEvals 
@@ -142,6 +152,7 @@ module PoolSetMakers =
                     rngType 
                     sortingWidth 
                     simpleSorterModelType
+                    excludeSelfCe
 
             let sorterEvalSelection = 
                 SorterEvalSelection.makeSelection 
@@ -201,6 +212,10 @@ module PoolSetMakers =
             let! (mutationMod: int<mutationMod>) = 
                         rp.GetMutationMod() 
                         |> Result.ofOption "Missing mutationMod in run parameters"
+
+            let! (excludeSelfCe: bool<excludeSelfCe>) =
+                    rp.GetExcludeSelfCe()
+                    |> Result.ofOption "Missing excludeSelfCe"
             
 
 
@@ -215,6 +230,7 @@ module PoolSetMakers =
                     rngType 
                     sorterLibId.sortingWidth 
                     simpleSorterModelType
+                    excludeSelfCe
 
             let sorterEvalSelection =
                 SorterEvalSelection.makeSelection 

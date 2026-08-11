@@ -83,8 +83,8 @@ module SorterEvalExecutor =
             let! sortingWidth = rp.GetSortingWidth()
             let! simpleSorterModelType = rp.GetSimpleSorterModelType()
             let! rngType = rp.GetRngType()
-
-            return CommonSorterEval.getSimpleUniformSorterModelGen rngType sortingWidth simpleSorterModelType
+            let! excludeSelfCe = rp.GetExcludeSelfCe()
+            return CommonSorterEval.getSimpleUniformSorterModelGen rngType sortingWidth simpleSorterModelType excludeSelfCe
         }
 
 
@@ -123,6 +123,10 @@ module SorterEvalExecutor =
                     rp.GetSorterEvalType() 
                     |> Result.ofOption "Missing sorterEvalType."
 
+                let! collectSortableTests =
+                    rp.GetCollectNewSortableTests() 
+                    |> Result.ofOption "Missing collectNewSortableTests."
+
                 // 2. Generate common evaluation dependencies
                 do! checkCancellation cts.Token
                 log "Generating Sortable Tests..."
@@ -136,7 +140,6 @@ module SorterEvalExecutor =
                     host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                     |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
 
-                let collectTests = CollectSortableTestsTrue
                 let testId = tests |> SortableTests.getId
                 let baseFirstIdx = (%repl * %totalSorterCount)
 
@@ -163,7 +166,7 @@ module SorterEvalExecutor =
 
                     // Compute sorter evaluations directly from the chunk array
                     let sorterEvalsChunk = 
-                        SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters tests sorterEvalType collectTests
+                        SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters tests sorterEvalType collectSortableTests
 
                     
                     // Accumulate the evaluations

@@ -20,8 +20,6 @@ open FSharp.UMX
 [<Measure>] type sorterSetId
 
 
-
-
 [<Measure>] type sorterSetConcatMapId
 [<Measure>] type sorterSetParentMapId
 [<Measure>] type sorterSetMutatorId

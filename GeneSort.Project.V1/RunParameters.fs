@@ -115,8 +115,9 @@ type runParameters =
         runParameters.tryGetInt runParameters.ceLengthKey this.paramMap
         |> Option.map UMX.tag<ceLength>
 
-    member this.GetCollectSortableTests() =
+    member this.GetCollectNewSortableTests() =
         runParameters.tryGetBool runParameters.collectSortableTestsKey this.paramMap
+        |> Option.map UMX.tag<collectNewSortableTests>
 
     member this.GetDatabaseName() =
         this.paramMap.TryFind runParameters.databaseNameKey

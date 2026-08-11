@@ -40,7 +40,7 @@ module SorterSetEval =
                 (sorters: sorter array) 
                 (sortableTest: sortableTest) 
                 (sorterEvalType:sorterEvalType) 
-                (collectNewSortableTests: bool) :sorterEval array =
+                (collectNewSortableTests: bool<collectNewSortableTests>) :sorterEval array =
         let ceBlocks = 
                 sorters 
                 |> Array.map (fun sorter ->
@@ -52,7 +52,7 @@ module SorterSetEval =
                 CeBlockOps.evalWithSorterTests 
                         sortableTest 
                         ceBlocks 
-                        collectNewSortableTests  
+                        %collectNewSortableTests  
 
         Array.zip sorters ceBlockEvals
         |> Array.map (
@@ -69,7 +69,7 @@ module SorterSetEval =
             (sorterSet: sorterSet)
             (sortableTest: sortableTest) 
             (sorterEvalType:sorterEvalType) 
-            (collectNewSortableTests: bool) : sorterSetEval =
+            (collectNewSortableTests: bool<collectNewSortableTests>) : sorterSetEval =
 
         let sorterEvals = makeSorterEvals 
                             sorterSet.Sorters 

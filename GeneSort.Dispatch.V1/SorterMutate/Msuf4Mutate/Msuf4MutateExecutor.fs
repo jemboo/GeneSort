@@ -70,6 +70,10 @@ module Msuf4MutateExecutor =
                         rp.GetRngType()
                         |> Result.ofOption "Missing RNG type in run parameters"
 
+            let! (excludeSelfCe: bool<excludeSelfCe>) =  
+                        rp.GetExcludeSelfCe()
+                        |> Result.ofOption "Missing ExcludeSelfCe in run parameters"
+
             let! (sortingWidth: int<sortingWidth>) = 
                         rp.GetSortingWidth() 
                         |> Result.ofOption "Missing sorting width in run parameters"
@@ -134,6 +138,7 @@ module Msuf4MutateExecutor =
                                         rngType 
                                         sortingWidth 
                                         simpleSorterModelType
+                                        excludeSelfCe
 
             let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
@@ -142,7 +147,7 @@ module Msuf4MutateExecutor =
             let sorterModelMutator = SimpleSorterModelMutator.getMsuf4ModelMutator
                                             sortingWidth
                                             rngFactory
-                                            ExcludeSelfCe
+                                            excludeSelfCe
                                             seedModificationRate
                                             modificationRate
                                             orthoRate
@@ -175,6 +180,10 @@ module Msuf4MutateExecutor =
             let! (rngType: rngType) =  
                         rp.GetRngType()
                         |> Result.ofOption "Missing RNG type in run parameters"
+
+            let! (excludeSelfCe: bool<excludeSelfCe>) =  
+                        rp.GetExcludeSelfCe()
+                        |> Result.ofOption "Missing ExcludeSelfCe in run parameters"
 
             let! (sortingWidth: int<sortingWidth>) = 
                         rp.GetSortingWidth() 
@@ -250,6 +259,7 @@ module Msuf4MutateExecutor =
                                         rngType 
                                         sortingWidth 
                                         simpleSorterModelType
+                                        excludeSelfCe
 
             let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
@@ -258,7 +268,7 @@ module Msuf4MutateExecutor =
             let sorterModelMutator = SimpleSorterModelMutator.getMsuf4ModelMutator
                                             sortingWidth
                                             rngFactory
-                                            ExcludeSelfCe
+                                            excludeSelfCe
                                             seedModificationRate
                                             modificationRate
                                             orthoRate
@@ -300,7 +310,8 @@ module Msuf4MutateExecutor =
         asyncResult {
             try
                 do! checkCancellation cts.Token
-                
+
+                let! collectTests = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests"
                 // 1. Fetch mutant sorter models as a lazy stream sequence
                 log "Generating Mutant Sorter Models Stream..."
                 let! (allMutantStream: sorterModel seq) = makeMutantSorterModels rp
@@ -323,7 +334,6 @@ module Msuf4MutateExecutor =
                     host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                     |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
 
-                let collectTests = CollectSortableTestsTrue
                 let testId = tests |> SortableTests.getId
                 
                 // 2. Setup Accumulators and Lazy Chunk Loop via Seq.chunkBySize

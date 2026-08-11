@@ -54,8 +54,8 @@ module MssiSgdSpecsRm =
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
+                mRateOrtho
+                mRatePara
                 modificationRatesMsuf4
                 testMergeSortingWidths
                 mssiModelType
@@ -85,8 +85,8 @@ module MssiSgdSpecsRm =
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
+                mRateOrtho
+                mRatePara
                 modificationRatesMsuf4
                 testMergeSortingWidths
                 mssiModelType
@@ -116,8 +116,8 @@ module MssiSgdSpecsRm =
                 sorterEvalMeasureInitial_CestM_noScw
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
-                orthoRate
-                paraRate
+                mRateOrtho
+                mRatePara
                 modificationRatesMsuf4
                 testMergeSortingWidths
                 mssiModelType
