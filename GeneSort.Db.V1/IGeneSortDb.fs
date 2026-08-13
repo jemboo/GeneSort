@@ -2,8 +2,9 @@
 open System
 open System.Threading
 open FSharp.UMX
-open GeneSort.Eval.V1
+open GeneSort.Core
 open GeneSort.Project.V1
+open GeneSort.Eval.V1
 
 [<Measure>] type allowOverwrite
 
@@ -44,3 +45,18 @@ type IGeneSortDb =
                         runParameters ->
                         outputDataType ->
                         queryParams option
+
+
+type IGeneSortGenDb =
+    inherit IGeneSortDb
+
+    abstract member getGenSaveIntervals : 
+                        unit -> samplingConfig
+
+    abstract member getGenSaveSubIntervals : 
+                        unit -> samplingConfig
+
+    abstract member getNextGenItemAsync :
+                        queryParams -> 
+                        (queryParams -> int<generationNumber> -> queryParams) -> 
+                        Async<outputData option>

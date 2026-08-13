@@ -34,6 +34,7 @@ type runParameters =
     static member snapshotReportIntervalsKey = "SnapshotReportIntervals"
     static member summaryReportIntervalsKey = "SummaryReportIntervals"
     static member sorterPoolSelectionIntervalsKey = "SorterPoolSelectionIntervals"
+    static member generationIntervalCountKey = "GenerationIntervalCount"
     static member generationLastKey = "GenerationLast"
     static member idKey = "Id"
     static member insertionRateKey = "InsertionRate"
@@ -137,6 +138,10 @@ type runParameters =
     member this.GetExcludeSelfCe() =
         runParameters.tryGetBool runParameters.excludeSelfCeKey this.paramMap
         |> Option.map UMX.tag<excludeSelfCe>
+
+    member this.GetGenerationIntervalCount() =
+        runParameters.tryGetInt runParameters.generationIntervalCountKey this.paramMap
+        |> Option.map UMX.tag<generationIntervalCount>
 
     member this.GetGenerationCurrent() =
         runParameters.tryGetInt runParameters.generationCurrentKey this.paramMap
@@ -368,6 +373,9 @@ type runParameters =
 
     member this.WithGenerationFirst(gen: int<generationNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationFirstKey (gen |> Option.map UmxExt.intToRaw) }
+
+    member this.WithGenerationIntervalCount(count: int<generationIntervalCount> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationIntervalCountKey (count |> Option.map UmxExt.intToRaw) }
 
     member this.WithSorterPoolSelectionIntervals(essd: essData option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterPoolSelectionIntervalsKey (essd |> Option.map (fun e -> e.toString())) }

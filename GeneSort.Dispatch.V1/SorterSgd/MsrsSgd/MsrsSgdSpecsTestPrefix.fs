@@ -109,9 +109,9 @@ module MsrsSgdSpecsTestPrefix =
                 generationCurrent
                 sixteenSortersPerPool
                 poolCount16
-                runResultReportInterval2
-                summaryReport_cSampleC
-                sorterPoolSelects25_5i
+                IntervalDefinitions.runResultReportInterval2
+                IntervalDefinitions.summaryReport_cSampleC
+                IntervalDefinitions.sorterPoolSelects25_5i
                 generationLastTest
                 sorterCountCycle100
                 sorterCountCycleMultiplier1
@@ -133,9 +133,9 @@ module MsrsSgdSpecsTestPrefix =
                 generationCurrent
                 thirtyTwoSortersPerPool
                 poolCount32
-                runResultReportInterval500
-                summaryReport_cSample5C
-                sorterPoolSelects25_5i
+                IntervalDefinitions.runResultReportInterval500
+                IntervalDefinitions.summaryReport_cSample5C
+                IntervalDefinitions.sorterPoolSelects25_5i
                 generationLastLight
                 sorterCountCycle100
                 sorterCountCycleMultiplier1
@@ -173,8 +173,8 @@ module MsrsSgdSpecsTestPrefix =
                 distinctSorterHashesTrue
                 prioritizeNewMutantsTrue
                 sortedFraction99
-                runResultReportInterval1000
-                runResultReportInterval100
+                IntervalDefinitions.runResultReportInterval1000
+                IntervalDefinitions.runResultReportInterval100
                 generationLast
                 sorterCountCycle500
                 sorterCountCycleMultipliersLow

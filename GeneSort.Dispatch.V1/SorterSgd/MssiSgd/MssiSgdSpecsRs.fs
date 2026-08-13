@@ -71,7 +71,7 @@ module MssiSgdSpecsRs =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                runResultReportInterval100
+                IntervalDefinitions.runResultReportInterval100
                 generationLast
                 generationCurrent
             ]
@@ -100,7 +100,7 @@ module MssiSgdSpecsRs =
                 poolCount1
                 fourKSortersPerPool
                 oneChildCount
-                runResultReportInterval100
+                IntervalDefinitions.runResultReportInterval100
                 generationLast
                 generationCurrent
                 distinctSorterHashesTrue
@@ -131,7 +131,7 @@ module MssiSgdSpecsRs =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                runResultReportInterval100
+                IntervalDefinitions.runResultReportInterval100
                 generationLast
                 generationCurrent
             ]
@@ -159,7 +159,7 @@ module MssiSgdSpecsRs =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                runResultReportInterval100
+                IntervalDefinitions.runResultReportInterval100
                 generationLast
                 generationCurrent
             ]

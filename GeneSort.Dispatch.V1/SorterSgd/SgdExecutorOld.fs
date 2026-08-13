@@ -14,7 +14,7 @@ open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.SortingOps
 
-module SgdExecutor =
+module SgdExecutorOld =
 
 /// Dispatches the evolution history run parameters, executes the generative loop via asyncResult,
     /// and manages final state serialization/reporting pipelines.

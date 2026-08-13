@@ -45,7 +45,7 @@ module Sandbox =
         printfn $"**** Sandbox Engine Active: {startTime.ToString()} ****"
 
 
-        let yab = CommonParams.sorterPoolSelects25_5i |> snd |> List.head
+        let yab = CommonParams.IntervalDefinitions.sorterPoolSelects25_5i |> snd |> List.head
         let essD = yab |> EssData.fromString
 
         let qua = EssData.getSamplesInOrder essD 10000 |> Seq.toArray

@@ -17,6 +17,7 @@
     <Compile Include="Rando.fs" />
     <Compile Include="ByteUtils.fs" />
     <Compile Include="EssData.fs" />
+    <Compile Include="IntSampleMethod.fs" />
     <Compile Include="MathUtils.fs" />
     <Compile Include="ArrayUtils.fs" />
     <Compile Include="SimdUtils.fs" />

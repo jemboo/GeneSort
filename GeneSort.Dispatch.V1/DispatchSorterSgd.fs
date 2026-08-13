@@ -16,7 +16,7 @@ open GeneSort.Dispatch.V1.SorterSgd.Mssi
 open GeneSort.Dispatch.V1.SorterSgd.Msrs
 open GeneSort.Dispatch.V1.SorterSgd.Msuf4
 
-module DispatcherSgd = 
+module DispatchSorterSgd = 
 
     let createThreadSafeProgress () =
         let sessionTimestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss")

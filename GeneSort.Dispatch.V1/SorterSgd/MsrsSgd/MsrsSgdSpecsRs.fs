@@ -58,7 +58,7 @@ module MsrsSgdSpecsRs =
                 poolCount8
                 oneSorterPerPool
                 oneChildCount
-                runResultReportInterval100
+                IntervalDefinitions.runResultReportInterval100
                 generationLast
                 generationCurrent                
                 sorterCountCycle20
@@ -80,7 +80,7 @@ module MsrsSgdSpecsRs =
                 sorterEvalTypeV1
                 sorterEvalSelection
                 sorterEvalMeasureInitial_CestM_noScw
-                sorterEvalMeasureInitial_CestM_noScw
+                sorterEvalMeasure_CestM_noScw
                 mRateOrtho
                 mRatePara
                 mRateSelfSym
@@ -90,7 +90,7 @@ module MsrsSgdSpecsRs =
                 fourKSortersPerPool
                 oneChildCount
                 generationCurrent
-                runResultReportInterval100
+                IntervalDefinitions.runResultReportInterval100
                 generationLast
                 distinctSorterHashesTrue
                 prioritizeNewMutantsBoth
@@ -122,7 +122,7 @@ module MsrsSgdSpecsRs =
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
-                runResultReportInterval100
+                IntervalDefinitions.runResultReportInterval100
                 generationLast
             ]
             filter = paramMapFilter
@@ -151,7 +151,7 @@ module MsrsSgdSpecsRs =
                 oneSorterPerPool
                 oneChildCount
                 generationCurrent
-                runResultReportInterval100
+                IntervalDefinitions.runResultReportInterval100
                 generationLast
             ]
             filter = paramMapFilter

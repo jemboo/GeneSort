@@ -86,10 +86,10 @@ type queryParams =
 
 
     static member createForTextReport
-            (queryName:      string<databaseName>)
+            (databaseName:      string<databaseName>)
             (projName:       string<projectName>)
             (textReportName: string<textReportName>) : queryParams =
-        queryParams.create queryName projName None (outputDataType.TextReport textReportName) [||]
+        queryParams.create databaseName projName None (outputDataType.TextReport textReportName) [||]
 
 
 
