@@ -64,33 +64,6 @@ type GeneSortDbMp(
                     | Error _ -> return None
             }
 
-        //member this.getNextGenerationalItemAsync 
-        //            (baseQueryParams: queryParams) 
-        //            (generationMutator: queryParams -> int<generationNumber> -> queryParams) 
-        //            (defaultValue: outputData option) : Async<outputData option> =
-        //    async {
-        //        // Collect standard intervals and reverse them to start at the highest generation number
-        //        let reversedIntervals = GenerationNumber.standardIntervals() |> Seq.toArray |> Array.rev
-        //        let db = this :> IGeneSortDb
-
-        //        let rec search index =
-        //            async {
-        //                if index >= reversedIntervals.Length then
-        //                    return defaultValue
-        //                else
-        //                    let currentGen = reversedIntervals.[index]
-        //                    let targetQueryParams = generationMutator baseQueryParams currentGen
-                            
-        //                    let! itemOpt = db.loadIfFoundAsync targetQueryParams
-                            
-        //                    match itemOpt with
-        //                    | Some data -> return Some data // Boundary found! Stop tracking backwards immediately.
-        //                    | None -> return! search (index + 1) // File missing, check next lowest interval.
-        //            }
-
-        //        return! search 0
-        //    }
-
         member _.getRunParameters 
                             (runName: string<runName>) 
                             (minReplNumber: int<replNumber> option) 

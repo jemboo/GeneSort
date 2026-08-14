@@ -78,9 +78,9 @@ type GeneSortGenDbMp(
         member _.getGenSaveIntervals () = genSaveIntervals
         member _.getGenSaveSubIntervals () = genSaveSubIntervals
 
-        member this.getNextGenItemAsync 
-                    (baseQueryParams: queryParams) 
-                    (generationMutator: queryParams -> int<generationNumber> -> queryParams) : Async<outputData option> =
+        member this.getNextGenSavePointAsync 
+                    (baseRunParams: runParameters)
+                    (odt: outputDataType) : Async<outputData option> =
             async {
                 // Generate up to 200 linear checkpoints
                 let targetCount = defaultArg genSaveIntervals.MaxCount 200
@@ -103,17 +103,22 @@ type GeneSortGenDbMp(
                             else
                                 let mid = low + (high - low) / 2
                                 let currentGen = intervals.[mid]
-                                let targetQueryParams = generationMutator baseQueryParams currentGen
-                            
-                                let! itemOpt = db.loadIfFoundAsync targetQueryParams
-                            
-                                match itemOpt with
-                                | Some data -> 
-                                    // Found at mid! Search right half for potentially higher saved generations
-                                    return! binarySearch (mid + 1) high (Some data)
+                                let wrp = baseRunParams.WithGenerationCurrent(Some currentGen)
+                        
+                                // Handle the query parameter resolution failure immediately
+                                match db.MakeQueryParamsFromRunParams wrp odt with
                                 | None -> 
-                                    // Missing at mid; highest saved must be in the left half
-                                    return! binarySearch low (mid - 1) bestMatch
+                                    return failwithf "Failed to create QueryParams from RunParams for generation %d and output type %A." %currentGen odt
+                                | Some targetQueryParams ->
+                                    let! itemOpt = db.loadIfFoundAsync targetQueryParams
+                            
+                                    match itemOpt with
+                                    | Some data -> 
+                                        // Found at mid! Search right half for higher saved generations
+                                        return! binarySearch (mid + 1) high (Some data)
+                                    | None -> 
+                                        // Missing at mid; search left half
+                                        return! binarySearch low (mid - 1) bestMatch
                         }
 
                     return! binarySearch 0 (intervals.Length - 1) None

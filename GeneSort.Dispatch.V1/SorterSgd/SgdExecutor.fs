@@ -11,12 +11,13 @@ open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Model.Sorting.Simple.V1
+open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.SortingOps
 
 module SgdExecutor =
 
-/// Dispatches the evolution history run parameters, executes the generative loop via asyncResult,
+    /// Dispatches the evolution history run parameters, executes the generative loop via asyncResult,
     /// and manages final state serialization/reporting pipelines.
     let evaluateEvolutionRun
             (makeSortableTests: runParameters -> Async<Result<sortableTest, string>>)
@@ -35,9 +36,8 @@ module SgdExecutor =
             try
                 do! checkCancellation cts.Token
 
-                // 1. Gather all required run metrics and options out of your parameters block securely
-                let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."             
-                let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
+                // 1. Gather required run metrics and options out of parameters block
+                let! initialGenCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
                 let! genIntervalCount = rp.GetGenerationIntervalCount() |> Result.ofOption "Missing genIntervalCount."
                 let! sorterPoolSelectionIntervals = rp.GetSorterPoolSelectionIntervals() |> Result.ofOption "Missing sorterPoolSelectionInterval."
                 let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
@@ -51,49 +51,65 @@ module SgdExecutor =
                 let! sorterCountCycleMultiplier = rp.GetSorterCountCycleMultiplier() |> Result.ofOption "Missing sorterCountCycleMultiplier."
                 let! sorterPoolExpansionRate = rp.GetSorterPoolExpansionRate () |> Result.ofOption "Missing sorterPoolExpansionRate."
                 let! sorterPoolMeasure = rp.GetSorterPoolMeasure() |> Result.ofOption "Missing sorterPoolMeasure."
-                let! (collectNewSortableTests: bool<collectNewSortableTests>) = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests in run parameters"
-
+                let! (collectNewSortableTests: bool<collectNewSortableTests>) = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests"
+                
+                // 2. Make sortableTest
                 log "Executing makeSortableTests..."
                 let! (sortableTest: sortableTest) = makeSortableTests rp
 
-                // 2. Resolve target seed sorterPoolSet collection state depending on genFirst criteria
+                // 3. Verify host.RunDb is IGeneSortGenDb and extract save configs
+                let genDb = 
+                    match host.RunDb with
+                    | :? IGeneSortGenDb as gdb -> gdb
+                    | _ -> failwith "host.RunDb must implement IGeneSortGenDb"
+
+                // 4. Query DB for existing state to determine genCurrent and initialSeedPoolSet
+                log "Checking for saved checkpoint..."
+                let! qpBase = 
+                    genDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterRunResult "")
+                    |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
+
+                let! (maybeNextData: outputData option) = 
+                    genDb.getNextGenSavePointAsync rp (outputDataType.SorterRunResult "")
+                    |> Async.map Ok
+
                 let! (initialSeedPoolSet: sorterPoolSet) = 
-                    if %genCurrent > 0 then
-                        log "Looking up historical sorterPoolSet from database..."
-                        let qpSRRResult = 
-                            host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterRunResult "")
-                            |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
+                    match maybeNextData with
+                    | Some outData ->
                         asyncResult {
-                            let! qpSRR = qpSRRResult 
-                            let! (outData: outputData) = host.RunDb.loadAsync qpSRR |> AsyncResult.mapError (fun err -> sprintf "Database load error: %A" err)
                             let! sorterRunRes = outData |> OutputData.asSorterRunResult
+                            log (sprintf "Resuming evolution from saved checkpoint at generation %d." %sorterRunRes.FinalPoolSet.GenerationNumber)
                             return sorterRunRes.FinalPoolSet
                         }
-                    else
-                        log "Make seedSorterPoolSet..."
+                    | None ->
                         asyncResult {
+                            log "No saved checkpoint found. Creating initial seedSorterPoolSet..."
                             let! (seedPoolSet: sorterPoolSet) = sorterPoolSetCreator rp
                             let reEvaluateParents = true
                             let computedEvals = 
-                                    seedPoolSet 
-                                    |> SorterPoolRunner.evaluatePoolSet 
-                                                        sortableTest 
-                                                        sorterEvalType
-                                                        reEvaluateParents
-                                                        collectNewSortableTests
-                            return seedPoolSet |> SorterPoolSet.updateSorterEvals computedEvals
+                                seedPoolSet 
+                                |> SorterPoolRunner.evaluatePoolSet 
+                                    sortableTest 
+                                    sorterEvalType
+                                    reEvaluateParents
+                                    collectNewSortableTests
+                            
+                            let evaluatedSeedSet = seedPoolSet |> SorterPoolSet.updateSorterEvals computedEvals
+                            return evaluatedSeedSet
                         }
+
+                let updatedRp = rp.WithGenerationCurrent(Some initialSeedPoolSet.GenerationNumber)
 
                 do! checkCancellation cts.Token
                 
                 log "Making sorterModelMutator..."
-                let! (simpleSorterModelMutator :simpleSorterModelMutator) = MutatorMakers.makeSimpleSorterModelMutator rp
+                let! (simpleSorterModelMutator: simpleSorterModelMutator) = MutatorMakers.makeSimpleSorterModelMutator updatedRp
                 let sorterModelMutator = simpleSorterModelMutator |> sorterModelMutator.Simple
 
-                log "Executing unified evolution run..."
+                log (sprintf "Executing unified evolution run starting at generation %d..." %initialSeedPoolSet.GenerationNumber)
                 let! (finalRunResult: sorterRunResult) = 
                     EvolutionOrchestrator.runEvolutionAsync
-                        host rp allowOverwrite genCurrent genIntervalCount
+                        host updatedRp allowOverwrite initialSeedPoolSet.GenerationNumber genIntervalCount
                         sorterCountCycle sorterCountCycleMultiplier sorterPoolExpansionRate
                         sorterModelMutator prioritizeNewMutants distinctSorterHashes
                         sortersPerPool sorterChildCount sortableTest sorterEvalType
@@ -102,8 +118,7 @@ module SgdExecutor =
                         sorterPoolMeasure cts.Token log
 
                 log "evaluateEvolutionRun completed."
-                let finalRp = rp.WithRunFinished(Some true)
-                return finalRp
+                return updatedRp
 
             with e -> 
                 let errorMsg = sprintf "Error in evaluateEvolutionRun: %s" e.Message

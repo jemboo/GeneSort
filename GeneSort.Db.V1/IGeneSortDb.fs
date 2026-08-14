@@ -27,12 +27,6 @@ type IGeneSortDb =
                         queryParams -> 
                             Async<outputData option>
 
-    //abstract member getNextGenerationalItemAsync :
-    //                    queryParams ->
-    //                    (queryParams -> int<generationNumber> -> queryParams) ->
-    //                    outputData option ->
-    //                        Async<outputData option>
-
     abstract member getRunParameters :
                         string<runName> ->
                         int<replNumber> option ->
@@ -56,7 +50,7 @@ type IGeneSortGenDb =
     abstract member getGenSaveSubIntervals : 
                         unit -> samplingConfig
 
-    abstract member getNextGenItemAsync :
-                        queryParams -> 
-                        (queryParams -> int<generationNumber> -> queryParams) -> 
+    abstract member getNextGenSavePointAsync :
+                        runParameters -> 
+                        outputDataType -> 
                         Async<outputData option>
