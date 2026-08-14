@@ -11,7 +11,6 @@ open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Model.Sorting.Simple.V1
-open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.SortingOps
 
@@ -37,7 +36,6 @@ module SgdExecutor =
                 do! checkCancellation cts.Token
 
                 // 1. Gather required run metrics and options out of parameters block
-                let! initialGenCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
                 let! genIntervalCount = rp.GetGenerationIntervalCount() |> Result.ofOption "Missing genIntervalCount."
                 let! sorterPoolSelectionIntervals = rp.GetSorterPoolSelectionIntervals() |> Result.ofOption "Missing sorterPoolSelectionInterval."
                 let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
@@ -73,7 +71,7 @@ module SgdExecutor =
                     genDb.getNextGenSavePointAsync rp (outputDataType.SorterRunResult "")
                     |> Async.map Ok
 
-                let! (initialSeedPoolSet: sorterPoolSet) = 
+                let! (firstSeedPoolSet: sorterPoolSet) = 
                     match maybeNextData with
                     | Some outData ->
                         asyncResult {
@@ -94,11 +92,21 @@ module SgdExecutor =
                                     reEvaluateParents
                                     collectNewSortableTests
                             
-                            let evaluatedSeedSet = seedPoolSet |> SorterPoolSet.updateSorterEvals computedEvals
+                            let (evaluatedSeedSet :sorterPoolSet) = seedPoolSet |> SorterPoolSet.updateSorterEvals computedEvals
+
+                            // since this was not found in the db, let's save it as the initial seed run result
+                            let (seedSorterRunResult : outputData) = sorterRunResult.create evaluatedSeedSet [||] |> outputData.SorterRunResult
+                            let! qpSsrr = 
+                                genDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterRunResult "")
+                                |> Result.ofOption "Failed to create QueryParams for seedSorterRunResult."
+                            do! genDb.saveAsync qpSsrr seedSorterRunResult (false |> UMX.tag<allowOverwrite>)
+                            log (sprintf "Initial seedSorterPoolSet saved at generation %d." %evaluatedSeedSet.GenerationNumber)
+
                             return evaluatedSeedSet
                         }
 
-                let updatedRp = rp.WithGenerationCurrent(Some initialSeedPoolSet.GenerationNumber)
+                let firstGenNumber = firstSeedPoolSet.GenerationNumber
+                let updatedRp = rp.WithGenerationCurrent(Some firstGenNumber)
 
                 do! checkCancellation cts.Token
                 
@@ -106,14 +114,14 @@ module SgdExecutor =
                 let! (simpleSorterModelMutator: simpleSorterModelMutator) = MutatorMakers.makeSimpleSorterModelMutator updatedRp
                 let sorterModelMutator = simpleSorterModelMutator |> sorterModelMutator.Simple
 
-                log (sprintf "Executing unified evolution run starting at generation %d..." %initialSeedPoolSet.GenerationNumber)
+                log (sprintf "Executing unified evolution run starting at generation %d..." %firstGenNumber)
                 let! (finalRunResult: sorterRunResult) = 
                     EvolutionOrchestrator.runEvolutionAsync
-                        host updatedRp allowOverwrite initialSeedPoolSet.GenerationNumber genIntervalCount
+                        host updatedRp allowOverwrite firstGenNumber genIntervalCount
                         sorterCountCycle sorterCountCycleMultiplier sorterPoolExpansionRate
                         sorterModelMutator prioritizeNewMutants distinctSorterHashes
                         sortersPerPool sorterChildCount sortableTest sorterEvalType
-                        sorterEvalMeasure initialSeedPoolSet collectNewSortableTests sortedFraction 
+                        sorterEvalMeasure firstSeedPoolSet collectNewSortableTests sortedFraction 
                         sorterPoolSelectionIntervals
                         sorterPoolMeasure cts.Token log
 

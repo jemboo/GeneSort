@@ -1,14 +1,6 @@
 ﻿namespace GeneSort.Eval.V1.Sgd
 
-open FSharp.UMX
-open System.Threading
-open GeneSort.Sorting.Sortable
-open GeneSort.SortingOps
-open GeneSort.Model.Sorting.V1
 open GeneSort.Core
-open System
-open GeneSort.Eval.V1
-open System.Diagnostics
 
 /// Holds the combined results of the historical optimization run using light snapshot telemetry
 type sorterRunResult = 
