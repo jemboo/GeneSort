@@ -208,7 +208,7 @@ module EvolutionOrchestrator =
         let requiredCount = int genIntervalCount + 1
 
         let targetSamples = 
-            IntSampleMethod.getSampleSetMinBound saveIntervals (startInt - 1) requiredCount
+            SamplingConfig.getSampleSetMinBound saveIntervals (startInt - 1) requiredCount
             |> Set.toArray
             |> Array.sort
 
@@ -223,13 +223,13 @@ module EvolutionOrchestrator =
 
             // --- Frequency Triggers ---
             let targetGenerationsForPoolExpansion = 
-                IntSampleMethod.getSampleSetMaxBound sorterPoolSelectionIntervals targetGenInt
+                SamplingConfig.getSampleSetMaxBound sorterPoolSelectionIntervals targetGenInt
 
             let targetGenerationsForSaveRunResult = 
-                IntSampleMethod.getSampleSetMaxBound saveIntervals targetGenInt
+                SamplingConfig.getSampleSetMaxBound saveIntervals targetGenInt
 
             let targetGenerationsForSummaryReport = 
-                IntSampleMethod.getSampleSetMaxBound subIntervals targetGenInt
+                SamplingConfig.getSampleSetMaxBound subIntervals targetGenInt
 
             let rec loop 
                         (remainingSteps: int) 

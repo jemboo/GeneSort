@@ -18,7 +18,7 @@ module SgdExecutorOld =
 
 /// Dispatches the evolution history run parameters, executes the generative loop via asyncResult,
     /// and manages final state serialization/reporting pipelines.
-    let evaluateEvolutionRun
+    let evaluateEvolutionRunOld
             (makeSortableTests: runParameters -> Async<Result<sortableTest, string>>)
             (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
             (host: IRunHost)
@@ -40,7 +40,7 @@ module SgdExecutorOld =
                 let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
                 let! snapshotReportInterval = rp.GetSnapshotReportIntervals() |> Result.ofOption "Missing snapshot report interval."
                 let! summaryReportInterval = rp.GetSummaryReportIntervals() |> Result.ofOption "Missing summary report interval."
-                let! sorterPoolSelectionIntervals = rp.GetSorterPoolSelectionIntervals() |> Result.ofOption "Missing sorterPoolSelectionInterval."
+                let! sorterPoolSelectionIntervals = rp.GetSorterPoolSelectionIntervalsOld() |> Result.ofOption "Missing sorterPoolSelectionInterval."
                 let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
                 let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
                 let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count"
@@ -75,13 +75,14 @@ module SgdExecutorOld =
                         asyncResult {
                             let! (seedPoolSet: sorterPoolSet) = sorterPoolSetCreator rp
                             let reEvaluateParents = true
+                            let dontCollectNewTests = false |> UMX.tag<collectNewSortableTests>
                             let computedEvals = 
                                     seedPoolSet 
                                     |> SorterPoolRunner.evaluatePoolSet 
                                                         sortableTest 
                                                         sorterEvalType
                                                         reEvaluateParents
-                                                        collectNewSortableTests
+                                                        dontCollectNewTests
                             return seedPoolSet |> SorterPoolSet.updateSorterEvals computedEvals
                         }
 

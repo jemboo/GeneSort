@@ -87,43 +87,43 @@ module CommonParams =
         // SorterPool selection Intervals
 
         let sorterPoolSelectEmpty = 
-            (runParameters.sorterPoolSelectionIntervalsKey, [getSampleStr "sorterPoolSelectEmpty"])
+            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelectEmpty"])
 
         // 5, 10
         let sorterPoolSelect5_2 = 
-            (runParameters.sorterPoolSelectionIntervalsKey, [getSampleStr "sorterPoolSelect5_2"])
+            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelect5_2"])
 
         // 5, 10 followed by empty state
         let sorterPoolSelects5_2 = 
-            (runParameters.sorterPoolSelectionIntervalsKey, [getSampleStr "sorterPoolSelects5_2"; getSampleStr "sorterPoolSelectEmpty"])
+            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelects5_2"; getSampleStr "sorterPoolSelectEmpty"])
 
         // 25, 50, 75, 100, 125
         let sorterPoolSelects25_5 = 
-            (runParameters.sorterPoolSelectionIntervalsKey, [getSampleStr "sorterPoolSelects25_5"; getSampleStr "sorterPoolSelectEmpty"])
+            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelects25_5"; getSampleStr "sorterPoolSelectEmpty"])
 
         // 25, 50, 100, 200, 400
         let sorterPoolSelects25_5i = 
-            (runParameters.sorterPoolSelectionIntervalsKey, [getSampleStr "sorterPoolSelects25_5i"; getSampleStr "sorterPoolSelectEmpty"])
+            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelects25_5i"; getSampleStr "sorterPoolSelectEmpty"])
 
         // 100, 150, 200, 250, 300 ...
         let sorterPoolSelect100_50 = 
-            (runParameters.sorterPoolSelectionIntervalsKey, [getSampleStr "sorterPoolSelect100_50"])
+            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelect100_50"])
 
         // 100, 200, 300, 400, ...
         let sorterPoolSelect100_100 = 
-            (runParameters.sorterPoolSelectionIntervalsKey, [getSampleStr "sorterPoolSelect100_100"])
+            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelect100_100"])
 
         // 10, 20, 40, 80, 160, ...
         let sorterPoolSelect25_20i = 
-            (runParameters.sorterPoolSelectionIntervalsKey, [getSampleStr "sorterPoolSelect25_20i"])
+            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelect25_20i"])
 
         // 50, 100, 200, 400, 800, 1600, ...
         let sorterPoolSelect50_10i = 
-            (runParameters.sorterPoolSelectionIntervalsKey, [getSampleStr "sorterPoolSelect50_10i"])
+            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelect50_10i"])
 
         // 100, 200, 400, 800, 1600, ...
         let sorterPoolSelect100_10i = 
-            (runParameters.sorterPoolSelectionIntervalsKey, [getSampleStr "sorterPoolSelect100_10i"])
+            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelect100_10i"])
 
 
 

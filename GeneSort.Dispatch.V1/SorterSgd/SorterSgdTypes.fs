@@ -23,7 +23,7 @@ module SorterSgdExecutorType =
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                SgdExecutor.evaluateEvolutionRun
+                SgdExecutorOld.evaluateEvolutionRunOld
                     SortableTestMakers.makeStandardTests
                     PoolSetMakers.createSeedSorterPoolSetStandard
                     host rp allowOverwrite cts progress }
@@ -31,22 +31,15 @@ module SorterSgdExecutorType =
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                SgdExecutor.evaluateEvolutionRun
+                SgdExecutorOld.evaluateEvolutionRunOld
                     SortableTestMakers.makeMergeTests
                     PoolSetMakers.createSeedSorterPoolSetMerge
                     host rp allowOverwrite cts progress }
 
-    let fullReportExecutor =
-        { new IRunParamsExecutor with
-            member _.Execute host rp allowOverwrite cts progress =
-                Reporting.makeSummaryReport
-                    host rp allowOverwrite cts progress }
-
-
     let prefixExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                SgdExecutor.evaluateEvolutionRun
+                SgdExecutorOld.evaluateEvolutionRunOld
                     SortableTestMakers.makePrefixTests
                     PoolSetMakers.createSeedSorterPoolSetPrefix
                     host rp allowOverwrite cts progress }

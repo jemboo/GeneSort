@@ -38,8 +38,7 @@ module SgdExecutor =
                 // 1. Gather all required run metrics and options out of your parameters block securely
                 let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."             
                 let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
-                let! snapshotReportInterval = rp.GetSnapshotReportIntervals() |> Result.ofOption "Missing snapshot report interval."
-                let! summaryReportInterval = rp.GetSummaryReportIntervals() |> Result.ofOption "Missing summary report interval."
+                let! genIntervalCount = rp.GetGenerationIntervalCount() |> Result.ofOption "Missing genIntervalCount."
                 let! sorterPoolSelectionIntervals = rp.GetSorterPoolSelectionIntervals() |> Result.ofOption "Missing sorterPoolSelectionInterval."
                 let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
                 let! sortersPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
@@ -93,13 +92,13 @@ module SgdExecutor =
 
                 log "Executing unified evolution run..."
                 let! (finalRunResult: sorterRunResult) = 
-                    EvolutionOrchestrator.runEvolutionAsyncOld
-                        host rp allowOverwrite genCurrent (genLast - genCurrent)
+                    EvolutionOrchestrator.runEvolutionAsync
+                        host rp allowOverwrite genCurrent genIntervalCount
                         sorterCountCycle sorterCountCycleMultiplier sorterPoolExpansionRate
                         sorterModelMutator prioritizeNewMutants distinctSorterHashes
                         sortersPerPool sorterChildCount sortableTest sorterEvalType
                         sorterEvalMeasure initialSeedPoolSet collectNewSortableTests sortedFraction 
-                        snapshotReportInterval summaryReportInterval sorterPoolSelectionIntervals
+                        sorterPoolSelectionIntervals
                         sorterPoolMeasure cts.Token log
 
                 log "evaluateEvolutionRun completed."

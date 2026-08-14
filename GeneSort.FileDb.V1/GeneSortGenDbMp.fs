@@ -10,11 +10,6 @@ open GeneSort.Project.V1
 open GeneSort.Eval.V1
 open GeneSort.Core
 
-type private DbMessage =
-    | Save of string<pathToRootFolder> * queryParams * outputData * bool<allowOverwrite> * AsyncReplyChannel<Result<unit, string>>
-    | Load of string<pathToRootFolder> * queryParams * AsyncReplyChannel<Result<outputData, string>>
-    | GetRunParameters of string<runName> * (int<replNumber> option) * (int<replNumber> option) * CancellationToken option * IProgress<string> option * AsyncReplyChannel<Result<runParameters[], string>>
-
 type GeneSortGenDbMp(
                 rootFolder: string<pathToRootFolder>,
                 queryParamsMaker: runParameters -> outputDataType -> queryParams option,

@@ -141,9 +141,33 @@ module IntSampleMethod =
         if count <= 0 then Seq.empty
         else generateUnbounded method minVal |> Seq.take count
 
+
+module SamplingConfig =
+
+    let toString (config: samplingConfig) : string =
+        sprintf "Name: %s, Min: %d, MaxCount: %s, Scale: %f, Method: %s" 
+            config.Name 
+            config.Min 
+            (match config.MaxCount with | Some c -> string c | None -> "None") 
+            config.Scale 
+            (IntSampleMethod.toString config.Method)
+
+    let fromString (s: string) : samplingConfig =
+        let parts = s.Split([|','|], StringSplitOptions.RemoveEmptyEntries)
+        if parts.Length <> 5 then
+            invalidArg "s" "Invalid samplingConfig string format. Expected 5 comma-separated values."
+        let name = parts.[0].Trim().Substring(6).Trim()
+        let min = int (parts.[1].Trim().Substring(5).Trim())
+        let maxCountStr = parts.[2].Trim().Substring(9).Trim()
+        let maxCount = if maxCountStr = "None" then None else Some (int maxCountStr)
+        let scale = float (parts.[3].Trim().Substring(7).Trim())
+        let methodStr = parts.[4].Trim().Substring(7).Trim()
+        let method = IntSampleMethod.fromString methodStr
+        { Name = name; Min = min; MaxCount = maxCount; Scale = scale; Method = method }
+
     /// Evaluates the method to yield a scaled set of integer samples constrained by maxBound.
     let getSampleSetMaxBound (config: samplingConfig) (maxBound: int) : Set<int> =
-        let rawSeq = generateUnbounded config.Method config.Min
+        let rawSeq = IntSampleMethod.generateUnbounded config.Method config.Min
         
         let boundedSeq = 
             match config.MaxCount with
@@ -160,7 +184,7 @@ module IntSampleMethod =
         if sampleCount <= 0 then
             Set.empty
         else
-            let rawSeq = generateUnbounded config.Method config.Min
+            let rawSeq = IntSampleMethod.generateUnbounded config.Method config.Min
             
             let boundedSeq = 
                 match config.MaxCount with
@@ -172,6 +196,9 @@ module IntSampleMethod =
             |> Seq.filter (fun scaledVal -> scaledVal > minBound)
             |> Seq.take sampleCount
             |> Set.ofSeq
+
+
+
 
 module SampleRegistry =
 
@@ -256,7 +283,7 @@ module SampleRegistry =
         printfn "=== Printing First %d Members of Generated Samples ===" sampleCount
         for KeyValue(name, config) in sampleConfigs do
             let samples = 
-                IntSampleMethod.getSampleSetMaxBound config maxBound
+                SamplingConfig.getSampleSetMaxBound config maxBound
                 |> Set.toSeq
                 |> Seq.truncate sampleCount
                 |> Seq.toList

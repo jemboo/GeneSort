@@ -66,7 +66,7 @@ module MssiSgdDbs =
                        (runParameters.prioritizeNewMutantsKey, (Some pNm) |> string)
                        (runParameters.distinctSorterHashesKey, (Some dsh) |> string)
                        (runParameters.sortedFractionKey, (Some %sfrac) |> string)
-                       (runParameters.sorterPoolSelectionIntervalsKey, (Some spsi) |> EssData.toString)
+                       (runParameters.sorterPoolSelectionIntervalsKeyOld, (Some spsi) |> EssData.toString)
                        (runParameters.snapshotReportIntervalsKey, (Some ssri) |> EssData.toString)
                        (runParameters.summaryReportIntervalsKey, (Some syri) |> EssData.toString)
                     |]
@@ -94,7 +94,7 @@ module MssiSgdDbs =
                     let! dsh = rp.GetDistinctSorterHashes()
                     let! pNm = rp.GetPrioritizeNewMutants()
                     let! sfrac = rp.GetSortedFraction()
-                    let! spsi = rp.GetSorterPoolSelectionIntervals()
+                    let! spsi = rp.GetSorterPoolSelectionIntervalsOld()
                     let! ssri = rp.GetSnapshotReportIntervals()
                     let! syri = rp.GetSummaryReportIntervals()
                     return makeQueryParams rng curGen scPP spc scc ses sem semi 
@@ -166,7 +166,7 @@ module MssiSgdDbs =
                        (runParameters.prioritizeNewMutantsKey, (Some pNm) |> string)
                        (runParameters.distinctSorterHashesKey, (Some dsh) |> string)
                        (runParameters.sortedFractionKey, (Some %sfrac) |> string)
-                       (runParameters.sorterPoolSelectionIntervalsKey, (Some spsi) |> EssData.toString)
+                       (runParameters.sorterPoolSelectionIntervalsKeyOld, (Some spsi) |> EssData.toString)
                        (runParameters.snapshotReportIntervalsKey, (Some ssri) |> EssData.toString)
                        (runParameters.summaryReportIntervalsKey, (Some syri) |> EssData.toString)
                     |]
@@ -197,7 +197,7 @@ module MssiSgdDbs =
                     let! dsh = rp.GetDistinctSorterHashes()
                     let! pNm = rp.GetPrioritizeNewMutants()
                     let! sfrac = rp.GetSortedFraction()
-                    let! spsi = rp.GetSorterPoolSelectionIntervals()
+                    let! spsi = rp.GetSorterPoolSelectionIntervalsOld()
                     let! ssri = rp.GetSnapshotReportIntervals()
                     let! syri = rp.GetSummaryReportIntervals()
                     return makeQueryParams rng curGen scPP spc scc ses sem semi 
