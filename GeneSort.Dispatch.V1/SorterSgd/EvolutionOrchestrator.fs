@@ -63,8 +63,6 @@ module EvolutionOrchestrator =
                     (historyAcc: sorterPoolSetSummary list) 
                     : Async<Result<sorterRunResult, string>> =
             asyncResult {
-                if cts.IsCancellationRequested then 
-                    return! Error "runEvolutionAsync was cancelled."
 
                 if remainingSteps <= 0 then
                     let finalResult = 
@@ -141,13 +139,11 @@ module EvolutionOrchestrator =
                                 let! qp = 
                                     host.RunDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterRunResult "")
                                     |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
-
                                 log (sprintf "Saving SorterRunResult checkpoint at Generation %d..." %currentGen)
-            
-                                // saveAsync matches Async<Result<unit, string>> so do! directly unrolls it
                                 do! host.RunDb.saveAsync qp (currentRunResult |> outputData.SorterRunResult) allowOverwrite
 
-                                // Reset accumulator on success
+                                // Reset accumulator on success, and allow cancellation
+                                if cts.IsCancellationRequested then return! Error "runEvolutionAsync was cancelled."
                                 return []
                             else
                                 return updatedSorterPoolSetSummary
@@ -170,7 +166,7 @@ module EvolutionOrchestrator =
     /// Asynchronously runs evolution step-by-step over generation intervals.
     /// Handles sampling triggers for history accumulation, pool expansion, and DB persistence.
     let runEvolutionAsync
-            (host: IRunHost)
+            (genDb: IGeneSortGenDb)
             (rp: runParameters)
             (allowOverwrite: bool<allowOverwrite>)
             (genStart: int<generationNumber>)
@@ -194,12 +190,7 @@ module EvolutionOrchestrator =
             (cts: CancellationToken)
             (log: string -> unit) : Async<Result<sorterRunResult, string>> =
 
-        // 1. Verify host.RunDb is IGeneSortGenDb and extract save configs
-        let genDb = 
-            match host.RunDb with
-            | :? IGeneSortGenDb as gdb -> gdb
-            | _ -> failwith "host.RunDb must implement IGeneSortGenDb"
-
+        // 1. Extract save configs
         let saveIntervals = genDb.getGenSaveIntervals()
         let subIntervals = genDb.getGenSaveSubIntervals()
 
@@ -237,9 +228,6 @@ module EvolutionOrchestrator =
                         (historyAcc: sorterPoolSetSummary list) 
                         : Async<Result<sorterRunResult, string>> =
                 asyncResult {
-                    if cts.IsCancellationRequested then 
-                        return! Error "runEvolutionAsync was cancelled."
-
                     if remainingSteps <= 0 then
                         let finalResult = 
                             sorterRunResult.create 
@@ -310,17 +298,15 @@ module EvolutionOrchestrator =
                                             (updatedSorterPoolSetSummary |> List.rev |> List.toArray)
 
                                     let stepRp = rp.WithGenerationCurrent(Some currentGen)
-                                
+            
                                     let! qp = 
-                                        host.RunDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterRunResult "")
+                                        genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterRunResult "")
                                         |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
-
                                     log (sprintf "Saving SorterRunResult checkpoint at Generation %d..." %currentGen)
-                                
-                                    // Save run result to DB
                                     do! genDb.saveAsync qp (currentRunResult |> outputData.SorterRunResult) allowOverwrite
 
-                                    // Reset accumulator on success
+                                    // Reset accumulator on success, and allow cancellation
+                                    if cts.IsCancellationRequested then return! Error "runEvolutionAsync was cancelled."
                                     return []
                                 else
                                     return updatedSorterPoolSetSummary

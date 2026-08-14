@@ -117,7 +117,7 @@ module SgdExecutor =
                 log (sprintf "Executing unified evolution run starting at generation %d..." %firstGenNumber)
                 let! (finalRunResult: sorterRunResult) = 
                     EvolutionOrchestrator.runEvolutionAsync
-                        host updatedRp allowOverwrite firstGenNumber genIntervalCount
+                        genDb updatedRp allowOverwrite firstGenNumber genIntervalCount
                         sorterCountCycle sorterCountCycleMultiplier sorterPoolExpansionRate
                         sorterModelMutator prioritizeNewMutants distinctSorterHashes
                         sortersPerPool sorterChildCount sortableTest sorterEvalType
