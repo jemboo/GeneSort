@@ -161,163 +161,176 @@ module EvolutionOrchestrator =
         loop %genCount initialPoolSet []
 
 
-    
 
-    /// Asynchronously runs evolution step-by-step over generation intervals.
-    /// Handles sampling triggers for history accumulation, pool expansion, and DB persistence.
     let runEvolutionAsync
-            (genDb: IGeneSortGenDb)
-            (rp: runParameters)
-            (allowOverwrite: bool<allowOverwrite>)
-            (genStart: int<generationNumber>)
-            (genIntervalCount: int<generationIntervalCount>)
-            (sorterCountCycle: int<sorterCountCycle>)
-            (sorterCountCycleMultiplier: float<sorterCountCycleMultiplier>)
-            (sorterPoolExpansionRate: int<sorterPoolExpansionRate>)
-            (mutator: sorterModelMutator)
-            (prioritizeNewMutants: bool<prioritizeNewMutants>)
-            (distinctSorterHashes: bool<distinctSorterHashes>)
-            (sorterCountPerPool: int<sorterCountPerPool>)
-            (sorterChildCount: int<sorterChildCount>)
-            (sortableTest: sortableTest)
-            (srtrEvalType: sorterEvalType)
-            (selectionMeasure: sorterEvalMeasure)
-            (initialPoolSet: sorterPoolSet)
-            (collectNewSortableTests: bool<collectNewSortableTests>)
-            (sortedFractionThreshold: float<sortedFraction>)
-            (sorterPoolSelectionIntervals: samplingConfig)
-            (poolMeasure: sorterPoolMeasure)
-            (cts: CancellationToken)
-            (log: string -> unit) : Async<Result<sorterRunResult, string>> =
+                (genDb: IGeneSortGenDb)
+                (rp: runParameters)
+                (allowOverwrite: bool<allowOverwrite>)
+                (initialPoolSet: sorterPoolSet)
+                (sortableTest: sortableTest)
+                (mutator: sorterModelMutator)
+                (cts: CancellationToken)
+                (log: string -> unit) : Async<Result<sorterRunResult, string>> =
 
-        // 1. Extract save configs
-        let saveIntervals = genDb.getGenSaveIntervals()
-        let subIntervals = genDb.getGenSaveSubIntervals()
+        asyncResult {
+            // Mandatory parameters
+            let! genStart = rp.GetGenerationCurrent() |> Result.ofOption "Missing generationCurrent"
+            let! genIntervalCount = rp.GetGenerationIntervalCount() |> Result.ofOption "Missing genIntervalCount."
+            let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
+            let! distinctSorterHashes = rp.GetDistinctSorterHashes() |> Result.ofOption "Missing distinctSorterHashes."
+            let! sorterCountPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
+            let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count."
+            let! evalType = rp.GetSorterEvalType() |> Result.ofOption "Missing sorterEvalType."
+            let! selectionMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
+            let! collectNewSortableTests = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests."
+            let! sortedFractionThreshold = rp.GetSortedFraction() |> Result.ofOption "Missing sortedFraction."
 
-        // 2. Fetch the minimal sample set starting from genStart for genIntervalCount steps
-        let startInt = int genStart
-        let requiredCount = int genIntervalCount + 1
+            // Optional parameters for Dynamic Variation and Pool Expansion
+            let optSorterCountCycle = rp.GetSorterCountCycle()
+            let optSorterCountCycleMultiplier = rp.GetSorterCountCycleMultiplier()
+            let optSorterPoolExpansionRate = rp.GetSorterPoolExpansionRate()
+            let optSorterPoolSelectionIntervals = rp.GetSorterPoolSelectionIntervals()
+            let optPoolMeasure = rp.GetSorterPoolMeasure()
 
-        let targetSamples = 
-            SamplingConfig.getSampleSetMinBound saveIntervals (startInt - 1) requiredCount
-            |> Set.toArray
-            |> Array.sort
+            // 1. Extract save configs
+            let saveIntervals = genDb.getGenSaveIntervals()
+            let subIntervals = genDb.getGenSaveSubIntervals()
 
-        if targetSamples.Length = 0 || targetSamples.[0] <> startInt then
-            async { return Error (sprintf "genStart (%d) is not a valid member of the getGenSaveIntervals sampling series." startInt) }
-        elif targetSamples.Length < requiredCount then
-            async { return Error (sprintf "Target generation sequence ended early: requested %d intervals from %d, but only obtained %d." %genIntervalCount startInt targetSamples.Length) }
-        else
-            let targetGenInt = targetSamples.[targetSamples.Length - 1]
-            let totalGen = %targetGenInt : int<generationNumber>
-            let genCount = totalGen - genStart
+            // 2. Fetch the minimal sample set starting from genStart
+            let startInt = int genStart
+            let requiredCount = int genIntervalCount + 1
 
-            // --- Frequency Triggers ---
-            let targetGenerationsForPoolExpansion = 
-                SamplingConfig.getSampleSetMaxBound sorterPoolSelectionIntervals targetGenInt
+            let targetSamples = 
+                SamplingConfig.getSampleSetMinBound saveIntervals (startInt - 1) requiredCount
+                |> Set.toArray
+                |> Array.sort
 
-            let targetGenerationsForSaveRunResult = 
-                SamplingConfig.getSampleSetMaxBound saveIntervals targetGenInt
+            if targetSamples.Length = 0 || targetSamples.[0] <> startInt then
+                return! Error (sprintf "genStart (%d) is not a valid member of the getGenSaveIntervals sampling series." startInt)
+            elif targetSamples.Length < requiredCount then
+                return! Error (sprintf "Target generation sequence ended early: requested %d intervals from %d, but only obtained %d." %genIntervalCount startInt targetSamples.Length)
+            else
+                let targetGenInt = targetSamples.[targetSamples.Length - 1]
+                let totalGen = %targetGenInt : int<generationNumber>
+                let genCount = totalGen - genStart
 
-            let targetGenerationsForSummaryReport = 
-                SamplingConfig.getSampleSetMaxBound subIntervals targetGenInt
+                // --- Frequency Triggers ---
+                let targetGenerationsForPoolExpansion = 
+                    match optSorterPoolSelectionIntervals with
+                    | Some intervals -> SamplingConfig.getSampleSetMaxBound intervals targetGenInt
+                    | None -> Set.empty
 
-            let rec loop 
+                let targetGenerationsForSaveRunResult = 
+                    SamplingConfig.getSampleSetMaxBound saveIntervals targetGenInt
+
+                let targetGenerationsForSummaryReport = 
+                    SamplingConfig.getSampleSetMaxBound subIntervals targetGenInt
+
+                let rec loop 
                         (remainingSteps: int) 
                         (currentSorterPoolSet: sorterPoolSet) 
                         (historyAcc: sorterPoolSetSummary list) 
                         : Async<Result<sorterRunResult, string>> =
-                asyncResult {
-                    if remainingSteps <= 0 then
-                        let finalResult = 
-                            sorterRunResult.create 
-                                currentSorterPoolSet 
-                                (historyAcc |> List.rev |> List.toArray)
-                        return finalResult
-                    else
-                        let currentGen = genStart + (genCount - %remainingSteps)
+                    asyncResult {
+                        if remainingSteps <= 0 then
+                            return sorterRunResult.create currentSorterPoolSet (historyAcc |> List.rev |> List.toArray)
+                        else
+                            let currentGen = genStart + (genCount - %remainingSteps)
 
-                        // Dynamic Periodic Variation for sorterCountPerPool
-                        let scm = float %sorterCountCycleMultiplier
-                        let scPP = float %sorterCountPerPool
-                        let multiplier = if ((%currentGen / %sorterCountCycle) % 2 = 0) then (1.0 / scm) else (2.0 - 1.0 / scm)
-                        let currentSorterCountPerPool : int<sorterCountPerPool> = UMX.tag (int (scPP * multiplier))
+                            // 3. Dynamic Periodic Variation for sorterCountPerPool (Conditional)
+                            let currentSorterCountPerPool : int<sorterCountPerPool> =
+                                match optSorterCountCycle, optSorterCountCycleMultiplier with
+                                | Some cycle, Some multiplierVal when %cycle > 0 ->
+                                    let scm = float %multiplierVal
+                                    let scPP = float %sorterCountPerPool
+                                    let multiplier = if ((%currentGen / %cycle) % 2 = 0) then (1.0 / scm) else (2.0 - 1.0 / scm)
+                                    UMX.tag (int (scPP * multiplier))
+                                | _ ->
+                                    sorterCountPerPool
 
-                        // Evaluate Triggers
-                        let shouldSummaryReport = Set.contains %currentGen targetGenerationsForSummaryReport
-                        let shouldSaveRunResult = Set.contains %currentGen targetGenerationsForSaveRunResult
-                        let shouldExpandPools = Set.contains %currentGen targetGenerationsForPoolExpansion
+                            // 4. Evaluate Triggers
+                            let shouldSummaryReport = Set.contains %currentGen targetGenerationsForSummaryReport
+                            let shouldSaveRunResult = Set.contains %currentGen targetGenerationsForSaveRunResult
 
-                        if shouldSummaryReport then
-                            log (sprintf "Starting evolution step. Generation %d of %d" currentGen totalGen)
+                            let shouldExpandPools = 
+                                match optSorterPoolExpansionRate, optPoolMeasure with
+                                | Some expansionRate, Some _ when expansionRate > 1<sorterPoolExpansionRate> ->
+                                    Set.contains %currentGen targetGenerationsForPoolExpansion && (%currentGen > 0)
+                                | _ -> false
 
-                        // 1. Snapshot summary before applying structural changes
-                        let updatedSorterPoolSetSummary = 
-                            if shouldSummaryReport then 
-                                let currentSnapshot = SorterPoolSetSummary.fromPoolSet currentSorterPoolSet
-                                currentSnapshot :: historyAcc
-                            else 
-                                historyAcc
+                            if shouldSummaryReport then
+                                log (sprintf "Starting evolution step. Generation %d of %d" currentGen totalGen)
 
-                        // 2. Perform Pool Expansion on milestone
-                        let poolSetForStep =
-                            if shouldExpandPools && (%currentGen > 0) && (sorterPoolExpansionRate > 1<sorterPoolExpansionRate>) then
-                                log (sprintf "Expanding pools at Generation %d (Rate: %d)..." %currentGen %sorterPoolExpansionRate)
-                                currentSorterPoolSet
-                                |> SorterPoolSet.trimPools sorterPoolExpansionRate poolMeasure
-                                |> SorterPoolSet.expandPools sorterPoolExpansionRate
-                            else
-                                currentSorterPoolSet
+                            // 5. Snapshot summary before applying structural changes
+                            let updatedSorterPoolSetSummary = 
+                                if shouldSummaryReport then 
+                                    let currentSnapshot = SorterPoolSetSummary.fromPoolSet currentSorterPoolSet
+                                    currentSnapshot :: historyAcc
+                                else 
+                                    historyAcc
 
-                        // 3. Step Evolution
-                        let adjSorterEvalType = if (remainingSteps = 1) then sorterEvalType.V2 else srtrEvalType
-                        let reEvaluateParents = (remainingSteps % 10 = 0)
-
-                        let nextSorterPoolSet = 
-                            SorterPipeline.runGenerationStepDebug 
-                                mutator 
-                                currentSorterCountPerPool
-                                sorterChildCount
-                                prioritizeNewMutants
-                                distinctSorterHashes
-                                sortableTest 
-                                adjSorterEvalType
-                                selectionMeasure
-                                reEvaluateParents
-                                poolSetForStep
-                                collectNewSortableTests
-                                sortedFractionThreshold
-
-                        // 4. Save RunResult to Database on milestone
-                        let! historyAccNext = 
-                            asyncResult {
-                                if shouldSaveRunResult && (%currentGen > 0) then
-                                    let currentRunResult = 
-                                        sorterRunResult.create 
-                                            nextSorterPoolSet 
-                                            (updatedSorterPoolSetSummary |> List.rev |> List.toArray)
-
-                                    let stepRp = rp.WithGenerationCurrent(Some currentGen)
-            
-                                    let! qp = 
-                                        genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterRunResult "")
-                                        |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
-                                    log (sprintf "Saving SorterRunResult checkpoint at Generation %d..." %currentGen)
-                                    do! genDb.saveAsync qp (currentRunResult |> outputData.SorterRunResult) allowOverwrite
-
-                                    // Reset accumulator on success, and allow cancellation
-                                    if cts.IsCancellationRequested then return! Error "runEvolutionAsync was cancelled."
-                                    return []
+                            // 6. Perform Pool Expansion on milestone (Conditional on Rate + Measure)
+                            let poolSetForStep =
+                                if shouldExpandPools then
+                                    let expansionRate = optSorterPoolExpansionRate.Value
+                                    let poolMeasure = optPoolMeasure.Value
+                                    log (sprintf "Expanding pools at Generation %d (Rate: %d)..." %currentGen %expansionRate)
+                                    currentSorterPoolSet
+                                    |> SorterPoolSet.trimPools expansionRate poolMeasure
+                                    |> SorterPoolSet.expandPools expansionRate
                                 else
-                                    return updatedSorterPoolSetSummary
-                            }
+                                    currentSorterPoolSet
 
-                        // Forced GC Compacting
-                        if remainingSteps % 50 = 0 then
-                            System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
-                            GC.Collect(2, GCCollectionMode.Forced, true, true)
+                            // 7. Step Evolution
+                            let adjSorterEvalType = if (remainingSteps = 1) then sorterEvalType.V2 else evalType
+                            let reEvaluateParents = (remainingSteps % 10 = 0)
 
-                        return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext
-                }
+                            let nextSorterPoolSet = 
+                                SorterPipeline.runGenerationStepDebug 
+                                    mutator 
+                                    currentSorterCountPerPool
+                                    sorterChildCount
+                                    prioritizeNewMutants
+                                    distinctSorterHashes
+                                    sortableTest 
+                                    adjSorterEvalType
+                                    selectionMeasure
+                                    reEvaluateParents
+                                    poolSetForStep
+                                    collectNewSortableTests
+                                    sortedFractionThreshold
 
-            loop %genCount initialPoolSet []
+                            // 8. Save RunResult to Database on milestone
+                            let! historyAccNext = 
+                                asyncResult {
+                                    if shouldSaveRunResult && (%currentGen > 0) then
+                                        let currentRunResult = 
+                                            sorterRunResult.create 
+                                                nextSorterPoolSet 
+                                                (updatedSorterPoolSetSummary |> List.rev |> List.toArray)
+
+                                        let stepRp = rp.WithGenerationCurrent(Some currentGen)
+                                
+                                        let! qp = 
+                                            genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterRunResult "")
+                                            |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
+                                        log (sprintf "Saving SorterRunResult checkpoint at Generation %d..." %currentGen)
+                                        do! genDb.saveAsync qp (currentRunResult |> outputData.SorterRunResult) allowOverwrite
+
+                                        if cts.IsCancellationRequested then return! Error "runEvolutionAsync was cancelled."
+                                        return []
+                                    else
+                                        return updatedSorterPoolSetSummary
+                                }
+
+                            // 9. Forced GC Compacting
+                            if remainingSteps % 50 = 0 then
+                                System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
+                                GC.Collect(2, GCCollectionMode.Forced, true, true)
+
+                            return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext
+                    }
+
+                // Execute loop
+                return! loop %genCount initialPoolSet []
+        }

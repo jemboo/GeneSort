@@ -332,10 +332,6 @@ type runParameters =
         this.paramMap.TryFind runParameters.snapshotReportIntervalsKey
         |> Option.map (fun v -> essData.fromString(v))
 
-
-
-
-
     member this.GetSortingWidth() =
         runParameters.tryGetInt runParameters.sortingWidthKey this.paramMap
         |> Option.map UMX.tag<sortingWidth>

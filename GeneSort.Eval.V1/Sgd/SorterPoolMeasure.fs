@@ -40,6 +40,20 @@ type sorterPoolMeasure =
 
 module SorterPoolMeasure =
 
+    let noStdev = 
+        stDevPoolMeasure.create 
+                (0.0<stDevWeight>) 
+                SorterEvalMeasure.stageBiased
+                |> sorterPoolMeasure.StDevPool
+
+    let stdev = 
+        stDevPoolMeasure.create 
+                (0.4<stDevWeight>) 
+                SorterEvalMeasure.stageBiased
+                |> sorterPoolMeasure.StDevPool
+
+
+
     let toCompactString (measure: sorterPoolMeasure) : string =
         match measure with
         | StDevPool m -> m.ToCompactString()

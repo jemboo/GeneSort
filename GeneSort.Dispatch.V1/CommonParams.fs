@@ -477,13 +477,6 @@ module CommonParams =
 
     // SorterEvalMeasures
 
-    let _cestM_noScw = ceStMeasure.create 
-                                (1.1<stageWeight>) 
-                                (true |> UMX.tag<filterUnsorted>)
-                                (false |> UMX.tag<filterReflectionSymmetric>)
-                                (0.0 |> UMX.tag<stageCrossingWeight>)
-                      |> sorterEvalMeasure.CeSt
-
     let _cestM_ScwP1 = ceStMeasure.create 
                                 (1.1<stageWeight>) 
                                 (true |> UMX.tag<filterUnsorted>)
@@ -542,7 +535,7 @@ module CommonParams =
 
     let sorterEvalMeasureInitial_CestM_noScw =
             (runParameters.sorterEvalMeasureInitialKey, 
-            [ _cestM_noScw;] |> List.map SorterEvalMeasure.toCompactString)
+            [ SorterEvalMeasure.stageBiased;] |> List.map SorterEvalMeasure.toCompactString)
     let sorterEvalMeasureInitial_CestM_Scw =
             (runParameters.sorterEvalMeasureInitialKey, 
             [ _cestM_ScwP2;] |> List.map SorterEvalMeasure.toCompactString)
@@ -551,7 +544,7 @@ module CommonParams =
 
     let sorterEvalMeasure_CestM_noScw =
             (runParameters.sorterEvalMeasureKey, 
-            [ _cestM_noScw;] |> List.map SorterEvalMeasure.toCompactString)
+            [ SorterEvalMeasure.stageBiased;] |> List.map SorterEvalMeasure.toCompactString)
     let sorterEvalMeasure_CestM_Scw =
             (runParameters.sorterEvalMeasureKey, 
             [ _cestM_ScwP2;] |> List.map SorterEvalMeasure.toCompactString)
@@ -559,7 +552,7 @@ module CommonParams =
 
     let sorterEvalMeasure_CestM_Range =
             (runParameters.sorterEvalMeasureKey, 
-            [ _cestM_noScw; _cestM_ScwP1; _cestM_ScwP2; _cestM_ScwP3; 
+            [ SorterEvalMeasure.stageBiased; _cestM_ScwP1; _cestM_ScwP2; _cestM_ScwP3; 
              _cestM_ScwP4; _cestM_ScwP5; _cestM_ScwM1; _cestM_ScwM2; ] 
             |> List.map SorterEvalMeasure.toCompactString)
 
@@ -568,30 +561,18 @@ module CommonParams =
 
     // SorterPoolMeasures
 
-    let _spm_zp4_noScw = stDevPoolMeasure.create 
-                                (0.4<stDevWeight>) 
-                                _cestM_noScw
-                         |> sorterPoolMeasure.StDevPool
-
-
-    let _spm_z_noScw = stDevPoolMeasure.create 
-                                (0.0<stDevWeight>) 
-                                _cestM_noScw
-                       |> sorterPoolMeasure.StDevPool
-
     let sorterPoolMeasure_zp4_noScw =
             (runParameters.sorterPoolMeasureKey, 
-            [ _spm_zp4_noScw;] |> List.map SorterPoolMeasure.toCompactString)
+            [ SorterPoolMeasure.noStdev;] |> List.map SorterPoolMeasure.toCompactString)
 
 
     let sorterPoolMeasure_z_noScw =
             (runParameters.sorterPoolMeasureKey, 
-            [ _spm_z_noScw;] |> List.map SorterPoolMeasure.toCompactString)
+            [ SorterPoolMeasure.stdev;] |> List.map SorterPoolMeasure.toCompactString)
 
-
-    let sorterPoolMeasures_noScw =
+    let sorterPoolMeasures =
             (runParameters.sorterPoolMeasureKey, 
-            [ _spm_zp4_noScw; _spm_z_noScw;] |> List.map SorterPoolMeasure.toCompactString)
+            [ SorterPoolMeasure.noStdev; SorterPoolMeasure.stdev;] |> List.map SorterPoolMeasure.toCompactString)
 
 
 

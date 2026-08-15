@@ -1,0 +1,128 @@
+﻿namespace GeneSort.Dispatch.V1.SorterSgd
+
+open FSharp.UMX
+open GeneSort.Sorting
+open GeneSort.Model.Sorting.V1
+open GeneSort.Core
+open GeneSort.Project.V1
+open GeneSort.Db.V1
+open GeneSort.FileDb.V1
+open GeneSort.SortingOps
+open GeneSort.Eval.V1
+open GeneSort.SortingLib.Sorter
+open GeneSort.Eval.V1.Sgd
+open GeneSort.Dispatch.V1
+
+module Msrs24p3a =
+
+    let standardParams (rp:runParameters) =
+        let spp = rp.GetSorterCountPerPool().Value |> UMX.untag
+        let pc = rp.GetSorterPoolCount().Value |> UMX.untag
+        let sorterEvalSelectionType = sorterEvalSelectionType.GuidOrder ((spp * pc) |> UMX.tag<sorterCount>)
+        let stf = SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix3a
+
+        rp.WithRngType(Some rngType.Lcg)
+          .WithCollectNewSortableTests(false |> UMX.tag<collectNewSortableTests> |> Some)
+          .WithExcludeSelfCe(true |> UMX.tag<excludeSelfCe> |> Some)
+          .WithSorterChildCount(Some 1<sorterChildCount>)
+          .WithSimpleSorterModelType(Some simpleSorterModelType.Msrs)
+          .WithSorterEvalType(Some sorterEvalType.V1)
+          .WithOrthoRate(Some 4.001<orthoRate>)
+          .WithParaRate(Some 0.4<paraRate>)
+          .WithSelfSymRate(Some 2.001<selfSymRate>)
+          .WithSortableDataFormat(Some sortableDataFormat.BitVector512)
+          .WithDistinctSorterHashes(Some true)
+          .WithPrioritizeNewMutants(Some true)
+          .WithSortedFraction(Some 0.99<sortedFraction>)
+          .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiased)
+          .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiased)
+          .WithSorterEvalSelectionType(Some sorterEvalSelectionType)
+          .WithSortableTestFilter(Some stf)
+          .WithSortingWidth(Some stf.sortingWidth)
+
+
+    module PoolSzComp =
+
+        let projectName = "SorterSgd.Prfefix.Msrs24p3a.PoolSzComp" |> UMX.tag<projectName>
+        let dbName = "PoolSzComp" |> UMX.tag<databaseName>
+        let dbFolder = @$"c:\Projects\{projectName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
+
+        let makeQueryParams
+                (repl: int<replNumber>)
+                (genCurrent: int<generationNumber>)
+                (sorterCtPerPool: int<sorterCountPerPool>)
+                (sorterPoolCt: int<sorterPoolCount>)
+                (ses:sorterEvalSelectionType)
+                (sper: int<sorterPoolExpansionRate>)
+                (mmod: int<mutationMod>)
+                (spm: sorterPoolMeasure)
+                (spsi: samplingConfig)
+                (outputDataType: outputDataType) : queryParams =
+
+            queryParams.create 
+                dbName projectName
+                (Some repl)
+                outputDataType
+                [| 
+                    (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
+                    (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                    (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                    (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
+                    (runParameters.sorterPoolExpansionRateKey, (Some %sper) |> string)
+                    (runParameters.mutationModKey, (Some %mmod) |> string)
+                    (runParameters.sorterPoolSelectionIntervalsKey, spsi |> SamplingConfig.toString)
+                    (runParameters.sorterPoolMeasureKey, spm |> SorterPoolMeasure.toCompactString)
+                |]
+
+        let queryParamsFromRunParams 
+                                (rp: runParameters) 
+                                (odt: outputDataType) : queryParams option =
+            maybe {
+                let! repl = rp.GetRepl()
+                let! curGen = rp.GetGenerationCurrent()
+                let! scPP = rp.GetSorterCountPerPool()
+                let! spc = rp.GetSorterPoolCount()
+                let! ses = rp.GetSorterEvalSelectionType()
+                let! sper = rp.GetSorterPoolExpansionRate()
+                let! mmod = rp.GetMutationMod()
+                let! spsi = rp.GetSorterPoolSelectionIntervals()
+                let! spm = rp.GetSorterPoolMeasure()
+                return makeQueryParams repl curGen scPP spc ses 
+                                       sper mmod spm spsi odt
+
+            }
+
+        let addLocalParams (rp:runParameters) =
+            let rpn = standardParams rp
+            rpn.WithSeedModificationRate(Some 0.02<seedModificationRate>)
+               .WithModificationRate(Some 0.06<modificationRate>)
+
+
+        let saveIntervals = SampleRegistry.sampleConfigs["uniformInterval100"]
+        let saveSubIntervals = SampleRegistry.sampleConfigs["summaryInterval_C.2C"]
+
+        let db = new GeneSortGenDbMp(dbFolder, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
+
+
+        //let Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
+        //    databaseName = MsrsSgdDbs.Prefix.dbName
+        //    runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+        //    runDescription = "Mutation analysis for 24pfx Msrs"
+        //    spans = [
+        //        (runParameters.generationCurrentKey, [0] |> List.map string)
+        //        (runParameters.sorterCountPerPoolKey, ["16";])
+        //        (runParameters.sorterPoolCountKey, ["16";] )
+        //        IntervalDefinitions.runResultReportInterval2
+        //        IntervalDefinitions.summaryReport_cSampleC
+        //        IntervalDefinitions.sorterPoolSelects25_5i
+        //        (runParameters.generationLastKey, [11] |> List.map string)
+        //        sorterCountCycle100
+        //        sorterCountCycleMultiplier1
+        //        (runParameters.mutationModKey, [4;] |> List.map string)
+        //        (runParameters.sorterPoolMeasureKey, [ SorterPoolMeasure.noStdev; SorterPoolMeasure.stdev;] |> List.map SorterPoolMeasure.toCompactString)
+        //    ]
+        //    filter = paramMapFilter
+        //    enhancer = prefixEnhancer
+        //    allowOverwrite = false |> UMX.tag
+        //    maxParallel = 1
+        //}

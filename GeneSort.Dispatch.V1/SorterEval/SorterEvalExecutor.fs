@@ -275,7 +275,7 @@ module SorterEvalExecutor =
                     |> SorterStageStats.fromSorterEval
                     |> Array.map (fun sss -> sss.toDataTableRecord())
 
-                let _sorterEvalMeasure = CommonParams._cestM_noScw
+                let _sorterEvalMeasure = SorterEvalMeasure.stageBiased
                 let _sorterEvalSelectionType = sorterEvalSelectionType.Tmb 300<sorterCount>
                 let _sorterEvalSelection = SorterEvalSelection.makeSelection 
                                                 _sorterEvalMeasure

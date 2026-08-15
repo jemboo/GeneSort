@@ -11,7 +11,6 @@ open GeneSort.Core
 open GeneSort.Model.Sorting.V1
 open GeneSort.SortingOps
 open GeneSort.SortingLib.Sorter
-//open GeneSort.Model.Sorting.V1
 
 
 module MsrsSgdSpecsTestPrefix =
@@ -41,27 +40,13 @@ module MsrsSgdSpecsTestPrefix =
 
     let prefixEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let stf = SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix3a
-        let evalMeasureInitial = ceStMeasure.create 
-                                    (1.1<stageWeight>) 
-                                    (true |> UMX.tag<filterUnsorted>)
-                                    (false |> UMX.tag<filterReflectionSymmetric>)
-                                    (0.0 |> UMX.tag<stageCrossingWeight>)
-                                 |> sorterEvalMeasure.CeSt
-
-        let evalMeasureRun = ceStMeasure.create 
-                                (1.1<stageWeight>) 
-                                (true |> UMX.tag<filterUnsorted>)
-                                (false |> UMX.tag<filterReflectionSymmetric>)
-                                (0.0 |> UMX.tag<stageCrossingWeight>)
-                             |> sorterEvalMeasure.CeSt
 
         let spp = rp.GetSorterCountPerPool().Value |> UMX.untag
         let pc = rp.GetSorterPoolCount().Value |> UMX.untag
-
-        let sorterEvalSelectionType = sorterEvalSelectionType.GuidOrder ((spp) |> UMX.tag<sorterCount>)
+        let sorterEvalSelectionType = sorterEvalSelectionType.GuidOrder ((spp * pc) |> UMX.tag<sorterCount>)
 
         let newRp = rp.WithRngType(Some rngType.Lcg)
-                      .WithCollectNewSortableTests(true |> UMX.tag<collectNewSortableTests> |> Some)
+                      .WithCollectNewSortableTests(false |> UMX.tag<collectNewSortableTests> |> Some)
                       .WithExcludeSelfCe(true |> UMX.tag<excludeSelfCe> |> Some)
                       .WithSortableTestFilter(Some stf)
                       .WithSortingWidth(Some stf.sortingWidth)
@@ -77,21 +62,17 @@ module MsrsSgdSpecsTestPrefix =
                       .WithDistinctSorterHashes(Some true)
                       .WithPrioritizeNewMutants(Some true)
                       .WithSortedFraction(Some 0.99<sortedFraction>)
-                      .WithSorterEvalMeasureInitial(Some evalMeasureInitial)
-                      .WithSorterEvalMeasure(Some evalMeasureRun)
+                      .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiased)
+                      .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiased)
                       .WithSorterEvalSelectionType(Some sorterEvalSelectionType)
                       .WithSorterPoolExpansionRate(Some 2<sorterPoolExpansionRate>)
-
 
         let qp = host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.Run host.Run.RunName)
 
         newRp.WithDatabaseName(Some host.Run.DatabaseName)
-             .WithSortingWidth(Some stf.sortingWidth)
              .WithRunName(Some host.Run.RunName)
              .WithRunFinished(Some false)
              .WithId (Some qp.Value.Id)
-
-
 
 
 
@@ -116,7 +97,7 @@ module MsrsSgdSpecsTestPrefix =
                 sorterCountCycle100
                 sorterCountCycleMultiplier1
                 mutationMod4
-                sorterPoolMeasures_noScw
+                sorterPoolMeasures
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
@@ -140,7 +121,7 @@ module MsrsSgdSpecsTestPrefix =
                 sorterCountCycle100
                 sorterCountCycleMultiplier1
                 mutationMods128
-                sorterPoolMeasures_noScw
+                sorterPoolMeasures
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer
