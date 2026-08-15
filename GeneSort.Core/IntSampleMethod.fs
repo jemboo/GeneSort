@@ -227,7 +227,7 @@ module SampleRegistry =
     let maxCount100 = Some 100
     let maxCount500 = Some 500
 
-    let sampleConfigs: Dictionary<string, samplingConfig> = 
+    let samplingConfigsDict: Dictionary<string, samplingConfig> = 
 
         let dict = Dictionary<string, samplingConfig>()
         let add cfg = dict.Add(cfg.Name, cfg)
@@ -281,7 +281,7 @@ module SampleRegistry =
     /// Iterates through the sample registry and prints the first `sampleCount` members generated.
     let printFirstMembers (sampleCount: int) (maxBound: int) =
         printfn "=== Printing First %d Members of Generated Samples ===" sampleCount
-        for KeyValue(name, config) in sampleConfigs do
+        for KeyValue(name, config) in samplingConfigsDict do
             let samples = 
                 SamplingConfig.getSampleSetMaxBound config maxBound
                 |> Set.toSeq

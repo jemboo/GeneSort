@@ -38,7 +38,7 @@ module CommonParams =
 
         /// Helper to fetch registered configuration strings by key name from the SampleRegistry
         let private getSampleStr (key: string) : string =
-            match SampleRegistry.sampleConfigs.TryGetValue(key) with
+            match SampleRegistry.samplingConfigsDict.TryGetValue(key) with
             | true, cfg -> IntSampleMethod.toString cfg.Method
             | false, _ -> invalidArg "key" (sprintf "Key '%s' not found in SampleRegistry" key)
 

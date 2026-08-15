@@ -67,7 +67,6 @@ module Msrs24p3a =
                     (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
                     (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                     (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                    (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                     (runParameters.sorterPoolExpansionRateKey, (Some %sper) |> string)
                     (runParameters.mutationModKey, (Some %mmod) |> string)
                     (runParameters.sorterPoolSelectionIntervalsKey, spsi |> SamplingConfig.toString)
@@ -75,51 +74,61 @@ module Msrs24p3a =
                 |]
 
         let queryParamsFromRunParams 
-                                (rp: runParameters) 
-                                (odt: outputDataType) : queryParams option =
+                        (rp: runParameters) 
+                        (odt: outputDataType) : queryParams option =
             maybe {
                 let! repl = rp.GetRepl()
                 let! curGen = rp.GetGenerationCurrent()
                 let! scPP = rp.GetSorterCountPerPool()
                 let! spc = rp.GetSorterPoolCount()
-                let! ses = rp.GetSeedPoolSorterEvalSelectionType()
+                let! spsev = rp.GetSeedPoolSorterEvalSelectionType()
                 let! sper = rp.GetSorterPoolExpansionRate()
                 let! mmod = rp.GetMutationMod()
                 let! spsi = rp.GetSorterPoolSelectionIntervals()
                 let! spm = rp.GetSorterPoolMeasure()
-                return makeQueryParams repl curGen scPP spc ses 
+                return makeQueryParams repl curGen scPP spc spsev 
                                        sper mmod spm spsi odt
-
             }
 
-        let addLocalParams (rp:runParameters) =
+
+        let private withLocalParams (rp:runParameters) =
             let rpn = standardParams rp
             rpn.WithSeedModificationRate(Some 0.02<seedModificationRate>)
                .WithModificationRate(Some 0.06<modificationRate>)
 
+        let private paramMapFilter (rp: runParameters) =
+            Some rp
 
-        let saveIntervals = SampleRegistry.sampleConfigs["uniformInterval100"]
-        let saveSubIntervals = SampleRegistry.sampleConfigs["summaryInterval_C.2C"]
+
+        let private finishRunParams (host: IRunHost) (rp:runParameters) =
+            let newRp = withLocalParams rp
+            let qp = host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.Run host.Run.RunName)
+            newRp.WithRunFinished(Some false)
+                 .WithId (Some qp.Value.Id)
+
+
+
+        let saveIntervals = SampleRegistry.samplingConfigsDict["uniformInterval100"]
+        let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.2C"]
 
         let db = new GeneSortGenDbMp(dbFolder, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
 
 
-        //let Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
-        //    databaseName = MsrsSgdDbs.Prefix.dbName
-        //    runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-        //    runDescription = "Mutation analysis for 24pfx Msrs"
-        //    spans = [
-        //        (runParameters.generationCurrentKey, [0] |> List.map string)
-        //        (runParameters.sorterCountPerPoolKey, ["16";])
-        //        (runParameters.sorterPoolCountKey, ["16";] )
-        //        (runParameters.generationLastKey, [11] |> List.map string)
-        //        sorterCountCycle100
-        //        sorterCountCycleMultiplier1
-        //        (runParameters.mutationModKey, [4;] |> List.map string)
-        //        (runParameters.sorterPoolMeasureKey, [ SorterPoolMeasure.noStdev; SorterPoolMeasure.stdev;] |> List.map SorterPoolMeasure.toCompactString)
-        //    ]
-        //    filter = paramMapFilter
-        //    enhancer = prefixEnhancer
-        //    allowOverwrite = false |> UMX.tag
-        //    maxParallel = 1
-        //}
+        let Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
+            databaseName = dbName
+            runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for 24pfx Msrs"
+            spans = [
+                (runParameters.generationCurrentKey, [0] |> List.map string)
+                (runParameters.sorterCountPerPoolKey, ["16";])
+                (runParameters.sorterPoolCountKey, ["16";] )
+                (runParameters.sorterPoolExpansionRateKey, ["2";] )
+                (runParameters.mutationModKey, [4;] |> List.map string)
+                (runParameters.sorterPoolSelectionIntervalsKey, [ SampleRegistry.samplingConfigsDict["uniformInterval5_L5"] ] |> List.map SamplingConfig.toString)
+                (runParameters.sorterPoolMeasureKey, [ SorterPoolMeasure.noStdev; SorterPoolMeasure.stdev;] |> List.map SorterPoolMeasure.toCompactString)
+            ]
+            filter = paramMapFilter
+            enhancer = finishRunParams
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 1
+        }
