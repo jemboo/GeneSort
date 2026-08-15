@@ -13,7 +13,7 @@ open GeneSort.Dispatch.V1.SorterSgd
 module MsrsSgdSpecsRm =
 
     let sorterEvalSelection = 
-            (runParameters.sorterEvalSelectionType, 
+            (runParameters.seedPoolSorterEvalSelectionType, 
             [ sorterEvalSelectionType.RankSpan 600<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
         
     let generationLast = 

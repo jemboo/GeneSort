@@ -44,7 +44,7 @@ module PoolSetMakers =
                     |> Result.ofOption "Missing simpleSorterModelType."
 
             let! (sorterEvalSelectionType: sorterEvalSelectionType) =
-                    rp.GetSorterEvalSelectionType() 
+                    rp.GetSeedPoolSorterEvalSelectionType() 
                     |> Result.ofOption "Missing sorterEvalSelectionType"
 
             let! (excludeSelfCe: bool<excludeSelfCe>) =
@@ -128,7 +128,7 @@ module PoolSetMakers =
                     |> Result.ofOption "Missing simpleSorterModelType."
 
             let! (sorterEvalSelectionType: sorterEvalSelectionType) =
-                    rp.GetSorterEvalSelectionType() 
+                    rp.GetSeedPoolSorterEvalSelectionType() 
                     |> Result.ofOption "Missing sorterEvalSelectionType"
 
             let! (mutationMod: int<mutationMod>) = 
@@ -206,7 +206,7 @@ module PoolSetMakers =
                     |> Result.ofOption "Missing simpleSorterModelType."
 
             let! (sorterEvalSelectionType: sorterEvalSelectionType) =
-                    rp.GetSorterEvalSelectionType() 
+                    rp.GetSeedPoolSorterEvalSelectionType() 
                     |> Result.ofOption "Missing sorterEvalSelectionType"
 
             let! (mutationMod: int<mutationMod>) = 

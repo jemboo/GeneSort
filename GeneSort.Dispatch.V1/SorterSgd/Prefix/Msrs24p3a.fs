@@ -36,7 +36,7 @@ module Msrs24p3a =
           .WithSortedFraction(Some 0.99<sortedFraction>)
           .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiased)
           .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiased)
-          .WithSorterEvalSelectionType(Some sorterEvalSelectionType)
+          .WithSeedPoolSorterEvalSelectionType(Some sorterEvalSelectionType)
           .WithSortableTestFilter(Some stf)
           .WithSortingWidth(Some stf.sortingWidth)
 
@@ -67,7 +67,7 @@ module Msrs24p3a =
                     (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
                     (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                     (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                    (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
+                    (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                     (runParameters.sorterPoolExpansionRateKey, (Some %sper) |> string)
                     (runParameters.mutationModKey, (Some %mmod) |> string)
                     (runParameters.sorterPoolSelectionIntervalsKey, spsi |> SamplingConfig.toString)
@@ -82,7 +82,7 @@ module Msrs24p3a =
                 let! curGen = rp.GetGenerationCurrent()
                 let! scPP = rp.GetSorterCountPerPool()
                 let! spc = rp.GetSorterPoolCount()
-                let! ses = rp.GetSorterEvalSelectionType()
+                let! ses = rp.GetSeedPoolSorterEvalSelectionType()
                 let! sper = rp.GetSorterPoolExpansionRate()
                 let! mmod = rp.GetMutationMod()
                 let! spsi = rp.GetSorterPoolSelectionIntervals()
@@ -112,9 +112,6 @@ module Msrs24p3a =
         //        (runParameters.generationCurrentKey, [0] |> List.map string)
         //        (runParameters.sorterCountPerPoolKey, ["16";])
         //        (runParameters.sorterPoolCountKey, ["16";] )
-        //        IntervalDefinitions.runResultReportInterval2
-        //        IntervalDefinitions.summaryReport_cSampleC
-        //        IntervalDefinitions.sorterPoolSelects25_5i
         //        (runParameters.generationLastKey, [11] |> List.map string)
         //        sorterCountCycle100
         //        sorterCountCycleMultiplier1

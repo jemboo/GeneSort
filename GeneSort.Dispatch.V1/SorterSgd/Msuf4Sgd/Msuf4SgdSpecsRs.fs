@@ -14,7 +14,7 @@ open GeneSort.Dispatch.V1.SorterSgd
 module Msuf4SgdSpecsRs = 
 
     let sorterEvalSelection = 
-            (runParameters.sorterEvalSelectionType, 
+            (runParameters.seedPoolSorterEvalSelectionType, 
             [ sorterEvalSelectionType.Tmb 3000<sorterCount>; ] |> List.map SorterEvalSelectionType.toString)
 
 

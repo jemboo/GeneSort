@@ -12,7 +12,7 @@ open GeneSort.Dispatch.V1.SorterSgd
 module Msuf4SgdSpecsTestPrefix =
 
     let sorterEvalSelectionTypeRs6000 = 
-            (runParameters.sorterEvalSelectionType, 
+            (runParameters.seedPoolSorterEvalSelectionType, 
             [ sorterEvalSelectionType.RankSpan 6000<sorterCount>;] 
             |> List.map SorterEvalSelectionType.toString)
         

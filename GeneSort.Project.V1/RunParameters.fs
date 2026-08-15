@@ -70,7 +70,7 @@ type runParameters =
     static member sorterCountPerPoolKey = "SorterCountPerPool"
     static member sorterEvalMeasureInitialKey = "SorterEvalMeasureInitial"
     static member sorterEvalMeasureKey = "SorterEvalMeasure"
-    static member sorterEvalSelectionType = "SorterEvalSelectionType"
+    static member seedPoolSorterEvalSelectionType = "SeedPoolSorterEvalSelectionType"
     static member sorterEvalTypeKey = "SorterEvalType"
     static member sortableTestFilterKey = "SortableTestFilter"
     static member sorterParentCountKey = "SorterParentCount"
@@ -292,8 +292,8 @@ type runParameters =
         this.paramMap.TryFind runParameters.sorterEvalMeasureInitialKey
         |> Option.map SorterEvalFunctions.fromCompactString
 
-    member this.GetSorterEvalSelectionType() =
-        this.paramMap.TryFind runParameters.sorterEvalSelectionType
+    member this.GetSeedPoolSorterEvalSelectionType() =
+        this.paramMap.TryFind runParameters.seedPoolSorterEvalSelectionType
         |> Option.map SorterEvalSelectionType.fromString
 
     member this.GetSorterEvalType() =
@@ -496,8 +496,8 @@ type runParameters =
     member this.WithSorterEvalMeasureInitial(sem: sorterEvalMeasure option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalMeasureInitialKey (sem |> Option.map SorterEvalFunctions.toCompactString) }
 
-    member this.WithSorterEvalSelectionType(ses: sorterEvalSelectionType option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalSelectionType (ses |> Option.map SorterEvalSelectionType.toString) }
+    member this.WithSeedPoolSorterEvalSelectionType(ses: sorterEvalSelectionType option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedPoolSorterEvalSelectionType (ses |> Option.map SorterEvalSelectionType.toString) }
 
     member this.WithSorterEvalType(set: sorterEvalType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalTypeKey (set |> Option.map SorterEvalType.toString) }

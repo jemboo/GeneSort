@@ -38,7 +38,7 @@ module MssiMutateDbs =
                 queryParams.create dbName projectName (Some repl) odt
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                       (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
+                       (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toCompactString)
                        (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                        (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
@@ -54,7 +54,7 @@ module MssiMutateDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! ses = rp.GetSorterEvalSelectionType()
+                    let! ses = rp.GetSeedPoolSorterEvalSelectionType()
                     let! sem = rp.GetSorterEvalMeasure()
                     let! sw = rp.GetSortingWidth()
                     let! smt = rp.GetSimpleSorterModelType()
@@ -100,7 +100,7 @@ module MssiMutateDbs =
                     outputDataType
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                       (runParameters.sorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
+                       (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toCompactString)
                        (runParameters.sortingWidthKey, string %sortingWidth); 
                        (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
@@ -119,7 +119,7 @@ module MssiMutateDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! rng = rp.GetRngType()
-                    let! ses = rp.GetSorterEvalSelectionType()
+                    let! ses = rp.GetSeedPoolSorterEvalSelectionType()
                     let! sem = rp.GetSorterEvalMeasure()
                     let! repl = rp.GetRepl()
                     let! sw = rp.GetSortingWidth()

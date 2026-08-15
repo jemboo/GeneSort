@@ -71,7 +71,7 @@ module SgdExecutor =
             let! sorterCountPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
             let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count."
             let! evalType = rp.GetSorterEvalType() |> Result.ofOption "Missing sorterEvalType."
-            let! selectionMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
+            let! srtrEvalMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
             let! collectNewSortableTests = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests."
             let! sortedFractionThreshold = rp.GetSortedFraction() |> Result.ofOption "Missing sortedFraction."
 
@@ -203,7 +203,7 @@ module SgdExecutor =
                                     distinctSorterHashes
                                     sortableTest 
                                     adjSorterEvalType
-                                    selectionMeasure
+                                    srtrEvalMeasure
                                     reEvaluateParents
                                     poolSetForStep
                                     collectNewSortableTests

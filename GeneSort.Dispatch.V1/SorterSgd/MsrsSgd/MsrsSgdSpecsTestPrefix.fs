@@ -16,12 +16,12 @@ open GeneSort.SortingLib.Sorter
 module MsrsSgdSpecsTestPrefix =
 
     let sorterEvalSelectionTypeGuid12K = 
-            (runParameters.sorterEvalSelectionType, 
+            (runParameters.seedPoolSorterEvalSelectionType, 
             [ sorterEvalSelectionType.GuidOrder 12000<sorterCount>;] 
             |> List.map SorterEvalSelectionType.toString)
 
     let sorterEvalSelectionTypeGuid1K = 
-            (runParameters.sorterEvalSelectionType, 
+            (runParameters.seedPoolSorterEvalSelectionType, 
             [ sorterEvalSelectionType.GuidOrder 1000<sorterCount>;] 
             |> List.map SorterEvalSelectionType.toString)
         
@@ -64,7 +64,7 @@ module MsrsSgdSpecsTestPrefix =
                       .WithSortedFraction(Some 0.99<sortedFraction>)
                       .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiased)
                       .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiased)
-                      .WithSorterEvalSelectionType(Some sorterEvalSelectionType)
+                      .WithSeedPoolSorterEvalSelectionType(Some sorterEvalSelectionType)
                       .WithSorterPoolExpansionRate(Some 2<sorterPoolExpansionRate>)
 
         let qp = host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.Run host.Run.RunName)

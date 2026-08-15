@@ -18,7 +18,7 @@ module MsceSgdSpecsRs =
             [ true; false ] |> List.map string)
 
     let sorterEvalSelectionType = 
-            (runParameters.sorterEvalSelectionType, 
+            (runParameters.seedPoolSorterEvalSelectionType, 
             [ sorterEvalSelectionType.Tmb 1500<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
     
     let generationLast = 
