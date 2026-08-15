@@ -43,9 +43,9 @@ module Msrs24p3a =
 
     module PoolSzComp =
 
-        let projectName = "SorterSgd.Prfefix.Msrs24p3a.PoolSzComp" |> UMX.tag<projectName>
+        let projName = "SorterSgd.Prfefix.Msrs24p3a.PoolSzComp" |> UMX.tag<projectName>
         let dbName = "PoolSzComp" |> UMX.tag<databaseName>
-        let dbFolder = @$"c:\Projects\{projectName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
+        let dbFolder = @$"c:\Projects\{projName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
 
         let makeQueryParams
                 (repl: int<replNumber>)
@@ -60,7 +60,7 @@ module Msrs24p3a =
                 (outputDataType: outputDataType) : queryParams =
 
             queryParams.create 
-                dbName projectName
+                dbName projName
                 (Some repl)
                 outputDataType
                 [| 
@@ -132,3 +132,20 @@ module Msrs24p3a =
             allowOverwrite = false |> UMX.tag
             maxParallel = 1
         }
+
+        let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
+            [ 
+                (dbName, db :> IGeneSortDb);
+            ]
+            |> Map.ofList
+
+        let getDatabaseByName (name: string<databaseName>) : IGeneSortDb =
+            match databaseConfigs.TryFind name with
+            | Some db -> db
+            | None -> failwithf "Database with name %s not found" (UMX.untag name)
+
+
+        let createRunHost (spec: runHostSpec) : IRunHost =
+            let db = getDatabaseByName spec.databaseName
+            let run = run.create spec.databaseName projName spec.runName spec.runDescription
+            runHost.Create db spec run :> IRunHost
