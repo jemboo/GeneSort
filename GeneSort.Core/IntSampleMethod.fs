@@ -165,6 +165,7 @@ module SamplingConfig =
         let method = IntSampleMethod.fromString methodStr
         { Name = name; Min = min; MaxCount = maxCount; Scale = scale; Method = method }
 
+
     /// Evaluates the method to yield a scaled set of integer samples constrained by maxBound.
     let getSampleSetMaxBound (config: samplingConfig) (maxBound: int) : Set<int> =
         let rawSeq = IntSampleMethod.generateUnbounded config.Method config.Min
@@ -179,23 +180,27 @@ module SamplingConfig =
         |> Seq.takeWhile (fun scaledVal -> scaledVal <= maxBound)
         |> Set.ofSeq
 
-    /// Evaluates the method to yield a scaled set of the first sampleCount integer samples strictly larger than minBound.
-    let getSampleSetMinBound (config: samplingConfig) (minBound: int) (sampleCount: int) : Set<int> =
-        if sampleCount <= 0 then
-            Set.empty
-        else
-            let rawSeq = IntSampleMethod.generateUnbounded config.Method config.Min
-            
-            let boundedSeq = 
-                match config.MaxCount with
-                | Some maxCount -> rawSeq |> Seq.take maxCount
-                | None -> rawSeq
 
-            boundedSeq
-            |> Seq.map (fun x -> int (ceil (float x * config.Scale)))
-            |> Seq.filter (fun scaledVal -> scaledVal > minBound)
-            |> Seq.take sampleCount
-            |> Set.ofSeq
+    /// Evaluates the method to yield a scaled set of the first sampleCount integer samples strictly larger than minBound.
+    let getSamplesWithMinBound (config: samplingConfig) (minBound: int) : seq<int> =
+        let rawSeq = IntSampleMethod.generateUnbounded config.Method config.Min
+            
+        let boundedSeq = 
+            match config.MaxCount with
+            | Some maxCount -> rawSeq |> Seq.take maxCount
+            | None -> rawSeq
+
+        boundedSeq
+        |> Seq.map (fun x -> int (ceil (float x * config.Scale)))
+        |> Seq.filter (fun scaledVal -> scaledVal > minBound)
+            
+
+    /// Evaluates the method to yield a scaled set of the first sampleCount integer samples strictly larger than minBound.
+    let getSampleSetWithMinBound (config: samplingConfig) (minBound: int) (sampleCount: int) : Set<int> =
+            if sampleCount <= 0 then
+                Set.empty
+            else
+                getSamplesWithMinBound config minBound |> Seq.take sampleCount |> Set.ofSeq
 
 
 

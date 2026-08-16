@@ -53,6 +53,7 @@
     <Compile Include="SorterMutate\Msuf4Mutate\Msuf4MutateExecutor.fs" />
     <Compile Include="SorterMutate\Msuf4Mutate\Msuf4MutateSpecsRs.fs" />
     <Compile Include="SorterMutate\Msuf4Mutate\Msuf4MutateSpecsRm.fs" />
+    <Compile Include="SorterSgd\Utils.fs" />
     <Compile Include="SorterSgd\PoolSetMakers.fs" />
     <Compile Include="SorterSgd\MutatorMakers.fs" />
     <Compile Include="SorterSgd\SortableTestMakers.fs" />
@@ -60,6 +61,7 @@
     <Compile Include="SorterSgd\SgdExecutorOld.fs" />
     <Compile Include="SorterSgd\SgdExecutor.fs" />
     <Compile Include="SorterSgd\Reporting.fs" />
+    <Compile Include="SorterSgd\ReportingOld.fs" />
     <Compile Include="SorterSgd\SorterSgdTypesOld.fs" />
     <Compile Include="SorterSgd\SorterSgdTypes.fs" />
     <Compile Include="SorterSgd\Prefix\Msrs24p3a.fs" />

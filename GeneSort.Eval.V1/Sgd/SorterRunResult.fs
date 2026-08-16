@@ -22,15 +22,15 @@ type sorterRunResult =
 module SorterRunResult =
 
     /// Extracts dataTableRecords out of the run result's intermediate summary history
-    let toDataTableRecordsIntermediateHistory (prefix: string) (srRes: sorterRunResult) : dataTableRecord array =
+    let toDataTableRecordsIntermediateHistory (prefix: string) (srRes: sorterRunResult) : dataTableRecord seq =
         srRes.IntermediateHistory
-        |> Array.collect (fun poolSetSummary ->
+        |> Seq.collect (fun poolSetSummary ->
             poolSetSummary
             |> SorterPoolSetSummary.toDataTableRecords prefix
-        )
+        ) 
 
 
     /// Extracts dataTableRecords out of the run result's FinalPoolSet
-    let toDataTableRecordsSnapshot (prefix: string) (srRes: sorterRunResult) : dataTableRecord array =
+    let toDataTableRecordsSnapshot (prefix: string) (srRes: sorterRunResult) : dataTableRecord seq =
         let yab = SorterPoolSetDescription.fromPoolSet srRes.FinalPoolSet
         SorterPoolSetDescription.toDataTableRecords "" yab

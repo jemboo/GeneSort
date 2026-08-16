@@ -15,6 +15,8 @@ open GeneSort.Dispatch.V1
 
 module Msrs24p3a =
 
+    let projName = "SorterSgd.Prfefix.Msrs24p3a" |> UMX.tag<projectName>
+
     let standardParams (rp:runParameters) =
         let spp = rp.GetSorterCountPerPool().Value |> UMX.untag
         let pc = rp.GetSorterPoolCount().Value |> UMX.untag
@@ -43,9 +45,8 @@ module Msrs24p3a =
 
     module PoolSzComp =
 
-        let projName = "SorterSgd.Prfefix.Msrs24p3a.PoolSzComp" |> UMX.tag<projectName>
         let dbName = "PoolSzComp" |> UMX.tag<databaseName>
-        let dbFolder = @$"c:\Projects\{projName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
+        let dbFolder = @$"c:\Projects\{%projName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
 
         let makeQueryParams
                 (repl: int<replNumber>)
@@ -67,6 +68,7 @@ module Msrs24p3a =
                     (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
                     (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                     (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                    (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                     (runParameters.sorterPoolExpansionRateKey, (Some %sper) |> string)
                     (runParameters.mutationModKey, (Some %mmod) |> string)
                     (runParameters.sorterPoolSelectionIntervalsKey, spsi |> SamplingConfig.toString)
@@ -104,7 +106,8 @@ module Msrs24p3a =
             let newRp = withLocalParams rp
             let qp = host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.Run host.Run.RunName)
             newRp.WithRunFinished(Some false)
-                 .WithId (Some qp.Value.Id)
+                 .WithId(Some qp.Value.Id)
+                 .WithRunName(Some host.Run.RunName)
 
 
         let saveIntervals = SampleRegistry.samplingConfigsDict["uniformInterval100"]
@@ -119,6 +122,7 @@ module Msrs24p3a =
             runDescription = "Mutation analysis for 24pfx Msrs"
             spans = [
                 (runParameters.generationCurrentKey, [0] |> List.map string)
+                (runParameters.generationIntervalCountKey, [1] |> List.map string)
                 (runParameters.sorterCountPerPoolKey, ["16";])
                 (runParameters.sorterPoolCountKey, ["16";] )
                 (runParameters.sorterPoolExpansionRateKey, ["2";] )

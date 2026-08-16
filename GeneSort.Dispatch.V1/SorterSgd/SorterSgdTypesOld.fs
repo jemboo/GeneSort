@@ -50,5 +50,5 @@ module SorterSgdExecutorTypeOld =
         | sorterSgdExecutorTypeOld.GenStandard -> standardExecutor
         | sorterSgdExecutorTypeOld.GenMerge -> mergeExecutor
         | sorterSgdExecutorTypeOld.GenPrefix -> prefixExecutor
-        | sorterSgdExecutorTypeOld.SummaryReport -> Reporting.fullReportExecutor
-        | sorterSgdExecutorTypeOld.SnapshotReport -> Reporting.snapshotReportExecutor
+        | sorterSgdExecutorTypeOld.SummaryReport -> ReportingOld.fullReportExecutor
+        | sorterSgdExecutorTypeOld.SnapshotReport -> ReportingOld.snapshotReportExecutor

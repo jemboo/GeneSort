@@ -7,18 +7,12 @@ open System.Threading
 open FSharp.UMX
 
 open GeneSort.Dispatch.V1
-open GeneSort.Db.V1
 open GeneSort.Project.V1
-open GeneSort.FileDb.V1
-open GeneSort.Dispatch.V1.SorterSgd.Msce
 open GeneSort.Dispatch.V1.SorterSgd
-open GeneSort.Dispatch.V1.SorterSgd.Mssi
-open GeneSort.Dispatch.V1.SorterSgd.Msrs
-open GeneSort.Dispatch.V1.SorterSgd.Msuf4
 
 module DispatchSorterSgd = 
 
-    let createThreadSafeProgress () =
+    let private createThreadSafeProgress () =
         let sessionTimestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss")
         let logFileName = sprintf @"c:\Projects\session_%s.log" sessionTimestamp
     
@@ -42,13 +36,13 @@ module DispatchSorterSgd =
                 )
         }
 
-    let isServer = GCSettings.IsServerGC
-    let mode = GCSettings.LatencyMode
+    let private isServer = GCSettings.IsServerGC
+    let private mode = GCSettings.LatencyMode
 
-    let progress = createThreadSafeProgress()
-    let cts = new CancellationTokenSource()
+    let private progress = createThreadSafeProgress()
+    let private cts = new CancellationTokenSource()
 
-    let startTime = DateTime.Now
+    let private startTime = DateTime.Now
     printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
@@ -135,19 +129,16 @@ module DispatchSorterSgd =
 
 
     ////********** Msrs24p3a **********
-    let configType = MsrsSgdSpecsTestPrefix.configType.Test
-    let executorType = sorterSgdExecutorType.GenPrefix
-    let host: IRunHost = Msrs24p3a.PoolSzComp.createRunHost (Msrs24p3a.PoolSzComp.Test executorType)
+    let private executorType = sorterSgdExecutorType.GenPrefix
+    let private host: IRunHost = Msrs24p3a.PoolSzComp.createRunHost (Msrs24p3a.PoolSzComp.Test executorType)
+
+    let private executor = SorterSgdExecutorType.getExecutor executorType
+    let private minReplica = 0<replNumber>
+    let private maxReplica = 1<replNumber>
 
 
 
-    let executor = SorterSgdExecutorType.getExecutor executorType
-    let minReplica = 0<replNumber>
-    let maxReplica = 1<replNumber>
-
-
-
-    let runBoth() =
+    let makeParamsAndRun() =
 
         async {
 
@@ -186,7 +177,7 @@ module DispatchSorterSgd =
         } |> Async.RunSynchronously
 
 
-    let MakeRunParams() =
+    let makeRunParams() =
 
         async {
             printfn "Init Run: %s" %host.Run.RunName
@@ -210,7 +201,7 @@ module DispatchSorterSgd =
         } |> Async.RunSynchronously
 
 
-    let runEm() =
+    let doRunParameters() =
 
         async {
 

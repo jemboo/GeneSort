@@ -9,7 +9,6 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.SortingLib.Sorter
-open GeneSort.Core.MathUtils
 open GeneSort.Eval.V1.Sgd
 
 type runParameters =

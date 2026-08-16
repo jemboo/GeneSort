@@ -202,13 +202,11 @@ module EvolutionOrchestrator =
             let requiredCount = int genIntervalCount + 1
 
             let targetSamples = 
-                SamplingConfig.getSampleSetMinBound saveIntervals (startInt - 1) requiredCount
+                SamplingConfig.getSampleSetWithMinBound saveIntervals (startInt - 1) requiredCount
                 |> Set.toArray
                 |> Array.sort
 
-            if targetSamples.Length = 0 || targetSamples.[0] <> startInt then
-                return! Error (sprintf "genStart (%d) is not a valid member of the getGenSaveIntervals sampling series." startInt)
-            elif targetSamples.Length < requiredCount then
+            if targetSamples.Length < requiredCount then
                 return! Error (sprintf "Target generation sequence ended early: requested %d intervals from %d, but only obtained %d." %genIntervalCount startInt targetSamples.Length)
             else
                 let targetGenInt = targetSamples.[targetSamples.Length - 1]
@@ -227,13 +225,32 @@ module EvolutionOrchestrator =
                 let targetGenerationsForSummaryReport = 
                     SamplingConfig.getSampleSetMaxBound subIntervals targetGenInt
 
+                // Condensed Optional Features Log
+                let countLog = 
+                    match optSorterCountCycle, optSorterCountCycleMultiplier with
+                    | Some c, Some m -> sprintf "ENABLED (Cycle: %d, Mult: %.2f)" %c (float %m)
+                    | _ -> "DISABLED (Static)"
+
+                let poolLog = 
+                    match optSorterPoolExpansionRate, optSorterPoolSelectionIntervals, optPoolMeasure with
+                    | Some r, Some i, Some m -> sprintf "ENABLED (Rate: %d, Intervals: %A, Measure: %A)" %r i m
+                    | _ ->
+                           let missing = 
+                                [ if optSorterPoolExpansionRate.IsNone then yield "Rate"
+                                  if optSorterPoolSelectionIntervals.IsNone then yield "Intervals"
+                                  if optPoolMeasure.IsNone then yield "Measure" ] |> String.concat ","
+                           sprintf "DISABLED (Missing: %s)" missing
+
+                log (sprintf "  [Optional Features] Dynamic Count: %s | Pool Expansion: %s" countLog poolLog)
+
+
                 let rec loop 
                         (remainingSteps: int) 
                         (currentSorterPoolSet: sorterPoolSet) 
                         (historyAcc: sorterPoolSetSummary list) 
                         : Async<Result<sorterRunResult, string>> =
                     asyncResult {
-                        if remainingSteps <= 0 then
+                        if remainingSteps < 0 then
                             return sorterRunResult.create currentSorterPoolSet (historyAcc |> List.rev |> List.toArray)
                         else
                             let currentGen = genStart + (genCount - %remainingSteps)
@@ -261,25 +278,6 @@ module EvolutionOrchestrator =
 
                             if shouldSummaryReport then
                                 log (sprintf "Starting evolution step. Generation %d of %d" currentGen totalGen)
-
-                                // Condensed Optional Features Log
-                                let countLog = 
-                                    match optSorterCountCycle, optSorterCountCycleMultiplier with
-                                    | Some c, Some m -> sprintf "ENABLED (Cycle: %d, Mult: %.2f)" %c (float %m)
-                                    | _ -> "DISABLED (Static)"
-
-                                let poolLog = 
-                                    match optSorterPoolExpansionRate, optSorterPoolSelectionIntervals, optPoolMeasure with
-                                    | Some r, Some i, Some m -> sprintf "ENABLED (Rate: %d, Intervals: %A, Measure: %A)" %r i m
-                                    | _ -> 
-                                        let missing = 
-                                            [ if optSorterPoolExpansionRate.IsNone then yield "Rate"
-                                              if optSorterPoolSelectionIntervals.IsNone then yield "Intervals"
-                                              if optPoolMeasure.IsNone then yield "Measure" ]
-                                            |> String.concat ","
-                                        sprintf "DISABLED (Missing: %s)" missing
-
-                                log (sprintf "  [Optional Features] Dynamic Count: %s | Pool Expansion: %s" countLog poolLog)
 
                             // 5. Snapshot summary before applying structural changes
                             let updatedSorterPoolSetSummary = 

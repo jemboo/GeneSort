@@ -6,6 +6,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Db.V1
 open GeneSort.Project.V1
+open GeneSort.Eval.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Sorting.Sortable
@@ -72,36 +73,47 @@ module SgdExecutor =
                 log "Executing makeSortableTests..."
                 let! (sortableTest: sortableTest) = makeSortableTests rp
 
-                log "Initializing seed pool set..."
-                let! (initialSeedPoolSet: sorterPoolSet) = 
-                        initializeAndSaveSeedPoolSet
-                            sorterPoolSetCreator
-                            genDb
-                            rp
-                            sortableTest
-                            log
+                // 1. Check for existing checkpoints directly via genDb
+                let! highestResultOpt = 
+                    Utils.loadSorterRunResultWithHighestGenerationNumber genDb rp cts.Token log
+
+                // 2. Conditionally initialize or resume from the highest discovered checkpoint
+                let! (activeSeedPoolSet: sorterPoolSet), (activeRp: runParameters) = 
+                    match highestResultOpt with
+                    | None -> 
+                        asyncResult {
+                            let initRp = rp.WithGenerationCurrent(Some (0 |> UMX.tag<generationNumber>))
+                            let! (seedSet: sorterPoolSet) = initializeAndSaveSeedPoolSet sorterPoolSetCreator genDb initRp sortableTest log
+                            return seedSet, initRp
+                        }
+                    | Some (highestResult: sorterRunResult) -> 
+                        asyncResult {
+                            let (currentGen: int<generationNumber>) = highestResult.FinalPoolSet.GenerationNumber
+                            log (sprintf "Found existing checkpoint at Generation %d. Resuming evolution." %currentGen)
+                            let updatedRp = rp.WithGenerationCurrent(Some currentGen)
+                            return highestResult.FinalPoolSet, updatedRp
+                        }
 
                 do! checkCancellation cts.Token
                 
                 log "Making sorterModelMutator..."
-                let! (simpleSorterModelMutator: simpleSorterModelMutator) = MutatorMakers.makeSimpleSorterModelMutator rp
+                let! (simpleSorterModelMutator: simpleSorterModelMutator) = MutatorMakers.makeSimpleSorterModelMutator activeRp
                 let sorterModelMutator = simpleSorterModelMutator |> sorterModelMutator.Simple
 
                 log "Executing unified evolution run..."
                 let! (_finalRunResult: sorterRunResult) = 
                     EvolutionOrchestrator.runEvolutionAsync
                         genDb
-                        rp
+                        activeRp
                         allowOverwrite
-                        initialSeedPoolSet
+                        activeSeedPoolSet
                         sortableTest
                         sorterModelMutator
                         cts.Token
                         log
 
                 log "evaluateEvolutionRun completed."
-                let finalRp = rp.WithRunFinished(Some true)
-                return finalRp
+                return activeRp
 
             with e -> 
                 let errorMsg = sprintf "Error in evaluateEvolutionRun: %s" e.Message

@@ -1,187 +1,125 @@
 ﻿namespace GeneSort.Dispatch.V1.SorterSgd
 
 open System
-open FSharp.UMX
-open GeneSort.Project.V1
-open GeneSort.Core
-open GeneSort.Db.V1
-open FsToolkit.ErrorHandling
-open GeneSort.Dispatch.V1
 open System.Threading
+open FSharp.UMX
+open GeneSort.Core
+open GeneSort.Project.V1
+open GeneSort.Db.V1
+open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1
 
-
 module Reporting =
 
-    let makeSummaryReport 
-            (host: IRunHost)
-            (rp: runParameters) 
-            (allowOverwrite: bool<allowOverwrite>) 
-            (cts: CancellationTokenSource) 
+    /// Core engine for generating dynamic reports.
+    let private makeDynamicReport
+            (extractRecords: sorterRunResult -> dataTableRecord seq)
+            (reportNameTag: string)
+            (genDb: IGeneSortGenDb)
+            (rp: runParameters)
+            (allowOverwrite: bool<allowOverwrite>)
+            (cts: CancellationTokenSource)
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
-        let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+        let log msg = 
+            OpsUtils.report progress (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
-                do! checkCancellation cts.Token                
-                let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
-                let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
-                let! essSnapshotReportIntervals = rp.GetSnapshotReportIntervals () |> Result.ofOption "Missing generation report interval."
-
+                do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
-                OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (StringUtils.getTimestampString()) %runId)
+                OpsUtils.report progress (sprintf "%s Starting Dynamic %s for Run %s" (StringUtils.getTimestampString()) reportNameTag %runId)
 
-                // 1. Calculate the target generation slices
-                let reportGenerations = EssData.getSamplesInOrder essSnapshotReportIntervals %genLast
-                                        |> Seq.map(UMX.tag<generationNumber>) 
-                                        |> Seq.toList
+                // 1. Dynamic discovery and stream slices lazily via Utils
+                let! sliceSeq = Utils.loadAllAvailableSorterRunResults genDb rp cts.Token log
 
-                if List.isEmpty reportGenerations then
-                    return! Error "No generation steps calculated for the full report. Verify genCurrent, genLast, and genSliceSize bounds."
+                if Seq.isEmpty sliceSeq then
+                    return! Error "No valid SorterRunResult files were discovered starting at generation 0."
 
-                log (sprintf "Discovered %d report slices to load and collect..." (List.length reportGenerations))
+                // 2. Extract dynamic records and capture max generation number in a single streaming pass
+                let mutable sliceCount = 0
+                let mutable maxGenOpt = None
 
-                // 2. Accumulate all details records across our slices
-                let mutable accumulatedDetails = Seq.empty<dataTableRecord>
+                let accumulatedDetails = 
+                    sliceSeq
+                    |> Seq.collect (fun slice ->
+                        sliceCount <- sliceCount + 1
+                        let gen = slice.FinalPoolSet.GenerationNumber
+                        maxGenOpt <- 
+                            match maxGenOpt with
+                            | None -> Some gen
+                            | Some curMax -> Some (max curMax gen)
+                        extractRecords slice)
+                    // Materialize records lazily to ensure single traversal tracking
+                    |> Seq.cache
 
-                for targetGen in reportGenerations do
-                    do! checkCancellation cts.Token
-                    log (sprintf "Loading SorterRunResult slice for Gen %d..." %targetGen)
-                    
-                    let sliceRp = rp.WithGenerationCurrent (Some targetGen)
-                    let! qpSlice = 
-                        host.RunDb.MakeQueryParamsFromRunParams sliceRp (outputDataType.SorterRunResult "")
-                        |> Result.ofOption (sprintf "Failed to create QueryParams for SorterRunResult at generation %d." %targetGen)
+                let lastGen = 
+                    match maxGenOpt with
+                    | Some g -> g
+                    | None -> %0 : int<generationNumber>
 
-                    let! outData = host.RunDb.loadAsync qpSlice
-                    let! (sliceResult: sorterRunResult) = outData |> OutputData.asSorterRunResult |> Async.singleton
+                log (sprintf "Discovered and processed %d contiguous SorterRunResult slice(s)." sliceCount)
 
-                    // Extract the raw dataTableRecords from this slice's domain model
-                    let sliceDetails = sliceResult |> SorterRunResult.toDataTableRecordsIntermediateHistory ""
-                    accumulatedDetails <- Seq.append accumulatedDetails sliceDetails
-
-                // 3. Prepare query params and metadata headers for the final compiled text report
-                let reportName = (sprintf "SorterRunResult_SummaryReport" |> UMX.tag<textReportName>)
-                let newRp = rp.WithGenerationCurrent (rp.GetGenerationLast())
+                // 3. Prepare target metadata and query params for the finished text report
+                let reportName = reportNameTag |> UMX.tag<textReportName>
+                let finalRp = rp.WithGenerationCurrent(Some lastGen)
 
                 let! qpReport = 
-                    host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.TextReport reportName)
-                    |> Result.ofOption "Failed to create QueryParams for Report."
+                    genDb.MakeQueryParamsFromRunParams finalRp (outputDataType.TextReport reportName)
+                    |> Result.ofOption "Failed to create QueryParams for output Report."
 
-                // Combine the collected details with the lead/metadata columns
-                log "Combining collected records and generating final report format..."
+                // 4. Combine metadata lead columns with dynamic records
+                log "Combining collected records into final report format..."
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
                 let combinedDtrs = dataTableRecord.combineWithMany accumulatedDetails leadCols
-                
-                // 4. Transform into the actual dataTableReport
                 let report = DataTableReport.fromDataTableRecords combinedDtrs
 
-                // 5. Persist the compiled report to the database
-                let! (_: unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
-                
-                log "makeFullReport successfully completed."
-                return newRp.WithRunFinished(Some true)
-                
+                // 5. Persist the report
+                do! genDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
+
+                log (sprintf "%s successfully completed." reportNameTag)
+                return finalRp.WithRunFinished(Some true)
+
             with e -> 
-               return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
-        } |> Async.map (logResult progress log)
+                return! Error (sprintf "Error in %s for run %s: %s" reportNameTag (rp |> RunParameters.getIdString) e.Message)
+        } |> Async.map (logResult progress (fun msg -> OpsUtils.report progress msg))
 
-
-
-    let makeSnapshotReport 
+    /// Generates a summary/intermediate history report across all discovered generation slices.
+    let makeSummaryReport
             (host: IRunHost)
-            (rp: runParameters) 
-            (allowOverwrite: bool<allowOverwrite>) 
-            (cts: CancellationTokenSource) 
+            (rp: runParameters)
+            (allowOverwrite: bool<allowOverwrite>)
+            (cts: CancellationTokenSource)
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+        let genDb = host.RunDb :?> IGeneSortGenDb
+        makeDynamicReport 
+            (SorterRunResult.toDataTableRecordsIntermediateHistory "") 
+            "SorterRunResult_SummaryReport" 
+            genDb rp allowOverwrite cts progress
 
+    /// Generates a snapshot report across all discovered generation slices.
+    let makeSnapshotReport
+            (host: IRunHost)
+            (rp: runParameters)
+            (allowOverwrite: bool<allowOverwrite>)
+            (cts: CancellationTokenSource)
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+        let genDb = host.RunDb :?> IGeneSortGenDb
+        makeDynamicReport 
+            (SorterRunResult.toDataTableRecordsSnapshot "") 
+            "SorterRunResult_SnapshotReport" 
+            genDb rp allowOverwrite cts progress
 
-        let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
-
-
-        asyncResult {
-            try
-                do! checkCancellation cts.Token                
-                let! genLast = rp.GetGenerationLast() |> Result.ofOption "Missing genLast."
-                let! genCurrent = rp.GetGenerationCurrent() |> Result.ofOption "Missing genCurrent."
-                let! essSnapshotIntervals = rp.GetSnapshotReportIntervals() |> Result.ofOption "Missing generation report interval."
-
-                let runId = rp |> RunParameters.getIdString
-                OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (StringUtils.getTimestampString()) %runId)
-
-                // 1. Calculate the target generation slices
-                let reportGenerations = EssData.getSamplesInOrder essSnapshotIntervals %genLast
-                                        |> Seq.map(UMX.tag<generationNumber>) 
-                                        |> Seq.toList
-
-                if List.isEmpty reportGenerations then
-                    return! Error "No generation steps calculated for the full report. Verify genCurrent, genLast, and genSliceSize bounds."
-
-                log (sprintf "Discovered %d report slices to load and collect..." (List.length reportGenerations))
-
-                // 2. Accumulate all details records across our slices
-                let mutable accumulatedDetails = Seq.empty<dataTableRecord>
-
-                for targetGen in reportGenerations do
-                    do! checkCancellation cts.Token
-                    log (sprintf "Loading SorterRunResult slice for Gen %d..." %targetGen)
-                    
-                    let sliceRp = rp.WithGenerationCurrent (Some targetGen)
-                    let! qpSlice = 
-                        host.RunDb.MakeQueryParamsFromRunParams sliceRp (outputDataType.SorterRunResult "")
-                        |> Result.ofOption (sprintf "Failed to create QueryParams for SorterRunResult at generation %d." %targetGen)
-
-                    let! outData = host.RunDb.loadAsync qpSlice
-                    let! (sliceResult: sorterRunResult) = outData |> OutputData.asSorterRunResult |> Async.singleton
-
-                    // Extract the raw dataTableRecords from this slice's domain model
-                    let sliceDetails = sliceResult |> SorterRunResult.toDataTableRecordsSnapshot ""
-                    accumulatedDetails <- Seq.append accumulatedDetails sliceDetails
-
-                // 3. Prepare query params and metadata headers for the final compiled text report
-                let reportName = (sprintf "SorterRunResult_SnapshotReport" |> UMX.tag<textReportName>)
-                let newRp = rp.WithGenerationCurrent (rp.GetGenerationLast())
-
-                let! qpReport = 
-                    host.RunDb.MakeQueryParamsFromRunParams newRp (outputDataType.TextReport reportName)
-                    |> Result.ofOption "Failed to create QueryParams for Report."
-
-                // Combine the collected details with the lead/metadata columns
-                log "Combining collected records and generating final report format..."
-                let leadCols = qpReport |> QueryParams.makeDataTableRecord
-                let combinedDtrs = dataTableRecord.combineWithMany accumulatedDetails leadCols
-                
-                // 4. Transform into the actual dataTableReport
-                let report = DataTableReport.fromDataTableRecords combinedDtrs
-
-                // 5. Persist the compiled report to the database
-                let! (_: unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
-                
-                log "makeFullReport successfully completed."
-                return newRp.WithRunFinished(Some true)
-                
-            with e -> 
-               return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
-        } |> Async.map (logResult progress log)
-
-
-
+    /// Executor instance for full/summary reporting.
     let fullReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                makeSummaryReport
-                    host rp allowOverwrite cts progress }
+                makeSummaryReport host rp allowOverwrite cts progress }
 
-
+    /// Executor instance for snapshot reporting.
     let snapshotReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                makeSnapshotReport
-                    host rp allowOverwrite cts progress }
-
-
+                makeSnapshotReport host rp allowOverwrite cts progress }

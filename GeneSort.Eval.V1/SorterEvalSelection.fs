@@ -24,6 +24,7 @@ module SorterEvalSelectionType =
         | TopN count      -> sprintf "TopN:%d" count
         | GuidOrder count -> sprintf "GuidOrder:%d" count
 
+
     let fromString (str: string) = 
         match str.Split(':') with
         | [| caseName; countStr |] ->
@@ -37,6 +38,7 @@ module SorterEvalSelectionType =
             | _           -> failwithf "Invalid case name '%s' in string '%s'" caseName str
         | _ -> 
             failwithf "String '%s' is not in the expected format 'Name:Value'" str
+
 
     let toStrategyLabel = function
         | Tmb _        -> "Tmb"
