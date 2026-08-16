@@ -42,9 +42,9 @@ module Msuf4SgdSpecsRs =
 
     module Specs =
 
-        let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
+        let Rand_Test (executorType: sorterSgdExecutorTypeOld)  : runHostSpec = {
             databaseName = Msuf4SgdDbs.Standard.dbName
-            runName = sprintf @"Rand-Test1_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-Test1_%s" (SorterSgdExecutorTypeOld.toString executorType) |> UMX.tag
             runDescription = "Sgd analysis for Msuf4"
             spans = [
                 msuf4ModelType
@@ -73,9 +73,9 @@ module Msuf4SgdSpecsRs =
             maxParallel = 1
         }
 
-        let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
+        let Rand_Small (executorType: sorterSgdExecutorTypeOld) : runHostSpec = {
             databaseName = Msuf4SgdDbs.Standard.dbName
-            runName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-Small_%s" (SorterSgdExecutorTypeOld.toString executorType) |> UMX.tag
             runDescription = "Sgd analysis for Msuf4"
             spans = [
                 msuf4ModelType
@@ -104,9 +104,9 @@ module Msuf4SgdSpecsRs =
             maxParallel = 8
         }
 
-        let Rand_Pool (executorType: sorterSgdExecutorType) : runHostSpec = {
+        let Rand_Pool (executorType: sorterSgdExecutorTypeOld) : runHostSpec = {
             databaseName = Msuf4SgdDbs.Standard.dbName
-            runName = sprintf @"Rand-Pool_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-Pool_%s" (SorterSgdExecutorTypeOld.toString executorType) |> UMX.tag
             runDescription = "Sgd analysis for Msuf4"
             spans = [
                 msuf4ModelType
@@ -136,9 +136,9 @@ module Msuf4SgdSpecsRs =
         }
 
 
-        let Rand_Pool3 (executorType: sorterSgdExecutorType) : runHostSpec = {
+        let Rand_Pool3 (executorType: sorterSgdExecutorTypeOld) : runHostSpec = {
             databaseName = Msuf4SgdDbs.Standard.dbName
-            runName = sprintf @"Rand-Pool3_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-Pool3_%s" (SorterSgdExecutorTypeOld.toString executorType) |> UMX.tag
             runDescription = "Sgd analysis for Msuf4"
             spans = [
                 msuf4ModelType
@@ -181,6 +181,6 @@ module Msuf4SgdSpecsRs =
                         (configType.Rand_Pool3, Specs.Rand_Pool3);
                     ]
 
-    let getRunHostSpec (config: configType) (executorType: sorterSgdExecutorType) : runHostSpec =
+    let getRunHostSpec (config: configType) (executorType: sorterSgdExecutorTypeOld) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType

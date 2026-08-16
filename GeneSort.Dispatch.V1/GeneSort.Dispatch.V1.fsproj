@@ -60,6 +60,7 @@
     <Compile Include="SorterSgd\SgdExecutorOld.fs" />
     <Compile Include="SorterSgd\SgdExecutor.fs" />
     <Compile Include="SorterSgd\Reporting.fs" />
+    <Compile Include="SorterSgd\SorterSgdTypesOld.fs" />
     <Compile Include="SorterSgd\SorterSgdTypes.fs" />
     <Compile Include="SorterSgd\Prefix\Msrs24p3a.fs" />
     <Compile Include="SorterSgd\MsceSgd\MsceSgdDbs.fs" />

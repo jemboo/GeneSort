@@ -39,9 +39,9 @@ module MsrsSgdSpecsRs =
 
     module Specs =
 
-        let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
+        let Rand_Test (executorType: sorterSgdExecutorTypeOld)  : runHostSpec = {
             databaseName = MsrsSgdDbs.Standard.Uniform.dbName
-            runName = sprintf @"Rand-Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-Test_%s" (SorterSgdExecutorTypeOld.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for Msrs"
             spans = [
                 msrsModelType
@@ -70,9 +70,9 @@ module MsrsSgdSpecsRs =
             maxParallel = 4
         }
 
-        let Rand_Pool (executorType: sorterSgdExecutorType)  : runHostSpec = {
+        let Rand_Pool (executorType: sorterSgdExecutorTypeOld)  : runHostSpec = {
             databaseName = MsrsSgdDbs.Standard.Uniform.dbName
-            runName = sprintf @"Rand-Pool_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-Pool_%s" (SorterSgdExecutorTypeOld.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for Msrs"
             spans = [
                 msrsModelType
@@ -102,9 +102,9 @@ module MsrsSgdSpecsRs =
         }
 
 
-        let Rand_Small (executorType: sorterSgdExecutorType) : runHostSpec = {
+        let Rand_Small (executorType: sorterSgdExecutorTypeOld) : runHostSpec = {
             databaseName = MsrsSgdDbs.Standard.Uniform.dbName
-            runName = sprintf @"Rand-Small_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-Small_%s" (SorterSgdExecutorTypeOld.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for Msrs"
             spans = [
                 msrsModelType
@@ -131,9 +131,9 @@ module MsrsSgdSpecsRs =
             maxParallel = 4
         }
 
-        let Rand_Medium (executorType: sorterSgdExecutorType) : runHostSpec = {
+        let Rand_Medium (executorType: sorterSgdExecutorTypeOld) : runHostSpec = {
             databaseName = MsrsSgdDbs.Standard.Uniform.dbName
-            runName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-Medium_%s" (SorterSgdExecutorTypeOld.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for Msrs"
             spans = [
                 msrsModelType
@@ -174,6 +174,6 @@ module MsrsSgdSpecsRs =
                         (configType.Rand_Pool, Specs.Rand_Pool);
                     ]
 
-    let getRunHostSpec (config: configType) (executorType: sorterSgdExecutorType) : runHostSpec =
+    let getRunHostSpec (config: configType) (executorType: sorterSgdExecutorTypeOld) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType

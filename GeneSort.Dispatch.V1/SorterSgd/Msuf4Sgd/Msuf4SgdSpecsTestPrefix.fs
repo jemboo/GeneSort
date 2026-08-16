@@ -40,9 +40,9 @@ module Msuf4SgdSpecsTestPrefix =
 
     module Specs =
 
-        let Rand_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
+        let Rand_Test (executorType: sorterSgdExecutorTypeOld)  : runHostSpec = {
             databaseName = Msuf4SgdDbs.Prefix.dbName
-            runName = sprintf @"Rand-test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-test_%s" (SorterSgdExecutorTypeOld.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for 24pfx4 Msuf4"
             spans = [
                 rngTypeLcg
@@ -85,7 +85,7 @@ module Msuf4SgdSpecsTestPrefix =
                         (configType.Rand_Test, Specs.Rand_Test);
                     ]
 
-    let getRunHostSpec (config: configType) (executorType: sorterSgdExecutorType) : runHostSpec =
+    let getRunHostSpec (config: configType) (executorType: sorterSgdExecutorTypeOld) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType
 

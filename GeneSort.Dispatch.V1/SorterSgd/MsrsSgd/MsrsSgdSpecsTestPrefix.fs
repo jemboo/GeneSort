@@ -82,9 +82,9 @@ module MsrsSgdSpecsTestPrefix =
 
     module Specs =
 
-        let Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
+        let Test (executorType: sorterSgdExecutorTypeOld)  : runHostSpec = {
             databaseName = MsrsSgdDbs.Prefix.dbName
-            runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorTypeOld.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for 24pfx Msrs"
             spans = [
                 generationCurrent
@@ -106,9 +106,9 @@ module MsrsSgdSpecsTestPrefix =
         }
 
 
-        let Light (executorType: sorterSgdExecutorType)  : runHostSpec = {
+        let Light (executorType: sorterSgdExecutorTypeOld)  : runHostSpec = {
             databaseName = MsrsSgdDbs.Prefix.dbName
-            runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorTypeOld.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for 24pfx Msrs"
             spans = [
                 generationCurrent
@@ -129,9 +129,9 @@ module MsrsSgdSpecsTestPrefix =
             maxParallel = 16
         }
 
-        let T4_P3 (executorType: sorterSgdExecutorType)  : runHostSpec = {
+        let T4_P3 (executorType: sorterSgdExecutorTypeOld)  : runHostSpec = {
             databaseName = MsrsSgdDbs.Prefix.dbName
-            runName = sprintf @"T4_P3_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"T4_P3_%s" (SorterSgdExecutorTypeOld.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for 24pfx Msrs"
             spans = [
                 rngTypeLcg
@@ -181,7 +181,7 @@ module MsrsSgdSpecsTestPrefix =
                         (configType.T4_P3, Specs.T4_P3);
                     ]
 
-    let getRunHostSpec (config: configType) (executorType: sorterSgdExecutorType) : runHostSpec =
+    let getRunHostSpec (config: configType) (executorType: sorterSgdExecutorTypeOld) : runHostSpec =
         let specFunc = Configs.[config]
         specFunc executorType
 

@@ -103,7 +103,7 @@ module DispatchSorterSgd =
 
     //********** MsrsSgdSpecsPrefix **********
     let configType = MsrsSgdSpecsTestPrefix.configType.Test
-    let executorType = sorterSgdExecutorType.GenPrefix
+    let executorType = sorterSgdExecutorTypeOld.GenPrefix
     let host: IRunHost = 
         let spec = MsrsSgdSpecsTestPrefix.getRunHostSpec configType executorType
         MsrsSgdDbs.createRunHost spec
@@ -134,7 +134,12 @@ module DispatchSorterSgd =
 
 
 
-    let executor = SorterSgdExecutorType.getExecutor executorType
+
+
+
+
+
+    let executor = SorterSgdExecutorTypeOld.getExecutor executorType
     let minReplica = 0<replNumber>
     let maxReplica = 1<replNumber>
 

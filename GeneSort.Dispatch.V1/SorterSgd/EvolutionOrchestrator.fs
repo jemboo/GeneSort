@@ -162,6 +162,7 @@ module EvolutionOrchestrator =
 
 
 
+
     let runEvolutionAsync
                 (genDb: IGeneSortGenDb)
                 (rp: runParameters)
@@ -181,7 +182,7 @@ module EvolutionOrchestrator =
             let! sorterCountPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
             let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count."
             let! evalType = rp.GetSorterEvalType() |> Result.ofOption "Missing sorterEvalType."
-            let! selectionMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
+            let! srtrEvalMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
             let! collectNewSortableTests = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests."
             let! sortedFractionThreshold = rp.GetSortedFraction() |> Result.ofOption "Missing sortedFraction."
 
@@ -261,6 +262,25 @@ module EvolutionOrchestrator =
                             if shouldSummaryReport then
                                 log (sprintf "Starting evolution step. Generation %d of %d" currentGen totalGen)
 
+                                // Condensed Optional Features Log
+                                let countLog = 
+                                    match optSorterCountCycle, optSorterCountCycleMultiplier with
+                                    | Some c, Some m -> sprintf "ENABLED (Cycle: %d, Mult: %.2f)" %c (float %m)
+                                    | _ -> "DISABLED (Static)"
+
+                                let poolLog = 
+                                    match optSorterPoolExpansionRate, optSorterPoolSelectionIntervals, optPoolMeasure with
+                                    | Some r, Some i, Some m -> sprintf "ENABLED (Rate: %d, Intervals: %A, Measure: %A)" %r i m
+                                    | _ -> 
+                                        let missing = 
+                                            [ if optSorterPoolExpansionRate.IsNone then yield "Rate"
+                                              if optSorterPoolSelectionIntervals.IsNone then yield "Intervals"
+                                              if optPoolMeasure.IsNone then yield "Measure" ]
+                                            |> String.concat ","
+                                        sprintf "DISABLED (Missing: %s)" missing
+
+                                log (sprintf "  [Optional Features] Dynamic Count: %s | Pool Expansion: %s" countLog poolLog)
+
                             // 5. Snapshot summary before applying structural changes
                             let updatedSorterPoolSetSummary = 
                                 if shouldSummaryReport then 
@@ -294,7 +314,7 @@ module EvolutionOrchestrator =
                                     distinctSorterHashes
                                     sortableTest 
                                     adjSorterEvalType
-                                    selectionMeasure
+                                    srtrEvalMeasure
                                     reEvaluateParents
                                     poolSetForStep
                                     collectNewSortableTests
@@ -325,7 +345,8 @@ module EvolutionOrchestrator =
 
                             // 9. Forced GC Compacting
                             if remainingSteps % 50 = 0 then
-                                System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
+                                System.Runtime.GCSettings.LargeObjectHeapCompactionMode 
+                                        <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
                                 GC.Collect(2, GCCollectionMode.Forced, true, true)
 
                             return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext

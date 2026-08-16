@@ -1,9 +1,8 @@
 ﻿namespace GeneSort.Dispatch.V1.SorterSgd
 
 open GeneSort.Dispatch.V1
-open GeneSort.Db.V1
 
-type sorterSgdExecutorType = 
+type sorterSgdExecutorTypeOld = 
     | GenStandard
     | GenMerge
     | GenPrefix
@@ -11,7 +10,7 @@ type sorterSgdExecutorType =
     | SnapshotReport
 
 
-module SorterSgdExecutorType =
+module SorterSgdExecutorTypeOld =
 
     let toString = function
         | GenStandard -> "GenStandard"
@@ -24,29 +23,26 @@ module SorterSgdExecutorType =
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                let genDb = host.RunDb :?> IGeneSortGenDb
-                SgdExecutor.evaluateEvolutionRun
+                SgdExecutorOld.evaluateEvolutionRunOld
                     SortableTestMakers.makeStandardTests
                     PoolSetMakers.createSeedSorterPoolSetStandard
-                    genDb rp allowOverwrite cts progress }
+                    host rp allowOverwrite cts progress }
 
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                let genDb = host.RunDb :?> IGeneSortGenDb
-                SgdExecutor.evaluateEvolutionRun
+                SgdExecutorOld.evaluateEvolutionRunOld
                     SortableTestMakers.makeMergeTests
                     PoolSetMakers.createSeedSorterPoolSetMerge
-                    genDb rp allowOverwrite cts progress }
+                    host rp allowOverwrite cts progress }
 
     let prefixExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                let genDb = host.RunDb :?> IGeneSortGenDb
-                SgdExecutor.evaluateEvolutionRun
+                SgdExecutorOld.evaluateEvolutionRunOld
                     SortableTestMakers.makePrefixTests
                     PoolSetMakers.createSeedSorterPoolSetPrefix
-                    genDb rp allowOverwrite cts progress }
+                    host rp allowOverwrite cts progress }
 
 
     let getExecutor (executorType: sorterSgdExecutorTypeOld) : IRunParamsExecutor =
