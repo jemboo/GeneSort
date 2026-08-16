@@ -21,7 +21,7 @@ module SorterSgdExecutorType =
         | SnapshotReport -> "SnapshotReport"
 
 
-    let standardExecutor =
+    let private standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 let genDb = host.RunDb :?> IGeneSortGenDb
@@ -30,7 +30,7 @@ module SorterSgdExecutorType =
                     PoolSetMakers.createSeedSorterPoolSetStandard
                     genDb rp allowOverwrite cts progress }
 
-    let mergeExecutor =
+    let private mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 let genDb = host.RunDb :?> IGeneSortGenDb
@@ -39,7 +39,7 @@ module SorterSgdExecutorType =
                     PoolSetMakers.createSeedSorterPoolSetMerge
                     genDb rp allowOverwrite cts progress }
 
-    let prefixExecutor =
+    let private prefixExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 let genDb = host.RunDb :?> IGeneSortGenDb
@@ -49,10 +49,10 @@ module SorterSgdExecutorType =
                     genDb rp allowOverwrite cts progress }
 
 
-    let getExecutor (executorType: sorterSgdExecutorTypeOld) : IRunParamsExecutor =
+    let getExecutor (executorType: sorterSgdExecutorType) : IRunParamsExecutor =
         match executorType with
-        | sorterSgdExecutorTypeOld.GenStandard -> standardExecutor
-        | sorterSgdExecutorTypeOld.GenMerge -> mergeExecutor
-        | sorterSgdExecutorTypeOld.GenPrefix -> prefixExecutor
-        | sorterSgdExecutorTypeOld.SummaryReport -> Reporting.fullReportExecutor
-        | sorterSgdExecutorTypeOld.SnapshotReport -> Reporting.snapshotReportExecutor
+        | sorterSgdExecutorType.GenStandard -> standardExecutor
+        | sorterSgdExecutorType.GenMerge -> mergeExecutor
+        | sorterSgdExecutorType.GenPrefix -> prefixExecutor
+        | sorterSgdExecutorType.SummaryReport -> Reporting.fullReportExecutor
+        | sorterSgdExecutorType.SnapshotReport -> Reporting.snapshotReportExecutor

@@ -20,7 +20,7 @@ module SorterSgdExecutorTypeOld =
         | SnapshotReport -> "SnapshotReport"
 
 
-    let standardExecutor =
+    let private standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 SgdExecutorOld.evaluateEvolutionRunOld
@@ -28,7 +28,7 @@ module SorterSgdExecutorTypeOld =
                     PoolSetMakers.createSeedSorterPoolSetStandard
                     host rp allowOverwrite cts progress }
 
-    let mergeExecutor =
+    let private mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 SgdExecutorOld.evaluateEvolutionRunOld
@@ -36,7 +36,7 @@ module SorterSgdExecutorTypeOld =
                     PoolSetMakers.createSeedSorterPoolSetMerge
                     host rp allowOverwrite cts progress }
 
-    let prefixExecutor =
+    let private prefixExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 SgdExecutorOld.evaluateEvolutionRunOld

@@ -101,12 +101,12 @@ module DispatchSorterSgd =
 //    MsrsSgdDbs.createRunHost spec
 
 
-    //********** MsrsSgdSpecsPrefix **********
-    let configType = MsrsSgdSpecsTestPrefix.configType.Test
-    let executorType = sorterSgdExecutorTypeOld.GenPrefix
-    let host: IRunHost = 
-        let spec = MsrsSgdSpecsTestPrefix.getRunHostSpec configType executorType
-        MsrsSgdDbs.createRunHost spec
+    ////********** MsrsSgdSpecsPrefix **********
+    //let configType = MsrsSgdSpecsTestPrefix.configType.Test
+    //let executorType = sorterSgdExecutorTypeOld.GenPrefix
+    //let host: IRunHost = 
+    //    let spec = MsrsSgdSpecsTestPrefix.getRunHostSpec configType executorType
+    //    MsrsSgdDbs.createRunHost spec
 
 
 ////********** Msuf4SgdSpecsRs **********
@@ -134,12 +134,14 @@ module DispatchSorterSgd =
 
 
 
+    ////********** Msrs24p3a **********
+    let configType = MsrsSgdSpecsTestPrefix.configType.Test
+    let executorType = sorterSgdExecutorType.GenPrefix
+    let host: IRunHost = Msrs24p3a.PoolSzComp.createRunHost (Msrs24p3a.PoolSzComp.Test executorType)
 
 
 
-
-
-    let executor = SorterSgdExecutorTypeOld.getExecutor executorType
+    let executor = SorterSgdExecutorType.getExecutor executorType
     let minReplica = 0<replNumber>
     let maxReplica = 1<replNumber>
 

@@ -107,16 +107,15 @@ module Msrs24p3a =
                  .WithId (Some qp.Value.Id)
 
 
-
         let saveIntervals = SampleRegistry.samplingConfigsDict["uniformInterval100"]
         let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.2C"]
 
         let db = new GeneSortGenDbMp(dbFolder, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
 
 
-        let Test (executorType: sorterSgdExecutorTypeOld)  : runHostSpec = {
+        let Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
             databaseName = dbName
-            runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorTypeOld.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for 24pfx Msrs"
             spans = [
                 (runParameters.generationCurrentKey, [0] |> List.map string)
