@@ -1,12 +1,10 @@
 ﻿
 namespace GeneSort.Project.V1
 
-open FSharp.UMX
 open GeneSort.Sorting.Sortable
 open GeneSort.Core
 open GeneSort.SortingOps
 open GeneSort.Sorting.Sorter
-open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd
 
 type outputData =
@@ -16,6 +14,7 @@ type outputData =
     | SorterRunResult of sorterRunResult
     | SorterSet of sorterSet
     | SorterSetEval of sorterSetEval
+    | SorterPoolEvalBinsSetCollection of sorterPoolEvalBinsSetCollection
     | TextReport of dataTableReport
 
 
@@ -42,11 +41,13 @@ module OutputData =
         | SorterSet ss -> Ok ss
         | _ -> Error "Database returned data, but it was not a SorterSet."
 
-
     let asSorterSetEval = function
         | SorterSetEval sse -> Ok sse
         | _ -> Error "Database returned data, but it was not a SorterSetEval."
         
+    let asSorterPoolEvalBinSetCollection = function
+        | SorterPoolEvalBinsSetCollection sse -> Ok sse
+        | _ -> Error "Database returned data, but it was not a SorterSetEval."
 
     let asTextReport = function
         | TextReport tr -> Ok tr

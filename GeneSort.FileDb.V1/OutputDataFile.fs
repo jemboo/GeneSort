@@ -19,6 +19,7 @@ open GeneSort.Sorting.Sorter
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.Mp.V1.Sgd
 open GeneSort.Core
+open GeneSort.Eval.Mp.V1.Bins
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
@@ -86,11 +87,10 @@ module OutputDataFile =
                 let! domainData =
                     match queryParams.OutputDataType with
                     | outputDataType.RunParameters _ ->
-                        failwith "Not implemented: SorterSet deserialization"
-                        //async {
-                        //    let! domain = deserializeDto<runParametersDto, runParameters> stream token RunParametersDto.toDomain
-                        //    return outputData.RunParameters domain
-                        //}
+                        async {
+                            let! domain = deserializeDto<runParametersDto, runParameters> stream token RunParametersDto.toDomain
+                            return outputData.RunParameters domain
+                        }
                     | outputDataType.SorterRunResult _ ->
                         async {
                             let! domain = deserializeDto<sorterRunResultDto, sorterRunResult> stream token SorterRunResultDto.toDomain
@@ -106,11 +106,16 @@ module OutputDataFile =
                             let! domain = deserializeDto<sortableTestDto, sortableTest> stream token SortableTestDto.toDomain
                             return outputData.SortableTest domain
                         }
-
                     | outputDataType.SorterSetEval _ ->
                         async {
                             let! domain = deserializeDto<sorterSetEvalDto, sorterSetEval> stream token SorterSetEvalDto.toDomain
                             return outputData.SorterSetEval domain
+                        }
+                    | outputDataType.SorterPoolEvalBinsSetCollection _ ->
+                        async {
+                            let! domain = deserializeDto<sorterPoolEvalBinsSetCollectionDto, sorterPoolEvalBinsSetCollection> 
+                                                stream token SorterPoolEvalBinsSetCollectionDto.toDomain
+                            return outputData.SorterPoolEvalBinsSetCollection domain
                         }
                     | outputDataType.Run _ ->
                         async {
@@ -150,7 +155,6 @@ module OutputDataFile =
         (allowOverwrite: bool<allowOverwrite>) : Async<Result<unit, string>> =
 
         async {
-
             let filePath = getFullOutputDataFilePath pathToProjectFolder queryParams
             let directory = Path.GetDirectoryName %filePath
             let dirRes =
@@ -178,7 +182,9 @@ module OutputDataFile =
                             | outputData.SortableTest sts ->
                                  serializeDto stream sts SortableTestDto.fromDomain
                             | outputData.SorterSetEval sse ->
-                                serializeDto stream sse SorterSetEvalDto.fromDomain
+                                serializeDto stream sse SorterSetEvalDto.fromDomain                         
+                            | outputData.SorterPoolEvalBinsSetCollection sse ->
+                                serializeDto stream sse SorterPoolEvalBinsSetCollectionDto.fromDomain
                             | outputData.Run p ->
                                 serializeDto stream p RunDto.fromDomain
                             | outputData.TextReport dataTableReport ->

@@ -16,82 +16,82 @@ open GeneSort.Eval.V1.Bins
 open GeneSort.Sorting
 open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Model.Sorting.Simple.V1
-open GeneSort.Dispatch.V1.CommonParams
-
 
 module Reporting = 
 
-
     let makeMutantReport
-            (mutantDetailsMaker: runParameters -> Async<Result<sorterEvalSelection * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>> )
+            (mutantDetailsMaker: runParameters -> Async<Result<sorterEvalSelection * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>>)
             (host: IRunHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
             (cts: CancellationTokenSource) 
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
-
-        let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+        let log msg = 
+            OpsUtils.report progress 
+                (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
                 do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Mutant Report for Run %s" (StringUtils.getTimestampString()) %runId)
-                let reportName = (sprintf "MutantReport" |> UMX.tag<textReportName>)
+                let reportName = "MutantReport" |> UMX.tag<textReportName>
 
-                let! (_sorterEvalSelection, (mutantIdToParentIdMap: Map<Guid<sorterModelId>,Guid<sorterModelId>>)) = mutantDetailsMaker rp
+                // 1. Fetch selection and parent mapping
+                let! (sorterEvalSelection, mutantIdToParentIdMap) = mutantDetailsMaker rp
 
-                let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
-                                        |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
+                // 2. Load evaluation data
+                let! qpSorterSetEval = 
+                    host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                    |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
+
                 let! outB = host.RunDb.loadAsync qpSorterSetEval
                 let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
 
-                let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
-                                |> Result.ofOption "Failed to create QueryParams for Report."
+                // 3. Prepare parent record lookup
+                let! qpReport = 
+                    host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                    |> Result.ofOption "Failed to create QueryParams for Report."
+
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
-                let parentRecordMap = _sorterEvalSelection |> EvalReporting.toDataTableRecords leadCols "Parent_"
+                let parentRecordMap = sorterEvalSelection |> EvalReporting.toDataTableRecords leadCols "Parent_"
 
-                let tupes =
+                // 4. Directly create bin set from parent evaluation set
+                let binSet = sorterEvalBinSet.create (Guid.Empty |> UMX.tag<sorterEvalBinSetId>) sorterSetEvals
+
+                // 5. Map evaluations to parent records and combine
+                let childRecords = binSet |> SorterEvalBinSet.makeDataTableRecords
+
+                let dtaTableRs = 
                     sorterSetEvals.SorterEvals
-                    |> Array.choose (fun se -> 
-                        let (sorterModelId : Guid<sorterModelId>) = se |> SorterEval.getSorterId |> UMX.untag |> UMX.tag<sorterModelId>
-        
+                    |> Array.choose (fun se ->
+                        let sorterModelId = se |> SorterEval.getSorterId |> UMX.untag |> UMX.tag<sorterModelId>
+                        
                         match mutantIdToParentIdMap |> Map.tryFind sorterModelId with
-                        | None -> None // Safely ignore if the parent mapping is missing
-                        | Some parentSorterModelId ->
-                            Some (parentSorterModelId, se)
-                    ) |> Array.groupBy fst
-
-                let yab = tupes |> Array.map(fun (parentSorterModelId, group) ->
-                    (parentSorterModelId, group |> Array.map(snd)))
-
-                let wab = yab |> Array.map(fun (parentSorterModelId, ses) ->
-                            let evBinSet = sorterEvalBinSet.createFromSorterEvals
-                                                (Guid.Empty |> UMX.tag<sorterEvalBinSetId>)
-                                                (sorterSetEvals.SorterTestId)
-                                                ses
-                            (parentSorterModelId, evBinSet))
-
-
-                let chubby = wab |> Array.choose(fun (parentSorterModelId, evBinSet) ->
-                            let parentKey = %parentSorterModelId |> UMX.tag<sorterId>
+                        | None -> None
+                        | Some (parentModelId: Guid<sorterModelId>) ->
+                            let parentKey = (%parentModelId) |> UMX.tag<sorterId>
                             match parentRecordMap |> Map.tryFind parentKey with
-                            | None -> None // Safely ignore if the parent record detail is missing
+                            | None -> None
                             | Some parentRecord ->
-                                let childRecords = evBinSet |> SorterEvalBinSet.makeDataTableRecords
-                                Some (dataTableRecord.combineWithMany childRecords parentRecord |> Array.ofSeq))
-                            |> Array.concat
+                                // Combine individual child evaluations with their parent lead row
+                                Some (dataTableRecord.combineWithMany childRecords parentRecord)
+                    )
+                    |> Seq.concat
 
-
-                let dtrs = dataTableRecord.combineWithMany chubby leadCols
+                // 6. Build and save final text report
+                let dtrs = dataTableRecord.combineWithMany dtaTableRs leadCols
                 let report = DataTableReport.fromDataTableRecords dtrs
 
-                let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
-                return (rp : runParameters).WithRunFinished(Some true)
+                do! checkCancellation cts.Token
+                do! host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
+
+                log "MutantReport completed successfully."
+                return rp.WithRunFinished(Some true)
+
             with e -> 
-               return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
+                return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
         } |> Async.map (logResult progress log)
 
 

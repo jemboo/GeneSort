@@ -6,10 +6,6 @@ open FSharp.UMX
 open GeneSort.Eval.V1.Bins
 open GeneSort.SortingOps.Mp
 
-// ---------------------------------------------------------------------
-// 1. Supporting Bin DTOs
-// ---------------------------------------------------------------------
-
 [<MessagePackObject>]
 type sorterEvalKeyDto = {
     [<Key(0)>] CeCount: int
@@ -22,20 +18,12 @@ type sorterEvalBinDto = {
     [<Key(1)>] SorterEvals: sorterEvalDto array
 }
 
-// ---------------------------------------------------------------------
-// 2. Main SorterEvalBinSet DTO
-// ---------------------------------------------------------------------
-
 [<MessagePackObject>]
 type sorterEvalBinSetDto = {
     [<Key(0)>] SorterEvalBinSetId: Guid
-    [<Key(1)>] SortableTestId: Guid
+    [<Key(1)>] SorterSetEvalId: Guid
     [<Key(2)>] SorterEvalBins: sorterEvalBinDto array
 }
-
-// ---------------------------------------------------------------------
-// 3. Conversion Module
-// ---------------------------------------------------------------------
 
 module SorterEvalKeyDto =
 
@@ -65,7 +53,7 @@ module SorterEvalBinSetDto =
 
     let fromDomain (binSet: sorterEvalBinSet) : sorterEvalBinSetDto = {
         SorterEvalBinSetId = %binSet.SorterEvalBinSetId
-        SortableTestId = %binSet.SortableTestId
+        SorterSetEvalId = %binSet.SorterSetEvalId
         SorterEvalBins =
             binSet.Bins
             |> Map.values
@@ -75,10 +63,13 @@ module SorterEvalBinSetDto =
 
     let toDomain (dto: sorterEvalBinSetDto) : sorterEvalBinSet =
         let id = dto.SorterEvalBinSetId |> UMX.tag
-        let testId = dto.SortableTestId |> UMX.tag
+        let setEvalId = dto.SorterSetEvalId |> UMX.tag
 
-        let evals =
+        let bins =
             dto.SorterEvalBins
-            |> Seq.collect (fun binDto -> binDto.SorterEvals |> Seq.map SorterEvalDto.toDomain)
+            |> Seq.map (fun binDto -> 
+                let bin = SorterEvalBinDto.toDomain binDto
+                (bin.SorterEvalKey, bin))
+            |> Map.ofSeq
 
-        sorterEvalBinSet.createFromSorterEvals id testId evals
+        sorterEvalBinSet.recreate id setEvalId bins

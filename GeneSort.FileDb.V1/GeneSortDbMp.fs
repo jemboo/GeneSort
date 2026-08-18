@@ -6,7 +6,7 @@ open System.Threading
 open FSharp.UMX
 open GeneSort.Db.V1
 open GeneSort.Project.V1
-open GeneSort.Eval.V1
+
 
 type private DbMessage =
     | Save of string<pathToRootFolder> * queryParams * outputData * bool<allowOverwrite> * AsyncReplyChannel<Result<unit, string>>
@@ -65,10 +65,10 @@ type GeneSortDbMp(
             }
 
         member _.getRunParameters 
-                            (runName: string<runName>) 
-                            (minReplNumber: int<replNumber> option) 
-                            (maxReplNumber: int<replNumber> option) 
-                            (ct: CancellationToken option) 
-                            (progress: IProgress<string> option) =
-                    mailbox.PostAndAsyncReply(fun channel -> 
-                        GetRunParameters(runName, minReplNumber, maxReplNumber, ct, progress, channel))
+                        (runName: string<runName>) 
+                        (minReplNumber: int<replNumber> option) 
+                        (maxReplNumber: int<replNumber> option) 
+                        (ct: CancellationToken option) 
+                        (progress: IProgress<string> option) =
+                mailbox.PostAndAsyncReply(fun channel -> 
+                    GetRunParameters(runName, minReplNumber, maxReplNumber, ct, progress, channel))

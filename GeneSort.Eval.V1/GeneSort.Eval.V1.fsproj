@@ -28,6 +28,9 @@
     <Compile Include="Bins\SorterEvalKey.fs" />
     <Compile Include="Bins\SorterEvalBin.fs" />
     <Compile Include="Bins\SorterEvalBinSet.fs" />
+    <Compile Include="Bins\SorterPoolEvalBins.fs" />
+    <Compile Include="Bins\SorterPoolEvalBinsSet.fs" />
+    <Compile Include="Bins\SorterPoolEvalBinsSetCollection.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

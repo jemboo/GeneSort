@@ -162,16 +162,15 @@ module EvolutionOrchestrator =
 
 
 
-
     let runEvolutionAsync
-                (genDb: IGeneSortGenDb)
-                (rp: runParameters)
-                (allowOverwrite: bool<allowOverwrite>)
-                (initialPoolSet: sorterPoolSet)
-                (sortableTest: sortableTest)
-                (mutator: sorterModelMutator)
-                (cts: CancellationToken)
-                (log: string -> unit) : Async<Result<sorterRunResult, string>> =
+            (genDb: IGeneSortGenDb)
+            (rp: runParameters)
+            (allowOverwrite: bool<allowOverwrite>)
+            (initialPoolSet: sorterPoolSet)
+            (sortableTest: sortableTest)
+            (mutator: sorterModelMutator)
+            (cts: CancellationToken)
+            (log: string -> unit) : Async<Result<sorterRunResult, string>> =
 
         asyncResult {
             // Mandatory parameters
@@ -235,19 +234,20 @@ module EvolutionOrchestrator =
                     match optSorterPoolExpansionRate, optSorterPoolSelectionIntervals, optPoolMeasure with
                     | Some r, Some i, Some m -> sprintf "ENABLED (Rate: %d, Intervals: %A, Measure: %A)" %r i m
                     | _ ->
-                           let missing = 
-                                [ if optSorterPoolExpansionRate.IsNone then yield "Rate"
-                                  if optSorterPoolSelectionIntervals.IsNone then yield "Intervals"
-                                  if optPoolMeasure.IsNone then yield "Measure" ] |> String.concat ","
-                           sprintf "DISABLED (Missing: %s)" missing
+                        let missing = 
+                            [ if optSorterPoolExpansionRate.IsNone then yield "Rate"
+                              if optSorterPoolSelectionIntervals.IsNone then yield "Intervals"
+                              if optPoolMeasure.IsNone then yield "Measure" ] |> String.concat ","
+                        sprintf "DISABLED (Missing: %s)" missing
 
                 log (sprintf "  [Optional Features] Dynamic Count: %s | Pool Expansion: %s" countLog poolLog)
 
-
+                // Recursive loop modified to carry evalBinsSetAcc
                 let rec loop 
                         (remainingSteps: int) 
                         (currentSorterPoolSet: sorterPoolSet) 
                         (historyAcc: sorterPoolSetSummary list) 
+                        (evalBinsSetAcc: sorterPoolEvalBinsSet list) 
                         : Async<Result<sorterRunResult, string>> =
                     asyncResult {
                         if remainingSteps < 0 then
@@ -318,8 +318,17 @@ module EvolutionOrchestrator =
                                     collectNewSortableTests
                                     sortedFractionThreshold
 
-                            // 8. Save RunResult to Database on milestone
-                            let! historyAccNext = 
+                            // Accumulate sorterPoolEvalBinsSet at summary report frequency
+                            let updatedEvalBinsSetAcc =
+                                if shouldSummaryReport then
+                                    let binsSetId = Guid.NewGuid() |> UMX.tag<sorterPoolEvalBinsSetId>
+                                    let currentBinsSet = sorterPoolEvalBinsSet.create binsSetId nextSorterPoolSet
+                                    currentBinsSet :: evalBinsSetAcc
+                                else
+                                    evalBinsSetAcc
+
+                            // 8. Save RunResult and SorterPoolEvalBinsSetCollection on milestone
+                            let! (historyAccNext, evalBinsSetAccNext) = 
                                 asyncResult {
                                     if shouldSaveRunResult && (%currentGen > 0) then
                                         let currentRunResult = 
@@ -328,17 +337,29 @@ module EvolutionOrchestrator =
                                                 (updatedSorterPoolSetSummary |> List.rev |> List.toArray)
 
                                         let stepRp = rp.WithGenerationCurrent(Some currentGen)
-                                
-                                        let! qp = 
+
+                                        // Save SorterRunResult
+                                        let! qpRunResult = 
                                             genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterRunResult "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
                                         log (sprintf "Saving SorterRunResult checkpoint at Generation %d..." %currentGen)
-                                        do! genDb.saveAsync qp (currentRunResult |> outputData.SorterRunResult) allowOverwrite
+                                        do! genDb.saveAsync qpRunResult (currentRunResult |> outputData.SorterRunResult) allowOverwrite
+
+                                        // Save SorterPoolEvalBinsSetCollection
+                                        let collectionId = Guid.NewGuid() |> UMX.tag<sorterPoolEvalBinsSetCollectionId>
+                                        let evalBinsCollection = 
+                                                sorterPoolEvalBinsSetCollection.create collectionId (updatedEvalBinsSetAcc |> List.rev)
+
+                                        let! qpBinsCollection = 
+                                            genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolEvalBinsSetCollection "")
+                                            |> Result.ofOption "Failed to create QueryParams for SorterPoolEvalBinsSetCollection."
+                                        log (sprintf "Saving SorterPoolEvalBinsSetCollection checkpoint at Generation %d..." %currentGen)
+                                        do! genDb.saveAsync qpBinsCollection (evalBinsCollection |> outputData.SorterPoolEvalBinsSetCollection) allowOverwrite
 
                                         if cts.IsCancellationRequested then return! Error "runEvolutionAsync was cancelled."
-                                        return []
+                                        return ([], [])
                                     else
-                                        return updatedSorterPoolSetSummary
+                                        return (updatedSorterPoolSetSummary, updatedEvalBinsSetAcc)
                                 }
 
                             // 9. Forced GC Compacting
@@ -347,9 +368,9 @@ module EvolutionOrchestrator =
                                         <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
                                 GC.Collect(2, GCCollectionMode.Forced, true, true)
 
-                            return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext
+                            return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext evalBinsSetAccNext
                     }
 
-                // Execute loop
-                return! loop %genCount initialPoolSet []
-        }
+                // Execute loop with initial empty collection accumulator
+                return! loop %genCount initialPoolSet [] []
+    }
