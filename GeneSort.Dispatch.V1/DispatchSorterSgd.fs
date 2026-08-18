@@ -129,7 +129,7 @@ module DispatchSorterSgd =
 
 
     ////********** Msrs24p3a **********
-    let private executorType = sorterSgdExecutorType.GenPrefix
+    let private executorType = sorterSgdExecutorType.SummaryReport
     let private host: IRunHost = Msrs24p3a.PoolSzComp.createRunHost (Msrs24p3a.PoolSzComp.Test executorType)
 
     let private executor = SorterSgdExecutorType.getExecutor executorType
@@ -201,7 +201,7 @@ module DispatchSorterSgd =
         } |> Async.RunSynchronously
 
 
-    let doRunParameters() =
+    let runRunParameters() =
 
         async {
 

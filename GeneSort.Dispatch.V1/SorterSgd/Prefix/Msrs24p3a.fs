@@ -58,22 +58,39 @@ module Msrs24p3a =
                 (mmod: int<mutationMod>)
                 (spm: sorterPoolMeasure)
                 (spsi: samplingConfig)
-                (outputDataType: outputDataType) : queryParams =
+                (outDt: outputDataType) : queryParams =
 
-            queryParams.create 
-                dbName projName
-                (Some repl)
-                outputDataType
-                [| 
-                    (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
-                    (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
-                    (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                    (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
-                    (runParameters.sorterPoolExpansionRateKey, (Some %sper) |> string)
-                    (runParameters.mutationModKey, (Some %mmod) |> string)
-                    (runParameters.sorterPoolSelectionIntervalsKey, spsi |> SamplingConfig.toString)
-                    (runParameters.sorterPoolMeasureKey, spm |> SorterPoolMeasure.toCompactString)
-                |]
+            match outDt with
+            | outputDataType.RunParameters _ ->
+                queryParams.create 
+                    dbName projName
+                    (Some repl)
+                    outDt
+                    [| 
+                        //(runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
+                        (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                        (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                        (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
+                        (runParameters.sorterPoolExpansionRateKey, (Some %sper) |> string)
+                        (runParameters.mutationModKey, (Some %mmod) |> string)
+                        (runParameters.sorterPoolSelectionIntervalsKey, spsi |> SamplingConfig.toString)
+                        (runParameters.sorterPoolMeasureKey, spm |> SorterPoolMeasure.toCompactString)
+                    |]
+            | _ ->
+                 queryParams.create 
+                    dbName projName
+                    (Some repl)
+                    outDt
+                    [| 
+                        (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
+                        (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                        (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                        (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
+                        (runParameters.sorterPoolExpansionRateKey, (Some %sper) |> string)
+                        (runParameters.mutationModKey, (Some %mmod) |> string)
+                        (runParameters.sorterPoolSelectionIntervalsKey, spsi |> SamplingConfig.toString)
+                        (runParameters.sorterPoolMeasureKey, spm |> SorterPoolMeasure.toCompactString)
+                    |]
 
         let queryParamsFromRunParams 
                         (rp: runParameters) 

@@ -24,45 +24,47 @@ module Reporting =
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
         let log msg = 
-            OpsUtils.report progress (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+            OpsUtils.report progress (sprintf "%s [%s] %s" 
+                    (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
                 do! checkCancellation cts.Token
-                let runId = rp |> RunParameters.getIdString
-                OpsUtils.report progress (sprintf "%s Starting Dynamic %s for Run %s" (StringUtils.getTimestampString()) reportNameTag %runId)
+                let runId = rp |> RunParameters.getIdString 
+                OpsUtils.report progress (sprintf "%s Starting Dynamic %s for Run %s" 
+                        (StringUtils.getTimestampString()) reportNameTag %runId)
 
                 // 1. Dynamic discovery and stream slices lazily via Utils
-                let! sliceSeq = Utils.loadAllAvailableSorterRunResults genDb rp cts.Token log
+                let! (curGen: int<generationNumber>) = 
+                            rp.GetGenerationCurrent() |> Result.ofOption "Missing GenerationCurrent."
+                let! srrSeq = Utils.loadAvailableSorterRunResults genDb curGen rp cts.Token log
 
-                if Seq.isEmpty sliceSeq then
+                if Seq.isEmpty srrSeq then
                     return! Error "No valid SorterRunResult files were discovered starting at generation 0."
 
-                // 2. Extract dynamic records and capture max generation number in a single streaming pass
-                let mutable sliceCount = 0
+                // 2. Eagerly collect records and capture max generation number instantly
+                let mutable recordCount = 0
                 let mutable maxGenOpt = None
+                let accumulatedDetails = System.Collections.Generic.List<dataTableRecord>()
 
-                let accumulatedDetails = 
-                    sliceSeq
-                    |> Seq.collect (fun slice ->
-                        sliceCount <- sliceCount + 1
-                        let gen = slice.FinalPoolSet.GenerationNumber
-                        maxGenOpt <- 
-                            match maxGenOpt with
-                            | None -> Some gen
-                            | Some curMax -> Some (max curMax gen)
-                        extractRecords slice)
-                    // Materialize records lazily to ensure single traversal tracking
-                    |> Seq.cache
+                for srr in srrSeq do
+                    cts.Token.ThrowIfCancellationRequested()
+                    recordCount <- recordCount + 1
+                    let gen = srr.FinalPoolSet.GenerationNumber
+                    maxGenOpt <- 
+                        match maxGenOpt with
+                        | None -> Some gen
+                        | Some curMax -> Some (max curMax gen)
+                    accumulatedDetails.AddRange(extractRecords srr)
 
                 let lastGen = 
                     match maxGenOpt with
                     | Some g -> g
                     | None -> %0 : int<generationNumber>
 
-                log (sprintf "Discovered and processed %d contiguous SorterRunResult slice(s)." sliceCount)
+                log (sprintf "Discovered and processed %d contiguous SorterRunResult slice(s)." recordCount)
 
-                // 3. Prepare target metadata and query params for the finished text report
+                // 3. Prepare target metadata and query params with updated lastGen
                 let reportName = reportNameTag |> UMX.tag<textReportName>
                 let finalRp = rp.WithGenerationCurrent(Some lastGen)
 
@@ -76,15 +78,17 @@ module Reporting =
                 let combinedDtrs = dataTableRecord.combineWithMany accumulatedDetails leadCols
                 let report = DataTableReport.fromDataTableRecords combinedDtrs
 
-                // 5. Persist the report
+                // 5. Hard stop before saving if cancellation was requested
+                do! checkCancellation cts.Token
                 do! genDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
 
                 log (sprintf "%s successfully completed." reportNameTag)
-                return finalRp.WithRunFinished(Some true)
+                return finalRp
 
             with e -> 
                 return! Error (sprintf "Error in %s for run %s: %s" reportNameTag (rp |> RunParameters.getIdString) e.Message)
         } |> Async.map (logResult progress (fun msg -> OpsUtils.report progress msg))
+
 
     /// Generates a summary/intermediate history report across all discovered generation slices.
     let makeSummaryReport
@@ -113,7 +117,7 @@ module Reporting =
             genDb rp allowOverwrite cts progress
 
     /// Executor instance for full/summary reporting.
-    let fullReportExecutor =
+    let summaryReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 makeSummaryReport host rp allowOverwrite cts progress }

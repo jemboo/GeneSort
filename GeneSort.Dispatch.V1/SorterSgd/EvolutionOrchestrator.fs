@@ -199,7 +199,7 @@ module EvolutionOrchestrator =
 
             // 2. Fetch the minimal sample set starting from genStart
             let startInt = int genStart
-            let requiredCount = int genIntervalCount + 1
+            let requiredCount = int genIntervalCount
 
             let targetSamples = 
                 SamplingConfig.getSampleSetWithMinBound saveIntervals (startInt - 1) requiredCount
