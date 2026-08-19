@@ -7,6 +7,7 @@ open GeneSort.SortingOps
 open GeneSort.Sorting.Sorter
 open GeneSort.Eval.V1.Sgd
 
+
 type outputData =
     | Run of run
     | RunParameters of runParameters
@@ -15,7 +16,7 @@ type outputData =
     | SorterSet of sorterSet
     | SorterSetEval of sorterSetEval
     | SorterPoolEvalBinsSetCollection of sorterPoolEvalBinsSetCollection
-    | SorterPoolSetHistoryCollection of sorterPoolSetHistoryCollection
+    | SorterPoolSetHistory of sorterPoolSetHistory
     | TextReport of dataTableReport
 
 
@@ -51,7 +52,7 @@ module OutputData =
         | _ -> Error "Database returned data, but it was not a SorterPoolEvalBinSetCollection."
 
     let asSorterPoolSetHistoryCollection = function
-        | SorterPoolSetHistoryCollection sse -> Ok sse
+        | SorterPoolSetHistory sse -> Ok sse
         | _ -> Error "Database returned data, but it was not a SorterPoolSetHistoryCollection."
 
     let asTextReport = function

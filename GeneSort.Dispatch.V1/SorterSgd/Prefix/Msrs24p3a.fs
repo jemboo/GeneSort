@@ -44,8 +44,10 @@ module Msrs24p3a =
 
     module PoolSzComp =
 
-        let dbName = "PoolSzComp" |> UMX.tag<databaseName>
-        let dbFolder = @$"c:\Projects\{%projName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
+        let dbNameTest = "PoolSzTest" |> UMX.tag<databaseName>
+        let dbNamePoolSz32 = "PoolSz32" |> UMX.tag<databaseName>
+        let dbFolderTest = @$"c:\Projects\{%projName}\{%dbNameTest}\Data" |> UMX.tag<pathToRootFolder>
+        let dbFolderPoolSz32 = @$"c:\Projects\{%projName}\{%dbNamePoolSz32}\Data" |> UMX.tag<pathToRootFolder>
 
         let makeQueryParams
                 (repl: int<replNumber>)
@@ -62,7 +64,7 @@ module Msrs24p3a =
             match outDt with
             | outputDataType.RunParameters _ ->
                 queryParams.create 
-                    dbName projName
+                    dbNameTest projName
                     (Some repl)
                     outDt
                     [|
@@ -76,7 +78,7 @@ module Msrs24p3a =
                     |]
             | _ ->
                  queryParams.create 
-                    dbName projName
+                    dbNameTest projName
                     (Some repl)
                     outDt
                     [| 
@@ -125,15 +127,16 @@ module Msrs24p3a =
                  .WithRunName(Some host.Run.RunName)
 
 
-        let saveIntervals = SampleRegistry.samplingConfigsDict["uniformInterval100"]
-        let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.2C"]
+        let saveIntervals = SampleRegistry.samplingConfigsDict["uniformInterval1000"]
+        let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.K"]
 
-        let db = new GeneSortGenDbMp(dbFolder, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
+        let dbTest = new GeneSortGenDbMp(dbFolderTest, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
+        let dbPoolSz32 = new GeneSortGenDbMp(dbFolderPoolSz32, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
 
 
-        let Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = dbName
-            runName = sprintf @"Rand-testA_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+        let TestSpec (executorType: sorterSgdExecutorType)  : runHostSpec = {
+            databaseName = dbNameTest
+            runName = sprintf @"Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for 24pfx Msrs"
             spans = [
                 (runParameters.generationCurrentKey, [0] |> List.map string)
@@ -151,9 +154,31 @@ module Msrs24p3a =
             maxParallel = 1
         }
 
+
+        let PoolSz32Spec (executorType: sorterSgdExecutorType)  : runHostSpec = {
+            databaseName = dbNameTest
+            runName = sprintf @"Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for 24pfx Msrs"
+            spans = [
+                (runParameters.generationCurrentKey, [0] |> List.map string)
+                (runParameters.generationIntervalCountKey, [1] |> List.map string)
+                (runParameters.sorterCountPerPoolKey, ["32";])
+                (runParameters.sorterPoolCountKey, ["128";] )
+                (runParameters.sorterPoolExpansionRateKey, ["2";] )
+                (runParameters.mutationModKey, [0 .. 256;] |> List.map string)
+                (runParameters.sorterPoolSelectionIntervalsKey, [ SampleRegistry.samplingConfigsDict["uniformInterval5_L5"] ] |> List.map SamplingConfig.toString)
+                (runParameters.sorterPoolMeasureKey, [ SorterPoolMeasure.noStdev; SorterPoolMeasure.stdev;] |> List.map SorterPoolMeasure.toCompactString)
+            ]
+            filter = paramMapFilter
+            enhancer = finishRunParams
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
+        }
+
         let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
             [ 
-                (dbName, db :> IGeneSortDb);
+                (dbNameTest, dbTest :> IGeneSortDb);
+                (dbNamePoolSz32, dbPoolSz32 :> IGeneSortDb);
             ]
             |> Map.ofList
 

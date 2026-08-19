@@ -21,7 +21,7 @@ module OutputDataTypeDto =
         | SortableTest so -> { Tag = "SortableTest"; Value = so }
         | SorterSetEval so -> { Tag = "SorterSetEval"; Value = so }
         | SorterPoolEvalBinsSetCollection so -> { Tag = "SorterPoolEvalBinsSet"; Value = so }
-        | SorterPoolSetHistoryCollection so -> { Tag = "SorterPoolSetHistoryCollection"; Value = so }
+        | SorterPoolSetHistory so -> { Tag = "SorterPoolSetHistoryCollection"; Value = so }
         | Run so -> { Tag = "Run"; Value = %so }
         | TextReport trn -> { Tag = "TextReport"; Value = %trn }
         | _ -> failwith (sprintf "%A not handled" outputDataType)
@@ -35,7 +35,7 @@ module OutputDataTypeDto =
         | "SortableTest" -> SortableTest dto.Value
         | "SorterSetEval" -> SorterSetEval dto.Value
         | "SorterPoolEvalBinsSetCollection" -> SorterPoolEvalBinsSetCollection dto.Value
-        | "SorterPoolSetHistoryCollection" -> SorterPoolSetHistoryCollection dto.Value
+        | "SorterPoolSetHistoryCollection" -> SorterPoolSetHistory dto.Value
         | "Run" -> Run (dto.Value |> UMX.tag<runName>)
         | "TextReport" -> TextReport (dto.Value |> UMX.tag<textReportName>)
         | _ -> failwith (sprintf "%s not handled" dto.Tag)

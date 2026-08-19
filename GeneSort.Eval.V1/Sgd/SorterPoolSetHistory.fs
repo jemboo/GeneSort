@@ -12,20 +12,29 @@ type sorterPoolSetHistory = {
 
 module SorterPoolSetHistory =
 
-    /// Extracts a pool set history snapshot from a live sorterPoolSet
-    let fromPoolSet 
+    let pruneAndCreateFromPoolSet 
             (currentGen: int<generationNumber>) 
-            (poolSet: sorterPoolSet) : sorterPoolSetHistory =
-        {
+            (poolSet: sorterPoolSet)
+            (runningHistory: Map<Guid<sorterPoolId>, Map<Guid<sorterPoolMemberId>, sorterPoolMemberHistory>>)
+            : sorterPoolSetHistory * Map<Guid<sorterPoolId>, Map<Guid<sorterPoolMemberId>, sorterPoolMemberHistory>> =
+
+        let poolHistories, updatedRunningMap =
+            poolSet.SorterPools
+            |> Map.toList
+            |> List.fold (fun (accHist, accMap) (poolId, pool) ->
+                let runningForPool = Map.tryFind poolId accMap |> Option.defaultValue Map.empty
+                let poolHist, prunedForPool = SorterPoolHistory.pruneAndCreateForPool currentGen pool runningForPool
+                (poolHist :: accHist, Map.add poolId prunedForPool accMap)
+            ) ([], runningHistory)
+
+        let setHistory = {
             SorterPoolSetId = poolSet.SorterPoolSetId
             SaveGeneration = currentGen
-            PoolHistories = 
-                poolSet.SorterPools |> Map.toSeq |> Seq.map(snd)
-                |> Seq.map (SorterPoolHistory.fromPool currentGen)
-                |> Seq.toList
+            PoolHistories = poolHistories |> List.rev
         }
 
-    /// Flatten all contained member histories across all pools into a single record list
+        setHistory, updatedRunningMap
+
     let toDataTableRecords (history: sorterPoolSetHistory) : dataTableRecord list =
         history.PoolHistories 
         |> List.collect SorterPoolHistory.toDataTableRecords
