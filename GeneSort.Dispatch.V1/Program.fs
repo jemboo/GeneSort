@@ -11,7 +11,7 @@ open GeneSort.Dispatch.V1
 let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
-DispatchSorterSgd.makeParamsAndRun()
+DispatchSorterSgd.runRunParameters()
 
 
 let duration = DateTime.Now - startTime

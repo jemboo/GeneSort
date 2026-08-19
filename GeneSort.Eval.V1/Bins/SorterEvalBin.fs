@@ -13,7 +13,7 @@ type sorterEvalBin =
 
     static member create (score: sorterEval) (key : sorterEvalKey) =
         let sorterEvals = ResizeArray<sorterEval>()
-        sorterEvals.Add(score)
+        sorterEvals.Add(score |> SorterEval.downgradeTo sorterEvalType.V1)
         { 
             sorterEvals = sorterEvals
             sorterEvalKey = key
@@ -21,7 +21,7 @@ type sorterEvalBin =
 
     static member createWithSorterEvals (scores: sorterEval seq) (key : sorterEvalKey) =
         { 
-            sorterEvals = ResizeArray(scores) 
+            sorterEvals = ResizeArray(scores  |> Seq.map (SorterEval.downgradeTo sorterEvalType.V1))
             sorterEvalKey = key
         }
 

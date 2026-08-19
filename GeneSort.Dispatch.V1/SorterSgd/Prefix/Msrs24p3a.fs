@@ -28,7 +28,6 @@ module Msrs24p3a =
           .WithExcludeSelfCe(true |> UMX.tag<excludeSelfCe> |> Some)
           .WithSorterChildCount(Some 1<sorterChildCount>)
           .WithSimpleSorterModelType(Some simpleSorterModelType.Msrs)
-          .WithSorterEvalType(Some sorterEvalType.V1)
           .WithOrthoRate(Some 4.001<orthoRate>)
           .WithParaRate(Some 0.4<paraRate>)
           .WithSelfSymRate(Some 2.001<selfSymRate>)
@@ -66,8 +65,7 @@ module Msrs24p3a =
                     dbName projName
                     (Some repl)
                     outDt
-                    [| 
-                        //(runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
+                    [|
                         (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                         (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                         (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)

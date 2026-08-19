@@ -15,6 +15,7 @@ type outputData =
     | SorterSet of sorterSet
     | SorterSetEval of sorterSetEval
     | SorterPoolEvalBinsSetCollection of sorterPoolEvalBinsSetCollection
+    | SorterPoolSetHistoryCollection of sorterPoolSetHistoryCollection
     | TextReport of dataTableReport
 
 
@@ -47,7 +48,11 @@ module OutputData =
         
     let asSorterPoolEvalBinSetCollection = function
         | SorterPoolEvalBinsSetCollection sse -> Ok sse
-        | _ -> Error "Database returned data, but it was not a SorterSetEval."
+        | _ -> Error "Database returned data, but it was not a SorterPoolEvalBinSetCollection."
+
+    let asSorterPoolSetHistoryCollection = function
+        | SorterPoolSetHistoryCollection sse -> Ok sse
+        | _ -> Error "Database returned data, but it was not a SorterPoolSetHistoryCollection."
 
     let asTextReport = function
         | TextReport tr -> Ok tr

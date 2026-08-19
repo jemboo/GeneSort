@@ -86,44 +86,6 @@ module SorterPoolSet =
 
             sorterPoolSet.create(poolSet.SorterPoolSetId, poolSet.GenerationNumber, updatedPools)
 
-    // reduces the sorterPoolCount by a factor of sorterPoolExpansionRate, effectively pruning the pool set,
-    // selecting only the top-performing pools based on SorterPool.getAverageScore
-    let trimPoolsOld (sorterPoolExpansionRate: int<sorterPoolExpansionRate>) 
-                  (measure: sorterEvalMeasure) 
-                  (poolSet: sorterPoolSet) : sorterPoolSet =
-
-        let currentPoolCount = poolSet._sorterPools.Count
-        if currentPoolCount = 0 then
-            poolSet
-        else
-            let expansionFactor = %sorterPoolExpansionRate
-
-            // Guard: Expansion factor must be positive and non-zero to avoid division errors
-            if expansionFactor <= 0 then
-                raise (ArgumentException(
-                    sprintf "sorterPoolExpansionRate must be greater than 0, but was %d." expansionFactor))
-
-            // Guard: Pool count must be evenly divisible by sorterPoolExpansionRate
-            if currentPoolCount % expansionFactor <> 0 then
-                raise (ArgumentException(
-                    sprintf "Current pool count (%d) is not divisible by sorterPoolExpansionRate (%d)." 
-                        currentPoolCount expansionFactor))
-
-            let targetCount = currentPoolCount / expansionFactor
-
-            let updatedPools =
-                poolSet._sorterPools
-                |> Map.values
-                |> Seq.map (fun pool -> 
-                    let avgScore = SorterPool.getAverageScore measure pool
-                    (avgScore, pool)
-                )
-                // Lower score represents better performance; sort ascending
-                |> Seq.sortBy (fun (avgScore, _) -> %avgScore)
-                |> Seq.truncate targetCount
-                |> Seq.map snd
-
-            sorterPoolSet.create(poolSet.SorterPoolSetId, poolSet.GenerationNumber, updatedPools)
 
 
     // Increases the poolSet.PoolCount by a factor of sorterPoolExpansionRate.

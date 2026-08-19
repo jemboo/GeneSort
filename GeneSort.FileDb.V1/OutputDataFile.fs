@@ -117,6 +117,12 @@ module OutputDataFile =
                                                 stream token SorterPoolEvalBinsSetCollectionDto.toDomain
                             return outputData.SorterPoolEvalBinsSetCollection domain
                         }
+                    | outputDataType.SorterPoolSetHistoryCollection _ ->
+                        async {
+                            let! domain = deserializeDto<sorterPoolSetHistoryCollectionDto, sorterPoolSetHistoryCollection> 
+                                                stream token SorterPoolSetHistoryCollectionDto.toDomain
+                            return outputData.SorterPoolSetHistoryCollection domain
+                        }
                     | outputDataType.Run _ ->
                         async {
                             let! domain = deserializeDto<runDto, run> stream token RunDto.toDomain
@@ -185,6 +191,8 @@ module OutputDataFile =
                                 serializeDto stream sse SorterSetEvalDto.fromDomain                         
                             | outputData.SorterPoolEvalBinsSetCollection sse ->
                                 serializeDto stream sse SorterPoolEvalBinsSetCollectionDto.fromDomain
+                            | outputData.SorterPoolSetHistoryCollection sse ->
+                                serializeDto stream sse SorterPoolSetHistoryCollectionDto.fromDomain
                             | outputData.Run p ->
                                 serializeDto stream p RunDto.fromDomain
                             | outputData.TextReport dataTableReport ->

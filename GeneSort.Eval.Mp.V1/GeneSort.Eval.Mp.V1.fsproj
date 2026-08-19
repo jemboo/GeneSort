@@ -14,6 +14,7 @@
     <Compile Include="Sgd\SorterPoolSetDto.fs" />
     <Compile Include="Sgd\SorterPoolSetSummaryDto.fs" />
     <Compile Include="Sgd\SorterRunResultDto.fs" />
+    <Compile Include="Sgd\SorterPoolSetHistoryDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

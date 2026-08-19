@@ -24,16 +24,15 @@ module SgdExecutor =
             (sortableTest: sortableTest)
             (log: string -> unit) : Async<Result<sorterPoolSet, string>> =
         asyncResult {
+            let evalType = sorterEvalType.V2
             log "No saved checkpoint found. Creating initial seedSorterPoolSet..."
             let! seedPoolSet = sorterPoolSetCreator rp
             
-            let! sorterEvalType = rp.GetSorterEvalType() |> Result.ofOption "Missing sorterEvalType."
-
             let computedEvals = 
                 seedPoolSet 
                 |> SorterPoolRunner.evaluatePoolSet 
                     sortableTest 
-                    sorterEvalType
+                    evalType
                     true // reEvaluateParents
                     (false |> UMX.tag<collectNewSortableTests>)
             
