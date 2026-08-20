@@ -147,7 +147,7 @@ module Msrs24p3a =
                 (runParameters.sorterCountPerPoolKey, ["16";])
                 (runParameters.sorterPoolCountKey, ["16";] )
                 (runParameters.sorterPoolExpansionRateKey, ["2";] )
-                (runParameters.mutationModKey, [3; 4;] |> List.map string)
+                (runParameters.mutationModKey, [3;] |> List.map string)
                 (runParameters.sorterPoolSelectionIntervalsKey, [ SampleRegistry.samplingConfigsDict["uniformInterval5_L5"] ] |> List.map SamplingConfig.toString)
                 (runParameters.sorterPoolMeasureKey, [ SorterPoolMeasure.noStdev; SorterPoolMeasure.stdev;] |> List.map SorterPoolMeasure.toCompactString)
             ]
