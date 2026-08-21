@@ -15,7 +15,7 @@ open GeneSort.Dispatch.V1
 module Msrs24p3a =
 
     let projName = "SorterSgd.Prfefix.Msrs24p3a" |> UMX.tag<projectName>
-    let sorterCapactiy = 256
+    let sorterCapactiy = 4098
 
     let standardParams (rp:runParameters) =
         let sorterEvalSelectionType = sorterEvalSelectionType.GuidOrder (int (float sorterCapactiy * 1.1) |> UMX.tag<sorterCount>)
@@ -116,7 +116,7 @@ module Msrs24p3a =
                  .WithRunName(Some host.Run.RunName)
 
 
-        let saveIntervals = SampleRegistry.samplingConfigsDict["uniformInterval500"]
+        let saveIntervals = SampleRegistry.samplingConfigsDict["expInterval100_L50"]
         let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.K"]
 
         let dbTest = new GeneSortGenDbMp(dbFolderTest, queryParamsFromRunParams, saveIntervals, saveSubIntervals)

@@ -57,8 +57,8 @@ module Example =
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
-    //SampleRegistry.printFirstMembers 20 1000
-    concato()
+    SampleRegistry.printFirstMembers 20 100000
+    //concato()
 
 
     printfn "end: %s" (DateTime.Now.ToLongTimeString())
