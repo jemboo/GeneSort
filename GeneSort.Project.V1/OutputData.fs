@@ -51,9 +51,9 @@ module OutputData =
         | SorterPoolEvalBinsSetCollection sse -> Ok sse
         | _ -> Error "Database returned data, but it was not a SorterPoolEvalBinSetCollection."
 
-    let asSorterPoolSetHistoryCollection = function
+    let asSorterPoolSetHistory = function
         | SorterPoolSetHistory sse -> Ok sse
-        | _ -> Error "Database returned data, but it was not a SorterPoolSetHistoryCollection."
+        | _ -> Error "Database returned data, but it was not a SorterPoolSetHistory."
 
     let asTextReport = function
         | TextReport tr -> Ok tr

@@ -94,6 +94,7 @@ module Msrs24p3a =
                         (runParameters.sorterPoolMeasureKey, spm |> SorterPoolMeasure.toCompactString)
                     |]
 
+
         let queryParamsFromRunParams 
                         (rp: runParameters) 
                         (odt: outputDataType) : queryParams option =
@@ -117,6 +118,7 @@ module Msrs24p3a =
             rpn.WithSeedModificationRate(Some 0.02<seedModificationRate>)
                .WithModificationRate(Some 0.06<modificationRate>)
 
+
         let private paramMapFilter (rp: runParameters) =
             Some rp
 
@@ -136,71 +138,6 @@ module Msrs24p3a =
         let dbPoolSz32 = new GeneSortGenDbMp(dbFolderPoolSz32, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
         let dbPoolSz128 = new GeneSortGenDbMp(dbFolderPoolSz128, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
 
-
-        let TestSpec (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = dbNameTest
-            runName = sprintf @"Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for 24pfx Msrs"
-            spans = [
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [1] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, ["16";])
-                (runParameters.sorterPoolCountKey, ["16";] )
-                (runParameters.sorterPoolExpansionRateKey, ["2";] )
-                (runParameters.mutationModKey, [3;] |> List.map string)
-                (runParameters.sorterPoolSelectionIntervalsKey, [ SampleRegistry.samplingConfigsDict["uniformInterval5_L5"] ] |> List.map SamplingConfig.toString)
-                (runParameters.sorterPoolMeasureKey, [ SorterPoolMeasure.noStdev; SorterPoolMeasure.stdev;] |> List.map SorterPoolMeasure.toCompactString)
-            ]
-            filter = paramMapFilter
-            enhancer = finishRunParams
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 8
-        }
-
-
-        let PoolSz32Spec (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = dbNamePoolSz32
-            runName = sprintf @"PoolSz32_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for 24pfx Msrs"
-            spans = [
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [3] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, ["32";])
-                (runParameters.sorterPoolCountKey, ["128";] )
-                (runParameters.sorterPoolExpansionRateKey, ["2";] )
-                (runParameters.mutationModKey, [0 .. 63;] |> List.map string)
-                (runParameters.sorterPoolSelectionIntervalsKey, [ SampleRegistry.samplingConfigsDict["uniformInterval5_L5"] ] |> List.map SamplingConfig.toString)
-                (runParameters.sorterPoolMeasureKey, [ SorterPoolMeasure.noStdev; SorterPoolMeasure.stdev;] |> List.map SorterPoolMeasure.toCompactString)
-            ]
-            filter = paramMapFilter
-            enhancer = finishRunParams
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 16
-        }
-
-
-        let PoolSz128Spec (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = dbNamePoolSz128
-            runName = sprintf @"PoolSz128_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for 24pfx Msrs"
-            spans = [
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [3] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, ["128";])
-                (runParameters.sorterPoolCountKey, ["32";] )
-                (runParameters.sorterPoolExpansionRateKey, ["2";] )
-                (runParameters.mutationModKey, [0 .. 63;] |> List.map string)
-                (runParameters.sorterPoolSelectionIntervalsKey, [ SampleRegistry.samplingConfigsDict["uniformInterval5_L5"] ] |> List.map SamplingConfig.toString)
-                (runParameters.sorterPoolMeasureKey, [ SorterPoolMeasure.noStdev; SorterPoolMeasure.stdev;] |> List.map SorterPoolMeasure.toCompactString)
-            ]
-            filter = paramMapFilter
-            enhancer = finishRunParams
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 16
-        }
-
-
-
         let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
             [ 
                 (dbNameTest, dbTest :> IGeneSortDb);
@@ -219,3 +156,71 @@ module Msrs24p3a =
             let db = getDatabaseByName spec.databaseName
             let run = run.create spec.databaseName projName spec.runName spec.runDescription
             runHost.Create db spec run :> IRunHost
+
+
+        module Specs =
+
+            let TestSpec (executorType: sorterSgdExecutorType)  : runHostSpec = {
+                databaseName = dbNameTest
+                runName = sprintf @"Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+                runDescription = "Mutation analysis for 24pfx Msrs"
+                spans = [
+                    (runParameters.generationCurrentKey, [0] |> List.map string)
+                    (runParameters.generationIntervalCountKey, [1] |> List.map string)
+                    (runParameters.sorterCountPerPoolKey, ["16";])
+                    (runParameters.sorterPoolCountKey, ["16";] )
+                    (runParameters.sorterPoolExpansionRateKey, ["2";] )
+                    (runParameters.mutationModKey, [3;] |> List.map string)
+                    (runParameters.sorterPoolSelectionIntervalsKey, [ SampleRegistry.samplingConfigsDict["emptyInterval"] ] |> List.map SamplingConfig.toString)
+                    (runParameters.sorterPoolMeasureKey, [ SorterPoolMeasure.noStdev; SorterPoolMeasure.stdev;] |> List.map SorterPoolMeasure.toCompactString)
+                ]
+                filter = paramMapFilter
+                enhancer = finishRunParams
+                allowOverwrite = false |> UMX.tag
+                maxParallel = 8
+            }
+
+
+            let PoolSz32Spec (executorType: sorterSgdExecutorType)  : runHostSpec = {
+                databaseName = dbNamePoolSz32
+                runName = sprintf @"PoolSz32_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+                runDescription = "Mutation analysis for 24pfx Msrs"
+                spans = [
+                    (runParameters.generationCurrentKey, [0] |> List.map string)
+                    (runParameters.generationIntervalCountKey, [3] |> List.map string)
+                    (runParameters.sorterCountPerPoolKey, ["32";])
+                    (runParameters.sorterPoolCountKey, ["128";] )
+                    (runParameters.sorterPoolExpansionRateKey, ["2";] )
+                    (runParameters.mutationModKey, [0 .. 63;] |> List.map string)
+                    (runParameters.sorterPoolSelectionIntervalsKey, [ SampleRegistry.samplingConfigsDict["uniformInterval5_L5"] ] |> List.map SamplingConfig.toString)
+                    (runParameters.sorterPoolMeasureKey, [ SorterPoolMeasure.noStdev; SorterPoolMeasure.stdev;] |> List.map SorterPoolMeasure.toCompactString)
+                ]
+                filter = paramMapFilter
+                enhancer = finishRunParams
+                allowOverwrite = false |> UMX.tag
+                maxParallel = 16
+            }
+
+
+            let PoolSz128Spec (executorType: sorterSgdExecutorType)  : runHostSpec = {
+                databaseName = dbNamePoolSz128
+                runName = sprintf @"PoolSz128_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+                runDescription = "Mutation analysis for 24pfx Msrs"
+                spans = [
+                    (runParameters.generationCurrentKey, [0] |> List.map string)
+                    (runParameters.generationIntervalCountKey, [3] |> List.map string)
+                    (runParameters.sorterCountPerPoolKey, ["128";])
+                    (runParameters.sorterPoolCountKey, ["32";] )
+                    (runParameters.sorterPoolExpansionRateKey, ["2";] )
+                    (runParameters.mutationModKey, [0 .. 63;] |> List.map string)
+                    (runParameters.sorterPoolSelectionIntervalsKey, [ SampleRegistry.samplingConfigsDict["uniformInterval5_L5"] ] |> List.map SamplingConfig.toString)
+                    (runParameters.sorterPoolMeasureKey, [ SorterPoolMeasure.noStdev; SorterPoolMeasure.stdev;] |> List.map SorterPoolMeasure.toCompactString)
+                ]
+                filter = paramMapFilter
+                enhancer = finishRunParams
+                allowOverwrite = false |> UMX.tag
+                maxParallel = 16
+            }
+
+
+

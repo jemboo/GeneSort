@@ -87,6 +87,20 @@ module Utils =
             (outputDataType.SorterRunResult "") 
             generationalDb startingGen rp cts log
 
+
+    let loadAvailableSorterPoolSetHistories
+            (generationalDb: IGeneSortGenDb)
+            (startingGen: int<generationNumber>)
+            (rp: runParameters)
+            (cts: CancellationToken)
+            (log: string -> unit) : Async<seq<sorterPoolSetHistory>> =
+        loadAvailableOutputData
+            OutputData.asSorterPoolSetHistory 
+            (outputDataType.SorterPoolSetHistory "") 
+            generationalDb startingGen rp cts log
+
+
+
     /// Generic function to load only the slice with the highest available generation number,
     /// traversing the unbounded sequence lazily without storing prior slices in memory.
     let loadOutputDataWithHighestGenerationNumber<'T>
@@ -115,7 +129,7 @@ module Utils =
         }
 
     /// Convenience wrapper to retrieve the highest SorterRunResult slice.
-    let loadSorterRunResultWithHighestGenerationNumber
+    let loadHighestGenSorterRunResult
             (generationalDb: IGeneSortGenDb)
             (rp: runParameters)
             (cts: CancellationToken)

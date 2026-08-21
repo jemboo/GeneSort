@@ -80,28 +80,24 @@ module SorterPoolMemberHistoryDto =
                     (v2Dto.StageCrossingsCount |> UMX.tag)
             )
 
-        {
-            SorterPoolId = UMX.tag dto.SorterPoolId
-            SorterPoolMemberId = UMX.tag dto.SorterPoolMemberId
-            SorterModelId = UMX.tag dto.SorterModelId
-            Birthday = UMX.tag dto.Birthday
-            SaveGeneration = UMX.tag dto.SaveGeneration
-            MutationIndex = UMX.tag dto.MutationIndex
-            MutationMod = UMX.tag dto.MutationMod
-            
-            ParentSorterPoolMemberId = dto.ParentSorterPoolMemberId |> Option.ofNullable |> Option.map UMX.tag
-            ParentSorterModelId = dto.ParentSorterModelId |> Option.ofNullable |> Option.map UMX.tag
-            MutatorId = dto.MutatorId |> Option.ofNullable |> Option.map UMX.tag
-            ParentMutationIndex = dto.ParentMutationIndex |> Option.ofNullable |> Option.map UMX.tag
-            
-            EvalV2 = v2Domain
-        }
-
+        sorterPoolMemberHistory.create(
+            sorterPoolId = UMX.tag dto.SorterPoolId,
+            sorterPoolMemberId = UMX.tag dto.SorterPoolMemberId,
+            sorterModelId = UMX.tag dto.SorterModelId,
+            birthday = UMX.tag dto.Birthday,
+            saveGeneration = UMX.tag dto.SaveGeneration,
+            mutationIndex = UMX.tag dto.MutationIndex,
+            mutationMod = UMX.tag dto.MutationMod,
+            parentSorterPoolMemberId = (dto.ParentSorterPoolMemberId |> Option.ofNullable |> Option.map UMX.tag),
+            parentSorterModelId = (dto.ParentSorterModelId |> Option.ofNullable |> Option.map UMX.tag),
+            mutatorId = (dto.MutatorId |> Option.ofNullable |> Option.map UMX.tag),
+            parentMutationIndex = (dto.ParentMutationIndex |> Option.ofNullable |> Option.map UMX.tag),
+            evalV2 = v2Domain
+        )
 
 // ----------------------------------------------------------------------------
 // sorterPoolHistoryDto
 // ----------------------------------------------------------------------------
-
 [<MessagePackObject>]
 type sorterPoolHistoryDto = {
     [<Key(0)>] SorterPoolId: Guid
@@ -119,12 +115,11 @@ module SorterPoolHistoryDto =
         }
 
     let toDomain (dto: sorterPoolHistoryDto) : sorterPoolHistory =
-        {
-            SorterPoolId = UMX.tag dto.SorterPoolId
-            SaveGeneration = UMX.tag dto.SaveGeneration
-            MemberHistories = dto.MemberHistories |> List.map SorterPoolMemberHistoryDto.toDomain
-        }
-
+        sorterPoolHistory.create(
+            sorterPoolId = UMX.tag dto.SorterPoolId,
+            saveGeneration = UMX.tag dto.SaveGeneration,
+            memberHistories = (dto.MemberHistories |> List.map SorterPoolMemberHistoryDto.toDomain)
+        )
 
 // ----------------------------------------------------------------------------
 // sorterPoolSetHistoryDto
@@ -147,12 +142,11 @@ module SorterPoolSetHistoryDto =
         }
 
     let toDomain (dto: sorterPoolSetHistoryDto) : sorterPoolSetHistory =
-        {
-            SorterPoolSetId = UMX.tag dto.SorterPoolSetId
-            SaveGeneration = UMX.tag dto.SaveGeneration
-            PoolHistories = dto.PoolHistories |> List.map SorterPoolHistoryDto.toDomain
-        }
-
+        sorterPoolSetHistory.create(
+            sorterPoolSetId = UMX.tag dto.SorterPoolSetId,
+            saveGeneration = UMX.tag dto.SaveGeneration,
+            poolHistories = (dto.PoolHistories |> List.map SorterPoolHistoryDto.toDomain)
+        )
 
 // ----------------------------------------------------------------------------
 // sorterPoolSetHistoryCollectionDto

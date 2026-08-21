@@ -8,6 +8,7 @@ type sorterSgdExecutorType =
     | GenMerge
     | GenPrefix
     | SummaryReport
+    | HistoryReport
     | SnapshotReport
 
 
@@ -18,6 +19,7 @@ module SorterSgdExecutorType =
         | GenMerge -> "GenMerge"
         | GenPrefix -> "GenPrefix"
         | SummaryReport -> "SummaryReport"
+        | HistoryReport -> "HistoryReport"
         | SnapshotReport -> "SnapshotReport"
 
 
@@ -55,4 +57,5 @@ module SorterSgdExecutorType =
         | sorterSgdExecutorType.GenMerge -> mergeExecutor
         | sorterSgdExecutorType.GenPrefix -> prefixExecutor
         | sorterSgdExecutorType.SummaryReport -> Reporting.summaryReportExecutor
+        | sorterSgdExecutorType.HistoryReport -> Reporting.sorterPoolHistoryReportExecutor
         | sorterSgdExecutorType.SnapshotReport -> Reporting.snapshotReportExecutor

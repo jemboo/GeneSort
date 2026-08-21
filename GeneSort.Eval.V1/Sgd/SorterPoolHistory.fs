@@ -4,11 +4,27 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Eval.V1
 
-type sorterPoolHistory = {
-    SorterPoolId: Guid<sorterPoolId>
-    SaveGeneration: int<generationNumber>
-    MemberHistories: sorterPoolMemberHistory list
-}
+type sorterPoolHistory = 
+    private {
+        sorterPoolId: Guid<sorterPoolId>
+        saveGeneration: int<generationNumber>
+        memberHistories: sorterPoolMemberHistory list
+    }
+
+    static member create
+            (sorterPoolId: Guid<sorterPoolId>,
+             saveGeneration: int<generationNumber>,
+             memberHistories: sorterPoolMemberHistory list) : sorterPoolHistory =
+        {
+            sorterPoolId = sorterPoolId
+            saveGeneration = saveGeneration
+            memberHistories = memberHistories
+        }
+
+    member this.SorterPoolId with get() = this.sorterPoolId
+    member this.SaveGeneration with get() = this.saveGeneration
+    member this.MemberHistories with get() = this.memberHistories
+
 
 module SorterPoolHistory =
 
@@ -67,11 +83,12 @@ module SorterPoolHistory =
             |> Map.toList 
             |> List.map snd
 
-        let poolHistory = {
-            SorterPoolId = pool.SorterPoolId
-            SaveGeneration = currentGen
-            MemberHistories = memberHistories
-        }
+        let poolHistory = 
+            sorterPoolHistory.create(
+                sorterPoolId = pool.SorterPoolId,
+                saveGeneration = currentGen,
+                memberHistories = memberHistories
+            )
 
         poolHistory, prunedTrackedMap
 

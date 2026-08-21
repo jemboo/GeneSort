@@ -13,9 +13,11 @@ open GeneSort.Eval.V1
 
 module Reporting =
 
-    /// Core engine for generating dynamic reports.
-    let private makeDynamicReport
-            (extractRecords: sorterRunResult -> dataTableRecord seq)
+    /// Generic execution engine for dynamic generation-sliced reports.
+    let private makeDynamicReportFromSlices<'T>
+            (loadSlices: IGeneSortGenDb -> int<generationNumber> -> runParameters -> CancellationToken -> (string -> unit) -> Async<seq<'T>>)
+            (getGeneration: 'T -> int<generationNumber>)
+            (extractRecords: 'T -> dataTableRecord seq)
             (reportNameTag: string)
             (genDb: IGeneSortGenDb)
             (rp: runParameters)
@@ -34,43 +36,42 @@ module Reporting =
                 OpsUtils.report progress (sprintf "%s Starting Dynamic %s for Run %s" 
                         (StringUtils.getTimestampString()) reportNameTag %runId)
 
-                // 1. Dynamic discovery and stream slices lazily via Utils
                 let! (curGen: int<generationNumber>) = 
-                            rp.GetGenerationCurrent() |> Result.ofOption "Missing GenerationCurrent."
-                let! srrSeq = Utils.loadAvailableSorterRunResults genDb curGen rp cts.Token log
+                    rp.GetGenerationCurrent() |> Result.ofOption "Missing GenerationCurrent."
 
-                if Seq.isEmpty srrSeq then
-                    return! Error "No valid SorterRunResult files were discovered starting at generation 0."
+                // 1. Dynamic discovery and streaming of slices
+                let! slicesSeq = loadSlices genDb curGen rp cts.Token log
 
-                // 2. Eagerly collect records and capture max generation number instantly
+                if Seq.isEmpty slicesSeq then
+                    return! Error (sprintf "No valid slice files discovered for %s starting at generation %d." reportNameTag %curGen)
+
+                // 2. Accumulate records and determine maximum generation number reached
                 let mutable recordCount = 0
                 let mutable maxGenOpt = None
                 let accumulatedDetails = System.Collections.Generic.List<dataTableRecord>()
 
-                for srr in srrSeq do
+                for slice in slicesSeq do
                     cts.Token.ThrowIfCancellationRequested()
                     recordCount <- recordCount + 1
-                    let gen = srr.FinalPoolSet.GenerationNumber
+                    let gen = getGeneration slice
                     maxGenOpt <- 
                         match maxGenOpt with
                         | None -> Some gen
                         | Some curMax -> Some (max curMax gen)
-                    accumulatedDetails.AddRange(extractRecords srr)
 
-                let lastGen = 
-                    match maxGenOpt with
-                    | Some g -> g
-                    | None -> %0 : int<generationNumber>
+                    accumulatedDetails.AddRange(extractRecords slice)
 
-                log (sprintf "Discovered and processed %d contiguous SorterRunResult slice(s)." recordCount)
+                let lastGen = defaultArg maxGenOpt (%0 : int<generationNumber>)
 
-                // 3. Prepare target metadata and query params with updated lastGen
+                log (sprintf "Discovered and processed %d %s slice(s)." recordCount reportNameTag)
+
+                // 3. Prepare target metadata and QueryParams
                 let reportName = reportNameTag |> UMX.tag<textReportName>
                 let finalRp = rp.WithGenerationCurrent(Some lastGen)
 
                 let! qpReport = 
                     genDb.MakeQueryParamsFromRunParams finalRp (outputDataType.TextReport reportName)
-                    |> Result.ofOption "Failed to create QueryParams for output Report."
+                    |> Result.ofOption (sprintf "Failed to create QueryParams for output %s." reportNameTag)
 
                 // 4. Combine metadata lead columns with dynamic records
                 log "Combining collected records into final report format..."
@@ -89,41 +90,48 @@ module Reporting =
                 return! Error (sprintf "Error in %s for run %s: %s" reportNameTag (rp |> RunParameters.getIdString) e.Message)
         } |> Async.map (logResult progress (fun msg -> OpsUtils.report progress msg))
 
+    // --- Specific Report Builders ---
 
-    /// Generates a summary/intermediate history report across all discovered generation slices.
-    let makeSummaryReport
-            (host: IRunHost)
-            (rp: runParameters)
-            (allowOverwrite: bool<allowOverwrite>)
-            (cts: CancellationTokenSource)
-            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+    let private makeSummaryReport (host: IRunHost) rp allowOverwrite cts progress =
         let genDb = host.RunDb :?> IGeneSortGenDb
-        makeDynamicReport 
-            (SorterRunResult.toDataTableRecordsIntermediateHistory "") 
-            "SorterRunResult_SummaryReport" 
+        makeDynamicReportFromSlices
+            Utils.loadAvailableSorterRunResults
+            (fun srr -> srr.FinalPoolSet.GenerationNumber)
+            (SorterRunResult.toDataTableRecordsIntermediateHistory "")
+            "SorterRunResult_SummaryReport"
             genDb rp allowOverwrite cts progress
 
-    /// Generates a snapshot report across all discovered generation slices.
-    let makeSnapshotReport
-            (host: IRunHost)
-            (rp: runParameters)
-            (allowOverwrite: bool<allowOverwrite>)
-            (cts: CancellationTokenSource)
-            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+    let private makeSnapshotReport (host: IRunHost) rp allowOverwrite cts progress =
         let genDb = host.RunDb :?> IGeneSortGenDb
-        makeDynamicReport 
-            (SorterRunResult.toDataTableRecordsSnapshot "") 
-            "SorterRunResult_SnapshotReport" 
+        makeDynamicReportFromSlices
+            Utils.loadAvailableSorterRunResults
+            (fun srr -> srr.FinalPoolSet.GenerationNumber)
+            (SorterRunResult.toDataTableRecordsSnapshot "")
+            "SorterRunResult_SnapshotReport"
             genDb rp allowOverwrite cts progress
 
-    /// Executor instance for full/summary reporting.
+    let private makePoolHistoryReport (host: IRunHost) rp allowOverwrite cts progress =
+        let genDb = host.RunDb :?> IGeneSortGenDb
+        makeDynamicReportFromSlices
+            Utils.loadAvailableSorterPoolSetHistories
+            (fun hist -> hist.SaveGeneration)
+            SorterPoolSetHistory.toDataTableRecords
+            "SorterPoolSetHistory_Report"
+            genDb rp allowOverwrite cts progress
+
+    // --- Executors ---
+
     let summaryReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 makeSummaryReport host rp allowOverwrite cts progress }
 
-    /// Executor instance for snapshot reporting.
     let snapshotReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 makeSnapshotReport host rp allowOverwrite cts progress }
+
+    let sorterPoolHistoryReportExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                makePoolHistoryReport host rp allowOverwrite cts progress }
