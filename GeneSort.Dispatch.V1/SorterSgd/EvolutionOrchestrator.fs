@@ -49,20 +49,18 @@ module EvolutionOrchestrator =
             let subIntervals = genDb.getGenSaveSubIntervals()
 
             // 2. Fetch the minimal sample set starting from genStart
-            let startInt = int genStart
             let requiredCount = int genIntervalCount
 
             let targetSamples = 
-                SamplingConfig.getSampleSetWithMinBound saveIntervals (startInt - 1) requiredCount
+                SamplingConfig.getSampleSetWithMinBound saveIntervals (%genStart - 1) requiredCount
                 |> Set.toArray
                 |> Array.sort
 
             if targetSamples.Length < requiredCount then
-                return! Error (sprintf "Target generation sequence ended early: requested %d intervals from %d, but only obtained %d." %genIntervalCount startInt targetSamples.Length)
+                return! Error (sprintf "Target generation sequence ended early: requested %d intervals from %d, but only obtained %d." %genIntervalCount %genStart targetSamples.Length)
             else
                 let targetGenInt = targetSamples.[targetSamples.Length - 1]
                 let totalGen = %targetGenInt : int<generationNumber>
-                let genCount = totalGen - genStart
 
                 // --- Frequency Triggers ---
                 let targetGenerationsForPoolExpansion = 
@@ -106,7 +104,7 @@ module EvolutionOrchestrator =
                         if remainingSteps < 0 then
                             return sorterRunResult.create currentSorterPoolSet (historyAcc |> List.rev |> List.toArray)
                         else
-                            let currentGen = genStart + (genCount - %remainingSteps)
+                            let currentGen = totalGen - %remainingSteps
 
                             // Dynamic Periodic Variation for sorterCountPerPool
                             let currentSorterCountPerPool : int<sorterCountPerPool> =
@@ -152,6 +150,17 @@ module EvolutionOrchestrator =
                                 else
                                     currentSorterPoolSet
 
+
+                            let parentModelToMemberIdMap =
+                                currentSorterPoolSet.SorterPools
+                                |> Map.fold (fun acc _ pool ->
+                                    pool.SorterPoolMembers
+                                    |> Seq.fold (fun innerAcc spm ->
+                                        let modelId = SorterModel.getId spm.SorterModel
+                                        Map.add modelId spm.SorterPoolMemberId innerAcc
+                                    ) acc
+                                ) Map.empty
+
                             // Step Evolution
                             let reEvaluateParents = (remainingSteps % 10 = 0)
 
@@ -170,7 +179,7 @@ module EvolutionOrchestrator =
                                     collectNewSortableTests
                                     sortedFractionThreshold
 
-                            // Track all generated members in current gen across steps
+
                             let updatedRunningHistoryMap =
                                 nextSorterPoolSet.SorterPools
                                 |> Map.fold (fun acc poolId pool ->
@@ -178,13 +187,26 @@ module EvolutionOrchestrator =
                                     let newPoolMap = 
                                         pool.SorterPoolMembers 
                                         |> Seq.fold (fun pmAcc spm ->
-                                            if Map.containsKey spm.SorterPoolMemberId pmAcc then pmAcc
+                                            if Map.containsKey spm.SorterPoolMemberId pmAcc then 
+                                                pmAcc
                                             else
-                                                let pmHist = SorterPoolMemberHistory.fromPoolMember poolId currentGen spm
+                                                // Resolve parent sorterPoolMemberId via parent's sorterModelId
+                                                let parentMemberId = 
+                                                    spm.SorterMutationSource 
+                                                    |> Option.bind (fun src -> Map.tryFind src.SorterModelId parentModelToMemberIdMap)
+
+                                                let pmHist = 
+                                                    SorterPoolMemberHistory.fromPoolMember 
+                                                        poolId 
+                                                        parentMemberId 
+                                                        currentGen 
+                                                        spm
+
                                                 Map.add spm.SorterPoolMemberId pmHist pmAcc
                                         ) poolMap
                                     Map.add poolId newPoolMap acc
                                 ) runningMemberHistoryMap
+
 
                             // Accumulate sorterPoolEvalBinsSet at summary report frequency
                             let updatedEvalBinsSetAcc =
@@ -252,5 +274,5 @@ module EvolutionOrchestrator =
                     }
 
                 // Execute loop with empty initial states
-                return! loop %genCount initialPoolSet [] [] Map.empty
+                return! loop %totalGen initialPoolSet [] [] Map.empty
     }

@@ -147,27 +147,3 @@ module SorterPoolSetHistoryDto =
             saveGeneration = UMX.tag dto.SaveGeneration,
             poolHistories = (dto.PoolHistories |> List.map SorterPoolHistoryDto.toDomain)
         )
-
-// ----------------------------------------------------------------------------
-// sorterPoolSetHistoryCollectionDto
-// ----------------------------------------------------------------------------
-
-//[<MessagePackObject>]
-//type sorterPoolSetHistoryCollectionDto = {
-//    [<Key(0)>] CollectionId: Guid
-//    [<Key(1)>] Histories: sorterPoolSetHistoryDto list
-//}
-
-//module SorterPoolSetHistoryCollectionDto =
-
-//    let fromDomain (domain: sorterPoolSetHistoryCollection) : sorterPoolSetHistoryCollectionDto =
-//        {
-//            CollectionId = %domain.CollectionId
-//            Histories = domain.Histories |> List.map SorterPoolSetHistoryDto.fromDomain
-//        }
-
-//    let toDomain (dto: sorterPoolSetHistoryCollectionDto) : sorterPoolSetHistoryCollection =
-//        {
-//            CollectionId = UMX.tag dto.CollectionId
-//            Histories = dto.Histories |> List.map SorterPoolSetHistoryDto.toDomain
-//        }

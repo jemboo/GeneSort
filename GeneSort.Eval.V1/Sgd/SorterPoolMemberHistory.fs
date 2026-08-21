@@ -70,6 +70,7 @@ module SorterPoolMemberHistory =
     /// Extracts a snapshot from a surviving pool member, ensuring SorterEval is forced to V2
     let fromPoolMember 
             (poolId: Guid<sorterPoolId>) 
+            (parentSorterPoolMemberId: Guid<sorterPoolMemberId> option)
             (currentGen: int<generationNumber>) 
             (spm: sorterPoolMember) : sorterPoolMemberHistory =
             
@@ -86,7 +87,7 @@ module SorterPoolMemberHistory =
             saveGeneration = currentGen,
             mutationIndex = spm.MutationIndex,
             mutationMod = spm.MutationMod,
-            parentSorterPoolMemberId = None,
+            parentSorterPoolMemberId = parentSorterPoolMemberId,
             parentSorterModelId = (spm.SorterMutationSource |> Option.map (fun src -> src.SorterModelId)),
             mutatorId = (spm.SorterMutationSource |> Option.map (fun src -> src.SorterModelMutatorId)),
             parentMutationIndex = (spm.SorterMutationSource |> Option.map (fun src -> src.SorterMutationIndex)),
@@ -105,6 +106,7 @@ module SorterPoolMemberHistory =
             |> dataTableRecord.addData "MutationMod" (string %snapshot.MutationMod)
             
             // Parent Lineage fields
+            |> dataTableRecord.addData "ParentSorterPoolMemberId" (snapshot.ParentSorterPoolMemberId |> Option.map (fun id -> string %id) |> Option.defaultValue "")
             |> dataTableRecord.addData "ParentSorterModelId" (snapshot.ParentSorterModelId |> Option.map (fun id -> string %id) |> Option.defaultValue "")
             |> dataTableRecord.addData "MutatorId" (snapshot.MutatorId |> Option.map (fun id -> string %id) |> Option.defaultValue "")
             |> dataTableRecord.addData "ParentMutationIndex" (snapshot.ParentMutationIndex |> Option.map (fun idx -> string %idx) |> Option.defaultValue "")
