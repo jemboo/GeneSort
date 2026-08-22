@@ -19,6 +19,7 @@
     <Compile Include="Sgd\SorterPoolHistory.fs" />
     <Compile Include="Sgd\SorterPoolMeasure.fs" />
     <Compile Include="Sgd\SorterPoolSet.fs" />
+    <Compile Include="Sgd\RunningMemberHistoryMap.fs" />
     <Compile Include="Sgd\SorterPoolSetHistory.fs" />
     <Compile Include="Sgd\SorterPoolRunner.fs" />
     <Compile Include="Sgd\SorterPipeline.fs" />

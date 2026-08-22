@@ -249,13 +249,13 @@ module SampleRegistry =
         add (createConfig "uniformInterval1000" 1 noMaxCount scale1000 (Constant 1))
 
         //summaryInterval_C.2C         : [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 14, 15, 17, 18, 20, 21, 23, 24, 26]
-        //summaryInterval_C.5C         : [25, 26, 27, 28, 29, 30, 32, 33, 34, 36, 37, 39, 40, 42, 43, 45, 47, 49, 51, 53]
-        //summaryInterval_C.K          : [25, 26, 27, 28, 29, 31, 32, 33, 35, 36, 38, 39, 41, 43, 45, 47, 49, 51, 53, 56]
-        //summaryInterval_C.5K         : [25, 26, 27, 28, 29, 31, 32, 34, 35, 37, 39, 41, 43, 45, 48, 50, 53, 56, 59, 62]
+        //summaryInterval_C.5C         : [... 25, 26, 27, 28, 29, 30, 32, 33, 34, 36, 37, 39, 40, 42, 43, 45, 47, 49, 51, 53]
+        //summaryInterval_C.K          : [... 25, 26, 27, 28, 29, 31, 32, 33, 35, 36, 38, 39, 41, 43, 45, 47, 49, 51, 53, 56]
+        //summaryInterval_C.5K         : [... 25, 26, 27, 28, 29, 31, 32, 34, 35, 37, 39, 41, 43, 45, 48, 50, 53, 56, 59, 62]
         add (createConfig "summaryInterval_C.2C" 1 noMaxCount scale1 (Exponential (0.03, 1)))
-        add (createConfig "summaryInterval_C.5C" 25 noMaxCount scale1 (Exponential (0.041, 1)))
-        add (createConfig "summaryInterval_C.K" 25 noMaxCount scale1 (Exponential (0.05, 1)))
-        add (createConfig "summaryInterval_C.5K" 25 noMaxCount scale1 (Exponential (0.07, 1)))
+        add (createConfig "summaryInterval_C.5C" 1 noMaxCount scale1 (Exponential (0.041, 1)))
+        add (createConfig "summaryInterval_C.K" 1 noMaxCount scale1 (Exponential (0.05, 1)))
+        add (createConfig "summaryInterval_C.5K" 1 noMaxCount scale1 (Exponential (0.07, 1)))
 
         //emptyInterval                : [<empty>]
         //uniformInterval5_L5          : [5, 10, 15, 20, 25]

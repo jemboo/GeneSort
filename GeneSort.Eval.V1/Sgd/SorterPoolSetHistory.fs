@@ -31,17 +31,17 @@ module SorterPoolSetHistory =
     let pruneAndCreateFromPoolSet 
             (currentGen: int<generationNumber>) 
             (poolSet: sorterPoolSet)
-            (runningHistory: Map<Guid<sorterPoolId>, Map<Guid<sorterPoolMemberId>, sorterPoolMemberHistory>>)
-            : sorterPoolSetHistory * Map<Guid<sorterPoolId>, Map<Guid<sorterPoolMemberId>, sorterPoolMemberHistory>> =
+            (runningHistory: runningMemberHistoryMap)
+            : sorterPoolSetHistory * runningMemberHistoryMap =
 
-        let poolHistories, updatedRunningMap =
+        let poolHistories, updatedMap =
             poolSet.SorterPools
             |> Map.toList
             |> List.fold (fun (accHist, accMap) (poolId, pool) ->
                 let runningForPool = Map.tryFind poolId accMap |> Option.defaultValue Map.empty
                 let poolHist, prunedForPool = SorterPoolHistory.pruneAndCreateForPool currentGen pool runningForPool
                 (poolHist :: accHist, Map.add poolId prunedForPool accMap)
-            ) ([], runningHistory)
+            ) ([], RunningMemberHistoryMap.toMap runningHistory)
 
         let setHistory = 
             sorterPoolSetHistory.create(
@@ -50,7 +50,7 @@ module SorterPoolSetHistory =
                 poolHistories = (poolHistories |> List.rev)
             )
 
-        setHistory, updatedRunningMap
+        setHistory, RunningMemberHistoryMap.create updatedMap
 
     let toDataTableRecords (history: sorterPoolSetHistory) : dataTableRecord seq =
         history.PoolHistories 

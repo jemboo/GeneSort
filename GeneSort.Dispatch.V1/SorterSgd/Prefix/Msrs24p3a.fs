@@ -40,10 +40,11 @@ module Msrs24p3a =
 
         let dbNamePoolsTest = "PoolsTest" |> UMX.tag<databaseName>
         let dbNamePools4098_1_vs_512 = "Pools4098_1_vs_512" |> UMX.tag<databaseName>
+        let dbNamePools4098_2_vs_256 = "Pools4098_2_vs_256" |> UMX.tag<databaseName>
         let dbNamePoolSz128 = "PoolSz128" |> UMX.tag<databaseName>
         let dbFolderTest = @$"c:\Projects\{%projName}\{%dbNamePoolsTest}\Data" |> UMX.tag<pathToRootFolder>
-        let dbFolderPools4098 = @$"c:\Projects\{%projName}\{%dbNamePools4098_1_vs_512}\Data" |> UMX.tag<pathToRootFolder>
-        let dbFolderPoolSz128 = @$"c:\Projects\{%projName}\{%dbNamePoolSz128}\Data" |> UMX.tag<pathToRootFolder>
+        let dbFolderPools4098a = @$"c:\Projects\{%projName}\{%dbNamePools4098_1_vs_512}\Data" |> UMX.tag<pathToRootFolder>
+        let dbFolderPools4098b = @$"c:\Projects\{%projName}\{%dbNamePools4098_2_vs_256}\Data" |> UMX.tag<pathToRootFolder>
 
         let makeQueryParams
                 (repl: int<replNumber>)
@@ -120,14 +121,14 @@ module Msrs24p3a =
         let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.K"]
 
         let dbTest = new GeneSortGenDbMp(dbFolderTest, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
-        let dbPools4098 = new GeneSortGenDbMp(dbFolderPools4098, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
-        let dbPoolSz128 = new GeneSortGenDbMp(dbFolderPoolSz128, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
+        let dbPools4098a = new GeneSortGenDbMp(dbFolderPools4098a, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
+        let dbPools4098b = new GeneSortGenDbMp(dbFolderPools4098b, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
 
         let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
             [ 
                 (dbNamePoolsTest, dbTest :> IGeneSortDb);
-                (dbNamePools4098_1_vs_512, dbPools4098 :> IGeneSortDb);
-                (dbNamePoolSz128, dbPoolSz128 :> IGeneSortDb);
+                (dbNamePools4098_1_vs_512, dbPools4098a :> IGeneSortDb);
+                (dbNamePools4098_2_vs_256, dbPools4098b :> IGeneSortDb);
             ]
             |> Map.ofList
 
@@ -179,15 +180,14 @@ module Msrs24p3a =
             }
 
 
-            let PoolSz128Spec (executorType: sorterSgdExecutorType)  : runHostSpec = {
-                databaseName = dbNamePoolSz128
-                runName = sprintf @"PoolSz128_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-                runDescription = "Mutation analysis for 24pfx Msrs"
+            let PoolSz_2n256 (executorType: sorterSgdExecutorType)  : runHostSpec = {
+                databaseName = dbNamePools4098_2_vs_256
+                runName = sprintf @"PoolSz_2_vs_256_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+                runDescription = "Pool size comp (2 vs 256) for 24pfx3a Msrs"
                 spans = [
                     (runParameters.generationCurrentKey, [0] |> List.map string)
-                    (runParameters.generationIntervalCountKey, [3] |> List.map string)
-                    (runParameters.sorterCountPerPoolKey, ["128";])
-                    (runParameters.sorterPoolCountKey, ["32";] )
+                    (runParameters.generationIntervalCountKey, [5] |> List.map string)
+                    (runParameters.sorterCountPerPoolKey, ["2"; "256";])
                     (runParameters.mutationModKey, [0 .. 63;] |> List.map string)
                 ]
                 filter = paramMapFilter

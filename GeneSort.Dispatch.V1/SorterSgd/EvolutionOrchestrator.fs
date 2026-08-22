@@ -14,6 +14,11 @@ open GeneSort.Model.Sorting.V1
 
 module EvolutionOrchestrator =
 
+    let inline private triggerCompactingGC () =
+        System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- 
+            System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
+        GC.Collect(2, GCCollectionMode.Forced, true, true)
+
     let runEvolutionAsync
             (genDb: IGeneSortGenDb)
             (rp: runParameters)
@@ -57,7 +62,8 @@ module EvolutionOrchestrator =
                 |> Array.sort
 
             if targetSamples.Length < requiredCount then
-                return! Error (sprintf "Target generation sequence ended early: requested %d intervals from %d, but only obtained %d." %genIntervalCount %genStart targetSamples.Length)
+                return! Error (sprintf "Target generation sequence ended early: requested %d intervals from %d, but only obtained %d."
+                                        %genIntervalCount %genStart targetSamples.Length)
             else
                 let targetGenInt = targetSamples.[targetSamples.Length - 1]
                 let totalGen = %targetGenInt : int<generationNumber>
@@ -98,11 +104,15 @@ module EvolutionOrchestrator =
                         (currentSorterPoolSet: sorterPoolSet) 
                         (historyAcc: sorterPoolSetSummary list) 
                         (evalBinsSetAcc: sorterPoolEvalBinsSet list) 
-                        (runningMemberHistoryMap: Map<Guid<sorterPoolId>, Map<Guid<sorterPoolMemberId>, sorterPoolMemberHistory>>)
+                        (runningMap: runningMemberHistoryMap) 
                         : Async<Result<sorterRunResult, string>> =
                     asyncResult {
-                        if remainingSteps < 0 then
-                            return sorterRunResult.create currentSorterPoolSet (historyAcc |> List.rev |> List.toArray)
+                        // Cooperative cancellation evaluation at top of loop
+                        if cts.IsCancellationRequested then
+                            return! Error "runEvolutionAsync execution was cancelled."
+                        elif remainingSteps < 0 then
+                            let finalSummaries = historyAcc |> List.rev |> List.toArray
+                            return sorterRunResult.create currentSorterPoolSet finalSummaries
                         else
                             let currentGen = totalGen - %remainingSteps
 
@@ -150,7 +160,6 @@ module EvolutionOrchestrator =
                                 else
                                     currentSorterPoolSet
 
-
                             // Step Evolution
                             let reEvaluateParents = (remainingSteps % 10 = 0)
 
@@ -170,32 +179,8 @@ module EvolutionOrchestrator =
                                     sortedFractionThreshold
 
                             // Track all generated members using direct parent reference
-                            let updatedRunningHistoryMap =
-                                nextSorterPoolSet.SorterPools
-                                |> Map.fold (fun acc poolId pool ->
-                                    let poolMap = Map.tryFind poolId acc |> Option.defaultValue Map.empty
-                                    let newPoolMap = 
-                                        pool.SorterPoolMembers 
-                                        |> Seq.fold (fun pmAcc spm ->
-                                            if Map.containsKey spm.SorterPoolMemberId pmAcc then 
-                                                pmAcc
-                                            else
-                                                let parentMemberId = 
-                                                    spm.SorterMutationSource 
-                                                    |> Option.map (fun src -> src.SorterPoolMemberId)
-
-                                                let pmHist = 
-                                                    SorterPoolMemberHistory.fromPoolMember 
-                                                        poolId 
-                                                        parentMemberId 
-                                                        currentGen 
-                                                        spm
-
-                                                Map.add spm.SorterPoolMemberId pmHist pmAcc
-                                        ) poolMap
-                                    Map.add poolId newPoolMap acc
-                                ) runningMemberHistoryMap
-
+                            let updatedRunningHistoryMap = 
+                                runningMap |> RunningMemberHistoryMap.updateFromPoolSet currentGen nextSorterPoolSet
 
                             // Accumulate sorterPoolEvalBinsSet at summary report frequency
                             let updatedEvalBinsSetAcc =
@@ -206,15 +191,15 @@ module EvolutionOrchestrator =
                                 else
                                     evalBinsSetAcc
 
-
                             // Save RunResult, SorterPoolEvalBinsSetCollection, and SorterPoolSetHistory on shouldSaveRunResult
                             let! (historyAccNext, evalBinsSetAccNext, runningMemberHistoryMapNext) = 
                                 asyncResult {
                                     if shouldSaveRunResult && (%currentGen > 0) then
+                                        let currentSummaries = updatedSorterPoolSetSummary |> List.rev |> List.toArray
                                         let currentRunResult = 
                                             sorterRunResult.create 
                                                 nextSorterPoolSet 
-                                                (updatedSorterPoolSetSummary |> List.rev |> List.toArray)
+                                                currentSummaries
 
                                         let stepRp = rp.WithGenerationCurrent(Some currentGen)
 
@@ -228,7 +213,7 @@ module EvolutionOrchestrator =
                                         // Save SorterPoolEvalBinsSetCollection
                                         let collectionId = Guid.NewGuid() |> UMX.tag<sorterPoolEvalBinsSetCollectionId>
                                         let evalBinsCollection = 
-                                                sorterPoolEvalBinsSetCollection.create collectionId (updatedEvalBinsSetAcc |> List.rev)
+                                            sorterPoolEvalBinsSetCollection.create collectionId (updatedEvalBinsSetAcc |> List.rev)
 
                                         let! qpBinsCollection = 
                                             genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolEvalBinsSetCollection "")
@@ -247,21 +232,18 @@ module EvolutionOrchestrator =
                                         log (sprintf "Saving SorterPoolSetHistory checkpoint at Generation %d..." %currentGen)
                                         do! genDb.saveAsync qpHistory (poolSetHistory |> outputData.SorterPoolSetHistory) allowOverwrite
 
-                                        if cts.IsCancellationRequested then return! Error "runEvolutionAsync was cancelled."
                                         return ([], [], prunedRunningMap)
                                     else
                                         return (updatedSorterPoolSetSummary, updatedEvalBinsSetAcc, updatedRunningHistoryMap)
                                 }
 
-                            // Forced GC Compacting
-                            if remainingSteps % 50 = 0 then
-                                System.Runtime.GCSettings.LargeObjectHeapCompactionMode 
-                                        <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
-                                GC.Collect(2, GCCollectionMode.Forced, true, true)
+                            //// Forced GC Compacting
+                            //if remainingSteps % 50 = 0 then
+                            //    triggerCompactingGC ()
 
                             return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext evalBinsSetAccNext runningMemberHistoryMapNext
                     }
 
                 // Execute loop with empty initial states
-                return! loop %totalGen initialPoolSet [] [] Map.empty
-    }
+                return! loop %totalGen initialPoolSet [] [] RunningMemberHistoryMap.empty
+        }
