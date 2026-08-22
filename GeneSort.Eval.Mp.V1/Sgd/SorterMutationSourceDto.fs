@@ -18,7 +18,7 @@ type sorterMutationSourceDto = {
 
 module SorterMutationSourceDto =
     
-    let toDto (domain: sorterMutationSource) : sorterMutationSourceDto =
+    let toDto (domain: sorterMutationSourceOld) : sorterMutationSourceDto =
         {
             sorterModelMutatorId = UMX.untag domain.SorterModelMutatorId
             sorterModelId = UMX.untag domain.SorterModelId
@@ -28,8 +28,8 @@ module SorterMutationSourceDto =
         }
 
 
-    let fromDto (dto: sorterMutationSourceDto) : sorterMutationSource =
-        sorterMutationSource.create
+    let fromDto (dto: sorterMutationSourceDto) : sorterMutationSourceOld =
+        sorterMutationSourceOld.create
             (UMX.tag<sorterModelMutatorId> dto.sorterModelMutatorId)
             (UMX.tag<sorterModelId> dto.sorterModelId)
             (UMX.tag<mutationIndex> dto.mutationIndex)

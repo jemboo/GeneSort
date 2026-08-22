@@ -151,16 +151,6 @@ module EvolutionOrchestrator =
                                     currentSorterPoolSet
 
 
-                            let parentModelToMemberIdMap =
-                                currentSorterPoolSet.SorterPools
-                                |> Map.fold (fun acc _ pool ->
-                                    pool.SorterPoolMembers
-                                    |> Seq.fold (fun innerAcc spm ->
-                                        let modelId = SorterModel.getId spm.SorterModel
-                                        Map.add modelId spm.SorterPoolMemberId innerAcc
-                                    ) acc
-                                ) Map.empty
-
                             // Step Evolution
                             let reEvaluateParents = (remainingSteps % 10 = 0)
 
@@ -178,6 +168,17 @@ module EvolutionOrchestrator =
                                     poolSetForStep
                                     collectNewSortableTests
                                     sortedFractionThreshold
+
+
+                            let parentModelToMemberIdMap =
+                                currentSorterPoolSet.SorterPools
+                                |> Map.fold (fun acc _ pool ->
+                                    pool.SorterPoolMembers
+                                    |> Seq.fold (fun innerAcc spm ->
+                                        let modelId = SorterModel.getId spm.SorterModel
+                                        Map.add modelId spm.SorterPoolMemberId innerAcc
+                                    ) acc
+                                ) Map.empty
 
 
                             let updatedRunningHistoryMap =

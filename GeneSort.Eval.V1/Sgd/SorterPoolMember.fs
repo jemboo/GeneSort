@@ -13,7 +13,7 @@ type sorterPoolMember =
         _sorterModel:          sorterModel
         _mutationIndex:        int<mutationIndex>
         _mutationMod:          int<mutationMod>
-        _sorterMutationSource: sorterMutationSource option
+        _sorterMutationSource: sorterMutationSourceOld option
         _sorterEval:           sorterEval option
         _birthday:             int<generationNumber>
     }
@@ -100,7 +100,7 @@ module SorterPoolMember =
                     | None -> (0<ceLength>, 0<stageLength>)
                 
                 let mutationSource = 
-                    sorterMutationSource.create 
+                    sorterMutationSourceOld.create 
                         mutatorId 
                         parentModelId 
                         individualMutationIndex
