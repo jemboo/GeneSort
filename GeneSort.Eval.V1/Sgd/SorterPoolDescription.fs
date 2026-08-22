@@ -12,7 +12,7 @@ type spmDescription =
         _sorterPoolMemberId:   Guid<sorterPoolMemberId>
         _sorterModelId:        Guid<sorterModelId>
         _mutationIndex:        int<mutationIndex>
-        _sorterMutationSource: sorterMutationSourceOld option
+        _sorterMutationSource: sorterMutationSource option
         _sorterEval:           sorterEval option
         _birthday:             int<generationNumber>
     }
@@ -49,7 +49,7 @@ module SpmDescription =
         // 2. Flatten optional sorterMutationSource properties if present
         let sourceRecord =
             match spmDesc.SorterMutationSource with
-            | Some source -> source |> SorterMutationSourceOld.toDataTableRecordWithPrefix prefix
+            | Some source -> source |> SorterMutationSource.toDataTableRecordWithPrefix prefix
             | None -> dataTableRecord.createEmpty()
 
         // 3. Flatten optional sorterEval metrics if present

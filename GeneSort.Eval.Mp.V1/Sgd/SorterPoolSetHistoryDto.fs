@@ -23,12 +23,11 @@ type sorterPoolMemberHistoryDto = {
     
     // Lineage Details
     [<Key(7)>] ParentSorterPoolMemberId: Nullable<Guid>
-    [<Key(8)>] ParentSorterModelId: Nullable<Guid>
-    [<Key(9)>] MutatorId: Nullable<Guid>
-    [<Key(10)>] ParentMutationIndex: Nullable<int>
+    [<Key(8)>] MutatorId: Nullable<Guid>
+    [<Key(9)>] ParentMutationIndex: Nullable<int>
     
     // Evaluation at V2 level
-    [<Key(11)>] EvalV2: sorterEvalV2Dto option
+    [<Key(10)>] EvalV2: sorterEvalV2Dto option
 }
 
 module SorterPoolMemberHistoryDto =
@@ -58,7 +57,6 @@ module SorterPoolMemberHistoryDto =
             MutationMod = %domain.MutationMod
             
             ParentSorterPoolMemberId = domain.ParentSorterPoolMemberId |> Option.map (fun id -> %id) |> Option.toNullable
-            ParentSorterModelId = domain.ParentSorterModelId |> Option.map (fun id -> %id) |> Option.toNullable
             MutatorId = domain.MutatorId |> Option.map (fun id -> %id) |> Option.toNullable
             ParentMutationIndex = domain.ParentMutationIndex |> Option.map (fun idx -> %idx) |> Option.toNullable
             
@@ -80,20 +78,19 @@ module SorterPoolMemberHistoryDto =
                     (v2Dto.StageCrossingsCount |> UMX.tag)
             )
 
-        sorterPoolMemberHistory.create(
-            sorterPoolId = UMX.tag dto.SorterPoolId,
-            sorterPoolMemberId = UMX.tag dto.SorterPoolMemberId,
-            sorterModelId = UMX.tag dto.SorterModelId,
-            birthday = UMX.tag dto.Birthday,
-            saveGeneration = UMX.tag dto.SaveGeneration,
-            mutationIndex = UMX.tag dto.MutationIndex,
-            mutationMod = UMX.tag dto.MutationMod,
-            parentSorterPoolMemberId = (dto.ParentSorterPoolMemberId |> Option.ofNullable |> Option.map UMX.tag),
-            parentSorterModelId = (dto.ParentSorterModelId |> Option.ofNullable |> Option.map UMX.tag),
-            mutatorId = (dto.MutatorId |> Option.ofNullable |> Option.map UMX.tag),
-            parentMutationIndex = (dto.ParentMutationIndex |> Option.ofNullable |> Option.map UMX.tag),
-            evalV2 = v2Domain
-        )
+        sorterPoolMemberHistory.create
+            (UMX.tag dto.SorterPoolId)
+            (UMX.tag dto.SorterPoolMemberId)
+            (UMX.tag dto.SorterModelId)
+            (UMX.tag dto.Birthday)
+            (UMX.tag dto.SaveGeneration)
+            (UMX.tag dto.MutationIndex)
+            (UMX.tag dto.MutationMod)
+            (dto.ParentSorterPoolMemberId |> Option.ofNullable |> Option.map UMX.tag)
+            (dto.MutatorId |> Option.ofNullable |> Option.map UMX.tag)
+            (dto.ParentMutationIndex |> Option.ofNullable |> Option.map UMX.tag)
+            v2Domain
+
 
 // ----------------------------------------------------------------------------
 // sorterPoolHistoryDto

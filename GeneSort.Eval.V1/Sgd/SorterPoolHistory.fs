@@ -25,7 +25,6 @@ type sorterPoolHistory =
     member this.SaveGeneration with get() = this.saveGeneration
     member this.MemberHistories with get() = this.memberHistories
 
-
 module SorterPoolHistory =
 
     /// Updates running tracked history for a pool with all members generated in currentGen,
@@ -36,23 +35,15 @@ module SorterPoolHistory =
             (runningPoolMemberHistory: Map<Guid<sorterPoolMemberId>, sorterPoolMemberHistory>) 
             : sorterPoolHistory * Map<Guid<sorterPoolMemberId>, sorterPoolMemberHistory> =
 
-        // Map parent sorter model IDs to member IDs for lookup when instantiating new child member histories
-        let modelToMemberIdMap =
-            runningPoolMemberHistory
-            |> Map.toSeq
-            |> Seq.map (fun (memberId, hist) -> hist.SorterModelId, memberId)
-            |> Map.ofSeq
-
-        // 1. Ingest all current members into tracking map
+        // 1. Ingest all current members directly using ParentSorterPoolMemberId
         let updatedTrackedMap = 
             pool.SorterPoolMembers 
             |> Seq.fold (fun acc spm ->
                 if Map.containsKey spm.SorterPoolMemberId acc then acc
                 else
-                    // Resolve parent member ID by matching parent model ID against previously recorded histories
                     let parentMemberId =
                         spm.SorterMutationSource
-                        |> Option.bind (fun src -> Map.tryFind src.SorterModelId modelToMemberIdMap)
+                        |> Option.map (fun src -> src.SorterPoolMemberId)
 
                     let hist = SorterPoolMemberHistory.fromPoolMember pool.SorterPoolId parentMemberId currentGen spm
                     Map.add spm.SorterPoolMemberId hist acc
@@ -84,7 +75,6 @@ module SorterPoolHistory =
                         collectAncestors rest newVisited
 
         let keptMemberIds = collectAncestors (Set.toList aliveMemberIds) Set.empty
-
 
         // 4. Prune entries from history map that have no living descendants
         let prunedTrackedMap = 

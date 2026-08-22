@@ -155,7 +155,7 @@ module EvolutionOrchestrator =
                             let reEvaluateParents = (remainingSteps % 10 = 0)
 
                             let nextSorterPoolSet = 
-                                SorterPipeline.runGenerationStepDebug 
+                                SorterPipeline.runGenerationStepDebug
                                     mutator 
                                     currentSorterCountPerPool
                                     sorterChildCount
@@ -169,18 +169,7 @@ module EvolutionOrchestrator =
                                     collectNewSortableTests
                                     sortedFractionThreshold
 
-
-                            let parentModelToMemberIdMap =
-                                currentSorterPoolSet.SorterPools
-                                |> Map.fold (fun acc _ pool ->
-                                    pool.SorterPoolMembers
-                                    |> Seq.fold (fun innerAcc spm ->
-                                        let modelId = SorterModel.getId spm.SorterModel
-                                        Map.add modelId spm.SorterPoolMemberId innerAcc
-                                    ) acc
-                                ) Map.empty
-
-
+                            // Track all generated members using direct parent reference
                             let updatedRunningHistoryMap =
                                 nextSorterPoolSet.SorterPools
                                 |> Map.fold (fun acc poolId pool ->
@@ -191,10 +180,9 @@ module EvolutionOrchestrator =
                                             if Map.containsKey spm.SorterPoolMemberId pmAcc then 
                                                 pmAcc
                                             else
-                                                // Resolve parent sorterPoolMemberId via parent's sorterModelId
                                                 let parentMemberId = 
                                                     spm.SorterMutationSource 
-                                                    |> Option.bind (fun src -> Map.tryFind src.SorterModelId parentModelToMemberIdMap)
+                                                    |> Option.map (fun src -> src.SorterPoolMemberId)
 
                                                 let pmHist = 
                                                     SorterPoolMemberHistory.fromPoolMember 
