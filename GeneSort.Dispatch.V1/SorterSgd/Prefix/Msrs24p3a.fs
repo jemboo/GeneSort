@@ -36,15 +36,18 @@ module Msrs24p3a =
           .WithSortableTestFilter(Some stf)
           .WithSortingWidth(Some stf.sortingWidth)
 
+
     module PoolSzComp =
 
         let dbNamePoolsTest = "PoolsTest" |> UMX.tag<databaseName>
-        let dbNamePools4098_1_vs_512 = "Pools4098_1_vs_512" |> UMX.tag<databaseName>
-        let dbNamePools4098_2_vs_256 = "Pools4098_2_vs_256" |> UMX.tag<databaseName>
+        let dbNamePools4096_1_vs_512 = "Pools4098_1_vs_512" |> UMX.tag<databaseName>
+        let dbNamePools4096_2_vs_256 = "Pools4098_2_vs_256" |> UMX.tag<databaseName>
+        let dbNamePools4096_4096 = "Pools4098_4098" |> UMX.tag<databaseName>
         let dbNamePoolSz128 = "PoolSz128" |> UMX.tag<databaseName>
         let dbFolderTest = @$"c:\Projects\{%projName}\{%dbNamePoolsTest}\Data" |> UMX.tag<pathToRootFolder>
-        let dbFolderPools4098a = @$"c:\Projects\{%projName}\{%dbNamePools4098_1_vs_512}\Data" |> UMX.tag<pathToRootFolder>
-        let dbFolderPools4098b = @$"c:\Projects\{%projName}\{%dbNamePools4098_2_vs_256}\Data" |> UMX.tag<pathToRootFolder>
+        let dbFolderPools4098a = @$"c:\Projects\{%projName}\{%dbNamePools4096_1_vs_512}\Data" |> UMX.tag<pathToRootFolder>
+        let dbFolderPools4098b = @$"c:\Projects\{%projName}\{%dbNamePools4096_2_vs_256}\Data" |> UMX.tag<pathToRootFolder>
+        let dbFolderPools4098c = @$"c:\Projects\{%projName}\{%dbNamePools4096_4096}\Data" |> UMX.tag<pathToRootFolder>
 
         let makeQueryParams
                 (repl: int<replNumber>)
@@ -123,12 +126,15 @@ module Msrs24p3a =
         let dbTest = new GeneSortGenDbMp(dbFolderTest, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
         let dbPools4098a = new GeneSortGenDbMp(dbFolderPools4098a, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
         let dbPools4098b = new GeneSortGenDbMp(dbFolderPools4098b, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
+        let dbPools4098c = new GeneSortGenDbMp(dbFolderPools4098c, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
+
 
         let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
             [ 
                 (dbNamePoolsTest, dbTest :> IGeneSortDb);
-                (dbNamePools4098_1_vs_512, dbPools4098a :> IGeneSortDb);
-                (dbNamePools4098_2_vs_256, dbPools4098b :> IGeneSortDb);
+                (dbNamePools4096_1_vs_512, dbPools4098a :> IGeneSortDb);
+                (dbNamePools4096_2_vs_256, dbPools4098b :> IGeneSortDb);
+                (dbNamePools4096_4096, dbPools4098c :> IGeneSortDb);
             ]
             |> Map.ofList
 
@@ -164,7 +170,7 @@ module Msrs24p3a =
 
 
             let PoolSz_1n512 (executorType: sorterSgdExecutorType)  : runHostSpec = {
-                databaseName = dbNamePools4098_1_vs_512
+                databaseName = dbNamePools4096_1_vs_512
                 runName = sprintf @"PoolSz_1_vs_512_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
                 runDescription = "Pool size comp (1 vs 512) for 24pfx3a Msrs"
                 spans = [
@@ -181,7 +187,7 @@ module Msrs24p3a =
 
 
             let PoolSz_2n256 (executorType: sorterSgdExecutorType)  : runHostSpec = {
-                databaseName = dbNamePools4098_2_vs_256
+                databaseName = dbNamePools4096_2_vs_256
                 runName = sprintf @"PoolSz_2_vs_256_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
                 runDescription = "Pool size comp (2 vs 256) for 24pfx3a Msrs"
                 spans = [
@@ -197,4 +203,18 @@ module Msrs24p3a =
             }
 
 
-
+            let PoolSz_4096 (executorType: sorterSgdExecutorType)  : runHostSpec = {
+                databaseName = dbNamePools4096_4096
+                runName = sprintf @"PoolSz_4096_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+                runDescription = "Pool size 4096 for 24pfx3a Msrs"
+                spans = [
+                    (runParameters.generationCurrentKey, [0] |> List.map string)
+                    (runParameters.generationIntervalCountKey, [5] |> List.map string)
+                    (runParameters.sorterCountPerPoolKey, ["4096";])
+                    (runParameters.mutationModKey, [0 .. 63;] |> List.map string)
+                ]
+                filter = paramMapFilter
+                enhancer = finishRunParams
+                allowOverwrite = false |> UMX.tag
+                maxParallel = 16
+            }
