@@ -16,6 +16,7 @@ type sorterPoolMemberHistory =
         mutationIndex: int<mutationIndex>
         mutationMod: int<mutationMod>
         parentSorterPoolMemberId: Guid<sorterPoolMemberId> option
+        parentSorterPoolId: Guid<sorterPoolId> option
         mutatorId: Guid<sorterModelMutatorId> option
         parentMutationIndex: int<mutationIndex> option
         evalV2: sorterEvalV2 option
@@ -30,6 +31,7 @@ type sorterPoolMemberHistory =
             (mutationIndex: int<mutationIndex>)
             (mutationMod: int<mutationMod>)
             (parentSorterPoolMemberId: Guid<sorterPoolMemberId> option)
+            (parentSorterPoolId: Guid<sorterPoolId> option)
             (mutatorId: Guid<sorterModelMutatorId> option)
             (parentMutationIndex: int<mutationIndex> option)
             (evalV2: sorterEvalV2 option) : sorterPoolMemberHistory =
@@ -42,6 +44,7 @@ type sorterPoolMemberHistory =
             mutationIndex = mutationIndex
             mutationMod = mutationMod
             parentSorterPoolMemberId = parentSorterPoolMemberId
+            parentSorterPoolId = parentSorterPoolId
             mutatorId = mutatorId
             parentMutationIndex = parentMutationIndex
             evalV2 = evalV2
@@ -55,6 +58,7 @@ type sorterPoolMemberHistory =
     member this.MutationIndex with get() = this.mutationIndex
     member this.MutationMod with get() = this.mutationMod
     member this.ParentSorterPoolMemberId with get() = this.parentSorterPoolMemberId
+    member this.ParentSorterPoolId with get() = this.parentSorterPoolId
     member this.MutatorId with get() = this.mutatorId
     member this.ParentMutationIndex with get() = this.parentMutationIndex
     member this.EvalV2 with get() = this.evalV2
@@ -66,6 +70,7 @@ module SorterPoolMemberHistory =
     let fromPoolMember 
             (poolId: Guid<sorterPoolId>) 
             (parentSorterPoolMemberId: Guid<sorterPoolMemberId> option)
+            (parentSorterPoolId: Guid<sorterPoolId> option)
             (currentGen: int<generationNumber>) 
             (spm: sorterPoolMember) : sorterPoolMemberHistory =
             
@@ -83,6 +88,7 @@ module SorterPoolMemberHistory =
             spm.MutationIndex
             spm.MutationMod
             parentSorterPoolMemberId
+            parentSorterPoolId
             (spm.SorterMutationSource |> Option.map (fun src -> src.SorterModelMutatorId))
             (spm.SorterMutationSource |> Option.map (fun src -> src.SorterMutationIndex))
             v2Eval
@@ -100,6 +106,7 @@ module SorterPoolMemberHistory =
             
             // Parent Lineage fields
             |> dataTableRecord.addData "ParentSorterPoolMemberId" (snapshot.ParentSorterPoolMemberId |> Option.map (fun id -> string %id) |> Option.defaultValue "")
+            |> dataTableRecord.addData "ParentSorterPoolId" (snapshot.ParentSorterPoolId |> Option.map (fun id -> string %id) |> Option.defaultValue "")
             |> dataTableRecord.addData "MutatorId" (snapshot.MutatorId |> Option.map (fun id -> string %id) |> Option.defaultValue "")
             |> dataTableRecord.addData "ParentMutationIndex" (snapshot.ParentMutationIndex |> Option.map (fun idx -> string %idx) |> Option.defaultValue "")
 

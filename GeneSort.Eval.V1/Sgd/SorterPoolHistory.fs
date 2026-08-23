@@ -44,8 +44,13 @@ module SorterPoolHistory =
                     let parentMemberId =
                         spm.SorterMutationSource
                         |> Option.map (fun src -> src.SorterPoolMemberId)
+                    let parentPoolId =
+                        spm.SorterMutationSource
+                        |> Option.map (fun src -> src.SorterPoolId)
 
-                    let hist = SorterPoolMemberHistory.fromPoolMember pool.SorterPoolId parentMemberId currentGen spm
+                    let hist = SorterPoolMemberHistory.fromPoolMember 
+                                    pool.SorterPoolId parentMemberId 
+                                    parentPoolId currentGen spm
                     Map.add spm.SorterPoolMemberId hist acc
             ) runningPoolMemberHistory
 

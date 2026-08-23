@@ -50,6 +50,7 @@ module RunningMemberHistoryMap =
                                 SorterPoolMemberHistory.fromPoolMember 
                                     poolId 
                                     parentMemberId 
+                                    None
                                     currentGen 
                                     spm
 

@@ -11,7 +11,8 @@ open GeneSort.Eval.V1.Sgd
 type sorterMutationSourceDto = {
     [<Key(0)>] sorterModelMutatorId: Guid
     [<Key(1)>] sorterPoolMemberId: Guid
-    [<Key(2)>] mutationIndex: int
+    [<Key(2)>] sorterPoolId: Guid
+    [<Key(3)>] mutationIndex: int
 }
 
 module SorterMutationSourceDto =
@@ -20,6 +21,7 @@ module SorterMutationSourceDto =
         {
             sorterModelMutatorId = UMX.untag domain.SorterModelMutatorId
             sorterPoolMemberId = UMX.untag domain.SorterPoolMemberId
+            sorterPoolId = UMX.untag domain.SorterPoolId
             mutationIndex = UMX.untag domain.SorterMutationIndex
         }
 
@@ -27,4 +29,5 @@ module SorterMutationSourceDto =
         sorterMutationSource.create
             (UMX.tag<sorterModelMutatorId> dto.sorterModelMutatorId)
             (UMX.tag<sorterPoolMemberId> dto.sorterPoolMemberId)
+            (UMX.tag<sorterPoolId> dto.sorterPoolId)
             (UMX.tag<mutationIndex> dto.mutationIndex)

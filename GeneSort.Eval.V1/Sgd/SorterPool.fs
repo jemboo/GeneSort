@@ -166,6 +166,7 @@ module SorterPool =
                     SorterPoolMember.mutate 
                             sorterModelMut 
                             currentMember 
+                            pool.SorterPoolId
                             mutantsPerSorter
                             currentGeneration
 

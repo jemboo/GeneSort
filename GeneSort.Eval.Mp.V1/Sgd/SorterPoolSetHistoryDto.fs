@@ -23,11 +23,12 @@ type sorterPoolMemberHistoryDto = {
     
     // Lineage Details
     [<Key(7)>] ParentSorterPoolMemberId: Nullable<Guid>
-    [<Key(8)>] MutatorId: Nullable<Guid>
-    [<Key(9)>] ParentMutationIndex: Nullable<int>
+    [<Key(8)>] ParentSorterPoolId: Nullable<Guid>
+    [<Key(9)>] MutatorId: Nullable<Guid>
+    [<Key(10)>] ParentMutationIndex: Nullable<int>
     
     // Evaluation at V2 level
-    [<Key(10)>] EvalV2: sorterEvalV2Dto option
+    [<Key(11)>] EvalV2: sorterEvalV2Dto option
 }
 
 module SorterPoolMemberHistoryDto =
@@ -57,6 +58,7 @@ module SorterPoolMemberHistoryDto =
             MutationMod = %domain.MutationMod
             
             ParentSorterPoolMemberId = domain.ParentSorterPoolMemberId |> Option.map (fun id -> %id) |> Option.toNullable
+            ParentSorterPoolId = domain.ParentSorterPoolId |> Option.map (fun id -> %id) |> Option.toNullable
             MutatorId = domain.MutatorId |> Option.map (fun id -> %id) |> Option.toNullable
             ParentMutationIndex = domain.ParentMutationIndex |> Option.map (fun idx -> %idx) |> Option.toNullable
             
@@ -87,6 +89,7 @@ module SorterPoolMemberHistoryDto =
             (UMX.tag dto.MutationIndex)
             (UMX.tag dto.MutationMod)
             (dto.ParentSorterPoolMemberId |> Option.ofNullable |> Option.map UMX.tag)
+            (dto.ParentSorterPoolId |> Option.ofNullable |> Option.map UMX.tag)
             (dto.MutatorId |> Option.ofNullable |> Option.map UMX.tag)
             (dto.ParentMutationIndex |> Option.ofNullable |> Option.map UMX.tag)
             v2Domain
