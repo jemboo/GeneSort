@@ -32,6 +32,7 @@ type sorterPoolDto = {
     [<Key(2)>] sorterPoolMemberDtos: sorterPoolMemberDto array
     [<Key(3)>] ceLength: int
     [<Key(4)>] mutationMod: int
+    [<Key(5)>] parentSorterPoolId: Nullable<Guid>
 }
 
 [<MessagePackObject>]
@@ -63,11 +64,14 @@ module SorterPoolSetDto =
                     )
                     |> Seq.toArray
 
-                { sorterPoolId = %p.SorterPoolId; 
-                  name = %p.Name; 
-                  sorterPoolMemberDtos = memberDtos; 
-                  ceLength = %p.RawCeLength 
-                  mutationMod = %p.MutationMod }
+                { 
+                    sorterPoolId = %p.SorterPoolId
+                    name = %p.Name
+                    sorterPoolMemberDtos = memberDtos
+                    ceLength = %p.RawCeLength
+                    mutationMod = %p.MutationMod
+                    parentSorterPoolId = p.ParentSorterPoolId |> Option.map UMX.untag |> Option.toNullable
+                }
             )
             |> Seq.toArray
         {
@@ -75,6 +79,7 @@ module SorterPoolSetDto =
             generationNumber = UMX.untag domain.GenerationNumber
             sorterPools = poolDtos
         }
+
 
     let fromDto (dto: sorterPoolSetDto) : sorterPoolSet =
         let pools =
@@ -95,12 +100,17 @@ module SorterPoolSetDto =
                             evalOpt
                             (UMX.tag m.birthday)
                     )
+                let parentIdOpt = 
+                    p.parentSorterPoolId 
+                    |> Option.ofNullable 
+                    |> Option.map UMX.tag<sorterPoolId>
+
                 sorterPool.create 
-                            (p.sorterPoolId |> UMX.tag<sorterPoolId>) 
-                            (p.name |> UMX.tag<sorterPoolName>) 
-                            members
-                            (p.ceLength |> UMX.tag<ceLength> )
-                            (p.mutationMod |> UMX.tag<mutationMod>)
+                    (p.sorterPoolId |> UMX.tag<sorterPoolId>) 
+                    parentIdOpt
+                    (p.name |> UMX.tag<sorterPoolName>) 
+                    members
+                    (p.ceLength |> UMX.tag<ceLength>)
+                    (p.mutationMod |> UMX.tag<mutationMod>)
             )
         sorterPoolSet.create(UMX.tag dto.sorterPoolSetId, UMX.tag dto.generationNumber, pools)
-

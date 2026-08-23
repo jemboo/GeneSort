@@ -87,7 +87,6 @@ module SorterPoolSet =
             sorterPoolSet.create(poolSet.SorterPoolSetId, poolSet.GenerationNumber, updatedPools)
 
 
-
     // Increases the poolSet.PoolCount by a factor of sorterPoolExpansionRate.
     // Assigns distinct mutationMod values [0 .. (sorterPoolExpansionRate - 1)] to each new pool
     let expandPools (sorterPoolExpansionRate: int<sorterPoolExpansionRate>) 
@@ -118,6 +117,7 @@ module SorterPoolSet =
                         // Re-create the pool with a fresh pool ID while preserving name and members
                         sorterPool.create
                             newPoolId
+                            (Some parentPool.SorterPoolId)
                             mutatedPool.Name
                             (mutatedPool.SorterPoolMembers |> Seq.toArray)
                             mutatedPool.RawCeLength
@@ -256,6 +256,7 @@ module SorterPoolSet =
                 let poolId = Guid.NewGuid() |> UMX.tag<sorterPoolId>
                 sorterPool.create 
                         poolId 
+                        None
                         poolName 
                         sorterPoolMembers 
                         modelSet.RawCeLength 

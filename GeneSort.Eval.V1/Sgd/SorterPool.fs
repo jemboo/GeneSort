@@ -16,10 +16,12 @@ type sorterPool =
         _sorterPoolMembers: Map<Guid<sorterPoolMemberId>, sorterPoolMember>
         _rawCeLength: int<ceLength>
         _mutationMod: int<mutationMod>
+        _parentSorterPoolId: Guid<sorterPoolId> option
     }
 
     member this.MutationMod with get() = this._mutationMod
     member this.Name with get() = this._name
+    member this.ParentSorterPoolId = this._parentSorterPoolId
     member this.RawCeLength with get() = this._rawCeLength
     member this.SorterPoolMembers with get() :sorterPoolMember seq =
         Map.values this._sorterPoolMembers
@@ -27,6 +29,7 @@ type sorterPool =
 
     static member create 
             (sorterPoolId: Guid<sorterPoolId>) 
+            (parentSorterPoolId: Guid<sorterPoolId> option)
             (name: string<sorterPoolName>)
             (members: sorterPoolMember []) 
             (rawCeLength: int<ceLength>) 
@@ -38,6 +41,7 @@ type sorterPool =
         { 
             _name = name
             _sorterPoolId = sorterPoolId
+            _parentSorterPoolId = parentSorterPoolId
             _sorterPoolMembers = membersMap
             _rawCeLength = rawCeLength
             _mutationMod = mutationMod
@@ -230,6 +234,7 @@ module SorterPool =
             // Re-create the pool with the newly calculated cutoff as RawCeLength
             sorterPool.create 
                 pool.SorterPoolId 
+                pool.ParentSorterPoolId
                 pool.Name 
                 updatedMembers 
                 (UMX.tag<ceLength> %thresholdLastCeIndex)
@@ -299,11 +304,12 @@ module SorterPool =
             |> Seq.toArray
 
         sorterPool.create 
-                    pool.SorterPoolId 
-                    pool.Name 
-                    sortedSurvivors
-                    pool.RawCeLength 
-                    pool.MutationMod
+                pool.SorterPoolId 
+                pool.ParentSorterPoolId
+                pool.Name 
+                sortedSurvivors
+                pool.RawCeLength 
+                pool.MutationMod
 
 
 
@@ -394,7 +400,8 @@ module SorterPool =
             Debugger.Break() // Pause if final truncation resulted in an empty pool
 
         sorterPool.create 
-                    pool.SorterPoolId 
+                    pool.SorterPoolId
+                    pool.ParentSorterPoolId
                     pool.Name 
                     truncatedSurvivors
                     pool.RawCeLength 
