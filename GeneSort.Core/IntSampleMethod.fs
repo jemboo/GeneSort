@@ -237,6 +237,8 @@ module SampleRegistry =
         let dict = Dictionary<string, samplingConfig>()
         let add cfg = dict.Add(cfg.Name, cfg)
 
+
+
         //uniformInterval2             : [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
         //uniformInterval10            : [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
         //uniformInterval100           : [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000]
@@ -248,10 +250,10 @@ module SampleRegistry =
         add (createConfig "uniformInterval500" 1 noMaxCount scale500 (Constant 1))
         add (createConfig "uniformInterval1000" 1 noMaxCount scale1000 (Constant 1))
 
-        //summaryInterval_C.2C         : [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 14, 15, 17, 18, 20, 21, 23, 24, 26]
-        //summaryInterval_C.5C         : [... 25, 26, 27, 28, 29, 30, 32, 33, 34, 36, 37, 39, 40, 42, 43, 45, 47, 49, 51, 53]
-        //summaryInterval_C.K          : [... 25, 26, 27, 28, 29, 31, 32, 33, 35, 36, 38, 39, 41, 43, 45, 47, 49, 51, 53, 56]
-        //summaryInterval_C.5K         : [... 25, 26, 27, 28, 29, 31, 32, 34, 35, 37, 39, 41, 43, 45, 48, 50, 53, 56, 59, 62]
+        //summaryInterval_C.2C         : [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 14, 15, 17, 18, 20, 21, 23, 24, 26, 28, 30, 32, 33, 35, 37, 40, 42, 44, 46]
+        //summaryInterval_C.5C         : [1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 13, 15, 16, 18, 19, 21, 23, 25, 27, 29, 31, 33, 36, 38, 41, 43, 46, 49, 52, 55]
+        //summaryInterval_C.K          : [1, 2, 3, 4, 5, 7, 8, 9, 11, 12, 14, 15, 17, 19, 21, 23, 25, 27, 29, 32, 34, 37, 40, 42, 46, 49, 52, 56, 59, 63]
+        //summaryInterval_C.5K         : [1, 2, 3, 4, 5, 7, 8, 10, 11, 13, 15, 17, 19, 21, 24, 26, 29, 32, 35, 38, 42, 46, 50, 54, 59, 64, 70, 75, 82, 88]
         add (createConfig "summaryInterval_C.2C" 1 noMaxCount scale1 (Exponential (0.03, 1)))
         add (createConfig "summaryInterval_C.5C" 1 noMaxCount scale1 (Exponential (0.041, 1)))
         add (createConfig "summaryInterval_C.K" 1 noMaxCount scale1 (Exponential (0.05, 1)))
@@ -260,13 +262,15 @@ module SampleRegistry =
         //emptyInterval                : [<empty>]
         //uniformInterval5_L5          : [5, 10, 15, 20, 25]
         //uniformInterval5_L10         : [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-        //expInterval25_L5             : [25, 65, 125, 215, 350]
-        //expInterval25_L20            : [25, 55, 94, 145, 211, 296, 408, 552, 741, 985]
-        //expInterval50_L10            : [50, 125, 238, 406, 659]
-        //expInterval100_L10           : [100, 250, 475, 812]
         add (createConfig "emptyInterval" 0 maxCount0 scale1 (Constant 1))
         add (createConfig "uniformInterval5_L5" 1 maxCount5 scale5 (Constant 1))
         add (createConfig "uniformInterval5_L10" 1 maxCount10 scale5 (Constant 1))
+
+        //expInterval25_L5             : [25, 65, 125, 215, 350]
+        //expInterval25_L20            : [25, 55, 94, 145, 211, 296, 408, 552, 741, 985, 1304, 1717, 2255, 2954, 3862, 5044, 6579, 8575, 11171, 14544]
+        //expInterval50_L10            : [50, 125, 238, 406, 659, 1039, 1609, 2463, 3744, 5667]
+        //expInterval100_L10           : [100, 250, 475, 812, 1319, 2078, 3217, 4926, 7489, 11333]
+        //expInterval100_L50           : [100, 250, 475, 812, 1319, 2078, 3217, 4926, 7489, 11333, 17100, 25749, 38724, 58186, 87379]
         add (createConfig "expInterval25_L5" 25 maxCount5 scale1 (Exponential (0.5, 40)))
         add (createConfig "expInterval25_L20" 25 maxCount20 scale1 (Exponential (0.3, 30)))
         add (createConfig "expInterval50_L10" 50 maxCount10 scale1 (Exponential (0.5, 75)))

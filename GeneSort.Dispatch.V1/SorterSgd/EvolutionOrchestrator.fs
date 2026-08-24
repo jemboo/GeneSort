@@ -245,5 +245,5 @@ module EvolutionOrchestrator =
                     }
 
                 // Execute loop with empty initial states
-                return! loop %totalGen initialPoolSet [] [] RunningMemberHistoryMap.empty
+                return! loop (%totalGen - %genStart) initialPoolSet [] [] RunningMemberHistoryMap.empty
         }
