@@ -1,5 +1,4 @@
-﻿
-namespace GeneSort.FileDb.V1
+﻿namespace GeneSort.FileDb.V1
 
 open System
 open System.IO
@@ -65,6 +64,12 @@ type GeneSortGenDbMp(
                     | Error _ -> return None
             }
 
+        member _.doesOutPutDataExist (queryParams: queryParams) =
+            async {
+                let filePath = OutputDataFile.getFullOutputDataFilePath rootFolder queryParams
+                return File.Exists %filePath
+            }
+
         member _.getRunParameters 
                             (runName: string<runName>) 
                             (minReplNumber: int<replNumber> option) 
@@ -73,6 +78,7 @@ type GeneSortGenDbMp(
                             (progress: IProgress<string> option) =
                     mailbox.PostAndAsyncReply(fun channel -> 
                         GetRunParameters(runName, minReplNumber, maxReplNumber, ct, progress, channel))
+
 
     interface IGeneSortGenDb with
         member _.getGenSaveIntervals () = genSaveIntervals
@@ -95,31 +101,35 @@ type GeneSortGenDbMp(
                 else
                     let db = this :> IGeneSortDb
 
-                    // Binary search for the highest existing checkpoint index
-                    let rec binarySearch low high bestMatch =
+                    // Helper to build queryParams for a given interval index
+                    let getQueryParams index =
+                        let currentGen = intervals.[index]
+                        let wrp = baseRunParams.WithGenerationCurrent(Some currentGen)
+                        match db.MakeQueryParamsFromRunParams wrp odt with
+                        | Some qp -> qp
+                        | None -> failwithf "Failed to create QueryParams from RunParams for generation %d and output type %A." %currentGen odt
+
+                    // Binary search to find the maximum index where the output file exists
+                    let rec findHighestExistingIndex low high bestIdx =
                         async {
                             if low > high then
-                                return bestMatch
+                                return bestIdx
                             else
                                 let mid = low + (high - low) / 2
-                                let currentGen = intervals.[mid]
-                                let wrp = baseRunParams.WithGenerationCurrent(Some currentGen)
-                        
-                                // Handle the query parameter resolution failure immediately
-                                match db.MakeQueryParamsFromRunParams wrp odt with
-                                | None -> 
-                                    return failwithf "Failed to create QueryParams from RunParams for generation %d and output type %A." %currentGen odt
-                                | Some targetQueryParams ->
-                                    let! itemOpt = db.loadIfFoundAsync targetQueryParams
-                            
-                                    match itemOpt with
-                                    | Some data -> 
-                                        // Found at mid! Search right half for higher saved generations
-                                        return! binarySearch (mid + 1) high (Some data)
-                                    | None -> 
-                                        // Missing at mid; search left half
-                                        return! binarySearch low (mid - 1) bestMatch
+                                let targetQueryParams = getQueryParams mid
+                                let! exists = db.doesOutPutDataExist targetQueryParams
+                                if exists then
+                                    return! findHighestExistingIndex (mid + 1) high (Some mid)
+                                else
+                                    return! findHighestExistingIndex low (mid - 1) bestIdx
                         }
 
-                    return! binarySearch 0 (intervals.Length - 1) None
+                    let! highestIndexOpt = findHighestExistingIndex 0 (intervals.Length - 1) None
+                    
+                    // Only load and deserialize the single highest existing file
+                    match highestIndexOpt with
+                    | None -> return None
+                    | Some idx ->
+                        let targetQueryParams = getQueryParams idx
+                        return! db.loadIfFoundAsync targetQueryParams
             }

@@ -87,7 +87,6 @@ module Utils =
             (outputDataType.SorterRunResult "") 
             generationalDb startingGen rp cts log
 
-
     let loadAvailableSorterPoolSetHistories
             (generationalDb: IGeneSortGenDb)
             (startingGen: int<generationNumber>)
@@ -99,42 +98,26 @@ module Utils =
             (outputDataType.SorterPoolSetHistory "") 
             generationalDb startingGen rp cts log
 
-
-
-    /// Generic function to load only the slice with the highest available generation number,
-    /// traversing the unbounded sequence lazily without storing prior slices in memory.
+    /// Optimized search to locate and load ONLY the slice with the highest generation number.
+    /// Uses fast file-existence probes to skip expensive MessagePack deserialization.
+    /// Loads and extracts a specific output data slice at the highest saved generation.
     let loadOutputDataWithHighestGenerationNumber<'T>
             (extractFn: outputData -> Result<'T, string>)
             (dataType: outputDataType)
             (generationalDb: IGeneSortGenDb)
-            (rp: runParameters)
-            (cts: CancellationToken)
-            (log: string -> unit) : Async<Result<'T option, string>> =
+            (rp: runParameters) : Async<Result<'T option, string>> =
         async {
-            let saveConfig = generationalDb.getGenSaveIntervals()
-            let genSequence = SamplingConfig.getSamplesWithMinBound saveConfig -1
-
-            let rec findLast (genSeq: int seq) (lastSeen: 'T option) = async {
-                match Seq.tryHead genSeq with
-                | None -> return Ok lastSeen
-                | Some currentGenInt ->
-                    let! stepResult = tryLoadOutputDataForGen extractFn dataType generationalDb rp cts log currentGenInt
-                    match stepResult with
-                    | Ok (Some slice) -> return! findLast (Seq.tail genSeq) (Some slice)
-                    | Ok None -> return Ok lastSeen
-                    | Error err -> return Error err
-            }
-
-            return! findLast genSequence None
+            let! rawDataOpt = generationalDb.getNextGenSavePointAsync rp dataType
+            match rawDataOpt with
+            | None -> return Ok None
+            | Some rawData -> return extractFn rawData |> Result.map Some
         }
 
-    /// Convenience wrapper to retrieve the highest SorterRunResult slice.
+    /// Ergonomic 1-liner wrapper for SorterRunResult.
     let loadHighestGenSorterRunResult
             (generationalDb: IGeneSortGenDb)
-            (rp: runParameters)
-            (cts: CancellationToken)
-            (log: string -> unit) : Async<Result<sorterRunResult option, string>> =
+            (rp: runParameters) : Async<Result<sorterRunResult option, string>> =
         loadOutputDataWithHighestGenerationNumber 
             OutputData.asSorterRunResult 
             (outputDataType.SorterRunResult "") 
-            generationalDb rp cts log
+            generationalDb rp

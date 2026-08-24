@@ -74,7 +74,8 @@ module SgdExecutor =
 
                 // 1. Check for existing checkpoints directly via genDb
                 let! highestResultOpt = 
-                    Utils.loadHighestGenSorterRunResult genDb rp cts.Token log
+                    Utils.loadHighestGenSorterRunResult genDb rp
+
 
                 // 2. Conditionally initialize or resume from the highest discovered checkpoint
                 let! (activeSeedPoolSet: sorterPoolSet), (activeRp: runParameters) = 

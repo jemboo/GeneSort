@@ -52,6 +52,12 @@ type GeneSortDbMp(
         member _.loadAsync (queryParams: queryParams) =
             mailbox.PostAndAsyncReply(fun channel -> Load(rootFolder, queryParams, channel))
 
+        member _.doesOutPutDataExist (queryParams: queryParams) =
+                    async {
+                        let filePath = OutputDataFile.getFullOutputDataFilePath rootFolder queryParams
+                        return File.Exists %filePath
+                    }
+
         member this.loadIfFoundAsync(queryParams: queryParams) =
             async {
                 let filePath = OutputDataFile.getFullOutputDataFilePath rootFolder queryParams

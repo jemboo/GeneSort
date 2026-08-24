@@ -27,6 +27,10 @@ type IGeneSortDb =
                         queryParams -> 
                             Async<outputData option>
 
+    abstract member doesOutPutDataExist : 
+                        queryParams -> 
+                            Async<bool>
+
     abstract member getRunParameters :
                         string<runName> ->
                         int<replNumber> option ->
