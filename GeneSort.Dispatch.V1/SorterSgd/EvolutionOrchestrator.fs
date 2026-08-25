@@ -237,10 +237,6 @@ module EvolutionOrchestrator =
                                         return (updatedSorterPoolSetSummary, updatedEvalBinsSetAcc, updatedRunningHistoryMap)
                                 }
 
-                            //// Forced GC Compacting
-                            //if remainingSteps % 50 = 0 then
-                            //    triggerCompactingGC ()
-
                             return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext evalBinsSetAccNext runningMemberHistoryMapNext
                     }
 

@@ -90,42 +90,30 @@ module SorterPoolSet =
     // Increases the poolSet.PoolCount by a factor of sorterPoolExpansionRate.
     // Assigns distinct mutationMod values [0 .. (sorterPoolExpansionRate - 1)] to each new pool
     let expandPools (sorterPoolExpansionRate: int<sorterPoolExpansionRate>) 
-                    (poolSet: sorterPoolSet) : sorterPoolSet =
+                        (poolSet: sorterPoolSet) : sorterPoolSet =
 
-        let expansionFactor = %sorterPoolExpansionRate
+            let expansionFactor = %sorterPoolExpansionRate
 
-        // Guard: Expansion factor must be positive and non-zero
-        if expansionFactor <= 0 then
-            raise (ArgumentException(
-                sprintf "sorterPoolExpansionRate must be greater than 0, but was %d." expansionFactor))
+            if expansionFactor <= 0 then
+                raise (ArgumentException(
+                    sprintf "sorterPoolExpansionRate must be greater than 0, but was %d." expansionFactor))
 
-        if Map.isEmpty poolSet._sorterPools then
-            poolSet
-        else
-            let expandedPools =
-                poolSet._sorterPools
-                |> Map.values
-                |> Seq.collect (fun parentPool ->
-                    [| 0 .. expansionFactor - 1 |]
-                    |> Array.map (fun modValue ->
-                        let newPoolId = Guid.NewGuid() |> UMX.tag<sorterPoolId>
-                        let newMutationMod = modValue |> UMX.tag<mutationMod>
+            if Map.isEmpty poolSet._sorterPools then
+                poolSet
+            else
+                let expandedPools =
+                    poolSet._sorterPools
+                    |> Map.values
+                    |> Seq.collect (fun parentPool ->
+                        Array.init expansionFactor (fun modValue ->
+                            let newPoolId = Guid.NewGuid() |> UMX.tag<sorterPoolId>
+                            let newMutationMod = modValue |> UMX.tag<mutationMod>
                         
-                        // Apply the mutationMod to the pool and all of its members
-                        let mutatedPool = SorterPool.changeMutationMod newMutationMod parentPool
-
-                        // Re-create the pool with a fresh pool ID while preserving name and members
-                        sorterPool.create
-                            newPoolId
-                            (Some parentPool.SorterPoolId)
-                            mutatedPool.Name
-                            (mutatedPool.SorterPoolMembers |> Seq.toArray)
-                            mutatedPool.RawCeLength
-                            newMutationMod
+                            SorterPool.deriveChildPool newPoolId newMutationMod parentPool
+                        )
                     )
-                )
 
-            sorterPoolSet.create(poolSet.SorterPoolSetId, poolSet.GenerationNumber, expandedPools)
+                sorterPoolSet.create(poolSet.SorterPoolSetId, poolSet.GenerationNumber, expandedPools)
 
 
     /// Mutates every single pool across the entire pool set uniformly

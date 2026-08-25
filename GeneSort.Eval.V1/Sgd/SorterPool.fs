@@ -137,17 +137,23 @@ module SorterPool =
 
 
     /// Updates the mutationMod for the pool and applies the change to all members (resetting their mutationIndex)
-    let changeMutationMod (newMod: int<mutationMod>) (pool: sorterPool) : sorterPool =
-        let updatedMembers =
-            pool._sorterPoolMembers
-            |> Map.map (fun _ memberObj ->
-                memberObj |> SorterPoolMember.changeMutationMod newMod
-            )
+    let deriveChildPool 
+                (newPoolId: Guid<sorterPoolId>) 
+                (newMutationMod: int<mutationMod>) 
+                (parentPool: sorterPool) : sorterPool =
 
-        { pool with 
-            _mutationMod = newMod
-            _sorterPoolMembers = updatedMembers }
+            let updatedMembers =
+                parentPool.SorterPoolMembers
+                |> Seq.map (SorterPoolMember.changeMutationMod newMutationMod)
+                |> Seq.toArray
 
+            sorterPool.create
+                newPoolId
+                (Some parentPool.SorterPoolId)
+                parentPool.Name
+                updatedMembers
+                parentPool.RawCeLength
+                newMutationMod
 
 
     /// Applies the same mutantsPerSorter count to every pool member, accumulating 
