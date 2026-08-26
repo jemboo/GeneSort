@@ -134,7 +134,7 @@ module PoolSzCompL =
 
         let PoolSz_8Kp4 (executorType: sorterSgdExecutorType)  : runHostSpec = {
             databaseName = dbNamePools_8K
-            runName = sprintf @"PoolSz_8Kp4_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"PoolSz_8K_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Pool size 8K for 24pfx3a Msrs"
             spans = [
                 (runParameters.generationCurrentKey, [0] |> List.map string)
@@ -157,7 +157,7 @@ module PoolSzCompL =
                 (runParameters.generationCurrentKey, [0] |> List.map string)
                 (runParameters.generationIntervalCountKey, [1] |> List.map string)
                 (runParameters.sorterCountPerPoolKey, ["8192";])
-                (runParameters.mutationModKey, [4 .. 11;] |> List.map string)
+                (runParameters.mutationModKey, [0 .. 63;] |> List.map string)
             ]
             filter = paramMapFilter
             enhancer = finishRunParams

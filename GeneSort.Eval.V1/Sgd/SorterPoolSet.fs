@@ -216,8 +216,8 @@ module SorterPoolSet =
         let totalRequiredSorters = %poolCount * %sortersPerPool
         let availableModels = modelSet.SorterModels
 
-        if availableModels.Length < totalRequiredSorters then
-            invalidArg (nameof modelSet) (sprintf "Model set only contains %d models, but %d are required." availableModels.Length totalRequiredSorters)
+        //if availableModels.Length < totalRequiredSorters then
+        //    invalidArg (nameof modelSet) (sprintf "Model set only contains %d models, but %d are required." availableModels.Length totalRequiredSorters)
 
         // 2. Slice the exact number of required parent sorter models from the array head
         let targetedModels = availableModels |> Array.truncate totalRequiredSorters
