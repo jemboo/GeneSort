@@ -89,6 +89,7 @@ module PoolSetMakers =
                 (sorterEvalSelection.ToEvalLabelMap())
                 seedSorterModelSet
                 mutationMod
+                (latticeBounds.Dim1 %poolCount)
         }
 
 
@@ -174,6 +175,7 @@ module PoolSetMakers =
                 (sorterEvalSelection.ToEvalLabelMap())
                 seedSorterModelSet
                 mutationMod
+                (latticeBounds.Dim1 %poolCount)
         }
 
 
@@ -252,6 +254,7 @@ module PoolSetMakers =
                 (sorterEvalSelection.ToEvalLabelMap())
                 seedSorterModelSet
                 mutationMod
+                (latticeBounds.Dim1 %poolCount)
         }
 
 

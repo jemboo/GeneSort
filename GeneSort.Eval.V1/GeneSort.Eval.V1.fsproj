@@ -15,6 +15,7 @@
     <Compile Include="Sgd\SorterMutationSource.fs" />
     <Compile Include="Sgd\SorterPoolMember.fs" />
     <Compile Include="Sgd\SorterPoolMemberHistory.fs" />
+    <Compile Include="Sgd\SorterPoolTag.fs" />
     <Compile Include="Sgd\SorterPool.fs" />
     <Compile Include="Sgd\SorterPoolHistory.fs" />
     <Compile Include="Sgd\SorterPoolMeasure.fs" />

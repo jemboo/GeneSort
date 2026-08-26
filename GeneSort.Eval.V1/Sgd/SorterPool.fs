@@ -13,6 +13,7 @@ type sorterPool =
     private {
         _name: string<sorterPoolName>
         _sorterPoolId: Guid<sorterPoolId>
+        _sorterPoolTag: sorterPoolTag
         _sorterPoolMembers: Map<Guid<sorterPoolMemberId>, sorterPoolMember>
         _rawCeLength: int<ceLength>
         _mutationMod: int<mutationMod>
@@ -26,11 +27,13 @@ type sorterPool =
     member this.SorterPoolMembers with get() :sorterPoolMember seq =
         Map.values this._sorterPoolMembers
     member this.SorterPoolId with get() = this._sorterPoolId
+    member this.SorterPoolTag with get() = this._sorterPoolTag
 
     static member create 
             (sorterPoolId: Guid<sorterPoolId>) 
             (parentSorterPoolId: Guid<sorterPoolId> option)
             (name: string<sorterPoolName>)
+            (sorterPoolTag: sorterPoolTag)
             (members: sorterPoolMember []) 
             (rawCeLength: int<ceLength>) 
             (mutationMod: int<mutationMod>) =
@@ -41,6 +44,7 @@ type sorterPool =
         { 
             _name = name
             _sorterPoolId = sorterPoolId
+            _sorterPoolTag = sorterPoolTag
             _parentSorterPoolId = parentSorterPoolId
             _sorterPoolMembers = membersMap
             _rawCeLength = rawCeLength
@@ -154,6 +158,7 @@ module SorterPool =
                 newPoolId
                 (Some parentPool.SorterPoolId)
                 parentPool.Name
+                parentPool.SorterPoolTag
                 updatedMembers
                 parentPool.RawCeLength
                 newMutationMod
@@ -246,6 +251,7 @@ module SorterPool =
                 pool.SorterPoolId 
                 pool.ParentSorterPoolId
                 pool.Name 
+                pool.SorterPoolTag
                 updatedMembers 
                 (UMX.tag<ceLength> %thresholdLastCeIndex)
                 pool.MutationMod
@@ -317,6 +323,7 @@ module SorterPool =
                 pool.SorterPoolId 
                 pool.ParentSorterPoolId
                 pool.Name 
+                pool.SorterPoolTag
                 sortedSurvivors
                 pool.RawCeLength 
                 pool.MutationMod
@@ -413,6 +420,7 @@ module SorterPool =
                     pool.SorterPoolId
                     pool.ParentSorterPoolId
                     pool.Name 
+                    pool.SorterPoolTag
                     truncatedSurvivors
                     pool.RawCeLength 
                     pool.MutationMod

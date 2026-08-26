@@ -271,6 +271,7 @@ module SampleRegistry =
         //expInterval50_L10            : [50, 125, 238, 406, 659, 1039, 1609, 2463, 3744, 5667]
         //expInterval100_L10           : [100, 250, 475, 812, 1319, 2078, 3217, 4926, 7489, 11333]
         //expInterval100_L50           : [100, 250, 475, 812, 1319, 2078, 3217, 4926, 7489, 11333, 17100, 25749, 38724, 58186, 87379]
+        //expInterval100_L50s          : [100, 250, 445, 698, 1028, 1456, 2013, 2737, 3679, 4902, 6493, 8561, 11249, 14744, 19287, 25193, 32871, 42852, 55828, 72696, 94625]
         add (createConfig "expInterval25_L5" 25 maxCount5 scale1 (Exponential (0.5, 40)))
         add (createConfig "expInterval25_L20" 25 maxCount20 scale1 (Exponential (0.3, 30)))
         add (createConfig "expInterval50_L10" 50 maxCount10 scale1 (Exponential (0.5, 75)))

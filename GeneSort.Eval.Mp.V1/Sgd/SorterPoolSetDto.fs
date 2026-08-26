@@ -10,10 +10,6 @@ open GeneSort.Eval.V1.Sgd
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 
-// ---------------------------------------------------------------------
-// 2. Fully Realized Final State DTOs
-// ---------------------------------------------------------------------
-
 [<MessagePackObject>]
 type sorterPoolMemberDto = {
     [<Key(0)>] sorterPoolMemberId: Guid
@@ -33,6 +29,7 @@ type sorterPoolDto = {
     [<Key(3)>] ceLength: int
     [<Key(4)>] mutationMod: int
     [<Key(5)>] parentSorterPoolId: Nullable<Guid>
+    [<Key(6)>] sorterPoolTag: string
 }
 
 [<MessagePackObject>]
@@ -40,6 +37,7 @@ type sorterPoolSetDto = {
     [<Key(0)>] sorterPoolSetId: Guid
     [<Key(1)>] generationNumber: int
     [<Key(2)>] sorterPools: sorterPoolDto array
+    [<Key(3)>] latticeBounds: string
 }
 
 module SorterPoolSetDto =
@@ -67,6 +65,7 @@ module SorterPoolSetDto =
                 { 
                     sorterPoolId = %p.SorterPoolId
                     name = %p.Name
+                    sorterPoolTag = (p.SorterPoolTag |> SorterPoolTag.toString)
                     sorterPoolMemberDtos = memberDtos
                     ceLength = %p.RawCeLength
                     mutationMod = %p.MutationMod
@@ -74,10 +73,12 @@ module SorterPoolSetDto =
                 }
             )
             |> Seq.toArray
+
         {
             sorterPoolSetId = UMX.untag domain.SorterPoolSetId
             generationNumber = UMX.untag domain.GenerationNumber
             sorterPools = poolDtos
+            latticeBounds = LatticeBounds.toString domain.LatticeBounds
         }
 
 
@@ -109,8 +110,16 @@ module SorterPoolSetDto =
                     (p.sorterPoolId |> UMX.tag<sorterPoolId>) 
                     parentIdOpt
                     (p.name |> UMX.tag<sorterPoolName>) 
+                    (SorterPoolTag.fromString p.sorterPoolTag)
                     members
                     (p.ceLength |> UMX.tag<ceLength>)
                     (p.mutationMod |> UMX.tag<mutationMod>)
             )
-        sorterPoolSet.create(UMX.tag dto.sorterPoolSetId, UMX.tag dto.generationNumber, pools)
+
+        let bounds = LatticeBounds.fromString dto.latticeBounds
+
+        sorterPoolSet.create 
+            (UMX.tag dto.sorterPoolSetId) 
+            (UMX.tag dto.generationNumber) 
+            bounds 
+            (Some (pools :> seq<_>))
