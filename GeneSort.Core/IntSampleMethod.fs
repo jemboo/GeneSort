@@ -276,6 +276,7 @@ module SampleRegistry =
         add (createConfig "expInterval50_L10" 50 maxCount10 scale1 (Exponential (0.5, 75)))
         add (createConfig "expInterval100_L10" 100 maxCount10 scale1 (Exponential (0.5, 150)))
         add (createConfig "expInterval100_L50" 100 maxCount50 scale1 (Exponential (0.5, 150)))
+        add (createConfig "expInterval100_L50s" 100 maxCount50 scale1 (Exponential (0.3, 150)))
 
         //periodic_LinearBurst         : [1, 3, 5, 7, 9, 10, 12, 14, 16, 18, 19, 21, 23, 25, 27, 28, 30, 32, 34, 36]
         //periodic_DecayReset          : [5, 10, 15, 25, 30, 40, 45, 50, 55, 65, 70, 80, 85, 90, 95, 105, 110, 120, 125, 130]

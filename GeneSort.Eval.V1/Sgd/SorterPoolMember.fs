@@ -5,7 +5,6 @@ open FSharp.UMX
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1
-open GeneSort.Sorting
 
 type sorterPoolMember =
     private {
@@ -57,9 +56,15 @@ module SorterPoolMember =
     let updateIndex (spm: sorterPoolMember) : sorterPoolMember =
         advanceIndex 1 spm
 
-/// Updates the mutationMod of a pool member and resets its mutationIndex to 0
-    let changeMutationMod (newMod: int<mutationMod>) (spm: sorterPoolMember) : sorterPoolMember =
+    /// Derives a child pool member for a new pool branch:
+    /// Assigns a fresh sorterPoolMemberId, updates mutationMod, resets mutationIndex to 0,
+    /// and preserves the existing sorterMutationSource and sorterModel.
+    let deriveForChildPool 
+            (newMemberId: Guid<sorterPoolMemberId>) 
+            (newMod: int<mutationMod>) 
+            (spm: sorterPoolMember) : sorterPoolMember =
         { spm with 
+            _sorterPoolMemberId = newMemberId
             _mutationMod = newMod
             _mutationIndex = 0 |> UMX.tag<mutationIndex> }
 
@@ -94,11 +99,6 @@ module SorterPoolMember =
                         individualMutationIndex
                         spm.MutationMod
 
-                let parentCeLength, parentStageLength = 
-                    match spm.SorterEval with
-                    | Some sev -> (sev |> SorterEval.getCeLength, sev |> SorterEval.getStageLength)
-                    | None -> (0<ceLength>, 0<stageLength>)
-                
                 let mutationSource = 
                     sorterMutationSource.create 
                         mutatorId 

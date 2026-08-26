@@ -144,7 +144,10 @@ module SorterPool =
 
             let updatedMembers =
                 parentPool.SorterPoolMembers
-                |> Seq.map (SorterPoolMember.changeMutationMod newMutationMod)
+                |> Seq.map (fun memb -> 
+                    let newMemberId = Guid.NewGuid() |> UMX.tag<sorterPoolMemberId>
+                    SorterPoolMember.deriveForChildPool newMemberId newMutationMod memb
+                )
                 |> Seq.toArray
 
             sorterPool.create
