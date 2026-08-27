@@ -23,6 +23,7 @@ module SgdExecutor =
             (rp: runParameters)
             (sortableTest: sortableTest)
             (log: string -> unit) : Async<Result<sorterPoolSet, string>> =
+
         asyncResult {
             let evalType = sorterEvalType.V2
             log "No saved checkpoint found. Creating initial seedSorterPoolSet..."
@@ -37,13 +38,13 @@ module SgdExecutor =
                     (false |> UMX.tag<collectNewSortableTests>)
             
             let evaluatedSeedSet = seedPoolSet |> SorterPoolSet.updateSorterEvals computedEvals
-            let seedSorterRunResult = sorterRunResult.create evaluatedSeedSet [||] |> outputData.SorterRunResult
+            let outData = seedPoolSet |> outputData.SorterPoolSet
             
             let! qpSsrr = 
-                genDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterRunResult "")
+                genDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterPoolSetSummaries "")
                 |> Result.ofOption "Failed to create QueryParams for seedSorterRunResult."
                 
-            do! genDb.saveAsync qpSsrr seedSorterRunResult (false |> UMX.tag<allowOverwrite>)
+            do! genDb.saveAsync qpSsrr outData (false |> UMX.tag<allowOverwrite>)
             log (sprintf "Initial seedSorterPoolSet saved at generation %d." %evaluatedSeedSet.GenerationNumber)
 
             return evaluatedSeedSet
@@ -61,9 +62,9 @@ module SgdExecutor =
             (cts: CancellationTokenSource)
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
-        let log msg = 
-            OpsUtils.report progress 
-                (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+        let log (msg: string) =
+                OpsUtils.report progress 
+                    (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
             try
@@ -73,35 +74,33 @@ module SgdExecutor =
                 let! (sortableTest: sortableTest) = makeSortableTests rp
 
                 // 1. Check for existing checkpoints directly via genDb
-                let! highestResultOpt = 
-                    Utils.loadHighestGenSorterRunResult genDb rp
-
+                let! highestPoolSetOpt = Utils.loadHighestGenSorterPoolSet genDb rp
 
                 // 2. Conditionally initialize or resume from the highest discovered checkpoint
-                let! (activeSeedPoolSet: sorterPoolSet), (activeRp: runParameters) = 
-                    match highestResultOpt with
+                let! (activeSeedPoolSet, activeRp) = 
+                    match highestPoolSetOpt with
                     | None -> 
                         asyncResult {
                             let initRp = rp.WithGenerationCurrent(Some (0 |> UMX.tag<generationNumber>))
                             let! (seedSet: sorterPoolSet) = initializeAndSaveSeedPoolSet sorterPoolSetCreator genDb initRp sortableTest log
                             return seedSet, initRp
                         }
-                    | Some (highestResult: sorterRunResult) -> 
+                    | Some (highestPoolSet: sorterPoolSet) -> 
                         asyncResult {
-                            let (currentGen: int<generationNumber>) = highestResult.FinalPoolSet.GenerationNumber
+                            let currentGen = highestPoolSet.GenerationNumber
                             log (sprintf "Found existing checkpoint at Generation %d. Resuming evolution." %currentGen)
                             let updatedRp = rp.WithGenerationCurrent(Some currentGen)
-                            return highestResult.FinalPoolSet, updatedRp
+                            return highestPoolSet, updatedRp
                         }
 
                 do! checkCancellation cts.Token
                 
                 log "Making sorterModelMutator..."
-                let! (simpleSorterModelMutator: simpleSorterModelMutator) = MutatorMakers.makeSimpleSorterModelMutator activeRp
-                let sorterModelMutator = simpleSorterModelMutator |> sorterModelMutator.Simple
+                let! (sSmm: simpleSorterModelMutator) = MutatorMakers.makeSimpleSorterModelMutator activeRp
+                let (sorterModelMutator: sorterModelMutator) = sSmm |> sorterModelMutator.Simple
 
                 log "Executing unified evolution run..."
-                let! (_finalRunResult: sorterRunResult) = 
+                let! (_finalRunResult: sorterPoolSet) = 
                     EvolutionOrchestrator.runEvolutionAsync
                         genDb
                         activeRp

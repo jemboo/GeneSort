@@ -76,16 +76,29 @@ module Utils =
         }
 
     /// Backwards-compatible SorterRunResult slice loader returning a lazy sequence.
-    let loadAvailableSorterRunResults
+    let loadAvailableSorterPoolSets
             (generationalDb: IGeneSortGenDb)
             (startingGen: int<generationNumber>)
             (rp: runParameters)
             (cts: CancellationToken)
-            (log: string -> unit) : Async<seq<sorterRunResult>> =
+            (log: string -> unit) : Async<seq<sorterPoolSet>> =
         loadAvailableOutputData
-            OutputData.asSorterRunResult 
-            (outputDataType.SorterRunResult "") 
+            OutputData.asSorterPoolSet 
+            (outputDataType.SorterPoolSet "") 
             generationalDb startingGen rp cts log
+
+
+    let loadAvailableSorterPoolSetSummaries
+            (generationalDb: IGeneSortGenDb)
+            (startingGen: int<generationNumber>)
+            (rp: runParameters)
+            (cts: CancellationToken)
+            (log: string -> unit) : Async<seq<sorterPoolSetSummary array>> =
+        loadAvailableOutputData
+            OutputData.asSorterPoolSetSummaries 
+            (outputDataType.SorterPoolSetSummaries "") 
+            generationalDb startingGen rp cts log
+
 
     let loadAvailableSorterPoolSetHistories
             (generationalDb: IGeneSortGenDb)
@@ -114,10 +127,10 @@ module Utils =
         }
 
     /// Ergonomic 1-liner wrapper for SorterRunResult.
-    let loadHighestGenSorterRunResult
+    let loadHighestGenSorterPoolSet
             (generationalDb: IGeneSortGenDb)
-            (rp: runParameters) : Async<Result<sorterRunResult option, string>> =
+            (rp: runParameters) : Async<Result<sorterPoolSet option, string>> =
         loadOutputDataWithHighestGenerationNumber 
-            OutputData.asSorterRunResult 
-            (outputDataType.SorterRunResult "") 
+            OutputData.asSorterPoolSet 
+            (outputDataType.SorterPoolSet "") 
             generationalDb rp

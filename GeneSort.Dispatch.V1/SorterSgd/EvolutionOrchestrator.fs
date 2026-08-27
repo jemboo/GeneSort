@@ -27,7 +27,7 @@ module EvolutionOrchestrator =
             (sortableTest: sortableTest)
             (mutator: sorterModelMutator)
             (cts: CancellationToken)
-            (log: string -> unit) : Async<Result<sorterRunResult, string>> =
+            (log: string -> unit) : Async<Result<sorterPoolSet, string>> =
 
         asyncResult {
             let evalType = sorterEvalType.V2
@@ -74,7 +74,7 @@ module EvolutionOrchestrator =
                     | Some intervals -> SamplingConfig.getSampleSetMaxBound intervals targetGenInt
                     | None -> Set.empty
 
-                let targetGenerationsForSaveRunResult = 
+                let targetGenerationsForSaveResults = 
                     SamplingConfig.getSampleSetMaxBound saveIntervals targetGenInt
 
                 let targetGenerationsForSummaryReport = 
@@ -100,19 +100,19 @@ module EvolutionOrchestrator =
 
                 // Recursive loop carrying evalBinsSetAcc and active lineage tracking map
                 let rec loop 
-                        (remainingSteps: int) 
-                        (currentSorterPoolSet: sorterPoolSet) 
-                        (historyAcc: sorterPoolSetSummary list) 
-                        (evalBinsSetAcc: sorterPoolEvalBinsSet list) 
-                        (runningMap: runningMemberHistoryMap) 
-                        : Async<Result<sorterRunResult, string>> =
+                        (remainingSteps: int)
+                        (currentSorterPoolSet: sorterPoolSet)
+                        (historyAcc: sorterPoolSetSummary list)
+                        (evalBinsSetAcc: sorterPoolEvalBinsSet list)
+                        (runningMap: runningMemberHistoryMap)
+                        : Async<Result<sorterPoolSet, string>> =
+
                     asyncResult {
                         // Cooperative cancellation evaluation at top of loop
                         if cts.IsCancellationRequested then
                             return! Error "runEvolutionAsync execution was cancelled."
                         elif remainingSteps < 0 then
-                            let finalSummaries = historyAcc |> List.rev |> List.toArray
-                            return sorterRunResult.create currentSorterPoolSet finalSummaries
+                            return currentSorterPoolSet
                         else
                             let currentGen = totalGen - %remainingSteps
 
@@ -129,7 +129,7 @@ module EvolutionOrchestrator =
 
                             // Triggers
                             let shouldSummaryReport = Set.contains %currentGen targetGenerationsForSummaryReport
-                            let shouldSaveRunResult = Set.contains %currentGen targetGenerationsForSaveRunResult
+                            let shouldSaveResults = Set.contains %currentGen targetGenerationsForSaveResults
 
                             let shouldExpandPools = 
                                 match optSorterPoolExpansionRate, optPoolMeasure with
@@ -194,21 +194,17 @@ module EvolutionOrchestrator =
                             // Save RunResult, SorterPoolEvalBinsSetCollection, and SorterPoolSetHistory on shouldSaveRunResult
                             let! (historyAccNext, evalBinsSetAccNext, runningMemberHistoryMapNext) = 
                                 asyncResult {
-                                    if shouldSaveRunResult && (%currentGen > 0) then
-                                        let currentSummaries = updatedSorterPoolSetSummary |> List.rev |> List.toArray
-                                        let currentRunResult = 
-                                            sorterRunResult.create 
-                                                nextSorterPoolSet 
-                                                currentSummaries
+                                    if shouldSaveResults && (%currentGen > 0) then
+                                        let currentSummaries = updatedSorterPoolSetSummary |> List.toArray
 
                                         let stepRp = rp.WithGenerationCurrent(Some currentGen)
 
                                         // Save SorterRunResult
                                         let! qpRunResult = 
-                                            genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterRunResult "")
+                                            genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolSetSummaries "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterRunResult."
                                         log (sprintf "Saving SorterRunResult checkpoint at Generation %d..." %currentGen)
-                                        do! genDb.saveAsync qpRunResult (currentRunResult |> outputData.SorterRunResult) allowOverwrite
+                                        do! genDb.saveAsync qpRunResult (currentSummaries |> outputData.SorterPoolSetSummaries) allowOverwrite
 
                                         // Save SorterPoolEvalBinsSetCollection
                                         let collectionId = Guid.NewGuid() |> UMX.tag<sorterPoolEvalBinsSetCollectionId>

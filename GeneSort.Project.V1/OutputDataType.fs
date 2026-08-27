@@ -8,7 +8,8 @@ open System
 type outputDataType =
     | Run of string<runName>
     | RunParameters of string<runName>
-    | SorterRunResult of string
+    | SorterPoolSet of string
+    | SorterPoolSetSummaries of string
     | SorterSet of string
     | SortableTest of string
     | SorterSetEval of string
@@ -25,7 +26,8 @@ module OutputDataType =
         match outputDataType with
         | Run s -> "Run"
         | RunParameters s -> appendParam "RunParameters" %s
-        | SorterRunResult s -> appendParam "SorterRunResult" %s
+        | SorterPoolSet s -> appendParam "SorterPoolSet" %s
+        | SorterPoolSetSummaries s -> appendParam "SorterPoolSetSummaries" %s
         | SorterSet s -> appendParam "SorterSet" s
         | SortableTest s -> appendParam "SortableTest" s
         | SorterSetEval s -> appendParam "SorterSetEval" s
@@ -41,7 +43,8 @@ module OutputDataType =
         match prefix with
         | "Run" -> Some (Run (param |> UMX.tag<runName>))
         | "RunParameters" -> Some (RunParameters (param |> UMX.tag<runName>))
-        | "SorterRunResult" -> Some (SorterRunResult param)
+        | "SorterPoolSet" -> Some (SorterPoolSet param)
+        | "SorterPoolSetSummaries" -> Some (SorterPoolSetSummaries param)
         | "SorterSet" -> Some (SorterSet param)
         | "SortableTest" -> Some (SortableTest param)
         | "SorterSetEval" -> Some (SorterSetEval param)

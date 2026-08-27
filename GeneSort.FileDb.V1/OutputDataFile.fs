@@ -91,10 +91,15 @@ module OutputDataFile =
                             let! domain = deserializeDto<runParametersDto, runParameters> stream token RunParametersDto.toDomain
                             return outputData.RunParameters domain
                         }
-                    | outputDataType.SorterRunResult _ ->
+                    | outputDataType.SorterPoolSet _ ->
                         async {
-                            let! domain = deserializeDto<sorterRunResultDto, sorterRunResult> stream token SorterRunResultDto.toDomain
-                            return outputData.SorterRunResult domain
+                            let! domain = deserializeDto<sorterPoolSetDto, sorterPoolSet> stream token SorterPoolSetDto.fromDto
+                            return outputData.SorterPoolSet domain
+                        }
+                    | outputDataType.SorterPoolSetSummaries _ ->
+                        async {
+                            let! domain = deserializeDto<sorterPoolSetSummariesDto, sorterPoolSetSummary array> stream token SorterPoolSetSummariesDto.toDomain
+                            return outputData.SorterPoolSetSummaries domain
                         }
                     | outputDataType.SorterSet _ ->
                         async {
@@ -181,8 +186,10 @@ module OutputDataFile =
                             match outputData with
                             | outputData.RunParameters r ->
                                 serializeDto stream r RunParametersDto.fromDomain
-                            | outputData.SorterRunResult ss ->
-                                serializeDto stream ss SorterRunResultDto.fromDomain
+                            | outputData.SorterPoolSet ss ->
+                                serializeDto stream ss SorterPoolSetDto.toDto
+                            | outputData.SorterPoolSetSummaries ss ->
+                                serializeDto stream ss SorterPoolSetSummariesDto.fromDomain
                             | outputData.SorterSet ss ->
                                 serializeDto stream ss SorterSetDto.fromDomain
                             | outputData.SortableTest sts ->
