@@ -60,6 +60,10 @@ type sorterPoolSetSummary =
 
 module SorterPoolSetSummary =
 
+    let getMaxGeneration (spses: sorterPoolSetSummary array) :int<generationNumber> =
+        let mv = spses |> Array.maxBy(fun spss -> %spss.GenerationNumber)
+        mv.GenerationNumber
+
     /// Strips the heavy sorterModel references out of a pool set, creating a light memory footprint snapshot
     let fromPoolSet (poolSet: sorterPoolSet) : sorterPoolSetSummary =
         

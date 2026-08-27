@@ -130,7 +130,7 @@ module DispatchSorterSgd =
 
     ////********** Msrs24p3a **********
     let private executorType = sorterSgdExecutorType.GenPrefix
-    let private host: IRunHost = Msrs24p3a.PoolSzCompL.createRunHost (Msrs24p3a.PoolSzCompL.Specs.PoolSz_8Kp8 executorType)
+    let private host: IRunHost = Msrs24p3a.PoolSzComp.createRunHost (Msrs24p3a.PoolSzComp.Specs.TestSpec executorType)
 
 
     let private executor = SorterSgdExecutorType.getExecutor executorType

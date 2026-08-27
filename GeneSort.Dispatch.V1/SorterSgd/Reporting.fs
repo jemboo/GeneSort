@@ -91,23 +91,28 @@ module Reporting =
         } |> Async.map (logResult progress (fun msg -> OpsUtils.report progress msg))
 
     // --- Specific Report Builders ---
-
     let private makeSummaryReport (host: IRunHost) rp allowOverwrite cts progress =
         let genDb = host.RunDb :?> IGeneSortGenDb
+        let recordExtractor (prefix:string) (spsSummaries:sorterPoolSetSummary seq) : dataTableRecord seq =
+                spsSummaries |> Seq.collect(fun poolSetSummary ->
+                poolSetSummary
+                |> SorterPoolSetSummary.toDataTableRecords prefix
+            )
         makeDynamicReportFromSlices
-            Utils.loadAvailableSorterRunResults
-            (fun srr -> srr.FinalPoolSet.GenerationNumber)
-            (SorterRunResult.toDataTableRecordsIntermediateHistory "")
-            "SorterRunResult_SummaryReport"
+            Utils.loadAvailableSorterPoolSetSummaries
+            (fun spses -> spses |> SorterPoolSetSummary.getMaxGeneration)
+            (recordExtractor "")
+            "SummaryReport"
             genDb rp allowOverwrite cts progress
+
 
     let private makeSnapshotReport (host: IRunHost) rp allowOverwrite cts progress =
         let genDb = host.RunDb :?> IGeneSortGenDb
         makeDynamicReportFromSlices
-            Utils.loadAvailableSorterRunResults
-            (fun srr -> srr.FinalPoolSet.GenerationNumber)
-            (SorterRunResult.toDataTableRecordsSnapshot "")
-            "SorterRunResult_SnapshotReport"
+            Utils.loadAvailableSorterPoolSets
+            (fun srtrPoolSet -> srtrPoolSet.GenerationNumber)
+            (SorterPoolSetDescription.toDataTableRecordsSnapshot "")
+            "SnapshotReport"
             genDb rp allowOverwrite cts progress
 
     let private makePoolHistoryReport (host: IRunHost) rp allowOverwrite cts progress =
@@ -116,7 +121,7 @@ module Reporting =
             Utils.loadAvailableSorterPoolSetHistories
             (fun hist -> hist.SaveGeneration)
             SorterPoolSetHistory.toDataTableRecords
-            "SorterPoolSetHistory_Report"
+            "SorterPoolSetHistoryReport"
             genDb rp allowOverwrite cts progress
 
     // --- Executors ---

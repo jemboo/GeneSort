@@ -164,3 +164,9 @@ module SorterPoolSetDescription =
                 |> dataTableRecord.combine poolContextDtr
             )
         )
+
+
+    /// Extracts dataTableRecords out of the run result's FinalPoolSet
+    let toDataTableRecordsSnapshot (prefix: string) (srRes: sorterPoolSet) : dataTableRecord seq =
+        let yab = fromPoolSet srRes
+        toDataTableRecords "" yab

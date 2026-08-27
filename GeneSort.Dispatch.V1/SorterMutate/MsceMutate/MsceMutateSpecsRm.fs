@@ -48,7 +48,6 @@ module MsceMutateSpecsRm =
                     if (isMuf4able && %sw < 256) then Some () else None
                 | simpleSorterModelType.Msuf6 -> 
                     if isMuf6able then Some () else None
-                | _ -> None
 
             // Merge dimension check: If it doesn't divide, return None to stop
             if (%sw % %md <> 0) then return! None

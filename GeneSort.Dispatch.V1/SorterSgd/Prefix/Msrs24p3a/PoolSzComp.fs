@@ -144,7 +144,7 @@ module PoolSzComp =
             filter = paramMapFilter
             enhancer = finishRunParams
             allowOverwrite = false |> UMX.tag
-            maxParallel = 2
+            maxParallel = 1
         }
 
 

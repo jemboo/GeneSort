@@ -265,6 +265,3 @@ module SorterPoolSet =
         // 4. Package into updated curried constructor
         sorterPoolSet.create sorterPoolSetId generationNumber bounds (Some (pools :> seq<_>))
 
-
-    let toDataTableRecords (sorterPoolSet: sorterPoolSet) : dataTableRecord [] =
-        [||]
