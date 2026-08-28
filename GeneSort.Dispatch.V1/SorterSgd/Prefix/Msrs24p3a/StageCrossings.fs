@@ -13,7 +13,7 @@ open GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.Common
 open GeneSort.Dispatch.V1.SorterSgd
 
 
-module PoolSzComp =
+module StageCrossings =
 
     let globalSorterCount = 256 |> UMX.tag<sorterCount>
     let dbNamePoolsTest = "PoolsTest" |> UMX.tag<databaseName>

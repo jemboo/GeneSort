@@ -15,10 +15,10 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 module PoolSzCompL =
 
-    let overallPoolSetTotal = 8192 |> UMX.tag<sorterCount> //(2^13)
-   // let overallPoolSetTotal = 65536 |> UMX.tag<sorterCount> //(2^16)
-    //let overallPoolSetTotal = 131072 |> UMX.tag<sorterCount> //(2^17)
-    //let overallPoolSetTotal = 262144 |> UMX.tag<sorterCount> //(2^18)
+    let globalSorterCount = 8192 |> UMX.tag<sorterCount> //(2^13)
+   // let globalSorterCount = 65536 |> UMX.tag<sorterCount> //(2^16)
+    //let globalSorterCount = 131072 |> UMX.tag<sorterCount> //(2^17)
+    //let globalSorterCount = 262144 |> UMX.tag<sorterCount> //(2^18)
 
     let dbNamePools_8K = "PoolSz_8K" |> UMX.tag<databaseName>
     let dbNamePools_64K = "PoolSz_64K" |> UMX.tag<databaseName>
@@ -80,7 +80,7 @@ module PoolSzCompL =
         }
 
     let private withLocalParams (rp:runParameters) =
-        let rpn = standardParams rp
+        let rpn = standardPoolSzParams rp
         rpn.WithSeedModificationRate(Some 0.02<seedModificationRate>)
             .WithModificationRate(Some 0.06<modificationRate>)
             .WithOrthoRate(Some 4.001<orthoRate>)
@@ -93,7 +93,7 @@ module PoolSzCompL =
     let private finishRunParams (host: IRunHost) (rp:runParameters) =
         let rp2 = withLocalParams rp
         let scpp = rp.GetSorterCountPerPool().Value
-        let spc = (%overallPoolSetTotal / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
+        let spc = (%globalSorterCount / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
         let rp3 = rp2.WithSorterPoolCount(spc)
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
 

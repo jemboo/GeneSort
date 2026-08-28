@@ -19,7 +19,8 @@ type sorterPoolSummaryDto = {
     [<Key(3)>] minCeLength: int
     [<Key(4)>] minStageLength: int
     [<Key(5)>] aveStageLength: float
-    [<Key(6)>] rawCeLength: int
+    [<Key(6)>] aveStageCrossings: float
+    [<Key(7)>] rawCeLength: int
 }
 
 [<MessagePackObject>]
@@ -48,6 +49,7 @@ module SorterPoolSetSummaryDto =
                     minStageLength = UMX.untag p.MinStageLength
                     aveStageLength = UMX.untag p.AveStageLength
                     rawCeLength = UMX.untag p.RawCeLength
+                    aveStageCrossings = UMX.untag p.AveStageCrossings
                 }
             )
         {
@@ -68,6 +70,7 @@ module SorterPoolSetSummaryDto =
                     (p.aveCeLength |> UMX.tag<ceLength>)
                     (p.minStageLength |> UMX.tag<stageLength>)
                     (p.aveStageLength |> UMX.tag<stageLength>)
+                    (p.aveStageCrossings |> UMX.tag<stageCrossings>)
             )
         sorterPoolSetSummary.Create(
             UMX.tag dto.sorterPoolSetId, 
