@@ -10,7 +10,6 @@ printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 DispatchSorterSgd.runRunParameters()
 
-
 let duration = DateTime.Now - startTime
 Thread.Sleep(100)
 printfn "********************************************"
