@@ -130,9 +130,9 @@ module PoolSzComp16k =
             runDescription = "Pool size 16K for 24pfx3a Msrs"
             spans = [
                 (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [1] |> List.map string)
+                (runParameters.generationIntervalCountKey, [11] |> List.map string)
                 (runParameters.sorterCountPerPoolKey, ["16384";])
-                (runParameters.mutationModKey, [0 .. 63;] |> List.map string)
+                (runParameters.mutationModKey, [0 .. 1;] |> List.map string)
             ]
             filter = paramMapFilter
             enhancer = finishRunParams
@@ -143,13 +143,13 @@ module PoolSzComp16k =
 
         let PoolSz_16Kp4 (executorType: sorterSgdExecutorType)  : runHostSpec = {
             databaseName = dbNamePools_16K
-            runName = sprintf @"PoolSz_8Kp4_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"PoolSz_16Kp4_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Pool size 16K for 24pfx3a Msrs"
             spans = [
                 (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [1] |> List.map string)
+                (runParameters.generationIntervalCountKey, [11] |> List.map string)
                 (runParameters.sorterCountPerPoolKey, ["16384";])
-                (runParameters.mutationModKey, [0 .. 63;] |> List.map string)
+                (runParameters.mutationModKey, [0 .. 3;] |> List.map string)
             ]
             filter = paramMapFilter
             enhancer = finishRunParams
@@ -160,13 +160,13 @@ module PoolSzComp16k =
 
         let PoolSz_8Kp8 (executorType: sorterSgdExecutorType)  : runHostSpec = {
             databaseName = dbNamePools_16K
-            runName = sprintf @"PoolSz_8Kp8_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"PoolSz_16Kp8_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Pool size 16K for 24pfx3a Msrs"
             spans = [
                 (runParameters.generationCurrentKey, [0] |> List.map string)
                 (runParameters.generationIntervalCountKey, [1] |> List.map string)
                 (runParameters.sorterCountPerPoolKey, ["16384";])
-                (runParameters.mutationModKey, [12 .. 27;] |> List.map string)
+                (runParameters.mutationModKey, [0 .. 7;] |> List.map string)
             ]
             filter = paramMapFilter
             enhancer = finishRunParams

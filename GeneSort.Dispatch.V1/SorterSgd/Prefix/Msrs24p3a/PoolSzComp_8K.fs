@@ -165,6 +165,21 @@ module PoolSzComp8k =
             maxParallel = 8
         }
 
+        let PoolSz_8Kp8b (executorType: sorterSgdExecutorType)  : runHostSpec = {
+            databaseName = dbNamePools_8K
+            runName = sprintf @"PoolSz_8Kp8b_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Pool size 8K for 24pfx3a Msrs"
+            spans = [
+                (runParameters.generationCurrentKey, [0] |> List.map string)
+                (runParameters.generationIntervalCountKey, [2] |> List.map string)
+                (runParameters.sorterCountPerPoolKey, ["8192";])
+                (runParameters.mutationModKey, [64 .. 127;] |> List.map string)
+            ]
+            filter = paramMapFilter
+            enhancer = finishRunParams
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
+        }
 
         let PoolSz_8Kp16 (executorType: sorterSgdExecutorType)  : runHostSpec = {
             databaseName = dbNamePools_8K
