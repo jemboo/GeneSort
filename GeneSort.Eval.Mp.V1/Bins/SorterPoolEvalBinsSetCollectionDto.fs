@@ -22,7 +22,7 @@ type sorterPoolEvalBinsSetCollectionDto = {
 
 module SorterPoolEvalBinsSetCollectionDto =
 
-    let fromDomain (collection: sorterPoolEvalBinsSetCollection) : sorterPoolEvalBinsSetCollectionDto = {
+    let fromDomain (collection: sorterPoolBinsSetSeries) : sorterPoolEvalBinsSetCollectionDto = {
         SorterPoolEvalBinsSetCollectionId = %collection.SorterPoolEvalBinsSetCollectionId
         SorterPoolEvalBinsSets =
             collection.SorterPoolEvalBinsSets
@@ -31,7 +31,7 @@ module SorterPoolEvalBinsSetCollectionDto =
             |> Seq.toArray
     }
 
-    let toDomain (dto: sorterPoolEvalBinsSetCollectionDto) : sorterPoolEvalBinsSetCollection =
+    let toDomain (dto: sorterPoolEvalBinsSetCollectionDto) : sorterPoolBinsSetSeries =
         let id = dto.SorterPoolEvalBinsSetCollectionId |> UMX.tag
 
         let setsMap =
@@ -41,4 +41,4 @@ module SorterPoolEvalBinsSetCollectionDto =
                 (set.SorterPoolEvalBinsSetId, set))
             |> Map.ofSeq
 
-        sorterPoolEvalBinsSetCollection.recreate id setsMap
+        sorterPoolBinsSetSeries.recreate id setsMap

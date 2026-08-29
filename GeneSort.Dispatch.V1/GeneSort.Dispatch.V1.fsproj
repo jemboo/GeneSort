@@ -63,7 +63,8 @@
     <Compile Include="SorterSgd\SorterSgdTypes.fs" />
     <Compile Include="SorterSgd\Prefix\Msrs24p3a\Common.fs" />
     <Compile Include="SorterSgd\Prefix\Msrs24p3a\PoolSzComp.fs" />
-    <Compile Include="SorterSgd\Prefix\Msrs24p3a\PoolSzCompL.fs" />
+    <Compile Include="SorterSgd\Prefix\Msrs24p3a\PoolSzComp_8K.fs" />
+    <Compile Include="SorterSgd\Prefix\Msrs24p3a\PoolSzComp_16K.fs" />
     <Compile Include="SorterSgd\Prefix\Msrs24p3a\StageCrossings.fs" />
     <Compile Include="SorterSgd\MsceSgd\MsceSgdDbs.fs" />
     <Compile Include="SorterSgd\MssiSgd\MssiSgdDbs.fs" />

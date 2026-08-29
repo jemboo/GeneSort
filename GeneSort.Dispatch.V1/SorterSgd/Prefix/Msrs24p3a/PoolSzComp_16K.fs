@@ -11,33 +11,32 @@ open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.Common
 open GeneSort.Dispatch.V1.SorterSgd
-open GeneSort.SortingOps
 
 
-module StageCrossings =
+module PoolSzComp16k =
 
-    let globalSorterCount = 512 |> UMX.tag<sorterCount>
-    let dbNamePoolsTest = "StageCrossingsTest" |> UMX.tag<databaseName>
-    let dbNamePoolSz256 = "StageCrossingsPoolSz256" |> UMX.tag<databaseName>
+   // let globalSorterCount = 8192 |> UMX.tag<sorterCount> //(2^13)
+    let globalSorterCount = 16384 |> UMX.tag<sorterCount> //(2^16)
+    //let globalSorterCount = 131072 |> UMX.tag<sorterCount> //(2^17)
+    //let globalSorterCount = 262144 |> UMX.tag<sorterCount> //(2^18)
 
-    let dbFolderTest = @$"c:\Projects\{%projName}\{%dbNamePoolsTest}\Data" |> UMX.tag<pathToRootFolder>
-    let dbFolderPoolSz256 = @$"c:\Projects\{%projName}\{%dbNamePoolSz256}\Data" |> UMX.tag<pathToRootFolder>
-
+    let dbNamePools_16K = "PoolSz_16K" |> UMX.tag<databaseName>
+    let dbFolderPoolSz_16K = @$"c:\Projects\{%projName}\{%dbNamePools_16K}\Data" |> UMX.tag<pathToRootFolder>
 
     let makeQueryParams
+            (dbName: string<databaseName>)
             (repl: int<replNumber>)
             (genCurrent: int<generationNumber>)
             (sorterCtPerPool: int<sorterCountPerPool>)
             (sorterPoolCt: int<sorterPoolCount>)
             (ses:sorterEvalSelectionType)
             (mmod: int<mutationMod>)
-            (sev: sorterEvalMeasure)
             (outDt: outputDataType) : queryParams =
 
         match outDt with
         | outputDataType.RunParameters _ ->
             queryParams.create 
-                dbNamePoolsTest 
+                dbName 
                 projName
                 (Some repl)
                 outDt
@@ -46,11 +45,10 @@ module StageCrossings =
                     (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                     (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                     (runParameters.mutationModKey, (Some %mmod) |> string)
-                    (runParameters.sorterEvalMeasureKey, sev |> SorterEvalFunctions.toCompactString)
                 |]
         | _ ->
             queryParams.create 
-                dbNamePoolsTest 
+                dbName 
                 projName
                 (Some repl)
                 outDt
@@ -60,13 +58,13 @@ module StageCrossings =
                     (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                     (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                     (runParameters.mutationModKey, (Some %mmod) |> string)
-                    (runParameters.sorterEvalMeasureKey, sev |> SorterEvalFunctions.toCompactString)
                 |]
 
 
     let queryParamsFromRunParams 
-                    (rp: runParameters) 
-                    (odt: outputDataType) : queryParams option =
+            (dbName: string<databaseName>)
+            (rp: runParameters) 
+            (odt: outputDataType) : queryParams option =
         maybe {
             let! repl = rp.GetRepl()
             let! curGen = rp.GetGenerationCurrent()
@@ -74,12 +72,11 @@ module StageCrossings =
             let! spc = rp.GetSorterPoolCount()
             let! spsev = rp.GetSeedPoolSorterEvalSelectionType()
             let! mmod = rp.GetMutationMod()
-            let! sev = rp.GetSorterEvalMeasure()
-            return makeQueryParams repl curGen scPP spc spsev mmod sev odt
+            return makeQueryParams dbName repl curGen scPP spc spsev mmod odt
         }
 
     let private withLocalParams (rp:runParameters) =
-        let rpn = standardStageCrossingsParams rp
+        let rpn = standardPoolSzParams rp
         rpn.WithSeedModificationRate(Some 0.02<seedModificationRate>)
             .WithModificationRate(Some 0.06<modificationRate>)
             .WithOrthoRate(Some 4.001<orthoRate>)
@@ -102,17 +99,14 @@ module StageCrossings =
 
 
     let saveIntervals = SampleRegistry.samplingConfigsDict["expInterval100_L50s"]
-    let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.K"]
+    let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.2C"]
 
-    let dbTest = new GeneSortGenDbMp(dbFolderTest, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
-    let dbPoolSz256 = new GeneSortGenDbMp(dbFolderPoolSz256, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
-
+    let dbPools_16K = new GeneSortGenDbMp(dbFolderPoolSz_16K, queryParamsFromRunParams dbNamePools_16K, saveIntervals, saveSubIntervals)
 
 
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
         [ 
-            (dbNamePoolsTest, dbTest :> IGeneSortDb);
-            (dbNamePoolSz256, dbPoolSz256 :> IGeneSortDb);
+            (dbNamePools_16K, dbPools_16K :> IGeneSortDb);
         ]
         |> Map.ofList
 
@@ -130,16 +124,32 @@ module StageCrossings =
 
     module Specs =
 
-        let TestSpec (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = dbNamePoolsTest
-            runName = sprintf @"Test_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "StageCrossing analysis for 24pfx Msrs"
+        let PoolSz_16Kp2 (executorType: sorterSgdExecutorType)  : runHostSpec = {
+            databaseName = dbNamePools_16K
+            runName = sprintf @"PoolSz_16Kp2_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Pool size 16K for 24pfx3a Msrs"
             spans = [
                 (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [6] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, ["512"])
-                (runParameters.mutationModKey, [0 .. 7] |> List.map string)
-                CommonParams.sorterEvalMeasure_StageCrossing_Range
+                (runParameters.generationIntervalCountKey, [1] |> List.map string)
+                (runParameters.sorterCountPerPoolKey, ["16384";])
+                (runParameters.mutationModKey, [0 .. 63;] |> List.map string)
+            ]
+            filter = paramMapFilter
+            enhancer = finishRunParams
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 2
+        }
+
+
+        let PoolSz_16Kp4 (executorType: sorterSgdExecutorType)  : runHostSpec = {
+            databaseName = dbNamePools_16K
+            runName = sprintf @"PoolSz_8Kp4_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Pool size 16K for 24pfx3a Msrs"
+            spans = [
+                (runParameters.generationCurrentKey, [0] |> List.map string)
+                (runParameters.generationIntervalCountKey, [1] |> List.map string)
+                (runParameters.sorterCountPerPoolKey, ["16384";])
+                (runParameters.mutationModKey, [0 .. 63;] |> List.map string)
             ]
             filter = paramMapFilter
             enhancer = finishRunParams
@@ -147,19 +157,19 @@ module StageCrossings =
             maxParallel = 4
         }
 
-        let PoolSz_256a (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = dbNamePoolSz256
-            runName = sprintf @"PoolSz256a_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "StageCrossing analysis for 24pfx3a Msrs"
+
+        let PoolSz_8Kp8 (executorType: sorterSgdExecutorType)  : runHostSpec = {
+            databaseName = dbNamePools_16K
+            runName = sprintf @"PoolSz_8Kp8_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Pool size 16K for 24pfx3a Msrs"
             spans = [
                 (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [5] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, ["256"])
-                (runParameters.mutationModKey, [0 .. 63;] |> List.map string)
-                CommonParams.sorterEvalMeasure_StageCrossing_Range
+                (runParameters.generationIntervalCountKey, [1] |> List.map string)
+                (runParameters.sorterCountPerPoolKey, ["16384";])
+                (runParameters.mutationModKey, [12 .. 27;] |> List.map string)
             ]
             filter = paramMapFilter
             enhancer = finishRunParams
             allowOverwrite = false |> UMX.tag
-            maxParallel = 16
+            maxParallel = 8
         }

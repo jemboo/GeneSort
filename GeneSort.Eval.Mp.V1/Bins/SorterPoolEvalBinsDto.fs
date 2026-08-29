@@ -23,7 +23,7 @@ type sorterPoolEvalBinsDto = {
 
 module SorterPoolEvalBinsDto =
 
-    let fromDomain (poolBins: sorterPoolEvalBins) : sorterPoolEvalBinsDto = {
+    let fromDomain (poolBins: sorterPoolBins) : sorterPoolEvalBinsDto = {
         SorterPoolEvalBinsId = %poolBins.SorterPoolEvalBinsId
         SorterPoolId = %poolBins.SorterPoolId
         SorterEvalBins =
@@ -33,7 +33,7 @@ module SorterPoolEvalBinsDto =
             |> Seq.toArray
     }
 
-    let toDomain (dto: sorterPoolEvalBinsDto) : sorterPoolEvalBins =
+    let toDomain (dto: sorterPoolEvalBinsDto) : sorterPoolBins =
         let id = dto.SorterPoolEvalBinsId |> UMX.tag
         let poolId = dto.SorterPoolId |> UMX.tag
 
@@ -44,4 +44,4 @@ module SorterPoolEvalBinsDto =
                 (bin.SorterEvalKey, bin))
             |> Map.ofSeq
 
-        sorterPoolEvalBins.recreate id poolId bins
+        sorterPoolBins.recreate id poolId bins

@@ -13,7 +13,7 @@ type outputDataType =
     | SorterSet of string
     | SortableTest of string
     | SorterSetEval of string
-    | SorterPoolEvalBinsSetCollection of string
+    | SorterPoolBinsSetSeries of string
     | SorterPoolSetHistory of string
     | TextReport of string<textReportName>
 
@@ -31,7 +31,7 @@ module OutputDataType =
         | SorterSet s -> appendParam "SorterSet" s
         | SortableTest s -> appendParam "SortableTest" s
         | SorterSetEval s -> appendParam "SorterSetEval" s
-        | SorterPoolEvalBinsSetCollection s -> appendParam "SorterPoolEvalBinsSetCollection" s
+        | SorterPoolBinsSetSeries s -> appendParam "SorterPoolBinsSetSeries" s
         | SorterPoolSetHistory s -> appendParam "SorterPoolSetHistoryCollection" s
         | TextReport s -> appendParam "Report\\TextReport" %s
 
@@ -48,7 +48,7 @@ module OutputDataType =
         | "SorterSet" -> Some (SorterSet param)
         | "SortableTest" -> Some (SortableTest param)
         | "SorterSetEval" -> Some (SorterSetEval param)
-        | "SorterPoolEvalBinsSetCollection" -> Some (SorterPoolEvalBinsSetCollection param)
+        | "SorterPoolBinsSetSeries" -> Some (SorterPoolBinsSetSeries param)
         | "SorterPoolSetHistoryCollection" -> Some (SorterPoolSetHistory param)
         | "TextReport" -> Some (TextReport (param |> UMX.tag<textReportName>))
         | _ -> None

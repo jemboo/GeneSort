@@ -4,24 +4,24 @@ open FSharp.UMX
 open System
 open GeneSort.Eval.V1
 
-[<Measure>] type sorterPoolEvalBinsSetId
+[<Measure>] type sorterPoolBinsSetId
 
-type sorterPoolEvalBinsSet =
+type sorterPoolBinsSet =
     private {
-        _sorterPoolEvalBinsSetId: Guid<sorterPoolEvalBinsSetId>
+        _sorterPoolEvalBinsSetId: Guid<sorterPoolBinsSetId>
         _sorterPoolSetId: Guid<sorterPoolSetId>
         _generationNumber: int<generationNumber>
-        _sorterPoolEvalBinsMap: Map<Guid<sorterPoolEvalBinsId>, sorterPoolEvalBins>
+        _sorterPoolEvalBinsMap: Map<Guid<sorterPoolBinsId>, sorterPoolBins>
     }
     with
     /// Creates an evaluated bin set collection directly from a sorterPoolSet
-    static member create (id: Guid<sorterPoolEvalBinsSetId>) (poolSet: sorterPoolSet) =
+    static member create (id: Guid<sorterPoolBinsSetId>) (poolSet: sorterPoolSet) =
         let poolBinsMap =
             poolSet.SorterPools
             |> Map.values
             |> Seq.map (fun pool ->
-                let binId = Guid.NewGuid() |> UMX.tag<sorterPoolEvalBinsId>
-                let poolBins = sorterPoolEvalBins.create binId pool
+                let binId = Guid.NewGuid() |> UMX.tag<sorterPoolBinsId>
+                let poolBins = sorterPoolBins.create binId pool
                 (poolBins.SorterPoolEvalBinsId, poolBins))
             |> Map.ofSeq
 
@@ -33,10 +33,10 @@ type sorterPoolEvalBinsSet =
         }
 
     /// Explicit reconstructor for deserialization or manual instantiation
-    static member recreate (id: Guid<sorterPoolEvalBinsSetId>)
+    static member recreate (id: Guid<sorterPoolBinsSetId>)
                             (sorterPoolSetId: Guid<sorterPoolSetId>)
                             (generationNumber: int<generationNumber>)
-                            (evalBinsMap: Map<Guid<sorterPoolEvalBinsId>, sorterPoolEvalBins>) =
+                            (evalBinsMap: Map<Guid<sorterPoolBinsId>, sorterPoolBins>) =
         {
             _sorterPoolEvalBinsSetId = id
             _sorterPoolSetId = sorterPoolSetId
@@ -53,7 +53,7 @@ type sorterPoolEvalBinsSet =
 module SorterPoolEvalBinsSet =
 
     /// Flattens all bins across all sorterPoolEvalBins into a sequence of dataTableRecord
-    let makeDataTableRecords (source: sorterPoolEvalBinsSet) : GeneSort.Core.dataTableRecord seq =
+    let makeDataTableRecords (source: sorterPoolBinsSet) : GeneSort.Core.dataTableRecord seq =
         source.SorterPoolEvalBinsMap
         |> Map.values
         |> Seq.collect SorterPoolEvalBins.makeDataTableRecords

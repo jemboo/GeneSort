@@ -33,100 +33,6 @@ module CommonParams =
              [simpleSorterModelType.Msuf4] |> List.map SimpleSorterModelType.toString)
 
 
-
-    module IntervalDefinitions =
-
-        /// Helper to fetch registered configuration strings by key name from the SampleRegistry
-        let private getSampleStr (key: string) : string =
-            match SampleRegistry.samplingConfigsDict.TryGetValue(key) with
-            | true, cfg -> IntSampleMethod.toString cfg.Method
-            | false, _ -> invalidArg "key" (sprintf "Key '%s' not found in SampleRegistry" key)
-
-        // RunResult report Intervals
-
-        // 2, 4, 6, ...
-        let runResultReportInterval2 = 
-            (runParameters.snapshotReportIntervalsKey, [getSampleStr "runResultReportInterval2"])
-
-        // 10, 20, 30, ...
-        let runResultReportInterval10 = 
-            (runParameters.snapshotReportIntervalsKey, [getSampleStr "runResultReportInterval10"])
-
-        // 100, 200, 300 ..
-        let runResultReportInterval100 = 
-            (runParameters.snapshotReportIntervalsKey, [getSampleStr "runResultReportInterval100"])
-
-        // 500, 1000, 1500 ...
-        let runResultReportInterval500 = 
-            (runParameters.snapshotReportIntervalsKey, [getSampleStr "runResultReportInterval500"])
-
-        // 1000, 2000, 3000 ...
-        let runResultReportInterval1000 = 
-            (runParameters.snapshotReportIntervalsKey, [getSampleStr "runResultReportInterval1000"])
-
-
-        // SummaryReport Intervals
-
-        // 1, 2, 3, 4 ..
-        let summaryReport_cSampleC = 
-            (runParameters.summaryReportIntervalsKey, [getSampleStr "summaryReport_cSampleC"])
-
-        // 25, 27, 28, 29, 30, 31, 32, 34, 35, 36, 38
-        let summaryReport_cSample5C = 
-            (runParameters.summaryReportIntervalsKey, [getSampleStr "summaryReport_cSample5C"])
-
-        // 25, 27, 28, 29, 31, 32, 34, 36, 37, 39
-        let summaryReport_cSample1K = 
-            (runParameters.summaryReportIntervalsKey, [getSampleStr "summaryReport_cSample1K"])
-
-        // 25, 27, 29, 31, 33, 36 ...
-        let summaryReport_cSample5K = 
-            (runParameters.summaryReportIntervalsKey, [getSampleStr "summaryReport_cSample5K"])
-
-
-        // SorterPool selection Intervals
-
-        let sorterPoolSelectEmpty = 
-            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelectEmpty"])
-
-        // 5, 10
-        let sorterPoolSelect5_2 = 
-            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelect5_2"])
-
-        // 5, 10 followed by empty state
-        let sorterPoolSelects5_2 = 
-            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelects5_2"; getSampleStr "sorterPoolSelectEmpty"])
-
-        // 25, 50, 75, 100, 125
-        let sorterPoolSelects25_5 = 
-            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelects25_5"; getSampleStr "sorterPoolSelectEmpty"])
-
-        // 25, 50, 100, 200, 400
-        let sorterPoolSelects25_5i = 
-            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelects25_5i"; getSampleStr "sorterPoolSelectEmpty"])
-
-        // 100, 150, 200, 250, 300 ...
-        let sorterPoolSelect100_50 = 
-            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelect100_50"])
-
-        // 100, 200, 300, 400, ...
-        let sorterPoolSelect100_100 = 
-            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelect100_100"])
-
-        // 10, 20, 40, 80, 160, ...
-        let sorterPoolSelect25_20i = 
-            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelect25_20i"])
-
-        // 50, 100, 200, 400, 800, 1600, ...
-        let sorterPoolSelect50_10i = 
-            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelect50_10i"])
-
-        // 100, 200, 400, 800, 1600, ...
-        let sorterPoolSelect100_10i = 
-            (runParameters.sorterPoolSelectionIntervalsKeyOld, [getSampleStr "sorterPoolSelect100_10i"])
-
-
-
     // SorterCounts
     let testSorterCount = (runParameters.sorterCountKey, ["1000";] )
     let smallSorterCount = (runParameters.sorterCountKey, ["100";] )
@@ -454,8 +360,6 @@ module CommonParams =
 
 
 
-
-
     // Sorted Fractions
     let sortedFractions = 
             (runParameters.sortedFractionKey, [0.65; 0.75; 0.85; 0.90; 0.95; 0.98; 0.99; 0.995] |> List.map string)
@@ -477,11 +381,18 @@ module CommonParams =
 
     // SorterEvalMeasures
 
+    let _cestM_ScwP3 = ceStMeasure.create 
+                            (1.1<stageWeight>) 
+                            (true |> UMX.tag<filterUnsorted>)
+                            (false |> UMX.tag<filterReflectionSymmetric>)
+                            (0.5 |> UMX.tag<stageCrossingWeight>)
+                    |> sorterEvalMeasure.CeSt
+
     let _cestM_ScwP2 = ceStMeasure.create 
                                 (1.1<stageWeight>) 
                                 (true |> UMX.tag<filterUnsorted>)
                                 (false |> UMX.tag<filterReflectionSymmetric>)
-                                (0.01 |> UMX.tag<stageCrossingWeight>)
+                                (0.3 |> UMX.tag<stageCrossingWeight>)
                     |> sorterEvalMeasure.CeSt
 
 
@@ -489,7 +400,7 @@ module CommonParams =
                                 (1.1<stageWeight>) 
                                 (true |> UMX.tag<filterUnsorted>)
                                 (false |> UMX.tag<filterReflectionSymmetric>)
-                                (0.005 |> UMX.tag<stageCrossingWeight>)
+                                (0.1 |> UMX.tag<stageCrossingWeight>)
                     |> sorterEvalMeasure.CeSt
 
 
@@ -497,15 +408,10 @@ module CommonParams =
                                 (1.1<stageWeight>) 
                                 (true |> UMX.tag<filterUnsorted>)
                                 (false |> UMX.tag<filterReflectionSymmetric>)
-                                (-0.005 |> UMX.tag<stageCrossingWeight>)
+                                (-0.05 |> UMX.tag<stageCrossingWeight>)
                     |> sorterEvalMeasure.CeSt
 
-    let _cestM_ScwN2 = ceStMeasure.create 
-                                (1.1<stageWeight>) 
-                                (true |> UMX.tag<filterUnsorted>)
-                                (false |> UMX.tag<filterReflectionSymmetric>)
-                                (-0.01 |> UMX.tag<stageCrossingWeight>)
-                    |> sorterEvalMeasure.CeSt
+
 
 
 
@@ -526,9 +432,9 @@ module CommonParams =
             [ _cestM_ScwP2;] |> List.map SorterEvalMeasure.toCompactString)
 
 
-    let sorterEvalMeasure_CestM_Range =
+    let sorterEvalMeasure_StageCrossing_Range =
             (runParameters.sorterEvalMeasureKey, 
-            [ _cestM_ScwP2; _cestM_ScwP1; _cestM_ScwN1; _cestM_ScwN2; ] 
+            [ SorterEvalMeasure.stageBiased; _cestM_ScwP2; _cestM_ScwP1; _cestM_ScwN1; _cestM_ScwP3; ] 
             |> List.map SorterEvalMeasure.toCompactString)
 
 

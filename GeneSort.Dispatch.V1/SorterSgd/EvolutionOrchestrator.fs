@@ -103,7 +103,7 @@ module EvolutionOrchestrator =
                         (remainingSteps: int)
                         (currentSorterPoolSet: sorterPoolSet)
                         (historyAcc: sorterPoolSetSummary list)
-                        (evalBinsSetAcc: sorterPoolEvalBinsSet list)
+                        (evalBinsSetAcc: sorterPoolBinsSet list)
                         (runningMap: runningMemberHistoryMap)
                         : Async<Result<sorterPoolSet, string>> =
 
@@ -185,8 +185,8 @@ module EvolutionOrchestrator =
                             // Accumulate sorterPoolEvalBinsSet at summary report frequency
                             let updatedEvalBinsSetAcc =
                                 if shouldSummaryReport then
-                                    let binsSetId = Guid.NewGuid() |> UMX.tag<sorterPoolEvalBinsSetId>
-                                    let currentBinsSet = sorterPoolEvalBinsSet.create binsSetId nextSorterPoolSet
+                                    let binsSetId = Guid.NewGuid() |> UMX.tag<sorterPoolBinsSetId>
+                                    let currentBinsSet = sorterPoolBinsSet.create binsSetId nextSorterPoolSet
                                     currentBinsSet :: evalBinsSetAcc
                                 else
                                     evalBinsSetAcc
@@ -207,14 +207,14 @@ module EvolutionOrchestrator =
                                         do! genDb.saveAsync qpRunResult (currentSummaries |> outputData.SorterPoolSetSummaries) allowOverwrite
 
                                         // Save SorterPoolEvalBinsSetCollection
-                                        let collectionId = Guid.NewGuid() |> UMX.tag<sorterPoolEvalBinsSetCollectionId>
+                                        let collectionId = Guid.NewGuid() |> UMX.tag<sorterPoolBinsSetSeriesId>
                                         let evalBinsCollection = 
-                                            sorterPoolEvalBinsSetCollection.create collectionId (updatedEvalBinsSetAcc |> List.rev)
+                                            sorterPoolBinsSetSeries.create collectionId (updatedEvalBinsSetAcc |> List.rev)
                                         let! qpBinsCollection = 
-                                            genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolEvalBinsSetCollection "")
+                                            genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolBinsSetSeries "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolEvalBinsSetCollection."
                                         log (sprintf "Saving SorterPoolEvalBinsSetCollection checkpoint at Generation %d..." %currentGen)
-                                        do! genDb.saveAsync qpBinsCollection (evalBinsCollection |> outputData.SorterPoolEvalBinsSetCollection) allowOverwrite
+                                        do! genDb.saveAsync qpBinsCollection (evalBinsCollection |> outputData.SorterPoolBinsSetSeries) allowOverwrite
 
 
                                         // Prune dead lineages and generate SorterPoolSetHistory

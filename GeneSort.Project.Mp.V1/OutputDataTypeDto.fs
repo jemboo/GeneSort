@@ -20,7 +20,7 @@ module OutputDataTypeDto =
         | SorterSet so -> { Tag = "SorterSet"; Value = so }
         | SortableTest so -> { Tag = "SortableTest"; Value = so }
         | SorterSetEval so -> { Tag = "SorterSetEval"; Value = so }
-        | SorterPoolEvalBinsSetCollection so -> { Tag = "SorterPoolEvalBinsSet"; Value = so }
+        | SorterPoolBinsSetSeries so -> { Tag = "SorterPoolEvalBinsSet"; Value = so }
         | SorterPoolSetHistory so -> { Tag = "SorterPoolSetHistoryCollection"; Value = so }
         | Run so -> { Tag = "Run"; Value = %so }
         | TextReport trn -> { Tag = "TextReport"; Value = %trn }
@@ -34,7 +34,7 @@ module OutputDataTypeDto =
         | "SorterSet" -> SorterSet dto.Value
         | "SortableTest" -> SortableTest dto.Value
         | "SorterSetEval" -> SorterSetEval dto.Value
-        | "SorterPoolEvalBinsSetCollection" -> SorterPoolEvalBinsSetCollection dto.Value
+        | "SorterPoolEvalBinsSetCollection" -> SorterPoolBinsSetSeries dto.Value
         | "SorterPoolSetHistoryCollection" -> SorterPoolSetHistory dto.Value
         | "Run" -> Run (dto.Value |> UMX.tag<runName>)
         | "TextReport" -> TextReport (dto.Value |> UMX.tag<textReportName>)

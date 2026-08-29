@@ -4,17 +4,17 @@ open FSharp.UMX
 open GeneSort.Eval.V1.Bins
 open GeneSort.Eval.V1
 
-[<Measure>] type sorterPoolEvalBinsId
+[<Measure>] type sorterPoolBinsId
 
-type sorterPoolEvalBins =
+type sorterPoolBins =
     private {
-        _sorterPoolEvalBinsId: Guid<sorterPoolEvalBinsId>
+        _sorterPoolEvalBinsId: Guid<sorterPoolBinsId>
         _sorterPoolId: Guid<sorterPoolId>
         _sorterEvalBins: Map<sorterEvalKey, sorterEvalBin>
     }
     with
     /// Creates a bin set from a sorterPool by extracting evaluated members
-    static member create (id: Guid<sorterPoolEvalBinsId>) (pool: sorterPool) =
+    static member create (id: Guid<sorterPoolBinsId>) (pool: sorterPool) =
         let validEvals = 
             pool.SorterPoolMembers
             |> Seq.choose (fun memberObj -> memberObj.SorterEval)
@@ -34,7 +34,7 @@ type sorterPoolEvalBins =
         }
 
     /// Explicit reconstructor for deserialization or manual instantiation
-    static member recreate (id: Guid<sorterPoolEvalBinsId>) 
+    static member recreate (id: Guid<sorterPoolBinsId>) 
                             (sorterPoolId: Guid<sorterPoolId>) 
                             (bins: Map<sorterEvalKey, sorterEvalBin>) =
         {
@@ -51,6 +51,6 @@ type sorterPoolEvalBins =
 module SorterPoolEvalBins = 
 
     /// Returns one dataTableRecord for each bin member
-    let makeDataTableRecords (source: sorterPoolEvalBins) : GeneSort.Core.dataTableRecord seq =
+    let makeDataTableRecords (source: sorterPoolBins) : GeneSort.Core.dataTableRecord seq =
         source.Bins
         |> Seq.map (fun kvp -> SorterEvalBin.toDataTableRecord kvp.Value)

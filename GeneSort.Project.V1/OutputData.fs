@@ -16,7 +16,7 @@ type outputData =
     | SorterPoolSetSummaries of sorterPoolSetSummary array
     | SorterSet of sorterSet
     | SorterSetEval of sorterSetEval
-    | SorterPoolEvalBinsSetCollection of sorterPoolEvalBinsSetCollection
+    | SorterPoolBinsSetSeries of sorterPoolBinsSetSeries
     | SorterPoolSetHistory of sorterPoolSetHistory
     | TextReport of dataTableReport
 
@@ -53,8 +53,8 @@ module OutputData =
         | _ -> Error "Database returned data, but it was not a SorterSetEval."
         
     let asSorterPoolEvalBinSetCollection = function
-        | SorterPoolEvalBinsSetCollection sse -> Ok sse
-        | _ -> Error "Database returned data, but it was not a SorterPoolEvalBinSetCollection."
+        | SorterPoolBinsSetSeries sse -> Ok sse
+        | _ -> Error "Database returned data, but it was not a SorterPoolBinsSetSeries."
 
     let asSorterPoolSetHistory = function
         | SorterPoolSetHistory sse -> Ok sse

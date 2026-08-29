@@ -13,7 +13,7 @@ open GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.Common
 open GeneSort.Dispatch.V1.SorterSgd
 
 
-module PoolSzCompL =
+module PoolSzComp8k =
 
     let globalSorterCount = 8192 |> UMX.tag<sorterCount> //(2^13)
    // let globalSorterCount = 65536 |> UMX.tag<sorterCount> //(2^16)

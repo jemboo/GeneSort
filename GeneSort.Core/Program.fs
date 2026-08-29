@@ -51,15 +51,16 @@ module Example =
             //let rootDir = @"C:\Projects\SorterSgd.Prfefix.Msrs24p3a\PoolSz32\Data\Report\TextReport_SorterRunResult_SummaryReport"
             //let rootDir = @"C:\Projects\SorterSgd.Prfefix.Msrs24p3a\Pools4098_1_vs_512\Data\Report\TextReport_SorterRunResult_SummaryReport"
             //let rootDir = @"C:\Projects\SorterSgd.Prfefix.Msrs24p3a\Pools4098_2_vs_256\Data\Report\TextReport_SorterRunResult_SummaryReport"
-            let rootDir = @"C:\Projects\SorterSgd.Prfefix.Msrs24p3a\PoolsTest\Data\Report\TextReport_SorterPoolSetHistory_Report"
+            //let rootDir = @"C:\Projects\SorterSgd.Prfefix.Msrs24p3a\PoolsTest\Data\Report\TextReport_SorterPoolSetHistory_Report"
+            let rootDir = @"C:\Projects\SorterSgd.Prfefix.Msrs24p3a\StageCrossingsTest\Data\Report\TextReport_SummaryReport"
             DataTableIO.concatenateAllFiles rootDir  $"{rootDir}\\MergeReport_report.txt"
 
 
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
-    SampleRegistry.printFirstMembers 30 100000
-    //concato()
+    //SampleRegistry.printFirstMembers 30 100000
+    concato()
 
 
     printfn "end: %s" (DateTime.Now.ToLongTimeString())
