@@ -115,6 +115,7 @@ module Reporting =
             "SnapshotReport"
             genDb rp allowOverwrite cts progress
 
+
     let private makePoolHistoryReport (host: IRunHost) rp allowOverwrite cts progress =
         let genDb = host.RunDb :?> IGeneSortGenDb
         makeDynamicReportFromSlices
@@ -123,6 +124,17 @@ module Reporting =
             SorterPoolSetHistory.toDataTableRecords
             "SorterPoolSetHistoryReport"
             genDb rp allowOverwrite cts progress
+
+
+    let private makePoolBinsReport (host: IRunHost) rp allowOverwrite cts progress =
+        let genDb = host.RunDb :?> IGeneSortGenDb
+        makeDynamicReportFromSlices
+            Utils.loadAvailableSorterPoolBins
+            (fun hist -> hist.MaxGeneration)
+            SorterPoolEvalBinsSetCollection.makeDataTableRecords
+            "SorterPoolBinsReport"
+            genDb rp allowOverwrite cts progress
+
 
     // --- Executors ---
 
@@ -136,7 +148,12 @@ module Reporting =
             member _.Execute host rp allowOverwrite cts progress =
                 makeSnapshotReport host rp allowOverwrite cts progress }
 
-    let sorterPoolHistoryReportExecutor =
+    let poolHistoryReportExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 makePoolHistoryReport host rp allowOverwrite cts progress }
+
+    let poolBinsReportExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                makePoolBinsReport host rp allowOverwrite cts progress }

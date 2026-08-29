@@ -54,6 +54,12 @@ module SorterPoolEvalBinsSet =
 
     /// Flattens all bins across all sorterPoolEvalBins into a sequence of dataTableRecord
     let makeDataTableRecords (source: sorterPoolBinsSet) : GeneSort.Core.dataTableRecord seq =
-        source.SorterPoolEvalBinsMap
-        |> Map.values
-        |> Seq.collect SorterPoolEvalBins.makeDataTableRecords
+        let setRec =
+            GeneSort.Core.dataTableRecord.createEmpty()
+            |> GeneSort.Core.dataTableRecord.addKeyAndData "Generation" (source.GenerationNumber |> UMX.untag |> string)
+        let childRecs =
+            source.SorterPoolEvalBinsMap
+            |> Map.values
+            |> Seq.collect SorterPoolEvalBins.makeDataTableRecords
+
+        setRec |> GeneSort.Core.dataTableRecord.combineWithMany childRecs

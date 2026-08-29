@@ -10,6 +10,7 @@ type sorterSgdExecutorType =
     | SummaryReport
     | HistoryReport
     | SnapshotReport
+    | BinsReport
 
 
 module SorterSgdExecutorType =
@@ -21,6 +22,7 @@ module SorterSgdExecutorType =
         | SummaryReport -> "SummaryReport"
         | HistoryReport -> "HistoryReport"
         | SnapshotReport -> "SnapshotReport"
+        | BinsReport -> "BinsReport"
 
 
     let private standardExecutor =
@@ -57,5 +59,6 @@ module SorterSgdExecutorType =
         | sorterSgdExecutorType.GenMerge -> mergeExecutor
         | sorterSgdExecutorType.GenPrefix -> prefixExecutor
         | sorterSgdExecutorType.SummaryReport -> Reporting.summaryReportExecutor
-        | sorterSgdExecutorType.HistoryReport -> Reporting.sorterPoolHistoryReportExecutor
+        | sorterSgdExecutorType.HistoryReport -> Reporting.poolHistoryReportExecutor
         | sorterSgdExecutorType.SnapshotReport -> Reporting.snapshotReportExecutor
+        | sorterSgdExecutorType.BinsReport -> Reporting.poolBinsReportExecutor

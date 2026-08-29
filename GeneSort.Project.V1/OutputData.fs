@@ -52,7 +52,7 @@ module OutputData =
         | SorterSetEval sse -> Ok sse
         | _ -> Error "Database returned data, but it was not a SorterSetEval."
         
-    let asSorterPoolEvalBinSetCollection = function
+    let asSorterPoolBinsSetSeries = function
         | SorterPoolBinsSetSeries sse -> Ok sse
         | _ -> Error "Database returned data, but it was not a SorterPoolBinsSetSeries."
 
