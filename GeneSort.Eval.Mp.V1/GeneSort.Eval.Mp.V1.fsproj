@@ -9,7 +9,7 @@
     <Compile Include="Bins\SorterEvalBinSetDto.fs" />
     <Compile Include="Bins\SorterPoolEvalBinsDto.fs" />
     <Compile Include="Bins\SorterPoolEvalBinsSetDto.fs" />
-    <Compile Include="Bins\SorterPoolEvalBinsSetCollectionDto.fs" />
+    <Compile Include="Bins\SorterPoolBinsSetSeriesDto.fs" />
     <Compile Include="Sgd\SorterMutationSourceDto.fs" />
     <Compile Include="Sgd\SorterPoolSetDto.fs" />
     <Compile Include="Sgd\SorterPoolSetSummaryDto.fs" />

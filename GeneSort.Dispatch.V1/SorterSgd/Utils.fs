@@ -75,7 +75,6 @@ module Utils =
             return discoverLazy genSequence
         }
 
-    /// Backwards-compatible SorterRunResult slice loader returning a lazy sequence.
     let loadAvailableSorterPoolSets
             (generationalDb: IGeneSortGenDb)
             (startingGen: int<generationNumber>)
@@ -110,6 +109,20 @@ module Utils =
             OutputData.asSorterPoolSetHistory 
             (outputDataType.SorterPoolSetHistory "") 
             generationalDb startingGen rp cts log
+
+
+    let loadAvailableSorterPoolBins
+            (generationalDb: IGeneSortGenDb)
+            (startingGen: int<generationNumber>)
+            (rp: runParameters)
+            (cts: CancellationToken)
+            (log: string -> unit) : Async<seq<sorterPoolBinsSetSeries>> =
+        loadAvailableOutputData
+            OutputData.asSorterPoolBinsSetSeries 
+            (outputDataType.SorterPoolBinsSetSeries "") 
+            generationalDb startingGen rp cts log
+
+
 
     /// Optimized search to locate and load ONLY the slice with the highest generation number.
     /// Uses fast file-existence probes to skip expensive MessagePack deserialization.
