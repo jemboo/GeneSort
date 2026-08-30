@@ -15,11 +15,6 @@ open GeneSort.Dispatch.V1.SorterMutate.Msce
 open GeneSort.Dispatch.V1.SorterMutate.Mssi
 open GeneSort.Dispatch.V1.SorterMutate.Msrs
 open GeneSort.Dispatch.V1.SorterMutate.Msuf4
-open GeneSort.Dispatch.V1.SorterSgd.Msce
-open GeneSort.Dispatch.V1.SorterSgd
-open GeneSort.Dispatch.V1.SorterSgd.Mssi
-open GeneSort.Dispatch.V1.SorterSgd.Msrs
-open GeneSort.Dispatch.V1.SorterSgd.Msuf4
 open GeneSort.Core
 
 
@@ -89,11 +84,11 @@ module DispatchSorterEval =
 
 
     let executor = SorterEvalExecutor.getExecutor executorType
-    let minReplica = 0<replNumber>
-    let maxReplica = 1<replNumber>
+    let minReplica = 1<replNumber>
+    let maxReplica = 2<replNumber>
 
 
-    let runBoth() =
+    let makeParamsAndRun() =
 
         async {
 
@@ -132,7 +127,7 @@ module DispatchSorterEval =
         } |> Async.RunSynchronously
 
 
-    let MakeRunParams() =
+    let makeRunParams() =
 
         async {
             printfn "Init Run: %s" %host.Run.RunName

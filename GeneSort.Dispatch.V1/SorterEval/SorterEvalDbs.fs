@@ -216,13 +216,14 @@ module SorterEvalDbs =
 
     let getPrefixSorterEvals
                     (sorterLibId: sorterLibId)
+                    (repl: int<replNumber>)
                     (simpleSorterModelType: simpleSorterModelType)
                     (sorterEvalType: sorterEvalType)
                             : Async<Result<sorterSetEval, string>> =
 
         let qp = Prefix.makeQueryParams 
                         _rngTypeLcg
-                        (0 |> UMX.tag<replNumber>) 
+                        repl
                         sorterLibId 
                         simpleSorterModelType
                         sortableDataFormat.BitVector512

@@ -183,6 +183,11 @@ module PoolSetMakers =
     let createSeedSorterPoolSetPrefix
             (rp:runParameters) : Async<Result<sorterPoolSet, string>> =
         asyncResult {
+
+            let! repl =
+                   rp.GetRepl()
+                   |> Result.ofOption "Missing Repl"
+
             let! sorterLibId = 
                     rp.GetSortableTestFilter() 
                     |> Result.ofOption "Missing sorterLibId."
@@ -223,7 +228,8 @@ module PoolSetMakers =
 
             let! (parentSorterSetEval: sorterSetEval) = 
                 SorterEvalDbs.getPrefixSorterEvals 
-                    sorterLibId 
+                    sorterLibId
+                    repl
                     simpleSorterModelType
                     sorterEvalType.V2
 

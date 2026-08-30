@@ -48,9 +48,16 @@ type sorterPoolBins =
     member this.Bins with get() = this._sorterEvalBins
 
 
+
 module SorterPoolEvalBins = 
 
-    /// Returns one dataTableRecord for each bin member
+    ///// Returns one dataTableRecord for each bin member
     let makeDataTableRecords (source: sorterPoolBins) : GeneSort.Core.dataTableRecord seq =
-        source.Bins
-        |> Seq.map (fun kvp -> SorterEvalBin.toDataTableRecord kvp.Value)
+        let setRec =
+            GeneSort.Core.dataTableRecord.createEmpty()
+            |> GeneSort.Core.dataTableRecord.addKeyAndData "SorterPoolId" (source.SorterPoolId |> UMX.untag |> string)
+        let childRecs =
+            source.Bins
+            |> Seq.map (fun kvp -> SorterEvalBin.toDataTableRecord kvp.Value)
+
+        setRec |> GeneSort.Core.dataTableRecord.combineWithMany childRecs

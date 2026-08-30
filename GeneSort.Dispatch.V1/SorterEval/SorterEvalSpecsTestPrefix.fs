@@ -6,6 +6,8 @@ open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.CommonParams
+open GeneSort.Sorting
+open GeneSort.SortingOps
 
 module SorterEvalSpecsTestPrefix =
 
@@ -21,6 +23,8 @@ module SorterEvalSpecsTestPrefix =
           .WithSortingWidth(Some stf.sortingWidth)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
+          .WithExcludeSelfCe(Some (true |>UMX.tag<excludeSelfCe>))
+          .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
           .WithId (Some qp.Id)
 
 
