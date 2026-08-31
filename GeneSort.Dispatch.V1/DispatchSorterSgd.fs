@@ -128,8 +128,8 @@ module DispatchSorterSgd =
 
 
 
-    let private executorType = sorterSgdExecutorType.BinsReport
-    let private host: IRunHost = Msrs24p3a.PoolSzComp.createRunHost (Msrs24p3a.PoolSzComp.Specs.TestSpec executorType)
+    let private executorType = sorterSgdExecutorType.GenPrefix
+    let private host: IRunHost = Msrs24p3a.PoolSelSzComp.createRunHost (Msrs24p3a.PoolSelSzComp.Specs.PoolSz_4096 executorType)
 
     let private executor = SorterSgdExecutorType.getExecutor executorType
     let private minReplica = 0<replNumber>
