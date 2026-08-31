@@ -99,6 +99,7 @@ module PoolSzComp8k =
 
         rp3.WithRunFinished(Some false)
                 .WithId(Some qp.Value.Id)
+                .WithSelectedSorterCountPerPool(Some scpp)
                 .WithRunName(Some host.Run.RunName)
 
 

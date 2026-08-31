@@ -13,6 +13,7 @@ module SorterPipeline =
     let runGenerationStep
             (mutator: sorterModelMutator)
             (sorterCountPerPool: int<sorterCountPerPool>)
+            (selectedSorterCountPerPool: int<sorterCountPerPool>)
             (sorterChildCount: int<sorterChildCount>)
             (prioritizeNewMutants: bool<prioritizeNewMutants>)
             (distinctSorterHashes: bool<distinctSorterHashes>)
@@ -58,6 +59,7 @@ module SorterPipeline =
     let runGenerationStepDebug
             (mutator: sorterModelMutator)
             (sorterCountPerPool: int<sorterCountPerPool>)
+            (selectedSorterCountPerPool: int<sorterCountPerPool>)
             (sorterChildCount: int<sorterChildCount>)
             (prioritizeNewMutants: bool<prioritizeNewMutants>)
             (distinctSorterHashes: bool<distinctSorterHashes>)
@@ -75,7 +77,13 @@ module SorterPipeline =
             |> Map.exists (fun _ pool -> Seq.isEmpty pool.SorterPoolMembers)
 
         // --- Step 1a: Mutate / Expand Population ---
-        let mutatedPoolSet = SorterPoolSet.mutate mutator sorterChildCount currentPoolSet
+        //let mutatedPoolSet = SorterPoolSet.mutate mutator sorterChildCount currentPoolSet
+        let mutatedPoolSet = SorterPoolSet.mutateAndTrim 
+                                    mutator 
+                                    selectedSorterCountPerPool
+                                    selectionMeasure
+                                    sorterChildCount 
+                                    currentPoolSet
 
         if hasEmptyPool mutatedPoolSet && Debugger.IsAttached then
             Debugger.Break() // Pause if mutation resulted in an empty pool
@@ -110,7 +118,7 @@ module SorterPipeline =
                 selectionMeasure 
                 prioritizeNewMutants 
                 distinctSorterHashes 
-                sorterCountPerPool 
+                sorterCountPerPool
                 adjustedPoolSet
 
         if hasEmptyPool prunedPoolSet && Debugger.IsAttached then

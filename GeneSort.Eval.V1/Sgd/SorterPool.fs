@@ -198,6 +198,59 @@ module SorterPool =
         { pool with _sorterPoolMembers = updatedMembersMap }
 
 
+    /// Applies the same mutantsPerSorter count to every pool member, accumulating 
+    /// the advanced parents and all newly spawned mutants into a single updated pool.
+    // only keeps selectedSorterCountPerPool of each of the original pool members,
+    // prioritized according to selectionMeasure
+    let mutateAndTrim
+            (sorterModelMut: sorterModelMutator)
+            (selectedSorterCountPerPool: int<sorterCountPerPool>)
+            (selectionMeasure: sorterEvalMeasure)
+            (mutantsPerSorter: int<sorterChildCount>)  
+            (currentGeneration: int<generationNumber>)
+            (pool: sorterPool) : sorterPool =
+
+        let scoreFunc = SorterEvalFunctions.getFunctionForMeasure selectionMeasure
+
+        // Helper function to rank and extract a score for sorting
+        let getScore (spm: sorterPoolMember) =
+            match spm.SorterEval with
+            | Some eval -> scoreFunc eval
+            | None -> System.Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
+
+        // 1. Generate mutants for ALL original members and collect updated parents + children
+        let updatedParents, allChildren =
+            pool.SorterPoolMembers
+            |> Seq.fold (fun (parentsAcc, childrenAcc) currentMember ->
+                let updatedParent, childMutants = 
+                    SorterPoolMember.mutate 
+                        sorterModelMut 
+                        currentMember 
+                        pool.SorterPoolId 
+                        mutantsPerSorter 
+                        currentGeneration
+
+                (updatedParent :: parentsAcc, Seq.append childMutants childrenAcc)
+            ) ([], Seq.empty)
+
+        // 2. Trim parents based on score selection limit
+        let retainedParents =
+            if UMX.untag selectedSorterCountPerPool < (pool.SorterPoolMembers |> Seq.length) then
+                updatedParents
+                |> Seq.sortBy getScore
+                |> Seq.truncate (UMX.untag selectedSorterCountPerPool)
+            else
+                updatedParents :> seq<_>
+
+        // 3. Combine retained parents and all generated children into the pool map
+        let updatedMembersMap =
+            Seq.concat [ retainedParents; allChildren ]
+            |> Seq.map (fun m -> m.SorterPoolMemberId, m)
+            |> Map.ofSeq
+
+        { pool with _sorterPoolMembers = updatedMembersMap }
+
+
     /// Adjusts the RawCeLength to the minimal LastCeIndex required to keep at least 
     /// sortedFractionThreshold fraction of members sorted, and prunes any members exceeding that cutoff.
     let adjustCeLengthByThreshold
@@ -380,6 +433,7 @@ module SorterPool =
                 )
             else
                 birthdaySortedMembers
+
         let countAfterFilter2 = filter2Members.Length
 
         if countAfterFilter2 = 0 && countAfterFilter1 > 0 && Debugger.IsAttached then

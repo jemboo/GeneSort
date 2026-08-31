@@ -36,7 +36,8 @@ module EvolutionOrchestrator =
             let! genIntervalCount = rp.GetGenerationIntervalCount() |> Result.ofOption "Missing genIntervalCount."
             let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
             let! distinctSorterHashes = rp.GetDistinctSorterHashes() |> Result.ofOption "Missing distinctSorterHashes."
-            let! sorterCountPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sortersPerPool."
+            let! sorterCountPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sorterCountPerPool."
+            let! selectedSorterCountPerPool = rp.GetSelectedSorterCountPerPool() |> Result.ofOption "Missing selectedSorterCountPerPool."
             let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count."
             let! srtrEvalMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
             let! collectNewSortableTests = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests."
@@ -167,6 +168,7 @@ module EvolutionOrchestrator =
                                 SorterPipeline.runGenerationStepDebug
                                     mutator 
                                     currentSorterCountPerPool
+                                    selectedSorterCountPerPool
                                     sorterChildCount
                                     prioritizeNewMutants
                                     distinctSorterHashes

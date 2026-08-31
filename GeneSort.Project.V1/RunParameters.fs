@@ -67,6 +67,7 @@ type runParameters =
     static member sorterCountCycleKey = "SorterCountCycle"
     static member sorterCountCycleMultiplierKey = "SorterCountCycleMultiplier"
     static member sorterCountPerPoolKey = "SorterCountPerPool"
+    static member selectedSorterCountPerPoolKey = "SelectedSorterCountPerPool"
     static member sorterEvalMeasureInitialKey = "SorterEvalMeasureInitial"
     static member sorterEvalMeasureKey = "SorterEvalMeasure"
     static member seedPoolSorterEvalSelectionType = "SeedPoolSorterEvalSelectionType"
@@ -279,10 +280,14 @@ type runParameters =
         runParameters.tryGetFloat runParameters.sorterCountCycleMultiplierKey this.paramMap
         |> Option.map UMX.tag<sorterCountCycleMultiplier>
 
-    member this.GetSorterCountPerPool() =
-        runParameters.tryGetInt runParameters.sorterCountPerPoolKey this.ParamMap
+    member this.GetSelectedSorterCountPerPool() =
+        runParameters.tryGetInt runParameters.selectedSorterCountPerPoolKey this.ParamMap
         |> Option.map UMX.tag<sorterCountPerPool>
 
+    member this.GetSorterCountPerPool() =
+        runParameters.tryGetInt runParameters.sorterCountPerPoolKey this.ParamMap
+
+        |> Option.map UMX.tag<sorterCountPerPool>
     member this.GetSorterEvalMeasure() =
         this.paramMap.TryFind runParameters.sorterEvalMeasureKey
         |> Option.map SorterEvalFunctions.fromCompactString
@@ -488,6 +493,9 @@ type runParameters =
 
     member this.WithSorterCountPerPool(sc: int<sorterCountPerPool> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountPerPoolKey (sc |> Option.map UmxExt.intToRaw) }
+
+    member this.WithSelectedSorterCountPerPool(sc: int<sorterCountPerPool> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.selectedSorterCountPerPoolKey (sc |> Option.map UmxExt.intToRaw) }
 
     member this.WithSorterEvalMeasure(sem: sorterEvalMeasure option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalMeasureKey (sem |> Option.map SorterEvalFunctions.toCompactString) }

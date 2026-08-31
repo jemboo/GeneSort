@@ -138,6 +138,30 @@ module SorterPoolSet =
 
         { poolSet with _sorterPools = mutatedPools }
 
+    // mutates all the members of the poolSet
+    // only keeps selectedSorterCountPerPool of each of the original pool members,
+    // prioritized according to selectionMeasure
+    let mutateAndTrim
+            (sorterModelMut: sorterModelMutator)
+            (selectedSorterCountPerPool: int<sorterCountPerPool>)
+            (selectionMeasure: sorterEvalMeasure)
+            (mutantsPerSorter: int<sorterChildCount>)  
+            (poolSet: sorterPoolSet): sorterPoolSet =
+        
+        let mutatedPools = 
+            poolSet._sorterPools 
+            |> Map.map (fun _ pool -> SorterPool.mutateAndTrim 
+                                            sorterModelMut 
+                                            selectedSorterCountPerPool
+                                            selectionMeasure
+                                            mutantsPerSorter
+                                            poolSet.GenerationNumber
+                                            pool)
+
+        { poolSet with _sorterPools = mutatedPools }
+
+
+
     /// Extracts all evaluations across all members of all pools into a single flat map
     let extractSorterEvals (poolSet: sorterPoolSet) : Map<Guid<sorterPoolMemberId>, sorterEval> =
         poolSet._sorterPools
