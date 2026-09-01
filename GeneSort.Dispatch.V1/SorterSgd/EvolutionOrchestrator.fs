@@ -181,8 +181,8 @@ module EvolutionOrchestrator =
                                     sortedFractionThreshold
 
                             // Track all generated members using direct parent reference
-                            let updatedRunningHistoryMap = 
-                                runningMap |> RunningMemberHistoryMap.updateFromPoolSet currentGen nextSorterPoolSet
+                            //let updatedRunningHistoryMap = 
+                            //    runningMap |> RunningMemberHistoryMap.updateFromPoolSet currentGen nextSorterPoolSet
 
                             // Accumulate sorterPoolEvalBinsSet at summary report frequency
                             let updatedEvalBinsSetAcc =
@@ -227,19 +227,22 @@ module EvolutionOrchestrator =
 
 
                                         // Prune dead lineages and generate SorterPoolSetHistory
-                                        let poolSetHistory, prunedRunningMap = 
-                                            SorterPoolSetHistory.pruneAndCreateFromPoolSet currentGen nextSorterPoolSet updatedRunningHistoryMap
-                                        let! qpHistory = 
-                                            genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolSetHistory "")
-                                            |> Result.ofOption "Failed to create QueryParams for SorterPoolSetHistory."
-                                        do! genDb.saveAsync qpHistory (poolSetHistory |> outputData.SorterPoolSetHistory) allowOverwrite
+                                        //let poolSetHistory, prunedRunningMap = 
+                                        //    SorterPoolSetHistory.pruneAndCreateFromPoolSet currentGen nextSorterPoolSet updatedRunningHistoryMap
+                                        //let! qpHistory = 
+                                        //    genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolSetHistory "")
+                                        //    |> Result.ofOption "Failed to create QueryParams for SorterPoolSetHistory."
+                                        //do! genDb.saveAsync qpHistory (poolSetHistory |> outputData.SorterPoolSetHistory) allowOverwrite
 
-                                        return ([], [], prunedRunningMap)
+                                       // return ([], [], prunedRunningMap)
+                                        return ([], [], RunningMemberHistoryMap.empty)
                                     else
-                                        return (updatedSorterPoolSetSummary, updatedEvalBinsSetAcc, updatedRunningHistoryMap)
+                                        //return (updatedSorterPoolSetSummary, updatedEvalBinsSetAcc, updatedRunningHistoryMap)
+                                        return (updatedSorterPoolSetSummary, updatedEvalBinsSetAcc, RunningMemberHistoryMap.empty)
                                 }
 
-                            return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext evalBinsSetAccNext runningMemberHistoryMapNext
+                            return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext evalBinsSetAccNext RunningMemberHistoryMap.empty
+                           // return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext evalBinsSetAccNext []
                     }
 
                 // Execute loop with empty initial states

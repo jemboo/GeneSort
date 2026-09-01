@@ -54,7 +54,9 @@ module Example =
             //let rootDir = @"C:\Projects\SorterSgd.Prfefix.Msrs24p3a\PoolsTest\Data\Report\TextReport_SorterPoolSetHistory_Report"
 
             //let rootDir = @"C:\Projects\SorterSgd.Prfefix.Msrs24p3a\PoolsSelSzTest\Data\Report\TextReport_SorterPoolBinsReport"
-            let rootDir = @"C:\Projects\SorterSgd.Prfefix.Msrs24p3a\PoolsSelSzTest\Data\Report\TextReport_SummaryReport"
+           // let rootDir = @"C:\Projects\SorterSgd.Prfefix.Msrs24p3a\PoolsSelSzTest_4096\Data\Report\TextReport_SummaryReport"
+            let rootDir = @"C:\Projects\SorterSgd.Prfefix.Msrs24p3a\Sz_2048_Of_4096\Data\Report\TextReport_SorterPoolBinsReport"
+           // let rootDir = @"C:\Projects\SorterSgd.Prfefix.Msrs24p3a\Sz_2048_Of_4096\Data\Report\TextReport_SummaryReport"
             DataTableIO.concatenateAllFiles rootDir  $"{rootDir}\\MergeReport_report.txt"
 
 

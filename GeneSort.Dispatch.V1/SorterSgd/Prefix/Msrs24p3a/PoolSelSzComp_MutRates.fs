@@ -13,16 +13,16 @@ open GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.Common
 open GeneSort.Dispatch.V1.SorterSgd
 
 
-module PoolSelSzComp =
+module PoolSelSzComp_ModRates =
 
     let globalSorterCount = 4096 |> UMX.tag<sorterCount>
     let dbNamePoolsTest = "PoolsSelSzTest" |> UMX.tag<databaseName>
-    let dbName_Sz_2048_Of_4096 = "Sz_2048_Of_4096" |> UMX.tag<databaseName>
+    let dbName_Sz_2048_Of_4096_Mods = "Sz_2048_Of_4096_MutRates" |> UMX.tag<databaseName>
     let dbNamePools4096_2_vs_256 = "PoolsSelSzTest_2_vs_256" |> UMX.tag<databaseName>
     let dbNamePools4096_4096 = "Pools4096_4096" |> UMX.tag<databaseName>
     let dbNamePoolSz128 = "PoolSelSz128" |> UMX.tag<databaseName>
     let dbFolderTest = @$"c:\Projects\{%projName}\{%dbNamePoolsTest}\Data" |> UMX.tag<pathToRootFolder>
-    let dbFolderPools4096 = @$"c:\Projects\{%projName}\{%dbName_Sz_2048_Of_4096}\Data" |> UMX.tag<pathToRootFolder>
+    let dbFolderPools4096 = @$"c:\Projects\{%projName}\{%dbName_Sz_2048_Of_4096_Mods}\Data" |> UMX.tag<pathToRootFolder>
     let dbFolderPools4098b = @$"c:\Projects\{%projName}\{%dbNamePools4096_2_vs_256}\Data" |> UMX.tag<pathToRootFolder>
     let dbFolderPools4098c = @$"c:\Projects\{%projName}\{%dbNamePools4096_4096}\Data" |> UMX.tag<pathToRootFolder>
 
@@ -31,6 +31,7 @@ module PoolSelSzComp =
             (genCurrent: int<generationNumber>)
             (sorterCtPerPool: int<sorterCountPerPool>)
             (sorterPoolCt: int<sorterPoolCount>)
+            (mdr: float<modificationRate>)
             (ses:sorterEvalSelectionType)
             (selSz:int<sorterCountPerPool>)
             (mmod: int<mutationMod>)
@@ -46,6 +47,7 @@ module PoolSelSzComp =
                 [|
                     (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                     (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                    (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
                     (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                     (runParameters.selectedSorterCountPerPoolKey, (Some selSz) |> SorterCountPerPool.toString)
                     (runParameters.mutationModKey, (Some %mmod) |> string)
@@ -60,6 +62,7 @@ module PoolSelSzComp =
                     (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
                     (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                     (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                    (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
                     (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                     (runParameters.selectedSorterCountPerPoolKey, (Some selSz) |> SorterCountPerPool.toString)
                     (runParameters.mutationModKey, (Some %mmod) |> string)
@@ -74,16 +77,16 @@ module PoolSelSzComp =
             let! curGen = rp.GetGenerationCurrent()
             let! scPP = rp.GetSorterCountPerPool()
             let! spc = rp.GetSorterPoolCount()
+            let! mdr = rp.GetModificationRate()
             let! spsev = rp.GetSeedPoolSorterEvalSelectionType()
             let! mmod = rp.GetMutationMod()
             let! selSz = rp.GetSelectedSorterCountPerPool()
-            return makeQueryParams repl curGen scPP spc spsev selSz mmod odt
+            return makeQueryParams repl curGen scPP spc mdr spsev selSz mmod odt
         }
 
     let private withLocalParams (rp:runParameters) =
         let rpn = standardPoolSzParams rp
-        rpn.WithModificationRate(Some 0.06<modificationRate>)
-            .WithOrthoRate(Some 4.001<orthoRate>)
+        rpn.WithOrthoRate(Some 4.001<orthoRate>)
             .WithParaRate(Some 0.4<paraRate>)
             .WithSelfSymRate(Some 2.001<selfSymRate>)
 
@@ -114,7 +117,7 @@ module PoolSelSzComp =
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
         [ 
             (dbNamePoolsTest, dbTest :> IGeneSortDb);
-            (dbName_Sz_2048_Of_4096, dbPools4096 :> IGeneSortDb);
+            (dbName_Sz_2048_Of_4096_Mods, dbPools4096 :> IGeneSortDb);
             (dbNamePools4096_2_vs_256, dbPools4098b :> IGeneSortDb);
             (dbNamePools4096_4096, dbPools4098c :> IGeneSortDb);
         ]
@@ -142,6 +145,7 @@ module PoolSelSzComp =
                 (runParameters.generationCurrentKey, [0] |> List.map string)
                 (runParameters.generationIntervalCountKey, [1] |> List.map string)
                 (runParameters.sorterCountPerPoolKey, ["256"])
+                (runParameters.modificationRateKey, [0.01; 0.02; 0.03; 0.04] |> List.map string)
                 (runParameters.mutationModKey, [3;] |> List.map string)
                 (runParameters.selectedSorterCountPerPoolKey, ["64"; "128"; "256"] |> List.map string)
             ]
@@ -153,14 +157,15 @@ module PoolSelSzComp =
 
 
         let Sz_2048_Of_4096 (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = dbName_Sz_2048_Of_4096
+            databaseName = dbName_Sz_2048_Of_4096_Mods
             runName = sprintf @"Sz_2048_Of_4096_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "Selection size comp for 24pfx3a Msrs"
             spans = [
                 (runParameters.generationCurrentKey, [0] |> List.map string)
                 (runParameters.generationIntervalCountKey, [12] |> List.map string)
                 (runParameters.sorterCountPerPoolKey, ["4096";])
-                (runParameters.mutationModKey, [0 .. 7;] |> List.map string)
+                (runParameters.modificationRateKey, [0.01; 0.02; 0.03; 0.04] |> List.map string)
+                (runParameters.mutationModKey, [0 .. 3;] |> List.map string)
                 (runParameters.selectedSorterCountPerPoolKey, ["2048";] |> List.map string)
             ]
             filter = paramMapFilter
