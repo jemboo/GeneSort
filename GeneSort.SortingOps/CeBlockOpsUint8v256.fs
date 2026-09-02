@@ -138,7 +138,7 @@ module CeBlockOpsUint8v256 =
             ) |> ignore
 
             Array.init numNetworks (fun i ->
-                ceBlockEval.create ceBlocks.[i] globalUsage.[i] (globalUnsorted.[i] |> UMX.tag) None
+                ceBlockEval.create ceBlock.Empty ceBlocks.[i] globalUsage.[i] (globalUnsorted.[i] |> UMX.tag) None
             )
 
 
@@ -278,6 +278,7 @@ module CeBlockOpsUint8v256 =
                 else None
 
             ceBlockEval.create 
+                ceBlock.Empty
                 ceBlocks.[i] 
                 globalUsage.[i] 
                 (uniqueUnsortedCount |> UMX.tag<sortableCount>) 

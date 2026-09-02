@@ -12,10 +12,10 @@ open GeneSort.Sorting.Sortable
 module CeBlockOpsInt = 
 
 
-    let eval (sits: sortableIntTest) (ceBlock: ceBlock) =
-            let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
+    let eval (sits: sortableIntTest) (ceBlk: ceBlock) =
+            let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
             let mutable unsortedCount = 0
-            let ces = ceBlock.CeArray
+            let ces = ceBlk.CeArray
             let sw = sits.SortingWidth
             let pool = ArrayPool<int>.Shared
 
@@ -45,13 +45,13 @@ module CeBlockOpsInt =
 
                 pool.Return(workArray)
 
-            ceBlockEval.create ceBlock ceUseCounts (unsortedCount |> UMX.tag<sortableCount>) None
+            ceBlockEval.create ceBlock.Empty ceBlk ceUseCounts (unsortedCount |> UMX.tag<sortableCount>) None
 
 
 
-    let evalAndCollectNewSortableTests (sits: sortableIntTest) (ceBlock: ceBlock) =
-            let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
-            let ces = ceBlock.CeArray
+    let evalAndCollectNewSortableTests (sits: sortableIntTest) (ceBlk: ceBlock) =
+            let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
+            let ces = ceBlk.CeArray
             let sw = sits.SortingWidth
             let pool = ArrayPool<int>.Shared
             let results = HashSet<sortableIntArray>(SortableIntArray.SortableIntArrayValueComparer())
@@ -87,17 +87,18 @@ module CeBlockOpsInt =
 
             let newTests = Seq.toArray results |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sw
             ceBlockEval.create 
-                        ceBlock 
+                        ceBlock.Empty
+                        ceBlk 
                         ceUseCounts 
                         (results.Count |> UMX.tag<sortableCount>) 
                         (Some (sortableTest.Ints newTests))
 
 
 
-    let evalAndDedupeCeFetch (sits: sortableIntTest) (ceBlock: ceBlock) =
-            let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
-            let lows = Array.init %ceBlock.CeLength (fun i -> ceBlock.CeArray.[i].Low)
-            let highs = Array.init %ceBlock.CeLength (fun i -> ceBlock.CeArray.[i].Hi)
+    let evalAndDedupeCeFetch (sits: sortableIntTest) (ceBlk: ceBlock) =
+            let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
+            let lows = Array.init %ceBlk.CeLength (fun i -> ceBlk.CeArray.[i].Low)
+            let highs = Array.init %ceBlk.CeLength (fun i -> ceBlk.CeArray.[i].Hi)
             let sw = sits.SortingWidth
             let pool = ArrayPool<int>.Shared
             let results = HashSet<sortableIntArray>(SortableIntArray.SortableIntArrayValueComparer())
@@ -107,7 +108,7 @@ module CeBlockOpsInt =
                 Array.blit sia.Values 0 workArray 0 %sw
 
                 // HOT LOOP: Logic reduced to simple primitive array lookups
-                for i = 0 to %ceBlock.CeLength - 1 do
+                for i = 0 to %ceBlk.CeLength - 1 do
                     let lIdx = lows.[i]
                     let hIdx = highs.[i]
                     let a = workArray.[lIdx]
@@ -135,15 +136,16 @@ module CeBlockOpsInt =
 
             let newTests = Seq.toArray results |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sw
             ceBlockEval.create 
-                        ceBlock 
+                        ceBlock.Empty
+                        ceBlk 
                         ceUseCounts 
                         (results.Count |> UMX.tag<sortableCount>) 
                         (Some (sortableTest.Ints newTests))
 
 
 
-    let evalAndDedupeUnsafe (sits: sortableIntTest) (ceBlock: ceBlock) =
-        let ces = ceBlock.CeArray
+    let evalAndDedupeUnsafe (sits: sortableIntTest) (ceBlk: ceBlock) =
+        let ces = ceBlk.CeArray
         let ceLen = ces.Length |> UMX.tag<ceLength>
         let ceUseCounts = ceUseCounts.Create ceLen
         let sw = %sits.SortingWidth
@@ -192,6 +194,6 @@ module CeBlockOpsInt =
 
         pool.Return(workArray)
         let newTests = Seq.toArray results |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sits.SortingWidth
-        ceBlockEval.create ceBlock ceUseCounts (results.Count |> UMX.tag<sortableCount>) (Some (sortableTest.Ints newTests))
+        ceBlockEval.create ceBlock.Empty ceBlk ceUseCounts (results.Count |> UMX.tag<sortableCount>) (Some (sortableTest.Ints newTests))
 
 

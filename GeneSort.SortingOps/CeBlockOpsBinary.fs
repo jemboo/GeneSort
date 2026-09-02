@@ -12,10 +12,10 @@ open GeneSort.Sorting.Sortable
 module CeBlockOpsBinary = 
 
 
-    let eval (sbts: sortableBinaryTest) (ceBlock: ceBlock) :ceBlockEval =
-            let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
+    let eval (sbts: sortableBinaryTest) (ceBlk: ceBlock) :ceBlockEval =
+            let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
             let mutable unsortedCount = 0
-            let ces = ceBlock.CeArray
+            let ces = ceBlk.CeArray
             let sw = sbts.SortingWidth
             let pool = ArrayPool<bool>.Shared
 
@@ -46,12 +46,12 @@ module CeBlockOpsBinary =
 
                 pool.Return(workArray)
 
-            ceBlockEval.create ceBlock ceUseCounts (unsortedCount |> UMX.tag<sortableCount>) None
+            ceBlockEval.create ceBlock.Empty ceBlk ceUseCounts (unsortedCount |> UMX.tag<sortableCount>) None
 
 
-    let evalAndCollectNewSortableTests (sbts: sortableBinaryTest) (ceBlock: ceBlock) :ceBlockEval =
-            let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
-            let ces = ceBlock.CeArray
+    let evalAndCollectNewSortableTests (sbts: sortableBinaryTest) (ceBlk: ceBlock) :ceBlockEval =
+            let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
+            let ces = ceBlk.CeArray
             let sw = sbts.SortingWidth
             let pool = ArrayPool<bool>.Shared
             // Ensure SortableBoolArrayValueComparer is defined similarly to the Int version
@@ -89,16 +89,17 @@ module CeBlockOpsBinary =
 
             let newTests = Seq.toArray results |> sortableBinaryTest.create (Guid.NewGuid() |> UMX.tag) sw
             ceBlockEval.create 
-                            ceBlock 
+                            ceBlock.Empty
+                            ceBlk 
                             ceUseCounts 
                             (results.Count |> UMX.tag<sortableCount>) 
                             (Some (sortableTest.Bools newTests))
 
 
-    let evalAndDedupeCeFetch (sbts: sortableBinaryTest) (ceBlock: ceBlock) :ceBlockEval =
-            let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
-            let lows = Array.init %ceBlock.CeLength (fun i -> ceBlock.CeArray.[i].Low)
-            let highs = Array.init %ceBlock.CeLength (fun i -> ceBlock.CeArray.[i].Hi)
+    let evalAndDedupeCeFetch (sbts: sortableBinaryTest) (ceBlK: ceBlock) :ceBlockEval =
+            let ceUseCounts = ceUseCounts.Create ceBlK.CeLength
+            let lows = Array.init %ceBlK.CeLength (fun i -> ceBlK.CeArray.[i].Low)
+            let highs = Array.init %ceBlK.CeLength (fun i -> ceBlK.CeArray.[i].Hi)
             let sw = sbts.SortingWidth
             let pool = ArrayPool<bool>.Shared
             let results = HashSet<sortableBoolArray>(SortableBoolArray.SortableBoolArrayValueComparer())
@@ -107,7 +108,7 @@ module CeBlockOpsBinary =
                 let workArray = pool.Rent(%sw)
                 Array.blit sba.Values 0 workArray 0 %sw
 
-                for i = 0 to %ceBlock.CeLength - 1 do
+                for i = 0 to %ceBlK.CeLength - 1 do
                     let lIdx = lows.[i]
                     let hIdx = highs.[i]
                     // Boolean Comparison: true (1) > false (0)
@@ -134,15 +135,16 @@ module CeBlockOpsBinary =
 
             let newTests = Seq.toArray results |> sortableBinaryTest.create (Guid.NewGuid() |> UMX.tag) sw
             ceBlockEval.create 
-                        ceBlock 
+                        ceBlock.Empty
+                        ceBlK 
                         ceUseCounts 
                         (results.Count |> UMX.tag<sortableCount>) 
                         (Some (sortableTest.Bools newTests))
 
 
 
-    let evalAndDedupeUnsafe (sbts: sortableBinaryTest) (ceBlock: ceBlock) :ceBlockEval =
-        let ces = ceBlock.CeArray
+    let evalAndDedupeUnsafe (sbts: sortableBinaryTest) (ceBlK: ceBlock) :ceBlockEval =
+        let ces = ceBlK.CeArray
         let ceLen = ces.Length |> UMX.tag<ceLength>
         let ceUseCounts = ceUseCounts.Create ceLen
         let sw = %sbts.SortingWidth
@@ -181,4 +183,4 @@ module CeBlockOpsBinary =
 
         pool.Return(workArray)
         let newTests = Seq.toArray results |> (sortableBinaryTest.create (Guid.NewGuid() |> UMX.tag) sbts.SortingWidth)
-        ceBlockEval.create ceBlock ceUseCounts (results.Count |> UMX.tag<sortableCount>) (Some (sortableTest.Bools newTests))
+        ceBlockEval.create ceBlock.Empty ceBlK ceUseCounts (results.Count |> UMX.tag<sortableCount>) (Some (sortableTest.Bools newTests))

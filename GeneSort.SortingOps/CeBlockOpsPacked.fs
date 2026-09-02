@@ -70,15 +70,15 @@ module CeBlockOpsPacked =
                         newPackedData
                                            
 
-    let eval (tests: packedSortableIntTests) (ceBlock: ceBlock) : ceBlockEval =
+    let eval (tests: packedSortableIntTests) (ceBlk: ceBlock) : ceBlockEval =
         let sw = %tests.SortingWidth
         let totalTests = tests.SortableCount
-        let ces = ceBlock.CeArray
+        let ces = ceBlk.CeArray
     
         // Pre-deconstruct CEs for the hot loop
-        let lows = Array.init %ceBlock.CeLength (fun i -> ces.[i].Low)
-        let highs = Array.init %ceBlock.CeLength (fun i -> ces.[i].Hi)
-        let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
+        let lows = Array.init %ceBlk.CeLength (fun i -> ces.[i].Low)
+        let highs = Array.init %ceBlk.CeLength (fun i -> ces.[i].Hi)
+        let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
         let mutable unsortedCount = 0
     
         // Work on a mutable copy
@@ -88,7 +88,7 @@ module CeBlockOpsPacked =
         // PHASE 1: THE SORTING (Hot Loop)
         for t = 0 to %totalTests - 1 do
             let offset = t * sw
-            for i = 0 to %ceBlock.CeLength - 1 do
+            for i = 0 to %ceBlk.CeLength - 1 do
                 let lPtr = &Unsafe.Add(&dataRef, offset + lows.[i])
                 let hPtr = &Unsafe.Add(&dataRef, offset + highs.[i])
                 let a = lPtr
@@ -110,19 +110,19 @@ module CeBlockOpsPacked =
             if not isSorted then
                 unsortedCount <- unsortedCount + 1
        
-        ceBlockEval.create ceBlock ceUseCounts (unsortedCount |> UMX.tag<sortableCount>) None
+        ceBlockEval.create ceBlock.Empty ceBlk ceUseCounts (unsortedCount |> UMX.tag<sortableCount>) None
 
 
 
-    let evalAndCollectNewSortableTests (tests: packedSortableIntTests) (ceBlock: ceBlock) : ceBlockEval =
+    let evalAndCollectNewSortableTests (tests: packedSortableIntTests) (ceBlk: ceBlock) : ceBlockEval =
         let sw = %tests.SortingWidth
         let totalTests = tests.SortableCount
-        let ces = ceBlock.CeArray
+        let ces = ceBlk.CeArray
     
         // Pre-deconstruct CEs for the hot loop
-        let lows = Array.init %ceBlock.CeLength (fun i -> ces.[i].Low)
-        let highs = Array.init %ceBlock.CeLength (fun i -> ces.[i].Hi)
-        let ceUseCounts = ceUseCounts.Create ceBlock.CeLength
+        let lows = Array.init %ceBlk.CeLength (fun i -> ces.[i].Low)
+        let highs = Array.init %ceBlk.CeLength (fun i -> ces.[i].Hi)
+        let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
     
         // Work on a mutable copy
         let resultsBuffer = Array.copy tests.PackedValues
@@ -131,7 +131,7 @@ module CeBlockOpsPacked =
         // PHASE 1: THE SORTING (Hot Loop)
         for t = 0 to %totalTests - 1 do
             let offset = t * sw
-            for i = 0 to %ceBlock.CeLength - 1 do
+            for i = 0 to %ceBlk.CeLength - 1 do
                 let lPtr = &Unsafe.Add(&dataRef, offset + lows.[i])
                 let hPtr = &Unsafe.Add(&dataRef, offset + highs.[i])
                 let a = lPtr
@@ -170,7 +170,8 @@ module CeBlockOpsPacked =
                                                     newPackedData
        
         ceBlockEval.create 
-                    ceBlock 
+                    ceBlock.Empty
+                    ceBlk 
                     ceUseCounts 
                     (newCount |> UMX.tag<sortableCount>) 
                     (Some (sortableTest.PackedInts newPacked))
