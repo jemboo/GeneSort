@@ -31,5 +31,5 @@ module SorterDataParse =
 
 
 
-    let getCeArrayFromLib (sorterKey:sorterLibId) =
+    let getCeArrayFromLib (sorterKey:sorterLibId) : ce array option =
         (SorterData.tryGet sorterKey) |> Option.map (parseCeArray)

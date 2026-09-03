@@ -67,7 +67,7 @@ module Reporting =
 
                 // 3. Prepare target metadata and QueryParams
                 let reportName = reportNameTag |> UMX.tag<textReportName>
-                let finalRp = rp.WithGenerationCurrent(Some lastGen)
+                let finalRp = rp.WithGenerationCurrent(Some (lastGen + 1<generationNumber>))
 
                 let! qpReport = 
                     genDb.MakeQueryParamsFromRunParams finalRp (outputDataType.TextReport reportName)

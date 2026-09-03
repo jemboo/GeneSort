@@ -98,6 +98,7 @@
     <ProjectReference Include="..\GeneSort.Model.Sorting.Mp.V1\GeneSort.Model.Sorting.Mp.V1.fsproj" />
     <ProjectReference Include="..\GeneSort.Model.Sorting.V1\GeneSort.Model.Sorting.V1.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorting.Mp\GeneSort.Sorting.Mp.fsproj" />
+    <ProjectReference Include="..\GeneSort.SortingLib\GeneSort.SortingLib.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingOps.Mp\GeneSort.SortingOps.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingOps\GeneSort.SortingOps.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorting\GeneSort.Sorting.fsproj" />

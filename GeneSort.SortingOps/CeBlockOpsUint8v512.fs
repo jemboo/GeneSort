@@ -78,6 +78,7 @@ module CeBlockOpsUint8v512 =
 
     let evalSimdSortBlocks
         (simdSortableBlocks: SortBlockUint8v512 seq) 
+        (prefix: ceBlock)
         (ceBlocks: ceBlock array) 
         : ceBlockEval [] =
     
@@ -136,12 +137,13 @@ module CeBlockOpsUint8v512 =
         ) |> ignore
 
         Array.init numNetworks (fun i ->
-            ceBlockEval.create ceBlock.Empty ceBlocks.[i] globalUsage.[i] (globalUnsorted.[i] |> UMX.tag) None
+            ceBlockEval.create prefix ceBlocks.[i] globalUsage.[i] (globalUnsorted.[i] |> UMX.tag) None
         )
 
 
     let evalAndCollectUniqueFailures
             (simdSortableBlocks: SortBlockUint8v512 seq) 
+            (prefix: ceBlock)
             (ceBlocks: ceBlock array) 
             : ceBlockEval [] =
     
@@ -225,15 +227,15 @@ module CeBlockOpsUint8v512 =
                 else None
 
             ceBlockEval.create 
-                ceBlock.Empty
+                prefix
                 ceBlocks.[i] 
                 globalUsage.[i] 
                 (uniqueUnsortedCount |> UMX.tag<sortableCount>) 
                 failTest
         )
 
-    let eval (test: sortableUint8v512Test) (ceBlocks: ceBlock []) =
-        evalSimdSortBlocks test.SimdSortBlocks ceBlocks
+    let eval (test: sortableUint8v512Test) (prefix: ceBlock) (ceBlocks: ceBlock []) =
+        evalSimdSortBlocks test.SimdSortBlocks prefix ceBlocks
 
-    let evalAndCollectNewSortableTests (test: sortableUint8v512Test) (ceBlocks: ceBlock []) =
-        evalAndCollectUniqueFailures test.SimdSortBlocks ceBlocks
+    let evalAndCollectNewSortableTests (test: sortableUint8v512Test) (prefix: ceBlock) (ceBlocks: ceBlock []) =
+        evalAndCollectUniqueFailures test.SimdSortBlocks prefix ceBlocks

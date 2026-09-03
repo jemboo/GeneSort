@@ -38,6 +38,7 @@ module SorterSetEval =
 
     let makeSorterEvals
                 (sorters: sorter array) 
+                (prefix: ceBlock)
                 (sortableTest: sortableTest) 
                 (sorterEvalType:sorterEvalType) 
                 (collectNewSortableTests: bool<collectNewSortableTests>) :sorterEval array =
@@ -51,6 +52,7 @@ module SorterSetEval =
         let ceBlockEvals : ceBlockEval array =
                 CeBlockOps.evalWithSorterTests 
                         sortableTest 
+                        prefix
                         ceBlocks 
                         %collectNewSortableTests  
 
@@ -67,12 +69,14 @@ module SorterSetEval =
     let makeSorterSetEval
             (sorterSetEvalId: Guid<sorterSetEvalId>)
             (sorterSet: sorterSet)
+            (prefix: ceBlock)
             (sortableTest: sortableTest) 
             (sorterEvalType:sorterEvalType) 
             (collectNewSortableTests: bool<collectNewSortableTests>) : sorterSetEval =
 
         let sorterEvals = makeSorterEvals 
                             sorterSet.Sorters 
+                            prefix
                             sortableTest 
                             sorterEvalType 
                             collectNewSortableTests

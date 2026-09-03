@@ -25,6 +25,7 @@ module EvolutionOrchestrator =
             (allowOverwrite: bool<allowOverwrite>)
             (initialPoolSet: sorterPoolSet)
             (sortableTest: sortableTest)
+            (prefix: ceBlock)
             (mutator: sorterModelMutator)
             (cts: CancellationToken)
             (log: string -> unit) : Async<Result<sorterPoolSet, string>> =
@@ -173,6 +174,7 @@ module EvolutionOrchestrator =
                                     prioritizeNewMutants
                                     distinctSorterHashes
                                     sortableTest 
+                                    prefix
                                     evalType
                                     srtrEvalMeasure
                                     reEvaluateParents
@@ -202,10 +204,10 @@ module EvolutionOrchestrator =
                                         log (sprintf "Saving SorterPoolSet and others at Generation %d..." %currentGen)
 
                                         // Save SorterPoolSet
-                                        let! qpSummaries = 
+                                        let! qpSorterPoolSet = 
                                             genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolSet "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolSet."
-                                        do! genDb.saveAsync qpSummaries (nextSorterPoolSet |> outputData.SorterPoolSet) allowOverwrite
+                                        do! genDb.saveAsync qpSorterPoolSet (nextSorterPoolSet |> outputData.SorterPoolSet) allowOverwrite
 
 
                                         // Save SorterPoolSetSummaries

@@ -13,6 +13,7 @@ module SorterPoolRunner =
     /// Skips already evaluated members if reEvaluateParents is false.
     let evaluatePoolSet 
             (sortableTest: sortableTest)
+            (prefix: ceBlock)
             (sorterEvalType: sorterEvalType)
             (reEvaluateParents: bool)
             (collectNewSortableTests: bool<collectNewSortableTests>)
@@ -67,12 +68,18 @@ module SorterPoolRunner =
                     |> Array.map (fun (ceLength, m) -> SorterModel.makeSorter m.SorterModel (Some ceLength))
 
                 // 5. Run the evaluation engine on the filtered pool subset
-                let rawEvaluations =
+                let (rawEvaluations : sorterEval array) =
                     SorterSetEval.makeSorterEvals 
                         sorters 
+                        prefix
                         sortableTest 
                         sorterEvalType 
                         collectNewSortableTests
+
+                // Debugger check for short CE lengths (< 120)
+                if rawEvaluations |> Array.exists (fun eval -> %(SorterEval.getCeLength eval) < 120) then
+                    let evalWithShortCe = rawEvaluations |> Array.find (fun eval -> %(SorterEval.getCeLength eval) < 120)
+                    System.Diagnostics.Debugger.Break()
 
                 // 6. Map raw evaluations back to poolMemberId and merge them with any cached evaluations
                 rawEvaluations

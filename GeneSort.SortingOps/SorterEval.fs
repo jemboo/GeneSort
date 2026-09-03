@@ -412,16 +412,6 @@ module SorterEval =
         | sorterEvalType.V2 -> toV2 eval
         | sorterEvalType.V3 -> eval
 
-    /// Internal helper to extract ceData array for V2 and V3 records
-    let private extractCeUseArray (ceb: ceBlock) (useCounts: ceUseCounts) : ceUse array =
-        let results = ResizeArray<ceUse>()
-        for i in 0 .. (%ceb.CeLength - 1) do
-            let idx = i |> UMX.tag<ceIndex>
-            let count = useCounts.[idx]
-            if count > 0 then
-                results.Add(ceUse.create idx count (ceb.getCe i))
-        results.ToArray()
-
     let createV1 
             (sorterId: Guid<sorterId>) 
             (ceBlockEval: ceBlockEval) : sorterEval =
@@ -440,9 +430,9 @@ module SorterEval =
             ceBlockEval.CeBlock.SortingWidth
             ceBlockEval.UnsortedCount 
             (stageSequence.GetHashCode() |> UMX.tag<sequenceHash>) 
-            ceBlockEval.CeUseCounts.LastUsedCeIndex 
+            ceBlockEval.LastUsedIndex
             stageSequence.StageLength 
-            ceBlockEval.CeUseCounts.UsedCeCount
+            ceBlockEval.CeLength
             isReflectionSymmetric
             stageCrossingsCount
         |> V1
@@ -455,7 +445,7 @@ module SorterEval =
                                   ceBlockEval.CeBlock.SortingWidth 
                                   ceBlockEval.UsedCes
         let stageCrossingsCount = moves |> Array.sumBy Array.sum |> UMX.tag<stageCrossings>
-        let ceDataSeq = extractCeUseArray ceBlockEval.CeBlock ceBlockEval.CeUseCounts
+        let ceUseArray = ceBlockEval.extractCeUseArray
 
         let isReflectionSymmetric = stageSequence.Stages 
                                     |> Array.forall(fun st -> st |> Stage.isReflectionSymmetric)
@@ -466,7 +456,7 @@ module SorterEval =
             ceBlockEval.UnsortedCount 
             (stageSequence.GetHashCode() |> UMX.tag<sequenceHash>) 
             stageSequence.StageLength  
-            ceDataSeq
+            ceUseArray
             isReflectionSymmetric
             stageCrossingsCount
         |> V2
@@ -489,13 +479,13 @@ module SorterEval =
             createV2 sorterId ceBlockEval
         | Some test ->
 
-            let ceDataSeq = extractCeUseArray ceBlockEval.CeBlock ceBlockEval.CeUseCounts
+            let ceUseArray = ceBlockEval.extractCeUseArray
             sorterEvalV3.create 
                 sorterId 
                 ceBlockEval.CeBlock.SortingWidth
                 (stageSequence.GetHashCode() |> UMX.tag<sequenceHash>) 
                 stageSequence.StageLength 
-                ceDataSeq 
+                ceUseArray 
                 test
                 isReflectionSymmetric
                 stageCrossingsCount

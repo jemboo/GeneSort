@@ -27,7 +27,7 @@ module CeBlockEvalDto =
             Prefix = CeBlockDto.toCeBlockDto eval.Prefix
             CeBlock = CeBlockDto.toCeBlockDto eval.CeBlock
             // We store the raw array from the container
-            CeUseCounts = eval.CeUseCounts.ToArray()
+            CeUseCounts = eval.UseCountArray
             UnsortedCount = %eval.UnsortedCount
             SortableTest = 
                 eval.SortableTest

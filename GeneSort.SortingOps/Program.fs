@@ -59,11 +59,12 @@ module Sandbox =
         let sorterId = Guid.NewGuid() |> UMX.tag<sorterId>
         let sortingWidth = 16 |> UMX.tag<sortingWidth>
         let sorter = CeUse.ceUseStringToSorter sorterId sortingWidth yow1
-        let ceBlock = CeBlock.fromSorter sorter
+        let ceBlk = CeBlock.fromSorter sorter
 
         let sortableTest = makeFullBoolTest sortingWidth
         let collectNewSortableTests = true |> UMX.tag<collectNewSortableTests>
-        let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest ceBlock collectNewSortableTests
+        let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest 
+                                        ceBlock.Empty ceBlk collectNewSortableTests
         None
 
 
@@ -84,8 +85,10 @@ module Sandbox =
 
 
         let collectNewSortableTests = true |> UMX.tag<collectNewSortableTests>
-        let ceBlockEvalA = CeBlockOps.evalWithSorterTest sortableTest ceBlkA collectNewSortableTests
-        let ceBlockEvalB = CeBlockOps.evalWithSorterTest sortableTest ceBlkB collectNewSortableTests
+        let ceBlockEvalA = CeBlockOps.evalWithSorterTest sortableTest
+                                        ceBlock.Empty ceBlkA collectNewSortableTests
+        let ceBlockEvalB = CeBlockOps.evalWithSorterTest sortableTest
+                                        ceBlock.Empty ceBlkB collectNewSortableTests
 
         1
 
@@ -105,8 +108,10 @@ module Sandbox =
 
 
         let collectNewSortableTests = true |> UMX.tag<collectNewSortableTests>
-        let ceBlockEvalA = CeBlockOps.evalWithSorterTest sortableTest ceBlkA collectNewSortableTests
-        let ceBlockEvalB = CeBlockOps.evalWithSorterTest sortableTest ceBlkB collectNewSortableTests
+        let ceBlockEvalA = CeBlockOps.evalWithSorterTest sortableTest 
+                                        ceBlock.Empty ceBlkA collectNewSortableTests
+        let ceBlockEvalB = CeBlockOps.evalWithSorterTest sortableTest 
+                                        ceBlock.Empty ceBlkB collectNewSortableTests
 
         printfn "Hello from F# yo"
         1

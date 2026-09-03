@@ -18,6 +18,7 @@ module SorterPipeline =
             (prioritizeNewMutants: bool<prioritizeNewMutants>)
             (distinctSorterHashes: bool<distinctSorterHashes>)
             (sortableTest: sortableTest)
+            (prefix: ceBlock)
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
             (reEvaluateParents: bool)
@@ -27,13 +28,14 @@ module SorterPipeline =
 
         currentPoolSet
         // Step 1: Expand the population across all sub-pools
-        |> SorterPoolSet.mutate mutator sorterChildCount
+        |> SorterPoolSet.mutateAndTrim mutator selectedSorterCountPerPool selectionMeasure sorterChildCount
         
         |> (fun (expandedPoolSet: sorterPoolSet) ->
                 let (computedEvals: Map<Guid<sorterPoolMemberId>, sorterEval>) = 
                     expandedPoolSet
                     |> SorterPoolRunner.evaluatePoolSet 
                                         sortableTest 
+                                        prefix
                                         sorterEvalType
                                         reEvaluateParents
                                         collectNewSortableTests
@@ -64,6 +66,7 @@ module SorterPipeline =
             (prioritizeNewMutants: bool<prioritizeNewMutants>)
             (distinctSorterHashes: bool<distinctSorterHashes>)
             (sortableTest: sortableTest)
+            (prefix: ceBlock)
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
             (reEvaluateParents: bool)
@@ -77,7 +80,6 @@ module SorterPipeline =
             |> Map.exists (fun _ pool -> Seq.isEmpty pool.SorterPoolMembers)
 
         // --- Step 1a: Mutate / Expand Population ---
-        //let mutatedPoolSet = SorterPoolSet.mutate mutator sorterChildCount currentPoolSet
         let mutatedPoolSet = SorterPoolSet.mutateAndTrim 
                                     mutator 
                                     selectedSorterCountPerPool
@@ -92,6 +94,7 @@ module SorterPipeline =
         let computedEvals = 
             SorterPoolRunner.evaluatePoolSet 
                 sortableTest 
+                prefix
                 sorterEvalType 
                 reEvaluateParents
                 collectNewSortableTests

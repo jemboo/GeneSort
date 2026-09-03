@@ -13,6 +13,7 @@ open GeneSort.Sorting.Sortable
 open GeneSort.Eval.V1.Sgd
 open GeneSort.SortingOps
 open GeneSort.Dispatch.V1
+open GeneSort.Sorting.Sorter
 
 module SgdExecutor =
 
@@ -33,6 +34,7 @@ module SgdExecutor =
                 seedPoolSet 
                 |> SorterPoolRunner.evaluatePoolSet 
                     sortableTest 
+                    ceBlock.Empty
                     evalType
                     true // reEvaluateParents
                     (false |> UMX.tag<collectNewSortableTests>)
@@ -54,7 +56,7 @@ module SgdExecutor =
     /// Dispatches the evolution history run parameters, executes the generative loop via asyncResult,
     /// and manages final state serialization/reporting pipelines.
     let evaluateEvolutionRun
-            (makeSortableTests: runParameters -> Async<Result<sortableTest, string>>)
+            (makeSortableTests: runParameters ->  Async<Result<sortableTest * (ce array), string>> )
             (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
             (genDb: IGeneSortGenDb)
             (rp: runParameters)
@@ -71,7 +73,11 @@ module SgdExecutor =
                 do! checkCancellation cts.Token
 
                 log "Executing makeSortableTests..."
-                let! (sortableTest: sortableTest) = makeSortableTests rp
+                let! sWidth = 
+                    rp.GetSortingWidth() 
+                    |> Result.ofOption "Missing sorting width."
+                let! (sortableTest, ces) = makeSortableTests rp 
+                let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces
 
                 // 1. Check for existing checkpoints directly via genDb
                 let! highestPoolSetOpt = Utils.loadHighestGenSorterPoolSet genDb rp
@@ -107,6 +113,7 @@ module SgdExecutor =
                         allowOverwrite
                         activeSeedPoolSet
                         sortableTest
+                        prefix
                         sorterModelMutator
                         cts.Token
                         log

@@ -340,7 +340,7 @@ module MssiMutateExecutor =
 
                     // Compute sorter evaluations directly from the targeted network chunk
                     let sorterEvalsChunk = 
-                        SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters tests sorterEvalType collectTests
+                        SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters ceBlock.Empty tests sorterEvalType collectTests
 
                     // Accumulate transient array chunk results
                     allChunksEvals.Add(sorterEvalsChunk)

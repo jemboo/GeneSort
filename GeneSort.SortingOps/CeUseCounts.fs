@@ -99,7 +99,7 @@ type ceUseCounts =
 
     /// Number of CEs that have been used at least once
     member this.UsedCeCount : int<ceLength> =
-        (Array.fold (fun acc count -> if count > 0 then acc + 1 else acc) 0 this.useCounts)
+        (Array.fold (fun acc count -> if count <> 0 then acc + 1 else acc) 0 this.useCounts)
         |> UMX.tag<ceLength>
  
     member this.LastUsedCeIndex : int<ceIndex> =

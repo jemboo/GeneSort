@@ -6,6 +6,7 @@ open FsToolkit.ErrorHandling
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
+open GeneSort.Sorting.Sorter
 open GeneSort.SortingOps
 open GeneSort.Db.V1
 open GeneSort.Project.V1
@@ -16,10 +17,11 @@ open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Dispatch.V1.SortableTest
 open GeneSort.Eval.V1
+open GeneSort.SortingLib.Sorter
 
 module SorterEvalExecutor =
 
-    let makeStandardTests (rp:runParameters) : Async<Result<sortableTest, string>> =
+    let makeStandardTests (rp:runParameters) : Async<Result<sortableTest * (ce array), string>> =
         async {
             let paramsOpt = option {
                 let! sortingWidth = rp.GetSortingWidth()
@@ -29,16 +31,16 @@ module SorterEvalExecutor =
             match paramsOpt with
             | Some (sortingWidth, sortableTestId) ->
                 let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-                return Ok ( SortableTestModel.makeSortableTest 
+                return Ok (( SortableTestModel.makeSortableTest 
                                     sortableTestId
                                     testModel 
-                                    sortableDataFormat.BitVector512)
+                                    sortableDataFormat.BitVector512), [||])
             | None ->
                 return Error "Failed: One or more RunParameters for StandardTests were missing."
         }
 
 
-    let makeMergeTests (rp: runParameters) : Async<Result<sortableTest, string>> =
+    let makeMergeTests (rp: runParameters) : Async<Result<sortableTest * (ce array), string>> =
         async {
             let paramsOpt = option {
                 let repl = 0 |> UMX.tag<replNumber>   
@@ -51,29 +53,30 @@ module SorterEvalExecutor =
 
             match paramsOpt with
             | Some (repl, sw, md, mst, sdf) ->
-                return! SortableTestDbs.Merge.getMergeSorterTestSet 
-                                        repl sw md mst sdf  
+                let! res = SortableTestDbs.Merge.getMergeSorterTestSet repl sw md mst sdf
+                return Result.map (fun st -> (st, [||])) res
             | None ->
                 return Error "Failed: One or more RunParameters for MergeTests were missing."
         }
 
 
-    let makePrefixTests (rp: runParameters) : Async<Result<sortableTest, string>> =
+    let makePrefixTests (rp: runParameters) : Async<Result<sortableTest * (ce array), string>> =
         async {
             let paramsOpt = option {
                 let repl = 0 |> UMX.tag<replNumber>   
                 let! stf = rp.GetSortableTestFilter()
                 let! sdf = rp.GetSortableDataFormat()
-                return (repl, stf, sdf)
+                let! ces = SorterDataParse.getCeArrayFromLib stf
+                return (repl, stf, sdf, ces)
             }
 
             match paramsOpt with
-            | Some (repl, stf, sdf) ->
-                return! SortableTestDbs.Prefix.getPrefixSorterTestSet repl stf sdf  
+            | Some (repl, stf, sdf, ces) ->
+                let! res = SortableTestDbs.Prefix.getPrefixSorterTestSet repl stf sdf
+                return Result.map (fun st -> (st, ces)) res
             | None ->
-                return Error "Failed: One or more RunParameters for MergeTests were missing."
+                return Error "Failed: One or more RunParameters for PrefixTests were missing."
         }
-
 
 
     /// Creates and returns the generator using CommonSorterEval.
@@ -89,7 +92,7 @@ module SorterEvalExecutor =
 
     let _makeSorterEvals 
             (makeModelGen: runParameters -> sorterModelGen option)
-            (makeSortableTests: runParameters -> Async<Result<sortableTest, string>>)
+            (makeSortableTests: runParameters -> Async<Result<sortableTest * (ce array), string>>)
             (host: IRunHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
@@ -110,13 +113,18 @@ module SorterEvalExecutor =
                 
                 log (sprintf "Sorter evaluation over %d chunks..." splitFactor)
                 
+                let! repl = 
+                    rp.GetRepl() 
+                    |> Result.ofOption "Missing replication number."
+
+                let! sWidth = 
+                    rp.GetSortingWidth() 
+                    |> Result.ofOption "Missing sorting width."
+
                 let! sorterModelGen = 
                     makeModelGen rp 
                     |> Result.ofOption "Failed: SorterModelGen could not be initialized from parameters."
 
-                let! repl = 
-                    rp.GetRepl() 
-                    |> Result.ofOption "Missing replication number."
 
                 let! sorterEvalType =
                     rp.GetSorterEvalType() 
@@ -129,7 +137,8 @@ module SorterEvalExecutor =
                 // 2. Generate common evaluation dependencies
                 do! checkCancellation cts.Token
                 log "Generating Sortable Tests..."
-                let! tests = makeSortableTests rp 
+                let! (tests, ces) = makeSortableTests rp 
+                let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces
 
                 let! qpSorterSet = 
                     host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSet "")
@@ -165,7 +174,7 @@ module SorterEvalExecutor =
 
                     // Compute sorter evaluations directly from the chunk array
                     let sorterEvalsChunk = 
-                        SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters tests sorterEvalType collectSortableTests
+                        SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters prefix tests sorterEvalType collectSortableTests
 
                     
                     // Accumulate the evaluations

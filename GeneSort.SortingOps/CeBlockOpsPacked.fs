@@ -70,7 +70,8 @@ module CeBlockOpsPacked =
                         newPackedData
                                            
 
-    let eval (tests: packedSortableIntTests) (ceBlk: ceBlock) : ceBlockEval =
+    let eval (tests: packedSortableIntTests) 
+             (prefix: ceBlock) (ceBlk: ceBlock) : ceBlockEval =
         let sw = %tests.SortingWidth
         let totalTests = tests.SortableCount
         let ces = ceBlk.CeArray
@@ -110,11 +111,12 @@ module CeBlockOpsPacked =
             if not isSorted then
                 unsortedCount <- unsortedCount + 1
        
-        ceBlockEval.create ceBlock.Empty ceBlk ceUseCounts (unsortedCount |> UMX.tag<sortableCount>) None
+        ceBlockEval.create prefix ceBlk ceUseCounts (unsortedCount |> UMX.tag<sortableCount>) None
 
 
 
-    let evalAndCollectNewSortableTests (tests: packedSortableIntTests) (ceBlk: ceBlock) : ceBlockEval =
+    let evalAndCollectNewSortableTests (tests: packedSortableIntTests) 
+                                       (prefix: ceBlock) (ceBlk: ceBlock) : ceBlockEval =
         let sw = %tests.SortingWidth
         let totalTests = tests.SortableCount
         let ces = ceBlk.CeArray
@@ -170,7 +172,7 @@ module CeBlockOpsPacked =
                                                     newPackedData
        
         ceBlockEval.create 
-                    ceBlock.Empty
+                    prefix
                     ceBlk 
                     ceUseCounts 
                     (newCount |> UMX.tag<sortableCount>) 
