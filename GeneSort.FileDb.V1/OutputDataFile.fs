@@ -96,10 +96,10 @@ module OutputDataFile =
                             let! domain = deserializeDto<sorterPoolSetDto, sorterPoolSet> stream token SorterPoolSetDto.fromDto
                             return outputData.SorterPoolSet domain
                         }
-                    | outputDataType.SorterPoolSetSummaries _ ->
+                    | outputDataType.SorterPoolSetSummarySet _ ->
                         async {
-                            let! domain = deserializeDto<sorterPoolSetSummariesDto, sorterPoolSetSummary array> stream token SorterPoolSetSummariesDto.toDomain
-                            return outputData.SorterPoolSetSummaries domain
+                            let! domain = deserializeDto<sorterPoolSetSummarySetDto, sorterPoolSetSummarySet> stream token SorterPoolSetSummarySetDto.fromDto
+                            return outputData.SorterPoolSetSummarySet domain
                         }
                     | outputDataType.SorterSet _ ->
                         async {
@@ -188,8 +188,8 @@ module OutputDataFile =
                                 serializeDto stream r RunParametersDto.fromDomain
                             | outputData.SorterPoolSet ss ->
                                 serializeDto stream ss SorterPoolSetDto.toDto
-                            | outputData.SorterPoolSetSummaries ss ->
-                                serializeDto stream ss SorterPoolSetSummariesDto.fromDomain
+                            | outputData.SorterPoolSetSummarySet ss ->
+                                serializeDto stream ss SorterPoolSetSummarySetDto.toDto
                             | outputData.SorterSet ss ->
                                 serializeDto stream ss SorterSetDto.fromDomain
                             | outputData.SortableTest sts ->

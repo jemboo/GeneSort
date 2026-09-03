@@ -143,15 +143,15 @@ module DispatchSorterSgd =
 
             printfn "Init Project: %s" %host.Run.DatabaseName
     
-            let! initResult = 
+            let! initResult =
                 ParamOps.initRunAndParamFiles
-                    host.RunDb           
+                    host.RunDb
                     (Some progress) 
-                    host.Run              
-                    minReplica 
-                    maxReplica 
-                    host.AllowOverwrite 
-                    host.ParamMapRefiner      
+                    host.Run
+                    minReplica
+                    maxReplica
+                    host.AllowOverwrite
+                    host.ParamMapRefiner
                     host.ParameterSpans
 
 

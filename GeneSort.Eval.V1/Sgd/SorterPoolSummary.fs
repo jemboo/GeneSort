@@ -11,10 +11,12 @@ type sorterPoolSummary =
     private {
         _sorterPoolId: Guid<sorterPoolId>
         _sorterPoolName: string<sorterPoolName>
-        _aveCeLength: float<ceLength>
         _minCeLength: int<ceLength>
+        _aveCeLength: float<ceLength>
+        _stdDevCeLength: float<ceLength>
         _minStageLength: int<stageLength>
         _aveStageLength: float<stageLength>
+        _stdDevStageLength: float<stageLength>
         _rawCeLength: int<ceLength>
         _aveStageCrossings: float<stageCrossings>
     }
@@ -23,9 +25,11 @@ type sorterPoolSummary =
     member this.SorterPoolId with get() = this._sorterPoolId
     member this.SorterPoolName with get() = this._sorterPoolName
     member this.AveCeLength with get() = this._aveCeLength
+    member this.StdDevCeLength with get() = this._stdDevCeLength
     member this.MinCeLength with get() = this._minCeLength
     member this.MinStageLength with get() = this._minStageLength
     member this.AveStageLength with get() = this._aveStageLength
+    member this.StdDevStageLength with get() = this._stdDevStageLength
     member this.AveStageCrossings with get() = this._aveStageCrossings
 
     static member create 
@@ -34,17 +38,21 @@ type sorterPoolSummary =
                     (rawCeLength: int<ceLength>) 
                     (minCeLength: int<ceLength>) 
                     (aveCeLength: float<ceLength>) 
+                    (stdDevCeLength: float<ceLength>) 
                     (minStageLength: int<stageLength>) 
                     (aveStageLength: float<stageLength>) 
+                    (stdDevStageLength: float<stageLength>) 
                     (aveStageCrossings: float<stageCrossings>) =
         { 
           _sorterPoolId = poolId; 
           _sorterPoolName = sorterPoolName;
           _rawCeLength = rawCeLength; 
+          _minCeLength = minCeLength;
           _aveCeLength = aveCeLength; 
-          _minCeLength = minCeLength 
+          _stdDevCeLength = stdDevCeLength; 
           _minStageLength = minStageLength; 
           _aveStageLength = aveStageLength;
+          _stdDevStageLength = stdDevStageLength;
           _aveStageCrossings = aveStageCrossings;
         }
 
@@ -65,9 +73,17 @@ type sorterPoolSetSummary =
 
 module SorterPoolSetSummary =
 
-    let getMaxGeneration (spses: sorterPoolSetSummary array) :int<generationNumber> =
+    let getMaxGeneration (spses: sorterPoolSetSummary array) : int<generationNumber> =
         let mv = spses |> Array.maxBy(fun spss -> %spss.GenerationNumber)
         mv.GenerationNumber
+
+    /// Computes population standard deviation of an un-tagged float sequence
+    let private computeStdDev (values: float array) (mean: float) : float =
+        if values.Length <= 1 then 
+            0.0 
+        else
+            let variance = values |> Array.averageBy (fun x -> (x - mean) ** 2.0)
+            sqrt variance
 
     /// Strips the heavy sorterModel references out of a pool set, creating a light memory footprint snapshot
     let fromPoolSet (poolSet: sorterPoolSet) : sorterPoolSetSummary =
@@ -91,23 +107,31 @@ module SorterPoolSetSummary =
                         pool.RawCeLength 
                         (0 |> UMX.tag) 
                         (0.0 |> UMX.tag) 
+                        (0.0 |> UMX.tag) 
                         (0 |> UMX.tag) 
+                        (0.0 |> UMX.tag) 
                         (0.0 |> UMX.tag)
                         (0.0 |> UMX.tag)
                 else
                     // Map out the metrics across all evaluations
-                    let ceLengths = evals |> Array.map (fun ev -> % (SorterEval.getCeLength ev))
-                    let stageLengths = evals |> Array.map (fun ev -> % (SorterEval.getStageLength ev))
-                    let stageCrossings = evals |> Array.map (fun ev -> % (SorterEval.getStageCrossingsCount ev))
+                    let ceLengths = evals |> Array.map (fun ev -> float %(SorterEval.getCeLength ev))
+                    let stageLengths = evals |> Array.map (fun ev -> float %(SorterEval.getStageLength ev))
+                    let stageCrossings = evals |> Array.map (fun ev -> float %(SorterEval.getStageCrossingsCount ev))
 
                     // Compute minimums
-                    let minCe = Array.min ceLengths |> UMX.tag<ceLength>
-                    let minStage = Array.min stageLengths |> UMX.tag<stageLength>
+                    let minCe = (Array.min ceLengths |> int) |> UMX.tag<ceLength>
+                    let minStage = (Array.min stageLengths |> int) |> UMX.tag<stageLength>
 
-                    // Compute averages safely as integers
-                    let aveCe = (ceLengths |> Array.averageBy float) |> UMX.tag<ceLength>
-                    let aveStage = (stageLengths |> Array.averageBy float) |> UMX.tag<stageLength>
-                    let aveStageCrossings = (stageCrossings |> Array.averageBy float) |> UMX.tag<stageCrossings>
+                    // Compute averages
+                    let aveCeVal = ceLengths |> Array.average
+                    let aveStageVal = stageLengths |> Array.average
+                    let aveCe = aveCeVal |> UMX.tag<ceLength>
+                    let aveStage = aveStageVal |> UMX.tag<stageLength>
+                    let aveStageCrossings = (stageCrossings |> Array.average) |> UMX.tag<stageCrossings>
+
+                    // Compute standard deviations
+                    let stdDevCe = computeStdDev ceLengths aveCeVal |> UMX.tag<ceLength>
+                    let stdDevStage = computeStdDev stageLengths aveStageVal |> UMX.tag<stageLength>
 
                     sorterPoolSummary.create 
                         pool.SorterPoolId 
@@ -115,8 +139,10 @@ module SorterPoolSetSummary =
                         pool.RawCeLength 
                         minCe 
                         aveCe
+                        stdDevCe
                         minStage 
                         aveStage
+                        stdDevStage
                         aveStageCrossings
             )
             |> Seq.toArray
@@ -145,9 +171,11 @@ module SorterPoolSetSummary =
             |> dataTableRecord.addData (sprintf "%sSorterPoolId" prefix) (string (%poolSum.SorterPoolId))
             |> dataTableRecord.addData (sprintf "%sSorterPoolName" prefix) (string (%poolSum.SorterPoolName))
             |> dataTableRecord.addData (sprintf "%sRawCeLength" prefix) (string (%poolSum.RawCeLength))
-            |> dataTableRecord.addData (sprintf "%sAveCeLength" prefix) (sprintf "%.5f" (%poolSum.AveCeLength))
             |> dataTableRecord.addData (sprintf "%sMinCeLength" prefix) (string (%poolSum.MinCeLength))
+            |> dataTableRecord.addData (sprintf "%sAveCeLength" prefix) (sprintf "%.5f" (%poolSum.AveCeLength))
+            |> dataTableRecord.addData (sprintf "%sStdDevCeLength" prefix) (sprintf "%.5f" (%poolSum.StdDevCeLength))
             |> dataTableRecord.addData (sprintf "%sMinStageLength" prefix) (string (%poolSum.MinStageLength))
             |> dataTableRecord.addData (sprintf "%sAveStageLength" prefix) (sprintf "%.5f" (%poolSum.AveStageLength))
+            |> dataTableRecord.addData (sprintf "%sStdDevStageLength" prefix) (sprintf "%.5f" (%poolSum.StdDevStageLength))
             |> dataTableRecord.addData (sprintf "%sAveStageCrossings" prefix) (sprintf "%.5f" (%poolSum.AveStageCrossings))
         )

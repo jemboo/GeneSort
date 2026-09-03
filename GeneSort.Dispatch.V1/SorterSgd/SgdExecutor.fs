@@ -40,13 +40,12 @@ module SgdExecutor =
                     (false |> UMX.tag<collectNewSortableTests>)
             
             let evaluatedSeedSet = seedPoolSet |> SorterPoolSet.updateSorterEvals computedEvals
-            let outData = seedPoolSet |> outputData.SorterPoolSet
-            
+
+            // Save SorterPoolSetSummaries
             let! qpSsrr = 
-                genDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterPoolSetSummaries "")
-                |> Result.ofOption "Failed to create QueryParams for seedSorterRunResult."
-                
-            do! genDb.saveAsync qpSsrr outData (false |> UMX.tag<allowOverwrite>)
+                genDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterPoolSet "")
+                |> Result.ofOption "Failed to create QueryParams for seedSorterRunResult."   
+            do! genDb.saveAsync qpSsrr (seedPoolSet |> outputData.SorterPoolSet) (false |> UMX.tag<allowOverwrite>)
             log (sprintf "Initial seedSorterPoolSet saved at generation %d." %evaluatedSeedSet.GenerationNumber)
 
             return evaluatedSeedSet

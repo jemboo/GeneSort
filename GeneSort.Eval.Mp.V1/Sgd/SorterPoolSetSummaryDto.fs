@@ -6,6 +6,7 @@ open FSharp.UMX
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Sorting
 open GeneSort.Eval.V1
+open GeneSort.Core
 
 // ---------------------------------------------------------------------
 // Lightweight Summary Snapshot DTOs
@@ -21,6 +22,8 @@ type sorterPoolSummaryDto = {
     [<Key(5)>] aveStageLength: float
     [<Key(6)>] aveStageCrossings: float
     [<Key(7)>] rawCeLength: int
+    [<Key(8)>] stdDevCeLength: float
+    [<Key(9)>] stdDevStageLength: float
 }
 
 [<MessagePackObject>]
@@ -30,6 +33,12 @@ type sorterPoolSetSummaryDto = {
     [<Key(2)>] sorterPoolSummaryDtos: sorterPoolSummaryDto array
 }
 
+[<MessagePackObject>]
+type sorterPoolSetSummarySetDto = {
+    [<Key(0)>] sorterPoolSetSummarySetId: Guid
+    [<Key(1)>] lastGeneration: int
+    [<Key(2)>] sorterPoolSetSummaryDtos: sorterPoolSetSummaryDto array
+}
 
 // ---------------------------------------------------------------------
 // Translation Logic Modules
@@ -50,6 +59,8 @@ module SorterPoolSetSummaryDto =
                     aveStageLength = UMX.untag p.AveStageLength
                     rawCeLength = UMX.untag p.RawCeLength
                     aveStageCrossings = UMX.untag p.AveStageCrossings
+                    stdDevCeLength = UMX.untag p.StdDevCeLength
+                    stdDevStageLength = UMX.untag p.StdDevStageLength
                 }
             )
         {
@@ -68,8 +79,10 @@ module SorterPoolSetSummaryDto =
                     (p.rawCeLength |> UMX.tag<ceLength>)
                     (p.minCeLength |> UMX.tag<ceLength>)
                     (p.aveCeLength |> UMX.tag<ceLength>)
+                    (p.stdDevCeLength |> UMX.tag<ceLength>)
                     (p.minStageLength |> UMX.tag<stageLength>)
                     (p.aveStageLength |> UMX.tag<stageLength>)
+                    (p.stdDevStageLength |> UMX.tag<stageLength>)
                     (p.aveStageCrossings |> UMX.tag<stageCrossings>)
             )
         sorterPoolSetSummary.Create(
@@ -77,3 +90,25 @@ module SorterPoolSetSummaryDto =
             UMX.tag dto.generationNumber, 
             poolSummaryDomains
         )
+
+
+module SorterPoolSetSummarySetDto =
+
+    let toDto (domain: sorterPoolSetSummarySet) : sorterPoolSetSummarySetDto =
+        {
+            sorterPoolSetSummarySetId = UMX.untag domain.SorterPoolSetSummarySetId
+            lastGeneration = UMX.untag domain.LastGeneration
+            sorterPoolSetSummaryDtos = 
+                domain.SorterPoolSetSummaries 
+                |> Array.map SorterPoolSetSummaryDto.toDto
+        }
+
+    let fromDto (dto: sorterPoolSetSummarySetDto) : sorterPoolSetSummarySet =
+        let summaries = 
+            dto.sorterPoolSetSummaryDtos 
+            |> Array.map SorterPoolSetSummaryDto.fromDto
+        
+        sorterPoolSetSummarySet.create 
+            (dto.sorterPoolSetSummarySetId |> UMX.tag<sorterPoolSetSummarySetId>)
+            (dto.lastGeneration |> UMX.tag<generationNumber>) 
+            summaries

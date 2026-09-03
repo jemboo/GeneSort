@@ -16,6 +16,12 @@ type sorterVariant =
     | Prefix3b
     | Prefix4a
     | Prefix4b
+    | Merge2a
+    | Merge2b
+    | Merge4a
+    | Merge4b
+    | Merge8a
+    | Merge8b
 
 type sorterLibId = 
     { sortingWidth: int<sortingWidth>
@@ -55,6 +61,12 @@ module SorterLibId =
                 | "Prefix3b" -> Prefix3b
                 | "Prefix4a" -> Prefix4a
                 | "Prefix4b" -> Prefix4b
+                | "Merge2a" -> Merge2a
+                | "Merge2b" -> Merge2b
+                | "Merge4a" -> Merge4a
+                | "Merge4b" -> Merge4b
+                | "Merge8a" -> Merge8a
+                | "Merge8b" -> Merge8b
                 | _ -> failwith "Unknown sorterVariant"
             create sortingWidth variant
 

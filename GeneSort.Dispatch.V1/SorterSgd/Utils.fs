@@ -58,7 +58,8 @@ module Utils =
         async {
             let saveConfig = generationalDb.getGenSaveIntervals()
             let genSequence = SamplingConfig.getSamplesWithMinBound saveConfig %startingGen
-
+            let yab = genSequence |> Seq.toList
+            let qua = yab.Length
             let rec discoverLazy (gens: int seq) = seq {
                 match Seq.tryHead gens with
                 | None -> ()
@@ -87,15 +88,15 @@ module Utils =
             generationalDb startingGen rp cts log
 
 
-    let loadAvailableSorterPoolSetSummaries
+    let loadAvailableSorterPoolSetSummarySets
             (generationalDb: IGeneSortGenDb)
             (startingGen: int<generationNumber>)
             (rp: runParameters)
             (cts: CancellationToken)
-            (log: string -> unit) : Async<seq<sorterPoolSetSummary array>> =
+            (log: string -> unit) : Async<seq<sorterPoolSetSummarySet>> =
         loadAvailableOutputData
-            OutputData.asSorterPoolSetSummaries 
-            (outputDataType.SorterPoolSetSummaries "") 
+            OutputData.asSorterPoolSetSummarySet 
+            (outputDataType.SorterPoolSetSummarySet "") 
             generationalDb startingGen rp cts log
 
 

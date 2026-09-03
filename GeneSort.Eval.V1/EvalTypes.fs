@@ -9,6 +9,7 @@ open GeneSort.Core
 [<Measure>] type sorterPoolExpansionRate
 [<Measure>] type sorterPoolMemberId
 [<Measure>] type sorterPoolSetId
+[<Measure>] type sorterPoolSetSummarySetId
 [<Measure>] type sorterPoolName
 [<Measure>] type sorterPoolId
 [<Measure>] type sorterCountPerPool

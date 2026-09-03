@@ -211,11 +211,13 @@ module EvolutionOrchestrator =
 
 
                                         // Save SorterPoolSetSummaries
-                                        let currentSummaries = updatedSorterPoolSetSummary |> List.toArray
                                         let! qpSummaries = 
-                                            genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolSetSummaries "")
-                                            |> Result.ofOption "Failed to create QueryParams for SorterPoolSetSummaries."
-                                        do! genDb.saveAsync qpSummaries (currentSummaries |> outputData.SorterPoolSetSummaries) allowOverwrite
+                                            genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolSetSummarySet "")
+                                            |> Result.ofOption "Failed to create QueryParams for SorterPoolSetSummarySet."
+                                        let spsstID = qpSummaries.Id |> UMX.cast<queryParamsId, sorterPoolSetSummarySetId>
+                                        let currentSummaries = updatedSorterPoolSetSummary |> List.toArray
+                                        let sorterPoolSetSummarySet = sorterPoolSetSummarySet.create spsstID currentGen currentSummaries
+                                        do! genDb.saveAsync qpSummaries (sorterPoolSetSummarySet |> outputData.SorterPoolSetSummarySet) allowOverwrite
 
 
                                         // Save SorterPoolBinsSetSeries

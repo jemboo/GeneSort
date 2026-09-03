@@ -13,7 +13,7 @@ type outputData =
     | RunParameters of runParameters
     | SortableTest of sortableTest
     | SorterPoolSet of sorterPoolSet
-    | SorterPoolSetSummaries of sorterPoolSetSummary array
+    | SorterPoolSetSummarySet of sorterPoolSetSummarySet
     | SorterSet of sorterSet
     | SorterSetEval of sorterSetEval
     | SorterPoolBinsSetSeries of sorterPoolBinsSetSeries
@@ -40,9 +40,9 @@ module OutputData =
         | SorterPoolSet ss -> Ok ss
         | _ -> Error "Database returned data, but it was not a SorterPoolSet."
 
-    let asSorterPoolSetSummaries = function
-        | SorterPoolSetSummaries ss -> Ok ss
-        | _ -> Error "Database returned data, but it was not a SorterPoolSetSummaries."
+    let asSorterPoolSetSummarySet = function
+        | SorterPoolSetSummarySet ss -> Ok ss
+        | _ -> Error "Database returned data, but it was not a SorterPoolSetSummarySet."
 
     let asSorterSet = function
         | SorterSet ss -> Ok ss

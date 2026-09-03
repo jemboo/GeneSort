@@ -9,7 +9,7 @@ type outputDataType =
     | Run of string<runName>
     | RunParameters of string<runName>
     | SorterPoolSet of string
-    | SorterPoolSetSummaries of string
+    | SorterPoolSetSummarySet of string
     | SorterSet of string
     | SortableTest of string
     | SorterSetEval of string
@@ -27,7 +27,7 @@ module OutputDataType =
         | Run s -> "Run"
         | RunParameters s -> appendParam "RunParameters" %s
         | SorterPoolSet s -> appendParam "SorterPoolSet" %s
-        | SorterPoolSetSummaries s -> appendParam "SorterPoolSetSummaries" %s
+        | SorterPoolSetSummarySet s -> appendParam "SorterPoolSetSummarySet" %s
         | SorterSet s -> appendParam "SorterSet" s
         | SortableTest s -> appendParam "SortableTest" s
         | SorterSetEval s -> appendParam "SorterSetEval" s
@@ -44,7 +44,7 @@ module OutputDataType =
         | "Run" -> Some (Run (param |> UMX.tag<runName>))
         | "RunParameters" -> Some (RunParameters (param |> UMX.tag<runName>))
         | "SorterPoolSet" -> Some (SorterPoolSet param)
-        | "SorterPoolSetSummaries" -> Some (SorterPoolSetSummaries param)
+        | "SorterPoolSetSummarySet" -> Some (SorterPoolSetSummarySet param)
         | "SorterSet" -> Some (SorterSet param)
         | "SortableTest" -> Some (SortableTest param)
         | "SorterSetEval" -> Some (SorterSetEval param)

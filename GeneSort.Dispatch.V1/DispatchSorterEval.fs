@@ -84,8 +84,8 @@ module DispatchSorterEval =
 
 
     let executor = SorterEvalExecutor.getExecutor executorType
-    let minReplica = 1<replNumber>
-    let maxReplica = 2<replNumber>
+    let minReplica = 0<replNumber>
+    let maxReplica = 1<replNumber>
 
 
     let makeParamsAndRun() =

@@ -42,6 +42,8 @@ module Reporting =
                 // 1. Dynamic discovery and streaming of slices
                 let! slicesSeq = loadSlices genDb curGen rp cts.Token log
 
+                let yab = slicesSeq |> Seq.toList
+
                 if Seq.isEmpty slicesSeq then
                     return! Error (sprintf "No valid slice files discovered for %s starting at generation %d." reportNameTag %curGen)
 
@@ -67,7 +69,7 @@ module Reporting =
 
                 // 3. Prepare target metadata and QueryParams
                 let reportName = reportNameTag |> UMX.tag<textReportName>
-                let finalRp = rp.WithGenerationCurrent(Some (lastGen + 1<generationNumber>))
+                let finalRp = rp.WithGenerationCurrent(Some lastGen )
 
                 let! qpReport = 
                     genDb.MakeQueryParamsFromRunParams finalRp (outputDataType.TextReport reportName)
@@ -99,9 +101,9 @@ module Reporting =
                 |> SorterPoolSetSummary.toDataTableRecords prefix
             )
         makeDynamicReportFromSlices
-            Utils.loadAvailableSorterPoolSetSummaries
-            (fun spses -> spses |> SorterPoolSetSummary.getMaxGeneration)
-            (recordExtractor "")
+            Utils.loadAvailableSorterPoolSetSummarySets
+            (fun spss -> spss.LastGeneration)
+            (SorterPoolSetSummarySet.toDataTableRecords "")
             "SummaryReport"
             genDb rp allowOverwrite cts progress
 
