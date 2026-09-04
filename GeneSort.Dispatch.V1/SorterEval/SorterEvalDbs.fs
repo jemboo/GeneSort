@@ -25,8 +25,8 @@ module SorterEvalDbs =
 
 
         let makeQueryParams
-                        (rng: rngType)
                         (repl: int<replNumber>) 
+                        (rng: rngType)
                         (sw: int<sortingWidth>) 
                         (smt: simpleSorterModelType) 
                         (set: sorterEvalType)
@@ -49,7 +49,7 @@ module SorterEvalDbs =
                 let! smt = rp.GetSimpleSorterModelType()
                 let! rng = rp.GetRngType()
                 let! set = rp.GetSorterEvalType()
-                return makeQueryParams rng repl sw smt set odt 
+                return makeQueryParams repl rng sw smt set odt 
             }
         
 
@@ -64,14 +64,15 @@ module SorterEvalDbs =
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
         let makeQueryParams
-                    (rng: rngType)
                     (repl: int<replNumber>) 
+                    (rng: rngType)
                     (sortingWidth: int<sortingWidth>)
                     (simpleSorterModelType: simpleSorterModelType)
                     (mergeDimension: int<mergeDimension>) 
                     (mergeSuffixType: mergeSuffixType)
                     (sortableDataFormat: sortableDataFormat) 
                     (sorterEvalType: sorterEvalType)
+                    (sorterLibV: sorterLibVariant)
                     (outputDataType: outputDataType) : queryParams =
 
             queryParams.create 
@@ -85,6 +86,7 @@ module SorterEvalDbs =
                     (runParameters.mergeDimensionKey, string %mergeDimension);
                     (runParameters.mergeSuffixTypeKey, mergeSuffixType |> MergeSuffixType.toString);
                     (runParameters.sorterEvalTypeKey, sorterEvalType |> SorterEvalType.toString) 
+                    (runParameters.sorterLibVariantKey, sorterLibV |> SorterLibVariant.toString) 
                     (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
                 |]
 
@@ -100,12 +102,11 @@ module SorterEvalDbs =
                 let! mst = rp.GetMergeSuffixType()
                 let! smt = rp.GetSimpleSorterModelType()
                 let! sdf = rp.GetSortableDataFormat()
-                let! set = rp.GetSorterEvalType() 
-                return makeQueryParams rng repl sw smt md mst sdf set odt
+                let! set = rp.GetSorterEvalType()
+                let! slv = rp.GetSorterLibVariant()
+                return makeQueryParams repl rng sw smt md mst sdf set slv odt
             }
-
         let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
-
 
 
 
@@ -116,8 +117,8 @@ module SorterEvalDbs =
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
         let makeQueryParams
-                    (rng: rngType)
                     (repl: int<replNumber>)
+                    (rng: rngType)
                     (sorterLibId: sorterLibId)
                     (simpleSorterModelType: simpleSorterModelType)
                     (sortableDataFormat: sortableDataFormat) 
@@ -147,12 +148,10 @@ module SorterEvalDbs =
                 let! sdf = rp.GetSortableDataFormat()
                 let! set = rp.GetSorterEvalType() 
                 let! repl = rp.GetRepl()
-                return makeQueryParams rng repl slId smt sdf set odt
+                return makeQueryParams repl rng slId smt sdf set odt
             }
 
         let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
-
-
 
 
 
@@ -177,8 +176,8 @@ module SorterEvalDbs =
                     (sorterEvalType: sorterEvalType)
                             : Async<Result<sorterSetEval, string>> =
         let qp = Standard.makeQueryParams 
-                        _rngTypeLcg
                         (0 |> UMX.tag<replNumber>) 
+                        _rngTypeLcg
                         sortingWidth 
                         simpleSorterModelType 
                         sorterEvalType
@@ -194,18 +193,20 @@ module SorterEvalDbs =
                     (simpleSorterModelType: simpleSorterModelType)
                     (mergeDimension: int<mergeDimension>) 
                     (mergeSuffixType: mergeSuffixType)
+                    (sorterLibVariant: sorterLibVariant)
                     (sorterEvalType: sorterEvalType)
                             : Async<Result<sorterSetEval, string>> =
 
         let qp = Merge.makeQueryParams 
-                        _rngTypeLcg
                         (0 |> UMX.tag<replNumber>) 
+                        _rngTypeLcg
                         sortingWidth 
                         simpleSorterModelType
                         mergeDimension 
                         mergeSuffixType 
                         sortableDataFormat.Int8Vector512
                         sorterEvalType
+                        sorterLibVariant
                         (outputDataType.SorterSetEval "")
         async {
              let! result = (Merge.db :> IGeneSortDb).loadAsync qp
@@ -222,8 +223,8 @@ module SorterEvalDbs =
                             : Async<Result<sorterSetEval, string>> =
 
         let qp = Prefix.makeQueryParams 
-                        _rngTypeLcg
                         repl
+                        _rngTypeLcg
                         sorterLibId 
                         simpleSorterModelType
                         sortableDataFormat.BitVector512

@@ -48,13 +48,16 @@ module SorterEvalExecutor =
                 let! md = rp.GetMergeDimension()
                 let! mst = rp.GetMergeSuffixType()
                 let! sdf = rp.GetSortableDataFormat()
-                return (repl, sw, md, mst, sdf)
+                let! slv = rp.GetSorterLibVariant()
+                let slib = sorterLibId.create sw slv
+                let! ces = SorterDataParse.getCeArrayFromLib slib
+                return (repl, sw, md, mst, sdf, ces)
             }
 
             match paramsOpt with
-            | Some (repl, sw, md, mst, sdf) ->
+            | Some (repl, sw, md, mst, sdf, ces) ->
                 let! res = SortableTestDbs.Merge.getMergeSorterTestSet repl sw md mst sdf
-                return Result.map (fun st -> (st, [||])) res
+                return Result.map (fun st -> (st, ces)) res
             | None ->
                 return Error "Failed: One or more RunParameters for MergeTests were missing."
         }
@@ -64,10 +67,10 @@ module SorterEvalExecutor =
         async {
             let paramsOpt = option {
                 let repl = 0 |> UMX.tag<replNumber>   
-                let! stf = rp.GetSorterLibId()
+                let! slib = rp.GetSorterLibId()
                 let! sdf = rp.GetSortableDataFormat()
-                let! ces = SorterDataParse.getCeArrayFromLib stf
-                return (repl, stf, sdf, ces)
+                let! ces = SorterDataParse.getCeArrayFromLib slib
+                return (repl, slib, sdf, ces)
             }
 
             match paramsOpt with

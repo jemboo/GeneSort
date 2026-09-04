@@ -63,15 +63,23 @@ module SorterLibVariant =
         | "Merge8b" -> Merge8b
         | _ -> failwithf "Unknown sorterLibVariant: %s" s
 
+
 type sorterLibId = 
-    { sortingWidth: int<sortingWidth>
-      sorterVariant: sorterLibVariant }
+    private 
+        { sortingWidth: int<sortingWidth>
+          sorterVariant: sorterLibVariant }
+
+    static member create (sortingWidth: int<sortingWidth>) 
+                         (sorterVariant: sorterLibVariant) : sorterLibId =
+        { sortingWidth = sortingWidth; sorterVariant = sorterVariant }  
+
+    member this.SortingWidth with get() = this.sortingWidth
+    member this.SorterVariant with get() = this.sorterVariant
     
     interface IStableSerializable with
         member this.WriteStableBytes (writer: System.IO.BinaryWriter) =
             // 1. Write the underlying integer from the UMX tag
             writer.Write(UMX.untag this.sortingWidth)
-            
             // 2. Write the variant as a consistent string or integer tag
             writer.Write(sprintf "%A" this.sorterVariant)
 
