@@ -64,7 +64,7 @@ module SorterEvalExecutor =
         async {
             let paramsOpt = option {
                 let repl = 0 |> UMX.tag<replNumber>   
-                let! stf = rp.GetSortableTestFilter()
+                let! stf = rp.GetSorterLibId()
                 let! sdf = rp.GetSortableDataFormat()
                 let! ces = SorterDataParse.getCeArrayFromLib stf
                 return (repl, stf, sdf, ces)

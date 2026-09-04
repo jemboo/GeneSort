@@ -9,7 +9,7 @@ open GeneSort.Project.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1.OpsUtils
-
+open GeneSort.SortingLib.Sorter
 
 module SortableTestExecutor =
 
@@ -45,7 +45,12 @@ module SortableTestExecutor =
                     } |> Result.ofOption "Missing domain parameters required for generation"
 
                 // 3. Create SortableTestModel
-                let sortableTestModel = msasM.create sortingWidth mergeDim mergeSufixType |> sortableTestModel.MsasMi
+                let sortableTestModel = msasM.create 
+                                            sortingWidth 
+                                            mergeDim 
+                                            mergeSufixType 
+                                            sorterLibVariant.Merge2a
+                                        |> sortableTestModel.MsasMi
             
                 let! qpForSortableTest = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SortableTest "") 
                                          |> Result.ofOption "Failed to create query parameters for SortableTest"
@@ -91,7 +96,7 @@ module SortableTestExecutor =
                 // 2. Safe extraction
                 let! (sorterLibId, sortableDataFormat) = 
                     maybe {
-                        let! _slLibId = rp.GetSortableTestFilter()
+                        let! _slLibId = rp.GetSorterLibId()
                         let! _dataFmt = rp.GetSortableDataFormat()
                         return (_slLibId, _dataFmt)
                     } |> Result.ofOption "Missing domain parameters required for generation"

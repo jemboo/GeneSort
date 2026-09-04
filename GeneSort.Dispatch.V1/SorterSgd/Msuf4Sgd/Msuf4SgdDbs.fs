@@ -283,7 +283,7 @@ module Msuf4SgdDbs =
                     (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
                     (runParameters.sorterEvalMeasureKey, semEvo |> SorterEvalMeasure.toCompactString)
                     (runParameters.sorterEvalMeasureInitialKey, semInitial |> SorterEvalMeasure.toCompactString)
-                    (runParameters.sortableTestFilterKey, SorterLibId.toString sorterLibId);
+                    (runParameters.sorterLibIdKey, SorterLibId.toString sorterLibId);
                     (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
                     (runParameters.sorterEvalTypeKey, sorterEvalType |> SorterEvalType.toString) 
                     (runParameters.seedModificationRateKey, (Some seedModRate) |> SeedModificationRate.toString)
@@ -316,7 +316,7 @@ module Msuf4SgdDbs =
                 let! ses = rp.GetSeedPoolSorterEvalSelectionType()
                 let! sem = rp.GetSorterEvalMeasure()
                 let! semi = rp.GetSorterEvalMeasureInitial()
-                let! slId = rp.GetSortableTestFilter()
+                let! slId = rp.GetSorterLibId()
                 let! smt = rp.GetSimpleSorterModelType()
                 let! sdf = rp.GetSortableDataFormat()
                 let! set = rp.GetSorterEvalType()

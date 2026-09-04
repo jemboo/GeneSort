@@ -2,6 +2,8 @@ namespace GeneSort.SortingLib.Sorter
 
 open System
 open System.Text.RegularExpressions
+open FSharp.UMX
+open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 
 
@@ -33,3 +35,4 @@ module SorterDataParse =
 
     let getCeArrayFromLib (sorterKey:sorterLibId) : ce array option =
         (SorterData.tryGet sorterKey) |> Option.map (parseCeArray)
+

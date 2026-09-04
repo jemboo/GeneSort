@@ -6,6 +6,8 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open System.Runtime.Intrinsics
+open GeneSort.SortingLib.Sorter
+open GeneSort.Sorting.Sorter
 
 [<Struct; CustomEquality; NoComparison>]
 type msasM = 
@@ -13,12 +15,14 @@ type msasM =
         { id: Guid<sorterTestModelID>
           mergeDimension: int<mergeDimension>
           mergeFillType: mergeSuffixType
-          sortingWidth: int<sortingWidth> }
+          sortingWidth: int<sortingWidth> 
+          libVariant: sorterLibVariant }
 
     static member create 
             (sortingWidth: int<sortingWidth>)
             (mergeDimension: int<mergeDimension>)
             (mergeSuffixType: mergeSuffixType)
+            (libVariant: sorterLibVariant) 
             : msasM =
         if %sortingWidth < 2 then
             failwith "SortingWidth must be at least 2"
@@ -31,20 +35,24 @@ type msasM =
                     box (mergeDimension |> UMX.untag)
                     box (sprintf "%A" mergeSuffixType)
                     box (sortingWidth |> UMX.untag)
+                    box (libVariant |> SorterLibVariant.toString)
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
             { 
                 id = id; 
                 mergeDimension = mergeDimension
                 mergeFillType = mergeSuffixType
                 sortingWidth = sortingWidth
+                libVariant = libVariant;
             }
 
     member this.Id with get() = this.id
-
     member this.MergeDimension with get() = this.mergeDimension
     member this.MergeFillType with get() = this.mergeFillType
-
+    member this.SorterLibVariant with get() = this.libVariant
     member this.SortingWidth with get() = this.sortingWidth
+    member this.SorterLibId with get() = { sortingWidth = this.SortingWidth; sorterVariant = this.libVariant }
+    member this.CeArray with get() : ce array option = (SorterDataParse.getCeArrayFromLib this.SorterLibId)
+
 
     override this.Equals(obj) = 
         match obj with

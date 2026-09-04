@@ -16,7 +16,7 @@ module Common =
 
     let standardPoolSzParams (rp:runParameters) =
         let sorterEvalSelectionType = sorterEvalSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
-        let stf = SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix3a
+        let stf = SorterLibId.create (24<sortingWidth>) sorterLibVariant.Prefix3a
 
         rp.WithRngType(Some rngType.Lcg)
           .WithCollectNewSortableTests(false |> UMX.tag<collectNewSortableTests> |> Some)
@@ -30,13 +30,13 @@ module Common =
           .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiased)
           .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiased)
           .WithSeedPoolSorterEvalSelectionType(Some sorterEvalSelectionType)
-          .WithSortableTestFilter(Some stf)
+          .WithSorterLibId(Some stf)
           .WithSortingWidth(Some stf.sortingWidth)
 
 
     let standardStageCrossingsParams (rp:runParameters) =
         let sorterEvalSelectionType = sorterEvalSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
-        let stf = SorterLibId.create (24<sortingWidth>) sorterVariant.Prefix3a
+        let stf = SorterLibId.create (24<sortingWidth>) sorterLibVariant.Prefix3a
 
         rp.WithRngType(Some rngType.Lcg)
           .WithCollectNewSortableTests(false |> UMX.tag<collectNewSortableTests> |> Some)
@@ -49,5 +49,5 @@ module Common =
           .WithSortedFraction(Some 0.99<sortedFraction>)
           .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiased)
           .WithSeedPoolSorterEvalSelectionType(Some sorterEvalSelectionType)
-          .WithSortableTestFilter(Some stf)
+          .WithSorterLibId(Some stf)
           .WithSortingWidth(Some stf.sortingWidth)

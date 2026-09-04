@@ -130,7 +130,7 @@ module SorterEvalDbs =
                 outputDataType
                 [| 
                     (runParameters.rngTypeKey, rng |> RngType.toString)
-                    (runParameters.sortableTestFilterKey, SorterLibId.toString sorterLibId);
+                    (runParameters.sorterLibIdKey, SorterLibId.toString sorterLibId);
                     (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
                     (runParameters.sorterEvalTypeKey, sorterEvalType |> SorterEvalType.toString) 
                     (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
@@ -142,7 +142,7 @@ module SorterEvalDbs =
                                 (odt: outputDataType) : queryParams option =
             maybe {
                 let! rng = rp.GetRngType()
-                let! slId = rp.GetSortableTestFilter()
+                let! slId = rp.GetSorterLibId()
                 let! smt = rp.GetSimpleSorterModelType()
                 let! sdf = rp.GetSortableDataFormat()
                 let! set = rp.GetSorterEvalType() 

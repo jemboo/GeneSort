@@ -91,7 +91,7 @@ module SortableTestDbs =
                 dbName projectName
                 (Some repl)
                 outputDataType
-                [| (runParameters.sortableTestFilterKey, SorterLibId.toString sorterLibId);
+                [| (runParameters.sorterLibIdKey, SorterLibId.toString sorterLibId);
                    (runParameters.sortableDataFormatKey, SortableDataFormat.toString sortableDataFormat); |]
 
 
@@ -100,7 +100,7 @@ module SortableTestDbs =
                         (odt: outputDataType) : queryParams option =
             maybe {
                 let! repl = rp.GetRepl()
-                let! slId = rp.GetSortableTestFilter()
+                let! slId = rp.GetSorterLibId()
                 let! sdf = rp.GetSortableDataFormat()
                 return makeQueryParams repl slId sdf odt
             }

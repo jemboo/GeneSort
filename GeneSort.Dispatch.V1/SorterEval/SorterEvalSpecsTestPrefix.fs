@@ -17,7 +17,7 @@ module SorterEvalSpecsTestPrefix =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
                  |> Option.get
 
-        let stf = rp.GetSortableTestFilter().Value
+        let stf = rp.GetSorterLibId().Value
 
         rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithSortingWidth(Some stf.sortingWidth)
@@ -31,7 +31,7 @@ module SorterEvalSpecsTestPrefix =
     let private paramMapFilter (rp: runParameters) : runParameters option = 
         maybe {
             let! smt = rp.GetSimpleSorterModelType()
-            let! stf = rp.GetSortableTestFilter()
+            let! stf = rp.GetSorterLibId()
             let sw = stf.sortingWidth
         
             let has2factor = (%sw % 2 = 0)

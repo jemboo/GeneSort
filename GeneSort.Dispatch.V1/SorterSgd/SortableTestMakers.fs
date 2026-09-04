@@ -57,7 +57,7 @@ module SortableTestMakers =
         async {
             let paramsOpt = option {
                     let repl = 0 |> UMX.tag<replNumber>   
-                    let! sorterLibId = rp.GetSortableTestFilter()
+                    let! sorterLibId = rp.GetSorterLibId()
                     let! sdf = rp.GetSortableDataFormat()
                     let! ces = SorterDataParse.getCeArrayFromLib sorterLibId
                     return (repl, sorterLibId, sdf, ces)

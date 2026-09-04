@@ -189,7 +189,7 @@ module PoolSetMakers =
                    |> Result.ofOption "Missing Repl"
 
             let! sorterLibId = 
-                    rp.GetSortableTestFilter() 
+                    rp.GetSorterLibId() 
                     |> Result.ofOption "Missing sorterLibId."
 
             let! poolCount = 

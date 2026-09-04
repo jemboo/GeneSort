@@ -6,7 +6,7 @@ open System
 open GeneSort.Core
 
 
-type sorterVariant =
+type sorterLibVariant =
     | VariantA
     | VariantB
     | VariantC
@@ -23,9 +23,49 @@ type sorterVariant =
     | Merge8a
     | Merge8b
 
+
+module SorterLibVariant =
+
+    let toString (variant: sorterLibVariant) : string =
+        match variant with
+        | VariantA -> "VariantA"
+        | VariantB -> "VariantB"
+        | VariantC -> "VariantC"
+        | Prefix2a -> "Prefix2a"
+        | Prefix2b -> "Prefix2b"
+        | Prefix3a -> "Prefix3a"
+        | Prefix3b -> "Prefix3b"
+        | Prefix4a -> "Prefix4a"
+        | Prefix4b -> "Prefix4b"
+        | Merge2a -> "Merge2a"
+        | Merge2b -> "Merge2b"
+        | Merge4a -> "Merge4a"
+        | Merge4b -> "Merge4b"
+        | Merge8a -> "Merge8a"
+        | Merge8b -> "Merge8b"
+
+    let fromString (s: string) : sorterLibVariant =
+        match s with
+        | "VariantA" -> VariantA
+        | "VariantB" -> VariantB
+        | "VariantC" -> VariantC
+        | "Prefix2a" -> Prefix2a
+        | "Prefix2b" -> Prefix2b
+        | "Prefix3a" -> Prefix3a
+        | "Prefix3b" -> Prefix3b
+        | "Prefix4a" -> Prefix4a
+        | "Prefix4b" -> Prefix4b
+        | "Merge2a" -> Merge2a
+        | "Merge2b" -> Merge2b
+        | "Merge4a" -> Merge4a
+        | "Merge4b" -> Merge4b
+        | "Merge8a" -> Merge8a
+        | "Merge8b" -> Merge8b
+        | _ -> failwithf "Unknown sorterLibVariant: %s" s
+
 type sorterLibId = 
     { sortingWidth: int<sortingWidth>
-      sorterVariant: sorterVariant }
+      sorterVariant: sorterLibVariant }
     
     interface IStableSerializable with
         member this.WriteStableBytes (writer: System.IO.BinaryWriter) =
@@ -37,10 +77,12 @@ type sorterLibId =
 
 
 module SorterLibId =
-    let create (sortingWidth: int<sortingWidth>) (variant: sorterVariant) : sorterLibId =
+
+    let create (sortingWidth: int<sortingWidth>) (variant: sorterLibVariant) : sorterLibId =
         { sortingWidth = sortingWidth; sorterVariant = variant }
     let toString (key: sorterLibId) : string =
-        sprintf "SorterLibId(sortingWidth=%d, Variant=%A)" (UMX.untag key.sortingWidth) key.sorterVariant
+        sprintf "SorterLibId(sortingWidth=%d, Variant=%s)" 
+                (UMX.untag key.sortingWidth) (SorterLibVariant.toString key.sorterVariant)
     let fromString (s: string) : sorterLibId =
         // This is a simple parser; in a real implementation, you might want to use a more robust parsing method
         let parts = s.Trim().Split([|','|], StringSplitOptions.RemoveEmptyEntries)
@@ -50,25 +92,8 @@ module SorterLibId =
             let sortingWidthPart = parts.[0].Trim().Replace("SorterLibId(sortingWidth=", "").Replace(")", "")
             let variantPart = parts.[1].Trim().Replace("Variant=", "").Replace(")", "")
             let sortingWidth = Int32.Parse(sortingWidthPart) |> UMX.tag<sortingWidth>
-            let variant =
-                match variantPart with
-                | "VariantA" -> VariantA
-                | "VariantB" -> VariantB
-                | "VariantC" -> VariantC
-                | "Prefix2a" -> Prefix2a
-                | "Prefix2b" -> Prefix2b
-                | "Prefix3a" -> Prefix3a
-                | "Prefix3b" -> Prefix3b
-                | "Prefix4a" -> Prefix4a
-                | "Prefix4b" -> Prefix4b
-                | "Merge2a" -> Merge2a
-                | "Merge2b" -> Merge2b
-                | "Merge4a" -> Merge4a
-                | "Merge4b" -> Merge4b
-                | "Merge8a" -> Merge8a
-                | "Merge8b" -> Merge8b
-                | _ -> failwith "Unknown sorterVariant"
-            create sortingWidth variant
+            create sortingWidth (SorterLibVariant.fromString variantPart)
+
 
 
 module SorterData =
