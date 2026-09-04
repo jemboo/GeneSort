@@ -50,7 +50,7 @@ type msasM =
     member this.MergeFillType with get() = this.mergeFillType
     member this.SorterLibVariant with get() = this.libVariant
     member this.SortingWidth with get() = this.sortingWidth
-    member this.SorterLibId with get() = { sortingWidth = this.SortingWidth; sorterVariant = this.libVariant }
+    member this.SorterLibId with get() = sorterLibId.create this.SortingWidth this.libVariant
     member this.CeArray with get() : ce array option = (SorterDataParse.getCeArrayFromLib this.SorterLibId)
 
 

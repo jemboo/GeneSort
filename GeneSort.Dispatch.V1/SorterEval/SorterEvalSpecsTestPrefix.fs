@@ -20,7 +20,7 @@ module SorterEvalSpecsTestPrefix =
         let stf = rp.GetSorterLibId().Value
 
         rp.WithDatabaseName(Some host.Run.DatabaseName)
-          .WithSortingWidth(Some stf.sortingWidth)
+          .WithSortingWidth(Some stf.SortingWidth)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
           .WithExcludeSelfCe(Some (true |>UMX.tag<excludeSelfCe>))
@@ -32,7 +32,7 @@ module SorterEvalSpecsTestPrefix =
         maybe {
             let! smt = rp.GetSimpleSorterModelType()
             let! stf = rp.GetSorterLibId()
-            let sw = stf.sortingWidth
+            let sw = stf.SortingWidth
         
             let has2factor = (%sw % 2 = 0)
             let isMuf4able = (MathUtils.isAPowerOfTwo %sw)

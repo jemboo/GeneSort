@@ -20,6 +20,7 @@ open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
+open GeneSort.SortingLib.Sorter
 
 
 module Msuf4MutateExecutor =
@@ -236,6 +237,11 @@ module Msuf4MutateExecutor =
             let! (mutationMod: int<mutationMod>) = 
                         rp.GetMutationMod() 
                         |> Result.ofOption "Missing mutationMod in run parameters"
+
+            let! (slv: sorterLibVariant) = 
+                        rp.GetSorterLibVariant()
+                        |> Result.ofOption "Missing sorterLibVariant in run parameters"
+
                         
             let rngFactory = rngType |> RngFactory.create
 
@@ -245,6 +251,7 @@ module Msuf4MutateExecutor =
                                         simpleSorterModelType 
                                         mergeDimension
                                         mergeSuffixType
+                                        slv
                                         sorterEvalType.V2
 
             let _sorterEvalSelection = 

@@ -25,7 +25,7 @@ type msasPfx =
 
     member this.Id with get() = this.id
     member this.SorterKey with get() = this.sorterKey
-    member this.SortingWidth with get() = this.sorterKey.sortingWidth
+    member this.SortingWidth with get() = this.sorterKey.SortingWidth
 
     override this.Equals(obj) =
         match obj with

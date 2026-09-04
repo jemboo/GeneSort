@@ -16,6 +16,7 @@ open GeneSort.Eval.V1.Bins
 open GeneSort.Sorting
 open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Model.Sorting.Simple.V1
+open GeneSort.SortingLib.Sorter
 
 module Reporting = 
 
@@ -198,12 +199,18 @@ module Reporting =
                         rp.GetExcludeSelfCe() 
                         |> Result.ofOption "Missing excludeSelfCe in run parameters"
 
+            let! (slv: sorterLibVariant) = 
+                        rp.GetSorterLibVariant()
+                        |> Result.ofOption "Missing sorterLibVariant in run parameters"
+
+
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getMergeSorterEvals 
                                             sortingWidth 
                                             simpleSorterModelType
                                             mergeDimension
                                             mergeSuffixType
+                                            slv
                                             sorterEvalType.V2
 
             let (_sorterEvalSelection: sorterEvalSelection) = 

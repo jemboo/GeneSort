@@ -20,6 +20,7 @@ open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
+open GeneSort.SortingLib.Sorter
 
 
 module MsceMutateExecutor =
@@ -226,7 +227,11 @@ module MsceMutateExecutor =
 
             let! (excludeSelfCe: bool<excludeSelfCe>) = 
                         rp.GetExcludeSelfCe()
-                        |> Result.ofOption "Missing excludeSelfCe in run parameters" 
+                        |> Result.ofOption "Missing excludeSelfCe in run parameters"
+
+            let! (slv: sorterLibVariant) = 
+                        rp.GetSorterLibVariant()
+                        |> Result.ofOption "Missing sorterLibVariant in run parameters"
 
             let rngFactory = rngType |> RngFactory.create
 
@@ -236,6 +241,7 @@ module MsceMutateExecutor =
                                         simpleSorterModelType 
                                         mergeDimension
                                         mergeSuffixType
+                                        slv
                                         sorterEvalType.V2
 
             let _sorterEvalSelection = 

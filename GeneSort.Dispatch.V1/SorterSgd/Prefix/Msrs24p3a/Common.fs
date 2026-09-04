@@ -31,7 +31,7 @@ module Common =
           .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiased)
           .WithSeedPoolSorterEvalSelectionType(Some sorterEvalSelectionType)
           .WithSorterLibId(Some stf)
-          .WithSortingWidth(Some stf.sortingWidth)
+          .WithSortingWidth(Some stf.SortingWidth)
 
 
     let standardStageCrossingsParams (rp:runParameters) =
@@ -50,4 +50,4 @@ module Common =
           .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiased)
           .WithSeedPoolSorterEvalSelectionType(Some sorterEvalSelectionType)
           .WithSorterLibId(Some stf)
-          .WithSortingWidth(Some stf.sortingWidth)
+          .WithSortingWidth(Some stf.SortingWidth)

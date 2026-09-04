@@ -11,6 +11,7 @@ open System
 open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Sorting
+open GeneSort.SortingLib.Sorter
 
 
 
@@ -139,6 +140,11 @@ module PoolSetMakers =
             let! (excludeSelfCe: bool<excludeSelfCe>) =
                     rp.GetExcludeSelfCe()
                     |> Result.ofOption "Missing excludeSelfCe"
+
+            let! (slv: sorterLibVariant) = 
+                        rp.GetSorterLibVariant()
+                        |> Result.ofOption "Missing sorterLibVariant in run parameters"
+
             
             let! (parentSorterSetEval: sorterSetEval) = 
                 SorterEvalDbs.getMergeSorterEvals 
@@ -146,6 +152,7 @@ module PoolSetMakers =
                     simpleSorterModelType 
                     mergeDimension
                     mergeSuffixType
+                    slv
                     sorterEvalType.V2
 
             let seedSorterModelGen = 
@@ -236,7 +243,7 @@ module PoolSetMakers =
             let seedSorterModelGen = 
                 CommonSorterEval.getSimpleUniformSorterModelGen 
                     rngType 
-                    sorterLibId.sortingWidth 
+                    sorterLibId.SortingWidth 
                     simpleSorterModelType
                     excludeSelfCe
 

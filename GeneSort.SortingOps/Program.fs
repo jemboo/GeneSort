@@ -73,12 +73,12 @@ module Sandbox =
         let sortableTest = makeFullBoolTest sortingWidth
 
 
-        let slIdA = { sorterLibId.sortingWidth = sortingWidth; sorterVariant = sorterLibVariant.VariantA }
+        let slIdA = sorterLibId.create sortingWidth sorterLibVariant.VariantA
         let blockIdA = Guid.NewGuid() |> UMX.tag<ceBlockId>
         let cesA = (SorterDataParse.getCeArrayFromLib slIdA) |> Option.get
         let ceBlkA = ceBlock.create blockIdA sortingWidth cesA
 
-        let slIdB = { sorterLibId.sortingWidth = sortingWidth; sorterVariant = sorterLibVariant.VariantB }
+        let slIdB = sorterLibId.create sortingWidth sorterLibVariant.VariantB 
         let blockIdB = Guid.NewGuid() |> UMX.tag<ceBlockId>
         let cesB = (SorterDataParse.getCeArrayFromLib slIdB) |> Option.get
         let ceBlkB = ceBlock.create blockIdB sortingWidth cesB
@@ -98,7 +98,7 @@ module Sandbox =
         let sortableTest = makeFullBoolTest sortingWidth
 
 
-        let slIdA = { sorterLibId.sortingWidth = sortingWidth; sorterVariant = sorterLibVariant.VariantA }
+        let slIdA = sorterLibId.create sortingWidth sorterLibVariant.VariantA
         let blockIdA = Guid.NewGuid() |> UMX.tag<ceBlockId>
         let cesA = (SorterDataParse.getCeArrayFromLib slIdA) |> Option.get
         let ceBlkA = ceBlock.create blockIdA sortingWidth cesA
