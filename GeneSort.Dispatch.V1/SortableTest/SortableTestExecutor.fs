@@ -32,7 +32,7 @@ module SortableTestExecutor =
                 // 1. Initial Check & Sorter Model Creation
                 do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
-                log "Creating SortableTest..."
+                log "Creating Merge SortableTest..."
 
                 // 2. Safe extraction
                 let! (sortingWidth, mergeDim, mergeSufixType, sortableDataFormat) = 
@@ -91,7 +91,7 @@ module SortableTestExecutor =
                 // 1. Initial Check & Sorter Model Creation
                 do! checkCancellation cts.Token
                 let runId = rp |> RunParameters.getIdString
-                log "Creating SortableTest..."
+                log "Creating Prefix SortableTest..."
 
                 // 2. Safe extraction
                 let! (sorterLibId, sortableDataFormat) = 

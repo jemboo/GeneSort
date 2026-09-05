@@ -20,7 +20,7 @@ open GeneSort.Core
 
 module DispatchSorterEval = 
 
-    let createThreadSafeProgress () =
+    let private createThreadSafeProgress () =
         let sessionTimestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss")
         let logFileName = sprintf @"c:\Projects\session_%s.log" sessionTimestamp
     
@@ -44,13 +44,11 @@ module DispatchSorterEval =
                 )
         }
 
-    let isServer = GCSettings.IsServerGC
-    let mode = GCSettings.LatencyMode
 
-    let progress = createThreadSafeProgress()
-    let cts = new CancellationTokenSource()
+    let private progress = createThreadSafeProgress()
+    let private cts = new CancellationTokenSource()
 
-    let startTime = DateTime.Now
+    let private startTime = DateTime.Now
     printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
@@ -76,16 +74,16 @@ module DispatchSorterEval =
 
 
     //********** SorterEval Prefix **********
-    let configType = SorterEvalSpecsTestPrefix.configType.Prefix_24s
-    let executorType = sorterEvalExecutorType.GenPrefix
-    let host: IRunHost = 
+    let private configType = SorterEvalSpecsTestPrefix.configType.Prefix_24s
+    let private executorType = sorterEvalExecutorType.GenPrefix
+    let private host: IRunHost = 
         let spec = SorterEvalSpecsTestPrefix.getRunHostSpec configType executorType
         SorterEvalDbs.createRunHost spec
 
 
-    let executor = SorterEvalExecutor.getExecutor executorType
-    let minReplica = 0<replNumber>
-    let maxReplica = 1<replNumber>
+    let private executor = SorterEvalExecutor.getExecutor executorType
+    let private minReplica = 0<replNumber>
+    let private maxReplica = 1<replNumber>
 
 
     let makeParamsAndRun() =
@@ -151,7 +149,7 @@ module DispatchSorterEval =
         } |> Async.RunSynchronously
 
 
-    let runEm() =
+    let runRunParams() =
 
         async {
 

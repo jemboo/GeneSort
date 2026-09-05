@@ -15,7 +15,7 @@ open GeneSort.Core
 
 module DispatchSortableTest = 
 
-    let createThreadSafeProgress () =
+    let private createThreadSafeProgress () =
         let sessionTimestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss")
         let logFileName = sprintf @"c:\Projects\session_%s.log" sessionTimestamp
     
@@ -39,11 +39,8 @@ module DispatchSortableTest =
                 )
         }
 
-    let isServer = GCSettings.IsServerGC
-    let mode = GCSettings.LatencyMode
-
-    let progress = createThreadSafeProgress()
-    let cts = new CancellationTokenSource()
+    let private progress = createThreadSafeProgress()
+    let private cts = new CancellationTokenSource()
 
 
 
@@ -56,19 +53,19 @@ module DispatchSortableTest =
 
 
     //********** SortableTest Prefix **********
-    let configType = SortableTestSpecsPrefix.configType.Prefix_24s
-    let executorType = SortableTest.sortableTestExecutorType.GenPrefix
-    let host: IRunHost = 
+    let private configType = SortableTestSpecsPrefix.configType.Prefix_24s
+    let private executorType = SortableTest.sortableTestExecutorType.GenPrefix
+    let private host: IRunHost = 
         let spec = SortableTestSpecsPrefix.getRunHostSpec configType executorType
         SortableTestDbs.createRunHost spec
 
 
 
-    let executor = SortableTestExecutor.getExecutor executorType
-    let minReplica = 0<replNumber>
-    let maxReplica = 1<replNumber>
+    let private executor = SortableTestExecutor.getExecutor executorType
+    let private minReplica = 0<replNumber>
+    let private maxReplica = 1<replNumber>
 
-    let runBoth() =
+    let makeParamsAndRun() =
 
         async {
 
@@ -107,7 +104,7 @@ module DispatchSortableTest =
         } |> Async.RunSynchronously
 
 
-    let MakeRunParams() =
+    let makeRunParams() =
 
         async {
             printfn "Init Run: %s" %host.Run.RunName
@@ -131,7 +128,7 @@ module DispatchSortableTest =
         } |> Async.RunSynchronously
 
 
-    let runEm() =
+    let runRunParams() =
 
         async {
 
