@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="MessagePackSetup.fs" />
     <Compile Include="RngFactoryDto.fs" />
     <Compile Include="PermutationDto.fs" />
     <Compile Include="LatticePointDto.fs" />
@@ -42,7 +43,7 @@
   <ItemGroup>
     <PackageReference Include="FSharp.UMX" Version="1.1.0" />
     <PackageReference Include="FsToolkit.ErrorHandling" Version="6.0.0-beta001" />
-    <PackageReference Include="MessagePack" Version="3.1.7" />
+    <PackageReference Include="MessagePack" Version="3.1.8" />
     <PackageReference Include="MessagePack.FSharpExtensions" Version="4.0.0" />
   </ItemGroup>
 
@@ -51,7 +52,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="11.0.101-preview5.26302.115" />
+    <PackageReference Update="FSharp.Core" Version="11.0.101-preview7.26381.103" />
   </ItemGroup>
 
 </Project>
