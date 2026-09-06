@@ -1,13 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1
-open System
-open FSharp.UMX
-open System.Threading
-open GeneSort.Db.V1
-open GeneSort.Project.V1
-open GeneSort.FileDb.V1
-open System.Runtime
-open System.IO
-open GeneSort.Core
+﻿namespace GeneSort.Project.V1
 
 
 type qpSortableTestRestriction =
@@ -31,10 +22,12 @@ type qpSimpleSorter =
 
 type qpSorterType =
     | Simple of qpSimpleSorter
+    | Gated of qpSimpleSorter
+    | Dual of qpSimpleSorter
 
 
 type qpSorterEval =
-    | SorterEval of qpSorterType * qpSortableTestType
+    | Standard of qpSorterType * qpSortableTestType
 
 
 type qpSorterMutate =
@@ -53,7 +46,7 @@ type qpSorterPoolType =
     | Sgd of qpSorterPoolStructure * qpSgdType
 
 and qpSgdType =
-    | FixedPools of qpSorterPoolType * qpSorterPoolType
+    | FixedPools of qpSorterPoolType * qpSorterPoolType * qpSorterMutate
 
 
 type queryParamType =
