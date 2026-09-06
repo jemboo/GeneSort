@@ -1,23 +1,17 @@
-﻿namespace GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Si
+﻿
+namespace GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Si
 
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1.Simple.Si
-open MessagePack
-open MessagePack.Resolvers
-open MessagePack.FSharp
 open GeneSort.Core.Mp
 
-[<MessagePackObject>]
 type mssiRandGenDto = 
-    { [<Key(0)>] sortingWidth: int
-      [<Key(1)>] rngFactoryDto: rngFactoryDto
-      [<Key(2)>] stageLength: int }
+    { sortingWidth: int
+      rngFactoryDto: rngFactoryDto
+      stageLength: int }
 
 module MssiRandGenDto =
-
-    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let fromDomain (mssiRandGen: mssiRandGen) : mssiRandGenDto =
         { sortingWidth = %mssiRandGen.SortingWidth

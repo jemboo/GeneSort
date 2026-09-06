@@ -1,25 +1,17 @@
 ﻿namespace GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Ce
 
 open FSharp.UMX
-open MessagePack
-open MessagePack.Resolvers
-open MessagePack.FSharp
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1.Simple.Ce
 open GeneSort.Core.Mp
 
-
-[<MessagePackObject>]
 type msceRandGenDto = 
-    { [<Key(0)>] sortingWidth: int
-      [<Key(1)>] rngFactoryDto: rngFactoryDto
-      [<Key(2)>] ceLength: int
-      [<Key(3)>] excludeSelfCe: bool }
+    { sortingWidth: int
+      rngFactoryDto: rngFactoryDto
+      ceLength: int
+      excludeSelfCe: bool }
 
 module MsceRandGenDto =
-
-    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let fromDomain (msceRandGen: msceRandGen) : msceRandGenDto =
         { sortingWidth = %msceRandGen.SortingWidth
@@ -39,5 +31,4 @@ module MsceRandGenDto =
                     (UMX.tag<sortingWidth> dto.sortingWidth) 
                     (dto.excludeSelfCe |> UMX.tag) 
                     (UMX.tag<ceLength> dto.ceLength)
-
 

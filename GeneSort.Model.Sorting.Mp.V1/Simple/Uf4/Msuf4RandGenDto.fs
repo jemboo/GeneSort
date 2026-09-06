@@ -1,27 +1,21 @@
-﻿namespace GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Uf4
+﻿
+namespace GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Uf4
 
 open System
 open FSharp.UMX
-open MessagePack
-open MessagePack.Resolvers
-open MessagePack.FSharp
 open GeneSort.Core.Mp.RatesAndOps
 open GeneSort.Model.Sorting.V1.Simple.Uf4
 open GeneSort.Core.Mp
 open GeneSort.Sorting
 
-[<MessagePackObject>]
 type msuf4RandGenDto =
-    { [<Key(0)>] id: Guid
-      [<Key(1)>] rngFactoryDto: rngFactoryDto
-      [<Key(2)>] sortingWidth: int
-      [<Key(3)>] stageLength: int
-      [<Key(4)>] uf4GenRatesDto: uf4GenRatesDto }
+    { id: Guid
+      rngFactoryDto: rngFactoryDto
+      sortingWidth: int
+      stageLength: int
+      uf4GenRatesDto: uf4GenRatesDto }
 
 module Msuf4RandGenDto =
-
-    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let fromDomain (msuf4RandGen: msuf4RandGen) : msuf4RandGenDto =
         { id = %msuf4RandGen.Id
@@ -47,3 +41,4 @@ module Msuf4RandGenDto =
                     genRates
         with
         | ex -> failwith $"Failed to convert Msuf4RandGenDto: {ex.Message}"
+

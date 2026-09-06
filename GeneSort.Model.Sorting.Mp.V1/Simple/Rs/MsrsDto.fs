@@ -1,18 +1,17 @@
-﻿namespace GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Rs
+﻿
+namespace GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Rs
 
 open System
 open FSharp.UMX
-open MessagePack
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1.Simple.Rs
 open GeneSort.Core.Mp
 open GeneSort.Model.Sorting.V1
 
-[<MessagePackObject; Struct>]
 type msrsDto =
-    { [<Key(0)>] Id: Guid
-      [<Key(1)>] Width: int
-      [<Key(2)>] Perm_Rss: permRsDto array }
+    { Id: Guid
+      Width: int
+      Perm_Rss: permRsDto array }
     
     static member Create(id: Guid, width: int, permRss: permRsDto array) : msrsDto =
         if isNull permRss then
@@ -27,6 +26,7 @@ type msrsDto =
             { Id = id
               Width = width
               Perm_Rss = permRss }
+
 
 module MsrsDto =
 

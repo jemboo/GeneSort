@@ -1,18 +1,17 @@
-﻿namespace GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Uf6
+﻿
+namespace GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Uf6
 
 open System
 open FSharp.UMX
-open MessagePack
 open GeneSort.Sorting
 open GeneSort.Core.Mp.TwoOrbitUnfolder
 open GeneSort.Model.Sorting.V1.Simple.Uf6
 open GeneSort.Model.Sorting.V1
 
-[<MessagePackObject>]
 type msuf6Dto =
-    { [<Key(0)>] id: Guid
-      [<Key(1)>] sortingWidth: int
-      [<Key(2)>] twoOrbitUf6Dtos: twoOrbitUf6Dto array }
+    { id: Guid
+      sortingWidth: int
+      twoOrbitUf6Dtos: twoOrbitUf6Dto array }
     
     static member Create(id: Guid, sortingWidth: int, twoOrbitUnfolder6s: twoOrbitUf6Dto array) : msuf6Dto =
         if isNull twoOrbitUnfolder6s then
@@ -44,3 +43,4 @@ module Msuf6Dto =
             (UMX.tag<sorterModelId> dto.id)
             (UMX.tag<sortingWidth> dto.sortingWidth)
             twoOrbitUnfolder6s
+

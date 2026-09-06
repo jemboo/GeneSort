@@ -1,21 +1,12 @@
-﻿namespace GeneSort.Model.Mp.Sorting.Mp.V1.Simple
+﻿
+namespace GeneSort.Model.Mp.Sorting.Mp.V1.Simple
 
-open MessagePack
-open MessagePack.Resolvers
-open MessagePack.FSharp
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Ce
 open GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Si
 open GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Rs
 open GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Uf4
 open GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Uf6
-
-[<MessagePackObject; 
-  Union(0, typeof<msceRandGenDto>);
-  Union(1, typeof<mssiRandGenDto>);
-  Union(2, typeof<msrsRandGenDto>);
-  Union(3, typeof<msuf4RandGenDto>);
-  Union(4, typeof<msuf6RandGenDto>)>]
 
 type simpleSorterModelGenDto =
     | MsceRandGen of msceRandGenDto
@@ -25,9 +16,6 @@ type simpleSorterModelGenDto =
     | Msuf6RandGen of msuf6RandGenDto
 
 module SimpleSorterModelGenDto =
-
-    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let fromDomain (sorterModelGen: simpleSorterModelGen) : simpleSorterModelGenDto =
         match sorterModelGen with
@@ -41,7 +29,6 @@ module SimpleSorterModelGenDto =
             Msuf4RandGen (Msuf4RandGenDto.fromDomain msuf4RandGen)
         | simpleSorterModelGen.SmmMsuf6RandGen msuf6RandGen ->
             Msuf6RandGen (Msuf6RandGenDto.fromDomain msuf6RandGen)
-
 
     let toDomain (dto: simpleSorterModelGenDto) : simpleSorterModelGen =
         try
