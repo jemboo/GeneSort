@@ -6,7 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SorterData.fs" />
+    <Compile Include="SorterLib.fs" />
+    <Compile Include="PrefixLib.fs" />
+    <Compile Include="MergeLib.fs" />
     <Compile Include="SorterDataParse.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

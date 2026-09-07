@@ -49,7 +49,7 @@ module SortableTestExecutor =
                                             sortingWidth 
                                             mergeDim 
                                             mergeSufixType 
-                                            sorterLibVariant.Merge2a
+                                            sorterLibVariant.VariantA
                                         |> sortableTestModel.MsasMi
             
                 let! qpForSortableTest = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SortableTest "") 

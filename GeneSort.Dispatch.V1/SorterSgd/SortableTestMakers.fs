@@ -59,7 +59,7 @@ module SortableTestMakers =
                     let repl = 0 |> UMX.tag<replNumber>   
                     let! sorterLibId = rp.GetSorterLibId()
                     let! sdf = rp.GetSortableDataFormat()
-                    let! ces = SorterDataParse.getCeArrayFromLib sorterLibId
+                    let! ces = SorterDataParse.getCeArrayFromSorterLib sorterLibId
                     return (repl, sorterLibId, sdf, ces)
                 }
 

@@ -16,7 +16,7 @@ module Common =
 
     let standardPoolSzParams (rp:runParameters) =
         let sorterEvalSelectionType = sorterEvalSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
-        let stf = SorterLibId.create (24<sortingWidth>) sorterLibVariant.Prefix3a
+        let stf = SorterLibId.create (24<sortingWidth>) sorterLibVariant.VariantA
 
         rp.WithRngType(Some rngType.Lcg)
           .WithCollectNewSortableTests(false |> UMX.tag<collectNewSortableTests> |> Some)
@@ -34,9 +34,10 @@ module Common =
           .WithSortingWidth(Some stf.SortingWidth)
 
 
+
     let standardStageCrossingsParams (rp:runParameters) =
         let sorterEvalSelectionType = sorterEvalSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
-        let stf = SorterLibId.create (24<sortingWidth>) sorterLibVariant.Prefix3a
+        let stf = SorterLibId.create (24<sortingWidth>) sorterLibVariant.VariantA
 
         rp.WithRngType(Some rngType.Lcg)
           .WithCollectNewSortableTests(false |> UMX.tag<collectNewSortableTests> |> Some)

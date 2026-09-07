@@ -32,7 +32,13 @@ module SorterDataParse =
                 ce.create lowVal hiVal |]
 
 
+    let getCeArrayFromPrefixLib (prefixKey:prefixLibId) : ce array option =
+        (PrefixLib.tryGet prefixKey) |> Option.map (parseCeArray)
 
-    let getCeArrayFromLib (sorterKey:sorterLibId) : ce array option =
-        (SorterData.tryGet sorterKey) |> Option.map (parseCeArray)
 
+    let getCeArrayFromMergeLib (mergeKey:mergeLibId) : ce array option =
+        (MergeLib.tryGet mergeKey) |> Option.map (parseCeArray)
+
+
+    let getCeArrayFromSorterLib (sorterKey:sorterLibId) : ce array option =
+        (SorterLib.tryGet sorterKey) |> Option.map (parseCeArray)

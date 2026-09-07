@@ -51,7 +51,7 @@ type msasM =
     member this.SorterLibVariant with get() = this.libVariant
     member this.SortingWidth with get() = this.sortingWidth
     member this.SorterLibId with get() = sorterLibId.create this.SortingWidth this.libVariant
-    member this.CeArray with get() : ce array option = (SorterDataParse.getCeArrayFromLib this.SorterLibId)
+    member this.CeArray with get() : ce array option = (SorterDataParse.getCeArrayFromSorterLib this.SorterLibId)
 
 
     override this.Equals(obj) = 

@@ -42,7 +42,7 @@ type msasPfx =
 
     member this.MakeSortableBoolTest 
             (sorterTestId: Guid<sortableTestId>) : sortableBinaryTest =
-        let ceArray = (SorterDataParse.getCeArrayFromLib this.SorterKey).Value
+        let ceArray = (SorterDataParse.getCeArrayFromSorterLib this.SorterKey).Value
         let bArrays = SortableBoolArray.getAllPossibleResultsFromCeArray
                         ceArray
                         this.SortingWidth
@@ -54,7 +54,7 @@ type msasPfx =
 
     member this.MakeSortableBitv512Test 
             (sorterTestId: Guid<sortableTestId>) : sortableBitv512Test =
-        let ceArray = (SorterDataParse.getCeArrayFromLib this.SorterKey).Value
+        let ceArray = (SorterDataParse.getCeArrayFromSorterLib this.SorterKey).Value
         let bArrays = SortableBoolArray.getAllPossibleResultsFromCeArray
                         ceArray
                         this.SortingWidth

@@ -50,7 +50,7 @@ module SorterEvalExecutor =
                 let! sdf = rp.GetSortableDataFormat()
                 let! slv = rp.GetSorterLibVariant()
                 let slib = sorterLibId.create sw slv
-                let! ces = SorterDataParse.getCeArrayFromLib slib
+                let! ces = SorterDataParse.getCeArrayFromSorterLib slib
                 return (repl, sw, md, mst, sdf, ces)
             }
 
@@ -69,7 +69,7 @@ module SorterEvalExecutor =
                 let repl = 0 |> UMX.tag<replNumber>   
                 let! slib = rp.GetSorterLibId()
                 let! sdf = rp.GetSortableDataFormat()
-                let! ces = SorterDataParse.getCeArrayFromLib slib
+                let! ces = SorterDataParse.getCeArrayFromSorterLib slib
                 return (repl, slib, sdf, ces)
             }
 

@@ -75,12 +75,12 @@ module Sandbox =
 
         let slIdA = sorterLibId.create sortingWidth sorterLibVariant.VariantA
         let blockIdA = Guid.NewGuid() |> UMX.tag<ceBlockId>
-        let cesA = (SorterDataParse.getCeArrayFromLib slIdA) |> Option.get
+        let cesA = (SorterDataParse.getCeArrayFromSorterLib slIdA) |> Option.get
         let ceBlkA = ceBlock.create blockIdA sortingWidth cesA
 
         let slIdB = sorterLibId.create sortingWidth sorterLibVariant.VariantB 
         let blockIdB = Guid.NewGuid() |> UMX.tag<ceBlockId>
-        let cesB = (SorterDataParse.getCeArrayFromLib slIdB) |> Option.get
+        let cesB = (SorterDataParse.getCeArrayFromSorterLib slIdB) |> Option.get
         let ceBlkB = ceBlock.create blockIdB sortingWidth cesB
 
 
@@ -100,7 +100,7 @@ module Sandbox =
 
         let slIdA = sorterLibId.create sortingWidth sorterLibVariant.VariantA
         let blockIdA = Guid.NewGuid() |> UMX.tag<ceBlockId>
-        let cesA = (SorterDataParse.getCeArrayFromLib slIdA) |> Option.get
+        let cesA = (SorterDataParse.getCeArrayFromSorterLib slIdA) |> Option.get
         let ceBlkA = ceBlock.create blockIdA sortingWidth cesA
 
         let perm = make16TwoCycle()
