@@ -14,7 +14,7 @@ module SorterDataParse =
     // [(0,1),(2,3)]"
     /// Parses a string containing number pairs—ignoring brackets, newlines, 
     /// and whitespace—into an array of ce structs.
-    let parseCeArray (s: string) : ce[] =
+    let parseToFlatCeArray (s: string) : ce[] =
         if String.IsNullOrWhiteSpace(s) then 
             [||]
         else
@@ -32,13 +32,28 @@ module SorterDataParse =
                 ce.create lowVal hiVal |]
 
 
-    let getCeArrayFromPrefixLib (prefixKey:prefixLibId) : ce array option =
-        (PrefixLib.tryGet prefixKey) |> Option.map (parseCeArray)
+    /// Parses a string formatted into line-delimited stages (e.g. "[(0,2),(1,3)]\n[(0,1),(2,3)]")
+    /// into a 2D array of ce structs (ce[][]), where each inner array represents one stage.
+    let parseTo2dCeArray (s: string) : ce[][] =
+        if String.IsNullOrWhiteSpace(s) then
+            [||]
+        else
+            s.Split([| '\r'; '\n' |], System.StringSplitOptions.RemoveEmptyEntries)
+            |> Array.map (fun line -> line.Trim())
+            |> Array.filter (fun line -> not (String.IsNullOrWhiteSpace(line)))
+            |> Array.map parseToFlatCeArray
 
+
+
+
+    let getCeArrayFromPrefixLib (prefixKey:prefixLibId) : ce array option =
+        (PrefixLib.tryGet prefixKey) |> Option.map (parseToFlatCeArray)
 
     let getCeArrayFromMergeLib (mergeKey:mergeLibId) : ce array option =
-        (MergeLib.tryGet mergeKey) |> Option.map (parseCeArray)
-
+        (MergeLib.tryGet mergeKey) |> Option.map (parseToFlatCeArray)
 
     let getCeArrayFromSorterLib (sorterKey:sorterLibId) : ce array option =
-        (SorterLib.tryGet sorterKey) |> Option.map (parseCeArray)
+        (SorterLib.tryGet sorterKey) |> Option.map (parseToFlatCeArray)
+
+    let get2dCeArrayFromSorterLib (sorterKey:sorterLibId) : ce array array option =
+        (SorterLib.tryGet sorterKey) |> Option.map (parseTo2dCeArray)

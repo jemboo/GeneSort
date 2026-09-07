@@ -26,7 +26,7 @@ module BitonicSorter =
             let prefix = 
                 [| for i in %upperOffset .. %upperOffset + %halfWidth - 1 -> ce.create i (i + %halfWidth) |]
             let upperSuffix = bitonicMerge1 %upperOffset halfWidth
-            (Ce.multiStack upperSuffix upperSuffix halfWidth) |> Array.append [| prefix |]
+            (Ce.stack2d upperSuffix upperSuffix halfWidth) |> Array.append [| prefix |]
         else
             [||]
 
@@ -39,7 +39,7 @@ module BitonicSorter =
             let prefix = 
                 [| for i in %upperOffset .. %upperOffset + %halfWidth - 1 -> ce.create i (%upperOffset + %fullWidth - 1 - i) |]
             let upperSuffix = bitonicMerge1 %upperOffset halfWidth
-            Array.append [| prefix |] (Ce.multiStack upperSuffix upperSuffix halfWidth)
+            Array.append [| prefix |] (Ce.stack2d upperSuffix upperSuffix halfWidth)
         else
             [||]
 
@@ -55,7 +55,7 @@ module BitonicSorter =
                     [| for i in 0 .. %halfWidth - 1 -> ce.create (%upperOffset + i * 2) (%upperOffset + i * 2 + 1) |]
                let suffix = bitonicMerge1 %upperOffset fullWidth
                let upperPrefix = bitonicSortHelper %upperOffset halfWidth
-               let fullPrefix = (Ce.multiStack upperPrefix upperPrefix halfWidth)
+               let fullPrefix = (Ce.stack2d upperPrefix upperPrefix halfWidth)
                Array.append fullPrefix suffix
 
         bitonicSortHelper 0<sortingWidth> sortingWidth
@@ -72,7 +72,7 @@ module BitonicSorter =
                     [| for i in 0 .. %halfWidth - 1 -> ce.create (%upperOffset + i * 2) (%upperOffset + i * 2 + 1) |]
                let suffix = bitonicMerge2 %upperOffset fullWidth
                let upperPrefix = bitonicSortHelper %upperOffset halfWidth
-               let fullPrefix = (Ce.multiStack upperPrefix upperPrefix halfWidth)
+               let fullPrefix = (Ce.stack2d upperPrefix upperPrefix halfWidth)
                Array.append fullPrefix suffix
 
         bitonicSortHelper 0<sortingWidth> sortingWidth

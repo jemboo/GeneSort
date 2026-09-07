@@ -6,6 +6,7 @@ open System
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
+open GeneSort.Sorting.Sorter
 
 module Sandbox =
     let test32Pfx() =
@@ -22,14 +23,21 @@ module Sandbox =
 
 
 
+    let stackCeArrays () =
+        let sortingWidth = 4<sortingWidth>
+        let sorterVariant = sorterLibVariant.VariantA
+        let sorterKey = sorterLibId.create sortingWidth sorterVariant
+        let ceArray = (SorterDataParse.get2dCeArrayFromSorterLib sorterKey).Value
+
+        let stackedCes = Ce.stack2d ceArray ceArray sortingWidth
+        stackedCes
 
 
 
 
 
 
-
-    test32Pfx() |> ignore
+    stackCeArrays() |> ignore
 
     printfn "Hello from F# SortingLib"
     Console.ReadLine() |> ignore

@@ -55,7 +55,7 @@ module Ce =
 
 
     // combine the upper and lower arrays, but increase the low and hi indexes of the ce's in cesLower
-    // by sortingWidthUpper. Verify that ce.Low, and ce.Hi in cesUpper are between 0 and (sortingWidthUpper - 1).
+    // by lowerOffset. Verify that ce.Low, and ce.Hi in cesUpper are between 0 and (sortingWidthUpper - 1).
     // Verify that ce.Low, and ce.Hi in cesLower are between 0 and (sortingWidthLower - 1).
     let stack (cesUpper: ce[]) (cesLower: ce[]) 
               (lowerOffset: int<sortingWidth>)  : ce[] =
@@ -69,8 +69,8 @@ module Ce =
 
 
     // use stack to combine arrays of ce arrays
-    let multiStack (cesUpper: ce[][]) (cesLower: ce[][]) 
-                   (lowerOffset: int<sortingWidth>) : ce[][] =
+    let stack2d (cesUpper: ce[][]) (cesLower: ce[][]) 
+                (lowerOffset: int<sortingWidth>) : ce[][] =
 
         if cesUpper.Length <> cesLower.Length then
             failwith "cesUpper and cesLower must have the same length"
@@ -78,6 +78,66 @@ module Ce =
         Array.map2 (fun upper lower -> 
             stack upper lower lowerOffset
         ) cesUpper cesLower
+
+    let inline private validateDivisibility (width: int<sortingWidth>) (divisor: int) (funcName: string) =
+            let rawWidth = UMX.untag width
+            if rawWidth % divisor <> 0 then
+                invalidArg (nameof width) $"{funcName} requires mergedSortingWidth ({rawWidth}) to be divisible by {divisor}."
+
+    // stacks the 2d ce array twice
+    let merge2 (cesA: ce[][]) (mergedSortingWidth: int<sortingWidth>): ce[][] =
+        validateDivisibility mergedSortingWidth 2 "merge2"
+        let subWidth = (UMX.untag mergedSortingWidth / 2) |> UMX.tag<sortingWidth>
+        stack2d cesA cesA subWidth
+
+    // stacks the 2d ce array three times
+    let merge3 (cesA: ce[][]) (mergedSortingWidth: int<sortingWidth>): ce[][] =
+        validateDivisibility mergedSortingWidth 3 "merge3"  
+        let subWidth = (UMX.untag mergedSortingWidth / 3) |> UMX.tag<sortingWidth>
+        let stacked2 = stack2d cesA cesA subWidth
+        stack2d stacked2 cesA (subWidth * 2)
+
+    // stacks the 2d ce array four times
+    let merge4 (cesA: ce[][]) (mergedSortingWidth: int<sortingWidth>): ce[][] =
+        validateDivisibility mergedSortingWidth 4 "merge4"
+        let subWidth = (UMX.untag mergedSortingWidth / 4) |> UMX.tag<sortingWidth>
+        let stacked2 = stack2d cesA cesA subWidth
+        let stacked3 = stack2d stacked2 cesA (subWidth * 2)
+        stack2d stacked3 cesA (subWidth * 3)
+
+    // stacks the 2d ce array six times
+    let merge6 (cesA: ce[][]) (mergedSortingWidth: int<sortingWidth>): ce[][] =
+        validateDivisibility mergedSortingWidth 6 "merge6"
+        let subWidth = (UMX.untag mergedSortingWidth / 6) |> UMX.tag<sortingWidth>
+        let stacked2 = stack2d cesA cesA subWidth
+        let stacked3 = stack2d stacked2 cesA (subWidth * 2)
+        let stacked4 = stack2d stacked3 cesA (subWidth * 3)
+        let stacked5 = stack2d stacked4 cesA (subWidth * 4)
+        stack2d stacked5 cesA (subWidth * 5)
+
+    // stacks the 2d ce array eight times
+    let merge8 (cesA: ce[][]) (mergedSortingWidth: int<sortingWidth>): ce[][] =
+        validateDivisibility mergedSortingWidth 8 "merge8"
+        let subWidth = (UMX.untag mergedSortingWidth / 8) |> UMX.tag<sortingWidth>
+        let stacked2 = stack2d cesA cesA subWidth
+        let stacked3 = stack2d stacked2 cesA (subWidth * 2)
+        let stacked4 = stack2d stacked3 cesA (subWidth * 3)
+        let stacked5 = stack2d stacked4 cesA (subWidth * 4)
+        let stacked6 = stack2d stacked5 cesA (subWidth * 5)
+        let stacked7 = stack2d stacked6 cesA (subWidth * 6)
+        stack2d stacked7 cesA (subWidth * 7)
+
+
+    let merge (cesA: ce[][]) (mergedSortingWidth: int<sortingWidth>) : ce[][] =
+        match UMX.untag mergedSortingWidth with
+        | 2 -> merge2 cesA mergedSortingWidth
+        | 3 -> merge3 cesA mergedSortingWidth
+        | 4 -> merge4 cesA mergedSortingWidth
+        | 6 -> merge6 cesA mergedSortingWidth
+        | 8 -> merge8 cesA mergedSortingWidth
+        | _ -> failwith "Unsupported mergedSortingWidth for merging. Supported widths are 2, 3, 4, 6, and 8."
+
+
 
 
     let inline sortBy< ^a when ^a: comparison> 
