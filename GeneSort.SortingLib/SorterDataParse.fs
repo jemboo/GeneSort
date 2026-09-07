@@ -44,16 +44,18 @@ module SorterDataParse =
             |> Array.map parseToFlatCeArray
 
 
-
-
     let getCeArrayFromPrefixLib (prefixKey:prefixLibId) : ce array option =
         (PrefixLib.tryGet prefixKey) |> Option.map (parseToFlatCeArray)
-
-    let getCeArrayFromMergeLib (mergeKey:mergeLibId) : ce array option =
-        (MergeLib.tryGet mergeKey) |> Option.map (parseToFlatCeArray)
 
     let getCeArrayFromSorterLib (sorterKey:sorterLibId) : ce array option =
         (SorterLib.tryGet sorterKey) |> Option.map (parseToFlatCeArray)
 
     let get2dCeArrayFromSorterLib (sorterKey:sorterLibId) : ce array array option =
         (SorterLib.tryGet sorterKey) |> Option.map (parseTo2dCeArray)
+
+    let getCeArrayFromMergeLib (mergeKey:mergeLibId) : ce array array option =
+        let sorterKey = sorterLibId.create mergeKey.FactorSortingWidth mergeKey.SorterLibVariant
+        let ceArrayOpt = (SorterLib.tryGet sorterKey) |> Option.map (parseTo2dCeArray)
+        //Ce.merge2d (mergeKey.MergeDimension) (mergeKey.SortingWidth) ceArrayOpt.Value
+        //ceArrayOpt.Value |> (Ce.merge2d mergeKey.MergeDimension mergeKey.SortingWidth)
+        ceArrayOpt |> Option.map (Ce.merge2d mergeKey.MergeDimension mergeKey.SortingWidth)

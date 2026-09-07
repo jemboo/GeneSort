@@ -128,8 +128,8 @@ module Ce =
         stack2d stacked7 cesA (subWidth * 7)
 
 
-    let merge (cesA: ce[][]) (mergedSortingWidth: int<sortingWidth>) : ce[][] =
-        match UMX.untag mergedSortingWidth with
+    let merge2d (dim: int<mergeDimension>) (mergedSortingWidth: int<sortingWidth>) (cesA: ce[][]) :ce[][] =
+        match UMX.untag dim with
         | 2 -> merge2 cesA mergedSortingWidth
         | 3 -> merge3 cesA mergedSortingWidth
         | 4 -> merge4 cesA mergedSortingWidth

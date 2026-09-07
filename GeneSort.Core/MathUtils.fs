@@ -32,3 +32,6 @@ module MathUtils =
     let isAPowerOfTwo (order: int) : bool =
         if order <= 0 then invalidArg "order" "Order must be positive"
         order > 0 && (order &&& (order - 1)) = 0
+
+
+

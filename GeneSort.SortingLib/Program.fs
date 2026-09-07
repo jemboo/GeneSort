@@ -33,11 +33,16 @@ module Sandbox =
         stackedCes
 
 
+    let makeMergeLib() =
+        let sortingWidth = 64<sortingWidth>
+        let mergeDimension = 4<mergeDimension>
+        let variant = sorterLibVariant.VariantB
+        let mergeKey = mergeLibId.create sortingWidth mergeDimension variant
+        let ceArrayOpt = SorterDataParse.getCeArrayFromMergeLib mergeKey
+        ceArrayOpt
 
 
-
-
-    stackCeArrays() |> ignore
+    makeMergeLib() |> ignore
 
     printfn "Hello from F# SortingLib"
     Console.ReadLine() |> ignore
