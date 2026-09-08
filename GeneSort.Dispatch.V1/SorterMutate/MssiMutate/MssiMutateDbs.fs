@@ -35,7 +35,7 @@ module MssiMutateDbs =
                             (paraRate: float<paraRate>)
                             (mdr: float<modificationRate>)
                             (odt: outputDataType) : queryParams =
-                queryParams.create dbName projectName (Some repl) odt
+                queryParams.create dbName projectName (Some repl) None odt
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
                        (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
@@ -97,6 +97,7 @@ module MssiMutateDbs =
                 queryParams.create 
                     dbName projectName
                     (Some repl)
+                    None
                     outputDataType
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)

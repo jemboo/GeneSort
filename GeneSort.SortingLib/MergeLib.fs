@@ -53,25 +53,3 @@ module MergeLibId =
             let sortingWidth = Int32.Parse(sortingWidthPart) |> UMX.tag<sortingWidth>
             let mergeDimension = Int32.Parse(mergeDimensionPart) |> UMX.tag<mergeDimension>
             create sortingWidth mergeDimension (SorterLibVariant.fromString variantPart)
-
-
-
-//module MergeLib =
-
-//    let private AllNetworksList = 
-//        [
-//            { mergeLibId.sortingWidth = 2<sortingWidth>; variant = VariantA }, 
-//            "[(0,1)]"
-
-//            { mergeLibId.sortingWidth = 3<sortingWidth>; variant = mergeLibVariant.VariantA }, 
-//            "[(0,2)]
-//             [(0,1)]
-//             [(1,2)]"
-
-//        ] |> Map.ofList
-
-
-
-//    /// Safely attempts to find a network string by its key properties.
-//    let tryGet (mergeKey: mergeLibId) =
-//        Map.tryFind mergeKey AllNetworksList

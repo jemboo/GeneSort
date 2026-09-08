@@ -31,6 +31,7 @@ module SortableTestDbs =
             queryParams.create 
                 dbName projectName
                 (Some repl)
+                None
                 outputDataType
                 [| (runParameters.sortingWidthKey, string %sortingWidth); 
                    (runParameters.mergeDimensionKey, string %mergeDimension);
@@ -90,6 +91,7 @@ module SortableTestDbs =
             queryParams.create
                 dbName projectName
                 (Some repl)
+                None
                 outputDataType
                 [| (runParameters.sorterLibIdKey, SorterLibId.toString sorterLibId);
                    (runParameters.sortableDataFormatKey, SortableDataFormat.toString sortableDataFormat); |]

@@ -31,7 +31,7 @@ module SorterEvalDbs =
                         (smt: simpleSorterModelType) 
                         (set: sorterEvalType)
                         (odt: outputDataType) : queryParams =
-            queryParams.create dbName projectName (Some repl) odt
+            queryParams.create dbName projectName (Some repl) None odt
                 [| 
                     (runParameters.rngTypeKey, rng |> RngType.toString)
                     (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
@@ -78,6 +78,7 @@ module SorterEvalDbs =
             queryParams.create 
                 dbName projectName
                 (Some repl)
+                None
                 outputDataType
                 [| 
                     (runParameters.rngTypeKey, rng |> RngType.toString)
@@ -128,6 +129,7 @@ module SorterEvalDbs =
             queryParams.create 
                 dbName projectName
                 (Some repl)
+                None
                 outputDataType
                 [| 
                     (runParameters.rngTypeKey, rng |> RngType.toString)

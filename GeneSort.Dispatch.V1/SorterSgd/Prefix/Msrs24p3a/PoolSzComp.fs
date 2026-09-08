@@ -35,32 +35,18 @@ module PoolSzComp =
             (mmod: int<mutationMod>)
             (outDt: outputDataType) : queryParams =
 
-        match outDt with
-        | outputDataType.RunParameters _ ->
-            queryParams.create 
-                dbNamePoolsTest 
-                projName
-                (Some repl)
-                outDt
-                [|
-                    (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
-                    (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                    (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
-                    (runParameters.mutationModKey, (Some %mmod) |> string)
-                |]
-        | _ ->
-            queryParams.create 
-                dbNamePoolsTest 
-                projName
-                (Some repl)
-                outDt
-                [| 
-                    (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
-                    (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
-                    (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                    (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
-                    (runParameters.mutationModKey, (Some %mmod) |> string)
-                |]
+        queryParams.create 
+            dbNamePoolsTest 
+            projName
+            (Some repl)
+            (Some genCurrent)
+            outDt
+            [|
+                (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
+                (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
+            |]
 
 
     let queryParamsFromRunParams 

@@ -37,6 +37,7 @@ type runParameters =
     static member latticeDistanceKey = "LatticeDistance"
     static member maxOrbitKey = "MaxOrbit"
     static member mergeDimensionKey = "MergeDimension"
+    static member mergeLibIdKey = "MergeLibId"
     static member mergeSuffixTypeKey = "MergeSuffixType"
     static member messageKey = "Message"
     static member modificationRateKey = "ModificationRate"
@@ -44,6 +45,7 @@ type runParameters =
     static member mutationRateKey = "MutationRate"
     static member orthoRateKey = "OrthoRate"
     static member paraRateKey = "ParaRate"
+    static member prefixLibIdKey = "PrefixLibId"
     static member prioritizeNewMutantsKey = "PrioritizeNewMutants"
     static member projectNameKey = "ProjectName"
     static member queryNameKey = "QueryName"
@@ -176,6 +178,10 @@ type runParameters =
         runParameters.tryGetInt runParameters.mergeDimensionKey this.paramMap
         |> Option.map UMX.tag<mergeDimension>
 
+    member this.GetMergeLibId() =
+        this.paramMap.TryFind runParameters.mergeLibIdKey
+        |> Option.map MergeLibId.fromString
+
     member this.GetMergeSuffixType() =
         this.paramMap.TryFind runParameters.mergeSuffixTypeKey
         |> Option.bind (fun v ->
@@ -201,6 +207,10 @@ type runParameters =
     member this.GetParaRate() =
         runParameters.tryGetFloat runParameters.paraRateKey this.paramMap
         |> Option.map UMX.tag<paraRate>
+
+    member this.GetPrefixLibId() =
+        this.paramMap.TryFind runParameters.prefixLibIdKey
+            |> Option.map PrefixLibId.fromString
 
     member this.GetPrioritizeNewMutants() =
         runParameters.tryGetBool runParameters.prioritizeNewMutantsKey this.paramMap
@@ -411,6 +421,9 @@ type runParameters =
     member this.WithMergeDimension(md: int<mergeDimension> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeDimensionKey (md |> Option.map UmxExt.intToRaw) }
 
+    member this.WithMergeLibId(mlid: mergeLibId option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeLibIdKey (mlid |> Option.map MergeLibId.toString) }
+
     member this.WithMergeSuffixType(mft: mergeSuffixType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mergeSuffixTypeKey (mft |> Option.map MergeSuffixType.toString) }
 
@@ -431,6 +444,9 @@ type runParameters =
 
     member this.WithParaRate(para: float<paraRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.paraRateKey (para |> Option.map UmxExt.floatToRaw) }
+
+    member this.WithPrefixLibId(pfxLibId: prefixLibId option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.prefixLibIdKey (pfxLibId |> Option.map PrefixLibId.toString) }
 
     member this.WithPrioritizeNewMutants(pnm: bool option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.prioritizeNewMutantsKey (pnm |> Option.map string) }

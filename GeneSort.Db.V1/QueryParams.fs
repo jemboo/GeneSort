@@ -2,6 +2,7 @@
 
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Eval.V1
 open GeneSort.Project.V1
 
 
@@ -10,6 +11,7 @@ type queryParams =
         dbName:         string<databaseName>
         projectName:    string<projectName>
         repl:           int<replNumber> option
+        generation:     int<generationNumber> option
         outputDataType: outputDataType
         properties:     Map<string, string>
         id:             Guid<queryParamsId>
@@ -18,6 +20,7 @@ type queryParams =
     member this.Id             with get() = this.id
     member this.DbName         with get() = this.dbName
     member this.Repl           with get() = this.repl
+    member this.Generation     with get() = this.generation
     member this.OutputDataType with get() = this.outputDataType
     member this.ProjectName    with get() = this.projectName
     member this.Properties     with get() = this.properties
@@ -40,6 +43,7 @@ type queryParams =
             (dbName:         string<databaseName>)
             (projName:       string<projectName>)
             (repl:           int<replNumber> option)
+            (generation:     int<generationNumber> option)
             (outputDataType: outputDataType)
             (properties:     (string * string) []) : queryParams =
         let props = properties |> Array.filter (fst >> isNull >> not) |> Map.ofArray
@@ -53,6 +57,16 @@ type queryParams =
             | Some r -> yield box true; yield box %r
             | None -> yield box false
 
+            // Include generation in the structural identity ONLY when outputDataType is NOT RunParameters
+            match outputDataType, generation with
+            | RunParameters _, _ -> 
+                ()
+            | _, Some gen -> 
+                yield box true
+                yield box %gen
+            | _, None -> 
+                yield box false
+
             yield box (outputDataType |> OutputDataType.toFolderName)
             yield box props.Count
             
@@ -63,13 +77,15 @@ type queryParams =
         }
 
         {
-            dbName    = dbName
-            projectName =  projName
+            dbName         = dbName
+            projectName    = projName
             repl           = repl
+            generation     = generation
             outputDataType = outputDataType
             properties     = props
             id             = GuidUtils.guidFromObjs structuralIdentityComponents |> UMX.tag<queryParamsId>
         }
+
 
     interface IStableSerializable with
             member this.WriteStableBytes (writer: System.IO.BinaryWriter) =
@@ -79,17 +95,17 @@ type queryParams =
 
     static member createForRun 
                     (databaseName: string<databaseName>) 
-                    (projName:  string<projectName>)
-                    (runName:   string<runName>) 
+                    (projName:     string<projectName>)
+                    (runName:      string<runName>) 
                     : queryParams =
-        queryParams.create databaseName projName None (outputDataType.Run runName) [||]
+        queryParams.create databaseName projName None None (outputDataType.Run runName) [||]
 
 
     static member createForTextReport
-            (databaseName:      string<databaseName>)
+            (databaseName:   string<databaseName>)
             (projName:       string<projectName>)
             (textReportName: string<textReportName>) : queryParams =
-        queryParams.create databaseName projName None (outputDataType.TextReport textReportName) [||]
+        queryParams.create databaseName projName None None (outputDataType.TextReport textReportName) [||]
 
 
 

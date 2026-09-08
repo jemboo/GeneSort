@@ -23,7 +23,6 @@ module StageCrossings =
     let dbFolderTest = @$"c:\Projects\{%projName}\{%dbNamePoolsTest}\Data" |> UMX.tag<pathToRootFolder>
     let dbFolderPoolSz256 = @$"c:\Projects\{%projName}\{%dbNamePoolSz256}\Data" |> UMX.tag<pathToRootFolder>
 
-
     let makeQueryParams
             (repl: int<replNumber>)
             (genCurrent: int<generationNumber>)
@@ -34,39 +33,24 @@ module StageCrossings =
             (sev: sorterEvalMeasure)
             (outDt: outputDataType) : queryParams =
 
-        match outDt with
-        | outputDataType.RunParameters _ ->
-            queryParams.create 
-                dbNamePoolsTest 
-                projName
-                (Some repl)
-                outDt
-                [|
-                    (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
-                    (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                    (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
-                    (runParameters.mutationModKey, (Some %mmod) |> string)
-                    (runParameters.sorterEvalMeasureKey, sev |> SorterEvalFunctions.toCompactString)
-                |]
-        | _ ->
-            queryParams.create 
-                dbNamePoolsTest 
-                projName
-                (Some repl)
-                outDt
-                [| 
-                    (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
-                    (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
-                    (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                    (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
-                    (runParameters.mutationModKey, (Some %mmod) |> string)
-                    (runParameters.sorterEvalMeasureKey, sev |> SorterEvalFunctions.toCompactString)
-                |]
+        queryParams.create 
+            dbNamePoolsTest 
+            projName
+            (Some repl)
+            (Some genCurrent)
+            outDt
+            [|
+                (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
+                (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
+                (runParameters.sorterEvalMeasureKey, sev |> SorterEvalFunctions.toCompactString)
+            |]
 
 
     let queryParamsFromRunParams 
-                    (rp: runParameters) 
-                    (odt: outputDataType) : queryParams option =
+            (rp: runParameters) 
+            (odt: outputDataType) : queryParams option =
         maybe {
             let! repl = rp.GetRepl()
             let! curGen = rp.GetGenerationCurrent()

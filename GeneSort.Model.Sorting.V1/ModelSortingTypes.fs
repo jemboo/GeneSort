@@ -28,6 +28,11 @@ open GeneSort.Core
 [<Measure>] type paraRate
 [<Measure>] type selfSymRate
 
+
+module MutationMod =
+    let toString (w: int<mutationMod> option) : string =
+        UmxExt.intOptionToString w
+
 module MutationRate =
     let toString (w: float<mutationRate> option) : string =
         UmxExt.floatOptionToString w

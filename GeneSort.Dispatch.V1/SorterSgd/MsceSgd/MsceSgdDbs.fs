@@ -49,7 +49,7 @@ module MsceSgdDbs =
                             (ssri: essData)
                             (syri: essData)
                             (odt: outputDataType) : queryParams =
-                queryParams.create dbName projectName (Some repl) odt
+                queryParams.create dbName projectName (Some repl) None odt
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
                        (runParameters.generationCurrentKey, (Some genCurrent) |> GenerationNumber.toString)
@@ -149,6 +149,7 @@ module MsceSgdDbs =
                 queryParams.create 
                     dbName projectName
                     (Some repl)
+                    None
                     outputDataType
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
