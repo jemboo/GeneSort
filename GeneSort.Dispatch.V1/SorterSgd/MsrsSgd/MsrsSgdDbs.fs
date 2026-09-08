@@ -47,9 +47,6 @@ module MsrsSgdDbs =
                             (sfrac: float<sortedFraction>)      
                             (sper: int<sorterPoolExpansionRate>)
                             (mmod: int<mutationMod>)
-                            (spsi: essData)
-                            (ssri: essData)
-                            (syri: essData)
                             (odt: outputDataType) : queryParams =
                 queryParams.create dbName projectName (Some repl) None odt
                     [| 
@@ -73,9 +70,6 @@ module MsrsSgdDbs =
                        (runParameters.sortedFractionKey, (Some %sfrac) |> string)
                        (runParameters.sorterPoolExpansionRateKey, (Some %sper) |> string)
                        (runParameters.mutationModKey, (Some %mmod) |> string)
-                       (runParameters.sorterPoolSelectionIntervalsKeyOld, (Some spsi) |> EssData.toString)
-                       (runParameters.snapshotReportIntervalsKey, (Some ssri) |> EssData.toString)
-                       (runParameters.summaryReportIntervalsKey, (Some syri) |> EssData.toString)
                     |]
 
 
@@ -104,13 +98,10 @@ module MsrsSgdDbs =
                     let! sfrac = rp.GetSortedFraction()
                     let! sper = rp.GetSorterPoolExpansionRate()
                     let! mmod = rp.GetMutationMod()
-                    let! spsi = rp.GetSorterPoolSelectionIntervalsOld()
-                    let! ssri = rp.GetSnapshotReportIntervals()
-                    let! syri = rp.GetSummaryReportIntervals()
                     return makeQueryParams rng curGen scPP spc scc ses
                                            sem semi repl sw smt set ortho 
                                            para sym mdr dsh pNm sfrac sper
-                                           mmod spsi ssri syri odt
+                                           mmod odt
                 }
                 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -146,9 +137,6 @@ module MsrsSgdDbs =
                     (sfrac: float<sortedFraction>)
                     (sper: int<sorterPoolExpansionRate>)
                     (mmod: int<mutationMod>)
-                    (spsi: essData)
-                    (ssri: essData)
-                    (syri: essData)
                     (outputDataType: outputDataType) : queryParams =
 
             queryParams.create 
@@ -179,9 +167,6 @@ module MsrsSgdDbs =
                     (runParameters.sortedFractionKey, (Some %sfrac) |> string)
                     (runParameters.sorterPoolExpansionRateKey, (Some %sper) |> string)
                     (runParameters.mutationModKey, (Some %mmod) |> string)
-                    (runParameters.sorterPoolSelectionIntervalsKeyOld, (Some spsi) |> EssData.toString)
-                    (runParameters.snapshotReportIntervalsKey, (Some ssri) |> EssData.toString)
-                    (runParameters.summaryReportIntervalsKey, (Some syri) |> EssData.toString)
                 |]
 
 
@@ -212,13 +197,10 @@ module MsrsSgdDbs =
                 let! sfrac = rp.GetSortedFraction()
                 let! sper = rp.GetSorterPoolExpansionRate()
                 let! mmod = rp.GetMutationMod()
-                let! spsi = rp.GetSorterPoolSelectionIntervalsOld()
-                let! ssri = rp.GetSnapshotReportIntervals()
-                let! syri = rp.GetSummaryReportIntervals()
                 return makeQueryParams rng curGen scPP spc scc ses sem
                                         semi repl sw smt md mst sdf set 
                                         ortho para sym mdr dsh sfrac sper
-                                        mmod spsi ssri syri odt
+                                        mmod odt
                                         
             }
 
@@ -258,9 +240,6 @@ module MsrsSgdDbs =
                     (sfrac: float<sortedFraction>)
                     (sper: int<sorterPoolExpansionRate>)
                     (mmod: int<mutationMod>)
-                    (spsi: essData)
-                    (ssri: essData)
-                    (syri: essData)
                     (spm: sorterPoolMeasure)
                     (outputDataType: outputDataType) : queryParams =
 
@@ -294,9 +273,6 @@ module MsrsSgdDbs =
                     (runParameters.sortedFractionKey, (Some %sfrac) |> string)
                     (runParameters.sorterPoolExpansionRateKey, (Some %sper) |> string)
                     (runParameters.mutationModKey, (Some %mmod) |> string)
-                    (runParameters.sorterPoolSelectionIntervalsKeyOld, (Some spsi) |> EssData.toString)
-                    (runParameters.snapshotReportIntervalsKey, (Some ssri) |> EssData.toString)
-                    (runParameters.summaryReportIntervalsKey, (Some syri) |> EssData.toString)
                     (runParameters.sorterPoolMeasureKey, spm |> SorterPoolMeasure.toCompactString)
                 |]
 
@@ -330,15 +306,12 @@ module MsrsSgdDbs =
                 let! sfrac = rp.GetSortedFraction()
                 let! sper = rp.GetSorterPoolExpansionRate()
                 let! mmod = rp.GetMutationMod()
-                let! spsi = rp.GetSorterPoolSelectionIntervalsOld()
-                let! ssri = rp.GetSnapshotReportIntervals()
-                let! syri = rp.GetSummaryReportIntervals()
                 let! spm = rp.GetSorterPoolMeasure()
                 return makeQueryParams repl rng curGen scPP sctc sctm 
                                        spc scc ses sem semi slId smt 
                                        sdf set sdMdr ortho para sym mdr 
                                        dsh pNm sfrac sper mmod
-                                       spsi ssri syri spm odt
+                                       spm odt
 
             }
 

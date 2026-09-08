@@ -59,7 +59,6 @@ type runParameters =
     static member selectedSorterCountPerPoolKey = "SelectedSorterCountPerPool"
     static member selfSymRateKey = "SelfSym"
     static member simpleSorterModelTypeKey = "SimpleSorterModelType"
-    static member snapshotReportIntervalsKey = "SnapshotReportIntervals"
     static member sortableCountKey = "SortableCount"
     static member sortableDataFormatKey = "SortableDataFormat"
     static member sortedFractionKey = "SortedFraction"
@@ -78,11 +77,9 @@ type runParameters =
     static member sorterPoolExpansionRateKey = "SorterPoolExpansionRate"
     static member sorterPoolMeasureKey = "sorterPoolMeasure"
     static member sorterPoolSelectionIntervalsKey = "SorterPoolSelectionIntervals"
-    static member sorterPoolSelectionIntervalsKeyOld = "SorterPoolSelectionIntervalsOld"
     static member sortingWidthKey = "SortingWidth"
     static member stageLengthKey = "StageLength"
     static member startingReplKey = "StartingRepl"
-    static member summaryReportIntervalsKey = "SummaryReportIntervals"
     static member textReportNameKey = "TextReportName"
 
     // ============================================================
@@ -265,10 +262,6 @@ type runParameters =
             try Some (SimpleSorterModelType.fromString v)
             with _ -> None)
 
-    member this.GetSnapshotReportIntervals() =
-        this.paramMap.TryFind runParameters.snapshotReportIntervalsKey
-        |> Option.map (fun v -> essData.fromString(v))
-
     member this.GetSortableCount() =
         runParameters.tryGetInt runParameters.sortableCountKey this.paramMap
         |> Option.map UMX.tag<sorterCount>
@@ -345,10 +338,6 @@ type runParameters =
         this.paramMap.TryFind runParameters.sorterPoolSelectionIntervalsKey
         |> Option.map (fun v -> SamplingConfig.fromString(v))
 
-    member this.GetSorterPoolSelectionIntervalsOld() =
-        this.paramMap.TryFind runParameters.sorterPoolSelectionIntervalsKeyOld
-        |> Option.map (fun v -> essData.fromString(v))
-
     member this.GetSortingWidth() =
         runParameters.tryGetInt runParameters.sortingWidthKey this.paramMap
         |> Option.map UMX.tag<sortingWidth>
@@ -360,10 +349,6 @@ type runParameters =
     member this.GetStartingRepl() =
         runParameters.tryGetInt runParameters.startingReplKey this.paramMap
         |> Option.map UMX.tag<replNumber>
-
-    member this.GetSummaryReportIntervals() =
-        this.paramMap.TryFind runParameters.summaryReportIntervalsKey
-        |> Option.map (fun v -> essData.fromString(v))
 
     member this.GetTextReportName() =
         this.paramMap.TryFind runParameters.textReportNameKey
@@ -487,9 +472,6 @@ type runParameters =
     member this.WithSimpleSorterModelType(smt: simpleSorterModelType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.simpleSorterModelTypeKey (smt |> Option.map SimpleSorterModelType.toString) }
 
-    member this.WithSnapshotReportIntervals(essd: essData option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.snapshotReportIntervalsKey (essd |> Option.map (fun e -> e.toString())) }
-
     member this.WithSortableCount(sc: int<sortableCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortableCountKey (sc |> Option.map UmxExt.intToRaw) }
 
@@ -544,9 +526,6 @@ type runParameters =
     member this.WithSorterPoolSelectionIntervals(sConfig: samplingConfig option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterPoolSelectionIntervalsKey (sConfig |> Option.map SamplingConfig.toString) }
 
-    member this.WithSorterPoolSelectionIntervalsOld(essd: essData option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterPoolSelectionIntervalsKeyOld (essd |> Option.map (fun e -> e.toString())) }
-
     member this.WithSortingWidth(w: int<sortingWidth> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortingWidthKey (w |> Option.map UmxExt.intToRaw) }
 
@@ -555,9 +534,6 @@ type runParameters =
 
     member this.WithStartingRepl(sr: int<replNumber> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.startingReplKey (sr |> Option.map UmxExt.intToRaw) }
-
-    member this.WithSummaryReportIntervals(essd: essData option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.summaryReportIntervalsKey (essd |> Option.map (fun e -> e.toString())) }
 
     member this.WithTextReportName(trn: string<textReportName> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.textReportNameKey (trn |> Option.map UmxExt.stringToRaw) }

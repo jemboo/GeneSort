@@ -43,9 +43,6 @@ module MssiSgdDbs =
                             (dsh: bool<distinctSorterHashes>)
                             (pNm: bool<prioritizeNewMutants>)
                             (sfrac: float<sortedFraction>)
-                            (spsi: essData)
-                            (ssri: essData)
-                            (syri: essData)
                             (odt: outputDataType) : queryParams =
                 queryParams.create dbName projectName (Some repl) None odt
                     [| 
@@ -66,9 +63,6 @@ module MssiSgdDbs =
                        (runParameters.prioritizeNewMutantsKey, (Some pNm) |> string)
                        (runParameters.distinctSorterHashesKey, (Some dsh) |> string)
                        (runParameters.sortedFractionKey, (Some %sfrac) |> string)
-                       (runParameters.sorterPoolSelectionIntervalsKeyOld, (Some spsi) |> EssData.toString)
-                       (runParameters.snapshotReportIntervalsKey, (Some ssri) |> EssData.toString)
-                       (runParameters.summaryReportIntervalsKey, (Some syri) |> EssData.toString)
                     |]
 
 
@@ -94,12 +88,9 @@ module MssiSgdDbs =
                     let! dsh = rp.GetDistinctSorterHashes()
                     let! pNm = rp.GetPrioritizeNewMutants()
                     let! sfrac = rp.GetSortedFraction()
-                    let! spsi = rp.GetSorterPoolSelectionIntervalsOld()
-                    let! ssri = rp.GetSnapshotReportIntervals()
-                    let! syri = rp.GetSummaryReportIntervals()
                     return makeQueryParams rng curGen scPP spc scc ses sem semi 
                                             repl sw smt set ortho para mdr dsh pNm sfrac 
-                                            spsi ssri syri odt
+                                            odt
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -136,9 +127,6 @@ module MssiSgdDbs =
                         (dsh: bool<distinctSorterHashes>)
                         (pNm: bool<prioritizeNewMutants>)
                         (sfrac: float<sortedFraction>)
-                        (spsi: essData)
-                        (ssri: essData)
-                        (syri: essData)
                         (outputDataType: outputDataType) : queryParams =
 
                 queryParams.create 
@@ -167,9 +155,6 @@ module MssiSgdDbs =
                        (runParameters.prioritizeNewMutantsKey, (Some pNm) |> string)
                        (runParameters.distinctSorterHashesKey, (Some dsh) |> string)
                        (runParameters.sortedFractionKey, (Some %sfrac) |> string)
-                       (runParameters.sorterPoolSelectionIntervalsKeyOld, (Some spsi) |> EssData.toString)
-                       (runParameters.snapshotReportIntervalsKey, (Some ssri) |> EssData.toString)
-                       (runParameters.summaryReportIntervalsKey, (Some syri) |> EssData.toString)
                     |]
 
 
@@ -198,13 +183,9 @@ module MssiSgdDbs =
                     let! dsh = rp.GetDistinctSorterHashes()
                     let! pNm = rp.GetPrioritizeNewMutants()
                     let! sfrac = rp.GetSortedFraction()
-                    let! spsi = rp.GetSorterPoolSelectionIntervalsOld()
-                    let! ssri = rp.GetSnapshotReportIntervals()
-                    let! syri = rp.GetSummaryReportIntervals()
                     return makeQueryParams rng curGen scPP spc scc ses sem semi 
                                             repl sw smt md mst sdf set ortho para 
-                                            mdr dsh pNm sfrac 
-                                            spsi ssri syri odt
+                                            mdr dsh pNm sfrac odt
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
