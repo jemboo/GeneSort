@@ -87,6 +87,19 @@ type queryParams =
         }
 
 
+
+    static member createFromMap
+            (dbName:         string<databaseName>)
+            (projName:       string<projectName>)
+            (repl:           int<replNumber> option)
+            (generation:     int<generationNumber> option)
+            (outputDataType: outputDataType)
+            (propertyMap:     Map<string, string>) : queryParams =
+
+       queryParams.create dbName projName repl generation 
+                          outputDataType (propertyMap |> Map.toArray)
+            
+
     interface IStableSerializable with
             member this.WriteStableBytes (writer: System.IO.BinaryWriter) =
                 let rawGuid = UMX.untag this.id

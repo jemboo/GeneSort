@@ -89,9 +89,12 @@ type QueryParamMpTests () =
 
     [<Fact>]
     member _.``qpSorterMutateDto converts back and forth accurately`` () =
+        let eval1 = qpSorterEval.Standard (qpSorterType.Simple qpSimpleSorter.Msce, qpSortableTestType.Standard qpSortableTestRestriction.NoRestriction)
+        let eval2 = qpSorterEval.Standard (qpSorterType.Dual qpSimpleSorter.Msuf4, qpSortableTestType.Prefix qpSortableTestRestriction.Split)
+
         let cases = 
-            [ qpSorterMutate.Uniform (qpSorterType.Simple qpSimpleSorter.Msce)
-              qpSorterMutate.Variable (qpSorterType.Dual qpSimpleSorter.Msuf4) ]
+            [ qpSorterMutate.Uniform eval1
+              qpSorterMutate.Variable eval2 ]
 
         for case in cases do
             let dto = QpSorterMutateDto.fromDomain case
@@ -106,7 +109,7 @@ type QueryParamMpTests () =
 
         let poolRandom1 = qpSorterPoolType.Random (qpSorterPoolStructure.Singleton, eval1)
         let poolRandom2 = qpSorterPoolType.Random (qpSorterPoolStructure.Tiled, eval2)
-        let mutate = qpSorterMutate.Uniform (qpSorterType.Simple qpSimpleSorter.Msce)
+        let mutate = qpSorterMutate.Uniform eval1
 
         let sgdDomain = qpSgdType.FixedPools (poolRandom1, poolRandom2, mutate)
         let poolSgd = qpSorterPoolType.Sgd (qpSorterPoolStructure.Multiple, sgdDomain)
@@ -124,14 +127,14 @@ type QueryParamMpTests () =
         let eval = qpSorterEval.Standard (qpSorterType.Gated qpSimpleSorter.Msrs, qpSortableTestType.Merge qpSortableTestRestriction.NoRestriction)
         let pool1 = qpSorterPoolType.Random (qpSorterPoolStructure.Singleton, eval)
         let pool2 = qpSorterPoolType.Random (qpSorterPoolStructure.Multiple, eval)
-        let mutate = qpSorterMutate.Variable (qpSorterType.Dual qpSimpleSorter.Msuf4)
+        let mutate = qpSorterMutate.Variable eval
         let sgd = qpSgdType.FixedPools (pool1, pool2, mutate)
 
         let cases = 
-            [ queryParamType.SortableTest (qpSortableTestType.Standard qpSortableTestRestriction.Split)
-              queryParamType.SorterEval eval
-              queryParamType.SorterMutate mutate
-              queryParamType.SorterSgd sgd ]
+            [ queryProperties.SortableTest (qpSortableTestType.Standard qpSortableTestRestriction.Split)
+              queryProperties.SorterEval eval
+              queryProperties.SorterMutate mutate
+              queryProperties.SorterSgd sgd ]
 
         for case in cases do
             let dto = QueryParamTypeDto.fromDomain case

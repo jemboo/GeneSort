@@ -72,7 +72,6 @@
     <Compile Include="SorterSgd\MssiSgd\MssiSgdDbs.fs" />
     <Compile Include="SorterSgd\MsrsSgd\MsrsSgdDbs.fs" />
     <Compile Include="SorterSgd\Msuf4Sgd\Msuf4SgdDbs.fs" />
-    <Compile Include="QueryParamMap.fs" />
     <Compile Include="DispatchLib.fs" />
     <Compile Include="DispatchSortableTest.fs" />
     <Compile Include="DispatchSorterEval.fs" />

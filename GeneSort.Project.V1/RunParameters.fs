@@ -107,7 +107,7 @@ type runParameters =
     static member private tryGetInt (key: string) (map: Map<string, string>) =
         map.TryFind key |> Option.bind (fun v -> match Int32.TryParse v with true, i -> Some i | _ -> None)
 
-    member this.ParamMap with get() = this.paramMap
+    member this.ParamMap with get() :Map<string,string> = this.paramMap
 
     // ============================================================
     // Getters

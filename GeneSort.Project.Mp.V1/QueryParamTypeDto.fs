@@ -113,21 +113,23 @@ module QpSorterEvalDto =
 
 // --- qpSorterMutate ---
 
+// --- qpSorterMutate ---
+
 type qpSorterMutateDto =
-    | Uniform of qpSorterTypeDto
-    | Variable of qpSorterTypeDto
+    | Uniform of qpSorterEvalDto
+    | Variable of qpSorterEvalDto
 
 module QpSorterMutateDto =
 
     let fromDomain (domain: qpSorterMutate) : qpSorterMutateDto =
         match domain with
-        | qpSorterMutate.Uniform st -> Uniform (QpSorterTypeDto.fromDomain st)
-        | qpSorterMutate.Variable st -> Variable (QpSorterTypeDto.fromDomain st)
+        | qpSorterMutate.Uniform se -> Uniform (QpSorterEvalDto.fromDomain se)
+        | qpSorterMutate.Variable se -> Variable (QpSorterEvalDto.fromDomain se)
 
     let toDomain (dto: qpSorterMutateDto) : qpSorterMutate =
         match dto with
-        | Uniform stDto -> qpSorterMutate.Uniform (QpSorterTypeDto.toDomain stDto)
-        | Variable stDto -> qpSorterMutate.Variable (QpSorterTypeDto.toDomain stDto)
+        | Uniform seDto -> qpSorterMutate.Uniform (QpSorterEvalDto.toDomain seDto)
+        | Variable seDto -> qpSorterMutate.Variable (QpSorterEvalDto.toDomain seDto)
 
 
 // --- qpSorterPoolStructure ---
@@ -208,19 +210,19 @@ type queryParamTypeDto =
 
 module QueryParamTypeDto =
 
-    let fromDomain (domain: queryParamType) : queryParamTypeDto =
+    let fromDomain (domain: queryProperties) : queryParamTypeDto =
         match domain with
-        | queryParamType.SortableTest st -> SortableTest (QpSortableTestTypeDto.fromDomain st)
-        | queryParamType.SorterEval se -> SorterEval (QpSorterEvalDto.fromDomain se)
-        | queryParamType.SorterMutate sm -> SorterMutate (QpSorterMutateDto.fromDomain sm)
-        | queryParamType.SorterSgd sgd -> SorterSgd (QpSgdTypeDto.fromDomain sgd)
+        | queryProperties.SortableTest st -> SortableTest (QpSortableTestTypeDto.fromDomain st)
+        | queryProperties.SorterEval se -> SorterEval (QpSorterEvalDto.fromDomain se)
+        | queryProperties.SorterMutate sm -> SorterMutate (QpSorterMutateDto.fromDomain sm)
+        | queryProperties.SorterSgd sgd -> SorterSgd (QpSgdTypeDto.fromDomain sgd)
 
-    let toDomain (dto: queryParamTypeDto) : queryParamType =
+    let toDomain (dto: queryParamTypeDto) : queryProperties =
         try
             match dto with
-            | SortableTest stDto -> queryParamType.SortableTest (QpSortableTestTypeDto.toDomain stDto)
-            | SorterEval seDto -> queryParamType.SorterEval (QpSorterEvalDto.toDomain seDto)
-            | SorterMutate smDto -> queryParamType.SorterMutate (QpSorterMutateDto.toDomain smDto)
-            | SorterSgd sgdDto -> queryParamType.SorterSgd (QpSgdTypeDto.toDomain sgdDto)
+            | SortableTest stDto -> queryProperties.SortableTest (QpSortableTestTypeDto.toDomain stDto)
+            | SorterEval seDto -> queryProperties.SorterEval (QpSorterEvalDto.toDomain seDto)
+            | SorterMutate smDto -> queryProperties.SorterMutate (QpSorterMutateDto.toDomain smDto)
+            | SorterSgd sgdDto -> queryProperties.SorterSgd (QpSgdTypeDto.toDomain sgdDto)
         with
         | ex -> failwith $"Failed to convert QueryParamTypeDto: {ex.Message}"
