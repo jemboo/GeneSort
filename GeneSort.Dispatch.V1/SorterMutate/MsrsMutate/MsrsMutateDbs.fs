@@ -27,7 +27,7 @@ module MsrsMutateDbs =
 
             let makeQueryParams
                             (rng: rngType)
-                            (ses:sorterEvalSelectionType)
+                            (ses:sorterSelectionType)
                             (sem:sorterEvalMeasure)
                             (repl: int<replNumber>) 
                             (sw: int<sortingWidth>) 
@@ -41,7 +41,7 @@ module MsrsMutateDbs =
                 queryParams.create dbName projectName (Some repl) None odt
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                       (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
+                       (runParameters.seedPoolSorterSelectionTypeKey, ses |> SorterEvalSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalFunctions.toCompactString)
                        (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                        (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
@@ -58,7 +58,7 @@ module MsrsMutateDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! ses = rp.GetSeedPoolSorterEvalSelectionType()
+                    let! ses = rp.GetSeedPoolSorterSelectionType()
                     let! sem = rp.GetSorterEvalMeasure()
                     let! sw = rp.GetSortingWidth()
                     let! smt = rp.GetSimpleSorterModelType()
@@ -85,7 +85,7 @@ module MsrsMutateDbs =
 
             let makeQueryParams
                         (rng: rngType)
-                        (ses:sorterEvalSelectionType)
+                        (ses:sorterSelectionType)
                         (sem:sorterEvalMeasure)
                         (repl: int<replNumber>) 
                         (sortingWidth: int<sortingWidth>)
@@ -107,7 +107,7 @@ module MsrsMutateDbs =
                     outputDataType
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                       (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
+                       (runParameters.seedPoolSorterSelectionTypeKey, ses |> SorterEvalSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toCompactString)
                        (runParameters.sortingWidthKey, string %sortingWidth); 
                        (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
@@ -127,7 +127,7 @@ module MsrsMutateDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! rng = rp.GetRngType()
-                    let! ses = rp.GetSeedPoolSorterEvalSelectionType()
+                    let! ses = rp.GetSeedPoolSorterSelectionType()
                     let! sem = rp.GetSorterEvalMeasure()
                     let! repl = rp.GetRepl()
                     let! sw = rp.GetSortingWidth()

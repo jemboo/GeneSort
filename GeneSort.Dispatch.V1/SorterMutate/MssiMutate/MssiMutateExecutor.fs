@@ -95,8 +95,8 @@ module MssiMutateExecutor =
                         rp.GetModificationRate()
                         |> Result.ofOption "Missing modificationRate in run parameters"
 
-            let! (sest: sorterEvalSelectionType) = 
-                        rp.GetSeedPoolSorterEvalSelectionType()
+            let! (sest: sorterSelectionType) = 
+                        rp.GetSeedPoolSorterSelectionType()
                         |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
 
             let! (sem:sorterEvalMeasure) = 
@@ -121,7 +121,7 @@ module MssiMutateExecutor =
                                             sorterEvalType.V2
 
             let _sorterEvalSelection = 
-                            SorterEvalSelection.makeSelection 
+                            SorterSelection.makeSelection 
                                         sem 
                                         sest
                                         parentSorterSetEval.SorterEvals
@@ -204,8 +204,8 @@ module MssiMutateExecutor =
                         rp.GetModificationRate()
                         |> Result.ofOption "Missing modificationRate in run parameters"
 
-            let! (sest: sorterEvalSelectionType) = 
-                        rp.GetSeedPoolSorterEvalSelectionType()
+            let! (sest: sorterSelectionType) = 
+                        rp.GetSeedPoolSorterSelectionType()
                         |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
 
             let! (sem:sorterEvalMeasure) = 
@@ -237,7 +237,7 @@ module MssiMutateExecutor =
                                         sorterEvalType.V2
 
             let _sorterEvalSelection = 
-                            SorterEvalSelection.makeSelection 
+                            SorterSelection.makeSelection 
                                         sem 
                                         sest
                                         parentSorterSetEval.SorterEvals   

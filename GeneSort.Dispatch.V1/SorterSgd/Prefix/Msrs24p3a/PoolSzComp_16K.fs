@@ -29,7 +29,7 @@ module PoolSzComp16k =
             (genCurrent: int<generationNumber>)
             (sorterCtPerPool: int<sorterCountPerPool>)
             (sorterPoolCt: int<sorterPoolCount>)
-            (ses:sorterEvalSelectionType)
+            (ses:sorterSelectionType)
             (mmod: int<mutationMod>)
             (outDt: outputDataType) : queryParams =
 
@@ -42,7 +42,7 @@ module PoolSzComp16k =
             [|
                 (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                 (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                (runParameters.seedPoolSorterEvalSelectionType, ses |> SorterEvalSelectionType.toString)
+                (runParameters.seedPoolSorterSelectionTypeKey, ses |> SorterEvalSelectionType.toString)
                 (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
             |]
 
@@ -56,7 +56,7 @@ module PoolSzComp16k =
             let! curGen = rp.GetGenerationCurrent()
             let! scPP = rp.GetSorterCountPerPool()
             let! spc = rp.GetSorterPoolCount()
-            let! spsev = rp.GetSeedPoolSorterEvalSelectionType()
+            let! spsev = rp.GetSeedPoolSorterSelectionType()
             let! mmod = rp.GetMutationMod()
             return makeQueryParams dbName repl curGen scPP spc spsev mmod odt
         }

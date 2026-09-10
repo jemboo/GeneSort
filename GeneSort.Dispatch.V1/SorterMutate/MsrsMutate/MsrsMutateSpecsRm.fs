@@ -13,8 +13,8 @@ open GeneSort.Dispatch.V1.CommonParams
 module MsrsMutateSpecsRm =
 
     let sorterEvalSelectionType = 
-            (runParameters.seedPoolSorterEvalSelectionType, 
-            [ sorterEvalSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
+            (runParameters.seedPoolSorterSelectionTypeKey, 
+            [ sorterSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
 
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =

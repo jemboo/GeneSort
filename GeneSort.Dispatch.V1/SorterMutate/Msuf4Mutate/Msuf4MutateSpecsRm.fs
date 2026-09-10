@@ -13,8 +13,8 @@ open GeneSort.Dispatch.V1.CommonParams
 module Msuf4MutateSpecsRm =
 
     let sorterEvalSelectionType = 
-            (runParameters.seedPoolSorterEvalSelectionType, 
-            [ sorterEvalSelectionType.ValueSpan 5<sorterCount>;] 
+            (runParameters.seedPoolSorterSelectionTypeKey, 
+            [ sorterSelectionType.ValueSpan 5<sorterCount>;] 
             |> List.map SorterEvalSelectionType.toString)
    
 

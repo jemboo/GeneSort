@@ -21,7 +21,7 @@ open GeneSort.SortingLib.Sorter
 module Reporting = 
 
     let makeMutantReport
-            (mutantDetailsMaker: runParameters -> Async<Result<sorterEvalSelection * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>>)
+            (mutantDetailsMaker: runParameters -> Async<Result<sorterSelection * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>>)
             (host: IRunHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
@@ -138,7 +138,7 @@ module Reporting =
 
     let makeMergeMutantDetails (rp:runParameters) : 
             Async<Result<
-                        sorterEvalSelection * 
+                        sorterSelection * 
                         Map<Guid<sorterModelId>, Guid<sorterModelId>>, 
                         string>> =
         asyncResult {
@@ -175,8 +175,8 @@ module Reporting =
                         rp.GetModificationRate()
                         |> Result.ofOption "Missing modificationRate in run parameters"
 
-            let! (sest: sorterEvalSelectionType) = 
-                        rp.GetSeedPoolSorterEvalSelectionType()
+            let! (sest: sorterSelectionType) = 
+                        rp.GetSeedPoolSorterSelectionType()
                         |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
 
             let! (sem:sorterEvalMeasure) = 
@@ -213,8 +213,8 @@ module Reporting =
                                             slv
                                             sorterEvalType.V2
 
-            let (_sorterEvalSelection: sorterEvalSelection) = 
-                            SorterEvalSelection.makeSelection sem sest
+            let (_sorterEvalSelection: sorterSelection) = 
+                            SorterSelection.makeSelection sem sest
                                         parentSorterSetEval.SorterEvals
                                         parentSorterSetEval.SorterTestId
 
@@ -253,7 +253,7 @@ module Reporting =
 
     let makeStandardMutantDetails (rp:runParameters) : 
             Async<Result<
-                        sorterEvalSelection * 
+                        sorterSelection * 
                         Map<Guid<sorterModelId>, Guid<sorterModelId>>, 
                         string>> =
         asyncResult {
@@ -290,8 +290,8 @@ module Reporting =
                         rp.GetModificationRate()
                         |> Result.ofOption "Missing modificationRate in run parameters"
 
-            let! (sest: sorterEvalSelectionType) = 
-                        rp.GetSeedPoolSorterEvalSelectionType()
+            let! (sest: sorterSelectionType) = 
+                        rp.GetSeedPoolSorterSelectionType()
                         |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
 
             let! (sem:sorterEvalMeasure) = 
@@ -313,7 +313,7 @@ module Reporting =
                                             sorterEvalType.V2
 
             let _sorterEvalSelection = 
-                            SorterEvalSelection.makeSelection sem sest
+                            SorterSelection.makeSelection sem sest
                                         parentSorterSetEval.SorterEvals
                                         parentSorterSetEval.SorterTestId
 

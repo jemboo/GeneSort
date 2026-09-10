@@ -285,8 +285,8 @@ module SorterEvalExecutor =
                     |> Array.map (fun sss -> sss.toDataTableRecord())
 
                 let _sorterEvalMeasure = SorterEvalMeasure.stageBiased
-                let _sorterEvalSelectionType = sorterEvalSelectionType.Tmb 300<sorterCount>
-                let _sorterEvalSelection = SorterEvalSelection.makeSelection 
+                let _sorterEvalSelectionType = sorterSelectionType.Tmb 300<sorterCount>
+                let _sorterEvalSelection = SorterSelection.makeSelection 
                                                 _sorterEvalMeasure
                                                 _sorterEvalSelectionType 
                                                 sorterSetEvals.SorterEvals

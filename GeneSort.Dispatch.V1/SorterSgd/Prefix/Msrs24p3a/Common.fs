@@ -15,7 +15,7 @@ module Common =
     let seedSorterCount = 5000
 
     let standardPoolSzParams (rp:runParameters) =
-        let sorterEvalSelectionType = sorterEvalSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
+        let sorterEvalSelectionType = sorterSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
         let pfxLibId = prefixLibId.create (24<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixA
 
         rp.WithRngType(Some rngType.Lcg)
@@ -36,7 +36,7 @@ module Common =
 
 
     let standardStageCrossingsParams (rp:runParameters) =
-        let sorterEvalSelectionType = sorterEvalSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
+        let sorterEvalSelectionType = sorterSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
         let pfxLibId = prefixLibId.create (24<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixA
 
         rp.WithRngType(Some rngType.Lcg)

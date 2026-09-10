@@ -27,7 +27,7 @@
     <Compile Include="Sgd\SorterPoolDescription.fs" />
     <Compile Include="Sgd\SorterPoolSummary.fs" />
     <Compile Include="Sgd\SorterPoolSummarySet.fs" />
-    <Compile Include="SorterEvalSelection.fs" />
+    <Compile Include="SorterSelection.fs" />
     <Compile Include="SorterEvalBinStats.fs" />
     <Compile Include="SorterStageStats.fs" />
     <Compile Include="Bins\SorterEvalKey.fs" />

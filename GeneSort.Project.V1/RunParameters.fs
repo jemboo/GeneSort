@@ -55,7 +55,7 @@ type runParameters =
     static member runFinishedKey = "RunFinished"
     static member runNameKey = "RunName"
     static member seedModificationRateKey = "SeedModificationRate"
-    static member seedPoolSorterEvalSelectionType = "SeedPoolSorterEvalSelectionType"
+    static member seedPoolSorterSelectionTypeKey = "SeedPoolSorterEvalSelectionType"
     static member selectedSorterCountPerPoolKey = "SelectedSorterCountPerPool"
     static member selfSymRateKey = "SelfSym"
     static member simpleSorterModelTypeKey = "SimpleSorterModelType"
@@ -244,8 +244,8 @@ type runParameters =
         runParameters.tryGetFloat runParameters.seedModificationRateKey this.paramMap
         |> Option.map UMX.tag<seedModificationRate>
 
-    member this.GetSeedPoolSorterEvalSelectionType() =
-        this.paramMap.TryFind runParameters.seedPoolSorterEvalSelectionType
+    member this.GetSeedPoolSorterSelectionType() =
+        this.paramMap.TryFind runParameters.seedPoolSorterSelectionTypeKey
         |> Option.map SorterEvalSelectionType.fromString
 
     member this.GetSelectedSorterCountPerPool() =
@@ -460,8 +460,8 @@ type runParameters =
     member this.WithSeedModificationRate(mr: float<seedModificationRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedModificationRateKey (mr |> Option.map UmxExt.floatToRaw) }
 
-    member this.WithSeedPoolSorterEvalSelectionType(ses: sorterEvalSelectionType option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedPoolSorterEvalSelectionType (ses |> Option.map SorterEvalSelectionType.toString) }
+    member this.WithSeedPoolSorterEvalSelectionType(ses: sorterSelectionType option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedPoolSorterSelectionTypeKey (ses |> Option.map SorterEvalSelectionType.toString) }
 
     member this.WithSelectedSorterCountPerPool(sc: int<sorterCountPerPool> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.selectedSorterCountPerPoolKey (sc |> Option.map UmxExt.intToRaw) }
