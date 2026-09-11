@@ -55,8 +55,6 @@ type prefixLibId =
 
 module PrefixLibId =
 
-    let create (sortingWidth: int<sortingWidth>) (stageLength: int<stageLength>) (variant: prefixLibVariant) : prefixLibId =
-        { sortingWidth = sortingWidth; stageLength = stageLength; variant = variant }
     let toString (key: prefixLibId) : string =
         sprintf "PrefixLibId(sortingWidth=%d, stageLength=%d, Variant=%s)" 
                 (UMX.untag key.sortingWidth) (UMX.untag key.stageLength) (PrefixLibVariant.toString key.variant)
@@ -71,7 +69,7 @@ module PrefixLibId =
             let variantPart = parts.[2].Trim().Replace("Variant=", "").Replace(")", "")
             let sortingWidth = Int32.Parse(sortingWidthPart) |> UMX.tag<sortingWidth>
             let stageLength = Int32.Parse(stageLengthPart) |> UMX.tag<stageLength>
-            create sortingWidth stageLength (PrefixLibVariant.fromString variantPart)
+            prefixLibId.create sortingWidth stageLength (PrefixLibVariant.fromString variantPart)
 
 
 

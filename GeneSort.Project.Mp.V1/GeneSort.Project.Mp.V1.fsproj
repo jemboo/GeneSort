@@ -8,7 +8,7 @@
   <ItemGroup>
     <Compile Include="RunParametersDto.fs" />
     <Compile Include="OutputDataTypeDto.fs" />
-    <Compile Include="QueryParamTypeDto.fs" />
+    <Compile Include="QueryPropertiesDto.fs" />
     <Compile Include="RunDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

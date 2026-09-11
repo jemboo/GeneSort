@@ -20,47 +20,10 @@ open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.SortingLib.Sorter
+open GeneSort.Sorting.Sorter
 
 
 module Msuf4MutateExecutor =
-
-    let makeStandardTests (rp:runParameters) : Async<Result<Sortable.sortableTest, string>> =
-        async {
-            let paramsOpt = option {
-                let! sortingWidth = rp.GetSortingWidth()
-                let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
-                return (sortingWidth, sortableTestId)
-            }
-            match paramsOpt with
-            | Some (sortingWidth, sortableTestId) ->
-                let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-                return Ok ( SortableTestModel.makeSortableTest 
-                                    sortableTestId
-                                    testModel 
-                                    sortableDataFormat.BitVector512)
-            | None ->
-                return Error "Failed: One or more RunParameters for StandardTests were missing."
-        }
-
-
-    let makeMergeTests (rp: runParameters) : Async<Result<Sortable.sortableTest, string>> =
-        async {
-            let paramsOpt = option {
-                let repl = 0 |> UMX.tag<replNumber>   
-                let! sw = rp.GetSortingWidth()
-                let! md = rp.GetMergeDimension()
-                let! mst = rp.GetMergeSuffixType()
-                let! sdf = rp.GetSortableDataFormat()
-                return (repl, sw, md, mst, sdf)
-            }
-
-            match paramsOpt with
-            | Some (repl, sw, md, mst, sdf) ->
-                return! SortableTestDbs.Merge.getMergeSorterTestSet 
-                                        repl sw md mst sdf  
-            | None ->
-                return Error "Failed: One or more RunParameters for MergeTests were missing."
-        }
 
 
     let makeMutantSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
@@ -303,7 +266,7 @@ module Msuf4MutateExecutor =
 
     let _evaluateMutants 
             (makeMutantSorterModels: runParameters -> Async<Result<sorterModel seq, string>> )
-            (makeSortableTests: runParameters -> Async<Result<sortableTest, string>>)
+            (makeSortableTests: runParameters -> Async<Result<sortableTest * (ce array), string>>)
             (host: IRunHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
@@ -330,7 +293,8 @@ module Msuf4MutateExecutor =
 
                 do! checkCancellation cts.Token
                 log "Generating Sortable Tests..."
-                let! tests = makeSortableTests rp 
+                let! tests, ces = makeSortableTests rp 
+                let prefixBlock = ces |> ceBlock.create (Guid.Empty |> UMX.tag) (tests |> SortableTests.getSortingWidth)
 
                 let! qpSorterSet = 
                     host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSet "")
@@ -408,7 +372,7 @@ module Msuf4MutateExecutor =
             member _.Execute host rp allowOverwrite cts progress =
                 _evaluateMutants 
                     makeMutantSorterModels
-                    makeStandardTests
+                    SorterEvalExecutor.makeStandardTests
                     host rp allowOverwrite cts progress }
 
     let mergeExecutor =
@@ -416,7 +380,7 @@ module Msuf4MutateExecutor =
             member _.Execute host rp allowOverwrite cts progress =
                 _evaluateMutants 
                     makeMutantMergeSorterModels
-                    makeMergeTests
+                    SorterEvalExecutor.makeMergeTests
                     host rp allowOverwrite cts progress }
 
     let mergeReportExecutor =

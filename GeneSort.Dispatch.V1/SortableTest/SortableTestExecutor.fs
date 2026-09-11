@@ -9,6 +9,7 @@ open GeneSort.Project.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1.OpsUtils
+open GeneSort.Sorting
 open GeneSort.SortingLib.Sorter
 
 module SortableTestExecutor =
@@ -35,20 +36,18 @@ module SortableTestExecutor =
                 log "Creating Merge SortableTest..."
 
                 // 2. Safe extraction
-                let! (sortingWidth, mergeDim, mergeSufixType, sortableDataFormat) = 
+                let! (mrgLibId, sortableDataFormat) = 
                     maybe {
-                        let! width = rp.GetSortingWidth()
-                        let! mergeDim = rp.GetMergeDimension()
-                        let! suffixFill = rp.GetMergeSuffixType()
+                        let! mrgLibId = rp.GetMergeLibId()
                         let! dataFormat = rp.GetSortableDataFormat()
-                        return (width, mergeDim, suffixFill, dataFormat)
+                        return (mrgLibId, dataFormat)
                     } |> Result.ofOption "Missing domain parameters required for generation"
 
                 // 3. Create SortableTestModel
                 let sortableTestModel = msasM.create 
-                                            sortingWidth 
-                                            mergeDim 
-                                            mergeSufixType 
+                                            mrgLibId.SortingWidth
+                                            mrgLibId.MergeDimension 
+                                            mergeSuffixType.NoSuffix
                                             sorterLibVariant.VariantA
                                         |> sortableTestModel.MsasMi
             
@@ -94,15 +93,15 @@ module SortableTestExecutor =
                 log "Creating Prefix SortableTest..."
 
                 // 2. Safe extraction
-                let! (sorterLibId, sortableDataFormat) = 
+                let! (prefixLibId, sortableDataFormat) = 
                     maybe {
-                        let! _slLibId = rp.GetSorterLibId()
+                        let! _pfxLibId = rp.GetPrefixLibId()
                         let! _dataFmt = rp.GetSortableDataFormat()
-                        return (_slLibId, _dataFmt)
+                        return (_pfxLibId, _dataFmt)
                     } |> Result.ofOption "Missing domain parameters required for generation"
 
                 // 3. Create SortableTestModel
-                let sortableTestModel = msasPfx.create sorterLibId |> sortableTestModel.MsasPfx
+                let sortableTestModel = msasPfx.create prefixLibId |> sortableTestModel.MsasPfx
             
                 let! qpForSortableTest = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SortableTest "") 
                                          |> Result.ofOption "Failed to create query parameters for SortableTest"

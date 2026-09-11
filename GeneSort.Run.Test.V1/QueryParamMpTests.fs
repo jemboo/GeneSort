@@ -137,7 +137,7 @@ type QueryParamMpTests () =
               queryProperties.SorterSgd sgd ]
 
         for case in cases do
-            let dto = QueryParamTypeDto.fromDomain case
-            let roundtripped = QueryParamTypeDto.toDomain dto
+            let dto = QueryPropertiesDto.fromDomain case
+            let roundtripped = QueryPropertiesDto.toDomain dto
             Assert.Equal(case, roundtripped)
             TestHelpers.assertMpRoundtrip dto

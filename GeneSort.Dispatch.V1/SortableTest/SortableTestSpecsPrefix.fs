@@ -10,11 +10,8 @@ module SortableTestSpecsPrefix =
 
     let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
-        rp.WithDatabaseName(Some host.Run.DatabaseName)
-          .WithRunName(Some host.Run.RunName)
-          .WithRunFinished(Some false)
+        rp.WithRunFinished(Some false)
           .WithId (Some qp.Value.Id)
-
 
 
     module Specs =
@@ -25,7 +22,7 @@ module SortableTestSpecsPrefix =
             runDescription = "Bitv512 prefix sorter test sets"
             spans = [
                 dataFomatBitv512
-                sortableTestFilter_Prefix24s
+                prefixLib_Prefix24s
             ]
             filter = (fun rp -> Some rp)
             enhancer = standardEnhancer
@@ -39,7 +36,7 @@ module SortableTestSpecsPrefix =
             runDescription = "Bitv512 prefix sorter test sets"
             spans = [
                 dataFomatBitv512
-                sortableTestFilter_Prefix32_4
+                prefixLib_Prefix32_4
             ]
             filter = (fun rp -> Some rp)
             enhancer = standardEnhancer

@@ -202,22 +202,22 @@ module QpSgdTypeDto =
 
 // --- queryParamType ---
 
-type queryParamTypeDto =
+type queryPropertiesDto =
     | SortableTest of qpSortableTestTypeDto
     | SorterEval of qpSorterEvalDto
     | SorterMutate of qpSorterMutateDto
     | SorterSgd of qpSgdTypeDto
 
-module QueryParamTypeDto =
+module QueryPropertiesDto =
 
-    let fromDomain (domain: queryProperties) : queryParamTypeDto =
+    let fromDomain (domain: queryProperties) : queryPropertiesDto =
         match domain with
         | queryProperties.SortableTest st -> SortableTest (QpSortableTestTypeDto.fromDomain st)
         | queryProperties.SorterEval se -> SorterEval (QpSorterEvalDto.fromDomain se)
         | queryProperties.SorterMutate sm -> SorterMutate (QpSorterMutateDto.fromDomain sm)
         | queryProperties.SorterSgd sgd -> SorterSgd (QpSgdTypeDto.fromDomain sgd)
 
-    let toDomain (dto: queryParamTypeDto) : queryProperties =
+    let toDomain (dto: queryPropertiesDto) : queryProperties =
         try
             match dto with
             | SortableTest stDto -> queryProperties.SortableTest (QpSortableTestTypeDto.toDomain stDto)

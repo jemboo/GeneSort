@@ -44,20 +44,16 @@ module SorterEvalExecutor =
         async {
             let paramsOpt = option {
                 let repl = 0 |> UMX.tag<replNumber>   
-                let! sw = rp.GetSortingWidth()
-                let! md = rp.GetMergeDimension()
-                let! mst = rp.GetMergeSuffixType()
+                let! mrgLibId = rp.GetMergeLibId()
                 let! sdf = rp.GetSortableDataFormat()
-                let! slv = rp.GetSorterLibVariant()
-                let slib = sorterLibId.create sw slv
-                let! ces = SorterDataParse.getCeArrayFromSorterLib slib
-                return (repl, sw, md, mst, sdf, ces)
+                let! ces = SorterDataParse.getCeArrayFromMergeLib mrgLibId
+                return (repl, mrgLibId, sdf, ces)
             }
 
             match paramsOpt with
-            | Some (repl, sw, md, mst, sdf, ces) ->
-                let! res = SortableTestDbs.Merge.getMergeSorterTestSet repl sw md mst sdf
-                return Result.map (fun st -> (st, ces)) res
+            | Some (repl, mrgLibId, sdf, ces) ->
+                let! res = SortableTestDbs.Merge.getMergeSorterTestSet repl mrgLibId sdf
+                return Result.map (fun st -> (st, ces |> Array.concat)) res
             | None ->
                 return Error "Failed: One or more RunParameters for MergeTests were missing."
         }
@@ -67,15 +63,15 @@ module SorterEvalExecutor =
         async {
             let paramsOpt = option {
                 let repl = 0 |> UMX.tag<replNumber>   
-                let! slib = rp.GetSorterLibId()
+                let! pfxId = rp.GetPrefixLibId()
                 let! sdf = rp.GetSortableDataFormat()
-                let! ces = SorterDataParse.getCeArrayFromSorterLib slib
-                return (repl, slib, sdf, ces)
+                let! ces = SorterDataParse.getCeArrayFromPrefixLib pfxId
+                return (repl, pfxId, sdf, ces)
             }
 
             match paramsOpt with
-            | Some (repl, stf, sdf, ces) ->
-                let! res = SortableTestDbs.Prefix.getPrefixSorterTestSet repl stf sdf
+            | Some (repl, pfxId, sdf, ces) ->
+                let! res = SortableTestDbs.Prefix.getPrefixSorterTestSet repl pfxId sdf
                 return Result.map (fun st -> (st, ces)) res
             | None ->
                 return Error "Failed: One or more RunParameters for PrefixTests were missing."

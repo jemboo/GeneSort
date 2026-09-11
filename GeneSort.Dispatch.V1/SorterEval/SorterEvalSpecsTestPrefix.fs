@@ -61,7 +61,7 @@ module SorterEvalSpecsTestPrefix =
             runDescription = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf6"
             spans = [   
                 rngTypeLcg
-                sortableTestFilter_Prefix24s
+                prefixLib_Prefix24s
                 allSimpleSorterModelTypes
                 dataFomatBitv512
                 sorterEvalTypeV2
@@ -80,7 +80,7 @@ module SorterEvalSpecsTestPrefix =
             runDescription = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf4"
             spans = [   
                 rngTypeLcg
-                sortableTestFilter_Prefix32_4
+                prefixLib_Prefix32_4
                 allSimpleSorterModelTypes
                 dataFomatBitv512
                 sorterEvalTypeV2

@@ -50,8 +50,6 @@ type sorterLibId =
 
 module SorterLibId =
 
-    let create (sortingWidth: int<sortingWidth>) (variant: sorterLibVariant) : sorterLibId =
-        { sortingWidth = sortingWidth; sorterVariant = variant }
     let toString (key: sorterLibId) : string =
         sprintf "SorterLibId(sortingWidth=%d, Variant=%s)" 
                 (UMX.untag key.sortingWidth) (SorterLibVariant.toString key.sorterVariant)
@@ -64,7 +62,7 @@ module SorterLibId =
             let sortingWidthPart = parts.[0].Trim().Replace("SorterLibId(sortingWidth=", "").Replace(")", "")
             let variantPart = parts.[1].Trim().Replace("Variant=", "").Replace(")", "")
             let sortingWidth = Int32.Parse(sortingWidthPart) |> UMX.tag<sortingWidth>
-            create sortingWidth (SorterLibVariant.fromString variantPart)
+            sorterLibId.create sortingWidth (SorterLibVariant.fromString variantPart)
 
 
 

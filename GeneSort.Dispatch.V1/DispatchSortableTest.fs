@@ -53,10 +53,10 @@ module DispatchSortableTest =
 
 
     //********** SortableTest Prefix **********
-    let private configType = SortableTestSpecsPrefix.configType.Prefix_24s
-    let private executorType = SortableTest.sortableTestExecutorType.GenPrefix
+    let private configType = SortableTestSpecsMerge.configType.Merge_Test
+    let private executorType = SortableTest.sortableTestExecutorType.GenMerge
     let private host: IRunHost = 
-        let spec = SortableTestSpecsPrefix.getRunHostSpec configType executorType
+        let spec = SortableTestSpecsMerge.getRunHostSpec configType executorType
         SortableTestDbs.createRunHost spec
 
 

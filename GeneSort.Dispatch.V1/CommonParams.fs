@@ -313,52 +313,101 @@ module CommonParams =
 
 
 
-    // SortableTestFilters
-    let _sortableTestFilter_Prefix24_4a = 
-            SorterLibId.create (24<sortingWidth>) sorterLibVariant.VariantA
-    let sortableTestFilter_Prefix24_4a = 
-            (runParameters.sorterLibIdKey, [_sortableTestFilter_Prefix24_4a] |> List.map SorterLibId.toString)
+    // PrefixLib
+    let _prefixLib_Prefix24_4a = 
+            prefixLibId.create (24<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixA
+    let prefixLib_Prefix24_4a = 
+            (runParameters.prefixLibIdKey, [_prefixLib_Prefix24_4a] |> List.map PrefixLibId.toString)
 
-    let _sortableTestFilter_Prefix24_4b = 
-            SorterLibId.create (24<sortingWidth>) sorterLibVariant.VariantA
-    let sortableTestFilter_Prefix24_4b = 
-            (runParameters.sorterLibIdKey, [_sortableTestFilter_Prefix24_4b] |> List.map SorterLibId.toString)
+    let _prefixLib_Prefix24_4b = 
+            prefixLibId.create (24<sortingWidth>) (4<stageLength>)  prefixLibVariant.PrefixB
+    let prefixLib_Prefix24_4b = 
+            (runParameters.prefixLibIdKey, [_prefixLib_Prefix24_4b] |> List.map PrefixLibId.toString)
 
-    let _sortableTestFilter_Prefix24_3a = 
-            SorterLibId.create (24<sortingWidth>) sorterLibVariant.VariantA
-    let sortableTestFilter_Prefix24_3a = 
-            (runParameters.sorterLibIdKey, [_sortableTestFilter_Prefix24_3a] |> List.map SorterLibId.toString)
+    let _prefixLib_Prefix24_3a = 
+            prefixLibId.create (24<sortingWidth>) (3<stageLength>) prefixLibVariant.PrefixA
+    let prefixLib_Prefix24_3a = 
+            (runParameters.prefixLibIdKey, [_prefixLib_Prefix24_3a] |> List.map PrefixLibId.toString)
 
-    let _sortableTestFilter_Prefix24_3b = 
-            SorterLibId.create (24<sortingWidth>) sorterLibVariant.VariantA
-    let sortableTestFilter_Prefix24_3b = 
-            (runParameters.sorterLibIdKey, [_sortableTestFilter_Prefix24_3b] |> List.map SorterLibId.toString)
+    let _prefixLib_Prefix24_3b = 
+            prefixLibId.create (24<sortingWidth>) (3<stageLength>) prefixLibVariant.PrefixB
+    let prefixLib_Prefix24_3b = 
+            (runParameters.prefixLibIdKey, [_prefixLib_Prefix24_3b] |> List.map PrefixLibId.toString)
 
-    let sortableTestFilter_Prefix24_3s = 
-            (runParameters.sorterLibIdKey, 
-            [_sortableTestFilter_Prefix24_3a; _sortableTestFilter_Prefix24_3b] |> List.map SorterLibId.toString)
+    let prefixLib_Prefix24_3s = 
+            (runParameters.prefixLibIdKey, 
+            [_prefixLib_Prefix24_3a; 
+             _prefixLib_Prefix24_3b
+            ] |> List.map PrefixLibId.toString)
 
-    let sortableTestFilter_Prefix24s = 
-            (runParameters.sorterLibIdKey, 
-            [   _sortableTestFilter_Prefix24_4a
-                _sortableTestFilter_Prefix24_4b
-                _sortableTestFilter_Prefix24_3a
-                _sortableTestFilter_Prefix24_3b
-            ] |> List.map SorterLibId.toString)
+    let prefixLib_Prefix24s = 
+            (runParameters.prefixLibIdKey, 
+            [   _prefixLib_Prefix24_4a
+                _prefixLib_Prefix24_4b
+                _prefixLib_Prefix24_3a
+                _prefixLib_Prefix24_3b
+            ] |> List.map PrefixLibId.toString)
 
-    let _sortableTestFilter_Prefix28_4 = 
-            SorterLibId.create (28<sortingWidth>) sorterLibVariant.VariantA
-    let sortableTestFilter_Prefix28_4 = 
-            (runParameters.sorterLibIdKey, [_sortableTestFilter_Prefix28_4] |> List.map SorterLibId.toString)
-
-
-    let _sortableTestFilter_Prefix32_4 = 
-            SorterLibId.create (32<sortingWidth>) sorterLibVariant.VariantA
-    let sortableTestFilter_Prefix32_4 = 
-            (runParameters.sorterLibIdKey, [_sortableTestFilter_Prefix32_4] |> List.map SorterLibId.toString)
+    let _prefixLib_Prefix28_4a = 
+            prefixLibId.create (28<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixA
+    let prefixLib_Prefix28_4 = 
+            (runParameters.prefixLibIdKey, [_prefixLib_Prefix28_4a] |> List.map PrefixLibId.toString)
 
 
+    let _prefixLib_Prefix32_4a = 
+            prefixLibId.create (32<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixA
+    let prefixLib_Prefix32_4 = 
+            (runParameters.prefixLibIdKey, [_prefixLib_Prefix32_4a] |> List.map PrefixLibId.toString)
 
+
+
+    // MergeLib
+
+
+    let _mergeLib_Merge16_2a = 
+            mergeLibId.create (16<sortingWidth>) (2<mergeDimension>) sorterLibVariant.VariantA
+
+    let _mergeLib_Merge32_2a = 
+            mergeLibId.create (32<sortingWidth>) (2<mergeDimension>) sorterLibVariant.VariantA
+
+    let _mergeLib_Merge32_2b = 
+            mergeLibId.create (32<sortingWidth>) (2<mergeDimension>) sorterLibVariant.VariantB
+
+    let _mergeLib_Merge32_4a = 
+            mergeLibId.create (32<sortingWidth>) (4<mergeDimension>) sorterLibVariant.VariantA
+
+    let _mergeLib_Merge64_4a = 
+            mergeLibId.create (64<sortingWidth>) (4<mergeDimension>) sorterLibVariant.VariantA
+
+    let _mergeLib_Merge64_4b = 
+            mergeLibId.create (64<sortingWidth>) (4<mergeDimension>) sorterLibVariant.VariantB
+
+    let _mergeLib_Merge64_8a = 
+            mergeLibId.create (64<sortingWidth>) (8<mergeDimension>) sorterLibVariant.VariantA
+
+
+    let mergeLib_Merge16_2a = 
+            (runParameters.mergeLibIdKey, 
+            [   _mergeLib_Merge16_2a
+            ] |> List.map MergeLibId.toString)
+
+
+    let mergeLib_Merge32_2a = 
+            (runParameters.mergeLibIdKey, 
+            [   _mergeLib_Merge32_2a
+            ] |> List.map MergeLibId.toString)
+
+    let mergeLib_Merge32s = 
+            (runParameters.mergeLibIdKey, 
+            [   _mergeLib_Merge32_2a
+                _mergeLib_Merge32_2b
+                _mergeLib_Merge32_4a
+            ] |> List.map MergeLibId.toString)
+
+    let mergeLib_Merge64_4a =
+            (runParameters.mergeLibIdKey, 
+            [   _mergeLib_Merge64_4a
+            ] |> List.map MergeLibId.toString)
 
     // Sorted Fractions
     let sortedFractions = 

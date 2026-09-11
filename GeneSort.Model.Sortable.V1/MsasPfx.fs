@@ -11,21 +11,22 @@ open GeneSort.SortingLib.Sorter
 type msasPfx = 
     private 
         { id: Guid<sorterTestModelID>
-          sorterKey: sorterLibId }
+          pfxLibId: prefixLibId }
 
     static member create
-            (sorterLibId: sorterLibId) : msasPfx =
+            (pfxLibId: prefixLibId) : msasPfx =
             let id =
                 [
                     "MsasPfx" :> obj
-                    sorterLibId :> obj
+                    pfxLibId :> obj
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
 
-            { id = id; sorterKey = sorterLibId;}
+            { id = id; pfxLibId = pfxLibId;}
 
     member this.Id with get() = this.id
-    member this.SorterKey with get() = this.sorterKey
-    member this.SortingWidth with get() = this.sorterKey.SortingWidth
+    member this.PfxLibId with get() = this.pfxLibId
+    member this.SortingWidth with get() = this.pfxLibId.SortingWidth
+    member this.StageLength with get() = this.pfxLibId.StageLength
 
     override this.Equals(obj) =
         match obj with
@@ -34,7 +35,7 @@ type msasPfx =
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.id, this.sorterKey)
+        hash (this.id, this.pfxLibId)
 
     interface IEquatable<msasPfx> with
         member this.Equals(other) = 
@@ -42,7 +43,7 @@ type msasPfx =
 
     member this.MakeSortableBoolTest 
             (sorterTestId: Guid<sortableTestId>) : sortableBinaryTest =
-        let ceArray = (SorterDataParse.getCeArrayFromSorterLib this.SorterKey).Value
+        let ceArray = (SorterDataParse.getCeArrayFromPrefixLib this.PfxLibId).Value
         let bArrays = SortableBoolArray.getAllPossibleResultsFromCeArray
                         ceArray
                         this.SortingWidth
@@ -54,12 +55,14 @@ type msasPfx =
 
     member this.MakeSortableBitv512Test 
             (sorterTestId: Guid<sortableTestId>) : sortableBitv512Test =
-        let ceArray = (SorterDataParse.getCeArrayFromSorterLib this.SorterKey).Value
+        let ceArray = (SorterDataParse.getCeArrayFromPrefixLib this.PfxLibId).Value
         let bArrays = SortableBoolArray.getAllPossibleResultsFromCeArray
                         ceArray
                         this.SortingWidth
                       |> Seq.toArray
         SortableBitv512Test.fromBoolArrays sorterTestId this.SortingWidth bArrays
+
+
 
 module MsasPfx = ()
  

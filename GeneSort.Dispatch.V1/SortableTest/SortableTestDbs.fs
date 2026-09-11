@@ -22,9 +22,7 @@ module SortableTestDbs =
 
         let makeMergeQueryParams 
                     (repl: int<replNumber>) 
-                    (sortingWidth: int<sortingWidth>)
-                    (mergeDimension: int<mergeDimension>) 
-                    (mergeFillType: mergeSuffixType)
+                    (mrgLibId: mergeLibId)
                     (sortableDataFormat: sortableDataFormat) 
                     (outputDataType: outputDataType) : queryParams =
 
@@ -33,10 +31,10 @@ module SortableTestDbs =
                 (Some repl)
                 None
                 outputDataType
-                [| (runParameters.sortingWidthKey, string %sortingWidth); 
-                   (runParameters.mergeDimensionKey, string %mergeDimension);
-                   (runParameters.mergeSuffixTypeKey, MergeSuffixType.toString mergeFillType);
-                   (runParameters.sortableDataFormatKey, SortableDataFormat.toString sortableDataFormat); |]
+                [| 
+                   (runParameters.mergeLibIdKey, MergeLibId.toString mrgLibId);
+                   (runParameters.sortableDataFormatKey, SortableDataFormat.toString sortableDataFormat); 
+                |]
 
 
         let makeMergeQueryParamsFromRunParams 
@@ -44,34 +42,26 @@ module SortableTestDbs =
                         (odt: outputDataType) : queryParams option =
             maybe {
                 let! repl = rp.GetRepl()
-                let! sw = rp.GetSortingWidth()
-                let! md = rp.GetMergeDimension()
-                let! mst = rp.GetMergeSuffixType()
+                let! mrgLibId = rp.GetMergeLibId()
                 let! sdf = rp.GetSortableDataFormat()
-                return makeMergeQueryParams repl sw md mst sdf odt
+                return makeMergeQueryParams repl mrgLibId sdf odt
             }
 
 
         let db = new GeneSortDbMp(dbFolder, makeMergeQueryParamsFromRunParams)
 
-        let getMergeSorterTestSet
-                        (repl: int<replNumber>) 
-                        (sortingWidth: int<sortingWidth>)
-                        (mergeDimension: int<mergeDimension>) 
-                        (mergeSuffixType: mergeSuffixType)
-                        (sortableDataFormat: sortableDataFormat) 
-                                : Async<Result<sortableTest, string>> =
 
+        let getMergeSorterTestSet
+                (repl: int<replNumber>) 
+                (mrgLibId: mergeLibId)
+                (sortableDataFormat: sortableDataFormat): Async<Result<sortableTest, string>> =
             let qp = makeMergeQueryParams 
                             repl 
-                            sortingWidth 
-                            mergeDimension 
-                            mergeSuffixType 
+                            mrgLibId
                             sortableDataFormat 
                             (outputDataType.SortableTest "")
             (db :> IGeneSortDb).loadAsync qp
             |> Async.map (Result.bind OutputData.asSortableTest)
-
 
 
 
@@ -82,9 +72,9 @@ module SortableTestDbs =
                        |> UMX.tag<pathToRootFolder>
 
 
-        let makeQueryParams 
+        let makePrefixQueryParams 
                     (repl: int<replNumber>) 
-                    (sorterLibId: sorterLibId)
+                    (pfxId: prefixLibId)
                     (sortableDataFormat: sortableDataFormat) 
                     (outputDataType: outputDataType) : queryParams =
 
@@ -93,32 +83,34 @@ module SortableTestDbs =
                 (Some repl)
                 None
                 outputDataType
-                [| (runParameters.sorterLibIdKey, SorterLibId.toString sorterLibId);
-                   (runParameters.sortableDataFormatKey, SortableDataFormat.toString sortableDataFormat); |]
+                [| 
+                   (runParameters.prefixLibIdKey, PrefixLibId.toString pfxId);
+                   (runParameters.sortableDataFormatKey, SortableDataFormat.toString sortableDataFormat); 
+                |]
 
 
-        let makeQueryParamsFromRunParams 
+        let makePrefixQueryParamsFromRunParams 
                         (rp: runParameters) 
                         (odt: outputDataType) : queryParams option =
             maybe {
                 let! repl = rp.GetRepl()
-                let! slId = rp.GetSorterLibId()
+                let! pfxId = rp.GetPrefixLibId()
                 let! sdf = rp.GetSortableDataFormat()
-                return makeQueryParams repl slId sdf odt
+                return makePrefixQueryParams repl pfxId sdf odt
             }
 
 
-        let db = new GeneSortDbMp(dbFolder, makeQueryParamsFromRunParams)
+        let db = new GeneSortDbMp(dbFolder, makePrefixQueryParamsFromRunParams)
 
 
 
         let getPrefixSorterTestSet
                 (repl: int<replNumber>) 
-                (sorterLibId: sorterLibId)
+                (pfxId: prefixLibId)
                 (sortableDataFormat: sortableDataFormat): Async<Result<sortableTest, string>> =
-            let qp = makeQueryParams 
+            let qp = makePrefixQueryParams 
                             repl 
-                            sorterLibId
+                            pfxId
                             sortableDataFormat 
                             (outputDataType.SortableTest "")
             (db :> IGeneSortDb).loadAsync qp

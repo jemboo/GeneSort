@@ -195,7 +195,7 @@ module LatticeLevelSetMap =
 
 
 
-    let getStats =
+    let getStats () =
     
         //let latticeDimensions = [3; 4; 6; 8] |> List.map UMX.tag<latticeDimension>
         let latticeDimensions = [6; 8;] |> List.map UMX.tag<latticeDimension>
