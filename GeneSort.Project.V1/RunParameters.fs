@@ -55,9 +55,10 @@ type runParameters =
     static member runFinishedKey = "RunFinished"
     static member runNameKey = "RunName"
     static member seedModificationRateKey = "SeedModificationRate"
-    static member seedPoolSorterSelectionTypeKey = "SeedPoolSorterEvalSelectionType"
+    static member seedSorterPoolSelectionTypeKey = "SeedPoolSorterSelectionType"
     static member selectedSorterCountPerPoolKey = "SelectedSorterCountPerPool"
     static member selfSymRateKey = "SelfSym"
+    static member simpleMutatorParamsKey = "SimpleMutatorParams"
     static member simpleSorterModelTypeKey = "SimpleSorterModelType"
     static member sortableCountKey = "SortableCount"
     static member sortableDataFormatKey = "SortableDataFormat"
@@ -244,8 +245,8 @@ type runParameters =
         runParameters.tryGetFloat runParameters.seedModificationRateKey this.paramMap
         |> Option.map UMX.tag<seedModificationRate>
 
-    member this.GetSeedPoolSorterSelectionType() =
-        this.paramMap.TryFind runParameters.seedPoolSorterSelectionTypeKey
+    member this.GetSeedSorterPoolSelectionType() =
+        this.paramMap.TryFind runParameters.seedSorterPoolSelectionTypeKey
         |> Option.map SorterEvalSelectionType.fromString
 
     member this.GetSelectedSorterCountPerPool() =
@@ -255,6 +256,13 @@ type runParameters =
     member this.GetSelfSymRate() =
         runParameters.tryGetFloat runParameters.selfSymRateKey this.paramMap
         |> Option.map UMX.tag<selfSymRate>
+
+    member this.GetSimpleMutatorParams() =
+        this.paramMap.TryFind runParameters.simpleMutatorParamsKey
+        |> Option.bind (fun v ->
+            match SimpleMutatorParams.fromString v with
+            | Ok p -> Some p
+            | Error _ -> None)
 
     member this.GetSimpleSorterModelType() =
         this.paramMap.TryFind runParameters.simpleSorterModelTypeKey
@@ -439,6 +447,9 @@ type runParameters =
     member this.WithProjectName(pn: string<projectName> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.projectNameKey (pn |> Option.map UmxExt.stringToRaw) }
 
+    member this.WithSimpleMutatorParams(smp: simpleMutatorParams option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.simpleMutatorParamsKey (smp |> Option.map SimpleMutatorParams.toString) }
+
     member this.WithQueryName(qn: string<queryName> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.queryNameKey (qn |> Option.map UmxExt.stringToRaw) }
 
@@ -460,8 +471,8 @@ type runParameters =
     member this.WithSeedModificationRate(mr: float<seedModificationRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedModificationRateKey (mr |> Option.map UmxExt.floatToRaw) }
 
-    member this.WithSeedPoolSorterEvalSelectionType(ses: sorterSelectionType option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedPoolSorterSelectionTypeKey (ses |> Option.map SorterEvalSelectionType.toString) }
+    member this.WithSeedSorterPoolSelectionType(ses: sorterSelectionType option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedSorterPoolSelectionTypeKey (ses |> Option.map SorterEvalSelectionType.toString) }
 
     member this.WithSelectedSorterCountPerPool(sc: int<sorterCountPerPool> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.selectedSorterCountPerPoolKey (sc |> Option.map UmxExt.intToRaw) }

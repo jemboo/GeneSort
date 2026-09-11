@@ -12,7 +12,7 @@ open GeneSort.Dispatch.V1.CommonParams
 module MsrsMutateSpecsRs = 
 
     let sorterEvalSelection = 
-            (runParameters.seedPoolSorterSelectionTypeKey, 
+            (runParameters.seedSorterPoolSelectionTypeKey, 
             [ sorterSelectionType.Tmb 6<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
 
 

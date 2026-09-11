@@ -144,9 +144,10 @@ module QueryProperties =
                         | qpSortableTestType.Standard r ->
                             match r with
                             | NoRestriction ->
-                                let keys = [ runParameters.rngTypeKey; 
+                                let keys = [ runParameters.rngTypeKey;
+                                             runParameters.simpleMutatorParamsKey;
                                              runParameters.sorterEvalTypeKey; 
-                                             runParameters.seedPoolSorterSelectionTypeKey;
+                                             runParameters.seedSorterPoolSelectionTypeKey;
                                              runParameters.simpleSorterModelTypeKey;
                                              runParameters.sortingWidthKey;]
                                 tryExtractKeys keys props
@@ -157,8 +158,9 @@ module QueryProperties =
                             match r with
                             | NoRestriction ->
                                 let keys = [ runParameters.rngTypeKey;
+                                             runParameters.simpleMutatorParamsKey;
                                              runParameters.sorterEvalTypeKey;
-                                             runParameters.seedPoolSorterSelectionTypeKey;
+                                             runParameters.seedSorterPoolSelectionTypeKey;
                                              runParameters.simpleSorterModelTypeKey;
                                              runParameters.sortableDataFormatKey; 
                                              runParameters.mergeLibIdKey ]
@@ -170,8 +172,9 @@ module QueryProperties =
                             match r with
                             | NoRestriction ->
                                 let keys = [ runParameters.rngTypeKey;
+                                             runParameters.simpleMutatorParamsKey;
                                              runParameters.sorterEvalTypeKey; 
-                                             runParameters.seedPoolSorterSelectionTypeKey;
+                                             runParameters.seedSorterPoolSelectionTypeKey;
                                              runParameters.simpleSorterModelTypeKey;
                                              runParameters.sortableDataFormatKey; 
                                              runParameters.prefixLibIdKey ]

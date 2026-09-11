@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="RunParamBundles\SimpleMutatorParams.fs" />
     <Compile Include="ProjectTypes.fs" />
     <Compile Include="OutputDataType.fs" />
     <Compile Include="RunParameters.fs" />

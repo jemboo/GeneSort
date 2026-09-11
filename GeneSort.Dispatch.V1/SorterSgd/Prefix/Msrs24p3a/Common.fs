@@ -29,7 +29,7 @@ module Common =
           .WithSortedFraction(Some 0.99<sortedFraction>)
           .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiased)
           .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiased)
-          .WithSeedPoolSorterEvalSelectionType(Some sorterEvalSelectionType)
+          .WithSeedSorterPoolSelectionType(Some sorterEvalSelectionType)
           .WithPrefixLibId(Some pfxLibId)
           .WithSortingWidth(Some pfxLibId.SortingWidth)
 
@@ -49,6 +49,6 @@ module Common =
           .WithPrioritizeNewMutants(Some true)
           .WithSortedFraction(Some 0.99<sortedFraction>)
           .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiased)
-          .WithSeedPoolSorterEvalSelectionType(Some sorterEvalSelectionType)
+          .WithSeedSorterPoolSelectionType(Some sorterEvalSelectionType)
           .WithPrefixLibId(Some pfxLibId)
           .WithSortingWidth(Some pfxLibId.SortingWidth)

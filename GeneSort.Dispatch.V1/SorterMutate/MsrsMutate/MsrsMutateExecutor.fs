@@ -101,7 +101,7 @@ module MsrsMutateExecutor =
                         |> Result.ofOption "Missing modificationRate in run parameters"
 
             let! (sest: sorterSelectionType) = 
-                        rp.GetSeedPoolSorterSelectionType()
+                        rp.GetSeedSorterPoolSelectionType()
                         |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
 
             let! (sem:sorterEvalMeasure) = 
@@ -213,7 +213,7 @@ module MsrsMutateExecutor =
                         |> Result.ofOption "Missing modificationRate in run parameters"
 
             let! (sest: sorterSelectionType) = 
-                        rp.GetSeedPoolSorterSelectionType()
+                        rp.GetSeedSorterPoolSelectionType()
                         |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
 
             let! (sem:sorterEvalMeasure) = 

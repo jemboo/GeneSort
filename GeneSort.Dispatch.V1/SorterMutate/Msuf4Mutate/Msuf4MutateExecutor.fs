@@ -19,7 +19,6 @@ open GeneSort.Dispatch.V1.SortableTest
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
-open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.SortingLib.Sorter
 
 
@@ -108,7 +107,7 @@ module Msuf4MutateExecutor =
                         |> Result.ofOption "Missing modificationRate in run parameters"
 
             let! (sest: sorterSelectionType) = 
-                        rp.GetSeedPoolSorterSelectionType()
+                        rp.GetSeedSorterPoolSelectionType()
                         |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
 
             let! (sem:sorterEvalMeasure) = 
@@ -226,11 +225,11 @@ module Msuf4MutateExecutor =
                         rp.GetModificationRate()
                         |> Result.ofOption "Missing modificationRate in run parameters"
 
-            let! (sest: sorterSelectionType) = 
-                        rp.GetSeedPoolSorterSelectionType()
+            let! (sorterSelType: sorterSelectionType) = 
+                        rp.GetSeedSorterPoolSelectionType()
                         |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
 
-            let! (sem:sorterEvalMeasure) = 
+            let! (sorterEvalMeas:sorterEvalMeasure) = 
                         rp.GetSorterEvalMeasure()
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
@@ -256,8 +255,8 @@ module Msuf4MutateExecutor =
 
             let _sorterEvalSelection = 
                             SorterSelection.makeSelection 
-                                        sem 
-                                        sest
+                                        sorterEvalMeas 
+                                        sorterSelType
                                         parentSorterSetEval.SorterEvals   
                                         parentSorterSetEval.SorterTestId
 

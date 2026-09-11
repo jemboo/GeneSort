@@ -44,7 +44,7 @@ module PoolSelSzComp_ModRates =
                 (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                 (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                 (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
-                (runParameters.seedPoolSorterSelectionTypeKey, ses |> SorterEvalSelectionType.toString)
+                (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterEvalSelectionType.toString)
                 (runParameters.selectedSorterCountPerPoolKey, (Some selSz) |> SorterCountPerPool.toString)
                 (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
             |]
@@ -59,7 +59,7 @@ module PoolSelSzComp_ModRates =
             let! scPP = rp.GetSorterCountPerPool()
             let! spc = rp.GetSorterPoolCount()
             let! mdr = rp.GetModificationRate()
-            let! spsev = rp.GetSeedPoolSorterSelectionType()
+            let! spsev = rp.GetSeedSorterPoolSelectionType()
             let! mmod = rp.GetMutationMod()
             let! selSz = rp.GetSelectedSorterCountPerPool()
             return makeQueryParams repl curGen scPP spc mdr spsev selSz mmod odt

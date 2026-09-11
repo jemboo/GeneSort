@@ -42,7 +42,7 @@ module StageCrossings =
             [|
                 (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                 (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                (runParameters.seedPoolSorterSelectionTypeKey, ses |> SorterEvalSelectionType.toString)
+                (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterEvalSelectionType.toString)
                 (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
                 (runParameters.sorterEvalMeasureKey, sev |> SorterEvalFunctions.toCompactString)
             |]
@@ -56,7 +56,7 @@ module StageCrossings =
             let! curGen = rp.GetGenerationCurrent()
             let! scPP = rp.GetSorterCountPerPool()
             let! spc = rp.GetSorterPoolCount()
-            let! spsev = rp.GetSeedPoolSorterSelectionType()
+            let! spsev = rp.GetSeedSorterPoolSelectionType()
             let! mmod = rp.GetMutationMod()
             let! sev = rp.GetSorterEvalMeasure()
             return makeQueryParams repl curGen scPP spc spsev mmod sev odt
