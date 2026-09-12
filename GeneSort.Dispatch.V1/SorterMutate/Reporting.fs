@@ -147,9 +147,9 @@ module Reporting =
                         rp.GetRngType()
                         |> Result.ofOption "Missing RNG type in run parameters"
 
-            let! (sortingWidth: int<sortingWidth>) = 
-                        rp.GetSortingWidth() 
-                        |> Result.ofOption "Missing sorting width in run parameters"
+            let! (mrgLibId: mergeLibId) = 
+                        rp.GetMergeLibId() 
+                        |> Result.ofOption "Missing merge library ID in run parameters"
     
             let! (simpleSorterModelType: simpleSorterModelType) = 
                         rp.GetSimpleSorterModelType() 
@@ -206,12 +206,8 @@ module Reporting =
 
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getMergeSorterEvals 
-                                            sortingWidth 
+                                            mrgLibId 
                                             simpleSorterModelType
-                                            mergeDimension
-                                            mergeSuffixType
-                                            slv
-                                            sorterEvalType.V2
 
             let (_sorterEvalSelection: sorterSelection) = 
                             SorterSelection.makeSelection sem sest
@@ -221,7 +217,7 @@ module Reporting =
             let (parentSorterModelGen: sorterModelGen) = 
                 CommonSorterEval.getSimpleUniformSorterModelGen 
                                         rngType 
-                                        sortingWidth 
+                                        mrgLibId.SortingWidth 
                                         simpleSorterModelType
                                         excludeSelfCe
 

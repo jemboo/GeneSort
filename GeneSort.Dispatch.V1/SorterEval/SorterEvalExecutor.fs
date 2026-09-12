@@ -124,7 +124,6 @@ module SorterEvalExecutor =
                     makeModelGen rp 
                     |> Result.ofOption "Failed: SorterModelGen could not be initialized from parameters."
 
-
                 let! sorterEvalType =
                     rp.GetSorterEvalType() 
                     |> Result.ofOption "Missing sorterEvalType."
@@ -397,7 +396,7 @@ module SorterEvalExecutor =
 
     let getExecutor (executorType: sorterEvalExecutorType) : IRunParamsExecutor =
         match executorType with
-        | GenStandard -> standardExecutor
+        | sorterEvalExecutorType.GenStandard -> standardExecutor
         | sorterEvalExecutorType.GenMerge -> mergeExecutor
         | sorterEvalExecutorType.GenPrefix -> prefixExecutor
         | FullReport -> fullReportExecutor

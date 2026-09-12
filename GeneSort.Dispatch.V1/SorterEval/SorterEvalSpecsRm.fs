@@ -56,13 +56,12 @@ module SorterEvalSpecsRm =
             runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
             spans = [   
                 rngTypeLcg
+                mergeLib_Merge32s
                 dataFormatInt8v512
                 msuf4ModelType
                 noSuffixSuffixType
                 sorterEvalTypeV2
-                sortingWidth32
-                mergeDimension8
-                extraLargeSorterCount
+                smallSorterCount
             ]
             filter = paramMapFilter
             enhancer = mergeEnhancer

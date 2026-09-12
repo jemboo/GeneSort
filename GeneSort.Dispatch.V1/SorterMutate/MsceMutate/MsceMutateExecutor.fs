@@ -2,7 +2,6 @@
 
 open System
 open System.Threading
-open FsToolkit.ErrorHandling
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
@@ -12,14 +11,11 @@ open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
-open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Dispatch.V1.SorterEval
-open GeneSort.Dispatch.V1.SortableTest
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
-open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.SortingLib.Sorter
 open GeneSort.Sorting.Sorter
 
@@ -139,21 +135,13 @@ module MsceMutateExecutor =
                         rp.GetRngType()
                         |> Result.ofOption "Missing RNG type in run parameters"
 
-            let! (sortingWidth: int<sortingWidth>) = 
-                        rp.GetSortingWidth() 
-                        |> Result.ofOption "Missing sorting width in run parameters"
+            let! (mrgLibid: mergeLibId) = 
+                        rp.GetMergeLibId() 
+                        |> Result.ofOption "Missing merge library ID in run parameters"
     
             let! (simpleSorterModelType: simpleSorterModelType) = 
                         rp.GetSimpleSorterModelType() 
                         |> Result.ofOption "Missing simple sorter model type in run parameters"
-
-            let! (mergeDimension: int<mergeDimension>) = 
-                        rp.GetMergeDimension() 
-                        |> Result.ofOption "Missing mergeDimension in run parameters"
-
-            let! (mergeSuffixType: mergeSuffixType) = 
-                        rp.GetMergeSuffixType() 
-                        |> Result.ofOption "Missing mergeSuffixType in run parameters"
 
             let! (sorterChildCount: int<sorterChildCount>) = 
                         rp.GetSorterChildCount()
@@ -191,20 +179,12 @@ module MsceMutateExecutor =
                         rp.GetExcludeSelfCe()
                         |> Result.ofOption "Missing excludeSelfCe in run parameters"
 
-            let! (slv: sorterLibVariant) = 
-                        rp.GetSorterLibVariant()
-                        |> Result.ofOption "Missing sorterLibVariant in run parameters"
-
             let rngFactory = rngType |> RngFactory.create
 
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getMergeSorterEvals 
-                                        sortingWidth 
-                                        simpleSorterModelType 
-                                        mergeDimension
-                                        mergeSuffixType
-                                        slv
-                                        sorterEvalType.V2
+                                        mrgLibid 
+                                        simpleSorterModelType
 
             let _sorterEvalSelection = 
                             SorterSelection.makeSelection 
@@ -216,7 +196,7 @@ module MsceMutateExecutor =
             let (parentSorterModelGen: sorterModelGen) = 
                 CommonSorterEval.getSimpleUniformSorterModelGen 
                                         rngType 
-                                        sortingWidth 
+                                        mrgLibid.SortingWidth 
                                         simpleSorterModelType
                                         excludeSelfCe
 

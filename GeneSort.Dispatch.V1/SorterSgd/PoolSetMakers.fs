@@ -97,9 +97,10 @@ module PoolSetMakers =
     let createSeedSorterPoolSetMerge
             (rp:runParameters) : Async<Result<sorterPoolSet, string>> =
         asyncResult {
-            let! sortingWidth = 
-                    rp.GetSortingWidth() 
-                    |> Result.ofOption "Missing sorting width."
+
+            let! (mrgLibid: mergeLibId) = 
+                        rp.GetMergeLibId() 
+                        |> Result.ofOption "Missing merge library ID in run parameters"
 
             let! poolCount = 
                     rp.GetSorterPoolCount() 
@@ -108,14 +109,6 @@ module PoolSetMakers =
             let! sortersPerPool = 
                     rp.GetSorterCountPerPool() 
                     |> Result.ofOption "Missing sortersPerPool."
-
-            let! mergeDimension = 
-                    rp.GetMergeDimension() 
-                    |> Result.ofOption "Missing mergeDimension."
-
-            let! mergeSuffixType = 
-                    rp.GetMergeSuffixType() 
-                    |> Result.ofOption "Missing mergeSuffixType."
 
             let! sorterEvalMeasureInitial = 
                     rp.GetSorterEvalMeasureInitial() 
@@ -141,24 +134,16 @@ module PoolSetMakers =
                     rp.GetExcludeSelfCe()
                     |> Result.ofOption "Missing excludeSelfCe"
 
-            let! (slv: sorterLibVariant) = 
-                        rp.GetSorterLibVariant()
-                        |> Result.ofOption "Missing sorterLibVariant in run parameters"
-
             
             let! (parentSorterSetEval: sorterSetEval) = 
                 SorterEvalDbs.getMergeSorterEvals 
-                    sortingWidth 
-                    simpleSorterModelType 
-                    mergeDimension
-                    mergeSuffixType
-                    slv
-                    sorterEvalType.V2
+                    mrgLibid 
+                    simpleSorterModelType
 
             let seedSorterModelGen = 
                 CommonSorterEval.getSimpleUniformSorterModelGen 
                     rngType 
-                    sortingWidth 
+                    mrgLibid.SortingWidth 
                     simpleSorterModelType
                     excludeSelfCe
 
@@ -195,9 +180,9 @@ module PoolSetMakers =
                    rp.GetRepl()
                    |> Result.ofOption "Missing Repl"
 
-            let! sorterLibId = 
-                    rp.GetSorterLibId() 
-                    |> Result.ofOption "Missing sorterLibId."
+            let! pfxLibId = 
+                    rp.GetPrefixLibId() 
+                    |> Result.ofOption "Missing prefixLibId."
 
             let! poolCount = 
                     rp.GetSorterPoolCount() 
@@ -235,7 +220,7 @@ module PoolSetMakers =
 
             let! (parentSorterSetEval: sorterSetEval) = 
                 SorterEvalDbs.getPrefixSorterEvals 
-                    sorterLibId
+                    pfxLibId
                     repl
                     simpleSorterModelType
                     sorterEvalType.V2
@@ -243,7 +228,7 @@ module PoolSetMakers =
             let seedSorterModelGen = 
                 CommonSorterEval.getSimpleUniformSorterModelGen 
                     rngType 
-                    sorterLibId.SortingWidth 
+                    pfxLibId.SortingWidth 
                     simpleSorterModelType
                     excludeSelfCe
 

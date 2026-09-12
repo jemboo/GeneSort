@@ -17,10 +17,10 @@ module SorterEvalSpecsTestPrefix =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
                  |> Option.get
 
-        let stf = rp.GetSorterLibId().Value
+        let pfxLibId = rp.GetPrefixLibId().Value
 
         rp.WithDatabaseName(Some host.Run.DatabaseName)
-          .WithSortingWidth(Some stf.SortingWidth)
+          .WithSortingWidth(Some pfxLibId.SortingWidth)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
           .WithExcludeSelfCe(Some (true |>UMX.tag<excludeSelfCe>))
@@ -31,8 +31,8 @@ module SorterEvalSpecsTestPrefix =
     let private paramMapFilter (rp: runParameters) : runParameters option = 
         maybe {
             let! smt = rp.GetSimpleSorterModelType()
-            let! stf = rp.GetSorterLibId()
-            let sw = stf.SortingWidth
+            let! pfxLibId = rp.GetPrefixLibId()
+            let sw = pfxLibId.SortingWidth
         
             let has2factor = (%sw % 2 = 0)
             let isMuf4able = (MathUtils.isAPowerOfTwo %sw)
@@ -65,7 +65,7 @@ module SorterEvalSpecsTestPrefix =
                 allSimpleSorterModelTypes
                 dataFomatBitv512
                 sorterEvalTypeV2
-                veryLargeSorterCount
+                smallSorterCount
             ]
             filter = paramMapFilter
             enhancer = prefixEnhancer

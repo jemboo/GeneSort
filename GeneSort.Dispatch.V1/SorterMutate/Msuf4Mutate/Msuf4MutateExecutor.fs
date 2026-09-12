@@ -144,55 +144,39 @@ module Msuf4MutateExecutor =
                         rp.GetRngType()
                         |> Result.ofOption "Missing RNG type in run parameters"
 
-            let! (excludeSelfCe: bool<excludeSelfCe>) =  
-                        rp.GetExcludeSelfCe()
-                        |> Result.ofOption "Missing ExcludeSelfCe in run parameters"
-
-            let! (sortingWidth: int<sortingWidth>) = 
-                        rp.GetSortingWidth() 
-                        |> Result.ofOption "Missing sorting width in run parameters"
+            let! (mrgLibid: mergeLibId) = 
+                        rp.GetMergeLibId() 
+                        |> Result.ofOption "Missing merge library ID in run parameters"
     
             let! (simpleSorterModelType: simpleSorterModelType) = 
                         rp.GetSimpleSorterModelType() 
                         |> Result.ofOption "Missing simple sorter model type in run parameters"
 
-            let! (mergeDimension: int<mergeDimension>) = 
-                        rp.GetMergeDimension() 
-                        |> Result.ofOption "Missing mergeDimension in run parameters"
-
-            let! (mergeSuffixType: mergeSuffixType) = 
-                        rp.GetMergeSuffixType() 
-                        |> Result.ofOption "Missing mergeSuffixType in run parameters"
-
             let! (sorterChildCount: int<sorterChildCount>) = 
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
-            let! (orthoRate: float<orthoRate>) =  
-                        rp.GetOrthoRate()
-                        |> Result.ofOption "Missing orthoRate in run parameters"
+            let! (mutationRate: float<mutationRate>) =  
+                        rp.GetMutationRate()
+                        |> Result.ofOption "Missing mutationRate in run parameters"
 
-            let! (paraRate: float<paraRate>) =  
-                        rp.GetParaRate()
-                        |> Result.ofOption "Missing paraRate in run parameters"
+            let! (insertionRate: float<insertionRate>) =  
+                        rp.GetInsertionRate()
+                        |> Result.ofOption "Missing insertionRate in run parameters"
 
-            let! (selfSymRate: float<selfSymRate>) =  
-                        rp.GetSelfSymRate()
-                        |> Result.ofOption "Missing selfSymRate in run parameters"
-
-            let! (seedModificationRate: float<seedModificationRate>) =  
-                        rp.GetSeedModificationRate()
-                        |> Result.ofOption "Missing seedModificationRate in run parameters"
+            let! (deletionRate: float<deletionRate>) =  
+                        rp.GetDeletionRate()
+                        |> Result.ofOption "Missing deletionRate in run parameters"
 
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
                         |> Result.ofOption "Missing modificationRate in run parameters"
 
-            let! (sorterSelType: sorterSelectionType) = 
+            let! (sest: sorterSelectionType) = 
                         rp.GetSeedSorterPoolSelectionType()
                         |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
 
-            let! (sorterEvalMeas:sorterEvalMeasure) = 
+            let! (sem:sorterEvalMeasure) = 
                         rp.GetSorterEvalMeasure()
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
@@ -200,33 +184,28 @@ module Msuf4MutateExecutor =
                         rp.GetMutationMod() 
                         |> Result.ofOption "Missing mutationMod in run parameters"
 
-            let! (slv: sorterLibVariant) = 
-                        rp.GetSorterLibVariant()
-                        |> Result.ofOption "Missing sorterLibVariant in run parameters"
+            let! (excludeSelfCe: bool<excludeSelfCe>) = 
+                        rp.GetExcludeSelfCe()
+                        |> Result.ofOption "Missing excludeSelfCe in run parameters"
 
-                        
             let rngFactory = rngType |> RngFactory.create
 
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getMergeSorterEvals 
-                                        sortingWidth 
-                                        simpleSorterModelType 
-                                        mergeDimension
-                                        mergeSuffixType
-                                        slv
-                                        sorterEvalType.V2
+                                        mrgLibid 
+                                        simpleSorterModelType
 
             let _sorterEvalSelection = 
                             SorterSelection.makeSelection 
-                                        sorterEvalMeas 
-                                        sorterSelType
+                                        sem 
+                                        sest
                                         parentSorterSetEval.SorterEvals   
                                         parentSorterSetEval.SorterTestId
 
             let (parentSorterModelGen: sorterModelGen) = 
                 CommonSorterEval.getSimpleUniformSorterModelGen 
                                         rngType 
-                                        sortingWidth 
+                                        mrgLibid.SortingWidth 
                                         simpleSorterModelType
                                         excludeSelfCe
 
@@ -234,15 +213,13 @@ module Msuf4MutateExecutor =
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsuf4ModelMutator
-                                            sortingWidth
+            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
                                             rngFactory
                                             excludeSelfCe
-                                            seedModificationRate
                                             modificationRate
-                                            orthoRate
-                                            paraRate
-                                            selfSymRate
+                                            mutationRate
+                                            insertionRate
+                                            deletionRate
                                      |> sorterModelMutator.Simple
 
 
@@ -262,6 +239,7 @@ module Msuf4MutateExecutor =
 
             return generateMutantStream parentSorterModelSet.SorterModels
         }
+
 
 
     let _evaluateMutants 

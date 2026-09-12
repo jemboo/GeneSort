@@ -27,7 +27,6 @@
     <Compile Include="SortableTest\CommonSortableTest.fs" />
     <Compile Include="SortableTest\SortableTestDbs.fs" />
     <Compile Include="SortableTest\SortableTestExecutor.fs" />
-    <Compile Include="SortableTest\SortableTestSpecsMergeOld.fs" />
     <Compile Include="SortableTest\SortableTestSpecsMerge.fs" />
     <Compile Include="SortableTest\SortableTestSpecsPrefix.fs" />
     <Compile Include="SorterEval\CommonSorterEval.fs" />

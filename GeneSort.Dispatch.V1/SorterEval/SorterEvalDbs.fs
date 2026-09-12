@@ -66,13 +66,10 @@ module SorterEvalDbs =
         let makeQueryParams
                     (repl: int<replNumber>) 
                     (rng: rngType)
-                    (sortingWidth: int<sortingWidth>)
+                    (mrgLibId: mergeLibId)
                     (simpleSorterModelType: simpleSorterModelType)
-                    (mergeDimension: int<mergeDimension>) 
-                    (mergeSuffixType: mergeSuffixType)
                     (sortableDataFormat: sortableDataFormat) 
                     (sorterEvalType: sorterEvalType)
-                    (sorterLibV: sorterLibVariant)
                     (outputDataType: outputDataType) : queryParams =
 
             queryParams.create 
@@ -82,13 +79,10 @@ module SorterEvalDbs =
                 outputDataType
                 [| 
                     (runParameters.rngTypeKey, rng |> RngType.toString)
-                    (runParameters.sortingWidthKey, string %sortingWidth); 
-                    (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
-                    (runParameters.mergeDimensionKey, string %mergeDimension);
-                    (runParameters.mergeSuffixTypeKey, mergeSuffixType |> MergeSuffixType.toString);
-                    (runParameters.sorterEvalTypeKey, sorterEvalType |> SorterEvalType.toString) 
-                    (runParameters.sorterLibVariantKey, sorterLibV |> SorterLibVariant.toString) 
+                    (runParameters.mergeLibIdKey, MergeLibId.toString mrgLibId);
                     (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
+                    (runParameters.sorterEvalTypeKey, sorterEvalType |> SorterEvalType.toString)
+                    (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString);
                 |]
 
 
@@ -98,14 +92,11 @@ module SorterEvalDbs =
             maybe {
                 let! rng = rp.GetRngType()
                 let! repl = rp.GetRepl()
-                let! sw = rp.GetSortingWidth()
-                let! md = rp.GetMergeDimension()
-                let! mst = rp.GetMergeSuffixType()
+                let! mergeLibId = rp.GetMergeLibId()
                 let! smt = rp.GetSimpleSorterModelType()
                 let! sdf = rp.GetSortableDataFormat()
                 let! set = rp.GetSorterEvalType()
-                let! slv = rp.GetSorterLibVariant()
-                return makeQueryParams repl rng sw smt md mst sdf set slv odt
+                return makeQueryParams repl rng mergeLibId smt sdf set odt
             }
         let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
 
@@ -120,7 +111,7 @@ module SorterEvalDbs =
         let makeQueryParams
                     (repl: int<replNumber>)
                     (rng: rngType)
-                    (sorterLibId: sorterLibId)
+                    (pfxLibId: prefixLibId)
                     (simpleSorterModelType: simpleSorterModelType)
                     (sortableDataFormat: sortableDataFormat) 
                     (sorterEvalType: sorterEvalType)
@@ -133,7 +124,7 @@ module SorterEvalDbs =
                 outputDataType
                 [| 
                     (runParameters.rngTypeKey, rng |> RngType.toString)
-                    (runParameters.sorterLibIdKey, SorterLibId.toString sorterLibId);
+                    (runParameters.prefixLibIdKey, PrefixLibId.toString pfxLibId);
                     (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
                     (runParameters.sorterEvalTypeKey, sorterEvalType |> SorterEvalType.toString) 
                     (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
@@ -145,12 +136,12 @@ module SorterEvalDbs =
                                 (odt: outputDataType) : queryParams option =
             maybe {
                 let! rng = rp.GetRngType()
-                let! slId = rp.GetSorterLibId()
+                let! pfxLibId = rp.GetPrefixLibId()
                 let! smt = rp.GetSimpleSorterModelType()
                 let! sdf = rp.GetSortableDataFormat()
                 let! set = rp.GetSorterEvalType() 
                 let! repl = rp.GetRepl()
-                return makeQueryParams repl rng slId smt sdf set odt
+                return makeQueryParams repl rng pfxLibId smt sdf set odt
             }
 
         let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -191,24 +182,17 @@ module SorterEvalDbs =
 
 
     let getMergeSorterEvals
-                    (sortingWidth: int<sortingWidth>)
+                    (mrgLibId: mergeLibId)
                     (simpleSorterModelType: simpleSorterModelType)
-                    (mergeDimension: int<mergeDimension>) 
-                    (mergeSuffixType: mergeSuffixType)
-                    (sorterLibVariant: sorterLibVariant)
-                    (sorterEvalType: sorterEvalType)
                             : Async<Result<sorterSetEval, string>> =
 
         let qp = Merge.makeQueryParams 
                         (0 |> UMX.tag<replNumber>) 
                         _rngTypeLcg
-                        sortingWidth 
+                        mrgLibId
                         simpleSorterModelType
-                        mergeDimension 
-                        mergeSuffixType 
                         sortableDataFormat.Int8Vector512
-                        sorterEvalType
-                        sorterLibVariant
+                        sorterEvalType.V2
                         (outputDataType.SorterSetEval "")
         async {
              let! result = (Merge.db :> IGeneSortDb).loadAsync qp
@@ -218,7 +202,7 @@ module SorterEvalDbs =
 
 
     let getPrefixSorterEvals
-                    (sorterLibId: sorterLibId)
+                    (pfxLibId: prefixLibId)
                     (repl: int<replNumber>)
                     (simpleSorterModelType: simpleSorterModelType)
                     (sorterEvalType: sorterEvalType)
@@ -227,7 +211,7 @@ module SorterEvalDbs =
         let qp = Prefix.makeQueryParams 
                         repl
                         _rngTypeLcg
-                        sorterLibId 
+                        pfxLibId 
                         simpleSorterModelType
                         sortableDataFormat.BitVector512
                         sorterEvalType
