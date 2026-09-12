@@ -133,7 +133,6 @@ module PoolSetMakers =
             let! (excludeSelfCe: bool<excludeSelfCe>) =
                     rp.GetExcludeSelfCe()
                     |> Result.ofOption "Missing excludeSelfCe"
-
             
             let! (parentSorterSetEval: sorterSetEval) = 
                 SorterEvalDbs.getMergeSorterEvals 

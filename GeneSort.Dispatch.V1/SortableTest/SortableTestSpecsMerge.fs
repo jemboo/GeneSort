@@ -29,7 +29,7 @@ module SortableTestSpecsMerge =
             runName = sprintf @"Merge-Test_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Int8 merge sorter test sets"
             spans = [
-                mergeLib_Merge64_4a
+                mergeLib_Merge32s
                 dataFormatInt8v512
             ]
             filter = mergeDimensionDividesSortingWidth

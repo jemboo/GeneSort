@@ -6,6 +6,8 @@ open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.CommonParams
+open GeneSort.Sorting
+open GeneSort.SortingOps
 
 module SorterEvalSpecsRm =
 
@@ -14,21 +16,24 @@ module SorterEvalSpecsRm =
                     (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
                  |> Option.get
+        let mrgLibId = rp.GetMergeLibId().Value
         rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
+          .WithSortingWidth(Some mrgLibId.SortingWidth)
+          .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
+          .WithCollectNewSortableTests(Some (true |> UMX.tag<collectNewSortableTests>))
           .WithId (Some qp.Id)
 
 
     let private paramMapFilter (rp: runParameters) : runParameters option = 
         maybe {
             let! smt = rp.GetSimpleSorterModelType()
-            let! sw = rp.GetSortingWidth()
-            let! md = rp.GetMergeDimension()
+            let! mrgLibId = rp.GetMergeLibId()
         
-            let has2factor = (%sw % 2 = 0)
-            let isMuf4able = (MathUtils.isAPowerOfTwo %sw)
-            let isMuf6able = (%sw % 3 = 0) && (MathUtils.isAPowerOfTwo (%sw / 3))
+            let has2factor = (%mrgLibId.SortingWidth % 2 = 0)
+            let isMuf4able = (MathUtils.isAPowerOfTwo %mrgLibId.SortingWidth)
+            let isMuf6able = (%mrgLibId.SortingWidth % 3 = 0) && (MathUtils.isAPowerOfTwo (%mrgLibId.SortingWidth / 3))
 
             // We bind to unit just to enforce the filter
             let! _ = 
@@ -42,7 +47,7 @@ module SorterEvalSpecsRm =
                     if isMuf6able then Some () else None
 
             // Merge dimension check: If it doesn't divide, return None to stop
-            if (%sw % %md <> 0) then return! None
+            if (%mrgLibId.SortingWidth % %mrgLibId.MergeDimension <> 0) then return! None
         
             return rp
         }
