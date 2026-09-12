@@ -45,19 +45,19 @@ module DispatchSortableTest =
 
 
     //********** SortableTest Merge **********
-    //let configType = SortableTestSpecsMerge.configType.Merge_Test
-    //let executorType = SortableTest.sortableTestExecutorType.GenMerge
-    //let host: IRunHost = 
-    //    let spec = SortableTestSpecsMerge.getRunHostSpec configType executorType
-    //    SortableTestDbs.createRunHost spec
+    let configType = SortableTestSpecsMerge.configType.Merge_Test
+    let executorType = SortableTest.sortableTestExecutorType.GenMerge
+    let host: IRunHost = 
+        let spec = SortableTestSpecsMerge.getRunHostSpec configType executorType
+        SortableTestDbs.createRunHost spec
 
 
     //********** SortableTest Prefix **********
-    let private configType = SortableTestSpecsMerge.configType.Merge_Test
-    let private executorType = SortableTest.sortableTestExecutorType.GenMerge
-    let private host: IRunHost = 
-        let spec = SortableTestSpecsMerge.getRunHostSpec configType executorType
-        SortableTestDbs.createRunHost spec
+    //let private configType = SortableTestSpecsPrefix.configType.Prefix_24s
+    //let private executorType = SortableTest.sortableTestExecutorType.GenMerge
+    //let private host: IRunHost = 
+    //    let spec = SortableTestSpecsPrefix.getRunHostSpec configType executorType
+    //    SortableTestDbs.createRunHost spec
 
 
 

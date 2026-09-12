@@ -10,6 +10,7 @@ open GeneSort.FileDb.V1
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
+open GeneSort.SortingLib.Sorter
 
 module MssiMutateDbs =
     
@@ -82,11 +83,9 @@ module MssiMutateDbs =
                         (rng: rngType)
                         (ses:sorterSelectionType)
                         (sem:sorterEvalMeasure)
-                        (repl: int<replNumber>) 
-                        (sortingWidth: int<sortingWidth>)
+                        (repl: int<replNumber>)
+                        (mrgLibId: mergeLibId)
                         (simpleSorterModelType: simpleSorterModelType)
-                        (mergeDimension: int<mergeDimension>) 
-                        (mergeSuffixType: mergeSuffixType)
                         (sortableDataFormat: sortableDataFormat) 
                         (set: sorterEvalType)
                         (orthoRate: float<orthoRate>)
@@ -103,10 +102,8 @@ module MssiMutateDbs =
                        (runParameters.rngTypeKey, rng |> RngType.toString)
                        (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterEvalSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toCompactString)
-                       (runParameters.sortingWidthKey, string %sortingWidth); 
-                       (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
-                       (runParameters.mergeDimensionKey, string %mergeDimension);
-                       (runParameters.mergeSuffixTypeKey, mergeSuffixType |> MergeSuffixType.toString);
+                       (runParameters.mergeLibIdKey, mrgLibId |> MergeLibId.toString);
+                       (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString);
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString) 
                        (runParameters.orthoRateKey, (Some orthoRate) |> OrthoRate.toString)
                        (runParameters.paraRateKey, (Some paraRate) |> ParaRate.toString)
@@ -123,16 +120,14 @@ module MssiMutateDbs =
                     let! ses = rp.GetSeedSorterPoolSelectionType()
                     let! sem = rp.GetSorterEvalMeasure()
                     let! repl = rp.GetRepl()
-                    let! sw = rp.GetSortingWidth()
-                    let! md = rp.GetMergeDimension()
-                    let! mst = rp.GetMergeSuffixType()
+                    let! mrgLibId = rp.GetMergeLibId()
                     let! smt = rp.GetSimpleSorterModelType()
                     let! sdf = rp.GetSortableDataFormat()
                     let! set = rp.GetSorterEvalType()
                     let! ortho = rp.GetOrthoRate()
                     let! para = rp.GetParaRate()
                     let! mdr = rp.GetModificationRate()
-                    return makeQueryParams rng ses sem repl sw smt md mst sdf set ortho para mdr odt
+                    return makeQueryParams rng ses sem repl mrgLibId smt sdf set ortho para mdr odt
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)

@@ -2,6 +2,8 @@
 
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Sorting
+open GeneSort.SortingOps
 open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
@@ -15,6 +17,9 @@ module SorterEvalSpecsRs =
         rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
+          .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
+          .WithCollectNewSortableTests(Some (true |> UMX.tag<collectNewSortableTests>))
+          .WithSortableDataFormat(Some sortableDataFormat.BitVector512)
           .WithId (Some qp.Value.Id)
 
     

@@ -31,11 +31,15 @@
     <Compile Include="SortableTest\SortableTestSpecsPrefix.fs" />
     <Compile Include="SorterEval\CommonSorterEval.fs" />
     <Compile Include="SorterEval\SorterEvalDbs.fs" />
+    <Compile Include="SorterEval\SorterModelSetMakers.fs" />
+    <Compile Include="SorterEval\SortableTestMakers.fs" />
+    <Compile Include="SorterEval\Reporting.fs" />
     <Compile Include="SorterEval\SorterEvalExecutor.fs" />
     <Compile Include="SorterEval\SorterEvalSpecsRs.fs" />
     <Compile Include="SorterEval\SorterEvalSpecsRm.fs" />
     <Compile Include="SorterEval\SorterEvalSpecsTestPrefix.fs" />
     <Compile Include="SorterMutate\CommonSorterMutate.fs" />
+    <Compile Include="SorterMutate\SorterMutateExecutor.fs" />
     <Compile Include="SorterMutate\Reporting.fs" />
     <Compile Include="SorterMutate\MsceMutate\MsceMutateDbs.fs" />
     <Compile Include="SorterMutate\MsceMutate\MsceMutateExecutor.fs" />

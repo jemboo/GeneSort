@@ -8,6 +8,7 @@ open GeneSort.Sorting
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
+open GeneSort.Model.Sorting.V1
 
 
 module MssiMutateSpecsRm =
@@ -19,20 +20,41 @@ module MssiMutateSpecsRm =
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)  
+        let mrgLibId = rp.GetMergeLibId().Value
         rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
+          .WithSortingWidth(Some mrgLibId.SortingWidth)
+          .WithCollectNewSortableTests(Some (false |> UMX.tag))
+          .WithExcludeSelfCe(Some (true |> UMX.tag))
           .WithId (Some qp.Value.Id)
 
     
 
-    let private paramMapFilter (rp: runParameters) =
+    let private paramMapFilter (rp: runParameters) : runParameters option = 
         maybe {
-            let! sw = rp.GetSortingWidth()
-            let! md = rp.GetMergeDimension()
-            let has2factor = (%sw % 2 = 0)
-            let! _ = if (%sw % %md = 0) then Some rp else None
-            return! if has2factor then Some rp else None
+            let! smt = rp.GetSimpleSorterModelType()
+            let! mrgLibId = rp.GetMergeLibId()
+        
+            let has2factor = (%mrgLibId.SortingWidth % 2 = 0)
+            let isMuf4able = (MathUtils.isAPowerOfTwo %mrgLibId.SortingWidth)
+            let isMuf6able = (%mrgLibId.SortingWidth % 3 = 0) && (MathUtils.isAPowerOfTwo (%mrgLibId.SortingWidth / 3))
+
+            // We bind to unit just to enforce the filter
+            let! _ = 
+                match smt with
+                | simpleSorterModelType.Msce -> Some ()
+                | simpleSorterModelType.Mssi | simpleSorterModelType.Msrs -> 
+                    if has2factor then Some () else None
+                | simpleSorterModelType.Msuf4 -> 
+                    if isMuf4able then Some () else None
+                | simpleSorterModelType.Msuf6 -> 
+                    if isMuf6able then Some () else None
+
+            // Merge dimension check: If it doesn't divide, return None to stop
+            if (%mrgLibId.SortingWidth % %mrgLibId.MergeDimension <> 0) then return! None
+        
+            return rp
         }
 
     module Specs =
@@ -49,12 +71,11 @@ module MssiMutateSpecsRm =
                 mRateOrtho
                 mRatePara
                 modificationRatesMsuf4
-                testMergeSortingWidths
+                mergeLib_Merge32s
                 mssiModelType
-                testMergeDimensions
-                noSuffixSuffixType
                 dataFormatInt8v512
                 testChildCount
+                (runParameters.mutationModKey, [0;] |> List.map string)
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -80,6 +101,7 @@ module MssiMutateSpecsRm =
                 noSuffixSuffixType
                 dataFormatInt8v512
                 extraLargeChildCount
+                (runParameters.mutationModKey, [0;] |> List.map string)
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -105,6 +127,7 @@ module MssiMutateSpecsRm =
                 noSuffixSuffixType
                 dataFormatInt8v512
                 extraLargeChildCount
+                (runParameters.mutationModKey, [0;] |> List.map string)
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -130,6 +153,7 @@ module MssiMutateSpecsRm =
                 noSuffixSuffixType
                 dataFormatInt8v512
                 largeChildCount
+                (runParameters.mutationModKey, [0;] |> List.map string)
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -155,6 +179,7 @@ module MssiMutateSpecsRm =
                 noSuffixSuffixType
                 dataFormatInt8v512
                 largeChildCount
+                (runParameters.mutationModKey, [0;] |> List.map string)
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer

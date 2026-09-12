@@ -1,8 +1,7 @@
-﻿namespace GeneSort.Dispatch.V1.SorterMutate.Msuf4
+﻿namespace GeneSort.Dispatch.V1.SorterMutate.Mssi
 
 open System
 open System.Threading
-open FsToolkit.ErrorHandling
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
@@ -12,10 +11,8 @@ open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
-open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Dispatch.V1.SorterEval
-open GeneSort.Dispatch.V1.SortableTest
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
@@ -23,8 +20,7 @@ open GeneSort.SortingLib.Sorter
 open GeneSort.Sorting.Sorter
 
 
-module Msuf4MutateExecutor =
-
+module SorterMutateExecutor =
 
     let makeMutantSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
         asyncResult {
@@ -32,10 +28,6 @@ module Msuf4MutateExecutor =
             let! (rngType: rngType) =  
                         rp.GetRngType()
                         |> Result.ofOption "Missing RNG type in run parameters"
-
-            let! (excludeSelfCe: bool<excludeSelfCe>) =  
-                        rp.GetExcludeSelfCe()
-                        |> Result.ofOption "Missing ExcludeSelfCe in run parameters"
 
             let! (sortingWidth: int<sortingWidth>) = 
                         rp.GetSortingWidth() 
@@ -57,14 +49,6 @@ module Msuf4MutateExecutor =
                         rp.GetParaRate()
                         |> Result.ofOption "Missing paraRate in run parameters"
 
-            let! (selfSymRate: float<selfSymRate>) =  
-                        rp.GetSelfSymRate()
-                        |> Result.ofOption "Missing selfSymRate in run parameters"
-
-            let! (seedModificationRate: float<seedModificationRate>) =  
-                        rp.GetSeedModificationRate()
-                        |> Result.ofOption "Missing seedModificationRate in run parameters"
-
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
                         |> Result.ofOption "Missing modificationRate in run parameters"
@@ -80,6 +64,11 @@ module Msuf4MutateExecutor =
             let! (mutationMod: int<mutationMod>) = 
                         rp.GetMutationMod() 
                         |> Result.ofOption "Missing mutationMod in run parameters"
+
+            let! (excludeSelfCe: bool<excludeSelfCe>) = 
+                        rp.GetExcludeSelfCe()
+                        |> Result.ofOption "Missing excludeSelfCe in run parameters"
+
 
             let rngFactory = rngType |> RngFactory.create
 
@@ -107,15 +96,12 @@ module Msuf4MutateExecutor =
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsuf4ModelMutator
-                                            sortingWidth
+            let sorterModelMutator = SimpleSorterModelMutator.getMssiModelMutator
                                             rngFactory
                                             excludeSelfCe
-                                            seedModificationRate
                                             modificationRate
                                             orthoRate
                                             paraRate
-                                            selfSymRate
                                      |> sorterModelMutator.Simple
 
             let childIndexes = [| 0 .. (%sorterChildCount - 1) |]
@@ -156,17 +142,13 @@ module Msuf4MutateExecutor =
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
-            let! (mutationRate: float<mutationRate>) =  
-                        rp.GetMutationRate()
-                        |> Result.ofOption "Missing mutationRate in run parameters"
+            let! (orthoRate: float<orthoRate>) =  
+                        rp.GetOrthoRate()
+                        |> Result.ofOption "Missing orthoRate in run parameters"
 
-            let! (insertionRate: float<insertionRate>) =  
-                        rp.GetInsertionRate()
-                        |> Result.ofOption "Missing insertionRate in run parameters"
-
-            let! (deletionRate: float<deletionRate>) =  
-                        rp.GetDeletionRate()
-                        |> Result.ofOption "Missing deletionRate in run parameters"
+            let! (paraRate: float<paraRate>) =  
+                        rp.GetParaRate()
+                        |> Result.ofOption "Missing paraRate in run parameters"
 
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
@@ -213,13 +195,12 @@ module Msuf4MutateExecutor =
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
+            let sorterModelMutator = SimpleSorterModelMutator.getMssiModelMutator
                                             rngFactory
                                             excludeSelfCe
                                             modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
+                                            orthoRate
+                                            paraRate
                                      |> sorterModelMutator.Simple
 
 
@@ -241,7 +222,6 @@ module Msuf4MutateExecutor =
         }
 
 
-
     let _evaluateMutants 
             (makeMutantSorterModels: runParameters -> Async<Result<sorterModel seq, string>> )
             (makeSortableTests: runParameters -> Async<Result<sortableTest * (ce array), string>>)
@@ -257,7 +237,6 @@ module Msuf4MutateExecutor =
         asyncResult {
             try
                 do! checkCancellation cts.Token
-
                 let! collectTests = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests"
                 // 1. Fetch mutant sorter models as a lazy stream sequence
                 log "Generating Mutant Sorter Models Stream..."
@@ -270,6 +249,7 @@ module Msuf4MutateExecutor =
                     |> Result.ofOption "Missing sorterEvalType."
 
                 do! checkCancellation cts.Token
+                log "Generating Sortable Tests..."
                 log "Generating Sortable Tests..."
                 let! tests, ces = makeSortableTests rp 
                 let prefixBlock = ces |> ceBlock.create (Guid.Empty |> UMX.tag) (tests |> SortableTests.getSortingWidth)
@@ -298,9 +278,9 @@ module Msuf4MutateExecutor =
                     
                     // Wrap the subset models into an explicit SorterModelSet container
                     let modelSetChunk = sorterModelSet.create 
-                                                (Guid.Empty |> UMX.tag) 
-                                                modelChunk
-                                                (modelChunk.[0] |> SorterModel.getCeLength)
+                                            (Guid.Empty |> UMX.tag) 
+                                            modelChunk
+                                            (modelChunk.[0] |> SorterModel.getCeLength)
 
                     // Materialize into a functional SorterSet chunk
                     let maxCeCount = None
@@ -309,8 +289,7 @@ module Msuf4MutateExecutor =
 
                     // Compute sorter evaluations directly from the targeted network chunk
                     let sorterEvalsChunk = 
-                        SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters ceBlock.Empty tests 
-                                        sorterEvalType collectTests
+                        SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters prefixBlock tests sorterEvalType collectTests
 
                     // Accumulate transient array chunk results
                     allChunksEvals.Add(sorterEvalsChunk)
@@ -344,44 +323,6 @@ module Msuf4MutateExecutor =
                 return! Error errorMsg
         } |> Async.map (logResult progress log)
 
-
-    let standardExecutor =
-        { new IRunParamsExecutor with
-            member _.Execute host rp allowOverwrite cts progress =
-                _evaluateMutants 
-                    makeMutantSorterModels
-                    SortableTestMakers.makeStandardTests
-                    host rp allowOverwrite cts progress }
-
-    let mergeExecutor =
-        { new IRunParamsExecutor with
-            member _.Execute host rp allowOverwrite cts progress =
-                _evaluateMutants 
-                    makeMutantMergeSorterModels
-                    SortableTestMakers.makeMergeTests
-                    host rp allowOverwrite cts progress }
-
-    let mergeReportExecutor =
-        { new IRunParamsExecutor with
-            member _.Execute host rp allowOverwrite cts progress =
-                Reporting.makeMutantReport
-                    Reporting.makeMergeMutantDetails
-                    host rp allowOverwrite cts progress }
-
-    let mutantReportExecutor =
-        { new IRunParamsExecutor with
-            member _.Execute host rp allowOverwrite cts progress =
-                Reporting.makeMutantReport
-                    Reporting.makeStandardMutantDetails
-                    host rp allowOverwrite cts progress }
-
-
-    let getExecutor (executorType: sorterMutateExecutorType) : IRunParamsExecutor =
-        match executorType with
-        | sorterMutateExecutorType.GenStandard -> standardExecutor
-        | sorterMutateExecutorType.GenMerge -> mergeExecutor
-        | sorterMutateExecutorType.MergeReport -> mergeReportExecutor
-        | sorterMutateExecutorType.StandardReport -> mutantReportExecutor
 
 
 

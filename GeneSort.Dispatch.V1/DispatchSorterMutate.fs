@@ -83,7 +83,7 @@ module DispatchSorterMutate =
 
     //********** MssiMutateSpecsRm **********
     let configType = MssiMutateSpecsRm.configType.Rand_Test
-    let executorType = sorterMutateExecutorType.MergeReport
+    let executorType = sorterMutateExecutorType.GenMerge
     let host: IRunHost = 
         let spec = MssiMutateSpecsRm.getRunHostSpec configType executorType
         MssiMutateDbs.createRunHost spec
@@ -122,13 +122,13 @@ module DispatchSorterMutate =
 
 
 
-    let executor = Msuf4MutateExecutor.getExecutor executorType
+    let executor = MssiMutateExecutor.getExecutor executorType
     let minReplica = 0<replNumber>
     let maxReplica = 1<replNumber>
 
 
 
-    let runBoth() =
+    let makeParamsAndRun() =
 
         async {
 
@@ -167,7 +167,7 @@ module DispatchSorterMutate =
         } |> Async.RunSynchronously
 
 
-    let MakeRunParams() =
+    let makeRunParams() =
 
         async {
             printfn "Init Run: %s" %host.Run.RunName
@@ -191,7 +191,7 @@ module DispatchSorterMutate =
         } |> Async.RunSynchronously
 
 
-    let runEm() =
+    let runRunParams() =
 
         async {
 

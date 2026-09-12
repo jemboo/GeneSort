@@ -142,17 +142,13 @@ module MssiMutateExecutor =
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
-            let! (mutationRate: float<mutationRate>) =  
-                        rp.GetMutationRate()
-                        |> Result.ofOption "Missing mutationRate in run parameters"
+            let! (orthoRate: float<orthoRate>) =  
+                        rp.GetOrthoRate()
+                        |> Result.ofOption "Missing orthoRate in run parameters"
 
-            let! (insertionRate: float<insertionRate>) =  
-                        rp.GetInsertionRate()
-                        |> Result.ofOption "Missing insertionRate in run parameters"
-
-            let! (deletionRate: float<deletionRate>) =  
-                        rp.GetDeletionRate()
-                        |> Result.ofOption "Missing deletionRate in run parameters"
+            let! (paraRate: float<paraRate>) =  
+                        rp.GetParaRate()
+                        |> Result.ofOption "Missing paraRate in run parameters"
 
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
@@ -199,13 +195,12 @@ module MssiMutateExecutor =
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
+            let sorterModelMutator = SimpleSorterModelMutator.getMssiModelMutator
                                             rngFactory
                                             excludeSelfCe
                                             modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
+                                            orthoRate
+                                            paraRate
                                      |> sorterModelMutator.Simple
 
 
@@ -334,7 +329,7 @@ module MssiMutateExecutor =
             member _.Execute host rp allowOverwrite cts progress =
                 _evaluateMutants 
                     makeMutantSorterModels
-                    SorterEvalExecutor.makeStandardTests
+                    SortableTestMakers.makeStandardTests
                     host rp allowOverwrite cts progress }
 
     let mergeExecutor =
@@ -342,7 +337,7 @@ module MssiMutateExecutor =
             member _.Execute host rp allowOverwrite cts progress =
                 _evaluateMutants 
                     makeMutantMergeSorterModels
-                    SorterEvalExecutor.makeMergeTests
+                    SortableTestMakers.makeMergeTests
                     host rp allowOverwrite cts progress }
 
     let mergeReportExecutor =

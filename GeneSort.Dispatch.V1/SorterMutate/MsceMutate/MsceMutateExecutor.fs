@@ -339,7 +339,7 @@ module MsceMutateExecutor =
             member _.Execute host rp allowOverwrite cts progress =
                 _evaluateMutants 
                     makeMutantSorterModels
-                    SorterEvalExecutor.makeStandardTests
+                    SortableTestMakers.makeStandardTests
                     host rp allowOverwrite cts progress }
 
     let mergeExecutor =
@@ -347,7 +347,7 @@ module MsceMutateExecutor =
             member _.Execute host rp allowOverwrite cts progress =
                 _evaluateMutants 
                     makeMutantMergeSorterModels
-                    SorterEvalExecutor.makeMergeTests
+                    SortableTestMakers.makeMergeTests
                     host rp allowOverwrite cts progress }
 
     let mergeReportExecutor =

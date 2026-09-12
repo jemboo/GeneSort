@@ -157,7 +157,7 @@ module CommonParams =
 
     // MergeSortingWidths
     let testMergeSortingWidths = 
-            (runParameters.sortingWidthKey, [16; 24; 32;] |> List.map string)
+            (runParameters.sortingWidthKey, [32;] |> List.map string)
 
     let smallMergeSortingWidths = 
             (runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48; 64] |> List.map string)  
@@ -376,6 +376,9 @@ module CommonParams =
     let _mergeLib_Merge32_4a = 
             mergeLibId.create (32<sortingWidth>) (4<mergeDimension>) sorterLibVariant.VariantA
 
+    let _mergeLib_Merge32_8a = 
+            mergeLibId.create (32<sortingWidth>) (8<mergeDimension>) sorterLibVariant.VariantA
+
     let _mergeLib_Merge64_4a = 
             mergeLibId.create (64<sortingWidth>) (4<mergeDimension>) sorterLibVariant.VariantA
 
@@ -402,6 +405,7 @@ module CommonParams =
             [   _mergeLib_Merge32_2a
                 _mergeLib_Merge32_2b
                 _mergeLib_Merge32_4a
+                _mergeLib_Merge32_8a
             ] |> List.map MergeLibId.toString)
 
     let mergeLib_Merge64_4a =

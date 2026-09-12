@@ -61,7 +61,6 @@ module DispatchSorterEval =
     //    SorterEvalDbs.createRunHost spec
 
 
-
     //********** SorterEval Merge **********
     let configType = SorterEvalSpecsRm.configType.Rand_MergeTest_Test
     let executorType = sorterEvalExecutorType.GenMerge
