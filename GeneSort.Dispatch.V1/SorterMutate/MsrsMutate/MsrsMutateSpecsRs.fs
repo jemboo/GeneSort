@@ -13,7 +13,7 @@ module MsrsMutateSpecsRs =
 
     let sorterEvalSelection = 
             (runParameters.seedSorterPoolSelectionTypeKey, 
-            [ sorterSelectionType.Tmb 6<sorterCount> ; ] |> List.map SorterEvalSelectionType.toString)
+            [ sorterSelectionType.Tmb 6<sorterCount> ; ] |> List.map SorterSelectionType.toString)
 
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =

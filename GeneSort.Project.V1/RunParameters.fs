@@ -247,7 +247,7 @@ type runParameters =
 
     member this.GetSeedSorterPoolSelectionType() =
         this.paramMap.TryFind runParameters.seedSorterPoolSelectionTypeKey
-        |> Option.map SorterEvalSelectionType.fromString
+        |> Option.map SorterSelectionType.fromString
 
     member this.GetSelectedSorterCountPerPool() =
         runParameters.tryGetInt runParameters.selectedSorterCountPerPoolKey this.ParamMap
@@ -472,7 +472,7 @@ type runParameters =
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedModificationRateKey (mr |> Option.map UmxExt.floatToRaw) }
 
     member this.WithSeedSorterPoolSelectionType(ses: sorterSelectionType option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedSorterPoolSelectionTypeKey (ses |> Option.map SorterEvalSelectionType.toString) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedSorterPoolSelectionTypeKey (ses |> Option.map SorterSelectionType.toString) }
 
     member this.WithSelectedSorterCountPerPool(sc: int<sorterCountPerPool> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.selectedSorterCountPerPoolKey (sc |> Option.map UmxExt.intToRaw) }

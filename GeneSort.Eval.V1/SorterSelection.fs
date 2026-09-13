@@ -15,7 +15,7 @@ type sorterSelectionType =
     | TopN of int<sorterCount>
     | GuidOrder of int<sorterCount>
 
-module SorterEvalSelectionType =
+module SorterSelectionType =
     
     let toString = function
         | Tmb count        -> sprintf "Tmb:%d" count
@@ -237,8 +237,8 @@ module EvalReporting =
 
     let private createContextDtr (leadCols: dataTableRecord) (selection: sorterSelection) =
         dataTableRecord.createEmpty()
-        |> dataTableRecord.addData "SelectionType" (SorterEvalSelectionType.toString selection.SelectionType)
-        |> dataTableRecord.addData "SelectionStrategy" (SorterEvalSelectionType.toStrategyLabel selection.SelectionType)
+        |> dataTableRecord.addData "SelectionType" (SorterSelectionType.toString selection.SelectionType)
+        |> dataTableRecord.addData "SelectionStrategy" (SorterSelectionType.toStrategyLabel selection.SelectionType)
         |> dataTableRecord.addData "Measure" (SorterEvalFunctions.toCompactString selection.Measure)
         |> dataTableRecord.combine leadCols
         |> dataTableRecord.combine (SorterEvalMeasure.toDataTableRecord selection.Measure)

@@ -15,7 +15,7 @@ module MssiMutateSpecsRm =
 
     let sorterEvalSelectionType = 
             (runParameters.seedSorterPoolSelectionTypeKey, 
-            [ sorterSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterEvalSelectionType.toString)
+            [ sorterSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterSelectionType.toString)
 
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =

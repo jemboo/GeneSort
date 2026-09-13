@@ -41,7 +41,7 @@ module MsrsMutateDbs =
                 queryParams.create dbName projectName (Some repl) None odt
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                       (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterEvalSelectionType.toString)
+                       (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalFunctions.toCompactString)
                        (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
                        (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
@@ -107,7 +107,7 @@ module MsrsMutateDbs =
                     outputDataType
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                       (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterEvalSelectionType.toString)
+                       (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toCompactString)
                        (runParameters.sortingWidthKey, string %sortingWidth); 
                        (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );

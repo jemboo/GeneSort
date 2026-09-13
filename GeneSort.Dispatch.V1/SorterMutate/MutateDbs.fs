@@ -12,7 +12,7 @@ open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
 open GeneSort.SortingLib.Sorter
 
-module MssiMutateDbs =
+module SorterMutateDbs =
     
     let projectName = "SorterMutate" |> UMX.tag<projectName>
 
@@ -25,27 +25,27 @@ module MssiMutateDbs =
                     @$"c:\Projects\{projectName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
 
             let makeQueryParams
-                            (rng: rngType)
-                            (ses:sorterSelectionType)
-                            (sem:sorterEvalMeasure)
                             (repl: int<replNumber>) 
+                            (odt: outputDataType) 
+                            (rng: rngType)
+                            (strSel:sorterSelectionType)
+                            (sem:sorterEvalMeasure)
                             (sw: int<sortingWidth>) 
-                            (smt: simpleSorterModelType) 
+                            (smplSmt: simpleSorterModelType) 
+                            (srtableDf: sortableDataFormat) 
                             (set: sorterEvalType)
-                            (orthoRate: float<orthoRate>)
-                            (paraRate: float<paraRate>)
-                            (mdr: float<modificationRate>)
-                            (odt: outputDataType) : queryParams =
+                            (smps: simpleMutatorParams)
+                            (mdr: float<modificationRate>): queryParams =
                 queryParams.create dbName projectName (Some repl) None odt
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                       (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterSelectionType.toString)
+                       (runParameters.seedSorterPoolSelectionTypeKey, strSel |> SorterSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toCompactString)
                        (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
-                       (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
+                       (runParameters.simpleSorterModelTypeKey, smplSmt |> SimpleSorterModelType.toString) 
+                       (runParameters.sortableDataFormatKey, srtableDf |> SortableDataFormat.toString)
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString)
-                       (runParameters.orthoRateKey, (Some orthoRate) |> OrthoRate.toString)
-                       (runParameters.paraRateKey, (Some paraRate) |> ParaRate.toString)
+                       (runParameters.simpleMutatorParamsKey, smps |> SimpleMutatorParams.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
                     |]
 
@@ -59,12 +59,12 @@ module MssiMutateDbs =
                     let! sem = rp.GetSorterEvalMeasure()
                     let! sw = rp.GetSortingWidth()
                     let! smt = rp.GetSimpleSorterModelType()
+                    let! sdf = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
                     let! set = rp.GetSorterEvalType()
-                    let! ortho = rp.GetOrthoRate()
-                    let! para = rp.GetParaRate()
+                    let! smps = rp.GetSimpleMutatorParams()
                     let! mdr = rp.GetModificationRate()
-                    return makeQueryParams rng ses sem repl sw smt set ortho para mdr odt 
+                    return makeQueryParams repl odt rng ses sem sw smt sdf set smps mdr  
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -80,18 +80,17 @@ module MssiMutateDbs =
                     $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
             let makeQueryParams
-                        (rng: rngType)
-                        (ses:sorterSelectionType)
-                        (sem:sorterEvalMeasure)
                         (repl: int<replNumber>)
+                        (outputDataType: outputDataType)
+                        (rng: rngType)
+                        (strSel:sorterSelectionType)
+                        (sem:sorterEvalMeasure)
                         (mrgLibId: mergeLibId)
-                        (simpleSorterModelType: simpleSorterModelType)
-                        (sortableDataFormat: sortableDataFormat) 
+                        (smplSmt: simpleSorterModelType)
+                        (srtableDf: sortableDataFormat) 
                         (set: sorterEvalType)
-                        (orthoRate: float<orthoRate>)
-                        (paraRate: float<paraRate>)
-                        (mdr: float<modificationRate>)
-                        (outputDataType: outputDataType) : queryParams =
+                        (smps: simpleMutatorParams)
+                        (mdr: float<modificationRate>): queryParams =
 
                 queryParams.create 
                     dbName projectName
@@ -100,15 +99,14 @@ module MssiMutateDbs =
                     outputDataType
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                       (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterSelectionType.toString)
+                       (runParameters.seedSorterPoolSelectionTypeKey, strSel |> SorterSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toCompactString)
                        (runParameters.mergeLibIdKey, mrgLibId |> MergeLibId.toString);
-                       (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString);
+                       (runParameters.simpleSorterModelTypeKey, smplSmt |> SimpleSorterModelType.toString);
+                       (runParameters.sortableDataFormatKey, srtableDf |> SortableDataFormat.toString); 
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString) 
-                       (runParameters.orthoRateKey, (Some orthoRate) |> OrthoRate.toString)
-                       (runParameters.paraRateKey, (Some paraRate) |> ParaRate.toString)
+                       (runParameters.simpleMutatorParamsKey, smps |> SimpleMutatorParams.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
-                       (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
                     |]
 
 
@@ -117,17 +115,16 @@ module MssiMutateDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! rng = rp.GetRngType()
-                    let! ses = rp.GetSeedSorterPoolSelectionType()
+                    let! strSel = rp.GetSeedSorterPoolSelectionType()
                     let! sem = rp.GetSorterEvalMeasure()
                     let! repl = rp.GetRepl()
                     let! mrgLibId = rp.GetMergeLibId()
                     let! smt = rp.GetSimpleSorterModelType()
                     let! sdf = rp.GetSortableDataFormat()
                     let! set = rp.GetSorterEvalType()
-                    let! ortho = rp.GetOrthoRate()
-                    let! para = rp.GetParaRate()
+                    let! smps = rp.GetSimpleMutatorParams()
                     let! mdr = rp.GetModificationRate()
-                    return makeQueryParams rng ses sem repl mrgLibId smt sdf set ortho para mdr odt
+                    return makeQueryParams repl odt rng strSel sem mrgLibId smt sdf set smps mdr
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -138,23 +135,22 @@ module MssiMutateDbs =
     
         module Uniform =
             
-            let dbName = "Rmu" |> UMX.tag<databaseName>
+            let dbName = "Rpu" |> UMX.tag<databaseName>
             let dbFolder = 
                     $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
             let makeQueryParams
-                        (rng: rngType)
-                        (ses:sorterSelectionType)
-                        (sem:sorterEvalMeasure)
                         (repl: int<replNumber>)
-                        (mrgLibId: mergeLibId)
-                        (simpleSorterModelType: simpleSorterModelType)
-                        (sortableDataFormat: sortableDataFormat) 
+                        (outputDataType: outputDataType)
+                        (rng: rngType)
+                        (strSel:sorterSelectionType)
+                        (sem:sorterEvalMeasure)
+                        (pfxLibId: prefixLibId)
+                        (smplSmt: simpleSorterModelType)
+                        (srtableDf: sortableDataFormat) 
                         (set: sorterEvalType)
-                        (orthoRate: float<orthoRate>)
-                        (paraRate: float<paraRate>)
-                        (mdr: float<modificationRate>)
-                        (outputDataType: outputDataType) : queryParams =
+                        (smps: simpleMutatorParams)
+                        (mdr: float<modificationRate>) : queryParams =
 
                 queryParams.create 
                     dbName projectName
@@ -163,15 +159,14 @@ module MssiMutateDbs =
                     outputDataType
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                       (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterSelectionType.toString)
+                       (runParameters.seedSorterPoolSelectionTypeKey, strSel |> SorterSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toCompactString)
-                       (runParameters.mergeLibIdKey, mrgLibId |> MergeLibId.toString);
-                       (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString);
+                       (runParameters.prefixLibIdKey, pfxLibId |> PrefixLibId.toString);
+                       (runParameters.simpleSorterModelTypeKey, smplSmt |> SimpleSorterModelType.toString);
+                       (runParameters.sortableDataFormatKey, srtableDf |> SortableDataFormat.toString); 
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString) 
-                       (runParameters.orthoRateKey, (Some orthoRate) |> OrthoRate.toString)
-                       (runParameters.paraRateKey, (Some paraRate) |> ParaRate.toString)
+                       (runParameters.simpleMutatorParamsKey, smps |> SimpleMutatorParams.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
-                       (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
                     |]
 
 
@@ -180,21 +175,19 @@ module MssiMutateDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! rng = rp.GetRngType()
-                    let! ses = rp.GetSeedSorterPoolSelectionType()
+                    let! strSel = rp.GetSeedSorterPoolSelectionType()
                     let! sem = rp.GetSorterEvalMeasure()
                     let! repl = rp.GetRepl()
-                    let! mrgLibId = rp.GetMergeLibId()
+                    let! pfxLibId = rp.GetPrefixLibId()
                     let! smt = rp.GetSimpleSorterModelType()
                     let! sdf = rp.GetSortableDataFormat()
                     let! set = rp.GetSorterEvalType()
-                    let! ortho = rp.GetOrthoRate()
-                    let! para = rp.GetParaRate()
+                    let! smps = rp.GetSimpleMutatorParams()
                     let! mdr = rp.GetModificationRate()
-                    return makeQueryParams rng ses sem repl mrgLibId smt sdf set ortho para mdr odt
+                    return makeQueryParams repl odt rng strSel sem pfxLibId smt sdf set smps mdr
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
-
 
 
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 

@@ -44,7 +44,7 @@ module PoolSelSzComp_ModRates =
                 (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                 (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                 (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
-                (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterEvalSelectionType.toString)
+                (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterSelectionType.toString)
                 (runParameters.selectedSorterCountPerPoolKey, (Some selSz) |> SorterCountPerPool.toString)
                 (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
             |]
@@ -68,8 +68,8 @@ module PoolSelSzComp_ModRates =
     let private withLocalParams (rp:runParameters) =
         let rpn = standardPoolSzParams rp
         rpn.WithOrthoRate(Some 4.001<orthoRate>)
-            .WithParaRate(Some 0.4<paraRate>)
-            .WithSelfSymRate(Some 2.001<selfSymRate>)
+           .WithParaRate(Some 0.4<paraRate>)
+           .WithSelfSymRate(Some 2.001<selfSymRate>)
 
     let private paramMapFilter (rp: runParameters) =
         Some rp

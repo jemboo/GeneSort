@@ -51,7 +51,7 @@ module MssiSgdDbs =
                        (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                        (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                        (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
-                       (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterEvalSelectionType.toString)
+                       (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toCompactString)
                        (runParameters.sorterEvalMeasureInitialKey, semInitial |> SorterEvalMeasure.toCompactString)
                        (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
@@ -140,7 +140,7 @@ module MssiSgdDbs =
                        (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                        (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                        (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
-                       (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterEvalSelectionType.toString)
+                       (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterSelectionType.toString)
                        (runParameters.sorterEvalMeasureKey, sem |> SorterEvalMeasure.toCompactString)
                        (runParameters.sorterEvalMeasureInitialKey, semInitial |> SorterEvalMeasure.toCompactString)
                        (runParameters.sortingWidthKey, string %sortingWidth); 

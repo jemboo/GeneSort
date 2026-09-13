@@ -46,7 +46,7 @@ module PoolSzComp8k =
             [|
                 (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                 (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterEvalSelectionType.toString)
+                (runParameters.seedSorterPoolSelectionTypeKey, ses |> SorterSelectionType.toString)
                 (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
             |]
 

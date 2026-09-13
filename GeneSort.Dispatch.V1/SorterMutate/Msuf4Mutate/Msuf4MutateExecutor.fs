@@ -2,7 +2,6 @@
 
 open System
 open System.Threading
-open FsToolkit.ErrorHandling
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
@@ -12,10 +11,8 @@ open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
-open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Dispatch.V1.SorterEval
-open GeneSort.Dispatch.V1.SortableTest
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
@@ -24,7 +21,6 @@ open GeneSort.Sorting.Sorter
 
 
 module Msuf4MutateExecutor =
-
 
     let makeMutantSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
         asyncResult {
@@ -134,112 +130,6 @@ module Msuf4MutateExecutor =
 
             return generateMutantStream parentSorterModelSet.SorterModels
         }
-
-
-
-    let makeMutantMergeSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
-        asyncResult {
-
-            let! (rngType: rngType) =  
-                        rp.GetRngType()
-                        |> Result.ofOption "Missing RNG type in run parameters"
-
-            let! (mrgLibid: mergeLibId) = 
-                        rp.GetMergeLibId() 
-                        |> Result.ofOption "Missing merge library ID in run parameters"
-    
-            let! (simpleSorterModelType: simpleSorterModelType) = 
-                        rp.GetSimpleSorterModelType() 
-                        |> Result.ofOption "Missing simple sorter model type in run parameters"
-
-            let! (sorterChildCount: int<sorterChildCount>) = 
-                        rp.GetSorterChildCount()
-                        |> Result.ofOption "Missing parent sorterChildCount in run parameters"
-
-            let! (mutationRate: float<mutationRate>) =  
-                        rp.GetMutationRate()
-                        |> Result.ofOption "Missing mutationRate in run parameters"
-
-            let! (insertionRate: float<insertionRate>) =  
-                        rp.GetInsertionRate()
-                        |> Result.ofOption "Missing insertionRate in run parameters"
-
-            let! (deletionRate: float<deletionRate>) =  
-                        rp.GetDeletionRate()
-                        |> Result.ofOption "Missing deletionRate in run parameters"
-
-            let! (modificationRate: float<modificationRate>) =  
-                        rp.GetModificationRate()
-                        |> Result.ofOption "Missing modificationRate in run parameters"
-
-            let! (sest: sorterSelectionType) = 
-                        rp.GetSeedSorterPoolSelectionType()
-                        |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
-
-            let! (sem:sorterEvalMeasure) = 
-                        rp.GetSorterEvalMeasure()
-                        |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
-
-            let! (mutationMod: int<mutationMod>) = 
-                        rp.GetMutationMod() 
-                        |> Result.ofOption "Missing mutationMod in run parameters"
-
-            let! (excludeSelfCe: bool<excludeSelfCe>) = 
-                        rp.GetExcludeSelfCe()
-                        |> Result.ofOption "Missing excludeSelfCe in run parameters"
-
-            let rngFactory = rngType |> RngFactory.create
-
-            let! (parentSorterSetEval: sorterSetEval) =
-                        SorterEvalDbs.getMergeSorterEvals 
-                                        mrgLibid 
-                                        simpleSorterModelType
-
-            let _sorterEvalSelection = 
-                            SorterSelection.makeSelection 
-                                        sem 
-                                        sest
-                                        parentSorterSetEval.SorterEvals   
-                                        parentSorterSetEval.SorterTestId
-
-            let (parentSorterModelGen: sorterModelGen) = 
-                CommonSorterEval.getSimpleUniformSorterModelGen 
-                                        rngType 
-                                        mrgLibid.SortingWidth 
-                                        simpleSorterModelType
-                                        excludeSelfCe
-
-            let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
-                                            (Guid.Empty |> UMX.tag)
-                                            parentSorterModelGen
-
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            rngFactory
-                                            excludeSelfCe
-                                            modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
-                                     |> sorterModelMutator.Simple
-
-
-            let childIndexes = [| 0 .. (%sorterChildCount - 1) |]
-
-            // Streaming engine via sequence expression
-            let generateMutantStream (parents: sorterModel[]) =
-                seq {
-                    for parentModel in parents do
-                        for dex in childIndexes do
-                            yield SorterModelMutator.makeMutantSorterModelFromIndexAndMod
-                                        sorterModelMutator
-                                        parentModel
-                                        (dex |> UMX.tag<mutationIndex>)
-                                        mutationMod
-                }
-
-            return generateMutantStream parentSorterModelSet.SorterModels
-        }
-
 
 
     let _evaluateMutants 
@@ -357,7 +247,7 @@ module Msuf4MutateExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _evaluateMutants 
-                    makeMutantMergeSorterModels
+                    makeMutantSorterModels
                     SortableTestMakers.makeMergeTests
                     host rp allowOverwrite cts progress }
 

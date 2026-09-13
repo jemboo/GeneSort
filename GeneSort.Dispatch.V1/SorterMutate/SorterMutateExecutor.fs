@@ -15,7 +15,6 @@ open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1
-open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.SortingLib.Sorter
 open GeneSort.Sorting.Sorter
 
@@ -41,13 +40,9 @@ module SorterMutateExecutor =
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
-            let! (orthoRate: float<orthoRate>) =  
-                        rp.GetOrthoRate()
-                        |> Result.ofOption "Missing orthoRate in run parameters"
-
-            let! (paraRate: float<paraRate>) =  
-                        rp.GetParaRate()
-                        |> Result.ofOption "Missing paraRate in run parameters"
+            let! (smpleMutatorPrams: simpleMutatorParams ) =  
+                        rp.GetSimpleMutatorParams()
+                        |> Result.ofOption "Missing simpleMutatorParams in run parameters"
 
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
@@ -96,12 +91,11 @@ module SorterMutateExecutor =
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMssiModelMutator
+            let sorterModelMutator = SimpleMutatorParams.toModelMutator
+                                            sortingWidth
                                             rngFactory
-                                            excludeSelfCe
                                             modificationRate
-                                            orthoRate
-                                            paraRate
+                                            smpleMutatorPrams
                                      |> sorterModelMutator.Simple
 
             let childIndexes = [| 0 .. (%sorterChildCount - 1) |]
