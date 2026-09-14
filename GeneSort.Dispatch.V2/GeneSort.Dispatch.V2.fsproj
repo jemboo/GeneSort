@@ -15,6 +15,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+    <ProjectReference Include="..\GeneSort.Db.V1\GeneSort.Db.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.Eval.Mp.V2\GeneSort.Eval.Mp.V2.fsproj" />
+    <ProjectReference Include="..\GeneSort.FileDb.V1\GeneSort.FileDb.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.Model.Sortable.Mp.V1\GeneSort.Model.Sortable.Mp.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.Model.Sortable.V1\GeneSort.Model.Sortable.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.Model.Sorting.Mp.V1\GeneSort.Model.Sorting.Mp.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.Model.Sorting.V1\GeneSort.Model.Sorting.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.Sorting.Mp\GeneSort.Sorting.Mp.fsproj" />
+    <ProjectReference Include="..\GeneSort.SortingLib\GeneSort.SortingLib.fsproj" />
+    <ProjectReference Include="..\GeneSort.SortingOps.Mp\GeneSort.SortingOps.Mp.fsproj" />
+    <ProjectReference Include="..\GeneSort.SortingOps\GeneSort.SortingOps.fsproj" />
+    <ProjectReference Include="..\GeneSort.Sorting\GeneSort.Sorting.fsproj" />
+    <ProjectReference Include="..\GenSort.Eval.V2\GeneSort.Eval.V2.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="11.0.101-rc1.26425.128" />
   </ItemGroup>
 

@@ -6,6 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="ProjectTypes.fs" />
+    <Compile Include="Run\RunSortableSet.fs" />
+    <Compile Include="Run\Run.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -15,7 +18,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+    <ProjectReference Include="..\GeneSort.Model.Sortable.V1\GeneSort.Model.Sortable.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.Model.Sorting.V1\GeneSort.Model.Sorting.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.SortingOps\GeneSort.SortingOps.fsproj" />
+    <ProjectReference Include="..\GeneSort.Sorting\GeneSort.Sorting.fsproj" />
+    <ProjectReference Include="..\GenSort.Eval.V2\GeneSort.Eval.V2.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="11.0.101-rc1.26425.128" />
   </ItemGroup>
+
+  <ItemGroup />
 
 </Project>

@@ -69,7 +69,7 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.SortingLib", "Gene
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Run.V2", "Run.V2", "{615D7574-590E-4B99-A6D7-C2D4AAC4A7B8}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GenSort.Eval.V2", "GenSort.Eval.V2\GenSort.Eval.V2.fsproj", "{B9C8884B-328E-429F-AC97-EE932C7E7714}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.Eval.V2", "GenSort.Eval.V2\GeneSort.Eval.V2.fsproj", "{B9C8884B-328E-429F-AC97-EE932C7E7714}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneSort.Dispatch.V2", "GeneSort.Dispatch.V2\GeneSort.Dispatch.V2.fsproj", "{E79F5BEA-A2FA-433F-9757-98342B3B1F9A}"
 EndProject
