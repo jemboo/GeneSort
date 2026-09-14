@@ -63,14 +63,16 @@ module DispatchSorterMutate =
     //let host: IRunHost = 
     //    let spec = MsceMutateSpecsRs.getRunHostSpec configType executorType
     //    MsceMutateDbs.createRunHost spec
+    //let executor = MsceMutateExecutor.getExecutor executorType
 
 
     //********** MsceMutateSpecsRm **********
-    //let configType = MsceMutateSpecsRm.configType.Rand_Test
-    //let executorType = sorterMutateExecutorType.MergeReport
-    //let host: IRunHost = 
-    //    let spec = MsceMutateSpecsRm.getRunHostSpec configType executorType
-    //    MsceMutateDbs.createRunHost spec
+    let configType = MsceMutateSpecsRm.configType.Rand_Test
+    let executorType = sorterMutateExecutorType.GenMerge
+    let host: IRunHost = 
+        let spec = MsceMutateSpecsRm.getRunHostSpec configType executorType
+        MsceMutateDbs.createRunHost spec
+    let executor = MsceMutateExecutor.getExecutor executorType
 
 
     //********** MssiMutateSpecsRs **********
@@ -82,11 +84,11 @@ module DispatchSorterMutate =
 
 
     //********** MssiMutateSpecsRm **********
-    let configType = MssiMutateSpecsRm.configType.Rand_Test
-    let executorType = sorterMutateExecutorType.GenMerge
-    let host: IRunHost = 
-        let spec = MssiMutateSpecsRm.getRunHostSpec configType executorType
-        MssiMutateDbs.createRunHost spec
+    //let configType = MssiMutateSpecsRm.configType.Rand_Test
+    //let executorType = sorterMutateExecutorType.GenMerge
+    //let host: IRunHost = 
+    //    let spec = MssiMutateSpecsRm.getRunHostSpec configType executorType
+    //    MssiMutateDbs.createRunHost spec
 
 
     //********** MsrsMutateSpecsRs **********
@@ -122,7 +124,6 @@ module DispatchSorterMutate =
 
 
 
-    let executor = MssiMutateExecutor.getExecutor executorType
     let minReplica = 0<replNumber>
     let maxReplica = 1<replNumber>
 

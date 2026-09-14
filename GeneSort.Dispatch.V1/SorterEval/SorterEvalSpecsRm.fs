@@ -22,7 +22,7 @@ module SorterEvalSpecsRm =
           .WithRunFinished(Some false)
           .WithSortingWidth(Some mrgLibId.SortingWidth)
           .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
-          .WithCollectNewSortableTests(Some (true |> UMX.tag<collectNewSortableTests>))
+          .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
           .WithId (Some qp.Id)
 
 

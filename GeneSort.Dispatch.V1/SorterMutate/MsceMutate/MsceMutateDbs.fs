@@ -57,11 +57,11 @@ module MsceMutateDbs =
                                     (odt: outputDataType) : queryParams option =
                 maybe {
                     let! repl = rp.GetRepl()
+                    let! rng = rp.GetRngType()
                     let! ses = rp.GetSeedSorterPoolSelectionType()
                     let! sem = rp.GetSorterEvalMeasure()
                     let! sw = rp.GetSortingWidth()
                     let! smt = rp.GetSimpleSorterModelType()
-                    let! rng = rp.GetRngType()
                     let! set = rp.GetSorterEvalType()
                     let! mut = rp.GetMutationRate()
                     let! ins = rp.GetInsertionRate()
@@ -83,21 +83,20 @@ module MsceMutateDbs =
                     $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
             let makeQueryParams
+                        (repl: int<replNumber>) 
+                        (outputDataType: outputDataType) 
                         (rng: rngType)
                         (ses:sorterSelectionType)
                         (sem:sorterEvalMeasure)
-                        (repl: int<replNumber>) 
                         (sortingWidth: int<sortingWidth>)
                         (simpleSorterModelType: simpleSorterModelType)
                         (mergeDimension: int<mergeDimension>) 
                         (mergeSuffixType: mergeSuffixType)
-                        (sortableDataFormat: sortableDataFormat) 
                         (set: sorterEvalType)
                         (mut: float<mutationRate>)
                         (ins: float<insertionRate>)
                         (del: float<deletionRate>)
-                        (mdr: float<modificationRate>)
-                        (outputDataType: outputDataType) : queryParams =
+                        (mdr: float<modificationRate>): queryParams =
 
                 queryParams.create 
                     dbName projectName
@@ -117,7 +116,6 @@ module MsceMutateDbs =
                        (runParameters.insertionRateKey, (Some ins) |> InsertionRate.toString)
                        (runParameters.deletionRateKey, (Some del) |> DeletionRate.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
-                       (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
                     |]
 
 
@@ -125,21 +123,20 @@ module MsceMutateDbs =
                                     (rp: runParameters) 
                                     (odt: outputDataType) : queryParams option =
                 maybe {
+                    let! repl = rp.GetRepl()
                     let! rng = rp.GetRngType()
+                    let! smt = rp.GetSimpleSorterModelType()
                     let! ses = rp.GetSeedSorterPoolSelectionType()
                     let! sem = rp.GetSorterEvalMeasure()
-                    let! repl = rp.GetRepl()
                     let! sw = rp.GetSortingWidth()
                     let! md = rp.GetMergeDimension()
                     let! mst = rp.GetMergeSuffixType()
-                    let! smt = rp.GetSimpleSorterModelType()
-                    let! sdf = rp.GetSortableDataFormat()
                     let! set = rp.GetSorterEvalType()
                     let! mut = rp.GetMutationRate()
                     let! ins = rp.GetInsertionRate()
                     let! del = rp.GetDeletionRate()
                     let! mdr = rp.GetModificationRate()
-                    return makeQueryParams rng ses sem repl sw smt md mst sdf set mut ins del mdr odt
+                    return makeQueryParams repl odt rng ses sem  sw smt md mst set mut ins del mdr 
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)

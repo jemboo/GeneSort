@@ -8,6 +8,7 @@ open GeneSort.Eval.V1
 open GeneSort.Sorting
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
+open GeneSort.SortingOps
 
 module MsrsMutateSpecsRs = 
 
@@ -21,6 +22,9 @@ module MsrsMutateSpecsRs =
         rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
+          .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
+          .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
+          .WithSortableDataFormat(Some sortableDataFormat.BitVector512)
           .WithId (Some qp.Value.Id)
 
     let private paramMapFilter (rp: runParameters) =

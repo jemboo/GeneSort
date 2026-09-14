@@ -145,7 +145,7 @@ module QueryProperties =
                             match r with
                             | NoRestriction ->
                                 let keys = [ runParameters.rngTypeKey;
-                                             runParameters.simpleMutatorParamsKey;
+                                             runParameters.mutatorParamsKey;
                                              runParameters.sorterEvalTypeKey; 
                                              runParameters.seedSorterPoolSelectionTypeKey;
                                              runParameters.simpleSorterModelTypeKey;
@@ -158,7 +158,7 @@ module QueryProperties =
                             match r with
                             | NoRestriction ->
                                 let keys = [ runParameters.rngTypeKey;
-                                             runParameters.simpleMutatorParamsKey;
+                                             runParameters.mutatorParamsKey;
                                              runParameters.sorterEvalTypeKey;
                                              runParameters.seedSorterPoolSelectionTypeKey;
                                              runParameters.simpleSorterModelTypeKey;
@@ -172,7 +172,7 @@ module QueryProperties =
                             match r with
                             | NoRestriction ->
                                 let keys = [ runParameters.rngTypeKey;
-                                             runParameters.simpleMutatorParamsKey;
+                                             runParameters.mutatorParamsKey;
                                              runParameters.sorterEvalTypeKey; 
                                              runParameters.seedSorterPoolSelectionTypeKey;
                                              runParameters.simpleSorterModelTypeKey;

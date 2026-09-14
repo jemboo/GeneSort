@@ -9,6 +9,7 @@ open GeneSort.Eval.V1
 open GeneSort.Sorting
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
+open GeneSort.SortingOps
 
 
 module MsceMutateSpecsRs = 
@@ -23,6 +24,9 @@ module MsceMutateSpecsRs =
         rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
+          .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
+          .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
+          .WithSortableDataFormat(Some sortableDataFormat.BitVector512)
           .WithId (Some qp.Value.Id)
 
     

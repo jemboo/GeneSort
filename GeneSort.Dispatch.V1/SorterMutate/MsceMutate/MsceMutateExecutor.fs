@@ -147,7 +147,9 @@ module MsceMutateExecutor =
                 // 1. Fetch mutant sorter models as a lazy stream sequence
                 log "Generating Mutant Sorter Models Stream..."
                 let! (allMutantStream: sorterModel seq) = makeMutantSorterModels rp
-                let! (collectTests :bool<collectNewSortableTests>) = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests in run parameters"
+                let! (collectTests :bool<collectNewSortableTests>) = 
+                            rp.GetCollectNewSortableTests() 
+                            |> Result.ofOption "Missing collectNewSortableTests in run parameters"
 
                 let sortersPerSplit = 1000
                 

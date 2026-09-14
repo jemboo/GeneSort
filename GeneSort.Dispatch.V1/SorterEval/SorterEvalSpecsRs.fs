@@ -18,7 +18,7 @@ module SorterEvalSpecsRs =
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
           .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
-          .WithCollectNewSortableTests(Some (true |> UMX.tag<collectNewSortableTests>))
+          .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
           .WithSortableDataFormat(Some sortableDataFormat.BitVector512)
           .WithId (Some qp.Value.Id)
 

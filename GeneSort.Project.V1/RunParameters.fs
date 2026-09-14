@@ -43,6 +43,7 @@ type runParameters =
     static member modificationRateKey = "ModificationRate"
     static member mutationModKey = "MutationMod"
     static member mutationRateKey = "MutationRate"
+    static member mutatorParamsKey = "MutatorParams"
     static member orthoRateKey = "OrthoRate"
     static member paraRateKey = "ParaRate"
     static member prefixLibIdKey = "PrefixLibId"
@@ -58,7 +59,6 @@ type runParameters =
     static member seedSorterPoolSelectionTypeKey = "SeedPoolSorterSelectionType"
     static member selectedSorterCountPerPoolKey = "SelectedSorterCountPerPool"
     static member selfSymRateKey = "SelfSym"
-    static member simpleMutatorParamsKey = "SimpleMutatorParams"
     static member simpleSorterModelTypeKey = "SimpleSorterModelType"
     static member sortableCountKey = "SortableCount"
     static member sortableDataFormatKey = "SortableDataFormat"
@@ -257,10 +257,10 @@ type runParameters =
         runParameters.tryGetFloat runParameters.selfSymRateKey this.paramMap
         |> Option.map UMX.tag<selfSymRate>
 
-    member this.GetSimpleMutatorParams() =
-        this.paramMap.TryFind runParameters.simpleMutatorParamsKey
+    member this.GetMutatorParams() =
+        this.paramMap.TryFind runParameters.mutatorParamsKey
         |> Option.bind (fun v ->
-            match SimpleMutatorParams.fromString v with
+            match MutatorParams.fromString v with
             | Ok p -> Some p
             | Error _ -> None)
 
@@ -432,6 +432,9 @@ type runParameters =
     member this.WithMutationRate(mr: float<mutationRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mutationRateKey (mr |> Option.map UmxExt.floatToRaw) }
 
+    member this.WithMutatorParams(mtp: mutatorParams option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mutatorParamsKey (mtp |> Option.map MutatorParams.toString) }
+
     member this.WithOrthoRate(ortho: float<orthoRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.orthoRateKey (ortho |> Option.map UmxExt.floatToRaw) }
 
@@ -446,9 +449,6 @@ type runParameters =
 
     member this.WithProjectName(pn: string<projectName> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.projectNameKey (pn |> Option.map UmxExt.stringToRaw) }
-
-    member this.WithSimpleMutatorParams(smp: simpleMutatorParams option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.simpleMutatorParamsKey (smp |> Option.map SimpleMutatorParams.toString) }
 
     member this.WithQueryName(qn: string<queryName> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.queryNameKey (qn |> Option.map UmxExt.stringToRaw) }

@@ -14,7 +14,7 @@ open GeneSort.Dispatch.V1.CommonParams
 
 module MsceMutateSpecsRm =
 
-    let sorterEvalSelectionType = 
+    let seedSorterPoolSelectionType = 
             (runParameters.seedSorterPoolSelectionTypeKey, 
             [ sorterSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterSelectionType.toString)
 
@@ -23,6 +23,9 @@ module MsceMutateSpecsRm =
         rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
+          .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
+          .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
+          .WithSortableDataFormat(Some sortableDataFormat.Int8Vector512)
           .WithId (Some qp.Value.Id)
 
 
@@ -67,19 +70,19 @@ module MsceMutateSpecsRm =
             runDescription = "Mutation analysis for merge Msce"
             spans = [
                 rngTypeLcg
-                sorterEvalSelectionType
+                msceModelType
+                seedSorterPoolSelectionType
                 sorterEvalMeasure_CestM_noScw
+                testMergeSortingWidths
+                testMergeDimensions
+                noSuffixSuffixType
                 sorterEvalTypeV1
                 mutationRates
                 insertionRates
                 deletionRates
                 modificationRatesMsce
-                testMergeSortingWidths
-                msceModelType
-                testMergeDimensions
-                noSuffixSuffixType
-                dataFormatInt8v512
                 testChildCount
+                mutationMod1
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -93,7 +96,8 @@ module MsceMutateSpecsRm =
             runDescription = "Mutation analysis for merge Msce"
             spans = [
                 rngTypeLcg
-                sorterEvalSelectionType
+                msceModelType
+                seedSorterPoolSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 mutationRates
@@ -101,11 +105,10 @@ module MsceMutateSpecsRm =
                 deletionRates
                 modificationRatesMsce
                 smallMergeSortingWidths
-                msceModelType
                 allMergeDimensions
                 noSuffixSuffixType
-                dataFormatInt8v512
                 extraLargeChildCount
+                mutationMod1
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -119,7 +122,8 @@ module MsceMutateSpecsRm =
             runDescription = "Mutation analysis for merge Msce"
             spans = [
                 rngTypeLcg
-                sorterEvalSelectionType
+                msceModelType
+                seedSorterPoolSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 mutationRates
@@ -130,8 +134,8 @@ module MsceMutateSpecsRm =
                 msceModelType
                 lowMergeDimensions
                 noSuffixSuffixType
-                dataFormatInt8v512
                 extraLargeChildCount
+                mutationMod1
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -145,7 +149,7 @@ module MsceMutateSpecsRm =
             runDescription = "Mutation analysis for merge Msce"
             spans = [
                 rngTypeLcg
-                sorterEvalSelectionType
+                seedSorterPoolSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 mutationRates
@@ -156,8 +160,8 @@ module MsceMutateSpecsRm =
                 msceModelType
                 mergeDimension6
                 noSuffixSuffixType
-                dataFormatInt8v512
                 largeChildCount
+                mutationMod1
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer
@@ -172,7 +176,7 @@ module MsceMutateSpecsRm =
             runDescription = "Mutation analysis for merge Msce"
             spans = [
                 rngTypeLcg
-                sorterEvalSelectionType
+                seedSorterPoolSelectionType
                 sorterEvalMeasure_CestM_noScw
                 sorterEvalTypeV1
                 mutationRates
@@ -183,8 +187,8 @@ module MsceMutateSpecsRm =
                 msceModelType
                 mergeDimension2
                 noSuffixSuffixType
-                dataFormatInt8v512
                 largeChildCount
+                mutationMod1
             ]
             filter = paramMapFilter
             enhancer = standardEnhancer

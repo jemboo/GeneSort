@@ -8,6 +8,7 @@ open GeneSort.Project.V1
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
+open GeneSort.SortingOps
 
 
 module MsrsMutateSpecsRm =
@@ -22,6 +23,9 @@ module MsrsMutateSpecsRm =
         rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
+          .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
+          .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
+          .WithSortableDataFormat(Some sortableDataFormat.Int8Vector512)
           .WithId (Some qp.Value.Id)
 
 
@@ -54,7 +58,6 @@ module MsrsMutateSpecsRm =
                 msrsModelType
                 mergeDimension8
                 noSuffixSuffixType
-                dataFormatInt8v512
                 testChildCount
             ]
             filter = paramMapFilter
@@ -80,7 +83,6 @@ module MsrsMutateSpecsRm =
                 msrsModelType
                 lowMergeDimensions
                 noSuffixSuffixType
-                dataFormatInt8v512
                 extraLargeChildCount
             ]
             filter = paramMapFilter
@@ -106,7 +108,6 @@ module MsrsMutateSpecsRm =
                 msrsModelType
                 lowMergeDimensions
                 noSuffixSuffixType
-                dataFormatInt8v512
                 extraLargeChildCount
             ]
             filter = paramMapFilter
@@ -132,7 +133,6 @@ module MsrsMutateSpecsRm =
                 msrsModelType
                 mergeDimension6
                 noSuffixSuffixType
-                dataFormatInt8v512
                 largeChildCount
             ]
             filter = paramMapFilter
@@ -158,7 +158,6 @@ module MsrsMutateSpecsRm =
                 msrsModelType
                 mergeDimension2
                 noSuffixSuffixType
-                dataFormatInt8v512
                 largeChildCount
             ]
             filter = paramMapFilter

@@ -40,9 +40,9 @@ module SorterMutateExecutor =
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
-            let! (smpleMutatorPrams: simpleMutatorParams ) =  
-                        rp.GetSimpleMutatorParams()
-                        |> Result.ofOption "Missing simpleMutatorParams in run parameters"
+            let! (mutatorPrams: mutatorParams ) =  
+                        rp.GetMutatorParams()
+                        |> Result.ofOption "Missing mutatorParams in run parameters"
 
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
@@ -65,8 +65,6 @@ module SorterMutateExecutor =
                         |> Result.ofOption "Missing excludeSelfCe in run parameters"
 
 
-            let rngFactory = rngType |> RngFactory.create
-
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getStandardSorterEvals 
                                             sortingWidth 
@@ -87,16 +85,14 @@ module SorterMutateExecutor =
                                         simpleSorterModelType
                                         excludeSelfCe
 
+
             let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = SimpleMutatorParams.toModelMutator
-                                            sortingWidth
-                                            rngFactory
+            let sorterModelMutator = MutatorParams.toModelMutator
                                             modificationRate
-                                            smpleMutatorPrams
-                                     |> sorterModelMutator.Simple
+                                            mutatorPrams
 
             let childIndexes = [| 0 .. (%sorterChildCount - 1) |]
 

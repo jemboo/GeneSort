@@ -34,7 +34,7 @@ module SorterMutateDbs =
                             (smplSmt: simpleSorterModelType) 
                             (srtableDf: sortableDataFormat) 
                             (set: sorterEvalType)
-                            (smps: simpleMutatorParams)
+                            (mutPrams: mutatorParams)
                             (mdr: float<modificationRate>): queryParams =
                 queryParams.create dbName projectName (Some repl) None odt
                     [| 
@@ -45,7 +45,7 @@ module SorterMutateDbs =
                        (runParameters.simpleSorterModelTypeKey, smplSmt |> SimpleSorterModelType.toString) 
                        (runParameters.sortableDataFormatKey, srtableDf |> SortableDataFormat.toString)
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString)
-                       (runParameters.simpleMutatorParamsKey, smps |> SimpleMutatorParams.toString)
+                       (runParameters.mutatorParamsKey, mutPrams |> MutatorParams.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
                     |]
 
@@ -62,7 +62,7 @@ module SorterMutateDbs =
                     let! sdf = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
                     let! set = rp.GetSorterEvalType()
-                    let! smps = rp.GetSimpleMutatorParams()
+                    let! smps = rp.GetMutatorParams()
                     let! mdr = rp.GetModificationRate()
                     return makeQueryParams repl odt rng ses sem sw smt sdf set smps mdr  
                 }
@@ -89,7 +89,7 @@ module SorterMutateDbs =
                         (smplSmt: simpleSorterModelType)
                         (srtableDf: sortableDataFormat) 
                         (set: sorterEvalType)
-                        (smps: simpleMutatorParams)
+                        (mutPrams: mutatorParams)
                         (mdr: float<modificationRate>): queryParams =
 
                 queryParams.create 
@@ -105,7 +105,7 @@ module SorterMutateDbs =
                        (runParameters.simpleSorterModelTypeKey, smplSmt |> SimpleSorterModelType.toString);
                        (runParameters.sortableDataFormatKey, srtableDf |> SortableDataFormat.toString); 
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString) 
-                       (runParameters.simpleMutatorParamsKey, smps |> SimpleMutatorParams.toString)
+                       (runParameters.mutatorParamsKey, mutPrams |> MutatorParams.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
                     |]
 
@@ -122,9 +122,9 @@ module SorterMutateDbs =
                     let! smt = rp.GetSimpleSorterModelType()
                     let! sdf = rp.GetSortableDataFormat()
                     let! set = rp.GetSorterEvalType()
-                    let! smps = rp.GetSimpleMutatorParams()
+                    let! mutPrams = rp.GetMutatorParams()
                     let! mdr = rp.GetModificationRate()
-                    return makeQueryParams repl odt rng strSel sem mrgLibId smt sdf set smps mdr
+                    return makeQueryParams repl odt rng strSel sem mrgLibId smt sdf set mutPrams mdr
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
@@ -149,7 +149,7 @@ module SorterMutateDbs =
                         (smplSmt: simpleSorterModelType)
                         (srtableDf: sortableDataFormat) 
                         (set: sorterEvalType)
-                        (smps: simpleMutatorParams)
+                        (mutPrams: mutatorParams)
                         (mdr: float<modificationRate>) : queryParams =
 
                 queryParams.create 
@@ -165,7 +165,7 @@ module SorterMutateDbs =
                        (runParameters.simpleSorterModelTypeKey, smplSmt |> SimpleSorterModelType.toString);
                        (runParameters.sortableDataFormatKey, srtableDf |> SortableDataFormat.toString); 
                        (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString) 
-                       (runParameters.simpleMutatorParamsKey, smps |> SimpleMutatorParams.toString)
+                       (runParameters.mutatorParamsKey, mutPrams |> MutatorParams.toString)
                        (runParameters.modificationRateKey, (Some mdr) |> ModificationRate.toString)
                     |]
 
@@ -182,9 +182,9 @@ module SorterMutateDbs =
                     let! smt = rp.GetSimpleSorterModelType()
                     let! sdf = rp.GetSortableDataFormat()
                     let! set = rp.GetSorterEvalType()
-                    let! smps = rp.GetSimpleMutatorParams()
+                    let! mutPrams = rp.GetMutatorParams()
                     let! mdr = rp.GetModificationRate()
-                    return makeQueryParams repl odt rng strSel sem pfxLibId smt sdf set smps mdr
+                    return makeQueryParams repl odt rng strSel sem pfxLibId smt sdf set mutPrams mdr
                 }
 
             let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)

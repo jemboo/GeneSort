@@ -27,6 +27,7 @@ module MssiMutateSpecsRm =
           .WithSortingWidth(Some mrgLibId.SortingWidth)
           .WithCollectNewSortableTests(Some (false |> UMX.tag))
           .WithExcludeSelfCe(Some (true |> UMX.tag))
+          .WithSortableDataFormat(Some sortableDataFormat.Int8Vector512)
           .WithId (Some qp.Value.Id)
 
     
@@ -73,7 +74,6 @@ module MssiMutateSpecsRm =
                 modificationRatesMsuf4
                 mergeLib_Merge32s
                 mssiModelType
-                dataFormatInt8v512
                 testChildCount
                 (runParameters.mutationModKey, [0;] |> List.map string)
             ]
@@ -99,7 +99,6 @@ module MssiMutateSpecsRm =
                 mssiModelType
                 lowMergeDimensions
                 noSuffixSuffixType
-                dataFormatInt8v512
                 extraLargeChildCount
                 (runParameters.mutationModKey, [0;] |> List.map string)
             ]
@@ -125,7 +124,6 @@ module MssiMutateSpecsRm =
                 mssiModelType
                 lowMergeDimensions
                 noSuffixSuffixType
-                dataFormatInt8v512
                 extraLargeChildCount
                 (runParameters.mutationModKey, [0;] |> List.map string)
             ]
@@ -151,7 +149,6 @@ module MssiMutateSpecsRm =
                 mssiModelType
                 mergeDimension6
                 noSuffixSuffixType
-                dataFormatInt8v512
                 largeChildCount
                 (runParameters.mutationModKey, [0;] |> List.map string)
             ]
@@ -177,7 +174,6 @@ module MssiMutateSpecsRm =
                 mssiModelType
                 mergeDimension2
                 noSuffixSuffixType
-                dataFormatInt8v512
                 largeChildCount
                 (runParameters.mutationModKey, [0;] |> List.map string)
             ]
