@@ -18,233 +18,24 @@ open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.SortingLib.Sorter
 open GeneSort.Sorting.Sorter
+open GeneSort.Dispatch.V1.SorterMutate
 
 
 module MsceMutateExecutor =
 
-    let makeMutantSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
-        asyncResult {
-
-            let! (rngType: rngType) =  
-                        rp.GetRngType()
-                        |> Result.ofOption "Missing RNG type in run parameters"
-
-            let! (sortingWidth: int<sortingWidth>) = 
-                        rp.GetSortingWidth() 
-                        |> Result.ofOption "Missing sorting width in run parameters"
-    
-            let! (simpleSorterModelType: simpleSorterModelType) = 
-                        rp.GetSimpleSorterModelType() 
-                        |> Result.ofOption "Missing simple sorter model type in run parameters"
-
-            let! (sorterChildCount: int<sorterChildCount>) = 
-                        rp.GetSorterChildCount()
-                        |> Result.ofOption "Missing parent sorterChildCount in run parameters"
-
-            let! (mutationRate: float<mutationRate>) =  
-                        rp.GetMutationRate()
-                        |> Result.ofOption "Missing mutationRate in run parameters"
-
-            let! (insertionRate: float<insertionRate>) =  
-                        rp.GetInsertionRate()
-                        |> Result.ofOption "Missing insertionRate in run parameters"
-
-            let! (deletionRate: float<deletionRate>) =  
-                        rp.GetDeletionRate()
-                        |> Result.ofOption "Missing deletionRate in run parameters"
-
-            let! (modificationRate: float<modificationRate>) =  
-                        rp.GetModificationRate()
-                        |> Result.ofOption "Missing modificationRate in run parameters"
-
-            let! (sest: sorterSelectionType) = 
-                        rp.GetSeedSorterPoolSelectionType()
-                        |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
-
-            let! (sem:sorterEvalMeasure) = 
-                        rp.GetSorterEvalMeasure()
-                        |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
-
-            let! (mutationMod: int<mutationMod>) = 
-                        rp.GetMutationMod() 
-                        |> Result.ofOption "Missing mutationMod in run parameters"
-
-            let! (excludeSelfCe: bool<excludeSelfCe>) = 
-                        rp.GetExcludeSelfCe()
-                        |> Result.ofOption "Missing excludeSelfCe in run parameters"
-            
-
-            let rngFactory = rngType |> RngFactory.create
-
-            let! (parentSorterSetEval: sorterSetEval) =
-                        SorterEvalDbs.getStandardSorterEvals 
-                                            sortingWidth 
-                                            simpleSorterModelType
-                                            sorterEvalType.V2
-
-            let _sorterEvalSelection = 
-                            SorterSelection.makeSelection 
-                                        sem 
-                                        sest
-                                        parentSorterSetEval.SorterEvals
-                                        parentSorterSetEval.SorterTestId
-
-            let (parentSorterModelGen: sorterModelGen) = 
-                CommonSorterEval.getSimpleUniformSorterModelGen 
-                                        rngType 
-                                        sortingWidth 
-                                        simpleSorterModelType
-                                        excludeSelfCe
-
-            let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
-                                            (Guid.Empty |> UMX.tag)
-                                            parentSorterModelGen
-
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            rngFactory
-                                            excludeSelfCe
-                                            modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
-                                     |> sorterModelMutator.Simple
-
-            let childIndexes = [| 0 .. (%sorterChildCount - 1) |]
-
-            // Streaming engine via sequence expression
-            let generateMutantStream (parents: sorterModel[]) =
-                seq {
-                    for parentModel in parents do
-                        for dex in childIndexes do
-                            yield SorterModelMutator.makeMutantSorterModelFromIndexAndMod
-                                        sorterModelMutator
-                                        parentModel
-                                        (dex |> UMX.tag<mutationIndex>)
-                                        mutationMod
-                }
-
-            return generateMutantStream parentSorterModelSet.SorterModels
-        }
-
-
-
-    let _evaluateMutants 
-            (makeMutantSorterModels: runParameters -> Async<Result<sorterModel seq, string>> )
-            (makeSortableTests: runParameters ->  Async<Result<sortableTest * (ce array), string>>)
-            (host: IRunHost)
-            (rp: runParameters) 
-            (allowOverwrite: bool<allowOverwrite>) 
-            (cts: CancellationTokenSource) 
-            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
-
-        let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
-
-        asyncResult {
-            try
-                do! checkCancellation cts.Token
-                
-                // 1. Fetch mutant sorter models as a lazy stream sequence
-                log "Generating Mutant Sorter Models Stream..."
-                let! (allMutantStream: sorterModel seq) = makeMutantSorterModels rp
-                let! (collectTests :bool<collectNewSortableTests>) = 
-                            rp.GetCollectNewSortableTests() 
-                            |> Result.ofOption "Missing collectNewSortableTests in run parameters"
-
-                let sortersPerSplit = 1000
-                
-                let! sorterEvalType =
-                    rp.GetSorterEvalType() 
-                    |> Result.ofOption "Missing sorterEvalType."
-
-                do! checkCancellation cts.Token
-                log "Generating Sortable Tests..."
-                let! tests, ces = makeSortableTests rp 
-                let prefixBlock = ces |> ceBlock.create (Guid.Empty |> UMX.tag) (tests |> SortableTests.getSortingWidth)
-
-                let! qpSorterSet = 
-                    host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSet "")
-                    |> Result.ofOption "Failed to create QueryParams for SorterSet."
-
-                let! qpEval = 
-                    host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
-                    |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
-
-                let testId = tests |> SortableTests.getId
-                
-                // 2. Setup Accumulators and Lazy Chunk Loop via Seq.chunkBySize
-                log "Running Split Sorter Generation, Stream Chunk Evaluations, & Aggregation..."
-                let allChunksEvals = ResizeArray<sorterEval[]>()
-                let mutable chunkCounter = 0
-
-                let chunkedMutants = allMutantStream |> Seq.chunkBySize sortersPerSplit
-
-                for modelChunk in chunkedMutants do
-                    do! checkCancellation cts.Token
-                    chunkCounter <- chunkCounter + 1
-                    log (sprintf "Processing mutant chunk %d..." chunkCounter)
-                    
-                    // Wrap the subset models into an explicit SorterModelSet container
-                    let modelSetChunk = sorterModelSet.create 
-                                                (Guid.Empty |> UMX.tag) 
-                                                modelChunk
-                                                (modelChunk.[0] |> SorterModel.getCeLength)
-
-                    // Materialize into a functional SorterSet chunk
-                    let maxCeCount = None
-                    let fullSorterSetChunk = 
-                        SorterModelSet.makeSorterSet (Guid.Empty |> UMX.tag) maxCeCount modelSetChunk
-
-                    // Compute sorter evaluations directly from the targeted network chunk
-                    let sorterEvalsChunk = 
-                        SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters prefixBlock tests sorterEvalType collectTests
-
-                    // Accumulate transient array chunk results
-                    allChunksEvals.Add(sorterEvalsChunk)
-                    
-                    // Explicit GC collection cycle over the finished slice to drop garbage immediately
-                    System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
-                    GC.Collect(2, GCCollectionMode.Forced, true, true)
-
-                // 3. Compile Master SorterSetEval structure
-                log "Compiling final Master Mutant SorterSetEval structure..."
-                let correctSorterSetId = (%qpSorterSet.Id) |> UMX.tag<sorterSetId>
-                
-                let finalEvalsArray = allChunksEvals |> Array.concat
-                let finalSorterSetEval = 
-                    sorterSetEval.create 
-                        (%qpEval.Id |> UMX.tag) 
-                        correctSorterSetId 
-                        testId 
-                        finalEvalsArray
-
-                // 4. Persistence
-                log (sprintf "Saving Combined Mutant SorterSetEval %s" (string %qpEval.Id))
-                do! host.RunDb.saveAsync qpEval (finalSorterSetEval |> outputData.SorterSetEval) allowOverwrite
-                
-                log "Mutant Evaluation Run Complete."
-                return rp.WithRunFinished (Some true)
-
-            with e -> 
-                let errorMsg = sprintf "Fatal Error in %s: %s" (rp |> RunParameters.getIdString) e.Message
-                log errorMsg 
-                return! Error errorMsg
-        } |> Async.map (logResult progress log)
-
-
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _evaluateMutants 
-                    makeMutantSorterModels
+                SorterMutateExecutor._evaluateMutants 
+                    SorterMutateExecutor.makeMutantSorterModels
                     SortableTestMakers.makeStandardTests
                     host rp allowOverwrite cts progress }
 
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _evaluateMutants 
-                    makeMutantSorterModels
+                SorterMutateExecutor._evaluateMutants 
+                    SorterMutateExecutor.makeMutantSorterModels
                     SortableTestMakers.makeMergeTests
                     host rp allowOverwrite cts progress }
 

@@ -64,6 +64,32 @@ module MsceMutateSpecsRm =
 
     module Specs =
 
+        //let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
+        //    databaseName = MsceMutateDbs.RandomMerge.Uniform.dbName
+        //    runName = sprintf @"Rand-test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+        //    runDescription = "Mutation analysis for merge Msce"
+        //    spans = [
+        //        rngTypeLcg
+        //        msceModelType
+        //        seedSorterPoolSelectionType
+        //        sorterEvalMeasure_CestM_noScw
+        //        testMergeSortingWidths
+        //        testMergeDimensions
+        //        noSuffixSuffixType
+        //        sorterEvalTypeV1
+        //        mutationRates
+        //        insertionRates
+        //        deletionRates
+        //        modificationRatesMsce
+        //        testChildCount
+        //        mutationMod1
+        //    ]
+        //    filter = paramMapFilter
+        //    enhancer = standardEnhancer
+        //    allowOverwrite = false |> UMX.tag
+        //    maxParallel = 1
+        //}
+
         let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
             databaseName = MsceMutateDbs.RandomMerge.Uniform.dbName
             runName = sprintf @"Rand-test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
@@ -73,8 +99,7 @@ module MsceMutateSpecsRm =
                 msceModelType
                 seedSorterPoolSelectionType
                 sorterEvalMeasure_CestM_noScw
-                testMergeSortingWidths
-                testMergeDimensions
+                mergeLib_Merge32s
                 noSuffixSuffixType
                 sorterEvalTypeV1
                 mutationRates

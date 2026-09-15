@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterMutate.Mssi
+﻿namespace GeneSort.Dispatch.V1.SorterMutate
 
 open System
 open System.Threading
@@ -132,13 +132,9 @@ module SorterMutateExecutor =
                         rp.GetSorterChildCount()
                         |> Result.ofOption "Missing parent sorterChildCount in run parameters"
 
-            let! (orthoRate: float<orthoRate>) =  
-                        rp.GetOrthoRate()
-                        |> Result.ofOption "Missing orthoRate in run parameters"
-
-            let! (paraRate: float<paraRate>) =  
-                        rp.GetParaRate()
-                        |> Result.ofOption "Missing paraRate in run parameters"
+            let! (mutatorPrams: mutatorParams ) =  
+                        rp.GetMutatorParams()
+                        |> Result.ofOption "Missing mutatorParams in run parameters"
 
             let! (modificationRate: float<modificationRate>) =  
                         rp.GetModificationRate()
@@ -185,13 +181,9 @@ module SorterMutateExecutor =
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMssiModelMutator
-                                            rngFactory
-                                            excludeSelfCe
+            let sorterModelMutator = MutatorParams.toModelMutator
                                             modificationRate
-                                            orthoRate
-                                            paraRate
-                                     |> sorterModelMutator.Simple
+                                            mutatorPrams
 
 
             let childIndexes = [| 0 .. (%sorterChildCount - 1) |]

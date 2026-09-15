@@ -58,21 +58,21 @@ module DispatchSorterMutate =
 
 
     //********** MsceMutateSpecsRs **********
-    //let configType = MsceMutateSpecsRs.configType.Rand_Test
-    //let executorType = sorterMutateExecutorType.GenStandard
-    //let host: IRunHost = 
-    //    let spec = MsceMutateSpecsRs.getRunHostSpec configType executorType
-    //    MsceMutateDbs.createRunHost spec
-    //let executor = MsceMutateExecutor.getExecutor executorType
+    let configType = MsceMutateSpecsRs.configType.Rand_Test
+    let executorType = sorterMutateExecutorType.GenStandard
+    let host: IRunHost = 
+        let spec = MsceMutateSpecsRs.getRunHostSpec configType executorType
+        MsceMutateDbs.createRunHost spec
+    let executor = MsceMutateExecutor.getExecutor executorType
 
 
     //********** MsceMutateSpecsRm **********
-    let configType = MsceMutateSpecsRm.configType.Rand_Test
-    let executorType = sorterMutateExecutorType.GenMerge
-    let host: IRunHost = 
-        let spec = MsceMutateSpecsRm.getRunHostSpec configType executorType
-        MsceMutateDbs.createRunHost spec
-    let executor = MsceMutateExecutor.getExecutor executorType
+    //let configType = MsceMutateSpecsRm.configType.Rand_Test
+    //let executorType = sorterMutateExecutorType.GenMerge
+    //let host: IRunHost = 
+    //    let spec = MsceMutateSpecsRm.getRunHostSpec configType executorType
+    //    MsceMutateDbs.createRunHost spec
+    //let executor = MsceMutateExecutor.getExecutor executorType
 
 
     //********** MssiMutateSpecsRs **********
