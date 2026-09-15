@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterMutate.Mssi
+﻿namespace GeneSort.Dispatch.V1.SorterMutate
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -191,7 +191,8 @@ module SorterMutateDbs =
 
 
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
-        [ (RandomStandard.Uniform.dbName, RandomStandard.Uniform.db :> IGeneSortDb);
+        [ 
+            (RandomStandard.Uniform.dbName, RandomStandard.Uniform.db :> IGeneSortDb);
             (RandomMerge.Uniform.dbName, RandomMerge.Uniform.db :> IGeneSortDb) ]
         |> Map.ofList
 

@@ -21,7 +21,7 @@ open GeneSort.Sorting.Sorter
 
 module SorterMutateExecutor =
 
-    let makeMutantSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
+    let makeMutantStandardSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
         asyncResult {
 
             let! (rngType: rngType) =  
@@ -219,7 +219,7 @@ module SorterMutateExecutor =
         asyncResult {
             try
                 do! checkCancellation cts.Token
-                let! collectTests = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests"
+                let collectTests = false |> UMX.tag<collectNewSortableTests>
                 // 1. Fetch mutant sorter models as a lazy stream sequence
                 log "Generating Mutant Sorter Models Stream..."
                 let! (allMutantStream: sorterModel seq) = makeMutantSorterModels rp
@@ -231,7 +231,6 @@ module SorterMutateExecutor =
                     |> Result.ofOption "Missing sorterEvalType."
 
                 do! checkCancellation cts.Token
-                log "Generating Sortable Tests..."
                 log "Generating Sortable Tests..."
                 let! tests, ces = makeSortableTests rp 
                 let prefixBlock = ces |> ceBlock.create (Guid.Empty |> UMX.tag) (tests |> SortableTests.getSortingWidth)
@@ -308,5 +307,43 @@ module SorterMutateExecutor =
 
 
 
+    let standardExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                _evaluateMutants 
+                    makeMutantStandardSorterModels
+                    SortableTestMakers.makeStandardTests
+                    host rp allowOverwrite cts progress }
+
+    let mergeExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                _evaluateMutants 
+                    makeMutantMergeSorterModels
+                    SortableTestMakers.makeMergeTests
+                    host rp allowOverwrite cts progress }
+
+    let mergeReportExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                Reporting.makeMutantReport
+                    Reporting.makeMergeMutantDetails
+                    host rp allowOverwrite cts progress }
+
+    let standardReportExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                Reporting.makeMutantReport
+                    Reporting.makeStandardMutantDetails
+                    host rp allowOverwrite cts progress }
+
+
+
+    let getExecutor (executorType: sorterMutateExecutorType) : IRunParamsExecutor =
+        match executorType with
+        | sorterMutateExecutorType.GenStandard -> standardExecutor
+        | sorterMutateExecutorType.GenMerge -> mergeExecutor
+        | sorterMutateExecutorType.MergeReport -> mergeReportExecutor
+        | sorterMutateExecutorType.StandardReport -> standardReportExecutor
 
 

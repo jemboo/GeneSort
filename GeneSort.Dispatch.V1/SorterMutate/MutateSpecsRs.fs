@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterMutate.Msce
+﻿namespace GeneSort.Dispatch.V1.SorterMutate
 
 open FSharp.UMX
 open GeneSort.Model.Sorting.V1
@@ -25,7 +25,6 @@ module MsceMutateSpecsRs =
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)
           .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
-          .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
           .WithSortableDataFormat(Some sortableDataFormat.BitVector512)
           .WithId (Some qp.Value.Id)
 
@@ -48,19 +47,18 @@ module MsceMutateSpecsRs =
     module Specs =
 
         let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
-            databaseName = MsceMutateDbs.RandomStandard.Uniform.dbName
+            databaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
             runName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for Msce"
             spans = [
                 msceModelType
                 rngTypeLcg
+                dataFomatBitv512
                 sorterEvalTypeV1
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_Scw
-                mutationRates
-                insertionRates
-                deletionRates
-                modificationRatesMsce
+                (mutatorSpansMsce 16<sortingWidth> rngType.Lcg)
+                modificationRate03
                 sortingWidth16
                 testChildCount
                 mutationMod1
@@ -72,53 +70,6 @@ module MsceMutateSpecsRs =
         }
 
 
-        let Rand_Small (executorType: sorterMutateExecutorType) : runHostSpec = {
-            databaseName = MsceMutateDbs.RandomStandard.Uniform.dbName
-            runName = sprintf @"Rand-Small_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for Msce"
-            spans = [
-                msceModelType
-                rngTypeLcg
-                sorterEvalTypeV1
-                sorterEvalSelectionType
-                sorterEvalMeasure_CestM_Scw
-                mutationRates
-                insertionRates
-                deletionRates
-                modificationRatesMsce
-                smallSortingWidths
-                extraLargeChildCount
-                mutationMod1
-            ]
-            filter = standardSorterModelTypeFilter
-            enhancer = standardEnhancer
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 8
-        }
-
-        let Rand_Medium (executorType: sorterMutateExecutorType) : runHostSpec = {
-            databaseName = MsceMutateDbs.RandomStandard.Uniform.dbName
-            runName = sprintf @"Rand-Medium_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for Msce"
-            spans = [
-                msceModelType
-                rngTypeLcg
-                sorterEvalTypeV1
-                sorterEvalSelectionType
-                sorterEvalMeasure_CestM_Scw
-                mutationRates
-                insertionRates
-                deletionRates
-                modificationRatesMsce
-                mediumSortingWidths
-                extraLargeChildCount
-                mutationMod1
-            ]
-            filter = standardSorterModelTypeFilter
-            enhancer = standardEnhancer
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 4
-        }
 
     type configType =
         | Rand_Test
@@ -128,8 +79,7 @@ module MsceMutateSpecsRs =
     let Configs = Map.ofList 
                     [ 
                         (configType.Rand_Test, Specs.Rand_Test); 
-                        (configType.Rand_Small, Specs.Rand_Small);
-                        (configType.Rand_Medium, Specs.Rand_Medium);
+
                     ]
 
     let getRunHostSpec (config: configType) (executorType: sorterMutateExecutorType) : runHostSpec =

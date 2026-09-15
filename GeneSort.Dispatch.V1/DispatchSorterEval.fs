@@ -1,5 +1,6 @@
 ﻿namespace GeneSort.Dispatch.V1
 open System
+open System.IO
 open FSharp.UMX
 open System.Threading
 open GeneSort.Dispatch.V1
@@ -9,12 +10,6 @@ open GeneSort.FileDb.V1
 open System.Runtime
 open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Dispatch.V1.SortableTest
-open System.IO
-open GeneSort.Dispatch.V1.SorterMutate
-open GeneSort.Dispatch.V1.SorterMutate.Msce
-open GeneSort.Dispatch.V1.SorterMutate.Mssi
-open GeneSort.Dispatch.V1.SorterMutate.Msrs
-open GeneSort.Dispatch.V1.SorterMutate.Msuf4
 open GeneSort.Core
 
 
@@ -62,20 +57,20 @@ module DispatchSorterEval =
 
 
     //********** SorterEval Merge **********
-    //let configType = SorterEvalSpecsRm.configType.Rand_MergeTest_Test
-    //let executorType = sorterEvalExecutorType.GenMerge
-    //let host: IRunHost = 
-    //    let spec = SorterEvalSpecsRm.getRunHostSpec configType executorType
-    //    SorterEvalDbs.createRunHost spec
+    let configType = SorterEvalSpecsRm.configType.Rand_MergeTest_Test
+    let executorType = sorterEvalExecutorType.GenMerge
+    let host: IRunHost = 
+        let spec = SorterEvalSpecsRm.getRunHostSpec configType executorType
+        SorterEvalDbs.createRunHost spec
 
 
 
     //********** SorterEval Prefix **********
-    let private configType = SorterEvalSpecsTestPrefix.configType.Prefix_24s
-    let private executorType = sorterEvalExecutorType.GenPrefix
-    let private host: IRunHost = 
-        let spec = SorterEvalSpecsTestPrefix.getRunHostSpec configType executorType
-        SorterEvalDbs.createRunHost spec
+    //let private configType = SorterEvalSpecsTestPrefix.configType.Prefix_24s
+    //let private executorType = sorterEvalExecutorType.GenPrefix
+    //let private host: IRunHost = 
+    //    let spec = SorterEvalSpecsTestPrefix.getRunHostSpec configType executorType
+    //    SorterEvalDbs.createRunHost spec
 
 
     let private executor = SorterEvalExecutor.getExecutor executorType

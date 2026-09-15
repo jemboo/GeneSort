@@ -63,7 +63,7 @@ module SorterEvalSpecsRm =
                 rngTypeLcg
                 mergeLib_Merge32s
                 dataFormatInt8v512
-                msuf4ModelType
+                allSimpleSorterModelTypes
                 noSuffixSuffixType
                 sorterEvalTypeV2
                 smallSorterCount

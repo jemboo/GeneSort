@@ -11,10 +11,6 @@ open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Dispatch.V1.SortableTest
 open System.IO
 open GeneSort.Dispatch.V1.SorterMutate
-open GeneSort.Dispatch.V1.SorterMutate.Msce
-open GeneSort.Dispatch.V1.SorterMutate.Mssi
-open GeneSort.Dispatch.V1.SorterMutate.Msrs
-open GeneSort.Dispatch.V1.SorterMutate.Msuf4
 
 
 
@@ -57,22 +53,24 @@ module DispatchSorterMutate =
 
 
 
+
     //********** MsceMutateSpecsRs **********
-    let configType = MsceMutateSpecsRs.configType.Rand_Test
-    let executorType = sorterMutateExecutorType.GenStandard
-    let host: IRunHost = 
-        let spec = MsceMutateSpecsRs.getRunHostSpec configType executorType
-        MsceMutateDbs.createRunHost spec
-    let executor = MsceMutateExecutor.getExecutor executorType
+    //let configType = MsceMutateSpecsRs.configType.Rand_Test
+    //let executorType = sorterMutateExecutorType.GenStandard
+    //let host: IRunHost = 
+    //    let spec = MsceMutateSpecsRs.getRunHostSpec configType executorType
+    //    SorterMutateDbs.createRunHost spec
+    //let executor = MsceMutateExecutor.getExecutor executorType
+
 
 
     //********** MsceMutateSpecsRm **********
-    //let configType = MsceMutateSpecsRm.configType.Rand_Test
-    //let executorType = sorterMutateExecutorType.GenMerge
-    //let host: IRunHost = 
-    //    let spec = MsceMutateSpecsRm.getRunHostSpec configType executorType
-    //    MsceMutateDbs.createRunHost spec
-    //let executor = MsceMutateExecutor.getExecutor executorType
+    let configType = MsceMutateSpecsRm.configType.Test_Msuf4
+    let executorType = sorterMutateExecutorType.GenMerge
+    let host: IRunHost = 
+        let spec = MsceMutateSpecsRm.getRunHostSpec configType executorType
+        SorterMutateDbs.createRunHost spec
+    let executor = SorterMutateExecutor.getExecutor executorType
 
 
     //********** MssiMutateSpecsRs **********
