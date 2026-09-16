@@ -136,6 +136,108 @@ module Reporting =
 
 
 
+
+
+    let makeStandardMutantDetails (rp:runParameters) : 
+            Async<Result<
+                        sorterSelection * 
+                        Map<Guid<sorterModelId>, Guid<sorterModelId>>, 
+                        string>> =
+        asyncResult {
+
+            let! (rngType: rngType) =  
+                        rp.GetRngType()
+                        |> Result.ofOption "Missing RNG type in run parameters"
+
+            let! (sortingWidth: int<sortingWidth>) = 
+                        rp.GetSortingWidth() 
+                        |> Result.ofOption "Missing sorting width in run parameters"
+    
+            let! (simpleSorterModelType: simpleSorterModelType) = 
+                        rp.GetSimpleSorterModelType() 
+                        |> Result.ofOption "Missing simple sorter model type in run parameters"
+
+            let! (sorterChildCount: int<sorterChildCount>) = 
+                        rp.GetSorterChildCount()
+                        |> Result.ofOption "Missing parent sorterChildCount in run parameters"
+
+            let! (mutationRate: float<mutationRate>) =  
+                        rp.GetMutationRate()
+                        |> Result.ofOption "Missing mutationRate in run parameters"
+
+            let! (insertionRate: float<insertionRate>) =  
+                        rp.GetInsertionRate()
+                        |> Result.ofOption "Missing insertionRate in run parameters"
+
+            let! (deletionRate: float<deletionRate>) =  
+                        rp.GetDeletionRate()
+                        |> Result.ofOption "Missing deletionRate in run parameters"
+
+            let! (modificationRate: float<modificationRate>) =  
+                        rp.GetModificationRate()
+                        |> Result.ofOption "Missing modificationRate in run parameters"
+
+            let! (sest: sorterSelectionType) = 
+                        rp.GetSeedSorterPoolSelectionType()
+                        |> Result.ofOption "Missing sorterEvalSelectionType in run parameters"
+
+            let! (sem:sorterEvalMeasure) = 
+                        rp.GetSorterEvalMeasure()
+                        |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
+
+            let! (mutationMod: int<mutationMod>) = 
+                        rp.GetMutationMod() 
+                        |> Result.ofOption "Missing mutationMod in run parameters"
+
+            let! (excludeSelfCe: bool<excludeSelfCe>) = 
+                        rp.GetExcludeSelfCe() 
+                        |> Result.ofOption "Missing excludeSelfCe in run parameters"
+
+            let! (parentSorterSetEval: sorterSetEval) =
+                        SorterEvalDbs.getStandardSorterEvals 
+                                            sortingWidth 
+                                            simpleSorterModelType
+                                            sorterEvalType.V2
+
+            let _sorterEvalSelection = 
+                            SorterSelection.makeSelection sem sest
+                                        parentSorterSetEval.SorterEvals
+                                        parentSorterSetEval.SorterTestId
+
+            let (parentSorterModelGen: sorterModelGen) = 
+                CommonSorterEval.getSimpleUniformSorterModelGen 
+                                        rngType 
+                                        sortingWidth 
+                                        simpleSorterModelType
+                                        excludeSelfCe
+
+            let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
+                                            (Guid.Empty |> UMX.tag)
+                                            parentSorterModelGen
+
+            let simpleSorterModels = parentSorterModelSet.SorterModels |> Array.map (SorterModel.asSimpleSorterModel)
+
+            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
+                                            (rngType |> RngFactory.create)
+                                            excludeSelfCe
+                                            modificationRate
+                                            mutationRate
+                                            insertionRate
+                                            deletionRate
+
+            let parentMutantMap = 
+                    SimpleSorterModelMutator.makeMutantIdToParentIdMap
+                                        sorterModelMutator
+                                        simpleSorterModels
+                                        %sorterChildCount
+                                        mutationMod
+
+            return (_sorterEvalSelection, parentMutantMap)
+        }
+
+
+
+
     let makeMergeMutantDetails (rp:runParameters) : 
             Async<Result<
                         sorterSelection * 
@@ -146,6 +248,10 @@ module Reporting =
             let! (rngType: rngType) =  
                         rp.GetRngType()
                         |> Result.ofOption "Missing RNG type in run parameters"
+
+            let! repl =
+                   rp.GetRepl()
+                   |> Result.ofOption "Missing Repl"
 
             let! (mrgLibId: mergeLibId) = 
                         rp.GetMergeLibId() 
@@ -206,7 +312,8 @@ module Reporting =
 
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getMergeSorterEvals 
-                                            mrgLibId 
+                                            mrgLibId
+                                            repl
                                             simpleSorterModelType
 
             let (_sorterEvalSelection: sorterSelection) = 
@@ -246,8 +353,7 @@ module Reporting =
         }
 
 
-
-    let makeStandardMutantDetails (rp:runParameters) : 
+    let makePrefixMutantDetails (rp:runParameters) : 
             Async<Result<
                         sorterSelection * 
                         Map<Guid<sorterModelId>, Guid<sorterModelId>>, 

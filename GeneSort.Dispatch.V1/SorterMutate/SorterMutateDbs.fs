@@ -143,7 +143,7 @@ module SorterMutateDbs =
                         (repl: int<replNumber>)
                         (outputDataType: outputDataType)
                         (rng: rngType)
-                        (strSel:sorterSelectionType)
+                        (strSel: sorterSelectionType)
                         (sem:sorterEvalMeasure)
                         (pfxLibId: prefixLibId)
                         (smplSmt: simpleSorterModelType)
@@ -193,7 +193,9 @@ module SorterMutateDbs =
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
         [ 
             (RandomStandard.Uniform.dbName, RandomStandard.Uniform.db :> IGeneSortDb);
-            (RandomMerge.Uniform.dbName, RandomMerge.Uniform.db :> IGeneSortDb) ]
+            (RandomMerge.Uniform.dbName, RandomMerge.Uniform.db :> IGeneSortDb) 
+            (RandomPrefix.Uniform.dbName, RandomPrefix.Uniform.db :> IGeneSortDb) 
+        ]
         |> Map.ofList
 
 

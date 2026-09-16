@@ -183,11 +183,12 @@ module SorterEvalDbs =
 
     let getMergeSorterEvals
                     (mrgLibId: mergeLibId)
+                    (repl: int<replNumber>)
                     (simpleSorterModelType: simpleSorterModelType)
                             : Async<Result<sorterSetEval, string>> =
 
         let qp = Merge.makeQueryParams 
-                        (0 |> UMX.tag<replNumber>) 
+                        repl 
                         _rngTypeLcg
                         mrgLibId
                         simpleSorterModelType
@@ -205,7 +206,6 @@ module SorterEvalDbs =
                     (pfxLibId: prefixLibId)
                     (repl: int<replNumber>)
                     (simpleSorterModelType: simpleSorterModelType)
-                    (sorterEvalType: sorterEvalType)
                             : Async<Result<sorterSetEval, string>> =
 
         let qp = Prefix.makeQueryParams 
@@ -214,7 +214,7 @@ module SorterEvalDbs =
                         pfxLibId 
                         simpleSorterModelType
                         sortableDataFormat.BitVector512
-                        sorterEvalType
+                        sorterEvalType.V2
                         (outputDataType.SorterSetEval "")
         async {
              let! result = (Prefix.db :> IGeneSortDb).loadAsync qp

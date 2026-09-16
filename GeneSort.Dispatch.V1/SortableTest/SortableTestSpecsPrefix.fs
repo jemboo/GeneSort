@@ -11,6 +11,8 @@ module SortableTestSpecsPrefix =
     let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
         let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
         rp.WithRunFinished(Some false)
+          .WithRunName(Some host.Run.RunName)
+          .WithRunFinished(Some false)
           .WithId (Some qp.Value.Id)
 
 
@@ -18,7 +20,7 @@ module SortableTestSpecsPrefix =
 
         let Prefix_24s  (executorType: sortableTestExecutorType) : runHostSpec = {
             databaseName = SortableTestDbs.Prefix.dbName
-            runName = sprintf @"Prefix-Test_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Prefix-24s_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Bitv512 prefix sorter test sets"
             spans = [
                 dataFomatBitv512
@@ -32,7 +34,7 @@ module SortableTestSpecsPrefix =
 
         let Prefix_32  (executorType: sortableTestExecutorType) : runHostSpec = {
             databaseName = SortableTestDbs.Prefix.dbName
-            runName = sprintf @"Prefix-Test_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Prefix-32_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Bitv512 prefix sorter test sets"
             spans = [
                 dataFomatBitv512

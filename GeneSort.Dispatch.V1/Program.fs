@@ -7,7 +7,7 @@ open GeneSort.Dispatch.V1
 
 let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
-
+//DispatchSortableTest.makeParamsAndRun()
 //DispatchSorterEval.makeParamsAndRun()
 DispatchSorterMutate.makeParamsAndRun()
 

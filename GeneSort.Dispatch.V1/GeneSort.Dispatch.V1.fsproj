@@ -40,8 +40,9 @@
     <Compile Include="SorterEval\SorterEvalSpecsTestPrefix.fs" />
     <Compile Include="SorterMutate\CommonSorterMutate.fs" />
     <Compile Include="SorterMutate\SorterMutateDbs.fs" />
-    <Compile Include="SorterMutate\MutateSpecsRm.fs" />
     <Compile Include="SorterMutate\MutateSpecsRs.fs" />
+    <Compile Include="SorterMutate\MutateSpecsRm.fs" />
+    <Compile Include="SorterMutate\MutateSpecsRp.fs" />
     <Compile Include="SorterMutate\Reporting.fs" />
     <Compile Include="SorterMutate\SorterMutateExecutor.fs" />
     <Compile Include="SorterSgd\Utils.fs" />

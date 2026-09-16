@@ -98,6 +98,10 @@ module PoolSetMakers =
             (rp:runParameters) : Async<Result<sorterPoolSet, string>> =
         asyncResult {
 
+            let! repl =
+                   rp.GetRepl()
+                   |> Result.ofOption "Missing Repl"
+
             let! (mrgLibid: mergeLibId) = 
                         rp.GetMergeLibId() 
                         |> Result.ofOption "Missing merge library ID in run parameters"
@@ -135,8 +139,9 @@ module PoolSetMakers =
                     |> Result.ofOption "Missing excludeSelfCe"
             
             let! (parentSorterSetEval: sorterSetEval) = 
-                SorterEvalDbs.getMergeSorterEvals 
-                    mrgLibid 
+                SorterEvalDbs.getMergeSorterEvals
+                    mrgLibid
+                    repl
                     simpleSorterModelType
 
             let seedSorterModelGen = 
@@ -222,7 +227,6 @@ module PoolSetMakers =
                     pfxLibId
                     repl
                     simpleSorterModelType
-                    sorterEvalType.V2
 
             let seedSorterModelGen = 
                 CommonSorterEval.getSimpleUniformSorterModelGen 
