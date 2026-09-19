@@ -9,7 +9,8 @@ let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 //DispatchSortableTest.makeParamsAndRun()
 //DispatchSorterEval.makeParamsAndRun()
-DispatchSorterMutate.makeParamsAndRun()
+//DispatchSorterMutate.makeParamsAndRun()
+DispatchSorterSgd.makeParamsAndRun()
 
 let duration = DateTime.Now - startTime
 Thread.Sleep(100)

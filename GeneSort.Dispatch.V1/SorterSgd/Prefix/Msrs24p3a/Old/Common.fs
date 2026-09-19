@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a
+﻿namespace GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.Old
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -12,7 +12,7 @@ open GeneSort.SortingLib.Sorter
 module Common =
 
     let projName = "SorterSgd.Prfefix.Msrs24p3a" |> UMX.tag<projectName>
-    let seedSorterCount = 64
+    let seedSorterCount = 5000
 
     let standardPoolSzParams (rp:runParameters) =
         let sorterEvalSelectionType = sorterSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)

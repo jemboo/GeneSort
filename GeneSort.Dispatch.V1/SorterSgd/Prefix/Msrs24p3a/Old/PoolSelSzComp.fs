@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a
+﻿namespace GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.Old
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -9,7 +9,7 @@ open GeneSort.Db.V1
 open GeneSort.FileDb.V1
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.Common
+open GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.Old.Common
 open GeneSort.Dispatch.V1.SorterSgd
 
 

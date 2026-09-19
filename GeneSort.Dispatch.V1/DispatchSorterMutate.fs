@@ -55,12 +55,12 @@ module DispatchSorterMutate =
 
 
     //********** MsceMutateSpecsRs **********
-    //let configType = MsceMutateSpecsRs.configType.Rand_Test
-    //let executorType = sorterMutateExecutorType.GenStandard
-    //let host: IRunHost = 
-    //    let spec = MsceMutateSpecsRs.getRunHostSpec configType executorType
-    //    SorterMutateDbs.createRunHost spec
-    //let executor = MsceMutateExecutor.getExecutor executorType
+    let configType = MsceMutateSpecsRs.configType.Rand_Test
+    let executorType = sorterMutateExecutorType.GenStandard
+    let host: IRunHost = 
+        let spec = MsceMutateSpecsRs.getRunHostSpec configType executorType
+        SorterMutateDbs.createRunHost spec
+    let executor = SorterMutateExecutor.getExecutor executorType
 
 
 
@@ -74,12 +74,12 @@ module DispatchSorterMutate =
 
 
     //********** MsceMutateSpecsRp **********
-    let configType = MsceMutateSpecsRp.configType.Test_Msuf4
-    let executorType = sorterMutateExecutorType.GenPrefix
-    let host: IRunHost = 
-        let spec = MsceMutateSpecsRp.getRunHostSpec configType executorType
-        SorterMutateDbs.createRunHost spec
-    let executor = SorterMutateExecutor.getExecutor executorType
+    //let configType = MsceMutateSpecsRp.configType.Test_Msuf4
+    //let executorType = sorterMutateExecutorType.GenPrefix
+    //let host: IRunHost = 
+    //    let spec = MsceMutateSpecsRp.getRunHostSpec configType executorType
+    //    SorterMutateDbs.createRunHost spec
+    //let executor = SorterMutateExecutor.getExecutor executorType
 
 
 

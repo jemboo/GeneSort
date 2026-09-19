@@ -288,12 +288,12 @@ module MutatorParams =
 
     let msrsParamsRL (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
         simpleMutatorParams.create width rng (Msrs (true |> UMX.tag, 
-                                                    3.5 |> UMX.tag<orthoRate>, 
-                                                    0.4 |> UMX.tag<paraRate>, 
-                                                    2.01 |> UMX.tag<selfSymRate>))
+                                                    1.0 |> UMX.tag<orthoRate>, 
+                                                    1.0 |> UMX.tag<paraRate>, 
+                                                    1.0 |> UMX.tag<selfSymRate>))
         |> SimpleMutatorParams
 
-    let msrsParamsRC (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
+    let msrsParamsRM (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
         simpleMutatorParams.create width rng (Msrs (true |> UMX.tag, 
                                                     4.01 |> UMX.tag<orthoRate>, 
                                                     0.4 |> UMX.tag<paraRate>, 
@@ -302,9 +302,9 @@ module MutatorParams =
 
     let msrsParamsRH (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
         simpleMutatorParams.create width rng (Msrs (true |> UMX.tag, 
-                                                    4.5 |> UMX.tag<orthoRate>, 
-                                                    0.4 |> UMX.tag<paraRate>, 
-                                                    2.01 |> UMX.tag<selfSymRate>))
+                                                    6.5 |> UMX.tag<orthoRate>, 
+                                                    0.3 |> UMX.tag<paraRate>, 
+                                                    1.5 |> UMX.tag<selfSymRate>))
         |> SimpleMutatorParams
 
 

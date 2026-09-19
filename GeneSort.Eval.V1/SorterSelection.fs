@@ -94,14 +94,14 @@ type sorterSelection =
 
     member this.MakeSorterModelSet 
                     (sorterModelSetId: Guid<sorterModelSetId>) 
-                    (smg: sorterModelGen) : sorterModelSet =
+                    (sorterModGen: sorterModelGen) : sorterModelSet =
             let sorterModelIds = 
                 this.labeledSorterEvals 
                 |> Array.map(fun (_, se) -> 
                     se |> SorterEval.getSorterId |> UMX.untag |> UMX.tag<sorterModelId>)
 
-            let sorterModels = smg |> SorterModelGen.makeSorterModelsFromIds sorterModelIds
-            sorterModelSet.create sorterModelSetId sorterModels (smg |> SorterModelGen.getCeLength)
+            let sorterModels = sorterModGen |> SorterModelGen.makeSorterModelsFromIds sorterModelIds
+            sorterModelSet.create sorterModelSetId sorterModels (sorterModGen |> SorterModelGen.getCeLength)
 
 
 module SorterSelection =

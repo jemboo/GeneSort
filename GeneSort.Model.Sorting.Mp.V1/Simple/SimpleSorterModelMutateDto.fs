@@ -1,12 +1,12 @@
 ﻿
-namespace GeneSort.Model.Mp.Sorting.Mp.V1.Simple
+namespace GeneSort.Model.Sorting.Mp.V1.Simple
 
 open GeneSort.Model.Sorting.Simple.V1
-open GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Ce
-open GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Si
-open GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Rs
-open GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Uf4
-open GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Uf6
+open GeneSort.Model.Sorting.Mp.V1.Simple.Ce
+open GeneSort.Model.Sorting.Mp.V1.Simple.Si
+open GeneSort.Model.Sorting.Mp.V1.Simple.Rs
+open GeneSort.Model.Sorting.Mp.V1.Simple.Uf4
+open GeneSort.Model.Sorting.Mp.V1.Simple.Uf6
 
 type simpleSorterModelMutateDto =
     | MsceRandMutate of msceRandMutateDto

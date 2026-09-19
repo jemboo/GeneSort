@@ -1,7 +1,7 @@
-﻿namespace GeneSort.Model.Mp.Sorting.Mp.V1
+﻿namespace GeneSort.Model.Sorting.Mp.V1
 
 open GeneSort.Model.Sorting.V1
-open GeneSort.Model.Mp.Sorting.Mp.V1.Simple
+open GeneSort.Model.Sorting.Mp.V1.Simple
 
 type UnknownDto = UnknownDto
 

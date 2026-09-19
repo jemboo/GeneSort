@@ -5,7 +5,7 @@ open MessagePack
 open FSharp.UMX
 open GeneSort.SortingOps.Mp
 open GeneSort.Eval.V1
-open GeneSort.Model.Mp.Sorting.Mp.V1
+open GeneSort.Model.Sorting.Mp.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1

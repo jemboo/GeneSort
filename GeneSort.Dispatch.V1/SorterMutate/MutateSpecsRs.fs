@@ -49,16 +49,16 @@ module MsceMutateSpecsRs =
         let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
             databaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
             runName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for Msce"
+            runDescription = "Mutation analysis for Msrs"
             spans = [
-                msceModelType
+                msrsModelType
                 rngTypeLcg
                 dataFomatBitv512
                 sorterEvalTypeV1
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_Scw
-                (mutatorSpansMsce 16<sortingWidth> rngType.Lcg)
-                modificationRate03
+                (mutatorSpansMsrs 16<sortingWidth> rngType.Lcg)
+                modificationRate90
                 sortingWidth16
                 testChildCount
                 mutationMod1

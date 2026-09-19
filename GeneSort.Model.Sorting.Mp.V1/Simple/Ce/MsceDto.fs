@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Mp.Sorting.Mp.V1.Simple.Ce
+﻿namespace GeneSort.Model.Sorting.Mp.V1.Simple.Ce
 
 open System
 open FSharp.UMX

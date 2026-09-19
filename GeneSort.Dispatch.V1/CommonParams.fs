@@ -223,7 +223,7 @@ module CommonParams =
             (runParameters.mutatorParamsKey, 
                 [   
                     MutatorParams.msrsParamsRL srtingWdth rType
-                    //MutatorParams.msrsParamsRC srtingWdth rType
+                    //MutatorParams.msrsParamsRM srtingWdth rType
                     //MutatorParams.msrsParamsRH srtingWdth rType
                 ] 
             |> List.map MutatorParams.toString)
@@ -291,6 +291,9 @@ module CommonParams =
             
     let modificationRate03 =
             (runParameters.modificationRateKey, [ 0.03; ] |> List.map string)
+
+    let modificationRate90 =
+            (runParameters.modificationRateKey, [ 0.90; ] |> List.map string)
 
 
     let modificationRatesMsce =

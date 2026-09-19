@@ -118,11 +118,12 @@ module OpsActionRates =
         (selfSymMutator: permRs -> permRs) 
         (floatPicker: unit -> float) 
         (arrayToMutate: permRs[]) : permRs[] = 
-        
-        arrayToMutate |> Array.map (fun prs ->
-            match rates.PickMode floatPicker with
-            | opsActionMode.Ortho    -> orthoMutator prs
-            | opsActionMode.Para     -> paraMutator prs
-            | opsActionMode.SelfRefl -> selfSymMutator prs
-            | opsActionMode.NoAction -> prs
+
+        arrayToMutate |> Array.map (fun rsPerm ->
+            let mode = rates.PickMode floatPicker
+            match mode with
+            | opsActionMode.Ortho    -> orthoMutator rsPerm
+            | opsActionMode.Para     -> paraMutator rsPerm
+            | opsActionMode.SelfRefl -> selfSymMutator rsPerm
+            | opsActionMode.NoAction -> rsPerm
         )

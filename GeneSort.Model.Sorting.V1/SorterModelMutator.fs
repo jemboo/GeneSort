@@ -24,7 +24,7 @@ module SorterModelMutator =
                     (modd: int<mutationMod>) : sorterModel =
 
         match (sorterModelMutator, parentModel) with
-        | (Simple ssm, sorterModel.Simple parent) -> 
+        | (sorterModelMutator.Simple ssm, sorterModel.Simple parent) -> 
                     SimpleSorterModelMutator.makeMutantSorterModelFromIndexAndMod 
                         ssm parent index modd
                     |> sorterModel.Simple
