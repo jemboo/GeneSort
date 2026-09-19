@@ -6,9 +6,8 @@ open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 
-[<MessagePackObject>]
 type uf4GenRatesArrayDto =
-    { [<Key(0)>] uf4GenRatesDtos: uf4GenRatesDto array }
+    { uf4GenRatesDtos: uf4GenRatesDto array }
 
 module Uf4GenRatesArrayDto =
 

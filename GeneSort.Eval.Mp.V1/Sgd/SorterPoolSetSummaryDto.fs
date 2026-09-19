@@ -12,32 +12,29 @@ open GeneSort.Core
 // Lightweight Summary Snapshot DTOs
 // ---------------------------------------------------------------------
 
-[<MessagePackObject>]
 type sorterPoolSummaryDto = {
-    [<Key(0)>] sorterPoolId: Guid
-    [<Key(1)>] sorterPoolName: string
-    [<Key(2)>] aveCeLength: float
-    [<Key(3)>] minCeLength: int
-    [<Key(4)>] minStageLength: int
-    [<Key(5)>] aveStageLength: float
-    [<Key(6)>] aveStageCrossings: float
-    [<Key(7)>] rawCeLength: int
-    [<Key(8)>] stdDevCeLength: float
-    [<Key(9)>] stdDevStageLength: float
+    sorterPoolId: Guid
+    sorterPoolName: string
+    aveCeLength: float
+    minCeLength: int
+    minStageLength: int
+    aveStageLength: float
+    aveStageCrossings: float
+    rawCeLength: int
+    stdDevCeLength: float
+    stdDevStageLength: float
 }
 
-[<MessagePackObject>]
 type sorterPoolSetSummaryDto = {
-    [<Key(0)>] sorterPoolSetId: Guid
-    [<Key(1)>] generationNumber: int
-    [<Key(2)>] sorterPoolSummaryDtos: sorterPoolSummaryDto array
+    sorterPoolSetId: Guid
+    generationNumber: int
+    sorterPoolSummaryDtos: sorterPoolSummaryDto array
 }
 
-[<MessagePackObject>]
 type sorterPoolSetSummarySetDto = {
-    [<Key(0)>] sorterPoolSetSummarySetId: Guid
-    [<Key(1)>] lastGeneration: int
-    [<Key(2)>] sorterPoolSetSummaryDtos: sorterPoolSetSummaryDto array
+    sorterPoolSetSummarySetId: Guid
+    lastGeneration: int
+    sorterPoolSetSummaryDtos: sorterPoolSetSummaryDto array
 }
 
 // ---------------------------------------------------------------------
@@ -90,7 +87,6 @@ module SorterPoolSetSummaryDto =
             UMX.tag dto.generationNumber, 
             poolSummaryDomains
         )
-
 
 module SorterPoolSetSummarySetDto =
 

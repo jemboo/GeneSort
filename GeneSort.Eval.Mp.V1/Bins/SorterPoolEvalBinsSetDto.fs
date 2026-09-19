@@ -6,17 +6,15 @@ open FSharp.UMX
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.Mp.V1.Bins
 
-
 // ---------------------------------------------------------------------
 // 1. DTO Definition
 // ---------------------------------------------------------------------
 
-[<MessagePackObject>]
 type sorterPoolEvalBinsSetDto = {
-    [<Key(0)>] SorterPoolEvalBinsSetId: Guid
-    [<Key(1)>] SorterPoolSetId: Guid
-    [<Key(2)>] GenerationNumber: int
-    [<Key(3)>] SorterPoolEvalBins: sorterPoolEvalBinsDto array
+    SorterPoolEvalBinsSetId: Guid
+    SorterPoolSetId: Guid
+    GenerationNumber: int
+    SorterPoolEvalBins: sorterPoolEvalBinsDto array
 }
 
 // ---------------------------------------------------------------------

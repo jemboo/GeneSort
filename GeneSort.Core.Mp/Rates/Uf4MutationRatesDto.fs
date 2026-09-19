@@ -7,11 +7,10 @@ open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 
-[<MessagePackObject>]
 type uf4MutationRatesDto =
-    { [<Key(0)>] order: int
-      [<Key(1)>] seedOpsTransitionRates: opsTransitionRatesDto
-      [<Key(2)>] twoOrbitPairOpsTransitionRates: opsTransitionRatesArrayDto }
+    { order: int
+      seedOpsTransitionRates: opsTransitionRatesDto
+      twoOrbitPairOpsTransitionRates: opsTransitionRatesArrayDto }
 
 module Uf4MutationRatesDto =
 
@@ -29,7 +28,7 @@ module Uf4MutationRatesDto =
                 failwith $"Order must be at least 4 and divisible by 4, got {dto.order}"
             if dto.twoOrbitPairOpsTransitionRates.opsTransitionRatesDtos.Length <> MathUtils.exactLog2 (dto.order / 4) && 
                         dto.order <> 4 then
-                failwith $"TwoOrbitPairOpsTransitionRates length ({dto.twoOrbitPairOpsTransitionRates.opsTransitionRatesDtos.Length}) 
+                failwith $"TwoOrbitPairOpsTransitionRates length ({dto.twoOrbitPairOpsTransitionRates.opsTransitionRatesDtos.Length})                             
                             must match log2(order/4) ({MathUtils.exactLog2 (dto.order / 4)})"
 
             uf4MutationRates.create dto.order

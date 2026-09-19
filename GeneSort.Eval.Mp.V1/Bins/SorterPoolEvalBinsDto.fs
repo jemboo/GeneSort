@@ -10,11 +10,10 @@ open GeneSort.Eval.Mp.V1.Bins
 // 1. DTO Definition
 // ---------------------------------------------------------------------
 
-[<MessagePackObject>]
 type sorterPoolEvalBinsDto = {
-    [<Key(0)>] SorterPoolEvalBinsId: Guid
-    [<Key(1)>] SorterPoolId: Guid
-    [<Key(2)>] SorterEvalBins: sorterEvalBinDto array
+    SorterPoolEvalBinsId: Guid
+    SorterPoolId: Guid
+    SorterEvalBins: sorterEvalBinDto array
 }
 
 // ---------------------------------------------------------------------

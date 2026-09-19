@@ -6,9 +6,8 @@ open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 
-[<MessagePackObject>]
 type uf6MutationRatesArrayDto =
-    { [<Key(0)>] Rates: uf6MutationRatesDto array }
+    { Rates: uf6MutationRatesDto array }
 
 module Uf6MutationRatesArrayDto =
 

@@ -1,14 +1,10 @@
 ﻿namespace GeneSort.Core.Mp.RatesAndOps
-open MessagePack
+
 open GeneSort.Core
 
-[<MessagePackObject>]
 type opsTransitionRatesDto = {
-    [<Key(0)>]
     orthoRates: opsActionRatesDto
-    [<Key(1)>]
     paraRates: opsActionRatesDto
-    [<Key(2)>]
     selfReflRates: opsActionRatesDto
 }
 

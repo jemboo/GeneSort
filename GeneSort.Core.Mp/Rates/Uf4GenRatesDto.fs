@@ -1,5 +1,4 @@
-﻿
-namespace GeneSort.Core.Mp.RatesAndOps
+﻿namespace GeneSort.Core.Mp.RatesAndOps
 
 open System
 open GeneSort.Core
@@ -7,11 +6,10 @@ open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 
-[<MessagePackObject>]
 type uf4GenRatesDto =
-    { [<Key(0)>] order: int
-      [<Key(1)>] seedOpsGenRatesDto: opsGenRatesDto
-      [<Key(2)>] opsGenRatesArrayDtos: opsGenRatesArrayDto }
+    { order: int
+      seedOpsGenRatesDto: opsGenRatesDto
+      opsGenRatesArrayDtos: opsGenRatesArrayDto }
 
 module Uf4GenRatesDto =
 

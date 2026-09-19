@@ -1,5 +1,4 @@
-﻿
-namespace GeneSort.Model.Mp.Sorter.Uf6
+﻿namespace GeneSort.Model.Mp.Sorter.Uf6
 
 open GeneSort.Core
 open MessagePack
@@ -7,9 +6,8 @@ open MessagePack.Resolvers
 open MessagePack.FSharp
 open GeneSort.Core.Mp.RatesAndOps
 
-[<MessagePackObject>]
 type uf6GenRatesArrayDto =
-    { [<Key(0)>] uf6GenRatesDtos: uf6GenRatesDto array }
+    { uf6GenRatesDtos: uf6GenRatesDto array }
 
 module Uf6GenRatesArrayDto =
 

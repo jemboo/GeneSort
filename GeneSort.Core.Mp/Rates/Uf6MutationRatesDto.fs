@@ -7,11 +7,10 @@ open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 
-[<MessagePackObject>]
 type uf6MutationRatesDto =
-    { [<Key(0)>] order: int
-      [<Key(1)>] seed6TransitionRates: Seed6TransitionRatesDto
-      [<Key(2)>] opsTransitionRates: opsTransitionRatesArrayDto }
+    { order: int
+      seed6TransitionRates: Seed6TransitionRatesDto
+      opsTransitionRates: opsTransitionRatesArrayDto }
 
 module Uf6MutationRatesDto =
 

@@ -1,22 +1,14 @@
 ﻿namespace GeneSort.Core.Mp.RatesAndOps
-open MessagePack
+
 open GeneSort.Core
 
-[<MessagePackObject>]
 type Seed6TransitionRatesDto = {
-    [<Key(0)>]
     ortho1Rates: Seed6ActionRatesDto
-    [<Key(1)>]
     ortho2Rates: Seed6ActionRatesDto
-    [<Key(2)>]
     para1Rates: Seed6ActionRatesDto
-    [<Key(3)>]
     para2Rates: Seed6ActionRatesDto
-    [<Key(4)>]
     para3Rates: Seed6ActionRatesDto
-    [<Key(5)>]
     para4Rates: Seed6ActionRatesDto
-    [<Key(6)>]
     selfReflRates: Seed6ActionRatesDto
 }
 

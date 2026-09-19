@@ -1,11 +1,8 @@
 ﻿namespace GeneSort.Core.Mp.RatesAndOps
 
-open MessagePack
 open GeneSort.Core
 
-[<MessagePackObject>]
 type opActionRatesArrayDto = {
-    [<Key(0)>]
     opActionRatesDtos: opActionRatesDto array
 }
 

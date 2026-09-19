@@ -3,7 +3,9 @@
 open System
 open System.Threading
 open GeneSort.Dispatch.V1
+open GeneSort.Core.Mp
 
+MessagePackSetup.configure ()
 
 let startTime = DateTime.Now
 printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"

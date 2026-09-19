@@ -11,24 +11,23 @@ open GeneSort.Eval.V1.Sgd
 // sorterPoolMemberHistoryDto
 // ----------------------------------------------------------------------------
 
-[<MessagePackObject>]
 type sorterPoolMemberHistoryDto = {
-    [<Key(0)>] SorterPoolId: Guid
-    [<Key(1)>] SorterPoolMemberId: Guid
-    [<Key(2)>] SorterModelId: Guid
-    [<Key(3)>] Birthday: int
-    [<Key(4)>] SaveGeneration: int
-    [<Key(5)>] MutationIndex: int
-    [<Key(6)>] MutationMod: int
+    SorterPoolId: Guid
+    SorterPoolMemberId: Guid
+    SorterModelId: Guid
+    Birthday: int
+    SaveGeneration: int
+    MutationIndex: int
+    MutationMod: int
     
     // Lineage Details
-    [<Key(7)>] ParentSorterPoolMemberId: Nullable<Guid>
-    [<Key(8)>] ParentSorterPoolId: Nullable<Guid>
-    [<Key(9)>] MutatorId: Nullable<Guid>
-    [<Key(10)>] ParentMutationIndex: Nullable<int>
+    ParentSorterPoolMemberId: Nullable<Guid>
+    ParentSorterPoolId: Nullable<Guid>
+    MutatorId: Nullable<Guid>
+    ParentMutationIndex: Nullable<int>
     
     // Evaluation at V2 level
-    [<Key(11)>] EvalV2: sorterEvalV2Dto option
+    EvalV2: sorterEvalV2Dto option
 }
 
 module SorterPoolMemberHistoryDto =
@@ -94,15 +93,14 @@ module SorterPoolMemberHistoryDto =
             (dto.ParentMutationIndex |> Option.ofNullable |> Option.map UMX.tag)
             v2Domain
 
-
 // ----------------------------------------------------------------------------
 // sorterPoolHistoryDto
 // ----------------------------------------------------------------------------
-[<MessagePackObject>]
+
 type sorterPoolHistoryDto = {
-    [<Key(0)>] SorterPoolId: Guid
-    [<Key(1)>] SaveGeneration: int
-    [<Key(2)>] MemberHistories: sorterPoolMemberHistoryDto list
+    SorterPoolId: Guid
+    SaveGeneration: int
+    MemberHistories: sorterPoolMemberHistoryDto list
 }
 
 module SorterPoolHistoryDto =
@@ -125,11 +123,10 @@ module SorterPoolHistoryDto =
 // sorterPoolSetHistoryDto
 // ----------------------------------------------------------------------------
 
-[<MessagePackObject>]
 type sorterPoolSetHistoryDto = {
-    [<Key(0)>] SorterPoolSetId: Guid
-    [<Key(1)>] SaveGeneration: int
-    [<Key(2)>] PoolHistories: sorterPoolHistoryDto list
+    SorterPoolSetId: Guid
+    SaveGeneration: int
+    PoolHistories: sorterPoolHistoryDto list
 }
 
 module SorterPoolSetHistoryDto =

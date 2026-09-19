@@ -1,22 +1,14 @@
 ﻿namespace GeneSort.Core.Mp.RatesAndOps
-open MessagePack
+
 open GeneSort.Core
 
-[<MessagePackObject>]
 type Seed6ActionRatesDto = {
-    [<Key(0)>]
     ortho1Thresh: float
-    [<Key(1)>]
     ortho2Thresh: float
-    [<Key(2)>]
     para1Thresh: float
-    [<Key(3)>]
     para2Thresh: float
-    [<Key(4)>]
     para3Thresh: float
-    [<Key(5)>]
     para4Thresh: float
-    [<Key(6)>]
     selfReflThresh: float
 }
 

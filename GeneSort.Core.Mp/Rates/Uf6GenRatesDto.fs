@@ -6,11 +6,10 @@ open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp
 
-[<MessagePackObject>]
 type uf6GenRatesDto =
-    { [<Key(0)>] order: int
-      [<Key(1)>] seedGenRatesUf6: seed6GenRatesDto
-      [<Key(2)>] opsGenRatesArrays: opsGenRatesArrayDto }
+    { order: int
+      seedGenRatesUf6: seed6GenRatesDto
+      opsGenRatesArrays: opsGenRatesArrayDto }
 
 module Uf6GenRatesDto =
 
