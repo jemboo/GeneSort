@@ -12,7 +12,7 @@ open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.SortingOps
 
 
-module MsceMutateSpecsRs = 
+module MutateSpecsRs = 
 
     let sorterEvalSelectionType = 
             (runParameters.seedSorterPoolSelectionTypeKey, 
@@ -46,9 +46,9 @@ module MsceMutateSpecsRs =
 
     module Specs =
 
-        let Rand_Test (executorType: sorterMutateExecutorType)  : runHostSpec = {
+        let Test_Msrs (executorType: sorterMutateExecutorType)  : runHostSpec = {
             databaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
-            runName = sprintf @"Rand-Test_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            runName = sprintf @"Rand-Test_Msrs%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for Msrs"
             spans = [
                 msrsModelType
@@ -70,16 +70,41 @@ module MsceMutateSpecsRs =
         }
 
 
+        let Test_Msuf4 (executorType: sorterMutateExecutorType)  : runHostSpec = {
+            databaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
+            runName = sprintf @"Rand-Test_Msuf4%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Mutation analysis for Msuf4"
+            spans = [
+                msuf4ModelType
+                rngTypeLcg
+                dataFomatBitv512
+                sorterEvalTypeV1
+                sorterEvalSelectionType
+                sorterEvalMeasure_CestM_Scw
+                (mutatorSpansMsrs 16<sortingWidth> rngType.Lcg)
+                modificationRate90
+                sortingWidth16
+                testChildCount
+                mutationMod1
+            ]
+            filter = standardSorterModelTypeFilter
+            enhancer = standardEnhancer
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 1
+        }
+
+
+
+
 
     type configType =
-        | Rand_Test
+        | Test_Msrs
         | Rand_Small
         | Rand_Medium
 
     let Configs = Map.ofList 
                     [ 
-                        (configType.Rand_Test, Specs.Rand_Test); 
-
+                        (configType.Test_Msrs, Specs.Test_Msrs); 
                     ]
 
     let getRunHostSpec (config: configType) (executorType: sorterMutateExecutorType) : runHostSpec =

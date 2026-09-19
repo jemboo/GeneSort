@@ -49,11 +49,11 @@ module DispatchSorterEval =
 
 
     //********** SorterEval Standard **********
-    //let configType = SorterEvalSpecsRs.configType.Rand_Test
-    //let executorType = sorterEvalExecutorType.GenStandard
-    //let host: IRunHost = 
-    //    let spec = SorterEvalSpecsRs.getRunHostSpec configType executorType
-    //    SorterEvalDbs.createRunHost spec
+    let configType = SorterEvalSpecsRs.configType.Rand_Test
+    let executorType = sorterEvalExecutorType.GenStandard
+    let host: IRunHost = 
+        let spec = SorterEvalSpecsRs.getRunHostSpec configType executorType
+        SorterEvalDbs.createRunHost spec
 
 
     //********** SorterEval Merge **********
@@ -66,11 +66,11 @@ module DispatchSorterEval =
 
 
     //********** SorterEval Prefix **********
-    let private configType = SorterEvalSpecsTestPrefix.configType.Prefix_32
-    let private executorType = sorterEvalExecutorType.GenPrefix
-    let private host: IRunHost = 
-        let spec = SorterEvalSpecsTestPrefix.getRunHostSpec configType executorType
-        SorterEvalDbs.createRunHost spec
+    //let private configType = SorterEvalSpecsTestPrefix.configType.Prefix_24s
+    //let private executorType = sorterEvalExecutorType.GenPrefix
+    //let private host: IRunHost = 
+    //    let spec = SorterEvalSpecsTestPrefix.getRunHostSpec configType executorType
+    //    SorterEvalDbs.createRunHost spec
 
 
     let private executor = SorterEvalExecutor.getExecutor executorType

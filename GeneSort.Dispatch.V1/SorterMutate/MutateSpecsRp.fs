@@ -12,7 +12,7 @@ open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.SortingOps
 
 
-module MsceMutateSpecsRp = 
+module MutateSpecsRp = 
 
     let seedSorterPoolSelectionType = 
             (runParameters.seedSorterPoolSelectionTypeKey, 
