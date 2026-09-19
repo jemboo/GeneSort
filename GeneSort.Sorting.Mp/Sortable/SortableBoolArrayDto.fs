@@ -3,13 +3,10 @@
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
-open MessagePack
 
-
-[<MessagePackObject>]
 type sortableBoolArrayDto = {
-    [<Key(0)>] Values: bool[]
-    [<Key(1)>] SortingWidth: int
+    Values: bool[]
+    SortingWidth: int
 }
 
 module SortableBoolArrayDto =
@@ -19,4 +16,3 @@ module SortableBoolArrayDto =
 
     let toDomain (dto: sortableBoolArrayDto) : sortableBoolArray =
         sortableBoolArray.create(dto.Values, UMX.tag<sortingWidth> dto.SortingWidth)
-

@@ -1,18 +1,16 @@
 ﻿namespace GeneSort.Eval.Mp.V1.Sgd
 
 open System
-open MessagePack
 open FSharp.UMX
 open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd
 
-[<MessagePackObject>]
 type sorterMutationSourceDto = {
-    [<Key(0)>] sorterModelMutatorId: Guid
-    [<Key(1)>] sorterPoolMemberId: Guid
-    [<Key(2)>] sorterPoolId: Guid
-    [<Key(3)>] mutationIndex: int
+    sorterModelMutatorId: Guid
+    sorterPoolMemberId: Guid
+    sorterPoolId: Guid
+    mutationIndex: int
 }
 
 module SorterMutationSourceDto =
@@ -31,3 +29,4 @@ module SorterMutationSourceDto =
             (UMX.tag<sorterPoolMemberId> dto.sorterPoolMemberId)
             (UMX.tag<sorterPoolId> dto.sorterPoolId)
             (UMX.tag<mutationIndex> dto.mutationIndex)
+

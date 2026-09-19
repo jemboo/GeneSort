@@ -1,7 +1,6 @@
 ﻿namespace GeneSort.Eval.Mp.V1.Sgd
 
 open System
-open MessagePack
 open FSharp.UMX
 open GeneSort.SortingOps.Mp
 open GeneSort.Eval.V1
@@ -9,35 +8,33 @@ open GeneSort.Model.Sorting.Mp.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sorting.Mp.V1
 
-[<MessagePackObject>]
 type sorterPoolMemberDto = {
-    [<Key(0)>] sorterPoolMemberId: Guid
-    [<Key(1)>] sorterModelDto: sorterModelDto 
-    [<Key(2)>] sorterMutationIndex: int
-    [<Key(3)>] sorterMutationMod: int
-    [<Key(4)>] sorterMutationSource: sorterMutationSourceDto option
-    [<Key(5)>] sorterEvalDto: sorterEvalDto option
-    [<Key(6)>] birthday: int
+    sorterPoolMemberId: Guid
+    sorterModelDto: sorterModelDto 
+    sorterMutationIndex: int
+    sorterMutationMod: int
+    sorterMutationSource: sorterMutationSourceDto option
+    sorterEvalDto: sorterEvalDto option
+    birthday: int
 }
 
-[<MessagePackObject>]
 type sorterPoolDto = {
-    [<Key(0)>] sorterPoolId: Guid
-    [<Key(1)>] name: string
-    [<Key(2)>] sorterPoolMemberDtos: sorterPoolMemberDto array
-    [<Key(3)>] ceLength: int
-    [<Key(4)>] mutationMod: int
-    [<Key(5)>] parentSorterPoolId: Nullable<Guid>
-    [<Key(6)>] sorterPoolTag: string
+    sorterPoolId: Guid
+    name: string
+    sorterPoolMemberDtos: sorterPoolMemberDto array
+    ceLength: int
+    mutationMod: int
+    parentSorterPoolId: Nullable<Guid>
+    sorterPoolTag: string
 }
 
-[<MessagePackObject>]
 type sorterPoolSetDto = {
-    [<Key(0)>] sorterPoolSetId: Guid
-    [<Key(1)>] generationNumber: int
-    [<Key(2)>] sorterPools: sorterPoolDto array
-    [<Key(3)>] latticeBounds: string
+    sorterPoolSetId: Guid
+    generationNumber: int
+    sorterPools: sorterPoolDto array
+    latticeBounds: string
 }
 
 module SorterPoolSetDto =
@@ -80,7 +77,6 @@ module SorterPoolSetDto =
             sorterPools = poolDtos
             latticeBounds = LatticeBounds.toString domain.LatticeBounds
         }
-
 
     let fromDto (dto: sorterPoolSetDto) : sorterPoolSet =
         let pools =

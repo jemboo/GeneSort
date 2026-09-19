@@ -3,12 +3,10 @@
 open System
 open FSharp.UMX
 open GeneSort.Core
-open MessagePack
 
-[<MessagePackObject>]
 type twoOrbitUf6Dto =
-    { [<Key(0)>] seedType: twoOrbitTripleType
-      [<Key(1)>] twoOrbitUfSteps: twoOrbitUfStepDto array }
+    { seedType: twoOrbitTripleType
+      twoOrbitUfSteps: twoOrbitUfStepDto array }
     
     static member Create (seedType: twoOrbitTripleType) 
                          (twoOrbitUnfolderSteps: twoOrbitUfStepDto array) : twoOrbitUf6Dto =
@@ -20,7 +18,6 @@ type twoOrbitUf6Dto =
             else
                 { seedType = seedType
                   twoOrbitUfSteps = twoOrbitUnfolderSteps }
-
 
 module TwoOrbitUf6Dto =
 

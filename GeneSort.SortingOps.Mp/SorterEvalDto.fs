@@ -1,61 +1,53 @@
-﻿namespace GeneSort.SortingOps.Mp
+﻿
+namespace GeneSort.SortingOps.Mp
 
 open System
 open FSharp.UMX
-open MessagePack
 open GeneSort.SortingOps
 open GeneSort.Sorting.Mp.Sortable
 
-
-
-[<MessagePackObject>]
 type sorterEvalV1Dto = {
-    [<Key(0)>] SorterId : Guid
-    [<Key(1)>] UnsortedCount : int
-    [<Key(2)>] SequenceHash : int
-    [<Key(3)>] LastCeIndex : int
-    [<Key(4)>] StageLength : int
-    [<Key(5)>] CeLength : int
-    [<Key(6)>] SortingWidth : int
-    [<Key(7)>] ReflectionSymmetric : bool
-    [<Key(8)>] StageCrossingsCount : int
+    SorterId : Guid
+    UnsortedCount : int
+    SequenceHash : int
+    LastCeIndex : int
+    StageLength : int
+    CeLength : int
+    SortingWidth : int
+    ReflectionSymmetric : bool
+    StageCrossingsCount : int
 }
 
-[<MessagePackObject>]
 type sorterEvalV2Dto = {
-    [<Key(0)>] SorterId : Guid
-    [<Key(1)>] UnsortedCount : int
-    [<Key(2)>] SequenceHash : int
-    [<Key(3)>] StageLength : int
-    [<Key(4)>] CeUseArray : ceDataDto array
-    [<Key(5)>] SortingWidth : int
-    [<Key(6)>] ReflectionSymmetric : bool
-    [<Key(7)>] StageCrossingsCount : int
+    SorterId : Guid
+    UnsortedCount : int
+    SequenceHash : int
+    StageLength : int
+    CeUseArray : ceDataDto array
+    SortingWidth : int
+    ReflectionSymmetric : bool
+    StageCrossingsCount : int
 }
 
-[<MessagePackObject>]
 type sorterEvalV3Dto = {
-    [<Key(0)>] SorterId : Guid
-    [<Key(1)>] SequenceHash : int
-    [<Key(2)>] StageLength : int
-    [<Key(3)>] CeUseArray : ceDataDto array
-    [<Key(4)>] SortableTest : sortableTestDto
-    [<Key(5)>] SortingWidth : int
-    [<Key(6)>] ReflectionSymmetric : bool
-    [<Key(7)>] StageCrossingsCount : int
+    SorterId : Guid
+    SequenceHash : int
+    StageLength : int
+    CeUseArray : ceDataDto array
+    SortableTest : sortableTestDto
+    SortingWidth : int
+    ReflectionSymmetric : bool
+    StageCrossingsCount : int
 }
-
 
 // ---------------------------------------------------------------------
 // 2. Main Sorter Evaluation DTO Union
 // ---------------------------------------------------------------------
 
-[<MessagePackObject>]
 type sorterEvalDto =
     | V1 of sorterEvalV1Dto
     | V2 of sorterEvalV2Dto
     | V3 of sorterEvalV3Dto
-
 
 // ---------------------------------------------------------------------
 // 3. Conversion Module

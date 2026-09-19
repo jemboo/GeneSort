@@ -1,28 +1,24 @@
 ﻿namespace GeneSort.Eval.Mp.V1.Bins
 
 open System
-open MessagePack
 open FSharp.UMX
 open GeneSort.Eval.V1.Bins
 open GeneSort.SortingOps.Mp
 
-[<MessagePackObject>]
 type sorterEvalKeyDto = {
-    [<Key(0)>] CeCount: int
-    [<Key(1)>] StageLength: int
+    CeCount: int
+    StageLength: int
 }
 
-[<MessagePackObject>]
 type sorterEvalBinDto = {
-    [<Key(0)>] SorterEvalKey: sorterEvalKeyDto
-    [<Key(1)>] SorterEvals: sorterEvalDto array
+    SorterEvalKey: sorterEvalKeyDto
+    SorterEvals: sorterEvalDto array
 }
 
-[<MessagePackObject>]
 type sorterEvalBinSetDto = {
-    [<Key(0)>] SorterEvalBinSetId: Guid
-    [<Key(1)>] SorterSetEvalId: Guid
-    [<Key(2)>] SorterEvalBins: sorterEvalBinDto array
+    SorterEvalBinSetId: Guid
+    SorterSetEvalId: Guid
+    SorterEvalBins: sorterEvalBinDto array
 }
 
 module SorterEvalKeyDto =
@@ -35,7 +31,6 @@ module SorterEvalKeyDto =
     let toDomain (dto: sorterEvalKeyDto) : sorterEvalKey =
         sorterEvalKey.create (dto.CeCount |> UMX.tag) (dto.StageLength |> UMX.tag)
 
-
 module SorterEvalBinDto =
 
     let fromDomain (bin: sorterEvalBin) : sorterEvalBinDto = {
@@ -47,7 +42,6 @@ module SorterEvalBinDto =
         let key = SorterEvalKeyDto.toDomain dto.SorterEvalKey
         let evals = dto.SorterEvals |> Seq.map SorterEvalDto.toDomain
         sorterEvalBin.createWithSorterEvals evals key
-
 
 module SorterEvalBinSetDto =
 

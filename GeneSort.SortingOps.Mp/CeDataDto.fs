@@ -1,25 +1,23 @@
 ﻿namespace GeneSort.SortingOps.Mp
 
+open System
 open FSharp.UMX
-open MessagePack
 open GeneSort.Sorting.Sorter
 open GeneSort.Sorting
-
 
 // ---------------------------------------------------------------------
 // Compressed Data Transfer Object for ceData
 // ---------------------------------------------------------------------
 
-[<MessagePackObject>]
 type ceDataDto = {
     /// Accurate up to 65,535 (2 bytes)
-    [<Key(0)>] CeIndex : uint16
+    CeIndex : uint16
     
     /// Approximate count packed into a 16-bit Half-Precision float (2 bytes)
-    [<Key(1)>] UseCount : System.Half
+    UseCount : System.Half
     
     /// Flattened index representing the CE, accurate up to ~2 Billion (4 bytes)
-    [<Key(2)>] CeInt : int
+    CeInt : int
 }
 
 module CeDataDto =

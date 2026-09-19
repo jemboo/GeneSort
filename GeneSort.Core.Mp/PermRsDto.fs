@@ -1,11 +1,10 @@
 ﻿namespace GeneSort.Core.Mp
 
 open GeneSort.Core
-open MessagePack
 
-[<MessagePackObject; Struct>]
+[<Struct>]
 type permRsDto =
-    { [<Key(0)>] permSiDto: permSiDto }
+    { permSiDto: permSiDto }
     
     static member Create(arr: int array) : permRsDto =
         if arr.Length < 4 then
@@ -15,7 +14,6 @@ type permRsDto =
         else
             { permSiDto = permSiDto.Create(arr) }
 
-
 module PermRsDto =
 
     let toPerm_RsDto (permRs: permRs) : permRsDto =
@@ -24,4 +22,3 @@ module PermRsDto =
     let toPerm_Rs (dto: permRsDto) : permRs =
         let permSi = PermSiDto.toDomain dto.permSiDto
         permRs.create permSi.Array
-

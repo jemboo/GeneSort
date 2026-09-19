@@ -2,12 +2,11 @@
 
 open System
 open GeneSort.Core
-open MessagePack
 
-[<MessagePackObject; Struct>]
+[<Struct>]
 type twoOrbitUf4Dto =
-    { [<Key(0)>] seedType: twoOrbitPairType
-      [<Key(1)>] twoOrbitUfStepDtos: twoOrbitUfStepDto array }
+    { seedType: twoOrbitPairType
+      twoOrbitUfStepDtos: twoOrbitUfStepDto array }
     
     static member Create 
                     (seedType: twoOrbitPairType) 

@@ -2,11 +2,10 @@
 
 open System
 open GeneSort.Core
-open MessagePack
 
-[<MessagePackObject; Struct>]
+[<Struct>]
 type permutationDto =
-    { [<Key(0)>] intArray: int array }
+    { intArray: int array }
     
     static member Create(arr: int array) : permutationDto =
         if isNull arr then

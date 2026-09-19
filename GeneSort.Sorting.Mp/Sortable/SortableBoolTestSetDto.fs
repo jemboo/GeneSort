@@ -2,16 +2,13 @@
 
 open System
 open FSharp.UMX
-open MessagePack
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 
-
-[<MessagePackObject>]
 type sortableBoolTestSetDto = {
-    [<Key(0)>] Id: Guid
-    [<Key(1)>] SortableBoolTestDtos: sortableBoolTestDto[]
+    Id: Guid
+    SortableBoolTestDtos: sortableBoolTestDto[]
 }
 
 module SortableBoolTestSetDto =
@@ -24,5 +21,3 @@ module SortableBoolTestSetDto =
         sortableBoolTestSet.create
             (UMX.tag<sortableTestSetId> dto.Id)
             (dto.SortableBoolTestDtos |> Array.map SortableBoolTestDto.toDomain)
-
-

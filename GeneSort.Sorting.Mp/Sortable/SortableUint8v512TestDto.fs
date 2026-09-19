@@ -4,14 +4,12 @@ open System
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
-open MessagePack
 open System.Runtime.Intrinsics
 
-[<MessagePackObject>]
 type sortableUint8v512TestDto = {
-    [<Key(0)>] Id: Guid
-    [<Key(1)>] SortingWidth: int
-    [<Key(2)>] Blocks: simdSortBlockDto[]
+    Id: Guid
+    SortingWidth: int
+    Blocks: simdSortBlockDto[]
 }
 
 module SortableUint8v512TestDto =

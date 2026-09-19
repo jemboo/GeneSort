@@ -1,12 +1,8 @@
 ﻿namespace GeneSort.Core.Mp.RatesAndOps
 
-open MessagePack
 open GeneSort.Core
 
-
-[<MessagePackObject>]
 type indelRatesArrayDto = {
-    [<Key(0)>]
     indelRatesDtos: indelRatesDto array
 }
 
@@ -19,4 +15,3 @@ module IndelRatesArrayDto =
     let fromDomain (domain: indelRatesArray) : indelRatesArrayDto = {
         indelRatesDtos = Array.map IndelRatesDto.fromDomain domain.RatesArray
     }
-

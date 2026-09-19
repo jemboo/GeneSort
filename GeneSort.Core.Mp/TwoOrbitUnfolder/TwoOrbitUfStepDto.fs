@@ -1,13 +1,11 @@
-﻿
-namespace GeneSort.Core.Mp.TwoOrbitUnfolder
+﻿namespace GeneSort.Core.Mp.TwoOrbitUnfolder
 
-open MessagePack
 open GeneSort.Core
 
-[<MessagePackObject; Struct>]
+[<Struct>]
 type twoOrbitUfStepDto =
-    { [<Key(0)>] twoOrbitPairTypes: twoOrbitPairType array
-      [<Key(1)>] order: int }
+    { twoOrbitPairTypes: twoOrbitPairType array
+      order: int }
     
     static member Create (twoOrbitPairTypes: twoOrbitPairType array) 
                          (order: int) : twoOrbitUfStepDto =
@@ -20,14 +18,11 @@ type twoOrbitUfStepDto =
         else
             { twoOrbitPairTypes = twoOrbitPairTypes; order = order }
 
-
 module TwoOrbitUnfolderStepDto =
 
     let fromDomain (step: twoOrbitUfStep) : twoOrbitUfStepDto =
         { twoOrbitPairTypes = step.TwoOrbitPairTypes
           order = step.Order }
 
-    let toDomain (dto: twoOrbitUfStepDto) :twoOrbitUfStep =
+    let toDomain (dto: twoOrbitUfStepDto) : twoOrbitUfStep =
         twoOrbitUfStep.create dto.twoOrbitPairTypes dto.order
-
-

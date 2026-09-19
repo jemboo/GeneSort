@@ -1,12 +1,10 @@
 ﻿namespace GeneSort.Core.Mp
 
 open GeneSort.Core
-open MessagePack
 
-
-[<MessagePackObject; Struct>]
+[<Struct>]
 type permSiDto =
-    { [<Key(0)>] permutationDto: permutationDto }
+    { permutationDto: permutationDto }
     
     static member Create(arr: int array) : permSiDto =
         let permDto = permutationDto.Create(arr)

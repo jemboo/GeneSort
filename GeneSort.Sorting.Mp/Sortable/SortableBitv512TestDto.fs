@@ -4,23 +4,19 @@ open System
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
-open MessagePack
 open System.Runtime.Intrinsics
 
-
 /// DTO for an individual bit-packed SIMD block
-[<MessagePackObject>]
 type sortBlockBitv512Dto = {
     /// Each Vector512<uint64> becomes an 8-element uint64 array
-    [<Key(0)>] RawVectors: uint64[][] 
-    [<Key(1)>] SortableCount: int
+    RawVectors: uint64[][] 
+    SortableCount: int
 }
 
-[<MessagePackObject>]
 type sortableBitv512TestDto = {
-    [<Key(0)>] Id: Guid
-    [<Key(1)>] SortingWidth: int
-    [<Key(2)>] Blocks: sortBlockBitv512Dto[]
+    Id: Guid
+    SortingWidth: int
+    Blocks: sortBlockBitv512Dto[]
 }
 
 module SortableBitv512TestDto =

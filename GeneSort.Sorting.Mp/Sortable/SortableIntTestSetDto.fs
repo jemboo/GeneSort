@@ -2,14 +2,12 @@
 
 open System
 open FSharp.UMX
-open MessagePack
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 
-[<MessagePackObject>]
 type sortableIntTestSetDto = {
-    [<Key(0)>] Id: Guid
-    [<Key(1)>] SortableIntTestDtos: sortableIntTestDto[]
+    Id: Guid
+    SortableIntTestDtos: sortableIntTestDto[]
 }
 
 module SortableIntTestSetDto =

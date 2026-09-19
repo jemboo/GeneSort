@@ -4,13 +4,11 @@ open System
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
-open MessagePack
 
-[<MessagePackObject>]
 type sortableBoolTestDto = {
-    [<Key(0)>] Id: Guid
-    [<Key(1)>] SortingWidth: int
-    [<Key(2)>] SortableArrays: sortableBoolArrayDto[]
+    Id: Guid
+    SortingWidth: int
+    SortableArrays: sortableBoolArrayDto[]
 }
 
 module SortableBoolTestDto =

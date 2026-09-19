@@ -3,14 +3,11 @@
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
-open MessagePack
 
-
-[<MessagePackObject>]
 type sortableIntArrayDto = {
-    [<Key(0)>] Values: int[]
-    [<Key(1)>] SortingWidth: int
-    [<Key(2)>] SymbolSetSize: int
+    Values: int[]
+    SortingWidth: int
+    SymbolSetSize: int
 }
 
 module SortableIntArrayDto =
@@ -20,4 +17,3 @@ module SortableIntArrayDto =
 
     let toDomain (dto: sortableIntArrayDto) : sortableIntArray =
         sortableIntArray.create(dto.Values, UMX.tag<sortingWidth> dto.SortingWidth, UMX.tag<symbolSetSize> dto.SymbolSetSize)
-

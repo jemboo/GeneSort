@@ -3,9 +3,7 @@
 open System
 open FSharp.UMX
 open GeneSort.Core
-open MessagePack
 
-//[<MessagePackObject>]
 type rngTypeDto =
     | Lcg = 0
     | Net = 1
@@ -22,10 +20,10 @@ module RngTypeDto =
         | rngTypeDto.Net -> Net
         | _ -> failwith "Invalid rngTypeDto value"
 
-[<MessagePackObject>]
-type rngFactoryDto =
-    { [<Key(0)>] id: string
-      [<Key(1)>] rngTypeDto: rngTypeDto }
+type rngFactoryDto = {
+    id: string
+    rngTypeDto: rngTypeDto
+}
 
 module RngFactoryDto =
     let fromDomain (factory: rngFactory) : rngFactoryDto =

@@ -3,18 +3,17 @@
 open System
 open System.Collections.Generic
 open GeneSort.Core
-open MessagePack
 open FSharp.UMX
 
-[<MessagePackObject>]
-type latticeLevelSetMapDto =
-    { [<Key(0)>] centerSideMap: (latticePointDto * latticePointDto list) array
-      [<Key(1)>] poleSideMap: (latticePointDto * latticePointDto list) array
-      [<Key(2)>] latticeDimension: int
-      [<Key(3)>] edgeLength: int
-      [<Key(4)>] poleSideLevel: int
-      [<Key(5)>] centerSideLevel: int
-      [<Key(6)>] coverStrategy: int }
+type latticeLevelSetMapDto = {
+    centerSideMap: (latticePointDto * latticePointDto list) array
+    poleSideMap: (latticePointDto * latticePointDto list) array
+    latticeDimension: int
+    edgeLength: int
+    poleSideLevel: int
+    centerSideLevel: int
+    coverStrategy: int
+}
 
 module LatticeLevelSetMapDto =
 
