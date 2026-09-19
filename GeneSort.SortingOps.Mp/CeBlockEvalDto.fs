@@ -1,22 +1,15 @@
 ﻿namespace GeneSort.SortingOps.Mp
 
 open FSharp.UMX
-open MessagePack
 open GeneSort.SortingOps
 open GeneSort.Sorting
 open GeneSort.Sorting.Mp.Sortable
 
-[<MessagePackObject>]
 type ceBlockEvalDto = {
-    [<Key(0)>]
     Prefix: ceBlockDto
-    [<Key(1)>]
     CeBlock: ceBlockDto
-    [<Key(2)>]
     CeUseCounts: int array
-    [<Key(3)>]
     UnsortedCount: int
-    [<Key(4)>]
     SortableTest: sortableTestDto option
 }
 

@@ -1,14 +1,12 @@
 ﻿namespace GeneSort.Project.Mp.V1
 
 open FSharp.UMX
-open MessagePack
 open GeneSort.Project.V1
 
-[<MessagePackObject>]
 type outputDataTypeDto =
     {
-        [<MessagePack.Key(0)>] Tag: string
-        [<MessagePack.Key(1)>] Value: string
+        Tag: string
+        Value: string
     }
 
 module OutputDataTypeDto =

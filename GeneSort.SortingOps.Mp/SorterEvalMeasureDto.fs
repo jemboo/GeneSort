@@ -6,49 +6,41 @@ open GeneSort.SortingOps
 
 // --- Individual Case DTOs ---
 
-[<MessagePackObject>]
 type ceLengthMeasureDto = {
-    [<Key(0)>] FilterUnsorted: bool
-    [<Key(1)>] FilterReflectionSymmetric: bool
+    FilterUnsorted: bool
+    FilterReflectionSymmetric: bool
 }
 
-[<MessagePackObject>]
 type stageLengthMeasureDto = {
-    [<Key(0)>] FilterUnsorted: bool
-    [<Key(1)>] FilterReflectionSymmetric: bool
+    FilterUnsorted: bool
+    FilterReflectionSymmetric: bool
 }
 
-[<MessagePackObject>]
 type unsortedCountMeasureDto = {
-    [<Key(0)>] FilterReflectionSymmetric: bool
+    FilterReflectionSymmetric: bool
 }
 
-[<MessagePackObject>]
 type ceStMeasureDto = {
-    [<Key(0)>] StageWeight: float
-    [<Key(1)>] FilterUnsorted: bool
-    [<Key(2)>] FilterReflectionSymmetric: bool
-    [<Key(3)>] StageCrossingWeight: float
+    StageWeight: float
+    FilterUnsorted: bool
+    FilterReflectionSymmetric: bool
+    StageCrossingWeight: float
 }
 
-[<MessagePackObject>]
 type ceStUcMeasureDto = {
-    [<Key(0)>] StageWeight: float
-    [<Key(1)>] UnsortedWeight: float
-    [<Key(2)>] FilterReflectionSymmetric: bool
+    StageWeight: float
+    UnsortedWeight: float
+    FilterReflectionSymmetric: bool
 }
-
 
 // --- Main Measure Union DTO ---
 
-[<MessagePackObject>]
 type sorterEvalMeasureDto =
     | CeLength of ceLengthMeasureDto
     | StageLength of stageLengthMeasureDto
     | UnsortedCount of unsortedCountMeasureDto
     | CeSt of ceStMeasureDto
     | CeStUc of ceStUcMeasureDto
-
 
 // --- Mapping Module ---
 
@@ -93,16 +85,16 @@ module SorterEvalMeasureDto =
         | UnsortedCount d ->
             sorterEvalMeasure.UnsortedCount (unsortedCountMeasure.create d.FilterReflectionSymmetric)
         | CeSt d ->            
-                sorterEvalMeasure.CeSt (ceStMeasure.create 
-                                            (d.StageWeight |> UMX.tag)
-                                            (d.FilterUnsorted |> UMX.tag)
-                                            (d.FilterReflectionSymmetric |> UMX.tag)
-                                            (d.StageCrossingWeight |> UMX.tag))
+            sorterEvalMeasure.CeSt (ceStMeasure.create 
+                                        (d.StageWeight |> UMX.tag)
+                                        (d.FilterUnsorted |> UMX.tag)
+                                        (d.FilterReflectionSymmetric |> UMX.tag)
+                                        (d.StageCrossingWeight |> UMX.tag))
         | CeStUc d ->
             sorterEvalMeasure.CeStUc (ceStUcMeasure.create 
-                                            (d.StageWeight |> UMX.tag)
-                                            (d.UnsortedWeight |> UMX.tag)
-                                            (d.FilterReflectionSymmetric |> UMX.tag))
+                                        (d.StageWeight |> UMX.tag)
+                                        (d.UnsortedWeight |> UMX.tag)
+                                        (d.FilterReflectionSymmetric |> UMX.tag))
 
     let pack (domain: sorterEvalMeasure) : byte[] =
         domain |> fromDomain |> MessagePackSerializer.Serialize

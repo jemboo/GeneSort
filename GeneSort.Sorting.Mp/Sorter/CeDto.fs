@@ -1,12 +1,8 @@
 ﻿namespace GeneSort.Sorting.Mp.Sorter
 
 open GeneSort.Sorting.Sorter
-open MessagePack
 
-
-[<MessagePackObject>]
 type ceDto = {
-    [<Key(0)>]
     Index: int
 }
 

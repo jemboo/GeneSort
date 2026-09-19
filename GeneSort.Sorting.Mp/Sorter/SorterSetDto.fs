@@ -4,14 +4,9 @@ open System
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
-open MessagePack
 
-
-[<MessagePackObject>]
 type sorterSetDto = {
-    [<Key(0)>]
     SorterSetId: Guid
-    [<Key(1)>]
     Sorters: SorterDto array
 }
 

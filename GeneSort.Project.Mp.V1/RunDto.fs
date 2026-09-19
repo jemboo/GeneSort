@@ -1,24 +1,20 @@
 ﻿namespace GeneSort.Project.Mp.V1
 
-
 open FSharp.UMX
-open MessagePack
 open GeneSort.Project.V1
 
-[<MessagePackObject>]
 type parameterSpanDto =
     {
-        [<MessagePack.Key(0)>] Key: string
-        [<MessagePack.Key(1)>] Values: string []
+        Key: string
+        Values: string []
     }
 
-[<MessagePackObject>]
 type runDto =
     {
-        [<MessagePack.Key(0)>] DataBaseName: string
-        [<MessagePack.Key(1)>] ProjectName: string
-        [<MessagePack.Key(2)>] RunName: string
-        [<MessagePack.Key(3)>] Description: string
+        DataBaseName: string
+        ProjectName: string
+        RunName: string
+        Description: string
     }
 
 module RunDto =
