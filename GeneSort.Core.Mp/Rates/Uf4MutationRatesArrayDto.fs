@@ -11,9 +11,6 @@ type uf4MutationRatesArrayDto =
 
 module Uf4MutationRatesArrayDto =
 
-    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-
     let fromDomain (uf4MutationRatesArray: uf4MutationRatesArray) : uf4MutationRatesArrayDto =
         { uf4MutationRatesDtos = uf4MutationRatesArray.RatesArray |> Array.map Uf4MutationRatesDto.fromDomain }
 

@@ -28,8 +28,6 @@ open GeneSort.Eval.Mp.V1.Bins
 [<Measure>] type fullPathToFile // e.g., "C:\GeneSortData\Project1\RunParameters_0_0.msgpack"
 
 module OutputDataFile =
-    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
 
     let getPathToOutputDataFolder
                 (pathToRootFolder:string<pathToRootFolder>)
@@ -64,12 +62,15 @@ module OutputDataFile =
         let outputDataFolder = getPathToOutputDataFolder pathToRootFolder queryParams.ReplAsString queryParams.OutputDataType
         Path.Combine(%outputDataFolder, fileNameWithExtension) |> UMX.tag<fullPathToFile>
 
+
     /// Helper to deserialize DTO and convert to domain.
     let private deserializeDto<'Dto, 'Domain> (stream: Stream) (token: CancellationToken) (toDomain: 'Dto -> 'Domain) =
         async {
-            let! dto = MessagePackSerializer.DeserializeAsync<'Dto>(stream, options, token).AsTask() |> Async.AwaitTask
+            // Uses global DefaultOptions set in Program.fs
+            let! dto = MessagePackSerializer.DeserializeAsync<'Dto>(stream, MessagePackSerializer.DefaultOptions, token).AsTask() |> Async.AwaitTask
             return toDomain dto
         }
+
 
     let getOutputDataAsync
             (pathToProjectFolder :string<pathToRootFolder>)
@@ -146,10 +147,11 @@ module OutputDataFile =
             | e -> return Error (sprintf "Error reading file %s: %s" %filePath e.Message)
         }
 
-    /// Helper to serialize domain to DTO.
+            /// Helper to serialize domain to DTO.
     let private serializeDto<'Domain, 'Dto> (stream: Stream) (domain: 'Domain) (fromDomain: 'Domain -> 'Dto) =
         let dto = fromDomain domain
-        MessagePackSerializer.SerializeAsync(stream, dto, options) |> Async.AwaitTask
+        // Uses global DefaultOptions set in Program.fs
+        MessagePackSerializer.SerializeAsync(stream, dto, MessagePackSerializer.DefaultOptions) |> Async.AwaitTask
 
 
     let rec buildDetailedMessage (ex: exn) =
@@ -237,7 +239,8 @@ module OutputDataFile =
             try
                 use stream = new FileStream(runFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync = true)
                 let token = defaultArg ct CancellationToken.None
-                let! dto = MessagePackSerializer.DeserializeAsync<runParametersDto>(stream, options, token).AsTask() |> Async.AwaitTask
+                // Pass MessagePackSerializer.DefaultOptions here
+                let! dto = MessagePackSerializer.DeserializeAsync<runParametersDto>(stream, MessagePackSerializer.DefaultOptions, token).AsTask() |> Async.AwaitTask
                 return Ok (RunParametersDto.toDomain dto)
             with e -> return Error (sprintf "Error loading file %s: %s" runFilePath e.Message)
         }

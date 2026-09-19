@@ -14,9 +14,6 @@ type uf6MutationRatesDto =
 
 module Uf6MutationRatesDto =
 
-    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-
     let fromDomain (uf6MutationRates: uf6MutationRates) : uf6MutationRatesDto =
         { order = uf6MutationRates.Order
           seed6TransitionRates = Seed6TransitionRatesDto.fromDomain uf6MutationRates.Seed6TransitionRates

@@ -22,15 +22,6 @@ type runDto =
 
 module RunDto =
 
-    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-
-    let serialize (dto: runDto) : byte array =
-        MessagePackSerializer.Serialize(dto, options)
-
-    let deserialize (bytes: byte array) : runDto =
-        MessagePackSerializer.Deserialize<runDto>(bytes, options)
-
     let fromDomain (project: run) : runDto =
         {
             DataBaseName = %project.DatabaseName

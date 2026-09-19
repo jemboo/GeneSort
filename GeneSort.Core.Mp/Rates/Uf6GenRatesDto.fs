@@ -13,9 +13,6 @@ type uf6GenRatesDto =
 
 module Uf6GenRatesDto =
 
-    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-
     let fromDomain (uf6GenRates: uf6GenRates) : uf6GenRatesDto =
         { order = uf6GenRates.Order
           seedGenRatesUf6 = Seed6GenRatesDto.fromDomain uf6GenRates.SeedGenRatesUf6

@@ -11,9 +11,6 @@ type uf6GenRatesArrayDto =
 
 module Uf6GenRatesArrayDto =
 
-    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-
     let fromDomain (gen6RatesArray: uf6GenRatesArray) : uf6GenRatesArrayDto =
         { uf6GenRatesDtos = gen6RatesArray.RatesArray |> Array.map Uf6GenRatesDto.fromDomain }
 
