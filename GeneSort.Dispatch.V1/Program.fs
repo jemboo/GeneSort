@@ -17,7 +17,7 @@ let main argv =
     // 2. Call your dispatch logic strictly AFTER configuration
     //GeneSort.Dispatch.V1.DispatchSorterSgd.makeParamsAndRun()
 
-    DispatchSorterMutate.makeParamsAndRun()
+    DispatchSorterSgd.makeParamsAndRun()
 
     let duration = DateTime.Now - startTime
     Thread.Sleep(100)

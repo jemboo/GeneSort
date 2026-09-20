@@ -23,6 +23,7 @@ module SgdExecutor =
             (genDb: IGeneSortGenDb)
             (rp: runParameters)
             (sortableTest: sortableTest)
+            (prefix: ceBlock)
             (log: string -> unit) : Async<Result<sorterPoolSet, string>> =
 
         asyncResult {
@@ -34,7 +35,7 @@ module SgdExecutor =
                 seedPoolSet 
                 |> SorterPoolRunner.evaluatePoolSet 
                     sortableTest 
-                    ceBlock.Empty
+                    prefix
                     evalType
                     true // reEvaluateParents
                     (false |> UMX.tag<collectNewSortableTests>)
@@ -87,7 +88,9 @@ module SgdExecutor =
                     | None -> 
                         asyncResult {
                             let initRp = rp.WithGenerationCurrent(Some (0 |> UMX.tag<generationNumber>))
-                            let! (seedSet: sorterPoolSet) = initializeAndSaveSeedPoolSet sorterPoolSetCreator genDb initRp sortableTest log
+                            let! (seedSet: sorterPoolSet) = 
+                                        initializeAndSaveSeedPoolSet 
+                                            sorterPoolSetCreator genDb initRp sortableTest prefix log
                             return seedSet, initRp
                         }
                     | Some (highestPoolSet: sorterPoolSet) -> 

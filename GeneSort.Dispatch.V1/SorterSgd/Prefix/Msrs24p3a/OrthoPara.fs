@@ -13,7 +13,7 @@ open GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.Common
 open GeneSort.Dispatch.V1.SorterSgd
 
 
-module PoolModComp =
+module OrthoPara =
 
     let globalSorterCount = 512 |> UMX.tag<sorterCount>
     let dbName_Sz_2048_Of_4096 = "Sz_2048_Of_4096" |> UMX.tag<databaseName>
