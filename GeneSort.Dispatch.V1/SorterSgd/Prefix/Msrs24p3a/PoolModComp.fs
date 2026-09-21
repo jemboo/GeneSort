@@ -138,7 +138,7 @@ module PoolModComp =
             spans = [
                 (runParameters.generationCurrentKey, [0] |> List.map string)
                 (runParameters.generationIntervalCountKey, [8] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, ["32"])
+                (runParameters.sorterCountPerPoolKey, ["32"] |> List.map string)
                 (runParameters.modificationRateKey, [0.99;] |> List.map string)
                 (runParameters.paraRateKey, [0.075; 0.1; 0.125;] |> List.map string)
                 (runParameters.selfSymRateKey, [1.25; 1.75; 2.25; 2.75] |> List.map string)
@@ -161,7 +161,7 @@ module PoolModComp =
                 (runParameters.generationIntervalCountKey, [12] |> List.map string)
                 (runParameters.sorterCountPerPoolKey, ["4096";])
                 (runParameters.mutationModKey, [0 .. 7;] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, ["2048";] |> List.map string)
+                (runParameters.selectedSorterCountPerPoolKey, [2048;] |> List.map string)
             ]
             filter = paramMapFilter
             enhancer = finishRunParams

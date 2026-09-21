@@ -5,22 +5,31 @@ open FSharp.UMX
 open GeneSort.Core
 
 
-[<Measure>] type projectName
 [<Measure>] type databaseName
+[<Measure>] type codeModKey
+[<Measure>] type projectName
 [<Measure>] type runName
 [<Measure>] type queryParamsId
 [<Measure>] type queryName
 [<Measure>] type replNumber
 [<Measure>] type generationIntervalCount
 
-module ProjectName =
-    let toString (w: string<projectName> option) : string =
+
+module DatabaseName =
+    let toString (w: string<databaseName> option) : string =
        match w with
         | Some v -> %v
         | None -> "None"
 
-module DatabaseName =
-    let toString (w: string<databaseName> option) : string =
+
+module CodeModKey =
+    let toString (w: string<codeModKey> option) : string =
+       match w with
+        | Some v -> %v
+        | None -> "None"
+
+module ProjectName =
+    let toString (w: string<projectName> option) : string =
        match w with
         | Some v -> %v
         | None -> "None"

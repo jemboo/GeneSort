@@ -61,6 +61,18 @@ type opsActionRates =
         else
         opsActionMode.NoAction
 
+    /// Assumes that floatPicker returns a float in the range [0.0, 1.0).
+    member this.PickMode2 (floatPicker: unit -> float) : opsActionMode =
+        let r = floatPicker()
+        if r < (this.orthoThresh / 2.0) then
+            opsActionMode.Ortho
+        elif r < (this.paraThresh / 2.0) then
+            opsActionMode.Para
+        elif r < (this.selfSymThresh / 2.0) then
+            opsActionMode.SelfRefl
+        else
+        opsActionMode.NoAction
+
 
     member this.PickModeWithDefault 
                 (opgm:opsGenMode) 
@@ -111,7 +123,7 @@ type opsActionRates =
 module OpsActionRates =
 
     /// Mutates an array of Perm_Rs using a single uniform opsActionRates.
-    let mutate 
+    let mutateOld
         (rates: opsActionRates) 
         (orthoMutator: permRs -> permRs) 
         (paraMutator: permRs -> permRs) 
@@ -121,6 +133,30 @@ module OpsActionRates =
 
         arrayToMutate |> Array.map (fun rsPerm ->
             let mode = rates.PickMode floatPicker
+            match mode with
+            | opsActionMode.Ortho    -> orthoMutator rsPerm
+            | opsActionMode.Para     -> paraMutator rsPerm
+            | opsActionMode.SelfRefl -> selfSymMutator rsPerm
+            | opsActionMode.NoAction -> rsPerm
+        )
+
+
+/// Mutates an array of Perm_Rs using a single uniform opsActionRates.
+    /// Uses PickMode2 for the first 20% of items, and PickMode for the remaining 80%.
+    let mutate 
+        (rates: opsActionRates) 
+        (orthoMutator: permRs -> permRs) 
+        (paraMutator: permRs -> permRs) 
+        (selfSymMutator: permRs -> permRs) 
+        (floatPicker: unit -> float) 
+        (arrayToMutate: permRs[]) : permRs[] = 
+
+        let thresholdIndex = 2 //float arrayToMutate.Length * 0.20
+
+        arrayToMutate |> Array.mapi (fun idx rsPerm ->
+            let picker = if float idx < thresholdIndex then rates.PickMode2 else rates.PickMode
+            let mode = picker floatPicker
+
             match mode with
             | opsActionMode.Ortho    -> orthoMutator rsPerm
             | opsActionMode.Para     -> paraMutator rsPerm

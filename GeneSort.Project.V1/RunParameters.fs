@@ -22,6 +22,7 @@ type runParameters =
     // ============================================================
 
     static member ceLengthKey = "CeLength"
+    static member codeModKey = "CodeModKey"
     static member collectSortableTestsKey = "CollectSortableTests"
     static member databaseNameKey = "DatabaseName"
     static member deletionRateKey = "DeletionRate"
@@ -117,6 +118,10 @@ type runParameters =
     member this.GetCeLength() =
         runParameters.tryGetInt runParameters.ceLengthKey this.paramMap
         |> Option.map UMX.tag<ceLength>
+
+    member this.GetCodeModKey() =
+        this.paramMap.TryFind runParameters.codeModKey
+        |> Option.map UMX.tag<codeModKey>
 
     member this.GetCollectNewSortableTests() =
         runParameters.tryGetBool runParameters.collectSortableTestsKey this.paramMap
@@ -365,6 +370,9 @@ type runParameters =
     // ============================================================
     // With* members
     // ============================================================
+
+    member this.WithCodeModKey(dbn: string<codeModKey> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.codeModKey (dbn |> Option.map UmxExt.stringToRaw) }
 
     member this.WithCeLength(cl: int<ceLength> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.ceLengthKey (cl |> Option.map UmxExt.intToRaw) }
