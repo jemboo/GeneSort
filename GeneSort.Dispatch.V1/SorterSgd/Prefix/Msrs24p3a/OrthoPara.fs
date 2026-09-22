@@ -17,7 +17,7 @@ module OrthoPara =
 
     let globalSorterCount = 8192 |> UMX.tag<sorterCount>
     let dbOrthoPara32Name = "OrthoPara32" |> UMX.tag<databaseName>
-    let dbFolderOrthoPara = @$"c:\Projects\{%projName}\{%dbOrthoPara32Name}\Data" |> UMX.tag<pathToRootFolder>
+    let dbFolderOrthoPara32 = @$"c:\Projects\{%projName}\{%dbOrthoPara32Name}\Data" |> UMX.tag<pathToRootFolder>
 
 
     let makeQueryParams
@@ -89,7 +89,7 @@ module OrthoPara =
     let saveIntervals = SampleRegistry.samplingConfigsDict["expInterval100_L50ss"]
     let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.1p5C"]
 
-    let dbOrthoPara = new GeneSortGenDbMp(dbFolderOrthoPara, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
+    let dbOrthoPara = new GeneSortGenDbMp(dbFolderOrthoPara32, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
 
 
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 

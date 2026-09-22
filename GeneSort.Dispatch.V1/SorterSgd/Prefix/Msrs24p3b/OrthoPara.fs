@@ -17,8 +17,9 @@ module OrthoPara =
 
     let globalSorterCount = 8192 |> UMX.tag<sorterCount>
     let dbOrthoPara32Name = "OrthoPara32" |> UMX.tag<databaseName>
-    let dbFolderOrthoPara = @$"c:\Projects\{%projName}\{%dbOrthoPara32Name}\Data" |> UMX.tag<pathToRootFolder>
-
+    let dbFolderOrthoPara32 = @$"c:\Projects\{%projName}\{%dbOrthoPara32Name}\Data" |> UMX.tag<pathToRootFolder>
+    let dbOrthoPara512Name = "OrthoPara512" |> UMX.tag<databaseName>
+    let dbFolderOrthoPara512 = @$"c:\Projects\{%projName}\{%dbOrthoPara512Name}\Data" |> UMX.tag<pathToRootFolder>
 
     let makeQueryParams
             (repl: int<replNumber>)
@@ -89,12 +90,14 @@ module OrthoPara =
     let saveIntervals = SampleRegistry.samplingConfigsDict["expInterval100_L50ss"]
     let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.1p5C"]
 
-    let dbOrthoPara = new GeneSortGenDbMp(dbFolderOrthoPara, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
+    let dbOrthoPara32 = new GeneSortGenDbMp(dbFolderOrthoPara32, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
+    let dbOrthoPara512 = new GeneSortGenDbMp(dbFolderOrthoPara512, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
 
 
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
         [ 
-            (dbOrthoPara32Name, dbOrthoPara :> IGeneSortDb);
+            (dbOrthoPara32Name, dbOrthoPara32 :> IGeneSortDb);
+            (dbOrthoPara512Name, dbOrthoPara512 :> IGeneSortDb);
         ]
         |> Map.ofList
 
@@ -110,10 +113,34 @@ module OrthoPara =
         runHost.Create db spec run :> IRunHost
 
 
-    module Specs =
+    module Specs32 =
 
         let NoMods (executorType: sorterSgdExecutorType)  : runHostSpec = {
             databaseName = dbOrthoPara32Name
+            runName = sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "OrthroPara rate comp for 24pfx3b Msrs, NoMods"
+            spans = [
+                (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                (runParameters.generationCurrentKey, [0] |> List.map string)
+                (runParameters.generationIntervalCountKey, [5] |> List.map string)
+                (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+                (runParameters.paraRateKey, [0.075; 0.1; 0.125; 0.15] |> List.map string)
+                (runParameters.selfSymRateKey, [1.25; 1.75; 2.25; 2.75] |> List.map string)
+                (runParameters.mutationModKey, [0] |> List.map string)
+                (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
+            ]
+            filter = paramMapFilter
+            enhancer = finishRunParams
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
+        }
+
+
+
+    module Specs512 =
+
+        let NoMods (executorType: sorterSgdExecutorType)  : runHostSpec = {
+            databaseName = dbOrthoPara512Name
             runName = sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
             runDescription = "OrthroPara rate comp for 24pfx3b Msrs, NoMods"
             spans = [
