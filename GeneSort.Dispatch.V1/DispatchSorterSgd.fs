@@ -128,7 +128,7 @@ module DispatchSorterSgd =
 
 
 
-    let private executorType = sorterSgdExecutorType.GenPrefix
+    let private executorType = sorterSgdExecutorType.SummaryReport
     let private host: IRunHost = Msrs24p3b.OrthoPara.createRunHost (Msrs24p3b.OrthoPara.Specs.NoMods executorType)
 
     let private executor = SorterSgdExecutorType.getExecutor executorType
