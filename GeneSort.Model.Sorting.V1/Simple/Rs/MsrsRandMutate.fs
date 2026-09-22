@@ -61,7 +61,7 @@ type msrsRandMutate =
         let selfSymMutator = fun rsPerm -> PermRsOps.mutatePerm_Rs (rng.NextIndex) opsActionMode.SelfRefl rsPerm 
         
         // Perform the mutation using the uniform rate module
-        let mutated = OpsActionRates.mutate 
+        let mutated = OpsActionRates.mutateOld 
                         this.OpsActionRates 
                         orthoMutator 
                         paraMutator 

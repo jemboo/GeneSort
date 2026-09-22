@@ -47,8 +47,8 @@ module OrthoPara =
             |]
 
 
-    let queryParamsFromRunParams 
-                    (rp: runParameters) 
+    let queryParamsFromRunParams
+                    (rp: runParameters)
                     (odt: outputDataType) : queryParams option =
         maybe {
             let! repl = rp.GetRepl()
@@ -119,7 +119,7 @@ module OrthoPara =
             spans = [
                 (runParameters.codeModKey, ["PickMode2_2"] |> List.map string)
                 (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [1] |> List.map string)
+                (runParameters.generationIntervalCountKey, [5] |> List.map string)
                 (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
                 (runParameters.paraRateKey, [0.075; 0.1; 0.125; 0.15] |> List.map string)
                 (runParameters.selfSymRateKey, [1.25; 1.75; 2.25; 2.75] |> List.map string)
@@ -139,7 +139,7 @@ module OrthoPara =
             spans = [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
                 (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [1] |> List.map string)
+                (runParameters.generationIntervalCountKey, [7] |> List.map string)
                 (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
                 (runParameters.paraRateKey, [0.075; 0.1; 0.125; 0.15] |> List.map string)
                 (runParameters.selfSymRateKey, [1.25; 1.75; 2.25; 2.75] |> List.map string)

@@ -49,7 +49,7 @@ module SorterEvalSpecsRs =
                 sorterEvalTypeV2
                 sortingWidth16
                 allSimpleSorterModelTypes
-                testSorterCount
+                largeSorterCount
             ]
             filter = standardSorterModelTypeFilter
             enhancer = standardEnhancer

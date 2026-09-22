@@ -16,7 +16,10 @@ let main argv =
 
     // 2. Call your dispatch logic strictly AFTER configuration
     //GeneSort.Dispatch.V1.DispatchSorterSgd.makeParamsAndRun()
-
+    
+    //DispatchSortableTest.makeParamsAndRun()
+    //DispatchSorterEval.makeParamsAndRun()
+    //DispatchSorterMutate.makeParamsAndRun()
     DispatchSorterSgd.makeParamsAndRun()
 
     let duration = DateTime.Now - startTime
