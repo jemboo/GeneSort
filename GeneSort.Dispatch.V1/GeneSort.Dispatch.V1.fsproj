@@ -53,6 +53,8 @@
     <Compile Include="SorterSgd\SgdExecutor.fs" />
     <Compile Include="SorterSgd\Reporting.fs" />
     <Compile Include="SorterSgd\SorterSgdTypes.fs" />
+    <Compile Include="SorterSgd\Prefix\Msrs24p3b\Common.fs" />
+    <Compile Include="SorterSgd\Prefix\Msrs24p3b\OrthoPara.fs" />
     <Compile Include="SorterSgd\Prefix\Msrs24p3a\Common.fs" />
     <Compile Include="SorterSgd\Prefix\Msrs24p3a\OrthoPara.fs" />
     <Compile Include="SorterSgd\Prefix\Msrs24p3a\PoolModComp.fs" />
