@@ -123,7 +123,7 @@ type opsActionRates =
 module OpsActionRates =
 
     /// Mutates an array of Perm_Rs using a single uniform opsActionRates.
-    let mutateOld
+    let mutate
         (rates: opsActionRates) 
         (orthoMutator: permRs -> permRs) 
         (paraMutator: permRs -> permRs) 
@@ -143,7 +143,7 @@ module OpsActionRates =
 
 /// Mutates an array of Perm_Rs using a single uniform opsActionRates.
     /// Uses PickMode2 for the first 20% of items, and PickMode for the remaining 80%.
-    let mutate 
+    let mutateVaried 
         (rates: opsActionRates) 
         (orthoMutator: permRs -> permRs) 
         (paraMutator: permRs -> permRs) 

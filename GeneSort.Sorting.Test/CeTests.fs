@@ -166,3 +166,52 @@ type CeTests() =
         ces |> List.iter (fun ce -> ce.Low |> should not' (equal ce.Hi))
 
 
+    [<Fact>]
+    let ``getSelfReflectiveComplement fills all unused index pairs on even width`` () =
+        let width = 6<sortingWidth>
+        // Input occupies indices 0 and 5: ce(0, 5)
+        let inputCes = [| ce.create 0 5 |]
+        let result = Ce.getSelfReflectiveComplement width inputCes
+
+        // Unused indices are 1, 2, 3, 4 -> mirrored pairs are ce(1, 4) and ce(2, 3)
+        let expected = [| ce.create 1 4; ce.create 2 3 |]
+        result |> should equal expected
+        result |> Array.iter (fun c -> Ce.isSelfReflection width c |> should equal true)
+
+    [<Fact>]
+    let ``getSelfReflectiveComplement handles odd width with center index`` () =
+        let width = UMX.tag 5
+        // Input occupies 0 and 4
+        let inputCes = [| ce.create 0 4 |]
+        let result = Ce.getSelfReflectiveComplement width inputCes
+
+        // Unused indices are 1, 2, 3 -> mirrored pairs are ce(1, 3) and ce(2, 2)
+        let expected = [| ce.create 1 3; ce.create 2 2 |]
+        result |> should equal expected
+        result |> Array.iter (fun c -> Ce.isSelfReflection width c |> should equal true)
+
+    [<Fact>]
+    let ``getSelfReflectiveComplement throws when unused mirror index is occupied`` () =
+        let width = UMX.tag 4
+        // Input occupies 0 and 1. Mirror of 0 is 3 (unoccupied), mirror of 1 is 2 (unoccupied)
+        // But 1's mirror (2) is free while 0's mirror (3) is free.
+        // Let's create an asymmetric input: ce(0, 1). Mirror of 0 is 3, mirror of 1 is 2.
+        // Index 3 is free, but index 0 is occupied!
+        let inputCes = [| ce.create 0 1 |]
+
+        let ex = Assert.ThrowsAny(fun () -> 
+                Ce.getSelfReflectiveComplement width inputCes |> ignore)
+    
+        Assert.Contains("Cannot form self-reflective complement", ex.Message)
+
+    [<Fact>]
+    let ``getSelfReflectiveComplement throws on duplicate input indices`` () =
+        let width = UMX.tag 4
+        let inputCes = [| ce.create 0 1; ce.create 1 2 |] // Index 1 used twice
+
+        let ex = Assert.ThrowsAny(fun () -> 
+                Ce.getSelfReflectiveComplement width inputCes |> ignore)
+    
+        Assert.Contains("used multiple times", ex.Message)
+
+

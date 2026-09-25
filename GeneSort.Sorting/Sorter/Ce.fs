@@ -79,63 +79,66 @@ module Ce =
             stack upper lower lowerOffset
         ) cesUpper cesLower
 
+
     let inline private validateDivisibility (width: int<sortingWidth>) (divisor: int) (funcName: string) =
             let rawWidth = UMX.untag width
             if rawWidth % divisor <> 0 then
                 invalidArg (nameof width) $"{funcName} requires mergedSortingWidth ({rawWidth}) to be divisible by {divisor}."
 
-    // stacks the 2d ce array twice
-    let merge2 (cesA: ce[][]) (mergedSortingWidth: int<sortingWidth>): ce[][] =
-        validateDivisibility mergedSortingWidth 2 "merge2"
-        let subWidth = (UMX.untag mergedSortingWidth / 2) |> UMX.tag<sortingWidth>
-        stack2d cesA cesA subWidth
 
-    // stacks the 2d ce array three times
-    let merge3 (cesA: ce[][]) (mergedSortingWidth: int<sortingWidth>): ce[][] =
-        validateDivisibility mergedSortingWidth 3 "merge3"  
-        let subWidth = (UMX.untag mergedSortingWidth / 3) |> UMX.tag<sortingWidth>
-        let stacked2 = stack2d cesA cesA subWidth
-        stack2d stacked2 cesA (subWidth * 2)
-
-    // stacks the 2d ce array four times
-    let merge4 (cesA: ce[][]) (mergedSortingWidth: int<sortingWidth>): ce[][] =
-        validateDivisibility mergedSortingWidth 4 "merge4"
-        let subWidth = (UMX.untag mergedSortingWidth / 4) |> UMX.tag<sortingWidth>
-        let stacked2 = stack2d cesA cesA subWidth
-        let stacked3 = stack2d stacked2 cesA (subWidth * 2)
-        stack2d stacked3 cesA (subWidth * 3)
-
-    // stacks the 2d ce array six times
-    let merge6 (cesA: ce[][]) (mergedSortingWidth: int<sortingWidth>): ce[][] =
-        validateDivisibility mergedSortingWidth 6 "merge6"
-        let subWidth = (UMX.untag mergedSortingWidth / 6) |> UMX.tag<sortingWidth>
-        let stacked2 = stack2d cesA cesA subWidth
-        let stacked3 = stack2d stacked2 cesA (subWidth * 2)
-        let stacked4 = stack2d stacked3 cesA (subWidth * 3)
-        let stacked5 = stack2d stacked4 cesA (subWidth * 4)
-        stack2d stacked5 cesA (subWidth * 5)
-
-    // stacks the 2d ce array eight times
-    let merge8 (cesA: ce[][]) (mergedSortingWidth: int<sortingWidth>): ce[][] =
-        validateDivisibility mergedSortingWidth 8 "merge8"
-        let subWidth = (UMX.untag mergedSortingWidth / 8) |> UMX.tag<sortingWidth>
-        let stacked2 = stack2d cesA cesA subWidth
-        let stacked3 = stack2d stacked2 cesA (subWidth * 2)
-        let stacked4 = stack2d stacked3 cesA (subWidth * 3)
-        let stacked5 = stack2d stacked4 cesA (subWidth * 4)
-        let stacked6 = stack2d stacked5 cesA (subWidth * 5)
-        let stacked7 = stack2d stacked6 cesA (subWidth * 6)
-        stack2d stacked7 cesA (subWidth * 7)
+    let mergeN (dim: int<mergeDimension>) (mergedSortingWidth: int<sortingWidth>) (cesA: ce[][]) : ce[][] =
+            validateDivisibility mergedSortingWidth %dim $"merge{dim}"
+            let subWidth = mergedSortingWidth / %dim
+            let mutable current = cesA
+            for i in 1 .. (%dim - 1) do
+                current <- stack2d current cesA (subWidth * i)
+            current
 
 
-    let merge2d (dim: int<mergeDimension>) (mergedSortingWidth: int<sortingWidth>) (cesA: ce[][]) :ce[][] =
-        match UMX.untag dim with
-        | 2 -> merge2 cesA mergedSortingWidth
-        | 3 -> merge3 cesA mergedSortingWidth
-        | 4 -> merge4 cesA mergedSortingWidth
-        | 6 -> merge6 cesA mergedSortingWidth
-        | 8 -> merge8 cesA mergedSortingWidth
-        | _ -> failwith "Unsupported mergedSortingWidth for merging. Supported widths are 2, 3, 4, 6, and 8."
+    /// Returns an array of self-reflective CEs covering all remaining unused indices in 0 .. (sWidth - 1).
+    /// Each index in 0 .. (sWidth - 1) will be covered exactly once across input 'ces' and returned 'ces'.
+    /// Throws an exception if duplicate indices exist or if an unused index's mirror is already occupied.
+    let getSelfReflectiveComplement (sWidth: int<sortingWidth>) (ces: ce[]) : ce[] =
+        let rawWidth = %sWidth
+        if rawWidth <= 0 then
+            invalidArg (nameof sWidth) "Sorting width must be positive"
+
+        let occupied = Array.create rawWidth false
+
+        // Mark indices occupied by input CEs and validate input bounds & uniqueness
+        for c in ces do
+            if c.Low < 0 || c.Low >= rawWidth then
+                invalidArg "ces" $"CE index {c.Low} is out of bounds for sorting width {rawWidth}"
+            if c.Hi < 0 || c.Hi >= rawWidth then
+                invalidArg "ces" $"CE index {c.Hi} is out of bounds for sorting width {rawWidth}"
+            
+            if occupied.[c.Low] then
+                invalidArg "ces" $"Index {c.Low} is used multiple times in input CEs"
+            occupied.[c.Low] <- true
+
+            if c.Low <> c.Hi then
+                if occupied.[c.Hi] then
+                    invalidArg "ces" $"Index {c.Hi} is used multiple times in input CEs"
+                occupied.[c.Hi] <- true
+
+        let complement = ResizeArray()
+
+        // Pair remaining unused indices with their reflected counter-parts
+        for i in 0 .. (rawWidth - 1) do
+            if not occupied.[i] then
+                let mirror = rawWidth - 1 - i
+                
+                if occupied.[mirror] then
+                    failwithf "Cannot form self-reflective complement: index %d is available but its mirror index %d is already occupied." i mirror
+
+                let newCe = ce.create i mirror
+                complement.Add(newCe)
+                
+                // Mark both low and high mirror indices as processed
+                occupied.[i] <- true
+                occupied.[mirror] <- true
+
+        complement.ToArray()
 
 
 
@@ -239,13 +242,16 @@ module Ce =
     let permute (perm: permutation) (cer:ce) =
         ce.create (perm.permute cer.Low) (perm.permute cer.Hi)
 
-    let reflect 
-            (sortingWidth: int<sortingWidth>) 
-            (cer: ce) 
-        : ce =
+
+    let reflect (sortingWidth: int<sortingWidth>) (cer: ce) : ce =
             ce.create 
                 (cer.Hi |> GeneSort.Core.Combinatorics.reflect %sortingWidth) 
                 (cer.Low |>  GeneSort.Core.Combinatorics.reflect %sortingWidth)
+
+
+    let isSelfReflection (sortingWidth: int<sortingWidth>) (cer: ce) : bool =
+            let reflected = reflect sortingWidth cer
+            reflected = cer
 
 
     let generateCeCode (excludeSelfCe:bool)
