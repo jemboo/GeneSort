@@ -5,6 +5,7 @@ open MessagePack
 open FSharp.UMX
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Sorting
+open GeneSort.Sorting.Sorter
 open GeneSort.Eval.V1
 open GeneSort.Core
 
@@ -23,6 +24,7 @@ type sorterPoolSummaryDto = {
     rawCeLength: int
     stdDevCeLength: float
     stdDevStageLength: float
+    aveReflectiveCount: float
 }
 
 type sorterPoolSetSummaryDto = {
@@ -58,6 +60,7 @@ module SorterPoolSetSummaryDto =
                     aveStageCrossings = UMX.untag p.AveStageCrossings
                     stdDevCeLength = UMX.untag p.StdDevCeLength
                     stdDevStageLength = UMX.untag p.StdDevStageLength
+                    aveReflectiveCount = UMX.untag p.AveReflectiveCountR
                 }
             )
         {
@@ -81,6 +84,7 @@ module SorterPoolSetSummaryDto =
                     (p.aveStageLength |> UMX.tag<stageLength>)
                     (p.stdDevStageLength |> UMX.tag<stageLength>)
                     (p.aveStageCrossings |> UMX.tag<stageCrossings>)
+                    (p.aveReflectiveCount |> UMX.tag<reflectiveCount>)
             )
         sorterPoolSetSummary.Create(
             UMX.tag dto.sorterPoolSetId, 

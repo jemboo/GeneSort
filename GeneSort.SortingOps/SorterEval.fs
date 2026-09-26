@@ -17,6 +17,7 @@ type sorterEvalV1 =
         ceLength: int<ceLength>
         reflectionSymmetric: bool<isReflectionSymmetric>
         stageCrossingsCount: int<stageCrossings>
+        reflectiveCount: int<reflectiveCount>
     }
 
     static member create 
@@ -28,7 +29,8 @@ type sorterEvalV1 =
             (stageLength: int<stageLength>)
             (ceLength: int<ceLength>) 
             (reflectionSymmetric: bool<isReflectionSymmetric>) 
-            (stageCrossingsCount: int<stageCrossings>): sorterEvalV1 =
+            (stageCrossingsCount: int<stageCrossings>)
+            (reflectiveCount: int<reflectiveCount>): sorterEvalV1 =
         { 
                 sorterId = sorterId; 
                 sortingWidth = sortingWidth;
@@ -39,6 +41,7 @@ type sorterEvalV1 =
                 ceLength = ceLength;
                 reflectionSymmetric = reflectionSymmetric
                 stageCrossingsCount = stageCrossingsCount
+                reflectiveCount = reflectiveCount
         }
 
     member this.ReflectionSymmetric with get() : bool<isReflectionSymmetric> = this.reflectionSymmetric
@@ -50,6 +53,7 @@ type sorterEvalV1 =
     member this.UnsortedCount with get() : int<sortableCount>  = this.unsortedCount
     member this.SequenceHash with get() : int<sequenceHash>  = this.sequenceHash
     member this.LastCeIndex with get() : int<ceIndex>  = this.lastCeIndex
+    member this.ReflectiveCount with get() : int<reflectiveCount> = this.reflectiveCount
 
     member this.ToDataTableRecord() : dataTableRecord =
             let isSorted = this.unsortedCount = 0<sortableCount>
@@ -64,6 +68,7 @@ type sorterEvalV1 =
             |> dataTableRecord.addData "LastCeIndex" (string %this.lastCeIndex)
             |> dataTableRecord.addData "IsReflectionSymmetric" (string %this.reflectionSymmetric)
             |> dataTableRecord.addData "StageCrossingsCount" (string %this.stageCrossingsCount)
+            |> dataTableRecord.addData "ReflectiveCount" (string %this.reflectiveCount)
 
     member this.ToDataTableRecordWithPrefix(prefix: string) : dataTableRecord =
             let isSorted = this.unsortedCount = 0<sortableCount>
@@ -78,6 +83,7 @@ type sorterEvalV1 =
             |> dataTableRecord.addData (prefix + "LastCeIndex") (string %this.lastCeIndex)
             |> dataTableRecord.addData (prefix + "IsReflectionSymmetric") (string %this.reflectionSymmetric)
             |> dataTableRecord.addData (prefix + "StageCrossingsCount") (string %this.stageCrossingsCount)
+            |> dataTableRecord.addData (prefix + "ReflectiveCount") (string %this.reflectiveCount)
 
 
 type sorterEvalV2 =
@@ -90,6 +96,7 @@ type sorterEvalV2 =
         ceUseArray: ceUse array
         isReflectionSymmetric: bool<isReflectionSymmetric>
         stageCrossingsCount: int<stageCrossings>
+        reflectiveCount: int<reflectiveCount>
     }
 
     static member create 
@@ -100,7 +107,8 @@ type sorterEvalV2 =
                     (stageLength: int<stageLength>)
                     (ceUseArray: ceUse array)
                     (reflectionSymmetric: bool<isReflectionSymmetric>)
-                    (stageCrossingsCount: int<stageCrossings>): sorterEvalV2 =
+                    (stageCrossingsCount: int<stageCrossings>)
+                    (reflectiveCount: int<reflectiveCount>): sorterEvalV2 =
         { 
                 sorterId = sorterId; 
                 sortingWidth = sortingWidth;
@@ -110,6 +118,7 @@ type sorterEvalV2 =
                 ceUseArray = ceUseArray;
                 isReflectionSymmetric = reflectionSymmetric
                 stageCrossingsCount = stageCrossingsCount
+                reflectiveCount = reflectiveCount
         }
     
     member this.IsReflectionSymmetric with get() : bool<isReflectionSymmetric> = this.isReflectionSymmetric
@@ -121,6 +130,7 @@ type sorterEvalV2 =
     member this.CeUseArray with get() : ceUse array = this.ceUseArray
     member this.UnsortedCount with get() : int<sortableCount>  = this.unsortedCount
     member this.SequenceHash with get() : int<sequenceHash>  = this.sequenceHash
+    member this.ReflectiveCount with get() : int<reflectiveCount> = this.reflectiveCount
     member this.LastCeIndex with get() : int<ceIndex>  = 
         if this.ceUseArray.Length = 0 then 0<ceIndex>
         else this.ceUseArray.[this.ceUseArray.Length - 1].CeIndex
@@ -137,6 +147,7 @@ type sorterEvalV2 =
             this.CeLength
             this.isReflectionSymmetric
             this.stageCrossingsCount
+            this.reflectiveCount
 
     member this.ToDataTableRecord() : dataTableRecord =
             let isSorted = this.unsortedCount = 0<sortableCount>
@@ -152,6 +163,7 @@ type sorterEvalV2 =
             |> dataTableRecord.addData "CeUseArray" (CeUse.arrayToString this.ceUseArray)
             |> dataTableRecord.addData "IsReflectionSymmetric" (string %this.isReflectionSymmetric)
             |> dataTableRecord.addData "StageCrossingsCount" (string %this.stageCrossingsCount)
+            |> dataTableRecord.addData "ReflectiveCount" (string %this.reflectiveCount)
 
     member this.ToDataTableRecordWithPrefix(prefix: string) : dataTableRecord =
         let isSorted = this.unsortedCount = 0<sortableCount>
@@ -167,6 +179,7 @@ type sorterEvalV2 =
         |> dataTableRecord.addData (prefix + "CeUseArray") (CeUse.arrayToString this.ceUseArray)
         |> dataTableRecord.addData (prefix + "IsReflectionSymmetric") (string %this.isReflectionSymmetric)
         |> dataTableRecord.addData (prefix + "StageCrossingsCount") (string %this.stageCrossingsCount)
+        |> dataTableRecord.addData (prefix + "ReflectiveCount") (string %this.reflectiveCount)
 
 
 type sorterEvalV3 =
@@ -179,6 +192,7 @@ type sorterEvalV3 =
         sortableTest: sortableTest 
         reflectionSymmetric: bool<isReflectionSymmetric>
         stageCrossingsCount: int<stageCrossings>
+        reflectiveCount: int<reflectiveCount>
     }
 
     static member create 
@@ -189,7 +203,8 @@ type sorterEvalV3 =
                     (ceUseArray: ceUse array) 
                     (sortableTest:sortableTest) 
                     (reflectionSymmetric: bool<isReflectionSymmetric>) 
-                    (stageCrossingsCount: int<stageCrossings>): sorterEvalV3 =
+                    (stageCrossingsCount: int<stageCrossings>)
+                    (reflectiveCount: int<reflectiveCount>): sorterEvalV3 =
         { 
                 sorterId = sorterId;
                 sortingWidth = sortingWidth;
@@ -199,6 +214,7 @@ type sorterEvalV3 =
                 sortableTest =sortableTest;
                 reflectionSymmetric = reflectionSymmetric
                 stageCrossingsCount = stageCrossingsCount
+                reflectiveCount = reflectiveCount
         }
     
     member this.ReflectionSymmetric with get() : bool<isReflectionSymmetric> = this.reflectionSymmetric
@@ -210,6 +226,7 @@ type sorterEvalV3 =
     member this.CeUseArray with get() : ceUse array = this.ceUseArray
     member this.SequenceHash with get() : int<sequenceHash>  = this.sequenceHash
     member this.SortableTest with get() : sortableTest = this.sortableTest
+    member this.ReflectiveCount with get() : int<reflectiveCount> = this.reflectiveCount
     member this.UnsortedCount with get() : int<sortableCount>  = 
             this.sortableTest |> SortableTests.getUnsortedCount
     member this.LastCeIndex with get() : int<ceIndex>  = 
@@ -227,6 +244,7 @@ type sorterEvalV3 =
             this.ceUseArray
             this.reflectionSymmetric
             this.stageCrossingsCount
+            this.reflectiveCount
 
     /// Downgrades sorterEvalV3 directly to sorterEvalV1.
     member this.ToV1() : sorterEvalV1 =
@@ -240,6 +258,7 @@ type sorterEvalV3 =
             this.CeLength
             this.reflectionSymmetric
             this.stageCrossingsCount
+            this.reflectiveCount
 
     member this.ToDataTableRecord() : dataTableRecord =
             let isSorted = this.UnsortedCount = 0<sortableCount>
@@ -255,6 +274,7 @@ type sorterEvalV3 =
             |> dataTableRecord.addData "CeUseArray" (CeUse.arrayToString this.ceUseArray)
             |> dataTableRecord.addData "IsReflectionSymmetric" (string %this.reflectionSymmetric)
             |> dataTableRecord.addData "StageCrossingsCount" (string %this.stageCrossingsCount)
+            |> dataTableRecord.addData "ReflectiveCount" (string %this.reflectiveCount)
 
     member this.ToDataTableRecordWithPrefix(prefix: string) : dataTableRecord =
             let isSorted = this.UnsortedCount = 0<sortableCount>
@@ -270,6 +290,7 @@ type sorterEvalV3 =
             |> dataTableRecord.addData (prefix + "CeUseArray") (CeUse.arrayToString this.ceUseArray)
             |> dataTableRecord.addData (prefix + "IsReflectionSymmetric") (string %this.reflectionSymmetric)
             |> dataTableRecord.addData (prefix + "StageCrossingsCount") (string %this.stageCrossingsCount)
+            |> dataTableRecord.addData (prefix + "ReflectiveCount") (string %this.reflectiveCount)
 
 
 type sorterEvalType = 
@@ -310,6 +331,12 @@ module SorterEval =
         | V1 v1 -> v1.StageCrossingsCount
         | V2 v2 -> v2.StageCrossingsCount
         | V3 v3 -> v3.StageCrossingsCount
+
+    let getReflectiveCount (eval: sorterEval) : int<reflectiveCount> =
+        match eval with
+        | V1 v1 -> v1.ReflectiveCount
+        | V2 v2 -> v2.ReflectiveCount
+        | V3 v3 -> v3.ReflectiveCount
 
     let getSorterId (eval: sorterEval) : Guid<sorterId> =
         match eval with
@@ -425,6 +452,8 @@ module SorterEval =
                                     |> Array.forall(fun st -> st |> Stage.isReflectionSymmetric)
                                     |> UMX.tag<isReflectionSymmetric>
 
+        let reflectiveCount =  stageSequence.GetReflectiveCount()
+
         sorterEvalV1.create 
             sorterId 
             ceBlockEval.CeBlock.SortingWidth
@@ -435,6 +464,7 @@ module SorterEval =
             ceBlockEval.CeLength
             isReflectionSymmetric
             stageCrossingsCount
+            reflectiveCount
         |> V1
 
     let createV2
@@ -450,6 +480,9 @@ module SorterEval =
         let isReflectionSymmetric = stageSequence.Stages 
                                     |> Array.forall(fun st -> st |> Stage.isReflectionSymmetric)
                                     |> UMX.tag<isReflectionSymmetric>
+
+        let reflectiveCount =  stageSequence.GetReflectiveCount()
+
         sorterEvalV2.create 
             sorterId 
             ceBlockEval.CeBlock.SortingWidth
@@ -459,6 +492,7 @@ module SorterEval =
             ceUseArray
             isReflectionSymmetric
             stageCrossingsCount
+            reflectiveCount
         |> V2
 
     let createV3
@@ -473,6 +507,8 @@ module SorterEval =
         let isReflectionSymmetric = stageSequence.Stages 
                                     |> Array.forall(fun st -> st |> Stage.isReflectionSymmetric)
                                     |> UMX.tag<isReflectionSymmetric>
+
+        let reflectiveCount =  stageSequence.GetReflectiveCount()
 
         match ceBlockEval.SortableTest with
         | None -> 
@@ -489,6 +525,7 @@ module SorterEval =
                 test
                 isReflectionSymmetric
                 stageCrossingsCount
+                reflectiveCount
             |> V3
 
     let create 

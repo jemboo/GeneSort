@@ -98,3 +98,29 @@ module OpActionRates =
             | opActionMode.Para     -> paraMutator psi
             | opActionMode.NoAction -> psi
         )
+
+
+    let mutate2
+        (rates: opActionRates) 
+        (orthoMutator: permSi -> permSi)
+        (paraMutator: permSi -> permSi)
+        (floatPicker: unit -> float)
+        (permEval: permSi -> int)
+        (arrayToMutate: permSi[]) : permSi[] = 
+    
+        arrayToMutate |> Array.map (fun psi ->
+            match rates.PickMode floatPicker with
+            | opActionMode.NoAction -> 
+                psi
+            | mode ->
+                let mutated = 
+                    match mode with
+                    | opActionMode.Ortho -> orthoMutator psi
+                    | opActionMode.Para  -> paraMutator psi
+                    | opActionMode.NoAction -> psi // Unreachable, but completes exhaustiveness
+
+                let oVal = permEval psi
+                let mVal = permEval mutated
+
+                if oVal > (mVal + 1) then psi else mutated
+        )

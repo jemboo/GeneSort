@@ -46,7 +46,7 @@ type sortableBoolArray =
      
     /// Mutates and creates a new sortableBoolArray by sorting with CEs. (No use counters tracked)
     member this.SortByCes (ces: ce[]) : sortableBoolArray =
-        let sortedValues = Ce.sortBy ces (Array.copy this.values)
+        let sortedValues = CeSorting.sortBy ces (Array.copy this.values)
         sortableBoolArray.create(sortedValues, this.SortingWidth)
 
     override this.Equals(obj) =

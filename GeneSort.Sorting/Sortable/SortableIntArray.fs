@@ -91,13 +91,13 @@ type sortableIntArray =
     member this.SortByCes
                 (ces: ce[])
                 (useCounter: int[]) : sortableIntArray =
-        let sortedValues = Ce.sortByWithUses ces useCounter (Array.copy this.values)
+        let sortedValues = CeSorting.sortByWithUses ces useCounter (Array.copy this.values)
         sortableIntArray.create(sortedValues, this.SortingWidth, this.SymbolSetSize)
 
     member this.SortByCesWithHistory 
                 (ces: ce[])
                 (useCounter: int[]) : sortableIntArray[] =
-        let history = Ce.sortByWithHistoryAndUses ces useCounter this.values
+        let history = CeSorting.sortByWithHistoryAndUses ces useCounter this.values
         let sw = this.SortingWidth
         let sss = this.SymbolSetSize
         history |> Array.map (fun values -> sortableIntArray.create(values, sw, sss))

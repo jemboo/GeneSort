@@ -55,16 +55,12 @@ type mssi =
 
     member this.MakeSorter (maxCeLength: int<ceLength> option) = 
         let allCes = this.perm_Sis
-                        |> Array.map (fun psi -> psi |> PermSi.getTwoOrbits)
-                        |> Array.collect(id)
-                        |> Array.map(fun tbit -> ce.create tbit.First tbit.Second)
+                        |> Array.collect Ce.fromPermSi
         let ces = 
             match maxCeLength with
             | Some n -> allCes |> Array.truncate %n
             | None   -> allCes
         sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
-
-
 
 
 module Mssi =

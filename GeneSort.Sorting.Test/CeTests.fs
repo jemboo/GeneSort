@@ -16,9 +16,9 @@ type CeTests() =
         let width = 4
         let indices = [|0 .. 20|] // Corresponds to Ces: (0,1), (0,2), (1,2), (0,3), (1,3), (2,3)
         let picker = indexPicker indices
-        let result = Ce.generateCeCode false  width picker
+        let result = Ce.generateCeCode false width picker
         result |> should equal 0 // First index from picker
-        let maxIndex = Ce.maxIndexForWdith width
+        let maxIndex = Ce.maxIndexForWidth width
         result |> should be (lessThanOrEqualTo maxIndex)
 
     [<Fact>]
@@ -167,7 +167,7 @@ type CeTests() =
 
 
     [<Fact>]
-    let ``getSelfReflectiveComplement fills all unused index pairs on even width`` () =
+    let ``getSelfReflectiveComplement fills all unused index pairs on even width - simple case`` () =
         let width = 6<sortingWidth>
         // Input occupies indices 0 and 5: ce(0, 5)
         let inputCes = [| ce.create 0 5 |]
@@ -177,6 +177,20 @@ type CeTests() =
         let expected = [| ce.create 1 4; ce.create 2 3 |]
         result |> should equal expected
         result |> Array.iter (fun c -> Ce.isSelfReflection width c |> should equal true)
+
+
+    [<Fact>]
+    let ``getSelfReflectiveComplement fills all unused index pairs on even width`` () =
+        let width = 8<sortingWidth>
+        // Input occupies indices 0 and 5: ce(0, 5)
+        let inputCes = [| ce.create 0 2; ce.create 5 7 |]
+        let result = Ce.getSelfReflectiveComplement width inputCes
+
+        // Unused indices are 1, 2, 3, 4 -> mirrored pairs are ce(1, 4) and ce(2, 3)
+        let expected = [| ce.create 1 6; ce.create 3 4 |]
+        result |> should equal expected
+        result |> Array.iter (fun c -> Ce.isSelfReflection width c |> should equal true)
+
 
     [<Fact>]
     let ``getSelfReflectiveComplement handles odd width with center index`` () =
@@ -189,6 +203,7 @@ type CeTests() =
         let expected = [| ce.create 1 3; ce.create 2 2 |]
         result |> should equal expected
         result |> Array.iter (fun c -> Ce.isSelfReflection width c |> should equal true)
+
 
     [<Fact>]
     let ``getSelfReflectiveComplement throws when unused mirror index is occupied`` () =
@@ -204,6 +219,7 @@ type CeTests() =
     
         Assert.Contains("Cannot form self-reflective complement", ex.Message)
 
+
     [<Fact>]
     let ``getSelfReflectiveComplement throws on duplicate input indices`` () =
         let width = UMX.tag 4
@@ -213,5 +229,40 @@ type CeTests() =
                 Ce.getSelfReflectiveComplement width inputCes |> ignore)
     
         Assert.Contains("used multiple times", ex.Message)
+
+
+    [<Fact>]
+    let ``countReflectiveOrReflected returns 0 for empty array`` () =
+        let width = UMX.tag 4
+        let count = Ce.countReflectiveOrReflected width [||]
+        count |> should equal 0
+
+
+    [<Fact>]
+    let ``countReflectiveOrReflected counts self-reflective CEs`` () =
+        let width = UMX.tag 4
+        // (0, 3) and (1, 2) are self-reflective on width 4
+        let input = [| ce.create 0 3; ce.create 1 2 |]
+        let count = Ce.countReflectiveOrReflected width input
+        count |> should equal 2
+
+
+    [<Fact>]
+    let ``countReflectiveOrReflected counts paired reflected CEs`` () =
+        let width = UMX.tag 4
+        // (0, 1) reflects to (2, 3). Both are present in the array.
+        let input = [| ce.create 0 1; ce.create 2 3 |]
+        let count = Ce.countReflectiveOrReflected width input
+        count |> should equal 2
+
+
+    [<Fact>]
+    let ``countReflectiveOrReflected ignores unreflected CEs without matching reflection`` () =
+        let width = UMX.tag 4
+        // (0, 1) reflects to (2, 3), but (2, 3) is NOT in the array.
+        // (1, 2) is self-reflective.
+        let input = [| ce.create 0 1; ce.create 1 2 |]
+        let count = Ce.countReflectiveOrReflected width input
+        count |> should equal 1 // Only (1, 2) counts
 
 

@@ -25,11 +25,8 @@ module Combinatorics =
     /// <param name="modulus">The modulus for reflection (must be positive).</param>
     /// <param name="value">The value to reflect (must be non-negative and less than modulus).</param>
     /// <returns>The reflected value.</returns>
-    /// <exception cref="System.ArgumentException">Thrown when modulus is non-positive or value is invalid.</exception>
-    let reflect (modulus: int) (value: int) : int =
-        if modulus <= 0 then invalidArg "modulus" "Modulus must be positive"
-        if value < 0 || value >= modulus then invalidArg "value" "Value must be non-negative and less than modulus"
-        modulus - value - 1
+    let inline reflect (width: int) (index: int) : int = (width - 1) - index
+
 
 
     /// Computes the 2D Cartesian product of two sequences, yielding all possible pairs.
