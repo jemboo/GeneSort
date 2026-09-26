@@ -34,6 +34,10 @@ type stage =
         if this.ces.Length = 0 then 0.0
         else this.ces |> Array.averageBy (fun c -> float c.Length)
 
+
+    member this.GetReflectiveCount() : int<reflectiveCount>  =
+            Ce.countReflectiveOrReflected this.SortingWidth this.ces
+
     member this.SortingWidth with get() = this.sortingWidth
 
     override this.GetHashCode() = this.hashCode
@@ -75,7 +79,10 @@ type stageSequence =
             stages = stages 
             hashCode = h
         }
-
+        
+    member this.GetReflectiveCount() : int<reflectiveCount>  =
+        this.stages |> Array.sumBy(fun stg -> %stg.GetReflectiveCount())
+        
     member this.SortingWidth = this.sortingWidth
     member this.Stages = this.stages
     member this.StageLength = this.stages.Length |> UMX.tag<stageLength>

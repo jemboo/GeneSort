@@ -20,7 +20,7 @@ let main argv =
     //DispatchSortableTest.makeParamsAndRun()
     //DispatchSorterEval.makeParamsAndRun()
     //DispatchSorterMutate.makeParamsAndRun()
-    DispatchSorterSgd.makeParamsAndRun()
+    DispatchSorterSgd.runRunParameters()
 
     let duration = DateTime.Now - startTime
     Thread.Sleep(100)

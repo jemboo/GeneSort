@@ -45,6 +45,7 @@ module SorterPoolMemberHistoryDto =
                     SortingWidth = %v2.SortingWidth
                     ReflectionSymmetric = %v2.IsReflectionSymmetric
                     StageCrossingsCount = %v2.StageCrossingsCount
+                    ReflectiveCount = %v2.ReflectiveCount
                 })
 
         {
@@ -77,6 +78,7 @@ module SorterPoolMemberHistoryDto =
                     (v2Dto.CeUseArray |> Array.map CeDataDto.toDomain)
                     (v2Dto.ReflectionSymmetric |> UMX.tag)
                     (v2Dto.StageCrossingsCount |> UMX.tag)
+                    (v2Dto.ReflectiveCount |> UMX.tag)
             )
 
         sorterPoolMemberHistory.create

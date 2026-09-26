@@ -4,6 +4,7 @@ open FSharp.UMX
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Sorting
+open GeneSort.Sorting.Sorter
 open GeneSort.Core
 
 
@@ -19,6 +20,7 @@ type sorterPoolSummary =
         _stdDevStageLength: float<stageLength>
         _rawCeLength: int<ceLength>
         _aveStageCrossings: float<stageCrossings>
+        _aveReflectiveCountR: float<reflectiveCount>
     }
 
     member this.RawCeLength with get() = this._rawCeLength
@@ -31,6 +33,8 @@ type sorterPoolSummary =
     member this.AveStageLength with get() = this._aveStageLength
     member this.StdDevStageLength with get() = this._stdDevStageLength
     member this.AveStageCrossings with get() = this._aveStageCrossings
+    member this.AveReflectiveCountR with get() = this._aveReflectiveCountR
+
 
     static member create 
                     (poolId: Guid<sorterPoolId>) 
@@ -42,7 +46,8 @@ type sorterPoolSummary =
                     (minStageLength: int<stageLength>) 
                     (aveStageLength: float<stageLength>) 
                     (stdDevStageLength: float<stageLength>) 
-                    (aveStageCrossings: float<stageCrossings>) =
+                    (aveStageCrossings: float<stageCrossings>) 
+                    (aveReflectiveCountR: float<reflectiveCount>) =
         { 
           _sorterPoolId = poolId; 
           _sorterPoolName = sorterPoolName;
@@ -54,6 +59,7 @@ type sorterPoolSummary =
           _aveStageLength = aveStageLength;
           _stdDevStageLength = stdDevStageLength;
           _aveStageCrossings = aveStageCrossings;
+          _aveReflectiveCountR = aveReflectiveCountR;
         }
 
 
@@ -112,11 +118,13 @@ module SorterPoolSetSummary =
                         (0.0 |> UMX.tag) 
                         (0.0 |> UMX.tag)
                         (0.0 |> UMX.tag)
+                        (0.0 |> UMX.tag)
                 else
                     // Map out the metrics across all evaluations
                     let ceLengths = evals |> Array.map (fun ev -> float %(SorterEval.getCeLength ev))
                     let stageLengths = evals |> Array.map (fun ev -> float %(SorterEval.getStageLength ev))
                     let stageCrossings = evals |> Array.map (fun ev -> float %(SorterEval.getStageCrossingsCount ev))
+                    let reflectiveCountRs = evals |> Array.map (fun ev -> float (float %(SorterEval.getReflectiveCount ev) / float %(SorterEval.getCeLength ev)))
 
                     // Compute minimums
                     let minCe = (Array.min ceLengths |> int) |> UMX.tag<ceLength>
@@ -128,6 +136,7 @@ module SorterPoolSetSummary =
                     let aveCe = aveCeVal |> UMX.tag<ceLength>
                     let aveStage = aveStageVal |> UMX.tag<stageLength>
                     let aveStageCrossings = (stageCrossings |> Array.average) |> UMX.tag<stageCrossings>
+                    let aveReflectiveCountR = (reflectiveCountRs |> Array.average) |> UMX.tag<reflectiveCount>
 
                     // Compute standard deviations
                     let stdDevCe = computeStdDev ceLengths aveCeVal |> UMX.tag<ceLength>
@@ -144,6 +153,7 @@ module SorterPoolSetSummary =
                         aveStage
                         stdDevStage
                         aveStageCrossings
+                        aveReflectiveCountR
             )
             |> Seq.toArray
 
@@ -178,4 +188,5 @@ module SorterPoolSetSummary =
             |> dataTableRecord.addData (sprintf "%sAveStageLength" prefix) (sprintf "%.5f" (%poolSum.AveStageLength))
             |> dataTableRecord.addData (sprintf "%sStdDevStageLength" prefix) (sprintf "%.5f" (%poolSum.StdDevStageLength))
             |> dataTableRecord.addData (sprintf "%sAveStageCrossings" prefix) (sprintf "%.5f" (%poolSum.AveStageCrossings))
+            |> dataTableRecord.addData (sprintf "%sAveReflectiveCountR" prefix) (sprintf "%.5f" (%poolSum.AveReflectiveCountR))
         )

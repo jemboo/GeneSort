@@ -5,6 +5,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Core.PermSi
 open GeneSort.Model.Sorting.V1
+open GeneSort.Sorting.Sorter
 
 [<Struct; CustomEquality; NoComparison>]
 type mssiRandMutate = 
@@ -62,12 +63,19 @@ type mssiRandMutate =
         let orthoMutator = fun psi -> PermSi.mutate (rng.NextIndex) MutationMode.Ortho psi 
         let paraMutator = fun psi ->  PermSi.mutate (rng.NextIndex) MutationMode.Para psi 
         
+        let evalo (psi:permSi) : int =
+            let ces = Ce.fromPermSi psi
+            Ce.countReflectiveOrReflected parent.SortingWidth ces
+            |> UMX.untag
+
+
         // Mutate the array using the uniform rates module
-        let mutated = OpActionRates.mutate 
+        let mutated = OpActionRates.mutate2 
                         this.OpActionRates 
                         orthoMutator 
                         paraMutator 
-                        (rng.NextFloat) 
+                        (rng.NextFloat)
+                        evalo
                         parent.Perm_Sis
                         
         mssi.create id parent.SortingWidth mutated

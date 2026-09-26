@@ -7,6 +7,7 @@ open GeneSort.Core
 open GeneSort.Sorting
 
 [<Measure>] type sequenceHash
+[<Measure>] type reflectiveCount
 
 [<Struct>]
 type ce = private { low: int; hi: int } with
@@ -26,6 +27,8 @@ type ce = private { low: int; hi: int } with
     member this.Hi with get () = this.hi
 
     member this.Length with get() = this.Hi - this.Low
+
+
 
 module Ce =
 
@@ -52,6 +55,12 @@ module Ce =
         else
             let ceStrings = trimmed.Split(';')
             ceStrings |> Array.map (fun ceStr -> fromString (ceStr.Trim()))
+
+    /// Converts a permSi's two-orbits into an array of ce's.
+    let fromPermSi (psi: permSi) : ce [] =
+        psi
+        |> PermSi.getTwoOrbits
+        |> Array.map (fun tbit -> ce.create tbit.First tbit.Second)
 
 
     // combine the upper and lower arrays, but increase the low and hi indexes of the ce's in cesLower
@@ -141,81 +150,6 @@ module Ce =
         complement.ToArray()
 
 
-
-
-    let inline sortBy< ^a when ^a: comparison> 
-                (ces: ce[]) 
-                (values: ^a[]) : ^a[] =
-
-        for i = 0 to ces.Length - 1 do
-            let ce = ces.[i]
-            let lowIdx = ce.Low
-            let hiIdx = ce.Hi
-            
-            if values.[lowIdx] > values.[hiIdx] then
-                let temp = values.[lowIdx]
-                values.[lowIdx] <- values.[hiIdx]
-                values.[hiIdx] <- temp
-        values
-
-
-    let inline sortByBranchlessWithUses 
-            (ces: ce[]) 
-            (useCounter: int[]) 
-            (values: int[]) : int[] =
-
-        for i = 0 to ces.Length - 1 do
-            let ce = ces.[i]
-            let a = values.[ce.Low]
-            let b = values.[ce.Hi]
-        
-            // Tracking "uses" still requires a branch, but we can make it branchless too!
-            let diff = if a > b then 1 else 0
-            useCounter.[i] <- useCounter.[i] + diff
-        
-            let mask = -diff
-            let t = (a ^^^ b) &&& mask
-            values.[ce.Low] <- a ^^^ t
-            values.[ce.Hi] <- b ^^^ t
-        values
-
-
-   // mutates in placeby a sequence of ces, and returns the resulting sortable (values[]),
-   // records the number of uses of each ce in useCounter, starting at useCounterOffset
-    let inline sortByWithUses< ^a when ^a: comparison> 
-                (ces: ce[]) 
-                (useCounter: int[])
-                (values: ^a[]) : ^a[] =
-
-        for i = 0 to ces.Length - 1 do
-            let ce = ces.[i]
-            if values.[ce.Low] > values.[ce.Hi] then
-                let temp = values.[ce.Low]
-                values.[ce.Low] <- values.[ce.Hi]
-                values.[ce.Hi] <- temp
-                useCounter.[i] <- useCounter.[i] + 1
-        values
-
-
-   // mutates in placeby a sequence of ces, returning an array of the final and
-   // intermediate results (values[][]) 
-   // records the number of uses of each ce in useCounter, starting at useCounterOffset
-    let inline sortByWithHistoryAndUses< ^a when ^a: comparison> 
-                (ces: ce[]) 
-                (useCounter: int[])
-                (values: ^a[]) : ^a[][] =
-        let result = Array.init (ces.Length + 1) (fun _ -> Array.copy values)
-        for i = 0 to ces.Length - 1 do
-            let ce = ces.[i]
-            result.[i + 1] <- Array.copy result.[i]
-            if result.[i + 1].[ce.Low] > result.[i + 1].[ce.Hi] then
-                let temp = result.[i + 1].[ce.Low]
-                result.[i + 1].[ce.Low] <- result.[i + 1].[ce.Hi]
-                result.[i + 1].[ce.Hi] <- temp
-                useCounter.[i] <- useCounter.[i] + 1
-        result
-
-
     let maxIndexForWdith (width: int) : int =
         width*(width - 1) / 2
 
@@ -252,6 +186,20 @@ module Ce =
     let isSelfReflection (sortingWidth: int<sortingWidth>) (cer: ce) : bool =
             let reflected = reflect sortingWidth cer
             reflected = cer
+
+
+    /// Counts the number of CEs in the array that are either self-reflective OR are 
+    /// the reflection of at least one CE (including itself) present in the array.
+    let countReflectiveOrReflected (sortingWidth: int<sortingWidth>) (ces: ce[]) : int<reflectiveCount> =
+        if ces.Length = 0 then
+            0 |> UMX.tag<reflectiveCount>
+        else
+            let ceSet = Set.ofArray ces
+            ces
+            |> Array.filter (fun c ->
+                // Check if the CE is self-reflective OR its reflection exists in the array
+                isSelfReflection sortingWidth c || Set.contains (reflect sortingWidth c) ceSet)
+            |> Array.length |> UMX.tag<reflectiveCount>
 
 
     let generateCeCode (excludeSelfCe:bool)
