@@ -16,9 +16,9 @@ type CeTests() =
         let width = 4
         let indices = [|0 .. 20|] // Corresponds to Ces: (0,1), (0,2), (1,2), (0,3), (1,3), (2,3)
         let picker = indexPicker indices
-        let result = Ce.generateCeCode false  width picker
+        let result = Ce.generateCeCode false width picker
         result |> should equal 0 // First index from picker
-        let maxIndex = Ce.maxIndexForWdith width
+        let maxIndex = Ce.maxIndexForWidth width
         result |> should be (lessThanOrEqualTo maxIndex)
 
     [<Fact>]

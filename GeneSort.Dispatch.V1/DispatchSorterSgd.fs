@@ -138,8 +138,8 @@ module DispatchSorterSgd =
 
 
     //********** MssiSgdSpecsPrefix **********
-    let private executorType = sorterSgdExecutorType.GenPrefix
-    let private host: IRunHost = Mssi24p3b.OrthoPara.createRunHost (Mssi24p3b.OrthoPara.Specs64.NoMods executorType)
+    let private executorType = sorterSgdExecutorType.SummaryReport
+    let private host: IRunHost = Mssi24p3b.OrthoPara.createRunHost (Mssi24p3b.OrthoPara.Specs64.SymForceDiff1 executorType)
 
     let private executor = SorterSgdExecutorType.getExecutor executorType
     let private minReplica = 0<replNumber>

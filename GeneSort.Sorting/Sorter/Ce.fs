@@ -5,6 +5,7 @@ open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
+open System.Collections
 
 [<Measure>] type sequenceHash
 [<Measure>] type reflectiveCount
@@ -150,8 +151,7 @@ module Ce =
         complement.ToArray()
 
 
-    let maxIndexForWdith (width: int) : int =
-        width*(width - 1) / 2
+    let maxIndexForWidth (width: int) : int =  width * (width - 1) / 2
 
     let toIndex (ce: ce) : int =
         let i = ce.Low
@@ -192,6 +192,32 @@ module Ce =
     /// the reflection of at least one CE (including itself) present in the array.
     let countReflectiveOrReflected (sortingWidth: int<sortingWidth>) (ces: ce[]) : int<reflectiveCount> =
         if ces.Length = 0 then
+            0 |> UMX.tag
+        else
+            let w = %sortingWidth
+            let maxIdx = maxIndexForWidth (w + 1)
+        
+            // Create bit-presence mask (extremely fast bitwise operations)
+            let presence = BitArray(maxIdx + 1, false)
+            for i in 0 .. ces.Length - 1 do
+                presence.Set(toIndex ces.[i], true)
+
+            let mutable count = 0
+            for i in 0 .. ces.Length - 1 do
+                let c = ces.[i]
+                let reflected = reflect sortingWidth c
+                let reflectedIdx = toIndex reflected
+            
+                if presence.Get(reflectedIdx) then
+                    count <- count + 1
+
+            count |> UMX.tag
+
+
+    /// Counts the number of CEs in the array that are either self-reflective OR are 
+    /// the reflection of at least one CE (including itself) present in the array.
+    let countReflectiveOrReflected_Old (sortingWidth: int<sortingWidth>) (ces: ce[]) : int<reflectiveCount> =
+        if ces.Length = 0 then
             0 |> UMX.tag<reflectiveCount>
         else
             let ceSet = Set.ofArray ces
@@ -208,7 +234,7 @@ module Ce =
         if width < 1 then
             failwith "Width must be at least 1"
         let ww = if excludeSelfCe then width else width + 1
-        let indexMax = maxIndexForWdith ww
+        let indexMax = maxIndexForWidth ww
         let dex = indexPicker indexMax
         if excludeSelfCe then
             let ceTemp = fromIndex dex
@@ -223,7 +249,7 @@ module Ce =
                         (width:int) : int seq =
         if width < 1 then
             failwith "Width must be at least 1"
-        let indexMax = maxIndexForWdith width
+        let indexMax = maxIndexForWidth width
         seq {
             while true do
                 indexPicker indexMax
@@ -237,7 +263,7 @@ module Ce =
                     (width:int) : int seq =
         if width < 2 then
             failwith "Width must be at least 2"
-        let indexMax = maxIndexForWdith width
+        let indexMax = maxIndexForWidth width
         seq {
             while true do
                 let ceTemp = indexPicker indexMax |> fromIndex
