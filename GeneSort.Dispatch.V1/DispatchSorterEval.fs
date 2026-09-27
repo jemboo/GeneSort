@@ -66,7 +66,7 @@ module DispatchSorterEval =
 
 
     //********** SorterEval Prefix **********
-    let private configType = SorterEvalSpecsTestPrefix.configType.Prefix_24s
+    let private configType = SorterEvalSpecsTestPrefix.configType.Prefix_32
     let private executorType = sorterEvalExecutorType.GenPrefix
     let private host: IRunHost = 
         let spec = SorterEvalSpecsTestPrefix.getRunHostSpec configType executorType

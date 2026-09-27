@@ -171,3 +171,24 @@ module OrthoPara =
             maxParallel = 8
         }
 
+        
+        let Test2 (executorType: sorterSgdExecutorType) : runHostSpec = {
+            databaseName = dbOrthoParaTestName
+            runName = sprintf @"Test2%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+            spans = [
+                (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                (runParameters.generationCurrentKey, [0] |> List.map string)
+                (runParameters.generationIntervalCountKey, [8] |> List.map string)
+                (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+                (runParameters.paraRateKey, [0.05; 0.075; 0.1; 0.125] |> List.map string)
+                (runParameters.selfSymRateKey, [1.25; 1.5; 1.75; 2.5] |> List.map string)
+                (runParameters.mutationModKey, [0] |> List.map string)
+                (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
+                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+            ]
+            filter = paramMapFilter
+            enhancer = finishRunParams
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 8
+        }

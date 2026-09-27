@@ -50,7 +50,7 @@ module DispatchSorterSgd =
 
     //********** MsrsSgdSpecsPrefix **********
     let private executorType = sorterSgdExecutorType.GenPrefix
-    let private host: IRunHost = Msrs32p4a.OrthoPara.createRunHost (Msrs32p4a.OrthoPara.Rates32.Test executorType)
+    let private host: IRunHost = Msrs32p4a.OrthoPara.createRunHost (Msrs32p4a.OrthoPara.Rates32.Test2 executorType)
 
     let private executor = SorterSgdExecutorType.getExecutor executorType
     let private minReplica = 0<replNumber>

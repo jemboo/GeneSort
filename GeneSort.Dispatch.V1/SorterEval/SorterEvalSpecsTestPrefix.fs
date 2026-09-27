@@ -89,7 +89,7 @@ module SorterEvalSpecsTestPrefix =
             filter = paramMapFilter
             enhancer = prefixEnhancer
             allowOverwrite = false |> UMX.tag
-            maxParallel = 1
+            maxParallel = 8
         }
 
 
