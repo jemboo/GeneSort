@@ -185,6 +185,10 @@ module Reporting =
                         rp.GetSorterEvalMeasure()
                         |> Result.ofOption "Missing sorterEvalMeasure in run parameters"
 
+            let! (mutVariant:mutatorVariant) = 
+                        rp.GetMutatorVariant ()
+                        |> Result.ofOption "Missing mutatorVariant in run parameters"
+
             let! (mutationMod: int<mutationMod>) = 
                         rp.GetMutationMod() 
                         |> Result.ofOption "Missing mutationMod in run parameters"
@@ -224,7 +228,7 @@ module Reporting =
                                             mutationRate
                                             insertionRate
                                             deletionRate
-                                            mutatorVariant.V1
+                                            mutVariant
 
             let parentMutantMap = 
                     SimpleSorterModelMutator.makeMutantIdToParentIdMap

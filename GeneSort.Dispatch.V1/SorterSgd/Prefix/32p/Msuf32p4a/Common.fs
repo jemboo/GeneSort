@@ -16,7 +16,7 @@ module Common =
 
     let standardParams (rp:runParameters) =
         let sorterEvalSelectionType = sorterSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
-        let pfxLibId = prefixLibId.create (24<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixB
+        let pfxLibId = prefixLibId.create (32<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixA
 
         rp.WithRngType(Some rngType.Lcg)
           .WithCollectNewSortableTests(false |> UMX.tag<collectNewSortableTests> |> Some)

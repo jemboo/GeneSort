@@ -8,15 +8,26 @@ open GeneSort.Project.V1
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.SortingLib.Sorter
+open GeneSort.FileDb.V1
 
 module Common =
 
-    let projName = "SorterSgd.Prfefix.32p.Msrs32p4a" |> UMX.tag<projectName>
+    let projName = "SorterSgd.Prfefix.32p4a.Msrs" |> UMX.tag<projectName>
+
+
+    let makeFolderFromDbName (dbName: string<databaseName>) =
+        @$"c:\Projects\{%projName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
+
+
+
+
+
+
     let seedSorterCount = 512
 
     let standardParams (rp:runParameters) =
         let sorterEvalSelectionType = sorterSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
-        let pfxLibId = prefixLibId.create (24<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixB
+        let pfxLibId = prefixLibId.create (32<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixA
 
         rp.WithRngType(Some rngType.Lcg)
           .WithCollectNewSortableTests(false |> UMX.tag<collectNewSortableTests> |> Some)
