@@ -14,7 +14,7 @@ module Common =
     let projName = "SorterSgd.Prfefix.Msrs24p3a" |> UMX.tag<projectName>
     let seedSorterCount = 512
 
-    let standardPoolSzParams (rp:runParameters) =
+    let standardParams (rp:runParameters) =
         let sorterEvalSelectionType = sorterSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
         let pfxLibId = prefixLibId.create (24<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixA
 

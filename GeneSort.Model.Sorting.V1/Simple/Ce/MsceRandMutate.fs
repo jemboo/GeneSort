@@ -14,12 +14,15 @@ type msceRandMutate =
           id : Guid<sorterModelMutatorId>
           rngFactory: rngFactory
           indelRates: indelRates
-          excludeSelfCe: bool<excludeSelfCe> }
+          excludeSelfCe: bool<excludeSelfCe> 
+          mutVariant: mutatorVariant
+        }
     with
     static member create 
             (rngFactory: rngFactory)
             (indelRates: indelRates) // Single value
-            (excludeSelfCe: bool<excludeSelfCe>) : msceRandMutate = 
+            (excludeSelfCe: bool<excludeSelfCe>) 
+            (mutVariant: mutatorVariant) : msceRandMutate = 
         
         let id =
             [
@@ -34,9 +37,11 @@ type msceRandMutate =
             rngFactory = rngFactory
             indelRates = indelRates
             excludeSelfCe = excludeSelfCe
+            mutVariant = mutVariant
         }
         
     member this.Id with get () = this.id
+    member this.MutatorVariant = this.mutVariant
     member this.RngFactory with get () = this.rngFactory
     member this.IndelRates with get () = this.indelRates
     member this.ExcludeSelfCe with get () = this.excludeSelfCe
@@ -86,12 +91,3 @@ type msceRandMutate =
                     (modd: int<mutationMod>) : msce =
         let id = this.MakeSorterModelId parent index modd
         this.MakeSorterModelFromId parent id 
-
-
-
-module MsceRandMutate =
-    let toString (msceMutate: msceRandMutate) : string = 
-        sprintf "MsceRandMutate(%s, %s, %b)"
-            (msceMutate.RngFactory.ToString())
-            (msceMutate.IndelRates.toString())
-            %msceMutate.ExcludeSelfCe

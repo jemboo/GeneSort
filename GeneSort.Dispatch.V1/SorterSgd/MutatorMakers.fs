@@ -31,7 +31,8 @@ module MutatorMakers =
                             let! mutationRate = rp.GetMutationRate()
                             let! insertionRate = rp.GetInsertionRate()
                             let! deletionRate = rp.GetDeletionRate()
-                            return getMsceModelMutator rngFactory excludeSelfCe modificationRate mutationRate insertionRate deletionRate
+                            let! mutVariant = rp.GetMutatorVariant()
+                            return getMsceModelMutator rngFactory excludeSelfCe modificationRate mutationRate insertionRate deletionRate mutVariant
                         }
                         match res with
                         | Some mutator -> return Ok mutator
@@ -43,7 +44,8 @@ module MutatorMakers =
                             let! modificationRate = rp.GetModificationRate()
                             let! orthoRate = rp.GetOrthoRate()
                             let! paraRate = rp.GetParaRate()
-                            return getMssiModelMutator rngFactory excludeSelfCe modificationRate orthoRate paraRate
+                            let! mutVariant = rp.GetMutatorVariant()
+                            return getMssiModelMutator rngFactory excludeSelfCe modificationRate orthoRate paraRate mutVariant
                         }
                         match res with
                         | Some mutator -> return Ok mutator
@@ -56,7 +58,8 @@ module MutatorMakers =
                             let! orthoRate = rp.GetOrthoRate()
                             let! paraRate = rp.GetParaRate()
                             let! selfSymRate = rp.GetSelfSymRate()
-                            return getMsrsModelMutator rngFactory excludeSelfCe modificationRate orthoRate paraRate selfSymRate
+                            let! mutVariant = rp.GetMutatorVariant()
+                            return getMsrsModelMutator rngFactory excludeSelfCe modificationRate orthoRate paraRate selfSymRate mutVariant
                         }
                         match res with
                         | Some mutator -> return Ok mutator
@@ -70,7 +73,8 @@ module MutatorMakers =
                             let! orthoRate = rp.GetOrthoRate()
                             let! paraRate = rp.GetParaRate()
                             let! selfSymRate = rp.GetSelfSymRate()
-                            return getMsuf4ModelMutator sortingWidth rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate
+                            let! mutVariant = rp.GetMutatorVariant()
+                            return getMsuf4ModelMutator sortingWidth rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate mutVariant
                         }
                         match res with
                         | Some mutator -> return Ok mutator
@@ -84,7 +88,8 @@ module MutatorMakers =
                             let! orthoRate = rp.GetOrthoRate()
                             let! paraRate = rp.GetParaRate()
                             let! selfSymRate = rp.GetSelfSymRate()
-                            return getMsuf4ModelMutator sortingWidth rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate
+                            let! mutVariant = rp.GetMutatorVariant()
+                            return getMsuf4ModelMutator sortingWidth rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate mutVariant
                         }
                         match res with
                         | Some mutator -> return Ok mutator

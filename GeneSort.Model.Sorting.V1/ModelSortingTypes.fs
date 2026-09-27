@@ -29,6 +29,26 @@ open GeneSort.Core
 [<Measure>] type selfSymRate
 
 
+type mutatorVariant =
+    | V1
+    | V2
+    | V3 
+
+module MutatorVariant =
+
+    let toString = function
+        | V1 -> "V1"
+        | V2 -> "V2"
+        | V3 -> "V3"
+
+    let fromString = function
+        | "V1" -> V1
+        | "V2" -> V2
+        | "V3" -> V3
+        | s -> failwithf "Unknown mutatorVariant: %s" s
+
+
+
 module MutationMod =
     let toString (w: int<mutationMod> option) : string =
         UmxExt.intOptionToString w

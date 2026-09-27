@@ -12,12 +12,13 @@ type msuf4RandMutate =
           id : Guid<sorterModelMutatorId>
           rngFactory: rngFactory
           uf4MutationRates: uf4MutationRates 
+          mutVariant: mutatorVariant
         } 
     with
     static member create 
             (rngFactory: rngFactory)
             (uf4MutationRates: uf4MutationRates) 
-            : msuf4RandMutate =
+            (mutVariant: mutatorVariant) : msuf4RandMutate =
 
         let id =
             [
@@ -30,9 +31,11 @@ type msuf4RandMutate =
             id = id
             rngFactory = rngFactory
             uf4MutationRates = uf4MutationRates
+            mutVariant = mutVariant
         }
 
     member this.Id with get () = this.id
+    member this.MutatorVariant = this.mutVariant
     member this.RngFactory with get () = this.rngFactory
     member this.Uf4MutationRates with get () = this.uf4MutationRates
 
@@ -76,19 +79,3 @@ type msuf4RandMutate =
                         (modd: int<mutationMod>) : msuf4 =
         let id = this.MakeSorterModelId parent index modd
         this.MakeSorterModelFromId parent id 
-
-
-
-module Msuf4RandMutate =
-
-    let toString (msuf4RandMutate: msuf4RandMutate) : string =
-        let rates = msuf4RandMutate.Uf4MutationRates
-        let ratesStr = 
-            sprintf "Seed(O:%.2f, P:%.2f, S:%.2f)" 
-                rates.SeedOpsTransitionRates.OrthoRates.ParaRate
-                rates.SeedOpsTransitionRates.ParaRates.OrthoRate
-                rates.SeedOpsTransitionRates.SelfReflRates.ParaRate
-
-        sprintf "Msuf4RandMutate(RngType=%A, MutationRates=%s)" 
-                msuf4RandMutate.RngFactory
-                ratesStr

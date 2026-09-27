@@ -45,6 +45,7 @@ type runParameters =
     static member mutationModKey = "MutationMod"
     static member mutationRateKey = "MutationRate"
     static member mutatorParamsKey = "MutatorParams"
+    static member mutatorVariantKey = "MutatorVariantKey"
     static member orthoRateKey = "OrthoRate"
     static member paraRateKey = "ParaRate"
     static member prefixLibIdKey = "PrefixLibId"
@@ -202,6 +203,10 @@ type runParameters =
     member this.GetMutationRate() =
         runParameters.tryGetFloat runParameters.mutationRateKey this.paramMap
         |> Option.map UMX.tag<mutationRate>
+
+    member this.GetMutatorVariant() =
+        this.paramMap.TryFind runParameters.mutatorVariantKey
+        |> Option.map MutatorVariant.fromString
 
     member this.GetOrthoRate() =
         runParameters.tryGetFloat runParameters.orthoRateKey this.paramMap
@@ -442,6 +447,9 @@ type runParameters =
 
     member this.WithMutatorParams(mtp: mutatorParams option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mutatorParamsKey (mtp |> Option.map MutatorParams.toString) }
+
+    member this.WithMutatorVariant(mutv: mutatorVariant option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.mutatorVariantKey (mutv |> Option.map MutatorVariant.toString) }
 
     member this.WithOrthoRate(ortho: float<orthoRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.orthoRateKey (ortho |> Option.map UmxExt.floatToRaw) }

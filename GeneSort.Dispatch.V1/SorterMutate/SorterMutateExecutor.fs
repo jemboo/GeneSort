@@ -64,6 +64,9 @@ module SorterMutateExecutor =
                         rp.GetExcludeSelfCe()
                         |> Result.ofOption "Missing excludeSelfCe in run parameters"
 
+            let! (mutVariant: mutatorVariant) = 
+                        rp.GetMutatorVariant()
+                        |> Result.ofOption "Missing mutatorVariant in run parameters"
 
             let! (parentSorterSetEval: sorterSetEval) =
                         SorterEvalDbs.getStandardSorterEvals 
@@ -155,6 +158,10 @@ module SorterMutateExecutor =
             let! (mutationMod: int<mutationMod>) = 
                         rp.GetMutationMod() 
                         |> Result.ofOption "Missing mutationMod in run parameters"
+
+            let! (mutVariant: mutatorVariant) = 
+                        rp.GetMutatorVariant()
+                        |> Result.ofOption "Missing mutatorVariant in run parameters"
 
             let! (excludeSelfCe: bool<excludeSelfCe>) = 
                         rp.GetExcludeSelfCe()
@@ -252,6 +259,11 @@ module SorterMutateExecutor =
             let! (mutationMod: int<mutationMod>) = 
                         rp.GetMutationMod() 
                         |> Result.ofOption "Missing mutationMod in run parameters"
+
+            let! (mutVariant: mutatorVariant) = 
+                        rp.GetMutatorVariant()
+                        |> Result.ofOption "Missing mutatorVariant in run parameters"
+
 
             let! (excludeSelfCe: bool<excludeSelfCe>) = 
                         rp.GetExcludeSelfCe()

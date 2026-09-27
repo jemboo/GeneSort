@@ -65,7 +65,7 @@ module OrthoPara =
 
 
     let private withLocalParams (rp:runParameters) =
-        let rpn = standardPoolSzParams rp
+        let rpn = standardParams rp
         rpn.WithOrthoRate(Some 1.001<orthoRate>)
 
 

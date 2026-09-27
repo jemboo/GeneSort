@@ -12,12 +12,13 @@ type msuf6RandMutate =
           id : Guid<sorterModelMutatorId>
           rngFactory: rngFactory
           uf6MutationRates: uf6MutationRates 
+          mutVariant: mutatorVariant
         } 
     with
     static member create 
             (rngFactory: rngFactory)
             (uf6MutationRates: uf6MutationRates)
-            : msuf6RandMutate =
+            (mutVariant: mutatorVariant) : msuf6RandMutate =
 
         let id =
             [
@@ -30,9 +31,11 @@ type msuf6RandMutate =
             id = id
             rngFactory = rngFactory
             uf6MutationRates = uf6MutationRates
+            mutVariant = mutVariant
         }
 
     member this.Id with get () = this.id
+    member this.MutatorVariant with get() = this.mutVariant
     member this.RngFactory with get () = this.rngFactory
     member this.Uf6MutationRates with get () = this.uf6MutationRates
 

@@ -80,7 +80,7 @@ module PoolModComp =
     //       .WithSelfSymRate(Some 2.001<selfSymRate>)
 
     let private withLocalParams (rp:runParameters) =
-        let rpn = standardPoolSzParams rp
+        let rpn = standardParams rp
         rpn.WithOrthoRate(Some 4.001<orthoRate>)
 
 

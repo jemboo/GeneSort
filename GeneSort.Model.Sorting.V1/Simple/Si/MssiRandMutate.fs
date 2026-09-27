@@ -13,12 +13,14 @@ type mssiRandMutate =
         { 
           id : Guid<sorterModelMutatorId>
           rngFactory: rngFactory
-          opActionRates: opActionRates // Changed from opActionRatesArray
+          opActionRates: opActionRates
+          mutVariant: mutatorVariant
         } 
     with
     static member create 
             (rngFactory: rngFactory)
-            (opActionRates: opActionRates) :mssiRandMutate =
+            (opActionRates: opActionRates) 
+            (mutVariant: mutatorVariant) : mssiRandMutate =
         
         let id =
             [
@@ -31,9 +33,11 @@ type mssiRandMutate =
             id = id
             rngFactory = rngFactory
             opActionRates = opActionRates
+            mutVariant = mutVariant
         }
         
     member this.Id with get() = this.id
+    member this.MutatorVariant = this.mutVariant
     member this.RngFactory with get() = this.rngFactory
     member this.OpActionRates with get() = this.opActionRates
 
@@ -86,10 +90,3 @@ type mssiRandMutate =
                                 (modd: int<mutationMod>) : mssi =
         let id = this.MakeSorterModelId parent index modd
         this.MakeSorterModelFromId parent id
-
-
-module MssiRandMutate =
-    let toString (mssiRandMutate: mssiRandMutate) : string = 
-        sprintf "MssiRandMutate(RngType=%A, OpActionRates=%s)" 
-                mssiRandMutate.RngFactory
-                (mssiRandMutate.OpActionRates.toString())
