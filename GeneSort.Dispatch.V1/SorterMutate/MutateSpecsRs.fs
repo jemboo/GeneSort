@@ -57,7 +57,7 @@ module MutateSpecsRs =
                 sorterEvalTypeV1
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_Scw
-                (mutatorSpansMsrs 16<sortingWidth> rngType.Lcg)
+                (mutatorSpansMsrs 16<sortingWidth> mutatorVariant.V1 rngType.Lcg)
                 modificationRate90
                 sortingWidth16
                 testChildCount
@@ -81,7 +81,7 @@ module MutateSpecsRs =
                 sorterEvalTypeV1
                 sorterEvalSelectionType
                 sorterEvalMeasure_CestM_Scw
-                (mutatorSpansMsrs 16<sortingWidth> rngType.Lcg)
+                (mutatorSpansMsrs 16<sortingWidth> mutatorVariant.V1 rngType.Lcg )
                 modificationRate90
                 sortingWidth16
                 testChildCount

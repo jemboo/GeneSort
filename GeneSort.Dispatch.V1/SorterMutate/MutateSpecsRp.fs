@@ -67,7 +67,7 @@ module MutateSpecsRp =
                 seedSorterPoolSelectionType
                 sorterEvalMeasure_CestM_noScw
                 prefixLib_Prefix32_4
-                (mutatorSpansMsce 32<sortingWidth> rngType.Lcg)
+                (mutatorSpansMsce 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
                 modificationRate03
                 testChildCount
                 mutationMod1
@@ -91,7 +91,7 @@ module MutateSpecsRp =
                 seedSorterPoolSelectionType
                 sorterEvalMeasure_CestM_noScw
                 prefixLib_Prefix32_4
-                (mutatorSpansMssi 32<sortingWidth> rngType.Lcg)
+                (mutatorSpansMssi 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
                 modificationRate03
                 testChildCount
                 mutationMod1
@@ -115,7 +115,7 @@ module MutateSpecsRp =
                 seedSorterPoolSelectionType
                 sorterEvalMeasure_CestM_noScw
                 prefixLib_Prefix32_4
-                (mutatorSpansMsrs 32<sortingWidth> rngType.Lcg)
+                (mutatorSpansMsrs 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
                 modificationRate03
                 testChildCount
                 mutationMod1
@@ -138,7 +138,7 @@ module MutateSpecsRp =
                 seedSorterPoolSelectionType
                 sorterEvalMeasure_CestM_noScw
                 prefixLib_Prefix32_4
-                (mutatorSpansMsuf4 32<sortingWidth> rngType.Lcg)
+                (mutatorSpansMsuf4 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
                 modificationRate03
                 testChildCount
                 mutationMod1

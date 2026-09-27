@@ -70,7 +70,7 @@ module MutateSpecsRm =
                 seedSorterPoolSelectionType
                 sorterEvalMeasure_CestM_noScw
                 mergeLib_Merge32s
-                (mutatorSpansMsce 32<sortingWidth> rngType.Lcg)
+                (mutatorSpansMsce 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
                 modificationRate03
                 testChildCount
                 mutationMod1
@@ -94,7 +94,7 @@ module MutateSpecsRm =
                 seedSorterPoolSelectionType
                 sorterEvalMeasure_CestM_noScw
                 mergeLib_Merge32s
-                (mutatorSpansMssi 32<sortingWidth> rngType.Lcg)
+                (mutatorSpansMssi 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
                 modificationRate03
                 testChildCount
                 mutationMod1
@@ -118,7 +118,7 @@ module MutateSpecsRm =
                 seedSorterPoolSelectionType
                 sorterEvalMeasure_CestM_noScw
                 mergeLib_Merge32s
-                (mutatorSpansMsrs 32<sortingWidth> rngType.Lcg)
+                (mutatorSpansMsrs 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
                 modificationRate03
                 testChildCount
                 mutationMod1
@@ -141,7 +141,7 @@ module MutateSpecsRm =
                 seedSorterPoolSelectionType
                 sorterEvalMeasure_CestM_noScw
                 mergeLib_Merge32s
-                (mutatorSpansMsuf4 32<sortingWidth> rngType.Lcg)
+                (mutatorSpansMsuf4 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
                 modificationRate03
                 testChildCount
                 mutationMod1

@@ -224,6 +224,7 @@ module Reporting =
                                             mutationRate
                                             insertionRate
                                             deletionRate
+                                            mutatorVariant.V1
 
             let parentMutantMap = 
                     SimpleSorterModelMutator.makeMutantIdToParentIdMap
@@ -341,6 +342,7 @@ module Reporting =
                                             mutationRate
                                             insertionRate
                                             deletionRate
+                                            mutatorVariant.V1
 
             let parentMutantMap = 
                     SimpleSorterModelMutator.makeMutantIdToParentIdMap
@@ -439,6 +441,7 @@ module Reporting =
                                             mutationRate
                                             insertionRate
                                             deletionRate
+                                            mutatorVariant.V1
 
             let parentMutantMap = 
                     SimpleSorterModelMutator.makeMutantIdToParentIdMap

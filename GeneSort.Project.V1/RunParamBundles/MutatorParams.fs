@@ -37,13 +37,20 @@ type simpleMutatorCase =
 
 
 type simpleMutatorParams = 
-    { sortingWidth: int<sortingWidth>
-      rngType: rngType
-      mutCase: simpleMutatorCase }
+    private 
+        { sortingWidth: int<sortingWidth>
+          rngType: rngType
+          mutVariant: mutatorVariant
+          mutCase: simpleMutatorCase }
 
-    static member create (sortingWidth: int<sortingWidth>) (rngType: rngType) (case: simpleMutatorCase) =
-        { sortingWidth = sortingWidth; rngType = rngType; mutCase = case }
+    static member create 
+            (sortingWidth: int<sortingWidth>) 
+            (rngType: rngType) 
+            (mutVariant: mutatorVariant)
+            (case: simpleMutatorCase) =
+        { sortingWidth = sortingWidth; rngType = rngType; mutVariant = mutVariant; mutCase = case }
 
+    member this.MutatorVariant = this.mutVariant
     member this.SortingWidth = this.sortingWidth
     member this.RngType = this.rngType
     member this.Case = this.mutCase
@@ -92,8 +99,9 @@ module SimpleMutatorParams =
 
 
     let toString (params': simpleMutatorParams) : string =
-        sprintf "%d:%s:%s" 
+        sprintf "%d:%s:%s:%s" 
             (%params'.sortingWidth) 
+            (MutatorVariant.toString params'.MutatorVariant)
             (RngType.toString params'.RngType) 
             (caseToString params'.Case)
 
@@ -169,15 +177,18 @@ module SimpleMutatorParams =
 
     let fromString (str: string) : Result<simpleMutatorParams, string> =
         match str.Split(':') |> Array.toList with
-        | widthStr :: rngStr :: caseTokens when caseTokens.Length > 0 ->
+        | widthStr :: variantStr :: rngStr :: caseTokens when caseTokens.Length > 0 ->
             result {
                 let! rawWidth = parseInt widthStr
                 let sortingWidth = rawWidth |> UMX.tag
+                let! variantVal = 
+                    try Ok (MutatorVariant.fromString variantStr)
+                    with ex -> Error ex.Message
                 let! rngTypeVal = 
                     try Ok (RngType.fromString rngStr) 
                     with ex -> Error ex.Message
                 let! caseVal = parseCase caseTokens
-                return simpleMutatorParams.create sortingWidth rngTypeVal caseVal
+                return simpleMutatorParams.create sortingWidth rngTypeVal variantVal caseVal
             }
         | _ -> Error $"Unrecognized or malformed simpleMutatorParams string: '{str}'"
 
@@ -187,26 +198,28 @@ module SimpleMutatorParams =
             (params': simpleMutatorParams) : simpleSorterModelMutator =
         let rngFactory = RngFactory.create params'.rngType
         let sortingWidth = params'.sortingWidth
+        let mutVariant = params'.MutatorVariant
+
         match params'.Case with
         | Msce (excludeSelfCe, mutationRate, insertionRate, deletionRate) ->
             SimpleSorterModelMutator.getMsceModelMutator 
-                rngFactory excludeSelfCe modificationRate mutationRate insertionRate deletionRate
+                rngFactory excludeSelfCe modificationRate mutationRate insertionRate deletionRate mutVariant
 
         | Mssi (excludeSelfCe, orthoRate, paraRate) ->
             SimpleSorterModelMutator.getMssiModelMutator 
-                rngFactory excludeSelfCe modificationRate orthoRate paraRate
+                rngFactory excludeSelfCe modificationRate orthoRate paraRate mutVariant
 
         | Msrs (excludeSelfCe, orthoRate, paraRate, selfSymRate) ->
             SimpleSorterModelMutator.getMsrsModelMutator 
-                rngFactory excludeSelfCe modificationRate orthoRate paraRate selfSymRate
+                rngFactory excludeSelfCe modificationRate orthoRate paraRate selfSymRate mutVariant
 
         | Msuf4 (excludeSelfCe, seedModificationRate, orthoRate, paraRate, selfSymRate) ->
             SimpleSorterModelMutator.getMsuf4ModelMutator 
-                sortingWidth rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate
+                sortingWidth rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate mutVariant
 
         | Msuf6 (excludeSelfCe, seedModificationRate, orthoRate, paraRate, selfSymRate) ->
             SimpleSorterModelMutator.getMsuf6ModelMutator 
-                sortingWidth rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate
+                sortingWidth rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate mutVariant
 
 
 
@@ -253,82 +266,79 @@ module MutatorParams =
             failwith "Complex mutator parameters are not yet implemented."
 
 
-    let msceParamsR10 (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
-        simpleMutatorParams.create width rng (Msce (true |> UMX.tag, 1.01 |> UMX.tag<mutationRate>, 0.1 |> UMX.tag<insertionRate>, 0.1 |> UMX.tag<deletionRate>))
+    let msceParamsR10 (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+        simpleMutatorParams.create width rng variant (Msce (true |> UMX.tag, 1.01 |> UMX.tag, 0.1 |> UMX.tag, 0.1 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let msceParamsR5 (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
-        simpleMutatorParams.create width rng (Msce (true |> UMX.tag, 1.01 |> UMX.tag<mutationRate>, 0.2 |> UMX.tag<insertionRate>, 0.2 |> UMX.tag<deletionRate>))
+    let msceParamsR5 (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+        simpleMutatorParams.create width rng variant (Msce (true |> UMX.tag, 1.01 |> UMX.tag, 0.2 |> UMX.tag, 0.2 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let mssiParamsRL (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
-        simpleMutatorParams.create width rng (Mssi (true |> UMX.tag, 
-                                              1.01 |> UMX.tag<orthoRate>, 
-                                              1.01 |> UMX.tag<paraRate>))
+    let mssiParamsRL (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+        simpleMutatorParams.create width rng variant (Mssi (true |> UMX.tag, 
+                                                             1.01 |> UMX.tag, 
+                                                             1.01 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let mssiParamsRM (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
-        simpleMutatorParams.create width rng (Mssi (true |> UMX.tag, 
-                                              2.01 |> UMX.tag<orthoRate>, 
-                                              1.01 |> UMX.tag<paraRate>))
+    let mssiParamsRM (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+        simpleMutatorParams.create width rng variant (Mssi (true |> UMX.tag, 
+                                                             2.01 |> UMX.tag, 
+                                                             1.01 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let mssiParamsRH (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
-        simpleMutatorParams.create width rng (Mssi (true |> UMX.tag, 
-                                              4.01 |> UMX.tag<orthoRate>, 
-                                              1.01 |> UMX.tag<paraRate>))
+    let mssiParamsRH (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+        simpleMutatorParams.create width rng variant (Mssi (true |> UMX.tag, 
+                                                             4.01 |> UMX.tag, 
+                                                             1.01 |> UMX.tag))
         |> SimpleMutatorParams
 
-
-    let mssiParamsRVH (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
-        simpleMutatorParams.create width rng (Mssi (true |> UMX.tag, 
-                                              6.01 |> UMX.tag<orthoRate>, 
-                                              1.01 |> UMX.tag<paraRate>))
+    let mssiParamsRVH (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+        simpleMutatorParams.create width rng variant (Mssi (true |> UMX.tag, 
+                                                             6.01 |> UMX.tag, 
+                                                             1.01 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let msrsParamsRL (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
-        simpleMutatorParams.create width rng (Msrs (true |> UMX.tag, 
-                                                    1.0 |> UMX.tag<orthoRate>, 
-                                                    1.0 |> UMX.tag<paraRate>, 
-                                                    1.0 |> UMX.tag<selfSymRate>))
+    let msrsParamsRL (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+        simpleMutatorParams.create width rng variant (Msrs (true |> UMX.tag, 
+                                                                   1.0 |> UMX.tag, 
+                                                                   1.0 |> UMX.tag, 
+                                                                   1.0 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let msrsParamsRM (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
-        simpleMutatorParams.create width rng (Msrs (true |> UMX.tag, 
-                                                    4.01 |> UMX.tag<orthoRate>, 
-                                                    0.4 |> UMX.tag<paraRate>, 
-                                                    2.01 |> UMX.tag<selfSymRate>))
+    let msrsParamsRM (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+        simpleMutatorParams.create width rng variant (Msrs (true |> UMX.tag, 
+                                                                   4.01 |> UMX.tag, 
+                                                                   0.4 |> UMX.tag, 
+                                                                   2.01 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let msrsParamsRH (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
-        simpleMutatorParams.create width rng (Msrs (true |> UMX.tag, 
-                                                    6.5 |> UMX.tag<orthoRate>, 
-                                                    0.3 |> UMX.tag<paraRate>, 
-                                                    1.5 |> UMX.tag<selfSymRate>))
+    let msrsParamsRH (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+        simpleMutatorParams.create width rng variant (Msrs (true |> UMX.tag, 
+                                                                   6.5 |> UMX.tag, 
+                                                                   0.3 |> UMX.tag, 
+                                                                   1.5 |> UMX.tag))
         |> SimpleMutatorParams
 
-
-
-    let msuf4ParamsRL (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
-        simpleMutatorParams.create width rng (Msuf4 (true |> UMX.tag, 
-                                                     0.05 |> UMX.tag<seedModificationRate>, 
-                                                     3.51 |> UMX.tag<orthoRate>, 
-                                                     0.4 |> UMX.tag<paraRate>, 
-                                                     2.01 |> UMX.tag<selfSymRate>))
+    let msuf4ParamsRL (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+        simpleMutatorParams.create width rng variant (Msuf4 (true |> UMX.tag, 
+                                                                    0.05 |> UMX.tag, 
+                                                                    3.51 |> UMX.tag, 
+                                                                    0.4 |> UMX.tag, 
+                                                                    2.01 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let msuf4ParamsRC (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
-        simpleMutatorParams.create width rng (Msuf4 (true |> UMX.tag, 
-                                                     0.05 |> UMX.tag<seedModificationRate>, 
-                                                     4.01 |> UMX.tag<orthoRate>, 
-                                                     0.4 |> UMX.tag<paraRate>, 
-                                                     2.01 |> UMX.tag<selfSymRate>))
+    let msuf4ParamsRC (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+        simpleMutatorParams.create width rng variant (Msuf4 (true |> UMX.tag, 
+                                                                    0.05 |> UMX.tag, 
+                                                                    4.01 |> UMX.tag, 
+                                                                    0.4 |> UMX.tag, 
+                                                                    2.01 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let msuf4ParamsRH (width: int<sortingWidth>) (rng: rngType) : mutatorParams =
-        simpleMutatorParams.create width rng (Msuf4 (true |> UMX.tag, 
-                                                     0.05 |> UMX.tag<seedModificationRate>, 
-                                                     4.51 |> UMX.tag<orthoRate>, 
-                                                     0.4 |> UMX.tag<paraRate>, 
-                                                     2.01 |> UMX.tag<selfSymRate>))
+    let msuf4ParamsRH (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+        simpleMutatorParams.create width rng variant (Msuf4 (true |> UMX.tag, 
+                                                                    0.05 |> UMX.tag, 
+                                                                    4.51 |> UMX.tag, 
+                                                                    0.4 |> UMX.tag, 
+                                                                    2.01 |> UMX.tag))
         |> SimpleMutatorParams

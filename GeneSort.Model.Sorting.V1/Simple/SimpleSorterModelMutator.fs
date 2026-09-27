@@ -37,12 +37,14 @@ module SimpleSorterModelMutator =
                 (modificationRate: float<modificationRate>)
                 (mutationRate: float<mutationRate>)
                 (insertionRate: float<insertionRate>)
-                (deletionRate: float<deletionRate>) : simpleSorterModelMutator =
+                (deletionRate: float<deletionRate>) 
+                (mutVariant : mutatorVariant) : simpleSorterModelMutator =
             msceRandMutate.create rngFactory 
                     (indelRates.createMod 
                             (%modificationRate, %mutationRate, %insertionRate, %deletionRate)
                     )
                     (%excludeSelfCe)
+                    mutVariant
             |> simpleSorterModelMutator.SmmMsceRandMutate
 
 
@@ -51,10 +53,12 @@ module SimpleSorterModelMutator =
                 (excludeSelfCe: bool<excludeSelfCe>)
                 (modificationRate: float<modificationRate>)
                 (orthoRate: float<orthoRate>)
-                (paraRate: float<paraRate>) :simpleSorterModelMutator =
+                (paraRate: float<paraRate>) 
+                (mutVariant : mutatorVariant) : simpleSorterModelMutator =
 
             mssiRandMutate.create rngFactory 
                     (opActionRates.createMod (%modificationRate, %orthoRate, %paraRate))
+                    mutVariant
             |> simpleSorterModelMutator.SmmMssiRandMutate
 
 
@@ -64,9 +68,11 @@ module SimpleSorterModelMutator =
                 (modificationRate: float<modificationRate>)
                 (orthoRate: float<orthoRate>)
                 (paraRate: float<paraRate>) 
-                (selfSymRate: float<selfSymRate>) :simpleSorterModelMutator =
+                (selfSymRate: float<selfSymRate>) 
+                (mutVariant : mutatorVariant) : simpleSorterModelMutator =
             msrsRandMutate.create rngFactory 
                     (opsActionRates.createMod (%modificationRate, %orthoRate, %paraRate, %selfSymRate))
+                    mutVariant
             |> simpleSorterModelMutator.SmmMsrsRandMutate
 
 
@@ -78,7 +84,8 @@ module SimpleSorterModelMutator =
                 (modificationRate: float<modificationRate>)
                 (orthoRate: float<orthoRate>)
                 (paraRate: float<paraRate>) 
-                (selfSymRate: float<selfSymRate>) :simpleSorterModelMutator =
+                (selfSymRate: float<selfSymRate>) 
+                (mutVariant : mutatorVariant) : simpleSorterModelMutator =
 
             let opsSeedActionRates = 
                 opsActionRates.createMod (%seedModificationRate, %orthoRate, %paraRate, %selfSymRate)
@@ -89,11 +96,13 @@ module SimpleSorterModelMutator =
             let opsTransitionRates = 
                 opsTransitionRates.createUniform2 opsActionRates
 
-            msuf4RandMutate.create rngFactory 
+            msuf4RandMutate.create 
+                    rngFactory 
                     (Uf4MutationRates.makeUniform2 
                                     (%sortingWidth) 
                                     opsSeedTransitionRates 
                                     opsTransitionRates )
+                    mutVariant
             |> simpleSorterModelMutator.SmmMsuf4RandMutate
 
 
@@ -105,7 +114,8 @@ module SimpleSorterModelMutator =
                 (modificationRate: float<modificationRate>)
                 (orthoRate: float<orthoRate>)
                 (paraRate: float<paraRate>) 
-                (selfSymRate: float<selfSymRate>) : simpleSorterModelMutator =
+                (selfSymRate: float<selfSymRate>) 
+                (mutVariant : mutatorVariant) : simpleSorterModelMutator =
 
             let seed6ActionRates = 
                 seed6ActionRates.createUniform (%seedModificationRate)
@@ -120,11 +130,13 @@ module SimpleSorterModelMutator =
             let opsTransitionRates = 
                 opsTransitionRates.createUniform2 opsActionRates
 
-            msuf6RandMutate.create rngFactory 
+            msuf6RandMutate.create 
+                   rngFactory 
                     (Uf6MutationRates.makeUniform2
                                     (%sortingWidth) 
                                     seed6TransitionRates 
                                     opsTransitionRates)
+                  mutVariant
             |> simpleSorterModelMutator.SmmMsuf6RandMutate
 
 

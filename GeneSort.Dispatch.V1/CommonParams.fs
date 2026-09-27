@@ -200,18 +200,18 @@ module CommonParams =
 
     // MutatorParams
 
-    let mutatorSpansMsce (srtWdth: int<sortingWidth>) (rType: rngType) = 
+    let mutatorSpansMsce (srtWdth: int<sortingWidth>) (mutVariant:mutatorVariant) (rType: rngType) = 
             (runParameters.mutatorParamsKey, 
                 [   
-                    MutatorParams.msceParamsR5 srtWdth rType
+                    MutatorParams.msceParamsR5 srtWdth rType mutVariant
                     //MutatorParams.msceParamsR10 srtWdth rType
                 ] 
             |> List.map MutatorParams.toString)
 
-    let mutatorSpansMssi (srtingWdth: int<sortingWidth>) (rType: rngType) = 
+    let mutatorSpansMssi (srtingWdth: int<sortingWidth>) (mutVariant:mutatorVariant) (rType: rngType) = 
             (runParameters.mutatorParamsKey, 
                 [   
-                    MutatorParams.mssiParamsRL srtingWdth rType
+                    MutatorParams.mssiParamsRL srtingWdth rType mutVariant
                     //MutatorParams.mssiParamsRM srtingWdth rType
                     //MutatorParams.mssiParamsRH srtingWdth rType
                     //MutatorParams.mssiParamsRVH srtingWdth rType
@@ -219,20 +219,20 @@ module CommonParams =
             |> List.map MutatorParams.toString)
 
 
-    let mutatorSpansMsrs (srtingWdth: int<sortingWidth>) (rType: rngType) = 
+    let mutatorSpansMsrs (srtingWdth: int<sortingWidth>) (mutVariant:mutatorVariant) (rType: rngType) = 
             (runParameters.mutatorParamsKey, 
                 [   
-                    MutatorParams.msrsParamsRL srtingWdth rType
+                    MutatorParams.msrsParamsRL srtingWdth rType mutVariant
                     //MutatorParams.msrsParamsRM srtingWdth rType
                     //MutatorParams.msrsParamsRH srtingWdth rType
                 ] 
             |> List.map MutatorParams.toString)
 
 
-    let mutatorSpansMsuf4 (srtingWdth: int<sortingWidth>) (rType: rngType) = 
+    let mutatorSpansMsuf4 (srtingWdth: int<sortingWidth>) (mutVariant:mutatorVariant) (rType: rngType) = 
             (runParameters.mutatorParamsKey, 
                 [   
-                    MutatorParams.msuf4ParamsRL srtingWdth rType
+                    MutatorParams.msuf4ParamsRL srtingWdth rType mutVariant
                     //MutatorParams.msuf4ParamsRC srtingWdth rType
                     //MutatorParams.msuf4ParamsRH srtingWdth rType
                 ] 

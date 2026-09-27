@@ -77,7 +77,7 @@ module SorterPoolMemberHistory =
         let v2Eval = 
             spm.SorterEval 
             |> Option.map (SorterEval.downgradeTo sorterEvalType.V2)
-            |> Option.bind (function V2 evalV2 -> Some evalV2 | _ -> None)
+            |> Option.bind (function sorterEval.V2 evalV2 -> Some evalV2 | _ -> None)
 
         sorterPoolMemberHistory.create
             poolId
