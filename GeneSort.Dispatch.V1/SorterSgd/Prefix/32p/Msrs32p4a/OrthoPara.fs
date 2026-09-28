@@ -13,7 +13,7 @@ open GeneSort.Dispatch.V1.SorterSgd.Msrs32p4a.Common
 open GeneSort.Dispatch.V1.SorterSgd
 
 
-module MaxModRate =
+module MutRate =
 
     let dbVariableModR_32Name = "VariableModRates_32" |> UMX.tag<databaseName>
     let dbMaxModRate_32Name = "MaxModRate_32" |> UMX.tag<databaseName>
@@ -156,6 +156,29 @@ module MaxModRate =
             maxParallel = 16
         }
 
+        
+
+        let EqualOPS2 (executorType: sorterSgdExecutorType) : runHostSpec = {
+            databaseName = dbVariableModR_32Name
+            runName = sprintf @"EqualOPS2%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+            spans = [
+                (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                (runParameters.generationCurrentKey, [0] |> List.map string)
+                (runParameters.generationIntervalCountKey, [12] |> List.map string)
+                (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+                (runParameters.paraRateKey, [1.5; 2.5; 3.5] |> List.map string)
+                (runParameters.selfSymRateKey, [4.5; 5.5; 6.5]  |> List.map string)
+                (runParameters.mutationModKey, [0] |> List.map string)
+                (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
+                (runParameters.modificationRateKey, [0.225; 0.25; 0.275;] |> List.map string)
+                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+            ]
+            filter = paramMapFilter
+            enhancer = finishRunParams
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 16
+        }
 
     module MaxModR_32 =
     
