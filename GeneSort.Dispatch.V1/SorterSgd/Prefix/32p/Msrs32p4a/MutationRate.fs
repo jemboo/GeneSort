@@ -19,6 +19,7 @@ module MutationRate =
     let dbVariableModR_64Name = "VariableModRates_64" |> UMX.tag<databaseName>
 
     let dbMaxModRate_32Name = "MaxModRate_32" |> UMX.tag<databaseName>
+    let dbMaxModRate_64Name = "MaxModRate_64" |> UMX.tag<databaseName>
 
     let saveIntervals = SampleRegistry.samplingConfigsDict["expInterval100_L50ss"]
     let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.1p5C"]
@@ -230,7 +231,7 @@ module MutationRate =
             spans = [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
                 (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [1] |> List.map string)
+                (runParameters.generationIntervalCountKey, [5] |> List.map string)
                 (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
                 (runParameters.paraRateKey,    [0.05;  0.1;   0.5;   1.001; 1.5;   2.001; 3.001;] |> List.map string)
                 (runParameters.selfSymRateKey, [1.001; 1.5;   2.001; 3.001; 4.001; 5.001; 6.001]  |> List.map string)
@@ -282,12 +283,12 @@ module MutationRate =
             let selScpp = scpp
             let spc = (%globalSorterCount / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
             let rp3 = rp2.WithSorterPoolCount(spc)
+                         .WithModificationRate(Some 0.99<modificationRate>)
             let qp = host.RunDb.MakeQueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
 
             rp3.WithRunFinished(Some false)
                     .WithId(Some qp.Value.Id)
                     .WithRunName(Some host.Run.RunName)
-                    .WithModificationRate(Some 0.99<modificationRate>)
                     .WithSelectedSorterCountPerPool(Some selScpp)
 
         
@@ -310,4 +311,46 @@ module MutationRate =
             enhancer = finishRunParams
             allowOverwrite = false |> UMX.tag
             maxParallel = 8
+        }
+
+
+
+    module MaxModR_64 =
+    
+        let globalSorterCount = 512 |> UMX.tag<sorterCount>
+
+        let private finishRunParams (host: IRunHost) (rp:runParameters) =
+            let rp2 = withLocalParams rp
+            let scpp = rp.GetSorterCountPerPool().Value
+            let selScpp = scpp
+            let spc = (%globalSorterCount / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
+            let rp3 = rp2.WithSorterPoolCount(spc)
+                         .WithModificationRate(Some 0.99<modificationRate>)
+            let qp = host.RunDb.MakeQueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
+
+            rp3.WithRunFinished(Some false)
+                    .WithId(Some qp.Value.Id)
+                    .WithRunName(Some host.Run.RunName)
+                    .WithSelectedSorterCountPerPool(Some selScpp)
+
+        
+        let WideTest (executorType: sorterSgdExecutorType) : runHostSpec = {
+            databaseName = dbMaxModRate_64Name
+            runName = sprintf @"WideTest2%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+            spans = [
+                (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                (runParameters.generationCurrentKey, [0] |> List.map string)
+                (runParameters.generationIntervalCountKey, [10] |> List.map string)
+                (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
+                (runParameters.paraRateKey, [0.025; 0.05; 0.75; 0.1] |> List.map string)
+                (runParameters.selfSymRateKey, [0.75; 1.001; 1.5; 2.001] |> List.map string)
+                (runParameters.mutationModKey, [0] |> List.map string)
+                (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
+                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+            ]
+            filter = paramMapFilter
+            enhancer = finishRunParams
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 16
         }
