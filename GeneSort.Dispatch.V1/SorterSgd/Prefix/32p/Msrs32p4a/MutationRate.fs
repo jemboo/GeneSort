@@ -16,6 +16,8 @@ open GeneSort.Dispatch.V1.SorterSgd
 module MutationRate =
 
     let dbVariableModR_32Name = "VariableModRates_32" |> UMX.tag<databaseName>
+    let dbVariableModR_64Name = "VariableModRates_64" |> UMX.tag<databaseName>
+
     let dbMaxModRate_32Name = "MaxModRate_32" |> UMX.tag<databaseName>
 
     let saveIntervals = SampleRegistry.samplingConfigsDict["expInterval100_L50ss"]
@@ -178,6 +180,96 @@ module MutationRate =
             allowOverwrite = false |> UMX.tag
             maxParallel = 16
         }
+
+        
+    module VarModR_64 =
+    
+        let globalSorterCount = 512 |> UMX.tag<sorterCount>
+
+        let private finishRunParams (host: IRunHost) (rp:runParameters) =
+            let rp2 = withLocalParams rp
+            let scpp = rp.GetSorterCountPerPool().Value
+            let selScpp = scpp
+            let spc = (%globalSorterCount / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
+            let rp3 = rp2.WithSorterPoolCount(spc)
+            let qp = host.RunDb.MakeQueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
+
+            rp3.WithRunFinished(Some false)
+                    .WithId(Some qp.Value.Id)
+                    .WithRunName(Some host.Run.RunName)
+                    .WithSelectedSorterCountPerPool(Some selScpp)
+
+
+        let Test (executorType: sorterSgdExecutorType) : runHostSpec = {
+            databaseName = dbVariableModR_64Name
+            runName = sprintf @"Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+            spans = [
+                (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                (runParameters.generationCurrentKey, [0] |> List.map string)
+                (runParameters.generationIntervalCountKey, [12] |> List.map string)
+                (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
+                (runParameters.paraRateKey, [4.001] |> List.map string)
+                (runParameters.selfSymRateKey, [4.001]  |> List.map string)
+                (runParameters.mutationModKey, [0] |> List.map string)
+                (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
+                (runParameters.modificationRateKey, [0.25;] |> List.map string)
+                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+            ]
+            filter = paramMapFilter
+            enhancer = finishRunParams
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 1
+        }
+
+
+        let WideTest (executorType: sorterSgdExecutorType) : runHostSpec = {
+            databaseName = dbVariableModR_64Name
+            runName = sprintf @"WideTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+            spans = [
+                (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                (runParameters.generationCurrentKey, [0] |> List.map string)
+                (runParameters.generationIntervalCountKey, [1] |> List.map string)
+                (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
+                (runParameters.paraRateKey,    [0.05;  0.1;   0.5;   1.001; 1.5;   2.001; 3.001;] |> List.map string)
+                (runParameters.selfSymRateKey, [1.001; 1.5;   2.001; 3.001; 4.001; 5.001; 6.001]  |> List.map string)
+                (runParameters.mutationModKey, [0] |> List.map string)
+                (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
+                (runParameters.modificationRateKey, [0.015; 0.20; 0.25; 0.30; 0.40; 0.50; 0.99] |> List.map string)
+                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+            ]
+            filter = paramMapFilter
+            enhancer = finishRunParams
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 16
+        }
+
+        
+
+        let NarrowTest (executorType: sorterSgdExecutorType) : runHostSpec = {
+            databaseName = dbVariableModR_64Name
+            runName = sprintf @"NarrowTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+            spans = [
+                (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                (runParameters.generationCurrentKey, [0] |> List.map string)
+                (runParameters.generationIntervalCountKey, [12] |> List.map string)
+                (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
+                (runParameters.paraRateKey, [1.5; 2.5; 3.5] |> List.map string)
+                (runParameters.selfSymRateKey, [4.5; 5.5; 6.5]  |> List.map string)
+                (runParameters.mutationModKey, [0] |> List.map string)
+                (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
+                (runParameters.modificationRateKey, [0.225; 0.25; 0.275;] |> List.map string)
+                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+            ]
+            filter = paramMapFilter
+            enhancer = finishRunParams
+            allowOverwrite = false |> UMX.tag
+            maxParallel = 16
+        }
+
+
 
 
     module MaxModR_32 =

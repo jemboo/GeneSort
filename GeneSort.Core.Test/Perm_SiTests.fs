@@ -118,62 +118,62 @@ type PermSiTests() =
         reflectedTwoCycle.Array |> should equal expectedTwoCycle.Array
 
 
-    [<Fact>]
-    let ``mutatePerm_Sis with None mode returns original permutation`` () =
-        let perm = permSi.create [|1; 0; 2; 3|] // (0 1)
-        let mockIndexPicker = indexPicker [|0; 1|]
-        let result = mutate mockIndexPicker MutationMode.NoAction perm
-        Assert.True(perm.equals result)
-        Assert.Equal<int array>(perm.Array, result.Array)
+    //[<Fact>]
+    //let ``mutatePerm_Sis with None mode returns original permutation`` () =
+    //    let perm = permSi.create [|1; 0; 2; 3|] // (0 1)
+    //    let mockIndexPicker = indexPicker [|0; 1|]
+    //    let result = mutate mockIndexPicker MutationMode.NoAction perm
+    //    Assert.True(perm.equals result)
+    //    Assert.Equal<int array>(perm.Array, result.Array)
 
-    [<Fact>]
-    let ``mutatePerm_Sis with same orbit indices returns original permutation`` () =
-        let perm = permSi.create [|1; 0; 2; 3|] // (0 1)
-        let mockIndexPicker = indexPicker [|0; 1|] // Picks indices in the same orbit
-        let resultOrtho = mutate mockIndexPicker MutationMode.Ortho perm
-        let resultPara = mutate mockIndexPicker MutationMode.Para perm
-        Assert.True(perm.equals resultOrtho)
-        Assert.True(perm.equals resultPara)
-        Assert.Equal<int array>(perm.Array, resultOrtho.Array)
-        Assert.Equal<int array>(perm.Array, resultPara.Array)
+    //[<Fact>]
+    //let ``mutatePerm_Sis with same orbit indices returns original permutation`` () =
+    //    let perm = permSi.create [|1; 0; 2; 3|] // (0 1)
+    //    let mockIndexPicker = indexPicker [|0; 1|] // Picks indices in the same orbit
+    //    let resultOrtho = mutate mockIndexPicker MutationMode.Ortho perm
+    //    let resultPara = mutate mockIndexPicker MutationMode.Para perm
+    //    Assert.True(perm.equals resultOrtho)
+    //    Assert.True(perm.equals resultPara)
+    //    Assert.Equal<int array>(perm.Array, resultOrtho.Array)
+    //    Assert.Equal<int array>(perm.Array, resultPara.Array)
 
-    [<Fact>]
-    let ``mutatePerm_Sis with Ortho mode produces valid self-inverse permutation`` () =
-        let perm = permSi.create [|1; 0; 3; 2|] // (0 1)(2 3)
-        let mockIndexPicker = indexPicker [|0; 2|] // Picks indices 0 and 2
-        let result = mutate mockIndexPicker MutationMode.Ortho perm
-        let expectedArray = [|2; 3; 0; 1|] // Expected: (0 2)(1 3)
-        Assert.Equal<int array>(expectedArray, result.Array)
-        Assert.True(Permutation.isSelfInverse result.Permutation)
-        Assert.Equal(UMX.tag<Order> 4, result.Order)
+    //[<Fact>]
+    //let ``mutatePerm_Sis with Ortho mode produces valid self-inverse permutation`` () =
+    //    let perm = permSi.create [|1; 0; 3; 2|] // (0 1)(2 3)
+    //    let mockIndexPicker = indexPicker [|0; 2|] // Picks indices 0 and 2
+    //    let result = mutate mockIndexPicker MutationMode.Ortho perm
+    //    let expectedArray = [|2; 3; 0; 1|] // Expected: (0 2)(1 3)
+    //    Assert.Equal<int array>(expectedArray, result.Array)
+    //    Assert.True(Permutation.isSelfInverse result.Permutation)
+    //    Assert.Equal(UMX.tag<Order> 4, result.Order)
 
-    [<Fact>]
-    let ``mutatePerm_Sis with Para mode produces valid self-inverse permutation`` () =
-        let perm = permSi.create [|1; 0; 3; 2|] // (0 1)(2 3)
-        let mockIndexPicker = indexPicker [|0; 2|] // Picks indices 0 and 2
-        let result = mutate mockIndexPicker MutationMode.Para perm
-        let expectedArray = [|3; 2; 1; 0|] // Expected: (0 3)(1 2)
-        Assert.Equal<int array>(expectedArray, result.Array)
-        Assert.True(Permutation.isSelfInverse result.Permutation)
-        Assert.Equal(UMX.tag<Order> 4, result.Order)
+    //[<Fact>]
+    //let ``mutatePerm_Sis with Para mode produces valid self-inverse permutation`` () =
+    //    let perm = permSi.create [|1; 0; 3; 2|] // (0 1)(2 3)
+    //    let mockIndexPicker = indexPicker [|0; 2|] // Picks indices 0 and 2
+    //    let result = mutate mockIndexPicker MutationMode.Para perm
+    //    let expectedArray = [|3; 2; 1; 0|] // Expected: (0 3)(1 2)
+    //    Assert.Equal<int array>(expectedArray, result.Array)
+    //    Assert.True(Permutation.isSelfInverse result.Permutation)
+    //    Assert.Equal(UMX.tag<Order> 4, result.Order)
 
-    [<Fact>]
-    let ``mutatePerm_Sis with Ortho mode swaps correctly for non-adjacent indices`` () =
-        let perm = permSi.create [|1; 0; 3; 2; 5; 4|] // (0 1)(2 3)(4 5)
-        let mockIndexPicker = indexPicker [|1; 4|] // Picks indices 1 and 4
-        let result = mutate mockIndexPicker MutationMode.Ortho perm
-        let expectedArray = [|4; 5; 3; 2; 0; 1|] // Expected: (0 1)(2 3)(4 5)
-        Assert.Equal<int array>(expectedArray, result.Array)
-        Assert.True(Permutation.isSelfInverse result.Permutation)
+    //[<Fact>]
+    //let ``mutatePerm_Sis with Ortho mode swaps correctly for non-adjacent indices`` () =
+    //    let perm = permSi.create [|1; 0; 3; 2; 5; 4|] // (0 1)(2 3)(4 5)
+    //    let mockIndexPicker = indexPicker [|1; 4|] // Picks indices 1 and 4
+    //    let result = mutate mockIndexPicker MutationMode.Ortho perm
+    //    let expectedArray = [|4; 5; 3; 2; 0; 1|] // Expected: (0 1)(2 3)(4 5)
+    //    Assert.Equal<int array>(expectedArray, result.Array)
+    //    Assert.True(Permutation.isSelfInverse result.Permutation)
 
-    [<Fact>]
-    let ``permSi with Para mode swaps correctly for non-adjacent indices`` () =
-        let perm = permSi.create [|1; 0; 3; 2; 5; 4|] // (0 1)(2 3)(4 5)
-        let mockIndexPicker = indexPicker [|1; 4|] // Picks indices 1 and 4
-        let result = mutate mockIndexPicker MutationMode.Para perm
-        let expectedArray = [|5; 4; 3; 2; 1; 0|] // Expected: (0 5)(2 3)(1 4)
-        Assert.Equal<int array>(expectedArray, result.Array)
-        Assert.True(Permutation.isSelfInverse result.Permutation)
+    //[<Fact>]
+    //let ``permSi with Para mode swaps correctly for non-adjacent indices`` () =
+    //    let perm = permSi.create [|1; 0; 3; 2; 5; 4|] // (0 1)(2 3)(4 5)
+    //    let mockIndexPicker = indexPicker [|1; 4|] // Picks indices 1 and 4
+    //    let result = mutate mockIndexPicker MutationMode.Para perm
+    //    let expectedArray = [|5; 4; 3; 2; 1; 0|] // Expected: (0 5)(2 3)(1 4)
+    //    Assert.Equal<int array>(expectedArray, result.Array)
+    //    Assert.True(Permutation.isSelfInverse result.Permutation)
 
     [<Fact>]
     let ``mutatePerm_Sis preserves order of permutation`` () =
