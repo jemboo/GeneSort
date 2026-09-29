@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using MessagePack;
 
 namespace GeneSort.WPF;
@@ -23,6 +24,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private string selectionSize = string.Empty;
     private UserControl? currentViewer;
     private UserControl? detailsViewer;
+    private OutputFolderFilesGridControl? activeFolderGrid;
+    private CancellationTokenSource? childLoadCancellation;
+    private DataTable? runParametersTable;
+    private readonly HashSet<string> loadedRunParametersPaths = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> runParameterColumns = new(StringComparer.Ordinal);
+    private string activeFolderPath = string.Empty;
+    private IReadOnlyList<MessagePackNodePathSegment>? selectedNodePath;
     private long folderLoadVersion;
 
     public ObservableCollection<FileSystemTreeNode> RootNodes { get; } = [];
@@ -124,6 +132,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void LoadFolder(string folder)
     {
+        childLoadCancellation?.Cancel();
+        activeFolderGrid = null;
+        runParametersTable = null;
+        loadedRunParametersPaths.Clear();
+        runParameterColumns.Clear();
         Interlocked.Increment(ref folderLoadVersion);
         var fullPath = Path.GetFullPath(folder);
         FolderPathBox.Text = folder;
@@ -186,8 +199,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DetailsViewer = new FileSelectionDetailsControl();
     }
 
-    private void CenterOutputNode_Selected(MessagePackNode node)
+    private void CenterOutputNode_Selected(MessagePackNode node, IReadOnlyList<MessagePackNodePathSegment> path)
     {
+        selectedNodePath = path.ToArray();
         DetailsViewer = SelectedFile?.Kind == OutputDataKind.SorterPoolSet && node.Children.Count > 0
             ? new MessagePackNodeChildrenGridControl(node)
             : new FileSelectionDetailsControl();
@@ -195,12 +209,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private async Task DisplayRunParametersFolderAsync(string folderPath)
     {
+        childLoadCancellation?.Cancel();
         var version = Interlocked.Increment(ref folderLoadVersion);
+        activeFolderGrid = null;
+        runParametersTable = null;
+        loadedRunParametersPaths.Clear();
+        runParameterColumns.Clear();
+        activeFolderPath = folderPath;
         SelectedFile = null;
         FileSummary = folderPath;
         CurrentViewer = null;
         DetailsViewer = new FileSelectionDetailsControl();
-        StatusMessage = $"Reading files in {folderPath}…";
+        StatusMessage = $"Loading file details in {folderPath}…";
 
         try
         {
@@ -208,19 +228,37 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             if (version != folderLoadVersion)
                 return;
 
-            CurrentViewer = new OutputFolderFilesGridControl(Path.GetFileName(folderPath), result.FilesTable);
-            FileSummary = $"{folderPath}  •  {result.FileCount:N0} output file(s)";
-            if (result.RunParameters.FilesLoaded > 0)
+            var grid = new OutputFolderFilesGridControl(Path.GetFileName(folderPath), result.FilesTable);
+            grid.FileSelected += path =>
             {
-                DetailsViewer = new RunParametersTableControl(Path.GetFileName(folderPath), result.RunParameters.Table);
-                StatusMessage = result.RunParameters.FailedFiles == 0
-                    ? $"Showing {result.FileCount:N0} folder file(s) and parameters from {result.RunParameters.FilesLoaded:N0} RunParameters file(s)."
-                    : $"Showing folder files and parameters from {result.RunParameters.FilesLoaded:N0} of {result.RunParameters.FilesFound:N0} RunParameters files.";
+                var file = new MessagePackFile(path);
+                SelectedFile = file;
+                SelectionTitle = file.Name;
+                SelectionType = file.OutputDataType;
+                SelectionPath = file.FullPath;
+                SelectionSize = new FileInfo(path).Length.ToString("N0") + " bytes";
+                if (runParametersTable is null)
+                    DetailsViewer = new FileSelectionDetailsControl();
+                _ = LoadRootPropertiesForFileAsync(grid, path, version);
+            };
+            grid.StartRequested += () => _ = StartLazyLoadingAsync(grid, version);
+            grid.StopRequested += StopLazyLoading;
+            activeFolderGrid = grid;
+            CurrentViewer = grid;
+            FileSummary = $"{folderPath}  •  {result.FileCount:N0} output file(s)";
+            if (grid.GetAllFilePaths().Any(path => MessagePackFile.GetKind(path) == OutputDataKind.RunParameters))
+            {
+                runParametersTable = CreateEmptyRunParametersTable();
+                DetailsViewer = new RunParametersTableControl(Path.GetFileName(folderPath), runParametersTable);
             }
-            else if (result.RunParameters.FilesFound > 0)
-                StatusMessage = $"Showing folder files; found {result.RunParameters.FilesFound:N0} RunParameters file(s), but none could be read.";
             else
-                StatusMessage = $"Showing {result.FileCount:N0} output file(s) in this folder. No RunParameters files found beneath it.";
+                StatusMessage = $"Loaded {result.FileCount:N0} file-level records. Select a row or start loading root fields.";
+
+            var firstFile = grid.GetAllFilePaths().FirstOrDefault(path => Path.GetExtension(path).Equals(".msgpack", StringComparison.OrdinalIgnoreCase));
+            if (firstFile is not null)
+                await LoadRootPropertiesForFileAsync(grid, firstFile, version);
+            else
+                grid.SetProgressMessage($"0 of {result.FileCount:N0} files loaded");
         }
         catch (Exception ex)
         {
@@ -231,17 +269,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private static FolderOutputContentsResult BuildFolderContents(string folderPath)
     {
-        var table = new DataTable();
+        var table = new DataTable { CaseSensitive = true };
         table.Columns.Add("File", typeof(string));
         table.Columns.Add("Output data type", typeof(string));
         table.Columns.Add("Size (bytes)", typeof(long));
         table.Columns.Add("Last modified", typeof(DateTime));
         table.Columns.Add("Path", typeof(string));
 
-        var outputFiles = Directory.EnumerateFiles(folderPath)
-            .Where(path => Path.GetExtension(path).Equals(".msgpack", StringComparison.OrdinalIgnoreCase)
-                || Path.GetExtension(path).Equals(".txt", StringComparison.OrdinalIgnoreCase)
-                    && MessagePackFile.GetKind(path) == OutputDataKind.TextReport)
+        var outputFiles = EnumerateOutputFiles(folderPath)
             .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
@@ -250,79 +285,38 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             var info = new FileInfo(path);
             var row = table.NewRow();
             row["File"] = info.Name;
-            row["Output data type"] = MessagePackFile.OutputDataTypeForPath(path);
+            row["Output data type"] = MessagePackFile.OutputDataTypeForPath(info.FullName);
             row["Size (bytes)"] = info.Length;
             row["Last modified"] = info.LastWriteTime;
-            row["Path"] = path;
+            row["Path"] = info.FullName;
             table.Rows.Add(row);
         }
 
-        return new FolderOutputContentsResult(table, outputFiles.Length, BuildRunParametersTable(folderPath));
+        return new FolderOutputContentsResult(table, outputFiles.Length);
     }
 
-    private static RunParametersTableResult BuildRunParametersTable(string folderPath)
-    {
-        var files = EnumerateRunParametersFiles(folderPath).OrderBy(path => path, StringComparer.OrdinalIgnoreCase).ToArray();
-        var rows = new List<(string Path, Dictionary<string, string> Values)>();
-        var failedFiles = 0;
-        foreach (var path in files)
-        {
-            try
-            {
-                var bytes = File.ReadAllBytes(path);
-                var json = MessagePackSerializer.ConvertToJson(new ReadOnlyMemory<byte>(bytes));
-                using var document = JsonDocument.Parse(json);
-                rows.Add((Path.GetRelativePath(folderPath, path), ParseRunParameterMap(document.RootElement)));
-            }
-            catch
-            {
-                failedFiles++;
-            }
-        }
-
-        var table = new DataTable { CaseSensitive = true };
-        var fileColumnName = "File path";
-        while (rows.Any(row => row.Values.ContainsKey(fileColumnName)))
-            fileColumnName += " (source)";
-        table.Columns.Add(fileColumnName, typeof(string));
-
-        var keys = rows.SelectMany(row => row.Values.Keys)
-            .Distinct(StringComparer.Ordinal)
-            .OrderBy(key => key, StringComparer.OrdinalIgnoreCase)
-            .ThenBy(key => key, StringComparer.Ordinal)
-            .ToArray();
-        foreach (var key in keys)
-            table.Columns.Add(key, typeof(string));
-
-        foreach (var (relativePath, values) in rows)
-        {
-            var row = table.NewRow();
-            row[fileColumnName] = relativePath;
-            foreach (var (key, value) in values)
-                row[key] = value;
-            table.Rows.Add(row);
-        }
-
-        return new RunParametersTableResult(table, files.Length, rows.Count, failedFiles);
-    }
-
-    private static IEnumerable<string> EnumerateRunParametersFiles(string root)
+    private static IEnumerable<string> EnumerateOutputFiles(string root)
     {
         var pending = new Stack<string>();
         pending.Push(root);
         while (pending.Count > 0)
         {
-            var directory = pending.Pop();
+            var folder = pending.Pop();
             IEnumerable<string> files;
-            try { files = Directory.EnumerateFiles(directory, "*.msgpack").ToArray(); }
+            try { files = Directory.EnumerateFiles(folder).ToArray(); }
             catch (UnauthorizedAccessException) { files = []; }
             catch (IOException) { files = []; }
             foreach (var path in files)
-                if (MessagePackFile.GetKind(path) == OutputDataKind.RunParameters)
+            {
+                var extension = Path.GetExtension(path);
+                if (extension.Equals(".msgpack", StringComparison.OrdinalIgnoreCase)
+                    || extension.Equals(".txt", StringComparison.OrdinalIgnoreCase)
+                        && MessagePackFile.GetKind(path) == OutputDataKind.TextReport)
                     yield return path;
+            }
 
             IEnumerable<string> directories;
-            try { directories = Directory.EnumerateDirectories(directory).ToArray(); }
+            try { directories = Directory.EnumerateDirectories(folder).ToArray(); }
             catch (UnauthorizedAccessException) { directories = []; }
             catch (IOException) { directories = []; }
             foreach (var child in directories)
@@ -338,59 +332,126 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
-    private static Dictionary<string, string> ParseRunParameterMap(JsonElement root)
+    private static MessagePackFileProperties ReadRootNodeChildren(string path)
     {
-        if (root.ValueKind == JsonValueKind.Object)
-        {
-            foreach (var property in root.EnumerateObject())
-                if (property.Name.Equals("paramMap", StringComparison.OrdinalIgnoreCase))
-                    return ParseStringMap(property.Value);
-        }
+        if (!Path.GetExtension(path).Equals(".msgpack", StringComparison.OrdinalIgnoreCase))
+            return new MessagePackFileProperties(new Dictionary<string, string>(StringComparer.Ordinal), new Dictionary<string, string>(StringComparer.Ordinal));
 
-        if (root.ValueKind == JsonValueKind.Array && root.GetArrayLength() == 1)
-            return ParseStringMap(root[0]);
-        return ParseStringMap(root);
+        var bytes = File.ReadAllBytes(path);
+        var json = MessagePackSerializer.ConvertToJson(new ReadOnlyMemory<byte>(bytes));
+        using var document = JsonDocument.Parse(json);
+        var root = MessagePackNode.FromJson("root", document.RootElement);
+        var rootValues = root.Children.ToDictionary(child => child.Label, child => child.Value, StringComparer.Ordinal);
+        var paramMap = root.Children.FirstOrDefault(child => child.Label.Equals("paramMap", StringComparison.OrdinalIgnoreCase));
+        var runParameters = paramMap?.Children.ToDictionary(child => child.Label, child => child.Value, StringComparer.Ordinal)
+            ?? new Dictionary<string, string>(StringComparer.Ordinal);
+        return new MessagePackFileProperties(rootValues, runParameters);
     }
 
-    private static Dictionary<string, string> ParseStringMap(JsonElement element)
+    private async Task LoadRootPropertiesForFileAsync(OutputFolderFilesGridControl grid, string path, long version, CancellationToken token = default)
     {
-        var result = new Dictionary<string, string>(StringComparer.Ordinal);
-        if (element.ValueKind == JsonValueKind.Object)
+        if (!grid.TryBeginLoading(path))
+            return;
+
+        try
         {
-            foreach (var property in element.EnumerateObject())
-                result[property.Name] = JsonScalarToString(property.Value);
-        }
-        else if (element.ValueKind == JsonValueKind.Array)
-        {
-            foreach (var pair in element.EnumerateArray())
+            var properties = await Task.Run(() => ReadRootNodeChildren(path), token);
+            token.ThrowIfCancellationRequested();
+            if (version != folderLoadVersion || activeFolderGrid != grid)
             {
-                if (pair.ValueKind == JsonValueKind.Array && pair.GetArrayLength() >= 2)
-                {
-                    var key = JsonScalarToString(pair[0]);
-                    result[key] = JsonScalarToString(pair[1]);
-                }
-                else if (pair.ValueKind == JsonValueKind.Object)
-                {
-                    var key = pair.EnumerateObject().FirstOrDefault(property => property.Name.Equals("Key", StringComparison.OrdinalIgnoreCase));
-                    var value = pair.EnumerateObject().FirstOrDefault(property => property.Name.Equals("Value", StringComparison.OrdinalIgnoreCase));
-                    if (key.Name is not null)
-                        result[JsonScalarToString(key.Value)] = value.Name is null ? string.Empty : JsonScalarToString(value.Value);
-                }
+                grid.FailLoading(path);
+                return;
+            }
+
+            grid.CompleteLoading(path, properties.RootValues);
+            AddRunParametersRow(path, properties.RunParameters);
+            grid.SetProgressMessage($"{grid.LoadedFileCount:N0} of {grid.GetAllFilePaths().Count:N0} files loaded");
+            StatusMessage = $"Loaded root fields from {Path.GetFileName(path)}.";
+        }
+        catch (OperationCanceledException)
+        {
+            grid.FailLoading(path);
+        }
+        catch (Exception ex)
+        {
+            grid.FailLoading(path);
+            if (version == folderLoadVersion && activeFolderGrid == grid)
+                StatusMessage = $"Unable to read {Path.GetFileName(path)}: {ex.Message}";
+        }
+    }
+
+    private async Task StartLazyLoadingAsync(OutputFolderFilesGridControl grid, long version)
+    {
+        childLoadCancellation?.Cancel();
+        var cancellation = new CancellationTokenSource();
+        childLoadCancellation = cancellation;
+        var token = cancellation.Token;
+        var paths = grid.GetUnloadedFilePaths();
+        grid.SetLoadingState(true);
+        grid.SetProgressMessage($"Loading remaining files (0 of {paths.Count:N0})…");
+        var processed = 0;
+        try
+        {
+            foreach (var path in paths)
+            {
+                token.ThrowIfCancellationRequested();
+                await LoadRootPropertiesForFileAsync(grid, path, version, token);
+                processed++;
+                grid.SetProgressMessage($"Loading remaining files ({processed:N0} of {paths.Count:N0})…");
             }
         }
-        return result;
+        catch (OperationCanceledException) { }
+        finally
+        {
+            grid.SetLoadingState(false);
+            grid.SetProgressMessage($"{grid.LoadedFileCount:N0} of {grid.GetAllFilePaths().Count:N0} files loaded");
+            if (ReferenceEquals(childLoadCancellation, cancellation))
+                childLoadCancellation = null;
+            cancellation.Dispose();
+        }
     }
 
-    private static string JsonScalarToString(JsonElement value) => value.ValueKind switch
+    private void StopLazyLoading() => childLoadCancellation?.Cancel();
+
+    private static DataTable CreateEmptyRunParametersTable()
     {
-        JsonValueKind.String => value.GetString() ?? string.Empty,
-        JsonValueKind.Null or JsonValueKind.Undefined => string.Empty,
-        _ => value.GetRawText()
-    };
+        var table = new DataTable { CaseSensitive = true };
+        table.Columns.Add("File path", typeof(string));
+        return table;
+    }
+
+    private void AddRunParametersRow(string path, IReadOnlyDictionary<string, string> parameters)
+    {
+        if (runParametersTable is null
+            || MessagePackFile.GetKind(path) != OutputDataKind.RunParameters
+            || !loadedRunParametersPaths.Add(path))
+            return;
+
+        var columnNames = new HashSet<string>(runParametersTable.Columns.Cast<DataColumn>().Select(column => column.ColumnName), StringComparer.OrdinalIgnoreCase);
+        foreach (var key in parameters.Keys)
+        {
+            if (runParameterColumns.ContainsKey(key))
+                continue;
+            var columnName = key;
+            var suffix = 2;
+            while (!columnNames.Add(columnName))
+                columnName = $"{key} (value {suffix++})";
+            runParametersTable.Columns.Add(columnName, typeof(string));
+            runParameterColumns[key] = columnName;
+        }
+
+        var row = runParametersTable.NewRow();
+        row["File path"] = Path.GetRelativePath(activeFolderPath, path);
+        foreach (var (key, value) in parameters)
+            row[runParameterColumns[key]] = value;
+        runParametersTable.Rows.Add(row);
+        DetailsViewer = new RunParametersTableControl(Path.GetFileName(activeFolderPath), runParametersTable);
+    }
 
     private async Task DisplayFileAsync(MessagePackFile file)
     {
         var version = Interlocked.Increment(ref folderLoadVersion);
+        var nodePathToRestore = selectedNodePath?.ToArray();
         StatusMessage = $"Reading {file.Name}…";
         CurrentViewer = null;
         SelectedFile = file;
@@ -419,6 +480,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 var viewer = OutputDataViewerFactory.Create(file.Kind, result.Nodes);
                 viewer.NodeSelected += CenterOutputNode_Selected;
                 CurrentViewer = viewer;
+                if (nodePathToRestore is { Length: > 0 })
+                {
+                    Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
+                    {
+                        if (version == folderLoadVersion && ReferenceEquals(CurrentViewer, viewer))
+                            viewer.SelectNodePath(nodePathToRestore);
+                    }));
+                }
                 FileSummary = $"{file.FullPath}  •  {result.Size:N0} bytes  •  {result.NodeCount:N0} values";
                 SelectionSize = $"{result.Size:N0} bytes";
             }
@@ -444,8 +513,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     }
 }
 
-internal sealed record RunParametersTableResult(DataTable Table, int FilesFound, int FilesLoaded, int FailedFiles);
-internal sealed record FolderOutputContentsResult(DataTable FilesTable, int FileCount, RunParametersTableResult RunParameters);
+internal sealed record FolderOutputContentsResult(DataTable FilesTable, int FileCount);
+internal sealed record MessagePackFileProperties(Dictionary<string, string> RootValues, Dictionary<string, string> RunParameters);
 
 public sealed class MessagePackFile(string fullPath)
 {

@@ -26,10 +26,14 @@ public enum OutputDataKind
 /// gives the serialized output a type-specific heading and context.</summary>
 public abstract class OutputDataViewerControl : UserControl
 {
-    public event Action<MessagePackNode>? NodeSelected;
+    private readonly MessagePackNode[] rootNodes;
+    private readonly TreeView tree;
+
+    public event Action<MessagePackNode, IReadOnlyList<MessagePackNodePathSegment>>? NodeSelected;
 
     protected OutputDataViewerControl(string heading, string description, IEnumerable<MessagePackNode> nodes)
     {
+        rootNodes = nodes.ToArray();
         var layout = new DockPanel();
         var intro = new StackPanel { Margin = new Thickness(2, 0, 2, 10) };
         intro.Children.Add(new TextBlock
@@ -49,15 +53,100 @@ public abstract class OutputDataViewerControl : UserControl
         DockPanel.SetDock(intro, Dock.Top);
         layout.Children.Add(intro);
 
-        var tree = new TreeView { ItemsSource = nodes, BorderThickness = new Thickness(0) };
+        tree = new TreeView { ItemsSource = rootNodes, BorderThickness = new Thickness(0) };
         tree.Resources.Add(new DataTemplateKey(typeof(MessagePackNode)), CreateNodeTemplate());
         tree.SelectedItemChanged += (_, args) =>
         {
             if (args.NewValue is MessagePackNode selectedNode)
-                NodeSelected?.Invoke(selectedNode);
+                NodeSelected?.Invoke(selectedNode, GetPath(selectedNode));
         };
         layout.Children.Add(tree);
         Content = layout;
+    }
+
+    public bool SelectNodePath(IReadOnlyList<MessagePackNodePathSegment> path)
+    {
+        if (path.Count == 0)
+            return false;
+
+        tree.UpdateLayout();
+        ItemsControl owner = tree;
+        IReadOnlyList<MessagePackNode> currentNodes = rootNodes;
+        TreeViewItem? container = null;
+        for (var depth = 0; depth < path.Count; depth++)
+        {
+            var segment = path[depth];
+            var index = FindMatchingIndex(currentNodes, segment);
+            if (index < 0)
+                return false;
+
+            container = owner.ItemContainerGenerator.ContainerFromIndex(index) as TreeViewItem;
+            if (container is null)
+                return false;
+            if (depth < path.Count - 1)
+            {
+                container.IsExpanded = true;
+                container.UpdateLayout();
+                owner = container;
+                currentNodes = ((MessagePackNode)container.DataContext).Children.ToArray();
+            }
+        }
+
+        if (container is null)
+            return false;
+        container.IsSelected = true;
+        container.BringIntoView();
+        return true;
+    }
+
+    private IReadOnlyList<MessagePackNodePathSegment> GetPath(MessagePackNode target)
+    {
+        var nodes = new List<MessagePackNode>();
+        foreach (var root in rootNodes)
+            if (FindPath(root, target, nodes))
+                break;
+
+        var path = new List<MessagePackNodePathSegment>(nodes.Count);
+        for (var index = 0; index < nodes.Count; index++)
+        {
+            IEnumerable<MessagePackNode> siblings = index == 0 ? rootNodes : nodes[index - 1].Children;
+            var occurrence = 0;
+            foreach (var sibling in siblings)
+            {
+                if (ReferenceEquals(sibling, nodes[index]))
+                    break;
+                if (string.Equals(sibling.Label, nodes[index].Label, StringComparison.Ordinal))
+                    occurrence++;
+            }
+            path.Add(new MessagePackNodePathSegment(nodes[index].Label, occurrence));
+        }
+        return path;
+    }
+
+    private static bool FindPath(MessagePackNode current, MessagePackNode target, List<MessagePackNode> path)
+    {
+        path.Add(current);
+        if (ReferenceEquals(current, target))
+            return true;
+        foreach (var child in current.Children)
+            if (FindPath(child, target, path))
+                return true;
+        path.RemoveAt(path.Count - 1);
+        return false;
+    }
+
+    private static int FindMatchingIndex(IReadOnlyList<MessagePackNode> siblings, MessagePackNodePathSegment segment)
+    {
+        var occurrence = 0;
+        for (var index = 0; index < siblings.Count; index++)
+        {
+            if (!string.Equals(siblings[index].Label, segment.Label, StringComparison.Ordinal))
+                continue;
+            if (occurrence == segment.Occurrence)
+                return index;
+            occurrence++;
+        }
+        return -1;
     }
 
     private static HierarchicalDataTemplate CreateNodeTemplate()
@@ -344,10 +433,10 @@ public sealed class RunParametersTableControl : UserControl
         });
         heading.Children.Add(new TextBlock
         {
-            Text = $"{table.Rows.Count:N0} files in {folderName}; each row is a file and each parameter key is a column.",
+            Text = $"{table.Rows.Count:N0} RunParameters file(s) loaded from {folderName}; each parameter key is a column.",
             Margin = new Thickness(0, 4, 0, 0),
             Foreground = new SolidColorBrush(Color.FromRgb(89, 102, 117)),
-            TextTrimming = TextTrimming.CharacterEllipsis
+            TextWrapping = TextWrapping.Wrap
         });
         DockPanel.SetDock(heading, Dock.Top);
         layout.Children.Add(heading);
@@ -368,12 +457,30 @@ public sealed class RunParametersTableControl : UserControl
         });
         Content = layout;
     }
+
 }
+
+public sealed record MessagePackNodePathSegment(string Label, int Occurrence);
 
 public sealed class OutputFolderFilesGridControl : UserControl
 {
+    private readonly DataTable table;
+    private readonly DataGrid dataGrid;
+    private readonly Button startButton;
+    private readonly Button stopButton;
+    private readonly TextBlock progressText;
+    private readonly HashSet<string> loadedPaths = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> loadingPaths = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> rootColumns = new(StringComparer.Ordinal);
+    private bool isLoading;
+
+    public event Action<string>? FileSelected;
+    public event Action? StartRequested;
+    public event Action? StopRequested;
+
     public OutputFolderFilesGridControl(string folderName, DataTable table)
     {
+        this.table = table;
         var layout = new DockPanel();
         var heading = new StackPanel { Margin = new Thickness(2, 0, 2, 10) };
         heading.Children.Add(new TextBlock
@@ -385,13 +492,34 @@ public sealed class OutputFolderFilesGridControl : UserControl
         });
         heading.Children.Add(new TextBlock
         {
-            Text = $"{table.Rows.Count:N0} output file(s) in this folder.",
+            Text = $"{table.Rows.Count:N0} output file(s). Load root fields on demand.",
             Margin = new Thickness(0, 4, 0, 0),
             Foreground = new SolidColorBrush(Color.FromRgb(89, 102, 117))
         });
         DockPanel.SetDock(heading, Dock.Top);
         layout.Children.Add(heading);
-        layout.Children.Add(new DataGrid
+
+        var actions = new DockPanel { Margin = new Thickness(0, 0, 0, 8) };
+        stopButton = new Button { Content = "Stop", Padding = new Thickness(12, 5, 12, 5), IsEnabled = false };
+        stopButton.Click += (_, _) => StopRequested?.Invoke();
+        DockPanel.SetDock(stopButton, Dock.Right);
+        actions.Children.Add(stopButton);
+        startButton = new Button { Content = "Start loading remaining files", Padding = new Thickness(12, 5, 12, 5), IsEnabled = table.Rows.Count > 0 };
+        startButton.Click += (_, _) => StartRequested?.Invoke();
+        DockPanel.SetDock(startButton, Dock.Left);
+        actions.Children.Add(startButton);
+        progressText = new TextBlock
+        {
+            Text = $"0 of {table.Rows.Count:N0} files loaded",
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(10, 0, 4, 0),
+            Foreground = new SolidColorBrush(Color.FromRgb(89, 102, 117))
+        };
+        actions.Children.Add(progressText);
+        DockPanel.SetDock(actions, Dock.Top);
+        layout.Children.Add(actions);
+
+        dataGrid = new DataGrid
         {
             ItemsSource = table.DefaultView,
             AutoGenerateColumns = true,
@@ -403,8 +531,98 @@ public sealed class OutputFolderFilesGridControl : UserControl
             EnableColumnVirtualization = true,
             HeadersVisibility = DataGridHeadersVisibility.All,
             GridLinesVisibility = DataGridGridLinesVisibility.All
-        });
+        };
+        dataGrid.SelectionChanged += (_, _) =>
+        {
+            if (dataGrid.SelectedItem is DataRowView row && row.Row.Table.Columns.Contains("Path"))
+                FileSelected?.Invoke(Convert.ToString(row["Path"]) ?? string.Empty);
+        };
+        layout.Children.Add(dataGrid);
         Content = layout;
+    }
+
+    public IReadOnlyList<string> GetUnloadedFilePaths() => table.Rows.Cast<DataRow>()
+        .Select(row => Convert.ToString(row["Path"]) ?? string.Empty)
+        .Where(path => path.Length > 0 && !loadedPaths.Contains(path) && !loadingPaths.Contains(path))
+        .ToArray();
+
+    public IReadOnlyList<string> GetAllFilePaths() => table.Rows.Cast<DataRow>()
+        .Select(row => Convert.ToString(row["Path"]) ?? string.Empty)
+        .Where(path => path.Length > 0)
+        .ToArray();
+
+    public int LoadedFileCount => loadedPaths.Count;
+
+    public bool TryBeginLoading(string path)
+    {
+        if (loadedPaths.Contains(path) || !loadingPaths.Add(path))
+            return false;
+        return true;
+    }
+
+    public void CompleteLoading(string path, IReadOnlyDictionary<string, string> values)
+    {
+        var row = FindRow(path);
+        if (row is null)
+            return;
+
+        foreach (var key in values.Keys)
+        {
+            if (!rootColumns.TryGetValue(key, out var columnName))
+            {
+                columnName = CreateRootColumnName(key);
+                table.Columns.Add(columnName, typeof(string));
+                rootColumns[key] = columnName;
+                RefreshGridColumns();
+            }
+        }
+        foreach (var (key, value) in values)
+            row[rootColumns[key]] = value;
+
+        loadingPaths.Remove(path);
+        loadedPaths.Add(path);
+        UpdateProgress();
+    }
+
+    public void FailLoading(string path)
+    {
+        loadingPaths.Remove(path);
+        UpdateProgress();
+    }
+
+    public void SetLoadingState(bool isLoading)
+    {
+        this.isLoading = isLoading;
+        startButton.IsEnabled = !isLoading && GetUnloadedFilePaths().Count > 0;
+        stopButton.IsEnabled = isLoading;
+    }
+
+    public void SetProgressMessage(string message) => progressText.Text = message;
+
+    private DataRow? FindRow(string path) => table.Rows.Cast<DataRow>()
+        .FirstOrDefault(row => string.Equals(Convert.ToString(row["Path"]), path, StringComparison.OrdinalIgnoreCase));
+
+    private string CreateRootColumnName(string key)
+    {
+        var candidate = key;
+        var suffix = 2;
+        while (table.Columns.Cast<DataColumn>().Any(column => string.Equals(column.ColumnName, candidate, StringComparison.OrdinalIgnoreCase)))
+            candidate = $"{key} (value {suffix++})";
+        return candidate;
+    }
+
+    private void RefreshGridColumns()
+    {
+        dataGrid.ItemsSource = null;
+        dataGrid.Columns.Clear();
+        dataGrid.AutoGenerateColumns = true;
+        dataGrid.ItemsSource = table.DefaultView;
+    }
+
+    private void UpdateProgress()
+    {
+        progressText.Text = $"{loadedPaths.Count:N0} of {table.Rows.Count:N0} files loaded";
+        startButton.IsEnabled = !isLoading && GetUnloadedFilePaths().Count > 0;
     }
 }
 
