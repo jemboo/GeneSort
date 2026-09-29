@@ -25,7 +25,7 @@ module Common =
 
     let seedSorterCount = 512
 
-    let standardParams (rp:runParameters) =
+    let projectParams (rp:runParameters) =
         let sorterEvalSelectionType = sorterSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
         let pfxLibId = prefixLibId.create (32<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixA
 

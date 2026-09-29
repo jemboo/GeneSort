@@ -13,7 +13,7 @@ open GeneSort.Dispatch.V1.SorterSgd.Msrs32p4a.Common
 open GeneSort.Dispatch.V1.SorterSgd
 
 
-module MutRate =
+module MutationRate =
 
     let dbVariableModR_32Name = "VariableModRates_32" |> UMX.tag<databaseName>
     let dbMaxModRate_32Name = "MaxModRate_32" |> UMX.tag<databaseName>
@@ -71,9 +71,8 @@ module MutRate =
         }
 
 
-
     let private withLocalParams (rp:runParameters) =
-        let rpn = standardParams rp
+        let rpn = projectParams rp
         rpn.WithOrthoRate(Some 4.001<orthoRate>)
 
 
@@ -179,6 +178,7 @@ module MutRate =
             allowOverwrite = false |> UMX.tag
             maxParallel = 16
         }
+
 
     module MaxModR_32 =
     

@@ -14,7 +14,7 @@ module Common =
     let projName = "SorterSgd.Prfefix.32p.Msuf32p4a" |> UMX.tag<projectName>
     let seedSorterCount = 512
 
-    let standardParams (rp:runParameters) =
+    let projectParams (rp:runParameters) =
         let sorterEvalSelectionType = sorterSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
         let pfxLibId = prefixLibId.create (32<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixA
 
@@ -22,7 +22,7 @@ module Common =
           .WithCollectNewSortableTests(false |> UMX.tag<collectNewSortableTests> |> Some)
           .WithExcludeSelfCe(true |> UMX.tag<excludeSelfCe> |> Some)
           .WithSorterChildCount(Some 1<sorterChildCount>)
-          .WithSimpleSorterModelType(Some simpleSorterModelType.Msrs)
+          .WithSimpleSorterModelType(Some simpleSorterModelType.Msuf4)
           .WithSortableDataFormat(Some sortableDataFormat.BitVector512)
           .WithDistinctSorterHashes(Some true)
           .WithPrioritizeNewMutants(Some true)

@@ -13,7 +13,7 @@ open GeneSort.Dispatch.V1.SorterSgd.Msuf32p4a.Common
 open GeneSort.Dispatch.V1.SorterSgd
 
 
-module OrthoPara =
+module MutationRate =
 
     let globalSorterCount = 128 |> UMX.tag<sorterCount>
     let dbOrthoPara32Name = "OrthoPara32" |> UMX.tag<databaseName>
@@ -64,7 +64,7 @@ module OrthoPara =
 
 
     let private withLocalParams (rp:runParameters) =
-        let rpn = standardParams rp
+        let rpn = projectParams rp
         rpn.WithOrthoRate(Some 4.001<orthoRate>)
 
 
