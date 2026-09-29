@@ -255,13 +255,13 @@ module MutationRate =
             spans = [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
                 (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [12] |> List.map string)
+                (runParameters.generationIntervalCountKey, [4] |> List.map string)
                 (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
-                (runParameters.paraRateKey, [1.5; 2.5; 3.5] |> List.map string)
-                (runParameters.selfSymRateKey, [4.5; 5.5; 6.5]  |> List.map string)
+                (runParameters.paraRateKey,    [0.05;  0.1;   0.5;   1.001; ] |> List.map string)
+                (runParameters.selfSymRateKey, [1.5;   2.001;]  |> List.map string)
                 (runParameters.mutationModKey, [0] |> List.map string)
                 (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
-                (runParameters.modificationRateKey, [0.225; 0.25; 0.275;] |> List.map string)
+                (runParameters.modificationRateKey, [0.25; 0.30; 0.40; 0.50;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
             filter = paramMapFilter
