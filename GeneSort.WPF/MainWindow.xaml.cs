@@ -199,32 +199,65 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SelectedFile = null;
         FileSummary = folderPath;
         CurrentViewer = null;
-        StatusMessage = $"Searching for RunParameters files in {folderPath}…";
+        DetailsViewer = new FileSelectionDetailsControl();
+        StatusMessage = $"Reading files in {folderPath}…";
 
         try
         {
-            var result = await Task.Run(() => BuildRunParametersTable(folderPath));
+            var result = await Task.Run(() => BuildFolderContents(folderPath));
             if (version != folderLoadVersion)
                 return;
 
-            if (result.FilesLoaded == 0)
+            CurrentViewer = new OutputFolderFilesGridControl(Path.GetFileName(folderPath), result.FilesTable);
+            FileSummary = $"{folderPath}  •  {result.FileCount:N0} output file(s)";
+            if (result.RunParameters.FilesLoaded > 0)
             {
-                StatusMessage = result.FilesFound == 0
-                    ? "No RunParameters files found in this folder."
-                    : $"Found {result.FilesFound:N0} RunParameters file(s), but none could be read.";
-                return;
+                DetailsViewer = new RunParametersTableControl(Path.GetFileName(folderPath), result.RunParameters.Table);
+                StatusMessage = result.RunParameters.FailedFiles == 0
+                    ? $"Showing {result.FileCount:N0} folder file(s) and parameters from {result.RunParameters.FilesLoaded:N0} RunParameters file(s)."
+                    : $"Showing folder files and parameters from {result.RunParameters.FilesLoaded:N0} of {result.RunParameters.FilesFound:N0} RunParameters files.";
             }
-
-            CurrentViewer = new RunParametersTableControl(Path.GetFileName(folderPath), result.Table);
-            StatusMessage = result.FailedFiles == 0
-                ? $"Loaded parameters from {result.FilesLoaded:N0} RunParameters file(s)."
-                : $"Loaded {result.FilesLoaded:N0} of {result.FilesFound:N0} RunParameters files; {result.FailedFiles:N0} could not be read.";
+            else if (result.RunParameters.FilesFound > 0)
+                StatusMessage = $"Showing folder files; found {result.RunParameters.FilesFound:N0} RunParameters file(s), but none could be read.";
+            else
+                StatusMessage = $"Showing {result.FileCount:N0} output file(s) in this folder. No RunParameters files found beneath it.";
         }
         catch (Exception ex)
         {
             if (version == folderLoadVersion)
                 StatusMessage = $"Unable to search this folder: {ex.Message}";
         }
+    }
+
+    private static FolderOutputContentsResult BuildFolderContents(string folderPath)
+    {
+        var table = new DataTable();
+        table.Columns.Add("File", typeof(string));
+        table.Columns.Add("Output data type", typeof(string));
+        table.Columns.Add("Size (bytes)", typeof(long));
+        table.Columns.Add("Last modified", typeof(DateTime));
+        table.Columns.Add("Path", typeof(string));
+
+        var outputFiles = Directory.EnumerateFiles(folderPath)
+            .Where(path => Path.GetExtension(path).Equals(".msgpack", StringComparison.OrdinalIgnoreCase)
+                || Path.GetExtension(path).Equals(".txt", StringComparison.OrdinalIgnoreCase)
+                    && MessagePackFile.GetKind(path) == OutputDataKind.TextReport)
+            .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        foreach (var path in outputFiles)
+        {
+            var info = new FileInfo(path);
+            var row = table.NewRow();
+            row["File"] = info.Name;
+            row["Output data type"] = MessagePackFile.OutputDataTypeForPath(path);
+            row["Size (bytes)"] = info.Length;
+            row["Last modified"] = info.LastWriteTime;
+            row["Path"] = path;
+            table.Rows.Add(row);
+        }
+
+        return new FolderOutputContentsResult(table, outputFiles.Length, BuildRunParametersTable(folderPath));
     }
 
     private static RunParametersTableResult BuildRunParametersTable(string folderPath)
@@ -412,6 +445,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 }
 
 internal sealed record RunParametersTableResult(DataTable Table, int FilesFound, int FilesLoaded, int FailedFiles);
+internal sealed record FolderOutputContentsResult(DataTable FilesTable, int FileCount, RunParametersTableResult RunParameters);
 
 public sealed class MessagePackFile(string fullPath)
 {
@@ -445,6 +479,8 @@ public sealed class MessagePackFile(string fullPath)
                 return kind;
         return OutputDataKind.Unknown;
     }
+
+    public static string OutputDataTypeForPath(string path) => OutputDataTypeFromPath(path);
 
     private static string OutputDataTypeFromPath(string path)
     {

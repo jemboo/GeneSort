@@ -370,6 +370,44 @@ public sealed class RunParametersTableControl : UserControl
     }
 }
 
+public sealed class OutputFolderFilesGridControl : UserControl
+{
+    public OutputFolderFilesGridControl(string folderName, DataTable table)
+    {
+        var layout = new DockPanel();
+        var heading = new StackPanel { Margin = new Thickness(2, 0, 2, 10) };
+        heading.Children.Add(new TextBlock
+        {
+            Text = $"Files in {folderName}",
+            FontSize = 18,
+            FontWeight = FontWeights.SemiBold,
+            Foreground = new SolidColorBrush(Color.FromRgb(23, 43, 67))
+        });
+        heading.Children.Add(new TextBlock
+        {
+            Text = $"{table.Rows.Count:N0} output file(s) in this folder.",
+            Margin = new Thickness(0, 4, 0, 0),
+            Foreground = new SolidColorBrush(Color.FromRgb(89, 102, 117))
+        });
+        DockPanel.SetDock(heading, Dock.Top);
+        layout.Children.Add(heading);
+        layout.Children.Add(new DataGrid
+        {
+            ItemsSource = table.DefaultView,
+            AutoGenerateColumns = true,
+            IsReadOnly = true,
+            CanUserAddRows = false,
+            CanUserDeleteRows = false,
+            CanUserSortColumns = true,
+            EnableRowVirtualization = true,
+            EnableColumnVirtualization = true,
+            HeadersVisibility = DataGridHeadersVisibility.All,
+            GridLinesVisibility = DataGridGridLinesVisibility.All
+        });
+        Content = layout;
+    }
+}
+
 public static class OutputDataViewerFactory
 {
     public static OutputDataViewerControl Create(OutputDataKind kind, IEnumerable<MessagePackNode> nodes) => kind switch
