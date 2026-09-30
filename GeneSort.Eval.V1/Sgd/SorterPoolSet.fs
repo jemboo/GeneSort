@@ -20,6 +20,19 @@ type sorterPoolSet =
     member this.SorterPoolCount with get() = this._sorterPools.Count |> UMX.tag<sorterPoolCount>
     member this.GenerationNumber with get() = this._generationNumber
     member this.LatticeBounds with get() = this._latticeBounds
+    member this.SortedSorterEvalPercentage with get() =
+        let evals =
+            this._sorterPools
+            |> Map.values
+            |> Seq.collect (fun pool -> pool.SorterPoolMembers)
+            |> Seq.choose (fun memberObj -> memberObj.SorterEval)
+            |> Seq.toArray
+
+        if evals.Length = 0 then
+            0.0
+        else
+            let sortedCount = evals |> Array.sumBy (fun eval -> if SorterEval.getIsSorted eval then 1 else 0)
+            float sortedCount * 100.0 / float evals.Length
 
     static member create (sorterPoolSetId: Guid<sorterPoolSetId>)
                          (generationNumber: int<generationNumber>)

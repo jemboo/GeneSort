@@ -515,7 +515,7 @@ module CommonParams =
 
     let sorterEvalMeasureInitial_CestM_noScw =
             (runParameters.sorterEvalMeasureInitialKey, 
-            [ SorterEvalMeasure.stageBiased;] |> List.map SorterEvalMeasure.toCompactString)
+            [ SorterEvalMeasure.stageBiasedFilterUnsorted;] |> List.map SorterEvalMeasure.toCompactString)
     let sorterEvalMeasureInitial_CestM_Scw =
             (runParameters.sorterEvalMeasureInitialKey, 
             [ _cestM_ScwP2;] |> List.map SorterEvalMeasure.toCompactString)
@@ -524,7 +524,7 @@ module CommonParams =
 
     let sorterEvalMeasure_CestM_noScw =
             (runParameters.sorterEvalMeasureKey, 
-            [ SorterEvalMeasure.stageBiased;] |> List.map SorterEvalMeasure.toCompactString)
+            [ SorterEvalMeasure.stageBiasedFilterUnsorted;] |> List.map SorterEvalMeasure.toCompactString)
     let sorterEvalMeasure_CestM_Scw =
             (runParameters.sorterEvalMeasureKey, 
             [ _cestM_ScwP2;] |> List.map SorterEvalMeasure.toCompactString)
@@ -532,7 +532,7 @@ module CommonParams =
 
     let sorterEvalMeasure_StageCrossing_Range =
             (runParameters.sorterEvalMeasureKey, 
-            [ SorterEvalMeasure.stageBiased; _cestM_ScwP2; _cestM_ScwP1; _cestM_ScwN1; _cestM_ScwP3; ] 
+            [ SorterEvalMeasure.stageBiasedFilterUnsorted; _cestM_ScwP2; _cestM_ScwP1; _cestM_ScwN1; _cestM_ScwP3; ] 
             |> List.map SorterEvalMeasure.toCompactString)
 
 

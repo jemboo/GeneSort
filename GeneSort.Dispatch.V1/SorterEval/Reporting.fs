@@ -93,7 +93,7 @@ module Reporting =
                     |> SorterStageStats.fromSorterEval
                     |> Array.map (fun sss -> sss.toDataTableRecord())
 
-                let _sorterEvalMeasure = SorterEvalMeasure.stageBiased
+                let _sorterEvalMeasure = SorterEvalMeasure.stageBiasedFilterUnsorted
                 let _sorterEvalSelectionType = sorterSelectionType.Tmb 300<sorterCount>
                 let _sorterEvalSelection = SorterSelection.makeSelection 
                                                 _sorterEvalMeasure

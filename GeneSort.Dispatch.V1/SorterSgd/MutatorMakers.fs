@@ -89,7 +89,7 @@ module MutatorMakers =
                             let! paraRate = rp.GetParaRate()
                             let! selfSymRate = rp.GetSelfSymRate()
                             let! mutVariant = rp.GetMutatorVariant()
-                            return getMsuf4ModelMutator sortingWidth rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate mutVariant
+                            return getMsuf6ModelMutator sortingWidth rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate mutVariant
                         }
                         match res with
                         | Some mutator -> return Ok mutator

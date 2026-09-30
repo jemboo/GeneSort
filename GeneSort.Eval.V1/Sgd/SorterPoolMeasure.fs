@@ -43,13 +43,13 @@ module SorterPoolMeasure =
     let noStdev = 
         stDevPoolMeasure.create 
                 (0.0<stDevWeight>) 
-                SorterEvalMeasure.stageBiased
+                SorterEvalMeasure.stageBiasedFilterUnsorted
                 |> sorterPoolMeasure.StDevPool
 
     let stdev = 
         stDevPoolMeasure.create 
                 (0.4<stDevWeight>) 
-                SorterEvalMeasure.stageBiased
+                SorterEvalMeasure.stageBiasedFilterUnsorted
                 |> sorterPoolMeasure.StDevPool
 
 

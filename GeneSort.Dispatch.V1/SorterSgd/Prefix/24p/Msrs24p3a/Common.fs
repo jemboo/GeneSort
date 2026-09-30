@@ -5,6 +5,7 @@ open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Core
 open GeneSort.Project.V1
+open GeneSort.FileDb.V1
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.SortingLib.Sorter
@@ -13,6 +14,9 @@ module Common =
 
     let projName = "SorterSgd.Prfefix.Msrs24p3a" |> UMX.tag<projectName>
     let seedSorterCount = 512
+
+    let makeFolderFromDbName (dbName: string<databaseName>) =
+        @$"c:\Projects\{%projName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
 
     let standardParams (rp:runParameters) =
         let sorterEvalSelectionType = sorterSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
@@ -27,8 +31,8 @@ module Common =
           .WithDistinctSorterHashes(Some true)
           .WithPrioritizeNewMutants(Some true)
           .WithSortedFraction(Some 0.99<sortedFraction>)
-          .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiased)
-          .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiased)
+          .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
+          .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
           .WithSeedSorterPoolSelectionType(Some sorterEvalSelectionType)
           .WithPrefixLibId(Some pfxLibId)
           .WithSortingWidth(Some pfxLibId.SortingWidth)
@@ -48,7 +52,7 @@ module Common =
           .WithDistinctSorterHashes(Some true)
           .WithPrioritizeNewMutants(Some true)
           .WithSortedFraction(Some 0.99<sortedFraction>)
-          .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiased)
+          .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
           .WithSeedSorterPoolSelectionType(Some sorterEvalSelectionType)
           .WithPrefixLibId(Some pfxLibId)
           .WithSortingWidth(Some pfxLibId.SortingWidth)

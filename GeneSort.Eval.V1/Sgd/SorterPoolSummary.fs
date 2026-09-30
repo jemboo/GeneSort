@@ -67,14 +67,19 @@ type sorterPoolSetSummary =
     private {
         _sorterPoolSetId: Guid<sorterPoolSetId>
         _generationNumber: int<generationNumber>
+        _sortedSorterEvalPercentage: float
         _sorterPoolSummaries: sorterPoolSummary array
     }
     member this.SorterPoolSetId with get() = this._sorterPoolSetId
     member this.GenerationNumber with get() = this._generationNumber
+    member this.SortedSorterEvalPercentage with get() = this._sortedSorterEvalPercentage
     member this.SorterPoolSummaries with get() = this._sorterPoolSummaries
 
-    static member Create(setId, genNum, summaries) =
-        { _sorterPoolSetId = setId; _generationNumber = genNum; _sorterPoolSummaries = summaries }
+    static member Create(setId, genNum, sortedSorterEvalPercentage, summaries) =
+        { _sorterPoolSetId = setId
+          _generationNumber = genNum
+          _sortedSorterEvalPercentage = sortedSorterEvalPercentage
+          _sorterPoolSummaries = summaries }
 
 
 module SorterPoolSetSummary =
@@ -161,6 +166,7 @@ module SorterPoolSetSummary =
         sorterPoolSetSummary.Create(
             poolSet.SorterPoolSetId, 
             poolSet.GenerationNumber, 
+            poolSet.SortedSorterEvalPercentage,
             poolSummaries
         )
 
@@ -173,6 +179,7 @@ module SorterPoolSetSummary =
             dataTableRecord.createEmpty()
             |> dataTableRecord.addData (sprintf "%sSorterPoolSetId" prefix) (string (%summarySet.SorterPoolSetId))
             |> dataTableRecord.addData (sprintf "%sGenerationNumber" prefix) (string (%summarySet.GenerationNumber))
+            |> dataTableRecord.addData (sprintf "%sSortedSorterEvalPercentage" prefix) (sprintf "%.2f%%" summarySet.SortedSorterEvalPercentage)
 
         // 2. Iterate through each pool summary and combine metrics with the root context
         summarySet.SorterPoolSummaries

@@ -106,12 +106,11 @@ type sorterSelection =
 
 module SorterSelection =
 
-    let private prepareDistinctSorted 
+    let private filterAndDistinctify 
                         (measure: sorterEvalMeasure) 
                         (items: sorterEval seq): sorterEval array =
         items
         |> SorterEvalFunctions.filterEvaluations measure
-        |> Seq.filter SorterEval.getIsSorted
         |> Seq.distinctBy SorterEval.getSequenceHash
         |> Seq.toArray
 
@@ -122,7 +121,7 @@ module SorterSelection =
                 (items: sorterEval seq) 
                 (sortableTestId: Guid<sortableTestId>) : sorterSelection =
         let ranker = SorterEvalFunctions.getFunctionForMeasure measure
-        let cleanItems = prepareDistinctSorted measure items
+        let cleanItems = filterAndDistinctify measure items
         
         match selType with
         | TopN count ->

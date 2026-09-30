@@ -30,6 +30,7 @@ type sorterPoolSummaryDto = {
 type sorterPoolSetSummaryDto = {
     sorterPoolSetId: Guid
     generationNumber: int
+    sortedSorterEvalPercentage: float
     sorterPoolSummaryDtos: sorterPoolSummaryDto array
 }
 
@@ -66,6 +67,7 @@ module SorterPoolSetSummaryDto =
         {
             sorterPoolSetId = UMX.untag domain.SorterPoolSetId
             generationNumber = UMX.untag domain.GenerationNumber
+            sortedSorterEvalPercentage = domain.SortedSorterEvalPercentage
             sorterPoolSummaryDtos = poolSummaryDtos
         }
 
@@ -89,6 +91,7 @@ module SorterPoolSetSummaryDto =
         sorterPoolSetSummary.Create(
             UMX.tag dto.sorterPoolSetId, 
             UMX.tag dto.generationNumber, 
+            dto.sortedSorterEvalPercentage,
             poolSummaryDomains
         )
 

@@ -55,6 +55,8 @@
     <Compile Include="SorterSgd\SorterSgdTypes.fs" />
     <Compile Include="SorterSgd\Prefix\32p\Msuf32p4a\Common.fs" />
     <Compile Include="SorterSgd\Prefix\32p\Msuf32p4a\MutationRate.fs" />
+    <Compile Include="SorterSgd\Prefix\24p\Msuf624p3b\Common.fs" />
+    <Compile Include="SorterSgd\Prefix\24p\Msuf624p3b\MutationRate.fs" />
     <Compile Include="SorterSgd\Prefix\32p\Msrs32p4a\Common.fs" />
     <Compile Include="SorterSgd\Prefix\32p\Msrs32p4a\MutationRate.fs" />
     <Compile Include="SorterSgd\Prefix\24p\Msrs24p3a\Common.fs" />

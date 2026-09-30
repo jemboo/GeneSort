@@ -86,10 +86,17 @@ type ceStMeasure = private {
             stageCrossingWeight = stageCrossingWeight
         }
 
-    static member stageBiased () = 
+    static member stageBiasedFilterUnsorted () = 
             ceStMeasure.create
                     (1.1<stageWeight>)
                     (true |> UMX.tag<filterUnsorted>)
+                    (false |> UMX.tag<filterReflectionSymmetric>)
+                    (0.0 |> UMX.tag<stageCrossingWeight>)
+
+    static member stageBiased () = 
+            ceStMeasure.create
+                    (1.1<stageWeight>)
+                    (false |> UMX.tag<filterUnsorted>)
                     (false |> UMX.tag<filterReflectionSymmetric>)
                     (0.0 |> UMX.tag<stageCrossingWeight>)
 
@@ -152,6 +159,8 @@ type sorterEvalMeasure =
 
 
 module SorterEvalMeasure =
+
+    let stageBiasedFilterUnsorted = ceStMeasure.stageBiasedFilterUnsorted() |> sorterEvalMeasure.CeSt
 
     let stageBiased = ceStMeasure.stageBiased() |> sorterEvalMeasure.CeSt
 
