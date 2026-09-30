@@ -97,7 +97,6 @@ module MutationRate =
             let rp2 = withLocalParams rp
             let scpp = rp.GetSorterCountPerPool().Value
             let scpps = rp.GetSorterCountPerPoolSet().Value
-            let selScpp = scpp
             let spc = (%scpps / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
             let rp3 = rp2.WithSorterPoolCount(spc)
             let qp = host.RunDb.MakeQueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
@@ -105,7 +104,7 @@ module MutationRate =
             rp3.WithRunFinished(Some false)
                     .WithId(Some qp.Value.Id)
                     .WithRunName(Some host.Run.RunName)
-                    .WithSelectedSorterCountPerPool(Some selScpp)
+                    .WithSelectedSorterCountPerPool(Some scpp)
 
 
         let Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
@@ -121,7 +120,6 @@ module MutationRate =
                 (runParameters.paraRateKey,    [1.001;] |> List.map string)
                 (runParameters.selfSymRateKey, [2.001;]  |> List.map string)
                 (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
                 (runParameters.seedModificationRateKey, [0.005;] |> List.map string)
                 (runParameters.modificationRateKey, [0.0075;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
@@ -146,7 +144,6 @@ module MutationRate =
                 (runParameters.paraRateKey,    [0.1;   0.5; 1.001; 1.5;  ] |> List.map string)
                 (runParameters.selfSymRateKey, [1.001; 1.5; 2.001; 3.001;]  |> List.map string)
                 (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
                 (runParameters.seedModificationRateKey, [0.05;] |> List.map string)
                 (runParameters.modificationRateKey, [0.0025; 0.0035; 0.005; 0.0075; 0.0125; 0.02; 0.035; 0.06;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))

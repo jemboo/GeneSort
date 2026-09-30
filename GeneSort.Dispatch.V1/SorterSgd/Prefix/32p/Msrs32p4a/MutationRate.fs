@@ -188,7 +188,6 @@ module MutationRate =
         let private finishRunParams (host: IRunHost) (rp:runParameters) =
             let rp2 = withLocalParams rp
             let scpp = rp.GetSorterCountPerPool().Value
-            let selScpp = scpp
             let spc = (%globalSorterCount / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
             let rp3 = rp2.WithSorterPoolCount(spc)
             let qp = host.RunDb.MakeQueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
@@ -196,7 +195,7 @@ module MutationRate =
             rp3.WithRunFinished(Some false)
                     .WithId(Some qp.Value.Id)
                     .WithRunName(Some host.Run.RunName)
-                    .WithSelectedSorterCountPerPool(Some selScpp)
+                    .WithSelectedSorterCountPerPool(Some scpp)
 
 
         let Test (executorType: sorterSgdExecutorType) : runHostSpec = {
@@ -211,7 +210,6 @@ module MutationRate =
                 (runParameters.paraRateKey, [4.001] |> List.map string)
                 (runParameters.selfSymRateKey, [4.001]  |> List.map string)
                 (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
                 (runParameters.modificationRateKey, [0.25;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
@@ -234,7 +232,6 @@ module MutationRate =
                 (runParameters.paraRateKey,    [0.05;  0.1;   0.5;   1.001; 1.5;   2.001; 3.001;] |> List.map string)
                 (runParameters.selfSymRateKey, [1.001; 1.5;   2.001; 3.001; 4.001; 5.001; 6.001]  |> List.map string)
                 (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
                 (runParameters.modificationRateKey, [0.015; 0.20; 0.25; 0.30; 0.40; 0.50; 0.99] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
@@ -258,7 +255,6 @@ module MutationRate =
                 (runParameters.paraRateKey,    [0.05;  0.1;   0.5;   1.001; ] |> List.map string)
                 (runParameters.selfSymRateKey, [1.5;   2.001;]  |> List.map string)
                 (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
                 (runParameters.modificationRateKey, [0.25; 0.30; 0.40; 0.50;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
@@ -278,7 +274,6 @@ module MutationRate =
         let private finishRunParams (host: IRunHost) (rp:runParameters) =
             let rp2 = withLocalParams rp
             let scpp = rp.GetSorterCountPerPool().Value
-            let selScpp = scpp
             let spc = (%globalSorterCount / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
             let rp3 = rp2.WithSorterPoolCount(spc)
                          .WithModificationRate(Some 0.99<modificationRate>)
@@ -287,7 +282,7 @@ module MutationRate =
             rp3.WithRunFinished(Some false)
                     .WithId(Some qp.Value.Id)
                     .WithRunName(Some host.Run.RunName)
-                    .WithSelectedSorterCountPerPool(Some selScpp)
+                    .WithSelectedSorterCountPerPool(Some scpp)
 
         
         let Test2 (executorType: sorterSgdExecutorType) : runHostSpec = {
@@ -302,7 +297,6 @@ module MutationRate =
                 (runParameters.paraRateKey, [0.05; 0.075; 0.1; 0.125] |> List.map string)
                 (runParameters.selfSymRateKey, [1.25; 1.5; 1.75; 2.5] |> List.map string)
                 (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
             filter = paramMapFilter
@@ -320,7 +314,6 @@ module MutationRate =
         let private finishRunParams (host: IRunHost) (rp:runParameters) =
             let rp2 = withLocalParams rp
             let scpp = rp.GetSorterCountPerPool().Value
-            let selScpp = scpp
             let spc = (%globalSorterCount / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
             let rp3 = rp2.WithSorterPoolCount(spc)
                          .WithModificationRate(Some 0.99<modificationRate>)
@@ -329,7 +322,7 @@ module MutationRate =
             rp3.WithRunFinished(Some false)
                     .WithId(Some qp.Value.Id)
                     .WithRunName(Some host.Run.RunName)
-                    .WithSelectedSorterCountPerPool(Some selScpp)
+                    .WithSelectedSorterCountPerPool(Some scpp)
 
         
         let WideTest (executorType: sorterSgdExecutorType) : runHostSpec = {
@@ -344,7 +337,6 @@ module MutationRate =
                 (runParameters.paraRateKey, [0.025; 0.05; 0.75; 0.1] |> List.map string)
                 (runParameters.selfSymRateKey, [0.75; 1.001; 1.5; 2.001] |> List.map string)
                 (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
             filter = paramMapFilter
