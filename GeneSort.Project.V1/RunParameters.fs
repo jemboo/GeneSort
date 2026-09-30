@@ -70,6 +70,7 @@ type runParameters =
     static member sorterCountCycleMultiplierKey = "SorterCountCycleMultiplier"
     static member sorterCountKey = "SorterCount"
     static member sorterCountPerPoolKey = "SorterCountPerPool"
+    static member sorterCountPerPoolSetKey = "SorterCountPerPoolSet"
     static member sorterEvalMeasureInitialKey = "SorterEvalMeasureInitial"
     static member sorterEvalMeasureKey = "SorterEvalMeasure"
     static member sorterEvalTypeKey = "SorterEvalType"
@@ -314,6 +315,10 @@ type runParameters =
         runParameters.tryGetInt runParameters.sorterCountPerPoolKey this.ParamMap
         |> Option.map UMX.tag<sorterCountPerPool>
 
+    member this.GetSorterCountPerPoolSet() =
+        runParameters.tryGetInt runParameters.sorterCountPerPoolSetKey this.ParamMap
+        |> Option.map UMX.tag<sorterCountPerPoolSet>
+
     member this.GetSorterEvalMeasure() =
         this.paramMap.TryFind runParameters.sorterEvalMeasureKey
         |> Option.map SorterEvalFunctions.fromCompactString
@@ -522,6 +527,9 @@ type runParameters =
 
     member this.WithSorterCountPerPool(sc: int<sorterCountPerPool> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountPerPoolKey (sc |> Option.map UmxExt.intToRaw) }
+
+    member this.WithSorterCountPerPoolSet(sc: int<sorterCountPerPoolSet> option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterCountPerPoolSetKey (sc |> Option.map UmxExt.intToRaw) }
 
     member this.WithSorterEvalMeasure(sem: sorterEvalMeasure option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterEvalMeasureKey (sem |> Option.map SorterEvalFunctions.toCompactString) }

@@ -19,10 +19,6 @@ module Common =
         @$"c:\Projects\{%projName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
 
 
-
-
-
-
     let seedSorterCount = 512
 
     let projectParams (rp:runParameters) =

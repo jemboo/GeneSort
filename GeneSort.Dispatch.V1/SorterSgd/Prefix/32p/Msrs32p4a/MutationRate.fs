@@ -39,8 +39,8 @@ module MutationRate =
             (mmod: int<mutationMod>)
             (outDt: outputDataType) : queryParams =
 
-        queryParams.create 
-            dbVariableModR_32Name 
+        queryParams.create
+            dbName 
             projName
             (Some repl)
             (Some genCurrent)
@@ -81,8 +81,6 @@ module MutationRate =
 
     let private paramMapFilter (rp: runParameters) =
         Some rp
-
-
 
     let makeDatabase (dbName: string<databaseName>) : IGeneSortDb =
         new GeneSortGenDbMp(makeFolderFromDbName dbName, queryParamsFromRunParams dbName, saveIntervals, saveSubIntervals)

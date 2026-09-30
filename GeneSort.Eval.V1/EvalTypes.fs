@@ -13,6 +13,7 @@ open GeneSort.Core
 [<Measure>] type sorterPoolName
 [<Measure>] type sorterPoolId
 [<Measure>] type sorterCountPerPool
+[<Measure>] type sorterCountPerPoolSet
 [<Measure>] type sorterCountCycle
 [<Measure>] type sorterCountCycleMultiplier
 [<Measure>] type sortedFraction

@@ -15,12 +15,15 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 module MutationRate =
 
-    let globalSorterCount = 128 |> UMX.tag<sorterCount>
-    let dbOrthoPara32Name = "OrthoPara32" |> UMX.tag<databaseName>
-    let dbFolderOrthoPara = @$"c:\Projects\{%projName}\{%dbOrthoPara32Name}\Data" |> UMX.tag<pathToRootFolder>
+    let dbVariableModR_32Name = "VariableModRates_32" |> UMX.tag<databaseName>
+    let dbVariableModR_64Name = "VariableModRates_64" |> UMX.tag<databaseName>
+
+    let saveIntervals = SampleRegistry.samplingConfigsDict["expInterval100_L50ss"]
+    let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.1p5C"]
 
 
     let makeQueryParams
+            (dbName: string<databaseName>)
             (repl: int<replNumber>)
             (codeMod: string<codeModKey>)
             (genCurrent: int<generationNumber>)
@@ -28,11 +31,13 @@ module MutationRate =
             (sorterPoolCt: int<sorterPoolCount>)
             (para: float<paraRate>)
             (selfSym: float<selfSymRate>)
+            (seedModR: float<seedModificationRate>)
+            (modR: float<modificationRate>)
             (mmod: int<mutationMod>)
             (outDt: outputDataType) : queryParams =
 
         queryParams.create 
-            dbOrthoPara32Name 
+            dbName 
             projName
             (Some repl)
             (Some genCurrent)
@@ -43,11 +48,14 @@ module MutationRate =
                 (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                 (runParameters.paraRateKey, (Some para) |> ParaRate.toString)
                 (runParameters.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
+                (runParameters.seedModificationRateKey, (Some seedModR) |> SeedModificationRate.toString)
+                (runParameters.modificationRateKey, (Some modR) |> ModificationRate.toString)
                 (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
             |]
 
 
     let queryParamsFromRunParams
+                    (dbName: string<databaseName>)
                     (rp: runParameters)
                     (odt: outputDataType) : queryParams option =
         maybe {
@@ -56,10 +64,12 @@ module MutationRate =
             let! curGen = rp.GetGenerationCurrent()
             let! scPP = rp.GetSorterCountPerPool()
             let! spc = rp.GetSorterPoolCount()
-            let! mmod = rp.GetMutationMod()
             let! para = rp.GetParaRate()
             let! self = rp.GetSelfSymRate()
-            return makeQueryParams repl codeMod curGen scPP spc para self mmod odt
+            let! seedModR = rp.GetSeedModificationRate()
+            let! modR = rp.GetModificationRate()
+            let! mmod = rp.GetMutationMod()
+            return makeQueryParams dbName repl codeMod curGen scPP spc para self seedModR modR mmod odt
         }
 
 
@@ -71,80 +81,75 @@ module MutationRate =
     let private paramMapFilter (rp: runParameters) =
         Some rp
 
-    let private finishRunParams (host: IRunHost) (rp:runParameters) =
-        let rp2 = withLocalParams rp
-        let scpp = rp.GetSorterCountPerPool().Value
-        let selScpp = scpp
-        let spc = (%globalSorterCount / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
-        let rp3 = rp2.WithSorterPoolCount(spc)
-        let qp = host.RunDb.MakeQueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
-
-        rp3.WithRunFinished(Some false)
-                .WithId(Some qp.Value.Id)
-                .WithRunName(Some host.Run.RunName)
-                .WithModificationRate(Some 0.99<modificationRate>)
-                .WithSelectedSorterCountPerPool(Some selScpp)
-
-
-    let saveIntervals = SampleRegistry.samplingConfigsDict["expInterval100_L50ss"]
-    let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.1p5C"]
-
-    let dbOrthoPara = new GeneSortGenDbMp(dbFolderOrthoPara, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
-
-
-    let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
-        [ 
-            (dbOrthoPara32Name, dbOrthoPara :> IGeneSortDb);
-        ]
-        |> Map.ofList
-
-    let getDatabaseByName (name: string<databaseName>) : IGeneSortDb =
-        match databaseConfigs.TryFind name with
-        | Some db -> db
-        | None -> failwithf "Database with name %s not found" (UMX.untag name)
+    let makeDatabase (dbName: string<databaseName>) : IGeneSortDb =
+        new GeneSortGenDbMp(makeFolderFromDbName dbName, queryParamsFromRunParams dbName, saveIntervals, saveSubIntervals)
 
 
     let createRunHost (spec: runHostSpec) : IRunHost =
-        let db = getDatabaseByName spec.databaseName
+        let db = makeDatabase spec.databaseName
         let run = run.create spec.databaseName projName spec.runName spec.runDescription
         runHost.Create db spec run :> IRunHost
 
 
-    module Specs =
+    module VarModR_32 =
+
+        let private finishRunParams (host: IRunHost) (rp:runParameters) =
+            let rp2 = withLocalParams rp
+            let scpp = rp.GetSorterCountPerPool().Value
+            let scpps = rp.GetSorterCountPerPoolSet().Value
+            let selScpp = scpp
+            let spc = (%scpps / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
+            let rp3 = rp2.WithSorterPoolCount(spc)
+            let qp = host.RunDb.MakeQueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
+
+            rp3.WithRunFinished(Some false)
+                    .WithId(Some qp.Value.Id)
+                    .WithRunName(Some host.Run.RunName)
+                    .WithSelectedSorterCountPerPool(Some selScpp)
+
 
         let Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = dbOrthoPara32Name
-            runName = sprintf @"PickMode2_2_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "OrthroPara rate comp for 24pfx3a Msrs, PickMode2_2"
+            databaseName = dbVariableModR_32Name
+            runName = sprintf @"Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Rate comp for Msrs32p4a Msuf4"
             spans = [
+                (runParameters.sorterCountPerPoolSetKey, [256] |> List.map string)
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
                 (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [5] |> List.map string)
+                (runParameters.generationIntervalCountKey, [2] |> List.map string)
                 (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-                (runParameters.paraRateKey, [0.075; 0.1; 0.125; 0.15] |> List.map string)
-                (runParameters.selfSymRateKey, [1.25; 1.75; 2.25; 2.75] |> List.map string)
+                (runParameters.paraRateKey,    [1.001;] |> List.map string)
+                (runParameters.selfSymRateKey, [2.001;]  |> List.map string)
                 (runParameters.mutationModKey, [0] |> List.map string)
                 (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
+                (runParameters.seedModificationRateKey, [0.005;] |> List.map string)
+                (runParameters.modificationRateKey, [0.0075;] |> List.map string)
+                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
             filter = paramMapFilter
             enhancer = finishRunParams
             allowOverwrite = false |> UMX.tag
-            maxParallel = 8
+            maxParallel = 1
         }
 
-        let NoMods (executorType: sorterSgdExecutorType)  : runHostSpec = {
-            databaseName = dbOrthoPara32Name
-            runName = sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "OrthroPara rate comp for 24pfx3a Msrs, NoMods"
+
+        let WideTest (executorType: sorterSgdExecutorType)  : runHostSpec = {
+            databaseName = dbVariableModR_32Name
+            runName = sprintf @"WideTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+            runDescription = "Rate comp for Msrs32p4a Msuf4"
             spans = [
+                (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
                 (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [7] |> List.map string)
+                (runParameters.generationIntervalCountKey, [8] |> List.map string)
                 (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-                (runParameters.paraRateKey, [0.075; 0.1; 0.125; 0.15] |> List.map string)
-                (runParameters.selfSymRateKey, [1.25; 1.75; 2.25; 2.75] |> List.map string)
+                (runParameters.paraRateKey,    [0.1;   0.5; 1.001; 1.5;  ] |> List.map string)
+                (runParameters.selfSymRateKey, [1.001; 1.5; 2.001; 3.001;]  |> List.map string)
                 (runParameters.mutationModKey, [0] |> List.map string)
                 (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
+                (runParameters.seedModificationRateKey, [0.05;] |> List.map string)
+                (runParameters.modificationRateKey, [0.0025; 0.0035; 0.005; 0.0075; 0.0125; 0.02; 0.035; 0.06;] |> List.map string)
+                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
             filter = paramMapFilter
             enhancer = finishRunParams

@@ -8,10 +8,17 @@ open GeneSort.Project.V1
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.SortingLib.Sorter
+open GeneSort.FileDb.V1
 
 module Common =
 
-    let projName = "SorterSgd.Prfefix.32p.Msuf32p4a" |> UMX.tag<projectName>
+    let projName = "SorterSgd.Prfefix.32p4a.Msuf" |> UMX.tag<projectName>
+
+
+    let makeFolderFromDbName (dbName: string<databaseName>) =
+        @$"c:\Projects\{%projName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
+
+
     let seedSorterCount = 512
 
     let projectParams (rp:runParameters) =
