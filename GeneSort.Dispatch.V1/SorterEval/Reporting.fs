@@ -38,14 +38,14 @@ module Reporting =
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (StringUtils.getTimestampString()) %runId)
     
-                let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                let! qpSorterSetEval = host.QueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                                         |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
                 let! outB = host.RunDb.loadAsync qpSorterSetEval
                 let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
 
                 let reportName = (sprintf "FullEvalReport" |> UMX.tag<textReportName>)
 
-                let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                let! qpReport = host.QueryParamsFromRunParams rp (outputDataType.TextReport reportName)
                                 |> Result.ofOption "Failed to create QueryParams for Report."
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
                 let details = sorterSetEvals |> SorterSetEval.makeFullDataTableRecords
@@ -77,14 +77,14 @@ module Reporting =
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Stage stats Report for Run %s" (StringUtils.getTimestampString()) %runId)
     
-                let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                let! qpSorterSetEval = host.QueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                                         |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
                 let! outB = host.RunDb.loadAsync qpSorterSetEval
                 let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
 
                 let reportName = (sprintf "StageStatsReport" |> UMX.tag<textReportName>)
 
-                let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                let! qpReport = host.QueryParamsFromRunParams rp (outputDataType.TextReport reportName)
                                 |> Result.ofOption "Failed to create QueryParams for Report."
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
 
@@ -132,14 +132,14 @@ module Reporting =
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Ce bins Report for Run %s" (StringUtils.getTimestampString()) %runId)
     
-                let! qpSorterSetEval = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                let! qpSorterSetEval = host.QueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                                         |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
                 let! outB = host.RunDb.loadAsync qpSorterSetEval
                 let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
 
                 let reportName = (sprintf "CeBinsReport" |> UMX.tag<textReportName>)
 
-                let! qpReport = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                let! qpReport = host.QueryParamsFromRunParams rp (outputDataType.TextReport reportName)
                                 |> Result.ofOption "Failed to create QueryParams for Report."
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
 

@@ -21,8 +21,8 @@ module EvolutionOrchestrator =
 
     let runEvolutionAsync
             (genDb: IGeneSortDb)
-            (saveIntervals: samplingConfig)
-            (subIntervals: samplingConfig)
+            (saveIntervals: genIntervalConfig)
+            (subIntervals: genIntervalConfig)
             (rp: runParameters)
             (allowOverwrite: bool<allowOverwrite>)
             (initialPoolSet: sorterPoolSet)
@@ -58,7 +58,7 @@ module EvolutionOrchestrator =
             let requiredCount = int genIntervalCount
 
             let targetSamples = 
-                SamplingConfig.getSampleSetWithMinBound saveIntervals (%genStart - 1) requiredCount
+                GenIntervalConfig.getSampleSetWithMinBound saveIntervals (%genStart - 1) requiredCount
                 |> Set.toArray
                 |> Array.sort
 
@@ -72,14 +72,14 @@ module EvolutionOrchestrator =
                 // --- Frequency Triggers ---
                 let targetGenerationsForPoolExpansion = 
                     match optSorterPoolSelectionIntervals with
-                    | Some intervals -> SamplingConfig.getSampleSetMaxBound intervals targetGenInt
+                    | Some intervals -> GenIntervalConfig.getSampleSetMaxBound intervals targetGenInt
                     | None -> Set.empty
 
                 let targetGenerationsForSaveResults = 
-                    SamplingConfig.getSampleSetMaxBound saveIntervals targetGenInt
+                    GenIntervalConfig.getSampleSetMaxBound saveIntervals targetGenInt
 
                 let targetGenerationsForSummaryReport = 
-                    SamplingConfig.getSampleSetMaxBound subIntervals targetGenInt
+                    GenIntervalConfig.getSampleSetMaxBound subIntervals targetGenInt
 
                 // Condensed Optional Features Log
                 let countLog = 

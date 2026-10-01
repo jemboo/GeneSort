@@ -14,8 +14,15 @@ type private DbMessage =
     | GetRunParameters of string<runName> * (int<replNumber> option) * (int<replNumber> option) * CancellationToken option * IProgress<string> option * AsyncReplyChannel<Result<runParameters[], string>>
 
 type GeneSortDbMp(
-                rootFolder: string<pathToRootFolder>,
-                queryParamsMaker: runParameters -> outputDataType -> queryParams option) =
+                rootFolder: string<pathToRootFolder>) =
+
+    let dataFolder = DirectoryInfo(%rootFolder)
+    let databaseFolder = dataFolder.Parent
+    let projectFolder = if isNull databaseFolder then null else databaseFolder.Parent
+    let catalogName =
+        if isNull databaseFolder || isNull projectFolder then
+            invalidArg (nameof rootFolder) "The data folder must be nested under a project and database folder."
+        QueryParamsCatalog.nameForDatabase projectFolder.Name databaseFolder.Name
 
     let mailbox = MailboxProcessor.Start(fun inbox ->
         let rec loop () =
@@ -37,14 +44,13 @@ type GeneSortDbMp(
     )
 
     member _.RootFolder = rootFolder
-    member _.QueryParamsMaker = queryParamsMaker
 
     interface IGeneSortDb with
         member _.databaseName
-            with get (): string<databaseName> = DirectoryInfo(%rootFolder).Name |> UMX.tag
+            with get (): string<databaseName> = databaseFolder.Name |> UMX.tag
 
         member _.MakeQueryParamsFromRunParams rp odt =
-            queryParamsMaker rp odt
+            (QueryParamsCatalog.get catalogName) rp odt
 
         member _.saveAsync (queryParams: queryParams) (data: outputData) (allowOverwrite: bool<allowOverwrite>) =
             mailbox.PostAndAsyncReply(fun channel -> Save(rootFolder, queryParams, data, allowOverwrite, channel))

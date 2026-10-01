@@ -51,7 +51,7 @@ module SortableTestExecutor =
                                             sorterLibVariant.VariantA
                                         |> sortableTestModel.MsasMi
             
-                let! qpForSortableTest = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SortableTest "") 
+                let! qpForSortableTest = host.QueryParamsFromRunParams rp (outputDataType.SortableTest "")
                                          |> Result.ofOption "Failed to create query parameters for SortableTest"
                 let sortableTests = SortableTestModel.makeSortableTest 
                                             (%qpForSortableTest.Id |> UMX.tag) 
@@ -103,7 +103,7 @@ module SortableTestExecutor =
                 // 3. Create SortableTestModel
                 let sortableTestModel = msasPfx.create prefixLibId |> sortableTestModel.MsasPfx
             
-                let! qpForSortableTest = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SortableTest "") 
+                let! qpForSortableTest = host.QueryParamsFromRunParams rp (outputDataType.SortableTest "")
                                          |> Result.ofOption "Failed to create query parameters for SortableTest"
                 let sortableTests = SortableTestModel.makeSortableTest 
                                             (%qpForSortableTest.Id |> UMX.tag) 

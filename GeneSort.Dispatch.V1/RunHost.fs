@@ -13,14 +13,15 @@ type runHost =
         _projectDb: IGeneSortDb 
         _spec: runHostSpec
         _run: run
-        _genSaveIntervals: samplingConfig
-        _genSaveSubIntervals: samplingConfig
+        _genSaveIntervals: genIntervalConfig
+        _genSaveSubIntervals: genIntervalConfig
+        _queryParamsFromRunParams: queryParamsBuilder
         _maxParallel: int
     }
     
     static member Create (db: IGeneSortDb) (spec: runHostSpec) (run: run) =
         let lookupInterval name =
-            match SampleRegistry.samplingConfigsDict.TryGetValue name with
+            match GenIntervalRegistry.genIntervalConfigsDict.TryGetValue name with
             | true, interval -> interval
             | _ -> failwithf "Sampling interval '%s' is not registered for run '%s'." name (%run.RunName)
         { 
@@ -29,6 +30,7 @@ type runHost =
           _run = run;
           _genSaveIntervals = lookupInterval run.GenSaveIntervalsName;
           _genSaveSubIntervals = lookupInterval run.GenSaveSubIntervalsName;
+          _queryParamsFromRunParams = QueryParamsCatalog.get run.QueryCatalogName;
           _maxParallel = spec.maxParallel }
 
     member this.Spec = this._spec
@@ -42,6 +44,7 @@ type runHost =
         member this.Run = this._run
         member this.GenSaveIntervals = this._genSaveIntervals
         member this.GenSaveSubIntervals = this._genSaveSubIntervals
+        member this.QueryParamsFromRunParams = this._queryParamsFromRunParams
         member this.AllowOverwrite = this._spec.allowOverwrite
         member this.ParamMapRefiner rps = this.ParamMapRefiner rps
         member this.MaxParallel with get (): int = this._maxParallel

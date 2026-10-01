@@ -359,7 +359,7 @@ type runParameters =
 
     member this.GetSorterPoolSelectionIntervals() =
         this.paramMap.TryFind runParameters.sorterPoolSelectionIntervalsKey
-        |> Option.map (fun v -> SamplingConfig.fromString(v))
+        |> Option.map (fun v -> GenIntervalConfig.fromString(v))
 
     member this.GetSortingWidth() =
         runParameters.tryGetInt runParameters.sortingWidthKey this.paramMap
@@ -558,8 +558,8 @@ type runParameters =
     member this.WithSorterPoolMeasure(spm: sorterPoolMeasure option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterPoolMeasureKey (spm |> Option.map SorterPoolMeasure.toCompactString) }
 
-    member this.WithSorterPoolSelectionIntervals(sConfig: samplingConfig option) = 
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterPoolSelectionIntervalsKey (sConfig |> Option.map SamplingConfig.toString) }
+    member this.WithSorterPoolSelectionIntervals(sConfig: genIntervalConfig option) = 
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sorterPoolSelectionIntervalsKey (sConfig |> Option.map GenIntervalConfig.toString) }
 
     member this.WithSortingWidth(w: int<sortingWidth> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sortingWidthKey (w |> Option.map UmxExt.intToRaw) }

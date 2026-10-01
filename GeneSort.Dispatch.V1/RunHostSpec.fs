@@ -9,8 +9,9 @@ open GeneSort.Core
 type IRunHost =
     abstract member RunDb: IGeneSortDb
     abstract member Run: run
-    abstract member GenSaveIntervals: samplingConfig
-    abstract member GenSaveSubIntervals: samplingConfig
+    abstract member GenSaveIntervals: genIntervalConfig
+    abstract member GenSaveSubIntervals: genIntervalConfig
+    abstract member QueryParamsFromRunParams: queryParamsBuilder
     abstract member AllowOverwrite: bool<allowOverwrite>
     abstract member ParamMapRefiner: runParameters seq -> runParameters seq
     abstract member MaxParallel: int

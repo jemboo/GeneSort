@@ -97,7 +97,8 @@ module MsceSgdDbs =
                                            odt
                 }
 
-            let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+            do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
+            let db = new GeneSortDbMp(dbFolder)
 
 
 
@@ -195,7 +196,8 @@ module MsceSgdDbs =
                                             ins del mdr dsh pNm sfrac odt
                 }
 
-            let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+            do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
+            let db = new GeneSortDbMp(dbFolder)
 
 
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 

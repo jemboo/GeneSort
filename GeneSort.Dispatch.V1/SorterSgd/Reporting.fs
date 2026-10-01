@@ -15,11 +15,11 @@ module Reporting =
 
     /// Generic execution engine for dynamic generation-sliced reports.
     let private makeDynamicReportFromSlices<'T>
-            (loadSlices: samplingConfig -> IGeneSortDb -> int<generationNumber> -> runParameters -> CancellationToken -> (string -> unit) -> Async<seq<'T>>)
+            (loadSlices: genIntervalConfig -> IGeneSortDb -> int<generationNumber> -> runParameters -> CancellationToken -> (string -> unit) -> Async<seq<'T>>)
             (getGeneration: 'T -> int<generationNumber>)
             (extractRecords: 'T -> dataTableRecord seq)
             (reportNameTag: string)
-            (saveIntervals: samplingConfig)
+            (saveIntervals: genIntervalConfig)
             (genDb: IGeneSortDb)
             (rp: runParameters)
             (allowOverwrite: bool<allowOverwrite>)

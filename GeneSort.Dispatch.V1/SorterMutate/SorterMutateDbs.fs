@@ -67,7 +67,8 @@ module SorterMutateDbs =
                     return makeQueryParams repl odt rng ses sem sw smt sdf set smps mdr  
                 }
 
-            let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+            do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
+            let db = new GeneSortDbMp(dbFolder)
 
 
 
@@ -127,7 +128,8 @@ module SorterMutateDbs =
                     return makeQueryParams repl odt rng strSel sem mrgLibId smt sdf set mutPrams mdr
                 }
 
-            let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+            do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
+            let db = new GeneSortDbMp(dbFolder)
 
 
 
@@ -187,7 +189,8 @@ module SorterMutateDbs =
                     return makeQueryParams repl odt rng strSel sem pfxLibId smt sdf set mutPrams mdr
                 }
 
-            let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+            do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
+            let db = new GeneSortDbMp(dbFolder)
 
 
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 

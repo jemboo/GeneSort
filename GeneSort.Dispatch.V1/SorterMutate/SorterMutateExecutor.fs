@@ -352,11 +352,11 @@ module SorterMutateExecutor =
                 let prefixBlock = ces |> ceBlock.create (Guid.Empty |> UMX.tag) (tests |> SortableTests.getSortingWidth)
 
                 let! qpSorterSet = 
-                    host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSet "")
+                    host.QueryParamsFromRunParams rp (outputDataType.SorterSet "")
                     |> Result.ofOption "Failed to create QueryParams for SorterSet."
 
                 let! qpEval = 
-                    host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                    host.QueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
                     |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
 
                 let testId = tests |> SortableTests.getId

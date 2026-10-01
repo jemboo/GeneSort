@@ -15,6 +15,7 @@ type run =
           parameterSpans: (string * string list) list
           genSaveIntervalsName: string
           genSaveSubIntervalsName: string
+          queryCatalogName: string
         }
     with
 
@@ -34,6 +35,17 @@ type run =
             (parameterSpans: (string * string list) list)
             (genSaveIntervalsName: string)
             (genSaveSubIntervalsName: string) : run =
+        run.createWithCatalogAndIntervalNames databaseName projName runName description parameterSpans genSaveIntervalsName genSaveSubIntervalsName (sprintf "%s.%s" %projName %databaseName)
+
+    static member createWithCatalogAndIntervalNames
+            (databaseName: string<databaseName>)
+            (projName: string<projectName>)
+            (runName: string<runName>)
+            (description: string)
+            (parameterSpans: (string * string list) list)
+            (genSaveIntervalsName: string)
+            (genSaveSubIntervalsName: string)
+            (queryCatalogName: string) : run =
 
         if String.IsNullOrWhiteSpace %databaseName then
             failwith "Query name cannot be empty"
@@ -45,6 +57,7 @@ type run =
           parameterSpans = parameterSpans
           genSaveIntervalsName = genSaveIntervalsName
           genSaveSubIntervalsName = genSaveSubIntervalsName
+          queryCatalogName = queryCatalogName
         }
 
     member this.DatabaseName with get () = this.dataBaseName
@@ -54,6 +67,7 @@ type run =
     member this.ParameterSpans with get () = this.parameterSpans
     member this.GenSaveIntervalsName with get () = this.genSaveIntervalsName
     member this.GenSaveSubIntervalsName with get () = this.genSaveSubIntervalsName
+    member this.QueryCatalogName with get () = this.queryCatalogName
 
 
 

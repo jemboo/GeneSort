@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Db.V1
+namespace GeneSort.Project.V1
 
 open FSharp.UMX
 open GeneSort.Core

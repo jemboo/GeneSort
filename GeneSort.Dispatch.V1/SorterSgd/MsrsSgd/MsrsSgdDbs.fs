@@ -104,7 +104,8 @@ module MsrsSgdDbs =
                                            mmod odt
                 }
                 
-            let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+            do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
+            let db = new GeneSortDbMp(dbFolder)
 
 
     module Merge =
@@ -204,7 +205,8 @@ module MsrsSgdDbs =
                                         
             }
 
-        let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+        do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
+        let db = new GeneSortDbMp(dbFolder)
 
 
     module Prefix =
@@ -316,7 +318,8 @@ module MsrsSgdDbs =
             }
 
 
-        let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+        do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
+        let db = new GeneSortDbMp(dbFolder)
 
 
 

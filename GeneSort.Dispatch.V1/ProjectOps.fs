@@ -85,7 +85,7 @@ module ProjectOps =
                     // Map parameters to tasks and execute with internal throttling
                     let! results = 
                         paramsArray 
-                        |> Seq.map (runTask db runName db.MakeQueryParamsFromRunParams 
+                        |> Seq.map (runTask db runName host.QueryParamsFromRunParams
                                             (RunParamsExecutor.execute executor host) allowOverwrite cts progress)
                         |> fun tasks -> Async.Parallel(tasks, maxParallel)
 

@@ -48,7 +48,8 @@ module SortableTestDbs =
             }
 
 
-        let db = new GeneSortDbMp(dbFolder, makeMergeQueryParamsFromRunParams)
+        do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) makeMergeQueryParamsFromRunParams
+        let db = new GeneSortDbMp(dbFolder)
 
 
         let getMergeSorterTestSet
@@ -100,7 +101,8 @@ module SortableTestDbs =
             }
 
 
-        let db = new GeneSortDbMp(dbFolder, makePrefixQueryParamsFromRunParams)
+        do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) makePrefixQueryParamsFromRunParams
+        let db = new GeneSortDbMp(dbFolder)
 
 
 

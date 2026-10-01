@@ -103,7 +103,8 @@ module Msuf4SgdDbs =
                                 dsh pNm sfrac odt
             }
 
-        let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+        do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
+        let db = new GeneSortDbMp(dbFolder)
 
 
 
@@ -211,7 +212,8 @@ module Msuf4SgdDbs =
             }
 
 
-        let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+        do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
+        let db = new GeneSortDbMp(dbFolder)
 
 
     module Prefix =
@@ -312,7 +314,8 @@ module Msuf4SgdDbs =
             }
 
 
-        let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+        do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
+        let db = new GeneSortDbMp(dbFolder)
 
 
 

@@ -46,18 +46,18 @@ module Utils =
         }
 
     /// Dynamically discovers and yields contiguous slices lazily as an Async sequence generator.
-    /// Uses SamplingConfig.getSamplesWithMinBound without artificially capping sequence length.
+    /// Uses GenIntervalConfig.getSamplesWithMinBound without artificially capping sequence length.
     let loadAvailableOutputData<'T>
             (extractFn: outputData -> Result<'T, string>)
             (dataType: outputDataType)
-            (saveConfig: samplingConfig)
+            (saveConfig: genIntervalConfig)
             (generationalDb: IGeneSortDb)
             (startingGen: int<generationNumber>)
             (rp: runParameters)
             (cts: CancellationToken)
             (log: string -> unit) : Async<seq<'T>> =
         async {
-            let genSequence = SamplingConfig.getSamplesWithMinBound saveConfig %startingGen
+            let genSequence = GenIntervalConfig.getSamplesWithMinBound saveConfig %startingGen
             let yab = genSequence |> Seq.toList
             let qua = yab.Length
             let rec discoverLazy (gens: int seq) = seq {
@@ -77,7 +77,7 @@ module Utils =
         }
 
     let loadAvailableSorterPoolSets
-            (saveConfig: samplingConfig)
+            (saveConfig: genIntervalConfig)
             (generationalDb: IGeneSortDb)
             (startingGen: int<generationNumber>)
             (rp: runParameters)
@@ -90,7 +90,7 @@ module Utils =
 
 
     let loadAvailableSorterPoolSetSummarySets
-            (saveConfig: samplingConfig)
+            (saveConfig: genIntervalConfig)
             (generationalDb: IGeneSortDb)
             (startingGen: int<generationNumber>)
             (rp: runParameters)
@@ -103,7 +103,7 @@ module Utils =
 
 
     let loadAvailableSorterPoolSetHistories
-            (saveConfig: samplingConfig)
+            (saveConfig: genIntervalConfig)
             (generationalDb: IGeneSortDb)
             (startingGen: int<generationNumber>)
             (rp: runParameters)
@@ -116,7 +116,7 @@ module Utils =
 
 
     let loadAvailableSorterPoolBins
-            (saveConfig: samplingConfig)
+            (saveConfig: genIntervalConfig)
             (generationalDb: IGeneSortDb)
             (startingGen: int<generationNumber>)
             (rp: runParameters)
@@ -135,7 +135,7 @@ module Utils =
     let loadOutputDataWithHighestGenerationNumber<'T>
             (extractFn: outputData -> Result<'T, string>)
             (dataType: outputDataType)
-            (saveConfig: samplingConfig)
+            (saveConfig: genIntervalConfig)
             (generationalDb: IGeneSortDb)
             (rp: runParameters) : Async<Result<'T option, string>> =
         async {
@@ -181,7 +181,7 @@ module Utils =
 
     /// Ergonomic 1-liner wrapper for SorterRunResult.
     let loadHighestGenSorterPoolSet
-            (saveConfig: samplingConfig)
+            (saveConfig: genIntervalConfig)
             (generationalDb: IGeneSortDb)
             (rp: runParameters) : Async<Result<sorterPoolSet option, string>> =
         loadOutputDataWithHighestGenerationNumber 

@@ -13,7 +13,7 @@ open GeneSort.Dispatch.V1.CommonParams
 module SorterEvalSpecsRs =
 
     let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
+        let qp = host.QueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
         rp.WithDatabaseName(Some host.Run.DatabaseName)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)

@@ -52,7 +52,7 @@ module Example =
 
     printfn "start: %s" (DateTime.Now.ToLongTimeString())
 
-    //SampleRegistry.printFirstMembers 600 100000
+    //GenIntervalRegistry.printFirstMembers 600 100000
     concato()
 
 

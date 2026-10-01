@@ -14,7 +14,7 @@ module SorterEvalSpecsRm =
     let private mergeEnhancer 
                     (host: IRunHost) 
                     (rp: runParameters) : runParameters =
-        let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
+        let qp = host.QueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
                  |> Option.get
         let mrgLibId = rp.GetMergeLibId().Value
         rp.WithDatabaseName(Some host.Run.DatabaseName)

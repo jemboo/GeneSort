@@ -10,7 +10,7 @@ type intSampleMethod =
     | Cyclic of baseMethod: intSampleMethod * cycleLength: int
     | Prefixed of prefixLength: int * prefixMethod: intSampleMethod * mainMethod: intSampleMethod
 
-type samplingConfig = {
+type genIntervalConfig = {
     Name: string
     Min: int
     MaxCount: int option
@@ -142,9 +142,9 @@ module IntSampleMethod =
         else generateUnbounded method minVal |> Seq.take count
 
 
-module SamplingConfig =
+module GenIntervalConfig =
 
-    let toString (config: samplingConfig) : string =
+    let toString (config: genIntervalConfig) : string =
         sprintf "Name: %s, Min: %d, MaxCount: %s, Scale: %f, Method: %s" 
             config.Name 
             config.Min 
@@ -152,10 +152,10 @@ module SamplingConfig =
             config.Scale 
             (IntSampleMethod.toString config.Method)
 
-    let fromString (s: string) : samplingConfig =
+    let fromString (s: string) : genIntervalConfig =
         let parts = s.Split([|','|], StringSplitOptions.RemoveEmptyEntries)
         if parts.Length <> 5 then
-            invalidArg "s" "Invalid samplingConfig string format. Expected 5 comma-separated values."
+            invalidArg "s" "Invalid genIntervalConfig string format. Expected 5 comma-separated values."
         let name = parts.[0].Trim().Substring(6).Trim()
         let min = int (parts.[1].Trim().Substring(5).Trim())
         let maxCountStr = parts.[2].Trim().Substring(9).Trim()
@@ -167,7 +167,7 @@ module SamplingConfig =
 
 
     /// Evaluates the method to yield a scaled set of integer samples constrained by maxBound.
-    let getSampleSetMaxBound (config: samplingConfig) (maxBound: int) : Set<int> =
+    let getSampleSetMaxBound (config: genIntervalConfig) (maxBound: int) : Set<int> =
         let rawSeq = IntSampleMethod.generateUnbounded config.Method config.Min
         
         let boundedSeq = 
@@ -182,7 +182,7 @@ module SamplingConfig =
 
 
     /// Evaluates the method to yield a scaled set of the first sampleCount integer samples strictly larger than minBound.
-    let getSamplesWithMinBound (config: samplingConfig) (minBound: int) : seq<int> =
+    let getSamplesWithMinBound (config: genIntervalConfig) (minBound: int) : seq<int> =
         let rawSeq = IntSampleMethod.generateUnbounded config.Method config.Min
             
         let boundedSeq = 
@@ -196,7 +196,7 @@ module SamplingConfig =
             
 
     /// Evaluates the method to yield a scaled set of the first sampleCount integer samples strictly larger than minBound.
-    let getSampleSetWithMinBound (config: samplingConfig) (minBound: int) (sampleCount: int) : Set<int> =
+    let getSampleSetWithMinBound (config: genIntervalConfig) (minBound: int) (sampleCount: int) : Set<int> =
             if sampleCount <= 0 then
                 Set.empty
             else
@@ -205,7 +205,7 @@ module SamplingConfig =
 
 
 
-module SampleRegistry =
+module GenIntervalRegistry =
 
     let private createConfig name min maxCount scale method = {
         Name = name
@@ -232,9 +232,9 @@ module SampleRegistry =
     let maxCount100 = Some 100
     let maxCount500 = Some 500
 
-    let samplingConfigsDict: Dictionary<string, samplingConfig> = 
+    let genIntervalConfigsDict: Dictionary<string, genIntervalConfig> = 
 
-        let dict = Dictionary<string, samplingConfig>()
+        let dict = Dictionary<string, genIntervalConfig>()
         let add cfg = dict.Add(cfg.Name, cfg)
 
 
@@ -244,6 +244,7 @@ module SampleRegistry =
         //uniformInterval100           : [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000]
         //uniformInterval500           : [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000]
         //uniformInterval1000          : [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000]
+        
         add (createConfig "uniformInterval2" 1 noMaxCount scale2 (Constant 1))
         add (createConfig "uniformInterval10" 1 noMaxCount scale10 (Constant 1))
         add (createConfig "uniformInterval100" 1 noMaxCount scale100 (Constant 1))
@@ -314,9 +315,9 @@ module SampleRegistry =
     /// Iterates through the sample registry and prints the first `sampleCount` members generated.
     let printFirstMembers (sampleCount: int) (maxBound: int) =
         printfn "=== Printing First %d Members of Generated Samples ===" sampleCount
-        for KeyValue(name, config) in samplingConfigsDict do
+        for KeyValue(name, config) in genIntervalConfigsDict do
             let samples = 
-                SamplingConfig.getSampleSetMaxBound config maxBound
+                GenIntervalConfig.getSampleSetMaxBound config maxBound
                 |> Set.toSeq
                 |> Seq.truncate sampleCount
                 |> Seq.toList

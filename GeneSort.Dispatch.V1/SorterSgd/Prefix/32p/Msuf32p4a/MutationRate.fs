@@ -17,8 +17,6 @@ open GeneSort.Dispatch.V1.SorterSgd
 let dbVariableModR_32Name = "VariableModRates_32" |> UMX.tag<databaseName>
 let dbVariableModR_64Name = "VariableModRates_64" |> UMX.tag<databaseName>
 
-let saveIntervals = SampleRegistry.samplingConfigsDict["expInterval100_L50ss"]
-let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.1p5C"]
 
 
 let makeQueryParams
@@ -80,13 +78,16 @@ let private withLocalParams (rp:runParameters) =
 let private paramMapFilter (rp: runParameters) =
     Some rp
 
+do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projName %dbVariableModR_32Name) (queryParamsFromRunParams dbVariableModR_32Name)
+do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projName %dbVariableModR_64Name) (queryParamsFromRunParams dbVariableModR_64Name)
+
 let makeDatabase (dbName: string<databaseName>) : IGeneSortDb =
-    new GeneSortDbMp(makeFolderFromDbName dbName, queryParamsFromRunParams dbName)
+    new GeneSortDbMp(makeFolderFromDbName dbName)
 
 
 let createRunHost (spec: runHostSpec) : IRunHost =
     let db = makeDatabase spec.databaseName
-    let run = run.createWithIntervalNames spec.databaseName projName spec.runName spec.runDescription spec.spans saveIntervals.Name saveSubIntervals.Name
+    let run = run.create spec.databaseName projName spec.runName spec.runDescription spec.spans
     runHost.Create db spec run :> IRunHost
 
 
@@ -98,7 +99,7 @@ module VarModR_32 =
         let scpps = rp.GetSorterCountPerPoolSet().Value
         let spc = (%scpps / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
         let rp3 = rp2.WithSorterPoolCount(spc)
-        let qp = host.RunDb.MakeQueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
+        let qp = host.QueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
 
         rp3.WithRunFinished(Some false)
                 .WithId(Some qp.Value.Id)

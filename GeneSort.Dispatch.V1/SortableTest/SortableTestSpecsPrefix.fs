@@ -9,7 +9,7 @@ open CommonParams
 module SortableTestSpecsPrefix =
 
     let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
+        let qp = host.QueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
         rp.WithRunFinished(Some false)
           .WithRunName(Some host.Run.RunName)
           .WithRunFinished(Some false)

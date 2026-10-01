@@ -10,6 +10,7 @@ module ParamOps =
 
     let saveParametersFiles
             (db: IGeneSortDb)
+            (queryParamsBuilder: queryParamsBuilder)
             (runParameterArray: runParameters[])
             (allowOverwrite: bool<allowOverwrite>) 
             (progress: IProgress<string> option): Async<Result<unit, string>> =
@@ -21,7 +22,7 @@ module ParamOps =
                     runParameterArray
                     |> Array.map (fun rp -> 
                         let runName = rp.GetRunName() |> Option.defaultValue ("UnknownRun" |> UMX.tag<runName>)
-                        let queryParamsOpt = db.MakeQueryParamsFromRunParams rp (outputDataType.RunParameters runName)
+                        let queryParamsOpt = queryParamsBuilder rp (outputDataType.RunParameters runName)
                         match queryParamsOpt with
                         | Some qp -> db.saveAsync qp (outputData.RunParameters rp) allowOverwrite
                         | None -> async { return Error (sprintf "Failed to create query parameters for run parameters: %A" rp) })
@@ -67,6 +68,7 @@ module ParamOps =
                     report progress (sprintf "%s Saving run parameters files: (%d)" (StringUtils.getTimestampString()) runParametersArray.Length)
                     return! saveParametersFiles 
                                 db
+                                (QueryParamsCatalog.get run.QueryCatalogName)
                                 runParametersArray 
                                 allowOverwrite progress
             with e ->

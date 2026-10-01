@@ -14,7 +14,7 @@ module SorterEvalSpecsTestPrefix =
     let private prefixEnhancer 
                     (host: IRunHost) 
                     (rp: runParameters) : runParameters =
-        let qp = host.RunDb.MakeQueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
+        let qp = host.QueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
                  |> Option.get
 
         let pfxLibId = rp.GetPrefixLibId().Value

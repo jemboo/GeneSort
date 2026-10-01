@@ -53,7 +53,8 @@ module SorterEvalDbs =
             }
         
 
-        let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+        do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
+        let db = new GeneSortDbMp(dbFolder)
 
 
 
@@ -98,7 +99,8 @@ module SorterEvalDbs =
                 let! set = rp.GetSorterEvalType()
                 return makeQueryParams repl rng mergeLibId smt sdf set odt
             }
-        let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+        do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
+        let db = new GeneSortDbMp(dbFolder)
 
 
 
@@ -144,7 +146,8 @@ module SorterEvalDbs =
                 return makeQueryParams repl rng pfxLibId smt sdf set odt
             }
 
-        let db = new GeneSortDbMp(dbFolder, queryParamsFromRunParams)
+        do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
+        let db = new GeneSortDbMp(dbFolder)
 
 
 

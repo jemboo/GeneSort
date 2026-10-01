@@ -21,6 +21,7 @@ type runDto =
         ParameterSpans: parameterSpanDto []
         GenSaveIntervalsName: string
         GenSaveSubIntervalsName: string
+        QueryCatalogName: string
     }
 
 module RunDto =
@@ -33,6 +34,7 @@ module RunDto =
             Description = project.Description
             GenSaveIntervalsName = project.GenSaveIntervalsName
             GenSaveSubIntervalsName = project.GenSaveSubIntervalsName
+            QueryCatalogName = project.QueryCatalogName
             ParameterSpans =
                 project.ParameterSpans
                 |> List.map (fun (key, values) -> { Key = key; Values = List.toArray values })
@@ -40,7 +42,7 @@ module RunDto =
         }
 
     let toDomain (dto: runDto) : run =
-        run.createWithIntervalNames
+        run.createWithCatalogAndIntervalNames
           (dto.DataBaseName |> UMX.tag<databaseName> )
           (dto.ProjectName |> UMX.tag<projectName> )
           (dto.RunName |> UMX.tag<runName> )
@@ -52,3 +54,4 @@ module RunDto =
           |> Array.toList)
           (dto.GenSaveIntervalsName |> Option.ofObj |> Option.defaultValue "expInterval100_L50ss")
           (dto.GenSaveSubIntervalsName |> Option.ofObj |> Option.defaultValue "summaryInterval_C.1p5C")
+          (dto.QueryCatalogName |> Option.ofObj |> Option.defaultValue (sprintf "%s.%s" dto.ProjectName dto.DataBaseName))
