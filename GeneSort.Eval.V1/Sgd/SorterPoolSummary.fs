@@ -68,17 +68,20 @@ type sorterPoolSetSummary =
         _sorterPoolSetId: Guid<sorterPoolSetId>
         _generationNumber: int<generationNumber>
         _sortedSorterEvalPercentage: float
+        _averageUnsortedCount: float
         _sorterPoolSummaries: sorterPoolSummary array
     }
     member this.SorterPoolSetId with get() = this._sorterPoolSetId
     member this.GenerationNumber with get() = this._generationNumber
     member this.SortedSorterEvalPercentage with get() = this._sortedSorterEvalPercentage
+    member this.AverageUnsortedCount with get() = this._averageUnsortedCount
     member this.SorterPoolSummaries with get() = this._sorterPoolSummaries
 
-    static member Create(setId, genNum, sortedSorterEvalPercentage, summaries) =
+    static member Create(setId, genNum, sortedSorterEvalPercentage, averageUnsortedCount, summaries) =
         { _sorterPoolSetId = setId
           _generationNumber = genNum
           _sortedSorterEvalPercentage = sortedSorterEvalPercentage
+          _averageUnsortedCount = averageUnsortedCount
           _sorterPoolSummaries = summaries }
 
 
@@ -167,6 +170,7 @@ module SorterPoolSetSummary =
             poolSet.SorterPoolSetId, 
             poolSet.GenerationNumber, 
             poolSet.SortedSorterEvalPercentage,
+            poolSet.AverageUnsortedCount,
             poolSummaries
         )
 
@@ -180,6 +184,7 @@ module SorterPoolSetSummary =
             |> dataTableRecord.addData (sprintf "%sSorterPoolSetId" prefix) (string (%summarySet.SorterPoolSetId))
             |> dataTableRecord.addData (sprintf "%sGenerationNumber" prefix) (string (%summarySet.GenerationNumber))
             |> dataTableRecord.addData (sprintf "%sSortedSorterEvalPercentage" prefix) (sprintf "%.2f%%" summarySet.SortedSorterEvalPercentage)
+            |> dataTableRecord.addData (sprintf "%sAverageUnsortedCount" prefix) (sprintf "%.2f" summarySet.AverageUnsortedCount)
 
         // 2. Iterate through each pool summary and combine metrics with the root context
         summarySet.SorterPoolSummaries

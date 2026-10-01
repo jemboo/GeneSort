@@ -150,6 +150,14 @@ type ceStUcMeasure = private {
         ceStUcMeasure.create stW ucW fRefl
 
 
+    static member stageBiased () = 
+            ceStUcMeasure.create
+                    (1.1<stageWeight>)
+                    (5.25<unsortedWeight>)
+                    (false |> UMX.tag<filterReflectionSymmetric>)
+
+
+
 type sorterEvalMeasure =
     | CeLength of ceLengthMeasure
     | StageLength of stageLengthMeasure
@@ -162,7 +170,8 @@ module SorterEvalMeasure =
 
     let stageBiasedFilterUnsorted = ceStMeasure.stageBiasedFilterUnsorted() |> sorterEvalMeasure.CeSt
 
-    let stageBiased = ceStMeasure.stageBiased() |> sorterEvalMeasure.CeSt
+    let stageBiased_UnsortedCount = ceStUcMeasure.stageBiased() |> sorterEvalMeasure.CeStUc
+
 
     let toCompactString (measure: sorterEvalMeasure) : string =
         match measure with

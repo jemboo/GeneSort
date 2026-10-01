@@ -47,7 +47,7 @@ module DispatchSorterSgd =
 
 
     //********** Msuf6SgdSpecsPrefix **********
-    let private executorType = sorterSgdExecutorType.SummaryReport
+    let private executorType = sorterSgdExecutorType.GenPrefix
     let private host: IRunHost = Msuf624p3b.MutationRate.createRunHost (Msuf624p3b.MutationRate.VarModR_32.Test executorType)
 
     let private executor = SorterSgdExecutorType.getExecutor executorType
