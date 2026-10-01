@@ -32,8 +32,6 @@ module Common =
           .WithDistinctSorterHashes(Some true)
           .WithPrioritizeNewMutants(Some true)
           .WithSortedFraction(Some 0.99<sortedFraction>)
-          .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiased_UnsortedCount)
-          .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiased_UnsortedCount)
           .WithSeedSorterPoolSelectionType(Some sorterEvalSelectionType)
           .WithPrefixLibId(Some pfxLibId)
           .WithSortingWidth(Some pfxLibId.SortingWidth)

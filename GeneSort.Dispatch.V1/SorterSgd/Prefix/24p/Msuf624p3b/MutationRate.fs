@@ -2,6 +2,7 @@ module GeneSort.Dispatch.V1.SorterSgd.Msuf624p3b.MutationRate
 
 open FSharp.UMX
 open GeneSort.Sorting
+open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.Core
 open GeneSort.Project.V1
@@ -14,6 +15,17 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 let dbVariableModR_32Name = "VariableModRates_Uf6_32" |> UMX.tag<databaseName>
 
+let private sorterEvalMeasures =
+    [ 4.5; 5.5; 7.5; 9.5 ]
+    |> List.map (fun unsortedWeight ->
+        ceStUcMeasure.create
+            (1.1<stageWeight>)
+            (unsortedWeight |> UMX.tag<unsortedWeight>)
+            (false |> UMX.tag<filterReflectionSymmetric>)
+        |> sorterEvalMeasure.CeStUc
+        |> SorterEvalMeasure.toCompactString
+    )
+
 let saveIntervals = SampleRegistry.samplingConfigsDict["expInterval100_L50ss"]
 let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.1p5C"]
 
@@ -24,6 +36,8 @@ let makeQueryParams
         (genCurrent: int<generationNumber>)
         (sorterCtPerPool: int<sorterCountPerPool>)
         (sorterPoolCt: int<sorterPoolCount>)
+        (sorterEvalMeasure: sorterEvalMeasure)
+        (sorterEvalMeasureInitial: sorterEvalMeasure)
         (para: float<paraRate>)
         (selfSym: float<selfSymRate>)
         (seedModR: float<seedModificationRate>)
@@ -41,6 +55,8 @@ let makeQueryParams
             (runParameters.codeModKey, (Some codeMod) |> CodeModKey.toString)
             (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
             (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+            (runParameters.sorterEvalMeasureKey, sorterEvalMeasure |> SorterEvalMeasure.toCompactString)
+            (runParameters.sorterEvalMeasureInitialKey, sorterEvalMeasureInitial |> SorterEvalMeasure.toCompactString)
             (runParameters.paraRateKey, (Some para) |> ParaRate.toString)
             (runParameters.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
             (runParameters.seedModificationRateKey, (Some seedModR) |> SeedModificationRate.toString)
@@ -58,17 +74,21 @@ let queryParamsFromRunParams
         let! curGen = rp.GetGenerationCurrent()
         let! scPP = rp.GetSorterCountPerPool()
         let! spc = rp.GetSorterPoolCount()
+        let! sem = rp.GetSorterEvalMeasure()
+        let! semi = rp.GetSorterEvalMeasureInitial()
         let! para = rp.GetParaRate()
         let! self = rp.GetSelfSymRate()
         let! seedModR = rp.GetSeedModificationRate()
         let! modR = rp.GetModificationRate()
         let! mmod = rp.GetMutationMod()
-        return makeQueryParams dbName repl codeMod curGen scPP spc para self seedModR modR mmod odt
+        return makeQueryParams dbName repl codeMod curGen scPP spc sem semi para self seedModR modR mmod odt
     }
 
 let private withLocalParams (rp: runParameters) =
     let rpn = projectParams rp
-    rpn.WithOrthoRate(Some 4.001<orthoRate>)
+    let sem = rpn.GetSorterEvalMeasure().Value
+    rpn.WithSorterEvalMeasureInitial(Some sem)
+       .WithOrthoRate(Some 4.001<orthoRate>)
 
 let private paramMapFilter (rp: runParameters) =
     Some rp
@@ -104,19 +124,20 @@ module VarModR_32 =
             (runParameters.sorterCountPerPoolSetKey, [256] |> List.map string)
             (runParameters.codeModKey, ["NoMods"] |> List.map string)
             (runParameters.generationCurrentKey, [0] |> List.map string)
-            (runParameters.generationIntervalCountKey, [3] |> List.map string)
+            (runParameters.generationIntervalCountKey, [5] |> List.map string)
             (runParameters.sorterCountPerPoolKey, [64] |> List.map string)
+            (runParameters.sorterEvalMeasureKey, sorterEvalMeasures)
             (runParameters.paraRateKey, [1.001] |> List.map string)
             (runParameters.selfSymRateKey, [2.001] |> List.map string)
             (runParameters.mutationModKey, [0] |> List.map string)
-            (runParameters.seedModificationRateKey, [0.1] |> List.map string)
-            (runParameters.modificationRateKey, [0.05; 0.075; 0.1; 0.125; 0.15; 0.175] |> List.map string)
+            (runParameters.seedModificationRateKey, [0.05; 0.1] |> List.map string)
+            (runParameters.modificationRateKey, [0.05; 0.075; 0.1; 0.125;] |> List.map string)
             (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map MutatorVariant.toString)
         ]
         filter = paramMapFilter
         enhancer = finishRunParams
         allowOverwrite = false |> UMX.tag
-        maxParallel = 6
+        maxParallel = 8
     }
 
     let WideTest (executorType: sorterSgdExecutorType) : runHostSpec = {
@@ -127,13 +148,14 @@ module VarModR_32 =
             (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
             (runParameters.codeModKey, ["NoMods"] |> List.map string)
             (runParameters.generationCurrentKey, [0] |> List.map string)
-            (runParameters.generationIntervalCountKey, [3] |> List.map string)
-            (runParameters.sorterCountPerPoolKey, [32] |> List.map string)
+            (runParameters.generationIntervalCountKey, [10] |> List.map string)
+            (runParameters.sorterCountPerPoolKey, [128] |> List.map string)
+            (runParameters.sorterEvalMeasureKey, sorterEvalMeasures)
             (runParameters.paraRateKey, [0.1; 0.5; 1.001; 1.5] |> List.map string)
             (runParameters.selfSymRateKey, [1.001; 1.5; 2.001; 3.001] |> List.map string)
             (runParameters.mutationModKey, [0] |> List.map string)
             (runParameters.seedModificationRateKey, [0.05] |> List.map string)
-            (runParameters.modificationRateKey, [0.0025; 0.0035; 0.005; 0.0075; 0.0125; 0.02; 0.035; 0.06] |> List.map string)
+            (runParameters.modificationRateKey, [0.05; 0.075; 0.1; 0.125;] |> List.map string)
             (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map MutatorVariant.toString)
         ]
         filter = paramMapFilter
