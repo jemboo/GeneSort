@@ -8,7 +8,6 @@
   <ItemGroup>
     <Compile Include="OutputDataFile.fs" />
     <Compile Include="GeneSortDbMp.fs" />
-    <Compile Include="GeneSortGenDbMp.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

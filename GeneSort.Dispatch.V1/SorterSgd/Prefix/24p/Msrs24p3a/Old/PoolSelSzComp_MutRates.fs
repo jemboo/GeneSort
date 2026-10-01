@@ -89,8 +89,8 @@ module PoolSelSzComp_ModRates =
     let saveIntervals = SampleRegistry.samplingConfigsDict["expInterval100_L50ss"]
     let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.1p5C"]
 
-    let dbTest = new GeneSortGenDbMp(dbFolderTest, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
-    let dbPools256 = new GeneSortGenDbMp(dbFolder256, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
+    let dbTest = new GeneSortDbMp(dbFolderTest, queryParamsFromRunParams)
+    let dbPools256 = new GeneSortDbMp(dbFolder256, queryParamsFromRunParams)
 
 
 
@@ -109,7 +109,7 @@ module PoolSelSzComp_ModRates =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.databaseName
-        let run = run.create spec.databaseName projName spec.runName spec.runDescription
+        let run = run.createWithIntervalNames spec.databaseName projName spec.runName spec.runDescription spec.spans saveIntervals.Name saveSubIntervals.Name
         runHost.Create db spec run :> IRunHost
 
 

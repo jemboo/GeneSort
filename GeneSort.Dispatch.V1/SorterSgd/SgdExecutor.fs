@@ -20,7 +20,9 @@ module SgdExecutor =
     /// Handles initialization, evaluation, and DB saving when no checkpoint exists
     let initializeAndSaveSeedPoolSet 
             (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
-            (genDb: IGeneSortGenDb)
+            (genDb: IGeneSortDb)
+            (saveIntervals: samplingConfig)
+            (subIntervals: samplingConfig)
             (rp: runParameters)
             (sortableTest: sortableTest)
             (prefix: ceBlock)
@@ -58,7 +60,9 @@ module SgdExecutor =
     let evaluateEvolutionRun
             (makeSortableTests: runParameters ->  Async<Result<sortableTest * (ce array), string>> )
             (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
-            (genDb: IGeneSortGenDb)
+            (genDb: IGeneSortDb)
+            (saveIntervals: samplingConfig)
+            (subIntervals: samplingConfig)
             (rp: runParameters)
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource)
@@ -80,7 +84,7 @@ module SgdExecutor =
                 let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces
 
                 // 1. Check for existing checkpoints directly via genDb
-                let! highestPoolSetOpt = Utils.loadHighestGenSorterPoolSet genDb rp
+                let! highestPoolSetOpt = Utils.loadHighestGenSorterPoolSet saveIntervals genDb rp
 
                 // 2. Conditionally initialize or resume from the highest discovered checkpoint
                 let! (activeSeedPoolSet, activeRp) = 
@@ -90,7 +94,7 @@ module SgdExecutor =
                             let initRp = rp.WithGenerationCurrent(Some (0 |> UMX.tag<generationNumber>))
                             let! (seedSet: sorterPoolSet) = 
                                         initializeAndSaveSeedPoolSet 
-                                            sorterPoolSetCreator genDb initRp sortableTest prefix log
+                                            sorterPoolSetCreator genDb saveIntervals subIntervals initRp sortableTest prefix log
                             return seedSet, initRp
                         }
                     | Some (highestPoolSet: sorterPoolSet) -> 
@@ -111,6 +115,8 @@ module SgdExecutor =
                 let! (_finalRunResult: sorterPoolSet) = 
                     EvolutionOrchestrator.runEvolutionAsync
                         genDb
+                        saveIntervals
+                        subIntervals
                         activeRp
                         allowOverwrite
                         activeSeedPoolSet

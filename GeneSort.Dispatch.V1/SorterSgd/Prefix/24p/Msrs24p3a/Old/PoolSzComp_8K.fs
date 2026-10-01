@@ -92,9 +92,9 @@ module PoolSzComp8k =
     let saveIntervals = SampleRegistry.samplingConfigsDict["expInterval100_L50s"]
     let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.2C"]
 
-    let dbPools_8K = new GeneSortGenDbMp(dbFolderPoolSz_8K, queryParamsFromRunParams dbNamePools_8K, saveIntervals, saveSubIntervals)
-    let dbPools_64K = new GeneSortGenDbMp(dbFolderPoolSz_64K, queryParamsFromRunParams dbNamePools_64K, saveIntervals, saveSubIntervals)
-    let dbPools_256K = new GeneSortGenDbMp(dbFolderPoolSz_256K, queryParamsFromRunParams dbNamePools_256K, saveIntervals, saveSubIntervals)
+    let dbPools_8K = new GeneSortDbMp(dbFolderPoolSz_8K, queryParamsFromRunParams dbNamePools_8K)
+    let dbPools_64K = new GeneSortDbMp(dbFolderPoolSz_64K, queryParamsFromRunParams dbNamePools_64K)
+    let dbPools_256K = new GeneSortDbMp(dbFolderPoolSz_256K, queryParamsFromRunParams dbNamePools_256K)
 
 
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
@@ -113,7 +113,7 @@ module PoolSzComp8k =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.databaseName
-        let run = run.create spec.databaseName projName spec.runName spec.runDescription
+        let run = run.createWithIntervalNames spec.databaseName projName spec.runName spec.runDescription spec.spans saveIntervals.Name saveSubIntervals.Name
         runHost.Create db spec run :> IRunHost
 
 

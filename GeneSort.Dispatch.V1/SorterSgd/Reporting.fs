@@ -15,11 +15,12 @@ module Reporting =
 
     /// Generic execution engine for dynamic generation-sliced reports.
     let private makeDynamicReportFromSlices<'T>
-            (loadSlices: IGeneSortGenDb -> int<generationNumber> -> runParameters -> CancellationToken -> (string -> unit) -> Async<seq<'T>>)
+            (loadSlices: samplingConfig -> IGeneSortDb -> int<generationNumber> -> runParameters -> CancellationToken -> (string -> unit) -> Async<seq<'T>>)
             (getGeneration: 'T -> int<generationNumber>)
             (extractRecords: 'T -> dataTableRecord seq)
             (reportNameTag: string)
-            (genDb: IGeneSortGenDb)
+            (saveIntervals: samplingConfig)
+            (genDb: IGeneSortDb)
             (rp: runParameters)
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource)
@@ -40,7 +41,7 @@ module Reporting =
                     rp.GetGenerationCurrent() |> Result.ofOption "Missing GenerationCurrent."
 
                 // 1. Dynamic discovery and streaming of slices
-                let! slicesSeq = loadSlices genDb curGen rp cts.Token log
+                let! slicesSeq = loadSlices saveIntervals genDb curGen rp cts.Token log
 
                 let yab = slicesSeq |> Seq.toList
 
@@ -94,7 +95,7 @@ module Reporting =
 
     // --- Specific Report Builders ---
     let private makeSummaryReport (host: IRunHost) rp allowOverwrite cts progress =
-        let genDb = host.RunDb :?> IGeneSortGenDb
+        let genDb = host.RunDb
         let recordExtractor (prefix:string) (spsSummaries:sorterPoolSetSummary seq) : dataTableRecord seq =
                 spsSummaries |> Seq.collect(fun poolSetSummary ->
                 poolSetSummary
@@ -105,36 +106,40 @@ module Reporting =
             (fun spss -> spss.LastGeneration)
             (SorterPoolSetSummarySet.toDataTableRecords "")
             "SummaryReport"
+            host.GenSaveIntervals
             genDb rp allowOverwrite cts progress
 
 
     let private makeSnapshotReport (host: IRunHost) rp allowOverwrite cts progress =
-        let genDb = host.RunDb :?> IGeneSortGenDb
+        let genDb = host.RunDb
         makeDynamicReportFromSlices
             Utils.loadAvailableSorterPoolSets
             (fun srtrPoolSet -> srtrPoolSet.GenerationNumber)
             (SorterPoolSetDescription.toDataTableRecordsSnapshot "")
             "SnapshotReport"
+            host.GenSaveIntervals
             genDb rp allowOverwrite cts progress
 
 
     let private makePoolHistoryReport (host: IRunHost) rp allowOverwrite cts progress =
-        let genDb = host.RunDb :?> IGeneSortGenDb
+        let genDb = host.RunDb
         makeDynamicReportFromSlices
             Utils.loadAvailableSorterPoolSetHistories
             (fun hist -> hist.SaveGeneration)
             SorterPoolSetHistory.toDataTableRecords
             "SorterPoolSetHistoryReport"
+            host.GenSaveIntervals
             genDb rp allowOverwrite cts progress
 
 
     let private makePoolBinsReport (host: IRunHost) rp allowOverwrite cts progress =
-        let genDb = host.RunDb :?> IGeneSortGenDb
+        let genDb = host.RunDb
         makeDynamicReportFromSlices
             Utils.loadAvailableSorterPoolBins
             (fun hist -> hist.MaxGeneration)
             SorterPoolEvalBinsSetCollection.makeDataTableRecords
             "SorterPoolBinsReport"
+            host.GenSaveIntervals
             genDb rp allowOverwrite cts progress
 
 

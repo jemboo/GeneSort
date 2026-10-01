@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1
+namespace GeneSort.Dispatch.V1
 open System
 open FSharp.UMX
 open System.Threading
@@ -80,7 +80,7 @@ module DispatchSortableTest =
                     maxReplica 
                     host.AllowOverwrite 
                     host.ParamMapRefiner      
-                    host.ParameterSpans
+                    host.Run.ParameterSpans
 
 
             match initResult with
@@ -118,7 +118,7 @@ module DispatchSortableTest =
                     maxReplica 
                     host.AllowOverwrite 
                     host.ParamMapRefiner      
-                    host.ParameterSpans
+                    host.Run.ParameterSpans
 
             match initResult with
             | Error e -> printfn "Init Failure: %s" e

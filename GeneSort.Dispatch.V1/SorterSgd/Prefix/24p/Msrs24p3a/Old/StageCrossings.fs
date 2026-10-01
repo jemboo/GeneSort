@@ -88,8 +88,8 @@ module StageCrossings =
     let saveIntervals = SampleRegistry.samplingConfigsDict["expInterval100_L50s"]
     let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.K"]
 
-    let dbTest = new GeneSortGenDbMp(dbFolderTest, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
-    let dbPoolSz256 = new GeneSortGenDbMp(dbFolderPoolSz256, queryParamsFromRunParams, saveIntervals, saveSubIntervals)
+    let dbTest = new GeneSortDbMp(dbFolderTest, queryParamsFromRunParams)
+    let dbPoolSz256 = new GeneSortDbMp(dbFolderPoolSz256, queryParamsFromRunParams)
 
 
 
@@ -108,7 +108,7 @@ module StageCrossings =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.databaseName
-        let run = run.create spec.databaseName projName spec.runName spec.runDescription
+        let run = run.createWithIntervalNames spec.databaseName projName spec.runName spec.runDescription spec.spans saveIntervals.Name saveSubIntervals.Name
         runHost.Create db spec run :> IRunHost
 
 

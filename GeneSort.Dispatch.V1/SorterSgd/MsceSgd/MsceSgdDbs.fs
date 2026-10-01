@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterSgd.Msce
+namespace GeneSort.Dispatch.V1.SorterSgd.Msce
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -212,6 +212,6 @@ module MsceSgdDbs =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.databaseName
-        let run = run.create spec.databaseName projectName spec.runName spec.runDescription
+        let run = run.create spec.databaseName projectName spec.runName spec.runDescription spec.spans
         runHost.Create db spec run :> IRunHost
 

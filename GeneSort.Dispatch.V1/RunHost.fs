@@ -5,23 +5,30 @@ open System.Threading
 open FSharp.UMX
 open GeneSort.Db.V1
 open GeneSort.Project.V1
+open GeneSort.Core
 
 
 type runHost = 
     private { 
         _projectDb: IGeneSortDb 
-        _parameterSpans: (string * string list) list
         _spec: runHostSpec
         _run: run
+        _genSaveIntervals: samplingConfig
+        _genSaveSubIntervals: samplingConfig
         _maxParallel: int
     }
     
-    static member Create db spec run =
+    static member Create (db: IGeneSortDb) (spec: runHostSpec) (run: run) =
+        let lookupInterval name =
+            match SampleRegistry.samplingConfigsDict.TryGetValue name with
+            | true, interval -> interval
+            | _ -> failwithf "Sampling interval '%s' is not registered for run '%s'." name (%run.RunName)
         { 
           _projectDb = db; 
-          _parameterSpans = spec.spans; 
           _spec = spec;
           _run = run;
+          _genSaveIntervals = lookupInterval run.GenSaveIntervalsName;
+          _genSaveSubIntervals = lookupInterval run.GenSaveSubIntervalsName;
           _maxParallel = spec.maxParallel }
 
     member this.Spec = this._spec
@@ -33,7 +40,8 @@ type runHost =
     interface IRunHost with
         member this.RunDb = this._projectDb
         member this.Run = this._run
-        member this.ParameterSpans = this._parameterSpans
+        member this.GenSaveIntervals = this._genSaveIntervals
+        member this.GenSaveSubIntervals = this._genSaveSubIntervals
         member this.AllowOverwrite = this._spec.allowOverwrite
         member this.ParamMapRefiner rps = this.ParamMapRefiner rps
         member this.MaxParallel with get (): int = this._maxParallel

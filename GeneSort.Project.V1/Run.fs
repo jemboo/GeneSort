@@ -12,6 +12,9 @@ type run =
           projName:     string<projectName>
           runName: string<runName>
           description: string
+          parameterSpans: (string * string list) list
+          genSaveIntervalsName: string
+          genSaveSubIntervalsName: string
         }
     with
 
@@ -19,7 +22,18 @@ type run =
             (databaseName: string<databaseName>)
             (projName:     string<projectName>)
             (runName: string<runName>)
-            (description: string) : run =
+            (description: string)
+            (parameterSpans: (string * string list) list) : run =
+        run.createWithIntervalNames databaseName projName runName description parameterSpans "expInterval100_L50ss" "summaryInterval_C.1p5C"
+
+    static member createWithIntervalNames
+            (databaseName: string<databaseName>)
+            (projName: string<projectName>)
+            (runName: string<runName>)
+            (description: string)
+            (parameterSpans: (string * string list) list)
+            (genSaveIntervalsName: string)
+            (genSaveSubIntervalsName: string) : run =
 
         if String.IsNullOrWhiteSpace %databaseName then
             failwith "Query name cannot be empty"
@@ -28,12 +42,18 @@ type run =
           projName     = projName
           runName = runName
           description = description
+          parameterSpans = parameterSpans
+          genSaveIntervalsName = genSaveIntervalsName
+          genSaveSubIntervalsName = genSaveSubIntervalsName
         }
 
     member this.DatabaseName with get () = this.dataBaseName
     member this.ProjectName with get () = this.projName
     member this.RunName with get () = this.runName
     member this.Description with get () = this.description
+    member this.ParameterSpans with get () = this.parameterSpans
+    member this.GenSaveIntervalsName with get () = this.genSaveIntervalsName
+    member this.GenSaveSubIntervalsName with get () = this.genSaveSubIntervalsName
 
 
 

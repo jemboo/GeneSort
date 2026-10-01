@@ -1,4 +1,4 @@
-module GeneSort.Dispatch.V1.SorterSgd.Msuf32p4a.MutationRate
+﻿module GeneSort.Dispatch.V1.SorterSgd.Msuf32p4a.MutationRate
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -81,12 +81,12 @@ let private paramMapFilter (rp: runParameters) =
     Some rp
 
 let makeDatabase (dbName: string<databaseName>) : IGeneSortDb =
-    new GeneSortGenDbMp(makeFolderFromDbName dbName, queryParamsFromRunParams dbName, saveIntervals, saveSubIntervals)
+    new GeneSortDbMp(makeFolderFromDbName dbName, queryParamsFromRunParams dbName)
 
 
 let createRunHost (spec: runHostSpec) : IRunHost =
     let db = makeDatabase spec.databaseName
-    let run = run.create spec.databaseName projName spec.runName spec.runDescription
+    let run = run.createWithIntervalNames spec.databaseName projName spec.runName spec.runDescription spec.spans saveIntervals.Name saveSubIntervals.Name
     runHost.Create db spec run :> IRunHost
 
 

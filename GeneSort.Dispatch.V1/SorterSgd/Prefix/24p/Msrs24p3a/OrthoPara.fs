@@ -1,4 +1,4 @@
-module GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.OrthoPara
+﻿module GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.OrthoPara
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -90,12 +90,12 @@ let saveIntervals = SampleRegistry.samplingConfigsDict["expInterval100_L50ss"]
 let saveSubIntervals = SampleRegistry.samplingConfigsDict["summaryInterval_C.1p5C"]
 
 let makeDatabase (name: string<databaseName>) : IGeneSortDb =
-    new GeneSortGenDbMp(makeFolderFromDbName name, queryParamsFromRunParams name, saveIntervals, saveSubIntervals)
+    new GeneSortDbMp(makeFolderFromDbName name, queryParamsFromRunParams name)
 
 
 let createRunHost (spec: runHostSpec) : IRunHost =
     let db = makeDatabase spec.databaseName
-    let run = run.create spec.databaseName projName spec.runName spec.runDescription
+    let run = run.createWithIntervalNames spec.databaseName projName spec.runName spec.runDescription spec.spans saveIntervals.Name saveSubIntervals.Name
     runHost.Create db spec run :> IRunHost
 
 

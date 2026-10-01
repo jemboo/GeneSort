@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1
+namespace GeneSort.Dispatch.V1
 open System
 open System.IO
 open System.Runtime
@@ -96,7 +96,7 @@ module DispatchSorterSgd =
                     maxReplica
                     host.AllowOverwrite
                     host.ParamMapRefiner
-                    host.ParameterSpans
+                    host.Run.ParameterSpans
 
 
             match initResult with
@@ -134,7 +134,7 @@ module DispatchSorterSgd =
                     maxReplica 
                     host.AllowOverwrite 
                     host.ParamMapRefiner      
-                    host.ParameterSpans
+                    host.Run.ParameterSpans
 
             match initResult with
             | Error e -> printfn "Init Failure: %s" e

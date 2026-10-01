@@ -20,7 +20,9 @@ module EvolutionOrchestrator =
         GC.Collect(2, GCCollectionMode.Forced, true, true)
 
     let runEvolutionAsync
-            (genDb: IGeneSortGenDb)
+            (genDb: IGeneSortDb)
+            (saveIntervals: samplingConfig)
+            (subIntervals: samplingConfig)
             (rp: runParameters)
             (allowOverwrite: bool<allowOverwrite>)
             (initialPoolSet: sorterPoolSet)
@@ -52,9 +54,6 @@ module EvolutionOrchestrator =
             let optPoolMeasure = rp.GetSorterPoolMeasure()
 
             // 1. Extract save configs
-            let saveIntervals = genDb.getGenSaveIntervals()
-            let subIntervals = genDb.getGenSaveSubIntervals()
-
             // 2. Fetch the minimal sample set starting from genStart
             let requiredCount = int genIntervalCount
 

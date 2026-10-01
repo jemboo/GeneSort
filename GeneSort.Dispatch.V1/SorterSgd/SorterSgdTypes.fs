@@ -28,29 +28,29 @@ module SorterSgdExecutorType =
     let private standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                let genDb = host.RunDb :?> IGeneSortGenDb
+                let genDb = host.RunDb
                 SgdExecutor.evaluateEvolutionRun
                     SortableTestMakers.makeStandardTests
                     PoolSetMakers.createSeedSorterPoolSetStandard
-                    genDb rp allowOverwrite cts progress }
+                    genDb host.GenSaveIntervals host.GenSaveSubIntervals rp allowOverwrite cts progress }
 
     let private mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                let genDb = host.RunDb :?> IGeneSortGenDb
+                let genDb = host.RunDb
                 SgdExecutor.evaluateEvolutionRun
                     SortableTestMakers.makeMergeTests
                     PoolSetMakers.createSeedSorterPoolSetMerge
-                    genDb rp allowOverwrite cts progress }
+                    genDb host.GenSaveIntervals host.GenSaveSubIntervals rp allowOverwrite cts progress }
 
     let private prefixExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                let genDb = host.RunDb :?> IGeneSortGenDb
+                let genDb = host.RunDb
                 SgdExecutor.evaluateEvolutionRun
                     SortableTestMakers.makePrefixTests
                     PoolSetMakers.createSeedSorterPoolSetPrefix
-                    genDb rp allowOverwrite cts progress }
+                    genDb host.GenSaveIntervals host.GenSaveSubIntervals rp allowOverwrite cts progress }
 
 
     let getExecutor (executorType: sorterSgdExecutorType) : IRunParamsExecutor =

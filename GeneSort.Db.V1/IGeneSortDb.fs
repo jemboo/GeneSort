@@ -43,18 +43,3 @@ type IGeneSortDb =
                         runParameters ->
                         outputDataType ->
                         queryParams option
-
-
-type IGeneSortGenDb =
-    inherit IGeneSortDb
-
-    abstract member getGenSaveIntervals : 
-                        unit -> samplingConfig
-
-    abstract member getGenSaveSubIntervals : 
-                        unit -> samplingConfig
-
-    abstract member getNextGenSavePointAsync :
-                        runParameters -> 
-                        outputDataType -> 
-                        Async<outputData option>

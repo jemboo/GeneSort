@@ -3,12 +3,14 @@
 open FSharp.UMX
 open GeneSort.Db.V1
 open GeneSort.Project.V1
+open GeneSort.Core
 
 
 type IRunHost =
     abstract member RunDb: IGeneSortDb
     abstract member Run: run
-    abstract member ParameterSpans: (string * string list) list
+    abstract member GenSaveIntervals: samplingConfig
+    abstract member GenSaveSubIntervals: samplingConfig
     abstract member AllowOverwrite: bool<allowOverwrite>
     abstract member ParamMapRefiner: runParameters seq -> runParameters seq
     abstract member MaxParallel: int

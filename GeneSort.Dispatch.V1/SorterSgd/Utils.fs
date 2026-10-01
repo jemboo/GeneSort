@@ -14,7 +14,7 @@ module Utils =
     let private tryLoadOutputDataForGen<'T>
             (extractFn: outputData -> Result<'T, string>)
             (dataType: outputDataType)
-            (generationalDb: IGeneSortGenDb)
+            (generationalDb: IGeneSortDb)
             (rp: runParameters)
             (cts: CancellationToken)
             (log: string -> unit)
@@ -50,13 +50,13 @@ module Utils =
     let loadAvailableOutputData<'T>
             (extractFn: outputData -> Result<'T, string>)
             (dataType: outputDataType)
-            (generationalDb: IGeneSortGenDb)
+            (saveConfig: samplingConfig)
+            (generationalDb: IGeneSortDb)
             (startingGen: int<generationNumber>)
             (rp: runParameters)
             (cts: CancellationToken)
             (log: string -> unit) : Async<seq<'T>> =
         async {
-            let saveConfig = generationalDb.getGenSaveIntervals()
             let genSequence = SamplingConfig.getSamplesWithMinBound saveConfig %startingGen
             let yab = genSequence |> Seq.toList
             let qua = yab.Length
@@ -77,7 +77,8 @@ module Utils =
         }
 
     let loadAvailableSorterPoolSets
-            (generationalDb: IGeneSortGenDb)
+            (saveConfig: samplingConfig)
+            (generationalDb: IGeneSortDb)
             (startingGen: int<generationNumber>)
             (rp: runParameters)
             (cts: CancellationToken)
@@ -85,11 +86,12 @@ module Utils =
         loadAvailableOutputData
             OutputData.asSorterPoolSet 
             (outputDataType.SorterPoolSet "") 
-            generationalDb startingGen rp cts log
+            saveConfig generationalDb startingGen rp cts log
 
 
     let loadAvailableSorterPoolSetSummarySets
-            (generationalDb: IGeneSortGenDb)
+            (saveConfig: samplingConfig)
+            (generationalDb: IGeneSortDb)
             (startingGen: int<generationNumber>)
             (rp: runParameters)
             (cts: CancellationToken)
@@ -97,11 +99,12 @@ module Utils =
         loadAvailableOutputData
             OutputData.asSorterPoolSetSummarySet 
             (outputDataType.SorterPoolSetSummarySet "") 
-            generationalDb startingGen rp cts log
+            saveConfig generationalDb startingGen rp cts log
 
 
     let loadAvailableSorterPoolSetHistories
-            (generationalDb: IGeneSortGenDb)
+            (saveConfig: samplingConfig)
+            (generationalDb: IGeneSortDb)
             (startingGen: int<generationNumber>)
             (rp: runParameters)
             (cts: CancellationToken)
@@ -109,11 +112,12 @@ module Utils =
         loadAvailableOutputData
             OutputData.asSorterPoolSetHistory 
             (outputDataType.SorterPoolSetHistory "") 
-            generationalDb startingGen rp cts log
+            saveConfig generationalDb startingGen rp cts log
 
 
     let loadAvailableSorterPoolBins
-            (generationalDb: IGeneSortGenDb)
+            (saveConfig: samplingConfig)
+            (generationalDb: IGeneSortDb)
             (startingGen: int<generationNumber>)
             (rp: runParameters)
             (cts: CancellationToken)
@@ -121,7 +125,7 @@ module Utils =
         loadAvailableOutputData
             OutputData.asSorterPoolBinsSetSeries 
             (outputDataType.SorterPoolBinsSetSeries "") 
-            generationalDb startingGen rp cts log
+            saveConfig generationalDb startingGen rp cts log
 
 
 
@@ -131,20 +135,56 @@ module Utils =
     let loadOutputDataWithHighestGenerationNumber<'T>
             (extractFn: outputData -> Result<'T, string>)
             (dataType: outputDataType)
-            (generationalDb: IGeneSortGenDb)
+            (saveConfig: samplingConfig)
+            (generationalDb: IGeneSortDb)
             (rp: runParameters) : Async<Result<'T option, string>> =
         async {
-            let! rawDataOpt = generationalDb.getNextGenSavePointAsync rp dataType
-            match rawDataOpt with
-            | None -> return Ok None
-            | Some rawData -> return extractFn rawData |> Result.map Some
+            let targetCount = defaultArg saveConfig.MaxCount 200
+            let intervals =
+                IntSampleMethod.generate saveConfig.Method saveConfig.Min targetCount
+                |> Seq.map (fun gen -> int (ceil (float gen * saveConfig.Scale)))
+                |> Seq.toArray
+                |> Array.map (fun gen -> %gen : int<generationNumber>)
+
+            let getQueryParams index =
+                let currentGen = intervals.[index]
+                let wrp = rp.WithGenerationCurrent(Some currentGen)
+                generationalDb.MakeQueryParamsFromRunParams wrp dataType
+
+            let rec findHighestExistingIndex low high bestIdx =
+                async {
+                    if low > high then return bestIdx
+                    else
+                        let mid = low + (high - low) / 2
+                        match getQueryParams mid with
+                        | None -> return! findHighestExistingIndex low (mid - 1) bestIdx
+                        | Some qp ->
+                            let! exists = generationalDb.doesOutPutDataExist qp
+                            if exists then return! findHighestExistingIndex (mid + 1) high (Some mid)
+                            else return! findHighestExistingIndex low (mid - 1) bestIdx
+                }
+
+            if intervals.Length = 0 then return Ok None
+            else
+                let! highestIndexOpt = findHighestExistingIndex 0 (intervals.Length - 1) None
+                match highestIndexOpt with
+                | None -> return Ok None
+                | Some idx ->
+                    match getQueryParams idx with
+                    | None -> return Error "Failed to create query parameters for the highest saved generation."
+                    | Some qp ->
+                        let! rawDataOpt = generationalDb.loadIfFoundAsync qp
+                        match rawDataOpt with
+                        | None -> return Ok None
+                        | Some rawData -> return extractFn rawData |> Result.map Some
         }
 
     /// Ergonomic 1-liner wrapper for SorterRunResult.
     let loadHighestGenSorterPoolSet
-            (generationalDb: IGeneSortGenDb)
+            (saveConfig: samplingConfig)
+            (generationalDb: IGeneSortDb)
             (rp: runParameters) : Async<Result<sorterPoolSet option, string>> =
         loadOutputDataWithHighestGenerationNumber 
             OutputData.asSorterPoolSet 
             (outputDataType.SorterPoolSet "") 
-            generationalDb rp
+            saveConfig generationalDb rp

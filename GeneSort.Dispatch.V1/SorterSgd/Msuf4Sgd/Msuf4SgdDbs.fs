@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterSgd.Msuf4
+namespace GeneSort.Dispatch.V1.SorterSgd.Msuf4
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -332,6 +332,6 @@ module Msuf4SgdDbs =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.databaseName
-        let run = run.create spec.databaseName projectName spec.runName spec.runDescription
+        let run = run.create spec.databaseName projectName spec.runName spec.runDescription spec.spans
         runHost.Create db spec run :> IRunHost
 
