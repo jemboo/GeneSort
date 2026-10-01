@@ -28,14 +28,6 @@ type sorterPoolSet =
         else
             let sortedCount = evals |> Array.sumBy (fun eval -> if SorterEval.getIsSorted eval then 1 else 0)
             float sortedCount * 100.0 / float evals.Length
-    member this.AverageUnsortedCount with get() =
-        let evals = this.GetSorterEvals()
-
-        if evals.Length = 0 then
-            0.0
-        else
-            evals
-            |> Array.averageBy (fun eval -> float (UMX.untag (SorterEval.getUnsortedCount eval)))
     member private this.GetSorterEvals() : sorterEval array =
         this._sorterPools
         |> Map.values

@@ -21,6 +21,7 @@ type sorterPoolSummary =
         _rawCeLength: int<ceLength>
         _aveStageCrossings: float<stageCrossings>
         _aveReflectiveCountR: float<reflectiveCount>
+        _averageUnsortedCount: float
     }
 
     member this.RawCeLength with get() = this._rawCeLength
@@ -34,6 +35,7 @@ type sorterPoolSummary =
     member this.StdDevStageLength with get() = this._stdDevStageLength
     member this.AveStageCrossings with get() = this._aveStageCrossings
     member this.AveReflectiveCountR with get() = this._aveReflectiveCountR
+    member this.AverageUnsortedCount with get() = this._averageUnsortedCount
 
 
     static member create 
@@ -47,7 +49,8 @@ type sorterPoolSummary =
                     (aveStageLength: float<stageLength>) 
                     (stdDevStageLength: float<stageLength>) 
                     (aveStageCrossings: float<stageCrossings>) 
-                    (aveReflectiveCountR: float<reflectiveCount>) =
+                    (aveReflectiveCountR: float<reflectiveCount>)
+                    (averageUnsortedCount: float) =
         { 
           _sorterPoolId = poolId; 
           _sorterPoolName = sorterPoolName;
@@ -60,6 +63,7 @@ type sorterPoolSummary =
           _stdDevStageLength = stdDevStageLength;
           _aveStageCrossings = aveStageCrossings;
           _aveReflectiveCountR = aveReflectiveCountR;
+          _averageUnsortedCount = averageUnsortedCount;
         }
 
 
@@ -68,20 +72,17 @@ type sorterPoolSetSummary =
         _sorterPoolSetId: Guid<sorterPoolSetId>
         _generationNumber: int<generationNumber>
         _sortedSorterEvalPercentage: float
-        _averageUnsortedCount: float
         _sorterPoolSummaries: sorterPoolSummary array
     }
     member this.SorterPoolSetId with get() = this._sorterPoolSetId
     member this.GenerationNumber with get() = this._generationNumber
     member this.SortedSorterEvalPercentage with get() = this._sortedSorterEvalPercentage
-    member this.AverageUnsortedCount with get() = this._averageUnsortedCount
     member this.SorterPoolSummaries with get() = this._sorterPoolSummaries
 
-    static member Create(setId, genNum, sortedSorterEvalPercentage, averageUnsortedCount, summaries) =
+    static member Create(setId, genNum, sortedSorterEvalPercentage, summaries) =
         { _sorterPoolSetId = setId
           _generationNumber = genNum
           _sortedSorterEvalPercentage = sortedSorterEvalPercentage
-          _averageUnsortedCount = averageUnsortedCount
           _sorterPoolSummaries = summaries }
 
 
@@ -127,12 +128,14 @@ module SorterPoolSetSummary =
                         (0.0 |> UMX.tag)
                         (0.0 |> UMX.tag)
                         (0.0 |> UMX.tag)
+                        0.0
                 else
                     // Map out the metrics across all evaluations
                     let ceLengths = evals |> Array.map (fun ev -> float %(SorterEval.getCeLength ev))
                     let stageLengths = evals |> Array.map (fun ev -> float %(SorterEval.getStageLength ev))
                     let stageCrossings = evals |> Array.map (fun ev -> float %(SorterEval.getStageCrossingsCount ev))
                     let reflectiveCountRs = evals |> Array.map (fun ev -> float (float %(SorterEval.getReflectiveCount ev) / float %(SorterEval.getCeLength ev)))
+                    let averageUnsortedCount = evals |> Array.averageBy (fun ev -> float (UMX.untag (SorterEval.getUnsortedCount ev)))
 
                     // Compute minimums
                     let minCe = (Array.min ceLengths |> int) |> UMX.tag<ceLength>
@@ -162,6 +165,7 @@ module SorterPoolSetSummary =
                         stdDevStage
                         aveStageCrossings
                         aveReflectiveCountR
+                        averageUnsortedCount
             )
             |> Seq.toArray
 
@@ -170,7 +174,6 @@ module SorterPoolSetSummary =
             poolSet.SorterPoolSetId, 
             poolSet.GenerationNumber, 
             poolSet.SortedSorterEvalPercentage,
-            poolSet.AverageUnsortedCount,
             poolSummaries
         )
 
@@ -184,7 +187,6 @@ module SorterPoolSetSummary =
             |> dataTableRecord.addData (sprintf "%sSorterPoolSetId" prefix) (string (%summarySet.SorterPoolSetId))
             |> dataTableRecord.addData (sprintf "%sGenerationNumber" prefix) (string (%summarySet.GenerationNumber))
             |> dataTableRecord.addData (sprintf "%sSortedSorterEvalPercentage" prefix) (sprintf "%.2f%%" summarySet.SortedSorterEvalPercentage)
-            |> dataTableRecord.addData (sprintf "%sAverageUnsortedCount" prefix) (sprintf "%.2f" summarySet.AverageUnsortedCount)
 
         // 2. Iterate through each pool summary and combine metrics with the root context
         summarySet.SorterPoolSummaries
@@ -201,4 +203,5 @@ module SorterPoolSetSummary =
             |> dataTableRecord.addData (sprintf "%sStdDevStageLength" prefix) (sprintf "%.5f" (%poolSum.StdDevStageLength))
             |> dataTableRecord.addData (sprintf "%sAveStageCrossings" prefix) (sprintf "%.5f" (%poolSum.AveStageCrossings))
             |> dataTableRecord.addData (sprintf "%sAveReflectiveCountR" prefix) (sprintf "%.5f" (%poolSum.AveReflectiveCountR))
+            |> dataTableRecord.addData (sprintf "%sAverageUnsortedCount" prefix) (sprintf "%.2f" poolSum.AverageUnsortedCount)
         )

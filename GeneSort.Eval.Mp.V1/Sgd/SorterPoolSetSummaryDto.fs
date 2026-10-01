@@ -25,13 +25,13 @@ type sorterPoolSummaryDto = {
     stdDevCeLength: float
     stdDevStageLength: float
     aveReflectiveCount: float
+    averageUnsortedCount: float
 }
 
 type sorterPoolSetSummaryDto = {
     sorterPoolSetId: Guid
     generationNumber: int
     sortedSorterEvalPercentage: float
-    averageUnsortedCount: float
     sorterPoolSummaryDtos: sorterPoolSummaryDto array
 }
 
@@ -63,13 +63,13 @@ module SorterPoolSetSummaryDto =
                     stdDevCeLength = UMX.untag p.StdDevCeLength
                     stdDevStageLength = UMX.untag p.StdDevStageLength
                     aveReflectiveCount = UMX.untag p.AveReflectiveCountR
+                    averageUnsortedCount = p.AverageUnsortedCount
                 }
             )
         {
             sorterPoolSetId = UMX.untag domain.SorterPoolSetId
             generationNumber = UMX.untag domain.GenerationNumber
             sortedSorterEvalPercentage = domain.SortedSorterEvalPercentage
-            averageUnsortedCount = domain.AverageUnsortedCount
             sorterPoolSummaryDtos = poolSummaryDtos
         }
 
@@ -89,12 +89,12 @@ module SorterPoolSetSummaryDto =
                     (p.stdDevStageLength |> UMX.tag<stageLength>)
                     (p.aveStageCrossings |> UMX.tag<stageCrossings>)
                     (p.aveReflectiveCount |> UMX.tag<reflectiveCount>)
+                    p.averageUnsortedCount
             )
         sorterPoolSetSummary.Create(
             UMX.tag dto.sorterPoolSetId, 
             UMX.tag dto.generationNumber, 
             dto.sortedSorterEvalPercentage,
-            dto.averageUnsortedCount,
             poolSummaryDomains
         )
 
