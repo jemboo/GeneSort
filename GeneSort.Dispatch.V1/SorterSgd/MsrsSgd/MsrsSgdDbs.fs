@@ -25,7 +25,7 @@ module MsrsSgdDbs =
             let dbFolder = 
                     @$"c:\Projects\{projectName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
 
-            let makeQueryParams
+            let makeQueryParams (projectName: string<projectName>) (dbName: string<databaseName>)
                             (rng: rngType)
                             (genLast: int<generationNumber>)
                             (sorterCtPerPool: int<sorterCountPerPool>)
@@ -73,7 +73,7 @@ module MsrsSgdDbs =
                     |]
 
 
-            let queryParamsFromRunParams 
+            let queryParamsFromRunParams (projectName: string<projectName>) (dbName: string<databaseName>)
                                     (rp: runParameters) 
                                     (odt: outputDataType) : queryParams option =
                 maybe {
@@ -98,7 +98,7 @@ module MsrsSgdDbs =
                     let! sfrac = rp.GetSortedFraction()
                     let! sper = rp.GetSorterPoolExpansionRate()
                     let! mmod = rp.GetMutationMod()
-                    return makeQueryParams rng curGen scPP spc scc ses
+                    return makeQueryParams projectName dbName rng curGen scPP spc scc ses
                                            sem semi repl sw smt set ortho 
                                            para sym mdr dsh pNm sfrac sper
                                            mmod odt
@@ -114,7 +114,7 @@ module MsrsSgdDbs =
         let dbFolder = 
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
-        let makeQueryParams
+        let makeQueryParams (projectName: string<projectName>) (dbName: string<databaseName>)
                     (rng: rngType)
                     (genLast: int<generationNumber>)
                     (sorterCtPerPool: int<sorterCountPerPool>)
@@ -171,7 +171,7 @@ module MsrsSgdDbs =
                 |]
 
 
-        let queryParamsFromRunParams 
+        let queryParamsFromRunParams (projectName: string<projectName>) (dbName: string<databaseName>)
                                 (rp: runParameters) 
                                 (odt: outputDataType) : queryParams option =
             maybe {
@@ -198,7 +198,7 @@ module MsrsSgdDbs =
                 let! sfrac = rp.GetSortedFraction()
                 let! sper = rp.GetSorterPoolExpansionRate()
                 let! mmod = rp.GetMutationMod()
-                return makeQueryParams rng curGen scPP spc scc ses sem
+                return makeQueryParams projectName dbName rng curGen scPP spc scc ses sem
                                         semi repl sw smt md mst sdf set 
                                         ortho para sym mdr dsh sfrac sper
                                         mmod odt
@@ -216,7 +216,7 @@ module MsrsSgdDbs =
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
 
-        let makeQueryParams
+        let makeQueryParams (projectName: string<projectName>) (dbName: string<databaseName>)
                     (repl: int<replNumber>)
                     (rng: rngType)
                     (genCurrent: int<generationNumber>)
@@ -279,7 +279,7 @@ module MsrsSgdDbs =
                 |]
 
 
-        let queryParamsFromRunParams 
+        let queryParamsFromRunParams (projectName: string<projectName>) (dbName: string<databaseName>)
                                 (rp: runParameters) 
                                 (odt: outputDataType) : queryParams option =
             maybe {
@@ -309,7 +309,7 @@ module MsrsSgdDbs =
                 let! sper = rp.GetSorterPoolExpansionRate()
                 let! mmod = rp.GetMutationMod()
                 let! spm = rp.GetSorterPoolMeasure()
-                return makeQueryParams repl rng curGen scPP sctc sctm 
+                return makeQueryParams projectName dbName repl rng curGen scPP sctc sctm 
                                        spc scc ses sem semi slId smt 
                                        sdf set sdMdr ortho para sym mdr 
                                        dsh pNm sfrac sper mmod
@@ -340,6 +340,6 @@ module MsrsSgdDbs =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.databaseName
-        let run = run.create spec.databaseName projectName spec.runName spec.runDescription spec.spans
+        let run = run.createWithCatalogName spec.databaseName projectName spec.runName spec.runDescription spec.spans spec.queryCatalogName
         runHost.Create db spec run :> IRunHost
 

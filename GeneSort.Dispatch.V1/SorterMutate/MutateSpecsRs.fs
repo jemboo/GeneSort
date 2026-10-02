@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterMutate
+namespace GeneSort.Dispatch.V1.SorterMutate
 
 open FSharp.UMX
 open GeneSort.Model.Sorting.V1
@@ -47,6 +47,7 @@ module MutateSpecsRs =
     module Specs =
 
         let Test_Msrs (executorType: sorterMutateExecutorType)  : runHostSpec = {
+            queryCatalogName = "sorter-mutate.standard"
             databaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
             runName = sprintf @"Rand-Test_Msrs%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for Msrs"
@@ -71,6 +72,7 @@ module MutateSpecsRs =
 
 
         let Test_Msuf4 (executorType: sorterMutateExecutorType)  : runHostSpec = {
+            queryCatalogName = "sorter-mutate.standard"
             databaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
             runName = sprintf @"Rand-Test_Msuf4%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for Msuf4"

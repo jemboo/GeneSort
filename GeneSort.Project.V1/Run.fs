@@ -60,6 +60,15 @@ type run =
           queryCatalogName = queryCatalogName
         }
 
+    static member createWithCatalogName
+            (databaseName: string<databaseName>)
+            (projName: string<projectName>)
+            (runName: string<runName>)
+            (description: string)
+            (parameterSpans: (string * string list) list)
+            (queryCatalogName: string) : run =
+        run.createWithCatalogAndIntervalNames databaseName projName runName description parameterSpans "expInterval100_L50ss" "summaryInterval_C.1p5C" queryCatalogName
+
     member this.DatabaseName with get () = this.dataBaseName
     member this.ProjectName with get () = this.projName
     member this.RunName with get () = this.runName

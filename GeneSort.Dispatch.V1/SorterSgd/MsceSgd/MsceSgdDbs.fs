@@ -25,7 +25,7 @@ module MsceSgdDbs =
                     @$"c:\Projects\{projectName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
 
 
-            let makeQueryParams
+            let makeQueryParams (projectName: string<projectName>) (dbName: string<databaseName>)
                             (rng: rngType)
                             (genCurrent: int<generationNumber>)
                             (sorterCtPerPool: int<sorterCountPerPool>)
@@ -69,7 +69,7 @@ module MsceSgdDbs =
                     |]
 
 
-            let queryParamsFromRunParams 
+            let queryParamsFromRunParams (projectName: string<projectName>) (dbName: string<databaseName>)
                                     (rp: runParameters) 
                                     (odt: outputDataType) : queryParams option =
                 maybe {
@@ -92,7 +92,7 @@ module MsceSgdDbs =
                     let! dsh = rp.GetDistinctSorterHashes()
                     let! pNm = rp.GetPrioritizeNewMutants()
                     let! sfrac = rp.GetSortedFraction()
-                    return makeQueryParams rng curGen scPP spc scc ses sem semi
+                    return makeQueryParams projectName dbName rng curGen scPP spc scc ses sem semi
                                            repl sw smt set mut ins del mdr dsh pNm sfrac 
                                            odt
                 }
@@ -110,7 +110,7 @@ module MsceSgdDbs =
             let dbFolder = 
                     $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
-            let makeQueryParams
+            let makeQueryParams (projectName: string<projectName>) (dbName: string<databaseName>)
                         (rng: rngType)
                         (genCurrent: int<generationNumber>)
                         (sorterCtPerPool: int<sorterCountPerPool>)
@@ -165,7 +165,7 @@ module MsceSgdDbs =
                     |]
 
 
-            let queryParamsFromRunParams 
+            let queryParamsFromRunParams (projectName: string<projectName>) (dbName: string<databaseName>)
                                     (rp: runParameters) 
                                     (odt: outputDataType) : queryParams option =
                 maybe {
@@ -191,7 +191,7 @@ module MsceSgdDbs =
                     let! dsh = rp.GetDistinctSorterHashes()
                     let! pNm = rp.GetPrioritizeNewMutants()
                     let! sfrac = rp.GetSortedFraction()
-                    return makeQueryParams rng curGen scPP spc scc ses sem semi
+                    return makeQueryParams projectName dbName rng curGen scPP spc scc ses sem semi
                                             repl sw smt md mst sdf set mut 
                                             ins del mdr dsh pNm sfrac odt
                 }
@@ -214,6 +214,6 @@ module MsceSgdDbs =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.databaseName
-        let run = run.create spec.databaseName projectName spec.runName spec.runDescription spec.spans
+        let run = run.createWithCatalogName spec.databaseName projectName spec.runName spec.runDescription spec.spans spec.queryCatalogName
         runHost.Create db spec run :> IRunHost
 

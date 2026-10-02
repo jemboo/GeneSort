@@ -1,20 +1,22 @@
 namespace GeneSort.Project.V1
 
+open FSharp.UMX
 open GeneSort.Project.V1
 
 /// A normalized adapter for turning run parameters into the storage path metadata.
 type queryParamsBuilder = runParameters -> outputDataType -> queryParams option
+type queryParamsCatalogBuilder = string<projectName> -> string<databaseName> -> queryParamsBuilder
 
 /// Process-wide catalog of query parameter builders, addressed by stable names stored in runs.
 module QueryParamsCatalog =
 
     let private syncRoot = obj ()
-    let mutable private builders: Map<string, queryParamsBuilder> = Map.empty
+    let mutable private builders: Map<string, queryParamsCatalogBuilder> = Map.empty
 
     let nameForDatabase (projectName: string) (databaseName: string) =
         sprintf "%s.%s" projectName databaseName
 
-    let register (name: string) (builder: queryParamsBuilder) =
+    let register (name: string) (builder: queryParamsCatalogBuilder) =
         if System.String.IsNullOrWhiteSpace name then
             invalidArg (nameof name) "A query parameter catalog name cannot be empty."
 
@@ -23,7 +25,7 @@ module QueryParamsCatalog =
                 invalidOp (sprintf "A query parameter builder named '%s' is already registered." name)
             builders <- Map.add name builder builders)
 
-    let get (name: string) : queryParamsBuilder =
+    let get (name: string) : queryParamsCatalogBuilder =
         lock syncRoot (fun () ->
             match Map.tryFind name builders with
             | Some builder -> builder

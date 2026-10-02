@@ -19,6 +19,7 @@ type IRunHost =
 
 
 type runHostSpec = {
+    queryCatalogName: string
     databaseName: string<databaseName>
     runName: string<runName>
     runDescription: string

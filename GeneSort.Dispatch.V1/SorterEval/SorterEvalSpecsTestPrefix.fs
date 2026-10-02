@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterEval
+namespace GeneSort.Dispatch.V1.SorterEval
 
 open FSharp.UMX
 open GeneSort.Core
@@ -56,6 +56,7 @@ module SorterEvalSpecsTestPrefix =
     module Specs =
 
         let Prefix_24s (executorType: sorterEvalExecutorType) : runHostSpec = {
+            queryCatalogName = "sorter-eval.prefix"
             databaseName = SorterEvalDbs.Prefix.dbName
             runName = sprintf @"Prefix_24s_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             runDescription = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf6"
@@ -75,6 +76,7 @@ module SorterEvalSpecsTestPrefix =
 
 
         let Prefix_32 (executorType: sorterEvalExecutorType) : runHostSpec = {
+            queryCatalogName = "sorter-eval.prefix"
             databaseName = SorterEvalDbs.Prefix.dbName
             runName = sprintf @"Prefix_32_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             runDescription = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf4"

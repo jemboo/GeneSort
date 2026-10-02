@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterMutate
+namespace GeneSort.Dispatch.V1.SorterMutate
 
 
 open FSharp.UMX
@@ -59,6 +59,7 @@ module MutateSpecsRm =
     module Specs =
 
         let Test_Msce (executorType: sorterMutateExecutorType)  : runHostSpec = {
+            queryCatalogName = "sorter-mutate.merge"
             databaseName = SorterMutateDbs.RandomMerge.Uniform.dbName
             runName = sprintf @"Test-Msce_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for merge Msce"
@@ -83,6 +84,7 @@ module MutateSpecsRm =
 
 
         let Test_Mssi (executorType: sorterMutateExecutorType)  : runHostSpec = {
+            queryCatalogName = "sorter-mutate.merge"
             databaseName = SorterMutateDbs.RandomMerge.Uniform.dbName
             runName = sprintf @"Test-Mssi_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for merge Mssi"
@@ -107,6 +109,7 @@ module MutateSpecsRm =
 
 
         let Test_Msrs (executorType: sorterMutateExecutorType)  : runHostSpec = {
+            queryCatalogName = "sorter-mutate.merge"
             databaseName = SorterMutateDbs.RandomMerge.Uniform.dbName
             runName = sprintf @"Test-Msrs_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for merge Msrs"
@@ -130,6 +133,7 @@ module MutateSpecsRm =
         }
 
         let Test_Msuf4 (executorType: sorterMutateExecutorType)  : runHostSpec = {
+            queryCatalogName = "sorter-mutate.merge"
             databaseName = SorterMutateDbs.RandomMerge.Uniform.dbName
             runName = sprintf @"Test-Msuf4_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for merge Msuf4"

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterEval
+namespace GeneSort.Dispatch.V1.SorterEval
 
 open FSharp.UMX
 open GeneSort.Core
@@ -56,6 +56,7 @@ module SorterEvalSpecsRm =
     module Specs =
 
         let Rand_MergeTest_Test (executorType: sorterEvalExecutorType) : runHostSpec = {
+            queryCatalogName = "sorter-eval.merge"
             databaseName = SorterEvalDbs.Merge.dbName
             runName = sprintf @"Rand_MergeTest-Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
@@ -76,6 +77,7 @@ module SorterEvalSpecsRm =
 
 
         let Rand_MergeTest_Small (executorType: sorterEvalExecutorType) : runHostSpec = {
+            queryCatalogName = "sorter-eval.merge"
             databaseName = SorterEvalDbs.Merge.dbName
             runName = sprintf @"Rand_MergeTest-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
@@ -97,6 +99,7 @@ module SorterEvalSpecsRm =
 
 
         let Rand_MergeTest_MediumLd (executorType: sorterEvalExecutorType) : runHostSpec = {
+            queryCatalogName = "sorter-eval.merge"
             databaseName = SorterEvalDbs.Merge.dbName
             runName = sprintf @"Rand_MergeTest-MediumLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
@@ -118,6 +121,7 @@ module SorterEvalSpecsRm =
 
 
         let Rand_MergeTest_MediumHd (executorType: sorterEvalExecutorType) : runHostSpec = {
+            queryCatalogName = "sorter-eval.merge"
             databaseName = SorterEvalDbs.Merge.dbName
             runName = sprintf @"Rand_MergeTest-MediumHd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
@@ -139,6 +143,7 @@ module SorterEvalSpecsRm =
 
 
         let Rand_MergeTest_LargeLd (executorType: sorterEvalExecutorType) : runHostSpec = {
+            queryCatalogName = "sorter-eval.merge"
             databaseName = SorterEvalDbs.Merge.dbName
             runName = sprintf @"Rand_MergeTest-LargeLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"

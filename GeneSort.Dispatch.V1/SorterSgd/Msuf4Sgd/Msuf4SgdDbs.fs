@@ -22,7 +22,7 @@ module Msuf4SgdDbs =
         let dbFolder = 
                 @$"c:\Projects\{projectName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
 
-        let makeQueryParams
+        let makeQueryParams (projectName: string<projectName>) (dbName: string<databaseName>)
                         (rng: rngType)
                         (genCurrent: int<generationNumber>)
                         (sorterCtPerPool: int<sorterCountPerPool>)
@@ -72,7 +72,7 @@ module Msuf4SgdDbs =
                 |]
 
 
-        let queryParamsFromRunParams 
+        let queryParamsFromRunParams (projectName: string<projectName>) (dbName: string<databaseName>)
                                 (rp: runParameters) 
                                 (odt: outputDataType) : queryParams option =
             maybe {
@@ -98,7 +98,7 @@ module Msuf4SgdDbs =
                 let! dsh = rp.GetDistinctSorterHashes()
                 let! pNm = rp.GetPrioritizeNewMutants()
                 let! sfrac = rp.GetSortedFraction()
-                return makeQueryParams rng curGen scPP sctc sctm spc scc ses sem semi 
+                return makeQueryParams projectName dbName rng curGen scPP sctc sctm spc scc ses sem semi 
                                 repl sw smt set sdMdr ortho para sym mdr
                                 dsh pNm sfrac odt
             }
@@ -115,7 +115,7 @@ module Msuf4SgdDbs =
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
 
-        let makeQueryParams
+        let makeQueryParams (projectName: string<projectName>) (dbName: string<databaseName>)
                     (rng: rngType)
                     (genCurrent: int<generationNumber>)
                     (sorterCtPerPool: int<sorterCountPerPool>)
@@ -176,7 +176,7 @@ module Msuf4SgdDbs =
                 |]
 
 
-        let queryParamsFromRunParams 
+        let queryParamsFromRunParams (projectName: string<projectName>) (dbName: string<databaseName>)
                                 (rp: runParameters) 
                                 (odt: outputDataType) : queryParams option =
             maybe {
@@ -205,7 +205,7 @@ module Msuf4SgdDbs =
                 let! dsh = rp.GetDistinctSorterHashes()
                 let! pNm = rp.GetPrioritizeNewMutants()
                 let! sfrac = rp.GetSortedFraction()
-                return makeQueryParams rng curGen scPP sctc sctm spc scc ses sem semi 
+                return makeQueryParams projectName dbName rng curGen scPP sctc sctm spc scc ses sem semi 
                                         repl sw smt md mst sdf set sdMdr ortho 
                                         para sym mdr dsh pNm sfrac odt
 
@@ -223,7 +223,7 @@ module Msuf4SgdDbs =
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
 
-        let makeQueryParams
+        let makeQueryParams (projectName: string<projectName>) (dbName: string<databaseName>)
                     (repl: int<replNumber>)
                     (rng: rngType)
                     (genCurrent: int<generationNumber>)
@@ -280,7 +280,7 @@ module Msuf4SgdDbs =
                 |]
 
 
-        let queryParamsFromRunParams 
+        let queryParamsFromRunParams (projectName: string<projectName>) (dbName: string<databaseName>)
                                 (rp: runParameters) 
                                 (odt: outputDataType) : queryParams option =
             maybe {
@@ -307,7 +307,7 @@ module Msuf4SgdDbs =
                 let! dsh = rp.GetDistinctSorterHashes()
                 let! pNm = rp.GetPrioritizeNewMutants()
                 let! sfrac = rp.GetSortedFraction()
-                return makeQueryParams repl rng curGen scPP sctc sctm spc scc ses sem  
+                return makeQueryParams projectName dbName repl rng curGen scPP sctc sctm spc scc ses sem  
                                        semi slId smt sdf set sdMdr ortho 
                                        para sym mdr dsh pNm sfrac odt
 
@@ -335,6 +335,6 @@ module Msuf4SgdDbs =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.databaseName
-        let run = run.create spec.databaseName projectName spec.runName spec.runDescription spec.spans
+        let run = run.createWithCatalogName spec.databaseName projectName spec.runName spec.runDescription spec.spans spec.queryCatalogName
         runHost.Create db spec run :> IRunHost
 

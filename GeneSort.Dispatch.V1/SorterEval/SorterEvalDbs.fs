@@ -24,37 +24,10 @@ module SorterEvalDbs =
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
 
-        let makeQueryParams
-                        (repl: int<replNumber>) 
-                        (rng: rngType)
-                        (sw: int<sortingWidth>) 
-                        (smt: simpleSorterModelType) 
-                        (set: sorterEvalType)
-                        (odt: outputDataType) : queryParams =
-            queryParams.create dbName projectName (Some repl) None odt
-                [| 
-                    (runParameters.rngTypeKey, rng |> RngType.toString)
-                    (runParameters.sortingWidthKey, (Some sw) |> SortingWidth.toString); 
-                    (runParameters.simpleSorterModelTypeKey, smt |> SimpleSorterModelType.toString) 
-                    (runParameters.sorterEvalTypeKey, set |> SorterEvalType.toString)
-                |]
-
-
-        let queryParamsFromRunParams 
-                                (rp: runParameters) 
-                                (odt: outputDataType) : queryParams option =
-            maybe {
-                let! repl = rp.GetRepl()
-                let! sw = rp.GetSortingWidth()
-                let! smt = rp.GetSimpleSorterModelType()
-                let! rng = rp.GetRngType()
-                let! set = rp.GetSorterEvalType()
-                return makeQueryParams repl rng sw smt set odt 
-            }
-        
-
-        do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
-        let db = new GeneSortDbMp(dbFolder)
+        let makeQueryParams = QueryParamsBuilders.SorterEval.Standard.makeQueryParams projectName dbName
+        let queryParamsFromRunParams = QueryParamsBuilders.SorterEval.Standard.queryParamsFromRunParams projectName dbName
+        do QueryParamsBuilders.registerAll ()
+        let db = new GeneSortDbMp(dbFolder, "sorter-eval.standard")
 
 
 
@@ -64,43 +37,10 @@ module SorterEvalDbs =
         let dbFolder = 
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
-        let makeQueryParams
-                    (repl: int<replNumber>) 
-                    (rng: rngType)
-                    (mrgLibId: mergeLibId)
-                    (simpleSorterModelType: simpleSorterModelType)
-                    (sortableDataFormat: sortableDataFormat) 
-                    (sorterEvalType: sorterEvalType)
-                    (outputDataType: outputDataType) : queryParams =
-
-            queryParams.create 
-                dbName projectName
-                (Some repl)
-                None
-                outputDataType
-                [| 
-                    (runParameters.rngTypeKey, rng |> RngType.toString)
-                    (runParameters.mergeLibIdKey, MergeLibId.toString mrgLibId);
-                    (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
-                    (runParameters.sorterEvalTypeKey, sorterEvalType |> SorterEvalType.toString)
-                    (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString);
-                |]
-
-
-        let queryParamsFromRunParams 
-                                (rp: runParameters) 
-                                (odt: outputDataType) : queryParams option =
-            maybe {
-                let! rng = rp.GetRngType()
-                let! repl = rp.GetRepl()
-                let! mergeLibId = rp.GetMergeLibId()
-                let! smt = rp.GetSimpleSorterModelType()
-                let! sdf = rp.GetSortableDataFormat()
-                let! set = rp.GetSorterEvalType()
-                return makeQueryParams repl rng mergeLibId smt sdf set odt
-            }
-        do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
-        let db = new GeneSortDbMp(dbFolder)
+        let makeQueryParams = QueryParamsBuilders.SorterEval.Merge.makeQueryParams projectName dbName
+        let queryParamsFromRunParams = QueryParamsBuilders.SorterEval.Merge.queryParamsFromRunParams projectName dbName
+        do QueryParamsBuilders.registerAll ()
+        let db = new GeneSortDbMp(dbFolder, "sorter-eval.merge")
 
 
 
@@ -110,44 +50,10 @@ module SorterEvalDbs =
         let dbFolder = 
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
-        let makeQueryParams
-                    (repl: int<replNumber>)
-                    (rng: rngType)
-                    (pfxLibId: prefixLibId)
-                    (simpleSorterModelType: simpleSorterModelType)
-                    (sortableDataFormat: sortableDataFormat) 
-                    (sorterEvalType: sorterEvalType)
-                    (outputDataType: outputDataType) : queryParams =
-
-            queryParams.create 
-                dbName projectName
-                (Some repl)
-                None
-                outputDataType
-                [| 
-                    (runParameters.rngTypeKey, rng |> RngType.toString)
-                    (runParameters.prefixLibIdKey, PrefixLibId.toString pfxLibId);
-                    (runParameters.simpleSorterModelTypeKey, simpleSorterModelType |> SimpleSorterModelType.toString );
-                    (runParameters.sorterEvalTypeKey, sorterEvalType |> SorterEvalType.toString) 
-                    (runParameters.sortableDataFormatKey, sortableDataFormat |> SortableDataFormat.toString); 
-                |]
-
-
-        let queryParamsFromRunParams 
-                                (rp: runParameters) 
-                                (odt: outputDataType) : queryParams option =
-            maybe {
-                let! rng = rp.GetRngType()
-                let! pfxLibId = rp.GetPrefixLibId()
-                let! smt = rp.GetSimpleSorterModelType()
-                let! sdf = rp.GetSortableDataFormat()
-                let! set = rp.GetSorterEvalType() 
-                let! repl = rp.GetRepl()
-                return makeQueryParams repl rng pfxLibId smt sdf set odt
-            }
-
-        do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) queryParamsFromRunParams
-        let db = new GeneSortDbMp(dbFolder)
+        let makeQueryParams = QueryParamsBuilders.SorterEval.Prefix.makeQueryParams projectName dbName
+        let queryParamsFromRunParams = QueryParamsBuilders.SorterEval.Prefix.queryParamsFromRunParams projectName dbName
+        do QueryParamsBuilders.registerAll ()
+        let db = new GeneSortDbMp(dbFolder, "sorter-eval.prefix")
 
 
 
@@ -227,5 +133,5 @@ module SorterEvalDbs =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.databaseName
-        let run = run.create spec.databaseName projectName spec.runName spec.runDescription spec.spans
+        let run = run.createWithCatalogName spec.databaseName projectName spec.runName spec.runDescription spec.spans spec.queryCatalogName
         runHost.Create db spec run :> IRunHost

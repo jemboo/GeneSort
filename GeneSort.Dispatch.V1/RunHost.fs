@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1
+namespace GeneSort.Dispatch.V1
 
 open System
 open System.Threading
@@ -30,7 +30,7 @@ type runHost =
           _run = run;
           _genSaveIntervals = lookupInterval run.GenSaveIntervalsName;
           _genSaveSubIntervals = lookupInterval run.GenSaveSubIntervalsName;
-          _queryParamsFromRunParams = QueryParamsCatalog.get run.QueryCatalogName;
+          _queryParamsFromRunParams = QueryParamsCatalog.get spec.queryCatalogName run.ProjectName run.DatabaseName;
           _maxParallel = spec.maxParallel }
 
     member this.Spec = this._spec

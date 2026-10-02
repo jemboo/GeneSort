@@ -1,4 +1,4 @@
-﻿module GeneSort.Dispatch.V1.SorterSgd.Msuf32p4a.MutationRate
+module GeneSort.Dispatch.V1.SorterSgd.Msuf32p4a.MutationRate
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -19,57 +19,6 @@ let dbVariableModR_64Name = "VariableModRates_64" |> UMX.tag<databaseName>
 
 
 
-let makeQueryParams
-        (dbName: string<databaseName>)
-        (repl: int<replNumber>)
-        (codeMod: string<codeModKey>)
-        (genCurrent: int<generationNumber>)
-        (sorterCtPerPool: int<sorterCountPerPool>)
-        (sorterPoolCt: int<sorterPoolCount>)
-        (para: float<paraRate>)
-        (selfSym: float<selfSymRate>)
-        (seedModR: float<seedModificationRate>)
-        (modR: float<modificationRate>)
-        (mmod: int<mutationMod>)
-        (outDt: outputDataType) : queryParams =
-
-    queryParams.create 
-        dbName 
-        projName
-        (Some repl)
-        (Some genCurrent)
-        outDt
-        [|
-            (runParameters.codeModKey, (Some codeMod) |> CodeModKey.toString)
-            (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
-            (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-            (runParameters.paraRateKey, (Some para) |> ParaRate.toString)
-            (runParameters.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
-            (runParameters.seedModificationRateKey, (Some seedModR) |> SeedModificationRate.toString)
-            (runParameters.modificationRateKey, (Some modR) |> ModificationRate.toString)
-            (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
-        |]
-
-
-let queryParamsFromRunParams
-                (dbName: string<databaseName>)
-                (rp: runParameters)
-                (odt: outputDataType) : queryParams option =
-    maybe {
-        let! repl = rp.GetRepl()
-        let! codeMod = rp.GetCodeModKey()
-        let! curGen = rp.GetGenerationCurrent()
-        let! scPP = rp.GetSorterCountPerPool()
-        let! spc = rp.GetSorterPoolCount()
-        let! para = rp.GetParaRate()
-        let! self = rp.GetSelfSymRate()
-        let! seedModR = rp.GetSeedModificationRate()
-        let! modR = rp.GetModificationRate()
-        let! mmod = rp.GetMutationMod()
-        return makeQueryParams dbName repl codeMod curGen scPP spc para self seedModR modR mmod odt
-    }
-
-
 let private withLocalParams (rp:runParameters) =
     let rpn = projectParams rp
     rpn.WithOrthoRate(Some 4.001<orthoRate>)
@@ -77,17 +26,15 @@ let private withLocalParams (rp:runParameters) =
 
 let private paramMapFilter (rp: runParameters) =
     Some rp
-
-do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projName %dbVariableModR_32Name) (queryParamsFromRunParams dbVariableModR_32Name)
-do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projName %dbVariableModR_64Name) (queryParamsFromRunParams dbVariableModR_64Name)
+do QueryParamsBuilders.registerAll ()
 
 let makeDatabase (dbName: string<databaseName>) : IGeneSortDb =
-    new GeneSortDbMp(makeFolderFromDbName dbName)
+    new GeneSortDbMp(makeFolderFromDbName dbName, "sorter-sgd.msuf32-mutation-rate")
 
 
 let createRunHost (spec: runHostSpec) : IRunHost =
     let db = makeDatabase spec.databaseName
-    let run = run.create spec.databaseName projName spec.runName spec.runDescription spec.spans
+    let run = run.createWithCatalogName spec.databaseName projName spec.runName spec.runDescription spec.spans spec.queryCatalogName
     runHost.Create db spec run :> IRunHost
 
 
@@ -108,6 +55,7 @@ module VarModR_32 =
 
 
     let Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
+        queryCatalogName = "sorter-sgd.msuf32-mutation-rate"
         databaseName = dbVariableModR_32Name
         runName = sprintf @"Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "Rate comp for Msrs32p4a Msuf4"
@@ -132,6 +80,7 @@ module VarModR_32 =
 
 
     let WideTest (executorType: sorterSgdExecutorType)  : runHostSpec = {
+        queryCatalogName = "sorter-sgd.msuf32-mutation-rate"
         databaseName = dbVariableModR_32Name
         runName = sprintf @"WideTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "Rate comp for Msrs32p4a Msuf4"

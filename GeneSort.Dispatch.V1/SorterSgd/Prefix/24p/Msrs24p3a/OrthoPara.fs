@@ -1,4 +1,4 @@
-﻿module GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.OrthoPara
+module GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.OrthoPara
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -16,51 +16,6 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 let globalSorterCount = 8192 |> UMX.tag<sorterCount>
 let dbOrthoPara32Name = "OrthoPara32" |> UMX.tag<databaseName>
-
-
-let makeQueryParams
-        (dbName: string<databaseName>)
-        (repl: int<replNumber>)
-        (codeMod: string<codeModKey>)
-        (genCurrent: int<generationNumber>)
-        (sorterCtPerPool: int<sorterCountPerPool>)
-        (sorterPoolCt: int<sorterPoolCount>)
-        (para: float<paraRate>)
-        (selfSym: float<selfSymRate>)
-        (mmod: int<mutationMod>)
-        (outDt: outputDataType) : queryParams =
-
-    queryParams.create 
-        dbName 
-        projName
-        (Some repl)
-        (Some genCurrent)
-        outDt
-        [|
-            (runParameters.codeModKey, (Some codeMod) |> CodeModKey.toString)
-            (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
-            (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-            (runParameters.paraRateKey, (Some para) |> ParaRate.toString)
-            (runParameters.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
-            (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
-        |]
-
-
-let queryParamsFromRunParams
-                (dbName: string<databaseName>)
-                (rp: runParameters)
-                (odt: outputDataType) : queryParams option =
-    maybe {
-        let! repl = rp.GetRepl()
-        let! codeMod = rp.GetCodeModKey()
-        let! curGen = rp.GetGenerationCurrent()
-        let! scPP = rp.GetSorterCountPerPool()
-        let! spc = rp.GetSorterPoolCount()
-        let! mmod = rp.GetMutationMod()
-        let! para = rp.GetParaRate()
-        let! self = rp.GetSelfSymRate()
-        return makeQueryParams dbName repl codeMod curGen scPP spc para self mmod odt
-    }
 
 
 let private withLocalParams (rp:runParameters) =
@@ -87,21 +42,22 @@ let private finishRunParams (host: IRunHost) (rp:runParameters) =
 
 
 
-do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projName %dbOrthoPara32Name) (queryParamsFromRunParams dbOrthoPara32Name)
+do QueryParamsBuilders.registerAll ()
 
 let makeDatabase (name: string<databaseName>) : IGeneSortDb =
-    new GeneSortDbMp(makeFolderFromDbName name)
+    new GeneSortDbMp(makeFolderFromDbName name, "sorter-sgd.msrs-ortho-para")
 
 
 let createRunHost (spec: runHostSpec) : IRunHost =
     let db = makeDatabase spec.databaseName
-    let run = run.create spec.databaseName projName spec.runName spec.runDescription spec.spans
+    let run = run.createWithCatalogName spec.databaseName projName spec.runName spec.runDescription spec.spans spec.queryCatalogName
     runHost.Create db spec run :> IRunHost
 
 
 module Specs =
 
     let PickMode2_2 (executorType: sorterSgdExecutorType)  : runHostSpec = {
+        queryCatalogName = "sorter-sgd.msrs-ortho-para"
         databaseName = dbOrthoPara32Name
         runName = sprintf @"PickMode2_2_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "OrthroPara rate comp for 24pfx3a Msrs, PickMode2_2"
@@ -122,6 +78,7 @@ module Specs =
     }
 
     let NoMods (executorType: sorterSgdExecutorType)  : runHostSpec = {
+        queryCatalogName = "sorter-sgd.msrs-ortho-para"
         databaseName = dbOrthoPara32Name
         runName = sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "OrthroPara rate comp for 24pfx3a Msrs, NoMods"

@@ -12,6 +12,7 @@
     <Compile Include="RunParameters.fs" />
     <Compile Include="QueryParams.fs" />
     <Compile Include="QueryParamsCatalog.fs" />
+    <Compile Include="QueryParamsBuilders.fs" />
     <Compile Include="QueryProperties.fs" />
     <Compile Include="Run.fs" />
     <Compile Include="OutputData.fs" />
@@ -30,6 +31,7 @@
     <ProjectReference Include="..\GeneSort.Model.Sorting.V1\GeneSort.Model.Sorting.V1.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingOps\GeneSort.SortingOps.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorting\GeneSort.Sorting.fsproj" />
+    <ProjectReference Include="..\GeneSort.SortingLib\GeneSort.SortingLib.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

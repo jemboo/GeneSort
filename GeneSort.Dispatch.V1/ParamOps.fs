@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1
+namespace GeneSort.Dispatch.V1
 open System
 open FSharp.UMX
 open GeneSort.Core
@@ -68,7 +68,7 @@ module ParamOps =
                     report progress (sprintf "%s Saving run parameters files: (%d)" (StringUtils.getTimestampString()) runParametersArray.Length)
                     return! saveParametersFiles 
                                 db
-                                (QueryParamsCatalog.get run.QueryCatalogName)
+                                (QueryParamsCatalog.get run.QueryCatalogName run.ProjectName run.DatabaseName)
                                 runParametersArray 
                                 allowOverwrite progress
             with e ->

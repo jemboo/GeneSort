@@ -20,36 +20,14 @@ module SortableTestDbs =
                        |> UMX.tag<pathToRootFolder>
 
 
-        let makeMergeQueryParams 
-                    (repl: int<replNumber>) 
-                    (mrgLibId: mergeLibId)
-                    (sortableDataFormat: sortableDataFormat) 
-                    (outputDataType: outputDataType) : queryParams =
+        let makeMergeQueryParams repl mergeLibId sortableDataFormat outputDataType =
+            QueryParamsBuilders.SortableTest.Merge.makeQueryParams projectName dbName repl mergeLibId sortableDataFormat outputDataType
 
-            queryParams.create 
-                dbName projectName
-                (Some repl)
-                None
-                outputDataType
-                [| 
-                   (runParameters.mergeLibIdKey, MergeLibId.toString mrgLibId);
-                   (runParameters.sortableDataFormatKey, SortableDataFormat.toString sortableDataFormat); 
-                |]
+        let makeMergeQueryParamsFromRunParams rp odt =
+            QueryParamsBuilders.SortableTest.Merge.queryParamsFromRunParams projectName dbName rp odt
 
-
-        let makeMergeQueryParamsFromRunParams 
-                        (rp: runParameters) 
-                        (odt: outputDataType) : queryParams option =
-            maybe {
-                let! repl = rp.GetRepl()
-                let! mrgLibId = rp.GetMergeLibId()
-                let! sdf = rp.GetSortableDataFormat()
-                return makeMergeQueryParams repl mrgLibId sdf odt
-            }
-
-
-        do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) makeMergeQueryParamsFromRunParams
-        let db = new GeneSortDbMp(dbFolder)
+        do QueryParamsBuilders.registerAll ()
+        let db = new GeneSortDbMp(dbFolder, "sortable-test.merge")
 
 
         let getMergeSorterTestSet
@@ -73,36 +51,14 @@ module SortableTestDbs =
                        |> UMX.tag<pathToRootFolder>
 
 
-        let makePrefixQueryParams 
-                    (repl: int<replNumber>) 
-                    (pfxId: prefixLibId)
-                    (sortableDataFormat: sortableDataFormat) 
-                    (outputDataType: outputDataType) : queryParams =
+        let makePrefixQueryParams repl prefixLibId sortableDataFormat outputDataType =
+            QueryParamsBuilders.SortableTest.Prefix.makeQueryParams projectName dbName repl prefixLibId sortableDataFormat outputDataType
 
-            queryParams.create
-                dbName projectName
-                (Some repl)
-                None
-                outputDataType
-                [| 
-                   (runParameters.prefixLibIdKey, PrefixLibId.toString pfxId);
-                   (runParameters.sortableDataFormatKey, SortableDataFormat.toString sortableDataFormat); 
-                |]
+        let makePrefixQueryParamsFromRunParams rp odt =
+            QueryParamsBuilders.SortableTest.Prefix.queryParamsFromRunParams projectName dbName rp odt
 
-
-        let makePrefixQueryParamsFromRunParams 
-                        (rp: runParameters) 
-                        (odt: outputDataType) : queryParams option =
-            maybe {
-                let! repl = rp.GetRepl()
-                let! pfxId = rp.GetPrefixLibId()
-                let! sdf = rp.GetSortableDataFormat()
-                return makePrefixQueryParams repl pfxId sdf odt
-            }
-
-
-        do QueryParamsCatalog.register (QueryParamsCatalog.nameForDatabase %projectName %dbName) makePrefixQueryParamsFromRunParams
-        let db = new GeneSortDbMp(dbFolder)
+        do QueryParamsBuilders.registerAll ()
+        let db = new GeneSortDbMp(dbFolder, "sortable-test.prefix")
 
 
 
@@ -133,6 +89,6 @@ module SortableTestDbs =
 
     let createRunHost (spec: runHostSpec) : IRunHost =
         let db = getDatabaseByName spec.databaseName
-        let run = run.create spec.databaseName projectName spec.runName spec.runDescription spec.spans
+        let run = run.createWithCatalogName spec.databaseName projectName spec.runName spec.runDescription spec.spans spec.queryCatalogName
         runHost.Create db spec run :> IRunHost
 

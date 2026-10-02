@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SortableTest
+namespace GeneSort.Dispatch.V1.SortableTest
 
 open FSharp.UMX
 open GeneSort.Project.V1
@@ -19,6 +19,7 @@ module SortableTestSpecsPrefix =
     module Specs =
 
         let Prefix_24s  (executorType: sortableTestExecutorType) : runHostSpec = {
+            queryCatalogName = "sortable-test.prefix"
             databaseName = SortableTestDbs.Prefix.dbName
             runName = sprintf @"Prefix-24s_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Bitv512 prefix sorter test sets"
@@ -33,6 +34,7 @@ module SortableTestSpecsPrefix =
         }
 
         let Prefix_32  (executorType: sortableTestExecutorType) : runHostSpec = {
+            queryCatalogName = "sortable-test.prefix"
             databaseName = SortableTestDbs.Prefix.dbName
             runName = sprintf @"Prefix-32_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Bitv512 prefix sorter test sets"

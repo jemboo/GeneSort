@@ -1,15 +1,17 @@
-﻿module Program
+module Program
 
 open System
 open System.Threading
 open GeneSort.Core.Mp
 open MessagePack
 open GeneSort.Dispatch.V1
+open GeneSort.Project.V1
 
 [<EntryPoint>]
 let main argv =
     // 1. Force MessagePack setup FIRST before opening or executing any dispatch logic
     MessagePackSetup.configure ()
+    QueryParamsBuilders.registerAll ()
 
     let startTime = DateTime.Now
     printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
@@ -20,7 +22,7 @@ let main argv =
     //DispatchSortableTest.makeParamsAndRun()
    // DispatchSorterEval.makeParamsAndRun()
     //DispatchSorterMutate.makeParamsAndRun()
-    DispatchSorterSgd.runRunParameters()
+    DispatchSorterSgd.makeParamsAndRun()
 
     let duration = DateTime.Now - startTime
     Thread.Sleep(100)

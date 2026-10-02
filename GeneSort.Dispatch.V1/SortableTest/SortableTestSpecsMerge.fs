@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SortableTest
+namespace GeneSort.Dispatch.V1.SortableTest
 
 open FSharp.UMX
 open GeneSort.Project.V1
@@ -25,6 +25,7 @@ module SortableTestSpecsMerge =
     module Specs =
 
         let Merge_Test  (executorType: sortableTestExecutorType) : runHostSpec = {
+            queryCatalogName = "sortable-test.merge"
             databaseName = SortableTestDbs.Merge.dbName
             runName = sprintf @"Merge-Test_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Int8 merge sorter test sets"
