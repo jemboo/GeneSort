@@ -51,7 +51,6 @@ module MsrsSgdDbs =
                 queryParams.create dbName projectName (Some repl) None odt
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                       (runParameters.generationLastKey, (Some genLast) |> GenerationNumber.toString)
                        (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                        (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                        (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)
@@ -147,7 +146,6 @@ module MsrsSgdDbs =
                 outputDataType
                 [| 
                     (runParameters.rngTypeKey, rng |> RngType.toString)
-                    (runParameters.generationLastKey, (Some genLast) |> GenerationNumber.toString)
                     (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
                     (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
                     (runParameters.sorterChildCountKey, (Some childCt) |> SorterChildCount.toString)

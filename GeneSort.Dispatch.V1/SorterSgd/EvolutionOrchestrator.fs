@@ -36,7 +36,7 @@ module EvolutionOrchestrator =
             let evalType = sorterEvalType.V2
             // Mandatory parameters
             let! genStart = rp.GetGenerationCurrent() |> Result.ofOption "Missing generationCurrent"
-            let! genIntervalCount = rp.GetGenerationIntervalCount() |> Result.ofOption "Missing genIntervalCount."
+            let! genIntervalLast = rp.GetGenerationIntervalLast() |> Result.ofOption "Missing generationIntervalLast."
             let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
             let! distinctSorterHashes = rp.GetDistinctSorterHashes() |> Result.ofOption "Missing distinctSorterHashes."
             let! sorterCountPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sorterCountPerPool."
@@ -53,20 +53,11 @@ module EvolutionOrchestrator =
             let optSorterPoolSelectionIntervals = rp.GetSorterPoolSelectionIntervals()
             let optPoolMeasure = rp.GetSorterPoolMeasure()
 
-            // 1. Extract save configs
-            // 2. Fetch the minimal sample set starting from genStart
-            let requiredCount = int genIntervalCount
-
-            let targetSamples = 
-                GenIntervalConfig.getSampleSetWithMinBound saveIntervals (%genStart - 1) requiredCount
-                |> Set.toArray
-                |> Array.sort
-
-            if targetSamples.Length < requiredCount then
-                return! Error (sprintf "Target generation sequence ended early: requested %d intervals from %d, but only obtained %d."
-                                        %genIntervalCount %genStart targetSamples.Length)
+            // Resume from the latest completed interval and stop at the configured absolute last interval.
+            if %genIntervalLast < %genStart then
+                return! Error (sprintf "generationIntervalLast (%d) is before the resumed generation (%d)." %genIntervalLast %genStart)
             else
-                let targetGenInt = targetSamples.[targetSamples.Length - 1]
+                let targetGenInt = %genIntervalLast
                 let totalGen = %targetGenInt : int<generationNumber>
 
                 // --- Frequency Triggers ---
@@ -77,6 +68,7 @@ module EvolutionOrchestrator =
 
                 let targetGenerationsForSaveResults = 
                     GenIntervalConfig.getSampleSetMaxBound saveIntervals targetGenInt
+                    |> Set.add targetGenInt
 
                 let targetGenerationsForSummaryReport = 
                     GenIntervalConfig.getSampleSetMaxBound subIntervals targetGenInt
