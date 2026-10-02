@@ -102,3 +102,28 @@ module VarModR_32 =
         allowOverwrite = false |> UMX.tag
         maxParallel = 8
     }
+
+
+    let Pool_32 (executorType: sorterSgdExecutorType)  : runHostSpec = {
+        queryCatalogName = "sorter-sgd.msuf32-mutation-rate"
+        databaseName = dbVariableModR_32Name
+        runName = sprintf @"WideTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+        runDescription = "Rate comp for Msrs32p4a Msuf4"
+        spans = [
+            (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
+            (runParameters.codeModKey, ["NoMods"] |> List.map string)
+            (runParameters.generationCurrentKey, [0] |> List.map string)
+            (runParameters.generationIntervalCountKey, [8] |> List.map string)
+            (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+            (runParameters.paraRateKey,    [1.001;] |> List.map string)
+            (runParameters.selfSymRateKey, [1.001; 1.5;]  |> List.map string)
+            (runParameters.mutationModKey, [0] |> List.map string)
+            (runParameters.seedModificationRateKey, [0.05;] |> List.map string)
+            (runParameters.modificationRateKey, [0.025; 0.030; 0.035; 0.040;] |> List.map string)
+            (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+        ]
+        filter = paramMapFilter
+        enhancer = finishRunParams
+        allowOverwrite = false |> UMX.tag
+        maxParallel = 8
+    }

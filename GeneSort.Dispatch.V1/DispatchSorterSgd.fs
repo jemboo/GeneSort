@@ -46,21 +46,21 @@ module DispatchSorterSgd =
     printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
-    //********** Msuf6SgdSpecsPrefix **********
-    let private executorType = sorterSgdExecutorType.GenPrefix
-    let private host: IRunHost = Msuf624p3b.MutationRate.createRunHost (Msuf624p3b.MutationRate.VarModR_32.Test executorType)
-
-    let private executor = SorterSgdExecutorType.getExecutor executorType
-    let private minReplica = 0<replNumber>
-    let private maxReplica = 1<replNumber>
-
-    ////********** Msuf4SgdSpecsPrefix **********
+    ////********** Msuf6SgdSpecsPrefix **********
     //let private executorType = sorterSgdExecutorType.SummaryReport
-    //let private host: IRunHost = Msuf32p4a.MutationRate.createRunHost (Msuf32p4a.MutationRate.VarModR_32.Test executorType)
+    //let private host: IRunHost = Msuf624p3b.MutationRate.createRunHost (Msuf624p3b.MutationRate.VarModR_32.Test executorType)
 
     //let private executor = SorterSgdExecutorType.getExecutor executorType
     //let private minReplica = 0<replNumber>
     //let private maxReplica = 1<replNumber>
+
+    //********** Msuf4SgdSpecsPrefix **********
+    let private executorType = sorterSgdExecutorType.SummaryReport
+    let private host: IRunHost = Msuf32p4a.MutationRate.createRunHost (Msuf32p4a.MutationRate.VarModR_32.Test executorType)
+
+    let private executor = SorterSgdExecutorType.getExecutor executorType
+    let private minReplica = 0<replNumber>
+    let private maxReplica = 1<replNumber>
 
     //********** MsrsSgdSpecsPrefix **********
     //let private executorType = sorterSgdExecutorType.GenPrefix
