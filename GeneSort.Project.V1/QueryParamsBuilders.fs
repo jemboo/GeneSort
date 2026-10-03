@@ -119,7 +119,7 @@ module QueryParamsBuilders =
                     return makeQueryParams projectName dbName repl codeMod curGen scPP spc modR para mmod odt
                 }
         module Msuf32MutationRate =
-            let makeQueryParams projectName dbName repl codeMod genCurrent sorterCtPerPool sorterPoolCt para selfSym seedModR modR mmod outDt =
+            let makeQueryParams projectName dbName repl codeMod genCurrent sorterCtPerPool sorterPoolCt para selfSym seedModR modR mmod mutVar outDt  =
                 queryParams.create dbName projectName (Some repl) (Some genCurrent) outDt
                     [|
                         (runParameters.codeModKey, (Some codeMod) |> CodeModKey.toString)
@@ -130,6 +130,7 @@ module QueryParamsBuilders =
                         (runParameters.seedModificationRateKey, (Some seedModR) |> SeedModificationRate.toString)
                         (runParameters.modificationRateKey, (Some modR) |> ModificationRate.toString)
                         (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
+                        (runParameters.mutatorVariantKey, mutVar |> MutatorVariant.toString)
                     |]
             let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
                 maybe {
@@ -143,7 +144,8 @@ module QueryParamsBuilders =
                     let! seedModR = rp.GetSeedModificationRate()
                     let! modR = rp.GetModificationRate()
                     let! mmod = rp.GetMutationMod()
-                    return makeQueryParams projectName dbName repl codeMod curGen scPP spc para self seedModR modR mmod odt
+                    let! mutVar = rp.GetMutatorVariant()
+                    return makeQueryParams projectName dbName repl codeMod curGen scPP spc para self seedModR modR mmod mutVar odt
                 }
 
         module Msrs32MutationRate =

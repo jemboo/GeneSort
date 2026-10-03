@@ -96,14 +96,36 @@ module SimpleSorterModelMutator =
             let opsTransitionRates = 
                 opsTransitionRates.createUniform2 opsActionRates
 
-            msuf4RandMutate.create 
-                    rngFactory 
-                    (Uf4MutationRates.makeUniform2 
-                                    (%sortingWidth) 
-                                    opsSeedTransitionRates 
-                                    opsTransitionRates )
-                    mutVariant
-            |> simpleSorterModelMutator.SmmMsuf4RandMutate
+            let msuf4Mutator =
+                match mutVariant with
+                | mutatorVariant.V1 ->
+                    msuf4RandMutate.create 
+                        rngFactory 
+                        (Uf4MutationRates.makeV1 
+                                        (%sortingWidth) 
+                                        opsSeedTransitionRates 
+                                        opsTransitionRates )
+                        mutVariant
+
+                | mutatorVariant.V2 ->
+                    msuf4RandMutate.create 
+                        rngFactory 
+                        (Uf4MutationRates.makeV1
+                                        (%sortingWidth) 
+                                        opsSeedTransitionRates 
+                                        opsTransitionRates )
+                        mutVariant
+
+                | mutatorVariant.V3 ->
+                    msuf4RandMutate.create 
+                        rngFactory 
+                        (Uf4MutationRates.makeV1
+                                        (%sortingWidth) 
+                                        opsSeedTransitionRates 
+                                        opsTransitionRates )
+                        mutVariant
+
+            msuf4Mutator |> simpleSorterModelMutator.SmmMsuf4RandMutate
 
 
     let getMsuf6ModelMutator 

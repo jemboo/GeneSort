@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 
-namespace GeneSort.WPF;
+namespace GeneSort.WPF.ViewModels;
 
 public sealed class FileSystemTreeNode : INotifyPropertyChanged
 {

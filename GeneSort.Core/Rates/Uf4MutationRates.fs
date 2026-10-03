@@ -58,33 +58,37 @@ type uf4MutationRates =
 
 module Uf4MutationRates =
 
-    let makeUniform (order: int) (seed4MutationRates: float) (twoOrbitMutationRate: float) =
-        if order < 4 || order % 4 <> 0 then
-            failwith $"Order must be at least 4 and divisible by 4, got {order}"
-        let mutRatesArrayLength = MathUtils.exactLog2 (order / 4)
-        let mutRatesArray = Array.init mutRatesArrayLength (fun _ -> opsTransitionRates.createUniform twoOrbitMutationRate)
-        { uf4MutationRates.order = order
-          seedOpsTransitionRates = opsTransitionRates.createUniform seed4MutationRates
-          twoOrbitPairOpsTransitionRates = opsTransitionRatesArray.create mutRatesArray }
-
-    let makeUniform2 
-                    (order: int) 
-                    (seedRates: opsTransitionRates) 
-                    (twoOrbitRates: opsTransitionRates) :uf4MutationRates =
+    let makeV1 (order: int) 
+               (seedRates: opsTransitionRates) 
+               (twoOrbitRates: opsTransitionRates) : uf4MutationRates =
         uf4MutationRates.createUniform order seedRates twoOrbitRates
 
 
-    let biasTowards (order: int) 
-                    (perm_RsMutationRate: float) 
-                    (twoOrbitType: twoOrbitType) 
-                    (baseAmt: float) 
-                    (biasAmt: float) =
+    let makeV2 (order: int) 
+               (seed4MutationRates: float) 
+               (twoOrbitMutationRate: float) : uf4MutationRates =
+        if order < 4 || order % 4 <> 0 then
+            failwith $"Order must be at least 4 and divisible by 4, got {order}"
+        let mutRatesArrayLength = MathUtils.exactLog2 (order / 4)
+        let arrayRates = MathUtils.arrayInterpolationU seed4MutationRates twoOrbitMutationRate mutRatesArrayLength
+        let mutRatesArray = arrayRates |> Array.map (fun rate -> opsTransitionRates.createUniform rate)
+        uf4MutationRates.create order
+            (opsTransitionRates.createUniform seed4MutationRates)
+            (opsTransitionRatesArray.create mutRatesArray)
+
+
+    let makeV3 (order: int) 
+               (perm_RsMutationRate: float) 
+               (twoOrbitType: twoOrbitType) 
+               (baseAmt: float) 
+               (biasAmt: float) =
         if order < 4 || order % 4 <> 0 then
             failwith $"Order must be at least 4 and divisible by 4, got {order}"
         let mutRatesBaseArrayLength = MathUtils.exactLog2 (order / 4) - 1
         let mutRatesBaseArray = Array.init mutRatesBaseArrayLength (fun _ -> opsTransitionRates.createUniform baseAmt)
         let lastGenRates = opsTransitionRates.createBiased twoOrbitType baseAmt biasAmt
         let genRatesArray = Array.append mutRatesBaseArray [|lastGenRates|]
-        { uf4MutationRates.order = order
-          seedOpsTransitionRates = opsTransitionRates.createUniform perm_RsMutationRate
-          twoOrbitPairOpsTransitionRates = opsTransitionRatesArray.create genRatesArray }
+        uf4MutationRates.create 
+            order
+            (opsTransitionRates.createUniform perm_RsMutationRate)
+            (opsTransitionRatesArray.create genRatesArray)

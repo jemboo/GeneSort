@@ -4,23 +4,10 @@ using System.Windows.Data;
 using System.Windows.Media;
 using System.Data;
 using System.IO;
+using GeneSort.WPF.Views;
+using GeneSort.WPF.ViewModels;
 
-namespace GeneSort.WPF;
-
-public enum OutputDataKind
-{
-    Unknown,
-    Run,
-    RunParameters,
-    SortableTest,
-    SorterPoolSet,
-    SorterPoolSetSummarySet,
-    SorterSet,
-    SorterSetEval,
-    SorterPoolBinsSetSeries,
-    SorterPoolSetHistory,
-    TextReport
-}
+namespace GeneSort.WPF.Controls;
 
 /// <summary>Shared structure for the output-specific viewers. Each concrete control
 /// gives the serialized output a type-specific heading and context.</summary>
@@ -187,10 +174,10 @@ public sealed class FileSelectionDetailsControl : UserControl
             Foreground = new SolidColorBrush(Color.FromRgb(23, 43, 67)),
             Margin = new Thickness(0, 0, 0, 16)
         });
-        AddBoundDetail(details, "Name", nameof(MainWindow.SelectionTitle), FontWeights.SemiBold);
-        AddBoundDetail(details, "Type", nameof(MainWindow.SelectionType));
-        AddBoundDetail(details, "Path", nameof(MainWindow.SelectionPath));
-        AddBoundDetail(details, "Size", nameof(MainWindow.SelectionSize));
+        AddBoundDetail(details, "Name", "SelectionTitle", FontWeights.SemiBold);
+        AddBoundDetail(details, "Type", "SelectionType");
+        AddBoundDetail(details, "Path", "SelectionPath");
+        AddBoundDetail(details, "Size", "SelectionSize");
         Content = new ScrollViewer
         {
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,

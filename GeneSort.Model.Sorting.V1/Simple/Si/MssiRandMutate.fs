@@ -74,13 +74,27 @@ type mssiRandMutate =
 
 
         // Mutate the array using the uniform rates module
-        let mutated = OpActionRates.mutate2 
-                        this.OpActionRates 
-                        orthoMutator 
-                        paraMutator 
-                        (rng.NextFloat)
-                        evalo
-                        parent.Perm_Sis
+        let mutated =
+            match this.MutatorVariant with
+            | mutatorVariant.V1 -> 
+                OpActionRates.mutateV1 
+                    this.OpActionRates 
+                    orthoMutator 
+                    paraMutator 
+                    (rng.NextFloat)
+                    parent.Perm_Sis
+
+            | mutatorVariant.V2 ->
+                OpActionRates.mutateV2 
+                                this.OpActionRates 
+                                orthoMutator 
+                                paraMutator 
+                                (rng.NextFloat)
+                                evalo
+                                parent.Perm_Sis
+
+            | mutatorVariant.V3 ->
+                failwith "V3 mutator variant not implemented for mssiRandMutate"
                         
         mssi.create id parent.SortingWidth mutated
 

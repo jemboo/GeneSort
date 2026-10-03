@@ -85,7 +85,7 @@ type opActionRates =
 module OpActionRates =
 
     /// Mutates an array of PermSi using a single uniform opActionRates.
-    let mutate 
+    let mutateV1 
         (rates: opActionRates) 
         (orthoMutator: permSi -> permSi) 
         (paraMutator: permSi -> permSi) 
@@ -100,7 +100,7 @@ module OpActionRates =
         )
 
 
-    let mutate2
+    let mutateV2
         (rates: opActionRates) 
         (orthoMutator: permSi -> permSi)
         (paraMutator: permSi -> permSi)

@@ -67,10 +67,18 @@ type msuf4RandMutate =
         let width = parent.SortingWidth
 
         let mutatedUnfolders = 
-            unfolderArray
-            |> Array.map (fun unfolder ->
-                RandomUnfolderOps4.mutateTwoOrbitUf4 rng.NextFloat rates unfolder)
-                
+            match this.MutatorVariant with
+            | mutatorVariant.V1 -> 
+                unfolderArray
+                |> Array.map (fun unfolder ->
+                    RandomUnfolderOps4.mutateTwoOrbitUf4v1 rng.NextFloat rates unfolder)
+            | mutatorVariant.V2 ->
+                unfolderArray
+                |> Array.map (fun unfolder ->
+                    RandomUnfolderOps4.mutateTwoOrbitUf4v2 rng.NextFloat rates unfolder)
+            | mutatorVariant.V3 ->
+                failwith "V3 mutator variant not implemented for msuf4RandMutate"
+
         msuf4.create id width mutatedUnfolders
 
     member this.MakeSorterModelFromIndexAndMod 

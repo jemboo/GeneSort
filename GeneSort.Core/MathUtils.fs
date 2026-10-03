@@ -34,4 +34,20 @@ module MathUtils =
         order > 0 && (order &&& (order - 1)) = 0
 
 
+    /// Performs linear interpolation between two float values, with both endpoints included,
+    /// total array length of k.
+    let arrayInterpolation (x0: float) (x1: float) (k: int) : float [] =
+        if k < 2 then
+            invalidArg "k" "k must be at least 2 for interpolation"
+        let step = (x1 - x0) / float (k - 1)
+        Array.init k (fun i -> x0 + step * float i)
+
+
+    /// Performs linear interpolation between two float values, with the max endpoint included
+    /// total array length of k.
+    let arrayInterpolationU (x0: float) (x1: float) (k: int) : float [] =
+        if k < 2 then
+            invalidArg "k" "k must be at least 2 for interpolation"
+        let step = (x1 - x0) / float k
+        Array.init k (fun i -> x0 + step * float (i + 1))
 
