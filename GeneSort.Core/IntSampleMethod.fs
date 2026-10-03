@@ -165,6 +165,22 @@ module GenIntervalConfig =
         let method = IntSampleMethod.fromString methodStr
         { Name = name; Min = min; MaxCount = maxCount; Scale = scale; Method = method }
 
+    /// Returns the zero-based sample at the requested index after applying the config scale.
+    /// Returns None when the index is negative or beyond MaxCount.
+    let getSampleAtIndex (config: genIntervalConfig) (index: int) : int option =
+        if index < 0 then
+            None
+        else
+            let rawSeq = IntSampleMethod.generateUnbounded config.Method config.Min
+            let boundedSeq =
+                match config.MaxCount with
+                | Some maxCount -> rawSeq |> Seq.take (max 0 maxCount)
+                | None -> rawSeq
+
+            boundedSeq
+            |> Seq.map (fun sample -> int (ceil (float sample * config.Scale)))
+            |> Seq.tryItem index
+
 
     /// Evaluates the method to yield a scaled set of integer samples constrained by maxBound.
     let getSampleSetMaxBound (config: genIntervalConfig) (maxBound: int) : Set<int> =

@@ -35,7 +35,6 @@ module EvolutionOrchestrator =
         asyncResult {
             let evalType = sorterEvalType.V2
             // Mandatory parameters
-            let! genStart = rp.GetGenerationCurrent() |> Result.ofOption "Missing generationCurrent"
             let! genIntervalLast = rp.GetGenerationIntervalLast() |> Result.ofOption "Missing generationIntervalLast."
             let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
             let! distinctSorterHashes = rp.GetDistinctSorterHashes() |> Result.ofOption "Missing distinctSorterHashes."
@@ -52,12 +51,15 @@ module EvolutionOrchestrator =
             let optSorterPoolExpansionRate = rp.GetSorterPoolExpansionRate()
             let optSorterPoolSelectionIntervals = rp.GetSorterPoolSelectionIntervals()
             let optPoolMeasure = rp.GetSorterPoolMeasure()
+            let genStart = initialPoolSet.GenerationNumber
+            let! targetGenInt =
+                GenIntervalConfig.getSampleAtIndex saveIntervals %genIntervalLast
+                |> Result.ofOption (sprintf "generationIntervalLast index %d is not available in saveIntervals '%s'." %genIntervalLast saveIntervals.Name)
 
-            // Resume from the latest completed interval and stop at the configured absolute last interval.
-            if %genIntervalLast < %genStart then
-                return! Error (sprintf "generationIntervalLast (%d) is before the resumed generation (%d)." %genIntervalLast %genStart)
+            // Resume from the latest completed interval and stop at the configured interval index.
+            if targetGenInt < %genStart then
+                return! Error (sprintf "generationIntervalLast index %d resolves to generation %d, before the resumed generation %d." %genIntervalLast targetGenInt %genStart)
             else
-                let targetGenInt = %genIntervalLast
                 let totalGen = %targetGenInt : int<generationNumber>
 
                 // --- Frequency Triggers ---

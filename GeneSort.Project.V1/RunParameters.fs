@@ -162,7 +162,7 @@ type runParameters =
 
     member this.GetGenerationIntervalLast() =
         runParameters.tryGetInt runParameters.generationIntervalLastKey this.paramMap
-        |> Option.map UMX.tag<generationNumber>
+        |> Option.map UMX.tag<generationIntervalLast>
 
     member this.GetId() =
         runParameters.tryGetGuid runParameters.idKey this.paramMap
@@ -414,7 +414,7 @@ type runParameters =
     member this.WithGenerationIntervalCount(count: int<generationIntervalCount> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationIntervalCountKey (count |> Option.map UmxExt.intToRaw) }
 
-    member this.WithGenerationIntervalLast(last: int<generationNumber> option) =
+    member this.WithGenerationIntervalLast(last: int<generationIntervalLast> option) =
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationIntervalLastKey (last |> Option.map UmxExt.intToRaw) }
 
     member this.WithId(id: Guid<queryParamsId> option) = 

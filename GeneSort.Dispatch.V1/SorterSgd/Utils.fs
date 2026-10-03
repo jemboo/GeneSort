@@ -58,8 +58,6 @@ module Utils =
             (log: string -> unit) : Async<seq<'T>> =
         async {
             let genSequence = GenIntervalConfig.getSamplesWithMinBound saveConfig %startingGen
-            let yab = genSequence |> Seq.toList
-            let qua = yab.Length
             let rec discoverLazy (gens: int seq) = seq {
                 match Seq.tryHead gens with
                 | None -> ()

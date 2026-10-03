@@ -55,6 +55,34 @@ module VarModR_32 =
                 .WithSelectedSorterCountPerPool(Some scpp)
 
 
+
+    let Pool_32_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
+        queryCatalogName = "sorter-sgd.msuf32-mutation-rate"
+        databaseName = dbPool32name
+        runName = sprintf @"Pool_32_V1%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+        runDescription = "Rate comp for Msrs32p4a Msuf4"
+        spans = [
+            (runParameters.sorterCountPerPoolSetKey, [32] |> List.map string)
+            (runParameters.codeModKey, ["NoMods"] |> List.map string)
+            (runParameters.generationIntervalLastKey, [2] |> List.map string)
+            (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+            (runParameters.paraRateKey,    [1.15;] |> List.map string)
+            (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
+            (runParameters.mutationModKey, [0] |> List.map string)
+            (runParameters.seedModificationRateKey, [0.050;] |> List.map string)
+            (runParameters.modificationRateKey, [0.050;] |> List.map string)
+            (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+        ]
+        filter = paramMapFilter
+        enhancer = finishRunParams
+        allowOverwrite = false |> UMX.tag
+        maxParallel = 1
+    }
+
+
+
+
+
     let Pool_32_V1 (executorType: sorterSgdExecutorType)  : runHostSpec = {
         queryCatalogName = "sorter-sgd.msuf32-mutation-rate"
         databaseName = dbPool32name
@@ -63,7 +91,7 @@ module VarModR_32 =
         spans = [
             (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
             (runParameters.codeModKey, ["NoMods"] |> List.map string)
-            (runParameters.generationIntervalLastKey, [1] |> List.map string)
+            (runParameters.generationIntervalLastKey, [2] |> List.map string)
             (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
             (runParameters.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
             (runParameters.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
