@@ -63,7 +63,6 @@ type opsTransitionRates =
         | opsGenMode.SelfRefl -> this.selfReflRates.PickModeWithDefault opsGenMode floatPicker
 
 
-
     member this.toString() =
         sprintf "TwoOrbitPairActionRates(Ortho: %s, Para: %s, SelfRefl: %s)"
                 (this.orthoRates.toString())

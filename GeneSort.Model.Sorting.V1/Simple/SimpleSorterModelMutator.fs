@@ -99,21 +99,24 @@ module SimpleSorterModelMutator =
             let uf4MutRates =
                 match mutVariant with
                 | mutatorVariant.V1 ->
-                        (Uf4MutationRates.makeV1 
-                                        (%sortingWidth) 
-                                        opsSeedTransitionRates 
-                                        opsTransitionRates )
+                        Uf4MutationRates.makeV1 
+                            %sortingWidth 
+                            %seedModificationRate
+                            %modificationRate
+                            %orthoRate
+                            %paraRate
+                            %selfSymRate
                 | mutatorVariant.V2 ->
-                        (Uf4MutationRates.makeV1
-                                        (%sortingWidth) 
-                                        opsSeedTransitionRates 
-                                        opsTransitionRates )
+                        Uf4MutationRates.makeV2
+                            %sortingWidth 
+                            %seedModificationRate
+                            %modificationRate
+                            %orthoRate
+                            %paraRate
+                            %selfSymRate
 
                 | mutatorVariant.V3 ->
-                        (Uf4MutationRates.makeV1
-                                        (%sortingWidth) 
-                                        opsSeedTransitionRates 
-                                        opsTransitionRates )
+                        failwith "V3 mutator variant is not yet implemented for Msuf4RandMutate"
 
 
 
