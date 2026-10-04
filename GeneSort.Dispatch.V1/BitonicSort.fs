@@ -73,7 +73,7 @@ module BitonicSort =
         findDepth network 0 Set.empty
 
     /// Format a comparator for display
-    let formatComparator (i: int, j: int) : string =
+    let formatComparator (i: int) (j: int) : string =
         sprintf "(%d, %d)" i j
 
     /// Print the network in a readable format
@@ -83,8 +83,8 @@ module BitonicSort =
         printfn "Total comparators: %d" (countComparators network)
         printfn "Depth: %d" (calculateDepth network)
         printfn "\nComparators (i, j) - ensures arr[i] <= arr[j]:"
-        network |> List.iteri (fun idx comp -> 
-            printfn "%3d: %s" (idx + 1) (formatComparator comp))
+        network |> List.iteri (fun idx (i, j) ->
+            printfn "%3d: %s" (idx + 1) (formatComparator i j))
 
     /// Apply the sorting network to an array
     let applySortingNetwork (network: Comparator list) (arr: 'a array) : 'a array =
