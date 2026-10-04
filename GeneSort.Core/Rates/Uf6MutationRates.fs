@@ -56,13 +56,13 @@ module Uf6MutationRates =
     let makeUniform (order: int) (seed6MutationRates: float) (twoOrbitMutationRate: float) 
          : uf6MutationRates =
         let mutRatesArrayLength = MathUtils.exactLog2 (order / 6)
-        let mutRatesArray = Array.init mutRatesArrayLength (fun _ -> opsTransitionRates.createUniform(twoOrbitMutationRate))
+        let mutRatesArray = Array.init mutRatesArrayLength (fun _ -> opsTransitionRates.createUniformFromFloat(twoOrbitMutationRate))
         uf6MutationRates.create 
             order 
             (seed6TransitionRates.createUniform(seed6MutationRates))
             (opsTransitionRatesArray.create mutRatesArray)
 
-    let makeUniform2 
+    let makeUniformFromRates 
             (order: int) 
             (seed6TransitionRates: seed6TransitionRates) 
             (rates: opsTransitionRates) : uf6MutationRates =
@@ -71,7 +71,7 @@ module Uf6MutationRates =
     let biasTowards (order: int) (seed6MutationRates: float) (twoOrbitType: twoOrbitType) (baseAmt: float) (biasAmt: float) 
          : uf6MutationRates =
         let mutRatesBaseListLength = MathUtils.exactLog2 (order / 6) - 1
-        let mutRatesBaseList = List.init mutRatesBaseListLength (fun _ -> opsTransitionRates.createUniform(baseAmt))
+        let mutRatesBaseList = List.init mutRatesBaseListLength (fun _ -> opsTransitionRates.createUniformFromFloat(baseAmt))
         let lastGenRates = opsTransitionRates.createBiased twoOrbitType baseAmt biasAmt
         let genRatesListWithLast = mutRatesBaseList @ [lastGenRates]
         uf6MutationRates.create 

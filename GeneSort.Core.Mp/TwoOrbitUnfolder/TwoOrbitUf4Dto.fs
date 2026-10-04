@@ -20,7 +20,7 @@ type twoOrbitUf4Dto =
 module TwoOrbitUf4Dto =
 
     let fromDomain (tou: twoOrbitUf4) : twoOrbitUf4Dto =
-        { seedType = tou.TwoOrbitPairType
+        { seedType = tou.SeedTwoOrbitPairType
           twoOrbitUfStepDtos = tou.TwoOrbitUnfolderSteps |> Array.map TwoOrbitUnfolderStepDto.fromDomain }
 
     let toDomain (dto: twoOrbitUf4Dto) : twoOrbitUf4 =

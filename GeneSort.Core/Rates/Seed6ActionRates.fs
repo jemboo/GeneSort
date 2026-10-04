@@ -25,8 +25,8 @@ type seed6ActionRates =
             selfReflThresh: float
         }
 
-    static member create (ortho1Rate: float, ortho2Rate: float, para1Rate: float, para2Rate: float, 
-                         para3Rate: float, para4Rate: float, selfReflRate: float) : seed6ActionRates =
+    static member create (ortho1Rate: float) (ortho2Rate: float) (para1Rate: float) 
+                         (para2Rate: float) (para3Rate: float) (para4Rate: float) (selfReflRate: float) : seed6ActionRates =
         let noAction = 1.0 - ortho1Rate - ortho2Rate - para1Rate - para2Rate - para3Rate - para4Rate - selfReflRate
         let epsilon = 1e-10
         if ortho1Rate < 0.0 || ortho1Rate > 1.0 then failwith "ortho1Rate must be between 0 and 1"
@@ -49,7 +49,7 @@ type seed6ActionRates =
 
     static member createUniform (amt: float) : seed6ActionRates =
         let rate = amt / 7.0
-        seed6ActionRates.create(rate, rate, rate, rate, rate, rate, rate)
+        seed6ActionRates.create rate rate rate rate rate rate rate
 
     static member createBiased (mode: seed6ActionMode, baseAmt: float, biasAmt: float) : seed6ActionRates =
         if baseAmt < 0.0 || baseAmt > 1.0 then failwith "baseAmt must be between 0 and 1"
@@ -58,13 +58,13 @@ type seed6ActionRates =
         if adjustedBase < 0.0 then failwith "Adjusted base rate must not be negative"
         let biasedRate = baseAmt + biasAmt
         match mode with
-        | seed6ActionMode.Ortho1 -> seed6ActionRates.create(biasedRate, adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase)
-        | seed6ActionMode.Ortho2 -> seed6ActionRates.create(adjustedBase, biasedRate, adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase)
-        | seed6ActionMode.Para1 -> seed6ActionRates.create(adjustedBase, adjustedBase, biasedRate, adjustedBase, adjustedBase, adjustedBase, adjustedBase)
-        | seed6ActionMode.Para2 -> seed6ActionRates.create(adjustedBase, adjustedBase, adjustedBase, biasedRate, adjustedBase, adjustedBase, adjustedBase)
-        | seed6ActionMode.Para3 -> seed6ActionRates.create(adjustedBase, adjustedBase, adjustedBase, adjustedBase, biasedRate, adjustedBase, adjustedBase)
-        | seed6ActionMode.Para4 -> seed6ActionRates.create(adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase, biasedRate, adjustedBase)
-        | seed6ActionMode.SelfRefl -> seed6ActionRates.create(adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase, adjustedBase, biasedRate)
+        | seed6ActionMode.Ortho1 -> seed6ActionRates.create biasedRate adjustedBase adjustedBase adjustedBase adjustedBase adjustedBase adjustedBase
+        | seed6ActionMode.Ortho2 -> seed6ActionRates.create adjustedBase biasedRate adjustedBase adjustedBase adjustedBase adjustedBase adjustedBase
+        | seed6ActionMode.Para1 -> seed6ActionRates.create adjustedBase adjustedBase biasedRate adjustedBase adjustedBase adjustedBase adjustedBase
+        | seed6ActionMode.Para2 -> seed6ActionRates.create adjustedBase adjustedBase adjustedBase biasedRate adjustedBase adjustedBase adjustedBase
+        | seed6ActionMode.Para3 -> seed6ActionRates.create adjustedBase adjustedBase adjustedBase adjustedBase biasedRate adjustedBase adjustedBase
+        | seed6ActionMode.Para4 -> seed6ActionRates.create adjustedBase adjustedBase adjustedBase adjustedBase adjustedBase biasedRate adjustedBase
+        | seed6ActionMode.SelfRefl -> seed6ActionRates.create adjustedBase adjustedBase adjustedBase adjustedBase adjustedBase adjustedBase biasedRate
         | seed6ActionMode.NoAction -> failwith "NoAction mode is not valid for Seed6ActionRates"
 
 

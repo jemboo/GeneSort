@@ -16,7 +16,7 @@ type twoOrbitUf4 = private { seedType: twoOrbitPairType; twoOrbitUnfolderSteps: 
     member this.Order with get() : int  =
             4 * (MathUtils.integerPower 2 (Array.length this.twoOrbitUnfolderSteps))
 
-    member this.TwoOrbitPairType with get() : twoOrbitPairType  =
+    member this.SeedTwoOrbitPairType with get() : twoOrbitPairType  =
             this.seedType
 
     member this.TwoOrbitUnfolderSteps with get() : twoOrbitUfStep array  =
@@ -39,7 +39,7 @@ type twoOrbitUf4 = private { seedType: twoOrbitPairType; twoOrbitUnfolderSteps: 
     member this.MakePerm_Si : permSi =
             let seedTwoOrbitPairs = 
                 this.seedType 
-                    |> TwoOrbit.getTwoOrbits 
+                    |> TwoOrbit.getCannonicalTwoOrbits 
                     |> TwoOrbitPairOps.fromTwoOrbits 4 |> Seq.toArray
 
             let twoOrbitPairs = 

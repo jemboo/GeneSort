@@ -57,7 +57,7 @@ module OpsActionRatesArray =
                       (paraRate:float) 
                       (selfSymRate :float): opsActionRatesArray =
         if length <= 0 then failwith "Length must be positive"
-        let rates = Array.init length (fun _ -> opsActionRates.create(orthoRate, paraRate, selfSymRate))
+        let rates = Array.init length (fun _ -> opsActionRates.create orthoRate paraRate selfSymRate)  
         opsActionRatesArray.create rates
 
     // Smooth variation: Linear interpolation from startRates to endRates
@@ -69,7 +69,7 @@ module OpsActionRatesArray =
                 let o = startRates.OrthoRate + t * (endRates.OrthoRate - startRates.OrthoRate)
                 let p = startRates.ParaRate + t * (endRates.ParaRate - startRates.ParaRate)
                 let s = startRates.SelfReflRate + t * (endRates.SelfReflRate - startRates.SelfReflRate)
-                opsActionRates.create (o, p, s))
+                opsActionRates.create o p s)
         opsActionRatesArray.create rates
 
     // Smooth variation: Sinusoidal variation around base rates
@@ -81,7 +81,7 @@ module OpsActionRatesArray =
                 let o = clamp (baseRates.OrthoRate + amplitudes.OrthoRate * Math.Sin(t)) 0.0 1.0
                 let p = clamp (baseRates.ParaRate + amplitudes.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0
                 let s = clamp (baseRates.SelfReflRate + amplitudes.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0
-                opsActionRates.create (o, p, s))
+                opsActionRates.create o p s)
         opsActionRatesArray.create rates
 
     // Hot spot: Gaussian peak at specified index
@@ -96,7 +96,7 @@ module OpsActionRatesArray =
                 let o = baseRates.OrthoRate + (hotSpotRates.OrthoRate - baseRates.OrthoRate) * weight
                 let p = baseRates.ParaRate + (hotSpotRates.ParaRate - baseRates.ParaRate) * weight
                 let s = baseRates.SelfReflRate + (hotSpotRates.SelfReflRate - baseRates.SelfReflRate) * weight
-                opsActionRates.create (o, p, s))
+                opsActionRates.create o p s)
         opsActionRatesArray.create rates
 
     // Hot spot: Step function creating a region of elevated rates
@@ -106,7 +106,7 @@ module OpsActionRatesArray =
         let rates =
             Array.init length (fun i ->
                 let rates = if i >= hotSpotStart && i <= hotSpotEnd then hotSpotRates else baseRates
-                opsActionRates.create (rates.OrthoRate, rates.ParaRate, rates.SelfReflRate))
+                opsActionRates.create rates.OrthoRate rates.ParaRate rates.SelfReflRate)
         opsActionRatesArray.create rates
 
     /// Mutates an array based on the provided rates. Returns a new array.

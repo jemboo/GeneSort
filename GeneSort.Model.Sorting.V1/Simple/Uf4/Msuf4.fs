@@ -20,15 +20,15 @@ type msuf4 =
     static member create 
             (id: Guid<sorterModelId>) 
             (sortingWidth: int<sortingWidth>) 
-            (twoOrbitUnfolder4s: twoOrbitUf4 array) : msuf4 =
-        if twoOrbitUnfolder4s.Length < 1 then
-            failwith $"Must have at least 1 TwoOrbitUnfolder4, got %d{twoOrbitUnfolder4s.Length}"
+            (twoOrbitUf4s: twoOrbitUf4 array) : msuf4 =
+        if twoOrbitUf4s.Length < 1 then
+            failwith $"Must have at least 1 TwoOrbitUnfolder4, got %d{twoOrbitUf4s.Length}"
         else if %sortingWidth < 1 then
             failwith $"SortingWidth must be at least 1, got {%sortingWidth}"
-        else if twoOrbitUnfolder4s |> Array.exists (fun tou -> tou.Order <> %sortingWidth) then
+        else if twoOrbitUf4s |> Array.exists (fun tou -> tou.Order <> %sortingWidth) then
             failwith $"All TwoOrbitUnfolder4 must have order {%sortingWidth}"
         else
-            { id = id; sortingWidth = sortingWidth; twoOrbitUnfolder4s = twoOrbitUnfolder4s }
+            { id = id; sortingWidth = sortingWidth; twoOrbitUnfolder4s = twoOrbitUf4s }
 
     member this.Id with get () = this.id
     member this.CeLength with get () = (this.StageLength * %this.SortingWidth / 2) |> UMX.tag<ceLength>

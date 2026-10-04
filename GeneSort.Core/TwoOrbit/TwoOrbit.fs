@@ -93,20 +93,6 @@ module TwoOrbit =
         orbit.Equals(reflected)
 
         
-    ///// Gets the TwoOrbitType.
-    ///// <param name="order">The order (must be non-negative and even).</param>
-    ///// <param name="orbit">The TwoOrbit to check.</param>
-    //let getTwoOrbitType (order: int) (orbit: TwoOrbit) : TwoOrbitType =
-    //    if (isReflectionSymmetric order orbit) then
-    //        TwoOrbitType.SelfRefl
-    //    else if snd orbit.IndicesTuple > order / 2 then
-    //        if (fst orbit.IndicesTuple >= order / 2) then
-    //            TwoOrbitType.Ortho
-    //        else
-    //            TwoOrbitType.Para
-    //    else
-    //        TwoOrbitType.Ortho
-        
     /// Gets the TwoOrbitType.
     /// <param name="order">The order (must be non-negative and even).</param>
     /// <param name="orbit">The TwoOrbit to check.</param>
@@ -123,7 +109,7 @@ module TwoOrbit =
 
 
 
-    let getTwoOrbits (topType:twoOrbitPairType) : twoOrbit list =
+    let getCannonicalTwoOrbits (topType:twoOrbitPairType) : twoOrbit list =
         match topType with
         | twoOrbitPairType.Ortho -> [twoOrbit.create [0; 1]; twoOrbit.create [2; 3]]
         | twoOrbitPairType.Para -> [twoOrbit.create [0; 2]; twoOrbit.create [1; 3]]

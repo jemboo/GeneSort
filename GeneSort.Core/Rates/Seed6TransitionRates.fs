@@ -14,9 +14,9 @@ type seed6TransitionRates =
             selfReflRates: seed6ActionRates
         }
 
-    static member create (ortho1Rates: seed6ActionRates, ortho2Rates: seed6ActionRates, para1Rates: seed6ActionRates, 
-                         para2Rates: seed6ActionRates, para3Rates: seed6ActionRates, para4Rates: seed6ActionRates, 
-                         selfReflRates: seed6ActionRates) : seed6TransitionRates =
+    static member create (ortho1Rates: seed6ActionRates) (ortho2Rates: seed6ActionRates) (para1Rates: seed6ActionRates) 
+                         (para2Rates: seed6ActionRates) (para3Rates: seed6ActionRates) (para4Rates: seed6ActionRates) 
+                         (selfReflRates: seed6ActionRates) : seed6TransitionRates =
         { 
             ortho1Rates = ortho1Rates
             ortho2Rates = ortho2Rates
@@ -29,7 +29,7 @@ type seed6TransitionRates =
 
     static member createUniform (amt: float) : seed6TransitionRates =
         let rates = seed6ActionRates.createUniform amt
-        seed6TransitionRates.create(rates, rates, rates, rates, rates, rates, rates)
+        seed6TransitionRates.create rates rates rates rates rates rates rates
 
 
     static member createBiased (seed6GenMode: seed6GenMode) (baseAmt:float) (biasAmt:float) : seed6TransitionRates =
@@ -42,7 +42,7 @@ type seed6TransitionRates =
             let para3Rates = seed6ActionRates.createBiased(seed6ActionMode.Ortho1, baseAmt, biasAmt)
             let para4Rates = seed6ActionRates.createBiased(seed6ActionMode.Ortho1, baseAmt, biasAmt)
             let selfReflRates = seed6ActionRates.createBiased(seed6ActionMode.Ortho1, baseAmt, biasAmt)
-            seed6TransitionRates.create(ortho1Rates, ortho2Rates, para1Rates, para2Rates, para3Rates, para4Rates, selfReflRates)
+            seed6TransitionRates.create ortho1Rates ortho2Rates para1Rates para2Rates para3Rates para4Rates selfReflRates
         | seed6GenMode.Ortho2 ->
             let ortho1Rates = seed6ActionRates.createBiased(seed6ActionMode.Ortho2, baseAmt, biasAmt)
             let ortho2Rates = seed6ActionRates.createBiased(seed6ActionMode.Ortho2, baseAmt, biasAmt)
@@ -51,7 +51,7 @@ type seed6TransitionRates =
             let para3Rates = seed6ActionRates.createBiased(seed6ActionMode.Ortho2, baseAmt, biasAmt)
             let para4Rates = seed6ActionRates.createBiased(seed6ActionMode.Ortho2, baseAmt, biasAmt)
             let selfReflRates = seed6ActionRates.createBiased(seed6ActionMode.Ortho2, baseAmt, biasAmt)
-            seed6TransitionRates.create(ortho1Rates, ortho2Rates, para1Rates, para2Rates, para3Rates, para4Rates, selfReflRates)
+            seed6TransitionRates.create ortho1Rates ortho2Rates para1Rates para2Rates para3Rates para4Rates selfReflRates
         | seed6GenMode.Para1 -> 
             let ortho1Rates = seed6ActionRates.createBiased(seed6ActionMode.Para1, baseAmt, biasAmt)
             let ortho2Rates = seed6ActionRates.createBiased(seed6ActionMode.Para1, baseAmt, biasAmt)
@@ -60,7 +60,7 @@ type seed6TransitionRates =
             let para3Rates = seed6ActionRates.createBiased(seed6ActionMode.Para1, baseAmt, biasAmt)
             let para4Rates = seed6ActionRates.createBiased(seed6ActionMode.Para1, baseAmt, biasAmt)
             let selfReflRates = seed6ActionRates.createBiased(seed6ActionMode.Para1, baseAmt, biasAmt)
-            seed6TransitionRates.create(ortho1Rates, ortho2Rates, para1Rates, para2Rates, para3Rates, para4Rates, selfReflRates)
+            seed6TransitionRates.create ortho1Rates ortho2Rates para1Rates para2Rates para3Rates para4Rates selfReflRates
         | seed6GenMode.Para2 -> 
             let ortho1Rates = seed6ActionRates.createBiased(seed6ActionMode.Para2, baseAmt, biasAmt)
             let ortho2Rates = seed6ActionRates.createBiased(seed6ActionMode.Para2, baseAmt, biasAmt)
@@ -69,7 +69,7 @@ type seed6TransitionRates =
             let para3Rates = seed6ActionRates.createBiased(seed6ActionMode.Para2, baseAmt, biasAmt)
             let para4Rates = seed6ActionRates.createBiased(seed6ActionMode.Para2, baseAmt, biasAmt)
             let selfReflRates = seed6ActionRates.createBiased(seed6ActionMode.Para2, baseAmt, biasAmt)
-            seed6TransitionRates.create(ortho1Rates, ortho2Rates, para1Rates, para2Rates, para3Rates, para4Rates, selfReflRates)
+            seed6TransitionRates.create ortho1Rates ortho2Rates para1Rates para2Rates para3Rates para4Rates selfReflRates
         | seed6GenMode.Para3 -> 
             let ortho1Rates = seed6ActionRates.createBiased(seed6ActionMode.Para3, baseAmt, biasAmt)
             let ortho2Rates = seed6ActionRates.createBiased(seed6ActionMode.Para3, baseAmt, biasAmt)
@@ -78,7 +78,7 @@ type seed6TransitionRates =
             let para3Rates = seed6ActionRates.createBiased(seed6ActionMode.Para3, baseAmt + biasAmt, biasAmt)
             let para4Rates = seed6ActionRates.createBiased(seed6ActionMode.Para3, baseAmt, biasAmt)
             let selfReflRates = seed6ActionRates.createBiased(seed6ActionMode.Para3, baseAmt, biasAmt)
-            seed6TransitionRates.create(ortho1Rates, ortho2Rates, para1Rates, para2Rates, para3Rates, para4Rates, selfReflRates)
+            seed6TransitionRates.create ortho1Rates ortho2Rates para1Rates para2Rates para3Rates para4Rates selfReflRates
         | seed6GenMode.Para4 -> 
             let ortho1Rates = seed6ActionRates.createBiased(seed6ActionMode.Para4, baseAmt, biasAmt)
             let ortho2Rates = seed6ActionRates.createBiased(seed6ActionMode.Para4, baseAmt, biasAmt)
@@ -87,7 +87,7 @@ type seed6TransitionRates =
             let para3Rates = seed6ActionRates.createBiased(seed6ActionMode.Para4, baseAmt, biasAmt)
             let para4Rates = seed6ActionRates.createBiased(seed6ActionMode.Para4, baseAmt + biasAmt, biasAmt)
             let selfReflRates = seed6ActionRates.createBiased(seed6ActionMode.Para4, baseAmt, biasAmt)
-            seed6TransitionRates.create(ortho1Rates, ortho2Rates, para1Rates, para2Rates, para3Rates, para4Rates, selfReflRates)
+            seed6TransitionRates.create ortho1Rates ortho2Rates para1Rates para2Rates para3Rates para4Rates selfReflRates
         | seed6GenMode.SelfRefl -> 
             let ortho1Rates = seed6ActionRates.createBiased(seed6ActionMode.SelfRefl, baseAmt, biasAmt)
             let ortho2Rates = seed6ActionRates.createBiased(seed6ActionMode.SelfRefl, baseAmt, biasAmt)
@@ -96,7 +96,7 @@ type seed6TransitionRates =
             let para3Rates = seed6ActionRates.createBiased(seed6ActionMode.SelfRefl, baseAmt, biasAmt)
             let para4Rates = seed6ActionRates.createBiased(seed6ActionMode.SelfRefl, baseAmt, biasAmt)
             let selfReflRates = seed6ActionRates.createBiased(seed6ActionMode.SelfRefl, baseAmt + biasAmt, biasAmt)
-            seed6TransitionRates.create(ortho1Rates, ortho2Rates, para1Rates, para2Rates, para3Rates, para4Rates, selfReflRates)
+            seed6TransitionRates.create ortho1Rates ortho2Rates para1Rates para2Rates para3Rates para4Rates selfReflRates
 
 
     member this.PickMode (floatPicker: unit -> float) (orbitType: twoOrbitTripleType) : seed6ActionMode =

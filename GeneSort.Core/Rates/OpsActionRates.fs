@@ -13,7 +13,7 @@ type opsActionRates =
     private 
         { orthoThresh: float; paraThresh: float; selfSymThresh: float; }
 
-    static member create (orthoRate: float, paraRate: float, selfSymRate: float) : opsActionRates =
+    static member create (orthoRate: float) (paraRate: float) (selfSymRate: float) : opsActionRates =
         let noAction = 1.0 - orthoRate - paraRate - selfSymRate
         let epsilon = 1e-10
         if orthoRate < 0.0 || orthoRate > 1.0 then failwith "orthoRate must be between 0 and 1"
@@ -25,18 +25,22 @@ type opsActionRates =
             selfSymThresh = orthoRate + paraRate + selfSymRate
         }
 
-    static member createMod (modificationRate: float, orthoRate: float, paraRate: float, selfSymRate: float) : opsActionRates = 
+    static member createMod 
+                        (modificationRate: float) 
+                        (orthoRate: float) 
+                        (paraRate: float) 
+                        (selfSymRate: float) : opsActionRates = 
         let adj = modificationRate / (orthoRate + paraRate + selfSymRate)
-        opsActionRates.create (adj*orthoRate, adj*paraRate, adj*selfSymRate)
+        opsActionRates.create (adj*orthoRate) (adj*paraRate) (adj*selfSymRate)
 
     static member createUniform (amt:float) : opsActionRates =
-            opsActionRates.create(amt, amt, amt)
+            opsActionRates.create amt amt amt
 
-    static member createBiased(opsActionMode: opsActionMode, baseAmt:float, biasAmt: float) : opsActionRates =
+    static member createBiased (opsActionMode: opsActionMode) (baseAmt: float) (biasAmt: float) : opsActionRates =
         match opsActionMode with
-        | opsActionMode.Ortho -> opsActionRates.create(baseAmt + biasAmt, baseAmt - (biasAmt / 2.0), baseAmt - (biasAmt / 2.0))
-        | opsActionMode.Para -> opsActionRates.create(baseAmt - (biasAmt / 2.0), baseAmt + biasAmt, baseAmt - (biasAmt / 2.0))
-        | opsActionMode.SelfRefl -> opsActionRates.create(baseAmt - (biasAmt / 2.0), baseAmt - (biasAmt / 2.0), baseAmt + biasAmt)
+        | opsActionMode.Ortho -> opsActionRates.create(baseAmt + biasAmt) (baseAmt - (biasAmt / 2.0)) (baseAmt - (biasAmt / 2.0))
+        | opsActionMode.Para -> opsActionRates.create(baseAmt - (biasAmt / 2.0)) (baseAmt + biasAmt) (baseAmt - (biasAmt / 2.0))
+        | opsActionMode.SelfRefl -> opsActionRates.create(baseAmt - (biasAmt / 2.0)) (baseAmt - (biasAmt / 2.0)) (baseAmt + biasAmt)
         | opsActionMode.NoAction -> failwith "NoAction mode is not valid for OpsActionRates"
 
 

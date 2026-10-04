@@ -13,7 +13,7 @@ type uf6MutationRatesArray =
 
     static member create (rates: uf6MutationRates array) : uf6MutationRatesArray =
         // Domain Validation
-        if Array.exists (fun r -> r.order < 6 || r.order % 2 <> 0) rates then
+        if Array.exists (fun (r: uf6MutationRates) -> r.order < 6 || r.order % 2 <> 0) rates then
             failwith "All Uf6MutationRates orders must be at least 6 and even"
         
         // Calculate hash once at construction
@@ -33,7 +33,8 @@ type uf6MutationRatesArray =
 
     member this.toString() =
         String.Join(", ", Array.map (
-            fun r -> sprintf "Uf6MutationRates(order=%d, seed=%s, opsTransitionRates=%s)" 
+            fun (r: uf6MutationRates) -> 
+                sprintf "Uf6MutationRates(order=%d, seed=%s, opsTransitionRates=%s)" 
                         r.order 
                         (r.seed6TransitionRates.toString()) 
                         (r.opsTransitionRates.toString())) this.uf6MutationRates)
@@ -47,7 +48,7 @@ type uf6MutationRatesArray =
             if this.cachedHash <> other.cachedHash then false
             elif this.uf6MutationRates.Length <> other.uf6MutationRates.Length then false
             else
-                Array.forall2 (fun a b -> 
+                Array.forall2 (fun (a: uf6MutationRates) (b: uf6MutationRates) -> 
                     a.order = b.order && 
                     a.seed6TransitionRates.Equals(b.seed6TransitionRates) && 
                     a.opsTransitionRates.Equals(b.opsTransitionRates)) this.uf6MutationRates other.uf6MutationRates
@@ -58,7 +59,7 @@ type uf6MutationRatesArray =
             if this.cachedHash <> other.cachedHash then false
             elif this.uf6MutationRates.Length <> other.uf6MutationRates.Length then false
             else
-                Array.forall2 (fun a b -> 
+                Array.forall2 (fun (a: uf6MutationRates) (b: uf6MutationRates) -> 
                     a.order = b.order && 
                     a.seed6TransitionRates.Equals(b.seed6TransitionRates) && 
                     a.opsTransitionRates.Equals(b.opsTransitionRates)) this.uf6MutationRates other.uf6MutationRates
@@ -69,160 +70,155 @@ module Uf6MutationRatesArray =
     let private clamp (value: float) (min: float) (max: float) =
         Math.Max(min, Math.Min(max, value))
 
-    let private interpolateSeed6ActionRates (startRates: seed6ActionRates) (endRates: seed6ActionRates) (t: float) : seed6ActionRates =
-        seed6ActionRates.create(
-            startRates.Ortho1Rate + t * (endRates.Ortho1Rate - startRates.Ortho1Rate),
-            startRates.Ortho2Rate + t * (endRates.Ortho2Rate - startRates.Ortho2Rate),
-            startRates.Para1Rate + t * (endRates.Para1Rate - startRates.Para1Rate),
-            startRates.Para2Rate + t * (endRates.Para2Rate - startRates.Para2Rate),
-            startRates.Para3Rate + t * (endRates.Para3Rate - startRates.Para3Rate),
-            startRates.Para4Rate + t * (endRates.Para4Rate - startRates.Para4Rate),
-            startRates.SelfReflRate + t * (endRates.SelfReflRate - startRates.SelfReflRate))
+    let private lerp (t: float) (a: float) (b: float) : float =
+        a + t * (b - a)
 
-    let private interpolateOpsTransitionRates (startRates: opsTransitionRates) (endRates: opsTransitionRates) (t: float) : opsTransitionRates =
-        opsTransitionRates.create(
-            opsActionRates.create(
-                startRates.OrthoRates.OrthoRate + t * (endRates.OrthoRates.OrthoRate - startRates.OrthoRates.OrthoRate),
-                startRates.OrthoRates.ParaRate + t * (endRates.OrthoRates.ParaRate - startRates.OrthoRates.ParaRate),
-                startRates.OrthoRates.SelfReflRate + t * (endRates.OrthoRates.SelfReflRate - startRates.OrthoRates.SelfReflRate)),
-            opsActionRates.create(
-                startRates.ParaRates.OrthoRate + t * (endRates.ParaRates.OrthoRate - startRates.ParaRates.OrthoRate),
-                startRates.ParaRates.ParaRate + t * (endRates.ParaRates.ParaRate - startRates.ParaRates.ParaRate),
-                startRates.ParaRates.SelfReflRate + t * (endRates.ParaRates.SelfReflRate - startRates.ParaRates.SelfReflRate)),
-            opsActionRates.create(
-                startRates.SelfReflRates.OrthoRate + t * (endRates.SelfReflRates.OrthoRate - startRates.SelfReflRates.OrthoRate),
-                startRates.SelfReflRates.ParaRate + t * (endRates.SelfReflRates.ParaRate - startRates.SelfReflRates.ParaRate),
-                startRates.SelfReflRates.SelfReflRate + t * (endRates.SelfReflRates.SelfReflRate - startRates.SelfReflRates.SelfReflRate)))
+    // ---------- opsActionRates / opsTransitionRates helpers ----------
 
+    let private lerpActionRates (t: float) (a: opsActionRates) (b: opsActionRates) : opsActionRates =
+        opsActionRates.create
+            (lerp t a.OrthoRate b.OrthoRate)
+            (lerp t a.ParaRate b.ParaRate)
+            (lerp t a.SelfReflRate b.SelfReflRate)
 
+    let private lerpOps (t: float) (a: opsTransitionRates) (b: opsTransitionRates) : opsTransitionRates =
+        opsTransitionRates.create
+            (lerpActionRates t a.OrthoRates b.OrthoRates)
+            (lerpActionRates t a.ParaRates b.ParaRates)
+            (lerpActionRates t a.SelfReflRates b.SelfReflRates)
+
+    let private sinActionRates (t: float) (baseR: opsActionRates) (amp: opsActionRates) : opsActionRates =
+        let phase2 = 2.0 * Math.PI / 3.0
+        let phase3 = 4.0 * Math.PI / 3.0
+        opsActionRates.create
+            (clamp (baseR.OrthoRate + amp.OrthoRate * Math.Sin(t)) 0.0 1.0)
+            (clamp (baseR.ParaRate + amp.ParaRate * Math.Sin(t + phase2)) 0.0 1.0)
+            (clamp (baseR.SelfReflRate + amp.SelfReflRate * Math.Sin(t + phase3)) 0.0 1.0)
+
+    let private sinOps (t: float) (baseR: opsTransitionRates) (amp: opsTransitionRates) : opsTransitionRates =
+        opsTransitionRates.create
+            (sinActionRates t baseR.OrthoRates amp.OrthoRates)
+            (sinActionRates t baseR.ParaRates amp.ParaRates)
+            (sinActionRates t baseR.SelfReflRates amp.SelfReflRates)
+
+    // ---------- seed6 helpers ----------
+
+    let private lerpSeed6Action (t: float) (a: seed6ActionRates) (b: seed6ActionRates) : seed6ActionRates =
+        seed6ActionRates.create
+            (lerp t a.Ortho1Rate b.Ortho1Rate)
+            (lerp t a.Ortho2Rate b.Ortho2Rate)
+            (lerp t a.Para1Rate b.Para1Rate)
+            (lerp t a.Para2Rate b.Para2Rate)
+            (lerp t a.Para3Rate b.Para3Rate)
+            (lerp t a.Para4Rate b.Para4Rate)
+            (lerp t a.SelfReflRate b.SelfReflRate)
+
+    let private lerpSeed6 (t: float) (a: seed6TransitionRates) (b: seed6TransitionRates) : seed6TransitionRates =
+        seed6TransitionRates.create
+            (lerpSeed6Action t a.Ortho1Rates b.Ortho1Rates)
+            (lerpSeed6Action t a.Ortho2Rates b.Ortho2Rates)
+            (lerpSeed6Action t a.Para1Rates b.Para1Rates)
+            (lerpSeed6Action t a.Para2Rates b.Para2Rates)
+            (lerpSeed6Action t a.Para3Rates b.Para3Rates)
+            (lerpSeed6Action t a.Para4Rates b.Para4Rates)
+            (lerpSeed6Action t a.SelfReflRates b.SelfReflRates)
+
+    /// Sinusoidal offset for one seed6ActionRates row. The phase of entry (row, col) is
+    /// ((row + col) mod 7) * 2pi/7, matching the original hand-written phase table.
+    let private sinSeed6Action (t: float) (row: int) (baseR: seed6ActionRates) (amp: seed6ActionRates) : seed6ActionRates =
+        let phaseShift = 2.0 * Math.PI / 7.0
+        let v (col: int) (b: float) (a: float) =
+            clamp (b + a * Math.Sin(t + float ((row + col) % 7) * phaseShift)) 0.0 1.0
+        seed6ActionRates.create
+            (v 0 baseR.Ortho1Rate amp.Ortho1Rate)
+            (v 1 baseR.Ortho2Rate amp.Ortho2Rate)
+            (v 2 baseR.Para1Rate amp.Para1Rate)
+            (v 3 baseR.Para2Rate amp.Para2Rate)
+            (v 4 baseR.Para3Rate amp.Para3Rate)
+            (v 5 baseR.Para4Rate amp.Para4Rate)
+            (v 6 baseR.SelfReflRate amp.SelfReflRate)
+
+    let private sinSeed6 (t: float) (baseR: seed6TransitionRates) (amp: seed6TransitionRates) : seed6TransitionRates =
+        seed6TransitionRates.create
+            (sinSeed6Action t 0 baseR.Ortho1Rates amp.Ortho1Rates)
+            (sinSeed6Action t 1 baseR.Ortho2Rates amp.Ortho2Rates)
+            (sinSeed6Action t 2 baseR.Para1Rates amp.Para1Rates)
+            (sinSeed6Action t 3 baseR.Para2Rates amp.Para2Rates)
+            (sinSeed6Action t 4 baseR.Para3Rates amp.Para3Rates)
+            (sinSeed6Action t 5 baseR.Para4Rates amp.Para4Rates)
+            (sinSeed6Action t 6 baseR.SelfReflRates amp.SelfReflRates)
+
+    // ---------- uf6MutationRates helpers ----------
+
+    let private validateOrder (order: int) =
+        if order < 6 || order % 2 <> 0 then failwith "Order must be at least 6 and even"
+
+    /// Combines two uf6MutationRates: fSeed on the seed, fOps on each opsTransitionRates entry.
+    /// Where either ops list is too short, a uniform 0.1 entry is used (as in the original).
+    let private combine 
+            (order: int)
+            (fSeed: seed6TransitionRates -> seed6TransitionRates -> seed6TransitionRates)
+            (fOps: opsTransitionRates -> opsTransitionRates -> opsTransitionRates)
+            (a: uf6MutationRates) 
+            (b: uf6MutationRates) : uf6MutationRates =
+        let listLength = exactLog2 (order / 6)
+        let aList = a.opsTransitionRates.RatesArray
+        let bList = b.opsTransitionRates.RatesArray
+        let opsArr =
+            Array.init listLength (fun j ->
+                if j >= aList.Length || j >= bList.Length then opsTransitionRates.createUniformFromFloat(0.1)
+                else fOps aList.[j] bList.[j])
+        uf6MutationRates.create order 
+            (fSeed a.seed6TransitionRates b.seed6TransitionRates) 
+            (opsTransitionRatesArray.create opsArr)
 
     let createUniform (length: int) (order: int) (rates: uf6MutationRates) =
         if length <= 0 then failwith "Length must be positive"
-        if order < 6 || order % 3 <> 0 then failwith "Order must be at least 6 and divisible by 3"
+        validateOrder order
         if rates.order <> order then failwith "Rates order must match specified order"
         let ratesArray = Array.init length (fun _ -> rates)
         uf6MutationRatesArray.create ratesArray
 
-
-
-    let createLinearVariation (length: int) (order: int) (startRates: uf6MutationRates) (endRates: uf6MutationRates) : uf6MutationRatesArray =
+    let createLinearVariation 
+            (length: int) 
+            (order: int) 
+            (startRates: uf6MutationRates) 
+            (endRates: uf6MutationRates) : uf6MutationRatesArray =
         if length <= 0 then failwith "Length must be positive"
-        if order < 6 || order % 2 <> 0 then failwith "Order must be at least 6 and even"
+        validateOrder order
         if startRates.order <> order || endRates.order <> order then failwith "Start and end rates must have the same order"
         let rates =
             Array.init length (fun i ->
-                let t = float i / float (length - 1)
-                let seed = seed6TransitionRates.create(
-                    interpolateSeed6ActionRates startRates.seed6TransitionRates.Ortho1Rates endRates.seed6TransitionRates.Ortho1Rates t,
-                    interpolateSeed6ActionRates startRates.seed6TransitionRates.Ortho2Rates endRates.seed6TransitionRates.Ortho2Rates t,
-                    interpolateSeed6ActionRates startRates.seed6TransitionRates.Para1Rates endRates.seed6TransitionRates.Para1Rates t,
-                    interpolateSeed6ActionRates startRates.seed6TransitionRates.Para2Rates endRates.seed6TransitionRates.Para2Rates t,
-                    interpolateSeed6ActionRates startRates.seed6TransitionRates.Para3Rates endRates.seed6TransitionRates.Para3Rates t,
-                    interpolateSeed6ActionRates startRates.seed6TransitionRates.Para4Rates endRates.seed6TransitionRates.Para4Rates t,
-                    interpolateSeed6ActionRates startRates.seed6TransitionRates.SelfReflRates endRates.seed6TransitionRates.SelfReflRates t)
-                let listLength = exactLog2 (order / 6)
-                let opsTransitionRates =
-                    Array.init listLength (fun j ->
-                        let startList = startRates.opsTransitionRates.RatesArray
-                        let endList = endRates.opsTransitionRates.RatesArray
-                        if j >= startList.Length || j >= endList.Length then opsTransitionRates.createUniform(0.1)
-                        else interpolateOpsTransitionRates startList.[j] endList.[j] t)
-
-                uf6MutationRates.create order seed (opsTransitionRatesArray.create opsTransitionRates) )
+                let t = if length = 1 then 0.0 else float i / float (length - 1)
+                combine order (lerpSeed6 t) (lerpOps t) startRates endRates)
         uf6MutationRatesArray.create rates
 
-    let createSinusoidalVariation (length: int) (order: int) (baseRates: uf6MutationRates) (amplitudes: uf6MutationRates) (frequency: float) : uf6MutationRatesArray =
+    let createSinusoidalVariation 
+            (length: int) 
+            (order: int) 
+            (baseRates: uf6MutationRates) 
+            (amplitudes: uf6MutationRates) 
+            (frequency: float) : uf6MutationRatesArray =
         if length <= 0 then failwith "Length must be positive"
-        if order < 6 || order % 2 <> 0 then failwith "Order must be at least 6 and even"
+        validateOrder order
         if baseRates.order <> order || amplitudes.order <> order then failwith "Base and amplitudes must have the same order"
         let rates =
             Array.init length (fun i ->
-                let t = float i / float (length - 1) * 2.0 * Math.PI * frequency
-                let phaseShift = 2.0 * Math.PI / 7.0
-                let seed = seed6TransitionRates.create(
-                    seed6ActionRates.create(
-                        clamp (baseRates.seed6TransitionRates.Ortho1Rates.Ortho1Rate + amplitudes.seed6TransitionRates.Ortho1Rates.Ortho1Rate * Math.Sin(t)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Ortho1Rates.Ortho2Rate + amplitudes.seed6TransitionRates.Ortho1Rates.Ortho2Rate * Math.Sin(t + phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Ortho1Rates.Para1Rate + amplitudes.seed6TransitionRates.Ortho1Rates.Para1Rate * Math.Sin(t + 2.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Ortho1Rates.Para2Rate + amplitudes.seed6TransitionRates.Ortho1Rates.Para2Rate * Math.Sin(t + 3.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Ortho1Rates.Para3Rate + amplitudes.seed6TransitionRates.Ortho1Rates.Para3Rate * Math.Sin(t + 4.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Ortho1Rates.Para4Rate + amplitudes.seed6TransitionRates.Ortho1Rates.Para4Rate * Math.Sin(t + 5.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Ortho1Rates.SelfReflRate + amplitudes.seed6TransitionRates.Ortho1Rates.SelfReflRate * Math.Sin(t + 6.0 * phaseShift)) 0.0 1.0),
-                    seed6ActionRates.create(
-                        clamp (baseRates.seed6TransitionRates.Ortho2Rates.Ortho1Rate + amplitudes.seed6TransitionRates.Ortho2Rates.Ortho1Rate * Math.Sin(t + phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Ortho2Rates.Ortho2Rate + amplitudes.seed6TransitionRates.Ortho2Rates.Ortho2Rate * Math.Sin(t + 2.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Ortho2Rates.Para1Rate + amplitudes.seed6TransitionRates.Ortho2Rates.Para1Rate * Math.Sin(t + 3.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Ortho2Rates.Para2Rate + amplitudes.seed6TransitionRates.Ortho2Rates.Para2Rate * Math.Sin(t + 4.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Ortho2Rates.Para3Rate + amplitudes.seed6TransitionRates.Ortho2Rates.Para3Rate * Math.Sin(t + 5.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Ortho2Rates.Para4Rate + amplitudes.seed6TransitionRates.Ortho2Rates.Para4Rate * Math.Sin(t + 6.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Ortho2Rates.SelfReflRate + amplitudes.seed6TransitionRates.Ortho2Rates.SelfReflRate * Math.Sin(t)) 0.0 1.0),
-                    seed6ActionRates.create(
-                        clamp (baseRates.seed6TransitionRates.Para1Rates.Ortho1Rate + amplitudes.seed6TransitionRates.Para1Rates.Ortho1Rate * Math.Sin(t + 2.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para1Rates.Ortho2Rate + amplitudes.seed6TransitionRates.Para1Rates.Ortho2Rate * Math.Sin(t + 3.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para1Rates.Para1Rate + amplitudes.seed6TransitionRates.Para1Rates.Para1Rate * Math.Sin(t + 4.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para1Rates.Para2Rate + amplitudes.seed6TransitionRates.Para1Rates.Para2Rate * Math.Sin(t + 5.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para1Rates.Para3Rate + amplitudes.seed6TransitionRates.Para1Rates.Para3Rate * Math.Sin(t + 6.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para1Rates.Para4Rate + amplitudes.seed6TransitionRates.Para1Rates.Para4Rate * Math.Sin(t)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para1Rates.SelfReflRate + amplitudes.seed6TransitionRates.Para1Rates.SelfReflRate * Math.Sin(t + phaseShift)) 0.0 1.0),
-                    seed6ActionRates.create(
-                        clamp (baseRates.seed6TransitionRates.Para2Rates.Ortho1Rate + amplitudes.seed6TransitionRates.Para2Rates.Ortho1Rate * Math.Sin(t + 3.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para2Rates.Ortho2Rate + amplitudes.seed6TransitionRates.Para2Rates.Ortho2Rate * Math.Sin(t + 4.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para2Rates.Para1Rate + amplitudes.seed6TransitionRates.Para2Rates.Para1Rate * Math.Sin(t + 5.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para2Rates.Para2Rate + amplitudes.seed6TransitionRates.Para2Rates.Para2Rate * Math.Sin(t + 6.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para2Rates.Para3Rate + amplitudes.seed6TransitionRates.Para2Rates.Para3Rate * Math.Sin(t)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para2Rates.Para4Rate + amplitudes.seed6TransitionRates.Para2Rates.Para4Rate * Math.Sin(t + phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para2Rates.SelfReflRate + amplitudes.seed6TransitionRates.Para2Rates.SelfReflRate * Math.Sin(t + 2.0 * phaseShift)) 0.0 1.0),
-                    seed6ActionRates.create(
-                        clamp (baseRates.seed6TransitionRates.Para3Rates.Ortho1Rate + amplitudes.seed6TransitionRates.Para3Rates.Ortho1Rate * Math.Sin(t + 4.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para3Rates.Ortho2Rate + amplitudes.seed6TransitionRates.Para3Rates.Ortho2Rate * Math.Sin(t + 5.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para3Rates.Para1Rate + amplitudes.seed6TransitionRates.Para3Rates.Para1Rate * Math.Sin(t + 6.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para3Rates.Para2Rate + amplitudes.seed6TransitionRates.Para3Rates.Para2Rate * Math.Sin(t)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para3Rates.Para3Rate + amplitudes.seed6TransitionRates.Para3Rates.Para3Rate * Math.Sin(t + phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para3Rates.Para4Rate + amplitudes.seed6TransitionRates.Para3Rates.Para4Rate * Math.Sin(t + 2.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para3Rates.SelfReflRate + amplitudes.seed6TransitionRates.Para3Rates.SelfReflRate * Math.Sin(t + 3.0 * phaseShift)) 0.0 1.0),
-                    seed6ActionRates.create(
-                        clamp (baseRates.seed6TransitionRates.Para4Rates.Ortho1Rate + amplitudes.seed6TransitionRates.Para4Rates.Ortho1Rate * Math.Sin(t + 5.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para4Rates.Ortho2Rate + amplitudes.seed6TransitionRates.Para4Rates.Ortho2Rate * Math.Sin(t + 6.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para4Rates.Para1Rate + amplitudes.seed6TransitionRates.Para4Rates.Para1Rate * Math.Sin(t)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para4Rates.Para2Rate + amplitudes.seed6TransitionRates.Para4Rates.Para2Rate * Math.Sin(t + phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para4Rates.Para3Rate + amplitudes.seed6TransitionRates.Para4Rates.Para3Rate * Math.Sin(t + 2.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para4Rates.Para4Rate + amplitudes.seed6TransitionRates.Para4Rates.Para4Rate * Math.Sin(t + 3.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.Para4Rates.SelfReflRate + amplitudes.seed6TransitionRates.Para4Rates.SelfReflRate * Math.Sin(t + 4.0 * phaseShift)) 0.0 1.0),
-                    seed6ActionRates.create(
-                        clamp (baseRates.seed6TransitionRates.SelfReflRates.Ortho1Rate + amplitudes.seed6TransitionRates.SelfReflRates.Ortho1Rate * Math.Sin(t + 6.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.SelfReflRates.Ortho2Rate + amplitudes.seed6TransitionRates.SelfReflRates.Ortho2Rate * Math.Sin(t)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.SelfReflRates.Para1Rate + amplitudes.seed6TransitionRates.SelfReflRates.Para1Rate * Math.Sin(t + phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.SelfReflRates.Para2Rate + amplitudes.seed6TransitionRates.SelfReflRates.Para2Rate * Math.Sin(t + 2.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.SelfReflRates.Para3Rate + amplitudes.seed6TransitionRates.SelfReflRates.Para3Rate * Math.Sin(t + 3.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.SelfReflRates.Para4Rate + amplitudes.seed6TransitionRates.SelfReflRates.Para4Rate * Math.Sin(t + 4.0 * phaseShift)) 0.0 1.0,
-                        clamp (baseRates.seed6TransitionRates.SelfReflRates.SelfReflRate + amplitudes.seed6TransitionRates.SelfReflRates.SelfReflRate * Math.Sin(t + 5.0 * phaseShift)) 0.0 1.0))
-                let listLength = exactLog2 (order / 6)
-                let opsTransitionRates =
-                    Array.init listLength (fun j ->
-                        let baseList = baseRates.opsTransitionRates.RatesArray
-                        let ampList = amplitudes.opsTransitionRates.RatesArray
-                        if j >= baseList.Length || j >= ampList.Length then opsTransitionRates.createUniform(0.1)
-                        else
-                            opsTransitionRates.create(
-                                opsActionRates.create(
-                                    clamp (baseList.[j].OrthoRates.OrthoRate + ampList.[j].OrthoRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
-                                    clamp (baseList.[j].OrthoRates.ParaRate + ampList.[j].OrthoRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
-                                    clamp (baseList.[j].OrthoRates.SelfReflRate + ampList.[j].OrthoRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0),
-                                opsActionRates.create(
-                                    clamp (baseList.[j].ParaRates.OrthoRate + ampList.[j].ParaRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
-                                    clamp (baseList.[j].ParaRates.ParaRate + ampList.[j].ParaRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
-                                    clamp (baseList.[j].ParaRates.SelfReflRate + ampList.[j].ParaRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0),
-                                opsActionRates.create(
-                                    clamp (baseList.[j].SelfReflRates.OrthoRate + ampList.[j].SelfReflRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
-                                    clamp (baseList.[j].SelfReflRates.ParaRate + ampList.[j].SelfReflRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
-                                    clamp (baseList.[j].SelfReflRates.SelfReflRate + ampList.[j].SelfReflRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0)))
-
-                uf6MutationRates.create order seed (opsTransitionRatesArray.create opsTransitionRates) )
+                let t = 
+                    if length = 1 then 0.0 
+                    else float i / float (length - 1) * 2.0 * Math.PI * frequency
+                combine order (sinSeed6 t) (sinOps t) baseRates amplitudes)
         uf6MutationRatesArray.create rates
 
-    let createGaussianHotSpot (length: int) (order: int) (baseRates: uf6MutationRates) (hotSpotIndex: int) (hotSpotRates: uf6MutationRates) (sigma: float) : uf6MutationRatesArray =
+    let createGaussianHotSpot 
+            (length: int) 
+            (order: int) 
+            (baseRates: uf6MutationRates) 
+            (hotSpotIndex: int) 
+            (hotSpotRates: uf6MutationRates) 
+            (sigma: float) : uf6MutationRatesArray =
         if length <= 0 then failwith "Length must be positive"
-        if order < 6 || order % 2 <> 0 then failwith "Order must be at least 6 and even"
+        validateOrder order
         if baseRates.order <> order || hotSpotRates.order <> order then failwith "Base and hotspot rates must have the same order"
         if hotSpotIndex < 0 || hotSpotIndex >= length then failwith "HotSpotIndex out of range"
         if sigma <= 0.0 then failwith "Sigma must be positive"
@@ -230,96 +226,25 @@ module Uf6MutationRatesArray =
             Array.init length (fun i ->
                 let x = float (i - hotSpotIndex)
                 let weight = Math.Exp(-x * x / (2.0 * sigma * sigma))
-                let seed = seed6TransitionRates.create(
-                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Ortho1Rates hotSpotRates.seed6TransitionRates.Ortho1Rates weight,
-                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Ortho2Rates hotSpotRates.seed6TransitionRates.Ortho2Rates weight,
-                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Para1Rates hotSpotRates.seed6TransitionRates.Para1Rates weight,
-                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Para2Rates hotSpotRates.seed6TransitionRates.Para2Rates weight,
-                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Para3Rates hotSpotRates.seed6TransitionRates.Para3Rates weight,
-                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.Para4Rates hotSpotRates.seed6TransitionRates.Para4Rates weight,
-                    interpolateSeed6ActionRates baseRates.seed6TransitionRates.SelfReflRates hotSpotRates.seed6TransitionRates.SelfReflRates weight)
-                let listLength = exactLog2 (order / 6)
-                let opsTransitionRates =
-                    Array.init listLength (fun j ->
-                        let baseList = baseRates.opsTransitionRates.RatesArray
-                        let hotSpotList = hotSpotRates.opsTransitionRates.RatesArray
-                        if j >= baseList.Length || j >= hotSpotList.Length then opsTransitionRates.createUniform(0.1)
-                        else interpolateOpsTransitionRates baseList.[j] hotSpotList.[j] weight)
-                uf6MutationRates.create order seed (opsTransitionRatesArray.create opsTransitionRates) )
+                // weight = 0 -> baseRates, weight = 1 -> hotSpotRates
+                combine order (lerpSeed6 weight) (lerpOps weight) baseRates hotSpotRates)
         uf6MutationRatesArray.create rates
 
-    let createStepHotSpot (length: int) (order: int) (baseRates: uf6MutationRates) (hotSpotStart: int) (hotSpotEnd: int) (hotSpotRates: uf6MutationRates) : uf6MutationRatesArray =
+    let createStepHotSpot 
+            (length: int) 
+            (order: int) 
+            (baseRates: uf6MutationRates) 
+            (hotSpotStart: int) 
+            (hotSpotEnd: int) 
+            (hotSpotRates: uf6MutationRates) : uf6MutationRatesArray =
         if length <= 0 then failwith "Length must be positive"
-        if order < 6 || order % 2 <> 0 then failwith "Order must be at least 6 and even"
+        validateOrder order
         if baseRates.order <> order || hotSpotRates.order <> order then failwith "Base and hotspot rates must have the same order"
-        if hotSpotStart < 0 || hotSpotStart >= length || hotSpotEnd < hotSpotStart || hotSpotEnd >= length then failwith "Invalid hot spot range"
+        if hotSpotStart < 0 || hotSpotStart >= length || hotSpotEnd < hotSpotStart || hotSpotEnd >= length then 
+            failwith "Invalid hot spot range"
         let rates =
             Array.init length (fun i ->
-                let rates = if i >= hotSpotStart && i <= hotSpotEnd then hotSpotRates else baseRates
-                uf6MutationRates.create order rates.seed6TransitionRates rates.opsTransitionRates
-                //{ Uf6MutationRates.order = order
-                //  seed6TransitionRates = Seed6TransitionRates.create(
-                //      Seed6ActionRates.create(
-                //          rates.seed6TransitionRates.Ortho1Rates.Ortho1Rate,
-                //          rates.seed6TransitionRates.Ortho1Rates.Ortho2Rate,
-                //          rates.seed6TransitionRates.Ortho1Rates.Para1Rate,
-                //          rates.seed6TransitionRates.Ortho1Rates.Para2Rate,
-                //          rates.seed6TransitionRates.Ortho1Rates.Para3Rate,
-                //          rates.seed6TransitionRates.Ortho1Rates.Para4Rate,
-                //          rates.seed6TransitionRates.Ortho1Rates.SelfReflRate),
-                //      Seed6ActionRates.create(
-                //          rates.seed6TransitionRates.Ortho2Rates.Ortho1Rate,
-                //          rates.seed6TransitionRates.Ortho2Rates.Ortho2Rate,
-                //          rates.seed6TransitionRates.Ortho2Rates.Para1Rate,
-                //          rates.seed6TransitionRates.Ortho2Rates.Para2Rate,
-                //          rates.seed6TransitionRates.Ortho2Rates.Para3Rate,
-                //          rates.seed6TransitionRates.Ortho2Rates.Para4Rate,
-                //          rates.seed6TransitionRates.Ortho2Rates.SelfReflRate),
-                //      Seed6ActionRates.create(
-                //          rates.seed6TransitionRates.Para1Rates.Ortho1Rate,
-                //          rates.seed6TransitionRates.Para1Rates.Ortho2Rate,
-                //          rates.seed6TransitionRates.Para1Rates.Para1Rate,
-                //          rates.seed6TransitionRates.Para1Rates.Para2Rate,
-                //          rates.seed6TransitionRates.Para1Rates.Para3Rate,
-                //          rates.seed6TransitionRates.Para1Rates.Para4Rate,
-                //          rates.seed6TransitionRates.Para1Rates.SelfReflRate),
-                //      Seed6ActionRates.create(
-                //          rates.seed6TransitionRates.Para2Rates.Ortho1Rate,
-                //          rates.seed6TransitionRates.Para2Rates.Ortho2Rate,
-                //          rates.seed6TransitionRates.Para2Rates.Para1Rate,
-                //          rates.seed6TransitionRates.Para2Rates.Para2Rate,
-                //          rates.seed6TransitionRates.Para2Rates.Para3Rate,
-                //          rates.seed6TransitionRates.Para2Rates.Para4Rate,
-                //          rates.seed6TransitionRates.Para2Rates.SelfReflRate),
-                //      Seed6ActionRates.create(
-                //          rates.seed6TransitionRates.Para3Rates.Ortho1Rate,
-                //          rates.seed6TransitionRates.Para3Rates.Ortho2Rate,
-                //          rates.seed6TransitionRates.Para3Rates.Para1Rate,
-                //          rates.seed6TransitionRates.Para3Rates.Para2Rate,
-                //          rates.seed6TransitionRates.Para3Rates.Para3Rate,
-                //          rates.seed6TransitionRates.Para3Rates.Para4Rate,
-                //          rates.seed6TransitionRates.Para3Rates.SelfReflRate),
-                //      Seed6ActionRates.create(
-                //          rates.seed6TransitionRates.Para4Rates.Ortho1Rate,
-                //          rates.seed6TransitionRates.Para4Rates.Ortho2Rate,
-                //          rates.seed6TransitionRates.Para4Rates.Para1Rate,
-                //          rates.seed6TransitionRates.Para4Rates.Para2Rate,
-                //          rates.seed6TransitionRates.Para4Rates.Para3Rate,
-                //          rates.seed6TransitionRates.Para4Rates.Para4Rate,
-                //          rates.seed6TransitionRates.Para4Rates.SelfReflRate),
-                //      Seed6ActionRates.create(
-                //          rates.seed6TransitionRates.SelfReflRates.Ortho1Rate,
-                //          rates.seed6TransitionRates.SelfReflRates.Ortho2Rate,
-                //          rates.seed6TransitionRates.SelfReflRates.Para1Rate,
-                //          rates.seed6TransitionRates.SelfReflRates.Para2Rate,
-                //          rates.seed6TransitionRates.SelfReflRates.Para3Rate,
-                //          rates.seed6TransitionRates.SelfReflRates.Para4Rate,
-                //          rates.seed6TransitionRates.SelfReflRates.SelfReflRate))
-                //  opsTransitionRates = rates.opsTransitionRates }
-                  
-                  
-                  
-                  )
+                if i >= hotSpotStart && i <= hotSpotEnd then hotSpotRates else baseRates)
         uf6MutationRatesArray.create rates
 
     let mutate<'a> 

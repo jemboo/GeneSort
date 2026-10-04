@@ -11,7 +11,7 @@ type opsActionRatesDto = {
 module OpsActionRatesDto =
 
     let toDomain (dto: opsActionRatesDto) : opsActionRates =
-        opsActionRates.create (dto.orthoThresh, dto.paraThresh - dto.orthoThresh, dto.selfReflThresh - dto.paraThresh)
+        opsActionRates.create (dto.orthoThresh) (dto.paraThresh - dto.orthoThresh) (dto.selfReflThresh - dto.paraThresh)
 
     let fromDomain (domain: opsActionRates) : opsActionRatesDto = {
         orthoThresh = domain.OrthoRate

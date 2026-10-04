@@ -1,6 +1,5 @@
 ﻿namespace GeneSort.Core
 
-
 [<Struct; CustomEquality; NoComparison>]
 type uf4MutationRates =
     private
@@ -58,6 +57,22 @@ type uf4MutationRates =
 
 module Uf4MutationRates =
 
+    let make (order: int) 
+            (seedModificationRate: float)
+            (modificationRate: float)
+            (orthoRate: float)
+            (paraRate: float) 
+            (selfSymRate: float) : uf4MutationRates =
+
+        let opsSeedActionRates = opsActionRates.createMod seedModificationRate orthoRate paraRate selfSymRate
+
+
+
+        let seedRates = opsTransitionRates.createUniformFromFloat seedModificationRate
+        let twoOrbitRates = opsTransitionRates.createUniformFromFloat modificationRate
+        uf4MutationRates.createUniform order seedRates twoOrbitRates
+
+
     let makeV1 (order: int) 
                (seedRates: opsTransitionRates) 
                (twoOrbitRates: opsTransitionRates) : uf4MutationRates =
@@ -71,9 +86,9 @@ module Uf4MutationRates =
             failwith $"Order must be at least 4 and divisible by 4, got {order}"
         let mutRatesArrayLength = MathUtils.exactLog2 (order / 4)
         let arrayRates = MathUtils.arrayInterpolationU seed4MutationRates twoOrbitMutationRate mutRatesArrayLength
-        let mutRatesArray = arrayRates |> Array.map (fun rate -> opsTransitionRates.createUniform rate)
+        let mutRatesArray = arrayRates |> Array.map (fun rate -> opsTransitionRates.createUniformFromFloat rate)
         uf4MutationRates.create order
-            (opsTransitionRates.createUniform seed4MutationRates)
+            (opsTransitionRates.createUniformFromFloat seed4MutationRates)
             (opsTransitionRatesArray.create mutRatesArray)
 
 
@@ -85,10 +100,10 @@ module Uf4MutationRates =
         if order < 4 || order % 4 <> 0 then
             failwith $"Order must be at least 4 and divisible by 4, got {order}"
         let mutRatesBaseArrayLength = MathUtils.exactLog2 (order / 4) - 1
-        let mutRatesBaseArray = Array.init mutRatesBaseArrayLength (fun _ -> opsTransitionRates.createUniform baseAmt)
+        let mutRatesBaseArray = Array.init mutRatesBaseArrayLength (fun _ -> opsTransitionRates.createUniformFromFloat baseAmt)
         let lastGenRates = opsTransitionRates.createBiased twoOrbitType baseAmt biasAmt
         let genRatesArray = Array.append mutRatesBaseArray [|lastGenRates|]
         uf4MutationRates.create 
             order
-            (opsTransitionRates.createUniform perm_RsMutationRate)
+            (opsTransitionRates.createUniformFromFloat perm_RsMutationRate)
             (opsTransitionRatesArray.create genRatesArray)

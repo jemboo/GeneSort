@@ -15,8 +15,9 @@ module RandomUnfolderOps4 =
         twoOrbitUf4.create seedTypeUf4 twoOrbitUnfolderSteps
 
 
-    // mutateTwoOrbitUnfolder4v1
-    let mutateTwoOrbitUf4v1
+
+    // mutateTwoOrbitUnfolder4
+    let mutateTwoOrbitUf4
                 (floatPicker:unit -> float)
                 (uf4MutationRates:uf4MutationRates) 
                 (tOuf4:twoOrbitUf4) : twoOrbitUf4 =
@@ -24,31 +25,7 @@ module RandomUnfolderOps4 =
         let seedMutated = 
                 uf4MutationRates.seedOpsTransitionRates.TransitionMode 
                         floatPicker 
-                        (tOuf4.TwoOrbitPairType |> OpsGenMode.fromTwoOrbitType )
-                        |> OpsGenMode.toTwoOrbitPairType
-
-        let stepsMutated = 
-                uf4MutationRates.twoOrbitPairOpsTransitionRates.RatesArray
-                |> Array.mapi(fun dex rates -> 
-                     TwoOrbitTypeOps.mutateTwoOrbitUnfolderStep 
-                                floatPicker 
-                                rates 
-                                tOuf4.TwoOrbitUnfolderSteps[dex])
-
-        twoOrbitUf4.create seedMutated stepsMutated
-
-
-
-    // mutateTwoOrbitUnfolder4v2
-    let mutateTwoOrbitUf4v2
-                (floatPicker:unit -> float)
-                (uf4MutationRates:uf4MutationRates) 
-                (tOuf4:twoOrbitUf4) : twoOrbitUf4 =
-
-        let seedMutated = 
-                uf4MutationRates.seedOpsTransitionRates.TransitionMode 
-                        floatPicker 
-                        (tOuf4.TwoOrbitPairType |> OpsGenMode.fromTwoOrbitType )
+                        (tOuf4.SeedTwoOrbitPairType |> OpsGenMode.fromTwoOrbitType )
                         |> OpsGenMode.toTwoOrbitPairType
 
         let stepsMutated = 

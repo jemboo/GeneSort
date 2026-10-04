@@ -8,10 +8,10 @@ type opsTransitionRates =
           paraRates: opsActionRates
           selfReflRates: opsActionRates }
 
-    static member create (
-                orthoRates: opsActionRates, 
-                paraRates: opsActionRates, 
-                selfReflRates: opsActionRates) : opsTransitionRates =
+    static member create
+                (orthoRates: opsActionRates)
+                (paraRates: opsActionRates)
+                (selfReflRates: opsActionRates) : opsTransitionRates =
         { 
             orthoRates = orthoRates
             paraRates = paraRates
@@ -19,30 +19,30 @@ type opsTransitionRates =
         }
 
 
-    static member createUniform (amt: float) : opsTransitionRates =
+    static member createUniformFromFloat (amt: float) : opsTransitionRates =
         let rates = opsActionRates.createUniform amt
-        opsTransitionRates.create(rates, rates, rates)
+        opsTransitionRates.create rates rates rates
 
-    static member createUniform2 (rates: opsActionRates) : opsTransitionRates =
-        opsTransitionRates.create(rates, rates, rates)
+    static member createUniformFromRates (rates: opsActionRates) : opsTransitionRates =
+        opsTransitionRates.create rates rates rates
 
     static member createBiased (twoOrbitType: twoOrbitType) (baseAmt:float) (biasAmt:float) : opsTransitionRates =
         match twoOrbitType with
         | twoOrbitType.Ortho -> 
-            let orthoRates = opsActionRates.createBiased(opsActionMode.Ortho, baseAmt, biasAmt)
-            let paraRates = opsActionRates.createBiased(opsActionMode.Ortho, baseAmt, biasAmt)
-            let selfReflRates = opsActionRates.createBiased(opsActionMode.Ortho, baseAmt, biasAmt)
-            opsTransitionRates.create(orthoRates, paraRates, selfReflRates)
+            let orthoRates = opsActionRates.createBiased opsActionMode.Ortho baseAmt biasAmt
+            let paraRates = opsActionRates.createBiased opsActionMode.Ortho baseAmt biasAmt
+            let selfReflRates = opsActionRates.createBiased opsActionMode.Ortho baseAmt biasAmt
+            opsTransitionRates.create orthoRates paraRates selfReflRates
         | twoOrbitType.Para -> 
-            let orthoRates = opsActionRates.createBiased(opsActionMode.Para, baseAmt, biasAmt)
-            let paraRates = opsActionRates.createBiased(opsActionMode.Para, baseAmt + biasAmt, biasAmt)
-            let selfReflRates = opsActionRates.createBiased(opsActionMode.Para, baseAmt, biasAmt)
-            opsTransitionRates.create(orthoRates, paraRates, selfReflRates)
+            let orthoRates = opsActionRates.createBiased opsActionMode.Para baseAmt biasAmt
+            let paraRates = opsActionRates.createBiased opsActionMode.Para (baseAmt + biasAmt) biasAmt
+            let selfReflRates = opsActionRates.createBiased opsActionMode.Para baseAmt biasAmt
+            opsTransitionRates.create orthoRates paraRates selfReflRates
         | twoOrbitType.SelfRefl -> 
-            let orthoRates = opsActionRates.createBiased(opsActionMode.SelfRefl, baseAmt, biasAmt)
-            let paraRates = opsActionRates.createBiased(opsActionMode.SelfRefl, baseAmt, biasAmt)
-            let selfReflRates = opsActionRates.createBiased(opsActionMode.SelfRefl, baseAmt, biasAmt)
-            opsTransitionRates.create(orthoRates, paraRates, selfReflRates)
+            let orthoRates = opsActionRates.createBiased opsActionMode.SelfRefl baseAmt biasAmt
+            let paraRates = opsActionRates.createBiased opsActionMode.SelfRefl baseAmt biasAmt
+            let selfReflRates = opsActionRates.createBiased opsActionMode.SelfRefl baseAmt biasAmt
+            opsTransitionRates.create orthoRates paraRates selfReflRates
 
 
     member this.OrthoRates with get() = this.orthoRates

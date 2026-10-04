@@ -36,7 +36,7 @@ type opsTransitionRatesArray =
             if this.cachedHash <> other.cachedHash then false
             elif this.opsTransitionRates.Length <> other.opsTransitionRates.Length then false
             else
-                Array.forall2 (fun a b -> a.Equals(b)) this.opsTransitionRates other.opsTransitionRates
+                Array.forall2 (fun (a: opsTransitionRates) b -> a.Equals(b)) this.opsTransitionRates other.opsTransitionRates
         | _ -> false
 
     interface IEquatable<opsTransitionRatesArray> with
@@ -44,7 +44,7 @@ type opsTransitionRatesArray =
             if this.cachedHash <> other.cachedHash then false
             elif this.opsTransitionRates.Length <> other.opsTransitionRates.Length then false
             else
-                Array.forall2 (fun a b -> a.Equals(b)) this.opsTransitionRates other.opsTransitionRates
+                Array.forall2 (fun (a: opsTransitionRates) b -> a.Equals(b)) this.opsTransitionRates other.opsTransitionRates
 
 
 module OpsTransitionRatesArray =
@@ -52,50 +52,66 @@ module OpsTransitionRatesArray =
     let private clamp (value: float) (min: float) (max: float) =
         Math.Max(min, Math.Min(max, value))
 
+    /// Linear interpolation between two opsActionRates at position t (0.0 = a, 1.0 = b).
+    let private lerpActionRates (t: float) (a: opsActionRates) (b: opsActionRates) : opsActionRates =
+        opsActionRates.create
+            (a.OrthoRate + t * (b.OrthoRate - a.OrthoRate))
+            (a.ParaRate + t * (b.ParaRate - a.ParaRate))
+            (a.SelfReflRate + t * (b.SelfReflRate - a.SelfReflRate))
+
+    /// Interpolates all three opsActionRates inside an opsTransitionRates.
+    let private lerpTransitionRates (t: float) (a: opsTransitionRates) (b: opsTransitionRates) : opsTransitionRates =
+        opsTransitionRates.create
+            (lerpActionRates t a.OrthoRates b.OrthoRates)
+            (lerpActionRates t a.ParaRates b.ParaRates)
+            (lerpActionRates t a.SelfReflRates b.SelfReflRates)
+
+    /// Sinusoidal offset of an opsActionRates around base, with phase shifts of 0, 2pi/3, 4pi/3.
+    let private sinActionRates (t: float) (baseR: opsActionRates) (amp: opsActionRates) : opsActionRates =
+        let phase2 = 2.0 * Math.PI / 3.0
+        let phase3 = 4.0 * Math.PI / 3.0
+        opsActionRates.create
+            (clamp (baseR.OrthoRate + amp.OrthoRate * Math.Sin(t)) 0.0 1.0)
+            (clamp (baseR.ParaRate + amp.ParaRate * Math.Sin(t + phase2)) 0.0 1.0)
+            (clamp (baseR.SelfReflRate + amp.SelfReflRate * Math.Sin(t + phase3)) 0.0 1.0)
+
     // Smooth variation: Linear interpolation from startRates to endRates
-    let createLinearVariation (length: int) (startRates: opsTransitionRates) (endRates: opsTransitionRates) : opsTransitionRatesArray =
+    let createLinearVariation 
+            (length: int) 
+            (startRates: opsTransitionRates) 
+            (endRates: opsTransitionRates) : opsTransitionRatesArray =
         if length <= 0 then failwith "Length must be positive"
         let rates =
             Array.init length (fun i ->
-                let t = float i / float (length - 1)
-                let ortho = opsActionRates.create(
-                    startRates.OrthoRates.OrthoRate + t * (endRates.OrthoRates.OrthoRate - startRates.OrthoRates.OrthoRate),
-                    startRates.OrthoRates.ParaRate + t * (endRates.OrthoRates.ParaRate - startRates.OrthoRates.ParaRate),
-                    startRates.OrthoRates.SelfReflRate + t * (endRates.OrthoRates.SelfReflRate - startRates.OrthoRates.SelfReflRate))
-                let para = opsActionRates.create(
-                    startRates.ParaRates.OrthoRate + t * (endRates.ParaRates.OrthoRate - startRates.ParaRates.OrthoRate),
-                    startRates.ParaRates.ParaRate + t * (endRates.ParaRates.ParaRate - startRates.ParaRates.ParaRate),
-                    startRates.ParaRates.SelfReflRate + t * (endRates.ParaRates.SelfReflRate - startRates.ParaRates.SelfReflRate))
-                let selfRefl = opsActionRates.create(
-                    startRates.SelfReflRates.OrthoRate + t * (endRates.SelfReflRates.OrthoRate - startRates.SelfReflRates.OrthoRate),
-                    startRates.SelfReflRates.ParaRate + t * (endRates.SelfReflRates.ParaRate - startRates.SelfReflRates.ParaRate),
-                    startRates.SelfReflRates.SelfReflRate + t * (endRates.SelfReflRates.SelfReflRate - startRates.SelfReflRates.SelfReflRate))
-                opsTransitionRates.create(ortho, para, selfRefl))
+                let t = if length = 1 then 0.0 else float i / float (length - 1)
+                lerpTransitionRates t startRates endRates)
         opsTransitionRatesArray.create rates
 
     // Smooth variation: Sinusoidal variation around base rates
-    let createSinusoidalVariation (length: int) (baseRates: opsTransitionRates) (amplitudes: opsTransitionRates) (frequency: float) : opsTransitionRatesArray =
+    let createSinusoidalVariation 
+            (length: int) 
+            (baseRates: opsTransitionRates) 
+            (amplitudes: opsTransitionRates) 
+            (frequency: float) : opsTransitionRatesArray =
         if length <= 0 then failwith "Length must be positive"
         let rates =
             Array.init length (fun i ->
-                let t = float i / float (length - 1) * 2.0 * Math.PI * frequency
-                let ortho = opsActionRates.create(
-                    clamp (baseRates.OrthoRates.OrthoRate + amplitudes.OrthoRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
-                    clamp (baseRates.OrthoRates.ParaRate + amplitudes.OrthoRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
-                    clamp (baseRates.OrthoRates.SelfReflRate + amplitudes.OrthoRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0)
-                let para = opsActionRates.create(
-                    clamp (baseRates.ParaRates.OrthoRate + amplitudes.ParaRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
-                    clamp (baseRates.ParaRates.ParaRate + amplitudes.ParaRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
-                    clamp (baseRates.ParaRates.SelfReflRate + amplitudes.ParaRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0)
-                let selfRefl = opsActionRates.create(
-                    clamp (baseRates.SelfReflRates.OrthoRate + amplitudes.SelfReflRates.OrthoRate * Math.Sin(t)) 0.0 1.0,
-                    clamp (baseRates.SelfReflRates.ParaRate + amplitudes.SelfReflRates.ParaRate * Math.Sin(t + 2.0 * Math.PI / 3.0)) 0.0 1.0,
-                    clamp (baseRates.SelfReflRates.SelfReflRate + amplitudes.SelfReflRates.SelfReflRate * Math.Sin(t + 4.0 * Math.PI / 3.0)) 0.0 1.0)
-                opsTransitionRates.create(ortho, para, selfRefl))
+                let t = 
+                    if length = 1 then 0.0 
+                    else float i / float (length - 1) * 2.0 * Math.PI * frequency
+                opsTransitionRates.create
+                    (sinActionRates t baseRates.OrthoRates amplitudes.OrthoRates)
+                    (sinActionRates t baseRates.ParaRates amplitudes.ParaRates)
+                    (sinActionRates t baseRates.SelfReflRates amplitudes.SelfReflRates))
         opsTransitionRatesArray.create rates
 
     // Hot spot: Gaussian peak at specified index
-    let createGaussianHotSpot (length: int) (baseRates: opsTransitionRates) (hotSpotIndex: int) (hotSpotRates: opsTransitionRates) (sigma: float) : opsTransitionRatesArray =
+    let createGaussianHotSpot 
+            (length: int) 
+            (baseRates: opsTransitionRates) 
+            (hotSpotIndex: int) 
+            (hotSpotRates: opsTransitionRates) 
+            (sigma: float) : opsTransitionRatesArray =
         if length <= 0 then failwith "Length must be positive"
         if hotSpotIndex < 0 || hotSpotIndex >= length then failwith "HotSpotIndex out of range"
         if sigma <= 0.0 then failwith "Sigma must be positive"
@@ -103,32 +119,23 @@ module OpsTransitionRatesArray =
             Array.init length (fun i ->
                 let x = float (i - hotSpotIndex)
                 let weight = Math.Exp(-x * x / (2.0 * sigma * sigma))
-                let ortho = opsActionRates.create(
-                    baseRates.OrthoRates.OrthoRate + (hotSpotRates.OrthoRates.OrthoRate - baseRates.OrthoRates.OrthoRate) * weight,
-                    baseRates.OrthoRates.ParaRate + (hotSpotRates.OrthoRates.ParaRate - baseRates.OrthoRates.ParaRate) * weight,
-                    baseRates.OrthoRates.SelfReflRate + (hotSpotRates.OrthoRates.SelfReflRate - baseRates.OrthoRates.SelfReflRate) * weight)
-                let para = opsActionRates.create(
-                    baseRates.ParaRates.OrthoRate + (hotSpotRates.ParaRates.OrthoRate - baseRates.ParaRates.OrthoRate) * weight,
-                    baseRates.ParaRates.ParaRate + (hotSpotRates.ParaRates.ParaRate - baseRates.ParaRates.ParaRate) * weight,
-                    baseRates.ParaRates.SelfReflRate + (hotSpotRates.ParaRates.SelfReflRate - baseRates.ParaRates.SelfReflRate) * weight)
-                let selfRefl = opsActionRates.create(
-                    baseRates.SelfReflRates.OrthoRate + (hotSpotRates.SelfReflRates.OrthoRate - baseRates.SelfReflRates.OrthoRate) * weight,
-                    baseRates.SelfReflRates.ParaRate + (hotSpotRates.SelfReflRates.ParaRate - baseRates.SelfReflRates.ParaRate) * weight,
-                    baseRates.SelfReflRates.SelfReflRate + (hotSpotRates.SelfReflRates.SelfReflRate - baseRates.SelfReflRates.SelfReflRate) * weight)
-                opsTransitionRates.create(ortho, para, selfRefl))
+                // weight = 0 -> baseRates, weight = 1 -> hotSpotRates
+                lerpTransitionRates weight baseRates hotSpotRates)
         opsTransitionRatesArray.create rates
 
     // Hot spot: Step function creating a region of elevated rates
-    let createStepHotSpot (length: int) (baseRates: opsTransitionRates) (hotSpotStart: int) (hotSpotEnd: int) (hotSpotRates: opsTransitionRates) : opsTransitionRatesArray =
+    let createStepHotSpot 
+            (length: int) 
+            (baseRates: opsTransitionRates) 
+            (hotSpotStart: int) 
+            (hotSpotEnd: int) 
+            (hotSpotRates: opsTransitionRates) : opsTransitionRatesArray =
         if length <= 0 then failwith "Length must be positive"
-        if hotSpotStart < 0 || hotSpotStart >= length || hotSpotEnd < hotSpotStart || hotSpotEnd >= length then failwith "Invalid hot spot range"
+        if hotSpotStart < 0 || hotSpotStart >= length || hotSpotEnd < hotSpotStart || hotSpotEnd >= length then 
+            failwith "Invalid hot spot range"
         let rates =
             Array.init length (fun i ->
-                let rates = if i >= hotSpotStart && i <= hotSpotEnd then hotSpotRates else baseRates
-                opsTransitionRates.create(
-                    opsActionRates.create(rates.OrthoRates.OrthoRate, rates.OrthoRates.ParaRate, rates.OrthoRates.SelfReflRate),
-                    opsActionRates.create(rates.ParaRates.OrthoRate, rates.ParaRates.ParaRate, rates.ParaRates.SelfReflRate),
-                    opsActionRates.create(rates.SelfReflRates.OrthoRate, rates.SelfReflRates.ParaRate, rates.SelfReflRates.SelfReflRate)))
+                if i >= hotSpotStart && i <= hotSpotEnd then hotSpotRates else baseRates)
         opsTransitionRatesArray.create rates
 
     /// Mutates an array based on the provided rates. Returns a new array.

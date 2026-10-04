@@ -3,13 +3,13 @@
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
+open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sorting.V1.Simple
 open GeneSort.Model.Sorting.V1.Simple.Ce
 open GeneSort.Model.Sorting.V1.Simple.Si
 open GeneSort.Model.Sorting.V1.Simple.Rs
 open GeneSort.Model.Sorting.V1.Simple.Uf4
 open GeneSort.Model.Sorting.V1.Simple.Uf6
-open GeneSort.Model.Sorting.V1
-open GeneSort.Model.Sorting.V1.Simple
 
 
 type simpleSorterModelMutator =
@@ -71,7 +71,7 @@ module SimpleSorterModelMutator =
                 (selfSymRate: float<selfSymRate>) 
                 (mutVariant : mutatorVariant) : simpleSorterModelMutator =
             msrsRandMutate.create rngFactory 
-                    (opsActionRates.createMod (%modificationRate, %orthoRate, %paraRate, %selfSymRate))
+                    (opsActionRates.createMod %modificationRate %orthoRate %paraRate %selfSymRate)
                     mutVariant
             |> simpleSorterModelMutator.SmmMsrsRandMutate
 
@@ -88,44 +88,37 @@ module SimpleSorterModelMutator =
                 (mutVariant : mutatorVariant) : simpleSorterModelMutator =
 
             let opsSeedActionRates = 
-                opsActionRates.createMod (%seedModificationRate, %orthoRate, %paraRate, %selfSymRate)
+                opsActionRates.createMod %seedModificationRate %orthoRate %paraRate %selfSymRate
             let opsActionRates = 
-                opsActionRates.createMod (%modificationRate, %orthoRate, %paraRate, %selfSymRate)
+                opsActionRates.createMod %modificationRate %orthoRate %paraRate %selfSymRate
             let opsSeedTransitionRates = 
-                opsTransitionRates.createUniform2 opsSeedActionRates
+                opsTransitionRates.createUniformFromRates opsSeedActionRates
             let opsTransitionRates = 
-                opsTransitionRates.createUniform2 opsActionRates
+                opsTransitionRates.createUniformFromRates opsActionRates
 
-            let msuf4Mutator =
+            let uf4MutRates =
                 match mutVariant with
                 | mutatorVariant.V1 ->
-                    msuf4RandMutate.create 
-                        rngFactory 
                         (Uf4MutationRates.makeV1 
                                         (%sortingWidth) 
                                         opsSeedTransitionRates 
                                         opsTransitionRates )
-                        mutVariant
-
                 | mutatorVariant.V2 ->
-                    msuf4RandMutate.create 
-                        rngFactory 
                         (Uf4MutationRates.makeV1
                                         (%sortingWidth) 
                                         opsSeedTransitionRates 
                                         opsTransitionRates )
-                        mutVariant
 
                 | mutatorVariant.V3 ->
-                    msuf4RandMutate.create 
-                        rngFactory 
                         (Uf4MutationRates.makeV1
                                         (%sortingWidth) 
                                         opsSeedTransitionRates 
                                         opsTransitionRates )
-                        mutVariant
 
-            msuf4Mutator |> simpleSorterModelMutator.SmmMsuf4RandMutate
+
+
+            msuf4RandMutate.create rngFactory uf4MutRates mutVariant
+            |> simpleSorterModelMutator.SmmMsuf4RandMutate
 
 
     let getMsuf6ModelMutator 
@@ -142,19 +135,20 @@ module SimpleSorterModelMutator =
             let seed6ActionRates = 
                 seed6ActionRates.createUniform (%seedModificationRate)
 
-            let seed6TransitionRates = seed6TransitionRates.create(
-                        seed6ActionRates, seed6ActionRates, seed6ActionRates, 
-                        seed6ActionRates, seed6ActionRates, seed6ActionRates,
-                        seed6ActionRates)
+            let seed6TransitionRates = 
+                    seed6TransitionRates.create
+                        seed6ActionRates seed6ActionRates seed6ActionRates
+                        seed6ActionRates seed6ActionRates seed6ActionRates
+                        seed6ActionRates
 
             let opsActionRates = 
-                opsActionRates.createMod (%modificationRate, %orthoRate, %paraRate, %selfSymRate)
+                opsActionRates.createMod %modificationRate %orthoRate %paraRate %selfSymRate
             let opsTransitionRates = 
-                opsTransitionRates.createUniform2 opsActionRates
+                opsTransitionRates.createUniformFromRates opsActionRates
 
             msuf6RandMutate.create 
                    rngFactory 
-                    (Uf6MutationRates.makeUniform2
+                    (Uf6MutationRates.makeUniformFromRates
                                     (%sortingWidth) 
                                     seed6TransitionRates 
                                     opsTransitionRates)
