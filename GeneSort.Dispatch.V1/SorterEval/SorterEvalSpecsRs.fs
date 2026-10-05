@@ -12,32 +12,6 @@ open GeneSort.Dispatch.V1.CommonParams
 
 module SorterEvalSpecsRs =
 
-    let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let qp = host.QueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
-        rp.WithDatabaseName(Some host.Run.DatabaseName)
-          .WithRunName(Some host.Run.RunName)
-          .WithRunFinished(Some false)
-          .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
-          .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
-          .WithSortableDataFormat(Some sortableDataFormat.BitVector512)
-          .WithId (Some qp.Value.Id)
-
-    
-    let private standardSorterModelTypeFilter (rp: runParameters) =
-        maybe {
-            let! smt = rp.GetSimpleSorterModelType()
-            let! sw = rp.GetSortingWidth()
-            let has2factor = (%sw % 2 = 0)
-            let isPowerOf2 = (%sw &&& (%sw - 1) = 0)
-            let isGt4 = (%sw > 4)
-            let validMsce = (smt = simpleSorterModelType.Msce)
-            let validMssi = (smt = simpleSorterModelType.Mssi) && has2factor
-            let validMsrs = (smt = simpleSorterModelType.Msrs) && has2factor
-            let validMsuf4 = (smt = simpleSorterModelType.Msuf4) && isPowerOf2 && isGt4
-            return! if validMsce || validMssi || validMsrs || validMsuf4 then Some rp else None
-        }
-
-
     module Specs =
 
         let Rand_Test (executorType: sorterEvalExecutorType)  : runHostSpec = {
@@ -52,8 +26,8 @@ module SorterEvalSpecsRs =
                 allSimpleSorterModelTypes
                 largeSorterCount
             ]
-            filter = standardSorterModelTypeFilter
-            enhancer = standardEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.standardSorterModelCompatibility
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterEvalStandard
             allowOverwrite = false |> UMX.tag
             maxParallel = 1
         }
@@ -70,8 +44,8 @@ module SorterEvalSpecsRs =
                 allSimpleSorterModelTypes
                 extraLargeSorterCount
             ]
-            filter = standardSorterModelTypeFilter
-            enhancer = standardEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.standardSorterModelCompatibility
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterEvalStandard
             allowOverwrite = false |> UMX.tag
             maxParallel = 8
         }
@@ -88,8 +62,8 @@ module SorterEvalSpecsRs =
                 allSimpleSorterModelTypes
                 extraLargeSorterCount
             ]
-            filter = standardSorterModelTypeFilter
-            enhancer = standardEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.standardSorterModelCompatibility
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterEvalStandard
             allowOverwrite = false |> UMX.tag
             maxParallel = 4
         }

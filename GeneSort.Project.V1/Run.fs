@@ -5,78 +5,96 @@ open FSharp.UMX
 open GeneSort.Core
 
 
-type run =
+type simpleRun =
     private
         {
           dataBaseName: string<databaseName>
-          projName:     string<projectName>
+          projName: string<projectName>
           runName: string<runName>
           description: string
           parameterSpans: (string * string list) list
-          genSaveIntervalsName: string
-          genSaveSubIntervalsName: string
           queryCatalogName: string
         }
-    with
 
-    static member create
+module SimpleRun =
+    let create
             (databaseName: string<databaseName>)
-            (projName:     string<projectName>)
-            (runName: string<runName>)
-            (description: string)
-            (parameterSpans: (string * string list) list) : run =
-        run.createWithIntervalNames databaseName projName runName description parameterSpans "expInterval100_L50ss" "summaryInterval_C.1p5C"
-
-    static member createWithIntervalNames
-            (databaseName: string<databaseName>)
-            (projName: string<projectName>)
+            (projectName: string<projectName>)
             (runName: string<runName>)
             (description: string)
             (parameterSpans: (string * string list) list)
-            (genSaveIntervalsName: string)
-            (genSaveSubIntervalsName: string) : run =
-        run.createWithCatalogAndIntervalNames databaseName projName runName description parameterSpans genSaveIntervalsName genSaveSubIntervalsName (sprintf "%s.%s" %projName %databaseName)
+            (queryCatalogName: string) : simpleRun =
+        if String.IsNullOrWhiteSpace %databaseName then
+            failwith "Database name cannot be empty"
+        {
+          dataBaseName = databaseName
+          projName = projectName
+          runName = runName
+          description = description
+          parameterSpans = parameterSpans
+          queryCatalogName = queryCatalogName
+        }
 
-    static member createWithCatalogAndIntervalNames
+    let databaseName (run: simpleRun) = run.dataBaseName
+    let projectName (run: simpleRun) = run.projName
+    let runName (run: simpleRun) = run.runName
+    let description (run: simpleRun) = run.description
+    let parameterSpans (run: simpleRun) = run.parameterSpans
+    let queryCatalogName (run: simpleRun) = run.queryCatalogName
+
+type sgdRun =
+    private
+        {
+          baseRun: simpleRun
+          genSaveIntervalsName: string
+          genSaveSubIntervalsName: string
+        }
+
+module SgdRun =
+    let create
             (databaseName: string<databaseName>)
-            (projName: string<projectName>)
+            (projectName: string<projectName>)
             (runName: string<runName>)
             (description: string)
             (parameterSpans: (string * string list) list)
             (genSaveIntervalsName: string)
             (genSaveSubIntervalsName: string)
-            (queryCatalogName: string) : run =
-
-        if String.IsNullOrWhiteSpace %databaseName then
-            failwith "Query name cannot be empty"
+            (queryCatalogName: string) : sgdRun =
+        if String.IsNullOrWhiteSpace genSaveIntervalsName then
+            invalidArg (nameof genSaveIntervalsName) "Generation save interval name cannot be empty"
+        if String.IsNullOrWhiteSpace genSaveSubIntervalsName then
+            invalidArg (nameof genSaveSubIntervalsName) "Generation summary interval name cannot be empty"
         {
-          dataBaseName = databaseName
-          projName     = projName
-          runName = runName
-          description = description
-          parameterSpans = parameterSpans
+          baseRun = SimpleRun.create databaseName projectName runName description parameterSpans queryCatalogName
           genSaveIntervalsName = genSaveIntervalsName
           genSaveSubIntervalsName = genSaveSubIntervalsName
-          queryCatalogName = queryCatalogName
         }
 
-    static member createWithCatalogName
-            (databaseName: string<databaseName>)
-            (projName: string<projectName>)
-            (runName: string<runName>)
-            (description: string)
-            (parameterSpans: (string * string list) list)
-            (queryCatalogName: string) : run =
-        run.createWithCatalogAndIntervalNames databaseName projName runName description parameterSpans "expInterval100_L50ss" "summaryInterval_C.1p5C" queryCatalogName
+    let baseRun (run: sgdRun) = run.baseRun
+    let genSaveIntervalsName (run: sgdRun) = run.genSaveIntervalsName
+    let genSaveSubIntervalsName (run: sgdRun) = run.genSaveSubIntervalsName
 
-    member this.DatabaseName with get () = this.dataBaseName
-    member this.ProjectName with get () = this.projName
-    member this.RunName with get () = this.runName
-    member this.Description with get () = this.description
-    member this.ParameterSpans with get () = this.parameterSpans
-    member this.GenSaveIntervalsName with get () = this.genSaveIntervalsName
-    member this.GenSaveSubIntervalsName with get () = this.genSaveSubIntervalsName
-    member this.QueryCatalogName with get () = this.queryCatalogName
+type run =
+    | SimpleRun of simpleRun
+    | SgdRun of sgdRun
+    member this.BaseRun =
+        match this with
+        | SimpleRun value -> value
+        | SgdRun value -> SgdRun.baseRun value
+    member this.DatabaseName = SimpleRun.databaseName this.BaseRun
+    member this.ProjectName = SimpleRun.projectName this.BaseRun
+    member this.RunName = SimpleRun.runName this.BaseRun
+    member this.Description = SimpleRun.description this.BaseRun
+    member this.ParameterSpans = SimpleRun.parameterSpans this.BaseRun
+    member this.QueryCatalogName = SimpleRun.queryCatalogName this.BaseRun
+    member this.GenSaveIntervalsName =
+        match this with
+        | SimpleRun _ -> None
+        | SgdRun value -> Some (SgdRun.genSaveIntervalsName value)
+    member this.GenSaveSubIntervalsName =
+        match this with
+        | SimpleRun _ -> None
+        | SgdRun value -> Some (SgdRun.genSaveSubIntervalsName value)
 
 
 

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterEval
+namespace GeneSort.Dispatch.V1.SorterEval
 
 open System
 open System.Threading
@@ -22,7 +22,7 @@ open GeneSort.SortingLib.Sorter
 module Reporting =
 
     let makeFullReport 
-            (host: IRunHost)
+            (host: runHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
             (cts: CancellationTokenSource) 
@@ -61,7 +61,7 @@ module Reporting =
 
 
     let makeStageStatsReport 
-            (host: IRunHost)
+            (host: runHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
             (cts: CancellationTokenSource) 
@@ -116,7 +116,7 @@ module Reporting =
         } |> Async.map (logResult progress log)
 
     let makeCeBinSummaryStats
-            (host: IRunHost)
+            (host: runHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
             (cts: CancellationTokenSource) 

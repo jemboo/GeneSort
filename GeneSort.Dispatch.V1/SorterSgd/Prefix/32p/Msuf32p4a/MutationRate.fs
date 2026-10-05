@@ -24,16 +24,9 @@ let private withLocalParams (rp:runParameters) =
     rpn.WithOrthoRate(Some 4.001<orthoRate>)
 
 
-let private paramMapFilterMv2 (rp: runParameters) =
-    let seedRate = rp.GetSeedModificationRate().Value
-    let modRate = rp.GetModificationRate().Value
-    if %seedRate = %modRate then
-        None
-    else
-        Some rp
+let private paramMapFilterMv2 = RunParamFilterBuilders.seedModificationRateDiffers
 
-let private paramMapFilter (rp: runParameters) =
-        Some rp
+let private paramMapFilter = RunParamFilterBuilders.identity
 
 
 
@@ -43,27 +36,16 @@ let makeDatabase (dbName: string<databaseName>) : IGeneSortDb =
     new GeneSortDbMp(makeFolderFromDbName dbName, "sorter-sgd.msuf32-mutation-rate")
 
 
-let createRunHost (spec: runHostSpec) : IRunHost =
+let createRunHost (spec: runHostSpec) : runHost =
     let db = makeDatabase spec.databaseName
-    let run = run.createWithCatalogName spec.databaseName projName spec.runName spec.runDescription spec.spans spec.queryCatalogName
-    runHost.Create db spec run :> IRunHost
+    let run = run.SgdRun (SgdRun.create spec.databaseName projName spec.runName spec.runDescription spec.spans "expInterval100_L50ss" "summaryInterval_C.1p5C" spec.queryCatalogName)
+    runHost.Create db spec run
 
 
 module VarModR_32 =
 
-    let private finishRunParams (host: IRunHost) (rp:runParameters) =
-        let rp2 = withLocalParams rp
-        let scpp = rp.GetSorterCountPerPool().Value
-        let scpps = rp.GetSorterCountPerPoolSet().Value
-        let spc = (%scpps / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
-        let rp3 = rp2.WithSorterPoolCount(spc)
-                     .WithGenerationCurrent(Some 0<generationNumber>)
-        let qp = host.QueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
-
-        rp3.WithRunFinished(Some false)
-                .WithId(Some qp.Value.Id)
-                .WithRunName(Some host.Run.RunName)
-                .WithSelectedSorterCountPerPool(Some scpp)
+    let private finishRunParams =
+        RunParamEnhancerBuilders.Sgd.fromSorterPoolSet withLocalParams true true None
 
 
 
@@ -84,8 +66,8 @@ module VarModR_32 =
             (runParameters.modificationRateKey, [0.020; 0.050;]  |> List.map string)
             (runParameters.mutatorVariantKey, [mutatorVariant.V1; mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
         ]
-        filter = paramMapFilterMv2
-        enhancer = finishRunParams
+        filterCatalogName = RunParamFilterBuilders.register (paramMapFilterMv2)
+        enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
         allowOverwrite = false |> UMX.tag
         maxParallel = 8
     }
@@ -108,12 +90,11 @@ module VarModR_32 =
             (runParameters.modificationRateKey, [0.015; 0.020; 0.025; 0.030; 0.040; 0.050;] |> List.map string)
             (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
         ]
-        filter = paramMapFilter
-        enhancer = finishRunParams
+        filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
+        enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
         allowOverwrite = false |> UMX.tag
         maxParallel = 8
     }
-
 
 
     let Pool_512_V2a (executorType: sorterSgdExecutorType)  : runHostSpec = {
@@ -133,8 +114,8 @@ module VarModR_32 =
             (runParameters.modificationRateKey, [0.020; 0.025; 0.030; 0.035; 0.040;] |> List.map string)
             (runParameters.mutatorVariantKey, [mutatorVariant.V2] |> List.map (MutatorVariant.toString))
         ]
-        filter = paramMapFilter
-        enhancer = finishRunParams
+        filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
+        enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
         allowOverwrite = false |> UMX.tag
         maxParallel = 8
     }

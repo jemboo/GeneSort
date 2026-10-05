@@ -11,48 +11,6 @@ open GeneSort.SortingOps
 
 module SorterEvalSpecsTestPrefix =
 
-    let private prefixEnhancer 
-                    (host: IRunHost) 
-                    (rp: runParameters) : runParameters =
-        let qp = host.QueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
-                 |> Option.get
-
-        let pfxLibId = rp.GetPrefixLibId().Value
-
-        rp.WithDatabaseName(Some host.Run.DatabaseName)
-          .WithSortingWidth(Some pfxLibId.SortingWidth)
-          .WithRunName(Some host.Run.RunName)
-          .WithRunFinished(Some false)
-          .WithExcludeSelfCe(Some (true |>UMX.tag<excludeSelfCe>))
-          .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
-          .WithId (Some qp.Id)
-
-
-    let private paramMapFilter (rp: runParameters) : runParameters option = 
-        maybe {
-            let! smt = rp.GetSimpleSorterModelType()
-            let! pfxLibId = rp.GetPrefixLibId()
-            let sw = pfxLibId.SortingWidth
-        
-            let has2factor = (%sw % 2 = 0)
-            let isMuf4able = (MathUtils.isAPowerOfTwo %sw)
-            let isMuf6able = (%sw % 3 = 0) && (MathUtils.isAPowerOfTwo (%sw / 3))
-
-            // We bind to unit just to enforce the filter
-            let! _ = 
-                match smt with
-                | simpleSorterModelType.Msce -> Some ()
-                | simpleSorterModelType.Mssi | simpleSorterModelType.Msrs -> 
-                    if has2factor then Some () else None
-                | simpleSorterModelType.Msuf4 -> 
-                    if isMuf4able then Some () else None
-                | simpleSorterModelType.Msuf6 -> 
-                    if isMuf6able then Some () else None
-
-            return rp
-        }
-
-
     module Specs =
 
         let Prefix_24s (executorType: sorterEvalExecutorType) : runHostSpec = {
@@ -68,8 +26,8 @@ module SorterEvalSpecsTestPrefix =
                 sorterEvalTypeV2
                 largeSorterCount
             ]
-            filter = paramMapFilter
-            enhancer = prefixEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.prefixSorterModelCompatibility
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterEvalPrefix
             allowOverwrite = false |> UMX.tag
             maxParallel = 1
         }
@@ -88,8 +46,8 @@ module SorterEvalSpecsTestPrefix =
                 sorterEvalTypeV2
                 largeSorterCount
             ]
-            filter = paramMapFilter
-            enhancer = prefixEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.prefixSorterModelCompatibility
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterEvalPrefix
             allowOverwrite = false |> UMX.tag
             maxParallel = 8
         }

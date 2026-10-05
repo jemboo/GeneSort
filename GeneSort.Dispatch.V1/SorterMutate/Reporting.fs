@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterMutate
+namespace GeneSort.Dispatch.V1.SorterMutate
 
 open System
 open System.Threading
@@ -22,7 +22,7 @@ module Reporting =
 
     let makeMutantReport
             (mutantDetailsMaker: runParameters -> Async<Result<sorterSelection * Map<Guid<sorterModelId>, Guid<sorterModelId>>, string>>)
-            (host: IRunHost)
+            (host: runHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
             (cts: CancellationTokenSource) 
@@ -97,7 +97,7 @@ module Reporting =
 
 
     let makeFullReport 
-            (host: IRunHost)
+            (host: runHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
             (cts: CancellationTokenSource) 

@@ -28,18 +28,17 @@ module MutationRate =
         let rpn = projectParams rp
         rpn.WithOrthoRate(Some 4.001<orthoRate>)
 
-    let private paramMapFilter (rp: runParameters) =
-        Some rp
+    let private paramMapFilter = RunParamFilterBuilders.identity
 
     do QueryParamsBuilders.registerAll ()
     let makeDatabase (dbName: string<databaseName>) : IGeneSortDb =
         new GeneSortDbMp(makeFolderFromDbName dbName, "sorter-sgd.msrs32-mutation-rate")
 
 
-    let createRunHost (spec: runHostSpec) : IRunHost =
+    let createRunHost (spec: runHostSpec) : runHost =
         let db = makeDatabase spec.databaseName
-        let run = run.createWithCatalogName spec.databaseName projName spec.runName spec.runDescription spec.spans spec.queryCatalogName
-        runHost.Create db spec run :> IRunHost
+        let run = run.SgdRun (SgdRun.create spec.databaseName projName spec.runName spec.runDescription spec.spans "expInterval100_L50ss" "summaryInterval_C.1p5C" spec.queryCatalogName)
+        runHost.Create db spec run
 
 
 
@@ -47,18 +46,9 @@ module MutationRate =
     
         let globalSorterCount = 512 |> UMX.tag<sorterCount>
 
-        let private finishRunParams (host: IRunHost) (rp:runParameters) =
-            let rp2 = withLocalParams rp
-            let scpp = rp.GetSorterCountPerPool().Value
-            let selScpp = scpp
-            let spc = (%globalSorterCount / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
-            let rp3 = rp2.WithSorterPoolCount(spc)
-            let qp = host.QueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
-
-            rp3.WithRunFinished(Some false)
-                    .WithId(Some qp.Value.Id)
-                    .WithRunName(Some host.Run.RunName)
-                    .WithSelectedSorterCountPerPool(Some selScpp)
+        let private finishRunParams =
+            RunParamEnhancerBuilders.Sgd.fromGlobalSorterCount
+                withLocalParams globalSorterCount true None
 
 
         let Test (executorType: sorterSgdExecutorType) : runHostSpec = {
@@ -78,8 +68,8 @@ module MutationRate =
                 (runParameters.modificationRateKey, [0.25;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filter = paramMapFilter
-            enhancer = finishRunParams
+            filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
+            enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
             allowOverwrite = false |> UMX.tag
             maxParallel = 1
         }
@@ -102,8 +92,8 @@ module MutationRate =
                 (runParameters.modificationRateKey, [0.015; 0.20; 0.25; 0.30; 0.40; 0.50;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filter = paramMapFilter
-            enhancer = finishRunParams
+            filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
+            enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
             allowOverwrite = false |> UMX.tag
             maxParallel = 16
         }
@@ -127,8 +117,8 @@ module MutationRate =
                 (runParameters.modificationRateKey, [0.225; 0.25; 0.275;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filter = paramMapFilter
-            enhancer = finishRunParams
+            filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
+            enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
             allowOverwrite = false |> UMX.tag
             maxParallel = 16
         }
@@ -138,17 +128,9 @@ module MutationRate =
     
         let globalSorterCount = 512 |> UMX.tag<sorterCount>
 
-        let private finishRunParams (host: IRunHost) (rp:runParameters) =
-            let rp2 = withLocalParams rp
-            let scpp = rp.GetSorterCountPerPool().Value
-            let spc = (%globalSorterCount / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
-            let rp3 = rp2.WithSorterPoolCount(spc)
-            let qp = host.QueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
-
-            rp3.WithRunFinished(Some false)
-                    .WithId(Some qp.Value.Id)
-                    .WithRunName(Some host.Run.RunName)
-                    .WithSelectedSorterCountPerPool(Some scpp)
+        let private finishRunParams =
+            RunParamEnhancerBuilders.Sgd.fromGlobalSorterCount
+                withLocalParams globalSorterCount true None
 
 
         let Test (executorType: sorterSgdExecutorType) : runHostSpec = {
@@ -167,8 +149,8 @@ module MutationRate =
                 (runParameters.modificationRateKey, [0.25;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filter = paramMapFilter
-            enhancer = finishRunParams
+            filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
+            enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
             allowOverwrite = false |> UMX.tag
             maxParallel = 1
         }
@@ -190,8 +172,8 @@ module MutationRate =
                 (runParameters.modificationRateKey, [0.015; 0.20; 0.25; 0.30; 0.40; 0.50; 0.99] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filter = paramMapFilter
-            enhancer = finishRunParams
+            filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
+            enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
             allowOverwrite = false |> UMX.tag
             maxParallel = 16
         }
@@ -214,8 +196,8 @@ module MutationRate =
                 (runParameters.modificationRateKey, [0.25; 0.30; 0.40; 0.50;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filter = paramMapFilter
-            enhancer = finishRunParams
+            filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
+            enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
             allowOverwrite = false |> UMX.tag
             maxParallel = 16
         }
@@ -227,18 +209,9 @@ module MutationRate =
     
         let globalSorterCount = 512 |> UMX.tag<sorterCount>
 
-        let private finishRunParams (host: IRunHost) (rp:runParameters) =
-            let rp2 = withLocalParams rp
-            let scpp = rp.GetSorterCountPerPool().Value
-            let spc = (%globalSorterCount / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
-            let rp3 = rp2.WithSorterPoolCount(spc)
-                         .WithModificationRate(Some 0.99<modificationRate>)
-            let qp = host.QueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
-
-            rp3.WithRunFinished(Some false)
-                    .WithId(Some qp.Value.Id)
-                    .WithRunName(Some host.Run.RunName)
-                    .WithSelectedSorterCountPerPool(Some scpp)
+        let private finishRunParams =
+            RunParamEnhancerBuilders.Sgd.fromGlobalSorterCount
+                withLocalParams globalSorterCount true (Some 0.99<modificationRate>)
 
         
         let Test2 (executorType: sorterSgdExecutorType) : runHostSpec = {
@@ -256,8 +229,8 @@ module MutationRate =
                 (runParameters.mutationModKey, [0] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filter = paramMapFilter
-            enhancer = finishRunParams
+            filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
+            enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
             allowOverwrite = false |> UMX.tag
             maxParallel = 8
         }
@@ -268,18 +241,9 @@ module MutationRate =
     
         let globalSorterCount = 512 |> UMX.tag<sorterCount>
 
-        let private finishRunParams (host: IRunHost) (rp:runParameters) =
-            let rp2 = withLocalParams rp
-            let scpp = rp.GetSorterCountPerPool().Value
-            let spc = (%globalSorterCount / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
-            let rp3 = rp2.WithSorterPoolCount(spc)
-                         .WithModificationRate(Some 0.99<modificationRate>)
-            let qp = host.QueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
-
-            rp3.WithRunFinished(Some false)
-                    .WithId(Some qp.Value.Id)
-                    .WithRunName(Some host.Run.RunName)
-                    .WithSelectedSorterCountPerPool(Some scpp)
+        let private finishRunParams =
+            RunParamEnhancerBuilders.Sgd.fromGlobalSorterCount
+                withLocalParams globalSorterCount true (Some 0.99<modificationRate>)
 
         
         let WideTest (executorType: sorterSgdExecutorType) : runHostSpec = {
@@ -297,8 +261,8 @@ module MutationRate =
                 (runParameters.mutationModKey, [0] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filter = paramMapFilter
-            enhancer = finishRunParams
+            filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
+            enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
             allowOverwrite = false |> UMX.tag
             maxParallel = 16
         }

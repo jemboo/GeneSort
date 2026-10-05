@@ -8,20 +8,6 @@ open CommonParams
 
 module SortableTestSpecsMerge =
 
-    let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let qp = host.QueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
-        rp.WithDatabaseName(Some host.Run.DatabaseName)
-          .WithRunName(Some host.Run.RunName)
-          .WithRunFinished(Some false)
-          .WithId (Some qp.Value.Id)
-
-    let private mergeDimensionDividesSortingWidth (rp: runParameters) =
-        let sw = rp.GetMergeLibId().Value.SortingWidth
-        let md = rp.GetMergeLibId().Value.MergeDimension
-        if (%sw % %md = 0) then Some rp else None
-
-
-
     module Specs =
 
         let Merge_Test  (executorType: sortableTestExecutorType) : runHostSpec = {
@@ -33,8 +19,8 @@ module SortableTestSpecsMerge =
                 mergeLib_Merge32s
                 dataFormatInt8v512
             ]
-            filter = mergeDimensionDividesSortingWidth
-            enhancer = standardEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.mergeDimensionDividesSortingWidth
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sortableTest
             allowOverwrite = false |> UMX.tag
             maxParallel = 1
         }

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterSgd
+namespace GeneSort.Dispatch.V1.SorterSgd
 
 open System
 open System.Threading
@@ -94,52 +94,64 @@ module Reporting =
         } |> Async.map (logResult progress (fun msg -> OpsUtils.report progress msg))
 
     // --- Specific Report Builders ---
-    let private makeSummaryReport (host: IRunHost) rp allowOverwrite cts progress =
-        let genDb = host.RunDb
-        let recordExtractor (prefix:string) (spsSummaries:sorterPoolSetSummary seq) : dataTableRecord seq =
+    let private makeSummaryReport (host: runHost) rp allowOverwrite cts progress =
+        match host.GenSaveIntervals with
+        | None -> async { return Error "Generation reports require an SgdRun with generation save intervals." }
+        | Some saveIntervals ->
+          let genDb = host.RunDb
+          let recordExtractor (prefix:string) (spsSummaries:sorterPoolSetSummary seq) : dataTableRecord seq =
                 spsSummaries |> Seq.collect(fun poolSetSummary ->
                 poolSetSummary
                 |> SorterPoolSetSummary.toDataTableRecords prefix
             )
-        makeDynamicReportFromSlices
+          makeDynamicReportFromSlices
             Utils.loadAvailableSorterPoolSetSummarySets
             (fun spss -> spss.LastGeneration)
             (SorterPoolSetSummarySet.toDataTableRecords "")
             "SummaryReport"
-            host.GenSaveIntervals
+            saveIntervals
             genDb rp allowOverwrite cts progress
 
 
-    let private makeSnapshotReport (host: IRunHost) rp allowOverwrite cts progress =
-        let genDb = host.RunDb
-        makeDynamicReportFromSlices
+    let private makeSnapshotReport (host: runHost) rp allowOverwrite cts progress =
+        match host.GenSaveIntervals with
+        | None -> async { return Error "Generation reports require an SgdRun with generation save intervals." }
+        | Some saveIntervals ->
+          let genDb = host.RunDb
+          makeDynamicReportFromSlices
             Utils.loadAvailableSorterPoolSets
             (fun srtrPoolSet -> srtrPoolSet.GenerationNumber)
             (SorterPoolSetDescription.toDataTableRecordsSnapshot "")
             "SnapshotReport"
-            host.GenSaveIntervals
+            saveIntervals
             genDb rp allowOverwrite cts progress
 
 
-    let private makePoolHistoryReport (host: IRunHost) rp allowOverwrite cts progress =
-        let genDb = host.RunDb
-        makeDynamicReportFromSlices
+    let private makePoolHistoryReport (host: runHost) rp allowOverwrite cts progress =
+        match host.GenSaveIntervals with
+        | None -> async { return Error "Generation reports require an SgdRun with generation save intervals." }
+        | Some saveIntervals ->
+          let genDb = host.RunDb
+          makeDynamicReportFromSlices
             Utils.loadAvailableSorterPoolSetHistories
             (fun hist -> hist.SaveGeneration)
             SorterPoolSetHistory.toDataTableRecords
             "SorterPoolSetHistoryReport"
-            host.GenSaveIntervals
+            saveIntervals
             genDb rp allowOverwrite cts progress
 
 
-    let private makePoolBinsReport (host: IRunHost) rp allowOverwrite cts progress =
-        let genDb = host.RunDb
-        makeDynamicReportFromSlices
+    let private makePoolBinsReport (host: runHost) rp allowOverwrite cts progress =
+        match host.GenSaveIntervals with
+        | None -> async { return Error "Generation reports require an SgdRun with generation save intervals." }
+        | Some saveIntervals ->
+          let genDb = host.RunDb
+          makeDynamicReportFromSlices
             Utils.loadAvailableSorterPoolBins
             (fun hist -> hist.MaxGeneration)
             SorterPoolEvalBinsSetCollection.makeDataTableRecords
             "SorterPoolBinsReport"
-            host.GenSaveIntervals
+            saveIntervals
             genDb rp allowOverwrite cts progress
 
 

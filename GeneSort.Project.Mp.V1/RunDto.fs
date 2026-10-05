@@ -27,13 +27,15 @@ type runDto =
 module RunDto =
 
     let fromDomain (project: run) : runDto =
+        let saveIntervalsName = project.GenSaveIntervalsName |> Option.toObj
+        let saveSubIntervalsName = project.GenSaveSubIntervalsName |> Option.toObj
         {
             DataBaseName = %project.DatabaseName
             ProjectName = %project.ProjectName
             RunName = %project.RunName
             Description = project.Description
-            GenSaveIntervalsName = project.GenSaveIntervalsName
-            GenSaveSubIntervalsName = project.GenSaveSubIntervalsName
+            GenSaveIntervalsName = saveIntervalsName
+            GenSaveSubIntervalsName = saveSubIntervalsName
             QueryCatalogName = project.QueryCatalogName
             ParameterSpans =
                 project.ParameterSpans
@@ -42,16 +44,31 @@ module RunDto =
         }
 
     let toDomain (dto: runDto) : run =
-        run.createWithCatalogAndIntervalNames
-          (dto.DataBaseName |> UMX.tag<databaseName> )
-          (dto.ProjectName |> UMX.tag<projectName> )
-          (dto.RunName |> UMX.tag<runName> )
-          dto.Description
-          (dto.ParameterSpans
-           |> Option.ofObj
-           |> Option.defaultValue [||]
-           |> Array.map (fun span -> span.Key, (span.Values |> Array.toList))
-          |> Array.toList)
-          (dto.GenSaveIntervalsName |> Option.ofObj |> Option.defaultValue "expInterval100_L50ss")
-          (dto.GenSaveSubIntervalsName |> Option.ofObj |> Option.defaultValue "summaryInterval_C.1p5C")
-          (dto.QueryCatalogName |> Option.ofObj |> Option.defaultValue (sprintf "%s.%s" dto.ProjectName dto.DataBaseName))
+        let databaseName = dto.DataBaseName |> UMX.tag<databaseName>
+        let projectName = dto.ProjectName |> UMX.tag<projectName>
+        let runName = dto.RunName |> UMX.tag<runName>
+        let parameterSpans =
+            dto.ParameterSpans
+            |> Option.ofObj
+            |> Option.defaultValue [||]
+            |> Array.map (fun span -> span.Key, (span.Values |> Array.toList))
+            |> Array.toList
+        let queryCatalogName =
+            dto.QueryCatalogName
+            |> Option.ofObj
+            |> Option.defaultValue (sprintf "%s.%s" dto.ProjectName dto.DataBaseName)
+        match Option.ofObj dto.GenSaveIntervalsName, Option.ofObj dto.GenSaveSubIntervalsName with
+        | None, None ->
+            SimpleRun (SimpleRun.create databaseName projectName runName dto.Description parameterSpans queryCatalogName)
+        | saveIntervals, saveSubIntervals ->
+            SgdRun (
+                SgdRun.create
+                    databaseName
+                    projectName
+                    runName
+                    dto.Description
+                    parameterSpans
+                    (saveIntervals |> Option.defaultValue "expInterval100_L50ss")
+                    (saveSubIntervals |> Option.defaultValue "summaryInterval_C.1p5C")
+                    queryCatalogName
+            )

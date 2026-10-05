@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SortableTest
+namespace GeneSort.Dispatch.V1.SortableTest
 
 open System
 open System.Threading
@@ -15,7 +15,7 @@ open GeneSort.SortingLib.Sorter
 module SortableTestExecutor =
 
     let _makeSortableTestMerge
-        (host: IRunHost)
+        (host: runHost)
         (rp: runParameters) 
         (allowOverwrite: bool<allowOverwrite>) 
         (cts: CancellationTokenSource) 
@@ -72,7 +72,7 @@ module SortableTestExecutor =
 
 
     let _makeSortableTestPrefix
-        (host: IRunHost)
+        (host: runHost)
         (rp: runParameters) 
         (allowOverwrite: bool<allowOverwrite>) 
         (cts: CancellationTokenSource) 

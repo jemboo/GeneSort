@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterSgd
+namespace GeneSort.Dispatch.V1.SorterSgd
 
 open GeneSort.Dispatch.V1
 open GeneSort.Db.V1
@@ -15,6 +15,16 @@ type sorterSgdExecutorType =
 
 module SorterSgdExecutorType =
 
+    let private executeEvolution (host: runHost) rp allowOverwrite cts progress makeTests createSeedPoolSet =
+        match host with
+        | SgdRunHost sgdHost ->
+            SgdExecutor.evaluateEvolutionRun
+                makeTests
+                createSeedPoolSet
+                host.RunDb sgdHost.GenSaveIntervals sgdHost.GenSaveSubIntervals rp allowOverwrite cts progress
+        | SimpleRunHost _ ->
+            async { return Error "SGD execution requires an SgdRun with generation save interval names." }
+
     let toString = function
         | GenStandard -> "GenStandard"
         | GenMerge -> "GenMerge"
@@ -28,29 +38,26 @@ module SorterSgdExecutorType =
     let private standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                let genDb = host.RunDb
-                SgdExecutor.evaluateEvolutionRun
+                executeEvolution host rp allowOverwrite cts progress
                     SortableTestMakers.makeStandardTests
                     PoolSetMakers.createSeedSorterPoolSetStandard
-                    genDb host.GenSaveIntervals host.GenSaveSubIntervals rp allowOverwrite cts progress }
+        }
 
     let private mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                let genDb = host.RunDb
-                SgdExecutor.evaluateEvolutionRun
+                executeEvolution host rp allowOverwrite cts progress
                     SortableTestMakers.makeMergeTests
                     PoolSetMakers.createSeedSorterPoolSetMerge
-                    genDb host.GenSaveIntervals host.GenSaveSubIntervals rp allowOverwrite cts progress }
+        }
 
     let private prefixExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                let genDb = host.RunDb
-                SgdExecutor.evaluateEvolutionRun
+                executeEvolution host rp allowOverwrite cts progress
                     SortableTestMakers.makePrefixTests
                     PoolSetMakers.createSeedSorterPoolSetPrefix
-                    genDb host.GenSaveIntervals host.GenSaveSubIntervals rp allowOverwrite cts progress }
+        }
 
 
     let getExecutor (executorType: sorterSgdExecutorType) : IRunParamsExecutor =

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterEval
+namespace GeneSort.Dispatch.V1.SorterEval
 
 open System
 open System.Threading
@@ -21,7 +21,7 @@ module SorterEvalExecutor =
     let _makeSorterEvals 
             (makeSorterModelSet: runParameters -> sorterModelSet option)
             (makeSortableTests: runParameters -> Async<Result<sortableTest * (ce array), string>>)
-            (host: IRunHost)
+            (host: runHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
             (cts: CancellationTokenSource) 

@@ -48,7 +48,7 @@ module DispatchSorterSgd =
 
     ////********** Msuf6SgdSpecsPrefix **********
     //let private executorType = sorterSgdExecutorType.SummaryReport
-    //let private host: IRunHost = Msuf624p3b.MutationRate.createRunHost (Msuf624p3b.MutationRate.VarModR_32.Test executorType)
+    //let private host: runHost = Msuf624p3b.MutationRate.createRunHost (Msuf624p3b.MutationRate.VarModR_32.Test executorType)
 
     //let private executor = SorterSgdExecutorType.getExecutor executorType
     //let private minReplica = 0<replNumber>
@@ -56,7 +56,7 @@ module DispatchSorterSgd =
 
     //********** Msuf4SgdSpecsPrefix **********
     let private executorType = sorterSgdExecutorType.SummaryReport
-    let private host: IRunHost = Msuf32p4a.MutationRate.createRunHost (Msuf32p4a.MutationRate.VarModR_32.Pool_32_Test executorType)
+    let private host: runHost = Msuf32p4a.MutationRate.createRunHost (Msuf32p4a.MutationRate.VarModR_32.Pool_32_Test executorType)
 
     let private executor = SorterSgdExecutorType.getExecutor executorType
     let private minReplica = 0<replNumber>
@@ -64,7 +64,7 @@ module DispatchSorterSgd =
 
     //********** MsrsSgdSpecsPrefix **********
     //let private executorType = sorterSgdExecutorType.GenPrefix
-    //let private host: IRunHost = Msrs32p4a.MutationRate.createRunHost (Msrs32p4a.MutationRate.VarModR_64.NarrowTest executorType)
+    //let private host: runHost = Msrs32p4a.MutationRate.createRunHost (Msrs32p4a.MutationRate.VarModR_64.NarrowTest executorType)
 
     //let private executor = SorterSgdExecutorType.getExecutor executorType
     //let private minReplica = 1<replNumber>
@@ -73,7 +73,7 @@ module DispatchSorterSgd =
 
     //********** MssiSgdSpecsPrefix **********
     //let private executorType = sorterSgdExecutorType.SummaryReport
-    //let private host: IRunHost = Mssi24p3b.OrthoPara.createRunHost (Mssi24p3b.OrthoPara.Specs64.SymForceDiff1 executorType)
+    //let private host: runHost = Mssi24p3b.OrthoPara.createRunHost (Mssi24p3b.OrthoPara.Specs64.SymForceDiff1 executorType)
 
     //let private executor = SorterSgdExecutorType.getExecutor executorType
     //let private minReplica = 0<replNumber>

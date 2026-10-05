@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1
+namespace GeneSort.Dispatch.V1
 
 open System
 open System.Threading
@@ -9,7 +9,7 @@ open GeneSort.Project.V1
 /// Define the contract for an Executor
 type IRunParamsExecutor =
     abstract member Execute : 
-        host: IRunHost -> 
+        host: runHost -> 
         rp: runParameters -> 
         allowOverwrite: bool<allowOverwrite> -> 
         cts: CancellationTokenSource -> 
@@ -19,7 +19,7 @@ type IRunParamsExecutor =
 
 module RunParamsExecutor =
     let execute (executor: IRunParamsExecutor) 
-                (host: IRunHost) 
+                (host: runHost) 
                 (rp: runParameters) 
                 (allowOverwrite: bool<allowOverwrite>) 
                 (cts: CancellationTokenSource) 

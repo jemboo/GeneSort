@@ -11,48 +11,6 @@ open GeneSort.SortingOps
 
 module SorterEvalSpecsRm =
 
-    let private mergeEnhancer 
-                    (host: IRunHost) 
-                    (rp: runParameters) : runParameters =
-        let qp = host.QueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
-                 |> Option.get
-        let mrgLibId = rp.GetMergeLibId().Value
-        rp.WithDatabaseName(Some host.Run.DatabaseName)
-          .WithRunName(Some host.Run.RunName)
-          .WithRunFinished(Some false)
-          .WithSortingWidth(Some mrgLibId.SortingWidth)
-          .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
-          .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
-          .WithId (Some qp.Id)
-
-
-    let private paramMapFilter (rp: runParameters) : runParameters option = 
-        maybe {
-            let! smt = rp.GetSimpleSorterModelType()
-            let! mrgLibId = rp.GetMergeLibId()
-        
-            let has2factor = (%mrgLibId.SortingWidth % 2 = 0)
-            let isMuf4able = (MathUtils.isAPowerOfTwo %mrgLibId.SortingWidth)
-            let isMuf6able = (%mrgLibId.SortingWidth % 3 = 0) && (MathUtils.isAPowerOfTwo (%mrgLibId.SortingWidth / 3))
-
-            // We bind to unit just to enforce the filter
-            let! _ = 
-                match smt with
-                | simpleSorterModelType.Msce -> Some ()
-                | simpleSorterModelType.Mssi | simpleSorterModelType.Msrs -> 
-                    if has2factor then Some () else None
-                | simpleSorterModelType.Msuf4 -> 
-                    if isMuf4able then Some () else None
-                | simpleSorterModelType.Msuf6 -> 
-                    if isMuf6able then Some () else None
-
-            // Merge dimension check: If it doesn't divide, return None to stop
-            if (%mrgLibId.SortingWidth % %mrgLibId.MergeDimension <> 0) then return! None
-        
-            return rp
-        }
-
-
     module Specs =
 
         let Rand_MergeTest_Test (executorType: sorterEvalExecutorType) : runHostSpec = {
@@ -69,8 +27,8 @@ module SorterEvalSpecsRm =
                 sorterEvalTypeV2
                 smallSorterCount
             ]
-            filter = paramMapFilter
-            enhancer = mergeEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.mergeSorterModelCompatibility
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterEvalMerge
             allowOverwrite = false |> UMX.tag
             maxParallel = 1
         }
@@ -91,8 +49,8 @@ module SorterEvalSpecsRm =
                 allMergeDimensions
                 extraLargeSorterCount
             ]
-            filter = paramMapFilter
-            enhancer = mergeEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.mergeSorterModelCompatibility
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterEvalMerge
             allowOverwrite = false |> UMX.tag
             maxParallel = 8
         }
@@ -113,8 +71,8 @@ module SorterEvalSpecsRm =
                 lowMergeDimensions
                 largeSorterCount
             ]
-            filter = paramMapFilter
-            enhancer = mergeEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.mergeSorterModelCompatibility
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterEvalMerge
             allowOverwrite = false |> UMX.tag
             maxParallel = 4
         }
@@ -135,8 +93,8 @@ module SorterEvalSpecsRm =
                 mergeDimension6
                 largeSorterCount
             ]
-            filter = paramMapFilter
-            enhancer = mergeEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.mergeSorterModelCompatibility
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterEvalMerge
             allowOverwrite = false |> UMX.tag
             maxParallel = 2
         }
@@ -157,8 +115,8 @@ module SorterEvalSpecsRm =
                 mergeDimension2
                 largeSorterCount
             ]
-            filter = paramMapFilter
-            enhancer = mergeEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.mergeSorterModelCompatibility
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterEvalMerge
             allowOverwrite = false |> UMX.tag
             maxParallel = 2
         }

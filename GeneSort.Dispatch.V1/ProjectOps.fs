@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1
+namespace GeneSort.Dispatch.V1
 
 open System
 open System.Threading
@@ -64,7 +64,7 @@ module ProjectOps =
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource)
             (progress: IProgress<string> option)
-            (host: IRunHost)
+            (host: runHost)
             (executor: IRunParamsExecutor)
             (maxParallel: int) =
         asyncResult {

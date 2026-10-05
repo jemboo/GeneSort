@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterMutate
+namespace GeneSort.Dispatch.V1.SorterMutate
 
 open System
 open System.Threading
@@ -323,7 +323,7 @@ module SorterMutateExecutor =
     let _evaluateMutants 
             (makeMutantSorterModels: runParameters -> Async<Result<sorterModel seq, string>> )
             (makeSortableTests: runParameters -> Async<Result<sortableTest * (ce array), string>>)
-            (host: IRunHost)
+            (host: runHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
             (cts: CancellationTokenSource) 

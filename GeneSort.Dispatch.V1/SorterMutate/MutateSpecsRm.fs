@@ -18,44 +18,6 @@ module MutateSpecsRm =
             (runParameters.seedSorterPoolSelectionTypeKey, 
             [ sorterSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterSelectionType.toString)
 
-    let standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let qp = host.QueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
-        rp.WithDatabaseName(Some host.Run.DatabaseName)
-          .WithRunName(Some host.Run.RunName)
-          .WithRunFinished(Some false)
-          .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
-          .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
-          .WithId (Some qp.Value.Id)
-
-
-
-    let private paramMapFilter (rp: runParameters) : runParameters option = 
-        maybe {
-            let! smt = rp.GetSimpleSorterModelType()
-            let! mrgLibId = rp.GetMergeLibId()
-        
-            let has2factor = (%mrgLibId.SortingWidth % 2 = 0)
-            let isMuf4able = (MathUtils.isAPowerOfTwo %mrgLibId.SortingWidth)
-            let isMuf6able = (%mrgLibId.SortingWidth % 3 = 0) && (MathUtils.isAPowerOfTwo (%mrgLibId.SortingWidth / 3))
-
-            // We bind to unit just to enforce the filter
-            let! _ = 
-                match smt with
-                | simpleSorterModelType.Msce -> Some ()
-                | simpleSorterModelType.Mssi | simpleSorterModelType.Msrs -> 
-                    if has2factor then Some () else None
-                | simpleSorterModelType.Msuf4 -> 
-                    if isMuf4able then Some () else None
-                | simpleSorterModelType.Msuf6 -> 
-                    if isMuf6able then Some () else None
-
-            // Merge dimension check: If it doesn't divide, return None to stop
-            if (%mrgLibId.SortingWidth % %mrgLibId.MergeDimension <> 0) then return! None
-        
-            return rp
-        }
-
-
     module Specs =
 
         let Test_Msce (executorType: sorterMutateExecutorType)  : runHostSpec = {
@@ -76,8 +38,8 @@ module MutateSpecsRm =
                 testChildCount
                 mutationMod1
             ]
-            filter = paramMapFilter
-            enhancer = standardEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.mergeSorterModelCompatibility
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterMutateStandard
             allowOverwrite = false |> UMX.tag
             maxParallel = 4
         }
@@ -101,8 +63,8 @@ module MutateSpecsRm =
                 testChildCount
                 mutationMod1
             ]
-            filter = paramMapFilter
-            enhancer = standardEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.mergeSorterModelCompatibility
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterMutateStandard
             allowOverwrite = false |> UMX.tag
             maxParallel = 4
         }
@@ -126,8 +88,8 @@ module MutateSpecsRm =
                 testChildCount
                 mutationMod1
             ]
-            filter = paramMapFilter
-            enhancer = standardEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.mergeSorterModelCompatibility
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterMutateStandard
             allowOverwrite = false |> UMX.tag
             maxParallel = 4
         }
@@ -150,8 +112,8 @@ module MutateSpecsRm =
                 testChildCount
                 mutationMod1
             ]
-            filter = paramMapFilter
-            enhancer = standardEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.mergeSorterModelCompatibility
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterMutateStandard
             allowOverwrite = false |> UMX.tag
             maxParallel = 4
         }

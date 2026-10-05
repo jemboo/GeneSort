@@ -8,14 +8,6 @@ open CommonParams
 
 module SortableTestSpecsPrefix =
 
-    let private standardEnhancer (host: IRunHost) (rp: runParameters) : runParameters =
-        let qp = host.QueryParamsFromRunParams rp (outputDataType.Run host.Run.RunName)
-        rp.WithRunFinished(Some false)
-          .WithRunName(Some host.Run.RunName)
-          .WithRunFinished(Some false)
-          .WithId (Some qp.Value.Id)
-
-
     module Specs =
 
         let Prefix_24s  (executorType: sortableTestExecutorType) : runHostSpec = {
@@ -27,8 +19,8 @@ module SortableTestSpecsPrefix =
                 dataFomatBitv512
                 prefixLib_Prefix24s
             ]
-            filter = (fun rp -> Some rp)
-            enhancer = standardEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.identity
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sortableTest
             allowOverwrite = false |> UMX.tag
             maxParallel = 1
         }
@@ -42,8 +34,8 @@ module SortableTestSpecsPrefix =
                 dataFomatBitv512
                 prefixLib_Prefix32_4
             ]
-            filter = (fun rp -> Some rp)
-            enhancer = standardEnhancer
+            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.identity
+            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sortableTest
             allowOverwrite = false |> UMX.tag
             maxParallel = 1
         }

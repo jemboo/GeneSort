@@ -23,22 +23,11 @@ let private withLocalParams (rp:runParameters) =
     rpn.WithOrthoRate(Some 4.001<orthoRate>)
 
 
-let private paramMapFilter (rp: runParameters) =
-    Some rp
+let private paramMapFilter = RunParamFilterBuilders.identity
 
-let private finishRunParams (host: IRunHost) (rp:runParameters) =
-    let rp2 = withLocalParams rp
-    let scpp = rp.GetSorterCountPerPool().Value
-    let selScpp = scpp
-    let spc = (%globalSorterCount / %scpp) |> UMX.tag<sorterPoolCount> |> Option.Some
-    let rp3 = rp2.WithSorterPoolCount(spc)
-    let qp = host.QueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
-
-    rp3.WithRunFinished(Some false)
-            .WithId(Some qp.Value.Id)
-            .WithRunName(Some host.Run.RunName)
-            .WithModificationRate(Some 0.99<modificationRate>)
-            .WithSelectedSorterCountPerPool(Some selScpp)
+let private finishRunParams =
+    RunParamEnhancerBuilders.Sgd.fromGlobalSorterCount
+        withLocalParams globalSorterCount true (Some 0.99<modificationRate>)
 
 
 
@@ -48,10 +37,10 @@ let makeDatabase (dbName: string<databaseName>) : IGeneSortDb =
     new GeneSortDbMp(makeFolderFromDbName dbName, "sorter-sgd.msrs-ortho-para")
 
 
-let createRunHost (spec: runHostSpec) : IRunHost =
+let createRunHost (spec: runHostSpec) : runHost =
     let db = makeDatabase spec.databaseName
-    let run = run.createWithCatalogName spec.databaseName projName spec.runName spec.runDescription spec.spans spec.queryCatalogName
-    runHost.Create db spec run :> IRunHost
+    let run = run.SgdRun (SgdRun.create spec.databaseName projName spec.runName spec.runDescription spec.spans "expInterval100_L50ss" "summaryInterval_C.1p5C" spec.queryCatalogName)
+    runHost.Create db spec run
 
 
 module Specs =
@@ -71,8 +60,8 @@ module Specs =
             (runParameters.mutationModKey, [0] |> List.map string)
             (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
         ]
-        filter = paramMapFilter
-        enhancer = finishRunParams
+        filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
+        enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
         allowOverwrite = false |> UMX.tag
         maxParallel = 8
     }
