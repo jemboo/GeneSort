@@ -118,6 +118,7 @@ module QueryParamsBuilders =
                     let! para = rp.GetParaRate()
                     return makeQueryParams projectName dbName repl codeMod curGen scPP spc modR para mmod odt
                 }
+
         module Msuf32MutationRate =
             let makeQueryParams projectName dbName repl codeMod genCurrent sorterCtPerPool sorterPoolCt para selfSym seedModR modR mmod mutVar outDt  =
                 queryParams.create dbName projectName (Some repl) (Some genCurrent) outDt
@@ -201,6 +202,7 @@ module QueryParamsBuilders =
                     let! selectedCount = rp.GetSelectedSorterCountPerPool()
                     return makeQueryParams projectName dbName repl gen scpp spc modR para selfSym seedSelection selectedCount mmod odt
                 }
+
     module SortableTest =
 
         module Merge =
@@ -232,6 +234,7 @@ module QueryParamsBuilders =
                     let! sdf = rp.GetSortableDataFormat()
                     return makeQueryParams projectName dbName repl prefixLib sdf odt
                 }
+
     module SorterEval =
 
         module Standard =
@@ -294,6 +297,7 @@ module QueryParamsBuilders =
                     let! repl = rp.GetRepl()
                     return makeQueryParams projectName dbName repl rng prefixLibId model dataFormat evalType odt
                 }
+
     module SorterMutate =
 
         module Standard =

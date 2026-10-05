@@ -15,7 +15,7 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 
 let dbPool32name = "Pool_32" |> UMX.tag<databaseName>
-let dbVariableModR_64Name = "VariableModRates_64" |> UMX.tag<databaseName>
+let dbPool512name = "Pool_512" |> UMX.tag<databaseName>
 
 
 
@@ -24,8 +24,19 @@ let private withLocalParams (rp:runParameters) =
     rpn.WithOrthoRate(Some 4.001<orthoRate>)
 
 
+let private paramMapFilterMv2 (rp: runParameters) =
+    let seedRate = rp.GetSeedModificationRate().Value
+    let modRate = rp.GetModificationRate().Value
+    if %seedRate = %modRate then
+        None
+    else
+        Some rp
+
 let private paramMapFilter (rp: runParameters) =
-    Some rp
+        Some rp
+
+
+
 do QueryParamsBuilders.registerAll ()
 
 let makeDatabase (dbName: string<databaseName>) : IGeneSortDb =
@@ -59,24 +70,24 @@ module VarModR_32 =
     let Pool_32_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
         queryCatalogName = "sorter-sgd.msuf32-mutation-rate"
         databaseName = dbPool32name
-        runName = sprintf @"Pool_32_V1%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+        runName = sprintf @"Pool_32_Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "Rate comp for Msrs32p4a Msuf4"
         spans = [
-            (runParameters.sorterCountPerPoolSetKey, [32] |> List.map string)
+            (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
             (runParameters.codeModKey, ["NoMods"] |> List.map string)
-            (runParameters.generationIntervalLastKey, [3] |> List.map string)
+            (runParameters.generationIntervalLastKey, [9] |> List.map string)
             (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
             (runParameters.paraRateKey,    [1.15;] |> List.map string)
             (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
-            (runParameters.mutationModKey, [0] |> List.map string)
-            (runParameters.seedModificationRateKey, [0.050;] |> List.map string)
-            (runParameters.modificationRateKey, [0.050;] |> List.map string)
-            (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+            (runParameters.mutationModKey, [0; 2; 3; 4; 5; 6;] |> List.map string)
+            (runParameters.seedModificationRateKey, [0.020; 0.050;] |> List.map string)
+            (runParameters.modificationRateKey, [0.020; 0.050;]  |> List.map string)
+            (runParameters.mutatorVariantKey, [mutatorVariant.V1; mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
         ]
-        filter = paramMapFilter
+        filter = paramMapFilterMv2
         enhancer = finishRunParams
         allowOverwrite = false |> UMX.tag
-        maxParallel = 1
+        maxParallel = 8
     }
 
 
@@ -94,7 +105,7 @@ module VarModR_32 =
             (runParameters.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
             (runParameters.mutationModKey, [0] |> List.map string)
             (runParameters.seedModificationRateKey, [0.020; 0.030; 0.040; 0.050;] |> List.map string)
-            (runParameters.modificationRateKey, [0.020; 0.030; 0.040; 0.050;] |> List.map string)
+            (runParameters.modificationRateKey, [0.015; 0.020; 0.025; 0.030; 0.040; 0.050;] |> List.map string)
             (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
         ]
         filter = paramMapFilter
@@ -105,22 +116,22 @@ module VarModR_32 =
 
 
 
-    let Pool_32_V1a (executorType: sorterSgdExecutorType)  : runHostSpec = {
+    let Pool_512_V2a (executorType: sorterSgdExecutorType)  : runHostSpec = {
         queryCatalogName = "sorter-sgd.msuf32-mutation-rate"
-        databaseName = dbPool32name
-        runName = sprintf @"Pool_32_V1a%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
+        databaseName = dbPool512name
+        runName = sprintf @"Pool_512_V2a%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "Rate comp for Msrs32p4a Msuf4"
         spans = [
             (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
             (runParameters.codeModKey, ["NoMods"] |> List.map string)
             (runParameters.generationIntervalLastKey, [3] |> List.map string)
-            (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+            (runParameters.sorterCountPerPoolKey, [512] |>  List.map string)
             (runParameters.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
             (runParameters.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
             (runParameters.mutationModKey, [0] |> List.map string)
-            (runParameters.seedModificationRateKey, [0.015; 0.025;] |> List.map string)
-            (runParameters.modificationRateKey, [0.020; 0.030; 0.040; 0.050;] |> List.map string)
-            (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+            (runParameters.seedModificationRateKey, [0.015; 0.02; 0.025;] |> List.map string)
+            (runParameters.modificationRateKey, [0.020; 0.025; 0.030; 0.035; 0.040;] |> List.map string)
+            (runParameters.mutatorVariantKey, [mutatorVariant.V2] |> List.map (MutatorVariant.toString))
         ]
         filter = paramMapFilter
         enhancer = finishRunParams

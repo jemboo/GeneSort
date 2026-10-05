@@ -55,8 +55,8 @@ module DispatchSorterSgd =
     //let private maxReplica = 1<replNumber>
 
     //********** Msuf4SgdSpecsPrefix **********
-    let private executorType = sorterSgdExecutorType.GenPrefix
-    let private host: IRunHost = Msuf32p4a.MutationRate.createRunHost (Msuf32p4a.MutationRate.VarModR_32.Pool_32_V1a executorType)
+    let private executorType = sorterSgdExecutorType.SummaryReport
+    let private host: IRunHost = Msuf32p4a.MutationRate.createRunHost (Msuf32p4a.MutationRate.VarModR_32.Pool_32_Test executorType)
 
     let private executor = SorterSgdExecutorType.getExecutor executorType
     let private minReplica = 0<replNumber>
