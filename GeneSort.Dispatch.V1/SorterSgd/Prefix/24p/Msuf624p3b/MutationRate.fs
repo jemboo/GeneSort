@@ -26,33 +26,16 @@ let private sorterEvalMeasures =
         |> SorterEvalMeasure.toCompactString
     )
 
-
-let private withLocalParams (rp: runParameters) =
-    let rpn = projectParams rp
-    let sem = rpn.GetSorterEvalMeasure().Value
-    rpn.WithSorterEvalMeasureInitial(Some sem)
-       .WithOrthoRate(Some 4.001<orthoRate>)
-
-let private paramMapFilter = RunParamFilterBuilders.identity
-
 do QueryParamsBuilders.registerAll ()
 
-let makeDatabase (dbName: string<databaseName>) : IGeneSortDb =
-    new GeneSortDbMp(makeFolderFromDbName dbName, "sorter-sgd.uf6-mutation-rate")
-
-let createRunHost (spec: runHostSpec) : runHost =
-    let db = makeDatabase spec.databaseName
-    let run = run.SgdRun (SgdRun.create spec.databaseName projName spec.runName spec.runDescription spec.spans "expInterval100_L50ss" "summaryInterval_C.1p5C" spec.queryCatalogName)
-    runHost.Create db spec run
 
 module VarModR_32 =
 
-    let private finishRunParams =
-        RunParamEnhancerBuilders.Sgd.fromSorterPoolSet withLocalParams false true None
 
     let Test (executorType: sorterSgdExecutorType) : runHostSpec = {
         queryCatalogName = "sorter-sgd.uf6-mutation-rate"
         databaseName = dbVariableModR_32Name
+        projectName = projName
         runName = sprintf @"Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "Mutation rate test for Msuf6 24p3b"
         spans = [
@@ -69,8 +52,8 @@ module VarModR_32 =
             (runParameters.modificationRateKey, [0.05; 0.075; 0.1; 0.125;] |> List.map string)
             (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map MutatorVariant.toString)
         ]
-        filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
-        enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
+        filterCatalogName = RunParamBuilderNames.Filter.identity
+        enhancerCatalogName = RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
         allowOverwrite = false |> UMX.tag
         maxParallel = 8
     }
@@ -78,6 +61,7 @@ module VarModR_32 =
     let WideTest (executorType: sorterSgdExecutorType) : runHostSpec = {
         queryCatalogName = "sorter-sgd.uf6-mutation-rate"
         databaseName = dbVariableModR_32Name
+        projectName = projName
         runName = sprintf @"WideTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "Wide mutation rate test for Msuf6 24p3b"
         spans = [
@@ -94,8 +78,8 @@ module VarModR_32 =
             (runParameters.modificationRateKey, [0.05; 0.075; 0.1; 0.125;] |> List.map string)
             (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map MutatorVariant.toString)
         ]
-        filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
-        enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
+        filterCatalogName = RunParamBuilderNames.Filter.identity
+        enhancerCatalogName = RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
         allowOverwrite = false |> UMX.tag
         maxParallel = 8
     }

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1
+namespace GeneSort.Dispatch.V1
 
 // Bitonic Sort Network Generator
 // Generates a sorting network based on Batcher's Bitonic Sort algorithm

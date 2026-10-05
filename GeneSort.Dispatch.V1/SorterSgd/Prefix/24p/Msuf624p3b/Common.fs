@@ -13,10 +13,6 @@ open GeneSort.SortingLib.Sorter
 module Common =
 
     let projName = "SorterSgd.Prfefix.Msuf624p3b" |> UMX.tag<projectName>
-
-    let makeFolderFromDbName (dbName: string<databaseName>) =
-        @$"c:\Projects\{%projName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
-
     let seedSorterCount = 512
 
     let projectParams (rp: runParameters) =

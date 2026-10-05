@@ -2,11 +2,13 @@ namespace GeneSort.Dispatch.V1
 
 open FSharp.UMX
 open GeneSort.Db.V1
+open GeneSort.FileDb.V1
 open GeneSort.Project.V1
 open GeneSort.Core
 
 type runHostSpec = {
     queryCatalogName: string
+    projectName: string<projectName>
     databaseName: string<databaseName>
     runName: string<runName>
     runDescription: string
@@ -17,7 +19,15 @@ type runHostSpec = {
     maxParallel: int
 }
 
-and simpleRunHost = private {
+module runHostSpec =
+    let makeDataFolder (spec: runHostSpec) =
+        @$"c:\Projects\{%spec.projectName}\{%spec.databaseName}\Data"
+        |> UMX.tag<pathToRootFolder>
+
+    let makeDatabase (spec: runHostSpec) : IGeneSortDb =
+        new GeneSortDbMp(makeDataFolder spec, spec.queryCatalogName)
+
+type simpleRunHost = private {
     projectDb: IGeneSortDb
     spec: runHostSpec
     run: simpleRun
@@ -25,7 +35,7 @@ and simpleRunHost = private {
     maxParallel: int
 }
 
-and sgdRunHost = private {
+type sgdRunHost = private {
     simpleHost: simpleRunHost
     run: sgdRun
     genSaveIntervals: genIntervalConfig
@@ -34,7 +44,7 @@ and sgdRunHost = private {
     member this.GenSaveIntervals = this.genSaveIntervals
     member this.GenSaveSubIntervals = this.genSaveSubIntervals
 
-and runHost =
+type runHost =
     | SimpleRunHost of simpleRunHost
     | SgdRunHost of sgdRunHost
 
@@ -43,7 +53,7 @@ and runHost =
             { projectDb = db
               spec = spec
               run = simple
-              queryParamsFromRunParams = QueryParamsCatalog.get spec.queryCatalogName (SimpleRun.projectName simple) (SimpleRun.databaseName simple)
+              queryParamsFromRunParams = QueryParamsCatalog.get spec.queryCatalogName spec.projectName (SimpleRun.databaseName simple)
               maxParallel = spec.maxParallel }
 
         let lookupInterval name =
@@ -61,6 +71,20 @@ and runHost =
                 genSaveIntervals = SgdRun.genSaveIntervalsName value |> lookupInterval
                 genSaveSubIntervals = SgdRun.genSaveSubIntervalsName value |> lookupInterval
             }
+
+    static member CreateSgd (spec: runHostSpec) =
+        let db = runHostSpec.makeDatabase spec
+        let sgdRun =
+            SgdRun.create
+                spec.databaseName
+                spec.projectName
+                spec.runName
+                spec.runDescription
+                spec.spans
+                "expInterval100_L50ss"
+                "summaryInterval_C.1p5C"
+                spec.queryCatalogName
+        runHost.Create db spec (run.SgdRun sgdRun)
 
     member this.Spec =
         match this with
@@ -105,4 +129,5 @@ and runHost =
         let context = { QueryParamsFromRunParams = this.QueryParamsFromRunParams; Run = this.Run }
         runParametersSeq
         |> Seq.choose (filter >> Option.map (enhancer context))
+
 

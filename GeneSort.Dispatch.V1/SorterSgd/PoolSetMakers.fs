@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterSgd
+namespace GeneSort.Dispatch.V1.SorterSgd
 
 open GeneSort.Project.V1
 open GeneSort.Eval.V1

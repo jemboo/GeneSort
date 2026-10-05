@@ -11,28 +11,13 @@ open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.Common
 open GeneSort.Dispatch.V1.SorterSgd
-
-
-
-let globalSorterCount = 8192 |> UMX.tag<sorterCount>
 let dbOrthoPara32Name = "OrthoPara32" |> UMX.tag<databaseName>
 
-
-let private withLocalParams (rp:runParameters) =
-    let rpn = standardParams rp
-    rpn.WithOrthoRate(Some 4.001<orthoRate>)
 
 
 do QueryParamsBuilders.registerAll ()
 
-let makeDatabase (name: string<databaseName>) : IGeneSortDb =
-    new GeneSortDbMp(makeFolderFromDbName name, "sorter-sgd.msrs-ortho-para")
 
-
-let createRunHost (spec: runHostSpec) : runHost =
-    let db = makeDatabase spec.databaseName
-    let run = run.SgdRun (SgdRun.create spec.databaseName projName spec.runName spec.runDescription spec.spans "expInterval100_L50ss" "summaryInterval_C.1p5C" spec.queryCatalogName)
-    runHost.Create db spec run
 
 
 module Specs =
@@ -40,6 +25,7 @@ module Specs =
     let PickMode2_2 (executorType: sorterSgdExecutorType)  : runHostSpec = {
         queryCatalogName = "sorter-sgd.msrs-ortho-para"
         databaseName = dbOrthoPara32Name
+        projectName = projName
         runName = sprintf @"PickMode2_2_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "OrthroPara rate comp for 24pfx3a Msrs, PickMode2_2"
         spans = [
@@ -52,11 +38,8 @@ module Specs =
             (runParameters.mutationModKey, [0] |> List.map string)
             (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
         ]
-        filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.identity
-        enhancerCatalogName =
-            RunParamEnhancerBuilders.register (
-                RunParamEnhancerBuilders.Sgd.fromGlobalSorterCount
-                    withLocalParams globalSorterCount true (Some 0.99<modificationRate>))
+        filterCatalogName = RunParamBuilderNames.Filter.identity
+        enhancerCatalogName = RunParamBuilderNames.Enhancer.msrs24p3aOrthoPara
         allowOverwrite = false |> UMX.tag
         maxParallel = 8
     }
@@ -64,6 +47,7 @@ module Specs =
     let NoMods (executorType: sorterSgdExecutorType)  : runHostSpec = {
         queryCatalogName = "sorter-sgd.msrs-ortho-para"
         databaseName = dbOrthoPara32Name
+        projectName = projName
         runName = sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "OrthroPara rate comp for 24pfx3a Msrs, NoMods"
         spans = [
@@ -76,11 +60,8 @@ module Specs =
             (runParameters.mutationModKey, [0] |> List.map string)
             (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
         ]
-        filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.identity
-        enhancerCatalogName =
-            RunParamEnhancerBuilders.register (
-                RunParamEnhancerBuilders.Sgd.fromGlobalSorterCount
-                    withLocalParams globalSorterCount true (Some 0.99<modificationRate>))
+        filterCatalogName = RunParamBuilderNames.Filter.identity
+        enhancerCatalogName = RunParamBuilderNames.Enhancer.msrs24p3aOrthoPara
         allowOverwrite = false |> UMX.tag
         maxParallel = 8
     }

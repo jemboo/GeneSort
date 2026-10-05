@@ -13,14 +13,15 @@ module SortableTestSpecsMerge =
         let Merge_Test  (executorType: sortableTestExecutorType) : runHostSpec = {
             queryCatalogName = "sortable-test.merge"
             databaseName = SortableTestDbs.Merge.dbName
+            projectName = CommonSortableTest.projectName
             runName = sprintf @"Merge-Test_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
             runDescription = "Int8 merge sorter test sets"
             spans = [
                 mergeLib_Merge32s
                 dataFormatInt8v512
             ]
-            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.mergeDimensionDividesSortingWidth
-            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sortableTest
+            filterCatalogName = RunParamBuilderNames.Filter.mergeDimensionDividesSortingWidth
+            enhancerCatalogName = RunParamBuilderNames.Enhancer.sortableTest
             allowOverwrite = false |> UMX.tag
             maxParallel = 1
         }

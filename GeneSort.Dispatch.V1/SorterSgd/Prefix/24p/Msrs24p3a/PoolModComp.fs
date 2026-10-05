@@ -11,36 +11,12 @@ open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.Common
 open GeneSort.Dispatch.V1.SorterSgd
-
-
-
-let globalSorterCount = 512 |> UMX.tag<sorterCount>
 let dbName_Sz_2048_Of_4096 = "Sz_2048_Of_4096" |> UMX.tag<databaseName>
 let dbNamePools4096_2_vs_256 = "PoolsSelSzTest_2_vs_256" |> UMX.tag<databaseName>
 let dbNamePools4096_4096 = "Pools4096_4096" |> UMX.tag<databaseName>
 let dbNamePoolSz128 = "PoolSelSz128" |> UMX.tag<databaseName>
 
-let private withLocalParams (rp:runParameters) =
-    let rpn = standardParams rp
-    rpn.WithOrthoRate(Some 4.001<orthoRate>)
 
-
-let private paramMapFilter = RunParamFilterBuilders.identity
-
-let private finishRunParams =
-    RunParamEnhancerBuilders.Sgd.fromGlobalSorterCount
-        withLocalParams globalSorterCount false None
-
-do QueryParamsBuilders.registerAll ()
-
-let makeDatabase (dbName: string<databaseName>) : IGeneSortDb =
-    new GeneSortDbMp(makeFolderFromDbName dbName, "sorter-sgd.msrs-pool-mod-comp")
-
-
-let createRunHost (spec: runHostSpec) : runHost =
-    let db = makeDatabase spec.databaseName
-    let run = run.SgdRun (SgdRun.create spec.databaseName projName spec.runName spec.runDescription spec.spans "expInterval100_L50ss" "summaryInterval_C.1p5C" spec.queryCatalogName)
-    runHost.Create db spec run
 
 
 module Specs =
@@ -48,6 +24,7 @@ module Specs =
     let TestSpec (executorType: sorterSgdExecutorType)  : runHostSpec = {
         queryCatalogName = "sorter-sgd.msrs-pool-mod-comp"
         databaseName = dbNamePoolSz128
+        projectName = projName
         runName = sprintf @"PoolSz32_Mod_Testc%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "Para rate comp for 24pfx3a Msrs"
         spans = [
@@ -60,8 +37,8 @@ module Specs =
             (runParameters.mutationModKey, [0 .. 1] |> List.map string)
             (runParameters.selectedSorterCountPerPoolKey, ["32";] |> List.map string)
         ]
-        filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
-        enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
+        filterCatalogName = RunParamBuilderNames.Filter.identity
+        enhancerCatalogName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
         allowOverwrite = false |> UMX.tag
         maxParallel = 8
     }
@@ -70,6 +47,7 @@ module Specs =
     let Sz_2048_Of_4096 (executorType: sorterSgdExecutorType)  : runHostSpec = {
         queryCatalogName = "sorter-sgd.msrs-pool-mod-comp"
         databaseName = dbName_Sz_2048_Of_4096
+        projectName = projName
         runName = sprintf @"Sz_2048_Of_4096_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "Selection size comp for 24pfx3a Msrs"
         spans = [
@@ -79,8 +57,8 @@ module Specs =
             (runParameters.mutationModKey, [0 .. 7;] |> List.map string)
             (runParameters.selectedSorterCountPerPoolKey, [2048;] |> List.map string)
         ]
-        filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
-        enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
+        filterCatalogName = RunParamBuilderNames.Filter.identity
+        enhancerCatalogName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
         allowOverwrite = false |> UMX.tag
         maxParallel = 8
     }
@@ -89,6 +67,7 @@ module Specs =
     let PoolSz_2n256 (executorType: sorterSgdExecutorType)  : runHostSpec = {
         queryCatalogName = "sorter-sgd.msrs-pool-mod-comp"
         databaseName = dbNamePools4096_2_vs_256
+        projectName = projName
         runName = sprintf @"PoolSz_2_vs_256_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "Pool size comp (2 vs 256) for 24pfx3a Msrs"
         spans = [
@@ -98,8 +77,8 @@ module Specs =
             (runParameters.mutationModKey, [0 .. 63;] |> List.map string)
             (runParameters.selectedSorterCountPerPoolKey, ["64"; "128"; "256"] |> List.map string)
         ]
-        filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
-        enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
+        filterCatalogName = RunParamBuilderNames.Filter.identity
+        enhancerCatalogName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
         allowOverwrite = false |> UMX.tag
         maxParallel = 16
     }

@@ -71,6 +71,6 @@ module SorterMutateDbs =
 
     let createRunHost (spec: runHostSpec) : runHost =
         let db = getDatabaseByName spec.databaseName
-        let run = run.SimpleRun (SimpleRun.create spec.databaseName projectName spec.runName spec.runDescription spec.spans spec.queryCatalogName)
+        let run = run.SimpleRun (SimpleRun.create spec.databaseName spec.projectName spec.runName spec.runDescription spec.spans spec.queryCatalogName)
         runHost.Create db spec run
 

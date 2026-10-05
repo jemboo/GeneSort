@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1
+namespace GeneSort.Dispatch.V1
 open System
 open System.Threading
 open GeneSort.Dispatch.V1

@@ -16,6 +16,7 @@ module SorterEvalSpecsTestPrefix =
         let Prefix_24s (executorType: sorterEvalExecutorType) : runHostSpec = {
             queryCatalogName = "sorter-eval.prefix"
             databaseName = SorterEvalDbs.Prefix.dbName
+            projectName = SorterEvalDbs.projectName
             runName = sprintf @"Prefix_24s_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             runDescription = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf6"
             spans = [   
@@ -26,8 +27,8 @@ module SorterEvalSpecsTestPrefix =
                 sorterEvalTypeV2
                 largeSorterCount
             ]
-            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.prefixSorterModelCompatibility
-            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterEvalPrefix
+            filterCatalogName = RunParamBuilderNames.Filter.prefixSorterModelCompatibility
+            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
             allowOverwrite = false |> UMX.tag
             maxParallel = 1
         }
@@ -36,6 +37,7 @@ module SorterEvalSpecsTestPrefix =
         let Prefix_32 (executorType: sorterEvalExecutorType) : runHostSpec = {
             queryCatalogName = "sorter-eval.prefix"
             databaseName = SorterEvalDbs.Prefix.dbName
+            projectName = SorterEvalDbs.projectName
             runName = sprintf @"Prefix_32_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
             runDescription = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf4"
             spans = [   
@@ -46,8 +48,8 @@ module SorterEvalSpecsTestPrefix =
                 sorterEvalTypeV2
                 largeSorterCount
             ]
-            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.prefixSorterModelCompatibility
-            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterEvalPrefix
+            filterCatalogName = RunParamBuilderNames.Filter.prefixSorterModelCompatibility
+            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
             allowOverwrite = false |> UMX.tag
             maxParallel = 8
         }

@@ -19,39 +19,20 @@ let dbPool512name = "Pool_512" |> UMX.tag<databaseName>
 
 
 
-let private withLocalParams (rp:runParameters) =
-    let rpn = projectParams rp
-    rpn.WithOrthoRate(Some 4.001<orthoRate>)
-
-
-let private paramMapFilterMv2 = RunParamFilterBuilders.seedModificationRateDiffers
-
-let private paramMapFilter = RunParamFilterBuilders.identity
-
-
-
 do QueryParamsBuilders.registerAll ()
 
-let makeDatabase (dbName: string<databaseName>) : IGeneSortDb =
-    new GeneSortDbMp(makeFolderFromDbName dbName, "sorter-sgd.msuf32-mutation-rate")
 
-
-let createRunHost (spec: runHostSpec) : runHost =
-    let db = makeDatabase spec.databaseName
-    let run = run.SgdRun (SgdRun.create spec.databaseName projName spec.runName spec.runDescription spec.spans "expInterval100_L50ss" "summaryInterval_C.1p5C" spec.queryCatalogName)
-    runHost.Create db spec run
 
 
 module VarModR_32 =
 
-    let private finishRunParams =
-        RunParamEnhancerBuilders.Sgd.fromSorterPoolSet withLocalParams true true None
 
 
 
     let Pool_32_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
         queryCatalogName = "sorter-sgd.msuf32-mutation-rate"
         databaseName = dbPool32name
+        projectName = projName
         runName = sprintf @"Pool_32_Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "Rate comp for Msrs32p4a Msuf4"
         spans = [
@@ -66,8 +47,8 @@ module VarModR_32 =
             (runParameters.modificationRateKey, [0.020; 0.050;]  |> List.map string)
             (runParameters.mutatorVariantKey, [mutatorVariant.V1; mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
         ]
-        filterCatalogName = RunParamFilterBuilders.register (paramMapFilterMv2)
-        enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
+        filterCatalogName = RunParamBuilderNames.Filter.seedModificationRateDiffers
+        enhancerCatalogName = RunParamBuilderNames.Enhancer.msuf32MutationRate
         allowOverwrite = false |> UMX.tag
         maxParallel = 8
     }
@@ -76,6 +57,7 @@ module VarModR_32 =
     let Pool_32_V1 (executorType: sorterSgdExecutorType)  : runHostSpec = {
         queryCatalogName = "sorter-sgd.msuf32-mutation-rate"
         databaseName = dbPool32name
+        projectName = projName
         runName = sprintf @"Pool_32_V1%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "Rate comp for Msrs32p4a Msuf4"
         spans = [
@@ -90,8 +72,8 @@ module VarModR_32 =
             (runParameters.modificationRateKey, [0.015; 0.020; 0.025; 0.030; 0.040; 0.050;] |> List.map string)
             (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
         ]
-        filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
-        enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
+        filterCatalogName = RunParamBuilderNames.Filter.identity
+        enhancerCatalogName = RunParamBuilderNames.Enhancer.msuf32MutationRate
         allowOverwrite = false |> UMX.tag
         maxParallel = 8
     }
@@ -100,6 +82,7 @@ module VarModR_32 =
     let Pool_512_V2a (executorType: sorterSgdExecutorType)  : runHostSpec = {
         queryCatalogName = "sorter-sgd.msuf32-mutation-rate"
         databaseName = dbPool512name
+        projectName = projName
         runName = sprintf @"Pool_512_V2a%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "Rate comp for Msrs32p4a Msuf4"
         spans = [
@@ -114,8 +97,8 @@ module VarModR_32 =
             (runParameters.modificationRateKey, [0.020; 0.025; 0.030; 0.035; 0.040;] |> List.map string)
             (runParameters.mutatorVariantKey, [mutatorVariant.V2] |> List.map (MutatorVariant.toString))
         ]
-        filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
-        enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
+        filterCatalogName = RunParamBuilderNames.Filter.identity
+        enhancerCatalogName = RunParamBuilderNames.Enhancer.msuf32MutationRate
         allowOverwrite = false |> UMX.tag
         maxParallel = 8
     }

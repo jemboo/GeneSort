@@ -11,36 +11,9 @@ open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd.Msrs24p3b.Common
 open GeneSort.Dispatch.V1.SorterSgd
-
-
-
-let globalSorterCount = 8192 |> UMX.tag<sorterCount>
 let dbOrthoPara32Name = "OrthoPara32" |> UMX.tag<databaseName>
 
 
-let private withLocalParams (rp:runParameters) =
-    let rpn = standardParams rp
-    rpn.WithOrthoRate(Some 4.001<orthoRate>)
-
-
-let private paramMapFilter = RunParamFilterBuilders.identity
-
-let private finishRunParams =
-    RunParamEnhancerBuilders.Sgd.fromGlobalSorterCount
-        withLocalParams globalSorterCount true (Some 0.99<modificationRate>)
-
-
-
-do QueryParamsBuilders.registerAll ()
-
-let makeDatabase (dbName: string<databaseName>) : IGeneSortDb =
-    new GeneSortDbMp(makeFolderFromDbName dbName, "sorter-sgd.msrs-ortho-para")
-
-
-let createRunHost (spec: runHostSpec) : runHost =
-    let db = makeDatabase spec.databaseName
-    let run = run.SgdRun (SgdRun.create spec.databaseName projName spec.runName spec.runDescription spec.spans "expInterval100_L50ss" "summaryInterval_C.1p5C" spec.queryCatalogName)
-    runHost.Create db spec run
 
 
 module Specs =
@@ -48,6 +21,7 @@ module Specs =
     let NoMods (executorType: sorterSgdExecutorType)  : runHostSpec = {
         queryCatalogName = "sorter-sgd.msrs-ortho-para"
         databaseName = dbOrthoPara32Name
+        projectName = projName
         runName = sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
         runDescription = "OrthroPara rate comp for 24pfx3b Msrs, NoMods"
         spans = [
@@ -60,8 +34,8 @@ module Specs =
             (runParameters.mutationModKey, [0] |> List.map string)
             (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
         ]
-        filterCatalogName = RunParamFilterBuilders.register (paramMapFilter)
-        enhancerCatalogName = RunParamEnhancerBuilders.register (finishRunParams)
+        filterCatalogName = RunParamBuilderNames.Filter.identity
+        enhancerCatalogName = RunParamBuilderNames.Enhancer.msrs24p3bOrthoPara
         allowOverwrite = false |> UMX.tag
         maxParallel = 8
     }

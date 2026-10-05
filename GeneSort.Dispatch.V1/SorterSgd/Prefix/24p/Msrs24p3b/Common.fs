@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterSgd.Msrs24p3b
+namespace GeneSort.Dispatch.V1.SorterSgd.Msrs24p3b
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -14,10 +14,6 @@ module Common =
 
     let projName = "SorterSgd.Prfefix.Msrs24p3b" |> UMX.tag<projectName>
     let seedSorterCount = 512
-
-    let makeFolderFromDbName (dbName: string<databaseName>) =
-        @$"c:\Projects\{%projName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
-
     let standardParams (rp:runParameters) =
         let sorterEvalSelectionType = sorterSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
         let pfxLibId = prefixLibId.create (24<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixB

@@ -23,6 +23,7 @@ module MutateSpecsRp =
         let Test_Msce (executorType: sorterMutateExecutorType)  : runHostSpec = {
             queryCatalogName = "sorter-mutate.prefix"
             databaseName = SorterMutateDbs.RandomPrefix.Uniform.dbName
+            projectName = SorterMutateDbs.projectName
             runName = sprintf @"Test-Msce_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for merge Msce"
             spans = [
@@ -38,8 +39,8 @@ module MutateSpecsRp =
                 testChildCount
                 mutationMod1
             ]
-            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.prefixSorterModelCompatibility
-            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterMutateStandard
+            filterCatalogName = RunParamBuilderNames.Filter.prefixSorterModelCompatibility
+            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterMutateStandard
             allowOverwrite = false |> UMX.tag
             maxParallel = 4
         }
@@ -48,6 +49,7 @@ module MutateSpecsRp =
         let Test_Mssi (executorType: sorterMutateExecutorType)  : runHostSpec = {
             queryCatalogName = "sorter-mutate.prefix"
             databaseName = SorterMutateDbs.RandomPrefix.Uniform.dbName
+            projectName = SorterMutateDbs.projectName
             runName = sprintf @"Test-Mssi_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for merge Mssi"
             spans = [
@@ -63,8 +65,8 @@ module MutateSpecsRp =
                 testChildCount
                 mutationMod1
             ]
-            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.prefixSorterModelCompatibility
-            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterMutateStandard
+            filterCatalogName = RunParamBuilderNames.Filter.prefixSorterModelCompatibility
+            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterMutateStandard
             allowOverwrite = false |> UMX.tag
             maxParallel = 4
         }
@@ -73,6 +75,7 @@ module MutateSpecsRp =
         let Test_Msrs (executorType: sorterMutateExecutorType)  : runHostSpec = {
             queryCatalogName = "sorter-mutate.prefix"
             databaseName = SorterMutateDbs.RandomPrefix.Uniform.dbName
+            projectName = SorterMutateDbs.projectName
             runName = sprintf @"Test-Msrs_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for merge Msrs"
             spans = [
@@ -88,8 +91,8 @@ module MutateSpecsRp =
                 testChildCount
                 mutationMod1
             ]
-            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.prefixSorterModelCompatibility
-            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterMutateStandard
+            filterCatalogName = RunParamBuilderNames.Filter.prefixSorterModelCompatibility
+            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterMutateStandard
             allowOverwrite = false |> UMX.tag
             maxParallel = 4
         }
@@ -97,6 +100,7 @@ module MutateSpecsRp =
         let Test_Msuf4 (executorType: sorterMutateExecutorType)  : runHostSpec = {
             queryCatalogName = "sorter-mutate.prefix"
             databaseName = SorterMutateDbs.RandomPrefix.Uniform.dbName
+            projectName = SorterMutateDbs.projectName
             runName = sprintf @"Test-Msuf4_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
             runDescription = "Mutation analysis for merge Msuf4"
             spans = [
@@ -112,8 +116,8 @@ module MutateSpecsRp =
                 testChildCount
                 mutationMod1
             ]
-            filterCatalogName = RunParamFilterBuilders.register RunParamFilterBuilders.prefixSorterModelCompatibility
-            enhancerCatalogName = RunParamEnhancerBuilders.register RunParamEnhancerBuilders.sorterMutateStandard
+            filterCatalogName = RunParamBuilderNames.Filter.prefixSorterModelCompatibility
+            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterMutateStandard
             allowOverwrite = false |> UMX.tag
             maxParallel = 4
         }

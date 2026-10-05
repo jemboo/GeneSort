@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SortableTest
+namespace GeneSort.Dispatch.V1.SortableTest
 
 open FSharp.UMX
 open GeneSort.Project.V1

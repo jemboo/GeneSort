@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Dispatch.V1.SorterSgd.Msrs32p4a
+namespace GeneSort.Dispatch.V1.SorterSgd.Msrs32p4a
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -13,12 +13,6 @@ open GeneSort.FileDb.V1
 module Common =
 
     let projName = "SorterSgd.Prfefix.32p4a.Msrs" |> UMX.tag<projectName>
-
-
-    let makeFolderFromDbName (dbName: string<databaseName>) =
-        @$"c:\Projects\{%projName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
-
-
     let seedSorterCount = 512
 
     let projectParams (rp:runParameters) =
