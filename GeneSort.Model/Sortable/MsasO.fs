@@ -50,21 +50,21 @@ type msasO =
 
     member this.MakeSortableBoolTest 
             (sorterTestId: Guid<sortableTestsId>)
-            (sortingWidth: int<sortingWidth>) : sortableBinaryTest =
+            (sortingWidth: int<sortingWidth>) : sortableBinaryTests =
         let bArrays =
             this.sortableIntArrays 
             |> Array.map(fun sia -> sia.ToSortableBoolArrays())
             |> Array.collect id
             |> Array.distinct
-        sortableBinaryTest.create 
+        sortableBinaryTests.create 
                 sorterTestId 
                 sortingWidth
                 bArrays
 
     member this.MakeSortableIntTest 
             (sorterTestId: Guid<sortableTestsId>)
-            (sortingWidth: int<sortingWidth>) : sortableIntTest =
-        sortableIntTest.create 
+            (sortingWidth: int<sortingWidth>) : sortableIntTests =
+        sortableIntTests.create 
                 sorterTestId 
                 sortingWidth
                 this.sortableIntArrays

@@ -6,14 +6,14 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorter
 
-type sortableBoolTestSet =
+type sortableBoolTestsSet =
 
     { Id: Guid<sortableTestsSetId>
-      sortableTests: sortableBoolTest[] }
+      sortableTests: sortableBoolTests[] }
 
     static member create 
                     (id: Guid<sortableTestsSetId>) 
-                    (arrays: sortableBoolTest[]) : sortableBoolTestSet =
+                    (arrays: sortableBoolTests[]) : sortableBoolTestsSet =
         if Array.isEmpty arrays then
             invalidArg "arrays" "Arrays must not be empty."
         let sortingWidth = arrays.[0].sortableBoolArrays.[0]

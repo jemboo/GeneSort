@@ -62,7 +62,7 @@ type sortableIntArray =
     static member createFromPermutation(perm: permutation) =
         sortableIntArray.create(perm.Array, (%perm.Order |> UMX.tag<sortingWidth>), (%perm.Order |> UMX.tag<symbolSetSize>))
 
-    static member CreateSorted(sortingWidth: int<sortingWidth>) =
+    static member createSorted(sortingWidth: int<sortingWidth>) =
         if sortingWidth < 0<sortingWidth> then
             invalidArg "sortingWidth" "Sorting width must be non-negative."
         let values = [| 0 .. (%sortingWidth - 1) |]
@@ -182,9 +182,9 @@ module SortableIntArray =
         sprintf "[%s]" valuesStr
 
 
-    module BinaryArrayUtils =
+    module BinaryIntArrays =
 
-        let toSortableBinaryArrays(sia:sortableIntArray) : sortableIntArray[] =
+        let getAllBinaryIntArrays (sia:sortableIntArray) : sortableIntArray[] =
             if sia.SortingWidth <= 1<sortingWidth> then
                 [||]
             else
@@ -198,7 +198,7 @@ module SortableIntArray =
 
         /// Returns all possible sortableBoolArray instances for a given sorting width.
         /// <exception cref="ArgumentException">Thrown when sortingWidth is negative.</exception>
-        let getAllSortableBinaryArrays (sortingWidth: int<sortingWidth>) : sortableIntArray[] =
+        let getAllBinaryIntArraysForSortingWidth (sortingWidth: int<sortingWidth>) : sortableIntArray[] =
             if sortingWidth < 0<sortingWidth> then
                 invalidArg "sortingWidth" "Sorting width must be non-negative."
             let count = pown 2 (int sortingWidth)
@@ -209,7 +209,7 @@ module SortableIntArray =
             result
 
 
-        let getAllSortedSortableBoolArrays (sortingWidth: int<sortingWidth>) : sortableIntArray[] =
+        let getAllSortedBinaryIntArrays (sortingWidth: int<sortingWidth>) : sortableIntArray[] =
             if sortingWidth < 0<sortingWidth> then
                 invalidArg "sortingWidth" "Sorting width must be non-negative."
             let n = int sortingWidth

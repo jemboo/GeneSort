@@ -11,11 +11,11 @@
     <Compile Include="Sorter\SorterSetDto.fs" />
     <Compile Include="Sortable\SortableBoolArrayDto.fs" />
     <Compile Include="Sortable\SortableIntArrayDto.fs" />
-    <Compile Include="Sortable\SortableBoolTestDto.fs" />
-    <Compile Include="Sortable\SortableIntTestDto.fs" />
+    <Compile Include="Sortable\SortableBoolTestsDto.fs" />
+    <Compile Include="Sortable\SortableIntTestsDto.fs" />
     <Compile Include="Sortable\SortableTestsDto.fs" />
-    <Compile Include="Sortable\SortableIntTestSetDto.fs" />
-    <Compile Include="Sortable\SortableBoolTestSetDto.fs" />
+    <Compile Include="Sortable\SortableIntTestsSetDto.fs" />
+    <Compile Include="Sortable\SortableBoolTestsSetDto.fs" />
     <Compile Include="Sortable\SortableTestsSetDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

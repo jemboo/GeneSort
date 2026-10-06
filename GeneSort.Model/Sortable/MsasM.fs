@@ -60,60 +60,60 @@ type msasM =
         member this.Equals(other) =  this.sortingWidth = other.sortingWidth
 
     member this.MakeSortableIntTest 
-                    (sorterTestId: Guid<sortableTestsId>) : sortableIntTest =
+                    (sorterTestId: Guid<sortableTestsId>) : sortableIntTests =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
                             this.mergeSuffixType
 
-        sortableIntTest.create 
+        sortableIntTests.create 
                 sorterTestId
                 this.SortingWidth
                 intArrays
 
 
     member this.MakeSortableBoolTest
-                    (sorterTestId: Guid<sortableTestsId>) : sortableBinaryTest =
+                    (sorterTestId: Guid<sortableTestsId>) : sortableBinaryTests =
 
         let sortableArrays = SortableBoolArray.getMergeTestCases
                                     this.sortingWidth
                                     this.mergeDimension
                                     this.mergeSuffixType  
 
-        sortableBinaryTest.create 
+        sortableBinaryTests.create 
                 sorterTestId
                 this.sortingWidth
                 sortableArrays
 
 
     member this.MakeSortableUint8v256Test 
-                    (sorterTestId: Guid<sortableTestsId>) : sortableUint8v256Test =
+                    (sorterTestId: Guid<sortableTestsId>) : sortableUint8v256Tests =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
                             this.mergeSuffixType
 
-        SortableUint8v256Test.fromIntArrays 
+        SortableUint8v256Tests.fromIntArrays 
                 sorterTestId
                 this.SortingWidth
                 intArrays
 
 
     member this.MakeSortableUint8v512Test 
-                    (sorterTestId: Guid<sortableTestsId>) : sortableUint8v512Test =
+                    (sorterTestId: Guid<sortableTestsId>) : sortableUint8v512Tests =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
                             this.mergeSuffixType
 
-        SortableUint8v512Test.fromIntArrays 
+        SortableUint8v512Tests.fromIntArrays 
                 sorterTestId
                 this.SortingWidth
                 intArrays
 
 
     member this.MakeSortableBitv512Test 
-                    (sorterTestId: Guid<sortableTestsId>) : sortableBitv512Test =
+                    (sorterTestId: Guid<sortableTestsId>) : sortableBitv512Tests =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
@@ -152,7 +152,7 @@ type msasM =
                 |]
             )
 
-        sortableBitv512Test.create sorterTestId sw blocks
+        sortableBitv512Tests.create sorterTestId sw blocks
 
 
 

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingOps
+namespace GeneSort.SortingOps
 
 open System
 open System.Runtime.Intrinsics
@@ -111,7 +111,7 @@ module CeBlockOpsBitv512 =
 
 
     let eval 
-            (test: sortableBitv512Test) 
+            (test: sortableBitv512Tests) 
             (prefix: ceBlock)
             (ceBlocks: ceBlock []) =
             evalSimdSortBlocks test.SimdSortBlocks prefix ceBlocks
@@ -225,7 +225,7 @@ module CeBlockOpsBitv512 =
                     let sss = 2 |> UMX.tag<symbolSetSize> // Bit-packed is always 0-1
                     uniqueFailures 
                     |> Array.map (fun arr -> sortableIntArray.create(arr, sw, sss))
-                    |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sw
+                    |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sw
                     |> sortableTests.Ints
                     |> Some
                 else None
@@ -239,7 +239,7 @@ module CeBlockOpsBitv512 =
         )
 
     let evalAndCollectNewSortableTests
-            (test: sortableBitv512Test) 
+            (test: sortableBitv512Tests) 
             (prefix: ceBlock)
             (ceBlocks: ceBlock []) =
         evalAndCollectUniqueFailures test.SimdSortBlocks prefix ceBlocks

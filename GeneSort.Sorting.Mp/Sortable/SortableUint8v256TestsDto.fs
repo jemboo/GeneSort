@@ -7,13 +7,13 @@ open GeneSort.Sorting.Sortable
 open System.Runtime.Intrinsics
 
 /// DTO for the full SIMD-optimized test suite
-type sortableUint8v256TestDto = {
+type sortableUint8v256TestsDto = {
     Id: Guid
     SortingWidth: int
     Blocks: simdSortBlockDto[]
 }
 
-module SortableUint8v256TestDto =
+module SortableUint8v256TestsDto =
 
     let private blockFromDomain (block: SortBlockUint8v256) : simdSortBlockDto =
         let raw = 
@@ -31,13 +31,13 @@ module SortableUint8v256TestDto =
         
         SortBlockUint8v256.createFromVectors vecs dto.SortableCount
 
-    let fromDomain (test: sortableUint8v256Test) : sortableUint8v256TestDto =
+    let fromDomain (test: sortableUint8v256Tests) : sortableUint8v256TestsDto =
         { Id = %test.Id
           SortingWidth = %test.SortingWidth
           Blocks = test.SimdSortBlocks |> Array.map blockFromDomain }
 
-    let toDomain (dto: sortableUint8v256TestDto) : sortableUint8v256Test =
+    let toDomain (dto: sortableUint8v256TestsDto) : sortableUint8v256Tests =
         let id = UMX.tag<sortableTestsId> dto.Id
         let sw = UMX.tag<sortingWidth> dto.SortingWidth
         let blocks = dto.Blocks |> Array.map blockToDomain
-        sortableUint8v256Test.create id sw blocks
+        sortableUint8v256Tests.create id sw blocks

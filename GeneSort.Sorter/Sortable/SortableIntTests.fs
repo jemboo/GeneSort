@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorter.Sortable
 
 open System
@@ -6,49 +6,53 @@ open FSharp.UMX
 open GeneSort.Sorter
 
 [<Struct; CustomEquality; NoComparison>]
-type sortableBoolTest =
+type sortableIntTests =
     private { id: Guid<sorterTestId>
               sortingWidth: int<sortingWidth>
-              sortableBoolArrays: sortableBoolArray[]
+              sortableIntArrays: sortableIntArray[] 
               unsortedCount: Lazy<int>
             }
 
     static member create 
                     (id: Guid<sorterTestId>) 
                     (sortingWidth:int<sortingWidth>)
-                    (arrays: sortableBoolArray[]) : sortableBoolTest =
+                    (arrays: sortableIntArray[]) : sortableIntTests =
         { 
             id = id; 
             sortingWidth = sortingWidth; 
-            sortableBoolArrays = Array.copy arrays
+            sortableIntArrays = Array.copy arrays 
             unsortedCount = Lazy<int>(fun () -> arrays |> Seq.filter(fun sa -> not sa.IsSorted) |> Seq.length)
         }
 
+    static member Empty =
+        let id = Guid.NewGuid() |> UMX.tag<sorterTestId>
+        sortableIntTests.create id 0<sortingWidth> [||]
+
     override this.Equals(obj) =
         match obj with
-        | :? sortableBoolTest as other ->
-            this.Id = other.Id && Array.forall2 (=) this.sortableBoolArrays other.sortableBoolArrays
+        | :? sortableIntTests as other ->
+            this.Id = other.Id && Array.forall2 (=) this.sortableIntArrays other.sortableIntArrays
         | _ -> false
 
     override this.GetHashCode() =
-        hash this.sortableBoolArrays
+        hash this.sortableIntArrays
 
+    member this.SortableArrayType with get() = sortableDataType.Ints
 
-    member this.SoratbleCount with get() = this.sortableBoolArrays.Length  |> UMX.tag<sortableCount>
+    member this.SoratbleCount with get() = this.sortableIntArrays.Length |> UMX.tag<sortableCount>
 
     member this.Id with get() = this.id
     
-    member this.SortableArrayType with get() = sortableDataType.Bools
-
     member this.SortingWidth with get() = this.sortingWidth
 
-    member this.SortableBoolArrays with get() = this.sortableBoolArrays
-
+    member this.SortableIntArrays with get() = this.sortableIntArrays
+    
     member this.UnsortedCount with get() = this.unsortedCount.Value |> UMX.tag<sortableCount>
 
-    interface IEquatable<sortableBoolTest> with
+    interface IEquatable<sortableIntTests> with
         member this.Equals(other) =
-            this.Id = other.Id && Array.forall2 (=) this.sortableBoolArrays other.sortableBoolArrays
+            this.Id = other.Id && Array.forall2 (=) this.sortableIntArrays other.sortableIntArrays
 
 
-module SortableBoolTest = ()
+module SortableIntTests = ()
+ 

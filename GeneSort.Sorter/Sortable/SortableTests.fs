@@ -6,9 +6,9 @@ open GeneSort.Sorter
 
 
 type sortableTests = 
-    | Ints of sortableIntTest
+    | Ints of sortableIntTests
     | PackedInts of packedSortableIntTests
-    | Bools of sortableBoolTest
+    | Bools of sortableBoolTests
 
 
 module SortableTests = 

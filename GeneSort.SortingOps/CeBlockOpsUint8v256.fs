@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingOps
+namespace GeneSort.SortingOps
 
 open System.Runtime.Intrinsics
 open System.Threading.Tasks
@@ -144,7 +144,7 @@ module CeBlockOpsUint8v256 =
 
 
     let eval 
-            (test: sortableUint8v256Test) 
+            (test: sortableUint8v256Tests) 
             (prefix: ceBlock)
             (ceBlocks: ceBlock []) =
             //let chunkedStream = test.SimdSortBlocks |> Seq.chunkBySize chunkSize
@@ -275,7 +275,7 @@ module CeBlockOpsUint8v256 =
                     let sss = int sw |> UMX.tag<symbolSetSize>
                     uniqueFailures 
                     |> Array.map (fun arr -> sortableIntArray.create(arr, sw, sss))
-                    |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sw
+                    |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sw
                     |> sortableTests.Ints
                     |> Some
                 else None
@@ -289,7 +289,7 @@ module CeBlockOpsUint8v256 =
         )
 
     let evalAndCollectNewSortableTests 
-                    (test: sortableUint8v256Test) 
+                    (test: sortableUint8v256Tests) 
                     (prefix: ceBlock)
                     (ceBlocks: ceBlock []) =
         evalAndCollectUniqueFailures test.SimdSortBlocks prefix ceBlocks

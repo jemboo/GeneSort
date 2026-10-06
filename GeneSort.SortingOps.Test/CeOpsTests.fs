@@ -57,7 +57,7 @@ type CeOpsTests() =
             sortableBoolArray.create([| false; false; true |], sortingWidth) // Already sorted
         |]
         let sortableTests = 
-                sortableBinaryTest.create 
+                sortableBinaryTests.create 
                         (Guid.NewGuid() |> UMX.tag<sortableTestsId>)
                         sortingWidth
                         boolArrays |> sortableTests.Bools
@@ -85,7 +85,7 @@ type CeOpsTests() =
             sortableIntArray.create([| 0; 0; 1 |], sortingWidth, symbolSetSize) // Already sorted
         |]
         let sortableTests = 
-            sortableIntTest.create 
+            sortableIntTests.create 
                 (Guid.NewGuid() |> UMX.tag<sortableTestsId>) 
                 sortingWidth
                 intArrays |> sortableTests.Ints
@@ -109,7 +109,7 @@ type CeOpsTests() =
         let sortingWidth = 2<sortingWidth>
         let symbolSetSize = 2<symbolSetSize>
         let intArrays = [| sortableIntArray.create([| 1; 0 |], sortingWidth, symbolSetSize) |]
-        let sortableTests = (sortableIntTest.create 
+        let sortableTests = (sortableIntTests.create 
                                 (Guid.NewGuid() |> UMX.tag<sortableTestsId>)
                                 sortingWidth
                                 intArrays ) |> sortableTests.Ints

@@ -5,7 +5,7 @@ public enum OutputDataKind
     Unknown,
     Run,
     RunParameters,
-    SortableTest,
+    SortableTests,
     SorterPoolSet,
     SorterPoolSetSummarySet,
     SorterSet,

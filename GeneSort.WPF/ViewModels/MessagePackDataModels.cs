@@ -23,7 +23,7 @@ public sealed class MessagePackFile(string fullPath)
             ("SorterPoolBinsSetSeries", OutputDataKind.SorterPoolBinsSetSeries),
             ("RunParameters", OutputDataKind.RunParameters),
             ("SorterPoolSet", OutputDataKind.SorterPoolSet),
-            ("SortableTest", OutputDataKind.SortableTest),
+            ("SortableTests", OutputDataKind.SortableTests),
             ("SorterSetEval", OutputDataKind.SorterSetEval),
             ("SorterSet", OutputDataKind.SorterSet),
             ("TextReport", OutputDataKind.TextReport)
@@ -74,7 +74,7 @@ public sealed class MessagePackFile(string fullPath)
             ("SorterPoolSetHistoryCollection", "SorterPoolSetHistory"),
             ("SorterPoolBinsSetSeries", "SorterPoolBinsSetSeries"),
             ("SorterPoolSet", "SorterPoolSet"),
-            ("SortableTest", "SortableTest"),
+            ("SortableTests", "SortableTests"),
             ("SorterSetEval", "SorterSetEval"),
             ("SorterSet", "SorterSet")
         };

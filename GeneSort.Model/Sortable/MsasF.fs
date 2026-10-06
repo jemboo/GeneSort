@@ -45,9 +45,9 @@ type msasF =
 
     member this.MakeSortableBoolTest 
                     (sorterTestId: Guid<sortableTestsId>)
-                    (sortingWidth: int<sortingWidth>) : sortableBinaryTest =
+                    (sortingWidth: int<sortingWidth>) : sortableBinaryTests =
         let sortableArrays =  SortableBoolArray.getAllSortableBoolArrays sortingWidth
-        sortableBinaryTest.create 
+        sortableBinaryTests.create 
                 sorterTestId
                 sortingWidth
                 sortableArrays
@@ -55,9 +55,9 @@ type msasF =
 
     member this.MakeSortableIntTest 
                     (sorterTestId: Guid<sortableTestsId>)
-                    (sortingWidth: int<sortingWidth>) : sortableIntTest =
+                    (sortingWidth: int<sortingWidth>) : sortableIntTests =
         let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
-        sortableIntTest.create
+        sortableIntTests.create
                 sorterTestId
                 sortingWidth
                 sortableArrays
@@ -65,9 +65,9 @@ type msasF =
 
     member this.MakeSortableBitv512Test 
                     (sorterTestId: Guid<sortableTestsId>)
-                    (sortingWidth: int<sortingWidth>) : sortableBitv512Test =
+                    (sortingWidth: int<sortingWidth>) : sortableBitv512Tests =
         let grayBlocks = Sortable.GrayVectorGenerator.getAllSortBlockBitv512ForSortingWidth sortingWidth |> Seq.toArray
-        sortableBitv512Test.create
+        sortableBitv512Tests.create
                 sorterTestId
                 sortingWidth
                 grayBlocks
@@ -75,9 +75,9 @@ type msasF =
 
     member this.MakeSortableUint8v256Test 
                     (sorterTestId: Guid<sortableTestsId>)
-                    (sortingWidth: int<sortingWidth>) : sortableUint8v256Test =
+                    (sortingWidth: int<sortingWidth>) : sortableUint8v256Tests =
         let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
-        SortableUint8v256Test.fromIntArrays
+        SortableUint8v256Tests.fromIntArrays
                 sorterTestId
                 sortingWidth
                 sortableArrays
@@ -85,9 +85,9 @@ type msasF =
 
     member this.MakeSortableUint8v512Test 
                     (sorterTestId: Guid<sortableTestsId>)
-                    (sortingWidth: int<sortingWidth>) : sortableUint8v512Test =
+                    (sortingWidth: int<sortingWidth>) : sortableUint8v512Tests =
         let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
-        SortableUint8v512Test.fromIntArrays
+        SortableUint8v512Tests.fromIntArrays
                 sorterTestId
                 sortingWidth
                 sortableArrays

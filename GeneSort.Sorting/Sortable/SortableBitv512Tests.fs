@@ -7,7 +7,7 @@ open System.Threading.Tasks
 open System.Runtime.Intrinsics
 
 [<Struct>]
-type sortableBitv512Test =
+type sortableBitv512Tests =
     private { 
         id: Guid<sortableTestsId>
         sortingWidth: int<sortingWidth>
@@ -24,7 +24,7 @@ type sortableBitv512Test =
 
     static member Empty =
         let id = Guid.NewGuid() |> UMX.tag<sortableTestsId>
-        sortableBitv512Test.create id 0<sortingWidth> [||]
+        sortableBitv512Tests.create id 0<sortingWidth> [||]
 
     member this.Id with get() = this.id
 
@@ -41,12 +41,12 @@ type sortableBitv512Test =
 
 
 
-module SortableBitv512Test =
+module SortableBitv512Tests =
 
     let fromBoolArrays
         (id: Guid<sortableTestsId>)
         (sw: int<sortingWidth>) 
-        (sortableBoolArrays: sortableBoolArray[]) : sortableBitv512Test =
+        (sortableBoolArrays: sortableBoolArray[]) : sortableBitv512Tests =
         
         let width = %sw
         // Chunk the input arrays into groups of 512
@@ -75,4 +75,4 @@ module SortableBitv512Test =
                 sortBlockBitv512.createFromVectors vecs inputCount
             )
 
-        sortableBitv512Test.create id sw blocks
+        sortableBitv512Tests.create id sw blocks

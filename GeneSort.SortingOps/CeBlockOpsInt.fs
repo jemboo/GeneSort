@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingOps
+namespace GeneSort.SortingOps
 
 open System
 open FSharp.UMX
@@ -12,7 +12,7 @@ open GeneSort.Sorting.Sortable
 module CeBlockOpsInt = 
 
 
-    let eval (sits: sortableIntTest) 
+    let eval (sits: sortableIntTests) 
              (prefix: ceBlock)
              (ceBlk: ceBlock) =
             let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
@@ -51,7 +51,7 @@ module CeBlockOpsInt =
 
 
 
-    let evalAndCollectNewSortableTests (sits: sortableIntTest) 
+    let evalAndCollectNewSortableTests (sits: sortableIntTests) 
                 (prefix: ceBlock) (ceBlk: ceBlock) =
             let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
             let ces = ceBlk.CeArray
@@ -88,7 +88,7 @@ module CeBlockOpsInt =
 
                 pool.Return(workArray)
 
-            let newTests = Seq.toArray results |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sw
+            let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sw
             ceBlockEval.create 
                         prefix
                         ceBlk 
@@ -98,7 +98,7 @@ module CeBlockOpsInt =
 
 
 
-    let evalAndDedupeCeFetch (sits: sortableIntTest) 
+    let evalAndDedupeCeFetch (sits: sortableIntTests) 
                              (prefix: ceBlock) (ceBlk: ceBlock) =
             let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
             let lows = Array.init %ceBlk.CeLength (fun i -> ceBlk.CeArray.[i].Low)
@@ -138,7 +138,7 @@ module CeBlockOpsInt =
 
                 pool.Return(workArray)
 
-            let newTests = Seq.toArray results |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sw
+            let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sw
             ceBlockEval.create 
                         prefix
                         ceBlk 
@@ -148,7 +148,7 @@ module CeBlockOpsInt =
 
 
 
-    let evalAndDedupeUnsafe (sits: sortableIntTest) 
+    let evalAndDedupeUnsafe (sits: sortableIntTests) 
                             (prefix: ceBlock) (ceBlk: ceBlock) =
         let ces = ceBlk.CeArray
         let ceLen = ces.Length |> UMX.tag<ceLength>
@@ -198,7 +198,7 @@ module CeBlockOpsInt =
                     results.Add(sortableIntArray.create(finalValues, sits.SortingWidth, sia.SymbolSetSize)) |> ignore
 
         pool.Return(workArray)
-        let newTests = Seq.toArray results |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sits.SortingWidth
+        let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sits.SortingWidth
         ceBlockEval.create prefix ceBlk ceUseCounts (results.Count |> UMX.tag<sortableCount>) (Some (sortableTests.Ints newTests))
 
 

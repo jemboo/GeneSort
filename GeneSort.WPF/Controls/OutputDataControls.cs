@@ -299,7 +299,7 @@ public sealed class RunOutputDataControl(IEnumerable<MessagePackNode> nodes)
 public sealed class RunParametersOutputDataControl(IEnumerable<MessagePackNode> nodes)
     : OutputDataViewerControl("Run parameters", "Parameter names and values used by this run.", nodes);
 
-public sealed class SortableTestOutputDataControl(IEnumerable<MessagePackNode> nodes)
+public sealed class SortableTestsOutputDataControl(IEnumerable<MessagePackNode> nodes)
     : OutputDataViewerControl("Sortable test", "Sortable test inputs and their associated data.", nodes);
 
 public sealed class SorterPoolSetOutputDataControl(IEnumerable<MessagePackNode> nodes)
@@ -619,7 +619,7 @@ public static class OutputDataViewerFactory
     {
         OutputDataKind.Run => new RunOutputDataControl(nodes),
         OutputDataKind.RunParameters => new RunParametersOutputDataControl(nodes),
-        OutputDataKind.SortableTest => new SortableTestOutputDataControl(nodes),
+        OutputDataKind.SortableTests => new SortableTestsOutputDataControl(nodes),
         OutputDataKind.SorterPoolSet => new SorterPoolSetOutputDataControl(nodes),
         OutputDataKind.SorterPoolSetSummarySet => new SorterPoolSetSummarySetOutputDataControl(nodes),
         OutputDataKind.SorterSet => new SorterSetOutputDataControl(nodes),

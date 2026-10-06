@@ -1,62 +1,67 @@
-
 namespace GeneSort.Sorting.Sortable
 
 open System
 open FSharp.UMX
 open GeneSort.Sorting
 open System.Threading.Tasks
+open System.Runtime.Intrinsics
 
 [<Struct>]
-type sortableUint8v256Test =
+type sortableUint8v512Tests =
     private { 
         id: Guid<sortableTestsId>
         sortingWidth: int<sortingWidth>
-        simdSortBlocks: SortBlockUint8v256[]
+        simdSortBlocks: SortBlockUint8v512[]
     }
 
     static member create 
             (id: Guid<sortableTestsId>) 
             (sw: int<sortingWidth>) 
-            (blocks: SortBlockUint8v256[]) =
+            (blocks: SortBlockUint8v512[]) =
         { id = id
           sortingWidth = sw
           simdSortBlocks = blocks }
 
     static member Empty =
         let id = Guid.NewGuid() |> UMX.tag<sortableTestsId>
-        sortableUint8v256Test.create id 0<sortingWidth> [||]
+        sortableUint8v512Tests.create id 0<sortingWidth> [||]
 
     member this.Id with get() = this.id
     member this.SimdSortBlocks with get() = this.simdSortBlocks
-    member this.SortableDataFormat with get() = sortableDataFormat.Int8Vector256
+    
+    // Updated to reflect the 512-bit format
+    member this.SortableDataFormat with get() = sortableDataFormat.Int8Vector512
+    
     member this.SortableCount with get() = 
         this.simdSortBlocks 
         |> Array.sumBy (fun block -> block.SortableCount) 
         |> UMX.tag<sortableCount>
+        
     member this.SortingWidth with get() = this.sortingWidth
 
 
-
-module SortableUint8v256Test =
+module SortableUint8v512Tests =
 
     let fromIntArrays
         (id: Guid<sortableTestsId>)
-        (sw: int<sortingWidth>)
+        (sw: int<sortingWidth>) 
         (allTests: sortableIntArray[]) 
-                    : sortableUint8v256Test =
-        
-        let totalTests = allTests.Length
-        // Calculate how many SIMD blocks we need (32 lanes per block)
-        let totalBlocksCount = (totalTests + 31) / 32
-        let blocks = Array.zeroCreate<SortBlockUint8v256> totalBlocksCount
+                    : sortableUint8v512Tests =
 
-        // Parallel Pack: use all cores to build the blocks
+        let totalTests = allTests.Length
+        
+        // --- 64 Lanes per block for Vector512 ---
+        let totalBlocksCount = (totalTests + 63) / 64
+        let blocks = Array.zeroCreate<SortBlockUint8v512> totalBlocksCount
+
+        // Parallel Pack: use all cores to build the 64-lane blocks
         Parallel.For(0, totalBlocksCount, (fun i ->
-            let startIdx = i * 32
-            let length = min 32 (totalTests - startIdx)
+            let startIdx = i * 64
+            let length = min 64 (totalTests - startIdx)
+            
             // Extract the slice for this block
             let slice = Array.sub allTests startIdx length
-            blocks.[i] <- SortBlockUint8v256.createFromIntArrays sw slice
+            blocks.[i] <- SortBlockUint8v512.createFromIntArrays sw slice
         )) |> ignore
 
-        sortableUint8v256Test.create id sw blocks
+        sortableUint8v512Tests.create id sw blocks

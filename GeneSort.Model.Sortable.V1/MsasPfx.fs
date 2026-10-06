@@ -42,25 +42,25 @@ type msasPfx =
             this.id = other.id
 
     member this.MakeSortableBoolTest 
-            (sorterTestId: Guid<sortableTestsId>) : sortableBinaryTest =
+            (sorterTestId: Guid<sortableTestsId>) : sortableBinaryTests =
         let ceArray = (SorterDataParse.getCeArrayFromPrefixLib this.PfxLibId).Value
         let bArrays = SortableBoolArray.getAllPossibleResultsFromCeArray
                         ceArray
                         this.SortingWidth
                       |> Seq.toArray
-        sortableBinaryTest.create 
+        sortableBinaryTests.create 
                 sorterTestId 
                 this.SortingWidth
                 bArrays
 
     member this.MakeSortableBitv512Test 
-            (sorterTestId: Guid<sortableTestsId>) : sortableBitv512Test =
+            (sorterTestId: Guid<sortableTestsId>) : sortableBitv512Tests =
         let ceArray = (SorterDataParse.getCeArrayFromPrefixLib this.PfxLibId).Value
         let bArrays = SortableBoolArray.getAllPossibleResultsFromCeArray
                         ceArray
                         this.SortingWidth
                       |> Seq.toArray
-        SortableBitv512Test.fromBoolArrays sorterTestId this.SortingWidth bArrays
+        SortableBitv512Tests.fromBoolArrays sorterTestId this.SortingWidth bArrays
 
 
 

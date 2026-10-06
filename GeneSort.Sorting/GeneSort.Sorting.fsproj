@@ -20,16 +20,16 @@
     <Compile Include="Sortable\SortBlockBitv512.fs" />
     <Compile Include="Sortable\SortBlockUint8v256.fs" />
     <Compile Include="Sortable\SortBlockUint8v512.fs" />
-    <Compile Include="Sortable\SortableBinaryTest.fs" />
-    <Compile Include="Sortable\SortableIntTest.fs" />
+    <Compile Include="Sortable\SortableBinaryTests.fs" />
+    <Compile Include="Sortable\SortableIntTests.fs" />
     <Compile Include="Sortable\PackedSortableIntTest.fs" />
-    <Compile Include="Sortable\SortableBitv512Test.fs" />
-    <Compile Include="Sortable\SortableUint8v256Test.fs" />
-    <Compile Include="Sortable\SortableUint8v512Test.fs" />
+    <Compile Include="Sortable\SortableBitv512Tests.fs" />
+    <Compile Include="Sortable\SortableUint8v256Tests.fs" />
+    <Compile Include="Sortable\SortableUint8v512Tests.fs" />
     <Compile Include="Sortable\GrayVectorGenerator.fs" />
     <Compile Include="Sortable\SortableTests.fs" />
-    <Compile Include="Sortable\SortableBoolTestSet.fs" />
-    <Compile Include="Sortable\SortableIntTestSet.fs" />
+    <Compile Include="Sortable\SortableBoolTestsSet.fs" />
+    <Compile Include="Sortable\SortableIntTestsSet.fs" />
     <Compile Include="Sortable\SortableTestsSet.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

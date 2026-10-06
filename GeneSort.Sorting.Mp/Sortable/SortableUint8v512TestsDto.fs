@@ -6,13 +6,13 @@ open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open System.Runtime.Intrinsics
 
-type sortableUint8v512TestDto = {
+type sortableUint8v512TestsDto = {
     Id: Guid
     SortingWidth: int
     Blocks: simdSortBlockDto[]
 }
 
-module SortableUint8v512TestDto =
+module SortableUint8v512TestsDto =
 
     // --- Helper for simd512SortBlock ---
 
@@ -34,13 +34,13 @@ module SortableUint8v512TestDto =
 
     // --- Main DTO Logic ---
 
-    let fromDomain (test: sortableUint8v512Test) : sortableUint8v512TestDto =
+    let fromDomain (test: sortableUint8v512Tests) : sortableUint8v512TestsDto =
         { Id = %test.Id
           SortingWidth = %test.SortingWidth
           Blocks = test.SimdSortBlocks |> Array.map blockFromDomain }
 
-    let toDomain (dto: sortableUint8v512TestDto) : sortableUint8v512Test =
+    let toDomain (dto: sortableUint8v512TestsDto) : sortableUint8v512Tests =
         let id = UMX.tag<sortableTestsId> dto.Id
         let sw = UMX.tag<sortingWidth> dto.SortingWidth
         let blocks = dto.Blocks |> Array.map blockToDomain
-        sortableUint8v512Test.create id sw blocks
+        sortableUint8v512Tests.create id sw blocks

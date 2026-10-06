@@ -4,13 +4,13 @@ namespace GeneSort.Sorting.Sortable
 open FSharp.UMX
 open GeneSort.Sorting
 
-type sortableIntTestSet =
+type sortableIntTestsSet =
     { Id: Guid<sortableTestsSetId>
-      sortableTests: sortableIntTest[] }
+      sortableTests: sortableIntTests[] }
 
     static member create 
                     (id: Guid<sortableTestsSetId>) 
-                    (arrays: sortableIntTest[]) : sortableIntTestSet =
+                    (arrays: sortableIntTests[]) : sortableIntTestsSet =
         if Array.isEmpty arrays then
             invalidArg "arrays" "Arrays must not be empty."
         { Id = id; sortableTests = Array.copy arrays; }

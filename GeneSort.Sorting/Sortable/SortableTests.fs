@@ -6,12 +6,12 @@ open GeneSort.Sorting
 
 
 type sortableTests = 
-    | Bitv512 of sortableBitv512Test
-    | Bools of sortableBinaryTest
-    | Ints of sortableIntTest
+    | Bitv512 of sortableBitv512Tests
+    | Bools of sortableBinaryTests
+    | Ints of sortableIntTests
     | PackedInts of packedSortableIntTests
-    | Uint8v256 of sortableUint8v256Test
-    | Uint8v512 of sortableUint8v512Test
+    | Uint8v256 of sortableUint8v256Tests
+    | Uint8v512 of sortableUint8v512Tests
 
 
 module SortableTests = 

@@ -3,8 +3,8 @@ namespace GeneSort.Sorting.Sortable
 
 
 type sortableTestsSet = 
-    | Ints of sortableIntTestSet
-    | Bools of sortableBoolTestSet
+    | Ints of sortableIntTestsSet
+    | Bools of sortableBoolTestsSet
 
 
 

@@ -6,7 +6,7 @@ open FSharp.UMX
 open GeneSort.Sorting
 
 [<Struct; CustomEquality; NoComparison>]
-type sortableBinaryTest =
+type sortableBinaryTests =
     private { id: Guid<sortableTestsId>
               sortingWidth: int<sortingWidth>
               sortableBinaryArrays: sortableBoolArray[]
@@ -15,7 +15,7 @@ type sortableBinaryTest =
     static member create 
                     (id: Guid<sortableTestsId>) 
                     (sortingWidth:int<sortingWidth>)
-                    (arrays: sortableBoolArray[]) : sortableBinaryTest =
+                    (arrays: sortableBoolArray[]) : sortableBinaryTests =
         { 
             id = id; 
             sortingWidth = sortingWidth; 
@@ -24,11 +24,11 @@ type sortableBinaryTest =
 
     static member Empty =
         let id = Guid.NewGuid() |> UMX.tag<sortableTestsId>
-        sortableBinaryTest.create id 0<sortingWidth> [||]
+        sortableBinaryTests.create id 0<sortingWidth> [||]
 
     override this.Equals(obj) =
         match obj with
-        | :? sortableBinaryTest as other ->
+        | :? sortableBinaryTests as other ->
             this.Id = other.Id && Array.forall2 (=) this.sortableBinaryArrays other.sortableBinaryArrays
         | _ -> false
 
@@ -46,9 +46,9 @@ type sortableBinaryTest =
 
     member this.SortableBinaryArrays with get() = this.sortableBinaryArrays
 
-    interface IEquatable<sortableBinaryTest> with
+    interface IEquatable<sortableBinaryTests> with
         member this.Equals(other) =
             this.Id = other.Id && Array.forall2 (=) this.sortableBinaryArrays other.sortableBinaryArrays
 
 
-module SortableBoolTest = ()
+module SortableBoolTests = ()

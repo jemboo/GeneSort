@@ -32,7 +32,7 @@ type sortableTestsModelSet =
 
         //match sortableDataType with
         //| sortableDataType.Bools ->
-        //    (sortableBoolTestSet.create id sortableTestsArray) |> sortableTestsSet.Bools
+        //    (sortableBoolTestsSet.create id sortableTestsArray) |> sortableTestsSet.Bools
         //| sortableDataType.Ints -> 
 
 
@@ -49,7 +49,7 @@ type sortableTestsModelSet =
                     match st with
                     | sortableTests.Bools bt -> bt
                     | _ -> failwith "Inconsistent SorterTestModelSet: expected Bools")
-            sortableTestsSet.Bools (sortableBoolTestSet.create id boolTests)
+            sortableTestsSet.Bools (sortableBoolTestsSet.create id boolTests)
 
         | sortableDataFormat.IntArray -> 
             let intTests = 
@@ -63,4 +63,4 @@ type sortableTestsModelSet =
                     match st with
                     | sortableTests.Ints it -> it
                     | _ -> failwith "Inconsistent SorterTestModelSet: expected Ints")
-            sortableTestsSet.Ints (sortableIntTestSet.create id intTests)
+            sortableTestsSet.Ints (sortableIntTestsSet.create id intTests)

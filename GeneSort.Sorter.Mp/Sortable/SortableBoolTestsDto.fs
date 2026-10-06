@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Sorter.Mp.Sortable
+namespace GeneSort.Sorter.Mp.Sortable
 
 open System
 open FSharp.UMX
@@ -8,21 +8,21 @@ open GeneSort.Sorter.Sortable
 open MessagePack
 
 [<MessagePackObject>]
-type sortableBoolTestDto = {
+type sortableBoolTestsDto = {
     [<Key(0)>] Id: Guid
     [<Key(1)>] SortingWidth: int
     [<Key(2)>] SortableArrays: sortableBoolArrayDto[]
 }
 
-module SortableBoolTestDto =
+module SortableBoolTestsDto =
 
-    let fromDomain (sbt: sortableBoolTest) : sortableBoolTestDto =
+    let fromDomain (sbt: sortableBoolTests) : sortableBoolTestsDto =
         { Id = %sbt.Id
           SortingWidth = int sbt.SortingWidth
           SortableArrays = sbt.SortableBoolArrays |> Array.map SortableBoolArrayDto.fromDomain }
 
-    let toDomain (dto: sortableBoolTestDto) : sortableBoolTest =
-        sortableBoolTest.create
+    let toDomain (dto: sortableBoolTestsDto) : sortableBoolTests =
+        sortableBoolTests.create
             (UMX.tag<sorterTestId> dto.Id)
             (UMX.tag<sortingWidth> dto.SortingWidth)
             (dto.SortableArrays |> Array.map SortableBoolArrayDto.toDomain)

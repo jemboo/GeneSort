@@ -8,8 +8,8 @@ open GeneSort.Sorter
 
 
 type sortableTestsSet = 
-    | Ints of sortableIntTestSet
-    | Bools of sortableBoolTestSet
+    | Ints of sortableIntTestsSet
+    | Bools of sortableBoolTestsSet
 
 
 
