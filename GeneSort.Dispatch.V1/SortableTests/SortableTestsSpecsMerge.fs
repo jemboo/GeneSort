@@ -1,4 +1,4 @@
-namespace GeneSort.Dispatch.V1.SortableTest
+namespace GeneSort.Dispatch.V1.SortableTests
 
 open FSharp.UMX
 open GeneSort.Project.V1
@@ -6,16 +6,16 @@ open GeneSort.Dispatch.V1
 open CommonParams
 
 
-module SortableTestSpecsMerge =
+module SortableTestsSpecsMerge =
 
     module Specs =
 
-        let Merge_Test  (executorType: sortableTestExecutorType) : run =
+        let Merge_Test  (executorType: sortableTestsExecutorType) : run =
             run.SimpleRun (
                 SimpleRun.create
-                    SortableTestDbs.Merge.dbName
-                    CommonSortableTest.projectName
-                    (sprintf @"Merge-Test_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag)
+                    SortableTestsDbs.Merge.dbName
+                    CommonSortableTests.projectName
+                    (sprintf @"Merge-Test_%s" (SortableTestsExecutorType.toString executorType) |> UMX.tag)
                     "Int8 merge sorter test sets"
                     [
                 mergeLib_Merge32s
@@ -37,6 +37,6 @@ module SortableTestSpecsMerge =
                         (configType.Merge_Test, Specs.Merge_Test); 
                     ]
 
-    let getRun (config: configType) (executorType: sortableTestExecutorType) : run =
+    let getRun (config: configType) (executorType: sortableTestsExecutorType) : run =
         let specFunc = Configs.[config]
         specFunc executorType

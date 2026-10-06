@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Project.SorterBins
+namespace GeneSort.Project.SorterBins
 
 open System
 open System.Threading
@@ -171,9 +171,9 @@ module RandomSorterBins =
 
                 // 4. Create tests
                 let! (_: unit) = checkCancellation cts.Token
-                let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-                let qpTests = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTest "")
-                let tests = SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) testModel sortableDataFormat
+                let testModel = msasF.create sortingWidth |> sortableTestsModel.MsasF
+                let qpTests = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTests "")
+                let tests = SortableTestsModel.makeSortableTests (%qpTests.Id |> UMX.tag) testModel sortableDataFormat
 
                 // 5. Evaluate
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")

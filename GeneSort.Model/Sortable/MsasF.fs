@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sortable
+namespace GeneSort.Model.Sortable
 
 open System
 open FSharp.UMX
@@ -44,7 +44,7 @@ type msasF =
         member this.Equals(other) =  this.sortingWidth = other.sortingWidth
 
     member this.MakeSortableBoolTest 
-                    (sorterTestId: Guid<sortableTestId>)
+                    (sorterTestId: Guid<sortableTestsId>)
                     (sortingWidth: int<sortingWidth>) : sortableBinaryTest =
         let sortableArrays =  SortableBoolArray.getAllSortableBoolArrays sortingWidth
         sortableBinaryTest.create 
@@ -54,7 +54,7 @@ type msasF =
 
 
     member this.MakeSortableIntTest 
-                    (sorterTestId: Guid<sortableTestId>)
+                    (sorterTestId: Guid<sortableTestsId>)
                     (sortingWidth: int<sortingWidth>) : sortableIntTest =
         let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
         sortableIntTest.create
@@ -64,7 +64,7 @@ type msasF =
 
 
     member this.MakeSortableBitv512Test 
-                    (sorterTestId: Guid<sortableTestId>)
+                    (sorterTestId: Guid<sortableTestsId>)
                     (sortingWidth: int<sortingWidth>) : sortableBitv512Test =
         let grayBlocks = Sortable.GrayVectorGenerator.getAllSortBlockBitv512ForSortingWidth sortingWidth |> Seq.toArray
         sortableBitv512Test.create
@@ -74,7 +74,7 @@ type msasF =
 
 
     member this.MakeSortableUint8v256Test 
-                    (sorterTestId: Guid<sortableTestId>)
+                    (sorterTestId: Guid<sortableTestsId>)
                     (sortingWidth: int<sortingWidth>) : sortableUint8v256Test =
         let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
         SortableUint8v256Test.fromIntArrays
@@ -84,7 +84,7 @@ type msasF =
 
 
     member this.MakeSortableUint8v512Test 
-                    (sorterTestId: Guid<sortableTestId>)
+                    (sorterTestId: Guid<sortableTestsId>)
                     (sortingWidth: int<sortingWidth>) : sortableUint8v512Test =
         let sortableArrays =  BinaryArrayUtils.getAllSortableBinaryArrays sortingWidth
         SortableUint8v512Test.fromIntArrays

@@ -1,46 +1,46 @@
-﻿namespace rec GeneSort.Project.Mp.V1
+namespace rec GeneSort.Project.Mp.V1
 
 open GeneSort.Project.V1
 
-// --- qpSortableTestRestriction ---
+// --- qpSortableTestsRestriction ---
 
-type qpSortableTestRestrictionDto =
+type qpSortableTestsRestrictionDto =
     | NoRestriction
     | Split
 
-module QpSortableTestRestrictionDto =
+module QpSortableTestsRestrictionDto =
 
-    let fromDomain (domain: qpSortableTestRestriction) : qpSortableTestRestrictionDto =
+    let fromDomain (domain: qpSortableTestsRestriction) : qpSortableTestsRestrictionDto =
         match domain with
-        | qpSortableTestRestriction.NoRestriction -> NoRestriction
-        | qpSortableTestRestriction.Split -> Split
+        | qpSortableTestsRestriction.NoRestriction -> NoRestriction
+        | qpSortableTestsRestriction.Split -> Split
 
-    let toDomain (dto: qpSortableTestRestrictionDto) : qpSortableTestRestriction =
+    let toDomain (dto: qpSortableTestsRestrictionDto) : qpSortableTestsRestriction =
         match dto with
-        | NoRestriction -> qpSortableTestRestriction.NoRestriction
-        | Split -> qpSortableTestRestriction.Split
+        | NoRestriction -> qpSortableTestsRestriction.NoRestriction
+        | Split -> qpSortableTestsRestriction.Split
 
 
-// --- qpSortableTestType ---
+// --- qpSortableTestsType ---
 
-type qpSortableTestTypeDto =
-    | Standard of qpSortableTestRestrictionDto
-    | Merge of qpSortableTestRestrictionDto
-    | Prefix of qpSortableTestRestrictionDto
+type qpSortableTestsTypeDto =
+    | Standard of qpSortableTestsRestrictionDto
+    | Merge of qpSortableTestsRestrictionDto
+    | Prefix of qpSortableTestsRestrictionDto
 
-module QpSortableTestTypeDto =
+module QpSortableTestsTypeDto =
 
-    let fromDomain (domain: qpSortableTestType) : qpSortableTestTypeDto =
+    let fromDomain (domain: qpSortableTestsType) : qpSortableTestsTypeDto =
         match domain with
-        | qpSortableTestType.Standard r -> qpSortableTestTypeDto.Standard (QpSortableTestRestrictionDto.fromDomain r)
-        | qpSortableTestType.Merge r -> Merge (QpSortableTestRestrictionDto.fromDomain r)
-        | qpSortableTestType.Prefix r -> Prefix (QpSortableTestRestrictionDto.fromDomain r)
+        | qpSortableTestsType.Standard r -> qpSortableTestsTypeDto.Standard (QpSortableTestsRestrictionDto.fromDomain r)
+        | qpSortableTestsType.Merge r -> Merge (QpSortableTestsRestrictionDto.fromDomain r)
+        | qpSortableTestsType.Prefix r -> Prefix (QpSortableTestsRestrictionDto.fromDomain r)
 
-    let toDomain (dto: qpSortableTestTypeDto) : qpSortableTestType =
+    let toDomain (dto: qpSortableTestsTypeDto) : qpSortableTestsType =
         match dto with
-        | qpSortableTestTypeDto.Standard rDto -> qpSortableTestType.Standard (QpSortableTestRestrictionDto.toDomain rDto)
-        | Merge rDto -> qpSortableTestType.Merge (QpSortableTestRestrictionDto.toDomain rDto)
-        | Prefix rDto -> qpSortableTestType.Prefix (QpSortableTestRestrictionDto.toDomain rDto)
+        | qpSortableTestsTypeDto.Standard rDto -> qpSortableTestsType.Standard (QpSortableTestsRestrictionDto.toDomain rDto)
+        | Merge rDto -> qpSortableTestsType.Merge (QpSortableTestsRestrictionDto.toDomain rDto)
+        | Prefix rDto -> qpSortableTestsType.Prefix (QpSortableTestsRestrictionDto.toDomain rDto)
 
 
 // --- qpSimpleSorter ---
@@ -96,19 +96,19 @@ module QpSorterTypeDto =
 // --- qpSorterEval ---
 
 type qpSorterEvalDto =
-    | Standard of qpSorterTypeDto * qpSortableTestTypeDto
+    | Standard of qpSorterTypeDto * qpSortableTestsTypeDto
 
 module QpSorterEvalDto =
 
     let fromDomain (domain: qpSorterEval) : qpSorterEvalDto =
         match domain with
         | qpSorterEval.Standard (st, tt) ->
-            Standard (QpSorterTypeDto.fromDomain st, QpSortableTestTypeDto.fromDomain tt)
+            Standard (QpSorterTypeDto.fromDomain st, QpSortableTestsTypeDto.fromDomain tt)
 
     let toDomain (dto: qpSorterEvalDto) : qpSorterEval =
         match dto with
         | Standard (stDto, ttDto) ->
-            qpSorterEval.Standard (QpSorterTypeDto.toDomain stDto, QpSortableTestTypeDto.toDomain ttDto)
+            qpSorterEval.Standard (QpSorterTypeDto.toDomain stDto, QpSortableTestsTypeDto.toDomain ttDto)
 
 
 // --- qpSorterMutate ---
@@ -203,7 +203,7 @@ module QpSgdTypeDto =
 // --- queryParamType ---
 
 type queryPropertiesDto =
-    | SortableTest of qpSortableTestTypeDto
+    | SortableTests of qpSortableTestsTypeDto
     | SorterEval of qpSorterEvalDto
     | SorterMutate of qpSorterMutateDto
     | SorterSgd of qpSgdTypeDto
@@ -212,7 +212,7 @@ module QueryPropertiesDto =
 
     let fromDomain (domain: queryProperties) : queryPropertiesDto =
         match domain with
-        | queryProperties.SortableTest st -> SortableTest (QpSortableTestTypeDto.fromDomain st)
+        | queryProperties.SortableTests st -> SortableTests (QpSortableTestsTypeDto.fromDomain st)
         | queryProperties.SorterEval se -> SorterEval (QpSorterEvalDto.fromDomain se)
         | queryProperties.SorterMutate sm -> SorterMutate (QpSorterMutateDto.fromDomain sm)
         | queryProperties.SorterSgd sgd -> SorterSgd (QpSgdTypeDto.fromDomain sgd)
@@ -220,7 +220,7 @@ module QueryPropertiesDto =
     let toDomain (dto: queryPropertiesDto) : queryProperties =
         try
             match dto with
-            | SortableTest stDto -> queryProperties.SortableTest (QpSortableTestTypeDto.toDomain stDto)
+            | SortableTests stDto -> queryProperties.SortableTests (QpSortableTestsTypeDto.toDomain stDto)
             | SorterEval seDto -> queryProperties.SorterEval (QpSorterEvalDto.toDomain seDto)
             | SorterMutate smDto -> queryProperties.SorterMutate (QpSorterMutateDto.toDomain smDto)
             | SorterSgd sgdDto -> queryProperties.SorterSgd (QpSgdTypeDto.toDomain sgdDto)

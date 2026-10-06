@@ -112,7 +112,7 @@ module SorterEvalExecutor =
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvals 
                     SorterModelSetMakers.makeUniformSorterModelSet
-                    SortableTestMakers.makeStandardTests
+                    SortableTestsMakers.makeStandardTests
                     host rp allowOverwrite cts progress }
 
     let mergeExecutor =
@@ -120,7 +120,7 @@ module SorterEvalExecutor =
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvals 
                     SorterModelSetMakers.makeUniformSorterModelSet
-                    SortableTestMakers.makeMergeTests
+                    SortableTestsMakers.makeMergeTests
                     host rp allowOverwrite cts progress }
 
     let prefixExecutor =
@@ -128,7 +128,7 @@ module SorterEvalExecutor =
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvals 
                     SorterModelSetMakers.makeUniformSorterModelSet
-                    SortableTestMakers.getPrefixTests
+                    SortableTestsMakers.getPrefixTests
                     host rp allowOverwrite cts progress }
 
 

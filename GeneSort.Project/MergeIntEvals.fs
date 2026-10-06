@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Project
+namespace GeneSort.Project
 
 open System
 open System.Threading
@@ -151,10 +151,10 @@ module MergeIntEvals =
 
                 // 3. Load Sortable Tests
                 let qpSortableTests = SortableMergeTests.makeQueryParams 
-                                        (Some (0 |> UMX.tag)) (Some sw) (Some md) (Some mst) (Some sdf) (outputDataType.SortableTest "")
+                                        (Some (0 |> UMX.tag)) (Some sw) (Some md) (Some mst) (Some sdf) (outputDataType.SortableTests "")
                 let dbSortableTests = new GeneSortDbMp(SortableMergeTests.projectFolder) :> IGeneSortDb
                 let! rawTestData = dbSortableTests.loadAsync qpSortableTests 
-                let! sortableTest = rawTestData |> OutputData.asSortableTest
+                let! sortableTests = rawTestData |> OutputData.asSortableTests
 
                 // 4. Load SortingSet
                 let qpSorterModelSet = RandomSorters.makeQueryParams (Some repl) (Some sw) (Some smt) (outputDataType.SortingSet "")
@@ -170,7 +170,7 @@ module MergeIntEvals =
                 let sorterSetEval = SorterSetEval.makeSorterSetEval 
                                                 (%qpEval.Id |> UMX.tag) 
                                                 sorterSet 
-                                                sortableTest 
+                                                sortableTests 
                                                 sorterEvalType.V1
                                                 collectNewSortableTests
 

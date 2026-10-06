@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingOps.Mp
+namespace GeneSort.SortingOps.Mp
 
 open System
 open FSharp.UMX
@@ -35,7 +35,7 @@ type sorterEvalV3Dto = {
     SequenceHash : int
     StageLength : int
     CeUseArray : ceDataDto array
-    SortableTest : sortableTestDto
+    SortableTests : sortableTestsDto
     SortingWidth : int
     ReflectionSymmetric : bool
     StageCrossingsCount : int
@@ -90,7 +90,7 @@ module SorterEvalDto =
                 SequenceHash = %v3.SequenceHash
                 StageLength = %v3.StageLength
                 CeUseArray = v3.CeUseArray |> Array.map CeDataDto.fromDomain
-                SortableTest = SortableTestDto.fromDomain v3.SortableTest
+                SortableTests = SortableTestsDto.fromDomain v3.SortableTests
                 SortingWidth = %v3.SortingWidth
                 ReflectionSymmetric = %v3.ReflectionSymmetric
                 StageCrossingsCount = %v3.StageCrossingsCount
@@ -131,7 +131,7 @@ module SorterEvalDto =
                 (v3Dto.SequenceHash |> UMX.tag)
                 (v3Dto.StageLength |> UMX.tag)
                 (v3Dto.CeUseArray |> Array.map CeDataDto.toDomain)
-                (SortableTestDto.toDomain v3Dto.SortableTest)
+                (SortableTestsDto.toDomain v3Dto.SortableTests)
                 (v3Dto.ReflectionSymmetric |> UMX.tag)
                 (v3Dto.StageCrossingsCount |> UMX.tag)
                 (v3Dto.ReflectiveCount |> UMX.tag)

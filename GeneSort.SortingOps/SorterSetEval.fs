@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingOps
+namespace GeneSort.SortingOps
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -11,14 +11,14 @@ type sorterSetEval =
     private { 
         sorterSetEvalId: Guid<sorterSetEvalId>
         sorterSetId: Guid<sorterSetId>
-        sorterTestId: Guid<sortableTestId>
+        sorterTestId: Guid<sortableTestsId>
         sorterEvals: Map<Guid<sorterId>, sorterEval>
     }
 
     static member create 
                 (sorterSetEvalId: Guid<sorterSetEvalId>) 
                 (sorterSetId: Guid<sorterSetId>) 
-                (sorterTestsId: Guid<sortableTestId>) 
+                (sorterTestsId: Guid<sortableTestsId>) 
                 (sorterEvals: sorterEval[]) =
         { 
             sorterSetEvalId = sorterSetEvalId
@@ -29,7 +29,7 @@ type sorterSetEval =
 
     member this.SorterSetEvalId with get() : Guid<sorterSetEvalId> = this.sorterSetEvalId
     member this.SorterSetId with get() : Guid<sorterSetId> = this.sorterSetId
-    member this.SorterTestId with get() : Guid<sortableTestId> = this.sorterTestId
+    member this.SorterTestId with get() : Guid<sortableTestsId> = this.sorterTestId
     member this.SorterEvals with get() : sorterEval[] = this.sorterEvals.Values |> Seq.toArray
 
  

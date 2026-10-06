@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Project.Mp.V1
+namespace GeneSort.Project.Mp.V1
 
 open FSharp.UMX
 open GeneSort.Project.V1
@@ -16,7 +16,7 @@ module OutputDataTypeDto =
         | RunParameters so -> { Tag = "RunParameters"; Value = %so }
         | SorterPoolSetSummarySet srr -> { Tag = "SorterPoolSetSummarySet"; Value = srr }
         | SorterSet so -> { Tag = "SorterSet"; Value = so }
-        | outputDataType.SortableTest so -> { Tag = "SortableTest"; Value = so }
+        | outputDataType.SortableTests so -> { Tag = "SortableTests"; Value = so }
         | SorterSetEval so -> { Tag = "SorterSetEval"; Value = so }
         | SorterPoolBinsSetSeries so -> { Tag = "SorterPoolEvalBinsSet"; Value = so }
         | SorterPoolSetHistory so -> { Tag = "SorterPoolSetHistoryCollection"; Value = so }
@@ -30,7 +30,7 @@ module OutputDataTypeDto =
         | "RunParameters" -> RunParameters (dto.Value |> UMX.tag<runName>)
         | "SorterPoolSetSummarySet" -> SorterPoolSetSummarySet dto.Value
         | "SorterSet" -> SorterSet dto.Value
-        | "SortableTest" -> outputDataType.SortableTest dto.Value
+        | "SortableTests" -> outputDataType.SortableTests dto.Value
         | "SorterSetEval" -> SorterSetEval dto.Value
         | "SorterPoolEvalBinsSetCollection" -> SorterPoolBinsSetSeries dto.Value
         | "SorterPoolSetHistoryCollection" -> SorterPoolSetHistory dto.Value

@@ -428,7 +428,7 @@ module SorterMutateExecutor =
             member _.Execute host rp allowOverwrite cts progress =
                 _evaluateMutants 
                     makeMutantStandardSorterModels
-                    SortableTestMakers.makeStandardTests
+                    SortableTestsMakers.makeStandardTests
                     host rp allowOverwrite cts progress }
 
     let mergeExecutor =
@@ -436,7 +436,7 @@ module SorterMutateExecutor =
             member _.Execute host rp allowOverwrite cts progress =
                 _evaluateMutants 
                     makeMutantMergeSorterModels
-                    SortableTestMakers.makeMergeTests
+                    SortableTestsMakers.makeMergeTests
                     host rp allowOverwrite cts progress }
 
     let prefixExecutor =
@@ -444,7 +444,7 @@ module SorterMutateExecutor =
             member _.Execute host rp allowOverwrite cts progress =
                 _evaluateMutants 
                     makeMutantPrefixSorterModels
-                    SortableTestMakers.getPrefixTests
+                    SortableTestsMakers.getPrefixTests
                     host rp allowOverwrite cts progress }
 
 

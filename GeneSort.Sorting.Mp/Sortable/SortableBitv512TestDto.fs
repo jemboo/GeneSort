@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Sorting.Mp.Sortable
+namespace GeneSort.Sorting.Mp.Sortable
 
 open System
 open FSharp.UMX
@@ -51,7 +51,7 @@ module SortableBitv512TestDto =
           Blocks = test.SimdSortBlocks |> Array.map blockFromDomain }
 
     let toDomain (dto: sortableBitv512TestDto) : sortableBitv512Test =
-        let id = UMX.tag<sortableTestId> dto.Id
+        let id = UMX.tag<sortableTestsId> dto.Id
         let sw = UMX.tag<sortingWidth> dto.SortingWidth
         let blocks = dto.Blocks |> Array.map blockToDomain
         sortableBitv512Test.create id sw blocks

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Project
+namespace GeneSort.Project
 
 open System
 open System.Threading
@@ -140,10 +140,10 @@ module MergeIntQa =
                 report progress (sprintf "%s Starting Run %s repl %d" (MathUtils.getTimestampString()) runId %repl)
 
                 // 3. Load Sortable Tests (Cross-project)
-                let qpTests = SortableMergeTests.makeQueryParams (Some (0|>UMX.tag)) (Some sw) (Some md) (Some mft) (Some sdf) (outputDataType.SortableTest "")
+                let qpTests = SortableMergeTests.makeQueryParams (Some (0|>UMX.tag)) (Some sw) (Some md) (Some mft) (Some sdf) (outputDataType.SortableTests "")
                 let dbTests = new GeneSortDbMp(SortableMergeTests.projectFolder) :> IGeneSortDb
                 let! rawTestData = dbTests.loadAsync qpTests 
-                let! sortableTest = rawTestData |> OutputData.asSortableTest
+                let! sortableTests = rawTestData |> OutputData.asSortableTests
 
                 // 4. Load Sorter Set (Cross-project)
                 let qpSorters = RandomSorters.makeQueryParams (Some repl) (Some sw) (Some sm) (outputDataType.SortingSet "")
@@ -153,7 +153,7 @@ module MergeIntQa =
 
                 // 5. Computation
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")
-                let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) sorterSet sortableTest sorterEvalType.V1 false
+                let sorterSetEval = SorterSetEval.makeSorterSetEval (%qpEval.Id |> UMX.tag) sorterSet sortableTests sorterEvalType.V1 false
                 
                 report progress (sprintf "%s Saving test results %s" (MathUtils.getTimestampString()) runId)
                 let! (_: unit) = checkCancellation cts.Token

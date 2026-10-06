@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingOps
+namespace GeneSort.SortingOps
 
 open FSharp.UMX
 open GeneSort.Core
@@ -225,7 +225,7 @@ type sorterEvalV3 =
     member this.CeLength with get() : int<ceLength> = this.ceUseArray.Length |> UMX.tag<ceLength>
     member this.CeUseArray with get() : ceUse array = this.ceUseArray
     member this.SequenceHash with get() : int<sequenceHash>  = this.sequenceHash
-    member this.SortableTest with get() : sortableTests = this.sortableTests
+    member this.SortableTests with get() : sortableTests = this.sortableTests
     member this.ReflectiveCount with get() : int<reflectiveCount> = this.reflectiveCount
     member this.UnsortedCount with get() : int<sortableCount>  = 
             this.sortableTests |> SortableTests.getUnsortedCount
@@ -510,7 +510,7 @@ module SorterEval =
 
         let reflectiveCount =  stageSequence.GetReflectiveCount()
 
-        match ceBlockEval.SortableTest with
+        match ceBlockEval.SortableTests with
         | None -> 
             createV2 sorterId ceBlockEval
         | Some test ->

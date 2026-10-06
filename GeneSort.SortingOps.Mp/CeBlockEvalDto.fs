@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingOps.Mp
+namespace GeneSort.SortingOps.Mp
 
 open FSharp.UMX
 open GeneSort.SortingOps
@@ -10,7 +10,7 @@ type ceBlockEvalDto = {
     CeBlock: ceBlockDto
     CeUseCounts: int array
     UnsortedCount: int
-    SortableTest: sortableTestDto option
+    SortableTests: sortableTestsDto option
 }
 
 module CeBlockEvalDto =
@@ -22,16 +22,16 @@ module CeBlockEvalDto =
             // We store the raw array from the container
             CeUseCounts = eval.UseCountArray
             UnsortedCount = %eval.UnsortedCount
-            SortableTest = 
-                eval.SortableTest
-                |> Option.map SortableTestDto.fromDomain
+            SortableTests = 
+                eval.SortableTests
+                |> Option.map SortableTestsDto.fromDomain
         }
 
     let toDomain (dto: ceBlockEvalDto) : ceBlockEval =
         let prefix = CeBlockDto.fromCeBlockDto dto.Prefix
         let ceb = CeBlockDto.fromCeBlockDto dto.CeBlock
         let counts = ceUseCounts.CreateFromArray dto.CeUseCounts
-        let tests = dto.SortableTest |> Option.map SortableTestDto.toDomain
+        let tests = dto.SortableTests |> Option.map SortableTestsDto.toDomain
         let unsortedCount = dto.UnsortedCount |> UMX.tag<sortableCount>
         
         // The factory handles recreating the Lazy usedCes and stageSequence

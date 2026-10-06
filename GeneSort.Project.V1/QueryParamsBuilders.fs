@@ -203,7 +203,7 @@ module QueryParamsBuilders =
                     return makeQueryParams projectName dbName repl gen scpp spc modR para selfSym seedSelection selectedCount mmod odt
                 }
 
-    module SortableTest =
+    module SortableTests =
 
         module Merge =
             let makeQueryParams projectName dbName repl (mergeLib: mergeLibId) (sortableDataFormat: sortableDataFormat) outDt =
@@ -399,8 +399,8 @@ module QueryParamsBuilders =
                     "sorter-sgd.msuf32-mutation-rate", SorterSgd.Msuf32MutationRate.queryParamsFromRunParams
                     "sorter-sgd.msrs32-mutation-rate", SorterSgd.Msrs32MutationRate.queryParamsFromRunParams
                     "sorter-sgd.msrs-pool-mod-comp", SorterSgd.MsrsPoolModComp.queryParamsFromRunParams
-                    "sortable-test.merge", SortableTest.Merge.queryParamsFromRunParams
-                    "sortable-test.prefix", SortableTest.Prefix.queryParamsFromRunParams
+                    "sortable-test.merge", SortableTests.Merge.queryParamsFromRunParams
+                    "sortable-test.prefix", SortableTests.Prefix.queryParamsFromRunParams
                     "sorter-eval.standard", SorterEval.Standard.queryParamsFromRunParams
                     "sorter-eval.merge", SorterEval.Merge.queryParamsFromRunParams
                     "sorter-eval.prefix", SorterEval.Prefix.queryParamsFromRunParams

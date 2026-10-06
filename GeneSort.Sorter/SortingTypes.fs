@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Sorter
+namespace GeneSort.Sorter
 
 open FSharp.UMX
 
@@ -10,7 +10,7 @@ open FSharp.UMX
 [<Measure>] type symbolSetSize
 [<Measure>] type sortableCount
 [<Measure>] type sorterTestId
-[<Measure>] type sortableTestSetId
+[<Measure>] type sortableTestsSetId
 
 
 [<Measure>] type sorterParentId

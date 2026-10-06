@@ -1,4 +1,4 @@
-﻿namespace GeneSort.FileDb.V1
+namespace GeneSort.FileDb.V1
 open System
 open System.IO
 open System.Threading
@@ -107,9 +107,9 @@ module OutputDataFile =
                             let! domain = deserializeDto<sorterSetDto, sorterSet> stream token SorterSetDto.toDomain
                             return outputData.SorterSet domain
                         }
-                    | outputDataType.SortableTest _ ->
+                    | outputDataType.SortableTests _ ->
                         async {
-                            let! domain = deserializeDto<sortableTestDto, sortableTests> stream token SortableTestDto.toDomain
+                            let! domain = deserializeDto<sortableTestsDto, sortableTests> stream token SortableTestsDto.toDomain
                             return outputData.SortableTests domain
                         }
                     | outputDataType.SorterSetEval _ ->
@@ -195,7 +195,7 @@ module OutputDataFile =
                             | outputData.SorterSet ss ->
                                 serializeDto stream ss SorterSetDto.fromDomain
                             | outputData.SortableTests sts ->
-                                 serializeDto stream sts SortableTestDto.fromDomain
+                                 serializeDto stream sts SortableTestsDto.fromDomain
                             | outputData.SorterSetEval sse ->
                                 serializeDto stream sse SorterSetEvalDto.fromDomain                         
                             | outputData.SorterPoolBinsSetSeries sse ->

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -11,11 +11,8 @@
     <Compile Include="MsasM.fs" />
     <Compile Include="MsasO.fs" />
     <Compile Include="MsasPfx.fs" />
-    <Compile Include="SortableTestModel.fs" />
+    <Compile Include="SortableTestsModel.fs" />
     <Compile Include="MsasORandGen.fs" />
-    <Compile Include="SortableTestModelGen.fs" />
-    <Compile Include="SortableTestModelSet.fs" />
-    <Compile Include="SortableTestModelSetGen.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

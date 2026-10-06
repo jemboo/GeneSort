@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Sorting
+namespace GeneSort.Sorting
 
 open FSharp.UMX
 
@@ -12,8 +12,8 @@ open FSharp.UMX
 [<Measure>] type ceIndex
 [<Measure>] type symbolSetSize
 [<Measure>] type sortableCount
-[<Measure>] type sortableTestId
-[<Measure>] type sortableTestSetId
+[<Measure>] type sortableTestsId
+[<Measure>] type sortableTestsSetId
 
 
 [<Measure>] type sorterParentId

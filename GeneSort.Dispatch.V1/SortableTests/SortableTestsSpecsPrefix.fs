@@ -1,4 +1,4 @@
-namespace GeneSort.Dispatch.V1.SortableTest
+namespace GeneSort.Dispatch.V1.SortableTests
 
 open FSharp.UMX
 open GeneSort.Project.V1
@@ -6,16 +6,16 @@ open GeneSort.Dispatch.V1
 open CommonParams
 
 
-module SortableTestSpecsPrefix =
+module SortableTestsSpecsPrefix =
 
     module Specs =
 
-        let Prefix_24s  (executorType: sortableTestExecutorType) : run =
+        let Prefix_24s  (executorType: sortableTestsExecutorType) : run =
             run.SimpleRun (
                 SimpleRun.create
-                    SortableTestDbs.Prefix.dbName
-                    CommonSortableTest.projectName
-                    (sprintf @"Prefix-24s_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag)
+                    SortableTestsDbs.Prefix.dbName
+                    CommonSortableTests.projectName
+                    (sprintf @"Prefix-24s_%s" (SortableTestsExecutorType.toString executorType) |> UMX.tag)
                     "Bitv512 prefix sorter test sets"
                     [
                 dataFomatBitv512
@@ -27,12 +27,12 @@ module SortableTestSpecsPrefix =
                     false
             )
 
-        let Prefix_32  (executorType: sortableTestExecutorType) : run =
+        let Prefix_32  (executorType: sortableTestsExecutorType) : run =
             run.SimpleRun (
                 SimpleRun.create
-                    SortableTestDbs.Prefix.dbName
-                    CommonSortableTest.projectName
-                    (sprintf @"Prefix-32_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag)
+                    SortableTestsDbs.Prefix.dbName
+                    CommonSortableTests.projectName
+                    (sprintf @"Prefix-32_%s" (SortableTestsExecutorType.toString executorType) |> UMX.tag)
                     "Bitv512 prefix sorter test sets"
                     [
                 dataFomatBitv512
@@ -55,6 +55,6 @@ module SortableTestSpecsPrefix =
                         (configType.Prefix_32, Specs.Prefix_32);
                     ]
 
-    let getRun (config: configType) (executorType: sortableTestExecutorType) : run =
+    let getRun (config: configType) (executorType: sortableTestsExecutorType) : run =
         let specFunc = Configs.[config]
         specFunc executorType

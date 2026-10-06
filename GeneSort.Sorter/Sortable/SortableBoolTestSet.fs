@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorter.Sortable
 
 open System
@@ -8,11 +8,11 @@ open GeneSort.Sorter
 
 type sortableBoolTestSet =
 
-    { Id: Guid<sortableTestSetId>
+    { Id: Guid<sortableTestsSetId>
       sortableTests: sortableBoolTest[] }
 
     static member create 
-                    (id: Guid<sortableTestSetId>) 
+                    (id: Guid<sortableTestsSetId>) 
                     (arrays: sortableBoolTest[]) : sortableBoolTestSet =
         if Array.isEmpty arrays then
             invalidArg "arrays" "Arrays must not be empty."

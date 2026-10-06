@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingResults
+namespace GeneSort.SortingResults
 
 open FSharp.UMX
 open GeneSort.Core
@@ -9,7 +9,7 @@ open GeneSort.SortingOps
 type sorterCeUseProfile = {
     sorterId: Guid<sorterId>
     sorterSetId: Guid<sorterSetId>
-    sorterTestsId: Guid<sortableTestId>
+    sorterTestsId: Guid<sortableTestsId>
     lastUsedCeIndex: int<ceIndex>
     unsortedCount: int<sortableCount>
     unsorted: bool
@@ -23,7 +23,7 @@ module SorterCeUseProfile =
     let makeSorterCeUseProfile 
             (profileSegments: segment [])
             (sorterSetId: Guid<sorterSetId>)
-            (sorterTestsId: Guid<sortableTestId>)
+            (sorterTestsId: Guid<sortableTestsId>)
             (sorterEval : sorterEvalOld) : sorterCeUseProfile =
         {   
             sorterCeUseProfile.segmentTotals = 
@@ -71,7 +71,7 @@ module SorterCeUseProfile =
 type sorterSetCeUseProfile = {
     profileSegments: segment []
     sorterSetId: Guid<sorterSetId>
-    sorterTestsId: Guid<sortableTestId>
+    sorterTestsId: Guid<sortableTestsId>
     sorterCeUseProfiles : sorterCeUseProfile []
 }
 

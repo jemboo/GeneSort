@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Run.Test.V1
+namespace GeneSort.Run.Test.V1
 
 open Xunit
 open MessagePack
@@ -23,25 +23,25 @@ module TestHelpers =
 type QueryParamMpTests () =
 
     [<Fact>]
-    member _.``qpSortableTestRestrictionDto converts back and forth accurately`` () =
-        let cases = [ qpSortableTestRestriction.NoRestriction; qpSortableTestRestriction.Split ]
+    member _.``qpSortableTestsRestrictionDto converts back and forth accurately`` () =
+        let cases = [ qpSortableTestsRestriction.NoRestriction; qpSortableTestsRestriction.Split ]
         
         for case in cases do
-            let dto = QpSortableTestRestrictionDto.fromDomain case
-            let roundtripped = QpSortableTestRestrictionDto.toDomain dto
+            let dto = QpSortableTestsRestrictionDto.fromDomain case
+            let roundtripped = QpSortableTestsRestrictionDto.toDomain dto
             Assert.Equal(case, roundtripped)
             TestHelpers.assertMpRoundtrip dto
 
     [<Fact>]
-    member _.``qpSortableTestTypeDto converts back and forth accurately`` () =
+    member _.``qpSortableTestsTypeDto converts back and forth accurately`` () =
         let cases = 
-            [ qpSortableTestType.Standard qpSortableTestRestriction.NoRestriction
-              qpSortableTestType.Merge qpSortableTestRestriction.Split
-              qpSortableTestType.Prefix qpSortableTestRestriction.NoRestriction ]
+            [ qpSortableTestsType.Standard qpSortableTestsRestriction.NoRestriction
+              qpSortableTestsType.Merge qpSortableTestsRestriction.Split
+              qpSortableTestsType.Prefix qpSortableTestsRestriction.NoRestriction ]
 
         for case in cases do
-            let dto = QpSortableTestTypeDto.fromDomain case
-            let roundtripped = QpSortableTestTypeDto.toDomain dto
+            let dto = QpSortableTestsTypeDto.fromDomain case
+            let roundtripped = QpSortableTestsTypeDto.toDomain dto
             Assert.Equal(case, roundtripped)
             TestHelpers.assertMpRoundtrip dto
 
@@ -78,7 +78,7 @@ type QueryParamMpTests () =
         let sorterEval = 
             qpSorterEval.Standard (
                 qpSorterType.Gated qpSimpleSorter.Mssi, 
-                qpSortableTestType.Merge qpSortableTestRestriction.Split
+                qpSortableTestsType.Merge qpSortableTestsRestriction.Split
             )
 
         let dto = QpSorterEvalDto.fromDomain sorterEval
@@ -89,8 +89,8 @@ type QueryParamMpTests () =
 
     [<Fact>]
     member _.``qpSorterMutateDto converts back and forth accurately`` () =
-        let eval1 = qpSorterEval.Standard (qpSorterType.Simple qpSimpleSorter.Msce, qpSortableTestType.Standard qpSortableTestRestriction.NoRestriction)
-        let eval2 = qpSorterEval.Standard (qpSorterType.Dual qpSimpleSorter.Msuf4, qpSortableTestType.Prefix qpSortableTestRestriction.Split)
+        let eval1 = qpSorterEval.Standard (qpSorterType.Simple qpSimpleSorter.Msce, qpSortableTestsType.Standard qpSortableTestsRestriction.NoRestriction)
+        let eval2 = qpSorterEval.Standard (qpSorterType.Dual qpSimpleSorter.Msuf4, qpSortableTestsType.Prefix qpSortableTestsRestriction.Split)
 
         let cases = 
             [ qpSorterMutate.Uniform eval1
@@ -104,8 +104,8 @@ type QueryParamMpTests () =
 
     [<Fact>]
     member _.``Mutually recursive qpSorterPoolType & qpSgdType convert back and forth accurately`` () =
-        let eval1 = qpSorterEval.Standard (qpSorterType.Simple qpSimpleSorter.Msce, qpSortableTestType.Standard qpSortableTestRestriction.NoRestriction)
-        let eval2 = qpSorterEval.Standard (qpSorterType.Dual qpSimpleSorter.Msuf6, qpSortableTestType.Prefix qpSortableTestRestriction.Split)
+        let eval1 = qpSorterEval.Standard (qpSorterType.Simple qpSimpleSorter.Msce, qpSortableTestsType.Standard qpSortableTestsRestriction.NoRestriction)
+        let eval2 = qpSorterEval.Standard (qpSorterType.Dual qpSimpleSorter.Msuf6, qpSortableTestsType.Prefix qpSortableTestsRestriction.Split)
 
         let poolRandom1 = qpSorterPoolType.Random (qpSorterPoolStructure.Singleton, eval1)
         let poolRandom2 = qpSorterPoolType.Random (qpSorterPoolStructure.Tiled, eval2)
@@ -124,14 +124,14 @@ type QueryParamMpTests () =
 
     [<Fact>]
     member _.``queryParamTypeDto converts back and forth across all union cases`` () =
-        let eval = qpSorterEval.Standard (qpSorterType.Gated qpSimpleSorter.Msrs, qpSortableTestType.Merge qpSortableTestRestriction.NoRestriction)
+        let eval = qpSorterEval.Standard (qpSorterType.Gated qpSimpleSorter.Msrs, qpSortableTestsType.Merge qpSortableTestsRestriction.NoRestriction)
         let pool1 = qpSorterPoolType.Random (qpSorterPoolStructure.Singleton, eval)
         let pool2 = qpSorterPoolType.Random (qpSorterPoolStructure.Multiple, eval)
         let mutate = qpSorterMutate.Variable eval
         let sgd = qpSgdType.FixedPools (pool1, pool2, mutate)
 
         let cases = 
-            [ queryProperties.SortableTest (qpSortableTestType.Standard qpSortableTestRestriction.Split)
+            [ queryProperties.SortableTests (qpSortableTestsType.Standard qpSortableTestsRestriction.Split)
               queryProperties.SorterEval eval
               queryProperties.SorterMutate mutate
               queryProperties.SorterSgd sgd ]

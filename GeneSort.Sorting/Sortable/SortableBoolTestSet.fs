@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorting.Sortable
 
 open FSharp.UMX
@@ -6,11 +6,11 @@ open GeneSort.Sorting
 
 type sortableBoolTestSet =
 
-    { Id: Guid<sortableTestSetId>
+    { Id: Guid<sortableTestsSetId>
       sortableTests: sortableBinaryTest[] }
 
     static member create 
-                    (id: Guid<sortableTestSetId>) 
+                    (id: Guid<sortableTestsSetId>) 
                     (arrays: sortableBinaryTest[]) : sortableBoolTestSet =
         if Array.isEmpty arrays then
             invalidArg "arrays" "Arrays must not be empty."

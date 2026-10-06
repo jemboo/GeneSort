@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Project
+namespace GeneSort.Project
 
 open System
 open System.Threading
@@ -179,16 +179,16 @@ module MutateSortingSet =
 
                 // 4. Create sortable tests
                 let! (_: unit) = checkCancellation cts.Token
-                let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-                let qpSortableTests = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTest "")
-                let sortableTest = SortableTestModel.makeSortableTest (%qpSortableTests.Id |> UMX.tag) sortableTestModel sortableDataFormat
+                let sortableTestsModel = msasF.create sortingWidth |> sortableTestsModel.MsasF
+                let qpSortableTests = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTests "")
+                let sortableTests = SortableTestsModel.makeSortableTests (%qpSortableTests.Id |> UMX.tag) sortableTestsModel sortableDataFormat
 
                 // 5-6. Evaluate parent sortings & Map results
                 let qpEvalParents = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "Parents")
                 let sorterSetEvalParent = SorterSetEval.makeSorterSetEval 
                                                 (%qpEvalParents.Id |> UMX.tag) 
                                                 sorterSetParent 
-                                                sortableTest
+                                                sortableTests
                                                 sorterEvalType.V1
                                                 collectNewSortableTests
 
@@ -207,7 +207,7 @@ module MutateSortingSet =
                 //let qpEvalMutants = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "Mutants")
                 //let sorterSetEvalMutant = SorterSetEval.makeSorterSetEval 
                 //                                (%qpEvalMutants.Id |> UMX.tag)
-                //                                sorterSetMutants sortableTest 
+                //                                sorterSetMutants sortableTests 
                 //                                collectNewSortableTests
                 
                 //let mutationSegmentSetEvals = mutationSegmentSetEvals.create segments
@@ -232,7 +232,7 @@ module MutateSortingSet =
 
                 //// 12. Save All Results (Using Batch Helper)
                 //let resultsToSave = [
-                //    qpSortableTests, (sortableTest |> outputData.SortableTest)
+                //    qpSortableTests, (sortableTests |> outputData.SortableTests)
                 //    qpEvalParents, (sorterSetEvalParent |> outputData.SorterSetEval)
                 //    qpEvalMutants, (sorterSetEvalMutant |> outputData.SorterSetEval)
                 //    qpParentPass, (sortingSetParentPass |> outputData.SortingSet)

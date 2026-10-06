@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sortable.V1
+namespace GeneSort.Model.Sortable.V1
 
 open System
 open FSharp.UMX
@@ -48,7 +48,7 @@ type msasO =
             this.id = other.id
 
     member this.MakeSortableBoolTest 
-            (sorterTestId: Guid<sortableTestId>) : sortableBinaryTest =
+            (sorterTestId: Guid<sortableTestsId>) : sortableBinaryTest =
         let bArrays =
             this.sortableIntArrays 
             |> Array.map(fun sia -> sia.ToSortableBoolArrays())
@@ -60,7 +60,7 @@ type msasO =
                 bArrays
 
     member this.MakeSortableIntTest 
-            (sorterTestId: Guid<sortableTestId>) : sortableIntTest =
+            (sorterTestId: Guid<sortableTestsId>) : sortableIntTest =
         sortableIntTest.create 
                 sorterTestId 
                 this.SortingWidth

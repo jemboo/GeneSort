@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Runs
 
 open FSharp.UMX
@@ -20,12 +20,12 @@ type outputData =
     | Project of project
     | RunParameters of runParameters
     | SorterSet of sorterSet
-    | SortableTest of sortableTest
-    | SortableTestSet of sortableTestSet
+    | SortableTests of sortableTests
+    | SortableTestsSet of sortableTestsSet
     | SortingSet of sortingSet
     | SortingSetGen of sortingGenSegment
-    | SortableTestModelSet of sortableTestModelSet
-    | SortableTestModelSetGen of sortableTestModelSetGen
+    | SortableTestsModelSet of sortableTestsModelSet
+    | SortableTestsModelSetGen of sortableTestsModelSetGen
     | SorterSetEval of sorterSetEvalOld
     | SorterEvalBins of sorterEvalBins
     | TextReport of dataTableReport
@@ -42,9 +42,9 @@ module OutputData =
         | SorterSet ss -> Ok ss
         | _ -> Error "Database returned data, but it was not a SorterSet."
 
-    let asSortableTest = function
-        | SortableTest st -> Ok st
-        | _ -> Error "Database returned data, but it was not a SortableTest."
+    let asSortableTests = function
+        | SortableTests st -> Ok st
+        | _ -> Error "Database returned data, but it was not a SortableTests."
 
     let asSorterSetEval = function
         | SorterSetEval sse -> Ok sse
@@ -66,21 +66,21 @@ module OutputData =
         | Project p -> Ok p
         | _ -> Error "Database returned data, but it was not a Project."
 
-    let asSortableTestSet = function
-        | SortableTestSet sts -> Ok sts
-        | _ -> Error "Database returned data, but it was not a SortableTestSet."
+    let asSortableTestsSet = function
+        | SortableTestsSet sts -> Ok sts
+        | _ -> Error "Database returned data, but it was not a SortableTestsSet."
 
     let asSortingSetGen = function
         | SortingSetGen ssg -> Ok ssg
         | _ -> Error "Database returned data, but it was not a SortingSetGen."
 
-    let asSortableTestModelSet = function
-        | SortableTestModelSet stms -> Ok stms
-        | _ -> Error "Database returned data, but it was not a SortableTestModelSet."
+    let asSortableTestsModelSet = function
+        | SortableTestsModelSet stms -> Ok stms
+        | _ -> Error "Database returned data, but it was not a SortableTestsModelSet."
 
-    let asSortableTestModelSetGen = function
-        | SortableTestModelSetGen stmsm -> Ok stmsm
-        | _ -> Error "Database returned data, but it was not a SortableTestModelSetGen."
+    let asSortableTestsModelSetGen = function
+        | SortableTestsModelSetGen stmsm -> Ok stmsm
+        | _ -> Error "Database returned data, but it was not a SortableTestsModelSetGen."
 
     let asTextReport = function
         | TextReport tr -> Ok tr

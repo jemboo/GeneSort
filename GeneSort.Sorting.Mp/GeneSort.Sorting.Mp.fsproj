@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -17,10 +17,10 @@
     <Compile Include="Sortable\SortableBitv512TestDto.fs" />
     <Compile Include="Sortable\SortableUint8v256TestDto.fs" />
     <Compile Include="Sortable\SortableUint8v512TestDto.fs" />
-    <Compile Include="Sortable\SortableTestDto.fs" />
+    <Compile Include="Sortable\SortableTestsDto.fs" />
     <Compile Include="Sortable\SortableIntTestSetDto.fs" />
     <Compile Include="Sortable\SortableBoolTestSetDto.fs" />
-    <Compile Include="Sortable\SortableTestSetDto.fs" />
+    <Compile Include="Sortable\SortableTestsSetDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

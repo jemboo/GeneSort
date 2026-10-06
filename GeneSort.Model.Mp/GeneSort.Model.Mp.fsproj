@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -39,9 +39,9 @@
     <Compile Include="Sorting\ModelSetTagDto.fs" />
     <Compile Include="Sortable\MsasORandGenDto.fs" />
     <Compile Include="Sortable\SorterTestModelDto.fs" />
-    <Compile Include="Sortable\SortableTestModelGenDto.fs" />
-    <Compile Include="Sortable\SortableTestModelSetDto.fs" />
-    <Compile Include="Sortable\SortableTestModelSetGenDto.fs" />
+    <Compile Include="Sortable\SortableTestsModelGenDto.fs" />
+    <Compile Include="Sortable\SortableTestsModelSetDto.fs" />
+    <Compile Include="Sortable\SortableTestsModelSetGenDto.fs" />
     <Compile Include="Program.fs" CompileOrder="CompileLast" />
   </ItemGroup>
 

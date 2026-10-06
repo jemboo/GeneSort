@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sortable
+namespace GeneSort.Model.Sortable
 
 open System
 open FSharp.UMX
@@ -55,7 +55,7 @@ type msasORandGen =
             let rawGuid = UMX.untag this.id
             writer.Write(rawGuid.ToByteArray())
 
-    member this.getMsasOs (offset: int) : sortableTestModel seq =
+    member this.getMsasOs (offset: int) : sortableTestsModel seq =
             let randy = this.RngFactory.Create (%this.id)
             let sw = %this.sortingWidth
             let maxO = this.maxOrbit
@@ -63,6 +63,6 @@ type msasORandGen =
                 seq {   while true do
                             yield  Permutation.randomPermutation (randy.NextIndex) sw
                     }
-            permSeq |> Seq.skip offset |> Seq.map(fun perm -> msasO.create perm maxO |> sortableTestModel.MsasO)
+            permSeq |> Seq.skip offset |> Seq.map(fun perm -> msasO.create perm maxO |> sortableTestsModel.MsasO)
 
 module MsasORandGen = ()

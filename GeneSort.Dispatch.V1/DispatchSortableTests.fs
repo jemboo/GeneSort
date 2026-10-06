@@ -8,12 +8,12 @@ open GeneSort.Project.V1
 open GeneSort.FileDb.V1
 open System.Runtime
 open GeneSort.Dispatch.V1.SorterEval
-open GeneSort.Dispatch.V1.SortableTest
+open GeneSort.Dispatch.V1.SortableTests
 open System.IO
 open GeneSort.Core
 
 
-module DispatchSortableTest = 
+module DispatchSortableTests = 
 
     let private createThreadSafeProgress () =
         let sessionTimestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss")
@@ -44,24 +44,24 @@ module DispatchSortableTest =
 
 
 
-    //********** SortableTest Merge **********
-    //let configType = SortableTestSpecsMerge.configType.Merge_Test
-    //let executorType = SortableTest.sortableTestExecutorType.GenMerge
+    //********** SortableTests Merge **********
+    //let configType = SortableTestsSpecsMerge.configType.Merge_Test
+    //let executorType = SortableTests.sortableTestsExecutorType.GenMerge
     //let host: runHost = 
-    //    let spec = SortableTestSpecsMerge.getRun configType executorType
-    //    SortableTestDbs.createRunHost spec
+    //    let spec = SortableTestsSpecsMerge.getRun configType executorType
+    //    SortableTestsDbs.createRunHost spec
 
 
-    //********** SortableTest Prefix **********
-    let private configType = SortableTestSpecsPrefix.configType.Prefix_32
-    let private executorType = SortableTest.sortableTestExecutorType.GenPrefix
+    //********** SortableTests Prefix **********
+    let private configType = SortableTestsSpecsPrefix.configType.Prefix_32
+    let private executorType = SortableTests.sortableTestsExecutorType.GenPrefix
     let private host: runHost = 
-        let run = SortableTestSpecsPrefix.getRun configType executorType
+        let run = SortableTestsSpecsPrefix.getRun configType executorType
         runHost.Create run 1
 
 
 
-    let private executor = SortableTestExecutor.getExecutor executorType
+    let private executor = SortableTestsExecutor.getExecutor executorType
     let private minReplica = 0<replNumber>
     let private maxReplica = 1<replNumber>
 

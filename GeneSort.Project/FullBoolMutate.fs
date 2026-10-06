@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Project
+namespace GeneSort.Project
 
 open System
 open System.Threading
@@ -157,9 +157,9 @@ module FullBoolMutate =
                 let sorterSetParent = sortingSetParent |> SortingSet.makeSorterSet
 
                 // 3. Setup Tests & Initial Eval
-                let sortableTestModel = msasF.create sw |> sortableTestModel.MsasF
-                let qpTests = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTest "")
-                let sortableTests = SortableTestModel.makeSortableTest (%qpTests.Id |> UMX.tag) sortableTestModel sdt
+                let sortableTestsModel = msasF.create sw |> sortableTestsModel.MsasF
+                let qpTests = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTests "")
+                let sortableTests = SortableTestsModel.makeSortableTests (%qpTests.Id |> UMX.tag) sortableTestsModel sdt
 
                 let qpEvalParents = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "Parents")
                 let evalParents = SorterSetEval.makeSorterSetEval
@@ -194,7 +194,7 @@ module FullBoolMutate =
                 //// 6. Persistence
                 //let qpMutantSet = makeQueryParamsFromRunParams runParameters (outputDataType.SortingSet "Mutants")
                 //let results = [
-                //    qpTests, (sortableTests |> outputData.SortableTest)
+                //    qpTests, (sortableTests |> outputData.SortableTests)
                 //    qpEvalParents, (evalParents |> outputData.SorterSetEval)
                 //    qpEvalMutants, (evalMutants |> outputData.SorterSetEval)
                 //    qpMutantSet, (sortingSetMutant |> outputData.SortingSet)

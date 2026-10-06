@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingOps.Mp
+namespace GeneSort.SortingOps.Mp
 
 open System
 open FSharp.UMX
@@ -32,5 +32,5 @@ module SorterSetEvalDto =
         sorterSetEval.create
             (UMX.tag<sorterSetEvalId> dto.SorterSetEvalId)
             (UMX.tag<sorterSetId> dto.SorterSetId)
-            (UMX.tag<sortableTestId> dto.SorterTestsId)
+            (UMX.tag<sortableTestsId> dto.SorterTestsId)
             (dto.SorterEvals |> Array.map SorterEvalDto.toDomain)

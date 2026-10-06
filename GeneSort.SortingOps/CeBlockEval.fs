@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingOps
+namespace GeneSort.SortingOps
 
 open FSharp.UMX
 open GeneSort.Sorting.Sortable
@@ -53,7 +53,7 @@ type ceBlockEval =
             used.ToArray()
         Array.append prefix.CeArray blockCes
 
-    member this.SortableTest with get() = this.sortableTests
+    member this.SortableTests with get() = this.sortableTests
 
     member this.UnsortedCount with get() = this.unsortedCount
 

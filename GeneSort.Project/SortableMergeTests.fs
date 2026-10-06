@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Project
+namespace GeneSort.Project
 
 open System
 open System.Threading
@@ -127,7 +127,7 @@ module SortableMergeTests =
         |> Seq.toArray
         |> Array.toSeq
 
-    let outputDataTypes = [| outputDataType.SortableTestSet ""; outputDataType.RunParameters |]
+    let outputDataTypes = [| outputDataType.SortableTestsSet ""; outputDataType.RunParameters |]
 
     let project = project.create  projectName projectDesc outputDataTypes
 
@@ -148,18 +148,18 @@ module SortableMergeTests =
                     host.ExtractDomainParams runParams 
                     |> Result.ofOption "Missing domain parameters required for generation"
 
-                // 3. Create SortableTestModel
-                let sortableTestModel = msasM.create sw md mergeSufixType |> sortableTestModel.MsasMi
+                // 3. Create SortableTestsModel
+                let sortableTestsModel = msasM.create sw md mergeSufixType |> sortableTestsModel.MsasMi
             
-                let qpForSortableTest = makeQueryParamsFromRunParams runParams (outputDataType.SortableTest "") 
-                let sortableTests = SortableTestModel.makeSortableTest 
-                                            (%qpForSortableTest.Id |> UMX.tag) 
-                                            sortableTestModel 
+                let qpForSortableTests = makeQueryParamsFromRunParams runParams (outputDataType.SortableTests "") 
+                let sortableTests = SortableTestsModel.makeSortableTests 
+                                            (%qpForSortableTests.Id |> UMX.tag) 
+                                            sortableTestsModel 
                                             sortableDataFormat
 
                 // 4. Save (Using Host DB)
                 let! (_: unit) = checkCancellation cts.Token
-                let! (_: unit) = host.ProjectDb.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
+                let! (_: unit) = host.ProjectDb.saveAsync qpForSortableTests (sortableTests |> outputData.SortableTests) allowOverwrite
 
                 return runParams.WithRunFinished (Some true)
 

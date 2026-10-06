@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Project
+namespace GeneSort.Project
 
 open System
 open System.Threading
@@ -136,9 +136,9 @@ module FullBoolEvals =
 
                 // 4. Perform Computation
                 let! (_: unit) = checkCancellation cts.Token
-                let sortableTestModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-                let qpSortableTests = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTest "")
-                let sortableTests = SortableTestModel.makeSortableTest (%qpSortableTests.Id |> UMX.tag) sortableTestModel sortableDataFormat
+                let sortableTestsModel = msasF.create sortingWidth |> sortableTestsModel.MsasF
+                let qpSortableTests = makeQueryParamsFromRunParams runParameters (outputDataType.SortableTests "")
+                let sortableTests = SortableTestsModel.makeSortableTests (%qpSortableTests.Id |> UMX.tag) sortableTestsModel sortableDataFormat
 
                 let sorterSet = sortingSet |> SortingSet.makeSorterSet
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")

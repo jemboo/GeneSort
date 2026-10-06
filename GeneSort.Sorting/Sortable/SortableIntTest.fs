@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorting.Sortable
 
 open System
@@ -7,13 +7,13 @@ open GeneSort.Sorting
 
 [<Struct; CustomEquality; NoComparison>]
 type sortableIntTest =
-    private { id: Guid<sortableTestId>
+    private { id: Guid<sortableTestsId>
               sortingWidth: int<sortingWidth>
               sortableIntArrays: sortableIntArray[]
             }
 
     static member create 
-                    (id: Guid<sortableTestId>) 
+                    (id: Guid<sortableTestsId>) 
                     (sortingWidth:int<sortingWidth>)
                     (arrays: sortableIntArray[]) : sortableIntTest =
         { 
@@ -23,7 +23,7 @@ type sortableIntTest =
         }
 
     static member Empty =
-        let id = Guid.NewGuid() |> UMX.tag<sortableTestId>
+        let id = Guid.NewGuid() |> UMX.tag<sortableTestsId>
         sortableIntTest.create id 0<sortingWidth> [||]
 
     override this.Equals(obj) =

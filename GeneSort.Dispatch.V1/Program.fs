@@ -20,7 +20,7 @@ let main argv =
     // 2. Call your dispatch logic strictly AFTER configuration
     //GeneSort.Dispatch.V1.DispatchSorterSgd.makeParamsAndRun()
     
-    //DispatchSortableTest.makeParamsAndRun()
+    //DispatchSortableTests.makeParamsAndRun()
    // DispatchSorterEval.makeParamsAndRun()
     //DispatchSorterMutate.makeParamsAndRun()
     DispatchSorterSgd.makeParamsAndRun()

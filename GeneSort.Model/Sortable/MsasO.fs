@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sortable
+namespace GeneSort.Model.Sortable
 
 open System
 open FSharp.UMX
@@ -49,7 +49,7 @@ type msasO =
         member this.Equals(other) = this.id = other.id
 
     member this.MakeSortableBoolTest 
-            (sorterTestId: Guid<sortableTestId>)
+            (sorterTestId: Guid<sortableTestsId>)
             (sortingWidth: int<sortingWidth>) : sortableBinaryTest =
         let bArrays =
             this.sortableIntArrays 
@@ -62,7 +62,7 @@ type msasO =
                 bArrays
 
     member this.MakeSortableIntTest 
-            (sorterTestId: Guid<sortableTestId>)
+            (sorterTestId: Guid<sortableTestsId>)
             (sortingWidth: int<sortingWidth>) : sortableIntTest =
         sortableIntTest.create 
                 sorterTestId 

@@ -1,4 +1,4 @@
-namespace GeneSort.Dispatch.V1.SortableTest
+namespace GeneSort.Dispatch.V1.SortableTests
 
 open FSharp.UMX
 open GeneSort.Core
@@ -9,9 +9,9 @@ open GeneSort.Sorting
 open GeneSort.FileDb.V1
 open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
-open CommonSortableTest
+open CommonSortableTests
 
-module SortableTestDbs =
+module SortableTestsDbs =
 
     module Merge =
 
@@ -21,15 +21,15 @@ module SortableTestDbs =
 
 
         let makeMergeQueryParams repl mergeLibId sortableDataFormat outputDataType =
-            QueryParamsBuilders.SortableTest.Merge.makeQueryParams projectName dbName repl mergeLibId sortableDataFormat outputDataType
+            QueryParamsBuilders.SortableTests.Merge.makeQueryParams projectName dbName repl mergeLibId sortableDataFormat outputDataType
 
         let makeMergeQueryParamsFromRunParams rp odt =
-            QueryParamsBuilders.SortableTest.Merge.queryParamsFromRunParams projectName dbName rp odt
+            QueryParamsBuilders.SortableTests.Merge.queryParamsFromRunParams projectName dbName rp odt
 
         let db = new GeneSortDbMp(dbFolder, "sortable-test.merge")
 
 
-        let getMergeSortableTest
+        let getMergeSortableTests
                 (repl: int<replNumber>) 
                 (mrgLibId: mergeLibId)
                 (sortableDataFormat: sortableDataFormat): Async<Result<sortableTests, string>> =
@@ -37,7 +37,7 @@ module SortableTestDbs =
                             repl 
                             mrgLibId
                             sortableDataFormat 
-                            (outputDataType.SortableTest "")
+                            (outputDataType.SortableTests "")
             (db :> IGeneSortDb).loadAsync qp
             |> Async.map (Result.bind OutputData.asSortableTests)
 
@@ -51,16 +51,16 @@ module SortableTestDbs =
 
 
         let makePrefixQueryParams repl prefixLibId sortableDataFormat outputDataType =
-            QueryParamsBuilders.SortableTest.Prefix.makeQueryParams projectName dbName repl prefixLibId sortableDataFormat outputDataType
+            QueryParamsBuilders.SortableTests.Prefix.makeQueryParams projectName dbName repl prefixLibId sortableDataFormat outputDataType
 
         let makePrefixQueryParamsFromRunParams rp odt =
-            QueryParamsBuilders.SortableTest.Prefix.queryParamsFromRunParams projectName dbName rp odt
+            QueryParamsBuilders.SortableTests.Prefix.queryParamsFromRunParams projectName dbName rp odt
 
         let db = new GeneSortDbMp(dbFolder, "sortable-test.prefix")
 
 
 
-        let getPrefixSortableTest
+        let getPrefixSortableTests
                 (repl: int<replNumber>) 
                 (pfxId: prefixLibId)
                 (sortableDataFormat: sortableDataFormat): Async<Result<sortableTests, string>> =
@@ -68,7 +68,7 @@ module SortableTestDbs =
                             repl 
                             pfxId
                             sortableDataFormat 
-                            (outputDataType.SortableTest "")
+                            (outputDataType.SortableTests "")
             (db :> IGeneSortDb).loadAsync qp
             |> Async.map (Result.bind OutputData.asSortableTests)
 

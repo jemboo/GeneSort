@@ -1,4 +1,4 @@
-﻿// For more information see https://aka.ms/fsharp-console-apps
+// For more information see https://aka.ms/fsharp-console-apps
 open System
 open FSharp.UMX
 open GeneSort.Model.Sorting.V1
@@ -14,9 +14,9 @@ module Sandbox =
 
     let makeFullBoolTest (sw:int<sortingWidth>) : sortableTests =
 
-        let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
+        let sortableTestsId = Guid.NewGuid() |> UMX.tag<sortableTestsId>
         let sortableModel = msasF.create sw
-        sortableModel.MakeSortableBoolTest sortableTestId sw
+        sortableModel.MakeSortableBoolTest sortableTestsId sw
                             |> sortableTests.Bools
 
 

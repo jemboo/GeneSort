@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorting.Sortable
 
 open System
@@ -7,7 +7,7 @@ open GeneSort.Sorting
 
 [<Struct>]
 type packedSortableIntTests =
-    private { id: Guid<sortableTestId>
+    private { id: Guid<sortableTestsId>
               sortingWidth: int<sortingWidth>
               count: int<sortableCount>
               // All arrays flattened into one: [Test0_0..Test0_N, Test1_0..Test1_N...]

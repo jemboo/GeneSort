@@ -7,25 +7,25 @@ open System
 open GeneSort.Sorting
 open GeneSort.Model.Sortable.V1
 open GeneSort.Sorting.Sortable
-open GeneSort.Dispatch.V1.SortableTest
+open GeneSort.Dispatch.V1.SortableTests
 open GeneSort.Sorting.Sorter
 open GeneSort.SortingLib.Sorter
 
 
-module SortableTestMakers =
+module SortableTestsMakers =
 
     let makeStandardTests (rp:runParameters) : Async<Result<sortableTests * (ce array), string>> =
         async {
             let paramsOpt = option {
                 let! sortingWidth = rp.GetSortingWidth()
-                let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
-                return (sortingWidth, sortableTestId)
+                let sortableTestsId = Guid.NewGuid() |> UMX.tag<sortableTestsId>
+                return (sortingWidth, sortableTestsId)
             }
             match paramsOpt with
-            | Some (sortingWidth, sortableTestId) ->
-                let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-                return Ok ((SortableTestModel.makeSortableTest 
-                                    sortableTestId
+            | Some (sortingWidth, sortableTestsId) ->
+                let testModel = msasF.create sortingWidth |> sortableTestsModel.MsasF
+                return Ok ((SortableTestsModel.makeSortableTests 
+                                    sortableTestsId
                                     testModel 
                                     sortableDataFormat.BitVector512), [||])
             | None ->
@@ -44,7 +44,7 @@ module SortableTestMakers =
 
             match paramsOpt with
             | Some (repl, mrgLibId, sdf) ->
-                let! res = SortableTestDbs.Merge.getMergeSortableTest repl mrgLibId sdf  
+                let! res = SortableTestsDbs.Merge.getMergeSortableTests repl mrgLibId sdf  
                 return Result.map (fun st -> (st, [||])) res
             | None ->
                 return Error "Failed: One or more RunParameters for MergeTests were missing."
@@ -63,7 +63,7 @@ module SortableTestMakers =
 
             match paramsOpt with
             | Some (repl, pfxId, sdf, ces) ->
-                let! res = SortableTestDbs.Prefix.getPrefixSortableTest repl pfxId  sdf 
+                let! res = SortableTestsDbs.Prefix.getPrefixSortableTests repl pfxId  sdf 
                 return Result.map (fun st -> (st, ces)) res
             | None ->
                 return Error "Failed: One or more RunParameters for PrefixTests were missing."

@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorting.Sortable
 
 open FSharp.UMX
@@ -16,7 +16,7 @@ type sortableTests =
 
 module SortableTests = 
 
-    let getId (test: sortableTests) : Guid<sortableTestId> =
+    let getId (test: sortableTests) : Guid<sortableTestsId> =
         match test with
         | Bitv512 bitv512Test -> bitv512Test.Id
         | Bools boolTest -> boolTest.Id

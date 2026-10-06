@@ -1,25 +1,25 @@
-﻿namespace GeneSort.Model.Sortable
+namespace GeneSort.Model.Sortable
 
 open FSharp.UMX
 open GeneSort.Core
 
-type sortableTestModelSetGen =
+type sortableTestsModelSetGen =
     private
         { 
           id : Guid<sorterTestModelSetGenID>
-          sorterTestModelGen : sortableTestModelGen
+          sorterTestModelGen : sortableTestsModelGen
           firstIndex : int<sorterTestModelCount>
           count : int<sorterTestModelCount>
         }
     with
     static member create 
-                (sorterTestModelGen: sortableTestModelGen) 
+                (sorterTestModelGen: sortableTestsModelGen) 
                 (firstIndex: int<sorterTestModelCount>) 
-                (count: int<sorterTestModelCount>) : sortableTestModelSetGen =
+                (count: int<sorterTestModelCount>) : sortableTestsModelSetGen =
         
         let identityComponents = seq {
-            box "sortableTestModelSetGen"
-            box (sorterTestModelGen |> SortableTestModelGen.getId |> UMX.untag)
+            box "sortableTestsModelSetGen"
+            box (sorterTestModelGen |> SortableTestsModelGen.getId |> UMX.untag)
             box (firstIndex |> UMX.untag) 
             box (count |> UMX.untag)
         }
@@ -33,13 +33,13 @@ type sortableTestModelSetGen =
     member this.FirstIndex with get() = this.firstIndex
     member this.Count with get() = this.count
 
-    member this.MakeSortableTestModelSet: sortableTestModelSet =
+    member this.MakeSortableTestsModelSet: sortableTestsModelSet =
 
         let id = (%this.id) |> UMX.tag<sorterTestModelSetID>
 
         let sorterTestModels = 
                     this.SorterTestModelGen 
-                    |> SortableTestModelGen.makeSorterTestModels %this.firstIndex %this.count
+                    |> SortableTestsModelGen.makeSorterTestModels %this.firstIndex %this.count
                     |> Seq.toArray
 
         { id = id; sorterTestModels = sorterTestModels }

@@ -1,29 +1,29 @@
-﻿namespace GeneSort.Model.Sortable.V1
+namespace GeneSort.Model.Sortable.V1
 
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 
 
-type sortableTestModel =
+type sortableTestsModel =
      | MsasF of msasF      // MsasF = a full bool test set for a given sorting width
      | MsasO of msasO      // MsasO = generated from a seed permutation; for bool models, it's expanded from the integer permutations
      | MsasMi of msasM     // All (sorting width)/2 merge test cases
      | MsasPfx of msasPfx  // For testing sorters with a fixed prefix - an MsasF that's reduced by the prefix ce's.
 
 
-module SortableTestModel =
+module SortableTestsModel =
 
-    let getSortingWidth (simpleSortableTM: sortableTestModel): int<sortingWidth> =
+    let getSortingWidth (simpleSortableTM: sortableTestsModel): int<sortingWidth> =
         match simpleSortableTM with
         | MsasF msasF -> msasF.sortingWidth
         | MsasO msasO -> %msasO.SeedPermutation.Order |> UMX.tag<sortingWidth>
         | MsasMi msasMi -> msasMi.sortingWidth
         | MsasPfx msasPfx -> msasPfx.SortingWidth
 
-    let makeSortableTest 
-            (sorterTestId: Guid<sortableTestId>)
-            (simpleSortableTM: sortableTestModel) 
+    let makeSortableTests 
+            (sorterTestId: Guid<sortableTestsId>)
+            (simpleSortableTM: sortableTestsModel) 
             (sortableDF: sortableDataFormat) : sortableTests =
 
         match simpleSortableTM with

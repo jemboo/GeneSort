@@ -8,7 +8,7 @@ open GeneSort.Project.V1
 open GeneSort.FileDb.V1
 open System.Runtime
 open GeneSort.Dispatch.V1.SorterEval
-open GeneSort.Dispatch.V1.SortableTest
+open GeneSort.Dispatch.V1.SortableTests
 open System.IO
 open GeneSort.Core
 

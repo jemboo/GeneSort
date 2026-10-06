@@ -39,7 +39,7 @@ module SorterSgdExecutorType =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 executeEvolution host rp allowOverwrite cts progress
-                    SortableTestMakers.makeStandardTests
+                    SortableTestsMakers.makeStandardTests
                     PoolSetMakers.createSeedSorterPoolSetStandard
         }
 
@@ -47,7 +47,7 @@ module SorterSgdExecutorType =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 executeEvolution host rp allowOverwrite cts progress
-                    SortableTestMakers.makeMergeTests
+                    SortableTestsMakers.makeMergeTests
                     PoolSetMakers.createSeedSorterPoolSetMerge
         }
 
@@ -55,7 +55,7 @@ module SorterSgdExecutorType =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 executeEvolution host rp allowOverwrite cts progress
-                    SortableTestMakers.makePrefixTests
+                    SortableTestsMakers.makePrefixTests
                     PoolSetMakers.createSeedSorterPoolSetPrefix
         }
 

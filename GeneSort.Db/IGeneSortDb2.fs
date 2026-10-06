@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Db
+namespace GeneSort.Db
 
 open System
 open System.Threading
@@ -41,13 +41,13 @@ module GeneSortDb2 =
                 | Error err -> Error err
         }
     
-    let getSortableTestSetAsync (geneSortDb: IGeneSortDb2) (runParameters: runParameters) : Async<Result<sortableTestSet, OutputError>> =
+    let getSortableTestsSetAsync (geneSortDb: IGeneSortDb2) (runParameters: runParameters) : Async<Result<sortableTestsSet, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync (Some runParameters) outputDataType.SortableTestSet
+            let! result = geneSortDb.loadAsync (Some runParameters) outputDataType.SortableTestsSet
             return 
                 match result with
-                | Ok (SortableTestSet sts) -> Ok sts
-                | Ok _ -> Error "Unexpected output data type: expected SortableTestSet"
+                | Ok (SortableTestsSet sts) -> Ok sts
+                | Ok _ -> Error "Unexpected output data type: expected SortableTestsSet"
                 | Error err -> Error err
         }
     
@@ -61,23 +61,23 @@ module GeneSortDb2 =
                 | Error err -> Error err
         }
     
-    let getSortableTestModelSetAsync (geneSortDb: IGeneSortDb2) (runParameters: runParameters) : Async<Result<sortableTestModelSet, OutputError>> =
+    let getSortableTestsModelSetAsync (geneSortDb: IGeneSortDb2) (runParameters: runParameters) : Async<Result<sortableTestsModelSet, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync (Some runParameters) outputDataType.SortableTestModelSet
+            let! result = geneSortDb.loadAsync (Some runParameters) outputDataType.SortableTestsModelSet
             return 
                 match result with
-                | Ok (SortableTestModelSet stms) -> Ok stms
-                | Ok _ -> Error "Unexpected output data type: expected SortableTestModelSet"
+                | Ok (SortableTestsModelSet stms) -> Ok stms
+                | Ok _ -> Error "Unexpected output data type: expected SortableTestsModelSet"
                 | Error err -> Error err
         }
     
-    let getSortableTestModelSetMakerAsync (geneSortDb: IGeneSortDb2) (runParameters: runParameters) : Async<Result<sortableTestModelSetMaker, OutputError>> =
+    let getSortableTestsModelSetMakerAsync (geneSortDb: IGeneSortDb2) (runParameters: runParameters) : Async<Result<sortableTestsModelSetMaker, OutputError>> =
         async {
-            let! result = geneSortDb.loadAsync (Some runParameters) outputDataType.SortableTestModelSetMaker
+            let! result = geneSortDb.loadAsync (Some runParameters) outputDataType.SortableTestsModelSetMaker
             return 
                 match result with
-                | Ok (SortableTestModelSetMaker stmsm) -> Ok stmsm
-                | Ok _ -> Error "Unexpected output data type: expected SortableTestModelSetMaker"
+                | Ok (SortableTestsModelSetMaker stmsm) -> Ok stmsm
+                | Ok _ -> Error "Unexpected output data type: expected SortableTestsModelSetMaker"
                 | Error err -> Error err
         }
     

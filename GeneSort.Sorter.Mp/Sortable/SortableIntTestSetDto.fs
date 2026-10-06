@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Sorter.Mp.Sortable
+namespace GeneSort.Sorter.Mp.Sortable
 
 open System
 open FSharp.UMX
@@ -20,5 +20,5 @@ module SortableIntTestSetDto =
 
     let toDomain (dto: sortableIntTestSetDto) : sortableIntTestSet =
         sortableIntTestSet.create
-            (UMX.tag<sortableTestSetId> dto.Id)
+            (UMX.tag<sortableTestsSetId> dto.Id)
             (dto.SortableIntTestDtos |> Array.map SortableIntTestDto.toDomain)

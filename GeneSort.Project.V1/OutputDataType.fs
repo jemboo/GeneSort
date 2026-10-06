@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Project.V1
+namespace GeneSort.Project.V1
 
 open FSharp.UMX
 open System
@@ -11,7 +11,7 @@ type outputDataType =
     | SorterPoolSet of string
     | SorterPoolSetSummarySet of string
     | SorterSet of string
-    | SortableTest of string
+    | SortableTests of string
     | SorterSetEval of string
     | SorterPoolBinsSetSeries of string
     | SorterPoolSetHistory of string
@@ -29,7 +29,7 @@ module OutputDataType =
         | SorterPoolSet s -> appendParam "SorterPoolSet" %s
         | SorterPoolSetSummarySet s -> appendParam "SorterPoolSetSummarySet" %s
         | SorterSet s -> appendParam "SorterSet" s
-        | SortableTest s -> appendParam "SortableTest" s
+        | SortableTests s -> appendParam "SortableTests" s
         | SorterSetEval s -> appendParam "SorterSetEval" s
         | SorterPoolBinsSetSeries s -> appendParam "SorterPoolBinsSetSeries" s
         | SorterPoolSetHistory s -> appendParam "SorterPoolSetHistoryCollection" s
@@ -46,7 +46,7 @@ module OutputDataType =
         | "SorterPoolSet" -> Some (SorterPoolSet param)
         | "SorterPoolSetSummarySet" -> Some (SorterPoolSetSummarySet param)
         | "SorterSet" -> Some (SorterSet param)
-        | "SortableTest" -> Some (SortableTest param)
+        | "SortableTests" -> Some (SortableTests param)
         | "SorterSetEval" -> Some (SorterSetEval param)
         | "SorterPoolBinsSetSeries" -> Some (SorterPoolBinsSetSeries param)
         | "SorterPoolSetHistoryCollection" -> Some (SorterPoolSetHistory param)

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sortable.V1
+namespace GeneSort.Model.Sortable.V1
 
 open System
 open FSharp.UMX
@@ -42,7 +42,7 @@ type msasPfx =
             this.id = other.id
 
     member this.MakeSortableBoolTest 
-            (sorterTestId: Guid<sortableTestId>) : sortableBinaryTest =
+            (sorterTestId: Guid<sortableTestsId>) : sortableBinaryTest =
         let ceArray = (SorterDataParse.getCeArrayFromPrefixLib this.PfxLibId).Value
         let bArrays = SortableBoolArray.getAllPossibleResultsFromCeArray
                         ceArray
@@ -54,7 +54,7 @@ type msasPfx =
                 bArrays
 
     member this.MakeSortableBitv512Test 
-            (sorterTestId: Guid<sortableTestId>) : sortableBitv512Test =
+            (sorterTestId: Guid<sortableTestsId>) : sortableBitv512Test =
         let ceArray = (SorterDataParse.getCeArrayFromPrefixLib this.PfxLibId).Value
         let bArrays = SortableBoolArray.getAllPossibleResultsFromCeArray
                         ceArray

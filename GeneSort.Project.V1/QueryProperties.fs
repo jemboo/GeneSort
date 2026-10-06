@@ -1,15 +1,15 @@
-﻿namespace GeneSort.Project.V1
+namespace GeneSort.Project.V1
 
 
-type qpSortableTestRestriction =
+type qpSortableTestsRestriction =
     | NoRestriction
     | Split
 
 
-type qpSortableTestType =
-    | Standard of qpSortableTestRestriction
-    | Merge of qpSortableTestRestriction
-    | Prefix of qpSortableTestRestriction
+type qpSortableTestsType =
+    | Standard of qpSortableTestsRestriction
+    | Merge of qpSortableTestsRestriction
+    | Prefix of qpSortableTestsRestriction
 
 
 type qpSimpleSorter =
@@ -27,7 +27,7 @@ type qpSorterType =
 
 
 type qpSorterEval =
-    | Standard of qpSorterType * qpSortableTestType
+    | Standard of qpSorterType * qpSortableTestsType
 
 
 type qpSorterMutate =
@@ -50,7 +50,7 @@ and qpSgdType =
 
 
 type queryProperties =
-    | SortableTest of qpSortableTestType
+    | SortableTests of qpSortableTestsType
     | SorterEval of qpSorterEval
     | SorterMutate of qpSorterMutate
     | SorterSgd of qpSgdType
@@ -72,19 +72,19 @@ module QueryProperties =
 
     let filterPropertyMap (qp: queryProperties) (props: Map<string, string>) : Map<string, string> option =
         match qp with
-        | SortableTest st -> 
+        | SortableTests st -> 
             match st with
-            | qpSortableTestType.Standard restriction ->
+            | qpSortableTestsType.Standard restriction ->
                 failwith "Standard sortable test type is not supported."
 
-            | qpSortableTestType.Merge restriction ->
+            | qpSortableTestsType.Merge restriction ->
                 let keys = [ runParameters.sortingWidthKey; 
                              runParameters.mergeDimensionKey; 
                              runParameters.mergeSuffixTypeKey; 
                              runParameters.sortableDataFormatKey ]
                 tryExtractKeys keys props
 
-            | qpSortableTestType.Prefix restriction ->
+            | qpSortableTestsType.Prefix restriction ->
                 let keys = [ runParameters.sorterLibIdKey; 
                              runParameters.sortableDataFormatKey ]
                 tryExtractKeys keys props
@@ -95,7 +95,7 @@ module QueryProperties =
                 match sorterType with
                 | qpSorterType.Simple _ ->
                     match testType with
-                    | qpSortableTestType.Standard r ->
+                    | qpSortableTestsType.Standard r ->
                         match r with
                         | NoRestriction ->
                             let keys = [ runParameters.rngTypeKey; 
@@ -106,7 +106,7 @@ module QueryProperties =
                         | Split ->
                             failwith "Standard sortable test type with Split restriction is not supported."
 
-                    | qpSortableTestType.Merge r ->
+                    | qpSortableTestsType.Merge r ->
                         match r with
                         | NoRestriction ->
                             let keys = [ runParameters.rngTypeKey;
@@ -118,7 +118,7 @@ module QueryProperties =
                         | Split ->
                             failwith "Merge sortable test type with Split restriction is not supported."
 
-                    | qpSortableTestType.Prefix r ->
+                    | qpSortableTestsType.Prefix r ->
                         match r with
                         | NoRestriction ->
                             let keys = [ runParameters.rngTypeKey;
@@ -141,7 +141,7 @@ module QueryProperties =
                     match sorterType with
                     | qpSorterType.Simple _ ->
                         match testType with
-                        | qpSortableTestType.Standard r ->
+                        | qpSortableTestsType.Standard r ->
                             match r with
                             | NoRestriction ->
                                 let keys = [ runParameters.rngTypeKey;
@@ -154,7 +154,7 @@ module QueryProperties =
                             | Split ->
                                 failwith "Standard sortable test type with Split restriction is not supported."
 
-                        | qpSortableTestType.Merge r ->
+                        | qpSortableTestsType.Merge r ->
                             match r with
                             | NoRestriction ->
                                 let keys = [ runParameters.rngTypeKey;
@@ -168,7 +168,7 @@ module QueryProperties =
                             | Split ->
                                 failwith "Merge sortable test type with Split restriction is not supported."
 
-                        | qpSortableTestType.Prefix r ->
+                        | qpSortableTestsType.Prefix r ->
                             match r with
                             | NoRestriction ->
                                 let keys = [ runParameters.rngTypeKey;

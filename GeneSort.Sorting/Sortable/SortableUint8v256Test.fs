@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorting.Sortable
 
 open System
@@ -9,13 +9,13 @@ open System.Threading.Tasks
 [<Struct>]
 type sortableUint8v256Test =
     private { 
-        id: Guid<sortableTestId>
+        id: Guid<sortableTestsId>
         sortingWidth: int<sortingWidth>
         simdSortBlocks: SortBlockUint8v256[]
     }
 
     static member create 
-            (id: Guid<sortableTestId>) 
+            (id: Guid<sortableTestsId>) 
             (sw: int<sortingWidth>) 
             (blocks: SortBlockUint8v256[]) =
         { id = id
@@ -23,7 +23,7 @@ type sortableUint8v256Test =
           simdSortBlocks = blocks }
 
     static member Empty =
-        let id = Guid.NewGuid() |> UMX.tag<sortableTestId>
+        let id = Guid.NewGuid() |> UMX.tag<sortableTestsId>
         sortableUint8v256Test.create id 0<sortingWidth> [||]
 
     member this.Id with get() = this.id
@@ -40,7 +40,7 @@ type sortableUint8v256Test =
 module SortableUint8v256Test =
 
     let fromIntArrays
-        (id: Guid<sortableTestId>)
+        (id: Guid<sortableTestsId>)
         (sw: int<sortingWidth>)
         (allTests: sortableIntArray[]) 
                     : sortableUint8v256Test =

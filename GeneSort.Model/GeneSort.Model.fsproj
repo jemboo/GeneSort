@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -46,11 +46,11 @@
     <Compile Include="Sortable\MsasF.fs" />
     <Compile Include="Sortable\MsasM.fs" />
     <Compile Include="Sortable\MsasO.fs" />
-    <Compile Include="Sortable\SortableTestModel.fs" />
+    <Compile Include="Sortable\SortableTestsModel.fs" />
     <Compile Include="Sortable\MsasORandGen.fs" />
-    <Compile Include="Sortable\SortableTestModelGen.fs" />
-    <Compile Include="Sortable\SortableTestModelSet.fs" />
-    <Compile Include="Sortable\SortableTestModelSetGen.fs" />
+    <Compile Include="Sortable\SortableTestsModelGen.fs" />
+    <Compile Include="Sortable\SortableTestsModelSet.fs" />
+    <Compile Include="Sortable\SortableTestsModelSetGen.fs" />
     <Compile Include="Mutator\CommonMutator.fs" />
     <Compile Include="Mutator\Sorting\CommonSorting.fs" />
     <Compile Include="Mutator\Sorting\SorterPair\CommonSorterPair.fs" />

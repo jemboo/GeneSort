@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Project.SorterBins
+namespace GeneSort.Project.SorterBins
 
 open System
 open System.Threading
@@ -211,11 +211,11 @@ module RandomMergeSorterBins =
                                         (Some mergeDimension) 
                                         (Some mergeSuffixType) 
                                         (Some sortableDataFormat) 
-                                        (outputDataType.SortableTest "")
+                                        (outputDataType.SortableTests "")
 
                 let dbMergeTests = new GeneSortDbMp(SortableMergeTests.projectFolder) :> IGeneSortDb
                 let! rawTestData = dbMergeTests.loadAsync qpTests 
-                let! tests = rawTestData |> OutputData.asSortableTest
+                let! tests = rawTestData |> OutputData.asSortableTests
 
                 // 5. Evaluate
                 let qpEval = makeQueryParamsFromRunParams runParameters (outputDataType.SorterSetEval "")

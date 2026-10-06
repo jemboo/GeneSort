@@ -1,10 +1,10 @@
-﻿namespace GeneSort.Sorting.Mp.Sortable
+namespace GeneSort.Sorting.Mp.Sortable
 
 open MessagePack
 open GeneSort.Sorting.Sortable
 
 [<MessagePackObject>]
-type sortableTestDto =
+type sortableTestsDto =
     | Ints of sortableIntTestDto
     | Bools of sortableBoolTestDto
     | Uint8v256 of sortableUint8v256TestDto
@@ -12,9 +12,9 @@ type sortableTestDto =
     | Bitv512 of sortableBitv512TestDto
 
 
-module SortableTestDto =
+module SortableTestsDto =
 
-    let fromDomain (sorterTest: sortableTests) : sortableTestDto =
+    let fromDomain (sorterTest: sortableTests) : sortableTestsDto =
         match sorterTest with
         | sortableTests.Ints intTest -> Ints (SortableIntTestDto.fromDomain intTest)
         | sortableTests.Bools boolTest -> Bools (SortableBoolTestDto.fromDomain boolTest)
@@ -26,7 +26,7 @@ module SortableTestDto =
             Bitv512 (SortableBitv512TestDto.fromDomain bitv512Test)
         | _ -> failwith "Unsupported sortableTests variant for DTO conversion."
 
-    let toDomain (dto: sortableTestDto) : sortableTests =
+    let toDomain (dto: sortableTestsDto) : sortableTests =
         match dto with
         | Ints intTestDto -> sortableTests.Ints (SortableIntTestDto.toDomain intTestDto)
         | Bools boolTestDto -> sortableTests.Bools (SortableBoolTestDto.toDomain boolTestDto)

@@ -15,7 +15,7 @@ open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1.OpsUtils
-open GeneSort.Dispatch.V1.SortableTest
+open GeneSort.Dispatch.V1.SortableTests
 open GeneSort.Eval.V1
 open GeneSort.SortingLib.Sorter
 

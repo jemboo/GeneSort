@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Sorting.Mp.Sortable
+namespace GeneSort.Sorting.Mp.Sortable
 
 open System
 open FSharp.UMX
@@ -20,6 +20,6 @@ module SortableBoolTestDto =
 
     let toDomain (dto: sortableBoolTestDto) : sortableBinaryTest =
         sortableBinaryTest.create
-            (UMX.tag<sortableTestId> dto.Id)
+            (UMX.tag<sortableTestsId> dto.Id)
             (UMX.tag<sortingWidth> dto.SortingWidth)
             (dto.SortableArrays |> Array.map SortableBoolArrayDto.toDomain)

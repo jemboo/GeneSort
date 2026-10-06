@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Mp.Sortable
+namespace GeneSort.Model.Mp.Sortable
 
 open System
 open MessagePack
@@ -57,22 +57,22 @@ module MsasODtoConv =
 
 module SorterTestModelDto =
 
-    let fromDomain (dto: sorterTestModelDto) : sortableTestModel =
+    let fromDomain (dto: sorterTestModelDto) : sortableTestsModel =
         match dto.Kind with
-        | 0 -> dto.MsasF |> MsasFDtoConv.toDomain |> sortableTestModel.MsasF
-        | 1 -> dto.MsasO |> MsasODtoConv.toDomain |> sortableTestModel.MsasO
+        | 0 -> dto.MsasF |> MsasFDtoConv.toDomain |> sortableTestsModel.MsasF
+        | 1 -> dto.MsasO |> MsasODtoConv.toDomain |> sortableTestsModel.MsasO
         | k -> failwithf "Unknown SorterTestModelDto.Kind = %d" k
 
 
-    let toDomain (m: sortableTestModel) : sorterTestModelDto =
+    let toDomain (m: sortableTestsModel) : sorterTestModelDto =
         match m with
-        | sortableTestModel.MsasF msasF ->
+        | sortableTestsModel.MsasF msasF ->
             {
                 Kind = 0
                 MsasF = msasF |> MsasFDtoConv.fromDomain
                 MsasO = Unchecked.defaultof<msasODto>
             }
-        | sortableTestModel.MsasO msasO ->
+        | sortableTestsModel.MsasO msasO ->
             {
                 Kind = 1
                 MsasF = Unchecked.defaultof<msasFDto>

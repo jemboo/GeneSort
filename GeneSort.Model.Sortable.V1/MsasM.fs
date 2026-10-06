@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sortable.V1
+namespace GeneSort.Model.Sortable.V1
 
 open System
 open FSharp.UMX
@@ -67,7 +67,7 @@ type msasM =
         member this.Equals(other) =  this.sortingWidth = other.sortingWidth
 
     member this.MakeSortableIntTest 
-                    (sorterTestId: Guid<sortableTestId>) : sortableIntTest =
+                    (sorterTestId: Guid<sortableTestsId>) : sortableIntTest =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
@@ -80,7 +80,7 @@ type msasM =
 
 
     member this.MakeSortableBoolTest
-                    (sorterTestId: Guid<sortableTestId>) : sortableBinaryTest =
+                    (sorterTestId: Guid<sortableTestsId>) : sortableBinaryTest =
 
         let sortableArrays = SortableBoolArray.getMergeTestCases
                                     this.sortingWidth
@@ -95,7 +95,7 @@ type msasM =
 
 
     member this.MakeSortableUint8v256Test 
-                    (sorterTestId: Guid<sortableTestId>) : sortableUint8v256Test =
+                    (sorterTestId: Guid<sortableTestsId>) : sortableUint8v256Test =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
@@ -108,7 +108,7 @@ type msasM =
 
 
     member this.MakeSortableUint8v512Test 
-                    (sorterTestId: Guid<sortableTestId>) : sortableUint8v512Test =
+                    (sorterTestId: Guid<sortableTestsId>) : sortableUint8v512Test =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
@@ -121,7 +121,7 @@ type msasM =
 
 
     member this.MakeSortableBitv512Test 
-                    (sorterTestId: Guid<sortableTestId>) : sortableBitv512Test =
+                    (sorterTestId: Guid<sortableTestsId>) : sortableBitv512Test =
         let intArrays = SortableIntArray.getMergeTestCases 
                             this.SortingWidth
                             this.MergeDimension
