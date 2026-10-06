@@ -62,7 +62,7 @@ module CeBlockOpsUint8v256 =
 
 
     let evalSimdSortBlocks
-            (simdSortableBlocks: SortBlockUint8v256 seq) 
+            (simdSortableBlocks: sortBlockUint8v256 seq) 
             (prefix: ceBlock)
             (ceBlocks: ceBlock array) 
             : ceBlockEval [] =
@@ -182,7 +182,7 @@ module CeBlockOpsUint8v256 =
 
 
     let evalAndCollectUniqueFailures
-            (simdSortableBlocks: SortBlockUint8v256 seq) 
+            (simdSortableBlocks: sortBlockUint8v256 seq) 
             (prefix: ceBlock)
             (ceBlocks: ceBlock array) 
             : ceBlockEval [] =

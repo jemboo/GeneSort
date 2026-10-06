@@ -28,9 +28,6 @@
     <Compile Include="Sortable\SortableUint8v512Tests.fs" />
     <Compile Include="Sortable\GrayVectorGenerator.fs" />
     <Compile Include="Sortable\SortableTests.fs" />
-    <Compile Include="Sortable\SortableBoolTestsSet.fs" />
-    <Compile Include="Sortable\SortableIntTestsSet.fs" />
-    <Compile Include="Sortable\SortableTestsSet.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

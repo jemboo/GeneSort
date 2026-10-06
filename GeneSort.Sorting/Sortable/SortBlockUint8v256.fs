@@ -9,7 +9,7 @@ open System.Runtime.Intrinsics.X86
 open System.Collections.Concurrent
 
 [<Struct>]
-type SortBlockUint8v256 = 
+type sortBlockUint8v256 = 
     private { 
         vectors: Vector256<uint8>[] 
         sortableCount: int 
@@ -103,7 +103,7 @@ module Simd256GoldenHashProvider =
         let vectors = Array.init w (fun i -> Vector256.Create(byte i))
         
         // We use the createFromVectors we added to simdSortBlock earlier
-        let tempBlock = SortBlockUint8v256.createFromVectors vectors 32
+        let tempBlock = sortBlockUint8v256.createFromVectors vectors 32
         
         // ComputeLaneHashes32 is the method using UnpackLow/High + MultiplyLow
         SortBlockUint8v256.computeLaneHashes32 tempBlock.Vectors

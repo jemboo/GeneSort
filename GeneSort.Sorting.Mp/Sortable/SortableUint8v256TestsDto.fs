@@ -15,7 +15,7 @@ type sortableUint8v256TestsDto = {
 
 module SortableUint8v256TestsDto =
 
-    let private blockFromDomain (block: SortBlockUint8v256) : simdSortBlockDto =
+    let private blockFromDomain (block: sortBlockUint8v256) : simdSortBlockDto =
         let raw = 
             block.Vectors 
             |> Array.map (fun v -> 
@@ -24,12 +24,12 @@ module SortableUint8v256TestsDto =
                 buf)
         { RawVectors = raw; SortableCount = block.SortableCount }
 
-    let private blockToDomain (dto: simdSortBlockDto) : SortBlockUint8v256 =
+    let private blockToDomain (dto: simdSortBlockDto) : sortBlockUint8v256 =
         let vecs = 
             dto.RawVectors 
             |> Array.map (fun bytes -> Vector256.Create<byte>(bytes))
         
-        SortBlockUint8v256.createFromVectors vecs dto.SortableCount
+        sortBlockUint8v256.createFromVectors vecs dto.SortableCount
 
     let fromDomain (test: sortableUint8v256Tests) : sortableUint8v256TestsDto =
         { Id = %test.Id

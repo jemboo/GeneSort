@@ -11,13 +11,13 @@ type sortableUint8v512Tests =
     private { 
         id: Guid<sortableTestsId>
         sortingWidth: int<sortingWidth>
-        simdSortBlocks: SortBlockUint8v512[]
+        simdSortBlocks: sortBlockUint8v512[]
     }
 
     static member create 
             (id: Guid<sortableTestsId>) 
             (sw: int<sortingWidth>) 
-            (blocks: SortBlockUint8v512[]) =
+            (blocks: sortBlockUint8v512[]) =
         { id = id
           sortingWidth = sw
           simdSortBlocks = blocks }
@@ -52,7 +52,7 @@ module SortableUint8v512Tests =
         
         // --- 64 Lanes per block for Vector512 ---
         let totalBlocksCount = (totalTests + 63) / 64
-        let blocks = Array.zeroCreate<SortBlockUint8v512> totalBlocksCount
+        let blocks = Array.zeroCreate<sortBlockUint8v512> totalBlocksCount
 
         // Parallel Pack: use all cores to build the 64-lane blocks
         Parallel.For(0, totalBlocksCount, (fun i ->
@@ -61,7 +61,7 @@ module SortableUint8v512Tests =
             
             // Extract the slice for this block
             let slice = Array.sub allTests startIdx length
-            blocks.[i] <- SortBlockUint8v512.createFromIntArrays sw slice
+            blocks.[i] <- sortBlockUint8v512.createFromIntArrays sw slice
         )) |> ignore
 
         sortableUint8v512Tests.create id sw blocks

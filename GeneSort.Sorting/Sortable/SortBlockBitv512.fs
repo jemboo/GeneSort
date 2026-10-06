@@ -152,8 +152,6 @@ module SortBlockBitv512 =
 
 
 
-
-
 /// Returns true if all packed 0-1 sequences are sorted.
     /// This is orders of magnitude faster than transposing to IntArrays.
     let isAllSorted (sb: sortBlockBitv512) : bool =

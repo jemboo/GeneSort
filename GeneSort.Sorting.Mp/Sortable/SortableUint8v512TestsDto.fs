@@ -16,7 +16,7 @@ module SortableUint8v512TestsDto =
 
     // --- Helper for simd512SortBlock ---
 
-    let private blockFromDomain (block: SortBlockUint8v512) : simdSortBlockDto =
+    let private blockFromDomain (block: sortBlockUint8v512) : simdSortBlockDto =
         let raw = 
             block.Vectors 
             |> Array.map (fun v -> 
@@ -25,12 +25,12 @@ module SortableUint8v512TestsDto =
                 buf)
         { RawVectors = raw; SortableCount = block.SortableCount }
 
-    let private blockToDomain (dto: simdSortBlockDto) : SortBlockUint8v512 =
+    let private blockToDomain (dto: simdSortBlockDto) : sortBlockUint8v512 =
         let vecs = 
             dto.RawVectors 
             |> Array.map (fun bytes -> Vector512.Create<byte>(ReadOnlySpan(bytes)))
         
-        SortBlockUint8v512.createFromVectors vecs dto.SortableCount
+        sortBlockUint8v512.createFromVectors vecs dto.SortableCount
 
     // --- Main DTO Logic ---
 
