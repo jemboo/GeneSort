@@ -189,7 +189,7 @@ type sorterEvalV3 =
         sequenceHash: int<sequenceHash>
         stageLength: int<stageLength>
         ceUseArray: ceUse array
-        sortableTest: sortableTest 
+        sortableTests: sortableTests 
         reflectionSymmetric: bool<isReflectionSymmetric>
         stageCrossingsCount: int<stageCrossings>
         reflectiveCount: int<reflectiveCount>
@@ -201,7 +201,7 @@ type sorterEvalV3 =
                     (sequenceKey: int<sequenceHash>)
                     (stageLength: int<stageLength>)
                     (ceUseArray: ceUse array) 
-                    (sortableTest:sortableTest) 
+                    (sortableTests:sortableTests) 
                     (reflectionSymmetric: bool<isReflectionSymmetric>) 
                     (stageCrossingsCount: int<stageCrossings>)
                     (reflectiveCount: int<reflectiveCount>): sorterEvalV3 =
@@ -211,7 +211,7 @@ type sorterEvalV3 =
                 sequenceHash = sequenceKey; 
                 stageLength = stageLength;
                 ceUseArray = ceUseArray;
-                sortableTest =sortableTest;
+                sortableTests =sortableTests;
                 reflectionSymmetric = reflectionSymmetric
                 stageCrossingsCount = stageCrossingsCount
                 reflectiveCount = reflectiveCount
@@ -225,15 +225,15 @@ type sorterEvalV3 =
     member this.CeLength with get() : int<ceLength> = this.ceUseArray.Length |> UMX.tag<ceLength>
     member this.CeUseArray with get() : ceUse array = this.ceUseArray
     member this.SequenceHash with get() : int<sequenceHash>  = this.sequenceHash
-    member this.SortableTest with get() : sortableTest = this.sortableTest
+    member this.SortableTest with get() : sortableTests = this.sortableTests
     member this.ReflectiveCount with get() : int<reflectiveCount> = this.reflectiveCount
     member this.UnsortedCount with get() : int<sortableCount>  = 
-            this.sortableTest |> SortableTests.getUnsortedCount
+            this.sortableTests |> SortableTests.getUnsortedCount
     member this.LastCeIndex with get() : int<ceIndex>  = 
         if this.ceUseArray.Length = 0 then 0<ceIndex>
         else this.ceUseArray.[this.ceUseArray.Length - 1].CeIndex
 
-    /// Downgrades sorterEvalV3 to sorterEvalV2 by evaluating sortableTest into unsortedCount.
+    /// Downgrades sorterEvalV3 to sorterEvalV2 by evaluating sortableTests into unsortedCount.
     member this.ToV2() : sorterEvalV2 =
         sorterEvalV2.create
             this.sorterId

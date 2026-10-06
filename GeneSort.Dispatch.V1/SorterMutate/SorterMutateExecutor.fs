@@ -322,7 +322,7 @@ module SorterMutateExecutor =
 
     let _evaluateMutants 
             (makeMutantSorterModels: runParameters -> Async<Result<sorterModel seq, string>> )
-            (makeSortableTests: runParameters -> Async<Result<sortableTest * (ce array), string>>)
+            (makeSortableTests: runParameters -> Async<Result<sortableTests * (ce array), string>>)
             (host: runHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 

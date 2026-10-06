@@ -5,7 +5,7 @@ open FSharp.UMX
 open GeneSort.Sorting
 
 
-type sortableTest = 
+type sortableTests = 
     | Bitv512 of sortableBitv512Test
     | Bools of sortableBinaryTest
     | Ints of sortableIntTest
@@ -16,7 +16,7 @@ type sortableTest =
 
 module SortableTests = 
 
-    let getId (test: sortableTest) : Guid<sortableTestId> =
+    let getId (test: sortableTests) : Guid<sortableTestId> =
         match test with
         | Bitv512 bitv512Test -> bitv512Test.Id
         | Bools boolTest -> boolTest.Id
@@ -25,7 +25,7 @@ module SortableTests =
         | Uint8v256 uint8v256Test -> uint8v256Test.Id
         | Uint8v512 uint8v512Test -> uint8v512Test.Id
 
-    let getSortableDataFormat (test: sortableTest) : sortableDataFormat =
+    let getSortableDataFormat (test: sortableTests) : sortableDataFormat =
         match test with
         | Bitv512 bitv512Test -> bitv512Test.SortableDataFormat
         | Bools boolTest -> boolTest.SortableArrayType
@@ -34,7 +34,7 @@ module SortableTests =
         | Uint8v256 uint8v256Test -> uint8v256Test.SortableDataFormat
         | Uint8v512 uint8v512Test -> uint8v512Test.SortableDataFormat
 
-    let getSortingWidth (test: sortableTest) =
+    let getSortingWidth (test: sortableTests) =
         match test with
         | Bitv512 bitv512Test -> bitv512Test.SortingWidth
         | Bools boolTest -> boolTest.SortingWidth
@@ -43,7 +43,7 @@ module SortableTests =
         | Uint8v256 uint8v256Test -> uint8v256Test.SortingWidth
         | Uint8v512 uint8v512Test -> uint8v512Test.SortingWidth
 
-    let getSortableCount (test: sortableTest) : int<sortableCount> =
+    let getSortableCount (test: sortableTests) : int<sortableCount> =
         match test with
         | Bitv512 bitv512Test -> bitv512Test.SortableCount
         | Bools boolTest -> boolTest.SortableCount
@@ -53,7 +53,7 @@ module SortableTests =
         | Uint8v512 uint8v512Test -> uint8v512Test.SortableCount
 
 
-    let getUnsortedCount (test: sortableTest) =
+    let getUnsortedCount (test: sortableTests) =
         match test with
         | Bitv512 bitv512Test -> 
                 failwith "UnsortedCount not implemented for Bitv512."

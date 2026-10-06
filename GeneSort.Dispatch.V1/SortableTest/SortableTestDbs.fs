@@ -26,21 +26,20 @@ module SortableTestDbs =
         let makeMergeQueryParamsFromRunParams rp odt =
             QueryParamsBuilders.SortableTest.Merge.queryParamsFromRunParams projectName dbName rp odt
 
-        do QueryParamsBuilders.registerAll ()
         let db = new GeneSortDbMp(dbFolder, "sortable-test.merge")
 
 
-        let getMergeSorterTestSet
+        let getMergeSortableTest
                 (repl: int<replNumber>) 
                 (mrgLibId: mergeLibId)
-                (sortableDataFormat: sortableDataFormat): Async<Result<sortableTest, string>> =
+                (sortableDataFormat: sortableDataFormat): Async<Result<sortableTests, string>> =
             let qp = makeMergeQueryParams 
                             repl 
                             mrgLibId
                             sortableDataFormat 
                             (outputDataType.SortableTest "")
             (db :> IGeneSortDb).loadAsync qp
-            |> Async.map (Result.bind OutputData.asSortableTest)
+            |> Async.map (Result.bind OutputData.asSortableTests)
 
 
 
@@ -57,22 +56,21 @@ module SortableTestDbs =
         let makePrefixQueryParamsFromRunParams rp odt =
             QueryParamsBuilders.SortableTest.Prefix.queryParamsFromRunParams projectName dbName rp odt
 
-        do QueryParamsBuilders.registerAll ()
         let db = new GeneSortDbMp(dbFolder, "sortable-test.prefix")
 
 
 
-        let getPrefixSorterTestSet
+        let getPrefixSortableTest
                 (repl: int<replNumber>) 
                 (pfxId: prefixLibId)
-                (sortableDataFormat: sortableDataFormat): Async<Result<sortableTest, string>> =
+                (sortableDataFormat: sortableDataFormat): Async<Result<sortableTests, string>> =
             let qp = makePrefixQueryParams 
                             repl 
                             pfxId
                             sortableDataFormat 
                             (outputDataType.SortableTest "")
             (db :> IGeneSortDb).loadAsync qp
-            |> Async.map (Result.bind OutputData.asSortableTest)
+            |> Async.map (Result.bind OutputData.asSortableTests)
 
 
 

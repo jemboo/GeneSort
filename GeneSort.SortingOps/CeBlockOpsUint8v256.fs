@@ -276,7 +276,7 @@ module CeBlockOpsUint8v256 =
                     uniqueFailures 
                     |> Array.map (fun arr -> sortableIntArray.create(arr, sw, sss))
                     |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sw
-                    |> sortableTest.Ints
+                    |> sortableTests.Ints
                     |> Some
                 else None
 

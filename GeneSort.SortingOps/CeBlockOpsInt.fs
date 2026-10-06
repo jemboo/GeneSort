@@ -94,7 +94,7 @@ module CeBlockOpsInt =
                         ceBlk 
                         ceUseCounts 
                         (results.Count |> UMX.tag<sortableCount>) 
-                        (Some (sortableTest.Ints newTests))
+                        (Some (sortableTests.Ints newTests))
 
 
 
@@ -144,7 +144,7 @@ module CeBlockOpsInt =
                         ceBlk 
                         ceUseCounts 
                         (results.Count |> UMX.tag<sortableCount>) 
-                        (Some (sortableTest.Ints newTests))
+                        (Some (sortableTests.Ints newTests))
 
 
 
@@ -199,6 +199,6 @@ module CeBlockOpsInt =
 
         pool.Return(workArray)
         let newTests = Seq.toArray results |> sortableIntTest.create (Guid.NewGuid() |> UMX.tag) sits.SortingWidth
-        ceBlockEval.create prefix ceBlk ceUseCounts (results.Count |> UMX.tag<sortableCount>) (Some (sortableTest.Ints newTests))
+        ceBlockEval.create prefix ceBlk ceUseCounts (results.Count |> UMX.tag<sortableCount>) (Some (sortableTests.Ints newTests))
 
 

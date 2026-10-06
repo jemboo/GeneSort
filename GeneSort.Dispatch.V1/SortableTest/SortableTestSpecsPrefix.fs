@@ -23,7 +23,7 @@ module SortableTestSpecsPrefix =
             ]
                     "sortable-test.prefix"
                     RunParamBuilderNames.Filter.identity
-                    RunParamBuilderNames.Enhancer.sortableTest
+                    RunParamBuilderNames.Enhancer.sortableTests
                     false
             )
 
@@ -40,7 +40,7 @@ module SortableTestSpecsPrefix =
             ]
                     "sortable-test.prefix"
                     RunParamBuilderNames.Filter.identity
-                    RunParamBuilderNames.Enhancer.sortableTest
+                    RunParamBuilderNames.Enhancer.sortableTests
                     false
             )
 

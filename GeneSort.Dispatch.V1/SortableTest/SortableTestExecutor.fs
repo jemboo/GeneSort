@@ -61,7 +61,7 @@ module SortableTestExecutor =
                 // 4. Save
                 log (sprintf "Saving SortableTest %s" (string %qpForSortableTest.Id))
 
-                do! host.RunDb.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
+                do! host.RunDb.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTests) allowOverwrite
                 
                 log "Run Complete."
                 return rp.WithRunFinished (Some true)
@@ -113,7 +113,7 @@ module SortableTestExecutor =
                 // 4. Save
                 log (sprintf "Saving SortableTest %s" (string %qpForSortableTest.Id))
 
-                do! host.RunDb.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTest) allowOverwrite
+                do! host.RunDb.saveAsync qpForSortableTest (sortableTests |> outputData.SortableTests) allowOverwrite
                 
                 log "Run Complete."
                 return rp.WithRunFinished (Some true)

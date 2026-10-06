@@ -19,7 +19,6 @@ let dbPool512name = "Pool_512" |> UMX.tag<databaseName>
 
 
 
-do QueryParamsBuilders.registerAll ()
 
 
 

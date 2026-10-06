@@ -14,25 +14,25 @@ type sortableTestDto =
 
 module SortableTestDto =
 
-    let fromDomain (sorterTest: sortableTest) : sortableTestDto =
+    let fromDomain (sorterTest: sortableTests) : sortableTestDto =
         match sorterTest with
-        | sortableTest.Ints intTest -> Ints (SortableIntTestDto.fromDomain intTest)
-        | sortableTest.Bools boolTest -> Bools (SortableBoolTestDto.fromDomain boolTest)
-        | sortableTest.Uint8v256 uint8v256Test -> 
+        | sortableTests.Ints intTest -> Ints (SortableIntTestDto.fromDomain intTest)
+        | sortableTests.Bools boolTest -> Bools (SortableBoolTestDto.fromDomain boolTest)
+        | sortableTests.Uint8v256 uint8v256Test -> 
             Uint8v256 (SortableUint8v256TestDto.fromDomain uint8v256Test)
-        | sortableTest.Uint8v512 uint8v512Test -> 
+        | sortableTests.Uint8v512 uint8v512Test -> 
             Uint8v512 (SortableUint8v512TestDto.fromDomain uint8v512Test)
-        | sortableTest.Bitv512 bitv512Test  ->
+        | sortableTests.Bitv512 bitv512Test  ->
             Bitv512 (SortableBitv512TestDto.fromDomain bitv512Test)
-        | _ -> failwith "Unsupported sortableTest variant for DTO conversion."
+        | _ -> failwith "Unsupported sortableTests variant for DTO conversion."
 
-    let toDomain (dto: sortableTestDto) : sortableTest =
+    let toDomain (dto: sortableTestDto) : sortableTests =
         match dto with
-        | Ints intTestDto -> sortableTest.Ints (SortableIntTestDto.toDomain intTestDto)
-        | Bools boolTestDto -> sortableTest.Bools (SortableBoolTestDto.toDomain boolTestDto)
+        | Ints intTestDto -> sortableTests.Ints (SortableIntTestDto.toDomain intTestDto)
+        | Bools boolTestDto -> sortableTests.Bools (SortableBoolTestDto.toDomain boolTestDto)
         | Uint8v256 uint8v256TestDto -> 
-            sortableTest.Uint8v256 (SortableUint8v256TestDto.toDomain uint8v256TestDto)
+            sortableTests.Uint8v256 (SortableUint8v256TestDto.toDomain uint8v256TestDto)
         | Uint8v512 uint8v512TestDto ->
-            sortableTest.Uint8v512 (SortableUint8v512TestDto.toDomain uint8v512TestDto)
+            sortableTests.Uint8v512 (SortableUint8v512TestDto.toDomain uint8v512TestDto)
         | Bitv512 bitv512TestDto ->
-            sortableTest.Bitv512 (SortableBitv512TestDto.toDomain bitv512TestDto)
+            sortableTests.Bitv512 (SortableBitv512TestDto.toDomain bitv512TestDto)

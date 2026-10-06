@@ -96,7 +96,7 @@ module RunParamEnhancerBuilders =
     let private queryParamsForRun (context: runParamEnhancerContext) (rp: runParameters) =
         context.QueryParamsFromRunParams rp (outputDataType.Run context.Run.RunName) |> Option.get
 
-    let sortableTest (context: runParamEnhancerContext) (rp: runParameters) =
+    let sortableTests (context: runParamEnhancerContext) (rp: runParameters) =
         let qp = queryParamsForRun context rp
         rp.WithDatabaseName(Some context.Run.DatabaseName)
             .WithRunName(Some context.Run.RunName)
@@ -306,7 +306,7 @@ module RunParamBuilderNames =
 
     module Enhancer =
         [<Literal>]
-        let sortableTest = "sortable-test"
+        let sortableTests = "sortable-test"
         [<Literal>]
         let sorterEvalStandard = "sorter-eval-standard"
         [<Literal>]
@@ -347,7 +347,7 @@ module RunParamBuilders =
                 RunParamFilterBuilders.register RunParamBuilderNames.Filter.prefixSorterModelCompatibility RunParamFilterBuilders.prefixSorterModelCompatibility |> ignore
                 RunParamFilterBuilders.register RunParamBuilderNames.Filter.standardSorterModelCompatibility RunParamFilterBuilders.standardSorterModelCompatibility |> ignore
                 RunParamFilterBuilders.register RunParamBuilderNames.Filter.mergeDimensionDividesSortingWidth RunParamFilterBuilders.mergeDimensionDividesSortingWidth |> ignore
-                RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.sortableTest RunParamEnhancerBuilders.sortableTest |> ignore
+                RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.sortableTests RunParamEnhancerBuilders.sortableTests |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.sorterEvalStandard RunParamEnhancerBuilders.sorterEvalStandard |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.sorterEvalMerge RunParamEnhancerBuilders.sorterEvalMerge |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.sorterEvalPrefix RunParamEnhancerBuilders.sorterEvalPrefix |> ignore

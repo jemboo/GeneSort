@@ -12,12 +12,12 @@ open GeneSort.Core
 
 module Sandbox =
 
-    let makeFullBoolTest (sw:int<sortingWidth>) : sortableTest =
+    let makeFullBoolTest (sw:int<sortingWidth>) : sortableTests =
 
         let sortableTestId = Guid.NewGuid() |> UMX.tag<sortableTestId>
         let sortableModel = msasF.create sw
         sortableModel.MakeSortableBoolTest sortableTestId sw
-                            |> sortableTest.Bools
+                            |> sortableTests.Bools
 
 
 
@@ -61,16 +61,16 @@ module Sandbox =
         let sorter = CeUse.ceUseStringToSorter sorterId sortingWidth yow1
         let ceBlk = CeBlock.fromSorter sorter
 
-        let sortableTest = makeFullBoolTest sortingWidth
+        let sortableTests = makeFullBoolTest sortingWidth
         let collectNewSortableTests = true |> UMX.tag<collectNewSortableTests>
-        let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTest 
+        let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTests 
                                         ceBlock.Empty ceBlk collectNewSortableTests
         None
 
 
     let testTwo() =
         let sortingWidth = 16 |> UMX.tag<sortingWidth>
-        let sortableTest = makeFullBoolTest sortingWidth
+        let sortableTests = makeFullBoolTest sortingWidth
 
 
         let slIdA = sorterLibId.create sortingWidth sorterLibVariant.VariantA
@@ -85,9 +85,9 @@ module Sandbox =
 
 
         let collectNewSortableTests = true |> UMX.tag<collectNewSortableTests>
-        let ceBlockEvalA = CeBlockOps.evalWithSorterTest sortableTest
+        let ceBlockEvalA = CeBlockOps.evalWithSorterTest sortableTests
                                         ceBlock.Empty ceBlkA collectNewSortableTests
-        let ceBlockEvalB = CeBlockOps.evalWithSorterTest sortableTest
+        let ceBlockEvalB = CeBlockOps.evalWithSorterTest sortableTests
                                         ceBlock.Empty ceBlkB collectNewSortableTests
 
         1
@@ -95,7 +95,7 @@ module Sandbox =
 
     let testRelabel() =
         let sortingWidth = 16 |> UMX.tag<sortingWidth>
-        let sortableTest = makeFullBoolTest sortingWidth
+        let sortableTests = makeFullBoolTest sortingWidth
 
 
         let slIdA = sorterLibId.create sortingWidth sorterLibVariant.VariantA
@@ -108,9 +108,9 @@ module Sandbox =
 
 
         let collectNewSortableTests = true |> UMX.tag<collectNewSortableTests>
-        let ceBlockEvalA = CeBlockOps.evalWithSorterTest sortableTest 
+        let ceBlockEvalA = CeBlockOps.evalWithSorterTest sortableTests 
                                         ceBlock.Empty ceBlkA collectNewSortableTests
-        let ceBlockEvalB = CeBlockOps.evalWithSorterTest sortableTest 
+        let ceBlockEvalB = CeBlockOps.evalWithSorterTest sortableTests 
                                         ceBlock.Empty ceBlkB collectNewSortableTests
 
         printfn "Hello from F# yo"

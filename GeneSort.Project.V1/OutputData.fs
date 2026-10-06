@@ -11,7 +11,7 @@ open GeneSort.Eval.V1.Sgd
 type outputData =
     | Run of run
     | RunParameters of runParameters
-    | SortableTest of sortableTest
+    | SortableTests of sortableTests
     | SorterPoolSet of sorterPoolSet
     | SorterPoolSetSummarySet of sorterPoolSetSummarySet
     | SorterSet of sorterSet
@@ -32,9 +32,9 @@ module OutputData =
         | RunParameters rp -> Ok rp
         | _ -> Error "Database returned data, but it was not RunParameters."
 
-    let asSortableTest = function
-        | SortableTest st -> Ok st
-        | _ -> Error "Database returned data, but it was not a SortableTest."
+    let asSortableTests = function
+        | SortableTests st -> Ok st
+        | _ -> Error "Database returned data, but it was not a SortableTests."
 
     let asSorterPoolSet = function
         | SorterPoolSet ss -> Ok ss

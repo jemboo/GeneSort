@@ -26,7 +26,6 @@ let private sorterEvalMeasures =
         |> SorterEvalMeasure.toCompactString
     )
 
-do QueryParamsBuilders.registerAll ()
 
 
 module VarModR_32 =

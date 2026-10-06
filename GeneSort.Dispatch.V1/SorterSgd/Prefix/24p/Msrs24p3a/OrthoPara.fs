@@ -15,7 +15,6 @@ let dbOrthoPara32Name = "OrthoPara32" |> UMX.tag<databaseName>
 
 
 
-do QueryParamsBuilders.registerAll ()
 
 
 

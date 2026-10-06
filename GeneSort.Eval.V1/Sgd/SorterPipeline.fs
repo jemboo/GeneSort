@@ -17,7 +17,7 @@ module SorterPipeline =
             (sorterChildCount: int<sorterChildCount>)
             (prioritizeNewMutants: bool<prioritizeNewMutants>)
             (distinctSorterHashes: bool<distinctSorterHashes>)
-            (sortableTest: sortableTest)
+            (sortableTests: sortableTests)
             (prefix: ceBlock)
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
@@ -34,7 +34,7 @@ module SorterPipeline =
                 let (computedEvals: Map<Guid<sorterPoolMemberId>, sorterEval>) = 
                     expandedPoolSet
                     |> SorterPoolRunner.evaluatePoolSet 
-                                        sortableTest 
+                                        sortableTests 
                                         prefix
                                         sorterEvalType
                                         reEvaluateParents
@@ -65,7 +65,7 @@ module SorterPipeline =
             (sorterChildCount: int<sorterChildCount>)
             (prioritizeNewMutants: bool<prioritizeNewMutants>)
             (distinctSorterHashes: bool<distinctSorterHashes>)
-            (sortableTest: sortableTest)
+            (sortableTests: sortableTests)
             (prefix: ceBlock)
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
@@ -93,7 +93,7 @@ module SorterPipeline =
         // --- Step 1b: Evaluate Pool Set ---
         let computedEvals = 
             SorterPoolRunner.evaluatePoolSet 
-                sortableTest 
+                sortableTests 
                 prefix
                 sorterEvalType 
                 reEvaluateParents

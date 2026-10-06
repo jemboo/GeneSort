@@ -24,7 +24,7 @@ module SgdExecutor =
             (saveIntervals: genIntervalConfig)
             (subIntervals: genIntervalConfig)
             (rp: runParameters)
-            (sortableTest: sortableTest)
+            (sortableTests: sortableTests)
             (prefix: ceBlock)
             (log: string -> unit) : Async<Result<sorterPoolSet, string>> =
 
@@ -36,7 +36,7 @@ module SgdExecutor =
             let computedEvals = 
                 seedPoolSet 
                 |> SorterPoolRunner.evaluatePoolSet 
-                    sortableTest 
+                    sortableTests 
                     prefix
                     evalType
                     true // reEvaluateParents
@@ -58,7 +58,7 @@ module SgdExecutor =
     /// Dispatches the evolution history run parameters, executes the generative loop via asyncResult,
     /// and manages final state serialization/reporting pipelines.
     let evaluateEvolutionRun
-            (makeSortableTests: runParameters ->  Async<Result<sortableTest * (ce array), string>> )
+            (makeSortableTests: runParameters ->  Async<Result<sortableTests * (ce array), string>> )
             (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
             (genDb: IGeneSortDb)
             (saveIntervals: genIntervalConfig)
@@ -80,7 +80,7 @@ module SgdExecutor =
                 let! sWidth = 
                     rp.GetSortingWidth() 
                     |> Result.ofOption "Missing sorting width."
-                let! (sortableTest, ces) = makeSortableTests rp 
+                let! (sortableTests, ces) = makeSortableTests rp 
                 let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces
 
                 // 1. Check for existing checkpoints directly via genDb
@@ -94,7 +94,7 @@ module SgdExecutor =
                             let initRp = rp.WithGenerationCurrent(Some (0 |> UMX.tag<generationNumber>))
                             let! (seedSet: sorterPoolSet) = 
                                         initializeAndSaveSeedPoolSet 
-                                            sorterPoolSetCreator genDb saveIntervals subIntervals initRp sortableTest prefix log
+                                            sorterPoolSetCreator genDb saveIntervals subIntervals initRp sortableTests prefix log
                             return seedSet, initRp
                         }
                     | Some (highestPoolSet: sorterPoolSet) -> 
@@ -120,7 +120,7 @@ module SgdExecutor =
                         activeRp
                         allowOverwrite
                         activeSeedPoolSet
-                        sortableTest
+                        sortableTests
                         prefix
                         sorterModelMutator
                         cts.Token

@@ -176,7 +176,7 @@ module CeBlockOpsPacked =
                     ceBlk 
                     ceUseCounts 
                     (newCount |> UMX.tag<sortableCount>) 
-                    (Some (sortableTest.PackedInts newPacked))
+                    (Some (sortableTests.PackedInts newPacked))
 
 
 

@@ -26,7 +26,7 @@ module EvolutionOrchestrator =
             (rp: runParameters)
             (allowOverwrite: bool<allowOverwrite>)
             (initialPoolSet: sorterPoolSet)
-            (sortableTest: sortableTest)
+            (sortableTests: sortableTests)
             (prefix: ceBlock)
             (mutator: sorterModelMutator)
             (cts: CancellationToken)
@@ -166,7 +166,7 @@ module EvolutionOrchestrator =
                                     sorterChildCount
                                     prioritizeNewMutants
                                     distinctSorterHashes
-                                    sortableTest 
+                                    sortableTests 
                                     prefix
                                     evalType
                                     srtrEvalMeasure

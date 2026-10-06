@@ -12,7 +12,7 @@ open GeneSort.SortingLib.Sorter
 
 module SortableTestMakers =
 
-    let makeStandardTests (rp: runParameters) : Async<Result<sortableTest * (ce array), string>> =
+    let makeStandardTests (rp: runParameters) : Async<Result<sortableTests * (ce array), string>> =
         async {
             let paramsOpt = option {
                 let! sortingWidth = rp.GetSortingWidth()
@@ -30,7 +30,7 @@ module SortableTestMakers =
                 return Error "Failed: One or more RunParameters for StandardTests were missing."
         }
 
-    let makeMergeTests (rp: runParameters) : Async<Result<sortableTest * (ce array), string>> =
+    let makeMergeTests (rp: runParameters) : Async<Result<sortableTests * (ce array), string>> =
         async {
             let paramsOpt = option {
                 let repl = 0 |> UMX.tag<replNumber>   
@@ -42,13 +42,13 @@ module SortableTestMakers =
 
             match paramsOpt with
             | Some (repl, mrgLibId, sdf, ces) ->
-                let! res = SortableTestDbs.Merge.getMergeSorterTestSet repl mrgLibId sdf
+                let! res = SortableTestDbs.Merge.getMergeSortableTest repl mrgLibId sdf
                 return Result.map (fun st -> (st, ces |> Array.concat)) res
             | None ->
                 return Error "Failed: One or more RunParameters for MergeTests were missing."
         }
 
-    let getPrefixTests (rp: runParameters) : Async<Result<sortableTest * (ce array), string>> =
+    let getPrefixTests (rp: runParameters) : Async<Result<sortableTests * (ce array), string>> =
         async {
             let paramsOpt = option {
                 let repl = 0 |> UMX.tag<replNumber>   
@@ -60,7 +60,7 @@ module SortableTestMakers =
 
             match paramsOpt with
             | Some (repl, pfxId, sdf, ces) ->
-                let! res = SortableTestDbs.Prefix.getPrefixSorterTestSet repl pfxId sdf
+                let! res = SortableTestDbs.Prefix.getPrefixSortableTest repl pfxId sdf
                 return Result.map (fun st -> (st, ces)) res
             | None ->
                 return Error "Failed: One or more RunParameters for PrefixTests were missing."

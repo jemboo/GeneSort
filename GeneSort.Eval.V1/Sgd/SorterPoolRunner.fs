@@ -9,10 +9,10 @@ open GeneSort.Eval.V1
 
 module SorterPoolRunner =
 
-    /// Evaluates members of a sorterPoolSet against a sortableTest suite.
+    /// Evaluates members of a sorterPoolSet against a sortableTests suite.
     /// Skips already evaluated members if reEvaluateParents is false.
     let evaluatePoolSet 
-            (sortableTest: sortableTest)
+            (sortableTests: sortableTests)
             (prefix: ceBlock)
             (sorterEvalType: sorterEvalType)
             (reEvaluateParents: bool)
@@ -72,7 +72,7 @@ module SorterPoolRunner =
                     SorterSetEval.makeSorterEvals 
                         sorters 
                         prefix
-                        sortableTest 
+                        sortableTests 
                         sorterEvalType 
                         collectNewSortableTests
 

@@ -23,7 +23,7 @@ module SortableTestSpecsMerge =
             ]
                     "sortable-test.merge"
                     RunParamBuilderNames.Filter.mergeDimensionDividesSortingWidth
-                    RunParamBuilderNames.Enhancer.sortableTest
+                    RunParamBuilderNames.Enhancer.sortableTests
                     false
             )
 

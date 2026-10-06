@@ -20,7 +20,7 @@ module SorterEvalExecutor =
 
     let _makeSorterEvals 
             (makeSorterModelSet: runParameters -> sorterModelSet option)
-            (makeSortableTests: runParameters -> Async<Result<sortableTest * (ce array), string>>)
+            (makeSortableTests: runParameters -> Async<Result<sortableTests * (ce array), string>>)
             (host: runHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 

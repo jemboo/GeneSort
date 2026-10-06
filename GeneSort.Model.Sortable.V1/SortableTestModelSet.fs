@@ -41,7 +41,7 @@ type sortableTestModelSet =
                                         sortableDataType )
                 |> Array.map (fun st -> 
                     match st with
-                    | sortableTest.Bools bt -> bt
+                    | sortableTests.Bools bt -> bt
                     | _ -> failwith "Inconsistent SorterTestModelSet: expected Bools")
             sortableTestSet.Bools (sortableBoolTestSet.create id boolTests)
 
@@ -55,7 +55,7 @@ type sortableTestModelSet =
                                 sortableDataType)
                 |> Array.map (fun st -> 
                     match st with
-                    | sortableTest.Ints it -> it
+                    | sortableTests.Ints it -> it
                     | _ -> failwith "Inconsistent SorterTestModelSet: expected Ints")
             sortableTestSet.Ints (sortableIntTestSet.create id intTests)
 

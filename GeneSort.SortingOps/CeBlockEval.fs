@@ -12,7 +12,7 @@ type ceBlockEval =
         ceUseCounts: ceUseCounts // Does not track the prefix CEs
         usedCes: Lazy<ce array>
         unsortedCount: int<sortableCount>
-        sortableTest: sortableTest option
+        sortableTests: sortableTests option
     }
 
     static member create 
@@ -20,14 +20,14 @@ type ceBlockEval =
             (ceBlock: ceBlock) 
             (ceUseCts: ceUseCounts) 
             (unsortedCount: int<sortableCount>)
-            (sortableTest: sortableTest option) =
+            (sortableTests: sortableTests option) =
         { 
             prefix = prefix
             ceBlock = ceBlock 
             ceUseCounts = ceUseCts
             usedCes = Lazy<ce[]>(fun () -> ceBlockEval.getUsedCes prefix ceBlock ceUseCts)
             unsortedCount = unsortedCount
-            sortableTest = sortableTest 
+            sortableTests = sortableTests 
         }
 
     member this.Prefix with get() = this.prefix
@@ -53,7 +53,7 @@ type ceBlockEval =
             used.ToArray()
         Array.append prefix.CeArray blockCes
 
-    member this.SortableTest with get() = this.sortableTest
+    member this.SortableTest with get() = this.sortableTests
 
     member this.UnsortedCount with get() = this.unsortedCount
 

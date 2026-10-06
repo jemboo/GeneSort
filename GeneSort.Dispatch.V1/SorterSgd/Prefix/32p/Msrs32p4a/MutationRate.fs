@@ -21,7 +21,6 @@ module MutationRate =
     let dbMaxModRate_32Name = "MaxModRate_32" |> UMX.tag<databaseName>
     let dbMaxModRate_64Name = "MaxModRate_64" |> UMX.tag<databaseName>
 
-    do QueryParamsBuilders.registerAll ()
 
 
 

@@ -93,7 +93,7 @@ module CeBlockOpsBinary =
                             ceBlk 
                             ceUseCounts 
                             (results.Count |> UMX.tag<sortableCount>) 
-                            (Some (sortableTest.Bools newTests))
+                            (Some (sortableTests.Bools newTests))
 
 
     let evalAndDedupeCeFetch (sbts: sortableBinaryTest) (prefix: ceBlock) (ceBlK: ceBlock) :ceBlockEval =
@@ -139,7 +139,7 @@ module CeBlockOpsBinary =
                         ceBlK 
                         ceUseCounts 
                         (results.Count |> UMX.tag<sortableCount>) 
-                        (Some (sortableTest.Bools newTests))
+                        (Some (sortableTests.Bools newTests))
 
 
 
@@ -183,4 +183,4 @@ module CeBlockOpsBinary =
 
         pool.Return(workArray)
         let newTests = Seq.toArray results |> (sortableBinaryTest.create (Guid.NewGuid() |> UMX.tag) sbts.SortingWidth)
-        ceBlockEval.create prefix ceBlK ceUseCounts (results.Count |> UMX.tag<sortableCount>) (Some (sortableTest.Bools newTests))
+        ceBlockEval.create prefix ceBlK ceUseCounts (results.Count |> UMX.tag<sortableCount>) (Some (sortableTests.Bools newTests))
