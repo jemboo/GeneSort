@@ -10,37 +10,39 @@ module SortableTestSpecsPrefix =
 
     module Specs =
 
-        let Prefix_24s  (executorType: sortableTestExecutorType) : runHostSpec = {
-            queryCatalogName = "sortable-test.prefix"
-            databaseName = SortableTestDbs.Prefix.dbName
-            projectName = CommonSortableTest.projectName
-            runName = sprintf @"Prefix-24s_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Bitv512 prefix sorter test sets"
-            spans = [
+        let Prefix_24s  (executorType: sortableTestExecutorType) : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SortableTestDbs.Prefix.dbName
+                    CommonSortableTest.projectName
+                    (sprintf @"Prefix-24s_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag)
+                    "Bitv512 prefix sorter test sets"
+                    [
                 dataFomatBitv512
                 prefixLib_Prefix24s
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.identity
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sortableTest
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 1
-        }
+                    "sortable-test.prefix"
+                    RunParamBuilderNames.Filter.identity
+                    RunParamBuilderNames.Enhancer.sortableTest
+                    false
+            )
 
-        let Prefix_32  (executorType: sortableTestExecutorType) : runHostSpec = {
-            queryCatalogName = "sortable-test.prefix"
-            databaseName = SortableTestDbs.Prefix.dbName
-            projectName = CommonSortableTest.projectName
-            runName = sprintf @"Prefix-32_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Bitv512 prefix sorter test sets"
-            spans = [
+        let Prefix_32  (executorType: sortableTestExecutorType) : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SortableTestDbs.Prefix.dbName
+                    CommonSortableTest.projectName
+                    (sprintf @"Prefix-32_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag)
+                    "Bitv512 prefix sorter test sets"
+                    [
                 dataFomatBitv512
                 prefixLib_Prefix32_4
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.identity
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sortableTest
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 1
-        }
+                    "sortable-test.prefix"
+                    RunParamBuilderNames.Filter.identity
+                    RunParamBuilderNames.Enhancer.sortableTest
+                    false
+            )
 
 
     type configType =
@@ -53,6 +55,6 @@ module SortableTestSpecsPrefix =
                         (configType.Prefix_32, Specs.Prefix_32);
                     ]
 
-    let getRunHostSpec (config: configType) (executorType: sortableTestExecutorType) : runHostSpec =
+    let getRun (config: configType) (executorType: sortableTestExecutorType) : run =
         let specFunc = Configs.[config]
         specFunc executorType

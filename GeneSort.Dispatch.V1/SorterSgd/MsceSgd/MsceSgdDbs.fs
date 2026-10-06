@@ -212,8 +212,4 @@ module MsceSgdDbs =
         | None -> failwithf "Database with name %s not found" (UMX.untag name)
 
 
-    let createRunHost (spec: runHostSpec) : runHost =
-        let db = getDatabaseByName spec.databaseName
-        let run = run.SgdRun (SgdRun.create spec.databaseName spec.projectName spec.runName spec.runDescription spec.spans "expInterval100_L50ss" "summaryInterval_C.1p5C" spec.queryCatalogName)
-        runHost.Create db spec run
 

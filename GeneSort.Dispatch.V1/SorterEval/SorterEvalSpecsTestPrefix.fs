@@ -13,13 +13,14 @@ module SorterEvalSpecsTestPrefix =
 
     module Specs =
 
-        let Prefix_24s (executorType: sorterEvalExecutorType) : runHostSpec = {
-            queryCatalogName = "sorter-eval.prefix"
-            databaseName = SorterEvalDbs.Prefix.dbName
-            projectName = SorterEvalDbs.projectName
-            runName = sprintf @"Prefix_24s_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            runDescription = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf6"
-            spans = [   
+        let Prefix_24s (executorType: sorterEvalExecutorType) : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SorterEvalDbs.Prefix.dbName
+                    SorterEvalDbs.projectName
+                    (sprintf @"Prefix_24s_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag)
+                    "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf6"
+                    [   
                 rngTypeLcg
                 prefixLib_Prefix24s
                 allSimpleSorterModelTypes
@@ -27,20 +28,21 @@ module SorterEvalSpecsTestPrefix =
                 sorterEvalTypeV2
                 largeSorterCount
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.prefixSorterModelCompatibility
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 1
-        }
+                    "sorter-eval.prefix"
+                    RunParamBuilderNames.Filter.prefixSorterModelCompatibility
+                    RunParamBuilderNames.Enhancer.sorterEvalPrefix
+                    false
+            )
 
 
-        let Prefix_32 (executorType: sorterEvalExecutorType) : runHostSpec = {
-            queryCatalogName = "sorter-eval.prefix"
-            databaseName = SorterEvalDbs.Prefix.dbName
-            projectName = SorterEvalDbs.projectName
-            runName = sprintf @"Prefix_32_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            runDescription = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf4"
-            spans = [   
+        let Prefix_32 (executorType: sorterEvalExecutorType) : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SorterEvalDbs.Prefix.dbName
+                    SorterEvalDbs.projectName
+                    (sprintf @"Prefix_32_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag)
+                    "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf4"
+                    [   
                 rngTypeLcg
                 prefixLib_Prefix32_4
                 allSimpleSorterModelTypes
@@ -48,11 +50,11 @@ module SorterEvalSpecsTestPrefix =
                 sorterEvalTypeV2
                 largeSorterCount
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.prefixSorterModelCompatibility
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 8
-        }
+                    "sorter-eval.prefix"
+                    RunParamBuilderNames.Filter.prefixSorterModelCompatibility
+                    RunParamBuilderNames.Enhancer.sorterEvalPrefix
+                    false
+            )
 
 
     type configType =
@@ -65,6 +67,6 @@ module SorterEvalSpecsTestPrefix =
                         (configType.Prefix_32, Specs.Prefix_32);
                     ]
 
-    let getRunHostSpec (config: configType) (executorType: sorterEvalExecutorType) : runHostSpec =
+    let getRun (config: configType) (executorType: sorterEvalExecutorType) : run =
         let specFunc = Configs.[config]
         specFunc executorType

@@ -14,8 +14,8 @@ type sortableTestModel =
 
 module SortableTestModel =
 
-    let getSortingWidth (sortableTestModel: sortableTestModel): int<sortingWidth> =
-        match sortableTestModel with
+    let getSortingWidth (simpleSortableTM: sortableTestModel): int<sortingWidth> =
+        match simpleSortableTM with
         | MsasF msasF -> msasF.sortingWidth
         | MsasO msasO -> %msasO.SeedPermutation.Order |> UMX.tag<sortingWidth>
         | MsasMi msasMi -> msasMi.sortingWidth
@@ -23,30 +23,30 @@ module SortableTestModel =
 
     let makeSortableTest 
             (sorterTestId: Guid<sortableTestId>)
-            (sortableTestModel: sortableTestModel) 
-            (sortableDataFormat: sortableDataFormat) : sortableTest =
+            (simpleSortableTM: sortableTestModel) 
+            (sortableDF: sortableDataFormat) : sortableTest =
 
-        match sortableTestModel with
+        match simpleSortableTM with
 
         | MsasF msasF -> 
-                match sortableDataFormat with
+                match sortableDF with
                 | sortableDataFormat.BoolArray ->        
-                    (msasF.MakeSortableBoolTest sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Bools
+                    (msasF.MakeSortableBoolTest sorterTestId (getSortingWidth simpleSortableTM)) |> sortableTest.Bools
                 | sortableDataFormat.IntArray ->
-                    (msasF.MakeSortableIntTest sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Ints
+                    (msasF.MakeSortableIntTest sorterTestId (getSortingWidth simpleSortableTM)) |> sortableTest.Ints
                 | sortableDataFormat.BitVector256 ->
                     failwith "BitVector256 SortableArrayType not supported"
                 | sortableDataFormat.BitVector512 ->
-                    (msasF.MakeSortableBitv512Test sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Bitv512
+                    (msasF.MakeSortableBitv512Test sorterTestId (getSortingWidth simpleSortableTM)) |> sortableTest.Bitv512
                 | sortableDataFormat.Int8Vector256 ->
-                    (msasF.MakeSortableUint8v256Test sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Uint8v256
+                    (msasF.MakeSortableUint8v256Test sorterTestId (getSortingWidth simpleSortableTM)) |> sortableTest.Uint8v256
                 | sortableDataFormat.Int8Vector512  -> 
-                    (msasF.MakeSortableUint8v512Test sorterTestId (getSortingWidth sortableTestModel)) |> sortableTest.Uint8v512
+                    (msasF.MakeSortableUint8v512Test sorterTestId (getSortingWidth simpleSortableTM)) |> sortableTest.Uint8v512
                 | sortableDataFormat.PackedIntArray ->
                     failwith "PackedIntArray SortableArrayType not supported"
 
         | MsasO msasO ->
-                match sortableDataFormat with
+                match sortableDF with
                 | sortableDataFormat.BoolArray ->        
                      (msasO.MakeSortableBoolTest sorterTestId) |> sortableTest.Bools
                 | sortableDataFormat.IntArray ->
@@ -57,7 +57,7 @@ module SortableTestModel =
                     failwith "Unsupported SortableArrayType for MsasO"
 
         | MsasMi msasMi ->
-                match sortableDataFormat with
+                match sortableDF with
                 | sortableDataFormat.BoolArray ->        
                     (msasMi.MakeSortableBoolTest sorterTestId) |> sortableTest.Bools
                 | sortableDataFormat.IntArray ->
@@ -72,7 +72,7 @@ module SortableTestModel =
                     failwith "Unsupported SortableArrayType for MsasMi"
 
         | MsasPfx msasPfx ->
-                match sortableDataFormat with
+                match sortableDF with
                 | sortableDataFormat.BoolArray ->        
                      (msasPfx.MakeSortableBoolTest sorterTestId) |> sortableTest.Bools
                 | sortableDataFormat.IntArray ->

@@ -24,7 +24,7 @@ module SortableTestMakers =
             match paramsOpt with
             | Some (sortingWidth, sortableTestId) ->
                 let testModel = msasF.create sortingWidth |> sortableTestModel.MsasF
-                return Ok (( SortableTestModel.makeSortableTest 
+                return Ok ((SortableTestModel.makeSortableTest 
                                     sortableTestId
                                     testModel 
                                     sortableDataFormat.BitVector512), [||])

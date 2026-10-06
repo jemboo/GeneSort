@@ -31,13 +31,14 @@ module MutationRate =
 
 
 
-        let Test (executorType: sorterSgdExecutorType) : runHostSpec = {
-            queryCatalogName = "sorter-sgd.msrs32-mutation-rate"
-            databaseName = dbVariableModR_32Name
-            projectName = projName
-            runName = sprintf @"Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-            spans = [
+        let Test (executorType: sorterSgdExecutorType) : run =
+            run.SgdRun (
+                SgdRun.create
+                    dbVariableModR_32Name
+                    projName
+                    (sprintf @"Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
                 (runParameters.generationCurrentKey, [0] |> List.map string)
                 (runParameters.generationIntervalCountKey, [12] |> List.map string)
@@ -49,20 +50,23 @@ module MutationRate =
                 (runParameters.modificationRateKey, [0.25;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.identity
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.msrs32MutationRate
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 1
-        }
+                    "expInterval100_L50ss"
+                    "summaryInterval_C.1p5C"
+                    "sorter-sgd.msrs32-mutation-rate"
+                    RunParamBuilderNames.Filter.identity
+                    RunParamBuilderNames.Enhancer.msrs32MutationRate
+                    false
+            )
 
 
-        let EqualOPS (executorType: sorterSgdExecutorType) : runHostSpec = {
-            queryCatalogName = "sorter-sgd.msrs32-mutation-rate"
-            databaseName = dbVariableModR_32Name
-            projectName = projName
-            runName = sprintf @"EqualOPS%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-            spans = [
+        let EqualOPS (executorType: sorterSgdExecutorType) : run =
+            run.SgdRun (
+                SgdRun.create
+                    dbVariableModR_32Name
+                    projName
+                    (sprintf @"EqualOPS%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
                 (runParameters.generationCurrentKey, [0] |> List.map string)
                 (runParameters.generationIntervalCountKey, [12] |> List.map string)
@@ -74,21 +78,24 @@ module MutationRate =
                 (runParameters.modificationRateKey, [0.015; 0.20; 0.25; 0.30; 0.40; 0.50;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.identity
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.msrs32MutationRate
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 16
-        }
+                    "expInterval100_L50ss"
+                    "summaryInterval_C.1p5C"
+                    "sorter-sgd.msrs32-mutation-rate"
+                    RunParamBuilderNames.Filter.identity
+                    RunParamBuilderNames.Enhancer.msrs32MutationRate
+                    false
+            )
 
         
 
-        let EqualOPS2 (executorType: sorterSgdExecutorType) : runHostSpec = {
-            queryCatalogName = "sorter-sgd.msrs32-mutation-rate"
-            databaseName = dbVariableModR_32Name
-            projectName = projName
-            runName = sprintf @"EqualOPS2%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-            spans = [
+        let EqualOPS2 (executorType: sorterSgdExecutorType) : run =
+            run.SgdRun (
+                SgdRun.create
+                    dbVariableModR_32Name
+                    projName
+                    (sprintf @"EqualOPS2%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
                 (runParameters.generationCurrentKey, [0] |> List.map string)
                 (runParameters.generationIntervalCountKey, [12] |> List.map string)
@@ -100,24 +107,27 @@ module MutationRate =
                 (runParameters.modificationRateKey, [0.225; 0.25; 0.275;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.identity
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.msrs32MutationRate
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 16
-        }
+                    "expInterval100_L50ss"
+                    "summaryInterval_C.1p5C"
+                    "sorter-sgd.msrs32-mutation-rate"
+                    RunParamBuilderNames.Filter.identity
+                    RunParamBuilderNames.Enhancer.msrs32MutationRate
+                    false
+            )
 
         
     module VarModR_64 =
 
 
 
-        let Test (executorType: sorterSgdExecutorType) : runHostSpec = {
-            queryCatalogName = "sorter-sgd.msrs32-mutation-rate"
-            databaseName = dbVariableModR_64Name
-            projectName = projName
-            runName = sprintf @"Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-            spans = [
+        let Test (executorType: sorterSgdExecutorType) : run =
+            run.SgdRun (
+                SgdRun.create
+                    dbVariableModR_64Name
+                    projName
+                    (sprintf @"Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
                 (runParameters.generationCurrentKey, [0] |> List.map string)
                 (runParameters.generationIntervalCountKey, [12] |> List.map string)
@@ -128,20 +138,23 @@ module MutationRate =
                 (runParameters.modificationRateKey, [0.25;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.identity
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.msrs32MutationRate
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 1
-        }
+                    "expInterval100_L50ss"
+                    "summaryInterval_C.1p5C"
+                    "sorter-sgd.msrs32-mutation-rate"
+                    RunParamBuilderNames.Filter.identity
+                    RunParamBuilderNames.Enhancer.msrs32MutationRate
+                    false
+            )
 
 
-        let WideTest (executorType: sorterSgdExecutorType) : runHostSpec = {
-            queryCatalogName = "sorter-sgd.msrs32-mutation-rate"
-            databaseName = dbVariableModR_64Name
-            projectName = projName
-            runName = sprintf @"WideTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-            spans = [
+        let WideTest (executorType: sorterSgdExecutorType) : run =
+            run.SgdRun (
+                SgdRun.create
+                    dbVariableModR_64Name
+                    projName
+                    (sprintf @"WideTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
                 (runParameters.generationCurrentKey, [0] |> List.map string)
                 (runParameters.generationIntervalCountKey, [5] |> List.map string)
@@ -152,21 +165,24 @@ module MutationRate =
                 (runParameters.modificationRateKey, [0.015; 0.20; 0.25; 0.30; 0.40; 0.50; 0.99] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.identity
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.msrs32MutationRate
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 16
-        }
+                    "expInterval100_L50ss"
+                    "summaryInterval_C.1p5C"
+                    "sorter-sgd.msrs32-mutation-rate"
+                    RunParamBuilderNames.Filter.identity
+                    RunParamBuilderNames.Enhancer.msrs32MutationRate
+                    false
+            )
 
         
 
-        let NarrowTest (executorType: sorterSgdExecutorType) : runHostSpec = {
-            queryCatalogName = "sorter-sgd.msrs32-mutation-rate"
-            databaseName = dbVariableModR_64Name
-            projectName = projName
-            runName = sprintf @"NarrowTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-            spans = [
+        let NarrowTest (executorType: sorterSgdExecutorType) : run =
+            run.SgdRun (
+                SgdRun.create
+                    dbVariableModR_64Name
+                    projName
+                    (sprintf @"NarrowTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
                 (runParameters.generationCurrentKey, [0] |> List.map string)
                 (runParameters.generationIntervalCountKey, [4] |> List.map string)
@@ -177,11 +193,13 @@ module MutationRate =
                 (runParameters.modificationRateKey, [0.25; 0.30; 0.40; 0.50;] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.identity
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.msrs32MutationRate
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 16
-        }
+                    "expInterval100_L50ss"
+                    "summaryInterval_C.1p5C"
+                    "sorter-sgd.msrs32-mutation-rate"
+                    RunParamBuilderNames.Filter.identity
+                    RunParamBuilderNames.Enhancer.msrs32MutationRate
+                    false
+            )
 
 
 
@@ -190,13 +208,14 @@ module MutationRate =
 
 
         
-        let Test2 (executorType: sorterSgdExecutorType) : runHostSpec = {
-            queryCatalogName = "sorter-sgd.msrs32-mutation-rate"
-            databaseName = dbMaxModRate_32Name
-            projectName = projName
-            runName = sprintf @"Test2%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-            spans = [
+        let Test2 (executorType: sorterSgdExecutorType) : run =
+            run.SgdRun (
+                SgdRun.create
+                    dbMaxModRate_32Name
+                    projName
+                    (sprintf @"Test2%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
                 (runParameters.generationCurrentKey, [0] |> List.map string)
                 (runParameters.generationIntervalCountKey, [10] |> List.map string)
@@ -206,11 +225,13 @@ module MutationRate =
                 (runParameters.mutationModKey, [0] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.identity
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.msrs32MutationRateMax
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 8
-        }
+                    "expInterval100_L50ss"
+                    "summaryInterval_C.1p5C"
+                    "sorter-sgd.msrs32-mutation-rate"
+                    RunParamBuilderNames.Filter.identity
+                    RunParamBuilderNames.Enhancer.msrs32MutationRateMax
+                    false
+            )
 
 
 
@@ -218,13 +239,14 @@ module MutationRate =
 
 
         
-        let WideTest (executorType: sorterSgdExecutorType) : runHostSpec = {
-            queryCatalogName = "sorter-sgd.msrs32-mutation-rate"
-            databaseName = dbMaxModRate_64Name
-            projectName = projName
-            runName = sprintf @"WideTest2%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-            runDescription = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-            spans = [
+        let WideTest (executorType: sorterSgdExecutorType) : run =
+            run.SgdRun (
+                SgdRun.create
+                    dbMaxModRate_64Name
+                    projName
+                    (sprintf @"WideTest2%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
                 (runParameters.generationCurrentKey, [0] |> List.map string)
                 (runParameters.generationIntervalCountKey, [10] |> List.map string)
@@ -234,8 +256,10 @@ module MutationRate =
                 (runParameters.mutationModKey, [0] |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.identity
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.msrs32MutationRateMax
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 16
-        }
+                    "expInterval100_L50ss"
+                    "summaryInterval_C.1p5C"
+                    "sorter-sgd.msrs32-mutation-rate"
+                    RunParamBuilderNames.Filter.identity
+                    RunParamBuilderNames.Enhancer.msrs32MutationRateMax
+                    false
+            )

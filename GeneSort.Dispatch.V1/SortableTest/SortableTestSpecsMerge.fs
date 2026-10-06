@@ -10,21 +10,22 @@ module SortableTestSpecsMerge =
 
     module Specs =
 
-        let Merge_Test  (executorType: sortableTestExecutorType) : runHostSpec = {
-            queryCatalogName = "sortable-test.merge"
-            databaseName = SortableTestDbs.Merge.dbName
-            projectName = CommonSortableTest.projectName
-            runName = sprintf @"Merge-Test_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Int8 merge sorter test sets"
-            spans = [
+        let Merge_Test  (executorType: sortableTestExecutorType) : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SortableTestDbs.Merge.dbName
+                    CommonSortableTest.projectName
+                    (sprintf @"Merge-Test_%s" (SortableTestExecutorType.toString executorType) |> UMX.tag)
+                    "Int8 merge sorter test sets"
+                    [
                 mergeLib_Merge32s
                 dataFormatInt8v512
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.mergeDimensionDividesSortingWidth
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sortableTest
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 1
-        }
+                    "sortable-test.merge"
+                    RunParamBuilderNames.Filter.mergeDimensionDividesSortingWidth
+                    RunParamBuilderNames.Enhancer.sortableTest
+                    false
+            )
 
 
     type configType =
@@ -36,6 +37,6 @@ module SortableTestSpecsMerge =
                         (configType.Merge_Test, Specs.Merge_Test); 
                     ]
 
-    let getRunHostSpec (config: configType) (executorType: sortableTestExecutorType) : runHostSpec =
+    let getRun (config: configType) (executorType: sortableTestExecutorType) : run =
         let specFunc = Configs.[config]
         specFunc executorType

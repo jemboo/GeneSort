@@ -29,13 +29,14 @@ module VarModR_32 =
 
 
 
-    let Pool_32_Test (executorType: sorterSgdExecutorType)  : runHostSpec = {
-        queryCatalogName = "sorter-sgd.msuf32-mutation-rate"
-        databaseName = dbPool32name
-        projectName = projName
-        runName = sprintf @"Pool_32_Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-        runDescription = "Rate comp for Msrs32p4a Msuf4"
-        spans = [
+    let Pool_32_Test (executorType: sorterSgdExecutorType)  : run =
+        run.SgdRun (
+            SgdRun.create
+                dbPool32name
+                projName
+                (sprintf @"Pool_32_Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                "Rate comp for Msrs32p4a Msuf4"
+                [
             (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
             (runParameters.codeModKey, ["NoMods"] |> List.map string)
             (runParameters.generationIntervalLastKey, [9] |> List.map string)
@@ -47,20 +48,23 @@ module VarModR_32 =
             (runParameters.modificationRateKey, [0.020; 0.050;]  |> List.map string)
             (runParameters.mutatorVariantKey, [mutatorVariant.V1; mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
         ]
-        filterCatalogName = RunParamBuilderNames.Filter.seedModificationRateDiffers
-        enhancerCatalogName = RunParamBuilderNames.Enhancer.msuf32MutationRate
-        allowOverwrite = false |> UMX.tag
-        maxParallel = 8
-    }
+                "expInterval100_L50ss"
+                "summaryInterval_C.1p5C"
+                "sorter-sgd.msuf32-mutation-rate"
+                RunParamBuilderNames.Filter.seedModificationRateDiffers
+                RunParamBuilderNames.Enhancer.msuf32MutationRate
+                false
+        )
 
 
-    let Pool_32_V1 (executorType: sorterSgdExecutorType)  : runHostSpec = {
-        queryCatalogName = "sorter-sgd.msuf32-mutation-rate"
-        databaseName = dbPool32name
-        projectName = projName
-        runName = sprintf @"Pool_32_V1%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-        runDescription = "Rate comp for Msrs32p4a Msuf4"
-        spans = [
+    let Pool_32_V1 (executorType: sorterSgdExecutorType)  : run =
+        run.SgdRun (
+            SgdRun.create
+                dbPool32name
+                projName
+                (sprintf @"Pool_32_V1%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                "Rate comp for Msrs32p4a Msuf4"
+                [
             (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
             (runParameters.codeModKey, ["NoMods"] |> List.map string)
             (runParameters.generationIntervalLastKey, [3] |> List.map string)
@@ -72,20 +76,23 @@ module VarModR_32 =
             (runParameters.modificationRateKey, [0.015; 0.020; 0.025; 0.030; 0.040; 0.050;] |> List.map string)
             (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
         ]
-        filterCatalogName = RunParamBuilderNames.Filter.identity
-        enhancerCatalogName = RunParamBuilderNames.Enhancer.msuf32MutationRate
-        allowOverwrite = false |> UMX.tag
-        maxParallel = 8
-    }
+                "expInterval100_L50ss"
+                "summaryInterval_C.1p5C"
+                "sorter-sgd.msuf32-mutation-rate"
+                RunParamBuilderNames.Filter.identity
+                RunParamBuilderNames.Enhancer.msuf32MutationRate
+                false
+        )
 
 
-    let Pool_512_V2a (executorType: sorterSgdExecutorType)  : runHostSpec = {
-        queryCatalogName = "sorter-sgd.msuf32-mutation-rate"
-        databaseName = dbPool512name
-        projectName = projName
-        runName = sprintf @"Pool_512_V2a%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-        runDescription = "Rate comp for Msrs32p4a Msuf4"
-        spans = [
+    let Pool_512_V2a (executorType: sorterSgdExecutorType)  : run =
+        run.SgdRun (
+            SgdRun.create
+                dbPool512name
+                projName
+                (sprintf @"Pool_512_V2a%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                "Rate comp for Msrs32p4a Msuf4"
+                [
             (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
             (runParameters.codeModKey, ["NoMods"] |> List.map string)
             (runParameters.generationIntervalLastKey, [3] |> List.map string)
@@ -97,8 +104,10 @@ module VarModR_32 =
             (runParameters.modificationRateKey, [0.020; 0.025; 0.030; 0.035; 0.040;] |> List.map string)
             (runParameters.mutatorVariantKey, [mutatorVariant.V2] |> List.map (MutatorVariant.toString))
         ]
-        filterCatalogName = RunParamBuilderNames.Filter.identity
-        enhancerCatalogName = RunParamBuilderNames.Enhancer.msuf32MutationRate
-        allowOverwrite = false |> UMX.tag
-        maxParallel = 8
-    }
+                "expInterval100_L50ss"
+                "summaryInterval_C.1p5C"
+                "sorter-sgd.msuf32-mutation-rate"
+                RunParamBuilderNames.Filter.identity
+                RunParamBuilderNames.Enhancer.msuf32MutationRate
+                false
+        )

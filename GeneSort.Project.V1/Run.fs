@@ -14,6 +14,9 @@ type simpleRun =
           description: string
           parameterSpans: (string * string list) list
           queryCatalogName: string
+          filterCatalogName: string
+          enhancerCatalogName: string
+          allowOverwrite: bool
         }
 
 module SimpleRun =
@@ -23,7 +26,10 @@ module SimpleRun =
             (runName: string<runName>)
             (description: string)
             (parameterSpans: (string * string list) list)
-            (queryCatalogName: string) : simpleRun =
+            (queryCatalogName: string)
+            (filterCatalogName: string)
+            (enhancerCatalogName: string)
+            (allowOverwrite: bool) : simpleRun =
         if String.IsNullOrWhiteSpace %databaseName then
             failwith "Database name cannot be empty"
         {
@@ -33,6 +39,9 @@ module SimpleRun =
           description = description
           parameterSpans = parameterSpans
           queryCatalogName = queryCatalogName
+          filterCatalogName = filterCatalogName
+          enhancerCatalogName = enhancerCatalogName
+          allowOverwrite = allowOverwrite
         }
 
     let databaseName (run: simpleRun) = run.dataBaseName
@@ -41,6 +50,9 @@ module SimpleRun =
     let description (run: simpleRun) = run.description
     let parameterSpans (run: simpleRun) = run.parameterSpans
     let queryCatalogName (run: simpleRun) = run.queryCatalogName
+    let filterCatalogName (run: simpleRun) = run.filterCatalogName
+    let enhancerCatalogName (run: simpleRun) = run.enhancerCatalogName
+    let allowOverwrite (run: simpleRun) = run.allowOverwrite
 
 type sgdRun =
     private
@@ -59,13 +71,26 @@ module SgdRun =
             (parameterSpans: (string * string list) list)
             (genSaveIntervalsName: string)
             (genSaveSubIntervalsName: string)
-            (queryCatalogName: string) : sgdRun =
+            (queryCatalogName: string)
+            (filterCatalogName: string)
+            (enhancerCatalogName: string)
+            (allowOverwrite: bool) : sgdRun =
         if String.IsNullOrWhiteSpace genSaveIntervalsName then
             invalidArg (nameof genSaveIntervalsName) "Generation save interval name cannot be empty"
         if String.IsNullOrWhiteSpace genSaveSubIntervalsName then
             invalidArg (nameof genSaveSubIntervalsName) "Generation summary interval name cannot be empty"
         {
-          baseRun = SimpleRun.create databaseName projectName runName description parameterSpans queryCatalogName
+          baseRun =
+              SimpleRun.create
+                  databaseName
+                  projectName
+                  runName
+                  description
+                  parameterSpans
+                  queryCatalogName
+                  filterCatalogName
+                  enhancerCatalogName
+                  allowOverwrite
           genSaveIntervalsName = genSaveIntervalsName
           genSaveSubIntervalsName = genSaveSubIntervalsName
         }
@@ -87,6 +112,9 @@ type run =
     member this.Description = SimpleRun.description this.BaseRun
     member this.ParameterSpans = SimpleRun.parameterSpans this.BaseRun
     member this.QueryCatalogName = SimpleRun.queryCatalogName this.BaseRun
+    member this.FilterCatalogName = SimpleRun.filterCatalogName this.BaseRun
+    member this.EnhancerCatalogName = SimpleRun.enhancerCatalogName this.BaseRun
+    member this.AllowOverwrite = SimpleRun.allowOverwrite this.BaseRun
     member this.GenSaveIntervalsName =
         match this with
         | SimpleRun _ -> None

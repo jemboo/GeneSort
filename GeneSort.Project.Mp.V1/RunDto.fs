@@ -22,6 +22,9 @@ type runDto =
         GenSaveIntervalsName: string
         GenSaveSubIntervalsName: string
         QueryCatalogName: string
+        FilterCatalogName: string
+        EnhancerCatalogName: string
+        AllowOverwrite: bool
     }
 
 module RunDto =
@@ -37,6 +40,9 @@ module RunDto =
             GenSaveIntervalsName = saveIntervalsName
             GenSaveSubIntervalsName = saveSubIntervalsName
             QueryCatalogName = project.QueryCatalogName
+            FilterCatalogName = project.FilterCatalogName
+            EnhancerCatalogName = project.EnhancerCatalogName
+            AllowOverwrite = project.AllowOverwrite
             ParameterSpans =
                 project.ParameterSpans
                 |> List.map (fun (key, values) -> { Key = key; Values = List.toArray values })
@@ -57,9 +63,22 @@ module RunDto =
             dto.QueryCatalogName
             |> Option.ofObj
             |> Option.defaultValue (sprintf "%s.%s" dto.ProjectName dto.DataBaseName)
+        let filterCatalogName = dto.FilterCatalogName |> Option.ofObj |> Option.defaultValue "identity"
+        let enhancerCatalogName = dto.EnhancerCatalogName |> Option.ofObj |> Option.defaultValue "sortable-test"
+        let allowOverwrite = dto.AllowOverwrite
         match Option.ofObj dto.GenSaveIntervalsName, Option.ofObj dto.GenSaveSubIntervalsName with
         | None, None ->
-            SimpleRun (SimpleRun.create databaseName projectName runName dto.Description parameterSpans queryCatalogName)
+            SimpleRun (
+                SimpleRun.create
+                    databaseName
+                    projectName
+                    runName
+                    dto.Description
+                    parameterSpans
+                    queryCatalogName
+                    filterCatalogName
+                    enhancerCatalogName
+                    allowOverwrite)
         | saveIntervals, saveSubIntervals ->
             SgdRun (
                 SgdRun.create
@@ -71,4 +90,7 @@ module RunDto =
                     (saveIntervals |> Option.defaultValue "expInterval100_L50ss")
                     (saveSubIntervals |> Option.defaultValue "summaryInterval_C.1p5C")
                     queryCatalogName
+                    filterCatalogName
+                    enhancerCatalogName
+                    allowOverwrite
             )

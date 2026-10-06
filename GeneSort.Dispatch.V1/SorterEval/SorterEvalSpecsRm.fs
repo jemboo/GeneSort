@@ -13,13 +13,14 @@ module SorterEvalSpecsRm =
 
     module Specs =
 
-        let Rand_MergeTest_Test (executorType: sorterEvalExecutorType) : runHostSpec = {
-            queryCatalogName = "sorter-eval.merge"
-            databaseName = SorterEvalDbs.Merge.dbName
-            projectName = SorterEvalDbs.projectName
-            runName = sprintf @"Rand_MergeTest-Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
-            spans = [   
+        let Rand_MergeTest_Test (executorType: sorterEvalExecutorType) : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SorterEvalDbs.Merge.dbName
+                    SorterEvalDbs.projectName
+                    (sprintf @"Rand_MergeTest-Test_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag)
+                    "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
+                    [   
                 rngTypeLcg
                 mergeLib_Merge32s
                 dataFormatInt8v512
@@ -28,20 +29,21 @@ module SorterEvalSpecsRm =
                 sorterEvalTypeV2
                 smallSorterCount
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.mergeSorterModelCompatibility
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterEvalMerge
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 1
-        }
+                    "sorter-eval.merge"
+                    RunParamBuilderNames.Filter.mergeSorterModelCompatibility
+                    RunParamBuilderNames.Enhancer.sorterEvalMerge
+                    false
+            )
 
 
-        let Rand_MergeTest_Small (executorType: sorterEvalExecutorType) : runHostSpec = {
-            queryCatalogName = "sorter-eval.merge"
-            databaseName = SorterEvalDbs.Merge.dbName
-            projectName = SorterEvalDbs.projectName
-            runName = sprintf @"Rand_MergeTest-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
-            spans = [
+        let Rand_MergeTest_Small (executorType: sorterEvalExecutorType) : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SorterEvalDbs.Merge.dbName
+                    SorterEvalDbs.projectName
+                    (sprintf @"Rand_MergeTest-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag)
+                    "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
+                    [
                 rngTypeLcg
                 dataFormatInt8v512
                 allSimpleSorterModelTypes
@@ -51,20 +53,21 @@ module SorterEvalSpecsRm =
                 allMergeDimensions
                 extraLargeSorterCount
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.mergeSorterModelCompatibility
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterEvalMerge
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 8
-        }
+                    "sorter-eval.merge"
+                    RunParamBuilderNames.Filter.mergeSorterModelCompatibility
+                    RunParamBuilderNames.Enhancer.sorterEvalMerge
+                    false
+            )
 
 
-        let Rand_MergeTest_MediumLd (executorType: sorterEvalExecutorType) : runHostSpec = {
-            queryCatalogName = "sorter-eval.merge"
-            databaseName = SorterEvalDbs.Merge.dbName
-            projectName = SorterEvalDbs.projectName
-            runName = sprintf @"Rand_MergeTest-MediumLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
-            spans = [
+        let Rand_MergeTest_MediumLd (executorType: sorterEvalExecutorType) : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SorterEvalDbs.Merge.dbName
+                    SorterEvalDbs.projectName
+                    (sprintf @"Rand_MergeTest-MediumLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag)
+                    "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
+                    [
                 rngTypeLcg
                 dataFormatInt8v512
                 allSimpleSorterModelTypes
@@ -74,20 +77,21 @@ module SorterEvalSpecsRm =
                 lowMergeDimensions
                 largeSorterCount
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.mergeSorterModelCompatibility
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterEvalMerge
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 4
-        }
+                    "sorter-eval.merge"
+                    RunParamBuilderNames.Filter.mergeSorterModelCompatibility
+                    RunParamBuilderNames.Enhancer.sorterEvalMerge
+                    false
+            )
 
 
-        let Rand_MergeTest_MediumHd (executorType: sorterEvalExecutorType) : runHostSpec = {
-            queryCatalogName = "sorter-eval.merge"
-            databaseName = SorterEvalDbs.Merge.dbName
-            projectName = SorterEvalDbs.projectName
-            runName = sprintf @"Rand_MergeTest-MediumHd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
-            spans = [
+        let Rand_MergeTest_MediumHd (executorType: sorterEvalExecutorType) : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SorterEvalDbs.Merge.dbName
+                    SorterEvalDbs.projectName
+                    (sprintf @"Rand_MergeTest-MediumHd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag)
+                    "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
+                    [
                 rngTypeLcg
                 dataFormatInt8v512
                 noSuffixSuffixType
@@ -97,20 +101,21 @@ module SorterEvalSpecsRm =
                 mergeDimension6
                 largeSorterCount
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.mergeSorterModelCompatibility
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterEvalMerge
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 2
-        }
+                    "sorter-eval.merge"
+                    RunParamBuilderNames.Filter.mergeSorterModelCompatibility
+                    RunParamBuilderNames.Enhancer.sorterEvalMerge
+                    false
+            )
 
 
-        let Rand_MergeTest_LargeLd (executorType: sorterEvalExecutorType) : runHostSpec = {
-            queryCatalogName = "sorter-eval.merge"
-            databaseName = SorterEvalDbs.Merge.dbName
-            projectName = SorterEvalDbs.projectName
-            runName = sprintf @"Rand_MergeTest-LargeLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag
-            runDescription = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
-            spans = [
+        let Rand_MergeTest_LargeLd (executorType: sorterEvalExecutorType) : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SorterEvalDbs.Merge.dbName
+                    SorterEvalDbs.projectName
+                    (sprintf @"Rand_MergeTest-LargeLd_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag)
+                    "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
+                    [
                 rngTypeLcg
                 dataFormatInt8v512
                 noSuffixSuffixType
@@ -120,11 +125,11 @@ module SorterEvalSpecsRm =
                 mergeDimension2
                 largeSorterCount
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.mergeSorterModelCompatibility
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterEvalMerge
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 2
-        }
+                    "sorter-eval.merge"
+                    RunParamBuilderNames.Filter.mergeSorterModelCompatibility
+                    RunParamBuilderNames.Enhancer.sorterEvalMerge
+                    false
+            )
 
 
     type configType =
@@ -144,6 +149,6 @@ module SorterEvalSpecsRm =
                         (configType.Rand_MergeTest_LargeLd, Specs.Rand_MergeTest_LargeLd);
                     ]
 
-    let getRunHostSpec (config: configType) (executorType: sorterEvalExecutorType) : runHostSpec =
+    let getRun (config: configType) (executorType: sorterEvalExecutorType) : run =
         let specFunc = Configs.[config]
         specFunc executorType

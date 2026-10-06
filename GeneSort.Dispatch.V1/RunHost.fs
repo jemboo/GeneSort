@@ -6,30 +6,16 @@ open GeneSort.FileDb.V1
 open GeneSort.Project.V1
 open GeneSort.Core
 
-type runHostSpec = {
-    queryCatalogName: string
-    projectName: string<projectName>
-    databaseName: string<databaseName>
-    runName: string<runName>
-    runDescription: string
-    spans: (string * string list) list
-    filterCatalogName: string
-    enhancerCatalogName: string
-    allowOverwrite: bool<allowOverwrite>
-    maxParallel: int
-}
-
-module runHostSpec =
-    let makeDataFolder (spec: runHostSpec) =
-        @$"c:\Projects\{%spec.projectName}\{%spec.databaseName}\Data"
+module RunHost =
+    let makeDataFolder (run: run) =
+        @$"c:\Projects\{%run.ProjectName}\{%run.DatabaseName}\Data"
         |> UMX.tag<pathToRootFolder>
 
-    let makeDatabase (spec: runHostSpec) : IGeneSortDb =
-        new GeneSortDbMp(makeDataFolder spec, spec.queryCatalogName)
+    let makeDatabase (run: run) : IGeneSortDb =
+        new GeneSortDbMp(makeDataFolder run, run.QueryCatalogName)
 
 type simpleRunHost = private {
     projectDb: IGeneSortDb
-    spec: runHostSpec
     run: simpleRun
     queryParamsFromRunParams: queryParamsBuilder
     maxParallel: int
@@ -48,13 +34,18 @@ type runHost =
     | SimpleRunHost of simpleRunHost
     | SgdRunHost of sgdRunHost
 
-    static member Create (db: IGeneSortDb) (spec: runHostSpec) (run: run) =
+    static member Create (run: run) (maxParallel: int) =
+        let db = RunHost.makeDatabase run
+
         let makeSimpleHost (simple: simpleRun) =
             { projectDb = db
-              spec = spec
               run = simple
-              queryParamsFromRunParams = QueryParamsCatalog.get spec.queryCatalogName spec.projectName (SimpleRun.databaseName simple)
-              maxParallel = spec.maxParallel }
+              queryParamsFromRunParams =
+                  QueryParamsCatalog.get
+                      run.QueryCatalogName
+                      run.ProjectName
+                      run.DatabaseName
+              maxParallel = maxParallel }
 
         let lookupInterval name =
             match GenIntervalRegistry.genIntervalConfigsDict.TryGetValue name with
@@ -71,25 +62,6 @@ type runHost =
                 genSaveIntervals = SgdRun.genSaveIntervalsName value |> lookupInterval
                 genSaveSubIntervals = SgdRun.genSaveSubIntervalsName value |> lookupInterval
             }
-
-    static member CreateSgd (spec: runHostSpec) =
-        let db = runHostSpec.makeDatabase spec
-        let sgdRun =
-            SgdRun.create
-                spec.databaseName
-                spec.projectName
-                spec.runName
-                spec.runDescription
-                spec.spans
-                "expInterval100_L50ss"
-                "summaryInterval_C.1p5C"
-                spec.queryCatalogName
-        runHost.Create db spec (run.SgdRun sgdRun)
-
-    member this.Spec =
-        match this with
-        | SimpleRunHost host -> host.spec
-        | SgdRunHost host -> host.simpleHost.spec
 
     member this.RunDb =
         match this with
@@ -116,7 +88,7 @@ type runHost =
         | SimpleRunHost _ -> None
         | SgdRunHost host -> Some host.GenSaveSubIntervals
 
-    member this.AllowOverwrite = this.Spec.allowOverwrite
+    member this.AllowOverwrite = this.Run.AllowOverwrite |> UMX.tag<allowOverwrite>
 
     member this.MaxParallel =
         match this with
@@ -124,10 +96,8 @@ type runHost =
         | SgdRunHost host -> host.simpleHost.maxParallel
 
     member this.ParamMapRefiner (runParametersSeq: runParameters seq) : runParameters seq =
-        let filter = RunParamFilterBuilders.get this.Spec.filterCatalogName
-        let enhancer = RunParamEnhancerBuilders.get this.Spec.enhancerCatalogName
+        let filter = RunParamFilterBuilders.get this.Run.FilterCatalogName
+        let enhancer = RunParamEnhancerBuilders.get this.Run.EnhancerCatalogName
         let context = { QueryParamsFromRunParams = this.QueryParamsFromRunParams; Run = this.Run }
         runParametersSeq
         |> Seq.choose (filter >> Option.map (enhancer context))
-
-

@@ -21,13 +21,14 @@ module MutateSpecsRs =
 
     module Specs =
 
-        let Test_Msrs (executorType: sorterMutateExecutorType)  : runHostSpec = {
-            queryCatalogName = "sorter-mutate.standard"
-            databaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
-            projectName = SorterMutateDbs.projectName
-            runName = sprintf @"Rand-Test_Msrs%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for Msrs"
-            spans = [
+        let Test_Msrs (executorType: sorterMutateExecutorType)  : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SorterMutateDbs.RandomStandard.Uniform.dbName
+                    SorterMutateDbs.projectName
+                    (sprintf @"Rand-Test_Msrs%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag)
+                    "Mutation analysis for Msrs"
+                    [
                 msrsModelType
                 rngTypeLcg
                 dataFomatBitv512
@@ -40,20 +41,21 @@ module MutateSpecsRs =
                 testChildCount
                 mutationMod1
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.standardSorterModelCompatibility
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 1
-        }
+                    "sorter-mutate.standard"
+                    RunParamBuilderNames.Filter.standardSorterModelCompatibility
+                    RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
+                    false
+            )
 
 
-        let Test_Msuf4 (executorType: sorterMutateExecutorType)  : runHostSpec = {
-            queryCatalogName = "sorter-mutate.standard"
-            databaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
-            projectName = SorterMutateDbs.projectName
-            runName = sprintf @"Rand-Test_Msuf4%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for Msuf4"
-            spans = [
+        let Test_Msuf4 (executorType: sorterMutateExecutorType)  : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SorterMutateDbs.RandomStandard.Uniform.dbName
+                    SorterMutateDbs.projectName
+                    (sprintf @"Rand-Test_Msuf4%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag)
+                    "Mutation analysis for Msuf4"
+                    [
                 msuf4ModelType
                 rngTypeLcg
                 dataFomatBitv512
@@ -66,11 +68,11 @@ module MutateSpecsRs =
                 testChildCount
                 mutationMod1
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.standardSorterModelCompatibility
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 1
-        }
+                    "sorter-mutate.standard"
+                    RunParamBuilderNames.Filter.standardSorterModelCompatibility
+                    RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
+                    false
+            )
 
 
 
@@ -86,7 +88,7 @@ module MutateSpecsRs =
                         (configType.Test_Msrs, Specs.Test_Msrs); 
                     ]
 
-    let getRunHostSpec (config: configType) (executorType: sorterMutateExecutorType) : runHostSpec =
+    let getRun (config: configType) (executorType: sorterMutateExecutorType) : run =
         let specFunc = Configs.[config]
         specFunc executorType
 

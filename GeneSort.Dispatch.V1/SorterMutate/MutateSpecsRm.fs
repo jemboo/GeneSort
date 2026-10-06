@@ -20,13 +20,14 @@ module MutateSpecsRm =
 
     module Specs =
 
-        let Test_Msce (executorType: sorterMutateExecutorType)  : runHostSpec = {
-            queryCatalogName = "sorter-mutate.merge"
-            databaseName = SorterMutateDbs.RandomMerge.Uniform.dbName
-            projectName = SorterMutateDbs.projectName
-            runName = sprintf @"Test-Msce_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for merge Msce"
-            spans = [
+        let Test_Msce (executorType: sorterMutateExecutorType)  : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SorterMutateDbs.RandomMerge.Uniform.dbName
+                    SorterMutateDbs.projectName
+                    (sprintf @"Test-Msce_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag)
+                    "Mutation analysis for merge Msce"
+                    [
                 msceModelType
                 rngTypeLcg
                 dataFormatInt8v512
@@ -39,20 +40,21 @@ module MutateSpecsRm =
                 testChildCount
                 mutationMod1
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.mergeSorterModelCompatibility
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterMutateStandard
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 4
-        }
+                    "sorter-mutate.merge"
+                    RunParamBuilderNames.Filter.mergeSorterModelCompatibility
+                    RunParamBuilderNames.Enhancer.sorterMutateStandard
+                    false
+            )
 
 
-        let Test_Mssi (executorType: sorterMutateExecutorType)  : runHostSpec = {
-            queryCatalogName = "sorter-mutate.merge"
-            databaseName = SorterMutateDbs.RandomMerge.Uniform.dbName
-            projectName = SorterMutateDbs.projectName
-            runName = sprintf @"Test-Mssi_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for merge Mssi"
-            spans = [
+        let Test_Mssi (executorType: sorterMutateExecutorType)  : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SorterMutateDbs.RandomMerge.Uniform.dbName
+                    SorterMutateDbs.projectName
+                    (sprintf @"Test-Mssi_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag)
+                    "Mutation analysis for merge Mssi"
+                    [
                 mssiModelType
                 rngTypeLcg
                 dataFormatInt8v512
@@ -65,20 +67,21 @@ module MutateSpecsRm =
                 testChildCount
                 mutationMod1
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.mergeSorterModelCompatibility
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterMutateStandard
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 4
-        }
+                    "sorter-mutate.merge"
+                    RunParamBuilderNames.Filter.mergeSorterModelCompatibility
+                    RunParamBuilderNames.Enhancer.sorterMutateStandard
+                    false
+            )
 
 
-        let Test_Msrs (executorType: sorterMutateExecutorType)  : runHostSpec = {
-            queryCatalogName = "sorter-mutate.merge"
-            databaseName = SorterMutateDbs.RandomMerge.Uniform.dbName
-            projectName = SorterMutateDbs.projectName
-            runName = sprintf @"Test-Msrs_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for merge Msrs"
-            spans = [
+        let Test_Msrs (executorType: sorterMutateExecutorType)  : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SorterMutateDbs.RandomMerge.Uniform.dbName
+                    SorterMutateDbs.projectName
+                    (sprintf @"Test-Msrs_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag)
+                    "Mutation analysis for merge Msrs"
+                    [
                 msrsModelType
                 rngTypeLcg
                 dataFormatInt8v512
@@ -91,19 +94,20 @@ module MutateSpecsRm =
                 testChildCount
                 mutationMod1
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.mergeSorterModelCompatibility
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterMutateStandard
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 4
-        }
+                    "sorter-mutate.merge"
+                    RunParamBuilderNames.Filter.mergeSorterModelCompatibility
+                    RunParamBuilderNames.Enhancer.sorterMutateStandard
+                    false
+            )
 
-        let Test_Msuf4 (executorType: sorterMutateExecutorType)  : runHostSpec = {
-            queryCatalogName = "sorter-mutate.merge"
-            databaseName = SorterMutateDbs.RandomMerge.Uniform.dbName
-            projectName = SorterMutateDbs.projectName
-            runName = sprintf @"Test-Msuf4_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag
-            runDescription = "Mutation analysis for merge Msuf4"
-            spans = [
+        let Test_Msuf4 (executorType: sorterMutateExecutorType)  : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SorterMutateDbs.RandomMerge.Uniform.dbName
+                    SorterMutateDbs.projectName
+                    (sprintf @"Test-Msuf4_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag)
+                    "Mutation analysis for merge Msuf4"
+                    [
                 msuf4ModelType
                 rngTypeLcg
                 dataFormatInt8v512
@@ -116,11 +120,11 @@ module MutateSpecsRm =
                 testChildCount
                 mutationMod1
             ]
-            filterCatalogName = RunParamBuilderNames.Filter.mergeSorterModelCompatibility
-            enhancerCatalogName = RunParamBuilderNames.Enhancer.sorterMutateStandard
-            allowOverwrite = false |> UMX.tag
-            maxParallel = 4
-        }
+                    "sorter-mutate.merge"
+                    RunParamBuilderNames.Filter.mergeSorterModelCompatibility
+                    RunParamBuilderNames.Enhancer.sorterMutateStandard
+                    false
+            )
 
 
     type configType =
@@ -138,7 +142,7 @@ module MutateSpecsRm =
                         (configType.Test_Msuf4, Specs.Test_Msuf4);
                     ]
 
-    let getRunHostSpec (config: configType) (executorType: sorterMutateExecutorType) : runHostSpec =
+    let getRun (config: configType) (executorType: sorterMutateExecutorType) : run =
         let specFunc = Configs.[config]
         specFunc executorType
 

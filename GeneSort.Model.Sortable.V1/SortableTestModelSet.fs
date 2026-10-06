@@ -30,12 +30,6 @@ type sortableTestModelSet =
                 this.SorterTestModels
                 |> Array.map(fun model -> SortableTestModel.makeSortableTest sorterTestId model sortableDataType)
 
-        //match sortableDataType with
-        //| sortableDataType.Bools ->
-        //    (sortableBoolTestSet.create id sortableTestArray) |> sortableTestSet.Bools
-        //| sortableDataType.Ints -> 
-
-
         match sortableDataType with
         | sortableDataFormat.BoolArray -> 
             let boolTests = 
@@ -64,3 +58,5 @@ type sortableTestModelSet =
                     | sortableTest.Ints it -> it
                     | _ -> failwith "Inconsistent SorterTestModelSet: expected Ints")
             sortableTestSet.Ints (sortableIntTestSet.create id intTests)
+
+        | _ -> failwith "Unsupported sortableDataType for SortableTestModelSet"

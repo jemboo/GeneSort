@@ -48,7 +48,7 @@ module DispatchSortableTest =
     //let configType = SortableTestSpecsMerge.configType.Merge_Test
     //let executorType = SortableTest.sortableTestExecutorType.GenMerge
     //let host: runHost = 
-    //    let spec = SortableTestSpecsMerge.getRunHostSpec configType executorType
+    //    let spec = SortableTestSpecsMerge.getRun configType executorType
     //    SortableTestDbs.createRunHost spec
 
 
@@ -56,8 +56,8 @@ module DispatchSortableTest =
     let private configType = SortableTestSpecsPrefix.configType.Prefix_32
     let private executorType = SortableTest.sortableTestExecutorType.GenPrefix
     let private host: runHost = 
-        let spec = SortableTestSpecsPrefix.getRunHostSpec configType executorType
-        SortableTestDbs.createRunHost spec
+        let run = SortableTestSpecsPrefix.getRun configType executorType
+        runHost.Create run 1
 
 
 

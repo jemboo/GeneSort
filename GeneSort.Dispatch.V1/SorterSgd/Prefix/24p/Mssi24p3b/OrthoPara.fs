@@ -19,13 +19,14 @@ let dbOrthoPara128Name = "OrthoPara128" |> UMX.tag<databaseName>
 
 module Specs64 =
 
-    let NoMods (executorType: sorterSgdExecutorType)  : runHostSpec = {
-        queryCatalogName = "sorter-sgd.mssi-ortho-para"
-        databaseName = dbOrthoPara64Name
-        projectName = projName
-        runName = sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-        runDescription = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
-        spans = [
+    let NoMods (executorType: sorterSgdExecutorType)  : run =
+        run.SgdRun (
+            SgdRun.create
+                dbOrthoPara64Name
+                projName
+                (sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
+                [
             (runParameters.codeModKey, ["NoMods"] |> List.map string)
             (runParameters.generationCurrentKey, [0] |> List.map string)
             (runParameters.generationIntervalCountKey, [1] |> List.map string)
@@ -35,20 +36,23 @@ module Specs64 =
             (runParameters.mutationModKey, [0] |> List.map string)
             (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
         ]
-        filterCatalogName = RunParamBuilderNames.Filter.identity
-        enhancerCatalogName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
-        allowOverwrite = false |> UMX.tag
-        maxParallel = 8
-    }
+                "expInterval100_L50ss"
+                "summaryInterval_C.1p5C"
+                "sorter-sgd.mssi-ortho-para"
+                RunParamBuilderNames.Filter.identity
+                RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+                false
+        )
 
 
-    let SymForceDiff1 (executorType: sorterSgdExecutorType)  : runHostSpec = {
-        queryCatalogName = "sorter-sgd.mssi-ortho-para"
-        databaseName = dbOrthoPara64Name
-        projectName = projName
-        runName = sprintf @"SymForce_Diff1%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-        runDescription = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
-        spans = [
+    let SymForceDiff1 (executorType: sorterSgdExecutorType)  : run =
+        run.SgdRun (
+            SgdRun.create
+                dbOrthoPara64Name
+                projName
+                (sprintf @"SymForce_Diff1%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
+                [
             (runParameters.codeModKey, ["SymForce_Diff1"] |> List.map string)
             (runParameters.generationCurrentKey, [0] |> List.map string)
             (runParameters.generationIntervalCountKey, [5] |> List.map string)
@@ -58,20 +62,23 @@ module Specs64 =
             (runParameters.mutationModKey, [0] |> List.map string)
             (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
         ]
-        filterCatalogName = RunParamBuilderNames.Filter.identity
-        enhancerCatalogName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
-        allowOverwrite = false |> UMX.tag
-        maxParallel = 8
-    }
+                "expInterval100_L50ss"
+                "summaryInterval_C.1p5C"
+                "sorter-sgd.mssi-ortho-para"
+                RunParamBuilderNames.Filter.identity
+                RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+                false
+        )
 
 
-    let SymForce (executorType: sorterSgdExecutorType)  : runHostSpec = {
-        queryCatalogName = "sorter-sgd.mssi-ortho-para"
-        databaseName = dbOrthoPara64Name
-        projectName = projName
-        runName = sprintf @"SymForce%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-        runDescription = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
-        spans = [
+    let SymForce (executorType: sorterSgdExecutorType)  : run =
+        run.SgdRun (
+            SgdRun.create
+                dbOrthoPara64Name
+                projName
+                (sprintf @"SymForce%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
+                [
             (runParameters.codeModKey, ["SymForce"] |> List.map string)
             (runParameters.generationCurrentKey, [0] |> List.map string)
             (runParameters.generationIntervalCountKey, [5] |> List.map string)
@@ -81,22 +88,25 @@ module Specs64 =
             (runParameters.mutationModKey, [0] |> List.map string)
             (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
         ]
-        filterCatalogName = RunParamBuilderNames.Filter.identity
-        enhancerCatalogName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
-        allowOverwrite = false |> UMX.tag
-        maxParallel = 8
-    }
+                "expInterval100_L50ss"
+                "summaryInterval_C.1p5C"
+                "sorter-sgd.mssi-ortho-para"
+                RunParamBuilderNames.Filter.identity
+                RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+                false
+        )
 
 
 module Specs128 =
 
-    let NoMods (executorType: sorterSgdExecutorType)  : runHostSpec = {
-        queryCatalogName = "sorter-sgd.mssi-ortho-para"
-        databaseName = dbOrthoPara128Name
-        projectName = projName
-        runName = sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag
-        runDescription = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
-        spans = [
+    let NoMods (executorType: sorterSgdExecutorType)  : run =
+        run.SgdRun (
+            SgdRun.create
+                dbOrthoPara128Name
+                projName
+                (sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
+                [
             (runParameters.codeModKey, ["NoMods"] |> List.map string)
             (runParameters.generationCurrentKey, [0] |> List.map string)
             (runParameters.generationIntervalCountKey, [6] |> List.map string)
@@ -106,8 +116,10 @@ module Specs128 =
             (runParameters.mutationModKey, [0] |> List.map string)
             (runParameters.selectedSorterCountPerPoolKey, [128;] |> List.map string)
         ]
-        filterCatalogName = RunParamBuilderNames.Filter.identity
-        enhancerCatalogName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
-        allowOverwrite = false |> UMX.tag
-        maxParallel = 8
-    }
+                "expInterval100_L50ss"
+                "summaryInterval_C.1p5C"
+                "sorter-sgd.mssi-ortho-para"
+                RunParamBuilderNames.Filter.identity
+                RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+                false
+        )
