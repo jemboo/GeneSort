@@ -51,4 +51,4 @@ type sortableBinaryTests =
             this.Id = other.Id && Array.forall2 (=) this.sortableBinaryArrays other.sortableBinaryArrays
 
 
-module SortableBoolTests = ()
+module SortableBinaryTests = ()

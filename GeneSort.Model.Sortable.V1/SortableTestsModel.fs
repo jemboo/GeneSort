@@ -23,25 +23,25 @@ module SortableTestsModel =
 
     let makeSortableTests 
             (sorterTestId: Guid<sortableTestsId>)
-            (simpleSortableTM: sortableTestsModel) 
+            (sortableTM: sortableTestsModel) 
             (sortableDF: sortableDataFormat) : sortableTests =
 
-        match simpleSortableTM with
+        match sortableTM with
 
         | MsasF msasF -> 
                 match sortableDF with
                 | sortableDataFormat.BoolArray ->        
-                    (msasF.MakeSortableBoolTest sorterTestId (getSortingWidth simpleSortableTM)) |> sortableTests.Bools
+                    (msasF.MakeSortableBoolTest sorterTestId (getSortingWidth sortableTM)) |> sortableTests.Bools
                 | sortableDataFormat.IntArray ->
-                    (msasF.MakeSortableIntTest sorterTestId (getSortingWidth simpleSortableTM)) |> sortableTests.Ints
+                    (msasF.MakeSortableIntTest sorterTestId (getSortingWidth sortableTM)) |> sortableTests.Ints
                 | sortableDataFormat.BitVector256 ->
                     failwith "BitVector256 SortableArrayType not supported"
                 | sortableDataFormat.BitVector512 ->
-                    (msasF.MakeSortableBitv512Test sorterTestId (getSortingWidth simpleSortableTM)) |> sortableTests.Bitv512
+                    (msasF.MakeSortableBitv512Test sorterTestId (getSortingWidth sortableTM)) |> sortableTests.Bitv512
                 | sortableDataFormat.Int8Vector256 ->
-                    (msasF.MakeSortableUint8v256Test sorterTestId (getSortingWidth simpleSortableTM)) |> sortableTests.Uint8v256
+                    (msasF.MakeSortableUint8v256Test sorterTestId (getSortingWidth sortableTM)) |> sortableTests.Uint8v256
                 | sortableDataFormat.Int8Vector512  -> 
-                    (msasF.MakeSortableUint8v512Test sorterTestId (getSortingWidth simpleSortableTM)) |> sortableTests.Uint8v512
+                    (msasF.MakeSortableUint8v512Test sorterTestId (getSortingWidth sortableTM)) |> sortableTests.Uint8v512
                 | sortableDataFormat.PackedIntArray ->
                     failwith "PackedIntArray SortableArrayType not supported"
 
