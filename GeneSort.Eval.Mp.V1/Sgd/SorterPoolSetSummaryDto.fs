@@ -16,6 +16,7 @@ open GeneSort.Core
 type sorterPoolSummaryDto = {
     sorterPoolId: Guid
     sorterPoolName: string
+    sortableTestsSubsetId: string
     aveCeLength: float
     minCeLength: int
     minStageLength: int
@@ -54,6 +55,7 @@ module SorterPoolSetSummaryDto =
                 { 
                     sorterPoolSummaryDto.sorterPoolId = UMX.untag p.SorterPoolId
                     sorterPoolName = UMX.untag p.SorterPoolName
+                    sortableTestsSubsetId = UMX.untag p.SortableTestsSubsetId
                     aveCeLength = UMX.untag p.AveCeLength
                     minCeLength = UMX.untag p.MinCeLength
                     minStageLength = UMX.untag p.MinStageLength
@@ -80,6 +82,7 @@ module SorterPoolSetSummaryDto =
                 sorterPoolSummary.create
                     (p.sorterPoolId |> UMX.tag<sorterPoolId>)
                     (p.sorterPoolName |> UMX.tag<sorterPoolName>)
+                    (if String.IsNullOrWhiteSpace p.sortableTestsSubsetId then SortableTestsSubsetId.Default else p.sortableTestsSubsetId |> UMX.tag<sortableTestsSubsetId>)
                     (p.rawCeLength |> UMX.tag<ceLength>)
                     (p.minCeLength |> UMX.tag<ceLength>)
                     (p.aveCeLength |> UMX.tag<ceLength>)

@@ -57,7 +57,7 @@ module SorterPoolSetDto =
                             sorterMutationSource = m.SorterMutationSource |> Option.map SorterMutationSourceDto.toDto
                             sorterEvalDto = m.SorterEval |> Option.map SorterEvalDto.fromDomain
                             sorterEvalDtos =
-                                m.SorterEvals
+                                m.SorterEvalMap
                                 |> Map.toSeq
                                 |> Seq.map (fun (subsetId, evaluation) ->
                                     %subsetId, SorterEvalDto.fromDomain evaluation)

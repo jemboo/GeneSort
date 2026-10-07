@@ -14,7 +14,7 @@ type sorterPoolMember =
         _mutationIndex:        int<mutationIndex>
         _mutationMod:          int<mutationMod>
         _sorterMutationSource: sorterMutationSource option
-        _sorterEval:           Map<string<sortableTestsSubsetId>, sorterEval>
+        _sorterEvalMap:        Map<string<sortableTestsSubsetId>, sorterEval>
         _birthday:             int<generationNumber>
     }
 
@@ -26,8 +26,8 @@ type sorterPoolMember =
     member this.MutationIndex = this._mutationIndex
     member this.MutationMod = this._mutationMod
     member this.SorterMutationSource = this._sorterMutationSource
-    member this.SorterEvals = this._sorterEval
-    member this.SorterEval = Map.tryFind SortableTestsSubsetId.Default this._sorterEval
+    member this.SorterEvalMap = this._sorterEvalMap
+    member this.SorterEval = Map.tryFind SortableTestsSubsetId.Default this._sorterEvalMap
 
     static member create 
                     sorterPoolMemberId 
@@ -43,7 +43,7 @@ type sorterPoolMember =
             _mutationIndex = mutationIndex 
             _mutationMod = mutationMod
             _sorterMutationSource = sorterMutationSource
-            _sorterEval = sorterEval
+            _sorterEvalMap = sorterEval
             _birthday = birthday
         }
 
@@ -75,9 +75,9 @@ module SorterPoolMember =
         match eval with
         | Some value ->
             { spm with
-                _sorterEval =
-                    Map.add (SorterEval.getSortableTestsSubsetId value) value spm._sorterEval }
-        | None -> { spm with _sorterEval = Map.empty }
+                _sorterEvalMap =
+                    Map.add (SorterEval.getSortableTestsSubsetId value) value spm._sorterEvalMap }
+        | None -> { spm with _sorterEvalMap = Map.empty }
 
     /// Generates 'mutantCount' new mutants, updating the parent's index by 'mutantCount'
     let mutate (sorterModelMut: sorterModelMutator) 
