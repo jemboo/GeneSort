@@ -28,7 +28,7 @@ type sortBlockBitv512 =
             
             for testIdx = 0 to inputCount - 1 do
                 // If value is non-zero, it's a '1' in 0-1 principle
-                if arrays.[testIdx].Values.[wireIdx] <> 0 then
+                if arrays.[testIdx].Item(wireIdx) <> 0 then
                     let lane = testIdx / 64
                     let bit = testIdx % 64
                     buffer.[lane] <- buffer.[lane] ||| (1uL <<< bit)

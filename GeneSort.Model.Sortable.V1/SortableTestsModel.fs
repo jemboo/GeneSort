@@ -83,3 +83,14 @@ module SortableTestsModel =
                      msasPfx.MakeSortableBitv512Test sorterTestId |> sortableTests.Bitv512
                 | _ ->  
                     failwith "Unsupported SortableArrayType for MsasPfx"
+
+
+    /// Creates a balanced set of sortable tests, with composition controlled by indexPicker.
+    let makeSetOfSortableTests
+            (sortableTestsId: Guid<sortableTestsId>)
+            (indexPicker: int -> int)
+            (count: int<sortableTestsCount>)
+            (sortableTestsModel: sortableTestsModel)
+            (sortableDataFormat: sortableDataFormat) : setOfSortableTests =
+        makeSortableTests sortableTestsId sortableTestsModel sortableDataFormat
+        |> SetOfSortableTests.partition indexPicker count

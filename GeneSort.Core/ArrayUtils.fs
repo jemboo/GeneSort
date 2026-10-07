@@ -9,6 +9,19 @@ open System.Runtime.Intrinsics
 
 
 module ArrayUtils =
+    
+    // returns arrayLength arrays of length arrayLength, where each array is a rotated version 
+    //of the previous one, the first one being trueCount trues followed by (arrayLength - trueCount) falses.
+    let makeRotatingFlags (arrayLength: int) (trueCount: int) : bool[][] =
+        if trueCount < 0 || trueCount > arrayLength then
+            invalidArg "trueCount" "trueCount must be between 0 and arrayLength."
+        let baseArray = Array.init arrayLength (fun i -> i < trueCount)
+        Array.init arrayLength (fun i ->
+            Array.init arrayLength (fun j ->
+                baseArray.[(i + j) % arrayLength]
+            )
+        )
+
 
     let inline distanceSquared< ^a when ^a: (static member Zero: ^a)
                                         and ^a: (static member (+): ^a * ^a -> ^a)

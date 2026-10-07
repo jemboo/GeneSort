@@ -28,7 +28,7 @@ type sortBlockUint8v256 =
             for lane = 0 to 31 do
                 let value = 
                     if lane < inputCount then 
-                        byte arrays.[lane].Values.[vIdx]
+                        byte (arrays.[lane].Item(vIdx))
                     else 
                         byte vIdx // Golden padding: identity value
                 v <- v.WithElement(lane, value)
@@ -45,6 +45,24 @@ type sortBlockUint8v256 =
 
 
 module SortBlockUint8v256 = 
+
+    let toSortableIntArrays (s256: sortBlockUint8v256) : sortableIntArray[] =
+        let result = Array.zeroCreate<sortableIntArray> s256.SortableCount
+        let rawData : byte[][] =
+            Array.init s256.Length (fun index ->
+                let values = Array.zeroCreate<byte> 32
+                s256.Vectors.[index].CopyTo(System.Span<byte>(values))
+                values)
+
+        for lane = 0 to s256.SortableCount - 1 do
+            let values = Array.init s256.Length (fun index -> int rawData.[index].[lane])
+            result.[lane] <-
+                sortableIntArray.create(
+                    values,
+                    s256.Length |> UMX.tag<sortingWidth>,
+                    2 |> UMX.tag<symbolSetSize>)
+
+        result
 
     /// Computes 32 independent 32-bit hashes (one per lane) across all vectors in a block.
     let computeLaneHashes32 (vectors: Vector256<uint8>[]) : uint32[] =

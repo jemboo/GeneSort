@@ -95,3 +95,52 @@ module SortableTests =
         | Uint8v512 uint8v512Test ->
                 failwith "UnsortedCount not implemented for Uint8v512."
 
+
+    let mergeSortableTests (test1: sortableTests) (test2: sortableTests) : sortableTests =
+        let requireMatchingSortingWidths sortingWidth1 sortingWidth2 =
+            if sortingWidth1 <> sortingWidth2 then
+                invalidArg "test2" "Sortable tests must have the same sorting width."
+
+        match test1, test2 with
+        | Bitv512 bitv512Test1, Bitv512 bitv512Test2 ->
+            requireMatchingSortingWidths bitv512Test1.SortingWidth bitv512Test2.SortingWidth
+            sortableBitv512Tests.create
+                (System.Guid.NewGuid() |> UMX.tag<sortableTestsId>)
+                bitv512Test1.SortingWidth
+                (Array.append bitv512Test1.SimdSortBlocks bitv512Test2.SimdSortBlocks)
+            |> Bitv512
+        | Bools boolTest1, Bools boolTest2 ->
+            requireMatchingSortingWidths boolTest1.SortingWidth boolTest2.SortingWidth
+            sortableBinaryTests.create
+                (System.Guid.NewGuid() |> UMX.tag<sortableTestsId>)
+                boolTest1.SortingWidth
+                (Array.append boolTest1.SortableBinaryArrays boolTest2.SortableBinaryArrays)
+            |> Bools
+        | Ints intTest1, Ints intTest2 ->
+            requireMatchingSortingWidths intTest1.SortingWidth intTest2.SortingWidth
+            sortableIntTests.create
+                (System.Guid.NewGuid() |> UMX.tag<sortableTestsId>)
+                intTest1.SortingWidth
+                (Array.append intTest1.SortableIntArrays intTest2.SortableIntArrays)
+            |> Ints
+        | PackedInts packedIntTest1, PackedInts packedIntTest2 ->
+            requireMatchingSortingWidths packedIntTest1.SortingWidth packedIntTest2.SortingWidth
+            packedSortableIntTests.createFromPackedValues
+                packedIntTest1.SortingWidth
+                (Array.append packedIntTest1.PackedValues packedIntTest2.PackedValues)
+            |> PackedInts
+        | Uint8v256 uint8v256Test1, Uint8v256 uint8v256Test2 ->
+            requireMatchingSortingWidths uint8v256Test1.SortingWidth uint8v256Test2.SortingWidth
+            sortableUint8v256Tests.create
+                (System.Guid.NewGuid() |> UMX.tag<sortableTestsId>)
+                uint8v256Test1.SortingWidth
+                (Array.append uint8v256Test1.SimdSortBlocks uint8v256Test2.SimdSortBlocks)
+            |> Uint8v256
+        | Uint8v512 uint8v512Test1, Uint8v512 uint8v512Test2 ->
+            requireMatchingSortingWidths uint8v512Test1.SortingWidth uint8v512Test2.SortingWidth
+            sortableUint8v512Tests.create
+                (System.Guid.NewGuid() |> UMX.tag<sortableTestsId>)
+                uint8v512Test1.SortingWidth
+                (Array.append uint8v512Test1.SimdSortBlocks uint8v512Test2.SimdSortBlocks)
+            |> Uint8v512
+        | _ -> failwith "Cannot merge tests of different types."

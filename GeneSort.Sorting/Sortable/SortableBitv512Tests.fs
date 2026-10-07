@@ -62,7 +62,7 @@ module SortableBitv512Tests =
                     
                     for testIdx = 0 to inputCount - 1 do
                         // Direct bool check is faster than int conversion
-                        if chunk.[testIdx].Values.[wireIdx] then
+                        if chunk.[testIdx].Item(wireIdx) then
                             let lane = testIdx / 64
                             let bit = testIdx % 64
                             buffer.[lane] <- buffer.[lane] ||| (1uL <<< bit)

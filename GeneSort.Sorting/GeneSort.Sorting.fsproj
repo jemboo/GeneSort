@@ -17,6 +17,7 @@
     <Compile Include="Sorter\SorterSet.fs" />
     <Compile Include="Sortable\SortableBoolArray.fs" />
     <Compile Include="Sortable\SortableIntArray.fs" />
+    <Compile Include="Sortable\BinaryIntArrays.fs" />
     <Compile Include="Sortable\SortBlockBitv512.fs" />
     <Compile Include="Sortable\SortBlockUint8v256.fs" />
     <Compile Include="Sortable\SortBlockUint8v512.fs" />
@@ -28,6 +29,7 @@
     <Compile Include="Sortable\SortableUint8v512Tests.fs" />
     <Compile Include="Sortable\GrayVectorGenerator.fs" />
     <Compile Include="Sortable\SortableTests.fs" />
+    <Compile Include="Sortable\SetOfSortableTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

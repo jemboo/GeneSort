@@ -45,8 +45,7 @@ module SortableUint8v512Tests =
     let fromIntArrays
         (id: Guid<sortableTestsId>)
         (sw: int<sortingWidth>) 
-        (allTests: sortableIntArray[]) 
-                    : sortableUint8v512Tests =
+        (allTests: sortableIntArray[]) : sortableUint8v512Tests =
 
         let totalTests = allTests.Length
         

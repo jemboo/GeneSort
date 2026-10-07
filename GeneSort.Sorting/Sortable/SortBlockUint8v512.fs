@@ -29,7 +29,7 @@ type sortBlockUint8v512 =
             let mutable v = Vector512<uint8>.Zero
             for lane = 0 to 63 do
                 let value = 
-                    if lane < inputCount then byte arrays.[lane].Values.[vIdx]
+                    if lane < inputCount then byte (arrays.[lane].Item(vIdx))
                     else byte vIdx // Identity padding
                 v <- v.WithElement(lane, value)
             v

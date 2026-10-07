@@ -6,6 +6,7 @@ open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 open System.Linq
+open System.Collections
 open System.Collections.Generic
 
 [<Struct; CustomEquality; NoComparison>]
@@ -25,8 +26,12 @@ type sortableBoolArray =
             invalidArg "values" $"Values length ({values.Length}) must equal order ({int sortingWidth})."
         { values = Array.copy values; sortingWidth = sortingWidth; valuesHash = None }
 
-    /// Gets the values array.
-    member this.Values with get() = this.values
+    /// Gets a copy of the values array.
+    member this.Values with get() = Array.copy this.values
+
+    /// Gets a value without exposing the backing array.
+    member this.Item
+        with get(index: int) = this.values.[index]
 
     member this.ArrayLength with get() = this.values.Length
 
@@ -68,6 +73,14 @@ type sortableBoolArray =
     interface IEquatable<sortableBoolArray> with
         member this.Equals(other) =
             this.sortingWidth = other.sortingWidth && Array.forall2 (=) this.values other.values
+
+    interface IEnumerable<bool> with
+        member this.GetEnumerator() =
+            (this.values :> seq<bool>).GetEnumerator()
+
+    interface IEnumerable with
+        member this.GetEnumerator() =
+            (this.values :> IEnumerable).GetEnumerator()
 
 
 module SortableBoolArray =

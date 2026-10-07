@@ -42,8 +42,7 @@ module SortableUint8v256Tests =
     let fromIntArrays
         (id: Guid<sortableTestsId>)
         (sw: int<sortingWidth>)
-        (allTests: sortableIntArray[]) 
-                    : sortableUint8v256Tests =
+        (allTests: sortableIntArray[]) : sortableUint8v256Tests =
         
         let totalTests = allTests.Length
         // Calculate how many SIMD blocks we need (32 lanes per block)

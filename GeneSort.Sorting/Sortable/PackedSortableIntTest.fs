@@ -23,9 +23,9 @@ type packedSortableIntTests =
         
         // Pack the data into the flat array
         for i = 0 to n - 1 do
-            let source = arrays.[i].Values
             let destinationOffset = i * width
-            Array.blit source 0 flat destinationOffset width
+            for j = 0 to width - 1 do
+                flat.[destinationOffset + j] <- arrays.[i].Item(j)
             
         { id = Guid.NewGuid() |> UMX.tag
           sortingWidth = sw

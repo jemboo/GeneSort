@@ -13,7 +13,7 @@ open FSharp.UMX
 [<Measure>] type symbolSetSize
 [<Measure>] type sortableCount
 [<Measure>] type sortableTestsId
-[<Measure>] type sortableTestsSetId
+[<Measure>] type sortableTestsCount
 
 
 [<Measure>] type sorterParentId
@@ -31,6 +31,9 @@ open FSharp.UMX
 [<Measure>] type excludeSelfCe
 [<Measure>] type mergeDimension
 
+[<Measure>] type partitionCount
+[<Measure>] type includedCount
+[<Measure>] type cycleCount
 
 
 type mergeSuffixType =
