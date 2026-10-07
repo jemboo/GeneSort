@@ -2,12 +2,14 @@ namespace GeneSort.SortingOps.Mp
 
 open System
 open FSharp.UMX
+open GeneSort.Sorting
 open GeneSort.SortingOps
 open GeneSort.Sorting.Mp.Sortable
 
 type sorterEvalV1Dto = {
     SorterId : Guid
-    UnsortedCount : int
+    SortableTestsSubsetId : string
+    UnsortedCount : int option
     SequenceHash : int
     LastCeIndex : int
     StageLength : int
@@ -20,7 +22,8 @@ type sorterEvalV1Dto = {
 
 type sorterEvalV2Dto = {
     SorterId : Guid
-    UnsortedCount : int
+    SortableTestsSubsetId : string
+    UnsortedCount : int option
     SequenceHash : int
     StageLength : int
     CeUseArray : ceDataDto array
@@ -32,6 +35,8 @@ type sorterEvalV2Dto = {
 
 type sorterEvalV3Dto = {
     SorterId : Guid
+    SortableTestsSubsetId : string
+    UnsortedCount : int option
     SequenceHash : int
     StageLength : int
     CeUseArray : ceDataDto array
@@ -57,12 +62,17 @@ type sorterEvalDto =
 
 module SorterEvalDto =
 
+    let private toSubsetId (value: string) : string<sortableTestsSubsetId> =
+        if String.IsNullOrWhiteSpace value then SortableTestsSubsetId.Default
+        else value |> UMX.tag<sortableTestsSubsetId>
+
     let fromDomain (domain: sorterEval) : sorterEvalDto =
         match domain with
         | sorterEval.V1 v1 ->
             V1 {
                 SorterId = %v1.SorterId
-                UnsortedCount = %v1.UnsortedCount
+                SortableTestsSubsetId = %v1.SortableTestsSubsetId
+                UnsortedCount = v1.UnsortedCount |> Option.map UMX.untag
                 SequenceHash = %v1.SequenceHash
                 LastCeIndex = %v1.LastCeIndex
                 StageLength = %v1.StageLength
@@ -75,7 +85,8 @@ module SorterEvalDto =
         | sorterEval.V2 v2 ->
             V2 {
                 SorterId = %v2.SorterId
-                UnsortedCount = %v2.UnsortedCount
+                SortableTestsSubsetId = %v2.SortableTestsSubsetId
+                UnsortedCount = v2.UnsortedCount |> Option.map UMX.untag
                 SequenceHash = %v2.SequenceHash
                 StageLength = %v2.StageLength
                 CeUseArray = v2.CeUseArray |> Array.map CeDataDto.fromDomain
@@ -87,6 +98,8 @@ module SorterEvalDto =
         | sorterEval.V3 v3 ->
             V3 {
                 SorterId = %v3.SorterId
+                SortableTestsSubsetId = %v3.SortableTestsSubsetId
+                UnsortedCount = v3.UnsortedCount |> Option.map UMX.untag
                 SequenceHash = %v3.SequenceHash
                 StageLength = %v3.StageLength
                 CeUseArray = v3.CeUseArray |> Array.map CeDataDto.fromDomain
@@ -102,8 +115,9 @@ module SorterEvalDto =
         | V1 v1Dto ->
             sorterEvalV1.create
                 (v1Dto.SorterId |> UMX.tag)
+                (toSubsetId v1Dto.SortableTestsSubsetId)
                 (v1Dto.SortingWidth |> UMX.tag)
-                (v1Dto.UnsortedCount |> UMX.tag)
+                (v1Dto.UnsortedCount |> Option.map UMX.tag)
                 (v1Dto.SequenceHash |> UMX.tag)
                 (v1Dto.LastCeIndex |> UMX.tag)
                 (v1Dto.StageLength |> UMX.tag)
@@ -115,8 +129,9 @@ module SorterEvalDto =
         | V2 v2Dto ->
             sorterEvalV2.create
                 (v2Dto.SorterId |> UMX.tag)
+                (toSubsetId v2Dto.SortableTestsSubsetId)
                 (v2Dto.SortingWidth |> UMX.tag)
-                (v2Dto.UnsortedCount |> UMX.tag)
+                (v2Dto.UnsortedCount |> Option.map UMX.tag)
                 (v2Dto.SequenceHash |> UMX.tag)
                 (v2Dto.StageLength |> UMX.tag)
                 (v2Dto.CeUseArray |> Array.map CeDataDto.toDomain)
@@ -127,7 +142,9 @@ module SorterEvalDto =
         | V3 v3Dto ->
             sorterEvalV3.create
                 (v3Dto.SorterId |> UMX.tag)
+                (toSubsetId v3Dto.SortableTestsSubsetId)
                 (v3Dto.SortingWidth |> UMX.tag)
+                (v3Dto.UnsortedCount |> Option.map UMX.tag)
                 (v3Dto.SequenceHash |> UMX.tag)
                 (v3Dto.StageLength |> UMX.tag)
                 (v3Dto.CeUseArray |> Array.map CeDataDto.toDomain)

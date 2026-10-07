@@ -9,8 +9,9 @@ open GeneSort.Sorting.Sortable
 type sorterEvalV1 =
     private { 
         sorterId: Guid<sorterId>
+        sortableTestsSubsetId: string<sortableTestsSubsetId>
         sortingWidth: int<sortingWidth>
-        unsortedCount: int<sortableCount>
+        unsortedCount: int<sortableCount> option
         sequenceHash: int<sequenceHash>
         lastCeIndex: int<ceIndex>
         stageLength: int<stageLength>
@@ -22,8 +23,9 @@ type sorterEvalV1 =
 
     static member create 
             (sorterId: Guid<sorterId>)
+            (sortableTestsSubsetId: string<sortableTestsSubsetId>)
             (sortingWidth: int<sortingWidth>) 
-            (unsortedCount: int<sortableCount>)
+            (unsortedCount: int<sortableCount> option)
             (sequenceKey: int<sequenceHash>) 
             (lastCeIndex: int<ceIndex>) 
             (stageLength: int<stageLength>)
@@ -33,6 +35,7 @@ type sorterEvalV1 =
             (reflectiveCount: int<reflectiveCount>): sorterEvalV1 =
         { 
                 sorterId = sorterId; 
+                sortableTestsSubsetId = sortableTestsSubsetId
                 sortingWidth = sortingWidth;
                 unsortedCount = unsortedCount;
                 sequenceHash = sequenceKey; 
@@ -46,24 +49,26 @@ type sorterEvalV1 =
 
     member this.ReflectionSymmetric with get() : bool<isReflectionSymmetric> = this.reflectionSymmetric
     member this.SorterId with get() : Guid<sorterId>  = this.sorterId
+    member this.SortableTestsSubsetId with get() : string<sortableTestsSubsetId> = this.sortableTestsSubsetId
     member this.SortingWidth with get() : int<sortingWidth> = this.sortingWidth
     member this.StageCrossingsCount with get() : int<stageCrossings> = this.stageCrossingsCount
     member this.StageLength with get() : int<stageLength> = this.stageLength
     member this.CeLength with get() : int<ceLength> = this.ceLength
-    member this.UnsortedCount with get() : int<sortableCount>  = this.unsortedCount
+    member this.UnsortedCount with get() : int<sortableCount> option = this.unsortedCount
     member this.SequenceHash with get() : int<sequenceHash>  = this.sequenceHash
     member this.LastCeIndex with get() : int<ceIndex>  = this.lastCeIndex
     member this.ReflectiveCount with get() : int<reflectiveCount> = this.reflectiveCount
 
     member this.ToDataTableRecord() : dataTableRecord =
-            let isSorted = this.unsortedCount = 0<sortableCount>
+            let isSorted = this.unsortedCount |> Option.map ((=) 0<sortableCount>)
             dataTableRecord.createEmpty()
             |> dataTableRecord.addData "SorterId" (string %this.sorterId)
+            |> dataTableRecord.addData "SortableTestsSubsetId" (string %this.sortableTestsSubsetId)
             |> dataTableRecord.addData "SortingWidth" (string %this.sortingWidth)
-            |> dataTableRecord.addData "UnsortedCount" (string %this.unsortedCount)
+            |> dataTableRecord.addData "UnsortedCount" (this.unsortedCount |> Option.map (fun count -> string %count) |> Option.defaultValue "")
             |> dataTableRecord.addData "StageLength" (string %this.stageLength)
             |> dataTableRecord.addData "CeLength" (string %this.ceLength)
-            |> dataTableRecord.addData "IsSorted" (string isSorted)
+            |> dataTableRecord.addData "IsSorted" (isSorted |> Option.map string |> Option.defaultValue "")
             |> dataTableRecord.addData "SequenceHash" (string %this.sequenceHash)
             |> dataTableRecord.addData "LastCeIndex" (string %this.lastCeIndex)
             |> dataTableRecord.addData "IsReflectionSymmetric" (string %this.reflectionSymmetric)
@@ -71,14 +76,15 @@ type sorterEvalV1 =
             |> dataTableRecord.addData "ReflectiveCount" (string %this.reflectiveCount)
 
     member this.ToDataTableRecordWithPrefix(prefix: string) : dataTableRecord =
-            let isSorted = this.unsortedCount = 0<sortableCount>
+            let isSorted = this.unsortedCount |> Option.map ((=) 0<sortableCount>)
             dataTableRecord.createEmpty()
             |> dataTableRecord.addData (prefix + "SorterId") (string %this.sorterId)
+            |> dataTableRecord.addData (prefix + "SortableTestsSubsetId") (string %this.sortableTestsSubsetId)
             |> dataTableRecord.addData (prefix + "SortingWidth") (string %this.sortingWidth)
-            |> dataTableRecord.addData (prefix + "UnsortedCount") (string %this.unsortedCount)
+            |> dataTableRecord.addData (prefix + "UnsortedCount") (this.unsortedCount |> Option.map (fun count -> string %count) |> Option.defaultValue "")
             |> dataTableRecord.addData (prefix + "StageLength") (string %this.stageLength)
             |> dataTableRecord.addData (prefix + "CeLength") (string %this.ceLength)
-            |> dataTableRecord.addData (prefix + "IsSorted") (string isSorted)
+            |> dataTableRecord.addData (prefix + "IsSorted") (isSorted |> Option.map string |> Option.defaultValue "")
             |> dataTableRecord.addData (prefix + "SequenceHash") (string %this.sequenceHash)
             |> dataTableRecord.addData (prefix + "LastCeIndex") (string %this.lastCeIndex)
             |> dataTableRecord.addData (prefix + "IsReflectionSymmetric") (string %this.reflectionSymmetric)
@@ -89,8 +95,9 @@ type sorterEvalV1 =
 type sorterEvalV2 =
     private { 
         sorterId: Guid<sorterId>
+        sortableTestsSubsetId: string<sortableTestsSubsetId>
         sortingWidth: int<sortingWidth>
-        unsortedCount: int<sortableCount>
+        unsortedCount: int<sortableCount> option
         sequenceHash: int<sequenceHash>
         stageLength: int<stageLength>
         ceUseArray: ceUse array
@@ -101,8 +108,9 @@ type sorterEvalV2 =
 
     static member create 
                     (sorterId: Guid<sorterId>) 
+                    (sortableTestsSubsetId: string<sortableTestsSubsetId>)
                     (sortingWidth: int<sortingWidth>) 
-                    (unsortedCount: int<sortableCount>)
+                    (unsortedCount: int<sortableCount> option)
                     (sequenceKey: int<sequenceHash>)
                     (stageLength: int<stageLength>)
                     (ceUseArray: ceUse array)
@@ -111,6 +119,7 @@ type sorterEvalV2 =
                     (reflectiveCount: int<reflectiveCount>): sorterEvalV2 =
         { 
                 sorterId = sorterId; 
+                sortableTestsSubsetId = sortableTestsSubsetId
                 sortingWidth = sortingWidth;
                 unsortedCount = unsortedCount;
                 sequenceHash = sequenceKey; 
@@ -123,12 +132,13 @@ type sorterEvalV2 =
     
     member this.IsReflectionSymmetric with get() : bool<isReflectionSymmetric> = this.isReflectionSymmetric
     member this.SorterId with get() : Guid<sorterId>  = this.sorterId
+    member this.SortableTestsSubsetId with get() : string<sortableTestsSubsetId> = this.sortableTestsSubsetId
     member this.SortingWidth with get() : int<sortingWidth> = this.sortingWidth
     member this.StageCrossingsCount with get() : int<stageCrossings> = this.stageCrossingsCount
     member this.StageLength with get() : int<stageLength> = this.stageLength
     member this.CeLength with get() : int<ceLength> = this.ceUseArray.Length |> UMX.tag<ceLength>
     member this.CeUseArray with get() : ceUse array = this.ceUseArray
-    member this.UnsortedCount with get() : int<sortableCount>  = this.unsortedCount
+    member this.UnsortedCount with get() : int<sortableCount> option = this.unsortedCount
     member this.SequenceHash with get() : int<sequenceHash>  = this.sequenceHash
     member this.ReflectiveCount with get() : int<reflectiveCount> = this.reflectiveCount
     member this.LastCeIndex with get() : int<ceIndex>  = 
@@ -139,6 +149,7 @@ type sorterEvalV2 =
     member this.ToV1() : sorterEvalV1 =
         sorterEvalV1.create
             this.sorterId
+            this.sortableTestsSubsetId
             this.sortingWidth
             this.unsortedCount
             this.sequenceHash
@@ -150,14 +161,15 @@ type sorterEvalV2 =
             this.reflectiveCount
 
     member this.ToDataTableRecord() : dataTableRecord =
-            let isSorted = this.unsortedCount = 0<sortableCount>
+            let isSorted = this.unsortedCount |> Option.map ((=) 0<sortableCount>)
             dataTableRecord.createEmpty()
             |> dataTableRecord.addData "SorterId" (string %this.sorterId)
+            |> dataTableRecord.addData "SortableTestsSubsetId" (string %this.sortableTestsSubsetId)
             |> dataTableRecord.addData "SortingWidth" (string %this.sortingWidth)
-            |> dataTableRecord.addData "UnsortedCount" (string %this.unsortedCount)
+            |> dataTableRecord.addData "UnsortedCount" (this.unsortedCount |> Option.map (fun count -> string %count) |> Option.defaultValue "")
             |> dataTableRecord.addData "StageLength" (string %this.stageLength)
             |> dataTableRecord.addData "CeLength" (string %this.CeLength)
-            |> dataTableRecord.addData "IsSorted" (string isSorted)
+            |> dataTableRecord.addData "IsSorted" (isSorted |> Option.map string |> Option.defaultValue "")
             |> dataTableRecord.addData "SequenceHash" (string %this.sequenceHash)
             |> dataTableRecord.addData "LastCeIndex" (string %this.LastCeIndex)
             |> dataTableRecord.addData "CeUseArray" (CeUse.arrayToString this.ceUseArray)
@@ -166,14 +178,15 @@ type sorterEvalV2 =
             |> dataTableRecord.addData "ReflectiveCount" (string %this.reflectiveCount)
 
     member this.ToDataTableRecordWithPrefix(prefix: string) : dataTableRecord =
-        let isSorted = this.unsortedCount = 0<sortableCount>
+        let isSorted = this.unsortedCount |> Option.map ((=) 0<sortableCount>)
         dataTableRecord.createEmpty()
         |> dataTableRecord.addData (prefix + "SorterId") (string %this.sorterId)
+        |> dataTableRecord.addData (prefix + "SortableTestsSubsetId") (string %this.sortableTestsSubsetId)
         |> dataTableRecord.addData (prefix + "SortingWidth") (string %this.sortingWidth)
-        |> dataTableRecord.addData (prefix + "UnsortedCount") (string %this.unsortedCount)
+        |> dataTableRecord.addData (prefix + "UnsortedCount") (this.unsortedCount |> Option.map (fun count -> string %count) |> Option.defaultValue "")
         |> dataTableRecord.addData (prefix + "StageLength") (string %this.stageLength)
         |> dataTableRecord.addData (prefix + "CeLength") (string %this.CeLength)
-        |> dataTableRecord.addData (prefix + "IsSorted") (string isSorted)
+        |> dataTableRecord.addData (prefix + "IsSorted") (isSorted |> Option.map string |> Option.defaultValue "")
         |> dataTableRecord.addData (prefix + "SequenceHash") (string %this.sequenceHash)
         |> dataTableRecord.addData (prefix + "LastCeIndex") (string %this.LastCeIndex)
         |> dataTableRecord.addData (prefix + "CeUseArray") (CeUse.arrayToString this.ceUseArray)
@@ -185,7 +198,9 @@ type sorterEvalV2 =
 type sorterEvalV3 =
     private { 
         sorterId: Guid<sorterId>
+        sortableTestsSubsetId: string<sortableTestsSubsetId>
         sortingWidth: int<sortingWidth>
+        unsortedCount: int<sortableCount> option
         sequenceHash: int<sequenceHash>
         stageLength: int<stageLength>
         ceUseArray: ceUse array
@@ -197,7 +212,9 @@ type sorterEvalV3 =
 
     static member create 
                     (sorterId: Guid<sorterId>)
+                    (sortableTestsSubsetId: string<sortableTestsSubsetId>)
                     (sortingWidth: int<sortingWidth>) 
+                    (unsortedCount: int<sortableCount> option)
                     (sequenceKey: int<sequenceHash>)
                     (stageLength: int<stageLength>)
                     (ceUseArray: ceUse array) 
@@ -207,7 +224,9 @@ type sorterEvalV3 =
                     (reflectiveCount: int<reflectiveCount>): sorterEvalV3 =
         { 
                 sorterId = sorterId;
+                sortableTestsSubsetId = sortableTestsSubsetId
                 sortingWidth = sortingWidth;
+                unsortedCount = unsortedCount
                 sequenceHash = sequenceKey; 
                 stageLength = stageLength;
                 ceUseArray = ceUseArray;
@@ -219,6 +238,7 @@ type sorterEvalV3 =
     
     member this.ReflectionSymmetric with get() : bool<isReflectionSymmetric> = this.reflectionSymmetric
     member this.SorterId with get() : Guid<sorterId>  = this.sorterId
+    member this.SortableTestsSubsetId with get() : string<sortableTestsSubsetId> = this.sortableTestsSubsetId
     member this.SortingWidth with get() : int<sortingWidth> = this.sortingWidth
     member this.StageCrossingsCount with get() : int<stageCrossings> = this.stageCrossingsCount
     member this.StageLength with get() : int<stageLength> = this.stageLength
@@ -227,8 +247,7 @@ type sorterEvalV3 =
     member this.SequenceHash with get() : int<sequenceHash>  = this.sequenceHash
     member this.SortableTests with get() : sortableTests = this.sortableTests
     member this.ReflectiveCount with get() : int<reflectiveCount> = this.reflectiveCount
-    member this.UnsortedCount with get() : int<sortableCount>  = 
-            this.sortableTests |> SortableTests.getUnsortedCount
+    member this.UnsortedCount with get() : int<sortableCount> option = this.unsortedCount
     member this.LastCeIndex with get() : int<ceIndex>  = 
         if this.ceUseArray.Length = 0 then 0<ceIndex>
         else this.ceUseArray.[this.ceUseArray.Length - 1].CeIndex
@@ -237,6 +256,7 @@ type sorterEvalV3 =
     member this.ToV2() : sorterEvalV2 =
         sorterEvalV2.create
             this.sorterId
+            this.sortableTestsSubsetId
             this.sortingWidth
             this.UnsortedCount
             this.sequenceHash
@@ -250,6 +270,7 @@ type sorterEvalV3 =
     member this.ToV1() : sorterEvalV1 =
         sorterEvalV1.create
             this.sorterId
+            this.sortableTestsSubsetId
             this.sortingWidth
             this.UnsortedCount
             this.sequenceHash
@@ -261,14 +282,15 @@ type sorterEvalV3 =
             this.reflectiveCount
 
     member this.ToDataTableRecord() : dataTableRecord =
-            let isSorted = this.UnsortedCount = 0<sortableCount>
+            let isSorted = this.UnsortedCount |> Option.map ((=) 0<sortableCount>)
             dataTableRecord.createEmpty()
             |> dataTableRecord.addData "SorterId" (string %this.sorterId)
+            |> dataTableRecord.addData "SortableTestsSubsetId" (string %this.sortableTestsSubsetId)
             |> dataTableRecord.addData "SortingWidth" (string %this.sortingWidth)
-            |> dataTableRecord.addData "UnsortedCount" (string %this.UnsortedCount)
+            |> dataTableRecord.addData "UnsortedCount" (this.UnsortedCount |> Option.map (fun count -> string %count) |> Option.defaultValue "")
             |> dataTableRecord.addData "StageLength" (string %this.stageLength)
             |> dataTableRecord.addData "CeLength" (string %this.CeLength)
-            |> dataTableRecord.addData "IsSorted" (string isSorted)
+            |> dataTableRecord.addData "IsSorted" (isSorted |> Option.map string |> Option.defaultValue "")
             |> dataTableRecord.addData "SequenceHash" (string %this.sequenceHash)
             |> dataTableRecord.addData "LastCeIndex" (string %this.LastCeIndex)
             |> dataTableRecord.addData "CeUseArray" (CeUse.arrayToString this.ceUseArray)
@@ -277,14 +299,15 @@ type sorterEvalV3 =
             |> dataTableRecord.addData "ReflectiveCount" (string %this.reflectiveCount)
 
     member this.ToDataTableRecordWithPrefix(prefix: string) : dataTableRecord =
-            let isSorted = this.UnsortedCount = 0<sortableCount>
+            let isSorted = this.UnsortedCount |> Option.map ((=) 0<sortableCount>)
             dataTableRecord.createEmpty()
             |> dataTableRecord.addData (prefix + "SorterId") (string %this.sorterId)
+            |> dataTableRecord.addData (prefix + "SortableTestsSubsetId") (string %this.sortableTestsSubsetId)
             |> dataTableRecord.addData (prefix + "SortingWidth") (string %this.sortingWidth)
-            |> dataTableRecord.addData (prefix + "UnsortedCount") (string %this.UnsortedCount)
+            |> dataTableRecord.addData (prefix + "UnsortedCount") (this.UnsortedCount |> Option.map (fun count -> string %count) |> Option.defaultValue "")
             |> dataTableRecord.addData (prefix + "StageLength") (string %this.stageLength) 
             |> dataTableRecord.addData (prefix + "CeLength") (string %this.CeLength)
-            |> dataTableRecord.addData (prefix + "IsSorted") (string isSorted)
+            |> dataTableRecord.addData (prefix + "IsSorted") (isSorted |> Option.map string |> Option.defaultValue "")
             |> dataTableRecord.addData (prefix + "SequenceHash") (string %this.sequenceHash)
             |> dataTableRecord.addData (prefix + "LastCeIndex") (string %this.LastCeIndex)
             |> dataTableRecord.addData (prefix + "CeUseArray") (CeUse.arrayToString this.ceUseArray)
@@ -344,6 +367,12 @@ module SorterEval =
         | V2 v2 -> v2.SorterId
         | V3 v3 -> v3.SorterId
 
+    let getSortableTestsSubsetId (eval: sorterEval) : string<sortableTestsSubsetId> =
+        match eval with
+        | V1 v1 -> v1.SortableTestsSubsetId
+        | V2 v2 -> v2.SortableTestsSubsetId
+        | V3 v3 -> v3.SortableTestsSubsetId
+
     let getSortingWidth (eval: sorterEval) : int<sortingWidth> =
         match eval with
         | V1 v1 -> v1.SortingWidth
@@ -362,23 +391,23 @@ module SorterEval =
         | V2 v2 -> v2.CeLength
         | V3 v3 -> v3.CeLength
 
-    let getUnsortedCount (eval: sorterEval) : int<sortableCount> =
+    let getUnsortedCount (eval: sorterEval) : int<sortableCount> option =
         match eval with
         | V1 v1 -> v1.UnsortedCount
         | V2 v2 -> v2.UnsortedCount
         | V3 v3 -> v3.UnsortedCount
 
-    let getIsSorted (eval: sorterEval) : bool =
+    let getIsSorted (eval: sorterEval) : bool option =
         match eval with
-        | V1 v1 -> v1.UnsortedCount = 0<sortableCount>
-        | V2 v2 -> v2.UnsortedCount = 0<sortableCount>
-        | V3 v3 -> v3.UnsortedCount = 0<sortableCount>
+        | V1 v1 -> v1.UnsortedCount |> Option.map ((=) 0<sortableCount>)
+        | V2 v2 -> v2.UnsortedCount |> Option.map ((=) 0<sortableCount>)
+        | V3 v3 -> v3.UnsortedCount |> Option.map ((=) 0<sortableCount>)
 
-    let getIsUnSorted (eval: sorterEval) : bool =
+    let getIsUnSorted (eval: sorterEval) : bool option =
         match eval with
-        | V1 v1 -> v1.UnsortedCount > 0<sortableCount>
-        | V2 v2 -> v2.UnsortedCount > 0<sortableCount>
-        | V3 v3 -> v3.UnsortedCount > 0<sortableCount>
+        | V1 v1 -> v1.UnsortedCount |> Option.map ((<) 0<sortableCount>)
+        | V2 v2 -> v2.UnsortedCount |> Option.map ((<) 0<sortableCount>)
+        | V3 v3 -> v3.UnsortedCount |> Option.map ((<) 0<sortableCount>)
 
     let getSequenceHash (eval: sorterEval) : int<sequenceHash> =
         match eval with
@@ -397,7 +426,7 @@ module SorterEval =
             (eval: sorterEval): bool =
         (%(getLastCeIndex eval) <= %lengthCutoff)
         &&
-        (getIsSorted eval)
+        (getIsSorted eval |> Option.defaultValue false)
 
     let getCeUseArray (eval: sorterEval) : ceUse array =
         match eval with
@@ -456,8 +485,9 @@ module SorterEval =
 
         sorterEvalV1.create 
             sorterId 
+            SortableTestsSubsetId.Default
             ceBlockEval.CeBlock.SortingWidth
-            ceBlockEval.UnsortedCount 
+            (Some ceBlockEval.UnsortedCount)
             (stageSequence.GetHashCode() |> UMX.tag<sequenceHash>) 
             ceBlockEval.LastUsedIndex
             stageSequence.StageLength 
@@ -485,8 +515,9 @@ module SorterEval =
 
         sorterEvalV2.create 
             sorterId 
+            SortableTestsSubsetId.Default
             ceBlockEval.CeBlock.SortingWidth
-            ceBlockEval.UnsortedCount 
+            (Some ceBlockEval.UnsortedCount)
             (stageSequence.GetHashCode() |> UMX.tag<sequenceHash>) 
             stageSequence.StageLength  
             ceUseArray
@@ -518,7 +549,9 @@ module SorterEval =
             let ceUseArray = ceBlockEval.extractCeUseArray
             sorterEvalV3.create 
                 sorterId 
+                SortableTestsSubsetId.Default
                 ceBlockEval.CeBlock.SortingWidth
+                (Some ceBlockEval.UnsortedCount)
                 (stageSequence.GetHashCode() |> UMX.tag<sequenceHash>) 
                 stageSequence.StageLength 
                 ceUseArray 
@@ -537,3 +570,117 @@ module SorterEval =
         | sorterEvalType.V1 -> createV1 sorterId ceBlockEval
         | sorterEvalType.V2 -> createV2 sorterId ceBlockEval
         | sorterEvalType.V3 -> createV3 sorterId ceBlockEval
+
+    let private mergeCeUseArrays (first: ceUse[]) (second: ceUse[]) : ceUse[] =
+        let toMap parameterName (values: ceUse[]) =
+            values
+            |> Array.fold (fun result value ->
+                if Map.containsKey value.CeIndex result then
+                    invalidArg parameterName $"CE index {%value.CeIndex} occurs more than once."
+                Map.add value.CeIndex value result) Map.empty
+
+        let firstByIndex = toMap "first" first
+        let secondByIndex = toMap "second" second
+        secondByIndex
+        |> Map.fold (fun merged index right ->
+            match Map.tryFind index merged with
+            | Some left -> Map.add index (CeUse.merge left right) merged
+            | None -> Map.add index right merged) firstByIndex
+        |> Map.toArray
+        |> Array.map snd
+
+    let private calculateMetrics
+            (sortingWidth: int<sortingWidth>)
+            (ceUseArray: ceUse[]) =
+        let ces = ceUseArray |> Array.map (fun ceUse -> ceUse.Ce)
+        let stageSequence, moves =
+            StageBuilderSequence.toStageSequenceWithMoveInfo sortingWidth ces
+        let stageCrossingsCount = moves |> Array.sumBy Array.sum |> UMX.tag<stageCrossings>
+        let reflectionSymmetric =
+            stageSequence.Stages
+            |> Array.forall Stage.isReflectionSymmetric
+            |> UMX.tag<isReflectionSymmetric>
+
+        (stageSequence.GetHashCode() |> UMX.tag<sequenceHash>),
+        stageSequence.StageLength,
+        reflectionSymmetric,
+        stageCrossingsCount,
+        stageSequence.GetReflectiveCount()
+
+    let private validateMergeInputs (first: sorterEval) (second: sorterEval) =
+        match first, second with
+        | V1 _, _
+        | _, V1 _ ->
+            invalidArg "first" "Cannot merge a V1 sorter evaluation because it has no ceUseArray."
+        | _ ->
+            if getSorterId first <> getSorterId second then
+                invalidArg "second" "Sorter evaluations must belong to the same sorter."
+            if getSortingWidth first <> getSortingWidth second then
+                invalidArg "second" "Sorter evaluations must have the same sorting width."
+
+    /// Combines two evaluations of the same sorter over separate sortable-test partitions.
+    let merge (first: sorterEval) (second: sorterEval) : sorterEval =
+        validateMergeInputs first second
+
+        let sorterId = getSorterId first
+        let sortingWidth = getSortingWidth first
+        let ceUseArray = mergeCeUseArrays (getCeUseArray first) (getCeUseArray second)
+        let sequenceHash, stageLength, reflectionSymmetric, stageCrossingsCount, reflectiveCount =
+            calculateMetrics sortingWidth ceUseArray
+
+        match first, second with
+        | V2 firstV2, V2 secondV2 ->
+            sorterEvalV2.create
+                sorterId
+                SortableTestsSubsetId.Default
+                sortingWidth
+                None
+                sequenceHash
+                stageLength
+                ceUseArray
+                reflectionSymmetric
+                stageCrossingsCount
+                reflectiveCount
+            |> V2
+        | V3 firstV3, V3 secondV3 ->
+            sorterEvalV3.create
+                sorterId
+                SortableTestsSubsetId.Default
+                sortingWidth
+                None
+                sequenceHash
+                stageLength
+                ceUseArray
+                (SortableTests.mergeSortableTests firstV3.SortableTests secondV3.SortableTests)
+                reflectionSymmetric
+                stageCrossingsCount
+                reflectiveCount
+            |> V3
+        | V2 firstV2, V3 secondV3 ->
+            sorterEvalV2.create
+                sorterId
+                SortableTestsSubsetId.Default
+                sortingWidth
+                None
+                sequenceHash
+                stageLength
+                ceUseArray
+                reflectionSymmetric
+                stageCrossingsCount
+                reflectiveCount
+            |> V2
+        | V3 firstV3, V2 secondV2 ->
+            sorterEvalV2.create
+                sorterId
+                SortableTestsSubsetId.Default
+                sortingWidth
+                None
+                sequenceHash
+                stageLength
+                ceUseArray
+                reflectionSymmetric
+                stageCrossingsCount
+                reflectiveCount
+            |> V2
+        | _ ->
+            invalidArg "first" "Cannot merge a V1 sorter evaluation because it has no ceUseArray."

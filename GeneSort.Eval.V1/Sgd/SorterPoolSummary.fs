@@ -135,7 +135,12 @@ module SorterPoolSetSummary =
                     let stageLengths = evals |> Array.map (fun ev -> float %(SorterEval.getStageLength ev))
                     let stageCrossings = evals |> Array.map (fun ev -> float %(SorterEval.getStageCrossingsCount ev))
                     let reflectiveCountRs = evals |> Array.map (fun ev -> float (float %(SorterEval.getReflectiveCount ev) / float %(SorterEval.getCeLength ev)))
-                    let averageUnsortedCount = evals |> Array.averageBy (fun ev -> float (UMX.untag (SorterEval.getUnsortedCount ev)))
+                    let averageUnsortedCount =
+                        evals
+                        |> Array.choose (SorterEval.getUnsortedCount >> Option.map UMX.untag >> Option.map float)
+                        |> function
+                            | [||] -> 0.0
+                            | counts -> Array.average counts
 
                     // Compute minimums
                     let minCe = (Array.min ceLengths |> int) |> UMX.tag<ceLength>

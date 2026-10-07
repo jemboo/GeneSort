@@ -2,6 +2,7 @@
 
 open System
 open FSharp.UMX
+open GeneSort.SortingOps
 open GeneSort.SortingOps.Mp
 open GeneSort.Eval.V1
 open GeneSort.Model.Sorting.Mp.V1
@@ -17,6 +18,7 @@ type sorterPoolMemberDto = {
     sorterMutationMod: int
     sorterMutationSource: sorterMutationSourceDto option
     sorterEvalDto: sorterEvalDto option
+    sorterEvalDtos: Map<string, sorterEvalDto>
     birthday: int
 }
 
@@ -54,6 +56,12 @@ module SorterPoolSetDto =
                             sorterMutationMod = UMX.untag m.MutationMod
                             sorterMutationSource = m.SorterMutationSource |> Option.map SorterMutationSourceDto.toDto
                             sorterEvalDto = m.SorterEval |> Option.map SorterEvalDto.fromDomain
+                            sorterEvalDtos =
+                                m.SorterEvals
+                                |> Map.toSeq
+                                |> Seq.map (fun (subsetId, evaluation) ->
+                                    %subsetId, SorterEvalDto.fromDomain evaluation)
+                                |> Map.ofSeq
                             birthday = m.Birthday |> UMX.untag
                         }
                     )
@@ -85,7 +93,20 @@ module SorterPoolSetDto =
                 let members =
                     p.sorterPoolMemberDtos
                     |> Array.map (fun m ->
-                        let evalOpt = m.sorterEvalDto |> Option.map SorterEvalDto.toDomain
+                        let evalMap =
+                            if obj.ReferenceEquals(m.sorterEvalDtos, null) then
+                                m.sorterEvalDto
+                                |> Option.map SorterEvalDto.toDomain
+                                |> Option.map (fun evaluation ->
+                                    Map.ofList [ SorterEval.getSortableTestsSubsetId evaluation, evaluation ])
+                                |> Option.defaultValue Map.empty
+                            else
+                                m.sorterEvalDtos
+                                |> Map.toSeq
+                                |> Seq.map (fun (subsetId, evaluation) ->
+                                    subsetId |> UMX.tag<sortableTestsSubsetId>,
+                                    SorterEvalDto.toDomain evaluation)
+                                |> Map.ofSeq
                         let sourceOpt = m.sorterMutationSource |> Option.map SorterMutationSourceDto.fromDto
                         
                         sorterPoolMember.create
@@ -94,7 +115,7 @@ module SorterPoolSetDto =
                             (UMX.tag m.sorterMutationIndex)
                             (UMX.tag m.sorterMutationMod)
                             sourceOpt
-                            evalOpt
+                            evalMap
                             (UMX.tag m.birthday)
                     )
                 let parentIdOpt = 

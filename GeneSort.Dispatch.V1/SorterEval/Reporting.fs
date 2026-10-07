@@ -145,7 +145,7 @@ module Reporting =
 
                 let evalBins = 
                         sorterSetEvals.SorterEvals
-                        |> Array.filter(fun se -> se |> SorterEval.getIsSorted)
+                        |> Array.filter(fun se -> se |> SorterEval.getIsSorted = Some true)
                         |> SorterEvalBinStats.makeBins
 
                 let dtrs = evalBins

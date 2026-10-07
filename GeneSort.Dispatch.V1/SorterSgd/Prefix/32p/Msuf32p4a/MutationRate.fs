@@ -15,10 +15,8 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 
 let dbPool32name = "Pool_32" |> UMX.tag<databaseName>
+let dbPool32TestName = "Pool_32_Test" |> UMX.tag<databaseName>
 let dbPool512name = "Pool_512" |> UMX.tag<databaseName>
-
-
-
 
 
 
@@ -26,31 +24,29 @@ let dbPool512name = "Pool_512" |> UMX.tag<databaseName>
 module VarModR_32 =
 
 
-
-
     let Pool_32_Test (executorType: sorterSgdExecutorType)  : run =
         run.SgdRun (
             SgdRun.create
-                dbPool32name
+                dbPool32TestName
                 projName
                 (sprintf @"Pool_32_Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
                 "Rate comp for Msrs32p4a Msuf4"
                 [
-            (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
+            (runParameters.sorterCountPerPoolSetKey, [64] |> List.map string)
             (runParameters.codeModKey, ["NoMods"] |> List.map string)
-            (runParameters.generationIntervalLastKey, [9] |> List.map string)
+            (runParameters.generationIntervalLastKey, [1] |> List.map string)
             (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
             (runParameters.paraRateKey,    [1.15;] |> List.map string)
             (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
-            (runParameters.mutationModKey, [0; 2; 3; 4; 5; 6;] |> List.map string)
-            (runParameters.seedModificationRateKey, [0.020; 0.050;] |> List.map string)
-            (runParameters.modificationRateKey, [0.020; 0.050;]  |> List.map string)
-            (runParameters.mutatorVariantKey, [mutatorVariant.V1; mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
+            (runParameters.mutationModKey, [0;] |> List.map string)
+            (runParameters.seedModificationRateKey, [0.020;] |> List.map string)
+            (runParameters.modificationRateKey, [0.020;]  |> List.map string)
+            (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
         ]
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
                 "sorter-sgd.msuf32-mutation-rate"
-                RunParamBuilderNames.Filter.seedModificationRateDiffers
+                RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msuf32MutationRate
                 false
         )

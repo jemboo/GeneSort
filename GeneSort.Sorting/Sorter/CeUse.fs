@@ -33,6 +33,16 @@ module CeUse =
         |> Array.map toString
         |> String.concat "; "
 
+    // merges two ceUses with the same CeIndex and the same ce, combining their use counts
+    let merge (ceUse1: ceUse) (ceUse2: ceUse) : ceUse =
+        if ceUse1.CeIndex <> ceUse2.CeIndex then
+            invalidArg "ceUse2" "Cannot merge ceUses with different CeIndex values."
+        if ceUse1.Ce <> ceUse2.Ce then
+            invalidArg "ceUse2" "Cannot merge ceUses with different ce values."
+        let mergedUseCount = ceUse1.UseCount + ceUse2.UseCount
+        ceUse.create ceUse1.CeIndex mergedUseCount ceUse1.Ce
+
+
     let ceUseStringToCes
             (ceUseString: string) : ce[] =
     

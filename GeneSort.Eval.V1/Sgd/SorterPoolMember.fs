@@ -2,6 +2,7 @@
 
 open System
 open FSharp.UMX
+open GeneSort.Sorting
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1
@@ -13,7 +14,7 @@ type sorterPoolMember =
         _mutationIndex:        int<mutationIndex>
         _mutationMod:          int<mutationMod>
         _sorterMutationSource: sorterMutationSource option
-        _sorterEval:           sorterEval option
+        _sorterEval:           Map<string<sortableTestsSubsetId>, sorterEval>
         _birthday:             int<generationNumber>
     }
 
@@ -25,7 +26,8 @@ type sorterPoolMember =
     member this.MutationIndex = this._mutationIndex
     member this.MutationMod = this._mutationMod
     member this.SorterMutationSource = this._sorterMutationSource
-    member this.SorterEval = this._sorterEval
+    member this.SorterEvals = this._sorterEval
+    member this.SorterEval = Map.tryFind SortableTestsSubsetId.Default this._sorterEval
 
     static member create 
                     sorterPoolMemberId 
@@ -68,9 +70,14 @@ module SorterPoolMember =
             _mutationMod = newMod
             _mutationIndex = 0 |> UMX.tag<mutationIndex> }
 
-    /// Updates the sorterEval of a pool member
+    /// Adds or replaces one subset evaluation; None clears every cached evaluation.
     let withEval (eval: sorterEval option) (spm: sorterPoolMember) : sorterPoolMember =
-        { spm with _sorterEval = eval }
+        match eval with
+        | Some value ->
+            { spm with
+                _sorterEval =
+                    Map.add (SorterEval.getSortableTestsSubsetId value) value spm._sorterEval }
+        | None -> { spm with _sorterEval = Map.empty }
 
     /// Generates 'mutantCount' new mutants, updating the parent's index by 'mutantCount'
     let mutate (sorterModelMut: sorterModelMutator) 
@@ -112,7 +119,7 @@ module SorterPoolMember =
                     (0 |> UMX.tag)          // New mutants start at mutation index 0
                     spm.MutationMod
                     (Some mutationSource)
-                    None                    // New mutants start unevaluated
+                    Map.empty               // New mutants start unevaluated
                     currentGeneration
             )
 

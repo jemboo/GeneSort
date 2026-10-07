@@ -26,7 +26,7 @@ type sorterPoolSet =
         if evals.Length = 0 then
             0.0
         else
-            let sortedCount = evals |> Array.sumBy (fun eval -> if SorterEval.getIsSorted eval then 1 else 0)
+            let sortedCount = evals |> Array.sumBy (fun eval -> if SorterEval.getIsSorted eval = Some true then 1 else 0)
             float sortedCount * 100.0 / float evals.Length
     member private this.GetSorterEvals() : sorterEval array =
         this._sorterPools
@@ -283,7 +283,7 @@ module SorterPoolSet =
                             (0 |> UMX.tag<mutationIndex>)
                             mutationMod
                             None
-                            None
+                            Map.empty
                             0<generationNumber>
                     )
 
@@ -291,12 +291,12 @@ module SorterPoolSet =
                 let tag = SorterPoolTag.fromIndex bounds dex
 
                 sorterPool.create 
-                        poolId 
+                        poolId
                         None
                         poolName
                         tag
-                        sorterPoolMembers 
-                        modelSet.RawCeLength 
+                        sorterPoolMembers
+                        modelSet.RawCeLength
                         mutationMod
             )
 

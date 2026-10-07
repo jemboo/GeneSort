@@ -262,7 +262,7 @@ module SorterPool =
             pool.SorterPoolMembers
             |> Seq.choose (fun spm ->
                 match spm.SorterEval with
-                | Some eval when SorterEval.getIsSorted eval ->
+                | Some eval when SorterEval.getIsSorted eval = Some true ->
                     Some (spm, SorterEval.getLastCeIndex eval)
                 | _ -> None
             )

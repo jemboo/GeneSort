@@ -31,10 +31,9 @@ open FSharp.UMX
 [<Measure>] type excludeSelfCe
 [<Measure>] type mergeDimension
 
+[<Measure>] type sortableTestsSubsetId
 [<Measure>] type partitionCount
 [<Measure>] type includedCount
-[<Measure>] type cycleCount
-
 
 type mergeSuffixType =
     | NoSuffix
@@ -75,7 +74,8 @@ module SortableDataFormat =
         [ IntArray; BoolArray ]
 
 
-
+module SortableTestsSubsetId =
+    let Default = "0" |> UMX.tag<sortableTestsSubsetId>
 
 module SortingWidth =
     let toString (w: int<sortingWidth> option) : string =
