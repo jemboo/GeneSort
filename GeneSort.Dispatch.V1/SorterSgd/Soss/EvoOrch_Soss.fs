@@ -1,4 +1,4 @@
-namespace GeneSort.Dispatch.V1.SorterSgd.Standard
+namespace GeneSort.Dispatch.V1.SorterSgd.Soss
 
 open FSharp.UMX
 open System.Threading
@@ -26,7 +26,7 @@ module EvoOrch_Soss =
             (rp: runParameters)
             (allowOverwrite: bool<allowOverwrite>)
             (initialPoolSet: sorterPoolSet)
-            (sortableTests: sortableTests)
+            (sortableTestPartitions: setOfSortableTests)
             (prefix: ceBlock)
             (mutator: sorterModelMutator)
             (cts: CancellationToken)
@@ -159,14 +159,14 @@ module EvoOrch_Soss =
                             let reEvaluateParents = (remainingSteps % 10 = 0)
 
                             let nextSorterPoolSet = 
-                                SorterPipeline.runGenerationStepDebug
+                                SorterPipeline.runGenerationStepSossDebug
                                     mutator 
                                     currentSorterCountPerPool
                                     selectedSorterCountPerPool
                                     sorterChildCount
                                     prioritizeNewMutants
                                     distinctSorterHashes
-                                    sortableTests 
+                                    sortableTestPartitions
                                     prefix
                                     evalType
                                     srtrEvalMeasure

@@ -1,4 +1,4 @@
-namespace GeneSort.Dispatch.V1.SorterSgd.Standard
+namespace GeneSort.Dispatch.V1.SorterSgd.Soss
 
 open System
 open System.Threading
@@ -9,6 +9,7 @@ open GeneSort.Project.V1
 open GeneSort.Eval.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.Simple.V1
+open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open GeneSort.Eval.V1.Sgd
 open GeneSort.SortingOps
@@ -82,6 +83,25 @@ module SgdEx_Soss =
                     rp.GetSortingWidth() 
                     |> Result.ofOption "Missing sorting width."
                 let! (sortableTests, ces) = makeSortableTests rp 
+                let! seedSoss =
+                    rp.GetSeedSoss()
+                    |> Result.ofOption "Missing SeedSoss."
+                let! rngType =
+                    rp.GetRngType()
+                    |> Result.ofOption "Missing RNG type."
+                let sossRng: IRando =
+                    match rngType with
+                    | Lcg -> randomLcg(seedSoss) :> IRando
+                    | Net -> randomNet(UMX.tag<randomSeed> (int32 seedSoss)) :> IRando
+                    | Smx -> randomSplitMix64(seedSoss) :> IRando
+                let sortableTestsPartitions =
+                    SetOfSortableTests.partition sossRng.NextIndex (2 |> UMX.tag<sortableTestsCount>) sortableTests
+                let sortableTestsFirst = sortableTestsPartitions.SortableTests.[UMX.tag<sortableTestsSubsetId> "0"]
+                let sortableTestsSecond = sortableTestsPartitions.SortableTests.[UMX.tag<sortableTestsSubsetId> "1"]
+                log (sprintf "Partitioned sortable tests into two subsets of %d and %d tests."
+                        %(SortableTests.getSortableCount sortableTestsFirst)
+                        %(SortableTests.getSortableCount sortableTestsSecond))
+
                 let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces
 
                 // 1. Check for existing checkpoints directly via genDb
@@ -114,14 +134,14 @@ module SgdEx_Soss =
 
                 log "Executing unified evolution run..."
                 let! (_finalRunResult: sorterPoolSet) = 
-                    EvoOrch_Standard.runStandardEvolutionAsync
+                    EvoOrch_Soss.runSossEvolutionAsync
                         genDb
                         saveIntervals
                         subIntervals
                         activeRp
                         allowOverwrite
                         activeSeedPoolSet
-                        sortableTests
+                        sortableTestsPartitions
                         prefix
                         sorterModelMutator
                         cts.Token

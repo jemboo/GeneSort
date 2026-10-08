@@ -3,8 +3,10 @@ namespace GeneSort.Dispatch.V1.SorterSgd
 open GeneSort.Dispatch.V1
 open GeneSort.Db.V1
 open GeneSort.Dispatch.V1.SorterSgd.Standard
+open GeneSort.Dispatch.V1.SorterSgd.Soss
 
 type sorterSgdExecutorType = 
+    | GenSoss
     | GenStandard
     | GenMerge
     | GenPrefix
@@ -16,10 +18,10 @@ type sorterSgdExecutorType =
 
 module SorterSgdExecutorType =
 
-    let private executeEvolution (host: runHost) rp allowOverwrite cts progress makeTests createSeedPoolSet =
+    let private executeEvolution evaluateEvolution (host: runHost) rp allowOverwrite cts progress makeTests createSeedPoolSet =
         match host with
         | SgdRunHost sgdHost ->
-            SgdEx_Standard.evaluateEvolutionRunStandard
+            evaluateEvolution
                 makeTests
                 createSeedPoolSet
                 host.RunDb sgdHost.GenSaveIntervals sgdHost.GenSaveSubIntervals rp allowOverwrite cts progress
@@ -27,6 +29,7 @@ module SorterSgdExecutorType =
             async { return Error "SGD execution requires an SgdRun with generation save interval names." }
 
     let toString = function
+        | GenSoss -> "GenSoss"
         | GenStandard -> "GenStandard"
         | GenMerge -> "GenMerge"
         | GenPrefix -> "GenPrefix"
@@ -36,10 +39,18 @@ module SorterSgdExecutorType =
         | BinsReport -> "BinsReport"
 
 
+    let private sossExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                executeEvolution SgdEx_Soss.evaluateEvolutionRunSoss host rp allowOverwrite cts progress
+                    SortableTestsMakers.makePrefixTests
+                    PoolSetMakers.createSeedSorterPoolSetPrefix
+        }
+
     let private standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                executeEvolution host rp allowOverwrite cts progress
+                executeEvolution SgdEx_Standard.evaluateEvolutionRunStandard host rp allowOverwrite cts progress
                     SortableTestsMakers.makeStandardTests
                     PoolSetMakers.createSeedSorterPoolSetStandard
         }
@@ -47,7 +58,7 @@ module SorterSgdExecutorType =
     let private mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                executeEvolution host rp allowOverwrite cts progress
+                executeEvolution SgdEx_Standard.evaluateEvolutionRunStandard host rp allowOverwrite cts progress
                     SortableTestsMakers.makeMergeTests
                     PoolSetMakers.createSeedSorterPoolSetMerge
         }
@@ -55,7 +66,7 @@ module SorterSgdExecutorType =
     let private prefixExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                executeEvolution host rp allowOverwrite cts progress
+                executeEvolution SgdEx_Standard.evaluateEvolutionRunStandard host rp allowOverwrite cts progress
                     SortableTestsMakers.makePrefixTests
                     PoolSetMakers.createSeedSorterPoolSetPrefix
         }
@@ -63,6 +74,7 @@ module SorterSgdExecutorType =
 
     let getExecutor (executorType: sorterSgdExecutorType) : IRunParamsExecutor =
         match executorType with
+        | sorterSgdExecutorType.GenSoss -> sossExecutor
         | sorterSgdExecutorType.GenStandard -> standardExecutor
         | sorterSgdExecutorType.GenMerge -> mergeExecutor
         | sorterSgdExecutorType.GenPrefix -> prefixExecutor

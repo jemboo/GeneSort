@@ -48,15 +48,19 @@ module DispatchSorterSgd =
 
     ////********** Msuf6SgdSpecsPrefix **********
     //let private executorType = sorterSgdExecutorType.SummaryReport
-    //let private host: runHost = runHost.Create (Msuf624p3b.MutationRate.VarModR_32.Test executorType) 8
+    //let private host: runHost = runHost.Create (Prefix.p24.Msuf63b.MutationRate.VarModR_32.Test executorType) 8
 
     //let private executor = SorterSgdExecutorType.getExecutor executorType
     //let private minReplica = 0<replNumber>
     //let private maxReplica = 1<replNumber>
 
+    //********** Soss Msuf32p4a **********
+    //let private executorType = sorterSgdExecutorType.GenSoss
+    //let private host: runHost = runHost.Create (Prefix.p32.Msuf4a.Soss_32.Pool_32_Test executorType) 8
+
     //********** Msuf4SgdSpecsPrefix **********
-    let private executorType = sorterSgdExecutorType.SummaryReport
-    let private host: runHost = runHost.Create (Msuf32p4a.MutationRate.VarModR_32.Pool_32_Test executorType) 8
+    let private executorType = sorterSgdExecutorType.GenSoss
+    let private host: runHost = runHost.Create (Prefix.p32.Msuf4a.Soss_32.Pool_32_Test executorType) 8
 
     let private executor = SorterSgdExecutorType.getExecutor executorType
     let private minReplica = 0<replNumber>
@@ -64,7 +68,7 @@ module DispatchSorterSgd =
 
     //********** MsrsSgdSpecsPrefix **********
     //let private executorType = sorterSgdExecutorType.GenPrefix
-    //let private host: runHost = runHost.Create (Msrs32p4a.MutationRate.VarModR_64.NarrowTest executorType) 16
+    //let private host: runHost = runHost.Create (Prefix.p32.Msrs4a.MutationRate.VarModR_64.NarrowTest executorType) 16
 
     //let private executor = SorterSgdExecutorType.getExecutor executorType
     //let private minReplica = 1<replNumber>
@@ -73,7 +77,7 @@ module DispatchSorterSgd =
 
     //********** MssiSgdSpecsPrefix **********
     //let private executorType = sorterSgdExecutorType.SummaryReport
-    //let private host: runHost = runHost.Create (Mssi24p3b.OrthoPara.Specs64.SymForceDiff1 executorType) 8
+    //let private host: runHost = runHost.Create (Prefix.p24.Mssi3b.OrthoPara.Specs64.SymForceDiff1 executorType) 8
 
     //let private executor = SorterSgdExecutorType.getExecutor executorType
     //let private minReplica = 0<replNumber>
