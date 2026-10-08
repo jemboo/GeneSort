@@ -1,11 +1,11 @@
-﻿namespace GeneSort.Eval.V1.Sgd
-
+﻿namespace GeneSort.Eval.V1.Sgd.Standard
 open FSharp.UMX
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.Core
 open GeneSort.Eval.V1
 open GeneSort.Sorting
+open GeneSort.Eval.V1.Sgd
 
 type spmDescription =
     private {

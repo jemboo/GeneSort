@@ -16,6 +16,7 @@ open GeneSort.SortingOps
 open GeneSort.Dispatch.V1
 open GeneSort.Sorting.Sorter
 open GeneSort.Dispatch.V1.SorterSgd
+open GeneSort.Eval.V1.Sgd.Standard
 
 module SgdEx_Soss =
 

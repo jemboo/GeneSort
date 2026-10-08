@@ -5,6 +5,7 @@ open MessagePack
 open FSharp.UMX
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.Mp.V1.Bins
+open GeneSort.Eval.V1.Sgd.Bins.Standard
 
 // ---------------------------------------------------------------------
 // 1. DTO Definition

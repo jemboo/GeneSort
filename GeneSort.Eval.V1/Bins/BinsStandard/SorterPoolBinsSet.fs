@@ -1,10 +1,12 @@
-﻿namespace GeneSort.Eval.V1.Sgd
+﻿namespace GeneSort.Eval.V1.Sgd.Bins.Standard
 
 open FSharp.UMX
 open System
 open GeneSort.Eval.V1
+open GeneSort.Eval.V1.Bins
+open GeneSort.Eval.V1.Bins.Standard
+open GeneSort.Eval.V1.Sgd.Standard
 
-[<Measure>] type sorterPoolBinsSetId
 
 type sorterPoolBinsSet =
     private {

@@ -1,4 +1,4 @@
-namespace GeneSort.Eval.V1.Sgd
+namespace GeneSort.Eval.V1.Sgd.Standard
 
 open FSharp.UMX
 open GeneSort.Sorting.Sortable

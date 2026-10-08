@@ -10,6 +10,7 @@ open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1
+open GeneSort.Eval.V1.Sgd.Standard
 
 module Reporting =
 

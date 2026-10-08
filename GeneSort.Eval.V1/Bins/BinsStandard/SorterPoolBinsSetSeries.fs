@@ -1,7 +1,9 @@
-﻿namespace GeneSort.Eval.V1.Sgd
+﻿namespace GeneSort.Eval.V1.Sgd.Standard
 
 open FSharp.UMX
 open GeneSort.Eval.V1
+open GeneSort.Eval.V1.Bins
+open GeneSort.Eval.V1.Sgd.Bins.Standard
 
 [<Measure>] type sorterPoolBinsSetSeriesId
 

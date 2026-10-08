@@ -20,6 +20,7 @@ open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.Mp.V1.Sgd
 open GeneSort.Core
 open GeneSort.Eval.Mp.V1.Bins
+open GeneSort.Eval.V1.Sgd.Standard
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder

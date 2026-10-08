@@ -7,6 +7,7 @@ open GeneSort.Sorting
 open GeneSort.SortingOps
 open GeneSort.SortingOps.Mp
 open GeneSort.Eval.V1.Sgd
+open GeneSort.Eval.V1.Sgd.Standard
 
 // ----------------------------------------------------------------------------
 // sorterPoolMemberHistoryDto

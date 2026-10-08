@@ -8,6 +8,7 @@ open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 open GeneSort.Eval.V1
 open GeneSort.Core
+open GeneSort.Eval.V1.Sgd.Standard
 
 // ---------------------------------------------------------------------
 // Lightweight Summary Snapshot DTOs

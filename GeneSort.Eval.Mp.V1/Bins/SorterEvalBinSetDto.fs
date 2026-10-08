@@ -4,6 +4,7 @@ open System
 open FSharp.UMX
 open GeneSort.Eval.V1.Bins
 open GeneSort.SortingOps.Mp
+open GeneSort.Eval.V1.Bins.Standard
 
 type sorterEvalKeyDto = {
     CeCount: int

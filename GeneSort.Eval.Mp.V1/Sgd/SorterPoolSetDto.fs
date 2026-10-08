@@ -10,6 +10,7 @@ open GeneSort.Eval.V1.Sgd
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.Mp.V1
+open GeneSort.Eval.V1.Sgd.Standard
 
 type sorterPoolMemberDto = {
     sorterPoolMemberId: Guid

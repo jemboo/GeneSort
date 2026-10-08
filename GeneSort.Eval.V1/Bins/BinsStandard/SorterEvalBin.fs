@@ -1,8 +1,9 @@
-namespace GeneSort.Eval.V1.Bins
+namespace GeneSort.Eval.V1.Bins.Standard
 
 open System.Collections.Generic
 open GeneSort.Core
 open GeneSort.SortingOps
+open GeneSort.Eval.V1.Bins
 
 type sorterEvalBin =
     private {

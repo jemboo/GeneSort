@@ -11,6 +11,7 @@ open GeneSort.Eval.V1
 open GeneSort.SortingLib.Sorter
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Project.V1.RunParamBundles
+open GeneSort.Eval.V1.Sgd.Standard
 
 type runParameters =
     private { paramMap : Map<string, string> }

@@ -6,6 +6,7 @@ open GeneSort.Core
 open GeneSort.SortingOps
 open GeneSort.Sorting.Sorter
 open GeneSort.Eval.V1.Sgd
+open GeneSort.Eval.V1.Sgd.Standard
 
 
 type outputData =

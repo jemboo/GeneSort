@@ -11,6 +11,9 @@ open GeneSort.Eval.V1.Sgd
 open GeneSort.SortingOps
 open System
 open GeneSort.Model.Sorting.V1
+open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Eval.V1.Bins
+open GeneSort.Eval.V1.Sgd.Bins.Standard
 
 module EvoOrch_Soss =
 

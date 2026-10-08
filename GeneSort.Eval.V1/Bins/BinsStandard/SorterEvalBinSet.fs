@@ -1,9 +1,9 @@
-﻿namespace GeneSort.Eval.V1.Bins
+﻿namespace GeneSort.Eval.V1.Bins.Standard
 
 open FSharp.UMX
 open GeneSort.SortingOps
+open GeneSort.Eval.V1.Bins
 
-[<Measure>] type sorterEvalBinSetId
 
 type sorterEvalBinSet =
     private {
