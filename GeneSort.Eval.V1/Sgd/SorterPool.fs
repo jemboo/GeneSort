@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Eval.V1.Sgd
+namespace GeneSort.Eval.V1.Sgd
 
 open System
 open FSharp.UMX
@@ -262,7 +262,7 @@ module SorterPool =
             pool.SorterPoolMembers
             |> Seq.choose (fun spm ->
                 match spm.SorterEval with
-                | Some eval when SorterEval.getIsSorted eval = Some true ->
+                | Some eval when SorterEval.getIsSorted eval ->
                     Some (spm, SorterEval.getLastCeIndex eval)
                 | _ -> None
             )

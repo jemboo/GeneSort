@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Eval.V1.Sgd
+namespace GeneSort.Eval.V1.Sgd
 
 open System
 open FSharp.UMX
@@ -26,7 +26,7 @@ type sorterPoolSet =
         if evals.Length = 0 then
             0.0
         else
-            let sortedCount = evals |> Array.sumBy (fun eval -> if SorterEval.getIsSorted eval = Some true then 1 else 0)
+            let sortedCount = evals |> Array.sumBy (fun eval -> if SorterEval.getIsSorted eval then 1 else 0)
             float sortedCount * 100.0 / float evals.Length
     member private this.GetSorterEvals() : sorterEval array =
         this._sorterPools

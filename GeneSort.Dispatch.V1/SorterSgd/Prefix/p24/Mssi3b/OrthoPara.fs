@@ -1,4 +1,4 @@
-module GeneSort.Dispatch.V1.SorterSgd.Mssi24p3b.OrthoPara
+module GeneSort.Dispatch.V1.SorterSgd.Prefix.p24.Mssi3b.OrthoPara
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -9,7 +9,7 @@ open GeneSort.Db.V1
 open GeneSort.FileDb.V1
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.SorterSgd.Mssi24p3b.Common
+open GeneSort.Dispatch.V1.SorterSgd.Prefix.p24.Mssi3b.Common
 open GeneSort.Dispatch.V1.SorterSgd
 let dbOrthoPara64Name = "OrthoPara64" |> UMX.tag<databaseName>
 let dbOrthoPara128Name = "OrthoPara128" |> UMX.tag<databaseName>

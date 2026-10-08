@@ -1,4 +1,4 @@
-module GeneSort.Dispatch.V1.SorterSgd.Msuf624p3b.MutationRate
+module GeneSort.Dispatch.V1.SorterSgd.Prefix.p24.Msuf63b.MutationRate
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -10,7 +10,7 @@ open GeneSort.Db.V1
 open GeneSort.FileDb.V1
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.SorterSgd.Msuf624p3b.Common
+open GeneSort.Dispatch.V1.SorterSgd.Prefix.p24.Msuf63b.Common
 open GeneSort.Dispatch.V1.SorterSgd
 
 let dbVariableModR_32Name = "VariableModRates_Uf6_32" |> UMX.tag<databaseName>

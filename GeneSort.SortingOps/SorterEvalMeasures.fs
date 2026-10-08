@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingOps
+namespace GeneSort.SortingOps
 
 open System
 open FSharp.UMX
@@ -247,12 +247,8 @@ module SorterEvalFunctions =
         UMX.tag<sorterEvalScore> score
 
     let byUnsortedCount (m: float) (eval: sorterEval) : float<sorterEvalScore> =
-        let score =
-            match SorterEval.getUnsortedCount eval with
-            | Some count ->
-                let uc = float count
-                if uc <= 0.0 then 0.0 else m * Math.Log uc
-            | None -> Double.PositiveInfinity
+        let uc = SorterEval.getUnsortedCount eval |> float
+        let score = if uc <= 0.0 then 0.0 else m * Math.Log uc
         UMX.tag<sorterEvalScore> score
 
     let getFunctionForMeasure (measure: sorterEvalMeasure) : (sorterEval -> float<sorterEvalScore>) =
@@ -298,7 +294,7 @@ module SorterEvalFunctions =
         |> Seq.filter (fun se -> 
             let passUnsorted = 
                 not (%getFilterUnsortedFlag measure)
-                || (SorterEval.getUnsortedCount se |> Option.exists ((>=) 0<sortableCount>))
+                || (SorterEval.getUnsortedCount se <= 0<sortableCount>)
             let passRefl = 
                 not (%getFilterReflectionSymmetricFlag measure) || 
                 (SorterEval.getIsReflectionSymmetric se |> UMX.untag)

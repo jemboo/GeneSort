@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Eval.Mp.V1.Sgd
+namespace GeneSort.Eval.Mp.V1.Sgd
 
 open System
 open MessagePack
@@ -40,7 +40,7 @@ module SorterPoolMemberHistoryDto =
                 {
                     SorterId = %v2.SorterId
                     SortableTestsSubsetId = %v2.SortableTestsSubsetId
-                    UnsortedCount = v2.UnsortedCount |> Option.map UMX.untag
+                    UnsortedCount = Some (UMX.untag v2.UnsortedCount)
                     SequenceHash = %v2.SequenceHash
                     StageLength = %v2.StageLength
                     CeUseArray = v2.CeUseArray |> Array.map CeDataDto.fromDomain
@@ -75,7 +75,7 @@ module SorterPoolMemberHistoryDto =
                     (v2Dto.SorterId |> UMX.tag)
                     (if String.IsNullOrWhiteSpace v2Dto.SortableTestsSubsetId then SortableTestsSubsetId.Default else v2Dto.SortableTestsSubsetId |> UMX.tag<sortableTestsSubsetId>)
                     (v2Dto.SortingWidth |> UMX.tag)
-                    (v2Dto.UnsortedCount |> Option.map UMX.tag)
+                    (v2Dto.UnsortedCount |> Option.defaultValue 0 |> UMX.tag)
                     (v2Dto.SequenceHash |> UMX.tag)
                     (v2Dto.StageLength |> UMX.tag)
                     (v2Dto.CeUseArray |> Array.map CeDataDto.toDomain)

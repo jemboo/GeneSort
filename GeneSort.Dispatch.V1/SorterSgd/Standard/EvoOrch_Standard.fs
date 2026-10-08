@@ -166,7 +166,7 @@ module EvoOrch_Standard =
                                     sorterChildCount
                                     prioritizeNewMutants
                                     distinctSorterHashes
-                                    sortableTests 
+                                    sortableTests
                                     prefix
                                     evalType
                                     srtrEvalMeasure

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Eval.V1.Sgd
+namespace GeneSort.Eval.V1.Sgd
 
 open FSharp.UMX
 open GeneSort.SortingOps
@@ -127,7 +127,7 @@ module SorterPoolSetSummary =
                     let reflectiveCountRs = evals |> Array.map (fun ev -> float (float %(SorterEval.getReflectiveCount ev) / float %(SorterEval.getCeLength ev)))
                     let averageUnsortedCount =
                         evals
-                        |> Array.choose (SorterEval.getUnsortedCount >> Option.map UMX.untag >> Option.map float)
+                        |> Array.map (SorterEval.getUnsortedCount >> UMX.untag >> float)
                         |> function
                             | [||] -> 0.0
                             | counts -> Array.average counts

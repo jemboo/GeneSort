@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Eval.V1.Bins
+namespace GeneSort.Eval.V1.Bins
 
 open System.Collections.Generic
 open GeneSort.Core
@@ -29,9 +29,9 @@ type sorterEvalBin =
     member this.SorterEvalKey with get() = this.sorterEvalKey
     member this.SorterEvals with get() = this.sorterEvals :> IReadOnlyList<sorterEval>
     member this.SortedCount with get() = 
-        this.sorterEvals |> Seq.filter (fun eval -> SorterEval.getIsSorted eval = Some true) |> Seq.length
+        this.sorterEvals |> Seq.filter (fun eval -> SorterEval.getIsSorted eval) |> Seq.length
     member this.UnsortedCount with get() = 
-        this.sorterEvals |> Seq.filter (fun eval -> SorterEval.getIsUnSorted eval = Some true) |> Seq.length
+        this.sorterEvals |> Seq.filter (fun eval -> SorterEval.getIsUnSorted eval) |> Seq.length
     /// Appends a score to the existing bin (Mutable Addition)
     member this.AddSorterEval (sorterEval: sorterEval) =
         this.sorterEvals.Add(sorterEval)

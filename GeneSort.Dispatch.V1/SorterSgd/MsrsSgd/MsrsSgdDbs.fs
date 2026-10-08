@@ -1,4 +1,4 @@
-namespace GeneSort.Dispatch.V1.SorterSgd.Msrs
+namespace GeneSort.Dispatch.V1.SorterSgd.MsrsSgd
 
 open FSharp.UMX
 open GeneSort.Sorting

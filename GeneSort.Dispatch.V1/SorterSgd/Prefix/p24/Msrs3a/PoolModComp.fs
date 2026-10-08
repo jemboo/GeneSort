@@ -1,4 +1,4 @@
-module GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.PoolModComp
+module GeneSort.Dispatch.V1.SorterSgd.Prefix.p24.Msrs3a.PoolModComp
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -9,7 +9,7 @@ open GeneSort.Db.V1
 open GeneSort.FileDb.V1
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a.Common
+open GeneSort.Dispatch.V1.SorterSgd.Prefix.p24.Msrs3a.Common
 open GeneSort.Dispatch.V1.SorterSgd
 let dbName_Sz_2048_Of_4096 = "Sz_2048_Of_4096" |> UMX.tag<databaseName>
 let dbNamePools4096_2_vs_256 = "PoolsSelSzTest_2_vs_256" |> UMX.tag<databaseName>

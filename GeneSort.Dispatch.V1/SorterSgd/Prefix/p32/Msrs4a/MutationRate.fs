@@ -1,4 +1,4 @@
-namespace GeneSort.Dispatch.V1.SorterSgd.Msrs32p4a
+namespace GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msrs4a
 
 open FSharp.UMX
 open GeneSort.Sorting
@@ -9,7 +9,7 @@ open GeneSort.Db.V1
 open GeneSort.FileDb.V1
 open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.SorterSgd.Msrs32p4a.Common
+open GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msrs4a.Common
 open GeneSort.Dispatch.V1.SorterSgd
 
 

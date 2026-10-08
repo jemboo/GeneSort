@@ -1,4 +1,4 @@
-namespace GeneSort.Dispatch.V1.SorterSgd.Msrs24p3a
+namespace GeneSort.Dispatch.V1.SorterSgd.Prefix.p24.Msrs3a
 
 open FSharp.UMX
 open GeneSort.Sorting

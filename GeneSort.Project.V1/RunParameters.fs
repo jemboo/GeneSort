@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Project.V1
+namespace GeneSort.Project.V1
 
 open System
 open System.Globalization
@@ -59,6 +59,7 @@ type runParameters =
     static member runFinishedKey = "RunFinished"
     static member runNameKey = "RunName"
     static member seedModificationRateKey = "SeedModificationRate"
+    static member seedSossKey = "SeedSoss"
     static member seedSorterPoolSelectionTypeKey = "SeedPoolSorterSelectionType"
     static member selectedSorterCountPerPoolKey = "SelectedSorterCountPerPool"
     static member selfSymRateKey = "SelfSym"
@@ -111,6 +112,13 @@ type runParameters =
 
     static member private tryGetInt (key: string) (map: Map<string, string>) =
         map.TryFind key |> Option.bind (fun v -> match Int32.TryParse v with true, i -> Some i | _ -> None)
+
+    static member private tryGetUInt64 (key: string) (map: Map<string, string>) =
+        map.TryFind key
+        |> Option.bind (fun v ->
+            match UInt64.TryParse(v, NumberStyles.Integer, CultureInfo.InvariantCulture) with
+            | true, seed -> Some seed
+            | _ -> None)
 
     member this.ParamMap with get() :Map<string,string> = this.paramMap
 
@@ -256,6 +264,10 @@ type runParameters =
     member this.GetSeedModificationRate() =
         runParameters.tryGetFloat runParameters.seedModificationRateKey this.paramMap
         |> Option.map UMX.tag<seedModificationRate>
+
+    member this.GetSeedSoss() : uint64<randomSeed> option =
+        runParameters.tryGetUInt64 runParameters.seedSossKey this.paramMap
+        |> Option.map UMX.tag<randomSeed>
 
     member this.GetSeedSorterPoolSelectionType() =
         this.paramMap.TryFind runParameters.seedSorterPoolSelectionTypeKey
@@ -492,6 +504,10 @@ type runParameters =
 
     member this.WithSeedModificationRate(mr: float<seedModificationRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedModificationRateKey (mr |> Option.map UmxExt.floatToRaw) }
+
+    member this.WithSeedSoss(seed: uint64<randomSeed> option) =
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedSossKey
+                        (seed |> Option.map (fun value -> (UMX.untag value).ToString(CultureInfo.InvariantCulture))) }
 
     member this.WithSeedSorterPoolSelectionType(ses: sorterSelectionType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedSorterPoolSelectionTypeKey (ses |> Option.map SorterSelectionType.toString) }
