@@ -41,7 +41,7 @@ module MutateSpecsRs =
                 testChildCount
                 mutationMod1
             ]
-                    "sorter-mutate.standard"
+                    QueryCatalogNames.sorterMutateStandard
                     RunParamBuilderNames.Filter.standardSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
                     false
@@ -68,7 +68,7 @@ module MutateSpecsRs =
                 testChildCount
                 mutationMod1
             ]
-                    "sorter-mutate.standard"
+                    QueryCatalogNames.sorterMutateStandard
                     RunParamBuilderNames.Filter.standardSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
                     false

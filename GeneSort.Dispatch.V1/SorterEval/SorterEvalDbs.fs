@@ -26,7 +26,7 @@ module SorterEvalDbs =
 
         let makeQueryParams = QueryParamsBuilders.SorterEval.Standard.makeQueryParams projectName dbName
         let queryParamsFromRunParams = QueryParamsBuilders.SorterEval.Standard.queryParamsFromRunParams projectName dbName
-        let db = new GeneSortDbMp(dbFolder, "sorter-eval.standard")
+        let db = new GeneSortDbMp(dbFolder, QueryCatalogNames.sorterEvalStandard)
 
 
 
@@ -38,7 +38,7 @@ module SorterEvalDbs =
 
         let makeQueryParams = QueryParamsBuilders.SorterEval.Merge.makeQueryParams projectName dbName
         let queryParamsFromRunParams = QueryParamsBuilders.SorterEval.Merge.queryParamsFromRunParams projectName dbName
-        let db = new GeneSortDbMp(dbFolder, "sorter-eval.merge")
+        let db = new GeneSortDbMp(dbFolder, QueryCatalogNames.sorterEvalMerge)
 
 
 
@@ -50,7 +50,7 @@ module SorterEvalDbs =
 
         let makeQueryParams = QueryParamsBuilders.SorterEval.Prefix.makeQueryParams projectName dbName
         let queryParamsFromRunParams = QueryParamsBuilders.SorterEval.Prefix.queryParamsFromRunParams projectName dbName
-        let db = new GeneSortDbMp(dbFolder, "sorter-eval.prefix")
+        let db = new GeneSortDbMp(dbFolder, QueryCatalogNames.sorterEvalPrefix)
 
 
 

@@ -54,7 +54,7 @@ module VarModR_32 =
         ]
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
-                "sorter-sgd.uf6-mutation-rate"
+                QueryCatalogNames.sorterSgdUf6MutationRate
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
                 false
@@ -83,7 +83,7 @@ module VarModR_32 =
         ]
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
-                "sorter-sgd.uf6-mutation-rate"
+                QueryCatalogNames.sorterSgdUf6MutationRate
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
                 false

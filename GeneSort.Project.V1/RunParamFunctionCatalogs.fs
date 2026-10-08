@@ -154,6 +154,7 @@ module RunParamEnhancerBuilders =
             .WithId(Some qp.Id)
 
     module Sgd =
+
         let private applyPrefixDefaults
                 (sortingWidth: int<sortingWidth>)
                 (stageLength: int<stageLength>)

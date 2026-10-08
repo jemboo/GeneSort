@@ -28,7 +28,7 @@ module SorterEvalSpecsTestPrefix =
                 sorterEvalTypeV2
                 largeSorterCount
             ]
-                    "sorter-eval.prefix"
+                    QueryCatalogNames.sorterEvalPrefix
                     RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalPrefix
                     false
@@ -50,7 +50,7 @@ module SorterEvalSpecsTestPrefix =
                 sorterEvalTypeV2
                 largeSorterCount
             ]
-                    "sorter-eval.prefix"
+                    QueryCatalogNames.sorterEvalPrefix
                     RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalPrefix
                     false

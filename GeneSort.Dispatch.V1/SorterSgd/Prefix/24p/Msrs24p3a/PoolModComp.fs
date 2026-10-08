@@ -40,7 +40,7 @@ module Specs =
         ]
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
-                "sorter-sgd.msrs-pool-mod-comp"
+                QueryCatalogNames.sorterSgdMsrsPoolModComp
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
                 false
@@ -63,7 +63,7 @@ module Specs =
         ]
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
-                "sorter-sgd.msrs-pool-mod-comp"
+                QueryCatalogNames.sorterSgdMsrsPoolModComp
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
                 false
@@ -86,7 +86,7 @@ module Specs =
         ]
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
-                "sorter-sgd.msrs-pool-mod-comp"
+                QueryCatalogNames.sorterSgdMsrsPoolModComp
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
                 false

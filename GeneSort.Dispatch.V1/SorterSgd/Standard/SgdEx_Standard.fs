@@ -1,4 +1,4 @@
-namespace GeneSort.Dispatch.V1.SorterSgd
+namespace GeneSort.Dispatch.V1.SorterSgd.Standard
 
 open System
 open System.Threading
@@ -14,8 +14,9 @@ open GeneSort.Eval.V1.Sgd
 open GeneSort.SortingOps
 open GeneSort.Dispatch.V1
 open GeneSort.Sorting.Sorter
+open GeneSort.Dispatch.V1.SorterSgd
 
-module SgdExecutor =
+module SgdEx_Standard =
 
     /// Handles initialization, evaluation, and DB saving when no checkpoint exists
     let initializeAndSaveSeedPoolSet 
@@ -57,7 +58,7 @@ module SgdExecutor =
 
     /// Dispatches the evolution history run parameters, executes the generative loop via asyncResult,
     /// and manages final state serialization/reporting pipelines.
-    let evaluateEvolutionRun
+    let evaluateEvolutionRunStandard
             (makeSortableTests: runParameters ->  Async<Result<sortableTests * (ce array), string>> )
             (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
             (genDb: IGeneSortDb)
@@ -113,7 +114,7 @@ module SgdExecutor =
 
                 log "Executing unified evolution run..."
                 let! (_finalRunResult: sorterPoolSet) = 
-                    EvolutionOrchestrator.runEvolutionAsync
+                    EvoOrch_Standard.runStandardEvolutionAsync
                         genDb
                         saveIntervals
                         subIntervals

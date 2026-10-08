@@ -24,7 +24,7 @@ module SorterMutateDbs =
             let dbFolder = 
                     @$"c:\Projects\{projectName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
 
-            let db = new GeneSortDbMp(dbFolder, "sorter-mutate.standard")
+            let db = new GeneSortDbMp(dbFolder, QueryCatalogNames.sorterMutateStandard)
 
 
 
@@ -36,7 +36,7 @@ module SorterMutateDbs =
             let dbFolder = 
                     $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
-            let db = new GeneSortDbMp(dbFolder, "sorter-mutate.merge")
+            let db = new GeneSortDbMp(dbFolder, QueryCatalogNames.sorterMutateMerge)
 
 
 
@@ -48,7 +48,7 @@ module SorterMutateDbs =
             let dbFolder = 
                     $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
-            let db = new GeneSortDbMp(dbFolder, "sorter-mutate.prefix")
+            let db = new GeneSortDbMp(dbFolder, QueryCatalogNames.sorterMutatePrefix)
 
 
     let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 

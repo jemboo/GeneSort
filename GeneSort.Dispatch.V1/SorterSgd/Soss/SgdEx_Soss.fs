@@ -1,0 +1,137 @@
+namespace GeneSort.Dispatch.V1.SorterSgd.Standard
+
+open System
+open System.Threading
+open FSharp.UMX
+open GeneSort.Core
+open GeneSort.Db.V1
+open GeneSort.Project.V1
+open GeneSort.Eval.V1
+open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sorting.Simple.V1
+open GeneSort.Sorting.Sortable
+open GeneSort.Eval.V1.Sgd
+open GeneSort.SortingOps
+open GeneSort.Dispatch.V1
+open GeneSort.Sorting.Sorter
+open GeneSort.Dispatch.V1.SorterSgd
+
+module SgdEx_Soss =
+
+    /// Handles initialization, evaluation, and DB saving when no checkpoint exists
+    let initializeAndSaveSeedPoolSet 
+            (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
+            (genDb: IGeneSortDb)
+            (saveIntervals: genIntervalConfig)
+            (subIntervals: genIntervalConfig)
+            (rp: runParameters)
+            (sortableTests: sortableTests)
+            (prefix: ceBlock)
+            (log: string -> unit) : Async<Result<sorterPoolSet, string>> =
+
+        asyncResult {
+            let evalType = sorterEvalType.V2
+            log "No saved checkpoint found. Creating initial seedSorterPoolSet..."
+            let! seedPoolSet = sorterPoolSetCreator rp
+            
+            let computedEvals = 
+                seedPoolSet 
+                |> SorterPoolRunner.evaluatePoolSet 
+                    sortableTests 
+                    prefix
+                    evalType
+                    true // reEvaluateParents
+                    (false |> UMX.tag<collectNewSortableTests>)
+            
+            let evaluatedSeedSet = seedPoolSet |> SorterPoolSet.updateSorterEvals computedEvals
+
+            // Save SorterPoolSetSummaries
+            let! qpSsrr = 
+                genDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterPoolSet "")
+                |> Result.ofOption "Failed to create QueryParams for seedSorterRunResult."   
+            do! genDb.saveAsync qpSsrr (seedPoolSet |> outputData.SorterPoolSet) (false |> UMX.tag<allowOverwrite>)
+            log (sprintf "Initial seedSorterPoolSet saved at generation %d." %evaluatedSeedSet.GenerationNumber)
+
+            return evaluatedSeedSet
+        }
+
+
+    /// Dispatches the evolution history run parameters, executes the generative loop via asyncResult,
+    /// and manages final state serialization/reporting pipelines.
+    let evaluateEvolutionRunSoss
+            (makeSortableTests: runParameters ->  Async<Result<sortableTests * (ce array), string>> )
+            (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
+            (genDb: IGeneSortDb)
+            (saveIntervals: genIntervalConfig)
+            (subIntervals: genIntervalConfig)
+            (rp: runParameters)
+            (allowOverwrite: bool<allowOverwrite>)
+            (cts: CancellationTokenSource)
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+
+        let log (msg: string) =
+                OpsUtils.report progress 
+                    (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+
+        asyncResult {
+            try
+                do! checkCancellation cts.Token
+
+                log "Executing makeSortableTests..."
+                let! sWidth = 
+                    rp.GetSortingWidth() 
+                    |> Result.ofOption "Missing sorting width."
+                let! (sortableTests, ces) = makeSortableTests rp 
+                let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces
+
+                // 1. Check for existing checkpoints directly via genDb
+                let! highestPoolSetOpt = Utils.loadHighestGenSorterPoolSet saveIntervals genDb rp
+
+                // 2. Conditionally initialize or resume from the highest discovered checkpoint
+                let! (activeSeedPoolSet, activeRp) = 
+                    match highestPoolSetOpt with
+                    | None -> 
+                        asyncResult {
+                            let initRp = rp.WithGenerationCurrent(Some (0 |> UMX.tag<generationNumber>))
+                            let! (seedSet: sorterPoolSet) = 
+                                        initializeAndSaveSeedPoolSet 
+                                            sorterPoolSetCreator genDb saveIntervals subIntervals initRp sortableTests prefix log
+                            return seedSet, initRp
+                        }
+                    | Some (highestPoolSet: sorterPoolSet) -> 
+                        asyncResult {
+                            let currentGen = highestPoolSet.GenerationNumber
+                            log (sprintf "Found existing checkpoint at Generation %d. Resuming evolution." %currentGen)
+                            let updatedRp = rp.WithGenerationCurrent(Some currentGen)
+                            return highestPoolSet, updatedRp
+                        }
+
+                do! checkCancellation cts.Token
+                
+                log "Making sorterModelMutator..."
+                let! (sSmm: simpleSorterModelMutator) = MutatorMakers.makeSimpleSorterModelMutator activeRp
+                let (sorterModelMutator: sorterModelMutator) = sSmm |> sorterModelMutator.Simple
+
+                log "Executing unified evolution run..."
+                let! (_finalRunResult: sorterPoolSet) = 
+                    EvoOrch_Standard.runStandardEvolutionAsync
+                        genDb
+                        saveIntervals
+                        subIntervals
+                        activeRp
+                        allowOverwrite
+                        activeSeedPoolSet
+                        sortableTests
+                        prefix
+                        sorterModelMutator
+                        cts.Token
+                        log
+
+                log "evaluateEvolutionRun completed."
+                return activeRp
+
+            with e -> 
+                let errorMsg = sprintf "Error in evaluateEvolutionRun: %s" e.Message
+                log errorMsg 
+                return! Error errorMsg
+        } |> Async.map (OpsUtils.logResult progress log)

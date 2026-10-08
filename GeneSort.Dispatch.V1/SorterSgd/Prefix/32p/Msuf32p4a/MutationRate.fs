@@ -45,7 +45,7 @@ module VarModR_32 =
         ]
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
-                "sorter-sgd.msuf32-mutation-rate"
+                QueryCatalogNames.sorterSgdMsuf32MutationRate
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msuf32MutationRate
                 false
@@ -73,7 +73,7 @@ module VarModR_32 =
         ]
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
-                "sorter-sgd.msuf32-mutation-rate"
+                QueryCatalogNames.sorterSgdMsuf32MutationRate
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msuf32MutationRate
                 false
@@ -101,7 +101,7 @@ module VarModR_32 =
         ]
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
-                "sorter-sgd.msuf32-mutation-rate"
+                QueryCatalogNames.sorterSgdMsuf32MutationRate
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msuf32MutationRate
                 false

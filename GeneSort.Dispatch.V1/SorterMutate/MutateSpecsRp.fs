@@ -40,7 +40,7 @@ module MutateSpecsRp =
                 testChildCount
                 mutationMod1
             ]
-                    "sorter-mutate.prefix"
+                    QueryCatalogNames.sorterMutatePrefix
                     RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false
@@ -67,7 +67,7 @@ module MutateSpecsRp =
                 testChildCount
                 mutationMod1
             ]
-                    "sorter-mutate.prefix"
+                    QueryCatalogNames.sorterMutatePrefix
                     RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false
@@ -94,7 +94,7 @@ module MutateSpecsRp =
                 testChildCount
                 mutationMod1
             ]
-                    "sorter-mutate.prefix"
+                    QueryCatalogNames.sorterMutatePrefix
                     RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false
@@ -120,7 +120,7 @@ module MutateSpecsRp =
                 testChildCount
                 mutationMod1
             ]
-                    "sorter-mutate.prefix"
+                    QueryCatalogNames.sorterMutatePrefix
                     RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false

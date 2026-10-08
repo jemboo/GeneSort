@@ -28,7 +28,7 @@ module SorterEvalSpecsRs =
                 allSimpleSorterModelTypes
                 largeSorterCount
             ]
-                    "sorter-eval.standard"
+                    QueryCatalogNames.sorterEvalStandard
                     RunParamBuilderNames.Filter.standardSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalStandard
                     false
@@ -48,7 +48,7 @@ module SorterEvalSpecsRs =
                 allSimpleSorterModelTypes
                 extraLargeSorterCount
             ]
-                    "sorter-eval.standard"
+                    QueryCatalogNames.sorterEvalStandard
                     RunParamBuilderNames.Filter.standardSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalStandard
                     false
@@ -68,7 +68,7 @@ module SorterEvalSpecsRs =
                 allSimpleSorterModelTypes
                 extraLargeSorterCount
             ]
-                    "sorter-eval.standard"
+                    QueryCatalogNames.sorterEvalStandard
                     RunParamBuilderNames.Filter.standardSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalStandard
                     false

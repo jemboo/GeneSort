@@ -21,7 +21,7 @@ module SortableTestsSpecsMerge =
                 mergeLib_Merge32s
                 dataFormatInt8v512
             ]
-                    "sortable-test.merge"
+                    QueryCatalogNames.sortableTestMerge
                     RunParamBuilderNames.Filter.mergeDimensionDividesSortingWidth
                     RunParamBuilderNames.Enhancer.sortableTests
                     false

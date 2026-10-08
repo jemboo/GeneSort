@@ -394,20 +394,20 @@ module QueryParamsBuilders =
         lock registrationLock (fun () ->
             if not registered then
                 [
-                    "sorter-sgd.uf6-mutation-rate", SorterSgd.Uf6MutationRate.queryParamsFromRunParams
-                    "sorter-sgd.msrs-ortho-para", SorterSgd.MsrsOrthoPara.queryParamsFromRunParams
-                    "sorter-sgd.mssi-ortho-para", SorterSgd.MssiOrthoPara.queryParamsFromRunParams
-                    "sorter-sgd.msuf32-mutation-rate", SorterSgd.Msuf32MutationRate.queryParamsFromRunParams
-                    "sorter-sgd.msrs32-mutation-rate", SorterSgd.Msrs32MutationRate.queryParamsFromRunParams
-                    "sorter-sgd.msrs-pool-mod-comp", SorterSgd.MsrsPoolModComp.queryParamsFromRunParams
-                    "sortable-test.merge", SortableTests.Merge.queryParamsFromRunParams
-                    "sortable-test.prefix", SortableTests.Prefix.queryParamsFromRunParams
-                    "sorter-eval.standard", SorterEval.Standard.queryParamsFromRunParams
-                    "sorter-eval.merge", SorterEval.Merge.queryParamsFromRunParams
-                    "sorter-eval.prefix", SorterEval.Prefix.queryParamsFromRunParams
-                    "sorter-mutate.standard", SorterMutate.Standard.queryParamsFromRunParams
-                    "sorter-mutate.merge", SorterMutate.Merge.queryParamsFromRunParams
-                    "sorter-mutate.prefix", SorterMutate.Prefix.queryParamsFromRunParams
+                    QueryCatalogNames.sorterSgdUf6MutationRate, SorterSgd.Uf6MutationRate.queryParamsFromRunParams
+                    QueryCatalogNames.sorterSgdMsrsOrthoPara, SorterSgd.MsrsOrthoPara.queryParamsFromRunParams
+                    QueryCatalogNames.sorterSgdMssiOrthoPara, SorterSgd.MssiOrthoPara.queryParamsFromRunParams
+                    QueryCatalogNames.sorterSgdMsuf32MutationRate, SorterSgd.Msuf32MutationRate.queryParamsFromRunParams
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate, SorterSgd.Msrs32MutationRate.queryParamsFromRunParams
+                    QueryCatalogNames.sorterSgdMsrsPoolModComp, SorterSgd.MsrsPoolModComp.queryParamsFromRunParams
+                    QueryCatalogNames.sortableTestMerge, SortableTests.Merge.queryParamsFromRunParams
+                    QueryCatalogNames.sortableTestPrefix, SortableTests.Prefix.queryParamsFromRunParams
+                    QueryCatalogNames.sorterEvalStandard, SorterEval.Standard.queryParamsFromRunParams
+                    QueryCatalogNames.sorterEvalMerge, SorterEval.Merge.queryParamsFromRunParams
+                    QueryCatalogNames.sorterEvalPrefix, SorterEval.Prefix.queryParamsFromRunParams
+                    QueryCatalogNames.sorterMutateStandard, SorterMutate.Standard.queryParamsFromRunParams
+                    QueryCatalogNames.sorterMutateMerge, SorterMutate.Merge.queryParamsFromRunParams
+                    QueryCatalogNames.sorterMutatePrefix, SorterMutate.Prefix.queryParamsFromRunParams
                 ]
                 |> List.iter (fun (name, builder) -> QueryParamsCatalog.register name builder)
 

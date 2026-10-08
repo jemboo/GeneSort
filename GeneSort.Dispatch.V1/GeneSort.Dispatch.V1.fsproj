@@ -48,8 +48,10 @@
     <Compile Include="SorterSgd\PoolSetMakers.fs" />
     <Compile Include="SorterSgd\MutatorMakers.fs" />
     <Compile Include="SorterSgd\SortableTestsMakers.fs" />
-    <Compile Include="SorterSgd\EvolutionOrchestrator.fs" />
-    <Compile Include="SorterSgd\SgdExecutor.fs" />
+    <Compile Include="SorterSgd\Standard\EvoOrch_Standard.fs" />
+    <Compile Include="SorterSgd\Standard\SgdEx_Standard.fs" />
+    <Compile Include="SorterSgd\Soss\EvoOrch_Soss.fs" />
+    <Compile Include="SorterSgd\Soss\SgdEx_Soss.fs" />
     <Compile Include="SorterSgd\Reporting.fs" />
     <Compile Include="SorterSgd\SorterSgdTypes.fs" />
     <Compile Include="SorterSgd\Prefix\32p\Msuf32p4a\Common.fs" />

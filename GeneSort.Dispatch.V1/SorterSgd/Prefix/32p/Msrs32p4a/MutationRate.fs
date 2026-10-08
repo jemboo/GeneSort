@@ -51,7 +51,7 @@ module MutationRate =
             ]
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
-                    "sorter-sgd.msrs32-mutation-rate"
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
@@ -79,7 +79,7 @@ module MutationRate =
             ]
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
-                    "sorter-sgd.msrs32-mutation-rate"
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
@@ -108,7 +108,7 @@ module MutationRate =
             ]
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
-                    "sorter-sgd.msrs32-mutation-rate"
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
@@ -139,7 +139,7 @@ module MutationRate =
             ]
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
-                    "sorter-sgd.msrs32-mutation-rate"
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
@@ -166,7 +166,7 @@ module MutationRate =
             ]
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
-                    "sorter-sgd.msrs32-mutation-rate"
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
@@ -194,7 +194,7 @@ module MutationRate =
             ]
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
-                    "sorter-sgd.msrs32-mutation-rate"
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
@@ -226,7 +226,7 @@ module MutationRate =
             ]
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
-                    "sorter-sgd.msrs32-mutation-rate"
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRateMax
                     false
@@ -257,7 +257,7 @@ module MutationRate =
             ]
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
-                    "sorter-sgd.msrs32-mutation-rate"
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRateMax
                     false

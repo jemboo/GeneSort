@@ -21,7 +21,7 @@ module SortableTestsSpecsPrefix =
                 dataFomatBitv512
                 prefixLib_Prefix24s
             ]
-                    "sortable-test.prefix"
+                    QueryCatalogNames.sortableTestPrefix
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.sortableTests
                     false
@@ -38,7 +38,7 @@ module SortableTestsSpecsPrefix =
                 dataFomatBitv512
                 prefixLib_Prefix32_4
             ]
-                    "sortable-test.prefix"
+                    QueryCatalogNames.sortableTestPrefix
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.sortableTests
                     false

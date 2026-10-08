@@ -37,7 +37,7 @@ module Specs =
         ]
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
-                "sorter-sgd.msrs-ortho-para"
+                QueryCatalogNames.sorterSgdMsrsOrthoPara
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msrs24p3bOrthoPara
                 false

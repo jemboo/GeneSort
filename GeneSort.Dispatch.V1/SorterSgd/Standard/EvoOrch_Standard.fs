@@ -1,4 +1,4 @@
-namespace GeneSort.Dispatch.V1.SorterSgd
+namespace GeneSort.Dispatch.V1.SorterSgd.Standard
 
 open FSharp.UMX
 open System.Threading
@@ -12,14 +12,14 @@ open GeneSort.SortingOps
 open System
 open GeneSort.Model.Sorting.V1
 
-module EvolutionOrchestrator =
+module EvoOrch_Standard =
 
     let inline private triggerCompactingGC () =
         System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- 
             System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
         GC.Collect(2, GCCollectionMode.Forced, true, true)
 
-    let runEvolutionAsync
+    let runStandardEvolutionAsync
             (genDb: IGeneSortDb)
             (saveIntervals: genIntervalConfig)
             (subIntervals: genIntervalConfig)

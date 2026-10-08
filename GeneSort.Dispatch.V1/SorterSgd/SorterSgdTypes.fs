@@ -2,6 +2,7 @@ namespace GeneSort.Dispatch.V1.SorterSgd
 
 open GeneSort.Dispatch.V1
 open GeneSort.Db.V1
+open GeneSort.Dispatch.V1.SorterSgd.Standard
 
 type sorterSgdExecutorType = 
     | GenStandard
@@ -18,7 +19,7 @@ module SorterSgdExecutorType =
     let private executeEvolution (host: runHost) rp allowOverwrite cts progress makeTests createSeedPoolSet =
         match host with
         | SgdRunHost sgdHost ->
-            SgdExecutor.evaluateEvolutionRun
+            SgdEx_Standard.evaluateEvolutionRunStandard
                 makeTests
                 createSeedPoolSet
                 host.RunDb sgdHost.GenSaveIntervals sgdHost.GenSaveSubIntervals rp allowOverwrite cts progress

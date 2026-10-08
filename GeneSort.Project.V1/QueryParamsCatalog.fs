@@ -7,6 +7,36 @@ open GeneSort.Project.V1
 type queryParamsBuilder = runParameters -> outputDataType -> queryParams option
 type queryParamsCatalogBuilder = string<projectName> -> string<databaseName> -> queryParamsBuilder
 
+module QueryCatalogNames =
+    [<Literal>]
+    let sorterSgdUf6MutationRate = "sorter-sgd.uf6-mutation-rate"
+    [<Literal>]
+    let sorterSgdMsrsOrthoPara = "sorter-sgd.msrs-ortho-para"
+    [<Literal>]
+    let sorterSgdMssiOrthoPara = "sorter-sgd.mssi-ortho-para"
+    [<Literal>]
+    let sorterSgdMsuf32MutationRate = "sorter-sgd.msuf32-mutation-rate"
+    [<Literal>]
+    let sorterSgdMsrs32MutationRate = "sorter-sgd.msrs32-mutation-rate"
+    [<Literal>]
+    let sorterSgdMsrsPoolModComp = "sorter-sgd.msrs-pool-mod-comp"
+    [<Literal>]
+    let sortableTestMerge = "sortable-test.merge"
+    [<Literal>]
+    let sortableTestPrefix = "sortable-test.prefix"
+    [<Literal>]
+    let sorterEvalStandard = "sorter-eval.standard"
+    [<Literal>]
+    let sorterEvalMerge = "sorter-eval.merge"
+    [<Literal>]
+    let sorterEvalPrefix = "sorter-eval.prefix"
+    [<Literal>]
+    let sorterMutateStandard = "sorter-mutate.standard"
+    [<Literal>]
+    let sorterMutateMerge = "sorter-mutate.merge"
+    [<Literal>]
+    let sorterMutatePrefix = "sorter-mutate.prefix"
+
 /// Process-wide catalog of query parameter builders, addressed by stable names stored in runs.
 module QueryParamsCatalog =
 

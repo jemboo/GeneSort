@@ -38,7 +38,7 @@ module Specs64 =
         ]
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
-                "sorter-sgd.mssi-ortho-para"
+                QueryCatalogNames.sorterSgdMssiOrthoPara
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 false
@@ -64,7 +64,7 @@ module Specs64 =
         ]
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
-                "sorter-sgd.mssi-ortho-para"
+                QueryCatalogNames.sorterSgdMssiOrthoPara
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 false
@@ -90,7 +90,7 @@ module Specs64 =
         ]
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
-                "sorter-sgd.mssi-ortho-para"
+                QueryCatalogNames.sorterSgdMssiOrthoPara
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 false
@@ -118,7 +118,7 @@ module Specs128 =
         ]
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
-                "sorter-sgd.mssi-ortho-para"
+                QueryCatalogNames.sorterSgdMssiOrthoPara
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 false

@@ -29,7 +29,7 @@ module SorterEvalSpecsRm =
                 sorterEvalTypeV2
                 smallSorterCount
             ]
-                    "sorter-eval.merge"
+                    QueryCatalogNames.sorterEvalMerge
                     RunParamBuilderNames.Filter.mergeSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalMerge
                     false
@@ -53,7 +53,7 @@ module SorterEvalSpecsRm =
                 allMergeDimensions
                 extraLargeSorterCount
             ]
-                    "sorter-eval.merge"
+                    QueryCatalogNames.sorterEvalMerge
                     RunParamBuilderNames.Filter.mergeSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalMerge
                     false
@@ -77,7 +77,7 @@ module SorterEvalSpecsRm =
                 lowMergeDimensions
                 largeSorterCount
             ]
-                    "sorter-eval.merge"
+                    QueryCatalogNames.sorterEvalMerge
                     RunParamBuilderNames.Filter.mergeSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalMerge
                     false
@@ -101,7 +101,7 @@ module SorterEvalSpecsRm =
                 mergeDimension6
                 largeSorterCount
             ]
-                    "sorter-eval.merge"
+                    QueryCatalogNames.sorterEvalMerge
                     RunParamBuilderNames.Filter.mergeSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalMerge
                     false
@@ -125,7 +125,7 @@ module SorterEvalSpecsRm =
                 mergeDimension2
                 largeSorterCount
             ]
-                    "sorter-eval.merge"
+                    QueryCatalogNames.sorterEvalMerge
                     RunParamBuilderNames.Filter.mergeSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalMerge
                     false

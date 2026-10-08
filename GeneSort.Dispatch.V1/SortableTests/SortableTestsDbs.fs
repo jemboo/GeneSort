@@ -26,7 +26,7 @@ module SortableTestsDbs =
         let makeMergeQueryParamsFromRunParams rp odt =
             QueryParamsBuilders.SortableTests.Merge.queryParamsFromRunParams projectName dbName rp odt
 
-        let db = new GeneSortDbMp(dbFolder, "sortable-test.merge")
+        let db = new GeneSortDbMp(dbFolder, QueryCatalogNames.sortableTestMerge)
 
 
         let getMergeSortableTests
@@ -56,7 +56,7 @@ module SortableTestsDbs =
         let makePrefixQueryParamsFromRunParams rp odt =
             QueryParamsBuilders.SortableTests.Prefix.queryParamsFromRunParams projectName dbName rp odt
 
-        let db = new GeneSortDbMp(dbFolder, "sortable-test.prefix")
+        let db = new GeneSortDbMp(dbFolder, QueryCatalogNames.sortableTestPrefix)
 
 
 
