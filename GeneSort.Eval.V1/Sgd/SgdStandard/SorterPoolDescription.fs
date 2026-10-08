@@ -111,7 +111,7 @@ type sorterPoolSetDescription =
 module SorterPoolSetDescription =
 
     /// Strips the heavy sorterModel references out of a pool set, creating a light memory footprint snapshot
-    let fromPoolSet (poolSet: sorterPoolSet) : sorterPoolSetDescription =
+    let fromPoolSet (poolSet: spSet_Standard) : sorterPoolSetDescription =
         let poolDescriptions =
             poolSet.SorterPools
             |> Map.values
@@ -174,6 +174,6 @@ module SorterPoolSetDescription =
 
     /// Extracts one dataTableRecord for every pool-member evaluation.  Each evaluation
     /// supplies SortableTestsSubsetId, which partitions a pool's snapshot statistics.
-    let toDataTableRecordsSnapshot (prefix: string) (srRes: sorterPoolSet) : dataTableRecord seq =
+    let toDataTableRecordsSnapshot (prefix: string) (srRes: spSet_Standard) : dataTableRecord seq =
         let yab = fromPoolSet srRes
         toDataTableRecords prefix yab

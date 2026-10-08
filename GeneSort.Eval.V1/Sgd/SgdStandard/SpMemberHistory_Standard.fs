@@ -6,7 +6,7 @@ open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1
 
-type sorterPoolMemberHistory = 
+type spMemberHistory_Standard = 
     private {
         sorterPoolId: Guid<sorterPoolId>
         sorterPoolMemberId: Guid<sorterPoolMemberId>
@@ -34,7 +34,7 @@ type sorterPoolMemberHistory =
             (parentSorterPoolId: Guid<sorterPoolId> option)
             (mutatorId: Guid<sorterModelMutatorId> option)
             (parentMutationIndex: int<mutationIndex> option)
-            (evalV2: sorterEvalV2 option) : sorterPoolMemberHistory =
+            (evalV2: sorterEvalV2 option) : spMemberHistory_Standard =
         {
             sorterPoolId = sorterPoolId
             sorterPoolMemberId = sorterPoolMemberId
@@ -72,14 +72,14 @@ module SorterPoolMemberHistory =
             (parentSorterPoolMemberId: Guid<sorterPoolMemberId> option)
             (parentSorterPoolId: Guid<sorterPoolId> option)
             (currentGen: int<generationNumber>) 
-            (spm: sorterPoolMember) : sorterPoolMemberHistory =
+            (spm: spMember_Standard) : spMemberHistory_Standard =
             
         let v2Eval = 
             spm.SorterEval 
             |> Option.map (SorterEval.downgradeTo sorterEvalType.V2)
             |> Option.bind (function sorterEval.V2 evalV2 -> Some evalV2 | _ -> None)
 
-        sorterPoolMemberHistory.create
+        spMemberHistory_Standard.create
             poolId
             spm.SorterPoolMemberId
             (SorterModel.getId spm.SorterModel)
@@ -93,7 +93,7 @@ module SorterPoolMemberHistory =
             (spm.SorterMutationSource |> Option.map (fun src -> src.SorterMutationIndex))
             v2Eval
 
-    let toDataTableRecord (snapshot: sorterPoolMemberHistory) : dataTableRecord =
+    let toDataTableRecord (snapshot: spMemberHistory_Standard) : dataTableRecord =
         let baseRecord = 
             dataTableRecord.createEmpty()
             |> dataTableRecord.addData "SorterPoolId" (string %snapshot.SorterPoolId)

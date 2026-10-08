@@ -10,6 +10,7 @@ open GeneSort.SortingLib.Sorter
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Project.V1.RunParamBundles
 open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Eval.V1.Sgd.Standard
 
 module CommonParams =
 

@@ -22,15 +22,15 @@ module SorterPipeline =
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
             (reEvaluateParents: bool)
-            (currentPoolSet: sorterPoolSet) 
+            (currentPoolSet: spSet_Standard) 
             (collectNewSortableTests: bool<collectNewSortableTests>)
-            (sortedFractionThreshold: float<sortedFraction>) : sorterPoolSet =
+            (sortedFractionThreshold: float<sortedFraction>) : spSet_Standard =
 
         currentPoolSet
         // Step 1: Expand the population across all sub-pools
         |> SorterPoolSet.mutateAndTrim mutator selectedSorterCountPerPool selectionMeasure sorterChildCount
         
-        |> (fun (expandedPoolSet: sorterPoolSet) ->
+        |> (fun (expandedPoolSet: spSet_Standard) ->
                 let (computedEvals: Map<Guid<sorterPoolMemberId>, sorterEval>) = 
                     expandedPoolSet
                     |> SorterPoolRunner.evaluatePoolSet 
@@ -70,12 +70,12 @@ module SorterPipeline =
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
             (reEvaluateParents: bool)
-            (currentPoolSet: sorterPoolSet) 
+            (currentPoolSet: spSet_Standard) 
             (collectNewSortableTests: bool<collectNewSortableTests>)
-            (sortedFractionThreshold: float<sortedFraction>) : sorterPoolSet =
+            (sortedFractionThreshold: float<sortedFraction>) : spSet_Standard =
 
         // Helper to check if any pool in a poolSet has dropped to 0 members
-        let hasEmptyPool (poolSet: sorterPoolSet) =
+        let hasEmptyPool (poolSet: spSet_Standard) =
             poolSet.SorterPools 
             |> Map.exists (fun _ pool -> Seq.isEmpty pool.SorterPoolMembers)
 
@@ -145,12 +145,12 @@ module SorterPipeline =
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
             (reEvaluateParents: bool)
-            (currentPoolSet: sorterPoolSet)
+            (currentPoolSet: spSet_Standard)
             (collectNewSortableTests: bool<collectNewSortableTests>)
-            (sortedFractionThreshold: float<sortedFraction>) : sorterPoolSet =
+            (sortedFractionThreshold: float<sortedFraction>) : spSet_Standard =
 
         // Helper to check if any pool in a poolSet has dropped to 0 members
-        let hasEmptyPool (poolSet: sorterPoolSet) =
+        let hasEmptyPool (poolSet: spSet_Standard) =
             poolSet.SorterPools
             |> Map.exists (fun _ pool -> Seq.isEmpty pool.SorterPoolMembers)
 

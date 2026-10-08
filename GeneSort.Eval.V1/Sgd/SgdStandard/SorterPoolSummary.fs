@@ -105,7 +105,7 @@ module SorterPoolSetSummary =
             sqrt variance
 
     /// Strips the heavy sorterModel references out of a pool set, creating a light memory footprint snapshot
-    let fromPoolSet (poolSet: sorterPoolSet) : sorterPoolSetSummary =
+    let fromPoolSet (poolSet: spSet_Standard) : sorterPoolSetSummary =
         
         // 1. Process each pool within the pool set
         let poolSummaries = 

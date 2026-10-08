@@ -4,17 +4,17 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Eval.V1
 
-type sorterPoolHistory = 
+type spHistory_Standard = 
     private {
         sorterPoolId: Guid<sorterPoolId>
         saveGeneration: int<generationNumber>
-        memberHistories: sorterPoolMemberHistory list
+        memberHistories: spMemberHistory_Standard list
     }
 
     static member create
             (sorterPoolId: Guid<sorterPoolId>,
              saveGeneration: int<generationNumber>,
-             memberHistories: sorterPoolMemberHistory list) : sorterPoolHistory =
+             memberHistories: spMemberHistory_Standard list) : spHistory_Standard =
         {
             sorterPoolId = sorterPoolId
             saveGeneration = saveGeneration
@@ -31,9 +31,9 @@ module SorterPoolHistory =
     /// and then prunes all entries that do not belong to the ancestral tree of alive members.
     let pruneAndCreateForPool
             (currentGen: int<generationNumber>) 
-            (pool: sorterPool)
-            (runningPoolMemberHistory: Map<Guid<sorterPoolMemberId>, sorterPoolMemberHistory>) 
-            : sorterPoolHistory * Map<Guid<sorterPoolMemberId>, sorterPoolMemberHistory> =
+            (pool: sp_Standard)
+            (runningPoolMemberHistory: Map<Guid<sorterPoolMemberId>, spMemberHistory_Standard>) 
+            : spHistory_Standard * Map<Guid<sorterPoolMemberId>, spMemberHistory_Standard> =
 
         // 1. Ingest all current members directly using ParentSorterPoolMemberId
         let updatedTrackedMap = 
@@ -92,7 +92,7 @@ module SorterPoolHistory =
             |> List.map snd
 
         let poolHistory = 
-            sorterPoolHistory.create(
+            spHistory_Standard.create(
                 sorterPoolId = pool.SorterPoolId,
                 saveGeneration = currentGen,
                 memberHistories = memberHistories
@@ -100,6 +100,6 @@ module SorterPoolHistory =
 
         poolHistory, prunedTrackedMap
 
-    let toDataTableRecords (history: sorterPoolHistory) : dataTableRecord list =
+    let toDataTableRecords (history: spHistory_Standard) : dataTableRecord list =
         history.MemberHistories 
         |> List.map SorterPoolMemberHistory.toDataTableRecord

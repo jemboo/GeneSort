@@ -8,7 +8,7 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd
 
-type sorterPoolMember =
+type spMember_Standard =
     private {
         _sorterPoolMemberId:   Guid<sorterPoolMemberId>
         _sorterModel:          sorterModel
@@ -52,11 +52,10 @@ type sorterPoolMember =
 module SorterPoolMember =
 
     /// Increments a member's mutation index by a given integer value
-    let advanceIndex (offset: int) (spm: sorterPoolMember) : sorterPoolMember =
+    let advanceIndex (offset: int) (spm: spMember_Standard) : spMember_Standard =
         { spm with _mutationIndex = (%spm.MutationIndex + offset) |> UMX.tag }
-
-    /// Increments a member's mutation index by exactly 1
-    let updateIndex (spm: sorterPoolMember) : sorterPoolMember =
+        
+    let updateIndex (spm: spMember_Standard) : spMember_Standard =
         advanceIndex 1 spm
 
     /// Derives a child pool member for a new pool branch:
@@ -65,14 +64,14 @@ module SorterPoolMember =
     let deriveForChildPool 
             (newMemberId: Guid<sorterPoolMemberId>) 
             (newMod: int<mutationMod>) 
-            (spm: sorterPoolMember) : sorterPoolMember =
+            (spm: spMember_Standard) : spMember_Standard =
         { spm with 
             _sorterPoolMemberId = newMemberId
             _mutationMod = newMod
-            _mutationIndex = 0 |> UMX.tag<mutationIndex> }
+            _mutationIndex = 0 |> UMX.tag }
 
-    /// Adds or replaces one subset evaluation; None clears every cached evaluation.
-    let withEval (eval: sorterEval option) (spm: sorterPoolMember) : sorterPoolMember =
+    /// Adds or replaces one subset evaluation; None clears every cached evaluation.spMember_Standard 
+    let withEval (eval: sorterEval option) (spm: spMember_Standard) : spMember_Standard =
         match eval with
         | Some value ->
             { spm with
@@ -82,10 +81,10 @@ module SorterPoolMember =
 
     /// Generates 'mutantCount' new mutants, updating the parent's index by 'mutantCount'
     let mutate (sorterModelMut: sorterModelMutator) 
-               (spm: sorterPoolMember) 
+               (spm: spMember_Standard) 
                (spId: Guid<sorterPoolId>) 
                (mutantCount: int<sorterChildCount>) 
-               (currentGeneration: int<generationNumber>): sorterPoolMember * sorterPoolMember [] =
+               (currentGeneration: int<generationNumber>): spMember_Standard * spMember_Standard [] =
         
         let countRaw = %mutantCount
         let baseIndexRaw = %spm.MutationIndex
@@ -114,7 +113,7 @@ module SorterPoolMember =
                         spId
                         individualMutationIndex
 
-                sorterPoolMember.create
+                spMember_Standard.create
                     childPoolMemberId
                     mutantModel
                     (0 |> UMX.tag)          // New mutants start at mutation index 0

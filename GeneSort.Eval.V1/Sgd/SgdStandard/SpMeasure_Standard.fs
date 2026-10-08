@@ -53,7 +53,6 @@ module SorterPoolMeasure =
                 |> sorterPoolMeasure.StDevPool
 
 
-
     let toCompactString (measure: sorterPoolMeasure) : string =
         match measure with
         | StDevPool m -> m.ToCompactString()
@@ -69,12 +68,13 @@ module SorterPoolMeasure =
         try Some (fromCompactString s) with _ -> None
 
 
-module PoolEvalFunctions =
+
+module PoolEvalFunctions  =
 
     /// Evaluates a sorterPool given a poolMeasure.
     /// Composite Score = (1.0 * AverageScore) - (stDevWeight * StandardDeviationOfScores)
     /// Lower scores represent better performance; larger std deviations decrease the final score.
-    let getFunctionForMeasure (measure: sorterPoolMeasure) : (sorterPool -> float<sorterPoolEvalScore>) =
+    let getFunctionForMeasure (measure: sorterPoolMeasure) : (sp_Standard -> float<sorterPoolEvalScore>) =
         match measure with
         | StDevPool m ->
             fun pool ->
@@ -87,6 +87,6 @@ module PoolEvalFunctions =
 
 
     /// Evaluates the pool score using the specified poolMeasure.
-    let getPoolScore (measure: sorterPoolMeasure) (pool: sorterPool) : float<sorterPoolEvalScore> =
+    let getPoolScore (measure: sorterPoolMeasure) (pool: sp_Standard) : float<sorterPoolEvalScore> =
         let evalFunc = getFunctionForMeasure measure
         evalFunc pool

@@ -10,12 +10,12 @@ open System.Diagnostics
 open GeneSort.Eval.V1.Sgd
 
 
-type sorterPool =
+type sp_Standard =
     private {
         _name: string<sorterPoolName>
         _sorterPoolId: Guid<sorterPoolId>
         _sorterPoolTag: sorterPoolTag
-        _sorterPoolMembers: Map<Guid<sorterPoolMemberId>, sorterPoolMember>
+        _sorterPoolMembers: Map<Guid<sorterPoolMemberId>, spMember_Standard>
         _rawCeLength: int<ceLength>
         _mutationMod: int<mutationMod>
         _parentSorterPoolId: Guid<sorterPoolId> option
@@ -25,7 +25,7 @@ type sorterPool =
     member this.Name with get() = this._name
     member this.ParentSorterPoolId = this._parentSorterPoolId
     member this.RawCeLength with get() = this._rawCeLength
-    member this.SorterPoolMembers with get() :sorterPoolMember seq =
+    member this.SorterPoolMembers with get() :spMember_Standard seq =
         Map.values this._sorterPoolMembers
     member this.SorterPoolId with get() = this._sorterPoolId
     member this.SorterPoolTag with get() = this._sorterPoolTag
@@ -35,7 +35,7 @@ type sorterPool =
             (parentSorterPoolId: Guid<sorterPoolId> option)
             (name: string<sorterPoolName>)
             (sorterPoolTag: sorterPoolTag)
-            (members: sorterPoolMember []) 
+            (members: spMember_Standard []) 
             (rawCeLength: int<ceLength>) 
             (mutationMod: int<mutationMod>) =
         let membersMap = 
@@ -55,7 +55,7 @@ type sorterPool =
 
 module SorterPool = 
 
-    let getAverageScore (measure: sorterEvalMeasure) (pool: sorterPool) : float<sorterEvalScore> =
+    let getAverageScore (measure: sorterEvalMeasure) (pool: sp_Standard) : float<sorterEvalScore> =
             let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
             let validScores =
                 pool.SorterPoolMembers
@@ -71,7 +71,7 @@ module SorterPool =
 
     /// Calculates the standard deviation of scores in the pool for the specified measure.
     /// Returns 0.0 if empty or if fewer than 2 evaluated members exist.
-    let getStandardDeviationOfScores (measure: sorterEvalMeasure) (pool: sorterPool) : float<sorterEvalScore> =
+    let getStandardDeviationOfScores (measure: sorterEvalMeasure) (pool: sp_Standard) : float<sorterEvalScore> =
         let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
         let validScores =
             pool.SorterPoolMembers
@@ -90,8 +90,8 @@ module SorterPool =
 
     /// Adds or updates a member inside the pool
     let upsertMember 
-            (memberToUpsert: sorterPoolMember) 
-            (pool: sorterPool) : sorterPool =
+            (memberToUpsert: spMember_Standard) 
+            (pool: sp_Standard) : sp_Standard =
         let updatedMap = Map.add 
                             memberToUpsert.SorterPoolMemberId 
                             memberToUpsert 
@@ -102,7 +102,7 @@ module SorterPool =
     let updateMemberEval 
                     (memberId: Guid<sorterPoolMemberId>) 
                     (eval: sorterEval option) 
-                    (pool: sorterPool) : sorterPool =
+                    (pool: sp_Standard) : sp_Standard =
         match Map.tryFind memberId pool._sorterPoolMembers with
         | Some memberObj ->
             let updatedMember = memberObj |> SorterPoolMember.withEval eval
@@ -111,7 +111,7 @@ module SorterPool =
 
 
     /// The returned SorterPool only contains members with sorterPoolMemberIds that are found in map
-    let updateSorterEval (map: Map<Guid<sorterPoolMemberId>, sorterEval>) (pool: sorterPool) : sorterPool =
+    let updateSorterEval (map: Map<Guid<sorterPoolMemberId>, sorterEval>) (pool: sp_Standard) : sp_Standard =
         let updatedMembersMap =
             map 
             |> Map.fold (fun acc poolMemberId eval ->
@@ -124,12 +124,12 @@ module SorterPool =
                     // If it's in the map but not in the pool, it is ignored
                     acc
             ) Map.empty
-
+            
         { pool with _sorterPoolMembers = updatedMembersMap }
 
 
     /// Gets the sorterEvals from the sorterPool, and ignores SorterPoolMembers that don't have them
-    let extractSorterEvals (pool: sorterPool) : Map<Guid<sorterPoolMemberId>, sorterEval> =
+    let extractSorterEvals (pool: sp_Standard) : Map<Guid<sorterPoolMemberId>, sorterEval> =
         pool.SorterPoolMembers
         |> Seq.fold (fun accMap spm ->
             match spm.SorterEval with
@@ -145,7 +145,7 @@ module SorterPool =
     let deriveChildPool 
                 (newPoolId: Guid<sorterPoolId>) 
                 (newMutationMod: int<mutationMod>) 
-                (parentPool: sorterPool) : sorterPool =
+                (parentPool: sp_Standard) : sp_Standard =
 
             let updatedMembers =
                 parentPool.SorterPoolMembers
@@ -155,7 +155,7 @@ module SorterPool =
                 )
                 |> Seq.toArray
 
-            sorterPool.create
+            sp_Standard.create
                 newPoolId
                 (Some parentPool.SorterPoolId)
                 parentPool.Name
@@ -171,7 +171,7 @@ module SorterPool =
             (sorterModelMut: sorterModelMutator) 
             (mutantsPerSorter: int<sorterChildCount>)  
             (currentGeneration: int<generationNumber>)
-            (pool: sorterPool) : sorterPool =
+            (pool: sp_Standard) : sp_Standard =
 
         let updatedMembersMap =
             pool.SorterPoolMembers
@@ -195,7 +195,7 @@ module SorterPool =
                 ) mapWithParent
 
             ) Map.empty
-
+            
         { pool with _sorterPoolMembers = updatedMembersMap }
 
 
@@ -209,12 +209,12 @@ module SorterPool =
             (selectionMeasure: sorterEvalMeasure)
             (mutantsPerSorter: int<sorterChildCount>)  
             (currentGeneration: int<generationNumber>)
-            (pool: sorterPool) : sorterPool =
+            (pool: sp_Standard) : sp_Standard =
 
         let scoreFunc = SorterEvalFunctions.getFunctionForMeasure selectionMeasure
 
         // Helper function to rank and extract a score for sorting
-        let getScore (spm: sorterPoolMember) =
+        let getScore (spm: spMember_Standard) =
             match spm.SorterEval with
             | Some eval -> scoreFunc eval
             | None -> System.Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
@@ -248,7 +248,7 @@ module SorterPool =
             Seq.concat [ retainedParents; allChildren ]
             |> Seq.map (fun m -> m.SorterPoolMemberId, m)
             |> Map.ofSeq
-
+        
         { pool with _sorterPoolMembers = updatedMembersMap }
 
 
@@ -256,7 +256,7 @@ module SorterPool =
     /// sortedFractionThreshold fraction of members sorted, and prunes any members exceeding that cutoff.
     let adjustCeLengthByThreshold
             (sortedFractionThreshold: float<sortedFraction>)
-            (pool: sorterPool) : sorterPool =
+            (pool: sp_Standard) : sp_Standard =
 
         // 1. Gather all sorted members that have valid evaluations
         let sortedMembersWithLastIndex =
@@ -301,7 +301,7 @@ module SorterPool =
                 |> Seq.toArray
 
             // Re-create the pool with the newly calculated cutoff as RawCeLength
-            sorterPool.create 
+            sp_Standard.create 
                 pool.SorterPoolId 
                 pool.ParentSorterPoolId
                 pool.Name 
@@ -314,11 +314,11 @@ module SorterPool =
 
     /// Trims the SorterPool to size prunedSize, selecting the best (lowest score) according to measure
     let pruneSorterPool 
-                (pool: sorterPool) 
+                (pool: sp_Standard) 
                 (measure: sorterEvalMeasure) 
                 (prioritizeNewMutants: bool<prioritizeNewMutants>)
                 (distinctSorterHashes: bool<distinctSorterHashes>)
-                (sorterCountPerPool: int<sorterCountPerPool>) : sorterPool =
+                (sorterCountPerPool: int<sorterCountPerPool>) : sp_Standard =
         
         let targetSize = max 0 %sorterCountPerPool
         let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
@@ -373,7 +373,7 @@ module SorterPool =
             |> Seq.map snd
             |> Seq.toArray
 
-        sorterPool.create 
+        sp_Standard.create 
                 pool.SorterPoolId 
                 pool.ParentSorterPoolId
                 pool.Name 
@@ -387,11 +387,11 @@ module SorterPool =
     /// Debug version of pruneSorterPool that forces immediate evaluation at each step
     /// to allow complete inspection of intermediate collections and count drop-offs.
     let pruneSorterPoolDebug
-            (pool: sorterPool) 
+            (pool: sp_Standard) 
             (measure: sorterEvalMeasure) 
             (prioritizeNewMutants: bool<prioritizeNewMutants>)
             (distinctSorterHashes: bool<distinctSorterHashes>)
-            (sorterCountPerPool: int<sorterCountPerPool>) : sorterPool =
+            (sorterCountPerPool: int<sorterCountPerPool>) : sp_Standard =
 
         let targetSize = max 0 %sorterCountPerPool
         let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
@@ -471,7 +471,7 @@ module SorterPool =
         if finalCount = 0 && targetSize > 0 && countAfterFilter2 > 0 && Debugger.IsAttached then
             Debugger.Break() // Pause if final truncation resulted in an empty pool
 
-        sorterPool.create 
+        sp_Standard.create 
                     pool.SorterPoolId
                     pool.ParentSorterPoolId
                     pool.Name 

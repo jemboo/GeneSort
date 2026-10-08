@@ -81,7 +81,7 @@ module Utils =
             (startingGen: int<generationNumber>)
             (rp: runParameters)
             (cts: CancellationToken)
-            (log: string -> unit) : Async<seq<sorterPoolSet>> =
+            (log: string -> unit) : Async<seq<spSet_Standard>> =
         loadAvailableOutputData
             OutputData.asSorterPoolSet 
             (outputDataType.SorterPoolSet "") 
@@ -182,7 +182,7 @@ module Utils =
     let loadHighestGenSorterPoolSet
             (saveConfig: genIntervalConfig)
             (generationalDb: IGeneSortDb)
-            (rp: runParameters) : Async<Result<sorterPoolSet option, string>> =
+            (rp: runParameters) : Async<Result<spSet_Standard option, string>> =
         loadOutputDataWithHighestGenerationNumber 
             OutputData.asSorterPoolSet 
             (outputDataType.SorterPoolSet "") 

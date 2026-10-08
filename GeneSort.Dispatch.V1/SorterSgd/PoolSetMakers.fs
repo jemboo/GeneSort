@@ -19,7 +19,7 @@ open GeneSort.Eval.V1.Sgd.Standard
 module PoolSetMakers =
 
     let createSeedSorterPoolSetStandard 
-            (rp:runParameters) : Async<Result<sorterPoolSet, string>> =
+            (rp:runParameters) : Async<Result<spSet_Standard, string>> =
         asyncResult {
             let! sortingWidth = 
                     rp.GetSortingWidth() 
@@ -98,7 +98,7 @@ module PoolSetMakers =
 
 
     let createSeedSorterPoolSetMerge
-            (rp:runParameters) : Async<Result<sorterPoolSet, string>> =
+            (rp:runParameters) : Async<Result<spSet_Standard, string>> =
         asyncResult {
 
             let! repl =
@@ -182,7 +182,7 @@ module PoolSetMakers =
 
 
     let createSeedSorterPoolSetPrefix
-            (rp:runParameters) : Async<Result<sorterPoolSet, string>> =
+            (rp:runParameters) : Async<Result<spSet_Standard, string>> =
         asyncResult {
 
             let! repl =

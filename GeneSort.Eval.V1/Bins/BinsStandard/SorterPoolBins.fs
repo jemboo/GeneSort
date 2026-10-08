@@ -14,7 +14,7 @@ type sorterPoolBins =
     }
     with
     /// Creates a bin set from a sorterPool by extracting evaluated members
-    static member create (id: Guid<sorterPoolBinsId>) (pool: sorterPool) =
+    static member create (id: Guid<sorterPoolBinsId>) (pool: sp_Standard) =
         let validEvals = 
             pool.SorterPoolMembers
             |> Seq.choose (fun memberObj -> memberObj.SorterEval)

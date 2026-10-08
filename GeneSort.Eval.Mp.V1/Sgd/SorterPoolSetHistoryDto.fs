@@ -34,7 +34,7 @@ type sorterPoolMemberHistoryDto = {
 
 module SorterPoolMemberHistoryDto =
 
-    let fromDomain (domain: sorterPoolMemberHistory) : sorterPoolMemberHistoryDto =
+    let fromDomain (domain: spMemberHistory_Standard) : sorterPoolMemberHistoryDto =
         let v2Dto =
             domain.EvalV2
             |> Option.map (fun v2 ->
@@ -68,7 +68,7 @@ module SorterPoolMemberHistoryDto =
             EvalV2 = v2Dto
         }
 
-    let toDomain (dto: sorterPoolMemberHistoryDto) : sorterPoolMemberHistory =
+    let toDomain (dto: sorterPoolMemberHistoryDto) : spMemberHistory_Standard =
         let v2Domain =
             dto.EvalV2
             |> Option.map (fun v2Dto ->
@@ -85,7 +85,7 @@ module SorterPoolMemberHistoryDto =
                     (v2Dto.ReflectiveCount |> UMX.tag)
             )
 
-        sorterPoolMemberHistory.create
+        spMemberHistory_Standard.create
             (UMX.tag dto.SorterPoolId)
             (UMX.tag dto.SorterPoolMemberId)
             (UMX.tag dto.SorterModelId)
@@ -111,15 +111,15 @@ type sorterPoolHistoryDto = {
 
 module SorterPoolHistoryDto =
 
-    let fromDomain (domain: sorterPoolHistory) : sorterPoolHistoryDto =
+    let fromDomain (domain: spHistory_Standard) : sorterPoolHistoryDto =
         {
             SorterPoolId = %domain.SorterPoolId
             SaveGeneration = %domain.SaveGeneration
             MemberHistories = domain.MemberHistories |> List.map SorterPoolMemberHistoryDto.fromDomain
         }
 
-    let toDomain (dto: sorterPoolHistoryDto) : sorterPoolHistory =
-        sorterPoolHistory.create(
+    let toDomain (dto: sorterPoolHistoryDto) : spHistory_Standard =
+        spHistory_Standard.create(
             sorterPoolId = UMX.tag dto.SorterPoolId,
             saveGeneration = UMX.tag dto.SaveGeneration,
             memberHistories = (dto.MemberHistories |> List.map SorterPoolMemberHistoryDto.toDomain)

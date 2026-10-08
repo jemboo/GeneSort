@@ -17,7 +17,7 @@ module SorterPoolRunner =
             (sorterEvalType: sorterEvalType)
             (reEvaluateParents: bool)
             (collectNewSortableTests: bool<collectNewSortableTests>)
-            (poolSet: sorterPoolSet)
+            (poolSet: spSet_Standard)
             : Map<Guid<sorterPoolMemberId>, sorterEval> =
 
         // 1. Collect all members across all pools paired with their respective pool's ceLength

@@ -13,7 +13,7 @@ type outputData =
     | Run of run
     | RunParameters of runParameters
     | SortableTests of sortableTests
-    | SorterPoolSet of sorterPoolSet
+    | SorterPoolSet of spSet_Standard
     | SorterPoolSetSummarySet of sorterPoolSetSummarySet
     | SorterSet of sorterSet
     | SorterSetEval of sorterSetEval

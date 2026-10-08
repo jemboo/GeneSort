@@ -42,13 +42,13 @@ module SorterPoolSetSummarySet =
         create (Guid.NewGuid() |> UMX.tag<sorterPoolSetSummarySetId>) summaries
 
     /// Constructs a summary set directly from an array of heavy sorterPoolSet models using a provided ID
-    let fromPoolSets (setId: Guid<sorterPoolSetSummarySetId>) (poolSets: sorterPoolSet array) : sorterPoolSetSummarySet =
+    let fromPoolSets (setId: Guid<sorterPoolSetSummarySetId>) (poolSets: spSet_Standard array) : sorterPoolSetSummarySet =
         poolSets
         |> Array.map SorterPoolSetSummary.fromPoolSet
         |> create setId
 
     /// Constructs a summary set directly from an array of heavy sorterPoolSet models using an auto-generated Guid
-    let fromPoolSetsNew (poolSets: sorterPoolSet array) : sorterPoolSetSummarySet =
+    let fromPoolSetsNew (poolSets: spSet_Standard array) : sorterPoolSetSummarySet =
         fromPoolSets (Guid.NewGuid() |> UMX.tag<sorterPoolSetSummarySetId>) poolSets
 
     /// Flattens the entire collection of pool set summaries into a single array of dataTableRecords,

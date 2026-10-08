@@ -8,13 +8,13 @@ type sorterPoolSetHistory =
     private {
         sorterPoolSetId: Guid<sorterPoolSetId>
         saveGeneration: int<generationNumber>
-        poolHistories: sorterPoolHistory list
+        poolHistories: spHistory_Standard list
     }
 
     static member create
             (sorterPoolSetId: Guid<sorterPoolSetId>,
              saveGeneration: int<generationNumber>,
-             poolHistories: sorterPoolHistory list) : sorterPoolSetHistory =
+             poolHistories: spHistory_Standard list) : sorterPoolSetHistory =
         {
             sorterPoolSetId = sorterPoolSetId
             saveGeneration = saveGeneration
@@ -30,9 +30,9 @@ module SorterPoolSetHistory =
 
     let pruneAndCreateFromPoolSet 
             (currentGen: int<generationNumber>) 
-            (poolSet: sorterPoolSet)
-            (runningHistory: runningMemberHistoryMap)
-            : sorterPoolSetHistory * runningMemberHistoryMap =
+            (poolSet: spSet_Standard)
+            (runningHistory: rmhMap_Standard)
+            : sorterPoolSetHistory * rmhMap_Standard =
 
         let poolHistories, updatedMap =
             poolSet.SorterPools

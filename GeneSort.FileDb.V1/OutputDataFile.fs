@@ -95,7 +95,7 @@ module OutputDataFile =
                         }
                     | outputDataType.SorterPoolSet _ ->
                         async {
-                            let! domain = deserializeDto<sorterPoolSetDto, sorterPoolSet> stream token SorterPoolSetDto.fromDto
+                            let! domain = deserializeDto<sorterPoolSetDto, spSet_Standard> stream token SorterPoolSetDto.fromDto
                             return outputData.SorterPoolSet domain
                         }
                     | outputDataType.SorterPoolSetSummarySet _ ->

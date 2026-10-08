@@ -28,12 +28,12 @@ module EvoOrch_Standard =
             (subIntervals: genIntervalConfig)
             (rp: runParameters)
             (allowOverwrite: bool<allowOverwrite>)
-            (initialPoolSet: sorterPoolSet)
+            (initialPoolSet: spSet_Standard)
             (sortableTests: sortableTests)
             (prefix: ceBlock)
             (mutator: sorterModelMutator)
             (cts: CancellationToken)
-            (log: string -> unit) : Async<Result<sorterPoolSet, string>> =
+            (log: string -> unit) : Async<Result<spSet_Standard, string>> =
 
         asyncResult {
             let evalType = sorterEvalType.V2
@@ -99,11 +99,11 @@ module EvoOrch_Standard =
                 // Recursive loop carrying evalBinsSetAcc and active lineage tracking map
                 let rec loop 
                         (remainingSteps: int)
-                        (currentSorterPoolSet: sorterPoolSet)
+                        (currentSorterPoolSet: spSet_Standard)
                         (historyAcc: sorterPoolSetSummary list)
                         (sorterPoolBinsSetAcc: sorterPoolBinsSet list)
-                        (runningMap: runningMemberHistoryMap)
-                        : Async<Result<sorterPoolSet, string>> =
+                        (runningMap: rmhMap_Standard)
+                        : Async<Result<spSet_Standard, string>> =
 
                     asyncResult {
                         // Cooperative cancellation evaluation at top of loop

@@ -21,14 +21,14 @@ module SgdEx_Standard =
 
     /// Handles initialization, evaluation, and DB saving when no checkpoint exists
     let initializeAndSaveSeedPoolSet 
-            (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
+            (sorterPoolSetCreator: runParameters -> Async<Result<spSet_Standard, string>>)
             (genDb: IGeneSortDb)
             (saveIntervals: genIntervalConfig)
             (subIntervals: genIntervalConfig)
             (rp: runParameters)
             (sortableTests: sortableTests)
             (prefix: ceBlock)
-            (log: string -> unit) : Async<Result<sorterPoolSet, string>> =
+            (log: string -> unit) : Async<Result<spSet_Standard, string>> =
 
         asyncResult {
             let evalType = sorterEvalType.V2
@@ -61,7 +61,7 @@ module SgdEx_Standard =
     /// and manages final state serialization/reporting pipelines.
     let evaluateEvolutionRunStandard
             (makeSortableTests: runParameters ->  Async<Result<sortableTests * (ce array), string>> )
-            (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
+            (sorterPoolSetCreator: runParameters -> Async<Result<spSet_Standard, string>>)
             (genDb: IGeneSortDb)
             (saveIntervals: genIntervalConfig)
             (subIntervals: genIntervalConfig)
@@ -94,12 +94,12 @@ module SgdEx_Standard =
                     | None -> 
                         asyncResult {
                             let initRp = rp.WithGenerationCurrent(Some (0 |> UMX.tag<generationNumber>))
-                            let! (seedSet: sorterPoolSet) = 
+                            let! (seedSet: spSet_Standard) = 
                                         initializeAndSaveSeedPoolSet 
                                             sorterPoolSetCreator genDb saveIntervals subIntervals initRp sortableTests prefix log
                             return seedSet, initRp
                         }
-                    | Some (highestPoolSet: sorterPoolSet) -> 
+                    | Some (highestPoolSet: spSet_Standard) -> 
                         asyncResult {
                             let currentGen = highestPoolSet.GenerationNumber
                             log (sprintf "Found existing checkpoint at Generation %d. Resuming evolution." %currentGen)
@@ -114,7 +114,7 @@ module SgdEx_Standard =
                 let (sorterModelMutator: sorterModelMutator) = sSmm |> sorterModelMutator.Simple
 
                 log "Executing unified evolution run..."
-                let! (_finalRunResult: sorterPoolSet) = 
+                let! (_finalRunResult: spSet_Standard) = 
                     EvoOrch_Standard.runStandardEvolutionAsync
                         genDb
                         saveIntervals
