@@ -126,25 +126,25 @@ module SorterPoolHistoryDto =
         )
 
 // ----------------------------------------------------------------------------
-// sorterPoolSetHistoryDto
+// sorterPoolSetHistoryDto_Soss
 // ----------------------------------------------------------------------------
 
-type sorterPoolSetHistoryDto = {
+type sorterPoolSetHistoryDto_Soss = {
     SorterPoolSetId: Guid
     SaveGeneration: int
     PoolHistories: sorterPoolHistoryDto list
 }
 
-module SorterPoolSetHistoryDto =
+module SorterPoolSetHistoryDto_Soss =
 
-    let fromDomain (domain: spsh_Soss) : sorterPoolSetHistoryDto =
+    let fromDomain (domain: spsh_Soss) : sorterPoolSetHistoryDto_Soss =
         {
             SorterPoolSetId = %domain.SorterPoolSetId
             SaveGeneration = %domain.SaveGeneration
             PoolHistories = domain.PoolHistories |> List.map SorterPoolHistoryDto.fromDomain
         }
 
-    let toDomain (dto: sorterPoolSetHistoryDto) : spsh_Soss =
+    let toDomain (dto: sorterPoolSetHistoryDto_Soss) : spsh_Soss =
         spsh_Soss.create(
             sorterPoolSetId = UMX.tag dto.SorterPoolSetId,
             saveGeneration = UMX.tag dto.SaveGeneration,

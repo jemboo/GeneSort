@@ -1,55 +1,58 @@
 namespace GeneSort.Eval.Mp.V1.Sgd
 
 open GeneSort.Eval.V1.Sgd
+open GeneSort.Eval.Mp.V1.Sgd.Soss
+open GeneSort.Eval.Mp.V1.Bins
+open GeneSort.Eval.Mp.V1.Bins.Soss
 
 [<RequireQualifiedAccess>]
-type sorterPoolSetUnionDto =
-    | Standard of sorterPoolSetDto
-    | Soss of Soss.sorterPoolSetDto
+type sorterPoolSetDto =
+    | Standard of sorterPoolSetDto_Standard
+    | Soss of sorterPoolSetDto_Soss
 
-module SorterPoolSetUnionDto =
+module SorterPoolSetDto =
     let fromDomain = function
-        | sorterPoolSet.Standard value -> sorterPoolSetUnionDto.Standard (SorterPoolSetDto.toDto value)
-        | sorterPoolSet.Soss value -> sorterPoolSetUnionDto.Soss (Soss.SorterPoolSetDto.toDto value)
+        | sorterPoolSet.Standard value -> sorterPoolSetDto.Standard (SorterPoolSetDto_Standard.toDto value)
+        | sorterPoolSet.Soss value -> sorterPoolSetDto.Soss (SorterPoolSetDto_Soss.toDto value)
     let toDomain = function
-        | sorterPoolSetUnionDto.Standard value -> sorterPoolSet.Standard (SorterPoolSetDto.fromDto value)
-        | sorterPoolSetUnionDto.Soss value -> sorterPoolSet.Soss (Soss.SorterPoolSetDto.fromDto value)
+        | sorterPoolSetDto.Standard value -> sorterPoolSet.Standard (SorterPoolSetDto_Standard.fromDto value)
+        | sorterPoolSetDto.Soss value -> sorterPoolSet.Soss (SorterPoolSetDto_Soss.fromDto value)
 
 [<RequireQualifiedAccess>]
-type spSummarySetUnionDto =
-    | Standard of sorterPoolSetSummarySetDto
-    | Soss of Soss.sorterPoolSetSummarySetDto
+type spSummarySetDto =
+    | Standard of sorterPoolSetSummarySetDto_Standard
+    | Soss of sorterPoolSetSummarySetDto_Soss
 
-module SpSummarySetUnionDto =
+module SpSummarySetDto =
     let fromDomain = function
-        | spSummarySet.Standard value -> spSummarySetUnionDto.Standard (SorterPoolSetSummarySetDto.toDto value)
-        | spSummarySet.Soss value -> spSummarySetUnionDto.Soss (Soss.SorterPoolSetSummarySetDto.toDto value)
+        | spSummarySet.Standard value -> spSummarySetDto.Standard (SorterPoolSetSummarySetDto_Standard.toDto value)
+        | spSummarySet.Soss value -> spSummarySetDto.Soss (SorterPoolSetSummarySetDto_Soss.toDto value)
     let toDomain = function
-        | spSummarySetUnionDto.Standard value -> spSummarySet.Standard (SorterPoolSetSummarySetDto.fromDto value)
-        | spSummarySetUnionDto.Soss value -> spSummarySet.Soss (Soss.SorterPoolSetSummarySetDto.fromDto value)
+        | spSummarySetDto.Standard value -> spSummarySet.Standard (SorterPoolSetSummarySetDto_Standard.fromDto value)
+        | spSummarySetDto.Soss value -> spSummarySet.Soss (SorterPoolSetSummarySetDto_Soss.fromDto value)
 
 [<RequireQualifiedAccess>]
-type sorterPoolBinsSetSeriesUnionDto =
-    | Standard of GeneSort.Eval.Mp.V1.Bins.sorterPoolBinsSetSeriesDto
-    | Soss of GeneSort.Eval.Mp.V1.Bins.Soss.sorterPoolBinsSetSeriesDto
+type sorterPoolBinsSetSeriesDto =
+    | Standard of sorterPoolBinsSetSeriesDto_Standard
+    | Soss of sorterPoolBinsSetSeriesDto_Soss
 
-module SorterPoolBinsSetSeriesUnionDto =
+module SorterPoolBinsSetSeriesDto =
     let fromDomain = function
-        | sorterPoolBinsSetSeries.Standard value -> sorterPoolBinsSetSeriesUnionDto.Standard (GeneSort.Eval.Mp.V1.Bins.SorterPoolBinsSetSeriesDto.fromDomain value)
-        | sorterPoolBinsSetSeries.Soss value -> sorterPoolBinsSetSeriesUnionDto.Soss (GeneSort.Eval.Mp.V1.Bins.Soss.SorterPoolBinsSetSeriesDto.fromDomain value)
+        | sorterPoolBinsSetSeries.Standard value -> sorterPoolBinsSetSeriesDto.Standard (SorterPoolBinsSetSeriesDto_Standard.fromDomain value)
+        | sorterPoolBinsSetSeries.Soss value -> sorterPoolBinsSetSeriesDto.Soss (SorterPoolBinsSetSeriesDto_Soss.fromDomain value)
     let toDomain = function
-        | sorterPoolBinsSetSeriesUnionDto.Standard value -> sorterPoolBinsSetSeries.Standard (GeneSort.Eval.Mp.V1.Bins.SorterPoolBinsSetSeriesDto.toDomain value)
-        | sorterPoolBinsSetSeriesUnionDto.Soss value -> sorterPoolBinsSetSeries.Soss (GeneSort.Eval.Mp.V1.Bins.Soss.SorterPoolBinsSetSeriesDto.toDomain value)
+        | sorterPoolBinsSetSeriesDto.Standard value -> sorterPoolBinsSetSeries.Standard (SorterPoolBinsSetSeriesDto_Standard.toDomain value)
+        | sorterPoolBinsSetSeriesDto.Soss value -> sorterPoolBinsSetSeries.Soss (SorterPoolBinsSetSeriesDto_Soss.toDomain value)
 
 [<RequireQualifiedAccess>]
-type spshUnionDto =
-    | Standard of sorterPoolSetHistoryDto
-    | Soss of Soss.sorterPoolSetHistoryDto
+type spshDto =
+    | Standard of sorterPoolSetHistoryDto_Standard
+    | Soss of sorterPoolSetHistoryDto_Soss
 
-module SpshUnionDto =
+module SpshDto =
     let fromDomain = function
-        | spsh.Standard value -> spshUnionDto.Standard (SorterPoolSetHistoryDto.fromDomain value)
-        | spsh.Soss value -> spshUnionDto.Soss (Soss.SorterPoolSetHistoryDto.fromDomain value)
+        | spsh.Standard value -> spshDto.Standard (SorterPoolSetHistoryDto_Standard.fromDomain value)
+        | spsh.Soss value -> spshDto.Soss (SorterPoolSetHistoryDto_Soss.fromDomain value)
     let toDomain = function
-        | spshUnionDto.Standard value -> spsh.Standard (SorterPoolSetHistoryDto.toDomain value)
-        | spshUnionDto.Soss value -> spsh.Soss (Soss.SorterPoolSetHistoryDto.toDomain value)
+        | spshDto.Standard value -> spsh.Standard (SorterPoolSetHistoryDto_Standard.toDomain value)
+        | spshDto.Soss value -> spsh.Soss (SorterPoolSetHistoryDto_Soss.toDomain value)

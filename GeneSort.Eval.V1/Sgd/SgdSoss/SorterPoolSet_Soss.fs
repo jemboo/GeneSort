@@ -63,9 +63,14 @@ module SorterPoolSet_Soss =
                 let members =
                     pool.SorterPoolMembers
                     |> Seq.map (fun memberValue ->
+                        let evaluations =
+                            memberValue.SorterEval
+                            |> Option.map (fun evaluation ->
+                                Map.ofList [ SorterEval.getSortableTestsSubsetId evaluation, evaluation ])
+                            |> Option.defaultValue Map.empty
                         spMember_Soss.create memberValue.SorterPoolMemberId memberValue.SorterModel
                             memberValue.MutationIndex memberValue.MutationMod memberValue.SorterMutationSource
-                            memberValue.SorterEvalMap memberValue.Birthday)
+                            evaluations memberValue.Birthday)
                     |> Seq.toArray
                 sorterPool_Soss.create pool.SorterPoolId pool.ParentSorterPoolId pool.Name pool.SorterPoolTag
                     members pool.RawCeLength pool.MutationMod)

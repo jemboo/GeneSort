@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="SortingOpsTypes.fs" />
+    <Compile Include="CeBlock.fs" />
+    <Compile Include="CeUseCounts.fs" />
+    <Compile Include="CeBlockEval.fs" />
+    <Compile Include="CeBlockOpsInt.fs" />
+    <Compile Include="CeBlockOpsBinary.fs" />
+    <Compile Include="CeBlockOpsPacked.fs" />
+    <Compile Include="CeBlockOpsBitv512.fs" />
+    <Compile Include="CeBlockOpsUint8v256.fs" />
+    <Compile Include="CeBlockOpsUint8v512.fs" />
+    <Compile Include="CeBlockOps.fs" />
+    <Compile Include="SorterEval.fs" />
+    <Compile Include="SorterEvalMeasures.fs" />
+    <Compile Include="SorterSetEval.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.UMX" Version="1.1.0" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="6.0.0-beta001" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
+    <ProjectReference Include="..\GeneSort.Model.Sortable.V1\GeneSort.Model.Sortable.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.Model.Sorting.V1\GeneSort.Model.Sorting.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.SortingLib\GeneSort.SortingLib.fsproj" />
+    <ProjectReference Include="..\GeneSort.Sorting\GeneSort.Sorting.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="11.0.101-rc1.26425.128" />
+  </ItemGroup>
+
+</Project>

@@ -34,16 +34,16 @@ type sorterPoolDto = {
     sorterPoolTag: string
 }
 
-type sorterPoolSetDto = {
+type sorterPoolSetDto_Soss = {
     sorterPoolSetId: Guid
     generationNumber: int
     sorterPools: sorterPoolDto array
     latticeBounds: string
 }
 
-module SorterPoolSetDto =
+module SorterPoolSetDto_Soss =
 
-    let toDto (domain: sorterPoolSet_Soss) : sorterPoolSetDto =
+    let toDto (domain: sorterPoolSet_Soss) : sorterPoolSetDto_Soss =
         let poolDtos =
             domain.SorterPools
             |> Map.values
@@ -88,7 +88,7 @@ module SorterPoolSetDto =
             latticeBounds = LatticeBounds.toString domain.LatticeBounds
         }
 
-    let fromDto (dto: sorterPoolSetDto) : sorterPoolSet_Soss =
+    let fromDto (dto: sorterPoolSetDto_Soss) : sorterPoolSet_Soss =
         let pools =
             dto.sorterPools
             |> Array.map (fun p ->

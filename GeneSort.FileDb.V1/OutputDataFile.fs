@@ -115,12 +115,12 @@ module OutputDataFile =
                         }
                     | outputDataType.SorterPoolSet _ ->
                         async {
-                            let! domain = deserializeUnionDto<sorterPoolSetUnionDto, sorterPoolSetDto, sorterPoolSet> stream token SorterPoolSetUnionDto.toDomain (SorterPoolSetDto.fromDto >> sorterPoolSet.Standard)
+                            let! domain = deserializeUnionDto<sorterPoolSetDto, sorterPoolSetDto_Standard, sorterPoolSet> stream token SorterPoolSetDto.toDomain (SorterPoolSetDto_Standard.fromDto >> sorterPoolSet.Standard)
                             return outputData.SorterPoolSet domain
                         }
                     | outputDataType.SorterPoolSetSummarySet _ ->
                         async {
-                            let! domain = deserializeUnionDto<spSummarySetUnionDto, sorterPoolSetSummarySetDto, spSummarySet> stream token SpSummarySetUnionDto.toDomain (SorterPoolSetSummarySetDto.fromDto >> spSummarySet.Standard)
+                            let! domain = deserializeUnionDto<spSummarySetDto, sorterPoolSetSummarySetDto_Standard, spSummarySet> stream token SpSummarySetDto.toDomain (SorterPoolSetSummarySetDto_Standard.fromDto >> spSummarySet.Standard)
                             return outputData.SorterPoolSetSummarySet domain
                         }
                     | outputDataType.SorterSet _ ->
@@ -140,14 +140,14 @@ module OutputDataFile =
                         }
                     | outputDataType.SorterPoolBinsSetSeries _ ->
                         async {
-                            let! domain = deserializeUnionDto<sorterPoolBinsSetSeriesUnionDto, sorterPoolBinsSetSeriesDto, sorterPoolBinsSetSeries>
-                                                stream token SorterPoolBinsSetSeriesUnionDto.toDomain (SorterPoolBinsSetSeriesDto.toDomain >> sorterPoolBinsSetSeries.Standard)
+                            let! domain = deserializeUnionDto<sorterPoolBinsSetSeriesDto, sorterPoolBinsSetSeriesDto_Standard, sorterPoolBinsSetSeries>
+                                                stream token SorterPoolBinsSetSeriesDto.toDomain (SorterPoolBinsSetSeriesDto_Standard.toDomain >> sorterPoolBinsSetSeries.Standard)
                             return outputData.SorterPoolBinsSetSeries domain
                         }
                     | outputDataType.SorterPoolSetHistory _ ->
                         async {
-                            let! domain = deserializeUnionDto<spshUnionDto, sorterPoolSetHistoryDto, spsh>
-                                                stream token SpshUnionDto.toDomain (SorterPoolSetHistoryDto.toDomain >> spsh.Standard)
+                            let! domain = deserializeUnionDto<spshDto, sorterPoolSetHistoryDto_Standard, spsh>
+                                                stream token SpshDto.toDomain (SorterPoolSetHistoryDto_Standard.toDomain >> spsh.Standard)
                             return outputData.SorterPoolSetHistory domain
                         }
                     | outputDataType.Run _ ->
@@ -210,9 +210,9 @@ module OutputDataFile =
                             | outputData.RunParameters r ->
                                 serializeDto stream r RunParametersDto.fromDomain
                             | outputData.SorterPoolSet ss ->
-                                serializeDto stream ss SorterPoolSetUnionDto.fromDomain
+                                serializeDto stream ss SorterPoolSetDto.fromDomain
                             | outputData.SorterPoolSetSummarySet ss ->
-                                serializeDto stream ss SpSummarySetUnionDto.fromDomain
+                                serializeDto stream ss SpSummarySetDto.fromDomain
                             | outputData.SorterSet ss ->
                                 serializeDto stream ss SorterSetDto.fromDomain
                             | outputData.SortableTests sts ->
@@ -220,9 +220,9 @@ module OutputDataFile =
                             | outputData.SorterSetEval sse ->
                                 serializeDto stream sse SorterSetEvalDto.fromDomain                         
                             | outputData.SorterPoolBinsSetSeries sse ->
-                                serializeDto stream sse SorterPoolBinsSetSeriesUnionDto.fromDomain
+                                serializeDto stream sse SorterPoolBinsSetSeriesDto.fromDomain
                             | outputData.SorterPoolSetHistory sse ->
-                                serializeDto stream sse SpshUnionDto.fromDomain
+                                serializeDto stream sse SpshDto.fromDomain
                             | outputData.Run p ->
                                 serializeDto stream p RunDto.fromDomain
                             | outputData.TextReport dataTableReport ->

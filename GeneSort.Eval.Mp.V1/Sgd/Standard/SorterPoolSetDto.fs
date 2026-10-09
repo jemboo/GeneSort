@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Eval.Mp.V1.Sgd
+namespace GeneSort.Eval.Mp.V1.Sgd
 
 open System
 open FSharp.UMX
@@ -19,7 +19,6 @@ type sorterPoolMemberDto = {
     sorterMutationMod: int
     sorterMutationSource: sorterMutationSourceDto option
     sorterEvalDto: sorterEvalDto option
-    sorterEvalDtos: Map<string, sorterEvalDto>
     birthday: int
 }
 
@@ -33,16 +32,16 @@ type sorterPoolDto = {
     sorterPoolTag: string
 }
 
-type sorterPoolSetDto = {
+type sorterPoolSetDto_Standard = {
     sorterPoolSetId: Guid
     generationNumber: int
     sorterPools: sorterPoolDto array
     latticeBounds: string
 }
 
-module SorterPoolSetDto =
+module SorterPoolSetDto_Standard =
 
-    let toDto (domain: sorterPoolSet_Standard) : sorterPoolSetDto =
+    let toDto (domain: sorterPoolSet_Standard) : sorterPoolSetDto_Standard =
         let poolDtos =
             domain.SorterPools
             |> Map.values
@@ -57,12 +56,6 @@ module SorterPoolSetDto =
                             sorterMutationMod = UMX.untag m.MutationMod
                             sorterMutationSource = m.SorterMutationSource |> Option.map SorterMutationSourceDto.toDto
                             sorterEvalDto = m.SorterEval |> Option.map SorterEvalDto.fromDomain
-                            sorterEvalDtos =
-                                m.SorterEvalMap
-                                |> Map.toSeq
-                                |> Seq.map (fun (subsetId, evaluation) ->
-                                    %subsetId, SorterEvalDto.fromDomain evaluation)
-                                |> Map.ofSeq
                             birthday = m.Birthday |> UMX.untag
                         }
                     )
@@ -87,27 +80,14 @@ module SorterPoolSetDto =
             latticeBounds = LatticeBounds.toString domain.LatticeBounds
         }
 
-    let fromDto (dto: sorterPoolSetDto) : sorterPoolSet_Standard =
+    let fromDto (dto: sorterPoolSetDto_Standard) : sorterPoolSet_Standard =
         let pools =
             dto.sorterPools
             |> Array.map (fun p ->
                 let members =
                     p.sorterPoolMemberDtos
                     |> Array.map (fun m ->
-                        let evalMap =
-                            if obj.ReferenceEquals(m.sorterEvalDtos, null) then
-                                m.sorterEvalDto
-                                |> Option.map SorterEvalDto.toDomain
-                                |> Option.map (fun evaluation ->
-                                    Map.ofList [ SorterEval.getSortableTestsSubsetId evaluation, evaluation ])
-                                |> Option.defaultValue Map.empty
-                            else
-                                m.sorterEvalDtos
-                                |> Map.toSeq
-                                |> Seq.map (fun (subsetId, evaluation) ->
-                                    subsetId |> UMX.tag<sortableTestsSubsetId>,
-                                    SorterEvalDto.toDomain evaluation)
-                                |> Map.ofSeq
+                        let evaluation = m.sorterEvalDto |> Option.map SorterEvalDto.toDomain
                         let sourceOpt = m.sorterMutationSource |> Option.map SorterMutationSourceDto.fromDto
                         
                         spMember_Standard.create
@@ -116,7 +96,7 @@ module SorterPoolSetDto =
                             (UMX.tag m.sorterMutationIndex)
                             (UMX.tag m.sorterMutationMod)
                             sourceOpt
-                            evalMap
+                            evaluation
                             (UMX.tag m.birthday)
                     )
                 let parentIdOpt = 

@@ -1,5 +1,7 @@
 namespace GeneSort.Eval.V1.Sgd.Standard
 
+open GeneSort.Eval.V1.Sgd
+
 open FSharp.UMX
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
@@ -12,7 +14,6 @@ type spSummary_Standard =
     private {
         _sorterPoolId: Guid<sorterPoolId>
         _sorterPoolName: string<sorterPoolName>
-        _sortableTestsSubsetId: string<sortableTestsSubsetId>
         _minCeLength: int<ceLength>
         _aveCeLength: float<ceLength>
         _stdDevCeLength: float<ceLength>
@@ -28,7 +29,6 @@ type spSummary_Standard =
     member this.RawCeLength with get() = this._rawCeLength
     member this.SorterPoolId with get() = this._sorterPoolId
     member this.SorterPoolName with get() = this._sorterPoolName
-    member this.SortableTestsSubsetId with get() = this._sortableTestsSubsetId
     member this.AveCeLength with get() = this._aveCeLength
     member this.StdDevCeLength with get() = this._stdDevCeLength
     member this.MinCeLength with get() = this._minCeLength
@@ -43,7 +43,6 @@ type spSummary_Standard =
     static member create 
                     (poolId: Guid<sorterPoolId>) 
                     (sorterPoolName: string<sorterPoolName>) 
-                    (sortableTestsSubsetId: string<sortableTestsSubsetId>)
                     (rawCeLength: int<ceLength>) 
                     (minCeLength: int<ceLength>) 
                     (aveCeLength: float<ceLength>) 
@@ -57,7 +56,6 @@ type spSummary_Standard =
         { 
           _sorterPoolId = poolId; 
           _sorterPoolName = sorterPoolName;
-          _sortableTestsSubsetId = sortableTestsSubsetId
           _rawCeLength = rawCeLength; 
           _minCeLength = minCeLength;
           _aveCeLength = aveCeLength; 
@@ -110,27 +108,36 @@ module SorterPoolSetSummary_Standard =
         // 1. Process each pool within the pool set
         let poolSummaries = 
             poolSet.SorterPools 
-            |> Seq.collect (fun (KeyValue(_, pool)) ->
-                let evalsBySubset =
+            |> Seq.map (fun (KeyValue(_, pool)) ->
+
+                // Get evaluations for all evaluated members in this pool
+                let evals =
                     pool.SorterPoolMembers
-                    |> Seq.collect (fun memberObj -> memberObj.SorterEvalMap |> Map.toSeq)
-                    |> Seq.groupBy fst
+                    |> Seq.choose (fun memberObj -> memberObj.SorterEval)
+                    |> Seq.toArray
 
-                evalsBySubset
-                |> Seq.map (fun (sortableTestsSubsetId, subsetEvals) ->
-                    let evals = subsetEvals |> Seq.map snd |> Seq.toArray
-
+                // Defensive check if a pool contains no evaluated members yet
+                if Array.isEmpty evals then
+                    spSummary_Standard.create
+                        pool.SorterPoolId
+                        pool.Name
+                        pool.RawCeLength
+                        (0 |> UMX.tag)
+                        (0.0 |> UMX.tag)
+                        (0.0 |> UMX.tag)
+                        (0 |> UMX.tag)
+                        (0.0 |> UMX.tag)
+                        (0.0 |> UMX.tag)
+                        (0.0 |> UMX.tag)
+                        (0.0 |> UMX.tag)
+                        0.0
+                else
                     // Map out the metrics across all evaluations
                     let ceLengths = evals |> Array.map (fun ev -> float %(SorterEval.getCeLength ev))
                     let stageLengths = evals |> Array.map (fun ev -> float %(SorterEval.getStageLength ev))
                     let stageCrossings = evals |> Array.map (fun ev -> float %(SorterEval.getStageCrossingsCount ev))
                     let reflectiveCountRs = evals |> Array.map (fun ev -> float (float %(SorterEval.getReflectiveCount ev) / float %(SorterEval.getCeLength ev)))
-                    let averageUnsortedCount =
-                        evals
-                        |> Array.map (SorterEval.getUnsortedCount >> UMX.untag >> float)
-                        |> function
-                            | [||] -> 0.0
-                            | counts -> Array.average counts
+                    let averageUnsortedCount = evals |> Array.averageBy (fun ev -> float (UMX.untag (SorterEval.getUnsortedCount ev)))
 
                     // Compute minimums
                     let minCe = (Array.min ceLengths |> int) |> UMX.tag<ceLength>
@@ -151,7 +158,6 @@ module SorterPoolSetSummary_Standard =
                     spSummary_Standard.create 
                         pool.SorterPoolId 
                         pool.Name 
-                        sortableTestsSubsetId
                         pool.RawCeLength 
                         minCe 
                         aveCe
@@ -162,7 +168,7 @@ module SorterPoolSetSummary_Standard =
                         aveStageCrossings
                         aveReflectiveCountR
                         averageUnsortedCount
-                ))
+            )
             |> Seq.toArray
 
         // 2. Wrap the final payload up into the collection summary
@@ -190,7 +196,6 @@ module SorterPoolSetSummary_Standard =
             setContextDtr
             |> dataTableRecord.addData (sprintf "%sSorterPoolId" prefix) (string (%poolSum.SorterPoolId))
             |> dataTableRecord.addData (sprintf "%sSorterPoolName" prefix) (string (%poolSum.SorterPoolName))
-            |> dataTableRecord.addData (sprintf "%sSortableTestsSubsetId" prefix) (string (%poolSum.SortableTestsSubsetId))
             |> dataTableRecord.addData (sprintf "%sRawCeLength" prefix) (string (%poolSum.RawCeLength))
             |> dataTableRecord.addData (sprintf "%sMinCeLength" prefix) (string (%poolSum.MinCeLength))
             |> dataTableRecord.addData (sprintf "%sAveCeLength" prefix) (sprintf "%.5f" (%poolSum.AveCeLength))

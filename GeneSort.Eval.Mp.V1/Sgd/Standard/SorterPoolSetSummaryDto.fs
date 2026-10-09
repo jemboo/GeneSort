@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Eval.Mp.V1.Sgd
+namespace GeneSort.Eval.Mp.V1.Sgd
 
 open System
 open MessagePack
@@ -17,7 +17,6 @@ open GeneSort.Eval.V1.Sgd.Standard
 type sorterPoolSummaryDto = {
     sorterPoolId: Guid
     sorterPoolName: string
-    sortableTestsSubsetId: string
     aveCeLength: float
     minCeLength: int
     minStageLength: int
@@ -37,7 +36,7 @@ type sorterPoolSetSummaryDto = {
     sorterPoolSummaryDtos: sorterPoolSummaryDto array
 }
 
-type sorterPoolSetSummarySetDto = {
+type sorterPoolSetSummarySetDto_Standard = {
     sorterPoolSetSummarySetId: Guid
     lastGeneration: int
     sorterPoolSetSummaryDtos: sorterPoolSetSummaryDto array
@@ -56,7 +55,6 @@ module SorterPoolSetSummaryDto =
                 { 
                     sorterPoolSummaryDto.sorterPoolId = UMX.untag p.SorterPoolId
                     sorterPoolName = UMX.untag p.SorterPoolName
-                    sortableTestsSubsetId = UMX.untag p.SortableTestsSubsetId
                     aveCeLength = UMX.untag p.AveCeLength
                     minCeLength = UMX.untag p.MinCeLength
                     minStageLength = UMX.untag p.MinStageLength
@@ -83,7 +81,6 @@ module SorterPoolSetSummaryDto =
                 spSummary_Standard.create
                     (p.sorterPoolId |> UMX.tag<sorterPoolId>)
                     (p.sorterPoolName |> UMX.tag<sorterPoolName>)
-                    (if String.IsNullOrWhiteSpace p.sortableTestsSubsetId then SortableTestsSubsetId.Default else p.sortableTestsSubsetId |> UMX.tag<sortableTestsSubsetId>)
                     (p.rawCeLength |> UMX.tag<ceLength>)
                     (p.minCeLength |> UMX.tag<ceLength>)
                     (p.aveCeLength |> UMX.tag<ceLength>)
@@ -102,9 +99,9 @@ module SorterPoolSetSummaryDto =
             poolSummaryDomains
         )
 
-module SorterPoolSetSummarySetDto =
+module SorterPoolSetSummarySetDto_Standard =
 
-    let toDto (domain: spSummarySet_Standard) : sorterPoolSetSummarySetDto =
+    let toDto (domain: spSummarySet_Standard) : sorterPoolSetSummarySetDto_Standard =
         {
             sorterPoolSetSummarySetId = UMX.untag domain.SorterPoolSetSummarySetId
             lastGeneration = UMX.untag domain.LastGeneration
@@ -113,7 +110,7 @@ module SorterPoolSetSummarySetDto =
                 |> Array.map SorterPoolSetSummaryDto.toDto
         }
 
-    let fromDto (dto: sorterPoolSetSummarySetDto) : spSummarySet_Standard =
+    let fromDto (dto: sorterPoolSetSummarySetDto_Standard) : spSummarySet_Standard =
         let summaries = 
             dto.sorterPoolSetSummaryDtos 
             |> Array.map SorterPoolSetSummaryDto.fromDto

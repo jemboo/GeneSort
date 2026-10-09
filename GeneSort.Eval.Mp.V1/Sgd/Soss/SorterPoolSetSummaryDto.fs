@@ -37,7 +37,7 @@ type sorterPoolSetSummaryDto = {
     sorterPoolSummaryDtos: sorterPoolSummaryDto array
 }
 
-type sorterPoolSetSummarySetDto = {
+type sorterPoolSetSummarySetDto_Soss = {
     sorterPoolSetSummarySetId: Guid
     lastGeneration: int
     sorterPoolSetSummaryDtos: sorterPoolSetSummaryDto array
@@ -102,9 +102,9 @@ module SorterPoolSetSummaryDto =
             poolSummaryDomains
         )
 
-module SorterPoolSetSummarySetDto =
+module SorterPoolSetSummarySetDto_Soss =
 
-    let toDto (domain: spSummarySet_Soss) : sorterPoolSetSummarySetDto =
+    let toDto (domain: spSummarySet_Soss) : sorterPoolSetSummarySetDto_Soss =
         {
             sorterPoolSetSummarySetId = UMX.untag domain.SorterPoolSetSummarySetId
             lastGeneration = UMX.untag domain.LastGeneration
@@ -113,7 +113,7 @@ module SorterPoolSetSummarySetDto =
                 |> Array.map SorterPoolSetSummaryDto.toDto
         }
 
-    let fromDto (dto: sorterPoolSetSummarySetDto) : spSummarySet_Soss =
+    let fromDto (dto: sorterPoolSetSummarySetDto_Soss) : spSummarySet_Soss =
         let summaries = 
             dto.sorterPoolSetSummaryDtos 
             |> Array.map SorterPoolSetSummaryDto.fromDto

@@ -1,12 +1,12 @@
-﻿namespace GeneSort.Eval.V1.Sgd.Standard
+namespace GeneSort.Eval.V1.Sgd.Standard
+
+open GeneSort.Eval.V1.Sgd
 
 open System
 open FSharp.UMX
-open GeneSort.Sorting
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1
-open GeneSort.Eval.V1.Sgd
 
 type spMember_Standard =
     private {
@@ -15,7 +15,7 @@ type spMember_Standard =
         _mutationIndex:        int<mutationIndex>
         _mutationMod:          int<mutationMod>
         _sorterMutationSource: sorterMutationSource option
-        _sorterEvalMap:        Map<string<sortableTestsSubsetId>, sorterEval>
+        _sorterEval:           sorterEval option
         _birthday:             int<generationNumber>
     }
 
@@ -27,8 +27,7 @@ type spMember_Standard =
     member this.MutationIndex = this._mutationIndex
     member this.MutationMod = this._mutationMod
     member this.SorterMutationSource = this._sorterMutationSource
-    member this.SorterEvalMap = this._sorterEvalMap
-    member this.SorterEval = Map.tryFind SortableTestsSubsetId.Default this._sorterEvalMap
+    member this.SorterEval = this._sorterEval
 
     static member create 
                     sorterPoolMemberId 
@@ -44,7 +43,7 @@ type spMember_Standard =
             _mutationIndex = mutationIndex 
             _mutationMod = mutationMod
             _sorterMutationSource = sorterMutationSource
-            _sorterEvalMap = sorterEval
+            _sorterEval = sorterEval
             _birthday = birthday
         }
 
@@ -54,7 +53,8 @@ module SpMember_Standard =
     /// Increments a member's mutation index by a given integer value
     let advanceIndex (offset: int) (spm: spMember_Standard) : spMember_Standard =
         { spm with _mutationIndex = (%spm.MutationIndex + offset) |> UMX.tag }
-        
+
+    /// Increments a member's mutation index by exactly 1
     let updateIndex (spm: spMember_Standard) : spMember_Standard =
         advanceIndex 1 spm
 
@@ -68,16 +68,11 @@ module SpMember_Standard =
         { spm with 
             _sorterPoolMemberId = newMemberId
             _mutationMod = newMod
-            _mutationIndex = 0 |> UMX.tag }
+            _mutationIndex = 0 |> UMX.tag<mutationIndex> }
 
-    /// Adds or replaces one subset evaluation; None clears every cached evaluation.spMember_Standard 
+    /// Updates the sorterEval of a pool member
     let withEval (eval: sorterEval option) (spm: spMember_Standard) : spMember_Standard =
-        match eval with
-        | Some value ->
-            { spm with
-                _sorterEvalMap =
-                    Map.add (SorterEval.getSortableTestsSubsetId value) value spm._sorterEvalMap }
-        | None -> { spm with _sorterEvalMap = Map.empty }
+        { spm with _sorterEval = eval }
 
     /// Generates 'mutantCount' new mutants, updating the parent's index by 'mutantCount'
     let mutate (sorterModelMut: sorterModelMutator) 
@@ -119,7 +114,7 @@ module SpMember_Standard =
                     (0 |> UMX.tag)          // New mutants start at mutation index 0
                     spm.MutationMod
                     (Some mutationSource)
-                    Map.empty               // New mutants start unevaluated
+                    None                    // New mutants start unevaluated
                     currentGeneration
             )
 

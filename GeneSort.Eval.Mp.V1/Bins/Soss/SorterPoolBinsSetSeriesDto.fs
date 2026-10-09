@@ -11,7 +11,7 @@ open GeneSort.Eval.V1.Sgd.Bins.Soss
 // 1. DTO Definition
 // ---------------------------------------------------------------------
 
-type sorterPoolBinsSetSeriesDto = {
+type sorterPoolBinsSetSeriesDto_Soss = {
     SorterPoolEvalBinsSetCollectionId: Guid
     SorterPoolEvalBinsSets: sorterPoolEvalBinsSetDto array
 }
@@ -20,9 +20,9 @@ type sorterPoolBinsSetSeriesDto = {
 // 2. Conversion Module
 // ---------------------------------------------------------------------
 
-module SorterPoolBinsSetSeriesDto =
+module SorterPoolBinsSetSeriesDto_Soss =
 
-    let fromDomain (collection: sorterPoolBinsSetSeries_Soss) : sorterPoolBinsSetSeriesDto = {
+    let fromDomain (collection: sorterPoolBinsSetSeries_Soss) : sorterPoolBinsSetSeriesDto_Soss = {
         SorterPoolEvalBinsSetCollectionId = %collection.SorterPoolEvalBinsSetCollectionId
         SorterPoolEvalBinsSets =
             collection.SorterPoolEvalBinsSets
@@ -31,7 +31,7 @@ module SorterPoolBinsSetSeriesDto =
             |> Seq.toArray
     }
 
-    let toDomain (dto: sorterPoolBinsSetSeriesDto) : sorterPoolBinsSetSeries_Soss =
+    let toDomain (dto: sorterPoolBinsSetSeriesDto_Soss) : sorterPoolBinsSetSeries_Soss =
         let id = dto.SorterPoolEvalBinsSetCollectionId |> UMX.tag
 
         let setsMap =

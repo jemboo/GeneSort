@@ -1,11 +1,13 @@
-﻿namespace GeneSort.Eval.V1.Sgd.Standard
+namespace GeneSort.Eval.V1.Sgd.Standard
+
+open GeneSort.Eval.V1.Sgd
+
 open FSharp.UMX
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.Core
 open GeneSort.Eval.V1
 open GeneSort.Sorting
-open GeneSort.Eval.V1.Sgd
 
 type spDescription_Standard =
     private {
@@ -13,7 +15,7 @@ type spDescription_Standard =
         _sorterModelId:        Guid<sorterModelId>
         _mutationIndex:        int<mutationIndex>
         _sorterMutationSource: sorterMutationSource option
-        _sorterEvalMap:        Map<string<sortableTestsSubsetId>, sorterEval>
+        _sorterEval:           sorterEval option
         _birthday:             int<generationNumber>
     }
     member this.Birthday with get() = this._birthday
@@ -21,24 +23,24 @@ type spDescription_Standard =
     member this.SorterModelId with get() = this._sorterModelId
     member this.MutationIndex with get() = this._mutationIndex
     member this.SorterMutationSource with get() = this._sorterMutationSource
-    member this.SorterEvalMap with get() = this._sorterEvalMap
+    member this.SorterEval with get() = this._sorterEval
 
-    static member create poolMemberId modelId mutationIndex mutationSource sorterEvalMap birthday =
+    static member create poolMemberId modelId mutationIndex mutationSource evaluation birthday =
         {
             _sorterPoolMemberId = poolMemberId
             _sorterModelId = modelId
             _mutationIndex = mutationIndex
             _sorterMutationSource = mutationSource
-            _sorterEvalMap = sorterEvalMap
+            _sorterEval = evaluation
             _birthday = birthday
         }
 
 
 module SpDescription_Standard = 
 
-    let toDataTableRecordsWithPrefix (prefix: string)
-                                     (spmDesc: spDescription_Standard) : dataTableRecord array =
-        // 1. Map root scalar fields belonging directly to spmDescription
+    let toDataTableRecordWithPrefix (prefix: string)
+                                    (spmDesc: spDescription_Standard) : dataTableRecord =
+        // 1. Map root scalar fields belonging directly to spDescription_Standard
         let baseRecord =
             dataTableRecord.createEmpty()
             |> dataTableRecord.addData (sprintf "%sSorterPoolMemberId" prefix) (string (%spmDesc.SorterPoolMemberId))
@@ -52,22 +54,16 @@ module SpDescription_Standard =
             | Some source -> source |> SorterMutationSource.toDataTableRecordWithPrefix prefix
             | None -> dataTableRecord.createEmpty()
 
-        // 3. Emit one row per sortable-test subset evaluation.
-        spmDesc.SorterEvalMap
-        |> Map.toSeq
-        |> Seq.map (fun (sortableTestsSubsetId, sorterEval) ->
-            let subsetRecord =
-                dataTableRecord.createEmpty()
-                |> dataTableRecord.addData
-                    (sprintf "%sSortableTestsSubsetId" prefix)
-                    (string %sortableTestsSubsetId)
+        // 3. Flatten optional sorterEval metrics if present
+        let evalRecord =
+            match spmDesc.SorterEval with
+            | Some sorterEval -> sorterEval |> SorterEval.toDataTableRecordWithPrefix prefix
+            | None -> dataTableRecord.createEmpty()
 
-            sorterEval
-            |> SorterEval.toDataTableRecordWithPrefix prefix
-            |> dataTableRecord.combine subsetRecord
-            |> dataTableRecord.combine sourceRecord
-            |> dataTableRecord.combine baseRecord)
-        |> Seq.toArray
+        // 4. Structural aggregation using the dataTableRecord combinators
+        baseRecord
+        |> dataTableRecord.combine sourceRecord
+        |> dataTableRecord.combine evalRecord
 
 
 type sorterPoolDescription =
@@ -125,7 +121,7 @@ module SorterPoolSetDescription =
                             modelId
                             spm.MutationIndex
                             spm.SorterMutationSource
-                            spm.SorterEvalMap
+                            spm.SorterEval
                             spm.Birthday
                     )
                     |> Seq.toArray
@@ -162,18 +158,17 @@ module SorterPoolSetDescription =
                 |> dataTableRecord.addData (sprintf "%sRawCeLength" prefix) (string (%poolDesc.RawCeLength))
                 |> dataTableRecord.addData (sprintf "%sSorterPoolName" prefix) (string (%poolDesc.SorterPoolName))
 
-            // 2b. Emit one record for every sortable-test subset evaluation on each member.
+            // 2b. Map every single pool member, flattening and combining structures upward
             poolDesc.SorterPoolMembers
-            |> Array.collect (fun memberDesc ->
+            |> Array.map (fun memberDesc ->
                 memberDesc 
-                |> SpDescription_Standard.toDataTableRecordsWithPrefix prefix
-                |> Array.map (dataTableRecord.combine poolContextDtr)
+                |> SpDescription_Standard.toDataTableRecordWithPrefix prefix
+                |> dataTableRecord.combine poolContextDtr
             )
         )
 
 
-    /// Extracts one dataTableRecord for every pool-member evaluation.  Each evaluation
-    /// supplies SortableTestsSubsetId, which partitions a pool's snapshot statistics.
+    /// Extracts dataTableRecords out of the run result's FinalPoolSet
     let toDataTableRecordsSnapshot (prefix: string) (srRes: sorterPoolSet_Standard) : dataTableRecord seq =
         let yab = fromPoolSet srRes
-        toDataTableRecords prefix yab
+        toDataTableRecords "" yab
