@@ -17,7 +17,7 @@ type sorterPoolBinsSet =
     }
     with
     /// Creates an evaluated bin set collection directly from a sorterPoolSet
-    static member create (id: Guid<sorterPoolBinsSetId>) (poolSet: spSet_Standard) =
+    static member create (id: Guid<sorterPoolBinsSetId>) (poolSet: sorterPoolSet_Standard) =
         let poolBinsMap =
             poolSet.SorterPools
             |> Map.values

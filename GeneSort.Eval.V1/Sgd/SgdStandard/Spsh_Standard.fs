@@ -4,7 +4,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Eval.V1
 
-type sorterPoolSetHistory = 
+type spsh_Standard = 
     private {
         sorterPoolSetId: Guid<sorterPoolSetId>
         saveGeneration: int<generationNumber>
@@ -14,7 +14,7 @@ type sorterPoolSetHistory =
     static member create
             (sorterPoolSetId: Guid<sorterPoolSetId>,
              saveGeneration: int<generationNumber>,
-             poolHistories: spHistory_Standard list) : sorterPoolSetHistory =
+             poolHistories: spHistory_Standard list) : spsh_Standard =
         {
             sorterPoolSetId = sorterPoolSetId
             saveGeneration = saveGeneration
@@ -26,32 +26,32 @@ type sorterPoolSetHistory =
     member this.PoolHistories with get() = this.poolHistories
 
 
-module SorterPoolSetHistory =
+module Spsh_Standard =
 
     let pruneAndCreateFromPoolSet 
             (currentGen: int<generationNumber>) 
-            (poolSet: spSet_Standard)
-            (runningHistory: rmhMap_Standard)
-            : sorterPoolSetHistory * rmhMap_Standard =
+            (poolSet: sorterPoolSet_Standard)
+            (runningHistory: mhMap_Standard)
+            : spsh_Standard * mhMap_Standard =
 
         let poolHistories, updatedMap =
             poolSet.SorterPools
             |> Map.toList
             |> List.fold (fun (accHist, accMap) (poolId, pool) ->
                 let runningForPool = Map.tryFind poolId accMap |> Option.defaultValue Map.empty
-                let poolHist, prunedForPool = SorterPoolHistory.pruneAndCreateForPool currentGen pool runningForPool
+                let poolHist, prunedForPool = SpHistory_Standard.pruneAndCreateForPool currentGen pool runningForPool
                 (poolHist :: accHist, Map.add poolId prunedForPool accMap)
-            ) ([], RunningMemberHistoryMap.toMap runningHistory)
+            ) ([], MhMap_Standard.toMap runningHistory)
 
         let setHistory = 
-            sorterPoolSetHistory.create(
+            spsh_Standard.create(
                 sorterPoolSetId = poolSet.SorterPoolSetId,
                 saveGeneration = currentGen,
                 poolHistories = (poolHistories |> List.rev)
             )
 
-        setHistory, RunningMemberHistoryMap.create updatedMap
+        setHistory, MhMap_Standard.create updatedMap
 
-    let toDataTableRecords (history: sorterPoolSetHistory) : dataTableRecord seq =
+    let toDataTableRecords (history: spsh_Standard) : dataTableRecord seq =
         history.PoolHistories 
-        |> Seq.collect SorterPoolHistory.toDataTableRecords
+        |> Seq.collect SpHistory_Standard.toDataTableRecords

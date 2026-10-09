@@ -42,7 +42,7 @@ type sorterPoolSetDto = {
 
 module SorterPoolSetDto =
 
-    let toDto (domain: spSet_Standard) : sorterPoolSetDto =
+    let toDto (domain: sorterPoolSet_Standard) : sorterPoolSetDto =
         let poolDtos =
             domain.SorterPools
             |> Map.values
@@ -87,7 +87,7 @@ module SorterPoolSetDto =
             latticeBounds = LatticeBounds.toString domain.LatticeBounds
         }
 
-    let fromDto (dto: sorterPoolSetDto) : spSet_Standard =
+    let fromDto (dto: sorterPoolSetDto) : sorterPoolSet_Standard =
         let pools =
             dto.sorterPools
             |> Array.map (fun p ->
@@ -124,7 +124,7 @@ module SorterPoolSetDto =
                     |> Option.ofNullable 
                     |> Option.map UMX.tag<sorterPoolId>
 
-                sp_Standard.create 
+                sorterPool_Standard.create 
                     (p.sorterPoolId |> UMX.tag<sorterPoolId>) 
                     parentIdOpt
                     (p.name |> UMX.tag<sorterPoolName>) 
@@ -136,7 +136,7 @@ module SorterPoolSetDto =
 
         let bounds = LatticeBounds.fromString dto.latticeBounds
 
-        spSet_Standard.create 
+        sorterPoolSet_Standard.create 
             (UMX.tag dto.sorterPoolSetId) 
             (UMX.tag dto.generationNumber) 
             bounds 

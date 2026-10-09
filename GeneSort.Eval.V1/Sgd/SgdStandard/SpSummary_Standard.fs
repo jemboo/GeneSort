@@ -8,7 +8,7 @@ open GeneSort.Sorting.Sorter
 open GeneSort.Core
 
 
-type sorterPoolSummary =
+type spSummary_Standard =
     private {
         _sorterPoolId: Guid<sorterPoolId>
         _sorterPoolName: string<sorterPoolName>
@@ -76,7 +76,7 @@ type sorterPoolSetSummary =
         _sorterPoolSetId: Guid<sorterPoolSetId>
         _generationNumber: int<generationNumber>
         _sortedSorterEvalPercentage: float
-        _sorterPoolSummaries: sorterPoolSummary array
+        _sorterPoolSummaries: spSummary_Standard array
     }
     member this.SorterPoolSetId with get() = this._sorterPoolSetId
     member this.GenerationNumber with get() = this._generationNumber
@@ -105,7 +105,7 @@ module SorterPoolSetSummary =
             sqrt variance
 
     /// Strips the heavy sorterModel references out of a pool set, creating a light memory footprint snapshot
-    let fromPoolSet (poolSet: spSet_Standard) : sorterPoolSetSummary =
+    let fromPoolSet (poolSet: sorterPoolSet_Standard) : sorterPoolSetSummary =
         
         // 1. Process each pool within the pool set
         let poolSummaries = 
@@ -148,7 +148,7 @@ module SorterPoolSetSummary =
                     let stdDevCe = computeStdDev ceLengths aveCeVal |> UMX.tag<ceLength>
                     let stdDevStage = computeStdDev stageLengths aveStageVal |> UMX.tag<stageLength>
 
-                    sorterPoolSummary.create 
+                    spSummary_Standard.create 
                         pool.SorterPoolId 
                         pool.Name 
                         sortableTestsSubsetId

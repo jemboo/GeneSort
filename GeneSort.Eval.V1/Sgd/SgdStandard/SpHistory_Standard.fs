@@ -25,13 +25,14 @@ type spHistory_Standard =
     member this.SaveGeneration with get() = this.saveGeneration
     member this.MemberHistories with get() = this.memberHistories
 
-module SorterPoolHistory =
+
+module SpHistory_Standard =
 
     /// Updates running tracked history for a pool with all members generated in currentGen,
     /// and then prunes all entries that do not belong to the ancestral tree of alive members.
     let pruneAndCreateForPool
             (currentGen: int<generationNumber>) 
-            (pool: sp_Standard)
+            (pool: sorterPool_Standard)
             (runningPoolMemberHistory: Map<Guid<sorterPoolMemberId>, spMemberHistory_Standard>) 
             : spHistory_Standard * Map<Guid<sorterPoolMemberId>, spMemberHistory_Standard> =
 
@@ -48,7 +49,7 @@ module SorterPoolHistory =
                         spm.SorterMutationSource
                         |> Option.map (fun src -> src.SorterPoolId)
 
-                    let hist = SorterPoolMemberHistory.fromPoolMember 
+                    let hist = SpMemberHistory_Standard.fromPoolMember 
                                     pool.SorterPoolId parentMemberId 
                                     parentPoolId currentGen spm
                     Map.add spm.SorterPoolMemberId hist acc
@@ -102,4 +103,4 @@ module SorterPoolHistory =
 
     let toDataTableRecords (history: spHistory_Standard) : dataTableRecord list =
         history.MemberHistories 
-        |> List.map SorterPoolMemberHistory.toDataTableRecord
+        |> List.map SpMemberHistory_Standard.toDataTableRecord

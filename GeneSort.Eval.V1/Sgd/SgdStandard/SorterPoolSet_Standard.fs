@@ -9,10 +9,10 @@ open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd
 
 
-type spSet_Standard =
+type sorterPoolSet_Standard =
     private {
         _sorterPoolSetId: Guid<sorterPoolSetId>
-        _sorterPools: Map<Guid<sorterPoolId>, sp_Standard>
+        _sorterPools: Map<Guid<sorterPoolId>, sorterPool_Standard>
         _generationNumber: int<generationNumber>
         _latticeBounds: latticeBounds
     }
@@ -39,7 +39,7 @@ type spSet_Standard =
     static member create (sorterPoolSetId: Guid<sorterPoolSetId>)
                          (generationNumber: int<generationNumber>)
                          (bounds: latticeBounds)
-                         (pools: seq<sp_Standard> option) =
+                         (pools: seq<sorterPool_Standard> option) =
         let poolsMap = 
             defaultArg pools Seq.empty
             |> Seq.map (fun p -> p.SorterPoolId, p)
@@ -52,26 +52,26 @@ type spSet_Standard =
         }
 
 
-module SorterPoolSet =
+module SorterPoolSet_Standard =
 
     /// Safely attempts to find a specific SorterPool within the set
-    let tryFindPool (poolId: Guid<sorterPoolId>) (poolSet: spSet_Standard) : sp_Standard option =
+    let tryFindPool (poolId: Guid<sorterPoolId>) (poolSet: sorterPoolSet_Standard) : sorterPool_Standard option =
         Map.tryFind poolId poolSet._sorterPools
 
     /// Adds or updates a SorterPool inside the SorterPoolSet
-    let upsertPool (pool: sp_Standard) (poolSet: spSet_Standard) : spSet_Standard =
+    let upsertPool (pool: sorterPool_Standard) (poolSet: sorterPoolSet_Standard) : sorterPoolSet_Standard =
         let updatedMap = Map.add pool.SorterPoolId pool poolSet._sorterPools
         { poolSet with _sorterPools = updatedMap }
 
     /// Advances the generation counter by a given step count
-    let advanceGeneration (steps: int) (poolSet: spSet_Standard) : spSet_Standard =
-        { poolSet with _generationNumber = (%poolSet._generationNumber + steps) |> UMX.tag }
+    let advanceGeneration (steps: int) (poolSet: sorterPoolSet_Standard) : sorterPoolSet_Standard =
+        { poolSet with _generationNumber = (%poolSet._generationNumber + steps) |> UMX.tag<generationNumber> }
 
     // reduces the sorterPoolCount by a factor of sorterPoolExpansionRate, effectively pruning the pool set,
     // selecting only the top-performing pools based on SorterPool.getAverageScore
     let trimPools (sorterPoolExpansionRate: int<sorterPoolExpansionRate>) 
                   (measure: sorterPoolMeasure) 
-                  (poolSet: spSet_Standard) : spSet_Standard =
+                  (poolSet: sorterPoolSet_Standard) : sorterPoolSet_Standard =
 
         let currentPoolCount = poolSet._sorterPools.Count
         if currentPoolCount = 0 then
@@ -104,13 +104,13 @@ module SorterPoolSet =
                 |> Seq.truncate targetCount
                 |> Seq.map snd
 
-            spSet_Standard.create poolSet.SorterPoolSetId poolSet.GenerationNumber poolSet.LatticeBounds (Some updatedPools)
+            sorterPoolSet_Standard.create poolSet.SorterPoolSetId poolSet.GenerationNumber poolSet.LatticeBounds (Some updatedPools)
 
 
     // Increases the poolSet.PoolCount by a factor of sorterPoolExpansionRate.
     // Assigns distinct mutationMod values [0 .. (sorterPoolExpansionRate - 1)] to each new pool
     let expandPools (sorterPoolExpansionRate: int<sorterPoolExpansionRate>) 
-                        (poolSet: spSet_Standard) : spSet_Standard =
+                        (poolSet: sorterPoolSet_Standard) : sorterPoolSet_Standard =
 
             let expansionFactor = %sorterPoolExpansionRate
 
@@ -129,28 +129,29 @@ module SorterPoolSet =
                             let newPoolId = Guid.NewGuid() |> UMX.tag<sorterPoolId>
                             let newMutationMod = modValue |> UMX.tag<mutationMod>
                         
-                            SorterPool.deriveChildPool newPoolId newMutationMod parentPool
+                            SorterPool_Standard.deriveChildPool newPoolId newMutationMod parentPool
                         )
                     )
 
-                spSet_Standard.create poolSet.SorterPoolSetId poolSet.GenerationNumber poolSet.LatticeBounds (Some expandedPools)
+                sorterPoolSet_Standard.create poolSet.SorterPoolSetId poolSet.GenerationNumber poolSet.LatticeBounds (Some expandedPools)
 
 
     /// Mutates every single pool across the entire pool set uniformly
     let mutate 
             (sorterModelMut: sorterModelMutator) 
             (mutantsPerSorter: int<sorterChildCount>)  
-            (poolSet: spSet_Standard): spSet_Standard =
+            (poolSet: sorterPoolSet_Standard): sorterPoolSet_Standard =
         
         let mutatedPools = 
             poolSet._sorterPools 
-            |> Map.map (fun _ pool -> SorterPool.mutate 
+            |> Map.map (fun _ pool -> SorterPool_Standard.mutate 
                                             sorterModelMut 
                                             mutantsPerSorter
                                             poolSet.GenerationNumber
                                             pool)
 
         { poolSet with _sorterPools = mutatedPools }
+
 
     // mutates all the members of the poolSet
     // only keeps selectedSorterCountPerPool of each of the original pool members,
@@ -160,11 +161,11 @@ module SorterPoolSet =
             (selectedSorterCountPerPool: int<sorterCountPerPool>)
             (selectionMeasure: sorterEvalMeasure)
             (mutantsPerSorter: int<sorterChildCount>)  
-            (poolSet: spSet_Standard): spSet_Standard =
+            (poolSet: sorterPoolSet_Standard): sorterPoolSet_Standard =
         
         let mutatedPools = 
             poolSet._sorterPools 
-            |> Map.map (fun _ pool -> SorterPool.mutateAndTrim 
+            |> Map.map (fun _ pool -> SorterPool_Standard.mutateAndTrim 
                                             sorterModelMut 
                                             selectedSorterCountPerPool
                                             selectionMeasure
@@ -177,10 +178,10 @@ module SorterPoolSet =
 
 
     /// Extracts all evaluations across all members of all pools into a single flat map
-    let extractSorterEvals (poolSet: spSet_Standard) : Map<Guid<sorterPoolMemberId>, sorterEval> =
+    let extractSorterEvals (poolSet: sorterPoolSet_Standard) : Map<Guid<sorterPoolMemberId>, sorterEval> =
         poolSet._sorterPools
         |> Map.values
-        |> Seq.map SorterPool.extractSorterEvals
+        |> Seq.map SorterPool_Standard.extractSorterEvals
         |> Seq.fold (fun accMap individualPoolMap -> 
             // Merge maps cleanly
             Map.fold (fun acc key value -> Map.add key value acc) accMap individualPoolMap
@@ -190,12 +191,13 @@ module SorterPoolSet =
     /// The resulting pool set will only preserve pool members actively found in the evaluation map.
     let updateSorterEvals 
                 (evalMap: Map<Guid<sorterPoolMemberId>, sorterEval>) 
-                (poolSet: spSet_Standard) : spSet_Standard =
+                (poolSet: sorterPoolSet_Standard) : sorterPoolSet_Standard =
         let updatedPools = 
             poolSet._sorterPools
-            |> Map.map (fun _ pool -> SorterPool.updateSorterEval evalMap pool)
+            |> Map.map (fun _ pool -> SorterPool_Standard.updateSorterEval evalMap pool)
 
         { poolSet with _sorterPools = updatedPools }
+
 
     /// Trims every pool inside the set down to the designated pruned size using the given evaluation rule
     let pruneSorterPools 
@@ -203,35 +205,34 @@ module SorterPoolSet =
                 (prioritizeNewMutants: bool<prioritizeNewMutants>)
                 (distinctSorterHashes: bool<distinctSorterHashes>)
                 (sorterCountPerPool: int<sorterCountPerPool>) 
-                (poolSet: spSet_Standard) : spSet_Standard =
+                (poolSet: sorterPoolSet_Standard) : sorterPoolSet_Standard =
         
         let prunedPools = 
             poolSet._sorterPools
-            |> Map.map (fun _ pool -> SorterPool.pruneSorterPoolDebug 
+            |> Map.map (fun _ pool -> SorterPool_Standard.pruneSorterPoolDebug 
                                             pool 
                                             measure
                                             prioritizeNewMutants
                                             distinctSorterHashes 
                                             sorterCountPerPool)
-
-        
         { poolSet with _sorterPools = prunedPools }
+
 
     /// Iterates through all sorter pools in the set and adjusts their RawCeLengths
     /// and member population based on sortedFractionThreshold.
     let adjustCeLengths
             (sortedFractionThreshold: float<sortedFraction>)
-            (poolSet: spSet_Standard) : spSet_Standard =
+            (poolSet: sorterPoolSet_Standard) : sorterPoolSet_Standard =
 
         let updatedPools =
             poolSet.SorterPools
             |> Map.toSeq
             |> Seq.map (fun (_, pool) ->
-                SorterPool.adjustCeLengthByThreshold sortedFractionThreshold pool
+                SorterPool_Standard.adjustCeLengthByThreshold sortedFractionThreshold pool
             )
             |> Seq.toArray
 
-        spSet_Standard.create poolSet.SorterPoolSetId poolSet.GenerationNumber poolSet.LatticeBounds (Some (updatedPools :> seq<_>))
+        sorterPoolSet_Standard.create poolSet.SorterPoolSetId poolSet.GenerationNumber poolSet.LatticeBounds (Some (updatedPools :> seq<_>))
 
 
     /// Initializes a sorterPoolSet with poolCount pools from a sorterModelSet, each pool
@@ -245,7 +246,7 @@ module SorterPoolSet =
             (evalLabelMap: Map<Guid<sorterModelId>, evalLabel>)
             (modelSet: sorterModelSet) 
             (mutationMod: int<mutationMod>) 
-            (bounds: latticeBounds): spSet_Standard =
+            (bounds: latticeBounds): sorterPoolSet_Standard =
 
         // 1. Guard check: latticeBounds volume must equal requested poolCount
         let expectedPoolCount = SorterPoolTag.totalCells bounds
@@ -291,7 +292,7 @@ module SorterPoolSet =
                 let poolId = Guid.NewGuid() |> UMX.tag<sorterPoolId>
                 let tag = SorterPoolTag.fromIndex bounds dex
 
-                sp_Standard.create 
+                sorterPool_Standard.create 
                         poolId
                         None
                         poolName
@@ -302,5 +303,5 @@ module SorterPoolSet =
             )
 
         // 4. Package into updated curried constructor
-        spSet_Standard.create sorterPoolSetId generationNumber bounds (Some (pools :> seq<_>))
+        sorterPoolSet_Standard.create sorterPoolSetId generationNumber bounds (Some (pools :> seq<_>))
 

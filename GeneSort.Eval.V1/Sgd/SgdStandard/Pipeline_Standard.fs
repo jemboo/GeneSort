@@ -7,7 +7,7 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1
 open System.Diagnostics
 
-module SorterPipeline =
+module Pipeline_Standard =
 
     /// Executes one full generational iteration of the algorithm suite
     let runGenerationStep
@@ -22,18 +22,18 @@ module SorterPipeline =
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
             (reEvaluateParents: bool)
-            (currentPoolSet: spSet_Standard) 
+            (currentPoolSet: sorterPoolSet_Standard) 
             (collectNewSortableTests: bool<collectNewSortableTests>)
-            (sortedFractionThreshold: float<sortedFraction>) : spSet_Standard =
+            (sortedFractionThreshold: float<sortedFraction>) : sorterPoolSet_Standard =
 
         currentPoolSet
         // Step 1: Expand the population across all sub-pools
-        |> SorterPoolSet.mutateAndTrim mutator selectedSorterCountPerPool selectionMeasure sorterChildCount
+        |> SorterPoolSet_Standard.mutateAndTrim mutator selectedSorterCountPerPool selectionMeasure sorterChildCount
         
-        |> (fun (expandedPoolSet: spSet_Standard) ->
+        |> (fun (expandedPoolSet: sorterPoolSet_Standard) ->
                 let (computedEvals: Map<Guid<sorterPoolMemberId>, sorterEval>) = 
                     expandedPoolSet
-                    |> SorterPoolRunner.evaluatePoolSet 
+                    |> PoolRunner_Standard.evaluatePoolSet 
                                         sortableTests 
                                         prefix
                                         sorterEvalType
@@ -41,19 +41,19 @@ module SorterPipeline =
                                         collectNewSortableTests
             
                 expandedPoolSet 
-                |> SorterPoolSet.updateSorterEvals computedEvals
+                |> SorterPoolSet_Standard.updateSorterEvals computedEvals
         )
         
         // Step 2b: Adjust the constraint boundaries based on performance thresholds
-        |> SorterPoolSet.adjustCeLengths sortedFractionThreshold
+        |> SorterPoolSet_Standard.adjustCeLengths sortedFractionThreshold
         
         // Step 3: Trim out defective or un-optimized sorters down to baseline target capacities
-        |> SorterPoolSet.pruneSorterPools 
+        |> SorterPoolSet_Standard.pruneSorterPools 
                     selectionMeasure
                     prioritizeNewMutants
                     distinctSorterHashes 
                     sorterCountPerPool
-        |> SorterPoolSet.advanceGeneration 1
+        |> SorterPoolSet_Standard.advanceGeneration 1
 
 
 
@@ -70,17 +70,17 @@ module SorterPipeline =
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
             (reEvaluateParents: bool)
-            (currentPoolSet: spSet_Standard) 
+            (currentPoolSet: sorterPoolSet_Standard) 
             (collectNewSortableTests: bool<collectNewSortableTests>)
-            (sortedFractionThreshold: float<sortedFraction>) : spSet_Standard =
+            (sortedFractionThreshold: float<sortedFraction>) : sorterPoolSet_Standard =
 
         // Helper to check if any pool in a poolSet has dropped to 0 members
-        let hasEmptyPool (poolSet: spSet_Standard) =
+        let hasEmptyPool (poolSet: sorterPoolSet_Standard) =
             poolSet.SorterPools 
             |> Map.exists (fun _ pool -> Seq.isEmpty pool.SorterPoolMembers)
 
         // --- Step 1a: Mutate / Expand Population ---
-        let mutatedPoolSet = SorterPoolSet.mutateAndTrim 
+        let mutatedPoolSet = SorterPoolSet_Standard.mutateAndTrim 
                                     mutator 
                                     selectedSorterCountPerPool
                                     selectionMeasure
@@ -92,7 +92,7 @@ module SorterPipeline =
 
         // --- Step 1b: Evaluate Pool Set ---
         let computedEvals = 
-            SorterPoolRunner.evaluatePoolSet 
+            PoolRunner_Standard.evaluatePoolSet 
                 sortableTests 
                 prefix
                 sorterEvalType 
@@ -100,7 +100,7 @@ module SorterPipeline =
                 collectNewSortableTests
                 mutatedPoolSet
 
-        let evaluatedPoolSet = SorterPoolSet.updateSorterEvals computedEvals mutatedPoolSet
+        let evaluatedPoolSet = SorterPoolSet_Standard.updateSorterEvals computedEvals mutatedPoolSet
 
         if hasEmptyPool evaluatedPoolSet && Debugger.IsAttached then
             Debugger.Break() // Pause if evaluation or eval update failed
@@ -108,7 +108,7 @@ module SorterPipeline =
         // --- Step 2: Adjust Constraint Boundaries ---
         let adjustedPoolSet = 
             if reEvaluateParents then
-                SorterPoolSet.adjustCeLengths sortedFractionThreshold evaluatedPoolSet
+                SorterPoolSet_Standard.adjustCeLengths sortedFractionThreshold evaluatedPoolSet
             else
                 evaluatedPoolSet
 
@@ -117,7 +117,7 @@ module SorterPipeline =
 
         // --- Step 3: Prune Sorter Pools ---
         let prunedPoolSet = 
-            SorterPoolSet.pruneSorterPools 
+            SorterPoolSet_Standard.pruneSorterPools 
                 selectionMeasure 
                 prioritizeNewMutants 
                 distinctSorterHashes 
@@ -128,7 +128,7 @@ module SorterPipeline =
             Debugger.Break() // Pause if pruning reduced a pool to zero members
 
         // --- Step 4: Advance Generation Counter ---
-        let finalPoolSet = SorterPoolSet.advanceGeneration 1 prunedPoolSet
+        let finalPoolSet = SorterPoolSet_Standard.advanceGeneration 1 prunedPoolSet
 
         finalPoolSet
 
@@ -145,17 +145,17 @@ module SorterPipeline =
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
             (reEvaluateParents: bool)
-            (currentPoolSet: spSet_Standard)
+            (currentPoolSet: sorterPoolSet_Standard)
             (collectNewSortableTests: bool<collectNewSortableTests>)
-            (sortedFractionThreshold: float<sortedFraction>) : spSet_Standard =
+            (sortedFractionThreshold: float<sortedFraction>) : sorterPoolSet_Standard =
 
         // Helper to check if any pool in a poolSet has dropped to 0 members
-        let hasEmptyPool (poolSet: spSet_Standard) =
+        let hasEmptyPool (poolSet: sorterPoolSet_Standard) =
             poolSet.SorterPools
             |> Map.exists (fun _ pool -> Seq.isEmpty pool.SorterPoolMembers)
 
         // --- Step 1a: Mutate / Expand Population ---
-        let mutatedPoolSet = SorterPoolSet.mutateAndTrim
+        let mutatedPoolSet = SorterPoolSet_Standard.mutateAndTrim
                                     mutator
                                     selectedSorterCountPerPool
                                     selectionMeasure
@@ -170,7 +170,7 @@ module SorterPipeline =
         let partitionEvals =
             sortableTestPartitions.SortableTests
             |> Map.map (fun subsetId tests ->
-                SorterPoolRunner.evaluatePoolSet
+                PoolRunner_Standard.evaluatePoolSet
                     tests
                     prefix
                     sorterEvalType
@@ -195,7 +195,7 @@ module SorterPipeline =
                 {| PartitionEvals = memberPartitionEvals; MergedEval = mergedEval |})
 
         let mergedEvals = computedEvals |> Map.map (fun _ evals -> evals.MergedEval)
-        let evaluatedPoolSet = SorterPoolSet.updateSorterEvals mergedEvals mutatedPoolSet
+        let evaluatedPoolSet = SorterPoolSet_Standard.updateSorterEvals mergedEvals mutatedPoolSet
 
         if hasEmptyPool evaluatedPoolSet && Debugger.IsAttached then
             Debugger.Break() // Pause if evaluation or eval update failed
@@ -203,7 +203,7 @@ module SorterPipeline =
         // --- Step 2: Adjust Constraint Boundaries ---
         let adjustedPoolSet =
             if reEvaluateParents then
-                SorterPoolSet.adjustCeLengths sortedFractionThreshold evaluatedPoolSet
+                SorterPoolSet_Standard.adjustCeLengths sortedFractionThreshold evaluatedPoolSet
             else
                 evaluatedPoolSet
 
@@ -212,7 +212,7 @@ module SorterPipeline =
 
         // --- Step 3: Prune Sorter Pools ---
         let prunedPoolSet =
-            SorterPoolSet.pruneSorterPools
+            SorterPoolSet_Standard.pruneSorterPools
                 selectionMeasure
                 prioritizeNewMutants
                 distinctSorterHashes
@@ -223,7 +223,7 @@ module SorterPipeline =
             Debugger.Break() // Pause if pruning reduced a pool to zero members
 
         // --- Step 4: Advance Generation Counter ---
-        let finalPoolSet = SorterPoolSet.advanceGeneration 1 prunedPoolSet
+        let finalPoolSet = SorterPoolSet_Standard.advanceGeneration 1 prunedPoolSet
 
         finalPoolSet
 

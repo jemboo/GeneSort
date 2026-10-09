@@ -158,3 +158,4 @@ module SorterEvalExecutor =
         | sorterEvalExecutorType.GenPrefix -> prefixExecutor
         | FullReport -> fullReportExecutor
         | StageStatsReport -> stageStatsReportExecutor
+        | _ -> failwithf "Executor type %A not implemented." executorType

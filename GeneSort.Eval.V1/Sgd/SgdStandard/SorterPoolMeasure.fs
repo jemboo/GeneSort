@@ -74,12 +74,12 @@ module PoolEvalFunctions  =
     /// Evaluates a sorterPool given a poolMeasure.
     /// Composite Score = (1.0 * AverageScore) - (stDevWeight * StandardDeviationOfScores)
     /// Lower scores represent better performance; larger std deviations decrease the final score.
-    let getFunctionForMeasure (measure: sorterPoolMeasure) : (sp_Standard -> float<sorterPoolEvalScore>) =
+    let getFunctionForMeasure (measure: sorterPoolMeasure) : (sorterPool_Standard -> float<sorterPoolEvalScore>) =
         match measure with
         | StDevPool m ->
             fun pool ->
-                let avg = SorterPool.getAverageScore m.SorterEvalMeasure pool |> UMX.untag
-                let stdDev = SorterPool.getStandardDeviationOfScores m.SorterEvalMeasure pool |> UMX.untag
+                let avg = SorterPool_Standard.getAverageScore m.SorterEvalMeasure pool |> UMX.untag
+                let stdDev = SorterPool_Standard.getStandardDeviationOfScores m.SorterEvalMeasure pool |> UMX.untag
                 let weight = %m.StDevWeight
                 // Subtract stdDev component since larger standard deviation is better (lowers score)
                 let compositeScore = avg - (weight * stdDev)
@@ -87,6 +87,6 @@ module PoolEvalFunctions  =
 
 
     /// Evaluates the pool score using the specified poolMeasure.
-    let getPoolScore (measure: sorterPoolMeasure) (pool: sp_Standard) : float<sorterPoolEvalScore> =
+    let getPoolScore (measure: sorterPoolMeasure) (pool: sorterPool_Standard) : float<sorterPoolEvalScore> =
         let evalFunc = getFunctionForMeasure measure
         evalFunc pool

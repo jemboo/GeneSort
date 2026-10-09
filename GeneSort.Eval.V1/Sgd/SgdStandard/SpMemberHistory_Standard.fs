@@ -64,7 +64,8 @@ type spMemberHistory_Standard =
     member this.EvalV2 with get() = this.evalV2
 
 
-module SorterPoolMemberHistory =
+
+module SpMemberHistory_Standard =
 
     /// Extracts a snapshot from a surviving pool member, ensuring SorterEval is forced to V2
     let fromPoolMember 

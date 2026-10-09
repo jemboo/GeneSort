@@ -137,15 +137,15 @@ type sorterPoolSetHistoryDto = {
 
 module SorterPoolSetHistoryDto =
 
-    let fromDomain (domain: sorterPoolSetHistory) : sorterPoolSetHistoryDto =
+    let fromDomain (domain: spsh_Standard) : sorterPoolSetHistoryDto =
         {
             SorterPoolSetId = %domain.SorterPoolSetId
             SaveGeneration = %domain.SaveGeneration
             PoolHistories = domain.PoolHistories |> List.map SorterPoolHistoryDto.fromDomain
         }
 
-    let toDomain (dto: sorterPoolSetHistoryDto) : sorterPoolSetHistory =
-        sorterPoolSetHistory.create(
+    let toDomain (dto: sorterPoolSetHistoryDto) : spsh_Standard =
+        spsh_Standard.create(
             sorterPoolSetId = UMX.tag dto.SorterPoolSetId,
             saveGeneration = UMX.tag dto.SaveGeneration,
             poolHistories = (dto.PoolHistories |> List.map SorterPoolHistoryDto.toDomain)

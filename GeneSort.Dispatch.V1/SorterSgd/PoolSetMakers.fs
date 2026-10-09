@@ -19,7 +19,7 @@ open GeneSort.Eval.V1.Sgd.Standard
 module PoolSetMakers =
 
     let createSeedSorterPoolSetStandard 
-            (rp:runParameters) : Async<Result<spSet_Standard, string>> =
+            (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
         asyncResult {
             let! sortingWidth = 
                     rp.GetSortingWidth() 
@@ -85,7 +85,7 @@ module PoolSetMakers =
                     (Guid.Empty |> UMX.tag) 
                     seedSorterModelGen
 
-            return SorterPoolSet.fromSorterModelSet 
+            return SorterPoolSet_Standard.fromSorterModelSet 
                 (Guid.NewGuid() |> UMX.tag)
                 poolCount
                 sortersPerPool
@@ -98,7 +98,7 @@ module PoolSetMakers =
 
 
     let createSeedSorterPoolSetMerge
-            (rp:runParameters) : Async<Result<spSet_Standard, string>> =
+            (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
         asyncResult {
 
             let! repl =
@@ -168,7 +168,7 @@ module PoolSetMakers =
                     (Guid.Empty |> UMX.tag<sorterModelSetId>) 
                     seedSorterModelGen
 
-            return SorterPoolSet.fromSorterModelSet 
+            return SorterPoolSet_Standard.fromSorterModelSet 
                 (Guid.NewGuid() |> UMX.tag)
                 poolCount
                 sortersPerPool
@@ -182,7 +182,7 @@ module PoolSetMakers =
 
 
     let createSeedSorterPoolSetPrefix
-            (rp:runParameters) : Async<Result<spSet_Standard, string>> =
+            (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
         asyncResult {
 
             let! repl =
@@ -252,7 +252,7 @@ module PoolSetMakers =
                     (Guid.Empty |> UMX.tag<sorterModelSetId>) 
                     seedSorterModelGen
 
-            return SorterPoolSet.fromSorterModelSet 
+            return SorterPoolSet_Standard.fromSorterModelSet 
                 (Guid.NewGuid() |> UMX.tag)
                 poolCount
                 sortersPerPool

@@ -13,12 +13,12 @@ type outputData =
     | Run of run
     | RunParameters of runParameters
     | SortableTests of sortableTests
-    | SorterPoolSet of spSet_Standard
-    | SorterPoolSetSummarySet of sorterPoolSetSummarySet
+    | SorterPoolSet of sorterPoolSet_Standard
+    | SorterPoolSetSummarySet of spSummarySet_Standard
     | SorterSet of sorterSet
     | SorterSetEval of sorterSetEval
     | SorterPoolBinsSetSeries of sorterPoolBinsSetSeries
-    | SorterPoolSetHistory of sorterPoolSetHistory
+    | SorterPoolSetHistory of spsh_Standard
     | TextReport of dataTableReport
 
 

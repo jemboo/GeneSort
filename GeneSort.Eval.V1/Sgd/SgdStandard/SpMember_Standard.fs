@@ -49,7 +49,7 @@ type spMember_Standard =
         }
 
 
-module SorterPoolMember =
+module SpMember_Standard =
 
     /// Increments a member's mutation index by a given integer value
     let advanceIndex (offset: int) (spm: spMember_Standard) : spMember_Standard =

@@ -108,7 +108,7 @@ module Reporting =
           makeDynamicReportFromSlices
             Utils.loadAvailableSorterPoolSetSummarySets
             (fun spss -> spss.LastGeneration)
-            (SorterPoolSetSummarySet.toDataTableRecords "")
+            (SpSummarySet_Standard.toDataTableRecords "")
             "SummaryReport"
             saveIntervals
             genDb rp allowOverwrite cts progress
@@ -136,7 +136,7 @@ module Reporting =
           makeDynamicReportFromSlices
             Utils.loadAvailableSorterPoolSetHistories
             (fun hist -> hist.SaveGeneration)
-            SorterPoolSetHistory.toDataTableRecords
+            Spsh_Standard.toDataTableRecords
             "SorterPoolSetHistoryReport"
             saveIntervals
             genDb rp allowOverwrite cts progress

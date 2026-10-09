@@ -3,28 +3,28 @@
 open FSharp.UMX
 open GeneSort.Eval.V1
 
-type rmhMap_Standard = 
+type mhMap_Standard = 
     private { 
         map: Map<Guid<sorterPoolId>, Map<Guid<sorterPoolMemberId>, spMemberHistory_Standard>> 
     }
 
     member this.SorterPoolMap = this.map
 
-module RunningMemberHistoryMap =
+module MhMap_Standard =
 
-    let empty : rmhMap_Standard = 
+    let empty : mhMap_Standard = 
         { map = Map.empty }
 
-    let create (map: Map<Guid<sorterPoolId>, Map<Guid<sorterPoolMemberId>, spMemberHistory_Standard>>) : rmhMap_Standard =
+    let create (map: Map<Guid<sorterPoolId>, Map<Guid<sorterPoolMemberId>, spMemberHistory_Standard>>) : mhMap_Standard =
         { map = map }
 
-    let toMap (runningMap: rmhMap_Standard) = runningMap.SorterPoolMap
+    let toMap (runningMap: mhMap_Standard) = runningMap.SorterPoolMap
 
     /// Incorporates newly generated members from an updated pool set into history tracking
     let updateFromPoolSet 
             (currentGen: int<generationNumber>)
-            (poolSet: spSet_Standard) 
-            (runningMap: rmhMap_Standard) : rmhMap_Standard =
+            (poolSet: sorterPoolSet_Standard) 
+            (runningMap: mhMap_Standard) : mhMap_Standard =
     
         let newMap = 
             poolSet.SorterPools
@@ -47,7 +47,7 @@ module RunningMemberHistoryMap =
                                 |> Option.map (fun src -> src.SorterPoolMemberId)
 
                             let pmHist = 
-                                SorterPoolMemberHistory.fromPoolMember 
+                                SpMemberHistory_Standard.fromPoolMember 
                                     poolId 
                                     parentMemberId 
                                     None

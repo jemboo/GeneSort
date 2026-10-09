@@ -7,7 +7,7 @@ open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1
 
-module SorterPoolRunner =
+module PoolRunner_Standard =
 
     /// Evaluates members of a sorterPoolSet against a sortableTests suite.
     /// Skips already evaluated members if reEvaluateParents is false.
@@ -17,7 +17,7 @@ module SorterPoolRunner =
             (sorterEvalType: sorterEvalType)
             (reEvaluateParents: bool)
             (collectNewSortableTests: bool<collectNewSortableTests>)
-            (poolSet: spSet_Standard)
+            (poolSet: sorterPoolSet_Standard)
             : Map<Guid<sorterPoolMemberId>, sorterEval> =
 
         // 1. Collect all members across all pools paired with their respective pool's ceLength

@@ -7,7 +7,7 @@ open GeneSort.Eval.V1
 open GeneSort.Sorting
 open GeneSort.Eval.V1.Sgd
 
-type spmDescription =
+type spDescription_Standard =
     private {
         _sorterPoolMemberId:   Guid<sorterPoolMemberId>
         _sorterModelId:        Guid<sorterModelId>
@@ -34,10 +34,10 @@ type spmDescription =
         }
 
 
-module SpmDescription = 
+module SpDescription_Standard = 
 
     let toDataTableRecordsWithPrefix (prefix: string)
-                                     (spmDesc: spmDescription) : dataTableRecord array =
+                                     (spmDesc: spDescription_Standard) : dataTableRecord array =
         // 1. Map root scalar fields belonging directly to spmDescription
         let baseRecord =
             dataTableRecord.createEmpty()
@@ -74,7 +74,7 @@ type sorterPoolDescription =
     private {
         _sorterPoolId: Guid<sorterPoolId>
         _sorterPoolName: string<sorterPoolName>
-        _sorterPoolMembers: spmDescription array
+        _sorterPoolMembers: spDescription_Standard array
         _rawCeLength: int<ceLength>
     }
 
@@ -87,7 +87,7 @@ type sorterPoolDescription =
                     (poolId: Guid<sorterPoolId>) 
                     (sorterPoolName: string<sorterPoolName>) 
                     (rawCeLength: int<ceLength>) 
-                    (spmDescriptions: spmDescription []) =
+                    (spmDescriptions: spDescription_Standard []) =
         { _sorterPoolId = poolId; 
           _rawCeLength = rawCeLength; 
           _sorterPoolName = sorterPoolName; 
@@ -111,7 +111,7 @@ type sorterPoolSetDescription =
 module SorterPoolSetDescription =
 
     /// Strips the heavy sorterModel references out of a pool set, creating a light memory footprint snapshot
-    let fromPoolSet (poolSet: spSet_Standard) : sorterPoolSetDescription =
+    let fromPoolSet (poolSet: sorterPoolSet_Standard) : sorterPoolSetDescription =
         let poolDescriptions =
             poolSet.SorterPools
             |> Map.values
@@ -120,7 +120,7 @@ module SorterPoolSetDescription =
                     pool.SorterPoolMembers
                     |> Seq.map (fun spm ->
                         let modelId = SorterModel.getId spm.SorterModel
-                        spmDescription.create
+                        spDescription_Standard.create
                             spm.SorterPoolMemberId
                             modelId
                             spm.MutationIndex
@@ -166,7 +166,7 @@ module SorterPoolSetDescription =
             poolDesc.SorterPoolMembers
             |> Array.collect (fun memberDesc ->
                 memberDesc 
-                |> SpmDescription.toDataTableRecordsWithPrefix prefix
+                |> SpDescription_Standard.toDataTableRecordsWithPrefix prefix
                 |> Array.map (dataTableRecord.combine poolContextDtr)
             )
         )
@@ -174,6 +174,6 @@ module SorterPoolSetDescription =
 
     /// Extracts one dataTableRecord for every pool-member evaluation.  Each evaluation
     /// supplies SortableTestsSubsetId, which partitions a pool's snapshot statistics.
-    let toDataTableRecordsSnapshot (prefix: string) (srRes: spSet_Standard) : dataTableRecord seq =
+    let toDataTableRecordsSnapshot (prefix: string) (srRes: sorterPoolSet_Standard) : dataTableRecord seq =
         let yab = fromPoolSet srRes
         toDataTableRecords prefix yab

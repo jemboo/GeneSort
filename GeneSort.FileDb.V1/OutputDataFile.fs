@@ -95,12 +95,12 @@ module OutputDataFile =
                         }
                     | outputDataType.SorterPoolSet _ ->
                         async {
-                            let! domain = deserializeDto<sorterPoolSetDto, spSet_Standard> stream token SorterPoolSetDto.fromDto
+                            let! domain = deserializeDto<sorterPoolSetDto, sorterPoolSet_Standard> stream token SorterPoolSetDto.fromDto
                             return outputData.SorterPoolSet domain
                         }
                     | outputDataType.SorterPoolSetSummarySet _ ->
                         async {
-                            let! domain = deserializeDto<sorterPoolSetSummarySetDto, sorterPoolSetSummarySet> stream token SorterPoolSetSummarySetDto.fromDto
+                            let! domain = deserializeDto<sorterPoolSetSummarySetDto, spSummarySet_Standard> stream token SorterPoolSetSummarySetDto.fromDto
                             return outputData.SorterPoolSetSummarySet domain
                         }
                     | outputDataType.SorterSet _ ->
@@ -126,7 +126,7 @@ module OutputDataFile =
                         }
                     | outputDataType.SorterPoolSetHistory _ ->
                         async {
-                            let! domain = deserializeDto<sorterPoolSetHistoryDto, sorterPoolSetHistory> 
+                            let! domain = deserializeDto<sorterPoolSetHistoryDto, spsh_Standard> 
                                                 stream token SorterPoolSetHistoryDto.toDomain
                             return outputData.SorterPoolSetHistory domain
                         }

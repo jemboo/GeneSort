@@ -28,12 +28,12 @@ module EvoOrch_Soss =
             (subIntervals: genIntervalConfig)
             (rp: runParameters)
             (allowOverwrite: bool<allowOverwrite>)
-            (initialPoolSet: spSet_Standard)
+            (initialPoolSet: sorterPoolSet_Standard)
             (sortableTestPartitions: setOfSortableTests)
             (prefix: ceBlock)
             (mutator: sorterModelMutator)
             (cts: CancellationToken)
-            (log: string -> unit) : Async<Result<spSet_Standard, string>> =
+            (log: string -> unit) : Async<Result<sorterPoolSet_Standard, string>> =
 
         asyncResult {
             let evalType = sorterEvalType.V2
@@ -99,11 +99,11 @@ module EvoOrch_Soss =
                 // Recursive loop carrying evalBinsSetAcc and active lineage tracking map
                 let rec loop 
                         (remainingSteps: int)
-                        (currentSorterPoolSet: spSet_Standard)
+                        (currentSorterPoolSet: sorterPoolSet_Standard)
                         (historyAcc: sorterPoolSetSummary list)
                         (sorterPoolBinsSetAcc: sorterPoolBinsSet list)
-                        (runningMap: rmhMap_Standard)
-                        : Async<Result<spSet_Standard, string>> =
+                        (runningMap: mhMap_Standard)
+                        : Async<Result<sorterPoolSet_Standard, string>> =
 
                     asyncResult {
                         // Cooperative cancellation evaluation at top of loop
@@ -153,8 +153,8 @@ module EvoOrch_Soss =
                                     let poolMeasure = optPoolMeasure.Value
                                     log (sprintf "Expanding pools at Generation %d (Rate: %d)..." %currentGen %expansionRate)
                                     currentSorterPoolSet
-                                    |> SorterPoolSet.trimPools expansionRate poolMeasure
-                                    |> SorterPoolSet.expandPools expansionRate
+                                    |> SorterPoolSet_Standard.trimPools expansionRate poolMeasure
+                                    |> SorterPoolSet_Standard.expandPools expansionRate
                                 else
                                     currentSorterPoolSet
 
@@ -162,7 +162,7 @@ module EvoOrch_Soss =
                             let reEvaluateParents = (remainingSteps % 10 = 0)
 
                             let nextSorterPoolSet = 
-                                SorterPipeline.runGenerationStepSossDebug
+                                Pipeline_Standard.runGenerationStepSossDebug
                                     mutator 
                                     currentSorterCountPerPool
                                     selectedSorterCountPerPool
@@ -212,7 +212,7 @@ module EvoOrch_Soss =
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolSetSummarySet."
                                         let spsstID = qpSummaries.Id |> UMX.cast<queryParamsId, sorterPoolSetSummarySetId>
                                         let currentSummaries = updatedSorterPoolSetSummary |> List.toArray
-                                        let sorterPoolSetSummarySet = sorterPoolSetSummarySet.create spsstID currentGen currentSummaries
+                                        let sorterPoolSetSummarySet = spSummarySet_Standard.create spsstID currentGen currentSummaries
                                         do! genDb.saveAsync qpSummaries (sorterPoolSetSummarySet |> outputData.SorterPoolSetSummarySet) allowOverwrite
 
 
@@ -235,16 +235,16 @@ module EvoOrch_Soss =
                                         //do! genDb.saveAsync qpHistory (poolSetHistory |> outputData.SorterPoolSetHistory) allowOverwrite
 
                                        // return ([], [], prunedRunningMap)
-                                        return ([], [], RunningMemberHistoryMap.empty)
+                                        return ([], [], MhMap_Standard.empty)
                                     else
                                         //return (updatedSorterPoolSetSummary, updatedEvalBinsSetAcc, updatedRunningHistoryMap)
-                                        return (updatedSorterPoolSetSummary, updatedEvalBinsSetAcc, RunningMemberHistoryMap.empty)
+                                        return (updatedSorterPoolSetSummary, updatedEvalBinsSetAcc, MhMap_Standard.empty)
                                 }
 
-                            return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext evalBinsSetAccNext RunningMemberHistoryMap.empty
+                            return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext evalBinsSetAccNext MhMap_Standard.empty
                            // return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext evalBinsSetAccNext []
                     }
 
                 // Execute loop with empty initial states
-                return! loop (%totalGen - %genStart) initialPoolSet [] [] RunningMemberHistoryMap.empty
+                return! loop (%totalGen - %genStart) initialPoolSet [] [] MhMap_Standard.empty
         }
