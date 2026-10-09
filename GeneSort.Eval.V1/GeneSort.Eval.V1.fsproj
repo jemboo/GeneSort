@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -12,13 +12,14 @@
   <ItemGroup>
     <Compile Include="EvalTypes.fs" />
     <Compile Include="EvalLabel.fs" />
+    <Compile Include="Sgd\SorterPoolMeasure.fs" />
     <Compile Include="Sgd\SorterMutationSource.fs" />
     <Compile Include="Sgd\SorterPoolTag.fs" />
     <Compile Include="Sgd\SgdStandard\SpMember_Standard.fs" />
     <Compile Include="Sgd\SgdStandard\SorterPool_Standard.fs" />
     <Compile Include="Sgd\SgdStandard\SpMemberHistory_Standard.fs" />
     <Compile Include="Sgd\SgdStandard\SpHistory_Standard.fs" />
-    <Compile Include="Sgd\SgdStandard\SorterPoolMeasure.fs" />
+    <Compile Include="Sgd\SgdStandard\PoolEvalFunctions_Standard.fs" />
     <Compile Include="Sgd\SgdStandard\SorterPoolSet_Standard.fs" />
     <Compile Include="Sgd\SgdStandard\MhMap_Standard.fs" />
     <Compile Include="Sgd\SgdStandard\Spsh_Standard.fs" />
@@ -27,17 +28,35 @@
     <Compile Include="Sgd\SgdStandard\SpDescription_Standard.fs" />
     <Compile Include="Sgd\SgdStandard\SpSummary_Standard.fs" />
     <Compile Include="Sgd\SgdStandard\SpSummarySet_Standard.fs" />
-    <Compile Include="Sgd\SgdSoss\SpmSoss.fs" />
+    <Compile Include="Sgd\SgdSoss\SpMember_Soss.fs" />
+    <Compile Include="Sgd\SgdSoss\SorterPool_Soss.fs" />
+    <Compile Include="Sgd\SgdSoss\SpMemberHistory_Soss.fs" />
+    <Compile Include="Sgd\SgdSoss\SpHistory_Soss.fs" />
+    <Compile Include="Sgd\SgdSoss\PoolEvalFunctions_Soss.fs" />
+    <Compile Include="Sgd\SgdSoss\SorterPoolSet_Soss.fs" />
+    <Compile Include="Sgd\SgdSoss\MhMap_Soss.fs" />
+    <Compile Include="Sgd\SgdSoss\Spsh_Soss.fs" />
+    <Compile Include="Sgd\SgdSoss\PoolRunner_Soss.fs" />
+    <Compile Include="Sgd\SgdSoss\Pipeline_Soss.fs" />
+    <Compile Include="Sgd\SgdSoss\SpDescription_Soss.fs" />
+    <Compile Include="Sgd\SgdSoss\SpSummary_Soss.fs" />
+    <Compile Include="Sgd\SgdSoss\SpSummarySet_Soss.fs" />
     <Compile Include="SorterSelection.fs" />
     <Compile Include="SorterEvalBinStats.fs" />
     <Compile Include="SorterStageStats.fs" />
     <Compile Include="bins\CommonSgdBins.fs" />
     <Compile Include="Bins\SorterEvalKey.fs" />
-    <Compile Include="Bins\BinsStandard\SorterEvalBin.fs" />
-    <Compile Include="Bins\BinsStandard\SorterPoolBins.fs" />
-    <Compile Include="Bins\BinsStandard\SorterEvalBinSet.fs" />
-    <Compile Include="Bins\BinsStandard\SorterPoolBinsSet.fs" />
-    <Compile Include="Bins\BinsStandard\SorterPoolBinsSetSeries.fs" />
+    <Compile Include="Bins\BinsSoss\SorterEvalBin_Soss.fs" />
+    <Compile Include="Bins\BinsSoss\SorterPoolBins_Soss.fs" />
+    <Compile Include="Bins\BinsSoss\SorterEvalBinSet_Soss.fs" />
+    <Compile Include="Bins\BinsSoss\SorterPoolBinsSet_Soss.fs" />
+    <Compile Include="Bins\BinsSoss\SorterPoolBinsSetSeries_Soss.fs" />
+    <Compile Include="Bins\BinsStandard\SorterEvalBin_Standard.fs" />
+    <Compile Include="Bins\BinsStandard\SorterPoolBins_Standard.fs" />
+    <Compile Include="Bins\BinsStandard\SorterEvalBinSet_Standard.fs" />
+    <Compile Include="Bins\BinsStandard\SorterPoolBinsSet_Standard.fs" />
+    <Compile Include="Bins\BinsStandard\SorterPoolBinsSetSeries_Standard.fs" />
+    <Compile Include="Sgd\OutputUnions.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -55,10 +74,6 @@
 
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="11.0.101-rc1.26425.128" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Bins\BinsSoss\" />
   </ItemGroup>
 
 </Project>

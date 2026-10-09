@@ -81,7 +81,7 @@ module Utils =
             (startingGen: int<generationNumber>)
             (rp: runParameters)
             (cts: CancellationToken)
-            (log: string -> unit) : Async<seq<sorterPoolSet_Standard>> =
+            (log: string -> unit) : Async<seq<sorterPoolSet>> =
         loadAvailableOutputData
             OutputData.asSorterPoolSet 
             (outputDataType.SorterPoolSet "") 
@@ -94,7 +94,7 @@ module Utils =
             (startingGen: int<generationNumber>)
             (rp: runParameters)
             (cts: CancellationToken)
-            (log: string -> unit) : Async<seq<spSummarySet_Standard>> =
+            (log: string -> unit) : Async<seq<spSummarySet>> =
         loadAvailableOutputData
             OutputData.asSorterPoolSetSummarySet 
             (outputDataType.SorterPoolSetSummarySet "") 
@@ -107,7 +107,7 @@ module Utils =
             (startingGen: int<generationNumber>)
             (rp: runParameters)
             (cts: CancellationToken)
-            (log: string -> unit) : Async<seq<spsh_Standard>> =
+            (log: string -> unit) : Async<seq<spsh>> =
         loadAvailableOutputData
             OutputData.asSorterPoolSetHistory 
             (outputDataType.SorterPoolSetHistory "") 
@@ -183,7 +183,16 @@ module Utils =
             (saveConfig: genIntervalConfig)
             (generationalDb: IGeneSortDb)
             (rp: runParameters) : Async<Result<sorterPoolSet_Standard option, string>> =
-        loadOutputDataWithHighestGenerationNumber 
-            OutputData.asSorterPoolSet 
-            (outputDataType.SorterPoolSet "") 
+        loadOutputDataWithHighestGenerationNumber
+            OutputData.asSorterPoolSetStandard
+            (outputDataType.SorterPoolSet "")
+            saveConfig generationalDb rp
+
+    let loadHighestGenSorterPoolSetSoss
+            (saveConfig: genIntervalConfig)
+            (generationalDb: IGeneSortDb)
+            (rp: runParameters) : Async<Result<GeneSort.Eval.V1.Sgd.Soss.sorterPoolSet_Soss option, string>> =
+        loadOutputDataWithHighestGenerationNumber
+            OutputData.asSorterPoolSetSoss
+            (outputDataType.SorterPoolSet "")
             saveConfig generationalDb rp

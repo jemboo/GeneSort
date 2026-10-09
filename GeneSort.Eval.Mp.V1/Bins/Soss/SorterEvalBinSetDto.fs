@@ -1,10 +1,10 @@
-﻿namespace GeneSort.Eval.Mp.V1.Bins
+namespace GeneSort.Eval.Mp.V1.Bins.Soss
 
 open System
 open FSharp.UMX
 open GeneSort.Eval.V1.Bins
 open GeneSort.SortingOps.Mp
-open GeneSort.Eval.V1.Sgd.Bins.Standard
+open GeneSort.Eval.V1.Sgd.Bins.Soss
 
 type sorterEvalKeyDto = {
     CeCount: int
@@ -34,19 +34,19 @@ module SorterEvalKeyDto =
 
 module SorterEvalBinDto =
 
-    let fromDomain (bin: sorterEvalBin_Standard) : sorterEvalBinDto = {
+    let fromDomain (bin: sorterEvalBin_Soss) : sorterEvalBinDto = {
         SorterEvalKey = SorterEvalKeyDto.fromDomain bin.SorterEvalKey
         SorterEvals = bin.SorterEvals |> Seq.map SorterEvalDto.fromDomain |> Seq.toArray
     }
 
-    let toDomain (dto: sorterEvalBinDto) : sorterEvalBin_Standard =
+    let toDomain (dto: sorterEvalBinDto) : sorterEvalBin_Soss =
         let key = SorterEvalKeyDto.toDomain dto.SorterEvalKey
         let evals = dto.SorterEvals |> Seq.map SorterEvalDto.toDomain
-        sorterEvalBin_Standard.createWithSorterEvals evals key
+        sorterEvalBin_Soss.createWithSorterEvals evals key
 
 module SorterEvalBinSetDto =
 
-    let fromDomain (binSet: sorterEvalBinSet_Standard) : sorterEvalBinSetDto = {
+    let fromDomain (binSet: sorterEvalBinSet_Soss) : sorterEvalBinSetDto = {
         SorterEvalBinSetId = %binSet.SorterEvalBinSetId
         SorterSetEvalId = %binSet.SorterSetEvalId
         SorterEvalBins =
@@ -56,7 +56,7 @@ module SorterEvalBinSetDto =
             |> Seq.toArray
     }
 
-    let toDomain (dto: sorterEvalBinSetDto) : sorterEvalBinSet_Standard =
+    let toDomain (dto: sorterEvalBinSetDto) : sorterEvalBinSet_Soss =
         let id = dto.SorterEvalBinSetId |> UMX.tag
         let setEvalId = dto.SorterSetEvalId |> UMX.tag
 
@@ -67,4 +67,4 @@ module SorterEvalBinSetDto =
                 (bin.SorterEvalKey, bin))
             |> Map.ofSeq
 
-        sorterEvalBinSet_Standard.recreate id setEvalId bins
+        sorterEvalBinSet_Soss.recreate id setEvalId bins

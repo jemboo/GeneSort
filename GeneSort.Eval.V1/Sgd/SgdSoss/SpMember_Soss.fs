@@ -8,7 +8,7 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd
 
-type spmSoss =
+type spMember_Soss =
     private {
         _sorterPoolMemberId:   Guid<sorterPoolMemberId>
         _sorterModel:          sorterModel
@@ -49,14 +49,14 @@ type spmSoss =
         }
 
 
-module SpmSoss =
+module SpMember_Soss =
 
     /// Increments a member's mutation index by a given integer value
-    let advanceIndex (offset: int) (spm: spmSoss) : spmSoss =
+    let advanceIndex (offset: int) (spm: spMember_Soss) : spMember_Soss =
         { spm with _mutationIndex = (%spm.MutationIndex + offset) |> UMX.tag }
 
     /// Increments a member's mutation index by exactly 1
-    let updateIndex (spm: spmSoss) : spmSoss =
+    let updateIndex (spm: spMember_Soss) : spMember_Soss =
         advanceIndex 1 spm
 
     /// Derives a child pool member for a new pool branch:
@@ -65,14 +65,14 @@ module SpmSoss =
     let deriveForChildPool 
             (newMemberId: Guid<sorterPoolMemberId>) 
             (newMod: int<mutationMod>) 
-            (spm: spmSoss) : spmSoss =
+            (spm: spMember_Soss) : spMember_Soss =
         { spm with 
             _sorterPoolMemberId = newMemberId
             _mutationMod = newMod
             _mutationIndex = 0 |> UMX.tag<mutationIndex> }
 
     /// Adds or replaces one subset evaluation; None clears every cached evaluation.
-    let withEval (eval: sorterEval option) (spm: spmSoss) : spmSoss =
+    let withEval (eval: sorterEval option) (spm: spMember_Soss) : spMember_Soss =
         match eval with
         | Some value ->
             { spm with
@@ -82,10 +82,10 @@ module SpmSoss =
 
     /// Generates 'mutantCount' new mutants, updating the parent's index by 'mutantCount'
     let mutate (sorterModelMut: sorterModelMutator) 
-               (spm: spmSoss) 
+               (spm: spMember_Soss) 
                (spId: Guid<sorterPoolId>) 
                (mutantCount: int<sorterChildCount>) 
-               (currentGeneration: int<generationNumber>): spmSoss * spmSoss [] =
+               (currentGeneration: int<generationNumber>): spMember_Soss * spMember_Soss [] =
         
         let countRaw = %mutantCount
         let baseIndexRaw = %spm.MutationIndex
@@ -114,7 +114,7 @@ module SpmSoss =
                         spId
                         individualMutationIndex
 
-                spmSoss.create
+                spMember_Soss.create
                     childPoolMemberId
                     mutantModel
                     (0 |> UMX.tag)          // New mutants start at mutation index 0

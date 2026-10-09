@@ -7,3 +7,4 @@ open GeneSort.Eval.V1.Sgd.Standard
 [<Measure>] type sorterPoolBinsId
 [<Measure>] type sorterEvalBinSetId
 [<Measure>] type sorterPoolBinsSetId
+[<Measure>] type sorterPoolBinsSetSeriesId

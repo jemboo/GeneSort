@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Eval.V1.Bins.Standard
+﻿namespace GeneSort.Eval.V1.Sgd.Bins.Standard
 
 open FSharp.UMX
 open GeneSort.Eval.V1.Bins
@@ -6,11 +6,11 @@ open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd.Standard
 
 
-type sorterPoolBins =
+type sorterPoolBins_Standard =
     private {
         _sorterPoolEvalBinsId: Guid<sorterPoolBinsId>
         _sorterPoolId: Guid<sorterPoolId>
-        _sorterEvalBins: Map<sorterEvalKey, sorterEvalBin>
+        _sorterEvalBins: Map<sorterEvalKey, sorterEvalBin_Standard>
     }
     with
     /// Creates a bin set from a sorterPool by extracting evaluated members
@@ -23,7 +23,7 @@ type sorterPoolBins =
             validEvals
             |> Seq.groupBy SorterEvalKey.fromSorterEval
             |> Seq.map (fun (key, evals) -> 
-                let bin = sorterEvalBin.createWithSorterEvals evals key
+                let bin = sorterEvalBin_Standard.createWithSorterEvals evals key
                 (key, bin))
             |> Map.ofSeq
 
@@ -36,7 +36,7 @@ type sorterPoolBins =
     /// Explicit reconstructor for deserialization or manual instantiation
     static member recreate (id: Guid<sorterPoolBinsId>) 
                             (sorterPoolId: Guid<sorterPoolId>) 
-                            (bins: Map<sorterEvalKey, sorterEvalBin>) =
+                            (bins: Map<sorterEvalKey, sorterEvalBin_Standard>) =
         {
             _sorterPoolEvalBinsId = id
             _sorterPoolId = sorterPoolId
@@ -49,15 +49,15 @@ type sorterPoolBins =
 
 
 
-module SorterPoolEvalBins = 
+module SorterPoolEvalBins_Standard = 
 
     ///// Returns one dataTableRecord for each bin member
-    let makeDataTableRecords (source: sorterPoolBins) : GeneSort.Core.dataTableRecord seq =
+    let makeDataTableRecords (source: sorterPoolBins_Standard) : GeneSort.Core.dataTableRecord seq =
         let setRec =
             GeneSort.Core.dataTableRecord.createEmpty()
             |> GeneSort.Core.dataTableRecord.addKeyAndData "SorterPoolId" (source.SorterPoolId |> UMX.untag |> string)
         let childRecs =
             source.Bins
-            |> Seq.map (fun kvp -> SorterEvalBin.toDataTableRecord kvp.Value)
+            |> Seq.map (fun kvp -> SorterEvalBin_Standard.toDataTableRecord kvp.Value)
 
         setRec |> GeneSort.Core.dataTableRecord.combineWithMany childRecs

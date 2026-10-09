@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -11,9 +11,17 @@
     <Compile Include="Bins\SorterPoolEvalBinsSetDto.fs" />
     <Compile Include="Bins\SorterPoolBinsSetSeriesDto.fs" />
     <Compile Include="Sgd\SorterMutationSourceDto.fs" />
-    <Compile Include="Sgd\SorterPoolSetDto.fs" />
-    <Compile Include="Sgd\SorterPoolSetSummaryDto.fs" />
-    <Compile Include="Sgd\SorterPoolSetHistoryDto.fs" />
+    <Compile Include="Sgd\Standard\SorterPoolSetDto.fs" />
+    <Compile Include="Sgd\Standard\SorterPoolSetSummaryDto.fs" />
+    <Compile Include="Sgd\Standard\SorterPoolSetHistoryDto.fs" />
+    <Compile Include="Bins\Soss\SorterEvalBinSetDto.fs" />
+    <Compile Include="Bins\Soss\SorterPoolEvalBinsDto.fs" />
+    <Compile Include="Bins\Soss\SorterPoolEvalBinsSetDto.fs" />
+    <Compile Include="Bins\Soss\SorterPoolBinsSetSeriesDto.fs" />
+    <Compile Include="Sgd\Soss\SorterPoolSetDto.fs" />
+    <Compile Include="Sgd\Soss\SorterPoolSetSummaryDto.fs" />
+    <Compile Include="Sgd\Soss\SorterPoolSetHistoryDto.fs" />
+    <Compile Include="Sgd\OutputUnionsDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

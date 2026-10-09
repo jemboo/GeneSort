@@ -100,8 +100,8 @@ module EvoOrch_Standard =
                 let rec loop 
                         (remainingSteps: int)
                         (currentSorterPoolSet: sorterPoolSet_Standard)
-                        (historyAcc: sorterPoolSetSummary list)
-                        (sorterPoolBinsSetAcc: sorterPoolBinsSet list)
+                        (historyAcc: sorterPoolSetSummary_Standard list)
+                        (sorterPoolBinsSetAcc: sorterPoolBinsSet_Standard list)
                         (runningMap: mhMap_Standard)
                         : Async<Result<sorterPoolSet_Standard, string>> =
 
@@ -141,7 +141,7 @@ module EvoOrch_Standard =
                             // Snapshot summary before applying structural changes
                             let updatedSorterPoolSetSummary = 
                                 if shouldSummaryReport then 
-                                    let currentSnapshot = SorterPoolSetSummary.fromPoolSet currentSorterPoolSet
+                                    let currentSnapshot = SorterPoolSetSummary_Standard.fromPoolSet currentSorterPoolSet
                                     currentSnapshot :: historyAcc
                                 else 
                                     historyAcc
@@ -186,7 +186,7 @@ module EvoOrch_Standard =
                             let updatedEvalBinsSetAcc =
                                 if shouldSummaryReport then
                                     let binsSetId = Guid.NewGuid() |> UMX.tag<sorterPoolBinsSetId>
-                                    let currentBinsSet = sorterPoolBinsSet.create binsSetId nextSorterPoolSet
+                                    let currentBinsSet = sorterPoolBinsSet_Standard.create binsSetId nextSorterPoolSet
                                     currentBinsSet :: sorterPoolBinsSetAcc
                                 else
                                     sorterPoolBinsSetAcc
@@ -203,7 +203,7 @@ module EvoOrch_Standard =
                                         let! qpSorterPoolSet = 
                                             genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolSet "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolSet."
-                                        do! genDb.saveAsync qpSorterPoolSet (nextSorterPoolSet |> outputData.SorterPoolSet) allowOverwrite
+                                        do! genDb.saveAsync qpSorterPoolSet (nextSorterPoolSet |> sorterPoolSet.Standard |> outputData.SorterPoolSet) allowOverwrite
 
 
                                         // Save SorterPoolSetSummaries
@@ -213,17 +213,17 @@ module EvoOrch_Standard =
                                         let spsstID = qpSummaries.Id |> UMX.cast<queryParamsId, sorterPoolSetSummarySetId>
                                         let currentSummaries = updatedSorterPoolSetSummary |> List.toArray
                                         let sorterPoolSetSummarySet = spSummarySet_Standard.create spsstID currentGen currentSummaries
-                                        do! genDb.saveAsync qpSummaries (sorterPoolSetSummarySet |> outputData.SorterPoolSetSummarySet) allowOverwrite
+                                        do! genDb.saveAsync qpSummaries (sorterPoolSetSummarySet |> spSummarySet.Standard |> outputData.SorterPoolSetSummarySet) allowOverwrite
 
 
                                         // Save SorterPoolBinsSetSeries
                                         let collectionId = Guid.NewGuid() |> UMX.tag<sorterPoolBinsSetSeriesId>
                                         let evalBinsCollection = 
-                                            sorterPoolBinsSetSeries.create collectionId (updatedEvalBinsSetAcc |> List.rev)
+                                            sorterPoolBinsSetSeries_Standard.create collectionId (updatedEvalBinsSetAcc |> List.rev)
                                         let! qpBinsSeries = 
                                             genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolBinsSetSeries "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolEvalBinsSetCollection."
-                                        do! genDb.saveAsync qpBinsSeries (evalBinsCollection |> outputData.SorterPoolBinsSetSeries) allowOverwrite
+                                        do! genDb.saveAsync qpBinsSeries (evalBinsCollection |> sorterPoolBinsSetSeries.Standard |> outputData.SorterPoolBinsSetSeries) allowOverwrite
 
 
                                         // Prune dead lineages and generate SorterPoolSetHistory
@@ -232,7 +232,7 @@ module EvoOrch_Standard =
                                         //let! qpHistory = 
                                         //    genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolSetHistory "")
                                         //    |> Result.ofOption "Failed to create QueryParams for SorterPoolSetHistory."
-                                        //do! genDb.saveAsync qpHistory (poolSetHistory |> outputData.SorterPoolSetHistory) allowOverwrite
+                                        //do! genDb.saveAsync qpHistory (poolSetHistory |> spsh.Standard |> outputData.SorterPoolSetHistory) allowOverwrite
 
                                        // return ([], [], prunedRunningMap)
                                         return ([], [], MhMap_Standard.empty)

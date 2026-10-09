@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Project.V1
 
 open GeneSort.Sorting.Sortable
@@ -6,19 +6,18 @@ open GeneSort.Core
 open GeneSort.SortingOps
 open GeneSort.Sorting.Sorter
 open GeneSort.Eval.V1.Sgd
-open GeneSort.Eval.V1.Sgd.Standard
 
 
 type outputData =
     | Run of run
     | RunParameters of runParameters
     | SortableTests of sortableTests
-    | SorterPoolSet of sorterPoolSet_Standard
-    | SorterPoolSetSummarySet of spSummarySet_Standard
+    | SorterPoolSet of sorterPoolSet
+    | SorterPoolSetSummarySet of spSummarySet
     | SorterSet of sorterSet
     | SorterSetEval of sorterSetEval
     | SorterPoolBinsSetSeries of sorterPoolBinsSetSeries
-    | SorterPoolSetHistory of spsh_Standard
+    | SorterPoolSetHistory of spsh
     | TextReport of dataTableReport
 
 
@@ -65,3 +64,9 @@ module OutputData =
         | TextReport tr -> Ok tr
         | _ -> Error "Database returned data, but it was not a TextReport."
 
+
+    let asSorterPoolSetStandard data =
+        asSorterPoolSet data |> Result.bind SorterPoolSet.asStandard
+
+    let asSorterPoolSetSoss data =
+        asSorterPoolSet data |> Result.bind SorterPoolSet.asSoss

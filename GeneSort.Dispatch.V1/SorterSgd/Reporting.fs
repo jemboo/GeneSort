@@ -11,7 +11,7 @@ open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd.Standard
-
+open GeneSort.Eval.V1.Sgd.Bins.Standard
 module Reporting =
 
     /// Generic execution engine for dynamic generation-sliced reports.
@@ -100,15 +100,15 @@ module Reporting =
         | None -> async { return Error "Generation reports require an SgdRun with generation save intervals." }
         | Some saveIntervals ->
           let genDb = host.RunDb
-          let recordExtractor (prefix:string) (spsSummaries:sorterPoolSetSummary seq) : dataTableRecord seq =
+          let recordExtractor (prefix:string) (spsSummaries: sorterPoolSetSummary_Standard seq) : dataTableRecord seq =
                 spsSummaries |> Seq.collect(fun poolSetSummary ->
                 poolSetSummary
-                |> SorterPoolSetSummary.toDataTableRecords prefix
+                |> SorterPoolSetSummary_Standard.toDataTableRecords prefix
             )
           makeDynamicReportFromSlices
             Utils.loadAvailableSorterPoolSetSummarySets
             (fun spss -> spss.LastGeneration)
-            (SpSummarySet_Standard.toDataTableRecords "")
+            (SpSummarySet.toDataTableRecords "")
             "SummaryReport"
             saveIntervals
             genDb rp allowOverwrite cts progress
@@ -122,7 +122,7 @@ module Reporting =
           makeDynamicReportFromSlices
             Utils.loadAvailableSorterPoolSets
             (fun srtrPoolSet -> srtrPoolSet.GenerationNumber)
-            (SorterPoolSetDescription.toDataTableRecordsSnapshot "")
+            (SorterPoolSet.toDataTableRecordsSnapshot "")
             "SnapshotReport"
             saveIntervals
             genDb rp allowOverwrite cts progress
@@ -136,7 +136,7 @@ module Reporting =
           makeDynamicReportFromSlices
             Utils.loadAvailableSorterPoolSetHistories
             (fun hist -> hist.SaveGeneration)
-            Spsh_Standard.toDataTableRecords
+            Spsh.toDataTableRecords
             "SorterPoolSetHistoryReport"
             saveIntervals
             genDb rp allowOverwrite cts progress
@@ -150,7 +150,7 @@ module Reporting =
           makeDynamicReportFromSlices
             Utils.loadAvailableSorterPoolBins
             (fun hist -> hist.MaxGeneration)
-            SorterPoolEvalBinsSetCollection.makeDataTableRecords
+            SorterPoolBinsSetSeries.makeDataTableRecords
             "SorterPoolBinsReport"
             saveIntervals
             genDb rp allowOverwrite cts progress

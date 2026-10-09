@@ -1,7 +1,8 @@
 namespace GeneSort.Dispatch.V1.SorterSgd.Soss
 
-open FSharp.UMX
+open System
 open System.Threading
+open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting.Sortable
 open GeneSort.Project.V1
@@ -9,11 +10,10 @@ open GeneSort.Eval.V1
 open GeneSort.Db.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.SortingOps
-open System
 open GeneSort.Model.Sorting.V1
-open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Eval.V1.Bins
-open GeneSort.Eval.V1.Sgd.Bins.Standard
+open GeneSort.Eval.V1.Sgd.Soss
+open GeneSort.Eval.V1.Sgd.Bins.Soss
 
 module EvoOrch_Soss =
 
@@ -28,12 +28,12 @@ module EvoOrch_Soss =
             (subIntervals: genIntervalConfig)
             (rp: runParameters)
             (allowOverwrite: bool<allowOverwrite>)
-            (initialPoolSet: sorterPoolSet_Standard)
+            (initialPoolSet: sorterPoolSet_Soss)
             (sortableTestPartitions: setOfSortableTests)
             (prefix: ceBlock)
             (mutator: sorterModelMutator)
             (cts: CancellationToken)
-            (log: string -> unit) : Async<Result<sorterPoolSet_Standard, string>> =
+            (log: string -> unit) : Async<Result<sorterPoolSet_Soss, string>> =
 
         asyncResult {
             let evalType = sorterEvalType.V2
@@ -99,11 +99,11 @@ module EvoOrch_Soss =
                 // Recursive loop carrying evalBinsSetAcc and active lineage tracking map
                 let rec loop 
                         (remainingSteps: int)
-                        (currentSorterPoolSet: sorterPoolSet_Standard)
-                        (historyAcc: sorterPoolSetSummary list)
-                        (sorterPoolBinsSetAcc: sorterPoolBinsSet list)
-                        (runningMap: mhMap_Standard)
-                        : Async<Result<sorterPoolSet_Standard, string>> =
+                        (currentSorterPoolSet: sorterPoolSet_Soss)
+                        (historyAcc: sorterPoolSetSummary_Soss list)
+                        (sorterPoolBinsSetAcc: sorterPoolBinsSet_Soss list)
+                        (runningMap: mhMap_Soss)
+                        : Async<Result<sorterPoolSet_Soss, string>> =
 
                     asyncResult {
                         // Cooperative cancellation evaluation at top of loop
@@ -141,7 +141,7 @@ module EvoOrch_Soss =
                             // Snapshot summary before applying structural changes
                             let updatedSorterPoolSetSummary = 
                                 if shouldSummaryReport then 
-                                    let currentSnapshot = SorterPoolSetSummary.fromPoolSet currentSorterPoolSet
+                                    let currentSnapshot = SorterPoolSetSummary_Soss.fromPoolSet currentSorterPoolSet
                                     currentSnapshot :: historyAcc
                                 else 
                                     historyAcc
@@ -153,8 +153,8 @@ module EvoOrch_Soss =
                                     let poolMeasure = optPoolMeasure.Value
                                     log (sprintf "Expanding pools at Generation %d (Rate: %d)..." %currentGen %expansionRate)
                                     currentSorterPoolSet
-                                    |> SorterPoolSet_Standard.trimPools expansionRate poolMeasure
-                                    |> SorterPoolSet_Standard.expandPools expansionRate
+                                    |> SorterPoolSet_Soss.trimPools expansionRate poolMeasure
+                                    |> SorterPoolSet_Soss.expandPools expansionRate
                                 else
                                     currentSorterPoolSet
 
@@ -162,7 +162,7 @@ module EvoOrch_Soss =
                             let reEvaluateParents = (remainingSteps % 10 = 0)
 
                             let nextSorterPoolSet = 
-                                Pipeline_Standard.runGenerationStepSossDebug
+                                Pipeline_Soss.runGenerationStepSossDebug
                                     mutator 
                                     currentSorterCountPerPool
                                     selectedSorterCountPerPool
@@ -186,7 +186,7 @@ module EvoOrch_Soss =
                             let updatedEvalBinsSetAcc =
                                 if shouldSummaryReport then
                                     let binsSetId = Guid.NewGuid() |> UMX.tag<sorterPoolBinsSetId>
-                                    let currentBinsSet = sorterPoolBinsSet.create binsSetId nextSorterPoolSet
+                                    let currentBinsSet = sorterPoolBinsSet_Soss.create binsSetId nextSorterPoolSet
                                     currentBinsSet :: sorterPoolBinsSetAcc
                                 else
                                     sorterPoolBinsSetAcc
@@ -203,7 +203,7 @@ module EvoOrch_Soss =
                                         let! qpSorterPoolSet = 
                                             genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolSet "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolSet."
-                                        do! genDb.saveAsync qpSorterPoolSet (nextSorterPoolSet |> outputData.SorterPoolSet) allowOverwrite
+                                        do! genDb.saveAsync qpSorterPoolSet (nextSorterPoolSet |> sorterPoolSet.Soss |> outputData.SorterPoolSet) allowOverwrite
 
 
                                         // Save SorterPoolSetSummaries
@@ -212,18 +212,18 @@ module EvoOrch_Soss =
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolSetSummarySet."
                                         let spsstID = qpSummaries.Id |> UMX.cast<queryParamsId, sorterPoolSetSummarySetId>
                                         let currentSummaries = updatedSorterPoolSetSummary |> List.toArray
-                                        let sorterPoolSetSummarySet = spSummarySet_Standard.create spsstID currentGen currentSummaries
-                                        do! genDb.saveAsync qpSummaries (sorterPoolSetSummarySet |> outputData.SorterPoolSetSummarySet) allowOverwrite
+                                        let sorterPoolSetSummarySet = spSummarySet_Soss.create spsstID currentGen currentSummaries
+                                        do! genDb.saveAsync qpSummaries (sorterPoolSetSummarySet |> spSummarySet.Soss |> outputData.SorterPoolSetSummarySet) allowOverwrite
 
 
                                         // Save SorterPoolBinsSetSeries
                                         let collectionId = Guid.NewGuid() |> UMX.tag<sorterPoolBinsSetSeriesId>
                                         let evalBinsCollection = 
-                                            sorterPoolBinsSetSeries.create collectionId (updatedEvalBinsSetAcc |> List.rev)
+                                            sorterPoolBinsSetSeries_Soss.create collectionId (updatedEvalBinsSetAcc |> List.rev)
                                         let! qpBinsSeries = 
                                             genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolBinsSetSeries "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolEvalBinsSetCollection."
-                                        do! genDb.saveAsync qpBinsSeries (evalBinsCollection |> outputData.SorterPoolBinsSetSeries) allowOverwrite
+                                        do! genDb.saveAsync qpBinsSeries (evalBinsCollection |> sorterPoolBinsSetSeries.Soss |> outputData.SorterPoolBinsSetSeries) allowOverwrite
 
 
                                         // Prune dead lineages and generate SorterPoolSetHistory
@@ -232,19 +232,19 @@ module EvoOrch_Soss =
                                         //let! qpHistory = 
                                         //    genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolSetHistory "")
                                         //    |> Result.ofOption "Failed to create QueryParams for SorterPoolSetHistory."
-                                        //do! genDb.saveAsync qpHistory (poolSetHistory |> outputData.SorterPoolSetHistory) allowOverwrite
+                                        //do! genDb.saveAsync qpHistory (poolSetHistory |> spsh.Soss |> outputData.SorterPoolSetHistory) allowOverwrite
 
                                        // return ([], [], prunedRunningMap)
-                                        return ([], [], MhMap_Standard.empty)
+                                        return ([], [], MhMap_Soss.empty)
                                     else
                                         //return (updatedSorterPoolSetSummary, updatedEvalBinsSetAcc, updatedRunningHistoryMap)
-                                        return (updatedSorterPoolSetSummary, updatedEvalBinsSetAcc, MhMap_Standard.empty)
+                                        return (updatedSorterPoolSetSummary, updatedEvalBinsSetAcc, MhMap_Soss.empty)
                                 }
 
-                            return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext evalBinsSetAccNext MhMap_Standard.empty
+                            return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext evalBinsSetAccNext MhMap_Soss.empty
                            // return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext evalBinsSetAccNext []
                     }
 
                 // Execute loop with empty initial states
-                return! loop (%totalGen - %genStart) initialPoolSet [] [] MhMap_Standard.empty
+                return! loop (%totalGen - %genStart) initialPoolSet [] [] MhMap_Soss.empty
         }

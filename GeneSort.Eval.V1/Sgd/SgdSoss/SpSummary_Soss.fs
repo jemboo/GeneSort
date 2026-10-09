@@ -1,4 +1,4 @@
-namespace GeneSort.Eval.V1.Sgd.Standard
+namespace GeneSort.Eval.V1.Sgd.Soss
 
 open FSharp.UMX
 open GeneSort.SortingOps
@@ -8,7 +8,7 @@ open GeneSort.Sorting.Sorter
 open GeneSort.Core
 
 
-type spSummary_Standard =
+type spSummary_Soss =
     private {
         _sorterPoolId: Guid<sorterPoolId>
         _sorterPoolName: string<sorterPoolName>
@@ -71,12 +71,12 @@ type spSummary_Standard =
         }
 
 
-type sorterPoolSetSummary_Standard =
+type sorterPoolSetSummary_Soss =
     private {
         _sorterPoolSetId: Guid<sorterPoolSetId>
         _generationNumber: int<generationNumber>
         _sortedSorterEvalPercentage: float
-        _sorterPoolSummaries: spSummary_Standard array
+        _sorterPoolSummaries: spSummary_Soss array
     }
     member this.SorterPoolSetId with get() = this._sorterPoolSetId
     member this.GenerationNumber with get() = this._generationNumber
@@ -90,9 +90,9 @@ type sorterPoolSetSummary_Standard =
           _sorterPoolSummaries = summaries }
 
 
-module SorterPoolSetSummary_Standard =
+module SorterPoolSetSummary_Soss =
 
-    let getMaxGeneration (spses: sorterPoolSetSummary_Standard array) : int<generationNumber> =
+    let getMaxGeneration (spses: sorterPoolSetSummary_Soss array) : int<generationNumber> =
         let mv = spses |> Array.maxBy(fun spss -> %spss.GenerationNumber)
         mv.GenerationNumber
 
@@ -105,7 +105,7 @@ module SorterPoolSetSummary_Standard =
             sqrt variance
 
     /// Strips the heavy sorterModel references out of a pool set, creating a light memory footprint snapshot
-    let fromPoolSet (poolSet: sorterPoolSet_Standard) : sorterPoolSetSummary_Standard =
+    let fromPoolSet (poolSet: sorterPoolSet_Soss) : sorterPoolSetSummary_Soss =
         
         // 1. Process each pool within the pool set
         let poolSummaries = 
@@ -148,7 +148,7 @@ module SorterPoolSetSummary_Standard =
                     let stdDevCe = computeStdDev ceLengths aveCeVal |> UMX.tag<ceLength>
                     let stdDevStage = computeStdDev stageLengths aveStageVal |> UMX.tag<stageLength>
 
-                    spSummary_Standard.create 
+                    spSummary_Soss.create 
                         pool.SorterPoolId 
                         pool.Name 
                         sortableTestsSubsetId
@@ -166,7 +166,7 @@ module SorterPoolSetSummary_Standard =
             |> Seq.toArray
 
         // 2. Wrap the final payload up into the collection summary
-        sorterPoolSetSummary_Standard.Create(
+        sorterPoolSetSummary_Soss.Create(
             poolSet.SorterPoolSetId, 
             poolSet.GenerationNumber, 
             poolSet.SortedSorterEvalPercentage,
@@ -175,7 +175,7 @@ module SorterPoolSetSummary_Standard =
 
     /// Flattens the hierarchical summary structure into an array of flat dataTableRecords 
     /// containing pool set context alongside individual pool summary metrics.
-    let toDataTableRecords (prefix: string) (summarySet: sorterPoolSetSummary_Standard) : dataTableRecord array =
+    let toDataTableRecords (prefix: string) (summarySet: sorterPoolSetSummary_Soss) : dataTableRecord array =
         
         // 1. Establish the highest-level context columns
         let setContextDtr =

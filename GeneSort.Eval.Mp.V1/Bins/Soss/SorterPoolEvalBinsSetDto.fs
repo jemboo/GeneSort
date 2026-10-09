@@ -1,11 +1,11 @@
-﻿namespace GeneSort.Eval.Mp.V1.Bins
+namespace GeneSort.Eval.Mp.V1.Bins.Soss
 
 open System
 open MessagePack
 open FSharp.UMX
 open GeneSort.Eval.V1.Sgd
-open GeneSort.Eval.Mp.V1.Bins
-open GeneSort.Eval.V1.Sgd.Bins.Standard
+open GeneSort.Eval.Mp.V1.Bins.Soss
+open GeneSort.Eval.V1.Sgd.Bins.Soss
 
 // ---------------------------------------------------------------------
 // 1. DTO Definition
@@ -24,7 +24,7 @@ type sorterPoolEvalBinsSetDto = {
 
 module SorterPoolEvalBinsSetDto =
 
-    let fromDomain (binsSet: sorterPoolBinsSet_Standard) : sorterPoolEvalBinsSetDto = {
+    let fromDomain (binsSet: sorterPoolBinsSet_Soss) : sorterPoolEvalBinsSetDto = {
         SorterPoolEvalBinsSetId = %binsSet.SorterPoolEvalBinsSetId
         SorterPoolSetId = %binsSet.SorterPoolSetId
         GenerationNumber = %binsSet.GenerationNumber
@@ -35,7 +35,7 @@ module SorterPoolEvalBinsSetDto =
             |> Seq.toArray
     }
 
-    let toDomain (dto: sorterPoolEvalBinsSetDto) : sorterPoolBinsSet_Standard =
+    let toDomain (dto: sorterPoolEvalBinsSetDto) : sorterPoolBinsSet_Soss =
         let id = dto.SorterPoolEvalBinsSetId |> UMX.tag
         let poolSetId = dto.SorterPoolSetId |> UMX.tag
         let genNum = dto.GenerationNumber |> UMX.tag
@@ -47,4 +47,4 @@ module SorterPoolEvalBinsSetDto =
                 (poolBins.SorterPoolEvalBinsId, poolBins))
             |> Map.ofSeq
 
-        sorterPoolBinsSet_Standard.recreate id poolSetId genNum evalBinsMap
+        sorterPoolBinsSet_Soss.recreate id poolSetId genNum evalBinsMap

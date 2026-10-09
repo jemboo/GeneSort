@@ -1,15 +1,16 @@
-﻿namespace GeneSort.Eval.V1.Bins.Standard
+﻿namespace GeneSort.Eval.V1.Sgd.Bins.Soss
 
 open FSharp.UMX
 open GeneSort.SortingOps
 open GeneSort.Eval.V1.Bins
+open GeneSort.Eval.V1.Sgd.Bins.Soss
 
 
-type sorterEvalBinSet =
+type sorterEvalBinSet_Soss =
     private {
         sorterEvalBinSetId: Guid<sorterEvalBinSetId>
         sorterSetEvalId: Guid<sorterSetEvalId>
-        sorterEvalBins: Map<sorterEvalKey, sorterEvalBin>
+        sorterEvalBins: Map<sorterEvalKey, sorterEvalBin_Soss>
     }
     with
     /// Creates a bin set directly from a parent sorterSetEval
@@ -18,7 +19,7 @@ type sorterEvalBinSet =
             setEval.SorterEvals
             |> Seq.groupBy SorterEvalKey.fromSorterEval
             |> Seq.map (fun (key, evals) -> 
-                let bin = sorterEvalBin.createWithSorterEvals evals key
+                let bin = sorterEvalBin_Soss.createWithSorterEvals evals key
                 (key, bin))
             |> Map.ofSeq
 
@@ -31,7 +32,7 @@ type sorterEvalBinSet =
     /// Explicit reconstructor for persistence/DTO deserialization
     static member recreate (id: Guid<sorterEvalBinSetId>) 
                             (sorterSetEvalId: Guid<sorterSetEvalId>) 
-                            (bins: Map<sorterEvalKey, sorterEvalBin>) =
+                            (bins: Map<sorterEvalKey, sorterEvalBin_Soss>) =
         {
             sorterEvalBinSetId = id
             sorterSetEvalId = sorterSetEvalId
@@ -43,8 +44,8 @@ type sorterEvalBinSet =
     member this.Bins with get() = this.sorterEvalBins
 
 
-module SorterEvalBinSet = 
+module SorterEvalBinSet_Soss = 
 
-    let makeDataTableRecords (source: sorterEvalBinSet) : GeneSort.Core.dataTableRecord seq =
+    let makeDataTableRecords (source: sorterEvalBinSet_Soss) : GeneSort.Core.dataTableRecord seq =
         source.Bins
-        |> Seq.map (fun kvp -> SorterEvalBin.toDataTableRecord kvp.Value)
+        |> Seq.map (fun kvp -> SorterEvalBin_Soss.toDataTableRecord kvp.Value)

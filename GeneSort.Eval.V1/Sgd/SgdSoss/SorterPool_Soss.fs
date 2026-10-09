@@ -1,0 +1,481 @@
+namespace GeneSort.Eval.V1.Sgd.Soss
+
+open System
+open FSharp.UMX
+open GeneSort.SortingOps
+open GeneSort.Sorting
+open GeneSort.Model.Sorting.V1
+open GeneSort.Eval.V1
+open System.Diagnostics
+open GeneSort.Eval.V1.Sgd
+
+
+type sorterPool_Soss =
+    private {
+        _name: string<sorterPoolName>
+        _sorterPoolId: Guid<sorterPoolId>
+        _sorterPoolTag: sorterPoolTag
+        _sorterPoolMembers: Map<Guid<sorterPoolMemberId>, spMember_Soss>
+        _rawCeLength: int<ceLength>
+        _mutationMod: int<mutationMod>
+        _parentSorterPoolId: Guid<sorterPoolId> option
+    }
+
+    member this.MutationMod with get() = this._mutationMod
+    member this.Name with get() = this._name
+    member this.ParentSorterPoolId = this._parentSorterPoolId
+    member this.RawCeLength with get() = this._rawCeLength
+    member this.SorterPoolMembers with get() : spMember_Soss seq =
+        Map.values this._sorterPoolMembers
+    member this.SorterPoolId with get() = this._sorterPoolId
+    member this.SorterPoolTag with get() = this._sorterPoolTag
+
+    static member create 
+            (sorterPoolId: Guid<sorterPoolId>) 
+            (parentSorterPoolId: Guid<sorterPoolId> option)
+            (name: string<sorterPoolName>)
+            (sorterPoolTag: sorterPoolTag)
+            (members: spMember_Soss []) 
+            (rawCeLength: int<ceLength>) 
+            (mutationMod: int<mutationMod>) =
+        let membersMap = 
+            members
+            |> Seq.map (fun m -> m.SorterPoolMemberId, m)
+            |> Map.ofSeq
+        { 
+            _name = name
+            _sorterPoolId = sorterPoolId
+            _sorterPoolTag = sorterPoolTag
+            _parentSorterPoolId = parentSorterPoolId
+            _sorterPoolMembers = membersMap
+            _rawCeLength = rawCeLength
+            _mutationMod = mutationMod
+        }
+
+
+module SorterPool_Soss = 
+
+    let getAverageScore (measure: sorterEvalMeasure) (pool: sorterPool_Soss) : float<sorterEvalScore> =
+            let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
+            let validScores =
+                pool.SorterPoolMembers
+                |> Seq.choose (fun spm -> spm.SorterEval |> Option.map scoreFunc)
+                |> Seq.map UMX.untag
+                |> Seq.toArray
+
+            if Array.isEmpty validScores then
+                Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
+            else
+                Array.average validScores |> UMX.tag<sorterEvalScore>
+
+
+    /// Calculates the standard deviation of scores in the pool for the specified measure.
+    /// Returns 0.0 if empty or if fewer than 2 evaluated members exist.
+    let getStandardDeviationOfScores (measure: sorterEvalMeasure) (pool: sorterPool_Soss) : float<sorterEvalScore> =
+        let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
+        let validScores =
+            pool.SorterPoolMembers
+            |> Seq.choose (fun spm -> spm.SorterEval |> Option.map scoreFunc)
+            |> Seq.map UMX.untag
+            |> Seq.toArray
+
+        if validScores.Length < 2 then
+            0.0 |> UMX.tag<sorterEvalScore>
+        else
+            let avg = Array.average validScores
+            let sumOfSquares = validScores |> Array.sumBy (fun score -> (score - avg) ** 2.0)
+            let stdDev = Math.Sqrt(sumOfSquares / float validScores.Length)
+            stdDev |> UMX.tag<sorterEvalScore>
+
+
+    /// Adds or updates a member inside the pool
+    let upsertMember 
+            (memberToUpsert: spMember_Soss) 
+            (pool: sorterPool_Soss) : sorterPool_Soss =
+        let updatedMap = Map.add 
+                            memberToUpsert.SorterPoolMemberId 
+                            memberToUpsert 
+                            pool._sorterPoolMembers
+        { pool with _sorterPoolMembers = updatedMap }
+
+    /// Finds a member and updates its evaluation within the pool context
+    let updateMemberEval 
+                    (memberId: Guid<sorterPoolMemberId>) 
+                    (eval: sorterEval option) 
+                    (pool: sorterPool_Soss) : sorterPool_Soss =
+        match Map.tryFind memberId pool._sorterPoolMembers with
+        | Some memberObj ->
+            let updatedMember = memberObj |> SpMember_Soss.withEval eval
+            upsertMember updatedMember pool
+        | None -> pool
+
+
+    /// The returned SorterPool only contains members with sorterPoolMemberIds that are found in map
+    let updateSorterEval (map: Map<Guid<sorterPoolMemberId>, sorterEval>) (pool: sorterPool_Soss) : sorterPool_Soss =
+        let updatedMembersMap =
+            map 
+            |> Map.fold (fun acc poolMemberId eval ->
+                match Map.tryFind poolMemberId pool._sorterPoolMembers with
+                | Some memberObj ->
+                    // Update the evaluation and accumulate it into the new map
+                    let updatedMember = memberObj |> SpMember_Soss.withEval (Some eval)
+                    Map.add poolMemberId updatedMember acc
+                | None -> 
+                    // If it's in the map but not in the pool, it is ignored
+                    acc
+            ) Map.empty
+            
+        { pool with _sorterPoolMembers = updatedMembersMap }
+
+
+    /// Gets the sorterEvals from the sorterPool, and ignores SorterPoolMembers that don't have them
+    let extractSorterEvals (pool: sorterPool_Soss) : Map<Guid<sorterPoolMemberId>, sorterEval> =
+        pool.SorterPoolMembers
+        |> Seq.fold (fun accMap spm ->
+            match spm.SorterEval with
+            | Some eval -> 
+                Map.add spm.SorterPoolMemberId eval accMap
+            | None -> 
+                // Ignore members that don't have an evaluation yet
+                accMap
+        ) Map.empty
+
+
+    /// Updates the mutationMod for the pool and applies the change to all members (resetting their mutationIndex)
+    let deriveChildPool 
+                (newPoolId: Guid<sorterPoolId>) 
+                (newMutationMod: int<mutationMod>) 
+                (parentPool: sorterPool_Soss) : sorterPool_Soss =
+
+            let updatedMembers =
+                parentPool.SorterPoolMembers
+                |> Seq.map (fun memb -> 
+                    let newMemberId = Guid.NewGuid() |> UMX.tag<sorterPoolMemberId>
+                    SpMember_Soss.deriveForChildPool newMemberId newMutationMod memb
+                )
+                |> Seq.toArray
+
+            sorterPool_Soss.create
+                newPoolId
+                (Some parentPool.SorterPoolId)
+                parentPool.Name
+                parentPool.SorterPoolTag
+                updatedMembers
+                parentPool.RawCeLength
+                newMutationMod
+
+
+    /// Applies the same mutantsPerSorter count to every pool member, accumulating 
+    /// the advanced parents and all newly spawned mutants into a single updated pool.
+    let mutate 
+            (sorterModelMut: sorterModelMutator) 
+            (mutantsPerSorter: int<sorterChildCount>)  
+            (currentGeneration: int<generationNumber>)
+            (pool: sorterPool_Soss) : sorterPool_Soss =
+
+        let updatedMembersMap =
+            pool.SorterPoolMembers
+            |> Seq.fold (fun accMap currentMember ->
+                // Invoke the member-level mutation strategy designed earlier
+                let updatedParent, childMutants = 
+                    SpMember_Soss.mutate 
+                            sorterModelMut 
+                            currentMember 
+                            pool.SorterPoolId
+                            mutantsPerSorter
+                            currentGeneration
+
+                // Add the updated parent to our accumulator map
+                let mapWithParent = Map.add updatedParent.SorterPoolMemberId updatedParent accMap
+                
+                // Add all newly created child mutants to the accumulator map
+                childMutants 
+                |> Array.fold (fun mapAcc child -> 
+                    Map.add child.SorterPoolMemberId child mapAcc
+                ) mapWithParent
+
+            ) Map.empty
+            
+        { pool with _sorterPoolMembers = updatedMembersMap }
+
+
+    /// Applies the same mutantsPerSorter count to every pool member, accumulating 
+    /// the advanced parents and all newly spawned mutants into a single updated pool.
+    // only keeps selectedSorterCountPerPool of each of the original pool members,
+    // prioritized according to selectionMeasure
+    let mutateAndTrim
+            (sorterModelMut: sorterModelMutator)
+            (selectedSorterCountPerPool: int<sorterCountPerPool>)
+            (selectionMeasure: sorterEvalMeasure)
+            (mutantsPerSorter: int<sorterChildCount>)  
+            (currentGeneration: int<generationNumber>)
+            (pool: sorterPool_Soss) : sorterPool_Soss =
+
+        let scoreFunc = SorterEvalFunctions.getFunctionForMeasure selectionMeasure
+
+        // Helper function to rank and extract a score for sorting
+        let getScore (spm: spMember_Soss) =
+            match spm.SorterEval with
+            | Some eval -> scoreFunc eval
+            | None -> System.Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
+
+        // 1. Generate mutants for ALL original members and collect updated parents + children
+        let updatedParents, allChildren =
+            pool.SorterPoolMembers
+            |> Seq.fold (fun (parentsAcc, childrenAcc) currentMember ->
+                let updatedParent, childMutants = 
+                    SpMember_Soss.mutate 
+                        sorterModelMut 
+                        currentMember 
+                        pool.SorterPoolId 
+                        mutantsPerSorter 
+                        currentGeneration
+
+                (updatedParent :: parentsAcc, Seq.append childMutants childrenAcc)
+            ) ([], Seq.empty)
+
+        // 2. Trim parents based on score selection limit
+        let retainedParents =
+            if UMX.untag selectedSorterCountPerPool < (pool.SorterPoolMembers |> Seq.length) then
+                updatedParents
+                |> Seq.sortBy getScore
+                |> Seq.truncate (UMX.untag selectedSorterCountPerPool)
+            else
+                updatedParents :> seq<_>
+
+        // 3. Combine retained parents and all generated children into the pool map
+        let updatedMembersMap =
+            Seq.concat [ retainedParents; allChildren ]
+            |> Seq.map (fun m -> m.SorterPoolMemberId, m)
+            |> Map.ofSeq
+        
+        { pool with _sorterPoolMembers = updatedMembersMap }
+
+
+    /// Adjusts the RawCeLength to the minimal LastCeIndex required to keep at least 
+    /// sortedFractionThreshold fraction of members sorted, and prunes any members exceeding that cutoff.
+    let adjustCeLengthByThreshold
+            (sortedFractionThreshold: float<sortedFraction>)
+            (pool: sorterPool_Soss) : sorterPool_Soss =
+
+        // 1. Gather all sorted members that have valid evaluations
+        let sortedMembersWithLastIndex =
+            pool.SorterPoolMembers
+            |> Seq.choose (fun spm ->
+                match spm.SorterEval with
+                | Some eval when SorterEval.getIsSorted eval ->
+                    Some (spm, SorterEval.getLastCeIndex eval)
+                | _ -> None
+            )
+            |> Seq.toArray
+
+        if Array.isEmpty sortedMembersWithLastIndex then
+            // If no sorted members exist, keep pool unchanged
+            pool
+        else
+            // 2. Sort by LastCeIndex ascending to determine the threshold index cutoff
+            let sortedByLastCe = 
+                sortedMembersWithLastIndex 
+                |> Array.sortBy (fun (_, lastIdx) -> %lastIdx)
+
+            // Calculate target count based on the threshold
+            let targetCount = 
+                sortedByLastCe.Length 
+                |> float 
+                |> (*) %sortedFractionThreshold 
+                |> Math.Ceiling 
+                |> int 
+                |> max 1
+
+            let targetIndex = min (targetCount - 1) (sortedByLastCe.Length - 1)
+            let _, thresholdLastCeIndex = sortedByLastCe.[targetIndex]
+
+            // 3. Filter out all pool members whose LastCeIndex exceeds the cutoff
+            let updatedMembers =
+                pool.SorterPoolMembers
+                |> Seq.filter (fun spm ->
+                    match spm.SorterEval with
+                    | Some eval -> SorterEval.getLastCeIndex eval <= thresholdLastCeIndex
+                    | None -> true
+                )
+                |> Seq.toArray
+
+            // Re-create the pool with the newly calculated cutoff as RawCeLength
+            sorterPool_Soss.create 
+                pool.SorterPoolId 
+                pool.ParentSorterPoolId
+                pool.Name 
+                pool.SorterPoolTag
+                updatedMembers 
+                (UMX.tag<ceLength> %thresholdLastCeIndex)
+                pool.MutationMod
+
+
+
+    /// Trims the SorterPool to size prunedSize, selecting the best (lowest score) according to measure
+    let pruneSorterPool 
+                (pool: sorterPool_Soss) 
+                (measure: sorterEvalMeasure) 
+                (prioritizeNewMutants: bool<prioritizeNewMutants>)
+                (distinctSorterHashes: bool<distinctSorterHashes>)
+                (sorterCountPerPool: int<sorterCountPerPool>) : sorterPool_Soss =
+        
+        let targetSize = max 0 %sorterCountPerPool
+        let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
+        let filterUnsorted = SorterEvalFunctions.getFilterUnsortedFlag measure
+
+        let filter1 =
+            pool.SorterPoolMembers
+            // Step 1: Handle filtering of unsorted elements if required by the measure rules
+            |> Seq.filter (fun spm ->
+                if %filterUnsorted then
+                    match spm.SorterEval with
+                    | Some eval -> eval |> SorterEval.getIsShortEnough pool.RawCeLength 
+                    | None -> false // Unevaluated members cannot verify if they are fully sorted
+                else true
+            )
+
+        // if the hashes are the same, then prioritize the older member
+        let birthdaySort =
+                filter1 |> Seq.sortBy(fun spm -> spm.Birthday)
+
+        let filter2 =
+            if %distinctSorterHashes then
+                birthdaySort 
+                |> Seq.distinctBy (fun spm -> %(SorterEval.getSequenceHash spm.SorterEval.Value))
+            else
+                birthdaySort
+
+        let sortedSurvivors =
+            filter2
+            // Step 2: Score members and construct the sorting key matrix
+            // Unevaluated members (None) get Double.PositiveInfinity (worst possible score)
+            |> Seq.map (fun spm ->
+                let score = 
+                    match spm.SorterEval with
+                    | Some eval -> scoreFunc eval
+                    | None -> Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
+                (score, spm)
+            )
+            // Step 3: Sort ascending (best scores first). 
+            // Tie-break on MutationIndex when scores match uniformly.
+            |> Seq.sortBy (fun (score, spm) ->
+                let mIndexRaw = %spm.MutationIndex
+                
+                // If prioritizing NEW mutants: lower mutation index comes first.
+                // If prioritizing OLD members: higher mutation index comes first (so we negate it).
+                let tieBreaker = if %prioritizeNewMutants then mIndexRaw else -mIndexRaw
+                
+                (score, tieBreaker)
+            )
+            // Step 4: Take the best up to the designated pruned size limit
+            |> Seq.truncate targetSize
+            |> Seq.map snd
+            |> Seq.toArray
+
+        sorterPool_Soss.create 
+                pool.SorterPoolId 
+                pool.ParentSorterPoolId
+                pool.Name 
+                pool.SorterPoolTag
+                sortedSurvivors
+                pool.RawCeLength 
+                pool.MutationMod
+
+
+
+    /// Debug version of pruneSorterPool that forces immediate evaluation at each step
+    /// to allow complete inspection of intermediate collections and count drop-offs.
+    let pruneSorterPoolDebug
+            (pool: sorterPool_Soss) 
+            (measure: sorterEvalMeasure) 
+            (prioritizeNewMutants: bool<prioritizeNewMutants>)
+            (distinctSorterHashes: bool<distinctSorterHashes>)
+            (sorterCountPerPool: int<sorterCountPerPool>) : sorterPool_Soss =
+
+        let targetSize = max 0 %sorterCountPerPool
+        let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
+        let filterUnsorted = SorterEvalFunctions.getFilterUnsortedFlag measure
+
+        let initialMembers = pool.SorterPoolMembers |> Seq.toArray
+        let initialCount = initialMembers.Length
+
+        // --- Step 1: Filter Unsorted ---
+        let filter1Members =
+            initialMembers
+            |> Array.filter (fun spm ->
+                if %filterUnsorted then
+                    match spm.SorterEval with
+                    | Some eval -> eval |> SorterEval.getIsShortEnough pool.RawCeLength 
+                    | None -> false // Unevaluated members cannot verify if they are fully sorted
+                else true
+            )
+
+        let countAfterFilter1 = filter1Members.Length
+
+        if countAfterFilter1 = 0 && initialCount > 0 && Debugger.IsAttached then
+            Debugger.Break() // Pause if filtering unsorted wiped out all members
+
+        // --- Step 2: Birthday Sort (Stable base order for deduplication) ---
+        let birthdaySortedMembers =
+            filter1Members 
+            |> Array.sortBy (fun spm -> spm.Birthday)
+
+        // --- Step 3: Distinct Hashes Deduplication ---
+        let filter2Members =
+            if %distinctSorterHashes then
+                birthdaySortedMembers 
+                |> Array.distinctBy (fun spm -> 
+                    match spm.SorterEval with
+                    | Some eval -> %(SorterEval.getSequenceHash eval)
+                    | None -> 
+                        if Debugger.IsAttached then Debugger.Break() // Unevaluated member reaching distinctBy step
+                        0
+                )
+            else
+                birthdaySortedMembers
+
+        let countAfterFilter2 = filter2Members.Length
+
+        if countAfterFilter2 = 0 && countAfterFilter1 > 0 && Debugger.IsAttached then
+            Debugger.Break() // Pause if distinct hashing wiped out all members
+
+        // --- Step 4: Scoring & Tuple Generation ---
+        let scoredMembers =
+            filter2Members
+            |> Array.map (fun spm ->
+                let score = 
+                    match spm.SorterEval with
+                    | Some eval -> scoreFunc eval
+                    | None -> Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
+            
+                let mIndexRaw = %spm.MutationIndex
+                let tieBreaker = if %prioritizeNewMutants then mIndexRaw else -mIndexRaw
+            
+                (score, tieBreaker, spm)
+            )
+
+        // --- Step 5: Ranking & Sorting ---
+        let rankedMembers =
+            scoredMembers
+            |> Array.sortBy (fun (score, tieBreaker, _) -> (score, tieBreaker))
+
+        // --- Step 6: Truncation (Pruning to Target Capacity) ---
+        let truncatedSurvivors =
+            rankedMembers
+            |> Array.truncate targetSize
+            |> Array.map (fun (_, _, spm) -> spm)
+
+        let finalCount = truncatedSurvivors.Length
+
+        if finalCount = 0 && targetSize > 0 && countAfterFilter2 > 0 && Debugger.IsAttached then
+            Debugger.Break() // Pause if final truncation resulted in an empty pool
+
+        sorterPool_Soss.create 
+                    pool.SorterPoolId
+                    pool.ParentSorterPoolId
+                    pool.Name 
+                    pool.SorterPoolTag
+                    truncatedSurvivors
+                    pool.RawCeLength 
+                    pool.MutationMod

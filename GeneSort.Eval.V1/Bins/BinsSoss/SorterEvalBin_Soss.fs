@@ -1,11 +1,11 @@
-namespace GeneSort.Eval.V1.Bins.Standard
+namespace GeneSort.Eval.V1.Sgd.Bins.Soss
 
 open System.Collections.Generic
 open GeneSort.Core
 open GeneSort.SortingOps
 open GeneSort.Eval.V1.Bins
 
-type sorterEvalBin =
+type sorterEvalBin_Soss =
     private {
         /// Mutable for O(1) additions during the evaluation phase
         sorterEvals: ResizeArray<sorterEval>
@@ -38,8 +38,8 @@ type sorterEvalBin =
         this.sorterEvals.Add(sorterEval)
 
 
-module SorterEvalBin =
-    let toDataTableRecord (bin: sorterEvalBin) : GeneSort.Core.dataTableRecord =
+module SorterEvalBin_Soss =
+    let toDataTableRecord (bin: sorterEvalBin_Soss) : GeneSort.Core.dataTableRecord =
         let keyRecord = SorterEvalKey.toDataTableRecord bin.SorterEvalKey
         let evalCountRecord = dataTableRecord.addData "SortedCount" (bin.SortedCount.ToString()) keyRecord
         let unsortedCountRecord = dataTableRecord.addData "UnsortedCount" (bin.UnsortedCount.ToString()) evalCountRecord

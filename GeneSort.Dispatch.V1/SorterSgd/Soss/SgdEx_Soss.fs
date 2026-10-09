@@ -17,6 +17,7 @@ open GeneSort.Dispatch.V1
 open GeneSort.Sorting.Sorter
 open GeneSort.Dispatch.V1.SorterSgd
 open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Eval.V1.Sgd.Soss
 
 module SgdEx_Soss =
 
@@ -29,29 +30,30 @@ module SgdEx_Soss =
             (rp: runParameters)
             (sortableTests: sortableTests)
             (prefix: ceBlock)
-            (log: string -> unit) : Async<Result<sorterPoolSet_Standard, string>> =
+            (log: string -> unit) : Async<Result<sorterPoolSet_Soss, string>> =
 
         asyncResult {
             let evalType = sorterEvalType.V2
             log "No saved checkpoint found. Creating initial seedSorterPoolSet..."
-            let! seedPoolSet = sorterPoolSetCreator rp
+            let! standardSeedPoolSet = sorterPoolSetCreator rp
+            let seedPoolSet = SorterPoolSet_Soss.fromStandard standardSeedPoolSet
             
             let computedEvals = 
                 seedPoolSet 
-                |> PoolRunner_Standard.evaluatePoolSet 
+                |> PoolRunner_Soss.evaluatePoolSet
                     sortableTests 
                     prefix
                     evalType
                     true // reEvaluateParents
                     (false |> UMX.tag<collectNewSortableTests>)
             
-            let evaluatedSeedSet = seedPoolSet |> SorterPoolSet_Standard.updateSorterEvals computedEvals
+            let evaluatedSeedSet = seedPoolSet |> SorterPoolSet_Soss.updateSorterEvals computedEvals
 
             // Save SorterPoolSetSummaries
             let! qpSsrr = 
                 genDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterPoolSet "")
                 |> Result.ofOption "Failed to create QueryParams for seedSorterRunResult."   
-            do! genDb.saveAsync qpSsrr (seedPoolSet |> outputData.SorterPoolSet) (false |> UMX.tag<allowOverwrite>)
+            do! genDb.saveAsync qpSsrr (seedPoolSet |> sorterPoolSet.Soss |> outputData.SorterPoolSet) (false |> UMX.tag<allowOverwrite>)
             log (sprintf "Initial seedSorterPoolSet saved at generation %d." %evaluatedSeedSet.GenerationNumber)
 
             return evaluatedSeedSet
@@ -106,7 +108,7 @@ module SgdEx_Soss =
                 let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces
 
                 // 1. Check for existing checkpoints directly via genDb
-                let! highestPoolSetOpt = Utils.loadHighestGenSorterPoolSet saveIntervals genDb rp
+                let! highestPoolSetOpt = Utils.loadHighestGenSorterPoolSetSoss saveIntervals genDb rp
 
                 // 2. Conditionally initialize or resume from the highest discovered checkpoint
                 let! (activeSeedPoolSet, activeRp) = 
@@ -114,12 +116,12 @@ module SgdEx_Soss =
                     | None -> 
                         asyncResult {
                             let initRp = rp.WithGenerationCurrent(Some (0 |> UMX.tag<generationNumber>))
-                            let! (seedSet: sorterPoolSet_Standard) = 
+                            let! (seedSet: sorterPoolSet_Soss) =
                                         initializeAndSaveSeedPoolSet 
                                             sorterPoolSetCreator genDb saveIntervals subIntervals initRp sortableTests prefix log
                             return seedSet, initRp
                         }
-                    | Some (highestPoolSet: sorterPoolSet_Standard) -> 
+                    | Some (highestPoolSet: sorterPoolSet_Soss) ->
                         asyncResult {
                             let currentGen = highestPoolSet.GenerationNumber
                             log (sprintf "Found existing checkpoint at Generation %d. Resuming evolution." %currentGen)
@@ -134,7 +136,7 @@ module SgdEx_Soss =
                 let (sorterModelMutator: sorterModelMutator) = sSmm |> sorterModelMutator.Simple
 
                 log "Executing unified evolution run..."
-                let! (_finalRunResult: sorterPoolSet_Standard) = 
+                let! (_finalRunResult: sorterPoolSet_Soss) =
                     EvoOrch_Soss.runSossEvolutionAsync
                         genDb
                         saveIntervals

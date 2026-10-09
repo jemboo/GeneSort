@@ -1,22 +1,19 @@
-﻿namespace GeneSort.Eval.V1.Sgd.Standard
+﻿namespace GeneSort.Eval.V1.Sgd.Bins.Soss
 
 open FSharp.UMX
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Bins
-open GeneSort.Eval.V1.Sgd.Bins.Standard
 
-[<Measure>] type sorterPoolBinsSetSeriesId
-
-type sorterPoolBinsSetSeries =
+type sorterPoolBinsSetSeries_Soss =
     private {
         _sorterPoolEvalBinsSetCollectionId: Guid<sorterPoolBinsSetSeriesId>
-        _sorterPoolEvalBinsSets: Map<Guid<sorterPoolBinsSetId>, sorterPoolBinsSet>
+        _sorterPoolEvalBinsSets: Map<Guid<sorterPoolBinsSetId>, sorterPoolBinsSet_Soss>
     }
     with
     /// Creates an empty collection or populates it from an initial sequence of bin sets
     static member create 
             (id: Guid<sorterPoolBinsSetSeriesId>)
-            (sets: seq<sorterPoolBinsSet>) =
+            (sets: seq<sorterPoolBinsSet_Soss>) =
         let setsMap =
             sets
             |> Seq.map (fun s -> s.SorterPoolEvalBinsSetId, s)
@@ -28,14 +25,14 @@ type sorterPoolBinsSetSeries =
 
     /// Explicit reconstructor for deserialization or manual instantiation
     static member recreate (id: Guid<sorterPoolBinsSetSeriesId>)
-                           (sets: Map<Guid<sorterPoolBinsSetId>, sorterPoolBinsSet>) =
+                           (sets: Map<Guid<sorterPoolBinsSetId>, sorterPoolBinsSet_Soss>) =
         {
             _sorterPoolEvalBinsSetCollectionId = id
             _sorterPoolEvalBinsSets = sets
         }
 
     static member empty (id: Guid<sorterPoolBinsSetSeriesId>) =
-        sorterPoolBinsSetSeries.create id Seq.empty
+        sorterPoolBinsSetSeries_Soss.create id Seq.empty
 
     member this.SorterPoolEvalBinsSetCollectionId with get() = this._sorterPoolEvalBinsSetCollectionId
     member this.SorterPoolEvalBinsSets with get() = this._sorterPoolEvalBinsSets
@@ -45,17 +42,17 @@ type sorterPoolBinsSetSeries =
                                             |> Seq.max |> UMX.tag<generationNumber>
 
 
-module SorterPoolEvalBinsSetCollection =
+module SorterPoolEvalBinsSetCollection_Soss =
 
     /// Adds a sorterPoolEvalBinsSet to the collection
-    let add (binSet: sorterPoolBinsSet) (collection: sorterPoolBinsSetSeries) : sorterPoolBinsSetSeries =
+    let add (binSet: sorterPoolBinsSet_Soss) (collection: sorterPoolBinsSetSeries_Soss) : sorterPoolBinsSetSeries_Soss =
         let updatedMap = Map.add binSet.SorterPoolEvalBinsSetId binSet collection.SorterPoolEvalBinsSets
-        sorterPoolBinsSetSeries.recreate 
+        sorterPoolBinsSetSeries_Soss.recreate 
                     collection.SorterPoolEvalBinsSetCollectionId
                     updatedMap
 
     /// Flattens all bins across all sets in the collection into a sequence of dataTableRecord
-    let makeDataTableRecords (source: sorterPoolBinsSetSeries) : GeneSort.Core.dataTableRecord seq =
+    let makeDataTableRecords (source: sorterPoolBinsSetSeries_Soss) : GeneSort.Core.dataTableRecord seq =
         source.SorterPoolEvalBinsSets
         |> Map.values
-        |> Seq.collect SorterPoolEvalBinsSet.makeDataTableRecords
+        |> Seq.collect SorterPoolEvalBinsSet_Soss.makeDataTableRecords

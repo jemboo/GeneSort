@@ -17,7 +17,7 @@ open GeneSort.Sorting
 open GeneSort.Dispatch.V1.SorterEval
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.SortingLib.Sorter
-open GeneSort.Eval.V1.Bins.Standard
+open GeneSort.Eval.V1.Sgd.Bins.Standard
 
 module Reporting = 
 
@@ -60,10 +60,10 @@ module Reporting =
                 let parentRecordMap = sorterEvalSelection |> EvalReporting.toDataTableRecords leadCols "Parent_"
 
                 // 4. Directly create bin set from parent evaluation set
-                let binSet = sorterEvalBinSet.create (Guid.Empty |> UMX.tag<sorterEvalBinSetId>) sorterSetEvals
+                let binSet = sorterEvalBinSet_Standard.create (Guid.Empty |> UMX.tag<sorterEvalBinSetId>) sorterSetEvals
 
                 // 5. Map evaluations to parent records and combine
-                let childRecords = binSet |> SorterEvalBinSet.makeDataTableRecords
+                let childRecords = binSet |> SorterEvalBinSet_Standard.makeDataTableRecords
 
                 let dtaTableRs = 
                     sorterSetEvals.SorterEvals
