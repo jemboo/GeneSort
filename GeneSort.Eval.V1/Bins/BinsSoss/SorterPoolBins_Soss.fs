@@ -17,7 +17,7 @@ type sorterPoolBins_Soss =
     static member create (id: Guid<sorterPoolBinsId>) (pool: sorterPool_Soss) =
         let validEvals = 
             pool.SorterPoolMembers
-            |> Seq.choose (fun memberObj -> memberObj.SorterEval)
+            |> Seq.choose (fun memberObj -> memberObj.SorterEvalForSelection)
 
         let bins = 
             validEvals

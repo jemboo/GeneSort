@@ -28,6 +28,7 @@
     <Compile Include="Sgd\SgdStandard\SpDescription_Standard.fs" />
     <Compile Include="Sgd\SgdStandard\SpSummary_Standard.fs" />
     <Compile Include="Sgd\SgdStandard\SpSummarySet_Standard.fs" />
+    <Compile Include="Sgd\SgdSoss\CommonSgdSoss.fs" />
     <Compile Include="Sgd\SgdSoss\SpMember_Soss.fs" />
     <Compile Include="Sgd\SgdSoss\SorterPool_Soss.fs" />
     <Compile Include="Sgd\SgdSoss\SpMemberHistory_Soss.fs" />

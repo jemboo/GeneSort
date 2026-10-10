@@ -31,6 +31,7 @@ open FSharp.UMX
 [<Measure>] type excludeSelfCe
 [<Measure>] type mergeDimension
 
+[<Measure>] type sortableTestsPartitionId
 [<Measure>] type sortableTestsSubsetId
 [<Measure>] type partitionCount
 [<Measure>] type includedCount
@@ -73,6 +74,8 @@ module SortableDataFormat =
     let all () : sortableDataFormat list =
         [ IntArray; BoolArray ]
 
+module SortableTestsPartitionId =
+    let Default = "0" |> UMX.tag<sortableTestsPartitionId>
 
 module SortableTestsSubsetId =
     let Default = "0" |> UMX.tag<sortableTestsSubsetId>

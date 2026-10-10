@@ -40,10 +40,10 @@ module PoolRunner_Soss =
                 if reEvaluateParents then
                     allMembers, Map.empty
                 else
-                    let toEval = allMembers |> Array.filter (fun (_, m) -> m.SorterEval.IsNone)
+                    let toEval = allMembers |> Array.filter (fun (_, m) -> m.SorterEvalForSelection.IsNone)
                     let cached = 
                         allMembers 
-                        |> Seq.choose (fun (_, m) -> m.SorterEval |> Option.map (fun eval -> m.SorterPoolMemberId, eval))
+                        |> Seq.choose (fun (_, m) -> m.SorterEvalForSelection |> Option.map (fun eval -> m.SorterPoolMemberId, eval))
                         |> Map.ofSeq
                     toEval, cached
 

@@ -9,6 +9,7 @@ open GeneSort.Project.V1
 open GeneSort.Eval.V1
 open GeneSort.Db.V1
 open GeneSort.Eval.V1.Sgd
+open GeneSort.Sorting
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1.Bins
@@ -29,7 +30,7 @@ module EvoOrch_Soss =
             (rp: runParameters)
             (allowOverwrite: bool<allowOverwrite>)
             (initialPoolSet: sorterPoolSet_Soss)
-            (sortableTestPartitions: setOfSortableTests)
+            (sortableTestPartitions: partitionOfSortableTests)
             (prefix: ceBlock)
             (mutator: sorterModelMutator)
             (cts: CancellationToken)
@@ -161,6 +162,10 @@ module EvoOrch_Soss =
                             // Step Evolution
                             let reEvaluateParents = (remainingSteps % 10 = 0)
 
+                            let (subsetIdForSelection: string<sortableTestsSubsetId>) =
+                                0 |> string |> UMX.tag<sortableTestsSubsetId>
+
+
                             let nextSorterPoolSet = 
                                 Pipeline_Soss.runGenerationStepSossDebug
                                     mutator 
@@ -170,6 +175,7 @@ module EvoOrch_Soss =
                                     prioritizeNewMutants
                                     distinctSorterHashes
                                     sortableTestPartitions
+                                    subsetIdForSelection
                                     prefix
                                     evalType
                                     srtrEvalMeasure

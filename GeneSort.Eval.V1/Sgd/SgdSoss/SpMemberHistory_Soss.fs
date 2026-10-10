@@ -76,7 +76,7 @@ module SpMemberHistory_Soss =
             (spm: spMember_Soss) : spMemberHistory_Soss =
             
         let v2Eval = 
-            spm.SorterEval 
+            spm.SorterEvalForSelection 
             |> Option.map (SorterEval.downgradeTo sorterEvalType.V2)
             |> Option.bind (function sorterEval.V2 evalV2 -> Some evalV2 | _ -> None)
 

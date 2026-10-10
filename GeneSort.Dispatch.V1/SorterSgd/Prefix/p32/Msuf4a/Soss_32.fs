@@ -30,7 +30,7 @@ let Pool_32_Test (executorType: sorterSgdExecutorType)  : run =
         (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
         (runParameters.seedSossKey, [1234UL] |> List.map string)
         (runParameters.codeModKey, ["NoMods"] |> List.map string)
-        (runParameters.generationIntervalLastKey, [2] |> List.map string)
+        (runParameters.generationIntervalLastKey, [0] |> List.map string)
         (runParameters.paraRateKey,    [1.15;] |> List.map string)
         (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
         (runParameters.mutationModKey, [0;] |> List.map string)

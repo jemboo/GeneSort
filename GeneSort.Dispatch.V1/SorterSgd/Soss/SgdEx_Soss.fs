@@ -98,9 +98,9 @@ module SgdEx_Soss =
                     | Net -> randomNet(UMX.tag<randomSeed> (int32 seedSoss)) :> IRando
                     | Smx -> randomSplitMix64(seedSoss) :> IRando
                 let sortableTestsPartitions =
-                    SetOfSortableTests.partition sossRng.NextIndex (2 |> UMX.tag<sortableTestsCount>) sortableTests
-                let sortableTestsFirst = sortableTestsPartitions.SortableTests.[UMX.tag<sortableTestsSubsetId> "0"]
-                let sortableTestsSecond = sortableTestsPartitions.SortableTests.[UMX.tag<sortableTestsSubsetId> "1"]
+                    PartitionOfSortableTests.partition sossRng.NextIndex (2 |> UMX.tag<sortableTestsCount>) sortableTests
+                let sortableTestsFirst = sortableTestsPartitions.SortableTests.[UMX.tag<sortableTestsPartitionId> "0"]
+                let sortableTestsSecond = sortableTestsPartitions.SortableTests.[UMX.tag<sortableTestsPartitionId> "1"]
                 log (sprintf "Partitioned sortable tests into two subsets of %d and %d tests."
                         %(SortableTests.getSortableCount sortableTestsFirst)
                         %(SortableTests.getSortableCount sortableTestsSecond))

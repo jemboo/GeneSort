@@ -116,6 +116,72 @@ module private Fixtures =
 
 module OutputUnionTests =
     [<Fact>]
+    let ``Soss stores both cast partition evaluations and a separate Merge evaluation`` () =
+        let firstPartitionId = UMX.tag<sortableTestsPartitionId> "0"
+        let secondPartitionId = UMX.tag<sortableTestsPartitionId> "1"
+        let firstSubsetId = UMX.cast<sortableTestsPartitionId, sortableTestsSubsetId> firstPartitionId
+        let secondSubsetId = UMX.cast<sortableTestsPartitionId, sortableTestsSubsetId> secondPartitionId
+        let first = SorterEval.withSortableTestsSubsetId firstSubsetId Fixtures.evaluation
+        let second = SorterEval.withSortableTestsSubsetId secondSubsetId Fixtures.evaluation
+        let partitionEvals =
+            Map.ofList
+                [ firstPartitionId, Map.ofList [Fixtures.memberId, first]
+                  secondPartitionId, Map.ofList [Fixtures.memberId, second] ]
+        let mergedEvals = CommonSgdSoss.mergePartitionEvals partitionEvals
+        let merged = mergedEvals.[Fixtures.memberId]
+        Assert.True(SorterEval.getSortableTestsSubsetId merged = (UMX.tag<sortableTestsSubsetId> "Merge"))
+        Assert.True((merged = (SorterEval.merge first second |> SorterEval.withSortableTestsSubsetId CommonSgdSoss.mergedSubsetId)))
+        let memberValue =
+            spMember_Soss.create Fixtures.memberId sorterModel.Unknown 0<mutationIndex> 5<mutationMod>
+                None Map.empty 0<generationNumber>
+        let stored =
+            memberValue
+            |> SpMember_Soss.withEval (Some first)
+            |> SpMember_Soss.withEval (Some second)
+            |> SpMember_Soss.withEval (Some merged)
+        Assert.Equal(3, stored.SorterEvalMap.Count)
+        Assert.True(stored.SorterEvalMap.[firstSubsetId] = first)
+        Assert.True(stored.SorterEvalMap.[secondSubsetId] = second)
+        let selected = stored |> SpMember_Soss.withSubsetIdForSelection CommonSgdSoss.mergedSubsetId
+        Assert.True(selected.SorterEvalForSelection = Some merged)
+
+    [<Fact>]
+    let ``Soss selection switches partitions and reuses the matching cached evaluation`` () =
+        let selected = Fixtures.soss |> SorterPoolSet_Soss.withSubsetIdForSelection Fixtures.subsetId
+        let memberValue = selected.SorterPools.[Fixtures.poolId].SorterPoolMembers |> Seq.exactlyOne
+        Assert.True(memberValue.SorterEvalForSelection = Some Fixtures.evaluation)
+        Assert.True(memberValue.SorterEvalMap = Fixtures.evaluations)
+        let cached =
+            PoolRunner_Soss.evaluatePoolSet Unchecked.defaultof<_> Unchecked.defaultof<_>
+                sorterEvalType.V2 false (UMX.tag<collectNewSortableTests> false) selected
+        Assert.True(cached.[Fixtures.memberId] = Fixtures.evaluation)
+        let missing = memberValue |> SpMember_Soss.withSubsetIdForSelection (UMX.tag<sortableTestsSubsetId> "missing")
+        Assert.True(missing.SorterEvalForSelection.IsNone)
+
+    [<Fact>]
+    let ``Soss selection subset survives serialization and legacy DTOs default it`` () =
+        MessagePackSetup.configure()
+        let selected = Fixtures.soss |> SorterPoolSet_Soss.withSubsetIdForSelection Fixtures.subsetId
+        let dto = GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.toDto selected
+        let bytes = MessagePackSerializer.Serialize(dto)
+        let restoredDto = MessagePackSerializer.Deserialize<GeneSort.Eval.Mp.V1.Sgd.Soss.sorterPoolSetDto_Soss>(bytes)
+        let restored = GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.fromDto restoredDto
+        let memberValue = restored.SorterPools.[Fixtures.poolId].SorterPoolMembers |> Seq.exactlyOne
+        Assert.True(memberValue.SubsetIdForSelection = Fixtures.subsetId)
+        Assert.True(memberValue.SorterEvalForSelection = Some Fixtures.evaluation)
+        let legacyPools =
+            dto.sorterPools
+            |> Array.map (fun pool ->
+                let legacyMembers =
+                    pool.sorterPoolMemberDtos
+                    |> Array.map (fun memberDto -> { memberDto with subsetIdForSelection = null })
+                { pool with sorterPoolMemberDtos = legacyMembers })
+        let legacyDto = { dto with sorterPools = legacyPools }
+        let legacy = GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.fromDto legacyDto
+        let legacyMember = legacy.SorterPools.[Fixtures.poolId].SorterPoolMembers |> Seq.exactlyOne
+        Assert.True(legacyMember.SubsetIdForSelection = SortableTestsSubsetId.Default)
+
+    [<Fact>]
     let ``Standard reuses its single cached evaluation regardless of subset id`` () =
         // Unknown models and absent test inputs would fail if this tried to evaluate again.
         let cached =

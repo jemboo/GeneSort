@@ -16,6 +16,7 @@ type spMember_Soss =
         _mutationMod:          int<mutationMod>
         _sorterMutationSource: sorterMutationSource option
         _sorterEvalMap:        Map<string<sortableTestsSubsetId>, sorterEval>
+        _subsetIdForSelection: string<sortableTestsSubsetId>
         _birthday:             int<generationNumber>
     }
 
@@ -28,7 +29,8 @@ type spMember_Soss =
     member this.MutationMod = this._mutationMod
     member this.SorterMutationSource = this._sorterMutationSource
     member this.SorterEvalMap = this._sorterEvalMap
-    member this.SorterEval = Map.tryFind SortableTestsSubsetId.Default this._sorterEvalMap
+    member this.SubsetIdForSelection = this._subsetIdForSelection
+    member this.SorterEvalForSelection = Map.tryFind this._subsetIdForSelection this._sorterEvalMap
 
     static member create 
                     sorterPoolMemberId 
@@ -45,11 +47,15 @@ type spMember_Soss =
             _mutationMod = mutationMod
             _sorterMutationSource = sorterMutationSource
             _sorterEvalMap = sorterEval
+            _subsetIdForSelection = SortableTestsSubsetId.Default
             _birthday = birthday
         }
 
 
 module SpMember_Soss =
+
+    let withSubsetIdForSelection subsetIdForSelection (spm: spMember_Soss) =
+        { spm with _subsetIdForSelection = subsetIdForSelection }
 
     /// Increments a member's mutation index by a given integer value
     let advanceIndex (offset: int) (spm: spMember_Soss) : spMember_Soss =
@@ -122,6 +128,7 @@ module SpMember_Soss =
                     (Some mutationSource)
                     Map.empty               // New mutants start unevaluated
                     currentGeneration
+                |> withSubsetIdForSelection spm.SubsetIdForSelection
             )
 
         // Increment the parent's SorterMutationIndex by the number of mutants produced

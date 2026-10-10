@@ -5,10 +5,10 @@ open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Core
 
-type setOfSortableTests =
-    private { sortableTests: Map<string<sortableTestsSubsetId>, sortableTests> }
+type partitionOfSortableTests =
+    private { sortableTests: Map<string<sortableTestsPartitionId>, sortableTests> }
 
-    static member create (tests: Map<string<sortableTestsSubsetId>, sortableTests>) : setOfSortableTests =
+    static member create (tests: Map<string<sortableTestsPartitionId>, sortableTests>) : partitionOfSortableTests =
         if Map.isEmpty tests then
             invalidArg "tests" "A set of sortable tests must not be empty."
 
@@ -33,11 +33,11 @@ type setOfSortableTests =
     member this.Count = this.sortableTests.Count
 
 
-module SetOfSortableTests =
+module PartitionOfSortableTests =
 
     let private newId () = System.Guid.NewGuid() |> UMX.tag<sortableTestsId>
 
-    let private partitionItems (indexPicker: int -> int) (count: int) (items: 'a[]) : Map<string<sortableTestsSubsetId>, 'a[]> =
+    let private partitionItems (indexPicker: int -> int) (count: int) (items: 'a[]) : Map<string<sortableTestsPartitionId>, 'a[]> =
         if count <= 0 then
             invalidArg "count" "Partition count must be greater than zero."
         if count > items.Length then
@@ -56,16 +56,16 @@ module SetOfSortableTests =
               let values =
                   [| for index in partitionIndex .. count .. shuffled.Length - 1 do
                          yield shuffled.[index] |]
-              yield (string partitionIndex) |> UMX.tag<sortableTestsSubsetId>, values ]
+              yield (string partitionIndex) |> UMX.tag<sortableTestsPartitionId>, values ]
         |> Map.ofList
 
     let partition
             (indexPicker: int -> int)
             (count: int<sortableTestsCount>)
-            (tests: sortableTests) : setOfSortableTests =
+            (tests: sortableTests) : partitionOfSortableTests =
         let partitionCount = %count
         let makeSet makeTests =
-            makeTests () |> setOfSortableTests.create
+            makeTests () |> partitionOfSortableTests.create
 
         match tests with
         | Bitv512 bitv512Tests ->
@@ -120,7 +120,7 @@ module SetOfSortableTests =
                     |> Uint8v512))
 
 
-    let mergeAll (setOfSTs: setOfSortableTests) : sortableTests =
+    let mergeAll (setOfSTs: partitionOfSortableTests) : sortableTests =
         if setOfSTs.Count = 0 then
             invalidArg "setOfSTs" "Cannot merge an empty set of sortable tests."
         setOfSTs.SortableTests
@@ -130,7 +130,7 @@ module SetOfSortableTests =
 
                         
     //returns the merge of the tests in the setOfSTs that are flagged as true in indexFlags
-    let mergeSelected (setOfSTs: setOfSortableTests) (indexFlags: bool[]) : sortableTests =
+    let mergeSelected (setOfSTs: partitionOfSortableTests) (indexFlags: bool[]) : sortableTests =
         if indexFlags.Length <> setOfSTs.Count then
             invalidArg "indexFlags" "Length of indexFlags must match the number of sortable tests in the set."
         let selectedTests =
@@ -146,7 +146,7 @@ module SetOfSortableTests =
         |> Array.reduce SortableTests.mergeSortableTests
 
 
-    let makeRotatingSubsets (setOfSTs: setOfSortableTests) (partitionCount: int<partitionCount>) (includedCount: int<includedCount>) =
+    let makeRotatingSubsets (setOfSTs: partitionOfSortableTests) (partitionCount: int<partitionCount>) (includedCount: int<includedCount>) =
         let rotatingFlags = ArrayUtils.makeRotatingFlags %partitionCount %includedCount
         rotatingFlags
         |> Array.map (fun flags -> mergeSelected setOfSTs flags)

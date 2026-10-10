@@ -91,6 +91,6 @@ module SortableTestsModel =
             (indexPicker: int -> int)
             (count: int<sortableTestsCount>)
             (sortableTestsModel: sortableTestsModel)
-            (sortableDataFormat: sortableDataFormat) : setOfSortableTests =
+            (sortableDataFormat: sortableDataFormat) : partitionOfSortableTests =
         makeSortableTests sortableTestsId sortableTestsModel sortableDataFormat
-        |> SetOfSortableTests.partition indexPicker count
+        |> PartitionOfSortableTests.partition indexPicker count

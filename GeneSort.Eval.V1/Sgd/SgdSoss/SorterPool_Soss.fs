@@ -55,11 +55,16 @@ type sorterPool_Soss =
 
 module SorterPool_Soss = 
 
+    let withSubsetIdForSelection subsetIdForSelection (pool: sorterPool_Soss) =
+        { pool with
+            _sorterPoolMembers = pool._sorterPoolMembers |> Map.map (fun _ memberValue ->
+                SpMember_Soss.withSubsetIdForSelection subsetIdForSelection memberValue) }
+
     let getAverageScore (measure: sorterEvalMeasure) (pool: sorterPool_Soss) : float<sorterEvalScore> =
             let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
             let validScores =
                 pool.SorterPoolMembers
-                |> Seq.choose (fun spm -> spm.SorterEval |> Option.map scoreFunc)
+                |> Seq.choose (fun spm -> spm.SorterEvalForSelection |> Option.map scoreFunc)
                 |> Seq.map UMX.untag
                 |> Seq.toArray
 
@@ -75,7 +80,7 @@ module SorterPool_Soss =
         let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
         let validScores =
             pool.SorterPoolMembers
-            |> Seq.choose (fun spm -> spm.SorterEval |> Option.map scoreFunc)
+            |> Seq.choose (fun spm -> spm.SorterEvalForSelection |> Option.map scoreFunc)
             |> Seq.map UMX.untag
             |> Seq.toArray
 
@@ -132,7 +137,7 @@ module SorterPool_Soss =
     let extractSorterEvals (pool: sorterPool_Soss) : Map<Guid<sorterPoolMemberId>, sorterEval> =
         pool.SorterPoolMembers
         |> Seq.fold (fun accMap spm ->
-            match spm.SorterEval with
+            match spm.SorterEvalForSelection with
             | Some eval -> 
                 Map.add spm.SorterPoolMemberId eval accMap
             | None -> 
@@ -215,7 +220,7 @@ module SorterPool_Soss =
 
         // Helper function to rank and extract a score for sorting
         let getScore (spm: spMember_Soss) =
-            match spm.SorterEval with
+            match spm.SorterEvalForSelection with
             | Some eval -> scoreFunc eval
             | None -> System.Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
 
@@ -262,7 +267,7 @@ module SorterPool_Soss =
         let sortedMembersWithLastIndex =
             pool.SorterPoolMembers
             |> Seq.choose (fun spm ->
-                match spm.SorterEval with
+                match spm.SorterEvalForSelection with
                 | Some eval when SorterEval.getIsSorted eval ->
                     Some (spm, SorterEval.getLastCeIndex eval)
                 | _ -> None
@@ -294,7 +299,7 @@ module SorterPool_Soss =
             let updatedMembers =
                 pool.SorterPoolMembers
                 |> Seq.filter (fun spm ->
-                    match spm.SorterEval with
+                    match spm.SorterEvalForSelection with
                     | Some eval -> SorterEval.getLastCeIndex eval <= thresholdLastCeIndex
                     | None -> true
                 )
@@ -329,7 +334,7 @@ module SorterPool_Soss =
             // Step 1: Handle filtering of unsorted elements if required by the measure rules
             |> Seq.filter (fun spm ->
                 if %filterUnsorted then
-                    match spm.SorterEval with
+                    match spm.SorterEvalForSelection with
                     | Some eval -> eval |> SorterEval.getIsShortEnough pool.RawCeLength 
                     | None -> false // Unevaluated members cannot verify if they are fully sorted
                 else true
@@ -342,7 +347,7 @@ module SorterPool_Soss =
         let filter2 =
             if %distinctSorterHashes then
                 birthdaySort 
-                |> Seq.distinctBy (fun spm -> %(SorterEval.getSequenceHash spm.SorterEval.Value))
+                |> Seq.distinctBy (fun spm -> %(SorterEval.getSequenceHash spm.SorterEvalForSelection.Value))
             else
                 birthdaySort
 
@@ -352,7 +357,7 @@ module SorterPool_Soss =
             // Unevaluated members (None) get Double.PositiveInfinity (worst possible score)
             |> Seq.map (fun spm ->
                 let score = 
-                    match spm.SorterEval with
+                    match spm.SorterEvalForSelection with
                     | Some eval -> scoreFunc eval
                     | None -> Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
                 (score, spm)
@@ -405,7 +410,7 @@ module SorterPool_Soss =
             initialMembers
             |> Array.filter (fun spm ->
                 if %filterUnsorted then
-                    match spm.SorterEval with
+                    match spm.SorterEvalForSelection with
                     | Some eval -> eval |> SorterEval.getIsShortEnough pool.RawCeLength 
                     | None -> false // Unevaluated members cannot verify if they are fully sorted
                 else true
@@ -426,7 +431,7 @@ module SorterPool_Soss =
             if %distinctSorterHashes then
                 birthdaySortedMembers 
                 |> Array.distinctBy (fun spm -> 
-                    match spm.SorterEval with
+                    match spm.SorterEvalForSelection with
                     | Some eval -> %(SorterEval.getSequenceHash eval)
                     | None -> 
                         if Debugger.IsAttached then Debugger.Break() // Unevaluated member reaching distinctBy step
@@ -445,7 +450,7 @@ module SorterPool_Soss =
             filter2Members
             |> Array.map (fun spm ->
                 let score = 
-                    match spm.SorterEval with
+                    match spm.SorterEvalForSelection with
                     | Some eval -> scoreFunc eval
                     | None -> Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
             

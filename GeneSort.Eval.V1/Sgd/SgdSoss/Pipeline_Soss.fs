@@ -1,6 +1,7 @@
 namespace GeneSort.Eval.V1.Sgd.Soss
 
 open FSharp.UMX
+open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
@@ -64,7 +65,8 @@ module Pipeline_Soss =
             (sorterChildCount: int<sorterChildCount>)
             (prioritizeNewMutants: bool<prioritizeNewMutants>)
             (distinctSorterHashes: bool<distinctSorterHashes>)
-            (sortableTestPartitions: setOfSortableTests)
+            (sortableTestPartitions: partitionOfSortableTests)
+            (subsetIdForSelection: string<sortableTestsSubsetId>)
             (prefix: ceBlock)
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
@@ -78,48 +80,66 @@ module Pipeline_Soss =
             poolSet.SorterPools
             |> Map.exists (fun _ pool -> Seq.isEmpty pool.SorterPoolMembers)
 
+        let poolSetForSelection =
+            currentPoolSet
+            |> SorterPoolSet_Soss.withSubsetIdForSelection subsetIdForSelection
+
+        let selectionPartitionId = UMX.cast<sortableTestsSubsetId, sortableTestsPartitionId> subsetIdForSelection
+        if subsetIdForSelection <> CommonSgdSoss.mergedSubsetId
+           && not (Map.containsKey selectionPartitionId sortableTestPartitions.SortableTests) then
+            invalidArg "subsetIdForSelection" (sprintf "Unknown selection subset '%s'." %subsetIdForSelection)
+
+        let evaluatePartitions reEvaluate poolSet =
+            sortableTestPartitions.SortableTests
+            |> Map.map (fun partitionId tests ->
+                let subsetId = UMX.cast<sortableTestsPartitionId, sortableTestsSubsetId> partitionId
+                PoolRunner_Soss.evaluatePoolSet tests prefix sorterEvalType reEvaluate
+                    collectNewSortableTests
+                    (poolSet |> SorterPoolSet_Soss.withSubsetIdForSelection subsetId)
+                |> Map.map (fun _ eval -> SorterEval.withSortableTestsSubsetId subsetId eval))
+
+        let storeEvaluations partitionEvals poolSet =
+            partitionEvals
+            |> Map.fold (fun updated _ evaluations ->
+                SorterPoolSet_Soss.updateSorterEvals evaluations updated) poolSet
+            |> SorterPoolSet_Soss.updateSorterEvals (CommonSgdSoss.mergePartitionEvals partitionEvals)
+
+        // Seed a newly selected partition before ranking parents, including on the first step.
+        let preparedPoolSet =
+            let hasMissingSelectionEval =
+                poolSetForSelection.SorterPools
+                |> Map.values
+                |> Seq.collect (fun pool -> pool.SorterPoolMembers)
+                |> Seq.exists (fun memberValue -> memberValue.SorterEvalForSelection.IsNone)
+            if hasMissingSelectionEval then
+                match Map.tryFind selectionPartitionId sortableTestPartitions.SortableTests with
+                | Some tests ->
+                    let evaluations =
+                        PoolRunner_Soss.evaluatePoolSet tests prefix sorterEvalType false
+                            collectNewSortableTests poolSetForSelection
+                        |> Map.map (fun _ eval -> SorterEval.withSortableTestsSubsetId subsetIdForSelection eval)
+                    SorterPoolSet_Soss.updateSorterEvals evaluations poolSetForSelection
+                | None when subsetIdForSelection = CommonSgdSoss.mergedSubsetId ->
+                    storeEvaluations (evaluatePartitions false poolSetForSelection) poolSetForSelection
+                | None -> invalidArg "subsetIdForSelection" (sprintf "Unknown selection subset '%s'." %subsetIdForSelection)
+            else
+                poolSetForSelection
+
         // --- Step 1a: Mutate / Expand Population ---
         let mutatedPoolSet = SorterPoolSet_Soss.mutateAndTrim
                                     mutator
                                     selectedSorterCountPerPool
                                     selectionMeasure
                                     sorterChildCount
-                                    currentPoolSet
+                                    preparedPoolSet
 
         if hasEmptyPool mutatedPoolSet && Debugger.IsAttached then
             Debugger.Break() // Pause if mutation resulted in an empty pool
 
         // --- Step 1b: Evaluate Pool Set ---
 
-        let partitionEvals =
-            sortableTestPartitions.SortableTests
-            |> Map.map (fun subsetId tests ->
-                PoolRunner_Soss.evaluatePoolSet
-                    tests
-                    prefix
-                    sorterEvalType
-                    reEvaluateParents
-                    collectNewSortableTests
-                    mutatedPoolSet
-                |> Map.map (fun _ eval -> SorterEval.withSortableTestsSubsetId subsetId eval))
-
-        // Keep each partition evaluation and the merged evaluation together per member.
-        let computedEvals =
-            let partitionMaps = partitionEvals |> Map.toArray
-            let _, firstEvals = partitionMaps.[0]
-            firstEvals
-            |> Map.map (fun memberId firstEval ->
-                let memberPartitionEvals =
-                    partitionMaps
-                    |> Array.map (fun (subsetId, evals) -> subsetId, evals.[memberId])
-                    |> Map.ofArray
-                let mergedEval =
-                    if partitionMaps.Length = 1 then firstEval
-                    else SorterEval.merge firstEval (snd partitionMaps.[1]).[memberId]
-                {| PartitionEvals = memberPartitionEvals; MergedEval = mergedEval |})
-
-        let mergedEvals = computedEvals |> Map.map (fun _ evals -> evals.MergedEval)
-        let evaluatedPoolSet = SorterPoolSet_Soss.updateSorterEvals mergedEvals mutatedPoolSet
+        let partitionEvals = evaluatePartitions reEvaluateParents mutatedPoolSet
+        let evaluatedPoolSet = storeEvaluations partitionEvals mutatedPoolSet
 
         if hasEmptyPool evaluatedPoolSet && Debugger.IsAttached then
             Debugger.Break() // Pause if evaluation or eval update failed

@@ -33,7 +33,7 @@ type sorterPoolSet_Soss =
         this._sorterPools
         |> Map.values
         |> Seq.collect (fun pool -> pool.SorterPoolMembers)
-        |> Seq.choose (fun memberObj -> memberObj.SorterEval)
+        |> Seq.choose (fun memberObj -> memberObj.SorterEvalForSelection)
         |> Seq.toArray
 
     static member create (sorterPoolSetId: Guid<sorterPoolSetId>)
@@ -53,6 +53,11 @@ type sorterPoolSet_Soss =
 
 
 module SorterPoolSet_Soss =
+
+    let withSubsetIdForSelection subsetIdForSelection (poolSet: sorterPoolSet_Soss) =
+        { poolSet with
+            _sorterPools = poolSet._sorterPools |> Map.map (fun _ pool ->
+                SorterPool_Soss.withSubsetIdForSelection subsetIdForSelection pool) }
 
     /// Copies a Standard seed pool into Soss while preserving identities and evaluations.
     let fromStandard (source: Standard.sorterPoolSet_Standard) : sorterPoolSet_Soss =
