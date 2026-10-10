@@ -44,7 +44,8 @@ module SortableTestsDbs =
 
 
     module Prefix =
-
+    
+        let dbNameTest = "PrefixTest" |> UMX.tag<databaseName>
         let dbName = "Prefix" |> UMX.tag<databaseName>
         let dbFolder = $"c:\\Projects\\{projectName}\\{%dbName}\\Data"
                        |> UMX.tag<pathToRootFolder>

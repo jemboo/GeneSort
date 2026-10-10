@@ -24,17 +24,17 @@ let Pool_32_Test (executorType: sorterSgdExecutorType)  : run =
             dbPool32TestName
             projName
             (sprintf @"Pool_32_Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
-            "Rate comp for Msrs32p4a Msuf4"
+            "Rate comp for 32p4a Msuf4"
             [
-        (runParameters.sorterCountPerPoolSetKey, [32] |> List.map string)
-        (runParameters.codeModKey, ["NoMods"] |> List.map string)
-        (runParameters.generationIntervalLastKey, [1] |> List.map string)
         (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+        (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
+        (runParameters.codeModKey, ["NoMods"] |> List.map string)
+        (runParameters.generationIntervalLastKey, [2] |> List.map string)
         (runParameters.paraRateKey,    [1.15;] |> List.map string)
         (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
         (runParameters.mutationModKey, [0;] |> List.map string)
         (runParameters.seedModificationRateKey, [0.020;] |> List.map string)
-        (runParameters.modificationRateKey, [0.020;]  |> List.map string)
+        (runParameters.modificationRateKey, [0.035;]  |> List.map string)
         (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
     ]
             "expInterval100_L50ss"
@@ -51,7 +51,7 @@ let Pool_32_V1 (executorType: sorterSgdExecutorType)  : run =
             dbPool32name
             projName
             (sprintf @"Pool_32_V1%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
-            "Rate comp for Msrs32p4a Msuf4"
+            "Rate comp for 32p4a Msuf4"
             [
         (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
         (runParameters.codeModKey, ["NoMods"] |> List.map string)
@@ -78,7 +78,7 @@ let Pool_512_V2a (executorType: sorterSgdExecutorType)  : run =
             dbPool512name
             projName
             (sprintf @"Pool_512_V2a%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
-            "Rate comp for Msrs32p4a Msuf4"
+            "Rate comp for 32p4a Msuf4"
             [
         (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
         (runParameters.codeModKey, ["NoMods"] |> List.map string)

@@ -21,7 +21,7 @@ let main argv =
     //GeneSort.Dispatch.V1.DispatchSorterSgd.makeParamsAndRun()
     
     //DispatchSortableTests.makeParamsAndRun()
-   // DispatchSorterEval.makeParamsAndRun()
+    DispatchSorterEval.makeParamsAndRun()
     //DispatchSorterMutate.makeParamsAndRun()
     DispatchSorterSgd.makeParamsAndRun()
 

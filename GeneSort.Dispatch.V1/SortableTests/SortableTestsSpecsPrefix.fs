@@ -10,6 +10,25 @@ module SortableTestsSpecsPrefix =
 
     module Specs =
 
+        let Prefix_Test  (executorType: sortableTestsExecutorType) : run =
+            run.SimpleRun (
+                SimpleRun.create
+                    SortableTestsDbs.Prefix.dbNameTest
+                    CommonSortableTests.projectName
+                    (sprintf @"Prefix24-4b_%s" (SortableTestsExecutorType.toString executorType) |> UMX.tag)
+                    "Bitv512 prefix sorter test sets"
+                    [
+                dataFomatBitv512
+                prefixLib_Prefix24_3a
+            ]
+                    QueryCatalogNames.sortableTestPrefix
+                    RunParamBuilderNames.Filter.identity
+                    RunParamBuilderNames.Enhancer.sortableTests
+                    false
+            )
+
+
+
         let Prefix_24s  (executorType: sortableTestsExecutorType) : run =
             run.SimpleRun (
                 SimpleRun.create

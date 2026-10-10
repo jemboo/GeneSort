@@ -66,14 +66,21 @@ module DispatchSorterEval =
 
 
     //********** SorterEval Prefix **********
-    let private configType = SorterEvalSpecsTestPrefix.configType.Prefix_32
+    //let private configType = SorterEvalSpecsTestPrefix.configType.Prefix_32
+    //let private executorType = sorterEvalExecutorType.GenPrefix
+    //let private host: runHost = 
+    //    let run = SorterEvalSpecsTestPrefix.getRun configType executorType
+    //    runHost.Create run 8
+    //let private executor = SorterEvalExecutor.getExecutor executorType
+
+
     let private executorType = sorterEvalExecutorType.GenPrefix
-    let private host: runHost = 
-        let run = SorterEvalSpecsTestPrefix.getRun configType executorType
-        runHost.Create run 8
-
-
+    let private host: runHost = runHost.Create (SorterEvalSpecsTestPrefix.Specs.Prefix_32 executorType) 5
     let private executor = SorterEvalExecutor.getExecutor executorType
+
+
+
+
     let private minReplica = 0<replNumber>
     let private maxReplica = 1<replNumber>
 

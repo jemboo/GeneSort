@@ -53,15 +53,19 @@ module DispatchSortableTests =
 
 
     //********** SortableTests Prefix **********
-    let private configType = SortableTestsSpecsPrefix.configType.Prefix_32
+    //let private configType = SortableTestsSpecsPrefix.configType.Prefix_32
+    //let private executorType = SortableTests.sortableTestsExecutorType.GenPrefix
+    //let private host: runHost = 
+    //    let run = SortableTestsSpecsPrefix.getRun configType executorType
+    //    runHost.Create run 1
+    //let private executor = SortableTestsExecutor.getExecutor executorType
+
     let private executorType = SortableTests.sortableTestsExecutorType.GenPrefix
-    let private host: runHost = 
-        let run = SortableTestsSpecsPrefix.getRun configType executorType
-        runHost.Create run 1
-
-
-
+    let private host: runHost = runHost.Create (SortableTestsSpecsPrefix.Specs.Prefix_32 executorType) 1
     let private executor = SortableTestsExecutor.getExecutor executorType
+
+
+
     let private minReplica = 0<replNumber>
     let private maxReplica = 1<replNumber>
 
