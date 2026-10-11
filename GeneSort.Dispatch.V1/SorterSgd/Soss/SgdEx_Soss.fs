@@ -98,12 +98,13 @@ module SgdEx_Soss =
                     | Net -> randomNet(UMX.tag<randomSeed> (int32 seedSoss)) :> IRando
                     | Smx -> randomSplitMix64(seedSoss) :> IRando
                 let sortableTestsPartitions =
-                    PartitionOfSortableTests.partition sossRng.NextIndex (2 |> UMX.tag<sortableTestsCount>) sortableTests
-                let sortableTestsFirst = sortableTestsPartitions.SortableTests.[UMX.tag<sortableTestsPartitionId> "0"]
-                let sortableTestsSecond = sortableTestsPartitions.SortableTests.[UMX.tag<sortableTestsPartitionId> "1"]
-                log (sprintf "Partitioned sortable tests into two subsets of %d and %d tests."
-                        %(SortableTests.getSortableCount sortableTestsFirst)
-                        %(SortableTests.getSortableCount sortableTestsSecond))
+                    PartitionOfSortableTests.partition sossRng.NextIndex (4 |> UMX.tag<sortableTestsCount>) sortableTests
+                let partitionSizes =
+                    sortableTestsPartitions.SortableTests
+                    |> Map.values
+                    |> Seq.map (fun tests -> string %(SortableTests.getSortableCount tests))
+                    |> String.concat ", "
+                log (sprintf "Partitioned sortable tests into four subsets with test counts: %s." partitionSizes)
 
                 let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces
 

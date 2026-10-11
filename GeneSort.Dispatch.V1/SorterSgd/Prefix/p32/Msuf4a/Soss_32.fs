@@ -14,6 +14,7 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 let projName = "SorterSgd.Soss.32p4a.Msuf" |> UMX.tag<projectName>
 
+let dbPool4name = "Pool_4" |> UMX.tag<databaseName>
 let dbPool32name = "Pool_32" |> UMX.tag<databaseName>
 let dbPool32TestName = "Pool_32_Test" |> UMX.tag<databaseName>
 let dbPool512name = "Pool_512" |> UMX.tag<databaseName>
@@ -30,7 +31,7 @@ let Pool_32_Test (executorType: sorterSgdExecutorType)  : run =
         (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
         (runParameters.seedSossKey, [1234UL] |> List.map string)
         (runParameters.codeModKey, ["NoMods"] |> List.map string)
-        (runParameters.generationIntervalLastKey, [0] |> List.map string)
+        (runParameters.generationIntervalLastKey, [9] |> List.map string)
         (runParameters.paraRateKey,    [1.15;] |> List.map string)
         (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
         (runParameters.mutationModKey, [0;] |> List.map string)
@@ -39,12 +40,44 @@ let Pool_32_Test (executorType: sorterSgdExecutorType)  : run =
         (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
     ]
             "expInterval100_L50ss"
-            "summaryInterval_C.1p5C"
+            "uniformInterval2"
             QueryCatalogNames.sorterSgdMsuf32MutationRate
             RunParamBuilderNames.Filter.identity
             RunParamBuilderNames.Enhancer.msuf32MutationRate
             false
     )
+
+let Pool_4_Test (executorType: sorterSgdExecutorType)  : run =
+    run.SgdRun (
+        SgdRun.create
+            dbPool4name
+            projName
+            (sprintf @"Pool_4_Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag<runName>)
+            "Soss rate comparison for Msuf32p4a"
+            [
+        (runParameters.sorterCountPerPoolKey, [4] |>  List.map string)
+        (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
+        (runParameters.seedSossKey, [1234UL] |> List.map string)
+        (runParameters.codeModKey, ["NoMods"] |> List.map string)
+        (runParameters.generationIntervalLastKey, [5] |> List.map string)
+        (runParameters.paraRateKey,    [1.15;] |> List.map string)
+        (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
+        (runParameters.mutationModKey, [0; 1; 2; 3;] |> List.map string)
+        (runParameters.seedModificationRateKey, [0.020;] |> List.map string)
+        (runParameters.modificationRateKey, [0.035;]  |> List.map string)
+        (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
+    ]
+            "expInterval100_L50ss"
+            "uniformInterval10"
+            QueryCatalogNames.sorterSgdMsuf32MutationRate
+            RunParamBuilderNames.Filter.identity
+            RunParamBuilderNames.Enhancer.msuf32MutationRate
+            false
+    )
+
+
+
+
 
 let Pool_32_V1 (executorType: sorterSgdExecutorType)  : run =
     run.SgdRun (

@@ -13,6 +13,20 @@ module CommonSgdSoss =
 
     let mergedSubsetId = "Merge" |> UMX.tag<sortableTestsSubsetId>
 
+    /// Selects each of four partitions and then Merge for 100 generations apiece.
+    let subsetIdForGeneration
+            (generation: int<generationNumber>)
+            (partitionIds: string<sortableTestsPartitionId> array) =
+        if partitionIds.Length <> 4 then
+            invalidArg "partitionIds" "The 500-generation selection cycle requires four partitions."
+        if %generation < 0 then
+            invalidArg "generation" "Generation must not be negative."
+        let cycleIndex = (%generation % 500) / 100
+        if cycleIndex < partitionIds.Length then
+            UMX.cast<sortableTestsPartitionId, sortableTestsSubsetId> partitionIds.[cycleIndex]
+        else
+            mergedSubsetId
+
     /// Combines explicitly evaluated partitions without evaluating their merged tests again.
     let mergePartitionEvals
             (partitionEvals: Map<string<sortableTestsPartitionId>, Map<Guid<sorterPoolMemberId>, sorterEval>>) =

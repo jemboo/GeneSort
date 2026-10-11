@@ -10,55 +10,8 @@ open System.Diagnostics
 
 module Pipeline_Soss =
 
-    /// Executes one full generational iteration of the algorithm suite
-    let runGenerationStep
-            (mutator: sorterModelMutator)
-            (sorterCountPerPool: int<sorterCountPerPool>)
-            (selectedSorterCountPerPool: int<sorterCountPerPool>)
-            (sorterChildCount: int<sorterChildCount>)
-            (prioritizeNewMutants: bool<prioritizeNewMutants>)
-            (distinctSorterHashes: bool<distinctSorterHashes>)
-            (sortableTests: sortableTests)
-            (prefix: ceBlock)
-            (sorterEvalType: sorterEvalType)
-            (selectionMeasure: sorterEvalMeasure)
-            (reEvaluateParents: bool)
-            (currentPoolSet: sorterPoolSet_Soss) 
-            (collectNewSortableTests: bool<collectNewSortableTests>)
-            (sortedFractionThreshold: float<sortedFraction>) : sorterPoolSet_Soss =
-
-        currentPoolSet
-        // Step 1: Expand the population across all sub-pools
-        |> SorterPoolSet_Soss.mutateAndTrim mutator selectedSorterCountPerPool selectionMeasure sorterChildCount
-        
-        |> (fun (expandedPoolSet: sorterPoolSet_Soss) ->
-                let (computedEvals: Map<Guid<sorterPoolMemberId>, sorterEval>) = 
-                    expandedPoolSet
-                    |> PoolRunner_Soss.evaluatePoolSet 
-                                        sortableTests 
-                                        prefix
-                                        sorterEvalType
-                                        reEvaluateParents
-                                        collectNewSortableTests
-            
-                expandedPoolSet 
-                |> SorterPoolSet_Soss.updateSorterEvals computedEvals
-        )
-        
-        // Step 2b: Adjust the constraint boundaries based on performance thresholds
-        |> SorterPoolSet_Soss.adjustCeLengths sortedFractionThreshold
-        
-        // Step 3: Trim out defective or un-optimized sorters down to baseline target capacities
-        |> SorterPoolSet_Soss.pruneSorterPools 
-                    selectionMeasure
-                    prioritizeNewMutants
-                    distinctSorterHashes 
-                    sorterCountPerPool
-        |> SorterPoolSet_Soss.advanceGeneration 1
-
-
     /// Soss generation step with per-partition and merged evaluations and debug breakpoints
-    let runGenerationStepSossDebug
+    let runGenerationStepSoss
             (mutator: sorterModelMutator)
             (sorterCountPerPool: int<sorterCountPerPool>)
             (selectedSorterCountPerPool: int<sorterCountPerPool>)
@@ -66,11 +19,9 @@ module Pipeline_Soss =
             (prioritizeNewMutants: bool<prioritizeNewMutants>)
             (distinctSorterHashes: bool<distinctSorterHashes>)
             (sortableTestPartitions: partitionOfSortableTests)
-            (subsetIdForSelection: string<sortableTestsSubsetId>)
             (prefix: ceBlock)
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
-            (reEvaluateParents: bool)
             (currentPoolSet: sorterPoolSet_Soss)
             (collectNewSortableTests: bool<collectNewSortableTests>)
             (sortedFractionThreshold: float<sortedFraction>) : sorterPoolSet_Soss =
@@ -79,6 +30,19 @@ module Pipeline_Soss =
         let hasEmptyPool (poolSet: sorterPoolSet_Soss) =
             poolSet.SorterPools
             |> Map.exists (fun _ pool -> Seq.isEmpty pool.SorterPoolMembers)
+
+        let subsetIdForSelection =
+            sortableTestPartitions.SortableTests
+            |> Map.keys
+            |> Seq.toArray
+            |> CommonSgdSoss.subsetIdForGeneration currentPoolSet.GenerationNumber
+
+        // Members retain the selection subset used by the preceding generation step.
+        let reEvaluateParents =
+            currentPoolSet.SorterPools
+            |> Map.values
+            |> Seq.collect (fun pool -> pool.SorterPoolMembers)
+            |> Seq.exists (fun memberValue -> memberValue.SubsetIdForSelection <> subsetIdForSelection)
 
         let poolSetForSelection =
             currentPoolSet

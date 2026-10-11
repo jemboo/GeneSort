@@ -160,14 +160,9 @@ module EvoOrch_Soss =
                                     currentSorterPoolSet
 
                             // Step Evolution
-                            let reEvaluateParents = (remainingSteps % 10 = 0)
-
-                            let (subsetIdForSelection: string<sortableTestsSubsetId>) =
-                                0 |> string |> UMX.tag<sortableTestsSubsetId>
-
 
                             let nextSorterPoolSet = 
-                                Pipeline_Soss.runGenerationStepSossDebug
+                                Pipeline_Soss.runGenerationStepSoss
                                     mutator 
                                     currentSorterCountPerPool
                                     selectedSorterCountPerPool
@@ -175,11 +170,9 @@ module EvoOrch_Soss =
                                     prioritizeNewMutants
                                     distinctSorterHashes
                                     sortableTestPartitions
-                                    subsetIdForSelection
                                     prefix
                                     evalType
                                     srtrEvalMeasure
-                                    reEvaluateParents
                                     poolSetForStep
                                     collectNewSortableTests
                                     sortedFractionThreshold

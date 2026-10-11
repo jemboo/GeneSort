@@ -115,6 +115,27 @@ module private Fixtures =
         finally Directory.Delete(folder, true)
 
 module OutputUnionTests =
+    [<Theory>]
+    [<InlineData(0, "0")>]
+    [<InlineData(99, "0")>]
+    [<InlineData(100, "1")>]
+    [<InlineData(199, "1")>]
+    [<InlineData(200, "2")>]
+    [<InlineData(299, "2")>]
+    [<InlineData(300, "3")>]
+    [<InlineData(399, "3")>]
+    [<InlineData(400, "Merge")>]
+    [<InlineData(499, "Merge")>]
+    [<InlineData(500, "0")>]
+    [<InlineData(600, "1")>]
+    [<InlineData(700, "2")>]
+    [<InlineData(800, "3")>]
+    [<InlineData(900, "Merge")>]
+    let ``Soss selection rotates every 100 generations and repeats after 500`` (generation: int) (expected: string) =
+        let partitions = [| for index in 0 .. 3 -> string index |> UMX.tag<sortableTestsPartitionId> |]
+        let selected = CommonSgdSoss.subsetIdForGeneration (UMX.tag<generationNumber> generation) partitions
+        Assert.Equal(expected, UMX.untag selected)
+
     [<Fact>]
     let ``Soss stores both cast partition evaluations and a separate Merge evaluation`` () =
         let firstPartitionId = UMX.tag<sortableTestsPartitionId> "0"
