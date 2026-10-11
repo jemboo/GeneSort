@@ -24,6 +24,8 @@ type spSummary_Standard =
         _aveStageCrossings: float<stageCrossings>
         _aveReflectiveCountR: float<reflectiveCount>
         _averageUnsortedCount: float
+        _averageSorterPoolScore: float<sorterEvalScore>
+        _minimumSorterPoolScore: float<sorterEvalScore>
     }
 
     member this.RawCeLength with get() = this._rawCeLength
@@ -38,6 +40,10 @@ type spSummary_Standard =
     member this.AveStageCrossings with get() = this._aveStageCrossings
     member this.AveReflectiveCountR with get() = this._aveReflectiveCountR
     member this.AverageUnsortedCount with get() = this._averageUnsortedCount
+    member this.AverageSorterPoolScore = this._averageSorterPoolScore
+    member this.MinimumSorterPoolScore = this._minimumSorterPoolScore
+    member this.WithScores(average: float<sorterEvalScore>, minimum: float<sorterEvalScore>) =
+        { this with _averageSorterPoolScore = average; _minimumSorterPoolScore = minimum }
 
 
     static member create 
@@ -66,6 +72,8 @@ type spSummary_Standard =
           _aveStageCrossings = aveStageCrossings;
           _aveReflectiveCountR = aveReflectiveCountR;
           _averageUnsortedCount = averageUnsortedCount;
+          _averageSorterPoolScore = System.Double.NaN |> UMX.tag<sorterEvalScore>
+          _minimumSorterPoolScore = System.Double.NaN |> UMX.tag<sorterEvalScore>
         }
 
 
@@ -110,6 +118,13 @@ module SorterPoolSetSummary_Standard =
             poolSet.SorterPools 
             |> Seq.map (fun (KeyValue(_, pool)) ->
 
+                let scores = pool.SorterPoolMembers |> Seq.map (fun memberValue -> memberValue.Score) |> Seq.toArray
+                let averageScore, minimumScore =
+                    if Array.isEmpty scores then
+                        let worst = System.Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
+                        worst, worst
+                    else Array.average scores, Array.min scores
+
                 // Get evaluations for all evaluated members in this pool
                 let evals =
                     pool.SorterPoolMembers
@@ -131,6 +146,7 @@ module SorterPoolSetSummary_Standard =
                         (0.0 |> UMX.tag)
                         (0.0 |> UMX.tag)
                         0.0
+                    |> fun summary -> summary.WithScores(averageScore, minimumScore)
                 else
                     // Map out the metrics across all evaluations
                     let ceLengths = evals |> Array.map (fun ev -> float %(SorterEval.getCeLength ev))
@@ -168,6 +184,7 @@ module SorterPoolSetSummary_Standard =
                         aveStageCrossings
                         aveReflectiveCountR
                         averageUnsortedCount
+                    |> fun summary -> summary.WithScores(averageScore, minimumScore)
             )
             |> Seq.toArray
 
@@ -206,4 +223,8 @@ module SorterPoolSetSummary_Standard =
             |> dataTableRecord.addData (sprintf "%sAveStageCrossings" prefix) (sprintf "%.5f" (%poolSum.AveStageCrossings))
             |> dataTableRecord.addData (sprintf "%sAveReflectiveCountR" prefix) (sprintf "%.5f" (%poolSum.AveReflectiveCountR))
             |> dataTableRecord.addData (sprintf "%sAverageUnsortedCount" prefix) (sprintf "%.2f" poolSum.AverageUnsortedCount)
+            |> dataTableRecord.addData (sprintf "%sAverageSorterPoolScore" prefix)
+                (if System.Double.IsNaN %poolSum.AverageSorterPoolScore then "" else UmxExt.floatToRaw poolSum.AverageSorterPoolScore)
+            |> dataTableRecord.addData (sprintf "%sMinimumSorterPoolScore" prefix)
+                (if System.Double.IsNaN %poolSum.MinimumSorterPoolScore then "" else UmxExt.floatToRaw poolSum.MinimumSorterPoolScore)
         )

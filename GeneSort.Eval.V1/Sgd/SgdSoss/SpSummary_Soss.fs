@@ -23,6 +23,8 @@ type spSummary_Soss =
         _aveStageCrossings: float<stageCrossings>
         _aveReflectiveCountR: float<reflectiveCount>
         _averageUnsortedCount: float
+        _averageSorterPoolScore: float<sorterEvalScore>
+        _minimumSorterPoolScore: float<sorterEvalScore>
     }
 
     member this.RawCeLength with get() = this._rawCeLength
@@ -38,6 +40,10 @@ type spSummary_Soss =
     member this.AveStageCrossings with get() = this._aveStageCrossings
     member this.AveReflectiveCountR with get() = this._aveReflectiveCountR
     member this.AverageUnsortedCount with get() = this._averageUnsortedCount
+    member this.AverageSorterPoolScore = this._averageSorterPoolScore
+    member this.MinimumSorterPoolScore = this._minimumSorterPoolScore
+    member this.WithScores(average: float<sorterEvalScore>, minimum: float<sorterEvalScore>) =
+        { this with _averageSorterPoolScore = average; _minimumSorterPoolScore = minimum }
 
 
     static member create 
@@ -68,6 +74,8 @@ type spSummary_Soss =
           _aveStageCrossings = aveStageCrossings;
           _aveReflectiveCountR = aveReflectiveCountR;
           _averageUnsortedCount = averageUnsortedCount;
+          _averageSorterPoolScore = System.Double.NaN |> UMX.tag<sorterEvalScore>
+          _minimumSorterPoolScore = System.Double.NaN |> UMX.tag<sorterEvalScore>
         }
 
 
@@ -113,12 +121,26 @@ module SorterPoolSetSummary_Soss =
             |> Seq.collect (fun (KeyValue(_, pool)) ->
                 let evalsBySubset =
                     pool.SorterPoolMembers
-                    |> Seq.collect (fun memberObj -> memberObj.SorterEvalMap |> Map.toSeq)
+                    |> Seq.collect (fun memberObj ->
+                        memberObj.SorterEvalMap
+                        |> Map.toSeq
+                        |> Seq.map (fun (subsetId, evaluation) ->
+                            subsetId, (evaluation, memberObj.SelectionMeasure)))
                     |> Seq.groupBy fst
 
                 evalsBySubset
                 |> Seq.map (fun (sortableTestsSubsetId, subsetEvals) ->
-                    let evals = subsetEvals |> Seq.map snd |> Seq.toArray
+                    let evaluationsWithMeasures = subsetEvals |> Seq.map snd |> Seq.toArray
+                    let evals = evaluationsWithMeasures |> Array.map fst
+                    // Score this row's subset evaluations, independently of the active selection subset.
+                    let scores =
+                        evaluationsWithMeasures
+                        |> Array.map (fun (evaluation, measure) ->
+                            match measure with
+                            | Some value -> SorterEvalFunctions.getFunctionForMeasure value evaluation
+                            | None -> System.Double.PositiveInfinity |> UMX.tag<sorterEvalScore>)
+                    let averageScore = Array.average scores
+                    let minimumScore = Array.min scores
 
                     // Map out the metrics across all evaluations
                     let ceLengths = evals |> Array.map (fun ev -> float %(SorterEval.getCeLength ev))
@@ -162,6 +184,7 @@ module SorterPoolSetSummary_Soss =
                         aveStageCrossings
                         aveReflectiveCountR
                         averageUnsortedCount
+                    |> fun summary -> summary.WithScores(averageScore, minimumScore)
                 ))
             |> Seq.toArray
 
@@ -201,4 +224,8 @@ module SorterPoolSetSummary_Soss =
             |> dataTableRecord.addData (sprintf "%sAveStageCrossings" prefix) (sprintf "%.5f" (%poolSum.AveStageCrossings))
             |> dataTableRecord.addData (sprintf "%sAveReflectiveCountR" prefix) (sprintf "%.5f" (%poolSum.AveReflectiveCountR))
             |> dataTableRecord.addData (sprintf "%sAverageUnsortedCount" prefix) (sprintf "%.2f" poolSum.AverageUnsortedCount)
+            |> dataTableRecord.addData (sprintf "%sAverageSorterPoolScore" prefix)
+                (if System.Double.IsNaN %poolSum.AverageSorterPoolScore then "" else UmxExt.floatToRaw poolSum.AverageSorterPoolScore)
+            |> dataTableRecord.addData (sprintf "%sMinimumSorterPoolScore" prefix)
+                (if System.Double.IsNaN %poolSum.MinimumSorterPoolScore then "" else UmxExt.floatToRaw poolSum.MinimumSorterPoolScore)
         )

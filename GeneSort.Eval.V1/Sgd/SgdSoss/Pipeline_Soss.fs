@@ -10,6 +10,41 @@ open System.Diagnostics
 
 module Pipeline_Soss =
 
+    /// Evaluates the selected partition, or all partitions when Merge or reporting needs them.
+    let evaluateRequiredPartitions
+            (sortableTestPartitions: partitionOfSortableTests)
+            (prefix: ceBlock)
+            (sorterEvalType: sorterEvalType)
+            (reEvaluateParents: bool)
+            (collectNewSortableTests: bool<collectNewSortableTests>)
+            (subsetIdForSelection: string<sortableTestsSubsetId>)
+            (evaluateAllPartitionsForReport: bool)
+            (poolSet: sorterPoolSet_Soss) =
+        let evaluateAll = evaluateAllPartitionsForReport || subsetIdForSelection = CommonSgdSoss.mergedSubsetId
+        let selectedPartitionId = UMX.cast<sortableTestsSubsetId, sortableTestsPartitionId> subsetIdForSelection
+        let requiredPartitions =
+            sortableTestPartitions.SortableTests
+            |> Map.filter (fun partitionId _ -> evaluateAll || partitionId = selectedPartitionId)
+        if Map.isEmpty requiredPartitions then
+            invalidArg "subsetIdForSelection" (sprintf "Unknown selection subset '%s'." %subsetIdForSelection)
+        let partitionEvals =
+            requiredPartitions
+            |> Map.map (fun partitionId tests ->
+                let subsetId = UMX.cast<sortableTestsPartitionId, sortableTestsSubsetId> partitionId
+                PoolRunner_Soss.evaluatePoolSet tests prefix sorterEvalType reEvaluateParents
+                    collectNewSortableTests
+                    (poolSet |> SorterPoolSet_Soss.withSubsetIdForSelection subsetId)
+                |> Map.map (fun _ eval -> SorterEval.withSortableTestsSubsetId subsetId eval))
+        let evaluatedPoolSet =
+            partitionEvals
+            |> Map.fold (fun updated _ evaluations ->
+                SorterPoolSet_Soss.updateSorterEvals evaluations updated) poolSet
+        if evaluateAll then
+            evaluatedPoolSet
+            |> SorterPoolSet_Soss.updateSorterEvals (CommonSgdSoss.mergePartitionEvals partitionEvals)
+        else
+            evaluatedPoolSet
+
     /// Soss generation step with per-partition and merged evaluations and debug breakpoints
     let runGenerationStepSoss
             (mutator: sorterModelMutator)
@@ -23,6 +58,7 @@ module Pipeline_Soss =
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
             (currentPoolSet: sorterPoolSet_Soss)
+            (evaluateAllPartitionsForReport: bool)
             (collectNewSortableTests: bool<collectNewSortableTests>)
             (sortedFractionThreshold: float<sortedFraction>) : sorterPoolSet_Soss =
 
@@ -53,20 +89,9 @@ module Pipeline_Soss =
            && not (Map.containsKey selectionPartitionId sortableTestPartitions.SortableTests) then
             invalidArg "subsetIdForSelection" (sprintf "Unknown selection subset '%s'." %subsetIdForSelection)
 
-        let evaluatePartitions reEvaluate poolSet =
-            sortableTestPartitions.SortableTests
-            |> Map.map (fun partitionId tests ->
-                let subsetId = UMX.cast<sortableTestsPartitionId, sortableTestsSubsetId> partitionId
-                PoolRunner_Soss.evaluatePoolSet tests prefix sorterEvalType reEvaluate
-                    collectNewSortableTests
-                    (poolSet |> SorterPoolSet_Soss.withSubsetIdForSelection subsetId)
-                |> Map.map (fun _ eval -> SorterEval.withSortableTestsSubsetId subsetId eval))
-
-        let storeEvaluations partitionEvals poolSet =
-            partitionEvals
-            |> Map.fold (fun updated _ evaluations ->
-                SorterPoolSet_Soss.updateSorterEvals evaluations updated) poolSet
-            |> SorterPoolSet_Soss.updateSorterEvals (CommonSgdSoss.mergePartitionEvals partitionEvals)
+        let evaluateForSelection reEvaluate poolSet =
+            evaluateRequiredPartitions sortableTestPartitions prefix sorterEvalType reEvaluate
+                collectNewSortableTests subsetIdForSelection false poolSet
 
         // Seed a newly selected partition before ranking parents, including on the first step.
         let preparedPoolSet =
@@ -76,16 +101,7 @@ module Pipeline_Soss =
                 |> Seq.collect (fun pool -> pool.SorterPoolMembers)
                 |> Seq.exists (fun memberValue -> memberValue.SorterEvalForSelection.IsNone)
             if hasMissingSelectionEval then
-                match Map.tryFind selectionPartitionId sortableTestPartitions.SortableTests with
-                | Some tests ->
-                    let evaluations =
-                        PoolRunner_Soss.evaluatePoolSet tests prefix sorterEvalType false
-                            collectNewSortableTests poolSetForSelection
-                        |> Map.map (fun _ eval -> SorterEval.withSortableTestsSubsetId subsetIdForSelection eval)
-                    SorterPoolSet_Soss.updateSorterEvals evaluations poolSetForSelection
-                | None when subsetIdForSelection = CommonSgdSoss.mergedSubsetId ->
-                    storeEvaluations (evaluatePartitions false poolSetForSelection) poolSetForSelection
-                | None -> invalidArg "subsetIdForSelection" (sprintf "Unknown selection subset '%s'." %subsetIdForSelection)
+                evaluateForSelection false poolSetForSelection
             else
                 poolSetForSelection
 
@@ -102,8 +118,7 @@ module Pipeline_Soss =
 
         // --- Step 1b: Evaluate Pool Set ---
 
-        let partitionEvals = evaluatePartitions reEvaluateParents mutatedPoolSet
-        let evaluatedPoolSet = storeEvaluations partitionEvals mutatedPoolSet
+        let evaluatedPoolSet = evaluateForSelection reEvaluateParents mutatedPoolSet
 
         if hasEmptyPool evaluatedPoolSet && Debugger.IsAttached then
             Debugger.Break() // Pause if evaluation or eval update failed
@@ -131,7 +146,14 @@ module Pipeline_Soss =
             Debugger.Break() // Pause if pruning reduced a pool to zero members
 
         // --- Step 4: Advance Generation Counter ---
-        let finalPoolSet = SorterPoolSet_Soss.advanceGeneration 1 prunedPoolSet
+        // Report-only partitions are needed for survivors, so defer them until after pruning.
+        let poolSetForReport =
+            if evaluateAllPartitionsForReport then
+                evaluateRequiredPartitions sortableTestPartitions prefix sorterEvalType false
+                    collectNewSortableTests subsetIdForSelection true prunedPoolSet
+            else
+                prunedPoolSet
+        let finalPoolSet = SorterPoolSet_Soss.advanceGeneration 1 poolSetForReport
 
         finalPoolSet
 

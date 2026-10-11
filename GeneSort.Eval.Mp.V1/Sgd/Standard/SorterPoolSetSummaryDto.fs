@@ -27,6 +27,8 @@ type sorterPoolSummaryDto = {
     stdDevStageLength: float
     aveReflectiveCount: float
     averageUnsortedCount: float
+    averageSorterPoolScore: float option
+    minimumSorterPoolScore: float option
 }
 
 type sorterPoolSetSummaryDto = {
@@ -65,6 +67,8 @@ module SorterPoolSetSummaryDto =
                     stdDevStageLength = UMX.untag p.StdDevStageLength
                     aveReflectiveCount = UMX.untag p.AveReflectiveCountR
                     averageUnsortedCount = p.AverageUnsortedCount
+                    averageSorterPoolScore = if Double.IsNaN %p.AverageSorterPoolScore then None else Some %p.AverageSorterPoolScore
+                    minimumSorterPoolScore = if Double.IsNaN %p.MinimumSorterPoolScore then None else Some %p.MinimumSorterPoolScore
                 }
             )
         {
@@ -91,6 +95,9 @@ module SorterPoolSetSummaryDto =
                     (p.aveStageCrossings |> UMX.tag<stageCrossings>)
                     (p.aveReflectiveCount |> UMX.tag<reflectiveCount>)
                     p.averageUnsortedCount
+                |> fun summary -> summary.WithScores(
+                    p.averageSorterPoolScore |> Option.defaultValue Double.NaN |> UMX.tag,
+                    p.minimumSorterPoolScore |> Option.defaultValue Double.NaN |> UMX.tag)
             )
         sorterPoolSetSummary_Standard.Create(
             UMX.tag dto.sorterPoolSetId, 

@@ -86,6 +86,16 @@ type sorterPoolDescription =
     member this.SorterPoolId with get() = this._sorterPoolId
     member this.SorterPoolName with get() = this._sorterPoolName
     member this.SorterPoolMembers with get() = this._sorterPoolMembers
+    member this.AverageScore : float<sorterEvalScore> =
+        if Array.isEmpty this._sorterPoolMembers then
+            System.Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
+        else
+            this._sorterPoolMembers |> Array.averageBy (fun memberDesc -> memberDesc.Score)
+    member this.MinimumScore : float<sorterEvalScore> =
+        if Array.isEmpty this._sorterPoolMembers then
+            System.Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
+        else
+            this._sorterPoolMembers |> Array.map (fun memberDesc -> memberDesc.Score) |> Array.min
 
     static member create 
                     (poolId: Guid<sorterPoolId>) 
@@ -166,6 +176,8 @@ module SorterPoolSetDescription =
                 |> dataTableRecord.addData (sprintf "%sSorterPoolId" prefix) (string (%poolDesc.SorterPoolId))
                 |> dataTableRecord.addData (sprintf "%sRawCeLength" prefix) (string (%poolDesc.RawCeLength))
                 |> dataTableRecord.addData (sprintf "%sSorterPoolName" prefix) (string (%poolDesc.SorterPoolName))
+                |> dataTableRecord.addData (sprintf "%sAverageSorterPoolScore" prefix) (UmxExt.floatToRaw poolDesc.AverageScore)
+                |> dataTableRecord.addData (sprintf "%sMinimumSorterPoolScore" prefix) (UmxExt.floatToRaw poolDesc.MinimumScore)
 
             // 2b. Emit one record for every sortable-test subset evaluation on each member.
             poolDesc.SorterPoolMembers

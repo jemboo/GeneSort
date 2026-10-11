@@ -139,10 +139,23 @@ module EvoOrch_Soss =
                             if shouldSummaryReport then
                                 log (sprintf "Starting evolution step. Generation %d of %d" currentGen totalGen)
 
+                            // Complete partition evaluations before the incoming-generation snapshot.
+                            let poolSetForSummary =
+                                if shouldSummaryReport then
+                                    let subsetId =
+                                        sortableTestPartitions.SortableTests
+                                        |> Map.keys
+                                        |> Seq.toArray
+                                        |> CommonSgdSoss.subsetIdForGeneration currentSorterPoolSet.GenerationNumber
+                                    Pipeline_Soss.evaluateRequiredPartitions sortableTestPartitions prefix evalType false
+                                        collectNewSortableTests subsetId true currentSorterPoolSet
+                                else
+                                    currentSorterPoolSet
+
                             // Snapshot summary before applying structural changes
                             let updatedSorterPoolSetSummary = 
                                 if shouldSummaryReport then 
-                                    let currentSnapshot = SorterPoolSetSummary_Soss.fromPoolSet currentSorterPoolSet
+                                    let currentSnapshot = SorterPoolSetSummary_Soss.fromPoolSet poolSetForSummary
                                     currentSnapshot :: historyAcc
                                 else 
                                     historyAcc
@@ -153,11 +166,11 @@ module EvoOrch_Soss =
                                     let expansionRate = optSorterPoolExpansionRate.Value
                                     let poolMeasure = optPoolMeasure.Value
                                     log (sprintf "Expanding pools at Generation %d (Rate: %d)..." %currentGen %expansionRate)
-                                    currentSorterPoolSet
+                                    poolSetForSummary
                                     |> SorterPoolSet_Soss.trimPools expansionRate poolMeasure
                                     |> SorterPoolSet_Soss.expandPools expansionRate
                                 else
-                                    currentSorterPoolSet
+                                    poolSetForSummary
 
                             // Step Evolution
 
@@ -174,6 +187,7 @@ module EvoOrch_Soss =
                                     evalType
                                     srtrEvalMeasure
                                     poolSetForStep
+                                    shouldSummaryReport
                                     collectNewSortableTests
                                     sortedFractionThreshold
 

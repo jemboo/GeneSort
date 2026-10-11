@@ -115,6 +115,194 @@ module private Fixtures =
         finally Directory.Delete(folder, true)
 
 module OutputUnionTests =
+    [<Theory>]
+    [<InlineData(false, false)>]
+    [<InlineData(true, false)>]
+    [<InlineData(false, true)>]
+    [<InlineData(true, true)>]
+    let ``reports pool score statistics once per member within each pool`` (useSoss: bool) (summaryReport: bool) =
+        MessagePackSetup.configure()
+        let measure = stageLengthMeasure.create false false |> sorterEvalMeasure.StageLength
+        let makeMember (stageCount: int) =
+            let modelId = UMX.tag<sorterModelId> (Guid.NewGuid())
+            let model = msce.create modelId 32<sortingWidth> [|1|] |> simpleSorterModel.Msce |> sorterModel.Simple
+            let evaluation =
+                sorterEvalV2.create (UMX.cast<sorterModelId, sorterId> modelId) Fixtures.subsetId 32<sortingWidth> 3<sortableCount>
+                    7<sequenceHash> (UMX.tag<stageLength> stageCount) [||] (UMX.tag false) (UMX.tag 1) 0<reflectiveCount>
+                |> sorterEval.V2
+            spMember_Standard.create (UMX.tag<sorterPoolMemberId> (Guid.NewGuid())) model 0<mutationIndex> 5<mutationMod>
+                None (Some evaluation) 0<generationNumber>
+            |> SpMember_Standard.withSelectionMeasure measure
+        let makePool (name: string) members =
+            sorterPool_Standard.create (UMX.tag<sorterPoolId> (Guid.NewGuid())) None (UMX.tag<sorterPoolName> name)
+                (D1 0) members 100<ceLength> 5<mutationMod>
+        let standard =
+            sorterPoolSet_Standard.create Fixtures.standard.SorterPoolSetId 0<generationNumber> (Dim1 2)
+                (Some [makePool "first" [|makeMember 2; makeMember 8|]; makePool "second" [|makeMember 11|]])
+        let rows =
+            if useSoss then
+                let soss = standard |> SorterPoolSet_Soss.fromStandard |> SorterPoolSet_Soss.withSubsetIdForSelection Fixtures.subsetId
+                let firstPool = soss.SorterPools |> Map.values |> Seq.find (fun pool -> %pool.Name = "first")
+                let lowMember = firstPool.SorterPoolMembers |> Seq.find (fun memberValue -> %memberValue.Score = 2.0)
+                // Extra evaluation rows must not give this member extra weight in the pool average.
+                let expandedMember =
+                    ["extra-A"; "extra-B"]
+                    |> List.fold (fun memberValue subset ->
+                        let evaluation = lowMember.SorterEvalForSelection.Value |> SorterEval.withSortableTestsSubsetId (UMX.tag subset)
+                        memberValue |> SpMember_Soss.withEval (Some evaluation)) lowMember
+                let expandedPool = firstPool |> SorterPool_Soss.upsertMember expandedMember
+                let poolSet = soss |> SorterPoolSet_Soss.upsertPool expandedPool
+                if summaryReport then
+                    let dto =
+                        poolSet |> SorterPoolSetSummary_Soss.fromPoolSet
+                        |> GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetSummaryDto.toDto
+                    let bytes = MessagePackSerializer.Serialize(dto)
+                    MessagePackSerializer.Deserialize<GeneSort.Eval.Mp.V1.Sgd.Soss.sorterPoolSetSummaryDto>(bytes)
+                    |> GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetSummaryDto.fromDto
+                    |> SorterPoolSetSummary_Soss.toDataTableRecords ""
+                else
+                    poolSet
+                    |> GeneSort.Eval.V1.Sgd.Soss.SorterPoolSetDescription.toDataTableRecordsSnapshot ""
+                    |> Seq.toArray
+            else
+                if summaryReport then
+                    let dto = standard |> SorterPoolSetSummary_Standard.fromPoolSet |> SorterPoolSetSummaryDto.toDto
+                    let bytes = MessagePackSerializer.Serialize(dto)
+                    MessagePackSerializer.Deserialize<sorterPoolSetSummaryDto>(bytes)
+                    |> SorterPoolSetSummaryDto.fromDto
+                    |> SorterPoolSetSummary_Standard.toDataTableRecords ""
+                else
+                    standard
+                    |> GeneSort.Eval.V1.Sgd.Standard.SorterPoolSetDescription.toDataTableRecordsSnapshot ""
+                    |> Seq.toArray
+        let expectedRows = if summaryReport then (if useSoss then 4 else 2) else (if useSoss then 5 else 3)
+        Assert.Equal(expectedRows, rows.Length)
+        for row in rows do
+            let expectedAverage, expectedMinimum =
+                if useSoss && summaryReport && row.Data.["SortableTestsSubsetId"].StartsWith("extra-") then "2", "2"
+                elif row.Data.["SorterPoolName"] = "first" then "5", "2"
+                else "11", "11"
+            Assert.Equal(expectedAverage, row.Data.["AverageSorterPoolScore"])
+            Assert.Equal(expectedMinimum, row.Data.["MinimumSorterPoolScore"])
+            if not summaryReport then Assert.True(row.Data.ContainsKey "Score")
+
+    [<Fact>]
+    let ``Soss summary scores use each subset evaluation independently of selection`` () =
+        MessagePackSetup.configure()
+        let measure = stageLengthMeasure.create false false |> sorterEvalMeasure.StageLength
+        let makeMember (stageCounts: int list) =
+            let memberId = UMX.tag<sorterPoolMemberId> (Guid.NewGuid())
+            let evaluations =
+                List.zip ["0"; "1"; "Merge"] stageCounts
+                |> List.map (fun (subset, stageCount) ->
+                    let subsetId = UMX.tag<sortableTestsSubsetId> subset
+                    let evaluation =
+                        sorterEvalV2.create (UMX.cast<sorterPoolMemberId, sorterId> memberId) subsetId 32<sortingWidth> 3<sortableCount>
+                            7<sequenceHash> (UMX.tag<stageLength> stageCount) [||] (UMX.tag false) (UMX.tag 1) 0<reflectiveCount>
+                        |> sorterEval.V2
+                    subsetId, evaluation)
+                |> Map.ofList
+            spMember_Soss.create memberId sorterModel.Unknown 0<mutationIndex> 5<mutationMod> None evaluations 0<generationNumber>
+            |> SpMember_Soss.withSelectionMeasure measure
+        let pool =
+            sorterPool_Soss.create Fixtures.poolId None Fixtures.poolStandard.Name (D1 0)
+                [| makeMember [2; 10; 20]; makeMember [8; 14; 30] |] 100<ceLength> 5<mutationMod>
+        let poolSet = Fixtures.soss |> SorterPoolSet_Soss.upsertPool pool
+        for selection in ["0"; "1"; "Merge"] do
+            let dto =
+                poolSet |> SorterPoolSet_Soss.withSubsetIdForSelection (UMX.tag selection)
+                |> SorterPoolSetSummary_Soss.fromPoolSet
+                |> GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetSummaryDto.toDto
+            let bytes = MessagePackSerializer.Serialize(dto)
+            let rows =
+                MessagePackSerializer.Deserialize<GeneSort.Eval.Mp.V1.Sgd.Soss.sorterPoolSetSummaryDto>(bytes)
+                |> GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetSummaryDto.fromDto
+                |> SorterPoolSetSummary_Soss.toDataTableRecords ""
+            Assert.Equal(3, rows.Length)
+            for row in rows do
+                let average, minimum =
+                    match row.Data.["SortableTestsSubsetId"] with
+                    | "0" -> "5", "2"
+                    | "1" -> "12", "10"
+                    | "Merge" -> "25", "20"
+                    | other -> failwithf "Unexpected subset %s" other
+                Assert.Equal(average, row.Data.["AverageSorterPoolScore"])
+                Assert.Equal(minimum, row.Data.["MinimumSorterPoolScore"])
+
+    [<Fact>]
+    let ``summaries without recorded score statistics leave score columns blank`` () =
+        let standard = Fixtures.summarySetStandard.SorterPoolSetSummaries.[0] |> SorterPoolSetSummaryDto.toDto
+        let soss = Fixtures.summarySetSoss.SorterPoolSetSummaries.[0] |> GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetSummaryDto.toDto
+        Assert.True(standard.sorterPoolSummaryDtos.[0].averageSorterPoolScore.IsNone)
+        Assert.True(soss.sorterPoolSummaryDtos.[0].minimumSorterPoolScore.IsNone)
+        let rows =
+            Array.append
+                (standard |> SorterPoolSetSummaryDto.fromDto |> SorterPoolSetSummary_Standard.toDataTableRecords "")
+                (soss |> GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetSummaryDto.fromDto |> SorterPoolSetSummary_Soss.toDataTableRecords "")
+        for row in rows do
+            Assert.Equal("", row.Data.["AverageSorterPoolScore"])
+            Assert.Equal("", row.Data.["MinimumSorterPoolScore"])
+
+    [<Fact>]
+    let ``Soss skips unneeded partitions and does not merge a partial evaluation`` () =
+        let selectedId = UMX.tag<sortableTestsSubsetId> "0"
+        let tests =
+            GeneSort.Sorting.Sortable.sortableBinaryTests.create (UMX.tag<sortableTestsId> (Guid.NewGuid()))
+                32<sortingWidth> [| GeneSort.Sorting.Sortable.sortableBoolArray.create(Array.zeroCreate<bool> 32, 32<sortingWidth>) |]
+            |> GeneSort.Sorting.Sortable.sortableTests.Bools
+        let partitions =
+            [0 .. 3]
+            |> List.map (fun index -> UMX.tag<sortableTestsPartitionId> (string index), tests)
+            |> Map.ofList
+            |> GeneSort.Sorting.Sortable.partitionOfSortableTests.create
+        let cachedEval = SorterEval.withSortableTestsSubsetId selectedId Fixtures.evaluation
+        let memberValue =
+            Fixtures.soss.SorterPools.[Fixtures.poolId].SorterPoolMembers |> Seq.exactlyOne
+            |> SpMember_Soss.withEval None
+            |> SpMember_Soss.withEval (Some cachedEval)
+        let pool = Fixtures.soss.SorterPools.[Fixtures.poolId] |> SorterPool_Soss.upsertMember memberValue
+        let poolSet = Fixtures.soss |> SorterPoolSet_Soss.upsertPool pool
+        // Unknown models would fail if any of the other, uncached partitions were evaluated.
+        let evaluated =
+            Pipeline_Soss.evaluateRequiredPartitions partitions Unchecked.defaultof<_> sorterEvalType.V2 false
+                (UMX.tag<collectNewSortableTests> false) selectedId false poolSet
+        let result = evaluated.SorterPools.[Fixtures.poolId].SorterPoolMembers |> Seq.exactlyOne
+        Assert.Equal(1, result.SorterEvalMap.Count)
+        Assert.True(result.SorterEvalMap.[selectedId] = cachedEval)
+        Assert.False(Map.containsKey CommonSgdSoss.mergedSubsetId result.SorterEvalMap)
+
+    [<Theory>]
+    [<InlineData("Merge", false)>]
+    [<InlineData("0", true)>]
+    let ``Soss completes all partition evaluations for Merge and reports`` (selection: string) (forReport: bool) =
+        let selectedId = UMX.tag<sortableTestsSubsetId> selection
+        let tests =
+            GeneSort.Sorting.Sortable.sortableBinaryTests.create (UMX.tag<sortableTestsId> (Guid.NewGuid()))
+                32<sortingWidth> [| GeneSort.Sorting.Sortable.sortableBoolArray.create(Array.zeroCreate<bool> 32, 32<sortingWidth>) |]
+            |> GeneSort.Sorting.Sortable.sortableTests.Bools
+        let partitions =
+            [0 .. 3]
+            |> List.map (fun index -> UMX.tag<sortableTestsPartitionId> (string index), tests)
+            |> Map.ofList
+            |> GeneSort.Sorting.Sortable.partitionOfSortableTests.create
+        let memberValue =
+            Fixtures.soss.SorterPools.[Fixtures.poolId].SorterPoolMembers |> Seq.exactlyOne
+            |> SpMember_Soss.withEval None
+            |> SpMember_Soss.withSubsetIdForSelection selectedId
+        let cachedMember =
+            [0 .. 3] |> List.fold (fun memberValue index ->
+                let evaluation = SorterEval.withSortableTestsSubsetId (UMX.tag<sortableTestsSubsetId> (string index)) Fixtures.evaluation
+                memberValue |> SpMember_Soss.withEval (Some evaluation)) memberValue
+        let pool = Fixtures.soss.SorterPools.[Fixtures.poolId] |> SorterPool_Soss.upsertMember cachedMember
+        let poolSet = Fixtures.soss |> SorterPoolSet_Soss.upsertPool pool
+        let evaluated =
+            Pipeline_Soss.evaluateRequiredPartitions partitions Unchecked.defaultof<_> sorterEvalType.V2 false
+                (UMX.tag<collectNewSortableTests> false) selectedId forReport poolSet
+        let result = evaluated.SorterPools.[Fixtures.poolId].SorterPoolMembers |> Seq.exactlyOne
+        Assert.Equal(5, result.SorterEvalMap.Count)
+        Assert.True(result.SubsetIdForSelection = selectedId)
+        Assert.True(SorterEval.getSortableTestsSubsetId result.SorterEvalMap.[CommonSgdSoss.mergedSubsetId] = CommonSgdSoss.mergedSubsetId)
+
     [<Fact>]
     let ``member scores follow evaluation updates and Soss subset changes`` () =
         let measure = stageLengthMeasure.create false false |> sorterEvalMeasure.StageLength
