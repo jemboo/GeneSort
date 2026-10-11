@@ -54,6 +54,11 @@ type sorterPoolSet_Soss =
 
 module SorterPoolSet_Soss =
 
+    let withSelectionMeasure measure (poolSet: sorterPoolSet_Soss) =
+        let pools = poolSet._sorterPools |> Map.map (fun _ pool ->
+            SorterPool_Soss.withSelectionMeasure measure pool)
+        { poolSet with _sorterPools = pools }
+
     let withSubsetIdForSelection subsetIdForSelection (poolSet: sorterPoolSet_Soss) =
         { poolSet with
             _sorterPools = poolSet._sorterPools |> Map.map (fun _ pool ->
@@ -75,7 +80,11 @@ module SorterPoolSet_Soss =
                             |> Option.defaultValue Map.empty
                         spMember_Soss.create memberValue.SorterPoolMemberId memberValue.SorterModel
                             memberValue.MutationIndex memberValue.MutationMod memberValue.SorterMutationSource
-                            evaluations memberValue.Birthday)
+                            evaluations memberValue.Birthday
+                        |> fun converted ->
+                            match memberValue.SelectionMeasure with
+                            | Some measure -> converted |> SpMember_Soss.withSelectionMeasure measure
+                            | None -> converted)
                     |> Seq.toArray
                 sorterPool_Soss.create pool.SorterPoolId pool.ParentSorterPoolId pool.Name pool.SorterPoolTag
                     members pool.RawCeLength pool.MutationMod)

@@ -19,6 +19,7 @@ type sorterPoolMemberDto = {
     sorterMutationMod: int
     sorterMutationSource: sorterMutationSourceDto option
     sorterEvalDto: sorterEvalDto option
+    selectionMeasure: sorterEvalMeasureDto option
     birthday: int
 }
 
@@ -56,6 +57,7 @@ module SorterPoolSetDto_Standard =
                             sorterMutationMod = UMX.untag m.MutationMod
                             sorterMutationSource = m.SorterMutationSource |> Option.map SorterMutationSourceDto.toDto
                             sorterEvalDto = m.SorterEval |> Option.map SorterEvalDto.fromDomain
+                            selectionMeasure = m.SelectionMeasure |> Option.map SorterEvalMeasureDto.fromDomain
                             birthday = m.Birthday |> UMX.untag
                         }
                     )
@@ -98,6 +100,10 @@ module SorterPoolSetDto_Standard =
                             sourceOpt
                             evaluation
                             (UMX.tag m.birthday)
+                        |> fun memberValue ->
+                            match m.selectionMeasure with
+                            | Some measure -> memberValue |> SpMember_Standard.withSelectionMeasure (SorterEvalMeasureDto.toDomain measure)
+                            | None -> memberValue
                     )
                 let parentIdOpt = 
                     p.parentSorterPoolId 

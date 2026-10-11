@@ -16,6 +16,7 @@ type spDescription_Standard =
         _mutationIndex:        int<mutationIndex>
         _sorterMutationSource: sorterMutationSource option
         _sorterEval:           sorterEval option
+        _score:               float<sorterEvalScore>
         _birthday:             int<generationNumber>
     }
     member this.Birthday with get() = this._birthday
@@ -24,8 +25,9 @@ type spDescription_Standard =
     member this.MutationIndex with get() = this._mutationIndex
     member this.SorterMutationSource with get() = this._sorterMutationSource
     member this.SorterEval with get() = this._sorterEval
+    member this.Score = this._score
 
-    static member create poolMemberId modelId mutationIndex mutationSource evaluation birthday =
+    static member create poolMemberId modelId mutationIndex mutationSource evaluation birthday score =
         {
             _sorterPoolMemberId = poolMemberId
             _sorterModelId = modelId
@@ -33,6 +35,7 @@ type spDescription_Standard =
             _sorterMutationSource = mutationSource
             _sorterEval = evaluation
             _birthday = birthday
+            _score = score
         }
 
 
@@ -47,6 +50,7 @@ module SpDescription_Standard =
             |> dataTableRecord.addData (sprintf "%sSorterModelId" prefix) (string (%spmDesc.SorterModelId))
             |> dataTableRecord.addData (sprintf "%sMutationIndex" prefix) (string (%spmDesc.MutationIndex))
             |> dataTableRecord.addData (sprintf "%sBirthday" prefix) (string (%spmDesc.Birthday))
+            |> dataTableRecord.addData (sprintf "%sScore" prefix) (UmxExt.floatToRaw spmDesc.Score)
 
         // 2. Flatten optional sorterMutationSource properties if present
         let sourceRecord =
@@ -123,6 +127,7 @@ module SorterPoolSetDescription =
                             spm.SorterMutationSource
                             spm.SorterEval
                             spm.Birthday
+                            spm.Score
                     )
                     |> Seq.toArray
 

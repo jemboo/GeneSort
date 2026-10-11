@@ -47,13 +47,17 @@ module SgdEx_Soss =
                     true // reEvaluateParents
                     (false |> UMX.tag<collectNewSortableTests>)
             
-            let evaluatedSeedSet = seedPoolSet |> SorterPoolSet_Soss.updateSorterEvals computedEvals
+            let! selectionMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
+            let evaluatedSeedSet =
+                seedPoolSet
+                |> SorterPoolSet_Soss.updateSorterEvals computedEvals
+                |> SorterPoolSet_Soss.withSelectionMeasure selectionMeasure
 
             // Save SorterPoolSetSummaries
             let! qpSsrr = 
                 genDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterPoolSet "")
                 |> Result.ofOption "Failed to create QueryParams for seedSorterRunResult."   
-            do! genDb.saveAsync qpSsrr (seedPoolSet |> sorterPoolSet.Soss |> outputData.SorterPoolSet) (false |> UMX.tag<allowOverwrite>)
+            do! genDb.saveAsync qpSsrr (evaluatedSeedSet |> sorterPoolSet.Soss |> outputData.SorterPoolSet) (false |> UMX.tag<allowOverwrite>)
             log (sprintf "Initial seedSorterPoolSet saved at generation %d." %evaluatedSeedSet.GenerationNumber)
 
             return evaluatedSeedSet

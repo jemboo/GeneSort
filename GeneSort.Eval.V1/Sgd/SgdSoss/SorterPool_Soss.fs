@@ -55,6 +55,11 @@ type sorterPool_Soss =
 
 module SorterPool_Soss = 
 
+    let withSelectionMeasure measure (pool: sorterPool_Soss) =
+        let members = pool._sorterPoolMembers |> Map.map (fun _ memberValue ->
+            SpMember_Soss.withSelectionMeasure measure memberValue)
+        { pool with _sorterPoolMembers = members }
+
     let withSubsetIdForSelection subsetIdForSelection (pool: sorterPool_Soss) =
         { pool with
             _sorterPoolMembers = pool._sorterPoolMembers |> Map.map (fun _ memberValue ->
@@ -216,13 +221,11 @@ module SorterPool_Soss =
             (currentGeneration: int<generationNumber>)
             (pool: sorterPool_Soss) : sorterPool_Soss =
 
-        let scoreFunc = SorterEvalFunctions.getFunctionForMeasure selectionMeasure
+        let pool = pool |> withSelectionMeasure selectionMeasure
 
         // Helper function to rank and extract a score for sorting
         let getScore (spm: spMember_Soss) =
-            match spm.SorterEvalForSelection with
-            | Some eval -> scoreFunc eval
-            | None -> System.Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
+            spm.Score
 
         // 1. Generate mutants for ALL original members and collect updated parents + children
         let updatedParents, allChildren =
@@ -326,7 +329,7 @@ module SorterPool_Soss =
                 (sorterCountPerPool: int<sorterCountPerPool>) : sorterPool_Soss =
         
         let targetSize = max 0 %sorterCountPerPool
-        let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
+        let pool = pool |> withSelectionMeasure measure
         let filterUnsorted = SorterEvalFunctions.getFilterUnsortedFlag measure
 
         let filter1 =
@@ -356,10 +359,7 @@ module SorterPool_Soss =
             // Step 2: Score members and construct the sorting key matrix
             // Unevaluated members (None) get Double.PositiveInfinity (worst possible score)
             |> Seq.map (fun spm ->
-                let score = 
-                    match spm.SorterEvalForSelection with
-                    | Some eval -> scoreFunc eval
-                    | None -> Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
+                let score = spm.Score
                 (score, spm)
             )
             // Step 3: Sort ascending (best scores first). 
@@ -399,7 +399,7 @@ module SorterPool_Soss =
             (sorterCountPerPool: int<sorterCountPerPool>) : sorterPool_Soss =
 
         let targetSize = max 0 %sorterCountPerPool
-        let scoreFunc = SorterEvalFunctions.getFunctionForMeasure measure
+        let pool = pool |> withSelectionMeasure measure
         let filterUnsorted = SorterEvalFunctions.getFilterUnsortedFlag measure
 
         let initialMembers = pool.SorterPoolMembers |> Seq.toArray
@@ -449,10 +449,7 @@ module SorterPool_Soss =
         let scoredMembers =
             filter2Members
             |> Array.map (fun spm ->
-                let score = 
-                    match spm.SorterEvalForSelection with
-                    | Some eval -> scoreFunc eval
-                    | None -> Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
+                let score = spm.Score
             
                 let mIndexRaw = %spm.MutationIndex
                 let tieBreaker = if %prioritizeNewMutants then mIndexRaw else -mIndexRaw

@@ -54,6 +54,11 @@ type sorterPoolSet_Standard =
 
 module SorterPoolSet_Standard =
 
+    let withSelectionMeasure measure (poolSet: sorterPoolSet_Standard) =
+        let pools = poolSet._sorterPools |> Map.map (fun _ pool ->
+            SorterPool_Standard.withSelectionMeasure measure pool)
+        { poolSet with _sorterPools = pools }
+
     /// Safely attempts to find a specific SorterPool within the set
     let tryFindPool (poolId: Guid<sorterPoolId>) (poolSet: sorterPoolSet_Standard) : sorterPool_Standard option =
         Map.tryFind poolId poolSet._sorterPools

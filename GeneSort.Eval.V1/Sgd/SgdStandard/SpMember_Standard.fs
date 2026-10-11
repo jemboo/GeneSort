@@ -16,6 +16,7 @@ type spMember_Standard =
         _mutationMod:          int<mutationMod>
         _sorterMutationSource: sorterMutationSource option
         _sorterEval:           sorterEval option
+        _selectionMeasure:     sorterEvalMeasure option
         _birthday:             int<generationNumber>
     }
 
@@ -28,6 +29,11 @@ type spMember_Standard =
     member this.MutationMod = this._mutationMod
     member this.SorterMutationSource = this._sorterMutationSource
     member this.SorterEval = this._sorterEval
+    member this.SelectionMeasure = this._selectionMeasure
+    member this.Score : float<sorterEvalScore> =
+        match this._selectionMeasure, this.SorterEval with
+        | Some measure, Some evaluation -> SorterEvalFunctions.getFunctionForMeasure measure evaluation
+        | _ -> Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
 
     static member create 
                     sorterPoolMemberId 
@@ -44,11 +50,15 @@ type spMember_Standard =
             _mutationMod = mutationMod
             _sorterMutationSource = sorterMutationSource
             _sorterEval = sorterEval
+            _selectionMeasure = None
             _birthday = birthday
         }
 
 
 module SpMember_Standard =
+
+    let withSelectionMeasure measure (spm: spMember_Standard) =
+        { spm with _selectionMeasure = Some measure }
 
     /// Increments a member's mutation index by a given integer value
     let advanceIndex (offset: int) (spm: spMember_Standard) : spMember_Standard =
@@ -116,6 +126,7 @@ module SpMember_Standard =
                     (Some mutationSource)
                     None                    // New mutants start unevaluated
                     currentGeneration
+                |> fun child -> { child with _selectionMeasure = spm.SelectionMeasure }
             )
 
         // Increment the parent's SorterMutationIndex by the number of mutants produced

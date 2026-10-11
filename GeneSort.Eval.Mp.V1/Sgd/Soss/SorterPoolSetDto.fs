@@ -22,6 +22,7 @@ type sorterPoolMemberDto = {
     sorterEvalDto: sorterEvalDto option
     sorterEvalDtos: Map<string, sorterEvalDto>
     subsetIdForSelection: string
+    selectionMeasure: sorterEvalMeasureDto option
     birthday: int
 }
 
@@ -60,6 +61,7 @@ module SorterPoolSetDto_Soss =
                             sorterMutationSource = m.SorterMutationSource |> Option.map SorterMutationSourceDto.toDto
                             sorterEvalDto = m.SorterEvalForSelection |> Option.map SorterEvalDto.fromDomain
                             subsetIdForSelection = %m.SubsetIdForSelection
+                            selectionMeasure = m.SelectionMeasure |> Option.map SorterEvalMeasureDto.fromDomain
                             sorterEvalDtos =
                                 m.SorterEvalMap
                                 |> Map.toSeq
@@ -124,6 +126,10 @@ module SorterPoolSetDto_Soss =
                         |> SpMember_Soss.withSubsetIdForSelection
                             (if isNull m.subsetIdForSelection then SortableTestsSubsetId.Default
                              else UMX.tag<sortableTestsSubsetId> m.subsetIdForSelection)
+                        |> fun memberValue ->
+                            match m.selectionMeasure with
+                            | Some measure -> memberValue |> SpMember_Soss.withSelectionMeasure (SorterEvalMeasureDto.toDomain measure)
+                            | None -> memberValue
                     )
                 let parentIdOpt = 
                     p.parentSorterPoolId 

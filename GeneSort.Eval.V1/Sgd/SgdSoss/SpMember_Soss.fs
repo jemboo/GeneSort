@@ -17,6 +17,7 @@ type spMember_Soss =
         _sorterMutationSource: sorterMutationSource option
         _sorterEvalMap:        Map<string<sortableTestsSubsetId>, sorterEval>
         _subsetIdForSelection: string<sortableTestsSubsetId>
+        _selectionMeasure:     sorterEvalMeasure option
         _birthday:             int<generationNumber>
     }
 
@@ -31,6 +32,11 @@ type spMember_Soss =
     member this.SorterEvalMap = this._sorterEvalMap
     member this.SubsetIdForSelection = this._subsetIdForSelection
     member this.SorterEvalForSelection = Map.tryFind this._subsetIdForSelection this._sorterEvalMap
+    member this.SelectionMeasure = this._selectionMeasure
+    member this.Score : float<sorterEvalScore> =
+        match this._selectionMeasure, this.SorterEvalForSelection with
+        | Some measure, Some evaluation -> SorterEvalFunctions.getFunctionForMeasure measure evaluation
+        | _ -> Double.PositiveInfinity |> UMX.tag<sorterEvalScore>
 
     static member create 
                     sorterPoolMemberId 
@@ -48,11 +54,15 @@ type spMember_Soss =
             _sorterMutationSource = sorterMutationSource
             _sorterEvalMap = sorterEval
             _subsetIdForSelection = SortableTestsSubsetId.Default
+            _selectionMeasure = None
             _birthday = birthday
         }
 
 
 module SpMember_Soss =
+
+    let withSelectionMeasure measure (spm: spMember_Soss) =
+        { spm with _selectionMeasure = Some measure }
 
     let withSubsetIdForSelection subsetIdForSelection (spm: spMember_Soss) =
         { spm with _subsetIdForSelection = subsetIdForSelection }
@@ -129,6 +139,7 @@ module SpMember_Soss =
                     Map.empty               // New mutants start unevaluated
                     currentGeneration
                 |> withSubsetIdForSelection spm.SubsetIdForSelection
+                |> fun child -> { child with _selectionMeasure = spm.SelectionMeasure }
             )
 
         // Increment the parent's SorterMutationIndex by the number of mutants produced

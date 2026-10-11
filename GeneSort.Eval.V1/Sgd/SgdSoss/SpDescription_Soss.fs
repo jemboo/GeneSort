@@ -14,6 +14,7 @@ type spDescription_Soss =
         _mutationIndex:        int<mutationIndex>
         _sorterMutationSource: sorterMutationSource option
         _sorterEvalMap:        Map<string<sortableTestsSubsetId>, sorterEval>
+        _score:               float<sorterEvalScore>
         _birthday:             int<generationNumber>
     }
     member this.Birthday with get() = this._birthday
@@ -22,8 +23,9 @@ type spDescription_Soss =
     member this.MutationIndex with get() = this._mutationIndex
     member this.SorterMutationSource with get() = this._sorterMutationSource
     member this.SorterEvalMap with get() = this._sorterEvalMap
+    member this.Score = this._score
 
-    static member create poolMemberId modelId mutationIndex mutationSource sorterEvalMap birthday =
+    static member create poolMemberId modelId mutationIndex mutationSource sorterEvalMap birthday score =
         {
             _sorterPoolMemberId = poolMemberId
             _sorterModelId = modelId
@@ -31,6 +33,7 @@ type spDescription_Soss =
             _sorterMutationSource = mutationSource
             _sorterEvalMap = sorterEvalMap
             _birthday = birthday
+            _score = score
         }
 
 
@@ -45,6 +48,7 @@ module SpDescription_Soss =
             |> dataTableRecord.addData (sprintf "%sSorterModelId" prefix) (string (%spmDesc.SorterModelId))
             |> dataTableRecord.addData (sprintf "%sMutationIndex" prefix) (string (%spmDesc.MutationIndex))
             |> dataTableRecord.addData (sprintf "%sBirthday" prefix) (string (%spmDesc.Birthday))
+            |> dataTableRecord.addData (sprintf "%sScore" prefix) (UmxExt.floatToRaw spmDesc.Score)
 
         // 2. Flatten optional sorterMutationSource properties if present
         let sourceRecord =
@@ -127,6 +131,7 @@ module SorterPoolSetDescription =
                             spm.SorterMutationSource
                             spm.SorterEvalMap
                             spm.Birthday
+                            spm.Score
                     )
                     |> Seq.toArray
 

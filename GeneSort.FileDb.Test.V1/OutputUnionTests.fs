@@ -115,6 +115,64 @@ module private Fixtures =
         finally Directory.Delete(folder, true)
 
 module OutputUnionTests =
+    [<Fact>]
+    let ``member scores follow evaluation updates and Soss subset changes`` () =
+        let measure = stageLengthMeasure.create false false |> sorterEvalMeasure.StageLength
+        let standard = Fixtures.memberStandard |> SpMember_Standard.withSelectionMeasure measure
+        Assert.Equal(2.0, %standard.Score)
+        Assert.True(Double.IsPositiveInfinity %(standard |> SpMember_Standard.withEval None).Score)
+        let secondSubset = UMX.tag<sortableTestsSubsetId> "second"
+        let secondEval =
+            sorterEvalV2.create (SorterEval.getSorterId Fixtures.evaluation) secondSubset 32<sortingWidth> 3<sortableCount>
+                7<sequenceHash> 9<stageLength> [||] (UMX.tag<isReflectionSymmetric> false)
+                (UMX.tag 1) 0<reflectiveCount> |> sorterEval.V2
+        let updatedStandard = standard |> SpMember_Standard.withEval (Some secondEval)
+        Assert.Equal(9.0, %updatedStandard.Score)
+        let soss =
+            Fixtures.soss.SorterPools.[Fixtures.poolId].SorterPoolMembers |> Seq.exactlyOne
+            |> SpMember_Soss.withSelectionMeasure measure
+            |> SpMember_Soss.withEval (Some secondEval)
+            |> SpMember_Soss.withSubsetIdForSelection Fixtures.subsetId
+        Assert.Equal(2.0, %soss.Score)
+        let selected = soss |> SpMember_Soss.withSubsetIdForSelection secondSubset
+        Assert.Equal(9.0, %selected.Score)
+        Assert.True(Double.IsPositiveInfinity %(selected |> SpMember_Soss.withEval None).Score)
+
+    [<Fact>]
+    let ``selection persists its measure and reports the same score for both member types`` () =
+        MessagePackSetup.configure()
+        let measure = stageLengthMeasure.create false false |> sorterEvalMeasure.StageLength
+        let standardPool =
+            SorterPool_Standard.pruneSorterPool Fixtures.poolStandard measure (UMX.tag false) (UMX.tag false) 1<sorterCountPerPool>
+        let standardMember = standardPool.SorterPoolMembers |> Seq.exactlyOne
+        Assert.Equal(2.0, %standardMember.Score)
+        let standardSet = Fixtures.standard |> SorterPoolSet_Standard.upsertPool standardPool
+        let standardBytes = MessagePackSerializer.Serialize(SorterPoolSetDto_Standard.toDto standardSet)
+        let standardDto = MessagePackSerializer.Deserialize<GeneSort.Eval.Mp.V1.Sgd.sorterPoolSetDto_Standard>(standardBytes)
+        let restoredStandard = SorterPoolSetDto_Standard.fromDto standardDto
+        let restoredMember = restoredStandard.SorterPools.[Fixtures.poolId].SorterPoolMembers |> Seq.exactlyOne
+        Assert.Equal(2.0, %restoredMember.Score)
+        let standardDescription =
+            spDescription_Standard.create restoredMember.SorterPoolMemberId Fixtures.modelId restoredMember.MutationIndex
+                restoredMember.SorterMutationSource restoredMember.SorterEval restoredMember.Birthday restoredMember.Score
+        let standardRow = SpDescription_Standard.toDataTableRecordWithPrefix "" standardDescription
+        Assert.Equal("2", standardRow.Data.["Score"])
+        let sossSet = Fixtures.soss |> SorterPoolSet_Soss.withSubsetIdForSelection Fixtures.subsetId
+        let sossPool =
+            SorterPool_Soss.pruneSorterPool sossSet.SorterPools.[Fixtures.poolId] measure (UMX.tag false) (UMX.tag false) 1<sorterCountPerPool>
+        let selectedSet = sossSet |> SorterPoolSet_Soss.upsertPool sossPool
+        let sossBytes = MessagePackSerializer.Serialize(GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.toDto selectedSet)
+        let sossDto = MessagePackSerializer.Deserialize<GeneSort.Eval.Mp.V1.Sgd.Soss.sorterPoolSetDto_Soss>(sossBytes)
+        let restoredSoss = GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.fromDto sossDto
+        let restoredSossMember = restoredSoss.SorterPools.[Fixtures.poolId].SorterPoolMembers |> Seq.exactlyOne
+        Assert.Equal(2.0, %restoredSossMember.Score)
+        let sossDescription =
+            spDescription_Soss.create restoredSossMember.SorterPoolMemberId Fixtures.modelId restoredSossMember.MutationIndex
+                restoredSossMember.SorterMutationSource restoredSossMember.SorterEvalMap restoredSossMember.Birthday restoredSossMember.Score
+        let sossRows = SpDescription_Soss.toDataTableRecordsWithPrefix "Test_" sossDescription
+        Assert.Equal(3, sossRows.Length)
+        sossRows |> Array.iter (fun row -> Assert.Equal("2", row.Data.["Test_Score"]))
+
     [<Theory>]
     [<InlineData(0, "0")>]
     [<InlineData(99, "0")>]
