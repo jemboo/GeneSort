@@ -30,6 +30,9 @@ let Pool_32_Test (executorType: sorterSgdExecutorType)  : run =
         (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
         (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
         (runParameters.seedSossKey, [1234UL] |> List.map string)
+        (runParameters.partitionCountKey, [4] |> List.map string)
+        (runParameters.generationsPerSubsetKey, [100] |> List.map string)
+        (runParameters.adjustCeLengthFrequencyKey, [100] |> List.map string)
         (runParameters.codeModKey, ["NoMods"] |> List.map string)
         (runParameters.generationIntervalLastKey, [9] |> List.map string)
         (runParameters.paraRateKey,    [1.15;] |> List.map string)
@@ -58,6 +61,9 @@ let Pool_4_Test (executorType: sorterSgdExecutorType)  : run =
         (runParameters.sorterCountPerPoolKey, [512] |>  List.map string)
         (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
         (runParameters.seedSossKey, [1234UL] |> List.map string)
+        (runParameters.partitionCountKey, [4] |> List.map string)
+        (runParameters.generationsPerSubsetKey, [100] |> List.map string)
+        (runParameters.adjustCeLengthFrequencyKey, [100] |> List.map string)
         (runParameters.codeModKey, ["NoMods"] |> List.map string)
         (runParameters.generationIntervalLastKey, [14] |> List.map string)
         (runParameters.paraRateKey,    [1.15;] |> List.map string)
@@ -88,6 +94,9 @@ let Pool_32_V1 (executorType: sorterSgdExecutorType)  : run =
             "Soss rate comparison for Msuf32p4a"
             [
         (runParameters.seedSossKey, [1234UL] |> List.map string)
+        (runParameters.partitionCountKey, [4] |> List.map string)
+        (runParameters.generationsPerSubsetKey, [100] |> List.map string)
+        (runParameters.adjustCeLengthFrequencyKey, [100] |> List.map string)
         (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
         (runParameters.codeModKey, ["NoMods"] |> List.map string)
         (runParameters.generationIntervalLastKey, [3] |> List.map string)
@@ -116,6 +125,9 @@ let Pool_512_V2a (executorType: sorterSgdExecutorType)  : run =
             "Soss rate comparison for Msuf32p4a"
             [
         (runParameters.seedSossKey, [1234UL] |> List.map string)
+        (runParameters.partitionCountKey, [4] |> List.map string)
+        (runParameters.generationsPerSubsetKey, [100] |> List.map string)
+        (runParameters.adjustCeLengthFrequencyKey, [100] |> List.map string)
         (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
         (runParameters.codeModKey, ["NoMods"] |> List.map string)
         (runParameters.generationIntervalLastKey, [3] |> List.map string)

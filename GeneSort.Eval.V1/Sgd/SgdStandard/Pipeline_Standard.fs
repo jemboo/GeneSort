@@ -1,6 +1,8 @@
 namespace GeneSort.Eval.V1.Sgd.Standard
 
 open FSharp.UMX
+open GeneSort.Sorting
+open GeneSort.Eval.V1.Sgd
 open GeneSort.Sorting.Sortable
 open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
@@ -21,10 +23,13 @@ module Pipeline_Standard =
             (prefix: ceBlock)
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
-            (reEvaluateParents: bool)
+            (adjustCeLengthFrequency: int<adjustCeLengthFrequency>)
             (currentPoolSet: sorterPoolSet_Standard) 
             (collectNewSortableTests: bool<collectNewSortableTests>)
             (sortedFractionThreshold: float<sortedFraction>) : sorterPoolSet_Standard =
+
+        let adjustCeLengthsThisGeneration =
+            GenerationSchedule.shouldAdjustCeLengths adjustCeLengthFrequency currentPoolSet.GenerationNumber
 
         currentPoolSet
         // Step 1: Expand the population across all sub-pools
@@ -37,7 +42,7 @@ module Pipeline_Standard =
                                         sortableTests 
                                         prefix
                                         sorterEvalType
-                                        reEvaluateParents
+                                        adjustCeLengthsThisGeneration
                                         collectNewSortableTests
             
                 expandedPoolSet 
@@ -45,7 +50,11 @@ module Pipeline_Standard =
         )
         
         // Step 2b: Adjust the constraint boundaries based on performance thresholds
-        |> SorterPoolSet_Standard.adjustCeLengths sortedFractionThreshold
+        |> (fun evaluatedPoolSet ->
+            if adjustCeLengthsThisGeneration then
+                SorterPoolSet_Standard.adjustCeLengths sortedFractionThreshold evaluatedPoolSet
+            else
+                evaluatedPoolSet)
         
         // Step 3: Trim out defective or un-optimized sorters down to baseline target capacities
         |> SorterPoolSet_Standard.pruneSorterPools 
@@ -69,10 +78,13 @@ module Pipeline_Standard =
             (prefix: ceBlock)
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
-            (reEvaluateParents: bool)
+            (adjustCeLengthFrequency: int<adjustCeLengthFrequency>)
             (currentPoolSet: sorterPoolSet_Standard) 
             (collectNewSortableTests: bool<collectNewSortableTests>)
             (sortedFractionThreshold: float<sortedFraction>) : sorterPoolSet_Standard =
+
+        let adjustCeLengthsThisGeneration =
+            GenerationSchedule.shouldAdjustCeLengths adjustCeLengthFrequency currentPoolSet.GenerationNumber
 
         // Helper to check if any pool in a poolSet has dropped to 0 members
         let hasEmptyPool (poolSet: sorterPoolSet_Standard) =
@@ -96,7 +108,7 @@ module Pipeline_Standard =
                 sortableTests 
                 prefix
                 sorterEvalType 
-                reEvaluateParents
+                adjustCeLengthsThisGeneration
                 collectNewSortableTests
                 mutatedPoolSet
 
@@ -107,7 +119,7 @@ module Pipeline_Standard =
 
         // --- Step 2: Adjust Constraint Boundaries ---
         let adjustedPoolSet = 
-            if reEvaluateParents then
+            if adjustCeLengthsThisGeneration then
                 SorterPoolSet_Standard.adjustCeLengths sortedFractionThreshold evaluatedPoolSet
             else
                 evaluatedPoolSet

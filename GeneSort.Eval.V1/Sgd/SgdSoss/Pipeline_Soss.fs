@@ -54,6 +54,8 @@ module Pipeline_Soss =
             (prioritizeNewMutants: bool<prioritizeNewMutants>)
             (distinctSorterHashes: bool<distinctSorterHashes>)
             (sortableTestPartitions: partitionOfSortableTests)
+            (generationsPerSubset: int<generationsPerSubset>)
+            (adjustCeLengthFrequency: int<adjustCeLengthFrequency>)
             (prefix: ceBlock)
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
@@ -71,14 +73,20 @@ module Pipeline_Soss =
             sortableTestPartitions.SortableTests
             |> Map.keys
             |> Seq.toArray
-            |> CommonSgdSoss.subsetIdForGeneration currentPoolSet.GenerationNumber
+            |> CommonSgdSoss.subsetIdForGeneration generationsPerSubset currentPoolSet.GenerationNumber
+
+        let adjustCeLengthsThisGeneration =
+            CommonSgdSoss.shouldAdjustCeLengths adjustCeLengthFrequency currentPoolSet.GenerationNumber
 
         // Members retain the selection subset used by the preceding generation step.
-        let reEvaluateParents =
+        let selectionSubsetChanged =
             currentPoolSet.SorterPools
             |> Map.values
             |> Seq.collect (fun pool -> pool.SorterPoolMembers)
             |> Seq.exists (fun memberValue -> memberValue.SubsetIdForSelection <> subsetIdForSelection)
+
+        // Refresh parent evaluations before adjusting CE lengths, even within the same subset.
+        let reEvaluateParents = selectionSubsetChanged || adjustCeLengthsThisGeneration
 
         let poolSetForSelection =
             currentPoolSet
@@ -125,7 +133,7 @@ module Pipeline_Soss =
 
         // --- Step 2: Adjust Constraint Boundaries ---
         let adjustedPoolSet =
-            if reEvaluateParents then
+            if adjustCeLengthsThisGeneration then
                 SorterPoolSet_Soss.adjustCeLengths sortedFractionThreshold evaluatedPoolSet
             else
                 evaluatedPoolSet

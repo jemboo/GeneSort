@@ -34,6 +34,8 @@ open FSharp.UMX
 [<Measure>] type sortableTestsPartitionId
 [<Measure>] type sortableTestsSubsetId
 [<Measure>] type partitionCount
+[<Measure>] type generationsPerSubset
+[<Measure>] type adjustCeLengthFrequency
 [<Measure>] type includedCount
 
 type mergeSuffixType =

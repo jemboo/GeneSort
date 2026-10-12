@@ -44,6 +44,8 @@ module EvoOrch_Standard =
             let! sorterCountPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sorterCountPerPool."
             let! selectedSorterCountPerPool = rp.GetSelectedSorterCountPerPool() |> Result.ofOption "Missing selectedSorterCountPerPool."
             let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count."
+            let! adjustCeLengthFrequency = rp.GetAdjustCeLengthFrequency() |> Result.ofOption "Missing AdjustCeLengthFrequency."
+            do! if %adjustCeLengthFrequency > 0 then Ok () else Error "AdjustCeLengthFrequency must be greater than zero."
             let! srtrEvalMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
             let! collectNewSortableTests = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests."
             let! sortedFractionThreshold = rp.GetSortedFraction() |> Result.ofOption "Missing sortedFraction."
@@ -159,7 +161,6 @@ module EvoOrch_Standard =
                                     currentSorterPoolSet
 
                             // Step Evolution
-                            let reEvaluateParents = (remainingSteps % 10 = 0)
 
                             let nextSorterPoolSet = 
                                 Pipeline_Standard.runGenerationStepDebug
@@ -173,7 +174,7 @@ module EvoOrch_Standard =
                                     prefix
                                     evalType
                                     srtrEvalMeasure
-                                    reEvaluateParents
+                                    adjustCeLengthFrequency
                                     poolSetForStep
                                     collectNewSortableTests
                                     sortedFractionThreshold

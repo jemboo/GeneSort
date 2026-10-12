@@ -35,6 +35,8 @@ type runParameters =
     static member generationFirstKey = "GenerationFirst"
     static member generationIntervalCountKey = "GenerationIntervalCount"
     static member generationIntervalLastKey = "GenerationIntervalLast"
+    static member generationsPerSubsetKey = "GenerationsPerSubset"
+    static member adjustCeLengthFrequencyKey = "AdjustCeLengthFrequency"
     static member idKey = "Id"
     static member insertionRateKey = "InsertionRate"
     static member latticeDistanceKey = "LatticeDistance"
@@ -50,6 +52,7 @@ type runParameters =
     static member mutatorVariantKey = "MutatorVariantKey"
     static member orthoRateKey = "OrthoRate"
     static member paraRateKey = "ParaRate"
+    static member partitionCountKey = "PartitionCount"
     static member prefixLibIdKey = "PrefixLibId"
     static member prioritizeNewMutantsKey = "PrioritizeNewMutants"
     static member projectNameKey = "ProjectName"
@@ -226,6 +229,18 @@ type runParameters =
     member this.GetParaRate() =
         runParameters.tryGetFloat runParameters.paraRateKey this.paramMap
         |> Option.map UMX.tag<paraRate>
+
+    member this.GetPartitionCount() : int<GeneSort.Sorting.partitionCount> option =
+        runParameters.tryGetInt runParameters.partitionCountKey this.paramMap
+        |> Option.map UMX.tag<GeneSort.Sorting.partitionCount>
+
+    member this.GetGenerationsPerSubset() : int<generationsPerSubset> option =
+        runParameters.tryGetInt runParameters.generationsPerSubsetKey this.paramMap
+        |> Option.map UMX.tag<generationsPerSubset>
+
+    member this.GetAdjustCeLengthFrequency() : int<adjustCeLengthFrequency> option =
+        runParameters.tryGetInt runParameters.adjustCeLengthFrequencyKey this.paramMap
+        |> Option.map UMX.tag<adjustCeLengthFrequency>
 
     member this.GetPrefixLibId() =
         this.paramMap.TryFind runParameters.prefixLibIdKey
@@ -475,6 +490,15 @@ type runParameters =
 
     member this.WithParaRate(para: float<paraRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.paraRateKey (para |> Option.map UmxExt.floatToRaw) }
+
+    member this.WithPartitionCount(count: int<GeneSort.Sorting.partitionCount> option) =
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.partitionCountKey (count |> Option.map UmxExt.intToRaw) }
+
+    member this.WithGenerationsPerSubset(count: int<generationsPerSubset> option) =
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationsPerSubsetKey (count |> Option.map UmxExt.intToRaw) }
+
+    member this.WithAdjustCeLengthFrequency(count: int<adjustCeLengthFrequency> option) =
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.adjustCeLengthFrequencyKey (count |> Option.map UmxExt.intToRaw) }
 
     member this.WithPrefixLibId(pfxLibId: prefixLibId option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.prefixLibIdKey (pfxLibId |> Option.map PrefixLibId.toString) }

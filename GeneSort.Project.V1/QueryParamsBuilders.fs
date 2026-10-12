@@ -15,6 +15,13 @@ module QueryParamsBuilders =
 
     module SorterSgd =
 
+        let private withAdjustmentFrequency (rp: runParameters) (query: queryParams) =
+            match rp.GetAdjustCeLengthFrequency() with
+            | None -> query
+            | Some frequency ->
+                let properties = query.Properties |> Map.add runParameters.adjustCeLengthFrequencyKey (string %frequency)
+                queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
+
         module Uf6MutationRate =
 
             let makeQueryParams
@@ -66,6 +73,7 @@ module QueryParamsBuilders =
                     let! modR = rp.GetModificationRate()
                     let! mmod = rp.GetMutationMod()
                     return makeQueryParams projectName dbName repl codeMod curGen scPP spc sem semi para self seedModR modR mmod odt
+                           |> withAdjustmentFrequency rp
                 }
 
         module MsrsOrthoPara =
@@ -92,6 +100,7 @@ module QueryParamsBuilders =
                     let! para = rp.GetParaRate()
                     let! self = rp.GetSelfSymRate()
                     return makeQueryParams projectName dbName repl codeMod curGen scPP spc para self mmod odt
+                           |> withAdjustmentFrequency rp
                 }
 
         module MssiOrthoPara =
@@ -118,6 +127,7 @@ module QueryParamsBuilders =
                     let! modR = rp.GetModificationRate()
                     let! para = rp.GetParaRate()
                     return makeQueryParams projectName dbName repl codeMod curGen scPP spc modR para mmod odt
+                           |> withAdjustmentFrequency rp
                 }
 
         module Msuf32MutationRate =
@@ -147,7 +157,22 @@ module QueryParamsBuilders =
                     let! modR = rp.GetModificationRate()
                     let! mmod = rp.GetMutationMod()
                     let! mutVar = rp.GetMutatorVariant()
-                    return makeQueryParams projectName dbName repl codeMod curGen scPP spc para self seedModR modR mmod mutVar odt
+                    let query = makeQueryParams projectName dbName repl codeMod curGen scPP spc para self seedModR modR mmod mutVar odt
+                    let properties =
+                        query.Properties
+                        |> fun properties ->
+                            match rp.GetPartitionCount() with
+                            | None -> properties
+                            | Some count -> properties |> Map.add runParameters.partitionCountKey (string %count)
+                        |> fun properties ->
+                            match rp.GetGenerationsPerSubset() with
+                            | None -> properties
+                            | Some count -> properties |> Map.add runParameters.generationsPerSubsetKey (string %count)
+                        |> fun properties ->
+                            match rp.GetAdjustCeLengthFrequency() with
+                            | None -> properties
+                            | Some count -> properties |> Map.add runParameters.adjustCeLengthFrequencyKey (string %count)
+                    return queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
                 }
 
         module Msrs32MutationRate =
@@ -174,6 +199,7 @@ module QueryParamsBuilders =
                     let! modR = rp.GetModificationRate()
                     let! mmod = rp.GetMutationMod()
                     return makeQueryParams projectName dbName repl codeMod curGen scPP spc para selfSym modR mmod odt
+                           |> withAdjustmentFrequency rp
                 }
 
         module MsrsPoolModComp =
@@ -202,6 +228,7 @@ module QueryParamsBuilders =
                     let! selfSym = rp.GetSelfSymRate()
                     let! selectedCount = rp.GetSelectedSorterCountPerPool()
                     return makeQueryParams projectName dbName repl gen scpp spc modR para selfSym seedSelection selectedCount mmod odt
+                           |> withAdjustmentFrequency rp
                 }
 
     module SortableTests =

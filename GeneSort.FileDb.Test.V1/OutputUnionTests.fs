@@ -116,6 +116,64 @@ module private Fixtures =
 
 module OutputUnionTests =
     [<Theory>]
+    [<InlineData(100, 0, true)>]
+    [<InlineData(100, 99, false)>]
+    [<InlineData(100, 100, true)>]
+    [<InlineData(100, 101, false)>]
+    [<InlineData(100, 200, true)>]
+    [<InlineData(7, 100, false)>]
+    [<InlineData(7, 105, true)>]
+    [<InlineData(1, 3, true)>]
+    let ``Standard and Soss share the configured CE adjustment schedule`` (frequency: int) (generation: int) (expected: bool) =
+        let parameters =
+            (runParameters.create Map.empty)
+                .WithAdjustCeLengthFrequency(Some (UMX.tag<adjustCeLengthFrequency> frequency))
+        let actual = CommonSgdSoss.shouldAdjustCeLengths (parameters.GetAdjustCeLengthFrequency().Value) (UMX.tag<generationNumber> generation)
+        Assert.Equal(expected, actual)
+        Assert.Equal(expected, GenerationSchedule.shouldAdjustCeLengths (parameters.GetAdjustCeLengthFrequency().Value) (UMX.tag<generationNumber> generation))
+        Assert.True(parameters.WithAdjustCeLengthFrequency(None).GetAdjustCeLengthFrequency().IsNone)
+
+    [<Theory>]
+    [<InlineData(0)>]
+    [<InlineData(-1)>]
+    let ``Standard and Soss reject nonpositive CE adjustment frequencies`` (frequency: int) =
+        Assert.Throws<ArgumentException>(fun () ->
+            CommonSgdSoss.shouldAdjustCeLengths (UMX.tag<adjustCeLengthFrequency> frequency) 0<generationNumber>
+            |> ignore) |> ignore
+        Assert.Throws<ArgumentException>(fun () ->
+            GenerationSchedule.shouldAdjustCeLengths (UMX.tag<adjustCeLengthFrequency> frequency) 0<generationNumber>
+            |> ignore) |> ignore
+
+    [<Theory>]
+    [<InlineData(1, 1)>]
+    [<InlineData(2, 30)>]
+    [<InlineData(6, 100)>]
+    [<InlineData(4, 7)>]
+    let ``Soss cycles through the configured partitions then Merge`` (count: int) (duration: int) =
+        let parameters =
+            (runParameters.create Map.empty)
+                .WithPartitionCount(Some (UMX.tag<GeneSort.Sorting.partitionCount> count))
+                .WithGenerationsPerSubset(Some (UMX.tag<generationsPerSubset> duration))
+        let configuredCount = parameters.GetPartitionCount().Value |> UMX.untag
+        let configuredDuration = parameters.GetGenerationsPerSubset().Value
+        let partitionIds = Array.init configuredCount (fun index -> UMX.tag<sortableTestsPartitionId> (string index))
+        for cycle in 0 .. 1 do
+            for index in 0 .. configuredCount do
+                let expected = if index = configuredCount then "Merge" else string index
+                for offset in [0; duration - 1] do
+                    let generation = cycle * ((configuredCount + 1) * duration) + index * duration + offset
+                    let actual = CommonSgdSoss.subsetIdForGeneration configuredDuration (UMX.tag<generationNumber> generation) partitionIds
+                    Assert.Equal(expected, UMX.untag actual)
+
+    [<Theory>]
+    [<InlineData(0)>]
+    [<InlineData(-1)>]
+    let ``Soss rejects nonpositive subset cycle durations`` (duration: int) =
+        Assert.Throws<ArgumentException>(fun () ->
+            CommonSgdSoss.subsetIdForGeneration (UMX.tag<generationsPerSubset> duration) 0<generationNumber>
+                [|UMX.tag<sortableTestsPartitionId> "0"|] |> ignore) |> ignore
+
+    [<Theory>]
     [<InlineData(false, false)>]
     [<InlineData(true, false)>]
     [<InlineData(false, true)>]
@@ -379,7 +437,7 @@ module OutputUnionTests =
     [<InlineData(900, "Merge")>]
     let ``Soss selection rotates every 100 generations and repeats after 500`` (generation: int) (expected: string) =
         let partitions = [| for index in 0 .. 3 -> string index |> UMX.tag<sortableTestsPartitionId> |]
-        let selected = CommonSgdSoss.subsetIdForGeneration (UMX.tag<generationNumber> generation) partitions
+        let selected = CommonSgdSoss.subsetIdForGeneration 100<generationsPerSubset> (UMX.tag<generationNumber> generation) partitions
         Assert.Equal(expected, UMX.untag selected)
 
     [<Fact>]

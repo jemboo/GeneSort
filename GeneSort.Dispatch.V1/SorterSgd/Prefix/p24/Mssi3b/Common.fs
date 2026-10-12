@@ -27,6 +27,7 @@ module Common =
           .WithDistinctSorterHashes(Some true)
           .WithPrioritizeNewMutants(Some true)
           .WithSortedFraction(Some 0.99<sortedFraction>)
+          .WithAdjustCeLengthFrequency(rp.GetAdjustCeLengthFrequency() |> Option.orElse (Some 100<adjustCeLengthFrequency>))
           .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
           .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
           .WithSeedSorterPoolSelectionType(Some sorterEvalSelectionType)

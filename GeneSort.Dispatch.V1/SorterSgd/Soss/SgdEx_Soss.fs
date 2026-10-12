@@ -85,6 +85,9 @@ module SgdEx_Soss =
             try
                 do! checkCancellation cts.Token
 
+                let! partitionCount = rp.GetPartitionCount() |> Result.ofOption "Missing PartitionCount."
+                do! if %partitionCount > 0 then Ok () else Error "PartitionCount must be greater than zero."
+
                 log "Executing makeSortableTests..."
                 let! sWidth = 
                     rp.GetSortingWidth() 
@@ -102,13 +105,13 @@ module SgdEx_Soss =
                     | Net -> randomNet(UMX.tag<randomSeed> (int32 seedSoss)) :> IRando
                     | Smx -> randomSplitMix64(seedSoss) :> IRando
                 let sortableTestsPartitions =
-                    PartitionOfSortableTests.partition sossRng.NextIndex (4 |> UMX.tag<sortableTestsCount>) sortableTests
+                    PartitionOfSortableTests.partition sossRng.NextIndex (UMX.cast<partitionCount, sortableTestsCount> partitionCount) sortableTests
                 let partitionSizes =
                     sortableTestsPartitions.SortableTests
                     |> Map.values
                     |> Seq.map (fun tests -> string %(SortableTests.getSortableCount tests))
                     |> String.concat ", "
-                log (sprintf "Partitioned sortable tests into four subsets with test counts: %s." partitionSizes)
+                log (sprintf "Partitioned sortable tests into %d subsets with test counts: %s." %partitionCount partitionSizes)
 
                 let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces
 
