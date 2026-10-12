@@ -60,10 +60,12 @@ type sgdRun =
           baseRun: simpleRun
           genSaveIntervalsName: string
           genSaveSubIntervalsName: string
+          makerNames: evolutionMakerNames
         }
 
 module SgdRun =
     let create
+            (makerNames: evolutionMakerNames)
             (databaseName: string<databaseName>)
             (projectName: string<projectName>)
             (runName: string<runName>)
@@ -75,6 +77,7 @@ module SgdRun =
             (filterCatalogName: string)
             (enhancerCatalogName: string)
             (allowOverwrite: bool) : sgdRun =
+        EvolutionMakerNames.validate makerNames
         if String.IsNullOrWhiteSpace genSaveIntervalsName then
             invalidArg (nameof genSaveIntervalsName) "Generation save interval name cannot be empty"
         if String.IsNullOrWhiteSpace genSaveSubIntervalsName then
@@ -93,9 +96,11 @@ module SgdRun =
                   allowOverwrite
           genSaveIntervalsName = genSaveIntervalsName
           genSaveSubIntervalsName = genSaveSubIntervalsName
+          makerNames = makerNames
         }
 
     let baseRun (run: sgdRun) = run.baseRun
+    let makerNames (run: sgdRun) = run.makerNames
     let genSaveIntervalsName (run: sgdRun) = run.genSaveIntervalsName
     let genSaveSubIntervalsName (run: sgdRun) = run.genSaveSubIntervalsName
 
@@ -119,6 +124,10 @@ type run =
         match this with
         | SimpleRun _ -> None
         | SgdRun value -> Some (SgdRun.genSaveIntervalsName value)
+    member this.MakerNames =
+        match this with
+        | SimpleRun _ -> None
+        | SgdRun value -> Some (SgdRun.makerNames value)
     member this.GenSaveSubIntervalsName =
         match this with
         | SimpleRun _ -> None

@@ -1,4 +1,4 @@
-namespace GeneSort.Dispatch.V1.SorterSgd
+namespace GeneSort.Project.V1
 
 open GeneSort.Project.V1
 open FsToolkit.ErrorHandling
@@ -7,14 +7,14 @@ open System
 open GeneSort.Sorting
 open GeneSort.Model.Sortable.V1
 open GeneSort.Sorting.Sortable
-open GeneSort.Dispatch.V1.SortableTests
+
 open GeneSort.Sorting.Sorter
 open GeneSort.SortingLib.Sorter
 
 
-module SortableTestsMakers =
+module EvolutionTestMakers =
 
-    let makeStandardTests (rp:runParameters) : Async<Result<sortableTests * (ce array), string>> =
+    let makeStandardTests (_context: evolutionMakerContext) (rp:runParameters) : Async<Result<sortableTests * (ce array), string>> =
         async {
             let paramsOpt = option {
                 let! sortingWidth = rp.GetSortingWidth()
@@ -33,7 +33,7 @@ module SortableTestsMakers =
         }
 
         
-    let makeMergeTests (rp: runParameters) : Async<Result<sortableTests * (ce array), string>> =
+    let makeMergeTests (context: evolutionMakerContext) (rp: runParameters) : Async<Result<sortableTests * (ce array), string>> =
         async {
             let paramsOpt = option {
                 let repl = 0 |> UMX.tag<replNumber>   // only repl 0 is relevant
@@ -44,14 +44,14 @@ module SortableTestsMakers =
 
             match paramsOpt with
             | Some (repl, mrgLibId, sdf) ->
-                let! res = SortableTestsDbs.Merge.getMergeSortableTests repl mrgLibId sdf  
+                let! res = context.LoadMergeTests repl mrgLibId sdf  
                 return Result.map (fun st -> (st, [||])) res
             | None ->
                 return Error "Failed: One or more RunParameters for MergeTests were missing."
         }
 
         
-    let makePrefixTests (rp: runParameters) : Async<Result<sortableTests * (ce array), string>> =
+    let makePrefixTests (context: evolutionMakerContext) (rp: runParameters) : Async<Result<sortableTests * (ce array), string>> =
         async {
             let paramsOpt = option {
                     let repl = 0 |> UMX.tag<replNumber>  // only repl 0 is relevant
@@ -63,7 +63,7 @@ module SortableTestsMakers =
 
             match paramsOpt with
             | Some (repl, pfxId, sdf, ces) ->
-                let! res = SortableTestsDbs.Prefix.getPrefixSortableTests repl pfxId  sdf 
+                let! res = context.LoadPrefixTests repl pfxId  sdf 
                 return Result.map (fun st -> (st, ces)) res
             | None ->
                 return Error "Failed: One or more RunParameters for PrefixTests were missing."

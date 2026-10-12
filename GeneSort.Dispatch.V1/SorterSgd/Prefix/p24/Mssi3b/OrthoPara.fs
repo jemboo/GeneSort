@@ -21,7 +21,7 @@ module Specs64 =
 
     let NoMods (executorType: sorterSgdExecutorType)  : run =
         run.SgdRun (
-            SgdRun.create
+            SgdRun.create EvolutionMakerNames.prefix
                 dbOrthoPara64Name
                 projName
                 (sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -47,7 +47,7 @@ module Specs64 =
 
     let SymForceDiff1 (executorType: sorterSgdExecutorType)  : run =
         run.SgdRun (
-            SgdRun.create
+            SgdRun.create EvolutionMakerNames.prefix
                 dbOrthoPara64Name
                 projName
                 (sprintf @"SymForce_Diff1%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -73,7 +73,7 @@ module Specs64 =
 
     let SymForce (executorType: sorterSgdExecutorType)  : run =
         run.SgdRun (
-            SgdRun.create
+            SgdRun.create EvolutionMakerNames.prefix
                 dbOrthoPara64Name
                 projName
                 (sprintf @"SymForce%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -101,7 +101,7 @@ module Specs128 =
 
     let NoMods (executorType: sorterSgdExecutorType)  : run =
         run.SgdRun (
-            SgdRun.create
+            SgdRun.create EvolutionMakerNames.prefix
                 dbOrthoPara128Name
                 projName
                 (sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)

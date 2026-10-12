@@ -23,7 +23,7 @@ module Specs =
 
     let TestSpec (executorType: sorterSgdExecutorType)  : run =
         run.SgdRun (
-            SgdRun.create
+            SgdRun.create EvolutionMakerNames.prefix
                 dbNamePoolSz128
                 projName
                 (sprintf @"PoolSz32_Mod_Testc%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -49,7 +49,7 @@ module Specs =
 
     let Sz_2048_Of_4096 (executorType: sorterSgdExecutorType)  : run =
         run.SgdRun (
-            SgdRun.create
+            SgdRun.create EvolutionMakerNames.prefix
                 dbName_Sz_2048_Of_4096
                 projName
                 (sprintf @"Sz_2048_Of_4096_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -72,7 +72,7 @@ module Specs =
 
     let PoolSz_2n256 (executorType: sorterSgdExecutorType)  : run =
         run.SgdRun (
-            SgdRun.create
+            SgdRun.create EvolutionMakerNames.prefix
                 dbNamePools4096_2_vs_256
                 projName
                 (sprintf @"PoolSz_2_vs_256_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)

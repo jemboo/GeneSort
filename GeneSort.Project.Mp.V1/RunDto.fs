@@ -25,6 +25,9 @@ type runDto =
         FilterCatalogName: string
         EnhancerCatalogName: string
         AllowOverwrite: bool
+        SortableTestsMakerName: string
+        SeedPoolSetMakerName: string
+        MutatorMakerName: string
     }
 
 module RunDto =
@@ -43,6 +46,9 @@ module RunDto =
             FilterCatalogName = project.FilterCatalogName
             EnhancerCatalogName = project.EnhancerCatalogName
             AllowOverwrite = project.AllowOverwrite
+            SortableTestsMakerName = project.MakerNames |> Option.map (fun names -> names.SortableTests) |> Option.toObj
+            SeedPoolSetMakerName = project.MakerNames |> Option.map (fun names -> names.SeedPoolSet) |> Option.toObj
+            MutatorMakerName = project.MakerNames |> Option.map (fun names -> names.Mutator) |> Option.toObj
             ParameterSpans =
                 project.ParameterSpans
                 |> List.map (fun (key, values) -> { Key = key; Values = List.toArray values })
@@ -80,8 +86,29 @@ module RunDto =
                     enhancerCatalogName
                     allowOverwrite)
         | saveIntervals, saveSubIntervals ->
+            let makerNames =
+                match Option.ofObj dto.SortableTestsMakerName, Option.ofObj dto.SeedPoolSetMakerName, Option.ofObj dto.MutatorMakerName with
+                | Some tests, Some seed, Some mutator ->
+                    { SortableTests = tests; SeedPoolSet = seed; Mutator = mutator }
+                | None, None, None ->
+                    // Older runs encoded input selection in their project/executor names.
+                    let projectParts = (dto.ProjectName |> Option.ofObj |> Option.defaultValue "").Split('.')
+                    let runName = dto.RunName |> Option.ofObj |> Option.defaultValue ""
+                    if runName.EndsWith("GenPrefix") || runName.EndsWith("GenSoss") then
+                        EvolutionMakerNames.prefix
+                    elif runName.EndsWith("GenMerge") then
+                        EvolutionMakerNames.merge
+                    elif runName.EndsWith("GenStandard") then
+                        EvolutionMakerNames.standard
+                    elif Array.contains "Prefix" projectParts then
+                        EvolutionMakerNames.prefix
+                    elif Array.contains "Merge" projectParts then
+                        EvolutionMakerNames.merge
+                    else EvolutionMakerNames.standard
+                | _ -> invalidArg "dto" "An SGD run must specify all three evolution maker names, or omit all three for a legacy run."
             SgdRun (
                 SgdRun.create
+                    makerNames
                     databaseName
                     projectName
                     runName

@@ -1,5 +1,5 @@
 
-namespace GeneSort.Dispatch.V1.SorterSgd
+namespace GeneSort.Project.V1
 
 open GeneSort.Model.Sorting.V1
 open GeneSort.Project.V1

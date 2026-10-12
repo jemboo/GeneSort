@@ -1,9 +1,9 @@
-namespace GeneSort.Dispatch.V1.SorterSgd
+namespace GeneSort.Project.V1
 
 open GeneSort.Project.V1
 open GeneSort.Eval.V1
 open GeneSort.Core
-open GeneSort.Dispatch.V1.SorterEval
+
 open GeneSort.SortingOps
 open FsToolkit.ErrorHandling
 open FSharp.UMX
@@ -16,10 +16,10 @@ open GeneSort.Eval.V1.Sgd.Standard
 
 
 
-module PoolSetMakers =
+module SeedPoolSetMakers =
 
     let createSeedSorterPoolSetStandard 
-            (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
+            (context: evolutionMakerContext) (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
         asyncResult {
             let! sortingWidth = 
                     rp.GetSortingWidth() 
@@ -61,13 +61,13 @@ module PoolSetMakers =
 
 
             let! (parentSorterSetEval: sorterSetEval) = 
-                SorterEvalDbs.getStandardSorterEvals 
+                context.LoadStandardSorterEvals 
                     sortingWidth 
                     simpleSorterModelType 
                     GeneSort.SortingOps.sorterEvalType.V2
 
             let seedSorterModelGen = 
-                CommonSorterEval.getSimpleUniformSorterModelGen 
+                SeedSorterModelGeneration.getSimpleUniformSorterModelGen 
                     rngType 
                     sortingWidth 
                     simpleSorterModelType
@@ -98,7 +98,7 @@ module PoolSetMakers =
 
 
     let createSeedSorterPoolSetMerge
-            (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
+            (context: evolutionMakerContext) (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
         asyncResult {
 
             let! repl =
@@ -142,7 +142,7 @@ module PoolSetMakers =
                     |> Result.ofOption "Missing excludeSelfCe"
             
             let! (parentSorterSetEval: sorterSetEval) = 
-                SorterEvalDbs.getMergeSorterEvals
+                context.LoadMergeSorterEvals
                     mrgLibid
                     repl
                     simpleSorterModelType
@@ -150,7 +150,7 @@ module PoolSetMakers =
 
 
             let seedSorterModelGen = 
-                CommonSorterEval.getSimpleUniformSorterModelGen 
+                SeedSorterModelGeneration.getSimpleUniformSorterModelGen 
                     rngType 
                     mrgLibid.SortingWidth 
                     simpleSorterModelType
@@ -182,7 +182,7 @@ module PoolSetMakers =
 
 
     let createSeedSorterPoolSetPrefix
-            (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
+            (context: evolutionMakerContext) (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
         asyncResult {
 
             let! repl =
@@ -228,13 +228,13 @@ module PoolSetMakers =
 
 
             let! (parentSorterSetEval: sorterSetEval) = 
-                SorterEvalDbs.getPrefixSorterEvals 
+                context.LoadPrefixSorterEvals 
                     pfxLibId
                     repl
                     simpleSorterModelType
 
             let seedSorterModelGen = 
-                CommonSorterEval.getSimpleUniformSorterModelGen 
+                SeedSorterModelGeneration.getSimpleUniformSorterModelGen 
                     rngType 
                     pfxLibId.SortingWidth 
                     simpleSorterModelType

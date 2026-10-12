@@ -20,7 +20,7 @@ module Specs =
 
     let NoMods (executorType: sorterSgdExecutorType)  : run =
         run.SgdRun (
-            SgdRun.create
+            SgdRun.create EvolutionMakerNames.prefix
                 dbOrthoPara32Name
                 projName
                 (sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)

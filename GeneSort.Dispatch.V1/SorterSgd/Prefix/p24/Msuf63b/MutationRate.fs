@@ -33,7 +33,7 @@ module VarModR_32 =
 
     let Test (executorType: sorterSgdExecutorType) : run =
         run.SgdRun (
-            SgdRun.create
+            SgdRun.create EvolutionMakerNames.prefix
                 dbVariableModR_32Name
                 projName
                 (sprintf @"Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -62,7 +62,7 @@ module VarModR_32 =
 
     let WideTest (executorType: sorterSgdExecutorType) : run =
         run.SgdRun (
-            SgdRun.create
+            SgdRun.create EvolutionMakerNames.prefix
                 dbVariableModR_32Name
                 projName
                 (sprintf @"WideTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)

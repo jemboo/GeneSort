@@ -69,6 +69,7 @@ module SgdEx_Soss =
     let evaluateEvolutionRunSoss
             (makeSortableTests: runParameters ->  Async<Result<sortableTests * (ce array), string>> )
             (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet_Standard, string>>)
+            (makeMutator: sorterModelMutatorMaker)
             (genDb: IGeneSortDb)
             (saveIntervals: genIntervalConfig)
             (subIntervals: genIntervalConfig)
@@ -140,7 +141,7 @@ module SgdEx_Soss =
                 do! checkCancellation cts.Token
                 
                 log "Making sorterModelMutator..."
-                let! (sSmm: simpleSorterModelMutator) = MutatorMakers.makeSimpleSorterModelMutator activeRp
+                let! (sSmm: simpleSorterModelMutator) = makeMutator activeRp
                 let (sorterModelMutator: sorterModelMutator) = sSmm |> sorterModelMutator.Simple
 
                 log "Executing unified evolution run..."

@@ -45,9 +45,7 @@
     <Compile Include="SorterMutate\Reporting.fs" />
     <Compile Include="SorterMutate\SorterMutateExecutor.fs" />
     <Compile Include="SorterSgd\Utils.fs" />
-    <Compile Include="SorterSgd\PoolSetMakers.fs" />
-    <Compile Include="SorterSgd\MutatorMakers.fs" />
-    <Compile Include="SorterSgd\SortableTestsMakers.fs" />
+    <Compile Include="SorterSgd\MakerContext.fs" />
     <Compile Include="SorterSgd\Standard\EvoOrch_Standard.fs" />
     <Compile Include="SorterSgd\Standard\SgdEx_Standard.fs" />
     <Compile Include="SorterSgd\Soss\EvoOrch_Soss.fs" />

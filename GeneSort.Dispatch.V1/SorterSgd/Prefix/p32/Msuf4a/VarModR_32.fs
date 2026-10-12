@@ -20,7 +20,7 @@ let dbPool512name = "Pool_512" |> UMX.tag<databaseName>
 
 let Pool_32_Test (executorType: sorterSgdExecutorType)  : run =
     run.SgdRun (
-        SgdRun.create
+        SgdRun.create EvolutionMakerNames.prefix
             dbPool32TestName
             projName
             (sprintf @"Pool_32_Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -47,7 +47,7 @@ let Pool_32_Test (executorType: sorterSgdExecutorType)  : run =
 
 let Pool_32_V1 (executorType: sorterSgdExecutorType)  : run =
     run.SgdRun (
-        SgdRun.create
+        SgdRun.create EvolutionMakerNames.prefix
             dbPool32name
             projName
             (sprintf @"Pool_32_V1%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -74,7 +74,7 @@ let Pool_32_V1 (executorType: sorterSgdExecutorType)  : run =
 
 let Pool_512_V2a (executorType: sorterSgdExecutorType)  : run =
     run.SgdRun (
-        SgdRun.create
+        SgdRun.create EvolutionMakerNames.prefix
             dbPool512name
             projName
             (sprintf @"Pool_512_V2a%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)

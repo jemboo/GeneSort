@@ -30,24 +30,4 @@ module SorterEvalExecutorType =
 
 module CommonSorterEval =
 
-    let getSimpleUniformSorterModelGen
-            (rngType: rngType) 
-            (sortingWidth: int<sortingWidth>)
-            (simpleSorterModelType: simpleSorterModelType) 
-            (excludeSelfCe: bool<excludeSelfCe>)
-                            : sorterModelGen =
-            let stageLength = getStageLength simpleSorterModelType sortingWidth
-            let rngFactory = rngType |> RngFactory.create
-            SimpleSorterModelGen.makeUniform 
-                                    rngFactory 
-                                    sortingWidth 
-                                    stageLength 
-                                    simpleSorterModelType
-                                    excludeSelfCe
-                                    |> sorterModelGen.Simple
-
-
-
-
-
-
+    let getSimpleUniformSorterModelGen = SeedSorterModelGeneration.getSimpleUniformSorterModelGen

@@ -11,8 +11,7 @@ open GeneSort.Project.V1
 let main argv =
     // 1. Force MessagePack setup FIRST before opening or executing any dispatch logic
     MessagePackSetup.configure ()
-    QueryParamsBuilders.registerAll ()
-    RunParamBuilders.registerAll ()
+    ProjectCatalogs.registerAll ()
 
     let startTime = DateTime.Now
     printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"

@@ -26,15 +26,23 @@ type sgdRunHost = private {
     run: sgdRun
     genSaveIntervals: genIntervalConfig
     genSaveSubIntervals: genIntervalConfig
+    makeSortableTests: sortableTestsMaker
+    makeSeedPoolSet: seedSorterPoolSetMaker
+    makeMutator: sorterModelMutatorMaker
 } with
     member this.GenSaveIntervals = this.genSaveIntervals
     member this.GenSaveSubIntervals = this.genSaveSubIntervals
+    member this.MakerNames = SgdRun.makerNames this.run
+    member this.MakeSortableTests = this.makeSortableTests
+    member this.MakeSeedPoolSet = this.makeSeedPoolSet
+    member this.MakeMutator = this.makeMutator
 
 type runHost =
     | SimpleRunHost of simpleRunHost
     | SgdRunHost of sgdRunHost
 
     static member Create (run: run) (maxParallel: int) =
+        ProjectCatalogs.registerAll ()
         let db = RunHost.makeDatabase run
 
         let makeSimpleHost (simple: simpleRun) =
@@ -55,12 +63,19 @@ type runHost =
         match run with
         | run.SimpleRun value -> SimpleRunHost (makeSimpleHost value)
         | run.SgdRun value ->
+            let names = SgdRun.makerNames value
+            let makeTests = SortableTestsMakerCatalog.get names.SortableTests
+            let makeSeedPool = SeedSorterPoolSetMakerCatalog.get names.SeedPoolSet
+            let makeMutator = MutatorMakerCatalog.get names.Mutator
             let simpleHost = makeSimpleHost (SgdRun.baseRun value)
             SgdRunHost {
                 simpleHost = simpleHost
                 run = value
                 genSaveIntervals = SgdRun.genSaveIntervalsName value |> lookupInterval
                 genSaveSubIntervals = SgdRun.genSaveSubIntervalsName value |> lookupInterval
+                makeSortableTests = makeTests
+                makeSeedPoolSet = makeSeedPool
+                makeMutator = makeMutator
             }
 
     member this.RunDb =

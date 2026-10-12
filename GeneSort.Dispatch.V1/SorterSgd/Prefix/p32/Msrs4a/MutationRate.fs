@@ -32,7 +32,7 @@ module MutationRate =
 
         let Test (executorType: sorterSgdExecutorType) : run =
             run.SgdRun (
-                SgdRun.create
+                SgdRun.create EvolutionMakerNames.prefix
                     dbVariableModR_32Name
                     projName
                     (sprintf @"Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -60,7 +60,7 @@ module MutationRate =
 
         let EqualOPS (executorType: sorterSgdExecutorType) : run =
             run.SgdRun (
-                SgdRun.create
+                SgdRun.create EvolutionMakerNames.prefix
                     dbVariableModR_32Name
                     projName
                     (sprintf @"EqualOPS%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -89,7 +89,7 @@ module MutationRate =
 
         let EqualOPS2 (executorType: sorterSgdExecutorType) : run =
             run.SgdRun (
-                SgdRun.create
+                SgdRun.create EvolutionMakerNames.prefix
                     dbVariableModR_32Name
                     projName
                     (sprintf @"EqualOPS2%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -121,7 +121,7 @@ module MutationRate =
 
         let Test (executorType: sorterSgdExecutorType) : run =
             run.SgdRun (
-                SgdRun.create
+                SgdRun.create EvolutionMakerNames.prefix
                     dbVariableModR_64Name
                     projName
                     (sprintf @"Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -148,7 +148,7 @@ module MutationRate =
 
         let WideTest (executorType: sorterSgdExecutorType) : run =
             run.SgdRun (
-                SgdRun.create
+                SgdRun.create EvolutionMakerNames.prefix
                     dbVariableModR_64Name
                     projName
                     (sprintf @"WideTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -176,7 +176,7 @@ module MutationRate =
 
         let NarrowTest (executorType: sorterSgdExecutorType) : run =
             run.SgdRun (
-                SgdRun.create
+                SgdRun.create EvolutionMakerNames.prefix
                     dbVariableModR_64Name
                     projName
                     (sprintf @"NarrowTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -209,7 +209,7 @@ module MutationRate =
         
         let Test2 (executorType: sorterSgdExecutorType) : run =
             run.SgdRun (
-                SgdRun.create
+                SgdRun.create EvolutionMakerNames.prefix
                     dbMaxModRate_32Name
                     projName
                     (sprintf @"Test2%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -240,7 +240,7 @@ module MutationRate =
         
         let WideTest (executorType: sorterSgdExecutorType) : run =
             run.SgdRun (
-                SgdRun.create
+                SgdRun.create EvolutionMakerNames.prefix
                     dbMaxModRate_64Name
                     projName
                     (sprintf @"WideTest2%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
