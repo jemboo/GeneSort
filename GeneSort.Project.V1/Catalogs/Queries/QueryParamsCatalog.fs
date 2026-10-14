@@ -15,7 +15,9 @@ module QueryCatalogNames =
     [<Literal>]
     let sorterSgdMssiOrthoPara = "sorter-sgd.mssi-ortho-para"
     [<Literal>]
-    let sorterSgdMsuf32MutationRate = "sorter-sgd.msuf32-mutation-rate"
+    let sorterSgdMsufStandard = "sorter-sgd.msuf-standard"
+    [<Literal>]
+    let sorterSgdMsufSoss = "sorter-sgd.msuf-soss"
     [<Literal>]
     let sorterSgdMsrs32MutationRate = "sorter-sgd.msrs32-mutation-rate"
     [<Literal>]

@@ -36,6 +36,7 @@ type runParameters =
     static member generationIntervalCountKey = "GenerationIntervalCount"
     static member generationIntervalLastKey = "GenerationIntervalLast"
     static member generationsPerSubsetKey = "GenerationsPerSubset"
+    static member generationsPerMergedSetKey = "GenerationsPerMergedSet"
     static member adjustCeLengthFrequencyKey = "AdjustCeLengthFrequency"
     static member idKey = "Id"
     static member insertionRateKey = "InsertionRate"
@@ -236,6 +237,10 @@ type runParameters =
 
     member this.GetGenerationsPerSubset() : int<generationsPerSubset> option =
         runParameters.tryGetInt runParameters.generationsPerSubsetKey this.paramMap
+        |> Option.map UMX.tag<generationsPerSubset>
+
+    member this.GetGenerationsPerMergedSet() : int<generationsPerSubset> option =
+        runParameters.tryGetInt runParameters.generationsPerMergedSetKey this.paramMap
         |> Option.map UMX.tag<generationsPerSubset>
 
     member this.GetAdjustCeLengthFrequency() : int<adjustCeLengthFrequency> option =
@@ -491,11 +496,14 @@ type runParameters =
     member this.WithParaRate(para: float<paraRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.paraRateKey (para |> Option.map UmxExt.floatToRaw) }
 
-    member this.WithPartitionCount(count: int<GeneSort.Sorting.partitionCount> option) =
+    member this.WithPartitionCount(count: int<partitionCount> option) =
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.partitionCountKey (count |> Option.map UmxExt.intToRaw) }
 
     member this.WithGenerationsPerSubset(count: int<generationsPerSubset> option) =
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationsPerSubsetKey (count |> Option.map UmxExt.intToRaw) }
+
+    member this.WithGenerationsPerMergedSet(count: int<generationsPerSubset> option) =
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.generationsPerMergedSetKey (count |> Option.map UmxExt.intToRaw) }
 
     member this.WithAdjustCeLengthFrequency(count: int<adjustCeLengthFrequency> option) =
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.adjustCeLengthFrequencyKey (count |> Option.map UmxExt.intToRaw) }
@@ -531,8 +539,7 @@ type runParameters =
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedModificationRateKey (mr |> Option.map UmxExt.floatToRaw) }
 
     member this.WithSeedSoss(seed: uint64<randomSeed> option) =
-        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedSossKey
-                        (seed |> Option.map (fun value -> (UMX.untag value).ToString(CultureInfo.InvariantCulture))) }
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedSossKey (seed |> Option.map UmxExt.uint64ToRaw) } 
 
     member this.WithSeedSorterPoolSelectionType(ses: sorterSelectionType option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.seedSorterPoolSelectionTypeKey (ses |> Option.map SorterSelectionType.toString) }

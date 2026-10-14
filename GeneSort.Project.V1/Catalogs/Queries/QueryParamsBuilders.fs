@@ -130,50 +130,97 @@ module QueryParamsBuilders =
                            |> withAdjustmentFrequency rp
                 }
 
-        module Msuf32MutationRate =
-            let makeQueryParams projectName dbName repl codeMod genCurrent sorterCtPerPool sorterPoolCt para selfSym seedModR modR mmod mutVar outDt  =
-                queryParams.create dbName projectName (Some repl) (Some genCurrent) outDt
-                    [|
-                        (runParameters.codeModKey, (Some codeMod) |> CodeModKey.toString)
-                        (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
-                        (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                        (runParameters.paraRateKey, (Some para) |> ParaRate.toString)
-                        (runParameters.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
-                        (runParameters.seedModificationRateKey, (Some seedModR) |> SeedModificationRate.toString)
-                        (runParameters.modificationRateKey, (Some modR) |> ModificationRate.toString)
-                        (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
-                        (runParameters.mutatorVariantKey, mutVar |> MutatorVariant.toString)
-                    |]
-            let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
-                maybe {
-                    let! repl = rp.GetRepl()
-                    let! codeMod = rp.GetCodeModKey()
-                    let! curGen = rp.GetGenerationCurrent()
-                    let! scPP = rp.GetSorterCountPerPool()
-                    let! spc = rp.GetSorterPoolCount()
-                    let! para = rp.GetParaRate()
-                    let! self = rp.GetSelfSymRate()
-                    let! seedModR = rp.GetSeedModificationRate()
-                    let! modR = rp.GetModificationRate()
-                    let! mmod = rp.GetMutationMod()
-                    let! mutVar = rp.GetMutatorVariant()
-                    let query = makeQueryParams projectName dbName repl codeMod curGen scPP spc para self seedModR modR mmod mutVar odt
-                    let properties =
-                        query.Properties
-                        |> fun properties ->
-                            match rp.GetPartitionCount() with
-                            | None -> properties
-                            | Some count -> properties |> Map.add runParameters.partitionCountKey (string %count)
-                        |> fun properties ->
-                            match rp.GetGenerationsPerSubset() with
-                            | None -> properties
-                            | Some count -> properties |> Map.add runParameters.generationsPerSubsetKey (string %count)
-                        |> fun properties ->
-                            match rp.GetAdjustCeLengthFrequency() with
-                            | None -> properties
-                            | Some count -> properties |> Map.add runParameters.adjustCeLengthFrequencyKey (string %count)
-                    return queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
-                }
+        module Msuf =
+
+            module Standard =
+                let makeQueryParams projectName dbName repl codeMod genCurrent sorterCtPerPool sorterPoolCt para selfSym seedModR modR mmod mutVar outDt  =
+                    queryParams.create dbName projectName (Some repl) (Some genCurrent) outDt
+                        [|
+                            (runParameters.codeModKey, (Some codeMod) |> CodeModKey.toString)
+                            (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                            (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                            (runParameters.paraRateKey, (Some para) |> ParaRate.toString)
+                            (runParameters.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
+                            (runParameters.seedModificationRateKey, (Some seedModR) |> SeedModificationRate.toString)
+                            (runParameters.modificationRateKey, (Some modR) |> ModificationRate.toString)
+                            (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
+                            (runParameters.mutatorVariantKey, mutVar |> MutatorVariant.toString)
+                        |]
+                let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
+                    maybe {
+                        let! repl = rp.GetRepl()
+                        let! codeMod = rp.GetCodeModKey()
+                        let! curGen = rp.GetGenerationCurrent()
+                        let! scPP = rp.GetSorterCountPerPool()
+                        let! spc = rp.GetSorterPoolCount()
+                        let! para = rp.GetParaRate()
+                        let! self = rp.GetSelfSymRate()
+                        let! seedModR = rp.GetSeedModificationRate()
+                        let! modR = rp.GetModificationRate()
+                        let! mmod = rp.GetMutationMod()
+                        let! mutVar = rp.GetMutatorVariant()
+                        return makeQueryParams projectName dbName repl codeMod curGen scPP spc para self 
+                                               seedModR modR mmod mutVar odt
+                               |> withAdjustmentFrequency rp
+                    }
+
+            module Soss =
+
+                let makeQueryParams projectName dbName repl codeMod genCurrent 
+                                    sorterCtPerPool sorterPoolCt para selfSym seedModR 
+                                    modR mmod mutVar seedSoss partCt genSoss genMerged outDt =
+                    queryParams.create dbName projectName (Some repl) (Some genCurrent) outDt
+                        [|
+                            (runParameters.codeModKey, (Some codeMod) |> CodeModKey.toString)
+                            (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                            (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                            (runParameters.paraRateKey, (Some para) |> ParaRate.toString)
+                            (runParameters.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
+                            (runParameters.seedModificationRateKey, (Some seedModR) |> SeedModificationRate.toString)
+                            (runParameters.modificationRateKey, (Some modR) |> ModificationRate.toString)
+                            (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
+                            (runParameters.mutatorVariantKey, mutVar |> MutatorVariant.toString)
+                            (runParameters.seedSossKey, seedSoss |> string)
+                            (runParameters.partitionCountKey, (Some partCt) |> PartitionCount.toString)
+                            (runParameters.generationsPerSubsetKey, (Some genSoss) |> GenerationsPerSubset.toString)
+                            (runParameters.generationsPerMergedSetKey, (Some genMerged) |> GenerationsPerSubset.toString)
+                        |]
+
+                let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
+                    maybe {
+                        let! repl = rp.GetRepl()
+                        let! codeMod = rp.GetCodeModKey()
+                        let! curGen = rp.GetGenerationCurrent()
+                        let! scPP = rp.GetSorterCountPerPool()
+                        let! spc = rp.GetSorterPoolCount()
+                        let! para = rp.GetParaRate()
+                        let! self = rp.GetSelfSymRate()
+                        let! seedModR = rp.GetSeedModificationRate()
+                        let! modR = rp.GetModificationRate()
+                        let! mmod = rp.GetMutationMod()
+                        let! mutVar = rp.GetMutatorVariant()
+                        let! seedSoss = rp.GetSeedSoss()
+                        let! partCt = rp.GetPartitionCount()
+                        let! genSoss = rp.GetGenerationsPerSubset()
+                        let! genMerged = rp.GetGenerationsPerMergedSet()
+                        let query = makeQueryParams projectName dbName repl codeMod curGen scPP spc para self seedModR 
+                                                    modR mmod mutVar seedSoss partCt genSoss genMerged odt
+                        let properties =
+                            query.Properties
+                            |> fun properties ->
+                                match rp.GetPartitionCount() with
+                                | None -> properties
+                                | Some count -> properties |> Map.add runParameters.partitionCountKey (string %count)
+                            |> fun properties ->
+                                match rp.GetGenerationsPerSubset() with
+                                | None -> properties
+                                | Some count -> properties |> Map.add runParameters.generationsPerSubsetKey (string %count)
+                            |> fun properties ->
+                                match rp.GetAdjustCeLengthFrequency() with
+                                | None -> properties
+                                | Some count -> properties |> Map.add runParameters.adjustCeLengthFrequencyKey (string %count)
+                        return queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
+                    }
 
         module Msrs32MutationRate =
             let makeQueryParams projectName dbName repl codeMod genCurrent sorterCtPerPool sorterPoolCt para selfSym modR mmod outDt =
@@ -424,7 +471,8 @@ module QueryParamsBuilders =
                     QueryCatalogNames.sorterSgdUf6MutationRate, SorterSgd.Uf6MutationRate.queryParamsFromRunParams
                     QueryCatalogNames.sorterSgdMsrsOrthoPara, SorterSgd.MsrsOrthoPara.queryParamsFromRunParams
                     QueryCatalogNames.sorterSgdMssiOrthoPara, SorterSgd.MssiOrthoPara.queryParamsFromRunParams
-                    QueryCatalogNames.sorterSgdMsuf32MutationRate, SorterSgd.Msuf32MutationRate.queryParamsFromRunParams
+                    QueryCatalogNames.sorterSgdMsufStandard, SorterSgd.Msuf.Standard.queryParamsFromRunParams
+                    QueryCatalogNames.sorterSgdMsufSoss, SorterSgd.Msuf.Soss.queryParamsFromRunParams
                     QueryCatalogNames.sorterSgdMsrs32MutationRate, SorterSgd.Msrs32MutationRate.queryParamsFromRunParams
                     QueryCatalogNames.sorterSgdMsrsPoolModComp, SorterSgd.MsrsPoolModComp.queryParamsFromRunParams
                     QueryCatalogNames.sortableTestMerge, SortableTests.Merge.queryParamsFromRunParams

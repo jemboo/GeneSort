@@ -47,6 +47,19 @@ generation suffixes (including Soss's former prefix default); other legacy runs
 use standard. Explicit names always take precedence, and partially populated
 maker fields are rejected.
 
+Seed makers return the `sorterPoolSet` union. Seed catalog keys identify both the
+output variant and input source: `seed-pool.standard.standard`,
+`seed-pool.standard.merge`, `seed-pool.standard.prefix`, and the corresponding
+`seed-pool.soss.*` keys. Use `EvolutionMakerNames.sossStandard`, `sossMerge`, or
+`sossPrefix` with `GenSoss`. The original presets produce Standard pools.
+
+Each workflow unwraps its expected variant before evaluation or saving and returns
+an error for an incompatible maker. The Soss makers perform seed conversion;
+generation pipelines remain strongly typed. Legacy `seed-sorter-pool-set.*` keys
+remain Standard aliases. The DTO reader upgrades these legacy keys for saved runs
+ending in `GenSoss` to the matching Soss key; custom and explicit variant keys are
+preserved.
+
 ```fsharp
 ProjectCatalogs.registerAll ()
 let makeTests = SortableTestsMakerCatalog.get SortableTestsMakerNames.prefix context

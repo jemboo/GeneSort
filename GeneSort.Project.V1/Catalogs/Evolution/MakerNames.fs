@@ -20,6 +20,23 @@ module SortableTestsMakerNames =
     let prefix = "sortable-tests.prefix"
 
 module SeedSorterPoolSetMakerNames =
+    module Standard =
+        [<Literal>]
+        let standard = "seed-pool.standard.standard"
+        [<Literal>]
+        let merge = "seed-pool.standard.merge"
+        [<Literal>]
+        let prefix = "seed-pool.standard.prefix"
+
+    module Soss =
+        [<Literal>]
+        let standard = "seed-pool.soss.standard"
+        [<Literal>]
+        let merge = "seed-pool.soss.merge"
+        [<Literal>]
+        let prefix = "seed-pool.soss.prefix"
+
+    // Legacy keys retained for saved configurations.
     [<Literal>]
     let standard = "seed-sorter-pool-set.standard"
     [<Literal>]
@@ -30,11 +47,14 @@ module SeedSorterPoolSetMakerNames =
 module EvolutionMakerNames =
     let standard = {
         SortableTests = SortableTestsMakerNames.standard
-        SeedPoolSet = SeedSorterPoolSetMakerNames.standard
+        SeedPoolSet = SeedSorterPoolSetMakerNames.Standard.standard
         Mutator = MutatorMakerNames.simpleSorterModel
     }
-    let merge = { standard with SortableTests = SortableTestsMakerNames.merge; SeedPoolSet = SeedSorterPoolSetMakerNames.merge }
-    let prefix = { standard with SortableTests = SortableTestsMakerNames.prefix; SeedPoolSet = SeedSorterPoolSetMakerNames.prefix }
+    let merge = { standard with SortableTests = SortableTestsMakerNames.merge; SeedPoolSet = SeedSorterPoolSetMakerNames.Standard.merge }
+    let prefix = { standard with SortableTests = SortableTestsMakerNames.prefix; SeedPoolSet = SeedSorterPoolSetMakerNames.Standard.prefix }
+    let sossStandard = { standard with SeedPoolSet = SeedSorterPoolSetMakerNames.Soss.standard }
+    let sossMerge = { merge with SeedPoolSet = SeedSorterPoolSetMakerNames.Soss.merge }
+    let sossPrefix = { prefix with SeedPoolSet = SeedSorterPoolSetMakerNames.Soss.prefix }
 
     let validate names =
         for field, value in ["SortableTests", names.SortableTests; "SeedPoolSet", names.SeedPoolSet; "Mutator", names.Mutator] do

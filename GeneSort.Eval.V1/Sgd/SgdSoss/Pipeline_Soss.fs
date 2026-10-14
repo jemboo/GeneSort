@@ -55,6 +55,7 @@ module Pipeline_Soss =
             (distinctSorterHashes: bool<distinctSorterHashes>)
             (sortableTestPartitions: partitionOfSortableTests)
             (generationsPerSubset: int<generationsPerSubset>)
+            (generationsPerMergedSet: int<generationsPerSubset>)
             (adjustCeLengthFrequency: int<adjustCeLengthFrequency>)
             (prefix: ceBlock)
             (sorterEvalType: sorterEvalType)
@@ -73,7 +74,7 @@ module Pipeline_Soss =
             sortableTestPartitions.SortableTests
             |> Map.keys
             |> Seq.toArray
-            |> CommonSgdSoss.subsetIdForGeneration generationsPerSubset currentPoolSet.GenerationNumber
+            |> CommonSgdSoss.subsetIdForGeneration generationsPerSubset generationsPerMergedSet currentPoolSet.GenerationNumber
 
         let adjustCeLengthsThisGeneration =
             CommonSgdSoss.shouldAdjustCeLengths adjustCeLengthFrequency currentPoolSet.GenerationNumber

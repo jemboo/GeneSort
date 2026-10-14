@@ -47,6 +47,8 @@ module EvoOrch_Soss =
             let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count."
             let! generationsPerSubset = rp.GetGenerationsPerSubset() |> Result.ofOption "Missing GenerationsPerSubset."
             do! if %generationsPerSubset > 0 then Ok () else Error "GenerationsPerSubset must be greater than zero."
+            let! generationsPerMergedSet = rp.GetGenerationsPerMergedSet() |> Result.ofOption "Missing GenerationsPerMergedSet."
+            do! if %generationsPerMergedSet > 0 then Ok () else Error "GenerationsPerMergedSet must be greater than zero."
             let! adjustCeLengthFrequency = rp.GetAdjustCeLengthFrequency() |> Result.ofOption "Missing AdjustCeLengthFrequency."
             do! if %adjustCeLengthFrequency > 0 then Ok () else Error "AdjustCeLengthFrequency must be greater than zero."
             let! srtrEvalMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
@@ -150,7 +152,7 @@ module EvoOrch_Soss =
                                         sortableTestPartitions.SortableTests
                                         |> Map.keys
                                         |> Seq.toArray
-                                        |> CommonSgdSoss.subsetIdForGeneration generationsPerSubset currentSorterPoolSet.GenerationNumber
+                                        |> CommonSgdSoss.subsetIdForGeneration generationsPerSubset generationsPerMergedSet currentSorterPoolSet.GenerationNumber
                                     Pipeline_Soss.evaluateRequiredPartitions sortableTestPartitions prefix evalType false
                                         collectNewSortableTests subsetId true currentSorterPoolSet
                                 else
@@ -188,6 +190,7 @@ module EvoOrch_Soss =
                                     distinctSorterHashes
                                     sortableTestPartitions
                                     generationsPerSubset
+                                    generationsPerMergedSet
                                     adjustCeLengthFrequency
                                     prefix
                                     evalType

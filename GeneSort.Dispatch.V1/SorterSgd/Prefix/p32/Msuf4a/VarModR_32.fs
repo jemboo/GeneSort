@@ -39,7 +39,7 @@ let Pool_32_Test (executorType: sorterSgdExecutorType)  : run =
     ]
             "expInterval100_L50ss"
             "summaryInterval_C.1p5C"
-            QueryCatalogNames.sorterSgdMsuf32MutationRate
+            QueryCatalogNames.sorterSgdMsufStandard
             RunParamBuilderNames.Filter.identity
             RunParamBuilderNames.Enhancer.msuf32MutationRate
             false
@@ -66,7 +66,7 @@ let Pool_32_V1 (executorType: sorterSgdExecutorType)  : run =
     ]
             "expInterval100_L50ss"
             "summaryInterval_C.1p5C"
-            QueryCatalogNames.sorterSgdMsuf32MutationRate
+            QueryCatalogNames.sorterSgdMsufStandard
             RunParamBuilderNames.Filter.identity
             RunParamBuilderNames.Enhancer.msuf32MutationRate
             false
@@ -93,7 +93,7 @@ let Pool_512_V2a (executorType: sorterSgdExecutorType)  : run =
     ]
             "expInterval100_L50ss"
             "summaryInterval_C.1p5C"
-            QueryCatalogNames.sorterSgdMsuf32MutationRate
+            QueryCatalogNames.sorterSgdMsufStandard
             RunParamBuilderNames.Filter.identity
             RunParamBuilderNames.Enhancer.msuf32MutationRate
             false

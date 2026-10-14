@@ -11,6 +11,13 @@ open GeneSort.Dispatch.V1
 open GeneSort.Project.Mp.V1
 open GeneSort.Core.Mp
 open MessagePack
+open GeneSort.Core
+open GeneSort.SortingOps
+open GeneSort.Model.Sorting.V1
+open GeneSort.Eval.V1
+open GeneSort.Eval.V1.Sgd
+open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Eval.V1.Sgd.Soss
 
 let private emptyParameters = runParameters.create Map.empty
 
@@ -30,7 +37,7 @@ let private errorOf result =
 let private makeRun names (projectName: string) (runName: string) =
     SgdRun.create names (UMX.tag "CatalogTests") (UMX.tag projectName) (UMX.tag runName)
         "Catalog configuration test" [] "expInterval100_L50ss" "summaryInterval_C.1p5C"
-        QueryCatalogNames.sorterSgdMsuf32MutationRate RunParamBuilderNames.Filter.identity
+        QueryCatalogNames.sorterSgdMsufStandard RunParamBuilderNames.Filter.identity
         RunParamBuilderNames.Enhancer.msuf32MutationRate false
     |> run.SgdRun
 
@@ -76,7 +83,7 @@ let ``SGD maker names survive MessagePack round trip`` () =
 [<InlineData("SorterSgd.Merge", "Report", "merge")>]
 [<InlineData("Tests", "OldGenPrefix", "prefix")>]
 [<InlineData("Tests", "OldGenMerge", "merge")>]
-[<InlineData("Tests", "OldGenSoss", "prefix")>]
+[<InlineData("Tests", "OldGenSoss", "sossPrefix")>]
 [<InlineData("Tests", "OldGenStandard", "standard")>]
 [<InlineData("SorterSgd.Prefix", "OldGenStandard", "standard")>]
 [<InlineData("SorterSgd.Prefix", "OldGenMerge", "merge")>]
@@ -87,13 +94,87 @@ let ``legacy saved runs recover maker presets without new fields`` projectName r
     for key in ["SortableTestsMakerName"; "SeedPoolSetMakerName"; "MutatorMakerName"] do
         Assert.True(json.AsObject().Remove key)
     let restored = MessagePackSerializer.ConvertFromJson(json.ToJsonString()) |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
-    let names = match expected with "prefix" -> EvolutionMakerNames.prefix | "merge" -> EvolutionMakerNames.merge | _ -> EvolutionMakerNames.standard
+    let names = match expected with "sossPrefix" -> EvolutionMakerNames.sossPrefix | "prefix" -> EvolutionMakerNames.prefix | "merge" -> EvolutionMakerNames.merge | _ -> EvolutionMakerNames.standard
     Assert.Equal(Some names, restored.MakerNames)
 
 [<Fact>]
 let ``partially configured saved runs are rejected`` () =
     let dto = makeRun EvolutionMakerNames.standard "Tests" "Partial" |> RunDto.fromDomain
     Assert.Throws<ArgumentException>(fun () -> RunDto.toDomain { dto with MutatorMakerName = null } |> ignore) |> ignore
+
+[<Theory>]
+[<InlineData("seed-sorter-pool-set.standard", "seed-pool.soss.standard")>]
+[<InlineData("seed-sorter-pool-set.merge", "seed-pool.soss.merge")>]
+[<InlineData("seed-sorter-pool-set.prefix", "seed-pool.soss.prefix")>]
+let ``legacy Soss seed names migrate to Soss variants`` oldName expected =
+    let names = { EvolutionMakerNames.prefix with SeedPoolSet = oldName }
+    let restored = makeRun names "Tests" "OldGenSoss" |> RunDto.fromDomain |> RunDto.toDomain
+    Assert.Equal(expected, restored.MakerNames.Value.SeedPoolSet)
+
+[<Theory>]
+[<InlineData("seed-pool.standard.standard", false)>]
+[<InlineData("seed-pool.standard.merge", false)>]
+[<InlineData("seed-pool.standard.prefix", false)>]
+[<InlineData("seed-pool.soss.standard", true)>]
+[<InlineData("seed-pool.soss.merge", true)>]
+[<InlineData("seed-pool.soss.prefix", true)>]
+let ``seed catalogs produce the requested pool variant`` (name: string) (expectSoss: bool) =
+    ProjectCatalogs.registerAll ()
+    let evaluation =
+        sorterEvalV2.create (UMX.tag (Guid.NewGuid())) SortableTestsSubsetId.Default 32<sortingWidth> 3<sortableCount>
+            (UMX.tag 7) 2<stageLength> [||] (UMX.tag<isReflectionSymmetric> false)
+            (UMX.tag 1) (UMX.tag 0) |> sorterEval.V2
+    let evaluations = sorterSetEval.create (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid())) [|evaluation|]
+    let supplied = {
+        context with
+            LoadStandardSorterEvals = fun _ _ _ -> async { return Ok evaluations }
+            LoadMergeSorterEvals = fun _ _ _ -> async { return Ok evaluations }
+            LoadPrefixSorterEvals = fun _ _ _ -> async { return Ok evaluations }
+    }
+    let parameters =
+        emptyParameters.WithSortingWidth(Some 32<sortingWidth>)
+            .WithRepl(Some 0<replNumber>)
+            .WithMergeLibId(Some (mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA))
+            .WithPrefixLibId(Some (prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA))
+            .WithSorterPoolCount(Some 1<sorterPoolCount>)
+            .WithSorterCountPerPool(Some 1<sorterCountPerPool>)
+            .WithSorterEvalMeasureInitial(Some (stageLengthMeasure.create false false |> sorterEvalMeasure.StageLength))
+            .WithRngType(Some rngType.Lcg)
+            .WithSimpleSorterModelType(Some simpleSorterModelType.Msuf4)
+            .WithSeedSorterPoolSelectionType(Some (sorterSelectionType.GuidOrder 1<sorterCount>))
+            .WithExcludeSelfCe(Some (UMX.tag<excludeSelfCe> true))
+            .WithMutationMod(Some 0<mutationMod>)
+    let poolSet =
+        match SeedSorterPoolSetMakerCatalog.get name supplied parameters |> Async.RunSynchronously with
+        | Ok value -> value
+        | Error error -> failwith error
+    match poolSet with
+    | sorterPoolSet.Standard value ->
+        Assert.False(expectSoss)
+        Assert.Single(value.SorterPools) |> ignore
+    | sorterPoolSet.Soss value ->
+        Assert.True(expectSoss)
+        Assert.Single(value.SorterPools) |> ignore
+
+[<Theory>]
+[<InlineData(true)>]
+[<InlineData(false)>]
+let ``workflows reject incompatible seeds before evaluating or saving`` (sossWorkflow: bool) =
+    let standard = sorterPoolSet_Standard.create (UMX.tag (Guid.NewGuid())) 0<generationNumber> (Dim1 1) None
+    let seed = if sossWorkflow then sorterPoolSet.Standard standard else SorterPoolSet_Soss.fromStandard standard |> sorterPoolSet.Soss
+    let creator _ = async { return Ok seed }
+    let result =
+        if sossWorkflow then
+            GeneSort.Dispatch.V1.SorterSgd.Soss.SgdEx_Soss.initializeAndSaveSeedPoolSet
+                creator Unchecked.defaultof<_> Unchecked.defaultof<_> Unchecked.defaultof<_> emptyParameters
+                Unchecked.defaultof<_> Unchecked.defaultof<_> ignore
+            |> Async.RunSynchronously |> Result.map ignore
+        else
+            GeneSort.Dispatch.V1.SorterSgd.Standard.SgdEx_Standard.initializeAndSaveSeedPoolSet
+                creator Unchecked.defaultof<_> Unchecked.defaultof<_> Unchecked.defaultof<_> emptyParameters
+                Unchecked.defaultof<_> Unchecked.defaultof<_> ignore
+            |> Async.RunSynchronously |> Result.map ignore
+    Assert.Contains((if sossWorkflow then "Expected a Soss" else "Expected a Standard"), errorOf result)
 
 [<Fact>]
 let ``project catalogs initialize together without dispatch dependencies`` () =

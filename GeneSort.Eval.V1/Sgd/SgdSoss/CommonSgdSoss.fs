@@ -16,9 +16,10 @@ module CommonSgdSoss =
     /// Adjusts at generation zero and every configured interval thereafter.
     let shouldAdjustCeLengths = GenerationSchedule.shouldAdjustCeLengths
 
-    /// Selects each configured partition and then Merge for the configured number of generations apiece.
+    /// Cycles through partitions, then Merge with its independently configured duration.
     let subsetIdForGeneration
             (generationsPerSubset: int<generationsPerSubset>)
+            (generationsPerMergedSet: int<generationsPerSubset>)
             (generation: int<generationNumber>)
             (partitionIds: string<sortableTestsPartitionId> array) =
         if Array.isEmpty partitionIds then
@@ -27,8 +28,13 @@ module CommonSgdSoss =
             invalidArg "generation" "Generation must not be negative."
         if %generationsPerSubset <= 0 then
             invalidArg "generationsPerSubset" "GenerationsPerSubset must be greater than zero."
-        let cycleIndex = (%generation / %generationsPerSubset) % (partitionIds.Length + 1)
-        if cycleIndex < partitionIds.Length then
+        if %generationsPerMergedSet <= 0 then
+            invalidArg "generationsPerMergedSet" "GenerationsPerMergedSet must be greater than zero."
+        let partitionDuration = int64 %generationsPerSubset
+        let partitionsDuration = partitionDuration * int64 partitionIds.Length
+        let cyclePosition = int64 %generation % (partitionsDuration + int64 %generationsPerMergedSet)
+        if cyclePosition < partitionsDuration then
+            let cycleIndex = int (cyclePosition / partitionDuration)
             UMX.cast<sortableTestsPartitionId, sortableTestsSubsetId> partitionIds.[cycleIndex]
         else
             mergedSubsetId

@@ -116,6 +116,60 @@ module private Fixtures =
 
 module OutputUnionTests =
     [<Theory>]
+    [<InlineData(25, 399, "3")>]
+    [<InlineData(25, 400, "Merge")>]
+    [<InlineData(25, 424, "Merge")>]
+    [<InlineData(25, 425, "0")>]
+    [<InlineData(25, 825, "Merge")>]
+    [<InlineData(250, 400, "Merge")>]
+    [<InlineData(250, 649, "Merge")>]
+    [<InlineData(250, 650, "0")>]
+    let ``Soss merged duration is independent of partition duration`` (mergedDuration: int) (generation: int) expected =
+        let parameters = (runParameters.create Map.empty).WithGenerationsPerMergedSet(Some (UMX.tag<generationsPerSubset> mergedDuration))
+        let duration = parameters.GetGenerationsPerMergedSet().Value
+        let partitions = [| for index in 0 .. 3 -> UMX.tag<sortableTestsPartitionId> (string index) |]
+        let actual = CommonSgdSoss.subsetIdForGeneration (100<generationsPerSubset>)  duration (UMX.tag<generationNumber> generation) partitions
+        Assert.Equal(expected, UMX.untag actual)
+        Assert.True(parameters.WithGenerationsPerMergedSet(None).GetGenerationsPerMergedSet().IsNone)
+
+    [<Theory>]
+    [<InlineData(0)>]
+    [<InlineData(-1)>]
+    let ``Soss rejects nonpositive merged durations`` (duration: int) =
+        Assert.Throws<ArgumentException>(fun () ->
+            CommonSgdSoss.subsetIdForGeneration 100<generationsPerSubset> (UMX.tag<generationsPerSubset> duration)
+                0<generationNumber> [| UMX.tag<sortableTestsPartitionId> "0" |] |> ignore) |> ignore
+
+    [<Fact>]
+    let ``Soss query identity includes merged duration`` () =
+        let parameters =
+            (runParameters.create Map.empty)
+                .WithRepl(Some 0<replNumber>)
+                .WithCodeModKey(Some (UMX.tag "NoMods"))
+                .WithGenerationCurrent(Some 0<generationNumber>)
+                .WithSorterCountPerPool(Some 32<sorterCountPerPool>)
+                .WithSorterPoolCount(Some 4<sorterPoolCount>)
+                .WithParaRate(Some (UMX.tag 1.15))
+                .WithSelfSymRate(Some (UMX.tag 1.75))
+                .WithSeedModificationRate(Some (UMX.tag 0.02))
+                .WithModificationRate(Some (UMX.tag 0.03))
+                .WithMutationMod(Some 0<mutationMod>)
+                .WithMutatorVariant(Some mutatorVariant.V2)
+                .WithSeedSoss(Some (UMX.tag 1234UL))
+                .WithPartitionCount(Some 4<GeneSort.Sorting.partitionCount>)
+                .WithGenerationsPerSubset(Some 100<generationsPerSubset>)
+        QueryParamsBuilders.registerAll ()
+        let builder = QueryParamsCatalog.get QueryCatalogNames.sorterSgdMsufSoss (UMX.tag "Test") (UMX.tag "Soss")
+        let query duration =
+            builder (parameters.WithGenerationsPerMergedSet(Some duration)) (outputDataType.SorterPoolSet "")
+            |> Option.get
+        let shortQuery = query 25<generationsPerSubset>
+        let longQuery = query 250<generationsPerSubset>
+        Assert.Equal("25", shortQuery.Properties.[runParameters.generationsPerMergedSetKey])
+        Assert.NotEqual(shortQuery.Id, longQuery.Id)
+        Assert.True((builder parameters (outputDataType.SorterPoolSet "")).IsNone)
+
+    [<Theory>]
     [<InlineData(100, 0, true)>]
     [<InlineData(100, 99, false)>]
     [<InlineData(100, 100, true)>]
@@ -162,7 +216,7 @@ module OutputUnionTests =
                 let expected = if index = configuredCount then "Merge" else string index
                 for offset in [0; duration - 1] do
                     let generation = cycle * ((configuredCount + 1) * duration) + index * duration + offset
-                    let actual = CommonSgdSoss.subsetIdForGeneration configuredDuration (UMX.tag<generationNumber> generation) partitionIds
+                    let actual = CommonSgdSoss.subsetIdForGeneration configuredDuration configuredDuration (UMX.tag<generationNumber> generation) partitionIds
                     Assert.Equal(expected, UMX.untag actual)
 
     [<Theory>]
@@ -170,7 +224,7 @@ module OutputUnionTests =
     [<InlineData(-1)>]
     let ``Soss rejects nonpositive subset cycle durations`` (duration: int) =
         Assert.Throws<ArgumentException>(fun () ->
-            CommonSgdSoss.subsetIdForGeneration (UMX.tag<generationsPerSubset> duration) 0<generationNumber>
+            CommonSgdSoss.subsetIdForGeneration (UMX.tag<generationsPerSubset> duration) 100<generationsPerSubset> 0<generationNumber>
                 [|UMX.tag<sortableTestsPartitionId> "0"|] |> ignore) |> ignore
 
     [<Theory>]
@@ -437,7 +491,7 @@ module OutputUnionTests =
     [<InlineData(900, "Merge")>]
     let ``Soss selection rotates every 100 generations and repeats after 500`` (generation: int) (expected: string) =
         let partitions = [| for index in 0 .. 3 -> string index |> UMX.tag<sortableTestsPartitionId> |]
-        let selected = CommonSgdSoss.subsetIdForGeneration 100<generationsPerSubset> (UMX.tag<generationNumber> generation) partitions
+        let selected = CommonSgdSoss.subsetIdForGeneration 100<generationsPerSubset> 100<generationsPerSubset> (UMX.tag<generationNumber> generation) partitions
         Assert.Equal(expected, UMX.untag selected)
 
     [<Fact>]

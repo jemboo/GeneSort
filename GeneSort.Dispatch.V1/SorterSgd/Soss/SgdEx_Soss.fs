@@ -23,7 +23,7 @@ module SgdEx_Soss =
 
     /// Handles initialization, evaluation, and DB saving when no checkpoint exists
     let initializeAndSaveSeedPoolSet 
-            (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet_Standard, string>>)
+            (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
             (genDb: IGeneSortDb)
             (saveIntervals: genIntervalConfig)
             (subIntervals: genIntervalConfig)
@@ -35,8 +35,8 @@ module SgdEx_Soss =
         asyncResult {
             let evalType = sorterEvalType.V2
             log "No saved checkpoint found. Creating initial seedSorterPoolSet..."
-            let! standardSeedPoolSet = sorterPoolSetCreator rp
-            let seedPoolSet = SorterPoolSet_Soss.fromStandard standardSeedPoolSet
+            let! seed = sorterPoolSetCreator rp
+            let! seedPoolSet = SorterPoolSet.asSoss seed
             
             let computedEvals = 
                 seedPoolSet 
@@ -68,7 +68,7 @@ module SgdEx_Soss =
     /// and manages final state serialization/reporting pipelines.
     let evaluateEvolutionRunSoss
             (makeSortableTests: runParameters ->  Async<Result<sortableTests * (ce array), string>> )
-            (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet_Standard, string>>)
+            (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
             (makeMutator: sorterModelMutatorMaker)
             (genDb: IGeneSortDb)
             (saveIntervals: genIntervalConfig)

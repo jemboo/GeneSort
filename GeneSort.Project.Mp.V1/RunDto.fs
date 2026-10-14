@@ -89,12 +89,22 @@ module RunDto =
             let makerNames =
                 match Option.ofObj dto.SortableTestsMakerName, Option.ofObj dto.SeedPoolSetMakerName, Option.ofObj dto.MutatorMakerName with
                 | Some tests, Some seed, Some mutator ->
-                    { SortableTests = tests; SeedPoolSet = seed; Mutator = mutator }
+                    let seedName =
+                        // Before variant-specific keys, Soss converted Standard seeds internally.
+                        let isSoss = dto.RunName <> null && dto.RunName.EndsWith("GenSoss")
+                        match seed with
+                        | SeedSorterPoolSetMakerNames.standard -> if isSoss then SeedSorterPoolSetMakerNames.Soss.standard else SeedSorterPoolSetMakerNames.Standard.standard
+                        | SeedSorterPoolSetMakerNames.merge -> if isSoss then SeedSorterPoolSetMakerNames.Soss.merge else SeedSorterPoolSetMakerNames.Standard.merge
+                        | SeedSorterPoolSetMakerNames.prefix -> if isSoss then SeedSorterPoolSetMakerNames.Soss.prefix else SeedSorterPoolSetMakerNames.Standard.prefix
+                        | _ -> seed
+                    { SortableTests = tests; SeedPoolSet = seedName; Mutator = mutator }
                 | None, None, None ->
                     // Older runs encoded input selection in their project/executor names.
                     let projectParts = (dto.ProjectName |> Option.ofObj |> Option.defaultValue "").Split('.')
                     let runName = dto.RunName |> Option.ofObj |> Option.defaultValue ""
-                    if runName.EndsWith("GenPrefix") || runName.EndsWith("GenSoss") then
+                    if runName.EndsWith("GenSoss") then
+                        EvolutionMakerNames.sossPrefix
+                    elif runName.EndsWith("GenPrefix") then
                         EvolutionMakerNames.prefix
                     elif runName.EndsWith("GenMerge") then
                         EvolutionMakerNames.merge

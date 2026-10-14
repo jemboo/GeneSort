@@ -7,9 +7,16 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.Simple.V1
 open FsToolkit.ErrorHandling
 
-
-[<Measure>] type partitionCount
 [<Measure>] type cycleFraction
+
+
+
+module PartitionCount =
+
+    let toString (w: int<partitionCount> option) : string =
+       match w with
+        | Some v -> %v |> string
+        | None -> "None"
 
 
 type cycleStepProfile = bool array

@@ -21,6 +21,15 @@ module RandomSeed =
             UMX.tag<randomSeed> finalSeed
 
 
+    let toString(value: uint64<randomSeed>) : string =
+         UmxExt.uint64OptionToString (Some value)
+
+    let fromString(value: string) : uint64<randomSeed> =
+        match UInt64.TryParse(value) with
+        | true, parsedValue -> UMX.tag<randomSeed> parsedValue
+        | false, _ -> failwithf "Invalid randomSeed string: %s" value
+
+
 type rngType =
     | Lcg
     | Net

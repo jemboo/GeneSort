@@ -3,11 +3,11 @@ namespace GeneSort.Project.V1
 open GeneSort.Project.V1
 open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
-open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Eval.V1.Sgd
 open GeneSort.Model.Sorting.Simple.V1
 
 type sortableTestsMaker = evolutionMakerContext -> runParameters -> Async<Result<sortableTests * ce array, string>>
-type seedSorterPoolSetMaker = evolutionMakerContext -> runParameters -> Async<Result<sorterPoolSet_Standard, string>>
+type seedSorterPoolSetMaker = evolutionMakerContext -> runParameters -> Async<Result<sorterPoolSet, string>>
 type sorterModelMutatorMaker = runParameters -> Async<Result<simpleSorterModelMutator, string>>
 
 module private MakerCatalog =
@@ -60,5 +60,11 @@ module SorterSgdMakerCatalogs =
                 SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.standard SeedPoolSetMakers.createSeedSorterPoolSetStandard
                 SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.merge SeedPoolSetMakers.createSeedSorterPoolSetMerge
                 SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.prefix SeedPoolSetMakers.createSeedSorterPoolSetPrefix
+                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Standard.standard SeedPoolSetMakers.createSeedSorterPoolSetStandard
+                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Standard.merge SeedPoolSetMakers.createSeedSorterPoolSetMerge
+                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Standard.prefix SeedPoolSetMakers.createSeedSorterPoolSetPrefix
+                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Soss.standard SeedPoolSetMakers.createSossSeedSorterPoolSetStandard
+                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Soss.merge SeedPoolSetMakers.createSossSeedSorterPoolSetMerge
+                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Soss.prefix SeedPoolSetMakers.createSossSeedSorterPoolSetPrefix
                 MutatorMakerCatalog.register MutatorMakerNames.simpleSorterModel MutatorMakers.makeSimpleSorterModelMutator
                 registered <- true)

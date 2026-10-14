@@ -18,7 +18,7 @@ open GeneSort.Eval.V1.Sgd.Standard
 
 module SeedPoolSetMakers =
 
-    let createSeedSorterPoolSetStandard 
+    let private buildStandard
             (context: evolutionMakerContext) (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
         asyncResult {
             let! sortingWidth = 
@@ -97,7 +97,7 @@ module SeedPoolSetMakers =
         }
 
 
-    let createSeedSorterPoolSetMerge
+    let private buildMerge
             (context: evolutionMakerContext) (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
         asyncResult {
 
@@ -181,7 +181,7 @@ module SeedPoolSetMakers =
 
 
 
-    let createSeedSorterPoolSetPrefix
+    let private buildPrefix
             (context: evolutionMakerContext) (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
         asyncResult {
 
@@ -264,3 +264,16 @@ module SeedPoolSetMakers =
         }
 
 
+    let private wrapStandard builder context rp =
+        builder context rp |> Async.map (Result.map sorterPoolSet.Standard)
+
+    let private wrapSoss builder context rp =
+        builder context rp
+        |> Async.map (Result.map (GeneSort.Eval.V1.Sgd.Soss.SorterPoolSet_Soss.fromStandard >> sorterPoolSet.Soss))
+
+    let createSeedSorterPoolSetStandard context rp = wrapStandard buildStandard context rp
+    let createSeedSorterPoolSetMerge context rp = wrapStandard buildMerge context rp
+    let createSeedSorterPoolSetPrefix context rp = wrapStandard buildPrefix context rp
+    let createSossSeedSorterPoolSetStandard context rp = wrapSoss buildStandard context rp
+    let createSossSeedSorterPoolSetMerge context rp = wrapSoss buildMerge context rp
+    let createSossSeedSorterPoolSetPrefix context rp = wrapSoss buildPrefix context rp

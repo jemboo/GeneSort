@@ -82,6 +82,14 @@ module SortableTestsPartitionId =
 module SortableTestsSubsetId =
     let Default = "0" |> UMX.tag<sortableTestsSubsetId>
 
+
+module GenerationsPerSubset =
+
+    let toString (w: int<generationsPerSubset> option) : string =
+       match w with
+        | Some v -> %v |> string
+        | None -> "None"
+
 module SortingWidth =
     let toString (w: int<sortingWidth> option) : string =
        match w with
@@ -100,7 +108,6 @@ module MergeDimension =
         match d with
         | Some v -> sprintf "%d" %v
         | None -> "None"
-
 
 
 module MergeSuffixType =
