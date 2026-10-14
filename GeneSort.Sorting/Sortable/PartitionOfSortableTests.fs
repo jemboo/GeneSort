@@ -68,6 +68,9 @@ module PartitionOfSortableTests =
             makeTests () |> partitionOfSortableTests.create
 
         match tests with
+        | _ when partitionCount = 1 ->
+            Map.ofList [ SortableTestsPartitionId.Default, tests ]
+            |> partitionOfSortableTests.create
         | Bitv512 bitv512Tests ->
             let arrays =
                 bitv512Tests.SimdSortBlocks

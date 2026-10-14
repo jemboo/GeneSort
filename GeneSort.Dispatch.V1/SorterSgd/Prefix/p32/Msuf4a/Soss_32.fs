@@ -17,6 +17,7 @@ let projName = "SorterSgd.Soss.32p4a.Msuf" |> UMX.tag<projectName>
 let dbPool4name = "Pool_4" |> UMX.tag<databaseName>
 let dbPool16name = "Pool_16" |> UMX.tag<databaseName>
 let dbPool32name = "Pool_32" |> UMX.tag<databaseName>
+let dbPool128name = "Pool_128" |> UMX.tag<databaseName>
 let dbPool32TestName = "Pool_32_Test" |> UMX.tag<databaseName>
 let dbPool512name = "Pool_512" |> UMX.tag<databaseName>
 
@@ -52,32 +53,33 @@ let Pool_4_Debug (executorType: sorterSgdExecutorType)  : run =
             false
     )
 
-let Pool_4_Test (executorType: sorterSgdExecutorType)  : run =
+
+let Pool_32_Gens15 (executorType: sorterSgdExecutorType)  : run =
     run.SgdRun (
         SgdRun.create EvolutionMakerNames.sossPrefix
-            dbPool4name
+            dbPool32name
             projName
-            (sprintf @"Pool_4_Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag<runName>)
+            (sprintf @"Pool_32_Gens15%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag<runName>)
             "Soss rate comparison for Msuf32p4a"
             [
-        (runParameters.sorterCountPerPoolKey, [4] |>  List.map string)
-        (runParameters.sorterCountPerPoolSetKey, [32] |> List.map string)
-        (runParameters.seedSossKey, [1234UL] |> List.map string)
-        (runParameters.partitionCountKey, [2; 4; 6; 8] |> List.map string)
-        (runParameters.generationsPerSubsetKey, [10; 20] |> List.map string)
-        (runParameters.generationsPerMergedSetKey, [10; 20; 40; 80] |> List.map string)
-        (runParameters.adjustCeLengthFrequencyKey, [10] |> List.map string)
-        (runParameters.codeModKey, ["NoMods"] |> List.map string)
-        (runParameters.generationIntervalLastKey, [5] |> List.map string)
-        (runParameters.paraRateKey,    [1.15;] |> List.map string)
-        (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
-        (runParameters.mutationModKey, [0;] |> List.map string)
-        (runParameters.seedModificationRateKey, [0.020;] |> List.map string)
-        (runParameters.modificationRateKey, [0.035;]  |> List.map string)
-        (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
-    ]
+                (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+                (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
+                (runParameters.seedSossKey, [1234UL] |> List.map string)
+                (runParameters.partitionCountKey, [3; 9] |> List.map string)
+                (runParameters.generationsPerSubsetKey, [15;] |> List.map string)
+                (runParameters.generationsPerMergedSetKey, [15;] |> List.map string)
+                (runParameters.adjustCeLengthFrequencyKey, [10] |> List.map string)
+                (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                (runParameters.generationIntervalLastKey, [14] |> List.map string)
+                (runParameters.paraRateKey,    [1.15;] |> List.map string)
+                (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
+                (runParameters.mutationModKey, [0 .. 7] |> List.map string)
+                (runParameters.seedModificationRateKey, [0.020;] |> List.map string)
+                (runParameters.modificationRateKey, [0.035;]  |> List.map string)
+                (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
+            ]
             "expInterval100_L50ss"
-            "uniformInterval2"
+            "uniformInterval5"
             QueryCatalogNames.sorterSgdMsufSoss
             RunParamBuilderNames.Filter.identity
             RunParamBuilderNames.Enhancer.msuf32MutationRate
@@ -86,12 +88,48 @@ let Pool_4_Test (executorType: sorterSgdExecutorType)  : run =
 
 
 
-let Pool_16_Test (executorType: sorterSgdExecutorType)  : run =
+let Pool_32_Test_null (executorType: sorterSgdExecutorType)  : run =
     run.SgdRun (
         SgdRun.create EvolutionMakerNames.sossPrefix
-            dbPool16name
+            dbPool32name
             projName
-            (sprintf @"Pool_16_Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag<runName>)
+            (sprintf @"Pool_32_Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag<runName>)
+            "Soss rate comparison for Msuf32p4a"
+            [
+                (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+                (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
+                (runParameters.seedSossKey, [1234UL] |> List.map string)
+                (runParameters.partitionCountKey, [1] |> List.map string)
+                (runParameters.generationsPerSubsetKey, [99] |> List.map string)
+                (runParameters.generationsPerMergedSetKey, [99;] |> List.map string)
+                (runParameters.adjustCeLengthFrequencyKey, [10] |> List.map string)
+                (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                (runParameters.generationIntervalLastKey, [13] |> List.map string)
+                (runParameters.paraRateKey,    [1.15;] |> List.map string)
+                (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
+                (runParameters.mutationModKey, [0 .. 7] |> List.map string)
+                (runParameters.seedModificationRateKey, [0.020;] |> List.map string)
+                (runParameters.modificationRateKey, [0.035;]  |> List.map string)
+                (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
+            ]
+            "expInterval100_L50ss"
+            "uniformInterval5"
+            QueryCatalogNames.sorterSgdMsufSoss
+            RunParamBuilderNames.Filter.identity
+            RunParamBuilderNames.Enhancer.msuf32MutationRate
+            false
+    )
+
+
+
+
+
+let Pool_128_Test (executorType: sorterSgdExecutorType)  : run =
+    run.SgdRun (
+        SgdRun.create EvolutionMakerNames.sossPrefix
+            dbPool128name
+            projName
+            (sprintf @"Pool_128_Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag<runName>)
             "Soss rate comparison for Msuf32p4a"
             [
         (runParameters.sorterCountPerPoolKey, [128] |>  List.map string)

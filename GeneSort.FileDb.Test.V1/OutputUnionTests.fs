@@ -213,7 +213,7 @@ module OutputUnionTests =
         let partitionIds = Array.init configuredCount (fun index -> UMX.tag<sortableTestsPartitionId> (string index))
         for cycle in 0 .. 1 do
             for index in 0 .. configuredCount do
-                let expected = if index = configuredCount then "Merge" else string index
+                let expected = if configuredCount = 1 then "0" elif index = configuredCount then "Merge" else string index
                 for offset in [0; duration - 1] do
                     let generation = cycle * ((configuredCount + 1) * duration) + index * duration + offset
                     let actual = CommonSgdSoss.subsetIdForGeneration configuredDuration configuredDuration (UMX.tag<generationNumber> generation) partitionIds
@@ -355,15 +355,18 @@ module OutputUnionTests =
             Assert.Equal("", row.Data.["AverageSorterPoolScore"])
             Assert.Equal("", row.Data.["MinimumSorterPoolScore"])
 
-    [<Fact>]
-    let ``Soss skips unneeded partitions and does not merge a partial evaluation`` () =
+    [<Theory>]
+    [<InlineData(4, false)>]
+    [<InlineData(1, false)>]
+    [<InlineData(1, true)>]
+    let ``Soss skips unneeded partitions and avoids a redundant single partition merge`` (count: int) (forReport: bool) =
         let selectedId = UMX.tag<sortableTestsSubsetId> "0"
         let tests =
             GeneSort.Sorting.Sortable.sortableBinaryTests.create (UMX.tag<sortableTestsId> (Guid.NewGuid()))
                 32<sortingWidth> [| GeneSort.Sorting.Sortable.sortableBoolArray.create(Array.zeroCreate<bool> 32, 32<sortingWidth>) |]
             |> GeneSort.Sorting.Sortable.sortableTests.Bools
         let partitions =
-            [0 .. 3]
+            [0 .. count - 1]
             |> List.map (fun index -> UMX.tag<sortableTestsPartitionId> (string index), tests)
             |> Map.ofList
             |> GeneSort.Sorting.Sortable.partitionOfSortableTests.create
@@ -377,11 +380,23 @@ module OutputUnionTests =
         // Unknown models would fail if any of the other, uncached partitions were evaluated.
         let evaluated =
             Pipeline_Soss.evaluateRequiredPartitions partitions Unchecked.defaultof<_> sorterEvalType.V2 false
-                (UMX.tag<collectNewSortableTests> false) selectedId false poolSet
+                (UMX.tag<collectNewSortableTests> false) selectedId forReport poolSet
         let result = evaluated.SorterPools.[Fixtures.poolId].SorterPoolMembers |> Seq.exactlyOne
         Assert.Equal(1, result.SorterEvalMap.Count)
         Assert.True(result.SorterEvalMap.[selectedId] = cachedEval)
         Assert.False(Map.containsKey CommonSgdSoss.mergedSubsetId result.SorterEvalMap)
+
+    [<Fact>]
+    let ``A single partition retains the original tests without shuffling`` () =
+        let tests =
+            GeneSort.Sorting.Sortable.sortableBinaryTests.create (UMX.tag<sortableTestsId> (Guid.NewGuid()))
+                32<sortingWidth> [| GeneSort.Sorting.Sortable.sortableBoolArray.create(Array.zeroCreate<bool> 32, 32<sortingWidth>) |]
+            |> GeneSort.Sorting.Sortable.sortableTests.Bools
+        let partitions =
+            GeneSort.Sorting.Sortable.PartitionOfSortableTests.partition
+                (fun _ -> failwith "Single partition must not shuffle tests") 1<sortableTestsCount> tests
+        Assert.Equal(1, partitions.Count)
+        Assert.Same(tests, partitions.SortableTests.[SortableTestsPartitionId.Default])
 
     [<Theory>]
     [<InlineData("Merge", false)>]

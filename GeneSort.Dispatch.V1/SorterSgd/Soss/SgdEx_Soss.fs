@@ -112,7 +112,10 @@ module SgdEx_Soss =
                     |> Map.values
                     |> Seq.map (fun tests -> string %(SortableTests.getSortableCount tests))
                     |> String.concat ", "
-                log (sprintf "Partitioned sortable tests into %d subsets with test counts: %s." %partitionCount partitionSizes)
+                if %partitionCount = 1 then
+                    log (sprintf "Using unpartitioned sortable tests with test count: %s." partitionSizes)
+                else
+                    log (sprintf "Partitioned sortable tests into %d subsets with test counts: %s." %partitionCount partitionSizes)
 
                 let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces
 

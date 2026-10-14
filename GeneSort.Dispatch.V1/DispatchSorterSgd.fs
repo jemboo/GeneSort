@@ -55,8 +55,8 @@ module DispatchSorterSgd =
     //let private maxReplica = 1<replNumber>
 
     //********** Soss Msuf32p4a **********
-    let private executorType = sorterSgdExecutorType.SummaryReport
-    let private host: runHost = runHost.Create (Prefix.p32.Msuf4a.Soss_32.Pool_4_Test executorType) 8
+    let private executorType = sorterSgdExecutorType.GenSoss
+    let private host: runHost = runHost.Create (Prefix.p32.Msuf4a.Soss_32.Pool_32_Gens15 executorType) 8
 
     //********** Msuf4SgdSpecsPrefix **********
     //let private executorType = sorterSgdExecutorType.SummaryReport

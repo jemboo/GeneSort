@@ -39,7 +39,7 @@ module Pipeline_Soss =
             partitionEvals
             |> Map.fold (fun updated _ evaluations ->
                 SorterPoolSet_Soss.updateSorterEvals evaluations updated) poolSet
-        if evaluateAll then
+        if evaluateAll && sortableTestPartitions.Count > 1 then
             evaluatedPoolSet
             |> SorterPoolSet_Soss.updateSorterEvals (CommonSgdSoss.mergePartitionEvals partitionEvals)
         else

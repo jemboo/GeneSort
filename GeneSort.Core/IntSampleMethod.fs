@@ -263,6 +263,7 @@ module GenIntervalRegistry =
         
         add (createConfig "uniformInterval1" 1 noMaxCount scale1 (Constant 1))
         add (createConfig "uniformInterval2" 1 noMaxCount scale2 (Constant 1))
+        add (createConfig "uniformInterval5" 1 noMaxCount scale5 (Constant 1))
         add (createConfig "uniformInterval10" 1 noMaxCount scale10 (Constant 1))
         add (createConfig "uniformInterval100" 1 noMaxCount scale100 (Constant 1))
         add (createConfig "uniformInterval500" 1 noMaxCount scale500 (Constant 1))

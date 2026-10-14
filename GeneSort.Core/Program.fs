@@ -44,7 +44,7 @@ module Example =
            //// let rootDir = @"C:\Projects\SorterSgd.Prfefix.Msrs24p3a\OrthoPara32\Data\Report\TextReport_SummaryReport"
            //// let rootDir = @"C:\Projects\SorterSgd.Prfefix.Mssi24p3b\OrthoPara64\Data\Report\TextReport_SummaryReport"
            // let rootDir = @"C:\Projects\SorterSgd.Prfefix.32p4a.Msrs\OrthoParaTest\Data\Report\TextReport_SummaryReport"
-            let rootDir = @"C:\Projects\SorterSgd.Soss.32p4a.Msuf\Pool_4\Data\Report\TextReport_SummaryReport"
+            let rootDir = @"C:\Projects\SorterSgd.Soss.32p4a.Msuf\Pool_16\Data\Report\TextReport_SummaryReport"
 
             DataTableIO.concatenateAllFiles rootDir  $"{rootDir}\\MergeReport_report.txt"
 

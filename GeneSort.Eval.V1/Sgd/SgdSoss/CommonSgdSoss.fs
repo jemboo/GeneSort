@@ -33,7 +33,9 @@ module CommonSgdSoss =
         let partitionDuration = int64 %generationsPerSubset
         let partitionsDuration = partitionDuration * int64 partitionIds.Length
         let cyclePosition = int64 %generation % (partitionsDuration + int64 %generationsPerMergedSet)
-        if cyclePosition < partitionsDuration then
+        if partitionIds.Length = 1 then
+            UMX.cast<sortableTestsPartitionId, sortableTestsSubsetId> partitionIds.[0]
+        elif cyclePosition < partitionsDuration then
             let cycleIndex = int (cyclePosition / partitionDuration)
             UMX.cast<sortableTestsPartitionId, sortableTestsSubsetId> partitionIds.[cycleIndex]
         else
