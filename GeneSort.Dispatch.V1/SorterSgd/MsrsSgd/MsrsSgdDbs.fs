@@ -1,5 +1,6 @@
 namespace GeneSort.Dispatch.V1.SorterSgd.MsrsSgd
 
+open GeneSort.Project.V1.Catalogs.Queries
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1

@@ -1,5 +1,6 @@
-namespace GeneSort.Project.V1
+namespace GeneSort.Project.V1.Catalogs.Evolution
 
+open GeneSort.Project.V1
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Core

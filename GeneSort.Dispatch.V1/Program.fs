@@ -1,5 +1,6 @@
 module Program
 
+open GeneSort.Project.V1.Catalogs
 open System
 open System.Threading
 open GeneSort.Core.Mp

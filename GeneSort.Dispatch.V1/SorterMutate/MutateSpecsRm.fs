@@ -1,6 +1,8 @@
 namespace GeneSort.Dispatch.V1.SorterMutate
 
 
+open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Queries
 open FSharp.UMX
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1

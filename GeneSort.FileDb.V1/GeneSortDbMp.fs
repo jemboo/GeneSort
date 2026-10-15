@@ -1,5 +1,6 @@
 namespace GeneSort.FileDb.V1
 
+open GeneSort.Project.V1.Catalogs.Queries
 open System
 open System.IO
 open System.Threading

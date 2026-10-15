@@ -1,5 +1,6 @@
 namespace GeneSort.Dispatch.V1.SorterSgd.Standard
 
+open GeneSort.Project.V1.Catalogs.Evolution
 open System
 open System.Threading
 open FSharp.UMX

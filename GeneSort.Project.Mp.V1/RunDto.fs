@@ -1,5 +1,6 @@
 ﻿namespace GeneSort.Project.Mp.V1
 
+open GeneSort.Project.V1.Catalogs.Evolution
 open MessagePack
 open MessagePack.Resolvers
 open MessagePack.FSharp

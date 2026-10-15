@@ -1,5 +1,7 @@
 namespace GeneSort.Dispatch.V1.SorterEval
 
+open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Queries
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting

@@ -1,4 +1,4 @@
-namespace GeneSort.Project.V1
+namespace GeneSort.Project.V1.Catalogs.Queries
 
 open FSharp.UMX
 open GeneSort.Project.V1

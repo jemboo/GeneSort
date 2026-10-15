@@ -1,4 +1,4 @@
-namespace GeneSort.Project.V1
+namespace GeneSort.Project.V1.Catalogs.Evolution
 
 /// Serializable selections, independent of the evolution strategy and storage host.
 type evolutionMakerNames = {

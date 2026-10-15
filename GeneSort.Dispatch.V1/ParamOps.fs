@@ -1,4 +1,5 @@
 namespace GeneSort.Dispatch.V1
+open GeneSort.Project.V1.Catalogs.Queries
 open System
 open FSharp.UMX
 open GeneSort.Core

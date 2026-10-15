@@ -1,5 +1,5 @@
 
-namespace GeneSort.Project.V1
+namespace GeneSort.Project.V1.Catalogs.Evolution
 
 open GeneSort.Model.Sorting.V1
 open GeneSort.Project.V1

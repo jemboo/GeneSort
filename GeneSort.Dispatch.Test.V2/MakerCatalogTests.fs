@@ -1,5 +1,9 @@
 module GeneSort.Dispatch.Test.V2.MakerCatalogTests
 
+open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Catalogs.Evolution
+open GeneSort.Project.V1.Catalogs
 open System
 open Xunit
 open GeneSort.Project.V1

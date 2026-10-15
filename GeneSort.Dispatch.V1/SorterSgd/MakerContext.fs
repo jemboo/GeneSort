@@ -1,5 +1,6 @@
 namespace GeneSort.Dispatch.V1.SorterSgd
 
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1
 open GeneSort.Dispatch.V1.SortableTests
 open GeneSort.Dispatch.V1.SorterEval

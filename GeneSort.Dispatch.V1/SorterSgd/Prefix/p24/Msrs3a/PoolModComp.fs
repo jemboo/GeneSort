@@ -1,5 +1,8 @@
 module GeneSort.Dispatch.V1.SorterSgd.Prefix.p24.Msrs3a.PoolModComp
 
+open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Catalogs.Evolution
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1

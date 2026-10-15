@@ -1,5 +1,6 @@
 namespace GeneSort.FileDb.Test.V1
 
+open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Model.Sorting.V1.Simple
 open GeneSort.Model.Sorting.V1.Simple.Ce
 open System
