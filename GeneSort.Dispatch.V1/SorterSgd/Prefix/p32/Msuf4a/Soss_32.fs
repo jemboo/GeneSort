@@ -63,7 +63,7 @@ let Pool_32_Gens15 (executorType: sorterSgdExecutorType)  : run =
             "Soss rate comparison for Msuf32p4a"
             [
                 (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-                (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
+                (runParameters.sorterCountPerPoolSetKey, [256] |> List.map string)
                 (runParameters.seedSossKey, [1234UL] |> List.map string)
                 (runParameters.partitionCountKey, [3; 9] |> List.map string)
                 (runParameters.generationsPerSubsetKey, [15;] |> List.map string)
@@ -73,7 +73,7 @@ let Pool_32_Gens15 (executorType: sorterSgdExecutorType)  : run =
                 (runParameters.generationIntervalLastKey, [14] |> List.map string)
                 (runParameters.paraRateKey,    [1.15;] |> List.map string)
                 (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
-                (runParameters.mutationModKey, [0 .. 7] |> List.map string)
+                (runParameters.mutationModKey, [0 .. 3] |> List.map string)
                 (runParameters.seedModificationRateKey, [0.020;] |> List.map string)
                 (runParameters.modificationRateKey, [0.035;]  |> List.map string)
                 (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
