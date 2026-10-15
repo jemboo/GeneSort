@@ -94,7 +94,7 @@ module RunParamEnhancerBuilders =
     let get name = RunParamCatalog.get "run parameter enhancer" name enhancers syncRoot
 
     let private queryParamsForRun (context: runParamEnhancerContext) (rp: runParameters) =
-        context.QueryParamsFromRunParams rp (outputDataType.Run context.Run.RunName) |> Option.get
+        context.QueryParamsFromRunParams rp (geneSortDataType.Run context.Run.RunName) |> Option.get
 
     let sortableTests (context: runParamEnhancerContext) (rp: runParameters) =
         let qp = queryParamsForRun context rp
@@ -202,7 +202,7 @@ module RunParamEnhancerBuilders =
                     match modificationRate with
                     | Some rate -> rp3.WithModificationRate(Some rate)
                     | None -> rp3
-                let qp = host.QueryParamsFromRunParams rp3 (outputDataType.Run host.Run.RunName)
+                let qp = host.QueryParamsFromRunParams rp3 (geneSortDataType.Run host.Run.RunName)
 
                 let result =
                     rp3.WithRunFinished(Some false)

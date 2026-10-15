@@ -5,7 +5,18 @@ open System
 
 [<Measure>] type textReportName
 
-type outputDataType =
+type geneSortDataMode =
+    | Project
+    | Setup
+    | Results
+
+module GeneSortDataMode =
+    let toFolderName = function
+        | geneSortDataMode.Project -> "Project"
+        | geneSortDataMode.Setup -> "Setup"
+        | geneSortDataMode.Results -> "Results"
+
+type geneSortDataType =
     | Run of string<runName>
     | RunParameters of string<runName>
     | SorterPoolSet of string
@@ -22,7 +33,7 @@ module OutputDataType =
     let private appendParam (prefix: string) (param: string) =
         if String.IsNullOrEmpty param then prefix else prefix + "_" + param
 
-    let toFolderName (outputDataType: outputDataType) : string =
+    let toFolderName (outputDataType: geneSortDataType) : string =
         match outputDataType with
         | Run s -> "Run"
         | RunParameters s -> appendParam "RunParameters" %s
@@ -36,7 +47,7 @@ module OutputDataType =
         | TextReport s -> appendParam "Report\\TextReport" %s
 
 
-    let fromFolderName (description: string) : outputDataType option =
+    let fromFolderName (description: string) : geneSortDataType option =
         let parts = description.Split([|'_'|], StringSplitOptions.RemoveEmptyEntries)
         let prefix = parts.[0]
         let param = if parts.Length > 1 then String.Join("_", parts.[1..]) else ""
@@ -54,7 +65,7 @@ module OutputDataType =
         | _ -> None
 
 
-    let extractTextReportNames (outputDataTypes: outputDataType array) : string<textReportName> list =
+    let extractTextReportNames (outputDataTypes: geneSortDataType array) : string<textReportName> list =
         outputDataTypes
         |> Array.choose (function TextReport name -> Some name | _ -> None)
         |> Array.toList

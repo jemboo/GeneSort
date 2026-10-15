@@ -25,7 +25,6 @@ open GeneSort.Eval.V1.Sgd.Bins.Standard
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
-[<Measure>] type runParamsType
 [<Measure>] type fileNameWithoutExtension
 [<Measure>] type fullPathToFile // e.g., "C:\GeneSortData\Project1\RunParameters_0_0.msgpack"
 
@@ -33,14 +32,22 @@ module OutputDataFile =
 
     let getPathToOutputDataFolder
                 (pathToRootFolder:string<pathToRootFolder>)
+                (dataMode: geneSortDataMode)
                 (replString: string)
-                (outputDataType: outputDataType)
+                (outputDataType: geneSortDataType)
                  :string<fullPathToFolder> =
+        let effectiveMode =
+            match outputDataType with
+            | geneSortDataType.Run _ | geneSortDataType.RunParameters _ -> geneSortDataMode.Project
+            | _ -> dataMode
+        let pathToRootFolder =
+            Path.Combine(%pathToRootFolder, GeneSortDataMode.toFolderName effectiveMode)
+            |> UMX.tag<pathToRootFolder>
         match outputDataType with
-        | outputDataType.Run runName ->
+        | geneSortDataType.Run runName ->
             let folderPath = Path.Combine(%pathToRootFolder, "Run", %runName)
             UMX.tag<fullPathToFolder> folderPath
-        | outputDataType.RunParameters _   ->
+        | geneSortDataType.RunParameters _   ->
             Path.Combine(%pathToRootFolder, "Run", outputDataType |> OutputDataType.toFolderName, replString) 
             |> UMX.tag<fullPathToFolder>
         | _ -> 
@@ -50,18 +57,19 @@ module OutputDataFile =
     let makeOutputDataName (queryParams: queryParams) : string =
         let idPart = queryParams.Id.ToString()
         match queryParams.OutputDataType with
-        | outputDataType.Run runName -> sprintf "Run_%s" %runName
+        | geneSortDataType.Run runName -> sprintf "Run_%s" %runName
         | _ -> idPart
 
     let getFullOutputDataFilePath
             (pathToRootFolder: string<pathToRootFolder>)
+            (dataMode: geneSortDataMode)
             (queryParams: queryParams) : string<fullPathToFile> =
         let fileNameWithExtension =
             match queryParams.OutputDataType with
-            | outputDataType.TextReport reportName -> 
+            | geneSortDataType.TextReport reportName -> 
                 sprintf "%s.txt" (string %queryParams.Id)
             | _ -> makeOutputDataName queryParams + ".msgpack"
-        let outputDataFolder = getPathToOutputDataFolder pathToRootFolder queryParams.ReplAsString queryParams.OutputDataType
+        let outputDataFolder = getPathToOutputDataFolder pathToRootFolder dataMode queryParams.ReplAsString queryParams.OutputDataType
         Path.Combine(%outputDataFolder, fileNameWithExtension) |> UMX.tag<fullPathToFile>
 
 
@@ -95,11 +103,12 @@ module OutputDataFile =
 
     let getOutputDataAsync
             (pathToProjectFolder :string<pathToRootFolder>)
+            (dataMode: geneSortDataMode)
             (queryParams :queryParams)
             (ct :CancellationToken option)
                 :Async<Result<outputData, string>> =
         async {
-            let filePath = getFullOutputDataFilePath pathToProjectFolder queryParams
+            let filePath = getFullOutputDataFilePath pathToProjectFolder dataMode queryParams
             if not (File.Exists %filePath) then
                 return Error (sprintf "File not found: %s" %filePath)
             else
@@ -108,54 +117,54 @@ module OutputDataFile =
                 use stream = new FileStream(%filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync = true)
                 let! domainData =
                     match queryParams.OutputDataType with
-                    | outputDataType.RunParameters _ ->
+                    | geneSortDataType.RunParameters _ ->
                         async {
                             let! domain = deserializeDto<runParametersDto, runParameters> stream token RunParametersDto.toDomain
                             return outputData.RunParameters domain
                         }
-                    | outputDataType.SorterPoolSet _ ->
+                    | geneSortDataType.SorterPoolSet _ ->
                         async {
                             let! domain = deserializeUnionDto<sorterPoolSetDto, sorterPoolSetDto_Standard, sorterPoolSet> stream token SorterPoolSetDto.toDomain (SorterPoolSetDto_Standard.fromDto >> sorterPoolSet.Standard)
                             return outputData.SorterPoolSet domain
                         }
-                    | outputDataType.SorterPoolSetSummarySet _ ->
+                    | geneSortDataType.SorterPoolSetSummarySet _ ->
                         async {
                             let! domain = deserializeUnionDto<spSummarySetDto, sorterPoolSetSummarySetDto_Standard, spSummarySet> stream token SpSummarySetDto.toDomain (SorterPoolSetSummarySetDto_Standard.fromDto >> spSummarySet.Standard)
                             return outputData.SorterPoolSetSummarySet domain
                         }
-                    | outputDataType.SorterSet _ ->
+                    | geneSortDataType.SorterSet _ ->
                         async {
                             let! domain = deserializeDto<sorterSetDto, sorterSet> stream token SorterSetDto.toDomain
                             return outputData.SorterSet domain
                         }
-                    | outputDataType.SortableTests _ ->
+                    | geneSortDataType.SortableTests _ ->
                         async {
                             let! domain = deserializeDto<sortableTestsDto, sortableTests> stream token SortableTestsDto.toDomain
                             return outputData.SortableTests domain
                         }
-                    | outputDataType.SorterSetEval _ ->
+                    | geneSortDataType.SorterSetEval _ ->
                         async {
                             let! domain = deserializeDto<sorterSetEvalDto, sorterSetEval> stream token SorterSetEvalDto.toDomain
                             return outputData.SorterSetEval domain
                         }
-                    | outputDataType.SorterPoolBinsSetSeries _ ->
+                    | geneSortDataType.SorterPoolBinsSetSeries _ ->
                         async {
                             let! domain = deserializeUnionDto<sorterPoolBinsSetSeriesDto, sorterPoolBinsSetSeriesDto_Standard, sorterPoolBinsSetSeries>
                                                 stream token SorterPoolBinsSetSeriesDto.toDomain (SorterPoolBinsSetSeriesDto_Standard.toDomain >> sorterPoolBinsSetSeries.Standard)
                             return outputData.SorterPoolBinsSetSeries domain
                         }
-                    | outputDataType.SorterPoolSetHistory _ ->
+                    | geneSortDataType.SorterPoolSetHistory _ ->
                         async {
                             let! domain = deserializeUnionDto<spshDto, sorterPoolSetHistoryDto_Standard, spsh>
                                                 stream token SpshDto.toDomain (SorterPoolSetHistoryDto_Standard.toDomain >> spsh.Standard)
                             return outputData.SorterPoolSetHistory domain
                         }
-                    | outputDataType.Run _ ->
+                    | geneSortDataType.Run _ ->
                         async {
                             let! domain = deserializeDto<runDto, run> stream token RunDto.toDomain
                             return outputData.Run domain
                         }
-                    | outputDataType.TextReport _ ->
+                    | geneSortDataType.TextReport _ ->
                         failwith "Not implemented: SorterSet deserialization"
                         //async {
                         //    use reader = new StreamReader(stream, Encoding.UTF8)
@@ -184,12 +193,13 @@ module OutputDataFile =
 
     let saveToFileAsync
         (pathToProjectFolder:string<pathToRootFolder>)
+        (dataMode: geneSortDataMode)
         (queryParams: queryParams)
         (outputData: outputData)
         (allowOverwrite: bool<allowOverwrite>) : Async<Result<unit, string>> =
 
         async {
-            let filePath = getFullOutputDataFilePath pathToProjectFolder queryParams
+            let filePath = getFullOutputDataFilePath pathToProjectFolder dataMode queryParams
             let directory = Path.GetDirectoryName %filePath
             let dirRes =
                 try
@@ -273,7 +283,7 @@ module OutputDataFile =
                 (ct: CancellationToken option)
                 (progress: IProgress<string> option) : Async<Result<runParameters[], string>> =
         async {
-            let folder = getPathToOutputDataFolder rootFolder (repl |> UmxExt.intOptionToString) (outputDataType.RunParameters %runName)
+            let folder = getPathToOutputDataFolder rootFolder geneSortDataMode.Project (repl |> UmxExt.intOptionToString) (geneSortDataType.RunParameters %runName)
             progress |> Option.iter (fun p -> p.Report(sprintf "Scanning directory: %s" %folder))
             let! filePathsRes = getFilesSortedByCreationTimeAsync %folder ct
             match filePathsRes with

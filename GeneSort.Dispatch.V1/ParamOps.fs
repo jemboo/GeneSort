@@ -22,9 +22,9 @@ module ParamOps =
                     runParameterArray
                     |> Array.map (fun rp -> 
                         let runName = rp.GetRunName() |> Option.defaultValue ("UnknownRun" |> UMX.tag<runName>)
-                        let queryParamsOpt = queryParamsBuilder rp (outputDataType.RunParameters runName)
+                        let queryParamsOpt = queryParamsBuilder rp (geneSortDataType.RunParameters runName)
                         match queryParamsOpt with
-                        | Some qp -> db.saveAsync qp (outputData.RunParameters rp) allowOverwrite
+                        | Some qp -> db.saveAsync geneSortDataMode.Project qp (outputData.RunParameters rp) allowOverwrite
                         | None -> async { return Error (sprintf "Failed to create query parameters for run parameters: %A" rp) })
                     |> Async.Parallel
 
@@ -60,7 +60,7 @@ module ParamOps =
             try
                 report progress (sprintf "%s Saving run file: %s" (StringUtils.getTimestampString()) %run.DatabaseName)
                 let queryParams = queryParams.createForRun run.DatabaseName run.ProjectName run.RunName
-                let! saveProjRes = db.saveAsync queryParams (run |> outputData.Run) (true |> UMX.tag<allowOverwrite>)
+                let! saveProjRes = db.saveAsync geneSortDataMode.Project queryParams (run |> outputData.Run) (true |> UMX.tag<allowOverwrite>)
                 match saveProjRes with
                 | Error err -> return Error err
                 | Ok () ->

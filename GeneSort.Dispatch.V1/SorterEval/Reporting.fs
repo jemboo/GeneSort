@@ -38,21 +38,21 @@ module Reporting =
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (StringUtils.getTimestampString()) %runId)
     
-                let! qpSorterSetEval = host.QueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                let! qpSorterSetEval = host.QueryParamsFromRunParams rp (geneSortDataType.SorterSetEval "")
                                         |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
-                let! outB = host.RunDb.loadAsync qpSorterSetEval
+                let! outB = host.RunDb.loadAsync geneSortDataMode.Results qpSorterSetEval
                 let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
 
                 let reportName = (sprintf "FullEvalReport" |> UMX.tag<textReportName>)
 
-                let! qpReport = host.QueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                let! qpReport = host.QueryParamsFromRunParams rp (geneSortDataType.TextReport reportName)
                                 |> Result.ofOption "Failed to create QueryParams for Report."
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
                 let details = sorterSetEvals |> SorterSetEval.makeFullDataTableRecords
                 let dtrs = dataTableRecord.combineWithMany details leadCols
                 let report = DataTableReport.fromDataTableRecords dtrs
 
-                let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
+                let! (_:unit) = host.RunDb.saveAsync geneSortDataMode.Results qpReport (report |> outputData.TextReport) allowOverwrite
                 let yab = (rp : runParameters).WithRunFinished(Some true)
                 return yab
             with e -> 
@@ -77,14 +77,14 @@ module Reporting =
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Stage stats Report for Run %s" (StringUtils.getTimestampString()) %runId)
     
-                let! qpSorterSetEval = host.QueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                let! qpSorterSetEval = host.QueryParamsFromRunParams rp (geneSortDataType.SorterSetEval "")
                                         |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
-                let! outB = host.RunDb.loadAsync qpSorterSetEval
+                let! outB = host.RunDb.loadAsync geneSortDataMode.Results qpSorterSetEval
                 let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
 
                 let reportName = (sprintf "StageStatsReport" |> UMX.tag<textReportName>)
 
-                let! qpReport = host.QueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                let! qpReport = host.QueryParamsFromRunParams rp (geneSortDataType.TextReport reportName)
                                 |> Result.ofOption "Failed to create QueryParams for Report."
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
 
@@ -108,7 +108,7 @@ module Reporting =
 
                 let report = DataTableReport.fromDataTableRecords dtrs
 
-                let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
+                let! (_:unit) = host.RunDb.saveAsync geneSortDataMode.Results qpReport (report |> outputData.TextReport) allowOverwrite
                 return (rp : runParameters).WithRunFinished(Some true)
 
             with e -> 
@@ -132,14 +132,14 @@ module Reporting =
                 let runId = rp |> RunParameters.getIdString
                 OpsUtils.report progress (sprintf "%s Starting Ce bins Report for Run %s" (StringUtils.getTimestampString()) %runId)
     
-                let! qpSorterSetEval = host.QueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                let! qpSorterSetEval = host.QueryParamsFromRunParams rp (geneSortDataType.SorterSetEval "")
                                         |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
-                let! outB = host.RunDb.loadAsync qpSorterSetEval
+                let! outB = host.RunDb.loadAsync geneSortDataMode.Results qpSorterSetEval
                 let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
 
                 let reportName = (sprintf "CeBinsReport" |> UMX.tag<textReportName>)
 
-                let! qpReport = host.QueryParamsFromRunParams rp (outputDataType.TextReport reportName)
+                let! qpReport = host.QueryParamsFromRunParams rp (geneSortDataType.TextReport reportName)
                                 |> Result.ofOption "Failed to create QueryParams for Report."
                 let leadCols = qpReport |> QueryParams.makeDataTableRecord
 
@@ -155,7 +155,7 @@ module Reporting =
                                 
                 let report = DataTableReport.fromDataTableRecords dtrs
 
-                let! (_:unit) = host.RunDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
+                let! (_:unit) = host.RunDb.saveAsync geneSortDataMode.Results qpReport (report |> outputData.TextReport) allowOverwrite
                 let yab = (rp : runParameters).WithRunFinished(Some true)
                 return yab
             with e -> 

@@ -45,7 +45,7 @@ module Msuf4SgdDbs =
                         (dsh: bool<distinctSorterHashes>)
                         (pNm: bool<prioritizeNewMutants>)
                         (sfrac: float<sortedFraction>)
-                        (odt: outputDataType) : queryParams =
+                        (odt: geneSortDataType) : queryParams =
             queryParams.create dbName projectName (Some repl) None odt
                 [| 
                     (runParameters.rngTypeKey, rng |> RngType.toString)
@@ -74,7 +74,7 @@ module Msuf4SgdDbs =
 
         let queryParamsFromRunParams (projectName: string<projectName>) (dbName: string<databaseName>)
                                 (rp: runParameters) 
-                                (odt: outputDataType) : queryParams option =
+                                (odt: geneSortDataType) : queryParams option =
             maybe {
                 let! repl = rp.GetRepl()
                 let! curGen = rp.GetGenerationCurrent()
@@ -141,7 +141,7 @@ module Msuf4SgdDbs =
                     (dsh: bool<distinctSorterHashes>)
                     (pNm: bool<prioritizeNewMutants>)
                     (sfrac: float<sortedFraction>)
-                    (outputDataType: outputDataType) : queryParams =
+                    (outputDataType: geneSortDataType) : queryParams =
 
             queryParams.create 
                 dbName projectName
@@ -178,7 +178,7 @@ module Msuf4SgdDbs =
 
         let queryParamsFromRunParams (projectName: string<projectName>) (dbName: string<databaseName>)
                                 (rp: runParameters) 
-                                (odt: outputDataType) : queryParams option =
+                                (odt: geneSortDataType) : queryParams option =
             maybe {
                 let! rng = rp.GetRngType()
                 let! curGen = rp.GetGenerationCurrent()
@@ -247,7 +247,7 @@ module Msuf4SgdDbs =
                     (dsh: bool<distinctSorterHashes>)
                     (pNm: bool<prioritizeNewMutants>)
                     (sfrac: float<sortedFraction>)
-                    (outputDataType: outputDataType) : queryParams =
+                    (outputDataType: geneSortDataType) : queryParams =
 
             queryParams.create 
                 dbName projectName
@@ -282,7 +282,7 @@ module Msuf4SgdDbs =
 
         let queryParamsFromRunParams (projectName: string<projectName>) (dbName: string<databaseName>)
                                 (rp: runParameters) 
-                                (odt: outputDataType) : queryParams option =
+                                (odt: geneSortDataType) : queryParams option =
             maybe {
                 let! repl = rp.GetRepl()
                 let! rng = rp.GetRngType()

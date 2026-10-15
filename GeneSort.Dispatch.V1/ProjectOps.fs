@@ -13,7 +13,7 @@ module ProjectOps =
     /// Internal logic for a single unit of work
     let private runTask (db: IGeneSortDb)
                         (runName: string<runName>)
-                        (buildQueryParams: runParameters -> outputDataType -> queryParams option)
+                        (buildQueryParams: runParameters -> geneSortDataType -> queryParams option)
                         executor 
                         allowOverwrite 
                         cts 
@@ -41,7 +41,7 @@ module ProjectOps =
                     | Error m -> 
                         return Failure (id, repl, sprintf "%s\n%s" m (rp |> RunParameters.reportKvps))
                     | Ok updated ->
-                        let qp = buildQueryParams updated (outputDataType.RunParameters %runName)
+                        let qp = buildQueryParams updated (geneSortDataType.RunParameters %runName)
                                  |> Option.defaultWith (fun () -> 
                                         let msg = sprintf "Failed to build query parameters for saving results of run %s, repl %d" 
                                                             (string %runName) (int %repl)
@@ -49,7 +49,7 @@ module ProjectOps =
                                         raise (Exception msg)
                                     )
                         // 2. Standard async bind (no Result wrapper here)
-                        let! _ = db.saveAsync qp (updated |> outputData.RunParameters) (true |> UMX.tag<allowOverwrite>)
+                        let! _ = db.saveAsync geneSortDataMode.Project qp (updated |> outputData.RunParameters) (true |> UMX.tag<allowOverwrite>)
                     
                         return Success (id, repl, (updated |> RunParameters.reportKvps))
             with 

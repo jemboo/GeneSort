@@ -51,7 +51,7 @@ module SortableTestsExecutor =
                                             sorterLibVariant.VariantA
                                         |> sortableTestsModel.MsasMi
             
-                let! qpForSortableTests = host.QueryParamsFromRunParams rp (outputDataType.SortableTests "")
+                let! qpForSortableTests = host.QueryParamsFromRunParams rp (geneSortDataType.SortableTests "")
                                          |> Result.ofOption "Failed to create query parameters for SortableTests"
                 let sortableTests = SortableTestsModel.makeSortableTests 
                                             (%qpForSortableTests.Id |> UMX.tag) 
@@ -61,7 +61,7 @@ module SortableTestsExecutor =
                 // 4. Save
                 log (sprintf "Saving SortableTests %s" (string %qpForSortableTests.Id))
 
-                do! host.RunDb.saveAsync qpForSortableTests (sortableTests |> outputData.SortableTests) allowOverwrite
+                do! host.RunDb.saveAsync geneSortDataMode.Results qpForSortableTests (sortableTests |> outputData.SortableTests) allowOverwrite
                 
                 log "Run Complete."
                 return rp.WithRunFinished (Some true)
@@ -103,7 +103,7 @@ module SortableTestsExecutor =
                 // 3. Create SortableTestsModel
                 let sortableTestsModel = msasPfx.create prefixLibId |> sortableTestsModel.MsasPfx
             
-                let! qpForSortableTests = host.QueryParamsFromRunParams rp (outputDataType.SortableTests "")
+                let! qpForSortableTests = host.QueryParamsFromRunParams rp (geneSortDataType.SortableTests "")
                                          |> Result.ofOption "Failed to create query parameters for SortableTests"
                 let sortableTests = SortableTestsModel.makeSortableTests 
                                             (%qpForSortableTests.Id |> UMX.tag) 
@@ -113,7 +113,7 @@ module SortableTestsExecutor =
                 // 4. Save
                 log (sprintf "Saving SortableTests %s" (string %qpForSortableTests.Id))
 
-                do! host.RunDb.saveAsync qpForSortableTests (sortableTests |> outputData.SortableTests) allowOverwrite
+                do! host.RunDb.saveAsync geneSortDataMode.Results qpForSortableTests (sortableTests |> outputData.SortableTests) allowOverwrite
                 
                 log "Run Complete."
                 return rp.WithRunFinished (Some true)

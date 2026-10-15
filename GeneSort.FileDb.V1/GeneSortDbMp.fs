@@ -9,8 +9,8 @@ open GeneSort.Project.V1
 
 
 type private DbMessage =
-    | Save of string<pathToRootFolder> * queryParams * outputData * bool<allowOverwrite> * AsyncReplyChannel<Result<unit, string>>
-    | Load of string<pathToRootFolder> * queryParams * AsyncReplyChannel<Result<outputData, string>>
+    | Save of string<pathToRootFolder> * geneSortDataMode * queryParams * outputData * bool<allowOverwrite> * AsyncReplyChannel<Result<unit, string>>
+    | Load of string<pathToRootFolder> * geneSortDataMode * queryParams * AsyncReplyChannel<Result<outputData, string>>
     | GetRunParameters of string<runName> * (int<replNumber> option) * (int<replNumber> option) * CancellationToken option * IProgress<string> option * AsyncReplyChannel<Result<runParameters[], string>>
 
 type GeneSortDbMp(
@@ -30,11 +30,11 @@ type GeneSortDbMp(
             async {
                 let! msg = inbox.Receive()
                 match msg with
-                | Save (projectFolder, queryParams, data, allowOverwrite, replyChannel) ->
-                    let! res = OutputDataFile.saveToFileAsync projectFolder queryParams data allowOverwrite
+                | Save (projectFolder, dataMode, queryParams, data, allowOverwrite, replyChannel) ->
+                    let! res = OutputDataFile.saveToFileAsync projectFolder dataMode queryParams data allowOverwrite
                     replyChannel.Reply res
-                | Load (projectFolder, queryParams, replyChannel) ->
-                    let! res = OutputDataFile.getOutputDataAsync projectFolder queryParams None
+                | Load (projectFolder, dataMode, queryParams, replyChannel) ->
+                    let! res = OutputDataFile.getOutputDataAsync projectFolder dataMode queryParams None
                     replyChannel.Reply res
                 | GetRunParameters (runName, replMin, replMax, ct, progress, replyChannel) ->
                     let! res = OutputDataFile.getRunParameters rootFolder runName replMin replMax ct progress
@@ -50,30 +50,30 @@ type GeneSortDbMp(
         member _.databaseName
             with get (): string<databaseName> = databaseFolder.Name |> UMX.tag
 
-        member _.MakeQueryParamsFromRunParams rp odt =
+        member _.makeQueryParamsFromRunParams rp odt =
             let projectName = projectFolder.Name |> UMX.tag<projectName>
             let databaseName = databaseFolder.Name |> UMX.tag<databaseName>
             (QueryParamsCatalog.get catalogName projectName databaseName) rp odt
 
-        member _.saveAsync (queryParams: queryParams) (data: outputData) (allowOverwrite: bool<allowOverwrite>) =
-            mailbox.PostAndAsyncReply(fun channel -> Save(rootFolder, queryParams, data, allowOverwrite, channel))
+        member _.saveAsync dataMode (queryParams: queryParams) (data: outputData) (allowOverwrite: bool<allowOverwrite>) =
+            mailbox.PostAndAsyncReply(fun channel -> Save(rootFolder, dataMode, queryParams, data, allowOverwrite, channel))
 
-        member _.loadAsync (queryParams: queryParams) =
-            mailbox.PostAndAsyncReply(fun channel -> Load(rootFolder, queryParams, channel))
+        member _.loadAsync dataMode (queryParams: queryParams) =
+            mailbox.PostAndAsyncReply(fun channel -> Load(rootFolder, dataMode, queryParams, channel))
 
-        member _.doesOutPutDataExist (queryParams: queryParams) =
+        member _.doesOutPutDataExist dataMode (queryParams: queryParams) =
                     async {
-                        let filePath = OutputDataFile.getFullOutputDataFilePath rootFolder queryParams
+                        let filePath = OutputDataFile.getFullOutputDataFilePath rootFolder dataMode queryParams
                         return File.Exists %filePath
                     }
 
-        member this.loadIfFoundAsync(queryParams: queryParams) =
+        member this.loadIfFoundAsync dataMode (queryParams: queryParams) =
             async {
-                let filePath = OutputDataFile.getFullOutputDataFilePath rootFolder queryParams
+                let filePath = OutputDataFile.getFullOutputDataFilePath rootFolder dataMode queryParams
                 if not (File.Exists %filePath) then
                     return None
                 else
-                    let! loadResult = (this :> IGeneSortDb).loadAsync queryParams
+                    let! loadResult = (this :> IGeneSortDb).loadAsync dataMode queryParams
                     match loadResult with
                     | Ok data -> return Some data
                     | Error _ -> return None

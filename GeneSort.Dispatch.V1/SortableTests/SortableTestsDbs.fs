@@ -37,8 +37,8 @@ module SortableTestsDbs =
                             repl 
                             mrgLibId
                             sortableDataFormat 
-                            (outputDataType.SortableTests "")
-            (db :> IGeneSortDb).loadAsync qp
+                            (geneSortDataType.SortableTests "")
+            (db :> IGeneSortDb).loadAsync geneSortDataMode.Results qp
             |> Async.map (Result.bind OutputData.asSortableTests)
 
 
@@ -69,8 +69,8 @@ module SortableTestsDbs =
                             repl 
                             pfxId
                             sortableDataFormat 
-                            (outputDataType.SortableTests "")
-            (db :> IGeneSortDb).loadAsync qp
+                            (geneSortDataType.SortableTests "")
+            (db :> IGeneSortDb).loadAsync geneSortDataMode.Results qp
             |> Async.map (Result.bind OutputData.asSortableTests)
 
 

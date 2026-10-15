@@ -80,9 +80,9 @@ module SorterEvalDbs =
                         sortingWidth 
                         simpleSorterModelType 
                         sorterEvalType
-                        (outputDataType.SorterSetEval "")
+                        (geneSortDataType.SorterSetEval "")
         async {
-             let! result = (Standard.db :> IGeneSortDb).loadAsync qp
+             let! result = (Standard.db :> IGeneSortDb).loadAsync geneSortDataMode.Results qp
              return  result |> Result.bind OutputData.asSorterSetEval
         }
 
@@ -100,9 +100,9 @@ module SorterEvalDbs =
                         simpleSorterModelType
                         sortableDataFormat.Int8Vector512
                         sorterEvalType.V2
-                        (outputDataType.SorterSetEval "")
+                        (geneSortDataType.SorterSetEval "")
         async {
-             let! result = (Merge.db :> IGeneSortDb).loadAsync qp
+             let! result = (Merge.db :> IGeneSortDb).loadAsync geneSortDataMode.Results qp
              return  result |> Result.bind OutputData.asSorterSetEval
         }
 
@@ -121,9 +121,9 @@ module SorterEvalDbs =
                         simpleSorterModelType
                         sortableDataFormat.BitVector512
                         sorterEvalType.V2
-                        (outputDataType.SorterSetEval "")
+                        (geneSortDataType.SorterSetEval "")
         async {
-             let! result = (Prefix.db :> IGeneSortDb).loadAsync qp
+             let! result = (Prefix.db :> IGeneSortDb).loadAsync geneSortDataMode.Results qp
              return  result |> Result.bind OutputData.asSorterSetEval
         }
 

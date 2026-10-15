@@ -4,7 +4,7 @@ open FSharp.UMX
 open GeneSort.Project.V1
 
 /// A normalized adapter for turning run parameters into the storage path metadata.
-type queryParamsBuilder = runParameters -> outputDataType -> queryParams option
+type queryParamsBuilder = runParameters -> geneSortDataType -> queryParams option
 type queryParamsCatalogBuilder = string<projectName> -> string<databaseName> -> queryParamsBuilder
 
 module QueryCatalogNames =

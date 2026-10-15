@@ -202,19 +202,19 @@ module EvoOrch_Standard =
 
                                         // Save SorterPoolSet
                                         let! qpSorterPoolSet = 
-                                            genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolSet "")
+                                            genDb.makeQueryParamsFromRunParams stepRp (geneSortDataType.SorterPoolSet "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolSet."
-                                        do! genDb.saveAsync qpSorterPoolSet (nextSorterPoolSet |> sorterPoolSet.Standard |> outputData.SorterPoolSet) allowOverwrite
+                                        do! genDb.saveAsync geneSortDataMode.Results qpSorterPoolSet (nextSorterPoolSet |> sorterPoolSet.Standard |> outputData.SorterPoolSet) allowOverwrite
 
 
                                         // Save SorterPoolSetSummaries
                                         let! qpSummaries = 
-                                            genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolSetSummarySet "")
+                                            genDb.makeQueryParamsFromRunParams stepRp (geneSortDataType.SorterPoolSetSummarySet "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolSetSummarySet."
                                         let spsstID = qpSummaries.Id |> UMX.cast<queryParamsId, sorterPoolSetSummarySetId>
                                         let currentSummaries = updatedSorterPoolSetSummary |> List.toArray
                                         let sorterPoolSetSummarySet = spSummarySet_Standard.create spsstID currentGen currentSummaries
-                                        do! genDb.saveAsync qpSummaries (sorterPoolSetSummarySet |> spSummarySet.Standard |> outputData.SorterPoolSetSummarySet) allowOverwrite
+                                        do! genDb.saveAsync geneSortDataMode.Results qpSummaries (sorterPoolSetSummarySet |> spSummarySet.Standard |> outputData.SorterPoolSetSummarySet) allowOverwrite
 
 
                                         // Save SorterPoolBinsSetSeries
@@ -222,9 +222,9 @@ module EvoOrch_Standard =
                                         let evalBinsCollection = 
                                             sorterPoolBinsSetSeries_Standard.create collectionId (updatedEvalBinsSetAcc |> List.rev)
                                         let! qpBinsSeries = 
-                                            genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolBinsSetSeries "")
+                                            genDb.makeQueryParamsFromRunParams stepRp (geneSortDataType.SorterPoolBinsSetSeries "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolEvalBinsSetCollection."
-                                        do! genDb.saveAsync qpBinsSeries (evalBinsCollection |> sorterPoolBinsSetSeries.Standard |> outputData.SorterPoolBinsSetSeries) allowOverwrite
+                                        do! genDb.saveAsync geneSortDataMode.Results qpBinsSeries (evalBinsCollection |> sorterPoolBinsSetSeries.Standard |> outputData.SorterPoolBinsSetSeries) allowOverwrite
 
 
                                         // Prune dead lineages and generate SorterPoolSetHistory
@@ -233,7 +233,7 @@ module EvoOrch_Standard =
                                         //let! qpHistory = 
                                         //    genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolSetHistory "")
                                         //    |> Result.ofOption "Failed to create QueryParams for SorterPoolSetHistory."
-                                        //do! genDb.saveAsync qpHistory (poolSetHistory |> spsh.Standard |> outputData.SorterPoolSetHistory) allowOverwrite
+                                        //do! genDb.saveAsync geneSortDataMode.Results qpHistory (poolSetHistory |> spsh.Standard |> outputData.SorterPoolSetHistory) allowOverwrite
 
                                        // return ([], [], prunedRunningMap)
                                         return ([], [], MhMap_Standard.empty)

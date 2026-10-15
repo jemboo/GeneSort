@@ -12,7 +12,7 @@ type queryParams =
         projectName:    string<projectName>
         repl:           int<replNumber> option
         generation:     int<generationNumber> option
-        outputDataType: outputDataType
+        outputDataType: geneSortDataType
         properties:     Map<string, string>
         id:             Guid<queryParamsId>
     }
@@ -44,7 +44,7 @@ type queryParams =
             (projName:       string<projectName>)
             (repl:           int<replNumber> option)
             (generation:     int<generationNumber> option)
-            (outputDataType: outputDataType)
+            (outputDataType: geneSortDataType)
             (properties:     (string * string) []) : queryParams =
         let props = properties |> Array.filter (fst >> isNull >> not) |> Map.ofArray
         
@@ -93,7 +93,7 @@ type queryParams =
             (projName:       string<projectName>)
             (repl:           int<replNumber> option)
             (generation:     int<generationNumber> option)
-            (outputDataType: outputDataType)
+            (outputDataType: geneSortDataType)
             (propertyMap:     Map<string, string>) : queryParams =
 
        queryParams.create dbName projName repl generation 
@@ -111,14 +111,14 @@ type queryParams =
                     (projName:     string<projectName>)
                     (runName:      string<runName>) 
                     : queryParams =
-        queryParams.create databaseName projName None None (outputDataType.Run runName) [||]
+        queryParams.create databaseName projName None None (geneSortDataType.Run runName) [||]
 
 
     static member createForTextReport
             (databaseName:   string<databaseName>)
             (projName:       string<projectName>)
             (textReportName: string<textReportName>) : queryParams =
-        queryParams.create databaseName projName None None (outputDataType.TextReport textReportName) [||]
+        queryParams.create databaseName projName None None (geneSortDataType.TextReport textReportName) [||]
 
 
 

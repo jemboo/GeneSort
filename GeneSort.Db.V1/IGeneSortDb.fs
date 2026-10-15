@@ -14,20 +14,24 @@ type IGeneSortDb =
     abstract member databaseName : string<databaseName>
 
     abstract member saveAsync : 
+                        geneSortDataMode ->
                         queryParams -> 
                         outputData -> 
                         bool<allowOverwrite> -> 
                             Async<Result<unit, string>>
 
     abstract member loadAsync : 
+                        geneSortDataMode ->
                         queryParams -> 
                             Async<Result<outputData, OutputError>>
 
     abstract member loadIfFoundAsync : 
+                        geneSortDataMode ->
                         queryParams -> 
                             Async<outputData option>
 
     abstract member doesOutPutDataExist : 
+                        geneSortDataMode ->
                         queryParams -> 
                             Async<bool>
 
@@ -39,7 +43,7 @@ type IGeneSortDb =
                         IProgress<string> option ->
                                 Async<Result<runParameters[], string>>
 
-    abstract member MakeQueryParamsFromRunParams :
+    abstract member makeQueryParamsFromRunParams :
                         runParameters ->
-                        outputDataType ->
+                        geneSortDataType ->
                         queryParams option

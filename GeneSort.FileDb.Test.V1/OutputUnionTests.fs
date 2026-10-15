@@ -92,14 +92,14 @@ module private Fixtures =
         spsh_Soss.create(soss.SorterPoolSetId, 9<generationNumber>,
             [spHistory_Soss.create(poolId, 9<generationNumber>, [memberHistorySoss])])
     let outputs =
-        [ outputDataType.SorterPoolSet "", outputData.SorterPoolSet (sorterPoolSet.Standard standard)
-          outputDataType.SorterPoolSet "", outputData.SorterPoolSet (sorterPoolSet.Soss soss)
-          outputDataType.SorterPoolSetSummarySet "", outputData.SorterPoolSetSummarySet (spSummarySet.Standard summarySetStandard)
-          outputDataType.SorterPoolSetSummarySet "", outputData.SorterPoolSetSummarySet (spSummarySet.Soss summarySetSoss)
-          outputDataType.SorterPoolBinsSetSeries "", outputData.SorterPoolBinsSetSeries (sorterPoolBinsSetSeries.Standard binsStandard)
-          outputDataType.SorterPoolBinsSetSeries "", outputData.SorterPoolBinsSetSeries (sorterPoolBinsSetSeries.Soss binsSoss)
-          outputDataType.SorterPoolSetHistory "", outputData.SorterPoolSetHistory (spsh.Standard historyStandard)
-          outputDataType.SorterPoolSetHistory "", outputData.SorterPoolSetHistory (spsh.Soss historySoss) ]
+        [ geneSortDataType.SorterPoolSet "", outputData.SorterPoolSet (sorterPoolSet.Standard standard)
+          geneSortDataType.SorterPoolSet "", outputData.SorterPoolSet (sorterPoolSet.Soss soss)
+          geneSortDataType.SorterPoolSetSummarySet "", outputData.SorterPoolSetSummarySet (spSummarySet.Standard summarySetStandard)
+          geneSortDataType.SorterPoolSetSummarySet "", outputData.SorterPoolSetSummarySet (spSummarySet.Soss summarySetSoss)
+          geneSortDataType.SorterPoolBinsSetSeries "", outputData.SorterPoolBinsSetSeries (sorterPoolBinsSetSeries.Standard binsStandard)
+          geneSortDataType.SorterPoolBinsSetSeries "", outputData.SorterPoolBinsSetSeries (sorterPoolBinsSetSeries.Soss binsSoss)
+          geneSortDataType.SorterPoolSetHistory "", outputData.SorterPoolSetHistory (spsh.Standard historyStandard)
+          geneSortDataType.SorterPoolSetHistory "", outputData.SorterPoolSetHistory (spsh.Soss historySoss) ]
     let serialized = function
         | outputData.SorterPoolSet value -> MessagePackSerializer.Serialize(SorterPoolSetDto.fromDomain value)
         | outputData.SorterPoolSetSummarySet value -> MessagePackSerializer.Serialize(SpSummarySetDto.fromDomain value)
@@ -161,13 +161,13 @@ module OutputUnionTests =
         QueryParamsBuilders.registerAll ()
         let builder = QueryParamsCatalog.get QueryCatalogNames.sorterSgdMsufSoss (UMX.tag "Test") (UMX.tag "Soss")
         let query duration =
-            builder (parameters.WithGenerationsPerMergedSet(Some duration)) (outputDataType.SorterPoolSet "")
+            builder (parameters.WithGenerationsPerMergedSet(Some duration)) (geneSortDataType.SorterPoolSet "")
             |> Option.get
         let shortQuery = query 25<generationsPerSubset>
         let longQuery = query 250<generationsPerSubset>
         Assert.Equal("25", shortQuery.Properties.[runParameters.generationsPerMergedSetKey])
         Assert.NotEqual(shortQuery.Id, longQuery.Id)
-        Assert.True((builder parameters (outputDataType.SorterPoolSet "")).IsNone)
+        Assert.True((builder parameters (geneSortDataType.SorterPoolSet "")).IsNone)
 
     [<Theory>]
     [<InlineData(100, 0, true)>]
@@ -632,10 +632,49 @@ module OutputUnionTests =
         for dataType, original in Fixtures.outputs do
             Fixtures.withFolder (fun folder ->
                 let qp = Fixtures.query dataType
-                OutputDataFile.saveToFileAsync folder qp original (UMX.tag<allowOverwrite> false)
+                OutputDataFile.saveToFileAsync folder geneSortDataMode.Results qp original (UMX.tag<allowOverwrite> false)
                 |> Async.RunSynchronously |> Fixtures.unwrap
-                let loaded = OutputDataFile.getOutputDataAsync folder qp None |> Async.RunSynchronously |> Fixtures.unwrap
+                let loaded = OutputDataFile.getOutputDataAsync folder geneSortDataMode.Results qp None |> Async.RunSynchronously |> Fixtures.unwrap
                 Assert.True(Fixtures.serialized original = Fixtures.serialized loaded, "Workflow tag or nested payload changed."))
+
+    [<Fact>]
+    let ``data modes isolate result files and database lookups`` () =
+        MessagePackSetup.configure()
+        Fixtures.withFolder (fun folder ->
+            let db = GeneSortDbMp(folder, QueryCatalogNames.sorterSgdMsufSoss) :> IGeneSortDb
+            let dataType, original = Fixtures.outputs.[0]
+            let qp = Fixtures.query dataType
+            for mode in [geneSortDataMode.Project; geneSortDataMode.Setup; geneSortDataMode.Results] do
+                Assert.False(db.doesOutPutDataExist mode qp |> Async.RunSynchronously)
+                Assert.True((db.loadIfFoundAsync mode qp |> Async.RunSynchronously).IsNone)
+                db.saveAsync mode qp original (UMX.tag false) |> Async.RunSynchronously |> Fixtures.unwrap
+                let path = OutputDataFile.getFullOutputDataFilePath folder mode qp |> UMX.untag
+                Assert.Equal(Path.Combine(%folder, GeneSortDataMode.toFolderName mode, "SorterPoolSet", "0", string %qp.Id + ".msgpack"), path)
+                Assert.True(File.Exists path)
+                Assert.True(db.doesOutPutDataExist mode qp |> Async.RunSynchronously)
+                let loaded = db.loadAsync mode qp |> Async.RunSynchronously |> Fixtures.unwrap
+                Assert.True(Fixtures.serialized original = Fixtures.serialized loaded)
+                Assert.True((db.loadIfFoundAsync mode qp |> Async.RunSynchronously).IsSome))
+
+    [<Fact>]
+    let ``runs and run parameters always use Project and bulk loading finds parameters`` () =
+        MessagePackSetup.configure()
+        Fixtures.withFolder (fun folder ->
+            let runName = UMX.tag<runName> "TestRun"
+            let runQuery = Fixtures.query (geneSortDataType.Run runName)
+            let paramQuery = Fixtures.query (geneSortDataType.RunParameters runName)
+            for mode in [geneSortDataMode.Project; geneSortDataMode.Setup; geneSortDataMode.Results] do
+                let runPath = OutputDataFile.getFullOutputDataFilePath folder mode runQuery |> UMX.untag
+                Assert.Equal(Path.Combine(%folder, "Project", "Run", "TestRun", "Run_TestRun.msgpack"), runPath)
+                let paramPath = OutputDataFile.getFullOutputDataFilePath folder mode paramQuery |> UMX.untag
+                Assert.Equal(Path.Combine(%folder, "Project", "Run", "RunParameters_TestRun", "0", string %paramQuery.Id + ".msgpack"), paramPath)
+            let parameters = runParameters.create (Map.ofList [runParameters.replKey, "0"])
+            OutputDataFile.saveToFileAsync folder geneSortDataMode.Results paramQuery (outputData.RunParameters parameters) (UMX.tag false)
+            |> Async.RunSynchronously |> Fixtures.unwrap
+            let loaded = OutputDataFile.getRunParameters folder runName (Some 0<replNumber>) (Some 1<replNumber>) None None
+                         |> Async.RunSynchronously |> Fixtures.unwrap
+            Assert.Single(loaded) |> ignore
+            Assert.True(parameters.ParamMap = loaded.[0].ParamMap))
 
     [<Fact>]
     let ``legacy Standard files load into Standard union cases`` () =
@@ -648,10 +687,10 @@ module OutputUnionTests =
         for (dataType, expected), bytes in legacyFiles do
             Fixtures.withFolder (fun folder ->
                 let qp = Fixtures.query dataType
-                let path = OutputDataFile.getFullOutputDataFilePath folder qp |> UMX.untag
+                let path = OutputDataFile.getFullOutputDataFilePath folder geneSortDataMode.Results qp |> UMX.untag
                 Directory.CreateDirectory(Path.GetDirectoryName path) |> ignore
                 File.WriteAllBytes(path, bytes)
-                let loaded = OutputDataFile.getOutputDataAsync folder qp None |> Async.RunSynchronously |> Fixtures.unwrap
+                let loaded = OutputDataFile.getOutputDataAsync folder geneSortDataMode.Results qp None |> Async.RunSynchronously |> Fixtures.unwrap
                 Assert.True(Fixtures.serialized expected = Fixtures.serialized loaded, "Legacy Standard payload changed."))
 
     [<Fact>]

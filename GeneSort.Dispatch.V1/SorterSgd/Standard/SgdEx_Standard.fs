@@ -53,9 +53,9 @@ module SgdEx_Standard =
 
             // Save SorterPoolSetSummaries
             let! qpSsrr = 
-                genDb.MakeQueryParamsFromRunParams rp (outputDataType.SorterPoolSet "")
+                genDb.makeQueryParamsFromRunParams rp (geneSortDataType.SorterPoolSet "")
                 |> Result.ofOption "Failed to create QueryParams for seedSorterRunResult."   
-            do! genDb.saveAsync qpSsrr (evaluatedSeedSet |> sorterPoolSet.Standard |> outputData.SorterPoolSet) (false |> UMX.tag<allowOverwrite>)
+            do! genDb.saveAsync geneSortDataMode.Results qpSsrr (evaluatedSeedSet |> sorterPoolSet.Standard |> outputData.SorterPoolSet) (false |> UMX.tag<allowOverwrite>)
             log (sprintf "Initial seedSorterPoolSet saved at generation %d." %evaluatedSeedSet.GenerationNumber)
 
             return evaluatedSeedSet

@@ -59,11 +59,11 @@ module SorterEvalExecutor =
                 let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces
 
                 let! qpSorterSet = 
-                    host.QueryParamsFromRunParams rp (outputDataType.SorterSet "")
+                    host.QueryParamsFromRunParams rp (geneSortDataType.SorterSet "")
                     |> Result.ofOption "Failed to create QueryParams for SorterSet."
 
                 let! qpEval = 
-                    host.QueryParamsFromRunParams rp (outputDataType.SorterSetEval "")
+                    host.QueryParamsFromRunParams rp (geneSortDataType.SorterSetEval "")
                     |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
 
                 let testId = tests |> SortableTests.getId
@@ -91,7 +91,7 @@ module SorterEvalExecutor =
 
                 // 5. Persistence
                 log (sprintf "Saving Combined SorterSetEval %s" (string %qpEval.Id))
-                do! host.RunDb.saveAsync qpEval (finalSorterSetEval |> outputData.SorterSetEval) allowOverwrite
+                do! host.RunDb.saveAsync geneSortDataMode.Results qpEval (finalSorterSetEval |> outputData.SorterSetEval) allowOverwrite
                 
                 log "Run Complete."
                 return rp.WithRunFinished (Some true)

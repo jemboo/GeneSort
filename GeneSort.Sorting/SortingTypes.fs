@@ -77,10 +77,10 @@ module SortableDataFormat =
         [ IntArray; BoolArray ]
 
 module SortableTestsPartitionId =
-    let Default = "0" |> UMX.tag<sortableTestsPartitionId>
+    let Default = "Default" |> UMX.tag<sortableTestsPartitionId>
 
 module SortableTestsSubsetId =
-    let Default = "0" |> UMX.tag<sortableTestsSubsetId>
+    let Default = "Default" |> UMX.tag<sortableTestsSubsetId>
 
 
 module GenerationsPerSubset =

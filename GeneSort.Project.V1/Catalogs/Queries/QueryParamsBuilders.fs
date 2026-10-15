@@ -39,7 +39,7 @@ module QueryParamsBuilders =
                     (seedModR: float<seedModificationRate>)
                     (modR: float<modificationRate>)
                     (mmod: int<mutationMod>)
-                    (outDt: outputDataType) : queryParams =
+                    (outDt: geneSortDataType) : queryParams =
                 queryParams.create dbName projectName (Some repl) (Some genCurrent) outDt
                     [|
                         (runParameters.codeModKey, (Some codeMod) |> CodeModKey.toString)
@@ -58,7 +58,7 @@ module QueryParamsBuilders =
                     (projectName: string<projectName>)
                     (dbName: string<databaseName>)
                     (rp: runParameters)
-                    (odt: outputDataType) : queryParams option =
+                    (odt: geneSortDataType) : queryParams option =
                 maybe {
                     let! repl = rp.GetRepl()
                     let! codeMod = rp.GetCodeModKey()
@@ -89,7 +89,7 @@ module QueryParamsBuilders =
                         (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
                     |]
 
-            let queryParamsFromRunParams projectName dbName (rp: runParameters) (odt: outputDataType) =
+            let queryParamsFromRunParams projectName dbName (rp: runParameters) (odt: geneSortDataType) =
                 maybe {
                     let! repl = rp.GetRepl()
                     let! codeMod = rp.GetCodeModKey()
@@ -116,7 +116,7 @@ module QueryParamsBuilders =
                         (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
                     |]
 
-            let queryParamsFromRunParams projectName dbName (rp: runParameters) (odt: outputDataType) =
+            let queryParamsFromRunParams projectName dbName (rp: runParameters) (odt: geneSortDataType) =
                 maybe {
                     let! repl = rp.GetRepl()
                     let! codeMod = rp.GetCodeModKey()

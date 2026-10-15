@@ -74,7 +74,7 @@ module Reporting =
                 let finalRp = rp.WithGenerationCurrent(Some lastGen )
 
                 let! qpReport = 
-                    genDb.MakeQueryParamsFromRunParams finalRp (outputDataType.TextReport reportName)
+                    genDb.makeQueryParamsFromRunParams finalRp (geneSortDataType.TextReport reportName)
                     |> Result.ofOption (sprintf "Failed to create QueryParams for output %s." reportNameTag)
 
                 // 4. Combine metadata lead columns with dynamic records
@@ -85,7 +85,7 @@ module Reporting =
 
                 // 5. Hard stop before saving if cancellation was requested
                 do! checkCancellation cts.Token
-                do! genDb.saveAsync qpReport (report |> outputData.TextReport) allowOverwrite
+                do! genDb.saveAsync geneSortDataMode.Results qpReport (report |> outputData.TextReport) allowOverwrite
 
                 log (sprintf "%s successfully completed." reportNameTag)
                 return finalRp

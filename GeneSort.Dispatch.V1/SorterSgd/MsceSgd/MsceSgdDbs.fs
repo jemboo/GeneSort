@@ -45,7 +45,7 @@ module MsceSgdDbs =
                             (dsh: bool<distinctSorterHashes>)
                             (pNm: bool<prioritizeNewMutants>)
                             (sfrac: float<sortedFraction>)
-                            (odt: outputDataType) : queryParams =
+                            (odt: geneSortDataType) : queryParams =
                 queryParams.create dbName projectName (Some repl) None odt
                     [| 
                        (runParameters.rngTypeKey, rng |> RngType.toString)
@@ -71,7 +71,7 @@ module MsceSgdDbs =
 
             let queryParamsFromRunParams (projectName: string<projectName>) (dbName: string<databaseName>)
                                     (rp: runParameters) 
-                                    (odt: outputDataType) : queryParams option =
+                                    (odt: geneSortDataType) : queryParams option =
                 maybe {
                     let! rng = rp.GetRngType()
                     let! curGen = rp.GetGenerationCurrent()
@@ -133,7 +133,7 @@ module MsceSgdDbs =
                         (dsh: bool<distinctSorterHashes>)
                         (pNm: bool<prioritizeNewMutants>)
                         (sfrac: float<sortedFraction>)
-                        (outputDataType: outputDataType) : queryParams =
+                        (outputDataType: geneSortDataType) : queryParams =
 
                 queryParams.create 
                     dbName projectName
@@ -167,7 +167,7 @@ module MsceSgdDbs =
 
             let queryParamsFromRunParams (projectName: string<projectName>) (dbName: string<databaseName>)
                                     (rp: runParameters) 
-                                    (odt: outputDataType) : queryParams option =
+                                    (odt: geneSortDataType) : queryParams option =
                 maybe {
                     let! rng = rp.GetRngType()
                     let! curGen = rp.GetGenerationCurrent()
