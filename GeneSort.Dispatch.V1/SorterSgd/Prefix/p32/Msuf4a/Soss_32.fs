@@ -23,7 +23,8 @@ let dbPool512name = "Pool_512" |> UMX.tag<databaseName>
 
 let Pool_4_Debug (executorType: sorterSgdExecutorType)  : run =
     run.SgdRun (
-        SgdRun.create EvolutionMakerNames.sossPrefix
+        SgdRun.create 
+            EvolutionMakerNames.sossPrefix
             dbPool4name
             projName
             (sprintf @"Pool_4_Debug%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag<runName>)
@@ -56,7 +57,8 @@ let Pool_4_Debug (executorType: sorterSgdExecutorType)  : run =
 
 let Pool_32_Gens15 (executorType: sorterSgdExecutorType)  : run =
     run.SgdRun (
-        SgdRun.create EvolutionMakerNames.sossPrefix
+        SgdRun.create 
+            EvolutionMakerNames.sossPrefix
             dbPool32name
             projName
             (sprintf @"Pool_32_Gens15%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag<runName>)
@@ -90,7 +92,8 @@ let Pool_32_Gens15 (executorType: sorterSgdExecutorType)  : run =
 
 let Pool_32_Test_null (executorType: sorterSgdExecutorType)  : run =
     run.SgdRun (
-        SgdRun.create EvolutionMakerNames.sossPrefix
+        SgdRun.create 
+            EvolutionMakerNames.sossPrefix
             dbPool32name
             projName
             (sprintf @"Pool_32_Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag<runName>)
@@ -126,7 +129,8 @@ let Pool_32_Test_null (executorType: sorterSgdExecutorType)  : run =
 
 let Pool_128_Test (executorType: sorterSgdExecutorType)  : run =
     run.SgdRun (
-        SgdRun.create EvolutionMakerNames.sossPrefix
+        SgdRun.create 
+            EvolutionMakerNames.sossPrefix
             dbPool128name
             projName
             (sprintf @"Pool_128_Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag<runName>)
@@ -162,7 +166,8 @@ let Pool_128_Test (executorType: sorterSgdExecutorType)  : run =
 
 let Pool_32_V1 (executorType: sorterSgdExecutorType)  : run =
     run.SgdRun (
-        SgdRun.create EvolutionMakerNames.sossPrefix
+        SgdRun.create 
+           EvolutionMakerNames.sossPrefix
             dbPool32name
             projName
             (sprintf @"Pool_32_V1%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
@@ -194,7 +199,8 @@ let Pool_32_V1 (executorType: sorterSgdExecutorType)  : run =
 
 let Pool_512_V2a (executorType: sorterSgdExecutorType)  : run =
     run.SgdRun (
-        SgdRun.create EvolutionMakerNames.sossPrefix
+        SgdRun.create 
+            EvolutionMakerNames.sossPrefix
             dbPool512name
             projName
             (sprintf @"Pool_512_V2a%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
