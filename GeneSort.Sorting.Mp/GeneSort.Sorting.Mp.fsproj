@@ -18,6 +18,7 @@
     <Compile Include="Sortable\SortableUint8v256TestsDto.fs" />
     <Compile Include="Sortable\SortableUint8v512TestsDto.fs" />
     <Compile Include="Sortable\SortableTestsDto.fs" />
+    <Compile Include="Sortable\SortableTestsWithPrefixDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

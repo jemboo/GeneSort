@@ -6,15 +6,18 @@ open GeneSort.Core
 open GeneSort.SortingOps
 open GeneSort.Sorting.Sorter
 open GeneSort.Eval.V1.Sgd
+open GeneSort.Model.Sorting.V1
 
 
 type outputData =
     | Run of run
     | RunParameters of runParameters
     | SortableTests of sortableTests
+    | SortableTestsWithPrefix of sortableTests * ce array
     | SorterPoolSet of sorterPoolSet
     | SorterPoolSetSummarySet of spSummarySet
     | SorterSet of sorterSet
+    | SorterModelSet of sorterModelSet
     | SorterSetEval of sorterSetEval
     | SorterPoolBinsSetSeries of sorterPoolBinsSetSeries
     | SorterPoolSetHistory of spsh
@@ -23,6 +26,10 @@ type outputData =
 
 
 module OutputData =
+
+    let asSorterModelSet = function
+        | SorterModelSet models -> Ok models
+        | _ -> Error "Database returned data, but it was not a SorterModelSet."
 
     let asRun = function
         | Run msebs -> Ok msebs
@@ -35,6 +42,10 @@ module OutputData =
     let asSortableTests = function
         | SortableTests st -> Ok st
         | _ -> Error "Database returned data, but it was not a SortableTests."
+
+    let asSortableTestsWithPrefix = function
+        | SortableTestsWithPrefix (tests, prefix) -> Ok (tests, prefix)
+        | _ -> Error "Database returned data, but it was not SortableTestsWithPrefix."
 
     let asSorterPoolSet = function
         | SorterPoolSet ss -> Ok ss

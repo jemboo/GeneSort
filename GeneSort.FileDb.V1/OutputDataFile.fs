@@ -22,6 +22,8 @@ open GeneSort.Core
 open GeneSort.Eval.Mp.V1.Bins
 open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Eval.V1.Sgd.Bins.Standard
+open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sorting.Mp.V1
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder
@@ -137,10 +139,20 @@ module OutputDataFile =
                             let! domain = deserializeDto<sorterSetDto, sorterSet> stream token SorterSetDto.toDomain
                             return outputData.SorterSet domain
                         }
+                    | geneSortDataType.SorterModelSet _ ->
+                        async {
+                            let! domain = deserializeDto<sorterModelSetDto, sorterModelSet> stream token SorterModelSetDto.toDomain
+                            return outputData.SorterModelSet domain
+                        }
                     | geneSortDataType.SortableTests _ ->
                         async {
                             let! domain = deserializeDto<sortableTestsDto, sortableTests> stream token SortableTestsDto.toDomain
                             return outputData.SortableTests domain
+                        }
+                    | geneSortDataType.SortableTestsWithPrefix _ ->
+                        async {
+                            let! domain = deserializeDto<sortableTestsWithPrefixDto, sortableTests * ce array> stream token SortableTestsWithPrefixDto.toDomain
+                            return outputData.SortableTestsWithPrefix domain
                         }
                     | geneSortDataType.SorterSetEval _ ->
                         async {
@@ -225,8 +237,12 @@ module OutputDataFile =
                                 serializeDto stream ss SpSummarySetDto.fromDomain
                             | outputData.SorterSet ss ->
                                 serializeDto stream ss SorterSetDto.fromDomain
+                            | outputData.SorterModelSet models ->
+                                serializeDto stream models SorterModelSetDto.fromDomain
                             | outputData.SortableTests sts ->
                                  serializeDto stream sts SortableTestsDto.fromDomain
+                            | outputData.SortableTestsWithPrefix (tests, prefix) ->
+                                serializeDto stream (tests, prefix) SortableTestsWithPrefixDto.fromDomain
                             | outputData.SorterSetEval sse ->
                                 serializeDto stream sse SorterSetEvalDto.fromDomain                         
                             | outputData.SorterPoolBinsSetSeries sse ->

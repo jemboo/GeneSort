@@ -25,6 +25,7 @@
     <Compile Include="Simple\SimpleSorterModelGenDto.fs" />
     <Compile Include="Simple\SimpleSorterModelMutateDto.fs" />
     <Compile Include="SorterModelDto.fs" />
+    <Compile Include="SorterModelSetDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

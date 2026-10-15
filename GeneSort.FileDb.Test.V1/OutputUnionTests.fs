@@ -116,6 +116,74 @@ module private Fixtures =
 
 module OutputUnionTests =
     [<Theory>]
+    [<InlineData(0)>]
+    [<InlineData(2)>]
+    let ``sorter model sets round trip as setup data`` (count: int) =
+        MessagePackSetup.configure()
+        Fixtures.withFolder (fun folder ->
+            let models =
+                Array.init count (fun index ->
+                    msce.create (UMX.tag (Guid.NewGuid())) 4<sortingWidth> [| 1; 2 + index |]
+                    |> simpleSorterModel.Msce |> sorterModel.Simple)
+            let original = sorterModelSet.create (UMX.tag (Guid.NewGuid())) models 17<ceLength>
+            let dataType = geneSortDataType.SorterModelSet "evaluation_setup"
+            let query = Fixtures.query dataType
+            OutputDataFile.saveToFileAsync folder geneSortDataMode.Setup query (outputData.SorterModelSet original) (UMX.tag false)
+            |> Async.RunSynchronously |> Fixtures.unwrap
+            let loaded =
+                OutputDataFile.getOutputDataAsync folder geneSortDataMode.Setup query None
+                |> Async.RunSynchronously |> Fixtures.unwrap
+                |> OutputData.asSorterModelSet |> Fixtures.unwrap
+            Assert.Equal(original.Id, loaded.Id)
+            Assert.Equal(original.RawCeLength, loaded.RawCeLength)
+            Assert.Equal(count, loaded.Count)
+            let serialize value =
+                value |> GeneSort.Model.Sorting.Mp.V1.SorterModelSetDto.fromDomain |> MessagePackSerializer.Serialize
+            Assert.True(serialize original = serialize loaded)
+            Assert.Equal(Some dataType, OutputDataType.fromFolderName (OutputDataType.toFolderName dataType))
+            Assert.Equal(dataType, dataType |> GeneSort.Project.Mp.V1.OutputDataTypeDto.fromDomain |> GeneSort.Project.Mp.V1.OutputDataTypeDto.toDomain)
+            Assert.True(OutputData.asSorterModelSet (outputData.SorterPoolSet (sorterPoolSet.Soss Fixtures.soss)) |> Result.isError)
+            let path = OutputDataFile.getFullOutputDataFilePath folder geneSortDataMode.Setup query |> UMX.untag
+            Assert.True(File.Exists path)
+            Assert.Contains(Path.Combine("Setup", "SorterModelSet_evaluation_setup"), path)
+            let resultPath = OutputDataFile.getFullOutputDataFilePath folder geneSortDataMode.Results query |> UMX.untag
+            Assert.False(File.Exists resultPath))
+
+    [<Theory>]
+    [<InlineData(false)>]
+    [<InlineData(true)>]
+    let ``sortable tests with prefix round trip as setup data`` (hasPrefix: bool) =
+        MessagePackSetup.configure()
+        Fixtures.withFolder (fun folder ->
+            let tests =
+                GeneSort.Sorting.Sortable.sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 4<sortingWidth>
+                    [| GeneSort.Sorting.Sortable.sortableBoolArray.create([| true; false; true; false |], 4<sortingWidth>) |]
+                |> GeneSort.Sorting.Sortable.sortableTests.Bools
+            let prefix = if hasPrefix then [| ce.create 0 3; ce.create 1 2; ce.create 0 1 |] else [||]
+            let dataType = geneSortDataType.SortableTestsWithPrefix "evaluation_setup"
+            let query = Fixtures.query dataType
+            let original = outputData.SortableTestsWithPrefix (tests, prefix)
+            OutputDataFile.saveToFileAsync folder geneSortDataMode.Setup query original (UMX.tag false)
+            |> Async.RunSynchronously |> Fixtures.unwrap
+            let loadedTests, loadedPrefix =
+                OutputDataFile.getOutputDataAsync folder geneSortDataMode.Setup query None
+                |> Async.RunSynchronously |> Fixtures.unwrap
+                |> OutputData.asSortableTestsWithPrefix |> Fixtures.unwrap
+            Assert.Equal(GeneSort.Sorting.Sortable.SortableTests.getId tests, GeneSort.Sorting.Sortable.SortableTests.getId loadedTests)
+            let serializeTests value =
+                value |> GeneSort.Sorting.Mp.Sortable.SortableTestsDto.fromDomain |> MessagePackSerializer.Serialize
+            Assert.True(serializeTests tests = serializeTests loadedTests)
+            Assert.True((prefix = loadedPrefix))
+            Assert.Equal(Some dataType, OutputDataType.fromFolderName (OutputDataType.toFolderName dataType))
+            Assert.Equal(dataType, dataType |> GeneSort.Project.Mp.V1.OutputDataTypeDto.fromDomain |> GeneSort.Project.Mp.V1.OutputDataTypeDto.toDomain)
+            Assert.True(OutputData.asSortableTestsWithPrefix (outputData.SortableTests tests) |> Result.isError)
+            let path = OutputDataFile.getFullOutputDataFilePath folder geneSortDataMode.Setup query |> UMX.untag
+            Assert.True(File.Exists path)
+            Assert.Contains(Path.Combine("Setup", "SortableTestsWithPrefix_evaluation_setup"), path)
+            let resultPath = OutputDataFile.getFullOutputDataFilePath folder geneSortDataMode.Results query |> UMX.untag
+            Assert.False(File.Exists resultPath))
+
+    [<Theory>]
     [<InlineData(25, 399, "3")>]
     [<InlineData(25, 400, "Merge")>]
     [<InlineData(25, 424, "Merge")>]

@@ -22,7 +22,9 @@ type geneSortDataType =
     | SorterPoolSet of string
     | SorterPoolSetSummarySet of string
     | SorterSet of string
+    | SorterModelSet of string
     | SortableTests of string
+    | SortableTestsWithPrefix of string
     | SorterSetEval of string
     | SorterPoolBinsSetSeries of string
     | SorterPoolSetHistory of string
@@ -40,7 +42,9 @@ module OutputDataType =
         | SorterPoolSet s -> appendParam "SorterPoolSet" %s
         | SorterPoolSetSummarySet s -> appendParam "SorterPoolSetSummarySet" %s
         | SorterSet s -> appendParam "SorterSet" s
+        | SorterModelSet s -> appendParam "SorterModelSet" s
         | SortableTests s -> appendParam "SortableTests" s
+        | SortableTestsWithPrefix s -> appendParam "SortableTestsWithPrefix" s
         | SorterSetEval s -> appendParam "SorterSetEval" s
         | SorterPoolBinsSetSeries s -> appendParam "SorterPoolBinsSetSeries" s
         | SorterPoolSetHistory s -> appendParam "SorterPoolSetHistoryCollection" s
@@ -57,7 +61,9 @@ module OutputDataType =
         | "SorterPoolSet" -> Some (SorterPoolSet param)
         | "SorterPoolSetSummarySet" -> Some (SorterPoolSetSummarySet param)
         | "SorterSet" -> Some (SorterSet param)
+        | "SorterModelSet" -> Some (SorterModelSet param)
         | "SortableTests" -> Some (SortableTests param)
+        | "SortableTestsWithPrefix" -> Some (SortableTestsWithPrefix param)
         | "SorterSetEval" -> Some (SorterSetEval param)
         | "SorterPoolBinsSetSeries" -> Some (SorterPoolBinsSetSeries param)
         | "SorterPoolSetHistoryCollection" -> Some (SorterPoolSetHistory param)

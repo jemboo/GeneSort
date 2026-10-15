@@ -19,8 +19,8 @@ open GeneSort.Dispatch.V1.OpsUtils
 module SorterEvalExecutor =
 
     let _makeSorterEvals 
-            (makeSorterModelSet: runParameters -> sorterModelSet option)
-            (makeSortableTests: runParameters -> Async<Result<sortableTests * (ce array), string>>)
+            (makeSorterModelSet: runParameters -> Async<Result<unit, string>>)
+            (makeSortableTests: runParameters -> Async<Result<unit, string>>)
             (host: runHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
@@ -36,9 +36,15 @@ module SorterEvalExecutor =
                 do! checkCancellation cts.Token
                 
                 // 1. Unpack run configuration
-                let! modelSet = 
-                    makeSorterModelSet rp 
-                    |> Result.ofOption "Failed: SorterModelSet could not be initialized from parameters."
+                log "Generating and saving SorterModelSet..."
+                do! makeSorterModelSet rp
+                do! checkCancellation cts.Token
+                let! qpModels =
+                    host.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
+                    |> Result.ofOption "Failed to create QueryParams for SorterModelSet."
+                log "Loading saved SorterModelSet..."
+                let! savedModels = host.RunDb.loadAsync geneSortDataMode.Setup qpModels
+                let! modelSet = savedModels |> OutputData.asSorterModelSet
 
                 let! sWidth = 
                     rp.GetSortingWidth() 
@@ -54,8 +60,15 @@ module SorterEvalExecutor =
 
                 // 2. Generate common evaluation dependencies
                 do! checkCancellation cts.Token
-                log "Generating Sortable Tests..."
-                let! (tests, ces) = makeSortableTests rp 
+                log "Generating and saving Sortable Tests with prefix..."
+                do! makeSortableTests rp
+                do! checkCancellation cts.Token
+                let! qpTests =
+                    host.QueryParamsFromRunParams rp (geneSortDataType.SortableTestsWithPrefix "")
+                    |> Result.ofOption "Failed to create QueryParams for SortableTestsWithPrefix."
+                log "Loading saved Sortable Tests with prefix..."
+                let! savedTests = host.RunDb.loadAsync geneSortDataMode.Setup qpTests
+                let! tests, ces = savedTests |> OutputData.asSortableTestsWithPrefix
                 let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces
 
                 let! qpSorterSet = 
@@ -111,24 +124,24 @@ module SorterEvalExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvals 
-                    SorterModelSetMakers.makeUniformSorterModelSet
-                    SortableTestsMakers.makeStandardTests
+                    (SorterModelSetMakers.makeUniformSorterModelSet host allowOverwrite)
+                    (SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests host allowOverwrite)
                     host rp allowOverwrite cts progress }
 
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvals 
-                    SorterModelSetMakers.makeUniformSorterModelSet
-                    SortableTestsMakers.makeMergeTests
+                    (SorterModelSetMakers.makeUniformSorterModelSet host allowOverwrite)
+                    (SortableTestsMakers.storeTests SortableTestsMakers.makeMergeTests host allowOverwrite)
                     host rp allowOverwrite cts progress }
 
     let prefixExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvals 
-                    SorterModelSetMakers.makeUniformSorterModelSet
-                    SortableTestsMakers.getPrefixTests
+                    (SorterModelSetMakers.makeUniformSorterModelSet host allowOverwrite)
+                    (SortableTestsMakers.storeTests SortableTestsMakers.getPrefixTests host allowOverwrite)
                     host rp allowOverwrite cts progress }
 
 

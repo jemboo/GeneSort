@@ -9,8 +9,25 @@ open GeneSort.Sorting.Sortable
 open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1.SortableTests
 open GeneSort.SortingLib.Sorter
+open GeneSort.Db.V1
+open GeneSort.Dispatch.V1
 
 module SortableTestsMakers =
+
+    /// Persists evaluation setup; callers load it through the same query catalog.
+    let storeTests
+            (makeTests: runParameters -> Async<Result<sortableTests * ce array, string>>)
+            (host: runHost)
+            (allowOverwrite: bool<allowOverwrite>)
+            (rp: runParameters) : Async<Result<unit, string>> =
+        asyncResult {
+            let! query =
+                host.QueryParamsFromRunParams rp (geneSortDataType.SortableTestsWithPrefix "")
+                |> Result.requireSome "Failed to create QueryParams for SortableTestsWithPrefix."
+            let! tests, prefix = makeTests rp
+            return! host.RunDb.saveAsync geneSortDataMode.Setup query
+                        (outputData.SortableTestsWithPrefix (tests, prefix)) allowOverwrite
+        }
 
     let makeStandardTests (rp: runParameters) : Async<Result<sortableTests * (ce array), string>> =
         async {
