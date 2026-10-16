@@ -90,11 +90,11 @@ module SgdEx_Soss =
                 let! partitionCount = rp.GetPartitionCount() |> Result.ofOption "Missing PartitionCount."
                 do! if %partitionCount > 0 then Ok () else Error "PartitionCount must be greater than zero."
 
-                log "Executing makeSortableTests..."
+                log "Loading or creating Setup SortableTestsWithPrefix..."
                 let! sWidth = 
                     rp.GetSortingWidth() 
                     |> Result.ofOption "Missing sorting width."
-                let! (sortableTests, ces) = makeSortableTests rp 
+                let! (sortableTests, ces) = Utils.loadOrCreateSortableTestsWithPrefix makeSortableTests genDb rp
                 let! seedSoss =
                     rp.GetSeedSoss()
                     |> Result.ofOption "Missing SeedSoss."

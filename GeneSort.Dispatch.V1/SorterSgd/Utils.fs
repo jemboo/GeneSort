@@ -10,8 +10,31 @@ open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.SortingOps
 open GeneSort.Eval.V1.Sgd.Soss
+open GeneSort.Sorting.Sortable
+open GeneSort.Sorting.Sorter
 
 module Utils =
+
+    /// Reuses run setup across checkpoints, or creates and persists it before evolution.
+    let loadOrCreateSortableTestsWithPrefix
+            (makeTests: runParameters -> Async<Result<sortableTests * ce array, string>>)
+            (genDb: IGeneSortDb)
+            (rp: runParameters) : Async<Result<sortableTests * ce array, string>> =
+        asyncResult {
+            let setupRp = rp.WithGenerationCurrent(Some (UMX.tag<generationNumber> 0))
+            let! query =
+                genDb.makeQueryParamsFromRunParams setupRp (geneSortDataType.SortableTestsWithPrefix "")
+                |> Result.ofOption "Failed to create QueryParams for Setup SortableTestsWithPrefix."
+            let! exists = genDb.doesOutPutDataExist geneSortDataMode.Setup query
+            if exists then
+                let! savedTests = genDb.loadAsync geneSortDataMode.Setup query
+                return! OutputData.asSortableTestsWithPrefix savedTests
+            else
+                let! (tests, prefix) = makeTests setupRp
+                do! genDb.saveAsync geneSortDataMode.Setup query
+                        (outputData.SortableTestsWithPrefix (tests, prefix)) (UMX.tag<allowOverwrite> false)
+                return tests, prefix
+        }
 
     /// Helper to evaluate one generation step asynchronously without accumulating history.
     let private tryLoadOutputDataForGen<'T>

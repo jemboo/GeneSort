@@ -85,11 +85,11 @@ module SgdEx_Standard =
             try
                 do! checkCancellation cts.Token
 
-                log "Executing makeSortableTests..."
+                log "Loading or creating Setup SortableTestsWithPrefix..."
                 let! sWidth = 
                     rp.GetSortingWidth() 
                     |> Result.ofOption "Missing sorting width."
-                let! (sortableTests, ces) = makeSortableTests rp 
+                let! (sortableTests, ces) = Utils.loadOrCreateSortableTestsWithPrefix makeSortableTests genDb rp
                 let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces
 
                 // 1. Check for existing checkpoints directly via genDb

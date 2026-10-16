@@ -29,6 +29,7 @@ module SorterSgdExecutorType =
         | SimpleRunHost _ ->
             async { return Error "SGD execution requires an SgdRun with generation save interval names." }
 
+
     let toString = function
         | GenSoss -> "GenSoss"
         | GenStandard -> "GenStandard"
